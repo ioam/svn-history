@@ -22,23 +22,35 @@ From the Makefile (Tabs have been stripped):
 
 $Id$
 """
-
 import pydoc, glob, sys, os
 
 TOPO = 'topo'   # Subdirectory with Topographica source
 DOCS = 'docs'   # Subdirectory to place Docs
 pydoc.writing = 1
 
-os.system('rm -rf ' + DOCS + '/*')
 
-# Generate the files once.  Skip if already generated.
-filelist = glob.glob(TOPO + '/*.py')
-for i in filelist:
-    if not glob.glob(DOCS + '/' + TOPO + '.' + i[len(TOPO)+1:-3] + '.html'):
-        pydoc.writedoc('topo.' + i[len(TOPO)+1:-3])
-    if glob.glob(TOPO + '.' + i[len(TOPO)+1:-3] + '.html'):
-        cline = 'mv -f ' + TOPO + '.' + i[len(TOPO)+1:-3] + '.html ' + DOCS + '/'
-        os.system(cline)
-    else:                   
-        filelist.remove(i)  
+def generate_docs():
+    """
+    Generate all pydoc documentation files within a docs directory under
+    ./topographica according to the constant DOCS.  After generation,
+    there is an index.html that displays all the modules.  Note, if the
+    documentation is being changed, it may be necessary to call
+    'make cleandocs' to force a regeneration of documentation since we
+    don't want to regenerate all the documentation each time a source
+    file is changed.
+    """
+    os.system('rm -rf ' + DOCS + '/*')
+    # Generate the files once.  Skip if already generated.
+    filelist = glob.glob(TOPO + '/*.py')
+    for i in filelist:
+        if not glob.glob(DOCS + '/' + TOPO + '.' + i[len(TOPO)+1:-3] + '.html'):
+            pydoc.writedoc('topo.' + i[len(TOPO)+1:-3])
+        if glob.glob(TOPO + '.' + i[len(TOPO)+1:-3] + '.html'):
+            cline = 'mv -f ' + TOPO + '.' + i[len(TOPO)+1:-3] + '.html ' + DOCS + '/'
+            os.system(cline)
+        else:                   
+            filelist.remove(i)  
+        
 
+if __name__ == '__main__':
+    generate_docs()
