@@ -25,6 +25,7 @@ import inputsheet
 import bitmap
 import sheetview
 import plot
+import histogram
 
 # set import all the important stuff directly into the package
 # namespace.
