@@ -34,6 +34,16 @@ completed successfully but the final notice that says to add the
 DISLIN and PYTHONPATH environment variables will not be displayed.
 ---
 
+If you experience the error:
+  File "C:\Python23\lib\string.py", line 220, in atoi 
+    return _int(s, base)
+TypeError: int() can't convert non-string with explicit base
+
+Then you may be running an old version of Python.  Check your
+Environment Variables in "My Computer -> Properties" to make sure you
+don't have an old version of Python earlier in your path statement
+that is running first.
+---
 
 ===================================================================
 
