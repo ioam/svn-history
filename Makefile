@@ -1,8 +1,8 @@
 # $Id$
 
-all: topographica ext-packages docs
+all: topographica ext-packages  docs
 
-clean: cleandocs
+clean: cleandocs clean-ext-packages
 
 topographica: topographica-script.py Makefile
 	echo "#!/usr/bin/env" ${PWD}/bin/python > topographica
@@ -12,6 +12,9 @@ topographica: topographica-script.py Makefile
 ext-packages:
 	make -C external
 
+clean-ext-packages: 
+	make -C external clean
+	make -C external uninstall
 
 ##############################################################
 # Auto-generated Source Documentation

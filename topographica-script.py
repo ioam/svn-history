@@ -26,8 +26,6 @@ opts = dict(opts)
 interpreter_locals = copy.copy(locals())
 interpreter = code.InteractiveConsole(interpreter_locals)
 
-# set sys.argv to the argumens including and after the first file argument
-sys.argv = args
 
 
 if args:

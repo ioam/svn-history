@@ -3,9 +3,9 @@ PREFIX = ${dir ${CURDIR}}
 
 all: python jpeg pil numeric pmw
 
-clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean
+clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall
 
 ##############################################################
 # Python
@@ -18,16 +18,59 @@ PYTHON_UNINSTALL += bin/idle bin/python bin/pydoc bin/python2.3
 PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.3
 
 
-python: ${PYTHON}.tgz
+python: ${PYTHON}.tgz tk
 	tar xzf ${PYTHON}.tgz
 	cd ${PYTHON}; ./configure --prefix=${PREFIX}
-	make -C ${PYTHON} install
+	env PREFIX=${PREFIX} make -C ${PYTHON} install
 	touch python
 
 python-clean:
 	rm -rf  ${PYTHON} 
 python-uninstall:
 	rm -rf python ${foreach f,${PYTHON_UNINSTALL}, ${PREFIX}/${f}}
+
+##############################################################
+# Tcl
+#
+TCL = tcl8.4.6
+
+TCL_UNINSTALL += bin/tclsh8.4 bin/wish8.4 lib/tclConfig.sh
+TCL_UNINSTALL += lib/tcl8.4 lib.tclConfig.sh lib/libtcl8.4.so lib/libtclstub8.4.a
+TCL_UNINSTALL += include/tcl*.h man/man*
+
+tcl: ${TCL}.tgz 
+	tar xzf ${TCL}.tgz
+	cd ${TCL}/unix; ./configure --prefix=${PREFIX}
+	make -C ${TCL}/unix install
+	touch tcl
+
+tcl-clean:
+	rm -rf  ${TCL} 
+tcl-uninstall:
+	rm -rf tcl ${foreach f,${TCL_UNINSTALL}, ${PREFIX}/${f}}
+
+
+
+##############################################################
+# Tk
+#
+TK = tk8.4.6
+
+TK_UNINSTALL += lib/tk8.4 lib/libtk8.4.so lib/libtkstub8.4.a
+TK_UNINSTALL += include/tk*.h lib/tkConfig.sh
+
+tk: ${TK}.tgz tcl
+	tar xzf ${TK}.tgz
+	cd ${TK}/unix; ./configure --prefix=${PREFIX}
+	make -C ${TK}/unix install
+	touch tk
+
+tk-clean:
+	rm -rf  ${TK} 
+tk-uninstall:
+	rm -rf tk ${foreach f,${TK_UNINSTALL}, ${PREFIX}/${f}}
+
+
 
 #############################################################
 # jpeg
@@ -64,8 +107,8 @@ pil: ${PIL}.tgz jpeg python
 	tar xzf ${PIL}.tgz
 	cd ${PIL}/libImaging; ./configure --prefix=${PREFIX} --with-jpeg=${PREFIX}/lib
 	make -C ${PIL}/libImaging
-	cd ${PIL}; ${PREFIX}/bin/python setup.py build
-	cd ${PIL}; ${PREFIX}/bin/python setup.py install
+	cd ${PIL}; env PREFIX=${PREFIX} ${PREFIX}/bin/python setup.py build
+	cd ${PIL}; env PREFIX=${PREFIX} ${PREFIX}/bin/python setup.py install
 	touch pil
 
 pil-clean:
