@@ -108,6 +108,19 @@ class Bitmap(object):
         """
         self.bitmap.show()
 
+    def width(self): return self.bitmap.size[0]
+    def height(self): return self.bitmap.size[1]
+
+    def zoom(self, factor):
+        """
+        Return a resized Image object, given the input 'factor'
+        parameter.  1.0 is the same size, 2.0 is doubling the height
+        and width, 0.5 is 1/2 the original size.  The original Image
+        is not changed.
+        """
+        x,y = self.bitmap.size
+        zx, zy = x*factor, y*factor
+        return self.bitmap.resize((zx,zy))
 
     def arrayToImage(self, inArray):
         """
