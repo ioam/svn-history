@@ -7,7 +7,7 @@ Defines a class to return Kernels
 """
 
 import debug
-
+import types
 import random
 
 from boundingregion import BoundingBox
@@ -16,6 +16,20 @@ from sheet import sheet2matrix, matrix2sheet
 from Numeric import *
 from pprint import pprint,pformat
 from params import setup_params
+
+
+"""
+produce -- takes in an argument, if its a generator, it calls it 
+           otherwise it treats it as a literal
+"""
+
+def produce(func):
+    #print "Called produce on: ", func
+    if(type(func) != types.GeneratorType): 
+        return func
+    else:
+        return func.next( ) 
+
 
 """
 The width and height of the gaussian are specified in terms of the matrix size, i.e. a gaussian with
@@ -36,62 +50,68 @@ class KernelFactory:
 
     #kernel = array([[1.0]])
 
-    kernel_bounds = BoundingBox( points=((0,0), (1,1)) )
-    kernel_density  = 1.0
+    bounds = BoundingBox( points=((0,0), (1,1)) )
+    density  = 1.0
 
+    # setup some default parameters. keep in mind that these are effectively
+    # meaningless
     x = 0.5 
     y = 0.5
     width = 0.5 
     height = 0.5
     theta = 0.0
-    
+   
+    # the default, we can set this by passing a new value to the init 
     function = gaussian
 
     def __init__(self,**config):
         setup_params(self,KernelFactory,**config)
         #self.kernel = zeros((1,1), Float)
 
-    def create(self,**config):
-        setup_params(self,KernelFactory,**config)
-        (x_min,y_min) = sheet2matrix( self.kernel_bounds.aarect().left(),
-                                      self.kernel_bounds.aarect().top(),
-                                      self.kernel_bounds, 
-                                      self.kernel_density )
+    def create(self):
+        x = produce( self.x )
+        y = produce( self.y )
+        theta = produce( self.theta )
+        width = produce( self.width )
+        height = produce( self.height )
 
-        (x_max,y_max) = sheet2matrix( self.kernel_bounds.aarect().right(),
-                                      self.kernel_bounds.aarect().bottom(),
-                                      self.kernel_bounds, 
-                                      self.kernel_density )
+        # TODO: This is all embedded in matrix2sheet...
+        bound_width  = self.bounds.aarect().right()-self.bounds.aarect().left()
+        bound_height = self.bounds.aarect().top()-self.bounds.aarect().bottom()
+        linear_density = sqrt(self.density)
+
+        # TODO: this can generate ouput that may be off by one in terms of size,
+        # for example most times this generates a 100x100 image, but sometimes
+        # it generates a 101x100 of something like that.
+
+        # TODO: This uses 5 numeric arrays. We can probably simplify this. It is
+        # faster than the previous implementation though.
+
+        kernel_x = arange(self.bounds.aarect().left()-x,
+                          self.bounds.aarect().right()-x, bound_width / linear_density);
+        kernel_y = arange(self.bounds.aarect().bottom()-y,
+                          self.bounds.aarect().top()-y, bound_height / linear_density);
         
-        new_kernel = array([[1.0]])
-        new_kernel = zeros((x_max-x_min+1,y_max-y_min+1), Float)
+        new_kernel_x = subtract.outer(cos(theta)*kernel_x,
+                                      sin(theta)*kernel_y)
+        new_kernel_y = add.outer(sin(theta)*kernel_x,
+                                 cos(theta)*kernel_y)
 
-# Ok, lets dissect this transform:
-# We have a generic function, function, that returns the x and y heights 
-# of a kernel centered at 0,0 with width and height and theta
+        new_kernel = -(new_kernel_x / width)**2 + -(new_kernel_y / height)**2
+        new_kernel = maximum(-100, new_kernel)
 
-# first, we need to get the bounds of the sheet in matrix coords,
-# then we need to iterate over those bounds in matrix coordinates 
-# (the step is calculated by the transform function) and get the 
-# sheet coordinates to feed into the function.  
+        new_kernel = exp(new_kernel)
 
-        for x in range(x_min, x_max+1): # need to ensure we get the boundary points 
-            for y in range(y_min, y_max+1):
-                (sheet_x, sheet_y) = matrix2sheet(x, y, self.kernel_bounds, self.kernel_density)
-        #        print sheet_x, sheet_y
-                (a, b)=self.function(sheet_x-self.x,sheet_y-self.y, self.width, self.height, self.theta)
-                new_kernel[x][y] = a*b
-
-        self.kernel = new_kernel
-
-        return self.kernel
-
+        return new_kernel
 
 
 if __name__ == '__main__':
 
-    l = KernelFactory(kernel_bounds=BoundingBox(points=((0,0), (10,10)), kernel_density=1))
+    l = KernelFactory(bounds=BoundingBox(points=((0,0), (10,10)), density=1))
 
-    print l.create(x=1.0, y=1.0, theta=3.14159/2.0)
-    print l.create(x=2.0, y=2.0)
-    print l.create(x=2.0, y=2.0, width=3, kernel_bounds=BoundingBox(points=((0,0), (1,1))), kernel_density=100)
+    
+
+
+#    print l.create(x=1.0, y=1.0, theta=3.14159/2.0)
+#    print l.create(x=2.0, y=2.0)
+#    print l.create(x=2.0, y=2.0, width=3, bounds=BoundingBox(points=((0,0), (1,1))), density=100)
