@@ -266,7 +266,7 @@ class EventProcessor(TopoObject):
         (by default, do nothing)
         """
         pass
-        
+    
 
 
 class PulseGenerator(EventProcessor):

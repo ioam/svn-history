@@ -14,7 +14,6 @@ import pdb #debugger
 
 print "Setting parameters..."
 
-
 # input generation params
 InputSheet.period = 1.0
 InputSheet.density = 900
@@ -29,7 +28,7 @@ GaussianSheet.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
 
 # rf som parameters
-RFSOM.density = 900
+RFSOM.density = 2500
 RFSOM.rf_width = 0.2
 RFSOM.training_length = 10000
 RFSOM.radius_0 = 0.1
@@ -54,8 +53,8 @@ s.connect(retina,V1,delay=1)
 
 # Uncomment the connections to the image saver, to save all the activation
 # images to disk.
-# s.connect(retina,save,dest_port='retina',delay=1)
-# s.connect(V1,save,dest_port='V1',delay=0)
+s.connect(retina,save,dest_port='retina',delay=2)
+s.connect(V1,save,dest_port='V1',delay=1)
 
 s.run(10000)
 

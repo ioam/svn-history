@@ -6,7 +6,7 @@ $Id$
 from params import Parameter
 from sheet import Sheet
 from utils import mdot
-import RandomArray
+import RandomArray,Numeric
 
 
 ###############################################
@@ -96,8 +96,12 @@ class RFSheet(Sheet):
     rf_type = Parameter(default=RF)
 
     activation_fn = Parameter(default=mdot)
-    transfer_fn  = Parameter(default=lambda x:x)
+    transfer_fn  = Parameter(default=lambda x:Numeric.array(x))
                              
+
+    def __init__(self,**params):
+        super(RFSheet,self).__init__(**params)
+        self.temp_activation = Numeric.array(self.activation)
 
     def _connect_from(self,src,src_port=None,dest_port=None):
         Sheet._connect_from(self,src,src_port,dest_port)
@@ -111,11 +115,11 @@ class RFSheet(Sheet):
     def input_event(self,src,src_port,dest_port,data):
         self.message("Received input from,",src,"at time",self.simulator.time())
         self.train(data,src)
-        self.send_output(data=self.activation)
 
     def pre_sleep(self):
-        self.send_output(data=self.transfer_fn(self.activation))
-        self.activation *= 0.0
+        self.activation = self.transfer_fn(self.temp_activation)
+        self.send_output(data=self.activation)
+        self.temp_activation *= 0.0
 
 
     def present_input(self,input_activation,input_sheet):
@@ -125,7 +129,7 @@ class RFSheet(Sheet):
                 for proj in self.projections[input_sheet.name]:
                     rf = proj.rf(r,c)
                     X = rf.get_input_matrix(input_activation)
-                    self.activation[r,c] += self.activation_fn(X,rf.weights)
+                    self.temp_activation[r,c] += self.activation_fn(X,rf.weights)
 
     def train(self,input_activation,input_sheet):
         raise NYI
