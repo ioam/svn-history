@@ -24,7 +24,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
     display various categories of bitmaps.
     """
     def __init__(self,parent=None,pengine=None,console=None,**config):
-        assert isinstance(pengine,plotengine.PlotEngine) or pengine == None, 'Variable sim not Simulator object.'
+        assert isinstance(pengine,plotengine.PlotEngine) or pengine == None, 'Variable pengine not PlotEngine object.'
 
         Frame.__init__(self,parent,config)
         topo.plot.TopoObject.__init__(self,**config)
@@ -64,12 +64,12 @@ class PlotPanel(Frame,topo.base.TopoObject):
         self.refresh()
 
 
-
     def refresh(self):
         self.do_plot_cmd()
         self.load_images()
         self.display_plots()
         self.display_labels()
+
 
     def do_plot_cmd(self):
         """
@@ -98,14 +98,12 @@ class PlotPanel(Frame,topo.base.TopoObject):
         
 
     def load_images(self):
-
         # need to calculate the old min width, so we know if we need to reset
         # the zoom factors
         if self.images:
             old_min_width = reduce(min,[im.width() for im in self.images])
         else:
             old_min_width = -1
-
 
         self.images = []
         for (figure_tuple, hist_tuple) in self.plot_tuples:
@@ -215,9 +213,9 @@ class PlotPanel(Frame,topo.base.TopoObject):
 
 
 class ActivityPanel(PlotPanel):
-    def __init__(self,parent,pengine,console=None,**config):
+    def __init__(self,parent,pengine=None,console=None,**config):
         self.plot_key = "Activation"
-        PlotPanel.__init__(self,parent,pengine=pengine,console=console,**config)
+        PlotPanel.__init__(self,parent,pengine,console=console,**config)
         self.auto_refresh_checkbutton.invoke()
 
 
@@ -268,6 +266,7 @@ class PreferenceMapPanel(PlotPanel):
                                          'call measure_cog')
                      ).pack(side=LEFT,expand=YES,fill=X)
 
+
     def do_plot_cmd(self):
         Pmw.showbusycursor()
 #        Lissom.cmd(self.cmdname.get())
@@ -275,33 +274,43 @@ class PreferenceMapPanel(PlotPanel):
         PlotPanel.do_plot_cmd(self)
         Pmw.hidebusycursor()
 
+
+
 class WeightsPanel(PlotPanel):
-    def __init__(self,parent,console=None,**config):
+    def __init__(self,parent,pengine,console=None,**config):
 
-        self.row_str = StringVar()
-        self.row_str.set('current_height/2')
+#         self.row_str = StringVar()
+#         self.row_str.set('current_height/2')
+#         self.col_str = StringVar()
+#         self.col_str.set('current_width/2')
+# 
+        self.row_str = DoubleVar()
+        self.row_str.set(0)
+        self.col_str = DoubleVar()
+        self.col_str.set(0)
 
-        self.col_str = StringVar()
-        self.col_str.set('current_width/2')
-
-        PlotPanel.__init__(self,parent,console,**config)
+        self.plot_key = ('Weights',self.row_str.get(),self.col_str.get())
+        self.debug('plot_key = ' + str(self.plot_key))
+        PlotPanel.__init__(self,parent,pengine,console,**config)
 
         params_frame = Frame(master=self)
         params_frame.pack(side=TOP,expand=YES,fill=X)
-
-        # hack alert!
-        # This shouldn't be hard-coded
-        # region_names = ['Primary', 'Ganglia00', 'Ganglia01', 'Secondary']
-        # still need a dropdown... from Tix?
 
         Message(params_frame,text="Row:",aspect=1000).pack(side=LEFT)
         Entry(params_frame,textvariable=self.row_str).pack(side=LEFT,expand=YES,fill=X)
         Message(params_frame,text="Column:",aspect=1000).pack(side=LEFT)
         Entry(params_frame,textvariable=self.col_str).pack(side=LEFT,expand=YES,fill=X)
 
-    def do_plot_cmd(self):        
-        self.plot_cmd = "plot_unit %s %s" % (self.row_str.get(),self.col_str.get())
-        PlotPanel.do_plot_cmd(self)
+
+    def do_plot_cmd(self):
+        """
+        Overloaded do_plot_cmd() so that the plot_key can change to the
+        active row/col pair in the window.
+        """
+        self.plot_key = ('Weights',self.row_str.get(),self.col_str.get())
+        super(WeightsPanel,self).do_plot_cmd()
+
+
 
 class WeightsArrayPanel(PlotPanel):
     def __init__(self,parent,console=None,**config):
@@ -309,7 +318,7 @@ class WeightsArrayPanel(PlotPanel):
         self.skip_str = StringVar()
         self.skip_str.set('N/8')
 
-        self.situate = IntVar()
+        self.situate = StringVar()
         self.situate.set(0)
 
         self.region = StringVar()
@@ -349,22 +358,37 @@ class WeightsArrayPanel(PlotPanel):
 
 
     def do_plot_cmd(self):
+        """
+        Behaves similarly to Activation plots, except that these Weights
+        plots are (currently) only defined for RFSheets.
+        """
+        
+        Pmw.showbusycursor()
 
-        if self.situate.get():
-            prefix = 'ppm_border=1 '
-            situate = 'True'
-            suffix = ' weight_bare=false ppm_outline_width=1 ppm_interior_border=0 ppm_interior_outline=False'
-        else:
-            prefix = ''
-            situate = 'False'
-            suffix = ''
-            
-        self.plot_cmd = prefix + 'plot_unit_range'
-        self.plot_cmd += ' region=' + self.region.get()
-        self.plot_cmd += ' name=' + self.weight_name.get()
-        self.plot_cmd += ' verbose=true ppm_separate_plots=false ppm_combined_plots=true'
-        self.plot_cmd += ' ppm_neuron_skip_aff=' + self.skip_str.get()
-        self.plot_cmd += ' weight_situate=' + situate +  suffix
+        self.pe_group = self.pe.get_plot_group(self.plot_key)
+        self.plot_tuples = self.pe_group.plots()
+        self.pe.debug('Type of plot_group', type(self.pe_group))
+
+        self.plotlist = []
+        self.plotlabels = []
+
+        Pmw.hidebusycursor()
+
+
+#         if self.situate.get():
+#             prefix = 'ppm_border=1 '
+#             situate = 'True'
+#             suffix = ' weight_bare=false ppm_outline_width=1 ppm_interior_border=0 ppm_interior_outline=False'
+#         else:
+#             prefix = ''
+#             situate = 'False'
+#             suffix = ''
+#         self.plot_cmd = prefix + 'plot_unit_range'
+#         self.plot_cmd += ' region=' + self.region.get()
+#         self.plot_cmd += ' name=' + self.weight_name.get()
+#         self.plot_cmd += ' verbose=true ppm_separate_plots=false ppm_combined_plots=true'
+#         self.plot_cmd += ' ppm_neuron_skip_aff=' + self.skip_str.get()
+#         self.plot_cmd += ' weight_situate=' + situate +  suffix
 
         PlotPanel.do_plot_cmd(self)
 

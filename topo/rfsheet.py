@@ -10,6 +10,9 @@ from kernelfactory import UniformRandomFactory
 from utils import mdot
 from boundingregion import Intersection
 import RandomArray,Numeric,copy
+import topo.sheetview
+import topo.boundingregion
+from topo.base import flatten
 
 
 ###############################################
@@ -33,9 +36,38 @@ class Projection(TopoObject):
         return len(self.__rfs),len(self.__rfs[0])
 
     shape = property(get_shape)
+
+
+    def get_view(self,sheet_r, sheet_c, pixel_scale = 255, offset = 0):
+        """
+        Return a single receptive field UnitView, for the unit at
+        sheet_r, sheet_c.  sheet_r and sheet_c are assumed to be in
+        sheet coordinates.
+
+        offset and pixel scale are currently unused.  The original
+        version of the function passed it to a PIL Image object, but
+        this does not, though it should in the future.
+
+        NOTE: BOUNDS MUST BE PROPERLY SET. CURRENTLY A STUB IS IN EFFECT.
+        """
+        (r,c) = (self.dest()).sheet2matrix(sheet_r,sheet_c)
+        composite_name = self.name + ': ' + str(sheet_r) + ',' + str(sheet_c)
+        matrix_data = Numeric.array(self.rf(r,c).weights)
+        # print 'matrix_data = ', matrix_data
+        new_box = self.dest().bounds  # TURN INTO A PROPER COPY
+        assert matrix_data != None, "Projection Matrix is None"
+        return topo.sheetview.UnitView((matrix_data,new_box),
+                                       sheet_r,sheet_c,name=composite_name)
+        
+
     
     def plot_rfs(self,montage=True,file_format='ppm',file_prefix='',
                  pixel_scale = 255, pixel_offset = 0):
+        """
+        DEPRICATED:  This function can still be used to dump the weights to
+        files, but any reason to use this function means that the necessary
+        replacement has not been written yet.
+        """
         from Numeric import concatenate as join
         import Image
         from utils import add_border
@@ -60,8 +92,6 @@ class Projection(TopoObject):
             f.close()
             
             
-
-
 class RF(TopoObject):
     
     def __init__(self,input_sheet,weights,bounds,**params):
@@ -165,6 +195,36 @@ class RFSheet(Sheet):
                     rf = proj.rf(r,c)
                     X = rf.get_input_matrix(input_activation)
                     self.temp_activation[r,c] += self.activation_fn(X,rf.weights)
+
+
+    def unit_view(self,r,c):
+        """
+        Get a list of UnitView objects for a particular unit
+        in this RFSheet.  Can return multiple UnitView objects.
+        """
+        views = flatten([[i.get_view(r,c) for i in p]
+                         for p in self.projections.values()])
+        self.debug('views = '+str(views)+'type = '+str(type(views[0]))+str(views[0].view()))
+        key = ('Weights',r,c)
+        self.add_sheet_view(key,views)      # Will be adding a list
+        self.debug('Added to sheet_view_dict', views, 'at', key)
+        return views
+
+
+    def sheet_view(self,request='Activation'):
+        """
+        Check for unit_view, but then call Sheet.sheet_view().  The
+        addition of unit_view() means that it's now possible for one
+        sheet_view request to return multiple UnitView objects, which
+        are subclasses of SheetViews.
+        """
+        self.debug('request = ' + str(request))
+        if isinstance(request,tuple) and request[0] == 'Weights':
+            (name,r,c) = request
+            return self.unit_view(r,c)
+        else:
+            return Sheet.sheet_view(self,request)
+        
 
     def train(self,input_activation,input_sheet):
         pass

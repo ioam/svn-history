@@ -16,7 +16,7 @@ import types
 
 from Numeric import zeros, ones
 
-from base import TopoObject
+from base import TopoObject, flatten
 from sheetview import *
 from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
 from histogram import Histogram
@@ -52,7 +52,7 @@ class Plot(TopoObject):
     def __init__(self, (channel_1, channel_2, channel_3), plot_type, sheet=None, **params):
         """
         channel_1, channel_2, and channel_3 all have one of two types:
-        It is either a string that points to a stored SheetView on the
+        It is either a key that points to a stored SheetView on the
         variable sheet, or
         It is a SheetView object.
 
@@ -85,23 +85,50 @@ class Plot(TopoObject):
         R/G/B channels, List of Histograms)
         """
 
+        self.debug('plot() channels = ' + str(self.channels) + 'self.source = ' + str(self.source) + 'type(self.source) = ' + str(type(self.source)))
+
         #  Convert what is in the channels into SheetViews if not already
         for each in self.channels:
-            if isinstance(each,str):
-                sv = self.source.sheet_view(each)
-                self.channel_views.append(sv)
-            elif isinstance(each,SheetView):
+
+            # It's possible for Plots to be accidentally passed in a
+            # list of SheetViews, but it should be avoided.  A warning
+            # will be displayed and the first one in the list will be
+            # used.
+            if isinstance(each,list) and len(each) > 0:
+                if len(each) > 1:
+                    self.warning('Plot Channel contains multiple entries, only plotting first: ' + str(each))
+                    each = each[0]
+
+            # Case 1: Simple SheetView with the view already embedded.
+            #         No need for a Sheet.
+            if isinstance(each,SheetView):
                 self.channel_views.append(each)
+
+            # Case 2: Entry is a string, or tuple that will be used as a
+            #         key in the Sheet dictionary.
+            elif isinstance(each,str) or isinstance(each,tuple):
+                if self.source is None:
+                    self.warning('Plot Channel-type requires a Sheet, but None Sheet passed to Plot() object.')
+                    self.warning('channels = ' + str(self.channels) + ' type(self.source) = ' + str(type(self.source)))
+                    self.channel_views.append(None)
+                else:
+                    sv = self.source.sheet_view(each)
+                    self.channel_views.append(sv)
+
+            # Case 3: Channel entry is None.  Pass along.
             elif each == None:
                 self.channel_views.append(each)
+
+            # Case 4: Undefined.
             else:
-                self.warning(each, 'not a valid string, SheetView, or None')
+                self.warning(each, 'not a String, Tuple, SheetView, or None')
 
         # NOTE: THIS NEEDS TO BE CHANGED WHEN BOUNDINGBOXES ARE
         # IMPLEMENTED TO TRIM DOWN THE SIZES OF THE MATRICES! 
         # CURRENTLY ASSUMES THAT ALL SUBVIEWS WILL BE OF THE SAME
         # SHAPE.
         shape = (0,0)
+        self.debug('self.channel_views = ' + str(self.channel_views))
         for each in self.channel_views:
             if each != None:
                 view_matrix = each.view()
@@ -214,10 +241,11 @@ class PlotGroup(TopoObject):
         bitmap_list = []
         if isinstance(self.plot_list,types.ListType):
             self.debug('Static plotgroup')
-            all_plots = self.plot_list + self.added_list
+            all_plots = flatten(self.plot_list) + self.added_list
         else:       # Assume it's a callable object that returns a list.
             self.debug('Dynamic plotgroup')
-            all_plots = self.plot_list() + self.added_list
+            all_plots = flatten(self.plot_list()) + self.added_list
+            self.debug('all_plots = ' + str(all_plots))
 
         # Eventually a simple list comprehension is not going to be
         # sufficient as outlining and other things will need to be

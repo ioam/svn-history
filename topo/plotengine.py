@@ -7,7 +7,7 @@ routines.
 
 $Id$
 """
-from base import TopoObject
+from base import TopoObject, flatten
 from plot import *
 from sheet import Sheet
 
@@ -70,7 +70,7 @@ class PlotEngine(TopoObject):
         self.plot_group_dict[name] = group
 
 
-    def get_plot_group(self, name):
+    def get_plot_group(self, name, filter=sheet_filter):
         """
         Return the PlotGroup registered in self.plot_group_dict with
         the provided key 'name'.  If the name does not exist, then
@@ -89,13 +89,49 @@ class PlotEngine(TopoObject):
             self.debug(name, "key match failure in PlotEngine's PlotGroup list")
             # Rather than fail, check for SheetViews of the name.
             # Current filter is sheet_filter(..).
-            requested_plot = self.make_sheetview_group(name,sheet_filter)
+            requested_plot = self.make_sheetview_group(name,filter)
         return requested_plot
+
+
+    def lambda_single_view_per_name(self,name,filter_lam):
+        """
+        Basic lambda function that assumes a single sheet per name in
+        each Sheets SheetView dictionary.
+        """
+        dynamic_list = lambda : [Plot((name,None,None),COLORMAP,each)
+                                for each in self._sheets() if filter_lam(each)]
+        return dynamic_list
+
+
+    def lambda_flat_dynamic_list(self, name, filter_lam):
+        """
+        Expanded so that the a sheet_view dictionary key entry can
+        have a list of sheetviews, and not just one.  Each SheetView
+        in the list will be set with a Plot object.
+        """
+        sheet_list = [each for each in self._sheets() if filter_lam(each)]
+        self.debug('sheet_list =' + str(sheet_list) + 'name = ' + str(name))
+
+        view_list = [(each, each.sheet_view(name)) for each in sheet_list
+                     if each is not None]
+        
+        ### A possible list from the Sheet.sheet_view dictionary is
+        ### converted into multiple Plot generation requests.
+        plot_list = []
+        for (sheet,views) in view_list:
+            if not isinstance(views,list):
+                views = [views]
+            for each in views:
+                if isinstance(each,SheetView):
+                    plot_list.append(Plot((each,None,None),COLORMAP,None))
+                else:
+                    plot_list.append(Plot((name,None,None),COLORMAP,sheet))
+        self.debug('plot_list =' + str(plot_list))
+        return plot_list
 
 
     def make_sheetview_group(self, name, filter_lam=None):
         """
-        
         Default method of creating a dynamic plot such as
         'Activation'.  Makes a new PlotGroup containing a lambda
         function that will poll the latest and greatest list of
@@ -103,14 +139,13 @@ class PlotEngine(TopoObject):
         uses the filter_lambda to decide if it should include the
         sheet in the Group.  If passed in, filter_lambda must take a
         Sheet, and return True or False.
-
         """
         if filter_lam is None:
             filter_lam = lambda sheet: True            
-        dynamic_list = lambda : [Plot((name,None,None),COLORMAP,each)
-                               for each in self._sheets() if filter_lam(each)]
+        # An alternative is lambda_single_view_per_name(name,filter_lam)
+        dynamic_list = lambda : self.lambda_flat_dynamic_list(name,filter_lam)
         new_group = PlotGroup(dynamic_list)
-
+#        print new_group.plots()
         self.debug('Type of new_group is', type(new_group))
         return new_group
 

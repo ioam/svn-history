@@ -120,7 +120,7 @@ class Sheet(EventProcessor):
         matrix.  Uses self.sheet_view_dict if the request is not
         the default.
 
-        The name for an Activation View is the Sheet name plus
+        The name for an Activation View should be the Sheet name plus
         '_Activation', e.g. 'Sheet0002_Activation'.
 
         Returns None if the View does not exist in this sheet.

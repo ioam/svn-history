@@ -66,7 +66,7 @@ class SheetView(TopoObject):
         3.  (Sheet, sheet_view_name)
                 Degenerate case that will pull data from another SheetView
                 and not do any additional processing.  Don't yet know a
-                use for this case, but documented for future possible use.
+                use for this case, but documented for possible future use.
         """
         super(SheetView,self).__init__(**params)
         # Assume there's no such thing as an operator that can be mistaken
@@ -132,19 +132,49 @@ class SheetView(TopoObject):
         return result
 
 
+
 class UnitView(SheetView):
     """
-    NOT COMPLETED, NOR EXPECTING TO IN THE TIME REMAINING OF SUMMER 2004
+    UNDER DEVELOPMENT, SPRING 2005.  Currently does not extend any
+    functions, but can do so to add outlines, and other interesting
+    features.
 
     Consists of an X,Y position for the unit that this View is
-    created.
+    created.  Subclasses the SheetView class.
 
-    Same type of functionality found in SheetViews should prove useful
-    here.
+    UnitViews should be stored in Sheets via a tuple
+    ('SomeString',X,Y).  The dictionary in Sheets can be accessed by
+    any valid key.
     """
 
-    def __init__(self, x, y, input_tuple, **params):
-        super(UnitView,self).__init__(input_tuple, **params)
+    def __init__(self, term_tuple, x, y, **params):
+        """
+        Subclass of SheetView.
+
+        Three types of input_tuples.
+        1.  (matrix_data, matrix_bbox)  
+	    This form locks the value of the sheetview to a single matrix.
+            Terminating case of a composite SheetView.
+            
+        2.  (operation, [tuple_list])
+	    'operation' is performed on the matrices collected from
+                tuple_list.  See the list of valid operations in
+                operations.keys()
+	    Each tuple in the tuple_list is one of the following:
+                (SheetView, None)
+                    Another SheetView may be passed in to create nested plots.
+	        (matrix_data, bounding_box)
+                    Static matrix data complete with bounding box.
+	        (Sheet, sheet_view_name)
+                    This gets sheet_name.sheet_view(sheet_view_name) each time
+                    the current SheetView has its data requested by .view().
+
+        3.  (Sheet, sheet_view_name)
+                Degenerate case that will pull data from another SheetView
+                and not do any additional processing.  Don't yet know a
+                use for this case, but documented for future possible use.
+        """
+        super(UnitView,self).__init__(term_tuple, **params)
         self.x = x
         self.y = y
 

@@ -295,16 +295,13 @@ class TopoConsole(Frame):
     # New plot windows
     #
     def new_activity_window(self):
-        # Judah - MUST SHOW WINDOW.
         pe = self.active_plotengine()
         if pe:
             self.num_activity_windows += 1
             win = GUIToplevel(self)
             win.withdraw()
             win.title("Activity %d" % self.num_activity_windows)
-            ActivityPanel(console=self,
-                          pengine=pe,
-                          parent=win).pack(expand=YES,fill=BOTH)
+            ActivityPanel(console=self,pengine=pe,parent=win).pack(expand=YES,fill=BOTH)
             win.deiconify()
         else:
             self.messageBar.message('state', 'No active Simulator object.')
@@ -320,13 +317,21 @@ class TopoConsole(Frame):
         # win.deiconify()
 
     def new_weights_window(self):
+        pe = self.active_plotengine()
+        if pe:
+            self.num_weights_windows += 1
+            win = GUIToplevel(self)
+            win.withdraw()
+            win.title("Weights %d" % self.num_weights_windows)
+            WeightsPanel(console=self,
+                         pengine=pe,
+                         parent=win).pack(expand=YES,fill=BOTH)
+            win.deiconify()
+
+
+        else:
+            self.messageBar.message('state', 'No active Simulator object.')
         # Judah - MUST SHOW THIS WINDOW
-        self.num_weights_windows += 1
-        win = GUIToplevel(self)
-        win.withdraw()
-        win.title("Weights %d" % self.num_weights_windows)
-        WeightsPanel(console=self,parent=win).pack(expand=YES,fill=BOTH)
-        win.deiconify()
 
     def new_weights_array_window(self):
         self.messageBar.message('state', 'Not yet implemented')
