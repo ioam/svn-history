@@ -165,7 +165,7 @@ class KernelFactory(base.TopoObject):
     theta = Parameter(default=0)
     
     def __call__(self,**params):
-        self.message("params = ",params)
+        self.verbose("params = ",params)
         self.setup_xy(params.get('bounds',self.bounds),
                       params.get('density',self.density),
                       params.get('x', self.x),
@@ -174,7 +174,7 @@ class KernelFactory(base.TopoObject):
         return self.function(**params)
 
     def setup_xy(self,bounds,density,x,y,theta):
-        self.message("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
+        self.verbose("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
         x,y = produce_kernel_matrices(bounds,density)
         self.kernel_x, self.kernel_y = produce_rotated_matrices(x-self.x,y-self.y,self.theta)
 
