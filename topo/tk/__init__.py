@@ -12,7 +12,7 @@ import topo.tk.plotpanel
 import Pmw, sys, Tkinter
 import topo.simulator
 import topo.base
-
+import topo.gui
 
 def show_cmd_prompt():
     """
@@ -51,6 +51,7 @@ def start(sim=None, mainloop=False):
     if mainloop:
         console.mainloop()
 
+    topo.gui.set_console(console)
     return console
 
 

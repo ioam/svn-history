@@ -10,6 +10,7 @@ from topo.tk.propertiesframe import *
 from topo.tk.plotpanel import *
 import topo.simulator as simulator
 import topo.plotengine
+import topo.gui
 
 KNOWN_FILETYPES = [('Python Files','*.py'),('Topographica Files','*.ty'),('All Files','*')]
 
