@@ -39,6 +39,7 @@ import sched
 from base import TopoObject
 from params import Parameter
 
+SLEEP_EXCEPTION = "Sleep Exception"
 STOP = "Simulator Stopped"
 
 class Simulator(TopoObject):
@@ -48,7 +49,7 @@ class Simulator(TopoObject):
     events to them in time order, and moving the simulation clock as needed.    
     """
 
-    step_mode = Parameter(0)
+    step_mode = Parameter(default=False)
     
     def __init__(self,**config):
         """
@@ -61,7 +62,8 @@ class Simulator(TopoObject):
 
         self.__time = 0
         self.__event_processors = []
-
+        self.__sleep_window = 0
+        self.__sleep_window_violation = False
         self.__scheduler = sched.scheduler(self.time,self.sleep)
         
         
@@ -69,6 +71,10 @@ class Simulator(TopoObject):
         """
         Run the simulator.   Call .start() for each EventProcessor, and
         start the event scheduler.
+        parameters:
+          duration = time to run in simulator time. Default: run indefinitely.
+          until    = time to stop in simulator time. Default: run indefinitely.
+          (note if both duration an until are used, they both will apply.)
         """
         for node in self.__event_processors:
             node.start()
@@ -76,11 +82,20 @@ class Simulator(TopoObject):
 
     def continue_(self,duration=0,until=0):
         if duration:
-            self.__scheduler.enter(dur,0,self.stop,[])
+            self.__scheduler.enter(duration,0,self.stop,[])
         if until:
             self.__scheduler.enterabs(until,0,self.stop,[])
         try:
-            self.__scheduler.run()
+            keep_running = True
+            while keep_running:
+                keep_running = False
+                try:
+                    self.__scheduler.run()
+                except SLEEP_EXCEPTION:
+                    self.debug("SLEEP EXCEPTION")
+                    self.__sleep_window_violation = False
+                    self.__sleep_window = 0
+                    keep_running = True
         except STOP:
             print "Simulation stopped at time %f" % self.time()
         except EOFError:
@@ -131,20 +146,36 @@ class Simulator(TopoObject):
           dest_port  = destination port (default None)
           data  = event data (default None)
         """
-        self.__scheduler.enter(delay,1,self.__dispatch,(src,src_port,dest,dest_port,data))
+        # If this event is scheduled when the simulator is about to sleep,
+        # make sure that the event isn't being scheduled during the sleep window,
+        # if it is, indicate a violation.
+        if self.__sleep_window and delay < self.__sleep_window:
+            self.__sleep_window_violation = True
+        # now schedule the event
+        self.__scheduler.enter(delay,1,self.__dispatch,(self.time()+delay,src,src_port,dest,dest_port,data))
 
     def enqueue_event_abs(self,time,src,dest,src_port=None,dest_port=None,data=None):
         """
         Like enqueue_event_rel, except it schedules the event for some
         absolute time.
         """
-        self.__scheduler.enterabs(time,1,self.__dispatch,(src,src_port,dest,dest_port,data))
+        # If this event is scheduled when the simulator is about to sleep,
+        # make sure that the event isn't being scheduled during the sleep window,
+        # if it is, indicate a violation.
+        if self.__sleep_window and (self.time() <= time < self.time()+self.__sleep_window):
+            self.__sleep_window_violation = True
+        # now schedule the event
+        self.__scheduler.enterabs(time,1,self.__dispatch,(time,src,src_port,dest,dest_port,data))
 
-    def __dispatch(self,src,src_port,dest,dest_port,data):
+    def __dispatch(self,time,src,src_port,dest,dest_port,data):
         """
         Dispatch an event to dest.
         """
-        dest.input_event(src,src_port,dest_port,data)
+        if time < self.time():
+            self.warning("Ignoring stale event from",src,"to",dest,
+                         "scheduled for time",time,"processed at time",self.time())
+        else:
+            dest.input_event(src,src_port,dest_port,data)
         
     def time(self):
         """
@@ -157,8 +188,26 @@ class Simulator(TopoObject):
         Sleep in simulator time.  Skip the clock ahead by delay
         units.  If self.step_mode, pause and wait for input before continuing.
         """
-        if self.step_mode and delay > 0:
-            raw_input("\nsimulator time = %f: " % self.time())
+
+        if delay > 0:
+            # set the sleep window, so the event scheduling methods know
+            # that we're about to sleep, and for how long.
+            self.__sleep_window = delay
+            for ep in self.__event_processors:
+                # give each EP a chance to send some events
+                ep.pre_sleep()
+
+            # if an event was scheduled to occur during the time we're
+            # supposed to be asleep, then raise an exception -- the
+            # top level loop will catch it and rerun to make sure the
+            # event gets run.
+            if self.__sleep_window_violation:
+                raise SLEEP_EXCEPTION
+
+            if self.step_mode:
+                raw_input("\nsimulator time = %f: " % self.time())            
+        
+
         self.__time += delay
         
 
@@ -205,6 +254,14 @@ class EventProcessor(TopoObject):
         from src.  (By default do nothing)
         """
         pass
+    
+    def pre_sleep(self):
+        """
+        Called by the simulator before sleeping.  Allows the event processor
+        to send any events that must be sent before time advances.
+        (by default, do nothing)
+        """
+        pass
         
 
 
@@ -232,21 +289,16 @@ class PulseGenerator(EventProcessor):
     period    = Parameter(0)
     phase     = Parameter(0)
     
-    def __init__(self,**config):
-        EventProcessor.__init__(self,**config)
-        setup_params(self,PulseGenerator,**config)
-
-        if self.period:
-            self.connect_to(self,delay=self.period)
-        
     def input_event(self,src,src_port,dest_port,data):
         """
         On input from self, generate output. Ignore all other inputs.
         """
-        print '%s received event from %s on port %s with data %s' % (`self`,`src`,`port`,`data`)
+        self.verbose('received event from',src,'on port',dest_port,'with data',data)
         self.send_output(data=self.amplitude)
         
     def start(self):        
+        if self.period:
+            self.simulator.connect(self,self,delay=self.period)
         self.simulator.enqueue_event_rel(self.phase,self,self)
         EventProcessor.start(self)
 
@@ -265,40 +317,67 @@ class ThresholdUnit(EventProcessor):
     resets the accumulator to zero.
 
     """
-    threshold = Parameter(1.0)
-    accum     = Parameter(0.0)
-    amplitude = Parameter(1.0)
+    threshold     = Parameter(default=1.0)
+    initial_accum = Parameter(default=0.0)
+    amplitude     = Parameter(default=1.0)
 
     def __init__(self,**config):
         EventProcessor.__init__(self,**config)
-        setup_params(self,ThresholdUnit,config)
-
+        self.accum = self.initial_accum
+        
     def input_event(self,src,src_port,dest_port,data):
-        if port == 'input':
+        if dest_port == 'input':
             self.accum += data
-            print '%s received %d, accumulator now %d' % (`self`,data,self.accum)
+            self.verbose( 'received',data,'accumulator now',self.accum)
             if self.accum > self.threshold:
                 self.send_output(data=self.amplitude)
                 self.accum = 0
                 print `self` + ' firing, amplitude = ' + `self.amplitude`
 
 
+class SumUnit(EventProcessor):
+    """
+    A simple sum unit.
+    """
+    def __init__(self,**params):
+        super(SumUnit,self).__init__(**params)
+        self.value = 0.0
 
+    def input_event(self,src,src_port,dest_port,data):
+        self.value += data
+        self.debug("recieved",data,"from",src,"value =",self.value)
+
+    def pre_sleep(self):
+        self.debug("pre_sleep called, time =",self.simulator.time(),"value =",self.value)
+        if self.value:
+            self.debug("Sending output:",self.value)
+            self.send_output(data=self.value)
+            self.value = 0.0
+        
 
 
 ##################################################################################
 if __name__ == '__main__':
 
+    import base
+    
+    base.min_print_level = base.DEBUG
 
     s = Simulator(step_mode = 1)
 
-    pulse = PulseGenerator(period = 0.10, phase = 0.003)
-    sum1 = ThresholdUnit(threshold = 5)
-    sum2 = ThresholdUnit(threshold = 2)
-    
-    s.add(pulse,sum1,sum2)
-    connect(pulse,sum1,dest_port='input',delay = 0.1)
-    connect(sum1,sum2,dest_port='input',delay = 0.1)
-    connect(sum2,sum1,dest_port='input',delay = 0.1)
+    class Printer(EventProcessor):
+        def input_event(self,src,src_port,dest_port,data):
+            self.message("Recieved",data,"from",src,".")
+        
 
+    pulse1 = PulseGenerator(period = 1)
+    pulse2 = PulseGenerator(period = 3)
+    sum = SumUnit()
+    out = Printer(name="OUTPUT")
+    
+    s.connect(pulse1,sum,delay=1)
+    s.connect(pulse2,sum,delay=1)
+    s.connect(sum,out,delay=0)
+
+    
     s.run()

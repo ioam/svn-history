@@ -113,6 +113,29 @@ class Parameter(object):
     raise "Deleting parameters is not allowed."
 
 
+class Number(Parameter):
+  def __init__(self,default=None,bounds=(None,None)):
+    Parameter.__init__(self,default=default)
+    self.bounds = bounds
+    
+  def __set__(self,obj,val):
+    if not (isinstance(val,int) or isinstance(val,float)):
+      raise "Parameter only takes a numeric value."
+
+    min,max = self.bounds
+    if min != None and max != None:
+      if not (min <= val <= max):
+        raise "Parameter must be between"+`min`+'and'+`max`+', inclusive.'
+    elif min != None:
+      if not min <= val: 
+        raise "Parameter must be at least"+`min`+'.'
+    elif max != None:
+      if not val <= max:
+        raise "Parameter must be at most"+`min`+'.'
+        
+    super(NumberParam,self).__set__(obj,val)
+
+
 def produce_value(value_obj):
   """
   A helper function, produces an actual parameter from a stored
@@ -131,7 +154,5 @@ def is_iterator(obj):
   Predicate that returns whether an object is an iterator.
   """
   return '__iter__' in dir(obj) and 'next' in dir(obj)
-
-
 
 

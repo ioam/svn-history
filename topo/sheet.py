@@ -145,24 +145,14 @@ class Composer(Sheet):
     a single activity matrix.  When an activity matrix is received on
     an input port, it is added to the the sheet's input buffer
     according to the parameters of that port (see port_configure()
-    below).  Then after a specified delay, the contents of the buffer
-    are sent the sheet's outputs, and the buffer is cleared.
+    below).  
 
-    Parameters:
-      delay = (default 1.0) the time delay after receiving an input to
-              send output.
     """
 
-    delay = Parameter(1.0)
-
     def __init__(self,**config):
-        super(Composer,self).__init__(**config)
-        
+        super(Composer,self).__init__(**config)        
         self.ports = {}
-        self.timestamp = None
-
-        if self.delay:
-            self._connect_to(self,src_port='trigger_out',dest_port='trigger_in',delay=self.delay)
+        self.__dirty = False
 
     def port_configure(self,port,**config):
         """
@@ -177,18 +167,17 @@ class Composer(Sheet):
         for k,v in config.items():
             self.ports[port][k] = v
             
-
-    def input_event(self,src,src_port,dest_port,data):
-        if dest_port == 'trigger_in':
-            self.send_output(data=self.activation)
+    def pre_sleep(self):
+        if self.__dirty:        
+            self.send_output(data=self.activation) 
             self.activation = zeros(self.activation.shape)+0.0
-            return
-
-        if self.simulator.time != self.timestamp:
-            self.timestamp = self.simulator.time
-            self.send_output(src_port='trigger_out')
+            self.__dirty=False
+           
+    def input_event(self,src,src_port,dest_port,data):
 
         self.verbose("Received %s input from %s." % (NxN(data.shape),src))
+
+        self.__dirty = True
 
         in_rows, in_cols = data.shape
 
@@ -196,8 +185,8 @@ class Composer(Sheet):
         start_row,start_col = self.sheet2matrix(*self.ports[dest_port]['origin'])
         row_adj,col_adj = src.sheet2matrix(0,0)
 
-        self.verbose("origin (row,col) = "+`(start_row,start_col)`)
-        self.verbose("adjust (row,col) = "+`(row_adj,col_adj)`)
+        self.debug("origin (row,col) = "+`(start_row,start_col)`)
+        self.debug("adjust (row,col) = "+`(row_adj,col_adj)`)
 
         start_row -= row_adj
         start_col -= col_adj
@@ -205,8 +194,8 @@ class Composer(Sheet):
         # the maximum bounds
         max_row,max_col = self.activation.shape
 
-        self.verbose("max_row = %d, max_col = %d" % (max_row,max_col))
-        self.verbose("in_rows = %d, in_cols = %d" % (in_rows,in_cols))
+        self.debug("max_row = %d, max_col = %d" % (max_row,max_col))
+        self.debug("in_rows = %d, in_cols = %d" % (in_rows,in_cols))
 
         end_row = start_row+in_rows
         end_col = start_col+in_cols
@@ -222,13 +211,13 @@ class Composer(Sheet):
         end_col -= right_clip
         end_row -= bottom_clip
 
-        self.verbose("start_row = %d,start_col = %d" % (start_row,start_col))
-        self.verbose("end_row = %d,end_col = %d" % (end_row,end_col))
-        self.verbose("left_clip = %d" % left_clip)
-        self.verbose("right_clip = %d" % right_clip)
-        self.verbose("top_clip = %d" % top_clip)
-        self.verbose("bottom_clip = %d" % bottom_clip)
-        self.message("activation shape = %s" % NxN(self.activation.shape))
+        self.debug("start_row = %d,start_col = %d" % (start_row,start_col))
+        self.debug("end_row = %d,end_col = %d" % (end_row,end_col))
+        self.debug("left_clip = %d" % left_clip)
+        self.debug("right_clip = %d" % right_clip)
+        self.debug("top_clip = %d" % top_clip)
+        self.debug("bottom_clip = %d" % bottom_clip)
+        self.debug("activation shape = %s" % NxN(self.activation.shape))
 
         self.activation[start_row:end_row, start_col:end_col] += data[top_clip:in_rows-bottom_clip,
                                                                       left_clip:in_cols-right_clip]

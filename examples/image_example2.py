@@ -54,18 +54,12 @@ image_file = args[0]
 #################################################
 # Set class parameter defaults
 
-base.print_level = base.VERBOSE
+base.print_level = base.DEBUG
 
 Simulator.step_mode = step_mode
 
-# There's just one image generator, so we can set it's input as a class param
-ImageGenerator.filename = image_file
+# We want 100x100 images
 ImageGenerator.density = 10000
-
-# An off-center edge-detector kernel
-Convolver.kernel = array([[0, 1,0],
-                          [1,-4,1],
-                          [0, 1,0]])
 
 # Image saver parameters
 ImageSaver.file_format = 'jpeg'
@@ -79,19 +73,16 @@ Composer.density = 25600
 #################################################
 # Now make the objects
 
-im_gen = ImageGenerator()
-off_convolve = Convolver()
-on_convolve = Convolver()
+left_image = ImageGenerator(filename='main.ppm')
+right_image = ImageGenerator(filename='test.ppm')
 combine = Composer()
 output = ImageSaver()
 
 
 ################################################
 # Set instance-specific parameters
-on_convolve.kernel = Convolver.kernel * -1.0
-
-combine.port_configure('left', origin = (-0.25,-0.25))
-combine.port_configure('right', origin = (0.25,0.25))
+combine.port_configure('left', origin = (-0.25,0.0))
+combine.port_configure('right', origin = (0.25,0.0))
 
 ###############################################
 # Make the simulator
@@ -99,16 +90,11 @@ s = Simulator()
 
 ###############################################
 #  connect the objects
-s.connect(im_gen,on_convolve, delay=1)
-s.connect(im_gen,off_convolve,delay=1)
+s.connect(left_image,combine, dest_port='left', delay=1)
+s.connect(right_image,combine,dest_port='right',delay=1)
 
-s.connect(im_gen,       output,      dest_port='unmodified',delay=2)
-s.connect(on_convolve,  output,      dest_port='on_center', delay=1)
-s.connect(off_convolve, output,      dest_port='off_center',delay=1)
-
-# The on-center output goes to the left, off-center to the right
-s.connect(on_convolve, combine, dest_port='left', delay=1)
-s.connect(off_convolve,combine, dest_port='right',delay=1)
+s.connect(left_image,       output,      dest_port='left_input',delay=2)
+s.connect(right_image,      output,      dest_port='right_input',delay=2)
 
 s.connect(combine, output, dest_port='combined',delay=1)
 
@@ -116,4 +102,5 @@ s.connect(combine, output, dest_port='combined',delay=1)
 ##############################################
 #  run it!
 
-s.run()
+
+s.run(until=10)
