@@ -29,6 +29,11 @@ import plotengine
 import histogram
 import palette
 
+# GUI files
+import PropertiesFrame
+import TaggedSlider
+import gui
+
 # set import all the important stuff directly into the package
 # namespace.
 from simulator import *
