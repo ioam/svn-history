@@ -15,6 +15,8 @@ from topo.inputsheet import *
 from topo.simulator import *
 from topo.rfsom import RFSOM
 from topo.image import ImageSaver
+from topo import kernelfactory
+from topo.kernelfactory import GaussianFactory
 from math import pi
 from topo.params import Dynamic
 from Tkinter import *
@@ -108,14 +110,14 @@ class TestPlotEngine(unittest.TestCase):
         InputSheet.period = 1.0
         InputSheet.density = 900
         
-        GaussianSheet.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        GaussianSheet.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        
-        GaussianSheet.theta = Dynamic(lambda :random.uniform(-pi,pi))
-        GaussianSheet.width = 0.02
-        GaussianSheet.height = 0.9
-        GaussianSheet.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
-        
+        # GaussianSheet.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+        # GaussianSheet.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+        # 
+        # GaussianSheet.theta = Dynamic(lambda :random.uniform(-pi,pi))
+        # GaussianSheet.width = 0.02
+        # GaussianSheet.height = 0.9
+        # GaussianSheet.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+
         # rf som parameters
         RFSOM.density = 900
         RFSOM.rf_width = 0.2
@@ -130,8 +132,16 @@ class TestPlotEngine(unittest.TestCase):
         print "Creating simulation objects..."
         s = Simulator()
         pe = PlotEngine(s)
+
+        retina = InputSheet(input_generator=GaussianFactory(
+            x = Dynamic(lambda : random.uniform(-0.5,0.5)),
+            y = Dynamic(lambda : random.uniform(-0.5,0.5)),
+            theta = Dynamic(lambda :random.uniform(-pi,pi)),
+            width = 0.02,
+            height = 0.9))
         
-        retina = GaussianSheet(name='Retina')
+        # Old form
+        #retina = GaussianSheet(name='Retina')
         V1 = RFSOM(name='V1')
 
         poster = ImagePoster(pe)
