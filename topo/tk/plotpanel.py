@@ -30,7 +30,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
 
         self.pe = pengine
         self.pe_group = None
-        self.plot_list = []
+        self.plot_tuples = []
 
         self.console = console
         self.canvases = []
@@ -80,7 +80,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
         Pmw.showbusycursor()
 
         self.pe_group = self.pe.get_plot_group(self.plot_key)
-        self.plot_list = self.pe_group.plots()
+        self.plot_tuples = self.pe_group.plots()
         self.pe.debug('Type of plot_group', type(self.pe_group))
 
 #         plots = Lissom.plot_cmd(self.plot_cmd)
@@ -90,8 +90,8 @@ class PlotPanel(Frame,topo.base.TopoObject):
 #         goodplots = [t for t in zip(self.plotlist,self.plotlabels) if os.access(t[0],os.F_OK)]
 #         self.plotlist = [i for i,p in goodplots]
 #         self.plotlabels = [p for i,p in goodplots]
-        # self.plotlist = []
-        # self.plotlabels = []
+        self.plotlist = []
+        self.plotlabels = []
 
         Pmw.hidebusycursor()
         
@@ -111,11 +111,13 @@ class PlotPanel(Frame,topo.base.TopoObject):
         #self.images = [ImageTk.PhotoImage(file=pfile,master=self.plot_frame)
         #               for pfile in self.plotlist]
         self.images = []
-        for (figure_tuple, hist_tuple) in self.plot_list:
+        for (figure_tuple, hist_tuple) in self.plot_tuples:
             (r,g,b) = figure_tuple
             if r.shape != (0,0) and g.shape != (0,0) and b.shape != (0,0):
                 win = topo.bitmap.RGBMap(r,g,b)
                 self.images.append(win)
+                self.plotlist.append(win)
+                self.plotlabels.append(self.pe_group.name + ' ' + str(len(self.plotlist)))
                 #win.show()
 
         
@@ -137,7 +139,6 @@ class PlotPanel(Frame,topo.base.TopoObject):
 
         
     def display_plots(self):
-#        self.zoomed_images = [PhotoImage(im.zoom(self.zoom_factor)) for im in self.images]
         self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.zoom_factor)) for im in self.images]
         old_canvases = self.canvases
         self.canvases = [Canvas(self.plot_frame,
@@ -154,10 +155,9 @@ class PlotPanel(Frame,topo.base.TopoObject):
             c.grid_forget()
 
     def display_labels(self):
-        pass
-        #for i,file in enum(self.plotlabels):
-        #    print i, " ", file
-        #    Label(self.plot_frame,text=file).grid(row=1,column=i,sticky=NSEW)
+        for i,name in enum(self.plotlabels):
+            self.message(i, " ", name)
+            Label(self.plot_frame,text=name).grid(row=1,column=i,sticky=NSEW)
 
     def reduce(self):
         if self.zoom_factor > self.min_zoom_factor:
