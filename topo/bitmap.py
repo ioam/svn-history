@@ -42,6 +42,7 @@ $Id$
 
 from colorsys import rgb_to_hsv, hsv_to_rgb
 import Numeric, Image, math
+import topo.base
 
 # Background type.  Decides to fill dead areas with 0s or with 1s
 BLACK_BACKGROUND = 0
@@ -127,9 +128,10 @@ class Bitmap(object):
         Take in a normalized 2D array, return a one-channel luminosity image.
         """
         if max(inArray.flat) > 1:
-            print 'Warning: arrayToImage inputs not normalized. Dividing by 255.  Max value: ', max(inArray.flat)
-            inArray = Numeric.divide(inArray,255.0)
-
+            print 'Warning: arrayToImage inputs not normalized. Normalizing to 1.  Max value: ', max(inArray.flat)
+            inArray = Numeric.divide(inArray,max(inArray.flat))
+        assert max(inArray.flat) <= 1, 'arrayToImage failed to Normalize'
+            
         # PIL 'L' Images use 0 to 255.  Have to scale up.
         inArray = (Numeric.floor(inArray * 255)).astype(Numeric.Int)
         newImage = Image.new('L',inArray.shape,None)
@@ -154,6 +156,10 @@ class ColorMap(Bitmap):
 
         If palette is not passed as parameter, Grayscale is default.
         """
+        if max(inArray.flat) > 1.0:
+            topo.base.TopoObject().warning('ColorMap inArray not normalized to 1.  Normalizing')
+            inArray = Numeric.divide(inArray,max(inArray.flat))
+
         newImage = self.arrayToImage(inArray)
         if palette == None:
             palette = [i for i in range(256) for j in range(3)]
@@ -228,6 +234,15 @@ class RGBMap(Bitmap):
         """
         Each matrix must be the same size and normalized to 1.
         """
+        if max(rMapArray.flat) > 1.0:
+            topo.base.TopoObject().warning('RGBMap rMapArray not normalized to 1.  Normalizing')
+            rMapArray = Numeric.divide(rMapArray,max(rMapArray.flat))
+        if max(max(gMapArray)) > 1.0:
+            topo.base.TopoObject().warning('RGBMap gMapArray not normalized to 1.  Normalizing')
+            gMapArray = Numeric.divide(gMapArray,max(gMapArray.flat))
+        if max(max(bMapArray)) > 1.0:
+            topo.base.TopoObject().warning('RGBMap bMapArray not normalized to 1.  Normalizing')
+            bMapArray = Numeric.divide(bMapArray,max(bMapArray.flat))
         rImage = self.arrayToImage(rMapArray)
         gImage = self.arrayToImage(gMapArray)
         bImage = self.arrayToImage(bMapArray)
