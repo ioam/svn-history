@@ -11,6 +11,9 @@ sys.ps1 = 'Topographica> '
 
 banner = """
 Welcome to Topographica!
+
+Type help() for interactive help, or help(commandname) for info on a
+specific command.
 """
 
 opts,args = getopt(sys.argv[1:],'i')
