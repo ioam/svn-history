@@ -71,8 +71,8 @@ class Simulator(TopoObject):
         
     def run(self,duration=0,until=0):
         """
-        Run the simulator.   Call .start() for each EventProcessor, and
-        start the event scheduler.
+        Run the simulator.   Call .start() for each EventProcessor if not
+        previously done, and start the event scheduler.
         parameters:
           duration = time to run in simulator time. Default: run indefinitely.
           until    = time to stop in simulator time. Default: run indefinitely.
