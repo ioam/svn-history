@@ -79,6 +79,8 @@ class LISSOM(rfsheet.RFSheet):
 
 print "Setting parameters..."
 
+rfsheet.RF.print_level = base.VERBOSE
+
 # input generation params
 InputSheet.period = 1.0
 InputSheet.density = 900
