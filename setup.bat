@@ -3,7 +3,7 @@ ECHO This will install Topographica and its package dependencies.
 
 REM Developer's Note: Install Python then call the setup.py script
 REM inside the external/win32 directory.
-REM $Id: setup.bat,v 1.5 2004/06/30 15:23:55 judah Exp $
+REM $Id: setup.bat,v 1.6 2004/06/30 15:43:59 judah Exp $
 
 external\win32\util\Y_OR_N /Q /A "Do you wish to continue? [Y/n]"
 
@@ -20,11 +20,12 @@ IF ERRORLEVEL 0 GOTO :RUN_SETUP
 
 :INSTALL_PYTHON
 ECHO Python file associations not detected: Installing Python 2.3
-start /wait external/win32/Python-2.3.4.exe
+start /wait external\win32\Python-2.3.4.exe
 
 
 :RUN_SETUP
-cd external/win32
+cd external\win32
+cd
 start /wait setup.py configure
 start /wait setup.py install
 
