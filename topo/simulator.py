@@ -31,9 +31,11 @@ Formally, an simulation event is a tuple: (time,src,dest,port,data), where
 
 A simulation begins by giving each EventProcessor an opportunity to
 send any initial events.  It then proceeds by processing and
-delivering events in time order.  After all events for the current
-time are processed, simulation time skips to the time of earliest
-event remaining in the queue.
+delivering events to EventProcessors in time order.  After all events
+for the current time are processed, the simulator gives each
+EventProcessor a chance to do any final computation, afte which
+simulation time skips to the time of earliest event remaining in the
+queue.
 
 PORTS
 
@@ -448,9 +450,9 @@ class SimpleSimulator(Simulator):
 
 class EventProcessor(TopoObject):
     """
-    Base class for EventProcessors.  Handles basic mechanics of connections and
-    sending events.  Also handles the EP's dictionary of output ports
-    and outgoing connections.
+    Base class for EventProcessors. Handles basic mechanics of
+    connections and sending events.  Also handles the EP's dictionary
+    of output ports and outgoing  connections.
     """
     def __init__(self,**config):
         super(EventProcessor,self).__init__(**config)

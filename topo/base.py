@@ -75,11 +75,13 @@ object_count = 0
 
 
 class TopoMetaclass(type):
+
     """
-    The metaclass of TopoObject (and all its descendents).  The metaclass
-    overrides type.__setattr__ to allow us to set Parameter values on classes
-    without overwriting the attribute descriptor.  
+    The metaclass of TopoObject (and all its descendents).  The
+    metaclass overrides type.__setattr__ to allow us to set Parameter
+    values on classes without overwriting the attribute descriptor.
     """
+
     def __setattr__(self,name,value):
         from copy import copy
         desc,class_ = self.get_param_descriptor(name)
