@@ -41,11 +41,15 @@ def topo_interact(banner = ''):
         # The line needs to be added together, until there is a full
         # command.  This is when compile_command returns non-None.
         while Command == None:
-            if complete_command == '':
-                next_line = console.raw_input('Topographica> ') + '\n'
-            else:
-                next_line = console.raw_input('... ') + '\n'
-            complete_command = complete_command + next_line
+            try:
+                if complete_command == '':
+                    next_line = console.raw_input('Topographica> ') + '\n'
+                else:
+                    next_line = console.raw_input('... ') + '\n'
+                complete_command = complete_command + next_line
+            except EOFError:       # Ctrl-D from the input.
+                print "Goodbye!"
+                sys.exit()
 
             # If a single line, or blank line after multi-line.
             if complete_command == next_line or next_line == '\n':
@@ -62,7 +66,7 @@ def topo_interact(banner = ''):
         try:
             # Run the compiled command in the g environment.  Many
             # errors can result.  Catch all of them so Topographica
-            # doesn't crash out to the shell.  Ctrl-D still exits.
+            # doesn't crash out to the shell.  
             g = __main__.__dict__
             exec Command in g  
         except:
