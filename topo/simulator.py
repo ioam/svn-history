@@ -16,7 +16,8 @@ other EPs, as well as the mechanics of sending events to other EPs
 (through the simulator).  The EventProcessor class defines the basic
 EP programming interface.
 
-Formally, an simulation event is a tuple: (time,src,dest,port,data), where
+Formally, a simulation event is a tuple:
+(time,src,src_port,dest,dest_port,data), where
 
   time      = The time at which the event should be delivered, an arbitrary
               floating point value.
@@ -51,11 +52,11 @@ separately for each port.  Input ports distinguish different types of
 input an EP may receive and process.  The EP is free to interpret the
 input port designation on an incoming event in any way it chooses.
 
-An example of input port use might be an EP that receives neural
-'ordinary' neural activity on the default port, and receives a
-separate modulatory signal that influences learning.  The originator
-of the modulatory signal might have a connection to the EP with
-dest_port = 'modulation'.
+An example of input port use might be an EP that receives 'ordinary'
+neural activity on the default port, and receives a separate
+modulatory signal that influences learning.  The originator of the
+modulatory signal might have a connection to the EP with dest_port =
+'modulation'.
 
 An example of output port use might be an EP that sends different
 events to itself than it sends out to other EPs.  In this case the
@@ -92,7 +93,7 @@ N) minheap implementation in python somewhere.  It might even be in
 the CVS repository as a dead file.
 
 Note also that even though Simulator may guarantee that the event
-queue isn't corrupted by a raise exception, there is no guarantee that
+queue isn't corrupted by a raised exception, there is no guarantee that
 the internal state of the EP that raised the exception is sane, so
 it's not clear if the exception-safe aspect of sched.simulator is of
 particular value.
@@ -104,7 +105,7 @@ Currently, connections in the simulation's directed graph are not
 first-class objects in the system.  Rather, they are implemented as
 (dest,dest_port,delay) tuples stored in dictionaries indexed by
 src_port inside each individual EP (i.e. within each graph node).
-With the advent of Projection classes for RFSheets (see rfsheet.py),
+With the advent of Projection classes for RFSheets (see topo.rfsheet),
 it is worth considering whether to replace these tuples with an
 explicit Connection class, of which Projection would be a subclass.
 This class would encapsulate all data that parameterizes the
@@ -260,9 +261,8 @@ class Simulator(TopoObject):
         simulator, they will be added.
         """
         self.add(src,dest)
-        src._connect_to(dest,src_port=src_port,dest_port=dest_port,delay=delay,
-                        **extra_args)
-        dest._connect_from(src,src_port=src_port,dest_port=dest_port,**extra_args)
+        src._connect_to(dest,src_port,dest_port,delay,**extra_args)
+        dest._connect_from(src,src_port,dest_port,**extra_args)
 
     def enqueue_event_rel(self,delay,src,dest,src_port=None,dest_port=None,data=None):
         """
@@ -408,13 +408,13 @@ class SimpleSimulator(Simulator):
                     ep.pre_sleep()
                     
                 # set the time to the frontmost event (Note: the front
-                # event may have been changed by the .pre_sleep() calls.
+                # event may have been changed by the .pre_sleep() calls).
 
                 self._Simulator__time = self.events[0].time
             else:
 
                 # If it's not too late, and it's not too early, then
-                # it's just right, so pop the event and dispatch it to
+                # it's just right!  So pop the event and dispatch it to
                 # its destination.
 
                 e = self.events.pop(0)
@@ -475,7 +475,7 @@ class EventProcessor(TopoObject):
         self.connections = {None:[]}
         
 
-    def _connect_to(self,dest,src_port=None,dest_port=None,delay=0,**args):
+    def _connect_to(self,dest,src_port,dest_port,delay,**args):
         """
         Add a connection to dest/port with a delay (default=0).
         Should only be called from Simulator.connect(). The extra
@@ -488,7 +488,7 @@ class EventProcessor(TopoObject):
 
         self.connections[src_port].append((dest,dest_port,delay))
 
-    def _connect_from(self,src,src_port=None,dest_port=None,**args):
+    def _connect_from(self,src,src_port,dest_port,**args):
         """
         Add a connection from src/port with a delay (default=0).
         Should only be called from Simulator.connect().  The extra

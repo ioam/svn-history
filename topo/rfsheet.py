@@ -36,7 +36,6 @@ from base import TopoObject
 class RF(TopoObject):
     
     def __init__(self,input_sheet,weights,bounds,**params):
-        from sheet import activation_submatrix
         super(RF,self).__init__(**params)
         self.input_sheet = input_sheet
         self.bounds = bounds
@@ -47,10 +46,8 @@ class RF(TopoObject):
         return self.bounds.contains(x,y)
 
     def get_input_matrix(self, activation):
-        from sheet import activation_submatrix
-        return activation_submatrix(self.bounds,activation,
-                                    self.input_sheet.bounds,
-                                    self.input_sheet.density)
+        return self.input_sheet.activation_submatrix(self.bounds,activation)
+
 
 class Projection(TopoObject):
 
@@ -195,7 +192,7 @@ class RFSheet(Sheet):
         self.projections = {}
         self.new_input = False
 
-    def _connect_from(self,src,src_port=None,dest_port=None,
+    def _connect_from(self,src,src_port,dest_port,
                       projection_type=KernelProjection,
                       projection_params={},
                       **args):

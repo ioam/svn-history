@@ -1,115 +1,71 @@
-#!/usr/bin/env python
 """
 
 A simple example of how to use sheets.  Uses the ImageGenerator,
-ImageSaver, Convolver, and ActivityCombiner classes.  Read the
+ImageSaver,  and Combiner classes.  Read the
 in-line comments and code to see what it does.
+
+This differs from image_example.py in how it sets up the simulation
+parameters and objects.  It shows how to set parameters for classes of objects.
 
 'python image_example.py -h' for usage.
 
 $Id$
 """
 
+
 import sys
-import debug
-from convolve2d import Convolver
-from image import ImageSaver,ImageGenerator
-from simulator import Simulator
-from sheet import Composer
+from topo import * 
+from topo.image import *
+from topo.composer import Composer
 
-from getopt import getopt
-from Numeric import array
+#################################################
+# Set class parameter defaults
 
-USAGE = """
+base.print_level = base.DEBUG
 
-usage: image_example.py [--step] image-file
+Simulator.step_mode = True
 
-image-file = an image file to be convolved, etc.
+# We want 100x100 images
+ImageGenerator.density = 10000
 
---step puts the simulator in step mode.
-
-"""
-##################################################
-# read and process command line arguments
-try:    
-    opts,args = getopt(sys.argv[1:],'',['step'])
-except:
-    print USAGE
-    sys.exit()
-
-opts = dict(opts)
+# Image saver parameters
+ImageSaver.file_format = 'jpeg'
+ImageSaver.time_format = '%.2f'
+ImageSaver.pixel_scale = 255
 
 #
-# whether to run in step mode
-#
-step_mode = '--step' in opts
-
-if not args or len(args) > 1:
-    print USAGE
-    sys.exit()
-
-image_file = args[0]
+Composer.density = 25600
 
 
 #################################################
-# set up the simulation
-debug.print_level = debug.VERBOSE
+# Now make the objects
 
-s = Simulator(step_mode = step_mode)
+left_image = ImageGenerator(filename='main.ppm')
+right_image = ImageGenerator(filename='test.ppm')
+combine = Composer()
+output = ImageSaver()
 
-#
-# Make an image generator that gets its image from the command line
-#
-im_gen = ImageGenerator(filename = image_file)
 
-#
-# make a center-surround edge-detector kernel
-#
-off_center = array([[0, 1,0],
-                    [1,-4,1],
-                    [0, 1,0]])
 
-#
-#  two edge-detection sheets, one on-center, one off-center
-#
-on_convolve = Convolver( kernel = off_center * -1.0,  name="on_convolve")
-off_convolve = Convolver( kernel = off_center,        name="off_convolve")
+###############################################
+# Make the simulator
+s = Simulator()
 
-#
-# an image saver, named 'output' which saves ppm files. we only need
-# one -- inputs on different ports get saved with different names. 
-#
-output = ImageSaver(name = "output",
-                    time_format = '%.3f',
-                    file_format = 'jpeg',
-                    pixel_scale = 255)    
+###############################################
+#  connect the objects
 
-#
-# an activity combiner, with a 250 row x 700 column activity matrix
-# The left port input  is placed at (-5,-5), the right port input at (5,5), in
-# sheet coordinates
-#
-combine = Composer(matrix_shape = (250,700))
-combine.port_configure('left', origin = (-5,-5))
-combine.port_configure('right', origin = (5,5))
+# The left image gets pasted at x = -0.25
+s.connect(left_image,combine, delay=1,origin = (-0.25,0.0))
 
-#
-# Now add all the components to the simulator
-#
-s.add(im_gen, on_convolve, off_convolve, combine, output )
+# The right image gets pasted at x = 0.25
+s.connect(right_image,combine,delay=1,origin = (0.25,0.0))
 
-# make the connections
-im_gen.connect_to(on_convolve, delay=1)
-im_gen.connect_to(off_convolve,delay=1)
+s.connect(left_image,       output,      dest_port='left_input',delay=2)
+s.connect(right_image,      output,      dest_port='right_input',delay=2)
 
-im_gen.connect_to(output,      dest_port='unmodified',delay=2)
-on_convolve.connect_to(output, dest_port='on_center', delay=1)
-off_convolve.connect_to(output,dest_port='off_center',delay=1)
+s.connect(combine, output, dest_port='combined',delay=1)
 
-# The on-center output goes to the left, off-center to the right
-on_convolve.connect_to( combine, dest_port='left', delay=1)
-off_convolve.connect_to(combine, dest_port='right',delay=1)
 
-combine.connect_to(output,dest_port='combined',delay=1)
-
-s.run()
+##############################################
+#  run it!
+s.run(until=10)

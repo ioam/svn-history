@@ -1,4 +1,49 @@
-# $Id$
+"""
+Neural sheet objects and associated functions.
+
+The Sheet class is the base class for EPs that simulate
+topographically mapped sheets of units (neurons or columns).  A Sheet
+is an EventProcessor that maintains a rectangular array of activation
+values, and sends the contents of this array as the data element in
+events.
+
+The dimensions of a Sheet's activation array are specified not with
+numbers of rows and columns, but with a rectangular bounding box (see
+topo.boundingregion) and a density.  The default bounding box for
+sheets is the unit square with its center at the origin.  i.e:
+
+
+     (-0.5,0.5) +------+------+ (0.5,0.5)
+                |      |      |
+                |      |      |
+                +------+------+
+                |      |      |
+                |      |      |
+    (-0.5,-0.5) +------+------+ (0.5,-0.5)
+
+The default density is 100, giving the default sheet a 10x10
+activation matrix.
+
+This scheme gives a Sheet two coordinate systems.  A pair of 'sheet
+coordinates' (x,y) are real (floating point) cartesion coordinates
+indicating an arbitrary point on the sheet's plane.  A pair of 'matrix
+coordinates' (r,c), specify the row and column indices of a specific
+unit in the sheet.  This module provides facilities for converting
+between the two coordinate systems, and EVERYONE SHOULD USE THESE
+FACITILITES to guarantee that coordinate transformations are done
+consistently everywhere.
+
+In general sheets should be thought of as having arbitrary density and
+sheet coordinates should be used wherever possible, except when the
+code needs direct access to a specific unit.  By adhering to this
+convention, one should be able to write and debug a simulation at a
+low density, and then scale it up to run at higher densities simply by
+changing one or a few parameters (e.g. Sheet.density).
+
+$Id$
+"""
+
+__version__ = '$Revision$'
 
 from simulator import EventProcessor
 from params import Parameter
@@ -7,6 +52,16 @@ from boundingregion import BoundingBox
 from sheetview import SheetView
 
 def sheet2matrix(x,y,bounds,density):
+    """
+    Convert a point (x,y) in sheet coordinates to the row and column
+    of the matrix cell in which that point falls given bounds and density.
+    Returns (row,column).
+
+    NOTE: This is NOT the strict mathematical inverse of matrix2sheet!
+    
+    When computing this transformation for an existing sheet foo, one
+    should use the Sheet method foo.sheet2matrix(x,y).
+    """
     left,bottom,right,top = bounds.aarect().lbrt()
     linear_density = sqrt(density)
     col = (x-left) * linear_density
@@ -15,6 +70,23 @@ def sheet2matrix(x,y,bounds,density):
     return int(row),int(col)
     
 def matrix2sheet(row,col,bounds,density):
+    """
+    Convert a point (row,col) in matrix coordinates to its
+    corresponding point (x,y) in sheet coordinates given bounds and
+    density.
+
+    Returns (x,y) where x and y are the floating point coordinates of
+    the upper-left corner of the given matrix cell.
+
+    [ FIXME: This implementation is incorrect.  Should return the CENTER
+      of the given matrix cell. ]
+
+    NOTE: This is NOT the strict mathematical inverse of sheet2matrix.
+
+    When computing this transformation for an existing sheet foo, one
+    should use the Sheet method foo.matrix2sheet(r,c).
+
+    """
     left,bottom,right,top = bounds.aarect().lbrt()
     width = right-left
     height = top-bottom
@@ -27,7 +99,9 @@ def matrix2sheet(row,col,bounds,density):
 
 def activation_submatrix(slice_bounds,activation,activation_bounds,density):
     """
-    Gets a submatrix of an activation matrix defined by bounding rectangle.
+    Returns a submatrix of an activation matrix defined by bounding
+    rectangle. Uses topo.sheet.input_slice().  Does not copy the
+    submatrix!
     """
     r1,r2,c1,c2 = input_slice(slice_bounds,activation_bounds,density)
 
@@ -35,12 +109,12 @@ def activation_submatrix(slice_bounds,activation,activation_bounds,density):
 
 def input_slice(slice_bounds, input_bounds, input_density):
     """
-    Gets the parameters for slicing an activation matrix given the slice bounds,
-    activation bounds, and density of the activation matrix.
+    Gets the parameters for slicing an activation matrix given the
+    slice bounds, activation bounds, and density of the activation
+    matrix.
 
     returns a,b,c,d -- such that an activation matrix M
-    can be sliced like this: M[a:b,c:d]
-    
+    can be sliced like this: M[a:b,c:d]    
     """
     left,bottom,right,top = slice_bounds.aarect().lbrt()
     rows,cols = bounds2shape(slice_bounds,input_density)
@@ -60,6 +134,10 @@ def input_slice(slice_bounds, input_bounds, input_density):
     return rstart,rbound,cstart,cbound
 
 def bounds2shape(bounds,density):
+    """
+    Gives the matrix shape in rows and columns specified by the given
+    bounds and density.  Returns (rows,columns).
+    """
     left,bottom,right,top = bounds.aarect().lbrt()
     width = right-left
     height = top-bottom
@@ -170,122 +248,46 @@ class Sheet(EventProcessor):
     def sheet_offset(self):
         """
         Returns the offset of the sheet origin from the lower-left
-        corner of the sheet.
+        corner of the sheet, in sheet coordinates.
         """
         return -self.bounds.aarect().left(),-self.bounds.aarect().bottom()
 
+    def input_slice(self,slice_bounds):
+        """
+        Gets the parameters for slicing the sheet's activation matrix.
+
+        returns a,b,c,d -- such that an activaiton matrix M
+        originating from this sheet can be sliced like this M[a:b,c:d]
+        """
+        return input_slice(slice_bounds,self.bounds,self.density)
+
+    def activation_submatrix(self,slice_bounds,activation=None):
+        """
+        Returns a submatrix of an activation matrix that originated
+        from this sheet.  If no activation matrix is given, the
+        sheet's current activation is used.  Does not copy the
+        submatrix!  It is a true slice of the given matrix.
+        """
+        if not activation:
+            activation = self.activation
+
+        return activation_submatrix(slice_bounds,activation,self.bounds,self.density)
+
     def sheet_rows(self):
+        """
+        Returns a list of Y-coordinates correspoinding to the rows of
+        the activation matrix of the sheet.
+        """
         rows,cols = self.activation.shape
         coords = [self.matrix2sheet(r,0) for r in range(rows,0,-1)]
         return [y for (x,y) in coords]
 
     def sheet_cols(self):
+        """
+        Returns a list of X-coordinates corresponding to the columns
+        of the activation matrix of the sheet.
+        """
         rows,cols = self.activation.shape
         coords = [self.matrix2sheet(0,c) for c in range(cols)]
         return [x for (x,y) in coords]
-
-#####################################
-from utils import NxN
-
-class Composer(Sheet):
-    """
-    A Sheet that combines the activity of 2 or more other sheets into
-    a single activity matrix.  When an activity matrix is received on
-    an input port, it is added to the the sheet's input buffer
-    according to the parameters of that port (see port_configure()
-    below).  
-
-    """
-
-    def __init__(self,**config):
-        super(Composer,self).__init__(**config)        
-        self.ports = {}
-        self.__dirty = False
-
-    def port_configure(self,port,**config):
-        """
-        Configure a specific input port.
-        Port parameters:
-           origin = (default (0,0)) The offset in the output matrix
-                    where this port's input should be placed.
-        """
-        if not port in self.ports:
-            self.ports[port] = {}
-
-        for k,v in config.items():
-            self.ports[port][k] = v
-            
-    def pre_sleep(self):
-        if self.__dirty:        
-            self.send_output(data=self.activation) 
-            self.activation = zeros(self.activation.shape)+0.0
-            self.__dirty=False
-           
-    def input_event(self,src,src_port,dest_port,data):
-
-        self.verbose("Received %s input from %s." % (NxN(data.shape),src))
-
-        self.__dirty = True
-
-        in_rows, in_cols = data.shape
-
-        # compute the correct position of the input in the buffer
-        start_row,start_col = self.sheet2matrix(*self.ports[dest_port]['origin'])
-        row_adj,col_adj = src.sheet2matrix(0,0)
-
-        self.debug("origin (row,col) = "+`(start_row,start_col)`)
-        self.debug("adjust (row,col) = "+`(row_adj,col_adj)`)
-
-        start_row -= row_adj
-        start_col -= col_adj
-
-        # the maximum bounds
-        max_row,max_col = self.activation.shape
-
-        self.debug("max_row = %d, max_col = %d" % (max_row,max_col))
-        self.debug("in_rows = %d, in_cols = %d" % (in_rows,in_cols))
-
-        end_row = start_row+in_rows
-        end_col = start_col+in_cols
-
-        # if the input goes outside the activation, clip it
-        left_clip = -min(start_col,0)
-        top_clip  = -min(start_row,0)
-        right_clip = max(end_col,max_col) - max_col
-        bottom_clip = max(end_row,max_row) - max_row
-
-        start_col += left_clip
-        start_row += top_clip
-        end_col -= right_clip
-        end_row -= bottom_clip
-
-        self.debug("start_row = %d,start_col = %d" % (start_row,start_col))
-        self.debug("end_row = %d,end_col = %d" % (end_row,end_col))
-        self.debug("left_clip = %d" % left_clip)
-        self.debug("right_clip = %d" % right_clip)
-        self.debug("top_clip = %d" % top_clip)
-        self.debug("bottom_clip = %d" % bottom_clip)
-        self.debug("activation shape = %s" % NxN(self.activation.shape))
-
-        self.activation[start_row:end_row, start_col:end_col] += data[top_clip:in_rows-bottom_clip,
-                                                                      left_clip:in_cols-right_clip]
-
-
-if __name__ == '__main__':
-
-    # test sheet2matrix
-    s = Sheet()
-
-    print 'sheet -> matrix'
-    print (0,0), ' -> ', s.sheet2matrix(0,0)
-    print (0,0.5), ' -> ', s.sheet2matrix(0,0.5)
-    print (0.5,0), ' ->', s.sheet2matrix(0.5,0)
-    print (0.5,0.5), ' -> ', s.sheet2matrix(0.5,0.5)
-
-
-    print 'matrix -> sheet'
-    print (0,0), ' -> ', s.matrix2sheet(0,0)
-    print (0,100), ' -> ', s.matrix2sheet(0,100)
-    print (100,0), ' ->', s.matrix2sheet(100,0)
-    print (100,100), ' -> ', s.matrix2sheet(100,100)
 
