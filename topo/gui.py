@@ -9,7 +9,7 @@ $Id$
 from Tkinter import *
 import Pmw, re, os, sys
 import tkFileDialog
-if __name__ == '__main__':
+if __name__ == '__main__':  # Take control of console.
     from topo.propertiesframe import *
     import topo.simulator as simulator
 else:
@@ -18,15 +18,16 @@ else:
 
 MIN_PLOT_WIDTH = 100
 KNOWN_FILETYPES = [('Python Files','*.py'),('Topographica Files','*.ty'),('All Files','*')]
-COMMAND_NAMESPACE = 'topo.simulator'
+
+# Namespace that the simulations will be running from.  This is
+# not the only constant that must change since there are package
+# functions that must exist to be called in the package.
+COMMAND_NAMESPACE = 'topo.simulator'  
 
 
 class TopoConsole(Frame):
     def __init__(self, parent=None,**config):
         Frame.__init__(self,parent,config)
-
-# Delete soon
-#        self._init_lissom()
 
         self.parent = parent
         self.num_activity_windows = 0
@@ -100,9 +101,7 @@ class TopoConsole(Frame):
         self.menubar.addmenuitem('Plots', 'command',
                              'New activity plot',
                              label="Activity",
-                             command=self.dummy)
-                             # Judah - MUST SHOW WINDOW.
-                             #command=self.new_activity_window)
+                             command=self.new_activity_window)
         self.menubar.addmenuitem('Plots', 'command',
                              'New orientation, ocular dominance, or similar map plot',
                              label="Preference Map",
@@ -111,15 +110,11 @@ class TopoConsole(Frame):
                              activeforeground = 'Gray',      #
                              activebackground = 'Light Gray',#
                              #################################
-                             #command=self.new_preferencemap_window)
-                             # STUB CODE UNTIL MILESTONE 2
-                             command=None)
+                             command=self.new_preferencemap_window)
         self.menubar.addmenuitem('Plots', 'command',
                              'New weights plot',
                              label="Weights",
-                             command=None)
-                             # Judah - MUST SHOW WINDOW.
-                             #command=self.new_weights_window)
+                             command=self.new_weights_window)
         self.menubar.addmenuitem('Plots', 'command',
                              'New weights array plot',
                              label="Weights Array",
@@ -128,16 +123,12 @@ class TopoConsole(Frame):
                              activeforeground = 'Gray',      #
                              activebackground = 'Light Gray',#
                              #################################
-                             #command=self.new_weights_array_window)
-                             # STUB CODE UNTIL MILESTONE 2
-                             command=self.dummy)
+                             command=self.new_weights_array_window)
         self.menubar.addmenuitem('Plots','separator')
         self.menubar.addmenuitem('Plots', 'command',
                                  'Refresh auto-refresh plots',
                                  label="Refresh",
-                                 command=self.dummy)
-                                 # Judah - Should do something reasonable.
-                                 #command=self.auto_refresh)
+                                 command=self.auto_refresh)
         
 
         #
@@ -232,7 +223,7 @@ class TopoConsole(Frame):
                 self.messageBar.message('state', 'Loaded ' + self.loaded_script)
             else:
                 self.messageBar.message('state', 'Failure loading ' + self.loaded_script)
-        self.show_cmd_prompt()
+        show_cmd_prompt()
 
     def reload_network(self):
         """
@@ -254,11 +245,11 @@ class TopoConsole(Frame):
                 self.messageBar.message('state', 'Reloaded ' + self.loaded_script)
             else:
                 self.messageBar.message('state', 'Failure reloading ' + self.loaded_script)
-        self.show_cmd_prompt()
+        show_cmd_prompt()
             
                 
     def reset_network(self):
-	self.messageBar.message('state', 'Reset not implemented')        
+	self.messageBar.message('state', 'Reset not yet implemented')
 
     #
     # auto-refresh handling
@@ -278,6 +269,7 @@ class TopoConsole(Frame):
     # New plot windows
     #
     def new_activity_window(self):
+        # Judah - MUST SHOW WINDOW.
         self.num_activity_windows += 1
         win = GUIToplevel(self)
         win.withdraw()
@@ -286,14 +278,16 @@ class TopoConsole(Frame):
         win.deiconify()
 
     def new_preferencemap_window(self):
-        self.num_orientation_windows += 1
-        win = GUIToplevel(self)
-        win.withdraw()
-        win.title("Preference Map %d" % self.num_orientation_windows)
-        PreferenceMapPanel(console=self,parent=win).pack(expand=YES,fill=BOTH)
-        win.deiconify()
+        self.messageBar.message('state', 'Not yet implemented')
+        # self.num_orientation_windows += 1
+        # win = GUIToplevel(self)
+        # win.withdraw()
+        # win.title("Preference Map %d" % self.num_orientation_windows)
+        # PreferenceMapPanel(console=self,parent=win).pack(expand=YES,fill=BOTH)
+        # win.deiconify()
 
     def new_weights_window(self):
+        # Judah - MUST SHOW THIS WINDOW
         self.num_weights_windows += 1
         win = GUIToplevel(self)
         win.withdraw()
@@ -302,12 +296,13 @@ class TopoConsole(Frame):
         win.deiconify()
 
     def new_weights_array_window(self):
-        self.num_weights_array_windows += 1
-        win = GUIToplevel(self)
-        win.withdraw()
-        win.title("Weights Array %d" % self.num_weights_array_windows)
-        WeightsArrayPanel(console=self,parent=win).pack(expand=YES,fill=BOTH)
-        win.deiconify()
+        self.messageBar.message('state', 'Not yet implemented')
+        # self.num_weights_array_windows += 1
+        # win = GUIToplevel(self)
+        # win.withdraw()
+        # win.title("Weights Array %d" % self.num_weights_array_windows)
+        # WeightsArrayPanel(console=self,parent=win).pack(expand=YES,fill=BOTH)
+        # win.deiconify()
 
     def open_plot_params_window(self):
         """
@@ -340,22 +335,22 @@ class TopoConsole(Frame):
         """
         result = simulator.exec_cmd(cmd)
 	self.messageBar.message('state', result)
-        self.show_cmd_prompt()
+        show_cmd_prompt()
 
     def do_training(self,count):
-#        Lissom.cmd("training +" + count)
+        """
+        LOGIC ERROR: It is no longer possible to do training
+        iterations on an unnamed simulation since there may be
+        multiple objects.  There needs to be a way to link to a
+        particular simulation.
+        """
+        # Judah - THIS MUST BE IMPLEMENTED
+        #        Lissom.cmd("training +" + count)
         self.auto_refresh()
         
-    def reload_saved_network(self):
-#        Lissom.cmd('load_snapshot')
-        self.auto_refresh()
-
     def dummy(self):
         print "Button pressed in ", self
 
-    def not_yet_implemented(self):
-        print "Operation not yet implemented."
-    
 
         
 class PlotPanel(Frame):
@@ -404,26 +399,29 @@ class PlotPanel(Frame):
 
     def do_plot_cmd(self):
         Pmw.showbusycursor()
-        init_cmds = [
-            #set file names just before plot command to ensure that they are correct
-            "PlotGroup::Activity::filename_format=gui.$${current_region}_$${current_plot}",
-            "PlotGroup::Weights::filename_format=gui.$${current_region}_$${current_plot}",
-            "PlotGroup::WeightsMap::filename_format=gui.$${current_region}_$${current_plot}",
-            "PlotGroup::*Preference::filename_format=gui.$${current_region}_$${current_plot}",]
-#        Lissom.cmds(init_cmds)
-        
-#        plots = Lissom.plot_cmd(self.plot_cmd)
-        self.plotlist   = map(self.plotname_to_filename,plots);
-        self.plotlabels = map(self.plotname_to_label,plots);
+#         init_cmds = [
+#             #set file names just before plot command to ensure that they are correct
+#             "PlotGroup::Activity::filename_format=gui.$${current_region}_$${current_plot}",
+#             "PlotGroup::Weights::filename_format=gui.$${current_region}_$${current_plot}",
+#             "PlotGroup::WeightsMap::filename_format=gui.$${current_region}_$${current_plot}",
+#             "PlotGroup::*Preference::filename_format=gui.$${current_region}_$${current_plot}",]
+# #        Lissom.cmds(init_cmds)
+#         
+# #        plots = Lissom.plot_cmd(self.plot_cmd)
+#         self.plotlist   = map(self.plotname_to_filename,plots);
+#         self.plotlabels = map(self.plotname_to_label,plots);
+# 
+#         #print `self`+".plotlist = "+`self.plotlist`
+#         #print `self`+".plotlabels = "+`self.plotlabels`
+# 
+#         # remove non-existent plots
+#         goodplots = [t for t in zip(self.plotlist,self.plotlabels) if os.access(t[0],os.F_OK)]
+#         self.plotlist = [i for i,p in goodplots]
+#         self.plotlabels = [p for i,p in goodplots]
 
-        #print `self`+".plotlist = "+`self.plotlist`
-        #print `self`+".plotlabels = "+`self.plotlabels`
+        self.plotlist = []
+        self.plotlabels = []
 
-        # remove non-existent plots
-        goodplots = [t for t in zip(self.plotlist,self.plotlabels) if os.access(t[0],os.F_OK)]
-        self.plotlist = [i for i,p in goodplots]
-        self.plotlabels = [p for i,p in goodplots]
-        
         #print `self`+".plotlist = "+`self.plotlist`
         #print `self`+".plotlabels = "+`self.plotlabels`
         
@@ -437,9 +435,11 @@ class PlotPanel(Frame):
             old_min_width = reduce(min,[im.width() for im in self.images])
         else:
             old_min_width = -1
+
+        # Change to load from the plot manager.
+        #self.images = [PhotoImage(file=pfile,master=self.plot_frame)
+        #               for pfile in self.plotlist]
         
-        self.images = [PhotoImage(file=pfile,master=self.plot_frame)
-                       for pfile in self.plotlist]
         if self.images:
             min_width = reduce(min,[im.width() for im in self.images])
         else:
@@ -447,7 +447,8 @@ class PlotPanel(Frame):
         
         if old_min_width != min_width:
             # if the min width changed, then recalculate the zoom factor
-            if MIN_PLOT_WIDTH > min_width:
+            # If no plots, then no window.
+            if MIN_PLOT_WIDTH > min_width and old_min_width != -1:
                 self.min_zoom_factor = MIN_PLOT_WIDTH/min_width + 1
             else:
                 self.min_zoom_factor = 1
@@ -493,27 +494,32 @@ class PlotPanel(Frame):
 
     def toggle_auto_refresh(self):
         self.auto_refresh = not self.auto_refresh
+
         print "Auto-refresh = ", self.auto_refresh
+        show_cmd_prompt()
+
         if self.auto_refresh:
             self.console.add_auto_refresh_panel(self)
         else:
             self.console.del_auto_refresh_panel(self)
 
-    def plotname_to_filename(self,plotname):
-        """Converts a string like Eye0::Activity to the corresponding lissom filename.
-        Does not have any decent error checking.""" 
-        return 'gui.%s_%s.ppm' % self.plotname_components(plotname)
-        
-    def plotname_to_label(self,plotname):
-        """Converts a string like Eye0::Activity to the corresponding label.
-        Does not have any decent error checking.""" 
-        return '%s %s' % self.plotname_components(plotname)
-
-    def plotname_components(self,plotname):
-        """Gets the components of a plotname, e.g. 'Primary', 'Afferent00',
-        and returns them in a tuple."""
-        m =  re.match("([^ ]*)::([^ ]*)",plotname)
-        return (m.group(1),m.group(2))
+# No longer useful since there is no LISSOM, but these may be replaced
+# with functions for filename saving.
+#     def plotname_to_filename(self,plotname):
+#         """Converts a string like Eye0::Activity to the corresponding lissom filename.
+#         Does not have any decent error checking.""" 
+#         return 'gui.%s_%s.ppm' % self.plotname_components(plotname)
+#         
+#     def plotname_to_label(self,plotname):
+#         """Converts a string like Eye0::Activity to the corresponding label.
+#         Does not have any decent error checking.""" 
+#         return '%s %s' % self.plotname_components(plotname)
+# 
+#     def plotname_components(self,plotname):
+#         """Gets the components of a plotname, e.g. 'Primary', 'Afferent00',
+#         and returns them in a tuple."""
+#         m =  re.match("([^ ]*)::([^ ]*)",plotname)
+#         return (m.group(1),m.group(2))
 
 
     def destroy(self):
@@ -856,7 +862,19 @@ class GUIToplevel(Toplevel):
         self.resizable(0,0)
 
 ####################
-        
+
+
+def show_cmd_prompt():
+    """
+    Small helper to print the sys.ps1 prompt to the command-line.
+    Useful after a bunch of output has been displayed to stdout,
+    so as to let the user know that the command-line is still
+    active.
+    """
+    print "\n", sys.ps1,
+    sys.stdout.flush()
+    
+
 
 def enum(seq):
     return zip(range(len(seq)),seq)
