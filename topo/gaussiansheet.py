@@ -27,7 +27,6 @@ class GaussianSheet(Sheet):
         Sheet.__init__(self,**config)
         setup_params(self,GaussianSheet,**config)
 
-        # TODO: we need to recieve the size of the kernel from somewhere
         self.kernel =  KernelFactory(kernel_bounds=self.bounds,
                                      kernel_density=self.density)
 
@@ -45,9 +44,13 @@ class GaussianSheet(Sheet):
         self.db_print("Received %s input from %s." % (NxN(data.shape),src), debug.VERBOSE)
 
         self.db_print("Generating a new kernel...",debug.VERBOSE)
+
+        # NOTE: Is there a more elegant way of doing this? 
         self.activation = self.kernel.get_kernel(x=apply(self.x[0],self.x[1:]),
-                                                 y=random.uniform(-1,1),
-                                                 theta=random.uniform(-3.14159,3.14159)) 
+                                                 y=apply(self.x[0],self.x[1:]),
+                                                 theta=apply(self.x[0],self.x[1:]),
+                                                 width=apply(self.x[0],self.x[1:]),
+                                                 height=apply(self.x[0],self.x[1:]))
   
         self.send_output(data=self.activation)
         self.db_print("Sending %s output." % NxN(self.activation.shape))
@@ -60,7 +63,12 @@ if __name__ == '__main__':
     GaussianSheet.density = 10000
     GaussianSheet.period = 10.0
     GaussianSheet.phase = 3.0
+
     GaussianSheet.x = (random.gauss,0,0.5)
+    GaussianSheet.y = (random.uniform,-0.5,0.5)
+    GaussianSheet.theta = (random.uniform,-3.1415926,3.1415926)
+    GaussianSheet.width = (random.uniform,-1,1)
+    GaussianSheet.height = (random.uniform,-1,1)
 
     s = Simulator()
     g = GaussianSheet()

@@ -109,7 +109,7 @@ class KernelFactory:
                 (sheet_x, sheet_y) = matrix2sheet(x, y, self.kernel_bounds, self.kernel_density)
         #        print sheet_x, sheet_y
                 (a, b)=self.function(sheet_x-self.x,sheet_y-self.y, self.width, self.height, self.theta)
-                new_kernel[x][y] = (a+b)/2.0
+                new_kernel[x][y] = a*b
 
         self.kernel = new_kernel
 
