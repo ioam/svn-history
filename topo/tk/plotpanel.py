@@ -1,11 +1,9 @@
 """
-GUI windows to display bitmap plots. 
+Abstract Class PlotPanel to support GUI windows to display bitmap plots. 
 
 $Id$
 """
-#from Tkinter import *
 import Pmw, re, os, sys
-import __main__
 import topo
 import topo.base
 import topo.bitmap
@@ -17,89 +15,125 @@ import Image
 import ImageTk
 import Numeric
 
-MIN_PLOT_WIDTH = 100
+NYI = "Abstract method not implemented."
+
+def enum(seq):  return zip(range(len(seq)),seq)
 
 class PlotPanel(Frame,topo.base.TopoObject):
     """
-    Base class for GUI windows displaying bitmap images.  Subclassed to
-    display various categories of bitmaps.
+    Abstract PlotPanel class for displaying bitmaped images to a TK
+    GUI window.  Must be subclassed.
     """
+
     def __init__(self,parent=None,pengine=None,console=None,**config):
-        assert isinstance(pengine,plotengine.PlotEngine) or pengine == None, 'Variable pengine not PlotEngine object.'
+        assert isinstance(pengine,plotengine.PlotEngine) or pengine == None, \
+               'Variable pengine not PlotEngine object.'
 
         Frame.__init__(self,parent,config)
         topo.plot.TopoObject.__init__(self,**config)
 
+        # Must make assignment, even if only 'Activation'
+        self.plot_key = NYI    
+
+        # Each plot can have a different minimum size.  If INITIAL_PLOT_WIDTH
+        # is set to None, then no initial zooming is performed.  However,
+        # MIN_PLOT_WIDTH may cause a zoom if the raw bitmap is still too
+        # tiny.
+        self.MIN_PLOT_WIDTH = 50
+        self.INITIAL_PLOT_WIDTH = 100
+
         self.pe = pengine
         self.pe_group = None
         self.plot_tuples = []
+        self.images = []
+        self.labels = []
 
         self.console = console
         self.parent = parent
         self.canvases = []
 
-        self.images = []
-        
         self.plot_group = Pmw.Group(self,tag_pyclass=None)
         self.plot_group.pack(side=TOP,expand=YES,fill=BOTH,padx=5,pady=5)
         self.plot_frame = self.plot_group.interior()
 
+        # For the first plot, use the INITIAL_PLOT_WIDTH to calculate zoom.
+        self.initial_plot = True
         self.zoom_factor = self.min_zoom_factor = 1
-        
         
         self.control_frame = Frame(self)
         self.control_frame.pack(side=BOTTOM,expand=YES,fill=X)
 
-        Button(self.control_frame,text="Refresh",command=self.refresh).pack(side=LEFT)
+        # Refresh, Reduce, and Enlarge Buttons.
+        Button(self.control_frame,text="Refresh",
+               command=self.refresh).pack(side=LEFT)
         self.reduce_button = Button(self.control_frame,text="Reduce",
                                    state=DISABLED,
                                    command=self.reduce)
         self.reduce_button.pack(side=LEFT)
-        Button(self.control_frame,text="Enlarge",command=self.enlarge).pack(side=LEFT)        
+        Button(self.control_frame,text="Enlarge",
+               command=self.enlarge).pack(side=LEFT)        
 
+        # Default is to not have the window Auto-refresh, because of
+        # possible slow plots.  Call self.auto_refresh_checkbutton.invoke()
+        # to enable it in a subclassed constructor function.
         self.auto_refresh = 0
         self.auto_refresh_checkbutton = Checkbutton(self.control_frame,
                                                     text="Auto-refresh",
                                                     command=self.toggle_auto_refresh)
         self.auto_refresh_checkbutton.pack(side=LEFT)
-
-        self.refresh()
+        # self.refresh()
 
 
     def refresh(self):
-        self.do_plot_cmd()
-        self.load_images()
-        self.display_plots()
-        self.display_labels()
+        """
+        Main steps for generating plots in the Frame.  These functions
+        must be implemented, or overwritten.
+        """
+        Pmw.showbusycursor()
+        self.do_plot_cmd()                # Create plot tuples
+        self.load_images()                # Convert plots to bitmap images
+        self.display_plots()              # Put images in GUI canvas
+        self.display_labels()             # Match labels to grid
+        Pmw.hidebusycursor()
 
 
     def do_plot_cmd(self):
         """
-        Poll the PlotEngine for the plotgroup linked to self.plot_key.
-        Since the get_plot_group is being called, it may update the
-        plots, or it may use a cached version, depending on the type
-        of plot_group being requested.
+        Subclasses of PlotPanel will need to overwrite this function to
+        generate the plots.  Upon completion, it must have done two things:
+
+        1.  Create a PlotGroup and store it into self.pe_group
+        2.  Create a list of plot tuples, and store it into self.plot_tuples
+
+        Example:
+            self.pe_group = self.pe.get_plot_group(self.plot_key)
+            self.plot_tuples = self.pe_group.plots()
+
+        See topo.tk.WeightsPanel and topo.tk.WeightsArrayPanel for
+        more complicated examples.
         """
-        Pmw.showbusycursor()
-
-        self.pe_group = self.pe.get_plot_group(self.plot_key)
-        self.plot_tuples = self.pe_group.plots()
-        self.pe.debug('Type of plot_group', type(self.pe_group))
-
-#         plots = Lissom.plot_cmd(self.plot_cmd)
-#         self.plotlist   = map(self.plotname_to_filename,plots);
-#         self.plotlabels = map(self.plotname_to_label,plots);
-#         # remove non-existent plots
-#         goodplots = [t for t in zip(self.plotlist,self.plotlabels) if os.access(t[0],os.F_OK)]
-#         self.plotlist = [i for i,p in goodplots]
-#         self.plotlabels = [p for i,p in goodplots]
-        self.plotlist = []
-        self.plotlabels = []
-
-        Pmw.hidebusycursor()
-        
+        raise NYI
+    
 
     def load_images(self):
+        """
+        Pre:  self.pe_group contains a PlotGroup
+              self.plot_tuples contains a list of tuples that match the
+                  format defined by PlotGroup.plots()
+        Post: self.images contains a list of Bitmap Images ready for display.
+
+        No geometry or Sheet information is necessary to perform the
+        operations in this function, so it is unlikely that load_images()
+        will need to be redefined by a subclass.
+
+        Image scaling is automatically done, as well as adjusted by the
+        user.  self.MIN_PLOT_WIDTH is the number of pixels wide the
+        smallest plot figure can be, and self.INITIAL_PLOT_WIDTH is the
+        number of pixels wide the smallest plot figure will be on the
+        first display.
+        """
+        self.plotlist = []
+        self.plotlabels = []
         # need to calculate the old min width, so we know if we need to reset
         # the zoom factors
         if self.images:
@@ -119,28 +153,50 @@ class PlotPanel(Frame,topo.base.TopoObject):
                 win = topo.bitmap.RGBMap(r,g,b)
                 self.images.append(win)
                 self.plotlist.append(win)
-                self.plotlabels.append(self.pe_group.name + ' ' + str(len(self.plotlist)))
-
+                self.plotlabels.append(self.pe_group.name + ' ' \
+                                       + str(len(self.plotlist)))
         
         if self.images:
             min_width = reduce(min,[im.width() for im in self.images])
         else:
             min_width = 0
-        
+
+        # If the min width changed, then recalculate the zoom factor
+        # If no plots, then no window.
         if old_min_width != min_width:
-            # if the min width changed, then recalculate the zoom factor
-            # If no plots, then no window.
-            if MIN_PLOT_WIDTH > min_width and old_min_width != -1:
-                self.min_zoom_factor = MIN_PLOT_WIDTH/min_width + 1
+            if self.initial_plot and min_width != 0 and self.INITIAL_PLOT_WIDTH != None:
+                self.zoom_factor = self.INITIAL_PLOT_WIDTH/min_width + 1
+                if self.zoom_factor < self.min_zoom_factor:
+                    self.zoom_factor = self.min_zoom_factor
+                self.initial_plot = False
+            if self.MIN_PLOT_WIDTH > min_width and min_width != 0:
+                self.min_zoom_factor = self.MIN_PLOT_WIDTH/min_width + 1
+                if self.zoom_factor < self.min_zoom_factor:
+                    self.zoom_factor = self.min_zoom_factor
             else:
                 self.min_zoom_factor = 1
 
-            self.zoom_factor = self.min_zoom_factor
-            self.reduce_button.config(state=DISABLED)
+            if self.zoom_factor > self.min_zoom_factor:
+                self.reduce_button.config(state=NORMAL)
+            else:
+                self.reduce_button.config(state=DISABLED)
 
         
     def display_plots(self):
-        self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.zoom_factor)) for im in self.images]
+        """
+        Pre:  self.images contains a list of topo.bitmap objects.
+
+        Post: The bitmaps have been displayed to the screen in the active
+              console window.  All images are displayed from left to right,
+              in a single row.  If the number if images have changed since
+              the last display, the grid size is increased, or decreased
+              accordingly.
+
+        This function shuld be redefined in subclasses for interesting
+        things such as grids of plots.
+        """
+        self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.zoom_factor))
+                              for im in self.images]
         old_canvases = self.canvases
         self.canvases = [Canvas(self.plot_frame,
                                 width=image.width(),
@@ -155,12 +211,31 @@ class PlotPanel(Frame,topo.base.TopoObject):
         for c in old_canvases:
             c.grid_forget()
 
+
     def display_labels(self):
-        for i,name in enum(self.plotlabels):
-            self.debug(i, " ", name)
-            Label(self.plot_frame,text=name).grid(row=1,column=i,sticky=NSEW)
+        """
+        Pre:  self.plotlabels contains a list of strings that match the
+              list of bitmap images is self.images.
+        Post: Each string within self.plotlabels has been displayed on the
+              screen directly below its corresponding image in the GUI
+              window.
+
+        This function should be redefined by subclasses to match any
+        changes made to display_plots().  Depending on the situation,
+        it may be useful to make this function a stub, and display the
+        labels at the same time the images are displayed.
+        """
+        old_labels = self.labels
+        self.labels = [Label(self.plot_frame,text=name)
+                       for name in self.plotlabels]
+        for i in range(len(self.labels)):
+            self.labels[i].grid(row=1,column=i,sticky=NSEW)
+        for l in old_labels:
+            l.grid_forget()
+                 
 
     def reduce(self):
+        """Function called by Widget, to reduce the zoom factor"""
         if self.zoom_factor > self.min_zoom_factor:
             self.zoom_factor = self.zoom_factor - 1
 
@@ -168,22 +243,33 @@ class PlotPanel(Frame,topo.base.TopoObject):
             self.reduce_button.config(state=DISABLED)
             
         self.display_plots()
+
     
     def enlarge(self):
+        """Function called by Widget to increase the zoom factor"""
         self.reduce_button.config(state=NORMAL)
         self.zoom_factor = self.zoom_factor + 1
         self.display_plots()
 
+
     def toggle_auto_refresh(self):
+        """Function called by Widget when check-box clicked"""
         self.auto_refresh = not self.auto_refresh
 
-        self.message("Auto-refresh = ", self.auto_refresh)
+        self.debug("Auto-refresh = ", self.auto_refresh)
         topo.tk.show_cmd_prompt()
 
         if self.auto_refresh:
             self.console.add_auto_refresh_panel(self)
         else:
             self.console.del_auto_refresh_panel(self)
+
+
+    def destroy(self):
+        if self.auto_refresh:
+            self.console.del_auto_refresh_panel(self)
+        Frame.destroy(self)
+
 
 # No longer useful since there is no LISSOM, but these should be replaced
 # with functions for filename saving.
@@ -204,21 +290,26 @@ class PlotPanel(Frame,topo.base.TopoObject):
 #         return (m.group(1),m.group(2))
 
 
-    def destroy(self):
-        if self.auto_refresh:
-            self.console.del_auto_refresh_panel(self)
-        Frame.destroy(self)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ##############################################
 #
-# Different kinds of plot panels
+# Different kinds of plot panels.  Unchanged since LISSOM.  Will need
+# to be exported to their own files and rewritten.
 #
-
-
-class ActivityPanel(PlotPanel):
-    def __init__(self,parent,pengine=None,console=None,**config):
-        self.plot_key = "Activation"
-        PlotPanel.__init__(self,parent,pengine,console=console,**config)
-        self.auto_refresh_checkbutton.invoke()
 
 
 class PreferenceMapPanel(PlotPanel):
@@ -276,172 +367,6 @@ class PreferenceMapPanel(PlotPanel):
         PlotPanel.do_plot_cmd(self)
         Pmw.hidebusycursor()
 
-
-
-class WeightsPanel(PlotPanel):
-    def __init__(self,parent,pengine,console=None,**config):
-
-        self.r = 0
-        self.row_str = StringVar()
-        self.row_str.set(0.0)
-#         self.row_str.set('current_height/2')
-        self.c = 0
-        self.col_str = StringVar()
-        self.col_str.set(0.0)
-#         self.col_str.set('current_width/2')
-        self.WEIGHT_PLOT_INITIAL_SIZE = 100
-
-        # Generate the initial plot_key
-        self.generate_plot_key()
-        self.debug('plot_key = ' + str(self.plot_key))
-        
-        PlotPanel.__init__(self,parent,pengine,console,**config)
-
-        params_frame = Frame(master=self)
-        params_frame.pack(side=TOP,expand=YES,fill=X)
-
-        Message(params_frame,text="Row:",aspect=1000).pack(side=LEFT)
-        Entry(params_frame,textvariable=self.row_str).pack(side=LEFT,expand=YES,fill=X)
-        Message(params_frame,text="Column:",aspect=1000).pack(side=LEFT)
-        Entry(params_frame,textvariable=self.col_str).pack(side=LEFT,expand=YES,fill=X)
-
-        # The plot_key needs to be set, and the parent constructor as well,
-        # since a throw-away PlotGroup is going to be used to estimate an
-        # initial zoom factor.
-        self.set_initial_zoom_factor()
-        self.refresh()
-        
-
-    def set_initial_zoom_factor(self):
-        """
-        The initial zoom factor of 1 makes tiny RFs very hard to see.
-        By setting an initial dynamic zoom factor, the starting plot
-        will not have to be scaled much by the user.
-
-        It's very inefficient that an entire PlotGroup has to be
-        created, then discarded just to estimate how big to set the
-        initial scale size.  This should be replaced with something
-        more efficient later.
-        """
-        self.pe_group = self.pe.get_plot_group(self.plot_key)
-        self.plot_tuples = self.pe_group.plots()
-        # print 'self.plot_tuples = ', self.plot_tuples
-        shapes = [(each[0])[0].shape for each in self.plot_tuples]
-        main_dimension = [max(x,y) for (x,y) in shapes]
-        main = max(main_dimension)
-        self.zoom_factor = self.WEIGHT_PLOT_INITIAL_SIZE // main
-
-
-    def generate_plot_key(self):
-        """
-        The plot_key for the WeightsPanel will change depending on the
-        input within the window widgets.  This means that the key
-        needs to be regenerated at the appropriate times.
-        """
-        g = __main__.__dict__
-        self.r = eval(self.row_str.get(),g)
-        self.c = eval(self.col_str.get(),g)
-        if isinstance(self.r,int): self.r = float(self.r)
-        if isinstance(self.c,int): self.c = float(self.c)
-        self.plot_key = ('Weights',self.r,self.c)
-        
-        
-    def do_plot_cmd(self):
-        """
-        Overloaded do_plot_cmd() so that the plot_key can change to the
-        active row/col pair in the window.
-        """
-        self.generate_plot_key()
-        super(WeightsPanel,self).do_plot_cmd()
-        self.parent.title("Weights Array %d. (r=%0.4f, c=%0.4f)" %
-                          (self.console.num_weights_windows,self.r, self.c))
-
-
-
-class WeightsArrayPanel(PlotPanel):
-    def __init__(self,parent,console=None,**config):
-
-        self.skip_str = StringVar()
-        self.skip_str.set('N/8')
-
-        self.situate = StringVar()
-        self.situate.set(0)
-
-        self.region = StringVar()
-        self.region.set('Primary')
-
-        self.weight_name = StringVar()
-#        self.weight_name.set(Lissom.eval_param("cmd::plot_unit_range::name"))
-
-        PlotPanel.__init__(self,parent,console,**config)
-
-        params_frame1 = Frame(master=self)
-        params_frame1.pack(side=BOTTOM,expand=YES,fill=X)
-
-        Message(params_frame1,text="Skip:",aspect=1000).pack(side=LEFT)
-        Entry(params_frame1,textvariable=self.skip_str).pack(side=LEFT,expand=YES,fill=X)
-        Checkbutton(params_frame1,text="Situate",variable=self.situate,
-                    command=self.refresh).pack(side=LEFT)
-
-        params_frame2 = Frame(master=self)
-        params_frame2.pack(side=BOTTOM,expand=YES,fill=X)
-
-        Pmw.OptionMenu(params_frame2,
-                       labelpos = 'w',
-                       label_text = 'Region:',
-                       menubutton_textvariable = self.region,
-                       items = ['Primary', 'Ganglia00', 'Ganglia01', 'Secondary']
-                       ).pack(side=LEFT)
-
-        Pmw.OptionMenu(params_frame2,
-                       labelpos = 'w',
-                       label_text = 'Name:',
-                       menubutton_textvariable = self.weight_name,
-                       items = [ self.weight_name.get(),
-                                 'Afferent0', 'LateralExcitatory', 'LateralInhibitory']
-                       ).pack(side=LEFT)
-
-
-
-    def do_plot_cmd(self):
-        """
-        Behaves similarly to Activation plots, except that these Weights
-        plots are (currently) only defined for RFSheets.
-        """
-        
-        Pmw.showbusycursor()
-
-        self.pe_group = self.pe.get_plot_group(self.plot_key)
-        self.plot_tuples = self.pe_group.plots()
-        self.pe.debug('Type of plot_group', type(self.pe_group))
-
-        self.plotlist = []
-        self.plotlabels = []
-
-        Pmw.hidebusycursor()
-
-
-#         if self.situate.get():
-#             prefix = 'ppm_border=1 '
-#             situate = 'True'
-#             suffix = ' weight_bare=false ppm_outline_width=1 ppm_interior_border=0 ppm_interior_outline=False'
-#         else:
-#             prefix = ''
-#             situate = 'False'
-#             suffix = ''
-#         self.plot_cmd = prefix + 'plot_unit_range'
-#         self.plot_cmd += ' region=' + self.region.get()
-#         self.plot_cmd += ' name=' + self.weight_name.get()
-#         self.plot_cmd += ' verbose=true ppm_separate_plots=false ppm_combined_plots=true'
-#         self.plot_cmd += ' ppm_neuron_skip_aff=' + self.skip_str.get()
-#         self.plot_cmd += ' weight_situate=' + situate +  suffix
-
-        PlotPanel.do_plot_cmd(self)
-
-
-    def plotname_to_filename(self,plotname):
-        return 'gui.'+self.plotname_components(plotname)[0]+'_Weights.ppm'
-####################
 
 
 class RetinalInputParamsPanel(Frame):
@@ -603,7 +528,5 @@ class RetinalInputParamsPanel(Frame):
         return params
 
         
-def enum(seq):
-    return zip(range(len(seq)),seq)
 
 
