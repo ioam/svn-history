@@ -55,9 +55,9 @@ V1 = RFSOM(name='V1')
 V2 = RFSOM(name='V2')
 save  = ImageSaver(name='RFSOM')
 
-s.connect(retina,V1,delay=0.5)
-s.connect(retina,V2,delay=0.5)
-s.connect(retina2,V2,delay=0.5)
+s.connect(retina,V1,delay=0.5,projection_params={'name':'R1toV1'})
+s.connect(retina,V2,delay=0.5,projection_params={'name':'R1toV2'})
+s.connect(retina2,V2,delay=0.5,projection_params={'name':'R2toV2'})
 
 # Uncomment the connections to the image saver, to save all the activation
 # images to disk.
@@ -66,7 +66,7 @@ s.connect(retina2,V2,delay=0.5)
 
 #topo.gui.link_to_sim(s)
 
-s.run(5)
+s.run(2)
 
 #V1.projections['Retina'][0].plot_rfs()
 
