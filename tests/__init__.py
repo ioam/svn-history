@@ -16,6 +16,7 @@ import testplotengine
 import testsimulator
 import testpalette
 import testgui
+import testpropertiesframe
 
 suite = unittest.TestSuite()
 
