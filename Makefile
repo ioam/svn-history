@@ -15,16 +15,13 @@ ext-packages:
 
 ##############################################################
 # Auto-generated Source Documentation
-# Uses a partially integrated python script named gendocs.py
+# Uses an integrated python script named gendocs.py
 #
-GENDOC = ./topographica topo/gendocs.py -w 
-
 cleandocs:
-	rm -r docs
+	- rm -r docs
 
 docs: topo/*.py
 	mkdir -p docs
-	${GENDOC} topo/__init__.py
-	mv docs/__init__.html docs/index.html
-	${GENDOC} topo/
+	./topographica topo/gendocs.py
+	mv docs/topo.__init__.html docs/index.html
 
