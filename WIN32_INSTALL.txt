@@ -31,7 +31,7 @@ Known issues:
 Sometimes on Windows 2000 Machines the Dislin setup.exe program will
 not exit cleanly after the install.  The Topographica installation has
 completed successfully but the final notice that says to add the
-DISLIN and PYHONPATH environment variables will not be displayed.
+DISLIN and PYTHONPATH environment variables will not be displayed.
 ---
 
 

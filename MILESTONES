@@ -260,9 +260,9 @@ RELATED (BUT NOT STRICTLY REQUIRED) ISSUES TO ADDRESS BEFORE THIS MILESTONE:
   e.g. presenting a color bitmap to an Eye instead of to R, G, and B
   separately, plotting the resulting activation from the three areas
   in true color, combining ON and OFF plots into one bitmap (by
-  subtraction), measuring a vertically summed orientation map for a
-  model using several layers.  This functionality is only required for
-  later milestones, but may also be needed here to handle ON/OFF
+  subtraction), and measuring a vertically summed orientation map for a
+  model using several layers.  This functionality may only be required for
+  later milestones, but is listed here in case it is required for ON/OFF
   plots.
 
 - Unify random number generation, so that users can manipulate seeds
@@ -287,7 +287,7 @@ into something that will work with each new release.
 
 _______________________________________________________________________________
 
-		  REACHING MILESTONE 5: FLESHED OUT
+		  REACHING MILESTONE 5: ADVANCING
 
 See the Topographica grant proposal.  This milestone will include
 things like GUI-based network building, algorithms other than LISSOM
