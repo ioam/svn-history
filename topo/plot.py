@@ -96,7 +96,7 @@ class Plot(TopoObject):
                     self.warning('Plot Channel-type requires a Sheet, but None Sheet passed to Plot() object.')
                     self.warning('channels = ' + str(self.channels) + ' type(self.source) = ' + str(type(self.source)))
                 else:
-                    self.source.delete_sheet_view(each)
+                    self.source.release_sheet_view(each)
 
 
     def plot(self):
@@ -126,6 +126,7 @@ class Plot(TopoObject):
             #         No need for a Sheet.
             if isinstance(each,SheetView):
                 self.channel_views.append(each)
+                self.name = each.name
 
             # Case 2: Entry is a string, or tuple that will be used as a
             #         key in the Sheet dictionary.
@@ -134,9 +135,11 @@ class Plot(TopoObject):
                     self.warning('Plot Channel-type requires a Sheet, but None Sheet passed to Plot() object.')
                     self.warning('channels = ' + str(self.channels) + ' type(self.source) = ' + str(type(self.source)))
                     self.channel_views.append(None)
+                    self.name = 'Undefined'
                 else:
                     sv = self.source.sheet_view(each)
                     self.channel_views.append(sv)
+                    self.name = sv.name
 
             # Case 3: Channel entry is None.  Pass along.
             elif each == None:
@@ -286,8 +289,9 @@ class PlotGroup(TopoObject):
         # done to each of the matrices that come in from the Plot
         # objects.
         bitmap_list = [each.plot() for each in self.all_plots]
+        name_list = [each.name for each in self.all_plots]
 
-        return bitmap_list
+        return (bitmap_list, name_list)
 
 
 
