@@ -65,7 +65,9 @@ class PlotPanel(Frame,topo.base.TopoObject):
         self.parent = parent
         self.canvases = []
 
-        self.plot_group = Pmw.Group(self,tag_pyclass=None)
+        # Main Plot group title can be changed from a subclass with the
+        # command: self.plot_group.configure(tag_text='NewName')
+        self.plot_group = Pmw.Group(self,tag_text='Plot')
         self.plot_group.pack(side=TOP,expand=YES,fill=BOTH,padx=5,pady=5)
         self.plot_frame = self.plot_group.interior()
 
@@ -160,7 +162,6 @@ class PlotPanel(Frame,topo.base.TopoObject):
         first display.
         """
         self.plotlist = []
-        self.plotlabels = []
         # need to calculate the old min width, so we know if we need to reset
         # the zoom factors
         if self.images:
@@ -180,8 +181,6 @@ class PlotPanel(Frame,topo.base.TopoObject):
                 win = topo.bitmap.RGBMap(r,g,b)
                 self.images.append(win)
                 self.plotlist.append(win)
-                self.plotlabels.append(self.pe_group.name + ' ' \
-                                       + str(len(self.plotlist)))
         
         if self.images:
             min_width = reduce(min,[im.width() for im in self.images])
@@ -241,9 +240,9 @@ class PlotPanel(Frame,topo.base.TopoObject):
 
     def display_labels(self):
         """
-        Pre:  self.plotlabels contains a list of strings that match the
+        Pre:  self.plot_names contains a list of strings that match the
               list of bitmap images is self.images.
-        Post: Each string within self.plotlabels has been displayed on the
+        Post: Each string within self.plot_names has been displayed on the
               screen directly below its corresponding image in the GUI
               window.
 
@@ -254,7 +253,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
         """
         old_labels = self.labels
         self.labels = [Label(self.plot_frame,text=name)
-                       for name in self.plotlabels]
+                       for name in self.plot_names]
         for i in range(len(self.labels)):
             self.labels[i].grid(row=1,column=i,sticky=NSEW)
         for l in old_labels:
