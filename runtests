@@ -1,0 +1,46 @@
+#!/usr/bin/env python
+#
+# Script to run Topographica test modules.
+#
+# do './runtests -h' in topographica directory for usage.
+#
+
+import unittest
+import tests
+import getopt,sys
+
+USAGE = """
+
+usage: runtests [opts] [testmodule ...]
+
+Runs the given test modules.  Runs all test modules if no arguments.
+
+options:
+   -v level : set the verbosity level (0,1,2,...)
+   -h       : print this message and exit
+"""
+
+try:
+    opts,args = getopt.getopt(sys.argv[1:],'v:')
+except getopt.GetoptError,err:
+    print USAGE
+    sys.exit()
+
+opts = dict(opts)
+
+if '-h' in opts:
+    print USAGE
+    sys.exit()
+
+if '-v' in opts:
+    verbosity = int(opts['-v'])
+else:
+    verbosity = 1
+
+if args:
+    suite = unittest.TestSuite()
+    suite.addTests([getattr(tests,module).suite for module in args])
+else:
+    suite = tests.suite
+
+unittest.TextTestRunner(verbosity=verbosity).run(suite)
