@@ -3,6 +3,9 @@ import os,unittest
 import testpropertiesframe
 import testtopoconsole
 import testplotpanel
+import testactivitypanel
+import testweightspanel
+import testweightsarraypanel
 
 suite = unittest.TestSuite()
 
