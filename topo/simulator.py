@@ -39,7 +39,7 @@ import sched
 from base import TopoObject
 from params import Parameter
 
-PAUSE = "Simulator Paused"
+STOP = "Simulator Stopped"
 
 class Simulator(TopoObject):
     """
@@ -65,29 +65,31 @@ class Simulator(TopoObject):
         self.__scheduler = sched.scheduler(self.time,self.sleep)
         
         
-    def run(self,dur=0):
+    def run(self,duration=0,until=0):
         """
         Run the simulator.   Call .start() for each EventProcessor, and
         start the event scheduler.
         """
         for node in self.__event_processors:
             node.start()
-        self.cont(dur)
+        self.continue_(duration,until)
 
-    def cont(self,dur=0):
-        if dur:
-            self.__scheduler.enter(dur,0,self.pause,[])
+    def continue_(self,duration=0,until=0):
+        if duration:
+            self.__scheduler.enter(dur,0,self.stop,[])
+        if until:
+            self.__scheduler.enterabs(until,0,self.stop,[])
         try:
             self.__scheduler.run()
-        except PAUSE:
-            print "Paused"
+        except STOP:
+            print "Simulation stopped at time %f" % self.time()
         except EOFError:
-            print "Paused"
+            print "Simulation stopped at time %f" % self.time()
         except KeyboardInterrupt:
-            print "Paused"
+            print "Simulation stopped at time %f" % self.time()
 
-    def pause(self):
-        raise PAUSE
+    def stop(self):
+        raise STOP
 
     def add(self,*EPs):
         """
@@ -214,7 +216,7 @@ class PulseGenerator(EventProcessor):
 
     Parameters:
       amplitude = The size of the pulse to generate. (default 1.0)
-      period    = The period with which to repeat the pulse. (defalut 0.0)
+      period    = The period with which to repeat the pulse. (default 0.0)
                   If zero, the pulse will be sent exactly once.
       phase     = The time after starting the simulation to wait before
                   sending the first pulse. (default 0.0)

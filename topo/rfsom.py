@@ -1,7 +1,7 @@
 import RandomArray
 
+from utils import norm,inf,mdot
 from params import Parameter
-from utils import norm,inf,Struct,mdot
 from sheet import Sheet,activation_submatrix,input_slice
 from Numeric import argmax,sqrt,exp
 
@@ -34,11 +34,10 @@ class RFSOM(Sheet):
 
     def _connect_from(self,src,src_port=None,dest_port=None):
         Sheet._connect_from(self,src,src_port,dest_port)
-        self.projections[src.name] = Struct()
-        self.projections[src.name].sheet = src
-        self.projections[src.name].rfs = [[ RF(src,center=(x,y),width=self.rf_width)
-                                            for y in self.sheet_cols() ]
-                                          for x in self.sheet_rows() ]
+        self.projections[src.name] = Projection(sheet = src,
+                                                rfs = [[ RF(src,center=(x,y),width=self.rf_width)
+                                                         for y in self.sheet_cols() ]
+                                                       for x in self.sheet_rows() ])
                       
     def alpha(self):
         return self.alpha_0 * decay(self.count,self.half_life)
@@ -54,7 +53,7 @@ class RFSOM(Sheet):
         rows,cols = self.activation.shape
         for r in range(rows):
             for c in range(cols):
-                rf = self.projections[input_sheet.name].rfs[r][c]
+                rf = self.projections[input_sheet.name].rf(r,c)
                 X = rf.get_input_matrix(input_activation)
                 self.activation[r,c] = mdot(X,rf.weights)
 
@@ -73,14 +72,14 @@ class RFSOM(Sheet):
         rmin = max(0,wr-radius)
         rmax = min(wr+radius,rows)
 
-        rfs = self.projections[input_sheet.name].rfs
         for r in range(rmin,rmax):
             for c in range(cmin,cmax):
                 lattice_dist = norm((wc-c,wr-r))
                 if  lattice_dist <= radius:
+                    rf = self.projections[input_sheet.name].rf(r,c)
                     rate = self.alpha() * gaussian(lattice_dist,radius)
-                    X = rfs[r][c].get_input_matrix(input_activation)
-                    rfs[r][c].weights += rate * (X - rfs[r][c].weights)
+                    X = rf.get_input_matrix(input_activation)
+                    rf.weights += rate * (X - rf.weights)
                                    
         self.count += 1 
 
@@ -112,6 +111,18 @@ class RFSOM(Sheet):
 
 ###############################################
 from base import TopoObject
+
+class Projection(TopoObject):
+
+    def __init__(self,**params):
+        self.__rfs = params['rfs']
+        self.__sheet = params['sheet']
+        setup_params(self,Projection,**params)
+
+    def sheet(self): return __sheet
+
+    def rf(self,r,c):
+        return self.__rfs[r][c]
 
 class RF(TopoObject):
 
@@ -166,5 +177,5 @@ if __name__ == '__main__':
     s.add(som,input,save)
     s.connect(input,som)
     s.connect(som,save)
-    s.run()
+    s.run(duration=10)
     
