@@ -14,6 +14,7 @@ from topo.tk.weightsarraypanel import *
 import topo.simulator as simulator
 import topo.plotengine
 import topo.gui
+import topo.base
 
 KNOWN_FILETYPES = [('Python Files','*.py'),('Topographica Files','*.ty'),('All Files','*')]
 
@@ -140,6 +141,15 @@ class TopoConsole(Frame):
                                  label="Refresh",
                                  command=self.auto_refresh)
         
+
+        #
+        # Help menu
+        #
+        self.menubar.addmenu('Help','Information about Topographica', side='right')
+        self.menubar.addmenuitem('Help', 'command',
+                                 'Licensing and release information',
+                                 label="About",
+                                 command=self.new_about_window)
 
         #
         # Command entry
@@ -374,6 +384,16 @@ class TopoConsole(Frame):
         #     self.input_params_window.lift()
         #     self.input_params_window.focus_set()
 
+
+    def new_about_window(self):
+        win = GUIToplevel(self)
+        win.withdraw()
+        win.title("About Topographica")
+        text = Label(win,text=topo.base.ABOUT_TEXT,justify=LEFT)
+        text.pack(side=LEFT)
+        win.deiconify()
+        self.messageBar.message('state', 'OK')
+            
 
     #
     # Command buttons.

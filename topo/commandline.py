@@ -7,8 +7,9 @@ $Id$
 BANNER         = """
 Welcome to Topographica!
 
-Type help() for interactive help, or help(commandname) for info on a
-specific command.
+Type help() for interactive help, help(commandname) for info on a
+specific command, or topo.base.about() for info on this release, 
+including licensing information.
 """
 
 def start(interactive=True):
