@@ -58,4 +58,8 @@ Topic: component abstraction -- subgraph components
 
 Topic: Optimization
 
+Topic (from Jim): Interfaces to external programs or packages other
+than Pyro, such as Dia, logger, and g -- any ideas where these might
+be relevant, what the pros and cons of using them might be, and/or how
+to go about it?
 
