@@ -2,8 +2,12 @@
 
 import sys,os,code
 from pprint import pprint
-import topo
+from topo import *
 
+# set up the interactive prompt
+import rlcompleter,readline
+
+readline.parse_and_bind("tab: complete")
 
 sys.ps1 = 'Topographica> '
 
