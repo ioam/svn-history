@@ -1,4 +1,4 @@
-from topo import *
+from topo.kernelfactory import *
 from topo.inputsheet import *
 from topo.image import ImageSaver
 from math import pi
@@ -45,31 +45,39 @@ class LISSOM(rfsheet.RFSheet):
         self.ports[dest_port].append(self.projections[src.name][-1])
     def input_event(self,src,src_port,dest_port,data):
         super(LISSOM,self).input_event(src,src_port,dest_port,data)
+
+        ## FIXME: Need to store port,input_sheet, and activation data
         self.input_buffer[src.name] = data            
+
     def pre_sleep(self):
-        self.activation = self.transfer_fn(self.temp_activation)
-        self.send_output(data=self.activation)
+        self.debug("pre_sleep...")
+        if self.input_buffer:
 
-        rows,cols = self.activation.shape
-        for name,input in self.input_buffer.items():
-            for p in self.projections[name]:
-                for r in range(rows):
-                    for c in range(cols):
-                        rf = p.rf(r,c)
-                        rf.weights += self.learning_rate * self.activation[r,c] * rf.get_input_matrix(input)
-                        
+            ## FIXME: need to compute activation here
+            
+            self.activation = self.transfer_fn(self.activation)
+            self.debug("sending output")
+            self.send_output(data=self.activation)
 
-        # normalize weights
-        for r in range(rows):
-            for c in range(cols):
-                # normalize  weights attached to each port (e.g. 'afferent', 'lateral')
-                for name,projlist in self.ports.items():
-                    k = sum([msum(p.rf(r,c).weights) for p in projlist])
-                    for p in projlist:
-                        p.rf(r,c).weights /= k
+            rows,cols = self.activation.shape
+            for name,input in self.input_buffer.items():
+                for p in self.projections[name]:
+                    for r in range(rows):
+                        for c in range(cols):
+                            rf = p.rf(r,c)
+                            rf.weights += self.learning_rate * self.activation[r,c] * rf.get_input_matrix(input)
 
 
-        self.temp_activation *= 0.0
+            # normalize weights
+            for r in range(rows):
+                for c in range(cols):
+                    # normalize  weights attached to each port (e.g. 'afferent', 'lateral')
+                    for name,projlist in self.ports.items():
+                        k = sum([msum(p.rf(r,c).weights) for p in projlist])
+                        for p in projlist:
+                            p.rf(r,c).weights /= k
+
+
         self.input_buffer = {}
 
 
@@ -79,24 +87,23 @@ class LISSOM(rfsheet.RFSheet):
 
 print "Setting parameters..."
 
-rfsheet.RF.print_level = base.VERBOSE
 
 # input generation params
 InputSheet.period = 1.0
 InputSheet.density = 900
 
-FuzzyLineSheet.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-FuzzyLineSheet.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+FuzzyLineFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+FuzzyLineFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
 
-FuzzyLineSheet.theta = Dynamic(lambda :random.uniform(-pi,pi))
-FuzzyLineSheet.width = 0.02
-FuzzyLineSheet.height = 0.9
-FuzzyLineSheet.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+FuzzyLineFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
+FuzzyLineFactory.width = 0.02
+FuzzyLineFactory.height = 0.9
+FuzzyLineFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
 
 # rf som parameters
 LISSOM.density = 900
-LISSOM.weights_factory = UniformRandomSheet(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+LISSOM.weights_factory = UniformRandomFactory(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 
 
 # image saver parameters
@@ -106,26 +113,30 @@ ImageSaver.time_format='%0.4d'
 ###########################################
 # build simulation
 
-base.min_print_level = base.MESSAGE
 
 print "Creating simulation objects..."
 s = Simulator()
 
-retina = FuzzyLineSheet(name='Retina')
+retina = InputSheet(input_generator=FuzzyLineFactory(),name='Retina')
 V1 = LISSOM(name='V1')
 save  = ImageSaver(name='RFSOM')
 
 s.connect(retina,V1,dest_port='afferent',delay=1)
-s.connect(V1,V1,dest_port='lateral')
+
+#rfsheet.RF.print_level = base.VERBOSE
+s.connect(V1,V1,dest_port='lateral',delay=0.1)
+
+base.min_print_level = base.DEBUG
+
 
 # Uncomment the connections to the image saver, to save all the activation
 # images to disk.
 #s.connect(retina,save,dest_port='retina',delay=2)
 #s.connect(V1,save,dest_port='V1',delay=1)
 
-s.run(10000)
+#s.run(10000)
 
-V1.projections['Retina'][0].plot_rfs()
+#V1.projections['Retina'][0].plot_rfs()
 
 # import profile,pstats
 #

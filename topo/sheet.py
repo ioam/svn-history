@@ -43,17 +43,19 @@ def input_slice(slice_bounds, input_bounds, input_density):
     
     """
     left,bottom,right,top = slice_bounds.aarect().lbrt()
+    rows,cols = bounds2shape(slice_bounds,input_density)
+
     toprow,leftcol = sheet2matrix(left,top,input_bounds,input_density)
-    bottomrow,rightcol = sheet2matrix(right,bottom,input_bounds,input_density)
+    #bottomrow,rightcol = sheet2matrix(right,bottom,input_bounds,input_density)
 
     maxrow,maxcol = sheet2matrix(input_bounds.aarect().right(),
                                  input_bounds.aarect().bottom(),
                                  input_bounds,input_density)
 
     rstart = max(0,toprow)
-    rbound = min(maxrow+1,bottomrow+1)
+    rbound = min(maxrow+1,toprow+rows)
     cstart = max(0,leftcol)
-    cbound = min(maxcol+1,rightcol+1)
+    cbound = min(maxcol+1,leftcol+cols)
 
     return rstart,rbound,cstart,cbound
 

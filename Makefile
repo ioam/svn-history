@@ -46,7 +46,7 @@ topographica: ext-packages
 	echo "# exec" >> topographica
 	echo "os.execv(os.path.join(TOPO,'bin/python')," >> topographica
 	echo "         [os.path.join(TOPO,'topographica')," >> topographica
-	echo "          'topographica-script.py'] + sys.argv[1:])" >> topographica
+	echo "          os.path.join(TOPO,'topographica-script.py') ]+ sys.argv[1:])" >> topographica
 
 	chmod a+x ${PREFIX}topographica
 

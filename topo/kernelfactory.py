@@ -33,20 +33,30 @@ def produce_kernel_matrices(bounds, density):
     bound_width  = right-left
     bound_height = top-bottom
     linear_density = sqrt(density)
-
+    
     rows,cols = bounds2shape(bounds,density)
-        
+    
     # TODO: this can generate ouput that may be off by one in terms of size,
     # for example most times this generates a 100x100 image, but sometimes
     # it generates a 101x100 
-
+    
     # TODO: Use sheet operations defined in sheet.py? I think we already
     # do...
+    
+    
+    #kernel_y = arange(left,right, bound_width/cols)
+    #kernel_x = arange(bottom,top, bound_height/rows)
+    
+    kernel_x = array([matrix2sheet(r,0,bounds,density) for r in range(rows)])
+    kernel_y = array([matrix2sheet(0,c,bounds,density) for c in range(cols)])
 
-    kernel_y = arange(left,right, bound_width/cols)
-    kernel_x = arange(bottom,top, bound_height/rows)
- 
-    return kernel_x, kernel_y
+
+    # NOTE: This is correct,
+    #  kernels use x for rows and y for columns, not sure why. --jp
+    assert len(kernel_x) == rows
+    assert len(kernel_y) == cols
+    
+    return kernel_x[:,1], kernel_y[:,0]
 
 """
 Get Rotated matrices

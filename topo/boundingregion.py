@@ -50,6 +50,7 @@ class BoundingBox(BoundingRegion):
         return self._aarect
 
 
+
 class BoundingEllipse(BoundingBox):
     """
     Similar to BoundingBox, but it the region is the ellipse
@@ -110,9 +111,25 @@ class Unbounded(BoundingRegion):
         pass
     def aarect(self):
         return AARectangle((-inf,-inf),(inf,inf))
-      
-        
 
+
+class Intersection(BoundingRegion):
+    def __init__(self,*regions,**params):
+        super(Intersection,self).__init__(**params)
+        self.regions = regions
+
+        bounds = [r.aarect().lbrt() for r in self.regions]
+        left = max([l for (l,b,r,t) in bounds])
+        bottom = max([b for (l,b,r,t) in bounds])
+        right = min([r for (l,b,r,t) in bounds])
+        top = min([t for (l,b,r,t) in bounds])
+
+        self.__aarect = AARectangle((left,bottom),(right,top))
+
+    def aarect(self):
+        return self.__aarect
+    
+###################################################
 class AARectangle:
     """
     Axis-aligned rectangle class.   Defines the smallest
@@ -176,6 +193,11 @@ class AARectangle:
         t = min(t1,t2)
 
         return AARectangle(points=((l,b),(r,t)))
+
+    def width(self):
+        return self.__right - self.__left
+    def height(self):
+        return self.__top - self.__bottom
 
     def empty(self):
         l,b,r,t = self.lbrt()

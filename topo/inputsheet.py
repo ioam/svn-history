@@ -10,19 +10,16 @@ from utils import NxN
 
 from sheet import BoundingBox
 from params import *
-
+from kernelfactory import UniformRandomFactory
 
 class InputSheet(Sheet):
 
     sheet_period = Parameter(default=1)
     sheet_phase  = Parameter(default=0)
 
-    bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))))
-    density = Parameter(default=10000)
-
     theta = Parameter(default=0)
 
-    input_generator = Parameter(default=None)
+    input_generator = Parameter(default=UniformRandomFactory)
     
     def __init__(self,**params):
         super(InputSheet,self).__init__(**params)

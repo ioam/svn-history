@@ -28,6 +28,11 @@ class Projection(TopoObject):
     def rf(self,r,c):
         return self.__rfs[r][c]
 
+    def get_shape(self):
+        return len(self.__rfs),len(self.__rfs[0])
+
+    shape = property(get_shape)
+    
     def plot_rfs(self,montage=True,file_format='ppm',file_prefix='',
                  pixel_scale = 255, pixel_offset = 0):
         from Numeric import concatenate as join
@@ -78,6 +83,8 @@ class RF(TopoObject):
 
         slice_rows,slice_cols = self.get_input_matrix(self.input_sheet.activation).shape
 
+        # TODO: This cropping should be handled generically in the sheet module
+        # (maybe this whole function).
         if rmax != slice_rows:
             if t >= src_t:
                 rmin += rmax - slice_rows
@@ -127,14 +134,9 @@ class RFSheet(Sheet):
             row = []
             for x in self.sheet_cols():
                 # Move the kernel factory to the right position,
-                # TODO: this is a hack, the factory should allow parameter
-                # overiding when called.
                 bounds = copy.deepcopy(old_bounds)
                 bounds.translate(x,y)
-                self.weights_factory.x = x
-                self.weights_factory.y = y
-                self.weights_factory.bounds = bounds
-                weights = self.weights_factory()
+                weights = self.weights_factory(x=x,y=y,bounds=bounds,density=src.density)
                 row.append(self.rf_type(src,weights=weights,bounds=bounds))
             rfs.append(row)
             self.weights_factory.x = old_x

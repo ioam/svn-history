@@ -32,7 +32,7 @@ def topo_interact(banner = ''):
     """
     if banner != '':
         print banner
-    loc = copy.copy(locals())
+    loc = locals()
     console = code.InteractiveConsole(loc)
     while True:
         Command = None
@@ -79,7 +79,7 @@ def topo_interact(banner = ''):
 # NOTE: From here on, Topo interpeter's locals have "forked"
 # from the locals of this script
 #
-interpreter_locals = copy.copy(locals())
+interpreter_locals = locals()
 interpreter = code.InteractiveConsole(interpreter_locals)
 
 if args:
