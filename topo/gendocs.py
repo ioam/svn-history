@@ -8,12 +8,13 @@ To generate Documentation, enter 'make docs' from the base Topographica
 directory which will call this file on the Topographica sources.
 
 From the Makefile (Tabs have been stripped):
-    GENDOC = ./topographica topo/gendocs.py -w 
+    cleandocs:
+        - rm -r docs
+        
     docs: topo/*.py
-	mkdir -p docs
-	${GENDOC} topo/__init__.py
-	mv docs/__init__.html docs/index.html
-	${GENDOC} topo/
+        mkdir -p docs
+        ./topographica topo/gendocs.py
+        mv docs/topo.__init__.html docs/index.html
 
 $Id$
 """
@@ -22,14 +23,18 @@ import pydoc, glob, sys, os
 
 TOPO = 'topo'   # Subdirectory with Topographica source
 DOCS = 'docs'   # Subdirectory to place Docs
+pydoc.writing = 1
 
-sys.path.insert(1,TOPO + '/') 
-pydoc.cli()
+os.system('rm -rf ' + DOCS + '/*')
 
-# Move those files which were generated to ./docs/
-for i in glob.glob(TOPO + '/*.py'):
-    cline = 'mv -f ' + i[len(TOPO)+1:-3] + '.html ' + DOCS + '/' + i[len(TOPO)+1:-3] + '.html'
-    if glob.glob(i[len(TOPO)+1:-3] + '.html'):
-        # print cline
+# Generate the files once.  Skip if already generated.
+filelist = glob.glob(TOPO + '/*.py')
+for i in filelist:
+    if not glob.glob(DOCS + '/' + TOPO + '.' + i[len(TOPO)+1:-3] + '.html'):
+        pydoc.writedoc('topo.' + i[len(TOPO)+1:-3])
+    if glob.glob(TOPO + '.' + i[len(TOPO)+1:-3] + '.html'):
+        cline = 'mv -f ' + TOPO + '.' + i[len(TOPO)+1:-3] + '.html ' + DOCS + '/'
         os.system(cline)
+    else:                   
+        filelist.remove(i)  
 
