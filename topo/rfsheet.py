@@ -14,8 +14,58 @@ one sheet into an RFSheet.
 RF: a class for specifying a single receptive field within a
 projection.
 
+The module also defines KernelProjection, a subclass of Projection
+that defines projections of receptive fields where each RF's initial
+weight matrix is created by calling a KernelFactory.
+
+
+The RFSheet class should be sufficient to create a non-learning sheet
+that computes its activation via the contribution of many local
+receptive fields.  The activation output can be changed by changing
+the parameters RFSheet.activation_fn and RFSheet.transfer_fn.  (See
+RFSheet class documentation for more details).  To implement learning
+one must create a subclass and override the default .train() method.
+
+
+JEFF's IMPLEMENTATION NOTES
+
+* Non-rectangular RF bounds *
+
+Under the current implementation, I don't think learning rules like
+the one in lissom.ty will work correctly with non-rectangular RF
+bounds.  The learning rule is written to update each RF's entire weight
+matrix in a single step, and it will (I think) modify weights that are
+outside the bounds.  One way to handle this without having to call
+bounds.contains(x,y) for each and every weight value is to augment the
+current RF implementation with a 'mask' matrix of zeroes and ones
+indicating which weights actually belong in the RF.  After doing the
+learning step, do rf.weights *= rf.mask.
+
+* Computing stimulation in Projection objects *
+
+Currently each RFSheet object explicitly computes the activation of
+each RF in each projection by getting that RF's input matrix and
+calling the activation function on it with the RF's weights.  It would
+be more modular to add a .simulation(input_activation) method to the
+Projection class interface that would by default do what RFSheet does
+now.  Then RFSheet would, on input, just call the .stimulation()
+methods on the appropriate projections and add the results to its
+.temp_activation matrix.  In this scenario, the activation_fn
+parameter would move to Projection, or, better one of its subclasses,
+since one could conceive of Projections that compute their stimulation
+through some entirely different algorithm.
+
+BTW, in this case, the class RFSheet really isn't so much an 'rf
+sheet' as it is a 'projection sheet', that sums the contributions of
+many projections, and then passes them through a transfer function.
+This structure has an elegant kind of parsimony, where the Sheet is
+the large-scale analog of a neuron and the projection is the
+large-scale analog of the individual connection.
+
 $Id$
 """
+
+__version__ = '$Revision$'
 
 from params import *
 from sheet import Sheet
@@ -181,10 +231,56 @@ class KernelProjection(Projection):
 
 
 class RFSheet(Sheet):
+    """
+    A Sheet that computes activation via sets of weighted projections
+    onto other sheets.
 
+    A standard RFSheet expects its input to be generated from other
+    Sheets. Upon receiving an input event, the RFSheet interprets the
+    event data to be (a copy of) an activation matrix from another
+    sheet.  The RFSheet computes a 'stimulation' matrix for each
+    Projection to the sheet that generated the event by looping over
+    the Projection's matrix of RFs and calling the RFSheet's
+    .activation_fn() with the RF's weight matrix and input activation
+    region as parameters.  This stimulation is added to a temporary
+    activation buffer.  After all events have been processed for a
+    given time, the RFSheet computes it's .activation matrix as
+    self.transfer_fn(self.temp_activation).  This activation is then
+    sent on the default output port.
+
+    RFSheet takes two parameters:
+
+    activation_fn:  A function f(X,W) that takes two
+    identically shaped matrices X (the input) and W (the RF weights)
+    and computes a scalar stimulation value based on those weights.
+    The default is plastk.utils.mdot
+
+    transfer_fn: A function that s(A) that takes an activation matrix
+    A and produces and identically shaped output matrix. The default
+    is the identity function.
+
+    * Connections *
+
+    An RFSheet connection from another sheet takes two parameters:
+
+    projection_type: The type of projection to use for the
+    connection. default = KernelProjection
+
+    projection_params: A dictionary of keyword arguments for the
+    projection constructor.  default = {}
+
+    e.g. Given a simulator sim, an input sheet s1 and an RFSheet s2,
+    one might connect them thus:
+
+    sim.connect(s1,s2,projection_type=MyProjectionType,
+                      projection_params=dict(a=1,b=2))
+
+    s2 would then construct a new projection of type MyProjectionType
+    with the parameters (a=1,b=2).
+    """
+    
     activation_fn = Parameter(default=mdot)
     transfer_fn  = Parameter(default=lambda x:Numeric.array(x))
-    training_delay = NonNegativeInt(default=0)
                              
     def __init__(self,**params):
         super(RFSheet,self).__init__(**params)
@@ -196,6 +292,12 @@ class RFSheet(Sheet):
                       projection_type=KernelProjection,
                       projection_params={},
                       **args):
+
+        """
+        Accept a connection from src, on src_port, for dest_port.
+        Construct a new Projection of type projection_type using the
+        parameters in projection_params.
+        """
         
         Sheet._connect_from(self,src,src_port,dest_port,**args)
         if src.name not in self.projections:
@@ -203,11 +305,19 @@ class RFSheet(Sheet):
         self.projections[src.name].append(projection_type(src=src, dest=self,**projection_params))
 
     def input_event(self,src,src_port,dest_port,data):
+        """
+        Accept input from some sheet.  Call .present_input() to
+        compute the stimulation from that sheet.
+        """
         self.message("Received input from,",src,"at time",self.simulator.time())
         self.present_input(data,src)
         self.new_input = True
 
     def pre_sleep(self):
+        """
+        Pass the accumulated stimulation through self.transfer_fn and
+        send it out on the default output port.
+        """
         if self.new_input:
             self.new_input = False
             self.activation = self.transfer_fn(self.temp_activation)
@@ -219,9 +329,20 @@ class RFSheet(Sheet):
             self.debug("max activation =",max(self.activation.flat))
 
     def train(self):
+        """
+        Override this method to implement learning/adaptation.  Called
+        from self.pre_sleep() _after_ activation has been propagated.
+        """
         pass
 
     def present_input(self,input_activation,input_sheet):
+        """
+        Compute the stimulation caused by the given input_activation
+        (matrix) produced by the given sheet.  Applies f(X,W) for each
+        RF's weight matrix W and input matrix X for each projection
+        from self to input_sheet and adds the result to the
+        stimulation buffer.
+        """
         rows,cols = self.activation.shape
 
         for proj in self.projections[input_sheet.name]:

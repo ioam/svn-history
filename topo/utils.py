@@ -57,6 +57,18 @@ def mdot(m1,m2):
     return msum(m1*m2)
 
 
+def PLTF(x):
+    """
+    Piecewise-linear transfer function.
+    A matrix function that applies this function to each element:
+
+           /  0 : x < 0 
+    f(x) = |  x : 0 <= x <= 1
+           \  1 : x > 1
+    """
+    return ((x * (x>0)) * (x<1)) + (x>1)
+
+
 class Struct:
     """
     A simple structure class, takes keyword args and assigns them to
