@@ -5,6 +5,8 @@ import Numeric
 from topo.sheet import Sheet
 from topo.boundingregion import BoundingBox
 from topo.sheetview import *
+from topo.image import ImageGenerator
+from topo.bitmap import BWMap
 
 # Turn False once development is complete and this module is to be
 # included as part of the system unit testing.
@@ -40,6 +42,16 @@ class TestSheetView(unittest.TestCase):
             sv3.message(sv3.view())
             sv6.message('sv6.debug', sv6._view_list)
             sv6.message(sv6.view())
+
+
+    def test_view(self):
+        input = ImageGenerator(filename='tests/testsheetview.ppm',
+                        density=10000,
+                        bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))))
+        sv = input.sheet_view('Activation')
+        sv_tuple = sv.view()
+        map = BWMap(sv_tuple[0])
+        # map.show()
 
 
     def test_sum_maps(self):
