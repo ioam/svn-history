@@ -176,7 +176,15 @@ class Simulator(TopoObject):
                          "scheduled for time",time,"processed at time",self.time())
         else:
             dest.input_event(src,src_port,dest_port,data)
-        
+
+    def find_EP(self, obj_class, obj_name):
+        """
+        Look through the EventProcessor list to find an object of type
+        obj_type, and named obj_name.
+        """
+        return [ep for ep in self.__event_processors
+                if isinstance(ep,obj_class) and ep.name == obj_name]
+
     def time(self):
         """
         Return the current simulation time.
