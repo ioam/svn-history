@@ -8,6 +8,7 @@ To add new tests modules.
 1. Add a module to this directory containing unit tests defined using
    Python's standard 'unittest' module.  Each test module should define
    a variable 'suite' containing the entire test suite for that module.
+   See testdummy.py for a template file.
 
 2. Edit the file __init__.py, adding an import line for your module.
    The package initialization code will take care of adding your
