@@ -122,7 +122,7 @@ class Plot(TopoObject):
             self.warning('Unrecognized plot type')
 
         # Construct a list of Histogram objects from the matrices that have
-        # been created and are waiting to go.
+        # been created and are waiting to go.  
         self.histograms = [Hisogram(each) for each in self.matrices if each]
         
         return (self.matrices, self.histograms)
@@ -139,43 +139,61 @@ class PlotGroup(TopoObject):
 
     def __init__(self,plot_list,shape=FLAT,**params):
         """
-        plot_list has the plots to add to this group. 
+        plot_list can be of two types: 
+        1.  A list of Plot objects that will be polled for their bitmaps.
+        2.  Can also be a function that returns a list of plots so
+        that each time plot() is called, an updated list is created for the
+        latest list of sheets in the simulation.
 
-        Shape gives the visual arrangement of the plots within the group.
-        The default is FLAT (None) with each subsequent plot to the right
-        of the last.
-        TO BE IMPLEMENTED:  (None, 5) will have 5 columns of plots,
-        (5, None) will have 5 rows of of plots.  An X-tuple will have
-        each subsequent row the length of the corresponding value in
-        the tuple.
+        shape recommends the visual arrangement of the plots within
+        the group.  The default is FLAT (None) with each subsequent
+        plot to the right of the last.  PlotGroup does not do the
+        final pasting, instead allowing the GUI to do that, but it
+        will hold the shape information for it.
+        RECOMMENDED IMPLEMENTATION: (None, 5) will have 5 columns of
+        plots, (5, None) will have 5 rows of of plots.  An X-tuple
+        will have each subsequent row the length of the corresponding
+        value in the tuple.
         """
         super(PlotGroup,self).__init__(**params)
         self.plot_list = plot_list
+        self.added_list = []
         self.shape = shape
-        self.plot_list = []
 
 
     def add(self,new_plot):
         """
         new_plot can be a single Plot, or it can be a list of plots.
-        Either way, it will be properly appended to the end of self's
-        plot_list.
+        Either way, it will be properly added to the end of self.plot_list.
         """
         if isinstance(new_plot,types.ListType):
-            self.plot_list.extend(new_plot)
+            if not isinstance(self.plot_list,types.ListType):
+                self.warning('Adding to PlotGroup that uses dynamic plotlist')
+            self.added_list.extend(new_plot)
         else:
-            new_plot = self.plot_list.append(new_plot)
+            self.added_list.append(new_plot)
 
 
     def plot(self):
         """
-        Get the matrix data from each of the Plot objects and paste
-        the data into a larger matrix.
+        Get the matrix data from each of the Plot objects, do any needed
+        plot marking, then pass up the list of bitmaps.
+
+        JUDAH: WHO'S GOING TO GLUE THE HISTOGRAMS INTO ONE GLORIOUS WHOLE?
         """
-        big_matrix = None
-        # TBI
-        # TBI
-        return big_matrix
+        bitmap_list = []
+        if isinstance(plot_list,types.ListType):
+            all_plots = self.plot_list + self.added_list
+        else:       # Assume it's a callable object that returns a list.
+            all_plots = self.plot_list() + self.added_list
+
+        # Eventually a simple list comprehension is not going to be
+        # sufficient as outlining and other things will need to be done
+        # to each of the matrices/bitmaps that come in from the Plot
+        # objects.
+        bitmap_list = [each.plot() for each in all_plots]
+
+        return bitmap_list
 
 
 
