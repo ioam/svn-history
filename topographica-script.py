@@ -32,6 +32,7 @@ if args:
     # if there's a file argument, load it.
     try:
         f = open(args[0],'r')
+        sys.argv = args
         if interpreter.runsource(f.read(),args[0],'exec'):
             print "Input file '%s' is incomplete." % filename
         f.close()
