@@ -9,6 +9,8 @@ from topo.sheetview import *
 from topo.plotengine import *
 from topo.bitmap import *
 import topo.tk.topoconsole 
+import topo.tk.plotpanel
+import Tkinter
 
 class TestPlotPanel(unittest.TestCase):
 
@@ -89,13 +91,13 @@ class TestPlotPanel(unittest.TestCase):
         Test the creation the widgets
         """
         base.min_print_level = base.WARNING
-        ActivityPanel.print_level = base.WARNING
+        topo.tk.plotpanel.ActivityPanel.print_level = base.WARNING
 
-        root = Tk()
+        root = Tkinter.Tk()
         root.resizable(1,1)
         Pmw.initialise(root)
         console = topo.tk.topoconsole.TopoConsole(parent=root)
-        console.pack(expand=YES,fill=BOTH)
+        console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
         console.set_active_simulator(self.s)
         console.new_activity_window()
         console.mainloop()

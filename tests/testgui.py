@@ -15,6 +15,7 @@ from topo.sheetview import *
 from topo.plotengine import *
 from topo.bitmap import *
 import topo.tk.topoconsole 
+import Tkinter
 
 class TestGui(unittest.TestCase):
 
@@ -92,11 +93,11 @@ class TestGui(unittest.TestCase):
         """
         Test the creation the widgets
         """
-        root = Tk()
+        root = Tkinter.Tk()
         root.resizable(0,0)
         Pmw.initialise(root)
         console = topo.tk.topoconsole.TopoConsole(parent=root)
-        console.pack(expand=YES,fill=BOTH)
+        console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
         console.quit()
 
 
