@@ -20,3 +20,8 @@ import inputsheet
 # namespace.
 from simulator import *
 from sheet import *
+
+# For using .ty file types.  Auto-installs, but has to be last one in
+# the import list of __init__.py 
+import tyimputil
+
