@@ -6,7 +6,8 @@ import topo.base
 
 class TestTopoConsole(unittest.TestCase):
     def setUp(self):
-        self.s = Simulator()
+        topo.simulator.set_active_sim(None)
+        self.s = Simulator(register=False)
         self.pe = PlotEngine(self.s)
         self.console = start()
         topo.base.min_print_level = topo.base.WARNING
