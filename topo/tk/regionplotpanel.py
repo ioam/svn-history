@@ -28,8 +28,8 @@ class RegionPlotPanel(PlotPanel):
         _region_refresh() is called.  It can either call the refresh()
         funcion, or update another menu, and so on.
         """
-        self.params_frame2 = Frame(master=self)
-        self.params_frame2.pack(side=BOTTOM,expand=YES,fill=X)
+        self.__params_frame = Frame(master=self)
+        self.__params_frame.pack(side=LEFT,expand=YES,fill=X)
 
         # Create the item list for RFSheet 'Region'  This will not change
         # since this window will only examine one Simulator.
@@ -40,7 +40,7 @@ class RegionPlotPanel(PlotPanel):
         if len(sim_ep_names) > 0:
             self.region.set(sim_ep_names[0])
 
-        self.opt_menu = Pmw.OptionMenu(self.params_frame2,
+        self.opt_menu = Pmw.OptionMenu(self.__params_frame,
                        command = self.region_refresh,
                        labelpos = 'w',
                        label_text = 'Region:',
@@ -57,3 +57,17 @@ class RegionPlotPanel(PlotPanel):
         """
         if self.auto_refresh:
             self.refresh()
+
+
+    def do_plot_cmd(self):
+        """
+        Lambda function passed in, that will filter out all sheets
+        except the one with the name being looked for.
+        """
+        self.generate_plot_key()
+        active_sheet_name = self.region.get()
+        sheet_filter_lam = lambda s: s.name == active_sheet_name
+        self.pe_group = self.pe.get_plot_group(self.plot_key,sheet_filter_lam)
+        self.plot_tuples = self.pe_group.plots()
+        # Delete old Sheet.sheet_view_dict entries
+        self.pe_group.release_sheetviews()  
