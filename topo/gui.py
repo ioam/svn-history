@@ -1,25 +1,31 @@
-#!/usr/bin/env python2.2
-#
-# $Id$
-#
+"""
+Primary entry point for the Topographica GUI.  Based strongly off of
+code taken verbatim from LISSOM 5.0.
 
+To start the gui from the Topographica prompt, call gui.start().
+
+$Id$
+"""
 from Tkinter import *
 import Pmw, re, os
-# import Pmw, Lissom, re, os
+import tkFileDialog
 from propertiesframe import *
 
 MIN_PLOT_WIDTH = 100
+KNOWN_FILETYPES = [('Python Files','*.py'),('Topographica Files','*.ty'),('All Files','*')]
 
-class LissomConsole(Frame):
+class TopoConsole(Frame):
     def __init__(self, parent=None,**config):
         Frame.__init__(self,parent,config)
 
 #        self._init_lissom()
 
+        self.parent = parent
         self.num_activity_windows = 0
         self.num_orientation_windows = 0
         self.num_weights_windows = 0
         self.num_weights_array_windows = 0
+        self.loaded_script = None
 
         self.auto_refresh_panels = []
 
@@ -42,27 +48,40 @@ class LissomConsole(Frame):
 	self.menubar.pack(fill = X)
 
         self.menubar.addmenu('Simulation','Simulation commands')
+        self.menubar.addmenuitem('Simulation', 'command', 'Load script file',
+                                 label = 'Load',
+                                 command = self.load_network)
+        self.menubar.addmenuitem('Simulation', 'command', 'Reload script from disk',
+                                 label = 'Reload',
+                                 command = self.reload_network)
         self.menubar.addmenuitem('Simulation', 'command', 'Reset the network',
                                  label = 'Reset',
+                                 ## Gray out menu item
+                                 foreground = 'Gray',
+                                 activeforeground = 'Gray',
+                                 activebackground = 'Light Gray',
+                                 ## 
                                  command = self.reset_network)
-        self.menubar.addmenuitem('Simulation', 'command', 'Reload saved network',
-                                 label = 'Reload',
-                                 command = self.reload_saved_network)
         self.menubar.addmenuitem('Simulation', 'command', 'Present a test pattern',
                                  label = 'Test Pattern',
+                                 ## Gray out menu item
+                                 foreground = 'Gray',
+                                 activeforeground = 'Gray',
+                                 activebackground = 'Light Gray',
+                                 ##
                                  command = self.open_plot_params_window)
         self.menubar.addmenuitem('Simulation', 'separator')
-        self.menubar.addmenuitem('Simulation', 'command', 'Close the program',
+        self.menubar.addmenuitem('Simulation', 'command', 'Close the GUI window',
                                  label = 'Quit',
                                  command = self.quit)
 
 	# Create and pack the MessageBar.
 	self.messageBar = Pmw.MessageBar(self,
-                                         entry_width = 40,
+                                         entry_width = 60,
                                          entry_relief='groove',
                                          labelpos = 'w',
                                          label_text = 'Status:')
-	self.messageBar.pack(side = BOTTOM,fill=X,padx=4,pady=4)
+	self.messageBar.pack(side = BOTTOM,fill=X,padx=4,pady=8)
 	self.messageBar.message('state', 'OK')
 	self.balloon.configure(statuscommand = self.messageBar.helpmessage)
 
@@ -79,8 +98,13 @@ class LissomConsole(Frame):
         self.menubar.addmenuitem('Plots', 'command',
                              'New orientation, ocular dominance, or similar map plot',
                              label="Preference Map",
-                             command=self.dummy)
+                             ## Gray out menu item
+                             foreground = 'Gray',
+                             activeforeground = 'Gray',
+                             activebackground = 'Light Gray',
                              #command=self.new_preferencemap_window)
+                             ##
+                             command=None)
         self.menubar.addmenuitem('Plots', 'command',
                              'New weights plot',
                              label="Weights",
@@ -89,8 +113,13 @@ class LissomConsole(Frame):
         self.menubar.addmenuitem('Plots', 'command',
                              'New weights array plot',
                              label="Weights Array",
-                             command=self.dummy)
+                             ## Gray out menu item
+                             foreground = 'Gray',
+                             activeforeground = 'Gray',
+                             activebackground = 'Light Gray',
                              #command=self.new_weights_array_window)
+                             ##
+                             command=self.dummy)
         self.menubar.addmenuitem('Plots','separator')
         self.menubar.addmenuitem('Plots', 'command',
                                  'Refresh auto-refresh plots',
@@ -104,7 +133,7 @@ class LissomConsole(Frame):
         #
         command_group = Pmw.Group(self,tag_text='Command')
         command_frame = command_group.interior()
-        command_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=4)
+        command_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
 
         self.cmd_box = Pmw.ComboBox(command_frame, autoclear=1,history=1,dropdown=1,
                                     selectioncommand=Pmw.busycallback(self.do_command))
@@ -115,7 +144,7 @@ class LissomConsole(Frame):
         #
         training_group = Pmw.Group(self,tag_text='Training iterations')
         training_frame = training_group.interior()
-        training_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=4)
+        training_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
 
         self.training_str = StringVar()
         self.training_str.set('1')
@@ -127,15 +156,18 @@ class LissomConsole(Frame):
 
 
     def _init_lissom(self):
-
+        """
+        No longer used by Topographica.  Staying here as a record of the steps
+        that LISSOM needs to do, as a template for Topographica.
+        """
         root_prefix = os.path.split(os.getcwd())[-1]
         initial_params_file = root_prefix+'.param'
 
         #
         # Load the initial params file and set the filebase
         #
-#        Lissom.cmd("exec_file "+initial_params_file)
-#        Lissom.cmd("set filebase="+root_prefix)
+        Lissom.cmd("exec_file "+initial_params_file)
+        Lissom.cmd("set filebase="+root_prefix)
         init_cmds = [
             # Set parameters to generate individual images instead of combined plot
             "ppm_border=0",
@@ -146,9 +178,11 @@ class LissomConsole(Frame):
  
 
     def quit(self):
+        """Close the main GUI window.  Does not exit Topographica interpreter."""
         self.cleanup_dir()
-        print 'Quit call.'
         Frame.quit(self)
+        Frame.destroy(self)     # Get rid of widgets
+        self.parent.destroy()   # Get rid of window
 
 
     def cleanup_dir(self):
@@ -158,11 +192,37 @@ class LissomConsole(Frame):
             if m != None:
                 print 'removing: ' + f
                 os.remove(f)
-        
+
+    def load_network(self):
+        """
+        Load a script file from disk and evaluate it.
+        """
+        self.loaded_script = tkFileDialog.askopenfilename(filetypes=KNOWN_FILETYPES)
+        if self.loaded_script in ('',(),None):
+            self.loaded_script = None
+            self.messageBar.message('state', 'Load canceled')
+        else:
+            execfile(self.loaded_script)
+            self.messageBar.message('state', 'Loaded ' + self.loaded_script)
+
+
+    def reload_network(self):
+        """
+        Reload the previously loaded file from disk.  Does not
+        prompt for new filename.  Currently does not flush any
+        existing environment variables, so the loaded script needs
+        to take that into account.  Also, the script is run in the
+        existing namespace, so it all goes away upon exit of this
+        function.
+        """
+        if self.loaded_script == None:
+            self.messageBar.message('state', 'No script to reload')
+        else:
+            execfile(self.loaded_script)
+            self.messageBar.message('state', 'Reloaded ' + self.loaded_script)
                 
     def reset_network(self):
-        print "LissomConsole.reset_network for ", self
-
+	self.messageBar.message('state', 'Reset not implemented')        
 
     #
     # auto-refresh handling
@@ -214,22 +274,29 @@ class LissomConsole(Frame):
         win.deiconify()
 
     def open_plot_params_window(self):
-        if self.input_params_window == None:
-            self.input_params_window = Toplevel(self)
-            self.input_params_window.title('Test Pattern Parameters')
-            RetinalInputParamsPanel(self.input_params_window,self).pack(side=TOP,expand=YES,fill=BOTH)
-            self.input_params_window.protocol('WM_DELETE_WINDOW',self.input_params_window.withdraw)
-        else:
-            self.input_params_window.deiconify()
-            self.input_params_window.lift()
-            self.input_params_window.focus_set()
+        """
+        Test Pattern Parameters Window.  The original code is commented
+        out until the next phase of development.  For now, this is a stub.
+        """
+        self.messageBar.message('state', 'Not yet implemented')
+        # if self.input_params_window == None:
+        #     self.input_params_window = Toplevel(self)
+        #     self.input_params_window.title('Test Pattern Parameters')
+        #     RetinalInputParamsPanel(self.input_params_window,self).pack(side=TOP,expand=YES,
+        #                                                                 fill=BOTH)
+        #     self.input_params_window.protocol('WM_DELETE_WINDOW',
+        #                                       self.input_params_window.withdraw)
+        # else:
+        #     self.input_params_window.deiconify()
+        #     self.input_params_window.lift()
+        #     self.input_params_window.focus_set()
 
 
     #
     # Command buttons
     #
     def do_command(self,cmd):
-        dummy()  # Added so do_command doesn't freak with no body.
+        dummy()  # Added so do_command doesn't freak with empty body.
 #        Lissom.cmd(cmd)
 
     def do_training(self,count):
@@ -243,7 +310,9 @@ class LissomConsole(Frame):
 
     def dummy(self):
         print "Button pressed in ", self
-    
+
+    def not_yet_implemented(self):
+        print "Operation not yet implemented."
     
 
         
@@ -759,23 +828,27 @@ def start():
     root = Tk()
     root.resizable(0,0)
     Pmw.initialise(root)
-    console = LissomConsole(parent=root).pack(expand=YES,fill=BOTH)
-    root.title("Lissom Console")
+    console = TopoConsole(parent=root).pack(expand=YES,fill=BOTH)
+    root.title("Topographica Console")
     # mainloop() takes control of the commandline.  Without this line
     # the command-line is still responsive.
     # root.mainloop()
 
 
-import sys,getopt
-
-if __name__ == '__main__':
-    opts,args = getopt.getopt(sys.argv[1:],'',['noloop'])
-    print 'opts = ' + `opts` + ' args = ' + `args`
-
-    root = Tk()
-    root.resizable(0,0)
-    Pmw.initialise(root)
-    console = LissomConsole(parent=root).pack(expand=YES,fill=BOTH)
-    root.title("Lissom Console")
-    if not (('--noloop','') in opts):
-        root.mainloop()
+#  Original main rountine for LISSOM 5.0.  Useful as an example of
+#  how it used to be done, but should not be moved to the tests
+#  directory.  New entry point is gui.start()
+#
+#  import sys,getopt
+#  
+#  if __name__ == '__main__':
+#      opts,args = getopt.getopt(sys.argv[1:],'',['noloop'])
+#      print 'opts = ' + `opts` + ' args = ' + `args`
+#  
+#      root = Tk()
+#      root.resizable(0,0)
+#      Pmw.initialise(root)
+#      console = LissomConsole(parent=root).pack(expand=YES,fill=BOTH)
+#      root.title("Lissom Console")
+#      if not (('--noloop','') in opts):
+#          root.mainloop()
