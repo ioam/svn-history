@@ -11,6 +11,7 @@ from topo.tk.plotpanel import *
 from topo.tk.activitypanel import *
 from topo.tk.weightspanel import *
 from topo.tk.weightsarraypanel import *
+from topo.tk.inputparamspanel import *
 import topo.simulator as simulator
 import topo.plotengine
 import topo.gui
@@ -85,9 +86,9 @@ class TopoConsole(Frame):
         self.menubar.addmenuitem('Simulation', 'command', 'Present a test pattern',
                                  label = 'Test Pattern',
                                  ## Gray out menu item ###########
-                                 foreground = 'Gray',            #
-                                 activeforeground = 'Gray',      #
-                                 activebackground = 'Light Gray',#
+                                 # foreground = 'Gray',            #
+                                 # activeforeground = 'Gray',      #
+                                 # activebackground = 'Light Gray',#
                                  #################################
                                  command = self.open_plot_params_window)
         self.menubar.addmenuitem('Simulation', 'separator')
@@ -367,21 +368,29 @@ class TopoConsole(Frame):
 
     def open_plot_params_window(self):
         """
-        Test Pattern Parameters Window.  The original code is commented
-        out until the next phase of development.  For now, this is a stub.
+        Test Pattern Parameters Window.  
         """
-        self.messageBar.message('state', 'Not yet implemented')
-        # if self.input_params_window == None:
-        #     self.input_params_window = Toplevel(self)
-        #     self.input_params_window.title('Test Pattern Parameters')
-        #     RetinalInputParamsPanel(self.input_params_window,self).pack(side=TOP,expand=YES,
-        #                                                                 fill=BOTH)
-        #     self.input_params_window.protocol('WM_DELETE_WINDOW',
-        #                                       self.input_params_window.withdraw)
-        # else:
-        #     self.input_params_window.deiconify()
-        #     self.input_params_window.lift()
-        #     self.input_params_window.focus_set()
+        pe = self.active_plotengine()
+        if pe:
+            if self.input_params_window == None:
+                self.input_params_window = GUIToplevel(self)
+                self.input_params_window.withdraw()
+                self.input_params_window.title('Test Pattern Parameters')
+                ripp = InputParamsPanel(self.input_params_window,self)
+                ripp.pack(side=TOP,expand=YES,fill=BOTH)
+                self.input_params_window.protocol('WM_DELETE_WINDOW',
+                                       self.input_params_window.withdraw)
+                self.input_params_window.deiconify()
+                self.messageBar.message('state', 'OK')
+                #wap = WeightsArrayPanel(console=self,pengine=pe,parent=win)
+                #wap.pack(expand=YES,fill=BOTH)
+                #wap.refresh_title()
+            else:
+                self.input_params_window.deiconify()
+                self.input_params_window.lift()
+                self.input_params_window.focus_set()
+        else:
+            self.messageBar.message('state', 'No active Simulator object.')
 
 
     def new_about_window(self):

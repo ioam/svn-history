@@ -11,6 +11,7 @@ import topo.tk.activitypanel
 import topo.tk.weightspanel
 import topo.tk.weightsarraypanel
 import topo.tk.regionplotpanel
+import topo.tk.inputparamspanel
 
 # For show_cmd_prompt() and start()
 import Pmw, sys, Tkinter

@@ -7,6 +7,7 @@ $Id$
 """
 from Tkinter import *
 import string
+import inputparamspanel 
 
 class TaggedSlider(Frame):
     """
@@ -26,7 +27,8 @@ class TaggedSlider(Frame):
                  max_value='100',
                  string_format = '%f',
                  tag_width=10,
-                 string_translator=string.atof,
+                 string_translator=inputparamspanel.eval_atof,
+#                 string_translator=string.atof,
                  **config):
 
         Frame.__init__(self,root,**config)
