@@ -17,8 +17,24 @@ KNOWN_FILETYPES = [('Python Files','*.py'),('Topographica Files','*.ty'),('All F
 
 # Namespace that the simulations will be running from.  This is
 # not the only constant that must change since there are package
-# functions that must exist to be called in the package.
+# functions that must exist to be called within a package.
 COMMAND_NAMESPACE = '__main__'  
+
+
+# One location to store and retrieve the simulator object that
+# will be used to request plot data.
+active_simulator_obj = None
+
+# Handling the active_simulator variable.
+def set_active_simulator(new_sim):
+    """Assign to the active_simulator variable"""
+    global active_simulator_obj
+    active_simulator_obj = new_sim
+
+def active_simulator():
+    """Get the active_simulator object"""
+    return active_simulator_obj
+
 
 
 class TopoConsole(Frame):
@@ -193,15 +209,15 @@ class TopoConsole(Frame):
                 os.remove(f)
 
 
-    def show_cmd_prompt(self):
-        """
-        Small helper to print the sys.ps1 prompt to the command-line.
-        Useful after a bunch of output has been displayed to stdout,
-        so as to let the user know that the command-line is still
-        active.
-        """
-        print "\n", sys.ps1,
-        sys.stdout.flush()
+#     def show_cmd_prompt(self):
+#         """
+#         Small helper to print the sys.ps1 prompt to the command-line.
+#         Useful after a bunch of output has been displayed to stdout,
+#         so as to let the user know that the command-line is still
+#         active.
+#         """
+#         print "\n", sys.ps1,
+#         sys.stdout.flush()
     
 
     def load_network(self):
@@ -246,6 +262,7 @@ class TopoConsole(Frame):
                 
     def reset_network(self):
 	self.messageBar.message('state', 'Reset not yet implemented')
+
 
     #
     # auto-refresh handling
@@ -347,7 +364,6 @@ class TopoConsole(Frame):
         """
         try:
             #g = globals()
-            #exec cmd in g
             g = __main__.__dict__
             exec cmd in g
             result = 'OK: ' + cmd
@@ -933,30 +949,30 @@ def start(sim=None, mainloop=False):
     Startup code for GUI.  Template pulled from default __main__ code
     originally written for LISSOM.
 
-    sim: Imports a simulation object into the COMMAND_NAMESPACE
-    (topo.simulator) namespace.  This is useful if the user created a
-    simulation in the __main__ namespace, but now wants to use it with
-    the GUI.  The GUI runs in topo.simulator and does not normally
-    have access to __main__ variables.
+    sim: Adds a simulation object into the GUI's active_simulator
+    variable This simulator will be the one that the GUI polls for
+    plots and other types of data.
 
     mainloop: If True, then the command-line is frozen while the GUI
     is open.  If False, then commands can be entered at the command-line
     even while the GUI is operational.  Default is False.
     """
+    if isinstance(sim,simulator.Simulator):
+        set_active_simulator(sim)
+    elif sim != None:
+	print 'sim is not a Simulator object'
+
     root = Tk()
     root.resizable(0,0)
     Pmw.initialise(root)
     console = TopoConsole(parent=root).pack(expand=YES,fill=BOTH)
-    root.title("Topographica Console.  Namespace = " + COMMAND_NAMESPACE)
-    if type(sim) == simulator.Simulator:
-        setattr(sys.modules[COMMAND_NAMESPACE],sim.name,sim)
-	print 'Simulator object imported as ' + COMMAND_NAMESPACE + '.' + sim.name
-    elif sim != None:
-	print 'sim is not a Simulator object'
+    root.title("Topographica Console.  Active Simulator = " + (active_simulator()).name)
+
     # mainloop() freezes the commandline until the GUI window exits.
     # Without this line the command-line remains responsive.
     if mainloop:
         root.mainloop()
+
     return root
 
 
