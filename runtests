@@ -3,6 +3,12 @@
 #
 # do './topographica runtests -h' in topographica directory for usage.
 #
+# jbednar050109: This file should be renamed runtests.py so that it
+# can be loaded as a Python module.  It should also presumably be put
+# into the tests directory somewhere, and a make target added for it
+# so that "make tests" works.  The default set of tests run should not
+# be *all* tests, just all unit tests (and not lengthy or large-scale
+# functional tests)
 
 import unittest
 import tests
