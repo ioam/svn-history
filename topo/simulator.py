@@ -93,7 +93,8 @@ class Simulator(Debuggable):
 
     def add(self,*EPs):
         """
-        Add one or more EventProcessors to the simulator.  Note, EventProcessors do not necessarily
+        Add one or more EventProcessors to the simulator.
+        Note, EventProcessors do not necessarily
         have to be added to the simulator to be used in a simulation,
         but they will not receive the start() message.  Adding a node
         to the simulator also sets the backlink node.simulator, so
@@ -104,6 +105,21 @@ class Simulator(Debuggable):
                 self.__event_processors.append(ep)
                 ep.simulator = self
 
+
+    def connect(self,
+                src=None,
+                dest=None,
+                src_port=None,
+                dest_port=None,
+                delay=0):
+        """
+        Connect the source to the destination, at the appropriate ports,
+        if any are given.  If src and dest have not been added to the
+        simulator, they will be added.
+        """
+        self.add(src,dest)
+        src._connect_to(dest,src_port=src_port,dest_port=dest_port, delay=delay)
+        dest._connect_from(src,src_port=src_port,dest_port=dest_port)
 
     def enqueue_event_rel(self,delay,src,dest,src_port=None,dest_port=None,data=None):
         """
@@ -271,14 +287,6 @@ class ThresholdUnit(EventProcessor):
 
 
 
-def connect(src=None,
-            dest=None,
-            src_port=None,
-            dest_port=None,
-            delay=0):
-    
-    src._connect_to(dest,src_port=src_port,dest_port=dest_port, delay=delay)
-    dest._connect_from(src,src_port=src_port,dest_port=dest_port)
 
 ##################################################################################
 if __name__ == '__main__':

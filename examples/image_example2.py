@@ -12,11 +12,11 @@ parameters and objects.  It shows how to set parameters for classes of objects.
 $Id$
 """
 
+
 import sys
-from convolve2d import *
-from image import *
-from simulator import *
-from sheet import Composer
+from topo.convolve2d import *
+from topo.image import *
+from topo.sheet import Composer
 
 from getopt import getopt
 
@@ -93,25 +93,23 @@ combine.port_configure('left', origin = (-5,-5))
 combine.port_configure('right', origin = (5,5))
 
 ###############################################
-# Make the simulator and add the objects to it
+# Make the simulator
 s = Simulator()
-s.add(im_gen,on_convolve,off_convolve,combine,output)
-
 
 ###############################################
-#  connect them together
-im_gen.connect_to(on_convolve, delay=1)
-im_gen.connect_to(off_convolve,delay=1)
+#  connect the objects
+s.connect(im_gen,on_convolve, delay=1)
+s.connect(im_gen,off_convolve,delay=1)
 
-im_gen.connect_to(output,      dest_port='unmodified',delay=2)
-on_convolve.connect_to(output, dest_port='on_center', delay=1)
-off_convolve.connect_to(output,dest_port='off_center',delay=1)
+s.connect(im_gen,       output,      dest_port='unmodified',delay=2)
+s.connect(on_convolve,  output,      dest_port='on_center', delay=1)
+s.connect(off_convolve, output,      dest_port='off_center',delay=1)
 
 # The on-center output goes to the left, off-center to the right
-on_convolve.connect_to( combine, dest_port='left', delay=1)
-off_convolve.connect_to(combine, dest_port='right',delay=1)
+s.connect(on_convolve, combine, dest_port='left', delay=1)
+s.connect(off_convolve,combine, dest_port='right',delay=1)
 
-combine.connect_to(output,dest_port='combined',delay=1)
+s.connect(combine, output, dest_port='combined',delay=1)
 
 
 ##############################################

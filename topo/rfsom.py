@@ -164,7 +164,7 @@ if __name__ == '__main__':
     som = RFSOM()
     
     s.add(som,input,save)
-    connect(input,som)
-    connect(som,save)
+    s.connect(input,som)
+    s.connect(som,save)
     s.run()
     

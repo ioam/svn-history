@@ -1,18 +1,9 @@
 #!/usr/bin/env python
 
 import sys,os,code
+from getopt import getopt,GetoptError
 from pprint import pprint
 from topo import *
-
-# set up the readline
-try:
-    import readline
-except ImportError:
-    print "Module readline not available.\nHistory and completion support disabled."
-else:
-    import rlcompleter
-    readline.parse_and_bind("tab: complete")
-
 
 # set the prompt and banner
 sys.ps1 = 'Topographica> '
@@ -21,6 +12,39 @@ banner = """
 Welcome to Topographica!
 """
 
+opts,args = getopt(sys.argv[1:],'i')
+
+opts = dict(opts)
+
+
 #start the intepreter
 interpreter = code.InteractiveConsole(locals())
-interpreter.interact(banner)
+
+# set sys.argv to the argumens including and after the first file argument
+sys.argv = args
+
+
+if args:
+    # if there's a file argument, load it.
+    f = open(args[0],'r')
+    if interpreter.runsource(f.read(),args[0],'exec'):
+        sys.err.write("Input file '%s' is incomplete, aborting." % filename)
+        f.close()
+        sys.exit()
+    f.close()
+    
+
+if '-i' in opts or len(args) == 0:
+    # ...then we're running interactively...
+    # set up readline
+    try:
+        import readline
+    except ImportError:
+        print "Module readline not available.\nHistory and completion support disabled."
+    else:
+        #set up command completion
+        import rlcompleter
+        readline.parse_and_bind("tab: complete")
+
+    # start interacting
+    interpreter.interact(banner)

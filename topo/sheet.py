@@ -170,7 +170,7 @@ class Composer(Sheet):
         self.timestamp = None
 
         if self.delay:
-            self.connect_to(self,src_port='trigger_out',dest_port='trigger_in',delay=self.delay)
+            self._connect_to(self,src_port='trigger_out',dest_port='trigger_in',delay=self.delay)
 
     def port_configure(self,port,**config):
         """
