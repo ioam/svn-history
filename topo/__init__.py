@@ -31,8 +31,8 @@ import histogram
 import palette
 
 # GUI files
-import topo.tk
-import gui
+#import topo.tk
+#import gui
 
 # Documentation
 import gendocs
