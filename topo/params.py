@@ -67,6 +67,7 @@ class Parameter(object):
   Python:
           http://users.rcn.com/python/download/Descriptor.htm
   """
+  __slots__ = ['name','default']
   count = 0
   
   def __init__(self,default=None):
@@ -87,9 +88,9 @@ class Parameter(object):
     value, if one has been set, otherwise produce the default value.
     """
     if not obj:
-        result = produce_value(self.default)
+        result = self.default
     else:
-        result = produce_value(obj.__dict__.get(self.name,self.default))
+        result = obj.__dict__.get(self.name,self.default)
     return result
 
 
@@ -135,6 +136,19 @@ class Number(Parameter):
         
     super(NumberParam,self).__set__(obj,val)
 
+class Dynamic(Parameter):
+  def __get__(self,obj,objtype):
+    """
+    Get a parameter value.  If called on the class, produce the
+    default value.  If called on an instance, produce the instance's
+    value, if one has been set, otherwise produce the default value.
+    """
+    if not obj:
+        result = produce_value(self.default)
+    else:
+        result = produce_value(obj.__dict__.get(self.name,self.default))
+    return result
+
 
 def produce_value(value_obj):
   """
@@ -153,6 +167,8 @@ def is_iterator(obj):
   """
   Predicate that returns whether an object is an iterator.
   """
-  return '__iter__' in dir(obj) and 'next' in dir(obj)
+  import types
+  return type(obj) == types.GeneratorType
+  #return '__iter__' in dir(obj) and 'next' in dir(obj)
 
 

@@ -3,6 +3,7 @@
 from topo.inputsheet import GaussianSheet
 from topo.rfsom import RFSOM
 from topo.image import ImageSaver
+from topo.params import Dynamic
 import random
 import pdb #debugger
 
@@ -17,10 +18,10 @@ print "Setting parameters..."
 GaussianSheet.density = 900
 GaussianSheet.period = 1.0
 
-GaussianSheet.x = lambda : random.uniform(-0.5,0.5)
-GaussianSheet.y = lambda : random.uniform(-0.5,0.5)
+GaussianSheet.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+GaussianSheet.y = Dynamic(lambda : random.uniform(-0.5,0.5))
 
-GaussianSheet.theta = lambda :random.uniform(-3.1415926,3.1415926)
+GaussianSheet.theta = Dynamic(lambda :random.uniform(-3.1415926,3.1415926))
 GaussianSheet.width = 0.02
 GaussianSheet.height = 0.9
 GaussianSheet.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
@@ -55,6 +56,11 @@ s.connect(retina,V1,delay=1)
 #s.connect(V1,save,dest_port='V1',delay=0)
 
 print "Running..."
-s.run(10001)
+#s.run(10001)
 
-V1.projections['Retina'].plot_rfs()
+#V1.projections['Retina'].plot_rfs()
+
+import profile,pstats
+
+p = profile.Profile()
+p.runctx('s.run(10)',locals(),globals())

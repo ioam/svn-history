@@ -119,6 +119,7 @@ class AARectangle:
 
     usage:  aar = AARectangle( (x1,y1),(x2,y2), ... , (xN,yN) )
     """
+    __slots__ = ['__left','__bottom','__right','__top']
     def __init__(self,*points):
         self.__top = max([y for x,y in points])
         self.__bottom = min([y for x,y in points])
@@ -150,10 +151,10 @@ class AARectangle:
         """
         Return (left,bottom,right,top) as a tuple
         """
-        return (self.left(),
-                self.bottom(),
-                self.right(),
-                self.top())
+        return (self.__left,
+                self.__bottom,
+                self.__right,
+                self.__top)
 
     def centroid(self):
         """
