@@ -16,8 +16,8 @@ print "Setting parameters..."
 
 
 # input generation params
-SineGratingSin.density = 10000
 InputSheet.period = 1.0
+InputSheet.density = 900
 
 GaussianSheet.x = Dynamic(lambda : random.uniform(-0.5,0.5))
 GaussianSheet.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -46,8 +46,7 @@ base.min_print_level = base.MESSAGE
 print "Creating simulation objects..."
 s = Simulator()
 
-#retina = GaussianSheet(name='Retina')
-retina = SineGratingSheet(name='Retina')
+retina = GaussianSheet(name='Retina')
 V1 = RFSOM(name='V1')
 save  = ImageSaver(name='RFSOM')
 
