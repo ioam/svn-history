@@ -10,10 +10,10 @@ directory which will call this file on the Topographica sources.
 From the Makefile (Tabs have been stripped):
     GENDOC = ./topographica topo/gendocs.py -w 
     docs: topo/*.py
-        mkdir -p docs
-        ${GENDOC} topo
-        mv topo.html docs/index.html
-        ${GENDOC} topo/
+	mkdir -p docs
+	${GENDOC} topo/__init__.py
+	mv docs/__init__.html docs/index.html
+	${GENDOC} topo/
 
 $Id$
 """
