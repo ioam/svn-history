@@ -66,6 +66,7 @@ class Simulator(TopoObject):
         self.__sleep_window = 0
         self.__sleep_window_violation = False
         self.__scheduler = sched.scheduler(self.time,self.sleep)
+        self.__started = False
         
         
     def run(self,duration=0,until=0):
@@ -77,9 +78,12 @@ class Simulator(TopoObject):
           until    = time to stop in simulator time. Default: run indefinitely.
           (note if both duration an until are used, they both will apply.)
         """
-        for node in self.__event_processors:
-            node.start()
+        if not self.__started:
+            self.__started = True
+            for node in self.__event_processors:
+                node.start()
         self.continue_(duration,until)
+
 
     def continue_(self,duration=0,until=0):
         if duration:
