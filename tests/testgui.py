@@ -4,7 +4,7 @@ can then use to display data.
 
 $Id$
 """
-import unittest
+import unittest, os
 import topo
 from topo.inputsheet import *
 from topo.gui import *
@@ -89,6 +89,17 @@ class TestGui(unittest.TestCase):
         # s.run(1)
 
 
+    def test_tk(self):
+        """
+        Test the creation the widgets
+        """
+        root = Tk()
+        root.resizable(0,0)
+        Pmw.initialise(root)
+        console = TopoConsole(parent=root).pack(expand=YES,fill=BOTH)
+        root.title("Topographica Console.  Active Simulator = " + (active_simulator()).name)
+
+
     def test_Gui(self):
         plot_group = self.pe.get_plot_group('Activation')
         plot_list = plot_group.plots()
@@ -111,6 +122,6 @@ class TestGui(unittest.TestCase):
         root = start(self.s)
         #root.mainloop()
 
-
 suite = unittest.TestSuite()
 suite.addTest(unittest.makeSuite(TestGui))
+#    print 'testgui not added to test suite: $DISPLAY not found'
