@@ -177,13 +177,9 @@ class Simulator(TopoObject):
         else:
             dest.input_event(src,src_port,dest_port,data)
 
-    def find_EP(self, obj_class, obj_name):
-        """
-        Look through the EventProcessor list to find an object of type
-        obj_type, and named obj_name.
-        """
-        return [ep for ep in self.__event_processors
-                if isinstance(ep,obj_class) and ep.name == obj_name]
+    def find_EP(self):
+        """Return the list of event processors such as Sheets."""
+        return self.__event_processors
 
     def time(self):
         """
