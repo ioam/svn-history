@@ -14,11 +14,14 @@ $Id$
 import sys
 import types
 
+from Numeric import zeros, ones
+
 from base import TopoObject
 from sheetview import *
-from bitmap import matrix_rgb_to_hsv
-from Numeric import zeros
+from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
 from histogram import Histogram
+from params import Dynamic
+import palette
 
 # Types of plots that Plot knows how to create from input matrices.
 RGB = 'RGB'
@@ -32,8 +35,8 @@ COLORMAP = 'COLORMAP'
 # the plots laid out from left to right, then use (None, 3).  If three
 # rows are desired then (3, None).  Another method that would work is
 # [3,2,4] would have the first row with 3, the second row with 2, the
-# third row with 4, etc.
-
+# third row with 4, etc.  A key should be used to represent (None, INF)
+# or somesuch.
 FLAT = 'FLAT'
 
 class Plot(TopoObject):
@@ -43,6 +46,8 @@ class Plot(TopoObject):
     the whole unit can be clustered with PlotGroups to have multiple
     plots within a single window on the screen.
     """
+    background = Dynamic(default=BLACK_BACKGROUND)
+    palette_ = Dynamic(default=palette.Monochrome)
 
     def __init__(self, (channel_1, channel_2, channel_3), plot_type, sheet=None, **params):
         """
@@ -104,31 +109,46 @@ class Plot(TopoObject):
                 shape = view_matrix[0].shape
             else:
                 self.matrices.append(None)
-
-        # Replace any Nones with a matrix of size 'shape' full of zeros.
-        self.matrices = tuple([each or zeros(shape) for each in self.matrices])
+        # Replace any Nones with a matrix of size 'shape' full of values.
+        if self.background == BLACK_BACKGROUND:
+            self.matrices = tuple([each or zeros(shape) for each in self.matrices])
+        else:
+            self.matrices = tuple([each or ones(shape) for each in self.matrices])
+            
 
         # By this point, self.matrices should be a triple of 2D
         # matrices trimmed and ready to go to the caller of this
         # function ... after a possible conversion to a different
         # palette form.
         if self.plot_type == HSV:
-            # Do the RGB-->HSV conversion, assume the caller will be
+            # Do the HSV-->RGB conversion, assume the caller will be
             # displaying the plot as an RGB.
-            r,g,b = self.matrices
-            self.matrices = matrix_rgb_to_hsv(r,g,b)
+            h,s,v = self.matrices
+            self.matrices = matrix_hsv_to_rgb(h,s,v)
+
         elif self.plot_type == COLORMAP:
             # Don't delete anything, maybe they want position #3, but
-            # do warn them if they have more than one channel requested.
+            # do warn them if they have more than one channel
+            # requested.
+            #
+            # COLORMAP NOW GENERATES ONLY A GRAYSCALE IMAGE. WORK
+            # NEEDS TO BE DONE TO CHANGE THIS TO A SINGLE-CHANNEL
+            # MATRIX THAT TRANSLATES THROUGH A PALETTE OF 256 POSSIBLE
+            # COLORS THROUGH THE USE OF ColorMap and Palette.  WILL
+            # NEED TO PROBABLY WORK WITH PlotEngine SINCE IT CREATES
+            # THE FINAL IMAGES.
             single_map = [each for each in self.matrices if each]
             if len(single_map) > 1:
                 self.warning('More than one channel requested for single-channel colormap')
             if single_map:
                 self.matrices = (single_map[0], single_map[0], single_map[0])
+
         elif self.plot_type == RGB:
-            #  Do nothing, we're already in the RGB form.
-            #  Possibly change the order to make it match the Lissom order.
+            # Do nothing, we're already in the RGB form.  Possibly
+            # change the order to make it match the Lissom order, OR
+            # ADD BLACK_BACKGROUND, WHITE_BACKGROUND COLOR SHIFTS.
             None
+
         else:
             self.warning('Unrecognized plot type')
 
