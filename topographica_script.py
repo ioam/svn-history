@@ -11,21 +11,28 @@ $Id$
 from getopt import getopt,GetoptError
 import os
 
-# All valid Python 2.4 args
-VALID_OPTS     = 'ic:dEhOQ:StuvVW:xm:'  
+# All valid Python 2.4 args, plus 'g' for topo.gui.start()
+VALID_OPTS     = 'ic:dEhOQ:StuvVW:xm:g'  
 
-def generate_cmd_prefix(interactive=True):
+def generate_cmd_prefix(interactive=True,start_gui=False):
     """
     Since a function call is needed for startup, the parameter on if
     the banner should be displayed must be embedded within the command
     string.
     """
+#    if start_gui: interactive = True
     # To deal with a need to double-quote under Windows
-    if os.name == 'nt':
-        return '"import topo.commandline; topo.commandline.start(' + str(interactive) + ');"'
-    else:
-        return 'import topo.commandline; topo.commandline.start(' + str(interactive) + ');'
+    if os.name == 'nt': cmd = '"'
+    else: cmd = ''
 
+    cmd += 'import topo.commandline; topo.commandline.start(' \
+           + str(interactive) + ');'
+    if start_gui:
+        cmd += ' topo.gui.start();'
+
+    if os.name == 'nt': cmd += '"'
+
+    return cmd
 
 
 def generate_params(argv):
@@ -45,8 +52,14 @@ def generate_params(argv):
     for (key, val) in in_opts:
         if key == '-c':                # Add prefix string to start of a '-c' 
             c_flag = True
-            val = generate_cmd_prefix(flags.has_key('-i')) + val
-        opts.append((key,val))
+            val = generate_cmd_prefix(flags.has_key('-i'),
+                                      flags.has_key('-g')) + val
+        # Python can't handle a '-g', cut it, but add in a -i, so that
+        # the GUI will stay.
+        if key != '-g':                
+            opts.append((key,val))
+        else:
+            opts.append(('-i',''))
 
     if not c_flag:                     # Create the '-c' on arg 1 or go interactive.
         if len(in_args) >= 1:
@@ -55,14 +68,16 @@ def generate_params(argv):
 	    # generate_cmd_prefix is a double-quote that can be cut
 	    # off, and then extra commands added.
             if os.name == 'nt':
-                val = generate_cmd_prefix(flags.has_key('-i'))[:-1] + 'execfile(\'' + in_args[0] + '\');"'
+                val = generate_cmd_prefix(flags.has_key('-i'),
+                                          flags.has_key('-g'))[:-1] + 'execfile(\'' + in_args[0] + '\');"'
             else:
-                val = generate_cmd_prefix(flags.has_key('-i')) + 'execfile(\'' + in_args[0] + '\');'
+                val = generate_cmd_prefix(flags.has_key('-i'),
+                                          flags.has_key('-g')) + 'execfile(\'' + in_args[0] + '\');'
             opts.append((key,val))
             in_args = in_args[1:]
         else:
             opts.append(('-i',''))     # Add an '-i' since it's needed with -c.
-            opts.append(('-c',generate_cmd_prefix()))
+            opts.append(('-c',generate_cmd_prefix(start_gui=flags.has_key('-g'))))
 
     args = []
     for each in opts:
