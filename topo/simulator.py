@@ -361,7 +361,7 @@ class SimpleSimulator(Simulator):
         self._Simulator__time = 0.0
         
     def run(self,duration=inf,until=inf):
-        if self._Simulator__time = 0.0:
+        if self._Simulator__time == 0.0:
             # if the time is 0.0 start all the EPs
             # FIXME: this is probably not right, .run(until=0) will
             # cause EPs to be started more than once.
