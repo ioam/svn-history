@@ -19,6 +19,9 @@ import rfsom
 import image
 import inputsheet
 
+# plotting
+import bitmap
+
 # set import all the important stuff directly into the package
 # namespace.
 from simulator import *
