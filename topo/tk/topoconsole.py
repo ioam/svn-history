@@ -8,6 +8,9 @@ import Pmw, re, os, sys, code, traceback, __main__
 import tkFileDialog
 from topo.tk.propertiesframe import *
 from topo.tk.plotpanel import *
+from topo.tk.activitypanel import *
+from topo.tk.weightspanel import *
+from topo.tk.weightsarraypanel import *
 import topo.simulator as simulator
 import topo.plotengine
 import topo.gui
@@ -126,9 +129,9 @@ class TopoConsole(Frame):
                              'New weights array plot',
                              label="Weights Array",
                              ## Gray out menu item ###########
-                             foreground = 'Gray',            #
-                             activeforeground = 'Gray',      #
-                             activebackground = 'Light Gray',#
+                             # foreground = 'Gray',            #
+                             # activeforeground = 'Gray',      #
+                             # activebackground = 'Light Gray',#
                              #################################
                              command=self.new_weights_array_window)
         self.menubar.addmenuitem('Plots','separator')
@@ -302,8 +305,11 @@ class TopoConsole(Frame):
             win = GUIToplevel(self)
             win.withdraw()
             win.title("Activity %d" % self.num_activity_windows)
-            ActivityPanel(console=self,pengine=pe,parent=win).pack(expand=YES,fill=BOTH)
+            ActivityPanel(console=self,
+                          pengine=pe,
+                          parent=win).pack(expand=YES,fill=BOTH)
             win.deiconify()
+            self.messageBar.message('state', 'OK')
         else:
             self.messageBar.message('state', 'No active Simulator object.')
             
@@ -329,20 +335,23 @@ class TopoConsole(Frame):
                          pengine=pe,
                          parent=win).pack(expand=YES,fill=BOTH)
             win.deiconify()
+            self.messageBar.message('state', 'OK')
         else:
             self.messageBar.message('state', 'No active Simulator object.')
 
 
     def new_weights_array_window(self):
-        self.messageBar.message('state', 'Not yet implemented')
         pe = self.active_plotengine()
         if pe:
             self.num_weights_array_windows += 1
             win = GUIToplevel(self)
             win.withdraw()
             win.title("Weights Array %d" % self.num_weights_array_windows)
-            WeightsArrayPanel(console=self,parent=win).pack(expand=YES,fill=BOTH)
+            WeightsArrayPanel(console=self,
+                              pengine=pe,
+                              parent=win).pack(expand=YES,fill=BOTH)
             win.deiconify()
+            self.messageBar.message('state', 'OK')
         else:
             self.messageBar.message('state', 'No active Simulator object.')
 
