@@ -11,6 +11,12 @@ from topo.bitmap import *
 import topo.tk.topoconsole 
 import topo.tk.plotpanel
 import Tkinter
+from topo.rfsom import RFSOM
+from topo.image import ImageSaver
+from math import pi
+from topo.params import Dynamic
+import random
+import pdb #debugger
 
 class TestPlotPanel(unittest.TestCase):
 
@@ -108,8 +114,48 @@ class TestPlotPanel(unittest.TestCase):
         Here, we're not interested in the Activation plots, but we are
         interested in the weights of the receptive fields.
         """
-        pass
+        base.min_print_level = base.WARNING
+        topo.tk.plotpanel.PlotPanel.print_level = base.WARNING
+        # input generation params
+        InputSheet.period = 1.0
+        InputSheet.density = 900
+        
+        FuzzyLineFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+        FuzzyLineFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+        FuzzyLineFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
+        FuzzyLineFactory.width = 0.02
+        FuzzyLineFactory.height = 0.9
+        FuzzyLineFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+        
+        # rf som parameters
+        RFSOM.density = 2500
+        RFSOM.weights_factory = UniformRandomFactory(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+        RFSOM.training_length = 10000
+        RFSOM.radius_0 = 0.1
+        
+        ###########################################
+        # build simulation
+        s = topo.simulator.Simulator()
+        
+        retina = InputSheet(input_generator=FuzzyLineFactory(),name='Retina')
+        retina.print_level = base.WARNING
+        V1 = RFSOM(name='V1')
+        V1.print_level = base.WARNING
+        save  = ImageSaver(name='RFSOM')
+        
+        s.connect(retina,V1,delay=1)
+        s.print_level = base.WARNING
+        
+        s.run(1)
 
+        root = Tkinter.Tk()
+        root.resizable(1,1)
+        Pmw.initialise(root)
+        console = topo.tk.topoconsole.TopoConsole(parent=root)
+        console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
+        console.new_weights_window()
+        # console.mainloop()
+        
 
 
 suite = unittest.TestSuite()
