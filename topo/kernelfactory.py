@@ -98,7 +98,7 @@ def sine_grating(bounds, density, x, y, theta, frequency, phase):
     phase     = produce_value(phase)
     frequency = produce_value(frequency)
 
-    new_kernel = sin(frequency*2*pi*kernel_x + phase)
+    new_kernel = 0.5 + 0.5*sin(frequency*2*pi*kernel_x + phase)
 
     return new_kernel
 
