@@ -7,6 +7,7 @@ import tyimputil
 import simulator
 import params
 import utils
+import commandline
 
 # sheets and sheet geometry
 import sheet
@@ -40,6 +41,5 @@ import gendocs
 # namespace.
 from simulator import *
 from sheet import *
-
 
 
