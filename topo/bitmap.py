@@ -7,6 +7,7 @@ as a bitmap image.
 There are three different base image Classes which inherit Bitmap:
 
 ColorMap  - 1 2D Matrix, 1 1D Color Map
+BWMap     - 1 2D Matrix.  Defaults to a Luminance palette.
 HSVMap    - 3 2D Matrices, Color (H), Confidence (S), Strength (V)
 RGBMap    - 3 2D Matrices, Red, Green, Blue Channels.
 
@@ -15,6 +16,27 @@ part of the constructor and the image is generaed.
 
 The encapsulated Image is accessible through the .bitmap attribute if you're
 too lazy to extend the base Bitmap object.
+
+---
+Creating new Bitmaps:
+
+bitmap1 = ColorMap(inArray,palette)
+    inArray: 2D Array
+    palette: 768 integers (3x256 of RGB ranged 0-255).
+
+bitmap2 = BWMap(inArray)
+    Calls ColorMap with the default Luminosity palette.
+
+bitmap3 = RGBMap(rMapArray,gMapArray,bMapArray)
+    Three matrices that are combined into one image, where each matrix
+    represents a different color channel.
+    3 matrices expected, each should have been normalized to 1.
+
+bitmap4 = HSVMap(hMapArray,sMapArray,vMapArray)
+    HSV Map inputs, converts to RGB image.
+    3 matrices expected, each should have been normalized to 1.
+
+The constructed Image is then in [BitmapObject].bitmap.
 """
 
 from colorsys import rgb_to_hsv, hsv_to_rgb
