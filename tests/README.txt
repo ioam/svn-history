@@ -1,6 +1,6 @@
 Topographica Unit Tests  Package
 
-This packge contains unit test modules for topographica.  To run the
+This package contains unit test modules for topographica.  To run the
 tests use the 'runtests' script in the main topographica directory.
 
 To add new tests modules.
@@ -14,5 +14,11 @@ To add new tests modules.
    module's test suite to the Topographica test suite.
 
 Note that there need not be a 1-1 correspondence between test modules
-and topographica modules.  For example, a special test module designed to
-test the interaction between two topographica modules would be fine.
+and topographica modules.  For example, a special test module designed
+to test the interaction between two topographica modules would be
+fine.  However, large-scale integration or functional tests should be
+separated out from these unit tests, because the unit tests are
+designed to be easily updated when units change, and need to run
+quickly so that the unit tests can be run at least daily, and usually
+more often, during development.
+
