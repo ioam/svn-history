@@ -177,7 +177,7 @@ class Simulator(TopoObject):
         else:
             dest.input_event(src,src_port,dest_port,data)
 
-    def find_EP(self):
+    def get_event_processors(self):
         """Return the list of event processors such as Sheets."""
         return self.__event_processors
 
