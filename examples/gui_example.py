@@ -60,7 +60,7 @@ s.connect(retina,V1,delay=0.5)
 
 #topo.gui.link_to_sim(s)
 
-s.run(2)
+s.run(5)
 
 #V1.projections['Retina'][0].plot_rfs()
 
@@ -68,3 +68,5 @@ s.run(2)
 #
 # p = profile.Profile()
 # p.runctx('s.run(10)',locals(),globals())
+
+#topo.gui.start(s)

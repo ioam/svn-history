@@ -14,8 +14,8 @@ from kernelfactory import UniformRandomFactory
 
 class InputSheet(Sheet):
 
-    sheet_period = Parameter(default=1)
-    sheet_phase  = Parameter(default=0)
+    period = Parameter(default=1)
+    phase  = Parameter(default=0)
 
     theta = Parameter(default=0)
 
@@ -30,10 +30,10 @@ class InputSheet(Sheet):
         assert self.simulator
 
         # connect self<->self (for repeating)
-        self.simulator.connect(src=self,dest=self,delay=self.sheet_period)
+        self.simulator.connect(src=self,dest=self,delay=self.period)
 
         # first event is special
-        self.simulator.enqueue_event_rel(self.sheet_phase,self,self,data=self.activation)
+        self.simulator.enqueue_event_rel(self.phase,self,self,data=self.activation)
 
     def input_event(self,src,src_port,dest_port,data):
         self.verbose("Received %s input from %s." % (NxN(data.shape),src))

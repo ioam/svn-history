@@ -45,7 +45,7 @@ ImageSaver.time_format='%0.4d'
 base.min_print_level = base.MESSAGE
 
 print "Creating simulation objects..."
-s = Simulator()
+s = SimpleSimulator()
 
 retina = InputSheet(input_generator=FuzzyLineFactory(),name='Retina')
 V1 = RFSOM(name='V1')
@@ -58,7 +58,7 @@ s.connect(retina,V1,delay=1)
 #s.connect(retina,save,dest_port='retina',delay=2)
 #s.connect(V1,save,dest_port='V1',delay=1)
 
-s.run(10000)
+#s.run(10000)
 
 #V1.projections['Retina'][0].plot_rfs()
 

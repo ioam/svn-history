@@ -38,6 +38,7 @@ $Id$
 import sched
 from base import TopoObject
 from params import Parameter
+from utils import inf
 import __main__
 import topo.gui
 
@@ -75,9 +76,9 @@ class Simulator(TopoObject):
         """
         super(Simulator,self).__init__(**config)
 
-        self.__time = 0
+        self.__time = 0.0
         self.__event_processors = []
-        self.__sleep_window = 0
+        self.__sleep_window = 0.0
         self.__sleep_window_violation = False
         self.__scheduler = sched.scheduler(self.time,self.sleep)
         self.__started = False
@@ -92,7 +93,7 @@ class Simulator(TopoObject):
         parameters:
           duration = time to run in simulator time. Default: run indefinitely.
           until    = time to stop in simulator time. Default: run indefinitely.
-          (note if both duration an until are used, they both will apply.)
+          (note if both duration and until are used, they both will apply.)
         """
         if not self.__started:
             self.__started = True
@@ -167,6 +168,8 @@ class Simulator(TopoObject):
           dest_port  = destination port (default None)
           data  = event data (default None)
         """
+        self.debug("Enqueue relative: from", (src,src_port),"to",(dest,dest_port),
+                   "at time",self.time(),"with delay",delay)
         # If this event is scheduled when the simulator is about to sleep,
         # make sure that the event isn't being scheduled during the sleep window,
         # if it is, indicate a violation.
@@ -180,6 +183,9 @@ class Simulator(TopoObject):
         Like enqueue_event_rel, except it schedules the event for some
         absolute time.
         """
+        self.debug("Enqueue absolute: from", (src,src_port),"to",(dest,dest_port),
+                   "at time",self.time(),"with delay",delay)
+
         # If this event is scheduled when the simulator is about to sleep,
         # make sure that the event isn't being scheduled during the sleep window,
         # if it is, indicate a violation.
@@ -236,7 +242,81 @@ class Simulator(TopoObject):
         self.__time += delay
 
 
+class SimpleSimulator(Simulator):
+    """
+    A simulator class that uses a simple sorted event list instead of a
+    sched.scheduler object to manage events and dispatching.
+    """
+    class Event:
+        def __init__(self,time,src,dest,src_port,dest_port,data):
+            self.time = time
+            self.src = src
+            self.dest = dest
+            self.src_port = src_port
+            self.dest_port = dest_port
+            self.data = data
+            
+    def __init__(self,**args):
+        super(SimpleSimulator,self).__init__(**args)
+        self._Simulator__scheduler = None
+        self.events = []
 
+    def run(self,duration=inf,until=inf):
+        self._Simulator__time = 0.0
+        for e in self._Simulator__event_processors:
+            e.start()
+        self.continue_(duration,until)
+        
+    def continue_(self,duration=inf,until=inf):
+
+        stop_time = min(self.time()+duration,until)
+        while self.events and self.time() < stop_time:
+            if self.events[0].time < self.time():
+                self.warning('Discarding stale event from',(src,src_port),
+                             'to',(dest,dest_port),
+                             'for time',etime,
+                             '. current time =',self.time())
+                self.events.pop(0)
+            elif self.events[0].time > self.time():
+                self.debug("Time to sleep. current time =",self.time(),"next event time =",self.events[0].time)
+                for ep in self._Simulator__event_processors:
+                    self.debug("Doing pre_sleep for",e)
+                    ep.pre_sleep()
+                # so set the time to the frontmost event.
+                self._Simulator__time = self.events[0].time
+            else:
+                e = self.events.pop(0)
+                e.dest.input_event(e.src,e.src_port,e.dest_port,e.data)
+
+    def sleep(self,delay):
+        self.warning("sleep not supported in class",self.__class__.__name__)
+
+    def enqueue_event_abs(self,time,src,dest,src_port=None,dest_port=None,data=None):
+        """
+        Like enqueue_event_rel, except it schedules the event for some
+        absolute time.
+        """
+        self.debug("Enqueue absolute: from", (src,src_port),"to",(dest,dest_port),
+                   "at time",self.time(),"for time",time)
+        new_e = SimpleSimulator.Event(time,src,dest,src_port,dest_port,data)
+
+        if not self.events or time >= self.events[-1].time:
+            self.events.append(new_e)
+            return
+
+        for i,e in enumerate(self.events):
+            if time < e.time:
+                self.events.insert(i,new_e)
+                break
+
+    def enqueue_event_rel(self,delay,src,dest,src_port=None,dest_port=None,data=None):
+        self.enqueue_event_abs(self.time()+float(delay),
+                               src,dest,src_port,dest_port,data)
+
+    
+        
+
+        
 
 class EventProcessor(TopoObject):
     """

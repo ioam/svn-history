@@ -40,7 +40,7 @@ topographica: ext-packages
 	echo "os.putenv('DISLIN',DISLIN)" >> topographica
 	echo "os.putenv('LD_LIBRARY_PATH'," >> topographica
 	echo "          ':'.join((os.path.join(TOPO,'lib'),DISLIN,os.getenv('LD_LIBRARY_PATH',''))))" >> topographica
-	echo "os.putenv('PYTHONPATH',os.path.join(DISLIN,'python')+':'+os.getenv('PYTHONPATH',''))" >> topographica
+	echo "os.putenv('PYTHONPATH',TOPO+':'+os.path.join(DISLIN,'python')+':'+os.getenv('PYTHONPATH',''))" >> topographica
 	echo "" >> topographica
 	echo "" >> topographica
 	echo "# exec" >> topographica

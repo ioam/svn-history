@@ -26,6 +26,7 @@ class Projection(TopoObject):
         self.__rfs = params['rfs']
         self.__src = params['src']
         self.__dest = params['dest']
+        self.input_buffer = None
 
     def src(self): return self.__src
     def dest(self): return self.__dest
@@ -129,35 +130,10 @@ class RF(TopoObject):
         self.input_sheet = input_sheet
         self.bounds = bounds
         self.weights = weights
-        #self._crop_to_src()
         self.verbose("activation matrix shape: ",self.weights.shape)
 
     def contains(self,x,y):
         return self.bounds.contains(x,y)
-
-    def _crop_to_src(self):
-        l,b,r,t = self.bounds.aarect().lbrt()
-        src_l,src_b,src_r,src_t = self.input_sheet.bounds.aarect().lbrt()
-        rmin,cmin = 0,0
-        rmax,cmax = self.weights.shape
-
-        slice_rows,slice_cols = self.get_input_matrix(self.input_sheet.activation).shape
-
-        # TODO: This cropping should be handled generically in the sheet module
-        # (maybe this whole function).
-        if rmax != slice_rows:
-            if t >= src_t:
-                rmin += rmax - slice_rows
-            if b <= src_b:
-                rmax -= (rmax - rmin) - slice_rows
-        if cmax != slice_cols:
-            if l <= src_l:
-                cmin += cmax - slice_cols
-            if r >= src_r:
-                cmax -= (cmax - cmin) - slice_cols
-
-        self.weights = self.weights[rmin:rmax,cmin:cmax]
-        assert self.weights.shape == (slice_rows,slice_cols)
 
     def get_input_matrix(self, activation):
         from sheet import activation_submatrix
@@ -180,12 +156,11 @@ class RFSheet(Sheet):
     def __init__(self,**params):
         super(RFSheet,self).__init__(**params)
         self.temp_activation = Numeric.array(self.activation)
-        self.projections = {}
+        self.ports = {}
+        self.new_input = False
 
     def _connect_from(self,src,src_port=None,dest_port=None):
         Sheet._connect_from(self,src,src_port,dest_port)
-        if src.name not in self.projections:
-            self.projections[src.name] = []
         # set up array of RFs translated to each x,y in the sheet
         rfs = []
         old_bounds = self.weights_factory.bounds
@@ -200,39 +175,62 @@ class RFSheet(Sheet):
                 weights = self.weights_factory(x=x,y=y,bounds=bounds,density=src.density)
                 row.append(self.rf_type(src,weights=weights,bounds=bounds))
             rfs.append(row)
-            self.weights_factory.x = old_x
-            self.weights_factory.y = old_y
-            self.weights_factory.bounds = old_bounds
-                          
-        self.projections[src.name].append(Projection(src=src, dest=self, rfs=rfs))
+
+        if dest_port not in self.ports:
+            self.ports[dest_port] = dict(projections={})
+        projections = self.ports[dest_port]['projections']
+        if src.name in projections:
+            self.warning('Overwriting projection to "%s" on port "%s"' % (src.name,dest_port))
+        projections[src.name] = Projection(src=src, dest=self, rfs=rfs)
+
+    def get_projections(self):
+        from operator import add
+        return reduce(add,[port['projections'].values() for port in self.ports.values()])
+
+    projections = property(get_projections,
+                           doc="The list of all projections on all ports (read only).")
 
     def input_event(self,src,src_port,dest_port,data):
         self.message("Received input from,",src,"at time",self.simulator.time())
-        self.train(data,src)
+        self.present_input(data,src,dest_port)
+        self.new_input = True
 
     def pre_sleep(self):
-        self.activation = self.transfer_fn(self.temp_activation)
-        self.send_output(data=self.activation)
-        self.temp_activation *= 0.0
+        if self.new_input:
+            self.new_input = False
+            self.activation = self.transfer_fn(self.temp_activation)
+            self.send_output(data=self.activation)
+            self.temp_activation *= 0.0
 
+            self.train()
 
-    def present_input(self,input_activation,input_sheet):
+            for port in self.ports.values():
+                for proj in port['projections'].values():
+                    proj.input_buffer = None
+            self.debug("max activation =",max(self.activation.flat))
+
+    def train(self):
+        pass
+
+    def present_input(self,input_activation,input_sheet,port):
         rows,cols = self.activation.shape
+        proj = self.ports[port]['projections'][input_sheet.name]
+        proj.input_buffer = input_activation
         for r in range(rows):
             for c in range(cols):
-                for proj in self.projections[input_sheet.name]:
                     rf = proj.rf(r,c)
                     X = rf.get_input_matrix(input_activation)
                     self.temp_activation[r,c] += self.activation_fn(X,rf.weights)
 
 
+    ################################################################################
+    # GUI support
     def unit_view(self,r,c):
         """
         Get a list of UnitView objects for a particular unit
         in this RFSheet.  Can return multiple UnitView objects.
         """
-        views = flatten([[i.get_view(r,c) for i in p]
-                         for p in self.projections.values()])
+        views = flatten([p.get_view(r,c) for p in self.projections])
         self.debug('views = '+str(views)+'type = '+str(type(views[0]))+str(views[0].view()))
         key = ('Weights',r,c)
         self.add_sheet_view(key,views)      # Will be adding a list
@@ -254,6 +252,3 @@ class RFSheet(Sheet):
         else:
             return Sheet.sheet_view(self,request)
         
-
-    def train(self,input_activation,input_sheet):
-        pass

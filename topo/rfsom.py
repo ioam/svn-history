@@ -44,9 +44,7 @@ class RFSOM(RFSheet):
 
     ##########################################
 
-    def train(self,input_activation,input_sheet):
-
-        self.present_input(input_activation,input_sheet)
+    def train(self):
 
         rows,cols = self.activation.shape
         wr,wc = self.winner_coords(matrix_coords=True)
@@ -61,12 +59,12 @@ class RFSOM(RFSheet):
         for r in range(rmin,rmax):
             for c in range(cmin,cmax):
                 lattice_dist = norm((wc-c,wr-r))
-                for sheet,proj_list in self.projections.items():
-                    for proj in proj_list:
+                for port in self.ports:
+                    for sheet,proj in self.ports[port]['projections'].items():
                         if  lattice_dist <= radius:
                             rf = proj.rf(r,c)
                             rate = self.alpha() * gaussian(lattice_dist,radius)
-                            X = rf.get_input_matrix(input_activation)
+                            X = rf.get_input_matrix(proj.input_buffer)
                             rf.weights += rate * (X - rf.weights)
                                    
 
@@ -83,15 +81,6 @@ class RFSOM(RFSheet):
             return row,col
         else:
             return self.matrix2sheet(row,col)
-
-    def get_model_vector(self,index):
-        if type(index) == int:
-            y = index/self.ydim
-            x = index%self.xdim
-        else:
-            # assume it's a tuple of sheet coords
-            r,c = self.sheet2matrix(*index)
-        return self.weights[y,x]
 
 
 
