@@ -293,7 +293,9 @@ def descendents(class_):
     
 def print_all_param_defaults():
     print "===== Topographica Parameter Default Values ====="
-    for c in descendents(TopoObject):
+    classes = descendents(TopoObject)
+    classes.sort(key=lambda c:c.__name__)
+    for c in classes:
         c.print_param_defaults()
     print "==========================================="
 

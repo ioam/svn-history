@@ -59,8 +59,8 @@ class RFSOM(RFSheet):
         for r in range(rmin,rmax):
             for c in range(cmin,cmax):
                 lattice_dist = norm((wc-c,wr-r))
-                for port in self.ports:
-                    for sheet,proj in self.ports[port]['projections'].items():
+                for proj_list in self.projections.values():
+                    for proj in proj_list:
                         if  lattice_dist <= radius:
                             rf = proj.rf(r,c)
                             rate = self.alpha() * gaussian(lattice_dist,radius)

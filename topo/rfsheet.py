@@ -44,7 +44,8 @@ class Projection(TopoObject):
     src = Parameter(default=None)
     dest = Parameter(default=None)
     rf_type = Parameter(default=RF)
-    
+
+    strength = Number(default=1.0)
 
     def __init__(self,**params):
         super(Projection,self).__init__(**params)
@@ -61,7 +62,6 @@ class Projection(TopoObject):
         return len(self.__rfs),len(self.__rfs[0])
 
     shape = property(get_shape)
-
 
     def get_view(self,sheet_r, sheet_c, pixel_scale = 255, offset = 0):
         """
@@ -179,7 +179,7 @@ class RFSheet(Sheet):
     def __init__(self,**params):
         super(RFSheet,self).__init__(**params)
         self.temp_activation = Numeric.array(self.activation)
-        self.ports = {}
+        self.projections = {}
         self.new_input = False
 
     def _connect_from(self,src,src_port=None,dest_port=None,
@@ -188,24 +188,13 @@ class RFSheet(Sheet):
                       **args):
         
         Sheet._connect_from(self,src,src_port,dest_port,**args)
-
-        if dest_port not in self.ports:
-            self.ports[dest_port] = dict(projections={})
-        projections = self.ports[dest_port]['projections']
-        if src.name in projections:
-            self.warning('Overwriting projection to "%s" on port "%s"' % (src.name,dest_port))
-        projections[src.name] = projection_type(src=src, dest=self,**projection_params)
-
-    def get_projections(self):
-        from operator import add
-        return reduce(add,[port['projections'].values() for port in self.ports.values()])
-
-    projections = property(get_projections,
-                           doc="The list of all projections on all ports (read only).")
+        if src.name not in self.projections:
+            self.projections[src.name] = []
+        self.projections[src.name].append(projection_type(src=src, dest=self,**projection_params))
 
     def input_event(self,src,src_port,dest_port,data):
-        self.message("Received",dest_port,"2input from,",src,"at time",self.simulator.time())
-        self.present_input(data,src,dest_port)
+        self.message("Received input from,",src,"at time",self.simulator.time())
+        self.present_input(data,src)
         self.new_input = True
 
     def pre_sleep(self):
@@ -222,15 +211,16 @@ class RFSheet(Sheet):
     def train(self):
         pass
 
-    def present_input(self,input_activation,input_sheet,port):
+    def present_input(self,input_activation,input_sheet):
         rows,cols = self.activation.shape
-        proj = self.ports[port]['projections'][input_sheet.name]
-        proj.input_buffer = input_activation
-        for r in range(rows):
-            for c in range(cols):
-                    rf = proj.rf(r,c)
-                    X = rf.get_input_matrix(input_activation)
-                    self.temp_activation[r,c] += self.activation_fn(X,rf.weights)
+
+        for proj in self.projections[input_sheet.name]:
+            proj.input_buffer = input_activation
+            for r in range(rows):
+                for c in range(cols):
+                        rf = proj.rf(r,c)
+                        X = rf.get_input_matrix(input_activation)
+                        self.temp_activation[r,c] += proj.strength * self.activation_fn(X,rf.weights)
 
 
     ################################################################################
@@ -240,7 +230,8 @@ class RFSheet(Sheet):
         Get a list of UnitView objects for a particular unit
         in this RFSheet.  Can return multiple UnitView objects.
         """
-        views = flatten([p.get_view(r,c) for p in self.projections])
+        from itertools import chain
+        views = [p.get_view(r,c) for p in chain(*self.projections.values())]
         self.debug('views = '+str(views)+'type = '+str(type(views[0]))+str(views[0].view()))
         key = ('Weights',r,c)
         self.add_sheet_view(key,views)      # Will be adding a list
