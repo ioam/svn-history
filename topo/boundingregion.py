@@ -21,7 +21,8 @@ class BoundingRegion(TopoObject):
     def scale(self,xs,ys):
         raise NYI
     def translate(self,xoff,yoff):
-        raise NYI
+        l,b,r,t = self.aarect().lbrt()
+        self._aarect = AARectangle((l+xoff,b+yoff),(r+xoff,t+yoff))
     def rotate(self,theta):
         raise NYI
     def aarect(self):

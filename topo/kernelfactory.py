@@ -28,10 +28,7 @@ The x and y vectors are lists of indexes at which to sample the kernel
 function.
 """       
 
-def produce_kernel_matrices(bounds, density, x, y):
-    bounds  = produce_value(bounds)
-    density = produce_value(density)
-        
+def produce_kernel_matrices(bounds, density):
     left,bottom,right,top = bounds.aarect().lbrt()
     bound_width  = right-left
     bound_height = top-bottom
@@ -39,9 +36,6 @@ def produce_kernel_matrices(bounds, density, x, y):
 
     rows,cols = bounds2shape(bounds,density)
         
-    x = produce_value(x)
-    y = produce_value(y) 
-
     # TODO: this can generate ouput that may be off by one in terms of size,
     # for example most times this generates a 100x100 image, but sometimes
     # it generates a 101x100 
@@ -49,8 +43,8 @@ def produce_kernel_matrices(bounds, density, x, y):
     # TODO: Use sheet operations defined in sheet.py? I think we already
     # do...
 
-    kernel_y = arange(left-x,right-x, bound_width/cols)
-    kernel_x = arange(bottom-y,top-y, bound_height/rows)
+    kernel_y = arange(left,right, bound_width/cols)
+    kernel_x = arange(bottom,top, bound_height/rows)
  
     return kernel_x, kernel_y
 
@@ -64,7 +58,6 @@ rotated by that theta
 
 
 def produce_rotated_matrices(kernel_x, kernel_y, theta):
-    theta  = produce_value(theta)
     
     new_kernel_x = subtract.outer(cos(theta)*kernel_x, sin(theta)*kernel_y)
     new_kernel_y = add.outer(sin(theta)*kernel_x, cos(theta)*kernel_y)
@@ -106,29 +99,14 @@ Uniform Random Kernel Factory
 """
 
 def uniform_random(kernel_x, kernel_y):
-    #bounds  = produce_value(bounds)
-    #density = produce_value(density)
-        
-    #rows,cols = bounds2shape(bounds,density)
-                                                                                                                 
     return random(kernel_x.shape) 
-    #return random((rows,cols)) 
+
 
 """
 Rectangle Kernel Factory
 """
 
 def rectangle(kernel_x, kernel_y, x, y, width, height):
-    # TODO: This is also kind of a hack: produce x, y early to use them later
-    #x = produce_value(x)
-    #y = produce_value(y)
-    
-    #kernel_x, kernel_y = produce_kernel_matrices(bounds, density, x, y)
-    #kernel_x, kernel_y = produce_rotated_matrices(kernel_x, kernel_y, theta)
-   
-    #width  = produce_value(width)
-    #height = produce_value(height) 
-    
     kernel_x = bitwise_and( less_equal( kernel_x, x+width/2 ), 
                             greater_equal( kernel_x, x-width/2 ) )
     kernel_y = bitwise_and( less_equal( kernel_y, y+height/2 ), 

@@ -3,10 +3,12 @@ Generic class for sheets that take input through receptive fields.
 
 $Id$
 """
+
 from params import Parameter
 from sheet import Sheet
+from inputsheet import UniformRandomSheet
 from utils import mdot
-import RandomArray,Numeric
+import RandomArray,Numeric,copy
 
 
 ###############################################
@@ -55,35 +57,25 @@ class Projection(TopoObject):
 
 
 class RF(TopoObject):
+    weights = Parameter(default=None)
+    bounds = Parameter(default=None)
     
-    def __init__(self,input_sheet,width=1.0,center=(0,0)):
-        from boundingregion import BoundingBox
+    def __init__(self,input_sheet,**params):
         from sheet import activation_submatrix
-
-        super(RF,self).__init__()
-
+        super(RF,self).__init__(**params)
         self.input_sheet = input_sheet
-
-        self.verbose('center = %s, width= %.2f'%(`center`,width))
-        xc,yc = center
-        radius = width/2
-        self.__bounds = BoundingBox(points=((xc-radius,yc-radius),(xc+radius,yc+radius)))
-
-        weights_shape = activation_submatrix(self.__bounds,
+        weights_shape = activation_submatrix(self.bounds,
                                              input_sheet.activation,
                                              input_sheet.bounds,
                                              input_sheet.density).shape
         self.verbose("activation matrix shape: ",weights_shape)
-        self.weights = RandomArray.random(weights_shape)
 
-    def bounds(self):
-        return self.__bounds
     def contains(self,x,y):
-        return self.__bounds.contains(x,y)
+        return self.bounds.contains(x,y)
 
     def get_input_matrix(self, activation):
         from sheet import activation_submatrix
-        return activation_submatrix(self.__bounds,activation,
+        return activation_submatrix(self.bounds,activation,
                                     self.input_sheet.bounds,
                                     self.input_sheet.density)
 
@@ -92,25 +84,34 @@ class RF(TopoObject):
 class RFSheet(Sheet):
 
     # rf params
-    projection_type = Parameter(Projection)
     rf_type = Parameter(default=RF)
 
     activation_fn = Parameter(default=mdot)
     transfer_fn  = Parameter(default=lambda x:Numeric.array(x))
                              
+    weights_factory = Parameter(default=UniformRandomSheet())
 
     def __init__(self,**params):
         super(RFSheet,self).__init__(**params)
         self.temp_activation = Numeric.array(self.activation)
+        self.projections = {}
 
     def _connect_from(self,src,src_port=None,dest_port=None):
         Sheet._connect_from(self,src,src_port,dest_port)
         if src.name not in self.projections:
             self.projections[src.name] = []
-        self.projections[src.name].append(Projection(src=src, dest=self,
-                                                     rfs = [[ RF(src,center=(x,y),width=self.rf_width)
-                                                              for x in self.sheet_cols() ]
-                                                            for y in self.sheet_rows()[::-1] ]) )
+        # set up array of RFs translated to each x,y in the sheet
+        rfs = []
+        for y in self.sheet_rows()[::-1]:
+            row = []
+            for x in self.sheet_cols():
+                bounds = copy.deepcopy(self.weights_factory.bounds)
+                bounds.translate(x,y)
+                weights = self.weights_factory()
+                row.append(self.rf_type(src,weights=weights,bounds=bounds))
+            rfs.append(row)
+                          
+        self.projections[src.name].append(Projection(src=src, dest=self, rfs=rfs))
 
     def input_event(self,src,src_port,dest_port,data):
         self.message("Received input from,",src,"at time",self.simulator.time())
@@ -132,4 +133,4 @@ class RFSheet(Sheet):
                     self.temp_activation[r,c] += self.activation_fn(X,rf.weights)
 
     def train(self,input_activation,input_sheet):
-        raise NYI
+        pass

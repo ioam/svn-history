@@ -22,7 +22,13 @@ class InputSheet(Sheet):
 
     bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))))
     density = Parameter(default=10000)
+
+    theta = Parameter(default=0)
     
+    def __init__(self,**params):
+        super(InputSheet,self).__init__(**params)
+        self.setup_xy()
+        
     def start(self):
         assert self.simulator
 
@@ -36,14 +42,7 @@ class InputSheet(Sheet):
         self.verbose("Received %s input from %s." % (NxN(data.shape),src))
         self.verbose("Generating a new kernel...")
 
-
-        # TODO: Combine these functions since they are always used together 
-        self.produced_x = produce_value(self.x)
-        self.produced_y = produce_value(self.y)
-        
-        self.kernel_x, self.kernel_y = kernelfactory.produce_kernel_matrices(self.bounds, self.density,
-                                                                             self.produced_x, self.produced_y)
-        self.kernel_x, self.kernel_y = kernelfactory.produce_rotated_matrices(self.kernel_x, self.kernel_y, self.theta)
+        self.setup_xy()
     
         # TODO: Pass a dictionary to this function to avoid having all of the
         # subclasses below
@@ -55,6 +54,9 @@ class InputSheet(Sheet):
     def __call__(self):
         return self.function()
 
+    def setup_xy(self):        
+        x,y = kernelfactory.produce_kernel_matrices(self.bounds,self.density)
+        self.kernel_x, self.kernel_y = kernelfactory.produce_rotated_matrices(x-self.x,y-self.y,self.theta)
 
 """
 Gassian Kernel Generating Sheet
@@ -121,9 +123,9 @@ Uniform Random Generating Sheet
 """
   
 class UniformRandomSheet(InputSheet):
-
-    function = lambda self:kernelfactory.uniform_random( self.bounds,
-                                                         self.density ) 
+    x = Parameter(default=0)
+    y = Parameter(default=0)
+    function = lambda self:kernelfactory.uniform_random( self.kernel_x, self.kernel_y) 
 
 """
 Rectangle Generating Sheet

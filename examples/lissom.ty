@@ -1,0 +1,133 @@
+from topo import *
+from topo.inputsheet import *
+from topo.image import ImageSaver
+from math import pi
+from topo.params import Dynamic
+import random
+import pdb #debugger
+
+from topo.utils import msum
+"""
+TODO:
+
+x boundingregion.translate()
+- composing kernel factories (operator overloading?)
+
+x LISSOM learning rule (just mdot)
+x xfer funcs  (piecewise linear sigmoid)
+
+- port parameterization (in rfsheet? in sheet? in EventProcessor?)
+"""
+
+def PLTF(x):
+    """
+    Piecewise-linear transfer function.
+    A matrix function that applies this function to each element:
+
+           /  0 : x < 0 
+    f(x) = |  x : 0 <= x <= 1
+           \  1 : x > 1
+    """
+    return ((x * (x>0)) * (x<1)) + (x>1)
+
+
+class LISSOM(rfsheet.RFSheet):
+
+    transfer_fn = Parameter(default=PLTF)
+    learning_rate = Parameter(default=0.1)
+    
+    def __init__(self,**params):
+        super(LISSOM,self).__init__(**params)
+        self.ports = dict(afferent = [], lateral = [])
+        self.input_buffer = {}
+    def _connect_from(self,src,src_port=None,dest_port=None):
+        super(LISSOM,self)._connect_from(src,src_port,dest_port)
+        self.ports[dest_port].append(self.projections[src.name][-1])
+    def input_event(self,src,src_port,dest_port,data):
+        super(LISSOM,self).input_event(src,src_port,dest_port,data)
+        self.input_buffer[src.name] = data            
+    def pre_sleep(self):
+        self.activation = self.transfer_fn(self.temp_activation)
+        self.send_output(data=self.activation)
+
+        rows,cols = self.activation.shape
+        for name,input in self.input_buffer.items():
+            for p in self.projections[name]:
+                for r in range(rows):
+                    for c in range(cols):
+                        rf = p.rf(r,c)
+                        rf.weights += self.learning_rate * self.activation[r,c] * rf.get_input_matrix(input)
+                        
+
+        # normalize weights
+        for r in range(rows):
+            for c in range(cols):
+                # normalize  weights attached to each port (e.g. 'afferent', 'lateral')
+                for name,projlist in self.ports.items():
+                    k = sum([msum(p.rf(r,c).weights) for p in projlist])
+                    for p in projlist:
+                        p.rf(r,c).weights /= k
+
+
+        self.temp_activation *= 0.0
+        self.input_buffer = {}
+
+
+
+###########################################
+# Set parameters
+
+print "Setting parameters..."
+
+# input generation params
+InputSheet.period = 1.0
+InputSheet.density = 900
+
+FuzzyLineSheet.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+FuzzyLineSheet.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+
+FuzzyLineSheet.theta = Dynamic(lambda :random.uniform(-pi,pi))
+FuzzyLineSheet.width = 0.02
+FuzzyLineSheet.height = 0.9
+FuzzyLineSheet.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+
+
+# rf som parameters
+LISSOM.density = 900
+LISSOM.weights_factory = UniformRandomSheet(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+
+
+# image saver parameters
+ImageSaver.file_format='png'
+ImageSaver.time_format='%0.4d'
+
+###########################################
+# build simulation
+
+base.min_print_level = base.MESSAGE
+
+print "Creating simulation objects..."
+s = Simulator()
+
+retina = FuzzyLineSheet(name='Retina')
+V1 = LISSOM(name='V1')
+save  = ImageSaver(name='RFSOM')
+
+s.connect(retina,V1,dest_port='afferent',delay=1)
+s.connect(V1,V1,dest_port='lateral')
+
+# Uncomment the connections to the image saver, to save all the activation
+# images to disk.
+#s.connect(retina,save,dest_port='retina',delay=2)
+#s.connect(V1,save,dest_port='V1',delay=1)
+
+s.run(10000)
+
+V1.projections['Retina'][0].plot_rfs()
+
+# import profile,pstats
+#
+# p = profile.Profile()
+# p.runctx('s.run(10)',locals(),globals())
+
+                

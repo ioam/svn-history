@@ -35,13 +35,8 @@ class RFSOM(RFSheet):
     training_length = Parameter(1000)
     
     def __init__(self,**params):
-
         super(RFSOM,self).__init__(**params)
-
-        self.projections = {}
-        self.half_life = self.training_length/8
-
-                      
+        self.half_life = self.training_length/8                      
     def alpha(self):
         return self.alpha_0 * decay(self.simulator.time(),self.half_life)
     def radius(self):
