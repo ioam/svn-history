@@ -24,6 +24,68 @@ string.  Other differences are listed elsewhere in this file, such as
 in the REVISION INFO section.
 
 
+REVISION CONTROL
+
+Revision control is by CVS.  Please check in changes as soon as they
+are stable, e.g. at least by the end of each significant workday.
+Conversely, be sure to update your checked out code before doing any
+new work.  The goal is to make sure that all developers are always
+working with the latest code.
+
+Every CVS commit must include an informative log message, summarizing
+the items changed in easily understandable terms, and avoiding
+pejorative language (i.e. comments like "Lord only knows what idiot
+coded it that way!").  
+
+If so many items were changed that any single log message would have
+to be very general (e.g. "Misc changes to many files"), then please
+check in smaller groups of files, each with a meaningful log message.
+Using smaller, meaningful chunks makes debugging much easier later,
+allowing the source of a new bug to be tracked down to a small,
+understandable set of changes.  Conversely, if the same trivial
+changes were made to a large group of files, please check in all of
+those at once, with the same log message, so that it will be clear
+that they go together.  
+
+Similarly, when committing files, please do it in the appropriate
+order and grouping so that the code works at every time in the CVS
+repository history.  That is, if you change several files, adding a
+function to one file and then calling it in another, please check in
+the file with the new function *first*, and only then check in the
+file that calls the function.  If you check them in in the opposite
+order, then the repository temporarily will be in a state where it
+cannot supply working code.  Even if you know no one else is working
+at that time, such gaps make it much more difficult to debug using the
+CVS revision history, because they make it impractical to roll back
+history one file or change at a time to try to find the source of a
+bug.
+
+When making and checking in particularly extensive changes, please
+keep refactoring completely separate from new features whenever
+possible.  That is, if you have to change or clean up a lot of old
+code in order to add a new feature, follow something like this
+procedure:
+
+  cvs commit .	  # Commit all outstanding edits
+  runtests	  # Verify that things work when you start
+  emacs		  # Refactor old code, not changing behavior at all
+  runtests	  # Verify that nothing has been broken
+  cvs diff        # Will have many widespread changes
+  cvs commit -m    "No visible changes" .
+  emacs		  # Add new feature and new test for it
+  runtests	  # See if tests still work, fixing if necessary
+  cvs diff	  # Short list: only the new code
+  cvs commit -m    "Added feature Y" .
+  
+That way nearly all of the lines and files you changed can be tested
+thoroughly using the existing test suite as-is, and any tests added
+can be tested equally well on both the old and new code.  Then the few
+lines implementing the new feature can be added and debugged on their
+own, so that it will be very simple to see whether the new feature was
+the source of a bug, or whether it was all those other changes that
+"shouldn't" have changed anything.
+
+
 REVISION INFO
 
 Every readable file (i.e. text, source code, html, etc.) should
@@ -136,3 +198,69 @@ approach also greatly eases maintenance, because GUI libraries often
 vary significantly over time and across platforms.  To be able to
 maintain our code over the long term, we need to minimize the amount
 of our code that depends on such varying details.
+
+
+REFACTORING/TESTING TIPS
+
+This list of "soundbites" comes from Fowler 1999, Refactoring:
+Improving the Design of Existing Code, p 417-418
+(http://www.amazon.co.uk/exec/obidos/ASIN/0201485672/).  It seems to
+apply reasonably well to this project, particularly the parts about
+testing.
+
+Page 7: When you find you have to add a feature to a program, and the
+program's code is not structured in a convenient way to add the
+feature, first refactor the program to make it easy to add the
+feature, then add the feature.
+
+Page 8: Before you start refactoring, check that you have a solid
+suite of tests.  These tests must be self-checking.
+
+Page 13: Refactoring changes the programs in small steps.  If you make
+a mistake, it is easy to find the bug.
+
+Page 15: Any fool can write code that a computer can understand. Good
+programmers write code that humans can understand.
+
+Page 53: Refactoring (noun): a change made to the internal structure of
+software to make it easier to understand and cheaper to modify without
+changing the observable behavior of the software.
+
+Page 43: Refactor (verb): to restructure software by applying a series
+of refactorings without changing the observable behavior of the
+software.
+
+Page 58: Three strikes and you refactor.
+
+Page 65: Don't publish interfaces prematurely.  Modify your code
+ownership policies to smooth refactoring.
+
+Page 88: When you feel the need to write a comment, first try to
+refactor the code so that any comment becomes superfluous.
+
+Page 90: Make sure all tests are fully automatic and that they check
+their own results.
+
+Page 90: A suite of tests is a powerful bug detector that decapitates
+the time it takes to find bugs.
+
+Page 94: Run your tests frequently.  Localize tests whenever you
+compile --- every test at least every day.
+
+Page 97: When you get a bug report, start by writing a unit test that
+exposes the bug.
+
+Page 98: It is better to write and run incomplete tests than not to
+run complete tests.
+
+Page 99: Think of the boundary conditions under which things might go
+wrong and concentrate your tests there.
+
+Page 100: Don't forget to test that exceptions are raised when things
+are expected to go wrong.
+
+Page 101: Don't let the fear that testing can't catch all bugs stop
+you from writing the tests that will catch most bugs.
+
+
+
