@@ -182,7 +182,14 @@ class TopoObject(object):
                         setattr(self,name,config[name])
                     except KeyError:
                         pass
-            
+                    
+    def get_param_dict(self,**config):
+        paramdict = {}
+        for class_ in classlist(type(self)):
+            for name,val in class_.__dict__.items():
+                if isinstance(val,Parameter):
+                    paramdict[name] = getattr(self,name)
+        return paramdict
 
 def classlist(class_):
     """

@@ -150,6 +150,165 @@ def fuzzy_ring(kernel_x, kernel_y, inner_radius, outer_radius, gaussian_width):
            exp(maximum(-100, -(gaussian_x_coord/gaussian_width)**2))
 
 
-if __name__ == '__main__':
 
-    print "No tests here. Run inputsheet.py instead."
+
+#########################################################
+# Kernel Factory Objects
+#
+#
+
+class KernelFactory(base.TopoObject):
+
+    bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))))
+    density = Parameter(default=10000)
+
+    theta = Parameter(default=0)
+    
+    def __call__(self,**new_params):
+        self.setup_xy()
+        params = self.get_param_dict()
+        params.update(new_params)
+        return self.function(**params)
+
+    def setup_xy(self):        
+        x,y = kernelfactory.produce_kernel_matrices(self.bounds,self.density)
+        self.kernel_x, self.kernel_y = kernelfactory.produce_rotated_matrices(x-self.x,y-self.y,self.theta)
+
+"""
+Gassian Kernel Generating Generator
+"""
+
+class GaussianFactory(KernelFactory):
+
+    x       = Parameter(default=0)
+    y       = Parameter(default=0)
+    theta   = Parameter(default=0)
+    width   = Parameter(default=1)
+    height  = Parameter(default=1)
+
+    # Pass set up a function to run using lambdas. We need to specify self as a
+    # parameter. Should not be a parameter because we don't want the user to
+    # change it.
+
+    function = lambda self:kernelfactory.gaussian( self.kernel_x, 
+                                                   self.kernel_y, 
+                                                   produce_value(self.width), 
+                                                   produce_value(self.height) )
+
+"""
+Sine Grating Kernel Generating Factory
+"""
+
+class SineGratingFactory(KernelFactory):
+
+    x         = Parameter(default=0)
+    y         = Parameter(default=0)
+    theta     = Parameter(default=0)
+    frequency = Parameter(default=1)
+    phase     = Parameter(default=0)
+
+    function = lambda self:kernelfactory.sine_grating( self.kernel_x,
+                                                       self.kernel_y,
+                                                       produce_value(self.frequency), 
+                                                       produce_value(self.phase) )
+
+
+"""
+Gabor Kernel Generating Factory
+"""
+
+class GaborFactory(KernelFactory):
+
+    x        = Parameter(default=0)
+    y        = Parameter(default=0)
+    theta    = Parameter(default=0)
+    width    = Parameter(default=2)
+    height   = Parameter(default=1)
+    frequency = Parameter(default=1)
+    phase     = Parameter(default=0)
+
+    function  = lambda self:kernelfactory.gabor( self.kernel_x,
+                                                 self.kernel_y,
+                                                 produce_value(self.width),
+                                                 produce_value(self.height),
+                                                 produce_value(self.frequency),
+                                                 produce_value(self.phase) ) 
+
+"""
+Uniform Random Generating Factory
+"""
+  
+class UniformRandomFactory(KernelFactory):
+    x = Parameter(default=0)
+    y = Parameter(default=0)
+    function = lambda self:kernelfactory.uniform_random( self.kernel_x, self.kernel_y) 
+
+"""
+Rectangle Generating Factory
+"""
+
+class RectangleFactory(KernelFactory):
+
+    x       = Parameter(default=0)
+    y       = Parameter(default=0)
+    theta   = Parameter(default=0)
+    width   = Parameter(default=1)
+    height  = Parameter(default=1)
+
+    function = lambda self:kernelfactory.rectangle( self.kernel_x, 
+                                                    self.kernel_y, 
+                                                    self.produced_x,
+                                                    self.produced_y,
+                                                    produce_value(self.width),
+                                                    produce_value(self.height) ) 
+"""
+Fuzzy Line Generating Factory
+"""
+
+class FuzzyLineFactory(KernelFactory):
+
+    x       = Parameter(default=0)
+    y       = Parameter(default=0)
+    theta   = Parameter(default=0)
+    width   = Parameter(default=1)
+
+    function = lambda self:kernelfactory.fuzzy_line( self.kernel_x, 
+                                                     self.kernel_y, 
+                                                     produce_value(self.width) ) 
+
+"""
+Fuzzy Disk Generating Factory
+"""
+
+class FuzzyDiskFactory(KernelFactory):
+
+    x              = Parameter(default=0)
+    y              = Parameter(default=0)
+    # TODO: This is a hack, we need a theta in order to appease the rotation
+    # function
+    theta          = Parameter(default=0)
+    disk_radius    = Parameter(default=0.8)
+    gaussian_width = Parameter(default=1)
+
+    function = lambda self:kernelfactory.fuzzy_disk( self.kernel_x, 
+                                                     self.kernel_y, 
+                                                     produce_value(self.disk_radius), 
+                                                     produce_value(self.gaussian_width) ) 
+
+
+"""
+Fuzzy Ring Generating Factory
+"""
+
+class FuzzyRingFactory(KernelFactory):
+
+    x       = Parameter(default=0)
+    y       = Parameter(default=0)
+    theta   = Parameter(default=0)
+    width   = Parameter(default=1)
+
+    function = lambda self:kernelfactory.fuzzy_ring( self.kernel_x, 
+                                                     self.kernel_y, 
+                                                     produce_value(self.width) ) 
+
+

@@ -6,7 +6,7 @@ $Id$
 
 from params import Parameter
 from sheet import Sheet
-from inputsheet import UniformRandomSheet
+from kernelfactory import UniformRandomFactory
 from utils import mdot
 import RandomArray,Numeric,copy
 
@@ -57,21 +57,40 @@ class Projection(TopoObject):
 
 
 class RF(TopoObject):
-    weights = Parameter(default=None)
-    bounds = Parameter(default=None)
     
-    def __init__(self,input_sheet,**params):
+    def __init__(self,input_sheet,weights,bounds,**params):
         from sheet import activation_submatrix
         super(RF,self).__init__(**params)
         self.input_sheet = input_sheet
-        weights_shape = activation_submatrix(self.bounds,
-                                             input_sheet.activation,
-                                             input_sheet.bounds,
-                                             input_sheet.density).shape
-        self.verbose("activation matrix shape: ",weights_shape)
+        self.bounds = bounds
+        self.weights = weights
+        self._crop_to_src()
+        self.verbose("activation matrix shape: ",self.weights.shape)
 
     def contains(self,x,y):
         return self.bounds.contains(x,y)
+
+    def _crop_to_src(self):
+        l,b,r,t = self.bounds.aarect().lbrt()
+        src_l,src_b,src_r,src_t = self.input_sheet.bounds.aarect().lbrt()
+        rmin,cmin = 0,0
+        rmax,cmax = self.weights.shape
+
+        slice_rows,slice_cols = self.get_input_matrix(self.input_sheet.activation).shape
+
+        if rmax != slice_rows:
+            if t >= src_t:
+                rmin += rmax - slice_rows
+            if b <= src_b:
+                rmax -= (rmax - rmin) - slice_rows
+        if cmax != slice_cols:
+            if l <= src_l:
+                cmin += cmax - slice_cols
+            if r >= src_r:
+                cmax -= (cmax - cmin) - slice_cols
+
+        self.weights = self.weights[rmin:rmax,cmin:cmax]
+        assert self.weights.shape == (slice_rows,slice_cols)
 
     def get_input_matrix(self, activation):
         from sheet import activation_submatrix
@@ -89,7 +108,7 @@ class RFSheet(Sheet):
     activation_fn = Parameter(default=mdot)
     transfer_fn  = Parameter(default=lambda x:Numeric.array(x))
                              
-    weights_factory = Parameter(default=UniformRandomSheet())
+    weights_factory = Parameter(default=UniformRandomFactory())
 
     def __init__(self,**params):
         super(RFSheet,self).__init__(**params)
@@ -102,14 +121,25 @@ class RFSheet(Sheet):
             self.projections[src.name] = []
         # set up array of RFs translated to each x,y in the sheet
         rfs = []
+        old_bounds = self.weights_factory.bounds
+        old_x,old_y = self.weights_factory.x,self.weights_factory.y
         for y in self.sheet_rows()[::-1]:
             row = []
             for x in self.sheet_cols():
-                bounds = copy.deepcopy(self.weights_factory.bounds)
+                # Move the kernel factory to the right position,
+                # TODO: this is a hack, the factory should allow parameter
+                # overiding when called.
+                bounds = copy.deepcopy(old_bounds)
                 bounds.translate(x,y)
+                self.weights_factory.x = x
+                self.weights_factory.y = y
+                self.weights_factory.bounds = bounds
                 weights = self.weights_factory()
                 row.append(self.rf_type(src,weights=weights,bounds=bounds))
             rfs.append(row)
+            self.weights_factory.x = old_x
+            self.weights_factory.y = old_y
+            self.weights_factory.bounds = old_bounds
                           
         self.projections[src.name].append(Projection(src=src, dest=self, rfs=rfs))
 

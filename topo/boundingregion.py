@@ -165,5 +165,20 @@ class AARectangle:
         return (right+left)/2.0,(top+bottom)/2.0
     
 
+    def intersect(self,other):
+
+        l1,b1,r1,t1 = self.lbrt()
+        l2,b2,r2,t2 = other.lbrt()
+
+        l = max(l1,l2)
+        b = max(b1,b2)
+        r = min(r1,r2)
+        t = min(t1,t2)
+
+        return AARectangle(points=((l,b),(r,t)))
+
+    def empty(self):
+        l,b,r,t = self.lbrt()
+        return (r <= l) or (t <= b)
         
-        
+                         
