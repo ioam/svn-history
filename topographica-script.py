@@ -1,10 +1,8 @@
-
 import sys,os,code,copy
 import traceback
 from getopt import getopt,GetoptError
 from pprint import pprint
 from topo import *
-
 
 # set the prompt and banner
 sys.ps1 = 'Topographica> '
@@ -16,7 +14,7 @@ Type help() for interactive help, or help(commandname) for info on a
 specific command.
 """
 
-opts,args = getopt(sys.argv[1:],'i')
+opts, args = getopt(sys.argv[1:],'i')
 
 opts = dict(opts)
 
@@ -28,7 +26,6 @@ opts = dict(opts)
 #
 interpreter_locals = copy.copy(locals())
 interpreter = code.InteractiveConsole(interpreter_locals)
-
 
 
 if args:
@@ -56,4 +53,9 @@ if '-i' in opts or len(args) == 0:
         readline.parse_and_bind("tab: complete")
 
     # start interacting
-    interpreter.interact(banner)
+    # Because python is called twice: Once to set env vars, and second to start
+    # interacting, only display the banner if it's time to interact.
+    if 'topographica-script.py' in sys.argv[0]:
+        interpreter.interact(banner)
+    else:
+        interpreter.interact('')
