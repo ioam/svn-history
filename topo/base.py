@@ -71,11 +71,35 @@ DEBUG   = 300
 min_print_level = NORMAL
 object_count = 0
 
+
+class TopoMetaclass(type):
+    """
+    The metaclass of TopoObject (and all its descendents).  The metaclass
+    overrides type.__setattr__ to allow us to set Parameter values on classes
+    without overwriting the attribute descriptor.  
+    """
+    def __setattr__(self,name,value):
+
+        if isinstance(value,Parameter):
+            # If the value is a Parameter descriptor, set it in the class,
+            # replacing any existing descriptor
+            type.__setattr__(self,name,value)            
+        elif isinstance(self.__dict__[name],Parameter):
+            # If the attribute already has a Parameter descriptor,
+            # assign the value to the descriptor.
+            self.__dict__[name].__set__(None,value)
+        else:
+            # in all other cases set it in the 
+            type.__setattr__(self,name,value)
+        
+
 class TopoObject(object):
     """
     A mixin class for debuggable objects.  Makes sure every debuggable
     object has a name,, and __repr__(), __str__(), and db_print() methods.
     """
+    __metaclass__ = TopoMetaclass
+
 
     name           = Parameter(default=None)
     print_level = Parameter(default=MESSAGE)
@@ -159,7 +183,7 @@ def classlist(class_):
     Return a list of the class hierarchy above (and including) class_,
     from least- to most-specific.
     """
-    assert type(class_) == type(object)
+    assert isinstance(class_, type)
     q = [class_]
     out = []
     while len(q):
@@ -168,7 +192,8 @@ def classlist(class_):
         for b in x.__bases__:
             if b not in q and b not in out:
                 q.append(b)
-    return out[::-1]
+    out.reverse()
+    return out
 
 
 if __name__ == '__main__':
