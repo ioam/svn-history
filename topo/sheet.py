@@ -227,6 +227,12 @@ class Sheet(EventProcessor):
         """
         self.sheet_view_dict[view_name] = sheet_view
 
+    def delete_sheet_view(self,view_name):
+        """
+        Delete the dictionary entry with key entry 'view_name' to save
+        memory.
+        """
+        del self.sheet_view_dict[view_name]
                 
     def sheet2matrix(self,x,y):
         """

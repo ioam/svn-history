@@ -356,15 +356,15 @@ class RFSheet(Sheet):
 
     ################################################################################
     # GUI support
-    def unit_view(self,r,c):
+    def unit_view(self,x,y):
         """
         Get a list of UnitView objects for a particular unit
         in this RFSheet.  Can return multiple UnitView objects.
         """
         from itertools import chain
-        views = [p.get_view(r,c) for p in chain(*self.projections.values())]
+        views = [p.get_view(x,y) for p in chain(*self.projections.values())]
         self.debug('views = '+str(views)+'type = '+str(type(views[0]))+str(views[0].view()))
-        key = ('Weights',r,c)
+        key = ('Weights',x,y)
         self.add_sheet_view(key,views)      # Will be adding a list
         self.debug('Added to sheet_view_dict', views, 'at', key)
         return views
@@ -379,8 +379,8 @@ class RFSheet(Sheet):
         """
         self.debug('request = ' + str(request))
         if isinstance(request,tuple) and request[0] == 'Weights':
-            (name,r,c) = request
-            return self.unit_view(r,c)
+            (name,x,y) = request
+            return self.unit_view(x,y)
         else:
             return Sheet.sheet_view(self,request)
         

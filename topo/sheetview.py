@@ -135,12 +135,11 @@ class SheetView(TopoObject):
 
 class UnitView(SheetView):
     """
-    UNDER DEVELOPMENT, SPRING 2005.  Currently does not extend any
-    functions, but can do so to add outlines, and other interesting
-    features.
+    SPRING 2005: Currently does not extend any functions, but can do
+    so to add outlines, and other interesting features.
 
     Consists of an X,Y position for the unit that this View is
-    created.  Subclasses the SheetView class.
+    created for.  Subclasses the SheetView class.
 
     UnitViews should be stored in Sheets via a tuple
     ('SomeString',X,Y).  The dictionary in Sheets can be accessed by
@@ -149,30 +148,7 @@ class UnitView(SheetView):
 
     def __init__(self, term_tuple, x, y, **params):
         """
-        Subclass of SheetView.
-
-        Three types of input_tuples.
-        1.  (matrix_data, matrix_bbox)  
-	    This form locks the value of the sheetview to a single matrix.
-            Terminating case of a composite SheetView.
-            
-        2.  (operation, [tuple_list])
-	    'operation' is performed on the matrices collected from
-                tuple_list.  See the list of valid operations in
-                operations.keys()
-	    Each tuple in the tuple_list is one of the following:
-                (SheetView, None)
-                    Another SheetView may be passed in to create nested plots.
-	        (matrix_data, bounding_box)
-                    Static matrix data complete with bounding box.
-	        (Sheet, sheet_view_name)
-                    This gets sheet_name.sheet_view(sheet_view_name) each time
-                    the current SheetView has its data requested by .view().
-
-        3.  (Sheet, sheet_view_name)
-                Degenerate case that will pull data from another SheetView
-                and not do any additional processing.  Don't yet know a
-                use for this case, but documented for future possible use.
+        Subclass of SheetView.  Contains additional x,y member data.
         """
         super(UnitView,self).__init__(term_tuple, **params)
         self.x = x
@@ -181,18 +157,49 @@ class UnitView(SheetView):
 
 class UnitViewArray(SheetView):
     """
-    INCOMPLETE.
-    
-    UnitViewArrays are tiles of RF fields.  This implementation
-    creates the Array by having a single matrix of RFs, rather than
-    compiling multiple UnitViews into a larger unit.
+    Subclass of SheetView, but creates multiple UnitViews and tiles
+    together a composite matrix.
     """
 
-    def __init__(self, term_tuple, skip=0, **params):
+    def __init__(self, term_tuple, show_units=None, **params):
         """
-        Adds a skip value, so that every <skip> units are not included
-        in the final UnitViewArray view.
+        Adds a show_units value, so that the final map will have
+        <show_units> by <show_units> evently spaced units across the
+        sheet in question.  If show_units is not passed a value, or is
+        assigned to None, then every unit in the sheet will be
+        plotted.
         """
-        super(UnitView,self).__init__(term_tuple, **params)
-        self.skip = skip
+        super(UnitViewArray,self).__init__(term_tuple, **params)
+        self.show_units = show_units
+
+        (mat,bbox) = self.view()
+        if show_units == None:
+            self.show_units = min(mat.shape[0],mat.shape[1])
+            if mat.shape[0] != mat.shape[1]:
+                self.warning('View matrix is not square in SheetViewArray')
+        self.coords = self.generate_coords(self.show_units,bbox)
+
+
+    def generate_coords(self, num_points, bbox):
+        """
+        Evenly space out the units within the sheet bounding box, so
+        that it doesn't matter which corner the measurements start
+        from.  A 4 unit grid needs 5 segments.
+        """
+        aarect = bbox.aarect()
+        (l,b,r,t) = aarect.lbrt()
+        x = float(r - l)
+        y = float(b - t)
+        x_step = x / (num_points + 1)
+        y_step = y / (num_points + 1)
+        l = l + x_step
+        t = t + y_step
+        coords = []
+        for j in range(num_points):
+            y_list = []
+            for i in range(num_points):
+                y_list.append((x_step*j + l, y_step*i + t))
+            coords.append(y_list)
+        return coords
+            
 
