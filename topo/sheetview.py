@@ -20,7 +20,7 @@ from base import TopoObject
 
 # Valid operations that a SheetView should support for the list of
 # sheets passed in.  There are other things that would be useful
-# such as masking which will requrire a bit more work.
+# such as masking which will require a bit more work.  !!UNTESTED!!
 ADD      = 'ADD'
 SUBTRACT = 'SUB'
 MULTIPLY = 'MUL'
@@ -51,8 +51,9 @@ class SheetView(TopoObject):
             Terminating case of a composite SheetView.
             
         2.  (operation, [tuple_list])
-	    'operation' is performed on the matrices collected from tuple_list.
-                see the list of valid operations in operations.keys()
+	    'operation' is performed on the matrices collected from
+                tuple_list.  See the list of valid operations in
+                operations.keys()
 	    Each tuple in the tuple_list is one of the following:
                 (SheetView, None)
                     Another SheetView may be passed in to create nested plots.
@@ -83,28 +84,27 @@ class SheetView(TopoObject):
 
     def view(self):
         """
-        Return the requested view as a matrix.  If the constructor was
-        given multiple maps, the view must be built before being
-        returned, which may lock in new views of data from the
-        specified sheets.
+        Return the requested view as a (matrix, bbox) tuple.
 
-        Input is the variable self._view_list which is a list of
+        If the constructor was given multiple maps, the view must be
+        built before being returned, which may lock in new views of
+        data from the specified sheets.
+
+        Inputs are in the variable self._view_list which is a list of
         tuples, with each tuple being a matrix and a bounding box, or
         a sheet and a map name.  The sequence cannot be dumped into
         maps just once because the raw maps may have changed, so other
-        sheets must be queried for the data.
+        sheets must be queried for the data repeatedly.
         """
         maps = []
-        print self._view_list
         for tup in self._view_list:
-            print tup
             (term_1, term_2) = tup
             if isinstance(term_1,sheet.Sheet):
                 maps.append(term_1.sheet_view(term_2))
             elif isinstance(term_1,SheetView):
                 maps.append(term_1.view())         # Don't care about term_2
             else:
-                maps.append((term_1, term_2))       # Assume it is a matrix
+                maps.append((term_1, term_2))      # Assume it is a matrix
 
         # Convert the list of (matrix, bbox) tuples into a single
         # matrix and another bounding box.
@@ -125,8 +125,6 @@ class SheetView(TopoObject):
         WOULD HAVE DONE AN ADD/INTERSECTION/UNION, BUT BOUNDINGREGION
         DOES NOT YET SUPPORT SUCH OPERATIONS.
         """
-        # result = reduce(self.operation,maps)
-        # return (result, maps[0][1])
         result = maps.pop(0)
         for m in maps:
             # Needs to be changed
@@ -140,6 +138,9 @@ class UnitView(SheetView):
 
     Consists of an X,Y position for the unit that this View is
     created.
+
+    Same type of functionality found in SheetViews should prove useful
+    here.
     """
 
     def __init__(self, x, y, input_tuple, **params):

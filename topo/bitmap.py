@@ -2,7 +2,7 @@
 Topographica Bitmap Class
 
 Encapsulates the PIL Image class so that an input matrix can be displayed
-as a bitmap image.
+as a bitmap image without needing to know about PIL proper.
 
 There are three different base image Classes which inherit Bitmap:
 
@@ -14,8 +14,7 @@ RGBMap    - 3 2D Matrices, Red, Green, Blue Channels.
 All maps are assumed to be normalized to 1.  Matrices are passed in as
 part of the constructor and the image is generaed.
 
-The encapsulated Image is accessible through the .bitmap attribute if you're
-too lazy to extend the base Bitmap object.
+The encapsulated PIL Image is accessible through the .bitmap attribute.
 
 ---
 Creating new Bitmaps:
@@ -110,7 +109,7 @@ class Bitmap(object):
         """
         if max(inArray) > 1:
             print 'Warning: arrayToImage inputs not normalized. Dividing by 255'
-            inArray = inArray / 255.0
+            inArray = Numeric.divide(inArray,255.0)
 
         # PIL 'L' Images use 0 to 255.  Have to scale up.
         inArray = (Numeric.floor(inArray * 255)).astype(Numeric.Int)
@@ -173,6 +172,7 @@ class HSVMap(Bitmap):
         vFlat = vMapArray.flat
         if max(hFlat) > 1 or max(sFlat) > 1 or max(vFlat) > 1:
             print 'Warning: HSVMap inputs not normalized to 1. Dividing by 255'
+            print 'Max of each channel is: ', max(hflat), max(sFlat), max(vFlat)
             hFlat = hFlat / 255.0
             sFlat = sFlat / 255.0
             vFlat = vFlat / 255.0

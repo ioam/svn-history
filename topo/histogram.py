@@ -8,7 +8,7 @@ IN OTHER AREAS.
 from base import *
 import types
 
-# For stub calculate
+# For stub calculation
 import Numeric
 
 class Histogram(TopoObject):
@@ -23,7 +23,7 @@ class Histogram(TopoObject):
         """
         super(Histogram,self).__init__(**params)
 
-        # Do some basic function definition overloading
+        # Do some basic constructor definition overloading
         if isinstance(matrix,types.TupleType):
             matrix = list(matrix)
         if not isinstance(matrix,types.ListType):

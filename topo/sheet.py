@@ -142,7 +142,7 @@ class Sheet(EventProcessor):
         function through view_name.
 
         Because each SheetView has its own internal name, there is no
-        guarantee that the SheetView name will be stored under the key
+        guarantee that the SheetView 'name' will be stored under the key
         name passed into this function.
         """
         self.sheet_view_dict[view_name] = sheet_view
