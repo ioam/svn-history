@@ -34,8 +34,10 @@ python-uninstall:
 ##############################################################
 # Tcl
 #
+# Jeff says that these flags, passed to the linker
+# should make the need to add the path to LD_LIBRARY_PATH
+# unnecessary   -Wl,-rpath -Wl,/home/jp/research/topographica/lib
 TCL = tcl8.4.9
-
 TCL_UNINSTALL += bin/tclsh8.4 bin/wish8.4 lib/tclConfig.sh
 TCL_UNINSTALL += lib/tcl8.4 lib.tclConfig.sh lib/libtcl8.4.so lib/libtclstub8.4.a
 TCL_UNINSTALL += include/tcl*.h man/man*
@@ -56,6 +58,9 @@ tcl-uninstall:
 ##############################################################
 # Tk
 #
+# Jeff says that these flags, passed to the linker
+# should make the need to add the path to LD_LIBRARY_PATH
+# unnecessary   -Wl,-rpath -Wl,/home/jp/research/topographica/lib
 TK = tk8.4.9
 
 TK_UNINSTALL += lib/tk8.4 lib/libtk8.4.so lib/libtkstub8.4.a
@@ -188,14 +193,31 @@ dislinpy-uninstall: dislinpy-clean
 
 
 ##############################################################
-# Startup Script
+# Startup Script sh version.  No longer used.
 #
-startscript: dislin python
+startscript_old: dislin python
 	echo "#!/bin/sh" > ${PREFIX}topographica
 	echo 'export DISLIN="${PREFIX}${DISLIN_UNINSTALL}"' >> ${PREFIX}topographica
 	echo 'export PYTHONPATH="$$PYTHONPATH:${PREFIX}${DISLIN_UNINSTALL}/python"' >> ${PREFIX}topographica
 	echo 'export LD_LIBRARY_PATH="${PREFIX}lib:${PREFIX}${DISLIN_UNINSTALL}:$$LD_LIBRARY_PATH"' >> ${PREFIX}topographica
 	echo -e "/usr/bin/env ${PWD}/bin/python topographica-script.py \044\100" >> ${PREFIX}topographica
+	chmod a+x ${PREFIX}topographica
+
+
+
+##############################################################
+# Startup Script Python Version
+#
+startscript: dislin python
+	echo '#!/usr/bin/env ${PREFIX}bin/python'                     > ${PREFIX}topographica
+	echo 'import os,sys'                                         >> ${PREFIX}topographica
+	echo 'os.putenv("DISLIN","${PREFIX}${DISLIN_UNINSTALL}")'    >> ${PREFIX}topographica
+	echo 'sys.path.append("${PREFIX}${DISLIN_UNINSTALL}/python")'>> ${PREFIX}topographica
+	echo 'old_LD = os.getenv("LD_LIBRARY_PATH","")'	             >> ${PREFIX}topographica
+	echo 'os.putenv("LD_LIBRARY_PATH",old_LD+":${PREFIX}lib:${PREFIX}${DISLIN_UNINSTALL}")' >> ${PREFIX}topographica
+	echo 'sys.argv[0]="${PREFIX}topographica-script.py"'         >>  ${PREFIX}topographica
+	echo 'sys.argv.insert(0,"${PREFIX}bin/python")'              >>  ${PREFIX}topographica
+	echo 'os.execv(sys.argv[0],sys.argv)'               	     >>  ${PREFIX}topographica
 	chmod a+x ${PREFIX}topographica
 
 #############################################################################
