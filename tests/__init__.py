@@ -12,6 +12,7 @@ import testsheet
 import testsheetview
 import testhistogram
 import testplot
+import testplotengine
 import testsimulator
 
 suite = unittest.TestSuite()
