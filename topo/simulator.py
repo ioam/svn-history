@@ -98,11 +98,11 @@ class Simulator(TopoObject):
                     self.__sleep_window = 0
                     keep_running = True
         except STOP:
-            print "Simulation stopped at time %f" % self.time()
+            self.message("Simulation stopped at time %f" % self.time())
         except EOFError:
-            print "Simulation stopped at time %f" % self.time()
+            self.message("Simulation stopped at time %f" % self.time())
         except KeyboardInterrupt:
-            print "Simulation stopped at time %f" % self.time()
+            self.message("Simulation stopped at time %f" % self.time())
 
     def stop(self):
         raise STOP
@@ -338,7 +338,7 @@ class ThresholdUnit(EventProcessor):
             if self.accum > self.threshold:
                 self.send_output(data=self.amplitude)
                 self.accum = 0
-                print `self` + ' firing, amplitude = ' + `self.amplitude`
+                message(`self` + ' firing, amplitude = ' + `self.amplitude`)
 
 
 class SumUnit(EventProcessor):
