@@ -178,3 +178,21 @@ class UnitView(SheetView):
         self.x = x
         self.y = y
 
+
+class UnitViewArray(SheetView):
+    """
+    INCOMPLETE.
+    
+    UnitViewArrays are tiles of RF fields.  This implementation
+    creates the Array by having a single matrix of RFs, rather than
+    compiling multiple UnitViews into a larger unit.
+    """
+
+    def __init__(self, term_tuple, skip=0, **params):
+        """
+        Adds a skip value, so that every <skip> units are not included
+        in the final UnitViewArray view.
+        """
+        super(UnitView,self).__init__(term_tuple, **params)
+        self.skip = skip
+

@@ -12,6 +12,7 @@ from boundingregion import Intersection
 import RandomArray,Numeric,copy
 import topo.sheetview
 import topo.boundingregion
+import topo.bitmap
 from topo.base import flatten
 
 
@@ -58,7 +59,35 @@ class Projection(TopoObject):
         assert matrix_data != None, "Projection Matrix is None"
         return topo.sheetview.UnitView((matrix_data,new_box),
                                        sheet_r,sheet_c,name=composite_name)
-        
+
+
+    def get_arrayview(self,skip, pixel_scale = 255, offset = 0):
+        """
+        INCOMPLETE.  MAY NOT EVEN EXECUTE CORRECTLY SINCE NEVER CALLED.
+
+        Return a single receptive field UnitView, for the unit at
+        sheet_r, sheet_c.  sheet_r and sheet_c are assumed to be in
+        sheet coordinates.
+
+        offset and pixel scale are currently unused.  The original
+        version of the function passed it to a PIL Image object, but
+        this does not, though it should in the future.
+
+        NOTE: BOUNDS MUST BE PROPERLY SET. CURRENTLY A STUB IS IN EFFECT.
+        """
+        (r,c) = (self.dest()).sheet2matrix(sheet_r,sheet_c)
+        composite_name = self.name + ' Array'
+        # print 'matrix_data = ', matrix_data
+        new_box = self.dest().bounds  # WHAT DOES A BBOX MEAN FOR AN ARRAY?
+        assert matrix_data != None, "Projection Matrix is None"
+        for r,row in enumerate(self.__rfs):
+            for c,rf in enumerate(row):                    
+                im = Image.new('L',rf.weights.shape[::-1])
+                im.putdata(rf.weights.flat,scale=pixel_scale,offset=pixel_offset)
+                
+                bm = topo.bitmap.BWMap(im)
+        return topo.sheetview.UnitView((bm,new_box),
+                                       sheet_r,sheet_c,name=composite_name)
 
     
     def plot_rfs(self,montage=True,file_format='ppm',file_prefix='',

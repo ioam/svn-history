@@ -316,6 +316,7 @@ class TopoConsole(Frame):
         # PreferenceMapPanel(console=self,parent=win).pack(expand=YES,fill=BOTH)
         # win.deiconify()
 
+
     def new_weights_window(self):
         pe = self.active_plotengine()
         if pe:
@@ -327,20 +328,23 @@ class TopoConsole(Frame):
                          pengine=pe,
                          parent=win).pack(expand=YES,fill=BOTH)
             win.deiconify()
-
-
         else:
             self.messageBar.message('state', 'No active Simulator object.')
-        # Judah - MUST SHOW THIS WINDOW
+
 
     def new_weights_array_window(self):
         self.messageBar.message('state', 'Not yet implemented')
-        # self.num_weights_array_windows += 1
-        # win = GUIToplevel(self)
-        # win.withdraw()
-        # win.title("Weights Array %d" % self.num_weights_array_windows)
-        # WeightsArrayPanel(console=self,parent=win).pack(expand=YES,fill=BOTH)
-        # win.deiconify()
+        pe = self.active_plotengine()
+        if pe:
+            self.num_weights_array_windows += 1
+            win = GUIToplevel(self)
+            win.withdraw()
+            win.title("Weights Array %d" % self.num_weights_array_windows)
+            WeightsArrayPanel(console=self,parent=win).pack(expand=YES,fill=BOTH)
+            win.deiconify()
+        else:
+            self.messageBar.message('state', 'No active Simulator object.')
+
 
     def open_plot_params_window(self):
         """
@@ -460,7 +464,7 @@ class GUIToplevel(Toplevel):
     def __init__(self,parent,**config):
         Toplevel.__init__(self,parent,config)
         self.protocol('WM_DELETE_WINDOW',self.destroy)
-        self.resizable(0,0)
+        self.resizable(1,1)
 
 ####################
 

@@ -76,6 +76,10 @@ class Plot(TopoObject):
         self.matrices = []         # Will hold 3 2D matrices.
 
 
+    def shape():
+        """ Return the shape of the first matrix in the Plot """
+        return self.matrices[0].shape
+
     def plot(self):
         """
         Get the SheetViews requested from each channel passed in at

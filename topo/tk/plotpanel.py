@@ -5,6 +5,7 @@ $Id$
 """
 #from Tkinter import *
 import Pmw, re, os, sys
+import __main__
 import topo
 import topo.base
 import topo.bitmap
@@ -34,6 +35,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
         self.plot_tuples = []
 
         self.console = console
+        self.parent = parent
         self.canvases = []
 
         self.images = []
@@ -155,7 +157,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
 
     def display_labels(self):
         for i,name in enum(self.plotlabels):
-            self.message(i, " ", name)
+            self.debug(i, " ", name)
             Label(self.plot_frame,text=name).grid(row=1,column=i,sticky=NSEW)
 
     def reduce(self):
@@ -279,18 +281,20 @@ class PreferenceMapPanel(PlotPanel):
 class WeightsPanel(PlotPanel):
     def __init__(self,parent,pengine,console=None,**config):
 
-#         self.row_str = StringVar()
+        self.r = 0
+        self.row_str = StringVar()
+        self.row_str.set(0.0)
 #         self.row_str.set('current_height/2')
-#         self.col_str = StringVar()
+        self.c = 0
+        self.col_str = StringVar()
+        self.col_str.set(0.0)
 #         self.col_str.set('current_width/2')
-# 
-        self.row_str = DoubleVar()
-        self.row_str.set(0)
-        self.col_str = DoubleVar()
-        self.col_str.set(0)
+        self.WEIGHT_PLOT_INITIAL_SIZE = 100
 
-        self.plot_key = ('Weights',self.row_str.get(),self.col_str.get())
+        # Generate the initial plot_key
+        self.generate_plot_key()
         self.debug('plot_key = ' + str(self.plot_key))
+        
         PlotPanel.__init__(self,parent,pengine,console,**config)
 
         params_frame = Frame(master=self)
@@ -301,14 +305,56 @@ class WeightsPanel(PlotPanel):
         Message(params_frame,text="Column:",aspect=1000).pack(side=LEFT)
         Entry(params_frame,textvariable=self.col_str).pack(side=LEFT,expand=YES,fill=X)
 
+        # The plot_key needs to be set, and the parent constructor as well,
+        # since a throw-away PlotGroup is going to be used to estimate an
+        # initial zoom factor.
+        self.set_initial_zoom_factor()
+        self.refresh()
+        
 
+    def set_initial_zoom_factor(self):
+        """
+        The initial zoom factor of 1 makes tiny RFs very hard to see.
+        By setting an initial dynamic zoom factor, the starting plot
+        will not have to be scaled much by the user.
+
+        It's very inefficient that an entire PlotGroup has to be
+        created, then discarded just to estimate how big to set the
+        initial scale size.  This should be replaced with something
+        more efficient later.
+        """
+        self.pe_group = self.pe.get_plot_group(self.plot_key)
+        self.plot_tuples = self.pe_group.plots()
+        # print 'self.plot_tuples = ', self.plot_tuples
+        shapes = [(each[0])[0].shape for each in self.plot_tuples]
+        main_dimension = [max(x,y) for (x,y) in shapes]
+        main = max(main_dimension)
+        self.zoom_factor = self.WEIGHT_PLOT_INITIAL_SIZE // main
+
+
+    def generate_plot_key(self):
+        """
+        The plot_key for the WeightsPanel will change depending on the
+        input within the window widgets.  This means that the key
+        needs to be regenerated at the appropriate times.
+        """
+        g = __main__.__dict__
+        self.r = eval(self.row_str.get(),g)
+        self.c = eval(self.col_str.get(),g)
+        if isinstance(self.r,int): self.r = float(self.r)
+        if isinstance(self.c,int): self.c = float(self.c)
+        self.plot_key = ('Weights',self.r,self.c)
+        
+        
     def do_plot_cmd(self):
         """
         Overloaded do_plot_cmd() so that the plot_key can change to the
         active row/col pair in the window.
         """
-        self.plot_key = ('Weights',self.row_str.get(),self.col_str.get())
+        self.generate_plot_key()
         super(WeightsPanel,self).do_plot_cmd()
+        self.parent.title("Weights Array %d. (r=%0.4f, c=%0.4f)" %
+                          (self.console.num_weights_windows,self.r, self.c))
 
 
 

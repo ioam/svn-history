@@ -145,7 +145,6 @@ class PlotEngine(TopoObject):
         # An alternative is lambda_single_view_per_name(name,filter_lam)
         dynamic_list = lambda : self.lambda_flat_dynamic_list(name,filter_lam)
         new_group = PlotGroup(dynamic_list)
-#        print new_group.plots()
         self.debug('Type of new_group is', type(new_group))
         return new_group
 
