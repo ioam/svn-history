@@ -14,6 +14,7 @@ $Id$
 import sys
 
 from base import TopoObject
+from sheetview import *
 
 ADD      = 0
 SUBTRACT = 1
@@ -55,7 +56,7 @@ class Plot(TopoObject):
         generate_plot.  This is done in case the measurement causes a
         change in the Sheet providing the View.
         """
-        super(SheetView,self).__init__(**params)
+        super(Plot,self).__init__(**params)
         self.sheet_tuples = sheet_tuple_list
         self.op = operation
         self.histograms = []
@@ -76,7 +77,7 @@ class Plot(TopoObject):
         return (self.matrix, self.histograms)
 
 
-    def clear_cache():
+    def clear_cache(self):
         """Flush the cache so the next plot will be fresh."""
         self.plot_pending = False
         
