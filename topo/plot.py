@@ -3,7 +3,7 @@ Base Plot environment that manipulates SheetViews and has Histogram information
 
 A plot contains information about one or more SheetViews that it combines
 to create a single matrix that can be displayed as a bitmap.  Associated with
-this single (costructed) box of information are multiple histograms that
+this single (constructed) box of information are multiple histograms that
 are stored within the base plot object.
 
 The plot objects are generally clustered together within a PlotGroup Class
