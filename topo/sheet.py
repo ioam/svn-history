@@ -206,7 +206,7 @@ class Sheet(EventProcessor):
         if request == 'Activation':
             activation_copy = array(self.activation)
             new_view = SheetView((activation_copy,self.bounds),
-                                 name=('Activation'))
+                                 name=(self.name + ' Activation'))
         else:
             if self.sheet_view_dict.has_key(request):
                 new_view = self.sheet_view_dict[request]
@@ -227,7 +227,7 @@ class Sheet(EventProcessor):
         """
         self.sheet_view_dict[view_name] = sheet_view
 
-    def delete_sheet_view(self,view_name):
+    def release_sheet_view(self,view_name):
         """
         Delete the dictionary entry with key entry 'view_name' to save
         memory.
