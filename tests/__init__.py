@@ -18,6 +18,7 @@ import testpalette
 import testgui
 import testpropertiesframe
 import testdislinplot
+import testrfsom
 
 suite = unittest.TestSuite()
 
