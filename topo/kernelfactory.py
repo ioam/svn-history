@@ -20,16 +20,6 @@ from pprint import pprint,pformat
 from math import pi
 
 
-"""
-Function for constructing a gassian pattern out of a properly set up Numeric
-matrix
-"""
-
-def uniform_random(kernel_x, kernel_y, width, height, theta):
-    # not finished, needs some more information about the kernel size that isn't
-    # passed through this interface
-    return random(2,2)
-
 def rectangle(kernel_x, kernel_y, width, height, theta):
     # need to specify the bounds somehow 
     return kernel_x
@@ -66,11 +56,18 @@ class KernelFactory(base.TopoObject):
         rows,cols = bounds2shape(self.bounds,self.density)
         
         x = produce_value(self.x)
-        y = produce_value(self.y)
+        y = produce_value(self.y) 
 
+        # TODO: this can generate ouput that may be off by one in terms of size,
+        # for example most times this generates a 100x100 image, but sometimes
+        # it generates a 101x100 
 
-        self.kernel_x = arange(left-x,right-x, self.bound_width/cols)
-        self.kernel_y = arange(bottom-y,top-y, self.bound_height/rows)
+        # TODO: Use sheet operations defined in sheet.py
+
+        # TODO: fix the 90 degree rotation problem
+
+        self.kernel_y = arange(left-x,right-x, self.bound_width/cols)
+        self.kernel_x = arange(bottom-y,top-y, self.bound_height/rows)
   
         return self.function(self.kernel_x, self.kernel_y)
 
@@ -88,14 +85,6 @@ class GaussianKernelFactory(KernelFactory):
         theta  = produce_value(self.theta)
         width  = produce_value(self.width)
         height = produce_value(self.height) 
-
-        # TODO: this can generate ouput that may be off by one in terms of size,
-        # for example most times this generates a 100x100 image, but sometimes
-        # it generates a 101x100 of something like that.
-
-        # TODO: This uses 5 numeric arrays. We can probably simplify this. It is
-        # faster than the previous implementation though.
-
 
         new_kernel_x = subtract.outer(cos(theta)*kernel_x, sin(theta)*kernel_y)
         new_kernel_y = add.outer(sin(theta)*kernel_x, cos(theta)*kernel_y)
@@ -123,8 +112,6 @@ class SineGratingKernelFactory(KernelFactory):
         new_kernel_x = subtract.outer(cos(theta)*kernel_x, sin(theta)*kernel_y)
         new_kernel_y = add.outer(sin(theta)*kernel_x, cos(theta)*kernel_y)
 
-        # HACK: just for testing the sine_grating function, width and height are
-        # meaningless in this context
         new_kernel = amplitude*sin(frequency*new_kernel_x)
 
         return new_kernel
@@ -148,6 +135,18 @@ class GaborKernelFactory(KernelFactory):
         new_kernel_y = add.outer(sin(theta)*kernel_x, cos(theta)*kernel_y)
 
         return exp( -(new_kernel_x/width)**2 - (new_kernel_y/height)**2 ) * cos( 2*pi*new_kernel_x )
+
+"""
+Uniform Random Kernel Factory
+"""
+
+class UniformRandomKernelFactory(KernelFactory):
+ 
+    def function(self, kernel_x, kernel_y):
+        
+        return 
+
+
 
 
 if __name__ == '__main__':

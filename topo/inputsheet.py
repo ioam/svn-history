@@ -43,30 +43,40 @@ class InputSheet(Sheet):
 class GaussianSheet(InputSheet, GaussianKernelFactory):
     pass
 
-
-#class UniformRandomSheet(InputSheet, UniformRandomSheet):
-#    pass
-
 class SineGratingSheet(InputSheet, SineGratingKernelFactory):
     pass
 
 class GaborSheet(InputSheet, GaborKernelFactory):
     pass
 
+class UniformRandomSheet(InputSheet, UniformRandomKernelFactory):
+    pass
+
+
 
 if __name__ == '__main__':
     from simulator import Simulator
     from image import ImageSaver
 
-    # BUG?: these give errors now:
     GaussianSheet.density = 10000
     GaussianSheet.period = 1.0
 
-    GaussianSheet.x = lambda:random.uniform(-0.5,0.5)
-    GaussianSheet.y = lambda:random.uniform(-0.5,0.5)
-    GaussianSheet.theta = lambda:random.uniform(-3.1415926,3.1415926)
-    GaussianSheet.width = 0.05
-    GaussianSheet.height = 0.2
+    def translation( begin, step, end ):
+        x = begin
+        while(x < end):
+            x += step
+            yield x
+        while(1):
+            yield x    
+
+    #GaussianSheet.x = lambda:random.uniform(-0.5,0.5)
+    GaussianSheet.x = translation(-0.5, 0.05, 0.5)
+    #GaussianSheet.y = lambda:random.uniform(-0.5,0.5)
+    GaussianSheet.y = translation(-0.5, 0.05, 0.5) 
+    #GaussianSheet.theta = lambda:random.uniform(-3.1415926,3.1415926)
+    GaussianSheet.theta = 3.1415926/4
+    GaussianSheet.width = 20
+    GaussianSheet.height = 0.2 
 
     s = Simulator()
     g = GaussianSheet() 
