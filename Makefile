@@ -27,10 +27,8 @@ topographica_old: ext-packages
 
 
 ##############################################################
-# Startup Script Python Version -- Not working
-# It sets all the environment variables and even calls exec
-# but it can't find Dislin afterwards.  Don't know what's wrong.
-#
+# Startup Script Python Version
+
 topographica: ext-packages
 	echo "#!${PREFIX}/bin/python" > topographica
 	echo "#  wrapper.py test wrapper for setting environment" >> topographica
@@ -41,8 +39,8 @@ topographica: ext-packages
 	echo "" >> topographica
 	echo "os.putenv('DISLIN',DISLIN)" >> topographica
 	echo "os.putenv('LD_LIBRARY_PATH'," >> topographica
-	echo "          ':'.join((os.path.join(TOPO,'lib'),DISLIN,os.getenv('LD_LIBRARY_PATH'))))" >> topographica
-	echo "os.putenv('PYTHONPATH',os.path.join(DISLIN,'python')+':'+os.getenv('PYTHONPATH'))" >> topographica
+	echo "          ':'.join((os.path.join(TOPO,'lib'),DISLIN,os.getenv('LD_LIBRARY_PATH',''))))" >> topographica
+	echo "os.putenv('PYTHONPATH',os.path.join(DISLIN,'python')+':'+os.getenv('PYTHONPATH',''))" >> topographica
 	echo "" >> topographica
 	echo "" >> topographica
 	echo "# exec" >> topographica

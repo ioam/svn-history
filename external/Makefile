@@ -1,7 +1,7 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-all: python jpeg pil numeric pmw dislin startscript dislinpy
+all: python jpeg pil numeric pmw dislin  dislinpy
 
 clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean dislin-clean dislinpy-clean
 
