@@ -7,6 +7,10 @@ import topo.tk.propertiesframe
 import topo.tk.taggedslider
 import topo.tk.topoconsole
 import topo.tk.plotpanel
+import topo.tk.activitypanel
+import topo.tk.weightspanel
+import topo.tk.weightsarraypanel
+import topo.tk.regionplotpanel
 
 # For show_cmd_prompt() and start()
 import Pmw, sys, Tkinter
