@@ -2,6 +2,7 @@
 
 from topo.inputsheet import *
 from topo.kernelfactory import *
+from topo.simulator import *
 from topo.rfsom import RFSOM
 from topo.image import ImageSaver
 from math import pi
