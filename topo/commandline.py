@@ -1,7 +1,4 @@
-import sys,os,code,copy
-import traceback
-from getopt import getopt,GetoptError
-from pprint import pprint
+import sys
 from topo import *
 
 BANNER         = """
