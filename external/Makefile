@@ -193,36 +193,6 @@ dislinpy-uninstall: dislinpy-clean
 	rm -f dislinpy ${DISLIN_PYTHON_DIR}/dislinmodule.so
 
 
-##############################################################
-# Startup Script sh version.  
-#
-startscript: python
-	echo "#!/bin/sh" > ${PREFIX}topographica
-	echo 'export DISLIN="${PREFIX}${DISLIN_UNINSTALL}"' >> ${PREFIX}topographica
-	echo 'export PYTHONPATH="$$PYTHONPATH:${PREFIX}${DISLIN_UNINSTALL}/python"' >> ${PREFIX}topographica
-	echo 'export LD_LIBRARY_PATH="${PREFIX}lib:${PREFIX}${DISLIN_UNINSTALL}:$$LD_LIBRARY_PATH"' >> ${PREFIX}topographica
-	echo -e "/usr/bin/env ${PREFIX}/bin/python topographica-script.py \044\100" >> ${PREFIX}topographica
-	chmod a+x ${PREFIX}topographica
-	touch startscript
-
-
-##############################################################
-# Startup Script Python Version -- Not working
-# It sets all the environment variables and even calls exec
-# but it can't find Dislin afterwards.  Don't know what's wrong.
-#
-startscript_new: dislin python
-	echo '#!/usr/bin/env ${PREFIX}bin/python'                     > ${PREFIX}topographica
-	echo 'import os,sys'                                         >> ${PREFIX}topographica
-	echo 'os.environ["DISLIN"]="${PREFIX}${DISLIN_UNINSTALL}"'    >> ${PREFIX}topographica
-	echo 'os.environ["PATH"] = os.environ["PATH"] + ":${PREFIX}${DISLIN_UNINSTALL}/python"'>> ${PREFIX}topographica
-	echo 'old_LD = os.getenv("LD_LIBRARY_PATH","")'	             >> ${PREFIX}topographica
-	echo 'os.environ["LD_LIBRARY_PATH"]=old_LD+":${PREFIX}lib:${PREFIX}${DISLIN_UNINSTALL}"' >> ${PREFIX}topographica
-	echo 'sys.argv[0]="${PREFIX}topographica-script.py"'         >>  ${PREFIX}topographica
-	echo 'sys.argv.insert(0,"${PREFIX}bin/python")'              >>  ${PREFIX}topographica
-	echo 'os.execvpe(sys.argv[0],sys.argv,os.environ)'               	     >>  ${PREFIX}topographica
-	chmod a+x ${PREFIX}topographica
-
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
