@@ -136,14 +136,14 @@ class Projection(TopoObject):
         NOTE: BOUNDS MUST BE PROPERLY SET. CURRENTLY A STUB IS IN EFFECT.
         """
         (x,y) = (self.dest).sheet2matrix(sheet_x,sheet_y)
-        composite_name = '%s: %f, %f' % (self.name, sheet_x, sheet_y)
+        # composite_name = '%s: %0.3f, %0.3f' % (self.name, sheet_x, sheet_y)
         matrix_data = Numeric.array(self.rf(y,x).weights)
         # print 'matrix_data = ', matrix_data
         new_box = self.dest.bounds  # TURN INTO A PROPER COPY
         assert matrix_data != None, "Projection Matrix is None"
         return topo.sheetview.UnitView((matrix_data,new_box),
                                        sheet_x,sheet_y,self,
-                                       name=composite_name)
+                                       view_type='UnitView')
 
 
     

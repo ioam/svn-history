@@ -206,12 +206,11 @@ class Sheet(EventProcessor):
         if request == 'Activation':
             activation_copy = array(self.activation)
             new_view = SheetView((activation_copy,self.bounds),
-                                 name=(self.name + ' Activation'))
+                                 src_name=self.name,view_type='Activation')
+        elif self.sheet_view_dict.has_key(request):
+            new_view = self.sheet_view_dict[request]
         else:
-            if self.sheet_view_dict.has_key(request):
-                new_view = self.sheet_view_dict[request]
-            else:
-                new_view = None
+            new_view = None
         return new_view
 
 

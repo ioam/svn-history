@@ -57,6 +57,13 @@ class Plot(TopoObject):
         variable sheet, or
         It is a SheetView object.
 
+        plot_type has three options: HSV, COLORMAP, or RGB.  HSV plots
+        will be converted to an RGB matrix triple.  COLORMAPs take in
+        a single channel, since each pixel should be a single value,
+        that should be selected from a palette.  RGB plots are
+        three-channel plots that are not mixed together like HSV,
+        since it is assumed the GUI display will be in RGB.
+
         sheet gives the object that the three channels will request
         SheetViews from if a String has been passed in.
 
@@ -72,6 +79,7 @@ class Plot(TopoObject):
         self.source = sheet
         self.channels = (channel_1, channel_2, channel_3)
         self.plot_type = plot_type
+        self.view_info = {}
         self.histograms = []
         self.channel_views = []
         self.matrices = []         # Will hold 3 2D matrices.
