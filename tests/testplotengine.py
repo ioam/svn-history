@@ -1,6 +1,7 @@
 """
-See test_rfsom(self) and ImagePoster for an example of how to use and call
-the PlotEngine system from a simulation.
+This unit test also requires testbitmap.jpg to run.  The image is used
+to import into Sheet Sheetview dictionaries.  The stub simulation is
+not functional.
 
 $Id$
 """
@@ -21,51 +22,10 @@ from math import pi
 from topo.params import Dynamic
 from Tkinter import *
 from Tkconstants import *
+from PIL import Image
 import ImageTk
 import random
 import pdb #debugger
-
-
-class ImagePoster(EventProcessor):
-    """
-    Sample class of what it would take to display plots to the screen every
-    self.step steps.  This pulls all 'Activation' plots.
-    """
-
-    def __init__(self, plotengine, **params):
-        super(EventProcessor,self).__init__(**params)
-        self.plotengine = plotengine
-        self.c = 0
-        self.step = 1
-
-
-    def input_event(self,src,src_port,dest_port,data):
-        if self.c >= self.step:
-            self.c = 0
-            #Post the image
-            self.verbose('Sheets: ', self.plotengine._sheets())
-            plot_group = self.plotengine.get_plot_group('Activation')
-            plot_list = plot_group.plots()
-            self.plotengine.debug('Type of plot_group', type(plot_group))
-
-            # PIL will start displaying the images to a TK window once
-            # a Tk environment is started.  This is fine, but in order
-            # to display the window, mainloop() has to be called, and
-            # control is lost.  Until a workaround is written, I'll
-            # stick to XView
-            # root = Tk()       
-
-            for (figure_tuple, hist_tuple) in plot_group.plots():
-                plot_group.debug('Plot Tuple', figure_tuple)
-                (r,g,b) = figure_tuple
-                win = RGBMap(r,g,b)
-                win.show()
-
-            # The start loop for displaying the static Tk windows.
-            # root.mainloop()
-        else:
-            self.c = self.c + 1
-        
 
 
 class TestPlotEngine(unittest.TestCase):
@@ -73,10 +33,11 @@ class TestPlotEngine(unittest.TestCase):
     def setUp(self):
         self.s = Simulator(step_mode = 1)
         self.engine = PlotEngine(self.s)
-        self.sheet1 = Sheet()
-        self.sheet2 = Sheet()
-        self.plot1= plot.Plot(('Activity',None,None),plot.COLORMAP,self.sheet1)
-        self.plot2= plot.Plot(('Activity',None,None),plot.COLORMAP,self.sheet2)
+        self.sheetR = Sheet()
+        self.sheetG = Sheet()
+        self.sheetB = Sheet()
+        self.plot1= plot.Plot(('Activity',None,None),plot.COLORMAP,self.sheetR)
+        self.plot2= plot.Plot(('Activity',None,None),plot.COLORMAP,self.sheetG)
 
         pulse1 = PulseGenerator(period = 1)
         pulse2 = PulseGenerator(period = 3)
@@ -98,10 +59,10 @@ class TestPlotEngine(unittest.TestCase):
 
 
     def test_sheet_filter(self):
-        assert(sheet_filter(self.sheet1))
+        assert(sheet_filter(self.sheetR))
 
 
-    def test_rfsom(self):
+    def test_plotengine(self):
         """
         Cut and paste of current topographica/examples/rfsom_example.py
         with extensions to interface with the PlotEngine and ImagePoster
@@ -112,43 +73,80 @@ class TestPlotEngine(unittest.TestCase):
         
         GaussianFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        
         GaussianFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
         GaussianFactory.width = 0.02
         GaussianFactory.height = 0.9
         GaussianFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
-
-        # rf som parameters
-        RFSOM.density = 900
-        RFSOM.rf_width = 0.2
-        RFSOM.training_length = 10000
-        RFSOM.radius_0 = 0.1
 
         ###########################################
         # build simulation
         
         base.min_print_level = base.MESSAGE
         
-        print "Creating simulation objects..."
         s = Simulator()
-        pe = PlotEngine(s)
+        s.verbose("Creating simulation objects...")
 
+        # Uses testbitmap.jpg.
+        # Converts a JPG to a triple of arrays of [0 <= i <= 1].
+        miata = Image.open('tests/testbitmap.jpg')
+        miata = miata.resize((miata.size[0]/2,miata.size[1]/2))
+        self.rIm, self.gIm, self.bIm = miata.split()
+        self.rseq = self.rIm.getdata()
+        self.gseq = self.gIm.getdata()
+        self.bseq = self.bIm.getdata()
+        self.rar = Numeric.array(self.rseq)
+        self.gar = Numeric.array(self.gseq)
+        self.bar = Numeric.array(self.bseq)
+        self.ra = Numeric.reshape(self.rar,miata.size) / 255.0
+        self.ga = Numeric.reshape(self.gar,miata.size) / 255.0
+        self.ba = Numeric.reshape(self.bar,miata.size) / 255.0
+
+        sheetR = Sheet()
+        sheetG = Sheet()
+        sheetB = Sheet()
         retina = InputSheet(input_generator=GaussianFactory())
-        
-        # Old form
-        #retina = GaussianSheet(name='Retina')
-        V1 = RFSOM(name='V1')
 
-        poster = ImagePoster(pe)
-        
-        s.connect(retina,V1,delay=1)
-        s.connect(retina,poster,dest_port='retina',delay=1)
+        # For a new sheet_group named Miata:
+        sviewR = SheetView((self.ra,BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))))
+        sviewG = SheetView((self.ga,BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))))
+        sviewB = SheetView((self.ba,BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))))
+        sheetR.add_sheet_view("Miata",sviewR)
+        sheetG.add_sheet_view("Miata",sviewG)
+        sheetB.add_sheet_view("Miata",sviewB)
 
-        s.run(30)
+        # To change the activation matrix so "Activation" plot_group
+        # will be different.
+        sheetR.activation = self.ra
+        sheetG.activation = self.ga
+        sheetB.activation = self.ba
 
+        s.add(sheetR)
+        s.add(sheetG)
+        s.add(sheetB)
+        s.add(retina)
 
-        
+        pe = PlotEngine(s)
+        s.run(1)
+
+        plot_group = pe.get_plot_group('Activation')
+        plot_list = plot_group.plots()
+        pe.debug('Type of plot_group', type(plot_group))
+
+        s.verbose('Sheets: ', pe._sheets())
+        for (figure_tuple, hist_tuple) in plot_group.plots():
+            plot_group.debug('Plot Tuple', figure_tuple)
+            (r,g,b) = figure_tuple
+            if r.shape != (0,0) and g.shape != (0,0) and b.shape != (0,0):
+                win = RGBMap(r,g,b)
+                # win.show()
+                # Do not display the images when running in the unit
+                # test suite.
+                # 
+                # It doesn't make a whole lot of sense at this point to
+                # test these images against a target, but it may be
+                # useful in the future.
 
 
 suite = unittest.TestSuite()
 suite.addTest(unittest.makeSuite(TestPlotEngine))
+
