@@ -16,7 +16,7 @@ class TestTopoConsole(unittest.TestCase):
         generated_pe = console.active_plotengine()
         console.set_active_simulator(None)
         self.assertEqual(console.active_simulator(),None)
-        
+        console.quit()
 
 suite = unittest.TestSuite()
 #  Uncomment the following line of code, to not run the test if

@@ -18,8 +18,6 @@ import topo.tk.topoconsole
 
 class TestGui(unittest.TestCase):
 
-    requires_display = True
-
     def setUp(self):
         """
         Create a Simulator that has a couple of sheets within it that
@@ -30,8 +28,6 @@ class TestGui(unittest.TestCase):
         """
         InputSheet.period = 1.0
         InputSheet.density = 900
-#        base.print_level = base.WARNING
-#        InputSheet.print_level = base.WARNING
         
         GaussianFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -101,6 +97,7 @@ class TestGui(unittest.TestCase):
         Pmw.initialise(root)
         console = topo.tk.topoconsole.TopoConsole(parent=root)
         console.pack(expand=YES,fill=BOTH)
+        console.quit()
 
 
     def test_gui_plotengine(self):
@@ -123,6 +120,7 @@ class TestGui(unittest.TestCase):
                 # useful in the future.
 
         root = start(self.s)
+        root.quit()
         #root.mainloop()
 
 suite = unittest.TestSuite()
