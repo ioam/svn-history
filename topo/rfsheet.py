@@ -63,10 +63,10 @@ class Projection(TopoObject):
 
     shape = property(get_shape)
 
-    def get_view(self,sheet_r, sheet_c, pixel_scale = 255, offset = 0):
+    def get_view(self,sheet_x, sheet_y, pixel_scale = 255, offset = 0):
         """
         Return a single receptive field UnitView, for the unit at
-        sheet_r, sheet_c.  sheet_r and sheet_c are assumed to be in
+        sheet_x, sheet_y.  sheet_x and sheet_y are assumed to be in
         sheet coordinates.
 
         offset and pixel scale are currently unused.  The original
@@ -75,14 +75,14 @@ class Projection(TopoObject):
 
         NOTE: BOUNDS MUST BE PROPERLY SET. CURRENTLY A STUB IS IN EFFECT.
         """
-        (r,c) = (self.dest).sheet2matrix(sheet_r,sheet_c)
-        composite_name = self.name + ': ' + str(sheet_r) + ',' + str(sheet_c)
-        matrix_data = Numeric.array(self.rf(r,c).weights)
+        (x,y) = (self.dest).sheet2matrix(sheet_x,sheet_y)
+        composite_name = self.name + ': ' + str(sheet_x) + ',' + str(sheet_y)
+        matrix_data = Numeric.array(self.rf(x,y).weights)
         # print 'matrix_data = ', matrix_data
         new_box = self.dest.bounds  # TURN INTO A PROPER COPY
         assert matrix_data != None, "Projection Matrix is None"
         return topo.sheetview.UnitView((matrix_data,new_box),
-                                       sheet_r,sheet_c,name=composite_name)
+                                       sheet_x,sheet_y,name=composite_name)
 
 
     def get_arrayview(self,skip, pixel_scale = 255, offset = 0):
