@@ -191,12 +191,12 @@ class PlotPanel(Frame,topo.base.TopoObject):
         # If no plots, then no window.
         if old_min_width != min_width:
             if self.initial_plot and min_width != 0 and self.INITIAL_PLOT_WIDTH != None:
-                self.zoom_factor = self.INITIAL_PLOT_WIDTH/min_width + 1
+                self.zoom_factor = int(self.INITIAL_PLOT_WIDTH/min_width) + 1
                 if self.zoom_factor < self.min_zoom_factor:
                     self.zoom_factor = self.min_zoom_factor
                 self.initial_plot = False
             if self.MIN_PLOT_WIDTH > min_width and min_width != 0:
-                self.min_zoom_factor = self.MIN_PLOT_WIDTH/min_width + 1
+                self.min_zoom_factor = int(self.MIN_PLOT_WIDTH/min_width) + 1
                 if self.zoom_factor < self.min_zoom_factor:
                     self.zoom_factor = self.min_zoom_factor
             else:
@@ -227,7 +227,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
         self.canvases = [Canvas(self.plot_frame,
                                 width=image.width(),
                                 height=image.height(),
-                                bd=2)
+                                bd=0)
                          for image in self.zoomed_images]
         for i,image,canvas in zip(range(len(self.zoomed_images)),
                                   self.zoomed_images,self.canvases):

@@ -4,6 +4,7 @@ WeightsArray Panel for TK GUI visualization.
 $Id$
 """
 import __main__
+from math import ceil
 from topo.tk.regionplotpanel import *
 from topo.tk.plotpanel import *
 from itertools import chain
@@ -191,15 +192,15 @@ class WeightsArrayPanel(RegionPlotPanel):
         self.canvases = [Canvas(self.plot_frame,
                                 width=image.width(),
                                 height=image.height(),
-                                bd=2)
+                                bd=0)
                          for image in self.zoomed_images]
 
         # Lay out images
         for i,image,canvas in zip(range(len(self.zoomed_images)),
                                   self.zoomed_images,self.canvases):
             canvas.grid(row=i%self.shape[0],column=i//self.shape[1],
-                        padx=1,pady=1)
-            canvas.create_image(image.width()/2,image.height()/2,image=image)
+                        padx=0,pady=0)
+            canvas.create_image(image.width()/2+2,image.height()/2+2,image=image)
 
         # Delete old ones.  This may resize the grid.
         for c in old_canvases:
