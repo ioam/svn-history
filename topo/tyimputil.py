@@ -68,9 +68,9 @@ def installTYExtensions():
     n.install()
 
 
-# Nifty, but forces proper placement of the import location
-if __name__ != '__main__':
-    installTYExtensions()
+# Nifty, but causes issues in nested imports
+#if __name__ != '__main__':
+#    installTYExtensions()
 
 
 def tests():
