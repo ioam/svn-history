@@ -1,0 +1,77 @@
+				TO DO
+
+This file contains notes on future directions for the Topographica
+code.  Feel free to add your own comments on these items, or to add
+your own items, as long as you include your SourceForge username in
+parentheses around your items.  Also feel free to delete items once
+they have been completed or are no longer relevant, as long as you
+send email to the all those whose addresses are listed on an item
+announcing that it has been closed.  At some point, we should consider
+moving to SourceForge's support for feature requests and tasks instead
+of using this text file.
+
+
+Topic: GUI
+
+- The console should have some kind of visible command i/o history
+  that shows both the commands executed and their output, either
+  as a single shell-editor component (like IDLE or MatLab) or as a
+  separate pane (not a drop-down) like in Pyro Robotics (*).  The PMW
+  HistoryText widget will probably work nicely for this, but you need
+  to figureout how to get the output that normally goes to the shell
+  window and put it in a gui pane.  Pyro Robotics does this, so you
+  might be able to steal their code. (jprovost)
+
+  Another useful component for the console is some sort of global
+  variable display, a la MatLab, that shows all defined global
+  variables and their values.  Ideally this would use some kind of
+  hierarchicical version of the propertiesframe widget, so that
+  objects could be expanded and their attributes inspected.  I also
+  need something like this for PLASTK, so if anyone finds such a
+  widget available on the web, let me know. (jprovost)
+
+- The GUI and the simulation run should be asynchronous.  Either with
+  multiple threads or by spawning a subprocess and communicating with
+  it via RPC.  The latter will require substantial refactoring of the
+  GUI, but has a number of advantages including enabling a "clean
+  reload" of the simulation as you can get by hitting F5 in IDLE.
+  (jprovost)
+
+(* Unfortunately there are two Python packages called "Pyro", one is a
+robotics interface (pyrorobotics.org) and GUI, the other is a remote
+procedure call system (pyro.sourceforge.net).  I'm going to call them
+Pyro Robotics and Pyro RPC) (jprovost)
+
+Topic: Parallelization
+
+Topographica models lend themselves to coarse-grained parallelization,
+in which each event processor runs in parallel.  This kind of
+parallelization might be accomplished without having to rewrite the
+EPs at all, by writing new parallel Simulator classes, and wrappers
+for the EPs: (jprovost)
+
+- Threads (shared memory).  This seems like the easiest kind of
+  parallelism.  I think this could be done by writing two new classes:
+  ThreadedSimulator, and EPThreadWrapper: (jprovost)
+
+  - Each time an EP is added to  the simulator it's wrapped in an
+    EPThreadWrapper, that intercepts all calls between the Simulator
+    and the EP (i.e. the EP's .sim attribute points to the wrapper,
+    instead of the simulator) (jprovost)
+
+  - 
+  
+- RPC-based (jprovost)
+- MPI (jprovost)
+
+Topic: component abstraction -- subgraph components (jprovost)
+
+Topic: Optimization (jprovost)
+
+Topic: Interfaces to external programs or packages 
+
+- Other than Pyro, what packages should we be looking at including?
+  So far, I've noted Dia, logger, and g -- any ideas where these might
+  be relevant, what the pros and cons of using them might be, and/or
+  how to go about it? (jbednar)
+
