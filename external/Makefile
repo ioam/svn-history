@@ -1,11 +1,11 @@
 PREFIX = ${dir ${CURDIR}}
 
 
-all: python jpeg pil numeric pmw
+all: python jpeg pil numeric pmw dislin
 
-clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean
+clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean dislin-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall dislin-uninstall
 
 ##############################################################
 # Python
@@ -145,7 +145,24 @@ pmw: ${PMW}.tgz python
 pmw-clean:
 	rm -rf ${PMW} 
 pmw-uninstall:
-	rm -rf pmw ${PREFIX}/${PMW_UNINSTALL}#############################################################################
+	rm -rf pmw ${PREFIX}/${PMW_UNINSTALL}
+##############################################################
+# DISLIN
+#
+DISLIN = dislin-8.2
+DISLIN_UNINSTALL = lib/dislin
+
+dislin: ${DISLIN}.linux.tgz python
+	tar xzf ${DISLIN}.linux.tgz
+	mkdir -p ${PREFIX}/${DISLIN_UNINSTALL}
+	cd ${DISLIN}; env DISLIN=${PREFIX}/${DISLIN_UNINSTALL} ./INSTALL
+	touch dislin
+
+dislin-clean:
+	rm -rf ${DISLIN}
+dislin-uninstall:
+	rm -rf dislin ${DISLIN} ${PREFIX}/${DISLIN_UNINSTALL}
+#############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
 #   on Sourceforge where the binaries historically used by Topographica     #
