@@ -1,4 +1,6 @@
 # Topographica Package Include List
+#
+# $Id$
 
 # For using .ty file types.
 import tyimputil
@@ -12,7 +14,6 @@ import commandline
 # sheets and sheet geometry
 import sheet
 import boundingregion
-import convolve2d
 
 # kernels
 import kernelfactory

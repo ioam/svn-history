@@ -10,7 +10,7 @@ $Id$
 """
 
 from Numeric import resize,array,zeros
-from simulator import PulseGenerator,EventProcessor
+from simulator import EventProcessor
 from sheet import Sheet
 from params import Parameter
 from utils import NxN
@@ -30,9 +30,12 @@ class ImageGenerator(Sheet):
     matrix.  The image is converted to grayscale and scaled to match
     the bounds and density of the sheet.
 
-    ImageGenerator sheets are PulseGenerators, and hence can be set up to
-    repeatedly generate output.  The pulse amplitude scales the
-    output. See simulator.PulseGenerator for more details.
+    NOTE: A bare ImageGenerator only sends a single event, containing
+    its image when it gets the .start() call, to repeatedly generate
+    images, it must have a self-connection.  More elegant, however,
+    would be to convert the ImageGenerator from a sheet to a factory
+    function suitable for use with the InputSheet class (see
+    inputsheet.py). 
 
     """
     filename = Parameter(None)
@@ -55,11 +58,9 @@ class ImageGenerator(Sheet):
 
 
     def start(self):
-
         self.send_output(data=self.activation)
 
     def input_event(self,src,src_port,dest_port,data):
-
         self.send_output(data=self.activation)
 
 

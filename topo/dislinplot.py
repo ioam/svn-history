@@ -60,6 +60,7 @@
  
  <Insert other useful information here>
 
+ $Id$
 """
 
 import math, dislin, Image, ImageOps

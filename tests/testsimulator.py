@@ -1,6 +1,7 @@
 import unittest
 
 from topo.simulator import *
+from topo.scalarep import *
 
 class TestSimulator(unittest.TestCase):
     def test_get_event_processors(self,):

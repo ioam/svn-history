@@ -1,4 +1,8 @@
 import sys
+"""
+$Id$
+"""
+
 
 BANNER         = """
 Welcome to Topographica!

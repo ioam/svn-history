@@ -4,6 +4,7 @@ Kernel Factory
 
 Defines a class to return Kernels
 
+$Id$
 """
 
 import types
@@ -19,15 +20,15 @@ from pprint import pprint,pformat
 
 from math import pi
 
-"""
-Get Kernel Matrices
-
-Sets up two vectors for the x and y values based on a bounds and density.
-The x and y vectors are lists of indexes at which to sample the kernel
-function.
-"""       
 
 def produce_kernel_matrices(bounds, density):
+    """
+    Get Kernel Matrices
+
+    Sets up two vectors for the x and y values based on a bounds and density.
+    The x and y vectors are lists of indexes at which to sample the kernel
+    function.
+    """       
     left,bottom,right,top = bounds.aarect().lbrt()
     bound_width  = right-left
     bound_height = top-bottom
@@ -57,16 +58,16 @@ def produce_kernel_matrices(bounds, density):
     
     return kernel_x[:,1], kernel_y[:,0]
 
-"""
-Get Rotated matrices
-
-Takes in two Numeric /arrays/ that specify the x and y coordinates separately
-and a theta value, returns two Numeric matrices that have their coordinates
-rotated by that theta
-"""
 
 
 def produce_rotated_matrices(kernel_x, kernel_y, theta):
+    """
+    Get Rotated matrices
+
+    Takes in two Numeric /arrays/ that specify the x and y coordinates separately
+    and a theta value, returns two Numeric matrices that have their coordinates
+    rotated by that theta
+    """
     
     new_kernel_x = subtract.outer(cos(theta)*kernel_x, sin(theta)*kernel_y)
     new_kernel_y = add.outer(sin(theta)*kernel_x, cos(theta)*kernel_y)
@@ -74,11 +75,11 @@ def produce_rotated_matrices(kernel_x, kernel_y, theta):
     return new_kernel_x, new_kernel_y
 
 
-"""
-Gaussian Kernel Factory
-"""
-
 def gaussian(kernel_x, kernel_y, width, height):
+    """
+    Gaussian Kernel Factory
+    """
+
   
     new_kernel = -(kernel_x / width)**2 + -(kernel_y / height)**2
 
@@ -86,36 +87,36 @@ def gaussian(kernel_x, kernel_y, width, height):
     return exp(maximum(-100,new_kernel))
 
 
-"""
-Sine Grating Kernel Factory
-"""
 
 
 def sine_grating(kernel_x, kernel_y, frequency, phase):
+    """
+    Sine Grating Kernel Factory
+    """
     return 0.5 + 0.5*sin(frequency*2*pi*kernel_x + phase)
 
-"""
-Gabor Kernel Factory
-"""
 
 def gabor(kernel_x, kernel_y, width, height, frequency, phase):
+    """
+    Gabor Kernel Factory
+    """
  
     return exp( maximum(-100, -(kernel_x/width)**2-(kernel_y/height)**2)) *\
     (0.5 + 0.5*cos(2*pi*frequency*kernel_x + phase ))
 
-"""
-Uniform Random Kernel Factory
-"""
 
 def uniform_random(kernel_x, kernel_y,rmin,rmax):
+    """
+    Uniform Random Kernel Factory
+    """
     return RandomArray.uniform(rmin,rmax,kernel_x.shape) 
 
 
-"""
-Rectangle Kernel Factory
-"""
 
 def rectangle(kernel_x, kernel_y, x, y, width, height):
+    """
+    Rectangle Kernel Factory
+    """
     kernel_x = bitwise_and( less_equal( kernel_x, x+width/2 ), 
                             greater_equal( kernel_x, x-width/2 ) )
     kernel_y = bitwise_and( less_equal( kernel_y, y+height/2 ), 
@@ -123,20 +124,20 @@ def rectangle(kernel_x, kernel_y, x, y, width, height):
     
     return bitwise_and( kernel_x, kernel_y )
 
-"""
-Fuzzy Line Kernel Factory
-"""
 
 def fuzzy_line(kernel_x, kernel_y, width):
+    """
+    Fuzzy Line Kernel Factory
+    """
     #TODO: This is a hack: the height should be specified in terms of bounds
     return gaussian(kernel_x, kernel_y, width, 100)
 
 
-"""
-Fuzzy Disk Kernel Factory
-"""
 
 def fuzzy_disk(kernel_x, kernel_y, disk_radius, gaussian_width):
+    """
+    Fuzzy Disk Kernel Factory
+    """
 
     distance_from_line = sqrt((kernel_x**2)+(kernel_y**2)) 
     gaussian_x_coord   = distance_from_line - disk_radius/2.0 
@@ -146,12 +147,11 @@ def fuzzy_disk(kernel_x, kernel_y, disk_radius, gaussian_width):
     #       exp(maximum(-100, -(gaussian_x_coord/gaussian_width)**2 ))#- (kernel_y/gaussian_width)**2))
     return less_equal(gaussian_x_coord, 0) * \
            exp(maximum(-100, -(kernel_x/gaussian_width)**2 - (kernel_y/gaussian_width)**2))
-"""
-Fuzzy Ring Kernel Factory
-"""
 
 def fuzzy_ring(kernel_x, kernel_y, inner_radius, outer_radius, gaussian_width):
-    
+    """
+    Fuzzy Ring Kernel Factory
+    """    
     distance_from_line = abs(outer_radius - sqrt(kernel_x**2)+(kernel_y**2))
     gaussian_x_coord   = distance_from_line - disk_radius/2
 
@@ -187,11 +187,11 @@ class KernelFactory(base.TopoObject):
         x,y = produce_kernel_matrices(bounds,density)
         self.kernel_x, self.kernel_y = produce_rotated_matrices(x-self.x,y-self.y,self.theta)
 
-"""
-Gassian Kernel Generating Generator
-"""
 
 class GaussianFactory(KernelFactory):
+    """
+    Gassian Kernel Generating Generator
+    """
 
     x       = Parameter(default=0)
     y       = Parameter(default=0)
@@ -209,11 +209,11 @@ class GaussianFactory(KernelFactory):
                          params.get('width',self.width), 
                          params.get('height',self.height)) 
 
-"""
-Sine Grating Kernel Generating Factory
-"""
 
 class SineGratingFactory(KernelFactory):
+    """
+    Sine Grating Kernel Generating Factory
+    """
 
     x         = Parameter(default=0)
     y         = Parameter(default=0)
@@ -228,12 +228,11 @@ class SineGratingFactory(KernelFactory):
                              params.get('phase',self.phase)) 
     
 
-"""
-Gabor Kernel Generating Factory
-"""
 
 class GaborFactory(KernelFactory):
-
+    """
+    Gabor Kernel Generating Factory
+    """
     x        = Parameter(default=0)
     y        = Parameter(default=0)
     theta    = Parameter(default=0)
@@ -250,11 +249,11 @@ class GaborFactory(KernelFactory):
                       params.get('frequency',self.frequency),
                       params.get('phase',self.phase))  
 
-"""
-Uniform Random Generating Factory
-"""
   
 class UniformRandomFactory(KernelFactory):
+    """
+    Uniform Random Generating Factory
+    """
     x = Parameter(default=0)
     y = Parameter(default=0)
     min = Number(default=0.0)
@@ -265,11 +264,11 @@ class UniformRandomFactory(KernelFactory):
                                params.get('min',self.min),
                                params.get('max',self.max)) 
 
-"""
-Rectangle Generating Factory
-"""
 
 class RectangleFactory(KernelFactory):
+    """
+    Rectangle Generating Factory
+    """
 
     x       = Parameter(default=0)
     y       = Parameter(default=0)
@@ -284,12 +283,12 @@ class RectangleFactory(KernelFactory):
                           self.produced_y,
                           params.get('width',self.width),
                           params.get('height',self.height))  
-"""
-Fuzzy Line Generating Factory
-"""
 
 class FuzzyLineFactory(KernelFactory):
 
+    """
+    Fuzzy Line Generating Factory
+    """
     x       = Parameter(default=0)
     y       = Parameter(default=0)
     theta   = Parameter(default=0)
@@ -300,12 +299,12 @@ class FuzzyLineFactory(KernelFactory):
                            self.kernel_y, 
                            params.get('width',self.width))  
     
-"""
-Fuzzy Disk Generating Factory
-"""
 
 class FuzzyDiskFactory(KernelFactory):
 
+    """
+    Fuzzy Disk Generating Factory
+    """
     x              = Parameter(default=0)
     y              = Parameter(default=0)
     # TODO: This is a hack, we need a theta in order to appease the rotation
@@ -321,11 +320,11 @@ class FuzzyDiskFactory(KernelFactory):
                            params.get('gaussian_width',self.gaussian_width))  
     
 
-"""
-Fuzzy Ring Generating Factory
-"""
 
 class FuzzyRingFactory(KernelFactory):
+    """
+    Fuzzy Ring Generating Factory
+    """
 
     x       = Parameter(default=0)
     y       = Parameter(default=0)

@@ -4,6 +4,8 @@ a 2D matrix of data.
 
 STUB CLASS ONLY.  GENERIC INPUT AND OUTPUT DATA TO ALLOW DEVELOPMENT
 IN OTHER AREAS.
+
+$Id$
 """
 from base import *
 import types

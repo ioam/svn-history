@@ -42,7 +42,7 @@ will be printed.
 For each level (except SILENT) there's an associated print method:
 TopoObject.warning(), .message(), .verbose(), and .debug().
 
-Each lined printed this way is prepended with the name of the object
+Each line printed this way is prepended with the name of the object
 that printed it.  The TopoObject parameter print_level, and the module
 global variable min_print_level combine to determine what gets
 printed.  For example, if foo is a TopoObject:
@@ -60,6 +60,7 @@ $Id$
 import sys
 from params import *
 from pprint import pprint
+from utils import flatten
 
 SILENT  = 0
 WARNING = 50
@@ -72,42 +73,6 @@ min_print_level = NORMAL
 object_count = 0
 
 
-
-# def flatten(nested):
-#     for x in nested:
-#         if isinstance(x, (list, tuple)):
-#             for y in deep_iter(x):
-#                 yield y
-#         else:
-#             yield x
-
-
-
-def flatten(l):
-    """
-    Flattens a list.
-    Written by Bearophile as published on the www.python.org newsgroups.
-    Pulled into Topographica 3/5/2005
-    """
-    if type(l) != list:
-        return l
-    else:
-        result = []
-        stack = []
-        stack.append((l,0))
-        while len(stack) != 0:
-            sequence, j = stack.pop(-1)
-            while j < len(sequence):
-                if type(sequence[j]) != list:
-                    k, j, lens = j, j+1, len(sequence)
-                    while j < len(sequence) and \
-                          (type(sequence[j]) != list):
-                        j += 1
-                    result.extend(sequence[k:j])
-                else:
-                    stack.append((sequence, j+1))
-                    sequence, j = sequence[j], 0
-        return result
 
 
 class TopoMetaclass(type):

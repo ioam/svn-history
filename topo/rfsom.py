@@ -1,11 +1,13 @@
 """
 Defines RFSOM, a sheet class that works like a Kohonen SOM, but
-uses receptive fields.  
+uses receptive fields.
 
+
+$Id$
 """
 
 
-from utils import norm
+from utils import L2norm
 from params import Parameter
 from Numeric import argmax,sqrt,exp,floor
 
@@ -58,7 +60,7 @@ class RFSOM(RFSheet):
 
         for r in range(rmin,rmax):
             for c in range(cmin,cmax):
-                lattice_dist = norm((wc-c,wr-r))
+                lattice_dist = L2norm((wc-c,wr-r))
                 for proj_list in self.projections.values():
                     for proj in proj_list:
                         if  lattice_dist <= radius:

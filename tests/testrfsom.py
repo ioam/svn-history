@@ -29,11 +29,6 @@ class TestRFSom(unittest.TestCase):
         self.sheet1 = Sheet()
         self.sheet2 = Sheet()
 
-        pulse1 = PulseGenerator(period = 1)
-        pulse2 = PulseGenerator(period = 3)
-        sum = SumUnit()
-        self.s.connect(pulse1,sum,delay=1)
-        self.s.connect(pulse2,sum,delay=1)
         
 
     def test_rfsom(self):

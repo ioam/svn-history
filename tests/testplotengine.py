@@ -38,12 +38,6 @@ class TestPlotEngine(unittest.TestCase):
         self.sheetB = Sheet()
         self.plot1= plot.Plot(('Activity',None,None),plot.COLORMAP,self.sheetR)
         self.plot2= plot.Plot(('Activity',None,None),plot.COLORMAP,self.sheetG)
-
-        pulse1 = PulseGenerator(period = 1)
-        pulse2 = PulseGenerator(period = 3)
-        sum = SumUnit()
-        self.s.connect(pulse1,sum,delay=1)
-        self.s.connect(pulse2,sum,delay=1)
         
 
     def test_get_plot_group(self):
