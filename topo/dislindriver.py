@@ -98,6 +98,7 @@ def plot3():
 
 
 # Begin main
-plot1()
-plot2()
-plot3()
+if __name__ == '__main__':
+    plot1()
+    plot2()
+    plot3()
