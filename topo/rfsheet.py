@@ -8,7 +8,7 @@ themselves.  These classes are:
 
 RFSheet: a subclass of topo.sheet.Sheet.
 
-Projection: an class to handle one projection of receptive fields from
+Projection: a class to handle one projection of receptive fields from
 one sheet into an RFSheet.
 
 RF: a class for specifying a single receptive field within a

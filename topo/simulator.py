@@ -33,9 +33,9 @@ A simulation begins by giving each EventProcessor an opportunity to
 send any initial events.  It then proceeds by processing and
 delivering events to EventProcessors in time order.  After all events
 for the current time are processed, the simulator gives each
-EventProcessor a chance to do any final computation, afte which
-simulation time skips to the time of earliest event remaining in the
-queue.
+EventProcessor a chance to do any final computation, after which
+simulation time skips to the time of the earliest event remaining in
+the queue.
 
 PORTS
 
@@ -94,7 +94,7 @@ the CVS repository as a dead file.
 Note also that even though Simulator may guarantee that the event
 queue isn't corrupted by a raise exception, there is no guarantee that
 the internal state of the EP that raised the exception is sane, so
-it's not clear if the exception-save aspect if sched.simulator is of
+it's not clear if the exception-safe aspect of sched.simulator is of
 particular value.
 
 
