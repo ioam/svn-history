@@ -5,8 +5,6 @@ Defines a function and Sheet to do 2D convolution
 
 $Id$
 """
-
-import debug
 from simulator import EventProcessor
 from sheet import Sheet
 from utils import NxN
@@ -14,7 +12,7 @@ from utils import NxN
 
 from Numeric import *
 from pprint import pprint,pformat
-from params import setup_params,Parameter
+from params import Parameter
 
 
 def convolve2d(kernel,image):
@@ -54,21 +52,17 @@ class Convolver(Sheet):
     kernel = Parameter(array([[1.0]]))
 
     def __init__(self,**config):
-
-        EventProcessor.__init__(self,**config)
-        setup_params(self,Convolver,**config)
+        super(Convolver,self).__init__(**config)
 
     def input_event(self,src,src_port,dest_port,data):
             
-        self.db_print("Received %s input from %s." % (NxN(data.shape),src),
-                      debug.VERBOSE)
-
-        self.db_print("Convolving...",debug.VERBOSE)
+        self.verbose("Received %s input from %s." % (NxN(data.shape),src))
+        self.verbose("Convolving...")        
         self.activation = convolve2d(self.kernel,data)
         self.matrix_shape = self.activation.shape
         
         self.send_output(data=self.activation)
-        self.db_print("Sending %s output." % NxN(self.activation.shape))
+        self.message("Sending %s output." % NxN(self.activation.shape))
 
 
 if __name__ == '__main__':

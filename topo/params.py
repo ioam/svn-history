@@ -77,8 +77,8 @@ class Parameter(object):
     the default value.
     """
     self.name = "_param" + `Parameter.count`
-      Parameter.count += 1
-      self.default = default
+    Parameter.count += 1
+    self.default = default
 
   def __get__(self,obj,objtype):
     """
@@ -87,9 +87,9 @@ class Parameter(object):
     value, if one has been set, otherwise produce the default value.
     """
     if not obj:
-        result = __produce_value(self.default)
+        result = produce_value(self.default)
     else:
-        result = __produce_value(obj.__dict__.get(self.name,self.default))
+        result = produce_value(obj.__dict__.get(self.name,self.default))
     return result
 
 
@@ -102,20 +102,18 @@ class Parameter(object):
     instance's dictionary under the parameter's name gensym.
     """    
     if not obj:
-        print "Setting default to",val
         self.default = val
     else:
-        print "Setting value to",val
         obj.__dict__[self.name] = val
 
-  def __del__(self,obj,val):
+  def __delete__(self,obj):
     """
     Delete a parameter.  Raises an exception.
     """
     raise "Deleting parameters is not allowed."
 
 
-def __produce_value(value_obj):
+def produce_value(value_obj):
   """
   A helper function, produces an actual parameter from a stored
   object.  If the object is callable, call it, else if it's an
@@ -123,7 +121,7 @@ def __produce_value(value_obj):
   """
   if callable(value_obj):
       return value()
-  if iterable(value_obj):
+  if is_iterator(value_obj):
       return value.next()
   return value_obj
 
@@ -135,19 +133,5 @@ def is_iterator(obj):
   return '__iter__' in dir(obj) and 'next' in dir(obj)
 
 
-def setup_params(obj,cls,**args):
-  """
-  Function to set up parameters in an object.  Takes an object, a
-  class and a dictionary of  keyword arguments, as given to a
-  constructor. The setup algorithm traverses the class's dictionary looking for attributes
-  that are Parameters.  For each parameter it tries to set its value
-  to the argument value of the same name, if one exists.
-  """
-  for name,val in cls.__dict__.items():
-    if isinstance(val,Parameter)
-      try:
-        setattr(obj,name,args[name])
-      except KeyError:
-        pass
 
 

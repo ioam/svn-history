@@ -6,7 +6,6 @@ Defines a class to return Kernels
 
 """
 
-import debug
 import types
 import random
 
@@ -15,7 +14,6 @@ from sheet import sheet2matrix, matrix2sheet
 
 from Numeric import *
 from pprint import pprint,pformat
-from params import setup_params
 
 from math import pi
 
@@ -114,7 +112,6 @@ class KernelFactory:
     function = gaussian
 
     def __init__(self,**config):
-        setup_params(self,KernelFactory,**config)
         #self.kernel = zeros((1,1), Float)
 
         # TODO: This is all embedded in matrix2sheet...

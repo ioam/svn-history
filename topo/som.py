@@ -29,8 +29,7 @@ class SOM(Sheet):
     
     def __init__(self,**params):
 
-        Sheet.__init__(self,**params)
-        setup_params(self,SOM,**params)
+        super(SOM).__init__(**params)
 
         self.weights = RandomArray.uniform(self.rmin,self.rmax,
                                            self.activation.shape + (self.dim,))
@@ -117,13 +116,10 @@ class NoveltySOM(SOM):
     radius_gain = 2.0
 
     def __init__(self,**params):
-
-        SOM.__init__(self,**params)
-        setup_params(self,NoveltySOM,**params)
+        super(NoveltySOM).__init__(**params)
         self.error_ratio = 1.0
 
-    def present_input(self,X):
-        
+    def present_input(self,X):        
         SOM.present_input(self,X)        
         dist = norm( self.get_model_vector(self.winner()) - X )
         self.error_ratio = dist / norm(X)
@@ -142,13 +138,12 @@ class RandomVector(PulseGenerator):
     std  = 0.2
 
     def __init__(self,**params):
-        PulseGenerator.__init__(self,**params)
-        setup_params(self,RandomVector,**params)
+        super(RandomVector,self).__init__(**params)
         
         
     def input_event(self,src,src_port,dest_port,data):
         vec = RandomArray.normal(self.mean,self.std,2)
-        self.db_print('Sending '+`vec`)
+        self.verbose('Sending '+`vec`)
         self.send_output(data=vec)
 
 

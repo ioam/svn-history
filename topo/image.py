@@ -12,8 +12,7 @@ $Id$
 from Numeric import resize,array,zeros
 from simulator import PulseGenerator,EventProcessor
 from sheet import Sheet
-from debug import Debuggable,VERBOSE
-from params import setup_params,Parameter
+from params import Parameter
 from utils import NxN
 
 from pprint import *
@@ -40,11 +39,9 @@ class ImageGenerator(Sheet):
     
     def __init__(self,**config):
 
-        Sheet.__init__(self,**config)
+        super(ImageGenerator,self).__init__(**config)
 
-        setup_params(self,ImageGenerator,**config)
-
-        self.db_print("filename = " + self.filename)
+        self.message("filename = " + self.filename)
 
         image = Image.open(self.filename)
         image = ImageOps.grayscale(image)
@@ -52,8 +49,7 @@ class ImageGenerator(Sheet):
         self.activation = resize(array([x for x in image.getdata()]),
                                  (image.size[1],image.size[0]))
 
-	self.db_print("Initialized %s activation from %s" % (NxN(self.activation.shape),self.filename),
-                      VERBOSE)
+	self.verbose("Initialized %s activation from %s" % (NxN(self.activation.shape),self.filename))
         max_val = float(max(max(self.activation)))
         self.activation = self.activation / max_val
 
@@ -102,17 +98,11 @@ class ImageSaver(EventProcessor):
     pixel_offset = Parameter(0)
 
 
-    def __init__(self,**config):
-
-        EventProcessor.__init__(self,**config)
-
-        setup_params(self,ImageSaver,**config)
-            
 
     def input_event(self,src,src_port,dest_port,data):
 
-        self.db_print("Received %s  input from %s" % (NxN(data.shape),src),VERBOSE)
-        self.db_print("input max value = %d" % max(data.flat),VERBOSE)
+        self.verbose("Received %s  input from %s" % (NxN(data.shape),src))
+        self.verbose("input max value = %d" % max(data.flat))
 
         # assemble the filename
         filename = self.file_prefix + self.name
@@ -121,16 +111,16 @@ class ImageSaver(EventProcessor):
         filename += "_" + (self.time_format % self.simulator.time())
         filename += "." + self.file_format
 
-        self.db_print("filename = '%s'" % filename, VERBOSE)
+        self.verbose("filename = '%s'" % filename)
         
         # make and populate the image
         im = Image.new('L',(data.shape[1],data.shape[0]))
-        self.db_print("image size = %s" % NxN(im.size), VERBOSE)
+        self.verbose("image size = %s" % NxN(im.size))
         im.putdata(data.flat,
                    scale=self.pixel_scale,
                    offset=self.pixel_offset)
 
-        self.db_print("put image data.",VERBOSE)
+        self.verbose("put image data.")
 
         #save the image
         f = open(filename,'w')

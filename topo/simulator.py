@@ -36,12 +36,12 @@ $Id$
 
 
 import sched
-from debug import Debuggable
-from params import *
+from base import TopoObject
+from params import Parameter
 
 PAUSE = "Simulator Paused"
 
-class Simulator(Debuggable):
+class Simulator(TopoObject):
     """
     A class to manage a simulation.  A simulator object manages the
     event queue, simulation clock, and list of EventProcessors, dispatching
@@ -57,8 +57,7 @@ class Simulator(Debuggable):
            step_mode = debugging flag, causing the simulator to stop
                        before each tick.
         """
-        Debuggable.__init__(self,**config)
-        setup_params(self,Simulator,**config)
+        super(Simulator,self).__init__(**config)
 
         self.__time = 0
         self.__event_processors = []
@@ -162,15 +161,13 @@ class Simulator(Debuggable):
         
 
 
-class EventProcessor(Debuggable):
+class EventProcessor(TopoObject):
     """
     Base class for EventProcessors.  Handles basic mechanics of connections and
     sending events.
     """
     def __init__(self,**config):
-        Debuggable.__init__(self,**config)
-        setup_params(self,EventProcessor,**config)
-
+        super(EventProcessor,self).__init__(**config)
         self.connections = {None:[]}
         
 

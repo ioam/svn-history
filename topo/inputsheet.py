@@ -4,7 +4,6 @@ sheet for randomly generating inputs
 $Id$
 """
 
-import debug
 from kernelfactory import *
 import random
 from simulator import EventProcessor
@@ -13,7 +12,7 @@ from utils import NxN
 
 from Numeric import *
 from pprint import pprint,pformat
-from params import setup_params
+from params import Parameter
 
 class InputSheet(Sheet):
 
@@ -24,7 +23,6 @@ class InputSheet(Sheet):
 
     def __init__(self,**config):
         Sheet.__init__(self,**config)
-        setup_params(self,InputSheet,**config)
 
         self.kernel =  KernelFactory(bounds=self.bounds,
                                      density=self.density,
@@ -44,14 +42,14 @@ class InputSheet(Sheet):
         self.simulator.enqueue_event_rel(self.phase,self,self,data=self.activation)
 
     def input_event(self,src,src_port,dest_port,data):
-        self.db_print("Received %s input from %s." % (NxN(data.shape),src), debug.VERBOSE)
+        self.verbose("Received %s input from %s." % (NxN(data.shape),src))
 
-        self.db_print("Generating a new kernel...",debug.VERBOSE)
+        self.verbose("Generating a new kernel...")
 
         self.activation = self.kernel.create( )
   
         self.send_output(data=self.activation)
-        self.db_print("Sending %s output." % NxN(self.activation.shape))
+        self.message("Sending %s output." % NxN(self.activation.shape))
 
 # TODO: these should all be mix-ins
 
@@ -59,8 +57,6 @@ class GaussianSheet(InputSheet):
 
     def __init__(self, **config):
         InputSheet.__init__(self,**config)
-        setup_params(self,GaussianSheet,**config)
-
         self.kernel.function = gaussian
 
 
@@ -68,16 +64,12 @@ class UniformRandomSheet(InputSheet):
 
     def __init__(self, **config):
         InputSheet.__init__(self,**config)
-        setup_params(self,UniformRandomSheet,**config)
-
         self.kernel.function = uniform_random
 
 class SineGratingSheet(InputSheet):
 
     def __init__(self, **config):
         InputSheet.__init__(self,**config)
-        setup_params(self,GaussianSheet,**config)
-
         self.kernel.function = sine_grating
 
 if __name__ == '__main__':

@@ -3,20 +3,19 @@ Topographica bounding regions and boxes.
 
  $Id$
 """
-import debug
-from params import *
+from params import Parameter
 from Numeric import *
+from base import TopoObject
 
 NYI = "Abstract method not implemented."
 
-class BoundingRegion(debug.Debuggable):
+class BoundingRegion(TopoObject):
     """
     Abstract bounding region class.  Should be subclassed
     """
     
     def __init__(self,**args):
-        debug.Debuggable.__init__(self,**args)
-        params.setup_params(self,BoundingRegion,**args)
+        super(BoundingRegion,self).__init__(**args)
     def contains(self,x,y):
         raise NYI
     def scale(self,xs,ys):
@@ -39,9 +38,7 @@ class BoundingBox(BoundingRegion):
     points = a sequence of two points that define an axis-aligned rectangle.
     """
     def __init__(self,**args):
-        BoundingRegion.__init__(self,**args)
-        params.setup_params(self,BoundingRegion,**args)
-        
+        super(BoundingBox,self).__init__(**args)        
         self._aarect = AARectangle(*args['points'])
 
     def contains(self,x,y):
@@ -58,8 +55,7 @@ class BoundingEllipse(BoundingBox):
     inscribed within the rectangle.
     """
     def __init__(self,**args):
-        BoundingBox.__init__(self,**args)
-        params.setup_params(self,BoundingEllipse,**args)
+        super(BoundingEllipse,self).__init__(**args)
         
     def contains(self,x,y):
         left,bottom,right,top = self.aarect().lbrt()
@@ -85,8 +81,8 @@ class BoundingCircle(BoundingRegion):
     center = Parameter((0.0,0.0))
 
     def __init__(self,**args):
-        BoundingRegion.__init__(self,**args)
-        setup_params(self,BoundingCircle,**args)    
+        super(BoundingCircle,self).__init__(**args)
+
 
     def contains(self,x,y):
         xc,yc = self.center
@@ -102,8 +98,7 @@ class BoundingCircle(BoundingRegion):
 inf = array(1)/0.0
 class Unbounded(BoundingRegion):
     def __init__(self,**args):
-        BoundingRegion.__init__(self,**args)
-        params.setup_params(self,Unbounded,**args)
+        super(Unbounded,self).__init__(**args)
     def contains(self,x,y):
         return True
     def scale(self,xs,ys):

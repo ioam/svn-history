@@ -1,9 +1,8 @@
 # $Id$
 
 from simulator import EventProcessor
-from params import setup_params
+from params import Parameter
 from Numeric import zeros,sqrt
-from debug import VERBOSE
 from boundingregion import BoundingBox
 
 def sheet2matrix(x,y,bounds,density):
@@ -92,8 +91,7 @@ class Sheet(EventProcessor):
 
     def __init__(self,**params):
 
-        EventProcessor.__init__(self,**params)
-        setup_params(self,Sheet,**params)
+        super(Sheet,self).__init__(**params)
 
         linear_density = sqrt(self.density)
 
@@ -158,8 +156,7 @@ class Composer(Sheet):
     delay = Parameter(1.0)
 
     def __init__(self,**config):
-        Sheet.__init__(self,**config)
-        setup_params(self,Composer,**config)
+        super(Composer,self).__init__(**config)
         
         self.ports = {}
         self.timestamp = None
@@ -191,7 +188,7 @@ class Composer(Sheet):
             self.timestamp = self.simulator.time
             self.send_output(src_port='trigger_out')
 
-        self.db_print("Received %s input from %s." % (NxN(data.shape),src),VERBOSE)
+        self.verbose("Received %s input from %s." % (NxN(data.shape),src))
 
         in_rows, in_cols = data.shape
 
@@ -199,8 +196,8 @@ class Composer(Sheet):
         start_row,start_col = self.sheet2matrix(*self.ports[dest_port]['origin'])
         row_adj,col_adj = src.sheet2matrix(0,0)
 
-        self.db_print("origin (row,col) = "+`(start_row,start_col)`,VERBOSE)
-        self.db_print("adjust (row,col) = "+`(row_adj,col_adj)`,VERBOSE)
+        self.verbose("origin (row,col) = "+`(start_row,start_col)`)
+        self.verbose("adjust (row,col) = "+`(row_adj,col_adj)`)
 
         start_row -= row_adj
         start_col -= col_adj
@@ -208,8 +205,8 @@ class Composer(Sheet):
         # the maximum bounds
         max_row,max_col = self.activation.shape
 
-        self.db_print("max_row = %d, max_col = %d" % (max_row,max_col),VERBOSE)
-        self.db_print("in_rows = %d, in_cols = %d" % (in_rows,in_cols),VERBOSE)
+        self.verbose("max_row = %d, max_col = %d" % (max_row,max_col))
+        self.verbose("in_rows = %d, in_cols = %d" % (in_rows,in_cols))
 
         end_row = start_row+in_rows
         end_col = start_col+in_cols
@@ -225,13 +222,13 @@ class Composer(Sheet):
         end_col -= right_clip
         end_row -= bottom_clip
 
-        self.db_print("start_row = %d,start_col = %d" % (start_row,start_col),VERBOSE)
-        self.db_print("end_row = %d,end_col = %d" % (end_row,end_col),VERBOSE)
-        self.db_print("left_clip = %d" % left_clip, VERBOSE)
-        self.db_print("right_clip = %d" % right_clip, VERBOSE)
-        self.db_print("top_clip = %d" % top_clip, VERBOSE)
-        self.db_print("bottom_clip = %d" % bottom_clip, VERBOSE)
-        self.db_print("activation shape = %s" % NxN(self.activation.shape))
+        self.verbose("start_row = %d,start_col = %d" % (start_row,start_col))
+        self.verbose("end_row = %d,end_col = %d" % (end_row,end_col))
+        self.verbose("left_clip = %d" % left_clip)
+        self.verbose("right_clip = %d" % right_clip)
+        self.verbose("top_clip = %d" % top_clip)
+        self.verbose("bottom_clip = %d" % bottom_clip)
+        self.message("activation shape = %s" % NxN(self.activation.shape))
 
         self.activation[start_row:end_row, start_col:end_col] += data[top_clip:in_rows-bottom_clip,
                                                                       left_clip:in_cols-right_clip]

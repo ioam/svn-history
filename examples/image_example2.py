@@ -54,7 +54,7 @@ image_file = args[0]
 #################################################
 # Set class parameter defaults
 
-debug.print_level = debug.VERBOSE
+base.print_level = base.VERBOSE
 
 Simulator.step_mode = step_mode
 

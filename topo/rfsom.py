@@ -1,7 +1,6 @@
 import RandomArray
 
-from debug import VERBOSE,Debuggable
-from params import setup_params
+from params import Parameter
 from utils import norm,inf,Struct,mdot
 from sheet import Sheet,activation_submatrix,input_slice
 from Numeric import argmax,sqrt,exp
@@ -27,8 +26,7 @@ class RFSOM(Sheet):
     
     def __init__(self,**params):
 
-        Sheet.__init__(self,**params)
-        setup_params(self,RFSOM,**params)
+        super(RFSOM,self).__init__(**params)
 
         self.projections = {}
         self.count = 0
@@ -112,8 +110,10 @@ class RFSOM(Sheet):
             r,c = self.sheet2matrix(*index)
         return self.weights[y,x]
 
+###############################################
+from base import TopoObject
 
-class RF(Debuggable):
+class RF(TopoObject):
 
     def __init__(self,input_sheet,width=1.0,center=(0,0)):
         from boundingregion import BoundingBox
@@ -123,14 +123,14 @@ class RF(Debuggable):
 
         self.input_sheet = input_sheet
 
-        self.db_print('center = %s, width= %.2f'%(`center`,width),VERBOSE)
+        self.verbose('center = %s, width= %.2f'%(`center`,width))
         xc,yc = center
         self.__bounds = BoundingBox(points=((xc-width,yc-width),(xc+width,yc+width)))
 
         rmin,rbound,cmin,cbound = input_slice(self.__bounds,
                                               input_sheet.bounds,
                                               input_sheet.density)
-        self.db_print("activation matrix slice: "+`(rmin,rbound,cmin,cbound)`,VERBOSE)
+        self.verbose("activation matrix slice: "+`(rmin,rbound,cmin,cbound)`)
         self.weights = RandomArray.random((rbound-rmin,cbound-cmin))
 
     def contains(self,x,y):
@@ -145,7 +145,7 @@ class RF(Debuggable):
 
 if __name__ == '__main__':
 
-    from simulator import Simulator,connect
+    from simulator import Simulator
     from image import ImageGenerator,ImageSaver
     import pdb
     from boundingregion import BoundingBox
@@ -156,7 +156,7 @@ if __name__ == '__main__':
     RFSOM.rmax = 0.5
     RFSOM.rf_width = 0.1
 
-    input = ImageGenerator(filename='main.jpg',density=10000,
+    input = ImageGenerator(filename='main.ppm',density=10000,
                            bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))))
 
 

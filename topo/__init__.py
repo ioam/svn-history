@@ -1,6 +1,5 @@
 # core
 import simulator
-import debug
 import params
 import utils
 
