@@ -204,7 +204,7 @@ class RFSheet(Sheet):
                            doc="The list of all projections on all ports (read only).")
 
     def input_event(self,src,src_port,dest_port,data):
-        self.message("Received input from,",src,"at time",self.simulator.time())
+        self.message("Received",dest_port,"2input from,",src,"at time",self.simulator.time())
         self.present_input(data,src,dest_port)
         self.new_input = True
 
@@ -217,9 +217,6 @@ class RFSheet(Sheet):
 
             self.train()
 
-            for port in self.ports.values():
-                for proj in port['projections'].values():
-                    proj.input_buffer = None
             self.debug("max activation =",max(self.activation.flat))
 
     def train(self):

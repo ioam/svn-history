@@ -55,16 +55,28 @@ class LISSOM(topo.rfsheet.RFSheet):
     transfer_fn = Parameter(default=PLTF)
     learning_rate = Parameter(default=0.1)
 
+    def input_event(self,src,src_port,dest_port,data):
+
+        # On a new afferent input, clear the activation
+        if dest_port == 'afferent':
+            self.activation *= 0.0
+        super(LISSOM,self).input_event(src,src_port,dest_port,data)
+            
+
     def train(self):
 
         rows,cols = self.activation.shape
-        for port in self.ports.values():
+        for name,port in self.ports.items():
+            if 'inhibitory' in name:
+                sign = -1
+            else:
+                sign = 1
             for proj in port['projections'].values():
                 if proj.input_buffer:
                     for r in range(rows):
                         for c in range(cols):
                             rf = proj.rf(r,c)
-                            rf.weights += (self.learning_rate * self.activation[r,c]
+                            rf.weights += (sign * self.learning_rate * self.activation[r,c]
                                            * rf.get_input_matrix(proj.input_buffer))
 
 

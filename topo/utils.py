@@ -41,7 +41,8 @@ def msum(m):
 
 def mdot(m1,m2):
     return msum(m1*m2)
-    
+
+
 class Struct:
     def __init__(self,**fields):
         for name,value in fields.items():
