@@ -69,17 +69,33 @@ class ColorMap(Bitmap):
     1 2D Array, and a palette of 768 integers (3x256 of RGB ranged 0-255).
     """
 
-    def __init__(self,inArray,palette):
+    def __init__(self,inArray,palette=None):
         """
         Palette can be any color scale depending on the type of ColorMap
-        desired.  [0,0,0 ... 255,255,255] = Grayscale, [0,0,0 ... 255,0,0] =
-        Grayscale but through a Red filter.
+        desired.
+        [0,0,0 ... 255,255,255] = Grayscale
+        [0,0,0 ... 255,0,0] = Grayscale but through a Red filter.
+
+        If palette is not passed as parameter, Grayscale is default.
         """
         newImage = self.arrayToImage(inArray)
+        if palette == None:
+            palette = [i for i in range(256) for j in range(3)]
         newImage.putpalette(palette)
         newImage = newImage.convert('P')
         super(ColorMap,self).__init__(newImage)
 
+
+
+class BWMap(ColorMap):
+    """
+    The name has been changed to make the code more intuitive to read
+    when wishing to use B/W maps.  Just calls ColorMap with the default
+    palette.
+    """
+    def __init__(self,inArray):
+        super(BWMap,self).__init__(inArray)
+        
 
         
 class HSVMap(Bitmap):
@@ -112,6 +128,14 @@ class HSVMap(Bitmap):
                      int(math.floor(b * 255)))
             buffer.append(pixel)
 
+        # Equivalent to the above commented code, but this uses
+        # list comprehensions instead.  Slower than the for loop.
+        # rgbFlat = [hsv_to_rgb(h,s,v) for h,s,v in zip(hFlat, sFlat, vFlat)]
+        # buffer = [(int(math.floor(r * 255)),
+        #            int(math.floor(g * 255)),
+        #            int(math.floor(b * 255)))
+        #           for r,g,b in rgbFlat]
+
         newImage.putdata(buffer)
         super(HSVMap,self).__init__(newImage)
 
@@ -137,24 +161,36 @@ class RGBMap(Bitmap):
 
 if __name__ == '__main__':
     print 'Test Module'
-    a = Numeric.reshape(Numeric.arrayrange(10000) % 256,(100,100)) / 255.0
-    b = Numeric.reshape(Numeric.arrayrange(10000) % 200,(100,100)) / 255.0
-    c = Numeric.reshape(Numeric.arrayrange(10000) % 100,(100,100)) / 255.0
+    miata = Image.open('miata.jpg')
+    miata = miata.resize((miata.size[0]/2,miata.size[1]/2))
+    rIm, gIm, bIm = miata.split()
+    rseq, gseq, bseq = rIm.getdata(), gIm.getdata(), bIm.getdata()
+    rar,gar,bar = Numeric.array(rseq),Numeric.array(gseq),Numeric.array(bseq)
+    ra = Numeric.reshape(rar,miata.size) / 255.0
+    ga = Numeric.reshape(gar,miata.size) / 255.0
+    ba = Numeric.reshape(bar,miata.size) / 255.0
 
     # Test RGBMap
-    rgb = RGBMap(a,b,c)
+    rgb = RGBMap(ra,ga,ba)
     rgb.show()
 
     # Test ColorMap
-    import random
-    p = range(256)
-    p = p + p + p
-    random.shuffle(p)
-    cmap = ColorMap(a,p)
+    p = [j and i for i in range(256) for j in (1,0,0)]
+    cmap = ColorMap(ra,p)
     cmap.show()
 
     # Test HSVMap
+    a = [j for i in range(256) for j in range(256)]
+    b = [i for i in range(256) for j in range(256)]
+    c = [max(i,j) for i in range(256) for j in range(256)]
+    a = Numeric.reshape(a,(256,256)) / 255.0
+    b = Numeric.reshape(b,(256,256)) / 255.0
+    c = Numeric.reshape(c,(256,256)) / 255.0
     hsv = HSVMap(a,b,c)
     hsv.show()
-    hsv = HSVMap(a,a,a)
-    hsv.show()
+    #cmap = ColorMap(c)
+    #cmap.show()
+
+    # Test BWMap
+    bwmap = BWMap(ra)
+    bwmap.show()
