@@ -127,10 +127,11 @@ class DislinPlot:
         self.BITMAP_SQUARE = 600          # 100 pixels per inch estimated
         #self.display = 'tiff'
         self.dislinscale = False
-        self.display = 'postscript'       # Set to a name in self.format
-        self.filename = 'dislindriver.bmp'# Base name.  May be different.
-        self.xaxis_name = 'X-Axis Title'  # X Axis Title
-        self.yaxis_name = 'Y-Axis Title'  # Y Axis Title
+        self.display = 'postscript'          # Set to a name in self.format
+        self.infilename = 'dislindriver.bmp' # Base name.  May be different.
+        self.outfilename = None              # Output filename.  Must be set.
+        self.xaxis_name = 'X-Axis Title'     # X Axis Title
+        self.yaxis_name = 'Y-Axis Title'     # Y Axis Title
         self.layers = []               # (label, threshold, color)
         self.grid = []                 # Holding matrix for data points
         self.xgrid, self.ygrid = 0, 0  # Dimension of x and y in self.grid
@@ -171,7 +172,16 @@ class DislinPlot:
         Set the filename for the input file.  Currently must be of the
         BMP file format.
         """
-        self.filename = name        
+        self.infilename = name        
+
+    def set_output_filename(self,name):
+        """
+        Set the output filename of the plot.  The output name may be
+        different if the filename already exists.  To make sure this is
+        the actual name, be sure to remove any files with the same name
+        first.
+        """
+        self.outfilename = name
 
 
     def set_xname(self, name):
@@ -269,7 +279,7 @@ class DislinPlot:
         Generate plot using the values currently stored in the object
         instance.
         """
-        dislin.setfil (self.format[self.display]['setfil'])
+        dislin.setfil (self.outfilename)
         dislin.metafl (self.format[self.display]['metafl'])
         dislin.scrmod (self.format[self.display]['scrmod'])
         dislin.imgfmt('RGB')   # Change default from 256 palette for tiffs
@@ -302,20 +312,20 @@ class DislinPlot:
         if self.display == 'postscript':
             dislin.psfont('HELVETICA')
         if self.dislinscale:
-            image = Image.open(self.filename)
+            image = Image.open(self.infilename)
             (width, height) = image.size
             self.xlow, self.ylow, self.xhigh, self.yhigh = 0,0,width-1,height-1
             self.xlabst, self.ylabst = 0, 0
             self.xlabstep, self.ylabstep = 20, 20
             dislin.filbox (self.AXIS_XPOS, self.AXIS_YPOS - self.AXIS_HT,
                            self.AXIS_WT, self.AXIS_HT)
-            dislin.incfil (self.filename)
+            dislin.incfil (self.infilename)
         else:
             # Have to do my own scaling for bitmaps otherwise I would use
             # the built-in:
             self.__scale_and_post(self.AXIS_XPOS,
                                   self.AXIS_YPOS - self.AXIS_HT,
-                                  self.AXIS_WT,self.AXIS_HT,self.filename)
+                                  self.AXIS_WT,self.AXIS_HT,self.infilename)
 
         dislin.color  (self.format[self.display]['fcolor'])
 
