@@ -1,0 +1,95 @@
+INSTALLING TOPOGRAPHICA ON WINDOWS XP/2000/(NT?)
+===================================================================
+
+THE FAST WAY:
+
+1. Unpack the topographica archive into a temporary directory.
+2. Double click on setup.bat
+3. Follow the various installation prompts for the packages 
+   bundled with Topographica.
+4. Add "DISLIN=C:\DISLIN" and "PYTHONPATH=C:\DISLIN\PYTHON"
+   to your System Variables.  To do so go to the [Control Panel], 
+   double click on [System], select the [Advanced] tab, and then 
+   the button [Environment Variables].
+
+After installation you should now have an icon on your desktop that
+opens the directory where Topographica is installed.  There will be a
+new file association called ".ty" which are scripts that the
+Topographica program will execute when you double-click on them.
+
+You can now test the installation by double-clicking on the
+topographica.bat file which will run the interactive Topographica
+shell and give you a "Topographica>" prompt.
+
+
+===================================================================
+
+IF THERE IS A PROBLEM
+
+Known issues: 
+--- 
+Sometimes on Windows 2000 Machines the Dislin setup.exe program will
+not exit cleanly after the install.  The Topographica installation has
+completed successfully but the final notice that says to add the
+DISLIN and PYHONPATH environment variables will not be displayed.
+---
+
+
+===================================================================
+
+INSTALLING THE SLOW WAY
+
+To install the Topographica parts by hand, be sure Python 2.3 is
+installed and do (a), (b), and (c) below.  See Note.
+---
+
+Topographica is a Python 2.3 program and requires Python 2.3 to be
+installed.  The setup.bat script checks to see if the correct version
+exists and will automatically run an included Python 2.3 installer
+located in \external\ if an older version is the default Python
+associated with Python Files.
+
+After Python has been installed or detected, the directory is changed
+to .\external\win32\ and following commands are run:
+
+   start /wait setup.py configure     % Verifies Python 2.3 installed.
+   start /wait setup.py install
+
+
+The 'setup.py install' does the following:
+
+a) Installs the following programs found in external\win32\
+
+   Numeric-23.1.win32-py2.3.exe Python Numeric Package
+   PIL-1.1.4.win32-py2.3.exe	Python Imaging Library
+   ..\Pmw.tgz                   Python Mega Widgets  (Contains a Read-Me)
+   dl_82_p2.tar.gz              Dislin Plotting      (Runs setup.exe)
+
+b) Copy the core Topographica files in \topo\* to the install location
+   BASE_LOCATION\topo\
+
+c) Additional tasks in the script include (in no particular order):
+   1. Associate Topographica File extensions (.ty)
+   2. Construct and Set a Topographica run command for the .ty Files
+   3. Give .ty Files a pretty icon
+   5. Create a topographica.bat wrapper to preserve the Topographica output
+   6. Move the generic topographica script to the one that the system will use
+   7. Create a Desktop CMD file to open the Install location of Topographica
+   
+Note: The "Additional Tasks" of part (c) listed above are only for
+      streamlining the Topographica user interface and are not needed
+      to run the system.  If there is a problem with the install
+      script and (c) does not complete then Topographica can still be
+      executed by issuing the following command from a Shell window
+      which is in the root location of the Topographica installation:
+
+         [Python Location]\python.exe topographica-script.py
+
+      To execute an existing Topographica script add the filename to
+      the end of the command:
+
+         [Python Location]\python.exe topographica-script.py script.py
+
+
+---
+$Id$
