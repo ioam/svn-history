@@ -1,7 +1,7 @@
 #
 # Script to run Topographica test modules.
 #
-# do './runtests -h' in topographica directory for usage.
+# do './topographica runtests -h' in topographica directory for usage.
 #
 
 import unittest
