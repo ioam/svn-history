@@ -43,3 +43,5 @@ else:
     suite = tests.suite
 
 unittest.TextTestRunner(verbosity=verbosity).run(suite)
+
+# foo
