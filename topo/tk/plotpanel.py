@@ -63,6 +63,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
 
         self.console = console
         self.parent = parent
+        self.balloon = Pmw.Balloon(parent)
         self.canvases = []
 
         # Main Plot group title can be changed from a subclass with the

@@ -67,5 +67,5 @@ class WeightsPanel(RegionPlotPanel):
     
         
     def refresh_title(self):
-        self.parent.title("Unit Weights %d. (x=%0.4f, y=%0.4f)" %
+        self.parent.title("Unit Weights %d. (x=%0.3f, y=%0.3f)" %
                           (self.panel_num,self.x, self.y))

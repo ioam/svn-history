@@ -29,7 +29,9 @@ class WeightsArrayPanel(RegionPlotPanel):
 
         self.params_frame1 = Frame(master=self)
         self.params_frame1.pack(side=RIGHT,expand=YES,fill=X)
-        Message(self.params_frame1,text="Units per 1.0:",aspect=1000).pack(side=LEFT)
+        pd = Message(self.params_frame1,text="Plotting Density:",aspect=1000)
+        pd.pack(side=LEFT)
+        self.balloon.bind(pd,'Number of units to plot per 1.0 distance in sheet coordinates')
         Entry(self.params_frame1,
               textvariable=self.density_str).pack(side=LEFT,expand=YES,fill=X,padx=5)
 
@@ -214,7 +216,7 @@ class WeightsArrayPanel(RegionPlotPanel):
         """
         if len(self.projections) > 0:
             src_name = self.projections[self.weight_name.get()].src.name
-            new_title = 'Projections from ' + src_name
+            new_title = 'Projection from ' + src_name
             self.plot_group.configure(tag_text = new_title)
         else:
             self.plot_group.configure(tag_text = 'No Projections')
