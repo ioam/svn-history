@@ -7,7 +7,7 @@ $Id$
 import unittest, os
 import topo
 from topo.inputsheet import *
-from topo.gui import *
+from topo.tk import *
 from topo.kernelfactory import *
 from topo.simulator import *
 from PIL import Image

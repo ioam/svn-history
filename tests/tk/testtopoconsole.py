@@ -1,5 +1,5 @@
 import unittest
-from topo.gui import *
+from topo.tk import *
 from topo.simulator import Simulator
 from topo.plotengine import PlotEngine
 

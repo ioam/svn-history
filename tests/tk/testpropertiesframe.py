@@ -5,7 +5,7 @@ $Id$
 """
 import unittest
 from Tkinter import *
-from topo.gui import *
+from topo.tk import *
 from topo.tk.propertiesframe import *
 
 class TestPropertiesFrame(unittest.TestCase):
