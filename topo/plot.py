@@ -111,12 +111,23 @@ class Plot(TopoObject):
         """
         Get the SheetViews requested from each channel passed in at
         creation, combines them as necessary, and generates the
-        Histograms.
-        Returns: 2-Tuple, (triple of 2D Matrices mapping to the
-        R/G/B channels, List of Histograms)
+        Histograms.  plot() is here to allow dynamic creation of plots,
+        even after the creation of the Plot object.  See the input
+        parameters to the Plot object constructor.
+        
+        Returns: self (Plot)
+            Important features of this object are:
+                self.matrices: Triple of 2D Matrices mapping to the
+                    R/G/B channels.
+                self.histograms: List of Histogram objects associated with
+                    the matrices is self.matrices.
+                self.view_info: Name information that can be used to create
+                    labels and filenames.
         """
 
-        self.debug('plot() channels = ' + str(self.channels) + 'self.source = ' + str(self.source) + 'type(self.source) = ' + str(type(self.source)))
+        self.debug('plot() channels = ' + str(self.channels) + \
+                   'self.source = ' + str(self.source) + \
+                   'type(self.source) = ' + str(type(self.source)))
 
         #  Convert what is in the channels into SheetViews if not already
         for each in self.channels:
@@ -134,20 +145,23 @@ class Plot(TopoObject):
             #         No need for a Sheet.
             if isinstance(each,SheetView):
                 self.channel_views.append(each)
-                self.name = each.name
+                self.view_info = each.view_info
 
             # Case 2: Entry is a string, or tuple that will be used as a
             #         key in the Sheet dictionary.
             elif isinstance(each,str) or isinstance(each,tuple):
                 if self.source is None:
-                    self.warning('Plot Channel-type requires a Sheet, but None Sheet passed to Plot() object.')
-                    self.warning('channels = ' + str(self.channels) + ' type(self.source) = ' + str(type(self.source)))
+                    self.warning('Plot Channel-type requires a Sheet, '+ \
+                                 'but None Sheet passed to Plot() object.')
+                    self.warning('channels = ' + str(self.channels) + \
+                                 ' type(self.source) = ' + \
+                                 str(type(self.source)))
                     self.channel_views.append(None)
                     self.name = 'Undefined'
                 else:
                     sv = self.source.sheet_view(each)
                     self.channel_views.append(sv)
-                    self.name = sv.name
+                    self.view_info = sv.view_info
 
             # Case 3: Channel entry is None.  Pass along.
             elif each == None:
@@ -172,9 +186,11 @@ class Plot(TopoObject):
                 self.matrices.append(None)
         # Replace any Nones with a matrix of size 'shape' full of values.
         if self.background == BLACK_BACKGROUND:
-            self.matrices = tuple([each or zeros(shape) for each in self.matrices])
+            self.matrices = tuple([each or zeros(shape)
+                                   for each in self.matrices])
         else:
-            self.matrices = tuple([each or ones(shape) for each in self.matrices])
+            self.matrices = tuple([each or ones(shape)
+                                   for each in self.matrices])
             
 
         # By this point, self.matrices should be a triple of 2D
@@ -200,7 +216,8 @@ class Plot(TopoObject):
             # THE FINAL IMAGES.
             single_map = [each for each in self.matrices if each]
             if len(single_map) > 1:
-                self.warning('More than one channel requested for single-channel colormap')
+                self.warning('More than one channel requested for ' + \
+                             'single-channel colormap')
             if single_map:
                 self.matrices = (single_map[0], single_map[0], single_map[0])
 
@@ -218,7 +235,7 @@ class Plot(TopoObject):
         # CHANGE ONCE HISTOGRAM DOES SOMETHING.
         self.histograms = [Histogram(each) for each in self.matrices if each]
         
-        return (self.matrices, self.histograms)
+        return self
 
 
 
@@ -296,10 +313,9 @@ class PlotGroup(TopoObject):
         # sufficient as outlining and other things will need to be
         # done to each of the matrices that come in from the Plot
         # objects.
-        bitmap_list = [each.plot() for each in self.all_plots]
-        name_list = [each.name for each in self.all_plots]
+        generated_bitmap_list = [each.plot() for each in self.all_plots]
 
-        return (bitmap_list, name_list)
+        return generated_bitmap_list
 
 
 

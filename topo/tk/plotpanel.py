@@ -57,8 +57,8 @@ class PlotPanel(Frame,topo.base.TopoObject):
 
         self.pe = pengine
         self.pe_group = None
-        self.plot_tuples = []
-        self.images = []
+        self.plots = []
+        self.bitmaps = []
         self.labels = []
 
         self.console = console
@@ -130,17 +130,10 @@ class PlotPanel(Frame,topo.base.TopoObject):
     def do_plot_cmd(self):
         """
         Subclasses of PlotPanel will need to create this function to
-        generate the plots.  Upon completion, it must have done two things:
-
-        1.  Create a PlotGroup and store it into self.pe_group
-        2.  Create a list of plot tuples, and store it into self.plot_tuples
-
-        Example:
-            self.pe_group = self.pe.get_plot_group(self.plot_key)
-            self.plot_tuples = self.pe_group.plots()
+        generate the plots.
 
         See topo.tk.WeightsPanel and topo.tk.WeightsArrayPanel for
-        more complicated examples.
+        examples.
         """
         raise NYI
     
@@ -148,9 +141,9 @@ class PlotPanel(Frame,topo.base.TopoObject):
     def load_images(self):
         """
         Pre:  self.pe_group contains a PlotGroup
-              self.plot_tuples contains a list of tuples that match the
+              self.preplots contains a list that matches the
                   format defined by PlotGroup.plots()
-        Post: self.images contains a list of Bitmap Images ready for display.
+        Post: self.bitmaps contains a list of Bitmap Images ready for display.
 
         No geometry or Sheet information is necessary to perform the
         operations in this function, so it is unlikely that load_images()
@@ -162,17 +155,16 @@ class PlotPanel(Frame,topo.base.TopoObject):
         number of pixels wide the smallest plot figure will be on the
         first display.
         """
-        self.plotlist = []
         # need to calculate the old min width, so we know if we need to reset
         # the zoom factors
-        if self.images:
-            old_min_width = reduce(min,[im.width() for im in self.images])
+        if self.bitmaps:
+            old_min_width = reduce(min,[im.width() for im in self.bitmaps])
         else:
             old_min_width = -1
 
-        self.images = []
-        for (figure_tuple, hist_tuple) in self.plot_tuples:
-            (r,g,b) = figure_tuple
+        self.bitmaps = []
+        for each in self.plots:
+            (r,g,b) = each.matrices
             if r.shape != (0,0) and g.shape != (0,0) and b.shape != (0,0):
                 # Normalize activation to a maximum of 1.  Will scale brighter
                 # or darker, depending.
@@ -180,11 +172,11 @@ class PlotPanel(Frame,topo.base.TopoObject):
                 if max(g.flat) > 0: g = Numeric.divide(g,max(g.flat)) 
                 if max(b.flat) > 0: b = Numeric.divide(b,max(b.flat))
                 win = topo.bitmap.RGBMap(r,g,b)
-                self.images.append(win)
-                self.plotlist.append(win)
+                win.view_info = each.view_info
+                self.bitmaps.append(win)
         
-        if self.images:
-            min_width = reduce(min,[im.width() for im in self.images])
+        if self.bitmaps:
+            min_width = reduce(min,[im.width() for im in self.bitmaps])
         else:
             min_width = 0
 
@@ -211,7 +203,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
         
     def display_plots(self):
         """
-        Pre:  self.images contains a list of topo.bitmap objects.
+        Pre:  self.bitmaps contains a list of topo.bitmap objects.
 
         Post: The bitmaps have been displayed to the screen in the active
               console window.  All images are displayed from left to right,
@@ -223,7 +215,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
         things such as 2D grids.
         """
         self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.zoom_factor))
-                              for im in self.images]
+                              for im in self.bitmaps]
         old_canvases = self.canvases
         self.canvases = [Canvas(self.plot_frame,
                                 width=image.width(),
@@ -242,7 +234,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
     def display_labels(self):
         """
         Pre:  self.plot_names contains a list of strings that match the
-              list of bitmap images is self.images.
+              list of bitmap images is self.bitmaps.
         Post: Each string within self.plot_names has been displayed on the
               screen directly below its corresponding image in the GUI
               window.
@@ -253,8 +245,8 @@ class PlotPanel(Frame,topo.base.TopoObject):
         labels at the same time the images are displayed.
         """
         old_labels = self.labels
-        self.labels = [Label(self.plot_frame,text=name)
-                       for name in self.plot_names]
+        self.labels = [Label(self.plot_frame,text=each.view_info['src_name'])
+                       for each in self.bitmaps]
         for i in range(len(self.labels)):
             self.labels[i].grid(row=1,column=i,sticky=NSEW)
         for l in old_labels:

@@ -93,6 +93,7 @@ class Bitmap(object):
     
     def __init__(self,newMap):
         self.bitmap = newMap
+        self.view_info = {}
 
 
     def copy(self):

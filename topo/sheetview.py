@@ -158,7 +158,7 @@ class UnitView(SheetView):
         self.x = x
         self.y = y
         self.projection = projection
-        self.view_info['src_name'] = self.projection.src.name
+        self.view_info['src_name'] = self.projection.name
         self.view_info['x'] = x
         self.view_info['y'] = y
 

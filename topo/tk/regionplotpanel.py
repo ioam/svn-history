@@ -68,6 +68,6 @@ class RegionPlotPanel(PlotPanel):
         active_sheet_name = self.region.get()
         sheet_filter_lam = lambda s: s.name == active_sheet_name
         self.pe_group = self.pe.get_plot_group(self.plot_key,sheet_filter_lam)
-        (self.plot_tuples, self.plot_names) = self.pe_group.plots()
+        self.plots = self.pe_group.plots()
         # Delete old Sheet.sheet_view_dict entries
         self.pe_group.release_sheetviews()  

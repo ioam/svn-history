@@ -189,7 +189,7 @@ class WeightsArrayPanel(RegionPlotPanel):
         """
         # Generate the zoomed images.
         self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.zoom_factor))
-                              for im in self.images]
+                              for im in self.bitmaps]
         old_canvases = self.canvases
         self.canvases = [Canvas(self.plot_frame,
                                 width=image.width(),

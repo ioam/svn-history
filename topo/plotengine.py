@@ -124,11 +124,9 @@ class PlotEngine(TopoObject):
                 views = [views]
             for each in views:
                 if isinstance(each,SheetView):
-                    plot_list.append(Plot((each,None,None),COLORMAP,None,
-                                     name = each.name))
+                    plot_list.append(Plot((each,None,None),COLORMAP,None))
                 else:
-                    plot_list.append(Plot((name,None,None),COLORMAP,sheet,
-                                     name = 'Composite'))
+                    plot_list.append(Plot((name,None,None),COLORMAP,sheet))
         self.debug('plot_list =' + str(plot_list))
         return plot_list
 
