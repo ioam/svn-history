@@ -1,13 +1,11 @@
 # $Id$
 
-all: topographica ext-packages  docs
+all: ext-packages topographica docs
 
 clean: cleandocs clean-ext-packages
 
 topographica: topographica-script.py Makefile
-	echo "#!/usr/bin/env" ${PWD}/bin/python > topographica
-	cat topographica-script.py >> topographica 
-	chmod a+x topographica
+	make -C external startscript
 
 ext-packages:
 	make -C external

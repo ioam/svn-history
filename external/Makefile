@@ -1,7 +1,7 @@
 PREFIX = ${dir ${CURDIR}}
 
 
-all: python jpeg pil numeric pmw dislin
+all: python jpeg pil numeric pmw dislin startscript
 
 clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean dislin-clean
 
@@ -162,6 +162,18 @@ dislin-clean:
 	rm -rf ${DISLIN}
 dislin-uninstall:
 	rm -rf dislin ${DISLIN} ${PREFIX}/${DISLIN_UNINSTALL}
+
+
+##############################################################
+# Startup Script
+#
+startscript: dislin python
+	echo "#!/bin/sh" > ${PREFIX}topographica
+	echo 'export DISLIN="${PREFIX}${DISLIN_UNINSTALL}"' >> ${PREFIX}topographica
+	echo 'export PYTHONPATH="$$PYTHONPATH:${PREFIX}${DISLIN_UNINSTALL}/python"' >> ${PREFIX}topographica
+	echo 'export LD_LIBRARY_PATH="${PREFIX}lib:${PREFIX}${DISLIN_UNINSTALL}:$$LD_LIBRARY_PATH"' >> ${PREFIX}topographica
+	echo -e "/usr/bin/env ${PWD}/bin/python topographica-script.py \044\100" >> ${PREFIX}topographica
+	chmod a+x ${PREFIX}topographica
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
