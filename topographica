@@ -4,7 +4,7 @@ import sys,os,code
 from pprint import pprint
 from topo import *
 
-# set up the interactive prompt
+# set up the readline
 try:
     import readline
 except ImportError:
@@ -14,14 +14,13 @@ else:
     readline.parse_and_bind("tab: complete")
 
 
-
-readline.parse_and_bind("tab: complete")
-
+# set the prompt and banner
 sys.ps1 = 'Topographica> '
 
 banner = """
 Welcome to Topographica!
 """
 
+#start the intepreter
 interpreter = code.InteractiveConsole(locals())
 interpreter.interact(banner)
