@@ -76,7 +76,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         self.assertEqual(len(self.s.sheet_view_dict.keys()),0)
         self.s.add_sheet_view('key',sv2)
         self.assertEqual(len(self.s.sheet_view_dict.keys()),1)
-        self.s.delete_sheet_view('key')
+        self.s.release_sheet_view('key')
         self.assertEqual(len(self.s.sheet_view_dict.keys()),0)
 
 

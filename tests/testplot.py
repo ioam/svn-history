@@ -27,7 +27,7 @@ class TestPlot(unittest.TestCase):
         # Defined sheetview in the R channel
         plot1 = plot.Plot((None,None,sv),plot.COLORMAP)
         p_tuple = plot1.plot()
-        (r, g, b) = p_tuple[0]
+        (r, g, b) = p_tuple.matrices
         map = RGBMap(r,g,b)
         if SHOW_PLOTS: map.show()
 
@@ -61,7 +61,7 @@ class TestPlot(unittest.TestCase):
         self.pg1.add(z)
         plot_list = self.pg1.plots()
         for each in plot_list:
-            (r,g,b) = each[0]
+            (r,g,b) = each.matrices
             map = RGBMap(r,g,b)
             if SHOW_PLOTS: map.show()
         

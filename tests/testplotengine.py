@@ -130,7 +130,9 @@ class TestPlotEngine(unittest.TestCase):
         pe.debug('Type of plot_group', type(plot_group))
 
         s.verbose('Sheets: ', pe._sheets())
-        for (figure_tuple, hist_tuple) in plot_group.plots():
+        for each in plot_group.plots():
+            figure_tuple = each.matrices
+            hist_tuple = each.histograms
             plot_group.debug('Plot Tuple', figure_tuple)
             (r,g,b) = figure_tuple
             if r.shape != (0,0) and g.shape != (0,0) and b.shape != (0,0):
