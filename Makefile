@@ -2,6 +2,8 @@
 
 all: topographica ext-packages docs
 
+clean: cleandocs
+
 topographica: topographica-script.py Makefile
 	echo "#!/usr/bin/env" ${PWD}/bin/python > topographica
 	cat topographica-script.py >> topographica 
