@@ -51,7 +51,7 @@ retina = InputSheet(input_generator=FuzzyLineFactory(),name='Retina')
 V1 = RFSOM(name='V1')
 save  = ImageSaver(name='RFSOM')
 
-s.connect(retina,V1,delay=1)
+s.connect(retina,V1,delay=0.5)
 
 # Uncomment the connections to the image saver, to save all the activation
 # images to disk.
