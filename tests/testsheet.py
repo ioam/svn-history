@@ -58,7 +58,6 @@ class TestCoordinateTransforms(unittest.TestCase):
         log_level = s.print_level
         minlog_level = topo.base.min_print_level
 
-        # Disable the warning that we know will be displayed
         s.print_level = topo.base.SILENT
         topo.base.min_print_level = topo.base.SILENT
         s.sheet_view('Orientation')
