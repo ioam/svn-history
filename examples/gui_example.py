@@ -50,10 +50,14 @@ print "Creating simulation objects..."
 s = topo.simulator.Simulator()
 
 retina = InputSheet(input_generator=FuzzyLineFactory(),name='Retina')
+retina2 = InputSheet(input_generator=FuzzyLineFactory(),name='Retina2')
 V1 = RFSOM(name='V1')
+V2 = RFSOM(name='V2')
 save  = ImageSaver(name='RFSOM')
 
 s.connect(retina,V1,delay=0.5)
+s.connect(retina,V2,delay=0.5)
+s.connect(retina2,V2,delay=0.5)
 
 # Uncomment the connections to the image saver, to save all the activation
 # images to disk.
