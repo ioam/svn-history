@@ -7,14 +7,13 @@ Defines a class to return Kernels
 """
 
 import types
-import random
 
 import base
 from boundingregion import BoundingBox
 from sheet import sheet2matrix, matrix2sheet, bounds2shape
 
+import RandomArray
 from Numeric import *
-from RandomArray import *
 from params import * 
 from pprint import pprint,pformat
 
@@ -108,8 +107,8 @@ def gabor(kernel_x, kernel_y, width, height, frequency, phase):
 Uniform Random Kernel Factory
 """
 
-def uniform_random(kernel_x, kernel_y):
-    return random(kernel_x.shape) 
+def uniform_random(kernel_x, kernel_y,rmin,rmax):
+    return RandomArray.uniform(rmin,rmax,kernel_x.shape) 
 
 
 """
@@ -258,8 +257,13 @@ Uniform Random Generating Factory
 class UniformRandomFactory(KernelFactory):
     x = Parameter(default=0)
     y = Parameter(default=0)
+    min = Number(default=0.0)
+    max = Number(default=1.0)
+    
     def function(self,**params):
-        return uniform_random( self.kernel_x, self.kernel_y) 
+        return uniform_random( self.kernel_x, self.kernel_y,
+                               params.get('min',self.min),
+                               params.get('max',self.max)) 
 
 """
 Rectangle Generating Factory

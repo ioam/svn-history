@@ -124,12 +124,10 @@ class TestPlotPanel(unittest.TestCase):
         FuzzyLineFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
         FuzzyLineFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
         FuzzyLineFactory.width = 0.02
-        FuzzyLineFactory.height = 0.9
         FuzzyLineFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
         
         # rf som parameters
         RFSOM.density = 2500
-        RFSOM.weights_factory = UniformRandomFactory(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
         RFSOM.training_length = 10000
         RFSOM.radius_0 = 0.1
         

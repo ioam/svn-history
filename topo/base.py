@@ -127,6 +127,10 @@ class TopoMetaclass(type):
             self.__dict__[name].__set__(None,value)            
         else:
             # in all other cases set the attribute normally
+            if not isinstance(value,Parameter):
+                print (" ##WARNING## Setting non-parameter class attribute %s.%s = %s "
+                       % (self.__name__,name,`value`))
+                                   
             type.__setattr__(self,name,value)
         
     def get_param_descriptor(self,param_name):
@@ -137,11 +141,12 @@ class TopoMetaclass(type):
                 return attribute,c
         return None,None
 
+    def print_param_defaults(self):
+        for key,val in self.__dict__.items():
+            if isinstance(val,Parameter):
+                print self.__name__+'.'+key, '=', val.default
+
 class TopoObject(object):
-    """
-    A mixin class for debuggable objects.  Makes sure every debuggable
-    object has a name,, and __repr__(), __str__(), and db_print() methods.
-    """
     __metaclass__ = TopoMetaclass
 
 
@@ -205,22 +210,48 @@ class TopoObject(object):
         """
         self.__db_print(DEBUG,*args)
 
-
     def __setup_params(self,**config):
-        """
-        Traverse this object's family tree of classes discovering the
-        Parameters in the class dictionary, and set parameters that
-        are named in the config dictionary.
-        """
-        for class_ in classlist(type(self)):
-            self.debug('setting params for ', class_)
-            for name,val in class_.__dict__.items():
-                if isinstance(val,Parameter):
-                    try:
-                        setattr(self,name,config[name])
-                    except KeyError:
-                        pass
-                    
+        for name,val in config.items():
+            desc,desctype = self.__class__.get_param_descriptor(name)
+            if desc:
+                self.debug("Setting param %s ="%name, val)
+            else:
+                self.warning("CANNOT SET non-parameter %s ="%name, val)
+            setattr(self,name,val)
+
+    def __getstate__(self):
+        import copy
+        try:
+            state = copy.copy(self.__dict__)
+            for x in self.nopickle:
+                if x in state:
+                    del(state[x])
+                else:
+                    desc,cls = type(self).get_param_descriptor(x)
+                    if desc and (desc.name in state):
+                        del(state[desc.name])
+                
+        except AttributeError,err:
+            pass
+
+        for c in classlist(type(self)):
+            try:
+                for k in c.__slots__:
+                    state[k] = getattr(self,k)
+            except AttributeError:
+                pass
+        return state
+
+    def __setstate__(self,state):
+        for k,v in state.items():
+            setattr(self,k,v)
+        self.unpickle()
+
+    def unpickle(self):
+        pass
+
+
+
     def get_param_dict(self,**config):
         paramdict = {}
         for class_ in classlist(type(self)):
@@ -245,6 +276,26 @@ def classlist(class_):
                 q.append(b)
     out.reverse()
     return out
+
+def descendents(class_):
+    assert isinstance(class_,type)
+    q = [class_]
+    out = []
+    while len(q):
+        x = q.pop(0)
+        out.insert(0,x)
+        for b in x.__subclasses__():
+            if b not in q and b not in out:
+                q.append(b)
+    return out[::-1]
+
+    
+    
+def print_all_param_defaults():
+    print "===== Topographica Parameter Default Values ====="
+    for c in descendents(TopoObject):
+        c.print_param_defaults()
+    print "==========================================="
 
 
 if __name__ == '__main__':

@@ -46,16 +46,15 @@ class TestRFSom(unittest.TestCase):
         InputSheet.print_level = base.WARNING
         
         GaussianFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        GaussianFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        
+        GaussianFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))        
         GaussianFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
+        
         GaussianFactory.width = 0.02
         GaussianFactory.height = 0.9
         GaussianFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
         # rf som parameters
         RFSOM.density = 900
-        RFSOM.rf_width = 0.2
         RFSOM.training_length = 10000
         RFSOM.radius_0 = 0.1
 

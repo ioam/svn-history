@@ -3,7 +3,7 @@ from topo.kernelfactory import *
 from topo.inputsheet import *
 from topo.image import ImageSaver
 from math import pi
-from topo.params import Dynamic
+from topo.params import *
 import random
 import topo.gui
 import topo.rfsheet
@@ -34,11 +34,26 @@ def PLTF(x):
     return ((x * (x>0)) * (x<1)) + (x>1)
 
 
+class LateralExcitatoryProjection(topo.rfsheet.KernelProjection):
+    """
+    A projection class to allow easy parameterization of
+    Lateral connections.
+    """
+    pass
+
+class LateralInhibitoryProjection(topo.rfsheet.KernelProjection):
+    """
+    A projection class to allow easy parameterization of
+    Lateral connections.
+    """
+    pass
+
+
+
 class LISSOM(topo.rfsheet.RFSheet):
 
     transfer_fn = Parameter(default=PLTF)
     learning_rate = Parameter(default=0.1)
-    
 
     def train(self):
 
@@ -61,8 +76,7 @@ class LISSOM(topo.rfsheet.RFSheet):
                     projlist = port['projections'].values()
                     k = sum([msum(p.rf(r,c).weights) for p in projlist])
                     for p in projlist:
-                        p.rf(r,c).weights /= k
-
+                        p.rf(r,c).weights /= abs(k)
 
 
 
@@ -83,18 +97,20 @@ FuzzyLineFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
 
 FuzzyLineFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
 FuzzyLineFactory.width = 0.02
-FuzzyLineFactory.height = 0.9
 FuzzyLineFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
 
-# rf som parameters
+# lissom parameters
 LISSOM.density = 900
-LISSOM.weights_factory = UniformRandomFactory(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 
 
 # image saver parameters
 ImageSaver.file_format='png'
 ImageSaver.time_format='%0.4d'
+
+# lateral connection parameters
+LateralInhibitoryProjection.weights_bounds  = BoundingBox(points=((-0.2,-0.2),(0.2,0.2)))
+LateralInhibitoryProjection.weights_factory = UniformRandomFactory(min=-1,max=0)
 
 ###########################################
 # build simulation
@@ -109,9 +125,13 @@ V1 = LISSOM(name='V1')
 save  = ImageSaver(name='RFSOM')
 
 s.connect(retina,V1,dest_port='afferent',delay=10)
+s.connect(V1,V1, dest_port='lateral_excitatory', delay=1,
+                 projection_type = LateralExcitatoryProjection)
+s.connect(V1,V1, dest_port = 'lateral_inhibitory', delay = 1,
+                 projection_type = LateralInhibitoryProjection)
+        
 
 #rfsheet.RF.print_level = base.VERBOSE
-s.connect(V1,V1,dest_port='lateral',delay=1)
 
 
 # Uncomment the connections to the image saver, to save all the activation
@@ -119,7 +139,7 @@ s.connect(V1,V1,dest_port='lateral',delay=1)
 #s.connect(retina,save,dest_port='retina',delay=2)
 #s.connect(V1,save,dest_port='V1',delay=1)
 
-s.run(20)
+#s.run(20)
 
 #V1.projections['Retina'][0].plot_rfs()
 

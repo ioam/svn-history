@@ -148,15 +148,16 @@ class Simulator(TopoObject):
                 dest=None,
                 src_port=None,
                 dest_port=None,
-                delay=0):
+                delay=0,**extra_args):
         """
         Connect the source to the destination, at the appropriate ports,
         if any are given.  If src and dest have not been added to the
         simulator, they will be added.
         """
         self.add(src,dest)
-        src._connect_to(dest,src_port=src_port,dest_port=dest_port, delay=delay)
-        dest._connect_from(src,src_port=src_port,dest_port=dest_port)
+        src._connect_to(dest,src_port=src_port,dest_port=dest_port,delay=delay,
+                        **extra_args)
+        dest._connect_from(src,src_port=src_port,dest_port=dest_port,**extra_args)
 
     def enqueue_event_rel(self,delay,src,dest,src_port=None,dest_port=None,data=None):
         """
@@ -328,7 +329,7 @@ class EventProcessor(TopoObject):
         self.connections = {None:[]}
         
 
-    def _connect_to(self,dest,src_port=None,dest_port=None,delay=0):
+    def _connect_to(self,dest,src_port=None,dest_port=None,delay=0,**args):
         """
         Add a connection to dest/port with a delay (default=0).
         """
@@ -337,7 +338,7 @@ class EventProcessor(TopoObject):
 
         self.connections[src_port].append((dest,dest_port,delay))
 
-    def _connect_from(self,src,src_port=None,dest_port=None):
+    def _connect_from(self,src,src_port=None,dest_port=None,**args):
         pass
 
     def start(self):

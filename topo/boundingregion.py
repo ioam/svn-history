@@ -39,8 +39,10 @@ class BoundingBox(BoundingRegion):
     points = a sequence of two points that define an axis-aligned rectangle.
     """
     def __init__(self,**args):
-        super(BoundingBox,self).__init__(**args)        
         self._aarect = AARectangle(*args['points'])
+        if 'points' in args:
+            del args['points']
+        super(BoundingBox,self).__init__(**args)        
 
     def contains(self,x,y):
         left,bottom,right,top = self.aarect().lbrt()

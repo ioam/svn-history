@@ -4,11 +4,11 @@ Generic class for sheets that take input through receptive fields.
 $Id$
 """
 
-from params import Parameter
+from params import *
 from sheet import Sheet
 from kernelfactory import UniformRandomFactory
 from utils import mdot
-from boundingregion import Intersection
+from boundingregion import Intersection,BoundingBox
 import RandomArray,Numeric,copy
 import topo.sheetview
 import topo.boundingregion
@@ -19,20 +19,43 @@ from topo.base import flatten
 ###############################################
 from base import TopoObject
 
+
+class RF(TopoObject):
+    
+    def __init__(self,input_sheet,weights,bounds,**params):
+        from sheet import activation_submatrix
+        super(RF,self).__init__(**params)
+        self.input_sheet = input_sheet
+        self.bounds = bounds
+        self.weights = weights
+        self.verbose("activation matrix shape: ",self.weights.shape)
+
+    def contains(self,x,y):
+        return self.bounds.contains(x,y)
+
+    def get_input_matrix(self, activation):
+        from sheet import activation_submatrix
+        return activation_submatrix(self.bounds,activation,
+                                    self.input_sheet.bounds,
+                                    self.input_sheet.density)
+
 class Projection(TopoObject):
+
+    src = Parameter(default=None)
+    dest = Parameter(default=None)
+    rf_type = Parameter(default=RF)
+    
 
     def __init__(self,**params):
         super(Projection,self).__init__(**params)
-        self.__rfs = params['rfs']
-        self.__src = params['src']
-        self.__dest = params['dest']
+        self.__rfs = None
         self.input_buffer = None
-
-    def src(self): return self.__src
-    def dest(self): return self.__dest
 
     def rf(self,r,c):
         return self.__rfs[r][c]
+
+    def set_rfs(self,rf_list):
+        self.__rfs = rf_list
 
     def get_shape(self):
         return len(self.__rfs),len(self.__rfs[0])
@@ -52,11 +75,11 @@ class Projection(TopoObject):
 
         NOTE: BOUNDS MUST BE PROPERLY SET. CURRENTLY A STUB IS IN EFFECT.
         """
-        (r,c) = (self.dest()).sheet2matrix(sheet_r,sheet_c)
+        (r,c) = (self.dest).sheet2matrix(sheet_r,sheet_c)
         composite_name = self.name + ': ' + str(sheet_r) + ',' + str(sheet_c)
         matrix_data = Numeric.array(self.rf(r,c).weights)
         # print 'matrix_data = ', matrix_data
-        new_box = self.dest().bounds  # TURN INTO A PROPER COPY
+        new_box = self.dest.bounds  # TURN INTO A PROPER COPY
         assert matrix_data != None, "Projection Matrix is None"
         return topo.sheetview.UnitView((matrix_data,new_box),
                                        sheet_r,sheet_c,name=composite_name)
@@ -76,10 +99,10 @@ class Projection(TopoObject):
 
         NOTE: BOUNDS MUST BE PROPERLY SET. CURRENTLY A STUB IS IN EFFECT.
         """
-        (r,c) = (self.dest()).sheet2matrix(sheet_r,sheet_c)
+        (r,c) = (self.dest).sheet2matrix(sheet_r,sheet_c)
         composite_name = self.name + ' Array'
         # print 'matrix_data = ', matrix_data
-        new_box = self.dest().bounds  # WHAT DOES A BBOX MEAN FOR AN ARRAY?
+        new_box = self.dest.bounds  # WHAT DOES A BBOX MEAN FOR AN ARRAY?
         assert matrix_data != None, "Projection Matrix is None"
         for r,row in enumerate(self.__rfs):
             for c,rf in enumerate(row):                    
@@ -120,68 +143,58 @@ class Projection(TopoObject):
             f = open(file_stem+'-RFS.'+file_format,'w')
             im.save(f,file_format)
             f.close()
-            
-            
-class RF(TopoObject):
+
+
+class KernelProjection(Projection):
+
+    weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+    weights_factory = Parameter(default=UniformRandomFactory())
+
+    def __init__(self,**params):
+        super(KernelProjection,self).__init__(**params)
+        
+        # set up array of RFs translated to each x,y in the src sheet
+        rfs = []
+        for y in self.dest.sheet_rows()[::-1]:
+            row = []
+            for x in self.dest.sheet_cols():
+                # Move the kernel factory to the right position,
+                bounds = copy.deepcopy(self.weights_bounds)
+                bounds.translate(x,y)
+                bounds = Intersection(bounds,self.src.bounds)
+                weights = self.weights_factory(x=x,y=y,bounds=bounds,density=self.src.density)
+                row.append(self.rf_type(self.src,weights=weights,bounds=bounds))
+            rfs.append(row)
+        self.set_rfs(rfs)
+
     
-    def __init__(self,input_sheet,weights,bounds,**params):
-        from sheet import activation_submatrix
-        super(RF,self).__init__(**params)
-        self.input_sheet = input_sheet
-        self.bounds = bounds
-        self.weights = weights
-        self.verbose("activation matrix shape: ",self.weights.shape)
-
-    def contains(self,x,y):
-        return self.bounds.contains(x,y)
-
-    def get_input_matrix(self, activation):
-        from sheet import activation_submatrix
-        return activation_submatrix(self.bounds,activation,
-                                    self.input_sheet.bounds,
-                                    self.input_sheet.density)
-
 
 
 class RFSheet(Sheet):
 
-    # rf params
-    rf_type = Parameter(default=RF)
-
     activation_fn = Parameter(default=mdot)
     transfer_fn  = Parameter(default=lambda x:Numeric.array(x))
+    training_delay = NonNegativeInt(default=0)
                              
-    weights_factory = Parameter(default=UniformRandomFactory())
-
     def __init__(self,**params):
         super(RFSheet,self).__init__(**params)
         self.temp_activation = Numeric.array(self.activation)
         self.ports = {}
         self.new_input = False
 
-    def _connect_from(self,src,src_port=None,dest_port=None):
-        Sheet._connect_from(self,src,src_port,dest_port)
-        # set up array of RFs translated to each x,y in the sheet
-        rfs = []
-        old_bounds = self.weights_factory.bounds
-        old_x,old_y = self.weights_factory.x,self.weights_factory.y
-        for y in self.sheet_rows()[::-1]:
-            row = []
-            for x in self.sheet_cols():
-                # Move the kernel factory to the right position,
-                bounds = copy.deepcopy(old_bounds)
-                bounds.translate(x,y)
-                bounds = Intersection(bounds,src.bounds)
-                weights = self.weights_factory(x=x,y=y,bounds=bounds,density=src.density)
-                row.append(self.rf_type(src,weights=weights,bounds=bounds))
-            rfs.append(row)
+    def _connect_from(self,src,src_port=None,dest_port=None,
+                      projection_type=KernelProjection,
+                      projection_params={},
+                      **args):
+        
+        Sheet._connect_from(self,src,src_port,dest_port,**args)
 
         if dest_port not in self.ports:
             self.ports[dest_port] = dict(projections={})
         projections = self.ports[dest_port]['projections']
         if src.name in projections:
             self.warning('Overwriting projection to "%s" on port "%s"' % (src.name,dest_port))
-        projections[src.name] = Projection(src=src, dest=self, rfs=rfs)
+        projections[src.name] = projection_type(src=src, dest=self,**projection_params)
 
     def get_projections(self):
         from operator import add

@@ -68,10 +68,10 @@ class Parameter(object):
   Python:
           http://users.rcn.com/python/download/Descriptor.htm
   """
-  __slots__ = ['name','default']
+  __slots__ = ['name','default','doc']
   count = 0
   
-  def __init__(self,default=None):
+  def __init__(self,default=None,doc="Undocumented parameter."):
     """
     Initialize a new parameter.
 
@@ -79,6 +79,7 @@ class Parameter(object):
     the default value.
     """
     self.name = "_param" + `Parameter.count`
+    self.doc = doc
     Parameter.count += 1
     self.default = default
 
@@ -115,6 +116,11 @@ class Parameter(object):
     raise "Deleting parameters is not allowed."
 
 
+  def _get_doc(self):
+    return self.doc
+  __doc__ = property(_get_doc)
+
+
 class Number(Parameter):
   def __init__(self,default=None,bounds=(None,None)):
     Parameter.__init__(self,default=default)
@@ -135,7 +141,26 @@ class Number(Parameter):
       if not val <= max:
         raise "Parameter must be at most"+`min`+'.'
         
-    super(NumberParam,self).__set__(obj,val)
+    super(Number,self).__set__(obj,val)
+
+class Integer(Number):
+  def __set__(self,obj,val):
+    if not isinstance(val,int):
+      raise "Parameter must be an integer."
+    super(Integer,self).__set__(obj,val)
+
+class NonNegativeInt(Integer):
+  def __init__(self,default=0):
+    Integer.__init__(self,default=default,bounds=(0,None))
+
+class PositiveInt(Integer):
+  def __init__(self,default=1):
+    Integer.__init__(self,default=default,bounds=(1,None))
+                    
+class Magnitude(Number):
+  def __init__(self,default=1):
+    Number.__init__(self,default=default,bounds=(0.0,1.0))
+
 
 class Dynamic(Parameter):
   def __get__(self,obj,objtype):

@@ -7,7 +7,7 @@ uses receptive fields.
 
 from utils import norm
 from params import Parameter
-from Numeric import argmax,sqrt,exp
+from Numeric import argmax,sqrt,exp,floor
 
 from rfsheet import RFSheet
 
@@ -51,10 +51,10 @@ class RFSOM(RFSheet):
 
         radius = self.radius() * sqrt(self.density)
         
-        cmin = max(0,wc-radius)
-        cmax = min(wc+radius,cols)
-        rmin = max(0,wr-radius)
-        rmax = min(wr+radius,rows)
+        cmin = int(max(0,wc-radius))
+        cmax = int(min(wc+radius,cols))
+        rmin = int(max(0,wr-radius))
+        rmax = int(min(wr+radius,rows))
 
         for r in range(rmin,rmax):
             for c in range(cmin,cmax):

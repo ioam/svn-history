@@ -31,9 +31,11 @@ FuzzyLineFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
 # rf som parameters
 RFSOM.density = 2500
-RFSOM.weights_factory = UniformRandomFactory(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 RFSOM.training_length = 10000
 RFSOM.radius_0 = 0.1
+
+# Projection Parameters
+KernelProjection.weights_factory = UniformRandomFactory(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 
 # image saver parameters
 ImageSaver.file_format='png'
