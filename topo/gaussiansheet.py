@@ -59,6 +59,8 @@ if __name__ == '__main__':
     from simulator import Simulator
     from image import ImageSaver
 
+    debug.print_level = debug.VERBOSE
+
     GaussianSheet.density = 10000
     GaussianSheet.period = 10.0
     GaussianSheet.phase = 3.0

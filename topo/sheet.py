@@ -81,10 +81,9 @@ class Sheet(EventProcessor):
 
     Parameters:
 
-    sheet_shape: [default (20.0,20.0)]  A tuple specifying
-                 (width,height) in sheet coordinates.
-    matrix_shape: [default (100,100)]  The shape of the activation
-                 matrix (rows,cols).
+    bounds:   A BoundingBox object indicating the bounds of the sheet.
+              [default  (-0.5,-0.5) to (0.5,0.5)]
+    density:  The areal density of the sheet [default 100]
     
     """
 
@@ -102,7 +101,7 @@ class Sheet(EventProcessor):
         width,height = right-left,top-bottom
         rows = int(height*linear_density)
         cols = int(width*linear_density)
-        self.activation = zeros((rows,cols),'f') 
+        self.activation = zeros((rows,cols)) + 0.0 
 
                 
     def sheet2matrix(self,x,y):
@@ -190,7 +189,7 @@ class Composer(Sheet):
 
         if dest_port == 'trigger_in':
             self.send_output(data=self.activation)
-            self.activation = zeros(self.matrix_shape)
+            self.activation = zeros(self.activation.shape)+0.0
             return
 
         if self.simulator.time != self.timestamp:
@@ -205,11 +204,14 @@ class Composer(Sheet):
         start_row,start_col = self.sheet2matrix(*self.ports[dest_port]['origin'])
         row_adj,col_adj = src.sheet2matrix(0,0)
 
+        self.db_print("origin (row,col) = "+`(start_row,start_col)`,VERBOSE)
+        self.db_print("adjust (row,col) = "+`(row_adj,col_adj)`,VERBOSE)
+
         start_row -= row_adj
         start_col -= col_adj
 
         # the maximum bounds
-        max_row,max_col = self.matrix_shape
+        max_row,max_col = self.activation.shape
 
         self.db_print("max_row = %d, max_col = %d" % (max_row,max_col),VERBOSE)
         self.db_print("in_rows = %d, in_cols = %d" % (in_rows,in_cols),VERBOSE)
@@ -233,7 +235,7 @@ class Composer(Sheet):
         self.db_print("left_clip = %d" % left_clip, VERBOSE)
         self.db_print("right_clip = %d" % right_clip, VERBOSE)
         self.db_print("top_clip = %d" % top_clip, VERBOSE)
-        self.db_print("bottop_clip = %d" % bottom_clip, VERBOSE)
+        self.db_print("bottom_clip = %d" % bottom_clip, VERBOSE)
         self.db_print("activation shape = %s" % NxN(self.activation.shape))
 
         self.activation[start_row:end_row, start_col:end_col] += data[top_clip:in_rows-bottom_clip,

@@ -60,6 +60,7 @@ Simulator.step_mode = step_mode
 
 # There's just one image generator, so we can set it's input as a class param
 ImageGenerator.filename = image_file
+ImageGenerator.density = 10000
 
 # An off-center edge-detector kernel
 Convolver.kernel = array([[0, 1,0],
@@ -72,7 +73,7 @@ ImageSaver.time_format = '%.2f'
 ImageSaver.pixel_scale = 255
 
 #
-Composer.matrix_shape = (250,700)
+Composer.density = 25600
 
 
 #################################################
@@ -89,8 +90,8 @@ output = ImageSaver()
 # Set instance-specific parameters
 on_convolve.kernel = Convolver.kernel * -1.0
 
-combine.port_configure('left', origin = (-5,-5))
-combine.port_configure('right', origin = (5,5))
+combine.port_configure('left', origin = (-0.25,-0.25))
+combine.port_configure('right', origin = (0.25,0.25))
 
 ###############################################
 # Make the simulator
