@@ -1,16 +1,19 @@
-# $Id$
-#
-# Module that extends, but technically doesn't subclass, the
-# imputil.py script which allows changes to the Python 'import'
-# command.  This extension, when loaded and installed with
-# installTYExtensions(), will treat files with the .ty extension as
-# Python source files upon importing, compiling the code to .tyc or
-# .tyo depending on the optimization flag.  If the source .ty files
-# are not available, existing .tyc or .tyo (depending) will still
-# import properly like traditional Python files.  Note: No guarantees
-# about Pythonesque behavior if source and binaries with the same name
-# are scattered in different directories.
-# Original version by Judah on June 30, 2004
+"""
+Module that extends, but technically doesn't subclass, the
+imputil.py script which allows changes to the Python 'import'
+command.  This extension, when loaded and installed with
+installTYExtensions(), will treat files with the .ty extension as
+Python source files upon importing, compiling the code to .tyc or
+.tyo depending on the optimization flag.  If the source .ty files
+are not available, existing .tyc or .tyo (depending) will still
+import properly like traditional Python files.  Note: No guarantees
+about Pythonesque behavior if source and binaries with the same name
+are scattered in different directories.
+
+Original version by Judah on June 30, 2004
+
+$Id$
+"""
 
 import imp
 import struct
@@ -21,11 +24,12 @@ from imputil import _timestamp, _compile, _suffix_char, DynLoadSuffixImporter
 # byte-compiled file suffix
 _ty_suffix = '.ty' + _suffix_char
 
-#####################################################
-### A minor change on the py_suffix_importer from 
-### py_suffix_importer.  Will generate the compiled
-### code.
-#####################################################
+
+"""
+A minor change on the py_suffix_importer from 
+imputil.py.  Will generate the compiled
+code.
+"""
 def ty_suffix_importer(filename, finfo, fqname):
     "Modified py_suffix_importer for .TY"
     file = filename[:-3] + _ty_suffix
@@ -47,13 +51,13 @@ def ty_suffix_importer(filename, finfo, fqname):
     return 0, code, { '__file__' : file }
 
 
-#####################################################
-### Will log the .ty, and .tyc or .tyo (depending)
-### into the import command of Python.  If the .ty
-### files are not found, it will still attempt to
-### load the compiled files directly so the source
-### is not necessary.
-#####################################################
+"""
+Will log the .ty, and .tyc or .tyo (depending)
+into the import command of Python.  If the .ty
+files are not found, it will still attempt to
+load the compiled files directly so the source
+is not necessary.
+"""
 def installTYExtensions():
     "Install new ImportManager that handles .ty, .tyc, .tyo"
     n = ImportManager()
