@@ -23,8 +23,10 @@ from math import pi
 """
 Get Kernel Matrices
 
-Sets up two arrays for the x and y values based on a bounds and density
-"""      
+Sets up two vectors for the x and y values based on a bounds and density.
+The x and y vectors are lists of indexes at which to sample the kernel
+function.
+"""       
 
 def produce_kernel_matrices(bounds, density, x, y):
     bounds  = produce_value(bounds)
