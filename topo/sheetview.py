@@ -12,17 +12,24 @@ $Id$
 """
 import sys
 import types
-from operator import *
+import operator
 
 import Numeric
+import sheet
 from base import TopoObject
 
-
+# Valid operations that a SheetView should support for the list of
+# sheets passed in.  There are other things that would be useful
+# such as masking which will requrire a bit more work.
 ADD      = 'ADD'
 SUBTRACT = 'SUB'
 MULTIPLY = 'MUL'
 DIVIDE   = 'DIV'
-operations = {ADD:'add', SUBTRACT:'sub',MULTIPLY:'mul',DIVIDE:'truediv'}
+# These 'operator' functions require 2 parameters when using 'apply'.
+operations = {ADD : operator.add,
+              SUBTRACT : operator.sub,
+              MULTIPLY : operator.mul,
+              DIVIDE : operator.truediv}
 
 
 class SheetView(TopoObject):
@@ -51,11 +58,11 @@ class SheetView(TopoObject):
                     Another SheetView may be passed in to create nested plots.
 	        (matrix_data, bounding_box)
                     Static matrix data complete with bounding box.
-	        (sheet_name, sheet_view_name)
+	        (Sheet, sheet_view_name)
                     This gets sheet_name.sheet_view(sheet_view_name) each time
                     the current SheetView has its data requested by .view().
 
-        3.  (sheet_name, sheet_view_name)
+        3.  (Sheet, sheet_view_name)
                 Degenerate case that will pull data from another SheetView
                 and not do any additional processing.  Don't yet know a
                 use for this case, but documented for future possible use.
@@ -68,7 +75,7 @@ class SheetView(TopoObject):
             self.operation = ADD          
             self._view_list = [(term_1, term_2)]
         else:
-            self.operation = term_1
+            self.operation = operations[term_1]
             self._view_list = term_2
             if not isinstance(self._view_list,types.ListType):
                 self._view_list = [self._view_list]
@@ -77,7 +84,7 @@ class SheetView(TopoObject):
     def view(self):
         """
         Return the requested view as a matrix.  If the constructor was
-        given a composite, the view must be built before being
+        given a multiple maps, the view must be built before being
         returned, this may lock in new views of data from the
         specified sheets.
 
@@ -88,13 +95,16 @@ class SheetView(TopoObject):
         sheets must be requested for the data.
         """
         maps = []
-        for (term_1, term_2) in self._view_list:
-            if isinstance(term_1,Sheet):
-                maps.add(term_1.sheet_view(term_2))
+        print self._view_list
+        for tup in self._view_list:
+            print tup
+            (term_1, term_2) = tup
+            if isinstance(term_1,sheet.Sheet):
+                maps.append(term_1.sheet_view(term_2))
             elif isinstance(term_1,SheetView):
-                maps.add(term_1.view())         # Don't care about term_2
+                maps.append(term_1.view())         # Don't care about term_2
             else:
-                maps.add((term_1, term2))       # Assume it is a matrix
+                maps.append((term_1, term_2))       # Assume it is a matrix
 
         # Convert the list of (matrix, bbox) tuples into a single
         # matrix and another bounding box.
@@ -109,10 +119,19 @@ class SheetView(TopoObject):
 
         THIS MUST BE EXPANDED IN THE FUTURE TO MAKE PROPER USE OF THE
         BOUNDING BOX INFORMATION, CURRENT (8/04) IMPLEMENTATION
-        OPERATES THE MAPS TOGETHER RATHER BLINDLY.
+        PASSES THE FIRST MAP IN THE LIST AS THE BOUNDING BOX FOR THE
+        CONSTRUCTED VIEW.
+
+        WOULD HAVE DONE AN ADD/INTERSECTION/UNION, BUT BOUNDINGREGION
+        DOES NOT YET SUPPORT SUCH OPERATIONS.
         """
-        result = reduce(self.operation,maps)
-        return (result, maps[0][1])
+        # result = reduce(self.operation,maps)
+        # return (result, maps[0][1])
+        result = maps.pop(0)
+        for m in maps:
+            # Needs to be changed
+            result = (apply(self.operation, (result[0], m[0])), result[1]) 
+        return result
 
 
 class UnitView(SheetView):
