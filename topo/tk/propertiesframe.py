@@ -1,9 +1,7 @@
 """
-Support class file for gui.py.  Extends a Frame object from Tkinter.
-The code was originally taken verbatim from LISSOM 5.0.
+Class file for a properties page.
 
-CURRENT STATUS: Code generally unused.  Will be used and extended once
-the Gui starts expanding.
+CURRENT STATUS: Taken verbatim from LISSOM 5.0; not yet used.  
 
 $Id$
 """
@@ -13,6 +11,9 @@ from taggedslider import *
 import Pmw
 
 class PropertiesFrame(Frame):
+    """
+    GUI window for displaying and manipulating the properties of an object.
+    """
     def __init__(self, parent=None, padding=2,**config):
         self.properties = {}
         self.padding = padding

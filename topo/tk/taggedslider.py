@@ -1,9 +1,7 @@
 """
-Support class file for gui.py.  Extends a Frame object from Tkinter.
-The code was originally taken verbatim from LISSOM 5.0.
+Class file for a TaggedSlider widget.
 
-CURRENT STATUS: Code generally unused.  Will be used and extended once
-the Gui starts expanding.
+CURRENT STATUS: Taken verbatim from LISSOM 5.0; not yet used.  
 
 $Id$
 """
@@ -11,6 +9,16 @@ from Tkinter import *
 import string
 
 class TaggedSlider(Frame):
+    """
+    Widget for manipulating a numeric value using either a slider or a
+    text-entry box, keeping the two values in sync.
+
+    The expressions typed into the text-entry box are evaluated using
+    the given string_translator, which can be overridden with a custom
+    expression evaluator (e.g. to do a Python eval() in the namespace
+    of a particular object.)
+
+    """
 
     def __init__(self,root,
                  tagvariable=None,

@@ -1,10 +1,5 @@
 """
-TopoConsole class file.  Subclass of Tkinter's Frame.  Primary window
-for the Tk based GUI.  Loads, saves, calls other window frames in
-plotframe.py.  Keeps tabs on the active Simulation, and which
-PlotEngine is driving it.  If the active simulation is switched, then
-the PlotEngine is changed, but the old PlotEngine is stored and
-reactivated if the old Simulator is reactivated as well.
+TopoConsole class file.
 
 $Id$
 """
@@ -21,6 +16,15 @@ KNOWN_FILETYPES = [('Python Files','*.py'),('Topographica Files','*.ty'),('All F
 
 
 class TopoConsole(Frame):
+    """
+    TopoConsole class file.
+    
+    Primary window for the Tk-based GUI.  Loads, saves, calls other window
+    frames in plotframe.py.  Keeps tabs on the active Simulation, and
+    which PlotEngine is driving it.  If the active simulation is switched,
+    then the PlotEngine is changed, but the old PlotEngine is stored and
+    reactivated if the old Simulator is reactivated as well.
+    """
     def __init__(self, parent=None,**config):
         Frame.__init__(self,parent,config)
 

@@ -1,8 +1,5 @@
 """
-Primary entry point for the Topographica GUI.  Based strongly off of
-code taken verbatim from LISSOM 5.0.
-
-To start the gui from the Topographica prompt, call gui.start().
+GUI windows to display bitmap plots. 
 
 $Id$
 """
@@ -14,6 +11,11 @@ import topo.plotengine
 
 
 class PlotPanel(Frame):
+    """
+    Base class for GUI windows displaying bitmap images.  Subclassed to
+    display various categories of bitmaps.
+    """
+
 
     def __init__(self,parent=None,console=None,**config):
 
