@@ -40,8 +40,6 @@ class InputSheet(Sheet):
         self.send_output(data=self.activation)
         self.message("Sending %s output." % NxN(self.activation.shape))
 
-# TODO: these should all be mix-ins
-
 class GaussianSheet(InputSheet, GaussianKernelFactory):
     pass        
 
@@ -49,35 +47,40 @@ class GaussianSheet(InputSheet, GaussianKernelFactory):
 #class UniformRandomSheet(InputSheet, UniformRandomSheet):
 #    pass
 
-#class SineGratingSheet(InputSheet, SineGratingSheet):
-#    pass
+class SineGratingSheet(InputSheet, SineGratingKernelFactory):
+    pass
+
+class GaborSheet(InputSheet, GaborKernelFactory):
+    pass
+
 
 if __name__ == '__main__':
     from simulator import Simulator
     from image import ImageSaver
 
-    def random_gaussian(mean, std):
-        while( 1 ):
-            yield random.gauss(mean, std)
-
-    def random_uniform(lower, upper):
-        while( 1 ):        
-            yield random.uniform(lower, upper)
+    # BUG?: these give errors now:
 
     #GaussianSheet.density = 81 
-    GaussianSheet.density = 10000
-    GaussianSheet.period = 10.0
-    GaussianSheet.phase = 3.0
+    #GaussianSheet.density = 10000
+    #GaussianSheet.period = 10.0
+    #GaussianSheet.phase = 3.0
 
-    GaussianSheet.x = random_gaussian(0,0.5)
-    GaussianSheet.y = random_uniform(-0.5,0.5)
-    GaussianSheet.theta = random_uniform(-3.1415926,3.1415926)
-    GaussianSheet.width = random_uniform(0,1)
-    GaussianSheet.height = random_uniform(0,1)
+    #GaussianSheet.x = lambda:random.gauss(0,0.5)
+    #GaussianSheet.y = lambda:random.uniform(-0.5,0.5)
+    #GaussianSheet.theta  = lambda:random.uniform(-3.1415926,3.1415926)
+    #GaussianSheet.width  = lambda:random.uniform(0,1)
+    #GaussianSheet.height = lambda:random.uniform(0,1)
 
 
     s = Simulator()
-    g = GaussianSheet()
+    g = GaussianSheet(density=10000, 
+                      period=10.0, 
+                      phase=3.0,
+                      x = lambda:random.gauss(0,0.5),
+                      y = lambda:random.gauss(0,0.5),
+                      theta  = lambda:random.uniform(-3.1415926, 3.1415926),
+                      width  = lambda:random.uniform(0,1),
+                      height = lambda:random.uniform(0,1))
     save = ImageSaver()
 
     s.connect(src=g,dest=save)

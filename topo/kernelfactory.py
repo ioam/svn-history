@@ -47,25 +47,6 @@ def uniform_random(kernel_x, kernel_y, width, height, theta):
     # passed through this interface
     return random(2,2)
 
-def sine_grating(kernel_x, kernel_y, width, height, theta):
-    new_kernel_x = subtract.outer(cos(theta)*kernel_x, sin(theta)*kernel_y)
-    new_kernel_y = add.outer(sin(theta)*kernel_x, cos(theta)*kernel_y)
-
-    # HACK: just for testing the sine_grating function, width and height are
-    # meaningless in this context
-    new_kernel = width*sin(height*new_kernel_x)
-
-    return new_kernel
-
-
-def gabor(kernel_x, kernel_y, width, height, theta):
-    new_kernel_x = subtract.outer(cos(theta)*kernel_x, sin(theta)*kernel_y)
-    new_kernel_y = add.outer(sin(theta)*kernel_x, cos(theta)*kernel_y)
-
-    kernel = exp( -(new_kernel_x/width)**2 - (new_kernel_y/height)**2 ) * cos( 2*pi*new_kernel_x )
-
-    return kernel
-
 def rectangle(kernel_x, kernel_y, width, height, theta):
     # need to specify the bounds somehow 
     return kernel_x
@@ -76,7 +57,9 @@ def fuzzy_line(kernel_x, kernel_y, width, height, theta):
 def fuzzy_disc(kernel_x, kernel_y, width, height, theta):
     return kernel_x
 
-# Abstract base class for the different kinds of kernels
+"""
+Abstract base class for the different kinds of kernels
+"""
 
 class KernelFactory:
 
@@ -107,7 +90,10 @@ class KernelFactory:
                           self.linear_density);
   
         return self.function(self.kernel_x, self.kernel_y)
-      
+
+"""
+Gaussian Kernel Factory
+"""      
 
 class GaussianKernelFactory(KernelFactory):
     width = Parameter(default=0.5) 
@@ -135,9 +121,53 @@ class GaussianKernelFactory(KernelFactory):
 
         return exp(maximum(-100,new_kernel))
 
+"""
+Sine Grating Kernel Factory
+"""
 
+
+class SineGratingKernelFactory(KernelFactory):
+    amplitude = Parameter(default=0.5) 
+    period    = Parameter(default=0.5)
+    theta     = Parameter(default=0.0)
+ 
+    def function(self, kernel_x, kernel_y):
+
+        amplitude = produce_value(self.amplitude)
+        period    = produce_value(self.period)
+        theta     = produce_value(self.theta) 
+
+        new_kernel_x = subtract.outer(cos(theta)*kernel_x, sin(theta)*kernel_y)
+        new_kernel_y = add.outer(sin(theta)*kernel_x, cos(theta)*kernel_y)
+
+        # HACK: just for testing the sine_grating function, width and height are
+        # meaningless in this context
+        new_kernel = amplitude*sin(period*new_kernel_x)
+
+        return new_kernel
+
+"""
+Gabor Kernel Factory
+"""
+
+class GaborKernelFactory(KernelFactory):
+    width  = Parameter(default=0.5) 
+    height = Parameter(default=0.5)
+    theta  = Parameter(default=0.0)
+ 
+    def function(self, kernel_x, kernel_y):
+        
+        theta  = produce_value(self.theta)
+        width  = produce_value(self.width)
+        height = produce_value(self.height) 
+
+        new_kernel_x = subtract.outer(cos(theta)*kernel_x, sin(theta)*kernel_y)
+        new_kernel_y = add.outer(sin(theta)*kernel_x, cos(theta)*kernel_y)
+
+        return exp( -(new_kernel_x/width)**2 - (new_kernel_y/height)**2 ) * cos( 2*pi*new_kernel_x )
 
 
 if __name__ == '__main__':
 
-    l = KernelFactory(bounds=BoundingBox(points=((0,0), (10,10)), density=1))
+    print "No tests"
+    #l = KernelFactory(bounds=BoundingBox(points=((0,0), (10,10)), density=1))
