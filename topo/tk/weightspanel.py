@@ -38,7 +38,7 @@ class WeightsPanel(RegionPlotPanel):
         Message(params_frame,text="X:",aspect=1000).pack(side=LEFT)
         Entry(params_frame,textvariable=self.x_str).pack(side=LEFT,expand=YES,fill=X)
         Message(params_frame,text="Y:",aspect=1000).pack(side=LEFT)
-        Entry(params_frame,textvariable=self.y_str).pack(side=LEFT,expand=YES,fill=X)
+        Entry(params_frame,textvariable=self.y_str).pack(side=LEFT,expand=YES,fill=X,padx=5)
 
 
     def generate_plot_key(self):
@@ -55,7 +55,16 @@ class WeightsPanel(RegionPlotPanel):
         if isinstance(self.x,int): self.x = float(self.x)
         if isinstance(self.y,int): self.y = float(self.y)
         self.plot_key = ('Weights',self.x,self.y)
-        
+
+
+    def display_labels(self):
+        """
+        Change the title of the grid group, then call PlotPanel's
+        display_labels().
+        """
+        self.plot_group.configure(tag_text = 'Projection Plot')
+        super(WeightsPanel,self).display_labels()
+    
         
     def refresh_title(self):
         self.parent.title("Unit Weights %d. (x=%0.4f, y=%0.4f)" %
