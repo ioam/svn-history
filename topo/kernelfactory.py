@@ -65,8 +65,8 @@ class KernelFactory(base.TopoObject):
 
         rows,cols = bounds2shape(self.bounds,self.density)
         
-        x = self.x
-        y = self.y
+        x = produce_value(self.x)
+        y = produce_value(self.y)
 
 
         self.kernel_x = arange(left-x,right-x, self.bound_width/cols)
