@@ -45,6 +45,39 @@ from colorsys import rgb_to_hsv, hsv_to_rgb
 import Numeric, Image, math
 
 
+def matrix_rgb_to_hsv(hMapArray,sMapArray,vMapArray):
+    """
+    First matrix sets the Hue (Color).
+    Second marix sets the Sauration (How much color)
+    Third matrix sets the Value (How bright the pixel will be)
+
+    The three input matrices should all be the same size, and have
+    been normalized to 1.
+    """
+    shape = hMapArray.shape
+    hFlat = hMapArray.flat
+    sFlat = sMapArray.flat
+    vFlat = vMapArray.flat
+
+    if max(hFlat) > 1 or max(sFlat) > 1 or max(vFlat) > 1:
+        print 'Warning: HSVMap inputs not normalized to 1. Dividing by 255'
+        print max(hFlat), max(sFlat), max(vFlat)
+        hFlat = hFlat / 255.0
+        sFlat = sFlat / 255.0
+        vFlat = vFlat / 255.0
+
+    # List comprehensions were not used because it was slower.
+    for i in range(len(hFlat)):
+        (hFlat[i], sFlat[i], vFlat[i]) = hsv_to_rgb(hFlat[i],sFlat[i],vFlat[i])
+    hMapArray = Numeric.reshape(hFlat,shape)
+    sMapArray = Numeric.reshape(sFlat,shape)
+    vMapArray = Numeric.reshape(vFlat,shape)
+    return (hMapArray, sMapArray, vMapArray)
+    
+
+    
+
+
 class Bitmap(object):
     """
     Wrapper class for the PIL Image class.  Only slightly hides PILs extra
@@ -183,38 +216,5 @@ class RGBMap(Bitmap):
 
 
 
-if __name__ == '__main__':
-    print 'Test Module'
-    miata = Image.open('miata.jpg')
-    miata = miata.resize((miata.size[0]/2,miata.size[1]/2))
-    rIm, gIm, bIm = miata.split()
-    rseq, gseq, bseq = rIm.getdata(), gIm.getdata(), bIm.getdata()
-    rar,gar,bar = Numeric.array(rseq),Numeric.array(gseq),Numeric.array(bseq)
-    ra = Numeric.reshape(rar,miata.size) / 255.0
-    ga = Numeric.reshape(gar,miata.size) / 255.0
-    ba = Numeric.reshape(bar,miata.size) / 255.0
-
-    # Test RGBMap
-    rgb = RGBMap(ra,ga,ba)
-    rgb.show()
-
-    # Test ColorMap
-    p = [j and i for i in range(256) for j in (1,0,0)]
-    cmap = ColorMap(ra,p)
-    cmap.show()
-
-    # Test HSVMap
-    a = [j for i in range(256) for j in range(256)]
-    b = [i for i in range(256) for j in range(256)]
-    c = [max(i,j) for i in range(256) for j in range(256)]
-    a = Numeric.reshape(a,(256,256)) / 255.0
-    b = Numeric.reshape(b,(256,256)) / 255.0
-    c = Numeric.reshape(c,(256,256)) / 255.0
-    hsv = HSVMap(a,b,c)
-    hsv.show()
-    #cmap = ColorMap(c)
-    #cmap.show()
-
-    # Test BWMap
-    bwmap = BWMap(ra)
-    bwmap.show()
+#  All testing code has been moved to the unit testing module found at
+#  topographica/tests/testbitmap.py
