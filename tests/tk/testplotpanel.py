@@ -100,8 +100,15 @@ class TestPlotPanel(unittest.TestCase):
         console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
         console.set_active_simulator(self.s)
         console.new_activity_window()
-        console.mainloop()
+        # console.mainloop()
 
+
+    def test_weightspanel(self):
+        """
+        Here, we're not interested in the Activation plots, but we are
+        interested in the weights of the receptive fields.
+        """
+        pass
 
 
 
