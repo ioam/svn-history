@@ -10,6 +10,7 @@ import testdummy
 import testsheet
 import testbitmap
 import testplot
+import testsimulator
 
 suite = unittest.TestSuite()
 
