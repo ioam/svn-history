@@ -2,50 +2,70 @@
 Construct PlotGroups, Plots, and the occasional SheetView, and give it to
 the GUI to display or save at it wants.
 
-This class is the connector to Simulation
+This class is the connection between Simulation and the Plot generation
+routines.
 
 $Id$
 """
 from base import TopoObject
-from plot import Plot
-from plot import PlotGroup
+from plot import *
+from sheet import Sheet
+
+
+def sheet_filter(sheet):
+    """
+    Example sheet filter that can be used to limit which sheets are
+    displayed through _make_sheetview_group.  Default filter used
+    by the built-in get_plot_group(..) when there is no plot of the
+    correct key name in the PlotGroup dictionary.
+
+    SHOULD BE EXPANDED OR REPLACED FOR MORE (ANY?) DEFAULT FUNCTIONALITY
+    """
+    if sheet == sheet:
+        return True
+    else:
+        return False
+
 
 class PlotEngine(TopoObject):
     """
     Stores the main list of plots available to the simulation.  There are
-    some default plot types such as Activity.
+    some default plot types such as 'Activation'.  Use this interface when
+    generating plots.
     """
 
     def __init__(self, simulation, **params):
         """
         Create a new plot engine that is linked to a particular
         simulation.  The link is necessary since the PlotEngine will
-        poll all the event processors in the simulation to request
-        Plots from the Sheet objects.  This allows new Plot objects to
-        automatically appear on previously defined figures.
+        poll all the event processors in the simulation to dynamically
+        request Plots from the Sheet objects.  This allows new Plot
+        objects to automatically appear in previously defined
+        PlotGroups.
 
         Example calling style:
             s = Simulation(step=1)
             new_plot_engine = PlotEngine(s)
-        QUESTION: PUT A REFERENCE TO PLOT ENGINE WITHIN SIMULATION?
         """
         super(PlotEngine,self).__init__(**params)
-        self.simulation = simulation_name
+        self.simulation = simulation
         self.plot_group_dict = {}
 
 
     def _sheets(self):
         """
-        Get the list of sheets from the event processor list on the
-        local Simulation.
+        Get the list of sheets from the event processor list attached
+        to the local Simulation.
         """
-        return self.simulation.get_event_processors()
+        sheet_list = [each for each in self.simulation.get_event_processors()
+                      if isinstance(each,Sheet)]
+        return sheet_list
 
 
     def add_plot_group(self, name, group):
         """
         Add a constructed PlotGroup to the local dictionary for later
-        reuse.
+        reuse.  User defined plots should be stored here for later use.
         """
         self.plot_group_dict[name] = group
 
@@ -53,22 +73,44 @@ class PlotEngine(TopoObject):
     def get_plot_group(self, name):
         """
         Return the PlotGroup registered in self.plot_group_dict with
-        the provided 'name'.  If the name does not exist, then generate
-        a PlotGroup using the generic dynamic group creator.
+        the provided key 'name'.  If the name does not exist, then
+        generate a PlotGroup using the generic dynamic group creator.
+        This default construction allows for certain types of plots to
+        be defined automatically, such as 'Activation'.
 
         GENERATED PLOTGROUPS WILL POLL ALL SHEETS; NO PARAMETER BASED
-        DEFAULT SHEET GROUPS ARE CURRENTLY IMPLEMENTED BUT IT WOULD BE THE
-        BEST SOLUTION.
+        DEFAULT SHEET GROUPS OR FILTERS ARE CURRENTLY IMPLEMENTED BUT
+        IT WOULD BE THE BEST SOLUTION.
         """
-        self.plot_group_dict.setdefault(name,self._get_sheet_view_plot_group(name,self._sheets()))
-        
+        if self.plot_group_dict.has_key(name):
+            self.debug(name, "key match in PlotEngine's PlotGroup list")
+            requested_plot = self.plot_group_dict[name]
+        else:
+            self.debug(name, "key match failure in PlotEngine's PlotGroup list")
+            # Rather than fail, check for SheetViews of the name.
+            # Current filter is sheet_filter(..).
+            requested_plot = self.make_sheetview_group(name,sheet_filter)
+        return requested_plot
 
-    def _get_sheet_view_plot_group(self, name, filter_lam):
+
+    def make_sheetview_group(self, name, filter_lam=None):
         """
-        Default method of creating a plot such as Activity.  Creates
-        a new PlotGroup with a lambda function to poll the latest
-        and greatest SheetView with 'name' from each sheet in 'sheets',
-        using the filter_lambda to choose on inclusion of the sheet.
+        
+        Default method of creating a dynamic plot such as
+        'Activation'.  Makes a new PlotGroup containing a lambda
+        function that will poll the latest and greatest list of
+        SheetViews with 'name' from each Sheet in the simulation.  It
+        uses the filter_lambda to decide if it should include the
+        sheet in the Group.  If passed in, filter_lambda must take a
+        Sheet, and return True or False.
+
         """
-        None
+        if filter_lam is None:
+            filter_lam = lambda sheet: True            
+        dynamic_list = lambda : [Plot((name,None,None),COLORMAP,each)
+                               for each in self._sheets() if filter_lam(each)]
+        new_group = PlotGroup(dynamic_list)
+
+        self.debug('Type of new_group is', type(new_group))
+        return new_group
 
