@@ -1,7 +1,12 @@
-#!/usr/bin/env python
-#
-# $Id$
-#
+"""
+Support class file for gui.py.  Extends a Frame object from Tkinter.
+The code was originally taken verbatim from LISSOM 5.0.
+
+CURRENT STATUS: Code generally unused.  Will be used and extended once
+the Gui starts expanding.
+
+$Id$
+"""
 
 from Tkinter import *
 from taggedslider import *
@@ -73,26 +78,27 @@ class PropertiesFrame(Frame):
 
 
 
-if __name__ == '__main__':
-    root = Tk()
-    root.title('Properties Frame Test')
-    pp = PropertiesFrame(root,padding=0)
-    pp.pack(expand=YES,fill=X)
-    
-    pp.add_text_property('Name', 'Jefferson Provost')
-    pp.add_text_property('Addr', '1601 Faro Dr. #1504')
-    pp.add_checkbutton_property('Student', 1)
-
-    for i in range(5):
-        pp.add_text_property('Prop'+`i`, `i`)
-
-    pp.add_tagged_slider_property("Volume",value='5',
-                                  string_format='%d',
-                                  min_value='0',max_value='11')
-
-    pp.add_combobox_property("File",value='xxx',
-                             scrolledlist_items=('AAA','BBB','CCC'))
-    
-    values = pp.get_values()
-    print 'values = ' + `values`
-    pp.set_values(values)
+#  This code moved to topographica/tests/testpropertiesframe.py
+#  if __name__ == '__main__':
+#      root = Tk()
+#      root.title('Properties Frame Test')
+#      pp = PropertiesFrame(root,padding=0)
+#      pp.pack(expand=YES,fill=X)
+#      
+#      pp.add_text_property('Name', 'Jefferson Provost')
+#      pp.add_text_property('Addr', '1601 Faro Dr. #1504')
+#      pp.add_checkbutton_property('Student', 1)
+#  
+#      for i in range(5):
+#          pp.add_text_property('Prop'+`i`, `i`)
+#  
+#      pp.add_tagged_slider_property("Volume",value='5',
+#                                    string_format='%d',
+#                                    min_value='0',max_value='11')
+#  
+#      pp.add_combobox_property("File",value='xxx',
+#                               scrolledlist_items=('AAA','BBB','CCC'))
+#      
+#      values = pp.get_values()
+#      print 'values = ' + `values`
+#      pp.set_values(values)

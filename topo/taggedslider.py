@@ -1,3 +1,12 @@
+"""
+Support class file for gui.py.  Extends a Frame object from Tkinter.
+The code was originally taken verbatim from LISSOM 5.0.
+
+CURRENT STATUS: Code generally unused.  Will be used and extended once
+the Gui starts expanding.
+
+$Id$
+"""
 from Tkinter import *
 import string
 
@@ -86,20 +95,27 @@ class TaggedSlider(Frame):
         new_val = 10000 * (val - self.min_value)/range
         self.slider_val.set(int(new_val))
         
-    
-if __name__ == '__main__':
 
-    import Lissom
-    
-    root = Tk()
-    slider_val = StringVar()
-    slider_val.set('PI')
-    slider = TaggedSlider(root,tagvariable=slider_val,
-                          max_value='PI*2',                          
-                          string_translator=Lissom.eval_expr,
-                          string_format='%.3f')
-    slider.pack(side=TOP,expand=YES,fill=X)
-    #root.mainloop()
-        
+
+#  This test code no longer works because there are no longer any
+#  SWIG files named Lissom to attach to.  The new method of
+#  interfacing will be calling a specific Python function, or
+#  set of functions.  This needs to be expanded once the time
+#  comes.
+
+#  if __name__ == '__main__':
+#  
+#      import Lissom
+#      
+#      root = Tk()
+#      slider_val = StringVar()
+#      slider_val.set('PI')
+#      slider = TaggedSlider(root,tagvariable=slider_val,
+#                            max_value='PI*2',                          
+#                            string_translator=Lissom.eval_expr,
+#                            string_format='%.3f')
+#      slider.pack(side=TOP,expand=YES,fill=X)
+#      #root.mainloop()
+#          
         
                  
