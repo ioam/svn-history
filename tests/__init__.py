@@ -14,6 +14,7 @@ import testhistogram
 import testplot
 import testplotengine
 import testsimulator
+import testpalette
 
 suite = unittest.TestSuite()
 
