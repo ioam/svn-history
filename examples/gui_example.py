@@ -59,7 +59,7 @@ s.connect(retina,V1,delay=1)
 #s.connect(V1,save,dest_port='V1',delay=1)
 topo.gui.link_to_sim(s)
 
-s.run(200)
+s.run(2)
 
 #V1.projections['Retina'][0].plot_rfs()
 
