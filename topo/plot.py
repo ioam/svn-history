@@ -77,9 +77,27 @@ class Plot(TopoObject):
         self.matrices = []         # Will hold 3 2D matrices.
 
 
-    def shape():
+    def shape(self):
         """ Return the shape of the first matrix in the Plot """
         return self.matrices[0].shape
+
+
+    def release_sheetviews(self):
+        """
+        Delete any Sheet.sheet_view_dict entries used by this plot, under
+        the assumption that this Plot is the only object that references
+        the SheetView on the Sheet with that dictionary key.
+        """
+        for each in self.channels:
+            # Case 2 is the only time a Sheet holds a SheetView that needs
+            # to be deleted.
+            if isinstance(each,str) or isinstance(each,tuple):
+                if self.source is None:
+                    self.warning('Plot Channel-type requires a Sheet, but None Sheet passed to Plot() object.')
+                    self.warning('channels = ' + str(self.channels) + ' type(self.source) = ' + str(type(self.source)))
+                else:
+                    self.source.delete_sheet_view(each)
+
 
     def plot(self):
         """
@@ -218,6 +236,7 @@ class PlotGroup(TopoObject):
         """
         super(PlotGroup,self).__init__(**params)
         self.plot_list = plot_list
+        self.all_plots = []
         self.added_list = []
         self.shape = shape
         self.debug('Input type, ', type(self.plot_list))
@@ -236,6 +255,16 @@ class PlotGroup(TopoObject):
             self.added_list.append(new_plot)
 
 
+    def release_sheetviews(self):
+        """
+        Call release_sheetviews() on all Plots in plot list, to free
+        up Sheet.sheet_view_dict entries and save memory.  Note, not
+        all plots use SheetViews stored in a Sheet dictionary.
+        """
+        for each in self.all_plots:
+            each.release_sheetviews()
+
+
     def plots(self):
         """
         Get the matrix data from each of the Plot objects, do any needed
@@ -246,17 +275,17 @@ class PlotGroup(TopoObject):
         bitmap_list = []
         if isinstance(self.plot_list,types.ListType):
             self.debug('Static plotgroup')
-            all_plots = flatten(self.plot_list) + self.added_list
+            self.all_plots = flatten(self.plot_list) + self.added_list
         else:       # Assume it's a callable object that returns a list.
             self.debug('Dynamic plotgroup')
-            all_plots = flatten(self.plot_list()) + self.added_list
-            self.debug('all_plots = ' + str(all_plots))
+            self.all_plots = flatten(self.plot_list()) + self.added_list
+            self.debug('all_plots = ' + str(self.all_plots))
 
         # Eventually a simple list comprehension is not going to be
         # sufficient as outlining and other things will need to be
         # done to each of the matrices that come in from the Plot
         # objects.
-        bitmap_list = [each.plot() for each in all_plots]
+        bitmap_list = [each.plot() for each in self.all_plots]
 
         return bitmap_list
 

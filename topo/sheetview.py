@@ -155,51 +155,56 @@ class UnitView(SheetView):
         self.y = y
 
 
-class UnitViewArray(SheetView):
-    """
-    Subclass of SheetView, but creates multiple UnitViews and tiles
-    together a composite matrix.
-    """
-
-    def __init__(self, term_tuple, show_units=None, **params):
-        """
-        Adds a show_units value, so that the final map will have
-        <show_units> by <show_units> evently spaced units across the
-        sheet in question.  If show_units is not passed a value, or is
-        assigned to None, then every unit in the sheet will be
-        plotted.
-        """
-        super(UnitViewArray,self).__init__(term_tuple, **params)
-        self.show_units = show_units
-
-        (mat,bbox) = self.view()
-        if show_units == None:
-            self.show_units = min(mat.shape[0],mat.shape[1])
-            if mat.shape[0] != mat.shape[1]:
-                self.warning('View matrix is not square in SheetViewArray')
-        self.coords = self.generate_coords(self.show_units,bbox)
-
-
-    def generate_coords(self, num_points, bbox):
-        """
-        Evenly space out the units within the sheet bounding box, so
-        that it doesn't matter which corner the measurements start
-        from.  A 4 unit grid needs 5 segments.
-        """
-        aarect = bbox.aarect()
-        (l,b,r,t) = aarect.lbrt()
-        x = float(r - l)
-        y = float(b - t)
-        x_step = x / (num_points + 1)
-        y_step = y / (num_points + 1)
-        l = l + x_step
-        t = t + y_step
-        coords = []
-        for j in range(num_points):
-            y_list = []
-            for i in range(num_points):
-                y_list.append((x_step*j + l, y_step*i + t))
-            coords.append(y_list)
-        return coords
-            
+# UnitView Arrays have been turned into a collection of UnitViews that
+# only the GUI has the wherewithal to piece together onto the screen.
+# That said, an ordered list of UnitViews is all that's necessary for
+# storage of a UnitViewArray.
+#
+# class UnitViewArray(SheetView):
+#     """
+#     Subclass of SheetView, but creates multiple UnitViews and tiles
+#     together a composite matrix.
+#     """
+# 
+#     def __init__(self, term_tuple, show_units=None, **params):
+#         """
+#         Adds a show_units value, so that the final map will have
+#         <show_units> by <show_units> evently spaced units across the
+#         sheet in question.  If show_units is not passed a value, or is
+#         assigned to None, then every unit in the sheet will be
+#         plotted.
+#         """
+#         super(UnitViewArray,self).__init__(term_tuple, **params)
+#         self.show_units = show_units
+# 
+#         (mat,bbox) = self.view()
+#         if show_units == None:
+#             self.show_units = min(mat.shape[0],mat.shape[1])
+#             if mat.shape[0] != mat.shape[1]:
+#                 self.warning('View matrix is not square in SheetViewArray')
+#         self.coords = self.generate_coords(self.show_units,bbox)
+# 
+# 
+#     def generate_coords(self, num_points, bbox):
+#         """
+#         Evenly space out the units within the sheet bounding box, so
+#         that it doesn't matter which corner the measurements start
+#         from.  A 4 unit grid needs 5 segments.
+#         """
+#         aarect = bbox.aarect()
+#         (l,b,r,t) = aarect.lbrt()
+#         x = float(r - l)
+#         y = float(b - t)
+#         x_step = x / (num_points + 1)
+#         y_step = y / (num_points + 1)
+#         l = l + x_step
+#         t = t + y_step
+#         coords = []
+#         for j in range(num_points):
+#             y_list = []
+#             for i in range(num_points):
+#                 y_list.append((x_step*j + l, y_step*i + t))
+#             coords.append(y_list)
+#         return coords
+#             
 

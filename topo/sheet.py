@@ -232,7 +232,11 @@ class Sheet(EventProcessor):
         Delete the dictionary entry with key entry 'view_name' to save
         memory.
         """
-        del self.sheet_view_dict[view_name]
+        if view_name == 'Activation':
+            pass
+        elif self.sheet_view_dict.has_key(view_name):        
+            del self.sheet_view_dict[view_name]
+            
                 
     def sheet2matrix(self,x,y):
         """
