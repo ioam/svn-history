@@ -184,40 +184,43 @@ dislinpy: dislin
 	cd ${DISLIN_PYTHON_DIR}; tar xzf ${DISLIN_PYTHON_SRC}
 	cd ${DISLIN_PYTHON_DIR}; ${DISLINPY_BUILD}
 	cd ${DISLIN_PYTHON_DIR}; ${DISLINPY_LINK}
+	touch dislinpy
 
 dislinpy-clean:
 	cd ${DISLIN_PYTHON_DIR}; rm -f make_py README.PY dislin.h dislinmodule.{h,c,o}
 
 dislinpy-uninstall: dislinpy-clean
-	rm -f ${DISLIN_PYTHON_DIR}/dislinmodule.so
+	rm -f dislinpy ${DISLIN_PYTHON_DIR}/dislinmodule.so
 
 
 ##############################################################
-# Startup Script sh version.  No longer used.
+# Startup Script sh version.  
 #
-startscript_old: dislin python
+startscript: python
 	echo "#!/bin/sh" > ${PREFIX}topographica
 	echo 'export DISLIN="${PREFIX}${DISLIN_UNINSTALL}"' >> ${PREFIX}topographica
 	echo 'export PYTHONPATH="$$PYTHONPATH:${PREFIX}${DISLIN_UNINSTALL}/python"' >> ${PREFIX}topographica
 	echo 'export LD_LIBRARY_PATH="${PREFIX}lib:${PREFIX}${DISLIN_UNINSTALL}:$$LD_LIBRARY_PATH"' >> ${PREFIX}topographica
-	echo -e "/usr/bin/env ${PWD}/bin/python topographica-script.py \044\100" >> ${PREFIX}topographica
+	echo -e "/usr/bin/env ${PREFIX}/bin/python topographica-script.py \044\100" >> ${PREFIX}topographica
 	chmod a+x ${PREFIX}topographica
-
+	touch startscript
 
 
 ##############################################################
-# Startup Script Python Version
+# Startup Script Python Version -- Not working
+# It sets all the environment variables and even calls exec
+# but it can't find Dislin afterwards.  Don't know what's wrong.
 #
-startscript: dislin python
+startscript_new: dislin python
 	echo '#!/usr/bin/env ${PREFIX}bin/python'                     > ${PREFIX}topographica
 	echo 'import os,sys'                                         >> ${PREFIX}topographica
-	echo 'os.putenv("DISLIN","${PREFIX}${DISLIN_UNINSTALL}")'    >> ${PREFIX}topographica
-	echo 'sys.path.append("${PREFIX}${DISLIN_UNINSTALL}/python")'>> ${PREFIX}topographica
+	echo 'os.environ["DISLIN"]="${PREFIX}${DISLIN_UNINSTALL}"'    >> ${PREFIX}topographica
+	echo 'os.environ["PATH"] = os.environ["PATH"] + ":${PREFIX}${DISLIN_UNINSTALL}/python"'>> ${PREFIX}topographica
 	echo 'old_LD = os.getenv("LD_LIBRARY_PATH","")'	             >> ${PREFIX}topographica
-	echo 'os.putenv("LD_LIBRARY_PATH",old_LD+":${PREFIX}lib:${PREFIX}${DISLIN_UNINSTALL}")' >> ${PREFIX}topographica
+	echo 'os.environ["LD_LIBRARY_PATH"]=old_LD+":${PREFIX}lib:${PREFIX}${DISLIN_UNINSTALL}"' >> ${PREFIX}topographica
 	echo 'sys.argv[0]="${PREFIX}topographica-script.py"'         >>  ${PREFIX}topographica
 	echo 'sys.argv.insert(0,"${PREFIX}bin/python")'              >>  ${PREFIX}topographica
-	echo 'os.execv(sys.argv[0],sys.argv)'               	     >>  ${PREFIX}topographica
+	echo 'os.execvpe(sys.argv[0],sys.argv,os.environ)'               	     >>  ${PREFIX}topographica
 	chmod a+x ${PREFIX}topographica
 
 #############################################################################
