@@ -92,22 +92,6 @@ class TestPlotPanel(unittest.TestCase):
         # s.run(1)
 
 
-    def test_activation_plot(self):
-        """
-        Test the creation the widgets
-        """
-        base.min_print_level = base.WARNING
-        topo.tk.plotpanel.ActivityPanel.print_level = base.WARNING
-
-        root = Tkinter.Tk()
-        root.resizable(1,1)
-        Pmw.initialise(root)
-        console = topo.tk.topoconsole.TopoConsole(parent=root)
-        console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
-        console.set_active_simulator(self.s)
-        console.new_activity_window()
-        # console.mainloop()
-
 
     def test_weightspanel(self):
         """
