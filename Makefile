@@ -31,8 +31,8 @@ topographica_old: ext-packages
 
 topographica: ext-packages
 	echo "#!${PREFIX}/bin/python" > topographica
-	echo "#  wrapper.py test wrapper for setting environment" >> topographica
-	echo "import os,sys" >> topographica
+	echo "#  Wrapper for setting environment vars and execing commands" >> topographica
+	echo "import os,sys,topographica_script" >> topographica
 	echo "" >> topographica
 	echo "TOPO = '${PREFIX}'" >> topographica
 	echo "DISLIN = os.path.join(TOPO,'lib/dislin')" >> topographica
@@ -44,9 +44,9 @@ topographica: ext-packages
 	echo "" >> topographica
 	echo "" >> topographica
 	echo "# exec" >> topographica
-	echo "os.execv(os.path.join(TOPO,'bin/python')," >> topographica
-	echo "         [os.path.join(TOPO,'topographica')," >> topographica
-	echo "          os.path.join(TOPO,'topographica-script.py') ]+ sys.argv[1:])" >> topographica
+	echo "cmd = os.path.join(TOPO,'bin/python')" >> topographica
+	echo "args = topographica_script.generate_params(sys.argv[1:])" >> topographica
+	echo "os.execv(cmd,[cmd] + args)" >> topographica
 
 	chmod a+x ${PREFIX}topographica
 
