@@ -4,6 +4,7 @@ from topo import plot
 from topo.sheet import *
 from topo.bitmap import RGBMap
 from topo.image import ImageGenerator
+import Numeric
 from Numeric import divide
 
 SHOW_PLOTS = False
@@ -30,6 +31,21 @@ class TestPlot(unittest.TestCase):
         map = RGBMap(r,g,b)
         if SHOW_PLOTS: map.show()
 
+
+    def test_plotgroup_release(self):
+        self.s = Sheet()
+        self.s.activity = Numeric.array([[1,2],[3,4]])
+        # Call s.sheet_view(..) with a parameter
+        sv2 = self.s.sheet_view('Activation')
+        self.s.add_sheet_view('key',sv2)
+        self.assertEqual(len(self.s.sheet_view_dict.keys()),1)
+        y = plot.Plot(('key',None,None),plot.HSV,self.s)
+        z = plot.Plot(('key',None,None),plot.HSV,self.s)
+        self.pg1 = plot.PlotGroup([y,z])
+        tuples = self.pg1.plots()
+        self.pg1.release_sheetviews()
+        self.assertEqual(len(self.s.sheet_view_dict.keys()),0)
+        
 
 
     def test_plotgroup(self):

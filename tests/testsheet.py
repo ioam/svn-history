@@ -8,6 +8,7 @@ import unittest
 import topo
 from topo.sheet import *
 import topo.base
+import Numeric
 from topo import boundingregion
 
 
@@ -66,6 +67,18 @@ class TestCoordinateTransforms(unittest.TestCase):
 
         s.add_sheet_view('Orientation',sview)
         sview = s.sheet_view('Orientation')
+
+    def test_sheetview_release(self):
+        self.s = Sheet()
+        self.s.activity = Numeric.array([[1,2],[3,4]])
+        # Call s.sheet_view(..) with a parameter
+        sv2 = self.s.sheet_view('Activation')
+        self.assertEqual(len(self.s.sheet_view_dict.keys()),0)
+        self.s.add_sheet_view('key',sv2)
+        self.assertEqual(len(self.s.sheet_view_dict.keys()),1)
+        self.s.delete_sheet_view('key')
+        self.assertEqual(len(self.s.sheet_view_dict.keys()),0)
+
 
 
 
