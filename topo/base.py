@@ -60,7 +60,6 @@ $Id$
 import sys
 from params import *
 from pprint import pprint
-from utils import flatten
 
 SILENT  = 0
 WARNING = 50
@@ -264,21 +263,4 @@ def print_all_param_defaults():
         c.print_param_defaults()
     print "==========================================="
 
-
-if __name__ == '__main__':
-
-    from pprint import pprint
-    class A(TopoObject):
-        a = Parameter('A Param')
-    class B1(A):
-        b1 = Parameter('B1 Param')
-    class B2(A):
-        b2 = Parameter('B2 Param')
-    class C(B1,B2):
-        c = Parameter('C Param')
-
-    pprint(classlist(C))
-    
-    ob = C(a=1,b1=2,b2=3,c=4)
-    
     

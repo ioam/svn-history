@@ -16,7 +16,8 @@ import types
 
 from Numeric import zeros, ones
 
-from base import TopoObject, flatten
+from base import TopoObject
+from utils import flatten
 from sheetview import *
 from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
 from histogram import Histogram

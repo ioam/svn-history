@@ -26,7 +26,7 @@ import RandomArray,Numeric,copy
 import topo.sheetview
 import topo.boundingregion
 import topo.bitmap
-from topo.base import flatten
+from topo.utils import flatten
 
 
 ###############################################
