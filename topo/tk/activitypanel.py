@@ -31,6 +31,13 @@ class ActivityPanel(PlotPanel):
         version, depending on the type of PlotGroup being requested.
         """ 
         self.pe_group = self.pe.get_plot_group(self.plot_key)
-        self.plot_tuples = self.pe_group.plots()
+        (self.plot_tuples, self.plot_names) = self.pe_group.plots()
 
+
+    def display_labels(self):
+        """
+        Change the grid group label, then call PlotPanel's display_labels()
+        """
+        self.plot_group.configure(tag_text = 'Activation')
+        super(ActivityPanel,self).display_labels()
 
