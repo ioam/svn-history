@@ -32,7 +32,7 @@ import palette
 
 # GUI files
 #import topo.tk
-#import gui
+import gui
 
 # Documentation
 import gendocs
