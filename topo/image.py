@@ -41,7 +41,7 @@ class ImageGenerator(Sheet):
 
         super(ImageGenerator,self).__init__(**config)
 
-        self.message("filename = " + self.filename)
+        self.verbose("filename = " + self.filename)
 
         image = Image.open(self.filename)
         image = ImageOps.grayscale(image)
