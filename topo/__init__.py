@@ -27,6 +27,7 @@ import sheetview
 import plot
 import plotengine
 import histogram
+import palette
 
 # set import all the important stuff directly into the package
 # namespace.
