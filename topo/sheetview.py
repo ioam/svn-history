@@ -146,13 +146,14 @@ class UnitView(SheetView):
     any valid key.
     """
 
-    def __init__(self, term_tuple, x, y, **params):
+    def __init__(self, term_tuple, x, y, projection, **params):
         """
         Subclass of SheetView.  Contains additional x,y member data.
         """
         super(UnitView,self).__init__(term_tuple, **params)
         self.x = x
         self.y = y
+        self.projection = projection
 
 
 # UnitView Arrays have been turned into a collection of UnitViews that
