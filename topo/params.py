@@ -143,9 +143,9 @@ def produce_value(value_obj):
   iterator, call its .next(), otherwise return the object
   """
   if callable(value_obj):
-      return value()
+      return value_obj()
   if is_iterator(value_obj):
-      return value.next()
+      return value_obj.next()
   return value_obj
 
 

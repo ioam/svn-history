@@ -13,6 +13,7 @@ from boundingregion import BoundingBox
 from sheet import sheet2matrix, matrix2sheet
 
 from Numeric import *
+from params import * 
 from pprint import pprint,pformat
 
 from math import pi
@@ -41,24 +42,6 @@ Function for constructing a gassian pattern out of a properly set up Numeric
 matrix
 """
 
-def gaussian(kernel_x, kernel_y, width, height, theta):
-
-    # TODO: this can generate ouput that may be off by one in terms of size,
-    # for example most times this generates a 100x100 image, but sometimes
-    # it generates a 101x100 of something like that.
-
-    # TODO: This uses 5 numeric arrays. We can probably simplify this. It is
-    # faster than the previous implementation though.
-
-
-    new_kernel_x = subtract.outer(cos(theta)*kernel_x, sin(theta)*kernel_y)
-    new_kernel_y = add.outer(sin(theta)*kernel_x, cos(theta)*kernel_y)
-
-    new_kernel = -(new_kernel_x / width)**2 + -(new_kernel_y / height)**2
-
-    return exp(maximum(-100,new_kernel))
-
-
 def uniform_random(kernel_x, kernel_y, width, height, theta):
     # not finished, needs some more information about the kernel size that isn't
     # passed through this interface
@@ -84,6 +67,7 @@ def gabor(kernel_x, kernel_y, width, height, theta):
     return kernel
 
 def rectangle(kernel_x, kernel_y, width, height, theta):
+    # need to specify the bounds somehow 
     return kernel_x
 
 def fuzzy_line(kernel_x, kernel_y, width, height, theta):
@@ -92,50 +76,65 @@ def fuzzy_line(kernel_x, kernel_y, width, height, theta):
 def fuzzy_disc(kernel_x, kernel_y, width, height, theta):
     return kernel_x
 
+# Abstract base class for the different kinds of kernels
 
 class KernelFactory:
 
     #kernel = array([[1.0]])
 
-    bounds = BoundingBox( points=((0,0), (1,1)) )
-    density  = 1.0
+    bounds   = Parameter(default=BoundingBox( points=((0,0), (1,1)) ))
+    density  = Parameter(default=1.0)
 
     # setup some default parameters. keep in mind that these are effectively
     # meaningless
-    x = 0.5 
-    y = 0.5
-    width = 0.5 
-    height = 0.5
-    theta = 0.0
+    x = Parameter(default=0.5) 
+    y = Parameter(default=0.5)
    
-    # the default, we can set this by passing a new value to the init 
-    function = gaussian
 
-    def __init__(self,**config):
-        #self.kernel = zeros((1,1), Float)
-
-        # TODO: This is all embedded in matrix2sheet...
+    def create(self):
         self.bound_width  = self.bounds.aarect().right()-self.bounds.aarect().left()
         self.bound_height = self.bounds.aarect().top()-self.bounds.aarect().bottom()
         self.linear_density = sqrt(self.density)
 
-    def create(self):
         x = produce( self.x )
         y = produce( self.y )
-        theta = produce( self.theta )
-        width = produce( self.width )
-        height = produce( self.height )
 
-        kernel_x = arange(self.bounds.aarect().left()-x,
+        self.kernel_x = arange(self.bounds.aarect().left()-x,
                           self.bounds.aarect().right()-x, self.bound_width /
                           self.linear_density);
-        kernel_y = arange(self.bounds.aarect().bottom()-y,
+        self.kernel_y = arange(self.bounds.aarect().bottom()-y,
                           self.bounds.aarect().top()-y, self.bound_height /
                           self.linear_density);
-        
-        return self.function(kernel_x, kernel_y, width, height, theta)
+  
+        return self.function(self.kernel_x, self.kernel_y)
+      
 
-#class GaussianKernelFactory(KernelFactory):
+class GaussianKernelFactory(KernelFactory):
+    width = Parameter(default=0.5) 
+    height = Parameter(default=0.5)
+    theta = Parameter(default=0.0)
+ 
+    def function(self, kernel_x, kernel_y):
+
+        theta  = produce_value(self.theta)
+        width  = produce_value(self.width)
+        height = produce_value(self.height) 
+
+        # TODO: this can generate ouput that may be off by one in terms of size,
+        # for example most times this generates a 100x100 image, but sometimes
+        # it generates a 101x100 of something like that.
+
+        # TODO: This uses 5 numeric arrays. We can probably simplify this. It is
+        # faster than the previous implementation though.
+
+
+        new_kernel_x = subtract.outer(cos(theta)*kernel_x, sin(theta)*kernel_y)
+        new_kernel_y = add.outer(sin(theta)*kernel_x, cos(theta)*kernel_y)
+
+        new_kernel = -(new_kernel_x / width)**2 + -(new_kernel_y / height)**2
+
+        return exp(maximum(-100,new_kernel))
+
 
 
 

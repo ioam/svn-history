@@ -16,21 +16,10 @@ from params import Parameter
 
 class InputSheet(Sheet):
 
-    period = 1
-    phase = 0
+    period = Parameter(default=1)
+    phase = Parameter(default=0)
 
-    x = (random.uniform,-1,1)
-
-    def __init__(self,**config):
-        Sheet.__init__(self,**config)
-
-        self.kernel =  KernelFactory(bounds=self.bounds,
-                                     density=self.density,
-                                     x=self.x,
-                                     y=self.y,
-                                     theta=self.theta,
-                                     width=self.width,
-                                     height=self.height)
+    x = Parameter(default=0)
 
     def start(self):
         assert self.simulator
@@ -46,31 +35,22 @@ class InputSheet(Sheet):
 
         self.verbose("Generating a new kernel...")
 
-        self.activation = self.kernel.create( )
+        self.activation = self.create( )
   
         self.send_output(data=self.activation)
         self.message("Sending %s output." % NxN(self.activation.shape))
 
 # TODO: these should all be mix-ins
 
-class GaussianSheet(InputSheet):
-
-    def __init__(self, **config):
-        InputSheet.__init__(self,**config)
-        self.kernel.function = gaussian
+class GaussianSheet(InputSheet, GaussianKernelFactory):
+    pass        
 
 
-class UniformRandomSheet(InputSheet):
+#class UniformRandomSheet(InputSheet, UniformRandomSheet):
+#    pass
 
-    def __init__(self, **config):
-        InputSheet.__init__(self,**config)
-        self.kernel.function = uniform_random
-
-class SineGratingSheet(InputSheet):
-
-    def __init__(self, **config):
-        InputSheet.__init__(self,**config)
-        self.kernel.function = sine_grating
+#class SineGratingSheet(InputSheet, SineGratingSheet):
+#    pass
 
 if __name__ == '__main__':
     from simulator import Simulator
