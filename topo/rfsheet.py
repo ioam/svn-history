@@ -1,5 +1,18 @@
 """
-Generic class for sheets that take input through receptive fields.
+Superclass for sheets that take input through receptive fields.
+
+This module defines three basic classes of objects used to create
+simulations of cortical sheets that take input through receptive
+fields projected onto other cortical sheets, or laterally onto
+themselves.  These classes are:
+
+RFSheet: a subclass of topo.sheet.Sheet.
+
+Projection: an class to handle one projection of receptive fields from
+one sheet into an RFSheet.
+
+RF: a class for specifying a single receptive field within a
+projection.
 
 $Id$
 """

@@ -1,28 +1,32 @@
 """
-A prototype event-based simulator module.
+The topographica simulator module.  
+
+The Simulator object is the central object of a Topographica
+simulation.  It handles the simulation clock and maintains
+communication between the components of the simulation.
 
 A simulation is structured as directed graph of event-processing nodes
-called EventProcessors.  EventProcessors generate data-carrying
+called EventProcessors (EPs).  EventProcessors generate data-carrying
 events, which are routed through the graph to other EventProcessors
 via delayed connections.
 
-The simulator is modular: EventProcessors can be any kind of object
-that supports the (still evolving) interface for accepting and
-processing events, but in practice should inherit from class
-EventProcessor.  EventProcessors are responsible for managing their
-own connections.
+The simulator is modular: EventProcessors should inherit from the root
+EventProcessor class.  This class manages the EP's connections to
+other EPs, as well as the mechanics of sending events to other EPs
+(through the simulator).  The EventProcessor class defines the basic
+EP programming interface.
 
-Formally, an event is a tuple: (time,src,dest,port,data), where
+Formally, an simulation event is a tuple: (time,src,dest,port,data), where
 
-  time = The time at which the event should be delivered, an arbitrary
-         floating point value.
-  src  = The EventProcessor from which the event originated.
-  dest = Destination EventProcessor of the event
-  port = The destination port of the event.  Ports are arbitrary
-         'addresses' within an EventProcessor.  In principle, they can be any
-         kind of Python value, but in practice they are likely to be
-         strings, or None.
-  data = The event data to be delivered.  Can be anything.
+  time      = The time at which the event should be delivered, an arbitrary
+              floating point value.
+  src       = The EventProcessor from which the event originated.
+  src_port  = The output port from which the event originated
+              in the source EP. (see PORTS, below)
+  dest      = Destination EventProcessor of the event
+  dest_port = The input port to which the event is destined in dest.
+              (see PORTS) below.
+  data      = The event data to be delivered.  Can be anything.
 
 
 A simulation begins by giving each EventProcessor an opportunity to
@@ -30,6 +34,88 @@ send any initial events.  It then proceeds by processing and
 delivering events in time order.  After all events for the current
 time are processed, simulation time skips to the time of earliest
 event remaining in the queue.
+
+PORTS
+
+All connections between EPs are tagged with a source port and a
+destination port.  Ports are internal addresses that EPs can use to
+distinguish between inputs and outputs.  A port specifier can be any
+hashable Python object.  If not specified, the input and output ports
+for a connection default to None.
+
+Output ports distinguish different types of output that an EP may
+produce. When sending output, the EP must call self.send_output()
+separately for each port.  Input ports distinguish different types of
+input an EP may receive and process.  The EP is free to interpret the
+input port designation on an incoming event in any way it chooses.
+
+An example of input port use might be an EP that receives neural
+'ordinary' neural activity on the default port, and receives a
+separate modulatory signal that influences learning.  The originator
+of the modulatory signal might have a connection to the EP with
+dest_port = 'modulation'.
+
+An example of output port use might be an EP that sends different
+events to itself than it sends out to other EPs.  In this case the
+self connections might have src_port = 'recurrent'.
+
+
+=========================
+
+Jeff's implementation notes:
+
+* SimpleSimulator *
+
+This module actually contains two simulator classes.  The original
+Simulator, and a subclass SimpleSimulator.  Simulator uses the
+sched.scheduler class from the Python std library to handle event
+scheduling.  Because sched.scheduler is a black box, I wrote
+SimpleScheduler in order to be able to debug event scheduling issues,
+SimpleScheduler stores its events in a linear-time priority queue (i.e
+a sorted list.)
+
+The Simulator class is more mature, and should be better able to
+handle exceptions raised while running without corrupting the event
+queue.  The black-box nature of the scheduler, however, means that I
+had to do some fancy footwork with exceptions in order to get
+.pre_sleep() to behave correctly.  SimpleSimulator, on the other hand,
+may not (currently) guarantee that raised exceptions won't corrupt the
+event queue, but its implementation is much simpler and clearer and
+its performance is easier to inspect and debug.  It may be worth
+making SimpleSimulator the default (i.e. renaming it as Simulator and
+making it the superclass rather than the subclass).  For efficiency,
+e.g. for spiking neuron simulations, we'll probably need to replace
+the linear priority queue with a more efficient one.  I have an O(log
+N) minheap implementation in python somewhere.  It might even be in
+the CVS repository as a dead file.
+
+Note also that even though Simulator may guarantee that the event
+queue isn't corrupted by a raise exception, there is no guarantee that
+the internal state of the EP that raised the exception is sane, so
+it's not clear if the exception-save aspect if sched.simulator is of
+particular value.
+
+
+* Connection classes *
+
+Currently, connections in the simulation's directed graph are not
+first-class objects in the system.  Rather, they are implemented as
+(dest,dest_port,delay) tuples stored in dictionaries indexed by
+src_port inside each individual EP (i.e. within each graph node).
+With the advent of Projection classes for RFSheets (see rfsheet.py),
+it is worth considering whether to replace these tuples with an
+explicit Connection class, of which Projection would be a subclass.
+This class would encapsulate all data that parameterizes the
+connection.  This would simplify data structures somewhat, since
+Projection classes must also keep track of things like src and dest.
+It might also make future parallelization efforts easier, since each
+Connection object could conceivably maintain its own event queue, and
+since connections may naturally delimit independent and parallelizable
+computations within a simulation.  (This last point should be
+considered with care, since it is certainly not universally true,
+different connections will of course interact with one another within
+an EP.  The question of how much depends on the nature of the
+simulation.)
 
 $Id$
 """
@@ -110,13 +196,24 @@ class Simulator(TopoObject):
         try:
             keep_running = True
             while keep_running:
+                # By default we should stop running if there's an exception
                 keep_running = False
                 try:
                     self.__scheduler.run()
                 except SLEEP_EXCEPTION:
+
+                    # SLEEP_EXCEPTION is raised when an EP's
+                    # .pre_sleep() method enqueued an event to occur
+                    # during the time when the scheduler was supposed
+                    # to be asleep.  By raising an exception we are
+                    # able to stop the scheduler before it sleeps and
+                    # restart it to process the newly scheduled event(s).
+                    
                     self.debug("SLEEP EXCEPTION")
                     self.__sleep_window_violation = False
                     self.__sleep_window = 0
+                    # since the exception was a SLEEP_EXCEPTION
+                    # we want to keep running.
                     keep_running = True
         except STOP:
             self.message("Simulation stopped at time %f" % self.time())
@@ -261,35 +358,65 @@ class SimpleSimulator(Simulator):
         super(SimpleSimulator,self).__init__(**args)
         self._Simulator__scheduler = None
         self.events = []
-
-    def run(self,duration=inf,until=inf):
         self._Simulator__time = 0.0
-        for e in self._Simulator__event_processors:
-            e.start()
+        
+    def run(self,duration=inf,until=inf):
+        if self._Simulator__time = 0.0:
+            # if the time is 0.0 start all the EPs
+            # FIXME: this is probably not right, .run(until=0) will
+            # cause EPs to be started more than once.
+            for e in self._Simulator__event_processors:
+                e.start()
         self.continue_(duration,until)
         
     def continue_(self,duration=inf,until=inf):
 
         stop_time = min(self.time()+duration,until)
         while self.events and self.time() < stop_time:
+
+            # Loop while there are events and it's not time to stop.
+            
             if self.events[0].time < self.time():
+
+                # if the first event's time is less than the current time
+                # then the event is stale so print a warning and
+                # discard it.                
+
                 self.warning('Discarding stale event from',(src,src_port),
                              'to',(dest,dest_port),
                              'for time',etime,
                              '. current time =',self.time())
                 self.events.pop(0)
             elif self.events[0].time > self.time():
+
+                # If the first event's time is greater than the
+                # current time then it's time to sleep (i.e. increment
+                # the clock) before doing that, give everyone a
+                # pre_sleep() call.
+
                 self.debug("Time to sleep. current time =",self.time(),"next event time =",self.events[0].time)
                 for ep in self._Simulator__event_processors:
                     self.debug("Doing pre_sleep for",e)
                     ep.pre_sleep()
-                # so set the time to the frontmost event.
+                    
+                # set the time to the frontmost event (Note: the front
+                # event may have been changed by the .pre_sleep() calls.
+
                 self._Simulator__time = self.events[0].time
             else:
+
+                # If it's not too late, and it's not too early, then
+                # it's just right, so pop the event and dispatch it to
+                # its destination.
+
                 e = self.events.pop(0)
                 e.dest.input_event(e.src,e.src_port,e.dest_port,e.data)
 
     def sleep(self,delay):
+
+        # We don't need the sleep call in this class because the
+        # continue_ loop updates the clock directly.
+
         self.warning("sleep not supported in class",self.__class__.__name__)
 
     def enqueue_event_abs(self,time,src,dest,src_port=None,dest_port=None,data=None):
@@ -322,16 +449,31 @@ class SimpleSimulator(Simulator):
 class EventProcessor(TopoObject):
     """
     Base class for EventProcessors.  Handles basic mechanics of connections and
-    sending events.
+    sending events.  Also handles the EP's dictionary of output ports
+    and outgoing connections.
     """
     def __init__(self,**config):
         super(EventProcessor,self).__init__(**config)
+
+        # Connections are maintained within each EP.  The connection db
+        # is a dictionary indexed by output port.  Each output port
+        # refers to a list of connections represented as tuples:
+        # (dest,dest_port,delay) where:
+        #
+        #  dest      = destination EP
+        #  dest_port = destination port in the EP
+        #  delay     = connection propagation delay in simulator time units.
+        
         self.connections = {None:[]}
         
 
     def _connect_to(self,dest,src_port=None,dest_port=None,delay=0,**args):
         """
         Add a connection to dest/port with a delay (default=0).
+        Should only be called from Simulator.connect(). The extra
+        keyword arguments in **args contain arbitrary connection
+        parameters that can be interpreted by EP subclasses as
+        needed.  
         """
         if not src_port in self.connections:
             self.connections[src_port] = []
@@ -339,6 +481,13 @@ class EventProcessor(TopoObject):
         self.connections[src_port].append((dest,dest_port,delay))
 
     def _connect_from(self,src,src_port=None,dest_port=None,**args):
+        """
+        Add a connection from src/port with a delay (default=0).
+        Should only be called from Simulator.connect().  The extra
+        keyword arguments in **args contain arbitrary connection
+        parameters that can be interpreted by EP subclasses as
+        needed.  
+        """
         pass
 
     def start(self):
