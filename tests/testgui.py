@@ -14,8 +14,11 @@ from PIL import Image
 from topo.sheetview import *
 from topo.plotengine import *
 from topo.bitmap import *
+import topo.tk.topoconsole 
 
 class TestGui(unittest.TestCase):
+
+    requires_display = True
 
     def setUp(self):
         """
@@ -96,11 +99,11 @@ class TestGui(unittest.TestCase):
         root = Tk()
         root.resizable(0,0)
         Pmw.initialise(root)
-        console = TopoConsole(parent=root).pack(expand=YES,fill=BOTH)
-        root.title("Topographica Console.  Active Simulator = " + (active_simulator()).name)
+        console = topo.tk.topoconsole.TopoConsole(parent=root)
+        console.pack(expand=YES,fill=BOTH)
 
 
-    def test_Gui(self):
+    def test_gui_plotengine(self):
         plot_group = self.pe.get_plot_group('Activation')
         plot_list = plot_group.plots()
         self.pe.debug('Type of plot_group', type(plot_group))
@@ -123,5 +126,6 @@ class TestGui(unittest.TestCase):
         #root.mainloop()
 
 suite = unittest.TestSuite()
+suite.requires_display = True
 suite.addTest(unittest.makeSuite(TestGui))
-#    print 'testgui not added to test suite: $DISPLAY not found'
+
