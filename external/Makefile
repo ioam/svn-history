@@ -1,7 +1,7 @@
 PREFIX = ${dir ${CURDIR}}
 
 
-all: python pil numeric
+all: python pil numeric pmw
 
 clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean
 
