@@ -54,7 +54,14 @@ class TestSheetView(unittest.TestCase):
         # map.show()
 
 
+    def test_generate_coords(self):
+        sv = UnitViewArray((self.s.activity, self.s.bounds))
+        print sv.generate_coords(1,self.s.bounds)
+        
+
+
     def test_sum_maps(self):
+        """Stub"""
         self.assertEqual(1+1,2)
 
 
