@@ -1,0 +1,95 @@
+		 CODING CONVENTIONS FOR TOPOGRAPHICA
+
+$Id$
+
+This file specifies conventions to be used for code and documentation
+for the Topographica simulator.  By default, all code is assumed to be
+written in Python; special notes may be added for other languages such
+as C++ as needed.
+
+
+PYTHON CODING CONVENTIONS
+
+By default, the project uses the standard set of Python coding
+conventions written by Guido van Rossum, Python's author:
+
+  http://www.python.org/doc/essays/styleguide.html
+
+These need not be followed to the letter; they simply help resolve
+differences between Topographica authors if there are disagreements.
+
+One particular guideline of these that Jim does not always follow is
+that he likes to use lines much longer than 80 characters, e.g. for a
+string.  Other differences are listed elsewhere in this file, such as
+in the REVISION INFO section.
+
+
+REVISION INFO
+
+Every readable file (i.e. text, source code, html, etc.) should
+include an "Id" tag so that the CVS revision information will be
+visible immediately, even in files outside of the CVS repository.
+
+For text files, the Id tag should be placed near the top, surrounded
+by dollar signs, on a line by itself.  Near the bottom is also
+acceptable, but not preferred.  See the top of this file for an
+example; CVS fills in all but the letters Id and the dollar signs.
+
+For Python files, the Id tag should be placed at the end of the Python
+doc string for that module, surrounded by dollar signs, on a line by
+itself.  In addition, just after the doc string, the version number of
+the file should be declared:
+
+  """
+  The module documentation...
+
+  {dollar}Id{dollar}
+  """
+  __version__ = "{dollar}Revision: 1.6 {dollar}"
+
+where {dollar} should be replaced with a dollar sign ($).
+
+
+TEST SUITE
+
+Every Python module should have a corresponding unit test in tests/.
+The tests should be nearly exhaustive, in the sense that it should be
+unlikely that a good-faith re-implementation of the module would pass
+the tests but have significant bugs. Obviously, truly exhaustive tests
+capable of detecting arbitrary (e.g. deliberate) errors would be
+impractical.
+
+The default set of unit tests that are run must complete very quickly,
+with no extraneous output, no GUI windows popping up, etc., because
+these tests are (and should be) run automatically many times each day
+during active development.  Additional more expensive tests, GUI
+tests, or those requiring user input or user examination of the output
+are also encouraged, but all these must be kept separate from the main
+automated regression tests.
+
+
+NUMERICAL UNITS IN THE USER INTERFACE
+
+All quantities visible to the user, such as GUI labels, parameters,
+etc. must be in appropriate units that are independent of simulation
+or implementation details.  For instance, all coordinates and
+subregions of sheets must be in Sheet coordinates, not e.g. exposing
+the row and column in the underlying matrix.  Similarly, unit
+specifiers should be in Sheet coordinates, selecting the nearest
+appropriate unit, not row and column.
+
+Appropriate units for most parameters can be determined by considering
+the continuous plane underlying the discrete units forming the model
+sheet, and the continuous logical timeline behind the discrete
+timesteps in the model. Some parameters should be expressed in terms
+of lengths in that plane, some in terms of areas, and some in terms of
+volumes, rather than numbers of units, etc.  Others are expressed in
+terms of lengths of time, rather than number of time steps.  More
+information is available in Bednar et al, Neuroinformatics, 2004.
+There is usually only one correct answer for how to specify a
+particular parameter, so please discuss it with all, or at least with
+Jim, before picking a unit arbitrarily.
+
+
+
+
