@@ -7,17 +7,25 @@ To start the gui from the Topographica prompt, call gui.start().
 $Id$
 """
 from Tkinter import *
-import Pmw, re, os
+import Pmw, re, os, sys
 import tkFileDialog
-from propertiesframe import *
+if __name__ == '__main__':
+    from topo.propertiesframe import *
+    import topo.simulator as simulator
+else:
+    from propertiesframe import *
+    import simulator
 
 MIN_PLOT_WIDTH = 100
 KNOWN_FILETYPES = [('Python Files','*.py'),('Topographica Files','*.ty'),('All Files','*')]
+COMMAND_NAMESPACE = 'topo.simulator'
+
 
 class TopoConsole(Frame):
     def __init__(self, parent=None,**config):
         Frame.__init__(self,parent,config)
 
+# Delete soon
 #        self._init_lissom()
 
         self.parent = parent
@@ -25,18 +33,15 @@ class TopoConsole(Frame):
         self.num_orientation_windows = 0
         self.num_weights_windows = 0
         self.num_weights_array_windows = 0
-        self.loaded_script = None
 
+        self.loaded_script = None
+        self.input_params_window = None
         self.auto_refresh_panels = []
 
-        self.input_params_window = None
-        
         self._init_widgets()
 
 
     def _init_widgets(self):
-
-
 	# Create the Balloon.
 	self.balloon = Pmw.Balloon(self)
 
@@ -47,6 +52,9 @@ class TopoConsole(Frame):
                                    balloon = self.balloon)
 	self.menubar.pack(fill = X)
 
+        #
+        # Simulation Menu
+        #
         self.menubar.addmenu('Simulation','Simulation commands')
         self.menubar.addmenuitem('Simulation', 'command', 'Load script file',
                                  label = 'Load',
@@ -56,26 +64,26 @@ class TopoConsole(Frame):
                                  command = self.reload_network)
         self.menubar.addmenuitem('Simulation', 'command', 'Reset the network',
                                  label = 'Reset',
-                                 ## Gray out menu item
-                                 foreground = 'Gray',
-                                 activeforeground = 'Gray',
-                                 activebackground = 'Light Gray',
-                                 ## 
+                                 ## Gray out menu item ###########
+                                 foreground = 'Gray',            #
+                                 activeforeground = 'Gray',      #
+                                 activebackground = 'Light Gray',#
+                                 #################################
                                  command = self.reset_network)
         self.menubar.addmenuitem('Simulation', 'command', 'Present a test pattern',
                                  label = 'Test Pattern',
-                                 ## Gray out menu item
-                                 foreground = 'Gray',
-                                 activeforeground = 'Gray',
-                                 activebackground = 'Light Gray',
-                                 ##
+                                 ## Gray out menu item ###########
+                                 foreground = 'Gray',            #
+                                 activeforeground = 'Gray',      #
+                                 activebackground = 'Light Gray',#
+                                 #################################
                                  command = self.open_plot_params_window)
         self.menubar.addmenuitem('Simulation', 'separator')
         self.menubar.addmenuitem('Simulation', 'command', 'Close the GUI window',
                                  label = 'Quit',
                                  command = self.quit)
 
-	# Create and pack the MessageBar.
+	# Create and pack the MessageBar.  (Shows "Status:")
 	self.messageBar = Pmw.MessageBar(self,
                                          entry_width = 60,
                                          entry_relief='groove',
@@ -88,43 +96,47 @@ class TopoConsole(Frame):
         #
         # Plot menu
         #
-
         self.menubar.addmenu('Plots','Assorted plot displays')
         self.menubar.addmenuitem('Plots', 'command',
                              'New activity plot',
                              label="Activity",
                              command=self.dummy)
+                             # Judah - MUST SHOW WINDOW.
                              #command=self.new_activity_window)
         self.menubar.addmenuitem('Plots', 'command',
                              'New orientation, ocular dominance, or similar map plot',
                              label="Preference Map",
-                             ## Gray out menu item
-                             foreground = 'Gray',
-                             activeforeground = 'Gray',
-                             activebackground = 'Light Gray',
+                             ## Gray out menu item ###########
+                             foreground = 'Gray',            #
+                             activeforeground = 'Gray',      #
+                             activebackground = 'Light Gray',#
+                             #################################
                              #command=self.new_preferencemap_window)
-                             ##
+                             # STUB CODE UNTIL MILESTONE 2
                              command=None)
         self.menubar.addmenuitem('Plots', 'command',
                              'New weights plot',
                              label="Weights",
-                             command=self.dummy)
+                             command=None)
+                             # Judah - MUST SHOW WINDOW.
                              #command=self.new_weights_window)
         self.menubar.addmenuitem('Plots', 'command',
                              'New weights array plot',
                              label="Weights Array",
-                             ## Gray out menu item
-                             foreground = 'Gray',
-                             activeforeground = 'Gray',
-                             activebackground = 'Light Gray',
+                             ## Gray out menu item ###########
+                             foreground = 'Gray',            #
+                             activeforeground = 'Gray',      #
+                             activebackground = 'Light Gray',#
+                             #################################
                              #command=self.new_weights_array_window)
-                             ##
+                             # STUB CODE UNTIL MILESTONE 2
                              command=self.dummy)
         self.menubar.addmenuitem('Plots','separator')
         self.menubar.addmenuitem('Plots', 'command',
                                  'Refresh auto-refresh plots',
                                  label="Refresh",
                                  command=self.dummy)
+                                 # Judah - Should do something reasonable.
                                  #command=self.auto_refresh)
         
 
@@ -193,33 +205,57 @@ class TopoConsole(Frame):
                 print 'removing: ' + f
                 os.remove(f)
 
+
+    def show_cmd_prompt(self):
+        """
+        Small helper to print the sys.ps1 prompt to the command-line.
+        Useful after a bunch of output has been displayed to stdout,
+        so as to let the user know that the command-line is still
+        active.
+        """
+        print "\n", sys.ps1,
+        sys.stdout.flush()
+    
+
     def load_network(self):
         """
-        Load a script file from disk and evaluate it.
+        Load a script file from disk and evaluate it.  The file is evaluated
+        from within the globals() namespace.
         """
         self.loaded_script = tkFileDialog.askopenfilename(filetypes=KNOWN_FILETYPES)
         if self.loaded_script in ('',(),None):
             self.loaded_script = None
             self.messageBar.message('state', 'Load canceled')
         else:
-            execfile(self.loaded_script)
-            self.messageBar.message('state', 'Loaded ' + self.loaded_script)
-
+            result = simulator.load_script_file(self.loaded_script)
+            if result:
+                self.messageBar.message('state', 'Loaded ' + self.loaded_script)
+            else:
+                self.messageBar.message('state', 'Failure loading ' + self.loaded_script)
+        self.show_cmd_prompt()
 
     def reload_network(self):
         """
-        Reload the previously loaded file from disk.  Does not
+        Reload the previously loaded file from disk.  Will not
         prompt for new filename.  Currently does not flush any
         existing environment variables, so the loaded script needs
-        to take that into account.  Also, the script is run in the
-        existing namespace, so it all goes away upon exit of this
-        function.
+        to take that into account.  execfile() is run within the
+        globals() namespace.
+
+        WARNING: This function does not use the built-in reload()
+        function, so imports will not be reevaluated unless explicitly
+        commanded from within the loaded script.
         """
         if self.loaded_script == None:
             self.messageBar.message('state', 'No script to reload')
         else:
-            execfile(self.loaded_script)
-            self.messageBar.message('state', 'Reloaded ' + self.loaded_script)
+            result = simulator.load_script_file(self.loaded_script)
+            if result:
+                self.messageBar.message('state', 'Reloaded ' + self.loaded_script)
+            else:
+                self.messageBar.message('state', 'Failure reloading ' + self.loaded_script)
+        self.show_cmd_prompt()
+            
                 
     def reset_network(self):
 	self.messageBar.message('state', 'Reset not implemented')        
@@ -293,11 +329,18 @@ class TopoConsole(Frame):
 
 
     #
-    # Command buttons
+    # Command buttons.
     #
     def do_command(self,cmd):
-        dummy()  # Added so do_command doesn't freak with empty body.
-#        Lissom.cmd(cmd)
+        """
+        Pass a Python command to a simulator object so that it can execute it
+        in the simulator namespace.  Print the result that comes back.  Assumes
+        that the simulator always returns and does not throw any exceptions
+        if the cmd contains an error.
+        """
+        result = simulator.exec_cmd(cmd)
+	self.messageBar.message('state', result)
+        self.show_cmd_prompt()
 
     def do_training(self,count):
 #        Lissom.cmd("training +" + count)
@@ -306,7 +349,6 @@ class TopoConsole(Frame):
     def reload_saved_network(self):
 #        Lissom.cmd('load_snapshot')
         self.auto_refresh()
-
 
     def dummy(self):
         print "Button pressed in ", self
@@ -820,35 +862,39 @@ def enum(seq):
     return zip(range(len(seq)),seq)
 
 
-def start():
+def start(sim=None, mainloop=False):
     """
     Startup code for GUI.  Template pulled from default __main__ code
     originally written for LISSOM.
+
+    sim: Imports a simulation object into the COMMAND_NAMESPACE
+    (topo.simulator) namespace.  This is useful if the user created a
+    simulation in the __main__ namespace, but now wants to use it with
+    the GUI.  The GUI runs in topo.simulator and does not normally
+    have access to __main__ variables.
+
+    mainloop: If True, then the command-line is frozen while the GUI
+    is open.  If False, then commands can be entered at the command-line
+    even while the GUI is operational.  Default is False.
     """
     root = Tk()
     root.resizable(0,0)
     Pmw.initialise(root)
     console = TopoConsole(parent=root).pack(expand=YES,fill=BOTH)
-    root.title("Topographica Console")
-    # mainloop() takes control of the commandline.  Without this line
-    # the command-line is still responsive.
-    # root.mainloop()
+    root.title("Topographica Console.  Namespace = " + COMMAND_NAMESPACE)
+    if type(sim) == simulator.Simulator:
+        setattr(sys.modules[COMMAND_NAMESPACE],sim.name,sim)
+	print 'Simulator object imported as ' + COMMAND_NAMESPACE + '.' + sim.name
+    elif sim != None:
+	print 'sim is not a Simulator object'
+    # mainloop() freezes the commandline until the GUI window exits.
+    # Without this line the command-line remains responsive.
+    if mainloop:
+        root.mainloop()
 
 
-#  Original main rountine for LISSOM 5.0.  Useful as an example of
-#  how it used to be done, but should not be moved to the tests
-#  directory.  New entry point is gui.start()
-#
-#  import sys,getopt
-#  
-#  if __name__ == '__main__':
-#      opts,args = getopt.getopt(sys.argv[1:],'',['noloop'])
-#      print 'opts = ' + `opts` + ' args = ' + `args`
-#  
-#      root = Tk()
-#      root.resizable(0,0)
-#      Pmw.initialise(root)
-#      console = LissomConsole(parent=root).pack(expand=YES,fill=BOTH)
-#      root.title("Lissom Console")
-#      if not (('--noloop','') in opts):
-#          root.mainloop()
+####################### 
+
+if __name__ == '__main__':
+    start(mainloop=True)
+
