@@ -30,8 +30,8 @@ import histogram
 import palette
 
 # GUI files
-import PropertiesFrame
-import TaggedSlider
+import propertiesframe
+import taggedslider
 import gui
 
 # set import all the important stuff directly into the package

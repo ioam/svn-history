@@ -4,7 +4,7 @@
 #
 
 from Tkinter import *
-from TaggedSlider import *
+from taggedslider import *
 import Pmw
 
 class PropertiesFrame(Frame):

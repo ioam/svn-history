@@ -6,7 +6,7 @@
 from Tkinter import *
 import Pmw, re, os
 # import Pmw, Lissom, re, os
-from PropertiesFrame import *
+from propertiesframe import *
 
 MIN_PLOT_WIDTH = 100
 
