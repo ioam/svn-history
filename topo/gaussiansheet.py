@@ -45,12 +45,11 @@ class GaussianSheet(Sheet):
 
         self.db_print("Generating a new kernel...",debug.VERBOSE)
 
-        # NOTE: Is there a more elegant way of doing this? 
-        self.activation = self.kernel.get_kernel(x=apply(self.x[0],self.x[1:]),
-                                                 y=apply(self.y[0],self.y[1:]),
-                                                 theta=apply(self.theta[0],self.theta[1:]),
-                                                 width=apply(self.width[0],self.width[1:]),
-                                                 height=apply(self.height[0],self.height[1:]))
+        self.activation = self.kernel.create(x=GaussianSheet.x,
+                                             y=GaussianSheet.y,
+                                             theta=GaussianSheet.theta,
+                                             width=GaussianSheet.width,
+                                             height=GaussianSheet.height)
   
         self.send_output(data=self.activation)
         self.db_print("Sending %s output." % NxN(self.activation.shape))
