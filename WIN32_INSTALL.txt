@@ -27,7 +27,7 @@ shell and give you a "Topographica>" prompt.
 IF THERE IS A PROBLEM
 
 Known issues: 
---- 
+
 Sometimes on Windows 2000 Machines the Dislin setup.exe program will
 not exit cleanly after the install.  The Topographica installation has
 completed successfully but the final notice that says to add the
@@ -55,9 +55,9 @@ installed and do (a), (b), and (c) below.  See Note.
 
 Topographica is a Python 2.4 program and requires Python 2.4 to be
 installed.  The setup.bat script checks to see if the correct version
-exists and will automatically run an included Python 2.4 installer
-located in \external\ if an older version is the default Python
-associated with Python Files.
+exists and if an older version is the default Python associated with
+Python Files then an included Python 2.4 installer located in
+\external\ will be run.
 
 After Python has been installed or detected, the directory is changed
 to .\external\win32\ and following commands are run:
@@ -79,12 +79,12 @@ b) Copy the core Topographica files in \topo\* to the install location
    BASE_LOCATION\topo\
 
 c) Additional tasks in the script include (in no particular order):
-   1. Associate Topographica File extensions (.ty)
-   2. Construct and Set a Topographica run command for the .ty Files
-   3. Give .ty Files a pretty icon
-   5. Create a topographica.bat wrapper to preserve the Topographica output
-   6. Move the generic topographica script to the one that the system will use
-   7. Create a Desktop CMD file to open the Install location of Topographica
+   1. Associate Topographica File extensions (.ty).
+   2. Give .ty Files a pretty icon.
+   3. Construct a Topographica run command that is named topographica.py.
+      This can be run directly, or through topographica.bat:
+   4. Create a topographica.bat wrapper for running Topographica.
+   5. Create a Desktop CMD file to open the Install location of Topographica
    
 Note: The "Additional Tasks" of part (c) listed above are only for
       streamlining the Topographica user interface and are not needed
@@ -93,12 +93,12 @@ Note: The "Additional Tasks" of part (c) listed above are only for
       executed by issuing the following command from a Shell window
       that is in the root location of the Topographica installation:
 
-         [Python Location]\python.exe topographica-script.py
+         [Python Location]\python.exe topographica.py
 
       To execute an existing Topographica script add the filename to
       the end of the command:
 
-         [Python Location]\python.exe topographica-script.py script.py
+         [Python Location]\python.exe topographica.py script.py
 
 
 ---
