@@ -39,20 +39,20 @@ DISLIN and PYTHONPATH environment variables will not be displayed.
 
 INSTALLING THE SLOW WAY
 
-To install the Topographica parts by hand, be sure Python 2.3 is
+To install the Topographica parts by hand, be sure Python 2.4 is
 installed and do (a), (b), and (c) below.  See Note.
 ---
 
-Topographica is a Python 2.3 program and requires Python 2.3 to be
+Topographica is a Python 2.4 program and requires Python 2.4 to be
 installed.  The setup.bat script checks to see if the correct version
-exists and will automatically run an included Python 2.3 installer
+exists and will automatically run an included Python 2.4 installer
 located in \external\ if an older version is the default Python
 associated with Python Files.
 
 After Python has been installed or detected, the directory is changed
 to .\external\win32\ and following commands are run:
 
-   start /wait setup.py configure     % Verifies Python 2.3 installed.
+   start /wait setup.py configure     % Verifies Python 2.4 installed.
    start /wait setup.py install
 
 
@@ -60,10 +60,10 @@ The 'setup.py install' does the following:
 
 a) Installs the following programs found in external\win32\
 
-   Numeric-23.1.win32-py2.3.exe Python Numeric Package
-   PIL-1.1.4.win32-py2.3.exe	Python Imaging Library
+   Numeric-23.7.win32-py2.4.exe Python Numeric Package
+   PIL-1.1.5b3.win32-py2.4.exe	Python Imaging Library
    ..\Pmw.tgz                   Python Mega Widgets  (Contains a Read-Me)
-   dl_82_p2.tar.gz              Dislin Plotting      (Runs setup.exe)
+   dl_83_py.tar.gz              Dislin Plotting      (Runs setup.exe)
 
 b) Copy the core Topographica files in \topo\* to the install location
    BASE_LOCATION\topo\
@@ -81,7 +81,7 @@ Note: The "Additional Tasks" of part (c) listed above are only for
       to run the system.  If there is a problem with the install
       script and (c) does not complete then Topographica can still be
       executed by issuing the following command from a Shell window
-      which is in the root location of the Topographica installation:
+      that is in the root location of the Topographica installation:
 
          [Python Location]\python.exe topographica-script.py
 
