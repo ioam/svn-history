@@ -57,7 +57,8 @@ s.connect(retina,V1,delay=1)
 # images to disk.
 #s.connect(retina,save,dest_port='retina',delay=2)
 #s.connect(V1,save,dest_port='V1',delay=1)
-topo.gui.link_to_sim(s)
+
+#topo.gui.link_to_sim(s)
 
 s.run(2)
 
