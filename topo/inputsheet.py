@@ -36,10 +36,13 @@ class InputSheet(Sheet):
         self.verbose("Received %s input from %s." % (NxN(data.shape),src))
         self.verbose("Generating a new kernel...")
 
-        self.activation = produce_value(self.function)
+        self.activation = self.function()
         
         self.send_output(data=self.activation)
         self.message("Sending %s output." % NxN(self.activation.shape))
+
+    def __call__(self):
+        return self.function()
 
 
 """
@@ -209,13 +212,15 @@ if __name__ == '__main__':
     SineGratingSheet.y = lambda:random.uniform(-0.5,0.5)
     SineGratingSheet.theta = 3.1415926/4
     SineGratingSheet.amplitude = 20
-    SineGratingSheet.freguency = 2 
+    SineGratingSheet.frequency = 2 
 
     GaborSheet.x = lambda:random.uniform(-0.5,0.5)
     GaborSheet.y = lambda:random.uniform(-0.5,0.5)
     GaborSheet.theta = 0
     GaborSheet.width =  0.5 
-    GaborSheet.height = 0.5 
+    GaborSheet.height = 0.5
+    GaborSheet.frequency = 10
+    
 
     FuzzyLineSheet.x = lambda:random.uniform(-0.5,0.5)
     FuzzyLineSheet.x = lambda:random.uniform(-0.5,0.5)
