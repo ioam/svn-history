@@ -4,6 +4,8 @@ from topo.image import ImageSaver
 from math import pi
 from topo.params import Dynamic
 import random
+import topo.gui
+import topo.rfsheet
 import pdb #debugger
 
 from topo.utils import msum
@@ -31,7 +33,7 @@ def PLTF(x):
     return ((x * (x>0)) * (x<1)) + (x>1)
 
 
-class LISSOM(rfsheet.RFSheet):
+class LISSOM(topo.rfsheet.RFSheet):
 
     transfer_fn = Parameter(default=PLTF)
     learning_rate = Parameter(default=0.1)
@@ -115,7 +117,7 @@ ImageSaver.time_format='%0.4d'
 
 
 print "Creating simulation objects..."
-s = Simulator()
+s = topo.simulator.Simulator()
 
 retina = InputSheet(input_generator=FuzzyLineFactory(),name='Retina')
 V1 = LISSOM(name='V1')
@@ -135,6 +137,7 @@ base.min_print_level = base.DEBUG
 #s.connect(V1,save,dest_port='V1',delay=1)
 
 #s.run(10000)
+topo.gui.link_to_sim(s)
 
 #V1.projections['Retina'][0].plot_rfs()
 
