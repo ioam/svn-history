@@ -10,8 +10,20 @@ announcing that it has been closed.  At some point, we should consider
 moving to SourceForge's support for feature requests and tasks instead
 of using this text file.
 
+Topic: Command-line / Shell
+
+- Allow Topographica/Python commands to be passed to the interpreter,
+  even when a file is also being executed.  Current implementation
+  mirrors the Python standard: a file can be read, or a command-string
+  parsed, but not both.
 
 Topic: GUI
+
+- Rigorously test exact square plots within the Tk GUI.  Some plots
+  have been showing slightly off square plots, either do to the
+  zooming of the original data, or from the widget display functions.
+
+- Add a "Situate" option to the WeightsArray plot.
 
 - The console should have some kind of visible command i/o history
   that shows both the commands executed and their output, either
