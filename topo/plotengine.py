@@ -7,7 +7,8 @@ routines.
 
 $Id$
 """
-from base import TopoObject, flatten
+from base import TopoObject
+from utils import flatten
 from plot import *
 from sheet import Sheet
 
