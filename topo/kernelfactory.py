@@ -71,55 +71,33 @@ def produce_rotated_matrices(kernel_x, kernel_y, theta):
     
     return new_kernel_x, new_kernel_y
 
+
 """
 Gaussian Kernel Factory
 """
 
-def gaussian(bounds, density, x, y, theta, width, height):
-        
-    kernel_x, kernel_y = produce_kernel_matrices(bounds, density, x, y)
-    kernel_x, kernel_y = produce_rotated_matrices(kernel_x, kernel_y, theta)
-    
-    width  = produce_value(width)
-    height = produce_value(height) 
-    
+def gaussian(kernel_x, kernel_y, width, height):
+  
     new_kernel = -(kernel_x / width)**2 + -(kernel_y / height)**2
 
+    # maximum( ) is needed to avoid overflow in some situations
     return exp(maximum(-100,new_kernel))
+
 
 """
 Sine Grating Kernel Factory
 """
 
 
-def sine_grating(bounds, density, x, y, theta, frequency, phase):
-        
-    kernel_x, kernel_y = produce_kernel_matrices(bounds, density, x, y)
-    kernel_x, kernel_y = produce_rotated_matrices(kernel_x, kernel_y, theta)
-        
-    phase     = produce_value(phase)
-    frequency = produce_value(frequency)
-
-    new_kernel = 0.5 + 0.5*sin(frequency*2*pi*kernel_x + phase)
-
-    return new_kernel
+def sine_grating(kernel_x, kernel_y, frequency, phase):
+    return 0.5 + 0.5*sin(frequency*2*pi*kernel_x + phase)
 
 """
 Gabor Kernel Factory
 """
 
-def gabor(bounds, density, x, y, theta, width, height, frequency, phase):
+def gabor(kernel_x, kernel_y, width, height, frequency, phase):
  
-    kernel_x, kernel_y = produce_kernel_matrices(bounds, density, x, y)
-    kernel_x, kernel_y = produce_rotated_matrices(kernel_x, kernel_y, theta)
-        
-    phase     = produce_value(phase)
-    frequency = produce_value(frequency)
-    width  = produce_value(width)
-    height = produce_value(height) 
-
-    # TODO: this doesn't seem to be working correctly.
-
     return exp( maximum(-100, -(kernel_x/width)**2-(kernel_y/height)**2)) *\
     (0.5 + 0.5*cos(2*pi*frequency*kernel_x + phase ))
 
@@ -127,28 +105,29 @@ def gabor(bounds, density, x, y, theta, width, height, frequency, phase):
 Uniform Random Kernel Factory
 """
 
-def uniform_random(bounds, density):
-    bounds  = produce_value(bounds)
-    density = produce_value(density)
+def uniform_random(kernel_x, kernel_y):
+    #bounds  = produce_value(bounds)
+    #density = produce_value(density)
         
-    rows,cols = bounds2shape(bounds,density)
+    #rows,cols = bounds2shape(bounds,density)
                                                                                                                  
-    return random((rows,cols)) 
+    return random(kernel_x.shape) 
+    #return random((rows,cols)) 
 
 """
 Rectangle Kernel Factory
 """
 
-def rectangle(bounds, density, x, y, width, height, theta):
+def rectangle(kernel_x, kernel_y, x, y, width, height):
     # TODO: This is also kind of a hack: produce x, y early to use them later
-    x = produce_value(x)
-    y = produce_value(y)
+    #x = produce_value(x)
+    #y = produce_value(y)
     
-    kernel_x, kernel_y = produce_kernel_matrices(bounds, density, x, y)
-    kernel_x, kernel_y = produce_rotated_matrices(kernel_x, kernel_y, theta)
+    #kernel_x, kernel_y = produce_kernel_matrices(bounds, density, x, y)
+    #kernel_x, kernel_y = produce_rotated_matrices(kernel_x, kernel_y, theta)
    
-    width  = produce_value(width)
-    height = produce_value(height) 
+    #width  = produce_value(width)
+    #height = produce_value(height) 
     
     kernel_x = bitwise_and( less_equal( kernel_x, x+width/2 ), 
                             greater_equal( kernel_x, x-width/2 ) )
@@ -161,22 +140,16 @@ def rectangle(bounds, density, x, y, width, height, theta):
 Fuzzy Line Kernel Factory
 """
 
-def fuzzy_line(bounds, density, x, y, theta, width):
+def fuzzy_line(kernel_x, kernel_y, width):
     #TODO: This is a hack: the height should be specified in terms of bounds
-    return gaussian(bounds, density, x, y, theta, width, 100)
+    return gaussian(kernel_x, kernel_y, width, 100)
 
 
 """
 Fuzzy Disk Kernel Factory
 """
 
-def fuzzy_disk(bounds, density, x, y, disk_radius, gaussian_width):
-    kernel_x, kernel_y = produce_kernel_matrices(bounds, density, x, y)
-    # TODO: Needs Optimization: pass 0 for theta to simulate a rotation
-    kernel_x, kernel_y = produce_rotated_matrices(kernel_x, kernel_y, 0.0)
-
-    disk_radius    = produce_value(disk_radius)
-    gaussian_width = produce_value(gaussian_width)
+def fuzzy_disk(kernel_x, kernel_y, disk_radius, gaussian_width):
 
     distance_from_line = sqrt((kernel_x**2)+(kernel_y**2)) 
     gaussian_x_coord   = distance_from_line - disk_radius/2.0 
@@ -190,9 +163,7 @@ def fuzzy_disk(bounds, density, x, y, disk_radius, gaussian_width):
 Fuzzy Ring Kernel Factory
 """
 
-def fuzzy_ring(bounds, density, x, y, inner_radius, outer_radius, gaussian_width):
-    kernel_x, kernel_y = produce_kernel_matrices(bounds, density, x, y)
-    kernel_x, kernel_y = produce_rotated_matrices(kernel_x, kernel_y, theta)
+def fuzzy_ring(kernel_x, kernel_y, inner_radius, outer_radius, gaussian_width):
     
     distance_from_line = abs(outer_radius - sqrt(kernel_x**2)+(kernel_y**2))
     gaussian_x_coord   = distance_from_line - disk_radius/2
