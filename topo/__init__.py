@@ -30,8 +30,7 @@ import histogram
 import palette
 
 # GUI files
-import propertiesframe
-import taggedslider
+import topo.tk
 import gui
 
 # Documentation
