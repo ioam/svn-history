@@ -58,14 +58,14 @@ class TestBitmap(unittest.TestCase):
         hsv = HSVMap(a,b,c)
         # hsv.show()
 
-    def test_matrix_rgb_to_hsv(self):
+    def test_matrix_hsv_to_rgb(self):
         a = [j for i in range(256) for j in range(256)]
         b = [i for i in range(256) for j in range(256)]
         c = [max(i,j) for i in range(256) for j in range(256)]
         a = Numeric.reshape(a,(256,256)) / 255.0
         b = Numeric.reshape(b,(256,256)) / 255.0
         c = Numeric.reshape(c,(256,256)) / 255.0
-        (h,s,v) = matrix_rgb_to_hsv(a,b,c)
+        (h,s,v) = matrix_hsv_to_rgb(a,b,c)
         rgb = RGBMap(h,s,v)
         # rgb.show()
     
