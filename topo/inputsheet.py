@@ -4,7 +4,7 @@ sheet for randomly generating inputs
 $Id$
 """
 
-from kernelfactory import *
+import kernelfactory
 import random
 from simulator import EventProcessor
 from sheet import Sheet 
@@ -12,7 +12,8 @@ from utils import NxN
 
 from Numeric import *
 from pprint import pprint,pformat
-from params import Parameter
+from sheet import BoundingBox
+from params import *
 
 class InputSheet(Sheet):
 
@@ -57,13 +58,13 @@ class GaussianSheet(InputSheet):
     # parameter. Should not be a parameter because we don't want the user to
     # change it.
 
-    function = lambda self:gaussian( self.bounds,
-                                     self.density,
-                                     self.x, 
-                                     self.y, 
-                                     self.theta, 
-                                     self.width, 
-                                     self.height )
+    function = lambda self:kernelfactory.gaussian( self.bounds,
+                                                   self.density,
+                                                   self.x, 
+                                                   self.y, 
+                                                   self.theta, 
+                                                   self.width, 
+                                                   self.height )
 
 """
 Sine Grating Kernel Generating Sheet
@@ -77,13 +78,13 @@ class SineGratingSheet(InputSheet):
     frequency = Parameter(default=1)
     phase     = Parameter(default=0)
 
-    function = lambda self:sine_grating( self.bounds,
-                                         self.density,
-                                         self.x,
-                                         self.y,
-                                         self.theta,
-                                         self.frequency, 
-                                         self.phase )
+    function = lambda self:kernelfactory.sine_grating( self.bounds,
+                                                       self.density,
+                                                       self.x,
+                                                       self.y,
+                                                       self.theta,
+                                                       self.frequency, 
+                                                       self.phase )
 
 
 """
@@ -100,15 +101,15 @@ class GaborSheet(InputSheet):
     frequency = Parameter(default=1)
     phase     = Parameter(default=0)
 
-    function  = lambda self:sine_grating( self.bounds,
-                                          self.density,
-                                          self.x,
-                                          self.y,
-                                          self.theta,
-                                          self.width,
-                                          self.height,
-                                          self.frequency,
-                                          self.phase ) 
+    function  = lambda self:kernelfactory.gabor( self.bounds,
+                                                 self.density,
+                                                 self.x,
+                                                 self.y,
+                                                 self.theta,
+                                                 self.width,
+                                                 self.height,
+                                                 self.frequency,
+                                                 self.phase ) 
 
 """
 Uniform Random Generating Sheet
@@ -116,9 +117,28 @@ Uniform Random Generating Sheet
   
 class UniformRandomSheet(InputSheet):
 
-    function = lambda self:uniform_random( self.bounds,
-                                           self.density ) 
+    function = lambda self:kernelfactory.uniform_random( self.bounds,
+                                                         self.density ) 
 
+"""
+Rectangle Generating Sheet
+"""
+
+class RectangleSheet(InputSheet):
+
+    x       = Parameter(default=0)
+    y       = Parameter(default=0)
+    theta   = Parameter(default=0)
+    width   = Parameter(default=1)
+    heigh   = Parameter(default=1)
+
+    function = lambda self:kernelfactory.rectangle( self.bounds,
+                                                    self.density,
+                                                    self.x, 
+                                                    self.y, 
+                                                    self.theta, 
+                                                    self.width,
+                                                    self.height ) 
 """
 Fuzzy Line Generating Sheet
 """
@@ -130,51 +150,109 @@ class FuzzyLineSheet(InputSheet):
     theta   = Parameter(default=0)
     width   = Parameter(default=1)
 
-    function = lambda self:fuzzy_line( self.bounds,
-                                       self.density,
-                                       self.x, 
-                                       self.y, 
-                                       self.theta, 
-                                       self.width ) 
+    function = lambda self:kernelfactory.fuzzy_line( self.bounds,
+                                                     self.density,
+                                                     self.x, 
+                                                     self.y, 
+                                                     self.theta, 
+                                                     self.width ) 
+
+"""
+Fuzzy Disk Generating Sheet
+"""
+
+class FuzzyDiskSheet(InputSheet):
+
+    x              = Parameter(default=0)
+    y              = Parameter(default=0)
+    disk_radius    = Parameter(default=0.8)
+    gaussian_width = Parameter(default=1)
+
+    function = lambda self:kernelfactory.fuzzy_disk( self.bounds,
+                                                     self.density,
+                                                     self.x, 
+                                                     self.y, 
+                                                     self.disk_radius, 
+                                                     self.gaussian_width ) 
+
+
+"""
+Fuzzy Ring Generating Sheet
+"""
+
+class FuzzyRingSheet(InputSheet):
+
+    x       = Parameter(default=0)
+    y       = Parameter(default=0)
+    theta   = Parameter(default=0)
+    width   = Parameter(default=1)
+
+    function = lambda self:kernelfactory.fuzzy_ring( self.bounds,
+                                                     self.density,
+                                                     self.x, 
+                                                     self.y, 
+                                                     self.theta, 
+                                                     self.width ) 
 
 
 if __name__ == '__main__':
     from simulator import Simulator
     from image import ImageSaver
 
-    GaussianSheet.period = 1.0
     GaussianSheet.x = lambda:random.uniform(-0.5,0.5)
     GaussianSheet.y = lambda:random.uniform(-0.5,0.5)
     GaussianSheet.theta = 3.1415926/4
-    GaussianSheet.width = 20
+    GaussianSheet.width = 0.2
     GaussianSheet.height = 0.2 
 
-    SineGratingSheet.period = 1.0
     SineGratingSheet.x = lambda:random.uniform(-0.5,0.5)
     SineGratingSheet.y = lambda:random.uniform(-0.5,0.5)
     SineGratingSheet.theta = 3.1415926/4
     SineGratingSheet.amplitude = 20
     SineGratingSheet.freguency = 2 
 
-    GaborSheet.period = 1.0
     GaborSheet.x = lambda:random.uniform(-0.5,0.5)
     GaborSheet.y = lambda:random.uniform(-0.5,0.5)
     GaborSheet.theta = 0
     GaborSheet.width =  0.5 
     GaborSheet.height = 0.5 
-    
+
+    FuzzyLineSheet.x = lambda:random.uniform(-0.5,0.5)
+    FuzzyLineSheet.x = lambda:random.uniform(-0.5,0.5)
+    FuzzyLineSheet.theta = 3.1415926/4
+    FuzzyLineSheet.width = 0.2 
+
+    FuzzyDiskSheet.x = 0
+    #FuzzyDiskSheet.x = lambda:random.uniform(-0.5,0.5)
+    FuzzyDiskSheet.y = 0 
+    #FuzzyDiskSheet.y = lambda:random.uniform(-0.5,0.5)
+    FuzzyDiskSheet.disk_radius    = 0.3
+    FuzzyDiskSheet.gaussian_width = 0.2 
+
+    RectangleSheet.x = lambda:random.uniform(-0.5,0.5)
+    RectangleSheet.y = lambda:random.uniform(-0.5,0.5)
+    RectangleSheet.theta = 3.1415926/4
+    RectangleSheet.width = 0.2 
+    RectangleSheet.height = 0.2 
+
     s  = Simulator()
 
-    g  = GaussianSheet()
-    sg = SineGratingSheet()
-    ga = GaborSheet() 
-    ur = UniformRandomSheet()
+    gaussian       = GaussianSheet()
+    sine_grating   = SineGratingSheet()
+    gabor          = GaborSheet() 
+    uniform_random = UniformRandomSheet()
+    fuzzy_line     = FuzzyLineSheet()
+    fuzzy_disk     = FuzzyDiskSheet()
+    rectangle      = RectangleSheet()
 
     save = ImageSaver()
 
-    s.connect(src=ur,dest=save,dest_port='random')
-    s.connect(src=ga,dest=save,dest_port='gabor')
-    s.connect(src=sg,dest=save,dest_port='sine_grating')
-    s.connect(src=g,dest=save,dest_port='gassian')
+    s.connect(src=rectangle,dest=save,dest_port='rectangle')
+    s.connect(src=fuzzy_disk,dest=save,dest_port='fuzzy_disk')
+    s.connect(src=fuzzy_line,dest=save,dest_port='fuzzy_line')
+    s.connect(src=uniform_random,dest=save,dest_port='random')
+    s.connect(src=gabor,dest=save,dest_port='gabor')
+    s.connect(src=sine_grating,dest=save,dest_port='sine_grating')
+    s.connect(src=gaussian,dest=save,dest_port='gassian')
     
     s.run(duration=10)
