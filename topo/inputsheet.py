@@ -53,6 +53,8 @@ class InputSheet(Sheet):
         self.send_output(data=self.activation)
         self.db_print("Sending %s output." % NxN(self.activation.shape))
 
+# TODO: these should all be mix-ins
+
 class GaussianSheet(InputSheet):
 
     def __init__(self, **config):
@@ -60,6 +62,23 @@ class GaussianSheet(InputSheet):
         setup_params(self,GaussianSheet,**config)
 
         self.kernel.function = gaussian
+
+
+class UniformRandomSheet(InputSheet):
+
+    def __init__(self, **config):
+        InputSheet.__init__(self,**config)
+        setup_params(self,UniformRandomSheet,**config)
+
+        self.kernel.function = uniform_random
+
+class SineGratingSheet(InputSheet):
+
+    def __init__(self, **config):
+        InputSheet.__init__(self,**config)
+        setup_params(self,GaussianSheet,**config)
+
+        self.kernel.function = sine_grating
 
 if __name__ == '__main__':
     from simulator import Simulator
