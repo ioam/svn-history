@@ -46,12 +46,13 @@ def start(sim=None, mainloop=False):
     console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
     console.set_active_simulator(sim)
 
+    topo.gui.set_console(console)
+
     # mainloop() freezes the commandline until the GUI window exits.
     # Without this line the command-line remains responsive.
     if mainloop:
         console.mainloop()
 
-    topo.gui.set_console(console)
     return console
 
 
