@@ -24,7 +24,7 @@ cleandocs:
 
 docs: topo/*.py
 	mkdir -p docs
-	${GENDOC} topo
-	mv topo.html docs/index.html
+	${GENDOC} topo/__init__.py
+	mv docs/__init__.html docs/index.html
 	${GENDOC} topo/
 
