@@ -11,7 +11,6 @@ from topo.tk.plotpanel import *
 import topo.simulator as simulator
 import topo.plotengine
 
-MIN_PLOT_WIDTH = 100
 KNOWN_FILETYPES = [('Python Files','*.py'),('Topographica Files','*.ty'),('All Files','*')]
 
 
@@ -243,12 +242,12 @@ class TopoConsole(Frame):
             self.loaded_script = None
             self.messageBar.message('state', 'Load canceled')
         else:
-            result = simulator.load_script_file(self.loaded_script)
+            result = self.load_script_file(self.loaded_script)
             if result:
                 self.messageBar.message('state', 'Loaded ' + self.loaded_script)
             else:
                 self.messageBar.message('state', 'Failure loading ' + self.loaded_script)
-        show_cmd_prompt()
+        topo.tk.show_cmd_prompt()
 
     def reload_network(self):
         """
@@ -265,12 +264,12 @@ class TopoConsole(Frame):
         if self.loaded_script == None:
             self.messageBar.message('state', 'No script to reload')
         else:
-            result = simulator.load_script_file(self.loaded_script)
+            result = self.load_script_file(self.loaded_script)
             if result:
                 self.messageBar.message('state', 'Reloaded ' + self.loaded_script)
             else:
                 self.messageBar.message('state', 'Failure reloading ' + self.loaded_script)
-        show_cmd_prompt()
+        topo.tk.show_cmd_prompt()
             
                 
     def reset_network(self):
@@ -300,7 +299,9 @@ class TopoConsole(Frame):
         win = GUIToplevel(self)
         win.withdraw()
         win.title("Activity %d" % self.num_activity_windows)
-        ActivityPanel(console=self,parent=win).pack(expand=YES,fill=BOTH)
+        ActivityPanel(console=self,
+                      pengine=self.active_plotengine(),
+                      parent=win).pack(expand=YES,fill=BOTH)
         win.deiconify()
 
     def new_preferencemap_window(self):
@@ -361,7 +362,7 @@ class TopoConsole(Frame):
         """
         result = self.exec_cmd(cmd)
 	self.messageBar.message('state', result)
-        show_cmd_prompt()
+        topo.tk.show_cmd_prompt()
 
     def exec_cmd(self,cmd):
         """
@@ -370,10 +371,7 @@ class TopoConsole(Frame):
         command are caught, and the name of the exception is passed back to the
         calling function.  If the command goes through, an OK is sent, along with
         a copy of the command.
-    
-        The exec is run inside of the global namespace.  This function is run
-        inside of a class, but the global space is shared between classes, so
-        collisions between simultaneously running simulatiors is possible.
+        Collisions between simultaneously running simulatiors is possible.
         """
         try:
             #g = globals()
@@ -416,10 +414,8 @@ class TopoConsole(Frame):
 
     def do_training(self,count):
         """
-        LOGIC ERROR: It is no longer possible to do training
-        iterations on an unnamed simulation since there may be
-        multiple objects.  There needs to be a way to link to a
-        particular simulation.
+        A simulation object should be linked to the GUI before this
+        training command is issued on the Simulator object.
         """
         # Judah - THIS MUST BE IMPLEMENTED
         #        Lissom.cmd("training +" + count)

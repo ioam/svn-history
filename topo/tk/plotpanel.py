@@ -3,24 +3,35 @@ GUI windows to display bitmap plots.
 
 $Id$
 """
-from Tkinter import *
-import Pmw, re, os, sys 
+#from Tkinter import *
+import Pmw, re, os, sys
+import topo
+import topo.base
+import topo.bitmap
 from topo.tk.propertiesframe import *
 import topo.simulator as simulator
-import topo.plotengine
+import topo.plotengine as plotengine
+import PIL
+import Image
+import ImageTk
 
+MIN_PLOT_WIDTH = 100
 
-class PlotPanel(Frame):
+class PlotPanel(Frame,topo.base.TopoObject):
     """
     Base class for GUI windows displaying bitmap images.  Subclassed to
     display various categories of bitmaps.
     """
-
-
-    def __init__(self,parent=None,console=None,**config):
+    def __init__(self,parent=None,pengine=None,console=None,**config):
+        assert isinstance(pengine,plotengine.PlotEngine) or pengine == None, 'Variable sim not Simulator object.'
 
         Frame.__init__(self,parent,config)
-        
+        topo.plot.TopoObject.__init__(self,**config)
+
+        self.pe = pengine
+        self.pe_group = None
+        self.plot_list = []
+
         self.console = console
         self.canvases = []
 
@@ -60,33 +71,28 @@ class PlotPanel(Frame):
         self.display_labels()
 
     def do_plot_cmd(self):
+        """
+        Poll the PlotEngine for the plotgroup linked to self.plot_key.
+        Since the get_plot_group is being called, it may update the
+        plots, or it may use a cached version, depending on the type
+        of plot_group being requested.
+        """
         Pmw.showbusycursor()
-#         init_cmds = [
-#             #set file names just before plot command to ensure that they are correct
-#             "PlotGroup::Activity::filename_format=gui.$${current_region}_$${current_plot}",
-#             "PlotGroup::Weights::filename_format=gui.$${current_region}_$${current_plot}",
-#             "PlotGroup::WeightsMap::filename_format=gui.$${current_region}_$${current_plot}",
-#             "PlotGroup::*Preference::filename_format=gui.$${current_region}_$${current_plot}",]
-# #        Lissom.cmds(init_cmds)
-#         
-# #        plots = Lissom.plot_cmd(self.plot_cmd)
+
+        self.pe_group = self.pe.get_plot_group(self.plot_key)
+        self.plot_list = self.pe_group.plots()
+        self.pe.debug('Type of plot_group', type(self.pe_group))
+
+#         plots = Lissom.plot_cmd(self.plot_cmd)
 #         self.plotlist   = map(self.plotname_to_filename,plots);
 #         self.plotlabels = map(self.plotname_to_label,plots);
-# 
-#         #print `self`+".plotlist = "+`self.plotlist`
-#         #print `self`+".plotlabels = "+`self.plotlabels`
-# 
 #         # remove non-existent plots
 #         goodplots = [t for t in zip(self.plotlist,self.plotlabels) if os.access(t[0],os.F_OK)]
 #         self.plotlist = [i for i,p in goodplots]
 #         self.plotlabels = [p for i,p in goodplots]
+        # self.plotlist = []
+        # self.plotlabels = []
 
-        self.plotlist = []
-        self.plotlabels = []
-
-        #print `self`+".plotlist = "+`self.plotlist`
-        #print `self`+".plotlabels = "+`self.plotlabels`
-        
         Pmw.hidebusycursor()
         
     def load_images(self):
@@ -98,9 +104,20 @@ class PlotPanel(Frame):
         else:
             old_min_width = -1
 
+
+        # TURN THE FOR LOOP INTO A LIST COMPREHENSION USING A FUNCTION THAT
+        # WILL RETURN A IMAGE OBJECT.
         # Change to load from the plot manager.
-        #self.images = [PhotoImage(file=pfile,master=self.plot_frame)
+        #self.images = [ImageTk.PhotoImage(file=pfile,master=self.plot_frame)
         #               for pfile in self.plotlist]
+        self.images = []
+        for (figure_tuple, hist_tuple) in self.plot_list:
+            (r,g,b) = figure_tuple
+            if r.shape != (0,0) and g.shape != (0,0) and b.shape != (0,0):
+                win = topo.bitmap.RGBMap(r,g,b)
+                self.images.append(win)
+                #win.show()
+
         
         if self.images:
             min_width = reduce(min,[im.width() for im in self.images])
@@ -120,7 +137,8 @@ class PlotPanel(Frame):
 
         
     def display_plots(self):
-        self.zoomed_images = [im.zoom(self.zoom_factor) for im in self.images]
+#        self.zoomed_images = [PhotoImage(im.zoom(self.zoom_factor)) for im in self.images]
+        self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.zoom_factor)) for im in self.images]
         old_canvases = self.canvases
         self.canvases = [Canvas(self.plot_frame,
                                 width=image.width(),
@@ -136,9 +154,10 @@ class PlotPanel(Frame):
             c.grid_forget()
 
     def display_labels(self):
-        for i,file in enum(self.plotlabels):
-            print i, " ", file
-            Label(self.plot_frame,text=file).grid(row=1,column=i,sticky=NSEW)
+        pass
+        #for i,file in enum(self.plotlabels):
+        #    print i, " ", file
+        #    Label(self.plot_frame,text=file).grid(row=1,column=i,sticky=NSEW)
 
     def reduce(self):
         if self.zoom_factor > self.min_zoom_factor:
@@ -157,15 +176,15 @@ class PlotPanel(Frame):
     def toggle_auto_refresh(self):
         self.auto_refresh = not self.auto_refresh
 
-        print "Auto-refresh = ", self.auto_refresh
-        show_cmd_prompt()
+        self.message("Auto-refresh = ", self.auto_refresh)
+        topo.tk.show_cmd_prompt()
 
         if self.auto_refresh:
             self.console.add_auto_refresh_panel(self)
         else:
             self.console.del_auto_refresh_panel(self)
 
-# No longer useful since there is no LISSOM, but these may be replaced
+# No longer useful since there is no LISSOM, but these should be replaced
 # with functions for filename saving.
 #     def plotname_to_filename(self,plotname):
 #         """Converts a string like Eye0::Activity to the corresponding lissom filename.
@@ -195,9 +214,9 @@ class PlotPanel(Frame):
 
 
 class ActivityPanel(PlotPanel):
-    def __init__(self,parent,console=None,**config):
-        self.plot_cmd = "plot"
-        PlotPanel.__init__(self,parent,console=console,**config)
+    def __init__(self,parent,pengine,console=None,**config):
+        self.plot_key = "Activation"
+        PlotPanel.__init__(self,parent,pengine=pengine,console=console,**config)
         self.auto_refresh_checkbutton.invoke()
 
 
