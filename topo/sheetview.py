@@ -1,12 +1,12 @@
 """
 Topographica SheetView objects and its subclasses.
 
-For use with the Topographica plotting mechanisms.  A Sheet object has
-its internal data which remains hidden, but it will create views of
-this data depending on the Sheet defaults or the information
-requested.  This way there can be multiple views recorded for a single
-sheet, and a view can be passed around independent of the originating
-source object.
+For use with the Topographica plotting and data analysis mechanisms.
+A Sheet object has its internal data which remains hidden, but it will
+create views of this data depending on the Sheet defaults or the
+information requested.  This way there can be multiple views recorded
+for a single sheet, and a view can be passed around independent of the
+originating source object.
 
 $Id$
 """
@@ -34,10 +34,10 @@ operations = {ADD : operator.add,
 
 class SheetView(TopoObject):
     """
-    A SheetView constructs of a matrix of values, a bounding box for
-    that matrix, and holds onto a name.  There are two major ways to
-    create a SheetView, one is from a single matrix of data from a
-    single sheet, the other is by combining the matrices from multiple
+    A SheetView is constructed from a matrix of values, a bounding box
+    for that matrix, and a name.  There are two major ways to create a
+    SheetView: one is from a single matrix of data from a single
+    sheet, the other is by combining the matrices from multiple
     matrices or SheetViews.
     """
 
@@ -84,15 +84,15 @@ class SheetView(TopoObject):
     def view(self):
         """
         Return the requested view as a matrix.  If the constructor was
-        given a multiple maps, the view must be built before being
-        returned, this may lock in new views of data from the
+        given multiple maps, the view must be built before being
+        returned, which may lock in new views of data from the
         specified sheets.
 
         Input is the variable self._view_list which is a list of
         tuples, with each tuple being a matrix and a bounding box, or
         a sheet and a map name.  The sequence cannot be dumped into
-        maps just once because the raw maps may have changed so other
-        sheets must be requested for the data.
+        maps just once because the raw maps may have changed, so other
+        sheets must be queried for the data.
         """
         maps = []
         print self._view_list
@@ -118,7 +118,7 @@ class SheetView(TopoObject):
         prove useful to other areas of the simulator.
 
         THIS MUST BE EXPANDED IN THE FUTURE TO MAKE PROPER USE OF THE
-        BOUNDING BOX INFORMATION, CURRENT (8/04) IMPLEMENTATION
+        BOUNDING BOX INFORMATION. CURRENT (8/04) IMPLEMENTATION
         PASSES THE FIRST MAP IN THE LIST AS THE BOUNDING BOX FOR THE
         CONSTRUCTED VIEW.
 
