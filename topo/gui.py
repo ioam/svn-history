@@ -9,12 +9,8 @@ $Id$
 from Tkinter import *
 import Pmw, re, os, sys, code, traceback, __main__
 import tkFileDialog
-if __name__ == '__main__':  # Take control of console.
-    from topo.propertiesframe import *
-    import topo.simulator as simulator
-else:
-    from propertiesframe import *
-    import simulator
+from topo.tk.propertiesframe import *
+import topo.simulator as simulator
 
 MIN_PLOT_WIDTH = 100
 KNOWN_FILETYPES = [('Python Files','*.py'),('Topographica Files','*.ty'),('All Files','*')]
@@ -961,10 +957,10 @@ def start(sim=None, mainloop=False):
     # Without this line the command-line remains responsive.
     if mainloop:
         root.mainloop()
+    return root
 
 
 ####################### 
 
 if __name__ == '__main__':
     start(mainloop=True)
-
