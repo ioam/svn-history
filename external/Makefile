@@ -10,18 +10,18 @@ uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-u
 ##############################################################
 # Python
 #
-PYTHON = Python-2.3.3
+PYTHON = Python-2.4
 
-PYTHON_LIB = lib/python2.3
+PYTHON_LIB = lib/python2.4
 
-PYTHON_UNINSTALL += bin/idle bin/python bin/pydoc bin/python2.3 
-PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.3
+PYTHON_UNINSTALL += bin/idle bin/python bin/pydoc bin/python2.4 
+PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.4
 
 
 python: ${PYTHON}.tgz tk
 	tar xzf ${PYTHON}.tgz
 	cd ${PYTHON}; ./configure --prefix=${PREFIX}
-	env PREFIX=${PREFIX} make -C ${PYTHON} install
+	env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib make -C ${PYTHON} install
 	touch python
 
 python-clean:
@@ -32,7 +32,7 @@ python-uninstall:
 ##############################################################
 # Tcl
 #
-TCL = tcl8.4.6
+TCL = tcl8.4.9
 
 TCL_UNINSTALL += bin/tclsh8.4 bin/wish8.4 lib/tclConfig.sh
 TCL_UNINSTALL += lib/tcl8.4 lib.tclConfig.sh lib/libtcl8.4.so lib/libtclstub8.4.a
@@ -54,7 +54,7 @@ tcl-uninstall:
 ##############################################################
 # Tk
 #
-TK = tk8.4.6
+TK = tk8.4.9
 
 TK_UNINSTALL += lib/tk8.4 lib/libtk8.4.so lib/libtkstub8.4.a
 TK_UNINSTALL += include/tk*.h lib/tkConfig.sh
