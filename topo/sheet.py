@@ -7,12 +7,7 @@ from boundingregion import BoundingBox
 
 def sheet2matrix(x,y,bounds,density):
     left,bottom,right,top = bounds.aarect().lbrt()
-    width = right-left
-    height = top-bottom
     linear_density = sqrt(density)
-    rows = int(height*linear_density)
-    cols = int(width*linear_density)
-
     col = (x-left) * linear_density
     row = (top-y)  * linear_density
 
@@ -61,7 +56,14 @@ def input_slice(slice_bounds, input_bounds, input_density):
 
     return rstart,rbound,cstart,cbound
 
-    
+def bounds2shape(bounds,density):
+    left,bottom,right,top = bounds.aarect().lbrt()
+    width = right-left
+    height = top-bottom
+    linear_density = sqrt(density)
+    rows = int(height*linear_density)
+    cols = int(width*linear_density)
+    return rows,cols
 
 class Sheet(EventProcessor):
     """
@@ -95,11 +97,13 @@ class Sheet(EventProcessor):
 
         linear_density = sqrt(self.density)
 
+        self.debug("linear_density = ",linear_density)
         left,bottom,right,top = self.bounds.aarect().lbrt()
         width,height = right-left,top-bottom
         rows = int(height*linear_density)
         cols = int(width*linear_density)
-        self.activation = zeros((rows,cols)) + 0.0 
+        self.activation = zeros((rows,cols)) + 0.0
+        self.debug('activation.shape =',self.activation.shape)
 
                 
     def sheet2matrix(self,x,y):

@@ -9,8 +9,9 @@ Defines a class to return Kernels
 import types
 import random
 
+import base
 from boundingregion import BoundingBox
-from sheet import sheet2matrix, matrix2sheet
+from sheet import sheet2matrix, matrix2sheet, bounds2shape
 
 from Numeric import *
 from params import * 
@@ -43,7 +44,7 @@ def fuzzy_disc(kernel_x, kernel_y, width, height, theta):
 Abstract base class for the different kinds of kernels
 """
 
-class KernelFactory:
+class KernelFactory(base.TopoObject):
 
     #kernel = array([[1.0]])
 
@@ -57,19 +58,19 @@ class KernelFactory:
    
 
     def create(self):
-        self.bound_width  = self.bounds.aarect().right()-self.bounds.aarect().left()
-        self.bound_height = self.bounds.aarect().top()-self.bounds.aarect().bottom()
+        left,bottom,right,top = self.bounds.aarect().lbrt()
+        self.bound_width  = right-left
+        self.bound_height = top-bottom
         self.linear_density = sqrt(self.density)
 
-        x = produce_value( self.x )
-        y = produce_value( self.y )
+        rows,cols = bounds2shape(self.bounds,self.density)
+        
+        x = self.x
+        y = self.y
 
-        self.kernel_x = arange(self.bounds.aarect().left()-x,
-                          self.bounds.aarect().right()-x, self.bound_width /
-                          self.linear_density);
-        self.kernel_y = arange(self.bounds.aarect().bottom()-y,
-                          self.bounds.aarect().top()-y, self.bound_height /
-                          self.linear_density);
+
+        self.kernel_x = arange(left-x,right-x, self.bound_width/cols)
+        self.kernel_y = arange(bottom-y,top-y, self.bound_height/rows)
   
         return self.function(self.kernel_x, self.kernel_y)
 

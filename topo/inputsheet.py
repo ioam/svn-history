@@ -17,7 +17,7 @@ from params import Parameter
 class InputSheet(Sheet):
 
     period = Parameter(default=1)
-    phase = Parameter(default=0)
+    phase  = Parameter(default=0)
 
     x = Parameter(default=0)
 
@@ -41,7 +41,7 @@ class InputSheet(Sheet):
         self.message("Sending %s output." % NxN(self.activation.shape))
 
 class GaussianSheet(InputSheet, GaussianKernelFactory):
-    pass        
+    pass
 
 
 #class UniformRandomSheet(InputSheet, UniformRandomSheet):
@@ -59,29 +59,19 @@ if __name__ == '__main__':
     from image import ImageSaver
 
     # BUG?: these give errors now:
+    GaussianSheet.density = 10000
+    GaussianSheet.period = 1.0
 
-    #GaussianSheet.density = 81 
-    #GaussianSheet.density = 10000
-    #GaussianSheet.period = 10.0
-    #GaussianSheet.phase = 3.0
-
-    #GaussianSheet.x = lambda:random.gauss(0,0.5)
-    #GaussianSheet.y = lambda:random.uniform(-0.5,0.5)
-    #GaussianSheet.theta  = lambda:random.uniform(-3.1415926,3.1415926)
-    #GaussianSheet.width  = lambda:random.uniform(0,1)
-    #GaussianSheet.height = lambda:random.uniform(0,1)
-
+    GaussianSheet.x = lambda:random.uniform(-0.5,0.5)
+    GaussianSheet.y = lambda:random.uniform(-0.5,0.5)
+    GaussianSheet.theta = lambda:random.uniform(-3.1415926,3.1415926)
+    GaussianSheet.width = 0.05
+    GaussianSheet.height = 0.2
 
     s = Simulator()
-    g = GaussianSheet(density=10000, 
-                      period=10.0, 
-                      phase=3.0,
-                      x = lambda:random.gauss(0,0.5),
-                      y = lambda:random.gauss(0,0.5),
-                      theta  = lambda:random.uniform(-3.1415926, 3.1415926),
-                      width  = lambda:random.uniform(0,1),
-                      height = lambda:random.uniform(0,1))
+    g = GaussianSheet()
+
     save = ImageSaver()
 
-    s.connect(src=g,dest=save)
-    s.run()
+    s.connect(src=g,dest=save,dest_port='gassian')
+    s.run(duration=100)

@@ -2,7 +2,7 @@ import RandomArray
 
 from utils import norm,inf,mdot
 from params import Parameter
-from sheet import Sheet,activation_submatrix,input_slice
+from sheet import Sheet
 from Numeric import argmax,sqrt,exp
 
 def gaussian(dist,radius):
@@ -13,13 +13,13 @@ def decay(time,half_life):
 
 class RFSOM(Sheet):
 
-    rmin = 0.0
-    rmax = 1.0
+    rmin = Parameter(0.0)
+    rmax = Parameter(1.0)
     
-    alpha_0 = 0.5
-    radius_0 = 1.0
+    alpha_0 = Parameter(0.5)
+    radius_0 = Parameter(1.0)
     
-    training_length = 1000
+    training_length = Parameter(1000)
 
     # rf params
     rf_width = 0.1
@@ -34,10 +34,10 @@ class RFSOM(Sheet):
 
     def _connect_from(self,src,src_port=None,dest_port=None):
         Sheet._connect_from(self,src,src_port,dest_port)
-        self.projections[src.name] = Projection(sheet = src,
+        self.projections[src.name] = Projection(src=src, dest=self,
                                                 rfs = [[ RF(src,center=(x,y),width=self.rf_width)
-                                                         for y in self.sheet_cols() ]
-                                                       for x in self.sheet_rows() ])
+                                                         for x in self.sheet_cols() ]
+                                                       for y in self.sheet_rows()[::-1] ])
                       
     def alpha(self):
         return self.alpha_0 * decay(self.count,self.half_life)
@@ -84,6 +84,7 @@ class RFSOM(Sheet):
         self.count += 1 
 
     def input_event(self,src,src_port,dest_port,data):
+        self.message("Received input from,",src,"at time",self.simulator.time())
         self.train(data,src)
         self.send_output(data=self.activation)
 
@@ -115,39 +116,73 @@ from base import TopoObject
 class Projection(TopoObject):
 
     def __init__(self,**params):
+        super(Projection,self).__init__(**params)
         self.__rfs = params['rfs']
-        self.__sheet = params['sheet']
-        setup_params(self,Projection,**params)
+        self.__src = params['src']
+        self.__dest = params['dest']
 
-    def sheet(self): return __sheet
+    def src(self): return self.__src
+    def dest(self): return self.__dest
 
     def rf(self,r,c):
         return self.__rfs[r][c]
 
-class RF(TopoObject):
+    def plot_rfs(self,montage=True,file_format='ppm',file_prefix='',
+                 pixel_scale = 255, pixel_offset = 0):
+        from Numeric import concatenate as join
+        import Image
 
+        file_stem = file_prefix + self.__src.name + '-' + self.__dest.name
+        if not montage:
+            for r,row in enumerate(self.__rfs):
+                for c,rf in enumerate(row):                    
+                    im = Image.new('L',rf.weights.shape[::-1])
+                    im.putdata(rf.weights.flat,scale=pixel_scale,offset=pixel_offset)
+
+                    f = open(file_stem+'-RF-%0.4d-%0.4d.'%(r,c)+file_format,'w')
+                    im.save(f,file_format)
+                    f.close()
+        else:
+            data = join([join([rf.weights for rf in row],axis=1) for row in self.__rfs])
+            im = Image.new('L',data.shape[::-1])
+            im.putdata(data.flat,scale=pixel_scale,offset=pixel_offset)
+
+            f = open(file_stem+'-RFS.'+file_format,'w')
+            im.save(f,file_format)
+            f.close()
+            
+            
+
+
+class RF(TopoObject):
+    
     def __init__(self,input_sheet,width=1.0,center=(0,0)):
         from boundingregion import BoundingBox
-        from sheet import input_slice
-        
-        Debuggable.__init__(self)
+        from sheet import activation_submatrix
+
+        super(RF,self).__init__()
 
         self.input_sheet = input_sheet
 
         self.verbose('center = %s, width= %.2f'%(`center`,width))
         xc,yc = center
-        self.__bounds = BoundingBox(points=((xc-width,yc-width),(xc+width,yc+width)))
+        radius = width/2
+        self.__bounds = BoundingBox(points=((xc-radius,yc-radius),(xc+radius,yc+radius)))
 
-        rmin,rbound,cmin,cbound = input_slice(self.__bounds,
-                                              input_sheet.bounds,
-                                              input_sheet.density)
-        self.verbose("activation matrix slice: "+`(rmin,rbound,cmin,cbound)`)
-        self.weights = RandomArray.random((rbound-rmin,cbound-cmin))
+        weights_shape = activation_submatrix(self.__bounds,
+                                             input_sheet.activation,
+                                             input_sheet.bounds,
+                                             input_sheet.density).shape
+        self.verbose("activation matrix shape: ",weights_shape)
+        self.weights = RandomArray.random(weights_shape)
 
+    def bounds(self):
+        return self.__bounds
     def contains(self,x,y):
-        self.__bounds.contains(x,y)
+        return self.__bounds.contains(x,y)
 
-    def get_input_matrix(self, activation):        
+    def get_input_matrix(self, activation):
+        from sheet import activation_submatrix
         return activation_submatrix(self.__bounds,activation,
                                     self.input_sheet.bounds,
                                     self.input_sheet.density)
@@ -163,8 +198,6 @@ if __name__ == '__main__':
     
     s = Simulator(step_mode=True)
 
-    RFSOM.rmin = -0.5
-    RFSOM.rmax = 0.5
     RFSOM.rf_width = 0.1
 
     input = ImageGenerator(filename='main.ppm',density=10000,

@@ -14,7 +14,7 @@ import kernelfactory
 # sheet types
 import rfsom
 import image
-
+import inputsheet
 
 # set import all the important stuff directly into the package
 # namespace.

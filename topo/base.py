@@ -79,19 +79,25 @@ class TopoMetaclass(type):
     without overwriting the attribute descriptor.  
     """
     def __setattr__(self,name,value):
-
-        if isinstance(value,Parameter):
-            # If the value is a Parameter descriptor, set it in the class,
-            # replacing any existing descriptor
-            type.__setattr__(self,name,value)            
-        elif isinstance(self.__dict__[name],Parameter):
+        from copy import copy
+        desc,class_ = self.get_param_descriptor(name)
+        if desc and not isinstance(value,Parameter):
             # If the attribute already has a Parameter descriptor,
             # assign the value to the descriptor.
-            self.__dict__[name].__set__(None,value)
+            if class_ != self:
+                type.__setattr__(self,name,copy(desc)) 
+            self.__dict__[name].__set__(None,value)            
         else:
-            # in all other cases set it in the 
+            # in all other cases set the attribute normally
             type.__setattr__(self,name,value)
         
+    def get_param_descriptor(self,param_name):
+        classes = classlist(self)
+        for c in classes[::-1]:
+            attribute = c.__dict__.get(param_name)
+            if isinstance(attribute,Parameter):
+                return attribute,c
+        return None,None
 
 class TopoObject(object):
     """
