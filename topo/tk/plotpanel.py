@@ -14,6 +14,7 @@ import topo.plotengine as plotengine
 import PIL
 import Image
 import ImageTk
+import Numeric
 
 MIN_PLOT_WIDTH = 100
 
@@ -95,6 +96,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
 
         Pmw.hidebusycursor()
         
+
     def load_images(self):
 
         # need to calculate the old min width, so we know if we need to reset
@@ -105,20 +107,19 @@ class PlotPanel(Frame,topo.base.TopoObject):
             old_min_width = -1
 
 
-        # TURN THE FOR LOOP INTO A LIST COMPREHENSION USING A FUNCTION THAT
-        # WILL RETURN A IMAGE OBJECT.
-        # Change to load from the plot manager.
-        #self.images = [ImageTk.PhotoImage(file=pfile,master=self.plot_frame)
-        #               for pfile in self.plotlist]
         self.images = []
         for (figure_tuple, hist_tuple) in self.plot_tuples:
             (r,g,b) = figure_tuple
             if r.shape != (0,0) and g.shape != (0,0) and b.shape != (0,0):
+                # Normalize activation to a maximum of 1.  Will scale brighter
+                # or darker, depending.
+                if max(r.flat) > 0: r = Numeric.divide(r,max(r.flat))
+                if max(g.flat) > 0: g = Numeric.divide(g,max(g.flat)) 
+                if max(b.flat) > 0: b = Numeric.divide(b,max(b.flat))
                 win = topo.bitmap.RGBMap(r,g,b)
                 self.images.append(win)
                 self.plotlist.append(win)
                 self.plotlabels.append(self.pe_group.name + ' ' + str(len(self.plotlist)))
-                #win.show()
 
         
         if self.images:
