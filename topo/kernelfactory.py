@@ -18,24 +18,6 @@ from pprint import pprint,pformat
 
 from math import pi
 
-"""
-produce -- takes in an argument, if its a generator, it calls it 
-           otherwise it treats it as a literal
-"""
-
-def produce(func):
-    #print "Called produce on: ", func
-    if(type(func) != types.GeneratorType): 
-        return func
-    else:
-        return func.next( ) 
-
-
-# Each of these functions should be a class, and inherit from kernel_factory,
-# then we could create mixins for the sheet versions easily, with a minimal
-# amount of parameter passing.
-
-
 
 """
 Function for constructing a gassian pattern out of a properly set up Numeric
@@ -79,8 +61,8 @@ class KernelFactory:
         self.bound_height = self.bounds.aarect().top()-self.bounds.aarect().bottom()
         self.linear_density = sqrt(self.density)
 
-        x = produce( self.x )
-        y = produce( self.y )
+        x = produce_value( self.x )
+        y = produce_value( self.y )
 
         self.kernel_x = arange(self.bounds.aarect().left()-x,
                           self.bounds.aarect().right()-x, self.bound_width /
@@ -128,13 +110,13 @@ Sine Grating Kernel Factory
 
 class SineGratingKernelFactory(KernelFactory):
     amplitude = Parameter(default=0.5) 
-    period    = Parameter(default=0.5)
+    frequency = Parameter(default=0.5)
     theta     = Parameter(default=0.0)
  
     def function(self, kernel_x, kernel_y):
 
         amplitude = produce_value(self.amplitude)
-        period    = produce_value(self.period)
+        frequency = produce_value(self.frequency)
         theta     = produce_value(self.theta) 
 
         new_kernel_x = subtract.outer(cos(theta)*kernel_x, sin(theta)*kernel_y)
@@ -142,7 +124,7 @@ class SineGratingKernelFactory(KernelFactory):
 
         # HACK: just for testing the sine_grating function, width and height are
         # meaningless in this context
-        new_kernel = amplitude*sin(period*new_kernel_x)
+        new_kernel = amplitude*sin(frequency*new_kernel_x)
 
         return new_kernel
 
