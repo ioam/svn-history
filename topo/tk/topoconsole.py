@@ -295,14 +295,19 @@ class TopoConsole(Frame):
     #
     def new_activity_window(self):
         # Judah - MUST SHOW WINDOW.
-        self.num_activity_windows += 1
-        win = GUIToplevel(self)
-        win.withdraw()
-        win.title("Activity %d" % self.num_activity_windows)
-        ActivityPanel(console=self,
-                      pengine=self.active_plotengine(),
-                      parent=win).pack(expand=YES,fill=BOTH)
-        win.deiconify()
+        pe = self.active_plotengine()
+        if pe:
+            self.num_activity_windows += 1
+            win = GUIToplevel(self)
+            win.withdraw()
+            win.title("Activity %d" % self.num_activity_windows)
+            ActivityPanel(console=self,
+                          pengine=pe,
+                          parent=win).pack(expand=YES,fill=BOTH)
+            win.deiconify()
+        else:
+            self.messageBar.message('state', 'No active Simulator object.')
+            
 
     def new_preferencemap_window(self):
         self.messageBar.message('state', 'Not yet implemented')
@@ -417,9 +422,18 @@ class TopoConsole(Frame):
         A simulation object should be linked to the GUI before this
         training command is issued on the Simulator object.
         """
-        # Judah - THIS MUST BE IMPLEMENTED
-        #        Lissom.cmd("training +" + count)
-        self.auto_refresh()
+        s = self.active_simulator()
+        if s:
+            i = float(count)
+            s.run(i)
+            message = 'Ran ' + count + ' to time ' + str(s.time())
+            self.auto_refresh()
+        else:
+            message = 'Error: No active simulator.'
+
+        self.messageBar.message('state', message)
+        topo.tk.show_cmd_prompt()
+
         
     def dummy(self):
         print "Button pressed in ", self
