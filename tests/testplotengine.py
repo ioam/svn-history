@@ -81,9 +81,10 @@ class TestPlotEngine(unittest.TestCase):
         ###########################################
         # build simulation
         
-        base.min_print_level = base.MESSAGE
+        base.min_print_level = base.WARNING
         
         s = Simulator()
+        s.print_level = base.WARNING
         s.verbose("Creating simulation objects...")
 
         # Uses testbitmap.jpg.
@@ -105,6 +106,8 @@ class TestPlotEngine(unittest.TestCase):
         sheetG = Sheet()
         sheetB = Sheet()
         retina = InputSheet(input_generator=GaussianFactory())
+        retina.print_level = base.WARNING
+
 
         # For a new sheet_group named Miata:
         sviewR = SheetView((self.ra,BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))))

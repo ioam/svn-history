@@ -21,10 +21,15 @@ class TestGui(unittest.TestCase):
         """
         Create a Simulator that has a couple of sheets within it that
         have data within them that can then be used by the GUI tests.
+        Two objects created after completion:
+            self.s   Sample simulation with a couple of sheets
+            self.pe  Plot engine watching self.s
         """
         InputSheet.period = 1.0
         InputSheet.density = 900
-
+#        base.print_level = base.WARNING
+#        InputSheet.print_level = base.WARNING
+        
         GaussianFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
@@ -35,7 +40,7 @@ class TestGui(unittest.TestCase):
         ###########################################
         # build simulation
         
-        base.min_print_level = base.MESSAGE
+#        base.min_print_level = base.WARNING
         
         self.s = Simulator()
         self.s.verbose("Creating simulation objects...")
@@ -59,6 +64,7 @@ class TestGui(unittest.TestCase):
         sheetG = Sheet()
         sheetB = Sheet()
         retina = InputSheet(input_generator=GaussianFactory())
+        retina.print_level = base.WARNING
 
         # For a new sheet_group named Miata:
         sviewR = SheetView((self.ra,BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))))
@@ -103,7 +109,7 @@ class TestGui(unittest.TestCase):
                 # useful in the future.
 
         root = start(self.s)
-        root.mainloop()
+        #root.mainloop()
 
 
 suite = unittest.TestSuite()

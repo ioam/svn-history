@@ -43,6 +43,7 @@ class TestRFSom(unittest.TestCase):
         # input generation params
         InputSheet.period = 1.0
         InputSheet.density = 900
+        InputSheet.print_level = base.WARNING
         
         GaussianFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -61,7 +62,7 @@ class TestRFSom(unittest.TestCase):
         ###########################################
         # build simulation
         
-        base.min_print_level = base.NORMAL
+        base.min_print_level = base.WARNING
       
         s = Simulator()
         s.verbose("Creating simulation objects...")
@@ -70,8 +71,10 @@ class TestRFSom(unittest.TestCase):
         # Old form
         #retina = GaussianSheet(name='Retina')
         V1 = RFSOM(name='V1')
+        V1.print_level = base.WARNING
 
         s.connect(retina,V1,delay=1)
+        s.print_level = base.WARNING
 
         s.run(10)
 
