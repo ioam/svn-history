@@ -131,6 +131,7 @@ class Projection(TopoObject):
                  pixel_scale = 255, pixel_offset = 0):
         from Numeric import concatenate as join
         import Image
+        from utils import add_border
 
         file_stem = file_prefix + self.__src.name + '-' + self.__dest.name
         if not montage:
@@ -143,7 +144,7 @@ class Projection(TopoObject):
                     im.save(f,file_format)
                     f.close()
         else:
-            data = join([join([rf.weights for rf in row],axis=1) for row in self.__rfs])
+            data = join([join([add_border(rf.weights) for rf in row],axis=1) for row in self.__rfs])
             im = Image.new('L',data.shape[::-1])
             im.putdata(data.flat,scale=pixel_scale,offset=pixel_offset)
 

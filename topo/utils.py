@@ -60,3 +60,12 @@ def flat_indices(shape):
         return result
         
     
+def add_border(matrix,width=1,value=0.0):
+    from Numeric import concatenate as join,array
+    rows,cols = matrix.shape
+
+    hborder = array([ [value]*(cols+2*width) ]*width)
+    vborder = array([ [value]*width ] * rows)
+
+    temp = join( (vborder,matrix,vborder), axis=1)
+    return join( (hborder,temp,hborder) )

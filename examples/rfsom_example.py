@@ -22,14 +22,14 @@ GaussianSheet.y = lambda : random.uniform(-0.5,0.5)
 
 GaussianSheet.theta = lambda :random.uniform(-3.1415926,3.1415926)
 GaussianSheet.width = 0.02
-GaussianSheet.height = 0.1
+GaussianSheet.height = 0.9
 GaussianSheet.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
 # rf som parameters
 RFSOM.density = 900
-RFSOM.rf_width = 0.1
+RFSOM.rf_width = 0.2
 RFSOM.training_length = 10000
-RFSOM.radius_0 = 0.05
+RFSOM.radius_0 = 0.1
 
 # image saver parameters
 ImageSaver.file_format='png'
@@ -48,6 +48,9 @@ V1 = RFSOM(name='V1')
 save  = ImageSaver(name='RFSOM')
 
 s.connect(retina,V1,delay=1)
+
+# Uncomment the connections to the image saver, to save all the activation
+# images to disk.
 #s.connect(retina,save,dest_port='retina',delay=1)
 #s.connect(V1,save,dest_port='V1',delay=0)
 
