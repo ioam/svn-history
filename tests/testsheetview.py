@@ -1,8 +1,47 @@
 import unittest
 
+import Numeric
+
+from topo.sheet import Sheet
+from topo.boundingregion import BoundingBox
+from topo.sheetview import *
+
+# Turn False once development is complete and this module is to be
+# included as part of the system unit testing.
+DEV = False
+
 class TestSheetView(unittest.TestCase):
-    def test_view(self):
-        self.assertEqual(1+1,2)
+
+    def setUp(self):
+        self.s = Sheet()
+        self.s.activity = Numeric.array([[1,2],[3,4]])
+        self.s2 = Sheet()
+        self.s2.activity = Numeric.array([[4,3],[2,1]])
+    def test_init(self):
+        # s.sheet_view() returns a SheetView
+        sv = self.s.sheet_view()
+        # Call s.sheet_view(..) with a parameter
+        sv2 = self.s.sheet_view('Activation')
+        # Define a type 1 SheetView, with matrix and bounding box.
+        sv3 = SheetView((self.s.activity, self.s.bounds))
+        sv4 = SheetView((self.s2.activity,self.s2.bounds))
+        # Define a type 2 SheetView, 
+        sv5 = SheetView((ADD,((sv3,None),(sv4,None))))
+        sv6 = SheetView((ADD,[(sv3,None),
+                              (sv4,None),
+                              (self.s2.activity,self.s2.bounds)]))
+        sv7 = SheetView((SUBTRACT,[(sv3,None),
+                              (sv4,None),
+                              (self.s2.activity,self.s2.bounds)]))
+
+        # Define a type 3 SheetView
+        sv8 = SheetView((self.s,'Activation'))
+        if DEV:
+            sv3.message(sv3.view())
+            sv6.message('sv6.debug', sv6._view_list)
+            sv6.message(sv6.view())
+
+
     def test_sum_maps(self):
         self.assertEqual(1+1,2)
 
