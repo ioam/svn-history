@@ -176,22 +176,28 @@ def fuzzy_disk(bounds, density, x, y, disk_radius, gaussian_width):
     disk_radius    = produce_value(disk_radius)
     gaussian_width = produce_value(gaussian_width)
 
-    distance_from_line = sqrt((kernel_x**2)+(kernel_y**2)) - disk_radius/2.0
+    distance_from_line = sqrt((kernel_x**2)+(kernel_y**2)) 
+    gaussian_x_coord   = distance_from_line - disk_radius/2.0 
 
-    return less_equal(distance_from_line, 0) * \
+
+    #return less_equal(gaussian_x_coord, 0) * \
+    #       exp(maximum(-100, -(gaussian_x_coord/gaussian_width)**2 ))#- (kernel_y/gaussian_width)**2))
+    return less_equal(gaussian_x_coord, 0) * \
            exp(maximum(-100, -(kernel_x/gaussian_width)**2 - (kernel_y/gaussian_width)**2))
-
 """
 Fuzzy Ring Kernel Factory
 """
 
-def fuzzy_ring(bounds, density, x, y, radius):
+def fuzzy_ring(bounds, density, x, y, inner_radius, outer_radius, gaussian_width):
     kernel_x, kernel_y = produce_kernel_matrices(bounds, density, x, y)
     kernel_x, kernel_y = produce_rotated_matrices(kernel_x, kernel_y, theta)
     
-    print "TODO: Fuzzy Ring not yet implemented."
+    distance_from_line = abs(outer_radius - sqrt(kernel_x**2)+(kernel_y**2))
+    gaussian_x_coord   = distance_from_line - disk_radius/2
 
-    return tanh(radius*kernel_x*kernel_y)
+    return less_equal(gaussian_x_coord, 0) * \
+           exp(maximum(-100, -(gaussian_x_coord/gaussian_width)**2))
+
 
 if __name__ == '__main__':
 
