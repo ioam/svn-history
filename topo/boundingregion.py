@@ -1,7 +1,7 @@
 """
 Topographica bounding regions and boxes.
 
- $Id$
+$Id$
 """
 from params import Parameter
 from Numeric import *
