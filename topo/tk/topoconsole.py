@@ -314,10 +314,9 @@ class TopoConsole(Frame):
             self.num_activity_windows += 1
             win = GUIToplevel(self)
             win.withdraw()
-            win.title("Activity %d" % self.num_activity_windows)
-            ActivityPanel(console=self,
-                          pengine=pe,
-                          parent=win).pack(expand=YES,fill=BOTH)
+            ap = ActivityPanel(console=self,pengine=pe,parent=win)
+            ap.pack(expand=YES,fill=BOTH)
+            ap.refresh_title()
             win.deiconify()
             self.messageBar.message('state', 'OK')
         else:
@@ -340,10 +339,10 @@ class TopoConsole(Frame):
             self.num_weights_windows += 1
             win = GUIToplevel(self)
             win.withdraw()
-            win.title("Weights %d" % self.num_weights_windows)
-            WeightsPanel(console=self,
-                         pengine=pe,
-                         parent=win).pack(expand=YES,fill=BOTH)
+            #win.title("Weights %d" % self.num_weights_windows)
+            wp = WeightsPanel(console=self,pengine=pe,parent=win)
+            wp.pack(expand=YES,fill=BOTH)
+            wp.refresh_title()
             win.deiconify()
             self.messageBar.message('state', 'OK')
         else:
@@ -357,9 +356,9 @@ class TopoConsole(Frame):
             win = GUIToplevel(self)
             win.withdraw()
             win.title("Weights Array %d" % self.num_weights_array_windows)
-            WeightsArrayPanel(console=self,
-                              pengine=pe,
-                              parent=win).pack(expand=YES,fill=BOTH)
+            wap = WeightsArrayPanel(console=self,pengine=pe,parent=win)
+            wap.pack(expand=YES,fill=BOTH)
+            wap.refresh_title()
             win.deiconify()
             self.messageBar.message('state', 'OK')
         else:
