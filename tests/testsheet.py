@@ -7,6 +7,7 @@ $Id$
 import unittest
 import topo
 from topo.sheet import *
+import topo.base
 from topo import boundingregion
 
 
@@ -50,6 +51,22 @@ class TestCoordinateTransforms(unittest.TestCase):
         r,c = self.rbound,self.cbound
         x,y = self.right,self.bottom
         self.assertEqual(matrix2sheet(r,c,self.box,self.density), (x,y))        
+    def test_sheet_view(self):
+        s = Sheet()
+        sview = s.sheet_view()
+        sview = s.sheet_view('Activation')
+        log_level = s.print_level
+        minlog_level = topo.base.min_print_level
+
+        # Disable the warning that we know will be displayed
+        s.print_level = topo.base.SILENT
+        topo.base.min_print_level = topo.base.SILENT
+        s.sheet_view('Orientation')
+        s.print_level = log_level
+        topo.base.min_print_level = minlog_level
+
+        s.add_sheet_view('Orientation',sview)
+        sview = s.sheet_view('Orientation')
 
 
 

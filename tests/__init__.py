@@ -9,6 +9,7 @@ import testboundingregion
 import testdummy
 import testsheet
 import testbitmap
+import testplot
 
 suite = unittest.TestSuite()
 
