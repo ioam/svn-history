@@ -39,9 +39,22 @@ import sched
 from base import TopoObject
 from params import Parameter
 import __main__
+import topo.gui
 
 SLEEP_EXCEPTION = "Sleep Exception"
 STOP = "Simulator Stopped"
+
+# Singleton variable to register which Simulator is currently active in
+# the Topographica simulator.  This should not be set directly, but
+# through the two accessor functions.  This variable is also used by
+# the GUI to know which simulator to drive.
+__active_sim = None
+def active_sim(): return __active_sim
+def set_active_sim(a_sim):
+    global __active_sim
+    __active_sim = a_sim
+    topo.gui.link_to_sim(a_sim)
+
 
 class Simulator(TopoObject):
     """
@@ -51,6 +64,7 @@ class Simulator(TopoObject):
     """
 
     step_mode = Parameter(default=False)
+    register = Parameter(default=True)
     
     def __init__(self,**config):
         """
@@ -67,7 +81,9 @@ class Simulator(TopoObject):
         self.__sleep_window_violation = False
         self.__scheduler = sched.scheduler(self.time,self.sleep)
         self.__started = False
-        
+        if self.register:
+            set_active_sim(self)
+
         
     def run(self,duration=0,until=0):
         """

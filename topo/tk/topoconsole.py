@@ -165,30 +165,30 @@ class TopoConsole(Frame):
 
 
 
-    def _init_lissom(self):
-        """
-        No longer used by Topographica.  Staying here as a record of the steps
-        that LISSOM needs to do, as a template for Topographica.
-        """
-        root_prefix = os.path.split(os.getcwd())[-1]
-        initial_params_file = root_prefix+'.param'
-
-        #
-        # Load the initial params file and set the filebase
-        #
-        Lissom.cmd("exec_file "+initial_params_file)
-        Lissom.cmd("set filebase="+root_prefix)
-        init_cmds = [
-            # Set parameters to generate individual images instead of combined plot
-            "ppm_border=0",
-            "spawn_viewer=False",
-            "cmd::ppm_separate_plots=True",
-            "cmd::ppm_combined_plots=False"]
-        Lissom.cmds(init_cmds)
+#     def _init_lissom(self):
+#         """
+#         No longer used by Topographica.  Staying here as a record of the steps
+#         that LISSOM needs to do, as a template for Topographica.
+#         """
+#         root_prefix = os.path.split(os.getcwd())[-1]
+#         initial_params_file = root_prefix+'.param'
+# 
+#         #
+#         # Load the initial params file and set the filebase
+#         #
+#         Lissom.cmd("exec_file "+initial_params_file)
+#         Lissom.cmd("set filebase="+root_prefix)
+#         init_cmds = [
+#             # Set parameters to generate individual images instead of combined plot
+#             "ppm_border=0",
+#             "spawn_viewer=False",
+#             "cmd::ppm_separate_plots=True",
+#             "cmd::ppm_combined_plots=False"]
+#         Lissom.cmds(init_cmds)
 
 
     #
-    # Accessors for the active simulator and active plotengine objects.
+    # Accessors for the GUIs active simulator and active plotengine objects.
     #
     def set_active_simulator(self, new_sim):
         """
@@ -207,11 +207,11 @@ class TopoConsole(Frame):
         self.refresh_title()
     
     def active_simulator(self):
-        """Get the active_simulator object"""
+        """Get the active_simulator object relative to the GUI"""
         return self.__active_simulator_obj
     
     def active_plotengine(self):
-        """Get the active_plotengine object"""
+        """Get the active_plotengine object relative to the GUI"""
         return self.__active_plotengine_obj
 
 
@@ -219,6 +219,7 @@ class TopoConsole(Frame):
     def quit(self):
         """Close the main GUI window.  Does not exit Topographica interpreter."""
         self.cleanup_dir()
+        topo.gui.set_console(None)
         Frame.quit(self)
         Frame.destroy(self)     # Get rid of widgets
         self.parent.destroy()   # Get rid of window

@@ -44,7 +44,10 @@ def start(sim=None, mainloop=False):
     Pmw.initialise(root)
     console = topo.tk.topoconsole.TopoConsole(parent=root)
     console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
-    console.set_active_simulator(sim)
+    if sim is None:
+        console.set_active_simulator(topo.simulator.active_sim())
+    else:
+        console.set_active_simulator(sim)
 
     topo.gui.set_console(console)
 

@@ -14,8 +14,11 @@ calling that function must not be forced, so users can still use this
 file without needing to have Tk or topo.tk installed.
 
 To start the topo.tk gui from the Topographica prompt, run:
+  topo.gui.start()
+or
   import topo.tk
   topo.tk.start()
+  
   
 $Id$
 """
@@ -42,9 +45,12 @@ def set_console(con):
 
 def link_to_sim(sim):
     """Connect a simulator to the GUI."""
-    assert isinstance(sim,topo.simulator.Simulator), 'Parameter must be Simulator'
+    assert isinstance(sim,topo.simulator.Simulator) or sim is None, 'Parameter must be Simulator'
     if gui_imported():
         if gui_console != None:
             gui_console.set_active_simulator(sim)
-        else:
-            topo.base.TopoObject().message('No active GUI console')
+
+def start(sim=None):
+    """Import the topo.tk package, and fire 'er up."""
+    import topo.tk
+    topo.tk.start(sim)
