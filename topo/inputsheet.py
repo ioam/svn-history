@@ -16,8 +16,8 @@ from params import Parameter
 
 class InputSheet(Sheet):
 
-    period = Parameter(default=1)
-    phase  = Parameter(default=0)
+    sheet_period = Parameter(default=1)
+    sheet_phase  = Parameter(default=0)
 
     bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))))
     density = Parameter(default=10000)
@@ -26,10 +26,10 @@ class InputSheet(Sheet):
         assert self.simulator
 
         # connect self<->self (for repeating)
-        self.simulator.connect(src=self,dest=self,delay=self.period)
+        self.simulator.connect(src=self,dest=self,delay=self.sheet_period)
 
         # first event is special
-        self.simulator.enqueue_event_rel(self.phase,self,self,data=self.activation)
+        self.simulator.enqueue_event_rel(self.sheet_phase,self,self,data=self.activation)
 
     def input_event(self,src,src_port,dest_port,data):
         self.verbose("Received %s input from %s." % (NxN(data.shape),src))
@@ -40,10 +40,10 @@ class InputSheet(Sheet):
         self.send_output(data=self.activation)
         self.message("Sending %s output." % NxN(self.activation.shape))
 
+
 """
 Gassian Kernel Generating Sheet
 """
-
 
 class GaussianSheet(InputSheet):
 
@@ -53,15 +53,17 @@ class GaussianSheet(InputSheet):
     width   = Parameter(default=1)
     height  = Parameter(default=1)
 
-    # TODO: Why does this have to be a parameter?
+    # Pass set up a function to run using lambdas. We need to specify self as a
+    # parameter. Should not be a parameter because we don't want the user to
+    # change it.
 
-    function = Parameter(default=lambda:gaussian( GaussianSheet.bounds,
-                                                  GaussianSheet.density,
-                                                  GaussianSheet.x, 
-                                                  GaussianSheet.y, 
-                                                  GaussianSheet.theta, 
-                                                  GaussianSheet.width, 
-                                                  GaussianSheet.height ))
+    function = lambda self:gaussian( self.bounds,
+                                     self.density,
+                                     self.x, 
+                                     self.y, 
+                                     self.theta, 
+                                     self.width, 
+                                     self.height )
 
 """
 Sine Grating Kernel Generating Sheet
@@ -72,16 +74,16 @@ class SineGratingSheet(InputSheet):
     x         = Parameter(default=0)
     y         = Parameter(default=0)
     theta     = Parameter(default=0)
-    amplitude = Parameter(default=1)
     frequency = Parameter(default=1)
+    phase     = Parameter(default=0)
 
-    function  = Parameter(default=lambda:sine_grating( SineGratingSheet.bounds,
-                                                       SineGratingSheet.density,
-                                                       SineGratingSheet.x,
-                                                       SineGratingSheet.y,
-                                                       SineGratingSheet.theta,
-                                                       SineGratingSheet.amplitude,
-                                                       SineGratingSheet.frequency  ) )
+    function = lambda self:sine_grating( self.bounds,
+                                         self.density,
+                                         self.x,
+                                         self.y,
+                                         self.theta,
+                                         self.frequency, 
+                                         self.phase )
 
 
 """
@@ -95,24 +97,46 @@ class GaborSheet(InputSheet):
     theta    = Parameter(default=0)
     width    = Parameter(default=2)
     height   = Parameter(default=1)
+    frequency = Parameter(default=1)
+    phase     = Parameter(default=0)
 
-    function  = Parameter(default=lambda:sine_grating( GaborSheet.bounds,
-                                                       GaborSheet.density,
-                                                       GaborSheet.x,
-                                                       GaborSheet.y,
-                                                       GaborSheet.theta,
-                                                       GaborSheet.width,
-                                                       GaborSheet.height  ) )
+    function  = lambda self:sine_grating( self.bounds,
+                                          self.density,
+                                          self.x,
+                                          self.y,
+                                          self.theta,
+                                          self.width,
+                                          self.height,
+                                          self.frequency,
+                                          self.phase ) 
 
-
+"""
+Uniform Random Generating Sheet
+"""
   
 class UniformRandomSheet(InputSheet):
 
-    # TODO: Does UniformRandomSheet.x refer to this specific instance's x, or
-    # the class's x
+    function = lambda self:uniform_random( self.bounds,
+                                           self.density ) 
 
-    function = Parameter(default=lambda:uniform_random( UniformRandomSheet.bounds,
-                                                        UniformRandomSheet.density ) )
+"""
+Fuzzy Line Generating Sheet
+"""
+
+class FuzzyLineSheet(InputSheet):
+
+    x       = Parameter(default=0)
+    y       = Parameter(default=0)
+    theta   = Parameter(default=0)
+    width   = Parameter(default=1)
+
+    function = lambda self:fuzzy_line( self.bounds,
+                                       self.density,
+                                       self.x, 
+                                       self.y, 
+                                       self.theta, 
+                                       self.width ) 
+
 
 if __name__ == '__main__':
     from simulator import Simulator
@@ -141,7 +165,7 @@ if __name__ == '__main__':
     
     s  = Simulator()
 
-    g  = GaussianSheet() 
+    g  = GaussianSheet()
     sg = SineGratingSheet()
     ga = GaborSheet() 
     ur = UniformRandomSheet()
@@ -152,4 +176,5 @@ if __name__ == '__main__':
     s.connect(src=ga,dest=save,dest_port='gabor')
     s.connect(src=sg,dest=save,dest_port='sine_grating')
     s.connect(src=g,dest=save,dest_port='gassian')
-    s.run(duration=100)
+    
+    s.run(duration=10)

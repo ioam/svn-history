@@ -25,6 +25,9 @@ Gaussian Kernel Factory
 """      
 
 def gaussian(bounds, density, x, y, theta, width, height):
+        bounds  = produce_value(bounds)
+        density = produce_value(density)
+        
         left,bottom,right,top = bounds.aarect().lbrt()
         bound_width  = right-left
         bound_height = top-bottom
@@ -60,7 +63,10 @@ Sine Grating Kernel Factory
 """
 
 
-def sine_grating(bounds, density, x, y, theta, amplitude, frequency):
+def sine_grating(bounds, density, x, y, theta, frequency, phase):
+        bounds  = produce_value(bounds)
+        density = produce_value(density)
+
         left,bottom,right,top = bounds.aarect().lbrt()
         bound_width  = right-left
         bound_height = top-bottom
@@ -74,14 +80,17 @@ def sine_grating(bounds, density, x, y, theta, amplitude, frequency):
         kernel_y = arange(left-x,right-x, bound_width/cols)
         kernel_x = arange(bottom-y,top-y, bound_height/rows)
  
-        amplitude = produce_value(amplitude)
+        width  = produce_value(width)
+        height = produce_value(height) 
+
+        phase     = produce_value(phase)
         frequency = produce_value(frequency)
         theta     = produce_value(theta) 
 
         new_kernel_x = subtract.outer(cos(theta)*kernel_x, sin(theta)*kernel_y)
         new_kernel_y = add.outer(sin(theta)*kernel_x, cos(theta)*kernel_y)
 
-        new_kernel = amplitude*sin(frequency*2*pi*new_kernel_x)
+        new_kernel = sin(frequency*2*pi*new_kernel_x + phase)
 
         return new_kernel
 
@@ -89,7 +98,10 @@ def sine_grating(bounds, density, x, y, theta, amplitude, frequency):
 Gabor Kernel Factory
 """
 
-def gabor(bounds, density, x, y, theta, width, height):
+def gabor(bounds, density, x, y, theta, width, height, frequency, phase):
+        bounds  = produce_value(bounds)
+        density = produce_value(density)
+        
         left,bottom,right,top = bounds.aarect().lbrt()
         bound_width  = right-left
         bound_height = top-bottom
@@ -98,27 +110,33 @@ def gabor(bounds, density, x, y, theta, width, height):
         rows,cols = bounds2shape(bounds,density)
         
         x = produce_value(x)
-        y = produce_value(y) 
+        y = produce_value(y)
+  
+        theta     = produce_value(theta) 
+        phase     = produce_value(phase)
+        frequency = produce_value(frequency)
+        width  = produce_value(width)
+        height = produce_value(height) 
 
         kernel_y = arange(left-x,right-x, bound_width/cols)
         kernel_x = arange(bottom-y,top-y, bound_height/rows)
- 
-        theta  = produce_value(theta)
-        width  = produce_value(width)
-        height = produce_value(height) 
 
         new_kernel_x = subtract.outer(cos(theta)*kernel_x, sin(theta)*kernel_y)
         new_kernel_y = add.outer(sin(theta)*kernel_x, cos(theta)*kernel_y)
 
         # TODO: this doesn't seem to be working correctly.
 
-        return exp( maximum(-100, -(new_kernel_x/width)**2 - (new_kernel_y/height)**2 )) * cos( 2*pi*new_kernel_x )
+        return exp( maximum(-100, -(new_kernel_x/width)**2 -(new_kernel_y/height)**2 )) * 
+               (0.5 + 0.5*cos( 2*pi*frequency*new_kernel_x + phase )
 
 """
 Uniform Random Kernel Factory
 """
 
 def uniform_random(bounds, density):
+        bounds  = produce_value(bounds)
+        density = produce_value(density)
+        
         rows,cols = bounds2shape(bounds,density)
                                                                                                                    
         return random((rows,cols)) 
@@ -128,15 +146,18 @@ Uniform Random Kernel Factory
 """
 
 def rectangle(bounds, density, x, y, width, height, theta):
+    bounds  = produce_value(bounds)
+    density = produce_value(density)
+    
     return kernel_x
 
 """
 Uniform Random Kernel Factory
 """
 
-def fuzzy_line(bounds, density, x, y, width, theta):
+def fuzzy_line(bounds, density, x, y, theta, width):
     #TODO: This is a hack: the height should be specified in terms of bounds
-    return gaussian(bounds, density, x, y, width, 100, theta)
+    return gaussian(bounds, density, x, y, theta, width, 100)
 
 
 """
@@ -144,6 +165,8 @@ Uniform Random Kernel Factory
 """
 
 def fuzzy_disc(bounds, density, x, y, radius):
+    bounds  = produce_value(bounds)
+    density = produce_value(density)
 
     left,bottom,right,top = bounds.aarect().lbrt()
     bound_width  = right-left
@@ -168,9 +191,7 @@ def fuzzy_disc(bounds, density, x, y, radius):
     return tanh(radius*new_kernel_x*new_kernel_y)
 
 
-
-
 if __name__ == '__main__':
 
-    print "No tests"
+    print "No tests. Run inputsheet.py instead."
     #l = KernelFactory(bounds=BoundingBox(points=((0,0), (10,10)), density=1))
