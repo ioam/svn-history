@@ -6,7 +6,7 @@ $Id$
 import unittest
 from Tkinter import *
 from topo.gui import *
-from topo.propertiesframe import *
+from topo.tk.propertiesframe import *
 
 class TestPropertiesFrame(unittest.TestCase):
     def test_PropertiesFrame(self):
