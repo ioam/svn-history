@@ -7,6 +7,8 @@ import taggedslider
 import topoconsole
 import plotpanel
 
+# Code block-copied over from topo/gui.py  These imports should
+# be cleaned up.
 from Tkinter import *
 import Pmw, sys
 import topo.simulator as simulator
