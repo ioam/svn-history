@@ -17,6 +17,7 @@ import testsimulator
 import testpalette
 import testgui
 import testpropertiesframe
+import testdislinplot
 
 suite = unittest.TestSuite()
 
