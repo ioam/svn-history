@@ -20,7 +20,7 @@ def generate_cmd_prefix(interactive=True):
     the banner should be displayed must be embedded within the command
     string.
     """
-    return 'import topo.commandline; topo.commandline.start(' + str(interactive) + ');'
+    return '"import topo.commandline; topo.commandline.start(' + str(interactive) + ');"'
 
 
 
@@ -47,7 +47,10 @@ def generate_params(argv):
     if not c_flag:                     # Create the '-c' on arg 1 or go interactive.
         if len(in_args) >= 1:
             key = '-c'
-            val = generate_cmd_prefix(flags.has_key('-i')) + 'execfile("' + in_args[0] + '");'
+	    # Assumes the last character from generate_cmd_prefix is a 
+	    # double-quote that can be cut off, and then extra commands
+	    # added to it.
+            val = generate_cmd_prefix(flags.has_key('-i'))[:-1] + 'execfile(\'' + in_args[0] + '\');"'
             opts.append((key,val))
             in_args = in_args[1:]
         else:
