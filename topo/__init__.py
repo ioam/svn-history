@@ -1,3 +1,6 @@
+# For using .ty file types.
+import tyimputil
+
 # core
 import simulator
 import params
@@ -21,6 +24,5 @@ import inputsheet
 from simulator import *
 from sheet import *
 
-# For using .ty file types.
-import tyimputil
+
 
