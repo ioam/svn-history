@@ -1,14 +1,13 @@
-# Topographica Project
-# August 2003
-# Judah De Paula
-# Driver program to call DislinPlot with some sample plots.  This way it
-# can be tested independently of Topographica proper.
+"""
+Driver program to call DislinPlot with some sample plots.  This way it
+can be tested independently of Topographica proper.
+$Id$
+"""
 import dislinplot, math, Image, ImageOps
 
 
-######  Example From Dislin.  
 def generate_zmat(gridsize):
-    # Example contour map for simple overlay of bitmap
+    "Example from Dislin.  Example contour map for simple overlay of bitmap"
     n = gridsize
     m = gridsize
     xray = range (n)
@@ -40,8 +39,8 @@ def generate_layers(plot):
       plot.add_layer('FLOAT',zlev,(i+1) * 28)
 
 
-# First example plot.  Proof of concept, don't use as a template.
 def plot1():
+    "First example plot.  Proof of concept, don't use as a template."
     zmat = generate_zmat(50)
     contourplot = dislinplot.DislinPlot()
     generate_layers(contourplot)
@@ -51,8 +50,8 @@ def plot1():
 #######
 
 
-# Template example for creating a tiff file from DislinPlot
 def plot2():
+    "Template example for creating a tiff file from DislinPlot"
     # Set plot options for a tiff output file
     plot2 = dislinplot.DislinPlot()
     plot2.set_dislin_scale(False)              # Color will be 256
@@ -75,9 +74,8 @@ def plot2():
     print 'Plot 2 file created and named: ', filename
 
 
-# Template example for creating a postscript file from DislinPlot
 def plot3():
-    # Set plot options for a postscript output file
+    "Template example for creating a postscript file from DislinPlot"
     plot2 = dislinplot.DislinPlot()
     plot2.set_dislin_scale(True)
     #plot2.set_bitmap_size(800)                 # Not used for postscript
