@@ -4,3 +4,5 @@
 
 import propertiesframe
 import taggedslider
+import topoconsole
+import plotpanel
