@@ -13,7 +13,7 @@ from Numeric import resize,array,zeros
 from simulator import PulseGenerator,EventProcessor
 from sheet import Sheet
 from debug import Debuggable,VERBOSE
-from params import setup_params
+from params import setup_params,Parameter
 from utils import NxN
 
 from pprint import *
@@ -36,7 +36,7 @@ class ImageGenerator(Sheet):
     output. See simulator.PulseGenerator for more details.
 
     """
-    filename = None
+    filename = Parameter(None)
     
     def __init__(self,**config):
 
@@ -95,49 +95,12 @@ class ImageSaver(EventProcessor):
                      
     """
 
-    file_prefix = ''
-    file_format = 'ppm'
-    time_format = '%f'
-    pixel_scale = 255
-    pixel_offset = 0
+    file_prefix = Parameter('')
+    file_format = Parameter('ppm')
+    time_format = Parameter('%f')
+    pixel_scale = Parameter(255)
+    pixel_offset = Parameter(0)
 
-    """
-    Receives 2D activation matrices from other sheets, and saves them
-    as image files.  This component can receive input on any arbitrary
-    string-named port, and save that matrix as an image file of the
-    given type.  The image file is named using the following
-    convention:
- 
-         <file-prefix><component-name>_<port-name>_<sim-time>.<type>
-
-    where <file-prefix> is an arbitrary prefix or path,
-    <component-name> is the name of the image saver, <port-name> is
-    the name of the port on which the input was received, <sim-time>
-    is the simulation time at which the event was received, and <type>
-    is the image file type
-
-    Parameters:
-
-    file_format = (string) The image file format (e.g. 'ppm', 'gif').  Can be
-                  format understood by PIL. (default ppm)
-    file_prefix = (string) The prefix or path for the
-                  filename. (default "")
-    time_format = (string) The format string for the simulation time
-                  in the file name.  (default ('%f')
-    pixel_scale = (number) The amount by which the activity values will
-                  be scaled when converted to pixels.  Same as the
-                  scale parameter of PIL.Image.putdata().  (default 255)
-    pixel_offset = (number) The offset added to the activations when
-                  converting to pixel values.  Same as the offset
-                  paramter of PIL.Image.putdata().  (default 0)
-    
-    """
-
-    file_prefix = ''
-    file_format = 'ppm'
-    time_format = '%f'
-    pixel_scale = 255
-    pixel_offset = 0
 
     def __init__(self,**config):
 

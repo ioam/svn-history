@@ -45,11 +45,10 @@ class Simulator(Debuggable):
     """
     A class to manage a simulation.  A simulator object manages the
     event queue, simulation clock, and list of EventProcessors, dispatching
-    events to them in time order, and moving the simulation clock as needed.
-    
+    events to them in time order, and moving the simulation clock as needed.    
     """
 
-    step_mode = 0
+    step_mode = Parameter(0)
     
     def __init__(self,**config):
         """
@@ -230,9 +229,9 @@ class PulseGenerator(EventProcessor):
 
     """
 
-    amplitude = 1
-    period = 0
-    phase = 0
+    amplitude = Parameter(1)
+    period    = Parameter(0)
+    phase     = Parameter(0)
     
     def __init__(self,**config):
         EventProcessor.__init__(self,**config)
@@ -267,9 +266,9 @@ class ThresholdUnit(EventProcessor):
     resets the accumulator to zero.
 
     """
-    threshold = 1
-    accum     = 0
-    amplitude = 1
+    threshold = Parameter(1.0)
+    accum     = Parameter(0.0)
+    amplitude = Parameter(1.0)
 
     def __init__(self,**config):
         EventProcessor.__init__(self,**config)

@@ -14,7 +14,7 @@ from utils import NxN
 
 from Numeric import *
 from pprint import pprint,pformat
-from params import setup_params
+from params import setup_params,Parameter
 
 
 def convolve2d(kernel,image):
@@ -51,7 +51,7 @@ class Convolver(Sheet):
     
     """
 
-    kernel = array([[1.0]])
+    kernel = Parameter(array([[1.0]]))
 
     def __init__(self,**config):
 

@@ -17,14 +17,14 @@ DEBUG   = 300
 print_level = NORMAL
 object_count = 0
 
-class Debuggable:
+class Debuggable(object):
     """
     A mixin class for debuggable objects.  Makes sure every debuggable
     object has a name,, and __repr__(), __str__(), and db_print() methods.
     """
 
-    name = None
-    db_print_level = NORMAL
+    name           = Parameter(None)
+    db_print_level = Parameter(NORMAL)
     
     def __init__(self,**config):
         """

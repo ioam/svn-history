@@ -4,7 +4,7 @@ Topographica bounding regions and boxes.
  $Id$
 """
 import debug
-import params
+from params import *
 from Numeric import *
 
 NYI = "Abstract method not implemented."
@@ -81,12 +81,12 @@ class BoundingCircle(BoundingRegion):
     center = a single point (x,y)
     radius = a scalar radius
     """
-    radius = 0.5
-    center = (0.0,0.0)
+    radius = Parameter(0.5)
+    center = Parameter((0.0,0.0))
 
     def __init__(self,**args):
         BoundingRegion.__init__(self,**args)
-        params.setup_params(self,BoundingCircle,**args)    
+        setup_params(self,BoundingCircle,**args)    
 
     def contains(self,x,y):
         xc,yc = self.center

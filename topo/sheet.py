@@ -87,8 +87,8 @@ class Sheet(EventProcessor):
     
     """
 
-    bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
-    density = 100
+    bounds  = Parameter(BoundingBox(points=((-0.5,-0.5),(0.5,0.5))))
+    density = Parameter(100)
 
     def __init__(self,**params):
 
@@ -143,7 +143,6 @@ from utils import NxN
 
 class Composer(Sheet):
     """
-
     A Sheet that combines the activity of 2 or more other sheets into
     a single activity matrix.  When an activity matrix is received on
     an input port, it is added to the the sheet's input buffer
@@ -154,15 +153,12 @@ class Composer(Sheet):
     Parameters:
       delay = (default 1.0) the time delay after receiving an input to
               send output.
-    
     """
 
-    delay = 1.0
+    delay = Parameter(1.0)
 
     def __init__(self,**config):
-
         Sheet.__init__(self,**config)
-
         setup_params(self,Composer,**config)
         
         self.ports = {}
@@ -186,7 +182,6 @@ class Composer(Sheet):
             
 
     def input_event(self,src,src_port,dest_port,data):
-
         if dest_port == 'trigger_in':
             self.send_output(data=self.activation)
             self.activation = zeros(self.activation.shape)+0.0
