@@ -23,6 +23,8 @@ class WeightsPanel(RegionPlotPanel):
         self.y_str = StringVar()
         self.y_str.set(0.0)
 
+        self.panel_num = self.console.num_weights_windows
+
         self._add_xy_boxes()
         self.auto_refresh_checkbutton.invoke()
 
@@ -55,18 +57,6 @@ class WeightsPanel(RegionPlotPanel):
         self.plot_key = ('Weights',self.x,self.y)
         
         
-    def do_plot_cmd(self):
-        """
-        Define do_plot_cmd() so that the plot_key can change to the
-        active x/y pair in the window.
-
-        NOTE: THE PLOTVIEW REMAINS IN THE SHEET.  THIS WILL EVENTUALY
-        CONSUME ALL MEMORY.
-        """
-        self.generate_plot_key()
-        active_sheet_name = self.region.get()
-        sheet_filter_lam = lambda s: s.name == active_sheet_name
-        self.pe_group = self.pe.get_plot_group(self.plot_key,sheet_filter_lam)
-        self.plot_tuples = self.pe_group.plots()
+    def refresh_title(self):
         self.parent.title("Unit Weights %d. (x=%0.4f, y=%0.4f)" %
-                          (self.console.num_weights_windows,self.x, self.y))
+                          (self.panel_num,self.x, self.y))
