@@ -3,7 +3,7 @@ ECHO This will install Topographica and its package dependencies.
 
 REM Developer's Note: Install Python then call the setup.py script
 REM inside the external/win32 directory.
-REM $Id: setup.bat,v 1.3 2004/06/28 23:09:51 judah Exp $
+REM $Id: setup.bat,v 1.4 2004/06/30 14:57:55 judah Exp $
 
 external\win32\util\Y_OR_N /Q /A "Do you wish to continue? [Y/n]"
 
@@ -32,5 +32,3 @@ copy topographica-script.py topographica.py
 
 :EXIT
 ECHO Install Complete
-
-pause
