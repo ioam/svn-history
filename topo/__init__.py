@@ -34,6 +34,9 @@ import propertiesframe
 import taggedslider
 import gui
 
+# Documentation
+import gendocs
+
 # set import all the important stuff directly into the package
 # namespace.
 from simulator import *
