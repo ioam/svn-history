@@ -41,7 +41,7 @@ Parameters have several advantages over plain attributes:
       from random import gauss
       FooSheet.sigma = lambda:gauss(0.5,0.1)
 
-   If a Parameter's valuse is set to a Python generator or iterator,
+   If a Parameter's values are set to a Python generator or iterator,
    then when the Parameter is accessed, the iterator's .next() method
    is called.  So to get a parameter that cycles through a sequence,
    you could write:
