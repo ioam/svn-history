@@ -4,6 +4,10 @@ Moves generated pydoc HTML files to the docs directory after they are
 created by pydoc.  To be used with MAKE, and only from the base
 Topographica directory.
 
+The generated index.html file is for the topo/__init__.py file which
+does not necessarily catalog topo/*.py.  To see all files, select
+the 'index' link at the top of one of the html docs.
+
 To generate Documentation, enter 'make docs' from the base Topographica
 directory which will call this file on the Topographica sources.
 
