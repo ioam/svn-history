@@ -8,6 +8,7 @@ import unittest
 import testboundingregion
 import testdummy
 import testsheet
+import testsheetview
 import testbitmap
 import testplot
 import testsimulator
