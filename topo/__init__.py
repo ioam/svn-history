@@ -23,6 +23,8 @@ import inputsheet
 
 # plotting
 import bitmap
+import sheetview
+import plot
 
 # set import all the important stuff directly into the package
 # namespace.
