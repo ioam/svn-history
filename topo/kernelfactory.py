@@ -123,16 +123,49 @@ def uniform_random(bounds, density):
                                                                                                                    
         return random((rows,cols)) 
 
+"""
+Uniform Random Kernel Factory
+"""
 
-def rectangle(kernel_x, kernel_y, width, height, theta):
-    # need to specify the bounds somehow 
+def rectangle(bounds, density, x, y, width, height, theta):
     return kernel_x
 
-def fuzzy_line(kernel_x, kernel_y, width, height, theta):
-    return kernel_x
+"""
+Uniform Random Kernel Factory
+"""
 
-def fuzzy_disc(kernel_x, kernel_y, width, height, theta):
-    return kernel_x
+def fuzzy_line(bounds, density, x, y, width, theta):
+    #TODO: This is a hack: the height should be specified in terms of bounds
+    return gaussian(bounds, density, x, y, width, 100, theta)
+
+
+"""
+Uniform Random Kernel Factory
+"""
+
+def fuzzy_disc(bounds, density, x, y, radius):
+
+    left,bottom,right,top = bounds.aarect().lbrt()
+    bound_width  = right-left
+    bound_height = top-bottom
+    linear_density = sqrt(density)
+
+    rows,cols = bounds2shape(bounds,density)
+        
+    x = produce_value(x)
+    y = produce_value(y) 
+
+    kernel_y = arange(left-x,right-x, bound_width/cols)
+    kernel_x = arange(bottom-y,top-y, bound_height/rows)
+ 
+    theta  = produce_value(theta)
+    radius = produce_value(radius)
+
+    new_kernel_x = subtract.outer(cos(theta)*kernel_x, sin(theta)*kernel_y)
+    new_kernel_y = add.outer(sin(theta)*kernel_x, cos(theta)*kernel_y)
+
+
+    return tanh(radius*new_kernel_x*new_kernel_y)
 
 
 
