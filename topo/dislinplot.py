@@ -242,13 +242,13 @@ class DislinPlot:
         while pixel_y < height:
             left_in_image = height - pixel_y
             left_on_screen = scale_y - cur_y
-            stretch_y = round(left_on_screen / float(left_in_image))
+            stretch_y = int(round(left_on_screen / float(left_in_image)))
             cur_x, pixel_x = 0, 0
 
             while pixel_x < width:
                 ximage = width - pixel_x
                 xscreen = scale_x - cur_x
-                stretch_x = round(xscreen / float(ximage))
+                stretch_x = int(round(xscreen / float(ximage)))
 
                 # Let it guess an approximation or not
                 #dislin.setclr(bwimage.getpixel((pixel_x,pixel_y)))
@@ -374,6 +374,15 @@ class DislinPlot:
         #dislin.color('Black')
         #dislin.linwid (15)
         #dislin.vector(560,500,700,750,1701)
+
+        # Options are 'WARNINGS', 'CHECK', 'PROTOCOL' and 'ALL'.  Toggle: 'ON', 'OFF'
+        # Have turned off Protocol (File writing notifcation) but Warnings should still
+        # work.
+        dislin.errmod ('PROTOCOL','OFF')
+        dislin.errmod ('WARNINGS','ON')
+        dislin.errmod ('CHECK','ON')
+        # Options are 'FILE', or 'CONS'
+        # dislin.errdev ('FILE')
 
         actual_filename = dislin.getfil()
         dislin.disfin ()
