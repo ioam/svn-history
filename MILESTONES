@@ -58,7 +58,7 @@ deadlines:
 
 
   Milestone 4: Stable APIs. Finalize the user APIs, and port all
-  categories of simulations from parts II and III the LISSOM book
+  categories of simulations from parts II and III of the LISSOM book
   (i.e. orientation maps, ocular dominance maps, direction maps,
   combined maps, face maps, and two-level maps) to Topographica.
 
