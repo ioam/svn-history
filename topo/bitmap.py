@@ -37,6 +37,8 @@ bitmap4 = HSVMap(hMapArray,sMapArray,vMapArray)
     3 matrices expected, each should have been normalized to 1.
 
 The constructed Image is then in [BitmapObject].bitmap.
+
+$Id$
 """
 
 from colorsys import rgb_to_hsv, hsv_to_rgb
