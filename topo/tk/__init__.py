@@ -2,17 +2,16 @@
 #
 # $Id$
 
-import propertiesframe
-import taggedslider
-import topoconsole
-import plotpanel
+# For importing the tk GUI files
+import topo.tk.propertiesframe
+import topo.tk.taggedslider
+import topo.tk.topoconsole
+import topo.tk.plotpanel
 
-# Code block-copied over from topo/gui.py  These imports should
-# be cleaned up.
-from Tkinter import *
-import Pmw, sys
-import topo.simulator as simulator
-from topo.tk.topoconsole import *
+# For show_cmd_prompt() and start()
+import Pmw, sys, Tkinter
+import topo.simulator
+import topo.base
 
 
 def show_cmd_prompt():
@@ -22,8 +21,9 @@ def show_cmd_prompt():
     so as to let the user know that the command-line is still
     active.
     """
-    print "\n", sys.ps1,
-    sys.stdout.flush()
+    if topo.base.min_print_level >= topo.base.MESSAGE:
+        print "\n", sys.ps1,
+        sys.stdout.flush()
     
 def start(sim=None, mainloop=False):
     """
@@ -37,13 +37,13 @@ def start(sim=None, mainloop=False):
     is open.  If False, then commands can be entered at the command-line
     even while the GUI is operational.  Default is False.
     """
-    assert isinstance(sim,simulator.Simulator) or sim == None, 'sim is not a Simulator object'
+    assert isinstance(sim,topo.simulator.Simulator) or sim == None, 'sim is not a Simulator object'
 
-    root = Tk()
+    root = Tkinter.Tk()
     root.resizable(1,1)
     Pmw.initialise(root)
-    console = TopoConsole(parent=root)
-    console.pack(expand=YES,fill=BOTH)
+    console = topo.tk.topoconsole.TopoConsole(parent=root)
+    console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
     console.set_active_simulator(sim)
 
     # mainloop() freezes the commandline until the GUI window exits.
