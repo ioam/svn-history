@@ -7,9 +7,10 @@ $Id$
 import unittest
 import testboundingregion
 import testdummy
+import testbitmap
 import testsheet
 import testsheetview
-import testbitmap
+import testhistogram
 import testplot
 import testsimulator
 
