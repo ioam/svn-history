@@ -1,18 +1,20 @@
 PREFIX = ${dir ${CURDIR}}
+CC = gcc
 
+all: python jpeg pil numeric pmw dislin startscript dislinpy
 
-all: python jpeg pil numeric pmw dislin startscript
+clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean dislin-clean dislinpy-clean
 
-clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean dislin-clean
-
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall dislin-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall dislin-uninstall dislinpy-uninstall
 
 ##############################################################
 # Python
 #
 PYTHON = Python-2.4
 
-PYTHON_LIB = lib/python2.4
+PYTHON_LIB  = lib/python2.4
+PYTHON_INC  = include/python2.4
+PYTHON_CONF = lib/python2.4/config
 
 PYTHON_UNINSTALL += bin/idle bin/python bin/pydoc bin/python2.4 
 PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.4
@@ -165,6 +167,27 @@ dislin-uninstall:
 
 
 ##############################################################
+# Dislin/Pyton interface
+# Modified from the sample make script in ${DISLIN}/python
+#
+DISLIN_PYTHON_DIR = ${PREFIX}${DISLIN_UNINSTALL}/python
+DISLIN_PYTHON_SRC = ${DISLIN}.python.tar.gz
+DISLINPY_BUILD =${CC} -c -O -I${PREFIX}/${PYTHON_INC} -I${PREFIX}/${PYTHON_CONF} dislinmodule.c
+DISLINPY_LINK  = ${CC} -shared -Wl,-soname,dislinmodule.so -o dislinmodule.so *.o -L${PREFIX}/${DISLIN_UNINSTALL} -ldislnc
+
+dislinpy: dislin 
+	cd ${DISLIN_PYTHON_DIR}; tar xzf ${DISLIN_PYTHON_SRC}
+	cd ${DISLIN_PYTHON_DIR}; ${DISLINPY_BUILD}
+	cd ${DISLIN_PYTHON_DIR}; ${DISLINPY_LINK}
+
+dislinpy-clean:
+	cd ${DISLIN_PYTHON_DIR}; rm -f make_py README.PY dislin.h dislinmodule.{h,c,o}
+
+dislinpy-uninstall: dislinpy-clean
+	rm -f ${DISLIN_PYTHON_DIR}/dislinmodule.so
+
+
+##############################################################
 # Startup Script
 #
 startscript: dislin python
@@ -174,6 +197,7 @@ startscript: dislin python
 	echo 'export LD_LIBRARY_PATH="${PREFIX}lib:${PREFIX}${DISLIN_UNINSTALL}:$$LD_LIBRARY_PATH"' >> ${PREFIX}topographica
 	echo -e "/usr/bin/env ${PWD}/bin/python topographica-script.py \044\100" >> ${PREFIX}topographica
 	chmod a+x ${PREFIX}topographica
+
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
