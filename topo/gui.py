@@ -7,7 +7,7 @@ To start the gui from the Topographica prompt, call gui.start().
 $Id$
 """
 from Tkinter import *
-import Pmw, re, os, sys
+import Pmw, re, os, sys, code, traceback, __main__
 import tkFileDialog
 if __name__ == '__main__':  # Take control of console.
     from topo.propertiesframe import *
@@ -22,7 +22,7 @@ KNOWN_FILETYPES = [('Python Files','*.py'),('Topographica Files','*.ty'),('All F
 # Namespace that the simulations will be running from.  This is
 # not the only constant that must change since there are package
 # functions that must exist to be called in the package.
-COMMAND_NAMESPACE = 'topo.simulator'  
+COMMAND_NAMESPACE = '__main__'  
 
 
 class TopoConsole(Frame):
@@ -333,9 +333,61 @@ class TopoConsole(Frame):
         that the simulator always returns and does not throw any exceptions
         if the cmd contains an error.
         """
-        result = simulator.exec_cmd(cmd)
+        result = self.exec_cmd(cmd)
 	self.messageBar.message('state', result)
         show_cmd_prompt()
+
+    def exec_cmd(self,cmd):
+        """
+        Use exec to evaluate the command.  This is a prototype that needs to be
+        tested to see what kind of issues develop.  Exceptions raised by the exec
+        command are caught, and the name of the exception is passed back to the
+        calling function.  If the command goes through, an OK is sent, along with
+        a copy of the command.
+    
+        The exec is run inside of the global namespace.  This function is run
+        inside of a class, but the global space is shared between classes, so
+        collisions between simultaneously running simulatiors is possible.
+        """
+        try:
+            #g = globals()
+            #exec cmd in g
+            g = __main__.__dict__
+            exec cmd in g
+            result = 'OK: ' + cmd
+            # print 'Ran in namespace: ' + __name__
+        except Exception, e:
+            result = 'Exception Raised: ' + e.__doc__
+            traceback.print_exc()
+        return result
+    
+    
+    def load_script_file(self,filename):
+        """
+        Load a script file from disk and evaluate it from within this
+        package globals() namespace.  The purpose is to allow a
+        Simulation to add in new script code into an existing
+        Simulation.  Care needs to be taken that namespace variable
+        collisions don't take place across multiple simulations or
+        script files.
+    
+        This function was originally written so that the same script
+        can be loaded into a simulation from the GUI or from the
+        command-line.
+    
+        Returns False if the filename is '', (), or None.  Otherwise
+        Returns True.  If execfile raises an exception, then it is not
+        caught and passed to the calling function.
+        """
+        if filename in ('',(),None):
+            return False
+        else:
+            # g = globals()
+            g = __main__.__dict__
+            execfile(filename,g)
+            # print 'Loaded ' + filename + ' in ' + __name__
+            return True
+
 
     def do_training(self,count):
         """

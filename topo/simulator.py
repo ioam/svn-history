@@ -38,6 +38,7 @@ $Id$
 import sched
 from base import TopoObject
 from params import Parameter
+import __main__
 
 SLEEP_EXCEPTION = "Sleep Exception"
 STOP = "Simulator Stopped"
@@ -358,55 +359,6 @@ class SumUnit(EventProcessor):
             self.debug("Sending output:",self.value)
             self.send_output(data=self.value)
             self.value = 0.0
-
-
-def exec_cmd(cmd):
-    """
-    Use exec to evaluate the command.  This is a prototype that needs to be
-    tested to see what kind of issues develop.  Exceptions raised by the exec
-    command are caught, and the name of the exception is passed back to the
-    calling function.  If the command goes through, an OK is sent, along with
-    a copy of the command.
-
-    The exec is run inside of the global namespace.  This function is run
-    inside of a class, but the global space is shared between classes, so
-    collisions between simultaneously running simulatiors is possible.
-    """
-    try:
-        g = globals()
-        exec cmd in g
-        result = 'OK: ' + cmd
-        # print 'Ran in namespace: ' + __name__
-    except Exception, e:
-        result = 'Exception Raised: ' + e.__doc__
-    return result
-
-
-def load_script_file(filename):
-    """
-    Load a script file from disk and evaluate it from within this
-    package globals() namespace.  The purpose is to allow a
-    Simulation to add in new script code into an existing
-    Simulation.  Care needs to be taken that namespace variable
-    collisions don't take place across multiple simulations or
-    script files.
-
-    This function was originally written so that the same script
-    can be loaded into a simulation from the GUI or from the
-    command-line.
-
-    Returns False if the filename is '', (), or None.  Otherwise
-    Returns True.  If execfile raises an exception, then it is not
-    caught and passed to the calling function.
-    """
-    if filename in ('',(),None):
-        return False
-    else:
-        g = globals()
-        execfile(filename,g)
-        # print 'Loaded ' + filename + ' in ' + __name__
-        return True
-
 
 
 ##################################################################################
