@@ -28,7 +28,7 @@ pydoc.cli()
 
 # Move those files which were generated to ./docs/
 for i in glob.glob(TOPO + '/*.py'):
-    cline = 'mv -f ' + i[len(TOPO)+1:-3] + '.html ' + DOCS + '/' + TOPO + '.' + i[len(TOPO)+1:-3] + '.html'
+    cline = 'mv -f ' + i[len(TOPO)+1:-3] + '.html ' + DOCS + '/' + i[len(TOPO)+1:-3] + '.html'
     if glob.glob(i[len(TOPO)+1:-3] + '.html'):
         # print cline
         os.system(cline)
