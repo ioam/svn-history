@@ -32,18 +32,29 @@ def produce(func):
 
 
 """
-The width and height of the gaussian are specified in terms of the matrix size, i.e. a gaussian with
-with 2 has a width of two squares on the matrix. 
+Function for constructing a gassian pattern out of a properly set up Numeric
+matrix
 """
 
-def gaussian(self, x, y, width, height, theta):
-    st = sin(theta)
-    ct = cos(theta)
-    nx = ct*x - st*y
-    ny = st*x + ct*y
-    return (exp(-(nx**2)/(width**2)), exp(-(ny**2)/(height**2)))
+def gaussian(kernel_x, kernel_y, width, height, theta):
 
-def random_field(x, y, width, height, theta):
+    # TODO: this can generate ouput that may be off by one in terms of size,
+    # for example most times this generates a 100x100 image, but sometimes
+    # it generates a 101x100 of something like that.
+
+    # TODO: This uses 5 numeric arrays. We can probably simplify this. It is
+    # faster than the previous implementation though.
+
+
+    new_kernel_x = subtract.outer(cos(theta)*kernel_x, sin(theta)*kernel_y)
+    new_kernel_y = add.outer(sin(theta)*kernel_x, cos(theta)*kernel_y)
+
+    new_kernel = -(new_kernel_x / width)**2 + -(new_kernel_y / height)**2
+
+    return exp(maximum(-100,new_kernel))
+
+
+def random_field(kernel_x, kernel_y, width, height, theta):
     return random.uniform(0,1)
 
 class KernelFactory:
@@ -80,30 +91,12 @@ class KernelFactory:
         bound_height = self.bounds.aarect().top()-self.bounds.aarect().bottom()
         linear_density = sqrt(self.density)
 
-        # TODO: this can generate ouput that may be off by one in terms of size,
-        # for example most times this generates a 100x100 image, but sometimes
-        # it generates a 101x100 of something like that.
-
-        # TODO: This uses 5 numeric arrays. We can probably simplify this. It is
-        # faster than the previous implementation though.
-
         kernel_x = arange(self.bounds.aarect().left()-x,
                           self.bounds.aarect().right()-x, bound_width / linear_density);
         kernel_y = arange(self.bounds.aarect().bottom()-y,
                           self.bounds.aarect().top()-y, bound_height / linear_density);
         
-        new_kernel_x = subtract.outer(cos(theta)*kernel_x,
-                                      sin(theta)*kernel_y)
-        new_kernel_y = add.outer(sin(theta)*kernel_x,
-                                 cos(theta)*kernel_y)
-
-        new_kernel = -(new_kernel_x / width)**2 + -(new_kernel_y / height)**2
-        new_kernel = maximum(-100, new_kernel)
-
-        new_kernel = exp(new_kernel)
-
-        return new_kernel
-
+        return self.function(kernel_x, kernel_y, width, height, theta)
 
 if __name__ == '__main__':
 

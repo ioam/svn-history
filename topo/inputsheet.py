@@ -15,7 +15,7 @@ from Numeric import *
 from pprint import pprint,pformat
 from params import setup_params
 
-class GaussianSheet(Sheet):
+class InputSheet(Sheet):
 
     period = 1
     phase = 0
@@ -24,7 +24,7 @@ class GaussianSheet(Sheet):
 
     def __init__(self,**config):
         Sheet.__init__(self,**config)
-        setup_params(self,GaussianSheet,**config)
+        setup_params(self,InputSheet,**config)
 
         self.kernel =  KernelFactory(bounds=self.bounds,
                                      density=self.density,
@@ -52,6 +52,14 @@ class GaussianSheet(Sheet):
   
         self.send_output(data=self.activation)
         self.db_print("Sending %s output." % NxN(self.activation.shape))
+
+class GaussianSheet(InputSheet):
+
+    def __init__(self, **config):
+        InputSheet.__init__(self,**config)
+        setup_params(self,GaussianSheet,**config)
+
+        self.kernel.function = gaussian
 
 if __name__ == '__main__':
     from simulator import Simulator
