@@ -43,8 +43,14 @@ $Id$
 from colorsys import rgb_to_hsv, hsv_to_rgb
 import Numeric, Image, math
 
+# Background type.  Decides to fill dead areas with 0s or with 1s
+BLACK_BACKGROUND = 0
+WHITE_BACKGROUND = 1
+MONITOR_BASED_PLOTS = BLACK_BACKGROUND
+PAPER_BASED_PLOTS = WHITE_BACKGROUND
 
-def matrix_rgb_to_hsv(hMapArray,sMapArray,vMapArray):
+
+def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     """
     First matrix sets the Hue (Color).
     Second marix sets the Sauration (How much color)
@@ -68,10 +74,10 @@ def matrix_rgb_to_hsv(hMapArray,sMapArray,vMapArray):
     # List comprehensions were not used because it was slower.
     for i in range(len(hFlat)):
         (hFlat[i], sFlat[i], vFlat[i]) = hsv_to_rgb(hFlat[i],sFlat[i],vFlat[i])
-    hMapArray = Numeric.reshape(hFlat,shape)
-    sMapArray = Numeric.reshape(sFlat,shape)
-    vMapArray = Numeric.reshape(vFlat,shape)
-    return (hMapArray, sMapArray, vMapArray)
+    rMapArray = Numeric.reshape(hFlat,shape)
+    gMapArray = Numeric.reshape(sFlat,shape)
+    bMapArray = Numeric.reshape(vFlat,shape)
+    return (rMapArray, gMapArray, bMapArray)
     
 
     
@@ -107,8 +113,8 @@ class Bitmap(object):
         """
         Take in a normalized 2D array, return a one-channel luminosity image.
         """
-        if max(inArray) > 1:
-            print 'Warning: arrayToImage inputs not normalized. Dividing by 255'
+        if max(inArray.flat) > 1:
+            print 'Warning: arrayToImage inputs not normalized. Dividing by 255.  Max value: ', max(inArray.flat)
             inArray = Numeric.divide(inArray,255.0)
 
         # PIL 'L' Images use 0 to 255.  Have to scale up.
@@ -127,6 +133,7 @@ class ColorMap(Bitmap):
 
     def __init__(self,inArray,palette=None):
         """
+        inArray should be normalized so all values are between 0 and 1
         Palette can be any color scale depending on the type of ColorMap
         desired.
         [0,0,0 ... 255,255,255] = Grayscale
