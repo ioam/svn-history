@@ -16,14 +16,17 @@ import sys
 from base import TopoObject
 from sheetview import *
 
-ADD      = 0
-SUBTRACT = 1
-MULTIPLY = 2
-DIVIDE   = 3
-AVERAGE  = 4
-RGB      = 5
-HSV      = 7
-MASK     = 8
+# Types of plots that Plot knows how to piece together from the input
+# matrices.
+RGB = 'RGB'
+HSV = 'HSV'
+CMAP = 'COLORMAP'
+
+# Shape of the plotting display used by PlotGroup.  NOTE: INCOMPLETE,
+# THERE SHOULD BE MORE TYPES OF SHAPES SUCH AS SPECIFYING X ROWS, OR Y
+# COLUMNS, OR GIVING A LIST OF INTEGERS REPRESENTING NUMBER OF PLOTS
+# FOR EACH ROW.
+FLAT = 'FLAT'
 
 class Plot(TopoObject):
     """
@@ -33,7 +36,7 @@ class Plot(TopoObject):
     plots within a single bitmap on the screen.
     """
 
-    def __init__(self, sheet_tuple_list=None, operation=ADD, cache=True, **params):
+    def __init__(self, sheet_tuple_list=None, **params):
         """
         sheet_tuple_list has tuples of the sheet and the name of the
         sheet to be retrieved.  Ex: [(Eye0,Activity),(Eye1,Activity)]
@@ -41,26 +44,18 @@ class Plot(TopoObject):
         universe that has a View filed under the key entered with
         generate_plot(key_name).
 
-        operation, by default, will ADD multiple SheetViews together if
-        sheet_tuple_list has more than one entry.
-
-        When the plot has caching enabled subsequent calls to plot() will
-        return the same data with no new calculations taking place.  If
-        set to false, every call to plot will get new SheetViews which
-        may change the simulation state depending on the type of views
-        being requested.  Default is True.
-
         Named parameter name is being inherited from TopoObject
 
         __init__ does not generate the plot instead you must also call
         generate_plot.  This is done in case the measurement causes a
         change in the Sheet providing the View.
+
+        What about BoundingRegions?
         """
         super(Plot,self).__init__(**params)
         self.sheet_tuples = sheet_tuple_list
         self.op = operation
         self.histograms = []
-        self.do_caching = cache
         self.plot_pending = False
         self.matrix = None
 
@@ -72,17 +67,10 @@ class Plot(TopoObject):
         """
         if not self.plot_pending:
             generate_plot()
-        if not self.do_caching:
-            self.plot_pending = False
         return (self.matrix, self.histograms)
 
 
-    def clear_cache(self):
-        """Flush the cache so the next plot will be fresh."""
-        self.plot_pending = False
-        
-
-    def generate_plot(self,key_name='Activity'):
+    def generate(self,key_name='Activity'):
         """
         Poll each Sheet in the tuple list and get the Views requested,
         then combine as specified by self.op.  Generates Histograms
@@ -94,13 +82,81 @@ class Plot(TopoObject):
         """
         if self.sheet_tuples:
             for (sheet, view_name) in self.sheet_tuples:
-                sheet_view = None  #TBC
+                sheet_view = None
+                #NYI
         else:
             #  Do the global name check against the key_name
-            sheet_view = None  # TBC
+            sheet_view = None
+            #NYI
+
+
+
+class PlotGroup(TopoObject):
+    """
+    Container that has one or more Plots and also knows how to arrange
+    the plots and other special parameters.  Works with the bitmap
+    display mechanisms.
+    """
+
+    def __init__(self, sheet_tuple_list=None, shape=FLAT, **params):
+        """
+        sheet_tuple_list has tuples of the sheet and the name of the
+        sheet to be retrieved.  Ex: [(Eye0,Activity),(Eye1,Activity)]
+        The default is None, which means all existing sheets in the
+        known universe that have a View filed under the key entered
+        with generate_plot(key_name).
+
+        Shape gives the visual arrangement of the plots within the group.
+        The default is FLAT (None) with each subsequent plot to the right
+        of the last.
+        TO BE IMPLEMENTED:  (None, 5) will have 5 columns of plots,
+        (5, None) will have 5 rows of of plots.  An X-tuple will have
+        each subsequent row the length of the corresponding value in
+        the tuple.
+
+        __init__ does not generate the plot instead you must also call
+        generate_plot.  This is done in case the measurement causes a
+        change in the Sheet providing the View.
+
+        What about BoundingRegions?
+        """
+        super(PlotGroup,self).__init__(**params)
+        self.sheet_tuples = sheet_tuple_list
+        self.shape = shape
+        self.plot_pending = False
+        self.plot_list = []
+
+
+    def plot(self):
+        """
+        Uses the cached plot, or regenerate if needed.
+        Return: 2-Tuple, (Calculated Matrix, List of Histograms)
+        """
+        if not self.plot_pending:
+            generate_plot()
+        return (self.matrix, self.histograms)
+
+
+    def generate_plot(self,key_name='Activity'):
+        """
+        If sheet_tuple_list is empty at object creation, all Sheets
+        are checked for the View filed under key_name (default is
+        Activity).
+        """
+        if self.sheet_tuples:
+            for (sheet, view_name) in self.sheet_tuples:
+                # Do something with the Plot objects.
+                x = 1
+                #NYI
+        else:
+            x = 1
+            #  Do the global name check against the key_name
+            #NYI
+
+
 
 
 # No Main code.  All testing takes place in the unit testing mechanism
-# in ~/topographica/tests/testplot.py
+# to be found in ~/topographica/tests/testplot.py
     
     
