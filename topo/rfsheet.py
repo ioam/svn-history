@@ -8,6 +8,7 @@ from params import Parameter
 from sheet import Sheet
 from kernelfactory import UniformRandomFactory
 from utils import mdot
+from boundingregion import Intersection
 import RandomArray,Numeric,copy
 
 
@@ -69,7 +70,7 @@ class RF(TopoObject):
         self.input_sheet = input_sheet
         self.bounds = bounds
         self.weights = weights
-        self._crop_to_src()
+        #self._crop_to_src()
         self.verbose("activation matrix shape: ",self.weights.shape)
 
     def contains(self,x,y):
@@ -136,6 +137,7 @@ class RFSheet(Sheet):
                 # Move the kernel factory to the right position,
                 bounds = copy.deepcopy(old_bounds)
                 bounds.translate(x,y)
+                bounds = Intersection(bounds,src.bounds)
                 weights = self.weights_factory(x=x,y=y,bounds=bounds,density=src.density)
                 row.append(self.rf_type(src,weights=weights,bounds=bounds))
             rfs.append(row)
