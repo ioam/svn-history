@@ -1,5 +1,18 @@
 """
-Abstract Class PlotPanel to support GUI windows to display bitmap plots. 
+Abstract Class PlotPanel to support GUI windows that display bitmap plots. 
+
+Undefined Variables:
+    self.plot_key
+
+Virtual Functions:
+    refresh_title()
+    do_plot_cmd()
+    generate_plot_key()
+
+Suggested functions to replace:
+    display_plots()
+    display_labels()
+    
 
 $Id$
 """
@@ -94,12 +107,26 @@ class PlotPanel(Frame,topo.base.TopoObject):
         self.load_images()                # Convert plots to bitmap images
         self.display_plots()              # Put images in GUI canvas
         self.display_labels()             # Match labels to grid
+        self.refresh_title()              # Update Frame title.
         Pmw.hidebusycursor()
 
 
+    def refresh_title(self):
+        """
+        Change the window title.  TopoConsole will call this on
+        startup of window.  
+        """
+        raise NYI
+
+
+    def generate_plot_key(self):
+        """Should set a value to self.plot_key."""
+        raise NYI
+        
+
     def do_plot_cmd(self):
         """
-        Subclasses of PlotPanel will need to overwrite this function to
+        Subclasses of PlotPanel will need to create this function to
         generate the plots.  Upon completion, it must have done two things:
 
         1.  Create a PlotGroup and store it into self.pe_group
@@ -124,7 +151,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
 
         No geometry or Sheet information is necessary to perform the
         operations in this function, so it is unlikely that load_images()
-        will need to be redefined by a subclass.
+        will need to be redefined from a subclass.
 
         Image scaling is automatically done, as well as adjusted by the
         user.  self.MIN_PLOT_WIDTH is the number of pixels wide the
@@ -193,7 +220,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
               accordingly.
 
         This function shuld be redefined in subclasses for interesting
-        things such as grids of plots.
+        things such as 2D grids.
         """
         self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.zoom_factor))
                               for im in self.images]
