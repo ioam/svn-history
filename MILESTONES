@@ -1,11 +1,10 @@
 
 			      MILESTONES
-
+		       Created 14 January 2005
 
 Progress on Topographica will be measured in terms of milestones, and
 we will soon set dates for these milestones and work to meet those
 deadlines:
-
 
   Milestone 1: Skeleton.  Set up a very basic GUI version of the
   LISSOM tutorial (http://homepages.inf.ed.ac.uk/jbednar/pytutorial.html).  
@@ -15,16 +14,20 @@ deadlines:
   simple simulation that actually does work.  We hope to reach this
   milestone in weeks, not months.
 
+  ---- Reached on 20 March 2005!  Ok, that was months, not weeks :-(
+
   Once milestone 1 has been reached, we will be able to set up an
   equivalent simulation in LISSOM 5.0 and compare performance,
   functionality, etc.  We can even start trying to do that before the
   GUI is working, and may do so.
 
-
   Milestone 2: Tutorial. Fully implement everything meaningful from
   the LISSOM tutorial.  We hope to reach this milestone in a few
   months, but will have to study the current state of the code more to
   see if that is realistic.
+
+  ---- Hope to reach by 19 April 2005, before the HBP conference
+       starting 23 April 2005.
 
   Once milestone 2 has been reached, we will no longer have to use
   LISSOM 5.0 for demos, classes, etc., and can start getting people
