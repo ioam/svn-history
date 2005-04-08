@@ -18,7 +18,7 @@ class WeightsArrayPanel(RegionPlotPanel):
         self.panel_num = self.console.num_weights_array_windows
 
         self.density_str = StringVar()
-        self.density_str.set('100.0/10.0')
+        self.density_str.set('10.0')
         self.density = float(eval(self.density_str.get(),__main__.__dict__))
         self.shape = (0,0)
 
@@ -100,7 +100,7 @@ class WeightsArrayPanel(RegionPlotPanel):
     def projection_refresh(self,projection_name):
         """
         Called by the Pmw.OptionMenu when the menubutton_textvariable
-        is updated.  The do_plot_cmd() already polls the correct
+        is updated.  The do_plot_cmd() already plots the correct
         Projection but this will force a refresh() if auto_refresh if
         it is enabled.
         """
