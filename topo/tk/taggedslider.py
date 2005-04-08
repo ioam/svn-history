@@ -77,7 +77,7 @@ class TaggedSlider(Frame):
         
         
     def tag_keypress(self,ev):
-        print 'tag_keypress: '+ev.char
+        # print 'tag_keypress: '+ev.char
         self.set_slider_from_tag()
 
     def set_tag_from_slider(self):

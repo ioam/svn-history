@@ -201,7 +201,7 @@ class WeightsArrayPanel(RegionPlotPanel):
         for i,image,canvas in zip(range(len(self.zoomed_images)),
                                   self.zoomed_images,self.canvases):
             canvas.grid(row=i%self.shape[0],column=i//self.shape[1],
-                        padx=0,pady=0)
+                        padx=6,pady=6)
             canvas.create_image(image.width()/2+2,image.height()/2+2,image=image)
 
         # Delete old ones.  This may resize the grid.
