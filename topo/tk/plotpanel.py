@@ -52,7 +52,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
         # is set to None, then no initial zooming is performed.  However,
         # MIN_PLOT_WIDTH may cause a zoom if the raw bitmap is still too
         # tiny.
-        self.MIN_PLOT_WIDTH = 50
+        self.MIN_PLOT_WIDTH = 1
         self.INITIAL_PLOT_WIDTH = 100
 
         self.pe = pengine
@@ -283,42 +283,6 @@ class PlotPanel(Frame,topo.base.TopoObject):
             self.console.del_auto_refresh_panel(self)
         Frame.destroy(self)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# No longer useful since there is no LISSOM, but these should be replaced
-# with functions for filename saving.
-#     def plotname_to_filename(self,plotname):
-#         """Converts a string like Eye0::Activity to the corresponding lissom filename.
-#         Does not have any decent error checking.""" 
-#         return 'gui.%s_%s.ppm' % self.plotname_components(plotname)
-#         
-#     def plotname_to_label(self,plotname):
-#         """Converts a string like Eye0::Activity to the corresponding label.
-#         Does not have any decent error checking.""" 
-#         return '%s %s' % self.plotname_components(plotname)
-# 
-#     def plotname_components(self,plotname):
-#         """Gets the components of a plotname, e.g. 'Primary', 'Afferent00',
-#         and returns them in a tuple."""
-#         m =  re.match("([^ ]*)::([^ ]*)",plotname)
-#         return (m.group(1),m.group(2))
 
 ##############################################
 #
