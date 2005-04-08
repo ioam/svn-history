@@ -13,8 +13,8 @@ class WeightsArrayPanel(RegionPlotPanel):
     def __init__(self,parent,pengine,console=None,**config):
         super(WeightsArrayPanel,self).__init__(parent,pengine,console,**config)
 
-        self.MIN_PLOT_WIDTH = 5
-        self.INITIAL_PLOT_WIDTH = 20
+        self.MIN_PLOT_WIDTH = 1
+        self.INITIAL_PLOT_WIDTH = 8
         self.panel_num = self.console.num_weights_array_windows
 
         self.density_str = StringVar()
