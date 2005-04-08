@@ -25,7 +25,7 @@ class ActivityPanel(PlotPanel):
 
     def do_plot_cmd(self):
         """
-        This instantiation polls the PlotEngine for the plotgroup
+        This instantiation asks the PlotEngine for the plotgroup
         linked to self.plot_key.  Since get_plot_group() is being
         called, it may update the plots, or it may use a cached
         version, depending on the type of PlotGroup being requested.

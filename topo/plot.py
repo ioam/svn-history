@@ -42,10 +42,10 @@ FLAT = 'FLAT'
 
 class Plot(TopoObject):
     """
-    Class that maintains information on constructing a single matrix
-    from one or more SheetViews that has Histogram information, and
-    the whole unit can be clustered with PlotGroups to have multiple
-    plots within a single window on the screen.
+    Class that can construct a single bitmap plot from one or more
+    SheetViews, optionally including a Histogram.  The bitmap is just
+    stored for future use, e.g. as part of a PlotGroup of related
+    plots displayed within one GUI window.
     """
     background = Dynamic(default=BLACK_BACKGROUND)
     palette_ = Dynamic(default=palette.Monochrome)
@@ -248,7 +248,7 @@ class PlotGroup(TopoObject):
     def __init__(self,plot_list,shape=FLAT,**params):
         """
         plot_list can be of two types: 
-        1.  A list of Plot objects that will be polled for their bitmaps.
+        1.  A list of Plot objects that can return bitmaps when requested.
         2.  Can also be a function that returns a list of plots so
         that each time plot() is called, an updated list is created for the
         latest list of sheets in the simulation.

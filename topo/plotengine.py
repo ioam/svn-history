@@ -1,8 +1,8 @@
 """
-Construct PlotGroups, Plots, and the occasional SheetView, and give it to
-the GUI to display or save at it wants.
+Construct PlotGroups, Plots, and the occasional SheetView, for saving to a
+file or for a GUI to display.
 
-This class is the connection between Simulation and the Plot generation
+This class is the connection between the Simulator and the Plot generation
 routines.
 
 $Id$
@@ -39,10 +39,10 @@ class PlotEngine(TopoObject):
         """
         Create a new plot engine that is linked to a particular
         simulation.  The link is necessary since the PlotEngine will
-        poll all the event processors in the simulation to dynamically
-        request Plots from the Sheet objects.  This allows new Plot
-        objects to automatically appear in previously defined
-        PlotGroups.
+        iterate over all the event processors in the simulation,
+        requesting Plots from all EPs that are also Sheets.  This
+        approach ensures that new Plot objects will show up
+        automatically even in previously defined PlotGroups.
 
         Example calling style:
             s = Simulation(step=1)
@@ -79,9 +79,9 @@ class PlotEngine(TopoObject):
         This default construction allows for certain types of plots to
         be defined automatically, such as 'Activation'.
 
-        GENERATED PLOTGROUPS WILL POLL ALL SHEETS; NO PARAMETER BASED
-        DEFAULT SHEET GROUPS OR FILTERS ARE CURRENTLY IMPLEMENTED BUT
-        IT WOULD BE THE BEST SOLUTION.
+        GENERATED PLOTGROUPS WILL ASK FOR PLOTS FROM ALL SHEETS; NO
+        PARAMETER BASED DEFAULT SHEET GROUPS OR FILTERS ARE CURRENTLY
+        IMPLEMENTED BUT IT WOULD BE THE BEST SOLUTION.
         """
         if self.plot_group_dict.has_key(name):
             self.debug(name, "key match in PlotEngine's PlotGroup list")
@@ -97,7 +97,7 @@ class PlotEngine(TopoObject):
     def lambda_single_view_per_name(self,name,filter_lam):
         """
         Basic lambda function that assumes a single sheet per name in
-        each Sheets SheetView dictionary.
+        each Sheet's SheetView dictionary.
         """
         dynamic_list = lambda : [Plot((name,None,None),COLORMAP,each)
                                 for each in self._sheets() if filter_lam(each)]
@@ -135,7 +135,7 @@ class PlotEngine(TopoObject):
         """
         Default method of creating a dynamic plot such as
         'Activation'.  Makes a new PlotGroup containing a lambda
-        function that will poll the latest and greatest list of
+        function that will iterate over the current list of
         SheetViews with 'name' from each Sheet in the simulation.  It
         uses the filter_lambda to decide if it should include the
         sheet in the Group.  If passed in, filter_lambda must take a

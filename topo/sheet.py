@@ -25,12 +25,12 @@ The default density is 100, giving the default sheet a 10x10
 activation matrix.
 
 This scheme gives a Sheet two coordinate systems.  A pair of 'sheet
-coordinates' (x,y) are real (floating point) cartesion coordinates
+coordinates' (x,y) are real (floating point) Cartesian coordinates
 indicating an arbitrary point on the sheet's plane.  A pair of 'matrix
 coordinates' (r,c), specify the row and column indices of a specific
 unit in the sheet.  This module provides facilities for converting
 between the two coordinate systems, and EVERYONE SHOULD USE THESE
-FACITILITES to guarantee that coordinate transformations are done
+FACILITIES to guarantee that coordinate transformations are done
 consistently everywhere.
 
 In general sheets should be thought of as having arbitrary density and
@@ -38,7 +38,7 @@ sheet coordinates should be used wherever possible, except when the
 code needs direct access to a specific unit.  By adhering to this
 convention, one should be able to write and debug a simulation at a
 low density, and then scale it up to run at higher densities simply by
-changing one or a few parameters (e.g. Sheet.density).
+changing e.g. Sheet.density.
 
 $Id$
 """

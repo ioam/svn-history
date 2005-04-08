@@ -35,8 +35,8 @@ def start(sim=None, mainloop=False):
     Startup code for GUI.
 
     sim: Adds a simulation object into the GUI's active_simulator
-    variable This simulator will be the one that the GUI polls for
-    plots and other types of data.
+    variable. The GUI will request plots and other types of data
+    from this simulator.
 
     mainloop: If True, then the command-line is frozen while the GUI
     is open.  If False, then commands can be entered at the command-line
