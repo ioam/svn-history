@@ -124,10 +124,14 @@ impractical.
 The default set of unit tests that are run must complete very quickly,
 with no extraneous output, no GUI windows popping up, etc., because
 these tests are (and should be) run automatically many times each day
-during active development.  Additional more expensive tests, GUI
-tests, or those requiring user input or user examination of the output
-are also encouraged, but all these must be kept separate from the main
-automated regression tests.
+during active development.  All the output from such tests much be
+checked automatically, with any output generated for the user
+representing something the user really does have to do something
+about.  
+
+Additional more expensive tests, GUI tests, or those requiring user
+input or user examination of the output are also encouraged, but all
+these must be kept separate from the main automated regression tests.
 
 
 NUMERICAL UNITS IN THE USER INTERFACE
