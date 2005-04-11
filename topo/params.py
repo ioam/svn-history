@@ -6,7 +6,7 @@ $Id$
 
 This module defines an attribute descriptor for experiment
 parameters.  An experiment parameter is represented in Topographica as
-special kind of class attribute.
+a special kind of class attribute.
 
 For example, suppose someone has defined a new kind of sheet, that has
 parameters alpha, sigma, and gamma.  He would begin his class
