@@ -376,7 +376,7 @@ class TopoConsole(Frame):
                 self.input_params_window = GUIToplevel(self)
                 self.input_params_window.withdraw()
                 self.input_params_window.title('Test Pattern Parameters')
-                ripp = InputParamsPanel(self.input_params_window,self)
+                ripp = InputParamsPanel(self.input_params_window,pe,self)
                 ripp.pack(side=TOP,expand=YES,fill=BOTH)
                 self.input_params_window.protocol('WM_DELETE_WINDOW',
                                        self.input_params_window.withdraw)
