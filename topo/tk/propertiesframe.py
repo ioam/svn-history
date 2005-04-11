@@ -15,10 +15,14 @@ class PropertiesFrame(Frame):
     GUI window for displaying and manipulating the properties of an object.
     """
     def __init__(self, parent=None, padding=2,**config):
+        self.parent = parent
         self.properties = {}
         self.padding = padding
         Frame.__init__(self,parent,config)
 
+    def optional_refresh(self):
+        if self.parent.auto_refresh:
+            self.parent.refresh()
 
     def add_property(self,name,var,control,value):
         p = Message(self,text=name,aspect=5000)
