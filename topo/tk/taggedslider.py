@@ -32,6 +32,7 @@ class TaggedSlider(Frame):
                  **config):
 
         Frame.__init__(self,root,**config)
+        self.root = root
 
         self.min_value = string_translator(min_value)
         self.max_value = string_translator(max_value)
@@ -64,14 +65,14 @@ class TaggedSlider(Frame):
         self.set_slider_from_tag()
         
     def slider_command(self,arg):
-        #
-        # When this frame is first shown, it calls the slider
-        # callback, which would overwrite the initial string value
-        # with a string translation (e.g. 'PI' -> '3.142').
-        # This prevents that.
-        #
+        """
+        When this frame is first shown, it calls the slider callback,
+        which would overwrite the initial string value with a string
+        translation (e.g. 'PI' -> '3.142').  This prevents that.
+        """
         if not self.first_slider_command:
             self.set_tag_from_slider()
+            self.root.optional_refresh()
         else:
             self.first_slider_command = 0
         
@@ -83,8 +84,11 @@ class TaggedSlider(Frame):
     def set_tag_from_slider(self):
         new_string = self.fmt % self.get_slider_value()
         self.tag_val.set(new_string)
+##
         
     def set_slider_from_tag(self):
+        if not self.first_slider_command:
+            self.root.optional_refresh()
         try:
             val = self.string_translator(self.tag_val.get())
             if val > self.max_value:
@@ -106,26 +110,5 @@ class TaggedSlider(Frame):
         self.slider_val.set(int(new_val))
         
 
-
-#  This test code no longer works because there are no longer any
-#  SWIG files named Lissom to attach to.  The new method of
-#  interfacing will be calling a specific Python function, or
-#  set of functions.  This needs to be expanded once the time
-#  comes.
-
-#  if __name__ == '__main__':
-#  
-#      import Lissom
-#      
-#      root = Tk()
-#      slider_val = StringVar()
-#      slider_val.set('PI')
-#      slider = TaggedSlider(root,tagvariable=slider_val,
-#                            max_value='PI*2',                          
-#                            string_translator=Lissom.eval_expr,
-#                            string_format='%.3f')
-#      slider.pack(side=TOP,expand=YES,fill=X)
-#      #root.mainloop()
-#          
         
                  
