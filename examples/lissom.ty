@@ -84,9 +84,9 @@ print "Setting parameters..."
 
 
 # input generation params
-InputSheet.period = 1.0
+# jbednar050411: Doesn't seem to work with anything but 900 for both densities (!)
 InputSheet.density = 900
-InputSheet.period = 10
+InputSheet.period = 1
 
 FuzzyLineFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
 FuzzyLineFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -121,11 +121,11 @@ retina = InputSheet(input_generator=FuzzyLineFactory(),name='Retina')
 V1 = LISSOM(name='V1')
 save  = ImageSaver(name='RFSOM')
 
-s.connect(retina,V1,delay=1)
-s.connect(V1,V1, delay=1,
+s.connect(retina,V1,delay=0.0625)
+s.connect(V1,V1, delay=0.125,
           projection_params = dict(strength = 0.9,
                                    weights_bounds = excitatory_weight_bounds))
-s.connect(V1,V1, delay = 1,
+s.connect(V1,V1, delay = 0.125,
           projection_params = dict(strength = -0.9,
                                    weights_bounds = inhibitory_weight_bounds))
         
