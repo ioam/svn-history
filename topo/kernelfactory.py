@@ -4,22 +4,35 @@ Kernel Factory
 
 Defines a class to return Kernels
 
+There is a registry dictionary called
+topo.kernelfactory.kernel_factories that stores the class name as key,
+and a reference to the class definition as the value.  This dictionary
+is used in the GUI Input Parameter Panel to dynamically generate the
+list of valid KernelFactories that can be presented.  A user can
+define a new subclass of KernelFactory anywhere, and then add an entry
+to this dictionary, and the GUI will then add it to the list of
+presentation types.
+
 $Id$
 """
-
 import types
-
 import base
 from boundingregion import BoundingBox
 from sheet import sheet2matrix, matrix2sheet, bounds2shape
-
 import RandomArray
 from Numeric import *
 from params import * 
 from pprint import pprint,pformat
-
 from math import pi
 
+# Registry for subclasses of KernelFactory.  Users can add to this
+# list, and the GUI will automatically add them to the list of
+# KernelFactory inputs possible.  Additional work may be necessary if
+# other than default Parameter names are used in the definition of the
+# KernelFactory
+# Format:   {'NewKernelFactoryName':<NewKernelFactoryClass>,....}
+global kernel_factories
+kernel_factories = {}
 
 def produce_kernel_matrices(bounds, density):
     """
@@ -148,7 +161,19 @@ def fuzzy_disk(kernel_x, kernel_y, disk_radius, gaussian_width):
     return less_equal(gaussian_x_coord, 0) * \
            exp(maximum(-100, -(kernel_x/gaussian_width)**2 - (kernel_y/gaussian_width)**2))
 
-def fuzzy_ring(kernel_x, kernel_y, inner_radius, outer_radius, gaussian_width):
+
+#def fuzzy_ring(kernel_x, kernel_y, inner_radius, outer_radius, gaussian_width):
+#    """
+#    Fuzzy Ring Kernel Factory
+#    """    
+#    distance_from_line = abs(outer_radius - sqrt(kernel_x**2)+(kernel_y**2))
+#    gaussian_x_coord   = distance_from_line - disk_radius/2
+#
+#    return less_equal(gaussian_x_coord, 0) * \
+#           exp(maximum(-100, -(gaussian_x_coord/gaussian_width)**2))
+
+
+def fuzzy_ring(kernel_x, kernel_y, disk_radius, outer_radius, gaussian_width):
     """
     Fuzzy Ring Kernel Factory
     """    
@@ -157,7 +182,6 @@ def fuzzy_ring(kernel_x, kernel_y, inner_radius, outer_radius, gaussian_width):
 
     return less_equal(gaussian_x_coord, 0) * \
            exp(maximum(-100, -(gaussian_x_coord/gaussian_width)**2))
-
 
 
 
@@ -279,8 +303,8 @@ class RectangleFactory(KernelFactory):
     def function(self,**params):
         return rectangle( self.kernel_x, 
                           self.kernel_y, 
-                          self.produced_x,
-                          self.produced_y,
+                          params.get('x',self.x),
+                          params.get('y',self.y),
                           params.get('width',self.width),
                           params.get('height',self.height))  
 
@@ -309,9 +333,9 @@ class FuzzyDiskFactory(KernelFactory):
     y              = Parameter(default=0)
     # TODO: This is a hack, we need a theta in order to appease the rotation
     # function
-    theta          = Parameter(default=0)
-    disk_radius    = Parameter(default=0.8)
-    gaussian_width = Parameter(default=1)
+    # theta          = Parameter(default=0)
+    disk_radius    = Parameter(default=0.2)
+    gaussian_width = Parameter(default=0.5)
 
     def function(self,**params):
         return fuzzy_disk( self.kernel_x, 
@@ -326,14 +350,26 @@ class FuzzyRingFactory(KernelFactory):
     Fuzzy Ring Generating Factory
     """
 
-    x       = Parameter(default=0)
-    y       = Parameter(default=0)
-    theta   = Parameter(default=0)
-    width   = Parameter(default=1)
+    x              = Parameter(default=0)
+    y              = Parameter(default=0)
+    width          = Parameter(default=1)
+    disk_radius    = Parameter(default=0.8)
+    gaussian_width = Parameter(default=0.2)
 
     def function(self,**params):
-        return fuzzy_ring( self.kernel_x, 
-                           self.kernel_y, 
-                           params.get('width',self.width))  
+        return fuzzy_ring(self.kernel_x, 
+                          self.kernel_y,
+                          params.get('disk_radius',self.disk_radius),
+                          params.get('width',self.width),
+                          params.get('gaussian_width',self.gaussian_width))  
     
 
+# Populate the KernelFactory registry:
+if __name__ != '__main__':
+    l = locals()
+    for i in l.keys():
+        if (type(l[i]) is type(KernelFactory)) \
+               and issubclass(l[i],KernelFactory) \
+               and i != 'KernelFactory':
+            kernel_factories[i] = l[i]
+    print 'kernelfactories', kernel_factories
