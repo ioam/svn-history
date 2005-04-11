@@ -282,7 +282,7 @@ class RFSheet(Sheet):
         Accept input from some sheet.  Call .present_input() to
         compute the stimulation from that sheet.
         """
-        self.message("Received input from,",src,"at time",self.simulator.time())
+        self.message("Received input from",src,"at time",self.simulator.time())
         self.present_input(data,src)
         self.new_input = True
 
