@@ -3,6 +3,7 @@
 from topo.inputsheet import *
 from topo.kernelfactory import *
 from topo.simulator import *
+from topo.rfsheet import KernelProjection
 from topo.rfsom import RFSOM
 from topo.image import ImageSaver
 from math import pi
@@ -60,9 +61,9 @@ s.connect(retina,V1,delay=1)
 #s.connect(retina,save,dest_port='retina',delay=2)
 #s.connect(V1,save,dest_port='V1',delay=1)
 
-#s.run(10000)
+#s.run(100)
 
-#V1.projections['Retina'][0].plot_rfs()
+#V1.projections['Retina'][0].plot_cfs()
 
 # import profile,pstats
 #

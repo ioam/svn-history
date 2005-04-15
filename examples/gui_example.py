@@ -68,7 +68,7 @@ s.connect(retina2,V2,delay=0.5,projection_params={'name':'R2toV2'})
 
 s.run(2)
 
-#V1.projections['Retina'][0].plot_rfs()
+#V1.projections['Retina'][0].plot_cfs()
 
 # import profile,pstats
 #

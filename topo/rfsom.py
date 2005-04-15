@@ -11,7 +11,7 @@ from utils import L2norm
 from params import Parameter
 from Numeric import argmax,sqrt,exp,floor
 
-from rfsheet import RFSheet
+from cfsheet import CFSheet
 
 def gaussian(dist,radius):
     return exp( - dist/radius)
@@ -21,7 +21,7 @@ def decay(time,half_life):
 
 
 
-class RFSOM(RFSheet):
+class RFSOM(CFSheet):
     """
     Training operates by selecting a single winning unit from the SOM
     at each input, and training the units in a gaussian neighborhood
@@ -64,10 +64,10 @@ class RFSOM(RFSheet):
                 for proj_list in self.projections.values():
                     for proj in proj_list:
                         if  lattice_dist <= radius:
-                            rf = proj.rf(r,c)
+                            cf = proj.cf(r,c)
                             rate = self.alpha() * gaussian(lattice_dist,radius)
-                            X = rf.get_input_matrix(proj.input_buffer)
-                            rf.weights += rate * (X - rf.weights)
+                            X = cf.get_input_matrix(proj.input_buffer)
+                            cf.weights += rate * (X - cf.weights)
                                    
 
 
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     
     s = Simulator(step_mode=True)
 
-    RFSOM.rf_width = 0.1
+    RFSOM.cf_width = 0.1
 
     input = ImageGenerator(filename='main.ppm',density=10000,
                            bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))))

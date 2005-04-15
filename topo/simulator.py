@@ -105,7 +105,7 @@ Currently, connections in the simulation's directed graph are not
 first-class objects in the system.  Rather, they are implemented as
 (dest,dest_port,delay) tuples stored in dictionaries indexed by
 src_port inside each individual EP (i.e. within each graph node).
-With the advent of Projection classes for RFSheets (see topo.rfsheet),
+With the advent of Projection classes for CFSheets (see topo.cfsheet),
 it is worth considering whether to replace these tuples with an
 explicit Connection class, of which Projection would be a subclass.
 This class would encapsulate all data that parameterizes the

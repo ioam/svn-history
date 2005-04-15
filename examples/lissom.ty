@@ -9,7 +9,7 @@ from topo.kernelfactory import *
 from topo.inputsheet import *
 from topo.image import ImageSaver
 import topo.gui
-import topo.rfsheet
+import topo.cfsheet
 from topo.params import *
 
 
@@ -23,12 +23,12 @@ x boundingregion.translate()
 x LISSOM learning rule (just mdot)
 x xfer funcs  (piecewise linear sigmoid)
 
-- port parameterization (in rfsheet? in sheet? in EventProcessor?)
+- port parameterization (in cfsheet? in sheet? in EventProcessor?)
 """
 
 
 
-class LISSOM(topo.rfsheet.RFSheet):
+class LISSOM(topo.cfsheet.CFSheet):
 
     transfer_fn = Parameter(default=utils.PLTF)
     learning_rate = Parameter(default=0.1)
@@ -50,9 +50,9 @@ class LISSOM(topo.rfsheet.RFSheet):
             if proj.input_buffer:
                 for r in range(rows):
                     for c in range(cols):
-                        rf = proj.rf(r,c)
-                        rf.weights += (self.learning_rate * self.activation[r,c]
-                                       * rf.get_input_matrix(proj.input_buffer))
+                        cf = proj.cf(r,c)
+                        cf.weights += (self.learning_rate * self.activation[r,c]
+                                       * cf.get_input_matrix(proj.input_buffer))
 
 
         
@@ -64,12 +64,12 @@ class LISSOM(topo.rfsheet.RFSheet):
             for c in range(cols):
                 for group in (lateral,afferent):
                     # Uncomment for normalization over whole group (lateral, afferent)
-                    # k = sum([sum(p.rf(r,c).weights.flat)
+                    # k = sum([sum(p.cf(r,c).weights.flat)
                     #          for p in group])
                     for p in group:
                         # Uncomment for normalization per projection
-                        k = sum(p.rf(r,c).weights.flat)
-                        p.rf(r,c).weights /= k
+                        k = sum(p.cf(r,c).weights.flat)
+                        p.cf(r,c).weights /= k
 
     def lateral_projections(self):
         return [p for p in chain(*self.projections.values()) if p.src is self]
@@ -130,7 +130,7 @@ s.connect(V1,V1, delay = 0.125,
                                    weights_bounds = inhibitory_weight_bounds))
         
 
-#rfsheet.RF.print_level = base.VERBOSE
+#cfsheet.CF.print_level = base.VERBOSE
 
 
 # Uncomment the connections to the image saver, to save all the activation
@@ -140,7 +140,7 @@ s.connect(V1,V1, delay = 0.125,
 
 #s.run(20)
 
-#V1.projections['Retina'][0].plot_rfs()
+#V1.projections['Retina'][0].plot_cfs()
 
 # import profile,pstats
 #
