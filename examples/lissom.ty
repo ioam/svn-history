@@ -119,7 +119,7 @@ s = topo.simulator.Simulator()
 
 retina = InputSheet(input_generator=FuzzyLineFactory(),name='Retina')
 V1 = LISSOM(name='V1')
-save  = ImageSaver(name='RFSOM')
+save  = ImageSaver(name='LISSOM')
 
 s.connect(retina,V1,delay=0.0625)
 s.connect(V1,V1, delay=0.125,
