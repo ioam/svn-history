@@ -14,7 +14,7 @@ from topo.sheet import Sheet
 from topo.plotengine import *
 from topo.inputsheet import *
 from topo.simulator import *
-from topo.rfsom import RFSOM
+from topo.cfsom import CFSOM
 from topo.image import ImageSaver
 from topo import kernelfactory
 from topo.kernelfactory import GaussianFactory
@@ -58,7 +58,7 @@ class TestPlotEngine(unittest.TestCase):
 
     def test_plotengine(self):
         """
-        Cut and paste of current topographica/examples/rfsom_example.py
+        Cut and paste of current topographica/examples/cfsom_example.py
         with extensions to interface with the PlotEngine and ImagePoster
         """
         # input generation params

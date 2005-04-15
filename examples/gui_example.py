@@ -4,7 +4,7 @@ from topo.inputsheet import *
 from topo.kernelfactory import *
 from topo.simulator import *
 from topo.rfsheet import KernelProjection
-from topo.rfsom import RFSOM
+from topo.cfsom import CFSOM
 from topo.image import ImageSaver
 from math import pi
 from topo.params import Dynamic
@@ -30,9 +30,9 @@ FuzzyLineFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
 
 # rf som parameters
-RFSOM.density = 100
-RFSOM.training_length = 10000
-RFSOM.radius_0 = 0.1
+CFSOM.density = 100
+CFSOM.training_length = 10000
+CFSOM.radius_0 = 0.1
 
 KernelProjection.weights_factory = UniformRandomFactory(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 
@@ -51,9 +51,9 @@ s = topo.simulator.Simulator()
 
 retina = InputSheet(input_generator=FuzzyLineFactory(),name='Retina')
 retina2 = InputSheet(input_generator=FuzzyLineFactory(),name='Retina2')
-V1 = RFSOM(name='V1')
-V2 = RFSOM(name='V2')
-save  = ImageSaver(name='RFSOM')
+V1 = CFSOM(name='V1')
+V2 = CFSOM(name='V2')
+save  = ImageSaver(name='CFSOM')
 
 s.connect(retina,V1,delay=0.5,projection_params={'name':'R1toV1'})
 s.connect(retina,V2,delay=0.5,projection_params={'name':'R1toV2'})

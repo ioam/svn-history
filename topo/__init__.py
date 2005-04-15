@@ -19,7 +19,7 @@ import boundingregion
 import kernelfactory
 
 # sheet types
-import rfsom
+import cfsom
 import image
 import inputsheet
 
