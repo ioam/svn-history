@@ -1,6 +1,11 @@
 ;; Topographica mode for Emacs
 ;; $Id$
 
+;;; To use this mode, add the following lines to your .emacs file:
+;; (add-to-list 'load-path "$TOPO/etc/")
+;; (autoload 'Topographica-mode "topographica.elc" "Topographica mode" t)
+;;; where $TOPO is the path to your topographica/ directory.
+
 (define-derived-mode Topographica-mode
   python-mode "Topographica"
   "Major mode for editing Topographica scripts.
