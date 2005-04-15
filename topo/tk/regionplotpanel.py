@@ -3,12 +3,12 @@ VIRTUAL RegionPlotPanel class that subclasses PlotPanel with
 additional buttons for Region access.
 
 Not included in PlotPanel, because this class knows about, and
-requires, the RFSheet class.
+requires, the CFSheet class.
 
 $Id$
 """
 from topo.tk.plotpanel import *
-import topo.rfsheet
+import topo.cfsheet
 
 class RegionPlotPanel(PlotPanel):
 
@@ -31,11 +31,11 @@ class RegionPlotPanel(PlotPanel):
         self.__params_frame = Frame(master=self)
         self.__params_frame.pack(side=LEFT,expand=YES,fill=X)
 
-        # Create the item list for RFSheet 'Region'  This will not change
+        # Create the item list for CFSheet 'Region'  This will not change
         # since this window will only examine one Simulator.
         sim = self.console.active_simulator()
         self._sim_eps = [ep for ep in sim.get_event_processors()
-                  if isinstance(ep,topo.rfsheet.RFSheet)]
+                  if isinstance(ep,topo.cfsheet.CFSheet)]
         sim_ep_names = [ep.name for ep in self._sim_eps]
         if len(sim_ep_names) > 0:
             self.region.set(sim_ep_names[0])
