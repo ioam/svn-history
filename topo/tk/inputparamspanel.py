@@ -241,8 +241,18 @@ class InputParamsPanel(PlotPanel):
 
 
     def present(self):
-        self.update_inputsheet_kernels()
-        # Do cool stuff to the simulation and other open windows.
+        """
+        CURRENT IMPLEMENTATION GENERATES SIDE EFFECTS TO THE MODEL,
+        AND THERE IS NO WAY TO DISABLE LEARNING.
+        """
+        new_kernels_dict = self.update_inputsheet_kernels()
+        original_kernels = self.store_inputsheet_kernels()
+        self.register_inputsheet_kernels(new_kernels_dict)
+        
+        sim = self.console.active_simulator()
+        sim.run(1.0)
+        
+        self.register_inputsheet_kernels(original_kernels)
         self.console.auto_refresh()
 
 
@@ -261,7 +271,33 @@ class InputParamsPanel(PlotPanel):
             if self.in_ep_dict[each]['state']:
                 kf = topo.kernelfactory.__dict__[kname](**ndict)
                 self.in_ep_dict[each]['kernel'] = kf
-            
+        return self.in_ep_dict  # Doesn't have to return it, but is explicit.
+
+
+    def store_inputsheet_kernels(self):
+        """
+        Store the kernels currently in the InputSheets.
+        """
+        kernel_dict = {}
+        for each in self.in_ep_dict.keys():
+            kernel_dict[each] = {}
+            kernel_dict[each]['obj'] = self.in_ep_dict[each]['obj']
+            kernel_dict[each]['state'] = True
+            kernel_dict[each]['kernel'] = kernel_dict[each]['obj'].get_input_generator()
+        return kernel_dict
+    
+
+    def register_inputsheet_kernels(self,kernels_dict):
+        """
+        Each dictionary entry must have an 'obj' with an InputSheet as
+        value, with 'state' set to True or False to see if the kernel
+        should be replaced, and a 'kernel' key with the kernel object
+        as value that should be moved into the InputSheet.
+        """
+        for each in self.in_ep_dict.keys():
+            if kernels_dict[each]['state']:
+                ep = kernels_dict[each]['obj']
+                ep.set_input_generator(kernels_dict[each]['kernel'])
 
 
     def use_for_training(self):

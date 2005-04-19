@@ -44,8 +44,16 @@ class InputSheet(Sheet):
         input generator is going to be used, then this function will
         be needed so that the old generator can be replaced when done.
         """
-        return input_generator
-    
+        return self.input_generator
+
+
+    def set_input_generator(self,new_generator):
+        """
+        Set the existing input_generator.  Does not store any previous
+        input generator information.  May store generators in the future.
+        """
+        self.init_input_generator(new_generator)
+        
         
     def start(self):
         assert self.simulator
