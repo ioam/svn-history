@@ -26,7 +26,6 @@ class WeightsPanel(RegionPlotPanel):
         self.panel_num = self.console.num_weights_windows
 
         self._add_xy_boxes()
-        self.auto_refresh_checkbutton.invoke()
 
         self.refresh()
 

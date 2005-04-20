@@ -97,6 +97,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
                                                     text="Auto-refresh",
                                                     command=self.toggle_auto_refresh)
         self.auto_refresh_checkbutton.pack(side=LEFT)
+        self.auto_refresh_checkbutton.invoke()
         # self.refresh()
 
 
