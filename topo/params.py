@@ -162,6 +162,21 @@ class Magnitude(Number):
     Number.__init__(self,default=default,bounds=(0.0,1.0))
 
 
+class BooleanParameter(Parameter):
+  def __init__(self,default=False,bounds=(0,1)):
+    Parameter.__init__(self,default=default)
+    self.bounds = bounds
+    
+  def __set__(self,obj,val):
+    if not isinstance(val,bool):
+
+      raise "BooleanParameter only takes a Boolean value."
+    if val != True and val != False:
+
+        raise "BooleanParameter must be True or False"
+    super(BooleanParameter,self).__set__(obj,val)
+
+
 class Dynamic(Parameter):
   def __get__(self,obj,objtype):
     """
