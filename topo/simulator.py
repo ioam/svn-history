@@ -121,7 +121,7 @@ an EP.  The question of how much depends on the nature of the
 simulation.)
 
 Note that the EventProcessor.connections tracks the outgoing
-connections from an EP, while RFSheet.projections tracks the incoming
+connections from an EP, while CFSheet.projections tracks the incoming
 projections.  If we standardize to use Connection objects, probably
 the EventProcessor class will have to keep track of both incoming and
 outgoing connections for each EP.
