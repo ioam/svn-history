@@ -372,4 +372,4 @@ if __name__ != '__main__':
                and issubclass(l[i],KernelFactory) \
                and i != 'KernelFactory':
             kernel_factories[i] = l[i]
-    print 'kernelfactories', kernel_factories
+#    print 'kernelfactories', kernel_factories
