@@ -300,7 +300,8 @@ class CFSheet(Sheet):
             self.send_output(data=self.activation)
             self.temp_activation *= 0.0
 
-            self.train()
+            if self.training:
+                self.train()
 
             self.debug("max activation =",max(self.activation.flat))
 
@@ -308,6 +309,10 @@ class CFSheet(Sheet):
         """
         Override this method to implement learning/adaptation.  Called
         from self.pre_sleep() _after_ activation has been propagated.
+
+        Important:  This function will not be called by pre_sleep()
+        when the Sheet has training disabled.  (See enable_training(),
+        and disable_training())
         """
         pass
 
@@ -330,7 +335,7 @@ class CFSheet(Sheet):
                         self.temp_activation[r,c] += proj.strength * self.activation_fn(X,cf.weights)
 
 
-    ################################################################################
+    #########################################################################
     # GUI support
     def unit_view(self,x,y):
         """
