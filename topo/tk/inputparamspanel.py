@@ -28,6 +28,8 @@ import topo.sheetview
 # Preview plot list, so that it'll match the order that the plots appear
 # in the Acivation panel.
 LIST_REVERSE = True
+# Default time to show in the Presentation duration box.
+DEFAULT_PRESENTATION = '1.0'
 
 def eval_atof(in_string):
     """
@@ -64,6 +66,8 @@ def kernelfactory_names():
 
 class InputParamsPanel(PlotPanel):
     def __init__(self,parent,pengine,console=None,padding=2,**config):
+#        megaparent = parent
+#        parent = parent.component('hull')
         super(InputParamsPanel,self).__init__(parent,pengine,console,**config)
         self.plot_group.configure(tag_text='Preview')
 
@@ -94,9 +98,16 @@ class InputParamsPanel(PlotPanel):
             self.input_box.add(each)
             self.input_box.invoke(each)
 
+        self.present_length = Pmw.EntryField(self,
+                labelpos = 'w',
+                label_text = 'Duration to Present:',
+                value = DEFAULT_PRESENTATION,
+                validate = {'validator' : 'real'},
+                )
+        self.present_length.pack(fill='x', expand=1, padx=10, pady=5)
+
         buttonBox = Pmw.ButtonBox(self,orient = 'horizontal',padx=0,pady=0)
         buttonBox.pack(side=TOP)
-
         buttonBox.add('Present', command = self.present)
         buttonBox.add('Reset to Defaults', command = self.reset_to_defaults)
         Checkbutton(self,text='Network Learning',
@@ -250,7 +261,7 @@ class InputParamsPanel(PlotPanel):
         self.register_inputsheet_kernels(new_kernels_dict)
         
         sim = self.console.active_simulator()
-        sim.run(1.0)
+        sim.run(eval_atof(self.present_length.getvalue()))
         
         self.register_inputsheet_kernels(original_kernels)
         self.console.auto_refresh()
@@ -313,6 +324,7 @@ class InputParamsPanel(PlotPanel):
     def reset_to_defaults(self):
         self.prop_frame.set_values(self.default_values)
         self.input_type.set(self.input_types[0])
+        self.present_length.setvalue(DEFAULT_PRESENTATION)
         for each in self.in_ep_dict.keys():
             if not self.in_ep_dict[each]['state']:
                 self.input_box.invoke(each)
@@ -401,3 +413,6 @@ class InputParamsPanel(PlotPanel):
         """
         self.update_inputsheet_kernels()
         super(InputParamsPanel,self).refresh()
+
+#    def destroy(self):
+#        print "inputparamspanel destroy"
