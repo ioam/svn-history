@@ -89,7 +89,7 @@ To reach milestone 1, we will need to:
 - Implement a GUI patterned after the LISSOM 5.0 GUI, with a main
   window, a Activity plot window, and a Weights plot window.  The main
   window needs to provide a way to present one or more training inputs
-  and to select the other windows.
+  and to select the other windows. (done)
 
 - Fix the floating-point rounding bug in the current LISSOM-like
   implementation.
@@ -104,14 +104,14 @@ connection to C altogether.  Once that is done, we should have a GUI
 that doesn't do much but open a bunch of empty windows.  We can then
 merge those files into the Topographica directory, and start
 connecting them up to Topographica.  We can worry about cleaning up
-the GUI prototype code later, for milestone 2.
+the GUI prototype code later, for milestone 2. (done)
 
 RELATED (BUT NOT STRICTLY REQUIRED) ISSUES TO ADDRESS BEFORE THIS MILESTONE:
 
 - Check that events are not allowed to be put onto the event queue at
   the current time, only with some delay into the future.
 
-- Remove obsolete files like convolve2d.py.
+- Remove obsolete files like convolve2d.py. (done)
 
 _______________________________________________________________________________
 
