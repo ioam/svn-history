@@ -9,7 +9,7 @@ class ActivityPanel(PlotPanel):
     def __init__(self,parent,pengine=None,console=None,**config):
         PlotPanel.__init__(self,parent,pengine,console=console,**config)
         self.auto_refresh_checkbutton.invoke()
-        self.INITIAL_PLOT_WIDTH = None
+        self.INITIAL_PLOT_WIDTH = 60
         self.panel_num = self.console.num_activity_windows
         self.generate_plot_key()
         self.refresh()

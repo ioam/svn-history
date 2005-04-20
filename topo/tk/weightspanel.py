@@ -13,8 +13,8 @@ class WeightsPanel(RegionPlotPanel):
     def __init__(self,parent,pengine,console=None,**config):
         super(WeightsPanel,self).__init__(parent,pengine,console,**config)
 
-        # Receptive Fields are generally tiny.  Boost it up to 100 pixels.
-        self.WEIGHT_PLOT_INITIAL_SIZE = 100
+        # Receptive Fields are generally tiny.  Boost it up to make it visible.
+        self.WEIGHT_PLOT_INITIAL_SIZE = 30
 
         self.x = 0
         self.x_str = StringVar()

@@ -14,7 +14,7 @@ class WeightsArrayPanel(RegionPlotPanel):
         super(WeightsArrayPanel,self).__init__(parent,pengine,console,**config)
 
         self.MIN_PLOT_WIDTH = 1
-        self.INITIAL_PLOT_WIDTH = 8
+        self.INITIAL_PLOT_WIDTH = 13
         self.panel_num = self.console.num_weights_array_windows
 
         self.density_str = StringVar()
@@ -33,7 +33,7 @@ class WeightsArrayPanel(RegionPlotPanel):
         pd.pack(side=LEFT)
         self.balloon.bind(pd,'Number of units to plot per 1.0 distance in sheet coordinates')
         Entry(self.params_frame1,
-              textvariable=self.density_str).pack(side=LEFT,expand=YES,fill=X,padx=5)
+              textvariable=self.density_str).pack(side=LEFT,expand=YES,fill=X,padx=2)
 
         self._add_projection_menu()
 
@@ -51,7 +51,7 @@ class WeightsArrayPanel(RegionPlotPanel):
 
     def _create_projection_dict(self,sheet_name):
         """
-        PRE: Each Projection in the RFSheet should have a unique name.
+        PRE: Each Projection in the CFSheet should have a unique name.
         If there are two Projections with the same name, then even
         though the list will show two entries with the same name, only
         one Projection object will be accessible.
