@@ -300,7 +300,7 @@ class CFSheet(Sheet):
             self.send_output(data=self.activation)
             self.temp_activation *= 0.0
 
-            if self.learning:
+            if self._learning:
                 self.learn()
 
             self.debug("max activation =",max(self.activation.flat))
