@@ -166,7 +166,7 @@ class Sheet(EventProcessor):
     bounds:   A BoundingBox object indicating the bounds of the sheet.
               [default  (-0.5,-0.5) to (0.5,0.5)]
     density:  The areal density of the sheet [default 100]
-    learning: Whether the Sheet should adjust weights based upon
+    _learning: Whether the Sheet should adjust weights based upon
               incoming events.  
 
     sheet_view_dict is a dictionary that stores SheetViews that are
@@ -176,7 +176,7 @@ class Sheet(EventProcessor):
 
     bounds  = Parameter(BoundingBox(points=((-0.5,-0.5),(0.5,0.5))))
     density = Parameter(100)
-    learning = BooleanParameter(True)
+    _learning = BooleanParameter(True)
 
     def __init__(self,**params):
 
@@ -190,7 +190,7 @@ class Sheet(EventProcessor):
         rows = int(height*linear_density)
         cols = int(width*linear_density)
         self.activation = zeros((rows,cols)) + 0.0
-        self.__saved_activation = None          # For non-learning inputs
+        self.__saved_activation = []          # For non-learning inputs
         self.debug('activation.shape =',self.activation.shape)
         self.sheet_view_dict = {}
 
@@ -305,19 +305,43 @@ class Sheet(EventProcessor):
         return [x for (x,y) in coords]
 
 
+    def activation_push(self):
+        """
+        Save the current sheet activation to an internal stack.
+        """
+        self.__saved_activation.append(array(self.activation))
+
+    def activation_pop(self,restore_activation=True):
+        """
+        Pop an activation off the stack and return the values.  If
+        restore_activation is True, then put the poped information
+        back into the Sheet activation variable.
+        """
+        old_act = self.__saved_activation.pop()
+        if replace_activation:
+            self.activation = old_act
+        return old_act
+
+    def activation_len(self):
+        """Return length of elements in the __saved_activation stack."""
+        return len(self.__saved_activation)
+        
+
     def disable_learning(self):
         """
         Turn off learning for the sheet.  Since learning is defined in
         this class as a pass, a pass here is also done.  This function
         should be defined in subclasses when learning needs to be
         disabled for user inputs.  Call enable_learning() when ready
-        to resume.  Derived classes should "super" this function.
+        to resume.  Derived classes when redefining this function should
+        call this code through 'super()'.
 
-        Do NOT set self.learning directly, unless you're certain you
+        Do NOT set self._learning directly, unless you're certain you
         know what you're doing.
         """
-        self.learning = False
-        self.__saved_activation = array(self.activation)
+        if self._learning:
+            self._learning = False
+            self.activation_push()
 
 
     def enable_learning(self,restore_activation=True):
@@ -326,10 +350,8 @@ class Sheet(EventProcessor):
         then restore the Sheet to the previous state before
         non-learning stimuli was presented.  This function will
         probably need to be extended by derived classes.  Derived
-        classes should "super" this function.
+        class functions should call "super()" to run this code.
         """
-        if self.learning:
-            raise "Sheet is already in learning mode."
-        if restore_activation:
-            self.activation = self.__saved_activation
-        self.learning = True
+        if not self._learning:
+            self.activation_pop(restore_activation)
+            self._learning = True
