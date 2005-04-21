@@ -46,6 +46,7 @@ class WeightsArrayPanel(RegionPlotPanel):
         # Checkbutton(self.params_frame1,text="Situate",variable=self.situate,
         #             command=self.refresh).pack(side=LEFT)
 
+        self.auto_refresh_checkbutton.invoke()
         self.refresh()
 
 
