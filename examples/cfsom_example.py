@@ -32,7 +32,7 @@ FuzzyLineFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
 # rf som parameters
 CFSOM.density = 2500
-CFSOM.training_length = 10000
+CFSOM.learning_length = 10000
 CFSOM.radius_0 = 0.1
 
 # Projection Parameters
