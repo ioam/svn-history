@@ -166,7 +166,7 @@ class Sheet(EventProcessor):
     bounds:   A BoundingBox object indicating the bounds of the sheet.
               [default  (-0.5,-0.5) to (0.5,0.5)]
     density:  The areal density of the sheet [default 100]
-    training: Whether the Sheet should adjust weights based upon
+    learning: Whether the Sheet should adjust weights based upon
               incoming events.  
 
     sheet_view_dict is a dictionary that stores SheetViews that are
@@ -176,7 +176,7 @@ class Sheet(EventProcessor):
 
     bounds  = Parameter(BoundingBox(points=((-0.5,-0.5),(0.5,0.5))))
     density = Parameter(100)
-    training = BooleanParameter(True)
+    learning = BooleanParameter(True)
 
     def __init__(self,**params):
 
@@ -190,7 +190,7 @@ class Sheet(EventProcessor):
         rows = int(height*linear_density)
         cols = int(width*linear_density)
         self.activation = zeros((rows,cols)) + 0.0
-        self.__saved_activation = None          # For non-training inputs
+        self.__saved_activation = None          # For non-learning inputs
         self.debug('activation.shape =',self.activation.shape)
         self.sheet_view_dict = {}
 
@@ -305,31 +305,31 @@ class Sheet(EventProcessor):
         return [x for (x,y) in coords]
 
 
-    def disable_training(self):
+    def disable_learning(self):
         """
-        Turn off training for the sheet.  Since training is defined in
+        Turn off learning for the sheet.  Since learning is defined in
         this class as a pass, a pass here is also done.  This function
-        should be defined in subclasses when training needs to be
-        disabled for user inputs.  Call enable_training() when ready
+        should be defined in subclasses when learning needs to be
+        disabled for user inputs.  Call enable_learning() when ready
         to resume.  Derived classes should "super" this function.
 
-        Do NOT set self.training directly, unless you're certain you
+        Do NOT set self.learning directly, unless you're certain you
         know what you're doing.
         """
-        self.training = False
+        self.learning = False
         self.__saved_activation = array(self.activation)
 
 
-    def enable_training(self,restore_activation=True):
+    def enable_learning(self,restore_activation=True):
         """
-        Assert that training has in fact been previously disabled,
+        Assert that learning has in fact been previously disabled,
         then restore the Sheet to the previous state before
-        non-training stimuli was presented.  This function will
+        non-learning stimuli was presented.  This function will
         probably need to be extended by derived classes.  Derived
         classes should "super" this function.
         """
-        if self.training:
-            raise "Sheet is already in training mode."
+        if self.learning:
+            raise "Sheet is already in learning mode."
         if restore_activation:
             self.activation = self.__saved_activation
-        self.training = True
+        self.learning = True

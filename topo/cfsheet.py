@@ -25,7 +25,7 @@ that computes its activation via the contribution of many local
 connection fields.  The activation output can be changed by changing
 the parameters CFSheet.activation_fn and CFSheet.transfer_fn.  (See
 CFSheet class documentation for more details).  To implement learning
-one must create a subclass and override the default .train() method.
+one must create a subclass and override the default .learn() method.
 
 
 JEFF's IMPLEMENTATION NOTES
@@ -300,19 +300,19 @@ class CFSheet(Sheet):
             self.send_output(data=self.activation)
             self.temp_activation *= 0.0
 
-            if self.training:
-                self.train()
+            if self.learning:
+                self.learn()
 
             self.debug("max activation =",max(self.activation.flat))
 
-    def train(self):
+    def learn(self):
         """
         Override this method to implement learning/adaptation.  Called
         from self.pre_sleep() _after_ activation has been propagated.
 
         Important:  This function will not be called by pre_sleep()
-        when the Sheet has training disabled.  (See enable_training(),
-        and disable_training())
+        when the Sheet has learning disabled.  (See enable_learning(),
+        and disable_learning())
         """
         pass
 

@@ -23,8 +23,8 @@ def decay(time,half_life):
 
 class CFSOM(CFSheet):
     """
-    Training operates by selecting a single winning unit from the SOM
-    at each input, and training the units in a gaussian neighborhood
+    Learning operates by selecting a single winning unit from the SOM
+    at each input, and learning the units in a gaussian neighborhood
     around the winner.
 
     """
@@ -34,11 +34,11 @@ class CFSOM(CFSheet):
     alpha_0 = Parameter(0.5)
     radius_0 = Parameter(1.0)
     
-    training_length = Parameter(1000)
+    learning_length = Parameter(1000)
     
     def __init__(self,**params):
         super(CFSOM,self).__init__(**params)
-        self.half_life = self.training_length/8                      
+        self.half_life = self.learning_length/8                      
     def alpha(self):
         return self.alpha_0 * decay(self.simulator.time(),self.half_life)
     def radius(self):
@@ -46,7 +46,7 @@ class CFSOM(CFSheet):
 
     ##########################################
 
-    def train(self):
+    def learn(self):
 
         rows,cols = self.activation.shape
         wr,wc = self.winner_coords(matrix_coords=True)
