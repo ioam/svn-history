@@ -66,13 +66,12 @@ def kernelfactory_names():
 
 class InputParamsPanel(PlotPanel):
     def __init__(self,parent,pengine,console=None,padding=2,**config):
-#        megaparent = parent
-#        parent = parent.component('hull')
         super(InputParamsPanel,self).__init__(parent,pengine,console,**config)
         self.plot_group.configure(tag_text='Preview')
 
         self.INITIAL_PLOT_WIDTH = 25
         self.padding = padding
+        self.parent = parent
         self.console = console
         self.learning = IntVar()
         self.learning.set(0)
@@ -112,8 +111,8 @@ class InputParamsPanel(PlotPanel):
         buttonBox.add('Reset to Defaults', command = self.reset_to_defaults)
         Checkbutton(self,text='Network Learning',
                     variable=self.learning,state=DISABLED).pack(side=TOP)
-        buttonBox.add('Always use for Training',
-                      command = self.use_for_training)
+        buttonBox.add('Always use for Learning',
+                      command = self.use_for_learning)
 
         # Menu of valid KernelFactory types defined.
         self.input_types = kernelfactory_names()
@@ -142,9 +141,9 @@ class InputParamsPanel(PlotPanel):
         self.tparams['max'] = \
           self.add_slider( 'max'  ,       "0"      ,  "1"       , "1"       )
         self.tparams['width'] = \
-          self.add_slider( 'width',       "0"      ,  "1"       , "0.5"     )
+          self.add_slider( 'width',       "0.001"  ,  "1"       , "0.5"     )
         self.tparams['height'] = \
-          self.add_slider( 'height',      "0"      ,  "1"       , "0.5"     )
+          self.add_slider( 'height',      "0.001"  ,  "1"       , "0.5"     )
         self.tparams['frequency'] = \
           self.add_slider( 'frequency',   "0.01"  ,   "1.25"   ,  "0.5"     )
         self.tparams['phase'] = \
@@ -152,7 +151,7 @@ class InputParamsPanel(PlotPanel):
         self.tparams['disk_radius'] = \
           self.add_slider( 'disk_radius',  "0"     ,   "1"      ,  "0.8"    )
         self.tparams['gaussian_width'] = \
-          self.add_slider( 'gaussian_width',"0"    ,   "1"      ,  "1"      )
+          self.add_slider( 'gaussian_width',"0.001",   "1"      ,  "1"      )
 
 # NOT IN EXISTING KERNELFACTORIES 4/2005
 #        self.tparams['xsigma'] = \
@@ -176,8 +175,11 @@ class InputParamsPanel(PlotPanel):
         self._refresh_sliders(self.input_type.get())
         self.prop_frame.pack(side=TOP,expand=YES,fill=X)
 
+        # Hook to turn learning back on when Panel is closed.
+        self.parent.protocol('WM_DELETE_WINDOW',self._reset_and_withdraw)
+
         self.default_values = self.prop_frame.get_values()
-        self.update_inputsheet_kernels()
+        self._update_inputsheet_kernels()
         self.refresh()
 
 
@@ -214,7 +216,7 @@ class InputParamsPanel(PlotPanel):
                    padx=self.padding,
                    pady=self.padding,
                    sticky=N+S+W+E)
-        self.update_inputsheet_kernels()
+        self._update_inputsheet_kernels()
         if self.auto_refresh: self.refresh()
 
 
@@ -256,8 +258,8 @@ class InputParamsPanel(PlotPanel):
         CURRENT IMPLEMENTATION GENERATES SIDE EFFECTS TO THE MODEL,
         AND THERE IS NO WAY TO DISABLE LEARNING.
         """
-        new_kernels_dict = self.update_inputsheet_kernels()
-        original_kernels = self.store_inputsheet_kernels()
+        new_kernels_dict = self._update_inputsheet_kernels()
+        original_kernels = self._store_inputsheet_kernels()
         self.register_inputsheet_kernels(new_kernels_dict)
         
         sim = self.console.active_simulator()
@@ -267,7 +269,7 @@ class InputParamsPanel(PlotPanel):
         self.console.auto_refresh()
 
 
-    def update_inputsheet_kernels(self):
+    def _update_inputsheet_kernels(self):
         """
         Make an instantiation of the current user kernel, and put it into
         all of the selected input sheets.
@@ -285,7 +287,7 @@ class InputParamsPanel(PlotPanel):
         return self.in_ep_dict  # Doesn't have to return it, but is explicit.
 
 
-    def store_inputsheet_kernels(self):
+    def _store_inputsheet_kernels(self):
         """
         Store the kernels currently in the InputSheets.
         """
@@ -311,14 +313,18 @@ class InputParamsPanel(PlotPanel):
                 ep.set_input_generator(kernels_dict[each]['kernel'])
 
 
-    def use_for_training(self):
+    def use_for_learning(self):
         """
-        Lock in the existing KernelFactory as the new default stimulus
-        input to the input layer.  This should work like a test stimuli,
+        Lock in the existing KernelFactories as the new default stimulus
+        input to the input sheets.  This should work like a test stimuli,
         but the original input generator is not put back afterwards.
+
+        This function does not run() the simulator.
         """
-        pass # Added so do_command doesn't freak with no body.
-#        Lissom.cmd(self.get_training_pattern_cmd())
+        new_kernels_dict = self._update_inputsheet_kernels()
+        original_kernels = self._store_inputsheet_kernels()
+        self.register_inputsheet_kernels(new_kernels_dict)
+        self.console.auto_refresh()
 
 
     def reset_to_defaults(self):
@@ -328,37 +334,11 @@ class InputParamsPanel(PlotPanel):
         for each in self.in_ep_dict.keys():
             if not self.in_ep_dict[each]['state']:
                 self.input_box.invoke(each)
-        self.update_inputsheet_kernels()
+        self._update_inputsheet_kernels()
         self._refresh_sliders(self.input_type.get())
         if self.auto_refresh: self.refresh()
         self.learning.set(0)
 
-
-    def get_cmd(self):
-        format = """input_present_object learning=%s All Input_%s %s
-                    theta=%s cx=%s cy=%s xsigma=%s ysigma=%s scale=%s
-                    offset=%s freq=%s phase=%s center_width=%s size_scale=%s"""
-        params = self.get_params()
-        return format % (params['learning'],
-                         params['size_scale'])
-
-
-    def get_training_pattern_cmd(self):
-        format = """exec input_undefine 'input_define Obj0 All
-                    Input_%s %s xsigma=%s ysigma=%s scale=%s offset=%s
-                    freq=%s phase=%s center_width=%s size_scale=%s'"""
-        params = self.get_params()
-        return format % (params['type'],
-                         params['filename'],
-                         params['xsigma'],
-                         params['ysigma'],
-                         params['scale'],
-                         params['offset'],
-                         params['freq'],
-                         params['phase'],
-                         params['center_width'],
-                         params['size_scale'])
-        
 
     def get_params(self):
         """Get the property values as a dictionary."""
@@ -411,8 +391,19 @@ class InputParamsPanel(PlotPanel):
         """
         Use the parent class refresh
         """
-        self.update_inputsheet_kernels()
+        self._update_inputsheet_kernels()
         super(InputParamsPanel,self).refresh()
 
-#    def destroy(self):
-#        print "inputparamspanel destroy"
+    def _reset_and_withdraw(self):
+        """
+        There should only be one InputParamsPanel for the Simulator.
+        When the window is made to go away, it doesn't need to really
+        go away since the same window comes back.  This is done through
+        a withdraw() call, instead of a destroy().  More importantly,
+        the learning needs to be turned back on if the learning had
+        been previously turned off by the user.
+        """
+        print 'InputParamsPanel closed.  ',
+        print 'Learing enabled'
+        self.parent.withdraw()
+

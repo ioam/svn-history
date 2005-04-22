@@ -378,13 +378,8 @@ class TopoConsole(Frame):
                 self.input_params_window.title('Test Pattern Parameters')
                 ripp = InputParamsPanel(self.input_params_window,pe,self)
                 ripp.pack(side=TOP,expand=YES,fill=BOTH)
-                self.input_params_window.protocol('WM_DELETE_WINDOW',
-                                       self.input_params_window.withdraw)
                 self.input_params_window.deiconify()
                 self.messageBar.message('state', 'OK')
-                #wap = WeightsArrayPanel(console=self,pengine=pe,parent=win)
-                #wap.pack(expand=YES,fill=BOTH)
-                #wap.refresh_title()
             else:
                 self.input_params_window.deiconify()
                 self.input_params_window.lift()
@@ -500,6 +495,8 @@ class TopoConsole(Frame):
 
 class GUIToplevel(Toplevel):
     def __init__(self,parent,**config):
+        # Megawidgets contain Toplevels in .hull  Either system is acceptable.
+        # Pmw.MegaToplevel.__init__(self,parent)
         Toplevel.__init__(self,parent,config)
         self.protocol('WM_DELETE_WINDOW',self.destroy)
         self.resizable(1,1)
