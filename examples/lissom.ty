@@ -1,3 +1,6 @@
+#  
+#
+
 from math import pi
 from itertools import chain
 import random
@@ -31,7 +34,10 @@ x xfer funcs  (piecewise linear sigmoid)
 class LISSOM(topo.cfsheet.CFSheet):
 
     transfer_fn = Parameter(default=utils.PLTF)
-    learning_rate = Parameter(default=0.1)
+
+# Temporarily disabled learning for comparison with C++ lissom implementation
+#   learning_rate = Parameter(default=0.1) 
+    learning_rate = Parameter(default=0.0)
 
 
     def input_event(self,src,src_port,dest_port,data):
@@ -80,33 +86,77 @@ class LISSOM(topo.cfsheet.CFSheet):
 ###########################################
 # Set parameters
 
+
+
+# Temporary variables designed to match the C++ version of lissom
+BaseN=30.0
+BaseRN=30.0
+area_scale=1.0
+num_eyes=1
+rf_radius=BaseRN/4.0+0.5
+inh_rad=max(2.0,(BaseN/4.0-1.5)+0.5)
+exc_rad=max(2.0,(BaseN/10.0-0.5)+0.5)
+default_afferent_size_scale=BaseN/BaseRN
+gammaexc=0.9
+gammainh=0.9
+#delta=0
+#beta=1
+#min_exc_rad=max(1,BaseN/44+0.5)
+
+rf_radius_scale=6.0/rf_radius
+#retina_area_scale=(BaseRN*area_scale/24.0*rf_radius_scale)*(BaseRN*area_scale/24.0*rf_radius_scale)
+#inputs_pereye=max(retina_area_scale,1)
+#uncorrelation=0.0 
+xsigma=7.0/rf_radius_scale
+ysigma=1.5/rf_radius_scale
+
+#scale_input=1.0
+retina_edge_buffer=0*(rf_radius+(BaseRN*area_scale/2))
+RN=BaseRN*area_scale+2*retina_edge_buffer
+
+#acs=6.5*6.5/rf_radius/rf_radius
+#ecs=19.5*19.5/exc_rad/exc_rad
+#ics=47.5*47.5/inh_rad/inh_rad
+#
+#alpha_input=0.0
+#alpha_exc=0.0
+#alpha_inh=0.0
+#
+tsettle=8
+
+
+
 print "Setting parameters..."
 
 
 # input generation params
 # jbednar050411: Doesn't seem to work with anything but 900 for both densities (!)
-InputSheet.density = 900
+InputSheet.density = RN*RN
 InputSheet.period = 1
 
-FuzzyLineFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-FuzzyLineFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+GaussianFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+GaussianFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
 
-FuzzyLineFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
-FuzzyLineFactory.width = 0.02
-FuzzyLineFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+GaussianFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
+GaussianFactory.width = xsigma/RN
+GaussianFactory.height = ysigma/RN
+GaussianFactory.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 
 
 # lissom parameters
-LISSOM.density = 900
+LISSOM.density = BaseN*BaseN
 
 
 # image saver parameters
 ImageSaver.file_format='png'
 ImageSaver.time_format='%0.4d'
 
-# lateral connection parameters
-inhibitory_weight_bounds = BoundingBox(points=((-0.2,-0.2),(0.2,0.2)))
-excitatory_weight_bounds = BoundingBox(points=((-0.1,-0.1),(0.1,0.1)))
+# Connection parameters
+# Not yet clear why the various 0.4 and 0.5 constants are needed to get the same sizes;
+# presumably it's due to rounding differences
+afferent_weight_bounds   = BoundingBox(points=((-(rf_radius+0.5)/RN,-(rf_radius+0.5)/RN),((rf_radius+0.5)/RN,(rf_radius+0.5)/RN)))
+excitatory_weight_bounds = BoundingBox(points=((-(exc_rad+0.5)/BaseN,-(exc_rad+0.5)/BaseN),((exc_rad+0.5)/BaseN,(exc_rad+0.5)/BaseN)))
+inhibitory_weight_bounds = BoundingBox(points=((-(inh_rad+0.4)/BaseN,-(inh_rad+0.4)/BaseN),((inh_rad+0.4)/BaseN,(inh_rad+0.4)/BaseN)))
 
 
 ###########################################
@@ -117,16 +167,19 @@ print "Creating simulation objects..."
 s = topo.simulator.Simulator()
 
 
-retina = InputSheet(input_generator=FuzzyLineFactory(),name='Retina')
+retina = InputSheet(input_generator=GaussianFactory(),name='Retina')
 V1 = LISSOM(name='V1')
 save  = ImageSaver(name='LISSOM')
 
-s.connect(retina,V1,delay=0.0625)
-s.connect(V1,V1, delay=0.125,
-          projection_params = dict(strength = 0.9,
+s.connect(retina,V1, delay = 0.5/tsettle,
+          projection_params = dict(strength = 1.0, name='Afferent0',
+                                   weights_bounds = afferent_weight_bounds))
+
+s.connect(V1,V1, delay = 1.0/tsettle,
+          projection_params = dict(strength = gammaexc, name='LateralExcitatory',
                                    weights_bounds = excitatory_weight_bounds))
-s.connect(V1,V1, delay = 0.125,
-          projection_params = dict(strength = -0.9,
+s.connect(V1,V1, delay = 1.0/tsettle,
+          projection_params = dict(strength = -gammainh, name='LateralInhibitory',
                                    weights_bounds = inhibitory_weight_bounds))
         
 
