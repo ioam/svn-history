@@ -79,6 +79,7 @@ import RandomArray,Numeric,copy
 import topo.sheetview
 import topo.boundingregion
 import topo.bitmap
+from MLab import rot90,flipud
 from topo.utils import flatten
 
 
@@ -99,7 +100,9 @@ class ConnectionField(TopoObject):
         return self.bounds.contains(x,y)
 
     def get_input_matrix(self, activation):
-        return self.input_sheet.activation_submatrix(self.bounds,activation)
+        # KERNELFACTORY HACK PATCH TO GET THE KERNELS TO USE X/Y IN THE
+        # RIGHT SHAPE.
+        return flipud(rot90(self.input_sheet.activation_submatrix(self.bounds,activation)))
 
 
 class Projection(TopoObject):

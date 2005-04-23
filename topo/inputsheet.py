@@ -8,9 +8,11 @@ $Id$
 from sheet import Sheet 
 from utils import NxN
 
+import copy
 from sheet import BoundingBox
 from params import *
 from kernelfactory import UniformRandomFactory
+from MLab import rot90, flipud
 
 class InputSheet(Sheet):
 
@@ -35,8 +37,11 @@ class InputSheet(Sheet):
         """
         self.input_generator = new_ig
         self.input_generator.bounds = self.bounds
+        # KERNELFACTORY HACK PATCH TO GET THE X/Y RIGHT OUTSIDE OF KFS.
+        (l,b,r,t) = self.bounds.aarect().lbrt()
+        self.input_generator.bounds = BoundingBox(points=((b,l),(t,r)))
         self.input_generator.density = self.density
-        
+
 
     def get_input_generator(self):
         """
@@ -71,7 +76,11 @@ class InputSheet(Sheet):
     
         # TODO: Pass a dictionary to this function to avoid having all of the
         # subclasses below
-        self.activation = self.input_generator()
+        # KERNELFACTORY HACK PATCH TO GET KERNEL SHAPE TO MATCH INTERNAL SHAPE.
+        # self.activation = self.input_generator()
+        self.activation = flipud(rot90(self.input_generator()))
+
+        
         
         self.send_output(data=self.activation)
         self.message("Sending %s output." % NxN(self.activation.shape))
