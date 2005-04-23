@@ -60,22 +60,21 @@ def produce_kernel_matrices(bounds, density):
     #kernel_y = arange(left,right, bound_width/cols)
     #kernel_x = arange(bottom,top, bound_height/rows)
     
-    kernel_x = array([matrix2sheet(r,0,bounds,density) for r in range(rows)])
-    kernel_y = array([matrix2sheet(0,c,bounds,density) for c in range(cols)])
-
-    # NOTE: This is correct,
-    #  kernels use x for rows and y for columns, not sure why. --jp
-    assert len(kernel_x) == rows
-    assert len(kernel_y) == cols
-    return kernel_x[:,1], kernel_y[:,0]
+    # kernel_x = array([matrix2sheet(r,0,bounds,density) for r in range(rows)])
+    # kernel_y = array([matrix2sheet(0,c,bounds,density) for c in range(cols)])
+    # # NOTE: This is correct,
+    # #  kernels use x for rows and y for columns, not sure why. --jp
+    # assert len(kernel_x) == rows
+    # assert len(kernel_y) == cols
+    # return kernel_x[:,1], kernel_y[:,0]
 
     # Experiment to see if swapping will work.  -Judah
     # It did for this class, but cfsheet.py expects a different kernel shape.
-    # kernel_y = array([matrix2sheet(r,0,bounds,density) for r in range(rows)])
-    # kernel_x = array([matrix2sheet(0,c,bounds,density) for c in range(cols)])
-    # assert len(kernel_x) == cols
-    # assert len(kernel_y) == rows
-    # return kernel_x[:,0], kernel_y[:,1]
+    kernel_y = array([matrix2sheet(r,0,bounds,density) for r in range(rows)])
+    kernel_x = array([matrix2sheet(0,c,bounds,density) for c in range(cols)])
+    assert len(kernel_x) == cols
+    assert len(kernel_y) == rows
+    return kernel_x[:,0], kernel_y[:,1]
 
 
 
