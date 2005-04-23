@@ -19,9 +19,12 @@ import math
 import propertiesframe
 import topo.kernelfactory
 import topo.plot
+from Numeric import array
+from MLab import rot90, flipud
 from plotpanel import *
 from regionplotpanel import *
 from topo.inputsheet import InputSheet
+from topo.sheet import BoundingBox
 import topo.sheetview 
 
 # Hack to reverse the order of the input EventProcessor list and the
@@ -69,7 +72,7 @@ class InputParamsPanel(PlotPanel):
         super(InputParamsPanel,self).__init__(parent,pengine,console,**config)
         self.plot_group.configure(tag_text='Preview')
 
-        self.INITIAL_PLOT_WIDTH = 25
+        self.INITIAL_PLOT_WIDTH = 100
         self.padding = padding
         self.parent = parent
         self.console = console
@@ -86,7 +89,7 @@ class InputParamsPanel(PlotPanel):
                                           'kernel':None} 
         self.input_box = Pmw.RadioSelect(parent, labelpos = 'w',
                                 command = self._input_change,
-                                label_text = 'Adjust Input:',
+                                label_text = 'Input:',
                                 frame_borderwidth = 2,
                                 frame_relief = 'ridge',
                                 selectmode = 'multiple')
@@ -111,7 +114,7 @@ class InputParamsPanel(PlotPanel):
         buttonBox.add('Reset to Defaults', command = self.reset_to_defaults)
         Checkbutton(self,text='Network Learning',
                     variable=self.learning,state=DISABLED).pack(side=TOP)
-        buttonBox.add('Always use for Learning',
+        buttonBox.add('Use for future learning',
                       command = self.use_for_learning)
 
         # Menu of valid KernelFactory types defined.
@@ -282,6 +285,7 @@ class InputParamsPanel(PlotPanel):
             ndict[each] = eval_atof(p[each])
         for each in self.in_ep_dict.keys():
             if self.in_ep_dict[each]['state']:
+                ndict['density'] = self.in_ep_dict[each]['obj'].density
                 kf = topo.kernelfactory.__dict__[kname](**ndict)
                 self.in_ep_dict[each]['kernel'] = kf
         return self.in_ep_dict  # Doesn't have to return it, but is explicit.
@@ -308,9 +312,10 @@ class InputParamsPanel(PlotPanel):
         as value that should be moved into the InputSheet.
         """
         for each in self.in_ep_dict.keys():
-            if kernels_dict[each]['state']:
-                ep = kernels_dict[each]['obj']
-                ep.set_input_generator(kernels_dict[each]['kernel'])
+            # Only present to the ones that are currently selected.
+            # if kernels_dict[each]['state']:
+            ep = kernels_dict[each]['obj']
+            ep.set_input_generator(kernels_dict[each]['kernel'])
 
 
     def use_for_learning(self):
@@ -376,7 +381,16 @@ class InputParamsPanel(PlotPanel):
         plist = []
         for each in self.in_ep_dict.keys():
             k = self.in_ep_dict[each]['kernel']
-            sv = topo.sheetview.SheetView((k(),k.bounds),src_name=each,
+
+            kmatrix = k()
+            kbounds = k.bounds
+            # KERNELFACTORY HACK PATCH TO GET THE X/Y MATCHED TO REST OF TOPO.
+            # WILL REQUIRE PROPER REPAIR.
+            kmatrix = array(flipud(rot90(kmatrix)))
+            #(l,b,r,t) = k.bounds.aarect().lbrt()
+            #kbounds = BoundingBox(points=((b,l),(t,r)))
+
+            sv = topo.sheetview.SheetView((kmatrix,kbounds),src_name=each,
                                           view_type='Kernel')
             p = topo.plot.Plot((sv,None,None),topo.plot.COLORMAP)
             plist.append(p)
