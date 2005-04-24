@@ -143,7 +143,7 @@ class Projection(TopoObject):
         """
         (x,y) = (self.dest).sheet2matrix(sheet_x,sheet_y)
         # composite_name = '%s: %0.3f, %0.3f' % (self.name, sheet_x, sheet_y)
-        matrix_data = Numeric.array(self.cf(y,x).weights)
+        matrix_data = Numeric.array(self.cf(x,y).weights)
         # print 'matrix_data = ', matrix_data
         new_box = self.dest.bounds  # TURN INTO A PROPER COPY
         assert matrix_data != None, "Projection Matrix is None"
