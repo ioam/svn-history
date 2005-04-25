@@ -164,17 +164,17 @@ class TopoConsole(Frame):
         self.cmd_box.pack(side=LEFT,expand=YES,fill=X)
 
         #
-        # Training
+        # Learning
         #
-        training_group = Pmw.Group(self,tag_text='Training iterations')
-        training_frame = training_group.interior()
-        training_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
+        learning_group = Pmw.Group(self,tag_text='Learning iterations')
+        learning_frame = learning_group.interior()
+        learning_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
 
-        self.training_str = StringVar()
-        self.training_str.set('1')
-        Pmw.ComboBox(training_frame,autoclear=1,history=1,dropdown=1,
-                     entry_textvariable=self.training_str,
-                     selectioncommand=Pmw.busycallback(self.do_training)
+        self.learning_str = StringVar()
+        self.learning_str.set('1')
+        Pmw.ComboBox(learning_frame,autoclear=1,history=1,dropdown=1,
+                     entry_textvariable=self.learning_str,
+                     selectioncommand=Pmw.busycallback(self.do_learning)
                      ).pack(side=LEFT,expand=YES,fill=X)
 
 
@@ -460,10 +460,10 @@ class TopoConsole(Frame):
             return True
 
 
-    def do_training(self,count):
+    def do_learning(self,count):
         """
         A simulation object should be linked to the GUI before this
-        training command is issued on the Simulator object.
+        learning command is issued on the Simulator object.
         """
         s = self.active_simulator()
         if s:
