@@ -417,7 +417,7 @@ class InputParamsPanel(PlotPanel):
         the learning needs to be turned back on if the learning had
         been previously turned off by the user.
         """
-        print 'InputParamsPanel closed.  ',
-        print 'Learing enabled'
+        #print 'InputParamsPanel closed.  ',
+        #print 'Learning enabled'
         self.parent.withdraw()
 
