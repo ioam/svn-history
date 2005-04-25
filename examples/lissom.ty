@@ -49,7 +49,7 @@ class LISSOM(topo.cfsheet.CFSheet):
 
 
 
-    def train(self):
+    def learn(self):
 
         rows,cols = self.activation.shape
         for proj in chain(*self.projections.values()):
