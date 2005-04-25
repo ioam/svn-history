@@ -156,37 +156,47 @@ def fuzzy_disk(kernel_x, kernel_y, disk_radius, gaussian_width):
     """
     Fuzzy Disk Kernel Factory
     """
-
     distance_from_line = sqrt((kernel_x**2)+(kernel_y**2)) 
     gaussian_x_coord   = distance_from_line - disk_radius/2.0 
+    div_sigmasq = 1 / (gaussian_width*gaussian_width)
+
+    disc = less_equal(gaussian_x_coord,0)
+    return maximum(disc, exp(maximum(-100,-gaussian_x_coord*gaussian_x_coord*div_sigmasq)))
 
 
-    #return less_equal(gaussian_x_coord, 0) * \
-    #       exp(maximum(-100, -(gaussian_x_coord/gaussian_width)**2 ))#- (kernel_y/gaussian_width)**2))
-    return less_equal(gaussian_x_coord, 0) * \
-           exp(maximum(-100, -(kernel_x/gaussian_width)**2 - (kernel_y/gaussian_width)**2))
 
-
-#def fuzzy_ring(kernel_x, kernel_y, inner_radius, outer_radius, gaussian_width):
-#    """
-#    Fuzzy Ring Kernel Factory
-#    """    
-#    distance_from_line = abs(outer_radius - sqrt(kernel_x**2)+(kernel_y**2))
-#    gaussian_x_coord   = distance_from_line - disk_radius/2
-#
-#    return less_equal(gaussian_x_coord, 0) * \
-#           exp(maximum(-100, -(gaussian_x_coord/gaussian_width)**2))
-
-
-def fuzzy_ring(kernel_x, kernel_y, disk_radius, outer_radius, gaussian_width):
+def fuzzy_ring(kernel_x, kernel_y, disk_radius, ring_radius, gaussian_width):
     """
     Fuzzy Ring Kernel Factory
     """    
-    distance_from_line = abs(outer_radius - sqrt(kernel_x**2)+(kernel_y**2))
-    gaussian_x_coord   = distance_from_line - disk_radius/2
+#    return less_equal(gaussian_x_coord, 0) * \
+#           exp(maximum(-100, -(gaussian_x_coord/gaussian_width)**2))
+#  const Coordinate distance_from_line = fabs(radius - sqrt(dx*dx+dy*dy));
+#  const Coordinate gaussian_x_coord   = (distance_from_line - centerw/2);
+#  return (gaussian_x_coord<=0 ? 1.0
+#	  : exp(-gaussian_x_coord*gaussian_x_coord*div_ysigmasq));
 
-    return less_equal(gaussian_x_coord, 0) * \
-           exp(maximum(-100, -(gaussian_x_coord/gaussian_width)**2))
+    disk_radius = disk_radius
+    ring_radius = ring_radius / 2.0
+    distance_from_line = abs(sqrt((kernel_x**2)+(kernel_y**2)) - disk_radius)
+    inner_distance = distance_from_line - ring_radius
+    outer_distance = distance_from_line + ring_radius
+
+#    distance_from_line = abs(ring_radius - sqrt(kernel_x**2)+(kernel_y**2))
+#    gaussian_x_coord   = distance_from_line - ring_radius/2
+    div_sigmasq = 1 / (gaussian_width*gaussian_width)
+
+#    distance_from_line = sqrt((kernel_x**2)+(kernel_y**2)) 
+#    gaussian_x_coord   = distance_from_line - disk_radius/2.0 
+#    div_sigmasq = 1 / (gaussian_width*gaussian_width)
+    ring = less_equal(distance_from_line,ring_radius)
+           
+    inner_g = exp(maximum(-100,-inner_distance*inner_distance*div_sigmasq))
+    outer_g = exp(maximum(-100,-outer_distance*outer_distance*div_sigmasq))
+    dring = maximum(inner_g,maximum(outer_g,ring))
+    return dring
+#    return exp(maximum(-100,-gaussian_x_coord*gaussian_x_coord*div_sigmasq))
+
 
 
 
@@ -336,11 +346,8 @@ class FuzzyDiskFactory(KernelFactory):
     """
     x              = Parameter(default=0)
     y              = Parameter(default=0)
-    # TODO: This is a hack, we need a theta in order to appease the rotation
-    # function
-    # theta          = Parameter(default=0)
     disk_radius    = Parameter(default=0.2)
-    gaussian_width = Parameter(default=0.5)
+    gaussian_width = Parameter(default=0.2)
 
     def function(self,**params):
         return fuzzy_disk( self.kernel_x, 
@@ -357,9 +364,9 @@ class FuzzyRingFactory(KernelFactory):
 
     x              = Parameter(default=0)
     y              = Parameter(default=0)
-    width          = Parameter(default=1)
-    disk_radius    = Parameter(default=0.8)
-    gaussian_width = Parameter(default=0.2)
+    width          = Parameter(default=0.1)
+    disk_radius    = Parameter(default=0.2)
+    gaussian_width = Parameter(default=0.1)
 
     def function(self,**params):
         return fuzzy_ring(self.kernel_x, 
