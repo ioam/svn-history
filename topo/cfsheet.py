@@ -95,14 +95,17 @@ class ConnectionField(TopoObject):
         self.bounds = bounds
         self.weights = weights
         self.verbose("activation matrix shape: ",self.weights.shape)
+        self.slice = self.input_sheet.input_slice(self.bounds)
 
     def contains(self,x,y):
         return self.bounds.contains(x,y)
 
     def get_input_matrix(self, activation):
+        r1,r2,c1,c2 = self.slice
+
         # KERNELFACTORY HACK PATCH TO GET THE KERNELS TO USE X/Y IN THE
         # RIGHT SHAPE.
-        return flipud(rot90(self.input_sheet.activation_submatrix(self.bounds,activation)))
+        return flipud(rot90(activation[r1:r2,c1:c2]))
 
 
 class Projection(TopoObject):
@@ -331,8 +334,8 @@ class CFSheet(Sheet):
 
         for proj in self.projections[input_sheet.name]:
             proj.input_buffer = input_activation
-            for r in range(rows):
-                for c in range(cols):
+            for r in xrange(rows):
+                for c in xrange(cols):
                         cf = proj.cf(r,c)
                         X = cf.get_input_matrix(input_activation)
                         self.temp_activation[r,c] += proj.strength * self.activation_fn(X,cf.weights)
