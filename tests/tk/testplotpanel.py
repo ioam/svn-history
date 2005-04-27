@@ -11,7 +11,7 @@ from topo.bitmap import *
 import topo.tk.topoconsole 
 import topo.tk.plotpanel
 import Tkinter
-from topo.rfsom import RFSOM
+from topo.cfsom import CFSOM
 from topo.image import ImageSaver
 from math import pi
 from topo.params import Dynamic
@@ -111,9 +111,9 @@ class TestPlotPanel(unittest.TestCase):
         FuzzyLineFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
         
         # rf som parameters
-        RFSOM.density = 2500
-        RFSOM.training_length = 10000
-        RFSOM.radius_0 = 0.1
+        CFSOM.density = 2500
+        CFSOM.learning_length = 10000
+        CFSOM.radius_0 = 0.1
         
         ###########################################
         # build simulation
@@ -121,9 +121,9 @@ class TestPlotPanel(unittest.TestCase):
         
         retina = InputSheet(input_generator=FuzzyLineFactory(),name='Retina')
         retina.print_level = base.WARNING
-        V1 = RFSOM(name='V1')
+        V1 = CFSOM(name='V1')
         V1.print_level = base.WARNING
-        save  = ImageSaver(name='RFSOM')
+        save  = ImageSaver(name='CFSOM')
         
         s.connect(retina,V1,delay=1)
         s.print_level = base.WARNING

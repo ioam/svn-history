@@ -23,11 +23,11 @@ class TestTopoConsole(unittest.TestCase):
         self.console.set_active_simulator(None)
         self.assertEqual(self.console.active_simulator(),None)
 
-    def test_do_training(self):
+    def test_do_learning(self):
         run_time = 15.5
         self.console.set_active_simulator(self.s)
         start_time = self.s.time()
-        self.console.do_training(str(run_time))
+        self.console.do_learning(str(run_time))
         end_time = self.s.time()
         self.assertEqual(start_time+run_time,end_time)
 

@@ -50,7 +50,7 @@ class TestCFSom(unittest.TestCase):
 
         # rf som parameters
         CFSOM.density = 900
-        CFSOM.training_length = 10000
+        CFSOM.learning_length = 10000
         CFSOM.radius_0 = 0.1
 
         ###########################################
