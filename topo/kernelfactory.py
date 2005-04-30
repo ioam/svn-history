@@ -68,8 +68,8 @@ def produce_kernel_matrices(bounds, density):
     # assert len(kernel_y) == cols
     # return kernel_x[:,1], kernel_y[:,0]
 
-    # Experiment to see if swapping will work.  -Judah
-    # It did for this class, but cfsheet.py expects a different kernel shape.
+    # Experiment to see if swapping will work.  It did, but additional work
+    # is required to make the displays consistent.  -Judah
     kernel_y = array([matrix2sheet(r,0,bounds,density) for r in range(rows)])
     kernel_x = array([matrix2sheet(0,c,bounds,density) for c in range(cols)])
     assert len(kernel_x) == cols
@@ -169,33 +169,20 @@ def fuzzy_ring(kernel_x, kernel_y, disk_radius, ring_radius, gaussian_width):
     """
     Fuzzy Ring Kernel Factory
     """    
-#    return less_equal(gaussian_x_coord, 0) * \
-#           exp(maximum(-100, -(gaussian_x_coord/gaussian_width)**2))
-#  const Coordinate distance_from_line = fabs(radius - sqrt(dx*dx+dy*dy));
-#  const Coordinate gaussian_x_coord   = (distance_from_line - centerw/2);
-#  return (gaussian_x_coord<=0 ? 1.0
-#	  : exp(-gaussian_x_coord*gaussian_x_coord*div_ysigmasq));
-
     disk_radius = disk_radius
     ring_radius = ring_radius / 2.0
     distance_from_line = abs(sqrt((kernel_x**2)+(kernel_y**2)) - disk_radius)
     inner_distance = distance_from_line - ring_radius
     outer_distance = distance_from_line + ring_radius
-
-#    distance_from_line = abs(ring_radius - sqrt(kernel_x**2)+(kernel_y**2))
-#    gaussian_x_coord   = distance_from_line - ring_radius/2
     div_sigmasq = 1 / (gaussian_width*gaussian_width)
 
-#    distance_from_line = sqrt((kernel_x**2)+(kernel_y**2)) 
-#    gaussian_x_coord   = distance_from_line - disk_radius/2.0 
-#    div_sigmasq = 1 / (gaussian_width*gaussian_width)
     ring = less_equal(distance_from_line,ring_radius)
            
     inner_g = exp(maximum(-100,-inner_distance*inner_distance*div_sigmasq))
     outer_g = exp(maximum(-100,-outer_distance*outer_distance*div_sigmasq))
     dring = maximum(inner_g,maximum(outer_g,ring))
     return dring
-#    return exp(maximum(-100,-gaussian_x_coord*gaussian_x_coord*div_sigmasq))
+
 
 
 
