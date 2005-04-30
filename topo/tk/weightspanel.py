@@ -62,7 +62,7 @@ class WeightsPanel(RegionPlotPanel):
         Change the title of the grid group, then call PlotPanel's
         display_labels().
         """
-        self.plot_group.configure(tag_text = 'Projection Plot')
+        self.plot_group.configure(tag_text = 'Connection Field Plot')
         super(WeightsPanel,self).display_labels()
     
         
