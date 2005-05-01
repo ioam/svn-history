@@ -371,7 +371,8 @@ class InputParamsPanel(PlotPanel):
         self._update_inputsheet_kernels()
         self._refresh_sliders(self.input_type.get())
         if self.auto_refresh: self.refresh()
-        self.learning.set(0)
+        if not self.learning.get():
+            self.learning_button.invoke()
 
 
     def get_params(self):
