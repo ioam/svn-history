@@ -24,7 +24,7 @@ from MLab import rot90, flipud
 from plotpanel import *
 from regionplotpanel import *
 from topo.inputsheet import InputSheet
-from topo.sheet import BoundingBox
+from topo.sheet import BoundingBox, Sheet
 import topo.sheetview 
 
 # Hack to reverse the order of the input EventProcessor list and the
@@ -77,7 +77,7 @@ class InputParamsPanel(PlotPanel):
         self.parent = parent
         self.console = console
         self.learning = IntVar()
-        self.learning.set(0)
+        self.learning.set(1)
         self.tparams = {}
 
         # Variables and widgets for maintaining the list of input sheets
@@ -112,8 +112,10 @@ class InputParamsPanel(PlotPanel):
         buttonBox.pack(side=TOP)
         buttonBox.add('Present', command = self.present)
         buttonBox.add('Reset to Defaults', command = self.reset_to_defaults)
-        Checkbutton(self,text='Network Learning',
-                    variable=self.learning,state=DISABLED).pack(side=TOP)
+        self.learning_button = Checkbutton(self,text='Network Learning',
+                                      variable=self.learning,
+                                      command=self._learning_toggle)
+        self.learning_button.pack(side=TOP)
         buttonBox.add('Use for future learning',
                       command = self.use_for_learning)
 
@@ -196,6 +198,26 @@ class InputParamsPanel(PlotPanel):
         self.in_ep_dict[button_name]['state'] = checked
         
 
+    def _learning_toggle(self):
+        """
+        Invoked by the learning checkbox.  Requires that the initial
+        state is learning.  i.e. Trying to pop state off an empty
+        simulator event queue stack will causes problems.
+        """
+        learning = self.learning.get()
+        sim = self.console.active_simulator()
+        if not learning:
+            sim.state_push()
+            for each in sim.get_event_processors():
+                if isinstance(each,Sheet):
+                    each.disable_learning()
+        else: # Turn learning back on and restore
+            sim.state_pop()
+            for each in sim.get_event_processors():
+                if isinstance(each,Sheet):
+                    each.enable_learning()
+            
+
     def _refresh_sliders(self,new_name):
         """
         Called by the Pmw.OptionMenu object when the user selects a
@@ -258,8 +280,15 @@ class InputParamsPanel(PlotPanel):
 
     def present(self):
         """
-        CURRENT IMPLEMENTATION GENERATES SIDE EFFECTS TO THE MODEL,
-        AND THERE IS NO WAY TO DISABLE LEARNING.
+        Move the user created kernels into the InputSheets, run for
+        the specified length of time, then restore the original
+        kernels.  The system may become unstable if the user breaks
+        this thread so that the original kernels are not properly
+        restored, but then there are going to be other problems with
+        the Simulator state if a run is interrupted.
+
+        This function is run independent of if learning is enabled or
+        disabled since run() will detect sheet attributes.
         """
         new_kernels_dict = self._update_inputsheet_kernels()
         original_kernels = self._store_inputsheet_kernels()
@@ -417,7 +446,10 @@ class InputParamsPanel(PlotPanel):
         the learning needs to be turned back on if the learning had
         been previously turned off by the user.
         """
-        #print 'InputParamsPanel closed.  ',
-        #print 'Learning enabled'
+        if not self.learning.get():
+            self.learning_button.invoke()
+            self.message("Learning re-enabled.")
+            topo.tk.show_cmd_prompt()
+            
         self.parent.withdraw()
 
