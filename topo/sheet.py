@@ -318,7 +318,7 @@ class Sheet(EventProcessor):
         back into the Sheet activation variable.
         """
         old_act = self.__saved_activation.pop()
-        if replace_activation:
+        if restore_activation:
             self.activation = old_act
         return old_act
 
