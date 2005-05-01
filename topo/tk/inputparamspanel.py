@@ -181,7 +181,7 @@ class InputParamsPanel(PlotPanel):
         self.prop_frame.pack(side=TOP,expand=YES,fill=X)
 
         # Hook to turn learning back on when Panel is closed.
-        self.parent.protocol('WM_DELETE_WINDOW',self._reset_and_withdraw)
+        self.parent.protocol('WM_DELETE_WINDOW',self._reset_and_destroy)
 
         self.default_values = self.prop_frame.get_values()
         self._update_inputsheet_kernels()
@@ -437,7 +437,7 @@ class InputParamsPanel(PlotPanel):
         self._update_inputsheet_kernels()
         super(InputParamsPanel,self).refresh()
 
-    def _reset_and_withdraw(self):
+    def _reset_and_destroy(self):
         """
         There should only be one InputParamsPanel for the Simulator.
         When the window is made to go away, it doesn't need to really
@@ -450,6 +450,7 @@ class InputParamsPanel(PlotPanel):
             self.learning_button.invoke()
             self.message("Learning re-enabled.")
             topo.tk.show_cmd_prompt()
-            
-        self.parent.withdraw()
+        self.console.input_params_window = None
+        self.parent.destroy()
+        #self.parent.withdraw()
 
