@@ -67,32 +67,32 @@ self connections might have src_port = 'recurrent'.
 
 Jeff's implementation notes:
 
-* SimpleSimulator *
+* Simulator *
 
 This module actually contains two simulator classes.  The original
-Simulator, and a subclass SimpleSimulator.  Simulator uses the
+BaseSimulator, and a subclass Simulator.  BaseSimulator uses the
 sched.scheduler class from the Python std library to handle event
 scheduling.  Because sched.scheduler is a black box, I wrote
 SimpleScheduler in order to be able to debug event scheduling issues,
 SimpleScheduler stores its events in a linear-time priority queue (i.e
 a sorted list.)
 
-The Simulator class is more mature, and should be better able to
+The BaseSimulator class is more mature, and should be better able to
 handle exceptions raised while running without corrupting the event
 queue.  The black-box nature of the scheduler, however, means that I
 had to do some fancy footwork with exceptions in order to get
-.pre_sleep() to behave correctly.  SimpleSimulator, on the other hand,
+.pre_sleep() to behave correctly.  Simulator, on the other hand,
 may not (currently) guarantee that raised exceptions won't corrupt the
 event queue, but its implementation is much simpler and clearer and
 its performance is easier to inspect and debug.  It may be worth
-making SimpleSimulator the default (i.e. renaming it as Simulator and
+making Simulator the default (i.e. renaming it as Simulator and
 making it the superclass rather than the subclass).  For efficiency,
 e.g. for spiking neuron simulations, we'll probably need to replace
 the linear priority queue with a more efficient one.  I have an O(log
 N) minheap implementation in python somewhere.  It might even be in
 the CVS repository as a dead file.
 
-Note also that even though Simulator may guarantee that the event
+Note also that even though BaseSimulator may guarantee that the event
 queue isn't corrupted by a raised exception, there is no guarantee that
 the internal state of the EP that raised the exception is sane, so
 it's not clear if the exception-safe aspect of sched.simulator is of
@@ -134,6 +134,7 @@ import sched
 from base import TopoObject
 from params import Parameter
 from utils import inf
+from copy import copy, deepcopy
 import __main__
 import topo.gui
 
@@ -152,7 +153,7 @@ def set_active_sim(a_sim):
     topo.gui.link_to_sim(a_sim)
 
 
-class Simulator(TopoObject):
+class BaseSimulator(TopoObject):
     """
     A class to manage a simulation.  A simulator object manages the
     event queue, simulation clock, and list of EventProcessors, dispatching
@@ -169,19 +170,19 @@ class Simulator(TopoObject):
            step_mode = debugging flag, causing the simulator to stop
                        before each tick.
         """
-        super(Simulator,self).__init__(**config)
+        super(BaseSimulator,self).__init__(**config)
 
-        self.__time = 0.0
-        self.__event_processors = []
-        self.__sleep_window = 0.0
-        self.__sleep_window_violation = False
-        self.__scheduler = sched.scheduler(self.time,self.sleep)
-        self.__started = False
+        self._time = 0.0
+        self._event_processors = []
+        self._sleep_window = 0.0
+        self._sleep_window_violation = False
+        self._scheduler = sched.scheduler(self.time,self.sleep)
+        self._started = False
         if self.register:
             set_active_sim(self)
 
         
-    def run(self,duration=0,until=0):
+    def run(self,duration=inf,until=inf):
         """
         Run the simulator.   Call .start() for each EventProcessor if not
         previously done, and start the event scheduler.
@@ -190,25 +191,25 @@ class Simulator(TopoObject):
           until    = time to stop in simulator time. Default: run indefinitely.
           (note if both duration and until are used, they both will apply.)
         """
-        if not self.__started:
-            self.__started = True
-            for node in self.__event_processors:
+        if not self._started:
+            self._started = True
+            for node in self._event_processors:
                 node.start()
         self.continue_(duration,until)
 
 
     def continue_(self,duration=0,until=0):
         if duration:
-            self.__scheduler.enter(duration,0,self.stop,[])
+            self._scheduler.enter(duration,0,self.stop,[])
         if until:
-            self.__scheduler.enterabs(until,0,self.stop,[])
+            self._scheduler.enterabs(until,0,self.stop,[])
         try:
             keep_running = True
             while keep_running:
                 # By default we should stop running if there's an exception
                 keep_running = False
                 try:
-                    self.__scheduler.run()
+                    self._scheduler.run()
                 except SLEEP_EXCEPTION:
 
                     # SLEEP_EXCEPTION is raised when an EP's
@@ -219,8 +220,8 @@ class Simulator(TopoObject):
                     # restart it to process the newly scheduled event(s).
                     
                     self.debug("SLEEP EXCEPTION")
-                    self.__sleep_window_violation = False
-                    self.__sleep_window = 0
+                    self._sleep_window_violation = False
+                    self._sleep_window = 0
                     # since the exception was a SLEEP_EXCEPTION
                     # we want to keep running.
                     keep_running = True
@@ -244,8 +245,8 @@ class Simulator(TopoObject):
         that the node can enqueue events and read the simulator clock.
         """
         for ep in EPs:
-            if not ep in self.__event_processors:
-                self.__event_processors.append(ep)
+            if not ep in self._event_processors:
+                self._event_processors.append(ep)
                 ep.simulator = self
 
 
@@ -279,10 +280,10 @@ class Simulator(TopoObject):
         # If this event is scheduled when the simulator is about to sleep,
         # make sure that the event isn't being scheduled during the sleep window,
         # if it is, indicate a violation.
-        if self.__sleep_window and delay < self.__sleep_window:
-            self.__sleep_window_violation = True
+        if self._sleep_window and delay < self._sleep_window:
+            self._sleep_window_violation = True
         # now schedule the event
-        self.__scheduler.enter(delay,1,self.__dispatch,(self.time()+delay,src,src_port,dest,dest_port,data))
+        self._scheduler.enter(delay,1,self._dispatch,(self.time()+delay,src,src_port,dest,dest_port,data))
 
     def enqueue_event_abs(self,time,src,dest,src_port=None,dest_port=None,data=None):
         """
@@ -295,12 +296,12 @@ class Simulator(TopoObject):
         # If this event is scheduled when the simulator is about to sleep,
         # make sure that the event isn't being scheduled during the sleep window,
         # if it is, indicate a violation.
-        if self.__sleep_window and (self.time() <= time < self.time()+self.__sleep_window):
-            self.__sleep_window_violation = True
+        if self._sleep_window and (self.time() <= time < self.time()+self._sleep_window):
+            self._sleep_window_violation = True
         # now schedule the event
-        self.__scheduler.enterabs(time,1,self.__dispatch,(time,src,src_port,dest,dest_port,data))
+        self._scheduler.enterabs(time,1,self._dispatch,(time,src,src_port,dest,dest_port,data))
 
-    def __dispatch(self,time,src,src_port,dest,dest_port,data):
+    def _dispatch(self,time,src,src_port,dest,dest_port,data):
         """
         Dispatch an event to dest.
         """
@@ -312,13 +313,13 @@ class Simulator(TopoObject):
 
     def get_event_processors(self):
         """Return the list of event processors such as Sheets."""
-        return self.__event_processors
+        return self._event_processors
 
     def time(self):
         """
         Return the current simulation time.
         """
-        return self.__time
+        return self._time
     
     def sleep(self,delay):
         """
@@ -329,8 +330,8 @@ class Simulator(TopoObject):
         if delay > 0:
             # set the sleep window, so the event scheduling methods know
             # that we're about to sleep, and for how long.
-            self.__sleep_window = delay
-            for ep in self.__event_processors:
+            self._sleep_window = delay
+            for ep in self._event_processors:
                 # give each EP a chance to send some events
                 ep.pre_sleep()
 
@@ -338,17 +339,17 @@ class Simulator(TopoObject):
             # supposed to be asleep, then raise an exception -- the
             # top level loop will catch it and rerun to make sure the
             # event gets run.
-            if self.__sleep_window_violation:
+            if self._sleep_window_violation:
                 raise SLEEP_EXCEPTION
 
             if self.step_mode:
                 raw_input("\nsimulator time = %f: " % self.time())            
         
 
-        self.__time += delay
+        self._time += delay
 
 
-class SimpleSimulator(Simulator):
+class Simulator(BaseSimulator):
     """
     A simulator class that uses a simple sorted event list instead of a
     sched.scheduler object to manage events and dispatching.
@@ -361,21 +362,28 @@ class SimpleSimulator(Simulator):
             self.src_port = src_port
             self.dest_port = dest_port
             self.data = data
+
+        def __copy__(self):
+            new_copy = Simulator.Event(self.time,self.src,self.dest, \
+                       self.src_port,self.dest_port,deepcopy(self.data))
+            return new_copy
+            
             
     def __init__(self,**args):
-        super(SimpleSimulator,self).__init__(**args)
-        self._Simulator__scheduler = None
+        super(Simulator,self).__init__(**args)
         self.events = []
-        self._Simulator__time = 0.0
+        self._events_stack = []
+        self._time = 0.0
         
-    def run(self,duration=inf,until=inf):
-        if self._Simulator__time == 0.0:
-            # if the time is 0.0 start all the EPs
-            # FIXME: this is probably not right, .run(until=0) will
-            # cause EPs to be started more than once.
-            for e in self._Simulator__event_processors:
-                e.start()
-        self.continue_(duration,until)
+# Use derived class run function.
+#    def run(self,duration=inf,until=inf):
+#        if self._time == 0.0:
+#            # if the time is 0.0 start all the EPs
+#            # FIXME: this is probably not right, .run(until=0) will
+#            # cause EPs to be started more than once.
+#            for e in self._event_processors:
+#                e.start()
+#        self.continue_(duration,until)
         
     def continue_(self,duration=inf,until=inf):
 
@@ -403,14 +411,14 @@ class SimpleSimulator(Simulator):
                 # pre_sleep() call.
 
                 self.debug("Time to sleep. current time =",self.time(),"next event time =",self.events[0].time)
-                for ep in self._Simulator__event_processors:
+                for ep in self._event_processors:
                     self.debug("Doing pre_sleep for",e)
                     ep.pre_sleep()
                     
                 # set the time to the frontmost event (Note: the front
                 # event may have been changed by the .pre_sleep() calls).
 
-                self._Simulator__time = self.events[0].time
+                self._time = self.events[0].time
             else:
 
                 # If it's not too late, and it's not too early, then
@@ -419,6 +427,11 @@ class SimpleSimulator(Simulator):
 
                 e = self.events.pop(0)
                 e.dest.input_event(e.src,e.src_port,e.dest_port,e.data)
+
+        # The clock needs updating if the events have not done it.
+        #if self.events and self.events[0].time >= stop_time:
+        self._time = stop_time
+
 
     def sleep(self,delay):
 
@@ -434,7 +447,8 @@ class SimpleSimulator(Simulator):
         """
         self.debug("Enqueue absolute: from", (src,src_port),"to",(dest,dest_port),
                    "at time",self.time(),"for time",time)
-        new_e = SimpleSimulator.Event(time,src,dest,src_port,dest_port,data)
+        # Used to be SimpleSimulator
+        new_e = Simulator.Event(time,src,dest,src_port,dest_port,data)
 
         if not self.events or time >= self.events[-1].time:
             self.events.append(new_e)
@@ -448,6 +462,27 @@ class SimpleSimulator(Simulator):
     def enqueue_event_rel(self,delay,src,dest,src_port=None,dest_port=None,data=None):
         self.enqueue_event_abs(self.time()+float(delay),
                                src,dest,src_port,dest_port,data)
+
+    def state_push(self):
+        """
+        Save the current scheduler to an internal stack, and create a
+        copy to continue with.
+        """
+        self._events_stack.append((self._time,self.events))
+        # Make new copy for self.events
+        self.events = [copy(event) for event in self.events]
+
+    def state_pop(self):
+        """
+        Pop a scheduler off the stack.  
+        """
+        # Restore scheduler from stack
+        self._time, self.events = self._events_stack.pop()
+
+
+    def state_len(self):
+        """Return number of event queues in _events_stack."""
+        return len(self._events_stack)
 
     
         
