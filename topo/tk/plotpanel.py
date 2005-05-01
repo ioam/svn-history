@@ -60,6 +60,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
         self.plots = []
         self.bitmaps = []
         self.labels = []
+        self.__num_labels = 0
 
         self.console = console
         self.parent = parent
@@ -208,7 +209,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
 
         Post: The bitmaps have been displayed to the screen in the active
               console window.  All images are displayed from left to right,
-              in a single row.  If the number if images have changed since
+              in a single row.  If the number of images have changed since
               the last display, the grid size is increased, or decreased
               accordingly.
 
@@ -217,19 +218,36 @@ class PlotPanel(Frame,topo.base.TopoObject):
         """
         self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.zoom_factor))
                               for im in self.bitmaps]
-        old_canvases = self.canvases
-        self.canvases = [Canvas(self.plot_frame,
-                                width=image.width(),
-                                height=image.height(),
-                                bd=0)
-                         for image in self.zoomed_images]
-        for i,image,canvas in zip(range(len(self.zoomed_images)),
-                                  self.zoomed_images,self.canvases):
-            canvas.grid(row=0,column=i,padx=5)
-            canvas.create_image(image.width()/2,image.height()/2,image=image)
 
-        for c in old_canvases:
-            c.grid_forget()
+        # If the number of canvases has changed, or the width of the
+        # first plot and canvas no longer match, then create a new set
+        # of canvases.  If the old canvases still can work, then use
+        # them to prevent flicker.
+        if self.canvases:
+            first_new_width = str(self.zoomed_images[0].width())
+            first_old_width = self.canvases[0].config()['width'][-1]
+        else:
+            first_new_width, first_old_width = 0, 0
+        if len(self.zoomed_images) != len(self.canvases) or \
+               first_new_width != first_old_width:
+            old_canvases = self.canvases
+            self.canvases = [Canvas(self.plot_frame,
+                                    width=image.width(),
+                                    height=image.height(),
+                                    bd=0)
+                             for image in self.zoomed_images]
+            for i,image,canvas in zip(range(len(self.zoomed_images)),
+                                      self.zoomed_images,self.canvases):
+                canvas.create_image(image.width()/2,image.height()/2,image=image)
+                canvas.grid(row=0,column=i,padx=5)
+            for c in old_canvases:
+                c.grid_forget()
+        else:  # Width of first plot still same, and same number of images.
+            for i,image,canvas in zip(range(len(self.zoomed_images)),
+                                      self.zoomed_images,self.canvases):
+                canvas.create_image(image.width()/2,image.height()/2,image=image)
+                canvas.grid(row=0,column=i,padx=5)
+            
 
 
     def display_labels(self):
@@ -239,13 +257,18 @@ class PlotPanel(Frame,topo.base.TopoObject):
         it may be useful to make this function a stub, and display the
         labels at the same time the images are displayed.
         """
-        old_labels = self.labels
-        self.labels = [Label(self.plot_frame,text=each.view_info['src_name'])
-                       for each in self.bitmaps]
-        for i in range(len(self.labels)):
-            self.labels[i].grid(row=1,column=i,sticky=NSEW)
-        for l in old_labels:
-            l.grid_forget()
+        if self.__num_labels != len(self.canvases):
+            old_labels = self.labels
+            self.labels = [Label(self.plot_frame,text=each.view_info['src_name'])
+                           for each in self.bitmaps]
+            for i in range(len(self.labels)):
+                self.labels[i].grid(row=1,column=i,sticky=NSEW)
+            for l in old_labels:
+                l.grid_forget()
+            self.__num_labels = len(self.canvases)
+        else:  # Same number of labels; reuse to avoid flickering.
+            for i in range(len(self.labels)):
+                self.labels[i].configure(text=self.bitmaps[i].view_info['src_name']) 
                  
 
     def reduce(self):
