@@ -28,7 +28,7 @@ FuzzyLineFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
 
 FuzzyLineFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
 FuzzyLineFactory.width = 0.02
-FuzzyLineFactory.height = 0.9
+#FuzzyLineFactory.height = 0.9
 FuzzyLineFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
 
@@ -50,7 +50,8 @@ ImageSaver.time_format='%0.4d'
 base.min_print_level = base.MESSAGE
 
 print "Creating simulation objects..."
-s = SimpleSimulator()
+# Used to be SimpleSimulator
+s = Simulator()
 
 retina = InputSheet(input_generator=FuzzyLineFactory(),name='Retina')
 V1 = CFSOM(name='V1')
