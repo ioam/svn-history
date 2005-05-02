@@ -48,7 +48,7 @@ class TestCFSom(unittest.TestCase):
         GaussianFactory.height = 0.9
         GaussianFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
-        # rf som parameters
+        # cf som parameters
         CFSOM.density = 900
         CFSOM.learning_length = 10000
         CFSOM.radius_0 = 0.1
