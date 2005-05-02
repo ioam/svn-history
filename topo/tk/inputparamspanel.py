@@ -134,29 +134,29 @@ class InputParamsPanel(PlotPanel):
         self.prop_frame = propertiesframe.PropertiesFrame(self)
 
         #                name          min-value    max-value  init-value
-        #				    	       
+        #
         self.tparams['theta'] = \
-          self.add_slider( 'theta',        "0"     ,   "PI*2"   ,  "PI/2"   )
+          self.add_slider( 'theta',         "0"       , "PI*2",  "0"      )
         self.tparams['x'] = \
-          self.add_slider( 'x'   ,        "-1"     ,   "1"      ,  "0"      )
+          self.add_slider( 'x',             "-1"      , "1"   ,  "0"      )
         self.tparams['y'] = \
-          self.add_slider( 'y'   ,        "-1"      ,  "1"       , "0"       )
+          self.add_slider( 'y',             "-1"      , "1"   , "0"       )
         self.tparams['min'] = \
-          self.add_slider( 'min' ,        "0"      ,  "1"       , "0"       )
+          self.add_slider( 'min',           "0"       , "1"   , "0"       )
         self.tparams['max'] = \
-          self.add_slider( 'max'  ,       "0"      ,  "1"       , "1"       )
+          self.add_slider( 'max',           "0"       , "1"   , "1"       )
         self.tparams['width'] = \
-          self.add_slider( 'width',       "0.000001", "1"       , "0.2"     )
+          self.add_slider( 'width',         "0.000001", "1"   , "0.2"     )
         self.tparams['height'] = \
-          self.add_slider( 'height',      "0.000001", "1"       , "0.2"     )
+          self.add_slider( 'height',        "0.000001", "1"   , "0.2"     )
         self.tparams['frequency'] = \
-          self.add_slider( 'frequency',   "0.01"  ,   "1.25"   ,  "1.5"     )
+          self.add_slider( 'frequency',     "0.01"    , "7"   ,  "5"      )
         self.tparams['phase'] = \
-          self.add_slider( 'phase',        "0"     ,   "PI*2"   ,  "PI/2"   )
+          self.add_slider( 'phase',         "0"       , "PI*2",  "PI/2"   )
         self.tparams['disk_radius'] = \
-          self.add_slider( 'disk_radius',  "0"     ,   "1"      ,  "0.2"    )
+          self.add_slider( 'disk_radius',   "0"       , "1"   ,  "0.2"    )
         self.tparams['gaussian_width'] = \
-          self.add_slider( 'gaussian_width',"0.000001","1"      ,  "0.15"      )
+          self.add_slider( 'gaussian_width',"0.000001", "1"   ,  "0.15"   )
 
 # NOT IN EXISTING KERNELFACTORIES 4/2005
 #        self.tparams['xsigma'] = \
