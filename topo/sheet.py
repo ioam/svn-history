@@ -88,8 +88,8 @@ def matrix2sheet(row,col,bounds,density):
 
     """
     left,bottom,right,top = bounds.aarect().lbrt()
-    width = right-left
-    height = top-bottom
+    #width = right-left
+    #height = top-bottom
     linear_density = sqrt(density)
 
     x = (col / linear_density) + left
