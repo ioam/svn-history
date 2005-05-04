@@ -19,6 +19,7 @@ import math
 import propertiesframe
 import topo.kernelfactory
 import topo.plot
+from copy import deepcopy
 from Numeric import array
 from MLab import rot90, flipud
 from plotpanel import *
@@ -315,6 +316,7 @@ class InputParamsPanel(PlotPanel):
         for each in self.in_ep_dict.keys():
             if self.in_ep_dict[each]['state']:
                 ndict['density'] = self.in_ep_dict[each]['obj'].density
+                ndict['bounds'] = deepcopy(self.in_ep_dict[each]['obj'].bounds)
                 kf = topo.kernelfactory.__dict__[kname](**ndict)
                 self.in_ep_dict[each]['kernel'] = kf
         return self.in_ep_dict  # Doesn't have to return it, but is explicit.
