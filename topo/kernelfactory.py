@@ -34,6 +34,13 @@ from math import pi
 global kernel_factories
 kernel_factories = {}
 
+# Some kernels use math.exp() to generate a falling off of activation.
+# But exp will overflow if too small a value is given, so this
+# constant defines the smallest value to accept from the kernels.
+# exp(-100) is appx. 3.72e-44
+EXP_CUTOFF = -100
+
+
 def produce_kernel_matrices(bounds, density):
     """
     Get Kernel Matrices
@@ -86,9 +93,11 @@ def produce_rotated_matrices(kernel_x, kernel_y, theta):
     and a theta value, returns two Numeric matrices that have their coordinates
     rotated by that theta
     """
-    
-    new_kernel_x = subtract.outer(cos(theta)*kernel_x, sin(theta)*kernel_y)
-    new_kernel_y = add.outer(sin(theta)*kernel_x, cos(theta)*kernel_y)
+
+    # theta subtracted from pi for short term fix so that rotation matches the
+    # reflected kernel matrices.  Undo when the kernelfactory is reworked.
+    new_kernel_x = subtract.outer(cos(pi-theta)*kernel_x, sin(pi-theta)*kernel_y)
+    new_kernel_y = add.outer(sin(pi-theta)*kernel_x, cos(pi-theta)*kernel_y)
     
     return new_kernel_x, new_kernel_y
 
@@ -97,14 +106,13 @@ def gaussian(kernel_x, kernel_y, width, height):
     """
     Gaussian Kernel Factory
     """
-
-  
     new_kernel = -(kernel_x / width)**2 + -(kernel_y / height)**2
 
     # maximum( ) is needed to avoid overflow in some situations
-    return exp(maximum(-100,new_kernel))
-
-
+    k = exp(maximum(EXP_CUTOFF,new_kernel))
+    k = where(k != exp(EXP_CUTOFF), k, 0.0)
+#    print k
+    return k
 
 
 def sine_grating(kernel_x, kernel_y, frequency, phase):
@@ -119,8 +127,14 @@ def gabor(kernel_x, kernel_y, width, height, frequency, phase):
     Gabor Kernel Factory
     """
  
-    return exp( maximum(-100, -(kernel_x/width)**2-(kernel_y/height)**2)) *\
-    (0.5 + 0.5*cos(2*pi*frequency*kernel_x + phase ))
+    k = exp(maximum(EXP_CUTOFF,-(kernel_x/width)**2-(kernel_y/height)**2))
+    k = where(k > exp(EXP_CUTOFF), k, 0.0)
+    return k * (0.5 + 0.5*cos(2*pi*frequency*kernel_x + phase))
+
+    #k = exp( maximum(EXP_CUTOFF, -(kernel_x/width)**2-(kernel_y/height)**2)) *\
+    #    (0.5 + 0.5*cos(2*pi*frequency*kernel_x + phase ))
+    return where(k != exp(EXP_CUTOFF), k, 0.0)
+    
 
 
 def uniform_random(kernel_x, kernel_y,rmin,rmax):
@@ -147,7 +161,9 @@ def fuzzy_line(kernel_x, kernel_y, width):
     """
     Fuzzy Line Kernel Factory
     """
-    #TODO: This is a hack: the height should be specified in terms of bounds
+    # TODO: This is a hack: the height should be specified in terms of
+    # bounds.  This just sets the height of the gaussian so high, that
+    # the small window makes it look like a line.
     return gaussian(kernel_x, kernel_y, width, 100)
 
 
@@ -161,7 +177,9 @@ def fuzzy_disk(kernel_x, kernel_y, disk_radius, gaussian_width):
     div_sigmasq = 1 / (gaussian_width*gaussian_width)
 
     disc = less_equal(gaussian_x_coord,0)
-    return maximum(disc, exp(maximum(-100,-gaussian_x_coord*gaussian_x_coord*div_sigmasq)))
+    k = maximum(disc, exp(maximum(EXP_CUTOFF,
+                                  -gaussian_x_coord*gaussian_x_coord*div_sigmasq)))
+    return where(k != exp(EXP_CUTOFF), k, 0.0)
 
 
 
@@ -178,8 +196,10 @@ def fuzzy_ring(kernel_x, kernel_y, disk_radius, ring_radius, gaussian_width):
 
     ring = less_equal(distance_from_line,ring_radius)
            
-    inner_g = exp(maximum(-100,-inner_distance*inner_distance*div_sigmasq))
-    outer_g = exp(maximum(-100,-outer_distance*outer_distance*div_sigmasq))
+    inner_g = exp(maximum(EXP_CUTOFF,-inner_distance*inner_distance*div_sigmasq))
+    outer_g = exp(maximum(EXP_CUTOFF,-outer_distance*outer_distance*div_sigmasq))
+    inner_g = where(inner_g != exp(EXP_CUTOFF), inner_g, 0.0)
+    outer_g = where(outer_g != exp(EXP_CUTOFF), outer_g, 0.0)
     dring = maximum(inner_g,maximum(outer_g,ring))
     return dring
 
@@ -198,7 +218,7 @@ class KernelFactory(base.TopoObject):
     density = Parameter(default=10000)
 
     theta = Parameter(default=0)
-    
+
     def __call__(self,**params):
         self.verbose("params = ",params)
         self.setup_xy(params.get('bounds',self.bounds),
