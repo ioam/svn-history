@@ -6,6 +6,7 @@ Subclasses RegionPlotPanel, which is basically a PlotPanel.
 $Id$
 """
 import __main__
+import Tkinter
 from topo.tk.plotpanel import *
 from topo.tk.regionplotpanel import *
 
@@ -54,7 +55,31 @@ class WeightsPanel(RegionPlotPanel):
         self.y = eval(self.y_str.get(),g)
         if isinstance(self.x,int): self.x = float(self.x)
         if isinstance(self.y,int): self.y = float(self.y)
-        self.plot_key = ('Weights',self.x,self.y)
+
+        ep = [ep for ep in self.console.active_simulator().get_event_processors()
+              if ep.name == self.region.get()][0]
+        # This assumes that displaying the rectangle information is enough.
+        l,b,r,t = ep.bounds.aarect().lbrt()
+
+        # BUG WORKAROUND.  Bounding regions are currently (5/2005) consistent
+        # with reporting edge conditions.  getting a unit at 0.5 when the
+        # bounds ends at 0.5, will return an error, but bounds.contains(0.5,0.5)
+        # will return true.
+        if ep.bounds.contains(self.x,self.y) \
+           and self.x not in (l,r) and self.y not in (b,t):
+            self.plot_key = ('Weights',self.x,self.y)
+        else:
+            self.dialog = Pmw.Dialog(self.parent,title = 'Error')
+            message = 'The x/y coordinates are outside the bounding region.\n' \
+                    + '  ' + str(l) + ' < X < ' + str(r) + '\n' \
+                    + '  ' + str(b) + ' < Y < ' + str(t)
+            w = Tkinter.Label(self.dialog.interior(),
+                              text = message,
+                              background = 'black',
+                              foreground = 'white',
+                              pady = 20)
+            w.pack(expand = 1, fill = 'both', padx = 4, pady = 4)
+        
 
 
     def display_labels(self):
