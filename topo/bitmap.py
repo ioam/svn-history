@@ -236,13 +236,13 @@ class RGBMap(Bitmap):
         Each matrix must be the same size and normalized to 1.
         """
         if max(rMapArray.flat) > 1.0:
-            topo.base.TopoObject().warning('RGBMap rMapArray not normalized to 1.  Normalizing')
+            topo.base.TopoObject().warning('RGBMap rMapArray not normalized to 1.  Normalizing.  Max:' + str(max(rMapArray.flat)))
             rMapArray = Numeric.divide(rMapArray,max(rMapArray.flat))
         if max(max(gMapArray)) > 1.0:
-            topo.base.TopoObject().warning('RGBMap gMapArray not normalized to 1.  Normalizing')
+            topo.base.TopoObject().warning('RGBMap gMapArray not normalized to 1.  Normalizing.  Max:' + str(max(gMapArray.flat)))
             gMapArray = Numeric.divide(gMapArray,max(gMapArray.flat))
         if max(max(bMapArray)) > 1.0:
-            topo.base.TopoObject().warning('RGBMap bMapArray not normalized to 1.  Normalizing')
+            topo.base.TopoObject().warning('RGBMap bMapArray not normalized to 1.  Normalizing.  Max:' + str(max(bMapArray.flat)))
             bMapArray = Numeric.divide(bMapArray,max(bMapArray.flat))
         rImage = self.arrayToImage(rMapArray)
         gImage = self.arrayToImage(gMapArray)
