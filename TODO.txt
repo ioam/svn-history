@@ -19,6 +19,11 @@ Topic: Command-line / Shell
 
 Topic: GUI
 
+- Write a better string evaluation routine for use in the user entry
+  regions.  Minor variations of eval() are currently being used within
+  the __main__ namespace, which is nice, but no exceptions are being 
+  handled.
+
 - Rigorously test exact square plots within the Tk GUI.  Some plots
   have been showing slightly off square plots, either do to the
   zooming of the original data, or from the widget display functions.
