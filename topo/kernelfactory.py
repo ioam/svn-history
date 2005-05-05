@@ -21,6 +21,7 @@ from boundingregion import BoundingBox
 from sheet import sheet2matrix, matrix2sheet, bounds2shape
 import RandomArray
 from Numeric import *
+from MLab import *
 from params import * 
 from pprint import pprint,pformat
 from math import pi
@@ -91,14 +92,19 @@ def produce_rotated_matrices(kernel_x, kernel_y, theta):
 
     Takes in two Numeric /arrays/ that specify the x and y coordinates separately
     and a theta value, returns two Numeric matrices that have their coordinates
-    rotated by that theta
+    rotated by that theta.
+
+    The matrix itself is rotated to match the Topographica cartesian
+    style coordinates.
     """
 
     # theta subtracted from pi for short term fix so that rotation matches the
     # reflected kernel matrices.  Undo when the kernelfactory is reworked.
     new_kernel_x = subtract.outer(cos(pi-theta)*kernel_x, sin(pi-theta)*kernel_y)
     new_kernel_y = add.outer(sin(pi-theta)*kernel_x, cos(pi-theta)*kernel_y)
-    
+
+    new_kernel_x = flipud(rot90(new_kernel_x))
+    new_kernel_y = flipud(rot90(new_kernel_y))
     return new_kernel_x, new_kernel_y
 
 
@@ -111,7 +117,6 @@ def gaussian(kernel_x, kernel_y, width, height):
     # maximum( ) is needed to avoid overflow in some situations
     k = exp(maximum(EXP_CUTOFF,new_kernel))
     k = where(k != exp(EXP_CUTOFF), k, 0.0)
-#    print k
     return k
 
 
@@ -131,18 +136,12 @@ def gabor(kernel_x, kernel_y, width, height, frequency, phase):
     k = where(k > exp(EXP_CUTOFF), k, 0.0)
     return k * (0.5 + 0.5*cos(2*pi*frequency*kernel_x + phase))
 
-    #k = exp( maximum(EXP_CUTOFF, -(kernel_x/width)**2-(kernel_y/height)**2)) *\
-    #    (0.5 + 0.5*cos(2*pi*frequency*kernel_x + phase ))
-    return where(k != exp(EXP_CUTOFF), k, 0.0)
-    
-
 
 def uniform_random(kernel_x, kernel_y,rmin,rmax):
     """
     Uniform Random Kernel Factory
     """
     return RandomArray.uniform(rmin,rmax,kernel_x.shape) 
-
 
 
 def rectangle(kernel_x, kernel_y, x, y, width, height):
@@ -164,7 +163,9 @@ def fuzzy_line(kernel_x, kernel_y, width):
     # TODO: This is a hack: the height should be specified in terms of
     # bounds.  This just sets the height of the gaussian so high, that
     # the small window makes it look like a line.
-    return gaussian(kernel_x, kernel_y, width, 100)
+    fl = gaussian(kernel_x, kernel_y, width, 100)
+    print fl
+    return fl
 
 
 
@@ -202,8 +203,6 @@ def fuzzy_ring(kernel_x, kernel_y, disk_radius, ring_radius, gaussian_width):
     outer_g = where(outer_g != exp(EXP_CUTOFF), outer_g, 0.0)
     dring = maximum(inner_g,maximum(outer_g,ring))
     return dring
-
-
 
 
 
@@ -272,7 +271,6 @@ class SineGratingFactory(KernelFactory):
                              self.kernel_y,
                              params.get('frequency',self.frequency), 
                              params.get('phase',self.phase)) 
-    
 
 
 class GaborFactory(KernelFactory):
@@ -329,6 +327,7 @@ class RectangleFactory(KernelFactory):
                           params.get('y',self.y),
                           params.get('width',self.width),
                           params.get('height',self.height))  
+
 
 class FuzzyLineFactory(KernelFactory):
 

@@ -21,7 +21,6 @@ import topo.kernelfactory
 import topo.plot
 from copy import deepcopy
 from Numeric import array
-from MLab import rot90, flipud
 from plotpanel import *
 from regionplotpanel import *
 from topo.inputsheet import InputSheet
@@ -416,9 +415,7 @@ class InputParamsPanel(PlotPanel):
 
             kmatrix = k()
             kbounds = k.bounds
-            # KERNELFACTORY HACK PATCH TO GET THE X/Y MATCHED TO REST OF TOPO.
-            # WILL REQUIRE PROPER REPAIR.
-            kmatrix = array(flipud(rot90(kmatrix)))
+            # Code to make another copy, without using a copy()
             #(l,b,r,t) = k.bounds.aarect().lbrt()
             #kbounds = BoundingBox(points=((b,l),(t,r)))
 

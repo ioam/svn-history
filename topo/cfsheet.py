@@ -79,7 +79,6 @@ import RandomArray,Numeric,copy
 import topo.sheetview
 import topo.boundingregion
 import topo.bitmap
-from MLab import rot90,flipud
 from topo.utils import flatten
 
 
@@ -103,9 +102,7 @@ class ConnectionField(TopoObject):
     def get_input_matrix(self, activation):
         r1,r2,c1,c2 = self.slice
 
-        # KERNELFACTORY HACK PATCH TO GET THE KERNELS TO USE X/Y IN THE
-        # RIGHT SHAPE.
-        return flipud(rot90(activation[r1:r2,c1:c2]))
+        return activation[r1:r2,c1:c2]
 
 
 class Projection(TopoObject):
@@ -146,7 +143,7 @@ class Projection(TopoObject):
         """
         (x,y) = (self.dest).sheet2matrix(sheet_x,sheet_y)
         # composite_name = '%s: %0.3f, %0.3f' % (self.name, sheet_x, sheet_y)
-        matrix_data = Numeric.array(flipud(rot90(Numeric.array(self.cf(y,x).weights))))
+        matrix_data = Numeric.array(Numeric.array(self.cf(y,x).weights))
         # print 'matrix_data = ', matrix_data
         new_box = self.dest.bounds  # TURN INTO A PROPER COPY
         assert matrix_data != None, "Projection Matrix is None"

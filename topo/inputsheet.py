@@ -12,7 +12,6 @@ import copy
 from sheet import BoundingBox
 from params import *
 from kernelfactory import UniformRandomFactory
-from MLab import rot90, flipud
 
 class InputSheet(Sheet):
 
@@ -73,12 +72,9 @@ class InputSheet(Sheet):
         self.verbose("Received %s input from %s." % (NxN(data.shape),src))
         self.verbose("Generating a new kernel...")
 
-    
         # TODO: Pass a dictionary to this function to avoid having all of the
         # subclasses below
-        # KERNELFACTORY HACK PATCH TO GET KERNEL SHAPE TO MATCH INTERNAL SHAPE.
-        # self.activation = self.input_generator()
-        self.activation = flipud(rot90(self.input_generator()))
+        self.activation = self.input_generator()
 
         
         
