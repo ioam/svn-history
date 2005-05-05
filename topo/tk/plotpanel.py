@@ -170,9 +170,10 @@ class PlotPanel(Frame,topo.base.TopoObject):
             if r.shape != (0,0) and g.shape != (0,0) and b.shape != (0,0):
                 # Normalize activation to a maximum of 1.  Will scale brighter
                 # or darker, depending.
-                if max(r.flat) > 0: r = Numeric.divide(r,max(r.flat))
-                if max(g.flat) > 0: g = Numeric.divide(g,max(g.flat)) 
-                if max(b.flat) > 0: b = Numeric.divide(b,max(b.flat))
+                # Sometimes this needs to be here, sometimes not.
+                # if max(r.flat) > 0: r = Numeric.divide(r,max(r.flat))
+                # if max(g.flat) > 0: g = Numeric.divide(g,max(g.flat)) 
+                # if max(b.flat) > 0: b = Numeric.divide(b,max(b.flat))
                 win = topo.bitmap.RGBMap(r,g,b)
                 win.view_info = each.view_info
                 self.bitmaps.append(win)
