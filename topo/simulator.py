@@ -5,7 +5,7 @@ The Simulator object is the central object of a Topographica
 simulation.  It handles the simulation clock and maintains
 communication between the components of the simulation.
 
-A simulation is structured as directed graph of event-processing nodes
+A simulation is structured as a directed graph of event-processing nodes
 called EventProcessors (EPs).  EventProcessors generate data-carrying
 events, which are routed through the graph to other EventProcessors
 via delayed connections.
@@ -65,32 +65,30 @@ self connections might have src_port = 'recurrent'.
 
 =========================
 
-Jeff's implementation notes:
-
 * Simulator *
 
 This module actually contains two simulator classes.  The original
 BaseSimulator, and a subclass Simulator.  BaseSimulator uses the
 sched.scheduler class from the Python std library to handle event
-scheduling.  Because sched.scheduler is a black box, I wrote
-SimpleScheduler in order to be able to debug event scheduling issues,
-SimpleScheduler stores its events in a linear-time priority queue (i.e
-a sorted list.)
+scheduling.  Because sched.scheduler is a black box, Simulator was
+written in order to be able to debug event scheduling issues,
+Simulator stores its events in a linear-time priority queue (i.e a
+sorted list.)
 
 The BaseSimulator class is more mature, and should be better able to
 handle exceptions raised while running without corrupting the event
-queue.  The black-box nature of the scheduler, however, means that I
-had to do some fancy footwork with exceptions in order to get
-.pre_sleep() to behave correctly.  Simulator, on the other hand,
-may not (currently) guarantee that raised exceptions won't corrupt the
+queue.  The black-box nature of the scheduler, however, means that
+fancy footwork with exceptions must be done in order to get
+.pre_sleep() to behave correctly.  Simulator, on the other hand, may
+not (currently) guarantee that raised exceptions won't corrupt the
 event queue, but its implementation is much simpler and clearer and
-its performance is easier to inspect and debug.  It may be worth
-making Simulator the default (i.e. renaming it as Simulator and
-making it the superclass rather than the subclass).  For efficiency,
+its performance is easier to inspect and debug.  Simulator is
+currently the default (i.e. renaming it as Simulator and making it the
+subclass of BaseSimulator rather than the superclass,) because
+toggling learning requries copies of the event queue.  For efficiency,
 e.g. for spiking neuron simulations, we'll probably need to replace
-the linear priority queue with a more efficient one.  I have an O(log
-N) minheap implementation in python somewhere.  It might even be in
-the CVS repository as a dead file.
+the linear priority queue with a more efficient one.  Jeff have an
+O(log N) minheap implementation.  
 
 Note also that even though BaseSimulator may guarantee that the event
 queue isn't corrupted by a raised exception, there is no guarantee that
@@ -283,7 +281,10 @@ class BaseSimulator(TopoObject):
         if self._sleep_window and delay < self._sleep_window:
             self._sleep_window_violation = True
         # now schedule the event
-        self._scheduler.enter(delay,1,self._dispatch,(self.time()+delay,src,src_port,dest,dest_port,data))
+        self._scheduler.enter(delay,
+                              1,
+                              self._dispatch,
+                              (self.time()+delay,src,src_port,dest,dest_port,data))
 
     def enqueue_event_abs(self,time,src,dest,src_port=None,dest_port=None,data=None):
         """
@@ -296,10 +297,14 @@ class BaseSimulator(TopoObject):
         # If this event is scheduled when the simulator is about to sleep,
         # make sure that the event isn't being scheduled during the sleep window,
         # if it is, indicate a violation.
-        if self._sleep_window and (self.time() <= time < self.time()+self._sleep_window):
+        if self._sleep_window \
+               and (self.time() <= time < self.time()+self._sleep_window):
             self._sleep_window_violation = True
         # now schedule the event
-        self._scheduler.enterabs(time,1,self._dispatch,(time,src,src_port,dest,dest_port,data))
+        self._scheduler.enterabs(time,
+                                 1,
+                                 self._dispatch,
+                                 (time,src,src_port,dest,dest_port,data))
 
     def _dispatch(self,time,src,src_port,dest,dest_port,data):
         """
@@ -375,16 +380,6 @@ class Simulator(BaseSimulator):
         self._events_stack = []
         self._time = 0.0
         
-# Use derived class run function.
-#    def run(self,duration=inf,until=inf):
-#        if self._time == 0.0:
-#            # if the time is 0.0 start all the EPs
-#            # FIXME: this is probably not right, .run(until=0) will
-#            # cause EPs to be started more than once.
-#            for e in self._event_processors:
-#                e.start()
-#        self.continue_(duration,until)
-        
     def continue_(self,duration=inf,until=inf):
 
         stop_time = min(self.time()+duration,until)
@@ -410,7 +405,8 @@ class Simulator(BaseSimulator):
                 # the clock) before doing that, give everyone a
                 # pre_sleep() call.
 
-                self.debug("Time to sleep. current time =",self.time(),"next event time =",self.events[0].time)
+                self.debug("Time to sleep. current time =",self.time(),
+                           "next event time =",self.events[0].time)
                 for ep in self._event_processors:
                     self.debug("Doing pre_sleep for",e)
                     ep.pre_sleep()
@@ -486,9 +482,6 @@ class Simulator(BaseSimulator):
 
     
         
-
-        
-
 class EventProcessor(TopoObject):
     """
     Base class for EventProcessors. Handles basic mechanics of
