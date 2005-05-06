@@ -164,7 +164,7 @@ def fuzzy_line(kernel_x, kernel_y, width):
     # bounds.  This just sets the height of the gaussian so high, that
     # the small window makes it look like a line.
     fl = gaussian(kernel_x, kernel_y, width, 100)
-    print fl
+#    print fl
     return fl
 
 
