@@ -40,6 +40,31 @@ convention, one should be able to write and debug a simulation at a
 low density, and then scale it up to run at higher densities simply by
 changing e.g. Sheet.density.
 
+
+Matrix Orientations:
+
+For the purposes of this example, assume the goal is a Topographica
+matrix, density=3, that has a 1 at (-0.5,-0.5) a 3 at (0.0,0.0), and a
+5 at (0.5,0.5), this can be said in a different way,
+
+the area from   -0.5,-0.5   to -0.5/3,-0.5/3 has value 1, 
+the area from -0.5/3,-0.5/3 to  0.5/3,0.5/3  has value 3, and 
+the area from  0.5/3,0.5/3  to    0.5,0.5    has value 5.
+
+The matrix that would match the sheet coordinates described above, and
+in the correct orientation is:
+
+  [[3 4 5]
+   [2 3 4]
+   [1 2 3]]
+
+This matrix corresponds to a sheet with the value 1 in the Cartesian
+plane area -0.5,-05 to -0.5/3,-0.5/3, etc.  NOTE: Accessing this
+matrix using normal matrix notation will not yield correct results.
+The row-major matrix location [0,0] will give 3, but if
+sheet2matrix(0,0) is called, then the correct returned value is 1.
+
+
 $Id$
 """
 
@@ -55,7 +80,12 @@ def sheet2matrix(x,y,bounds,density):
     """
     Convert a point (x,y) in sheet coordinates to the row and column
     of the matrix cell in which that point falls given bounds and density.
-    Returns (row,column).
+    Returns (row,column).  If the x,y is right on the edge of the sheet,
+    so that it would normally bump up to a matrix unit that does not exist,
+    it is knocked back one.  ie. If the right hand edge is 1.0, and the
+    passed in x is 1.0, then the math would give a col of 'linear_density'
+    but with matrices indexed from 0, this is an invalid location, so
+    linear_density - 1 is used.
 
     NOTE: This is NOT the strict mathematical inverse of matrix2sheet!
     
@@ -64,10 +94,15 @@ def sheet2matrix(x,y,bounds,density):
     """
     left,bottom,right,top = bounds.aarect().lbrt()
     linear_density = sqrt(density)
-    col = (x-left) * linear_density
-    row = (top-y)  * linear_density
+    col = int((x-left) * linear_density)
+    row = int((top-y)  * linear_density)
 
-    return int(row),int(col)
+    # The border of the sheet should be inclusive.
+    if col == int(linear_density * (right-left)): col = col - 1
+    if row == int(linear_density * (top-bottom)): row = row - 1
+
+    return row, col
+
     
 def matrix2sheet(row,col,bounds,density):
     """
@@ -76,26 +111,39 @@ def matrix2sheet(row,col,bounds,density):
     density.
 
     Returns (x,y) where x and y are the floating point coordinates of
-    the upper-left corner of the given matrix cell.
-
-    [ FIXME: This implementation is incorrect.  Should return the CENTER
-      of the given matrix cell. ]
+    the CENTER of the given matrix cell.  If the matrix cell
+    represents a 0.2 by 0.2 region, then the center location returned
+    would be 0.1,0.1
 
     NOTE: This is NOT the strict mathematical inverse of sheet2matrix.
 
     When computing this transformation for an existing sheet foo, one
     should use the Sheet method foo.matrix2sheet(r,c).
-
     """
     left,bottom,right,top = bounds.aarect().lbrt()
-    #width = right-left
-    #height = top-bottom
     linear_density = sqrt(density)
 
-    x = (col / linear_density) + left
-    y = top - (row / linear_density)
+    width = right-left
+    height = top-bottom
+    rows = int(height * linear_density)
+    cols = int(width * linear_density)
 
-    return x,y
+    width_unit_size = float(width)  / cols
+    height_unit_size = float(height) / rows
+
+    # Account for the coordinate transformation between Numeric arrays and
+    # Topographica x/y.
+    row = (rows-1) - row  # 0 Indexed.
+
+    x = left + (col + 0.5) * width_unit_size 
+    y = bottom + (row + 0.5) * height_unit_size 
+    if x > right: x = x - width_unit_size
+    if y > top: y = y - height_unit_size
+    # Round eliminates any precision errors that have been compounded
+    # via math.  This way, any representation errors left, will be the
+    # std., and will match coded floating points.
+    return round(x,10),round(y,10)
+
 
 def activation_submatrix(slice_bounds,activation,activation_bounds,density):
     """
@@ -104,8 +152,8 @@ def activation_submatrix(slice_bounds,activation,activation_bounds,density):
     submatrix!
     """
     r1,r2,c1,c2 = input_slice(slice_bounds,activation_bounds,density)
-
     return activation[r1:r2,c1:c2]
+
 
 def input_slice(slice_bounds, input_bounds, input_density):
     """
