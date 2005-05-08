@@ -13,6 +13,34 @@ define a new subclass of KernelFactory anywhere, and then add an entry
 to this dictionary, and the GUI will then add it to the list of
 presentation types.
 
+Kernel Matrix Orientations:
+
+These kernels work closely with Sheets and have been written so that
+the orientation of the kernel matrices have the same orientation
+maintained by the Sheet classes.  Refer to sheet.py for a longer
+discussion of the Topographica coordinate system.
+
+For the purposes of this example, assume the goal is a Topographica
+matrix that has a 1 at (-0.5,-0.5) a 3 at (0.0,0.0), and a 5 at
+(0.5,0.5), this can be said in a different way,
+
+the area from   -0.5,-0.5   to -0.5/3,-0.5/3 has value 1, 
+the area from -0.5/3,-0.5/3 to  0.5/3,0.5/3  has value 3, and 
+the area from  0.5/3,0.5/3  to    0.5,0.5    has value 5.
+
+The matrix that would match the sheet coordinates describe above is:
+
+  [[3 4 5]
+   [2 3 4]
+   [1 2 3]]
+
+This matrix corresponds to a sheet with the value 1 in the Cartesian
+plane area -0.5,-05 to -0.5/3,-0.5/3, etc.  NOTE: Accessing this
+matrix using normal matrix notation will not yield reasonable results.
+The row-major matrix location [0,0] will give 3, but if
+sheet2matrix(0,0) is called, then the returned value is 1.
+
+
 $Id$
 """
 import types
@@ -148,10 +176,11 @@ def rectangle(kernel_x, kernel_y, x, y, width, height):
     """
     Rectangle Kernel Factory
     """
-    kernel_x = bitwise_and( less_equal( kernel_x, x+width/2 ), 
-                            greater_equal( kernel_x, x-width/2 ) )
-    kernel_y = bitwise_and( less_equal( kernel_y, y+height/2 ), 
-                            greater_equal( kernel_y, y-height/2 ) )
+    kernel_x = bitwise_and( less_equal( kernel_x, x+width/2 ), greater_equal( kernel_x, x-width/2 ) )
+    kernel_y = bitwise_and( less_equal( kernel_y, y+height/2 ),greater_equal( kernel_y, y-height/2 ) )
+# Something is wrong here.  Rotation is all screwed up.
+#    kernel_x = where(less_equal(kernel_x,x+width/2),1,0)
+#    kernel_y = where(less_equal(kernel_y,y+width/2) and greater_equal(kernel_y,y-width/2)),1,0)
     
     return bitwise_and( kernel_x, kernel_y )
 
