@@ -27,6 +27,7 @@ import PIL
 import Image
 import ImageTk
 import Numeric
+import MLab
 
 NYI = "Abstract method not implemented."
 
@@ -168,12 +169,14 @@ class PlotPanel(Frame,topo.base.TopoObject):
         for each in self.plots:
             (r,g,b) = each.matrices
             if r.shape != (0,0) and g.shape != (0,0) and b.shape != (0,0):
-                # Normalize activation to a maximum of 1.  Will scale brighter
+                # Crop activation to a maximum of 1.  Will scale brighter
                 # or darker, depending.
-                # Sometimes this needs to be here, sometimes not.
-                # if max(r.flat) > 0: r = Numeric.divide(r,max(r.flat))
-                # if max(g.flat) > 0: g = Numeric.divide(g,max(g.flat)) 
-                # if max(b.flat) > 0: b = Numeric.divide(b,max(b.flat))
+                #
+                # Should report that cropping took place.
+                #
+                if max(r.flat) > 0: r = MLab.clip(r,0.0,1.0)
+                if max(g.flat) > 0: g = MLab.clip(g,0.0,1.0)
+                if max(b.flat) > 0: b = MLab.clip(b,0.0,1.0)
                 win = topo.bitmap.RGBMap(r,g,b)
                 win.view_info = each.view_info
                 self.bitmaps.append(win)
@@ -366,7 +369,6 @@ class PreferenceMapPanel(PlotPanel):
 
     def do_plot_cmd(self):
         Pmw.showbusycursor()
-#        Lissom.cmd(self.cmdname.get())
         self.plot_cmd = "plot " + self.mapname.get()
         PlotPanel.do_plot_cmd(self)
         Pmw.hidebusycursor()
