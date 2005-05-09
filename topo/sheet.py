@@ -121,24 +121,19 @@ def matrix2sheet(row,col,bounds,density):
     should use the Sheet method foo.matrix2sheet(r,c).
     """
     left,bottom,right,top = bounds.aarect().lbrt()
-    linear_density = sqrt(density)
-
+    rows,cols = bounds2shape(bounds,density)
     width = right-left
-    height = top-bottom
-    rows = int(height * linear_density)
-    cols = int(width * linear_density)
-
-    width_unit_size = float(width)  / cols
-    height_unit_size = float(height) / rows
 
     # Account for the coordinate transformation between Numeric arrays and
     # Topographica x/y.
-    row = (rows-1) - row  # 0 Indexed.
+    # 0 Indexed, and internal matrices are flipped.
+    row = (rows-1) - row
+    unit_size = float(width)  / cols
 
-    x = left + (col + 0.5) * width_unit_size 
-    y = bottom + (row + 0.5) * height_unit_size 
-    if x > right: x = x - width_unit_size
-    if y > top: y = y - height_unit_size
+    x = left + (col + 0.5) * unit_size 
+    y = bottom + (row + 0.5) * unit_size 
+    if x > right: x = x - unit_size
+    if y > top: y = y - unit_size
     # Round eliminates any precision errors that have been compounded
     # via math.  This way, any representation errors left, will be the
     # std., and will match coded floating points.
@@ -192,6 +187,8 @@ def bounds2shape(bounds,density):
     linear_density = sqrt(density)
     rows = int(height*linear_density)
     cols = int(width*linear_density)
+    if rows == 0: rows = 1
+    if cols == 0: cols = 1
     return rows,cols
 
 class Sheet(EventProcessor):
