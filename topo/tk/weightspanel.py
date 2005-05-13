@@ -23,6 +23,7 @@ class WeightsPanel(RegionPlotPanel):
         self.y = 0
         self.y_str = StringVar()
         self.y_str.set(0.0)
+        self.displayed_x, self.displayed_y = 0, 0
 
         self.panel_num = self.console.num_weights_windows
 
@@ -65,9 +66,10 @@ class WeightsPanel(RegionPlotPanel):
         # with reporting edge conditions.  getting a unit at 0.5 when the
         # bounds ends at 0.5, will return an error, but bounds.contains(0.5,0.5)
         # will return true.
-        if ep.bounds.contains(self.x,self.y) \
-           and self.x not in (l,r) and self.y not in (b,t):
+
+        if ep.bounds.contains(self.x,self.y):
             self.plot_key = ('Weights',self.x,self.y)
+            self.displayed_x, self.displayed_y = self.x, self.y
         else:
             self.dialog = Pmw.Dialog(self.parent,title = 'Error')
             message = 'The x/y coordinates are outside the bounding region.\n' \
@@ -93,4 +95,4 @@ class WeightsPanel(RegionPlotPanel):
         
     def refresh_title(self):
         self.parent.title("Unit Weights %d. (x=%0.3f, y=%0.3f)" %
-                          (self.panel_num,self.x, self.y))
+                          (self.panel_num,self.displayed_x, self.displayed_y))
