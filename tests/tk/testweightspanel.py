@@ -12,7 +12,7 @@ from topo.tk.activitypanel import *
 
 class TestWeightsPanel(unittest.TestCase):
 
-    def setUp(self):
+    def test_panel_creation(self):
         """
         Create a Simulator that has a couple of sheets within it that
         have data within them that can then be used by the GUI tests.
@@ -82,6 +82,19 @@ class TestWeightsPanel(unittest.TestCase):
 
         self.pe = PlotEngine(self.s)
         # s.run(1)
+
+    def test_top_right_edge(self):
+        self.left    = -0.1
+        self.bottom  = -0.2
+        self.right   =  0.3
+        self.top     =  0.4
+        self.lbrt = (self.left,self.bottom,self.right,self.top)
+        self.region = BoundingBox(points = ((self.left,self.bottom),
+                                            (self.right,self.top)))
+        self.xc,self.yc = self.region.aarect().centroid()
+
+        self.assertTrue(self.region.contains(0.3,0.4))
+
 
 
 
