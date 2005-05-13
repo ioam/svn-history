@@ -59,10 +59,8 @@ in the correct orientation is:
    [1 2 3]]
 
 This matrix corresponds to a sheet with the value 1 in the Cartesian
-plane area -0.5,-05 to -0.5/3,-0.5/3, etc.  NOTE: Accessing this
+plane area -0.5,-0.5 to -0.5/3,-0.5/3, etc.  NOTE: Accessing this
 matrix using normal matrix notation will not yield correct results.
-The row-major matrix location [0,0] will give 3, but if
-sheet2matrix(0,0) is called, then the correct returned value is 1.
 
 
 $Id$
@@ -134,9 +132,10 @@ def matrix2sheet(row,col,bounds,density):
     y = bottom + (row + 0.5) * unit_size 
     if x > right: x = x - unit_size
     if y > top: y = y - unit_size
+
     # Round eliminates any precision errors that have been compounded
-    # via math.  This way, any representation errors left, will be the
-    # std., and will match coded floating points.
+    # via math.  This way, any representation errors left, will be
+    # minimum and will match coded floating points.
     return round(x,10),round(y,10)
 
 
