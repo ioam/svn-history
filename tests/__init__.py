@@ -12,6 +12,7 @@ import testsheet
 import testsheetview
 import testhistogram
 import testplot
+import testplotgroup
 import testplotengine
 import testsimulator
 import testpalette

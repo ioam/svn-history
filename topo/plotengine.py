@@ -10,6 +10,7 @@ $Id$
 from base import TopoObject
 from utils import flatten
 from plot import *
+from plotgroup import *
 from sheet import Sheet
 
 

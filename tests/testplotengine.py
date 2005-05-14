@@ -11,6 +11,7 @@ from topo import plot
 from topo import base
 from topo.bitmap import *
 from topo.sheet import Sheet
+from topo.plotgroup import *
 from topo.plotengine import *
 from topo.inputsheet import *
 from topo.simulator import *
@@ -41,8 +42,8 @@ class TestPlotEngine(unittest.TestCase):
         
 
     def test_get_plot_group(self):
-        self.engine.add_plot_group('OldAct',plot.PlotGroup([self.plot1,
-                                                            self.plot2]))
+        self.engine.add_plot_group('OldAct',PlotGroup([self.plot1,
+                                                       self.plot2]))
         group = self.engine.get_plot_group('OldAct')
         activity_group = self.engine.get_plot_group('Activity')
 
