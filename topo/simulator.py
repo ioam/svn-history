@@ -408,7 +408,7 @@ class Simulator(BaseSimulator):
                 self.debug("Time to sleep. current time =",self.time(),
                            "next event time =",self.events[0].time)
                 for ep in self._event_processors:
-                    self.debug("Doing pre_sleep for",e)
+#                    self.debug("Doing pre_sleep for",e)
                     ep.pre_sleep()
                     
                 # set the time to the frontmost event (Note: the front
