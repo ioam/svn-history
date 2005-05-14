@@ -5,6 +5,11 @@ all:  topographica docs
 
 clean: cleandocs clean-ext-packages
 
+FORCE:
+
+tests: FORCE
+	./topographica runtests
+
 
 ext-packages:
 	make -C external
