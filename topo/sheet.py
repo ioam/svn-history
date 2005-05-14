@@ -401,7 +401,7 @@ class Sheet(EventProcessor):
     def activation_pop(self,restore_activation=True):
         """
         Pop an activation off the stack and return the values.  If
-        restore_activation is True, then put the poped information
+        restore_activation is True, then put the popped information
         back into the Sheet activation variable.
         """
         old_act = self.__saved_activation.pop()
