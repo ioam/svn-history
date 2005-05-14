@@ -35,10 +35,9 @@ The matrix that would match the sheet coordinates describe above is:
    [1 2 3]]
 
 This matrix corresponds to a sheet with the value 1 in the Cartesian
-plane area -0.5,-05 to -0.5/3,-0.5/3, etc.  NOTE: Accessing this
-matrix using normal matrix notation will not yield reasonable results.
-The row-major matrix location [0,0] will give 3, but if
-sheet2matrix(0,0) is called, then the returned value is 1.
+plane area -0.5,-0.5 to -0.5/3,-0.5/3, etc.  NOTE: Accessing this
+matrix using normal matrix notation will rarely yield reasonable
+results.
 
 
 $Id$
@@ -82,30 +81,14 @@ def produce_kernel_matrices(bounds, density):
     bound_width  = right-left
     bound_height = top-bottom
     linear_density = sqrt(density)
-    
     rows,cols = bounds2shape(bounds,density)
     
     # TODO: this can generate ouput that may be off by one in terms of size,
     # for example most times this generates a 100x100 image, but sometimes
     # it generates a 101x100 
-    
     # TODO: Use sheet operations defined in sheet.py? I think we already
     # do...
-    
-    
-    #kernel_y = arange(left,right, bound_width/cols)
-    #kernel_x = arange(bottom,top, bound_height/rows)
-    
-    # kernel_x = array([matrix2sheet(r,0,bounds,density) for r in range(rows)])
-    # kernel_y = array([matrix2sheet(0,c,bounds,density) for c in range(cols)])
-    # # NOTE: This is correct,
-    # #  kernels use x for rows and y for columns, not sure why. --jp
-    # assert len(kernel_x) == rows
-    # assert len(kernel_y) == cols
-    # return kernel_x[:,1], kernel_y[:,0]
 
-    # Experiment to see if swapping will work.  It did, but additional work
-    # is required to make the displays consistent.  -Judah
     kernel_y = array([matrix2sheet(r,0,bounds,density) for r in range(rows)])
     kernel_x = array([matrix2sheet(0,c,bounds,density) for c in range(cols)])
     assert len(kernel_x) == cols
@@ -125,9 +108,6 @@ def produce_rotated_matrices(kernel_x, kernel_y, theta):
     The matrix itself is rotated to match the Topographica cartesian
     style coordinates.
     """
-
-    # theta subtracted from pi for short term fix so that rotation matches the
-    # reflected kernel matrices.  Undo when the kernelfactory is reworked.
     new_kernel_x = subtract.outer(cos(pi-theta)*kernel_x, sin(pi-theta)*kernel_y)
     new_kernel_y = add.outer(sin(pi-theta)*kernel_x, cos(pi-theta)*kernel_y)
 
@@ -176,13 +156,23 @@ def rectangle(kernel_x, kernel_y, x, y, width, height):
     """
     Rectangle Kernel Factory
     """
+# Attempt to debug the problem with this factory.  Has the same problem as the
+# two lines currently defining rectangle.
+#    m = array(kernel_x)
+#    num_y,num_x = m.shape
+#    for j in range(num_y):
+#        for i in range(num_x):
+#            xx = kernel_x[j,i]
+#            yy = kernel_y[j,i]
+#            if (x-height/2) <= xx <=(j+height/2) and (y-width/2) <= yy <=(y+width/2):
+#                m[i,j] = 1
+#            else:
+#                m[i,j] = 0
+
+# Something is wrong here.  Rotation is all screwed up.
     kernel_x = bitwise_and( less_equal( kernel_x, x+width/2 ), greater_equal( kernel_x, x-width/2 ) )
     kernel_y = bitwise_and( less_equal( kernel_y, y+height/2 ),greater_equal( kernel_y, y-height/2 ) )
-# Something is wrong here.  Rotation is all screwed up.
-#    kernel_x = where(less_equal(kernel_x,x+width/2),1,0)
-#    kernel_y = where(less_equal(kernel_y,y+width/2) and greater_equal(kernel_y,y-width/2)),1,0)
-    
-    return bitwise_and( kernel_x, kernel_y )
+    return m
 
 
 def fuzzy_line(kernel_x, kernel_y, width):
