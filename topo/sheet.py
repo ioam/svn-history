@@ -13,20 +13,20 @@ topo.boundingregion) and a density.  The default bounding box for
 sheets is the unit square with its center at the origin.  i.e:
 
 
-     (-0.5,0.5) +------+------+ (0.5,0.5)
-                |      |      |
-                |      |      |
-                +------+------+
-                |      |      |
-                |      |      |
-    (-0.5,-0.5) +------+------+ (0.5,-0.5)
+            (-0.5,0.5) +----+----+ (0.5,0.5)
+                       |    |    |
+                       |    |    |
+                       +----+----+
+                       |    |    |
+                       |    |    |
+           (-0.5,-0.5) +----+----+ (0.5,-0.5)
 
 The default density is 100, giving the default sheet a 10x10
 activation matrix.
 
 This scheme gives a Sheet two coordinate systems.  A pair of 'sheet
-coordinates' (x,y) are real (floating point) Cartesian coordinates
-indicating an arbitrary point on the sheet's plane.  A pair of 'matrix
+coordinates' (x,y) are floating-point Cartesian coordinates indicating
+an arbitrary point on the sheet's plane.  A pair of 'matrix
 coordinates' (r,c), specify the row and column indices of a specific
 unit in the sheet.  This module provides facilities for converting
 between the two coordinate systems, and EVERYONE SHOULD USE THESE
@@ -37,31 +37,57 @@ In general sheets should be thought of as having arbitrary density and
 sheet coordinates should be used wherever possible, except when the
 code needs direct access to a specific unit.  By adhering to this
 convention, one should be able to write and debug a simulation at a
-low density, and then scale it up to run at higher densities simply by
-changing e.g. Sheet.density.
+low density, and then scale it up to run at higher densities (or down
+for lower densities) simply by changing e.g. Sheet.density.
 
 
-Matrix Orientations:
+Example of how the matrix stores the representation of the Sheet:
 
-For the purposes of this example, assume the goal is a Topographica
-matrix, density=3, that has a 1 at (-0.5,-0.5) a 3 at (0.0,0.0), and a
-5 at (0.5,0.5), this can be said in a different way,
+For the purposes of this example, assume the goal is a Sheet with
+density=3 that has a 1 at (-1/2,-1/2), a 5 at (0.0,0.0), and a 9 at
+(1/2,1/2).  More precisely, for this Sheet,
 
-the area from   -0.5,-0.5   to -0.5/3,-0.5/3 has value 1, 
-the area from -0.5/3,-0.5/3 to  0.5/3,0.5/3  has value 3, and 
-the area from  0.5/3,0.5/3  to    0.5,0.5    has value 5.
+the continuous area from -1/2,-1/2 to -1/6,-1/6 has value 1, 
+the continuous area from -1/6,-1/6 to  1/6,1/6  has value 5, and 
+the continuous area from  1/6,1/6  to  1/2,1/2  has value 9.
 
-The matrix that would match the sheet coordinates described above, and
-in the correct orientation is:
+With the rest of the elements filled in, the Sheet would look like:
 
-  [[3 4 5]
-   [2 3 4]
+    (-1/2,1/2) -+-----+-----+-----+- (1/2,1/2)
+                |     |     |     |
+                |  7  |  8  |  9  |
+                |     |     |     |
+    (-1/2,1/6) -+-----+-----+-----+- (1/2,1/6)
+                |     |     |     |
+                |  4  |  5  |  6  |
+                |     |     |     |
+   (-1/2,-1/6) -+-----+-----+-----+- (1/2,-1/6)
+                |     |     |     |
+                |  1  |  2  |  3  |
+                |     |     |     |
+   (-1/2,-1/2) -+-----+-----+-----+- (1/2,-1/2)
+
+where element 5 is centered on 0.0,0.0.  A matrix that would match
+these Sheet coordinates is:
+
+  [[7 8 9]
+   [4 5 6]
    [1 2 3]]
 
-This matrix corresponds to a sheet with the value 1 in the Cartesian
-plane area -0.5,-0.5 to -0.5/3,-0.5/3, etc.  NOTE: Accessing this
-matrix using normal matrix notation will not yield correct results.
+If we have such a matrix, we can access it in one of two ways: Sheet
+or matrix coordinates.  In matrix coordinates, the matrix is indexed
+by rows and columns, and it is possible to ask for the element at
+location [0,2] (which returns 9 as in any normal row-major matrix).
+But the values can additionally be accessed in Sheet coordinates,
+where the matrix is indexed by a point in the Cartesian plane.  In
+Sheet coordinates, it is possible to ask for the element at location
+(0.3,0.02), which returns floating-point matrix coordinates that can
+be cropped to give the nearest matrix element, namely the one with
+value 6.
 
+Of course, it would be an error to try to pass Matrix coordinates like
+[0,2] to the sheet2matrix calls; the result would be a value far
+outside of the actual matrix.
 
 $Id$
 """
@@ -86,7 +112,15 @@ def sheet2matrix(x,y,bounds,density):
     linear_density - 1 is used.
 
     NOTE: This is NOT the strict mathematical inverse of matrix2sheet!
-    
+
+    jbednar20050514: This implementation is not correct; it should
+    return floats, not ints, with no if statements or other
+    corrections.  It should just be a simple coordinate
+    transformation, implementable using a matrix as in computer
+    graphics routines.  An additional function sheet2matrixint
+    might be useful which also crops to integer, but that function
+    would be based on this one.
+
     When computing this transformation for an existing sheet foo, one
     should use the Sheet method foo.sheet2matrix(x,y).
     """
@@ -115,6 +149,12 @@ def matrix2sheet(row,col,bounds,density):
 
     NOTE: This is NOT the strict mathematical inverse of sheet2matrix.
 
+    jbednar20050514: This implementation is not correct; it should not
+    assume that the arguments are integers, and should not contain any
+    if statements or other corrections.  It should just be a simple
+    coordinate transformation, implementable using a matrix as in
+    computer graphics routines.
+    
     When computing this transformation for an existing sheet foo, one
     should use the Sheet method foo.matrix2sheet(r,c).
     """
@@ -210,6 +250,9 @@ class Sheet(EventProcessor):
     bounds:   A BoundingBox object indicating the bounds of the sheet.
               [default  (-0.5,-0.5) to (0.5,0.5)]
     density:  The areal density of the sheet [default 100]
+
+    jbednar20050514: All densities should be changed to be linear rather than areal. 
+    
     _learning: Whether the Sheet should adjust weights based upon
               incoming events.  
 
@@ -394,7 +437,7 @@ class Sheet(EventProcessor):
         then restore the Sheet to the previous state before
         non-learning stimuli was presented.  This function will
         probably need to be extended by derived classes.  Derived
-        class functions should call "super()" to run this code.
+        class functions should call 'super()' to run this code.
         """
         if not self._learning:
             self.activation_pop(restore_activation)
