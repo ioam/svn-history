@@ -168,11 +168,12 @@ def rectangle(kernel_x, kernel_y, x, y, width, height):
 #                m[i,j] = 1
 #            else:
 #                m[i,j] = 0
+#    return m
 
 # Something is wrong here.  Rotation is all screwed up.
     kernel_x = bitwise_and( less_equal( kernel_x, x+width/2 ), greater_equal( kernel_x, x-width/2 ) )
     kernel_y = bitwise_and( less_equal( kernel_y, y+height/2 ),greater_equal( kernel_y, y-height/2 ) )
-    return m
+    return bitwise_and(kernel_x,kernel_y)
 
 
 def fuzzy_line(kernel_x, kernel_y, width):
