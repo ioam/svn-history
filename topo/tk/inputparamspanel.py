@@ -40,7 +40,7 @@ def eval_atof(in_string):
     keypress in the field calls this function, so it's quite likely
     that the expression has not been defined yet, and an eval will
     raise an exception.  Catch any exceptions and return 0 if this is
-    the case.  Undefined is the Parameter calling this doesn't like the
+    the case.  Undefined if the Parameter calling this doesn't like the
     value 0.
     """
     x_dict = {'PI':math.pi, 'pi':math.pi, 'Pi':math.pi, 'pI':math.pi,

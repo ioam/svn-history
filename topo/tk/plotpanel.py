@@ -4,7 +4,7 @@ Abstract Class PlotPanel to support GUI windows that display bitmap plots.
 Undefined Variables:
     self.plot_key
 
-Virtual Functions:
+Not-Yet-Implemented Functions:
     refresh_title()
     do_plot_cmd()
     generate_plot_key()
