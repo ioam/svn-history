@@ -48,7 +48,7 @@ from boundingregion import BoundingBox
 from sheet import sheet2matrix, matrix2sheet, bounds2shape
 import RandomArray
 from Numeric import *
-from MLab import *
+from MLab import flipud,rot90
 from params import * 
 from pprint import pprint,pformat
 from math import pi
