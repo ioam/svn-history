@@ -25,7 +25,7 @@ Topic: GUI
   handled.
 
 - Rigorously test exact square plots within the Tk GUI.  Some plots
-  have been showing slightly off square plots, either do to the
+  have been showing slightly off square plots, either due to the
   zooming of the original data, or from the widget display functions.
 
 - Add a "Situate" option to the WeightsArray plot.
