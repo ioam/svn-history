@@ -31,6 +31,7 @@ import plotengine
 import histogram
 import palette
 import plotgroup
+import plotfilesaver
 
 # GUI files
 #import topo.tk
