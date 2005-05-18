@@ -119,6 +119,8 @@ class Plot(TopoObject):
                    'self.source = ' + str(self.source) + \
                    'type(self.source) = ' + str(type(self.source)))
 
+        self.channel_views = []
+        self.matrices = []
         #  Convert what is in the channels into SheetViews if not already
         for each in self.channels:
 
@@ -177,10 +179,10 @@ class Plot(TopoObject):
         # Replace any Nones with a matrix of size 'shape' full of values.
         if self.background == BLACK_BACKGROUND:
             self.matrices = tuple([each or zeros(shape)
-                                   for each in self.matrices])
+                                  for each in self.matrices])
         else:
             self.matrices = tuple([each or ones(shape)
-                                   for each in self.matrices])
+                                  for each in self.matrices])
             
 
         # By this point, self.matrices should be a triple of 2D
