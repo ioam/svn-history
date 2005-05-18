@@ -1,18 +1,9 @@
 """
-Abstract Class PlotPanel to support GUI windows that display bitmap plots. 
 
-Undefined Variables:
-    self.plot_key
-
-Not-Yet-Implemented Functions:
-    refresh_title()
-    do_plot_cmd()
-    generate_plot_key()
-
-Suggested functions to replace:
-    display_plots()
-    display_labels()
-    
+Abstract Class PlotPanel to support GUI windows that display bitmap
+plots. PlotPanel should deal with the GUI, and as much as possible use
+GUI independent code from outside the topo.tk package.  See Plots,
+PlotGroups, and PlotEngine.
 
 $Id$
 """
@@ -29,7 +20,7 @@ import ImageTk
 import Numeric
 import MLab
 
-NYI = "Abstract method not implemented."
+NYI = "Not Yet Implemented."
 
 def enum(seq):  return zip(range(len(seq)),seq)
 
@@ -46,7 +37,6 @@ class PlotPanel(Frame,topo.base.TopoObject):
         Frame.__init__(self,parent,config)
         topo.plot.TopoObject.__init__(self,**config)
 
-        # Must make assignment, even if only 'Activation'
         self.plot_key = NYI    
 
         # Each plot can have a different minimum size.  If INITIAL_PLOT_WIDTH
@@ -110,7 +100,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
         """
         Pmw.showbusycursor()
         self.do_plot_cmd()                # Create plot tuples
-        self.load_images()                # Convert plots to bitmap images
+        self.load_images()                # Scale bitmap images
         self.display_plots()              # Put images in GUI canvas
         self.display_labels()             # Match labels to grid
         self.refresh_title()              # Update Frame title.
@@ -124,11 +114,6 @@ class PlotPanel(Frame,topo.base.TopoObject):
         """
         raise NYI
 
-
-    def generate_plot_key(self):
-        """Should set a value to self.plot_key."""
-        raise NYI
-        
 
     def do_plot_cmd(self):
         """
@@ -144,13 +129,15 @@ class PlotPanel(Frame,topo.base.TopoObject):
     def load_images(self):
         """
         Pre:  self.pe_group contains a PlotGroup
-              self.plots contains a list that matches the
-                  format defined by PlotGroup.plots()
+              self.plots contains a list of plots following the
+                  format provided by PlotGroup.plots()
         Post: self.bitmaps contains a list of Bitmap Images ready for display.
 
         No geometry or Sheet information is necessary to perform the
         operations in this function, so it is unlikely that load_images()
-        will need to be redefined from a subclass.
+        will need to be redefined from a subclass.  It is assumed that
+        the PlotGroup code has not scaled the bitmap to the size currently
+        desired by the GUI.
 
         Image scaling is automatically done, as well as adjusted by the
         user.  self.MIN_PLOT_WIDTH is the number of pixels wide the
@@ -165,21 +152,8 @@ class PlotPanel(Frame,topo.base.TopoObject):
         else:
             old_min_width = -1
 
-        self.bitmaps = []
-        for each in self.plots:
-            (r,g,b) = each.matrices
-            if r.shape != (0,0) and g.shape != (0,0) and b.shape != (0,0):
-                # Crop activation to a maximum of 1.  Will scale brighter
-                # or darker, depending.
-                #
-                # Should report that cropping took place.
-                #
-                if max(r.flat) > 0: r = MLab.clip(r,0.0,1.0)
-                if max(g.flat) > 0: g = MLab.clip(g,0.0,1.0)
-                if max(b.flat) > 0: b = MLab.clip(b,0.0,1.0)
-                win = topo.bitmap.RGBMap(r,g,b)
-                win.view_info = each.view_info
-                self.bitmaps.append(win)
+        if self.pe_group:
+            self.bitmaps = self.pe_group.load_images()
         
         if self.bitmaps:
             min_width = reduce(min,[im.width() for im in self.bitmaps])
@@ -366,12 +340,6 @@ class PreferenceMapPanel(PlotPanel):
                                          'call measure_cog')
                      ).pack(side=LEFT,expand=YES,fill=X)
 
-
-    def do_plot_cmd(self):
-        Pmw.showbusycursor()
-        self.plot_cmd = "plot " + self.mapname.get()
-        PlotPanel.do_plot_cmd(self)
-        Pmw.hidebusycursor()
 
 
 

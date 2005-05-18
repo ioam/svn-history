@@ -20,7 +20,6 @@ class WeightsArrayPanel(RegionPlotPanel):
         self.density_str = StringVar()
         self.density_str.set('10.0')
         self.density = float(eval(self.density_str.get(),__main__.__dict__))
-        self.shape = (0,0)
 
         self.weight_name = StringVar()
         self.weight_name.set('None')
@@ -65,10 +64,11 @@ class WeightsArrayPanel(RegionPlotPanel):
         Projection object as value, so this is its own function since
         it needs to be done the same way in both places.
         """
-        self._sim_ep = [ep for ep in self._sim_eps
-                  if ep.name == sheet_name][0]
-        self.projections = dict([(i.name, i) for i in
-                                 chain(*self._sim_ep.projections.values())])
+        if self._sim_eps:
+            self._sim_ep = [ep for ep in self._sim_eps
+                            if ep.name == sheet_name][0]
+            self.projections = dict([(i.name, i) for i in
+                                     chain(*self._sim_ep.projections.values())])
 
         old_projection_name = self.weight_name.get()
         if len(self.projections.keys()) == 0:
@@ -140,80 +140,51 @@ class WeightsArrayPanel(RegionPlotPanel):
 
     def do_plot_cmd(self):
         """
-        The WeightsArrayPanel will calculate the number of plots to
-        show for the active Sheet and Projection.  It will generate
-        multiple unit_view() requests; keep the Projections desired,
-        and then store the composite list back into the Sheet under a
-        key that other functions in this class will use to display.
+        self.generate_plot_key() creates the density information needed for
+        a WeightsArrayPlotGroup to create necessary Plots.
         """
-        self.generate_plot_key()
-        coords = self.generate_coords()
-        
-        full_unitview_list = [self._sim_ep.unit_view(x,y)
-                         for (x,y) in coords]
-        filtered_list = [view for view in chain(*full_unitview_list)
-                         if view.projection == self.projections[self.weight_name.get()]]
-        self._sim_ep.add_sheet_view(self.plot_key,filtered_list)
-
-        super(WeightsArrayPanel,self).do_plot_cmd()
-
-        for (x,y) in coords: self._sim_ep.release_unit_view(x,y)
-        
-
-    def generate_coords(self):
-        """
-        Evenly space out the units within the sheet bounding box, so
-        that it doesn't matter which corner the measurements start
-        from.  A 4 unit grid needs 5 segments.
-        """
-        aarect = self._sim_ep.bounds.aarect()
-        (l,b,r,t) = aarect.lbrt()
-        x = float(r - l) 
-        y = float(t - b)
-        x_step = x / (int(x * self.density) + 1)
-        y_step = y / (int(y * self.density) + 1)
-        l = l + x_step
-        b = b + y_step
-        coords = []
-        self.shape = (int(x * self.density), int(y * self.density))
-        for j in range(self.shape[1]):
-            for i in range(self.shape[0]):
-                coords.append((x_step*j + l, y_step*i + b))
-        return coords
-            
+        if self.console.active_simulator().get_event_processors():
+            self.generate_plot_key()
+            self.pe_group = self.pe.get_plot_group(self.plot_key,
+                                                   'WeightsArrayPlotGroup',
+                                                   self.region.get())
+            self.pe_group.do_plot_cmd()
+            self.plots = self.pe_group.plots()
 
 
     def display_plots(self):
         """
-        PlotPanel will display plots in a single row.  WeightsArrayPanel requires
-        a 2D grid of plots.
+        This must be changed from PlotPanels version since
+        WeightsArrayPanel requires a 2D grid of plots.
         """
-        # Generate the zoomed images.
-        self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.zoom_factor))
-                              for im in self.bitmaps]
-        old_canvases = self.canvases
-        self.canvases = [Canvas(self.plot_frame,
-                                width=image.width(),
-                                height=image.height(),
-                                bd=0)
-                         for image in self.zoomed_images]
-
-        # Lay out images
-        for i,image,canvas in zip(range(len(self.zoomed_images)),
-                                  self.zoomed_images,self.canvases):
-            canvas.grid(row=i%self.shape[0],column=i//self.shape[1],
-                        padx=6,pady=6)
-            canvas.create_image(image.width()/2+2,image.height()/2+2,image=image)
-
-        # Delete old ones.  This may resize the grid.
-        for c in old_canvases:
-            c.grid_forget()
-
+        if self.pe_group:
+            # Generate the zoomed images.
+            self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.zoom_factor))
+                                  for im in self.pe_group.bitmaps]
+            old_canvases = self.canvases
+            self.canvases = [Canvas(self.plot_frame,
+                                    width=image.width(),
+                                    height=image.height(),
+                                    bd=0)
+                             for image in self.zoomed_images]
+    
+            # Lay out images
+            for i,image,canvas in zip(range(len(self.zoomed_images)),
+                                      self.zoomed_images,self.canvases):
+                canvas.grid(row=i%self.pe_group.shape[0],
+                            column=i//self.pe_group.shape[1],
+                            padx=6,pady=6)
+                canvas.create_image(image.width()/2+2,image.height()/2+2,image=image)
+    
+            # Delete old ones.  This may resize the grid.
+            for c in old_canvases:
+                c.grid_forget()
+    
 
     def display_labels(self):
         """
         It's not a good idea to show the name of every plot, but it is
-        reasonable to put information on the X and Y axes.
+        reasonable to put information around the plot group.
         """
         if len(self.projections) > 0:
             src_name = self.projections[self.weight_name.get()].src.name

@@ -7,10 +7,10 @@ The list of valid Input Types is automatically generated from the list
 of KernelFactory subclasses found in topo.kernelfactory.  Every
 Parameter defined in the KernelFactory subclass will be taken with the
 intersection of valid TaggedSlider types defined in this class and
-shown in the window.
+then shown in the window.
 
-The Preview panel draws heavily from the PlotPanel class, and just
-needs a redefinition of the do_plot_cmd().
+The Preview panel draws heavily from the PlotPanel class, and instead
+of using a PlotGroup subclass, creates a group on the fly.  
 
 $Id$
 """
@@ -58,7 +58,7 @@ def kernelfactory_names():
     change based on the existing classes found within kernelfactory.py
     """
     return topo.kernelfactory.kernel_factories.keys()
-    # Slow method, only looks at kernelfactory.py
+    # Slow method, only looks at kernelfactory.py, but doesn't need a registry:
     #import pyclbr
     #names = [x for x in pyclbr.readmodule('topo.kernelfactory').keys()
     #         if issubclass(topo.kernelfactory.__dict__[x],
@@ -287,7 +287,7 @@ class InputParamsPanel(PlotPanel):
         restored, but then there are going to be other problems with
         the Simulator state if a run is interrupted.
 
-        This function is run independent of if learning is enabled or
+        This function is run no matter if learning is enabled or
         disabled since run() will detect sheet attributes.
         """
         new_kernels_dict = self._update_inputsheet_kernels()
@@ -342,7 +342,7 @@ class InputParamsPanel(PlotPanel):
         as value that should be moved into the InputSheet.
         """
         for each in self.in_ep_dict.keys():
-            # Only present to the ones that are currently selected.
+            # Use this to only present to the ones that are currently selected:
             # if kernels_dict[each]['state']:
             ep = kernels_dict[each]['obj']
             ep.set_input_generator(kernels_dict[each]['kernel'])
@@ -404,28 +404,20 @@ class InputParamsPanel(PlotPanel):
         """
         Replace the superclass do_plot_cmd.
         Create a PlotGroup that has a list of Plots that have been
-        created from a set of activations defined by the user.
+        created from a set of activations defined by the user. We
+        don't need a completely now PlotGroup type for this temporary
+        plot.
 
-        Post: self.pe_group contains a PlotGroup, and self.plots is
-        a list from the PlotGroup.plots()
+        Post: self.pe_group contains a PlotGroup.
         """
         plist = []
         for each in self.in_ep_dict.keys():
             k = self.in_ep_dict[each]['kernel']
-
-            kmatrix = k()
-            kbounds = k.bounds
-            # Code to make another copy, without using a copy()
-            #(l,b,r,t) = k.bounds.aarect().lbrt()
-            #kbounds = BoundingBox(points=((b,l),(t,r)))
-
-            sv = topo.sheetview.SheetView((kmatrix,kbounds),src_name=each,
+            sv = topo.sheetview.SheetView((k(),k.bounds),src_name=each,
                                           view_type='Kernel')
-            p = topo.plot.Plot((sv,None,None),topo.plot.COLORMAP)
-            plist.append(p)
+            plist.append(topo.plot.Plot((sv,None,None),topo.plot.COLORMAP))
         if LIST_REVERSE: plist.reverse()
-        self.pe_group = topo.plot.PlotGroup(plist)
-        self.plots = self.pe_group.plots()
+        self.pe_group = topo.plotgroup.PlotGroup('Preview',None,plist)
 
 
     def refresh_title(self): pass
@@ -440,11 +432,10 @@ class InputParamsPanel(PlotPanel):
     def _reset_and_destroy(self):
         """
         There should only be one InputParamsPanel for the Simulator.
-        When the window is made to go away, it doesn't need to really
-        go away since the same window comes back.  This is done through
-        a withdraw() call, instead of a destroy().  More importantly,
-        the learning needs to be turned back on if the learning had
-        been previously turned off by the user.
+        When the window is made to go away, a new window should be
+        allowed.  More importantly, the learning needs to be turned
+        back on if the learning had been previously turned off by the
+        user.
         """
         if not self.learning.get():
             self.learning_button.invoke()
@@ -452,5 +443,4 @@ class InputParamsPanel(PlotPanel):
             topo.tk.show_cmd_prompt()
         self.console.input_params_window = None
         self.parent.destroy()
-        #self.parent.withdraw()
 

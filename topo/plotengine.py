@@ -2,8 +2,12 @@
 Construct PlotGroups, Plots, and the occasional SheetView, for saving to a
 file or for a GUI to display.
 
-This class is the connection between the Simulator and the Plot generation
-routines.
+This class should be the connection between the Simulator or GUI, and
+any Plot generation routines.
+
+Note: get_plot_group() function interface could be cleaned up, since
+the lambda functions are a bit confusing, and the user should probably
+be protected as much as possible while remaining flexible.  
 
 $Id$
 """
@@ -25,8 +29,6 @@ def sheet_filter(sheet):
     """
     if sheet == sheet:
         return True
-    else:
-        return False
 
 
 class PlotEngine(TopoObject):
@@ -46,8 +48,8 @@ class PlotEngine(TopoObject):
         automatically even in previously defined PlotGroups.
 
         Example calling style:
-            s = Simulation(step=1)
-            new_plot_engine = PlotEngine(s)
+            s = topo.simulation.Simulation()
+            new_plot_engine = topo.plotengine.PlotEngine(s)
         """
         super(PlotEngine,self).__init__(**params)
         self.simulation = simulation
@@ -72,18 +74,20 @@ class PlotEngine(TopoObject):
         self.plot_group_dict[name] = group
 
 
-    def get_plot_group(self, name, filter=sheet_filter):
+    def get_plot_group(self, name, group_type = 'ActivationPlotGroup',filter=None):
         """
         Return the PlotGroup registered in self.plot_group_dict with
         the provided key 'name'.  If the name does not exist, then
         generate a PlotGroup using the generic dynamic group creator.
         This default construction allows for certain types of plots to
         be defined automatically, such as 'Activation'.
-
-        GENERATED PLOTGROUPS WILL ASK FOR PLOTS FROM ALL SHEETS; NO
-        PARAMETER BASED DEFAULT SHEET GROUPS OR FILTERS ARE CURRENTLY
-        IMPLEMENTED BUT IT WOULD BE THE BEST SOLUTION.
         """
+        if filter == None:
+            filter = sheet_filter
+        elif isinstance(filter,str):     # Allow sheet string name as input.
+            target_string = filter
+            filter = lambda s: s.name == target_string
+        
         if self.plot_group_dict.has_key(name):
             self.debug(name, "key match in PlotEngine's PlotGroup list")
             requested_plot = self.plot_group_dict[name]
@@ -91,7 +95,7 @@ class PlotEngine(TopoObject):
             self.debug(name, "key match failure in PlotEngine's PlotGroup list")
             # Rather than fail, check for SheetViews of the name.
             # Current filter is sheet_filter(..).
-            requested_plot = self.make_sheetview_group(name,filter)
+            requested_plot = self.make_sheetview_group(name,group_type,filter)
         return requested_plot
 
 
@@ -101,7 +105,7 @@ class PlotEngine(TopoObject):
         each Sheet's SheetView dictionary.
         """
         dynamic_list = lambda : [Plot((name,None,None),COLORMAP,each)
-                                for each in self._sheets() if filter_lam(each)]
+                                 for each in self._sheets() if filter_lam(each)]
         return dynamic_list
 
 
@@ -132,21 +136,28 @@ class PlotEngine(TopoObject):
         return plot_list
 
 
-    def make_sheetview_group(self, name, filter_lam=None):
+    def make_sheetview_group(self, name, group_type='ActivationPlotGroup',
+                             filter_lam=None):
         """
-        Default method of creating a dynamic plot such as
-        'Activation'.  Makes a new PlotGroup containing a lambda
-        function that will iterate over the current list of
-        SheetViews with 'name' from each Sheet in the simulation.  It
-        uses the filter_lambda to decide if it should include the
-        sheet in the Group.  If passed in, filter_lambda must take a
-        Sheet, and return True or False.
+        name : The key to look under in the SheetView dictionaries.
+        group_type: The string name of the PlotGroup subclass to create.
+               The actual name is passed in instead of a class pointer
+               so the function can be used from the command-line, and
+               also so a full list of class names is not required.
+        filter_lam: Optional lambda function to filter which sheets to
+               ask for SheetViews
         """
         if filter_lam is None:
             filter_lam = lambda sheet: True            
-        # An alternative is lambda_single_view_per_name(name,filter_lam)
         dynamic_list = lambda : self.lambda_flat_dynamic_list(name,filter_lam)
-        new_group = PlotGroup(dynamic_list)
+
+        # try:
+        exec 'ptr = ' + group_type in globals()
+        # except Exception, e:
+        #     self.warning('Exception:', e)
+        #     self.warning('Invalid PlotGroup subclass: ', group_type)
+        #     return PlotGroup(dynamic_list)
+        new_group = ptr(name,filter_lam,dynamic_list)
         self.debug('Type of new_group is', type(new_group))
         return new_group
 

@@ -1,10 +1,25 @@
 """
-PlotGroup and subclasses
+
+PlotGroups are containers of Plots that store specific information
+about different plot types.  Specifically, a PlotGroup contains the
+do_plot_cmd() function that knows how to generate plots, and the
+filename information.  All information in these classes must be medium
+independent.  That is to say, the bitmaps produced by the groups of
+plots should be as easily displayed in a GUI window, as saved to a
+file.
+
+NOTE: It might be reasonable to move the filename information into the
+file saver classes, and make some kind of Unique Name function here, that
+the file savers would instead use.
 
 $Id$
 """
 from base import TopoObject
 from plot import *
+import topo.simulator
+import topo
+import MLab
+from itertools import chain
 
 # Shape of the plotting display used by PlotGroup.  NOTE: INCOMPLETE,
 # THERE SHOULD BE MORE TYPES OF SHAPES SUCH AS SPECIFYING X ROWS, OR Y
@@ -17,6 +32,8 @@ from plot import *
 # or somesuch.
 FLAT = 'FLAT'
 
+NYI = "Abstract method not implemented."
+
 
 class PlotGroup(TopoObject):
     """
@@ -24,30 +41,66 @@ class PlotGroup(TopoObject):
     the plots and other special parameters.
     """
 
-    def __init__(self,plot_list,shape=FLAT,**params):
+    def __init__(self,plot_key=None,sheet_filter_lam=None,plot_list=None,shape=FLAT,**params):
         """
         plot_list can be of two types: 
         1.  A list of Plot objects that can return bitmaps when requested.
         2.  Can also be a function that returns a list of plots so
         that each time plot() is called, an updated list is created for the
         latest list of sheets in the simulation.
-
-        shape recommends the visual arrangement of the plots within
-        the group.  The default is FLAT.  PlotGroup does not do the
-        final pasting, instead allowing the GUI to do that, but it
-        will hold the shape information as needed.  RECOMMENDED
-        IMPLEMENTATION: (None, 5) will have 5 columns of plots, (5,
-        None) will have 5 rows of of plots.  An X-tuple will have each
-        subsequent row the length of the corresponding value in the
-        tuple.
         """
         super(PlotGroup,self).__init__(**params)
         self.plot_list = plot_list
         self.all_plots = []
         self.added_list = []
         self.shape = shape
-        self.debug('Input type, ', type(self.plot_list))
+        self.plot_key = plot_key
+        self.bitmaps = []
+        self.filename = ''
 
+        if sheet_filter_lam:
+            self.sheet_filter_lam = sheet_filter_lam
+        else:
+            self.sheet_filter_lam = lambda : True
+
+        self.debug('Input type, ', type(self.plot_list))
+ 
+
+    def do_plot_cmd(self):
+        """Subclasses of PlotGroup will need to create this function."""
+        pass
+    
+
+    def load_images(self):
+        """
+        Pre:  do_plot_cmd() has already been called, so plots() will return
+              valid plots.
+        Post: self.bitmaps contains a list of topo.bitmap objects or None if
+              no valid maps were available.
+
+        Returns: List of bitmaps.  self.bitmaps also has been updated.
+        """
+        self.bitmaps = []
+        for each in self.plots():
+            (r,g,b) = each.matrices
+            if r.shape != (0,0) and g.shape != (0,0) and b.shape != (0,0):
+                # Crop activation to a maximum of 1.  Will scale brighter
+                # or darker, depending.
+                #
+                # Should report that cropping took place.
+                #
+                if max(r.flat) > 0: r = MLab.clip(r,0.0,1.0)
+                if max(g.flat) > 0: g = MLab.clip(g,0.0,1.0)
+                if max(b.flat) > 0: b = MLab.clip(b,0.0,1.0)
+                win = topo.bitmap.RGBMap(r,g,b)
+                win.view_info = each.view_info
+                self.bitmaps.append(win)
+        return self.bitmaps
+    
+
+    def filename(self):
+        raise NYI
+    
 
     def add(self,new_plot):
         """
@@ -74,10 +127,7 @@ class PlotGroup(TopoObject):
 
     def plots(self):
         """
-        Get the matrix data from each of the Plot objects, do any needed
-        plot marking, then pass up the list of bitmaps.
-
-        THE GUI IS GOING TO GLUE THE HISTOGRAMS INTO ONE GLORIOUS WHOLE.
+        Generate the bitmap lists.
         """
         bitmap_list = []
         if isinstance(self.plot_list,types.ListType):
@@ -95,3 +145,99 @@ class PlotGroup(TopoObject):
         generated_bitmap_list = [each.plot() for each in self.all_plots]
 
         return generated_bitmap_list
+
+
+
+class ActivationPlotGroup(PlotGroup):
+    """
+    PlotGroup for Activation SheetViews
+    """
+
+    def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):
+        super(ActivationPlotGroup,self).__init__(plot_key,sheet_filter_lam,plot_list,
+                                                 **params)
+
+    def filename(self):
+        self.filename = 'Activation'
+
+
+
+
+class WeightsPlotGroup(PlotGroup):
+    """
+    PlotGroup for Weights UnitViews
+    """
+
+    def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):
+        super(WeightsPlotGroup,self).__init__(plot_key,sheet_filter_lam,plot_list,
+                                              **params)
+        self.x = float(plot_key[1])
+        self.y = float(plot_key[2])
+
+    def filename(self):
+        self.filename = 'Weights_' + str(x) + '_' + str(y)
+
+    def do_plot_cmd(self):
+        """
+        Lambda function passed in, that will filter out all sheets
+        except the one with the name being looked for.
+        """
+        sheets = topo.simulator.active_sim().get_event_processors()
+        for each in sheets:
+            if self.sheet_filter_lam(each):
+                each.unit_view(self.x,self.y)
+
+
+
+class WeightsArrayPlotGroup(PlotGroup):
+    """
+    PlotGroup for WeightsArray
+    """
+
+    def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):
+        super(WeightsArrayPlotGroup,self).__init__(plot_key,sheet_filter_lam,
+                                                   plot_list,**params)
+        self.weight_name = plot_key[1]
+        self.density = float(plot_key[2])
+        self.shape = (0,0)
+        self._sim_ep = [s for s in topo.simulator.active_sim().get_event_processors()
+                        if self.sheet_filter_lam(s)][0]
+
+
+    def filename(self):
+        self.filename = 'WeightsArray_' + self.weight_name + '_' + str(self.density)
+
+
+    def _generate_coords(self):
+        """
+        Evenly space out the units within the sheet bounding box, so
+        that it doesn't matter which corner the measurements start
+        from.  A 4 unit grid needs 5 segments.
+        """
+        aarect = self._sim_ep.bounds.aarect()
+        (l,b,r,t) = aarect.lbrt()
+        x = float(r - l) 
+        y = float(t - b)
+        x_step = x / (int(x * self.density) + 1)
+        y_step = y / (int(y * self.density) + 1)
+        l = l + x_step
+        b = b + y_step
+        coords = []
+        self.shape = (int(x * self.density), int(y * self.density))
+        for j in range(self.shape[1]):
+            for i in range(self.shape[0]):
+                coords.append((x_step*j + l, y_step*i + b))
+        return coords
+
+
+    def do_plot_cmd(self):
+        coords = self._generate_coords()
+        
+        full_unitview_list = [self._sim_ep.unit_view(x,y) for (x,y) in coords]
+        filtered_list = [view for view in chain(*full_unitview_list)
+                         if view.projection.name == self.weight_name]
+
+        self._sim_ep.add_sheet_view(self.plot_key,filtered_list)
+
+        for (x,y) in coords: self._sim_ep.release_unit_view(x,y)
+        

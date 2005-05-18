@@ -1,7 +1,10 @@
 """
-PMW WeightsPanel object for GUI visualization.
+WeightsPanel object for GUI visualization.
 
 Subclasses RegionPlotPanel, which is basically a PlotPanel.
+
+Uses a WeightsPlotGroup to generate the plots displayed in the main
+widget.
 
 $Id$
 """
@@ -62,11 +65,6 @@ class WeightsPanel(RegionPlotPanel):
         # This assumes that displaying the rectangle information is enough.
         l,b,r,t = ep.bounds.aarect().lbrt()
 
-        # BUG WORKAROUND.  Bounding regions are currently (5/2005) consistent
-        # with reporting edge conditions.  getting a unit at 0.5 when the
-        # bounds ends at 0.5, will return an error, but bounds.contains(0.5,0.5)
-        # will return true.
-
         if ep.bounds.contains(self.x,self.y):
             self.plot_key = ('Weights',self.x,self.y)
             self.displayed_x, self.displayed_y = self.x, self.y
@@ -82,6 +80,22 @@ class WeightsPanel(RegionPlotPanel):
                               pady = 20)
             w.pack(expand = 1, fill = 'both', padx = 4, pady = 4)
         
+
+    def do_plot_cmd(self):
+        """
+        Create the right Plot Key that will define the needed
+        information for a WeightsPlotGroup.  This is the key-word
+        'Weights', and the necessary x,y coordinate.  Once the
+        PlotGroup is created, and call its do_plot_cmd() to prepare
+        the Plot objects.
+        """
+        if self.console.active_simulator().get_event_processors():
+            self.generate_plot_key()
+            self.pe_group = self.pe.get_plot_group(self.plot_key,
+                                                   'WeightsPlotGroup',
+                                                   self.region.get())
+            self.pe_group.do_plot_cmd()
+            self.plots = self.pe_group.plots()
 
 
     def display_labels(self):

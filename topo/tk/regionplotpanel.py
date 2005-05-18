@@ -1,8 +1,9 @@
 """
-VIRTUAL RegionPlotPanel class that subclasses PlotPanel with
-additional buttons for Region access.
+RegionPlotPanel must be subclassed to be used.
 
-Not included in PlotPanel, because this class knows about, and
+Subclasses PlotPanel with additional buttons for Region access.
+
+Region menu not included in PlotPanel, because Region knows about and
 requires, the CFSheet class.
 
 $Id$
@@ -23,7 +24,7 @@ class RegionPlotPanel(PlotPanel):
 
     def _add_region_menu(self):
         """
-        This function adds a Region: menu that queries the active
+          This function adds a Region: menu that queries the active
         simulation for the list of options.  When an update is made,
         _region_refresh() is called.  It can either call the refresh()
         funcion, or update another menu, and so on.
@@ -58,16 +59,3 @@ class RegionPlotPanel(PlotPanel):
         if self.auto_refresh:
             self.refresh()
 
-
-    def do_plot_cmd(self):
-        """
-        Lambda function passed in, that will filter out all sheets
-        except the one with the name being looked for.
-        """
-        self.generate_plot_key()
-        active_sheet_name = self.region.get()
-        sheet_filter_lam = lambda s: s.name == active_sheet_name
-        self.pe_group = self.pe.get_plot_group(self.plot_key,sheet_filter_lam)
-        self.plots = self.pe_group.plots()
-        # Delete old Sheet.sheet_view_dict entries
-        self.pe_group.release_sheetviews()  

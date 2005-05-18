@@ -49,8 +49,8 @@ class TestPlotEngine(unittest.TestCase):
 
 
     def test_make_sheetview_group(self):
-        activity_group = self.engine.make_sheetview_group('Activity',sheet_filter)
-        activity_group2 = self.engine.make_sheetview_group('Activity',sheet_filter)
+        activity_group = self.engine.make_sheetview_group('Activity',filter_lam=sheet_filter)
+        activity_group2 = self.engine.make_sheetview_group('Activity',filter_lam=sheet_filter)
 
 
     def test_sheet_filter(self):
