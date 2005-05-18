@@ -14,6 +14,7 @@ import testhistogram
 import testplot
 import testplotgroup
 import testplotengine
+import testplotfilesaver
 import testsimulator
 import testpalette
 import testgui
