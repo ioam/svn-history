@@ -426,12 +426,10 @@ class Sheet(EventProcessor):
         Do NOT set self._learning directly, unless you're certain you
         know what you're doing.
         """
-        if self._learning:
-            self._learning = False
-            self.activation_push()
+        self._learning = False
 
 
-    def enable_learning(self,restore_activation=True):
+    def enable_learning(self):
         """
         Assert that learning has in fact been previously disabled,
         then restore the Sheet to the previous state before
@@ -439,6 +437,4 @@ class Sheet(EventProcessor):
         probably need to be extended by derived classes.  Derived
         class functions should call 'super()' to run this code.
         """
-        if not self._learning:
-            self.activation_pop(restore_activation)
-            self._learning = True
+        self._learning = True

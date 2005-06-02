@@ -211,11 +211,13 @@ class InputParamsPanel(PlotPanel):
             for each in sim.get_event_processors():
                 if isinstance(each,Sheet):
                     each.disable_learning()
+                    each.activation_push()
         else: # Turn learning back on and restore
             sim.state_pop()
             for each in sim.get_event_processors():
                 if isinstance(each,Sheet):
                     each.enable_learning()
+                    each.activation_pop()
             
 
     def _refresh_sliders(self,new_name):
