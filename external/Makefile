@@ -107,15 +107,16 @@ jpeg-uninstall:
 ##############################################################
 # PIL
 #
-PIL = Imaging-1.1.4jp
+PIL = Imaging-1.1.5
 PIL_UNINSTALL = ${PYTHON_LIB}/site-packages/PIL
 
 pil: ${PIL}.tgz jpeg python
 	tar xzf ${PIL}.tgz
-	cd ${PIL}/libImaging; ./configure --prefix=${PREFIX} --with-jpeg=${PREFIX}/lib
-	make -C ${PIL}/libImaging
-	cd ${PIL}; env PREFIX=${PREFIX} ${PREFIX}/bin/python setup.py build
-	cd ${PIL}; env PREFIX=${PREFIX} ${PREFIX}/bin/python setup.py install
+#	cd ${PIL}/libImaging; ./configure --prefix=${PREFIX} --with-jpeg=${PREFIX}/lib
+#	make -C ${PIL}/libImaging
+	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build_ext -i
+	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python selftest.py
+	cd ${PIL}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch pil
 
 pil-clean:
