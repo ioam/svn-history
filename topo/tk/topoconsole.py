@@ -487,7 +487,7 @@ class TopoConsole(Frame):
         """
         title = "Topographica Console."
         if self.active_simulator() != None:
-            title += "  Active Simulator = " + (self.active_simulator()).name
+            title += "  Active = " + (self.active_simulator()).name
         self.parent.title(title)
 
         
