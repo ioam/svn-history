@@ -19,6 +19,17 @@ Topic: Command-line / Shell
 
 Topic: GUI
 
+- Create a mechanism for user-defined Parameters in the Kernel files.
+  Right now only the developer defined kernel types will show up in 
+  the InputParamsPanel.
+
+- Create a mechanism to have individual defaults for the different
+  kernels in the InputParamsPanel.  Right now each type of
+  TaggedSlider has default values that do not change depending on
+  which Kernel it is being used.  In other words, the default for
+  theta for the Gaussian kernel is the same default theta for the sine
+  grating.
+
 - Write a better string evaluation routine for use in the user entry
   regions.  Minor variations of eval() are currently being used within
   the __main__ namespace, which is nice, but no exceptions are being 
