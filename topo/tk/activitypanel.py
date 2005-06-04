@@ -19,6 +19,7 @@ class ActivityPanel(PlotPanel):
 
     def do_plot_cmd(self):
         self.pe_group = self.pe.get_plot_group('Activation','ActivationPlotGroup')
+        # This is a pass, so commented out: self.pe_group.do_plot_cmd()
         self.plots = self.pe_group.plots()
 
     def display_labels(self):
