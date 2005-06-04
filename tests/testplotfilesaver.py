@@ -50,9 +50,9 @@ class TestPlotFileSaver(unittest.TestCase):
         af = ActivationFile('Retina')
         wf = WeightsFile('V1',0.0,0.0)
         waf = WeightsArrayFile('V1','R1toV1',10)
-#        for each in af.files + wf.files + waf.files:
-#            os.remove(each)
-#
+        for each in af.files + wf.files + waf.files:
+            os.remove(each)
+
 
 
 suite = unittest.TestSuite()
