@@ -225,7 +225,7 @@ class InputParamsPanel(PlotPanel):
         Called by the Pmw.OptionMenu object when the user selects a
         KernelFactory type from the menu.  The visible TaggedSliders
         will be updated.  The old ones are removed, and new ones are
-        added to the screen.  The widgets themselfs do not change but
+        added to the screen.  The widgets themselves do not change but
         the grid location does.
         """
         # How to wipe the widgets off the screen
@@ -429,6 +429,9 @@ class InputParamsPanel(PlotPanel):
         Use the parent class refresh
         """
         self._update_inputsheet_kernels()
+        for entry in self.tparams.values():
+            if entry[1].need_to_refresh_slider:
+                entry[1].set_slider_from_tag()
         super(InputParamsPanel,self).refresh()
 
     def _reset_and_destroy(self):

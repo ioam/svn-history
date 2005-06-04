@@ -38,6 +38,7 @@ class TaggedSlider(Frame):
         self.max_value = string_translator(max_value)
         self.fmt = string_format
 
+        self.need_to_refresh_slider = False
         self.string_translator = string_translator
 
         # Add the slider
@@ -78,25 +79,34 @@ class TaggedSlider(Frame):
         
         
     def tag_keypress(self,ev):
-        # print 'tag_keypress: '+ev.char
-        self.set_slider_from_tag()
+        #print 'tag_keypress: '+ev.char
+        if ev.char != '\r':
+            self.need_to_refresh_slider = True
+        self.set_slider_from_tag(ev.char)
 
     def set_tag_from_slider(self):
         new_string = self.fmt % self.get_slider_value()
         self.tag_val.set(new_string)
 ##
         
-    def set_slider_from_tag(self):
-        if not self.first_slider_command:
+    def set_slider_from_tag(self,evchar=None):
+        # Attempt to update the sliders only on return.
+        if not self.first_slider_command \
+               and evchar == '\r' and self.need_to_refresh_slider:
+            self.need_to_refresh_slider = False
             self.root.optional_refresh()
         try:
-            val = self.string_translator(self.tag_val.get())
-            if val > self.max_value:
-                self.max_value = val
-            elif val < self.min_value:
-                self.min_value = val
-                    
-            self.set_slider_value(val)
+            if self.need_to_refresh_slider: 
+                #print 'tag_keypress: '+evchar
+
+                val = self.string_translator(self.tag_val.get())
+                if val > self.max_value:
+                    self.max_value = val
+                elif val < self.min_value:
+                    self.min_value = val
+                        
+                self.set_slider_value(val)
+
         except ValueError:
             pass
         
