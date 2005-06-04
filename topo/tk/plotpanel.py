@@ -5,6 +5,9 @@ plots. PlotPanel should deal with the GUI, and as much as possible use
 GUI independent code from outside the topo.tk package.  See Plots,
 PlotGroups, and PlotEngine.
 
+activitypanel.py is the smallest class possible to create a new plot
+window.  Look at it as an example of creating additional subclasss.
+
 $Id$
 """
 import Pmw, re, os, sys
@@ -38,6 +41,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
         topo.plot.TopoObject.__init__(self,**config)
 
         self.plot_key = NYI    
+        self.plotgroup_type = NYI
 
         # Each plot can have a different minimum size.  If INITIAL_PLOT_WIDTH
         # is set to None, then no initial zooming is performed.  However,
@@ -52,6 +56,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
         self.bitmaps = []
         self.labels = []
         self.__num_labels = 0
+        self.panel_num = 1
 
         self.console = console
         self.parent = parent
@@ -112,7 +117,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
         Change the window title.  TopoConsole will call this on
         startup of window.  
         """
-        raise NYI
+        self.parent.title("%s %d" % (self.plot_key,self.panel_num))
 
 
     def do_plot_cmd(self):
@@ -123,7 +128,10 @@ class PlotPanel(Frame,topo.base.TopoObject):
         See topo.tk.WeightsPanel and topo.tk.WeightsArrayPanel for
         examples.
         """
-        raise NYI
+        self.pe_group = self.pe.get_plot_group(self.plot_key,
+                                               self.plotgroup_type)
+        self.pe_group.do_plot_cmd()
+        self.plots = self.pe_group.plots()
     
 
     def load_images(self):
@@ -231,7 +239,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
     def display_labels(self):
         """
         This function should be redefined by subclasses to match any
-        changes made to display_plots().  Depending on the situation,
+        changes made to display__plots().  Depending on the situation,
         it may be useful to make this function a stub, and display the
         labels at the same time the images are displayed.
         """
