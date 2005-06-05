@@ -171,8 +171,8 @@ class WeightsArrayPanel(RegionPlotPanel):
             # Lay out images
             for i,image,canvas in zip(range(len(self.zoomed_images)),
                                       self.zoomed_images,self.canvases):
-                canvas.grid(row=i%self.pe_group.shape[0],
-                            column=i//self.pe_group.shape[1],
+                canvas.grid(row=i//self.pe_group.shape[0],
+                            column=i%self.pe_group.shape[1],
                             padx=6,pady=6)
                 canvas.create_image(image.width()/2+2,image.height()/2+2,image=image)
     
