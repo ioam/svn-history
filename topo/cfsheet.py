@@ -79,6 +79,7 @@ import RandomArray,Numeric,copy
 import topo.sheetview
 import topo.boundingregion
 import topo.bitmap
+from MLab import flipud, rot90
 from topo.utils import flatten
 
 
@@ -110,8 +111,8 @@ class Projection(TopoObject):
     src = Parameter(default=None)
     dest = Parameter(default=None)
     cf_type = Parameter(default=ConnectionField)
-
     strength = Number(default=1.0)
+#    shape = property(get_shape)
 
     def __init__(self,**params):
         super(Projection,self).__init__(**params)
@@ -127,7 +128,6 @@ class Projection(TopoObject):
     def get_shape(self):
         return len(self.__cfs),len(self.__cfs[0])
 
-    shape = property(get_shape)
 
     def get_view(self,sheet_x, sheet_y, pixel_scale = 255, offset = 0):
         """
@@ -141,10 +141,9 @@ class Projection(TopoObject):
 
         NOTE: BOUNDS MUST BE PROPERLY SET. CURRENTLY A STUB IS IN EFFECT.
         """
-        (x,y) = (self.dest).sheet2matrix(sheet_x,sheet_y)
+        (r,c) = (self.dest).sheet2matrix(sheet_x,sheet_y)
         # composite_name = '%s: %0.3f, %0.3f' % (self.name, sheet_x, sheet_y)
-        matrix_data = Numeric.array(Numeric.array(self.cf(y,x).weights))
-        # print 'matrix_data = ', matrix_data
+        matrix_data = Numeric.array(Numeric.transpose(self.cf(r,c).weights))
         new_box = self.dest.bounds  # TURN INTO A PROPER COPY
         assert matrix_data != None, "Projection Matrix is None"
         return topo.sheetview.UnitView((matrix_data,new_box),
@@ -158,7 +157,7 @@ class Projection(TopoObject):
         """
         DEPRICATED:  This function can still be used to dump the weights to
         files, but any reason to use this function means that the necessary
-        replacement has not been written yet.
+        replacement has not yet been written.
         """
         from Numeric import concatenate as join
         import Image
