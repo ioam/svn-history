@@ -70,7 +70,7 @@ class WeightsPanel(RegionPlotPanel):
             self.displayed_x, self.displayed_y = self.x, self.y
         else:
             self.dialog = Pmw.Dialog(self.parent,title = 'Error')
-            message = 'The x/y coordinates are outside the bounding region.\n' \
+            message = 'The x/y coordinates are outside the bounding region.\n'\
                     + '  ' + str(l) + ' < X < ' + str(r) + '\n' \
                     + '  ' + str(b) + ' < Y < ' + str(t)
             w = Tkinter.Label(self.dialog.interior(),
