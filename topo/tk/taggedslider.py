@@ -38,7 +38,7 @@ class TaggedSlider(Frame):
         self.max_value = string_translator(max_value)
         self.fmt = string_format
 
-        self.need_to_refresh_slider = False
+        self.need_to_refresh_slider = True
         self.string_translator = string_translator
 
         # Add the slider
