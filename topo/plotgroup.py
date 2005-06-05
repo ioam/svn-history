@@ -2,15 +2,10 @@
 
 PlotGroups are containers of Plots that store specific information
 about different plot types.  Specifically, a PlotGroup contains the
-do_plot_cmd() function that knows how to generate plots, and the
-filename information.  All information in these classes must be medium
-independent.  That is to say, the bitmaps produced by the groups of
-plots should be as easily displayed in a GUI window, as saved to a
-file.
-
-NOTE: It might be reasonable to move the filename information into the
-file saver classes, and make some kind of Unique Name function here, that
-the file savers would instead use.
+do_plot_cmd() function that knows how to generate plots.  All
+information in these classes must be medium independent.  That is to
+say, the bitmaps produced by the groups of plots should be as easily
+displayed in a GUI window, as saved to a file.
 
 $Id$
 """
@@ -20,6 +15,7 @@ import topo.simulator
 import topo
 import MLab
 from itertools import chain
+from Numeric import transpose, array
 
 # Shape of the plotting display used by PlotGroup.  NOTE: INCOMPLETE,
 # THERE SHOULD BE MORE TYPES OF SHAPES SUCH AS SPECIFYING X ROWS, OR Y
@@ -56,7 +52,6 @@ class PlotGroup(TopoObject):
         self.shape = shape
         self.plot_key = plot_key
         self.bitmaps = []
-        self.filename = ''
 
         if sheet_filter_lam:
             self.sheet_filter_lam = sheet_filter_lam
@@ -92,15 +87,14 @@ class PlotGroup(TopoObject):
                 if max(r.flat) > 0: r = MLab.clip(r,0.0,1.0)
                 if max(g.flat) > 0: g = MLab.clip(g,0.0,1.0)
                 if max(b.flat) > 0: b = MLab.clip(b,0.0,1.0)
-                win = topo.bitmap.RGBMap(r,g,b)
+                win = topo.bitmap.RGBMap(r,
+                                         g,
+                                         b)
                 win.view_info = each.view_info
                 self.bitmaps.append(win)
         return self.bitmaps
     
 
-    def filename(self):
-        raise NYI
-    
 
     def add(self,new_plot):
         """
@@ -157,11 +151,6 @@ class ActivationPlotGroup(PlotGroup):
         super(ActivationPlotGroup,self).__init__(plot_key,sheet_filter_lam,plot_list,
                                                  **params)
 
-    def filename(self):
-        self.filename = 'Activation'
-
-
-
 
 class WeightsPlotGroup(PlotGroup):
     """
@@ -173,9 +162,6 @@ class WeightsPlotGroup(PlotGroup):
                                               **params)
         self.x = float(plot_key[1])
         self.y = float(plot_key[2])
-
-    def filename(self):
-        self.filename = 'Weights_' + str(x) + '_' + str(y)
 
     def do_plot_cmd(self):
         """
@@ -204,16 +190,15 @@ class WeightsArrayPlotGroup(PlotGroup):
                         if self.sheet_filter_lam(s)][0]
 
 
-    def filename(self):
-        self.filename = 'WeightsArray_' + self.weight_name + '_' + str(self.density)
-
-
     def _generate_coords(self):
         """
         Evenly space out the units within the sheet bounding box, so
         that it doesn't matter which corner the measurements start
-        from.  A 4 unit grid needs 5 segments.
+        from.  A 4 unit grid needs 5 segments.  List is in left-to-right,
+        from top-to-bottom.
         """
+        def rev(x): y = x; y.reverse(); return y
+        
         aarect = self._sim_ep.bounds.aarect()
         (l,b,r,t) = aarect.lbrt()
         x = float(r - l) 
@@ -224,9 +209,9 @@ class WeightsArrayPlotGroup(PlotGroup):
         b = b + y_step
         coords = []
         self.shape = (int(x * self.density), int(y * self.density))
-        for j in range(self.shape[1]):
+        for j in rev(range(self.shape[1])):
             for i in range(self.shape[0]):
-                coords.append((x_step*j + l, y_step*i + b))
+                coords.append((x_step*i + l, y_step*j + b))
         return coords
 
 
