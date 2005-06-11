@@ -55,12 +55,16 @@ class TaggedSlider(Frame):
         self.tag_val = tagvariable
         self.tag = Entry(self,textvariable=self.tag_val,width=tag_width)
         self.tag.bind('<KeyRelease>', self.tag_keypress)
+        self.tag.bind('<FocusOut>', self.refresh)
+        
         self.tag.pack(side=LEFT)
 
         self.tag_val.trace_variable('w',self.tag_val_callback)
         #print 'self.tag_val = ' + self.tag_val.get()
         self.set_slider_from_tag()
 
+    def refresh(self,e):
+        self.root.optional_refresh()
 
     def tag_val_callback(self,*args):
         self.set_slider_from_tag()
