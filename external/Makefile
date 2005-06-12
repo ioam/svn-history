@@ -1,11 +1,11 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-all: python jpeg pil numeric pmw dislin  dislinpy
+all: python jpeg pil numeric pmw matplotlib dislin  dislinpy
 
-clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean dislin-clean dislinpy-clean
+clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean matplotlib-clean dislin-clean dislinpy-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall dislin-uninstall dislinpy-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall dislin-uninstall dislinpy-uninstall
 
 ##############################################################
 # Python
@@ -139,6 +139,22 @@ numeric-clean:
 	rm -rf ${NUMERIC} 
 numeric-uninstall:
 	rm -rf numeric $(foreach f, ${NUMERIC_UNINSTALL}, ${PREFIX}/${f})
+##############################################################
+# MatPlotLib
+#
+MATPLOTLIB = matplotlib-0.81
+MATPLOTLIB_UNINSTALL =  ${PYTHON_LIB}/site-packages/matplotlib
+
+matplotlib: ${MATPLOTLIB}.tgz
+	tar xzf ${MATPLOTLIB}.tgz
+	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build
+	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
+	touch matplotlib
+
+matplotlib-clean:
+	rm -rf ${MATPLOTLIB} 
+matplotlib-uninstall:
+	rm -rf ${MATPLOTLIB} $(foreach f, ${MATPLOTLIB_UNINSTALL}, ${PREFIX}/${f})
 ##############################################################
 # PMW
 #
