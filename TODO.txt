@@ -10,6 +10,17 @@ announcing that it has been closed.  At some point, we should consider
 moving to SourceForge's support for feature requests and tasks instead
 of using this text file.
 
+Topic: Plotting
+
+- Add some kind of normalization feature to replace the old
+  normalization defaults.  Existing values are cropped if they go
+  beyond 1, but it is reasonable to add a normalization option for
+  plots where activation needs to be strengthened, or peaks need to be
+  preserved.  This would be best used with an "overload", or "cropped"
+  button in plot panels that would work with the normalization
+  functionality.
+
+
 Topic: Command-line / Shell
 
 - Allow Topographica/Python commands to be passed to the interpreter,
