@@ -6,6 +6,7 @@ import testplotpanel
 import testactivitypanel
 import testweightspanel
 import testweightsarraypanel
+import testmatplotlibtk
 
 suite = unittest.TestSuite()
 
