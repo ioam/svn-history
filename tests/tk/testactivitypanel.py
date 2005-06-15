@@ -8,7 +8,7 @@ from topo.kernelfactory import *
 from topo.simulator import *
 from topo.sheetview import *
 from topo.plotengine import *
-from topo.tk.activitypanel import *
+from topo.tk.basicplotpanel import *
 
 
 class TestActivityPanel(unittest.TestCase):
@@ -89,7 +89,7 @@ class TestActivityPanel(unittest.TestCase):
         Test the creation the widgets
         """
         base.min_print_level = base.WARNING
-        ActivityPanel.print_level = base.WARNING
+        BasicPlotPanel.print_level = base.WARNING
 
         root = Tkinter.Tk()
         root.resizable(1,1)

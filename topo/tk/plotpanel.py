@@ -5,7 +5,7 @@ plots. PlotPanel should deal with the GUI, and as much as possible use
 GUI independent code from outside the topo.tk package.  See Plots,
 PlotGroups, and PlotEngine.
 
-activitypanel.py is the smallest class possible to create a new plot
+baseplotpanel.py is the smallest class possible to create a new plot
 window.  Look at it as an example of creating additional subclasss.
 
 $Id$
@@ -33,22 +33,23 @@ class PlotPanel(Frame,topo.base.TopoObject):
     GUI window.  Must be subclassed.
     """
 
-    def __init__(self,parent=None,pengine=None,console=None,**config):
+    def __init__(self,parent=None,pengine=None,console=None,plot_key='None',
+                 plotgroup_type='BasicPlotGroup',**config):
         assert isinstance(pengine,plotengine.PlotEngine) or pengine == None, \
                'Variable pengine not PlotEngine object.'
 
         Frame.__init__(self,parent,config)
         topo.plot.TopoObject.__init__(self,**config)
 
-        self.plot_key = NYI    
-        self.plotgroup_type = NYI
+        self.plot_key = plot_key
+        self.plotgroup_type = plotgroup_type
 
         # Each plot can have a different minimum size.  If INITIAL_PLOT_WIDTH
         # is set to None, then no initial zooming is performed.  However,
         # MIN_PLOT_WIDTH may cause a zoom if the raw bitmap is still too
         # tiny.
         self.MIN_PLOT_WIDTH = 1
-        self.INITIAL_PLOT_WIDTH = 100
+        self.INITIAL_PLOT_WIDTH = 60
 
         self.pe = pengine
         self.pe_group = None
@@ -56,16 +57,17 @@ class PlotPanel(Frame,topo.base.TopoObject):
         self.bitmaps = []
         self.labels = []
         self.__num_labels = 0
-        self.panel_num = 1
 
         self.console = console
         self.parent = parent
         self.balloon = Pmw.Balloon(parent)
         self.canvases = []
 
+        self.panel_num = self.console.num_activity_windows
+
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
-        self.plot_group = Pmw.Group(self,tag_text='Plot')
+        self.plot_group = Pmw.Group(self,tag_text=str(self.plot_key))
         self.plot_group.pack(side=TOP,expand=YES,fill=BOTH,padx=5,pady=5)
         self.plot_frame = self.plot_group.interior()
 
@@ -292,6 +294,10 @@ class PlotPanel(Frame,topo.base.TopoObject):
         if self.auto_refresh:
             self.console.del_auto_refresh_panel(self)
         Frame.destroy(self)
+
+
+
+
 
 
 ##############################################

@@ -142,14 +142,14 @@ class PlotGroup(TopoObject):
 
 
 
-class ActivationPlotGroup(PlotGroup):
+class BasicPlotGroup(PlotGroup):
     """
     PlotGroup for Activation SheetViews
     """
 
     def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):
-        super(ActivationPlotGroup,self).__init__(plot_key,sheet_filter_lam,plot_list,
-                                                 **params)
+        super(BasicPlotGroup,self).__init__(plot_key,sheet_filter_lam,plot_list,
+                                            **params)
 
 
 class WeightsPlotGroup(PlotGroup):

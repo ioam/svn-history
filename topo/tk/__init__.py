@@ -7,7 +7,7 @@ import topo.tk.propertiesframe
 import topo.tk.taggedslider
 import topo.tk.topoconsole
 import topo.tk.plotpanel
-import topo.tk.activitypanel
+import topo.tk.basicplotpanel
 import topo.tk.weightspanel
 import topo.tk.weightsarraypanel
 import topo.tk.regionplotpanel

@@ -57,7 +57,7 @@ class TestPlotGroup(unittest.TestCase):
         sim = topo.simulator.Simulator()
         pe = topo.plotengine.PlotEngine(sim)
         pg = pe.get_plot_group('Activation')
-        pg = pe.get_plot_group('Activation',group_type='ActivationPlotGroup')
+        pg = pe.get_plot_group('Activation',group_type='BasicPlotGroup')
 
 
 

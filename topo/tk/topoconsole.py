@@ -8,7 +8,7 @@ import Pmw, re, os, sys, code, traceback, __main__
 import tkFileDialog
 from topo.tk.propertiesframe import *
 from topo.tk.plotpanel import *
-from topo.tk.activitypanel import *
+from topo.tk.basicplotpanel import *
 from topo.tk.weightspanel import *
 from topo.tk.weightsarraypanel import *
 from topo.tk.inputparamspanel import *
@@ -315,7 +315,7 @@ class TopoConsole(Frame):
             self.num_activity_windows += 1
             win = GUIToplevel(self)
             win.withdraw()
-            ap = ActivityPanel(console=self,pengine=pe,parent=win)
+            ap = BasicPlotPanel(console=self,pengine=pe,parent=win)
             ap.pack(expand=YES,fill=BOTH)
             ap.refresh_title()
             win.deiconify()

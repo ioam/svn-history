@@ -50,7 +50,7 @@ class ActivationFile(PlotFileSaver):
         self.save_to_disk()
 
     def create_bitmaps(self):
-        pg = self.pe.get_plot_group('Activation','ActivationPlotGroup',
+        pg = self.pe.get_plot_group('Activation','BasicPlotGroup',
                                     self.region)
         self.bitmaps = pg.load_images()
         

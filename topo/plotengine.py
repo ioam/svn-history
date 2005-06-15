@@ -74,7 +74,7 @@ class PlotEngine(TopoObject):
         self.plot_group_dict[name] = group
 
 
-    def get_plot_group(self, name, group_type = 'ActivationPlotGroup',filter=None):
+    def get_plot_group(self, name, group_type = 'BasicPlotGroup',filter=None):
         """
         Return the PlotGroup registered in self.plot_group_dict with
         the provided key 'name'.  If the name does not exist, then
@@ -136,7 +136,7 @@ class PlotEngine(TopoObject):
         return plot_list
 
 
-    def make_sheetview_group(self, name, group_type='ActivationPlotGroup',
+    def make_sheetview_group(self, name, group_type='BasicPlotGroup',
                              filter_lam=None):
         """
         name : The key to look under in the SheetView dictionaries.

@@ -8,7 +8,6 @@ from topo.kernelfactory import *
 from topo.simulator import *
 from topo.sheetview import *
 from topo.plotengine import *
-from topo.tk.activitypanel import *
 
 class TestWeightsArrayPanel(unittest.TestCase):
 
