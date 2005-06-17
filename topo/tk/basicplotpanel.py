@@ -8,7 +8,7 @@ $Id$
 from topo.tk.plotpanel import *
 
 class BasicPlotPanel(PlotPanel):
-    def __init__(self,parent,pengine=None,console=None,**config):
-        PlotPanel.__init__(self,parent,pengine,console=console,plot_key='Activation',**config)
+    def __init__(self,parent,pengine=None,console=None,plot_key='Activation',**config):
+        PlotPanel.__init__(self,parent,pengine,console=console,plot_key=plot_key,**config)
         self.refresh()
 
