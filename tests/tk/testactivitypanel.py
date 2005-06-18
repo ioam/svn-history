@@ -2,6 +2,7 @@ import unittest
 import topo
 import Numeric
 import Tkinter
+import Pmw
 from PIL import Image
 from topo.inputsheet import *
 from topo.kernelfactory import *
