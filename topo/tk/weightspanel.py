@@ -9,7 +9,7 @@ widget.
 $Id$
 """
 import __main__
-import Tkinter
+from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry
 from topo.tk.plotpanel import PlotPanel
 from topo.tk.regionplotpanel import RegionPlotPanel
 

@@ -4,6 +4,10 @@ WeightsArray Panel for TK GUI visualization.
 $Id$
 """
 import __main__
+from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
+     Entry, Canvas
+import Pmw
+import ImageTk
 from math import ceil
 from topo.tk.regionplotpanel import RegionPlotPanel
 from topo.tk.plotpanel import PlotPanel

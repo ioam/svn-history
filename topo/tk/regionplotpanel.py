@@ -8,6 +8,8 @@ requires, the CFSheet class.
 
 $Id$
 """
+from Tkinter import StringVar, Frame, LEFT, RIGHT, TOP, BOTTOM, YES, X
+import Pmw
 import plotpanel
 import topo.cfsheet
 

@@ -20,6 +20,9 @@ import propertiesframe
 import topo.kernelfactory
 import topo.plot
 import plotpanel
+import Pmw
+from Tkinter import IntVar, StringVar, TOP, LEFT, RIGHT, BOTTOM, YES, \
+     Checkbutton, N,S,E,W, X
 from copy import deepcopy
 from topo.inputsheet import InputSheet
 from topo.sheet import BoundingBox, Sheet
