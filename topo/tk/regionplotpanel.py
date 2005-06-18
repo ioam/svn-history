@@ -8,13 +8,13 @@ requires, the CFSheet class.
 
 $Id$
 """
-from topo.tk.plotpanel import *
+import plotpanel
 import topo.cfsheet
 
-class RegionPlotPanel(PlotPanel):
+class RegionPlotPanel(plotpanel.PlotPanel):
 
     def __init__(self,parent,pengine,console=None,**config):
-        PlotPanel.__init__(self,parent,pengine,console,**config)
+        plotpanel.PlotPanel.__init__(self,parent,pengine,console,**config)
 
         self.region = StringVar()
         self.region.set('None')

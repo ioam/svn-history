@@ -5,7 +5,8 @@ CURRENT STATUS: Taken verbatim from LISSOM 5.0; not yet used.
 
 $Id$
 """
-from Tkinter import *
+from Tkinter import Frame, IntVar, Scale, LEFT, RIGHT, TOP, BOTTOM, \
+     YES, BOTH, Entry
 import string
 import inputparamspanel 
 

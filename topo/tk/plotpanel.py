@@ -5,16 +5,17 @@ plots. PlotPanel should deal with the GUI, and as much as possible use
 GUI independent code from outside the topo.tk package.  See Plots,
 PlotGroups, and PlotEngine.
 
-baseplotpanel.py is the smallest class possible to create a new plot
+basicplotpanel.py is the smallest class possible to create a new plot
 window.  Look at it as an example of creating additional subclasss.
 
 $Id$
 """
 import Pmw, re, os, sys
+from Tkinter import Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
+     RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW
 import topo
 import topo.base
 import topo.bitmap
-from topo.tk.propertiesframe import *
 import topo.simulator as simulator
 import topo.plotengine as plotengine
 import PIL

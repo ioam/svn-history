@@ -3,15 +3,14 @@ TopoConsole class file.
 
 $Id$
 """
-from Tkinter import *
+from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, \
+     LEFT, RIGHT, YES, BOTH
 import Pmw, re, os, sys, code, traceback, __main__
 import tkFileDialog
-from topo.tk.propertiesframe import *
-from topo.tk.plotpanel import *
-from topo.tk.basicplotpanel import *
-from topo.tk.weightspanel import *
-from topo.tk.weightsarraypanel import *
-from topo.tk.inputparamspanel import *
+from topo.tk.basicplotpanel import BasicPlotPanel
+from topo.tk.weightspanel import WeightsPanel
+from topo.tk.weightsarraypanel import WeightsArrayPanel
+from topo.tk.inputparamspanel import InputParamsPanel
 import topo.simulator as simulator
 import topo.plotengine
 import topo.gui

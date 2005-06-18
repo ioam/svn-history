@@ -19,10 +19,8 @@ import math
 import propertiesframe
 import topo.kernelfactory
 import topo.plot
+import plotpanel
 from copy import deepcopy
-from Numeric import array
-from plotpanel import *
-from regionplotpanel import *
 from topo.inputsheet import InputSheet
 from topo.sheet import BoundingBox, Sheet
 import topo.sheetview 
@@ -67,7 +65,7 @@ def kernelfactory_names():
     return names
 
 
-class InputParamsPanel(PlotPanel):
+class InputParamsPanel(plotpanel.PlotPanel):
     def __init__(self,parent,pengine,console=None,padding=2,**config):
         super(InputParamsPanel,self).__init__(parent,pengine,console,**config)
         self.plot_group.configure(tag_text='Preview')

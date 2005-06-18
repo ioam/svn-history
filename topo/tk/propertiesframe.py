@@ -1,13 +1,11 @@
 """
 Class file for a properties page.
 
-CURRENT STATUS: Taken verbatim from LISSOM 5.0; not yet used.  
-
 $Id$
 """
 
-from Tkinter import *
-from taggedslider import *
+from Tkinter import Frame, StringVar, Entry, Message, Checkbutton, IntVar
+from taggedslider import TaggedSlider
 import Pmw
 
 class PropertiesFrame(Frame):

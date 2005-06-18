@@ -5,10 +5,10 @@ class to be small.
 
 $Id$
 """
-from topo.tk.plotpanel import *
+import plotpanel
 
-class BasicPlotPanel(PlotPanel):
+class BasicPlotPanel(plotpanel.PlotPanel):
     def __init__(self,parent,pengine=None,console=None,plot_key='Activation',**config):
-        PlotPanel.__init__(self,parent,pengine,console=console,plot_key=plot_key,**config)
+        plotpanel.PlotPanel.__init__(self,parent,pengine,console=console,plot_key=plot_key,**config)
         self.refresh()
 

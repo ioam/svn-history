@@ -10,8 +10,8 @@ $Id$
 """
 import __main__
 import Tkinter
-from topo.tk.plotpanel import *
-from topo.tk.regionplotpanel import *
+from topo.tk.plotpanel import PlotPanel
+from topo.tk.regionplotpanel import RegionPlotPanel
 
 class WeightsPanel(RegionPlotPanel):
     def __init__(self,parent,pengine,console=None,**config):

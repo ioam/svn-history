@@ -5,8 +5,8 @@ $Id$
 """
 import __main__
 from math import ceil
-from topo.tk.regionplotpanel import *
-from topo.tk.plotpanel import *
+from topo.tk.regionplotpanel import RegionPlotPanel
+from topo.tk.plotpanel import PlotPanel
 from itertools import chain
 
 class WeightsArrayPanel(RegionPlotPanel):
