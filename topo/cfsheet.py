@@ -49,7 +49,7 @@ Currently each CFSheet object explicitly computes the activation of
 each ConnectionField in each projection by getting that
 ConnectionField's input matrix and calling the activation function on
 it with the ConnectionField's weights.  It would be more modular to
-add a .simulation(input_activation) method to the Projection class
+add a .stimulation(input_activation) method to the Projection class
 interface that would by default do what CFSheet does now.  Then
 CFSheet would, on input, just call the .stimulation() methods on the
 appropriate projections and add the results to its .temp_activation
@@ -64,6 +64,16 @@ many projections, and then passes them through a transfer function.
 This structure has an elegant kind of parsimony, where the Sheet is
 the large-scale analog of a neuron and the projection is the
 large-scale analog of the individual connection.
+
+jbednar050621: The approach Jeff describes above sounds very
+reasonable, except that instead of just adding the results to the
+temp_activation matrix, each Projection also needs to store the
+intermediate results, so that they can be retrieved when processing
+subsequent input events (which will likely change only some of the
+inputs, not all, e.g. only lateral weights, not afferent).  For
+generality, the CFSheet should also not simply sum, but should sum by
+default (and could e.g. multiply or gate one by another, though it is
+not clear to me right now how that could be done.)
 
 $Id$
 """
