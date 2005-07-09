@@ -44,6 +44,7 @@ class LISSOM(topo.cfsheet.CFSheet):
 
         # On a new afferent input, clear the activation
         if dest_port == 'afferent':
+            print "clear"
             self.activation *= 0.0
         super(LISSOM,self).input_event(src,src_port,dest_port,data)
 
@@ -51,31 +52,32 @@ class LISSOM(topo.cfsheet.CFSheet):
 
     def learn(self):
 
-        rows,cols = self.activation.shape
-        for proj in chain(*self.projections.values()):
-            if proj.input_buffer:
-                for r in range(rows):
-                    for c in range(cols):
-                        cf = proj.cf(r,c)
-                        cf.weights += (self.learning_rate * self.activation[r,c]
-                                       * cf.get_input_matrix(proj.input_buffer))
-
-
-        
-        # normalize weights
-        lateral = self.lateral_projections()
-        afferent = self.afferent_projections()
-                                             
-        for r in range(rows):
-            for c in range(cols):
-                for group in (lateral,afferent):
-                    # Uncomment for normalization over whole group (lateral, afferent)
-                    # k = sum([sum(p.cf(r,c).weights.flat)
-                    #          for p in group])
-                    for p in group:
-                        # Uncomment for normalization per projection
-                        k = sum(p.cf(r,c).weights.flat)
-                        p.cf(r,c).weights /= k
+        pass
+#        rows,cols = self.activation.shape
+#        for proj in chain(*self.projections.values()):
+#            if proj.input_buffer:
+#                for r in range(rows):
+#                    for c in range(cols):
+#                        cf = proj.cf(r,c)
+#                        cf.weights += (self.learning_rate * self.activation[r,c]
+#                                       * cf.get_input_matrix(proj.input_buffer))
+#
+#
+#        
+#        # normalize weights
+#        lateral = self.lateral_projections()
+#        afferent = self.afferent_projections()
+#                                             
+#        for r in range(rows):
+#            for c in range(cols):
+#                for group in (lateral,afferent):
+#                    # Uncomment for normalization over whole group (lateral, afferent)
+#                    # k = sum([sum(p.cf(r,c).weights.flat)
+#                    #          for p in group])
+#                    for p in group:
+#                        # Uncomment for normalization per projection
+#                        k = sum(p.cf(r,c).weights.flat)
+#                        p.cf(r,c).weights /= k
 
     def lateral_projections(self):
         return [p for p in chain(*self.projections.values()) if p.src is self]
@@ -107,7 +109,7 @@ rf_radius_scale=6.0/rf_radius
 #retina_area_scale=(BaseRN*area_scale/24.0*rf_radius_scale)*(BaseRN*area_scale/24.0*rf_radius_scale)
 #inputs_pereye=max(retina_area_scale,1)
 #uncorrelation=0.0 
-xsigma=7.0/rf_radius_scale
+xsigma=6.0/rf_radius_scale
 ysigma=1.5/rf_radius_scale
 
 #scale_input=1.0
@@ -152,13 +154,9 @@ ImageSaver.file_format='png'
 ImageSaver.time_format='%0.4d'
 
 # Connection parameters
-# Not yet clear why the various 0.4 and 0.5 constants are needed to get the same sizes;
-# presumably it's due to rounding differences
-afferent_weight_bounds   = BoundingBox(points=((-(rf_radius+0.5)/RN,-(rf_radius+0.5)/RN),((rf_radius+0.5)/RN,(rf_radius+0.5)/RN)))
-excitatory_weight_bounds = BoundingBox(points=((-(exc_rad+0.5)/BaseN,-(exc_rad+0.5)/BaseN),((exc_rad+0.5)/BaseN,(exc_rad+0.5)/BaseN)))
-inhibitory_weight_bounds = BoundingBox(points=((-(inh_rad+0.4)/BaseN,-(inh_rad+0.4)/BaseN),((inh_rad+0.4)/BaseN,(inh_rad+0.4)/BaseN)))
-
-
+afferent_weight_bounds   = BoundingBox(points=((-rf_radius/RN,-rf_radius/RN),(rf_radius/RN,rf_radius/RN)))
+excitatory_weight_bounds = BoundingBox(points=((-exc_rad/BaseN,-exc_rad/BaseN),(exc_rad/BaseN,exc_rad/BaseN)))
+inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(inh_rad/BaseN,inh_rad/BaseN)))
 ###########################################
 # build simulation
 
@@ -173,14 +171,15 @@ save  = ImageSaver(name='LISSOM')
 
 s.connect(retina,V1, delay = 0.5/tsettle,
           projection_params = dict(strength = 1.0, name='Afferent0',
-                                   weights_bounds = afferent_weight_bounds))
+                                   weights_bounds = afferent_weight_bounds, normalize = 1))
 
-s.connect(V1,V1, delay = 1.0/tsettle,
+s.connect(V1,V1, delay = 1.0/tsettle, dest_port="exc",
           projection_params = dict(strength = gammaexc, name='LateralExcitatory',
-                                   weights_bounds = excitatory_weight_bounds))
-s.connect(V1,V1, delay = 1.0/tsettle,
+                                   weights_bounds = excitatory_weight_bounds, normalize = 1))
+
+s.connect(V1,V1, delay = 1.0/tsettle, dest_port="inh",
           projection_params = dict(strength = -gammainh, name='LateralInhibitory',
-                                   weights_bounds = inhibitory_weight_bounds))
+                                   weights_bounds = inhibitory_weight_bounds, normalize = 1))
         
 
 #cfsheet.CF.print_level = base.VERBOSE
@@ -191,13 +190,21 @@ s.connect(V1,V1, delay = 1.0/tsettle,
 #s.connect(retina,save,dest_port='retina',delay=2)
 #s.connect(V1,save,dest_port='V1',delay=1)
 
-#s.run(20)
+#s.run(100)
 
 #V1.projections['Retina'][0].plot_cfs()
 
-# import profile,pstats
+#import hotshot,hotshot.stats
+#prof = hotshot.Profile("abc")
+#prof.runctx('s.run(50)',globals(),locals())
+#prof.close()
 #
-# p = profile.Profile()
-# p.runctx('s.run(10)',locals(),globals())
+#p = hotshot.stats.load("abc")
+#p.strip_dirs().sort_stats('time').print_stats()
 
-                
+
+
+#import profile,pstats
+#profile.runctx('s.run(3)',globals(),locals(),"abc")
+#p = pstats.Stats('abc')
+#p.strip_dirs().sort_stats(-1).print_stats()

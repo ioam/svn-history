@@ -54,8 +54,8 @@ def mdot(m1,m2):
     arrays.  Works in cases where dot(a.flat,b.flat) fails, e.g, with
     matrix slices or submatrices.
     """
-    return msum(m1*m2)
-
+    a = m1*m2
+    return sum(a.flat)
 
 def PLTF(x):
     """

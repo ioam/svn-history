@@ -188,8 +188,36 @@ def activation_submatrix(slice_bounds,activation,activation_bounds,density):
     r1,r2,c1,c2 = input_slice(slice_bounds,activation_bounds,density)
     return activation[r1:r2,c1:c2]
 
-
 def input_slice(slice_bounds, input_bounds, input_density):
+    """
+    Gets the parameters for slicing an activation matrix given the
+    slice bounds, activation bounds, and density of the activation
+    matrix.
+
+    returns a,b,c,d -- such that an activation matrix M
+    can be sliced like this: M[a:b,c:d]
+    """
+
+    left,bottom,right,top = slice_bounds.aarect().lbrt()
+    rows,cols = bounds2shape(slice_bounds,input_density)
+    toprow,leftcol = sheet2matrix(left,top,input_bounds,input_density)
+
+    cr,cc = sheet2matrix((left+right)/2,(top+bottom)/2,input_bounds,input_density)
+    toprow = cr - rows/2
+    leftcol = cc - cols/2
+
+    maxrow,maxcol = sheet2matrix(input_bounds.aarect().right(),input_bounds.aarect().bottom(),input_bounds,input_density)
+
+    rstart = max(0,toprow)
+    rbound = min(maxrow+1,cr+rows/2+1)
+    cstart = max(0,leftcol)
+    cbound = min(maxcol+1,cc+cols/2+1)
+
+    return rstart,rbound,cstart,cbound
+
+
+
+def input_slice(slice_bounds, input_bounds, input_density, x, y):
     """
     Gets the parameters for slicing an activation matrix given the
     slice bounds, activation bounds, and density of the activation
@@ -198,22 +226,24 @@ def input_slice(slice_bounds, input_bounds, input_density):
     returns a,b,c,d -- such that an activation matrix M
     can be sliced like this: M[a:b,c:d]    
     """
-    left,bottom,right,top = slice_bounds.aarect().lbrt()
     rows,cols = bounds2shape(slice_bounds,input_density)
 
-    toprow,leftcol = sheet2matrix(left,top,input_bounds,input_density)
-    #bottomrow,rightcol = sheet2matrix(right,bottom,input_bounds,input_density)
+    cr,cc = sheet2matrix(x, y, input_bounds, input_density)
+
+    toprow = cr - rows/2
+    leftcol = cc - cols/2
 
     maxrow,maxcol = sheet2matrix(input_bounds.aarect().right(),
                                  input_bounds.aarect().bottom(),
                                  input_bounds,input_density)
 
     rstart = max(0,toprow)
-    rbound = min(maxrow+1,toprow+rows)
+    rbound = min(maxrow+1,cr+rows/2+1)
     cstart = max(0,leftcol)
-    cbound = min(maxcol+1,leftcol+cols)
+    cbound = min(maxcol+1,cc+cols/2+1)
 
     return rstart,rbound,cstart,cbound
+
 
 def bounds2shape(bounds,density):
     """
@@ -226,6 +256,7 @@ def bounds2shape(bounds,density):
     linear_density = sqrt(density)
     rows = int(height*linear_density)
     cols = int(width*linear_density)
+
     if rows == 0: rows = 1
     if cols == 0: cols = 1
     return rows,cols
@@ -352,14 +383,14 @@ class Sheet(EventProcessor):
         """
         return -self.bounds.aarect().left(),-self.bounds.aarect().bottom()
 
-    def input_slice(self,slice_bounds):
+    def input_slice(self,slice_bounds,x,y):
         """
         Gets the parameters for slicing the sheet's activation matrix.
 
         returns a,b,c,d -- such that an activaiton matrix M
         originating from this sheet can be sliced like this M[a:b,c:d]
         """
-        return input_slice(slice_bounds,self.bounds,self.density)
+        return input_slice(slice_bounds,self.bounds,self.density,x,y)
 
     def activation_submatrix(self,slice_bounds,activation=None):
         """
@@ -379,7 +410,7 @@ class Sheet(EventProcessor):
         the activation matrix of the sheet.
         """
         rows,cols = self.activation.shape
-        coords = [self.matrix2sheet(r,0) for r in range(rows,0,-1)]
+        coords = [self.matrix2sheet(r,0) for r in range(rows-1,-1,-1)]
         return [y for (x,y) in coords]
 
     def sheet_cols(self):
