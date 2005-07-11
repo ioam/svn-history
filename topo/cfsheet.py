@@ -49,7 +49,7 @@ Currently each CFSheet object explicitly computes the activation of
 each ConnectionField in each projection by getting that
 ConnectionField's input matrix and calling the activation function on
 it with the ConnectionField's weights.  It would be more modular to
-add a .simulation(input_activation) method to the Projection class
+add a .stimulation(input_activation) method to the Projection class
 interface that would by default do what CFSheet does now.  Then
 CFSheet would, on input, just call the .stimulation() methods on the
 appropriate projections and add the results to its .temp_activation
@@ -64,6 +64,16 @@ many projections, and then passes them through a transfer function.
 This structure has an elegant kind of parsimony, where the Sheet is
 the large-scale analog of a neuron and the projection is the
 large-scale analog of the individual connection.
+
+jbednar050621: The approach Jeff describes above sounds very
+reasonable, except that instead of just adding the results to the
+temp_activation matrix, each Projection also needs to store the
+intermediate results, so that they can be retrieved when processing
+subsequent input events (which will likely change only some of the
+inputs, not all, e.g. only lateral weights, not afferent).  For
+generality, the CFSheet should also not simply sum, but should sum by
+default (and could e.g. multiply or gate one by another, though it is
+not clear to me right now how that could be done.)
 
 -- DONE: yfsit 2005/08 --
 
@@ -155,6 +165,7 @@ class Projection(TopoObject):
     dest = Parameter(default=None)
     cf_type = Parameter(default=ConnectionField)
     strength = Number(default=1.0)
+#    shape = property(get_shape)
     temp_activation = []
 
     def __init__(self,**params):
@@ -173,7 +184,7 @@ class Projection(TopoObject):
         return len(self.cfs),len(self.cfs[0])
 
 
-    def get_view(self,sheet_x, sheet_y, pixel_scale = 1, offset = 0):
+    def get_view(self,sheet_x, sheet_y, pixel_scale = 255, offset = 0):
         """
         Return a single connection field UnitView, for the unit at
         sheet_x, sheet_y.  sheet_x and sheet_y are assumed to be in
@@ -187,7 +198,7 @@ class Projection(TopoObject):
         """
         (r,c) = (self.dest).sheet2matrix(sheet_x,sheet_y)
         # composite_name = '%s: %0.3f, %0.3f' % (self.name, sheet_x, sheet_y)
-        matrix_data = Numeric.array(Numeric.transpose(self.cf(r,c).weights))*pixel_scale
+        matrix_data = Numeric.array(Numeric.transpose(self.cf(r,c).weights))
         new_box = self.dest.bounds  # TURN INTO A PROPER COPY
         assert matrix_data != None, "Projection Matrix is None"
         return topo.sheetview.UnitView((matrix_data,new_box),
@@ -409,7 +420,7 @@ class CFSheet(Sheet):
         in this CFSheet.  Can return multiple UnitView objects.
         """
         from itertools import chain
-        views = [p.get_view(x,y,100) for p in chain(*self.projections.values())]
+        views = [p.get_view(x,y) for p in chain(*self.projections.values())]
         self.debug('views = '+str(views)+'type = '+str(type(views[0]))+str(views[0].view()))
         key = ('Weights',x,y)
         self.add_sheet_view(key,views)      # Will be adding a list
