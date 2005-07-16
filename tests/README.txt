@@ -2,6 +2,18 @@ Topographica Unit Tests  Package
 
 This package contains unit test modules for topographica.  To run the
 tests use the 'runtests' script in the main topographica directory.
+For example:
+
+./topographica runtests
+
+To run the tests within a single file (such as testsheet.py) use:
+
+./topographica runtests testsheet
+
+To run all the tests within a subdirectory (such as tk) use:
+
+./topographica runtests tk
+
 
 To add new tests modules.
 
