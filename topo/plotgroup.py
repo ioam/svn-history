@@ -28,9 +28,6 @@ from Numeric import transpose, array
 # or somesuch.
 FLAT = 'FLAT'
 
-NYI = "Abstract method not implemented."
-
-
 class PlotGroup(TopoObject):
     """
     Container that has one or more Plots and also knows how to arrange
@@ -226,3 +223,31 @@ class WeightsArrayPlotGroup(PlotGroup):
 
         for (x,y) in coords: self._sim_ep.release_unit_view(x,y)
         
+
+class PreferenceMapPlotGroup(PlotGroup):
+    """
+    PlotGroup for Strength/Color/Confidence plots such as Preference Maps
+
+    CURRENTLY STUB CODE COPIED FROM WEIGHTSPLOTGROUP
+    """
+
+    def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):
+        super(PreferenceMapPlotGroup,self).__init__(plot_key,sheet_filter_lam,
+                                                    plot_list,**params)
+
+    def do_plot_cmd(self):
+        """
+        Currently a pass.  The plot generation of a CSC plot should
+        not be forced at the same time that it is displayed.
+        """
+        pass
+    
+        # coords = self._generate_coords()
+        # 
+        # full_unitview_list = [self._sim_ep.unit_view(x,y) for (x,y) in coords]
+        # filtered_list = [view for view in chain(*full_unitview_list)
+        #                  if view.projection.name == self.weight_name]
+        # 
+        # self._sim_ep.add_sheet_view(self.plot_key,filtered_list)
+        # 
+        # for (x,y) in coords: self._sim_ep.release_unit_view(x,y)
