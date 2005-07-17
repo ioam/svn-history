@@ -231,6 +231,19 @@ class Plot(TopoObject):
 
 
 
+class SCCPlot(Plot):
+    """
+    Special type of HSV Plot.
+
+    Color      -> Hue
+    Strength   -> Saturation
+    Confidence -> Value
+    """
+    def __init__(self, (channel_1, channel_2, channel_3),
+                 sheet=None, **params):
+        super(SCCPlot,self).__init__((channel_1, channel_2, channel_3),
+                                     HSV, sheet=sheet, **params)
+
 
 
 
