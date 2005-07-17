@@ -151,12 +151,12 @@ class PlotEngine(TopoObject):
             filter_lam = lambda sheet: True            
         dynamic_list = lambda : self.lambda_flat_dynamic_list(name,filter_lam)
 
-        # try:
-        exec 'ptr = ' + group_type in globals()
-        # except Exception, e:
-        #     self.warning('Exception:', e)
-        #     self.warning('Invalid PlotGroup subclass: ', group_type)
-        #     return PlotGroup(dynamic_list)
+        try:
+            exec 'ptr = ' + group_type in globals()
+        except Exception, e:
+            self.warning('Exception:', e)
+            self.warning('Invalid PlotGroup subclass: ', group_type)
+            return PlotGroup(dynamic_list)
         new_group = ptr(name,filter_lam,dynamic_list)
         self.debug('Type of new_group is', type(new_group))
         return new_group
