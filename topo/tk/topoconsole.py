@@ -11,6 +11,7 @@ from topo.tk.basicplotpanel import BasicPlotPanel
 from topo.tk.weightspanel import WeightsPanel
 from topo.tk.weightsarraypanel import WeightsArrayPanel
 from topo.tk.inputparamspanel import InputParamsPanel
+from topo.tk.preferencemappanel import PreferenceMapPanel
 import topo.simulator as simulator
 import topo.plotengine
 import topo.gui
@@ -117,9 +118,9 @@ class TopoConsole(Frame):
                              'New orientation, ocular dominance, or similar map plot',
                              label="Preference Map",
                              ## Gray out menu item ###########
-                             foreground = 'Gray',            #
-                             activeforeground = 'Gray',      #
-                             activebackground = 'Light Gray',#
+                             # foreground = 'Gray',            #
+                             # activeforeground = 'Gray',      #
+                             # activebackground = 'Light Gray',#
                              #################################
                              command=self.new_preferencemap_window)
         self.menubar.addmenuitem('Plots', 'command',
@@ -324,13 +325,19 @@ class TopoConsole(Frame):
             
 
     def new_preferencemap_window(self):
-        self.messageBar.message('state', 'Not yet implemented')
-        # self.num_orientation_windows += 1
-        # win = GUIToplevel(self)
-        # win.withdraw()
-        # win.title("Preference Map %d" % self.num_orientation_windows)
-        # PreferenceMapPanel(console=self,parent=win).pack(expand=YES,fill=BOTH)
-        # win.deiconify()
+        pe = self.active_plotengine()
+        if pe:
+            self.num_orientation_windows += 1
+            win = GUIToplevel(self)
+            win.withdraw()
+            win.title("Preference Map %d" % self.num_orientation_windows)
+            ap = PreferenceMapPanel(console=self,pengine=pe,parent=win)
+            ap.pack(expand=YES,fill=BOTH)
+            ap.refresh_title()
+            win.deiconify()
+            self.messageBar.message('state', 'OK')
+        else:
+            self.messageBar.message('state', 'No active Simulator object.')
 
 
     def new_weights_window(self):
