@@ -105,16 +105,23 @@ class ConnectionField(TopoObject):
     y = Parameter(default=0)
     weights = []
     
-    def __init__(self,input_sheet,weight_bounds,**params):
+    def __init__(self,input_sheet,weight_bounds,weights_factory,**params):
         super(ConnectionField,self).__init__(**params)
 
         self.input_sheet = input_sheet
         self.bounds = weight_bounds
-        self.slice = self.input_sheet.input_slice(self.bounds,self.x,self.y)
-        r1,r2,c1,c2 = self.slice
 
-        # Assuming initially uniform weight distribution
-        self.weights = RandomArray.uniform(0,1,(r2-r1,c2-c1))
+        if isinstance(weights_factory, UniformRandomFactory):
+            self.slice = self.input_sheet.input_slice(self.bounds,self.x,self.y)
+            r1,r2,c1,c2 = self.slice
+            self.weights = RandomArray.uniform(0,1,(r2-r1,c2-c1))
+        else:
+            self.bounds = copy.deepcopy(weight_bounds)
+            self.bounds.translate(self.x,self.y)
+            self.bounds = Intersection(self.bounds,self.input_sheet.bounds)
+            self.weights = weights_factory(x=self.x,y=self.y,bounds=self.bounds,density=self.input_sheet.density)
+            self.slice = self.input_sheet.input_slice2(self.bounds)
+
         self.verbose("activation matrix shape: ",self.weights.shape)
         if self.normalize:
             self.normalize_wts(self.weights, self.normalize)
@@ -131,9 +138,9 @@ class ConnectionField(TopoObject):
         wts /= sum
 
         # testing only: same weight within each cf	
-        for i in xrange(len(wts)):
-            for j in xrange(len(wts[i])):
-                wts[i][j] = 1.0/len(wts)/len(wts[i])
+        #for i in xrange(len(wts)):
+        #    for j in xrange(len(wts[i])):
+        #        wts[i][j] = 1.0/len(wts)/len(wts[i])
 
 
     def contains(self,x,y):
@@ -244,6 +251,7 @@ class Projection(TopoObject):
 class KernelProjection(Projection):
 
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+    weights_factory = Parameter(default=UniformRandomFactory())
     normalize = Parameter(default=0)
     dest_port = Parameter(default="")
 
@@ -255,7 +263,7 @@ class KernelProjection(Projection):
         for y in self.dest.sheet_rows()[::-1]:
             row = []
             for x in self.dest.sheet_cols():
-                row.append(self.cf_type(input_sheet=self.src,weight_bounds=self.weights_bounds,normalize=self.normalize,x=x,y=y))
+                row.append(self.cf_type(input_sheet=self.src,weight_bounds=self.weights_bounds,normalize=self.normalize,weights_factory=self.weights_factory,x=x,y=y))
 
             cfs.append(row)
         self.set_cfs(cfs)
