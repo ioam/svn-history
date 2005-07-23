@@ -18,13 +18,8 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
 
         self.panel_num = self.console.num_orientation_windows
         
-        self.mapcmds = dict((('OrientationPreference',      'call measure_or_pref '),
-                             ('OcularPreference',           'call measure_or_pref'),
-                             ('DirectionPreference',        'call measure_dir_pref'),
-                             ('PositionPreference',         'call measure_cog'),
-                             ('SpatialFrequencyPreference', 'call measure_or_pref'),
-                             ('SpatialPhasePreference',     'call measure_or_pref'),
-                             ('SpeedPreference',            'call measure_dir_pref')))
+        self.mapcmds = dict((('OrientationPreference',      'pass'),
+                             ('OcularPreference',           'pass')))
 
         # Name of the plotgroup to plot
         self.mapname = StringVar()
@@ -40,12 +35,7 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
         Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
                      entry_textvariable=self.mapname,
                      scrolledlist_items=('OrientationPreference',
-                                         'OcularPreference',
-                                         'DirectionPreference',
-                                         'PositionPreference',
-                                         'SpatialFrequencyPreference',
-#                                        'SpatialPhasePreference',
-                                         'SpeedPreference')
+                                         'OcularPreference')
                      ).pack(side=LEFT,expand=YES,fill=X)
 
         # Ideally, whenever self.mapname changes this selection would be 
@@ -53,10 +43,8 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
         # don't know how to set up such a callback. (jbednar@cs)
         Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
                      entry_textvariable=self.cmdname,
-                     scrolledlist_items=('call measure_or_pref',
-                                         'call measure_od_pref',
-                                         'call measure_dir_pref',
-                                         'call measure_cog')
+                     scrolledlist_items=('pass',
+                                         'pass')
                      ).pack(side=LEFT,expand=YES,fill=X)
 
         self.refresh()
@@ -95,11 +83,9 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
             # self.pe_group.do_plot_cmd()
 
             all_sheets = self.console.active_simulator().get_event_processors()
-            print 'all_sheets', all_sheets
             plotlist = [SCCPlot(('Activation','Activation','Activation'),
                                 sheet=each)
                         for each in all_sheets]
-            print plotlist
             self.pe_group = PreferenceMapPlotGroup('None',None,plotlist)
             self.plots = self.pe_group.plots()
 
