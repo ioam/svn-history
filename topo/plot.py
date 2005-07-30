@@ -71,7 +71,12 @@ class Plot(TopoObject):
         since it is assumed the GUI display will be in RGB.
 
         sheet gives the object that the three channels will request
-        SheetViews from if a String has been passed in.
+        SheetViews from if a String has been passed in.  Valid options
+        are: None, Single Sheet, 3-tuple of Sheets or None.
+
+        TODO: TRIPLE IS CURRENTLY NOT IMPLEMENTED.  THIS REQUIRES
+        THAT ALL CHANNELS DERIVE FROM THE SAME SHEET.  SHOULD EXTEND
+        self.source SO THAT DIFFERENT SHEET INPUTS ARE POSSIBLE (7/2005)
 
         If each of the channels are preconstructed SheetViews, there
         is no reason to pass in the sheet, and therefore it can be
@@ -82,6 +87,7 @@ class Plot(TopoObject):
         WHAT ABOUT BOUNDINGREGIONS?
         """
         super(Plot,self).__init__(**params)
+
         self.source = sheet
         self.channels = (channel_1, channel_2, channel_3)
         self.plot_type = plot_type
