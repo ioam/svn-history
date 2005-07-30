@@ -54,6 +54,7 @@ from base import TopoObject
 from utils import flatten
 from plot import *
 from plotgroup import *
+from bitmap import WHITE_BACKGROUND, BLACK_BACKGROUND
 from sheet import Sheet
 
 
@@ -210,16 +211,12 @@ class PlotEngine(TopoObject):
         Create and return a single Plot object matching the passed in
         PlotTemplate (parameter 'pt'), using the Sheet (parameter 'sheet').
         """
-
-        # This is not valid since we no longer have a name variable
-        # view_list = [(each, each.sheet_view(name)) for each in sheet_list
-        #              if each is not None]
-
         strength = pt.channels.get('Strength',None)
         hue = pt.channels.get('Hue',None)
         confidence = pt.channels.get('Confidence',None)
-        return Plot((strength,hue,confidence),SHC,sheet,name=k)
-
+        p = Plot((strength,hue,confidence),SHC,sheet,name=k)
+        p.background = pt.background
+        return p
 
     def make_plot_group(self, name='Activation', group_type='BasicPlotGroup',
                              filter_lam=sheet_filter):
