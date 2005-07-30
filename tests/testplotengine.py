@@ -48,14 +48,23 @@ class TestPlotEngine(unittest.TestCase):
         activity_group = self.engine.get_plot_group('Activity')
 
 
-    def test_make_sheetview_group(self):
-        activity_group = self.engine.make_sheetview_group('Activity',filter_lam=sheet_filter)
-        activity_group2 = self.engine.make_sheetview_group('Activity',filter_lam=sheet_filter)
+    def test_make_plot_group(self):
+        activity_group = self.engine.make_plot_group('Activity',filter_lam=sheet_filter)
+        activity_group2 = self.engine.make_plot_group('Activity',filter_lam=sheet_filter)
 
 
     def test_sheet_filter(self):
         assert(sheet_filter(self.sheetR))
 
+    def test_dict_plot(self):
+        hue_plot_template = {'name' : 'HuePreference',
+                             'HuePref' : {'Hue' : 'Activation'},
+                             'HuePrefAndSel' : {'Strength' : 'Activation',  
+                                                'Hue'      : 'Activation'},
+                             'HueSelect' : {'Strength'   : 'Activation'}}
+
+        self.engine.make_plot_group(group_type=hue_plot_template)
+                                    
 
     def test_plotengine(self):
         """

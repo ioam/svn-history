@@ -48,10 +48,10 @@ class TestPlotGroup(unittest.TestCase):
             map = RGBMap(r,g,b)
             if SHOW_PLOTS: map.show()
 
-    def test_make_sheetview_group(self):
+    def test_make_plot_group(self):
         sim = topo.simulator.Simulator()
         pe = topo.plotengine.PlotEngine(sim)
-        pg = pe.make_sheetview_group('Activation')
+        pg = pe.make_plot_group('Activation')
 
     def test_get_plot_group(self):
         sim = topo.simulator.Simulator()
@@ -59,6 +59,20 @@ class TestPlotGroup(unittest.TestCase):
         pg = pe.get_plot_group('Activation')
         pg = pe.get_plot_group('Activation',group_type='BasicPlotGroup')
 
+
+    def test_keyedlist(self):
+        kl = KeyedList()
+        kl = KeyedList(((2,3),(4,5)))
+        self.assertEqual(kl[2],3)
+        self.assertEqual(kl[4],5)
+        kl.append((6,7))
+        self.assertEqual(kl[6],7)
+        kl[2] = 8
+        self.assertEqual(kl[2],8)
+        self.assertEqual(kl.has_key(5),False)
+        self.assertTrue(kl.has_key(6))
+        self.assertEqual(len(kl),3)
+        
 
 
 suite = unittest.TestSuite()
