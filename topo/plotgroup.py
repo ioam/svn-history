@@ -28,6 +28,108 @@ from Numeric import transpose, array
 # or somesuch.
 FLAT = 'FLAT'
 
+class KeyedList(list):
+    """
+    
+    Extends the built-in type list to superficially behave like a
+    dictionary with [] keyed access.  Internal representation is a
+    list of (key,value) pairs.
+
+    Redefined functions:
+        __getitem__ ([,])
+        __setitem__ ([,])
+        append
+    New functions modeled from dictionaries:
+        get
+        set
+        has_key
+    """
+
+    def __getitem__(self,k):
+        """ The bracket [] accessor. """
+        return self.get(k)
+
+    def __setitem__(self,k,v):
+        """
+        The bracket [] mutator.
+        Will overwrite value if key already exists, otherwise append.
+        """
+        return self.set(k,v)
+
+    def append(self, (template_name, template_obj)):
+        """
+        Append the new PlotTemplate object to the end of the existing
+        internal plot template list.
+
+        Takes in a 2-tuple, (Name Key of new PlotTemplate, PlotTemplate Object)
+
+        Does not have to be redefined in this subclass, but by forcing
+        the tuple in the function parameters, it may catch an
+        erroneous assignment.
+        """
+        super(KeyedList,self).append((template_name,template_obj))
+
+    def get(self, template_name):
+        """
+        Get the PlotTemplate with the key <template_name>.
+        Return None if it does not exist.
+        """
+        for (name,template_obj) in self:
+            if name == template_name:
+                return template_obj
+        return None
+
+    def set(self, template_name, template_obj):
+        """
+        If the template_name already exists in the list, change the
+        entry, otherwise append the new template_name, template_obj to
+        the end of the PlotTemplate list.
+        """
+        for (k,v) in self:
+            if k == template_name:
+                i = self.index((k,v))
+                self.pop(i)
+                self.insert(i,(template_name, template_obj))
+                return True
+        self.append(self, (template_name, template_obj))
+        return True
+
+    def has_key(self,template_name):
+        """
+        Return True if template_name is a key in the ordered list.
+        Return False otherwise.
+        """
+        for (name,template_obj) in self:
+            if name == template_name:
+                return True
+        return False
+
+
+class PlotGroupTemplate(TopoObject):
+    """
+    Container class for a PlotGroup object definition.  This is
+    separate from a PlotGroup object since it defines how to create a
+    PlotGroup object and should contain a series of PlotTemplates.
+    The PlotEngine will create the requested plot group type given the
+    template definition.  The templates are used so that standard plot
+    types can be redefined at the users convenience.
+
+    The plot_templates member variable can and should be accessed
+    directly by outside code.  It is KeyedList (defined in this file)
+    so it can be treated like a dictionary using the [] notation, but
+    it will preserve ordering.
+    """
+
+    def __init__(self, plot_templates=None, **params):
+        """
+        plot_templates is of the form:
+            ( (name_1, PlotTemplate_1), ... , (name_i, PlotTemplate_i) )
+        """
+        super(PlotGroupTemplate,self).__init__(**params)
+        self.plot_templates = KeyedList(plot_templates)
+
+        
+
 class PlotGroup(TopoObject):
     """
     Container that has one or more Plots and also knows how to arrange
@@ -147,6 +249,17 @@ class BasicPlotGroup(PlotGroup):
     def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):
         super(BasicPlotGroup,self).__init__(plot_key,sheet_filter_lam,plot_list,
                                             **params)
+
+
+class DictPlotGroup(PlotGroup):
+    """
+    PlotGroup for Activation SheetViews
+    """
+
+    def __init__(self,plot_key,sheet_filter_lam,plot_list,definition,**params):
+        self.definition = definition
+        super(DictPlotGroup,self).__init__(plot_key,sheet_filter_lam,plot_list,
+                                       **params)
 
 
 class WeightsPlotGroup(PlotGroup):
