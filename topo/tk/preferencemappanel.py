@@ -9,8 +9,9 @@ from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas
 import plotpanel
 import Pmw
-from topo.plot import SCCPlot, PlotTemplate
+from topo.plot import PlotTemplate
 from topo.plotgroup import PreferenceMapPlotGroup, PlotGroupTemplate
+from topo.bitmap import WHITE_BACKGROUND, BLACK_BACKGROUND
      
 class PreferenceMapPanel(plotpanel.PlotPanel):
     def __init__(self,parent,pengine=None,console=None,plot_key='Activation',**config):
@@ -72,22 +73,14 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
         the Plot objects.
         """
         if self.console.active_simulator().get_event_processors():
-            self.generate_plot_key()
-
-            pgt = PlotGroupTemplate( 
-                [('ActivationPref', PlotTemplate({'Strength'   : 'Activation',
-                                                  'Hue'        : 'Activation',
-                                                  'Confidence' : 'Activation'}))])
-
+            pgt = PlotGroupTemplate([('ActivationPref',
+                  PlotTemplate({'background' : WHITE_BACKGROUND,
+                                'Strength'   : 'Activation',
+                                'Hue'        : 'Activation',
+                                'Confidence' : 'Activation'}))])
             self.pe_group = self.pe.get_plot_group('ActivationHSV',pgt)
             self.pe_group.do_plot_cmd()
             
-#            all_sheets = self.console.active_simulator().get_event_processors()
-#            plotlist = [SCCPlot(('Activation','Activation','Activation'),
-#                                sheet=each)
-#                        for each in all_sheets]
-#            self.pe_group = PreferenceMapPlotGroup('None',None,plotlist)
-#            self.plots = self.pe_group.plots()
 
     def display_labels(self):
         """
