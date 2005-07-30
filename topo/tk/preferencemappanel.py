@@ -9,8 +9,8 @@ from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas
 import plotpanel
 import Pmw
-from topo.plot import SCCPlot
-from topo.plotgroup import PreferenceMapPlotGroup
+from topo.plot import SCCPlot, PlotTemplate
+from topo.plotgroup import PreferenceMapPlotGroup, PlotGroupTemplate
      
 class PreferenceMapPanel(plotpanel.PlotPanel):
     def __init__(self,parent,pengine=None,console=None,plot_key='Activation',**config):
@@ -74,20 +74,20 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
         if self.console.active_simulator().get_event_processors():
             self.generate_plot_key()
 
-            # This is what should be done once the plot engine can
-            # handle three-color plots.
-            # self.pe_group = self.pe.get_plot_group(self.plot_key,
-            #                                        'PreferenceMapPlotGroup')
-            #                                        # self.region.get())
-            #                                        # No filter
-            # self.pe_group.do_plot_cmd()
+            pgt = PlotGroupTemplate( 
+                [('ActivationPref', PlotTemplate({'Strength'   : 'Activation',
+                                                  'Hue'        : 'Activation',
+                                                  'Confidence' : 'Activation'}))])
 
-            all_sheets = self.console.active_simulator().get_event_processors()
-            plotlist = [SCCPlot(('Activation','Activation','Activation'),
-                                sheet=each)
-                        for each in all_sheets]
-            self.pe_group = PreferenceMapPlotGroup('None',None,plotlist)
-            self.plots = self.pe_group.plots()
+            self.pe_group = self.pe.get_plot_group('ActivationHSV',pgt)
+            self.pe_group.do_plot_cmd()
+            
+#            all_sheets = self.console.active_simulator().get_event_processors()
+#            plotlist = [SCCPlot(('Activation','Activation','Activation'),
+#                                sheet=each)
+#                        for each in all_sheets]
+#            self.pe_group = PreferenceMapPlotGroup('None',None,plotlist)
+#            self.plots = self.pe_group.plots()
 
     def display_labels(self):
         """
