@@ -156,6 +156,7 @@ class PlotGroup(TopoObject):
         self.shape = shape
         self.plot_key = plot_key
         self.bitmaps = []
+        self.template = None
 
         if sheet_filter_lam:
             self.sheet_filter_lam = sheet_filter_lam
@@ -254,17 +255,6 @@ class BasicPlotGroup(PlotGroup):
     def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):
         super(BasicPlotGroup,self).__init__(plot_key,sheet_filter_lam,plot_list,
                                             **params)
-
-
-class DictPlotGroup(PlotGroup):
-    """
-    PlotGroup for Activation SheetViews
-    """
-
-    def __init__(self,plot_key,sheet_filter_lam,plot_list,definition,**params):
-        self.definition = definition
-        super(DictPlotGroup,self).__init__(plot_key,sheet_filter_lam,plot_list,
-                                       **params)
 
 
 class WeightsPlotGroup(PlotGroup):
