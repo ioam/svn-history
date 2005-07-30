@@ -41,6 +41,21 @@ class TestPlotEngine(unittest.TestCase):
         self.plot2= plot.Plot(('Activity',None,None),plot.COLORMAP,self.sheetG)
         
 
+    def test_template_groups(self):
+        pgt = PlotGroupTemplate( 
+            [('HuePref', PlotTemplate({'Strength'   : None,
+                                       'Hue'        : 'Activation',
+                                       'Confidence' : None})),
+             ('HuePrefAndSel', PlotTemplate({'Strength'   : 'Activation',  
+                                             'Hue'        : 'Activation',
+                                             'Confidence' : None})),
+             ('HueSelect', PlotTemplate({'Strength'   : 'Activation',
+                                         'Hue'        : None,
+                                         'Confidence' : None}))])
+
+        ag = self.engine.make_plot_group('ActivitySHC',pgt)
+        
+
     def test_get_plot_group(self):
         self.engine.add_plot_group('OldAct',PlotGroup([self.plot1,
                                                        self.plot2]))
@@ -55,16 +70,6 @@ class TestPlotEngine(unittest.TestCase):
 
     def test_sheet_filter(self):
         assert(sheet_filter(self.sheetR))
-
-    def test_dict_plot(self):
-        hue_plot_template = {'name' : 'HuePreference',
-                             'HuePref' : {'Hue' : 'Activation'},
-                             'HuePrefAndSel' : {'Strength' : 'Activation',  
-                                                'Hue'      : 'Activation'},
-                             'HueSelect' : {'Strength'   : 'Activation'}}
-
-        self.engine.make_plot_group(group_type=hue_plot_template)
-                                    
 
     def test_plotengine(self):
         """
