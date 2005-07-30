@@ -212,8 +212,8 @@ class HSVMap(Bitmap):
                      int(math.floor(b * 255)))
             buffer.append(pixel)
 
-        # Equivalent to the above commented code, but this uses
-        # list comprehensions instead.  Slower than the for loop.
+        # Equivalent to the above code, but this uses list
+        # comprehensions instead.  Slower than the for loop.
         # rgbFlat = [hsv_to_rgb(h,s,v) for h,s,v in zip(hFlat, sFlat, vFlat)]
         # buffer = [(int(math.floor(r * 255)),
         #            int(math.floor(g * 255)),
