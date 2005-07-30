@@ -30,6 +30,22 @@ HSV = 'HSV'
 COLORMAP = 'COLORMAP'
 
 
+class PlotTemplate(TopoObject):
+    """
+    Container class for a plot object definition.  This is separate
+    from a Plot object since it defines how to create a Plot object
+    and should be contained within a PlotGroupTemplate.  The
+    PlotEngine will create the requested plot type given the template
+    definition.  The templates are used so that standard plot types
+    can be redefined at the users convenience.
+    """
+
+    def __init__(self, channels=None, **params):
+        super(PlotTemplate,self).__init__(**params)
+        self.channels = channels
+        
+
+
 class Plot(TopoObject):
     """
     Class that can construct a single bitmap plot from one or more
