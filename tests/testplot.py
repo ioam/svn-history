@@ -45,6 +45,14 @@ class TestPlot(unittest.TestCase):
         map = HSVMap(r,g,b)
         if SHOW_PLOTS: map.show()
 
+    def test_plottemplate(self):
+        pt = plot.PlotTemplate()
+        pt = plot.PlotTemplate({'Strength'   : None,
+                                'Hue'        : 'HueP',
+                                'Confidence' : None})
+        pt = plot.PlotTemplate(channels={'Strength'   : None,
+                                         'Hue'        : 'HueP',
+                                         'Confidence' : None})
 
 
 
