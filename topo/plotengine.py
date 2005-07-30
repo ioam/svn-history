@@ -5,12 +5,51 @@ file or for a GUI to display.
 This class should be the connection between the Simulator or GUI, and
 any Plot generation routines.
 
-Note: get_plot_group() function interface could be cleaned up, since
+PlotEngine will create the requeted plot group type from a plot_key
+(dictionary key name for the SheetView dictionaries on each sheet) or
+a plot dictionary definition.
+
+A Plot that contains the old LISSOM style plot information, (in a
+different displayed form):
+
+Define PlotGroup HuePreference
+    Define Plot HuePref
+        Channels:
+            Strength   = Null
+	    Hue        = HueP   (Predefined SheetView)
+	    Confidence = Null
+    Define Plot HuePrefAndSel
+        Channels:
+	    Strength   = HueSel (Predefined SheetView)
+	    Hue        = HueP   (Predefined SheetView)
+	    Confidence = Null 
+    Define Plot HueSelect
+        Channels:
+	    Strength   = HueSel (Predefined SheetView)
+	    Hue	       = Null
+	    Confidence = Null
+
+in the new syntax would look like:
+
+    hue_template = PlotGroupTemplate( 
+        [('HuePref', PlotTemplate({'Strength'   : None,
+                                   'Hue'        : 'HueP',
+                                   'Confidence' : None})),
+         ('HuePrefAndSel', PlotTemplate({'Strength'   : 'HueSel',  
+                                         'Hue'        : 'HueP',
+                                         'Confidence' : None})),
+         ('HueSelect', PlotTemplate({'Strength'   : 'HueSel',
+                                     'Hue'        : None,
+                                     'Confidence' : None}))])
+
+
+NOTE: get_plot_group() function interface could be cleaned up, since
 the lambda functions are a bit confusing, and the user should probably
 be protected as much as possible while remaining flexible.  
 
 $Id$
 """
+from copy import deepcopy
 from base import TopoObject
 from utils import flatten
 from plot import *
@@ -21,7 +60,7 @@ from sheet import Sheet
 def sheet_filter(sheet):
     """
     Example sheet filter that can be used to limit which sheets are
-    displayed through _make_sheetview_group.  Default filter used
+    displayed through make_plot_group().  Default filter used
     by the built-in get_plot_group(..) when there is no plot of the
     correct key name in the PlotGroup dictionary.
 
@@ -74,13 +113,15 @@ class PlotEngine(TopoObject):
         self.plot_group_dict[name] = group
 
 
-    def get_plot_group(self, name, group_type = 'BasicPlotGroup',filter=None):
+    def get_plot_group(self, name, group_type = 'BasicPlotGroup',filter=sheet_filter):
         """
         Return the PlotGroup registered in self.plot_group_dict with
         the provided key 'name'.  If the name does not exist, then
         generate a PlotGroup using the generic dynamic group creator.
         This default construction allows for certain types of plots to
-        be defined automatically, such as 'Activation'.
+        be defined automatically, such as 'Activation'.  If a SheetView
+        dictionary entry has a key entry with 'name' then it will be part
+        of the new plot.
         """
         if filter == None:
             filter = sheet_filter
@@ -95,11 +136,11 @@ class PlotEngine(TopoObject):
             self.debug(name, "key match failure in PlotEngine's PlotGroup list")
             # Rather than fail, check for SheetViews of the name.
             # Current filter is sheet_filter(..).
-            requested_plot = self.make_sheetview_group(name,group_type,filter)
+            requested_plot = self.make_plot_group(name,group_type,filter)
         return requested_plot
 
 
-    def lambda_single_view_per_name(self,name,filter_lam):
+    def lambda_single_view_per_name(self, name, filter_lam):
         """
         Basic lambda function that assumes a single sheet per name in
         each Sheet's SheetView dictionary.
@@ -111,9 +152,10 @@ class PlotEngine(TopoObject):
 
     def lambda_flat_dynamic_list(self, name, filter_lam):
         """
-        Expanded so that the a sheet_view dictionary key entry can
-        have a list of sheetviews, and not just one.  Each SheetView
-        in the list will be set with a Plot object.
+        lambda_single_view_per_name() expanded so that the a
+        sheet_view dictionary key entry can have a list of SheetViews,
+        and not just one.  Each SheetView in the list will be set with
+        a Plot object.
         """
         sheet_list = [each for each in self._sheets() if filter_lam(each)]
         self.debug('sheet_list =' + str(sheet_list) + 'name = ' + str(name))
@@ -136,28 +178,81 @@ class PlotEngine(TopoObject):
         return plot_list
 
 
-    def make_sheetview_group(self, name, group_type='BasicPlotGroup',
-                             filter_lam=None):
+    def lambda_for_templates(self, template, filter_lam):
+        """
+        This assumes that a PlotGroupTemplate named 'template' has
+        been passed in that describes a list of plots.  An example is
+        given at the top of plotengine.py.
+
+        It is possible for a requested SheetView to in fact have a
+        list of Views under that dictionary key instead of a single
+        SheetView.  The default behavior will be to only look at the
+        first one and dispose of any others if they exist.
+        """
+        sheet_list = [each for each in self._sheets() if filter_lam(each)]
+        # Loop over all sheets that passed the filter.
+        #     Loop over each individual Plot:
+        #         Loop over each channel in the Plot.  Add needed Nones.
+        #         Create new Plot and add to list.
+        plot_list = []
+        for each in sheet_list:
+            for (k,pt) in template.plot_templates:
+                c = pt.channels
+                if 'Strength' in c or 'Hue' in c or 'Confidence' in c:
+                    plot_list.append(self.make_SHC_plot(k,pt,each))
+                else:
+                    self.warning("Only SHC plots currently implemented.")
+        return plot_list
+
+
+    def make_SHC_plot(self, k, pt, sheet):
+        """
+        Create and return a single Plot object matching the passed in
+        PlotTemplate (parameter 'pt'), using the Sheet (parameter 'sheet').
+        """
+
+        # This is not valid since we no longer have a name variable
+        # view_list = [(each, each.sheet_view(name)) for each in sheet_list
+        #              if each is not None]
+
+        strength = pt.channels.get('Strength',None)
+        hue = pt.channels.get('Hue',None)
+        confidence = pt.channels.get('Confidence',None)
+        return Plot((strength,hue,confidence),SHC,sheet,name=k)
+
+
+    def make_plot_group(self, name='Activation', group_type='BasicPlotGroup',
+                             filter_lam=sheet_filter):
         """
         name : The key to look under in the SheetView dictionaries.
-        group_type: The string name of the PlotGroup subclass to create.
-               The actual name is passed in instead of a class pointer
-               so the function can be used from the command-line, and
-               also so a full list of class names is not required.
+        group_type: 2 Valid inputs:
+               1. The string name of the PlotGroup subclass to create.
+                  The actual name is passed in instead of a class
+                  pointer so the function can be used from the
+                  command-line, and also so a full list of class names
+                  is not required.
+               2. If group_type is a PlotGroupTemplate, then the
+                  lambda function to handle templates is called.
         filter_lam: Optional lambda function to filter which sheets to
-               ask for SheetViews
+               ask for SheetViews.  
         """
-        if filter_lam is None:
-            filter_lam = lambda sheet: True            
-        dynamic_list = lambda : self.lambda_flat_dynamic_list(name,filter_lam)
+        if isinstance(group_type,PlotGroupTemplate):
+            dynamic_list = lambda: self.lambda_for_templates(group_type,filter_lam)
+            new_group = BasicPlotGroup('None',filter_lam,dynamic_list)
+            # Just copying the pointer.  Not currently sure if we want to
+            # promote side-effects by not doing a deepcopy():
+            new_group.template = group_type 
+            self.add_plot_group(name,new_group)
+        else:
+            dynamic_list = lambda : self.lambda_flat_dynamic_list(name,filter_lam)
+            try:
+                exec 'ptr = ' + group_type in globals()
+            except Exception, e:
+                self.warning('Exception:', e)
+                self.warning('Invalid PlotGroup subclass: ', group_type)
+                return PlotGroup(dynamic_list)
+            new_group = ptr(name,filter_lam,dynamic_list)
 
-        try:
-            exec 'ptr = ' + group_type in globals()
-        except Exception, e:
-            self.warning('Exception:', e)
-            self.warning('Invalid PlotGroup subclass: ', group_type)
-            return PlotGroup(dynamic_list)
-        new_group = ptr(name,filter_lam,dynamic_list)
         self.debug('Type of new_group is', type(new_group))
         return new_group
 
