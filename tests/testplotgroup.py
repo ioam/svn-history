@@ -72,7 +72,36 @@ class TestPlotGroup(unittest.TestCase):
         self.assertEqual(kl.has_key(5),False)
         self.assertTrue(kl.has_key(6))
         self.assertEqual(len(kl),3)
-        
+
+
+    def test_plotgrouptemplate(self):
+        pgt = PlotGroupTemplate()
+
+        pt1 = plot.PlotTemplate({'Strength'   : None,
+                                 'Hue'        : 'HueP',
+                                 'Confidence' : None})
+        pt2 = plot.PlotTemplate({'Strength'   : 'HueSel',
+                                 'Hue'        : 'HueP',
+                                 'Confidence' : None})
+        pt3 = plot.PlotTemplate({'Strength'   : 'HueSel',
+                                 'Hue'        : None,
+                                 'Confidence' : None})
+        pgt = PlotGroupTemplate([('HuePref', pt1),
+                                 ('HuePrefAndSel', pt2),
+                                 ('HueSelect', pt3)])
+
+        pgt2 = PlotGroupTemplate( 
+            [('HuePref', PlotTemplate({'Strength'   : None,
+                                       'Hue'        : 'HueP',
+                                       'Confidence' : None})),
+             ('HuePrefAndSel', PlotTemplate({'Strength'   : 'HueSel',  
+                                             'Hue'        : 'HueP',
+                                             'Confidence' : None})),
+             ('HueSelect', PlotTemplate({'Strength'   : 'HueSel',
+                                         'Hue'        : None,
+                                         'Confidence' : None}))])
+
+
 
 
 suite = unittest.TestSuite()
