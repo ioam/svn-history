@@ -41,8 +41,9 @@ class PlotTemplate(TopoObject):
     can be redefined at the users convenience.
     """
 
-    def __init__(self, channels=None, **params):
+    def __init__(self, channels=None, background=BLACK_BACKGROUND,**params):
         super(PlotTemplate,self).__init__(**params)
+        self.background = Dynamic(default=background)
         self.channels = channels
         
 
@@ -73,11 +74,12 @@ class Plot(TopoObject):
 
         sheet gives the object that the three channels will request
         SheetViews from if a String has been passed in.  Valid options
-        are: None, Single Sheet, 3-tuple of Sheets or None.
-
-        TODO: TRIPLE IS CURRENTLY NOT IMPLEMENTED.  THIS REQUIRES
-        THAT ALL CHANNELS DERIVE FROM THE SAME SHEET.  SHOULD EXTEND
-        self.source SO THAT DIFFERENT SHEET INPUTS ARE POSSIBLE (7/2005)
+        are: None, Single Sheet, or None.
+        TODO: TRIPLE OF SHEETS, ONE FOR EACH CHANNEL, IS CURRENTLY NOT
+        IMPLEMENTED.  CURRENT IMPLEMENTATION REQUIRES THAT ALL
+        CHANNELS DERIVE FROM THE SAME SHEET.  SHOULD EXTEND
+        self.source SO THAT DIFFERENT SHEET INPUTS ARE POSSIBLE
+        (7/2005)
 
         If each of the channels are preconstructed SheetViews, there
         is no reason to pass in the sheet, and therefore it can be
@@ -258,26 +260,5 @@ class Plot(TopoObject):
         return self
 
 
-
-class SCCPlot(Plot):
-    """
-    Special type of HSV Plot.
-
-    Color      -> Hue
-    Strength   -> Saturation
-    Confidence -> Value
-    """
-    def __init__(self, (channel_1, channel_2, channel_3),
-                 sheet=None, **params):
-        super(SCCPlot,self).__init__((channel_1, channel_2, channel_3),
-                                     HSV, sheet=sheet, **params)
-
-
-
-
-
-
 # No Main code.  All testing takes place in the unit testing mechanism
 # to be found in ~/topographica/tests/testplot.py
-    
-    
