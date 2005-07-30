@@ -27,6 +27,7 @@ import palette
 # Types of plots that Plot knows how to create from input matrices.
 RGB = 'RGB'
 HSV = 'HSV'
+SHC = 'HSV'  # For now treat as an HSV, but reorder the channels.
 COLORMAP = 'COLORMAP'
 
 
@@ -89,7 +90,12 @@ class Plot(TopoObject):
         super(Plot,self).__init__(**params)
 
         self.source = sheet
+
         self.channels = (channel_1, channel_2, channel_3)
+        # Shuffle an SHC into HSV ordering:  SHC -> HSV
+        if plot_type == SHC:  
+            self.channels = (channel_2, channel_3, channel_1)
+
         self.plot_type = plot_type
         self.view_info = {}
         self.histograms = []
