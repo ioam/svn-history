@@ -33,7 +33,9 @@ class KeyedList(list):
     
     Extends the built-in type list to superficially behave like a
     dictionary with [] keyed access.  Internal representation is a
-    list of (key,value) pairs.
+    list of (key,value) pairs.  Note: Core functionality has been
+    added, but because of the way that [] does not return the name
+    tuple, not all list operations may behave properly.
 
     Redefined functions:
         __getitem__ ([,])
@@ -126,7 +128,10 @@ class PlotGroupTemplate(TopoObject):
             ( (name_1, PlotTemplate_1), ... , (name_i, PlotTemplate_i) )
         """
         super(PlotGroupTemplate,self).__init__(**params)
-        self.plot_templates = KeyedList(plot_templates)
+        if not plot_templates:
+            self.plot_templates = KeyedList()
+        else:
+            self.plot_templates = KeyedList(plot_templates)
 
         
 
