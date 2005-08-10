@@ -30,8 +30,9 @@ import topo.sheetview
 
 # Hack to reverse the order of the input EventProcessor list and the
 # Preview plot list, so that it'll match the order that the plots appear
-# in the Acivation panel.
+# in the Activation panel.
 LIST_REVERSE = True
+
 # Default time to show in the Presentation duration box.
 DEFAULT_PRESENTATION = '1.0'
 
@@ -44,6 +45,11 @@ def eval_atof(in_string):
     the case.  Undefined if the Parameter calling this doesn't like the
     value 0.
     """
+    ### JABHACKALERT!
+    ### 
+    ### This dictionary needs to be replaced with a real evaluation
+    ### in an appropriate namespace, presumably the global namespace.
+    ### pi and PI should be defined there; RN isn't necessary.
     x_dict = {'PI':math.pi, 'pi':math.pi, 'Pi':math.pi, 'pI':math.pi,
               'RN':1.0}
     try:
@@ -56,16 +62,10 @@ def eval_atof(in_string):
 def kernelfactory_names():
     """
     Return the existing list of KernelFactory subclasses.  This list will
-    change based on the existing classes found within kernelfactory.py
+    change based on the existing classes found within kernelfactory.py,
+    and can be extended by the user.
     """
     return topo.kernelfactory.kernel_factories.keys()
-    # Slow method, only looks at kernelfactory.py, but doesn't need a registry:
-    #import pyclbr
-    #names = [x for x in pyclbr.readmodule('topo.kernelfactory').keys()
-    #         if issubclass(topo.kernelfactory.__dict__[x],
-    #                       topo.kernelfactory.KernelFactory) \
-    #            and x != 'KernelFactory']
-    return names
 
 
 class InputParamsPanel(plotpanel.PlotPanel):
