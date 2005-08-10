@@ -122,11 +122,11 @@ To reach milestone 2, we will need to:
 - Add the remaining features of the LISSOM model, such as:
   - Lateral excitatory radius shrinking
   - Gradually reducing sigmoid parameters
-  - Multiple input areas (two eyes).  
+  - Multiple input areas (two eyes). (done) 
 
 - Add preference map measurement and plotting
 
-- Add a test pattern window
+- Add a test pattern window (done)
 
 - Add bitmap colorizations (using palette.py)
 
@@ -136,7 +136,7 @@ RELATED (BUT NOT STRICTLY REQUIRED) ISSUES TO ADDRESS BEFORE THIS MILESTONE:
 
 - Write a coding standards document: follow Python.org coding
   conventions, require unit tests, require code be examined by at
-  least two people, etc.
+  least two people, etc. (done)
 
 - Compare unittest code to the Python unittest module for code overlap
   and possible improvements.  
@@ -151,7 +151,7 @@ RELATED (BUT NOT STRICTLY REQUIRED) ISSUES TO ADDRESS BEFORE THIS MILESTONE:
 
 - Verify that everything works on Windows and Mac.  
 
-- Try upgrading to Python 2.4, and use that if it works.  
+- Try upgrading to Python 2.4, and use that if it works.  (done)
 
 _______________________________________________________________________________
 
@@ -232,7 +232,7 @@ Subsystem 13. 1D and 3D line-based plotting
 
 Subsystem 14. Bounding box class
 - Add intersections and unions, which are needed when RFs extend past
-  the edge of a sheet.
+  the edge of a sheet. (intersections done)
 
 Subsystem 15. Bounded number type
 - Make most parameters use bounded ranges.
@@ -251,7 +251,7 @@ RELATED (BUT NOT STRICTLY REQUIRED) ISSUES TO ADDRESS BEFORE THIS MILESTONE:
 
 - To eliminate bottlenecks, consider Pyrex and PyInline for inline C
   and C++.  May also need to add full C code to implement some python
-  classes.
+  classes.  (done)
 
 - For overall speedup, consider Psyco, a just-in-time lazy evaluator
   and optimizing compiler (only for x86 machines, though). 
