@@ -1,14 +1,24 @@
 """
 Class file for a TaggedSlider widget.
 
-CURRENT STATUS: Taken verbatim from LISSOM 5.0; not yet used.  
-
 $Id$
 """
-from Tkinter import Frame, IntVar, Scale, LEFT, RIGHT, TOP, BOTTOM, \
-     YES, BOTH, Entry
+from Tkinter import Frame, IntVar, Scale, Entry
+from Tkinter import LEFT, RIGHT, TOP, BOTTOM, YES, BOTH
 import string
 import inputparamspanel 
+
+### JABHACKALERT!
+###
+### This file must be changed so that it does not depend on
+### inputparamspanel; it's a general widget that could be useful in
+### any Tk program.  It should probably just define a general
+### string_translator function, e.g. string.atof, which would then be
+### overridden with inputparamspanel.eval_atof.  Because it's not
+### actually inputparamspanel that defines the sliders, but
+### propertiesframe, propertiesframe would need to have a constructor
+### argument for the appropriate string_translator, and would pass
+### that on to the TaggedSlider.
 
 class TaggedSlider(Frame):
     """
