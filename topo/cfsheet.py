@@ -478,10 +478,27 @@ class CFSheet(Sheet):
         """
         from itertools import chain
         views = [p.get_view(x,y) for p in chain(*self.projections.values())]
-        self.debug('views = '+str(views)+'type = '+str(type(views[0]))+str(views[0].view()))
-        key = ('Weights',x,y)
-        self.add_sheet_view(key,views)      # Will be adding a list
-        self.debug('Added to sheet_view_dict', views, 'at', key)
+
+        # Old version to delete:
+        # self.debug('views = '+str(views)+'type = '+str(type(views[0]))+str(views[0].view()))
+        # key = ('Weights',x,y)
+        # self.add_sheet_view(key,views)      # Will be adding a list
+        # self.debug('Added to sheet_view_dict', views, 'at', key)
+
+        # Delete previous entry if it exists.  Allows appending in next block.
+        for v in views:
+            key = ('Weights',v.projection.dest.name,v.projection.name,x,y)
+            if v.projection.src.sheet_view_dict.has_key(key):
+                v.projection.src.release_sheet_view(key)
+
+        for v in views:
+            src = v.projection.src
+            key = ('Weights',v.projection.dest.name,v.projection.name,x,y)
+            unit_list = src.sheet_view_dict.get(key,[])
+            unit_list.append(v)
+            src.add_sheet_view(key,unit_list)      # Will be adding a list
+            self.debug('Added to sheet_view_dict', views, 'at', key)
+
         return views
 
     def release_unit_view(self,x,y):
@@ -498,7 +515,7 @@ class CFSheet(Sheet):
         """
         self.debug('request = ' + str(request))
         if isinstance(request,tuple) and request[0] == 'Weights':
-            (name,x,y) = request
+            (name,s,p,x,y) = request
             return self.unit_view(x,y)
         else:
             return Sheet.sheet_view(self,request)

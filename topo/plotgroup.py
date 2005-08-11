@@ -265,8 +265,8 @@ class WeightsPlotGroup(PlotGroup):
     def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):
         super(WeightsPlotGroup,self).__init__(plot_key,sheet_filter_lam,plot_list,
                                               **params)
-        self.x = float(plot_key[1])
-        self.y = float(plot_key[2])
+        self.x = float(plot_key[2])
+        self.y = float(plot_key[3])
 
     def do_plot_cmd(self):
         """
@@ -332,30 +332,3 @@ class WeightsArrayPlotGroup(PlotGroup):
         for (x,y) in coords: self._sim_ep.release_unit_view(x,y)
         
 
-class PreferenceMapPlotGroup(PlotGroup):
-    """
-    PlotGroup for Strength/Color/Confidence plots such as Preference Maps
-
-    CURRENTLY STUB CODE COPIED FROM WEIGHTSPLOTGROUP
-    """
-
-    def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):
-        super(PreferenceMapPlotGroup,self).__init__(plot_key,sheet_filter_lam,
-                                                    plot_list,**params)
-
-    def do_plot_cmd(self):
-        """
-        Currently a pass.  The plot generation of a CSC plot should
-        not be forced at the same time that it is displayed.
-        """
-        pass
-    
-        # coords = self._generate_coords()
-        # 
-        # full_unitview_list = [self._sim_ep.unit_view(x,y) for (x,y) in coords]
-        # filtered_list = [view for view in chain(*full_unitview_list)
-        #                  if view.projection.name == self.weight_name]
-        # 
-        # self._sim_ep.add_sheet_view(self.plot_key,filtered_list)
-        # 
-        # for (x,y) in coords: self._sim_ep.release_unit_view(x,y)

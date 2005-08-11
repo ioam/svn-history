@@ -62,7 +62,7 @@ class WeightsFile(PlotFileSaver):
         self.region = region
         self.name['region'] = '%s_%01.03f_%01.03f' % (region, x, y)
         self.name['type'] = 'Weights'
-        self.plot_key = ('Weights',x,y)
+        self.plot_key = ('Weights',self.region,x,y)
         self.create_bitmaps()
         self.save_to_disk()
 

@@ -10,7 +10,7 @@ from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
 import plotpanel
 import Pmw
 from topo.plot import PlotTemplate
-from topo.plotgroup import PreferenceMapPlotGroup, PlotGroupTemplate
+from topo.plotgroup import PlotGroupTemplate
 from topo.bitmap import WHITE_BACKGROUND, BLACK_BACKGROUND
      
 class PreferenceMapPanel(plotpanel.PlotPanel):

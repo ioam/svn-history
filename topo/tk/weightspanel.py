@@ -52,7 +52,7 @@ class WeightsPanel(RegionPlotPanel):
         input within the window widgets.  This means that the key
         needs to be regenerated at the appropriate times.
 
-        Key Format:  Tuple: ('Weights', X_Number, Y_Number)
+        Key Format:  Tuple: ('Weights', Sheet_Name, X_Number, Y_Number)
         """
         g = __main__.__dict__
         self.x = eval(self.x_str.get(),g)
@@ -66,7 +66,7 @@ class WeightsPanel(RegionPlotPanel):
         l,b,r,t = ep.bounds.aarect().lbrt()
 
         if ep.bounds.contains(self.x,self.y):
-            self.plot_key = ('Weights',self.x,self.y)
+            self.plot_key = ('Weights',self.region.get(),self.x,self.y)
             self.displayed_x, self.displayed_y = self.x, self.y
         else:
             self.dialog = Pmw.Dialog(self.parent,title = 'Error')

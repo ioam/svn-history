@@ -56,7 +56,7 @@ from plot import *
 from plotgroup import *
 from bitmap import WHITE_BACKGROUND, BLACK_BACKGROUND
 from sheet import Sheet
-
+from cfsheet import CFSheet
 
 def sheet_filter(sheet):
     """
@@ -179,6 +179,39 @@ class PlotEngine(TopoObject):
         return plot_list
 
 
+    def lambda_for_weight_view(self, (w,sheet_target,sheet_x,sheet_y), filter_lam):
+        """
+        To have the UnitViews stored on the Projection source sheet,
+        the weights must be requested from each Projection on the
+        target sheets.
+        """
+        sheet_list = [each for each in self._sheets() if filter_lam(each) and each.name == sheet_target]
+
+        projection_list = []
+        for s in sheet_list:
+            if not isinstance(s,CFSheet):
+                self.warning('Requested weights view from other than CFSheet.')
+            else:
+                for p in set(flatten(s.projections.values())):
+                    key = ('Weights',sheet_target,p.name,sheet_x,sheet_y)
+                    v = p.src.sheet_view(key)
+                    if v: projection_list += [(s,p,each) for each in v if each.projection.name == p.name]
+        projection_list.sort(key=lambda x: x[2].name,reverse=True)
+
+        plot_list = []
+        for (sheet,projection,views) in projection_list:
+            if not isinstance(views,list):
+                views = [views]
+            for each in views:
+                if isinstance(each,SheetView):
+                    plot_list.append(Plot((each,None,None),COLORMAP,None))
+                else:
+                    key = ('Weights',sheet,projection,sheet_x,sheet_y)
+                    plot_list.append(Plot((key,None,None),COLORMAP,p.src))
+        self.debug('plot_list =' + str(plot_list))
+        return plot_list
+
+
     def lambda_for_templates(self, template, filter_lam):
         """
         This assumes that a PlotGroupTemplate named 'template' has
@@ -237,11 +270,15 @@ class PlotEngine(TopoObject):
             dynamic_list = lambda: self.lambda_for_templates(group_type,filter_lam)
             new_group = BasicPlotGroup('None',filter_lam,dynamic_list)
             # Just copying the pointer.  Not currently sure if we want to
-            # promote side-effects by not doing a deepcopy():
+            # promote side-effects by not doing a deepcopy(), but assuming
+            # we do for now.  If not, use deepcopy(group_type).
             new_group.template = group_type 
             self.add_plot_group(name,new_group)
         else:
-            dynamic_list = lambda : self.lambda_flat_dynamic_list(name,filter_lam)
+            if isinstance(name,tuple) and name[0] == 'Weights':
+                dynamic_list = lambda : self.lambda_for_weight_view(name,filter_lam)
+            else:
+                dynamic_list = lambda : self.lambda_flat_dynamic_list(name,filter_lam)
             try:
                 exec 'ptr = ' + group_type in globals()
             except Exception, e:
