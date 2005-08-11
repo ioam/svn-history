@@ -1,7 +1,7 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-all: python jpeg pil numeric pmw matplotlib dislin  dislinpy
+all: python jpeg pil numeric pmw matplotlib dislin  dislinpy weave
 
 clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean matplotlib-clean dislin-clean dislinpy-clean
 
@@ -209,6 +209,21 @@ dislinpy-clean:
 dislinpy-uninstall: dislinpy-clean
 	rm -f dislinpy ${DISLIN_PYTHON_DIR}/dislinmodule.so
 
+##############################################################
+# Scipy (weave)
+#
+WEAVE = Scipy_core-0.3.0_108.1820
+WEAVE_UNINSTALL = ${PYTHON_LIB}/site-packages/weave
+
+weave: ${WEAVE}.tar.gz python
+	tar xzf ${WEAVE}.tar.gz
+	cd ${WEAVE}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
+	touch weave
+
+weave-clean:
+	rm -rf ${WEAVE} 
+weave-uninstall:
+	rm -rf ${WEAVE} $(foreach f, ${WEAVE_UNINSTALL}, ${PREFIX}/${f})
 
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
