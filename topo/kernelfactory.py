@@ -69,7 +69,7 @@ kernel_factories = {}
 EXP_CUTOFF = -100
 
 
-def produce_kernel_matrices(bounds, density):
+def produce_kernel_matrices(bounds, density, r, c):
     """
     Get Kernel Matrices
 
@@ -77,11 +77,16 @@ def produce_kernel_matrices(bounds, density):
     The x and y vectors are lists of indexes at which to sample the kernel
     function.
     """       
-    left,bottom,right,top = bounds.aarect().lbrt()
-    bound_width  = right-left
-    bound_height = top-bottom
+    #left,bottom,right,top = bounds.aarect().lbrt()
+    #bound_width  = right-left
+    #bound_height = top-bottom
     linear_density = sqrt(density)
-    rows,cols = bounds2shape(bounds,density)
+
+    if r == 0 and c == 0:
+        rows,cols = bounds2shape(bounds,density)
+    else:
+        rows = r
+        cols = c
     
     # TODO: this can generate ouput that may be off by one in terms of size,
     # for example most times this generates a 100x100 image, but sometimes
@@ -108,6 +113,7 @@ def produce_rotated_matrices(kernel_x, kernel_y, theta):
     The matrix itself is rotated to match the Topographica cartesian
     style coordinates.
     """
+
     new_kernel_x = subtract.outer(cos(pi-theta)*kernel_x, sin(pi-theta)*kernel_y)
     new_kernel_y = add.outer(sin(pi-theta)*kernel_x, cos(pi-theta)*kernel_y)
 
@@ -244,13 +250,15 @@ class KernelFactory(base.TopoObject):
                       params.get('density',self.density),
                       params.get('x', self.x),
                       params.get('y',self.y),
-                      params.get('theta',self.theta))
+                      params.get('theta',self.theta),
+                      params.get('rows',0),
+                      params.get('cols',0))
         return self.function(**params)
 
-    def setup_xy(self,bounds,density,x,y,theta):
+    def setup_xy(self,bounds,density,x,y,theta,rows,cols):
         self.verbose("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
-        x,y = produce_kernel_matrices(bounds,density)
-        self.kernel_x, self.kernel_y = produce_rotated_matrices(x-self.x,y-self.y,self.theta)
+        xm,ym = produce_kernel_matrices(bounds,density,rows,cols)
+        self.kernel_x, self.kernel_y = produce_rotated_matrices(xm-x,ym-y,theta)
 
 
 class GaussianFactory(KernelFactory):

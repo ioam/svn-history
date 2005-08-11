@@ -93,6 +93,7 @@ import topo.boundingregion
 import topo.bitmap
 from MLab import flipud, rot90
 from topo.utils import flatten
+import weave
 
 
 ###############################################
@@ -104,6 +105,7 @@ class ConnectionField(TopoObject):
     x = Parameter(default=0)
     y = Parameter(default=0)
     weights = []
+    slice_array = []
     
     def __init__(self,input_sheet,weight_bounds,weights_factory,**params):
         super(ConnectionField,self).__init__(**params)
@@ -111,36 +113,30 @@ class ConnectionField(TopoObject):
         self.input_sheet = input_sheet
         self.bounds = weight_bounds
 
+        self.slice = self.input_sheet.input_slice(self.bounds,self.x,self.y)
+        r1,r2,c1,c2 = self.slice
+
+        self.slice_array = Numeric.zeros((4), Numeric.Int32)
+        self.slice_array[0] = r1
+        self.slice_array[1] = r2
+        self.slice_array[2] = c1
+        self.slice_array[3] = c2
+
+
         if isinstance(weights_factory, UniformRandomFactory):
-            self.slice = self.input_sheet.input_slice(self.bounds,self.x,self.y)
-            r1,r2,c1,c2 = self.slice
-            self.weights = RandomArray.uniform(0,1,(r2-r1,c2-c1))
+            self.weights = RandomArray.uniform(0,1,[r2-r1,c2-c1])
+            #self.weights = Numeric.ones([r2-r1,c2-c1], Numeric.Float)
         else:
-            self.bounds = copy.deepcopy(weight_bounds)
-            self.bounds.translate(self.x,self.y)
-            self.bounds = Intersection(self.bounds,self.input_sheet.bounds)
-            self.weights = weights_factory(x=self.x,y=self.y,bounds=self.bounds,density=self.input_sheet.density)
-            self.slice = self.input_sheet.input_slice2(self.bounds)
+            self.weights = weights_factory(x=0,y=0,bounds=self.bounds,density=self.input_sheet.density,theta=0,rows=r2-r1,cols=c2-c1)
 
         self.verbose("activation matrix shape: ",self.weights.shape)
+
         if self.normalize:
-            self.normalize_wts(self.weights, self.normalize)
-
-    def normalize_wts(self, wts, mag):
-        """Normalize the weights array wts to total magnitude mag."""
-        sum = 0
-
-        for x in wts:
-            for y in x:
-                sum += y
-
-        sum /= mag
-        wts /= sum
-
-        # testing only: same weight within each cf	
-        #for i in xrange(len(wts)):
-        #    for j in xrange(len(wts[i])):
-        #        wts[i][j] = 1.0/len(wts)/len(wts[i])
+            wts = self.weights
+            s = sum(wts.flat)
+            if s > 0:
+                s = self.normalize/s
+                wts *= s
 
 
     def contains(self,x,y):
@@ -172,7 +168,7 @@ class Projection(TopoObject):
     dest = Parameter(default=None)
     cf_type = Parameter(default=ConnectionField)
     strength = Number(default=1.0)
-#    shape = property(get_shape)
+#   shape = property(get_shape)
     temp_activation = []
 
     def __init__(self,**params):
@@ -272,6 +268,7 @@ class KernelProjection(Projection):
     def compute_response(self,input_activation, rows, cols):
         self.input_buffer = input_activation
         if self.activation_fn.func_name == "mdot":
+            # should use self.compute_response_mdot_py if C compiler is absent
             self.compute_response_mdot(input_activation, rows, cols)
 	else:
             for r in xrange(rows):
@@ -285,6 +282,58 @@ class KernelProjection(Projection):
 
 
     def compute_response_mdot(self,input_activation, rows, cols):
+        temp_act = self.temp_activation
+        cfs = self.cfs
+        strength = self.strength
+        len, len2 = input_activation.shape
+        X = input_activation.flat
+
+        code = """
+            double tot;
+            double *wi, *xi, *xj;
+            double *tact = temp_act;
+            int *slice;
+            int rr1, rr2, cc1, cc2;
+            int i, j, r, l;
+            PyObject *cf, *cfsr;
+            PyObject *sarray = PyString_FromString("slice_array");
+            PyObject *weights = PyString_FromString("weights");
+
+            for (r=0; r<rows; ++r) {
+                cfsr = PyList_GetItem(cfs,r);
+                for (l=0; l<cols; ++l) {
+                    cf = PyList_GetItem(cfsr,l);
+                    wi = (double *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
+                    slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
+                    rr1 = *slice++;
+                    rr2 = *slice++;
+                    cc1 = *slice++;
+                    cc2 = *slice;
+
+                    tot = 0.0;
+
+                    xj = X+len*rr1+cc1;
+                    for (i=rr1; i<rr2; ++i) {
+                        xi = xj;
+                        for (j=cc1; j<cc2; ++j) {
+                            tot += *wi * *xi;
+                            ++wi;
+                            ++xi;
+                        }
+                        xj += len;
+                    }
+
+                    *tact = tot*strength;
+                    ++tact;
+                }
+            }
+        """
+
+        weave.inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'])
+
+
+    # The original mdot function that the inline C code based on
+    def compute_response_mdot_py(self,input_activation, rows, cols):
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = self.cfs[r][c]
@@ -369,7 +418,7 @@ class CFSheet(Sheet):
         Accept input from some sheet.  Call .present_input() to
         compute the stimulation from that sheet.
         """
-        self.message("Received input from",src,"at time",self.simulator.time())
+        #self.message("Received input from",src,"at time",self.simulator.time())
         self.present_input(data,src,dest_port)
         self.new_input = True
 
@@ -390,7 +439,7 @@ class CFSheet(Sheet):
             if self._learning:
                 self.learn()
 
-            self.debug("max activation =",max(self.activation.flat))
+            #self.debug("max activation =",max(self.activation.flat))
             #print self.activation 
 
     def learn(self):
