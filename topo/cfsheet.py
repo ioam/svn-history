@@ -201,7 +201,8 @@ class Projection(TopoObject):
         """
         (r,c) = (self.dest).sheet2matrix(sheet_x,sheet_y)
         # composite_name = '%s: %0.3f, %0.3f' % (self.name, sheet_x, sheet_y)
-        matrix_data = Numeric.array(Numeric.transpose(self.cf(r,c).weights))
+        #matrix_data = Numeric.array(Numeric.transpose(self.cf(r,c).weights))
+        matrix_data = Numeric.array(self.cf(r,c).weights)
         new_box = self.dest.bounds  # TURN INTO A PROPER COPY
         assert matrix_data != None, "Projection Matrix is None"
         return topo.sheetview.UnitView((matrix_data,new_box),
@@ -421,6 +422,7 @@ class CFSheet(Sheet):
         #self.message("Received input from",src,"at time",self.simulator.time())
         self.present_input(data,src,dest_port)
         self.new_input = True
+
 
     def pre_sleep(self):
         """

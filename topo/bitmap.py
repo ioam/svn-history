@@ -135,7 +135,9 @@ class Bitmap(object):
             
         # PIL 'L' Images use 0 to 255.  Have to scale up.
         inArray = (Numeric.floor(inArray * 255)).astype(Numeric.Int)
-        newImage = Image.new('L',inArray.shape,None)
+        r,c = inArray.shape
+        # size is (width,height)
+        newImage = Image.new('L',(c,r),None)
         newImage.putdata(inArray.flat)
         return newImage
         
