@@ -2,6 +2,9 @@
 A Sheet class for composing activation from different sheets into a
 single activation matrix.
 
+May not be necessary or useful any longer (as of 8/2005), and could
+perhaps be moved to the examples/ directory or deleted.
+
 $Id$
 """
 from topo.sheet import *

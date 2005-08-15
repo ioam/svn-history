@@ -2,6 +2,8 @@
  Dislin Plotting interface.  Started August 2003 by Judah De Paula for
  the Topographica project.
 
+ This file is NOT yet integrated into Topographica, as of 8/2005.
+
  Requirements:
  * Needs dislin to be installed.
  * Needs Python's PIL to be installed.

@@ -1,6 +1,9 @@
 """
 Driver program to call DislinPlot with some sample plots.  This way it
 can be tested independently of Topographica proper.
+
+This file is NOT yet integrated into Topographica, as of 8/2005.
+
 $Id$
 """
 import dislinplot, math, Image, ImageOps
