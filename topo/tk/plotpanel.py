@@ -30,8 +30,8 @@ def enum(seq):  return zip(range(len(seq)),seq)
 
 class PlotPanel(Frame,topo.base.TopoObject):
     """
-    Abstract PlotPanel class for displaying bitmaped images to a TK
-    GUI window.  Must be subclassed.
+    Abstract PlotPanel class for displaying bitmapped images to a TK
+    GUI window.  Must be subclassed to be usable.
     """
 
     def __init__(self,parent=None,pengine=None,console=None,plot_key='None',
@@ -45,6 +45,28 @@ class PlotPanel(Frame,topo.base.TopoObject):
         self.plot_key = plot_key
         self.plotgroup_type = plotgroup_type
 
+        ### JABHACKALERT!
+        ###
+        ### When the InputSheet.density is changed to a relatively
+        ### large but not unreasonable number, e.g. 512*512, the plot
+        ### window is many times larger than the screen, and there's
+        ### no way to reach the Reduce button.  In general, there need
+        ### to be scrollbars for viewing plots too large for the
+        ### screen.
+        ###
+        ### In this particular case, there appears to be a bug in how
+        ### INITIAL_PLOT_WIDTH is handled, because with a size of 512
+        ### a fixed INITIAL_PLOT_WIDTH of 60 shouldn't have any effect
+        ### at all.  Yet changing INITIAL_PLOT_WIDTH to 1 fixes the
+        ### size problem, and makes the images fit on screen with no
+        ### problem.  Very strange.  My guess for the culprit is the line:
+        ###
+        ###   self.zoom_factor = int(self.INITIAL_PLOT_WIDTH/min_width) + 1
+        ###
+        ### (below), which doesn't seem at all a correct way to
+        ### enforce a minimum width and an initial width.
+        
+        
         # Each plot can have a different minimum size.  If INITIAL_PLOT_WIDTH
         # is set to None, then no initial zooming is performed.  However,
         # MIN_PLOT_WIDTH may cause a zoom if the raw bitmap is still too
@@ -79,6 +101,14 @@ class PlotPanel(Frame,topo.base.TopoObject):
         self.control_frame = Frame(self)
         self.control_frame.pack(side=BOTTOM,expand=YES,fill=X)
 
+        # JAB: Because these three buttons are present in nearly every
+        # window, and aren't particularly important, we should
+        # probably use small icons for them instead of text.  That way
+        # they will form a visual group that users can typically
+        # ignore.  Of course, the icons will need to announce their
+        # names as help text if the mouse lingers over them, so that
+        # the user can figure them out the first time.
+        # 
         # Refresh, Reduce, and Enlarge Buttons.
         Button(self.control_frame,text="Refresh",
                command=self.refresh).pack(side=LEFT)
@@ -89,9 +119,10 @@ class PlotPanel(Frame,topo.base.TopoObject):
         Button(self.control_frame,text="Enlarge",
                command=self.enlarge).pack(side=LEFT)        
 
-        # Default is to not have the window Auto-refresh, because of
-        # possible slow plots.  Call self.auto_refresh_checkbutton.invoke()
-        # to enable it in a subclassed constructor function.
+        # Default is to not have the window Auto-refresh, because some
+        # plots are very slow to generate (e.g. some preference map
+        # plots).  Call self.auto_refresh_checkbutton.invoke() to
+        # enable autorefresh in a subclassed constructor function.
         self.auto_refresh = 0
         self.auto_refresh_checkbutton = Checkbutton(self.control_frame,
                                                     text="Auto-refresh",
@@ -104,7 +135,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
     def refresh(self):
         """
         Main steps for generating plots in the Frame.  These functions
-        must be implemented, or overwritten.
+        must either be implemented, or overwritten.
         """
         Pmw.showbusycursor()
         self.do_plot_cmd()                # Create plot tuples
@@ -210,7 +241,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
 
         # If the number of canvases has changed, or the width of the
         # first plot and canvas no longer match, then create a new set
-        # of canvases.  If the old canvases still can work, then use
+        # of canvases.  If the old canvases still can work, then reuse
         # them to prevent flicker.
         if self.canvases:
             first_new_width = str(self.zoomed_images[0].width())
@@ -261,7 +292,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
                  
 
     def reduce(self):
-        """Function called by Widget, to reduce the zoom factor"""
+        """Function called by Widget to reduce the zoom factor"""
         if self.zoom_factor > self.min_zoom_factor:
             self.zoom_factor = self.zoom_factor - 1
 

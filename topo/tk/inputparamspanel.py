@@ -21,8 +21,8 @@ import topo.kernelfactory
 import topo.plot
 import plotpanel
 import Pmw
-from Tkinter import IntVar, StringVar, TOP, LEFT, RIGHT, BOTTOM, YES, \
-     Checkbutton, N,S,E,W, X
+from Tkinter import IntVar, StringVar, Checkbutton
+from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
 from copy import deepcopy
 from topo.inputsheet import InputSheet
 from topo.sheet import BoundingBox, Sheet
@@ -49,7 +49,12 @@ def eval_atof(in_string):
     ### 
     ### This dictionary needs to be replaced with a real evaluation
     ### in an appropriate namespace, presumably the global namespace.
-    ### pi and PI should be defined there; RN isn't necessary.
+    ### pi and PI should be defined there; RN isn't necessary at all.
+    ### 
+    ### If possible, it should not be undefined if the Parameter
+    ### calling it does not like zero.  Instead, it should probably
+    ### accept a default value when called, to be returned on
+    ### exceptions.
     x_dict = {'PI':math.pi, 'pi':math.pi, 'Pi':math.pi, 'pI':math.pi,
               'RN':1.0}
     try:
@@ -69,6 +74,8 @@ def kernelfactory_names():
 
 
 class InputParamsPanel(plotpanel.PlotPanel):
+
+    ### This function is too long, and should be broken up if at all possible.
     def __init__(self,parent,pengine,console=None,padding=2,**config):
         super(InputParamsPanel,self).__init__(parent,pengine,console,**config)
         self.plot_group.configure(tag_text='Preview')
@@ -78,7 +85,8 @@ class InputParamsPanel(plotpanel.PlotPanel):
         self.parent = parent
         self.console = console
         self.learning = IntVar()
-        ### JABHACKALERT
+        
+        ### JABHACKALERT!
         ###
         ### This being a Test Pattern window, not a Training Pattern
         ### window, learning should most definitely be turned off by
@@ -86,9 +94,11 @@ class InputParamsPanel(plotpanel.PlotPanel):
         ### saying that there was a pop from an empty list.  This
         ### appears to be due to _learning_toggle saving the state
         ### when it is toggled, which seems clearly incorrect.
-        ### Instead, the event queue should be saved before the first
-        ### test pattern is presented, and restored whenever the next
-        ### training pattern is presented.        
+        ### Instead, the event queue should presumably be saved before
+        ### the first test pattern is presented, and restored whenever
+        ### the next training pattern is presented.  Otherwise, I
+        ### can't see how one could ensure that the system is in the
+        ### correct state.
         
         self.learning.set(1)
         self.tparams = {}
@@ -132,10 +142,11 @@ class InputParamsPanel(plotpanel.PlotPanel):
         buttonBox.add('Use for future learning',
                       command = self.use_for_learning)
 
-        ### JABHACKALERT
+        ### JABHACKALERT!
         ###
         ### Must remove the string "Factory" from all items in the
-        ### list of input types
+        ### list of input types.  Factory does not mean anything to
+        ### the user.
         ###
         # Menu of valid KernelFactory types defined.
         self.input_types = kernelfactory_names()
@@ -151,6 +162,18 @@ class InputParamsPanel(plotpanel.PlotPanel):
  
         self.prop_frame = propertiesframe.PropertiesFrame(self)
 
+        ### JABHACKALERT!
+        ###
+        ### There can't be any list of valid parameters defined in
+        ### this class; the user needs to be able to add any arbitrary
+        ### parameter to a new KernelFactory of his or her own design.
+        ### So all the information below needs to be stored with the
+        ### KernelFactory or some lower-level entity, preferably as
+        ### part of the Parameter definition.  Some of the values here
+        ### are just hints, while others are absolute maximum or
+        ### minimums, and the Parameter definition would need to
+        ### distinguish between those two cases.
+        
         #                name          min-value    max-value  init-value
         #
         self.tparams['theta'] = \
@@ -209,9 +232,9 @@ class InputParamsPanel(plotpanel.PlotPanel):
     def _input_change(self,button_name, checked):
         """
         Called by the input box.
-        checked records the state, True/False.  The self.in_ep_dict
-        records all input event processors, and if they're checked
-        or not.
+        The variable checked records the state, either True or False.
+        The variable self.in_ep_dict records all input event
+        processors, and whether they are checked or not.
         """
         self.in_ep_dict[button_name]['state'] = checked
         
@@ -321,6 +344,9 @@ class InputParamsPanel(plotpanel.PlotPanel):
         self.console.auto_refresh()
 
 
+    ### JAB: It is not clear how this will need to be extended to support
+    ### objects with different parameters in the different eyes, e.g. to
+    ### test ocular dominance.
     def _update_inputsheet_kernels(self):
         """
         Make an instantiation of the current user kernel, and put it into
@@ -368,6 +394,11 @@ class InputParamsPanel(plotpanel.PlotPanel):
             ep.set_input_generator(kernels_dict[each]['kernel'])
 
 
+    ### JAB: It is not clear how this will need to be extended to support
+    ### objects with different parameters in the different eyes, e.g. to
+    ### test ocular dominance.  It is also not clear which types of
+    ### randomness to add in, e.g. to provide random positions and
+    ### orientations, but not random sizes.
     def use_for_learning(self):
         """
         Lock in the existing KernelFactories as the new default stimulus
@@ -425,7 +456,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         Replace the superclass do_plot_cmd.
         Create a PlotGroup that has a list of Plots that have been
         created from a set of activations defined by the user. We
-        don't need a completely now PlotGroup type for this temporary
+        don't need a completely new PlotGroup type for this temporary
         plot.
 
         Post: self.pe_group contains a PlotGroup.
@@ -452,6 +483,16 @@ class InputParamsPanel(plotpanel.PlotPanel):
                 entry[1].set_slider_from_tag()
         super(InputParamsPanel,self).refresh()
 
+    ### JABHACKALERT!
+    ### 
+    ### It should be perfectly ok to have multiple InputParamsPanels,
+    ### and would be very useful.  E.g. in one panel one could have
+    ### defined a horizontal test stimulus, and another a vertical
+    ### stimulus, and the user could present either one as he or she
+    ### wishes.  For this to work, some of the complicated state saving
+    ### and similar code in this file needs to be moved out of this
+    ### class, but that's a good idea anyway.  E.g. that code needs to
+    ### be available without a GUI, e.g. for measuring preference maps.
     def _reset_and_destroy(self):
         """
         There should only be one InputParamsPanel for the Simulator.

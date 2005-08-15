@@ -178,31 +178,8 @@ class TopoConsole(Frame):
                      ).pack(side=LEFT,expand=YES,fill=X)
 
 
-
-#     def _init_lissom(self):
-#         """
-#         No longer used by Topographica.  Staying here as a record of the steps
-#         that LISSOM needs to do, as a template for Topographica.
-#         """
-#         root_prefix = os.path.split(os.getcwd())[-1]
-#         initial_params_file = root_prefix+'.param'
-# 
-#         #
-#         # Load the initial params file and set the filebase
-#         #
-#         Lissom.cmd("exec_file "+initial_params_file)
-#         Lissom.cmd("set filebase="+root_prefix)
-#         init_cmds = [
-#             # Set parameters to generate individual images instead of combined plot
-#             "ppm_border=0",
-#             "spawn_viewer=False",
-#             "cmd::ppm_separate_plots=True",
-#             "cmd::ppm_combined_plots=False"]
-#         Lissom.cmds(init_cmds)
-
-
     #
-    # Accessors for the GUIs active simulator and active plotengine objects.
+    # Accessors for the GUI's active simulator and active plotengine objects.
     #
     def set_active_simulator(self, new_sim):
         """
@@ -229,23 +206,19 @@ class TopoConsole(Frame):
         return self.__active_plotengine_obj
 
 
-
+    ### JABHACKALERT!
+    ### 
+    ### If the GUI interface was requested on the command line,
+    ### quitting from the GUI should also quit from the interpreter.
+    ### If the GUI was started as a separate function from the
+    ### Topographica interpreter, quitting from the GUI should 
+    ### probably *not* exit the Topographica interpreter.
     def quit(self):
         """Close the main GUI window.  Does not exit Topographica interpreter."""
-        self.cleanup_dir()
         topo.gui.set_console(None)
         Frame.quit(self)
         Frame.destroy(self)     # Get rid of widgets
         self.parent.destroy()   # Get rid of window
-
-
-    def cleanup_dir(self):
-        dir = os.listdir(os.curdir)
-        for f in dir:
-            m = re.match('gui\..*\.ppm$',f)
-            if m != None:
-                print 'removing: ' + f
-                os.remove(f)
 
 
     def load_network(self):
@@ -262,7 +235,7 @@ class TopoConsole(Frame):
             if result:
                 self.messageBar.message('state', 'Loaded ' + self.loaded_script)
             else:
-                self.messageBar.message('state', 'Failure loading ' + self.loaded_script)
+                self.messageBar.message('state', 'Failed to load ' + self.loaded_script)
         topo.tk.show_cmd_prompt()
 
     def reload_network(self):
@@ -306,6 +279,12 @@ class TopoConsole(Frame):
         self.auto_refresh_panels.remove(panel)
     
 
+    ### JABHACKALERT!
+    ### 
+    ### Is it necessary to have all these new_*_window functions?
+    ### They all seem very similar, and it seems like they could
+    ### be handled by one shared function, e.g. new_plot_window.
+        
     #
     # New plot windows
     #
@@ -394,6 +373,11 @@ class TopoConsole(Frame):
             self.messageBar.message('state', 'No active Simulator object.')
 
 
+    ### JABHACKALERT!
+    ### 
+    ### This code does not work at all; the user sees
+    ### "NameError: global name 'Label' is not defined" whenever the
+    ### About menu option is selected.
     def new_about_window(self):
         win = GUIToplevel(self)
         win.withdraw()
@@ -425,7 +409,7 @@ class TopoConsole(Frame):
         command are caught, and the name of the exception is passed back to the
         calling function.  If the command goes through, an OK is sent, along with
         a copy of the command.
-        Collisions between simultaneously running simulatiors is possible.
+        Collisions between simultaneously running simulators are possible.
         """
         try:
             #g = globals()
@@ -456,6 +440,13 @@ class TopoConsole(Frame):
         Returns True.  If execfile raises an exception, then it is not
         caught and passed to the calling function.
         """
+        ### JABHACKALERT!
+        ###
+        ### Please clarify the last sentence above.  Is the exception
+        ### passed to the calling function? (If so, say "and is
+        ### instead passed on".)  Or is it not passed to the calling
+        ### function? (If so, say "then it is neither caught nor
+        ### passed to the calling function".)
         if filename in ('',(),None):
             return False
         else:
@@ -499,6 +490,10 @@ class TopoConsole(Frame):
         
 ####################
 
+### JABHACKALERT!
+### 
+### Please explain what this class does.  It is not obvious to me, and
+### the comments below don't appear to make sense.
 class GUIToplevel(Toplevel):
     def __init__(self,parent,**config):
         # Megawidgets contain Toplevels in .hull  Either system is acceptable.

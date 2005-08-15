@@ -5,6 +5,7 @@ extending it.
 
 $Id$
 """
+
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas
 import plotpanel
@@ -12,7 +13,9 @@ import Pmw
 from topo.plot import PlotTemplate
 from topo.plotgroup import PlotGroupTemplate
 from topo.bitmap import WHITE_BACKGROUND, BLACK_BACKGROUND
-     
+
+### JAB: This class is not currently useful; it will need to be revisited once
+### preference maps can be measured.
 class PreferenceMapPanel(plotpanel.PlotPanel):
     def __init__(self,parent,pengine=None,console=None,plot_key='Activation',**config):
         plotpanel.PlotPanel.__init__(self,parent,pengine,console=console,plot_key=plot_key,**config)
@@ -63,14 +66,13 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
         self.plot_key = ('Activation','Activation','Activation')
 
 
-
+    ### JABHACKALERT!
+    ### 
+    ### This function needs to be fixed and/or documented; the old
+    ### documentation was incorrect (copied from another file).
     def do_plot_cmd(self):
         """
-        Create the right Plot Key that will define the needed
-        information for a WeightsPlotGroup.  This is the key-word
-        'Weights', and the necessary x,y coordinate.  Once the
-        PlotGroup is created, and call its do_plot_cmd() to prepare
-        the Plot objects.
+        Currently plots Activation as an example, but needs fixing.
         """
         if self.console.active_simulator().get_event_processors():
             pgt = PlotGroupTemplate([('ActivationPref',
