@@ -1,7 +1,7 @@
 """
 WeightsPanel object for GUI visualization.
 
-Subclasses RegionPlotPanel, which is basically a PlotPanel.
+Subclasses CFSheetPlotPanel, which is basically a PlotPanel.
 
 Uses a WeightsPlotGroup to generate the plots displayed in the main
 widget.
@@ -11,9 +11,16 @@ $Id$
 import __main__
 from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry
 from topo.tk.plotpanel import PlotPanel
-from topo.tk.regionplotpanel import RegionPlotPanel
+from topo.tk.regionplotpanel import CFSheetPlotPanel
 
-class WeightsPanel(RegionPlotPanel):
+### JABHACKALERT!
+###
+### This file and the class in it should be renamed to
+### unitweightspanel.py and UnitWeightsPanel.py, respectively. I've
+### already changed the relevant menu items, and the code should be
+### changed to match.
+
+class WeightsPanel(CFSheetPlotPanel):
     def __init__(self,parent,pengine,console=None,**config):
         super(WeightsPanel,self).__init__(parent,pengine,console,**config)
 
@@ -40,7 +47,7 @@ class WeightsPanel(RegionPlotPanel):
         params_frame = Frame(master=self)
         params_frame.pack(side=TOP,expand=YES,fill=X)
 
-        Message(params_frame,text="X:",aspect=1000).pack(side=LEFT)
+        Message(params_frame,text="Unit  X:",aspect=1000).pack(side=LEFT)
         Entry(params_frame,textvariable=self.x_str).pack(side=LEFT,expand=YES,fill=X)
         Message(params_frame,text="Y:",aspect=1000).pack(side=LEFT)
         Entry(params_frame,textvariable=self.y_str).pack(side=LEFT,expand=YES,fill=X,padx=5)
@@ -103,7 +110,9 @@ class WeightsPanel(RegionPlotPanel):
         Change the title of the grid group, then call PlotPanel's
         display_labels().
         """
-        self.plot_group.configure(tag_text = 'Connection Field Plot')
+        new_title = 'Connection Fields of ' + self.region.get() + \
+                    ' unit (' + str(self.x) + ',' + str(self.y) + ')'
+        self.plot_group.configure(tag_text = new_title)
         super(WeightsPanel,self).display_labels()
     
         

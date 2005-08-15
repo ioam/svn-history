@@ -78,6 +78,18 @@ class InputParamsPanel(plotpanel.PlotPanel):
         self.parent = parent
         self.console = console
         self.learning = IntVar()
+        ### JABHACKALERT
+        ###
+        ### This being a Test Pattern window, not a Training Pattern
+        ### window, learning should most definitely be turned off by
+        ### default.  However, when I try to do that, I get an error
+        ### saying that there was a pop from an empty list.  This
+        ### appears to be due to _learning_toggle saving the state
+        ### when it is toggled, which seems clearly incorrect.
+        ### Instead, the event queue should be saved before the first
+        ### test pattern is presented, and restored whenever the next
+        ### training pattern is presented.        
+        
         self.learning.set(1)
         self.tparams = {}
 
@@ -90,7 +102,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
                                           'kernel':None} 
         self.input_box = Pmw.RadioSelect(parent, labelpos = 'w',
                                 command = self._input_change,
-                                label_text = 'Input:',
+                                label_text = 'Input Sheets:',
                                 frame_borderwidth = 2,
                                 frame_relief = 'ridge',
                                 selectmode = 'multiple')
@@ -120,6 +132,11 @@ class InputParamsPanel(plotpanel.PlotPanel):
         buttonBox.add('Use for future learning',
                       command = self.use_for_learning)
 
+        ### JABHACKALERT
+        ###
+        ### Must remove the string "Factory" from all items in the
+        ### list of input types
+        ###
         # Menu of valid KernelFactory types defined.
         self.input_types = kernelfactory_names()
         self.input_type = StringVar()

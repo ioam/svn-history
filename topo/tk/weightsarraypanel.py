@@ -1,5 +1,5 @@
 """
-WeightsArray Panel for TK GUI visualization.
+Projection Panel for TK GUI visualization.
 
 $Id$
 """
@@ -9,13 +9,20 @@ from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
 import Pmw
 import ImageTk
 from math import ceil
-from topo.tk.regionplotpanel import RegionPlotPanel
+from topo.tk.regionplotpanel import CFSheetPlotPanel
 from topo.tk.plotpanel import PlotPanel
 from itertools import chain
 
-class WeightsArrayPanel(RegionPlotPanel):
+### JABHACKALERT!
+###
+### This file and the class in it should be renamed to
+### projectionpanel.py and ProjectionPanel.py, respectively. I've
+### already changed the relevant menu items, and the code should be
+### changed to match.
+
+class ProjectionPanel(CFSheetPlotPanel):
     def __init__(self,parent,pengine,console=None,**config):
-        super(WeightsArrayPanel,self).__init__(parent,pengine,console,**config)
+        super(ProjectionPanel,self).__init__(parent,pengine,console,**config)
 
         self.MIN_PLOT_WIDTH = 1
         self.INITIAL_PLOT_WIDTH = 13
@@ -28,7 +35,6 @@ class WeightsArrayPanel(RegionPlotPanel):
         self.weight_name = StringVar()
         self.weight_name.set('None')
         self.projections = {}
-
 
         self.params_frame1 = Frame(master=self)
         self.params_frame1.pack(side=RIGHT,expand=YES,fill=X)
@@ -116,7 +122,7 @@ class WeightsArrayPanel(RegionPlotPanel):
     def region_refresh(self,sheet_name):
         """
         Update the Projection menu.  This overwrites the parent class
-        function RegionPlotPanel.region_refresh() which is called when
+        function CFSheetPlotPanel.region_refresh() which is called when
         the Region Widget menu is changed.
         """
         self._create_projection_dict(sheet_name)
@@ -126,26 +132,26 @@ class WeightsArrayPanel(RegionPlotPanel):
 
 
     def refresh_title(self):
-        self.parent.title("Weights Array %d. (Region %s, Projection %s, Density %0.2f)" % (self.panel_num,self.region.get(),
+        self.parent.title("Projection %d. (Region %s, Projection %s, Density %0.2f)" % (self.panel_num,self.region.get(),
             self.weight_name.get(), self.density))
         
 
     def generate_plot_key(self):
         """
-        The plot_key for the WeightsArrayPanel will change depending
+        The plot_key for the ProjectionPanel will change depending
         on the input within the window widgets.  This means that the
         key needs to be regenerated at the appropriate times.
 
-        Key Format:  Tuple: ('WeightsArray', self.weight_name, self.density)
+        Key Format:  Tuple: ('Projection', self.weight_name, self.density)
         """
         self.density = float(eval(self.density_str.get(),__main__.__dict__))
-        self.plot_key = ('WeightsArray',self.weight_name.get(),self.density)
+        self.plot_key = ('Projection',self.weight_name.get(),self.density)
 
 
     def do_plot_cmd(self):
         """
         self.generate_plot_key() creates the density information needed for
-        a WeightsArrayPlotGroup to create necessary Plots.
+        a ProjectionPlotGroup to create necessary Plots.
         """
         if self.console.active_simulator().get_event_processors():
             self.generate_plot_key()
@@ -159,7 +165,7 @@ class WeightsArrayPanel(RegionPlotPanel):
     def display_plots(self):
         """
         This must be changed from PlotPanels version since
-        WeightsArrayPanel requires a 2D grid of plots.
+        ProjectionPanel requires a 2D grid of plots.
         """
         if self.pe_group:
             # Generate the zoomed images.
@@ -192,7 +198,8 @@ class WeightsArrayPanel(RegionPlotPanel):
         """
         if len(self.projections) > 0:
             src_name = self.projections[self.weight_name.get()].src.name
-            new_title = 'Projection from ' + src_name
+
+            new_title = 'Projection ' + self.weight_name.get() + ' from ' + src_name + ' to ' + self.region.get()
             self.plot_group.configure(tag_text = new_title)
         else:
             self.plot_group.configure(tag_text = 'No Projections')

@@ -9,7 +9,7 @@ import Pmw, re, os, sys, code, traceback, __main__
 import tkFileDialog
 from topo.tk.basicplotpanel import BasicPlotPanel
 from topo.tk.weightspanel import WeightsPanel
-from topo.tk.weightsarraypanel import WeightsArrayPanel
+from topo.tk.weightsarraypanel import ProjectionPanel
 from topo.tk.inputparamspanel import InputParamsPanel
 from topo.tk.preferencemappanel import PreferenceMapPanel
 import topo.simulator as simulator
@@ -124,12 +124,12 @@ class TopoConsole(Frame):
                              #################################
                              command=self.new_preferencemap_window)
         self.menubar.addmenuitem('Plots', 'command',
-                             'New weights plot',
-                             label="Weights",
+                             'New unit weights (connection fields) plot',
+                             label="Unit Weights",
                              command=self.new_weights_window)
         self.menubar.addmenuitem('Plots', 'command',
-                             'New weights array plot',
-                             label="Weights Array",
+                             'New projection (connection field array) plot',
+                             label="Projection",
                              ## Gray out menu item ###########
                              # foreground = 'Gray',            #
                              # activeforeground = 'Gray',      #
@@ -362,8 +362,8 @@ class TopoConsole(Frame):
             self.num_weights_array_windows += 1
             win = GUIToplevel(self)
             win.withdraw()
-            win.title("Weights Array %d" % self.num_weights_array_windows)
-            wap = WeightsArrayPanel(console=self,pengine=pe,parent=win)
+            win.title("Projection %d" % self.num_weights_array_windows)
+            wap = ProjectionPanel(console=self,pengine=pe,parent=win)
             wap.pack(expand=YES,fill=BOTH)
             wap.refresh_title()
             win.deiconify()
@@ -374,14 +374,14 @@ class TopoConsole(Frame):
 
     def open_plot_params_window(self):
         """
-        Test Pattern Parameters Window.  
+        Test Pattern Window.  
         """
         pe = self.active_plotengine()
         if pe:
             if self.input_params_window == None:
                 self.input_params_window = GUIToplevel(self)
                 self.input_params_window.withdraw()
-                self.input_params_window.title('Test Pattern Parameters')
+                self.input_params_window.title('Test Pattern')
                 ripp = InputParamsPanel(self.input_params_window,pe,self)
                 ripp.pack(side=TOP,expand=YES,fill=BOTH)
                 self.input_params_window.deiconify()

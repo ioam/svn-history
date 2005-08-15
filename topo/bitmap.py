@@ -65,6 +65,23 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     sFlat = sMapArray.flat
     vFlat = vMapArray.flat
 
+    ### JABHACKALERT
+    ###
+    ### The PreferenceMap panel currently prints the warning below.
+    ### Dividing automatically by 255 is not appropriate, because
+    ### there is no way to know what the appropriate value might be.
+    ### It should be entirely legal to plot something with a range
+    ### higher than 1.0.  E.g. very often we deliverately plot
+    ### selectivity with the brightness turned up so high that many of
+    ### the brighter pixels get cropped off, to accentuate the shape
+    ### of the few remaining areas that are poorly selective.  It's 
+    ### very important to have some way to warn the user of such cropping,
+    ### but not ok to simply rescale everything (unless the user has 
+    ### explictly turned on such autoscaling.
+    ### 
+    ### In any case, there must be a bug in the current code, because there's no 
+    ### reason this routine should get called with values ranging 0..255 if
+    ### they are intended to plot in the logical range 0..1.
     if max(hFlat) > 1 or max(sFlat) > 1 or max(vFlat) > 1:
         print 'Warning: HSVMap inputs not normalized to 1. Dividing by 255'
         print max(hFlat), max(sFlat), max(vFlat)
