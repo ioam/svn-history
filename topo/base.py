@@ -5,55 +5,6 @@ Implements the Topographica generic base class TopoObject.  This class
 encapsulates generic functions of all Topographica classes, such as
 automatic parameter setting, message output, etc.
 
-=== FACILITIES PROVIDED ===
-
--Automatic object naming-
-
-Every TopoObject has a name parameter.  If the user doesn't designate
-a name=<str> argument when constructing the object, the object will be
-given a name consisting of its class name followed by a unique 5-digit
-number. 
-
--Automatic parameter setting-
-
-The TopoObject __init__ method will automatically read the list of
-keyword parameters.  If any keyword matches the name of a Parameter
-(see params.py) defined in the object's class or any of its
-superclasses, that parameter in the instance will get the value given
-as a keyword argument.  For example:
-
-  class Foo(TopoObject):
-     xx = Parameter(default=1)
-
-  foo = Foo(xx=20)
-
-in this case foo.xx gets the value 20.
-
-- Advanced output -
-
-Each TopoObject has several methods for optionally printing output
-according to the current 'print level'.  The print levels are SILENT,
-WARNING, MESSAGE, VERBOSE, and DEBUG.  Each successive level allows
-more messages to be printed.  For example, when the level is VERBOSE,
-all warning, message, and verbose output will be printed.  When it is
-WARNING, only warnings will be printed.  When it is SILENT, no output
-will be printed.
-
-For each level (except SILENT) there's an associated print method:
-TopoObject.warning(), .message(), .verbose(), and .debug().
-
-Each line printed this way is prepended with the name of the object
-that printed it.  The TopoObject parameter print_level, and the module
-global variable min_print_level combine to determine what gets
-printed.  For example, if foo is a TopoObject:
-
-   foo.message('The answer is',42)
-
-is equivalent to:
-
-   if max(foo.print_level,base.min_print_level) >= MESSAGE:
-       print foo.name+':', 'The answer is', 42
-
 $Id$
 """
 
@@ -78,7 +29,7 @@ of the code unless you have verified it yourself.  An updated version
 may be available from topographica.org.
 
 Copyright 2005 James A. Bednar, Yoonsuck Choe, Judah B.
-De Paula, Jefferson Provost, and Joseph Reisinger.
+De Paula, Jefferson Provost, Joseph Reisinger, and Yiu Fai Sit.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License version 2 as
@@ -132,6 +83,59 @@ class TopoMetaclass(type):
                 print self.__name__+'.'+key, '=', val.default
 
 class TopoObject(object):
+    """
+    Base class for most Topographica objects, providing automatic
+    object naming, automatic parameter setting, and message formatting
+    facilities:
+    
+    -Automatic object naming-
+    
+    Every TopoObject has a name parameter.  If the user doesn't designate
+    a name=<str> argument when constructing the object, the object will be
+    given a name consisting of its class name followed by a unique 5-digit
+    number. 
+    
+    -Automatic parameter setting-
+    
+    The TopoObject __init__ method will automatically read the list of
+    keyword parameters.  If any keyword matches the name of a Parameter
+    (see params.py) defined in the object's class or any of its
+    superclasses, that parameter in the instance will get the value given
+    as a keyword argument.  For example:
+    
+      class Foo(TopoObject):
+         xx = Parameter(default=1)
+    
+      foo = Foo(xx=20)
+    
+    in this case foo.xx gets the value 20.
+    
+    - Message formatting -
+    
+    Each TopoObject has several methods for optionally printing output
+    according to the current 'print level'.  The print levels are SILENT,
+    WARNING, MESSAGE, VERBOSE, and DEBUG.  Each successive level allows
+    more messages to be printed.  For example, when the level is VERBOSE,
+    all warning, message, and verbose output will be printed.  When it is
+    WARNING, only warnings will be printed.  When it is SILENT, no output
+    will be printed.
+    
+    For each level (except SILENT) there's an associated print method:
+    TopoObject.warning(), .message(), .verbose(), and .debug().
+    
+    Each line printed this way is prepended with the name of the object
+    that printed it.  The TopoObject parameter print_level, and the module
+    global variable min_print_level combine to determine what gets
+    printed.  For example, if foo is a TopoObject:
+    
+       foo.message('The answer is',42)
+    
+    is equivalent to:
+    
+       if max(foo.print_level,base.min_print_level) >= MESSAGE:
+           print foo.name+':', 'The answer is', 42
+    """
+
     __metaclass__ = TopoMetaclass
 
 
