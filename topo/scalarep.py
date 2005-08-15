@@ -7,14 +7,19 @@ constructing single-unit simulations.
 
 $Id$
 """
+
+### JABHACKALERT!
+###
+### Should be rewritten to avoid 'import *'.
+###
 from topo.params import *
 from topo.simulator import *
 
 class PulseGenerator(EventProcessor):
 
     """
-
-    A simple pulse generator node.
+    A simple pulse generator node.  Produces pulses (scalars) of a
+    fixed amplitude at a fixed frequency and phase.
 
     Parameters:
       amplitude = The size of the pulse to generate. (default 1.0)
@@ -23,10 +28,9 @@ class PulseGenerator(EventProcessor):
       phase     = The time after starting the simulation to wait before
                   sending the first pulse. (default 0.0)
 
-    Produces pulses (scalars) of a fixed amplitude at a fixed
-    frequency and phase.  Period and phase simulation time intervals.
-    If period is omitted or set to 0, a single pulse is sent, offset
-    from the start of the simulation by the phase.
+    Period and phase are in units of simulation time.  If period is
+    omitted or set to 0, a single pulse is sent, offset from the start
+    of the simulation by the phase.
 
     """
 
@@ -50,18 +54,15 @@ class PulseGenerator(EventProcessor):
 
 class ThresholdUnit(EventProcessor):
     """
-
-    A simple pulse-accumulator threshold node.
+    A simple pulse-accumulator threshold node.  Accumulates incoming
+    pulses.  When the accumulated value rises above threshold, it
+    generates a pulse of a given amplitude and resets the accumulator
+    to zero.
 
     Parameters:
        threshold = (default 1.0) The threshold at which to fire.
        amplitude = (default 1.0) The size of the pulse to generate.
        accum     = (default 0.0) The initial accumulator value
-
-    Accumulates incoming pulses.  When the accumulated value rises
-    above threshold, it generates a pulse of a given amplitude and
-    resets the accumulator to zero.
-
     """
     threshold     = Parameter(default=1.0)
     initial_accum = Parameter(default=0.0)
@@ -80,9 +81,10 @@ class ThresholdUnit(EventProcessor):
                 self.accum = 0
                 print `self` + ' firing, amplitude = ' + `self.amplitude`
 
+
 class SumUnit(EventProcessor):
     """
-    A simple sum unit.
+    A simple unit that outputs the running sum of input received thus far.
     """
     def __init__(self,**params):
         super(SumUnit,self).__init__(**params)
@@ -90,7 +92,7 @@ class SumUnit(EventProcessor):
 
     def input_event(self,src,src_port,dest_port,data):
         self.value += data
-        self.debug("recieved",data,"from",src,"value =",self.value)
+        self.debug("received",data,"from",src,"value =",self.value)
 
     def pre_sleep(self):
         self.debug("pre_sleep called, time =",self.simulator.time(),"value =",self.value)

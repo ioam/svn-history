@@ -11,15 +11,16 @@ inf = (ones(1)/0.0)[0]
 
 def NxN(tuple):
     """
-    Converts a tuple (X1,X2,...,Xn) to a string "X1xX2x...xXn"
+    Converts a tuple (X1,X2,...,Xn) to a string 'X1xX2x...xXn'
     """    
     return 'x'.join([`N` for N in tuple])
 
 
 def enumerate(seq):
     """
-    A copy of the Python 2.3 enumeration generator, for each element Xi
-    of a sequence, the enumerator yields the tuple (i,Xi).    
+    For each element Xi of the given sequence, produces the tuple (i,Xi).
+    
+    (A copy of the Python 2.3 enumeration generator.)
     """
     Generator
     i = 0
@@ -37,17 +38,18 @@ def L2norm(v):
 
 def norm(v,L=2):
     """
-    Returns the L? norm of v, L defaults to 2.
+    Returns the L? norm of v, where L is arbitrary and defaults to 2.
     """
     return sum(v**L)**(1.0/L)
 
 def msum(m):
     """
-    Returns the sum of elements in a 2-d matrix.  Works in cases where
+    Returns the sum of elements in a 2D matrix.  Works in cases where
     sum(a.flat) fails, e.g, with matrix slices or submatrices.
     """
     return sum(sum(m))
 
+### JAB: Could be rewritten using weave.blitz to avoid creating a temporary
 def mdot(m1,m2):
     """
     Returns the sum of the element-by-element product of two 2D
@@ -90,7 +92,7 @@ class Struct:
 def flat_indices(shape):
     """
     Returns a list of the indices needed to address or loop over all
-    the elements of a 1D or 2D matrix with the given shape. e.g.:
+    the elements of a 1D or 2D matrix with the given shape. E.g.:
 
     flat_indices((3,)) == [0,1,2]
     """
@@ -103,7 +105,7 @@ def flat_indices(shape):
     
 def add_border(matrix,width=1,value=0.0):
     """
-    returns a new matrix consisting of the given matrix with a border
+    Returns a new matrix consisting of the given matrix with a border
     or margin of the given width filled with the given value.
     """
     from Numeric import concatenate as join,array
@@ -118,8 +120,9 @@ def add_border(matrix,width=1,value=0.0):
 def flatten(l):
     """
     Flattens a list.
+    
     Written by Bearophile as published on the www.python.org newsgroups.
-    Pulled into Topographica 3/5/2005
+    Pulled into Topographica 3/5/2005.
     """
     if type(l) != list:
         return l

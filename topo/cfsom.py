@@ -6,6 +6,15 @@ uses receptive fields.
 $Id$
 """
 
+### JABHACKALERT!
+###
+### This file and other files defining specific runnable models
+### (e.g. lissom.ty) should be moved into a new directory ../models/.
+### Files in that directory will have names ending in .ty, indicating
+### that they are Topographica models or scripts (and are not core .py
+### Topographica source code.)  When this file and others are moved,
+### various test and example code will need to be updated in other
+### directories.
 
 from utils import L2norm
 from params import Parameter
@@ -23,8 +32,14 @@ def decay(time,half_life):
 
 class CFSOM(CFSheet):
     """
+    An implementation of the Kohonen Self-Organizing Map algorithm
+    extended to support ConnectionFields, i.e., different spatially
+    restricted input regions for different units.  With fully
+    connected input regions, should be usable as a regular SOM as
+    well.
+    
     Learning operates by selecting a single winning unit from the SOM
-    at each input, and learning the units in a gaussian neighborhood
+    at each input, and learning the units in a Gaussian neighborhood
     around the winner.
 
     """
@@ -85,8 +100,13 @@ class CFSOM(CFSheet):
             return self.matrix2sheet(row,col)
 
 
+### JABHACKALERT!
+###
+### Is the following code redundant, when ../tests/testcfsom.py is
+### taken into account?  If so, it should be deleted.
 
 
+# Simple example of using CFSOM
 if __name__ == '__main__':
 
     from simulator import Simulator
