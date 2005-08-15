@@ -7,7 +7,7 @@ $Id$
 """
 import plotpanel
 
-### JABHACKALERT
+### JABHACKALERT!
 ###
 ### The word "Activation" should henceforth not be used anywhere in
 ### the code.  We need to change all instances of "Activation" to

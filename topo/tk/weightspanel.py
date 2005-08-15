@@ -93,7 +93,7 @@ class WeightsPanel(CFSheetPlotPanel):
         Create the right Plot Key that will define the needed
         information for a WeightsPlotGroup.  This is the key-word
         'Weights', and the necessary x,y coordinate.  Once the
-        PlotGroup is created, and call its do_plot_cmd() to prepare
+        PlotGroup is created, call its do_plot_cmd() to prepare
         the Plot objects.
         """
         if self.console.active_simulator().get_event_processors():

@@ -65,7 +65,7 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     sFlat = sMapArray.flat
     vFlat = vMapArray.flat
 
-    ### JABHACKALERT
+    ### JABHACKALERT!
     ###
     ### The PreferenceMap panel currently prints the warning below.
     ### Dividing automatically by 255 is not appropriate, because

@@ -10,7 +10,9 @@ import Pmw
 
 class PropertiesFrame(Frame):
     """
-    GUI window for displaying and manipulating the properties of an object.
+    GUI window for displaying and manipulating the properties of an
+    object.  This class is very general, and could be used for
+    manipulating any object that has enumerable properties.
     """
     def __init__(self, parent=None, padding=2,**config):
         self.parent = parent

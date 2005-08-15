@@ -84,7 +84,7 @@ class TaggedSlider(Frame):
         """
         When this frame is first shown, it calls the slider callback,
         which would overwrite the initial string value with a string
-        translation (e.g. 'PI' -> '3.142').  This prevents that.
+        translation (e.g. 'PI' -> '3.142').  This code prevents that.
         """
         if not self.first_slider_command:
             self.set_tag_from_slider()

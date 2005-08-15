@@ -102,7 +102,7 @@ def produce_kernel_matrices(bounds, density, r, c):
 
 
 
-### JABHACKALERT
+### JABHACKALERT!
 ### 
 ### Instead of theta, any user-visible parameter should have a
 ### readable name like "orientation" or "angle" (which is shorter but
