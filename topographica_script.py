@@ -11,6 +11,14 @@ $Id$
 from getopt import getopt,GetoptError
 import os
 
+### JABHACKALERT!
+### 
+### This file will need to be rewritten nearly entirely, probably by
+### me (jbednar), to be simpler and have the necessary features.  It's
+### clear that there's no reason to keep it even partially compatible
+### with python's own command-line format, because that format is not
+### very useful.  See TODO.txt for some more details.
+
 # All valid Python 2.4 args, plus 'g' for topo.gui.start()
 VALID_OPTS     = 'ic:dEhOQ:StuvVW:xm:g'  
 

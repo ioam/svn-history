@@ -1,9 +1,9 @@
 """
-sheet for randomly generating inputs
+Sheet for generating a series of inputs, e.g. by choosing
+parameters from a random distribution.
 
 $Id$
 """
-
 
 from sheet import Sheet 
 from utils import NxN
@@ -36,6 +36,10 @@ class InputSheet(Sheet):
         """
         self.input_generator = new_ig
         self.input_generator.bounds = self.bounds
+        ### JABHACKALERT!
+        ###
+        ### Why is this hack necessary?  How can we eliminate it?
+        ###
         # KERNELFACTORY HACK PATCH TO GET THE X/Y RIGHT OUTSIDE OF KFS.
         (l,b,r,t) = self.bounds.aarect().lbrt()
         self.input_generator.bounds = BoundingBox(points=((b,l),(t,r)))

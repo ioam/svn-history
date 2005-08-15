@@ -1,9 +1,10 @@
 """
-Changed July 3, 2004 by Judah De Paula to import TY files.  Chains
-imputil extension after the dafault importer since the replacement
-installer was giving errors on imports of subpackages.  By importing
-this package, the additional TY importer will automatically be
-installed.  Replaced extension module with the full imputil once
+Based on imputil.py, modified July 3, 2004 by Judah De Paula to import TY files.  
+
+Chains imputil extension after the default importer, because the
+replacement installer was giving errors on imports of subpackages.  By
+importing this package, the additional TY importer will automatically
+be installed.  Replaced extension module with the full imputil once
 problems were encountered with subpackages for future modifications.
 
 Import utilities
@@ -18,6 +19,25 @@ Exported classes:
 
 $Id$
 """
+### JABHACKALERT!
+###
+### What does "Replaced extension module with the full imputil once
+### problems were encountered with subpackages for future
+### modifications" mean?  Does that mean that it was difficult to
+### simply extend the standard Python imputil.py, and instead we had
+### to copy and modify it?  If so, we need to document what changes we
+### made and why they were necessary.
+###
+### It would be much better for our changes to be simply a few extra
+### functions in a separate file, with at most a trivial patch
+### automatically applied to the distributed version of imputil.py.
+### That way we will gracefully adapt when they make changes to their
+### imputil.py, and we won't have to keep updating our private copy.
+### If changes to their code are absolutely required, please file a
+### bug report with python.org explaining what you had to do, and how
+### imputil.py can be modified so that we would no longer need a
+### custom copy of it.
+
 
 # note: avoid importing non-builtin modules
 import imp                      ### not available in JPython?
@@ -626,8 +646,11 @@ _ty_suffix = '.ty' + _suffix_char
 
 def ty_suffix_importer(filename, finfo, fqname):
     """
-    Importer function for .TY A minor change on the py_suffix_importer
-    from imputil.py.  Will generate the compiled code for .ty files too.
+    Importer function for .TY
+
+    A minor change of the py_suffix_importer from imputil.py, to treat
+    .ty extensions just like .py.  Will also generate the compiled
+    code for .ty files.
     """
     file = filename[:-3] + _ty_suffix
     t_py = long(finfo[8])

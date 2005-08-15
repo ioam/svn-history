@@ -23,6 +23,21 @@ or
 $Id$
 """
 
+### JABHACKALERT!
+### 
+### This file should be renamed to something like ui.py, to truly
+### reflect whatever it does.  What it seems to do is to provide a way
+### for a user interface to be registered, or at least provide a way
+### for such an interface to be connected to simulator.py.  So this
+### could be renamed and generalized to allow any user interface to be
+### selected, of which the one in topo.tk is only an example.  At most
+### topographica_script.py should be the only thing that even knows
+### topo.tk exists; because it needs to know what to do with -g.  If
+### someone changes the implementation of -g to select some other GUI,
+### eg. topo/gtk, then it should not be necessary to modify any code
+### in this directory.  This file does not respect that rule, and
+### needs to be changed.
+
 import sys, __main__
 import topo.simulator
 import topo.base
