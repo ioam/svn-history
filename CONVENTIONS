@@ -24,6 +24,21 @@ string.  Other differences are listed elsewhere in this file, such as
 in the REVISION INFO section.
 
 
+USER-LEVEL AND SIMULATOR CODE
+
+By convention, we use a file extension of .py for the Python code
+making up the simulator, in the topo/ subdirectory.  Models and other
+user-level code such as scripts and examples should use an extension
+of .ty, indicating that it is a file for use with Topographica.  (Many
+of the .py files are general purpose, and could be used with any
+Python program, but the .ty files typically require all or most of
+Topographica.)  
+
+All .ty files should use only the publically available classes and
+functions in topo/, i.e. they should respect the
+(as-yet-only-loosely-defined) Topographica API.
+
+
 REVISION CONTROL
 
 Revision control is by CVS.  Please check in changes as soon as they
