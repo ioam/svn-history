@@ -157,6 +157,28 @@ particular parameter, so please discuss it with all, or at least with
 Jim, before picking a unit arbitrarily.
 
 
+NAMING
+
+Please be consistent when naming code and user interface entities,
+always using a well-defined term.  E.g. Topographica is based on
+Sheets, so windows and messages should always call a Sheet a Sheet,
+not a Region or Area.  Just think about what you letting the user plot
+or manipulate, and ask whether that's one of the concepts for which we
+have (laboriously!)  worked out a specific term.  Examples of
+acceptable, well-defined terms:
+
+  Sheet
+  Unit
+  ConnectionField
+  Projection
+  CFSheet
+  InputSheet
+  SheetView
+  UnitView
+  Event
+  
+
+
 GUI
 
 No part of Topographica should import GUI files, rely on the presence
