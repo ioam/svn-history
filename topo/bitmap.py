@@ -71,7 +71,7 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     ### Dividing automatically by 255 is not appropriate, because
     ### there is no way to know what the appropriate value might be.
     ### It should be entirely legal to plot something with a range
-    ### higher than 1.0.  E.g. very often we deliverately plot
+    ### higher than 1.0.  E.g. very often we deliberately plot
     ### selectivity with the brightness turned up so high that many of
     ### the brighter pixels get cropped off, to accentuate the shape
     ### of the few remaining areas that are poorly selective.  It's 
