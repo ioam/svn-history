@@ -7,6 +7,11 @@ perhaps be moved to the examples/ directory or deleted.
 
 $Id$
 """
+
+### JABHACKALERT!
+###
+### Should be rewritten to avoid 'import *'.
+###
 from topo.sheet import *
 from utils import NxN
 from topo.utils import Struct

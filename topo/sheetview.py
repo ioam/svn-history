@@ -18,6 +18,11 @@ import Numeric
 import sheet
 from base import TopoObject
 
+### JABHACKALERT!
+###
+### Are any of these operators implemented?  They should either be
+### tested or removed.
+
 # Valid operations that a SheetView should support for the list of
 # sheets passed in.  There are other things that would be useful
 # such as masking which will require a bit more work.  !!UNTESTED!!

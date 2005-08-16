@@ -9,6 +9,11 @@ $Id$
 """
 
 import sys
+
+### JABHACKALERT!
+###
+### Should this be rewritten to avoid 'import *'?
+###
 from params import *
 from pprint import pprint
 
@@ -88,14 +93,14 @@ class TopoObject(object):
     object naming, automatic parameter setting, and message formatting
     facilities:
     
-    -Automatic object naming-
+    - Automatic object naming -
     
     Every TopoObject has a name parameter.  If the user doesn't designate
     a name=<str> argument when constructing the object, the object will be
     given a name consisting of its class name followed by a unique 5-digit
     number. 
     
-    -Automatic parameter setting-
+    - Automatic parameter setting -
     
     The TopoObject __init__ method will automatically read the list of
     keyword parameters.  If any keyword matches the name of a Parameter
