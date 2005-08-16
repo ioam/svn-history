@@ -38,6 +38,12 @@ All .ty files should use only the publically available classes and
 functions in topo/, i.e. they should respect the
 (as-yet-only-loosely-defined) Topographica API.
 
+Typically, files will be named with the lowercase version of the main
+class which they contain.  E.g. sheet.py contains class Sheet and some
+associated functions.  Most files should contain one main class,
+though often subclasses are also included (in which case the file
+should be named after the parent class).
+
 
 REVISION CONTROL
 
