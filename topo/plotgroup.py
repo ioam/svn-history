@@ -132,7 +132,7 @@ class PlotGroupTemplate(TopoObject):
             self.plot_templates = KeyedList()
         else:
             self.plot_templates = KeyedList(plot_templates)
-
+        self.description = self.name
         
 
 class PlotGroup(TopoObject):
