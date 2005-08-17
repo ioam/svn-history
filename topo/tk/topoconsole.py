@@ -12,6 +12,7 @@ from topo.tk.weightspanel import WeightsPanel
 from topo.tk.weightsarraypanel import ProjectionPanel
 from topo.tk.inputparamspanel import InputParamsPanel
 from topo.tk.preferencemappanel import PreferenceMapPanel
+from topo.plotgroup import PlotGroupTemplate, PlotTemplate, WHITE_BACKGROUND
 import topo.simulator as simulator
 import topo.plotengine
 import topo.gui
@@ -19,6 +20,48 @@ import topo.base
 
 KNOWN_FILETYPES = [('Python Files','*.py'),('Topographica Files','*.ty'),('All Files','*')]
 
+plot_panel_list = []
+
+class PlotsMenuEntry(topo.base.TopoObject):
+    """
+    Use these objects to populate the TopoConsole Plots pulldown.
+    """
+    def __init__(self,console,template,class_name=BasicPlotPanel,label=None,description=None,**config):
+        super(PlotsMenuEntry,self).__init__(**config)
+        self.console = console
+        self.template = template
+        self.class_name = class_name
+        if not label:
+            label = template.name
+        self.label = label
+        if not description:
+            description = template.description
+        self.description = description
+
+        self.num_windows = 0
+        self.title = ''
+
+
+    def command(self):
+        self.num_windows = self.num_windows + 1
+        self.title = '%s %d' % (self.label, self.num_windows)
+
+        pe = self.console.active_plotengine()
+        if pe:
+            win = GUIToplevel(self.console)
+            win.withdraw()
+            win.title(self.title)
+            pn = self.class_name(console=self.console,pengine=pe,parent=win,
+                                 plot_key=self.template,plotgroup_type=self.template)
+            pn.pack(expand=YES,fill=BOTH)
+            pn.refresh_title()
+            win.deiconify()
+            self.console.messageBar.message('state', 'OK')
+        else:
+            self.console.messageBar.message('state', 'No active Simulator object.')
+
+        
+    
 
 class TopoConsole(Frame):
     """
@@ -117,11 +160,6 @@ class TopoConsole(Frame):
         self.menubar.addmenuitem('Plots', 'command',
                              'New orientation, ocular dominance, or similar map plot',
                              label="Preference Map",
-                             ## Gray out menu item ###########
-                             # foreground = 'Gray',            #
-                             # activeforeground = 'Gray',      #
-                             # activebackground = 'Light Gray',#
-                             #################################
                              command=self.new_preferencemap_window)
         self.menubar.addmenuitem('Plots', 'command',
                              'New unit weights (connection fields) plot',
@@ -130,18 +168,17 @@ class TopoConsole(Frame):
         self.menubar.addmenuitem('Plots', 'command',
                              'New projection (connection field array) plot',
                              label="Projection",
-                             ## Gray out menu item ###########
-                             # foreground = 'Gray',            #
-                             # activeforeground = 'Gray',      #
-                             # activebackground = 'Light Gray',#
-                             #################################
                              command=self.new_weights_array_window)
+        self.menubar.addmenuitem('Plots','separator')
+
+        self.populate_plots_menu(self.menubar)
+
         self.menubar.addmenuitem('Plots','separator')
         self.menubar.addmenuitem('Plots', 'command',
                                  'Refresh auto-refresh plots',
                                  label="Refresh",
                                  command=self.auto_refresh)
-        
+
 
         #
         # Help menu
@@ -176,6 +213,24 @@ class TopoConsole(Frame):
                      entry_textvariable=self.learning_str,
                      selectioncommand=Pmw.busycallback(self.do_learning)
                      ).pack(side=LEFT,expand=YES,fill=X)
+
+
+    def populate_plots_menu(self, menubar):
+        """
+        Poll for a list of class types, and put them into the Console
+        plots list.  This replaces something of this form:
+
+        self.menubar.addmenuitem('Plots', 'command',
+                             'New activity plot',
+                             label="Activity",
+                             command=self.new_activity_window)
+        """
+        for (label,obj) in topo.plotengine.plotgroup_templates.items():
+            entry = PlotsMenuEntry(self,obj,label=label)            
+            menubar.addmenuitem('Plots','command',
+                                obj.description,label=label,
+                                command=entry.command)
+
 
 
     #
@@ -505,3 +560,11 @@ class GUIToplevel(Toplevel):
 ####################
 
 
+# Populate the dynamic plot menu list registry:
+if __name__ != '__main__':
+    pgt = PlotGroupTemplate([('ActivationPref',
+                              PlotTemplate({'background' : WHITE_BACKGROUND,
+                                            'Strength'   : 'Activation',
+                                            'Hue'        : 'Activation',
+                                            'Confidence' : 'Activation'}))])
+    topo.plotengine.plotgroup_templates[pgt.name] = pgt
