@@ -14,6 +14,8 @@ from topo.image import ImageSaver
 import topo.gui
 import topo.cfsheet
 from topo.params import *
+import weave
+import Numeric
 
 
 from topo.utils import msum
@@ -36,48 +38,153 @@ class LISSOM(topo.cfsheet.CFSheet):
     transfer_fn = Parameter(default=utils.PLTF)
 
 # Temporarily disabled learning for comparison with C++ lissom implementation
-#   learning_rate = Parameter(default=0.1) 
-    learning_rate = Parameter(default=0.0)
+    learning_rate = Parameter(default=0.1) 
+#    learning_rate = Parameter(default=0.0)
 
+    # modify weights after each activation?
+    continuous_learning = Parameter(default=False)
+
+    presleep_count = 0
 
     def input_event(self,src,src_port,dest_port,data):
-
         # On a new afferent input, clear the activation
-        if dest_port == 'afferent':
-            print "clear"
+        if src.name == 'Retina':
             self.activation *= 0.0
+            for name in self.projections:
+                for proj in self.projections[name]:
+                    proj.temp_activation *= 0.0
+
         super(LISSOM,self).input_event(src,src_port,dest_port,data)
 
+    def pre_sleep(self):
+        """
+        Pass the accumulated stimulation through self.transfer_fn and
+        send it out on the default output port.
+        """
+
+        if self.new_input:
+            self.new_input = False
+            self.temp_activation *= 0.0
+            for name in self.projections:
+                for proj in self.projections[name]:
+                    self.temp_activation += proj.temp_activation
+            self.activation = self.transfer_fn(self.temp_activation)
+            self.send_output(data=self.activation)
+
+        if self._learning:
+            if self.continuous_learning:
+                self.learn()
+            else:
+                self.presleep_count += 1
+                if self.presleep_count == tsettle+1:
+                    self.presleep_count = 0
+                    self.learn()
+                    
 
 
     def learn(self):
+        rows,cols = self.activation.shape
+        alpha = self.learning_rate
+        X = self.activation
 
-        pass
-#        rows,cols = self.activation.shape
-#        for proj in chain(*self.projections.values()):
-#            if proj.input_buffer:
-#                for r in range(rows):
-#                    for c in range(cols):
-#                        cf = proj.cf(r,c)
-#                        cf.weights += (self.learning_rate * self.activation[r,c]
-#                                       * cf.get_input_matrix(proj.input_buffer))
-#
-#
-#        
-#        # normalize weights
-#        lateral = self.lateral_projections()
-#        afferent = self.afferent_projections()
-#                                             
-#        for r in range(rows):
-#            for c in range(cols):
-#                for group in (lateral,afferent):
-#                    # Uncomment for normalization over whole group (lateral, afferent)
-#                    # k = sum([sum(p.cf(r,c).weights.flat)
-#                    #          for p in group])
-#                    for p in group:
-#                        # Uncomment for normalization per projection
-#                        k = sum(p.cf(r,c).weights.flat)
-#                        p.cf(r,c).weights /= k
+        learn_code = """
+            double *wi, *wj, *x, *inpi, *inpj;
+            int *slice;
+            int rr1, rr2, cc1, cc2, rc;
+            int i, j, r, l;
+            PyObject *cf, *cfsr;
+            PyObject *sarray = PyString_FromString("slice_array");
+            PyObject *weights = PyString_FromString("weights");
+            double load, delta;
+            double totald;
+
+            x = X;
+            for (r=0; r<rows; ++r) {
+                cfsr = PyList_GetItem(cfs,r);
+                for (l=0; l<cols; ++l) {
+                    load = *x++;
+                    if (load != 0) {
+                        load *= alpha;
+
+                        cf = PyList_GetItem(cfsr,l);
+                        wi = (double *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
+                        wj = wi;
+                        slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
+                        rr1 = *slice++;
+                        rr2 = *slice++;
+                        cc1 = *slice++;
+                        cc2 = *slice;
+
+                        totald = 0.0;
+
+                        inpj = inp+len*rr1+cc1;
+                        for (i=rr1; i<rr2; ++i) {
+                            inpi = inpj;
+                            for (j=cc1; j<cc2; ++j) {
+                                delta = load * *inpi;
+                                *wi += delta;
+                                totald += delta;
+                                ++wi;
+                                ++inpi;
+                            }
+                            inpj += len;
+                        }
+
+                        if (normalize) {
+                            totald += normalize; 
+                            totald = 1.0/totald;
+                            rc = (rr2-rr1)*(cc2-cc1);
+
+                            for (i=0; i<rc; ++i) {
+                                *wj *= totald;
+                                ++wj;
+                            }
+                        }
+                    }
+                }
+            }
+        """
+
+        for proj in chain(*self.projections.values()):
+            if proj.input_buffer:
+                if proj.src == self: #lateral connection
+                    inp = self.activation
+                else:
+                    inp = proj.input_buffer
+                cfs = proj.cfs
+                len, len2 = inp.shape
+                normalize = proj.normalize
+                weave.inline(learn_code, ['rows', 'cols', 'cfs', 'alpha', 'inp', 'X', 'len', 'normalize'])
+
+
+    # Python version of the learn function, the flow is a little different
+    # from the C version
+    def learn_py(self):
+        rows,cols = self.activation.shape
+        for proj in chain(*self.projections.values()):
+            if proj.input_buffer:
+                for r in range(rows):
+                    for c in range(cols):
+                        cf = proj.cf(r,c)
+                        cf.weights += (self.learning_rate * self.activation[r,c]
+                                       * cf.get_input_matrix(proj.input_buffer))
+
+
+        
+        # normalize weights
+        lateral = self.lateral_projections()
+        afferent = self.afferent_projections()
+                                             
+        for r in range(rows):
+            for c in range(cols):
+                for group in (lateral,afferent):
+                    # Uncomment for normalization over whole group (lateral, afferent)
+                    # k = sum([sum(p.cf(r,c).weights.flat)
+                    #          for p in group])
+                    for p in group:
+                        # Uncomment for normalization per projection
+                        k = sum(p.cf(r,c).weights.flat)
+                        p.cf(r,c).weights /= k
 
     def lateral_projections(self):
         return [p for p in chain(*self.projections.values()) if p.src is self]
@@ -162,8 +269,8 @@ inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(
 
 
 print "Creating simulation objects..."
-s = topo.simulator.Simulator()
 
+s = topo.simulator.Simulator()
 
 retina = InputSheet(input_generator=GaussianFactory(),name='Retina')
 V1 = LISSOM(name='V1')
@@ -172,6 +279,7 @@ save  = ImageSaver(name='LISSOM')
 s.connect(retina,V1, delay = 0.5/tsettle,
           projection_params = dict(strength = 1.0, name='Afferent0',
                                    weights_bounds = afferent_weight_bounds, normalize = 1))
+
 
 s.connect(V1,V1, delay = 1.0/tsettle, dest_port="exc",
           projection_params = dict(strength = gammaexc, name='LateralExcitatory',
@@ -190,7 +298,7 @@ s.connect(V1,V1, delay = 1.0/tsettle, dest_port="inh",
 #s.connect(retina,save,dest_port='retina',delay=2)
 #s.connect(V1,save,dest_port='V1',delay=1)
 
-#s.run(100)
+#s.run(200)
 
 #V1.projections['Retina'][0].plot_cfs()
 
@@ -205,6 +313,6 @@ s.connect(V1,V1, delay = 1.0/tsettle, dest_port="inh",
 
 
 #import profile,pstats
-#profile.runctx('s.run(3)',globals(),locals(),"abc")
+#profile.runctx('s.run(200)',globals(),locals(),"abc")
 #p = pstats.Stats('abc')
-#p.strip_dirs().sort_stats(-1).print_stats()
+#p.strip_dirs().sort_stats('cumulative').print_stats()
