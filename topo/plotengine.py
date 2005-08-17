@@ -58,6 +58,14 @@ from bitmap import WHITE_BACKGROUND, BLACK_BACKGROUND
 from sheet import Sheet
 from cfsheet import CFSheet
 
+
+# Global repository of templates that can be added as necessary.
+global plot_templates
+global plotgroup_templates
+plot_templates = {}
+plotgroup_templates = {}
+
+
 def sheet_filter(sheet):
     """
     Example sheet filter that can be used to limit which sheets are
