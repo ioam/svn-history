@@ -10,7 +10,13 @@ from utils import NxN
 
 import copy
 from sheet import BoundingBox
+
+### JABHACKALERT!
+###
+### Should be rewritten to avoid 'import *'.
+###
 from params import *
+
 from kernelfactory import UniformRandomFactory
 
 class InputSheet(Sheet):
