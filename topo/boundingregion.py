@@ -1,5 +1,5 @@
 """
-Topographica bounding regions and boxes.
+Bounding regions and bounding boxes.
 
 $Id$
 """
@@ -11,7 +11,9 @@ NYI = "Abstract method not implemented."
 
 class BoundingRegion(TopoObject):
     """
-    Abstract bounding region class.  Should be subclassed
+    Abstract bounding region class, for any portion of a 2D plane.
+
+    Only subclasses can be instantiated directly.
     """
     
     def __init__(self,**args):
@@ -45,8 +47,24 @@ class BoundingBox(BoundingRegion):
         super(BoundingBox,self).__init__(**args)        
 
     def contains(self,x,y):
+        """
+        Returns true if the given point is contained within the
+        bounding box, where all boundaries of the box are
+        considered to be inclusive.
+        """
         left,bottom,right,top = self.aarect().lbrt()
         return (left <= x <= right) and (bottom <= y <= top)
+
+    def upperexclusive_contains(self,x,y):
+        """
+        Returns true if the given point is contained within the
+        bounding box, where the right and upper boundaries
+        are exclusive, and the left and lower boundaries are
+        inclusive.  Useful for tiling a plane into non-overlapping
+        regions.
+        """
+        left,bottom,right,top = self.aarect().lbrt()
+        return (left <= x < right) and (bottom <= y < top)
 
     def aarect(self):
         return self._aarect
@@ -134,10 +152,12 @@ class Intersection(BoundingRegion):
 ###################################################
 class AARectangle:
     """
-    Axis-aligned rectangle class.   Defines the smallest
-    axis-aligned rectangle that encloses a set of points.
+    Axis-aligned rectangle class.
 
-    usage:  aar = AARectangle( (x1,y1),(x2,y2), ... , (xN,yN) )
+    Defines the smallest axis-aligned rectangle that encloses a set of
+    points.
+
+    Usage:  aar = AARectangle( (x1,y1),(x2,y2), ... , (xN,yN) )
     """
     __slots__ = ['__left','__bottom','__right','__top']
     def __init__(self,*points):
