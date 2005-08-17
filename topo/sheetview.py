@@ -20,8 +20,10 @@ from base import TopoObject
 
 ### JABHACKALERT!
 ###
-### Are any of these operators implemented?  They should either be
-### tested or removed.
+### Based on the comments, this file is not yet completed.  E.g. are
+### any of these operators implemented?  They should either be tested
+### or removed.  Similarly for other features below -- they need to be
+### either completed or removed.
 
 # Valid operations that a SheetView should support for the list of
 # sheets passed in.  There are other things that would be useful
