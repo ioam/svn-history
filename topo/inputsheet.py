@@ -89,4 +89,4 @@ class InputSheet(Sheet):
         
         
         self.send_output(data=self.activation)
-        self.message("Sending %s output." % NxN(self.activation.shape))
+        self.message("Sending %s output at time %d." % (NxN(self.activation.shape),self.simulator.time()))
