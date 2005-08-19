@@ -92,8 +92,8 @@ import topo.sheetview
 import topo.boundingregion
 import topo.bitmap
 from MLab import flipud, rot90
+from utils import *
 from topo.utils import flatten
-import weave
 
 
 ###############################################
@@ -268,9 +268,9 @@ class KernelProjection(Projection):
 
     def compute_response(self,input_activation, rows, cols):
         self.input_buffer = input_activation
-        if self.activation_fn.func_name == "mdot":
-            # should use self.compute_response_mdot_py if C compiler is absent
-            self.compute_response_mdot(input_activation, rows, cols)
+        if self.activation_fn.func_name == "compute_response_mdot_c":
+            # compute_response_mdot_c computes the mdot for all the units
+            compute_response_mdot_c(input_activation, rows, cols, self.temp_activation, self.cfs, self.strength)
 	else:
             for r in xrange(rows):
                 for c in xrange(cols):
@@ -280,70 +280,6 @@ class KernelProjection(Projection):
 
                     self.temp_activation[r,c] = self.activation_fn(X,cf.weights)
             self.temp_activation *= self.strength
-
-
-    def compute_response_mdot(self,input_activation, rows, cols):
-        temp_act = self.temp_activation
-        cfs = self.cfs
-        strength = self.strength
-        len, len2 = input_activation.shape
-        X = input_activation.flat
-
-        code = """
-            double tot;
-            double *wi, *xi, *xj;
-            double *tact = temp_act;
-            int *slice;
-            int rr1, rr2, cc1, cc2;
-            int i, j, r, l;
-            PyObject *cf, *cfsr;
-            PyObject *sarray = PyString_FromString("slice_array");
-            PyObject *weights = PyString_FromString("weights");
-
-            for (r=0; r<rows; ++r) {
-                cfsr = PyList_GetItem(cfs,r);
-                for (l=0; l<cols; ++l) {
-                    cf = PyList_GetItem(cfsr,l);
-                    wi = (double *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
-                    slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
-                    rr1 = *slice++;
-                    rr2 = *slice++;
-                    cc1 = *slice++;
-                    cc2 = *slice;
-
-                    tot = 0.0;
-
-                    xj = X+len*rr1+cc1;
-                    for (i=rr1; i<rr2; ++i) {
-                        xi = xj;
-                        for (j=cc1; j<cc2; ++j) {
-                            tot += *wi * *xi;
-                            ++wi;
-                            ++xi;
-                        }
-                        xj += len;
-                    }
-
-                    *tact = tot*strength;
-                    ++tact;
-                }
-            }
-        """
-
-        weave.inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'])
-
-
-    # The original mdot function that the inline C code based on
-    def compute_response_mdot_py(self,input_activation, rows, cols):
-        for r in xrange(rows):
-            for c in xrange(cols):
-                cf = self.cfs[r][c]
-                r1,r2,c1,c2 = cf.slice
-                X = input_activation[r1:r2,c1:c2]
-
-                a = X*cf.weights
-                self.temp_activation[r,c] = sum(a.flat)
-        self.temp_activation *= self.strength
 
 
 class CFSheet(Sheet):
