@@ -93,6 +93,7 @@ import topo.boundingregion
 import topo.bitmap
 from MLab import flipud, rot90
 from utils import *
+from learningrules import *
 from topo.utils import flatten
 
 
@@ -327,6 +328,7 @@ class CFSheet(Sheet):
     """
     
     transfer_fn  = Parameter(default=lambda x:Numeric.array(x))
+    learning_fn = Parameter(default=hebbian_c)
                              
     def __init__(self,**params):
         super(CFSheet,self).__init__(**params)
