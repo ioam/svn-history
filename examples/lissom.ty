@@ -14,6 +14,8 @@ from topo.image import ImageSaver
 import topo.gui
 import topo.cfsheet
 from topo.params import *
+from topo.utils import *
+from topo.learningrules import *
 import weave
 import Numeric
 
@@ -79,98 +81,45 @@ class LISSOM(topo.cfsheet.CFSheet):
                 if self.presleep_count == tsettle+1:
                     self.presleep_count = 0
                     self.learn()
+#        print self.activation
                     
-
 
     def learn(self):
         rows,cols = self.activation.shape
         alpha = self.learning_rate
-        X = self.activation
-
-        learn_code = """
-            double *wi, *wj, *x, *inpi, *inpj;
-            int *slice;
-            int rr1, rr2, cc1, cc2, rc;
-            int i, j, r, l;
-            PyObject *cf, *cfsr;
-            PyObject *sarray = PyString_FromString("slice_array");
-            PyObject *weights = PyString_FromString("weights");
-            double load, delta;
-            double totald;
-
-            x = X;
-            for (r=0; r<rows; ++r) {
-                cfsr = PyList_GetItem(cfs,r);
-                for (l=0; l<cols; ++l) {
-                    load = *x++;
-                    if (load != 0) {
-                        load *= alpha;
-
-                        cf = PyList_GetItem(cfsr,l);
-                        wi = (double *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
-                        wj = wi;
-                        slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
-                        rr1 = *slice++;
-                        rr2 = *slice++;
-                        cc1 = *slice++;
-                        cc2 = *slice;
-
-                        totald = 0.0;
-
-                        inpj = inp+len*rr1+cc1;
-                        for (i=rr1; i<rr2; ++i) {
-                            inpi = inpj;
-                            for (j=cc1; j<cc2; ++j) {
-                                delta = load * *inpi;
-                                *wi += delta;
-                                totald += delta;
-                                ++wi;
-                                ++inpi;
-                            }
-                            inpj += len;
-                        }
-
-                        if (normalize) {
-                            totald += normalize; 
-                            totald = 1.0/totald;
-                            rc = (rr2-rr1)*(cc2-cc1);
-
-                            for (i=0; i<rc; ++i) {
-                                *wj *= totald;
-                                ++wj;
-                            }
-                        }
-                    }
-                }
-            }
-        """
-
+	done = 1
         for proj in chain(*self.projections.values()):
             if proj.input_buffer:
                 if proj.src == self: #lateral connection
                     inp = self.activation
                 else:
                     inp = proj.input_buffer
-                cfs = proj.cfs
-                len, len2 = inp.shape
-                normalize = proj.normalize
-                weave.inline(learn_code, ['rows', 'cols', 'cfs', 'alpha', 'inp', 'X', 'len', 'normalize'])
 
-
-    # Python version of the learn function, the flow is a little different
-    # from the C version
-    def learn_py(self):
-        rows,cols = self.activation.shape
-        for proj in chain(*self.projections.values()):
-            if proj.input_buffer:
-                for r in range(rows):
-                    for c in range(cols):
-                        cf = proj.cf(r,c)
-                        cf.weights += (self.learning_rate * self.activation[r,c]
-                                       * cf.get_input_matrix(proj.input_buffer))
-
+                if self.learning_fn.func_name == "hebbian_c":
+                    # hebbian_c is an function for the whole sheet
+                    cfs = proj.cfs
+                    len, len2 = inp.shape
+		    if proj.normalize:
+                        # Hebbian learning with divisive normalization per 
+                        # projection. It is much faster to do both of them
+                        # in one function.
+                        hebbian_div_norm_c(inp, self.activation, rows, cols, len, cfs, alpha, proj.normalize)
+                    else:
+                        done = 0
+                        hebbian_c(inp, self.activation, rows, cols, len, cfs, alpha)
+                else:
+                    # apply learning rule for each unit
+                    done = 0
+                    for r in range(rows):
+                        for c in range(cols):
+                            cf = proj.cf(r,c)
+                            self.learning_fn(cf.get_input_matrix(inp), self.activation[r,c], cf.weights, alpha)
 
         
+        # if weights are already normalized, return
+        if done: 
+            return
+
         # normalize weights
         lateral = self.lateral_projections()
         afferent = self.afferent_projections()
@@ -183,8 +132,10 @@ class LISSOM(topo.cfsheet.CFSheet):
                     #          for p in group])
                     for p in group:
                         # Uncomment for normalization per projection
-                        k = sum(p.cf(r,c).weights.flat)
-                        p.cf(r,c).weights /= k
+                        if p.normalize:
+                            k = sum(p.cf(r,c).weights.flat)
+                            k = p.normalize / k
+                            p.cf(r,c).weights *= k
 
     def lateral_projections(self):
         return [p for p in chain(*self.projections.values()) if p.src is self]
@@ -278,16 +229,16 @@ save  = ImageSaver(name='LISSOM')
 
 s.connect(retina,V1, delay = 0.5/tsettle,
           projection_params = dict(strength = 1.0, name='Afferent0',
-                                   weights_bounds = afferent_weight_bounds, normalize = 1))
+                                   weights_bounds = afferent_weight_bounds, normalize = 1, activation_fn=compute_response_mdot_c))
 
 
 s.connect(V1,V1, delay = 1.0/tsettle, dest_port="exc",
           projection_params = dict(strength = gammaexc, name='LateralExcitatory',
-                                   weights_bounds = excitatory_weight_bounds, normalize = 1))
+                                   weights_bounds = excitatory_weight_bounds, normalize = 1, activation_fn=compute_response_mdot_c))
 
 s.connect(V1,V1, delay = 1.0/tsettle, dest_port="inh",
           projection_params = dict(strength = -gammainh, name='LateralInhibitory',
-                                   weights_bounds = inhibitory_weight_bounds, normalize = 1))
+                                   weights_bounds = inhibitory_weight_bounds, normalize = 1, activation_fn=compute_response_mdot_c))
         
 
 #cfsheet.CF.print_level = base.VERBOSE
