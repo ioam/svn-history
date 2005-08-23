@@ -39,10 +39,6 @@ class LISSOM(topo.cfsheet.CFSheet):
 
     transfer_fn = Parameter(default=utils.PLTF)
 
-# Temporarily disabled learning for comparison with C++ lissom implementation
-    learning_rate = Parameter(default=0.1) 
-#    learning_rate = Parameter(default=0.0)
-
     # modify weights after each activation?
     continuous_learning = Parameter(default=False)
 
@@ -86,7 +82,6 @@ class LISSOM(topo.cfsheet.CFSheet):
 
     def learn(self):
         rows,cols = self.activation.shape
-        alpha = self.learning_rate
 	done = 1
         for proj in chain(*self.projections.values()):
             if proj.input_buffer:
@@ -99,6 +94,7 @@ class LISSOM(topo.cfsheet.CFSheet):
                     # hebbian_c is an function for the whole sheet
                     cfs = proj.cfs
                     len, len2 = inp.shape
+                    alpha = proj.learning_rate
 		    if proj.normalize:
                         # Hebbian learning with divisive normalization per 
                         # projection. It is much faster to do both of them
@@ -174,14 +170,14 @@ ysigma=1.5/rf_radius_scale
 retina_edge_buffer=0*(rf_radius+(BaseRN*area_scale/2))
 RN=BaseRN*area_scale+2*retina_edge_buffer
 
-#acs=6.5*6.5/rf_radius/rf_radius
-#ecs=19.5*19.5/exc_rad/exc_rad
-#ics=47.5*47.5/inh_rad/inh_rad
-#
-#alpha_input=0.0
-#alpha_exc=0.0
-#alpha_inh=0.0
-#
+acs=6.5*6.5/rf_radius/rf_radius
+ecs=19.5*19.5/exc_rad/exc_rad
+ics=47.5*47.5/inh_rad/inh_rad
+
+alpha_input=0.007*acs
+alpha_exc=0.002*ecs
+alpha_inh=0.00025*ics
+
 tsettle=8
 
 
@@ -229,16 +225,16 @@ save  = ImageSaver(name='LISSOM')
 
 s.connect(retina,V1, delay = 0.5/tsettle,
           projection_params = dict(strength = 1.0, name='Afferent0',
-                                   weights_bounds = afferent_weight_bounds, normalize = 1, activation_fn=compute_response_mdot_c))
+                                   weights_bounds = afferent_weight_bounds, normalize = 1, activation_fn=compute_response_mdot_c,learning_rate=alpha_input))
 
 
 s.connect(V1,V1, delay = 1.0/tsettle, dest_port="exc",
           projection_params = dict(strength = gammaexc, name='LateralExcitatory',
-                                   weights_bounds = excitatory_weight_bounds, normalize = 1, activation_fn=compute_response_mdot_c))
+                                   weights_bounds = excitatory_weight_bounds, normalize = 1, activation_fn=compute_response_mdot_c,learning_rate=alpha_exc))
 
 s.connect(V1,V1, delay = 1.0/tsettle, dest_port="inh",
           projection_params = dict(strength = -gammainh, name='LateralInhibitory',
-                                   weights_bounds = inhibitory_weight_bounds, normalize = 1, activation_fn=compute_response_mdot_c))
+                                   weights_bounds = inhibitory_weight_bounds, normalize = 1, activation_fn=compute_response_mdot_c,learning_rate=alpha_inh))
         
 
 #cfsheet.CF.print_level = base.VERBOSE
