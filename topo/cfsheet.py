@@ -250,8 +250,9 @@ class KernelProjection(Projection):
 
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
     weights_factory = Parameter(default=UniformRandomFactory())
-    normalize = Parameter(default=0)
+    normalize = Parameter(default=0.0)
     dest_port = Parameter(default="")
+    learning_rate = Parameter(default=0.0)
 
     def __init__(self,**params):
         super(KernelProjection,self).__init__(**params)
