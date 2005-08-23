@@ -54,7 +54,6 @@ from base import TopoObject
 from utils import flatten
 from plot import *
 from plotgroup import *
-from bitmap import WHITE_BACKGROUND, BLACK_BACKGROUND
 from sheet import Sheet
 from cfsheet import CFSheet
 
@@ -256,7 +255,6 @@ class PlotEngine(TopoObject):
         hue = pt.channels.get('Hue',None)
         confidence = pt.channels.get('Confidence',None)
         p = Plot((strength,hue,confidence),SHC,sheet,name=k)
-        p.background = pt.background
         return p
 
     def make_plot_group(self, name='Activation', group_type='BasicPlotGroup',
