@@ -82,12 +82,18 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     ### In any case, there must be a bug in the current code, because there's no 
     ### reason this routine should get called with values ranging 0..255 if
     ### they are intended to plot in the logical range 0..1.
+
     if max(hFlat) > 1 or max(sFlat) > 1 or max(vFlat) > 1:
-        print 'Warning: HSVMap inputs not normalized to 1. Dividing by 255'
+        print 'Warning: HSVMap inputs not normalized to 1. Normalizing to 1.0'
         print max(hFlat), max(sFlat), max(vFlat)
-        hFlat = hFlat / 255.0
-        sFlat = sFlat / 255.0
-        vFlat = vFlat / 255.0
+        if max(hFlat) > 0: hFlat = Numeric.divide(hFlat,max(hFlat))
+        if max(sFlat) > 0: sFlat = Numeric.divide(sFlat,max(sFlat))
+        if max(sFlat) > 0: vFlat = Numeric.divide(vFlat,max(vFlat))
+        print max(hFlat), max(sFlat), max(vFlat)
+
+        # hFlat = hFlat / 255.0
+        # sFlat = sFlat / 255.0
+        # vFlat = vFlat / 255.0
 
     # List comprehensions were not used because it was slower.
     for i in range(len(hFlat)):
