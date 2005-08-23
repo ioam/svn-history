@@ -153,8 +153,8 @@ class UnitView(SheetView):
     created for.  Subclasses the SheetView class.
 
     UnitViews should be stored in Sheets via a tuple
-    ('SomeString',X,Y).  The dictionary in Sheets can be accessed by
-    any valid key.
+    ('Weights',Sheet,Projection,X,Y).  The dictionary in Sheets can be
+    accessed by any valid key.
     """
 
     def __init__(self, term_tuple, x, y, projection, **params):
