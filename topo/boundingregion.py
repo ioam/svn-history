@@ -55,6 +55,16 @@ class BoundingBox(BoundingRegion):
         left,bottom,right,top = self.aarect().lbrt()
         return (left <= x <= right) and (bottom <= y <= top)
 
+    def containsbb_exclusive(self,x):
+        """
+        Returns true if the given BoundingBox x is contained within the
+        bounding box, where at least one of the boundaries of the box has
+        to be exclusive.
+        """
+        left,bottom,right,top = self.aarect().lbrt()
+        leftx,bottomx,rightx,topx = self.aarect().lbrt()
+        return (left <= leftx) and (bottom <= bottomx) and (right >= rightx) and (top >= topx) and (not ((left == leftx) and (bottom == bottomx) and (right == rightx) and (top == topx)))
+
     def upperexclusive_contains(self,x,y):
         """
         Returns true if the given point is contained within the
