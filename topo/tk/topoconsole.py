@@ -12,7 +12,7 @@ from topo.tk.weightspanel import WeightsPanel
 from topo.tk.weightsarraypanel import ProjectionPanel
 from topo.tk.inputparamspanel import InputParamsPanel
 from topo.tk.preferencemappanel import PreferenceMapPanel
-from topo.plotgroup import PlotGroupTemplate, PlotTemplate, WHITE_BACKGROUND
+from topo.plotgroup import PlotGroupTemplate, PlotTemplate
 import topo.simulator as simulator
 import topo.plotengine
 import topo.gui
@@ -563,8 +563,12 @@ class GUIToplevel(Toplevel):
 # Populate the dynamic plot menu list registry:
 if __name__ != '__main__':
     pgt = PlotGroupTemplate([('ActivationPref',
-                              PlotTemplate({'background' : WHITE_BACKGROUND,
-                                            'Strength'   : 'Activation',
+                              PlotTemplate({'Strength'   : 'Activation',
                                             'Hue'        : 'Activation',
                                             'Confidence' : 'Activation'}))])
+    topo.plotengine.plotgroup_templates[pgt.name] = pgt
+    pgt = PlotGroupTemplate([('Activity',
+                              PlotTemplate({'Strength'   : 'Activation',
+                                            'Hue'        : None,
+                                            'Confidence' : None}))])
     topo.plotengine.plotgroup_templates[pgt.name] = pgt
