@@ -40,7 +40,7 @@ class TestBitmap(unittest.TestCase):
     def test_ColorMap(self):
         p = [j and i for i in range(256) for j in (1,0,0)]
         cmap = ColorMap(self.ra,p)
-        # cmap.show()
+         # cmap.show()
 
 
     def test_BWMap(self):
@@ -57,6 +57,33 @@ class TestBitmap(unittest.TestCase):
         c = Numeric.reshape(c,(256,256)) / 255.0
         hsv = HSVMap(a,b,c)
         # hsv.show()
+
+    def test_hsv_to_rgb(self):
+        h,s,v = 0.0,0.0,0.5
+        (r,g,b) = hsv_to_rgb(h,s,v)
+        self.assertEqual(r,0.5)
+        self.assertEqual(g,0.5)
+        self.assertEqual(b,0.5)
+
+        h,s,v = 0.0,0.0,0.01
+        (r,g,b) = hsv_to_rgb(h,s,v)
+        self.assertEqual(r,0.01)
+        self.assertEqual(g,0.01)
+        self.assertEqual(b,0.01)
+
+    def test_matrix_hsv_to_rgb2(self):
+        h = Numeric.array([[0.0,0.0],[0.0,0.0]])
+        s = Numeric.array([[0.0,0.0],[0.0,0.0]])
+        v = Numeric.array([[0.5,0.5],[0.5,0.5]])
+        h_orig = Numeric.array(h)
+        s_orig = Numeric.array(s)
+        v_orig = Numeric.array(v)
+        r,g,b = matrix_hsv_to_rgb(h,s,v)
+        rgb_target = Numeric.array([[0.5,0.5],[0.5,0.5]])
+        self.assertEqual(h,h_orig)
+        self.assertEqual(s,s_orig)
+        self.assertEqual(v,v_orig)
+        
 
     def test_matrix_hsv_to_rgb(self):
         a = [j for i in range(256) for j in range(256)]
