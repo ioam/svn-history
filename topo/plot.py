@@ -14,7 +14,7 @@ $Id$
 import sys
 import types
 
-from Numeric import zeros, ones
+from Numeric import zeros, ones, Float
 
 from base import TopoObject
 from utils import flatten
@@ -94,7 +94,7 @@ class Plot(TopoObject):
         self.source = sheet
 
         self.channels = (channel_1, channel_2, channel_3)
-        # Shuffle an SHC into HSV ordering:  SHC -> HSV
+        # Shuffle an SHC into HSV ordering:  SHC <- HSV
         if plot_type == SHC:  
             self.channels = (channel_2, channel_3, channel_1)
 
@@ -208,10 +208,10 @@ class Plot(TopoObject):
                 self.matrices.append(None)
         # Replace any Nones with a matrix of size 'shape' full of values.
         if self.background == BLACK_BACKGROUND:
-            self.matrices = tuple([each or zeros(shape)
+            self.matrices = tuple([each or zeros(shape,Float)
                                   for each in self.matrices])
         else:
-            self.matrices = tuple([each or ones(shape)
+            self.matrices = tuple([each or ones(shape,Float)
                                   for each in self.matrices])
             
 
