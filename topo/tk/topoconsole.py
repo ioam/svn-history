@@ -557,20 +557,3 @@ class GUIToplevel(Toplevel):
         self.protocol('WM_DELETE_WINDOW',self.destroy)
         self.resizable(1,1)
 
-####################
-
-
-# Populate the dynamic plot menu list registry:
-if __name__ != '__main__':
-    pgt = PlotGroupTemplate([('Activity',
-                              PlotTemplate({'Strength'   : 'Activation',
-                                            'Hue'        : None,
-                                            'Confidence' : None}))],
-                            name='Activity')
-    topo.plotengine.plotgroup_templates[pgt.name] = pgt
-    pgt = PlotGroupTemplate([('ActivationPref',
-                              PlotTemplate({'Strength'   : 'Activation',
-                                            'Hue'        : 'Activation',
-                                            'Confidence' : 'Activation'}))],
-                            name='Activity HSV')
-    topo.plotengine.plotgroup_templates[pgt.name] = pgt
