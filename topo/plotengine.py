@@ -52,7 +52,7 @@ $Id$
 from copy import deepcopy
 from base import TopoObject
 from utils import flatten
-from plot import *
+from plot import Plot, SHC
 from plotgroup import *
 from sheet import Sheet
 from cfsheet import CFSheet
@@ -232,7 +232,7 @@ class PlotEngine(TopoObject):
         """
         sheet_list = [each for each in self._sheets() if filter_lam(each)]
         # Loop over all sheets that passed the filter.
-        #     Loop over each individual Plot:
+        #     Loop over each individual PlotTemplate:
         #         Loop over each channel in the Plot.  Add needed Nones.
         #         Create new Plot and add to list.
         plot_list = []
@@ -296,3 +296,20 @@ class PlotEngine(TopoObject):
         self.debug('Type of new_group is', type(new_group))
         return new_group
 
+####################
+
+
+# Populate the dynamic plot menu list registry:
+if __name__ != '__main__':
+    pgt = PlotGroupTemplate([('Activity',
+                              PlotTemplate({'Strength'   : 'Activation',
+                                            'Hue'        : None,
+                                            'Confidence' : None}))],
+                            name='Activity')
+    plotgroup_templates[pgt.name] = pgt
+    pgt = PlotGroupTemplate([('ActivationPref',
+                              PlotTemplate({'Strength'   : 'Activation',
+                                            'Hue'        : 'Activation',
+                                            'Confidence' : 'Activation'}))],
+                            name='Activity HSV')
+    plotgroup_templates[pgt.name] = pgt
