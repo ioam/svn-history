@@ -42,7 +42,9 @@ $Id$
 
 from colorsys import rgb_to_hsv, hsv_to_rgb
 import Numeric, Image, math
+from Numeric import Float
 import topo.base
+import MLab
 
 # Background type.  Decides to fill dead areas with 0s or with 1s
 BLACK_BACKGROUND = 0
@@ -58,12 +60,24 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     Third matrix sets the Value (How bright the pixel will be)
 
     The three input matrices should all be the same size, and have
-    been normalized to 1.
+    been normalized to 1.  There should be no side-effects on the
+    original input matrices.
     """
+    
     shape = hMapArray.shape
-    hFlat = hMapArray.flat
-    sFlat = sMapArray.flat
-    vFlat = vMapArray.flat
+    rmat = Numeric.array(hMapArray,Float)
+    gmat = Numeric.array(sMapArray,Float)
+    bmat = Numeric.array(vMapArray,Float)
+
+    if max(rmat.flat) > 1 or max(gmat.flat) > 1 or max(bmat.flat) > 1:
+        print 'Warning: HSVMap inputs exceed 1. Clipping to 1.0'
+        #print 'Old max h:', max(rmat.flat), 'max s:', max(gmat.flat), \
+        #      'max v:', max(bmat.flat)
+        if max(rmat.flat) > 0: rmat = MLab.clip(rmat,0.0,1.0)
+        if max(gmat.flat) > 0: gmat = MLab.clip(gmat,0.0,1.0)
+        if max(bmat.flat) > 0: bmat = MLab.clip(bmat,0.0,1.0)
+        #print 'New max h:', max(rmat.flat), 'max s:', max(gmat.flat), 'max v:', max(bmat.flat)
+
 
     ### JABHACKALERT!
     ###
@@ -83,25 +97,15 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     ### reason this routine should get called with values ranging 0..255 if
     ### they are intended to plot in the logical range 0..1.
 
-    if max(hFlat) > 1 or max(sFlat) > 1 or max(vFlat) > 1:
-        print 'Warning: HSVMap inputs not normalized to 1. Normalizing to 1.0'
-        print max(hFlat), max(sFlat), max(vFlat)
-        if max(hFlat) > 0: hFlat = Numeric.divide(hFlat,max(hFlat))
-        if max(sFlat) > 0: sFlat = Numeric.divide(sFlat,max(sFlat))
-        if max(sFlat) > 0: vFlat = Numeric.divide(vFlat,max(vFlat))
-        print max(hFlat), max(sFlat), max(vFlat)
-
-        # hFlat = hFlat / 255.0
-        # sFlat = sFlat / 255.0
-        # vFlat = vFlat / 255.0
-
     # List comprehensions were not used because it was slower.
-    for i in range(len(hFlat)):
-        (hFlat[i], sFlat[i], vFlat[i]) = hsv_to_rgb(hFlat[i],sFlat[i],vFlat[i])
-    rMapArray = Numeric.reshape(hFlat,shape)
-    gMapArray = Numeric.reshape(sFlat,shape)
-    bMapArray = Numeric.reshape(vFlat,shape)
-    return (rMapArray, gMapArray, bMapArray)
+    for j in range(shape[0]):
+        for i in range(shape[1]):
+            rgb = hsv_to_rgb(rmat[j,i],gmat[j,i],bmat[j,i])
+            rmat[j,i] = rgb[0]
+            gmat[j,i] = rgb[1]
+            bmat[j,i] = rgb[2]
+                
+    return (rmat, gmat, bmat)
     
 
     
