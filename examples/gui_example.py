@@ -21,7 +21,7 @@ print "Setting parameters..."
 
 # input generation params
 InputSheet.period = 1.0
-InputSheet.density = 400
+InputSheet.density = 20*20
 
 FuzzyLineFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
 FuzzyLineFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -32,7 +32,7 @@ FuzzyLineFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
 
 # rf som parameters
-CFSOM.density = 100
+CFSOM.density = 10*10
 CFSOM.learning_length = 10000
 CFSOM.radius_0 = 0.1
 
