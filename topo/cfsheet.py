@@ -409,6 +409,20 @@ class CFSheet(Sheet):
                 proj.compute_response(input_activation,rows,cols)
 		break
 
+    def get_projection_by_name(self,tname):
+        """
+        More often than not, a Projection is requested from a sheet,
+        based upon it's name.  This hides the complex reverse
+        addressing necessary.  Always returns a list in case of
+        multiple name hits, but list may be empty if no projections
+        have the name passed in as t(arget)name.
+        """
+        
+        prjns = [p for name in self.projections
+                       for p in self.projections[name]
+                           if p.name == tname]
+        return prjns
+
 
     #########################################################################
     # GUI support
