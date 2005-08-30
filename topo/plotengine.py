@@ -62,7 +62,7 @@ from cfsheet import CFSheet
 global plot_templates
 global plotgroup_templates
 plot_templates = {}
-plotgroup_templates = {}
+plotgroup_templates = KeyedList()
 
 
 def sheet_filter(sheet):
@@ -121,7 +121,8 @@ class PlotEngine(TopoObject):
         self.plot_group_dict[name] = group
 
 
-    def get_plot_group(self, name, group_type = 'BasicPlotGroup',filter=sheet_filter):
+    def get_plot_group(self, name, group_type = 'BasicPlotGroup',
+                       filter=sheet_filter, class_type='BasicPlotGroup'):
         """
         Return the PlotGroup registered in self.plot_group_dict with
         the provided key 'name'.  If the name does not exist, then
@@ -141,10 +142,8 @@ class PlotEngine(TopoObject):
             self.debug(name, "key match in PlotEngine's PlotGroup list")
             requested_plot = self.plot_group_dict[name]
         else:
-            self.debug(name, "key match failure in PlotEngine's PlotGroup list")
-            # Rather than fail, check for SheetViews of the name.
             # Current filter is sheet_filter(..).
-            requested_plot = self.make_plot_group(name,group_type,filter)
+            requested_plot = self.make_plot_group(name,group_type,filter,class_type)
         return requested_plot
 
 
@@ -239,11 +238,74 @@ class PlotEngine(TopoObject):
         for each in sheet_list:
             for (k,pt) in template.plot_templates:
                 c = pt.channels
-                if 'Strength' in c or 'Hue' in c or 'Confidence' in c:
+                if 'Strength' in c or 'Hue' in c or 'Confidence' in c:     # SHC
                     plot_list.append(self.make_SHC_plot(k,pt,each))
+                elif 'Location' in c and 'Sheet_name' in c:                # Unit Weights 
+                    if c['Sheet_name'] == each.name:
+                        # Multiple Plots can be generated from one Sheet.
+                        plot_list = plot_list + self.make_unitweights_plot(k,pt,each)
+                elif 'Density' in c and 'Projection_name' in c:            # Projections
+                    projection = each.get_projection_by_name(c['Projection_name'])
+                    if projection:
+                        plot_list = plot_list + self.make_projection_plot(k,pt,projection[0].src)
                 else:
-                    self.warning("Only SHC plots currently implemented.")
+                    self.warning("Only SHC, Unit Weights, and Projection plots currently implemented.")
         return plot_list
+
+    def make_projection_plot(self, k, pt, s):
+        """
+        k is the name of the plot template passed in.
+        pt is the PlotTemplate being constructed.
+        s is the sheet to request the sheet views from.
+            It should be the source of the Projection connection.
+        """
+        c = pt.channels
+        key = (k,c['Projection_name'],c['Density'])
+        view_list = s.sheet_view(key)
+        if not isinstance(view_list,list):
+            view_list = [view_list]
+        
+        ### A probable list from the Sheet.sheet_view dictionary is
+        ### converted into multiple Plot generation requests.
+        plot_list = []
+        for each in view_list:
+            if isinstance(each,SheetView):
+                plot_list.append(Plot((each,None,None),COLORMAP,None))
+            else:
+                plot_list.append(Plot((name,None,None),COLORMAP,s))
+        return plot_list
+
+
+    def make_unitweights_plot(self, k, pt, s):
+        sheet_target = pt.channels['Sheet_name']
+        (sheet_x,sheet_y) = pt.channels['Location']
+
+        projection_list = []
+        if not isinstance(s,CFSheet):
+            self.warning('Requested weights view from other than CFSheet.')
+        else:
+            for p in set(flatten(s.projections.values())):
+                key = ('Weights',sheet_target,p.name,sheet_x,sheet_y)
+                v = p.src.sheet_view(key)
+                if v:
+                    projection_list += [(s,p,each) for each in v if each.projection.name == p.name]
+
+        # JUDAH HERE IS WHERE WE ADD ADDITIONAL SORTING INFORMATION.
+        projection_list.sort(key=lambda x: x[2].name,reverse=True)
+
+        plot_list = []
+        for (sheet,projection,views) in projection_list:
+            if not isinstance(views,list):
+                views = [views]
+            for each in views:
+                if isinstance(each,SheetView):
+                    plot_list.append(Plot((each,None,None),COLORMAP,None))
+                else:
+                    key = ('Weights',sheet,projection,sheet_x,sheet_y)
+                    plot_list.append(Plot((key,None,None),COLORMAP,p.src))
+        self.debug('plot_list =' + str(plot_list))
+        return plot_list
+
 
 
     def make_SHC_plot(self, k, pt, sheet):
@@ -257,8 +319,8 @@ class PlotEngine(TopoObject):
         p = Plot((strength,hue,confidence),SHC,sheet,name=k)
         return p
 
-    def make_plot_group(self, name='Activation', group_type='BasicPlotGroup',
-                             filter_lam=sheet_filter):
+    def make_plot_group(self, name='None', group_type='BasicPlotGroup',
+                             filter_lam=sheet_filter, class_type='BasicPlotGroup'):
         """
         name : The key to look under in the SheetView dictionaries.
         group_type: 2 Valid inputs:
@@ -274,13 +336,22 @@ class PlotEngine(TopoObject):
         """
         if isinstance(group_type,PlotGroupTemplate):
             dynamic_list = lambda: self.lambda_for_templates(group_type,filter_lam)
-            new_group = BasicPlotGroup('None',filter_lam,dynamic_list)
+            try:
+                exec 'ptr = ' + class_type in globals()
+            except Exception, e:
+                self.warning('Exception raised:', e)
+                self.warning('Invalid PlotGroup subclass: ', group_type)
+                return PlotGroup(dynamic_list)
+            new_group = ptr(name,filter_lam,dynamic_list)
+
+            #new_group = BasicPlotGroup('None',filter_lam,dynamic_list)
             # Just copying the pointer.  Not currently sure if we want to
             # promote side-effects by not doing a deepcopy(), but assuming
             # we do for now.  If not, use deepcopy(group_type).
             new_group.template = group_type 
             self.add_plot_group(name,new_group)
         else:
+#            print 'Old school'
             if isinstance(name,tuple) and name[0] == 'Weights':
                 dynamic_list = lambda : self.lambda_for_weight_view(name,filter_lam)
             else:
@@ -307,9 +378,19 @@ if __name__ != '__main__':
                                             'Confidence' : None}))],
                             name='Activity')
     plotgroup_templates[pgt.name] = pgt
-    pgt = PlotGroupTemplate([('ActivationPref',
+    pgt = PlotGroupTemplate([('Unit Weights',
+                              PlotTemplate({'Location'   : (0.0,0.0),
+                                            'Sheet_name' : 'V1'}))],
+                            name='Unit Weights')
+    plotgroup_templates[pgt.name] = pgt
+    pgt = PlotGroupTemplate([('Projection',
+                              PlotTemplate({'Density'         : 25,
+                                            'Projection_name' : 'None'}))],
+                            name='Projection')
+    plotgroup_templates[pgt.name] = pgt
+    pgt = PlotGroupTemplate([('Preference',
                               PlotTemplate({'Strength'   : 'Activation',
                                             'Hue'        : 'Activation',
                                             'Confidence' : 'Activation'}))],
-                            name='Activity HSV')
+                            name='Preference Map')
     plotgroup_templates[pgt.name] = pgt
