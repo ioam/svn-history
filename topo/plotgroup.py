@@ -31,7 +31,7 @@ FLAT = 'FLAT'
 class KeyedList(list):
     """
     
-    Extends the built-in type list to superficially behave like a
+    Extends the built-in type 'list' to superficially behave like a
     dictionary with [] keyed access.  Internal representation is a
     list of (key,value) pairs.  Note: Core functionality has been
     added, but because of the way that [] does not return the name
@@ -40,11 +40,13 @@ class KeyedList(list):
     Redefined functions:
         __getitem__ ([,])
         __setitem__ ([,])
-        append
+        append  --  Now takes a tuple, (key, value) so that value
+                    can be later accessed by [key].
     New functions modeled from dictionaries:
         get
         set
         has_key
+        items
     """
 
     def __getitem__(self,k):
@@ -69,7 +71,7 @@ class KeyedList(list):
         the tuple in the function parameters, it may catch an
         erroneous assignment.
         """
-        super(KeyedList,self).append((template_name,template_obj))
+        super(KeyedList,self).append(tuple((template_name,template_obj)))
 
     def get(self, template_name):
         """
@@ -93,7 +95,7 @@ class KeyedList(list):
                 self.pop(i)
                 self.insert(i,(template_name, template_obj))
                 return True
-        self.append(self, (template_name, template_obj))
+        self.append((template_name, template_obj))
         return True
 
     def has_key(self,template_name):
@@ -106,25 +108,44 @@ class KeyedList(list):
                 return True
         return False
 
+    def items(self):
+        """
+        Dictionaries have this function.  A keyed list already is
+        stored in this format, so just return a true list of this
+        object.
+        """
+        return list(self)
+        
+
 
 class PlotGroupTemplate(TopoObject):
     """
     Container class for a PlotGroup object definition.  This is
     separate from a PlotGroup object since it defines how to create a
     PlotGroup object and should contain a series of PlotTemplates.
-    The PlotEngine will create the requested plot group type given the
-    template definition.  The templates are used so that standard plot
-    types can be redefined at the users convenience.
+    The PlotEngine will create the requested plot group type given a
+    group template definition.  The templates are used so that
+    standard plot types can be redefined at the users convenience.
 
-    The plot_templates member variable can and should be accessed
-    directly by outside code.  It is KeyedList (defined in this file)
-    so it can be treated like a dictionary using the [] notation, but
-    it will preserve ordering.
+    The plot_templates member dictionary (KeyedList) can and should be
+    accessed directly by outside code.  It is a KeyedList (defined in
+    this file) so it can be treated like a dictionary using the []
+    notation, but it will preserve ordering.  An example definition:
+
+    pgt = PlotGroupTemplate([('ActivationPref',
+                              PlotTemplate({'Strength'   : 'Activation',
+                                            'Hue'        : 'Activation',
+                                            'Confidence' : 'Activation'}))],
+                            name='Activity SHC')
+
+    to change an entry in the above example:
+
+    pgt.plot_templates['ActivationPref'] = newPlotTemplate
     """
 
     def __init__(self, plot_templates=None, **params):
         """
-        plot_templates is of the form:
+        plot_templates are of the form:
             ( (name_1, PlotTemplate_1), ... , (name_i, PlotTemplate_i) )
         """
         super(PlotGroupTemplate,self).__init__(**params)
@@ -330,5 +351,60 @@ class WeightsArrayPlotGroup(PlotGroup):
         self._sim_ep.add_sheet_view(self.plot_key,filtered_list)
 
         for (x,y) in coords: self._sim_ep.release_unit_view(x,y)
+        
+
+class ProjectionPlotGroup(PlotGroup):
+    """
+    PlotGroup for Projection Plots
+    """
+
+    def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):
+        super(ProjectionPlotGroup,self).__init__(plot_key,sheet_filter_lam,
+                                                   plot_list,**params)
+        self.weight_name = plot_key[1]
+        self.density = float(plot_key[2])
+        self.shape = (0,0)
+        self._sim_ep = [s for s in topo.simulator.active_sim().get_event_processors()
+                        if self.sheet_filter_lam(s)][0]
+        self._sim_ep_src = self._sim_ep.get_projection_by_name(self.weight_name)[0].src
+
+
+    def _generate_coords(self):
+        """
+        Evenly space out the units within the sheet bounding box, so
+        that it doesn't matter which corner the measurements start
+        from.  A 4 unit grid needs 5 segments.  List is in left-to-right,
+        from top-to-bottom.
+        """
+        def rev(x): y = x; y.reverse(); return y
+        
+        aarect = self._sim_ep.bounds.aarect()
+        (l,b,r,t) = aarect.lbrt()
+        x = float(r - l) 
+        y = float(t - b)
+        x_step = x / (int(x * self.density) + 1)
+        y_step = y / (int(y * self.density) + 1)
+        l = l + x_step
+        b = b + y_step
+        coords = []
+        self.shape = (int(x * self.density), int(y * self.density))
+        for j in rev(range(self.shape[1])):
+            for i in range(self.shape[0]):
+                coords.append((x_step*i + l, y_step*j + b))
+        return coords
+
+
+    def do_plot_cmd(self):
+        coords = self._generate_coords()
+        
+        full_unitview_list = [self._sim_ep.unit_view(x,y) for (x,y) in coords]
+        filtered_list = [view for view in chain(*full_unitview_list)
+                         if view.projection.name == self.weight_name]
+
+        self._sim_ep_src.add_sheet_view(self.plot_key,filtered_list)
+
+        # This is no longer correct now that the UnitViews are no
+        # longer on the Projection target sheet.
+        # for (x,y) in coords: self._sim_ep.release_unit_view(x,y)
         
 
