@@ -6,8 +6,32 @@ to create a single matrix that can be displayed as a bitmap.  Associated with
 this single (constructed) box of information are multiple histograms that
 are stored within the base plot object.
 
-The plot objects are generally clustered together within a PlotGroup Class
-which arranges multiple plots into a single figure on the screen.
+The plot objects are clustered together within a PlotGroup Class which
+arranges multiple plots into a single figure on the screen.
+
+The PlotEngine class uses PlotTemplate objects, embedded within
+PlotGroupTemplate objects to create the Plots that will generate the
+bitmaps that will be displayed on screen or saved to disk.  A
+PlotTemplate is essentially a dictionary of keyed information,
+containing sheet names, or channel settings.
+
+Kinds of PlotTemplates:
+    SHC Plots:
+        Keys:
+            Strength   - SheetView dictionary key
+            Hue        - SheetView dictionary key
+            Confidence - SheetView dictionary key
+    Unit Weights Plots:
+        Keys:
+            Location   - (x,y) tuple
+            Sheet_name - Name of sheet to pull unit weights
+    Projection Plots:
+        Keys:
+            Density    - Density to plot projection weights
+            Projection_name - Name of projection to plot.  Looks at
+                .src sheet_view_dict
+            
+
 
 $Id$
 """
@@ -39,11 +63,16 @@ class PlotTemplate(TopoObject):
     PlotEngine will create the requested plot type given the template
     definition.  The templates are used so that standard plot types
     can be redefined at the users convenience.
+
+    For example, 'Activity' maps are defined as:
+    activity_template = PlotTemplate({'Strength'   : 'Activation',
+                                      'Hue'        : None,
+                                      'Confidence' : None})
     """
 
-    def __init__(self, channels=None, background=BLACK_BACKGROUND,**params):
+    def __init__(self, channels=None,**params):
         super(PlotTemplate,self).__init__(**params)
-        self.background = Dynamic(default=background)
+        #self.background = Dynamic(default=background)
         self.channels = channels
         
 
