@@ -4,12 +4,13 @@ TopoConsole class file.
 $Id$
 """
 from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, \
-     LEFT, RIGHT, YES, BOTH
+     LEFT, RIGHT, YES, BOTH, Label
 import Pmw, re, os, sys, code, traceback, __main__
 import tkFileDialog
 from topo.tk.basicplotpanel import BasicPlotPanel
+from topo.tk.unitweightspanel import UnitWeightsPanel
 from topo.tk.weightspanel import WeightsPanel
-from topo.tk.weightsarraypanel import ProjectionPanel
+from topo.tk.projectionpanel import ProjectionPanel
 from topo.tk.inputparamspanel import InputParamsPanel
 from topo.tk.preferencemappanel import PreferenceMapPanel
 from topo.plotgroup import PlotGroupTemplate, PlotTemplate
@@ -20,11 +21,14 @@ import topo.base
 
 KNOWN_FILETYPES = [('Python Files','*.py'),('Topographica Files','*.ty'),('All Files','*')]
 
-plot_panel_list = []
 
 class PlotsMenuEntry(topo.base.TopoObject):
     """
-    Use these objects to populate the TopoConsole Plots pulldown.
+    Use these objects to populate the TopoConsole Plots pulldown.  The
+    pulldown requires a name and a function to call when the item is
+    selected.  self.command is used for that.  self.command has to be
+    different for each plot type since this will include Activity,
+    Unit Weights, Projection grids, Preference Maps and more.
     """
     def __init__(self,console,template,class_name=BasicPlotPanel,label=None,description=None,**config):
         super(PlotsMenuEntry,self).__init__(**config)
@@ -40,6 +44,16 @@ class PlotsMenuEntry(topo.base.TopoObject):
 
         self.num_windows = 0
         self.title = ''
+
+        # Special cases.  These classes are specific to the topo/tk
+        # directory and therefore this link must be made within the tk
+        # files.
+        if self.label == 'Unit Weights':
+           self.class_name = UnitWeightsPanel
+        if self.label == 'Projection':
+            self.class_name = ProjectionPanel
+        elif self.label == 'Preference Map':
+            self.class_name = PreferenceMapPanel
 
 
     def command(self):
@@ -153,23 +167,23 @@ class TopoConsole(Frame):
         # Plot menu
         #
         self.menubar.addmenu('Plots','Assorted plot displays')
-        self.menubar.addmenuitem('Plots', 'command',
-                             'New activity plot',
-                             label="Activity",
-                             command=self.new_activity_window)
-        self.menubar.addmenuitem('Plots', 'command',
-                             'New orientation, ocular dominance, or similar map plot',
-                             label="Preference Map",
-                             command=self.new_preferencemap_window)
-        self.menubar.addmenuitem('Plots', 'command',
-                             'New unit weights (connection fields) plot',
-                             label="Unit Weights",
-                             command=self.new_weights_window)
-        self.menubar.addmenuitem('Plots', 'command',
-                             'New projection (connection field array) plot',
-                             label="Projection",
-                             command=self.new_weights_array_window)
-        self.menubar.addmenuitem('Plots','separator')
+        # self.menubar.addmenuitem('Plots', 'command',
+        #                      'New activity plot',
+        #                      label="Activity",
+        #                      command=self.new_activity_window)
+        # self.menubar.addmenuitem('Plots', 'command',
+        #                      'New orientation, ocular dominance, or similar map plot',
+        #                      label="Preference Map",
+        #                      command=self.new_preferencemap_window)
+        # self.menubar.addmenuitem('Plots', 'command',
+        #                      'New unit weights (connection fields) plot',
+        #                      label="Unit Weight",
+        #                      command=self.new_weights_window)
+        # self.menubar.addmenuitem('Plots', 'command',
+        #                      'New projection (connection field array) plot',
+        #                      label="Projection",
+        #                      command=self.new_weights_array_window)
+        # self.menubar.addmenuitem('Plots','separator')
 
         self.populate_plots_menu(self.menubar)
 
@@ -428,11 +442,6 @@ class TopoConsole(Frame):
             self.messageBar.message('state', 'No active Simulator object.')
 
 
-    ### JABHACKALERT!
-    ### 
-    ### This code does not work at all; the user sees
-    ### "NameError: global name 'Label' is not defined" whenever the
-    ### About menu option is selected.
     def new_about_window(self):
         win = GUIToplevel(self)
         win.withdraw()
