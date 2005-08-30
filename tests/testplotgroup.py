@@ -72,7 +72,9 @@ class TestPlotGroup(unittest.TestCase):
         self.assertEqual(kl.has_key(5),False)
         self.assertTrue(kl.has_key(6))
         self.assertEqual(len(kl),3)
-
+        kl.append((3,8))
+        l = list(kl)
+        
 
     def test_plotgrouptemplate(self):
         pgt = PlotGroupTemplate()
