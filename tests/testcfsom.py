@@ -67,9 +67,11 @@ class TestCFSom(unittest.TestCase):
         V1 = CFSOM(name='V1')
         V1.print_level = base.WARNING
 
-        s.connect(retina,V1,delay=1)
+        s.connect(retina,V1,delay=1,projection_params={'name':'RtoV1'})
         s.print_level = base.WARNING
 
+        self.assertTrue(len(V1.get_projection_by_name('RtoV1')) == 1)
+        self.assertTrue(len(V1.get_projection_by_name('R1toV1')) == 0)
         s.run(10)
 
 
