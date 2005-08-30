@@ -8,8 +8,9 @@ import topo.tk.taggedslider
 import topo.tk.topoconsole
 import topo.tk.plotpanel
 import topo.tk.basicplotpanel
-import topo.tk.weightspanel
-import topo.tk.weightsarraypanel
+import topo.tk.unitweightspanel
+import topo.tk.projectionpanel
+#import topo.tk.weightsarraypanel
 import topo.tk.regionplotpanel
 import topo.tk.inputparamspanel
 import topo.tk.preferencemappanel
