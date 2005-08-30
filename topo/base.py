@@ -175,8 +175,8 @@ class TopoObject(object):
 
     def __db_print(self,level=NORMAL,*args):
         """
-        Iff print_level or self.db_print_level is greater than level,
-        print str.
+        Iff print_level or self.db_print_level is greater than or
+        equal to the given level, print str.
         """
         if level <= max(min_print_level,self.print_level):
             s = ' '.join([str(x) for x in args])
