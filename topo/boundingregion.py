@@ -62,7 +62,7 @@ class BoundingBox(BoundingRegion):
         to be exclusive.
         """
         left,bottom,right,top = self.aarect().lbrt()
-        leftx,bottomx,rightx,topx = self.aarect().lbrt()
+        leftx,bottomx,rightx,topx = x.aarect().lbrt()
         return (left <= leftx) and (bottom <= bottomx) and (right >= rightx) and (top >= topx) and (not ((left == leftx) and (bottom == bottomx) and (right == rightx) and (top == topx)))
 
     def upperexclusive_contains(self,x,y):
