@@ -148,6 +148,34 @@ class ConnectionField(TopoObject):
 
         return activation[r1:r2,c1:c2]
 
+    def reduce_radius(self, new_wt_bounds):
+        """
+        Reduce the radius of an existing connection field. Weights are copied
+        from the old weight array and then renormalized.
+        """
+
+        slice = self.input_sheet.input_slice(new_wt_bounds, self.x, self.y)
+
+        if slice != self.slice:
+            or1,or2,oc1,oc2 = self.slice
+            self.slice = slice
+            r1,r2,c1,c2 = slice
+
+            self.slice_array[0] = r1
+            self.slice_array[1] = r2
+            self.slice_array[2] = c1
+            self.slice_array[3] = c2
+
+            self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=True)
+
+            if self.normalize:
+                wts = self.weights
+                s = sum(wts.flat)
+                if s > 0:
+                    s = self.normalize/s
+                    wts *= s
+
+
 
 class Projection(TopoObject):
     """
@@ -204,6 +232,7 @@ class Projection(TopoObject):
         # composite_name = '%s: %0.3f, %0.3f' % (self.name, sheet_x, sheet_y)
         #matrix_data = Numeric.array(Numeric.transpose(self.cf(r,c).weights))
         matrix_data = Numeric.array(self.cf(r,c).weights)
+        #matrix_data = Numeric.array(self.cf(r,c).weights)*100
         new_box = self.dest.bounds  # TURN INTO A PROPER COPY
         assert matrix_data != None, "Projection Matrix is None"
         return topo.sheetview.UnitView((matrix_data,new_box),
@@ -245,6 +274,9 @@ class Projection(TopoObject):
     def compute_response(self,input_activation,rows,cols):
         pass
 
+    def reduce_cfsize(self, new_wt_bounds):
+        pass
+
 
 class KernelProjection(Projection):
 
@@ -282,6 +314,23 @@ class KernelProjection(Projection):
 
                     self.temp_activation[r,c] = self.activation_fn(X,cf.weights)
             self.temp_activation *= self.strength
+
+
+    def reduce_cfsize(self, new_wt_bounds):
+        """
+        Reduce the sizes of the connection fields contained in this object to
+        new_wt_bounds.
+        """
+        if not self.weights_bounds.containsbb_exclusive(new_wt_bounds):
+            self.warning('reduce_cfsize: new weight bounds should be strictly smaller than the original weight bounds')
+            return
+
+        rows,cols = self.get_shape()
+        cfs = self.cfs
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cfs[r][c].reduce_radius(new_wt_bounds)
+
 
 
 class CFSheet(Sheet):
@@ -422,6 +471,7 @@ class CFSheet(Sheet):
                        for p in self.projections[name]
                            if p.name == tname]
         return prjns
+
 
 
     #########################################################################
