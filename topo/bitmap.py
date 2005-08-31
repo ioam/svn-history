@@ -70,7 +70,7 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     bmat = Numeric.array(vMapArray,Float)
 
     if max(rmat.flat) > 1 or max(gmat.flat) > 1 or max(bmat.flat) > 1:
-        print 'Warning: HSVMap inputs exceed 1. Clipping to 1.0'
+        print 'HSVMap inputs exceed 1. Clipping to 1.0'
         #print 'Old max h:', max(rmat.flat), 'max s:', max(gmat.flat), \
         #      'max v:', max(bmat.flat)
         if max(rmat.flat) > 0: rmat = MLab.clip(rmat,0.0,1.0)
@@ -78,24 +78,31 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
         if max(bmat.flat) > 0: bmat = MLab.clip(bmat,0.0,1.0)
         #print 'New max h:', max(rmat.flat), 'max s:', max(gmat.flat), 'max v:', max(bmat.flat)
 
-
     ### JABHACKALERT!
     ###
-    ### The PreferenceMap panel currently prints the warning below.
-    ### Dividing automatically by 255 is not appropriate, because
-    ### there is no way to know what the appropriate value might be.
-    ### It should be entirely legal to plot something with a range
-    ### higher than 1.0.  E.g. very often we deliberately plot
+    ### The PreferenceMap panel currently prints the message above,
+    ### but this should really be handled some other way.  The messages
+    ### fill the console with information that may not be relevant to
+    ### anyone, because it can be entirely legal to plot something with
+    ### a range higher than 1.0.  E.g. very often we deliberately plot
     ### selectivity with the brightness turned up so high that many of
     ### the brighter pixels get cropped off, to accentuate the shape
-    ### of the few remaining areas that are poorly selective.  It's 
-    ### very important to have some way to warn the user of such cropping,
-    ### but not ok to simply rescale everything (unless the user has 
-    ### explictly turned on such autoscaling.
+    ### of the few remaining areas that are poorly selective.  We should 
+    ### have some way of printing a message once, saying where to check
+    ### to see if further cropping has occurred.  E.g. there could be 
+    ### a variable associated with each plot that says what the maximum
+    ### value before cropping was, and a message could be printed the 
+    ### first time any plot reaches that maximum, listing the variable
+    ### that can be checked to find out the cropping on any particular 
+    ### plot.
     ### 
-    ### In any case, there must be a bug in the current code, because there's no 
-    ### reason this routine should get called with values ranging 0..255 if
-    ### they are intended to plot in the logical range 0..1.
+    ### In any case, we should never be using "print" directly; we need
+    ### all messages to be handled by the sharedfacility in TopoObject
+    ### so that the user can turn them on and off, etc.  If the facilities
+    ### in TopoObject are not sufficient, e.g. if there needs to be some
+    ### way to use them outside of a TopoObject, then such an interface 
+    ### to those shared messaging routines should be provided and then
+    ### used consistently.
 
     # List comprehensions were not used because it was slower.
     for j in range(shape[0]):
