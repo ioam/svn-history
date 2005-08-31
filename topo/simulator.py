@@ -360,13 +360,18 @@ class Simulator(BaseSimulator):
     sched.scheduler object to manage events and dispatching.
     """
     class Event:
-        def __init__(self,time,src,dest,src_port,dest_port,data):
+        execfn = Parameter(default=False)
+        fn = Parameter(default=None)
+
+        def __init__(self,time,src,dest,src_port,dest_port,data,execfn=False,fn=None):
             self.time = time
             self.src = src
             self.dest = dest
             self.src_port = src_port
             self.dest_port = dest_port
             self.data = data
+            self.execfn = execfn
+            self.fn = fn
 
         def __copy__(self):
             new_copy = Simulator.Event(self.time,self.src,self.dest, \
@@ -422,7 +427,10 @@ class Simulator(BaseSimulator):
                 # its destination.
 
                 e = self.events.pop(0)
-                e.dest.input_event(e.src,e.src_port,e.dest_port,e.data)
+                if not e.execfn:
+                    e.dest.input_event(e.src,e.src_port,e.dest_port,e.data)
+                else:
+                    e.fn(*(e.data))
 
         # The clock needs updating if the events have not done it.
         #if self.events and self.events[0].time >= stop_time:
@@ -458,6 +466,26 @@ class Simulator(BaseSimulator):
     def enqueue_event_rel(self,delay,src,dest,src_port=None,dest_port=None,data=None):
         self.enqueue_event_abs(self.time()+float(delay),
                                src,dest,src_port,dest_port,data)
+
+    def sched_execfn(self,time,fn,*p):
+        """
+        Like enqueue_event_abs, except it schedules a function to run at a
+        absolute time. This method should be used for functions that are
+        called occasionally, e.g. saving the weights of the sheets.
+
+        Usage: sched_execfn(time, function name, param 1, param 2, ...)
+        """
+        self.debug("Enqueue absolute execfn: ", fn, "at time",self.time(),"for time",time)
+        new_e = Simulator.Event(time,None,None,None,None,p,execfn=True,fn=fn)
+
+        if not self.events or time >= self.events[-1].time:
+            self.events.append(new_e)
+            return
+
+        for i,e in enumerate(self.events):
+            if time < e.time:
+                self.events.insert(i,new_e)
+                break
 
     def state_push(self):
         """
