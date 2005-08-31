@@ -14,13 +14,6 @@ from topo.tk.regionplotpanel import CFSheetPlotPanel
 from topo.tk.plotpanel import PlotPanel
 from itertools import chain
 
-### JABHACKALERT!
-###
-### This file and the class in it should be renamed to
-### projectionpanel.py and ProjectionPanel.py, respectively. I've
-### already changed the relevant menu items, and the code should be
-### changed to match.
-
 class ProjectionPanel(CFSheetPlotPanel):
     def __init__(self,parent,pengine,console=None,**config):
         super(ProjectionPanel,self).__init__(parent,pengine,console,**config)

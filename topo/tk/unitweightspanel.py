@@ -14,13 +14,6 @@ from topo.tk.plotpanel import PlotPanel
 from topo.tk.regionplotpanel import CFSheetPlotPanel
 import topo.plotengine as plotengine
 
-### JABHACKALERT!
-###
-### This file and the class in it should be renamed to
-### unitweightspanel.py and UnitWeightsPanel.py, respectively. I've
-### already changed the relevant menu items, and the code should be
-### changed to match.
-
 class UnitWeightsPanel(CFSheetPlotPanel):
     def __init__(self,parent,pengine,console=None,**config):
         super(UnitWeightsPanel,self).__init__(parent,pengine,console,**config)
