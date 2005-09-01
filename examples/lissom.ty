@@ -66,7 +66,7 @@ class LISSOM(topo.cfsheet.CFSheet):
             for name in self.projections:
                 for proj in self.projections[name]:
                     self.temp_activation += proj.temp_activation
-            self.activation = self.transfer_fn(self.temp_activation)
+            self.activation = self.transfer_fn(self.temp_activation,delta,beta)
             self.send_output(data=self.activation)
 
         if self._learning:
@@ -77,7 +77,6 @@ class LISSOM(topo.cfsheet.CFSheet):
                 if self.presleep_count == tsettle+1:
                     self.presleep_count = 0
                     self.learn()
-#        print self.activation
                     
 
     def learn(self):
@@ -101,7 +100,6 @@ class LISSOM(topo.cfsheet.CFSheet):
                         # in one function.
                         hebbian_div_norm_c(inp, self.activation, rows, cols, len, cfs, alpha, proj.normalize)
                     else:
-                        done = 0
                         hebbian_c(inp, self.activation, rows, cols, len, cfs, alpha)
                 else:
                     # apply learning rule for each unit
@@ -111,8 +109,7 @@ class LISSOM(topo.cfsheet.CFSheet):
                             cf = proj.cf(r,c)
                             self.learning_fn(cf.get_input_matrix(inp), self.activation[r,c], cf.weights, alpha)
 
-        
-        # if weights are already normalized, return
+        # if all weights have been normalized (if needed), return
         if done: 
             return
 
@@ -138,6 +135,20 @@ class LISSOM(topo.cfsheet.CFSheet):
     def afferent_projections(self):
         return [p for p in chain(*self.projections.values()) if p.src is not self]
 
+    def reduce_cfsize(self, name, new_wt_bounds):
+        for proj in chain(*self.projections.values()):
+            if proj.name == name:
+                proj.reduce_cfsize(new_wt_bounds)
+                return
+        self.warning("Can't find ", name)
+
+    def change_learning_rate(self, name, new_alpha):
+        for proj in chain(*self.projections.values()):
+            if proj.name == name:
+                proj.learning = new_alpha
+                return
+        self.warning("Can't find ", name)
+
 
 ###########################################
 # Set parameters
@@ -145,8 +156,8 @@ class LISSOM(topo.cfsheet.CFSheet):
 
 
 # Temporary variables designed to match the C++ version of lissom
-BaseN=30.0
-BaseRN=30.0
+BaseN=72.0
+BaseRN=24.0
 area_scale=1.0
 num_eyes=1
 rf_radius=BaseRN/4.0+0.5
@@ -155,16 +166,16 @@ exc_rad=max(2.0,(BaseN/10.0-0.5)+0.5)
 default_afferent_size_scale=BaseN/BaseRN
 gammaexc=0.9
 gammainh=0.9
-#delta=0
-#beta=1
+delta=0.1
+beta=0.65
 #min_exc_rad=max(1,BaseN/44+0.5)
 
 rf_radius_scale=6.0/rf_radius
 #retina_area_scale=(BaseRN*area_scale/24.0*rf_radius_scale)*(BaseRN*area_scale/24.0*rf_radius_scale)
 #inputs_pereye=max(retina_area_scale,1)
 #uncorrelation=0.0 
-xsigma=6.0/rf_radius_scale
-ysigma=1.5/rf_radius_scale
+xsigma=6.0*rf_radius_scale
+ysigma=1.5*rf_radius_scale
 
 #scale_input=1.0
 retina_edge_buffer=0*(rf_radius+(BaseRN*area_scale/2))
@@ -237,6 +248,41 @@ s.connect(V1,V1, delay = 1.0/tsettle, dest_port="inh",
                                    weights_bounds = inhibitory_weight_bounds, normalize = 1, activation_fn=compute_response_mdot_c,learning_rate=alpha_inh))
         
 
+#################################################
+# Schedule the changes of simulation parameters
+
+s.sched_execfn(200, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.6/BaseN,-exc_rad*0.6/BaseN),(exc_rad*0.6/BaseN,exc_rad*0.6/BaseN))))
+
+s.sched_execfn(500, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.42/BaseN,-exc_rad*0.42/BaseN),(exc_rad*0.42/BaseN,exc_rad*0.42/BaseN))))
+
+s.sched_execfn(1000, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.336/BaseN,-exc_rad*0.336/BaseN),(exc_rad*0.336/BaseN,exc_rad*0.336/BaseN))))
+
+s.sched_execfn(2000, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=((-2.0/BaseN,-2.0/BaseN),(2.0/BaseN,2.0/BaseN))))
+
+s.sched_execfn(500, V1.change_learning_rate, "Afferent0", 0.005*acs)
+s.sched_execfn(2000, V1.change_learning_rate, "Afferent0", 0.004*acs)
+s.sched_execfn(4000, V1.change_learning_rate, "Afferent0", 0.003*acs)
+
+s.sched_execfn(200, V1.change_learning_rate, "LateralExcitatory", 0.001*ecs)
+
+
+#function that set delta and beta for the threshold function
+def set_deltabeta(x,y): 
+    globals()["delta"]=x
+    globals()["beta"]=y
+
+
+s.sched_execfn(200, set_deltabeta, 0.11, 0.66)
+s.sched_execfn(500, set_deltabeta, 0.12, 0.67)
+s.sched_execfn(1000, set_deltabeta, 0.15, 0.68)
+s.sched_execfn(2000, set_deltabeta, 0.18, 0.70)
+s.sched_execfn(3000, set_deltabeta, 0.20, 0.73)
+s.sched_execfn(4000, set_deltabeta, 0.20, 0.76)
+s.sched_execfn(5000, set_deltabeta, 0.21, 0.79)
+s.sched_execfn(6500, set_deltabeta, 0.22, 0.82)
+s.sched_execfn(8000, set_deltabeta, 0.23, 0.85)
+
+
 #cfsheet.CF.print_level = base.VERBOSE
 
 
@@ -245,7 +291,7 @@ s.connect(V1,V1, delay = 1.0/tsettle, dest_port="inh",
 #s.connect(retina,save,dest_port='retina',delay=2)
 #s.connect(V1,save,dest_port='V1',delay=1)
 
-#s.run(200)
+#s.run(20010)
 
 #V1.projections['Retina'][0].plot_cfs()
 
@@ -260,6 +306,6 @@ s.connect(V1,V1, delay = 1.0/tsettle, dest_port="inh",
 
 
 #import profile,pstats
-#profile.runctx('s.run(200)',globals(),locals(),"abc")
+#profile.runctx('s.run(2000)',globals(),locals(),"abc")
 #p = pstats.Stats('abc')
 #p.strip_dirs().sort_stats('cumulative').print_stats()
