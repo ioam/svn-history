@@ -135,7 +135,7 @@ class TestPlotPanel(unittest.TestCase):
         Pmw.initialise(root)
         console = topo.tk.topoconsole.TopoConsole(parent=root)
         console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
-        console.new_weights_window()
+        #console.new_weights_window()
         # console.mainloop()
         
 

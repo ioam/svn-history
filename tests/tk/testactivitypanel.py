@@ -98,7 +98,7 @@ class TestActivityPanel(unittest.TestCase):
         console = topo.tk.topoconsole.TopoConsole(parent=root)
         console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
         console.set_active_simulator(self.s)
-        console.new_activity_window()
+        #console.new_activity_window()
         # console.mainloop()
 
 suite = unittest.TestSuite()
