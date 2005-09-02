@@ -147,16 +147,6 @@ class PlotEngine(TopoObject):
         return requested_plot
 
 
-    def lambda_single_view_per_name(self, name, filter_lam):
-        """
-        Basic lambda function that assumes a single sheet per name in
-        each Sheet's SheetView dictionary.
-        """
-        dynamic_list = lambda : [Plot((name,None,None),COLORMAP,each)
-                                 for each in self._sheets() if filter_lam(each)]
-        return dynamic_list
-
-
     def lambda_flat_dynamic_list(self, name, filter_lam):
         """
         lambda_single_view_per_name() expanded so that the a
@@ -351,18 +341,20 @@ class PlotEngine(TopoObject):
             new_group.template = group_type 
             self.add_plot_group(name,new_group)
         else:
-#            print 'Old school'
-            if isinstance(name,tuple) and name[0] == 'Weights':
-                dynamic_list = lambda : self.lambda_for_weight_view(name,filter_lam)
-            else:
-                dynamic_list = lambda : self.lambda_flat_dynamic_list(name,filter_lam)
-            try:
-                exec 'ptr = ' + group_type in globals()
-            except Exception, e:
-                self.warning('Exception:', e)
-                self.warning('Invalid PlotGroup subclass: ', group_type)
-                return PlotGroup(dynamic_list)
-            new_group = ptr(name,filter_lam,dynamic_list)
+            print 'Template was not passed in.  This code depricated and disabled.'
+            import inspect
+            print inspect.stack(), '\n'
+            #if isinstance(name,tuple) and name[0] == 'Weights':
+            #    dynamic_list = lambda : self.lambda_for_weight_view(name,filter_lam)
+            #else:
+            #    dynamic_list = lambda : self.lambda_flat_dynamic_list(name,filter_lam)
+            #try:
+            #    exec 'ptr = ' + group_type in globals()
+            #except Exception, e:
+            #    self.warning('Exception:', e)
+            #    self.warning('Invalid PlotGroup subclass: ', group_type)
+            #    return PlotGroup(dynamic_list)
+            #new_group = ptr(name,filter_lam,dynamic_list)
 
         self.debug('Type of new_group is', type(new_group))
         return new_group
