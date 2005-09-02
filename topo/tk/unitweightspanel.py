@@ -102,7 +102,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
             self.pe_group = self.pe.get_plot_group(self.plot_key,
                                                    plotengine.plotgroup_templates['Unit Weights'],
                                                    self.region.get(),
-                                                   'WeightsPlotGroup')
+                                                   'UnitWeightsPlotGroup')
             self.pe_group.do_plot_cmd()
             self.plots = self.pe_group.plots()
 
