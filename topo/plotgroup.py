@@ -1,5 +1,4 @@
 """
-
 PlotGroups are containers of Plots that store specific information
 about different plot types.  Specifically, a PlotGroup contains the
 do_plot_cmd() function that knows how to generate plots.  All
@@ -278,13 +277,13 @@ class BasicPlotGroup(PlotGroup):
                                             **params)
 
 
-class WeightsPlotGroup(PlotGroup):
+class UnitWeightsPlotGroup(PlotGroup):
     """
     PlotGroup for Weights UnitViews
     """
 
     def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):
-        super(WeightsPlotGroup,self).__init__(plot_key,sheet_filter_lam,plot_list,
+        super(UnitWeightsPlotGroup,self).__init__(plot_key,sheet_filter_lam,plot_list,
                                               **params)
         self.x = float(plot_key[2])
         self.y = float(plot_key[3])
@@ -299,59 +298,6 @@ class WeightsPlotGroup(PlotGroup):
             if self.sheet_filter_lam(each):
                 each.unit_view(self.x,self.y)
 
-
-
-class WeightsArrayPlotGroup(PlotGroup):
-    """
-    PlotGroup for WeightsArray
-    """
-
-    def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):
-        super(WeightsArrayPlotGroup,self).__init__(plot_key,sheet_filter_lam,
-                                                   plot_list,**params)
-        self.weight_name = plot_key[1]
-        self.density = float(plot_key[2])
-        self.shape = (0,0)
-        self._sim_ep = [s for s in topo.simulator.active_sim().get_event_processors()
-                        if self.sheet_filter_lam(s)][0]
-
-
-    def _generate_coords(self):
-        """
-        Evenly space out the units within the sheet bounding box, so
-        that it doesn't matter which corner the measurements start
-        from.  A 4 unit grid needs 5 segments.  List is in left-to-right,
-        from top-to-bottom.
-        """
-        def rev(x): y = x; y.reverse(); return y
-        
-        aarect = self._sim_ep.bounds.aarect()
-        (l,b,r,t) = aarect.lbrt()
-        x = float(r - l) 
-        y = float(t - b)
-        x_step = x / (int(x * self.density) + 1)
-        y_step = y / (int(y * self.density) + 1)
-        l = l + x_step
-        b = b + y_step
-        coords = []
-        self.shape = (int(x * self.density), int(y * self.density))
-        for j in rev(range(self.shape[1])):
-            for i in range(self.shape[0]):
-                coords.append((x_step*i + l, y_step*j + b))
-        return coords
-
-
-    def do_plot_cmd(self):
-        coords = self._generate_coords()
-        
-        full_unitview_list = [self._sim_ep.unit_view(x,y) for (x,y) in coords]
-        filtered_list = [view for view in chain(*full_unitview_list)
-                         if view.projection.name == self.weight_name]
-
-        self._sim_ep.add_sheet_view(self.plot_key,filtered_list)
-
-        for (x,y) in coords: self._sim_ep.release_unit_view(x,y)
-        
 
 class ProjectionPlotGroup(PlotGroup):
     """
