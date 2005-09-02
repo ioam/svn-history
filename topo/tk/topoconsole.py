@@ -9,7 +9,6 @@ import Pmw, re, os, sys, code, traceback, __main__
 import tkFileDialog
 from topo.tk.basicplotpanel import BasicPlotPanel
 from topo.tk.unitweightspanel import UnitWeightsPanel
-from topo.tk.weightspanel import WeightsPanel
 from topo.tk.projectionpanel import ProjectionPanel
 from topo.tk.inputparamspanel import InputParamsPanel
 from topo.tk.preferencemappanel import PreferenceMapPanel
@@ -357,67 +356,67 @@ class TopoConsole(Frame):
     #
     # New plot windows
     #
-    def new_activity_window(self):
-        pe = self.active_plotengine()
-        if pe:
-            self.num_activity_windows += 1
-            win = GUIToplevel(self)
-            win.withdraw()
-            ap = BasicPlotPanel(console=self,pengine=pe,parent=win)
-            ap.pack(expand=YES,fill=BOTH)
-            ap.refresh_title()
-            win.deiconify()
-            self.messageBar.message('state', 'OK')
-        else:
-            self.messageBar.message('state', 'No active Simulator object.')
-            
-
-    def new_preferencemap_window(self):
-        pe = self.active_plotengine()
-        if pe:
-            self.num_orientation_windows += 1
-            win = GUIToplevel(self)
-            win.withdraw()
-            win.title("Preference Map %d" % self.num_orientation_windows)
-            ap = PreferenceMapPanel(console=self,pengine=pe,parent=win)
-            ap.pack(expand=YES,fill=BOTH)
-            ap.refresh_title()
-            win.deiconify()
-            self.messageBar.message('state', 'OK')
-        else:
-            self.messageBar.message('state', 'No active Simulator object.')
-
-
-    def new_weights_window(self):
-        pe = self.active_plotengine()
-        if pe:
-            self.num_weights_windows += 1
-            win = GUIToplevel(self)
-            win.withdraw()
-            #win.title("Weights %d" % self.num_weights_windows)
-            wp = WeightsPanel(console=self,pengine=pe,parent=win)
-            wp.pack(expand=YES,fill=BOTH)
-            wp.refresh_title()
-            win.deiconify()
-            self.messageBar.message('state', 'OK')
-        else:
-            self.messageBar.message('state', 'No active Simulator object.')
-
-
-    def new_weights_array_window(self):
-        pe = self.active_plotengine()
-        if pe:
-            self.num_weights_array_windows += 1
-            win = GUIToplevel(self)
-            win.withdraw()
-            win.title("Projection %d" % self.num_weights_array_windows)
-            wap = ProjectionPanel(console=self,pengine=pe,parent=win)
-            wap.pack(expand=YES,fill=BOTH)
-            wap.refresh_title()
-            win.deiconify()
-            self.messageBar.message('state', 'OK')
-        else:
-            self.messageBar.message('state', 'No active Simulator object.')
+#    def new_activity_window(self):
+#        pe = self.active_plotengine()
+#        if pe:
+#            self.num_activity_windows += 1
+#            win = GUIToplevel(self)
+#            win.withdraw()
+#            ap = BasicPlotPanel(console=self,pengine=pe,parent=win)
+#            ap.pack(expand=YES,fill=BOTH)
+#            ap.refresh_title()
+#            win.deiconify()
+#            self.messageBar.message('state', 'OK')
+#        else:
+#            self.messageBar.message('state', 'No active Simulator object.')
+#            
+#
+#    def new_preferencemap_window(self):
+#        pe = self.active_plotengine()
+#        if pe:
+#            self.num_orientation_windows += 1
+#            win = GUIToplevel(self)
+#            win.withdraw()
+#            win.title("Preference Map %d" % self.num_orientation_windows)
+#            ap = PreferenceMapPanel(console=self,pengine=pe,parent=win)
+#            ap.pack(expand=YES,fill=BOTH)
+#            ap.refresh_title()
+#            win.deiconify()
+#            self.messageBar.message('state', 'OK')
+#        else:
+#            self.messageBar.message('state', 'No active Simulator object.')
+#
+#
+#    def new_weights_window(self):
+#        pe = self.active_plotengine()
+#        if pe:
+#            self.num_weights_windows += 1
+#            win = GUIToplevel(self)
+#            win.withdraw()
+#            #win.title("Weights %d" % self.num_weights_windows)
+#            wp = WeightsPanel(console=self,pengine=pe,parent=win)
+#            wp.pack(expand=YES,fill=BOTH)
+#            wp.refresh_title()
+#            win.deiconify()
+#            self.messageBar.message('state', 'OK')
+#        else:
+#            self.messageBar.message('state', 'No active Simulator object.')
+#
+#
+#    def new_weights_array_window(self):
+#        pe = self.active_plotengine()
+#        if pe:
+#            self.num_weights_array_windows += 1
+#            win = GUIToplevel(self)
+#            win.withdraw()
+#            win.title("Projection %d" % self.num_weights_array_windows)
+#            wap = ProjectionPanel(console=self,pengine=pe,parent=win)
+#            wap.pack(expand=YES,fill=BOTH)
+#            wap.refresh_title()
+#            win.deiconify()
+#            self.messageBar.message('state', 'OK')
+#        else:
+#            self.messageBar.message('state', 'No active Simulator object.')
 
 
     def open_plot_params_window(self):
