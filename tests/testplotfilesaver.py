@@ -48,8 +48,8 @@ class TestPlotFileSaver(unittest.TestCase):
         self.s.run(2)
 
         af = ActivationFile('Retina')
-        wf = WeightsFile('V1',0.0,0.0)
-        waf = WeightsArrayFile('V1','R1toV1',10)
+        wf = UnitWeightsFile('V1',0.0,0.0)
+        waf = ProjectionFile('V1','R1toV1',10)
         for each in af.files + wf.files + waf.files:
             os.remove(each)
 

@@ -12,7 +12,33 @@ from Numeric import divide
 
 SHOW_PLOTS = False
 
+plotgroup_templates = {}
+
 class TestPlotGroup(unittest.TestCase):
+
+    def setUp(self):
+        pgt = PlotGroupTemplate([('Activity',
+                                  PlotTemplate({'Strength'   : 'Activation',
+                                                'Hue'        : None,
+                                                'Confidence' : None}))],
+                                name='Activity')
+        plotgroup_templates[pgt.name] = pgt
+        pgt = PlotGroupTemplate([('Unit Weights',
+                                  PlotTemplate({'Location'   : (0.0,0.0),
+                                                'Sheet_name' : 'V1'}))],
+                                name='Unit Weights')
+        plotgroup_templates[pgt.name] = pgt
+        pgt = PlotGroupTemplate([('Projection',
+                                  PlotTemplate({'Density'         : 25,
+                                                'Projection_name' : 'None'}))],
+                                name='Projection')
+        plotgroup_templates[pgt.name] = pgt
+        pgt = PlotGroupTemplate([('Preference',
+                                  PlotTemplate({'Strength'   : 'Activation',
+                                                'Hue'        : 'Activation',
+                                                'Confidence' : 'Activation'}))],
+                                name='Preference Map')
+        plotgroup_templates[pgt.name] = pgt
 
 
     def test_plotgroup_release(self):
@@ -51,13 +77,17 @@ class TestPlotGroup(unittest.TestCase):
     def test_make_plot_group(self):
         sim = topo.simulator.Simulator()
         pe = topo.plotengine.PlotEngine(sim)
-        pg = pe.make_plot_group('Activation')
+        pg = pe.make_plot_group('Activation',
+                                plotgroup_templates['Activity'])
 
     def test_get_plot_group(self):
         sim = topo.simulator.Simulator()
         pe = topo.plotengine.PlotEngine(sim)
-        pg = pe.get_plot_group('Activation')
-        pg = pe.get_plot_group('Activation',group_type='BasicPlotGroup')
+        pg = pe.get_plot_group('Activation',
+                               plotgroup_templates['Activity'])
+        pg = pe.get_plot_group('Activation',
+                               plotgroup_templates['Activity'])
+
 
 
     def test_keyedlist(self):

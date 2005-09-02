@@ -57,15 +57,25 @@ class TestPlotEngine(unittest.TestCase):
         
 
     def test_get_plot_group(self):
+        pgt = PlotGroupTemplate([('Activity',
+                                  PlotTemplate({'Strength'   : 'Activation',
+                                                'Hue'        : None,
+                                                'Confidence' : None}))],
+                                name='Activity')
         self.engine.add_plot_group('OldAct',PlotGroup([self.plot1,
                                                        self.plot2]))
         group = self.engine.get_plot_group('OldAct')
-        activity_group = self.engine.get_plot_group('Activity')
+        activity_group = self.engine.get_plot_group('Activity',pgt)
 
 
     def test_make_plot_group(self):
-        activity_group = self.engine.make_plot_group('Activity',filter_lam=sheet_filter)
-        activity_group2 = self.engine.make_plot_group('Activity',filter_lam=sheet_filter)
+        pgt = PlotGroupTemplate([('Activity',
+                                  PlotTemplate({'Strength'   : 'Activation',
+                                                'Hue'        : None,
+                                                'Confidence' : None}))],
+                                name='Activity')
+        activity_group = self.engine.make_plot_group('Activity',pgt,filter_lam=sheet_filter)
+        activity_group2 = self.engine.make_plot_group('Activity',pgt,filter_lam=sheet_filter)
 
 
     def test_sheet_filter(self):
@@ -140,7 +150,12 @@ class TestPlotEngine(unittest.TestCase):
         pe = PlotEngine(s)
         s.run(1)
 
-        plot_group = pe.get_plot_group('Activation')
+        pgt = PlotGroupTemplate([('Activity',
+                                  PlotTemplate({'Strength'   : 'Activation',
+                                                'Hue'        : None,
+                                                'Confidence' : None}))],
+                                name='Activity')
+        plot_group = pe.get_plot_group('Activation',pgt)
         plot_list = plot_group.plots()
         pe.debug('Type of plot_group', type(plot_group))
 

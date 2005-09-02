@@ -102,7 +102,12 @@ class TestGui(unittest.TestCase):
 
 
     def test_gui_plotengine(self):
-        plot_group = self.pe.get_plot_group('Activation')
+        pgt = PlotGroupTemplate([('Activity',
+                                  PlotTemplate({'Strength'   : 'Activation',
+                                                'Hue'        : None,
+                                                'Confidence' : None}))],
+                                name='Activity')
+        plot_group = self.pe.get_plot_group('Activation',pgt)
         plot_list = plot_group.plots()
         self.pe.debug('Type of plot_group', type(plot_group))
 
