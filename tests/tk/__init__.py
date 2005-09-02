@@ -4,8 +4,6 @@ import testpropertiesframe
 import testtopoconsole
 import testplotpanel
 import testactivitypanel
-import testweightspanel
-import testweightsarraypanel
 import testpreferencemappanel
 import testmatplotlibtk
 
