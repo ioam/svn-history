@@ -10,11 +10,7 @@ $Id$
 
 import sys
 
-### JABHACKALERT!
-###
-### Should this be rewritten to avoid 'import *'?
-###
-from params import *
+from params import Parameter
 from pprint import pprint
 
 SILENT  = 0
