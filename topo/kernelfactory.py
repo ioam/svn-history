@@ -2,6 +2,10 @@
 
 Kernel Factory
 
+Note: ImageFactory has not yet been implemented, but inspiration may
+be found from the ImageGenerator class written for models.cfsom and
+currently (9/2005) residing in topo.image
+
 Defines a class to return Kernels
 
 There is a registry dictionary called

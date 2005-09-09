@@ -6,6 +6,21 @@ converting them to activity matrices, and receiving activity matrices
 and storing them as bitmap files.  The sheets use the Python Imaging
 Library (PIL) to handle the pixmaps.
 
+### ALERT!
+    image.py is only used by cfsom.py, examples/image_example.py, and
+    examples/cfsom_example.py.  But it is still being imported into
+    the main topo package.  There are two classes within image.py that
+    may be useful for the future but the functionality should be
+    absorbed by a different file.  ImageGenerator should probably go
+    into kernelfactory.py since we still do not have an image kernel.
+    While ImageSaver should be put into either bitmap.py or
+    plotfilesaver.py.  This file will need to be moved somewhere else
+    if image_example.py and cfsom_example are to be preserved.  It's
+    not really a 'model' of anything otherwise I'd suggest moving it
+    to models.  It would make the most sense to have cfsom.py absorb
+    all of it, and leave comments in kernelfactory.py and
+    plotfilesaver.py that there may be prototypes available.
+
 $Id$
 """
 
