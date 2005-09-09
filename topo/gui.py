@@ -1,8 +1,8 @@
 """
 Access the gui (topo.tk) from the commandline.
 
-IMPORTANT: This file must be able to be imported without requiring Tk
-or topo.tk.  This feature allows running on remote machines that do
+IMPORTANT: This file must remain able to be imported without requiring
+Tk or topo.tk.  This feature allows running on remote machines that do
 not have gui support.  To preserve this behavior, all Tk dependent
 files in topo.tk should not be auto-imported from this file.  Instead,
 a conditional test should be performed to see if the topo.tk package
@@ -12,6 +12,14 @@ already exist.
 It is reasonable to create a function that will import topo.tk, but
 calling that function must not be forced, so users can still use this
 file without needing to have Tk or topo.tk installed.
+
+gui.py has three main functions:
+1. Registering which Simulator is active.
+   (Allows then allows the GUI to requst views from a known simulation.)
+2. Letting the command-line run the gui with the '-g' flag.
+   (topographica_script.py runs topo.gui.start())
+3. Allows the GUI to be run with a single command: topo.gui.start().
+   This is instead of having to "import topo.tk" first. 
 
 To start the topo.tk gui from the Topographica prompt, run:
   topo.gui.start()
