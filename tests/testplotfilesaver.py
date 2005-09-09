@@ -47,7 +47,7 @@ class TestPlotFileSaver(unittest.TestCase):
         self.pe = topo.plotengine.PlotEngine(self.s)
         self.s.run(2)
 
-        af = ActivationFile('Retina')
+        af = ActivityFile('Retina')
         wf = UnitWeightsFile('V1',0.0,0.0)
         waf = ProjectionFile('V1','R1toV1',10)
         for each in af.files + wf.files + waf.files:

@@ -74,7 +74,7 @@ class TestGui(unittest.TestCase):
         sheetG.add_sheet_view("Miata",sviewG)
         sheetB.add_sheet_view("Miata",sviewB)
 
-        # To change the activation matrix so "Activation" plot_group
+        # To change the activation matrix so "Activity" plot_group
         # will be different.
         sheetR.activation = self.ra
         sheetG.activation = self.ga
@@ -103,11 +103,11 @@ class TestGui(unittest.TestCase):
 
     def test_gui_plotengine(self):
         pgt = PlotGroupTemplate([('Activity',
-                                  PlotTemplate({'Strength'   : 'Activation',
+                                  PlotTemplate({'Strength'   : 'Activity',
                                                 'Hue'        : None,
                                                 'Confidence' : None}))],
                                 name='Activity')
-        plot_group = self.pe.get_plot_group('Activation',pgt)
+        plot_group = self.pe.get_plot_group('Activity',pgt)
         plot_list = plot_group.plots()
         self.pe.debug('Type of plot_group', type(plot_group))
 

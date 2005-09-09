@@ -55,7 +55,7 @@ class TestCoordinateTransforms(unittest.TestCase):
     def test_sheet_view(self):
         s = Sheet()
         sview = s.sheet_view()
-        sview = s.sheet_view('Activation')
+        sview = s.sheet_view('Activity')
         log_level = s.print_level
         minlog_level = topo.base.min_print_level
 
@@ -72,7 +72,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         self.s = Sheet()
         self.s.activity = Numeric.array([[1,2],[3,4]])
         # Call s.sheet_view(..) with a parameter
-        sv2 = self.s.sheet_view('Activation')
+        sv2 = self.s.sheet_view('Activity')
         self.assertEqual(len(self.s.sheet_view_dict.keys()),0)
         self.s.add_sheet_view('key',sv2)
         self.assertEqual(len(self.s.sheet_view_dict.keys()),1)

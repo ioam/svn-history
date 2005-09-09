@@ -71,7 +71,7 @@ class TestActivityPanel(unittest.TestCase):
         sheetG.add_sheet_view("Miata",sviewG)
         sheetB.add_sheet_view("Miata",sviewB)
 
-        # To change the activation matrix so "Activation" plot_group
+        # To change the activation matrix so "Activity" plot_group
         # will be different.
         sheetR.activation = self.ra
         sheetG.activation = self.ga

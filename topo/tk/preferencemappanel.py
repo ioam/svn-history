@@ -17,7 +17,7 @@ from topo.bitmap import WHITE_BACKGROUND, BLACK_BACKGROUND
 ### JAB: This class is not currently useful; it will need to be revisited once
 ### preference maps can be measured.
 class PreferenceMapPanel(plotpanel.PlotPanel):
-    def __init__(self,parent,pengine=None,console=None,plot_key='Activation',**config):
+    def __init__(self,parent,pengine=None,console=None,plot_key='Activity',**config):
         plotpanel.PlotPanel.__init__(self,parent,pengine,console=console,plot_key=plot_key,**config)
 
         self.panel_num = self.console.num_orientation_windows
@@ -63,7 +63,7 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
         #       if ep.name == self.region.get()][0]
         # # This assumes that displaying the rectangle information is enough.
         # l,b,r,t = ep.bounds.aarect().lbrt()
-        self.plot_key = ('Activation','Activation','Activation')
+        self.plot_key = ('Activity','Activity','Activity')
 
 
     ### JABHACKALERT!
@@ -72,15 +72,15 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
     ### documentation was incorrect (copied from another file).
     def do_plot_cmd(self):
         """
-        Currently plots Activation as an example, but needs fixing.
+        Currently plots Activity as an example, but needs fixing.
         """
         if self.console.active_simulator().get_event_processors():
-            pgt = PlotGroupTemplate([('ActivationPref',
+            pgt = PlotGroupTemplate([('ActivityPref',
                   PlotTemplate({'background' : WHITE_BACKGROUND,
-                                'Strength'   : 'Activation',
-                                'Hue'        : 'Activation',
-                                'Confidence' : 'Activation'}))])
-            self.pe_group = self.pe.get_plot_group('ActivationHSV',pgt)
+                                'Strength'   : 'Activity',
+                                'Hue'        : 'Activity',
+                                'Confidence' : 'Activity'}))])
+            self.pe_group = self.pe.get_plot_group('ActivityHSV',pgt)
             self.pe_group.do_plot_cmd()
             
 

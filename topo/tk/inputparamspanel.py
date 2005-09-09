@@ -30,7 +30,7 @@ import topo.sheetview
 
 # Hack to reverse the order of the input EventProcessor list and the
 # Preview plot list, so that it'll match the order that the plots appear
-# in the Activation panel.
+# in the Activity panel.
 LIST_REVERSE = True
 
 # Default time to show in the Presentation duration box.

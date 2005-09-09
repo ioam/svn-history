@@ -77,7 +77,7 @@ class TestPlotPanel(unittest.TestCase):
         sheetG.add_sheet_view("Miata",sviewG)
         sheetB.add_sheet_view("Miata",sviewB)
 
-        # To change the activation matrix so "Activation" plot_group
+        # To change the activation matrix so "Activity" plot_group
         # will be different.
         sheetR.activation = self.ra
         sheetG.activation = self.ga
@@ -95,7 +95,7 @@ class TestPlotPanel(unittest.TestCase):
 
     def test_weightspanel(self):
         """
-        Here, we're not interested in the Activation plots, but we are
+        Here, we're not interested in the Activity plots, but we are
         interested in the weights of the receptive fields.
         """
         base.min_print_level = base.WARNING

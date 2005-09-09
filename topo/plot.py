@@ -65,7 +65,7 @@ class PlotTemplate(TopoObject):
     can be redefined at the users convenience.
 
     For example, 'Activity' maps are defined as:
-    activity_template = PlotTemplate({'Strength'   : 'Activation',
+    activity_template = PlotTemplate({'Strength'   : 'Activity',
                                       'Hue'        : None,
                                       'Confidence' : None})
     """

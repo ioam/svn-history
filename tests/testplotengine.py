@@ -44,12 +44,12 @@ class TestPlotEngine(unittest.TestCase):
     def test_template_groups(self):
         pgt = PlotGroupTemplate( 
             [('HuePref', PlotTemplate({'Strength'   : None,
-                                       'Hue'        : 'Activation',
+                                       'Hue'        : 'Activity',
                                        'Confidence' : None})),
-             ('HuePrefAndSel', PlotTemplate({'Strength'   : 'Activation',  
-                                             'Hue'        : 'Activation',
+             ('HuePrefAndSel', PlotTemplate({'Strength'   : 'Activity',  
+                                             'Hue'        : 'Activity',
                                              'Confidence' : None})),
-             ('HueSelect', PlotTemplate({'Strength'   : 'Activation',
+             ('HueSelect', PlotTemplate({'Strength'   : 'Activity',
                                          'Hue'        : None,
                                          'Confidence' : None}))])
 
@@ -58,7 +58,7 @@ class TestPlotEngine(unittest.TestCase):
 
     def test_get_plot_group(self):
         pgt = PlotGroupTemplate([('Activity',
-                                  PlotTemplate({'Strength'   : 'Activation',
+                                  PlotTemplate({'Strength'   : 'Activity',
                                                 'Hue'        : None,
                                                 'Confidence' : None}))],
                                 name='Activity')
@@ -70,7 +70,7 @@ class TestPlotEngine(unittest.TestCase):
 
     def test_make_plot_group(self):
         pgt = PlotGroupTemplate([('Activity',
-                                  PlotTemplate({'Strength'   : 'Activation',
+                                  PlotTemplate({'Strength'   : 'Activity',
                                                 'Hue'        : None,
                                                 'Confidence' : None}))],
                                 name='Activity')
@@ -136,7 +136,7 @@ class TestPlotEngine(unittest.TestCase):
         sheetG.add_sheet_view("Miata",sviewG)
         sheetB.add_sheet_view("Miata",sviewB)
 
-        # To change the activation matrix so "Activation" plot_group
+        # To change the activation matrix so "Activity" plot_group
         # will be different.
         sheetR.activation = self.ra
         sheetG.activation = self.ga
@@ -151,11 +151,11 @@ class TestPlotEngine(unittest.TestCase):
         s.run(1)
 
         pgt = PlotGroupTemplate([('Activity',
-                                  PlotTemplate({'Strength'   : 'Activation',
+                                  PlotTemplate({'Strength'   : 'Activity',
                                                 'Hue'        : None,
                                                 'Confidence' : None}))],
                                 name='Activity')
-        plot_group = pe.get_plot_group('Activation',pgt)
+        plot_group = pe.get_plot_group('Activity',pgt)
         plot_list = plot_group.plots()
         pe.debug('Type of plot_group', type(plot_group))
 

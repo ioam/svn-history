@@ -46,9 +46,9 @@ class PlotFileSaver(topo.base.TopoObject):
 
 
 
-class ActivationFile(PlotFileSaver):
+class ActivityFile(PlotFileSaver):
     def __init__(self,region,**config):
-        super(ActivationFile,self).__init__(**config)
+        super(ActivityFile,self).__init__(**config)
         self.region = region
         self.name['region'] = region
         self.name['type'] = 'Activity'
@@ -56,7 +56,7 @@ class ActivationFile(PlotFileSaver):
         self.save_to_disk()
 
     def create_bitmaps(self):
-        pg = self.pe.get_plot_group('Activation',
+        pg = self.pe.get_plot_group('Activity',
                                     topo.plotengine.plotgroup_templates['Activity'],
                                     self.region)
         self.bitmaps = pg.load_images()

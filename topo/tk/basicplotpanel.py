@@ -18,7 +18,7 @@ import plotpanel
 ### particular activated the neurons, which is only usually (and not
 ### always) the case for such a plot.
 class BasicPlotPanel(plotpanel.PlotPanel):
-    def __init__(self,parent,pengine=None,console=None,plot_key='Activation',**config):
+    def __init__(self,parent,pengine=None,console=None,plot_key='Activity',**config):
         plotpanel.PlotPanel.__init__(self,parent,pengine,console=console,plot_key=plot_key,**config)
         self.refresh()
 

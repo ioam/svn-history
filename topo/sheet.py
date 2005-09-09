@@ -325,22 +325,22 @@ class Sheet(EventProcessor):
         self.sheet_view_dict = {}
 
 
-    def sheet_view(self,request='Activation'):
+    def sheet_view(self,request='Activity'):
         """
         Create a SheetView object of the current activation of the
         Sheet.  Current implementation gives the raw activation
         matrix.  Uses self.sheet_view_dict if the request is not
         the default.
 
-        The name for an Activation View should be the Sheet name plus
-        '_Activation', e.g. 'Sheet0002_Activation'.
+        The name for an Activity View should be the Sheet name plus
+        '_Activity', e.g. 'Sheet0002_Activity'.
 
         Returns None if the View does not exist in this sheet.
         """
-        if request == 'Activation':
+        if request == 'Activity':
             activation_copy = array(self.activation)
             new_view = SheetView((activation_copy,self.bounds),
-                                 src_name=self.name,view_type='Activation')
+                                 src_name=self.name,view_type='Activity')
         elif self.sheet_view_dict.has_key(request):
             new_view = self.sheet_view_dict[request]
         else:
@@ -365,7 +365,7 @@ class Sheet(EventProcessor):
         Delete the dictionary entry with key entry 'view_name' to save
         memory.
         """
-        if view_name == 'Activation':
+        if view_name == 'Activity':
             pass
         elif self.sheet_view_dict.has_key(view_name):        
             del self.sheet_view_dict[view_name]

@@ -22,7 +22,7 @@ class TestPlot(unittest.TestCase):
         input = ImageGenerator(filename='tests/testsheetview.ppm',
                          density=10000,
                          bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))))
-        sv = input.sheet_view('Activation')
+        sv = input.sheet_view('Activity')
 
         # Defined sheetview in the R channel
         plot1 = plot.Plot((None,None,sv),plot.COLORMAP)
@@ -36,7 +36,7 @@ class TestPlot(unittest.TestCase):
         input = ImageGenerator(filename='tests/testsheetview.ppm',
                          density=10000,
                          bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))))
-        sv = input.sheet_view('Activation')
+        sv = input.sheet_view('Activity')
 
         # Defined sheetview in the R channel
         plot1 = plot.Plot((sv,sv,sv),plot.HSV)

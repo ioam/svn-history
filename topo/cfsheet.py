@@ -509,7 +509,7 @@ class CFSheet(Sheet):
     def release_unit_view(self,x,y):
         self.release_sheet_view(('Weights',x,y))
 
-    def sheet_view(self,request='Activation'):
+    def sheet_view(self,request='Activity'):
         """
 
         Check for 'Weights' or 'WeightsArray', but then call

@@ -131,15 +131,15 @@ class PlotGroupTemplate(TopoObject):
     this file) so it can be treated like a dictionary using the []
     notation, but it will preserve ordering.  An example definition:
 
-    pgt = PlotGroupTemplate([('ActivationPref',
-                              PlotTemplate({'Strength'   : 'Activation',
-                                            'Hue'        : 'Activation',
-                                            'Confidence' : 'Activation'}))],
+    pgt = PlotGroupTemplate([('ActivityPref',
+                              PlotTemplate({'Strength'   : 'Activity',
+                                            'Hue'        : 'Activity',
+                                            'Confidence' : 'Activity'}))],
                             name='Activity SHC')
 
     to change an entry in the above example:
 
-    pgt.plot_templates['ActivationPref'] = newPlotTemplate
+    pgt.plot_templates['ActivityPref'] = newPlotTemplate
     """
 
     def __init__(self, plot_templates=None, **params):
@@ -269,7 +269,7 @@ class PlotGroup(TopoObject):
 
 class BasicPlotGroup(PlotGroup):
     """
-    PlotGroup for Activation SheetViews
+    PlotGroup for Activity SheetViews
     """
 
     def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):

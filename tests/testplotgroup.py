@@ -18,7 +18,7 @@ class TestPlotGroup(unittest.TestCase):
 
     def setUp(self):
         pgt = PlotGroupTemplate([('Activity',
-                                  PlotTemplate({'Strength'   : 'Activation',
+                                  PlotTemplate({'Strength'   : 'Activity',
                                                 'Hue'        : None,
                                                 'Confidence' : None}))],
                                 name='Activity')
@@ -34,9 +34,9 @@ class TestPlotGroup(unittest.TestCase):
                                 name='Projection')
         plotgroup_templates[pgt.name] = pgt
         pgt = PlotGroupTemplate([('Preference',
-                                  PlotTemplate({'Strength'   : 'Activation',
-                                                'Hue'        : 'Activation',
-                                                'Confidence' : 'Activation'}))],
+                                  PlotTemplate({'Strength'   : 'Activity',
+                                                'Hue'        : 'Activity',
+                                                'Confidence' : 'Activity'}))],
                                 name='Preference Map')
         plotgroup_templates[pgt.name] = pgt
 
@@ -45,7 +45,7 @@ class TestPlotGroup(unittest.TestCase):
         self.s = Sheet()
         self.s.activity = Numeric.array([[1,2],[3,4]])
         # Call s.sheet_view(..) with a parameter
-        sv2 = self.s.sheet_view('Activation')
+        sv2 = self.s.sheet_view('Activity')
         self.s.add_sheet_view('key',sv2)
         self.assertEqual(len(self.s.sheet_view_dict.keys()),1)
         y = plot.Plot(('key',None,None),plot.HSV,self.s)
@@ -62,9 +62,9 @@ class TestPlotGroup(unittest.TestCase):
         ig = ImageGenerator(filename='tests/testsheetview.ppm',
                          density=10000,
                          bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))))
-        x = plot.Plot((None,None,ig.sheet_view('Activation')),plot.HSV)
-        y = plot.Plot(('Activation',None,None),plot.COLORMAP,ig)
-        z = plot.Plot(('Activation',None,'Activation'),plot.HSV,ig)
+        x = plot.Plot((None,None,ig.sheet_view('Activity')),plot.HSV)
+        y = plot.Plot(('Activity',None,None),plot.COLORMAP,ig)
+        z = plot.Plot(('Activity',None,'Activity'),plot.HSV,ig)
         self.pg1 = PlotGroup(plot_list=[x])
         self.pg1.add(y)
         self.pg1.add(z)
@@ -77,15 +77,15 @@ class TestPlotGroup(unittest.TestCase):
     def test_make_plot_group(self):
         sim = topo.simulator.Simulator()
         pe = topo.plotengine.PlotEngine(sim)
-        pg = pe.make_plot_group('Activation',
+        pg = pe.make_plot_group('Activity',
                                 plotgroup_templates['Activity'])
 
     def test_get_plot_group(self):
         sim = topo.simulator.Simulator()
         pe = topo.plotengine.PlotEngine(sim)
-        pg = pe.get_plot_group('Activation',
+        pg = pe.get_plot_group('Activity',
                                plotgroup_templates['Activity'])
-        pg = pe.get_plot_group('Activation',
+        pg = pe.get_plot_group('Activity',
                                plotgroup_templates['Activity'])
 
 

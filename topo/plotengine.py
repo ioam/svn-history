@@ -81,7 +81,7 @@ def sheet_filter(sheet):
 class PlotEngine(TopoObject):
     """
     Stores the main list of plots available to the simulation.  There are
-    some default plot types such as 'Activation'.  Use this interface when
+    some default plot types such as 'Activity'.  Use this interface when
     generating plots.
     """
 
@@ -128,7 +128,7 @@ class PlotEngine(TopoObject):
         the provided key 'name'.  If the name does not exist, then
         generate a PlotGroup using the generic dynamic group creator.
         This default construction allows for certain types of plots to
-        be defined automatically, such as 'Activation'.  If a SheetView
+        be defined automatically, such as 'Activity'.  If a SheetView
         dictionary entry has a key entry with 'name' then it will be part
         of the new plot.
         """
@@ -365,7 +365,7 @@ class PlotEngine(TopoObject):
 # Populate the dynamic plot menu list registry:
 if __name__ != '__main__':
     pgt = PlotGroupTemplate([('Activity',
-                              PlotTemplate({'Strength'   : 'Activation',
+                              PlotTemplate({'Strength'   : 'Activity',
                                             'Hue'        : None,
                                             'Confidence' : None}))],
                             name='Activity')
@@ -381,8 +381,8 @@ if __name__ != '__main__':
                             name='Projection')
     plotgroup_templates[pgt.name] = pgt
     pgt = PlotGroupTemplate([('Preference',
-                              PlotTemplate({'Strength'   : 'Activation',
-                                            'Hue'        : 'Activation',
-                                            'Confidence' : 'Activation'}))],
+                              PlotTemplate({'Strength'   : 'Activity',
+                                            'Hue'        : 'Activity',
+                                            'Confidence' : 'Activity'}))],
                             name='Preference Map')
     plotgroup_templates[pgt.name] = pgt

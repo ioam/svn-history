@@ -23,7 +23,7 @@ class TestSheetView(unittest.TestCase):
         # s.sheet_view() returns a SheetView
         sv = self.s.sheet_view()
         # Call s.sheet_view(..) with a parameter
-        sv2 = self.s.sheet_view('Activation')
+        sv2 = self.s.sheet_view('Activity')
         # Define a type 1 SheetView, with matrix and bounding box.
         sv3 = SheetView((self.s.activity, self.s.bounds))
         sv4 = SheetView((self.s2.activity,self.s2.bounds))
@@ -37,7 +37,7 @@ class TestSheetView(unittest.TestCase):
                               (self.s2.activity,self.s2.bounds)]))
 
         # Define a type 3 SheetView
-        sv8 = SheetView((self.s,'Activation'))
+        sv8 = SheetView((self.s,'Activity'))
         if DEV:
             sv3.message(sv3.view())
             sv6.message('sv6.debug', sv6._view_list)
@@ -48,7 +48,7 @@ class TestSheetView(unittest.TestCase):
         input = ImageGenerator(filename='tests/testsheetview.ppm',
                         density=10000,
                         bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))))
-        sv = input.sheet_view('Activation')
+        sv = input.sheet_view('Activity')
         sv_tuple = sv.view()
         map = BWMap(sv_tuple[0])
         # map.show()
