@@ -135,6 +135,10 @@ class Parameter(object):
 ### could be an extra tuple parameter ",enforce=(True,True)' (by
 ### default).  Of course, the bounds would only be enforced if not
 ### None.
+###
+### JBD: This is also important for a flexible and dynamic
+### InputParamsPanel since the sliders need to have different values
+### depending upon the kernel type.
   
 class Number(Parameter):
   def __init__(self,default=None,bounds=(None,None)):

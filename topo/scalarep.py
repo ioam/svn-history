@@ -8,6 +8,11 @@ constructing single-unit simulations.
 $Id$
 """
 
+### ALERT!
+### JBD - Topgraphica does not use this, nor is it imported.  Only
+### examples/testsimulator.py uses this, so it should either be
+### deleted, or turned into some sample code somewhere else.
+
 ### JABHACKALERT!
 ###
 ### Should be rewritten to avoid 'import *'.
