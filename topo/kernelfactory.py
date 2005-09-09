@@ -111,9 +111,14 @@ def produce_kernel_matrices(bounds, density, r, c):
 ### Instead of theta, any user-visible parameter should have a
 ### readable name like "orientation" or "angle" (which is shorter but
 ### not precisely correct).
-def produce_rotated_matrices(kernel_x, kernel_y, theta):
-    """
-    Get Rotated matrices
+###
+### JBD: This should be implemented in concert with changes to
+### inputparamspanel.py to make a dynamic parameter list.  Now (9/05)
+### the Python variable name must be the name displayed to the
+### InputParamsPanel sliders.
+
+def produce_rotated_matrices(kernel_x, kernel_y, theta): """ Get
+Rotated matrices
 
     Takes in two Numeric /arrays/ that specify the x and y coordinates separately
     and a theta value, returns two Numeric matrices that have their coordinates
