@@ -11,7 +11,7 @@ $Id$
 import __main__
 from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry
 from topo.tk.plotpanel import PlotPanel
-from topo.tk.regionplotpanel import CFSheetPlotPanel
+from topo.tk.cfsheetplotpanel import CFSheetPlotPanel
 import topo.plotengine as plotengine
 
 class UnitWeightsPanel(CFSheetPlotPanel):

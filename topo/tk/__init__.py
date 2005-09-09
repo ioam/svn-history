@@ -10,8 +10,7 @@ import topo.tk.plotpanel
 import topo.tk.basicplotpanel
 import topo.tk.unitweightspanel
 import topo.tk.projectionpanel
-#import topo.tk.weightsarraypanel
-import topo.tk.regionplotpanel
+import topo.tk.cfsheetplotpanel
 import topo.tk.inputparamspanel
 import topo.tk.preferencemappanel
 

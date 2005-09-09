@@ -10,7 +10,7 @@ import Pmw
 import ImageTk
 import topo.plotengine as plotengine
 from math import ceil
-from topo.tk.regionplotpanel import CFSheetPlotPanel
+from topo.tk.cfsheetplotpanel import CFSheetPlotPanel
 from topo.tk.plotpanel import PlotPanel
 from itertools import chain
 
