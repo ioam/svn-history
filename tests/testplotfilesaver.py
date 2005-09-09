@@ -9,7 +9,7 @@ import Numeric, random, os
 from math import pi
 from topo.kernelfactory import FuzzyLineFactory
 import topo.base
-import topo.cfsom
+import models.cfsom
 import topo.cfsheet
 from topo.plotfilesaver import *
 from PIL import *
@@ -24,9 +24,9 @@ class TestPlotFileSaver(unittest.TestCase):
         FuzzyLineFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
         FuzzyLineFactory.width = 0.02
         FuzzyLineFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
-        topo.cfsom.CFSOM.density = 100
-        topo.cfsom.CFSOM.learning_length = 10000
-        topo.cfsom.CFSOM.radius_0 = 0.1
+        models.cfsom.CFSOM.density = 100
+        models.cfsom.CFSOM.learning_length = 10000
+        models.cfsom.CFSOM.radius_0 = 0.1
         topo.cfsheet.KernelProjection.weights_factory = UniformRandomFactory(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
         
         topo.base.min_print_level = topo.base.WARNING
@@ -34,8 +34,8 @@ class TestPlotFileSaver(unittest.TestCase):
         
         retina = InputSheet(input_generator=FuzzyLineFactory(),name='Retina')
         retina2 = InputSheet(input_generator=FuzzyLineFactory(),name='Retina2')
-        V1 = topo.cfsom.CFSOM(name='V1')
-        V2 = topo.cfsom.CFSOM(name='V2')
+        V1 = models.cfsom.CFSOM(name='V1')
+        V2 = models.cfsom.CFSOM(name='V2')
         retina.print_level = topo.base.WARNING
         retina2.print_level = topo.base.WARNING
         V1.print_level = topo.base.WARNING

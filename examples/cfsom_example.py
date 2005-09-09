@@ -2,16 +2,17 @@
 $Id$
 """
 
+from math import pi
+import random
+import pdb #debugger
 from topo.inputsheet import *
 from topo.kernelfactory import *
 from topo.simulator import *
 from topo.cfsheet import KernelProjection
-from topo.cfsom import CFSOM
 from topo.image import ImageSaver
-from math import pi
 from topo.params import Dynamic
-import random
-import pdb #debugger
+from models.cfsom import CFSOM
+
 
 
 ###########################################

@@ -41,7 +41,7 @@ import boundingregion
 import kernelfactory
 
 # sheet types
-import cfsom
+#import cfsom
 import image
 import inputsheet
 
@@ -55,7 +55,9 @@ import palette
 import plotgroup
 import plotfilesaver
 
-# GUI files
+# GUI files.  This does not import the entire mechanism, only the
+# possibility of using and interacting with the console window.  This
+# will still import properly even if there is no GUI in the system.
 import gui
 
 # Documentation

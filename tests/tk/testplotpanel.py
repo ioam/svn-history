@@ -11,7 +11,7 @@ from topo.bitmap import *
 import topo.tk.topoconsole 
 import topo.tk.plotpanel
 import Tkinter
-from topo.cfsom import CFSOM
+from models.cfsom import CFSOM
 from topo.image import ImageSaver
 from math import pi
 from topo.params import Dynamic

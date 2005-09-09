@@ -5,6 +5,7 @@ the PlotEngine system from a simulation.
 $Id$
 """
 import unittest
+from models.cfsom import CFSOM
 from pprint import pprint
 from topo import plot
 from topo import base
@@ -12,7 +13,6 @@ from topo.bitmap import *
 from topo.sheet import Sheet
 from topo.inputsheet import *
 from topo.simulator import *
-from topo.cfsom import CFSOM
 from topo.image import ImageSaver
 from topo import kernelfactory
 from topo.kernelfactory import GaussianFactory
