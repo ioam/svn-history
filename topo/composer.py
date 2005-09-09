@@ -3,18 +3,13 @@ A Sheet class for composing activation from different sheets into a
 single activation matrix.
 
 May not be necessary or useful any longer (as of 8/2005), and could
-perhaps be moved to the examples/ directory or deleted.
+perhaps be moved to the examples/ directory, or deleted.
 
 $Id$
 """
 
-### JABHACKALERT!
-###
-### Should be rewritten to avoid 'import *'.
-###
-from topo.sheet import *
-from utils import NxN
-from topo.utils import Struct
+from topo.sheet import Sheet
+from topo.utils import Struct, NxN
 
 
 class Composer(Sheet):
