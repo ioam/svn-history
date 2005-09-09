@@ -29,7 +29,29 @@ class TestCFSom(unittest.TestCase):
         self.sheet1 = Sheet()
         self.sheet2 = Sheet()
 
+
+    def test_imagegenerator(self):
+        """
+        Code moved from __main__ block of cfsom.py.  Gives a tight example
+        of running a cfsom simulation.
+        """
+        from topo.image import ImageGenerator,ImageSaver
         
+        s = Simulator(step_mode=True)
+    
+        input = ImageGenerator(filename='examples/main.ppm',density=10000,
+                               bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))))
+    
+    
+        save = ImageSaver(pixel_scale=1.5)
+        som = CFSOM()
+        
+        s.add(som,input,save)
+        s.connect(input,som)
+        s.connect(som,save)
+        s.run(duration=10)
+    
+
 
     def test_cfsom(self):
         """

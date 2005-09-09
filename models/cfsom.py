@@ -89,33 +89,3 @@ class CFSOM(CFSheet):
             return self.matrix2sheet(row,col)
 
 
-### JABHACKALERT!
-###
-### Is the following code redundant, when ../tests/testcfsom.py is
-### taken into account?  If so, it should be deleted.
-
-
-# Simple example of using CFSOM
-if __name__ == '__main__':
-
-    from simulator import Simulator
-    from image import ImageGenerator,ImageSaver
-    import pdb
-    from boundingregion import BoundingBox
-    
-    s = Simulator(step_mode=True)
-
-    CFSOM.cf_width = 0.1
-
-    input = ImageGenerator(filename='main.ppm',density=10000,
-                           bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))))
-
-
-    save = ImageSaver(pixel_scale=1.5)
-    som = CFSOM()
-    
-    s.add(som,input,save)
-    s.connect(input,som)
-    s.connect(som,save)
-    s.run(duration=10)
-    
