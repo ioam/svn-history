@@ -82,7 +82,7 @@ $Id$
 
 __version__ = '$Revision$'
 
-from params import *
+from parameter import *
 from sheet import Sheet
 from kernelfactory import UniformRandomFactory
 from utils import mdot

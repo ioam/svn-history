@@ -14,7 +14,7 @@ import Tkinter
 from models.cfsom import CFSOM
 from topo.image import ImageSaver
 from math import pi
-from topo.params import Dynamic
+from topo.parameter import Dynamic
 import random
 import pdb #debugger
 

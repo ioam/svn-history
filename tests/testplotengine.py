@@ -19,7 +19,7 @@ from topo.simulator import *
 from topo.image import ImageSaver
 from topo import kernelfactory
 from topo.kernelfactory import GaussianFactory
-from topo.params import Dynamic
+from topo.parameter import Dynamic
 from models.cfsom import CFSOM
 from Tkinter import *
 from Tkconstants import *

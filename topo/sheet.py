@@ -95,7 +95,7 @@ $Id$
 __version__ = '$Revision$'
 
 from simulator import EventProcessor
-from params import Parameter, BooleanParameter
+from parameter import Parameter, BooleanParameter
 from Numeric import zeros,sqrt,array
 from boundingregion import BoundingBox
 from sheetview import SheetView

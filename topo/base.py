@@ -10,7 +10,7 @@ $Id$
 
 import sys
 
-from params import Parameter
+from parameter import Parameter
 from pprint import pprint
 
 SILENT  = 0
@@ -100,7 +100,7 @@ class TopoObject(object):
     
     The TopoObject __init__ method will automatically read the list of
     keyword parameters.  If any keyword matches the name of a Parameter
-    (see params.py) defined in the object's class or any of its
+    (see parameter.py) defined in the object's class or any of its
     superclasses, that parameter in the instance will get the value given
     as a keyword argument.  For example:
     

@@ -27,7 +27,7 @@ $Id$
 from Numeric import resize,array,zeros
 from simulator import EventProcessor
 from sheet import Sheet
-from params import Parameter
+from parameter import Parameter
 from utils import NxN
 
 from pprint import *

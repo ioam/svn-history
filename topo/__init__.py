@@ -29,7 +29,7 @@ import tyimputil
 
 # core
 import simulator
-import params
+import parameter
 import utils
 import commandline
 

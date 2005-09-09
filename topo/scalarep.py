@@ -12,7 +12,7 @@ $Id$
 ###
 ### Should be rewritten to avoid 'import *'.
 ###
-from topo.params import *
+from topo.parameter import *
 from topo.simulator import *
 
 class PulseGenerator(EventProcessor):

@@ -17,7 +17,7 @@ from topo.image import ImageSaver
 from topo import kernelfactory
 from topo.kernelfactory import GaussianFactory
 from math import pi
-from topo.params import Dynamic
+from topo.parameter import Dynamic
 import random
 import pdb #debugger
 

@@ -53,7 +53,7 @@ from sheet import sheet2matrix, matrix2sheet, bounds2shape
 import RandomArray
 from Numeric import *
 from MLab import flipud,rot90
-from params import * 
+from parameter import * 
 from pprint import pprint,pformat
 from math import pi
 
@@ -117,8 +117,8 @@ def produce_kernel_matrices(bounds, density, r, c):
 ### the Python variable name must be the name displayed to the
 ### InputParamsPanel sliders.
 
-def produce_rotated_matrices(kernel_x, kernel_y, theta): """ Get
-Rotated matrices
+def produce_rotated_matrices(kernel_x, kernel_y, theta):
+    """ Get Rotated matrices
 
     Takes in two Numeric /arrays/ that specify the x and y coordinates separately
     and a theta value, returns two Numeric matrices that have their coordinates

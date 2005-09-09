@@ -45,7 +45,7 @@ from utils import flatten
 from sheetview import *
 from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
 from histogram import Histogram
-from params import Dynamic
+from parameter import Dynamic
 import palette
 
 # Types of plots that Plot knows how to create from input matrices.

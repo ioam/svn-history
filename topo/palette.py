@@ -40,7 +40,7 @@ etc.
 $Id$
 """
 from base import TopoObject
-from params import Dynamic
+from parameter import Dynamic
 from bitmap import BLACK_BACKGROUND, WHITE_BACKGROUND
 import plot
 

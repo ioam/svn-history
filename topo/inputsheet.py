@@ -11,7 +11,7 @@ from utils import NxN
 import copy
 from sheet import BoundingBox
 
-from params import Parameter, Dynamic
+from parameter import Parameter, Dynamic
 
 from kernelfactory import UniformRandomFactory
 

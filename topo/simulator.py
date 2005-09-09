@@ -130,7 +130,7 @@ $Id$
 
 import sched
 from base import TopoObject
-from params import Parameter
+from parameter import Parameter
 from utils import inf
 from copy import copy, deepcopy
 import __main__

@@ -7,7 +7,7 @@ $Id$
 """
 
 from topo.utils import L2norm
-from topo.params import Parameter
+from topo.parameter import Parameter
 from Numeric import argmax,sqrt,exp,floor
 from topo.cfsheet import CFSheet
 

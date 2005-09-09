@@ -3,7 +3,7 @@ Bounding regions and bounding boxes.
 
 $Id$
 """
-from params import Parameter
+from parameter import Parameter
 from Numeric import *
 from base import TopoObject
 
