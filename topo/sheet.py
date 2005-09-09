@@ -348,11 +348,6 @@ class Sheet(EventProcessor):
         return new_view
 
 
-    ### JABHACKALERT!
-    ### 
-    ### If each SheetView has its own internal name, why is a view_name
-    ### passed in here?  Seems like we should either use the internal name
-    ### here (preferably), or guarantee that we use their view_name.
     def add_sheet_view(self,view_name,sheet_view):
         """
         Add a SheetView to the view database in this Sheet object.
@@ -476,18 +471,11 @@ class Sheet(EventProcessor):
         """
         self._learning = False
 
-    ### JABHACKALERT!
-    ### 
-    ### This function should not assert that learning has previously
-    ### been disabled; it should be perfectly ok to enable learning
-    ### twice or disable it twice.  Otherwise it's too hard to reason
-    ### about programs and design them.
+
     def enable_learning(self):
         """
-        Assert that learning has in fact been previously disabled,
-        then restore the Sheet to the previous state before
-        non-learning stimuli was presented.  This function will
-        probably need to be extended by derived classes.  Derived
-        class functions should call 'super()' to run this code.
+        This function will probably need to be extended by derived
+        classes.  Derived class functions should call 'super()' to run
+        this code.
         """
         self._learning = True
