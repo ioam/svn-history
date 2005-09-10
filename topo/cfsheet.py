@@ -95,6 +95,7 @@ from MLab import flipud, rot90
 from utils import *
 from learningrules import *
 from topo.utils import flatten
+import Numeric
 
 
 ###############################################
@@ -157,6 +158,7 @@ class ConnectionField(TopoObject):
         slice = self.input_sheet.input_slice(new_wt_bounds, self.x, self.y)
 
         if slice != self.slice:
+            self.bounds = new_wt_bounds
             or1,or2,oc1,oc2 = self.slice
             self.slice = slice
             r1,r2,c1,c2 = slice
@@ -166,15 +168,13 @@ class ConnectionField(TopoObject):
             self.slice_array[2] = c1
             self.slice_array[3] = c2
 
-            self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=True)
-
+            self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
             if self.normalize:
                 wts = self.weights
                 s = sum(wts.flat)
                 if s > 0:
                     s = self.normalize/s
                     wts *= s
-
 
 
 class Projection(TopoObject):
@@ -232,7 +232,7 @@ class Projection(TopoObject):
         # composite_name = '%s: %0.3f, %0.3f' % (self.name, sheet_x, sheet_y)
         #matrix_data = Numeric.array(Numeric.transpose(self.cf(r,c).weights))
         matrix_data = Numeric.array(self.cf(r,c).weights)
-        #matrix_data = Numeric.array(self.cf(r,c).weights)*100
+        #matrix_data = Numeric.array(self.cf(r,c).weights)*50
         new_box = self.dest.bounds  # TURN INTO A PROPER COPY
         assert matrix_data != None, "Projection Matrix is None"
         return topo.sheetview.UnitView((matrix_data,new_box),
@@ -283,6 +283,7 @@ class KernelProjection(Projection):
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
     weights_factory = Parameter(default=UniformRandomFactory())
     normalize = Parameter(default=0.0)
+    normalize_fn = Parameter(divisive_normalization)
     dest_port = Parameter(default="")
     learning_rate = Parameter(default=0.0)
 
@@ -325,12 +326,12 @@ class KernelProjection(Projection):
             self.warning('reduce_cfsize: new weight bounds should be strictly smaller than the original weight bounds')
             return
 
+        self.weights_bounds = new_wt_bounds
         rows,cols = self.get_shape()
         cfs = self.cfs
         for r in xrange(rows):
             for c in xrange(cols):
                 cfs[r][c].reduce_radius(new_wt_bounds)
-
 
 
 class CFSheet(Sheet):
