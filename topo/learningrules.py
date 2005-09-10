@@ -139,3 +139,15 @@ def hebbian(input_activation, unit_activation, weights, alpha):
     """
     weights += alpha * unit_activation * input_activation
 
+
+################################################################
+# Normalization methods
+
+def divisive_normalization(weights, normalize_total):
+    """
+    Normalize the numpy array weights to normalize_total by divisive
+    normalization.
+    """
+
+    factor = normalize_total/sum(weights.flat)
+    weights *= factor
