@@ -388,6 +388,7 @@ class Simulator(BaseSimulator):
     def continue_(self,duration=inf,until=inf):
 
         stop_time = min(self.time()+duration,until)
+        did_event = False
         while self.events and self.time() < stop_time:
 
             # Loop while there are events and it's not time to stop.
@@ -410,11 +411,13 @@ class Simulator(BaseSimulator):
                 # the clock) before doing that, give everyone a
                 # pre_sleep() call.
 
-                self.debug("Time to sleep. current time =",self.time(),
-                           "next event time =",self.events[0].time)
-                for ep in self._event_processors:
-#                    self.debug("Doing pre_sleep for",e)
-                    ep.pre_sleep()
+                if did_event:
+                    did_event = False
+                    self.debug("Time to sleep. current time =",self.time(),
+                               "next event time =",self.events[0].time)
+                    for ep in self._event_processors:
+    #                    self.debug("Doing pre_sleep for",e)
+                        ep.pre_sleep()
                     
                 # set the time to the frontmost event (Note: the front
                 # event may have been changed by the .pre_sleep() calls).
@@ -429,6 +432,7 @@ class Simulator(BaseSimulator):
                 e = self.events.pop(0)
                 if not e.execfn:
                     e.dest.input_event(e.src,e.src_port,e.dest_port,e.data)
+                    did_event = True
                 else:
                     e.fn(*(e.data))
 
