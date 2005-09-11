@@ -347,12 +347,6 @@ class TopoConsole(Frame):
         self.auto_refresh_panels.remove(panel)
     
 
-    ### JABHACKALERT!
-    ### 
-    ### Is it necessary to have all these new_*_window functions?
-    ### They all seem very similar, and it seems like they could
-    ### be handled by one shared function, e.g. new_plot_window.
-        
     #
     # New plot windows
     #
@@ -501,15 +495,8 @@ class TopoConsole(Frame):
     
         Returns False if the filename is '', (), or None.  Otherwise
         Returns True.  If execfile raises an exception, then it is not
-        caught and passed to the calling function.
+        caught and insteada passed on.
         """
-        ### JABHACKALERT!
-        ###
-        ### Please clarify the last sentence above.  Is the exception
-        ### passed to the calling function? (If so, say "and is
-        ### instead passed on".)  Or is it not passed to the calling
-        ### function? (If so, say "then it is neither caught nor
-        ### passed to the calling function".)
         if filename in ('',(),None):
             return False
         else:
@@ -551,13 +538,20 @@ class TopoConsole(Frame):
         self.parent.title(title)
 
         
-####################
-
-### JABHACKALERT!
-### 
-### Please explain what this class does.  It is not obvious to me, and
-### the comments below don't appear to make sense.
+        
 class GUIToplevel(Toplevel):
+    """
+    Each new TK window requires a new Toplevel class that contains the
+    window that created it, to handle such things as allowing resizing
+    windows, etc .  (In this file, it's usually something like win =
+    GUIToplevel(self).)
+    
+    The PMW Megawidgets classes also contain a Tkinter.toplevel object
+    stored within the object variable .hull.  GUIToplevel is
+    subclassing the Tkinter Toplevel, but the Megawidgets could also
+    be used here and the same function calls made upon the object
+    stored in the .hull
+    """
     def __init__(self,parent,**config):
         # Megawidgets contain Toplevels in .hull  Either system is acceptable.
         # Pmw.MegaToplevel.__init__(self,parent)
