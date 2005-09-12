@@ -12,7 +12,6 @@ import topo.tk.topoconsole
 import topo.tk.plotpanel
 import Tkinter
 from models.cfsom import CFSOM
-from topo.image import ImageSaver
 from math import pi
 from topo.parameter import Dynamic
 import random
@@ -123,7 +122,6 @@ class TestPlotPanel(unittest.TestCase):
         retina.print_level = base.WARNING
         V1 = CFSOM(name='V1')
         V1.print_level = base.WARNING
-        save  = ImageSaver(name='CFSOM')
         
         s.connect(retina,V1,delay=1)
         s.print_level = base.WARNING

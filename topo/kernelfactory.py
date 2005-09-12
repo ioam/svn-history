@@ -73,6 +73,62 @@ kernel_factories = {}
 EXP_CUTOFF = -100
 
 
+#####
+# The class ImageGenerator was originally written by Jeff, but now
+# it should be replaced by a KernelFactory that will load in an
+# input file.  Currently (9/05) only used by cfsom.py and a couple
+# of test files.
+from sheet import Sheet
+from simulator import EventProcessor
+from utils import NxN
+from pprint import *
+import Image, ImageOps
+class ImageGenerator(Sheet):
+    """
+
+    parameters:
+
+      filename = The path to the image file.
+
+    A sheet that reads a pixel map and uses it to generate an activity
+    matrix.  The image is converted to grayscale and scaled to match
+    the bounds and density of the sheet.
+
+    NOTE: A bare ImageGenerator only sends a single event, containing
+    its image when it gets the .start() call, to repeatedly generate
+    images, it must have a self-connection.  More elegant, however,
+    would be to convert the ImageGenerator from a sheet to a factory
+    function suitable for use with the InputSheet class (see
+    inputsheet.py). 
+
+    """
+    filename = Parameter(None)
+    
+    def __init__(self,**config):
+
+        super(ImageGenerator,self).__init__(**config)
+
+        self.verbose("filename = " + self.filename)
+
+        image = Image.open(self.filename)
+        image = ImageOps.grayscale(image)
+        image = image.resize(self.activation.shape)
+        self.activation = resize(array([x for x in image.getdata()]),
+                                 (image.size[1],image.size[0]))
+
+	self.verbose("Initialized %s activation from %s" % (NxN(self.activation.shape),self.filename))
+        max_val = float(max(max(self.activation)))
+        self.activation = self.activation / max_val
+
+
+    def start(self):
+        self.send_output(data=self.activation)
+
+    def input_event(self,src,src_port,dest_port,data):
+        self.send_output(data=self.activation)
+
+
+
 def produce_kernel_matrices(bounds, density, r, c):
     """
     Get Kernel Matrices

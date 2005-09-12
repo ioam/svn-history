@@ -111,3 +111,82 @@ class ProjectionFile(PlotFileSaver):
 
 
 
+
+
+#####
+# The class ImageSaver was originally written by Jeff, but now
+# it should be replaced by a KernelFactory that will load in an
+# input file.  Currently (9/05) only used by cfsom.py and a couple
+# of test files.
+from Numeric import resize,array,zeros
+from simulator import EventProcessor
+from sheet import Sheet
+from parameter import Parameter
+from utils import NxN
+from pprint import *
+import Image, ImageOps
+class ImageSaver(EventProcessor):
+    """
+
+    A Sheet that receives activity matrices and saves them as bitmaps.
+
+    [should this really be a sheet?? it doesn't generate activity. -jp]
+
+    Each time an ImageSaver sheet receives an input event on any input
+    port, it saves it to a file.  The file name is determined by:
+
+      <file_prefix><name>_<port>_<time>.<file_format>
+
+    Where <name> is the name of the ImageSaver object, <port> is the
+    name of the input port used, and <time> is the current simulation time.
+
+    Parameters:
+      file_prefix = (default '') A path or other prefix for the
+                    filename.
+      file_format = (default 'ppm') The file type to use when saving
+                    the image. (can be any image format understood by PIL)
+      time_format = (default '%f') The format string for the time.
+      pixel_scale = (default 255) The amount to scale the
+                     activity. Used as parameter to PIL's Image.putdata().
+      pixel_offset = (default 0) The zero-offset for each pixel. Used as
+                     parameter to PIL's Image.putdata()
+                     
+    """
+
+    file_prefix = Parameter('')
+    file_format = Parameter('ppm')
+    time_format = Parameter('%f')
+    pixel_scale = Parameter(255)
+    pixel_offset = Parameter(0)
+
+
+
+    def input_event(self,src,src_port,dest_port,data):
+
+        self.verbose("Received %s  input from %s" % (NxN(data.shape),src))
+        self.verbose("input max value = %d" % max(data.flat))
+
+        # assemble the filename
+        filename = self.file_prefix + self.name
+        if dest_port:
+            filename += "_" + str(dest_port)
+        filename += "_" + (self.time_format % self.simulator.time())
+        filename += "." + self.file_format
+
+        self.verbose("filename = '%s'" % filename)
+        
+        # make and populate the image
+        im = Image.new('L',(data.shape[1],data.shape[0]))
+        self.verbose("image size = %s" % NxN(im.size))
+        im.putdata(data.flat,
+                   scale=self.pixel_scale,
+                   offset=self.pixel_offset)
+
+        self.verbose("put image data.")
+
+        #save the image
+        f = open(filename,'w')
+        im.save(f,self.file_format)
+        f.close()
+        
+

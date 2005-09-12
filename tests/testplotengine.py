@@ -16,7 +16,6 @@ from topo.plotgroup import *
 from topo.plotengine import *
 from topo.inputsheet import *
 from topo.simulator import *
-from topo.image import ImageSaver
 from topo import kernelfactory
 from topo.kernelfactory import GaussianFactory
 from topo.parameter import Dynamic

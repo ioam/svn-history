@@ -41,8 +41,6 @@ import boundingregion
 import kernelfactory
 
 # sheet types
-#import cfsom
-import image
 import inputsheet
 
 # plotting

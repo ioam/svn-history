@@ -15,7 +15,7 @@ $Id$
 
 import sys
 from topo import * 
-from topo.image import *
+from topo.kernelfactory import *
 from topo.composer import Composer
 
 #################################################

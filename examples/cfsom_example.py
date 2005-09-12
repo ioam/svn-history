@@ -9,7 +9,7 @@ from topo.inputsheet import *
 from topo.kernelfactory import *
 from topo.simulator import *
 from topo.cfsheet import KernelProjection
-from topo.image import ImageSaver
+from topo.plotfilesaver import ImageSaver
 from topo.parameter import Dynamic
 from models.cfsom import CFSOM
 

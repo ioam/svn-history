@@ -3,7 +3,7 @@ from pprint import pprint
 from topo import plot
 from topo.sheet import *
 from topo.bitmap import RGBMap
-from topo.image import ImageGenerator
+from topo.kernelfactory import ImageGenerator
 from topo.inputsheet import *
 import Numeric, random, os
 from math import pi

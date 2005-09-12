@@ -13,7 +13,7 @@ from topo.bitmap import *
 from topo.sheet import Sheet
 from topo.inputsheet import *
 from topo.simulator import *
-from topo.image import ImageSaver
+from topo.plotfilesaver import ImageSaver
 from topo import kernelfactory
 from topo.kernelfactory import GaussianFactory
 from math import pi
@@ -35,7 +35,8 @@ class TestCFSom(unittest.TestCase):
         Code moved from __main__ block of cfsom.py.  Gives a tight example
         of running a cfsom simulation.
         """
-        from topo.image import ImageGenerator,ImageSaver
+        from topo.kernelfactory import ImageGenerator
+        from topo.plotfilesaver import ImageSaver
         
         s = Simulator(step_mode=True)
     

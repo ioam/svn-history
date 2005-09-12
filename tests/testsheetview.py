@@ -5,7 +5,7 @@ import Numeric
 from topo.sheet import Sheet
 from topo.boundingregion import BoundingBox
 from topo.sheetview import *
-from topo.image import ImageGenerator
+from topo.kernelfactory import ImageGenerator
 from topo.bitmap import BWMap
 
 # Turn False once development is complete and this module is to be
