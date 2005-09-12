@@ -13,17 +13,10 @@ It is reasonable to create a function that will import topo.tk, but
 calling that function must not be forced, so users can still use this
 file without needing to have Tk or topo.tk installed.
 
-gui.py has three main functions:
-1. Registering which Simulator is active.
-   (Allows then allows the GUI to requst views from a known simulation.)
-2. Letting the command-line run the gui with the '-g' flag.
-   (topographica_script.py runs topo.gui.start())
-3. Allows the GUI to be run with a single command: topo.gui.start().
-   This is instead of having to "import topo.tk" first. 
+gui.py has one main function: Registering which simulator is active.
+(Then allows the GUI to requst views from a known simulation.)
 
 To start the topo.tk gui from the Topographica prompt, run:
-  topo.gui.start()
-or
   import topo.tk
   topo.tk.start()
   
@@ -50,12 +43,7 @@ import sys, __main__
 import topo.simulator
 import topo.base
 
-GUIPACKAGE = 'topo.tk'
 gui_console = None
-
-def gui_imported():
-    """Return True if the GUIPACKAGE has already been imported"""
-    return sys.modules.has_key(GUIPACKAGE)
 
 def get_console():
     """Return the TopoConsole"""
@@ -73,7 +61,7 @@ def link_to_sim(sim):
         if gui_console != None:
             gui_console.set_active_simulator(sim)
 
-def start(sim=None):
-    """Import the topo.tk package, and fire 'er up."""
-    import topo.tk
-    topo.tk.start(sim)
+#def start(sim=None):
+#    """Import the topo.tk package, and fire 'er up."""
+#    import topo.tk
+#    topo.tk.start(sim)
