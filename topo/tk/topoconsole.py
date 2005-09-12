@@ -169,24 +169,6 @@ class TopoConsole(Frame):
         # Plot menu
         #
         self.menubar.addmenu('Plots','Assorted plot displays')
-        # self.menubar.addmenuitem('Plots', 'command',
-        #                      'New activity plot',
-        #                      label="Activity",
-        #                      command=self.new_activity_window)
-        # self.menubar.addmenuitem('Plots', 'command',
-        #                      'New orientation, ocular dominance, or similar map plot',
-        #                      label="Preference Map",
-        #                      command=self.new_preferencemap_window)
-        # self.menubar.addmenuitem('Plots', 'command',
-        #                      'New unit weights (connection fields) plot',
-        #                      label="Unit Weight",
-        #                      command=self.new_weights_window)
-        # self.menubar.addmenuitem('Plots', 'command',
-        #                      'New projection (connection field array) plot',
-        #                      label="Projection",
-        #                      command=self.new_weights_array_window)
-        # self.menubar.addmenuitem('Plots','separator')
-
         self.populate_plots_menu(self.menubar)
 
         self.menubar.addmenuitem('Plots','separator')
@@ -277,19 +259,14 @@ class TopoConsole(Frame):
         return self.__active_plotengine_obj
 
 
-    ### JABHACKALERT!
-    ### 
-    ### If the GUI interface was requested on the command line,
-    ### quitting from the GUI should also quit from the interpreter.
-    ### If the GUI was started as a separate function from the
-    ### Topographica interpreter, quitting from the GUI should 
-    ### probably *not* exit the Topographica interpreter.
     def quit(self):
         """Close the main GUI window.  Does not exit Topographica interpreter."""
         topo.gui.set_console(None)
         Frame.quit(self)
         Frame.destroy(self)     # Get rid of widgets
         self.parent.destroy()   # Get rid of window
+        if topo.gui_cmdline_flag:
+            sys.exit()
 
 
     def load_network(self):
@@ -353,69 +330,6 @@ class TopoConsole(Frame):
     #
     # New plot windows
     #
-#    def new_activity_window(self):
-#        pe = self.active_plotengine()
-#        if pe:
-#            self.num_activity_windows += 1
-#            win = GUIToplevel(self)
-#            win.withdraw()
-#            ap = BasicPlotPanel(console=self,pengine=pe,parent=win)
-#            ap.pack(expand=YES,fill=BOTH)
-#            ap.refresh_title()
-#            win.deiconify()
-#            self.messageBar.message('state', 'OK')
-#        else:
-#            self.messageBar.message('state', 'No active Simulator object.')
-#            
-#
-#    def new_preferencemap_window(self):
-#        pe = self.active_plotengine()
-#        if pe:
-#            self.num_orientation_windows += 1
-#            win = GUIToplevel(self)
-#            win.withdraw()
-#            win.title("Preference Map %d" % self.num_orientation_windows)
-#            ap = PreferenceMapPanel(console=self,pengine=pe,parent=win)
-#            ap.pack(expand=YES,fill=BOTH)
-#            ap.refresh_title()
-#            win.deiconify()
-#            self.messageBar.message('state', 'OK')
-#        else:
-#            self.messageBar.message('state', 'No active Simulator object.')
-#
-#
-#    def new_weights_window(self):
-#        pe = self.active_plotengine()
-#        if pe:
-#            self.num_weights_windows += 1
-#            win = GUIToplevel(self)
-#            win.withdraw()
-#            #win.title("Weights %d" % self.num_weights_windows)
-#            wp = WeightsPanel(console=self,pengine=pe,parent=win)
-#            wp.pack(expand=YES,fill=BOTH)
-#            wp.refresh_title()
-#            win.deiconify()
-#            self.messageBar.message('state', 'OK')
-#        else:
-#            self.messageBar.message('state', 'No active Simulator object.')
-#
-#
-#    def new_weights_array_window(self):
-#        pe = self.active_plotengine()
-#        if pe:
-#            self.num_weights_array_windows += 1
-#            win = GUIToplevel(self)
-#            win.withdraw()
-#            win.title("Projection %d" % self.num_weights_array_windows)
-#            wap = ProjectionPanel(console=self,pengine=pe,parent=win)
-#            wap.pack(expand=YES,fill=BOTH)
-#            wap.refresh_title()
-#            win.deiconify()
-#            self.messageBar.message('state', 'OK')
-#        else:
-#            self.messageBar.message('state', 'No active Simulator object.')
-
-
     def open_plot_params_window(self):
         """
         Test Pattern Window.  
@@ -545,14 +459,14 @@ class TopoConsole(Frame):
 class GUIToplevel(Toplevel):
     """
     Each new TK window requires a new Toplevel class that contains the
-    window that created it, to handle such things as allowing resizing
-    windows, etc .  (In this file, it's usually something like win =
-    GUIToplevel(self).)
+    object that created it, to handle such things as allowing resizing
+    windows, etc.  (In this file, it's usually called with something
+    like win = GUIToplevel(self).)
     
     The PMW Megawidgets classes also contain a Tkinter.toplevel object
-    stored within the object variable .hull.  GUIToplevel is
-    subclassing the Tkinter Toplevel, but the Megawidgets could also
-    be used here and the same function calls made upon the object
+    stored within the object variable .hull.  For now the GUIToplevel
+    is subclassing the Tkinter Toplevel, but the Megawidgets could
+    also be used here and the same function calls made upon the object
     stored in the .hull
     """
     def __init__(self,parent,**config):
