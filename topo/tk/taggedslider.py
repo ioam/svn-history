@@ -6,19 +6,7 @@ $Id$
 from Tkinter import Frame, IntVar, Scale, Entry
 from Tkinter import LEFT, RIGHT, TOP, BOTTOM, YES, BOTH
 import string
-import inputparamspanel 
-
-### JABHACKALERT!
-###
-### This file must be changed so that it does not depend on
-### inputparamspanel; it's a general widget that could be useful in
-### any Tk program.  It should probably just define a general
-### string_translator function, e.g. string.atof, which would then be
-### overridden with inputparamspanel.eval_atof.  Because it's not
-### actually inputparamspanel that defines the sliders, but
-### propertiesframe, propertiesframe would need to have a constructor
-### argument for the appropriate string_translator, and would pass
-### that on to the TaggedSlider.
+import topo.utils
 
 class TaggedSlider(Frame):
     """
@@ -38,7 +26,7 @@ class TaggedSlider(Frame):
                  max_value='100',
                  string_format = '%f',
                  tag_width=10,
-                 string_translator=inputparamspanel.eval_atof,
+                 string_translator=topo.utils.eval_atof,
 #                 string_translator=string.atof,
                  **config):
 
