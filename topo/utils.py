@@ -6,6 +6,7 @@ $Id$
 """
 
 from Numeric import sqrt,ones,dot,sum
+import __main__
 import weave
 
 inf = (ones(1)/0.0)[0]
@@ -228,3 +229,15 @@ def compute_response_mdot_c(input_activation, rows, cols, temp_activation, cfs, 
 
     weave.inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'])
 
+
+def eval_atof(in_string,default_val = 0):
+    """
+    Create a float from a string by eval'ing it in the __main__
+    namespace.  If the string raises an exception, 0 is returned.
+    Catch any exceptions and return 0 if this is the case.
+    """
+    try:
+        val = eval(in_string,__main__.__dict__)
+    except Exception:
+        val = default_val
+    return val
