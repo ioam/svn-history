@@ -114,10 +114,9 @@ class ProjectionFile(PlotFileSaver):
 
 
 #####
-# The class ImageSaver was originally written by Jeff, but now
-# it should be replaced by a KernelFactory that will load in an
-# input file.  Currently (9/05) only used by cfsom.py and a couple
-# of test files.
+# The class ImageSaver was originally written by Jeff, but now it
+# should be replaced by a PlotFileSaver that will save a plot.
+# Currently (9/05) only used by cfsom.py and a couple of test files.
 from Numeric import resize,array,zeros
 from simulator import EventProcessor
 from sheet import Sheet
@@ -129,9 +128,6 @@ class ImageSaver(EventProcessor):
     """
 
     A Sheet that receives activity matrices and saves them as bitmaps.
-
-    [should this really be a sheet?? it doesn't generate activity. -jp]
-
     Each time an ImageSaver sheet receives an input event on any input
     port, it saves it to a file.  The file name is determined by:
 

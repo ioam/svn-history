@@ -334,7 +334,6 @@ class PlotEngine(TopoObject):
                 return PlotGroup(dynamic_list)
             new_group = ptr(name,filter_lam,dynamic_list)
 
-            #new_group = BasicPlotGroup('None',filter_lam,dynamic_list)
             # Just copying the pointer.  Not currently sure if we want to
             # promote side-effects by not doing a deepcopy(), but assuming
             # we do for now.  If not, use deepcopy(group_type).

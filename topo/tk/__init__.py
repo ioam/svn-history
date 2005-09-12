@@ -18,7 +18,6 @@ import topo.tk.preferencemappanel
 import Pmw, sys, Tkinter
 import topo.simulator
 import topo.base
-import topo.gui
 
 def show_cmd_prompt():
     """
@@ -55,7 +54,7 @@ def start(sim=None, mainloop=False):
     else:
         console.set_active_simulator(sim)
 
-    topo.gui.set_console(console)
+    topo.simulator.set_console(console)
 
     # mainloop() freezes the commandline until the GUI window exits.
     # Without this line the command-line remains responsive.

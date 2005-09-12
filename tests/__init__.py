@@ -17,7 +17,6 @@ import testplotengine
 import testplotfilesaver
 import testsimulator
 import testpalette
-import testgui
 import testdislinplot
 import testcfsom
 import testkernelfactory
