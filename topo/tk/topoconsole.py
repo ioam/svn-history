@@ -497,8 +497,8 @@ class TopoConsole(Frame):
         command-line.
     
         Returns False if the filename is '', (), or None.  Otherwise
-        Returns True.  If execfile raises an exception, then it is not
-        caught and insteada passed on.
+        Returns True.  Exceptions raised by execfile are not caught
+        here, and are instead passed on to the calling function.
         """
         if filename in ('',(),None):
             return False
