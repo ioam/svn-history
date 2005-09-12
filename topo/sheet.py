@@ -351,12 +351,16 @@ class Sheet(EventProcessor):
     def add_sheet_view(self,view_name,sheet_view):
         """
         Add a SheetView to the view database in this Sheet object.
-        Each view is stored by a dictionary keyword passed into the
-        function through view_name.
+        Each view is stored by a dictionary key (string or tuple)
+        passed into the function through view_name.  It is valid for
+        sheet_view to be a list of SheetViews.
 
-        Because each SheetView has its own internal name, there is no
-        guarantee that the SheetView 'name' will be stored under the key
-        name passed into this function.
+        Because each SheetView has its own internal name, or an entry
+        may actually be a list, there is no guarantee that the
+        SheetView '.name' will be the same as the view_name.  For
+        example, the SheetView name might be "UnitView7754" whereas
+        the key may be, ('Projection',V1,R1toV1,0.2,0.3).  Or the
+        sheet_view may be a list of UnitViews for a Projection plot.
         """
         self.sheet_view_dict[view_name] = sheet_view
 

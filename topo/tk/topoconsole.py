@@ -47,6 +47,9 @@ class PlotsMenuEntry(topo.base.TopoObject):
         # Special cases.  These classes are specific to the topo/tk
         # directory and therefore this link must be made within the tk
         # files.
+        #
+        # If additional users want to extend the Plot Panel classes, then
+        # an additional line needs to be added here.
         if self.label == 'Unit Weights':
            self.class_name = UnitWeightsPanel
         if self.label == 'Projection':
