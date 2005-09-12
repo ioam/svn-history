@@ -15,19 +15,19 @@ of using a PlotGroup subclass, creates a group on the fly.
 $Id$
 """
 import __main__
-import math
+import math, string
 import propertiesframe
 import topo.kernelfactory
 import topo.plot
 import plotpanel
 import Pmw
+import topo.sheetview 
 from Tkinter import IntVar, StringVar, Checkbutton
 from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
 from copy import deepcopy
 from topo.inputsheet import InputSheet
 from topo.sheet import BoundingBox, Sheet
 from topo.utils import eval_atof
-import topo.sheetview 
 
 # Hack to reverse the order of the input EventProcessor list and the
 # Preview plot list, so that it'll match the order that the plots appear
@@ -44,7 +44,12 @@ def kernelfactory_names():
     change based on the existing classes found within kernelfactory.py,
     and can be extended by the user.
     """
-    return topo.kernelfactory.kernel_factories.keys()
+    k = topo.kernelfactory.kernel_factories.keys()
+    k = [name[:-7] for name in k]  # Cut off 'Factory'
+    for i in range(len(k)):        # Add spaces before capital leters
+        for c in string.uppercase:
+            k[i] = k[i].replace(c,' '+c).strip()
+    return k
 
 
 class InputParamsPanel(plotpanel.PlotPanel):
@@ -116,14 +121,9 @@ class InputParamsPanel(plotpanel.PlotPanel):
         buttonBox.add('Use for future learning',
                       command = self.use_for_learning)
 
-        ### JABHACKALERT!
-        ###
-        ### Must remove the string "Factory" from all items in the
-        ### list of input types.  Factory does not mean anything to
-        ### the user.
-        ###
         # Menu of valid KernelFactory types defined.
         self.input_types = kernelfactory_names()
+        
         self.input_type = StringVar()
         self.input_type.set(self.input_types[0])
         Pmw.OptionMenu(self,
@@ -243,6 +243,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         added to the screen.  The widgets themselves do not change but
         the grid location does.
         """
+        new_name = new_name.replace(' ','') + 'Factory'
         # How to wipe the widgets off the screen
         for (s,c) in self.tparams.values():
             s.grid_forget()
@@ -326,7 +327,8 @@ class InputParamsPanel(plotpanel.PlotPanel):
         Make an instantiation of the current user kernel, and put it into
         all of the selected input sheets.
         """
-        kname = self.input_type.get()
+        kname = self.input_type.get() + 'Factory'
+        kname = kname.replace(' ','')
         p = self.get_params()
         rp = self.relevant_parameters(kname,self.tparams.keys())
         ndict = {}
