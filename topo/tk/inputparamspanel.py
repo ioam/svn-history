@@ -26,6 +26,7 @@ from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
 from copy import deepcopy
 from topo.inputsheet import InputSheet
 from topo.sheet import BoundingBox, Sheet
+from topo.utils import eval_atof
 import topo.sheetview 
 
 # Hack to reverse the order of the input EventProcessor list and the
@@ -35,33 +36,6 @@ LIST_REVERSE = True
 
 # Default time to show in the Presentation duration box.
 DEFAULT_PRESENTATION = '1.0'
-
-def eval_atof(in_string):
-    """
-    Create a float from a string.  Some defaults are necessary.  Every
-    keypress in the field calls this function, so it's quite likely
-    that the expression has not been defined yet, and an eval will
-    raise an exception.  Catch any exceptions and return 0 if this is
-    the case.  Undefined if the Parameter calling this doesn't like the
-    value 0.
-    """
-    ### JABHACKALERT!
-    ### 
-    ### This dictionary needs to be replaced with a real evaluation
-    ### in an appropriate namespace, presumably the global namespace.
-    ### pi and PI should be defined there; RN isn't necessary at all.
-    ### 
-    ### If possible, it should not be undefined if the Parameter
-    ### calling it does not like zero.  Instead, it should probably
-    ### accept a default value when called, to be returned on
-    ### exceptions.
-    x_dict = {'PI':math.pi, 'pi':math.pi, 'Pi':math.pi, 'pI':math.pi,
-              'RN':1.0}
-    try:
-        val = eval(in_string,x_dict)
-    except Exception:
-        val = 0
-    return val
 
 
 def kernelfactory_names():
@@ -199,7 +173,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         self.tparams['gaussian_width'] = \
           self.add_slider( 'gaussian_width',"0.000001", "1"   ,  "0.15"   )
 
-# NOT IN EXISTING KERNELFACTORIES 4/2005
+# NOT IN EXISTING KERNELFACTORIES 9/2005
 #        self.tparams['xsigma'] = \
 #          self.add_slider( 'xsigma',       "0"     ,   "RN"     ,  "7.5"     )
 #        self.tparams['ysigma'] = \
