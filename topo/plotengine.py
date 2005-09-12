@@ -341,7 +341,7 @@ class PlotEngine(TopoObject):
             new_group.template = group_type 
             self.add_plot_group(name,new_group)
         else:
-            print 'Template was not passed in.  This code depricated and disabled.'
+            print 'Template was not passed in.  This code deprecated and disabled.'
             import inspect
             print inspect.stack(), '\n'
             #if isinstance(name,tuple) and name[0] == 'Weights':
