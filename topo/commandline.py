@@ -1,4 +1,4 @@
-import sys
+import sys, __main__, math
 """
 $Id$
 """
@@ -12,6 +12,8 @@ specific command, or topo.base.about() for info on this release,
 including licensing information.
 """
 
+global_constants = {'PI':math.pi, 'pi':math.pi, 'Pi':math.pi, 'pI':math.pi}
+
 def start(interactive=True):
     """
     Function that will display a banner, import topo into main,
@@ -20,6 +22,10 @@ def start(interactive=True):
     file is imported.
     """
     sys.ps1        = 'Topographica> '
+    
+    for (k,v) in global_constants.items():
+        exec '%s = %s' % (k,v) in __main__.__dict__
+        
     if interactive:
         print BANNER
         try:
