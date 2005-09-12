@@ -57,7 +57,7 @@ def set_console(con):
 def link_to_sim(sim):
     """Connect a simulator to the GUI."""
     assert isinstance(sim,topo.simulator.Simulator) or sim is None, 'Parameter must be Simulator'
-    if gui_imported():
+    if gui_console:
         if gui_console != None:
             gui_console.set_active_simulator(sim)
 
