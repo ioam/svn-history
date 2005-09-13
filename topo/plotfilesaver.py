@@ -113,7 +113,11 @@ class ProjectionFile(PlotFileSaver):
 
 
 
-#####
+### JABHACKALERT!
+### 
+### The code from here to the end of ImageSaver needs to be
+### reworked into a proper mechanism for saving images.
+
 # The class ImageSaver was originally written by Jeff, but now it
 # should be replaced by a PlotFileSaver that will save a plot.
 # Currently (9/05) only used by cfsom.py and a couple of test files.

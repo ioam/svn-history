@@ -73,11 +73,15 @@ kernel_factories = {}
 EXP_CUTOFF = -100
 
 
-#####
-# The class ImageGenerator was originally written by Jeff, but now
-# it should be replaced by a KernelFactory that will load in an
-# input file.  Currently (9/05) only used by cfsom.py and a couple
-# of test files.
+### JABHACKALERT!
+### 
+### The code from here to the end of ImageGenerator needs to be
+### reworked into a proper KernelFactory for rendering images.
+
+# Judah: The class ImageGenerator was originally written by Jeff, but
+# now it should be replaced by a KernelFactory that will load in an
+# input file.  Currently (9/05) only used by cfsom.py and a couple of
+# test files.
 from sheet import Sheet
 from simulator import EventProcessor
 from utils import NxN
