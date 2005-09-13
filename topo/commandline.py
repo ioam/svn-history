@@ -12,7 +12,7 @@ specific command, or topo.base.about() for info on this release,
 including licensing information.
 """
 
-global_constants = {'PI':math.pi, 'pi':math.pi, 'Pi':math.pi, 'pI':math.pi}
+global_constants = {'PI':math.pi, 'pi':math.pi, 'Pi':math.pi}
 
 def start(interactive=True):
     """
