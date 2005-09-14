@@ -13,7 +13,7 @@ from topo.inputsheet import *
 from topo.image import ImageSaver
 import topo.gui
 import topo.cfsheet
-from topo.params import *
+from topo.parameter import *
 from topo.utils import *
 from topo.learningrules import *
 import weave
@@ -60,6 +60,12 @@ class LISSOM(topo.cfsheet.CFSheet):
         send it out on the default output port.
         """
 
+        iteration_done = False
+        self.presleep_count += 1
+
+	if self.presleep_count == tsettle+1: #end of an iteration
+            iteration_done = True
+
         if self.new_input:
             self.new_input = False
             self.temp_activation *= 0.0
@@ -67,23 +73,24 @@ class LISSOM(topo.cfsheet.CFSheet):
                 for proj in self.projections[name]:
                     self.temp_activation += proj.temp_activation
             self.activation = self.transfer_fn(self.temp_activation,delta,beta)
-            self.send_output(data=self.activation)
+            # don't send output when an iteration has ended
+            if not iteration_done: 
+                self.send_output(data=self.activation)
 
         if self._learning:
             if self.continuous_learning:
                 self.learn()
             else:
-                self.presleep_count += 1
-                if self.presleep_count == tsettle+1:
+                if iteration_done:
                     self.presleep_count = 0
                     self.learn()
                     
 
     def learn(self):
         rows,cols = self.activation.shape
-	done = 1
         for proj in chain(*self.projections.values()):
             if proj.input_buffer:
+                alpha = proj.learning_rate
                 if proj.src == self: #lateral connection
                     inp = self.activation
                 else:
@@ -93,42 +100,30 @@ class LISSOM(topo.cfsheet.CFSheet):
                     # hebbian_c is an function for the whole sheet
                     cfs = proj.cfs
                     len, len2 = inp.shape
-                    alpha = proj.learning_rate
 		    if proj.normalize:
                         # Hebbian learning with divisive normalization per 
                         # projection. It is much faster to do both of them
                         # in one function.
-                        hebbian_div_norm_c(inp, self.activation, rows, cols, len, cfs, alpha, proj.normalize)
+			if proj.normalize_fn.func_name == "divisive_normalization":
+                            hebbian_div_norm_c(inp, self.activation, rows, cols, len, cfs, alpha, proj.normalize)
+                        else:
+                            hebbian_c(inp, self.activation, rows, cols, len, cfs, alpha)
+			    norm = proj.normalize
+                            for r in range(rows):
+                                for c in range(cols):
+                                    proj.normalize_fn(cfs[r][c].weights, norm)
                     else:
                         hebbian_c(inp, self.activation, rows, cols, len, cfs, alpha)
                 else:
-                    # apply learning rule for each unit
-                    done = 0
+                    # apply learning rule and normalization to each unit
+                    norm = proj.normalize
                     for r in range(rows):
                         for c in range(cols):
                             cf = proj.cf(r,c)
                             self.learning_fn(cf.get_input_matrix(inp), self.activation[r,c], cf.weights, alpha)
+                            if norm:
+                                proj.normalize_fn(cf.weights, norm)
 
-        # if all weights have been normalized (if needed), return
-        if done: 
-            return
-
-        # normalize weights
-        lateral = self.lateral_projections()
-        afferent = self.afferent_projections()
-                                             
-        for r in range(rows):
-            for c in range(cols):
-                for group in (lateral,afferent):
-                    # Uncomment for normalization over whole group (lateral, afferent)
-                    # k = sum([sum(p.cf(r,c).weights.flat)
-                    #          for p in group])
-                    for p in group:
-                        # Uncomment for normalization per projection
-                        if p.normalize:
-                            k = sum(p.cf(r,c).weights.flat)
-                            k = p.normalize / k
-                            p.cf(r,c).weights *= k
 
     def lateral_projections(self):
         return [p for p in chain(*self.projections.values()) if p.src is self]
@@ -145,9 +140,16 @@ class LISSOM(topo.cfsheet.CFSheet):
     def change_learning_rate(self, name, new_alpha):
         for proj in chain(*self.projections.values()):
             if proj.name == name:
-                proj.learning = new_alpha
+                proj.learning_rate = new_alpha
                 return
         self.warning("Can't find ", name)
+
+
+    # print the weights of a unit
+    def printwts(self,x,y):
+        for proj in chain(*self.projections.values()):
+            print proj.name, x, y
+            print transpose(proj.cfs[x][y].weights)
 
 
 ###########################################
@@ -190,8 +192,6 @@ alpha_exc=0.002*ecs
 alpha_inh=0.00025*ics
 
 tsettle=8
-
-
 
 print "Setting parameters..."
 
@@ -236,16 +236,16 @@ save  = ImageSaver(name='LISSOM')
 
 s.connect(retina,V1, delay = 0.5/tsettle,
           projection_params = dict(strength = 1.0, name='Afferent0',
-                                   weights_bounds = afferent_weight_bounds, normalize = 1, activation_fn=compute_response_mdot_c,learning_rate=alpha_input))
+                                   weights_bounds = afferent_weight_bounds, normalize = 1.0, activation_fn=compute_response_mdot_c,learning_rate=alpha_input))
 
 
 s.connect(V1,V1, delay = 1.0/tsettle, dest_port="exc",
           projection_params = dict(strength = gammaexc, name='LateralExcitatory',
-                                   weights_bounds = excitatory_weight_bounds, normalize = 1, activation_fn=compute_response_mdot_c,learning_rate=alpha_exc))
+                                   weights_bounds = excitatory_weight_bounds, normalize = 1.0, activation_fn=compute_response_mdot_c,learning_rate=alpha_exc))
 
 s.connect(V1,V1, delay = 1.0/tsettle, dest_port="inh",
           projection_params = dict(strength = -gammainh, name='LateralInhibitory',
-                                   weights_bounds = inhibitory_weight_bounds, normalize = 1, activation_fn=compute_response_mdot_c,learning_rate=alpha_inh))
+                                   weights_bounds = inhibitory_weight_bounds, normalize = 1.0, activation_fn=compute_response_mdot_c,learning_rate=alpha_inh))
         
 
 #################################################
@@ -262,8 +262,9 @@ s.sched_execfn(2000, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=(
 s.sched_execfn(500, V1.change_learning_rate, "Afferent0", 0.005*acs)
 s.sched_execfn(2000, V1.change_learning_rate, "Afferent0", 0.004*acs)
 s.sched_execfn(4000, V1.change_learning_rate, "Afferent0", 0.003*acs)
+s.sched_execfn(20000, V1.change_learning_rate, "Afferent0", 0.0015*acs)
 
-s.sched_execfn(200, V1.change_learning_rate, "LateralExcitatory", 0.001*ecs)
+s.sched_execfn(500, V1.change_learning_rate, "LateralExcitatory", 0.001*ecs)
 
 
 #function that set delta and beta for the threshold function
@@ -281,10 +282,11 @@ s.sched_execfn(4000, set_deltabeta, 0.20, 0.76)
 s.sched_execfn(5000, set_deltabeta, 0.21, 0.79)
 s.sched_execfn(6500, set_deltabeta, 0.22, 0.82)
 s.sched_execfn(8000, set_deltabeta, 0.23, 0.85)
+s.sched_execfn(20000, set_deltabeta, 0.24, 0.88)
 
+#s.sched_execfn(20009.99, V1.printwts, 36, 36)
 
 #cfsheet.CF.print_level = base.VERBOSE
-
 
 # Uncomment the connections to the image saver, to save all the activation
 # images to disk.
