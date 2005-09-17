@@ -187,7 +187,8 @@ def compute_response_mdot_c(input_activation, rows, cols, temp_activation, cfs, 
 
     code = """
         double tot;
-        double *wi, *xi, *xj;
+        float *wi; 
+        double *xi, *xj;
         double *tact = temp_act;
         int *slice;
         int rr1, rr2, cc1, cc2;
@@ -200,7 +201,7 @@ def compute_response_mdot_c(input_activation, rows, cols, temp_activation, cfs, 
             cfsr = PyList_GetItem(cfs,r);
             for (l=0; l<cols; ++l) {
                 cf = PyList_GetItem(cfsr,l);
-                wi = (double *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
+                wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
                 slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
                 rr1 = *slice++;
                 rr2 = *slice++;

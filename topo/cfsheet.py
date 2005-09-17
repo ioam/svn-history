@@ -126,10 +126,13 @@ class ConnectionField(TopoObject):
 
 
         if isinstance(weights_factory, UniformRandomFactory):
-            self.weights = RandomArray.uniform(0,1,[r2-r1,c2-c1])
-            #self.weights = Numeric.ones([r2-r1,c2-c1], Numeric.Float)
+            self.weights = RandomArray.uniform(0,1,[r2-r1,c2-c1], Numeric.Float32)
+            #self.weights = Numeric.ones([r2-r1,c2-c1], Numeric.Float32)
         else:
-            self.weights = weights_factory(x=0,y=0,bounds=self.bounds,density=self.input_sheet.density,theta=0,rows=r2-r1,cols=c2-c1)
+            w = weights_factory(x=0,y=0,bounds=self.bounds,density=self.input_sheet.density,theta=0,rows=r2-r1,cols=c2-c1)
+            self.weights = w.astype(Numeric.Float32)
+
+        self.weights.savespace(1)
 
         self.verbose("activation matrix shape: ",self.weights.shape)
 
@@ -169,6 +172,8 @@ class ConnectionField(TopoObject):
             self.slice_array[3] = c2
 
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
+            self.weights.savespace(1)
+
             if self.normalize:
                 wts = self.weights
                 s = sum(wts.flat)

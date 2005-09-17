@@ -15,7 +15,8 @@ def hebbian_div_norm_c(input_activation, self_activation, rows, cols, len, cfs, 
     """
         
     hebbian_div_norm_code = """
-        double *wi, *wj, *x, *inpi, *inpj;
+        float *wi, *wj;
+        double *x, *inpi, *inpj;
         int *slice;
         int rr1, rr2, cc1, cc2, rc;
         int i, j, r, l;
@@ -34,7 +35,7 @@ def hebbian_div_norm_c(input_activation, self_activation, rows, cols, len, cfs, 
                     load *= alpha;
 
                     cf = PyList_GetItem(cfsr,l);
-                    wi = (double *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
+                    wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
                     wj = wi;
                     slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
                     rr1 = *slice++;
@@ -83,7 +84,8 @@ def hebbian_c(input_activation, self_activation, rows, cols, len, cfs, alpha):
     """
         
     hebbian_code = """
-        double *wi, *wj, *x, *inpi, *inpj;
+        float *wi, *wj;
+        double *x, *inpi, *inpj;
         int *slice;
         int rr1, rr2, cc1, cc2, rc;
         int i, j, r, l;
@@ -102,7 +104,7 @@ def hebbian_c(input_activation, self_activation, rows, cols, len, cfs, alpha):
                     load *= alpha;
 
                     cf = PyList_GetItem(cfsr,l);
-                    wi = (double *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
+                    wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
                     wj = wi;
                     slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
                     rr1 = *slice++;
@@ -151,3 +153,44 @@ def divisive_normalization(weights, normalize_total):
 
     factor = normalize_total/sum(weights.flat)
     weights *= factor
+
+
+################################################################
+# Wrapper functions of the learning and normalization methods
+
+def apply_learn_norm_fn(proj, inp, act, learn_fn, norm_fn):
+    """
+    Apply the specified learn_fn and then norm_fn to the connections fields
+    in proj using input inp and output activation act.
+    """
+
+    rows,cols = act.shape
+    alpha = proj.learning_rate
+
+    if learn_fn.func_name == "hebbian_c":
+        # hebbian_c is an function for the whole sheet
+        cfs = proj.cfs
+        len, len2 = inp.shape
+        if proj.normalize:
+            # Hebbian learning with divisive normalization per projection. 
+            # It is much faster to do both of them in one function.
+            if norm_fn.func_name == "divisive_normalization":
+                hebbian_div_norm_c(inp, act, rows, cols, len, cfs, alpha, proj.normalize)
+            else:
+                hebbian_c(inp, act, rows, cols, len, cfs, alpha)
+                norm = proj.normalize
+                for r in range(rows):
+                    for c in range(cols):
+                        norm_fn(cfs[r][c].weights, norm)
+        else:
+            hebbian_c(inp, act, rows, cols, len, cfs, alpha)
+    else:
+        # apply learning rule and normalization to each unit
+        norm = proj.normalize
+        for r in range(rows):
+            for c in range(cols):
+                cf = proj.cf(r,c)
+                learn_fn(cf.get_input_matrix(inp), act[r,c], cf.weights, alpha)
+                if norm:
+                    norm_fn(cf.weights, norm)
+
