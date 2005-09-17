@@ -126,7 +126,8 @@ class ConnectionField(TopoObject):
 
 
         if isinstance(weights_factory, UniformRandomFactory):
-            self.weights = RandomArray.uniform(0,1,[r2-r1,c2-c1], Numeric.Float32)
+            w = RandomArray.uniform(0,1,[r2-r1,c2-c1])
+            self.weights = w.astype(Numeric.Float32)
             #self.weights = Numeric.ones([r2-r1,c2-c1], Numeric.Float32)
         else:
             w = weights_factory(x=0,y=0,bounds=self.bounds,density=self.input_sheet.density,theta=0,rows=r2-r1,cols=c2-c1)
