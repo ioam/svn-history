@@ -6,7 +6,6 @@ $Id$
 from Tkinter import Frame, IntVar, Scale, Entry
 from Tkinter import LEFT, RIGHT, TOP, BOTTOM, YES, BOTH
 import string
-import topo.utils
 
 class TaggedSlider(Frame):
     """
@@ -26,8 +25,7 @@ class TaggedSlider(Frame):
                  max_value='100',
                  string_format = '%f',
                  tag_width=10,
-                 string_translator=topo.utils.eval_atof,
-#                 string_translator=string.atof,
+                 string_translator=string.atof,
                  **config):
 
         Frame.__init__(self,root,**config)

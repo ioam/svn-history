@@ -6,7 +6,7 @@ $Id$
 
 from Tkinter import Frame, StringVar, Entry, Message, Checkbutton, IntVar
 from taggedslider import TaggedSlider
-import Pmw
+import Pmw, string
 
 class PropertiesFrame(Frame):
     """
@@ -14,10 +14,11 @@ class PropertiesFrame(Frame):
     object.  This class is very general, and could be used for
     manipulating any object that has enumerable properties.
     """
-    def __init__(self, parent=None, padding=2,**config):
+    def __init__(self, parent=None, padding=2,string_translator=string.atof,**config):
         self.parent = parent
         self.properties = {}
         self.padding = padding
+        self.string_translator = string_translator
         Frame.__init__(self,parent,config)
 
     def optional_refresh(self):
@@ -53,7 +54,7 @@ class PropertiesFrame(Frame):
     def add_tagged_slider_property(self,name,value='0',**kw):
         var = StringVar()
         var.set(value)
-        control = TaggedSlider(self,tagvariable=var,**kw)
+        control = TaggedSlider(self,tagvariable=var,string_translator=self.string_translator,**kw)
         return self.add_property(name,var,control,value)
 
     def add_combobox_property(self,name,value='',**kw):

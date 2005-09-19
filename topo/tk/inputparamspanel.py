@@ -134,7 +134,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
                        items = self.input_types
                        ).pack(side=TOP)
  
-        self.prop_frame = propertiesframe.PropertiesFrame(self)
+        self.prop_frame = propertiesframe.PropertiesFrame(self,string_translator=eval_atof)
 
         ### JABHACKALERT!
         ###
@@ -292,8 +292,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
 
     def add_slider(self,name,min,max,init):
         return self.prop_frame.add_tagged_slider_property(name,init,
-                 min_value=min,max_value=max,width=30,string_format='%.6f',
-                 string_translator=eval_atof)
+                 min_value=min,max_value=max,width=30,string_format='%.6f')
 
 
     def present(self):
