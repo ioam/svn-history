@@ -134,33 +134,11 @@ from parameter import Parameter
 from utils import inf
 from copy import copy, deepcopy
 import __main__
+import topo.registry
 
 SLEEP_EXCEPTION = "Sleep Exception"
 STOP = "Simulator Stopped"
 
-# Singleton variable to register which Simulator is currently active in
-# the Topographica simulator.  This should not be set directly, but
-# through the two accessor functions.  This variable is also used by
-# the GUI to know which simulator to drive.
-__active_sim = None
-def active_sim(): return __active_sim
-def set_active_sim(a_sim):
-    global __active_sim
-    __active_sim = a_sim
-    link_to_sim(a_sim)
-
-gui_console = None
-def get_console():
-    return gui_console
-def set_console(con):
-    global gui_console
-    gui_console = con
-def link_to_sim(sim):
-    """Connect a simulator to the GUI."""
-    assert isinstance(sim,Simulator) or sim is None, 'Parameter must be Simulator'
-    if gui_console:
-        if gui_console != None:
-            gui_console.set_active_simulator(sim)
 
 
 class BaseSimulator(TopoObject):
@@ -189,7 +167,7 @@ class BaseSimulator(TopoObject):
         self._scheduler = sched.scheduler(self.time,self.sleep)
         self._started = False
         if self.register:
-            set_active_sim(self)
+            topo.registry.set_active_sim(self)
 
         
     def run(self,duration=inf,until=inf):

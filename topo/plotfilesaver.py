@@ -17,12 +17,13 @@ $Id$
 import topo
 import topo.base
 import topo.plotengine
+import topo.registry
 from topo.utils import *
 
 class PlotFileSaver(topo.base.TopoObject):
     def __init__(self,**config):
         super(PlotFileSaver,self).__init__(**config)
-        self.sim = topo.simulator.active_sim()
+        self.sim = topo.registry.active_sim()
         self.pe = topo.plotengine.PlotEngine(self.sim)
         self.bitmaps = []
         self.files = []

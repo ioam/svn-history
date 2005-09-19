@@ -11,6 +11,7 @@ $Id$
 from base import TopoObject
 from plot import *
 import topo.simulator
+import topo.registry
 import topo
 import MLab
 from itertools import chain
@@ -293,7 +294,7 @@ class UnitWeightsPlotGroup(PlotGroup):
         Lambda function passed in, that will filter out all sheets
         except the one with the name being looked for.
         """
-        sheets = topo.simulator.active_sim().get_event_processors()
+        sheets = topo.registry.active_sim().get_event_processors()
         for each in sheets:
             if self.sheet_filter_lam(each):
                 each.unit_view(self.x,self.y)
@@ -310,7 +311,7 @@ class ProjectionPlotGroup(PlotGroup):
         self.weight_name = plot_key[1]
         self.density = float(plot_key[2])
         self.shape = (0,0)
-        self._sim_ep = [s for s in topo.simulator.active_sim().get_event_processors()
+        self._sim_ep = [s for s in topo.registry.active_sim().get_event_processors()
                         if self.sheet_filter_lam(s)][0]
         self._sim_ep_src = self._sim_ep.get_projection_by_name(self.weight_name)[0].src
 

@@ -17,6 +17,7 @@ import topo.tk.preferencemappanel
 # For show_cmd_prompt() and start()
 import Pmw, sys, Tkinter
 import topo.simulator
+import topo.registry
 import topo.base
 
 def show_cmd_prompt():
@@ -50,11 +51,11 @@ def start(sim=None, mainloop=False):
     console = topo.tk.topoconsole.TopoConsole(parent=root)
     console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
     if sim is None:
-        console.set_active_simulator(topo.simulator.active_sim())
+        console.set_active_simulator(topo.registry.active_sim())
     else:
         console.set_active_simulator(sim)
 
-    topo.simulator.set_console(console)
+    topo.registry.set_console(console)
 
     # mainloop() freezes the commandline until the GUI window exits.
     # Without this line the command-line remains responsive.

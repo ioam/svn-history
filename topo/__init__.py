@@ -32,6 +32,7 @@ import simulator
 import parameter
 import utils
 import commandline
+import registry
 
 # sheets and sheet geometry
 import sheet

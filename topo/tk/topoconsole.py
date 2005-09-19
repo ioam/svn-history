@@ -14,6 +14,7 @@ from topo.tk.inputparamspanel import InputParamsPanel
 from topo.tk.preferencemappanel import PreferenceMapPanel
 from topo.plotgroup import PlotGroupTemplate, PlotTemplate
 import topo.simulator as simulator
+import topo.registry
 import topo.plotengine
 import topo.base
 
@@ -260,7 +261,7 @@ class TopoConsole(Frame):
 
     def quit(self):
         """Close the main GUI window.  Does not exit Topographica interpreter."""
-        topo.simulator.set_console(None)
+        topo.registry.set_console(None)
         Frame.quit(self)
         Frame.destroy(self)     # Get rid of widgets
         self.parent.destroy()   # Get rid of window

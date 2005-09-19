@@ -3,10 +3,11 @@ from topo.tk import *
 from topo.simulator import Simulator
 from topo.plotengine import PlotEngine
 import topo.base
+import topo.registry
 
 class TestTopoConsole(unittest.TestCase):
     def setUp(self):
-        topo.simulator.set_active_sim(None)
+        topo.registry.set_active_sim(None)
         self.s = Simulator(register=False)
         self.pe = PlotEngine(self.s)
         self.console = start()
