@@ -22,6 +22,7 @@ import topo.plot
 import plotpanel
 import Pmw
 import topo.sheetview 
+import topo.registry
 from Tkinter import IntVar, StringVar, Checkbutton
 from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
 from copy import deepcopy
@@ -44,7 +45,7 @@ def kernelfactory_names():
     change based on the existing classes found within kernelfactory.py,
     and can be extended by the user.
     """
-    k = topo.kernelfactory.kernel_factories.keys()
+    k = topo.registry.kernel_factories.keys()
     k = [name[:-7] for name in k]  # Cut off 'Factory'
     for i in range(len(k)):        # Add spaces before capital leters
         for c in string.uppercase:

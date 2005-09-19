@@ -8,6 +8,18 @@ $Id$
 import topo
 
 ############################################################
+# Registry for subclasses of KernelFactory.  Users can add to this
+# list, and the GUI will automatically add them to the list of
+# KernelFactory inputs possible.  Additional work may be necessary if
+# other than default Parameter names are used in the definition of the
+# KernelFactory
+#
+# Format:   {'NewKernelFactoryClassName':<NewKernelFactoryClass>,....}
+#global kernel_factories
+kernel_factories = {}
+
+
+############################################################
 # Singleton variable to register which Simulator is currently active
 # in the Topographica simulator.  This should not be set directly, but
 # through the two accessor functions.  This variable is also used by

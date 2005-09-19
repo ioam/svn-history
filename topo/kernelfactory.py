@@ -56,22 +56,13 @@ from MLab import flipud,rot90
 from parameter import * 
 from pprint import pprint,pformat
 from math import pi
-
-# Registry for subclasses of KernelFactory.  Users can add to this
-# list, and the GUI will automatically add them to the list of
-# KernelFactory inputs possible.  Additional work may be necessary if
-# other than default Parameter names are used in the definition of the
-# KernelFactory
-# Format:   {'NewKernelFactoryClassName':<NewKernelFactoryClass>,....}
-global kernel_factories
-kernel_factories = {}
+import topo.registry
 
 # Some kernels use math.exp() to generate a falling off of activation.
 # But exp will overflow if too small a value is given, so this
 # constant defines the smallest value to accept from the kernels.
 # exp(-100) is appx. 3.72e-44
 EXP_CUTOFF = -100
-
 
 ### JABHACKALERT!
 ### 
@@ -491,5 +482,5 @@ if __name__ != '__main__':
         if (type(l[i]) is type(KernelFactory)) \
                and issubclass(l[i],KernelFactory) \
                and i != 'KernelFactory':
-            kernel_factories[i] = l[i]
+            topo.registry.kernel_factories[i] = l[i]
 #    print 'kernelfactories', kernel_factories
