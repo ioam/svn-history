@@ -5,7 +5,8 @@ to be added to by users.
 
 $Id$
 """
-import topo
+from topo.plotgroup import KeyedList, PlotGroupTemplate
+from topo.plot import PlotTemplate
 
 ############################################################
 # Registry for subclasses of KernelFactory.  Users can add to this
@@ -17,6 +18,12 @@ import topo
 # Format:   {'NewKernelFactoryClassName':<NewKernelFactoryClass>,....}
 #global kernel_factories
 kernel_factories = {}
+
+
+############################################################
+# Global repository of templates that can be added as necessary.
+plot_templates = {}
+plotgroup_templates = KeyedList()
 
 
 ############################################################
@@ -45,7 +52,35 @@ def set_console(con):
     __gui_console = con
 def link_to_sim(sim):
     """Connect a simulator to the GUI."""
-    assert isinstance(sim,topo.simulator.Simulator) or sim is None, 'Parameter must be Simulator'
+#    assert isinstance(sim,topo.Simulator) or sim is None, 'Parameter must be Simulator'
     if __gui_console:
         if __gui_console != None:
             __gui_console.set_active_simulator(sim)
+
+
+############################################################
+# Populate the dynamic plot menu list registry:
+if __name__ != '__main__':
+    pgt = PlotGroupTemplate([('Activity',
+                              PlotTemplate({'Strength'   : 'Activity',
+                                            'Hue'        : None,
+                                            'Confidence' : None}))],
+                            name='Activity')
+    plotgroup_templates[pgt.name] = pgt
+    pgt = PlotGroupTemplate([('Unit Weights',
+                              PlotTemplate({'Location'   : (0.0,0.0),
+                                            'Sheet_name' : 'V1'}))],
+                            name='Unit Weights')
+    plotgroup_templates[pgt.name] = pgt
+    pgt = PlotGroupTemplate([('Projection',
+                              PlotTemplate({'Density'         : 25,
+                                            'Projection_name' : 'None'}))],
+                            name='Projection')
+    plotgroup_templates[pgt.name] = pgt
+    pgt = PlotGroupTemplate([('Preference',
+                              PlotTemplate({'Strength'   : 'Activity',
+                                            'Hue'        : 'Activity',
+                                            'Confidence' : 'Activity'}))],
+                            name='Preference Map')
+    plotgroup_templates[pgt.name] = pgt
+

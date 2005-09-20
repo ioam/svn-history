@@ -98,7 +98,7 @@ from simulator import EventProcessor
 from parameter import Parameter, BooleanParameter
 from Numeric import zeros,sqrt,array
 from boundingregion import BoundingBox
-from sheetview import SheetView
+import sheetview 
 
 def sheet2matrix(x,y,bounds,density):
     ### JABHACKALERT!
@@ -339,7 +339,7 @@ class Sheet(EventProcessor):
         """
         if request == 'Activity':
             activation_copy = array(self.activation)
-            new_view = SheetView((activation_copy,self.bounds),
+            new_view = sheetview.SheetView((activation_copy,self.bounds),
                                  src_name=self.name,view_type='Activity')
         elif self.sheet_view_dict.has_key(request):
             new_view = self.sheet_view_dict[request]

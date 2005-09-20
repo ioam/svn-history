@@ -12,7 +12,7 @@ import __main__
 from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry
 from topo.tk.plotpanel import PlotPanel
 from topo.tk.cfsheetplotpanel import CFSheetPlotPanel
-import topo.plotengine as plotengine
+import topo.registry as registry
 
 class UnitWeightsPanel(CFSheetPlotPanel):
     def __init__(self,parent,pengine,console=None,**config):
@@ -73,7 +73,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
             # The PlotTemplate mechanism requires updating the Unit
             # Weight plots so that the PlotEngine will poll the
             # correct unit view.
-            pt = plotengine.plotgroup_templates['Unit Weights'].plot_templates['Unit Weights']
+            pt = registry.plotgroup_templates['Unit Weights'].plot_templates['Unit Weights']
             pt.channels['Sheet_name'] = self.region.get()
             pt.channels['Location'] = (self.x, self.y)
         else:
@@ -100,7 +100,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         if self.console.active_simulator().get_event_processors():
             self.generate_plot_key()
             self.pe_group = self.pe.get_plot_group(self.plot_key,
-                                                   plotengine.plotgroup_templates['Unit Weights'],
+                                                   registry.plotgroup_templates['Unit Weights'],
                                                    self.region.get(),
                                                    'UnitWeightsPlotGroup')
             self.pe_group.do_plot_cmd()

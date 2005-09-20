@@ -12,7 +12,8 @@ from topo.tk.unitweightspanel import UnitWeightsPanel
 from topo.tk.projectionpanel import ProjectionPanel
 from topo.tk.inputparamspanel import InputParamsPanel
 from topo.tk.preferencemappanel import PreferenceMapPanel
-from topo.plotgroup import PlotGroupTemplate, PlotTemplate
+from topo.plotgroup import PlotGroupTemplate
+from topo.plot import PlotTemplate
 import topo.simulator as simulator
 import topo.registry
 import topo.plotengine
@@ -223,7 +224,7 @@ class TopoConsole(Frame):
                              label="Activity",
                              command=self.new_activity_window)
         """
-        for (label,obj) in topo.plotengine.plotgroup_templates.items():
+        for (label,obj) in topo.registry.plotgroup_templates.items():
             entry = PlotsMenuEntry(self,obj,label=label)            
             menubar.addmenuitem('Plots','command',
                                 obj.description,label=label,

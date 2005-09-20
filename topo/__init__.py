@@ -28,11 +28,11 @@ import tyimputil
 ### if they want (and not otherwise). 
 
 # core
+import registry
 import simulator
 import parameter
 import utils
 import commandline
-import registry
 
 # sheets and sheet geometry
 import sheet

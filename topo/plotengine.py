@@ -52,17 +52,11 @@ $Id$
 from copy import deepcopy
 from base import TopoObject
 from utils import flatten
-from plot import Plot, SHC
+from plot import Plot, SHC,HSV,RGB,COLORMAP
 from plotgroup import *
 from sheet import Sheet
 from cfsheet import CFSheet
-
-
-# Global repository of templates that can be added as necessary.
-global plot_templates
-global plotgroup_templates
-plot_templates = {}
-plotgroup_templates = KeyedList()
+from sheetview import SheetView
 
 
 def sheet_filter(sheet):
@@ -361,27 +355,3 @@ class PlotEngine(TopoObject):
 ####################
 
 
-# Populate the dynamic plot menu list registry:
-if __name__ != '__main__':
-    pgt = PlotGroupTemplate([('Activity',
-                              PlotTemplate({'Strength'   : 'Activity',
-                                            'Hue'        : None,
-                                            'Confidence' : None}))],
-                            name='Activity')
-    plotgroup_templates[pgt.name] = pgt
-    pgt = PlotGroupTemplate([('Unit Weights',
-                              PlotTemplate({'Location'   : (0.0,0.0),
-                                            'Sheet_name' : 'V1'}))],
-                            name='Unit Weights')
-    plotgroup_templates[pgt.name] = pgt
-    pgt = PlotGroupTemplate([('Projection',
-                              PlotTemplate({'Density'         : 25,
-                                            'Projection_name' : 'None'}))],
-                            name='Projection')
-    plotgroup_templates[pgt.name] = pgt
-    pgt = PlotGroupTemplate([('Preference',
-                              PlotTemplate({'Strength'   : 'Activity',
-                                            'Hue'        : 'Activity',
-                                            'Confidence' : 'Activity'}))],
-                            name='Preference Map')
-    plotgroup_templates[pgt.name] = pgt

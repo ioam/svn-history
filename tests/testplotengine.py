@@ -12,7 +12,9 @@ from topo import plot
 from topo import base
 from topo.bitmap import *
 from topo.sheet import Sheet
+from topo.sheetview import SheetView
 from topo.plotgroup import *
+from topo.plot import PlotTemplate
 from topo.plotengine import *
 from topo.inputsheet import *
 from topo.simulator import *

@@ -8,11 +8,13 @@ displayed in a GUI window, as saved to a file.
 
 $Id$
 """
+import types
 from base import TopoObject
-from plot import *
+from utils import flatten
+#from plot import *
+import topo
 import topo.simulator
 import topo.registry
-import topo
 import MLab
 from itertools import chain
 from Numeric import transpose, array

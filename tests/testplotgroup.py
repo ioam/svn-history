@@ -5,6 +5,7 @@ from pprint import pprint
 from topo import plot
 from topo.sheet import *
 from topo.plotgroup import *
+from topo.plot import PlotTemplate
 from topo.bitmap import RGBMap
 from topo.kernelfactory import ImageGenerator
 import Numeric
