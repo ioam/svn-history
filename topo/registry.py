@@ -1,7 +1,8 @@
 """
-Package to store registry information that is accessed by the
-Topographica system.  Many of the entries in this class are designed
-to be added to by users.
+Central location for registering and retrieving information needed by
+Topographica.  Primarily useful when extending Topographica to provide
+new components; once the components are registered here, they will
+usually show up automatically in menus, online help, etc.  
 
 $Id$
 """
@@ -13,7 +14,9 @@ from topo.plot import PlotTemplate
 # list, and the GUI will automatically add them to the list of
 # KernelFactory inputs possible.  Additional work may be necessary if
 # other than default Parameter names are used in the definition of the
-# KernelFactory
+# KernelFactory.
+# JAB: Please explain what that work might be, e.g. which files might
+# need to be edited...
 #
 # Format:   {'NewKernelFactoryClassName':<NewKernelFactoryClass>,....}
 #global kernel_factories
@@ -21,7 +24,8 @@ kernel_factories = {}
 
 
 ############################################################
-# Global repository of templates that can be added as necessary.
+# Global repository of plot templates, which can be augmented
+# as necessary.
 plot_templates = {}
 plotgroup_templates = KeyedList()
 
@@ -38,12 +42,24 @@ def set_active_sim(a_sim):
     __active_sim = a_sim
     link_to_sim(a_sim)
 
+
 ############################################################
 # Even though Topographica base is not allowed to point to a
 # particular GUI, there are still times when a GUI may wish to be
 # notified when the active Simulator has been changed.  This mechanism
 # allows that to happen, by having the active Simulator function call
 # a registered GUI, which by default is a no-op.
+#
+### JABHACKALERT!
+### 
+### This code should be changed to be a registry for anything that
+### might want to be notified that the Simulator has changed; it is
+### not specific to a GUI.  E.g. various external plotting programs,
+### non-graphical user interfaces, pipes to interface to Matlab, and
+### so on, might all need to know this.  So it should be a list or
+### dictionary, not a single item, and it should never assume or state
+### that it's a GUI that is being held here.
+###
 __gui_console = None
 def get_console():
     return __gui_console
