@@ -30,6 +30,15 @@ from Numeric import transpose, array
 # or somesuch.
 FLAT = 'FLAT'
 
+
+### JABHACKALERT!
+###
+### This class should not be Topographica-specific, and should not be
+### embedded in plotgroup.py.  It should be a general-purpose sorted
+### dictionary class, and should be either in its own file or with
+### some other similarly general items.  Many of the comments and
+### variable names seem to assume that the only allowable contents are
+### Plot_Templates; that's not true, right?
 class KeyedList(list):
     """
     
