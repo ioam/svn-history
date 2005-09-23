@@ -206,6 +206,16 @@ def sine_grating(kernel_x, kernel_y, frequency, phase):
     return 0.5 + 0.5*sin(frequency*2*pi*kernel_x + phase)
 
 
+# We will probably want to add anti-aliasing to this,
+# and there might be an easier way to do it than by
+# cropping a sine grating.
+def square_grating(kernel_x, kernel_y, frequency, phase):
+    """
+    Square-wave Grating Kernel Factory
+    """
+    return around(0.5 + 0.5*sin(frequency*2*pi*kernel_x + phase))
+
+
 def gabor(kernel_x, kernel_y, width, height, frequency, phase):
     """
     Gabor Kernel Factory
@@ -361,6 +371,24 @@ class SineGratingFactory(KernelFactory):
 
     def function(self,**params):
         return sine_grating( self.kernel_x,
+                             self.kernel_y,
+                             params.get('frequency',self.frequency), 
+                             params.get('phase',self.phase)) 
+
+
+class SquareGratingFactory(KernelFactory):
+    """
+    Square Grating Kernel Generating Factory
+    """
+
+    x         = Parameter(default=0)
+    y         = Parameter(default=0)
+    theta     = Parameter(default=0)
+    frequency = Parameter(default=1)
+    phase     = Parameter(default=0)
+
+    def function(self,**params):
+        return square_grating( self.kernel_x,
                              self.kernel_y,
                              params.get('frequency',self.frequency), 
                              params.get('phase',self.phase)) 
