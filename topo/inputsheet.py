@@ -48,6 +48,10 @@ class InputSheet(Sheet):
         self.input_generator.density = self.density
 
 
+        ### JABALERT!
+        ###
+        ### These two functions should probably be rewritten to work as a stack, to 
+        ### reduce the complexity of client code.
     def get_input_generator(self):
         """
         Return the existing input_generator Parameter.  If a temporary
@@ -78,11 +82,13 @@ class InputSheet(Sheet):
         self.verbose("Received %s input from %s." % (NxN(data.shape),src))
         self.verbose("Generating a new kernel...")
 
+        ### JABHACKALERT!
+        ###
+        ### What does this comment mean?  Either remove it or clarify it.
+        ###
         # TODO: Pass a dictionary to this function to avoid having all of the
         # subclasses below
         self.activation = self.input_generator()
-
-        
         
         self.send_output(data=self.activation)
-        self.message("Sending %s output at time %d." % (NxN(self.activation.shape),self.simulator.time()))
+        self.verbose("Sending %s output at time %d." % (NxN(self.activation.shape),self.simulator.time()))

@@ -2,10 +2,6 @@
 
 Kernel Factory
 
-Note: ImageFactory has not yet been implemented, but inspiration may
-be found from the ImageGenerator class written for models.cfsom and
-currently (9/2005) residing in topo.image
-
 Defines a class to return Kernels
 
 There is a registry dictionary called
@@ -26,7 +22,7 @@ discussion of the Topographica coordinate system.
 
 For the purposes of this example, assume the goal is a Topographica
 matrix that has a 1 at (-0.5,-0.5) a 3 at (0.0,0.0), and a 5 at
-(0.5,0.5), this can be said in a different way,
+(0.5,0.5).  Put a different way,
 
 the area from   -0.5,-0.5   to -0.5/3,-0.5/3 has value 1, 
 the area from -0.5/3,-0.5/3 to  0.5/3,0.5/3  has value 3, and 
@@ -46,6 +42,9 @@ results.
 
 $Id$
 """
+### JABHACKALERT!
+###
+### Should eliminate all "import *" commands if at all possible.
 import types
 import base
 from boundingregion import BoundingBox
@@ -58,6 +57,21 @@ from pprint import pprint,pformat
 from math import pi
 import topo.registry
 
+### JABALERT!
+###
+### This class hierarchy (and file) should be renamed so that the
+### meaning is more obvious.  What it does is to generate
+### two-dimensional radial function patterns.  Convolution kernels are
+### one such option, but only one; others are input patterns, initial
+### weight patterns, etc.  So perhaps TwoDPattern, TwoDPatternFactory,
+### and twodpattern.py might be better names; in any case we need
+### something other than Kernel.
+
+
+### JABALERT!
+###
+### Is this really necessary?  If so, please document better why.
+###
 # Some kernels use math.exp() to generate a falling off of activation.
 # But exp will overflow if too small a value is given, so this
 # constant defines the smallest value to accept from the kernels.
@@ -143,7 +157,11 @@ def produce_kernel_matrices(bounds, density, r, c):
         rows = r
         cols = c
     
-    # TODO: this can generate ouput that may be off by one in terms of size,
+    ### JABHACKALERT!
+    ### 
+    ### We must fix these things:
+    ### 
+    # TODO: this can generate output that may be off by one in terms of size,
     # for example most times this generates a 100x100 image, but sometimes
     # it generates a 101x100 
     # TODO: Use sheet operations defined in sheet.py? I think we already
@@ -162,12 +180,15 @@ def produce_kernel_matrices(bounds, density, r, c):
 ### Instead of theta, any user-visible parameter should have a
 ### readable name like "orientation" or "angle" (which is shorter but
 ### not precisely correct).
-###
+### 
 ### JBD: This should be implemented in concert with changes to
 ### inputparamspanel.py to make a dynamic parameter list.  Now (9/05)
 ### the Python variable name must be the name displayed to the
 ### InputParamsPanel sliders.
 
+### JABHACKALERT!
+### 
+### Need to clarify this comment; not clear which matrices are which (data or coordinates)
 def produce_rotated_matrices(kernel_x, kernel_y, theta):
     """ Get Rotated matrices
 
@@ -175,8 +196,8 @@ def produce_rotated_matrices(kernel_x, kernel_y, theta):
     and a theta value, returns two Numeric matrices that have their coordinates
     rotated by that theta.
 
-    The matrix itself is rotated to match the Topographica cartesian
-    style coordinates.
+    The matrix itself is rotated to match the Topographica Cartesian
+    coordinates.
     """
 
     new_kernel_x = subtract.outer(cos(pi-theta)*kernel_x, sin(pi-theta)*kernel_y)
@@ -187,9 +208,20 @@ def produce_rotated_matrices(kernel_x, kernel_y, theta):
     return new_kernel_x, new_kernel_y
 
 
+### JABHACKALERT!
+### 
+### The following radial functions should be moved to their own file,
+### perhaps radialfunction.py.  They are useful in general, and do not
+### need to make any assumptions about matrices and coordinate
+### systems.  They should probably all be renamed to use x,y
+### instead of kernel_x, kernel_y, because they do not need to be
+### in the context of a kernel to be useful.
+
 def gaussian(kernel_x, kernel_y, width, height):
     """
-    Gaussian Kernel Factory
+    Two-dimensional oriented Gaussian pattern (i.e., 2D version of a
+    bell curve, like a normal distribution but without necessarily
+    summing to 1.0).
     """
     new_kernel = -(kernel_x / width)**2 + -(kernel_y / height)**2
 
@@ -201,7 +233,7 @@ def gaussian(kernel_x, kernel_y, width, height):
 
 def sine_grating(kernel_x, kernel_y, frequency, phase):
     """
-    Sine Grating Kernel Factory
+    Sine grating pattern (two-dimensional sine wave).
     """
     return 0.5 + 0.5*sin(frequency*2*pi*kernel_x + phase)
 
@@ -211,14 +243,14 @@ def sine_grating(kernel_x, kernel_y, frequency, phase):
 # cropping a sine grating.
 def square_grating(kernel_x, kernel_y, frequency, phase):
     """
-    Square-wave Grating Kernel Factory
+    Square-wave grating (alternating black and white bars).
     """
     return around(0.5 + 0.5*sin(frequency*2*pi*kernel_x + phase))
 
 
 def gabor(kernel_x, kernel_y, width, height, frequency, phase):
     """
-    Gabor Kernel Factory
+    Gabor pattern (sine grating multiplied by a circular Gaussian).
     """
  
     k = exp(maximum(EXP_CUTOFF,-(kernel_x/width)**2-(kernel_y/height)**2))
@@ -228,14 +260,18 @@ def gabor(kernel_x, kernel_y, width, height, frequency, phase):
 
 def uniform_random(kernel_x, kernel_y,rmin,rmax):
     """
-    Uniform Random Kernel Factory
+    Uniform random noise, independent for each pixel.
     """
     return RandomArray.uniform(rmin,rmax,kernel_x.shape) 
 
 
+### JABHACKALERT!
+### 
+### This pattern is broken -- the x and y offsets are not respected for
+### anything except rotation.
 def rectangle(kernel_x, kernel_y, x, y, width, height):
     """
-    Rectangle Kernel Factory
+    Rectangular spot.
     """
 # Attempt to debug the problem with this factory.  Has the same problem as the
 # two lines currently defining rectangle.
@@ -259,11 +295,14 @@ def rectangle(kernel_x, kernel_y, x, y, width, height):
 
 def fuzzy_line(kernel_x, kernel_y, width):
     """
-    Fuzzy Line Kernel Factory
+    Infinite line with a solid central region, then Gaussian fall-off at the edges. 
     """
-    # TODO: This is a hack: the height should be specified in terms of
-    # bounds.  This just sets the height of the gaussian so high, that
-    # the small window makes it look like a line.
+    ### JABHACKALERT!
+    ### 
+    ### The height should be specified in terms of bounds.  This
+    ### currently just sets the height of the gaussian so high that
+    ### the small window makes it look like a line, but it's not an
+    ### acceptable formula in general.
     fl = gaussian(kernel_x, kernel_y, width, 100)
 #    print fl
     return fl
@@ -272,14 +311,14 @@ def fuzzy_line(kernel_x, kernel_y, width):
 
 def fuzzy_disk(kernel_x, kernel_y, disk_radius, gaussian_width):
     """
-    Fuzzy Disk Kernel Factory
+    Circular disk with Gaussian fall-off after the solid central region.
     """
     distance_from_line = sqrt((kernel_x**2)+(kernel_y**2)) 
     gaussian_x_coord   = distance_from_line - disk_radius/2.0 
     div_sigmasq = 1 / (gaussian_width*gaussian_width)
 
-    disc = less_equal(gaussian_x_coord,0)
-    k = maximum(disc, exp(maximum(EXP_CUTOFF,
+    disk = less_equal(gaussian_x_coord,0)
+    k = maximum(disk, exp(maximum(EXP_CUTOFF,
                                   -gaussian_x_coord*gaussian_x_coord*div_sigmasq)))
     return where(k != exp(EXP_CUTOFF), k, 0.0)
 
@@ -287,7 +326,7 @@ def fuzzy_disk(kernel_x, kernel_y, disk_radius, gaussian_width):
 
 def fuzzy_ring(kernel_x, kernel_y, disk_radius, ring_radius, gaussian_width):
     """
-    Fuzzy Ring Kernel Factory
+    Circular ring (annulus) with Gaussian fall-off after the solid ring-shaped region.
     """    
     disk_radius = disk_radius
     ring_radius = ring_radius / 2.0
@@ -336,9 +375,17 @@ class KernelFactory(base.TopoObject):
         self.kernel_x, self.kernel_y = produce_rotated_matrices(xm-x,ym-y,theta)
 
 
+### JABHACKALERT!
+### 
+### These Factory classes should probably be named Generator instead,
+### because they are not quite like the Factory design pattern.  They
+### should also move to their own file, so that it will be clearer how
+### to extend to add new patterns.
+
+
 class GaussianFactory(KernelFactory):
     """
-    Gassian Kernel Generating Generator
+    Gaussian pattern generator
     """
 
     x       = Parameter(default=0)
@@ -346,10 +393,6 @@ class GaussianFactory(KernelFactory):
     theta   = Parameter(default=0)
     width   = Parameter(default=1)
     height  = Parameter(default=1)
-
-    # Pass set up a function to run using lambdas. We need to specify self as a
-    # parameter. Should not be a parameter because we don't want the user to
-    # change it.
 
     def function(self,**params):
         return gaussian( self.kernel_x, 
@@ -360,7 +403,7 @@ class GaussianFactory(KernelFactory):
 
 class SineGratingFactory(KernelFactory):
     """
-    Sine Grating Kernel Generating Factory
+    Sine grating pattern generator
     """
 
     x         = Parameter(default=0)
@@ -378,7 +421,7 @@ class SineGratingFactory(KernelFactory):
 
 class SquareGratingFactory(KernelFactory):
     """
-    Square Grating Kernel Generating Factory
+    Square grating pattern generator
     """
 
     x         = Parameter(default=0)
@@ -396,7 +439,7 @@ class SquareGratingFactory(KernelFactory):
 
 class GaborFactory(KernelFactory):
     """
-    Gabor Kernel Generating Factory
+    Gabor pattern generator
     """
     x        = Parameter(default=0)
     y        = Parameter(default=0)
@@ -417,7 +460,7 @@ class GaborFactory(KernelFactory):
   
 class UniformRandomFactory(KernelFactory):
     """
-    Uniform Random Generating Factory
+    Uniform random noise pattern generator
     """
     x = Parameter(default=0)
     y = Parameter(default=0)
@@ -432,7 +475,7 @@ class UniformRandomFactory(KernelFactory):
 
 class RectangleFactory(KernelFactory):
     """
-    Rectangle Generating Factory
+    Rectangle pattern generator
     """
 
     x       = Parameter(default=0)
@@ -453,7 +496,7 @@ class RectangleFactory(KernelFactory):
 class FuzzyLineFactory(KernelFactory):
 
     """
-    Fuzzy Line Generating Factory
+    Fuzzy line pattern generator
     """
     x       = Parameter(default=0)
     y       = Parameter(default=0)
@@ -469,7 +512,7 @@ class FuzzyLineFactory(KernelFactory):
 class FuzzyDiskFactory(KernelFactory):
 
     """
-    Fuzzy Disk Generating Factory
+    Fuzzy disk pattern generator
     """
     x              = Parameter(default=0)
     y              = Parameter(default=0)
@@ -486,7 +529,7 @@ class FuzzyDiskFactory(KernelFactory):
 
 class FuzzyRingFactory(KernelFactory):
     """
-    Fuzzy Ring Generating Factory
+    Fuzzy ring pattern generator
     """
 
     x              = Parameter(default=0)
@@ -511,4 +554,3 @@ if __name__ != '__main__':
                and issubclass(l[i],KernelFactory) \
                and i != 'KernelFactory':
             topo.registry.kernel_factories[i] = l[i]
-#    print 'kernelfactories', kernel_factories

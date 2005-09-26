@@ -3,8 +3,9 @@ InputParamsPanel
 
 Sliders panel for inputs
 
-The list of valid Input Types is automatically generated from the list
-of KernelFactory subclasses found in topo.kernelfactory.  Every
+The list of valid Input Types is retrieved from the registry, and
+would normally contain an automatically generated list of
+KernelFactory subclasses found in topo.kernelfactory.  Every
 Parameter defined in the KernelFactory subclass will be taken with the
 intersection of valid TaggedSlider types defined in this class and
 then shown in the window.
@@ -41,8 +42,8 @@ DEFAULT_PRESENTATION = '1.0'
 
 def kernelfactory_names():
     """
-    Return the existing list of KernelFactory subclasses.  This list will
-    change based on the existing classes found within kernelfactory.py,
+    Return the existing list of KernelFactory subclasses.  This list
+    will change based on the existing classes found in the registry,
     and can be extended by the user.
     """
     k = topo.registry.kernel_factories.keys()

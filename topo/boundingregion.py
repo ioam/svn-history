@@ -3,6 +3,13 @@ Bounding regions and bounding boxes.
 
 $Id$
 """
+### JABHACKALERT!
+###
+### Should eliminate all "import *" commands if at all possible.
+### The aarect information should probably be rewritten in matrix
+### notation, not list notation, so that it can be scaled,
+### translated, etc. easily.
+###
 from parameter import Parameter
 from Numeric import *
 from base import TopoObject
@@ -143,6 +150,14 @@ class Unbounded(BoundingRegion):
         return AARectangle((-inf,-inf),(inf,inf))
 
 
+### JABHACKALERT!
+###
+### Where is the actual intersection calculated here? I can see how
+### the aarect() is calculated, but the contains() function appears to
+### be missing.  Presumably it needs to be implemented as a logical OR
+### of the contains() of all the regions.  Scale, rotate, and
+### translate should presumably work fine if applied to the individual
+### regions.
 class Intersection(BoundingRegion):
     def __init__(self,*regions,**params):
         super(Intersection,self).__init__(**params)
