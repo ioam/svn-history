@@ -95,7 +95,7 @@ To reach milestone 1, we will need to:
   implementation.
 
 - Fix anything else that prevents the LISSOM example from working
-  reasonably.
+  reasonably. (done)
 
 One way to get started on such a GUI is to start with the LISSOM 5.0
 python/ subdirectory, and systematically replace every call to the
@@ -120,8 +120,8 @@ _______________________________________________________________________________
 To reach milestone 2, we will need to:
 
 - Add the remaining features of the LISSOM model, such as:
-  - Lateral excitatory radius shrinking
-  - Gradually reducing sigmoid parameters
+  - Lateral excitatory radius shrinking (done)
+  - Gradually reducing sigmoid parameters (done)
   - Multiple input areas (two eyes). (done) 
 
 - Add preference map measurement and plotting
@@ -247,14 +247,14 @@ Subsystem 16. Scaling objects
 RELATED (BUT NOT STRICTLY REQUIRED) ISSUES TO ADDRESS BEFORE THIS MILESTONE:
 
 - Compare performance to LISSOM 5.0, and profile to determine
-  bottlenecks.
+  bottlenecks. (done)
 
 - To eliminate bottlenecks, consider Pyrex and PyInline for inline C
   and C++.  May also need to add full C code to implement some python
   classes.  (done)
 
 - For overall speedup, consider Psyco, a just-in-time lazy evaluator
-  and optimizing compiler (only for x86 machines, though). 
+  and optimizing compiler (only for x86 machines, though). (done)
 
 - Add a mechanism to group Sheets into a logical unit for plotting,
   analysis, etc.  For instance, it should be possible to group three
@@ -276,6 +276,7 @@ RELATED (BUT NOT STRICTLY REQUIRED) ISSUES TO ADDRESS BEFORE THIS MILESTONE:
 
 - Might, or might not, want to support LISSOM's backprojection fuctions.
 
+- Support circular RFs.
 _______________________________________________________________________________
 
 		  REACHING MILESTONE 4: STABLE APIS
@@ -292,7 +293,7 @@ _______________________________________________________________________________
 
 		  REACHING MILESTONE 5: ADVANCING
 
-See the Topographica grant proposal.  This milestone will include
-things like GUI-based network building, algorithms other than LISSOM
-and SOM, libraries of learning rules and neuron types, etc.
-
+See the Topographica grant proposal, and notes sent to Eyal Seidemann
+'Tue, 6 Sep 2005 18:16:52 +0100'.  This milestone will include things
+like GUI-based network building, algorithms other than LISSOM and SOM,
+libraries of learning rules and neuron types, etc.
