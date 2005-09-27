@@ -265,32 +265,14 @@ def uniform_random(kernel_x, kernel_y,rmin,rmax):
     return RandomArray.uniform(rmin,rmax,kernel_x.shape) 
 
 
-### JABHACKALERT!
-### 
-### This pattern is broken -- the x and y offsets are not respected for
-### anything except rotation.
 def rectangle(kernel_x, kernel_y, x, y, width, height):
     """
     Rectangular spot.
     """
-# Attempt to debug the problem with this factory.  Has the same problem as the
-# two lines currently defining rectangle.
-#    m = array(kernel_x)
-#    num_y,num_x = m.shape
-#    for j in range(num_y):
-#        for i in range(num_x):
-#            xx = kernel_x[j,i]
-#            yy = kernel_y[j,i]
-#            if (x-height/2) <= xx <=(j+height/2) and (y-width/2) <= yy <=(y+width/2):
-#                m[i,j] = 1
-#            else:
-#                m[i,j] = 0
-#    return m
+    kernel_x = abs(kernel_x)
+    kernel_y = abs(kernel_y)
 
-# Something is wrong here.  Rotation is all screwed up.
-    kernel_x = bitwise_and( less_equal( kernel_x, x+width/2 ), greater_equal( kernel_x, x-width/2 ) )
-    kernel_y = bitwise_and( less_equal( kernel_y, y+height/2 ),greater_equal( kernel_y, y-height/2 ) )
-    return bitwise_and(kernel_x,kernel_y)
+    return bitwise_and(where(kernel_x<=width/2,1,0),where(kernel_y<=height/2,1,0))
 
 
 def fuzzy_line(kernel_x, kernel_y, width):
