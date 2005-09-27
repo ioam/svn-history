@@ -275,20 +275,22 @@ def rectangle(kernel_x, kernel_y, x, y, width, height):
     return bitwise_and(where(kernel_x<=width/2,1,0),where(kernel_y<=height/2,1,0))
 
 
-def fuzzy_line(kernel_x, kernel_y, width):
+def fuzzy_line(kernel_x, kernel_y, x, y, width, gaussian_width):
     """
-    Infinite line with a solid central region, then Gaussian fall-off at the edges. 
+    Maximum-length line with a solid central region, then Gaussian fall-off at the edges. 
     """
-    ### JABHACKALERT!
-    ### 
-    ### The height should be specified in terms of bounds.  This
-    ### currently just sets the height of the gaussian so high that
-    ### the small window makes it look like a line, but it's not an
-    ### acceptable formula in general.
-    fl = gaussian(kernel_x, kernel_y, width, 100)
-#    print fl
-    return fl
+    # The line is a Rectangle with a height equal to the diagonal length of kernel_x,
+    # and with gaussian fall-off from the edges
 
+    height = (size(kernel_x,0)**2 + size(kernel_x,1)**2)**0.5   # Maybe there is a better way
+                                                                # to get the maximum length?    
+    line = rectangle(kernel_x, kernel_y, x, y, width, height)
+
+    distance_from_line = abs(kernel_x) - width/2   # (Not strictly distance since still has sign)
+    falloff = exp(maximum(EXP_CUTOFF, -(distance_from_line/gaussian_width)**2))   
+    falloff = where(falloff != exp(EXP_CUTOFF), falloff, 0.0)                     
+
+    return line + where(line == 0,falloff,1)   # Only want falloff where there is no line
 
 
 def fuzzy_disk(kernel_x, kernel_y, disk_radius, gaussian_width):
@@ -364,6 +366,9 @@ class KernelFactory(base.TopoObject):
 ### should also move to their own file, so that it will be clearer how
 ### to extend to add new patterns.
 
+# CEB: Do the default values specified here have any effect?
+#      e.g. SineGratingFactory has default phase (below) of 0, but comes
+#      up with a phase of PI/2
 
 class GaussianFactory(KernelFactory):
     """
@@ -478,18 +483,22 @@ class RectangleFactory(KernelFactory):
 class FuzzyLineFactory(KernelFactory):
 
     """
-    Fuzzy line pattern generator
+    Fuzzy Line Generating Factory
     """
-    x       = Parameter(default=0)
-    y       = Parameter(default=0)
-    theta   = Parameter(default=0)
-    width   = Parameter(default=1)
-
+    x              = Parameter(default=0)
+    y              = Parameter(default=0)
+    theta          = Parameter(default=0)
+    width          = Parameter(default=0.5)
+    gaussian_width = Parameter(default=0.2)
+    
     def function(self,**params):
         return fuzzy_line( self.kernel_x, 
-                           self.kernel_y, 
-                           params.get('width',self.width))  
-    
+                           self.kernel_y,
+                           params.get('x',self.x),
+                           params.get('y',self.y),
+                           params.get('width',self.width),
+                           params.get('gaussian_width',self.gaussian_width))  
+
 
 class FuzzyDiskFactory(KernelFactory):
 
