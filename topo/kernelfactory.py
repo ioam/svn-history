@@ -265,7 +265,7 @@ def uniform_random(kernel_x, kernel_y,rmin,rmax):
     return RandomArray.uniform(rmin,rmax,kernel_x.shape) 
 
 
-def rectangle(kernel_x, kernel_y, x, y, width, height):
+def rectangle(kernel_x, kernel_y, width, height):
     """
     Rectangular spot.
     """
@@ -275,7 +275,7 @@ def rectangle(kernel_x, kernel_y, x, y, width, height):
     return bitwise_and(where(kernel_x<=width/2,1,0),where(kernel_y<=height/2,1,0))
 
 
-def fuzzy_line(kernel_x, kernel_y, x, y, width, gaussian_width):
+def fuzzy_line(kernel_x, kernel_y, width, gaussian_width):
     """
     Maximum-length line with a solid central region, then Gaussian fall-off at the edges. 
     """
@@ -284,7 +284,7 @@ def fuzzy_line(kernel_x, kernel_y, x, y, width, gaussian_width):
 
     height = (size(kernel_x,0)**2 + size(kernel_x,1)**2)**0.5   # Maybe there is a better way
                                                                 # to get the maximum length?    
-    line = rectangle(kernel_x, kernel_y, x, y, width, height)
+    line = rectangle(kernel_x, kernel_y, width, height)
 
     distance_from_line = abs(kernel_x) - width/2   # (Not strictly distance since still has sign)
     falloff = exp(maximum(EXP_CUTOFF, -(distance_from_line/gaussian_width)**2))   
@@ -474,8 +474,6 @@ class RectangleFactory(KernelFactory):
     def function(self,**params):
         return rectangle( self.kernel_x, 
                           self.kernel_y, 
-                          params.get('x',self.x),
-                          params.get('y',self.y),
                           params.get('width',self.width),
                           params.get('height',self.height))  
 
@@ -494,8 +492,6 @@ class FuzzyLineFactory(KernelFactory):
     def function(self,**params):
         return fuzzy_line( self.kernel_x, 
                            self.kernel_y,
-                           params.get('x',self.x),
-                           params.get('y',self.y),
                            params.get('width',self.width),
                            params.get('gaussian_width',self.gaussian_width))  
 
