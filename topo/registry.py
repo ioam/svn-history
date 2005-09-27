@@ -40,6 +40,14 @@ plotgroup_templates = KeyedList()
 
 
 ############################################################
+# Global repository for links between a plot group template name and a
+# subclassed Plot Panel to use instead of the default.
+#
+# An example: plotpanel_classes['Hue Pref Map'] = HuePreferencePanel
+plotpanel_classes = {}
+
+
+############################################################
 # Singleton variable to register which Simulator is currently active
 # in the Topographica simulator.  This should not be set directly, but
 # through the two accessor functions.  This variable is also used by

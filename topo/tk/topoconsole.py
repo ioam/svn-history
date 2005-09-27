@@ -34,7 +34,7 @@ class PlotsMenuEntry(topo.base.TopoObject):
         super(PlotsMenuEntry,self).__init__(**config)
         self.console = console
         self.template = template
-        self.class_name = class_name
+
         if not label:
             label = template.name
         self.label = label
@@ -42,22 +42,19 @@ class PlotsMenuEntry(topo.base.TopoObject):
             description = template.description
         self.description = description
 
-        self.num_windows = 0
-        self.title = ''
-
         # Special cases.  These classes are specific to the topo/tk
         # directory and therefore this link must be made within the tk
         # files.
         #
-        # If additional users want to extend the Plot Panel classes, then
-        # an additional line needs to be added here.
-        if self.label == 'Unit Weights':
-           self.class_name = UnitWeightsPanel
-        if self.label == 'Projection':
-            self.class_name = ProjectionPanel
-        elif self.label == 'Preference Map':
-            self.class_name = PreferenceMapPanel
+        # If users want to extend the Plot Panel classes, then add
+        # entries to topo.registry.plotpanel_classes.  If no dictionary
+        # entry is defined then the default class is used.
+        self.class_name = topo.registry.plotpanel_classes.get(self.label,class_name)
 
+        self.num_windows = 0
+        self.title = ''
+
+#
 
     def command(self):
         self.num_windows = self.num_windows + 1
@@ -477,3 +474,8 @@ class GUIToplevel(Toplevel):
         self.protocol('WM_DELETE_WINDOW',self.destroy)
         self.resizable(1,1)
 
+
+if __name__ != '__main__':
+    topo.registry.plotpanel_classes['Unit Weights'] = UnitWeightsPanel
+    topo.registry.plotpanel_classes['Projection'] = ProjectionPanel
+    topo.registry.plotpanel_classes['Preference Map'] = PreferenceMapPanel
