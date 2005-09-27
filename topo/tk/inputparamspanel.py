@@ -47,7 +47,7 @@ def kernelfactory_names():
     and can be extended by the user.
     """
     k = topo.registry.kernel_factories.keys()
-    k = [name[:-7] for name in k]  # Cut off 'Factory'
+    k = [name.replace('Factory','') for name in k]  # Cut off 'Factory'
     for i in range(len(k)):        # Add spaces before capital leters
         for c in string.uppercase:
             k[i] = k[i].replace(c,' '+c).strip()
