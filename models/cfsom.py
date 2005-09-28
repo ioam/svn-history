@@ -52,7 +52,7 @@ class CFSOM(CFSheet):
 
     def learn(self):
 
-        rows,cols = self.activation.shape
+        rows,cols = self.activity.shape
         wr,wc = self.winner_coords(matrix_coords=True)
 
         radius = self.radius() * sqrt(self.density)
@@ -76,11 +76,11 @@ class CFSOM(CFSheet):
 
 
     def winner(self):
-        return argmax(self.activation.flat)
+        return argmax(self.activity.flat)
 
     def winner_coords(self,matrix_coords=False):
-        pos = argmax(self.activation.flat)
-        rows,cols = self.activation.shape
+        pos = argmax(self.activity.flat)
+        rows,cols = self.activity.shape
         row = pos/cols
         col = pos%cols
         if matrix_coords:

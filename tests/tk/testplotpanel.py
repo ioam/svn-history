@@ -78,9 +78,9 @@ class TestPlotPanel(unittest.TestCase):
 
         # To change the activation matrix so "Activity" plot_group
         # will be different.
-        sheetR.activation = self.ra
-        sheetG.activation = self.ga
-        sheetB.activation = self.ba
+        sheetR.activity = self.ra
+        sheetG.activity = self.ga
+        sheetB.activity = self.ba
 
         self.s.add(sheetR)
         self.s.add(sheetG)

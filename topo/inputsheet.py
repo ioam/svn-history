@@ -76,7 +76,7 @@ class InputSheet(Sheet):
         self.simulator.connect(src=self,dest=self,delay=self.period)
 
         # first event is special
-        self.simulator.enqueue_event_rel(self.phase,self,self,data=self.activation)
+        self.simulator.enqueue_event_rel(self.phase,self,self,data=self.activity)
 
     def input_event(self,src,src_port,dest_port,data):
         self.verbose("Received %s input from %s." % (NxN(data.shape),src))
@@ -88,7 +88,7 @@ class InputSheet(Sheet):
         ###
         # TODO: Pass a dictionary to this function to avoid having all of the
         # subclasses below
-        self.activation = self.input_generator()
+        self.activity = self.input_generator()
         
-        self.send_output(data=self.activation)
-        self.verbose("Sending %s output at time %d." % (NxN(self.activation.shape),self.simulator.time()))
+        self.send_output(data=self.activity)
+        self.verbose("Sending %s output at time %d." % (NxN(self.activity.shape),self.simulator.time()))

@@ -8,7 +8,7 @@ __version__ = "$Revision$"
 import weave
 
 
-def hebbian_div_norm_c(input_activation, self_activation, rows, cols, len, cfs, alpha, normalize):
+def hebbian_div_norm_c(input_activity, self_activity, rows, cols, len, cfs, alpha, normalize):
     """
     An inline C implementation of Hebbian learning with divisive normalization
     for the whole sheet.
@@ -26,7 +26,7 @@ def hebbian_div_norm_c(input_activation, self_activation, rows, cols, len, cfs, 
         double load, delta;
         double totald;
 
-        x = self_activation;
+        x = self_activity;
         for (r=0; r<rows; ++r) {
             cfsr = PyList_GetItem(cfs,r);
             for (l=0; l<cols; ++l) {
@@ -45,7 +45,7 @@ def hebbian_div_norm_c(input_activation, self_activation, rows, cols, len, cfs, 
 
                     totald = 0.0;
 
-                    inpj = input_activation+len*rr1+cc1;
+                    inpj = input_activity+len*rr1+cc1;
                     for (i=rr1; i<rr2; ++i) {
                         inpi = inpj;
                         for (j=cc1; j<cc2; ++j) {
@@ -74,11 +74,11 @@ def hebbian_div_norm_c(input_activation, self_activation, rows, cols, len, cfs, 
         }
     """
     
-    weave.inline(hebbian_div_norm_code, ['input_activation', 'self_activation', 'rows', 'cols', 'len', 'cfs', 'alpha', 'normalize'])
+    weave.inline(hebbian_div_norm_code, ['input_activity', 'self_activity', 'rows', 'cols', 'len', 'cfs', 'alpha', 'normalize'])
 
 
 
-def hebbian_c(input_activation, self_activation, rows, cols, len, cfs, alpha):
+def hebbian_c(input_activity, self_activity, rows, cols, len, cfs, alpha):
     """
     An inline C implementation of Hebbian learning for the whole sheet.
     """
@@ -95,7 +95,7 @@ def hebbian_c(input_activation, self_activation, rows, cols, len, cfs, alpha):
         double load, delta;
         double totald;
 
-        x = self_activation;
+        x = self_activity;
         for (r=0; r<rows; ++r) {
             cfsr = PyList_GetItem(cfs,r);
             for (l=0; l<cols; ++l) {
@@ -114,7 +114,7 @@ def hebbian_c(input_activation, self_activation, rows, cols, len, cfs, alpha):
 
                     totald = 0.0;
 
-                    inpj = input_activation+len*rr1+cc1;
+                    inpj = input_activity+len*rr1+cc1;
                     for (i=rr1; i<rr2; ++i) {
                         inpi = inpj;
                         for (j=cc1; j<cc2; ++j) {
@@ -131,15 +131,15 @@ def hebbian_c(input_activation, self_activation, rows, cols, len, cfs, alpha):
         }
     """
     
-    weave.inline(hebbian_code, ['input_activation', 'self_activation', 'rows', 'cols', 'len', 'cfs', 'alpha'])
+    weave.inline(hebbian_code, ['input_activity', 'self_activity', 'rows', 'cols', 'len', 'cfs', 'alpha'])
 
 
 
-def hebbian(input_activation, unit_activation, weights, alpha):
+def hebbian(input_activity, unit_activity, weights, alpha):
     """
     Hebbian learning for one single unit.
     """
-    weights += alpha * unit_activation * input_activation
+    weights += alpha * unit_activity * input_activity
 
 
 ################################################################
@@ -161,7 +161,7 @@ def divisive_normalization(weights, normalize_total):
 def apply_learn_norm_fn(proj, inp, act, learn_fn, norm_fn):
     """
     Apply the specified learn_fn and then norm_fn to the connections fields
-    in proj using input inp and output activation act.
+    in proj using input inp and output activity act.
     """
 
     rows,cols = act.shape

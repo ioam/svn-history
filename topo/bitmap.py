@@ -43,6 +43,7 @@ $Id$
 from colorsys import rgb_to_hsv, hsv_to_rgb
 import Numeric, Image, math
 from Numeric import Float
+from topo.parameter import Parameter
 import topo.base
 import MLab
 
@@ -69,14 +70,17 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     gmat = Numeric.array(sMapArray,Float)
     bmat = Numeric.array(vMapArray,Float)
 
+    ## This code should never be seen.  It means that calling code did
+    ## not take the precaution of clipping the input matrices.
     if max(rmat.flat) > 1 or max(gmat.flat) > 1 or max(bmat.flat) > 1:
-        print 'HSVMap inputs exceed 1. Clipping to 1.0'
-        #print 'Old max h:', max(rmat.flat), 'max s:', max(gmat.flat), \
-        #      'max v:', max(bmat.flat)
+        topo.base.TopoObject().warning('HSVMap inputs exceed 1. Clipping to 1.0')
+        #topo.base.TopoObject().warning('Old max h:', max(rmat.flat), \
+        #    'max s:', max(gmat.flat), 'max v:', max(bmat.flat))
         if max(rmat.flat) > 0: rmat = MLab.clip(rmat,0.0,1.0)
         if max(gmat.flat) > 0: gmat = MLab.clip(gmat,0.0,1.0)
         if max(bmat.flat) > 0: bmat = MLab.clip(bmat,0.0,1.0)
-        #print 'New max h:', max(rmat.flat), 'max s:', max(gmat.flat), 'max v:', max(bmat.flat)
+        #topo.base.TopoObject().warning('New max h:', max(rmat.flat), \
+        #    'max s:', max(gmat.flat), 'max v:', max(bmat.flat))
 
     ### JABHACKALERT!
     ###
@@ -104,7 +108,7 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     ### to those shared messaging routines should be provided and then
     ### used consistently.
 
-    # List comprehensions were not used because it was slower.
+    # List comprehensions were not used because they were slower.
     for j in range(shape[0]):
         for i in range(shape[1]):
             rgb = hsv_to_rgb(rmat[j,i],gmat[j,i],bmat[j,i])
@@ -118,14 +122,16 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     
 
 
-class Bitmap(object):
+class Bitmap(topo.base.TopoObject):
     """
     Wrapper class for the PIL Image class.  Only slightly hides PILs extra
     functionality since the encapsulated Image (self.bitmap) can be accessed
     if desired.
     """
+    normalize = Parameter(default=0)
     
     def __init__(self,newMap):
+        self.cropped = False
         self.bitmap = newMap
         self.view_info = {}
 
@@ -194,7 +200,7 @@ class ColorMap(Bitmap):
         If palette is not passed as parameter, Grayscale is default.
         """
         if max(inArray.flat) > 1.0:
-            topo.base.TopoObject().warning('ColorMap inArray not normalized to 1.  Normalizing')
+            self.warning('ColorMap inArray not normalized to 1.  Normalizing')
             inArray = Numeric.divide(inArray,max(inArray.flat))
 
         newImage = self.arrayToImage(inArray)
@@ -272,13 +278,13 @@ class RGBMap(Bitmap):
         Each matrix must be the same size and normalized to 1.
         """
         if max(rMapArray.flat) > 1.0:
-            topo.base.TopoObject().warning('RGBMap rMapArray not normalized to 1.  Normalizing.  Max:' + str(max(rMapArray.flat)))
+            self.warning('RGBMap rMapArray not normalized to 1.  Normalizing.  Max:' + str(max(rMapArray.flat)))
             rMapArray = Numeric.divide(rMapArray,max(rMapArray.flat))
         if max(max(gMapArray)) > 1.0:
-            topo.base.TopoObject().warning('RGBMap gMapArray not normalized to 1.  Normalizing.  Max:' + str(max(gMapArray.flat)))
+            self.warning('RGBMap gMapArray not normalized to 1.  Normalizing.  Max:' + str(max(gMapArray.flat)))
             gMapArray = Numeric.divide(gMapArray,max(gMapArray.flat))
         if max(max(bMapArray)) > 1.0:
-            topo.base.TopoObject().warning('RGBMap bMapArray not normalized to 1.  Normalizing.  Max:' + str(max(bMapArray.flat)))
+            self.warning('RGBMap bMapArray not normalized to 1.  Normalizing.  Max:' + str(max(bMapArray.flat)))
             bMapArray = Numeric.divide(bMapArray,max(bMapArray.flat))
         rImage = self.arrayToImage(rMapArray)
         gImage = self.arrayToImage(gMapArray)

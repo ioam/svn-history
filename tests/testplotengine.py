@@ -137,11 +137,11 @@ class TestPlotEngine(unittest.TestCase):
         sheetG.add_sheet_view("Miata",sviewG)
         sheetB.add_sheet_view("Miata",sviewB)
 
-        # To change the activation matrix so "Activity" plot_group
+        # To change the activity matrix so "Activity" plot_group
         # will be different.
-        sheetR.activation = self.ra
-        sheetG.activation = self.ga
-        sheetB.activation = self.ba
+        sheetR.activity = self.ra
+        sheetG.activity = self.ga
+        sheetB.activity = self.ba
 
         s.add(sheetR)
         s.add(sheetG)

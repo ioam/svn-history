@@ -72,7 +72,7 @@ import topo.registry
 ###
 ### Is this really necessary?  If so, please document better why.
 ###
-# Some kernels use math.exp() to generate a falling off of activation.
+# Some kernels use math.exp() to generate a falling off of activity.
 # But exp will overflow if too small a value is given, so this
 # constant defines the smallest value to accept from the kernels.
 # exp(-100) is appx. 3.72e-44
@@ -121,20 +121,20 @@ class ImageGenerator(Sheet):
 
         image = Image.open(self.filename)
         image = ImageOps.grayscale(image)
-        image = image.resize(self.activation.shape)
-        self.activation = resize(array([x for x in image.getdata()]),
+        image = image.resize(self.activity.shape)
+        self.activity = resize(array([x for x in image.getdata()]),
                                  (image.size[1],image.size[0]))
 
-	self.verbose("Initialized %s activation from %s" % (NxN(self.activation.shape),self.filename))
-        max_val = float(max(max(self.activation)))
-        self.activation = self.activation / max_val
+	self.verbose("Initialized %s activity from %s" % (NxN(self.activity.shape),self.filename))
+        max_val = float(max(max(self.activity)))
+        self.activity = self.activity / max_val
 
 
     def start(self):
-        self.send_output(data=self.activation)
+        self.send_output(data=self.activity)
 
     def input_event(self,src,src_port,dest_port,data):
-        self.send_output(data=self.activation)
+        self.send_output(data=self.activity)
 
 
 

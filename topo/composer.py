@@ -1,6 +1,6 @@
 """
-A Sheet class for composing activation from different sheets into a
-single activation matrix.
+A Sheet class for composing activity from different sheets into a
+single activity matrix.
 
 May not be necessary or useful any longer (as of 8/2005), and could
 perhaps be moved to the examples/ directory, or deleted.
@@ -22,8 +22,8 @@ class Composer(Sheet):
 
     sim.connect(input_sheet,composer,delay=1, origin=(0.25,0.25))
 
-    will cause (0,0) on input sheet's activation to map to (0.25,0.25)
-    on composer's activation.
+    will cause (0,0) on input sheet's activity to map to (0.25,0.25)
+    on composer's activity.
 
     """
 
@@ -50,8 +50,8 @@ class Composer(Sheet):
     
     def pre_sleep(self):
         if self.__dirty:        
-            self.send_output(data=self.activation) 
-            self.activation = zeros(self.activation.shape)+0.0
+            self.send_output(data=self.activity) 
+            self.activity = zeros(self.activity.shape)+0.0
             self.__dirty=False
            
     def input_event(self,src,src_port,dest_port,data):
@@ -73,7 +73,7 @@ class Composer(Sheet):
         start_col -= col_adj
 
         # the maximum bounds
-        max_row,max_col = self.activation.shape
+        max_row,max_col = self.activity.shape
 
         self.debug("max_row = %d, max_col = %d" % (max_row,max_col))
         self.debug("in_rows = %d, in_cols = %d" % (in_rows,in_cols))
@@ -81,7 +81,7 @@ class Composer(Sheet):
         end_row = start_row+in_rows
         end_col = start_col+in_cols
 
-        # if the input goes outside the activation, clip it
+        # if the input goes outside the activity, clip it
         left_clip = -min(start_col,0)
         top_clip  = -min(start_row,0)
         right_clip = max(end_col,max_col) - max_col
@@ -98,9 +98,9 @@ class Composer(Sheet):
         self.debug("right_clip = %d" % right_clip)
         self.debug("top_clip = %d" % top_clip)
         self.debug("bottom_clip = %d" % bottom_clip)
-        self.debug("activation shape = %s" % NxN(self.activation.shape))
+        self.debug("activity shape = %s" % NxN(self.activity.shape))
 
-        self.activation[start_row:end_row, start_col:end_col] += data[top_clip:in_rows-bottom_clip,
+        self.activity[start_row:end_row, start_col:end_col] += data[top_clip:in_rows-bottom_clip,
                                                                       left_clip:in_cols-right_clip]
 
 

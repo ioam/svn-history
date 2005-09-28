@@ -158,7 +158,7 @@ def flatten(l):
         return result
 
 
-def compute_response_mdot_py(input_activation, rows, cols, temp_activation, cfs, strength):
+def compute_response_mdot_py(input_activity, rows, cols, temp_activity, cfs, strength):
     """
     The original mdot function that the inline C code based on. It is here just
     for reference.
@@ -168,22 +168,22 @@ def compute_response_mdot_py(input_activation, rows, cols, temp_activation, cfs,
         for c in xrange(cols):
             cf = cfs[r][c]
             r1,r2,c1,c2 = cf.slice
-            X = input_activation[r1:r2,c1:c2]
+            X = input_activity[r1:r2,c1:c2]
 
             a = X*cf.weights
-            self.temp_activation[r,c] = sum(a.flat)
-    self.temp_activation *= self.strength
+            self.temp_activity[r,c] = sum(a.flat)
+    self.temp_activity *= self.strength
 
-def compute_response_mdot_c(input_activation, rows, cols, temp_activation, cfs, strength):
+def compute_response_mdot_c(input_activity, rows, cols, temp_activity, cfs, strength):
     """
     An optmized version that computes the mdot functions for all the conection
-    fields with the input_activation. It loops through each unit in the sheet
+    fields with the input_activity. It loops through each unit in the sheet
     and therefore the loop in KernelProjection.compute_response is not needed.
     """
 
-    temp_act = temp_activation
-    len, len2 = input_activation.shape
-    X = input_activation.flat
+    temp_act = temp_activity
+    len, len2 = input_activity.shape
+    X = input_activity.flat
 
     code = """
         double tot;

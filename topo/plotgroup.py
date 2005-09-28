@@ -216,7 +216,7 @@ class PlotGroup(TopoObject):
         for each in self.plots():
             (r,g,b) = each.matrices
             if r.shape != (0,0) and g.shape != (0,0) and b.shape != (0,0):
-                # Crop activation to a maximum of 1.  Will scale brighter
+                # Crop activity to a maximum of 1.  Will scale brighter
                 # or darker, depending.
                 #
                 # Should report that cropping took place.

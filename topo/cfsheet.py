@@ -21,9 +21,9 @@ KernelFactory.
 
 
 The CFSheet class should be sufficient to create a non-learning sheet
-that computes its activation via the contribution of many local
-connection fields.  The activation output can be changed by changing
-the parameters CFSheet.activation_fn and CFSheet.transfer_fn.  (See
+that computes its activity via the contribution of many local
+connection fields.  The activity output can be changed by changing
+the parameters CFSheet.activity_fn and CFSheet.transfer_fn.  (See
 CFSheet class documentation for more details).  To implement learning
 one must create a subclass and override the default .learn() method.
 
@@ -45,15 +45,15 @@ learning step, do cf.weights *= cf.mask.
 
 * Computing stimulation in Projection objects *
 
-Currently each CFSheet object explicitly computes the activation of
+Currently each CFSheet object explicitly computes the activity of
 each ConnectionField in each projection by getting that
-ConnectionField's input matrix and calling the activation function on
+ConnectionField's input matrix and calling the activity function on
 it with the ConnectionField's weights.  It would be more modular to
-add a .stimulation(input_activation) method to the Projection class
+add a .stimulation(input_activity) method to the Projection class
 interface that would by default do what CFSheet does now.  Then
 CFSheet would, on input, just call the .stimulation() methods on the
-appropriate projections and add the results to its .temp_activation
-matrix.  In this scenario, the activation_fn parameter would move to
+appropriate projections and add the results to its .temp_activity
+matrix.  In this scenario, the activity_fn parameter would move to
 Projection, or, better one of its subclasses, since one could conceive
 of Projections that compute their stimulation through some entirely
 different algorithm.
@@ -67,7 +67,7 @@ large-scale analog of the individual connection.
 
 jbednar050621: The approach Jeff describes above sounds very
 reasonable, except that instead of just adding the results to the
-temp_activation matrix, each Projection also needs to store the
+temp_activity matrix, each Projection also needs to store the
 intermediate results, so that they can be retrieved when processing
 subsequent input events (which will likely change only some of the
 inputs, not all, e.g. only lateral weights, not afferent).  For
@@ -149,7 +149,7 @@ class ConnectionField(TopoObject):
         # promote to double.
         self.weights.savespace(1)
 
-        self.verbose("activation matrix shape: ",self.weights.shape)
+        self.verbose("activity matrix shape: ",self.weights.shape)
 
         ### JABHACKALERT!
         ### 
@@ -168,10 +168,10 @@ class ConnectionField(TopoObject):
     def contains(self,x,y):
         return self.bounds.contains(x,y)
 
-    def get_input_matrix(self, activation):
+    def get_input_matrix(self, activity):
         r1,r2,c1,c2 = self.slice
 
-        return activation[r1:r2,c1:c2]
+        return activity[r1:r2,c1:c2]
 
     def reduce_radius(self, new_wt_bounds):
         """
@@ -212,36 +212,36 @@ class Projection(TopoObject):
     """
     Projection takes one parameter:
 
-    activation_fn: A function f(X,W) that takes two identically shaped
+    activity_fn: A function f(X,W) that takes two identically shaped
     matrices X (the input) and W (the ConnectionField weights) and
     computes a scalar stimulation value based on those weights.  The
     default is plastk.utils.mdot
 
     Any subclass of Projection has to implement the interface
-    compute_response(self,input_activation,rows,cols) that computes
+    compute_response(self,input_activity,rows,cols) that computes
     the response resulted from the input and store them in the 
-    temp_activation[] array.
+    temp_activity[] array.
     """
 
     ### JABHACKALERT!
     ### 
-    ### The temp_activation array should be named something more
+    ### The temp_activity array should be named something more
     ### informative, i.e. whatever it actually is.  In this case it's
-    ### not really an activation, just the scalar result of applying
+    ### not really an activity, just the scalar result of applying
     ### the weight matrix to the input matrix.
-    activation_fn = Parameter(default=mdot)
+    activity_fn = Parameter(default=mdot)
     src = Parameter(default=None)
     dest = Parameter(default=None)
     cf_type = Parameter(default=ConnectionField)
     strength = Number(default=1.0)
 #   shape = property(get_shape)
-    temp_activation = []
+    temp_activity = []
 
     def __init__(self,**params):
         super(Projection,self).__init__(**params)
         self.cfs = None
         self.input_buffer = None
-        self.temp_activation = Numeric.array(self.dest.activation)
+        self.temp_activity = Numeric.array(self.dest.activity)
 
     def cf(self,r,c):
         return self.cfs[r][c]
@@ -308,7 +308,7 @@ class Projection(TopoObject):
             im.save(f,file_format)
             f.close()
 
-    def compute_response(self,input_activation,rows,cols):
+    def compute_response(self,input_activity,rows,cols):
         pass
 
     def reduce_cfsize(self, new_wt_bounds):
@@ -343,24 +343,24 @@ class KernelProjection(Projection):
 
     ### JABHACKALERT!
     ### 
-    ### Instead of having this special case, need to make all activation 
+    ### Instead of having this special case, need to make all activity 
     ### functions be array-based like compute_response_mdot_c, but with
     ### one simple and slow version provided that accepts a scalar
-    ### activation function (for generality).        
-    def compute_response(self,input_activation, rows, cols):
-        self.input_buffer = input_activation
-        if self.activation_fn.func_name == "compute_response_mdot_c":
+    ### activity function (for generality).        
+    def compute_response(self,input_activity, rows, cols):
+        self.input_buffer = input_activity
+        if self.activity_fn.func_name == "compute_response_mdot_c":
             # compute_response_mdot_c computes the mdot for all the units
-            compute_response_mdot_c(input_activation, rows, cols, self.temp_activation, self.cfs, self.strength)
+            compute_response_mdot_c(input_activity, rows, cols, self.temp_activity, self.cfs, self.strength)
 	else:
             for r in xrange(rows):
                 for c in xrange(cols):
                     cf = self.cfs[r][c]
                     r1,r2,c1,c2 = cf.slice
-                    X = input_activation[r1:r2,c1:c2]
+                    X = input_activity[r1:r2,c1:c2]
 
-                    self.temp_activation[r,c] = self.activation_fn(X,cf.weights)
-            self.temp_activation *= self.strength
+                    self.temp_activity[r,c] = self.activity_fn(X,cf.weights)
+            self.temp_activity *= self.strength
 
 
     def reduce_cfsize(self, new_wt_bounds):
@@ -382,25 +382,25 @@ class KernelProjection(Projection):
 
 class CFSheet(Sheet):
     """
-    A Sheet that computes activation via sets of weighted projections
+    A Sheet that computes activity via sets of weighted projections
     onto other sheets.
 
     A standard CFSheet expects its input to be generated from other
     Sheets. Upon receiving an input event, the CFSheet interprets the
-    event data to be (a copy of) an activation matrix from another
+    event data to be (a copy of) an activity matrix from another
     sheet.  The CFSheet computes a 'response' matrix for the
     Projection to the sheet that generated the event by calling the
-    Projection's .compute_response() with the input activation region 
+    Projection's .compute_response() with the input activity region 
     as parameters.  This response is added to the Projection's temporary 
-    activation buffer.  After all events have been processed for a given
-    time, the CFSheet computes its .activation matrix as 
-    self.transfer_fn(self.temp_activation), where self.temp_activation
-    is computed by summing all the Projections' temporary activation 
-    buffers.  This activation is then sent on the default output port.
+    activity buffer.  After all events have been processed for a given
+    time, the CFSheet computes its .activity matrix as 
+    self.transfer_fn(self.temp_activity), where self.temp_activity
+    is computed by summing all the Projections' temporary activity 
+    buffers.  This activity is then sent on the default output port.
 
     CFSheet takes one parameter:
 
-    transfer_fn: A function that s(A) that takes an activation matrix
+    transfer_fn: A function that s(A) that takes an activity matrix
     A and produces and identically shaped output matrix. The default
     is the identity function.
 
@@ -429,14 +429,14 @@ class CFSheet(Sheet):
     ### The default learning_fn should be a no-op; all such defaults
     ### should be trivial for such an abstract class.
     ### 
-    ### The temp_activation variable should probably be renamed
-    ### activation buffer; that's what it does, right?
+    ### The temp_activity variable should probably be renamed
+    ### activity buffer; that's what it does, right?
     transfer_fn  = Parameter(default=lambda x:Numeric.array(x))
     learning_fn = Parameter(default=hebbian_c)
                              
     def __init__(self,**params):
         super(CFSheet,self).__init__(**params)
-        self.temp_activation = Numeric.array(self.activation)
+        self.temp_activity = Numeric.array(self.activity)
         self.projections = {}
         self.new_input = False
 
@@ -475,39 +475,39 @@ class CFSheet(Sheet):
         """
         if self.new_input:
             self.new_input = False
-            self.temp_activation *= 0.0
+            self.temp_activity *= 0.0
             for name in self.projections:
                 for proj in self.projections[name]:
-                    self.temp_activation += proj.temp_activation
-            self.activation = self.transfer_fn(self.temp_activation)
-            self.send_output(data=self.activation)
+                    self.temp_activity += proj.temp_activity
+            self.activity = self.transfer_fn(self.temp_activity)
+            self.send_output(data=self.activity)
 
             if self._learning:
                 self.learn()
 
-            #self.debug("max activation =",max(self.activation.flat))
-            #print self.activation 
+            #self.debug("max activity =",max(self.activity.flat))
+            #print self.activity 
 
     def learn(self):
         """
         Override this method to implement learning/adaptation.  Called
-        from self.pre_sleep() _after_ activation has been propagated.
+        from self.pre_sleep() _after_ activity has been propagated.
         """
         pass
 
-    def present_input(self,input_activation,input_sheet,dest_port):
+    def present_input(self,input_activity,input_sheet,dest_port):
         """
-        Compute the stimulation caused by the given input_activation
+        Compute the stimulation caused by the given input_activity
         (matrix) produced by the given sheet.  Applies f(X,W) for each
         ConnectionField's weight matrix W and input matrix X for each
         projection from self to input_sheet and adds the result to the
         stimulation buffer.
         """
-        rows,cols = self.activation.shape
+        rows,cols = self.activity.shape
 
         for proj in self.projections[input_sheet.name]:
             if proj.dest_port == dest_port:
-                proj.compute_response(input_activation,rows,cols)
+                proj.compute_response(input_activity,rows,cols)
 		break
 
     def get_projection_by_name(self,tname):
