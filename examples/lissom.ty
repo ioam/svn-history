@@ -191,6 +191,8 @@ alpha_input=0.007*acs
 alpha_exc=0.002*ecs
 alpha_inh=0.00025*ics
 
+timeprecision=2
+
 tsettle=8
 
 print "Setting parameters..."
@@ -228,22 +230,22 @@ inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(
 
 print "Creating simulation objects..."
 
-s = topo.simulator.Simulator()
+s = topo.simulator.Simulator(time_precision=timeprecision)
 
 retina = InputSheet(input_generator=GaussianFactory(),name='Retina')
 V1 = LISSOM(name='V1')
 save  = ImageSaver(name='LISSOM')
 
-s.connect(retina,V1, delay = FixedPoint("0.001",4),
+s.connect(retina,V1, delay = FixedPoint("0.05"),
           projection_params = dict(strength = 1.0, name='Afferent0',
                                    weights_bounds = afferent_weight_bounds, normalize = 1.0, activation_fn=compute_response_mdot_c,learning_rate=alpha_input))
 
 
-s.connect(V1,V1, delay = FixedPoint("0.001",4), dest_port="exc",
+s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
           projection_params = dict(strength = gammaexc, name='LateralExcitatory',
                                    weights_bounds = excitatory_weight_bounds, normalize = 1.0, activation_fn=compute_response_mdot_c,learning_rate=alpha_exc))
 
-s.connect(V1,V1, delay = FixedPoint("0.001",4), dest_port="inh",
+s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
           projection_params = dict(strength = -gammainh, name='LateralInhibitory',
                                    weights_bounds = inhibitory_weight_bounds, normalize = 1.0, activation_fn=compute_response_mdot_c,learning_rate=alpha_inh))
         
@@ -293,7 +295,9 @@ s.sched_execfn(20000, set_deltabeta, 0.24, 0.88)
 #s.connect(retina,save,dest_port='retina',delay=2)
 #s.connect(V1,save,dest_port='V1',delay=1)
 
-s.run(FixedPoint(10))
+# can either pass a number or FixedPoint object to s.run()
+#s.run(10)
+#s.run(FixedPoint(10))
 
 #V1.projections['Retina'][0].plot_cfs()
 
