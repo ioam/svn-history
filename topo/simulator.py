@@ -131,10 +131,10 @@ $Id$
 import sched
 from base import TopoObject
 from parameter import Parameter
-from utils import inf
 from copy import copy, deepcopy
 import __main__
 import topo.registry
+from fixedpoint import FixedPoint
 
 SLEEP_EXCEPTION = "Sleep Exception"
 STOP = "Simulator Stopped"
@@ -160,7 +160,8 @@ class BaseSimulator(TopoObject):
         """
         super(BaseSimulator,self).__init__(**config)
 
-        self._time = 0.0
+        # time is a fixed-point number with 4 decimal places
+        self._time = FixedPoint("0.0", 4)
         self._event_processors = []
         self._sleep_window = 0.0
         self._sleep_window_violation = False
@@ -170,7 +171,7 @@ class BaseSimulator(TopoObject):
             topo.registry.set_active_sim(self)
 
         
-    def run(self,duration=inf,until=inf):
+    def run(self,duration=-1,until=-1):
         """
         Run the simulator.   Call .start() for each EventProcessor if not
         previously done, and start the event scheduler.
@@ -312,7 +313,10 @@ class BaseSimulator(TopoObject):
 
     def time(self):
         """
-        Return the current simulation time.
+        Return the current simulation time as a FixedPoint object.
+        
+	If the time return is used in the computation of a floating point 
+        variable, it should be cast into a floating point number by float().
         """
         return self._time
     
@@ -373,13 +377,21 @@ class Simulator(BaseSimulator):
         super(Simulator,self).__init__(**args)
         self.events = []
         self._events_stack = []
-        self._time = 0.0
+        self._time = FixedPoint("0.0", 4)
         
-    def continue_(self,duration=inf,until=inf):
+    def continue_(self,duration=-1,until=-1):
 
-        stop_time = min(self.time()+duration,until)
+        # time of value -1 means infinity
+        if duration == -1 and until == -1:
+            stop_time = -1     # runs forever
+        elif duration == -1:
+            stop_time = until
+        elif until == -1:
+            stop_time = self.time() + duration
+        else:
+            stop_time = min(self.time()+duration,until)
         did_event = False
-        while self.events and self.time() < stop_time:
+        while self.events and (stop_time == -1 or self.time() < stop_time):
 
             # Loop while there are events and it's not time to stop.
             
@@ -428,7 +440,8 @@ class Simulator(BaseSimulator):
 
         # The clock needs updating if the events have not done it.
         #if self.events and self.events[0].time >= stop_time:
-        self._time = stop_time
+        if stop_time != -1:
+            self._time = stop_time
 
 
     def sleep(self,delay):
