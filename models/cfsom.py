@@ -44,9 +44,9 @@ class CFSOM(CFSheet):
         super(CFSOM,self).__init__(**params)
         self.half_life = self.learning_length/8                      
     def alpha(self):
-        return self.alpha_0 * decay(self.simulator.time(),self.half_life)
+        return self.alpha_0 * decay(float(self.simulator.time()),self.half_life)
     def radius(self):
-        return self.radius_0 * decay(self.simulator.time(),self.half_life)
+        return self.radius_0 * decay(float(self.simulator.time()),self.half_life)
 
     ##########################################
 
