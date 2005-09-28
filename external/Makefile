@@ -1,11 +1,11 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-all: python jpeg pil numeric pmw matplotlib dislin  dislinpy weave
+all: python jpeg pil numeric pmw matplotlib dislin  dislinpy weave fixedpoint
 
-clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean matplotlib-clean dislin-clean dislinpy-clean
+clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean matplotlib-clean dislin-clean dislinpy-clean fixedpoint-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall dislin-uninstall dislinpy-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall dislin-uninstall dislinpy-uninstall fixedpoint-uninstall
 
 ##############################################################
 # Python
@@ -225,6 +225,23 @@ weave-clean:
 weave-uninstall:
 	rm -rf ${WEAVE} $(foreach f, ${WEAVE_UNINSTALL}, ${PREFIX}/${f})
 
+
+
+##############################################################
+# Fixed-Point package
+#
+FIXEDPT = fixedpoint-0.1.2
+FIXEDPT_UNINSTALL = ${PYTHON_LIB}/site-packages
+
+fixedpoint: ${FIXEDPT}.tgz python
+	tar xzf ${FIXEDPT}.tgz
+	cd ${FIXEDPT}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
+	touch fixedpoint
+
+fixedpoint-clean:
+	rm -rf ${FIXEDPT}
+fixedpoint-uninstall:
+	rm -rf ${FIXEDPT} ${FIXEDPT_UNINSTALL}/fixedpoint.*
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
