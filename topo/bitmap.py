@@ -74,13 +74,9 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     ## not take the precaution of clipping the input matrices.
     if max(rmat.flat) > 1 or max(gmat.flat) > 1 or max(bmat.flat) > 1:
         topo.base.TopoObject().warning('HSVMap inputs exceed 1. Clipping to 1.0')
-        #topo.base.TopoObject().warning('Old max h:', max(rmat.flat), \
-        #    'max s:', max(gmat.flat), 'max v:', max(bmat.flat))
         if max(rmat.flat) > 0: rmat = MLab.clip(rmat,0.0,1.0)
         if max(gmat.flat) > 0: gmat = MLab.clip(gmat,0.0,1.0)
         if max(bmat.flat) > 0: bmat = MLab.clip(bmat,0.0,1.0)
-        #topo.base.TopoObject().warning('New max h:', max(rmat.flat), \
-        #    'max s:', max(gmat.flat), 'max v:', max(bmat.flat))
 
     ### JABHACKALERT!
     ###
@@ -131,7 +127,6 @@ class Bitmap(topo.base.TopoObject):
     normalize = Parameter(default=0)
     
     def __init__(self,newMap):
-        self.cropped = False
         self.bitmap = newMap
         self.view_info = {}
 
@@ -169,7 +164,7 @@ class Bitmap(topo.base.TopoObject):
         Take in a normalized 2D array, return a one-channel luminosity image.
         """
         if max(inArray.flat) > 1:
-            print 'Warning: arrayToImage inputs not normalized. Normalizing to 1.  Max value: ', max(inArray.flat)
+            self.warning('arrayToImage inputs > 1. Normalizing.  Max value: ', max(inArray.flat))
             inArray = Numeric.divide(inArray,max(inArray.flat))
         assert max(inArray.flat) <= 1, 'arrayToImage failed to Normalize'
             
@@ -200,7 +195,7 @@ class ColorMap(Bitmap):
         If palette is not passed as parameter, Grayscale is default.
         """
         if max(inArray.flat) > 1.0:
-            self.warning('ColorMap inArray not normalized to 1.  Normalizing')
+            self.warning('ColorMap inArray > 1.  Normalizing')
             inArray = Numeric.divide(inArray,max(inArray.flat))
 
         newImage = self.arrayToImage(inArray)
@@ -239,13 +234,16 @@ class HSVMap(Bitmap):
         hFlat = hMapArray.flat
         sFlat = sMapArray.flat
         vFlat = vMapArray.flat
-        if max(hFlat) > 1 or max(sFlat) > 1 or max(vFlat) > 1:
-            print 'Warning: HSVMap inputs not normalized to 1. Dividing by 255'
-            print 'Max of each channel is: ', max(hflat), max(sFlat), max(vFlat)
-            hFlat = hFlat / 255.0
-            sFlat = sFlat / 255.0
-            vFlat = vFlat / 255.0
 
+        ## This code should never be seen.  It means that calling code did
+        ## not take the precaution of clipping the input matrices.
+        if max(hFlat) > 1 or max(sFlat) > 1 or max(vFlat) > 1:
+            topo.base.TopoObject().warning('HSVMap inputs exceed 1. Clipping to 1.0')
+            if max(hFlat) > 0: hFlat = MLab.clip(hFlat,0.0,1.0)
+            if max(sFlat) > 0: sFlat = MLab.clip(sFlat,0.0,1.0)
+            if max(vFlat) > 0: vFlat = MLab.clip(vFlat,0.0,1.0)
+
+        # List comprehensions not used for speed.
         buffer = []
         for i in range(len(hFlat)):
             (r, g, b) = hsv_to_rgb(hFlat[i],sFlat[i],vFlat[i])
@@ -253,14 +251,6 @@ class HSVMap(Bitmap):
                      int(math.floor(g * 255)),
                      int(math.floor(b * 255)))
             buffer.append(pixel)
-
-        # Equivalent to the above code, but this uses list
-        # comprehensions instead.  Slower than the for loop.
-        # rgbFlat = [hsv_to_rgb(h,s,v) for h,s,v in zip(hFlat, sFlat, vFlat)]
-        # buffer = [(int(math.floor(r * 255)),
-        #            int(math.floor(g * 255)),
-        #            int(math.floor(b * 255)))
-        #           for r,g,b in rgbFlat]
 
         newImage.putdata(buffer)
         super(HSVMap,self).__init__(newImage)
@@ -286,6 +276,15 @@ class RGBMap(Bitmap):
         if max(max(bMapArray)) > 1.0:
             self.warning('RGBMap bMapArray not normalized to 1.  Normalizing.  Max:' + str(max(bMapArray.flat)))
             bMapArray = Numeric.divide(bMapArray,max(bMapArray.flat))
+
+        ## This code should never be seen.  It means that calling code did
+        ## not take the precaution of clipping the input matrices.
+        if max(rMapArray.flat) > 1 or max(gMapArray.flat) > 1 or max(bMapArray.flat) > 1:
+            topo.base.TopoObject().warning('RGBMap inputs exceed 1. Clipping to 1.0')
+            rMapArray = MLab.clip(rMapArray,0.0,1.0)
+            gMapArray = MLab.clip(gMapArray,0.0,1.0)
+            bMapArray = MLab.clip(bMapArray,0.0,1.0)
+
         rImage = self.arrayToImage(rMapArray)
         gImage = self.arrayToImage(gMapArray)
         bImage = self.arrayToImage(bMapArray)
