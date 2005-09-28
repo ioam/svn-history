@@ -47,6 +47,7 @@ from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
 from histogram import Histogram
 from parameter import Dynamic
 import palette
+import MLab
 
 # Types of plots that Plot knows how to create from input matrices.
 RGB = 'RGB'
@@ -129,6 +130,7 @@ class Plot(TopoObject):
 
         self.plot_type = plot_type
         self.view_info = {}
+        self.cropped = False
         self.histograms = []
         self.channel_views = []
         self.matrices = []         # Will hold 3 2D matrices.
@@ -252,6 +254,16 @@ class Plot(TopoObject):
             # Do the HSV-->RGB conversion, assume the caller will be
             # displaying the plot as an RGB.
             h,s,v = self.matrices
+
+            if max(h.flat) > 1 or max(s.flat) > 1 or max(v.flat) > 1:
+                self.cropped = True
+                #self.warning('Plot: HSVMap inputs exceed 1. Clipping to 1.0')
+                if max(h.flat) > 0: h = MLab.clip(h,0.0,1.0)
+                if max(s.flat) > 0: s = MLab.clip(s,0.0,1.0)
+                if max(v.flat) > 0: v = MLab.clip(v,0.0,1.0)
+            else:
+                self.cropped = False
+
             self.matrices = matrix_hsv_to_rgb(h,s,v)
 
         elif self.plot_type == COLORMAP:
