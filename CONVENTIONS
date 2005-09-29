@@ -193,15 +193,17 @@ acceptable, well-defined terms:
   ConnectionField
   Projection
   CFSheet
-  InputSheet
+  GeneratorSheet
   SheetView
   UnitView
   Event
-  
+  EventProcessor
+  Activity  
 
 
 GUI
 
+When coding, the GUI should be considered an optional component.
 No part of Topographica should import GUI files, rely on the presence
 of a particular GUI or any GUI at all, or assume that the data it
 generates will be used only by a GUI unless it is absolutely
@@ -244,7 +246,9 @@ batch testing, supporting different look-and-feel standards, etc.  The
 approach also greatly eases maintenance, because GUI libraries often
 vary significantly over time and across platforms.  To be able to
 maintain our code over the long term, we need to minimize the amount
-of our code that depends on such varying details.
+of our code that depends on such varying details.  Finally, this
+approach ensures that scientific users can ignore all of the GUI
+details, which are irrelevant to what Topographica actually computes.
 
 
 IMPORTING EXTERNAL FILES AND FUNCTIONS
@@ -298,6 +302,18 @@ Please try to avoid such problems by importing only the specific
 functions and classes you need, or (even better where practical) by
 importing the package only and then using the fully qualified name
 (e.g. "import MLab ; MLab.max()").
+
+If you find that you need to change any file in an external package,
+please *DO NOT* change that file, wrap it up into a .tar or .zip
+archive, and put it back into the Topographica repository.  Doing so
+is a very bad idea, because it prevents us from upgrading that package
+in the future.  Instead, keep the original archive intact as
+distributed, but then have the external/Makefile patch it
+automatically to change the specific items that need editing.  When
+the package is updated, the same patch can often be applied as-is to
+the new package, and in any case it will be clear exactly where to 
+look in the package to make the necessary change.
+
 
 
 REFACTORING/TESTING TIPS
