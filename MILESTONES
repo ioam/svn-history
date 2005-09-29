@@ -92,7 +92,7 @@ To reach milestone 1, we will need to:
   and to select the other windows. (done)
 
 - Fix the floating-point rounding bug in the current LISSOM-like
-  implementation.
+  implementation. (done)
 
 - Fix anything else that prevents the LISSOM example from working
   reasonably. (done)
@@ -109,7 +109,7 @@ the GUI prototype code later, for milestone 2. (done)
 RELATED (BUT NOT STRICTLY REQUIRED) ISSUES TO ADDRESS BEFORE THIS MILESTONE:
 
 - Check that events are not allowed to be put onto the event queue at
-  the current time, only with some delay into the future.
+  the current time, only with some delay into the future. (done)
 
 - Remove obsolete files like convolve2d.py. (done)
 
