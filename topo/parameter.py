@@ -75,7 +75,7 @@ class Parameter(object):
   __slots__ = ['name','default','doc']
   count = 0
   
-  def __init__(self,default=None,doc="Undocumented parameter."):
+  def __init__(self,default=None,doc=""):
     """
     Initialize a new parameter.
 
@@ -148,7 +148,7 @@ class Number(Parameter):
   Example of creating a parameter:
   AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
   """
-  def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),doc="Undocumented parameter"):
+  def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),doc=""):
     Parameter.__init__(self,default=default,doc=doc)
     self.bounds = bounds
     self._softbounds = softbounds  
@@ -204,11 +204,11 @@ class Integer(Number):
     super(Integer,self).__set__(obj,val)
 
 class Magnitude(Number):
-  def __init__(self,default=1.0,softbounds=(None,None),doc="Undocumented paramter"):
+  def __init__(self,default=1.0,softbounds=(None,None),doc=""):
     Number.__init__(self,default=default,bounds=(0.0,1.0),softbounds=softbounds,doc=doc)
 
 class BooleanParameter(Parameter):
-  def __init__(self,default=False,bounds=(0,1),doc="Undocumented paramter"):
+  def __init__(self,default=False,bounds=(0,1),doc=""):
     Parameter.__init__(self,default=default,doc=doc)
     self.bounds = bounds
     
