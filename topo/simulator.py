@@ -139,7 +139,7 @@ from fixedpoint import FixedPoint
 SLEEP_EXCEPTION = "Sleep Exception"
 STOP = "Simulator Stopped"
 
-InfiniteTime = -1
+Forever = -1
 
 
 class BaseSimulator(TopoObject):
@@ -175,7 +175,7 @@ class BaseSimulator(TopoObject):
             topo.registry.set_active_sim(self)
 
         
-    def run(self,duration=InfiniteTime,until=InfiniteTime):
+    def run(self,duration=Forever,until=Forever):
         """
         Run the simulator.   Call .start() for each EventProcessor if not
         previously done, and start the event scheduler.
@@ -383,18 +383,18 @@ class Simulator(BaseSimulator):
         self._events_stack = []
         self._time = FixedPoint("0.0", self.time_precision)
         
-    def continue_(self,duration=InfiniteTime,until=InfiniteTime):
+    def continue_(self,duration=Forever,until=Forever):
 
-        if duration == InfiniteTime and until == InfiniteTime:
-            stop_time = InfiniteTime     # runs forever
-        elif duration == InfiniteTime:
+        if duration == Forever and until == Forever:
+            stop_time = Forever     # runs forever
+        elif duration == Forever:
             stop_time = until
-        elif until == InfiniteTime:
+        elif until == Forever:
             stop_time = self.time() + duration
         else:
             stop_time = min(self.time()+duration,until)
         did_event = False
-        while self.events and (stop_time == InfiniteTime or self.time() < stop_time):
+        while self.events and (stop_time == Forever or self.time() < stop_time):
 
             # Loop while there are events and it's not time to stop.
             
@@ -443,7 +443,7 @@ class Simulator(BaseSimulator):
 
         # The clock needs updating if the events have not done it.
         #if self.events and self.events[0].time >= stop_time:
-        if stop_time != InfiniteTime:
+        if stop_time != Forever:
             self._time = stop_time
 
 
