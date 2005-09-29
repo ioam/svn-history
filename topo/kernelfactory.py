@@ -365,21 +365,15 @@ class KernelFactory(base.TopoObject):
 ### because they are not quite like the Factory design pattern.  They
 ### should also move to their own file, so that it will be clearer how
 ### to extend to add new patterns.
-
-# CEB: Do the default values specified here have any effect?
-#      e.g. SineGratingFactory has default phase (below) of 0, but comes
-#      up with a phase of PI/2
-
 class GaussianFactory(KernelFactory):
     """
     Gaussian pattern generator
     """
-
-    x       = Parameter(default=0)
-    y       = Parameter(default=0)
-    theta   = Parameter(default=0)
-    width   = Parameter(default=1)
-    height  = Parameter(default=1)
+    x       = Number(default=0.0,softbounds=(-1.0,1.0))
+    y       = Number(default=0.0,softbounds=(-1.0,1.0))
+    theta   = Number(default=0.0,softbounds=(0.0,2*pi))
+    width   = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
+    height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
 
     def function(self,**params):
         return gaussian( self.kernel_x, 
@@ -392,12 +386,11 @@ class SineGratingFactory(KernelFactory):
     """
     Sine grating pattern generator
     """
-
-    x         = Parameter(default=0)
-    y         = Parameter(default=0)
-    theta     = Parameter(default=0)
-    frequency = Parameter(default=1)
-    phase     = Parameter(default=0)
+    x       = Number(default=0.0,softbounds=(-1.0,1.0))
+    y       = Number(default=0.0,softbounds=(-1.0,1.0))
+    theta   = Number(default=0.0,softbounds=(0.0,2*pi))
+    frequency = Number(default=5.0,bounds=(0.0,None),softbounds=(0.0,10.0))
+    phase     = Number(default=pi/2,bounds=(0.0,None),softbounds=(0.0,2*pi))
 
     def function(self,**params):
         return sine_grating( self.kernel_x,
@@ -410,12 +403,11 @@ class SquareGratingFactory(KernelFactory):
     """
     Square grating pattern generator
     """
-
-    x         = Parameter(default=0)
-    y         = Parameter(default=0)
-    theta     = Parameter(default=0)
-    frequency = Parameter(default=1)
-    phase     = Parameter(default=0)
+    x       = Number(default=0.0,softbounds=(-1.0,1.0))
+    y       = Number(default=0.0,softbounds=(-1.0,1.0))
+    theta   = Number(default=0.0,softbounds=(0.0,2*pi))
+    frequency = Number(default=5.0,bounds=(0.0,None),softbounds=(0.0,10.0))
+    phase     = Number(default=pi/2,bounds=(0.0,None),softbounds=(0.0,2*pi))
 
     def function(self,**params):
         return square_grating( self.kernel_x,
@@ -428,13 +420,13 @@ class GaborFactory(KernelFactory):
     """
     Gabor pattern generator
     """
-    x        = Parameter(default=0)
-    y        = Parameter(default=0)
-    theta    = Parameter(default=0)
-    width    = Parameter(default=2)
-    height   = Parameter(default=1)
-    frequency = Parameter(default=1)
-    phase     = Parameter(default=0)
+    x       = Number(default=0.0,softbounds=(-1.0,1.0))
+    y       = Number(default=0.0,softbounds=(-1.0,1.0))
+    theta   = Number(default=0.0,softbounds=(0.0,2*pi))
+    frequency = Number(default=5.0,bounds=(0.0,None),softbounds=(0.0,10.0))
+    phase     = Number(default=pi/2,bounds=(0.0,None),softbounds=(0.0,2*pi))
+    width   = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
+    height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
 
     def function(self,**params):
         return gabor( self.kernel_x,
@@ -449,10 +441,10 @@ class UniformRandomFactory(KernelFactory):
     """
     Uniform random noise pattern generator
     """
-    x = Parameter(default=0)
-    y = Parameter(default=0)
-    min = Number(default=0.0)
-    max = Number(default=1.0)
+    x       = Number(default=0.0,softbounds=(-1.0,1.0))
+    y       = Number(default=0.0,softbounds=(-1.0,1.0))
+    min     = Number(default=0.0,bounds=(0.0,1.0),softbounds=(0.0,1.0))
+    max     = Number(default=1.0,bounds=(0.0,1.0),softbounds=(0.0,1.0))
     
     def function(self,**params):
         return uniform_random( self.kernel_x, self.kernel_y,
@@ -464,12 +456,11 @@ class RectangleFactory(KernelFactory):
     """
     Rectangle pattern generator
     """
-
-    x       = Parameter(default=0)
-    y       = Parameter(default=0)
-    theta   = Parameter(default=0)
-    width   = Parameter(default=1)
-    height  = Parameter(default=1)
+    x       = Number(default=0.0,softbounds=(-1.0,1.0))
+    y       = Number(default=0.0,softbounds=(-1.0,1.0))
+    theta   = Number(default=0.0,softbounds=(0.0,2*pi))
+    width   = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
+    height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
 
     def function(self,**params):
         return rectangle( self.kernel_x, 
@@ -483,11 +474,12 @@ class FuzzyLineFactory(KernelFactory):
     """
     Fuzzy Line Generating Factory
     """
-    x              = Parameter(default=0)
-    y              = Parameter(default=0)
-    theta          = Parameter(default=0)
-    width          = Parameter(default=0.5)
-    gaussian_width = Parameter(default=0.2)
+    x       = Number(default=0.0,softbounds=(-1.0,1.0))
+    y       = Number(default=0.0,softbounds=(-1.0,1.0))
+    theta   = Number(default=0.0,softbounds=(0.0,2*pi))
+    width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
+    height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
+    gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     
     def function(self,**params):
         return fuzzy_line( self.kernel_x, 
@@ -501,11 +493,13 @@ class FuzzyDiskFactory(KernelFactory):
     """
     Fuzzy disk pattern generator
     """
-    x              = Parameter(default=0)
-    y              = Parameter(default=0)
-    disk_radius    = Parameter(default=0.2)
-    gaussian_width = Parameter(default=0.2)
-
+    x       = Number(default=0.0,softbounds=(-1.0,1.0))
+    y       = Number(default=0.0,softbounds=(-1.0,1.0))
+    theta   = Number(default=0.0,softbounds=(0.0,2*pi))
+    width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
+    disk_radius  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
+    gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
+    
     def function(self,**params):
         return fuzzy_disk( self.kernel_x, 
                            self.kernel_y, 
@@ -518,12 +512,13 @@ class FuzzyRingFactory(KernelFactory):
     """
     Fuzzy ring pattern generator
     """
+    x       = Number(default=0.0,softbounds=(-1.0,1.0))
+    y       = Number(default=0.0,softbounds=(-1.0,1.0))
+    theta   = Number(default=0.0,softbounds=(0.0,2*pi))
+    width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
+    disk_radius  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
+    gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
 
-    x              = Parameter(default=0)
-    y              = Parameter(default=0)
-    width          = Parameter(default=0.1)
-    disk_radius    = Parameter(default=0.2)
-    gaussian_width = Parameter(default=0.1)
 
     def function(self,**params):
         return fuzzy_ring(self.kernel_x, 
