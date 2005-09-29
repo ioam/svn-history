@@ -83,12 +83,10 @@ fancy footwork with exceptions must be done in order to get
 not (currently) guarantee that raised exceptions won't corrupt the
 event queue, but its implementation is much simpler and clearer and
 its performance is easier to inspect and debug.  Simulator is
-currently the default (i.e. renaming it as Simulator and making it the
-subclass of BaseSimulator rather than the superclass,) because
-toggling learning requries copies of the event queue.  For efficiency,
-e.g. for spiking neuron simulations, we'll probably need to replace
-the linear priority queue with a more efficient one.  Jeff have an
-O(log N) minheap implementation.  
+currently the default, because toggling learning requries copies of
+the event queue.  For efficiency, e.g. for spiking neuron simulations,
+we'll probably need to replace the linear priority queue with a more
+efficient one.  Jeff has an O(log N) minheap implementation.
 
 Note also that even though BaseSimulator may guarantee that the event
 queue isn't corrupted by a raised exception, there is no guarantee that
@@ -96,33 +94,6 @@ the internal state of the EP that raised the exception is sane, so
 it's not clear if the exception-safe aspect of sched.simulator is of
 particular value.
 
-
-* Connection classes *
-
-Currently, connections in the simulation's directed graph are not
-first-class objects in the system.  Rather, they are implemented as
-(dest,dest_port,delay) tuples stored in dictionaries indexed by
-src_port inside each individual EP (i.e. within each graph node).
-With the advent of Projection classes for CFSheets (see topo.cfsheet),
-it is worth considering whether to replace these tuples with an
-explicit Connection class, of which Projection would be a subclass.
-This class would encapsulate all data that parameterizes the
-connection.  This would simplify data structures somewhat, since
-Projection classes must also keep track of things like src and dest.
-It might also make future parallelization efforts easier, since each
-Connection object could conceivably maintain its own event queue, and
-since connections may naturally delimit independent and parallelizable
-computations within a simulation.  (This last point should be
-considered with care, since it is certainly not universally true,
-different connections will of course interact with one another within
-an EP.  The question of how much depends on the nature of the
-simulation.)
-
-Note that the EventProcessor.connections tracks the outgoing
-connections from an EP, while CFSheet.projections tracks the incoming
-projections.  If we standardize to use Connection objects, probably
-the EventProcessor class will have to keep track of both incoming and
-outgoing connections for each EP.
 
 $Id$
 """
@@ -141,12 +112,20 @@ STOP = "Simulator Stopped"
 
 Forever = -1
 
-
+### JABHACKALERT!
+###
+### Please eliminate this class, moving everything crucial from it into Simulator.
+### There doesn't seem to be much point in keeping this extra layer around, as
+### we seem often to need to access the event queue, and sched.scheduler
+### does not support that.
 class BaseSimulator(TopoObject):
     """
     A class to manage a simulation.  A simulator object manages the
     event queue, simulation clock, and list of EventProcessors, dispatching
-    events to them in time order, and moving the simulation clock as needed.    
+    events to them in time order, and moving the simulation clock as needed.
+
+    This implementation is based on sched.scheduler, but subclasses can
+    reimplement that if they want to.
     """
 
     step_mode = Parameter(default=False)
@@ -358,8 +337,14 @@ class Simulator(BaseSimulator):
     sched.scheduler object to manage events and dispatching.
     """
     class Event:
-        execfn = Parameter(default=False)
-        fn = Parameter(default=None)
+        ### JABHACKALERT!
+        ### 
+        ### Is there any reason to have the parameter execfn?  Seems like
+        ### all it does is declare whether to use fn, and isn't fn!=None enough?
+        ### If so, please delete execfn and just test fn==None instead.
+        ### If not, please document why it's needed.        
+        execfn = Parameter(default=False,doc="Whether to execute the fn")
+        fn = Parameter(default=None,doc="Function to execute when the event is processed")
 
         def __init__(self,time,src,dest,src_port,dest_port,data,execfn=False,fn=None):
             self.time = time
@@ -385,14 +370,16 @@ class Simulator(BaseSimulator):
         
     def continue_(self,duration=Forever,until=Forever):
 
+        # Complicated expression for min(time+duration,until)
         if duration == Forever and until == Forever:
-            stop_time = Forever     # runs forever
+            stop_time = Forever
         elif duration == Forever:
             stop_time = until
         elif until == Forever:
             stop_time = self.time() + duration
         else:
             stop_time = min(self.time()+duration,until)
+            
         did_event = False
         while self.events and (stop_time == Forever or self.time() < stop_time):
 
@@ -413,7 +400,7 @@ class Simulator(BaseSimulator):
 
                 # If the first event's time is greater than the
                 # current time then it's time to sleep (i.e. increment
-                # the clock) before doing that, give everyone a
+                # the clock).  Before doing that, give everyone a
                 # pre_sleep() call.
 
                 if did_event:
@@ -426,14 +413,12 @@ class Simulator(BaseSimulator):
                     
                 # set the time to the frontmost event (Note: the front
                 # event may have been changed by the .pre_sleep() calls).
-
                 self._time = self.events[0].time
             else:
 
                 # If it's not too late, and it's not too early, then
                 # it's just right!  So pop the event and dispatch it to
                 # its destination.
-
                 e = self.events.pop(0)
                 if not e.execfn:
                     e.dest.input_event(e.src,e.src_port,e.dest_port,e.data)
@@ -456,12 +441,10 @@ class Simulator(BaseSimulator):
 
     def enqueue_event_abs(self,time,src,dest,src_port=None,dest_port=None,data=None):
         """
-        Like enqueue_event_rel, except it schedules the event for some
-        absolute time.
+        Enqueue an event at an absolute simulator clock time.
         """
         self.debug("Enqueue absolute: from", (src,src_port),"to",(dest,dest_port),
                    "at time",self.time(),"for time",time)
-        # Used to be SimpleSimulator
         new_e = Simulator.Event(time,src,dest,src_port,dest_port,data)
 
         if not self.events or time >= self.events[-1].time:
@@ -474,14 +457,23 @@ class Simulator(BaseSimulator):
                 break
 
     def enqueue_event_rel(self,delay,src,dest,src_port=None,dest_port=None,data=None):
+        """
+        Enqueue an event at a time relative to the current simulator clock.
+        """
         self.enqueue_event_abs(self.time()+float(delay),
                                src,dest,src_port,dest_port,data)
 
+
+    ### JABHACKALERT!
+    ###    
+    ### This method should be renamed something more intuitively
+    ### obvious to the user, like "schedule_action".
     def sched_execfn(self,time,fn,*p):
         """
-        Like enqueue_event_abs, except it schedules a function to run at a
-        absolute time. This method should be used for functions that are
-        called occasionally, e.g. saving the weights of the sheets.
+        Enqueue a function call event at an absolute simulator clock time.
+        (Same as enqueue_event_abs, except for scheduling a function call and
+        not a generic event.) This method should be used for arbitrary
+        functions to be called at specific times, e.g. for saving snapshots.
 
         Usage: sched_execfn(time, function name, param 1, param 2, ...)
         """
@@ -500,17 +492,18 @@ class Simulator(BaseSimulator):
     def state_push(self):
         """
         Save the current scheduler to an internal stack, and create a
-        copy to continue with.
+        copy to continue with.  Useful for testing something while
+        being able to roll back to the original state.  The copy
+        of the scheduler includes a copy of all of the currently
+        scheduled events.
         """
         self._events_stack.append((self._time,self.events))
-        # Make new copy for self.events
         self.events = [copy(event) for event in self.events]
 
     def state_pop(self):
         """
         Pop a scheduler off the stack.  
         """
-        # Restore scheduler from stack
         self._time, self.events = self._events_stack.pop()
 
 
@@ -519,12 +512,46 @@ class Simulator(BaseSimulator):
         return len(self._events_stack)
 
     
+
         
+###   JABALERT!
+###   
+###   Instead of being tuples, connections should be made into proper
+###   objects (i.e., into instances of a new class called EPConnection)
+###   so that Projections could be subclasses of EPConnection.  That way
+###   Sheets wouldn't need any code to keep track of Projections. 
+###   The comments below have more background on this approach.
+###   
+###     Currently, connections in the simulation's directed graph are not
+###     first-class objects in the system.  Rather, they are implemented as
+###     (dest,dest_port,delay) tuples stored in dictionaries indexed by
+###     src_port inside each individual EP (i.e. within each graph node).
+###     With the advent of Projection classes for CFSheets (see topo.cfsheet),
+###     it is worth considering whether to replace these tuples with an
+###     explicit Connection class, of which Projection would be a subclass.
+###     This class would encapsulate all data that parameterizes the
+###     connection.  This would simplify data structures somewhat, since
+###     Projection classes must also keep track of things like src and dest.
+###     It might also make future parallelization efforts easier, since each
+###     Connection object could conceivably maintain its own event queue, and
+###     since connections may naturally delimit independent and parallelizable
+###     computations within a simulation.  (This last point should be
+###     considered with care, since it is certainly not universally true,
+###     different connections will of course interact with one another within
+###     an EP.  The question of how much depends on the nature of the
+###     simulation.)
+###     
+###     Note that the EventProcessor.connections tracks the outgoing
+###     connections from an EP, while CFSheet.projections tracks the incoming
+###     projections.  If we standardize to use Connection objects, probably
+###     the EventProcessor class will have to keep track of both incoming and
+###     outgoing connections for each EP.
 class EventProcessor(TopoObject):
     """
-    Base class for EventProcessors. Handles basic mechanics of
-    connections and sending events.  Also handles the EP's dictionary
-    of output ports and outgoing  connections.
+    Base class for EventProcessors, i.e. objects that can accept and
+    handle events.  This base calss handles the basic mechanics of
+    connections and sending events, and also stores the EP's
+    dictionaries of output ports and outgoing connections.
     """
     def __init__(self,**config):
         super(EventProcessor,self).__init__(**config)
@@ -567,13 +594,13 @@ class EventProcessor(TopoObject):
     def start(self):
         """
         Called by the simulator when a new simulation starts.  By
-        default, do nothing. 
+        default, does nothing. 
         """
         pass
 
     def send_output(self,src_port=None,data=None):
         """
-        Send some data out all connections.
+        Send some data out to all connections on the given src_port.
         """
         for dest,dest_port,delay in self.connections[src_port]:
             self.simulator.enqueue_event_rel(delay,self,dest,src_port,dest_port,data)
@@ -581,7 +608,7 @@ class EventProcessor(TopoObject):
     def input_event(self,src,src_port,dest_port,data):
         """
         Called by the simulator to dispatch an event on the given port
-        from src.  (By default do nothing)
+        from src.  (By default, does nothing.)
         """
         pass
     
@@ -589,7 +616,7 @@ class EventProcessor(TopoObject):
         """
         Called by the simulator before sleeping.  Allows the event processor
         to send any events that must be sent before time advances.
-        (by default, do nothing)
+        (By default, does nothing.)
         """
         pass
     
