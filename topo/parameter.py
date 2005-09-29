@@ -79,9 +79,15 @@ class Parameter(object):
     """
     Initialize a new parameter.
 
+
+    Set the name of the parameter 
     Set the name of the parameter to a gensym, and initialize
     the default value.
     """
+    # CEB:
+    # parameter name should probably match the variable name, e.g.
+    # x = Parameter()
+    # x.name = 'x'
     self.name = "_param" + `Parameter.count`
     self.doc = doc
     Parameter.count += 1
@@ -98,7 +104,6 @@ class Parameter(object):
     else:
         result = obj.__dict__.get(self.name,self.default)
     return result
-
 
 
   def __set__(self,obj,val):
@@ -125,42 +130,72 @@ class Parameter(object):
   __doc__ = property(_get_doc)
 
 
-### JABHACKALERT!
-###
-### I guess this is not a hack per se, but Number and the other
-### numeric classes below need to be extended somehow to allow soft
-### bounds as well as the current hard ones.  The soft bound would
-### specify a typical range, to suggest bounds for e.g. a GUI slider
-### for this quantity, but would not enforce those bounds.  E.g. there
-### could be an extra tuple parameter ",enforce=(True,True)' (by
-### default).  Of course, the bounds would only be enforced if not
-### None.
-###
-### JBD: This is also important for a flexible and dynamic
-### InputParamsPanel since the sliders need to have different values
-### depending upon the kernel type.
   
 class Number(Parameter):
-  def __init__(self,default=None,bounds=(None,None)):
-    Parameter.__init__(self,default=default)
+  """
+  Number is a numeric parameter. Numbers have a default value, and bounds.
+  There are two types of bounds: `bounds' and `softbounds'.`bounds' are
+  hard bounds: the parameter must have a value within the specified range.
+  The default bounds are (None,None), meaning there are actually no hard bounds.
+  One or both bounds can be set by specifying a value (e.g. bounds=(None,10) means
+  there is no lower bound, and an upper bound of 10).
+  Bounds are checked when a Number is created, and whenever its value is set.
+
+  `softbounds' are present to indicate the typical range of the parameter, but are
+  not enforced. Setting the soft bounds allows, for instance, a GUI to know what values
+  to display on sliders for the Number.
+
+  Example of creating a parameter:
+  AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
+  """
+  def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),doc="Undocumented parameter"):
+    Parameter.__init__(self,default=default,doc=doc)
     self.bounds = bounds
-    
+    self._softbounds = softbounds  
+    self._check_bounds(default)
+
   def __set__(self,obj,val):
+    self._check_bounds(val)        
+    super(Number,self).__set__(obj,val)
+
+  def _check_bounds(self,val):
+    """
+    Checks that the value is numeric, and checks the hard bounds
+    """
+
+    # CEB: all the following error messages should probably print out the parameter's name
+    # ('x', 'theta', or whatever)
     if not (isinstance(val,int) or isinstance(val,float)):
-      raise "Parameter only takes a numeric value."
+      raise "Parameter " + `self.name` + " (" + `self.__class__` + ") only takes a numeric value."
 
     min,max = self.bounds
     if min != None and max != None:
       if not (min <= val <= max):
-        raise "Parameter must be between"+`min`+'and'+`max`+', inclusive.'
+        raise "Parameter must be between " + `min` + ' and ' + `max` + ' (inclusive).'
     elif min != None:
       if not min <= val: 
-        raise "Parameter must be at least"+`min`+'.'
+        raise "Parameter must be at least " + `min` + '.'
     elif max != None:
       if not val <= max:
         raise "Parameter must be at most"+`min`+'.'
+
+  def get_soft_bounds(self):
+    """
+    For each soft bound (upper and lower), if there is a defined bound (not equal to None)
+    then it is returned, otherwise it defaults to the hard bound. The hard bound could still be None.
+    """
+    if not (self.softbounds[0]==None):
+      lower_bound = self.softbounds[0]
+    else:
+      lower_bound = self.bounds[0]
+
+    if not (self.softbounds[1]==None):
+      upper_bound = self.softbounds[1]
+    else:
+      upper_bound = self.bounds[1]
+
+    return (lower_bound, upper_bound)
         
-    super(Number,self).__set__(obj,val)
 
 class Integer(Number):
   def __set__(self,obj,val):
@@ -168,22 +203,13 @@ class Integer(Number):
       raise "Parameter must be an integer."
     super(Integer,self).__set__(obj,val)
 
-class NonNegativeInt(Integer):
-  def __init__(self,default=0):
-    Integer.__init__(self,default=default,bounds=(0,None))
-
-class PositiveInt(Integer):
-  def __init__(self,default=1):
-    Integer.__init__(self,default=default,bounds=(1,None))
-                    
 class Magnitude(Number):
-  def __init__(self,default=1):
-    Number.__init__(self,default=default,bounds=(0.0,1.0))
-
+  def __init__(self,default=1.0,softbounds=(None,None),doc="Undocumented paramter"):
+    Number.__init__(self,default=default,bounds=(0.0,1.0),softbounds=softbounds,doc=doc)
 
 class BooleanParameter(Parameter):
-  def __init__(self,default=False,bounds=(0,1)):
-    Parameter.__init__(self,default=default)
+  def __init__(self,default=False,bounds=(0,1),doc="Undocumented paramter"):
+    Parameter.__init__(self,default=default,doc=doc)
     self.bounds = bounds
     
   def __set__(self,obj,val):
