@@ -129,7 +129,6 @@ class Parameter(object):
     return self.doc
   __doc__ = property(_get_doc)
 
-
   
 class Number(Parameter):
   """
@@ -139,63 +138,101 @@ class Number(Parameter):
   The default bounds are (None,None), meaning there are actually no hard bounds.
   One or both bounds can be set by specifying a value (e.g. bounds=(None,10) means
   there is no lower bound, and an upper bound of 10).
-  Bounds are checked when a Number is created, and whenever its value is set.
+  
+  Bounds are checked when a Number is created. Using a default value outside the hard bounds,
+  or one that is not numeric, results in an exception. It is therefore not possible to create
+  a parameter with a default value that is inconsistent with the bounds.
+
+  Bounds are also checked when an attempt is made to change a Number's value.
+  Failure of the candidate value to be within the bounds and of the right type does not result
+  in an exception - instead, the following rules apply:
+  - value is larger than upper bound: Number set to maximum bound
+  - value is smaller than lower bound: Number set to minimum bound
+  - value is not numeric: Number set to the default
 
   `softbounds' are present to indicate the typical range of the parameter, but are
   not enforced. Setting the soft bounds allows, for instance, a GUI to know what values
   to display on sliders for the Number.
 
-  Example of creating a parameter:
+  Example of creating a Number:
   AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
   """
   def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),doc=""):
     Parameter.__init__(self,default=default,doc=doc)
     self.bounds = bounds
     self._softbounds = softbounds  
-    self._check_bounds(default)
+    self._check_bounds(default)  # only create this number if the default value and bounds are consistent
 
   def __set__(self,obj,val):
-    self._check_bounds(val)        
-    super(Number,self).__set__(obj,val)
+    bounded_val = self._bound(val)          
+    super(Number,self).__set__(obj,bounded_val)
+
+  def _bound(self,val):
+    """
+    Whatever the value passed in, makes sure the value returned is within in the hard bounds.
+  
+    If a numeric value is passed in, check it is within the hard bounds. If it is larger
+    than the high bound, return the high bound. If it's smaller, return
+    the low bound. In either case, the returned value could be None.
+    If a non-numeric value is passed in, set to be the default value (which could be None).
+    """
+    if (isinstance(val,int) or isinstance(val,float)):
+      min, max = self.bounds 
+      if min != None: 
+        if val < min:
+          # CEB: should there be a warning for the user here?
+          return  min
+        
+      if max != None:
+        if val > max:
+          # CEB: should there be a warning for the user here?
+          return max
+    
+    else:
+      # non-numeric value sent in: reverts to default value
+      return  self.default
+
+    return val
+        
+    
 
   def _check_bounds(self,val):
     """
-    Checks that the value is numeric, and checks the hard bounds
+    Checks that the value is numeric, and checks it is within the hard bounds
     """
 
     # CEB: all the following error messages should probably print out the parameter's name
     # ('x', 'theta', or whatever)
     if not (isinstance(val,int) or isinstance(val,float)):
-      raise "Parameter " + `self.name` + " (" + `self.__class__` + ") only takes a numeric value."
+      raise _NumberBoundsException("Parameter " + `self.name` + " (" + `self.__class__` + ") only takes a numeric value.")
 
     min,max = self.bounds
     if min != None and max != None:
       if not (min <= val <= max):
-        raise "Parameter must be between " + `min` + ' and ' + `max` + ' (inclusive).'
+        raise _NumberBoundsException("Parameter must be between " + `min` + ' and ' + `max` + ' (inclusive).')
     elif min != None:
       if not min <= val: 
-        raise "Parameter must be at least " + `min` + '.'
+        raise _NumberBoundsException("Parameter must be at least " + `min` + '.')
     elif max != None:
       if not val <= max:
-        raise "Parameter must be at most"+`min`+'.'
+        raise _NumberBoundsException("Parameter must be at most " + `min` + '.')
 
   def get_soft_bounds(self):
     """
     For each soft bound (upper and lower), if there is a defined bound (not equal to None)
     then it is returned, otherwise it defaults to the hard bound. The hard bound could still be None.
     """
-    if not (self.softbounds[0]==None):
-      lower_bound = self.softbounds[0]
-    else:
-      lower_bound = self.bounds[0]
+    hl,hu = self.bounds
+    sl,su = self._softbounds
 
-    if not (self.softbounds[1]==None):
-      upper_bound = self.softbounds[1]
-    else:
-      upper_bound = self.bounds[1]
+    if (sl==None): l = hl
+    else:          l = sl
 
-    return (lower_bound, upper_bound)
-        
+    if (su==None): u = hu
+    else:          u = su
+
+    return (l,u)
+
 
 class Integer(Number):
   def __set__(self,obj,val):
@@ -220,6 +257,16 @@ class BooleanParameter(Parameter):
 
         raise "BooleanParameter must be True or False"
     super(BooleanParameter,self).__set__(obj,val)
+
+
+# CEB: I'm not sure where this class should go.
+# It's the exception raised when there is an attempt
+# to create a Number with a default outside its hard bounds.
+class _NumberBoundsException(Exception):
+        def __init__(self, value):
+            self.value = value
+        def __str__(self):
+            return repr(self.value)
 
 
 class Dynamic(Parameter):
@@ -257,3 +304,8 @@ def is_iterator(obj):
   return type(obj) == types.GeneratorType or ('__iter__' in dir(obj) and 'next' in dir(obj))
 
 
+
+
+
+
+          
