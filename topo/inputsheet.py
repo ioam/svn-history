@@ -5,6 +5,13 @@ parameters from a random distribution.
 $Id$
 """
 
+### JABALERT!
+### 
+### This file and class should be renamed GeneratorSheet.  InputSheet
+### is confusing because such sheets do not actually accept inputs;
+### they could just as easily be called OutputSheets, since they are
+### output-only.  What they really do is generate patterns.
+
 from sheet import Sheet 
 from utils import NxN
 
