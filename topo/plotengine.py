@@ -49,6 +49,12 @@ be protected as much as possible while remaining flexible.
 
 $Id$
 """
+
+### JABHACKALERT!
+### 
+### The code in this file has not yet been reviewed, and may need
+### substantial changes.
+
 from copy import deepcopy
 from base import TopoObject
 from utils import flatten
@@ -351,7 +357,3 @@ class PlotEngine(TopoObject):
 
         self.debug('Type of new_group is', type(new_group))
         return new_group
-
-####################
-
-

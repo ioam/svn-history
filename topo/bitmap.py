@@ -40,6 +40,11 @@ The constructed Image is then in [BitmapObject].bitmap.
 $Id$
 """
 
+### JABHACKALERT!
+### 
+### The code in this file has not yet been reviewed, and may need
+### substantial changes.
+
 from colorsys import rgb_to_hsv, hsv_to_rgb
 import Numeric, Image, math
 from Numeric import Float
@@ -290,8 +295,3 @@ class RGBMap(Bitmap):
         bImage = self.arrayToImage(bMapArray)
 
         super(RGBMap,self).__init__(Image.merge('RGB',(rImage,gImage,bImage)))
-
-
-
-#  All testing code has been moved to the unit testing module found at
-#  topographica/tests/testbitmap.py

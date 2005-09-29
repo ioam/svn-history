@@ -20,6 +20,11 @@ import topo.plotengine
 import topo.registry
 from topo.utils import *
 
+### JABHACKALERT!
+### 
+### Not yet properly implemented; all the code in this file needs to
+### be either implemented or removed.
+
 class PlotFileSaver(topo.base.TopoObject):
     def __init__(self,**config):
         super(PlotFileSaver,self).__init__(**config)

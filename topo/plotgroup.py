@@ -8,6 +8,12 @@ displayed in a GUI window, as saved to a file.
 
 $Id$
 """
+
+### JABHACKALERT!
+### 
+### The code in this file has not yet been reviewed, and may need
+### substantial changes.
+
 import types
 from base import TopoObject
 from utils import flatten

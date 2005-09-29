@@ -35,6 +35,12 @@ Kinds of PlotTemplates:
 
 $Id$
 """
+
+### JABHACKALERT!
+### 
+### The code in this file has not yet been reviewed, and may need
+### substantial changes.
+
 import sys
 import types
 
@@ -300,6 +306,3 @@ class Plot(TopoObject):
         
         return self
 
-
-# No Main code.  All testing takes place in the unit testing mechanism
-# to be found in ~/topographica/tests/testplot.py

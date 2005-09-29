@@ -44,6 +44,11 @@ from parameter import Dynamic
 from bitmap import BLACK_BACKGROUND, WHITE_BACKGROUND
 import plot
 
+### JABHACKALERT!
+### 
+### Not yet properly implemented; all the code in this file needs to
+### be either implemented or removed.
+
 class Palette(TopoObject):
     """
     Each palette has 3*256 values that are keyed by an index.
