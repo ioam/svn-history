@@ -23,7 +23,7 @@ KernelFactory.
 The CFSheet class should be sufficient to create a non-learning sheet
 that computes its activity via the contribution of many local
 connection fields.  The activity output can be changed by changing
-the parameters CFSheet.activity_fn and CFSheet.transfer_fn.  (See
+the parameters CFSheet.activation_fn and CFSheet.transfer_fn.  (See
 CFSheet class documentation for more details).  To implement learning
 one must create a subclass and override the default .learn() method.
 
@@ -53,7 +53,7 @@ add a .stimulation(input_activity) method to the Projection class
 interface that would by default do what CFSheet does now.  Then
 CFSheet would, on input, just call the .stimulation() methods on the
 appropriate projections and add the results to its .temp_activity
-matrix.  In this scenario, the activity_fn parameter would move to
+matrix.  In this scenario, the activation_fn parameter would move to
 Projection, or, better one of its subclasses, since one could conceive
 of Projections that compute their stimulation through some entirely
 different algorithm.
@@ -212,7 +212,7 @@ class Projection(TopoObject):
     """
     Projection takes one parameter:
 
-    activity_fn: A function f(X,W) that takes two identically shaped
+    activation_fn: A function f(X,W) that takes two identically shaped
     matrices X (the input) and W (the ConnectionField weights) and
     computes a scalar stimulation value based on those weights.  The
     default is plastk.utils.mdot
@@ -229,7 +229,7 @@ class Projection(TopoObject):
     ### informative, i.e. whatever it actually is.  In this case it's
     ### not really an activity, just the scalar result of applying
     ### the weight matrix to the input matrix.
-    activity_fn = Parameter(default=mdot)
+    activation_fn = Parameter(default=mdot)
     src = Parameter(default=None)
     dest = Parameter(default=None)
     cf_type = Parameter(default=ConnectionField)
@@ -349,7 +349,7 @@ class KernelProjection(Projection):
     ### activity function (for generality).        
     def compute_response(self,input_activity, rows, cols):
         self.input_buffer = input_activity
-        if self.activity_fn.func_name == "compute_response_mdot_c":
+        if self.activation_fn.func_name == "compute_response_mdot_c":
             # compute_response_mdot_c computes the mdot for all the units
             compute_response_mdot_c(input_activity, rows, cols, self.temp_activity, self.cfs, self.strength)
 	else:
@@ -359,7 +359,7 @@ class KernelProjection(Projection):
                     r1,r2,c1,c2 = cf.slice
                     X = input_activity[r1:r2,c1:c2]
 
-                    self.temp_activity[r,c] = self.activity_fn(X,cf.weights)
+                    self.temp_activity[r,c] = self.activation_fn(X,cf.weights)
             self.temp_activity *= self.strength
 
 
