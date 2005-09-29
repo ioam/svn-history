@@ -2,13 +2,19 @@
 Hisogram object that both calculates, and holds information about
 a 2D matrix of data.
 
-STUB CLASS ONLY.  GENERIC INPUT AND OUTPUT DATA TO ALLOW DEVELOPMENT
-IN OTHER AREAS.
-
 $Id$
 """
 from base import *
 import types
+
+
+### JABHACKALERT!
+### 
+### This file is unimplemented; it needs to be implemented or
+### deleted.
+### 
+### JBD: STUB CLASS ONLY.  GENERIC INPUT AND OUTPUT DATA TO ALLOW DEVELOPMENT
+### IN OTHER AREAS.
 
 # For stub calculation
 import Numeric
