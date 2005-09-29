@@ -274,7 +274,7 @@ def rectangle(kernel_x, kernel_y, width, height):
 
     return bitwise_and(where(kernel_x<=width/2,1,0),where(kernel_y<=height/2,1,0))
 
-
+# CEB: going to re-implement this (to be the way it's done in LISSOM)
 def fuzzy_line(kernel_x, kernel_y, width, gaussian_width):
     """
     Maximum-length line with a solid central region, then Gaussian fall-off at the edges. 
@@ -365,6 +365,9 @@ class KernelFactory(base.TopoObject):
 ### because they are not quite like the Factory design pattern.  They
 ### should also move to their own file, so that it will be clearer how
 ### to extend to add new patterns.
+
+# CEB: ? x, y, etc. don't need to be declared in each of the subclasses:
+#      they could be moved to KernelFactory.        
 class GaussianFactory(KernelFactory):
     """
     Gaussian pattern generator
