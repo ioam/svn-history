@@ -8,11 +8,7 @@ import tyimputil
 ### JABHACKALERT!
 ### 
 ### Surely not all of these packages need to be imported by default.
-### E.g. everything still seems to work if I skip "import gui" and
-### run the simulator without a GUI, so presumably "import gui" 
-### should be omitted unless a GUI is actually requested.
-### 
-### Similarly, why on earth would cfsom need to be imported by everyone?
+### E.g., why on earth would cfsom need to be imported by everyone?
 ### Surely that is useful only to people actually using a CFSOM.
 ### 
 ### Most of the other packages below seem optional, and it does not
