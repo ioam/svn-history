@@ -187,12 +187,12 @@ Subsystem 4. ValueGenerators
 - Add examples of random, increment, reference, etc. value generators.
 
 Subsystem 5. Parameter handling, dictionaries, documentation
-- Add online help support.
+- Add online help support. (done)
 
 - Generate user reference documentation, as opposed to code documentation.
 
 - Add library of standard parameter types (boolean, tristate, int,
-  float, string, range, subregion, color).
+  float, string, range, subregion, color). (done)
 
 Subsystem 6. Binary file saving 
 - Implement binary file saving, using CDF, HDF, or something like it.
@@ -235,7 +235,7 @@ Subsystem 14. Bounding box class
   the edge of a sheet. (intersections done)
 
 Subsystem 15. Bounded number type
-- Make most parameters use bounded ranges.
+- Make most parameters use bounded ranges. (done)
 
 Subsystem 16. Scaling objects
 - Consider adding a general mechanism for scaling values from one
