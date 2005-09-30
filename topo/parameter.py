@@ -132,27 +132,27 @@ class Parameter(object):
   
 class Number(Parameter):
   """
-  Number is a numeric parameter. Numbers have a default value, and bounds.
-  There are two types of bounds: `bounds' and `softbounds'.`bounds' are
-  hard bounds: the parameter must have a value within the specified range.
-  The default bounds are (None,None), meaning there are actually no hard bounds.
-  One or both bounds can be set by specifying a value (e.g. bounds=(None,10) means
+  Number is a numeric parameter. Numbers have a default value, and
+  bounds.  There are two types of bounds: `bounds' and
+  `softbounds'.`bounds' are hard bounds: the parameter must have a
+  value within the specified range.  The default bounds are
+  (None,None), meaning there are actually no hard bounds.  One or both
+  bounds can be set by specifying a value (e.g. bounds=(None,10) means
   there is no lower bound, and an upper bound of 10).
   
-  Bounds are checked when a Number is created. Using a default value outside the hard bounds,
-  or one that is not numeric, results in an exception. It is therefore not possible to create
-  a parameter with a default value that is inconsistent with the bounds.
+  Bounds are checked when a Number is created or set. Using a default
+  value outside the hard bounds, or one that is not numeric, results
+  in an exception. It is therefore not possible to create a parameter
+  with a default value that is inconsistent with the bounds.
 
-  Bounds are also checked when an attempt is made to change a Number's value.
-  Failure of the candidate value to be within the bounds and of the right type does not result
-  in an exception - instead, the following rules apply:
-  - value is larger than upper bound: Number set to maximum bound
-  - value is smaller than lower bound: Number set to minimum bound
-  - value is not numeric: Number set to the default
+  A separate function set_in_bounds() is provided that will silently
+  crop the given value into the legal range, for use in, for instance,
+  a GUI.
 
-  `softbounds' are present to indicate the typical range of the parameter, but are
-  not enforced. Setting the soft bounds allows, for instance, a GUI to know what values
-  to display on sliders for the Number.
+  `softbounds' are present to indicate the typical range of the
+  parameter, but are not enforced. Setting the soft bounds allows, for
+  instance, a GUI to know what values to display on sliders for the
+  Number.
 
   Example of creating a Number:
   AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
@@ -164,28 +164,44 @@ class Number(Parameter):
     self._check_bounds(default)  # only create this number if the default value and bounds are consistent
 
   def __set__(self,obj,val):
-    bounded_val = self._bound(val)          
+    """
+    Set to the given value, raising an exception if out of bounds.
+    """
+    self._check_bounds(val)
+    super(Number,self).__set__(obj,val)
+
+  def set_in_bounds(self,obj,val):
+    """
+    Set to the given value, but cropped to be within the legal bounds.
+    All objects are accepted, and no exceptions will be raised.  See
+    crop_to_bounds for details on how cropping is done.
+    """
+    bounded_val = self.crop_to_bounds(val)
     super(Number,self).__set__(obj,bounded_val)
 
-  def _bound(self,val):
+  def crop_to_bounds(self,val):
     """
-    Whatever the value passed in, makes sure the value returned is within in the hard bounds.
+    Return the given value cropped to be within the hard bounds
+    for this parameter.
   
-    If a numeric value is passed in, check it is within the hard bounds. If it is larger
-    than the high bound, return the high bound. If it's smaller, return
-    the low bound. In either case, the returned value could be None.
-    If a non-numeric value is passed in, set to be the default value (which could be None).
+    If a numeric value is passed in, check it is within the hard
+    bounds. If it is larger than the high bound, return the high
+    bound. If it's smaller, return the low bound. In either case, the
+    returned value could be None.  If a non-numeric value is passed
+    in, set to be the default value (which could be None).  In no
+    case is an exception raised; all values are accepted.
     """
-    if (isinstance(val,int) or isinstance(val,float)):
+    # Currently, values outside the bounds are silently cropped to
+    # be inside the bounds; it may be appropriate to add a warning
+    # in such cases.
+    if (is_number(val)):
       min, max = self.bounds 
       if min != None: 
         if val < min:
-          # CEB: should there be a warning for the user here?
           return  min
         
       if max != None:
         if val > max:
-          # CEB: should there be a warning for the user here?
           return max
     
     else:
@@ -198,12 +214,13 @@ class Number(Parameter):
 
   def _check_bounds(self,val):
     """
-    Checks that the value is numeric, and checks it is within the hard bounds
+    Checks that the value is numeric and that it is within the hard
+    bounds; if not, an exception is raised.
     """
 
     # CEB: all the following error messages should probably print out the parameter's name
     # ('x', 'theta', or whatever)
-    if not (isinstance(val,int) or isinstance(val,float)):
+    if not (is_number(val)):
       raise _NumberBoundsException("Parameter " + `self.name` + " (" + `self.__class__` + ") only takes a numeric value.")
 
     min,max = self.bounds
@@ -259,16 +276,6 @@ class BooleanParameter(Parameter):
     super(BooleanParameter,self).__set__(obj,val)
 
 
-# CEB: I'm not sure where this class should go.
-# It's the exception raised when there is an attempt
-# to create a Number with a default outside its hard bounds.
-class _NumberBoundsException(Exception):
-        def __init__(self, value):
-            self.value = value
-        def __str__(self):
-            return repr(self.value)
-
-
 class Dynamic(Parameter):
   def __get__(self,obj,objtype):
     """
@@ -283,11 +290,22 @@ class Dynamic(Parameter):
     return result
 
 
+class _NumberBoundsException(Exception):
+  """
+  This exception should be raised when there is an attempt
+  to create a Number with a default outside its hard bounds.
+  """
+  def __init__(self, value):
+    self.value = value
+  def __str__(self):
+    return repr(self.value)
+
+
 def produce_value(value_obj):
   """
-  A helper function, produces an actual parameter from a stored
+  A helper function that produces an actual parameter from a stored
   object.  If the object is callable, call it, else if it's an
-  iterator, call its .next(), otherwise return the object
+  iterator, call its .next(), otherwise return the object.
   """
   if callable(value_obj):
       return value_obj()
@@ -304,6 +322,12 @@ def is_iterator(obj):
   return type(obj) == types.GeneratorType or ('__iter__' in dir(obj) and 'next' in dir(obj))
 
 
+def is_number(obj):
+  """
+  Predicate that returns whether an object is a number.
+  """
+  # This may need to be extended to work with FixedPoint values.
+  return (isinstance(obj,int) or isinstance(obj,float))
 
 
 
