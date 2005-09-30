@@ -84,7 +84,7 @@ __version__ = '$Revision$'
 
 from parameter import *
 from sheet import Sheet
-from kernelfactory import UniformRandomFactory
+from topo.patterns.random import UniformRandomFactory
 from utils import mdot
 from boundingregion import Intersection,BoundingBox
 import RandomArray,Numeric,copy

@@ -18,6 +18,8 @@ from topo.utils import *
 from topo.learningrules import *
 import weave
 import Numeric
+from topo.patterns.random import UniformRandomFactory
+from topo.patterns.basic import GaussianFactory
 
 
 from topo.utils import msum

@@ -12,7 +12,8 @@ from topo.cfsheet import KernelProjection
 from topo.plotfilesaver import ImageSaver
 from topo.parameter import Dynamic
 from models.cfsom import CFSOM
-
+from topo.patterns.random import UniformRandomFactory
+from topo.patterns.basic import FuzzyLineFactory
 
 
 ###########################################
