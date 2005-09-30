@@ -231,17 +231,15 @@ class KernelFactory(base.TopoObject):
         self.kernel_x, self.kernel_y = produce_rotated_matrices(xm-x,ym-y,theta)
 
 
-#########################################################
-# Kernel Factory Objects
-#
-#
-
 ### JABHACKALERT!
 ###
 ### The variables x, y, etc. don't need to be declared in each of the
 ### Factory subclasses, and should be moved to KernelFactory once
 ### inputparamspanel.py is fixed.
 
+# Trivial example of a KernelFactory, provided for when a default is
+# needed.  The other specific KernelFactory classes are stored in
+# patterns/, to be imported as needed.
 class SolidFactory(KernelFactory):
     """
     Solid-color pattern generator.
@@ -252,174 +250,6 @@ class SolidFactory(KernelFactory):
     def function(self,**params):
         return self.kernel_x*0+1
 
-class GaussianFactory(KernelFactory):
-    """
-    Gaussian pattern generator
-    """
-    x       = Number(default=0.0,softbounds=(-1.0,1.0))
-    y       = Number(default=0.0,softbounds=(-1.0,1.0))
-    theta   = Number(default=0.0,softbounds=(0.0,2*pi))
-    width   = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
-    height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
+# Register this KernelFactory for public use.
+topo.registry.kernel_factories['SolidFactory']=SolidFactory
 
-    def function(self,**params):
-        return gaussian( self.kernel_x, 
-                         self.kernel_y, 
-                         params.get('width',self.width), 
-                         params.get('height',self.height)) 
-
-
-class SineGratingFactory(KernelFactory):
-    """
-    Sine grating pattern generator
-    """
-    x       = Number(default=0.0,softbounds=(-1.0,1.0))
-    y       = Number(default=0.0,softbounds=(-1.0,1.0))
-    theta   = Number(default=0.0,softbounds=(0.0,2*pi))
-    frequency = Number(default=5.0,bounds=(0.0,None),softbounds=(0.0,10.0))
-    phase     = Number(default=pi/2,bounds=(0.0,None),softbounds=(0.0,2*pi))
-
-    def function(self,**params):
-        return sine_grating( self.kernel_x,
-                             self.kernel_y,
-                             params.get('frequency',self.frequency), 
-                             params.get('phase',self.phase)) 
-
-
-class SquareGratingFactory(KernelFactory):
-    """
-    Square grating pattern generator
-    """
-    x       = Number(default=0.0,softbounds=(-1.0,1.0))
-    y       = Number(default=0.0,softbounds=(-1.0,1.0))
-    theta   = Number(default=0.0,softbounds=(0.0,2*pi))
-    frequency = Number(default=5.0,bounds=(0.0,None),softbounds=(0.0,10.0))
-    phase     = Number(default=pi/2,bounds=(0.0,None),softbounds=(0.0,2*pi))
-
-    def function(self,**params):
-        return square_grating( self.kernel_x,
-                             self.kernel_y,
-                             params.get('frequency',self.frequency), 
-                             params.get('phase',self.phase)) 
-
-
-class GaborFactory(KernelFactory):
-    """
-    Gabor pattern generator
-    """
-    x       = Number(default=0.0,softbounds=(-1.0,1.0))
-    y       = Number(default=0.0,softbounds=(-1.0,1.0))
-    theta   = Number(default=0.0,softbounds=(0.0,2*pi))
-    frequency = Number(default=5.0,bounds=(0.0,None),softbounds=(0.0,10.0))
-    phase     = Number(default=pi/2,bounds=(0.0,None),softbounds=(0.0,2*pi))
-    width   = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
-    height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
-
-    def function(self,**params):
-        return gabor( self.kernel_x,
-                      self.kernel_y,
-                      params.get('width',self.width),
-                      params.get('height',self.height),
-                      params.get('frequency',self.frequency),
-                      params.get('phase',self.phase))  
-
-  
-class UniformRandomFactory(KernelFactory):
-    """
-    Uniform random noise pattern generator
-    """
-    x       = Number(default=0.0,softbounds=(-1.0,1.0))
-    y       = Number(default=0.0,softbounds=(-1.0,1.0))
-    min     = Number(default=0.0,bounds=(0.0,1.0),softbounds=(0.0,1.0))
-    max     = Number(default=1.0,bounds=(0.0,1.0),softbounds=(0.0,1.0))
-    
-    def function(self,**params):
-        return uniform_random( self.kernel_x, self.kernel_y,
-                               params.get('min',self.min),
-                               params.get('max',self.max)) 
-
-
-class RectangleFactory(KernelFactory):
-    """
-    Rectangle pattern generator
-    """
-    x       = Number(default=0.0,softbounds=(-1.0,1.0))
-    y       = Number(default=0.0,softbounds=(-1.0,1.0))
-    theta   = Number(default=0.0,softbounds=(0.0,2*pi))
-    width   = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
-    height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
-
-    def function(self,**params):
-        return rectangle( self.kernel_x, 
-                          self.kernel_y, 
-                          params.get('width',self.width),
-                          params.get('height',self.height))  
-
-
-class FuzzyLineFactory(KernelFactory):
-
-    """
-    Fuzzy Line Generating Factory
-    """
-    x       = Number(default=0.0,softbounds=(-1.0,1.0))
-    y       = Number(default=0.0,softbounds=(-1.0,1.0))
-    theta   = Number(default=0.0,softbounds=(0.0,2*pi))
-    width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
-    height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
-    gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
-    
-    def function(self,**params):
-        return fuzzy_line( self.kernel_x, 
-                           self.kernel_y,
-                           params.get('width',self.width),
-                           params.get('gaussian_width',self.gaussian_width))  
-
-
-class FuzzyDiskFactory(KernelFactory):
-
-    """
-    Fuzzy disk pattern generator
-    """
-    x       = Number(default=0.0,softbounds=(-1.0,1.0))
-    y       = Number(default=0.0,softbounds=(-1.0,1.0))
-    theta   = Number(default=0.0,softbounds=(0.0,2*pi))
-    width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
-    disk_radius  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
-    gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
-    
-    def function(self,**params):
-        return fuzzy_disk( self.kernel_x, 
-                           self.kernel_y, 
-                           params.get('disk_radius',self.disk_radius), 
-                           params.get('gaussian_width',self.gaussian_width))  
-    
-
-
-class FuzzyRingFactory(KernelFactory):
-    """
-    Fuzzy ring pattern generator
-    """
-    x       = Number(default=0.0,softbounds=(-1.0,1.0))
-    y       = Number(default=0.0,softbounds=(-1.0,1.0))
-    theta   = Number(default=0.0,softbounds=(0.0,2*pi))
-    width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
-    disk_radius  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
-    gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
-
-
-    def function(self,**params):
-        return fuzzy_ring(self.kernel_x, 
-                          self.kernel_y,
-                          params.get('disk_radius',self.disk_radius),
-                          params.get('width',self.width),
-                          params.get('gaussian_width',self.gaussian_width))  
-    
-
-# Populate the KernelFactory registry:
-if __name__ != '__main__':
-    l = locals()
-    for i in l.keys():
-        if (type(l[i]) is type(KernelFactory)) \
-               and issubclass(l[i],KernelFactory) \
-               and i != 'KernelFactory':
-            topo.registry.kernel_factories[i] = l[i]

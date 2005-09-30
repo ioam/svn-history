@@ -30,6 +30,8 @@ from copy import deepcopy
 from topo.inputsheet import InputSheet
 from topo.sheet import BoundingBox, Sheet
 from topo.utils import eval_atof
+from topo.utils import submodule_classes
+from topo.kernelfactory import KernelFactory
 
 # Hack to reverse the order of the input EventProcessor list and the
 # Preview plot list, so that it'll match the order that the plots appear
@@ -38,6 +40,17 @@ LIST_REVERSE = True
 
 # Default time to show in the Presentation duration box.
 DEFAULT_PRESENTATION = '1.0'
+
+
+# By default, none of the pattern types in topo/patterns/ are imported
+# in Topographica, but for the GUI, we want all of them to be
+# available as a list from which the user can select. To do this, we
+# import all of the KernelFactory classes in all of the modules
+# mentioned in topo.patterns.__all__, and will also use any that the
+# user has defined and registered.
+from topo.patterns import *
+patternclasses=submodule_classes(topo.patterns,KernelFactory)
+topo.registry.kernel_factories.update(patternclasses)
 
 
 def kernelfactory_names():
@@ -123,7 +136,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         buttonBox.add('Use for future learning',
                       command = self.use_for_learning)
 
-        # Menu of valid KernelFactory types defined.
+        # Define menu of valid KernelFactory types
         self.input_types = kernelfactory_names()
         
         self.input_type = StringVar()
