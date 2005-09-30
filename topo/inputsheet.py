@@ -20,7 +20,7 @@ from sheet import BoundingBox
 
 from parameter import Parameter, Dynamic
 
-from kernelfactory import UniformRandomFactory
+from kernelfactory import SolidFactory
 
 class InputSheet(Sheet):
 
@@ -29,7 +29,7 @@ class InputSheet(Sheet):
 
     theta = Parameter(default=0)
 
-    input_generator = Parameter(default=UniformRandomFactory)
+    input_generator = Parameter(default=SolidFactory)
     
     def __init__(self,**params):
         super(InputSheet,self).__init__(**params)
