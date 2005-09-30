@@ -15,7 +15,7 @@ from topo.inputsheet import *
 from topo.simulator import *
 from topo.plotfilesaver import ImageSaver
 from topo import kernelfactory
-from topo.kernelfactory import GaussianFactory
+from topo.patterns.basic import GaussianFactory
 from math import pi
 from topo.parameter import Dynamic
 import random

@@ -10,6 +10,7 @@ from topo.simulator import *
 from topo.sheetview import *
 from topo.plotengine import *
 from topo.tk.basicplotpanel import *
+from topo.patterns.basic import GaussianFactory
 
 
 class TestActivityPanel(unittest.TestCase):

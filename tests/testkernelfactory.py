@@ -7,6 +7,7 @@ import unittest
 from topo.kernelfactory import *
 from MLab import flipud, rot90
 from Numeric import *
+from topo.patterns.basic import RectangleFactory
 
 class TestKernelFactory(unittest.TestCase):
 

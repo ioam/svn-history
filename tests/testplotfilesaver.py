@@ -7,7 +7,8 @@ from topo.kernelfactory import ImageGenerator
 from topo.inputsheet import *
 import Numeric, random, os
 from math import pi
-from topo.kernelfactory import FuzzyLineFactory
+from topo.patterns.basic import FuzzyLineFactory
+from topo.patterns.random import UniformRandomFactory
 import topo.base
 import models.cfsom
 import topo.cfsheet

@@ -16,6 +16,7 @@ from math import pi
 from topo.parameter import Dynamic
 import random
 import pdb #debugger
+from topo.patterns.basic import GaussianFactory,FuzzyLineFactory
 
 class TestPlotPanel(unittest.TestCase):
 

@@ -19,7 +19,7 @@ from topo.plotengine import *
 from topo.inputsheet import *
 from topo.simulator import *
 from topo import kernelfactory
-from topo.kernelfactory import GaussianFactory
+from topo.patterns.basic import GaussianFactory
 from topo.parameter import Dynamic
 from models.cfsom import CFSOM
 from Tkinter import *
