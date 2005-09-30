@@ -333,6 +333,10 @@ class InputParamsPanel(plotpanel.PlotPanel):
         p = self.get_params()
         rp = self.relevant_parameters(kname,self.tparams.keys())
         ndict = {}
+        ### JABHACKALERT!
+        ###
+        ### How will this work for photographs and other items that need non-numeric
+        ### input boxes?  It *seems* to be assuming that everything is a float.
         for each in rp:
             ndict[each] = eval_atof(p[each])
         for each in self.in_ep_dict.keys():
