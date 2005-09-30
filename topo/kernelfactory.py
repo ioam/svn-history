@@ -199,10 +199,13 @@ def produce_rotated_matrices(kernel_x, kernel_y, theta):
     return new_kernel_x, new_kernel_y
 
 
-#########################################################
-# Kernel Factory Objects
-#
-#
+### JABHACKALERT!
+### 
+### KernelFactory should be renamed to PatternGenerator, and all
+### the Factory classes should be named Generator instead. (The
+### patterns are only sometimes kernels, and in python they are not
+### quite like the C++/Java Factory design pattern; instead they are
+### like generators.)
 
 class KernelFactory(base.TopoObject):
 
@@ -228,15 +231,27 @@ class KernelFactory(base.TopoObject):
         self.kernel_x, self.kernel_y = produce_rotated_matrices(xm-x,ym-y,theta)
 
 
-### JABHACKALERT!
-### 
-### These Factory classes should probably be named Generator instead,
-### because they are not quite like the Factory design pattern.  They
-### should also move to their own file, so that it will be clearer how
-### to extend to add new patterns.
+#########################################################
+# Kernel Factory Objects
+#
+#
 
-# CEB: ? x, y, etc. don't need to be declared in each of the subclasses:
-#      they could be moved to KernelFactory.        
+### JABHACKALERT!
+###
+### The variables x, y, etc. don't need to be declared in each of the
+### Factory subclasses, and should be moved to KernelFactory once
+### inputparamspanel.py is fixed.
+
+class SolidFactory(KernelFactory):
+    """
+    Solid-color pattern generator.
+    """
+    x       = Number(default=0.0,softbounds=(-1.0,1.0))
+    y       = Number(default=0.0,softbounds=(-1.0,1.0))
+
+    def function(self,**params):
+        return self.kernel_x*0+1
+
 class GaussianFactory(KernelFactory):
     """
     Gaussian pattern generator
