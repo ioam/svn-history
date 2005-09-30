@@ -45,14 +45,15 @@ $Id$
 ### JABHACKALERT!
 ###
 ### Should eliminate all "import *" commands if at all possible.
+### Is pprint used for anything?
 import types
 import base
 from boundingregion import BoundingBox
 from sheet import sheet2matrix, matrix2sheet, bounds2shape
-import RandomArray
 from Numeric import *
 from MLab import flipud,rot90
 from parameter import * 
+from patternfns import * 
 from pprint import pprint,pformat
 from math import pi
 import topo.registry
@@ -67,16 +68,6 @@ import topo.registry
 ### and twodpattern.py might be better names; in any case we need
 ### something other than Kernel.
 
-
-### JABALERT!
-###
-### Is this really necessary?  If so, please document better why.
-###
-# Some kernels use math.exp() to generate a falling off of activity.
-# But exp will overflow if too small a value is given, so this
-# constant defines the smallest value to accept from the kernels.
-# exp(-100) is appx. 3.72e-44
-EXP_CUTOFF = -100
 
 ### JABHACKALERT!
 ### 
@@ -206,128 +197,6 @@ def produce_rotated_matrices(kernel_x, kernel_y, theta):
     new_kernel_x = flipud(rot90(new_kernel_x))
     new_kernel_y = flipud(rot90(new_kernel_y))
     return new_kernel_x, new_kernel_y
-
-
-### JABHACKALERT!
-### 
-### The following radial functions should be moved to their own file,
-### perhaps radialfunction.py.  They are useful in general, and do not
-### need to make any assumptions about matrices and coordinate
-### systems.  They should probably all be renamed to use x,y
-### instead of kernel_x, kernel_y, because they do not need to be
-### in the context of a kernel to be useful.
-
-def gaussian(kernel_x, kernel_y, width, height):
-    """
-    Two-dimensional oriented Gaussian pattern (i.e., 2D version of a
-    bell curve, like a normal distribution but without necessarily
-    summing to 1.0).
-    """
-    new_kernel = -(kernel_x / width)**2 + -(kernel_y / height)**2
-
-    # maximum( ) is needed to avoid overflow in some situations
-    k = exp(maximum(EXP_CUTOFF,new_kernel))
-    k = where(k != exp(EXP_CUTOFF), k, 0.0)
-    return k
-
-
-def sine_grating(kernel_x, kernel_y, frequency, phase):
-    """
-    Sine grating pattern (two-dimensional sine wave).
-    """
-    return 0.5 + 0.5*sin(frequency*2*pi*kernel_x + phase)
-
-
-# We will probably want to add anti-aliasing to this,
-# and there might be an easier way to do it than by
-# cropping a sine grating.
-def square_grating(kernel_x, kernel_y, frequency, phase):
-    """
-    Square-wave grating (alternating black and white bars).
-    """
-    return around(0.5 + 0.5*sin(frequency*2*pi*kernel_x + phase))
-
-
-def gabor(kernel_x, kernel_y, width, height, frequency, phase):
-    """
-    Gabor pattern (sine grating multiplied by a circular Gaussian).
-    """
- 
-    k = exp(maximum(EXP_CUTOFF,-(kernel_x/width)**2-(kernel_y/height)**2))
-    k = where(k > exp(EXP_CUTOFF), k, 0.0)
-    return k * (0.5 + 0.5*cos(2*pi*frequency*kernel_x + phase))
-
-
-def uniform_random(kernel_x, kernel_y,rmin,rmax):
-    """
-    Uniform random noise, independent for each pixel.
-    """
-    return RandomArray.uniform(rmin,rmax,kernel_x.shape) 
-
-
-def rectangle(kernel_x, kernel_y, width, height):
-    """
-    Rectangular spot.
-    """
-    kernel_x = abs(kernel_x)
-    kernel_y = abs(kernel_y)
-
-    return bitwise_and(where(kernel_x<=width/2,1,0),where(kernel_y<=height/2,1,0))
-
-# CEB: going to re-implement this (to be the way it's done in LISSOM)
-def fuzzy_line(kernel_x, kernel_y, width, gaussian_width):
-    """
-    Maximum-length line with a solid central region, then Gaussian fall-off at the edges. 
-    """
-    # The line is a Rectangle with a height equal to the diagonal length of kernel_x,
-    # and with gaussian fall-off from the edges
-
-    height = (size(kernel_x,0)**2 + size(kernel_x,1)**2)**0.5   # Maybe there is a better way
-                                                                # to get the maximum length?    
-    line = rectangle(kernel_x, kernel_y, width, height)
-
-    distance_from_line = abs(kernel_x) - width/2   # (Not strictly distance since still has sign)
-    falloff = exp(maximum(EXP_CUTOFF, -(distance_from_line/gaussian_width)**2))   
-    falloff = where(falloff != exp(EXP_CUTOFF), falloff, 0.0)                     
-
-    return line + where(line == 0,falloff,1)   # Only want falloff where there is no line
-
-
-def fuzzy_disk(kernel_x, kernel_y, disk_radius, gaussian_width):
-    """
-    Circular disk with Gaussian fall-off after the solid central region.
-    """
-    distance_from_line = sqrt((kernel_x**2)+(kernel_y**2)) 
-    gaussian_x_coord   = distance_from_line - disk_radius/2.0 
-    div_sigmasq = 1 / (gaussian_width*gaussian_width)
-
-    disk = less_equal(gaussian_x_coord,0)
-    k = maximum(disk, exp(maximum(EXP_CUTOFF,
-                                  -gaussian_x_coord*gaussian_x_coord*div_sigmasq)))
-    return where(k != exp(EXP_CUTOFF), k, 0.0)
-
-
-
-def fuzzy_ring(kernel_x, kernel_y, disk_radius, ring_radius, gaussian_width):
-    """
-    Circular ring (annulus) with Gaussian fall-off after the solid ring-shaped region.
-    """    
-    disk_radius = disk_radius
-    ring_radius = ring_radius / 2.0
-    distance_from_line = abs(sqrt((kernel_x**2)+(kernel_y**2)) - disk_radius)
-    inner_distance = distance_from_line - ring_radius
-    outer_distance = distance_from_line + ring_radius
-    div_sigmasq = 1 / (gaussian_width*gaussian_width)
-
-    ring = less_equal(distance_from_line,ring_radius)
-           
-    inner_g = exp(maximum(EXP_CUTOFF,-inner_distance*inner_distance*div_sigmasq))
-    outer_g = exp(maximum(EXP_CUTOFF,-outer_distance*outer_distance*div_sigmasq))
-    inner_g = where(inner_g != exp(EXP_CUTOFF), inner_g, 0.0)
-    outer_g = where(outer_g != exp(EXP_CUTOFF), outer_g, 0.0)
-    dring = maximum(inner_g,maximum(outer_g,ring))
-    return dring
-
 
 
 #########################################################
