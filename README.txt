@@ -142,3 +142,7 @@ Topographica. Because of the fast pace of current development, there
 is very little documentation available, but the documentation for each
 file can be accessed by loading topographica/docs/index.html into your
 web browser.
+
+If you are a Topographica developer, please read and follow the
+information in the CONVENTIONS file.  This will help keep everyones'
+changes compatible.
