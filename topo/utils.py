@@ -242,3 +242,31 @@ def eval_atof(in_string,default_val = 0):
     except Exception:
         val = default_val
     return val
+
+from inspect import ismodule
+def submodule_classes(modulepath,parentclass):
+    """
+    Return a dictionary containing all items of the type
+    specified, owned by submodules of the specified module.
+    Only currently imported modules are searched, so
+    the caller will first need to do 'from modulepath import *'.
+
+    The implementation could probably be simplified, but it seems to
+    work.
+    """
+    result={}
+    pd=modulepath.__dict__
+    # iterate over all the items in the module
+    for k in pd:
+        if ismodule(pd[k]): 
+           md=pd[k].__dict__
+           # iterate over all the items in each submodule
+           for k2 in md:
+               # Add any subclasses of the given parentclass that we find
+               if (type(md[k2]) is type(parentclass)) \
+                      and issubclass(md[k2],parentclass) \
+                      and md[k2] is not parentclass:
+                   result[md[k2].__name__] = md[k2]
+    return result
+
+
