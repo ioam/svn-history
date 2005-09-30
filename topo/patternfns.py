@@ -16,7 +16,6 @@ $Id$
 ### Should eliminate all "import *" commands if at all possible.
 from math import pi,sin,cos,exp
 from Numeric import *
-import RandomArray
 
 
 ### JABALERT!
@@ -76,23 +75,6 @@ def gabor(kernel_x, kernel_y, width, height, frequency, phase):
     k = exp(maximum(EXP_CUTOFF,-(kernel_x/width)**2-(kernel_y/height)**2))
     k = where(k > exp(EXP_CUTOFF), k, 0.0)
     return k * (0.5 + 0.5*cos(2*pi*frequency*kernel_x + phase))
-
-
-def uniform_random(kernel_x, kernel_y,rmin,rmax):
-    """
-    Uniform random noise, independent for each pixel.
-    """
-    return RandomArray.uniform(rmin,rmax,kernel_x.shape) 
-
-
-def rectangle(kernel_x, kernel_y, width, height):
-    """
-    Rectangular spot.
-    """
-    kernel_x = abs(kernel_x)
-    kernel_y = abs(kernel_y)
-
-    return bitwise_and(where(kernel_x<=width/2,1,0),where(kernel_y<=height/2,1,0))
 
 
 ### JABHACKALERT!
