@@ -273,7 +273,8 @@ class InputParamsPanel(plotpanel.PlotPanel):
         Post: List of strings that is the Intersection of kf_classname's
               class member keys, and param_list entries.
         """
-        kf_class_keylist = topo.kernelfactory.__dict__[kf_classname].__dict__.keys()
+        
+        kf_class_keylist = topo.registry.kernel_factories[kf_classname].__dict__.keys()
         rlist = [s for s in param_list if s in kf_class_keylist]
         return rlist
 
@@ -343,7 +344,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
             if self.in_ep_dict[each]['state']:
                 ndict['density'] = self.in_ep_dict[each]['obj'].density
                 ndict['bounds'] = deepcopy(self.in_ep_dict[each]['obj'].bounds)
-                kf = topo.kernelfactory.__dict__[kname](**ndict)
+                kf = topo.registry.kernel_factories[kname](**ndict)
                 self.in_ep_dict[each]['kernel'] = kf
         return self.in_ep_dict  # Doesn't have to return it, but is explicit.
 
