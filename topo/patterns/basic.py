@@ -4,19 +4,6 @@ from topo.parameter import Number
 from topo.patternfns import *
 
 
-### JABALERT
-###
-### Should probably move this into the RectangleFactory class.
-def rectangle(kernel_x, kernel_y, width, height):
-    """
-    Rectangular spot.
-    """
-    kernel_x = abs(kernel_x)
-    kernel_y = abs(kernel_y)
-
-    return bitwise_and(where(kernel_x<=width/2,1,0),where(kernel_y<=height/2,1,0))
-
-
 class GaussianFactory(KernelFactory):
     """
     Gaussian pattern generator
@@ -141,10 +128,10 @@ class RectangleFactory(KernelFactory):
     height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
 
     def function(self,**params):
-        return rectangle( self.kernel_x, 
-                          self.kernel_y, 
-                          params.get('width',self.width),
-                          params.get('height',self.height))  
+        width = params.get('width',self.width)
+        height= params.get('height',self.height)
+        return bitwise_and(abs(self.kernel_x)<=width/2.0,
+                           abs(self.kernel_y)<=height/2.0)
 
 
 class SquareGratingFactory(KernelFactory):
