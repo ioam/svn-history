@@ -230,11 +230,13 @@ weave-uninstall:
 ##############################################################
 # Fixed-Point package
 #
-FIXEDPT = fixedpoint-0.1.2
+FIXEDPT = fixedpoint
 FIXEDPT_UNINSTALL = ${PYTHON_LIB}/site-packages
 
-fixedpoint: ${FIXEDPT}.tgz python
-	tar xzf ${FIXEDPT}.tgz
+fixedpoint: ${FIXEDPT}-0.1.2.tgz python
+	tar xzf ${FIXEDPT}-0.1.2.tgz
+	cp fixedpoint.diff ${FIXEDPT}
+	cp fixedpoint_setup.py ${FIXEDPT}/setup.py
 	cd ${FIXEDPT}; patch < fixedpoint.diff; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch fixedpoint
 

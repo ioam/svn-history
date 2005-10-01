@@ -1,0 +1,25 @@
+*** fixedpoint.py	Thu Sep 29 13:40:54 2005
+--- fixedpoint.py	Thu Sep 29 19:46:47 2005
+***************
+*** 167,174 ****
+          self.n is a long; self.p is an int
+      """
+      __slots__ = ['n', 'p']
+!     def __init__(self, value=0, precision=DEFAULT_PRECISION):
+          self.n = self.p = 0
+          self.set_precision(precision)
+          p = self.p
+  
+--- 167,178 ----
+          self.n is a long; self.p is an int
+      """
+      __slots__ = ['n', 'p']
+! 
+!     def __init__(self, value=0, precision=None):
+          self.n = self.p = 0
++         if precision == None:
++             precision = DEFAULT_PRECISION
++            
+          self.set_precision(precision)
+          p = self.p
+  
