@@ -28,8 +28,7 @@ class TestPlotFileSaver(unittest.TestCase):
         CFSOM.density = 100
         CFSOM.learning_length = 10000
         CFSOM.radius_0 = 0.1
-        topo.cfsheet.KernelProjection.weights_factory = UniformRandomFactory(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
-        
+        topo.projections.kernelprojection.weights_factory = UniformRandomFactory(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
         topo.base.min_print_level = topo.base.WARNING
         self.s = topo.simulator.Simulator()
         
