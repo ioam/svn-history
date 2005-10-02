@@ -250,6 +250,8 @@ def find_classes_in_package(package,parentclass):
     specified, owned by modules in the specified package.
     Only currently imported modules are searched, so
     the caller will first need to do 'from package import *'.
+    Does not search packages contained within the specified
+    package, only the top-level modules.
     """
     result = {}
     for v1 in package.__dict__.values():
