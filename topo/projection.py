@@ -9,7 +9,7 @@ import Numeric
 from topo.learningrules import *
 from topo.base import TopoObject
 from topo.cfsheet import ConnectionField
-
+from topo.sheetview import UnitView
 
 class Projection(TopoObject):
     """
@@ -75,10 +75,7 @@ class Projection(TopoObject):
         #matrix_data = Numeric.array(self.cf(r,c).weights)*50
         new_box = self.dest.bounds  # TURN INTO A PROPER COPY
         assert matrix_data != None, "Projection Matrix is None"
-        return topo.sheetview.UnitView((matrix_data,new_box),
-                                       sheet_x,sheet_y,self,
-                                       view_type='UnitView')
-
+        return UnitView((matrix_data,new_box),sheet_x,sheet_y,self,view_type='UnitView')
 
     
     def plot_cfs(self,montage=True,file_format='ppm',file_prefix='',
