@@ -9,7 +9,7 @@ new Plot Template mechanism the plot_keys are not as critical as they
 used to be.
 
 Note: Inspiration may be found from the ImageSaver class written for
-models.cfsom and currently (9/2005) residing in topo.image
+topo.sheets.cfsom and currently (9/2005) residing in topo.image
 
 
 $Id$
