@@ -10,9 +10,6 @@ from topo.learningrules import *
 from topo.base import TopoObject
 from topo.cfsheet import ConnectionField
 
-#from topo.patterns.random import UniformRandomFactory
-#from topo.sheet import Sheet
-# import RandomArray,copy
 
 class Projection(TopoObject):
     """
