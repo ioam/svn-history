@@ -30,7 +30,7 @@ from copy import deepcopy
 from topo.inputsheet import InputSheet
 from topo.sheet import BoundingBox, Sheet
 from topo.utils import eval_atof
-from topo.utils import submodule_classes
+from topo.utils import find_classes_in_package
 from topo.kernelfactory import KernelFactory
 
 # Hack to reverse the order of the input EventProcessor list and the
@@ -49,7 +49,7 @@ DEFAULT_PRESENTATION = '1.0'
 # mentioned in topo.patterns.__all__, and will also use any that the
 # user has defined and registered.
 from topo.patterns import *
-patternclasses=submodule_classes(topo.patterns,KernelFactory)
+patternclasses=find_classes_in_package(topo.patterns,KernelFactory)
 topo.registry.kernel_factories.update(patternclasses)
 
 

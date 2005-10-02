@@ -244,18 +244,18 @@ def eval_atof(in_string,default_val = 0):
     return val
 
 from inspect import ismodule
-def submodule_classes(modulepath,parentclass):
+def find_classes_in_package(package,parentclass):
     """
     Return a dictionary containing all items of the type
     specified, owned by submodules of the specified module.
     Only currently imported modules are searched, so
-    the caller will first need to do 'from modulepath import *'.
+    the caller will first need to do 'from package import *'.
 
     The implementation could probably be simplified, but it seems to
     work.
     """
     result={}
-    pd=modulepath.__dict__
+    pd=package.__dict__
     # iterate over all the items in the module
     for k in pd:
         if ismodule(pd[k]): 
