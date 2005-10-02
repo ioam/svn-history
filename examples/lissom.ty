@@ -10,7 +10,7 @@ import pdb #debugger
 from topo import *
 from topo.kernelfactory import *
 from topo.inputsheet import *
-from topo.image import ImageSaver
+from topo.plotfilesaver import ImageSaver
 import topo.gui
 import topo.cfsheet
 from topo.parameter import *

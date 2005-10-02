@@ -12,16 +12,14 @@ parameters and objects.  It shows how to set parameters for classes of objects.
 $Id$
 """
 
-# CEB: this example gives an error when run:
-# "NameError: name 'ImageSaver' is not defined".
-# I noticed this error when I moved composer.py from
-# topo/ to topo/sheets, but it was present before.
-
+# CEB: I get an error about missing "main.ppm". Maybe I deleted it from
+# my copy by mistake.
 
 import sys
 from topo import * 
 from topo.kernelfactory import *
 from topo.sheets.composer import Composer
+from topo.plotfilesaver import ImageSaver
 
 #################################################
 # Set class parameter defaults
