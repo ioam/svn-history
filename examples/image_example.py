@@ -12,11 +12,16 @@ parameters and objects.  It shows how to set parameters for classes of objects.
 $Id$
 """
 
+# CEB: this example gives an error when run:
+# "NameError: name 'ImageSaver' is not defined".
+# I noticed this error when I moved composer.py from
+# topo/ to topo/sheets, but it was present before.
+
 
 import sys
 from topo import * 
 from topo.kernelfactory import *
-from topo.composer import Composer
+from topo.sheets.composer import Composer
 
 #################################################
 # Set class parameter defaults
