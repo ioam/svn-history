@@ -2,5 +2,3 @@
 #
 # $Id$
 
-import cfsom
-
