@@ -8,7 +8,7 @@ import pdb #debugger
 from topo.inputsheet import *
 from topo.kernelfactory import *
 from topo.simulator import *
-from topo.cfsheet import KernelProjection
+from topo.projections.kernelprojection import KernelProjection
 from topo.plotfilesaver import ImageSaver
 from topo.parameter import Dynamic
 from topo.sheets.cfsom import CFSOM
