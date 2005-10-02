@@ -4,26 +4,11 @@ that defines projections of connection fields where each
 ConnectionField's initial weight matrix is created by calling a
 KernelFactory.
 """
-
-# for my second change only!
-from topo.projections.projection import Projection
+from topo.projection import Projection
 from topo.parameter import Parameter
 from topo.patterns.random import UniformRandomFactory
 from topo.boundingregion import Intersection,BoundingBox
 from topo.learningrules import *
-
-#from sheet import Sheet
-#from utils import mdot
-#import RandomArray,Numeric,copy
-#import topo.sheetview
-#import topo.boundingregion
-#import topo.bitmap
-#from MLab import flipud, rot90
-#from utils import *
-#from topo.utils import flatten
-#import Numeric
-#from base import TopoObject
-
 
 class KernelProjection(Projection):
     """
