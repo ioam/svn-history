@@ -11,7 +11,7 @@ from topo.bitmap import *
 import topo.tk.topoconsole 
 import topo.tk.plotpanel
 import Tkinter
-from models.cfsom import CFSOM
+from topo.sheets.cfsom import CFSOM
 from math import pi
 from topo.parameter import Dynamic
 import random

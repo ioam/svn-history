@@ -21,7 +21,7 @@ from topo.simulator import *
 from topo import kernelfactory
 from topo.patterns.basic import GaussianFactory
 from topo.parameter import Dynamic
-from models.cfsom import CFSOM
+from topo.sheets.cfsom import CFSOM
 from Tkinter import *
 from Tkconstants import *
 from PIL import Image

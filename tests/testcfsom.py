@@ -5,7 +5,7 @@ the PlotEngine system from a simulation.
 $Id$
 """
 import unittest
-from models.cfsom import CFSOM
+from topo.sheets.cfsom import CFSOM
 from pprint import pprint
 from topo import plot
 from topo import base
