@@ -1,9 +1,7 @@
 """
 A Sheet class for composing activity from different sheets into a
-single activity matrix.
-
-May not be necessary or useful any longer (as of 8/2005), and could
-perhaps be moved to the examples/ directory, or deleted.
+single activity matrix.  Primarily a simple example of how to make
+a sheet class, but can also be useful.
 
 $Id$
 """

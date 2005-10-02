@@ -1,5 +1,5 @@
 """
-Sheet for generating a series of inputs, e.g. by choosing
+Sheet for generating a series of patterns, e.g. by choosing
 parameters from a random distribution.
 
 $Id$
@@ -31,10 +31,10 @@ class GeneratorSheet(Sheet):
 
     def init_input_generator(self,new_ig):
         """
-        Allow assignment of a new input generator to this GeneratorSheet.
-        Only one generator is linked at a time, so if more than one is
-        going to be used, the code driving the sheet needs to keep
-        tabs on which one is being used.
+        Allow assignment of a new pattern generator to this
+        GeneratorSheet.  Only one generator is linked at a time, so if
+        more than one is going to be used, the code driving the sheet
+        needs to keep tabs on which one is being used.
         """
         self.input_generator = new_ig
         self.input_generator.bounds = self.bounds
@@ -80,7 +80,7 @@ class GeneratorSheet(Sheet):
 
     def input_event(self,src,src_port,dest_port,data):
         self.verbose("Received %s input from %s." % (NxN(data.shape),src))
-        self.verbose("Generating a new kernel...")
+        self.verbose("Generating a new pattern...")
 
         ### JABHACKALERT!
         ###
