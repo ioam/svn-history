@@ -9,6 +9,7 @@ from topo.parameter import Parameter
 from topo.patterns.random import UniformRandomFactory
 from topo.boundingregion import Intersection,BoundingBox
 from topo.learningrules import *
+from topo.utils import *
 
 class KernelProjection(Projection):
     """
