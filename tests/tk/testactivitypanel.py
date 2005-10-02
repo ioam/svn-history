@@ -4,7 +4,7 @@ import Numeric
 import Tkinter
 import Pmw
 from PIL import Image
-from topo.inputsheet import *
+from topo.sheets.generatorsheet import *
 from topo.kernelfactory import *
 from topo.simulator import *
 from topo.sheetview import *
@@ -23,10 +23,10 @@ class TestActivityPanel(unittest.TestCase):
             self.s   Sample simulation with a couple of sheets
             self.pe  Plot engine watching self.s
         """
-        InputSheet.period = 1.0
-        InputSheet.density = 900
+        GeneratorSheet.period = 1.0
+        GeneratorSheet.density = 900
 #        base.print_level = base.WARNING
-#        InputSheet.print_level = base.WARNING
+#        GeneratorSheet.print_level = base.WARNING
         
         GaussianFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -61,7 +61,7 @@ class TestActivityPanel(unittest.TestCase):
         sheetR = Sheet()
         sheetG = Sheet()
         sheetB = Sheet()
-        retina = InputSheet(input_generator=GaussianFactory())
+        retina = GeneratorSheet(input_generator=GaussianFactory())
         retina.print_level = base.WARNING
 
         # For a new sheet_group named Miata:

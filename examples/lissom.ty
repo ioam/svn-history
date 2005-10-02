@@ -9,7 +9,7 @@ import pdb #debugger
 
 from topo import *
 from topo.kernelfactory import *
-from topo.inputsheet import *
+from topo.sheets.generatorsheet import *
 from topo.plotfilesaver import ImageSaver
 import topo.gui
 import topo.cfsheet
@@ -202,8 +202,8 @@ print "Setting parameters..."
 
 # input generation params
 # jbednar050411: Doesn't seem to work with anything but 900 for both densities (!)
-InputSheet.density = RN*RN
-InputSheet.period = 1
+GeneratorSheet.density = RN*RN
+GeneratorSheet.period = 1
 
 GaussianFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
 GaussianFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -234,7 +234,7 @@ print "Creating simulation objects..."
 
 s = topo.simulator.Simulator(time_precision=timeprecision)
 
-retina = InputSheet(input_generator=GaussianFactory(),name='Retina')
+retina = GeneratorSheet(input_generator=GaussianFactory(),name='Retina')
 V1 = LISSOM(name='V1')
 save  = ImageSaver(name='LISSOM')
 

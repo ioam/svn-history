@@ -4,7 +4,7 @@ from topo import plot
 from topo.sheet import *
 from topo.bitmap import RGBMap
 from topo.kernelfactory import ImageGenerator
-from topo.inputsheet import *
+from topo.sheets.generatorsheet import *
 import Numeric, random, os
 from math import pi
 from topo.patterns.basic import FuzzyLineFactory
@@ -18,8 +18,8 @@ from PIL import *
 class TestPlotFileSaver(unittest.TestCase):
 
     def test_file_saving(self):
-        InputSheet.period = 1.0
-        InputSheet.density = 400
+        GeneratorSheet.period = 1.0
+        GeneratorSheet.density = 400
         FuzzyLineFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         FuzzyLineFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
         FuzzyLineFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
@@ -32,8 +32,8 @@ class TestPlotFileSaver(unittest.TestCase):
         topo.base.min_print_level = topo.base.WARNING
         self.s = topo.simulator.Simulator()
         
-        retina = InputSheet(input_generator=FuzzyLineFactory(),name='Retina')
-        retina2 = InputSheet(input_generator=FuzzyLineFactory(),name='Retina2')
+        retina = GeneratorSheet(input_generator=FuzzyLineFactory(),name='Retina')
+        retina2 = GeneratorSheet(input_generator=FuzzyLineFactory(),name='Retina2')
         V1 = CFSOM(name='V1')
         V2 = CFSOM(name='V2')
         retina.print_level = topo.base.WARNING

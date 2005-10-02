@@ -5,7 +5,7 @@ import Tkinter
 import Pmw
 import random
 from PIL import Image
-from topo.inputsheet import *
+from topo.sheets.generatorsheet import *
 from topo.kernelfactory import *
 from topo.simulator import *
 from topo.sheetview import *

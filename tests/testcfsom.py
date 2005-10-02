@@ -11,7 +11,7 @@ from topo import plot
 from topo import base
 from topo.bitmap import *
 from topo.sheet import Sheet
-from topo.inputsheet import *
+from topo.sheets.generatorsheet import *
 from topo.simulator import *
 from topo.plotfilesaver import ImageSaver
 from topo import kernelfactory
@@ -59,9 +59,9 @@ class TestCFSom(unittest.TestCase):
         Cut and paste of current topographica/examples/cfsom_example.py
         """
         # input generation params
-        InputSheet.period = 1.0
-        InputSheet.density = 900
-        InputSheet.print_level = base.WARNING
+        GeneratorSheet.period = 1.0
+        GeneratorSheet.density = 900
+        GeneratorSheet.print_level = base.WARNING
         
         GaussianFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))        
@@ -83,7 +83,7 @@ class TestCFSom(unittest.TestCase):
       
         s = Simulator()
         s.verbose("Creating simulation objects...")
-        retina = InputSheet(input_generator=GaussianFactory())
+        retina = GeneratorSheet(input_generator=GaussianFactory())
         
         # Old form
         #retina = GaussianSheet(name='Retina')

@@ -27,7 +27,7 @@ import topo.registry
 from Tkinter import IntVar, StringVar, Checkbutton
 from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
 from copy import deepcopy
-from topo.inputsheet import InputSheet
+from topo.sheets.generatorsheet import GeneratorSheet
 from topo.sheet import BoundingBox, Sheet
 from topo.utils import eval_atof
 from topo.utils import find_classes_in_package
@@ -297,11 +297,11 @@ class InputParamsPanel(plotpanel.PlotPanel):
         Return a list of event processors in the active simulator that
         can have Factories added to them.
 
-        For now, anything that is an InputSheet will be added.
+        For now, anything that is an GeneratorSheet will be added.
         """
         sim = self.console.active_simulator()
         eps = sim.get_event_processors()
-        i_eps = [i for i in eps if isinstance(i,InputSheet)]
+        i_eps = [i for i in eps if isinstance(i,GeneratorSheet)]
         return i_eps
         
 
@@ -313,7 +313,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
 
     def present(self):
         """
-        Move the user created kernels into the InputSheets, run for
+        Move the user created kernels into the GeneratorSheets, run for
         the specified length of time, then restore the original
         kernels.  The system may become unstable if the user breaks
         this thread so that the original kernels are not properly
@@ -364,7 +364,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
 
     def _store_inputsheet_kernels(self):
         """
-        Store the kernels currently in the InputSheets.
+        Store the kernels currently in the GeneratorSheets.
         """
         kernel_dict = {}
         for each in self.in_ep_dict.keys():
@@ -377,10 +377,10 @@ class InputParamsPanel(plotpanel.PlotPanel):
 
     def register_inputsheet_kernels(self,kernels_dict):
         """
-        Each dictionary entry must have an 'obj' with an InputSheet as
+        Each dictionary entry must have an 'obj' with an GeneratorSheet as
         value, with 'state' set to True or False to see if the kernel
         should be replaced, and a 'kernel' key with the kernel object
-        as value that should be moved into the InputSheet.
+        as value that should be moved into the GeneratorSheet.
         """
         for each in self.in_ep_dict.keys():
             # Use this to only present to the ones that are currently selected:

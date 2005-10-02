@@ -5,7 +5,7 @@ $Id$
 from math import pi
 import random
 import pdb #debugger
-from topo.inputsheet import *
+from topo.sheets.generatorsheet import *
 from topo.kernelfactory import *
 from topo.simulator import *
 from topo.projections.kernelprojection import KernelProjection
@@ -22,8 +22,8 @@ from topo.patterns.basic import FuzzyLineFactory
 print "Setting parameters..."
 
 # input generation params
-InputSheet.period = 1.0
-InputSheet.density = 900
+GeneratorSheet.period = 1.0
+GeneratorSheet.density = 900
 
 FuzzyLineFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
 FuzzyLineFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -55,7 +55,7 @@ print "Creating simulation objects..."
 # Used to be SimpleSimulator
 s = Simulator()
 
-retina = InputSheet(input_generator=FuzzyLineFactory(),name='Retina')
+retina = GeneratorSheet(input_generator=FuzzyLineFactory(),name='Retina')
 V1 = CFSOM(name='V1')
 save  = ImageSaver(name='CFSOM')
 

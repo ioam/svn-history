@@ -16,7 +16,7 @@ from topo.sheetview import SheetView
 from topo.plotgroup import *
 from topo.plot import PlotTemplate
 from topo.plotengine import *
-from topo.inputsheet import *
+from topo.sheets.generatorsheet import *
 from topo.simulator import *
 from topo import kernelfactory
 from topo.patterns.basic import GaussianFactory
@@ -88,8 +88,8 @@ class TestPlotEngine(unittest.TestCase):
         with extensions to interface with the PlotEngine and ImagePoster
         """
         # input generation params
-        InputSheet.period = 1.0
-        InputSheet.density = 900
+        GeneratorSheet.period = 1.0
+        GeneratorSheet.density = 900
         
         GaussianFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -125,7 +125,7 @@ class TestPlotEngine(unittest.TestCase):
         sheetR = Sheet()
         sheetG = Sheet()
         sheetB = Sheet()
-        retina = InputSheet(input_generator=GaussianFactory())
+        retina = GeneratorSheet(input_generator=GaussianFactory())
         retina.print_level = base.WARNING
 
 

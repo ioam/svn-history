@@ -1,6 +1,6 @@
 import unittest, os
 import topo
-from topo.inputsheet import *
+from topo.sheets.generatorsheet import *
 from topo.tk import *
 from topo.kernelfactory import *
 from topo.simulator import *
@@ -28,10 +28,10 @@ class TestPlotPanel(unittest.TestCase):
             self.s   Sample simulation with a couple of sheets
             self.pe  Plot engine watching self.s
         """
-        InputSheet.period = 1.0
-        InputSheet.density = 900
+        GeneratorSheet.period = 1.0
+        GeneratorSheet.density = 900
 #        base.print_level = base.WARNING
-#        InputSheet.print_level = base.WARNING
+#        GeneratorSheet.print_level = base.WARNING
         
         GaussianFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -66,7 +66,7 @@ class TestPlotPanel(unittest.TestCase):
         sheetR = Sheet()
         sheetG = Sheet()
         sheetB = Sheet()
-        retina = InputSheet(input_generator=GaussianFactory())
+        retina = GeneratorSheet(input_generator=GaussianFactory())
         retina.print_level = base.WARNING
 
         # For a new sheet_group named Miata:
@@ -101,8 +101,8 @@ class TestPlotPanel(unittest.TestCase):
         base.min_print_level = base.WARNING
         topo.tk.plotpanel.PlotPanel.print_level = base.WARNING
         # input generation params
-        InputSheet.period = 1.0
-        InputSheet.density = 900
+        GeneratorSheet.period = 1.0
+        GeneratorSheet.density = 900
         
         FuzzyLineFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         FuzzyLineFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -119,7 +119,7 @@ class TestPlotPanel(unittest.TestCase):
         # build simulation
         s = topo.simulator.Simulator()
         
-        retina = InputSheet(input_generator=FuzzyLineFactory(),name='Retina')
+        retina = GeneratorSheet(input_generator=FuzzyLineFactory(),name='Retina')
         retina.print_level = base.WARNING
         V1 = CFSOM(name='V1')
         V1.print_level = base.WARNING
