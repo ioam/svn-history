@@ -47,12 +47,12 @@ class LISSOM(topo.cfsheet.CFSheet):
     presleep_count = 0
 
     def input_event(self,src,src_port,dest_port,data):
-        # On a new afferent input, clear the activation
+        # On a new afferent input, clear the activity
         if src.name == 'Retina':
-            self.activation *= 0.0
+            self.activity *= 0.0
             for name in self.projections:
                 for proj in self.projections[name]:
-                    proj.temp_activation *= 0.0
+                    proj.temp_activity *= 0.0
 
         super(LISSOM,self).input_event(src,src_port,dest_port,data)
 
@@ -70,14 +70,14 @@ class LISSOM(topo.cfsheet.CFSheet):
 
         if self.new_input:
             self.new_input = False
-            self.temp_activation *= 0.0
+            self.temp_activity *= 0.0
             for name in self.projections:
                 for proj in self.projections[name]:
-                    self.temp_activation += proj.temp_activation
-            self.activation = self.transfer_fn(self.temp_activation,delta,beta)
+                    self.temp_activity += proj.temp_activity
+            self.activity = self.transfer_fn(self.temp_activity,delta,beta)
             # don't send output when an iteration has ended
             if not iteration_done: 
-                self.send_output(data=self.activation)
+                self.send_output(data=self.activity)
 
         if self._learning:
             if self.continuous_learning:
@@ -89,12 +89,12 @@ class LISSOM(topo.cfsheet.CFSheet):
                     
 
     def learn(self):
-        rows,cols = self.activation.shape
+        rows,cols = self.activity.shape
         for proj in chain(*self.projections.values()):
             if proj.input_buffer:
                 alpha = proj.learning_rate
                 if proj.src == self: #lateral connection
-                    inp = self.activation
+                    inp = self.activity
                 else:
                     inp = proj.input_buffer
 
@@ -107,22 +107,22 @@ class LISSOM(topo.cfsheet.CFSheet):
                         # projection. It is much faster to do both of them
                         # in one function.
 			if proj.normalize_fn.func_name == "divisive_normalization":
-                            hebbian_div_norm_c(inp, self.activation, rows, cols, len, cfs, alpha, proj.normalize)
+                            hebbian_div_norm_c(inp, self.activity, rows, cols, len, cfs, alpha, proj.normalize)
                         else:
-                            hebbian_c(inp, self.activation, rows, cols, len, cfs, alpha)
+                            hebbian_c(inp, self.activity, rows, cols, len, cfs, alpha)
 			    norm = proj.normalize
                             for r in range(rows):
                                 for c in range(cols):
                                     proj.normalize_fn(cfs[r][c].weights, norm)
                     else:
-                        hebbian_c(inp, self.activation, rows, cols, len, cfs, alpha)
+                        hebbian_c(inp, self.activity, rows, cols, len, cfs, alpha)
                 else:
                     # apply learning rule and normalization to each unit
                     norm = proj.normalize
                     for r in range(rows):
                         for c in range(cols):
                             cf = proj.cf(r,c)
-                            self.learning_fn(cf.get_input_matrix(inp), self.activation[r,c], cf.weights, alpha)
+                            self.learning_fn(cf.get_input_matrix(inp), self.activity[r,c], cf.weights, alpha)
                             if norm:
                                 proj.normalize_fn(cf.weights, norm)
 
@@ -292,7 +292,7 @@ s.sched_execfn(20000, set_deltabeta, 0.24, 0.88)
 
 #cfsheet.CF.print_level = base.VERBOSE
 
-# Uncomment the connections to the image saver, to save all the activation
+# Uncomment the connections to the image saver, to save all the activity
 # images to disk.
 #s.connect(retina,save,dest_port='retina',delay=2)
 #s.connect(V1,save,dest_port='V1',delay=1)
