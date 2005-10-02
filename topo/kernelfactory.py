@@ -98,8 +98,8 @@ class ImageGenerator(Sheet):
     its image when it gets the .start() call, to repeatedly generate
     images, it must have a self-connection.  More elegant, however,
     would be to convert the ImageGenerator from a sheet to a factory
-    function suitable for use with the InputSheet class (see
-    inputsheet.py). 
+    function suitable for use with the GeneratorSheet class (see
+    topo/sheets/generatorsheet.py). 
 
     """
     filename = Parameter(None)

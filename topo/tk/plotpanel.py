@@ -47,7 +47,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
 
         ### JABHACKALERT!
         ###
-        ### When the InputSheet.density is changed to a relatively
+        ### When the GeneratorSheet.density is changed to a relatively
         ### large but not unreasonable number, e.g. 512*512, the plot
         ### window is many times larger than the screen, and there's
         ### no way to reach the Reduce button.  In general, there need
