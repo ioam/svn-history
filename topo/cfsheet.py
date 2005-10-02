@@ -1,24 +1,15 @@
 """
 Superclass for sheets that take input through connection fields.
 
-This module defines three basic classes of objects used to create
+This module defines two basic classes of objects used to create
 simulations of cortical sheets that take input through connection
 fields projected onto other cortical sheets, or laterally onto
 themselves.  These classes are:
 
 CFSheet: a subclass of topo.sheet.Sheet.
 
-Projection: a class to handle a projection of ConnectionFields from
-one Sheet into a CFSheet.
-
 ConnectionField: a class for specifying a single connection field within a
 Projection.
-
-The module also defines KernelProjection, a subclass of Projection
-that defines projections of connection fields where each
-ConnectionField's initial weight matrix is created by calling a
-KernelFactory.
-
 
 The CFSheet class should be sufficient to create a non-learning sheet
 that computes its activity via the contribution of many local
@@ -82,21 +73,12 @@ $Id$
 
 __version__ = '$Revision$'
 
-from parameter import *
+from parameter import Parameter
 from sheet import Sheet
-from topo.patterns.random import UniformRandomFactory
-from utils import mdot
-from boundingregion import Intersection,BoundingBox
-import RandomArray,Numeric,copy
-import topo.sheetview
-import topo.boundingregion
-import topo.bitmap
-from MLab import flipud, rot90
-from utils import *
 from learningrules import *
-from topo.utils import flatten
 import Numeric
-
+import RandomArray
+from topo.patterns.random import UniformRandomFactory
 
 ###############################################
 from base import TopoObject
@@ -207,179 +189,6 @@ class ConnectionField(TopoObject):
                     s = self.normalize/s
                     wts *= s
 
-
-class Projection(TopoObject):
-    """
-    Projection takes one parameter:
-
-    activation_fn: A function f(X,W) that takes two identically shaped
-    matrices X (the input) and W (the ConnectionField weights) and
-    computes a scalar stimulation value based on those weights.  The
-    default is plastk.utils.mdot
-
-    Any subclass of Projection has to implement the interface
-    compute_response(self,input_activity,rows,cols) that computes
-    the response resulted from the input and store them in the 
-    temp_activity[] array.
-    """
-
-    ### JABHACKALERT!
-    ### 
-    ### The temp_activity array should be named something more
-    ### informative, i.e. whatever it actually is.  In this case it's
-    ### not really an activity, just the scalar result of applying
-    ### the weight matrix to the input matrix.
-    activation_fn = Parameter(default=mdot)
-    src = Parameter(default=None)
-    dest = Parameter(default=None)
-    cf_type = Parameter(default=ConnectionField)
-    strength = Number(default=1.0)
-#   shape = property(get_shape)
-    temp_activity = []
-
-    def __init__(self,**params):
-        super(Projection,self).__init__(**params)
-        self.cfs = None
-        self.input_buffer = None
-        self.temp_activity = Numeric.array(self.dest.activity)
-
-    def cf(self,r,c):
-        return self.cfs[r][c]
-
-    def set_cfs(self,cf_list):
-        self.cfs = cf_list
-
-    def get_shape(self):
-        return len(self.cfs),len(self.cfs[0])
-
-
-    def get_view(self,sheet_x, sheet_y, pixel_scale = 255, offset = 0):
-        """
-        Return a single connection field UnitView, for the unit at
-        sheet_x, sheet_y.  sheet_x and sheet_y are assumed to be in
-        sheet coordinates.
-
-        offset and pixel scale are currently unused.  The original
-        version of the function passed it to a PIL Image object, but
-        this does not, though it should in the future.
-
-        NOTE: BOUNDS MUST BE PROPERLY SET. CURRENTLY A STUB IS IN EFFECT.
-        """
-        (r,c) = (self.dest).sheet2matrix(sheet_x,sheet_y)
-        # composite_name = '%s: %0.3f, %0.3f' % (self.name, sheet_x, sheet_y)
-        #matrix_data = Numeric.array(Numeric.transpose(self.cf(r,c).weights))
-        matrix_data = Numeric.array(self.cf(r,c).weights)
-        #matrix_data = Numeric.array(self.cf(r,c).weights)*50
-        new_box = self.dest.bounds  # TURN INTO A PROPER COPY
-        assert matrix_data != None, "Projection Matrix is None"
-        return topo.sheetview.UnitView((matrix_data,new_box),
-                                       sheet_x,sheet_y,self,
-                                       view_type='UnitView')
-
-
-    
-    def plot_cfs(self,montage=True,file_format='ppm',file_prefix='',
-                 pixel_scale = 255, pixel_offset = 0):
-        """
-        DEPRECATED:  This function can still be used to dump the weights to
-        files, but any reason to use this function means that the necessary
-        replacement has not yet been written.
-        """
-        from Numeric import concatenate as join
-        import Image
-        from utils import add_border
-
-        file_stem = file_prefix + self.__src.name + '-' + self.__dest.name
-        if not montage:
-            for r,row in enumerate(self.cfs):
-                for c,cf in enumerate(row):                    
-                    im = Image.new('L',cf.weights.shape[::-1])
-                    im.putdata(cf.weights.flat,scale=pixel_scale,offset=pixel_offset)
-
-                    f = open(file_stem+'-CF-%0.4d-%0.4d.'%(r,c)+file_format,'w')
-                    im.save(f,file_format)
-                    f.close()
-        else:
-            data = join([join([add_border(cf.weights) for cf in row],axis=1) for row in self.cfs])
-            im = Image.new('L',data.shape[::-1])
-            im.putdata(data.flat,scale=pixel_scale,offset=pixel_offset)
-
-            f = open(file_stem+'-CFS.'+file_format,'w')
-            im.save(f,file_format)
-            f.close()
-
-    def compute_response(self,input_activity,rows,cols):
-        pass
-
-    def reduce_cfsize(self, new_wt_bounds):
-        pass
-
-
-class KernelProjection(Projection):
-    """
-    Projection that is based on an array of weight patterns
-    generated by a KernelFactory.
-    """
-    weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
-    weights_factory = Parameter(default=UniformRandomFactory())
-    normalize = Parameter(default=0.0)
-    normalize_fn = Parameter(divisive_normalization)
-    dest_port = Parameter(default="")
-    learning_rate = Parameter(default=0.0)
-
-    def __init__(self,**params):
-        super(KernelProjection,self).__init__(**params)
-        
-        # set up array of ConnectionFields translated to each x,y in the src sheet
-        cfs = []
-        for y in self.dest.sheet_rows()[::-1]:
-            row = []
-            for x in self.dest.sheet_cols():
-                row.append(self.cf_type(input_sheet=self.src,weight_bounds=self.weights_bounds,normalize=self.normalize,weights_factory=self.weights_factory,x=x,y=y))
-
-            cfs.append(row)
-        self.set_cfs(cfs)
-
-
-    ### JABHACKALERT!
-    ### 
-    ### Instead of having this special case, need to make all activity 
-    ### functions be array-based like compute_response_mdot_c, but with
-    ### one simple and slow version provided that accepts a scalar
-    ### activity function (for generality).        
-    def compute_response(self,input_activity, rows, cols):
-        self.input_buffer = input_activity
-        if self.activation_fn.func_name == "compute_response_mdot_c":
-            # compute_response_mdot_c computes the mdot for all the units
-            compute_response_mdot_c(input_activity, rows, cols, self.temp_activity, self.cfs, self.strength)
-	else:
-            for r in xrange(rows):
-                for c in xrange(cols):
-                    cf = self.cfs[r][c]
-                    r1,r2,c1,c2 = cf.slice
-                    X = input_activity[r1:r2,c1:c2]
-
-                    self.temp_activity[r,c] = self.activation_fn(X,cf.weights)
-            self.temp_activity *= self.strength
-
-
-    def reduce_cfsize(self, new_wt_bounds):
-        """
-        Reduce the sizes of the connection fields contained in this object to
-        new_wt_bounds.
-        """
-        if not self.weights_bounds.containsbb_exclusive(new_wt_bounds):
-            self.warning('reduce_cfsize: new weight bounds should be strictly smaller than the original weight bounds')
-            return
-
-        self.weights_bounds = new_wt_bounds
-        rows,cols = self.get_shape()
-        cfs = self.cfs
-        for r in xrange(rows):
-            for c in xrange(cols):
-                cfs[r][c].reduce_radius(new_wt_bounds)
-
-
 class CFSheet(Sheet):
     """
     A Sheet that computes activity via sets of weighted projections
@@ -423,7 +232,11 @@ class CFSheet(Sheet):
     s2 would then construct a new projection of type MyProjectionType
     with the parameters (a=1,b=2).
     """
-    
+
+    # CEB: does this import being here imply something else should move
+    # out of this file?
+    from topo.projections.kernelprojection import KernelProjection
+
     ### JABHACKALERT!
     ### 
     ### The default learning_fn should be a no-op; all such defaults
