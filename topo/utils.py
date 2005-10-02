@@ -247,26 +247,17 @@ from inspect import ismodule
 def find_classes_in_package(package,parentclass):
     """
     Return a dictionary containing all items of the type
-    specified, owned by submodules of the specified module.
+    specified, owned by modules in the specified package.
     Only currently imported modules are searched, so
     the caller will first need to do 'from package import *'.
-
-    The implementation could probably be simplified, but it seems to
-    work.
     """
-    result={}
-    pd=package.__dict__
-    # iterate over all the items in the module
-    for k in pd:
-        if ismodule(pd[k]): 
-           md=pd[k].__dict__
-           # iterate over all the items in each submodule
-           for k2 in md:
-               # Add any subclasses of the given parentclass that we find
-               if (type(md[k2]) is type(parentclass)) \
-                      and issubclass(md[k2],parentclass) \
-                      and md[k2] is not parentclass:
-                   result[md[k2].__name__] = md[k2]
+    result = {}
+    for v1 in package.__dict__.values():
+        if ismodule(v1):
+            for v2 in v1.__dict__.values():
+                if (isinstance(v2,type)
+                    and issubclass(v2,parentclass)
+                    and v2 is not parentclass):
+                    result[v2.__name__] = v2
     return result
-
 
