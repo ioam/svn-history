@@ -38,7 +38,7 @@ import boundingregion
 import kernelfactory
 
 # sheet types
-import inputsheet
+import topo.sheets.generatorsheet
 
 # plotting
 import bitmap
