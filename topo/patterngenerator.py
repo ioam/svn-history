@@ -1,22 +1,22 @@
 """
 
-Kernel Factory
+Pattern Generator
 
-Defines a class to return Kernels
+Defines a class to return Patterns
 
 There is a registry dictionary called
-topo.kernelfactory.kernel_factories that stores the class name as key,
+topo.patterngenerator.pattern_generators that stores the class name as key,
 and a reference to the class definition as the value.  This dictionary
 is used in the GUI Input Parameter Panel to dynamically generate the
-list of valid KernelFactories that can be presented.  A user can
-define a new subclass of KernelFactory anywhere, and then add an entry
+list of valid PatternGenerators that can be presented.  A user can
+define a new subclass of PatternGenerator anywhere, and then add an entry
 to this dictionary, and the GUI will then add it to the list of
 presentation types.
 
-Kernel Matrix Orientations:
+Pattern Matrix Orientations:
 
-These kernels work closely with Sheets and have been written so that
-the orientation of the kernel matrices have the same orientation
+These patterns work closely with Sheets and have been written so that
+the orientation of the pattern matrices have the same orientation
 maintained by the Sheet classes.  Refer to sheet.py for a longer
 discussion of the Topographica coordinate system.
 
@@ -58,24 +58,13 @@ from pprint import pprint,pformat
 from math import pi
 import topo.registry
 
-### JABALERT!
-###
-### This class hierarchy (and file) should be renamed so that the
-### meaning is more obvious.  What it does is to generate
-### two-dimensional radial function patterns.  Convolution kernels are
-### one such option, but only one; others are input patterns, initial
-### weight patterns, etc.  So perhaps TwoDPattern, TwoDPatternFactory,
-### and twodpattern.py might be better names; in any case we need
-### something other than Kernel.
-
-
 ### JABHACKALERT!
 ### 
 ### The code from here to the end of ImageGenerator needs to be
-### reworked into a proper KernelFactory for rendering images.
+### reworked into a proper PatternGenerator for rendering images.
 
 # Judah: The class ImageGenerator was originally written by Jeff, but
-# now it should be replaced by a KernelFactory that will load in an
+# now it should be replaced by a PatternGenerator that will load in an
 # input file.  Currently (9/05) only used by cfsom.py and a couple of
 # test files.
 from sheet import Sheet
@@ -97,7 +86,7 @@ class ImageGenerator(Sheet):
     NOTE: A bare ImageGenerator only sends a single event, containing
     its image when it gets the .start() call, to repeatedly generate
     images, it must have a self-connection.  More elegant, however,
-    would be to convert the ImageGenerator from a sheet to a factory
+    would be to convert the ImageGenerator from a sheet to a generator
     function suitable for use with the GeneratorSheet class (see
     topo/sheets/generatorsheet.py). 
 
@@ -129,12 +118,12 @@ class ImageGenerator(Sheet):
 
 
 
-def produce_kernel_matrices(bounds, density, r, c):
+def produce_pattern_matrices(bounds, density, r, c):
     """
-    Get Kernel Matrices
+    Get Pattern Matrices
 
     Sets up two vectors for the x and y values based on a bounds and density.
-    The x and y vectors are lists of indexes at which to sample the kernel
+    The x and y vectors are lists of indexes at which to sample the pattern
     function.
     """       
     #left,bottom,right,top = bounds.aarect().lbrt()
@@ -158,11 +147,11 @@ def produce_kernel_matrices(bounds, density, r, c):
     # TODO: Use sheet operations defined in sheet.py? I think we already
     # do...
 
-    kernel_y = array([matrix2sheet(r,0,bounds,density) for r in range(rows)])
-    kernel_x = array([matrix2sheet(0,c,bounds,density) for c in range(cols)])
-    assert len(kernel_x) == cols
-    assert len(kernel_y) == rows
-    return kernel_x[:,0], kernel_y[:,1]
+    pattern_y = array([matrix2sheet(r,0,bounds,density) for r in range(rows)])
+    pattern_x = array([matrix2sheet(0,c,bounds,density) for c in range(cols)])
+    assert len(pattern_x) == cols
+    assert len(pattern_y) == rows
+    return pattern_x[:,0], pattern_y[:,1]
 
 
 
@@ -180,7 +169,7 @@ def produce_kernel_matrices(bounds, density, r, c):
 ### JABHACKALERT!
 ### 
 ### Need to clarify this comment; not clear which matrices are which (data or coordinates)
-def produce_rotated_matrices(kernel_x, kernel_y, theta):
+def produce_rotated_matrices(pattern_x, pattern_y, theta):
     """ Get Rotated matrices
 
     Takes in two Numeric /arrays/ that specify the x and y coordinates separately
@@ -191,23 +180,23 @@ def produce_rotated_matrices(kernel_x, kernel_y, theta):
     coordinates.
     """
 
-    new_kernel_x = subtract.outer(cos(pi-theta)*kernel_x, sin(pi-theta)*kernel_y)
-    new_kernel_y = add.outer(sin(pi-theta)*kernel_x, cos(pi-theta)*kernel_y)
+    new_pattern_x = subtract.outer(cos(pi-theta)*pattern_x, sin(pi-theta)*pattern_y)
+    new_pattern_y = add.outer(sin(pi-theta)*pattern_x, cos(pi-theta)*pattern_y)
 
-    new_kernel_x = flipud(rot90(new_kernel_x))
-    new_kernel_y = flipud(rot90(new_kernel_y))
-    return new_kernel_x, new_kernel_y
+    new_pattern_x = flipud(rot90(new_pattern_x))
+    new_pattern_y = flipud(rot90(new_pattern_y))
+    return new_pattern_x, new_pattern_y
 
 
 ### JABHACKALERT!
 ### 
-### KernelFactory should be renamed to PatternGenerator, and all
-### the Factory classes should be named Generator instead. (The
-### patterns are only sometimes kernels, and in python they are not
-### quite like the C++/Java Factory design pattern; instead they are
+### PatternGenerator should be renamed to PatternGenerator, and all
+### the Generator classes should be named Generator instead. (The
+### patterns are only sometimes patterns, and in python they are not
+### quite like the C++/Java Generator design pattern; instead they are
 ### like generators.)
 
-class KernelFactory(base.TopoObject):
+class PatternGenerator(base.TopoObject):
 
     bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))))
     density = Parameter(default=10000)
@@ -227,20 +216,20 @@ class KernelFactory(base.TopoObject):
 
     def setup_xy(self,bounds,density,x,y,theta,rows,cols):
         self.verbose("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
-        xm,ym = produce_kernel_matrices(bounds,density,rows,cols)
-        self.kernel_x, self.kernel_y = produce_rotated_matrices(xm-x,ym-y,theta)
+        xm,ym = produce_pattern_matrices(bounds,density,rows,cols)
+        self.pattern_x, self.pattern_y = produce_rotated_matrices(xm-x,ym-y,theta)
 
 
 ### JABHACKALERT!
 ###
 ### The variables x, y, etc. don't need to be declared in each of the
-### Factory subclasses, and should be moved to KernelFactory once
+### Generator subclasses, and should be moved to PatternGenerator once
 ### inputparamspanel.py is fixed.
 
-# Trivial example of a KernelFactory, provided for when a default is
-# needed.  The other specific KernelFactory classes are stored in
+# Trivial example of a PatternGenerator, provided for when a default is
+# needed.  The other specific PatternGenerator classes are stored in
 # patterns/, to be imported as needed.
-class SolidFactory(KernelFactory):
+class SolidGenerator(PatternGenerator):
     """
     Solid-color pattern generator.
     """
@@ -248,8 +237,8 @@ class SolidFactory(KernelFactory):
     y       = Number(default=0.0,softbounds=(-1.0,1.0))
 
     def function(self,**params):
-        return self.kernel_x*0+1
+        return self.pattern_x*0+1
 
-# Register this KernelFactory for public use.
-topo.registry.kernel_factories['SolidFactory']=SolidFactory
+# Register this PatternGenerator for public use.
+topo.registry.pattern_generators['SolidGenerator']=SolidGenerator
 
