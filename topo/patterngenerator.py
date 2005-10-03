@@ -5,7 +5,7 @@ Pattern Generator
 Defines a class to return Patterns
 
 There is a registry dictionary called
-topo.patterngenerator.pattern_generators that stores the class name as key,
+topo.registry.pattern_generators that stores the class name as key,
 and a reference to the class definition as the value.  This dictionary
 is used in the GUI Input Parameter Panel to dynamically generate the
 list of valid PatternGenerators that can be presented.  A user can
@@ -20,41 +20,18 @@ the orientation of the pattern matrices have the same orientation
 maintained by the Sheet classes.  Refer to sheet.py for a longer
 discussion of the Topographica coordinate system.
 
-For the purposes of this example, assume the goal is a Topographica
-matrix that has a 1 at (-0.5,-0.5) a 3 at (0.0,0.0), and a 5 at
-(0.5,0.5).  Put a different way,
-
-the area from   -0.5,-0.5   to -0.5/3,-0.5/3 has value 1, 
-the area from -0.5/3,-0.5/3 to  0.5/3,0.5/3  has value 3, and 
-the area from  0.5/3,0.5/3  to    0.5,0.5    has value 5.
-
-The matrix that would match the sheet coordinates describe above is:
-
-  [[3 4 5]
-   [2 3 4]
-   [1 2 3]]
-
-This matrix corresponds to a sheet with the value 1 in the Cartesian
-plane area -0.5,-0.5 to -0.5/3,-0.5/3, etc.  NOTE: Accessing this
-matrix using normal matrix notation will rarely yield reasonable
-results.
-
-
 $Id$
 """
 ### JABHACKALERT!
 ###
 ### Should eliminate all "import *" commands if at all possible.
-### Is pprint used for anything?
 import types
 import base
 from boundingregion import BoundingBox
 from sheet import sheet2matrix, matrix2sheet, bounds2shape
 from Numeric import *
 from MLab import flipud,rot90
-from parameter import * 
-from patternfns import * 
-from pprint import pprint,pformat
+from parameter import Parameter,Number
 from math import pi
 import topo.registry
 
@@ -118,17 +95,17 @@ class ImageGenerator(Sheet):
 
 
 
+### JABHACKALERT!
+### 
+### This should presumably be a private method of PatternGenerator.
 def produce_pattern_matrices(bounds, density, r, c):
     """
-    Get Pattern Matrices
+    Generate vectors representing coordinates at which the pattern will be sampled.
 
     Sets up two vectors for the x and y values based on a bounds and density.
     The x and y vectors are lists of indexes at which to sample the pattern
     function.
     """       
-    #left,bottom,right,top = bounds.aarect().lbrt()
-    #bound_width  = right-left
-    #bound_height = top-bottom
     linear_density = sqrt(density)
 
     if r == 0 and c == 0:
@@ -168,33 +145,31 @@ def produce_pattern_matrices(bounds, density, r, c):
 
 ### JABHACKALERT!
 ### 
-### Need to clarify this comment; not clear which matrices are which (data or coordinates)
-def produce_rotated_matrices(pattern_x, pattern_y, theta):
-    """ Get Rotated matrices
+### Why do the matrices need to be "rotated to match the Topographica
+### Cartesian coordinates"? Is that why a line or grating of zero degrees
+### points upwards instead of to the right?  
+### 
+### This should presumably be a private method of PatternGenerator.
+def transform_coordinates(pattern_x, pattern_y, orientation):
+    """
+    Rotates and translates the given matrix coordinates.
 
-    Takes in two Numeric /arrays/ that specify the x and y coordinates separately
-    and a theta value, returns two Numeric matrices that have their coordinates
-    rotated by that theta.
+    Accepts Numeric matrices specifing the x and y coordinates
+    (separately), along with an orientation value.  Returns two Numeric
+    matrices of the same shape, but with the coordinate values translated
+    and rotated to have the specified origin and orientation.
 
-    The matrix itself is rotated to match the Topographica Cartesian
+    Each matrix is also rotated to match the Topographica Cartesian
     coordinates.
     """
 
-    new_pattern_x = subtract.outer(cos(pi-theta)*pattern_x, sin(pi-theta)*pattern_y)
-    new_pattern_y = add.outer(sin(pi-theta)*pattern_x, cos(pi-theta)*pattern_y)
+    new_pattern_x = subtract.outer(cos(pi-orientation)*pattern_x, sin(pi-orientation)*pattern_y)
+    new_pattern_y = add.outer(sin(pi-orientation)*pattern_x, cos(pi-orientation)*pattern_y)
 
     new_pattern_x = flipud(rot90(new_pattern_x))
     new_pattern_y = flipud(rot90(new_pattern_y))
     return new_pattern_x, new_pattern_y
 
-
-### JABHACKALERT!
-### 
-### PatternGenerator should be renamed to PatternGenerator, and all
-### the Generator classes should be named Generator instead. (The
-### patterns are only sometimes patterns, and in python they are not
-### quite like the C++/Java Generator design pattern; instead they are
-### like generators.)
 
 class PatternGenerator(base.TopoObject):
 
@@ -217,14 +192,14 @@ class PatternGenerator(base.TopoObject):
     def setup_xy(self,bounds,density,x,y,theta,rows,cols):
         self.verbose("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
         xm,ym = produce_pattern_matrices(bounds,density,rows,cols)
-        self.pattern_x, self.pattern_y = produce_rotated_matrices(xm-x,ym-y,theta)
+        self.pattern_x, self.pattern_y = transform_coordinates(xm-x,ym-y,theta)
 
 
 ### JABHACKALERT!
 ###
 ### The variables x, y, etc. don't need to be declared in each of the
-### Generator subclasses, and should be moved to PatternGenerator once
-### inputparamspanel.py is fixed.
+### Generator subclasses (here and elsewhere), and should be moved to
+### PatternGenerator once inputparamspanel.py is fixed.
 
 # Trivial example of a PatternGenerator, provided for when a default is
 # needed.  The other specific PatternGenerator classes are stored in
