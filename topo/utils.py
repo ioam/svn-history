@@ -254,9 +254,9 @@ def find_classes_in_package(package,parentclass):
     package, only the top-level modules.
     """
     result = {}
-    for v1 in package.__dict__.values():
+    for v1 in package.__dict__.itervalues():
         if ismodule(v1):
-            for v2 in v1.__dict__.values():
+            for v2 in v1.__dict__.itervalues():
                 if (isinstance(v2,type)
                     and issubclass(v2,parentclass)
                     and v2 is not parentclass):
