@@ -3,9 +3,9 @@ CC = gcc
 
 all: python jpeg pil numeric pmw matplotlib dislin  dislinpy weave fixedpoint
 
-clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean matplotlib-clean dislin-clean dislinpy-clean fixedpoint-clean
+clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean matplotlib-clean dislin-clean dislinpy-clean fixedpoint-clean weave-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall dislin-uninstall dislinpy-uninstall fixedpoint-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall dislin-uninstall dislinpy-uninstall fixedpoint-uninstall weave-uninstall
 
 ##############################################################
 # Python
@@ -230,14 +230,14 @@ weave-uninstall:
 ##############################################################
 # Fixed-Point package
 #
-FIXEDPT = fixedpoint
+FIXEDPT = fixedpoint-0.1.2
 FIXEDPT_UNINSTALL = ${PYTHON_LIB}/site-packages
 
-fixedpoint: ${FIXEDPT}-0.1.2.tgz python
-	tar xzf ${FIXEDPT}-0.1.2.tgz
-	cp fixedpoint.diff ${FIXEDPT}
-	cp fixedpoint_setup.py ${FIXEDPT}/setup.py
-	cd ${FIXEDPT}; patch < fixedpoint.diff; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
+fixedpoint: ${FIXEDPT}.tgz python
+	tar xzf ${FIXEDPT}.tgz
+	cp fixedpoint.diff fixedpoint${FIXEDPT}
+	cp fixedpoint_setup.py fixedpoint/setup.py
+	cd fixedpoint ; patch < fixedpoint.diff; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch fixedpoint
 
 fixedpoint-clean:
