@@ -79,9 +79,8 @@ for specific platforms and operating system versions.
 Linux: 
 
 To build Topographica under Linux, just type "make" from within the
-topographica/ directory.  Once it seems to be doing something is a
-good time to go out for dinner or a movie; the build process will take
-quite some time (e.g. about twenty minutes on a 3GHz Pentium IV
+topographica/ directory.  The build process will take a while to
+complete (e.g. about 5-10 minutes on a 1.5GHz Pentium IV
 machine).  If all goes well, a script named "topographica" will be
 created in the topographica/ directory; you can use this to start
 Topographica as described below.
