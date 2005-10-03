@@ -1,10 +1,10 @@
 from math import pi
-from topo.kernelfactory import KernelFactory
+from topo.patterngenerator import PatternGenerator
 from topo.parameter import Number
 from topo.patternfns import *
 
 
-class GaussianFactory(KernelFactory):
+class GaussianGenerator(PatternGenerator):
     """
     Gaussian pattern generator
     """
@@ -15,13 +15,13 @@ class GaussianFactory(KernelFactory):
     height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
 
     def function(self,**params):
-        return gaussian( self.kernel_x, 
-                         self.kernel_y, 
+        return gaussian( self.pattern_x, 
+                         self.pattern_y, 
                          params.get('width',self.width), 
                          params.get('height',self.height)) 
 
 
-class SineGratingFactory(KernelFactory):
+class SineGratingGenerator(PatternGenerator):
     """
     Sine grating pattern generator
     """
@@ -32,13 +32,13 @@ class SineGratingFactory(KernelFactory):
     phase     = Number(default=pi/2,bounds=(0.0,None),softbounds=(0.0,2*pi))
 
     def function(self,**params):
-        return sine_grating( self.kernel_x,
-                             self.kernel_y,
+        return sine_grating( self.pattern_x,
+                             self.pattern_y,
                              params.get('frequency',self.frequency), 
                              params.get('phase',self.phase)) 
 
 
-class GaborFactory(KernelFactory):
+class GaborGenerator(PatternGenerator):
     """
     Gabor pattern generator
     """
@@ -51,18 +51,18 @@ class GaborFactory(KernelFactory):
     height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
 
     def function(self,**params):
-        return gabor( self.kernel_x,
-                      self.kernel_y,
+        return gabor( self.pattern_x,
+                      self.pattern_y,
                       params.get('width',self.width),
                       params.get('height',self.height),
                       params.get('frequency',self.frequency),
                       params.get('phase',self.phase))  
 
 
-class FuzzyLineFactory(KernelFactory):
+class FuzzyLineGenerator(PatternGenerator):
 
     """
-    Fuzzy Line Generating Factory
+    Fuzzy Line Generating Generator
     """
     x       = Number(default=0.0,softbounds=(-1.0,1.0))
     y       = Number(default=0.0,softbounds=(-1.0,1.0))
@@ -72,13 +72,13 @@ class FuzzyLineFactory(KernelFactory):
     gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     
     def function(self,**params):
-        return fuzzy_line( self.kernel_x, 
-                           self.kernel_y,
+        return fuzzy_line( self.pattern_x, 
+                           self.pattern_y,
                            params.get('width',self.width),
                            params.get('gaussian_width',self.gaussian_width))  
 
 
-class FuzzyDiskFactory(KernelFactory):
+class FuzzyDiskGenerator(PatternGenerator):
 
     """
     Fuzzy disk pattern generator
@@ -91,13 +91,13 @@ class FuzzyDiskFactory(KernelFactory):
     gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     
     def function(self,**params):
-        return fuzzy_disk( self.kernel_x, 
-                           self.kernel_y, 
+        return fuzzy_disk( self.pattern_x, 
+                           self.pattern_y, 
                            params.get('disk_radius',self.disk_radius), 
                            params.get('gaussian_width',self.gaussian_width))  
 
 
-class FuzzyRingFactory(KernelFactory):
+class FuzzyRingGenerator(PatternGenerator):
     """
     Fuzzy ring pattern generator
     """
@@ -110,14 +110,14 @@ class FuzzyRingFactory(KernelFactory):
 
 
     def function(self,**params):
-        return fuzzy_ring(self.kernel_x, 
-                          self.kernel_y,
+        return fuzzy_ring(self.pattern_x, 
+                          self.pattern_y,
                           params.get('disk_radius',self.disk_radius),
                           params.get('width',self.width),
                           params.get('gaussian_width',self.gaussian_width))  
 
 
-class RectangleFactory(KernelFactory):
+class RectangleGenerator(PatternGenerator):
     """
     Rectangle pattern generator
     """
@@ -130,11 +130,11 @@ class RectangleFactory(KernelFactory):
     def function(self,**params):
         width = params.get('width',self.width)
         height= params.get('height',self.height)
-        return bitwise_and(abs(self.kernel_x)<=width/2.0,
-                           abs(self.kernel_y)<=height/2.0)
+        return bitwise_and(abs(self.pattern_x)<=width/2.0,
+                           abs(self.pattern_y)<=height/2.0)
 
 
-class SquareGratingFactory(KernelFactory):
+class SquareGratingGenerator(PatternGenerator):
     """
     Square grating pattern generator
     """
@@ -145,7 +145,7 @@ class SquareGratingFactory(KernelFactory):
     phase     = Number(default=pi/2,bounds=(0.0,None),softbounds=(0.0,2*pi))
 
     def function(self,**params):
-        return square_grating( self.kernel_x,
-                             self.kernel_y,
+        return square_grating( self.pattern_x,
+                             self.pattern_y,
                              params.get('frequency',self.frequency), 
                              params.get('phase',self.phase)) 

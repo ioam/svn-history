@@ -3,12 +3,12 @@ from pprint import pprint
 from topo import plot
 from topo.sheet import *
 from topo.bitmap import RGBMap
-from topo.kernelfactory import ImageGenerator
+from topo.patterngenerator import ImageGenerator
 from topo.sheets.generatorsheet import *
 import Numeric, random, os
 from math import pi
-from topo.patterns.basic import FuzzyLineFactory
-from topo.patterns.random import UniformRandomFactory
+from topo.patterns.basic import FuzzyLineGenerator
+from topo.patterns.random import UniformRandomGenerator
 import topo.base
 from topo.sheets.cfsom import CFSOM
 import topo.cfsheet
@@ -20,20 +20,20 @@ class TestPlotFileSaver(unittest.TestCase):
     def test_file_saving(self):
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 400
-        FuzzyLineFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        FuzzyLineFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        FuzzyLineFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
-        FuzzyLineFactory.width = 0.02
-        FuzzyLineFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+        FuzzyLineGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+        FuzzyLineGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+        FuzzyLineGenerator.theta = Dynamic(lambda :random.uniform(-pi,pi))
+        FuzzyLineGenerator.width = 0.02
+        FuzzyLineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
         CFSOM.density = 100
         CFSOM.learning_length = 10000
         CFSOM.radius_0 = 0.1
-        topo.projections.kernelprojection.weights_factory = UniformRandomFactory(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+        topo.projections.kernelprojection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
         topo.base.min_print_level = topo.base.WARNING
         self.s = topo.simulator.Simulator()
         
-        retina = GeneratorSheet(input_generator=FuzzyLineFactory(),name='Retina')
-        retina2 = GeneratorSheet(input_generator=FuzzyLineFactory(),name='Retina2')
+        retina = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina')
+        retina2 = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina2')
         V1 = CFSOM(name='V1')
         V2 = CFSOM(name='V2')
         retina.print_level = topo.base.WARNING

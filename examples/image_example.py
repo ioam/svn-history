@@ -17,7 +17,7 @@ $Id$
 
 import sys
 from topo import * 
-from topo.kernelfactory import *
+from topo.patterngenerator import *
 from topo.sheets.composer import Composer
 from topo.plotfilesaver import ImageSaver
 

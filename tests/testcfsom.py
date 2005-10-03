@@ -14,8 +14,8 @@ from topo.sheet import Sheet
 from topo.sheets.generatorsheet import *
 from topo.simulator import *
 from topo.plotfilesaver import ImageSaver
-from topo import kernelfactory
-from topo.patterns.basic import GaussianFactory
+from topo import patterngenerator
+from topo.patterns.basic import GaussianGenerator
 from math import pi
 from topo.parameter import Dynamic
 import random
@@ -35,7 +35,7 @@ class TestCFSom(unittest.TestCase):
         Code moved from __main__ block of cfsom.py.  Gives a tight example
         of running a cfsom simulation.
         """
-        from topo.kernelfactory import ImageGenerator
+        from topo.patterngenerator import ImageGenerator
         from topo.plotfilesaver import ImageSaver
         
         s = Simulator(step_mode=True)
@@ -63,13 +63,13 @@ class TestCFSom(unittest.TestCase):
         GeneratorSheet.density = 900
         GeneratorSheet.print_level = base.WARNING
         
-        GaussianFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        GaussianFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))        
-        GaussianFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
+        GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+        GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))        
+        GaussianGenerator.theta = Dynamic(lambda :random.uniform(-pi,pi))
         
-        GaussianFactory.width = 0.02
-        GaussianFactory.height = 0.9
-        GaussianFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+        GaussianGenerator.width = 0.02
+        GaussianGenerator.height = 0.9
+        GaussianGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
         # cf som parameters
         CFSOM.density = 900
@@ -83,7 +83,7 @@ class TestCFSom(unittest.TestCase):
       
         s = Simulator()
         s.verbose("Creating simulation objects...")
-        retina = GeneratorSheet(input_generator=GaussianFactory())
+        retina = GeneratorSheet(input_generator=GaussianGenerator())
         
         # Old form
         #retina = GaussianSheet(name='Retina')

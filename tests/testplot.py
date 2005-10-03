@@ -3,7 +3,7 @@ from pprint import pprint
 from topo import plot
 from topo.sheet import *
 from topo.bitmap import RGBMap, HSVMap
-from topo.kernelfactory import ImageGenerator
+from topo.patterngenerator import ImageGenerator
 import Numeric
 from Numeric import divide
 

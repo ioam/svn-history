@@ -10,16 +10,16 @@ from topo.plotgroup import KeyedList, PlotGroupTemplate
 from topo.plot import PlotTemplate
 
 ############################################################
-# Registry for subclasses of KernelFactory.  Users can add to this
+# Registry for subclasses of PatternGenerator.  Users can add to this
 # list, and the GUI will automatically add them to the list of
-# KernelFactory inputs possible.  Additional work may be necessary if
+# PatternGenerator inputs possible.  Additional work may be necessary if
 # other than default Parameter names are used in the definition of the
-# KernelFactory.
+# PatternGenerator.
 # JAB: Please explain what that work might be, e.g. which files might
 # need to be edited...
 #
-# Format:   {'NewKernelFactoryClassName':<NewKernelFactoryClass>,....}
-#global kernel_factories
+# Format:   {'NewPatternGeneratorClassName':<NewPatternGeneratorClass>,....}
+#global pattern_generators
 ###
 ### JABHACKALERT!
 ###
@@ -28,8 +28,8 @@ from topo.plot import PlotTemplate
 ### of course have inputparamspanel.py sort the list alphabetically,
 ### but it would be nice to have the option to enforce some other
 ### ordering, which we could achieve by letting things default to the
-### ordering they have in kernel_factories.py.
-kernel_factories = {}
+### ordering they have in pattern_generators.py.
+pattern_generators = {}
 
 
 ############################################################

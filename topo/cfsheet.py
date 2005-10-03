@@ -78,7 +78,7 @@ from sheet import Sheet
 from learningrules import *
 import Numeric
 import RandomArray
-from topo.patterns.random import UniformRandomFactory
+from topo.patterns.random import UniformRandomGenerator
 
 ###############################################
 from base import TopoObject
@@ -91,7 +91,7 @@ class ConnectionField(TopoObject):
     weights = []
     slice_array = []
     
-    def __init__(self,input_sheet,weight_bounds,weights_factory,**params):
+    def __init__(self,input_sheet,weight_bounds,weights_generator,**params):
         super(ConnectionField,self).__init__(**params)
 
         self.input_sheet = input_sheet
@@ -117,14 +117,14 @@ class ConnectionField(TopoObject):
         ### JABHACKALERT!
         ### 
         ### Why the special-purpose code just for
-        ### UniformRandomFactory?  Either document why it is
+        ### UniformRandomGenerator?  Either document why it is
         ### necessary, or eliminate it.
-        if isinstance(weights_factory, UniformRandomFactory):
+        if isinstance(weights_generator, UniformRandomGenerator):
             w = RandomArray.uniform(0,1,[r2-r1,c2-c1])
             self.weights = w.astype(Numeric.Float32)
             #self.weights = Numeric.ones([r2-r1,c2-c1], Numeric.Float32)
         else:
-            w = weights_factory(x=0,y=0,bounds=self.bounds,density=self.input_sheet.density,theta=0,rows=r2-r1,cols=c2-c1)
+            w = weights_generator(x=0,y=0,bounds=self.bounds,density=self.input_sheet.density,theta=0,rows=r2-r1,cols=c2-c1)
             self.weights = w.astype(Numeric.Float32)
 
         # Maintain the original type throughout operations, i.e. do not

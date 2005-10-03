@@ -18,8 +18,8 @@ from topo.plot import PlotTemplate
 from topo.plotengine import *
 from topo.sheets.generatorsheet import *
 from topo.simulator import *
-from topo import kernelfactory
-from topo.patterns.basic import GaussianFactory
+from topo import patterngenerator
+from topo.patterns.basic import GaussianGenerator
 from topo.parameter import Dynamic
 from topo.sheets.cfsom import CFSOM
 from Tkinter import *
@@ -91,12 +91,12 @@ class TestPlotEngine(unittest.TestCase):
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 900
         
-        GaussianFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        GaussianFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        GaussianFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
-        GaussianFactory.width = 0.02
-        GaussianFactory.height = 0.9
-        GaussianFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+        GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+        GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+        GaussianGenerator.theta = Dynamic(lambda :random.uniform(-pi,pi))
+        GaussianGenerator.width = 0.02
+        GaussianGenerator.height = 0.9
+        GaussianGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
         ###########################################
         # build simulation
@@ -125,7 +125,7 @@ class TestPlotEngine(unittest.TestCase):
         sheetR = Sheet()
         sheetG = Sheet()
         sheetB = Sheet()
-        retina = GeneratorSheet(input_generator=GaussianFactory())
+        retina = GeneratorSheet(input_generator=GaussianGenerator())
         retina.print_level = base.WARNING
 
 

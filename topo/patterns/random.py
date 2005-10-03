@@ -1,9 +1,9 @@
 from topo.parameter import Number
-from topo.kernelfactory import KernelFactory
+from topo.patterngenerator import PatternGenerator
 import RandomArray
 
 
-class UniformRandomFactory(KernelFactory):
+class UniformRandomGenerator(PatternGenerator):
     """
     Uniform random noise pattern generator
     """
@@ -15,4 +15,4 @@ class UniformRandomFactory(KernelFactory):
     def function(self,**params):
         return RandomArray.uniform( params.get('min',self.min),
                                     params.get('max',self.max),
-                                    self.kernel_x.shape) 
+                                    self.pattern_x.shape) 

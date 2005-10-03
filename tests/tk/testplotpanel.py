@@ -2,7 +2,7 @@ import unittest, os
 import topo
 from topo.sheets.generatorsheet import *
 from topo.tk import *
-from topo.kernelfactory import *
+from topo.patterngenerator import *
 from topo.simulator import *
 from PIL import Image
 from topo.sheetview import *
@@ -16,7 +16,7 @@ from math import pi
 from topo.parameter import Dynamic
 import random
 import pdb #debugger
-from topo.patterns.basic import GaussianFactory,FuzzyLineFactory
+from topo.patterns.basic import GaussianGenerator,FuzzyLineGenerator
 
 class TestPlotPanel(unittest.TestCase):
 
@@ -33,12 +33,12 @@ class TestPlotPanel(unittest.TestCase):
 #        base.print_level = base.WARNING
 #        GeneratorSheet.print_level = base.WARNING
         
-        GaussianFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        GaussianFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        GaussianFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
-        GaussianFactory.width = 0.02
-        GaussianFactory.height = 0.9
-        GaussianFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+        GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+        GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+        GaussianGenerator.theta = Dynamic(lambda :random.uniform(-pi,pi))
+        GaussianGenerator.width = 0.02
+        GaussianGenerator.height = 0.9
+        GaussianGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
         ###########################################
         # build simulation
@@ -66,7 +66,7 @@ class TestPlotPanel(unittest.TestCase):
         sheetR = Sheet()
         sheetG = Sheet()
         sheetB = Sheet()
-        retina = GeneratorSheet(input_generator=GaussianFactory())
+        retina = GeneratorSheet(input_generator=GaussianGenerator())
         retina.print_level = base.WARNING
 
         # For a new sheet_group named Miata:
@@ -104,11 +104,11 @@ class TestPlotPanel(unittest.TestCase):
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 900
         
-        FuzzyLineFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        FuzzyLineFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        FuzzyLineFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
-        FuzzyLineFactory.width = 0.02
-        FuzzyLineFactory.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+        FuzzyLineGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+        FuzzyLineGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+        FuzzyLineGenerator.theta = Dynamic(lambda :random.uniform(-pi,pi))
+        FuzzyLineGenerator.width = 0.02
+        FuzzyLineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
         
         # rf som parameters
         CFSOM.density = 2500
@@ -119,7 +119,7 @@ class TestPlotPanel(unittest.TestCase):
         # build simulation
         s = topo.simulator.Simulator()
         
-        retina = GeneratorSheet(input_generator=FuzzyLineFactory(),name='Retina')
+        retina = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina')
         retina.print_level = base.WARNING
         V1 = CFSOM(name='V1')
         V1.print_level = base.WARNING

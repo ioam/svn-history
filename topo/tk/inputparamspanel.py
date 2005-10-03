@@ -5,8 +5,8 @@ Sliders panel for inputs
 
 The list of valid Input Types is retrieved from the registry, and
 would normally contain an automatically generated list of
-KernelFactory subclasses found in topo.kernelfactory.  Every
-Parameter defined in the KernelFactory subclass will be taken with the
+PatternGenerator subclasses found in topo.patterngenerator.  Every
+Parameter defined in the PatternGenerator subclass will be taken with the
 intersection of valid TaggedSlider types defined in this class and
 then shown in the window.
 
@@ -18,7 +18,7 @@ $Id$
 import __main__
 import math, string, re
 import propertiesframe
-import topo.kernelfactory
+import topo.patterngenerator
 import topo.plot
 import plotpanel
 import Pmw
@@ -31,7 +31,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.sheet import BoundingBox, Sheet
 from topo.utils import eval_atof
 from topo.utils import find_classes_in_package
-from topo.kernelfactory import KernelFactory
+from topo.patterngenerator import PatternGenerator
 
 # Hack to reverse the order of the input EventProcessor list and the
 # Preview plot list, so that it'll match the order that the plots appear
@@ -45,22 +45,22 @@ DEFAULT_PRESENTATION = '1.0'
 # By default, none of the pattern types in topo/patterns/ are imported
 # in Topographica, but for the GUI, we want all of them to be
 # available as a list from which the user can select. To do this, we
-# import all of the KernelFactory classes in all of the modules
+# import all of the PatternGenerator classes in all of the modules
 # mentioned in topo.patterns.__all__, and will also use any that the
 # user has defined and registered.
 from topo.patterns import *
-patternclasses=find_classes_in_package(topo.patterns,KernelFactory)
-topo.registry.kernel_factories.update(patternclasses)
+patternclasses=find_classes_in_package(topo.patterns,PatternGenerator)
+topo.registry.pattern_generators.update(patternclasses)
 
 
-def kernelfactory_names():
+def patterngenerator_names():
     """
-    Return the existing list of KernelFactory subclasses.  This list
+    Return the existing list of PatternGenerator subclasses.  This list
     will change based on the existing classes found in the registry,
     and can be extended by the user.
     """
-    k = topo.registry.kernel_factories.keys()
-    k = [re.sub('Factory$','',name) for name in k]  # Cut off 'Factory'
+    k = topo.registry.pattern_generators.keys()
+    k = [re.sub('Generator$','',name) for name in k]  # Cut off 'Generator'
     for i in range(len(k)):        # Add spaces before capital leters
         for c in string.uppercase:
             k[i] = k[i].replace(c,' '+c).strip()
@@ -103,7 +103,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         for each in self.input_eps():
             self.in_ep_dict[each.name] = {'obj':each,
                                           'state':True,
-                                          'kernel':None} 
+                                          'pattern':None} 
         self.input_box = Pmw.RadioSelect(parent, labelpos = 'w',
                                 command = self._input_change,
                                 label_text = 'Input Sheets:',
@@ -136,8 +136,8 @@ class InputParamsPanel(plotpanel.PlotPanel):
         buttonBox.add('Use for future learning',
                       command = self.use_for_learning)
 
-        # Define menu of valid KernelFactory types
-        self.input_types = kernelfactory_names()
+        # Define menu of valid PatternGenerator types
+        self.input_types = patterngenerator_names()
         
         self.input_type = StringVar()
         self.input_type.set(self.input_types[0])
@@ -155,9 +155,9 @@ class InputParamsPanel(plotpanel.PlotPanel):
         ###
         ### There can't be any list of valid parameters defined in
         ### this class; the user needs to be able to add any arbitrary
-        ### parameter to a new KernelFactory of his or her own design.
+        ### parameter to a new PatternGenerator of his or her own design.
         ### So all the information below needs to be stored with the
-        ### KernelFactory or some lower-level entity, preferably as
+        ### PatternGenerator or some lower-level entity, preferably as
         ### part of the Parameter definition.  Some of the values here
         ### are just hints, while others are absolute maximum or
         ### minimums, and the Parameter definition would need to
@@ -214,7 +214,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         self.parent.protocol('WM_DELETE_WINDOW',self._reset_and_destroy)
 
         self.default_values = self.prop_frame.get_values()
-        self._update_inputsheet_kernels()
+        self._update_inputsheet_patterns()
         self.refresh()
 
 
@@ -253,12 +253,12 @@ class InputParamsPanel(plotpanel.PlotPanel):
     def _refresh_sliders(self,new_name):
         """
         Called by the Pmw.OptionMenu object when the user selects a
-        KernelFactory type from the menu.  The visible TaggedSliders
+        PatternGenerator type from the menu.  The visible TaggedSliders
         will be updated.  The old ones are removed, and new ones are
         added to the screen.  The widgets themselves do not change but
         the grid location does.
         """
-        new_name = new_name.replace(' ','') + 'Factory'
+        new_name = new_name.replace(' ','') + 'Generator'
         # How to wipe the widgets off the screen
         for (s,c) in self.tparams.values():
             s.grid_forget()
@@ -274,20 +274,20 @@ class InputParamsPanel(plotpanel.PlotPanel):
                    padx=self.padding,
                    pady=self.padding,
                    sticky=N+S+W+E)
-        self._update_inputsheet_kernels()
+        self._update_inputsheet_patterns()
         if self.auto_refresh: self.refresh()
 
 
     def relevant_parameters(self,kf_classname,param_list):
         """
-        Pre:  kf_classname is the string name of a KernelFactory subclass.
+        Pre:  kf_classname is the string name of a PatternGenerator subclass.
               param_list is a list of strings of parameter tagged sliders
               that are viewable from the window.
         Post: List of strings that is the Intersection of kf_classname's
               class member keys, and param_list entries.
         """
         
-        kf_class_keylist = topo.registry.kernel_factories[kf_classname].__dict__.keys()
+        kf_class_keylist = topo.registry.pattern_generators[kf_classname].__dict__.keys()
         rlist = [s for s in param_list if s in kf_class_keylist]
         return rlist
 
@@ -313,36 +313,36 @@ class InputParamsPanel(plotpanel.PlotPanel):
 
     def present(self):
         """
-        Move the user created kernels into the GeneratorSheets, run for
+        Move the user created patterns into the GeneratorSheets, run for
         the specified length of time, then restore the original
-        kernels.  The system may become unstable if the user breaks
-        this thread so that the original kernels are not properly
+        patterns.  The system may become unstable if the user breaks
+        this thread so that the original patterns are not properly
         restored, but then there are going to be other problems with
         the Simulator state if a run is interrupted.
 
         This function is run no matter if learning is enabled or
         disabled since run() will detect sheet attributes.
         """
-        new_kernels_dict = self._update_inputsheet_kernels()
-        original_kernels = self._store_inputsheet_kernels()
-        self.register_inputsheet_kernels(new_kernels_dict)
+        new_patterns_dict = self._update_inputsheet_patterns()
+        original_patterns = self._store_inputsheet_patterns()
+        self.register_inputsheet_patterns(new_patterns_dict)
         
         sim = self.console.active_simulator()
         sim.run(eval_atof(self.present_length.getvalue()))
         
-        self.register_inputsheet_kernels(original_kernels)
+        self.register_inputsheet_patterns(original_patterns)
         self.console.auto_refresh()
 
 
     ### JAB: It is not clear how this will need to be extended to support
     ### objects with different parameters in the different eyes, e.g. to
     ### test ocular dominance.
-    def _update_inputsheet_kernels(self):
+    def _update_inputsheet_patterns(self):
         """
-        Make an instantiation of the current user kernel, and put it into
+        Make an instantiation of the current user pattern, and put it into
         all of the selected input sheets.
         """
-        kname = self.input_type.get() + 'Factory'
+        kname = self.input_type.get() + 'Generator'
         kname = kname.replace(' ','')
         p = self.get_params()
         rp = self.relevant_parameters(kname,self.tparams.keys())
@@ -357,36 +357,36 @@ class InputParamsPanel(plotpanel.PlotPanel):
             if self.in_ep_dict[each]['state']:
                 ndict['density'] = self.in_ep_dict[each]['obj'].density
                 ndict['bounds'] = deepcopy(self.in_ep_dict[each]['obj'].bounds)
-                kf = topo.registry.kernel_factories[kname](**ndict)
-                self.in_ep_dict[each]['kernel'] = kf
+                kf = topo.registry.pattern_generators[kname](**ndict)
+                self.in_ep_dict[each]['pattern'] = kf
         return self.in_ep_dict  # Doesn't have to return it, but is explicit.
 
 
-    def _store_inputsheet_kernels(self):
+    def _store_inputsheet_patterns(self):
         """
-        Store the kernels currently in the GeneratorSheets.
+        Store the patterns currently in the GeneratorSheets.
         """
-        kernel_dict = {}
+        pattern_dict = {}
         for each in self.in_ep_dict.keys():
-            kernel_dict[each] = {}
-            kernel_dict[each]['obj'] = self.in_ep_dict[each]['obj']
-            kernel_dict[each]['state'] = True
-            kernel_dict[each]['kernel'] = kernel_dict[each]['obj'].get_input_generator()
-        return kernel_dict
+            pattern_dict[each] = {}
+            pattern_dict[each]['obj'] = self.in_ep_dict[each]['obj']
+            pattern_dict[each]['state'] = True
+            pattern_dict[each]['pattern'] = pattern_dict[each]['obj'].get_input_generator()
+        return pattern_dict
     
 
-    def register_inputsheet_kernels(self,kernels_dict):
+    def register_inputsheet_patterns(self,patterns_dict):
         """
         Each dictionary entry must have an 'obj' with an GeneratorSheet as
-        value, with 'state' set to True or False to see if the kernel
-        should be replaced, and a 'kernel' key with the kernel object
+        value, with 'state' set to True or False to see if the pattern
+        should be replaced, and a 'pattern' key with the pattern object
         as value that should be moved into the GeneratorSheet.
         """
         for each in self.in_ep_dict.keys():
             # Use this to only present to the ones that are currently selected:
-            # if kernels_dict[each]['state']:
-            ep = kernels_dict[each]['obj']
-            ep.set_input_generator(kernels_dict[each]['kernel'])
+            # if patterns_dict[each]['state']:
+            ep = patterns_dict[each]['obj']
+            ep.set_input_generator(patterns_dict[each]['pattern'])
 
 
     ### JAB: It is not clear how this will need to be extended to support
@@ -396,15 +396,15 @@ class InputParamsPanel(plotpanel.PlotPanel):
     ### orientations, but not random sizes.
     def use_for_learning(self):
         """
-        Lock in the existing KernelFactories as the new default stimulus
+        Lock in the existing PatternFactories as the new default stimulus
         input to the input sheets.  This should work like a test stimuli,
         but the original input generator is not put back afterwards.
 
         This function does not run() the simulator.
         """
-        new_kernels_dict = self._update_inputsheet_kernels()
-        original_kernels = self._store_inputsheet_kernels()
-        self.register_inputsheet_kernels(new_kernels_dict)
+        new_patterns_dict = self._update_inputsheet_patterns()
+        original_patterns = self._store_inputsheet_patterns()
+        self.register_inputsheet_patterns(new_patterns_dict)
         self.console.auto_refresh()
 
 
@@ -415,7 +415,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         for each in self.in_ep_dict.keys():
             if not self.in_ep_dict[each]['state']:
                 self.input_box.invoke(each)
-        self._update_inputsheet_kernels()
+        self._update_inputsheet_patterns()
         self._refresh_sliders(self.input_type.get())
         if self.auto_refresh: self.refresh()
         if not self.learning.get():
@@ -427,7 +427,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         params = self.prop_frame.get_values()
 
 # With no Photograph option, this block is not useful.  Something similar
-# may have to go back in once Photograph kernels are created.
+# may have to go back in once Photograph patterns are created.
 #        if self.input_type.get() == 'Photograph':
 #            # The type is PGM and the file name is the Photograph
 #            params['type'] = 'PGM'
@@ -458,9 +458,9 @@ class InputParamsPanel(plotpanel.PlotPanel):
         """
         plist = []
         for each in self.in_ep_dict.keys():
-            k = self.in_ep_dict[each]['kernel']
+            k = self.in_ep_dict[each]['pattern']
             sv = topo.sheetview.SheetView((k(),k.bounds),src_name=each,
-                                          view_type='Kernel')
+                                          view_type='Pattern')
             plist.append(topo.plot.Plot((sv,None,None),topo.plot.COLORMAP))
         if LIST_REVERSE: plist.reverse()
         self.pe_group = topo.plotgroup.PlotGroup('Preview',None,plist)
@@ -472,7 +472,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         """
         Use the parent class refresh
         """
-        self._update_inputsheet_kernels()
+        self._update_inputsheet_patterns()
         for entry in self.tparams.values():
             if entry[1].need_to_refresh_slider:
                 entry[1].set_slider_from_tag()

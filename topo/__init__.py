@@ -34,8 +34,8 @@ import commandline
 import sheet
 import boundingregion
 
-# kernels
-import kernelfactory
+# patterns
+import patterngenerator
 
 # sheet types
 import topo.sheets.generatorsheet

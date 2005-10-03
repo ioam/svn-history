@@ -8,7 +8,7 @@ import pdb #debugger
 
 
 from topo import *
-from topo.kernelfactory import *
+from topo.patterngenerator import *
 from topo.sheets.generatorsheet import *
 from topo.plotfilesaver import ImageSaver
 import topo.cfsheet
@@ -17,8 +17,8 @@ from topo.utils import *
 from topo.learningrules import *
 import weave
 import Numeric
-from topo.patterns.random import UniformRandomFactory
-from topo.patterns.basic import GaussianFactory
+from topo.patterns.random import UniformRandomGenerator
+from topo.patterns.basic import GaussianGenerator
 
 
 from topo.utils import msum
@@ -204,13 +204,13 @@ print "Setting parameters..."
 GeneratorSheet.density = RN*RN
 GeneratorSheet.period = 1
 
-GaussianFactory.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-GaussianFactory.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
 
-GaussianFactory.theta = Dynamic(lambda :random.uniform(-pi,pi))
-GaussianFactory.width = xsigma/RN
-GaussianFactory.height = ysigma/RN
-GaussianFactory.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+GaussianGenerator.theta = Dynamic(lambda :random.uniform(-pi,pi))
+GaussianGenerator.width = xsigma/RN
+GaussianGenerator.height = ysigma/RN
+GaussianGenerator.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 
 
 # lissom parameters
@@ -233,7 +233,7 @@ print "Creating simulation objects..."
 
 s = topo.simulator.Simulator(time_precision=timeprecision)
 
-retina = GeneratorSheet(input_generator=GaussianFactory(),name='Retina')
+retina = GeneratorSheet(input_generator=GaussianGenerator(),name='Retina')
 V1 = LISSOM(name='V1')
 save  = ImageSaver(name='LISSOM')
 

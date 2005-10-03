@@ -13,7 +13,7 @@ import copy
 
 from topo.parameter import Parameter, Dynamic
 
-from topo.kernelfactory import SolidFactory
+from topo.patterngenerator import SolidGenerator
 
 class GeneratorSheet(Sheet):
 
@@ -22,7 +22,7 @@ class GeneratorSheet(Sheet):
 
     theta = Parameter(default=0)
 
-    input_generator = Parameter(default=SolidFactory)
+    input_generator = Parameter(default=SolidGenerator)
     
     def __init__(self,**params):
         super(GeneratorSheet,self).__init__(**params)

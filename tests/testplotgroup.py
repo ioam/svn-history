@@ -7,7 +7,7 @@ from topo.sheet import *
 from topo.plotgroup import *
 from topo.plot import PlotTemplate
 from topo.bitmap import RGBMap
-from topo.kernelfactory import ImageGenerator
+from topo.patterngenerator import ImageGenerator
 import Numeric
 from Numeric import divide
 

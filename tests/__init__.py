@@ -19,7 +19,7 @@ import testsimulator
 import testpalette
 import testdislinplot
 import testcfsom
-import testkernelfactory
+import testpatterngenerator
 import testmatplotlib
 # tk import calls tk/__init__.py which should contain other test
 # imports for that directory.
