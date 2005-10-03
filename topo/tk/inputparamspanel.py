@@ -188,7 +188,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         self.tparams['gaussian_width'] = \
           self.add_slider( 'gaussian_width',"0.000001", "1"   ,  "0.15"   )
 
-# NOT IN EXISTING KERNELFACTORIES 9/2005
+# NOT IN EXISTING PATTERNGENERATORS 9/2005
 #        self.tparams['xsigma'] = \
 #          self.add_slider( 'xsigma',       "0"     ,   "RN"     ,  "7.5"     )
 #        self.tparams['ysigma'] = \

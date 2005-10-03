@@ -42,7 +42,7 @@ class GeneratorSheet(Sheet):
         ###
         ### Why is this hack necessary?  How can we eliminate it?
         ###
-        # KERNELFACTORY HACK PATCH TO GET THE X/Y RIGHT OUTSIDE OF KFS.
+        # PATTERNGENERATOR HACK PATCH TO GET THE X/Y RIGHT OUTSIDE OF KFS.
         (l,b,r,t) = self.bounds.aarect().lbrt()
         self.input_generator.bounds = BoundingBox(points=((b,l),(t,r)))
         self.input_generator.density = self.density
