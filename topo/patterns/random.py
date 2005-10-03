@@ -1,3 +1,12 @@
+"""
+Two-dimensional pattern generators drawing from various random distributions.
+
+At present, supports uniform random distributions, but could support
+normal distributions or 1/f noise.
+
+$Id$
+"""
+
 from topo.parameter import Number
 from topo.patterngenerator import PatternGenerator
 import RandomArray
@@ -5,7 +14,7 @@ import RandomArray
 
 class UniformRandomGenerator(PatternGenerator):
     """
-    Uniform random noise pattern generator
+    Uniform random noise pattern generator.
     """
     x       = Number(default=0.0,softbounds=(-1.0,1.0))
     y       = Number(default=0.0,softbounds=(-1.0,1.0))

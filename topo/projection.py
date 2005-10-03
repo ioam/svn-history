@@ -3,6 +3,9 @@ Projection: a class to handle a projection of ConnectionFields from
 one Sheet into a CFSheet.
 """
 
+### JABHACKALERT!
+###
+### Should eliminate import *.
 from topo.parameter import Parameter, Number
 from topo.utils import mdot
 import Numeric
@@ -28,10 +31,7 @@ class Projection(TopoObject):
 
     ### JABHACKALERT!
     ### 
-    ### The temp_activity array should be named something more
-    ### informative, i.e. whatever it actually is.  In this case it's
-    ### not really an activity, just the scalar result of applying
-    ### the weight matrix to the input matrix.
+    ### The temp_activity array should be renamed to "activity".
     activation_fn = Parameter(default=mdot)
     src = Parameter(default=None)
     dest = Parameter(default=None)
@@ -56,6 +56,10 @@ class Projection(TopoObject):
         return len(self.cfs),len(self.cfs[0])
 
 
+    ### JABHACKALERT!
+    ###
+    ### What does the documentation mean by "stub"?  Needs to be
+    ### fixed, and the commented-out code needs to be removed or used.
     def get_view(self,sheet_x, sheet_y, pixel_scale = 255, offset = 0):
         """
         Return a single connection field UnitView, for the unit at
@@ -78,6 +82,9 @@ class Projection(TopoObject):
         return UnitView((matrix_data,new_box),sheet_x,sheet_y,self,view_type='UnitView')
 
     
+    ### JABHACKALERT!
+    ###
+    ### Can this function be eliminated?
     def plot_cfs(self,montage=True,file_format='ppm',file_prefix='',
                  pixel_scale = 255, pixel_offset = 0):
         """

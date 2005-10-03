@@ -48,8 +48,10 @@ class CFSOM(CFSheet):
     def radius(self):
         return self.radius_0 * decay(float(self.simulator.time()),self.half_life)
 
-    ##########################################
 
+    ### JABHACKALERT!
+    ###
+    ### Would it make sense to move any of this to learningrules.py?  If not, document why not.
     def learn(self):
 
         rows,cols = self.activity.shape

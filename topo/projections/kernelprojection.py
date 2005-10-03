@@ -3,7 +3,13 @@ The module defines KernelProjection, a subclass of Projection
 that defines projections of connection fields where each
 ConnectionField's initial weight matrix is created by calling a
 PatternGenerator.
+
+$Id$
 """
+
+### JABHACKALERT!
+###
+### Should eliminate import *.
 from topo.projection import Projection
 from topo.parameter import Parameter
 from topo.patterns.random import UniformRandomGenerator
