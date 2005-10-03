@@ -35,13 +35,13 @@ EXP_CUTOFF = -100
 ### instead of pattern_x, pattern_y, because they do not need to be
 ### in the context of a pattern to be useful.
 
-def gaussian(pattern_x, pattern_y, width, height):
+def gaussian(x, y, width, height):
     """
     Two-dimensional oriented Gaussian pattern (i.e., 2D version of a
     bell curve, like a normal distribution but without necessarily
     summing to 1.0).
     """
-    new_pattern = -(pattern_x / width)**2 + -(pattern_y / height)**2
+    new_pattern = -(x / width)**2 + -(y / height)**2
 
     # maximum( ) is needed to avoid overflow in some situations
     k = exp(maximum(EXP_CUTOFF,new_pattern))
@@ -49,55 +49,60 @@ def gaussian(pattern_x, pattern_y, width, height):
     return k
 
 
-def sine_grating(pattern_x, pattern_y, frequency, phase):
+def sine_grating(x, y, frequency, phase):
     """
     Sine grating pattern (two-dimensional sine wave).
     """
-    return 0.5 + 0.5*sin(frequency*2*pi*pattern_x + phase)
+    return 0.5 + 0.5*sin(frequency*2*pi*x + phase)
 
 
 # We will probably want to add anti-aliasing to this,
 # and there might be an easier way to do it than by
 # cropping a sine grating.
-def square_grating(pattern_x, pattern_y, frequency, phase):
+def square_grating(x, y, frequency, phase):
     """
     Square-wave grating (alternating black and white bars).
     """
-    #return around(0.5 + 0.5*sin(frequency*2*pi*pattern_x + phase))
-    return 0.5 + 0.5*sin(frequency*2*pi*pattern_x + phase)
+    #return around(0.5 + 0.5*sin(frequency*2*pi*x + phase))
+    return 0.5 + 0.5*sin(frequency*2*pi*x + phase)
 
 
-def gabor(pattern_x, pattern_y, width, height, frequency, phase):
+def gabor(x, y, width, height, frequency, phase):
     """
     Gabor pattern (sine grating multiplied by a circular Gaussian).
     """
  
-    k = exp(maximum(EXP_CUTOFF,-(pattern_x/width)**2-(pattern_y/height)**2))
+    k = exp(maximum(EXP_CUTOFF,-(x/width)**2-(y/height)**2))
     k = where(k > exp(EXP_CUTOFF), k, 0.0)
-    return k * (0.5 + 0.5*cos(2*pi*frequency*pattern_x + phase))
+    return k * (0.5 + 0.5*cos(2*pi*frequency*x + phase))
 
 
-### JABHACKALERT!
-# CEB: Needs total reimplementation (to be the way it's done in LISSOM; currently it is a disk)
-def fuzzy_line(pattern_x, pattern_y, width, gaussian_width):
+def fuzzy_line(x, y, center_width, gaussian_width):
+    """
+    Infinite-length line with a solid central region, then Gaussian fall-off at the edges.
+    """
+    distance_from_line = abs(x)
+    gaussian_x_coord = distance_from_line - center_width/2
+    
+    return where(gaussian_x_coord<=0, 1.0,
+                 exp(maximum(EXP_CUTOFF,-(gaussian_x_coord/gaussian_width)**2)))
+
+# CEB: maybe this version is faster?
+
+#    div_gaussian_width_sq = 1/(gaussian_width*gaussian_width)
+#    distance_from_line = abs(x)
+#    gaussian_x_coord   = distance_from_line - center_width/2
+
+#    return where (gaussian_x_coord <= 0, 1.0, exp(maximum(EXP_CUTOFF,-gaussian_x_coord*gaussian_x_coord*div_gaussian_width_sq)))
+
+
+
+
+def fuzzy_disk(x, y, disk_radius, gaussian_width):
     """
     Circular disk with Gaussian fall-off after the solid central region.
     """
-    distance_from_line = sqrt((pattern_x**2)+(pattern_y**2))
-    gaussian_x_coord   = distance_from_line/2.0
-    div_sigmasq = 1 / (gaussian_width*gaussian_width)
-
-    disk = less_equal(gaussian_x_coord,0)
-    k = maximum(disk, exp(maximum(EXP_CUTOFF,
-                                  -gaussian_x_coord*gaussian_x_coord*div_sigmasq)))
-    return where(k != exp(EXP_CUTOFF), k, 0.0)
-
-
-def fuzzy_disk(pattern_x, pattern_y, disk_radius, gaussian_width):
-    """
-    Circular disk with Gaussian fall-off after the solid central region.
-    """
-    distance_from_line = sqrt((pattern_x**2)+(pattern_y**2)) 
+    distance_from_line = sqrt((x**2)+(y**2)) 
     gaussian_x_coord   = distance_from_line - disk_radius/2.0 
     div_sigmasq = 1 / (gaussian_width*gaussian_width)
 
@@ -108,13 +113,13 @@ def fuzzy_disk(pattern_x, pattern_y, disk_radius, gaussian_width):
 
 
 
-def fuzzy_ring(pattern_x, pattern_y, disk_radius, ring_radius, gaussian_width):
+def fuzzy_ring(x, y, disk_radius, ring_radius, gaussian_width):
     """
     Circular ring (annulus) with Gaussian fall-off after the solid ring-shaped region.
     """    
     disk_radius = disk_radius
     ring_radius = ring_radius / 2.0
-    distance_from_line = abs(sqrt((pattern_x**2)+(pattern_y**2)) - disk_radius)
+    distance_from_line = abs(sqrt((x**2)+(y**2)) - disk_radius)
     inner_distance = distance_from_line - ring_radius
     outer_distance = distance_from_line + ring_radius
     div_sigmasq = 1 / (gaussian_width*gaussian_width)
