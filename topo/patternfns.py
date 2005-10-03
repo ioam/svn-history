@@ -6,34 +6,17 @@ Numeric arrays of x and y (in which case the result is also an array).
 
 $Id$
 """
-### JABALERT!
-### 
-### It would be good to remove the dependence on Numeric and RandomArray,
-### but it may not be possible to do that.
-###
+
+from math import pi
+from Numeric import where,maximum,exp,cos,sin,sqrt,less_equal
+
+
 ### JABHACKALERT!
 ###
-### Should eliminate all "import *" commands if at all possible.
-from math import pi,sin,cos,exp
-from Numeric import *
-
-
-### JABALERT!
-###
-### Is this really necessary?  If so, please document better why.
-###
-# Some patterns use math.exp() to generate a falling off of activity.
-# But exp will overflow if too small a value is given, so this
-# constant defines the smallest value to accept from the patterns.
-# exp(-100) is appx. 3.72e-44
+### Instead of EXP_CUTOFF, which avoided a math RangeError, should
+### write a safeexp() function that catches such errors.
 EXP_CUTOFF = -100
 
-
-### JABHACKALERT!
-### 
-### They should probably all be renamed to use x,y
-### instead of pattern_x, pattern_y, because they do not need to be
-### in the context of a pattern to be useful.
 
 def gaussian(x, y, width, height):
     """
@@ -43,28 +26,9 @@ def gaussian(x, y, width, height):
     """
     new_pattern = -(x / width)**2 + -(y / height)**2
 
-    # maximum( ) is needed to avoid overflow in some situations
     k = exp(maximum(EXP_CUTOFF,new_pattern))
     k = where(k != exp(EXP_CUTOFF), k, 0.0)
     return k
-
-
-def sine_grating(x, y, frequency, phase):
-    """
-    Sine grating pattern (two-dimensional sine wave).
-    """
-    return 0.5 + 0.5*sin(frequency*2*pi*x + phase)
-
-
-# We will probably want to add anti-aliasing to this,
-# and there might be an easier way to do it than by
-# cropping a sine grating.
-def square_grating(x, y, frequency, phase):
-    """
-    Square-wave grating (alternating black and white bars).
-    """
-    #return around(0.5 + 0.5*sin(frequency*2*pi*x + phase))
-    return 0.5 + 0.5*sin(frequency*2*pi*x + phase)
 
 
 def gabor(x, y, width, height, frequency, phase):
@@ -87,16 +51,6 @@ def fuzzy_line(x, y, center_width, gaussian_width):
     return where(gaussian_x_coord<=0, 1.0,
                  exp(maximum(EXP_CUTOFF,-(gaussian_x_coord/gaussian_width)**2)))
 
-# CEB: maybe this version is faster?
-
-#    div_gaussian_width_sq = 1/(gaussian_width*gaussian_width)
-#    distance_from_line = abs(x)
-#    gaussian_x_coord   = distance_from_line - center_width/2
-
-#    return where (gaussian_x_coord <= 0, 1.0, exp(maximum(EXP_CUTOFF,-gaussian_x_coord*gaussian_x_coord*div_gaussian_width_sq)))
-
-
-
 
 def fuzzy_disk(x, y, disk_radius, gaussian_width):
     """
@@ -110,7 +64,6 @@ def fuzzy_disk(x, y, disk_radius, gaussian_width):
     k = maximum(disk, exp(maximum(EXP_CUTOFF,
                                   -gaussian_x_coord*gaussian_x_coord*div_sigmasq)))
     return where(k != exp(EXP_CUTOFF), k, 0.0)
-
 
 
 def fuzzy_ring(x, y, disk_radius, ring_radius, gaussian_width):
