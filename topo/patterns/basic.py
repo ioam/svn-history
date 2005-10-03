@@ -68,14 +68,13 @@ class FuzzyLineGenerator(PatternGenerator):
     y       = Number(default=0.0,softbounds=(-1.0,1.0))
     theta   = Number(default=0.0,softbounds=(0.0,2*pi))
     width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
-    height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     
     def function(self,**params):
         return fuzzy_line( self.pattern_x, 
                            self.pattern_y,
                            params.get('width',self.width),
-                           params.get('gaussian_width',self.gaussian_width))  
+                           params.get('gaussian_width',self.gaussian_width))
 
 
 class FuzzyDiskGenerator(PatternGenerator):
