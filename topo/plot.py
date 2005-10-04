@@ -272,9 +272,11 @@ class Plot(TopoObject):
             self.matrices = matrix_hsv_to_rgb(h,s,v)
             # V is [2]
             if self.normalize:
-                self.matrices = (self.matrices[0],
-                                 self.matrices[1],
-                                 divide(self.matrices[2],float(max(max(self.matrices[2])))))
+                m = float(max(max(self.matrices[2])))
+                if m > 0:
+                    self.matrices = (self.matrices[0],
+                                     self.matrices[1],
+                                     divide(self.matrices[2],m))
 
         elif self.plot_type == COLORMAP:
             # Don't delete anything, maybe they want position #3, but
