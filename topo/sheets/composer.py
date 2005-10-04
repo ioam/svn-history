@@ -8,7 +8,7 @@ $Id$
 
 from topo.sheet import Sheet
 from topo.utils import Struct, NxN
-
+from Numeric import zeros
 
 class Composer(Sheet):
     """
