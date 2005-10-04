@@ -110,7 +110,7 @@ if __name__ != '__main__':
     pgt = PlotGroupTemplate([('Projection',
                               PlotTemplate({'Density'         : 25,
                                             'Projection_name' : 'None',
-                                            'Normalize'       : False}))],
+                                            'Normalize'       : True}))],
                             name='Projection')
     plotgroup_templates[pgt.name] = pgt
     pgt = PlotGroupTemplate([('Preference',
