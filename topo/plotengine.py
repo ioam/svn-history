@@ -260,9 +260,9 @@ class PlotEngine(TopoObject):
         plot_list = []
         for each in view_list:
             if isinstance(each,SheetView):
-                plot_list.append(Plot((each,None,None),COLORMAP,None))
+                plot_list.append(Plot((each,None,None),COLORMAP,None,pt.channels['Normalize']))
             else:
-                plot_list.append(Plot((name,None,None),COLORMAP,s))
+                plot_list.append(Plot((name,None,None),COLORMAP,s,pt.channels['Normalize']))
         return plot_list
 
 
@@ -289,10 +289,10 @@ class PlotEngine(TopoObject):
                 views = [views]
             for each in views:
                 if isinstance(each,SheetView):
-                    plot_list.append(Plot((each,None,None),COLORMAP,None))
+                    plot_list.append(Plot((each,None,None),COLORMAP,None,pt.channels['Normalize']))
                 else:
                     key = ('Weights',sheet,projection,sheet_x,sheet_y)
-                    plot_list.append(Plot((key,None,None),COLORMAP,p.src))
+                    plot_list.append(Plot((key,None,None),COLORMAP,p.src,pt.channels['Normalize']))
         self.debug('plot_list =' + str(plot_list))
         return plot_list
 
@@ -306,7 +306,8 @@ class PlotEngine(TopoObject):
         strength = pt.channels.get('Strength',None)
         hue = pt.channels.get('Hue',None)
         confidence = pt.channels.get('Confidence',None)
-        p = Plot((strength,hue,confidence),SHC,sheet,name=k)
+        n = pt.channels.get('Normalize',False)
+        p = Plot((strength,hue,confidence),SHC,sheet,n,name=k)
         return p
 
     def make_plot_group(self, name='None', group_type='BasicPlotGroup',
