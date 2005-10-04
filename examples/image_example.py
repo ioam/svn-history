@@ -1,19 +1,16 @@
 """
 
-A simple example of how to use sheets.  Uses the ImageGenerator,
-ImageSaver,  and Combiner classes.  Read the
-in-line comments and code to see what it does.
+A simple non-neural example of how to use sheets.  Uses the
+ImageGenerator, ImageSaver, and Combiner classes.  Read the in-line
+comments and code to see what it does. Run this script from the parent
+directory as:
 
-This differs from image_example.py in how it sets up the simulation
-parameters and objects.  It shows how to set parameters for classes of objects.
+  ./topographica examples/image_example.py
 
-'python image_example.py -h' for usage.
+Output will be in files name ImageSaver.*.
 
 $Id$
 """
-
-# CEB: I get an error about missing "main.ppm". Maybe I deleted it from
-# my copy by mistake.
 
 import sys
 from topo import * 
@@ -43,8 +40,8 @@ Composer.density = 25600
 #################################################
 # Now make the objects
 
-left_image = ImageGenerator(filename='main.ppm')
-right_image = ImageGenerator(filename='test.ppm')
+left_image = ImageGenerator(filename='examples/main.ppm')
+right_image = ImageGenerator(filename='examples/test.ppm')
 combine = Composer()
 output = ImageSaver()
 
