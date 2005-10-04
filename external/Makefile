@@ -154,7 +154,7 @@ matplotlib: ${MATPLOTLIB}.tgz
 matplotlib-clean:
 	rm -rf ${MATPLOTLIB} 
 matplotlib-uninstall:
-	rm -rf ${MATPLOTLIB} $(foreach f, ${MATPLOTLIB_UNINSTALL}, ${PREFIX}/${f})
+	rm -rf matplotlib ${MATPLOTLIB} $(foreach f, ${MATPLOTLIB_UNINSTALL}, ${PREFIX}/${f})
 ##############################################################
 # PMW
 #
@@ -223,7 +223,7 @@ weave: ${WEAVE}.tar.gz python
 weave-clean:
 	rm -rf ${WEAVE} 
 weave-uninstall:
-	rm -rf ${WEAVE} $(foreach f, ${WEAVE_UNINSTALL}, ${PREFIX}/${f})
+	rm -rf weave ${WEAVE} $(foreach f, ${WEAVE_UNINSTALL}, ${PREFIX}/${f})
 
 
 
@@ -244,7 +244,7 @@ fixedpoint: ${FIXEDPT}.tgz python
 fixedpoint-clean:
 	rm -rf ${FIXEDPT}
 fixedpoint-uninstall:
-	rm -rf ${FIXEDPT} ${FIXEDPT_UNINSTALL}/fixedpoint.*
+	rm -rf fixedpoint ${FIXEDPT} ${FIXEDPT_UNINSTALL}/fixedpoint.*
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
