@@ -112,28 +112,32 @@ STOP = "Simulator Stopped"
 
 Forever = -1
 
-### JABHACKALERT!
-###
-### Please eliminate this class, moving everything crucial from it into Simulator.
-### There doesn't seem to be much point in keeping this extra layer around, as
-### we seem often to need to access the event queue, and sched.scheduler
-### does not support that.
-class BaseSimulator(TopoObject):
+class Simulator(TopoObject):
     """
-    A class to manage a simulation.  A simulator object manages the
-    event queue, simulation clock, and list of EventProcessors, dispatching
-    events to them in time order, and moving the simulation clock as needed.
-
-    This implementation is based on sched.scheduler, but subclasses can
-    reimplement that if they want to.
+    A simulator class that uses a simple sorted event list instead of a
+    sched.scheduler object to manage events and dispatching.
     """
+    class Event:
+        fn = Parameter(default=None,doc="Function to execute when the event is processed")
 
+        def __init__(self,time,src,dest,src_port,dest_port,data,fn=None):
+            self.time = time
+            self.src = src
+            self.dest = dest
+            self.src_port = src_port
+            self.dest_port = dest_port
+            self.data = data
+            self.fn = fn
+
+        def __copy__(self):
+            new_copy = Simulator.Event(self.time,self.src,self.dest, \
+                       self.src_port,self.dest_port,deepcopy(self.data))
+            return new_copy
+            
+            
     step_mode = Parameter(default=False)
     register = Parameter(default=True)
 
-    # the number of decimal places for time
-    time_precision = Parameter(default=5)
-    
     def __init__(self,**config):
         """
         The simulator constructor takes one keyword parameter:
@@ -141,10 +145,10 @@ class BaseSimulator(TopoObject):
            step_mode = debugging flag, causing the simulator to stop
                        before each tick.
         """
-        super(BaseSimulator,self).__init__(**config)
+        super(Simulator,self).__init__(**config)
 
-        # time is a fixed-point number with 4 decimal places
-        self._time = FixedPoint("0.0", self.time_precision)
+        # time is a fixed-point number
+        self._time = FixedPoint("0.0")
         self._event_processors = []
         self._sleep_window = 0.0
         self._sleep_window_violation = False
@@ -153,7 +157,18 @@ class BaseSimulator(TopoObject):
         if self.register:
             topo.registry.set_active_sim(self)
 
+        self.events = []
+        self._events_stack = []
         
+    def time(self):
+        """
+        Return the current simulation time as a FixedPoint object.
+        
+	If the time return is used in the computation of a floating point 
+        variable, it should be cast into a floating point number by float().
+        """
+        return self._time
+    
     def run(self,duration=Forever,until=Forever):
         """
         Run the simulator.   Call .start() for each EventProcessor if not
@@ -169,211 +184,10 @@ class BaseSimulator(TopoObject):
                 node.start()
         self.continue_(duration,until)
 
-
-    def continue_(self,duration=0,until=0):
-        if duration:
-            self._scheduler.enter(duration,0,self.stop,[])
-        if until:
-            self._scheduler.enterabs(until,0,self.stop,[])
-        try:
-            keep_running = True
-            while keep_running:
-                # By default we should stop running if there's an exception
-                keep_running = False
-                try:
-                    self._scheduler.run()
-                except SLEEP_EXCEPTION:
-
-                    # SLEEP_EXCEPTION is raised when an EP's
-                    # .pre_sleep() method enqueued an event to occur
-                    # during the time when the scheduler was supposed
-                    # to be asleep.  By raising an exception we are
-                    # able to stop the scheduler before it sleeps and
-                    # restart it to process the newly scheduled event(s).
-                    
-                    self.debug("SLEEP EXCEPTION")
-                    self._sleep_window_violation = False
-                    self._sleep_window = 0
-                    # since the exception was a SLEEP_EXCEPTION
-                    # we want to keep running.
-                    keep_running = True
-        except STOP:
-            self.message("Simulation stopped at time %f" % self.time())
-        except EOFError:
-            self.message("Simulation stopped at time %f" % self.time())
-        except KeyboardInterrupt:
-            self.message("Simulation stopped at time %f" % self.time())
-
-    def stop(self):
-        raise STOP
-
-    def add(self,*EPs):
-        """
-        Add one or more EventProcessors to the simulator.
-        Note, EventProcessors do not necessarily
-        have to be added to the simulator to be used in a simulation,
-        but they will not receive the start() message.  Adding a node
-        to the simulator also sets the backlink node.simulator, so
-        that the node can enqueue events and read the simulator clock.
-        """
-        for ep in EPs:
-            if not ep in self._event_processors:
-                self._event_processors.append(ep)
-                ep.simulator = self
-
-
-    def connect(self,
-                src=None,
-                dest=None,
-                src_port=None,
-                dest_port=None,
-                delay=0,**extra_args):
-        """
-        Connect the source to the destination, at the appropriate ports,
-        if any are given.  If src and dest have not been added to the
-        simulator, they will be added.
-        """
-        self.add(src,dest)
-        src._connect_to(dest,src_port,dest_port,delay,**extra_args)
-        dest._connect_from(src,src_port,dest_port,**extra_args)
-
-    def enqueue_event_rel(self,delay,src,dest,src_port=None,dest_port=None,data=None):
-        """
-        Enqueue an event for a specified delay from the current time.
-          delay = event delay
-          src   = source EP of event
-          dest  = destination EP of event
-          src_port   = source port (default None)
-          dest_port  = destination port (default None)
-          data  = event data (default None)
-        """
-        self.debug("Enqueue relative: from", (src,src_port),"to",(dest,dest_port),
-                   "at time",self.time(),"with delay",delay)
-        # If this event is scheduled when the simulator is about to sleep,
-        # make sure that the event isn't being scheduled during the sleep window,
-        # if it is, indicate a violation.
-        if self._sleep_window and delay < self._sleep_window:
-            self._sleep_window_violation = True
-        # now schedule the event
-        self._scheduler.enter(delay,
-                              1,
-                              self._dispatch,
-                              (self.time()+delay,src,src_port,dest,dest_port,data))
-
-    def enqueue_event_abs(self,time,src,dest,src_port=None,dest_port=None,data=None):
-        """
-        Like enqueue_event_rel, except it schedules the event for some
-        absolute time.
-        """
-        self.debug("Enqueue absolute: from", (src,src_port),"to",(dest,dest_port),
-                   "at time",self.time(),"with delay",delay)
-
-        # If this event is scheduled when the simulator is about to sleep,
-        # make sure that the event isn't being scheduled during the sleep window,
-        # if it is, indicate a violation.
-        if self._sleep_window \
-               and (self.time() <= time < self.time()+self._sleep_window):
-            self._sleep_window_violation = True
-        # now schedule the event
-        self._scheduler.enterabs(time,
-                                 1,
-                                 self._dispatch,
-                                 (time,src,src_port,dest,dest_port,data))
-
-    def _dispatch(self,time,src,src_port,dest,dest_port,data):
-        """
-        Dispatch an event to dest.
-        """
-        if time < self.time():
-            self.warning("Ignoring stale event from",src,"to",dest,
-                         "scheduled for time",time,"processed at time",self.time())
-        else:
-            dest.input_event(src,src_port,dest_port,data)
-
-    def get_event_processors(self):
-        """Return the list of event processors such as Sheets."""
-        return self._event_processors
-
-    def time(self):
-        """
-        Return the current simulation time as a FixedPoint object.
-        
-	If the time return is used in the computation of a floating point 
-        variable, it should be cast into a floating point number by float().
-        """
-        return self._time
-    
-    def sleep(self,delay):
-        """
-        Sleep in simulator time.  Skip the clock ahead by delay
-        units.  If self.step_mode, pause and wait for input before continuing.
-        """
-
-        if delay > 0:
-            # set the sleep window, so the event scheduling methods know
-            # that we're about to sleep, and for how long.
-            self._sleep_window = delay
-            for ep in self._event_processors:
-                # give each EP a chance to send some events
-                ep.pre_sleep()
-
-            # if an event was scheduled to occur during the time we're
-            # supposed to be asleep, then raise an exception -- the
-            # top level loop will catch it and rerun to make sure the
-            # event gets run.
-            if self._sleep_window_violation:
-                raise SLEEP_EXCEPTION
-
-            if self.step_mode:
-                raw_input("\nsimulator time = %f: " % self.time())            
-        
-
-        self._time += delay
-
-
-class Simulator(BaseSimulator):
-    """
-    A simulator class that uses a simple sorted event list instead of a
-    sched.scheduler object to manage events and dispatching.
-    """
-    class Event:
-        ### JABHACKALERT!
-        ### 
-        ### Is there any reason to have the parameter execfn?  Seems like
-        ### all it does is declare whether to use fn, and isn't fn!=None enough?
-        ### If so, please delete execfn and just test fn==None instead.
-        ### If not, please document why it's needed.        
-        execfn = Parameter(default=False,doc="Whether to execute the fn")
-        fn = Parameter(default=None,doc="Function to execute when the event is processed")
-
-        def __init__(self,time,src,dest,src_port,dest_port,data,execfn=False,fn=None):
-            self.time = time
-            self.src = src
-            self.dest = dest
-            self.src_port = src_port
-            self.dest_port = dest_port
-            self.data = data
-            self.execfn = execfn
-            self.fn = fn
-
-        def __copy__(self):
-            new_copy = Simulator.Event(self.time,self.src,self.dest, \
-                       self.src_port,self.dest_port,deepcopy(self.data))
-            return new_copy
-            
-            
-    def __init__(self,**args):
-        super(Simulator,self).__init__(**args)
-        self.events = []
-        self._events_stack = []
-        self._time = FixedPoint("0.0", self.time_precision)
-        
     def continue_(self,duration=Forever,until=Forever):
 
         # Complicated expression for min(time+duration,until)
-        if duration == Forever and until == Forever:
-            stop_time = Forever
-        elif duration == Forever:
+        if duration == Forever:
             stop_time = until
         elif until == Forever:
             stop_time = self.time() + duration
@@ -420,7 +234,7 @@ class Simulator(BaseSimulator):
                 # it's just right!  So pop the event and dispatch it to
                 # its destination.
                 e = self.events.pop(0)
-                if not e.execfn:
+                if e.fn == None:
                     e.dest.input_event(e.src,e.src_port,e.dest_port,e.data)
                     did_event = True
                 else:
@@ -464,21 +278,17 @@ class Simulator(BaseSimulator):
                                src,dest,src_port,dest_port,data)
 
 
-    ### JABHACKALERT!
-    ###    
-    ### This method should be renamed something more intuitively
-    ### obvious to the user, like "schedule_action".
-    def sched_execfn(self,time,fn,*p):
+    def schedule_action(self,time,fn,*p):
         """
         Enqueue a function call event at an absolute simulator clock time.
         (Same as enqueue_event_abs, except for scheduling a function call and
         not a generic event.) This method should be used for arbitrary
         functions to be called at specific times, e.g. for saving snapshots.
 
-        Usage: sched_execfn(time, function name, param 1, param 2, ...)
+        Usage: schedule_action(time, function name, param 1, param 2, ...)
         """
-        self.debug("Enqueue absolute execfn: ", fn, "at time",self.time(),"for time",time)
-        new_e = Simulator.Event(time,None,None,None,None,p,execfn=True,fn=fn)
+        self.debug("Enqueue absolute action: ", fn, "at time",self.time(),"for time",time)
+        new_e = Simulator.Event(time,None,None,None,None,p,fn=fn)
 
         if not self.events or time >= self.events[-1].time:
             self.events.append(new_e)
@@ -511,7 +321,42 @@ class Simulator(BaseSimulator):
         """Return number of event queues in _events_stack."""
         return len(self._events_stack)
 
+
+    def add(self,*EPs):
+        """
+        Add one or more EventProcessors to the simulator.
+        Note, EventProcessors do not necessarily
+        have to be added to the simulator to be used in a simulation,
+        but they will not receive the start() message.  Adding a node
+        to the simulator also sets the backlink node.simulator, so
+        that the node can enqueue events and read the simulator clock.
+        """
+        for ep in EPs:
+            if not ep in self._event_processors:
+                self._event_processors.append(ep)
+                ep.simulator = self
+
+
+    def connect(self,
+                src=None,
+                dest=None,
+                src_port=None,
+                dest_port=None,
+                delay=0,**extra_args):
+        """
+        Connect the source to the destination, at the appropriate ports,
+        if any are given.  If src and dest have not been added to the
+        simulator, they will be added.
+        """
+        self.add(src,dest)
+        src._connect_to(dest,src_port,dest_port,delay,**extra_args)
+        dest._connect_from(src,src_port,dest_port,**extra_args)
+
     
+    def get_event_processors(self):
+        """Return the list of event processors such as Sheets."""
+        return self._event_processors
+
 
         
 ###   JABALERT!
@@ -549,7 +394,7 @@ class Simulator(BaseSimulator):
 class EventProcessor(TopoObject):
     """
     Base class for EventProcessors, i.e. objects that can accept and
-    handle events.  This base calss handles the basic mechanics of
+    handle events.  This base class handles the basic mechanics of
     connections and sending events, and also stores the EP's
     dictionaries of output ports and outgoing connections.
     """

@@ -17,6 +17,7 @@ from topo.utils import *
 from topo.learningrules import *
 import weave
 import Numeric
+import fixedpoint
 from topo.patterns.random import UniformRandomGenerator
 from topo.patterns.basic import GaussianGenerator
 
@@ -192,7 +193,8 @@ alpha_input=0.007*acs
 alpha_exc=0.002*ecs
 alpha_inh=0.00025*ics
 
-timeprecision=2
+# Number of decimal places for simulator time
+fixedpoint.DEFAULT_PRECISION=3
 
 tsettle=8
 
@@ -231,7 +233,7 @@ inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(
 
 print "Creating simulation objects..."
 
-s = topo.simulator.Simulator(time_precision=timeprecision)
+s = topo.simulator.Simulator()
 
 retina = GeneratorSheet(input_generator=GaussianGenerator(),name='Retina')
 V1 = LISSOM(name='V1')
@@ -254,20 +256,20 @@ s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
 #################################################
 # Schedule the changes of simulation parameters
 
-s.sched_execfn(200, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.6/BaseN,-exc_rad*0.6/BaseN),(exc_rad*0.6/BaseN,exc_rad*0.6/BaseN))))
+s.schedule_action(200, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.6/BaseN,-exc_rad*0.6/BaseN),(exc_rad*0.6/BaseN,exc_rad*0.6/BaseN))))
 
-s.sched_execfn(500, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.42/BaseN,-exc_rad*0.42/BaseN),(exc_rad*0.42/BaseN,exc_rad*0.42/BaseN))))
+s.schedule_action(500, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.42/BaseN,-exc_rad*0.42/BaseN),(exc_rad*0.42/BaseN,exc_rad*0.42/BaseN))))
 
-s.sched_execfn(1000, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.336/BaseN,-exc_rad*0.336/BaseN),(exc_rad*0.336/BaseN,exc_rad*0.336/BaseN))))
+s.schedule_action(1000, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.336/BaseN,-exc_rad*0.336/BaseN),(exc_rad*0.336/BaseN,exc_rad*0.336/BaseN))))
 
-s.sched_execfn(2000, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=((-2.0/BaseN,-2.0/BaseN),(2.0/BaseN,2.0/BaseN))))
+s.schedule_action(2000, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=((-2.0/BaseN,-2.0/BaseN),(2.0/BaseN,2.0/BaseN))))
 
-s.sched_execfn(500, V1.change_learning_rate, "Afferent0", 0.005*acs)
-s.sched_execfn(2000, V1.change_learning_rate, "Afferent0", 0.004*acs)
-s.sched_execfn(4000, V1.change_learning_rate, "Afferent0", 0.003*acs)
-s.sched_execfn(20000, V1.change_learning_rate, "Afferent0", 0.0015*acs)
+s.schedule_action(500, V1.change_learning_rate, "Afferent0", 0.005*acs)
+s.schedule_action(2000, V1.change_learning_rate, "Afferent0", 0.004*acs)
+s.schedule_action(4000, V1.change_learning_rate, "Afferent0", 0.003*acs)
+s.schedule_action(20000, V1.change_learning_rate, "Afferent0", 0.0015*acs)
 
-s.sched_execfn(500, V1.change_learning_rate, "LateralExcitatory", 0.001*ecs)
+s.schedule_action(500, V1.change_learning_rate, "LateralExcitatory", 0.001*ecs)
 
 
 #function that set delta and beta for the threshold function
@@ -276,18 +278,18 @@ def set_deltabeta(x,y):
     globals()["beta"]=y
 
 
-s.sched_execfn(200, set_deltabeta, 0.11, 0.66)
-s.sched_execfn(500, set_deltabeta, 0.12, 0.67)
-s.sched_execfn(1000, set_deltabeta, 0.15, 0.68)
-s.sched_execfn(2000, set_deltabeta, 0.18, 0.70)
-s.sched_execfn(3000, set_deltabeta, 0.20, 0.73)
-s.sched_execfn(4000, set_deltabeta, 0.20, 0.76)
-s.sched_execfn(5000, set_deltabeta, 0.21, 0.79)
-s.sched_execfn(6500, set_deltabeta, 0.22, 0.82)
-s.sched_execfn(8000, set_deltabeta, 0.23, 0.85)
-s.sched_execfn(20000, set_deltabeta, 0.24, 0.88)
+s.schedule_action(200, set_deltabeta, 0.11, 0.66)
+s.schedule_action(500, set_deltabeta, 0.12, 0.67)
+s.schedule_action(1000, set_deltabeta, 0.15, 0.68)
+s.schedule_action(2000, set_deltabeta, 0.18, 0.70)
+s.schedule_action(3000, set_deltabeta, 0.20, 0.73)
+s.schedule_action(4000, set_deltabeta, 0.20, 0.76)
+s.schedule_action(5000, set_deltabeta, 0.21, 0.79)
+s.schedule_action(6500, set_deltabeta, 0.22, 0.82)
+s.schedule_action(8000, set_deltabeta, 0.23, 0.85)
+s.schedule_action(20000, set_deltabeta, 0.24, 0.88)
 
-#s.sched_execfn(20009.99, V1.printwts, 36, 36)
+#s.schedule_action(20009.99, V1.printwts, 36, 36)
 
 #cfsheet.CF.print_level = base.VERBOSE
 
