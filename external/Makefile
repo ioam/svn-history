@@ -235,9 +235,10 @@ FIXEDPT_UNINSTALL = ${PYTHON_LIB}/site-packages
 
 fixedpoint: ${FIXEDPT}.tgz python
 	tar xzf ${FIXEDPT}.tgz
-	cp fixedpoint.diff fixedpoint${FIXEDPT}
-	cp fixedpoint_setup.py fixedpoint/setup.py
-	cd fixedpoint ; patch < fixedpoint.diff; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
+	mv fixedpoint ${FIXEDPT}
+	cp fixedpoint.diff ${FIXEDPT}
+	cp fixedpoint_setup.py ${FIXEDPT}/setup.py
+	cd ${FIXEDPT}; patch < fixedpoint.diff; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch fixedpoint
 
 fixedpoint-clean:
