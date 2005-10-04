@@ -52,6 +52,7 @@ from sheetview import *
 from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
 from histogram import Histogram
 from parameter import Dynamic
+from Numeric import array
 import palette
 import MLab
 
@@ -260,6 +261,10 @@ class Plot(TopoObject):
             # displaying the plot as an RGB.
             h,s,v = self.matrices
 
+            # V is [2]
+            if self.normalize and max(max(v)) > 0:
+                v = divide(self.matrices[2],float(max(max(v))))
+
             if max(h.flat) > 1 or max(s.flat) > 1 or max(v.flat) > 1:
                 self.cropped = True
                 #self.warning('Plot: HSVMap inputs exceed 1. Clipping to 1.0')
@@ -270,13 +275,6 @@ class Plot(TopoObject):
                 self.cropped = False
 
             self.matrices = matrix_hsv_to_rgb(h,s,v)
-            # V is [2]
-            if self.normalize:
-                m = float(max(max(self.matrices[2])))
-                if m > 0:
-                    self.matrices = (self.matrices[0],
-                                     self.matrices[1],
-                                     divide(self.matrices[2],m))
 
         elif self.plot_type == COLORMAP:
             # Don't delete anything, maybe they want position #3, but
@@ -294,7 +292,7 @@ class Plot(TopoObject):
                 self.warning('More than one channel requested for ' + \
                              'single-channel colormap')
             if single_map:
-                if self.normalize:
+                if self.normalize and max(max(single_map[0])) > 0:
                     single_map[0] = single_map[0] / max(max(single_map[0]))
                 self.matrices = (single_map[0], single_map[0], single_map[0])
 
