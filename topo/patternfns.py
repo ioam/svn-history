@@ -8,15 +8,30 @@ $Id$
 """
 
 from math import pi
-from Numeric import where,maximum,exp,cos,sin,sqrt,less_equal
+from Numeric import where,maximum,minimum,exp,cos,sin,sqrt,less_equal
 
 
-### JABHACKALERT!
-###
-### Instead of EXP_CUTOFF, which avoided a math RangeError, should
-### write a safeexp() function that catches such errors.
-EXP_CUTOFF = -100
+# CEB: For patternfns.py, this only needs to handle arguments that
+# are of large magnitude and negative. The version here works for arguments
+# of either sign. But maybe this function (or a better version of
+# it) might be moved and used elsewhere when Numeric.exp() is being used?
+def safeexp(x):
+    """
+    Avoid OverflowError on large negative or positive arguments
 
+    Numeric.exp() gives an OverflowError ('math range error') for 
+    arguments of magnitude greater than about 700.
+
+    See e.g.
+    [Python-Dev] RE: Possible bug (was Re: numpy, overflow, inf, ieee, and rich comparison)
+    http://mail.python.org/pipermail/python-dev/2000-October/thread.html#9851
+    """
+    MAX_MAG_ARG = 700
+    
+    if x >= 0:
+        return exp(minimum(MAX_MAG_ARG,x))
+    else:
+        return exp(maximum(-MAX_MAG_ARG,x))
 
 def gaussian(x, y, width, height):
     """
@@ -26,9 +41,7 @@ def gaussian(x, y, width, height):
     """
     new_pattern = -(x / width)**2 + -(y / height)**2
 
-    k = exp(maximum(EXP_CUTOFF,new_pattern))
-    k = where(k != exp(EXP_CUTOFF), k, 0.0)
-    return k
+    return safeexp(new_pattern)
 
 
 def gabor(x, y, width, height, frequency, phase):
@@ -36,9 +49,8 @@ def gabor(x, y, width, height, frequency, phase):
     Gabor pattern (sine grating multiplied by a circular Gaussian).
     """
  
-    k = exp(maximum(EXP_CUTOFF,-(x/width)**2-(y/height)**2))
-    k = where(k > exp(EXP_CUTOFF), k, 0.0)
-    return k * (0.5 + 0.5*cos(2*pi*frequency*x + phase))
+    p = safeexp(-(x/width)**2-(y/height)**2)
+    return p * (0.5 + 0.5*cos(2*pi*frequency*x + phase))
 
 
 def fuzzy_line(x, y, center_width, gaussian_width):
@@ -49,7 +61,7 @@ def fuzzy_line(x, y, center_width, gaussian_width):
     gaussian_x_coord = distance_from_line - center_width/2
     
     return where(gaussian_x_coord<=0, 1.0,
-                 exp(maximum(EXP_CUTOFF,-(gaussian_x_coord/gaussian_width)**2)))
+                 safeexp(-(gaussian_x_coord/gaussian_width)**2))
 
 
 def fuzzy_disk(x, y, disk_radius, gaussian_width):
@@ -61,9 +73,7 @@ def fuzzy_disk(x, y, disk_radius, gaussian_width):
     div_sigmasq = 1 / (gaussian_width*gaussian_width)
 
     disk = less_equal(gaussian_x_coord,0)
-    k = maximum(disk, exp(maximum(EXP_CUTOFF,
-                                  -gaussian_x_coord*gaussian_x_coord*div_sigmasq)))
-    return where(k != exp(EXP_CUTOFF), k, 0.0)
+    return maximum(disk, safeexp(-gaussian_x_coord*gaussian_x_coord*div_sigmasq)) 
 
 
 def fuzzy_ring(x, y, disk_radius, ring_radius, gaussian_width):
@@ -79,10 +89,8 @@ def fuzzy_ring(x, y, disk_radius, ring_radius, gaussian_width):
 
     ring = less_equal(distance_from_line,ring_radius)
            
-    inner_g = exp(maximum(EXP_CUTOFF,-inner_distance*inner_distance*div_sigmasq))
-    outer_g = exp(maximum(EXP_CUTOFF,-outer_distance*outer_distance*div_sigmasq))
-    inner_g = where(inner_g != exp(EXP_CUTOFF), inner_g, 0.0)
-    outer_g = where(outer_g != exp(EXP_CUTOFF), outer_g, 0.0)
+    inner_g = safeexp(-inner_distance*inner_distance*div_sigmasq)
+    outer_g = safeexp(-outer_distance*outer_distance*div_sigmasq)
     dring = maximum(inner_g,maximum(outer_g,ring))
     return dring
 
