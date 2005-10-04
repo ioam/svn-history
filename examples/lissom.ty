@@ -20,6 +20,7 @@ import Numeric
 import fixedpoint
 from topo.patterns.random import UniformRandomGenerator
 from topo.patterns.basic import GaussianGenerator
+from topo.projections.kernelprojection import KernelProjection
 
 
 from topo.utils import msum
@@ -240,15 +241,18 @@ V1 = LISSOM(name='V1')
 save  = ImageSaver(name='LISSOM')
 
 s.connect(retina,V1, delay = FixedPoint("0.05"),
+          projection_type=KernelProjection,
           projection_params = dict(strength = 1.0, name='Afferent0',
                                    weights_bounds = afferent_weight_bounds, normalize = 1.0, activation_fn=compute_response_mdot_c,learning_rate=alpha_input))
 
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
+          projection_type=KernelProjection,
           projection_params = dict(strength = gammaexc, name='LateralExcitatory',
                                    weights_bounds = excitatory_weight_bounds, normalize = 1.0, activation_fn=compute_response_mdot_c,learning_rate=alpha_exc))
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
+          projection_type=KernelProjection,
           projection_params = dict(strength = -gammainh, name='LateralInhibitory',
                                    weights_bounds = inhibitory_weight_bounds, normalize = 1.0, activation_fn=compute_response_mdot_c,learning_rate=alpha_inh))
         
