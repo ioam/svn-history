@@ -44,7 +44,7 @@ $Id$
 import sys
 import types
 
-from Numeric import zeros, ones, Float
+from Numeric import zeros, ones, Float, divide
 
 from base import TopoObject
 from utils import flatten
@@ -94,7 +94,8 @@ class Plot(TopoObject):
     background = Dynamic(default=BLACK_BACKGROUND)
     palette_ = Dynamic(default=palette.Monochrome)
 
-    def __init__(self, (channel_1, channel_2, channel_3), plot_type, sheet=None, **params):
+    def __init__(self, (channel_1, channel_2, channel_3), plot_type, sheet=None,
+                 normalize=False, **params):
         """
         channel_1, channel_2, and channel_3 all have one of two types:
         It is either a key that points to a stored SheetView on the
@@ -140,6 +141,7 @@ class Plot(TopoObject):
         self.histograms = []
         self.channel_views = []
         self.matrices = []         # Will hold 3 2D matrices.
+        self.normalize = normalize
 
 
     def shape(self):
@@ -230,10 +232,6 @@ class Plot(TopoObject):
             else:
                 self.warning(each, 'not a String, Tuple, SheetView, or None')
 
-        # NOTE: THIS NEEDS TO BE CHANGED WHEN BOUNDINGBOXES ARE
-        # IMPLEMENTED TO TRIM DOWN THE SIZES OF THE MATRICES! 
-        # CURRENTLY ASSUMES THAT ALL SUBVIEWS WILL BE OF THE SAME
-        # SHAPE.
         shape = (0,0)
         self.debug('self.channel_views = ' + str(self.channel_views))
         for each in self.channel_views:
@@ -251,6 +249,7 @@ class Plot(TopoObject):
             self.matrices = tuple([each or ones(shape,Float)
                                   for each in self.matrices])
             
+        
 
         # By this point, self.matrices should be a triple of 2D
         # matrices trimmed and ready to go to the caller of this
@@ -271,6 +270,11 @@ class Plot(TopoObject):
                 self.cropped = False
 
             self.matrices = matrix_hsv_to_rgb(h,s,v)
+            # V is [2]
+            if self.normalize:
+                self.matrices = (self.matrices[0],
+                                 self.matrices[1],
+                                 divide(self.matrices[2],float(max(max(self.matrices[2])))))
 
         elif self.plot_type == COLORMAP:
             # Don't delete anything, maybe they want position #3, but
@@ -288,6 +292,8 @@ class Plot(TopoObject):
                 self.warning('More than one channel requested for ' + \
                              'single-channel colormap')
             if single_map:
+                if self.normalize:
+                    single_map[0] = single_map[0] / max(max(single_map[0]))
                 self.matrices = (single_map[0], single_map[0], single_map[0])
 
         elif self.plot_type == RGB:
