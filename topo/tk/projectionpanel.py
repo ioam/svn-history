@@ -16,7 +16,7 @@ from itertools import chain
 
 class ProjectionPanel(CFSheetPlotPanel):
     def __init__(self,parent,pengine,console=None,**config):
-        super(ProjectionPanel,self).__init__(parent,pengine,console,**config)
+        super(ProjectionPanel,self).__init__(parent,pengine,console,pgt_name='Projection',**config)
 
         self.MIN_PLOT_WIDTH = 1
         self.INITIAL_PLOT_WIDTH = 13

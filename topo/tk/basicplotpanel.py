@@ -8,7 +8,7 @@ $Id$
 import plotpanel
 
 class BasicPlotPanel(plotpanel.PlotPanel):
-    def __init__(self,parent,pengine=None,console=None,plot_key='Activity',**config):
-        plotpanel.PlotPanel.__init__(self,parent,pengine,console=console,plot_key=plot_key,**config)
+    def __init__(self,parent,pengine=None,console=None,plot_key='Activity',pgt_name='Activity',**config):
+        plotpanel.PlotPanel.__init__(self,parent,pengine,console=console,plot_key=plot_key,pgt_name=pgt_name,**config)
         self.refresh()
 

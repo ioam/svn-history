@@ -16,7 +16,7 @@ import topo.registry as registry
 
 class UnitWeightsPanel(CFSheetPlotPanel):
     def __init__(self,parent,pengine,console=None,**config):
-        super(UnitWeightsPanel,self).__init__(parent,pengine,console,**config)
+        super(UnitWeightsPanel,self).__init__(parent,pengine,console,pgt_name='Unit Weights',**config)
 
         # Receptive Fields are generally tiny.  Boost it up to make it visible.
         self.WEIGHT_PLOT_INITIAL_SIZE = 30

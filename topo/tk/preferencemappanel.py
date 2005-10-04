@@ -18,7 +18,7 @@ from topo.bitmap import WHITE_BACKGROUND, BLACK_BACKGROUND
 ### preference maps can be measured.
 class PreferenceMapPanel(plotpanel.PlotPanel):
     def __init__(self,parent,pengine=None,console=None,plot_key='Activity',**config):
-        plotpanel.PlotPanel.__init__(self,parent,pengine,console=console,plot_key=plot_key,**config)
+        plotpanel.PlotPanel.__init__(self,parent,pengine,console=console,plot_key=plot_key,pgt_name='Preference',**config)
 
         self.panel_num = self.console.num_orientation_windows
         
