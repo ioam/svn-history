@@ -8,30 +8,28 @@ $Id$
 """
 
 from math import pi
-from Numeric import where,maximum,minimum,exp,cos,sin,sqrt,less_equal
+from Numeric import where,maximum,exp,cos,sin,sqrt,less_equal
 
 
-# CEB: For patternfns.py, this only needs to handle arguments that
-# are of large magnitude and negative. The version here works for arguments
-# of either sign. But maybe this function (or a better version of
-# it) might be moved and used elsewhere when Numeric.exp() is being used?
+# CEB: This is a hack.
+# For patternfns.py, this only needs to handle arguments that are of large
+# magnitude and negative. A better version of this function could be put in
+# topo.utils for general use, returning 0.0 if there is underflow and Inf
+# if there is overflow.
 def safeexp(x):
     """
-    Avoid OverflowError on large negative or positive arguments
+    Avoid underflow of Numeric.exp() for large, negative arguments.
 
     Numeric.exp() gives an OverflowError ('math range error') for 
-    arguments of magnitude greater than about 700.
+    arguments of magnitude greater than about 700 on linux.
 
     See e.g.
     [Python-Dev] RE: Possible bug (was Re: numpy, overflow, inf, ieee, and rich comparison)
     http://mail.python.org/pipermail/python-dev/2000-October/thread.html#9851
     """
-    MAX_MAG_ARG = 700
-    
-    if x >= 0:
-        return exp(minimum(MAX_MAG_ARG,x))
-    else:
-        return exp(maximum(-MAX_MAG_ARG,x))
+    MIN_ARG = -700.0
+
+    return exp(maximum(MIN_ARG,x))
 
 def gaussian(x, y, width, height):
     """
