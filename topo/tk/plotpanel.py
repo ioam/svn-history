@@ -143,7 +143,6 @@ class PlotPanel(Frame,topo.base.TopoObject):
             if self.normalize:
                 self.normalize_checkbutton.select()
             self.normalize_checkbutton.pack(side=LEFT)
-            print pgt.plot_templates[0].channels['Normalize'], self.normalize
         # self.refresh()
 
 
