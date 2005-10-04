@@ -90,15 +90,23 @@ class KeyedList(list):
         """
         super(KeyedList,self).append(tuple((template_name,template_obj)))
 
-    def get(self, template_name):
+    def get(self, template_name, default=None):
         """
         Get the PlotTemplate with the key <template_name>.
-        Return None if it does not exist.
+        Return default (None) if it does not exist.
         """
         for (name,template_obj) in self:
             if name == template_name:
                 return template_obj
-        return None
+        if isinstance(template_name,int):
+            index = 0
+            for (name,template_obj) in self:
+                if index == template_name:
+                    return template_obj
+                else:
+                    index = index + 1
+            
+        return default
 
     def set(self, template_name, template_obj):
         """
