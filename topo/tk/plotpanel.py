@@ -12,12 +12,14 @@ $Id$
 """
 import Pmw, re, os, sys
 from Tkinter import Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
-     RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW
+     RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar
 import topo
 import topo.base
 import topo.bitmap
 import topo.simulator as simulator
 import topo.plotengine as plotengine
+import topo.registry as registry
+import topo.plotgroup
 import PIL
 import Image
 import ImageTk
@@ -35,7 +37,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
     """
 
     def __init__(self,parent=None,pengine=None,console=None,plot_key='None',
-                 plotgroup_type='BasicPlotGroup',**config):
+                 plotgroup_type='BasicPlotGroup',pgt_name='None',**config):
         assert isinstance(pengine,plotengine.PlotEngine) or pengine == None, \
                'Variable pengine not PlotEngine object.'
 
@@ -44,6 +46,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
 
         self.plot_key = plot_key
         self.plotgroup_type = plotgroup_type
+        self.pgt_name = pgt_name  #Plot Group Template name
 
         ### JABHACKALERT!
         ###
@@ -129,7 +132,28 @@ class PlotPanel(Frame,topo.base.TopoObject):
                                                     command=self.toggle_auto_refresh)
         self.auto_refresh_checkbutton.pack(side=LEFT)
         self.auto_refresh_checkbutton.invoke()
+
+        # Normalization check button.
+        pgt = registry.plotgroup_templates[self.pgt_name]
+        if pgt:
+            self.normalize = pgt.plot_templates[0].channels.get('Normalize',False)
+            self.normalize_checkbutton = Checkbutton(self.control_frame,
+                                                     text="Normalize",
+                                                     command=self.toggle_normalize)
+            if self.normalize:
+                self.normalize_checkbutton.select()
+            self.normalize_checkbutton.pack(side=LEFT)
+            print pgt.plot_templates[0].channels['Normalize'], self.normalize
         # self.refresh()
+
+
+    def toggle_normalize(self):
+        """Function called by Widget when check-box clicked"""
+        self.normalize = not self.normalize
+        pgt = registry.plotgroup_templates[self.pgt_name]
+        for (k,each) in pgt.plot_templates:
+            each.channels['Normalize'] = self.normalize
+        if self.auto_refresh: self.refresh()
 
 
     def refresh(self):
