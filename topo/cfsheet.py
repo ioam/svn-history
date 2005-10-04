@@ -253,20 +253,17 @@ class CFSheet(Sheet):
         self.projections = {}
         self.new_input = False
 
-    def _connect_from(self,src,src_port,dest_port,
-                      projection_type=KernelProjection,
-                      projection_params={},
-                      **args):
+    def _connect_from(self, proj, **args):
         """
         Accept a connection from src, on src_port, for dest_port.
         Construct a new Projection of type projection_type using the
         parameters in projection_params.
         """
         
-        Sheet._connect_from(self,src,src_port,dest_port,**args)
-        if src.name not in self.projections:
-            self.projections[src.name] = []
-        self.projections[src.name].append(projection_type(src=src,dest=self,dest_port=dest_port,**projection_params))
+        Sheet._connect_from(self,proj,**args)
+        if proj.src.name not in self.projections:
+            self.projections[proj.src.name] = []
+        self.projections[proj.src.name].append(proj)
 
     def input_event(self,src,src_port,dest_port,data):
         """

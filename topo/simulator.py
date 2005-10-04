@@ -67,32 +67,10 @@ self connections might have src_port = 'recurrent'.
 
 * Simulator *
 
-This module actually contains two simulator classes.  The original
-BaseSimulator, and a subclass Simulator.  BaseSimulator uses the
-sched.scheduler class from the Python std library to handle event
-scheduling.  Because sched.scheduler is a black box, Simulator was
-written in order to be able to debug event scheduling issues,
 Simulator stores its events in a linear-time priority queue (i.e a
-sorted list.)
-
-The BaseSimulator class is more mature, and should be better able to
-handle exceptions raised while running without corrupting the event
-queue.  The black-box nature of the scheduler, however, means that
-fancy footwork with exceptions must be done in order to get
-.pre_sleep() to behave correctly.  Simulator, on the other hand, may
-not (currently) guarantee that raised exceptions won't corrupt the
-event queue, but its implementation is much simpler and clearer and
-its performance is easier to inspect and debug.  Simulator is
-currently the default, because toggling learning requries copies of
-the event queue.  For efficiency, e.g. for spiking neuron simulations,
+sorted list.) For efficiency, e.g. for spiking neuron simulations,
 we'll probably need to replace the linear priority queue with a more
 efficient one.  Jeff has an O(log N) minheap implementation.
-
-Note also that even though BaseSimulator may guarantee that the event
-queue isn't corrupted by a raised exception, there is no guarantee that
-the internal state of the EP that raised the exception is sane, so
-it's not clear if the exception-safe aspect of sched.simulator is of
-particular value.
 
 
 $Id$
@@ -111,6 +89,22 @@ SLEEP_EXCEPTION = "Sleep Exception"
 STOP = "Simulator Stopped"
 
 Forever = -1
+
+class EPConnection(TopoObject):
+    """
+    EPConnection stores basic information for a connection between
+    two EventProcessors.
+    """
+
+    src = Parameter(default=None)
+    dest = Parameter(default=None)
+    src_port = Parameter(default=None)
+    dest_port = Parameter(default=None)
+    delay = Parameter(default=None)
+
+    def __init__(self,**params):
+        super(EPConnection,self).__init__(**params)
+
 
 class Simulator(TopoObject):
     """
@@ -342,15 +336,18 @@ class Simulator(TopoObject):
                 dest=None,
                 src_port=None,
                 dest_port=None,
-                delay=0,**extra_args):
+                delay=0,projection_type=EPConnection,projection_params={},**extra_args):
         """
         Connect the source to the destination, at the appropriate ports,
         if any are given.  If src and dest have not been added to the
         simulator, they will be added.
         """
         self.add(src,dest)
-        src._connect_to(dest,src_port,dest_port,delay,**extra_args)
-        dest._connect_from(src,src_port,dest_port,**extra_args)
+        proj = projection_type(src=src,dest=dest,src_port=src_port,dest_port=dest_port,delay=delay,**projection_params)
+        src._connect_to(proj,**extra_args)
+        dest._connect_from(proj,**extra_args)
+        #src._connect_to(dest,src_port,dest_port,delay,**extra_args)
+        #dest._connect_from(src,src_port,dest_port,**extra_args)
 
     
     def get_event_processors(self):
@@ -358,62 +355,27 @@ class Simulator(TopoObject):
         return self._event_processors
 
 
-        
-###   JABALERT!
-###   
-###   Instead of being tuples, connections should be made into proper
-###   objects (i.e., into instances of a new class called EPConnection)
-###   so that Projections could be subclasses of EPConnection.  That way
-###   Sheets wouldn't need any code to keep track of Projections. 
-###   The comments below have more background on this approach.
-###   
-###     Currently, connections in the simulation's directed graph are not
-###     first-class objects in the system.  Rather, they are implemented as
-###     (dest,dest_port,delay) tuples stored in dictionaries indexed by
-###     src_port inside each individual EP (i.e. within each graph node).
-###     With the advent of Projection classes for CFSheets (see topo.cfsheet),
-###     it is worth considering whether to replace these tuples with an
-###     explicit Connection class, of which Projection would be a subclass.
-###     This class would encapsulate all data that parameterizes the
-###     connection.  This would simplify data structures somewhat, since
-###     Projection classes must also keep track of things like src and dest.
-###     It might also make future parallelization efforts easier, since each
-###     Connection object could conceivably maintain its own event queue, and
-###     since connections may naturally delimit independent and parallelizable
-###     computations within a simulation.  (This last point should be
-###     considered with care, since it is certainly not universally true,
-###     different connections will of course interact with one another within
-###     an EP.  The question of how much depends on the nature of the
-###     simulation.)
-###     
-###     Note that the EventProcessor.connections tracks the outgoing
-###     connections from an EP, while CFSheet.projections tracks the incoming
-###     projections.  If we standardize to use Connection objects, probably
-###     the EventProcessor class will have to keep track of both incoming and
-###     outgoing connections for each EP.
+
+
 class EventProcessor(TopoObject):
     """
     Base class for EventProcessors, i.e. objects that can accept and
     handle events.  This base class handles the basic mechanics of
-    connections and sending events, and also stores the EP's
-    dictionaries of output ports and outgoing connections.
+    connections and sending events, and store both incoming and outgoing
+    connections. It also stores the EP's dictionaries of outgoing 
+    connections indexed by output port.
     """
     def __init__(self,**config):
         super(EventProcessor,self).__init__(**config)
 
-        # Connections are maintained within each EP.  The connection db
-        # is a dictionary indexed by output port.  Each output port
-        # refers to a list of connections represented as tuples:
-        # (dest,dest_port,delay) where:
-        #
-        #  dest      = destination EP
-        #  dest_port = destination port in the EP
-        #  delay     = connection propagation delay in simulator time units.
+        # The connection db is a dictionary indexed by output port.  Each 
+        # output port refers to a list of EPConnection objects with that 
+        # output port.
         
         self.connections = {None:[]}
-        
 
-    def _connect_to(self,dest,src_port,dest_port,delay,**args):
+
+    def _connect_to(self,proj,**args):
         """
         Add a connection to dest/port with a delay (default=0).
         Should only be called from Simulator.connect(). The extra
@@ -421,12 +383,13 @@ class EventProcessor(TopoObject):
         parameters that can be interpreted by EP subclasses as
         needed.  
         """
-        if not src_port in self.connections:
-            self.connections[src_port] = []
+        if not proj.src_port in self.connections:
+            self.connections[proj.src_port] = []
 
-        self.connections[src_port].append((dest,dest_port,delay))
+        self.connections[proj.src_port].append(proj)
 
-    def _connect_from(self,src,src_port,dest_port,**args):
+
+    def _connect_from(self,proj,**args):
         """
         Add a connection from src/port with a delay (default=0).
         Should only be called from Simulator.connect().  The extra
@@ -447,8 +410,8 @@ class EventProcessor(TopoObject):
         """
         Send some data out to all connections on the given src_port.
         """
-        for dest,dest_port,delay in self.connections[src_port]:
-            self.simulator.enqueue_event_rel(delay,self,dest,src_port,dest_port,data)
+        for proj in self.connections[src_port]:
+            self.simulator.enqueue_event_rel(proj.delay,self,proj.dest,proj.src_port,proj.dest_port,data)
 
     def input_event(self,src,src_port,dest_port,data):
         """
@@ -465,5 +428,4 @@ class EventProcessor(TopoObject):
         """
         pass
     
-
 

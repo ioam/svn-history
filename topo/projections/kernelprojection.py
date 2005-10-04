@@ -26,7 +26,6 @@ class KernelProjection(Projection):
     weights_generator = Parameter(default=UniformRandomGenerator())
     normalize = Parameter(default=0.0)
     normalize_fn = Parameter(divisive_normalization)
-    dest_port = Parameter(default="")
     learning_rate = Parameter(default=0.0)
 
     def __init__(self,**params):

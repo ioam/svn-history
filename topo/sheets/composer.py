@@ -43,8 +43,9 @@ class Composer(Sheet):
         for k,v in config.items():
             self.ports[port][k] = v
 
-    def _connect_from(self,src,src_port,dest_port,origin=(0,0)):
-        self.inputs[(src.name,src_port)] = Struct(origin=origin)
+    def _connect_from(self,proj,origin=(0,0)):
+        Sheet._connect_from(self,proj,**args)
+        self.inputs[(proj.src.name,proj.src_port)] = Struct(origin=origin)
     
     def pre_sleep(self):
         if self.__dirty:        

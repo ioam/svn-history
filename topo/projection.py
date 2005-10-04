@@ -13,8 +13,9 @@ from topo.learningrules import *
 from topo.base import TopoObject
 from topo.cfsheet import ConnectionField
 from topo.sheetview import UnitView
+from topo.simulator import EPConnection
 
-class Projection(TopoObject):
+class Projection(EPConnection):
     """
     Projection takes one parameter:
 
@@ -33,8 +34,6 @@ class Projection(TopoObject):
     ### 
     ### The temp_activity array should be renamed to "activity".
     activation_fn = Parameter(default=mdot)
-    src = Parameter(default=None)
-    dest = Parameter(default=None)
     cf_type = Parameter(default=ConnectionField)
     strength = Number(default=1.0)
 #   shape = property(get_shape)
