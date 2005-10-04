@@ -97,17 +97,20 @@ if __name__ != '__main__':
     pgt = PlotGroupTemplate([('Activity',
                               PlotTemplate({'Strength'   : 'Activity',
                                             'Hue'        : None,
-                                            'Confidence' : None}))],
+                                            'Confidence' : None,
+                                            'Normalize'  : False}))],
                             name='Activity')
     plotgroup_templates[pgt.name] = pgt
     pgt = PlotGroupTemplate([('Unit Weights',
                               PlotTemplate({'Location'   : (0.0,0.0),
+                                            'Normalize'  : True,
                                             'Sheet_name' : 'V1'}))],
                             name='Unit Weights')
     plotgroup_templates[pgt.name] = pgt
     pgt = PlotGroupTemplate([('Projection',
                               PlotTemplate({'Density'         : 25,
-                                            'Projection_name' : 'None'}))],
+                                            'Projection_name' : 'None',
+                                            'Normalize'       : False}))],
                             name='Projection')
     plotgroup_templates[pgt.name] = pgt
     pgt = PlotGroupTemplate([('Preference',
