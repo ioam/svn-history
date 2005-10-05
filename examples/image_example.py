@@ -12,6 +12,14 @@ Output will be in files name ImageSaver.*.
 $Id$
 """
 
+
+# CEB: On the menu, if I go to "Plots" then "Unit Weights" I get an
+# IndexError:
+#
+#  File "topo/tk/unitweightspanel.py", line 64, in generate_plot_key
+#     ep = [ep for ep in self.console.active_simulator().get_event_processors()
+# IndexError: list index out of range
+
 import sys
 from topo import * 
 from topo.patterngenerator import *
