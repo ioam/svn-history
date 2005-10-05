@@ -42,6 +42,7 @@ x xfer funcs  (piecewise linear sigmoid)
 class LISSOM(topo.cfsheet.CFSheet):
 
     transfer_fn = Parameter(default=utils.PLTF)
+    learning_fn = Parameter(default=hebbian_c)
 
     # modify weights after each activation?
     continuous_learning = Parameter(default=False)

@@ -207,13 +207,11 @@ class CFSheet(Sheet):
 
     ### JABHACKALERT!
     ### 
-    ### The default learning_fn should be a no-op; all such defaults
-    ### should be trivial for such an abstract class.
-    ### 
     ### The temp_activity variable should probably be renamed
     ### activity buffer; that's what it does, right?
     transfer_fn  = Parameter(default=lambda x:Numeric.array(x))
-    learning_fn = Parameter(default=hebbian_c)
+    # default learning function does nothing
+    learning_fn = Parameter(default=lambda *args: 0)
                              
     def __init__(self,**params):
         super(CFSheet,self).__init__(**params)
@@ -243,12 +241,14 @@ class CFSheet(Sheet):
         self.new_input = True
 
 
-        ### JABHACKALERT!
-        ### 
-        ### Needs a clearer name and/or documentation.        
     def pre_sleep(self):
         """
-        Pass the accumulated stimulation through self.transfer_fn and
+        Called by the simulator after all the events are processed for the 
+        current time but before time advances.  Allows the event processor
+        to send any events that must be sent before time advances to drive
+        the simulation. 
+
+        Here, pass the accumulated stimulation through self.transfer_fn and
         send it out on the default output port.
         """
         if self.new_input:
