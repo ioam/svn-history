@@ -14,6 +14,7 @@ from topo.sheets.cfsom import CFSOM
 import topo.cfsheet
 from topo.plotfilesaver import *
 from PIL import *
+from topo.projections.kernelprojection import KernelProjection
 
 class TestPlotFileSaver(unittest.TestCase):
 
@@ -41,9 +42,9 @@ class TestPlotFileSaver(unittest.TestCase):
         V1.print_level = topo.base.WARNING
         V2.print_level = topo.base.WARNING
         
-        self.s.connect(retina,V1,delay=0.5,projection_params={'name':'R1toV1'})
-        self.s.connect(retina,V2,delay=0.5,projection_params={'name':'R1toV2'})
-        self.s.connect(retina2,V2,delay=0.5,projection_params={'name':'R2toV2'})
+        self.s.connect(retina,V1,delay=0.5,projection_type=KernelProjection,projection_params={'name':'R1toV1'})
+        self.s.connect(retina,V2,delay=0.5,projection_type=KernelProjection,projection_params={'name':'R1toV2'})
+        self.s.connect(retina2,V2,delay=0.5,projection_type=KernelProjection,projection_params={'name':'R2toV2'})
         self.pe = topo.plotengine.PlotEngine(self.s)
         self.s.run(2)
 
