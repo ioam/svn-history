@@ -85,9 +85,10 @@ from base import TopoObject
 
 
 class ConnectionField(TopoObject):
-    normalize = Parameter(default=0)
     x = Parameter(default=0)
     y = Parameter(default=0)
+    weight_type = Parameter(default=Numeric.Float32)
+
     weights = []
     slice_array = []
     
@@ -114,37 +115,15 @@ class ConnectionField(TopoObject):
         self.slice_array[3] = c2
 
 
-        ### JABHACKALERT!
-        ### 
-        ### Why the special-purpose code just for
-        ### UniformRandomGenerator?  Either document why it is
-        ### necessary, or eliminate it.
-        if isinstance(weights_generator, UniformRandomGenerator):
-            w = RandomArray.uniform(0,1,[r2-r1,c2-c1])
-            self.weights = w.astype(Numeric.Float32)
-            #self.weights = Numeric.ones([r2-r1,c2-c1], Numeric.Float32)
-        else:
-            w = weights_generator(x=0,y=0,bounds=self.bounds,density=self.input_sheet.density,theta=0,rows=r2-r1,cols=c2-c1)
-            self.weights = w.astype(Numeric.Float32)
+        # set up the weights
+        w = weights_generator(x=0,y=0,bounds=self.bounds,density=self.input_sheet.density,theta=0,rows=r2-r1,cols=c2-c1)
+        self.weights = w.astype(self.weight_type)
 
         # Maintain the original type throughout operations, i.e. do not
         # promote to double.
         self.weights.savespace(1)
 
         self.verbose("activity matrix shape: ",self.weights.shape)
-
-        ### JABHACKALERT!
-        ### 
-        ### What does it mean to do self.normalize/s?  Isn't
-        ### self.normalize a Boolean???  In any case, this should
-        ### presumably be done by a separate routine so that it can be
-        ### overridden as needed.
-        if self.normalize:
-            wts = self.weights
-            s = sum(wts.flat)
-            if s > 0:
-                s = self.normalize/s
-                wts *= s
 
 
     def contains(self,x,y):
@@ -158,7 +137,7 @@ class ConnectionField(TopoObject):
     def reduce_radius(self, new_wt_bounds):
         """
         Reduce the radius of an existing connection field. Weights are copied
-        from the old weight array and then renormalized.
+        from the old weight array.
         """
 
         slice = self.input_sheet.input_slice(new_wt_bounds, self.x, self.y)
@@ -177,17 +156,6 @@ class ConnectionField(TopoObject):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
             self.weights.savespace(1)
 
-        ### JABHACKALERT!
-        ### 
-        ### Again, this should presumably be done by a separate
-        ### routine, to avoid duplication and so that it can be
-        ### overridden as needed.
-            if self.normalize:
-                wts = self.weights
-                s = sum(wts.flat)
-                if s > 0:
-                    s = self.normalize/s
-                    wts *= s
 
 class CFSheet(Sheet):
     """

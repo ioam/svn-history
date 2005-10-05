@@ -20,6 +20,7 @@ import Numeric
 import fixedpoint
 from topo.patterns.random import UniformRandomGenerator
 from topo.patterns.basic import GaussianGenerator
+from topo.patterns.basic import UniformGenerator
 from topo.projections.kernelprojection import KernelProjection
 
 

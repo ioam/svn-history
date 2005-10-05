@@ -6,7 +6,7 @@ $Id$
 """
 
 from math import pi
-from Numeric import around,bitwise_and,sqrt,sin
+from Numeric import around,bitwise_and,sqrt,sin,ones,Float
 
 from topo.parameter import Number
 from topo.patterngenerator import PatternGenerator
@@ -174,3 +174,13 @@ class SquareGratingGenerator(PatternGenerator):
                                     self.pattern_y,
                                     params.get('frequency',self.frequency), 
                                     params.get('phase',self.phase)) 
+
+class UniformGenerator(PatternGenerator):
+    """
+    Uniform pattern genertor.
+    """
+    x       = Number(default=0.0,softbounds=(-1.0,1.0))
+    y       = Number(default=0.0,softbounds=(-1.0,1.0))
+
+    def function(self,**params):
+        return ones(self.pattern_x.shape, Float)

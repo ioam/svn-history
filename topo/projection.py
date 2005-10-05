@@ -35,6 +35,11 @@ class Projection(EPConnection):
     ### The temp_activity array should be renamed to "activity".
     activation_fn = Parameter(default=mdot)
     cf_type = Parameter(default=ConnectionField)
+    # Magnitude of normalization of connection field weights. 0 = don't normalize
+    normalize = Parameter(default=0.0)
+    normalize_fn = Parameter(default=divisive_normalization)
+    weight_type = Parameter(default=Numeric.Float32)
+
     strength = Number(default=1.0)
 #   shape = property(get_shape)
     temp_activity = []

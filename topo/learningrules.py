@@ -151,8 +151,10 @@ def divisive_normalization(weights, normalize_total):
     normalization.
     """
 
-    factor = normalize_total/sum(weights.flat)
-    weights *= factor
+    s = sum(weights.flat)
+    if s != 0:
+        factor = normalize_total/s
+        weights *= factor
 
 
 ################################################################
