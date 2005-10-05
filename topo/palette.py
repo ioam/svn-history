@@ -10,7 +10,7 @@ CONSTRAINTS.  THE FUTURE PLANS FOR PALETTE DESIGN ARE AS FOLLOWS:
 Changes to plot.py need to be made in order to use the Palette class
 triples instead of defaulting to just copying the Colormap matrix
 three times.  To see where to do this in plot.py search for the line:
-"elif self.plot_type == COLORMAP:"
+'elif self.plot_type == COLORMAP:'
 
 A Palette object has 256 triples of RGB values ranging from 0 ... 255.
 The purpose of the class is to maintain an accurate palette
