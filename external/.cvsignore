@@ -28,3 +28,7 @@ fixedpoint
 fixedpoint-0.1.2
 pychecker
 pychecker-0.8.16
+common
+common-0.12.0
+pylint
+pylint-0.7.0

@@ -1,11 +1,11 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-all: python jpeg pil numeric pmw matplotlib dislin  dislinpy weave fixedpoint pychecker
+all: python jpeg pil numeric pmw matplotlib dislin  dislinpy weave fixedpoint pychecker common pylint
 
-clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean matplotlib-clean dislin-clean dislinpy-clean weave-clean fixedpoint-clean pychecker-clean
+clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean matplotlib-clean dislin-clean dislinpy-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall dislin-uninstall dislinpy-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall dislin-uninstall dislinpy-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall
 
 ##############################################################
 # Python
@@ -261,6 +261,43 @@ pychecker-clean:
 	rm -rf ${PYCHECKER} 
 pychecker-uninstall:
 	rm -rf pychecker ${PYCHECKER} $(foreach f, ${PYCHECKER_UNINSTALL}, ${PREFIX}/${f})
+
+
+
+##############################################################
+# logilab common files, required for pylint (but should be 
+# removed if pylint is removed)
+#
+COMMON = common-0.12.0
+COMMON_UNINSTALL = ${PYTHON_LIB}/site-packages/logilab/common
+
+common: ${COMMON}.tar.gz python
+	tar xzf ${COMMON}.tar.gz
+	cd ${COMMON}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
+	touch common
+
+common-clean:
+	rm -rf ${COMMON} 
+common-uninstall:
+	rm -rf common ${COMMON} $(foreach f, ${COMMON_UNINSTALL}, ${PREFIX}/${f})
+
+
+
+##############################################################
+# pylint
+#
+PYLINT = pylint-0.7.0
+PYLINT_UNINSTALL = ${PYTHON_LIB}/site-packages/pylint
+
+pylint: ${PYLINT}.tar.gz python common
+	tar xzf ${PYLINT}.tar.gz
+	cd ${PYLINT}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
+	touch pylint
+
+pylint-clean:
+	rm -rf ${PYLINT} 
+pylint-uninstall:
+	rm -rf pylint ${PYLINT} $(foreach f, ${PYLINT_UNINSTALL}, ${PREFIX}/${f})
 
 
 
