@@ -59,9 +59,11 @@ V1 = CFSOM(name='V1')
 V2 = CFSOM(name='V2')
 save  = ImageSaver(name='CFSOM')
 
-s.connect(retina,V1,delay=0.5,projection_params={'name':'R1toV1'})
-s.connect(retina,V2,delay=0.5,projection_params={'name':'R1toV2'})
-s.connect(retina2,V2,delay=0.5,projection_params={'name':'R2toV2'})
+s.connect(retina,V1,delay=0.5,projection_type=KernelProjection,projection_params={'name':'R1toV1'})
+s.connect(retina,V2,delay=0.5,projection_type=KernelProjection,projection_params={'name':'R1toV2'})
+s.connect(retina2,V2,delay=0.5,projection_type=KernelProjection,projection_params={'name':'R2toV2'})
+
+
 
 # Uncomment the connections to the image saver, to save all the activation
 # images to disk.

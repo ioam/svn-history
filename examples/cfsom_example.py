@@ -59,7 +59,8 @@ retina = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina')
 V1 = CFSOM(name='V1')
 save  = ImageSaver(name='CFSOM')
 
-s.connect(retina,V1,delay=1)
+s.connect(retina,V1,delay=1,projection_type=KernelProjection,projection_params={'name':'RtoV1'})
+
 
 # Uncomment the connections to the image saver, to save all the activation
 # images to disk.
