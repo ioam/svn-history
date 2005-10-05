@@ -1,11 +1,11 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-all: python jpeg pil numeric pmw matplotlib dislin  dislinpy weave fixedpoint
+all: python jpeg pil numeric pmw matplotlib dislin  dislinpy weave fixedpoint pychecker
 
-clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean matplotlib-clean dislin-clean dislinpy-clean fixedpoint-clean weave-clean
+clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean matplotlib-clean dislin-clean dislinpy-clean weave-clean fixedpoint-clean pychecker-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall dislin-uninstall dislinpy-uninstall fixedpoint-uninstall weave-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall dislin-uninstall dislinpy-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall
 
 ##############################################################
 # Python
@@ -245,6 +245,25 @@ fixedpoint-clean:
 	rm -rf ${FIXEDPT}
 fixedpoint-uninstall:
 	rm -rf fixedpoint ${FIXEDPT} ${FIXEDPT_UNINSTALL}/fixedpoint.*
+
+##############################################################
+# pychecker
+#
+PYCHECKER = pychecker-0.8.16
+PYCHECKER_UNINSTALL = ${PYTHON_LIB}/site-packages/pychecker
+
+pychecker: ${PYCHECKER}.tar.gz python
+	tar xzf ${PYCHECKER}.tar.gz
+	cd ${PYCHECKER}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
+	touch pychecker
+
+pychecker-clean:
+	rm -rf ${PYCHECKER} 
+pychecker-uninstall:
+	rm -rf pychecker ${PYCHECKER} $(foreach f, ${PYCHECKER_UNINSTALL}, ${PREFIX}/${f})
+
+
+
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
 #   These targets download the necessary files from external-full-history   #
