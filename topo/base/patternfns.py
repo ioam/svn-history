@@ -14,7 +14,7 @@ from Numeric import where,maximum,exp,cos,sin,sqrt,less_equal
 # CEB: This is a hack.
 # For patternfns.py, this only needs to handle arguments that are of large
 # magnitude and negative. A better version of this function could be put in
-# topo.base.utils for general use, returning 0.0 if there is underflow and Inf
+# utils for general use, returning 0.0 if there is underflow and Inf
 # if there is overflow.
 def safeexp(x):
     """

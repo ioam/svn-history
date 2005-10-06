@@ -9,7 +9,7 @@ events.
 
 The dimensions of a Sheet's activity array are specified not with
 numbers of rows and columns, but with a rectangular bounding box (see
-topo.base.boundingregion) and a density.  The default bounding box for
+boundingregion) and a density.  The default bounding box for
 sheets is the unit square with its center at the origin.  i.e:
 
 
@@ -94,11 +94,11 @@ $Id$
 
 __version__ = '$Revision$'
 
-from topo.base.simulator import EventProcessor
-from topo.base.parameter import Parameter, BooleanParameter
+from simulator import EventProcessor
+from parameter import Parameter, BooleanParameter
 from Numeric import zeros,sqrt,array
-from topo.base.boundingregion import BoundingBox
-import topo.base.sheetview 
+from boundingregion import BoundingBox
+import sheetview 
 
 def sheet2matrix(x,y,bounds,density):
     ### JABHACKALERT!
@@ -195,7 +195,7 @@ def matrix2sheet(row,col,bounds,density):
 def activity_submatrix(slice_bounds,activity,activity_bounds,density):
     """
     Returns a submatrix of an activity matrix defined by bounding
-    rectangle. Uses topo.base.sheet.input_slice().  Does not copy the
+    rectangle. Uses sheet.input_slice().  Does not copy the
     submatrix!
     """
     r1,r2,c1,c2 = input_slice(slice_bounds,activity_bounds,density)
@@ -339,7 +339,7 @@ class Sheet(EventProcessor):
         """
         if request == 'Activity':
             activity_copy = array(self.activity)
-            new_view = topo.base.sheetview.SheetView((activity_copy,self.bounds),
+            new_view = sheetview.SheetView((activity_copy,self.bounds),
                                  src_name=self.name,view_type='Activity')
         elif self.sheet_view_dict.has_key(request):
             new_view = self.sheet_view_dict[request]

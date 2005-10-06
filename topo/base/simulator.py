@@ -78,10 +78,10 @@ $Id$
 
 
 import sched
-from topo.base.object import TopoObject
-from topo.base.parameter import Parameter
+from object import TopoObject
+from parameter import Parameter
 from copy import copy, deepcopy
-import topo.base.registry
+import registry
 from fixedpoint import FixedPoint
 
 SLEEP_EXCEPTION = "Sleep Exception"
@@ -148,7 +148,7 @@ class Simulator(TopoObject):
         self._scheduler = sched.scheduler(self.time,self.sleep)
         self._started = False
         if self.register:
-            topo.base.registry.set_active_sim(self)
+            registry.set_active_sim(self)
 
         self.events = []
         self._events_stack = []

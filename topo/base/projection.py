@@ -6,14 +6,14 @@ one Sheet into a CFSheet.
 ### JABHACKALERT!
 ###
 ### Should eliminate import *.
-from topo.base.parameter import Parameter, Number
-from topo.base.utils import mdot
+from parameter import Parameter, Number
+from utils import mdot
 import Numeric
-from topo.base.learningrules import *
-from topo.base.object import TopoObject
-from topo.base.cfsheet import ConnectionField
-from topo.base.sheetview import UnitView
-from topo.base.simulator import EPConnection
+from learningrules import *
+from object import TopoObject
+from cfsheet import ConnectionField
+from sheetview import UnitView
+from simulator import EPConnection
 
 class Projection(EPConnection):
     """
@@ -98,7 +98,7 @@ class Projection(EPConnection):
         """
         from Numeric import concatenate as join
         import Image
-        from topo.base.utils import add_border
+        from utils import add_border
 
         file_stem = file_prefix + self.__src.name + '-' + self.__dest.name
         if not montage:

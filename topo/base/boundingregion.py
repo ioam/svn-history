@@ -10,9 +10,9 @@ $Id$
 ### notation, not list notation, so that it can be scaled,
 ### translated, etc. easily.
 ###
-from topo.base.parameter import Parameter
+from parameter import Parameter
 from Numeric import *
-from topo.base.object import TopoObject
+from object import TopoObject
 
 NYI = "Abstract method not implemented."
 

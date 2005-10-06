@@ -10,7 +10,7 @@ $Id$
 
 import sys
 
-from topo.base.parameter import Parameter
+from parameter import Parameter
 from pprint import pprint
 
 SILENT  = 0

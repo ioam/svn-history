@@ -5,7 +5,7 @@ Pattern Generator
 Defines a class to return Patterns
 
 There is a registry dictionary called
-topo.base.registry.pattern_generators that stores the class name as key,
+registry.pattern_generators that stores the class name as key,
 and a reference to the class definition as the value.  This dictionary
 is used in the GUI Input Parameter Panel to dynamically generate the
 list of valid PatternGenerators that can be presented.  A user can
@@ -26,14 +26,14 @@ $Id$
 ###
 ### Should eliminate all "import *" commands if at all possible.
 import types
-import topo.base
-from topo.base.boundingregion import BoundingBox
-from topo.base.sheet import sheet2matrix, matrix2sheet, bounds2shape
+from object import TopoObject
+from boundingregion import BoundingBox
+from sheet import sheet2matrix, matrix2sheet, bounds2shape
 from Numeric import *
 from MLab import flipud,rot90
-from topo.base.parameter import Parameter,Number
+from parameter import Parameter,Number
 from math import pi
-import topo.base.registry
+import registry
 
 ### JABHACKALERT!
 ### 
@@ -44,9 +44,9 @@ import topo.base.registry
 # now it should be replaced by a PatternGenerator that will load in an
 # input file.  Currently (9/05) only used by cfsom.py and a couple of
 # test files.
-from topo.base.sheet import Sheet
-from topo.base.simulator import EventProcessor
-from topo.base.utils import NxN
+from sheet import Sheet
+from simulator import EventProcessor
+from utils import NxN
 from pprint import *
 import Image, ImageOps
 class ImageGenerator(Sheet):
@@ -169,7 +169,7 @@ def transform_coordinates(pattern_x, pattern_y, orientation):
     return new_pattern_x, new_pattern_y
 
 
-class PatternGenerator(topo.base.object.TopoObject):
+class PatternGenerator(TopoObject):
 
     bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))))
     density = Parameter(default=10000)
@@ -213,5 +213,5 @@ class SolidGenerator(PatternGenerator):
         return ones(self.pattern_x.shape, Float)
 
 # Register this PatternGenerator for public use.
-topo.base.registry.pattern_generators['SolidGenerator']=SolidGenerator
+registry.pattern_generators['SolidGenerator']=SolidGenerator
 

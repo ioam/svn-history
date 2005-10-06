@@ -14,8 +14,8 @@ import sys
 import types
 import operator
 
-import topo.base.sheet
-from topo.base.object import TopoObject
+import sheet
+from object import TopoObject
 
 ### JABHACKALERT!
 ###
@@ -109,7 +109,7 @@ class SheetView(TopoObject):
         maps = []
         for tup in self._view_list:
             (term_1, term_2) = tup
-            if isinstance(term_1,topo.base.sheet.Sheet):
+            if isinstance(term_1,sheet.Sheet):
                 maps.append(term_1.sheet_view(term_2))
             elif isinstance(term_1,SheetView):
                 maps.append(term_1.view())         # Don't care about term_2

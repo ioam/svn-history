@@ -6,7 +6,7 @@ simulations of cortical sheets that take input through connection
 fields projected onto other cortical sheets, or laterally onto
 themselves.  These classes are:
 
-CFSheet: a subclass of topo.base.sheet.Sheet.
+CFSheet: a subclass of sheet.Sheet.
 
 ConnectionField: a class for specifying a single connection field within a
 Projection.
@@ -73,13 +73,13 @@ $Id$
 
 __version__ = '$Revision$'
 
-from topo.base.parameter import Parameter
-from topo.base.sheet import Sheet
-from topo.base.learningrules import *
+from parameter import Parameter
+from sheet import Sheet
+from learningrules import *
 import Numeric
 
 ###############################################
-from topo.base.object import TopoObject
+from object import TopoObject
 
 
 class ConnectionField(TopoObject):
