@@ -16,7 +16,7 @@ $Id$
 """
 import topo
 import topo.base.object
-import topo.plotting.plotengine
+import plotengine
 import topo.base.registry
 from topo.base.utils import *
 
@@ -29,7 +29,7 @@ class PlotFileSaver(topo.base.object.TopoObject):
     def __init__(self,**config):
         super(PlotFileSaver,self).__init__(**config)
         self.sim = topo.base.registry.active_sim()
-        self.pe = topo.plotting.plotengine.PlotEngine(self.sim)
+        self.pe = plotengine.PlotEngine(self.sim)
         self.bitmaps = []
         self.files = []
         self.name = {'base':self.sim.name, 'iteration':self.sim.time(), \

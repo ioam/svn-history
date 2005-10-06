@@ -18,7 +18,8 @@ import types
 from topo.base.object import TopoObject
 from topo.base.utils import flatten
 from topo.base.keyedlist import KeyedList
-#from topo.plotting.plot import *
+import bitmap
+
 import topo
 import topo.base.simulator
 import topo.base.registry
@@ -133,7 +134,7 @@ class PlotGroup(TopoObject):
                 if max(r.flat) > 0: r = MLab.clip(r,0.0,1.0)
                 if max(g.flat) > 0: g = MLab.clip(g,0.0,1.0)
                 if max(b.flat) > 0: b = MLab.clip(b,0.0,1.0)
-                win = topo.plotting.bitmap.RGBMap(r,
+                win = bitmap.RGBMap(r,
                                          g,
                                          b)
                 win.view_info = each.view_info

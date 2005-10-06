@@ -49,11 +49,11 @@ from Numeric import zeros, ones, Float, divide
 from topo.base.object import TopoObject
 from topo.base.utils import flatten
 from topo.base.sheetview import *
-from topo.plotting.bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
+from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
 from histogram import Histogram
 from topo.base.parameter import Dynamic
 from Numeric import array
-import topo.plotting.palette as palette 
+import palette as palette 
 import MLab
 
 # Types of plots that Plot knows how to create from input matrices.

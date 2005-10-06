@@ -6,7 +6,7 @@ This file is NOT yet integrated into Topographica, as of 8/2005.
 
 $Id$
 """
-import topo.plotting.dislinplot, math, Image, ImageOps
+import dislinplot, math, Image, ImageOps
 
 
 def generate_zmat(gridsize):
@@ -56,7 +56,7 @@ def plot1():
 def plot2():
     "Template example for creating a tiff file from DislinPlot"
     # Set plot options for a tiff output file
-    plot2 = topo.plotting.dislinplot.DislinPlot()
+    plot2 = dislinplot.DislinPlot()
     plot2.set_dislin_scale(False)              # Color will be 256
     plot2.set_bitmap_size(800)                 # Not used for postscript
     plot2.set_display('tiff')
@@ -79,7 +79,7 @@ def plot2():
 
 def plot3():
     "Template example for creating a postscript file from DislinPlot"
-    plot2 = topo.plotting.dislinplot.DislinPlot()
+    plot2 = dislinplot.DislinPlot()
     plot2.set_dislin_scale(True)
     #plot2.set_bitmap_size(800)                 # Not used for postscript
     plot2.set_display('postscript')             # Or 'tiff'

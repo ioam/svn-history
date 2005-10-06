@@ -58,8 +58,8 @@ $Id$
 from copy import deepcopy
 from topo.base.object import TopoObject
 from topo.base.utils import flatten
-from topo.plotting.plot import Plot, SHC,HSV,RGB,COLORMAP
-from topo.plotting.plotgroup import *
+from plot import Plot, SHC,HSV,RGB,COLORMAP
+from plotgroup import *
 from topo.base.sheet import Sheet
 from topo.base.cfsheet import CFSheet
 from topo.base.sheetview import SheetView
@@ -96,7 +96,7 @@ class PlotEngine(TopoObject):
 
         Example calling style:
             s = topo.simulation.Simulation()
-            new_plot_engine = topo.plotting.plotengine.PlotEngine(s)
+            new_plot_engine = plotengine.PlotEngine(s)
         """
         super(PlotEngine,self).__init__(**params)
         self.simulation = simulation
