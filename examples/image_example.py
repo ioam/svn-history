@@ -25,11 +25,12 @@ from topo import *
 from topo.base.patterngenerator import *
 from topo.sheets.composer import Composer
 from topo.plotting.plotfilesaver import ImageSaver
+from topo.base.simulator import Simulator
 
 #################################################
 # Set class parameter defaults
 
-base.print_level = base.DEBUG
+topo.base.object.print_level = topo.base.object.DEBUG
 
 Simulator.step_mode = True
 
