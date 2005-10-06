@@ -3,7 +3,7 @@
 # $Id$
 
 # For using .ty file types.
-import tyimputil
+import topo.base.tyimputil
 
 ### JABHACKALERT!
 ### 
@@ -24,38 +24,38 @@ import tyimputil
 ### if they want (and not otherwise). 
 
 # core
-import registry
-import simulator
-import parameter
-import utils
-import commandline
+import topo.base.registry
+import topo.base.simulator
+import topo.base.parameter
+import topo.base.utils
+import topo.base.commandline
 
 # sheets and sheet geometry
-import sheet
-import boundingregion
+import topo.base.sheet
+import topo.base.boundingregion
 
 # patterns
-import patterngenerator
+import topo.base.patterngenerator
 
 # sheet types
 import topo.sheets.generatorsheet
 
 # plotting
-import bitmap
-import sheetview
-import plot
-import plotengine
-import histogram
-import palette
-import plotgroup
-import plotfilesaver
+import topo.plotting.bitmap
+import topo.base.sheetview
+import topo.plotting.plot
+import topo.plotting.plotengine
+import topo.plotting.histogram
+import topo.plotting.palette
+import topo.plotting.plotgroup
+import topo.plotting.plotfilesaver
 
 # Documentation
-import gendocs
+import topo.base.gendocs
 
 # import all the important stuff directly into the package
 # namespace.
-from simulator import *
-from sheet import *
+from topo.base.simulator import *
+from topo.base.sheet import *
 
 
