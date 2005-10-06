@@ -354,7 +354,7 @@ class TopoConsole(Frame):
         win = GUIToplevel(self)
         win.withdraw()
         win.title("About Topographica")
-        text = Label(win,text=topo.base.object.ABOUT_TEXT,justify=LEFT)
+        text = Label(win,text=topo.ABOUT_TEXT,justify=LEFT)
         text.pack(side=LEFT)
         win.deiconify()
         self.messageBar.message('state', 'OK')
