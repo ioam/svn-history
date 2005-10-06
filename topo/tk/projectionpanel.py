@@ -10,8 +10,8 @@ import Pmw
 import ImageTk
 import topo.base.registry as registry
 from math import ceil
-from topo.tk.cfsheetplotpanel import CFSheetPlotPanel
-from topo.tk.plotpanel import PlotPanel
+from cfsheetplotpanel import CFSheetPlotPanel
+from plotpanel import PlotPanel
 from itertools import chain
 
 class ProjectionPanel(CFSheetPlotPanel):

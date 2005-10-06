@@ -3,18 +3,18 @@
 # $Id$
 
 # For importing the tk GUI files
-import topo.tk.propertiesframe
-import topo.tk.taggedslider
-import topo.tk.topoconsole
-import topo.tk.plotpanel
-import topo.tk.basicplotpanel
-import topo.tk.unitweightspanel
-import topo.tk.projectionpanel
-import topo.tk.cfsheetplotpanel
-import topo.tk.inputparamspanel
-import topo.tk.preferencemappanel
+import propertiesframe
+import taggedslider
+import topoconsole
+import plotpanel
+import basicplotpanel
+import unitweightspanel
+import projectionpanel
+import cfsheetplotpanel
+import inputparamspanel
+import preferencemappanel
 
-# For show_cmd_prompt() and start()
+# For topo.tk.show_cmd_prompt() and start()
 import Pmw, sys, Tkinter
 import topo.base.simulator
 import topo.base.registry
@@ -48,7 +48,7 @@ def start(sim=None, mainloop=False):
     root = Tkinter.Tk()
     root.resizable(1,1)
     Pmw.initialise(root)
-    console = topo.tk.topoconsole.TopoConsole(parent=root)
+    console = topoconsole.TopoConsole(parent=root)
     console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
     if sim is None:
         console.set_active_simulator(topo.base.registry.active_sim())

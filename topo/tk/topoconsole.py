@@ -7,14 +7,14 @@ from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, \
      LEFT, RIGHT, YES, BOTH, Label
 import Pmw, re, os, sys, code, traceback, __main__
 import tkFileDialog
-from topo.tk.basicplotpanel import BasicPlotPanel
-from topo.tk.unitweightspanel import UnitWeightsPanel
-from topo.tk.projectionpanel import ProjectionPanel
-from topo.tk.inputparamspanel import InputParamsPanel
-from topo.tk.preferencemappanel import PreferenceMapPanel
+from basicplotpanel import BasicPlotPanel
+from unitweightspanel import UnitWeightsPanel
+from projectionpanel import ProjectionPanel
+from inputparamspanel import InputParamsPanel
+from preferencemappanel import PreferenceMapPanel
 from topo.plotting.plotgroup import PlotGroupTemplate
 from topo.plotting.plot import PlotTemplate
-import topo.base.simulator as simulator
+from topo.base import simulator
 import topo.base.registry
 import topo.plotting.plotengine
 import topo.base.object
@@ -282,7 +282,7 @@ class TopoConsole(Frame):
                 self.messageBar.message('state', 'Loaded ' + self.loaded_script)
             else:
                 self.messageBar.message('state', 'Failed to load ' + self.loaded_script)
-        topo.tk.show_cmd_prompt()
+        topo.tk.topo.tk.show_cmd_prompt()
 
     def reload_network(self):
         """
@@ -304,7 +304,7 @@ class TopoConsole(Frame):
                 self.messageBar.message('state', 'Reloaded ' + self.loaded_script)
             else:
                 self.messageBar.message('state', 'Failure reloading ' + self.loaded_script)
-        topo.tk.show_cmd_prompt()
+        topo.tk.topo.tk.show_cmd_prompt()
             
                 
     def reset_network(self):
@@ -372,7 +372,7 @@ class TopoConsole(Frame):
         """
         result = self.exec_cmd(cmd)
 	self.messageBar.message('state', result)
-        topo.tk.show_cmd_prompt()
+        topo.tk.topo.tk.show_cmd_prompt()
 
     def exec_cmd(self,cmd):
         """
@@ -437,7 +437,7 @@ class TopoConsole(Frame):
             message = 'Error: No active simulator.'
 
         self.messageBar.message('state', message)
-        topo.tk.show_cmd_prompt()
+        topo.tk.topo.tk.show_cmd_prompt()
 
         
     def dummy(self):

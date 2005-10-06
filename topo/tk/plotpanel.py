@@ -182,7 +182,7 @@ class PlotPanel(Frame,topo.base.object.TopoObject):
         Subclasses of PlotPanel will need to create this function to
         generate the plots.
 
-        See topo.tk.UnitWeightsPanel and topo.tk.ProjectionPanel for
+        See UnitWeightsPanel and ProjectionPanel for
         examples.
         """
         self.pe_group = self.pe.get_plot_group(self.plot_key,
