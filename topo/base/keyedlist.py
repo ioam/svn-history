@@ -4,24 +4,22 @@ KeyedList sorted dictionary class.
 $Id$
 """
 
-### JABHACKALERT!
-###
-### Need to fix the variable names and comments that are
-### Topographica-specific -- nothing here should be assuming
-### anything about templates or other topo-specific concepts.
 class KeyedList(list):
     """
-    Extends the built-in type 'list' to superficially behave like a
-    dictionary with [] keyed access.  Internal representation is a
-    list of (key,value) pairs.  Note: Core functionality has been
-    added, but because of the way that [] does not return the name
-    tuple, not all list operations may behave properly.
+    Extends the built-in type 'list' to support dictionary-like
+    access using [].  The internal representation is as an ordinary
+    list of (key,value) pairs, not a hash table like an ordinary
+    dictionary, so that the elements will remain ordered.
+
+    Note: Not all list operations will work as expected, because
+    [] does not return the name tuple.
 
     Redefined functions:
         __getitem__ ([,])
         __setitem__ ([,])
         append  --  Now takes a tuple, (key, value) so that value
                     can be later accessed by [key].
+                    
     New functions modeled from dictionaries:
         get
         set
@@ -36,70 +34,67 @@ class KeyedList(list):
     def __setitem__(self,k,v):
         """
         The bracket [] mutator.
-        Will overwrite value if key already exists, otherwise append.
+        Overwrite value if key already exists, otherwise append.
         """
         return self.set(k,v)
 
-    def append(self, (template_name, template_obj)):
+    def append(self, (key, value)):
         """
-        Append the new PlotTemplate object to the end of the existing
-        internal plot template list.
+        Append a new object to the end of the existing list.
 
-        Takes in a 2-tuple, (Name Key of new PlotTemplate, PlotTemplate Object)
+        Accepts a 2-tuple (key, value).
 
-        Does not have to be redefined in this subclass, but by forcing
-        the tuple in the function parameters, it may catch an
-        erroneous assignment.
+        Strictly speaking, this operation did not need to be redefined
+        in this subclass, but by forcing the tuple in the function
+        parameters, we may be able to catch an erroneous assignment.
         """
-        super(KeyedList,self).append(tuple((template_name,template_obj)))
+        super(KeyedList,self).append(tuple((key,value)))
 
-    def get(self, template_name, default=None):
+    def get(self, key, default=None):
         """
-        Get the PlotTemplate with the key <template_name>.
-        Return default (None) if it does not exist.
+        Get the value with the specified <key>.
+        Returns None if no value with that key exists.
         """
-        for (name,template_obj) in self:
-            if name == template_name:
-                return template_obj
-        if isinstance(template_name,int):
+        for (name,value) in self:
+            if name == key:
+                return value
+        if isinstance(key,int):
             index = 0
-            for (name,template_obj) in self:
-                if index == template_name:
-                    return template_obj
+            for (name,value) in self:
+                if index == key:
+                    return value
                 else:
                     index = index + 1
             
         return default
 
-    def set(self, template_name, template_obj):
+    def set(self, key, value):
         """
-        If the template_name already exists in the list, change the
-        entry, otherwise append the new template_name, template_obj to
-        the end of the PlotTemplate list.
+        If the key already exists in the list, change the entry,
+        otherwise append the new key, value to the end of the list.
         """
         for (k,v) in self:
-            if k == template_name:
+            if k == key:
                 i = self.index((k,v))
                 self.pop(i)
-                self.insert(i,(template_name, template_obj))
+                self.insert(i,(key, value))
                 return True
-        self.append((template_name, template_obj))
+        self.append((key, value))
         return True
 
-    def has_key(self,template_name):
+    def has_key(self,key):
         """
-        Return True if template_name is a key in the ordered list.
-        Return False otherwise.
+        Return True iff key is found in the ordered list.
         """
-        for (name,template_obj) in self:
-            if name == template_name:
+        for (name,value) in self:
+            if name == key:
                 return True
         return False
 
     def items(self):
         """
-        Dictionaries have this function.  A keyed list already is
-        stored in this format, so just return a true list of this
-        object.
+        Provide function supported by dictionaries.  
+        A keyed list already is stored in this format, so just returns
+        the actual underlying list.
         """
         return list(self)
