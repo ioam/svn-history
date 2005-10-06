@@ -77,8 +77,6 @@ from topo.base.parameter import Parameter
 from topo.base.sheet import Sheet
 from topo.base.learningrules import *
 import Numeric
-import RandomArray
-from topo.patterns.random import UniformRandomGenerator
 
 ###############################################
 from topo.base.object import TopoObject
