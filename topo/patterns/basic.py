@@ -9,8 +9,9 @@ from math import pi
 from Numeric import around,bitwise_and,sqrt,sin,ones,Float
 
 from topo.base.parameter import Number
-from topo.base.patterngenerator import PatternGenerator
 from topo.base.patternfns import gaussian,gabor,fuzzy_line,fuzzy_disk,fuzzy_ring
+from topo.base.patterngenerator import PatternGenerator
+from topo.base.patterngenerator import SolidGenerator
 
 
 class GaussianGenerator(PatternGenerator):
@@ -175,6 +176,8 @@ class SquareGratingGenerator(PatternGenerator):
                                     params.get('frequency',self.frequency), 
                                     params.get('phase',self.phase)) 
 
+
+### JABHACKALERT!  Need to delete this class, since it's the same as SolidGenerator
 class UniformGenerator(PatternGenerator):
     """
     Uniform pattern genertor.
