@@ -5,15 +5,15 @@ parameters from a random distribution.
 $Id$
 """
 
-from topo.sheet import Sheet 
-from topo.sheet import BoundingBox
+from topo.base.sheet import Sheet 
+from topo.base.sheet import BoundingBox
 
-from topo.utils import NxN
+from topo.base.utils import NxN
 import copy
 
-from topo.parameter import Parameter, Dynamic
+from topo.base.parameter import Parameter, Dynamic
 
-from topo.patterngenerator import SolidGenerator
+from topo.base.patterngenerator import SolidGenerator
 
 class GeneratorSheet(Sheet):
 

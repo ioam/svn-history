@@ -10,12 +10,12 @@ $Id$
 ### JABHACKALERT!
 ###
 ### Should eliminate import *.
-from topo.projection import Projection
-from topo.parameter import Parameter
+from topo.base.projection import Projection
+from topo.base.parameter import Parameter
 from topo.patterns.random import UniformRandomGenerator
-from topo.boundingregion import Intersection,BoundingBox
-from topo.learningrules import *
-from topo.utils import *
+from topo.base.boundingregion import Intersection,BoundingBox
+from topo.base.learningrules import *
+from topo.base.utils import *
 
 class KernelProjection(Projection):
     """

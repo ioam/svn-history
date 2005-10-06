@@ -5,7 +5,7 @@ Sliders panel for inputs
 
 The list of valid Input Types is retrieved from the registry, and
 would normally contain an automatically generated list of
-PatternGenerator subclasses found in topo.patterngenerator.  Every
+PatternGenerator subclasses found in topo.base.patterngenerator.  Every
 Parameter defined in the PatternGenerator subclass will be taken with the
 intersection of valid TaggedSlider types defined in this class and
 then shown in the window.
@@ -18,20 +18,20 @@ $Id$
 import __main__
 import math, string, re
 import propertiesframe
-import topo.patterngenerator
-import topo.plot
+import topo.base.patterngenerator
+import topo.plotting.plot
 import plotpanel
 import Pmw
-import topo.sheetview 
-import topo.registry
+import topo.base.sheetview 
+import topo.base.registry
 from Tkinter import IntVar, StringVar, Checkbutton
 from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
 from copy import deepcopy
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.sheet import BoundingBox, Sheet
-from topo.utils import eval_atof
-from topo.utils import find_classes_in_package
-from topo.patterngenerator import PatternGenerator
+from topo.base.sheet import BoundingBox, Sheet
+from topo.base.utils import eval_atof
+from topo.base.utils import find_classes_in_package
+from topo.base.patterngenerator import PatternGenerator
 
 # Hack to reverse the order of the input EventProcessor list and the
 # Preview plot list, so that it'll match the order that the plots appear
@@ -50,7 +50,7 @@ DEFAULT_PRESENTATION = '1.0'
 # user has defined and registered.
 from topo.patterns import *
 patternclasses=find_classes_in_package(topo.patterns,PatternGenerator)
-topo.registry.pattern_generators.update(patternclasses)
+topo.base.registry.pattern_generators.update(patternclasses)
 
 
 def patterngenerator_names():
@@ -59,7 +59,7 @@ def patterngenerator_names():
     will change based on the existing classes found in the registry,
     and can be extended by the user.
     """
-    k = topo.registry.pattern_generators.keys()
+    k = topo.base.registry.pattern_generators.keys()
     k = [re.sub('Generator$','',name) for name in k]  # Cut off 'Generator'
     for i in range(len(k)):        # Add spaces before capital leters
         for c in string.uppercase:
@@ -287,7 +287,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
               class member keys, and param_list entries.
         """
         
-        kf_class_keylist = topo.registry.pattern_generators[kf_classname].__dict__.keys()
+        kf_class_keylist = topo.base.registry.pattern_generators[kf_classname].__dict__.keys()
         rlist = [s for s in param_list if s in kf_class_keylist]
         return rlist
 
@@ -357,7 +357,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
             if self.in_ep_dict[each]['state']:
                 ndict['density'] = self.in_ep_dict[each]['obj'].density
                 ndict['bounds'] = deepcopy(self.in_ep_dict[each]['obj'].bounds)
-                kf = topo.registry.pattern_generators[kname](**ndict)
+                kf = topo.base.registry.pattern_generators[kname](**ndict)
                 self.in_ep_dict[each]['pattern'] = kf
         return self.in_ep_dict  # Doesn't have to return it, but is explicit.
 
@@ -459,11 +459,11 @@ class InputParamsPanel(plotpanel.PlotPanel):
         plist = []
         for each in self.in_ep_dict.keys():
             k = self.in_ep_dict[each]['pattern']
-            sv = topo.sheetview.SheetView((k(),k.bounds),src_name=each,
+            sv = topo.base.sheetview.SheetView((k(),k.bounds),src_name=each,
                                           view_type='Pattern')
-            plist.append(topo.plot.Plot((sv,None,None),topo.plot.COLORMAP))
+            plist.append(topo.plotting.plot.Plot((sv,None,None),topo.plotting.plot.COLORMAP))
         if LIST_REVERSE: plist.reverse()
-        self.pe_group = topo.plotgroup.PlotGroup('Preview',None,plist)
+        self.pe_group = topo.plotting.plotgroup.PlotGroup('Preview',None,plist)
 
 
     def refresh_title(self): pass

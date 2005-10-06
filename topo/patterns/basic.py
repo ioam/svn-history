@@ -8,9 +8,9 @@ $Id$
 from math import pi
 from Numeric import around,bitwise_and,sqrt,sin,ones,Float
 
-from topo.parameter import Number
-from topo.patterngenerator import PatternGenerator
-from topo.patternfns import gaussian,gabor,fuzzy_line,fuzzy_disk,fuzzy_ring
+from topo.base.parameter import Number
+from topo.base.patterngenerator import PatternGenerator
+from topo.base.patternfns import gaussian,gabor,fuzzy_line,fuzzy_disk,fuzzy_ring
 
 
 class GaussianGenerator(PatternGenerator):

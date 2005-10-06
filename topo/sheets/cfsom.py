@@ -6,10 +6,10 @@ uses receptive fields.
 $Id$
 """
 
-from topo.utils import L2norm
-from topo.parameter import Parameter
+from topo.base.utils import L2norm
+from topo.base.parameter import Parameter
 from Numeric import argmax,sqrt,exp,floor
-from topo.cfsheet import CFSheet
+from topo.base.cfsheet import CFSheet
 
 def gaussian(dist,radius):
     return exp( - dist/radius)

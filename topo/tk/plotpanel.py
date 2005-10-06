@@ -14,12 +14,12 @@ import Pmw, re, os, sys
 from Tkinter import Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar
 import topo
-import topo.base
-import topo.bitmap
-import topo.simulator as simulator
-import topo.plotengine as plotengine
-import topo.registry as registry
-import topo.plotgroup
+import topo.base.object
+import topo.plotting.bitmap
+import topo.base.simulator as simulator
+import topo.plotting.plotengine as plotengine
+import topo.base.registry as registry
+import topo.plotting.plotgroup
 import PIL
 import Image
 import ImageTk
@@ -30,7 +30,7 @@ NYI = "Not Yet Implemented."
 
 def enum(seq):  return zip(range(len(seq)),seq)
 
-class PlotPanel(Frame,topo.base.TopoObject):
+class PlotPanel(Frame,topo.base.object.TopoObject):
     """
     Abstract PlotPanel class for displaying bitmapped images to a TK
     GUI window.  Must be subclassed to be usable.
@@ -42,7 +42,7 @@ class PlotPanel(Frame,topo.base.TopoObject):
                'Variable pengine not PlotEngine object.'
 
         Frame.__init__(self,parent,config)
-        topo.plot.TopoObject.__init__(self,**config)
+        topo.plotting.plot.TopoObject.__init__(self,**config)
 
         self.plot_key = plot_key
         self.plotgroup_type = plotgroup_type

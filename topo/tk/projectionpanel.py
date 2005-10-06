@@ -8,7 +8,7 @@ from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas
 import Pmw
 import ImageTk
-import topo.registry as registry
+import topo.base.registry as registry
 from math import ceil
 from topo.tk.cfsheetplotpanel import CFSheetPlotPanel
 from topo.tk.plotpanel import PlotPanel

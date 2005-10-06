@@ -6,8 +6,8 @@ a sheet class, but can also be useful.
 $Id$
 """
 
-from topo.sheet import Sheet
-from topo.utils import Struct, NxN
+from topo.base.sheet import Sheet
+from topo.base.utils import Struct, NxN
 from Numeric import zeros
 
 class Composer(Sheet):

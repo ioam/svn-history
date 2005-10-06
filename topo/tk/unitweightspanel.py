@@ -12,7 +12,7 @@ import __main__
 from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry
 from topo.tk.plotpanel import PlotPanel
 from topo.tk.cfsheetplotpanel import CFSheetPlotPanel
-import topo.registry as registry
+import topo.base.registry as registry
 
 class UnitWeightsPanel(CFSheetPlotPanel):
     def __init__(self,parent,pengine,console=None,**config):

@@ -16,9 +16,9 @@ import topo.tk.preferencemappanel
 
 # For show_cmd_prompt() and start()
 import Pmw, sys, Tkinter
-import topo.simulator
-import topo.registry
-import topo.base
+import topo.base.simulator
+import topo.base.registry
+import topo.base.object
 
 def show_cmd_prompt():
     """
@@ -27,7 +27,7 @@ def show_cmd_prompt():
     so as to let the user know that the command-line is still
     active.
     """
-    if topo.base.min_print_level >= topo.base.MESSAGE:
+    if topo.base.object.min_print_level >= topo.base.object.MESSAGE:
         print "\n", sys.ps1,
         sys.stdout.flush()
     
@@ -43,7 +43,7 @@ def start(sim=None, mainloop=False):
     is open.  If False, then commands can be entered at the command-line
     even while the GUI is operational.  Default is False.
     """
-    assert isinstance(sim,topo.simulator.Simulator) or sim == None, 'sim is not a Simulator object'
+    assert isinstance(sim,topo.base.simulator.Simulator) or sim == None, 'sim is not a Simulator object'
 
     root = Tkinter.Tk()
     root.resizable(1,1)
@@ -51,11 +51,11 @@ def start(sim=None, mainloop=False):
     console = topo.tk.topoconsole.TopoConsole(parent=root)
     console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
     if sim is None:
-        console.set_active_simulator(topo.registry.active_sim())
+        console.set_active_simulator(topo.base.registry.active_sim())
     else:
         console.set_active_simulator(sim)
 
-    topo.registry.set_console(console)
+    topo.base.registry.set_console(console)
 
     # mainloop() freezes the commandline until the GUI window exits.
     # Without this line the command-line remains responsive.

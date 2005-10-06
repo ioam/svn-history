@@ -10,9 +10,9 @@ from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas
 import plotpanel
 import Pmw
-from topo.plot import PlotTemplate
-from topo.plotgroup import PlotGroupTemplate
-from topo.bitmap import WHITE_BACKGROUND, BLACK_BACKGROUND
+from topo.plotting.plot import PlotTemplate
+from topo.plotting.plotgroup import PlotGroupTemplate
+from topo.plotting.bitmap import WHITE_BACKGROUND, BLACK_BACKGROUND
 
 ### JAB: This class is not currently useful; it will need to be revisited once
 ### preference maps can be measured.

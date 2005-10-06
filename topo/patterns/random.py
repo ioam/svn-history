@@ -7,8 +7,8 @@ normal distributions or 1/f noise.
 $Id$
 """
 
-from topo.parameter import Number
-from topo.patterngenerator import PatternGenerator
+from topo.base.parameter import Number
+from topo.base.patterngenerator import PatternGenerator
 import RandomArray
 
 

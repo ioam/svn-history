@@ -12,17 +12,17 @@ from topo.tk.unitweightspanel import UnitWeightsPanel
 from topo.tk.projectionpanel import ProjectionPanel
 from topo.tk.inputparamspanel import InputParamsPanel
 from topo.tk.preferencemappanel import PreferenceMapPanel
-from topo.plotgroup import PlotGroupTemplate
-from topo.plot import PlotTemplate
-import topo.simulator as simulator
-import topo.registry
-import topo.plotengine
-import topo.base
+from topo.plotting.plotgroup import PlotGroupTemplate
+from topo.plotting.plot import PlotTemplate
+import topo.base.simulator as simulator
+import topo.base.registry
+import topo.plotting.plotengine
+import topo.base.object
 
 KNOWN_FILETYPES = [('Python Files','*.py'),('Topographica Files','*.ty'),('All Files','*')]
 
 
-class PlotsMenuEntry(topo.base.TopoObject):
+class PlotsMenuEntry(topo.base.object.TopoObject):
     """
     Use these objects to populate the TopoConsole Plots pulldown.  The
     pulldown requires a name and a function to call when the item is
@@ -47,9 +47,9 @@ class PlotsMenuEntry(topo.base.TopoObject):
         # files.
         #
         # If users want to extend the Plot Panel classes, then add
-        # entries to topo.registry.plotpanel_classes.  If no dictionary
+        # entries to topo.base.registry.plotpanel_classes.  If no dictionary
         # entry is defined then the default class is used.
-        self.class_name = topo.registry.plotpanel_classes.get(self.label,class_name)
+        self.class_name = topo.base.registry.plotpanel_classes.get(self.label,class_name)
 
         self.num_windows = 0
         self.title = ''
@@ -221,7 +221,7 @@ class TopoConsole(Frame):
                              label="Activity",
                              command=self.new_activity_window)
         """
-        for (label,obj) in topo.registry.plotgroup_templates.items():
+        for (label,obj) in topo.base.registry.plotgroup_templates.items():
             entry = PlotsMenuEntry(self,obj,label=label)            
             menubar.addmenuitem('Plots','command',
                                 obj.description,label=label,
@@ -244,7 +244,7 @@ class TopoConsole(Frame):
         if self.__plotengine_dict.has_key(new_sim):
             self.__active_plotengine_obj = self.__plotengine_dict[new_sim]
         else:
-            self.__active_plotengine_obj = topo.plotengine.PlotEngine(new_sim)
+            self.__active_plotengine_obj = topo.plotting.plotengine.PlotEngine(new_sim)
             self.__plotengine_dict[new_sim] = self.__active_plotengine_obj
         self.refresh_title()
     
@@ -259,7 +259,7 @@ class TopoConsole(Frame):
 
     def quit(self):
         """Close the main GUI window.  Does not exit Topographica interpreter."""
-        topo.registry.set_console(None)
+        topo.base.registry.set_console(None)
         Frame.quit(self)
         Frame.destroy(self)     # Get rid of widgets
         self.parent.destroy()   # Get rid of window
@@ -354,7 +354,7 @@ class TopoConsole(Frame):
         win = GUIToplevel(self)
         win.withdraw()
         win.title("About Topographica")
-        text = Label(win,text=topo.base.ABOUT_TEXT,justify=LEFT)
+        text = Label(win,text=topo.base.object.ABOUT_TEXT,justify=LEFT)
         text.pack(side=LEFT)
         win.deiconify()
         self.messageBar.message('state', 'OK')
@@ -476,6 +476,6 @@ class GUIToplevel(Toplevel):
 
 
 if __name__ != '__main__':
-    topo.registry.plotpanel_classes['Unit Weights'] = UnitWeightsPanel
-    topo.registry.plotpanel_classes['Projection'] = ProjectionPanel
-    topo.registry.plotpanel_classes['Preference Map'] = PreferenceMapPanel
+    topo.base.registry.plotpanel_classes['Unit Weights'] = UnitWeightsPanel
+    topo.base.registry.plotpanel_classes['Projection'] = ProjectionPanel
+    topo.base.registry.plotpanel_classes['Preference Map'] = PreferenceMapPanel
