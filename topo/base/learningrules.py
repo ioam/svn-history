@@ -8,7 +8,7 @@ __version__ = "$Revision$"
 import weave
 
 
-def hebbian_div_norm_c(input_activity, self_activity, rows, cols, len, cfs, alpha, normalize):
+def hebbian_div_norm_c(input_activity, self_activity, rows, cols, len, cfs, alpha):
     """
     An inline C implementation of Hebbian learning with divisive normalization
     for the whole sheet.
@@ -59,22 +59,20 @@ def hebbian_div_norm_c(input_activity, self_activity, rows, cols, len, cfs, alph
                     }
 
                     // normalize the weights
-                    if (normalize) {
-                        totald += normalize; 
-                        totald = normalize/totald;
-                        rc = (rr2-rr1)*(cc2-cc1);
+                    totald += 1.0; 
+                    totald = 1.0/totald;
+                    rc = (rr2-rr1)*(cc2-cc1);
 
-                        for (i=0; i<rc; ++i) {
-                            *wj *= totald;
-                            ++wj;
-                        }
+                    for (i=0; i<rc; ++i) {
+                        *wj *= totald;
+                        ++wj;
                     }
                 }
             }
         }
     """
     
-    weave.inline(hebbian_div_norm_code, ['input_activity', 'self_activity', 'rows', 'cols', 'len', 'cfs', 'alpha', 'normalize'])
+    weave.inline(hebbian_div_norm_code, ['input_activity', 'self_activity', 'rows', 'cols', 'len', 'cfs', 'alpha'])
 
 
 
@@ -145,7 +143,7 @@ def hebbian(input_activity, unit_activity, weights, alpha):
 ################################################################
 # Normalization methods
 
-def divisive_normalization(weights, normalize_total):
+def divisive_normalization(weights):
     """
     Normalize the numpy array weights to normalize_total by divisive
     normalization.
@@ -153,7 +151,7 @@ def divisive_normalization(weights, normalize_total):
 
     s = sum(weights.flat)
     if s != 0:
-        factor = normalize_total/s
+        factor = 1.0/s
         weights *= factor
 
 
@@ -177,13 +175,13 @@ def apply_learn_norm_fn(proj, inp, act, learn_fn, norm_fn):
             # Hebbian learning with divisive normalization per projection. 
             # It is much faster to do both of them in one function.
             if norm_fn.func_name == "divisive_normalization":
-                hebbian_div_norm_c(inp, act, rows, cols, len, cfs, alpha, proj.normalize)
+                hebbian_div_norm_c(inp, act, rows, cols, len, cfs, alpha)
             else:
                 hebbian_c(inp, act, rows, cols, len, cfs, alpha)
                 norm = proj.normalize
                 for r in range(rows):
                     for c in range(cols):
-                        norm_fn(cfs[r][c].weights, norm)
+                        norm_fn(cfs[r][c].weights)
         else:
             hebbian_c(inp, act, rows, cols, len, cfs, alpha)
     else:
@@ -194,5 +192,5 @@ def apply_learn_norm_fn(proj, inp, act, learn_fn, norm_fn):
                 cf = proj.cf(r,c)
                 learn_fn(cf.get_input_matrix(inp), act[r,c], cf.weights, alpha)
                 if norm:
-                    norm_fn(cf.weights, norm)
+                    norm_fn(cf.weights)
 

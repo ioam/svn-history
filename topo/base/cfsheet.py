@@ -73,7 +73,7 @@ $Id$
 
 __version__ = '$Revision$'
 
-from parameter import Parameter
+from parameter import Parameter,BooleanParameter
 from sheet import Sheet
 from learningrules import *
 import Numeric
@@ -86,6 +86,9 @@ class ConnectionField(TopoObject):
     x = Parameter(default=0)
     y = Parameter(default=0)
     weight_type = Parameter(default=Numeric.Float32)
+    normalize = BooleanParameter(default=False)
+    normalize_fn = Parameter(default=divisive_normalization)
+
 
     weights = []
     slice_array = []
@@ -123,6 +126,9 @@ class ConnectionField(TopoObject):
 
         self.verbose("activity matrix shape: ",self.weights.shape)
 
+        if self.normalize:
+            self.normalize_fn(self.weights)
+
 
     def contains(self,x,y):
         return self.bounds.contains(x,y)
@@ -154,6 +160,8 @@ class ConnectionField(TopoObject):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
             self.weights.savespace(1)
 
+            if self.normalize:
+                self.normalize_fn(self.weights)
 
 class CFSheet(Sheet):
     """
@@ -198,10 +206,6 @@ class CFSheet(Sheet):
     s2 would then construct a new projection of type MyProjectionType
     with the parameters (a=1,b=2).
     """
-
-    # CEB: does this import being here imply something else should move
-    # out of this file?
-    from topo.projections.kernelprojection import KernelProjection
 
     ### JABHACKALERT!
     ### 

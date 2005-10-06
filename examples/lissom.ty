@@ -21,7 +21,6 @@ import fixedpoint
 from fixedpoint import FixedPoint
 from topo.patterns.random import UniformRandomGenerator
 from topo.patterns.basic import GaussianGenerator
-from topo.patterns.basic import UniformGenerator
 from topo.projections.kernelprojection import KernelProjection
 
 
@@ -111,13 +110,13 @@ class LISSOM(topo.base.cfsheet.CFSheet):
                         # projection. It is much faster to do both of them
                         # in one function.
 			if proj.normalize_fn.func_name == "divisive_normalization":
-                            hebbian_div_norm_c(inp, self.activity, rows, cols, len, cfs, alpha, proj.normalize)
+                            hebbian_div_norm_c(inp, self.activity, rows, cols, len, cfs, alpha)
                         else:
                             hebbian_c(inp, self.activity, rows, cols, len, cfs, alpha)
 			    norm = proj.normalize
                             for r in range(rows):
                                 for c in range(cols):
-                                    proj.normalize_fn(cfs[r][c].weights, norm)
+                                    proj.normalize_fn(cfs[r][c].weights)
                     else:
                         hebbian_c(inp, self.activity, rows, cols, len, cfs, alpha)
                 else:
@@ -128,7 +127,7 @@ class LISSOM(topo.base.cfsheet.CFSheet):
                             cf = proj.cf(r,c)
                             self.learning_fn(cf.get_input_matrix(inp), self.activity[r,c], cf.weights, alpha)
                             if norm:
-                                proj.normalize_fn(cf.weights, norm)
+                                proj.normalize_fn(cf.weights)
 
 
     def lateral_projections(self):
@@ -246,18 +245,18 @@ save  = ImageSaver(name='LISSOM')
 s.connect(retina,V1, delay = FixedPoint("0.05"),
           projection_type=KernelProjection,
           projection_params = dict(strength = 1.0, name='Afferent0',
-                                   weights_bounds = afferent_weight_bounds, normalize = 1.0, activation_fn=compute_response_mdot_c,learning_rate=alpha_input))
+                                   weights_bounds = afferent_weight_bounds, normalize = True, activation_fn=compute_response_mdot_c,learning_rate=alpha_input))
 
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
           projection_type=KernelProjection,
           projection_params = dict(strength = gammaexc, name='LateralExcitatory',
-                                   weights_bounds = excitatory_weight_bounds, normalize = 1.0, activation_fn=compute_response_mdot_c,learning_rate=alpha_exc))
+                                   weights_bounds = excitatory_weight_bounds, normalize = True, activation_fn=compute_response_mdot_c,learning_rate=alpha_exc))
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
           projection_type=KernelProjection,
           projection_params = dict(strength = -gammainh, name='LateralInhibitory',
-                                   weights_bounds = inhibitory_weight_bounds, normalize = 1.0, activation_fn=compute_response_mdot_c,learning_rate=alpha_inh))
+                                   weights_bounds = inhibitory_weight_bounds, normalize = True, activation_fn=compute_response_mdot_c,learning_rate=alpha_inh))
         
 
 #################################################

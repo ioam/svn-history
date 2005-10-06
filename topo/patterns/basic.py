@@ -6,7 +6,7 @@ $Id$
 """
 
 from math import pi
-from Numeric import around,bitwise_and,sqrt,sin,ones,Float
+from Numeric import around,bitwise_and,sqrt,sin,Float
 
 from topo.base.parameter import Number
 from topo.base.patternfns import gaussian,gabor,fuzzy_line,fuzzy_disk,fuzzy_ring
@@ -176,14 +176,3 @@ class SquareGratingGenerator(PatternGenerator):
                                     params.get('frequency',self.frequency), 
                                     params.get('phase',self.phase)) 
 
-
-### JABHACKALERT!  Need to delete this class, since it's the same as SolidGenerator
-class UniformGenerator(PatternGenerator):
-    """
-    Uniform pattern genertor.
-    """
-    x       = Number(default=0.0,softbounds=(-1.0,1.0))
-    y       = Number(default=0.0,softbounds=(-1.0,1.0))
-
-    def function(self,**params):
-        return ones(self.pattern_x.shape, Float)

@@ -6,7 +6,7 @@ one Sheet into a CFSheet.
 ### JABHACKALERT!
 ###
 ### Should eliminate import *.
-from parameter import Parameter, Number
+from parameter import Parameter, Number, BooleanParameter
 from utils import mdot
 import Numeric
 from learningrules import *
@@ -36,7 +36,7 @@ class Projection(EPConnection):
     activation_fn = Parameter(default=mdot)
     cf_type = Parameter(default=ConnectionField)
     # Magnitude of normalization of connection field weights. 0 = don't normalize
-    normalize = Parameter(default=0.0)
+    normalize = BooleanParameter(default=False)
     normalize_fn = Parameter(default=divisive_normalization)
     weight_type = Parameter(default=Numeric.Float32)
 
