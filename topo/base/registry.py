@@ -6,8 +6,7 @@ usually show up automatically in menus, online help, etc.
 
 $Id$
 """
-from topo.plotting.plotgroup import KeyedList, PlotGroupTemplate
-from topo.plotting.plot import PlotTemplate
+from keyedlist import KeyedList
 
 ############################################################
 # Registry for subclasses of PatternGenerator.  Users can add to this
@@ -90,33 +89,4 @@ def link_to_sim(sim):
         if __gui_console != None:
             __gui_console.set_active_simulator(sim)
 
-
-############################################################
-# Populate the dynamic plot menu list registry:
-if __name__ != '__main__':
-    pgt = PlotGroupTemplate([('Activity',
-                              PlotTemplate({'Strength'   : 'Activity',
-                                            'Hue'        : None,
-                                            'Confidence' : None,
-                                            'Normalize'  : False}))],
-                            name='Activity')
-    plotgroup_templates[pgt.name] = pgt
-    pgt = PlotGroupTemplate([('Unit Weights',
-                              PlotTemplate({'Location'   : (0.0,0.0),
-                                            'Normalize'  : True,
-                                            'Sheet_name' : 'V1'}))],
-                            name='Unit Weights')
-    plotgroup_templates[pgt.name] = pgt
-    pgt = PlotGroupTemplate([('Projection',
-                              PlotTemplate({'Density'         : 25,
-                                            'Projection_name' : 'None',
-                                            'Normalize'       : True}))],
-                            name='Projection')
-    plotgroup_templates[pgt.name] = pgt
-    pgt = PlotGroupTemplate([('Preference',
-                              PlotTemplate({'Strength'   : 'Activity',
-                                            'Hue'        : 'Activity',
-                                            'Confidence' : 'Activity'}))],
-                            name='Preference Map')
-    plotgroup_templates[pgt.name] = pgt
 
