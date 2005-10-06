@@ -155,6 +155,34 @@ input or user examination of the output are also encouraged, but all
 these must be kept separate from the main automated regression tests.
 
 
+PARAMETERS AND BOUNDS
+
+When writing user-visible classes, variables that are meant to be
+user-modifiable should be of class Parameter, so that they will be
+visible in the various user interfaces.
+
+Parameters should have the narrowest type and tightest bounds that
+would be meaningful.  For instance, a parameter that can be either
+true or false should be of type BooleanParameter, while one that can
+only have a value from 0 to 0.5 should be of type Number with a hard
+bound of 0 to 0.5.  Using the right types and bounds greatly
+simplifies life for the programmer, who can reason about the code
+knowing the full allowable range of the parameter, and for the user,
+who can tell what values make sense to use.
+
+For Parameters that might show up in a GUI, soft bounds should also be
+included wherever appropriate.  These bounds set the range of sliders,
+etc., and are a suggested range for the Parameter.  If there are hard
+bounds at both ends, soft bounds are not usually needed, but can be
+useful if the reasonable range of the Parameter is much smaller than
+the legal range.
+
+Parameters should each be documented with an appropriate docstring
+passed to the constructor.  The documentation should be written from
+the user perspective, not the programmer's, because it will appear in 
+various online and other forms of user documentation.
+
+
 NUMERICAL UNITS IN THE USER INTERFACE
 
 All quantities visible to the user, such as GUI labels, parameters,
