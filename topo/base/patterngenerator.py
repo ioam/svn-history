@@ -206,13 +206,13 @@ class PatternGenerator(topo.base.object.TopoObject):
 # patterns/, to be imported as needed.
 class SolidGenerator(PatternGenerator):
     """
-    Solid-color pattern generator.
+    Solid pattern generator, i.e. a uniform field of the same value.
     """
     x       = Number(default=0.0,softbounds=(-1.0,1.0))
     y       = Number(default=0.0,softbounds=(-1.0,1.0))
 
     def function(self,**params):
-        return self.pattern_x*0+1
+        return ones(self.pattern_x.shape, Float)
 
 # Register this PatternGenerator for public use.
 topo.base.registry.pattern_generators['SolidGenerator']=SolidGenerator
