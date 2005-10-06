@@ -14,7 +14,6 @@ import sys
 import types
 import operator
 
-import Numeric
 import topo.base.sheet
 from topo.base.object import TopoObject
 

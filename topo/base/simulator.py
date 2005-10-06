@@ -81,7 +81,6 @@ import sched
 from topo.base.object import TopoObject
 from topo.base.parameter import Parameter
 from copy import copy, deepcopy
-import __main__
 import topo.base.registry
 from fixedpoint import FixedPoint
 

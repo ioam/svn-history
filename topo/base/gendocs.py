@@ -22,7 +22,7 @@ From the Makefile (Tabs have been stripped):
 
 $Id$
 """
-import pydoc, glob, sys, os
+import pydoc, glob, os
 
 TOPO = 'topo'   # Subdirectory with Topographica source
 DOCS = 'docs'   # Subdirectory to place Docs

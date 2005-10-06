@@ -106,8 +106,6 @@ def produce_pattern_matrices(bounds, density, r, c):
     The x and y vectors are lists of indexes at which to sample the pattern
     function.
     """       
-    linear_density = sqrt(density)
-
     if r == 0 and c == 0:
         rows,cols = bounds2shape(bounds,density)
     else:

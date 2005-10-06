@@ -78,7 +78,6 @@ def fuzzy_ring(x, y, disk_radius, ring_radius, gaussian_width):
     """
     Circular ring (annulus) with Gaussian fall-off after the solid ring-shaped region.
     """    
-    disk_radius = disk_radius
     ring_radius = ring_radius / 2.0
     distance_from_line = abs(sqrt((x**2)+(y**2)) - disk_radius)
     inner_distance = distance_from_line - ring_radius
