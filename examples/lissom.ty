@@ -8,13 +8,13 @@ import pdb #debugger
 
 
 from topo import *
-from topo.patterngenerator import *
+from topo.base.patterngenerator import *
 from topo.sheets.generatorsheet import *
-from topo.plotfilesaver import ImageSaver
-import topo.cfsheet
-from topo.parameter import *
-from topo.utils import *
-from topo.learningrules import *
+from topo.plotting.plotfilesaver import ImageSaver
+import topo.base.cfsheet
+from topo.base.parameter import *
+from topo.base.utils import *
+from topo.base.learningrules import *
 import weave
 import Numeric
 import fixedpoint
@@ -24,7 +24,7 @@ from topo.patterns.basic import UniformGenerator
 from topo.projections.kernelprojection import KernelProjection
 
 
-from topo.utils import msum
+from topo.base.utils import msum
 """
 TODO:
 
@@ -39,7 +39,7 @@ x xfer funcs  (piecewise linear sigmoid)
 
 
 
-class LISSOM(topo.cfsheet.CFSheet):
+class LISSOM(topo.base.cfsheet.CFSheet):
 
     transfer_fn = Parameter(default=utils.PLTF)
     learning_fn = Parameter(default=hebbian_c)
@@ -236,7 +236,7 @@ inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(
 
 print "Creating simulation objects..."
 
-s = topo.simulator.Simulator()
+s = topo.base.simulator.Simulator()
 
 retina = GeneratorSheet(input_generator=GaussianGenerator(),name='Retina')
 V1 = LISSOM(name='V1')

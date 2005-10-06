@@ -12,7 +12,7 @@ classes.
 $Id$
 """
 import topo
-from topo.bitmap import *
+from topo.plotting.bitmap import *
 import Image, Numeric
 import unittest
 

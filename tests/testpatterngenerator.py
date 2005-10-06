@@ -4,7 +4,7 @@ Created to test the pattern input orientations.
 $Id$
 """
 import unittest
-from topo.patterngenerator import *
+from topo.base.patterngenerator import *
 from MLab import flipud, rot90
 from Numeric import *
 from topo.patterns.basic import RectangleGenerator

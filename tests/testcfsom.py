@@ -7,17 +7,17 @@ $Id$
 import unittest
 from topo.sheets.cfsom import CFSOM
 from pprint import pprint
-from topo import plot
-from topo import base
-from topo.bitmap import *
-from topo.sheet import Sheet
+from topo.plotting import plot
+from topo.base import object
+from topo.plotting.bitmap import *
+from topo.base.sheet import Sheet
 from topo.sheets.generatorsheet import *
-from topo.simulator import *
-from topo.plotfilesaver import ImageSaver
-from topo import patterngenerator
+from topo.base.simulator import *
+from topo.plotting.plotfilesaver import ImageSaver
+from topo.base import patterngenerator
 from topo.patterns.basic import GaussianGenerator
 from math import pi
-from topo.parameter import Dynamic
+from topo.base.parameter import Dynamic
 import random
 from topo.projections.kernelprojection import KernelProjection
 import pdb #debugger
@@ -36,8 +36,8 @@ class TestCFSom(unittest.TestCase):
         Code moved from __main__ block of cfsom.py.  Gives a tight example
         of running a cfsom simulation.
         """
-        from topo.patterngenerator import ImageGenerator
-        from topo.plotfilesaver import ImageSaver
+        from topo.base.patterngenerator import ImageGenerator
+        from topo.plotting.plotfilesaver import ImageSaver
         
         s = Simulator(step_mode=True)
     
@@ -62,7 +62,7 @@ class TestCFSom(unittest.TestCase):
         # input generation params
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 900
-        GeneratorSheet.print_level = base.WARNING
+        GeneratorSheet.print_level = topo.base.object.WARNING
         
         GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))        
@@ -80,7 +80,7 @@ class TestCFSom(unittest.TestCase):
         ###########################################
         # build simulation
         
-        base.min_print_level = base.WARNING
+        topo.base.object.min_print_level = topo.base.object.WARNING
       
         s = Simulator()
         s.verbose("Creating simulation objects...")
@@ -89,10 +89,10 @@ class TestCFSom(unittest.TestCase):
         # Old form
         #retina = GaussianSheet(name='Retina')
         V1 = CFSOM(name='V1')
-        V1.print_level = base.WARNING
+        V1.print_level = topo.base.object.WARNING
 
         s.connect(retina,V1,delay=1,projection_type=KernelProjection,projection_params={'name':'RtoV1'})
-        s.print_level = base.WARNING
+        s.print_level = topo.base.object.WARNING
 
         self.assertTrue(len(V1.get_projection_by_name('RtoV1')) == 1)
         self.assertTrue(len(V1.get_projection_by_name('R1toV1')) == 0)

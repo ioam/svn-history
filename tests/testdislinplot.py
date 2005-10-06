@@ -23,8 +23,8 @@ import unittest
 import math, Image, ImageOps, os
 import topo
 import Image
-from topo.dislinplot import *
-from topo.dislindriver import *
+topo.base.commandline
+from topo.plotting.dislindriver import *
 
 TESTS_DIR = 'tests/testdislinplot/'
 
@@ -46,7 +46,7 @@ class TestDislinPlot(unittest.TestCase):
     def test_dislinplot_1(self):
         "Template example for creating a tiff file from DislinPlot"
         # Set plot options for a tiff output file
-        plot2 = dislinplot.DislinPlot()
+        plot2 = topo.plotting.dislinplot.DislinPlot()
         plot2.set_dislin_scale(False)              # Color will be 256
         plot2.set_bitmap_size(800)                 # Not used for postscript
         plot2.set_display('tiff')
@@ -77,7 +77,7 @@ class TestDislinPlot(unittest.TestCase):
 
     def test_dislinplot_2(self):
         "Template example for creating a postscript file from DislinPlot"
-        plot2 = dislinplot.DislinPlot()
+        plot2 = topo.plotting.dislinplot.DislinPlot()
         plot2.set_dislin_scale(True)
         #plot2.set_bitmap_size(800)                 # Not used for postscript
         plot2.set_display('postscript')             # Or 'tiff'

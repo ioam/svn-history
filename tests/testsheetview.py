@@ -2,11 +2,11 @@ import unittest
 
 import Numeric
 
-from topo.sheet import Sheet
-from topo.boundingregion import BoundingBox
-from topo.sheetview import *
-from topo.patterngenerator import ImageGenerator
-from topo.bitmap import BWMap
+from topo.base.sheet import Sheet
+from topo.base.boundingregion import BoundingBox
+from topo.base.sheetview import *
+from topo.base.patterngenerator import ImageGenerator
+from topo.plotting.bitmap import BWMap
 
 # Turn False once development is complete and this module is to be
 # included as part of the system unit testing.

@@ -1,18 +1,18 @@
 import unittest
 from topo.tk import *
-from topo.simulator import Simulator
-from topo.plotengine import PlotEngine
-import topo.base
-import topo.registry
+from topo.base.simulator import Simulator
+from topo.plotting.plotengine import PlotEngine
+import topo.base.object
+import topo.base.registry
 
 class TestTopoConsole(unittest.TestCase):
     def setUp(self):
-        topo.registry.set_active_sim(None)
+        topo.base.registry.set_active_sim(None)
         self.s = Simulator(register=False)
         self.pe = PlotEngine(self.s)
         self.console = start()
-        topo.base.min_print_level = topo.base.WARNING
-        self.s.print_level = topo.base.WARNING
+        topo.base.object.min_print_level = topo.base.object.WARNING
+        self.s.print_level = topo.base.object.WARNING
 
     def test_plotengine_dict(self):
         self.assertEqual(self.console.active_simulator(),None)

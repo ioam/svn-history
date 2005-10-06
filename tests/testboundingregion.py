@@ -7,7 +7,7 @@ $Id$
 
 import unittest
 import topo
-from topo.boundingregion import *
+from topo.base.boundingregion import *
 
 
 class TestAARectangle(unittest.TestCase):

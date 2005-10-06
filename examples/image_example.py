@@ -22,9 +22,9 @@ $Id$
 
 import sys
 from topo import * 
-from topo.patterngenerator import *
+from topo.base.patterngenerator import *
 from topo.sheets.composer import Composer
-from topo.plotfilesaver import ImageSaver
+from topo.plotting.plotfilesaver import ImageSaver
 
 #################################################
 # Set class parameter defaults

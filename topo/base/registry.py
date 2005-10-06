@@ -6,8 +6,8 @@ usually show up automatically in menus, online help, etc.
 
 $Id$
 """
-from topo.plotgroup import KeyedList, PlotGroupTemplate
-from topo.plot import PlotTemplate
+from topo.plotting.plotgroup import KeyedList, PlotGroupTemplate
+from topo.plotting.plot import PlotTemplate
 
 ############################################################
 # Registry for subclasses of PatternGenerator.  Users can add to this

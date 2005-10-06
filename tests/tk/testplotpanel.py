@@ -2,18 +2,18 @@ import unittest, os
 import topo
 from topo.sheets.generatorsheet import *
 from topo.tk import *
-from topo.patterngenerator import *
-from topo.simulator import *
+from topo.base.patterngenerator import *
+from topo.base.simulator import *
 from PIL import Image
-from topo.sheetview import *
-from topo.plotengine import *
-from topo.bitmap import *
+from topo.base.sheetview import *
+from topo.plotting.plotengine import *
+from topo.plotting.bitmap import *
 import topo.tk.topoconsole 
 import topo.tk.plotpanel
 import Tkinter
 from topo.sheets.cfsom import CFSOM
 from math import pi
-from topo.parameter import Dynamic
+from topo.base.parameter import Dynamic
 import random
 import pdb #debugger
 from topo.patterns.basic import GaussianGenerator,FuzzyLineGenerator
@@ -30,8 +30,8 @@ class TestPlotPanel(unittest.TestCase):
         """
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 900
-#        base.print_level = base.WARNING
-#        GeneratorSheet.print_level = base.WARNING
+#        base.print_level = topo.base.object.WARNING
+#        GeneratorSheet.print_level = topo.base.object.WARNING
         
         GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -43,7 +43,7 @@ class TestPlotPanel(unittest.TestCase):
         ###########################################
         # build simulation
         
-#        base.min_print_level = base.WARNING
+#        topo.base.object.min_print_level = topo.base.object.WARNING
         
         self.s = Simulator()
         self.s.verbose("Creating simulation objects...")
@@ -67,7 +67,7 @@ class TestPlotPanel(unittest.TestCase):
         sheetG = Sheet()
         sheetB = Sheet()
         retina = GeneratorSheet(input_generator=GaussianGenerator())
-        retina.print_level = base.WARNING
+        retina.print_level = topo.base.object.WARNING
 
         # For a new sheet_group named Miata:
         sviewR = SheetView((self.ra,BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))))
@@ -98,8 +98,8 @@ class TestPlotPanel(unittest.TestCase):
         Here, we're not interested in the Activity plots, but we are
         interested in the weights of the receptive fields.
         """
-        base.min_print_level = base.WARNING
-        topo.tk.plotpanel.PlotPanel.print_level = base.WARNING
+        topo.base.object.min_print_level = topo.base.object.WARNING
+        topo.tk.plotpanel.PlotPanel.print_level = topo.base.object.WARNING
         # input generation params
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 900
@@ -117,15 +117,15 @@ class TestPlotPanel(unittest.TestCase):
         
         ###########################################
         # build simulation
-        s = topo.simulator.Simulator()
+        s = topo.base.simulator.Simulator()
         
         retina = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina')
-        retina.print_level = base.WARNING
+        retina.print_level = topo.base.object.WARNING
         V1 = CFSOM(name='V1')
-        V1.print_level = base.WARNING
+        V1.print_level = topo.base.object.WARNING
         
         s.connect(retina,V1,delay=1)
-        s.print_level = base.WARNING
+        s.print_level = topo.base.object.WARNING
         
         s.run(1)
 

@@ -1,13 +1,13 @@
 import unittest
-import topo.simulator
-import topo.plotengine
+import topo.base.simulator
+import topo.plotting.plotengine
 from pprint import pprint
-from topo import plot
-from topo.sheet import *
-from topo.plotgroup import *
-from topo.plot import PlotTemplate
-from topo.bitmap import RGBMap
-from topo.patterngenerator import ImageGenerator
+from topo.plotting import plot
+from topo.base.sheet import *
+from topo.plotting.plotgroup import *
+from topo.plotting.plot import PlotTemplate
+from topo.plotting.bitmap import RGBMap
+from topo.base.patterngenerator import ImageGenerator
 import Numeric
 from Numeric import divide
 
@@ -76,14 +76,14 @@ class TestPlotGroup(unittest.TestCase):
             if SHOW_PLOTS: map.show()
 
     def test_make_plot_group(self):
-        sim = topo.simulator.Simulator()
-        pe = topo.plotengine.PlotEngine(sim)
+        sim = topo.base.simulator.Simulator()
+        pe = topo.plotting.plotengine.PlotEngine(sim)
         pg = pe.make_plot_group('Activity',
                                 plotgroup_templates['Activity'])
 
     def test_get_plot_group(self):
-        sim = topo.simulator.Simulator()
-        pe = topo.plotengine.PlotEngine(sim)
+        sim = topo.base.simulator.Simulator()
+        pe = topo.plotting.plotengine.PlotEngine(sim)
         pg = pe.get_plot_group('Activity',
                                plotgroup_templates['Activity'])
         pg = pe.get_plot_group('Activity',

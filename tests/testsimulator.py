@@ -2,8 +2,8 @@ import unittest
 import copy
 
 from Numeric import array
-from topo.simulator import *
-from topo.scalarep import *
+from topo.base.simulator import *
+from topo.eps.scalarep import *
 
 class TestSimulator(unittest.TestCase):
     def test_event_copy(self):

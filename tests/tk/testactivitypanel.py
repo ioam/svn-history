@@ -5,10 +5,10 @@ import Tkinter
 import Pmw
 from PIL import Image
 from topo.sheets.generatorsheet import *
-from topo.patterngenerator import *
-from topo.simulator import *
-from topo.sheetview import *
-from topo.plotengine import *
+from topo.base.patterngenerator import *
+from topo.base.simulator import *
+from topo.base.sheetview import *
+from topo.plotting.plotengine import *
 from topo.tk.basicplotpanel import *
 from topo.patterns.basic import GaussianGenerator
 
@@ -25,8 +25,8 @@ class TestActivityPanel(unittest.TestCase):
         """
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 900
-#        base.print_level = base.WARNING
-#        GeneratorSheet.print_level = base.WARNING
+#        base.print_level = topo.base.object.WARNING
+#        GeneratorSheet.print_level = topo.base.object.WARNING
         
         GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -38,7 +38,7 @@ class TestActivityPanel(unittest.TestCase):
         ###########################################
         # build simulation
         
-#        base.min_print_level = base.WARNING
+#        topo.base.object.min_print_level = topo.base.object.WARNING
         
         self.s = Simulator()
         self.s.verbose("Creating simulation objects...")
@@ -62,7 +62,7 @@ class TestActivityPanel(unittest.TestCase):
         sheetG = Sheet()
         sheetB = Sheet()
         retina = GeneratorSheet(input_generator=GaussianGenerator())
-        retina.print_level = base.WARNING
+        retina.print_level = topo.base.object.WARNING
 
         # For a new sheet_group named Miata:
         sviewR = SheetView((self.ra,BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))))
@@ -90,8 +90,8 @@ class TestActivityPanel(unittest.TestCase):
         """
         Test the creation the widgets
         """
-        base.min_print_level = base.WARNING
-        BasicPlotPanel.print_level = base.WARNING
+        topo.base.object.min_print_level = topo.base.object.WARNING
+        BasicPlotPanel.print_level = topo.base.object.WARNING
 
         root = Tkinter.Tk()
         root.resizable(1,1)

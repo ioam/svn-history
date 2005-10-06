@@ -1,7 +1,7 @@
 import unittest
 
 import Numeric
-from topo.histogram import *
+from topo.plotting.histogram import *
 
 class TestHistogram(unittest.TestCase):
     def test_calculate(self):

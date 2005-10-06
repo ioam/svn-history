@@ -6,11 +6,11 @@ import random
 from math import pi
 import pdb #debugger
 from topo.sheets.generatorsheet import *
-from topo.patterngenerator import *
-from topo.simulator import *
+from topo.base.patterngenerator import *
+from topo.base.simulator import *
 from topo.projections.kernelprojection import KernelProjection
-from topo.plotfilesaver import ImageSaver
-from topo.parameter import Dynamic
+from topo.plotting.plotfilesaver import ImageSaver
+from topo.base.parameter import Dynamic
 from topo.sheets.cfsom import CFSOM
 from topo.patterns.random import UniformRandomGenerator
 from topo.patterns.basic import FuzzyLineGenerator
@@ -48,10 +48,10 @@ ImageSaver.time_format='%0.4d'
 ###########################################
 # build simulation
 
-base.min_print_level = base.MESSAGE
+topo.base.object.min_print_level = topo.base.object.MESSAGE
 
 print "Creating simulation objects..."
-s = topo.simulator.Simulator()
+s = topo.base.simulator.Simulator()
 
 retina = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina')
 retina2 = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina2')

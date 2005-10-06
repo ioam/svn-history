@@ -1,9 +1,9 @@
 import unittest
 from pprint import pprint
-from topo import plot
-from topo.sheet import *
-from topo.bitmap import RGBMap, HSVMap
-from topo.patterngenerator import ImageGenerator
+from topo.plotting import plot
+from topo.base.sheet import *
+from topo.plotting.bitmap import RGBMap, HSVMap
+from topo.base.patterngenerator import ImageGenerator
 import Numeric
 from Numeric import divide
 

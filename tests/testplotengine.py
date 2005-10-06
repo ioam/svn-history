@@ -8,19 +8,19 @@ $Id$
 import unittest
 from pprint import pprint
 from math import pi
-from topo import plot
-from topo import base
-from topo.bitmap import *
-from topo.sheet import Sheet
-from topo.sheetview import SheetView
-from topo.plotgroup import *
-from topo.plot import PlotTemplate
-from topo.plotengine import *
+from topo.plotting import plot
+from topo.base import object
+from topo.plotting.bitmap import *
+from topo.base.sheet import Sheet
+from topo.base.sheetview import SheetView
+from topo.plotting.plotgroup import *
+from topo.plotting.plot import PlotTemplate
+from topo.plotting.plotengine import *
 from topo.sheets.generatorsheet import *
-from topo.simulator import *
-from topo import patterngenerator
+from topo.base.simulator import *
+from topo.base import patterngenerator
 from topo.patterns.basic import GaussianGenerator
-from topo.parameter import Dynamic
+from topo.base.parameter import Dynamic
 from topo.sheets.cfsom import CFSOM
 from Tkinter import *
 from Tkconstants import *
@@ -101,10 +101,10 @@ class TestPlotEngine(unittest.TestCase):
         ###########################################
         # build simulation
         
-        base.min_print_level = base.WARNING
+        topo.base.object.min_print_level = topo.base.object.WARNING
         
         s = Simulator()
-        s.print_level = base.WARNING
+        s.print_level = topo.base.object.WARNING
         s.verbose("Creating simulation objects...")
 
         # Uses testbitmap.jpg.
@@ -126,7 +126,7 @@ class TestPlotEngine(unittest.TestCase):
         sheetG = Sheet()
         sheetB = Sheet()
         retina = GeneratorSheet(input_generator=GaussianGenerator())
-        retina.print_level = base.WARNING
+        retina.print_level = topo.base.object.WARNING
 
 
         # For a new sheet_group named Miata:

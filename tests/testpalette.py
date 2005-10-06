@@ -1,6 +1,6 @@
 import unittest
-from topo.bitmap import BLACK_BACKGROUND, WHITE_BACKGROUND
-from topo.palette import *
+from topo.plotting.bitmap import BLACK_BACKGROUND, WHITE_BACKGROUND
+from topo.plotting.palette import *
 
 class TestPalette(unittest.TestCase):
     def test_Palette(self):
