@@ -18,6 +18,7 @@ from topo.base.learningrules import *
 import weave
 import Numeric
 import fixedpoint
+from fixedpoint import FixedPoint
 from topo.patterns.random import UniformRandomGenerator
 from topo.patterns.basic import GaussianGenerator
 from topo.patterns.basic import UniformGenerator
