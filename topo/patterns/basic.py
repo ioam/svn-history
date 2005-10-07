@@ -1,6 +1,5 @@
 """
-Basic two-dimensional pattern generators, for mathematical functions
-and geometric objects.
+Simple two-dimensional mathematical or geometrical pattern generators.
 
 $Id$
 """
@@ -141,6 +140,10 @@ class RectangleGenerator(PatternGenerator):
     theta   = Number(default=0.0,softbounds=(0.0,2*pi))
     width   = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
+
+    # We will probably want to add Fuzzy-style anti-aliasing to this,
+    # and there might be an easier way to do it than by cropping a
+    # sine grating.
 
     def function(self,**params):
         width = params.get('width',self.width)

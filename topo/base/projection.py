@@ -56,24 +56,19 @@ class Projection(EPConnection):
         return len(self.cfs),len(self.cfs[0])
 
 
-    ### JABHACKALERT!
-    ###
-    ### What does the documentation mean by "stub"?  Needs to be
-    ### fixed, and the commented-out code needs to be removed or used.
     def get_view(self,sheet_x, sheet_y):
         """
-        Return a single connection field UnitView, for the unit at
-        sheet_x, sheet_y.  sheet_x and sheet_y are assumed to be in
-        sheet coordinates.
-
-        NOTE: BOUNDS MUST BE PROPERLY SET. CURRENTLY A STUB IS IN EFFECT.
+        Return a single connection field UnitView, for the unit
+        located at sheet coordinate (sheet_x,sheet_y).
         """
         (r,c) = (self.dest).sheet2matrix(sheet_x,sheet_y)
-        # composite_name = '%s: %0.3f, %0.3f' % (self.name, sheet_x, sheet_y)
-        #matrix_data = Numeric.array(Numeric.transpose(self.cf(r,c).weights))
         matrix_data = Numeric.array(self.cf(r,c).weights)
-        #matrix_data = Numeric.array(self.cf(r,c).weights)*50
-        new_box = self.dest.bounds  # TURN INTO A PROPER COPY
+
+        ### JABHACKALERT!
+        ###
+        ### The bounds are currently set to a default; what should
+        ### they really be set to?
+        new_box = self.dest.bounds
         assert matrix_data != None, "Projection Matrix is None"
         return UnitView((matrix_data,new_box),sheet_x,sheet_y,self,view_type='UnitView')
 
