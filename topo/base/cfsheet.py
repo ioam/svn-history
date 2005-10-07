@@ -68,10 +68,10 @@ class ConnectionField(TopoObject):
         r1,r2,c1,c2 = self.slice
 
 
-        # Numeric.Int32 should be specified explicitly, instead of just
-        # Numeric.Int or left unspecified. This ensures 32-bit integers are
-        # used so that the optimized C code will run properly on 64-bit
-        # machines.
+        # Numeric.Int32 is specified explicitly here to avoid having it
+        # default to Numeric.Int.  Numeric.Int works on 32-bit platforms,
+        # but does not work properly with the optimized C activation and
+        # learning functions on 64-bit machines.
         self.slice_array = Numeric.zeros((4), Numeric.Int32)
         self.slice_array[0] = r1
         self.slice_array[1] = r2
