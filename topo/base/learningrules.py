@@ -145,7 +145,7 @@ def hebbian(input_activity, unit_activity, weights, alpha):
 
 def divisive_normalization(weights):
     """
-    Normalize the numpy array weights to normalize_total by divisive
+    Normalize the numpy array weights to sum to 1.0 by divisive
     normalization.
     """
 
