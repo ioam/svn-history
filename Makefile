@@ -10,6 +10,8 @@ FORCE:
 tests: FORCE
 	./topographica runtests
 
+examples: FORCE
+	make -C examples
 
 ext-packages:
 	make -C external
