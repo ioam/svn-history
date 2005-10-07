@@ -63,22 +63,4 @@ s.connect(retina,V1,delay=0.5,projection_type=KernelProjection,projection_params
 s.connect(retina,V2,delay=0.5,projection_type=KernelProjection,projection_params={'name':'R1toV2'})
 s.connect(retina2,V2,delay=0.5,projection_type=KernelProjection,projection_params={'name':'R2toV2'})
 
-
-
-# Uncomment the connections to the image saver, to save all the activation
-# images to disk.
-#s.connect(retina,save,dest_port='retina',delay=2)
-#s.connect(V1,save,dest_port='V1',delay=1)
-
-#topo.gui.link_to_sim(s)
-
 s.run(2)
-
-#V1.projections['Retina'][0].plot_cfs()
-
-# import profile,pstats
-#
-# p = profile.Profile()
-# p.runctx('s.run(10)',locals(),globals())
-
-#topo.gui.start(s)

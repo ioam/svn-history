@@ -61,15 +61,7 @@ save  = ImageSaver(name='CFSOM')
 
 s.connect(retina,V1,delay=1,projection_type=KernelProjection,projection_params={'name':'RtoV1'})
 
-
-# Uncomment the connections to the image saver, to save all the activation
-# images to disk.
-#s.connect(retina,save,dest_port='retina',delay=2)
-#s.connect(V1,save,dest_port='V1',delay=1)
-
 #s.run(100)
-
-#V1.projections['Retina'][0].plot_cfs()
 
 # import profile,pstats
 #
