@@ -21,6 +21,7 @@ import testdislinplot
 import testcfsom
 import testpatterngenerator
 import testmatplotlib
+import testpatternpresent
 # tk import calls tk/__init__.py which should contain other test
 # imports for that directory.
 import tk
