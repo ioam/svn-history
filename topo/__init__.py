@@ -12,10 +12,15 @@ tk          - Tk-based graphical user interface (GUI)
 The Topographica primitives library consists of a family of classes
 that can be used with the above functions and classes:
 
-sheets      - 2D arrays of processing units (e.g. maps or filters)
-projections - Connections between Sheets
-patterns    - 2D value patterns (e.g. input patterns or weight patterns)
-eps         - EventProcessors (anything that can perform actions)
+sheets      - Sheet classes: 2D arrays of processing units
+projections - Projection classes: connections between Sheets
+patterns    - PatternGenerator classes: 2D input or weight patterns 
+eps         - EventProcessor classes: other simulator objects
+
+Each of the library directories can be extended with new classes of
+the appropriate type, just by adding a new .py file to that directory.
+E.g. new PatternGenerator classes can be added to patterns/, and will
+then show up in the GUI menus as potential input patterns.
 
 $Id$
 """
