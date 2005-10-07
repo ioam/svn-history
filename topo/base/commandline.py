@@ -7,9 +7,10 @@ $Id$
 BANNER         = """
 Welcome to Topographica!
 
-Type help() for interactive help, help(commandname) for info on a
-specific command, or topo.about() for info on this release, 
-including licensing information.
+Type help() for interactive help with python, help(topo) for general
+information about about Topographica, help(commandname) for info on a
+specific command, or topo.about() for info on this release, including
+licensing information.
 """
 
 global_constants = {'PI':math.pi, 'pi':math.pi, 'Pi':math.pi}
