@@ -1,7 +1,13 @@
-# $Id$
+"""
+Objects capable of generating a two-dimensional array of values.
 
-# Declare the modules in this package.
-#__all__ = ["basic","random"]
+Such patterns can be used as input to a Sheet, as initial or fixed
+weight patterns, or for any other purpose where a two-dimensional
+pattern may be needed.  Any new PatternGenerator classes added to this
+directory will automatically become available for any model.
+
+$Id$
+"""
 
 # Automatically discover all .py files in this directory. 
 import re,os

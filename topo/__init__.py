@@ -1,5 +1,21 @@
 """
-Topographica package; all important files are in subpackages.
+Topographica cortical map simulator package.
+
+Topographica is designed as a collection of packages from which
+elements can be selected to model specific systems.  For more
+information, see the individual subpackages:
+
+base        - Core Topographica functions and classes
+plotting    - Visualization functions and classes
+tk          - Tk-based graphical user interface (GUI)
+
+The Topographica primitives library consists of a family of classes
+that can be used with the above functions and classes:
+
+sheets      - 2D arrays of processing units (e.g. maps or filters)
+projections - Connections between Sheets
+patterns    - 2D value patterns (e.g. input patterns or weight patterns)
+eps         - EventProcessors (anything that can perform actions)
 
 $Id$
 """

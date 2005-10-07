@@ -1,6 +1,13 @@
-# Tk based GUI support files
-#
-# $Id$
+"""
+Tk-based graphical user interface (GUI).
+
+This package implements a Topographica GUI based on the Tk toolkit,
+through the Tkinter interface to Python.  The rest of Topographica
+does not depend on this package or any module in it, and thus other
+GUIs or other types of interfaces can also be used.
+
+$Id$
+"""
 
 # For importing the tk GUI files
 import propertiesframe
