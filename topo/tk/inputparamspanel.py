@@ -32,6 +32,7 @@ from topo.base.sheet import BoundingBox, Sheet
 from topo.base.utils import eval_atof
 from topo.base.utils import find_classes_in_package
 from topo.base.patterngenerator import PatternGenerator
+from topo.patterns.patternpresent import generator_eps
 
 # Hack to reverse the order of the input EventProcessor list and the
 # Preview plot list, so that it'll match the order that the plots appear
@@ -52,6 +53,9 @@ from topo.patterns import *
 patternclasses=find_classes_in_package(topo.patterns,PatternGenerator)
 topo.base.registry.pattern_generators.update(patternclasses)
 
+
+
+    
 
 def patterngenerator_names():
     """
@@ -100,7 +104,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         # Variables and widgets for maintaining the list of input sheets
         # that will be given the user defined stimuli.
         self.in_ep_dict = {}
-        for each in self.input_eps():
+        for each in generator_eps(self.console.active_simulator()):
             self.in_ep_dict[each.name] = {'obj':each,
                                           'state':True,
                                           'pattern':None} 
@@ -291,19 +295,6 @@ class InputParamsPanel(plotpanel.PlotPanel):
         rlist = [s for s in param_list if s in kf_class_keylist]
         return rlist
 
-
-    def input_eps(self):
-        """
-        Return a list of event processors in the active simulator that
-        can have Factories added to them.
-
-        For now, anything that is an GeneratorSheet will be added.
-        """
-        sim = self.console.active_simulator()
-        eps = sim.get_event_processors()
-        i_eps = [i for i in eps if isinstance(i,GeneratorSheet)]
-        return i_eps
-        
 
 
     def add_slider(self,name,min,max,init):
