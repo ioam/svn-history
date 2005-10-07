@@ -263,3 +263,17 @@ def find_classes_in_package(package,parentclass):
                     result[v2.__name__] = v2
     return result
 
+
+from math import atan2
+def arg(z):
+    """
+    Return the complex argument (phase) of z.
+
+    (z in radians.)
+    """
+    z += complex()   # so that arg(z) also works for real z
+    return atan2(z.imag, z.real)
+
+
+
+
