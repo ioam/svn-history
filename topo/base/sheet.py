@@ -358,7 +358,7 @@ class Sheet(EventProcessor):
         Because each SheetView has its own internal name, or an entry
         may actually be a list, there is no guarantee that the
         SheetView '.name' will be the same as the view_name.  For
-        example, the SheetView name might be "UnitView7754" whereas
+        example, the SheetView name might be 'UnitView7754' whereas
         the key may be, ('Projection',V1,R1toV1,0.2,0.3).  Or the
         sheet_view may be a list of UnitViews for a Projection plot.
         """
