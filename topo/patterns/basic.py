@@ -11,7 +11,7 @@ from Numeric import around,bitwise_and,sqrt,sin,Float
 from topo.base.parameter import Number
 from topo.base.patternfns import gaussian,gabor,fuzzy_line,fuzzy_disk,fuzzy_ring
 from topo.base.patterngenerator import PatternGenerator
-from topo.base.patterngenerator import SolidGenerator
+from topo.base.patterngenerator import ConstantGenerator
 
 
 class GaussianGenerator(PatternGenerator):

@@ -202,9 +202,9 @@ class PatternGenerator(TopoObject):
 # Trivial example of a PatternGenerator, provided for when a default is
 # needed.  The other specific PatternGenerator classes are stored in
 # patterns/, to be imported as needed.
-class SolidGenerator(PatternGenerator):
+class ConstantGenerator(PatternGenerator):
     """
-    Solid pattern generator, i.e. a uniform field of the same value.
+    Constant pattern generator, i.e. a solid, uniform field of the same value.
     """
     x       = Number(default=0.0,softbounds=(-1.0,1.0))
     y       = Number(default=0.0,softbounds=(-1.0,1.0))
@@ -213,5 +213,5 @@ class SolidGenerator(PatternGenerator):
         return ones(self.pattern_x.shape, Float)
 
 # Register this PatternGenerator for public use.
-registry.pattern_generators['SolidGenerator']=SolidGenerator
+registry.pattern_generators['ConstantGenerator']=ConstantGenerator
 
