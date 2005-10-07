@@ -60,15 +60,11 @@ class Projection(EPConnection):
     ###
     ### What does the documentation mean by "stub"?  Needs to be
     ### fixed, and the commented-out code needs to be removed or used.
-    def get_view(self,sheet_x, sheet_y, pixel_scale = 255, offset = 0):
+    def get_view(self,sheet_x, sheet_y):
         """
         Return a single connection field UnitView, for the unit at
         sheet_x, sheet_y.  sheet_x and sheet_y are assumed to be in
         sheet coordinates.
-
-        offset and pixel scale are currently unused.  The original
-        version of the function passed it to a PIL Image object, but
-        this does not, though it should in the future.
 
         NOTE: BOUNDS MUST BE PROPERLY SET. CURRENTLY A STUB IS IN EFFECT.
         """
