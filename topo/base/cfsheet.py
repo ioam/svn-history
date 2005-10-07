@@ -52,14 +52,13 @@ from learningrules import divisive_normalization
 class ConnectionField(TopoObject):
     x = Parameter(default=0)
     y = Parameter(default=0)
-    weight_type = Parameter(default=Numeric.Float32)
     normalize = BooleanParameter(default=False)
     normalize_fn = Parameter(default=divisive_normalization)
 
     weights = []
     slice_array = []
     
-    def __init__(self,input_sheet,weight_bounds,weights_generator,**params):
+    def __init__(self,input_sheet,weight_bounds,weights_generator,weight_type=Numeric.Float32,**params):
         super(ConnectionField,self).__init__(**params)
 
         self.input_sheet = input_sheet
@@ -69,12 +68,10 @@ class ConnectionField(TopoObject):
         r1,r2,c1,c2 = self.slice
 
 
-        ### JABHACKALERT!
-        ### 
-        ### Presumably Numeric.Int32 and Numeric.Float32 should be
-        ### user-selectable variables somewhere, not hard-coded like
-        ### this, unless hard-coding them gives a measurable
-        ### performance boost.
+        # Numeric.Int32 should be specified explicitly, instead of just
+        # Numeric.Int or left unspecified. This ensures 32-bit integers are
+        # used so that the optimized C code will run properly on 64-bit
+        # machines.
         self.slice_array = Numeric.zeros((4), Numeric.Int32)
         self.slice_array[0] = r1
         self.slice_array[1] = r2
@@ -84,7 +81,7 @@ class ConnectionField(TopoObject):
 
         # set up the weights
         w = weights_generator(x=0,y=0,bounds=self.bounds,density=self.input_sheet.density,theta=0,rows=r2-r1,cols=c2-c1)
-        self.weights = w.astype(self.weight_type)
+        self.weights = w.astype(weight_type)
 
         # Maintain the original type throughout operations, i.e. do not
         # promote to double.
