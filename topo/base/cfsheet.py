@@ -18,77 +18,43 @@ the parameters CFSheet.activation_fn and CFSheet.transfer_fn.  (See
 CFSheet class documentation for more details).  To implement learning
 one must create a subclass and override the default .learn() method.
 
-
-JEFF's IMPLEMENTATION NOTES
-
-* Non-rectangular ConnectionField bounds *
-
-Under the current implementation, I don't think learning rules like
-the one in lissom.ty will work correctly with non-rectangular
-ConnectionField bounds.  The learning rule is written to update each
-ConnectionField's entire weight matrix in a single step, and it will
-(I think) modify weights that are outside the bounds.  One way to
-handle this without having to call bounds.contains(x,y) for each and
-every weight value is to augment the current ConnectionField
-implementation with a 'mask' matrix of zeroes and ones indicating
-which weights actually belong in the ConnectionField.  After doing the
-learning step, do cf.weights *= cf.mask.
-
-* Computing stimulation in Projection objects *
-
-Currently each CFSheet object explicitly computes the activity of
-each ConnectionField in each projection by getting that
-ConnectionField's input matrix and calling the activity function on
-it with the ConnectionField's weights.  It would be more modular to
-add a .stimulation(input_activity) method to the Projection class
-interface that would by default do what CFSheet does now.  Then
-CFSheet would, on input, just call the .stimulation() methods on the
-appropriate projections and add the results to its .temp_activity
-matrix.  In this scenario, the activation_fn parameter would move to
-Projection, or, better one of its subclasses, since one could conceive
-of Projections that compute their stimulation through some entirely
-different algorithm.
-
-BTW, in this case, the class CFSheet really isn't so much an 'cf
-sheet' as it is a 'projection sheet', that sums the contributions of
-many projections, and then passes them through a transfer function.
-This structure has an elegant kind of parsimony, where the Sheet is
-the large-scale analog of a neuron and the projection is the
-large-scale analog of the individual connection.
-
-jbednar050621: The approach Jeff describes above sounds very
-reasonable, except that instead of just adding the results to the
-temp_activity matrix, each Projection also needs to store the
-intermediate results, so that they can be retrieved when processing
-subsequent input events (which will likely change only some of the
-inputs, not all, e.g. only lateral weights, not afferent).  For
-generality, the CFSheet should also not simply sum, but should sum by
-default (and could e.g. multiply or gate one by another, though it is
-not clear to me right now how that could be done.)
-
--- DONE: yfsit 2005/08 --
-
 $Id$
 """
 
 __version__ = '$Revision$'
 
-from parameter import Parameter,BooleanParameter
-from sheet import Sheet
-from learningrules import *
+
+### JEFF's IMPLEMENTATION NOTES
+### 
+### Non-rectangular ConnectionField bounds
+### 
+### Under the current implementation, I don't think learning rules like
+### the one in lissom.ty will work correctly with non-rectangular
+### ConnectionField bounds.  The learning rule is written to update each
+### ConnectionField's entire weight matrix in a single step, and it will
+### (I think) modify weights that are outside the bounds.  One way to
+### handle this without having to call bounds.contains(x,y) for each and
+### every weight value is to augment the current ConnectionField
+### implementation with a 'mask' matrix of zeroes and ones indicating
+### which weights actually belong in the ConnectionField.  After doing the
+### learning step, do cf.weights *= cf.mask. jbednar: See MaskedArray
+### for an alternative.
+
 import Numeric
 
-###############################################
 from object import TopoObject
+from parameter import Parameter,BooleanParameter
+from sheet import Sheet
+from learningrules import divisive_normalization
 
-
+### JABHACKALERT! This should presumably move to its own file or to Projection;
+### CFSheet does not use it directly.
 class ConnectionField(TopoObject):
     x = Parameter(default=0)
     y = Parameter(default=0)
     weight_type = Parameter(default=Numeric.Float32)
     normalize = BooleanParameter(default=False)
     normalize_fn = Parameter(default=divisive_normalization)
-
 
     weights = []
     slice_array = []
@@ -210,7 +176,7 @@ class CFSheet(Sheet):
     ### JABHACKALERT!
     ### 
     ### The temp_activity variable should probably be renamed
-    ### activity buffer; that's what it does, right?
+    ### activity_buffer; that's what it does, right?
     transfer_fn  = Parameter(default=lambda x:Numeric.array(x))
     # default learning function does nothing
     learning_fn = Parameter(default=lambda *args: 0)
