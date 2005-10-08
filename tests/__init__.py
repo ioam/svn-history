@@ -4,6 +4,12 @@ Unit tests for Topographica
 $Id$
 """
 
+### JABALERT!
+###
+### Should change this to be like topo/patterns/__init__.py, i.e.
+### to automatically discover the test files.  That way new tests
+### can be just dropped in.
+
 import unittest, os
 import testboundingregion
 import testdummy
