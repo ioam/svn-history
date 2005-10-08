@@ -140,7 +140,7 @@ class CFSheet(Sheet):
     as parameters.  This response is added to the Projection's temporary 
     activity buffer.  After all events have been processed for a given
     time, the CFSheet computes its .activity matrix as 
-    self.transfer_fn(self.temp_activity), where self.temp_activity
+    self.transfer_fn(self.activity_buffer), where self.activity_buffer
     is computed by summing all the Projections' temporary activity 
     buffers.  This activity is then sent on the default output port.
 
@@ -170,17 +170,13 @@ class CFSheet(Sheet):
     with the parameters (a=1,b=2).
     """
 
-    ### JABHACKALERT!
-    ### 
-    ### The temp_activity variable should probably be renamed
-    ### activity_buffer; that's what it does, right?
     transfer_fn  = Parameter(default=lambda x:Numeric.array(x))
     # default learning function does nothing
     learning_fn = Parameter(default=lambda *args: 0)
                              
     def __init__(self,**params):
         super(CFSheet,self).__init__(**params)
-        self.temp_activity = Numeric.array(self.activity)
+        self.activity_buffer = Numeric.array(self.activity)
         self.projections = {}
         self.new_input = False
 
@@ -218,11 +214,11 @@ class CFSheet(Sheet):
         """
         if self.new_input:
             self.new_input = False
-            self.temp_activity *= 0.0
+            self.activity_buffer *= 0.0
             for name in self.projections:
                 for proj in self.projections[name]:
-                    self.temp_activity += proj.temp_activity
-            self.activity = self.transfer_fn(self.temp_activity)
+                    self.activity_buffer += proj.activity
+            self.activity = self.transfer_fn(self.activity_buffer)
             self.send_output(data=self.activity)
 
             if self._learning:

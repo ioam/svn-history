@@ -50,7 +50,7 @@ class KernelProjection(Projection):
         self.input_buffer = input_activity
         if self.activation_fn.func_name == "compute_response_mdot_c":
             # compute_response_mdot_c computes the mdot for all the units
-            compute_response_mdot_c(input_activity, rows, cols, self.temp_activity, self.cfs, self.strength)
+            compute_response_mdot_c(input_activity, rows, cols, self.activity, self.cfs, self.strength)
 	else:
             for r in xrange(rows):
                 for c in xrange(cols):
@@ -58,8 +58,8 @@ class KernelProjection(Projection):
                     r1,r2,c1,c2 = cf.slice
                     X = input_activity[r1:r2,c1:c2]
 
-                    self.temp_activity[r,c] = self.activation_fn(X,cf.weights)
-            self.temp_activity *= self.strength
+                    self.activity[r,c] = self.activation_fn(X,cf.weights)
+            self.activity *= self.strength
 
 
     def reduce_cfsize(self, new_wt_bounds):

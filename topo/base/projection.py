@@ -25,12 +25,9 @@ class Projection(EPConnection):
     Any subclass of Projection has to implement the interface
     compute_response(self,input_activity,rows,cols) that computes
     the response resulted from the input and store them in the 
-    temp_activity[] array.
+    activity[] array.
     """
 
-    ### JABHACKALERT!
-    ### 
-    ### The temp_activity array should be renamed to "activity".
     activation_fn = Parameter(default=mdot)
     cf_type = Parameter(default=ConnectionField)
     normalize = BooleanParameter(default=False)
@@ -38,13 +35,13 @@ class Projection(EPConnection):
     weight_type = Parameter(default=Numeric.Float32)
 
     strength = Number(default=1.0)
-    temp_activity = []
+    activity = []
 
     def __init__(self,**params):
         super(Projection,self).__init__(**params)
         self.cfs = None
         self.input_buffer = None
-        self.temp_activity = Numeric.array(self.dest.activity)
+        self.activity = Numeric.array(self.dest.activity)
 
     def cf(self,r,c):
         return self.cfs[r][c]

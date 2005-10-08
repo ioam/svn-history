@@ -37,7 +37,7 @@ class LISSOM(CFSheet):
             self.activity *= 0.0
             for name in self.projections:
                 for proj in self.projections[name]:
-                    proj.temp_activity *= 0.0
+                    proj.activity *= 0.0
 
         super(LISSOM,self).input_event(src,src_port,dest_port,data)
 
@@ -55,11 +55,11 @@ class LISSOM(CFSheet):
 
         if self.new_input:
             self.new_input = False
-            self.temp_activity *= 0.0
+            self.activity_buffer *= 0.0
             for name in self.projections:
                 for proj in self.projections[name]:
-                    self.temp_activity += proj.temp_activity
-            self.activity = self.transfer_fn(self.temp_activity,self.delta,self.beta)
+                    self.activity_buffer += proj.activity
+            self.activity = self.transfer_fn(self.activity_buffer,self.delta,self.beta)
             # don't send output when an iteration has ended
             if not iteration_done: 
                 self.send_output(data=self.activity)
