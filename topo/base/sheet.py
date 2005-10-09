@@ -422,7 +422,7 @@ class Sheet(EventProcessor):
 
     def sheet_rows(self):
         """
-        Returns a list of Y-coordinates correspoinding to the rows of
+        Returns a list of Y-coordinates corresponding to the rows of
         the activity matrix of the sheet.
         """
         rows,cols = self.activity.shape
