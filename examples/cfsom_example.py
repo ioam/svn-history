@@ -19,8 +19,6 @@ from topo.patterns.basic import FuzzyLineGenerator
 ###########################################
 # Set parameters
 
-print "Setting parameters..."
-
 # input generation params
 GeneratorSheet.period = 1.0
 GeneratorSheet.density = 900
@@ -51,8 +49,6 @@ ImageSaver.time_format='%0.4d'
 
 topo.base.object.min_print_level = topo.base.object.MESSAGE
 
-print "Creating simulation objects..."
-# Used to be SimpleSimulator
 s = Simulator()
 
 retina = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina')
