@@ -178,7 +178,7 @@ def compute_response_mdot_c(input_activity, rows, cols, activity, cfs, strength)
     """
     An optmized version that computes the mdot functions for all the conection
     fields with the input_activity. It loops through each unit in the sheet
-    and therefore the loop in KernelProjection.compute_response is not needed.
+    and therefore the loop in KernelProjection.activate is not needed.
     """
 
     temp_act = activity

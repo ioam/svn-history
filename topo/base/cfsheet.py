@@ -136,7 +136,7 @@ class CFSheet(Sheet):
     event data to be (a copy of) an activity matrix from another
     sheet.  The CFSheet computes a 'response' matrix for the
     Projection to the sheet that generated the event by calling the
-    Projection's .compute_response() with the input activity region 
+    Projection's .activate() with the input activity region 
     as parameters.  This response is added to the Projection's temporary 
     activity buffer.  After all events have been processed for a given
     time, the CFSheet computes its .activity matrix as 
@@ -246,7 +246,7 @@ class CFSheet(Sheet):
 
         for proj in self.projections[input_sheet.name]:
             if proj.dest_port == dest_port:
-                proj.compute_response(input_activity,rows,cols)
+                proj.activate(input_activity,rows,cols)
 		break
 
     def get_projection_by_name(self,tname):
@@ -301,6 +301,12 @@ class CFSheet(Sheet):
     def release_unit_view(self,x,y):
         self.release_sheet_view(('Weights',x,y))
 
+    
+    ### JABALERT
+    ###
+    ### Need to figure whether this code (and unit_view) is ok,
+    ### i.e. whether there really is any need to handle multiple views
+    ### from the same call.
     def sheet_view(self,request='Activity'):
         """
 

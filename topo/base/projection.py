@@ -28,9 +28,8 @@ class Projection(EPConnection):
     stimulation value based on those weights.
 
     Any subclass of Projection has to implement the interface
-    compute_response(self,input_activity,rows,cols) that computes
-    the response resulted from the input and store them in the 
-    activity[] array.
+    activate(self,input_activity,rows,cols) that computes the response
+    from the input and stores it in the activity[] array.
     """
 
     activation_fn = Parameter(default=mdot)
@@ -74,7 +73,7 @@ class Projection(EPConnection):
         assert matrix_data != None, "Projection Matrix is None"
         return UnitView((matrix_data,new_box),sheet_x,sheet_y,self,view_type='UnitView')
 
-    def compute_response(self,input_activity,rows,cols):
+    def activate(self,input_activity,rows,cols):
         pass
 
     def reduce_cfsize(self, new_wt_bounds):

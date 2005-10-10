@@ -45,8 +45,8 @@ class KernelProjection(Projection):
     ### Instead of having this special case, need to make all activity 
     ### functions be array-based like compute_response_mdot_c, but with
     ### one simple and slow version provided that accepts a scalar
-    ### activity function (for generality).        
-    def compute_response(self,input_activity, rows, cols):
+    ### activity function (for generality).
+    def activate(self,input_activity, rows, cols):
         self.input_buffer = input_activity
         if self.activation_fn.func_name == "compute_response_mdot_c":
             # compute_response_mdot_c computes the mdot for all the units
