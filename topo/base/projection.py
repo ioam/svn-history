@@ -18,9 +18,29 @@ from simulator import EPConnection
 ###
 ### Need to provide a way to visualize the activity of a Projection,
 ### e.g. by putting it into the destination's SheetView database.
-class Projection(EPConnection):
+class BaseProjection(EPConnection):
     """
-    A projection of ConnectionFields from a Sheet into a CFSheet.
+    A projection from a Sheet into a CFSheet.
+
+    BaseProjections are required to support the activate() method,
+    which will construct a matrix the same size as the target CFSheet,
+    from an input matrix of activity from the source Sheet.
+    """
+    strength = Number(default=1.0)
+    activity = []
+
+    def __init__(self,**params):
+        super(BaseProjection,self).__init__(**params)
+        self.activity = Numeric.array(self.dest.activity)
+
+    def activate(self,input_activity,rows,cols):
+        pass
+
+
+
+class Projection(BaseProjection):
+    """
+    A projection composed of ConnectionFields from a Sheet into a CFSheet.
 
     Projection computes its activity using an activation_fn: A
     function f(X,W) that takes two identically shaped matrices X (the
