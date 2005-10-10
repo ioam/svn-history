@@ -209,30 +209,34 @@ class CFSheet(Sheet):
         self.new_input = True
 
 
+    ### JABHACKALERT!
+    ###
+    ### Can activity_buffer be deleted?
+    def activate(self):
+        """
+        Collect activity from each projection, combine it to calculate
+        the activity for this sheet, and send the result out.
+        """
+        self.activity_buffer *= 0.0
+        for name in self.projections:
+            for proj in self.projections[name]:
+                self.activity_buffer += proj.activity
+        self.activity = self.transfer_fn(self.activity_buffer)
+        self.send_output(data=self.activity)
+
+        if self._learning:
+            self.learn()
+
     def pre_sleep(self):
         """
         Called by the simulator after all the events are processed for the 
         current time but before time advances.  Allows the event processor
         to send any events that must be sent before time advances to drive
         the simulation. 
-
-        Here, pass the accumulated stimulation through self.transfer_fn and
-        send it out on the default output port.
         """
         if self.new_input:
+            self.activate()
             self.new_input = False
-            self.activity_buffer *= 0.0
-            for name in self.projections:
-                for proj in self.projections[name]:
-                    self.activity_buffer += proj.activity
-            self.activity = self.transfer_fn(self.activity_buffer)
-            self.send_output(data=self.activity)
-
-            if self._learning:
-                self.learn()
-
-            #self.debug("max activity =",max(self.activity.flat))
-            #print self.activity 
 
     def learn(self):
         """
