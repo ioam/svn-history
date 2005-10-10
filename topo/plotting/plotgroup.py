@@ -108,8 +108,16 @@ class PlotGroup(TopoObject):
         self.debug('Input type, ', type(self.plot_list))
  
 
+    ### JABHACKALERT!
+    ###
+    ### Shouldn't this raise NotImplementedError instead of passing?
+    ### If implementing it is required, not optional, then it must.
     def do_plot_cmd(self):
-        """Subclasses of PlotGroup will need to create this function."""
+        """
+        Command called when plots need to be generated.
+        
+        Subclasses of PlotGroup will need to create this function.
+        """
         pass
     
 

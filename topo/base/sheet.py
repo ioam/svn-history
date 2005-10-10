@@ -326,6 +326,10 @@ class Sheet(EventProcessor):
 
 
     def sheet_view(self,request='Activity'):
+        ### JABHACKALERT!
+        ### 
+        ### Shouldn't the name for an Activity View be a tuple, not
+        ### a string concatenating the sheet and view names?
         """
         Create a SheetView object of the current activity of the
         Sheet.  Current implementation gives the raw activity
@@ -337,6 +341,11 @@ class Sheet(EventProcessor):
 
         Returns None if the View does not exist in this sheet.
         """
+        ### JABHACKALERT!
+        ### 
+        ### Instead of this special coding for Activity, should make a
+        ### function that populates the SheetView dictionaries with
+        ### Activity plots, which will then be called before plotting.
         if request == 'Activity':
             activity_copy = array(self.activity)
             new_view = sheetview.SheetView((activity_copy,self.bounds),
@@ -364,6 +373,11 @@ class Sheet(EventProcessor):
         """
         self.sheet_view_dict[view_name] = sheet_view
 
+    ### JABHACKALERT!
+    ### 
+    ### Instead of this special coding for Activity, should make a
+    ### function that populates the SheetView dictionaries with
+    ### Activity plots, which will then be called before plotting.
     def release_sheet_view(self,view_name):
         """
         Delete the dictionary entry with key entry 'view_name' to save
