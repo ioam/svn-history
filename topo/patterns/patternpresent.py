@@ -61,7 +61,7 @@ def _register_inputsheet_patterns(inputs,gen_eps_dict):
             TopoObject().warning('%s not a valid Sheet Name.' % each)
 
 
-def pattern_present(inputs=None,duration=1.0,sim=None):
+def pattern_present(inputs=None,duration=1.0,sim=None, restore=True):
     """
     Generalized function that grew out of the inputparamspanel.py
     code.  Move the user created patterns into the GeneratorSheets,
@@ -71,14 +71,16 @@ def pattern_present(inputs=None,duration=1.0,sim=None):
     but then there are going to be other problems with the Simulator
     state if a run is interrupted.
 
-    This function is run no matter if learning is enabled or disabled
-    since run() will detect sheet attributes.
+    This function can be run no matter if learning is enabled or
+    disabled since run() will detect sheet attributes.
 
     -- inputs should be a dictionary with string keys and
        PatternGenerators as values.
     -- duration is length of time to run simulation.
     -- simulator is the Simulator object to drive.  If a simulator is
        not provided, the active simulator, if one exists, is requested.
+    -- restore: If this is False, then the original PatternGenerators
+       are not replaced in the InputSheets afterward.
     """
     if not sim:
         sim = topo.base.registry.active_sim()
@@ -89,6 +91,7 @@ def pattern_present(inputs=None,duration=1.0,sim=None):
             
         sim.run(duration)
             
-        _register_inputsheet_patterns(original_patterns,gen_eps_list)
+        if restore:
+            _register_inputsheet_patterns(original_patterns,gen_eps_list)
     else:
         TopoObject().warning('No active Simulator.')
