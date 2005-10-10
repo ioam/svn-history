@@ -32,7 +32,7 @@ from topo.base.sheet import BoundingBox, Sheet
 from topo.base.utils import eval_atof
 from topo.base.utils import find_classes_in_package
 from topo.base.patterngenerator import PatternGenerator
-from topo.patterns.patternpresent import generator_eps
+from topo.patterns.patternpresent import generator_eps, pattern_present
 
 # Hack to reverse the order of the input EventProcessor list and the
 # Preview plot list, so that it'll match the order that the plots appear
@@ -104,10 +104,10 @@ class InputParamsPanel(plotpanel.PlotPanel):
         # Variables and widgets for maintaining the list of input sheets
         # that will be given the user defined stimuli.
         self.in_ep_dict = {}
-        for each in generator_eps(self.console.active_simulator()):
-            self.in_ep_dict[each.name] = {'obj':each,
-                                          'state':True,
-                                          'pattern':None} 
+        for (each,obj) in generator_eps(self.console.active_simulator()).items():
+            self.in_ep_dict[each] = {'obj':obj,
+                                     'state':True,
+                                     'pattern':None} 
         self.input_box = Pmw.RadioSelect(parent, labelpos = 'w',
                                 command = self._input_change,
                                 label_text = 'Input Sheets:',
@@ -218,7 +218,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         self.parent.protocol('WM_DELETE_WINDOW',self._reset_and_destroy)
 
         self.default_values = self.prop_frame.get_values()
-        self._update_inputsheet_patterns()
+        self._create_inputsheet_patterns()
         self.refresh()
 
 
@@ -278,7 +278,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
                    padx=self.padding,
                    pady=self.padding,
                    sticky=N+S+W+E)
-        self._update_inputsheet_patterns()
+        self._create_inputsheet_patterns()
         if self.auto_refresh: self.refresh()
 
 
@@ -314,24 +314,26 @@ class InputParamsPanel(plotpanel.PlotPanel):
         This function is run no matter if learning is enabled or
         disabled since run() will detect sheet attributes.
         """
-        new_patterns_dict = self._update_inputsheet_patterns()
-        original_patterns = self._store_inputsheet_patterns()
-        self.register_inputsheet_patterns(new_patterns_dict)
-        
-        sim = self.console.active_simulator()
-        sim.run(eval_atof(self.present_length.getvalue()))
-        
-        self.register_inputsheet_patterns(original_patterns)
+        new_patterns_dict = self._create_inputsheet_patterns()
+        input_dict = dict([(name,d['pattern'])
+                           for (name,d) in new_patterns_dict.items()])
+        pattern_present(input_dict,self.present_length.getvalue())
         self.console.auto_refresh()
 
 
     ### JAB: It is not clear how this will need to be extended to support
     ### objects with different parameters in the different eyes, e.g. to
     ### test ocular dominance.
-    def _update_inputsheet_patterns(self):
+    def _create_inputsheet_patterns(self):
         """
-        Make an instantiation of the current user pattern, and put it into
-        all of the selected input sheets.
+        Make an instantiation of the current user pattern in
+        preparation of passing in the set to the pattern presentation
+        function.  The new pattern generator will be placed in a
+        dictionary for the input sheet under the key 'pattern'.
+
+        If the 'state' is turned off (from a button on the Frame),
+        then do not change the currently stored generator.  This
+        allows eyes to have different presentation patterns.
         """
         kname = self.input_type.get() + 'Generator'
         kname = kname.replace(' ','')
@@ -348,36 +350,11 @@ class InputParamsPanel(plotpanel.PlotPanel):
             if self.in_ep_dict[each]['state']:
                 ndict['density'] = self.in_ep_dict[each]['obj'].density
                 ndict['bounds'] = deepcopy(self.in_ep_dict[each]['obj'].bounds)
-                kf = topo.base.registry.pattern_generators[kname](**ndict)
-                self.in_ep_dict[each]['pattern'] = kf
+                pg = topo.base.registry.pattern_generators[kname](**ndict)
+                self.in_ep_dict[each]['pattern'] = pg
         return self.in_ep_dict  # Doesn't have to return it, but is explicit.
 
 
-    def _store_inputsheet_patterns(self):
-        """
-        Store the patterns currently in the GeneratorSheets.
-        """
-        pattern_dict = {}
-        for each in self.in_ep_dict.keys():
-            pattern_dict[each] = {}
-            pattern_dict[each]['obj'] = self.in_ep_dict[each]['obj']
-            pattern_dict[each]['state'] = True
-            pattern_dict[each]['pattern'] = pattern_dict[each]['obj'].get_input_generator()
-        return pattern_dict
-    
-
-    def register_inputsheet_patterns(self,patterns_dict):
-        """
-        Each dictionary entry must have an 'obj' with an GeneratorSheet as
-        value, with 'state' set to True or False to see if the pattern
-        should be replaced, and a 'pattern' key with the pattern object
-        as value that should be moved into the GeneratorSheet.
-        """
-        for each in self.in_ep_dict.keys():
-            # Use this to only present to the ones that are currently selected:
-            # if patterns_dict[each]['state']:
-            ep = patterns_dict[each]['obj']
-            ep.set_input_generator(patterns_dict[each]['pattern'])
 
 
     ### JAB: It is not clear how this will need to be extended to support
@@ -391,11 +368,12 @@ class InputParamsPanel(plotpanel.PlotPanel):
         input to the input sheets.  This should work like a test stimuli,
         but the original input generator is not put back afterwards.
 
-        This function does not run() the simulator.
+        This function does run() the simulator but for 0.0 time.
         """
-        new_patterns_dict = self._update_inputsheet_patterns()
-        original_patterns = self._store_inputsheet_patterns()
-        self.register_inputsheet_patterns(new_patterns_dict)
+        new_patterns_dict = self._create_inputsheet_patterns()
+        input_dict = dict([(name,d['pattern'])
+                           for (name,d) in new_patterns_dict.items()])
+        pattern_present(input_dict,0.0,sim=None,restore=False)
         self.console.auto_refresh()
 
 
@@ -406,7 +384,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         for each in self.in_ep_dict.keys():
             if not self.in_ep_dict[each]['state']:
                 self.input_box.invoke(each)
-        self._update_inputsheet_patterns()
+        self._create_inputsheet_patterns()
         self._refresh_sliders(self.input_type.get())
         if self.auto_refresh: self.refresh()
         if not self.learning.get():
@@ -463,7 +441,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         """
         Use the parent class refresh
         """
-        self._update_inputsheet_patterns()
+        self._create_inputsheet_patterns()
         for entry in self.tparams.values():
             if entry[1].need_to_refresh_slider:
                 entry[1].set_slider_from_tag()
