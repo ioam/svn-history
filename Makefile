@@ -1,7 +1,7 @@
 # $Id$
 PREFIX =  ${CURDIR}/
 
-all:  topographica docs
+all:  ext-packages topographica docs
 
 clean: cleandocs clean-ext-packages
 
@@ -21,22 +21,8 @@ clean-ext-packages:
 	make -C external uninstall
 
 
-##############################################################
-# Startup Script sh version.  
-#
-topographica_old: ext-packages
-	echo "#!/bin/sh" > ${PREFIX}topographica
-	echo 'export DISLIN="${PREFIX}${DISLIN_UNINSTALL}"' >> ${PREFIX}topographica
-	echo 'export PYTHONPATH="$$PYTHONPATH:${PREFIX}${DISLIN_UNINSTALL}/python"' >> ${PREFIX}topographica
-	echo 'export LD_LIBRARY_PATH="${PREFIX}lib:${PREFIX}${DISLIN_UNINSTALL}:$$LD_LIBRARY_PATH"' >> ${PREFIX}topographica
-	echo -e "/usr/bin/env ${PREFIX}/bin/python ${PREFIX}/topographica-script.py \044\100" >> ${PREFIX}topographica
-	chmod a+x ${PREFIX}topographica
-
-
-##############################################################
-# Startup Script Python Version
-
-topographica: ext-packages
+# Startup Script, in Python
+topographica: external Makefile
 	echo "#!${PREFIX}/bin/python" > topographica
 	echo "#  Wrapper for setting environment vars and execing commands" >> topographica
 	echo "import os,sys,topographica_script" >> topographica
@@ -58,15 +44,11 @@ topographica: ext-packages
 	chmod a+x ${PREFIX}topographica
 
 
-
-
-##############################################################
-# Auto-generated Source Documentation
-# Uses an integrated python script named gendocs.py
-#
 cleandocs:
 	- rm -r docs
 
+# Auto-generated Source Documentation
+# Uses an integrated python script named gendocs.py
 docs: topo/*.py
 	mkdir -p docs
 	./topographica topo/base/gendocs.py
