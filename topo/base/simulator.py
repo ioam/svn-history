@@ -63,16 +63,6 @@ events to itself than it sends out to other EPs.  In this case the
 self connections might have src_port = 'recurrent'.
 
 
-=========================
-
-* Simulator *
-
-Simulator stores its events in a linear-time priority queue (i.e a
-sorted list.) For efficiency, e.g. for spiking neuron simulations,
-we'll probably need to replace the linear priority queue with a more
-efficient one.  Jeff has an O(log N) minheap implementation.
-
-
 $Id$
 """
 
@@ -105,6 +95,12 @@ class EPConnection(TopoObject):
         super(EPConnection,self).__init__(**params)
 
 
+# Simulator stores its events in a linear-time priority queue (i.e a
+# sorted list.) For efficiency, e.g. for spiking neuron simulations,
+# we'll probably need to replace the linear priority queue with a more
+# efficient one.  Jeff has an O(log N) minheap implementation, but
+# there are likely to be many others to select from.
+#
 class Simulator(TopoObject):
     """
     A simulator class that uses a simple sorted event list instead of a
@@ -348,12 +344,30 @@ class Simulator(TopoObject):
         #src._connect_to(dest,src_port,dest_port,delay,**extra_args)
         #dest._connect_from(src,src_port,dest_port,**extra_args)
 
-    
+
     def get_event_processors(self):
         """Return the list of event processors such as Sheets."""
         return self._event_processors
 
 
+    ### It might be possible to come up with a more expressive name
+    ### for this function.  It should mean 'anything that exists in
+    ### the simulator universe, i.e. all EventProcessors'.
+    ###
+    ### JABALERT!
+    ###
+    ### It would be nice to have baseclass default to EventProcessor,
+    ### but that would be a forward reference.  If it can be done,
+    ### it may be possible to eliminate get_event_processors.
+    def objects(self,baseclass):
+        """
+        Return a list of simulator objects having the specified base
+        class.  All simulator objects have a base class of
+        EventProcessor, and so the baseclass must be either
+        EventProcessor or one of its subclasses.
+        """
+        return dict([(i.name,i) for i in self._event_processors \
+                     if isinstance(i,baseclass)])
 
 
 class EventProcessor(TopoObject):
@@ -373,6 +387,8 @@ class EventProcessor(TopoObject):
         
         self.connections = {None:[]}
 
+        # The simulator link is not set until the call to add()
+        self.simulator = None
 
     def _connect_to(self,proj,**args):
         """
