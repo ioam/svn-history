@@ -36,7 +36,7 @@ class PlotFileSaver(topo.base.object.TopoObject):
                     'presentation':'0', 'region':'', 'type':''}
 
     def create_bitmaps(self):
-        pass
+        raise NotImplementedError
 
     def save_to_disk(self):
         if self.bitmaps:

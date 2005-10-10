@@ -34,7 +34,7 @@ class Projection(EPConnection):
         self.activity = Numeric.array(self.dest.activity)
 
     def activate(self,input_activity,rows,cols):
-        pass
+        raise NotImplementedError
 
 
 
@@ -94,8 +94,8 @@ class CFProjection(Projection):
         return UnitView((matrix_data,new_box),sheet_x,sheet_y,self,view_type='UnitView')
 
     def activate(self,input_activity,rows,cols):
-        pass
+        raise NotImplementedError
 
     def reduce_cfsize(self, new_wt_bounds):
-        pass
+        raise NotImplementedError
 
