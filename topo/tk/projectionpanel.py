@@ -53,6 +53,10 @@ class ProjectionPanel(CFSheetPlotPanel):
         self.refresh()
 
 
+    ### JABHACKALERT! This function should test the projections list
+    ### from a Sheet to make sure that only those of type CFProjection
+    ### are included, because those are the only ones that this code
+    ### knows how to deal with.
     def _create_projection_dict(self,sheet_name):
         """
         PRE: Each Projection in the CFSheet should have a unique name.
