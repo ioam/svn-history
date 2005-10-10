@@ -1,5 +1,8 @@
 # $Id$
 PREFIX =  ${CURDIR}/
+PYLINT = bin/pylint --parseable=yes --required-attributes=__version__ --min-name-length=1 --notes=FIXME,XXX,TODO,ALERT --max-line-length=200 --disable-msg=C0324
+PYCHECKER = bin/pychecker
+
 
 all:  ext-packages topographica docs
 
@@ -42,6 +45,13 @@ topographica: external Makefile
 	echo "os.execv(cmd,[cmd] + args)" >> topographica
 
 	chmod a+x ${PREFIX}topographica
+
+
+check:
+	${PYCHECKER} topo/*.py topo/*/*.py
+
+lint:
+	${PYLINT} topo/*.py topo/*/*.py
 
 
 cleandocs:
