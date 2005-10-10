@@ -13,6 +13,11 @@ from cfsheet import ConnectionField
 from sheetview import UnitView
 from simulator import EPConnection
 
+
+### JABALERT
+###
+### Need to provide a way to visualize the activity of a Projection,
+### e.g. by putting it into the destination's SheetView database.
 class Projection(EPConnection):
     """
     A projection of ConnectionFields from a Sheet into a CFSheet.
