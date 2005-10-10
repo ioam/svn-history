@@ -180,6 +180,13 @@ class CFSheet(Sheet):
         self.projections = {}
         self.new_input = False
 
+    ### JABHACKALERT!
+    ###
+    ### What's the projections list for?  Isn't it redundant with
+    ### the connections list?  Seems like that's a relic from
+    ### back when projections were not a subclass of EPConnection.
+    ### This implementation needs to be cleaned up and unified with
+    ### the corresponding implementation in EventProcessor.
     def _connect_from(self, proj, **args):
         """
         Accept a connection from src, on src_port, for dest_port.
