@@ -119,8 +119,8 @@ class TopoObject(object):
     __metaclass__ = TopoMetaclass
 
 
-    name           = Parameter(default=None)
-    print_level = Parameter(default=MESSAGE)
+    name           = Parameter(default=None,hidden=True)
+    print_level = Parameter(default=MESSAGE,hidden=True)
     
     def __init__(self,**config):
         """
@@ -228,6 +228,19 @@ class TopoObject(object):
                 if isinstance(val,Parameter):
                     paramdict[name] = getattr(self,name)
         return paramdict
+
+    def get_paramobj_dict(self,**config):
+        """
+        For getting the parameter objects directly, not just the
+        values.
+        """
+        paramdict = {}
+        for class_ in classlist(type(self)):
+            for name,val in class_.__dict__.items():
+                if isinstance(val,Parameter):
+                    paramdict[name] = val
+        return paramdict
+
 
 def classlist(class_):
     """
