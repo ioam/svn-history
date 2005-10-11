@@ -18,17 +18,7 @@ from keyedlist import KeyedList
 # need to be edited...
 #
 # Format:   {'NewPatternGeneratorClassName':<NewPatternGeneratorClass>,....}
-#global pattern_generators
-###
-### JABHACKALERT!
-###
-### I think this should be a KeyedList, because otherwise the menu
-### items come out in random order in inputparamspanel.py.  We could
-### of course have inputparamspanel.py sort the list alphabetically,
-### but it would be nice to have the option to enforce some other
-### ordering, which we could achieve by letting things default to the
-### ordering they have in pattern_generators.py.
-pattern_generators = {}
+pattern_generators = KeyedList()
 
 
 ############################################################
