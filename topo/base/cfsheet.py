@@ -140,7 +140,7 @@ class CFSheet(Sheet):
     as parameters.  This response is added to the Projection's temporary 
     activity buffer.  After all events have been processed for a given
     time, the CFSheet computes its .activity matrix as 
-    self.transfer_fn(self.activity_buffer), where self.activity_buffer
+    self.transfer_fn(activity_buffer), where activity_buffer
     is computed by summing all the Projections' temporary activity 
     buffers.  This activity is then sent on the default output port.
 
@@ -176,7 +176,6 @@ class CFSheet(Sheet):
                              
     def __init__(self,**params):
         super(CFSheet,self).__init__(**params)
-        self.activity_buffer = Numeric.array(self.activity)
         self.projections = {}
         self.new_input = False
 
@@ -209,19 +208,16 @@ class CFSheet(Sheet):
         self.new_input = True
 
 
-    ### JABHACKALERT!
-    ###
-    ### Can activity_buffer be deleted?
     def activate(self):
         """
         Collect activity from each projection, combine it to calculate
         the activity for this sheet, and send the result out.
         """
-        self.activity_buffer *= 0.0
+        self.activity *= 0.0
         for name in self.projections:
             for proj in self.projections[name]:
-                self.activity_buffer += proj.activity
-        self.activity = self.transfer_fn(self.activity_buffer)
+                self.activity+= proj.activity
+        self.activity = self.transfer_fn(self.activity)
         self.send_output(data=self.activity)
 
         if self._learning:
