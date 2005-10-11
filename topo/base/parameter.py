@@ -72,10 +72,10 @@ class Parameter(object):
           http://users.rcn.com/python/download/Descriptor.htm
   """
 
-  __slots__ = ['name','default','doc']
+  __slots__ = ['name','default','doc','hidden']
   count = 0
   
-  def __init__(self,default=None,doc=""):
+  def __init__(self,default=None,doc="",hidden=False):
     """
     Initialize a new parameter.
 
@@ -90,6 +90,7 @@ class Parameter(object):
     # x.name = 'x'
     self.name = "_param" + `Parameter.count`
     self.doc = doc
+    self.hidden=hidden
     Parameter.count += 1
     self.default = default
 
@@ -157,8 +158,8 @@ class Number(Parameter):
   Example of creating a Number:
   AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
   """
-  def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),doc=""):
-    Parameter.__init__(self,default=default,doc=doc)
+  def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),doc="",**params):
+    Parameter.__init__(self,default=default,doc=doc,**params)
     self.bounds = bounds
     self._softbounds = softbounds  
     self._check_bounds(default)  # only create this number if the default value and bounds are consistent
@@ -258,12 +259,12 @@ class Integer(Number):
     super(Integer,self).__set__(obj,val)
 
 class Magnitude(Number):
-  def __init__(self,default=1.0,softbounds=(None,None),doc=""):
-    Number.__init__(self,default=default,bounds=(0.0,1.0),softbounds=softbounds,doc=doc)
+  def __init__(self,default=1.0,softbounds=(None,None),doc="",**params):
+    Number.__init__(self,default=default,bounds=(0.0,1.0),softbounds=softbounds,doc=doc,**params)
 
 class BooleanParameter(Parameter):
-  def __init__(self,default=False,bounds=(0,1),doc=""):
-    Parameter.__init__(self,default=default,doc=doc)
+  def __init__(self,default=False,bounds=(0,1),doc="",**params):
+    Parameter.__init__(self,default=default,doc=doc,**params)
     self.bounds = bounds
     
   def __set__(self,obj,val):
