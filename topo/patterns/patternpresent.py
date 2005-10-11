@@ -1,3 +1,15 @@
+"""
+patternpresent.py
+
+Functions for presenting PatternGenerators to Simulator objects.
+Designed with the intention that users can use pattern_present to
+temporarily (or permanently) change the default PatternGenerator in
+InputSheets.
+
+NOTE: It may be reasonable to reorganize the functions into some form
+of object.
+"""
+
 from topo.base.object import TopoObject
 import topo.base.simulator
 import topo.base.registry
