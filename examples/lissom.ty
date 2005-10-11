@@ -143,7 +143,7 @@ s.schedule_action(8000,  set_deltabeta, 0.23, 0.85)
 s.schedule_action(20000, set_deltabeta, 0.24, 0.88)
 
 # can either pass a number or FixedPoint object to s.run()
-s.run(1)
+#s.run(10)
 #s.run(FixedPoint(10))
 
 
