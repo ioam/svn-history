@@ -171,8 +171,8 @@ def transform_coordinates(pattern_x, pattern_y, orientation):
 
 class PatternGenerator(TopoObject):
 
-    bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))))
-    density = Parameter(default=10000)
+    bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True)
+    density = Parameter(default=10000,hidden=True)
 
     theta = Parameter(default=0)
 
@@ -206,8 +206,8 @@ class ConstantGenerator(PatternGenerator):
     """
     Constant pattern generator, i.e. a solid, uniform field of the same value.
     """
-    x       = Number(default=0.0,softbounds=(-1.0,1.0))
-    y       = Number(default=0.0,softbounds=(-1.0,1.0))
+    x       = Number(default=0.0,softbounds=(-1.0,1.0),hidden=True)
+    y       = Number(default=0.0,softbounds=(-1.0,1.0),hidden=True)
 
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)
