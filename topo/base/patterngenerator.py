@@ -209,10 +209,9 @@ class ConstantGenerator(PatternGenerator):
     x       = Number(default=0.0,softbounds=(-1.0,1.0))
     y       = Number(default=0.0,softbounds=(-1.0,1.0))
 
+    # Optimization: We use a simpler __call__ method here to skip the
+    # coordinate transformations (which would have no effect anyway)
     def __call__(self,**params):
-        self.verbose("params = ",params)
-        # doesn't need to transform coordinates, so we can call function()
-        # directly to speed things up
         return self.function(**params)
 
     def function(self,**params):
