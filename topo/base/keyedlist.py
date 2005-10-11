@@ -24,7 +24,9 @@ class KeyedList(list):
         get
         set
         has_key
+        keys
         items
+        update
     """
 
     def __getitem__(self,k):
@@ -98,3 +100,17 @@ class KeyedList(list):
         the actual underlying list.
         """
         return list(self)
+
+    def keys(self):
+        """
+        A copy of the list of keys.
+        """
+        l = [k for (k,v) in self.items()]
+        return l
+
+    def update(self,b):
+        """
+        updates (and overwrites) key/value pairs from b
+        """
+        for (k,v) in b.items():
+            self.set(k,v)
