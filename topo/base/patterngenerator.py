@@ -209,8 +209,14 @@ class ConstantGenerator(PatternGenerator):
     x       = Number(default=0.0,softbounds=(-1.0,1.0))
     y       = Number(default=0.0,softbounds=(-1.0,1.0))
 
+    def __call__(self,**params):
+        self.verbose("params = ",params)
+        # doesn't need to transform coordinates, so we can call function()
+        # directly to speed things up
+        return self.function(**params)
+
     def function(self,**params):
-        return ones(self.pattern_x.shape, Float)
+        return ones((params.get('rows',0),params.get('cols',0)), Float)
 
 # Register this PatternGenerator for public use.
 registry.pattern_generators['ConstantGenerator']=ConstantGenerator

@@ -7,7 +7,7 @@ normal distributions or 1/f noise.
 $Id$
 """
 
-from topo.base.parameter import Number
+from topo.base.parameter import Number,Parameter
 from topo.base.patterngenerator import PatternGenerator
 import RandomArray
 
@@ -21,7 +21,14 @@ class UniformRandomGenerator(PatternGenerator):
     min     = Number(default=0.0,bounds=(0.0,1.0),softbounds=(0.0,1.0))
     max     = Number(default=1.0,bounds=(0.0,1.0),softbounds=(0.0,1.0))
     
+    def __call__(self,**params):
+        self.verbose("params = ",params)
+	# doesn't need to transform coordinates, so we can call function() 
+        # directly to speed things up
+        return self.function(**params)
+
     def function(self,**params):
         return RandomArray.uniform( params.get('min',self.min),
                                     params.get('max',self.max),
-                                    self.pattern_x.shape) 
+                                    (params.get('rows',0),
+				     params.get('cols',0)))
