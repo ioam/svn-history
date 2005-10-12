@@ -47,9 +47,15 @@ from learningrules import divisive_normalization
 ### for an alternative.
 
 
-### JABHACKALERT! This should presumably move to its own file or to Projection;
-### CFSheet does not use it directly.
 class ConnectionField(TopoObject):
+    """
+    A set of weights on one input Sheet.
+
+    Each ConnectionField contributes to the activity of one unit on
+    the output sheet, and is normally used as part of a Projection
+    including many other ConnectionFields.
+    """
+    
     x = Parameter(default=0)
     y = Parameter(default=0)
     normalize = BooleanParameter(default=False)
@@ -219,8 +225,9 @@ class CFSheet(ProjectionSheet):
     ### before doing a get_view, because only CFProjections support that call.
     def unit_view(self,x,y):
         """
-        Get a list of UnitView objects for a particular unit
-        in this CFSheet.  Can return multiple UnitView objects.
+        Get a list of UnitView objects for a particular unit in this CFSheet.
+        
+        Can return multiple UnitView objects.
         """
         from itertools import chain
         views = [p.get_view(x,y) for p in chain(*self.projections.values())]
@@ -252,11 +259,11 @@ class CFSheet(ProjectionSheet):
     ### can be basic and simple, but I may be forgetting something.
     def sheet_view(self,request='Activity'):
         """
+        Check for 'Weights' or 'WeightsArray', but then call Sheet.sheet_view().  
 
-        Check for 'Weights' or 'WeightsArray', but then call
-        Sheet.sheet_view().  The addition of unit_view() means that
-        it's now possible for one sheet_view request to return
-        multiple UnitView objects, which are subclasses of SheetViews.
+        The addition of unit_view() means that it's now possible for
+        one sheet_view request to return multiple UnitView objects,
+        which are subclasses of SheetViews.
 
         """
         self.debug('request = ' + str(request))

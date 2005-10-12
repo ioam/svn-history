@@ -22,7 +22,7 @@ class Projection(EPConnection):
     Projections are required to support the activate() method, which
     will construct a matrix the same size as the target
     ProjectionSheet, from an input matrix of activity from the source
-    Sheet.
+    Sheet.  Other than that, a Projection may be of any type.
     """
     strength = Number(default=1.0)
     activity = []
@@ -152,11 +152,10 @@ class ProjectionSheet(Sheet):
 
     def present_input(self,input_activity,input_sheet,dest_port):
         """
-        Compute the stimulation caused by the given input_activity
-        (matrix) produced by the given sheet.  Applies f(X,W) for each
-        ConnectionField's weight matrix W and input matrix X for each
-        projection from self to input_sheet and adds the result to the
-        stimulation buffer.
+        Provide the given input_activity to all projections from the
+        given input_sheet, asking each one to compute its activity.
+        The sheet's own activity is not calculated until activite()
+        is called.
         """
         rows,cols = self.activity.shape
 
