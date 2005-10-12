@@ -53,10 +53,27 @@ class ProjectionPanel(CFSheetPlotPanel):
         self.refresh()
 
 
-    ### JABHACKALERT! This function should test the projections list
-    ### from a Sheet to make sure that only those of type CFProjection
-    ### are included, because those are the only ones that this code
-    ### knows how to deal with.
+    ### JABHACKALERT!
+    ###
+    ### This function should test the projections list from a Sheet to
+    ### make sure that only those of type CFProjection are included,
+    ### because those are the only ones that this code knows how to
+    ### deal with.  The abstract Projection class does not know
+    ### anything about CFs, and this code can only handle CFs (at
+    ### present).
+    ###
+    ### JABHACKALERT!
+    ###
+    ### Items in the Projection list in CFSheets should always be
+    ### guaranteed to have unique names; if that's not true at
+    ### present, the definition of an EventProcessor or a CFSheet (as
+    ### appropriate) should be changed to force unique names.  We
+    ### should not have to be reasoning about multiple Projections
+    ### with the same name anywhere in the code except when such
+    ### Projections are first defined, because it's meaningless to
+    ### have such a set of Projections.  Thus all comments like the
+    ### PRE below should be deleted, once the behavior of the list of
+    ### projections has been verified.
     def _create_projection_dict(self,sheet_name):
         """
         PRE: Each Projection in the CFSheet should have a unique name.
