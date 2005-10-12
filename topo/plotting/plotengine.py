@@ -61,7 +61,7 @@ from topo.base.utils import flatten
 from plot import Plot, SHC,HSV,RGB,COLORMAP
 from plotgroup import *
 from topo.base.sheet import Sheet
-from topo.base.cfsheet import CFSheet
+from topo.base.connectionfield import CFSheet
 from topo.base.sheetview import SheetView
 
 

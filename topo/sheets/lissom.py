@@ -11,7 +11,7 @@ from itertools import chain
 
 import topo
 
-from topo.base.cfsheet import CFSheet
+from topo.base.connectionfield import CFSheet
 from topo.base.parameter import Parameter
 from topo.base.utils import PLTF
 from topo.base.learningrules import hebbian_c,hebbian_div_norm_c

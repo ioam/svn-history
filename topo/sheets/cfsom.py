@@ -9,7 +9,7 @@ $Id$
 from topo.base.utils import L2norm
 from topo.base.parameter import Parameter
 from Numeric import argmax,sqrt,exp,floor
-from topo.base.cfsheet import CFSheet
+from topo.base.connectionfield import CFSheet
 
 def gaussian(dist,radius):
     return exp( - dist/radius)
