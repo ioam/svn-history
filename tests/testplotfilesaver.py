@@ -11,7 +11,7 @@ from topo.patterns.basic import FuzzyLineGenerator
 from topo.patterns.random import UniformRandomGenerator
 import topo.base.object
 from topo.sheets.cfsom import CFSOM
-import topo.base.cfsheet
+import topo.base.connectionfield
 from topo.plotting.plotfilesaver import *
 from PIL import *
 from topo.projections.kernelprojection import KernelProjection

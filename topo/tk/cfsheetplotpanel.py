@@ -11,7 +11,7 @@ $Id$
 from Tkinter import StringVar, Frame, LEFT, RIGHT, TOP, BOTTOM, YES, X
 import Pmw
 import plotpanel
-import topo.base.cfsheet
+import topo.base.connectionfield
 
 class CFSheetPlotPanel(plotpanel.PlotPanel):
 
@@ -38,7 +38,7 @@ class CFSheetPlotPanel(plotpanel.PlotPanel):
         # since this window will only examine one Simulator.
         sim = self.console.active_simulator()
         self._sim_eps = [ep for ep in sim.get_event_processors()
-                  if isinstance(ep,topo.base.cfsheet.CFSheet)]
+                  if isinstance(ep,topo.base.connectionfield.CFSheet)]
         sim_ep_names = [ep.name for ep in self._sim_eps]
         if len(sim_ep_names) > 0:
             self.region.set(sim_ep_names[0])
