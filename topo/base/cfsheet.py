@@ -126,42 +126,41 @@ class ConnectionField(TopoObject):
             if self.normalize:
                 self.normalize_fn(self.weights)
 
-class CFSheet(Sheet):
+class ProjectionSheet(Sheet):
     """
-    A Sheet that computes activity via sets of weighted projections
-    onto other sheets.
+    A Sheet whose activity is computed using projections from other sheets.
 
-    A standard CFSheet expects its input to be generated from other
-    Sheets. Upon receiving an input event, the CFSheet interprets the
-    event data to be (a copy of) an activity matrix from another
-    sheet.  The CFSheet computes a 'response' matrix for the
-    Projection to the sheet that generated the event by calling the
-    Projection's .activate() with the input activity region 
-    as parameters.  This response is added to the Projection's temporary 
-    activity buffer.  After all events have been processed for a given
-    time, the CFSheet computes its .activity matrix as 
-    self.transfer_fn(activity_buffer), where activity_buffer
-    is computed by summing all the Projections' temporary activity 
-    buffers.  This activity is then sent on the default output port.
+    A standard ProjectionSheet expects its input to be generated from
+    other Sheets. Upon receiving an input event, the ProjectionSheet
+    interprets the event data to be (a copy of) an activity matrix
+    from another sheet.  The ProjectionSheet provides a copy of this
+    matrix to each Projection from that input Sheet, asking each one
+    to compute their own activity in response.  The same occurs for
+    any other pending input events.
 
-    CFSheet takes one parameter:
+    After all events have been processed for a given time, the
+    ProjectionSheet computes its own activity matrix using its
+    activate() method, which by default sums all its Projections'
+    activity matrices and passes the result through a user-specified
+    transfer_fn() before sending it out on the default output port.
+    The activate() method can be overridden to treat sum some of the
+    connections, multiply that by the sum of other connections, etc.,
+    to model modulatory or other more complicated types of connection
+    influences.
 
-    transfer_fn: A function that s(A) that takes an activity matrix
+    The transfer_fn is a function s(A) that takes an activity matrix
     A and produces and identically shaped output matrix. The default
     is the identity function.
 
-    * Connections *
+    A ProjectionSheet connection from another sheet takes two parameters:
 
-    A CFSheet connection from another sheet takes two parameters:
-
-    projection_type: The type of projection to use for the
-    connection. default = KernelProjection
+    projection_type: The type of projection to use for the connection.
 
     projection_params: A dictionary of keyword arguments for the
-    projection constructor.  default = {}
+    projection constructor (defaulting to the empty dictionary {}).
 
-    e.g. Given a simulator sim, an input sheet s1 and a CFSheet s2,
-    one might connect them thus:
+    For instance, given a simulator sim, an input sheet s1 and a
+    ProjectionSheet s2, one might connect them thus:
 
     sim.connect(s1,s2,projection_type=MyProjectionType,
                       projection_params=dict(a=1,b=2))
@@ -175,7 +174,7 @@ class CFSheet(Sheet):
     learning_fn = Parameter(default=lambda *args: 0)
                              
     def __init__(self,**params):
-        super(CFSheet,self).__init__(**params)
+        super(ProjectionSheet,self).__init__(**params)
         self.projections = {}
         self.new_input = False
 
@@ -273,8 +272,26 @@ class CFSheet(Sheet):
 
 
 
-    #########################################################################
-    # Plotting support
+class CFSheet(ProjectionSheet):
+    """
+    A ProjectionSheet providing access to the ConnectionFields in its CFProjections.
+
+    ProjectionSheet classes do not assume that the Projections can
+    provide a set of weights for individual units, or indeed that
+    there are units or weights at all.  In contrast, CFSheet is built
+    around the assumption that there are units in this Sheet, indexed
+    by Sheet coordinates (x,y), and that these units have one or more
+    ConnectionField connections on another Sheet (via CFProjections).
+    It then provides a way to visualize these ConnectionFields for
+    each unit.
+    """
+
+    
+    ### JABALERT
+    ###
+    ### Need to figure whether this code (and sheet_view) is ok,
+    ### i.e. whether there really is any need to handle multiple views
+    ### from the same call.
     def unit_view(self,x,y):
         """
         Get a list of UnitView objects for a particular unit
@@ -282,12 +299,6 @@ class CFSheet(Sheet):
         """
         from itertools import chain
         views = [p.get_view(x,y) for p in chain(*self.projections.values())]
-
-        # Old version to delete:
-        # self.debug('views = '+str(views)+'type = '+str(type(views[0]))+str(views[0].view()))
-        # key = ('Weights',x,y)
-        # self.add_sheet_view(key,views)      # Will be adding a list
-        # self.debug('Added to sheet_view_dict', views, 'at', key)
 
         # Delete previous entry if it exists.  Allows appending in next block.
         for v in views:
@@ -311,9 +322,9 @@ class CFSheet(Sheet):
     
     ### JABALERT
     ###
-    ### Need to figure whether this code (and unit_view) is ok,
-    ### i.e. whether there really is any need to handle multiple views
-    ### from the same call.
+    ### Is it necessary to provide this special case?  It seems like
+    ### the database can be populated beforehand so that this code
+    ### can be basic and simple, but I may be forgetting something.
     def sheet_view(self,request='Activity'):
         """
 

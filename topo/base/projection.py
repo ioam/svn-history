@@ -6,6 +6,7 @@ $Id$
 
 import Numeric
 
+from object import TopoObject
 from parameter import Parameter, Number, BooleanParameter
 from utils import mdot
 from learningrules import divisive_normalization
@@ -20,11 +21,12 @@ from simulator import EPConnection
 ### e.g. by putting it into the destination's SheetView database.
 class Projection(EPConnection):
     """
-    A projection from a Sheet into a CFSheet.
+    A projection from a Sheet into a ProjectionSheet.
 
-    Projections are required to support the activate() method,
-    which will construct a matrix the same size as the target CFSheet,
-    from an input matrix of activity from the source Sheet.
+    Projections are required to support the activate() method, which
+    will construct a matrix the same size as the target
+    ProjectionSheet, from an input matrix of activity from the source
+    Sheet.
     """
     strength = Number(default=1.0)
     activity = []
@@ -40,7 +42,7 @@ class Projection(EPConnection):
 
 class CFProjection(Projection):
     """
-    A projection composed of ConnectionFields from a Sheet into a CFSheet.
+    A projection composed of ConnectionFields from a Sheet into a ProjectionSheet.
 
     Projection computes its activity using an activation_fn: A
     function f(X,W) that takes two identically shaped matrices X (the
