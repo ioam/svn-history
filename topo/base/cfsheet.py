@@ -25,7 +25,6 @@ import Numeric
 from object import TopoObject
 from projection import Projection,ProjectionSheet
 from parameter import Parameter, Number, BooleanParameter
-from sheet import Sheet
 from utils import mdot
 from sheetview import UnitView
 from learningrules import divisive_normalization

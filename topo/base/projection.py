@@ -7,9 +7,7 @@ $Id$
 import Numeric
 
 from sheet import Sheet
-from object import TopoObject
 from parameter import Parameter, Number
-from learningrules import divisive_normalization
 from simulator import EPConnection
 
 
