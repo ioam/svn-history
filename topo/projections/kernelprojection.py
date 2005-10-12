@@ -10,7 +10,7 @@ $Id$
 ### JABHACKALERT!
 ###
 ### Should eliminate import *.
-from topo.base.projection import CFProjection
+from topo.base.cfsheet import CFProjection
 from topo.base.parameter import Parameter
 from topo.patterns.random import UniformRandomGenerator
 from topo.base.boundingregion import Intersection,BoundingBox
