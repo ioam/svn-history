@@ -215,7 +215,13 @@ class ConstantGenerator(PatternGenerator):
         return self.function(**params)
 
     def function(self,**params):
-        return ones((params.get('rows',0),params.get('cols',0)), Float)
+        r = params.get('rows',0)
+	c = params.get('cols',0)
+
+        if r == 0 and c == 0:
+            r,c = bounds2shape(params.get('bounds',self.bounds),
+                               params.get('density',self.density))
+        return ones((r,c), Float)
 
 # Register this PatternGenerator for public use.
 registry.pattern_generators['ConstantGenerator']=ConstantGenerator

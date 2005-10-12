@@ -9,6 +9,7 @@ $Id$
 
 from topo.base.parameter import Number,Parameter
 from topo.base.patterngenerator import PatternGenerator
+from topo.base.sheet import bounds2shape
 import RandomArray
 
 
@@ -27,7 +28,13 @@ class UniformRandomGenerator(PatternGenerator):
         return self.function(**params)
 
     def function(self,**params):
+        r = params.get('rows',0)
+        c = params.get('cols',0)
+
+        if r == 0 and c == 0:
+            r,c = bounds2shape( params.get('bounds',self.bounds),
+                                params.get('density',self.density))
+
         return RandomArray.uniform( params.get('min',self.min),
                                     params.get('max',self.max),
-                                    (params.get('rows',0),
-				     params.get('cols',0)))
+                                    (r,c))
