@@ -146,15 +146,15 @@ class TestHistogram(unittest.TestCase):
 
 
     def test_lissom_peak_histogram(self):
-        self.p = Distribution((0,2))
+        self.p = Distribution((0,2),keep_peak=True)
 
-        self.p.add({0:1.0},keep_peak=True)
-        self.p.add({2:9.9},keep_peak=True)
-        self.p.add({2:3.3},keep_peak=True)
-        self.p.add({0:1.0},keep_peak=True)
-        self.p.add({1:0.3},keep_peak=True)
-        self.p.add({1:84.0},keep_peak=True)
-        self.p.add({1:36.0},keep_peak=True)
+        self.p.add({0:1.0})
+        self.p.add({2:9.9})
+        self.p.add({2:3.3})
+        self.p.add({0:1.0})
+        self.p.add({1:0.3})
+        self.p.add({1:84.0})
+        self.p.add({1:36.0})
 
         self.assertAlmostEqual(self.p.get_value(0), 1.0)
         self.assertAlmostEqual(self.p.get_value(1), 84.0)

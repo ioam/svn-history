@@ -72,7 +72,7 @@ class Distribution(object):
     individual counts are less than zero.
     """
 
-    def __init__(self, axis_bounds=(0.0, 2*pi), cyclic=False):
+    def __init__(self, axis_bounds=(0.0, 2*pi), cyclic=False, keep_peak=False):
         """
         ** ..
         
@@ -101,7 +101,8 @@ class Distribution(object):
 
         self.axis_bounds = axis_bounds
         self.axis_range = axis_bounds[1] - axis_bounds[0]
-        self.cyclic = cyclic        
+        self.cyclic = cyclic
+        self.keep_peak = keep_peak
 
 
     def get_value(self, bin):
@@ -150,7 +151,7 @@ class Distribution(object):
         return len(self._data)
 
 
-    def add(self, new_data, keep_peak=False):
+    def add(self, new_data):
         """
         Add new data in the form of a dictionary: {bin, value}.
         If the bin already exists, the value is added to its current value.
@@ -171,6 +172,7 @@ class Distribution(object):
         """
         for bin in new_data.keys():
 
+
             if self.cyclic==False:
                 # Raise an error if this bin is outside the range because this isn't a cyclic distribution.
                 if not (self.axis_bounds[0] <= bin <= self.axis_bounds[1]):
@@ -180,18 +182,16 @@ class Distribution(object):
                 self._data.update({bin: 0.0})
                 self._counts.update({bin: 0})
 
-            new_value = new_data.get(bin)  
+            new_value = new_data.get(bin)
             self.total_value += new_value
             self._counts[bin] += 1
             self.total_count += 1
 
-            # Should keep_peak be a property of the histogram instead?
-            # Then it could do the test earlier and skip some of the other stuff.
-            if keep_peak == False:
-                self._data[bin] += new_value
-            else:
+            if self.keep_peak == True:
                 if new_value > self._data[bin]: self._data[bin]=new_value
-
+            else:
+                self._data[bin] += new_value
+               
 
     def max_value_bin(self):
         """
