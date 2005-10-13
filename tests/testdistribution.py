@@ -43,8 +43,8 @@ class TestHistogram(unittest.TestCase):
         self.h.add({5:0.5})
         self.h.add({5:0.5})
 
-        # once implemented...
-        #self.assertRaises(SomethingError, self.h.add({6:1.0}))
+        
+
         
         self.g = copy.deepcopy(self.h)
         self.g.add({0:0.0})
@@ -53,6 +53,10 @@ class TestHistogram(unittest.TestCase):
         self.g.add({3:0.3})
         self.g.add({4:0.4})
         self.g.add({5:0.5})
+
+
+    def test_raise_error(self):
+        self.assertRaises(ValueError, self.h.add, {6:1.0})
 
 
     def test_lissom_values(self):

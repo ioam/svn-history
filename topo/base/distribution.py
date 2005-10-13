@@ -1,7 +1,7 @@
 """
-Histogram
+Distribution
 
-$Id:
+$Id$
 """
 
 # CEB:
@@ -12,7 +12,6 @@ $Id:
 # - come up with a name...it records a distribution of values and
 #   lets you get some statistics on it
 # - complete the documentation
-# - raise OperandRangeError, or whatever, in add()
 # - relative selectivity
 # - check use of float() in count_mag() etc
 #
@@ -157,8 +156,8 @@ class Distribution(object):
         If the bin already exists, the value is added to its current value.
         If the bin doesn't exist, it is created with that value.
 
-        If bin is outside axis_bounds, its position is allowed for cyclic=True and ignored
-        for cyclic=False. 
+        If bin is outside axis_bounds, its position is allowed for cyclic=True but raises
+        a ValueError for cyclic=False.
 
         If keep_peak=True, value becomes the new value for that bin if it's value
         is greater than the bin's current value. 
@@ -175,8 +174,7 @@ class Distribution(object):
             if self.cyclic==False:
                 # Raise an error if this bin is outside the range because this isn't a cyclic distribution.
                 if not (self.axis_bounds[0] <= bin <= self.axis_bounds[1]):
-#                    raise SomethingError("Bin outside bounds (this will be OperandRangeError or something).")
-                     continue #remove once you implement error above
+                      raise ValueError("Bin outside bounds.")
                  
             if bin not in self._data:
                 self._data.update({bin: 0.0})
@@ -187,6 +185,8 @@ class Distribution(object):
             self._counts[bin] += 1
             self.total_count += 1
 
+            # Should keep_peak be a property of the histogram instead?
+            # Then it could do the test earlier and skip some of the other stuff.
             if keep_peak == False:
                 self._data[bin] += new_value
             else:
