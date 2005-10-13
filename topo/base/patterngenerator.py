@@ -200,7 +200,7 @@ class PatternGenerator(TopoObject):
 ### PatternGenerator once inputparamspanel.py is fixed.
 
 # Trivial example of a PatternGenerator, provided for when a default is
-# needed.  The other specific PatternGenerator classes are stored in
+# needed.  The other concrete PatternGenerator classes are stored in
 # patterns/, to be imported as needed.
 class ConstantGenerator(PatternGenerator):
     """
@@ -222,7 +222,3 @@ class ConstantGenerator(PatternGenerator):
             r,c = bounds2shape(params.get('bounds',self.bounds),
                                params.get('density',self.density))
         return ones((r,c), Float)
-
-# Register this PatternGenerator for public use.
-registry.pattern_generators['ConstantGenerator']=ConstantGenerator
-
