@@ -127,7 +127,7 @@ class ProjectionSheet(Sheet):
         self.activity = self.transfer_fn(self.activity)
         self.send_output(data=self.activity)
 
-        if self._learning:
+        if self.learning:
             self.learn()
 
     def pre_sleep(self):

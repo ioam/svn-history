@@ -286,7 +286,7 @@ class Sheet(EventProcessor):
               [default  (-0.5,-0.5) to (0.5,0.5)]
     density:  The linear density of the sheet [default 100]
 
-    _learning: Whether the Sheet should adjust weights based upon
+    learning: Whether the Sheet should adjust weights based upon
               incoming events, or should process them without
               changing any weights.  
 
@@ -297,7 +297,7 @@ class Sheet(EventProcessor):
 
     bounds  = Parameter(BoundingBox(points=((-0.5,-0.5),(0.5,0.5))))
     density = Parameter(100)
-    _learning = BooleanParameter(True)
+    learning = BooleanParameter(True)
 
     def __init__(self,**params):
 
@@ -464,25 +464,3 @@ class Sheet(EventProcessor):
         return len(self.__saved_activity)
         
 
-    def disable_learning(self):
-        """
-        Turn off learning for the sheet.  Since learning is defined in
-        this class as a pass, a pass here is also done.  This function
-        should be defined in subclasses when learning needs to be
-        disabled for user inputs.  Call enable_learning() when ready
-        to resume.  Derived classes when redefining this function should
-        call this code through 'super()'.
-
-        Do NOT set self._learning directly, unless you're certain you
-        know what you're doing.
-        """
-        self._learning = False
-
-
-    def enable_learning(self):
-        """
-        This function will probably need to be extended by derived
-        classes.  Derived class functions should call 'super()' to run
-        this code.
-        """
-        self._learning = True

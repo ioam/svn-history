@@ -65,7 +65,7 @@ class LISSOM(CFSheet):
             if not iteration_done: 
                 self.send_output(data=self.activity)
 
-        if self._learning:
+        if self.learning:
             if self.continuous_learning:
                 self.learn()
             else:
