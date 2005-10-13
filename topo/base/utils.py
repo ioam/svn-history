@@ -70,7 +70,7 @@ def PLTF01(x):
     f(x) = |  x : 0 <= x <= 1
            \  1 : x > 1
     """
-    return ((x * (x>0)) * (x<1)) + (x>1)
+    return ((x * (x>0)) * (x<1)) + (x>=1)
 
 def PLTF(x,lb=0.0,ub=1.0):
     """ 
@@ -81,7 +81,7 @@ def PLTF(x,lb=0.0,ub=1.0):
     #return PLTF01((x-lb)/(ub-lb))
     fact = 1.0/(ub-lb)
     x = (x-lb)*fact
-    return ((x * (x>0)) * (x<1)) + (x>1)
+    return ((x * (x>0)) * (x<1)) + (x>=1)
 
 
 class Struct:
