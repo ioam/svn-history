@@ -35,7 +35,7 @@ topo.base.object.print_level = topo.base.object.DEBUG
 Simulator.step_mode = True
 
 # We want 100x100 images
-ImageGenerator.density = 10000
+ImageGenerator.density = 100
 
 # Image saver parameters
 ImageSaver.file_format = 'jpeg'
@@ -43,7 +43,7 @@ ImageSaver.time_format = '%.2f'
 ImageSaver.pixel_scale = 255
 
 #
-Composer.density = 25600
+Composer.density = 160
 
 
 #################################################

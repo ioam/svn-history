@@ -41,7 +41,7 @@ class TestCFSom(unittest.TestCase):
         
         s = Simulator(step_mode=True)
     
-        input = ImageGenerator(filename='examples/main.ppm',density=10000,
+        input = ImageGenerator(filename='examples/main.ppm',density=100,
                                bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))))
     
     
@@ -61,7 +61,7 @@ class TestCFSom(unittest.TestCase):
         """
         # input generation params
         GeneratorSheet.period = 1.0
-        GeneratorSheet.density = 900
+        GeneratorSheet.density = 30
         GeneratorSheet.print_level = topo.base.object.WARNING
         
         GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -73,7 +73,7 @@ class TestCFSom(unittest.TestCase):
         GaussianGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
         # cf som parameters
-        CFSOM.density = 900
+        CFSOM.density = 30
         CFSOM.learning_length = 10000
         CFSOM.radius_0 = 0.1
 

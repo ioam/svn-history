@@ -22,9 +22,9 @@ class TestPatternGenerator(unittest.TestCase):
                         [0, 0, 1, 1, 0, 0],
                         [0, 0, 0, 0, 0, 0]])
         bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
-        density = 16**2
+        density = 16
         rect = RectangleGenerator(width=0.3,height=0.9,
-                                density=4**2,bounds=bounds)
+                                density=4,bounds=bounds)
         self.assertEqual(rect(),target)
 #        print rect()
         

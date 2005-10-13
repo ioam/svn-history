@@ -8,7 +8,7 @@ $Id$
 
 from topo.base.utils import L2norm
 from topo.base.parameter import Parameter
-from Numeric import argmax,sqrt,exp,floor
+from Numeric import argmax,exp,floor
 from topo.base.connectionfield import CFSheet
 
 def gaussian(dist,radius):
@@ -57,7 +57,7 @@ class CFSOM(CFSheet):
         rows,cols = self.activity.shape
         wr,wc = self.winner_coords(matrix_coords=True)
 
-        radius = self.radius() * sqrt(self.density)
+        radius = self.radius() * self.density
         
         cmin = int(max(0,wc-radius))
         cmax = int(min(wc+radius,cols))

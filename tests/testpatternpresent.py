@@ -19,13 +19,13 @@ class TestPatternPresent(unittest.TestCase):
 
     def test_pattern_present(self):
         GeneratorSheet.period = 1.0
-        GeneratorSheet.density = 20*20
+        GeneratorSheet.density = 20
         FuzzyLineGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         FuzzyLineGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
         FuzzyLineGenerator.theta = Dynamic(lambda :random.uniform(-pi,pi))
         FuzzyLineGenerator.width = 0.02
         FuzzyLineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
-        CFSOM.density = 10*10
+        CFSOM.density = 10
         CFSOM.learning_length = 10000
         CFSOM.radius_0 = 0.1
         KernelProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))

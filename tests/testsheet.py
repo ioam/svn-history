@@ -16,9 +16,8 @@ class TestCoordinateTransforms(unittest.TestCase):
     def makeBox(self):
         self.box = boundingregion.BoundingBox(points=((self.left,self.bottom),
                                                       (self.right,self.top)))
-        linear_density = sqrt(self.density)
-        self.rbound = int(linear_density*(self.top-self.bottom))
-        self.cbound = int(linear_density*(self.right-self.left))
+        self.rbound = int(self.density*(self.top-self.bottom))
+        self.cbound = int(self.density*(self.right-self.left))
     def test_s2m_left_top(self):
         r,c = 0,0
         x,y = self.left,self.top
@@ -83,7 +82,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         l,b,r,t = (-0.8,-0.8,0.8,0.8)
         d = 16
         bounds = BoundingBox(points=((l,b),(r,t)))
-        density = d**2
+        density = d
         self.assertEqual(sheet2matrix(0.8,0.8,bounds,density),(0,24))
         self.assertEqual(sheet2matrix(0.0,0.0,bounds,density),(12,12))
         self.assertEqual(sheet2matrix(-0.8,-0.8,bounds,density),(24,0))
@@ -116,28 +115,28 @@ class TestCoordinateTransforms(unittest.TestCase):
 class TestBox1Coordinates(TestCoordinateTransforms):
     """
     Test coordinate transformations using the standard, origin-centered unit box
-    with density 100.
+    with density 10.
     """
     def setUp(self):
         self.left = -0.5
         self.bottom = -0.5
         self.top = 0.5
         self.right = 0.5
-        self.density = 100
+        self.density = 10
         self.half_unit = 0.05
         self.makeBox()
 
 class TestBox2Coordinates(TestCoordinateTransforms):
     """
     Test coordinate transformations on the box defined by (1,1), (3,4),
-    with density 50.
+    with density 8.
     """
     def setUp(self):
         self.left = 1
         self.bottom = 1
         self.right = 3
         self.top  = 4
-        self.density = 64
+        self.density = 8
         self.half_unit = 0.0625
         self.makeBox()
 

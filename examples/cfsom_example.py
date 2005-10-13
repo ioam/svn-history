@@ -21,7 +21,7 @@ from topo.patterns.basic import FuzzyLineGenerator
 
 # input generation params
 GeneratorSheet.period = 1.0
-GeneratorSheet.density = 900
+GeneratorSheet.density = 30
 
 FuzzyLineGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
 FuzzyLineGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -33,7 +33,7 @@ FuzzyLineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
 
 # rf som parameters
-CFSOM.density = 2500
+CFSOM.density = 50
 CFSOM.learning_length = 10000
 CFSOM.radius_0 = 0.1
 

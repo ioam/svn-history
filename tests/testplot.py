@@ -20,7 +20,7 @@ class TestPlot(unittest.TestCase):
                 o.warning('Found ', o.name)
 
         input = ImageGenerator(filename='tests/testsheetview.ppm',
-                         density=10000,
+                         density=100,
                          bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))))
         sv = input.sheet_view('Activity')
 
@@ -34,7 +34,7 @@ class TestPlot(unittest.TestCase):
 
     def test_HSV_plot(self):
         input = ImageGenerator(filename='tests/testsheetview.ppm',
-                         density=10000,
+                         density=100,
                          bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))))
         sv = input.sheet_view('Activity')
 

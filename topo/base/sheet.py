@@ -96,7 +96,7 @@ __version__ = '$Revision$'
 
 from simulator import EventProcessor
 from parameter import Parameter, BooleanParameter
-from Numeric import zeros,sqrt,array
+from Numeric import zeros,array
 from boundingregion import BoundingBox
 import sheetview 
 
@@ -117,9 +117,9 @@ def sheet2matrix(x,y,bounds,density):
     Returns (row,column).  If the x,y is right on the edge of the sheet,
     so that it would normally bump up to a matrix unit that does not exist,
     it is knocked back one.  ie. If the right hand edge is 1.0, and the
-    passed in x is 1.0, then the math would give a col of 'linear_density'
+    passed in x is 1.0, then the math would give a col of 'density'
     but with matrices indexed from 0, this is an invalid location, so
-    linear_density - 1 is used.
+    density - 1 is used.
 
     NOTE: This is NOT the strict mathematical inverse of matrix2sheet!
 
@@ -129,19 +129,11 @@ def sheet2matrix(x,y,bounds,density):
 
     left,bottom,right,top = bounds.aarect().lbrt()
 
-    ### JABHACKALERT!
-    ### 
-    ### The density needs to be specified directly as a linear
-    ### density; in practice an areal density is not useful.  Requires
-    ### changes throughout this file, as well as in any file that
-    ### specifies a density.
+    col = int((x-left) * density)
+    row = int((top-y)  * density)
 
-    linear_density = sqrt(density)
-    col = int((x-left) * linear_density)
-    row = int((top-y)  * linear_density)
-
-    if col == int(linear_density * (right-left)): col = col - 1
-    if row == int(linear_density * (top-bottom)): row = row - 1
+    if col == int(density * (right-left)): col = col - 1
+    if row == int(density * (top-bottom)): row = row - 1
 
     return row, col
 
@@ -266,9 +258,8 @@ def bounds2shape(bounds,density):
     left,bottom,right,top = bounds.aarect().lbrt()
     width = right-left
     height = top-bottom
-    linear_density = sqrt(density)
-    rows = int(height*linear_density)
-    cols = int(width*linear_density)
+    rows = int(height*density)
+    cols = int(width*density)
 
     if rows == 0: rows = 1
     if cols == 0: cols = 1
@@ -293,7 +284,7 @@ class Sheet(EventProcessor):
 
     bounds:   A BoundingBox object indicating the bounds of the sheet.
               [default  (-0.5,-0.5) to (0.5,0.5)]
-    density:  The areal density of the sheet [default 100]
+    density:  The linear density of the sheet [default 100]
 
     _learning: Whether the Sheet should adjust weights based upon
               incoming events, or should process them without
@@ -312,13 +303,11 @@ class Sheet(EventProcessor):
 
         super(Sheet,self).__init__(**params)
 
-        linear_density = sqrt(self.density)
-
-        self.debug("linear_density = ",linear_density)
+        self.debug("density = ",self.density)
         left,bottom,right,top = self.bounds.aarect().lbrt()
         width,height = right-left,top-bottom
-        rows = int(height*linear_density)
-        cols = int(width*linear_density)
+        rows = int(height*self.density)
+        cols = int(width*self.density)
         self.activity = zeros((rows,cols)) + 0.0
         self.__saved_activity = []          # For non-learning inputs
         self.debug('activity.shape =',self.activity.shape)

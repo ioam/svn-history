@@ -24,7 +24,7 @@ class TestActivityPanel(unittest.TestCase):
             self.pe  Plot engine watching self.s
         """
         GeneratorSheet.period = 1.0
-        GeneratorSheet.density = 900
+        GeneratorSheet.density = 30
 #        base.print_level = topo.base.object.WARNING
 #        GeneratorSheet.print_level = topo.base.object.WARNING
         

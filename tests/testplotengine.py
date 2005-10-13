@@ -89,7 +89,7 @@ class TestPlotEngine(unittest.TestCase):
         """
         # input generation params
         GeneratorSheet.period = 1.0
-        GeneratorSheet.density = 900
+        GeneratorSheet.density = 30
         
         GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))

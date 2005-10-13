@@ -29,7 +29,7 @@ class TestPlotPanel(unittest.TestCase):
             self.pe  Plot engine watching self.s
         """
         GeneratorSheet.period = 1.0
-        GeneratorSheet.density = 900
+        GeneratorSheet.density = 30
 #        base.print_level = topo.base.object.WARNING
 #        GeneratorSheet.print_level = topo.base.object.WARNING
         
@@ -102,7 +102,7 @@ class TestPlotPanel(unittest.TestCase):
         topo.tk.plotpanel.PlotPanel.print_level = topo.base.object.WARNING
         # input generation params
         GeneratorSheet.period = 1.0
-        GeneratorSheet.density = 900
+        GeneratorSheet.density = 30
         
         FuzzyLineGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         FuzzyLineGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -111,7 +111,7 @@ class TestPlotPanel(unittest.TestCase):
         FuzzyLineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
         
         # rf som parameters
-        CFSOM.density = 2500
+        CFSOM.density = 50
         CFSOM.learning_length = 10000
         CFSOM.radius_0 = 0.1
         

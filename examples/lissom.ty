@@ -61,7 +61,7 @@ alpha_inh=0.00025*ics
 fixedpoint.DEFAULT_PRECISION=3
 
 # input generation params
-GeneratorSheet.density = RN*RN
+GeneratorSheet.density = RN
 GeneratorSheet.period = 1
 
 GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -74,7 +74,7 @@ GaussianGenerator.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 
 
 # lissom parameters
-LISSOM.density = BaseN*BaseN
+LISSOM.density = BaseN
 
 # Connection parameters
 afferent_weight_bounds   = BoundingBox(points=((-rf_radius/RN,-rf_radius/RN),(rf_radius/RN,rf_radius/RN)))
