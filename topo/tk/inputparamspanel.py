@@ -99,15 +99,12 @@ class InputParamsPanel(plotpanel.PlotPanel):
         ### correct state.
         
         self.learning.set(1)
-        self.tparams = {}
 
         # Variables and widgets for maintaining the list of input sheets
         # that will be given the user defined stimuli.
         self.in_ep_dict = {}
         for (each,obj) in generator_eps(self.console.active_simulator()).items():
-            self.in_ep_dict[each] = {'obj':obj,
-                                     'state':True,
-                                     'pattern':None} 
+            self.in_ep_dict[each] = {'obj':obj,'state':True,'pattern':None} 
         self.input_box = Pmw.RadioSelect(parent, labelpos = 'w',
                                 command = self._input_change,
                                 label_text = 'Input Sheets:',
@@ -137,8 +134,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
                                       variable=self.learning,
                                       command=self._learning_toggle)
         self.learning_button.pack(side=TOP)
-        buttonBox.add('Use for future learning',
-                      command = self.use_for_learning)
+        buttonBox.add('Use for future learning',command = self.use_for_learning)
 
         # Define menu of valid PatternGenerator types
         self.input_types = patterngenerator_names()
@@ -167,6 +163,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         ### minimums, and the Parameter definition would need to
         ### distinguish between those two cases.
         
+        self.tparams = {}
         #                name          min-value    max-value  init-value
         #
         self.tparams['theta'] = \
@@ -192,24 +189,17 @@ class InputParamsPanel(plotpanel.PlotPanel):
         self.tparams['gaussian_width'] = \
           self.add_slider( 'gaussian_width',"0.000001", "1"   ,  "0.15"   )
 
-# NOT IN EXISTING PATTERNGENERATORS 9/2005
-#        self.tparams['xsigma'] = \
-#          self.add_slider( 'xsigma',       "0"     ,   "RN"     ,  "7.5"     )
-#        self.tparams['ysigma'] = \
-#          self.add_slider( 'ysigma',       "0"     ,   "RN"     ,  "1.5"     )
-#        self.tparams['center_width'] = \
-#          self.add_slider( 'center_width', "0"     ,   "RN"     ,  "10"      )
-#        self.tparams['scale'] = \
-#          self.add_slider( 'scale',        "0"     ,   "3"      ,  "1.0"     )
-#        self.tparams['offset'] = \
-#          self.add_slider( 'offset',       "-3"    ,   "3"      ,  "0.0"     )
-#        self.tparams['photograph'] = \
-#          self.prop_frame.add_combobox_property('Photograph',
-#                  value='small/ellen_arthur.pgm',
-#                  scrolledlist_items=('small/arch.pgm',
-#                                      'small/skye.pgm'))
-#        self.tparams['size_scale'] = \
-#          self.add_slider( 'size_scale' ,  "0"     ,   "5"      ,  "1"    )
+# How to access the list of non-hidden Parameters in a PatternGenerator object
+#        # Test to find the params and names.
+#        pgc = topo.base.registry.pattern_generators[kf_classname] 
+#        pg = pgc()
+#        plist = [(k,v)
+#                 for (k,v)  # ('name':'...', 'density':10000, ...)
+#                 in pg.get_paramobj_dict().items()
+#                 if not v.hidden
+#                 ]
+#        print plist
+
 
         self._refresh_sliders(self.input_type.get())
         self.prop_frame.pack(side=TOP,expand=YES,fill=X)
@@ -244,13 +234,13 @@ class InputParamsPanel(plotpanel.PlotPanel):
             sim.state_push()
             for each in sim.get_event_processors():
                 if isinstance(each,Sheet):
-                    each.disable_learning()
+                    each.learning = False
                     each.activity_push()
         else: # Turn learning back on and restore
             sim.state_pop()
             for each in sim.get_event_processors():
                 if isinstance(each,Sheet):
-                    each.enable_learning()
+                    each.learning = True
                     each.activity_pop()
             
 
@@ -290,9 +280,10 @@ class InputParamsPanel(plotpanel.PlotPanel):
         Post: List of strings that is the Intersection of kf_classname's
               class member keys, and param_list entries.
         """
-        
+
         kf_class_keylist = topo.base.registry.pattern_generators[kf_classname].__dict__.keys()
         rlist = [s for s in param_list if s in kf_class_keylist]
+
         return rlist
 
 
@@ -319,6 +310,27 @@ class InputParamsPanel(plotpanel.PlotPanel):
                            for (name,d) in new_patterns_dict.items()])
         pattern_present(input_dict,self.present_length.getvalue())
         self.console.auto_refresh()
+
+
+    ### JAB: It is not clear how this will need to be extended to support
+    ### objects with different parameters in the different eyes, e.g. to
+    ### test ocular dominance.  It is also not clear which types of
+    ### randomness to add in, e.g. to provide random positions and
+    ### orientations, but not random sizes.
+    def use_for_learning(self):
+        """
+        Lock in the existing PatternFactories as the new default stimulus
+        input to the input sheets.  This should work like a test stimuli,
+        but the original input generator is not put back afterwards.
+
+        This function does run() the simulator but for 0.0 time.
+        """
+        new_patterns_dict = self._create_inputsheet_patterns()
+        input_dict = dict([(name,d['pattern'])
+                           for (name,d) in new_patterns_dict.items()])
+        pattern_present(input_dict,0.0,sim=None,restore=False)
+        self.console.auto_refresh()
+
 
 
     ### JAB: It is not clear how this will need to be extended to support
@@ -353,28 +365,6 @@ class InputParamsPanel(plotpanel.PlotPanel):
                 pg = topo.base.registry.pattern_generators[kname](**ndict)
                 self.in_ep_dict[each]['pattern'] = pg
         return self.in_ep_dict  # Doesn't have to return it, but is explicit.
-
-
-
-
-    ### JAB: It is not clear how this will need to be extended to support
-    ### objects with different parameters in the different eyes, e.g. to
-    ### test ocular dominance.  It is also not clear which types of
-    ### randomness to add in, e.g. to provide random positions and
-    ### orientations, but not random sizes.
-    def use_for_learning(self):
-        """
-        Lock in the existing PatternFactories as the new default stimulus
-        input to the input sheets.  This should work like a test stimuli,
-        but the original input generator is not put back afterwards.
-
-        This function does run() the simulator but for 0.0 time.
-        """
-        new_patterns_dict = self._create_inputsheet_patterns()
-        input_dict = dict([(name,d['pattern'])
-                           for (name,d) in new_patterns_dict.items()])
-        pattern_present(input_dict,0.0,sim=None,restore=False)
-        self.console.auto_refresh()
 
 
     def reset_to_defaults(self):
