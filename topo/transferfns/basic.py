@@ -18,14 +18,14 @@ class PiecewiseLinear(TransferFunction):
     Piecewise-linear transfer function with lower and upper thresholds
     as constructor parameters.
     """
-    lb = Number(default=0.0,softbounds=(0.0,1.0))
-    ub = Number(default=1.0,softbounds=(0.0,1.0))
+    lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
+    upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
     
     def __init__(self,**params):
         super(PiecewiseLinear,self).__init__(**params)
 
     def __call__(self,x):
-        fact = 1.0/(self.ub-self.lb)
-        x = (x-self.lb)*fact
+        fact = 1.0/(self.upper_bound-self.lower_bound)
+        x = (x-self.lower_bound)*fact
         return Numeric.clip(x,0.0,1.0)
 
