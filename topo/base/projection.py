@@ -80,8 +80,6 @@ class ProjectionSheet(Sheet):
     """
 
     transfer_fn  = Parameter(default=lambda x:Numeric.array(x))
-    # default learning function does nothing
-    learning_fn = Parameter(default=lambda *args: 0)
                              
     def __init__(self,**params):
         super(ProjectionSheet,self).__init__(**params)
