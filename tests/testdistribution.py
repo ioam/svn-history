@@ -1,6 +1,6 @@
 
 """
-Test cases for the boundingregion module.
+Tests of distribution.py
 
 $Id$
 """
@@ -8,17 +8,19 @@ $Id$
 # CEB:
 # This file is still being written
 
-# ** THERE IS NO TEST FOR SOME OF THE STUFF
-# e.g. selectivity
-# go through each function and check
+# No test for relative_selectivity(), vector_selectivity()
+
 
 import unittest
-from topo.base.histogram import *
+
+from topo.base.distribution import Distribution
+
+import copy 
+
+# for testing the statistics
 from math import pi, atan2, cos
 from topo.base.utils import arg
-from Numeric import array
 
-import copy # HELP
 
 class TestHistogram(unittest.TestCase):
 
@@ -41,7 +43,8 @@ class TestHistogram(unittest.TestCase):
         self.h.add({5:0.5})
         self.h.add({5:0.5})
 
-#        self.h.add({6:1.0})  # when you implement operandrangeerror, check you get exception with this
+        # once implemented...
+        #self.assertRaises(SomethingError, self.h.add({6:1.0}))
         
         self.g = copy.deepcopy(self.h)
         self.g.add({0:0.0})
@@ -52,31 +55,28 @@ class TestHistogram(unittest.TestCase):
         self.g.add({5:0.5})
 
 
-
     def test_lissom_values(self):
-        self.assertAlmostEqual(self.h.get(0), 0.0)
-        self.assertAlmostEqual(self.h.get(1), 0.1)
-        self.assertAlmostEqual(self.h.get(2), 0.4)
-        self.assertAlmostEqual(self.h.get(3), 0.9)
-        self.assertAlmostEqual(self.h.get(4), 1.6)
-        self.assertAlmostEqual(self.h.get(5), 2.5)
+        self.assertAlmostEqual(self.h.get_value(0), 0.0)
+        self.assertAlmostEqual(self.h.get_value(1), 0.1)
+        self.assertAlmostEqual(self.h.get_value(2), 0.4)
+        self.assertAlmostEqual(self.h.get_value(3), 0.9)
+        self.assertAlmostEqual(self.h.get_value(4), 1.6)
+        self.assertAlmostEqual(self.h.get_value(5), 2.5)
 
-        # should it have a function to value an individual count?
-        self.assertEqual(self.h._counts.get(0), 1)
-        self.assertEqual(self.h._counts.get(1), 1)
-        self.assertEqual(self.h._counts.get(2), 2)
-        self.assertEqual(self.h._counts.get(3), 3)
-        self.assertEqual(self.h._counts.get(4), 4)
-        self.assertEqual(self.h._counts.get(5), 5)
+        self.assertEqual(self.h.get_count(0), 1)
+        self.assertEqual(self.h.get_count(1), 1)
+        self.assertEqual(self.h.get_count(2), 2)
+        self.assertEqual(self.h.get_count(3), 3)
+        self.assertEqual(self.h.get_count(4), 4)
+        self.assertEqual(self.h.get_count(5), 5)
 
-        self.assertAlmostEqual(self.g.get(0), 0.0)
-        self.assertAlmostEqual(self.g.get(1), 0.2)
-        self.assertAlmostEqual(self.g.get(2), 0.6)
-        self.assertAlmostEqual(self.g.get(3), 1.2)
-        self.assertAlmostEqual(self.g.get(4), 2.0)
-        self.assertAlmostEqual(self.g.get(5), 3.0)
+        self.assertAlmostEqual(self.g.get_value(0), 0.0)
+        self.assertAlmostEqual(self.g.get_value(1), 0.2)
+        self.assertAlmostEqual(self.g.get_value(2), 0.6)
+        self.assertAlmostEqual(self.g.get_value(3), 1.2)
+        self.assertAlmostEqual(self.g.get_value(4), 2.0)
+        self.assertAlmostEqual(self.g.get_value(5), 3.0)
         
-
 
     def test_lissom_mags(self):
         self.assertAlmostEqual(self.h.value_mag(0), 0.0/5.5)
@@ -93,25 +93,26 @@ class TestHistogram(unittest.TestCase):
         self.assertAlmostEqual(self.h.count_mag(4), 4.0/16)
         self.assertAlmostEqual(self.h.count_mag(5), 5.0/16)
 
-
    
     def test_lissom_statistics(self):
         self.assertEqual(self.h.num_bins(), 6)
         self.assertAlmostEqual(self.h.total_value, 5.5)
         self.assertEqual(self.h.total_count, 16)
-        self.assertAlmostEqual(max(self.h.values()), 2.5)
-        self.assertEqual(min(self.h.values()), 0)                
-        self.assertEqual(max(self.h.counts()), 5)        
-        self.assertEqual(min(self.h.counts()), 1)
+        
+        values = [value for bin,value in self.h.values()]
+        self.assertAlmostEqual(max(values), 2.5)
+        self.assertAlmostEqual(min(values), 0.0)
+        counts = [count for bin,count in self.h.counts()]
+        self.assertEqual(max(counts), 5)
+        self.assertEqual(min(counts), 1)
 
-
+        
         self.assertAlmostEqual(self.g.total_value, 7.0)         
         self.assertEqual(self.g.total_count, 22)
-        self.assertAlmostEqual(sum(self.g.values()), 7.0)
+        self.assertAlmostEqual(sum([value for bin,value in self.g.values()]), 7.0)
         self.assertAlmostEqual(self.g.weighted_sum(), 28.0)
-        self.assertAlmostEqual(self.g.weighted_average(), 28.0/sum(self.g.values()))
+        self.assertAlmostEqual(self.g.weighted_average(), 28.0/sum([value for bin,value in self.g.values()]))
         # Different from lissom's g because this is 0 to 5 where 0 and 5 are the same
-        # The expected value is what I calculated by hand.
         self.assertAlmostEqual(self.g.vector_sum()[1], -0.59550095717251439) 
         self.assertAlmostEqual(self.g.vector_average(), self.g.vector_sum()[0]/self.g.num_bins()) 
 
@@ -151,13 +152,13 @@ class TestHistogram(unittest.TestCase):
         self.p.add({1:84.0},keep_peak=True)
         self.p.add({1:36.0},keep_peak=True)
 
-        self.assertAlmostEqual(self.p.get(0), 1.0)
-        self.assertAlmostEqual(self.p.get(1), 84.0)
-        self.assertAlmostEqual(self.p.get(2), 9.9)
+        self.assertAlmostEqual(self.p.get_value(0), 1.0)
+        self.assertAlmostEqual(self.p.get_value(1), 84.0)
+        self.assertAlmostEqual(self.p.get_value(2), 9.9)
 
-        self.assertEqual(self.p._counts.get(0), 2)
-        self.assertEqual(self.p._counts.get(1), 3)
-        self.assertEqual(self.p._counts.get(2), 2)
+        self.assertEqual(self.p.get_count(0), 2)
+        self.assertEqual(self.p.get_count(1), 3)
+        self.assertEqual(self.p.get_count(2), 2)
 
 
 
