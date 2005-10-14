@@ -8,7 +8,7 @@ $Id$
 # CEB:
 # This file is still being written
 
-# No test for relative_selectivity(), vector_selectivity()
+# No test for selectivity()
 
 
 import unittest
@@ -117,15 +117,13 @@ class TestHistogram(unittest.TestCase):
         self.assertAlmostEqual(self.g.weighted_average(), 28.0/sum([value for bin,value in self.g.values()]))
         # Different from lissom's g because this is 0 to 5 where 0 and 5 are the same
         self.assertAlmostEqual(self.g.vector_sum()[1], -0.59550095717251439) 
-        self.assertAlmostEqual(self.g._vector_average(), self.g.vector_sum()[0]/self.g.num_bins()) 
 
 
         self.q = Distribution((0,4), cyclic=True)
         self.q.add({3:1})
         self.q.add({0:0, 1:0, 2:0, 4:0})                
         self.assertAlmostEqual(self.q.vector_sum()[0], 1.0)
-        self.assertAlmostEqual(self.q.weighted_average(), 1.0/5.0)
-        self.assertAlmostEqual(self.q.weighted_average(), self.q._vector_average())
+        self.assertAlmostEqual(self.q.weighted_average(), -1.0)
         self.assertAlmostEqual(self.q.vector_sum()[1], -1.0)  # what do i do about that? (expect 3/4 but cyclic)
 
         # Example where this matches LISSOM by using an empty bin at 5.
@@ -133,15 +131,15 @@ class TestHistogram(unittest.TestCase):
         self.rr.add({0:1, 1:1, 2:1, 3:1, 4:1})
         
         self.assertAlmostEqual(self.rr.vector_sum()[0], 0.0)
-        self.assertAlmostEqual(self.rr.weighted_average(), self.rr.vector_sum()[0]/5.0)
+#        self.assertAlmostEqual(self.rr.weighted_average(), self.rr.vector_sum()[0]/5.0)
         self.rr.add({1:2})
         self.assertAlmostEqual(self.rr.vector_sum()[0], 2.0) 
-        self.assertAlmostEqual(self.rr.weighted_average(), self.rr.vector_sum()[0]/5.0)
-        self.assertAlmostEqual(self.rr.vector_sum()[1], 1.0)  
+#        self.assertAlmostEqual(self.rr.weighted_average(), self.rr.vector_sum()[0]/5.0)
+        self.assertAlmostEqual(self.rr.weighted_average(), 1.0)  
         self.rr.add({3:2})
         self.assertAlmostEqual(self.rr.vector_sum()[0], 2*2*cos(2*pi/5)) 
-        self.assertAlmostEqual(self.rr.weighted_average(), self.rr.vector_sum()[0]/5.0)
-        self.assertAlmostEqual(self.rr.vector_sum()[1], 2.0)  
+        self.assertAlmostEqual(self.rr.weighted_average(), 2.0)
+
 
 
 
@@ -171,8 +169,8 @@ class TestHistogram(unittest.TestCase):
         self.a = Distribution(cyclic=True)
         self.a.add({0.0:0.0, pi/2:1.0})
         self.assertAlmostEqual(self.a.vector_sum()[0], 1.0)
-        self.assertAlmostEqual(self.a.weighted_average(), 1.0/2.0)
-        self.assertAlmostEqual(self.a.vector_sum()[1], pi/2)
+        self.assertAlmostEqual(self.a.weighted_average(), pi/2)
+        self.assertAlmostEqual(self.a.vector_sum()[1], self.a.weighted_average())
 
         self.a.add({-pi/2:1.0}) # (should be like 3pi/2)
         self.assertAlmostEqual(self.a.vector_sum()[0], 0.0)
@@ -180,20 +178,17 @@ class TestHistogram(unittest.TestCase):
 
         self.a.add({3*pi/8:0.3})
         self.assertAlmostEqual(self.a.vector_sum()[0], 0.3)
-        self.assertAlmostEqual(self.a.weighted_average(), 0.3/4.0)
-        self.assertAlmostEqual(self.a.vector_sum()[1], 3*pi/8)
-
+        self.assertAlmostEqual(self.a.weighted_average(), 3*pi/8)
 
         self.c = Distribution((0.0,1.0), cyclic=True)
         self.c.add({0.0:1.0, 0.25:1.0})
         self.assertAlmostEqual(self.c.vector_sum()[0], (1.0+1.0)**0.5) 
-        self.assertAlmostEqual(self.c.weighted_average(), self.c.vector_sum()[0]/self.c.num_bins())
+        self.assertAlmostEqual(self.c.weighted_average(), self.c.vector_sum()[1])
         self.assertEqual(self.c.vector_sum()[1], atan2(1.0,1.0)/(2*pi))
 
         self.c.add({1.75:1.0})  # added beyond bounds
         self.assertAlmostEqual(self.c.vector_sum()[0], 1.0) 
-        self.assertAlmostEqual(self.c.weighted_average(), self.c.vector_sum()[0]/self.c.num_bins())
-        self.assertEqual(self.c.vector_sum()[1], 0.0)
+        self.assertEqual(self.c.weighted_average(), 0.0)
         
 
 
