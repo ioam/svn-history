@@ -276,7 +276,7 @@ def arg(z):
     return arctan2(z.imag, z.real)
 
 
-
+from object import TopoObject
 class TransferFunction(TopoObject):
     """
     Object to map a numeric item into another of the same size.
