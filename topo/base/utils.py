@@ -10,9 +10,6 @@ import __main__
 import weave
 import math
 
-### JABHACKALERT! Need to remove this by moving OutputFunction.
-from object import TopoObject
-
 inf = (ones(1)/0.0)[0]
 
 
@@ -267,38 +264,3 @@ def arg(z):
     z = add(z, complex())  # so that arg(z) also works for real z
 
     return arctan2(z.imag, z.real)
-
-
-from object import TopoObject
-class OutputFunction(TopoObject):
-    """
-    Object to map a numeric item into another of the same size.
-
-    Typically used for transforming an array of intermediate results
-    into a final version.  For instance, when computing the output of
-    a Sheet, one will often first compute a linear sum, then use a
-    sigmoidal OutputFunction to transform that into the final result.
-
-    Objects in this class must support being called as a function with
-    one argument, typically a matrix, and return a matrix of the same
-    size.  If implemented using Numeric functions, subclasses of this
-    class should also work for scalars.
-    """
-    def __call__(self,x):
-        raise NotImplementedError
-
-
-# Trivial example of an OutputFunction, provided for when a default
-# is needed.  The other concrete OutputFunction classes are stored
-# in outputfns/, to be imported as needed.
-class Identity(OutputFunction):
-    """
-    Identity function, returning its argument as-is.
-    """
-    def __init__(self,**params):
-        super(Identity,self).__init__(**params)
-
-    def __call__(self,x):
-        return x
-
-
