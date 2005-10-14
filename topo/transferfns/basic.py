@@ -1,8 +1,8 @@
 """
-Simple transfer functions.
+Simple transfer functions mapping from a value into another.
 
-These functions should work for either scalar or array arguments.  Can
-easily be extended to include Sigmoid or other functions.
+All of these function objects (callable objects) should work for
+Numeric array arguments.  Some will also work for scalars.
 
 $Id$
 """
@@ -11,7 +11,8 @@ import Numeric
 from Numeric import clip
 from topo.base.object import TopoObject
 from topo.base.parameter import Number
-from topo.base.utils import TransferFunction,Identity
+from topo.base.utils import TransferFunction,Identity,L2norm,norm
+
 
 class PiecewiseLinear(TransferFunction):
     """ 
@@ -29,3 +30,90 @@ class PiecewiseLinear(TransferFunction):
         x = (x-self.lower_bound)*fact
         return Numeric.clip(x,0.0,1.0)
 
+
+class DivisiveL1Normalize(TransferFunction):
+    """
+    Transfer function that divides an array by its sum (aka its L1 norm).
+
+    This operation keeps an array at a specified norm_value, rescaling
+    each value to make this true.  The array is unchanged if the sum
+    is zero.  This operation also keeps 
+    """
+    norm_value = Number(default=1.0)
+    
+    def __init__(self,**params):
+        super(DivisiveL1Normalize,self).__init__(**params)
+
+    def __call__(self,x):
+        tot = 1.0*sum(x.flat)
+        if tot != 0:
+            factor = (self.norm_value/tot)
+            x = x*factor
+        return x
+
+
+class DivisiveL2Normalize(TransferFunction):
+    """
+    Transfer function to divide an array by its Euclidean distance (aka its L2 norm).
+
+    For a given array interpreted as a flattened vector, keeps the
+    Euclidean length of the vector at a specified norm_value.
+    """
+    norm_value = Number(default=1.0)
+    
+    def __init__(self,**params):
+        super(DivisiveL2Normalize,self).__init__(**params)
+
+    def __call__(self,x):
+        tot = 1.0*L2norm(x.flat)
+        if tot != 0:
+            factor = (self.norm_value/tot)
+            x = x*factor
+        return x
+
+
+class DivisiveMaxNormalize(TransferFunction):
+    """
+    Transfer function to divide an array by the absolute value of its maximum.
+
+    For a given array interpreted as a flattened vector, scales the
+    elements divisively so that the maximum absolute value is the
+    specified norm_value.  This is also called the divisive
+    L-infinity, infinity, or Chebyshev norm.
+    """
+    norm_value = Number(default=1.0)
+    
+    def __init__(self,**params):
+        super(DivisiveMaxNormalize,self).__init__(**params)
+
+    def __call__(self,x):
+        tot = 1.0*max(abs(x.flat))
+        if tot != 0:
+            factor = (self.norm_value/tot)
+            x = x*factor
+        return x
+
+
+class DivisiveLpNormalize(TransferFunction):
+    """
+    Transfer function to divide an array by its Lp-Norm, where p is specified.
+
+    For a parameter p and a given array interpreted as a flattened
+    vector, keeps the Lp-norm of the vector at a specified norm_value.
+    Faster versions are provided separately for the typical L1-norm
+    and L2-norm cases.  Defaults to be the same as an L2-norm.
+    """
+    p = Number(default=2)
+    norm_value = Number(default=1.0)
+    
+    def __init__(self,**params):
+        super(DivisiveLpNormalize,self).__init__(**params)
+
+    def __call__(self,x):
+        tot = 1.0*norm(x.flat,self.p)
+        if tot != 0:
+            factor = (self.norm_value/tot)
+            x = x*factor
+        return x
+
+# Add a type of Parameter for TransferFunctions.
