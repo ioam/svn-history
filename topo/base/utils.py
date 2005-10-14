@@ -78,6 +78,11 @@ def mdot(m1,m2):
     return sum(a.flat)
 
 
+def hebbian(input_activity, unit_activity, weights, alpha):
+    """Simple Hebbian learning for one single unit."""
+    weights += alpha * unit_activity * input_activity
+
+
 class Struct:
     """
     A simple structure class, taking keyword args and assigning them to attributes.
