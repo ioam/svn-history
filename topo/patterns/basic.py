@@ -10,6 +10,8 @@ from Numeric import around,bitwise_and,sqrt,sin,Float
 from topo.base.parameter import Number
 from topo.base.patternfns import gaussian,gabor,fuzzy_line,fuzzy_disk,fuzzy_ring
 from topo.base.patterngenerator import PatternGenerator
+
+# Imported here so that all PatternGenerators will be in the same package
 from topo.base.patterngenerator import ConstantGenerator
 
 

@@ -11,7 +11,10 @@ import Numeric
 from Numeric import clip
 from topo.base.object import TopoObject
 from topo.base.parameter import Number
-from topo.base.utils import TransferFunction,Identity,L2norm,norm
+from topo.base.utils import TransferFunction,L2norm,norm
+
+# Imported here so that all TransferFunctions will be in the same package
+from topo.base.utils import Identity
 
 
 class PiecewiseLinear(TransferFunction):
@@ -115,5 +118,3 @@ class DivisiveLpNormalize(TransferFunction):
             factor = (self.norm_value/tot)
             x = x*factor
         return x
-
-# Add a type of Parameter for TransferFunctions.

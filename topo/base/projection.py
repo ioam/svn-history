@@ -119,6 +119,8 @@ class ProjectionSheet(Sheet):
         """
         Collect activity from each projection, combine it to calculate
         the activity for this sheet, and send the result out.
+
+        If learning is enabled, also calls learn().
         """
         self.activity *= 0.0
         for name in self.projections:
