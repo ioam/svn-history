@@ -194,10 +194,10 @@ class Simulator(TopoObject):
                 # then the event is stale so print a warning and
                 # discard it.                
 
-                self.warning('Discarding stale event from',(src,src_port),
-                             'to',(dest,dest_port),
-                             'for time',etime,
-                             '. current time =',self.time())
+                self.warning('Discarding stale event from',(self.events[0].src,self.events[0].src_port),
+                             'to',(self.events[0].dest,self.events[0].dest_port),
+                             'for time',self.events[0].time,
+                             '. Current time =',self.time())
                 self.events.pop(0)
             elif self.events[0].time > self.time():
 
@@ -208,8 +208,8 @@ class Simulator(TopoObject):
 
                 if did_event:
                     did_event = False
-                    self.debug("Time to sleep. current time =",self.time(),
-                               "next event time =",self.events[0].time)
+                    self.debug("Time to sleep. Current time =",self.time(),
+                               ".  Next event time =",self.events[0].time)
                     for ep in self._event_processors:
     #                    self.debug("Doing pre_sleep for",e)
                         ep.pre_sleep()
