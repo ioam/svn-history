@@ -9,6 +9,7 @@ import Numeric
 from sheet import Sheet
 from parameter import Parameter, Number
 from simulator import EPConnection
+from utils import Identity
 
 
 ### JABALERT
@@ -79,7 +80,8 @@ class ProjectionSheet(Sheet):
     with the parameters (a=1,b=2).
     """
 
-    transfer_fn  = Parameter(default=lambda x:Numeric.array(x))
+    # Should be changed to a TransferFunctionParameter
+    transfer_fn  = Parameter(default=Identity())
                              
     def __init__(self,**params):
         super(ProjectionSheet,self).__init__(**params)

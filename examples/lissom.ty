@@ -127,9 +127,9 @@ s.schedule_action(500, V1.change_learning_rate, "LateralExcitatory", 0.001*ecs)
 
 
 #function that set delta and beta for the threshold function
-def set_deltabeta(x,y): 
-    V1.delta=x
-    V1.beta=y
+def set_deltabeta(x,y):
+    V1.transfer_fn.lower_bound=x
+    V1.transfer_fn.upper_bound=y
 
 s.schedule_action(200,   set_deltabeta, 0.11, 0.66)
 s.schedule_action(500,   set_deltabeta, 0.12, 0.67)
