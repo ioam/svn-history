@@ -1,18 +1,13 @@
 """
-Distribution
+Distribution class
 
 $Id$
 """
 
-# CEB:
-# This file is still being written.
-#
 # To do:
 #
-# - come up with a name...it records a distribution of values and
-#   lets you get some statistics on it
 # - complete the documentation
-# - relative selectivity
+# - test relative_selectivity
 # - check use of float() in count_mag() etc
 #
 # - function to return value in a range (like a real histogram)
@@ -24,81 +19,68 @@ $Id$
 # - should this be two classes: one for the core (which would be
 #   small though) and another for statistics?
 
-
-
-
-
-# These imports are required only for the extra statistical functions (e.g. vector sum);
-# they are not used for anything else.
+# The basic functions do not have any dependencies, but these imports
+# are needed for some of the statistical functions (e.g. vector sum).
 from math import pi
 from Numeric import innerproduct, array, exp, argmax
 from utils import arg
 
 
 class Distribution(object):
-
     """
-    Distribution
-    Histogram-like object that is a dictionary of bins:values. Each
-    bin's value is the sum of all values that have been placed into
+    Holds a distribution of the values f(x) associated with a variable x.
+    
+    A Distribution is a histogram-like object that is a dictionary of
+    samples.  Each sample is an x:f(x) pair, where x is called the bin
+    and f(x) is called the value(). Each bin's value is typically
+    maintained as the sum of all the values that have been placed into
     it.
 
-    The bin-axis is continuous, and can represent a physical quantity
-    (such as direction or frequency).
+    The bin axis is continuous, and can represent a continuous
+    quantity without discretization.  Alternatively, this class can be
+    used as a traditional histogram by either discretizing the bin
+    number before adding each sample, or by binning the values in the
+    final Distribution.
 
-    A bin is placed along this axis whenever one is specified by input
-    data, and its value is set equal to the one specified (unless the
-    bin has previously been created, in which case its value is added
-    to).
+    Distributions are bounded by the specified axis_bounds, and can
+    either be cyclic (like directions or hues) or non-cyclic.  For
+    cyclic distributions, samples provided outside the axis_bounds
+    will be wrapped back into the bound range, as is appropriate for
+    quantities like directions.  For non-cyclic distributions,
+    providing samples outside the axis_bounds will result in a
+    ValueError.
 
-    ** The range that the bins may fall in is specified by the
-    axis_bounds; any input data with a bin outside are ignored unless
-    cyclic=True, in which case they are allowed and later wrapped
-    according to axis_bounds (upper limit=lower limit, e.g. 0 = 2*pi)
-    in any calculations. So for non-cyclic data the bounds are just
-    used to check input but for cyclic data they affect the
-    calculation of vector quantities**
+    In addition to the values, can also return the counts, i.e., the
+    number of times that a sample has been added with the given bin.
 
-    Also contains a dictionary, _counts, which stores bins:counts. Each
-    bin's count is the number of times that a value has been added to
-    the bin (the value could have been zero).
+    Not all instances of this class will be a true distribution in the
+    mathematical sense; e.g. the values will have to be normalized
+    before they can be considered a probability distribution.
 
-    In addition, stores the total value that has been added to the
-    object, and the total count of times a value was added.
-
-    ** This object is designed to include some features that are not
-    strictly speaking part of histograms ... e.g. if their total
-    counts are less than the sum of the individual counts, or if
-    individual counts are less than zero.
+    If keep_peak=True, the value stored in each bin will be the
+    maximum of all values ever added, instead of the sum.  The
+    distribution will thus be a record of the maximum value
+    seen at each bin, also known as an envelope.
     """
 
+    # Holds the number of times that undefined values have been
+    # returned from calculations for any instance of this class,
+    # e.g. calls to vector_direction() or vector_selectivity() when no
+    # value is non-zero.  Useful for warning users when the values are
+    # not meaningful.
+    undefined_vals = 0 
+
     def __init__(self, axis_bounds=(0.0, 2*pi), cyclic=False, keep_peak=False):
-        """
-        ** ..
-        
-        total_count holds the total number of values that have ever been provided for each
-        bin.  ** For a simple histogram this will be the same as
-        sum_counts(), but for other OneDBinList types it often
-        differs. 
-
-        total_value holds the sum of all of the values ever provided for each bin.  ** For a
-        simple histogram this will be the same as sum_value(), but for
-        other OneDBinList types it often differs from sum_value().
-
-        undefined_vals holds the number of times that undefined values have been
-        returned from calculations for ** any instance of this class,
-        e.g. calls to vector_direction() or vector_selectivity() when no
-        value is non-zero.  Useful for warning users when the values are
-        not meaningful.
-        """
         self._data = {}
         self._counts = {}
-        
+            
+        # total_count and total_value hold the total number and sum
+        # (respectively) of values that have ever been provided for
+        # each bin.  For a simple distribution these will be the same as
+        # sum_counts() and sum_values().
         self.total_count = 0
         self.total_value = 0.0
-
-        self.undefined_vals = 0 
-
+        
         self.axis_bounds = axis_bounds
         self.axis_range = axis_bounds[1] - axis_bounds[0]
         self.cyclic = cyclic
@@ -106,75 +88,93 @@ class Distribution(object):
 
 
     def get_value(self, bin):
-        """
-        Return the value of bin.
-        """
+        """Return the value of the specified bin."""
         return self._data.get(bin)
 
 
     def get_count(self, bin):
-        """
-        Return the count of bin.
-        """
+        """Return the count from the specified bin."""
         return self._counts.get(bin)
     
-        
+
+
+    ### JABALERT!
+    ### 
+    ### Seems to me that it would make the user's life easier if we
+    ### went ahead and provided the two separate lists, i.e.  bins()
+    ### and values(), to simplify all of their expressions.  Sure,
+    ### they can do it with the tuple list using list comprehensions,
+    ### but it's awkward.
     def values(self):
         """
-        Return a list of (bin, value) pairs, as 2-tuples.
+        Return a list of (bin,value) pairs, as 2-tuples.
 
-        Get a list of values with e.g.: [value for bin,value in dist1.values()]
+        From this tuple list, lists of values and bins can be obtained
+        using list comprehensions, as in:
+        
+          vals = [value for bin,value in dist1.values()]
+          bins = [bin   for bin,value in dist1.values()]
 
-        Where should the following note go (see also get_counts())?
-        Various statistics could be calculated from these values. For
-        example, the sum of the current values,
-        the largest value of any bin, ...
-        any bin, 
+        Various statistics can then be calculated if desired:
+        
+          sum(vals)  (total of all values)
+          max(vals)  (highest value in any bin)
         """
         return self._data.items()
 
 
     def counts(self):
         """
-        Return a list of (bin, count) pairs, as 2-tuples.        
+        Return a list of (bin,count) pairs, as 2-tuples.
 
-        e.g. use to get
-        The sum of the current counts, the largest count of any bin, ...
+        From this tuple list, lists of counts and bins can be obtained
+        using list comprehensions, as in:
+        
+          cts  = [count for bin,count in dist1.counts()]
+          bins = [bin   for bin,count in dist1.counts()]
+
+        Various statistics can then be calculated if desired:
+        
+          sum(counts)  (total of all counts)
+          max(counts)  (highest count in any bin)
         """
         return self._counts.items()
 
-
+    ### JABALERT!  Is this redundant?  Seems so.
     def num_bins(self):
-        """
-        Return the number of bins.
-        """
+        """Return the number of bins."""
         return len(self._data)
 
 
+    ### JABHACKALERT!
+    ###
+    ### Instead of allowing values outside the range for cyclic,
+    ### we should either flag them with a ValueError as usual, or
+    ### else wrap them around ourselves.  You can use the wrap()
+    ### function I put in utils.py, but please try to simplify 
+    ### it first so it's not so embarrassing.  It might help to
+    ### see the definition of fmod in topographica/external/Python-2.4/Python/fmod.c .
     def add(self, new_data):
         """
-        Add new data in the form of a dictionary: {bin, value}.
-        If the bin already exists, the value is added to its current value.
-        If the bin doesn't exist, it is created with that value.
+        Add a set of new data in the form of a dictionary of (bin,
+        value) pairs.  If the bin already exists, the value is added
+        to the current value.  If the bin doesn't exist, one is created
+        with that value.
 
-        If bin is outside axis_bounds, its position is allowed for cyclic=True but raises
-        a ValueError for cyclic=False.
+        Bin numbers outside axis_bounds are allowed for cyclic=True,
+        but otherwise a ValueError is raised.
 
-        If keep_peak=True, value becomes the new value for that bin if it's value
-        is greater than the bin's current value. 
-        Useful for maintaining a
-        distribution of maxiumum values for different bins, as opposed
-        to the summations typical to histogram bins.  Note that each
-        call will increase the total_value and total_count (and thus
-        decrease the value_mag() and count_mag()) even if the value
-        doesn't happen to be the maximum seen so far, since each data
-        point still helps improve the sampling and thus the confidence.
+        If keep_peak=True, the value of the bin is the maximum of the
+        current value and the supplied value.  That is, the bin stores
+        the peak value seen so far.  Note that each call will increase
+        the total_value and total_count (and thus decrease the
+        value_mag() and count_mag()) even if the value doesn't happen
+        to be the maximum seen so far, since each data point still
+        helps improve the sampling and thus the confidence.
         """
         for bin in new_data.keys():
 
-
             if self.cyclic==False:
-                # Raise an error if this bin is outside the range because this isn't a cyclic distribution.
                 if not (self.axis_bounds[0] <= bin <= self.axis_bounds[1]):
                       raise ValueError("Bin outside bounds.")
                  
@@ -194,65 +194,61 @@ class Distribution(object):
                
 
     def max_value_bin(self):
-        """
-        Return the bin with the largest value.
-        """
+        """Return the bin with the largest value."""
         return self._data.keys()[argmax(self._data.values())]
 
 
     def weighted_sum(self):
-        """
-        Return the sum of each value times its bin 
-        """
+        """Return the sum of each value times its bin."""
         return innerproduct(self._data.keys(), self._data.values()) 
 
 
+    ### JABALERT!
+    ###
+    ### Since distribution now knows whether it is cyclic or not,
+    ### I guess we may as well make it smart enough to return a
+    ### vector_average back to the user in that case.  So we
+    ### should probably rename this function to _arithmetic_weighted_average,
+    ### and rename vector_average to _vector_average, then make
+    ### a new public function weighted_average() that chooses
+    ### the right one depending on the value of cyclic.
     def weighted_average(self):
         """
-        Return the average of the data on the bin_axis, where each bin is
-        weighted by its value.
+        Return the arithmetic average of the data on the bin_axis,
+        where each bin is weighted by its value.
 
-        This quantity is a continuous
-        measure of the bin with the largest value - for a
-        non-cyclic distribution, i.e.  one with distinct upper and lower
-        bounds.
+        For a non-cyclic distribution, this quantity is a continuous,
+        interpolated equivalent for the max_value_bin().
         """
         return self._safe_divide(self.weighted_sum(),sum(self._data.values())) 
 
 
     def vector_sum(self):
         """
-        Return the vector sum of the data as the 2-tuple (magnitude, direction).
+        Return the vector sum of the data as a tuple (magnitude, avgbinnum).
 
-        ** direction is maybe a bad name
-        ** since returned direction has the same dimensions as the bin_axis specified on creating the binogram.
-
-        Each bin contributes a vector of length equal to its value, at a direction
-        of the bin itself (scaled to [0,2pi] according to the range specified on creating the binogram).
+        Each bin contributes a vector of length equal to its value, at
+        a direction corresponding to the bin number.  Specifically,
+        the total bin number range is mapped into a direction range
+        [0,2pi].
         
-        The direction is a continuous measure of the
-        max_value_bin() of the distribution, assuming the distribution is
-        cyclic i.e. wraps around from the top of axis_bounds to the bottom (e.g.
-        direction, where 0 = 2pi radians).
+        For a cyclic distribution, the avgbinnum will be a continuous
+        measure analogous to the max_value_bin() of the distribution.
+        But this quantity has more precision than max_value_bin()
+        because it is computed from the entire distribution instead of
+        just the peak bin.  However, it is likely to be useful only
+        for uniform or very dense sampling; with sparse, non-uniform
+        sampling the estimates will be biased significantly by the
+        particular samples chosen.
 
-        It has more precision than finding the bin with the largest value
-        (i.e. max_value_bin()) because it is computed from the entire
-        distribution instead of just the peak bin.
-
-        no longer
-        ** However, it requires uniform sampling for correct results, which
-        ** is not always possible.
-
-        The direction is not meaningful when
-        the magnitude is 0, since a zero-length vector has no
-        direction.  To find out whether such cases occurred, you can
-        compare the value of undefined_vals before and after
-        a series of calls to this function.
-
-        If cyclic=false, might want to warn this was not the thing to do?
+        The avgbinnum is not meaningful when the magnitude is 0,
+        because a zero-length vector has no direction.  To find out
+        whether such cases occurred, you can compare the value of
+        undefined_vals before and after a series of calls to this
+        function.
         """
-        # vectors are represented in polar form as complex numbers
 
+        # vectors are represented in polar form as complex numbers
         r = self._data.values()                                  
         theta = self._bins_to_radians(array(self._data.keys()))
         v_sum = innerproduct(r, exp(theta*1j))                  
@@ -267,38 +263,37 @@ class Distribution(object):
 
 
     def vector_average(self):
-        """
-        ** Return 
-        i.e. the vector sum divided by the number of bins.
-        """
+        """Return the vector_sum divided by the number of bins."""
         return self._safe_divide(self.vector_sum()[0], len(self._data))
 
 
     # not tested
     def relative_selectivity(self):
         """
-        Return valuemax_value_bin()) as a proportion of the
-        sum_value(), scaled to 0.0 to 1.0.
+        Return max_value_bin()) as a proportion of the sum_value().
 
-        This quantity is a measure of how strongly the histogram is
-        biased towards the
-        max_value_bin().  For a smooth, single-lobed distribution with an
-        inclusive, non-cyclic range, this quantity is an analog to
-        vector_selectivity.  To be a precise analog for arbitrary
-        distributions, it would need to compute some measure of the
-        selectivity that works like the weighted_average() instead of
-        the max_value_bin().  The scaling is such that if all bins are
-        identical, the selectivity is 0.0, and if all bins but one are
-        zero, the selectivity is 1.0.      
+        This quantity is a measure of how strongly the distribution is
+        biased towards the max_value_bin().  For a smooth,
+        single-lobed distribution with an inclusive, non-cyclic range,
+        this quantity is an analog to vector_selectivity.  To be a
+        precise analog for arbitrary distributions, it would need to
+        compute some measure of the selectivity that works like the
+        weighted_average() instead of the max_value_bin().  The result
+        is scaled such that if all bins are identical, the selectivity
+        is 0.0, and if all bins but one are zero, the selectivity is
+        1.0.
         """
-        # With only one bin, one is always fully selective
+        # A single bin is considered fully selective (but could also
+        # arguably be considered fully unselective)
         if len(self._data) <= 1: 
             return 1.0
 
-        proportion = self._safe_divide(self._data[self.max_value_bin()], sum(self._data.values()))
+        proportion = self._safe_divide(self._data[self.max_value_bin()],
+                                       sum(self._data.values()))
         offset = 1.0/len(self._data)
         scaled = (proportion-offset)/(1.0-offset)
 
+        # JABALERT! Can we remove these comments?  I can't follow them.
         # "Since we take the peak, negative selectivities shouldn't be possible, but just in case..."
         # So make this Number(bounds=(0.0, 1.0)) and use set_in_bounds() or something?
         return scaled 
@@ -307,16 +302,15 @@ class Distribution(object):
     # not tested
     def vector_selectivity(self):
         """
-        Returns the ratio of the length of the vector sum to the sum of the vector lengths
-        i.e. vector_mag()/sum_value()
+        Return the vector_mag() divided by the sum_value().
 
-        This is a vector-based measure of the peakedness of the histogram.
-        If only a single bin has a non-zero value(), the selectivity
-        will be 1.0, and if all bins have the same value() then the
-        selectivity will be 0.0.  Other distributions will result in
-        intermediate values.
+        This quantity is a vector-based measure of the peakedness of
+        the distribution.  If only a single bin has a non-zero value(),
+        the selectivity will be 1.0, and if all bins have the same
+        value() then the selectivity will be 0.0.  Other distributions
+        will result in intermediate values.
 
-        For a histogram with a sum_value() of zero (i.e. all bins
+        For a distribution with a sum_value() of zero (i.e. all bins
         empty), the selectivity is undefined.  Assuming that one will
         usually be looking for high selectivity, we return zero in such
         a case so that high selectivity will not mistakenly be claimed.
@@ -328,49 +322,50 @@ class Distribution(object):
 
 
     def value_mag(self, bin):
-        """
-        Return the value of a single bin in the histogram as a portion of total_value.
-        """
+        """Return the value of a single bin as a proportion of total_value."""
         return self._safe_divide(self._data.get(bin), self.total_value)
 
 
     def count_mag(self, bin):
-        """
-        Return the count of a single bin in the histogram as a portion of total_count.
-        """
-        return self._safe_divide(float(self._counts.get(bin)), float(self.total_count)) # use of float()
+        """Return the count of a single bin as a proportion of total_count."""
+        return self._safe_divide(float(self._counts.get(bin)), float(self.total_count))
+        # use of float()
 
 
-    def _bins_to_radians(self, bins):
+    def _bins_to_radians(self, bin):
         """
-        Based on the axis_range given on creation of this distribution, take 
+        Convert a bin number to a direction in radians.
+
+        Works for Numeric arrays of bin numbers, returning
+        an array of directions.
         """
-        # assumes bins is a Numeric array
-        return (2*pi)*bins/self.axis_range 
+        return (2*pi)*bin/self.axis_range 
 
 
-    def _radians_to_bins(self, angles):
+    def _radians_to_bins(self, direction):
         """
+        Convert a direction in radians into a bin number.
+
+        Works for Numeric arrays of direction, returning
+        an array of bin numbers.
         """
-        # assumes angles is a Numeric array
-        return angles*self.axis_range/(2*pi)
+        return direction*self.axis_range/(2*pi)
         
         
     def _safe_divide(self,numerator,denominator):
         """
         Division routine that avoids division-by-zero errors
         (returning zero in such cases) but keeps track of them
-        for undefined_values.
+        for undefined_values().
         """
         if denominator==0:
             self.undefined_vals += 1
-            return 0  # should that return a float? or the same type as numerator?
+            return 0
         else:
             return numerator/denominator
 
 
-##    # not tested - not used by anyone?
-##
+##    # not tested - will it be needed?
 ##    def relative_value(self, bin):
 ##        """
 ##        Return the value of the given bin as a proportion of the
@@ -378,7 +373,7 @@ class Distribution(object):
 ##
 ##        This quantity is on a scale from 0.0 (the
 ##        specified bin is zero and others are nonzero) to 1.0 (the
-##        specified bin is the only nonzero bin).  If the histogram is
+##        specified bin is the only nonzero bin).  If the distribution is
 ##        empty the result is undefined; in such a case zero is returned
 ##        and the value returned by undefined_values() is incremented.
 ##        """
