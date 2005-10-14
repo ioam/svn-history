@@ -19,7 +19,6 @@ from topo.projections.kernelprojection import KernelProjection
 from topo.patterns.basic import GaussianGenerator
 from topo.base.sheet import BoundingBox
 from topo.base.parameter import Dynamic
-from topo.base.utils import compute_response_mdot_c
 from topo.responsefns.basic import CFDotProduct
 
 
