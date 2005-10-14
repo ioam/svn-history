@@ -14,7 +14,6 @@ from topo.base.connectionfield import CFProjection
 from topo.base.parameter import Parameter
 from topo.patterns.random import UniformRandomGenerator
 from topo.base.boundingregion import Intersection,BoundingBox
-from topo.base.learningrules import *
 from topo.base.utils import *
 from topo.base.projection import Identity
 
