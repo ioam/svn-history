@@ -204,10 +204,12 @@ class Distribution(object):
         """
         Return a continuous, interpolated equivalent of the max_value_bin().
         
-        For a cyclic distribution, this is the direction of the vector sum (see vector_sum()).
+        For a cyclic distribution, this is the direction of the vector
+        sum (see vector_sum()).
 
-        For a non-cyclic distribution, this is the arithmetic average of the data on the bin_axis, where each bin
-        is weighted by its value.
+        For a non-cyclic distribution, this is the arithmetic average
+        of the data on the bin_axis, where each bin is weighted by its
+        value.
         """
         if self.cyclic == True:
             return self.vector_sum()[1]
@@ -268,27 +270,23 @@ class Distribution(object):
 
     def selectivity(self):
         """
-        Cyclic
-        ======
-        Return the magnitude of the vector_sum() divided by the sum_value().
-
-        This quantity is a vector-based measure of the peakedness of
-        the distribution.  If only a single bin has a non-zero value(),
-        the selectivity will be 1.0, and if all bins have the same
-        value() then the selectivity will be 0.0.  Other distributions
-        will result in intermediate values.
-
-        For a distribution with a sum_value() of zero (i.e. all bins
-        empty), the selectivity is undefined.  Assuming that one will
-        usually be looking for high selectivity, we return zero in such
-        a case so that high selectivity will not mistakenly be claimed.
-        To find out whether such cases occurred, you can compare the
-        value of undefined_values() before and after a series of
-        calls to this function.
+        Return a measure of the peakedness of the distribution.  The
+        calculation differs depending on whether this is a cyclic
+        variable.  For a cyclic variable, returns the magnitude of the
+        vector_sum() divided by the sum_value() (see
+        _vector_selectivity for more details).  For a non-cyclic
+        variable, returns the max_value_bin()) as a proportion of the
+        sum_value() (see _relative_selectivity for more details).
+        """
+        if self.cyclic == True:
+            return self._vector_selectivity()
+        else:
+            return self._relative_selectivity()
 
 
-        Non-Cyclic
-        ==========
+    # not tested
+    def _relative_selectivity(self):
+        """
         Return max_value_bin()) as a proportion of the sum_value().
 
         This quantity is a measure of how strongly the distribution is
@@ -301,17 +299,6 @@ class Distribution(object):
         is scaled such that if all bins are identical, the selectivity
         is 0.0, and if all bins but one are zero, the selectivity is
         1.0.
-        """
-        if self.cyclic == True:
-            return self._vector_selectivity()
-        else:
-            return self._relative_selectivity()
-
-
-    # not tested
-    def _relative_selectivity(self):
-        """
-        See selectivity() (non-cyclic)
         """
         # A single bin is considered fully selective (but could also
         # arguably be considered fully unselective)
@@ -332,7 +319,21 @@ class Distribution(object):
     # not tested
     def _vector_selectivity(self):
         """
-        See selectivity() (cyclic).
+        Return the magnitude of the vector_sum() divided by the sum_value().
+
+        This quantity is a vector-based measure of the peakedness of
+        the distribution.  If only a single bin has a non-zero value(),
+        the selectivity will be 1.0, and if all bins have the same
+        value() then the selectivity will be 0.0.  Other distributions
+        will result in intermediate values.
+
+        For a distribution with a sum_value() of zero (i.e. all bins
+        empty), the selectivity is undefined.  Assuming that one will
+        usually be looking for high selectivity, we return zero in such
+        a case so that high selectivity will not mistakenly be claimed.
+        To find out whether such cases occurred, you can compare the
+        value of undefined_values() before and after a series of
+        calls to this function.
         """
         return self._safe_divide(self.vector_sum()[0], sum(self._data.values()))
 
