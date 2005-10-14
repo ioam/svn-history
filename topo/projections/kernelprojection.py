@@ -22,8 +22,8 @@ class KernelProjection(CFProjection):
     """
     Projection that is based on an array of weight patterns generated
     by a PatternGenerator.  The activity of the Projection is
-    calculated by a specified activation_fn and output_fn (which is
-    typically Identity).    
+    calculated by a specified response_fn (typically a CF-aware
+    version of mdot) and output_fn (which is typically Identity).
     """
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
     weights_generator = Parameter(default=UniformRandomGenerator())
@@ -46,29 +46,10 @@ class KernelProjection(CFProjection):
         self.set_cfs(cfs)
 
 
-    ### JABHACKALERT!
-    ### 
-    ### Instead of having this special case, need to make all activity 
-    ### functions be array-based like compute_response_mdot_c, but with
-    ### one simple and slow version provided that accepts a scalar
-    ### activity function (for generality).
     def activate(self,input_activity, rows, cols):
-        """
-        Activate using the specified activation_fn followed by the specified output_fn.
-        """
+        """Activate using the specified response_fn and output_fn."""
         self.input_buffer = input_activity
-        if self.activation_fn.func_name == "compute_response_mdot_c":
-            # compute_response_mdot_c computes the mdot for all the units
-            compute_response_mdot_c(input_activity, rows, cols, self.activity, self.cfs, self.strength)
-	else:
-            for r in xrange(rows):
-                for c in xrange(cols):
-                    cf = self.cfs[r][c]
-                    r1,r2,c1,c2 = cf.slice
-                    X = input_activity[r1:r2,c1:c2]
-
-                    self.activity[r,c] = self.activation_fn(X,cf.weights)
-            self.activity *= self.strength
+        self.response_fn(input_activity, rows, cols, self.activity, self.cfs, self.strength)
         self.activity = self.output_fn(self.activity)
 
 

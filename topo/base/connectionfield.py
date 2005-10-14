@@ -186,17 +186,13 @@ class CFProjection(Projection):
     """
     A projection composed of ConnectionFields from a Sheet into a ProjectionSheet.
 
-    Projection computes its activity using an activation_fn: A
-    function f(X,W) that takes two identically shaped matrices X (the
-    input) and W (the ConnectionField weights) and computes a scalar
-    stimulation value based on those weights.
-
-    Any subclass of Projection has to implement the interface
+    CFProjection computes its activity using a response_fn of type
+    CFResponseFunction.  Any subclass has to implement the interface
     activate(self,input_activity,rows,cols) that computes the response
-    from the input and stores it in the activity[] array.
+    from the input and stores it in the activity array.
     """
 
-    activation_fn = Parameter(default=mdot)
+    response_fn = Parameter(default=GenericCFResponseFn())
     cf_type = Parameter(default=ConnectionField)
     normalize = BooleanParameter(default=False)
     normalize_fn = Parameter(default=divisive_normalization)

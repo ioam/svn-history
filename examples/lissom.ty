@@ -20,6 +20,7 @@ from topo.patterns.basic import GaussianGenerator
 from topo.base.sheet import BoundingBox
 from topo.base.parameter import Dynamic
 from topo.base.utils import compute_response_mdot_c
+from topo.responsefns.basic import CFDotProduct
 
 
 ###########################################
@@ -93,18 +94,18 @@ V1 = LISSOM(name='V1')
 s.connect(retina,V1, delay = FixedPoint("0.05"),
           projection_type=KernelProjection,
           projection_params = dict(strength = 1.0, name='Afferent0',
-                                   weights_bounds = afferent_weight_bounds, normalize = True, activation_fn=compute_response_mdot_c,learning_rate=alpha_input))
+                                   weights_bounds = afferent_weight_bounds, normalize = True, response_fn=CFDotProduct(),learning_rate=alpha_input))
 
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
           projection_type=KernelProjection,
           projection_params = dict(strength = gammaexc, name='LateralExcitatory',
-                                   weights_bounds = excitatory_weight_bounds, normalize = True, activation_fn=compute_response_mdot_c,learning_rate=alpha_exc))
+                                   weights_bounds = excitatory_weight_bounds, normalize = True, response_fn=CFDotProduct(),learning_rate=alpha_exc))
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
           projection_type=KernelProjection,
           projection_params = dict(strength = -gammainh, name='LateralInhibitory',
-                                   weights_bounds = inhibitory_weight_bounds, normalize = True, activation_fn=compute_response_mdot_c,learning_rate=alpha_inh))
+                                   weights_bounds = inhibitory_weight_bounds, normalize = True, response_fn=CFDotProduct(),learning_rate=alpha_inh))
         
 
 #################################################
