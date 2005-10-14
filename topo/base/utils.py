@@ -8,8 +8,24 @@ $Id$
 from Numeric import sqrt,ones,dot,sum
 import __main__
 import weave
+import math
+
+### JABHACKALERT! Need to remove this by moving TransferFunction.
+from object import TopoObject
 
 inf = (ones(1)/0.0)[0]
+
+
+def wrap(lower, upper, x):
+    """
+    Circularly alias the numeric value x into the range [lower,upper).
+
+    Valid for cyclic quantities like orientations or hues.
+    """
+    #I have no idea how I came up with this algorithm; it should be simplified.
+    range=upper-lower
+    return lower + math.fmod(x-lower + 2*range*(1-math.floor(x/(2*range))), range)
+
 
 def NxN(tuple):
     """
