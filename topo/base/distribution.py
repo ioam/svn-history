@@ -6,8 +6,7 @@ $Id$
 
 # To do:
 #
-# - complete the documentation
-# - test relative_selectivity
+# - test selectivity()
 # - check use of float() in count_mag() etc
 #
 # - function to return value in a range (like a real histogram)
@@ -18,6 +17,8 @@ $Id$
 #   "array" anywhere in here?
 # - should this be two classes: one for the core (which would be
 #   small though) and another for statistics?
+
+
 
 # The basic functions do not have any dependencies, but these imports
 # are needed for some of the statistical functions (e.g. vector sum).
@@ -97,7 +98,6 @@ class Distribution(object):
         return self._counts.get(bin)
     
 
-
     ### JABALERT!
     ### 
     ### Seems to me that it would make the user's life easier if we
@@ -140,20 +140,13 @@ class Distribution(object):
         """
         return self._counts.items()
 
+
     ### JABALERT!  Is this redundant?  Seems so.
     def num_bins(self):
         """Return the number of bins."""
         return len(self._data)
 
 
-    ### JABHACKALERT!
-    ###
-    ### Instead of allowing values outside the range for cyclic,
-    ### we should either flag them with a ValueError as usual, or
-    ### else wrap them around ourselves.  You can use the wrap()
-    ### function I put in utils.py, but please try to simplify 
-    ### it first so it's not so embarrassing.  It might help to
-    ### see the definition of fmod in topographica/external/Python-2.4/Python/fmod.c .
     def add(self, new_data):
         """
         Add a set of new data in the form of a dictionary of (bin,
@@ -174,10 +167,11 @@ class Distribution(object):
         """
         for bin in new_data.keys():
 
+            # To do: wrap cyclic bins
             if self.cyclic==False:
                 if not (self.axis_bounds[0] <= bin <= self.axis_bounds[1]):
-                      raise ValueError("Bin outside bounds.")
-                 
+                    raise ValueError("Bin outside bounds.")
+        
             if bin not in self._data:
                 self._data.update({bin: 0.0})
                 self._counts.update({bin: 0})
@@ -198,21 +192,30 @@ class Distribution(object):
         return self._data.keys()[argmax(self._data.values())]
 
 
+    def weighted_average(self):
+        """
+        """
+        if self.cyclic == True:
+            return self._vector_average()
+        else:
+            return self._weighted_average()
+
+
+    def selectivity(self):
+        """
+        """
+        if self.cyclic == True:
+            return self._vector_selectivity()
+        else:
+            return self._relative_selectivity()
+
+
     def weighted_sum(self):
         """Return the sum of each value times its bin."""
         return innerproduct(self._data.keys(), self._data.values()) 
 
 
-    ### JABALERT!
-    ###
-    ### Since distribution now knows whether it is cyclic or not,
-    ### I guess we may as well make it smart enough to return a
-    ### vector_average back to the user in that case.  So we
-    ### should probably rename this function to _arithmetic_weighted_average,
-    ### and rename vector_average to _vector_average, then make
-    ### a new public function weighted_average() that chooses
-    ### the right one depending on the value of cyclic.
-    def weighted_average(self):
+    def _weighted_average(self):
         """
         Return the arithmetic average of the data on the bin_axis,
         where each bin is weighted by its value.
@@ -262,13 +265,13 @@ class Distribution(object):
         return (magnitude, self._radians_to_bins(direction)) 
 
 
-    def vector_average(self):
+    def _vector_average(self):
         """Return the vector_sum divided by the number of bins."""
         return self._safe_divide(self.vector_sum()[0], len(self._data))
 
 
     # not tested
-    def relative_selectivity(self):
+    def _relative_selectivity(self):
         """
         Return max_value_bin()) as a proportion of the sum_value().
 
@@ -300,7 +303,7 @@ class Distribution(object):
 
 
     # not tested
-    def vector_selectivity(self):
+    def _vector_selectivity(self):
         """
         Return the vector_mag() divided by the sum_value().
 
