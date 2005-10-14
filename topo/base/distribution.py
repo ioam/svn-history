@@ -6,6 +6,7 @@ $Id$
 
 # To do:
 #
+# - wrap bins for cyclic histograms
 # - test selectivity()
 # - check use of float() in count_mag() etc
 #
@@ -26,6 +27,7 @@ from math import pi
 from Numeric import innerproduct, array, exp, argmax
 from utils import arg
 
+from utils import wrap
 
 class Distribution(object):
     """
@@ -86,6 +88,10 @@ class Distribution(object):
         self.axis_range = axis_bounds[1] - axis_bounds[0]
         self.cyclic = cyclic
         self.keep_peak = keep_peak
+
+
+    def __add__(self,a):
+        self.add(a)
 
 
     def get_value(self, bin):
@@ -167,24 +173,26 @@ class Distribution(object):
         """
         for bin in new_data.keys():
 
-            # To do: wrap cyclic bins
             if self.cyclic==False:
                 if not (self.axis_bounds[0] <= bin <= self.axis_bounds[1]):
                     raise ValueError("Bin outside bounds.")
-        
-            if bin not in self._data:
-                self._data.update({bin: 0.0})
-                self._counts.update({bin: 0})
+
+            # new_bin = wrap(self.axis_bounds[0], self.axis_bounds[1], bin)
+            new_bin = bin
+            
+            if new_bin not in self._data:
+                self._data.update({new_bin: 0.0})
+                self._counts.update({new_bin: 0})
 
             new_value = new_data.get(bin)
             self.total_value += new_value
-            self._counts[bin] += 1
+            self._counts[new_bin] += 1
             self.total_count += 1
 
             if self.keep_peak == True:
-                if new_value > self._data[bin]: self._data[bin]=new_value
+                if new_value > self._data[new_bin]: self._data[new_bin]=new_value
             else:
-                self._data[bin] += new_value
+                self._data[new_bin] += new_value
                
 
     def max_value_bin(self):
@@ -194,6 +202,24 @@ class Distribution(object):
 
     def weighted_average(self):
         """
+        For a cyclic distribution, return a vector average; otherwise,
+        return a non-vector average.
+        
+        Non-cyclic
+        ==========
+        Return the arithmetic average of the data on the bin_axis,
+        where each bin is weighted by its value.
+
+        For a non-cyclic distribution, this quantity is a continuous,
+        interpolated equivalent for the max_value_bin().
+
+        See weighted_sum().
+
+        Cyclic
+        ======
+        Return the magnitude of the vector_sum divided by the number of bins.
+        (see vector_sum()).
+
         """
         if self.cyclic == True:
             return self._vector_average()
@@ -203,6 +229,39 @@ class Distribution(object):
 
     def selectivity(self):
         """
+        Cyclic
+        ======
+        Return the vector_mag() divided by the sum_value().
+
+        This quantity is a vector-based measure of the peakedness of
+        the distribution.  If only a single bin has a non-zero value(),
+        the selectivity will be 1.0, and if all bins have the same
+        value() then the selectivity will be 0.0.  Other distributions
+        will result in intermediate values.
+
+        For a distribution with a sum_value() of zero (i.e. all bins
+        empty), the selectivity is undefined.  Assuming that one will
+        usually be looking for high selectivity, we return zero in such
+        a case so that high selectivity will not mistakenly be claimed.
+        To find out whether such cases occurred, you can compare the
+        value of undefined_values() before and after a series of
+        calls to this function.
+
+
+        Non-Cyclic
+        ==========
+        Return max_value_bin()) as a proportion of the sum_value().
+
+        This quantity is a measure of how strongly the distribution is
+        biased towards the max_value_bin().  For a smooth,
+        single-lobed distribution with an inclusive, non-cyclic range,
+        this quantity is an analog to vector_selectivity.  To be a
+        precise analog for arbitrary distributions, it would need to
+        compute some measure of the selectivity that works like the
+        weighted_average() instead of the max_value_bin().  The result
+        is scaled such that if all bins are identical, the selectivity
+        is 0.0, and if all bins but one are zero, the selectivity is
+        1.0.
         """
         if self.cyclic == True:
             return self._vector_selectivity()
@@ -213,17 +272,6 @@ class Distribution(object):
     def weighted_sum(self):
         """Return the sum of each value times its bin."""
         return innerproduct(self._data.keys(), self._data.values()) 
-
-
-    def _weighted_average(self):
-        """
-        Return the arithmetic average of the data on the bin_axis,
-        where each bin is weighted by its value.
-
-        For a non-cyclic distribution, this quantity is a continuous,
-        interpolated equivalent for the max_value_bin().
-        """
-        return self._safe_divide(self.weighted_sum(),sum(self._data.values())) 
 
 
     def vector_sum(self):
@@ -249,8 +297,8 @@ class Distribution(object):
         whether such cases occurred, you can compare the value of
         undefined_vals before and after a series of calls to this
         function.
-        """
 
+        """
         # vectors are represented in polar form as complex numbers
         r = self._data.values()                                  
         theta = self._bins_to_radians(array(self._data.keys()))
@@ -265,26 +313,24 @@ class Distribution(object):
         return (magnitude, self._radians_to_bins(direction)) 
 
 
+    def _weighted_average(self):
+        """
+        See weighted_average() (non-cyclic)
+        """
+        return self._safe_divide(self.weighted_sum(),sum(self._data.values())) 
+
+
     def _vector_average(self):
-        """Return the vector_sum divided by the number of bins."""
+        """
+        See weighted_average() (cyclic)
+        """
         return self._safe_divide(self.vector_sum()[0], len(self._data))
 
 
     # not tested
     def _relative_selectivity(self):
         """
-        Return max_value_bin()) as a proportion of the sum_value().
-
-        This quantity is a measure of how strongly the distribution is
-        biased towards the max_value_bin().  For a smooth,
-        single-lobed distribution with an inclusive, non-cyclic range,
-        this quantity is an analog to vector_selectivity.  To be a
-        precise analog for arbitrary distributions, it would need to
-        compute some measure of the selectivity that works like the
-        weighted_average() instead of the max_value_bin().  The result
-        is scaled such that if all bins are identical, the selectivity
-        is 0.0, and if all bins but one are zero, the selectivity is
-        1.0.
+        See selectivity() (non-cyclic)
         """
         # A single bin is considered fully selective (but could also
         # arguably be considered fully unselective)
@@ -305,21 +351,7 @@ class Distribution(object):
     # not tested
     def _vector_selectivity(self):
         """
-        Return the vector_mag() divided by the sum_value().
-
-        This quantity is a vector-based measure of the peakedness of
-        the distribution.  If only a single bin has a non-zero value(),
-        the selectivity will be 1.0, and if all bins have the same
-        value() then the selectivity will be 0.0.  Other distributions
-        will result in intermediate values.
-
-        For a distribution with a sum_value() of zero (i.e. all bins
-        empty), the selectivity is undefined.  Assuming that one will
-        usually be looking for high selectivity, we return zero in such
-        a case so that high selectivity will not mistakenly be claimed.
-        To find out whether such cases occurred, you can compare the
-        value of undefined_values() before and after a series of
-        calls to this function.
+        See selectivity() (cyclic).
         """
         return self._safe_divide(self.vector_sum()[0], sum(self._data.values()))
 
