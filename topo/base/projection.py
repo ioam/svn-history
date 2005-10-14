@@ -53,13 +53,13 @@ class ProjectionSheet(Sheet):
     ProjectionSheet computes its own activity matrix using its
     activate() method, which by default sums all its Projections'
     activity matrices and passes the result through a user-specified
-    transfer_fn() before sending it out on the default output port.
+    output_fn() before sending it out on the default output port.
     The activate() method can be overridden to treat sum some of the
     connections, multiply that by the sum of other connections, etc.,
     to model modulatory or other more complicated types of connection
     influences.
 
-    The transfer_fn is a function s(A) that takes an activity matrix
+    The output_fn is a function s(A) that takes an activity matrix
     A and produces and identically shaped output matrix. The default
     is the identity function.
 
@@ -80,8 +80,8 @@ class ProjectionSheet(Sheet):
     with the parameters (a=1,b=2).
     """
 
-    # Should be changed to a TransferFunctionParameter
-    transfer_fn  = Parameter(default=Identity())
+    # Should be changed to a OutputFunctionParameter
+    output_fn  = Parameter(default=Identity())
                              
     def __init__(self,**params):
         super(ProjectionSheet,self).__init__(**params)
@@ -128,7 +128,7 @@ class ProjectionSheet(Sheet):
         for name in self.projections:
             for proj in self.projections[name]:
                 self.activity+= proj.activity
-        self.activity = self.transfer_fn(self.activity)
+        self.activity = self.output_fn(self.activity)
         self.send_output(data=self.activity)
 
         if self.learning:

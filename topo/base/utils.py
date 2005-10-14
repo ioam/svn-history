@@ -10,7 +10,7 @@ import __main__
 import weave
 import math
 
-### JABHACKALERT! Need to remove this by moving TransferFunction.
+### JABHACKALERT! Need to remove this by moving OutputFunction.
 from object import TopoObject
 
 inf = (ones(1)/0.0)[0]
@@ -76,29 +76,6 @@ def mdot(m1,m2):
     """
     a = m1*m2
     return sum(a.flat)
-
-def PLTF01(x):
-    """
-    Piecewise-linear transfer function.
-    A matrix function that applies this function to each element:
-
-           /  0 : x < 0 
-    f(x) = |  x : 0 <= x <= 1
-           \  1 : x > 1
-    """
-    return ((x * (x>0)) * (x<1)) + (x>=1)
-
-def PLTF(x,lb=0.0,ub=1.0):
-    """ 
-    Piecewise-linear transfer function with lower and upper thresholds
-    as parameters.
-    """
-
-    #return PLTF01((x-lb)/(ub-lb))
-    fact = 1.0/(ub-lb)
-    x = (x-lb)*fact
-    return ((x * (x>0)) * (x<1)) + (x>=1)
-
 
 class Struct:
     """
@@ -293,14 +270,14 @@ def arg(z):
 
 
 from object import TopoObject
-class TransferFunction(TopoObject):
+class OutputFunction(TopoObject):
     """
     Object to map a numeric item into another of the same size.
 
     Typically used for transforming an array of intermediate results
     into a final version.  For instance, when computing the output of
     a Sheet, one will often first compute a linear sum, then use a
-    sigmoidal TransferFunction to transform that into the final result.
+    sigmoidal OutputFunction to transform that into the final result.
 
     Objects in this class must support being called as a function with
     one argument, typically a matrix, and return a matrix of the same
@@ -311,12 +288,12 @@ class TransferFunction(TopoObject):
         raise NotImplementedError
 
 
-# Trivial example of a TransferFunction, provided for when a default
-# is needed.  The other concrete TransferFunction classes are stored
-# in transferfns/, to be imported as needed.
-class Identity(TransferFunction):
+# Trivial example of an OutputFunction, provided for when a default
+# is needed.  The other concrete OutputFunction classes are stored
+# in outputfns/, to be imported as needed.
+class Identity(OutputFunction):
     """
-    Identity transfer function, returning its argument as-is.
+    Identity function, returning its argument as-is.
     """
     def __init__(self,**params):
         super(Identity,self).__init__(**params)

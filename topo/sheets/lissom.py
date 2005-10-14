@@ -13,14 +13,13 @@ import topo
 
 from topo.base.connectionfield import CFSheet
 from topo.base.parameter import Parameter
-from topo.base.utils import PLTF
 from topo.base.learningrules import hebbian_c,hebbian_div_norm_c
-from topo.transferfns.basic import PiecewiseLinear
+from topo.outputfns.basic import PiecewiseLinear
 
 class LISSOM(CFSheet):
 
-    # Should be changed to a TransferFunctionParameter
-    transfer_fn = Parameter(default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
+    # Should be changed to a OutputFunctionParameter
+    output_fn = Parameter(default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
     learning_fn = Parameter(default=hebbian_c)
 
     # modify weights after each activation?
@@ -42,7 +41,7 @@ class LISSOM(CFSheet):
 
     def pre_sleep(self):
         """
-        Pass the accumulated stimulation through self.transfer_fn and
+        Pass the accumulated stimulation through self.output_fn and
         send it out on the default output port.
         """
 
@@ -58,7 +57,7 @@ class LISSOM(CFSheet):
             for name in self.projections:
                 for proj in self.projections[name]:
                     self.activity += proj.activity
-            self.activity = self.transfer_fn(self.activity)
+            self.activity = self.output_fn(self.activity)
 
             # don't send output when an iteration has ended
             if not iteration_done: 
