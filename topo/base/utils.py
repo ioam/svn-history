@@ -45,17 +45,20 @@ def enumerate(seq):
 
 enum = enumerate
 
+
 def L2norm(v):
     """
     Return the L2 norm of the vector v.
     """    
     return sqrt(dot(v,v))
 
-def norm(v,L=2):
+
+def norm(v,p=2):
     """
-    Returns the L? norm of v, where L is arbitrary and defaults to 2.
+    Returns the Lp norm of v, where p is arbitrary and defaults to 2.
     """
-    return sum(v**L)**(1.0/L)
+    return sum(v**p)**(1.0/p)
+
 
 def msum(m):
     """
@@ -63,6 +66,7 @@ def msum(m):
     sum(a.flat) fails, e.g, with matrix slices or submatrices.
     """
     return sum(sum(m))
+
 
 ### JAB: Could be rewritten using weave.blitz to avoid creating a temporary
 def mdot(m1,m2):
@@ -74,18 +78,18 @@ def mdot(m1,m2):
     a = m1*m2
     return sum(a.flat)
 
+
 class Struct:
     """
-    A simple structure class, takes keyword args and assigns them to
-    attributes, e.g:
+    A simple structure class, taking keyword args and assigning them to attributes.
 
+    For instance:
+    
     s = Struct(foo='a',bar=1)
-
     >>> s.foo
     'a'
     >>> s.bar
     1
-    >>>
     """
     def __init__(self,**fields):
         for name,value in fields.items():
@@ -119,6 +123,7 @@ def add_border(matrix,width=1,value=0.0):
 
     temp = join( (vborder,matrix,vborder), axis=1)
     return join( (hborder,temp,hborder) )
+
 
 def flatten(l):
     """
@@ -163,6 +168,7 @@ def compute_response_mdot_py(input_activity, rows, cols, activity, cfs, strength
             a = X*cf.weights
             activity[r,c] = sum(a.flat)
     activity *= strength
+
 
 def compute_response_mdot_c(input_activity, rows, cols, activity, cfs, strength):
     """
@@ -232,6 +238,7 @@ def eval_atof(in_string,default_val = 0):
     except Exception:
         val = default_val
     return val
+
 
 from inspect import ismodule
 def find_classes_in_package(package,parentclass):
