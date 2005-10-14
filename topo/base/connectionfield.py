@@ -1,7 +1,7 @@
 """
 ConnectionField and associated classes.
 
-This module defines three basic classes of objects used to create
+This module defines some basic classes of objects used to create
 simulations of cortical sheets that take input through connection
 fields that project from other cortical sheets (or laterally from
 themselves):
@@ -134,6 +134,53 @@ class ConnectionField(TopoObject):
                 self.normalize_fn(self.weights)
 
 
+### JABALERT!  Is there a way to reduce the complexity of the argument list?
+class CFResponseFunction(TopoObject):
+    """
+    Map an input activity matrix into an output matrix using CFs.
+
+    Objects in this hierarchy of callable function objects compute a
+    response matrix when given an input pattern and a set of
+    ConnectionField objects.  Typically used as part of the activation
+    function for a neuron, computing activation for one Projection.
+
+    Objects in this class must support being called as a function with
+    the arguments specified below, and must return a matrix the same
+    size as the activity matrix supplied.
+    """
+    def __call__(self,input_activity, rows, cols, activity, cfs, strength):
+        raise NotImplementedError
+
+
+class GenericCFResponseFn(CFResponseFunction):
+    """
+    Generic large-scale response function based on a simple single-CF function.
+
+    Applies the single_cf_fn to each CF in turn.  For the default
+    single_cf_fn of mdot, does a basic dot product of each CF with the
+    corresponding slice of the input array.  This function is likely
+    to be slow to run, but it is easy to extend with any arbitrary
+    single-CF response function.
+
+    The single_cf_fn must be a function f(X,W) that takes two
+    identically shaped matrices X (the input) and W (the
+    ConnectionField weights) and computes a scalar activation value
+    based on those weights.
+    """
+    single_cf_fn = Parameter(default=mdot)
+    
+    def __init__(self,**params):
+        super(GenericCFResponseFn,self).__init__(**params)
+
+    def __call__(self,input_activity, rows, cols, activity, cfs, strength):
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+                r1,r2,c1,c2 = cf.slice
+                X = input_activity[r1:r2,c1:c2]
+                activity[r,c] = self.single_cf_fn(X,cf.weights)
+        activity *= strength
+        
 
 class CFProjection(Projection):
     """
