@@ -113,11 +113,10 @@ class TestHistogram(unittest.TestCase):
         self.assertAlmostEqual(sum([value for bin,value in self.g.values()]), 7.0)
 
         self.assertAlmostEqual(self.g.weighted_sum(), 28.0)
-        # should return _weighted_average:
+        # (should return _weighted_average:)
         self.assertAlmostEqual(self.g.weighted_average(), 28.0/sum([value for bin,value in self.g.values()]))
         # Different from lissom's g because this is 0 to 5 where 0 and 5 are the same
         self.assertAlmostEqual(self.g.vector_sum()[1], -0.59550095717251439) 
-        # not relevant
         self.assertAlmostEqual(self.g._vector_average(), self.g.vector_sum()[0]/self.g.num_bins()) 
 
 
