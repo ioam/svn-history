@@ -29,6 +29,8 @@ import testpatterngenerator
 import testmatplotlib
 import testpatternpresent
 import testdistribution
+import testfeaturemap
+
 
 # tk import calls tk/__init__.py which should contain other test
 # imports for that directory.
