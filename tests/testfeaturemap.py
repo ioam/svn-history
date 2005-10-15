@@ -7,7 +7,8 @@ $Id$
 # CEB:
 # This file is still being written
 
-# No test for relative_selectivity(), vector_selectivity()
+# To do:
+# 
 
 
 import unittest
@@ -71,8 +72,8 @@ class TestFeatureMap(unittest.TestCase):
             for j in range(2):
                 self.assertAlmostEqual(self.fm0.map()[i,j], 0.6)
                 self.assertAlmostEqual(self.fm1.map()[i,j], 0.6)
-                self.assertAlmostEqual(self.fm2.map()[i,j], (arg(exp(0.7*2*pi*1j)+exp(0.6*2*pi*1j)))/(2*pi)) 
-                self.assertAlmostEqual(self.fm3.map()[i,j], arg(exp(0.7*2*pi*1j)+exp(0.6*2*pi*1j)))
+                self.assertAlmostEqual(self.fm2.map()[i,j], (arg(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j)))/(2*pi)) 
+                self.assertAlmostEqual(self.fm3.map()[i,j], (arg(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j)))/(2*pi))
 
        
         self.fm0.update(self.a1,0.7)
@@ -82,10 +83,10 @@ class TestFeatureMap(unittest.TestCase):
 
         for i in range(3):
             for j in range(2):
-                self.assertAlmostEqual(self.fm0.map()[i,j], (0.5+2*0.7)/2)
+                self.assertAlmostEqual(self.fm0.map()[i,j], (0.5+2*0.7)/3)
                 self.assertAlmostEqual(self.fm1.map()[i,j], 0.6)
-                self.assertAlmostEqual(self.fm2.map()[i,j], arg(exp(0.7*2*pi*1j)+2*exp(0.6*2*pi*1j)))
-                self.assertAlmostEqual(self.fm3.map()[i,j], arg(exp(0.7*2*pi*1j)+exp(0.6*2*pi*1j)))
+                self.assertAlmostEqual(self.fm2.map()[i,j], (arg(2*exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/(2*pi)))
+                self.assertAlmostEqual(self.fm3.map()[i,j], (arg(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/(2*pi)))
 
                 
         self.a2 = array([[2,2], [2,2], [2,2]])
