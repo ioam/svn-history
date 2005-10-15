@@ -83,6 +83,13 @@ def hebbian(input_activity, unit_activity, weights, alpha):
     weights += alpha * unit_activity * input_activity
 
 
+def divisive_normalization(weights):
+    """Divisively normalize an array to sum to 1.0"""
+    s = sum(weights.flat)
+    if s != 0:
+        factor = 1.0/s
+        weights *= factor
+
 class Struct:
     """
     A simple structure class, taking keyword args and assigning them to attributes.

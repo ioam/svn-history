@@ -25,10 +25,9 @@ import Numeric
 from object import TopoObject
 from projection import Projection,ProjectionSheet,Identity
 from parameter import Parameter, Number, BooleanParameter
-from utils import mdot,hebbian
+from utils import mdot,hebbian,divisive_normalization
 from sheet import Sheet
 from sheetview import UnitView
-from learningrules import divisive_normalization
 
 
 ### JEFF's IMPLEMENTATION NOTES
