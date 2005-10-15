@@ -29,6 +29,7 @@ class LISSOM(CFSheet):
 
     tsettle=8
 
+
     def input_event(self,src,src_port,dest_port,data):
         # On a new afferent input, clear the activity
         if src.name == 'Retina':
@@ -39,6 +40,8 @@ class LISSOM(CFSheet):
 
         super(LISSOM,self).input_event(src,src_port,dest_port,data)
 
+
+    ### JABALERT: Should change to activate() instead
     def pre_sleep(self):
         """
         Pass the accumulated stimulation through self.output_fn and
@@ -123,6 +126,8 @@ class LISSOM(CFSheet):
                 return
         self.warning("Can't find ", name)
 
+    ### JABALERT: Should be able to eliminate this by just providing a 
+    ### convenient way for callers to access projections.
     def change_learning_rate(self, name, new_alpha):
         for proj in self.connections:
             if proj.name == name:
