@@ -79,7 +79,7 @@ def mdot(m1,m2):
 
 
 def hebbian(input_activity, unit_activity, weights, alpha):
-    """Simple Hebbian learning for one single unit."""
+    """Simple Hebbian learning for the weights of one single unit."""
     weights += alpha * unit_activity * input_activity
 
 
