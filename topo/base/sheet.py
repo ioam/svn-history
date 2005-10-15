@@ -286,9 +286,9 @@ class Sheet(EventProcessor):
               [default  (-0.5,-0.5) to (0.5,0.5)]
     density:  The linear density of the sheet [default 100]
 
-    learning: Whether the Sheet should adjust weights based upon
-              incoming events, or should process them without
-              changing any weights.  
+    learning: Setting this to False tells the Sheet not to change its
+              permanent state (e.g. any connection weights) based on
+              incoming events.
 
     sheet_view_dict is a dictionary that stores SheetViews,
     i.e. representations of the sheet for use by analysis or plotting
