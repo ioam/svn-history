@@ -341,8 +341,6 @@ class Simulator(TopoObject):
         proj = projection_type(src=src,dest=dest,src_port=src_port,dest_port=dest_port,delay=delay,**projection_params)
         src._connect_to(proj,**extra_args)
         dest._connect_from(proj,**extra_args)
-        #src._connect_to(dest,src_port,dest_port,delay,**extra_args)
-        #dest._connect_from(src,src_port,dest_port,**extra_args)
 
 
     def get_event_processors(self):
@@ -375,8 +373,7 @@ class EventProcessor(TopoObject):
     Base class for EventProcessors, i.e. objects that can accept and
     handle events.  This base class handles the basic mechanics of
     connections and sending events, and store both incoming and outgoing
-    connections. It also stores the EP's dictionaries of outgoing 
-    connections indexed by output port.
+    connections. 
     """
     def __init__(self,**config):
         super(EventProcessor,self).__init__(**config)
@@ -385,7 +382,7 @@ class EventProcessor(TopoObject):
         # output port refers to a list of EPConnection objects with that 
         # output port.
         
-        self.connections = {None:[]}
+        self.connections = []
 
         # The simulator link is not set until the call to add()
         self.simulator = None
@@ -398,10 +395,10 @@ class EventProcessor(TopoObject):
         parameters that can be interpreted by EP subclasses as
         needed.  
         """
-        if not proj.src_port in self.connections:
-            self.connections[proj.src_port] = []
 
-        self.connections[proj.src_port].append(proj)
+        # connections contain unique projections, even for self-projections
+	if proj not in self.connections:
+            self.connections.append(proj)
 
 
     def _connect_from(self,proj,**args):
@@ -412,7 +409,9 @@ class EventProcessor(TopoObject):
         parameters that can be interpreted by EP subclasses as
         needed.  
         """
-        pass
+
+	if proj not in self.connections:
+            self.connections.append(proj)
 
     def start(self):
         """
@@ -425,8 +424,9 @@ class EventProcessor(TopoObject):
         """
         Send some data out to all connections on the given src_port.
         """
-        for proj in self.connections[src_port]:
-            self.simulator.enqueue_event_rel(proj.delay,self,proj.dest,proj.src_port,proj.dest_port,data)
+        for proj in self.connections:
+            if proj.src is self and proj.src_port == src_port:
+                self.simulator.enqueue_event_rel(proj.delay,self,proj.dest,proj.src_port,proj.dest_port,data)
 
     def input_event(self,src,src_port,dest_port,data):
         """

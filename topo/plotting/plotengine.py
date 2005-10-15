@@ -188,7 +188,7 @@ class PlotEngine(TopoObject):
             if not isinstance(s,CFSheet):
                 self.warning('Requested weights view from other than CFSheet.')
             else:
-                for p in set(flatten(s.projections.values())):
+                for p in s.connections:
                     key = ('Weights',sheet_target,p.name,sheet_x,sheet_y)
                     v = p.src.sheet_view(key)
                     if v: projection_list += [(s,p,each) for each in v if each.projection.name == p.name]
@@ -274,7 +274,7 @@ class PlotEngine(TopoObject):
         if not isinstance(s,CFSheet):
             self.warning('Requested weights view from other than CFSheet.')
         else:
-            for p in set(flatten(s.projections.values())):
+            for p in s.connections:
                 key = ('Weights',sheet_target,p.name,sheet_x,sheet_y)
                 v = p.src.sheet_view(key)
                 if v:

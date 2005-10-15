@@ -77,7 +77,7 @@ class Projection(EPConnection):
 
 class ProjectionSheet(Sheet):
     """
-    A Sheet whose activity is computed using projections from other sheets.
+    A Sheet whose activity is computed using connections from other sheets.
 
     A standard ProjectionSheet expects its input to be generated from
     other Sheets. Upon receiving an input event, the ProjectionSheet
@@ -123,16 +123,8 @@ class ProjectionSheet(Sheet):
                              
     def __init__(self,**params):
         super(ProjectionSheet,self).__init__(**params)
-        self.projections = {}
         self.new_input = False
 
-    ### JABHACKALERT!
-    ###
-    ### What's the projections list for?  Isn't it redundant with
-    ### the connections list?  Seems like that's a relic from
-    ### back when projections were not a subclass of EPConnection.
-    ### This implementation needs to be cleaned up and unified with
-    ### the corresponding implementation in EventProcessor.
     def _connect_from(self, proj, **args):
         """
         Accept a connection from src, on src_port, for dest_port.
@@ -141,9 +133,6 @@ class ProjectionSheet(Sheet):
         """
         
         Sheet._connect_from(self,proj,**args)
-        if proj.src.name not in self.projections:
-            self.projections[proj.src.name] = []
-        self.projections[proj.src.name].append(proj)
 
     def input_event(self,src,src_port,dest_port,data):
         """
@@ -163,8 +152,8 @@ class ProjectionSheet(Sheet):
         If learning is enabled, also calls learn().
         """
         self.activity *= 0.0
-        for name in self.projections:
-            for proj in self.projections[name]:
+        for proj in self.connections:
+            if proj.dest is self:
                 self.activity+= proj.activity
         self.activity = self.output_fn(self.activity)
         self.send_output(data=self.activity)
@@ -192,31 +181,30 @@ class ProjectionSheet(Sheet):
 
     def present_input(self,input_activity,input_sheet,dest_port):
         """
-        Provide the given input_activity to all projections from the
+        Provide the given input_activity to all connections from the
         given input_sheet, asking each one to compute its activity.
         The sheet's own activity is not calculated until activite()
         is called.
         """
         rows,cols = self.activity.shape
 
-        for proj in self.projections[input_sheet.name]:
-            if proj.dest_port == dest_port:
+        for proj in self.connections:
+            if proj.src == input_sheet and proj.dest_port == dest_port:
                 proj.activate(input_activity,rows,cols)
 		break
 
     def get_projection_by_name(self,tname):
         """
         More often than not, a Projection is requested by name from a
-        sheet, rather than by the location in the projections list.
+        sheet, rather than by the location in the connections list.
         This code hides the complex reverse addressing necessary.
         Always returns a list in case of multiple name hits, but the
-        list may be empty if no projections have a name matching the
+        list may be empty if no connections have a name matching the
         one passed in as t(arget)name.
         """
         
-        prjns = [p for name in self.projections
-                       for p in self.projections[name]
-                           if p.name == tname]
+        prjns = [p for p in self.connections
+                            if p.name == tname]
         return prjns
 
 

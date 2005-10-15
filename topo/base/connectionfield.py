@@ -12,7 +12,7 @@ CFProjection: A set of ConnectionFields mapping from a Sheet into a
 ProjectionSheet.
 
 CFSheet: A subclass of ProjectionSheet that provides an interface to
-the underlying ConnectionFields in any CFProjection projections.
+the underlying ConnectionFields in any CFProjection connections.
 
 $Id$
 """
@@ -274,7 +274,7 @@ class CFSheet(ProjectionSheet):
         Can return multiple UnitView objects.
         """
         from itertools import chain
-        views = [p.get_view(x,y) for p in chain(*self.projections.values())]
+        views = [p.get_view(x,y) for p in self.connections]
 
         # Delete previous entry if it exists.  Allows appending in next block.
         for v in views:

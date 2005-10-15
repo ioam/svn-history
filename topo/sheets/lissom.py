@@ -33,8 +33,8 @@ class LISSOM(CFSheet):
         # On a new afferent input, clear the activity
         if src.name == 'Retina':
             self.activity *= 0.0
-            for name in self.projections:
-                for proj in self.projections[name]:
+            for proj in self.connections:
+                if proj.dest is self:
                     proj.activity *= 0.0
 
         super(LISSOM,self).input_event(src,src_port,dest_port,data)
@@ -54,8 +54,8 @@ class LISSOM(CFSheet):
         if self.new_input:
             self.new_input = False
             self.activity *= 0.0
-            for name in self.projections:
-                for proj in self.projections[name]:
+            for proj in self.connections:
+                if proj.dest is self:
                     self.activity += proj.activity
             self.activity = self.output_fn(self.activity)
 
@@ -74,8 +74,8 @@ class LISSOM(CFSheet):
 
     def learn(self):
         rows,cols = self.activity.shape
-        for proj in chain(*self.projections.values()):
-            if proj.input_buffer:
+        for proj in self.connections:
+            if proj.input_buffer and proj.dest is self:
                 alpha = proj.learning_rate
                 if proj.src == self: #lateral connection
                     inp = self.activity
@@ -111,20 +111,20 @@ class LISSOM(CFSheet):
                                 proj.normalize_fn(cf.weights)
 
 
-    def lateral_projections(self):
-        return [p for p in chain(*self.projections.values()) if p.src is self]
-    def afferent_projections(self):
-        return [p for p in chain(*self.projections.values()) if p.src is not self]
+    def lateral_connections(self):
+        return [p for p in self.connections if p.src is self]
+    def afferent_connections(self):
+        return [p for p in self.connections if p.src is not self]
 
     def reduce_cfsize(self, name, new_wt_bounds):
-        for proj in chain(*self.projections.values()):
+        for proj in self.connections:
             if proj.name == name:
                 proj.reduce_cfsize(new_wt_bounds)
                 return
         self.warning("Can't find ", name)
 
     def change_learning_rate(self, name, new_alpha):
-        for proj in chain(*self.projections.values()):
+        for proj in self.connections:
             if proj.name == name:
                 proj.learning_rate = new_alpha
                 return
@@ -133,6 +133,6 @@ class LISSOM(CFSheet):
 
     # print the weights of a unit
     def printwts(self,x,y):
-        for proj in chain(*self.projections.values()):
+        for proj in self.connections:
             print proj.name, x, y
             print transpose(proj.cfs[x][y].weights)

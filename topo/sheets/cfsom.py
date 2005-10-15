@@ -67,13 +67,12 @@ class CFSOM(CFSheet):
         for r in range(rmin,rmax):
             for c in range(cmin,cmax):
                 lattice_dist = L2norm((wc-c,wr-r))
-                for proj_list in self.projections.values():
-                    for proj in proj_list:
-                        if  lattice_dist <= radius:
-                            cf = proj.cf(r,c)
-                            rate = self.alpha() * gaussian(lattice_dist,radius)
-                            X = cf.get_input_matrix(proj.input_buffer)
-                            cf.weights += rate * (X - cf.weights)
+                for proj in self.connections:
+                    if lattice_dist <= radius:
+                        cf = proj.cf(r,c)
+                        rate = self.alpha() * gaussian(lattice_dist,radius)
+                        X = cf.get_input_matrix(proj.input_buffer)
+                        cf.weights += rate * (X - cf.weights)
                                    
 
 
