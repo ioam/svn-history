@@ -72,7 +72,7 @@ def hebbian_div_norm_c(input_activity, self_activity, rows, cols, len, cfs, alph
         }
     """
     
-    weave.inline(hebbian_div_norm_code, ['input_activity', 'self_activity', 'rows', 'cols', 'len', 'cfs', 'alpha'])
+    weave.inline(hebbian_div_norm_code, ['input_activity', 'self_activity', 'rows', 'cols', 'len', 'cfs', 'alpha'], extra_link_args=['-lstdc++'])
 
 
 
@@ -129,7 +129,7 @@ def hebbian_c(input_activity, self_activity, rows, cols, len, cfs, alpha):
         }
     """
     
-    weave.inline(hebbian_code, ['input_activity', 'self_activity', 'rows', 'cols', 'len', 'cfs', 'alpha'])
+    weave.inline(hebbian_code, ['input_activity', 'self_activity', 'rows', 'cols', 'len', 'cfs', 'alpha'], extra_link_args=['-lstdc++'])
 
 
 

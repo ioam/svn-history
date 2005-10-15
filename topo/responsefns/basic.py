@@ -91,5 +91,5 @@ class CFDotProduct(CFResponseFunction):
             }
         """
     
-        weave.inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'])
+        weave.inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], extra_link_args=['-lstdc++'])
 
