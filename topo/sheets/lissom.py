@@ -13,14 +13,14 @@ import topo
 
 from topo.base.connectionfield import CFSheet
 from topo.base.parameter import Parameter
-from topo.base.learningrules import hebbian_c,hebbian_div_norm_c
 from topo.outputfns.basic import PiecewiseLinear
+from topo.learningfns.basic import DivisiveHebbian,GenericCFLF
 
 class LISSOM(CFSheet):
 
     # Should be changed to a OutputFunctionParameter
     output_fn = Parameter(default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
-    learning_fn = Parameter(default=hebbian_c)
+    learning_fn = Parameter(default=DivisiveHebbian())
 
     # modify weights after each activation?
     continuous_learning = Parameter(default=False)
@@ -75,43 +75,22 @@ class LISSOM(CFSheet):
                     self.learn()
                     
 
+    ### JABHACKALERT! Can this function now be moved to the base class?
+    ### I.e., is there anything LISSOM-specific about it now?
     def learn(self):
         rows,cols = self.activity.shape
         for proj in self.connections:
             if proj.input_buffer and proj.dest is self:
                 alpha = proj.learning_rate
+                ### JABHACKALERT!  Why is this test necessary?
                 if proj.src == self: #lateral connection
                     inp = self.activity
                 else:
                     inp = proj.input_buffer
 
-                if self.learning_fn.func_name == "hebbian_c":
-                    # hebbian_c is an function for the whole sheet
-                    cfs = proj.cfs
-                    len, len2 = inp.shape
-		    if proj.normalize:
-                        # Hebbian learning with divisive normalization per 
-                        # projection. It is much faster to do both of them
-                        # in one function.
-			if proj.normalize_fn.func_name == "divisive_normalization":
-                            hebbian_div_norm_c(inp, self.activity, rows, cols, len, cfs, alpha)
-                        else:
-                            hebbian_c(inp, self.activity, rows, cols, len, cfs, alpha)
-			    norm = proj.normalize
-                            for r in range(rows):
-                                for c in range(cols):
-                                    proj.normalize_fn(cfs[r][c].weights)
-                    else:
-                        hebbian_c(inp, self.activity, rows, cols, len, cfs, alpha)
-                else:
-                    # apply learning rule and normalization to each unit
-                    norm = proj.normalize
-                    for r in range(rows):
-                        for c in range(cols):
-                            cf = proj.cf(r,c)
-                            self.learning_fn(cf.get_input_matrix(inp), self.activity[r,c], cf.weights, alpha)
-                            if norm:
-                                proj.normalize_fn(cf.weights)
+                cfs = proj.cfs
+                len, len2 = inp.shape
+                self.learning_fn(inp, self.activity, rows, cols, len, cfs, alpha)
 
 
     def lateral_connections(self):
