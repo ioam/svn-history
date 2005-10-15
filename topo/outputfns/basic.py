@@ -23,6 +23,9 @@ from topo.base.projection import OutputFunction
 from topo.base.projection import Identity
 
 
+### JABALERT!  Consider fixing these functions to modify their argument
+### in place, to avoid creating temporaries.
+
 class PiecewiseLinear(OutputFunction):
     """ 
     Piecewise-linear output function with lower and upper thresholds
@@ -46,7 +49,7 @@ class DivisiveL1Normalize(OutputFunction):
 
     This operation keeps an array at a specified norm_value, rescaling
     each value to make this true.  The array is unchanged if the sum
-    is zero.  This operation also keeps 
+    is zero.
     """
     norm_value = Number(default=1.0)
     

@@ -25,8 +25,9 @@ class OutputFunction(TopoObject):
     one argument, typically a matrix, and return a matrix of the same
     size.  If implemented using Numeric functions, subclasses of this
     class should also work for scalars.  For matrix or other mutable
-    objects, the value returned from the function will also be returned
-    by modifying the argument x.
+    objects, the argument x may be modified by the call to this function,
+    and is not currently guaranteed to have the same value as the one
+    returned by this function.
     """
     def __call__(self,x):
         raise NotImplementedError
@@ -121,7 +122,7 @@ class ProjectionSheet(Sheet):
     """
 
     # Should be changed to a OutputFunctionParameter
-    output_fn  = Parameter(default=Identity())
+    output_fn = Parameter(default=Identity())
                              
     def __init__(self,**params):
         super(ProjectionSheet,self).__init__(**params)
