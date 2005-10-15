@@ -269,11 +269,11 @@ class BooleanParameter(Parameter):
     
   def __set__(self,obj,val):
     if not isinstance(val,bool):
+        raise "BooleanParameter only takes a Boolean value."
 
-      raise "BooleanParameter only takes a Boolean value."
     if val != True and val != False:
-
         raise "BooleanParameter must be True or False"
+
     super(BooleanParameter,self).__set__(obj,val)
 
 
@@ -291,6 +291,14 @@ class Dynamic(Parameter):
     return result
 
 
+class Constant(Parameter):
+  """Constant Parameter that can be constructed and used but not set."""
+  def __set__(self,obj,val):
+    """Does not allow set commands."""
+    raise "Constant parameter cannot be modified"
+
+
+### JABALERT! Should this be replaced with simply ValueError?
 class _NumberBoundsException(Exception):
   """
   This exception should be raised when there is an attempt
