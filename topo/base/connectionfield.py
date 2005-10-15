@@ -23,9 +23,9 @@ __version__ = '$Revision$'
 import Numeric
 
 from object import TopoObject
-from projection import Projection,ProjectionSheet
+from projection import Projection,ProjectionSheet,Identity
 from parameter import Parameter, Number, BooleanParameter
-from utils import mdot
+from utils import mdot,hebbian
 from sheet import Sheet
 from sheetview import UnitView
 from learningrules import divisive_normalization
@@ -108,6 +108,8 @@ class ConnectionField(TopoObject):
 
         return activity[r1:r2,c1:c2]
 
+    ### JABHACKALERT! Need to figure out how to handle the normalization
+    ### here once the learning functions handle that internally.
     def reduce_radius(self, new_wt_bounds):
         """
         Reduce the radius of an existing connection field. Weights are copied
@@ -181,6 +183,54 @@ class GenericCFResponseFn(CFResponseFunction):
                 activity[r,c] = self.single_cf_fn(X,cf.weights)
         activity *= strength
         
+
+### JABALERT!  Is there a way to reduce the complexity of the argument list?
+### E.g. the alpha should be made into a member variable.
+class CFLearningFunction(TopoObject):
+    """
+    Compute new CFs based on input and output activity values.
+
+    Objects in this hierarchy of callable function objects compute a
+    new set of CFs when given input and output patterns and a set of
+    ConnectionField objects.  Typically used for updating the weights
+    of one CFProjection.
+
+    Objects in this class must support being called as a function with
+    the arguments specified below.
+    """
+    def __call__(self,input_activity, self_activity, rows, cols, len, cfs, alpha):
+        raise NotImplementedError
+
+
+class IdentityCFLF(CFLearningFunction):
+    """CFLearningFunction performing no learning."""
+
+    ### JABALERT! Can this function be omitted entirely?
+    def __init__(self,**params):
+        super(IdentityCFLF,self).__init__(**params)
+
+    def __call__(self, input_activity, self_activity, rows, cols, len, cfs, alpha):
+        pass
+
+
+### JABALERT! Untested.
+class GenericCFLF(CFLearningFunction):
+    """CFLearningFunction applying the specified single_cf_fn to each CF."""
+    single_cf_fn = Parameter(default=hebbian)
+    output_fn = Parameter(default=Identity())
+    
+    def __init__(self,**params):
+        super(GenericCFLF,self).__init__(**params)
+
+    def __call__(self,input_activity, self_activity, rows, cols, len, cfs, alpha):
+        """Apply the specified learn_fn to every CF."""
+        for r in range(rows):
+            for c in range(cols):
+                cf = cfs[r][c]
+                self.single_cf_fn(cf.get_input_matrix(input_activity),
+                                  self_activity[r,c], cf.weights, alpha)
+                cfs[r][c].weights=self.output_fn(cf.weights)
+                
 
 class CFProjection(Projection):
     """
