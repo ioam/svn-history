@@ -51,7 +51,7 @@ class CFSOM(CFSheet):
 
     ### JABHACKALERT!
     ###
-    ### Would it make sense to move any of this to learningrules.py?  If not, document why not.
+    ### Would it make sense to move any of this to learningfns/?  If not, document why not.
     def learn(self):
 
         rows,cols = self.activity.shape
