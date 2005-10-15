@@ -17,12 +17,12 @@ from topo.plotting.plot import PlotTemplate
 from topo.base import simulator
 import topo.base.registry
 import topo.plotting.plotengine
-import topo.base.object
+import topo.base.topoobject
 
 KNOWN_FILETYPES = [('Python Files','*.py'),('Topographica Files','*.ty'),('All Files','*')]
 
 
-class PlotsMenuEntry(topo.base.object.TopoObject):
+class PlotsMenuEntry(topo.base.topoobject.TopoObject):
     """
     Use these objects to populate the TopoConsole Plots pulldown.  The
     pulldown requires a name and a function to call when the item is

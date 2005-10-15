@@ -14,7 +14,7 @@ import Pmw, re, os, sys
 from Tkinter import Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar
 import topo
-import topo.base.object
+import topo.base.topoobject
 import topo.plotting.bitmap
 import topo.base.simulator as simulator
 import topo.plotting.plotengine as plotengine
@@ -30,7 +30,7 @@ NYI = "Not Yet Implemented."
 
 def enum(seq):  return zip(range(len(seq)),seq)
 
-class PlotPanel(Frame,topo.base.object.TopoObject):
+class PlotPanel(Frame,topo.base.topoobject.TopoObject):
     """
     Abstract PlotPanel class for displaying bitmapped images to a TK
     GUI window.  Must be subclassed to be usable.

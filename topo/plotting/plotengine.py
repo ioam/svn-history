@@ -56,7 +56,7 @@ $Id$
 ### substantial changes.
 
 from copy import deepcopy
-from topo.base.object import TopoObject
+from topo.base.topoobject import TopoObject
 from topo.base.utils import flatten
 from plot import Plot, SHC,HSV,RGB,COLORMAP
 from plotgroup import *

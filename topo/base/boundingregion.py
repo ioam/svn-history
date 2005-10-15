@@ -12,7 +12,7 @@ $Id$
 ###
 from parameter import Parameter
 from Numeric import *
-from object import TopoObject
+from topoobject import TopoObject
 
 NYI = "Abstract method not implemented."
 

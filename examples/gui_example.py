@@ -35,7 +35,7 @@ CFSOM.radius_0 = 0.1
 
 KernelProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 
-#topo.base.object.min_print_level = topo.base.object.MESSAGE
+#topo.base.topoobject.min_print_level = topo.base.topoobject.MESSAGE
 
 
 ###########################################

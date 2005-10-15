@@ -46,7 +46,7 @@ import types
 
 from Numeric import zeros, ones, Float, divide
 
-from topo.base.object import TopoObject
+from topo.base.topoobject import TopoObject
 from topo.base.utils import flatten
 from topo.base.sheetview import *
 from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND

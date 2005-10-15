@@ -15,7 +15,7 @@ topo.sheets.cfsom and currently (9/2005) residing in topo.image
 $Id$
 """
 import topo
-import topo.base.object
+import topo.base.topoobject
 import plotengine
 import topo.base.registry
 from topo.base.utils import *
@@ -25,7 +25,7 @@ from topo.base.utils import *
 ### Not yet properly implemented; all the code in this file needs to
 ### be either implemented or removed.
 
-class PlotFileSaver(topo.base.object.TopoObject):
+class PlotFileSaver(topo.base.topoobject.TopoObject):
     def __init__(self,**config):
         super(PlotFileSaver,self).__init__(**config)
         self.sim = topo.base.registry.active_sim()

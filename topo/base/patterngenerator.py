@@ -26,7 +26,7 @@ $Id$
 ###
 ### Should eliminate all "import *" commands if at all possible.
 import types
-from object import TopoObject
+from topoobject import TopoObject
 from boundingregion import BoundingBox
 from sheet import sheet2matrix, matrix2sheet, bounds2shape
 from Numeric import *

@@ -10,7 +10,7 @@ NOTE: It may be reasonable to reorganize the functions into some form
 of object.
 """
 
-from topo.base.object import TopoObject
+from topo.base.topoobject import TopoObject
 import topo.base.simulator
 import topo.base.registry
 from topo.sheets.generatorsheet import GeneratorSheet

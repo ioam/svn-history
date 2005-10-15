@@ -68,7 +68,7 @@ $Id$
 
 
 import sched
-from object import TopoObject
+from topoobject import TopoObject
 from parameter import Parameter
 from copy import copy, deepcopy
 import registry

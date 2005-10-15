@@ -25,8 +25,8 @@ class TestActivityPanel(unittest.TestCase):
         """
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 30
-#        base.print_level = topo.base.object.WARNING
-#        GeneratorSheet.print_level = topo.base.object.WARNING
+#        base.print_level = topo.base.topoobject.WARNING
+#        GeneratorSheet.print_level = topo.base.topoobject.WARNING
         
         GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -38,7 +38,7 @@ class TestActivityPanel(unittest.TestCase):
         ###########################################
         # build simulation
         
-#        topo.base.object.min_print_level = topo.base.object.WARNING
+#        topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
         
         self.s = Simulator()
         self.s.verbose("Creating simulation objects...")
@@ -62,7 +62,7 @@ class TestActivityPanel(unittest.TestCase):
         sheetG = Sheet()
         sheetB = Sheet()
         retina = GeneratorSheet(input_generator=GaussianGenerator())
-        retina.print_level = topo.base.object.WARNING
+        retina.print_level = topo.base.topoobject.WARNING
 
         # For a new sheet_group named Miata:
         sviewR = SheetView((self.ra,BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))))
@@ -90,8 +90,8 @@ class TestActivityPanel(unittest.TestCase):
         """
         Test the creation the widgets
         """
-        topo.base.object.min_print_level = topo.base.object.WARNING
-        BasicPlotPanel.print_level = topo.base.object.WARNING
+        topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
+        BasicPlotPanel.print_level = topo.base.topoobject.WARNING
 
         root = Tkinter.Tk()
         root.resizable(1,1)

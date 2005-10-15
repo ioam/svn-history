@@ -25,7 +25,7 @@ import preferencemappanel
 import Pmw, sys, Tkinter
 import topo.base.simulator
 import topo.base.registry
-import topo.base.object
+import topo.base.topoobject
 
 def show_cmd_prompt():
     """
@@ -34,7 +34,7 @@ def show_cmd_prompt():
     so as to let the user know that the command-line is still
     active.
     """
-    if topo.base.object.min_print_level >= topo.base.object.MESSAGE:
+    if topo.base.topoobject.min_print_level >= topo.base.topoobject.MESSAGE:
         print "\n", sys.ps1,
         sys.stdout.flush()
     

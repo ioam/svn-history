@@ -9,7 +9,7 @@ import Numeric
 from sheet import Sheet
 from parameter import Parameter, Number
 from simulator import EPConnection
-from object import TopoObject
+from topoobject import TopoObject
 
 
 class OutputFunction(TopoObject):

@@ -8,7 +8,7 @@ import unittest
 from topo.sheets.cfsom import CFSOM
 from pprint import pprint
 from topo.plotting import plot
-from topo.base import object
+from topo.base import topoobject
 from topo.plotting.bitmap import *
 from topo.base.sheet import Sheet
 from topo.sheets.generatorsheet import *
@@ -62,7 +62,7 @@ class TestCFSom(unittest.TestCase):
         # input generation params
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 30
-        GeneratorSheet.print_level = topo.base.object.WARNING
+        GeneratorSheet.print_level = topo.base.topoobject.WARNING
         
         GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))        
@@ -80,7 +80,7 @@ class TestCFSom(unittest.TestCase):
         ###########################################
         # build simulation
         
-        topo.base.object.min_print_level = topo.base.object.WARNING
+        topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
       
         s = Simulator()
         s.verbose("Creating simulation objects...")
@@ -89,10 +89,10 @@ class TestCFSom(unittest.TestCase):
         # Old form
         #retina = GaussianSheet(name='Retina')
         V1 = CFSOM(name='V1')
-        V1.print_level = topo.base.object.WARNING
+        V1.print_level = topo.base.topoobject.WARNING
 
         s.connect(retina,V1,delay=1,projection_type=KernelProjection,projection_params={'name':'RtoV1'})
-        s.print_level = topo.base.object.WARNING
+        s.print_level = topo.base.topoobject.WARNING
 
         self.assertTrue(len(V1.get_projection_by_name('RtoV1')) == 1)
         self.assertTrue(len(V1.get_projection_by_name('R1toV1')) == 0)

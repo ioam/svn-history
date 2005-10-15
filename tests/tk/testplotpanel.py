@@ -30,8 +30,8 @@ class TestPlotPanel(unittest.TestCase):
         """
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 30
-#        base.print_level = topo.base.object.WARNING
-#        GeneratorSheet.print_level = topo.base.object.WARNING
+#        base.print_level = topo.base.topoobject.WARNING
+#        GeneratorSheet.print_level = topo.base.topoobject.WARNING
         
         GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -43,7 +43,7 @@ class TestPlotPanel(unittest.TestCase):
         ###########################################
         # build simulation
         
-#        topo.base.object.min_print_level = topo.base.object.WARNING
+#        topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
         
         self.s = Simulator()
         self.s.verbose("Creating simulation objects...")
@@ -67,7 +67,7 @@ class TestPlotPanel(unittest.TestCase):
         sheetG = Sheet()
         sheetB = Sheet()
         retina = GeneratorSheet(input_generator=GaussianGenerator())
-        retina.print_level = topo.base.object.WARNING
+        retina.print_level = topo.base.topoobject.WARNING
 
         # For a new sheet_group named Miata:
         sviewR = SheetView((self.ra,BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))))
@@ -98,8 +98,8 @@ class TestPlotPanel(unittest.TestCase):
         Here, we're not interested in the Activity plots, but we are
         interested in the weights of the receptive fields.
         """
-        topo.base.object.min_print_level = topo.base.object.WARNING
-        topo.tk.plotpanel.PlotPanel.print_level = topo.base.object.WARNING
+        topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
+        topo.tk.plotpanel.PlotPanel.print_level = topo.base.topoobject.WARNING
         # input generation params
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 30
@@ -120,12 +120,12 @@ class TestPlotPanel(unittest.TestCase):
         s = topo.base.simulator.Simulator()
         
         retina = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina')
-        retina.print_level = topo.base.object.WARNING
+        retina.print_level = topo.base.topoobject.WARNING
         V1 = CFSOM(name='V1')
-        V1.print_level = topo.base.object.WARNING
+        V1.print_level = topo.base.topoobject.WARNING
         
         s.connect(retina,V1,delay=1)
-        s.print_level = topo.base.object.WARNING
+        s.print_level = topo.base.topoobject.WARNING
         
         s.run(1)
 

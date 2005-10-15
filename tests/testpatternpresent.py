@@ -11,7 +11,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.sheets.cfsom import CFSOM
 from topo.patterns.random import UniformRandomGenerator
 from topo.projections.kernelprojection import KernelProjection
-import topo.base.object
+import topo.base.topoobject
 from math import pi
 from topo.patterns.patternpresent import pattern_present
 
@@ -29,7 +29,7 @@ class TestPatternPresent(unittest.TestCase):
         CFSOM.learning_length = 10000
         CFSOM.radius_0 = 0.1
         KernelProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
-        topo.base.object.min_print_level = topo.base.object.MESSAGE
+        topo.base.topoobject.min_print_level = topo.base.topoobject.MESSAGE
         s = topo.base.simulator.Simulator()
         retina = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina')
         retina2 = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina2')

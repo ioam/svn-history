@@ -15,7 +15,7 @@ $Id$
 ### substantial changes.
 
 import types
-from topo.base.object import TopoObject
+from topo.base.topoobject import TopoObject
 from topo.base.utils import flatten
 from topo.base.keyedlist import KeyedList
 import bitmap

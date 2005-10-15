@@ -9,7 +9,7 @@ import unittest
 from pprint import pprint
 from math import pi
 from topo.plotting import plot
-from topo.base import object
+from topo.base import topoobject
 from topo.plotting.bitmap import *
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
@@ -101,10 +101,10 @@ class TestPlotEngine(unittest.TestCase):
         ###########################################
         # build simulation
         
-        topo.base.object.min_print_level = topo.base.object.WARNING
+        topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
         
         s = Simulator()
-        s.print_level = topo.base.object.WARNING
+        s.print_level = topo.base.topoobject.WARNING
         s.verbose("Creating simulation objects...")
 
         # Uses testbitmap.jpg.
@@ -126,7 +126,7 @@ class TestPlotEngine(unittest.TestCase):
         sheetG = Sheet()
         sheetB = Sheet()
         retina = GeneratorSheet(input_generator=GaussianGenerator())
-        retina.print_level = topo.base.object.WARNING
+        retina.print_level = topo.base.topoobject.WARNING
 
 
         # For a new sheet_group named Miata:

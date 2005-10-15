@@ -4,7 +4,7 @@ a 2D matrix of data.
 
 $Id$
 """
-from topo.base.object import *
+from topo.base.topoobject import *
 import types
 
 

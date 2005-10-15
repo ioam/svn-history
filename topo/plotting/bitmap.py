@@ -49,7 +49,7 @@ from colorsys import rgb_to_hsv, hsv_to_rgb
 import Numeric, Image, math
 from Numeric import Float
 from topo.base.parameter import Parameter
-import topo.base.object
+import topo.base.topoobject
 import MLab
 
 # Background type.  Decides to fill dead areas with 0s or with 1s
@@ -78,7 +78,7 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     ## This code should never be seen.  It means that calling code did
     ## not take the precaution of clipping the input matrices.
     if max(rmat.flat) > 1 or max(gmat.flat) > 1 or max(bmat.flat) > 1:
-        topo.base.object.TopoObject().warning('HSVMap inputs exceed 1. Clipping to 1.0')
+        topo.base.topoobject.TopoObject().warning('HSVMap inputs exceed 1. Clipping to 1.0')
         if max(rmat.flat) > 0: rmat = MLab.clip(rmat,0.0,1.0)
         if max(gmat.flat) > 0: gmat = MLab.clip(gmat,0.0,1.0)
         if max(bmat.flat) > 0: bmat = MLab.clip(bmat,0.0,1.0)
@@ -123,7 +123,7 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     
 
 
-class Bitmap(topo.base.object.TopoObject):
+class Bitmap(topo.base.topoobject.TopoObject):
     """
     Wrapper class for the PIL Image class.  Only slightly hides PILs extra
     functionality since the encapsulated Image (self.bitmap) can be accessed
@@ -243,7 +243,7 @@ class HSVMap(Bitmap):
         ## This code should never be seen.  It means that calling code did
         ## not take the precaution of clipping the input matrices.
         if max(hFlat) > 1 or max(sFlat) > 1 or max(vFlat) > 1:
-            topo.base.object.TopoObject().warning('HSVMap inputs exceed 1. Clipping to 1.0')
+            topo.base.topoobject.TopoObject().warning('HSVMap inputs exceed 1. Clipping to 1.0')
             if max(hFlat) > 0: hFlat = MLab.clip(hFlat,0.0,1.0)
             if max(sFlat) > 0: sFlat = MLab.clip(sFlat,0.0,1.0)
             if max(vFlat) > 0: vFlat = MLab.clip(vFlat,0.0,1.0)
@@ -285,7 +285,7 @@ class RGBMap(Bitmap):
         ## This code should never be seen.  It means that calling code did
         ## not take the precaution of clipping the input matrices.
         if max(rMapArray.flat) > 1 or max(gMapArray.flat) > 1 or max(bMapArray.flat) > 1:
-            topo.base.object.TopoObject().warning('RGBMap inputs exceed 1. Clipping to 1.0')
+            topo.base.topoobject.TopoObject().warning('RGBMap inputs exceed 1. Clipping to 1.0')
             rMapArray = MLab.clip(rMapArray,0.0,1.0)
             gMapArray = MLab.clip(gMapArray,0.0,1.0)
             bMapArray = MLab.clip(bMapArray,0.0,1.0)

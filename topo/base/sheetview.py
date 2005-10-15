@@ -15,7 +15,7 @@ import types
 import operator
 
 import sheet
-from object import TopoObject
+from topoobject import TopoObject
 
 ### JABHACKALERT!
 ###

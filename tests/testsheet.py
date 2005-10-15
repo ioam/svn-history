@@ -7,7 +7,7 @@ $Id$
 import unittest
 import topo
 from topo.base.sheet import *
-import topo.base.object
+import topo.base.topoobject
 import Numeric
 from topo.base import boundingregion
 
@@ -56,13 +56,13 @@ class TestCoordinateTransforms(unittest.TestCase):
         sview = s.sheet_view()
         sview = s.sheet_view('Activity')
         log_level = s.print_level
-        minlog_level = topo.base.object.min_print_level
+        minlog_level = topo.base.topoobject.min_print_level
 
-        s.print_level = topo.base.object.SILENT
-        topo.base.object.min_print_level = topo.base.object.SILENT
+        s.print_level = topo.base.topoobject.SILENT
+        topo.base.topoobject.min_print_level = topo.base.topoobject.SILENT
         s.sheet_view('Orientation')
         s.print_level = log_level
-        topo.base.object.min_print_level = minlog_level
+        topo.base.topoobject.min_print_level = minlog_level
 
         s.add_sheet_view('Orientation',sview)
         sview = s.sheet_view('Orientation')

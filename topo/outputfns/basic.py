@@ -14,7 +14,7 @@ $Id$
 
 import Numeric
 from Numeric import clip
-from topo.base.object import TopoObject
+from topo.base.topoobject import TopoObject
 from topo.base.parameter import Number
 from topo.base.utils import L2norm,norm
 from topo.base.projection import OutputFunction

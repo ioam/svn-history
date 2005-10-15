@@ -30,7 +30,7 @@ from topo.base.simulator import Simulator
 #################################################
 # Set class parameter defaults
 
-topo.base.object.print_level = topo.base.object.DEBUG
+topo.base.topoobject.print_level = topo.base.topoobject.DEBUG
 
 Simulator.step_mode = True
 

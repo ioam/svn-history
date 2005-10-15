@@ -22,7 +22,7 @@ __version__ = '$Revision$'
 
 import Numeric
 
-from object import TopoObject
+from topoobject import TopoObject
 from projection import Projection,ProjectionSheet,Identity
 from parameter import Parameter, Number, BooleanParameter
 from utils import mdot,hebbian,divisive_normalization

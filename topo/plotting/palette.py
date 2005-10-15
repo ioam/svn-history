@@ -39,7 +39,7 @@ etc.
 
 $Id$
 """
-from topo.base.object import TopoObject
+from topo.base.topoobject import TopoObject
 from topo.base.parameter import Dynamic
 from bitmap import BLACK_BACKGROUND, WHITE_BACKGROUND
 import plot

@@ -7,7 +7,7 @@ __version__ = "$Revision$"
 
 import weave
 
-from topo.base.object import TopoObject
+from topo.base.topoobject import TopoObject
 from topo.base.parameter import Parameter,Constant
 from topo.base.projection import Identity
 from topo.base.connectionfield import CFLearningFunction
