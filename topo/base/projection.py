@@ -24,7 +24,9 @@ class OutputFunction(TopoObject):
     Objects in this class must support being called as a function with
     one argument, typically a matrix, and return a matrix of the same
     size.  If implemented using Numeric functions, subclasses of this
-    class should also work for scalars.
+    class should also work for scalars.  For matrix or other mutable
+    objects, the value returned from the function will also be returned
+    by modifying the argument x.
     """
     def __call__(self,x):
         raise NotImplementedError

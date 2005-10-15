@@ -37,8 +37,8 @@ class PiecewiseLinear(OutputFunction):
     def __call__(self,x):
         fact = 1.0/(self.upper_bound-self.lower_bound)
         x = (x-self.lower_bound)*fact
-        return Numeric.clip(x,0.0,1.0)
-
+        x = Numeric.clip(x,0.0,1.0)
+        return x
 
 class DivisiveL1Normalize(OutputFunction):
     """
