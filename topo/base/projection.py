@@ -80,7 +80,7 @@ class Projection(EPConnection):
 
 class ProjectionSheet(Sheet):
     """
-    A Sheet whose activity is computed using connections from other sheets.
+    A Sheet whose activity is computed using Projections from other sheets.
 
     A standard ProjectionSheet expects its input to be generated from
     other Sheets. Upon receiving an input event, the ProjectionSheet
@@ -95,21 +95,20 @@ class ProjectionSheet(Sheet):
     activate() method, which by default sums all its Projections'
     activity matrices and passes the result through a user-specified
     output_fn() before sending it out on the default output port.
-    The activate() method can be overridden to treat sum some of the
-    connections, multiply that by the sum of other connections, etc.,
-    to model modulatory or other more complicated types of connection
-    influences.
+    The activate() method can be overridden to sum some of the
+    projections, multiply that by the sum of other projections, etc.,
+    to model modulatory or other more complicated types of connections.
 
     The output_fn is a function s(A) that takes an activity matrix
     A and produces and identically shaped output matrix. The default
     is the identity function.
 
-    A ProjectionSheet connection from another sheet takes two parameters:
+    A Projection from another sheet takes two parameters:
 
     projection_type: The type of projection to use for the connection.
 
     projection_params: A dictionary of keyword arguments for the
-    projection constructor (defaulting to the empty dictionary {}).
+    Projection constructor (defaulting to the empty dictionary {}).
 
     For instance, given a simulator sim, an input sheet s1 and a
     ProjectionSheet s2, one might connect them thus:
@@ -123,19 +122,25 @@ class ProjectionSheet(Sheet):
 
     # Should be changed to a OutputFunctionParameter
     output_fn = Parameter(default=Identity())
+
                              
     def __init__(self,**params):
         super(ProjectionSheet,self).__init__(**params)
         self.new_input = False
 
+
+    ### JABHACKALERT!
+    ###
+    ### Does this function do anything?  Won't it work the same if it is deleted?
+    ### If so, please delete it.
     def _connect_from(self, proj, **args):
         """
         Accept a connection from src, on src_port, for dest_port.
         Construct a new Projection of type projection_type using the
         parameters in projection_params.
         """
-        
         Sheet._connect_from(self,proj,**args)
+
 
     def input_event(self,src,src_port,dest_port,data):
         """
@@ -184,7 +189,7 @@ class ProjectionSheet(Sheet):
 
     def present_input(self,input_activity,input_sheet,dest_port):
         """
-        Provide the given input_activity to all connections from the
+        Provide the given input_activity to all projections from the
         given input_sheet, asking each one to compute its activity.
         The sheet's own activity is not calculated until activite()
         is called.
@@ -202,7 +207,7 @@ class ProjectionSheet(Sheet):
         sheet, rather than by the location in the connections list.
         This code hides the complex reverse addressing necessary.
         Always returns a list in case of multiple name hits, but the
-        list may be empty if no connections have a name matching the
+        list may be empty if no Projections have a name matching the
         one passed in as t(arget)name.
         """
         
