@@ -7,8 +7,8 @@ $Id$
 # To do:
 #
 # - wrap bins for cyclic histograms
-# - test selectivity()
 # - check use of float() in count_mag() etc
+# - clarify comment about negative selectivity
 #
 # - function to return value in a range (like a real histogram)
 # - cache values
@@ -91,66 +91,60 @@ class Distribution(object):
 
 
     def __add__(self,a):
+        """
+        Allows add() method to be used via the '+' operator; i.e.,
+        Distribution + dictionary does Distribution.add(dictionary).
+        """
         self.add(a)
-
+        return None
+    
 
     def get_value(self, bin):
-        """Return the value of the specified bin."""
+        """
+        Return the value of the specified bin.
+
+        (Return None if there is no such bin.)        
+        """
         return self._data.get(bin)
 
 
     def get_count(self, bin):
-        """Return the count from the specified bin."""
+        """
+        Return the count from the specified bin.
+
+        (Return None if there is no such bin.)        
+        """
         return self._counts.get(bin)
     
 
-    ### JABALERT!
-    ### 
-    ### Seems to me that it would make the user's life easier if we
-    ### went ahead and provided the two separate lists, i.e.  bins()
-    ### and values(), to simplify all of their expressions.  Sure,
-    ### they can do it with the tuple list using list comprehensions,
-    ### but it's awkward.
     def values(self):
         """
-        Return a list of (bin,value) pairs, as 2-tuples.
-
-        From this tuple list, lists of values and bins can be obtained
-        using list comprehensions, as in:
-        
-          vals = [value for bin,value in dist1.values()]
-          bins = [bin   for bin,value in dist1.values()]
+        Return a list of values.
 
         Various statistics can then be calculated if desired:
         
           sum(vals)  (total of all values)
           max(vals)  (highest value in any bin)
+
+        Note that the bin-order of values returned does not necessarily
+        match that returned by counts().
         """
-        return self._data.items()
+        return self._data.values()
 
 
     def counts(self):
         """
-        Return a list of (bin,count) pairs, as 2-tuples.
-
-        From this tuple list, lists of counts and bins can be obtained
-        using list comprehensions, as in:
-        
-          cts  = [count for bin,count in dist1.counts()]
-          bins = [bin   for bin,count in dist1.counts()]
+        Return a list of values.
 
         Various statistics can then be calculated if desired:
-        
+
           sum(counts)  (total of all counts)
           max(counts)  (highest count in any bin)
+
+        Note that the bin-order of values returned does not necessarily
+        match that returned by values().
         """
-        return self._counts.items()
-
-
-    ### JABALERT!  Is this redundant?  Seems so.
-    def num_bins(self):
-        """Return the number of bins."""
-        return len(self._data)
+        return self._counts.values()
 
 
     def add(self, new_data):
@@ -181,16 +175,16 @@ class Distribution(object):
             new_bin = bin
             
             if new_bin not in self._data:
-                self._data.update({new_bin: 0.0})
-                self._counts.update({new_bin: 0})
+                self._data[new_bin] = 0.0
+                self._counts[new_bin] = 0
 
-            new_value = new_data.get(bin)
+            new_value = new_data[bin]
             self.total_value += new_value
             self._counts[new_bin] += 1
             self.total_count += 1
 
             if self.keep_peak == True:
-                if new_value > self._data[new_bin]: self._data[new_bin]=new_value
+                if new_value > self._data[new_bin]: self._data[new_bin] = new_value
             else:
                 self._data[new_bin] += new_value
                
@@ -305,15 +299,18 @@ class Distribution(object):
         if len(self._data) <= 1: 
             return 1.0
 
-        proportion = self._safe_divide(self._data[self.max_value_bin()],
-                                       sum(self._data.values()))
+        proportion = self._safe_divide( max(self._data.values()),
+                                        sum(self._data.values()) )
         offset = 1.0/len(self._data)
         scaled = (proportion-offset)/(1.0-offset)
 
-        # JABALERT! Can we remove these comments?  I can't follow them.
-        # "Since we take the peak, negative selectivities shouldn't be possible, but just in case..."
-        # So make this Number(bounds=(0.0, 1.0)) and use set_in_bounds() or something?
-        return scaled 
+        # negative scaled is possible 
+        # e.g. 2 bins, with values that sum to less than 0.5
+        # this probably isn't what should be done in those cases
+        if scaled >= 0.0:
+            return scaled
+        else:
+            return 0.0
 
 
     # not tested
