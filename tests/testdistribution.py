@@ -8,13 +8,13 @@ $Id$
 # CEB:
 # This file is still being written
 
-# No test for selectivity()
+# To do:
+# - add comments
+# - clean up redundant tests
 
 
 import unittest
-
 from topo.base.distribution import Distribution
-
 import copy 
 
 # for testing the statistics
@@ -52,7 +52,7 @@ class TestHistogram(unittest.TestCase):
         self.g.add({5:0.5})
 
 
-    def test_raise_error(self):
+    def test_raise_errors(self):
         self.assertRaises(ValueError, self.h.add, {6:1.0})
 
 
@@ -96,25 +96,23 @@ class TestHistogram(unittest.TestCase):
 
    
     def test_lissom_statistics(self):
-        self.assertEqual(self.h.num_bins(), 6)
+        self.assertEqual(len(self.h.values()), 6)
         self.assertAlmostEqual(self.h.total_value, 5.5)
         self.assertEqual(self.h.total_count, 16)
         
-        values = [value for bin,value in self.h.values()]
-        self.assertAlmostEqual(max(values), 2.5)
-        self.assertAlmostEqual(min(values), 0.0)
-        counts = [count for bin,count in self.h.counts()]
-        self.assertEqual(max(counts), 5)
-        self.assertEqual(min(counts), 1)
+        self.assertAlmostEqual(max(self.h.values()), 2.5)
+        self.assertAlmostEqual(min(self.h.values()), 0.0)
+        self.assertEqual(max(self.h.counts()), 5)
+        self.assertEqual(min(self.h.counts()), 1)
 
         
         self.assertAlmostEqual(self.g.total_value, 7.0)         
         self.assertEqual(self.g.total_count, 22)
-        self.assertAlmostEqual(sum([value for bin,value in self.g.values()]), 7.0)
+        self.assertAlmostEqual(sum(self.g.values()), 7.0)
 
         self.assertAlmostEqual(self.g.weighted_sum(), 28.0)
         # (should return _weighted_average:)
-        self.assertAlmostEqual(self.g.weighted_average(), 28.0/sum([value for bin,value in self.g.values()]))
+        self.assertAlmostEqual(self.g.weighted_average(), 28.0/sum(self.g.values()))
         # Different from lissom's g because this is 0 to 5 where 0 and 5 are the same
         self.assertAlmostEqual(self.g.vector_sum()[1], -0.59550095717251439) 
 
@@ -131,10 +129,9 @@ class TestHistogram(unittest.TestCase):
         self.rr.add({0:1, 1:1, 2:1, 3:1, 4:1})
         
         self.assertAlmostEqual(self.rr.vector_sum()[0], 0.0)
-#        self.assertAlmostEqual(self.rr.weighted_average(), self.rr.vector_sum()[0]/5.0)
+        self.assertAlmostEqual(self.rr.weighted_average(), self.rr.vector_sum()[1])
         self.rr.add({1:2})
         self.assertAlmostEqual(self.rr.vector_sum()[0], 2.0) 
-#        self.assertAlmostEqual(self.rr.weighted_average(), self.rr.vector_sum()[0]/5.0)
         self.assertAlmostEqual(self.rr.weighted_average(), 1.0)  
         self.rr.add({3:2})
         self.assertAlmostEqual(self.rr.vector_sum()[0], 2*2*cos(2*pi/5)) 
@@ -171,14 +168,17 @@ class TestHistogram(unittest.TestCase):
         self.assertAlmostEqual(self.a.vector_sum()[0], 1.0)
         self.assertAlmostEqual(self.a.weighted_average(), pi/2)
         self.assertAlmostEqual(self.a.vector_sum()[1], self.a.weighted_average())
+        self.assertAlmostEqual(self.a.selectivity(), 1.0)
 
         self.a.add({-pi/2:1.0}) # (should be like 3pi/2)
         self.assertAlmostEqual(self.a.vector_sum()[0], 0.0)
         self.assertAlmostEqual(self.a.weighted_average(), 0.0)
+        self.assertAlmostEqual(self.a.selectivity(), 0.0)
 
         self.a.add({3*pi/8:0.3})
         self.assertAlmostEqual(self.a.vector_sum()[0], 0.3)
         self.assertAlmostEqual(self.a.weighted_average(), 3*pi/8)
+        self.assertAlmostEqual(self.a.selectivity(), self.a.vector_sum()[0]/2.3)
 
         self.c = Distribution((0.0,1.0), cyclic=True)
         self.c.add({0.0:1.0, 0.25:1.0})
@@ -189,8 +189,32 @@ class TestHistogram(unittest.TestCase):
         self.c.add({1.75:1.0})  # added beyond bounds
         self.assertAlmostEqual(self.c.vector_sum()[0], 1.0) 
         self.assertEqual(self.c.weighted_average(), 0.0)
-        
 
+        
+        self.d = Distribution(axis_bounds=(0.0,1.0),cyclic=False,keep_peak=False)
+        self.assertEqual(self.d.undefined_vals, 0)
+        self.assertAlmostEqual(self.d.selectivity(), 1.0)
+
+        self.d.add({0.0: 0.0})
+        self.assertAlmostEqual(self.d.selectivity(), 1.0)
+        self.d.add({0.5: 0.0})
+        self.assertAlmostEqual(self.d.selectivity(), 0.0)
+        self.assertEqual(self.d.undefined_vals, 1)
+
+
+        self.assertAlmostEqual(self.d.weighted_average(),0.0)
+        self.assertEqual(self.d.undefined_vals, 2)
+        
+        self.d.add({0.0: 1.0})
+        self.assertAlmostEqual(self.d.selectivity(), 1.0)
+        self.assertEqual(self.d.undefined_vals, 2)
+        
+        self.d.add({0.5: 1.0})
+        self.assertAlmostEqual(self.d.selectivity(), 0.0)
+
+        self.d.add({0.75: 2.0})
+        self.assertAlmostEqual(self.d.selectivity(), 0.25) 
+        
 
         
 cases = [TestHistogram]
