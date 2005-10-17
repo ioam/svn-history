@@ -1,24 +1,20 @@
 """
-Scalar EPs
+Basic scalar EventProcessors
 
-Some EventProcessors that emit and accept scalar events, e.g. pulses.
-Mostly useful for testing the simulator.  Also possibly for
-constructing single-unit simulations.
+This file contains some EventProcessors that emit and accept scalar
+events, e.g. pulses.  These are not currently used in the sample
+simulations, but can be useful for testing purposes and for controlling
+other types of simulations.
 
 $Id$
 """
-
-### ALERT!
-### JBD - Topgraphica does not use this, nor is it imported.  Only
-### examples/testsimulator.py uses this, so it should either be
-### deleted, or turned into some sample code somewhere else.
 
 ### JABHACKALERT!
 ###
 ### Should be rewritten to avoid 'import *'.
 ###
-from topo.base.parameter import *
-from topo.base.simulator import *
+from topo.base.parameter import Parameter
+from topo.base.simulator import EventProcessor
 
 class PulseGenerator(EventProcessor):
 

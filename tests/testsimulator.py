@@ -3,7 +3,7 @@ import copy
 
 from Numeric import array
 from topo.base.simulator import *
-from topo.eps.scalarep import *
+from topo.eps.basic import *
 
 class TestSimulator(unittest.TestCase):
     def test_event_copy(self):
