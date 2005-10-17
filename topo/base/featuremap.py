@@ -6,7 +6,7 @@ FeatureMap
 $Id$
 """
 
-from Numeric import array, zeros, add
+from Numeric import array, zeros, add, Float
 from distribution import Distribution
 
 
@@ -60,7 +60,7 @@ class FeatureMap(object):
         """
 
         rows, cols = self.distribution_matrix.shape
-        preference_matrix=zeros((rows, cols),'O')
+        preference_matrix=zeros((rows, cols),Float) 
 
         # preference_matrix = self.distribution_matrix
         
@@ -75,7 +75,7 @@ class FeatureMap(object):
         """
 
         rows, cols = self.distribution_matrix.shape
-        selectivity_matrix=zeros((rows, cols),'O')
+        selectivity_matrix=zeros((rows, cols),Float) 
 
         # preference_matrix = self.distribution_matrix
         
