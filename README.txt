@@ -37,7 +37,7 @@ repository.
 
 To get started, first change to a directory to which you have write
 access with sufficient space available, i.e., at least several hundred
-megabytes as of 4/2005.
+megabytes as of 10/2005.
 
 Then to get read-only access, log in to the CVS server using the UNIX
 command:
@@ -52,13 +52,19 @@ wherever you want the files to be stored, and use the command:
 The result will be a directory named "topographica" within your
 current directory.
 
-For read/write access, no login step is needed, and the checkout
+For read/write access, no login step is needed.  However, you may need
+to tell CVS to use ssh, because most systems default to rsh, which is 
+almost never supported anymore.  Just type "export CVS_RSH=ssh" for
+sh/bash or "setenv CVS_RSH ssh" for csh/tcsh; you may want to put this
+in your shell startup file.  The checkout
 command is:
 
   cvs -d ':ext:uname@cvs.sourceforge.net:/cvsroot/topographica' checkout topographica
 
 where uname should be replaced with your SourceForge.net username.
-You will be asked for your SourceForge.net password.
+You will be asked for your SourceForge.net password.  If instead you
+get a message about rsh timing out, you have forgotten to do the
+CVS_RSH command.
 
 The download process make take quite a while over a slow link, due to
 the sizes of the files involved, but should only take a few minutes on
@@ -112,9 +118,9 @@ have not yet documented how to do that.
 RUNNING TOPOGRAPHICA
 
 Topographica is still under very active development, and until a full
-public release, is not suitable for serious use unless you are
+public release, is probably not suitable for serious use unless you are
 coordinating such usage with the developers.  However, it already
-includes some useful code, such as a GUI version of a SOM-based
+includes much useful code, including as a GUI version of a SOM-based
 orientation map network.  To start this code, go to your topographica/
 directory, and type e.g.:
 
@@ -127,11 +133,11 @@ the one in the LISSOM tutorial at:
 
 The tutorial was written for our more polished but less flexible
 simulator LISSOM, also available from http://topographica.org, but you
-can follow many of the instructions in that tutorial.  As of 4/2005,
+can follow many of the instructions in that tutorial.  As of 10/2005,
 the main differences are that all plots are grayscale, there is no
-orientation or ocular dominance map measurement available, the model
-does not have lateral connections or LGN cells, and no trained map is
-provided.
+orientation or ocular dominance map measurement available in the
+menus, the model does not have lateral connections or LGN cells, and
+no trained map is provided.
 
 
 DOCUMENTATION AND FURTHER STUDY
@@ -140,7 +146,7 @@ For practical use, please wait for the full public release of
 Topographica. Because of the fast pace of current development, there
 is very little documentation available, but the documentation for each
 file can be accessed by loading topographica/docs/index.html into your
-web browser.
+web browser, or by doing pydoc(modulename) from the Topographica prompt.
 
 If you are a Topographica developer, please read and follow the
 information in the CONVENTIONS file.  This will help keep everyones'
