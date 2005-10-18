@@ -1,14 +1,11 @@
 """
 FeatureMap
 
-** this file doesn't do anything yet **
-
 $Id$
 """
 
-from Numeric import array, zeros, add, Float
+from Numeric import array, zeros, add, Float  # need add?
 from distribution import Distribution
-
 
 
 def fm_add(activity_matrix,stimulus_value):
@@ -25,7 +22,6 @@ def fm_add(activity_matrix,stimulus_value):
         for j in range(len(activity_matrix[i])):
                        new_matrix[i,j] = {stimulus_value:activity_matrix[i,j]}
     return new_matrix
-
 
 
 class FeatureMap(object):

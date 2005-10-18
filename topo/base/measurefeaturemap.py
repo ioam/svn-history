@@ -9,6 +9,7 @@ $Id$
 # - namespace __main__, as in later comment 
 # - remove temporary testing code
 # - give the variables better names!
+# - make variables private as appropriate
 #
 # - some i,j counting could probably be done better
 
