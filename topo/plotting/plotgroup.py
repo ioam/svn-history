@@ -242,7 +242,7 @@ class ProjectionPlotGroup(PlotGroup):
         self.shape = (0,0)
         self._sim_ep = [s for s in topo.base.registry.active_sim().get_event_processors()
                         if self.sheet_filter_lam(s)][0]
-        self._sim_ep_src = self._sim_ep.get_projection_by_name(self.weight_name)[0].src
+        self._sim_ep_src = self._sim_ep.get_in_projection_by_name(self.weight_name)[0].src
 
 
     def _generate_coords(self):

@@ -105,16 +105,16 @@ class ProjectionSheet(Sheet):
 
     A Projection from another sheet takes two parameters:
 
-    projection_type: The type of projection to use for the connection.
+    connection_type: The type of projection to use for the connection.
 
-    projection_params: A dictionary of keyword arguments for the
+    connection_params: A dictionary of keyword arguments for the
     Projection constructor (defaulting to the empty dictionary {}).
 
     For instance, given a simulator sim, an input sheet s1 and a
     ProjectionSheet s2, one might connect them thus:
 
-    sim.connect(s1,s2,projection_type=MyProjectionType,
-                      projection_params=dict(a=1,b=2))
+    sim.connect(s1,s2,connection_type=MyProjectionType,
+                      connection_params=dict(a=1,b=2))
 
     s2 would then construct a new projection of type MyProjectionType
     with the parameters (a=1,b=2).
@@ -126,20 +126,19 @@ class ProjectionSheet(Sheet):
                              
     def __init__(self,**params):
         super(ProjectionSheet,self).__init__(**params)
+	self.in_projections = {}
         self.new_input = False
 
 
-    ### JABHACKALERT!
-    ###
-    ### Does this function do anything?  Won't it work the same if it is deleted?
-    ### If so, please delete it.
     def _connect_from(self, proj, **args):
         """
         Accept a connection from src, on src_port, for dest_port.
-        Construct a new Projection of type projection_type using the
-        parameters in projection_params.
+        Contruct a dictionary of projections indexed by source name.
         """
-        Sheet._connect_from(self,proj,**args)
+        #Sheet._connect_from(self, proj, **args)
+        if proj.src.name not in self.in_projections:
+            self.in_projections[proj.src.name] = []
+        self.in_projections[proj.src.name].append(proj)
 
 
     def input_event(self,src,src_port,dest_port,data):
@@ -160,8 +159,8 @@ class ProjectionSheet(Sheet):
         If learning is enabled, also calls learn().
         """
         self.activity *= 0.0
-        for proj in self.connections:
-            if proj.dest is self:
+        for name in self.in_projections:
+            for proj in self.in_projections[name]:
                 self.activity+= proj.activity
         self.activity = self.output_fn(self.activity)
         self.send_output(data=self.activity)
@@ -196,12 +195,12 @@ class ProjectionSheet(Sheet):
         """
         rows,cols = self.activity.shape
 
-        for proj in self.connections:
-            if proj.src == input_sheet and proj.dest_port == dest_port:
+        for proj in self.in_projections[input_sheet.name]:
+            if proj.dest_port == dest_port:
                 proj.activate(input_activity,rows,cols)
 		break
 
-    def get_projection_by_name(self,tname):
+    def get_in_projection_by_name(self,tname):
         """
         More often than not, a Projection is requested by name from a
         sheet, rather than by the location in the connections list.
@@ -211,10 +210,9 @@ class ProjectionSheet(Sheet):
         one passed in as t(arget)name.
         """
         
-        prjns = [p for p in self.connections
-                            if p.name == tname]
+        prjns = [p for name in self.in_projections
+                       for p in self.in_projections[name]
+                           if p.name == tname]
+
         return prjns
-
-
-
 

@@ -91,19 +91,19 @@ retina = GeneratorSheet(input_generator=GaussianGenerator(),name='Retina')
 V1 = LISSOM(name='V1')
 
 s.connect(retina,V1, delay = FixedPoint("0.05"),
-          projection_type=KernelProjection,
-          projection_params = dict(strength = 1.0, name='Afferent0',
+          connection_type=KernelProjection,
+          connection_params = dict(strength = 1.0, name='Afferent0',
                                    weights_bounds = afferent_weight_bounds, normalize = True, response_fn=CFDotProduct(),learning_rate=alpha_input))
 
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
-          projection_type=KernelProjection,
-          projection_params = dict(strength = gammaexc, name='LateralExcitatory',
+          connection_type=KernelProjection,
+          connection_params = dict(strength = gammaexc, name='LateralExcitatory',
                                    weights_bounds = excitatory_weight_bounds, normalize = True, response_fn=CFDotProduct(),learning_rate=alpha_exc))
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
-          projection_type=KernelProjection,
-          projection_params = dict(strength = -gammainh, name='LateralInhibitory',
+          connection_type=KernelProjection,
+          connection_params = dict(strength = -gammainh, name='LateralInhibitory',
                                    weights_bounds = inhibitory_weight_bounds, normalize = True, response_fn=CFDotProduct(),learning_rate=alpha_inh))
         
 

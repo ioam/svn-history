@@ -93,7 +93,7 @@ class ProjectionPanel(CFSheetPlotPanel):
             self._sim_ep = [ep for ep in self._sim_eps
                             if ep.name == sheet_name][0]
             self.projections = dict([(i.name, i) for i in
-                                     self._sim_ep.connections])
+                                     chain(*self._sim_ep.in_projections.values())])
 
         old_projection_name = self.weight_name.get()
         if len(self.projections.keys()) == 0:

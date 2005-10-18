@@ -323,7 +323,7 @@ class CFSheet(ProjectionSheet):
         Can return multiple UnitView objects.
         """
         from itertools import chain
-        views = [p.get_view(x,y) for p in self.connections]
+        views = [p.get_view(x,y) for p in chain(*self.in_projections.values())]
 
         # Delete previous entry if it exists.  Allows appending in next block.
         for v in views:

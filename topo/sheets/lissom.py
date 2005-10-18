@@ -34,8 +34,8 @@ class LISSOM(CFSheet):
         # On a new afferent input, clear the activity
         if src.name == 'Retina':
             self.activity *= 0.0
-            for proj in self.connections:
-                if proj.dest is self:
+            for name in self.in_projections:
+                for proj in self.in_projections[name]:
                     proj.activity *= 0.0
 
         super(LISSOM,self).input_event(src,src_port,dest_port,data)
@@ -57,8 +57,8 @@ class LISSOM(CFSheet):
         if self.new_input:
             self.new_input = False
             self.activity *= 0.0
-            for proj in self.connections:
-                if proj.dest is self:
+            for name in self.in_projections:
+                for proj in self.in_projections[name]:
                     self.activity += proj.activity
             self.activity = self.output_fn(self.activity)
 
@@ -79,10 +79,10 @@ class LISSOM(CFSheet):
     ### I.e., is there anything LISSOM-specific about it now?
     def learn(self):
         rows,cols = self.activity.shape
-        for proj in self.connections:
-            if proj.input_buffer and proj.dest is self:
+        for proj in chain(*self.in_projections.values()):
+            if proj.input_buffer:
                 alpha = proj.learning_rate
-                ### JABHACKALERT!  Why is this test necessary?
+		# Learning in lateral connections uses the most current activity
                 if proj.src == self: #lateral connection
                     inp = self.activity
                 else:
@@ -93,13 +93,13 @@ class LISSOM(CFSheet):
                 self.learning_fn(inp, self.activity, rows, cols, len, cfs, alpha)
 
 
-    def lateral_connections(self):
-        return [p for p in self.connections if p.src is self]
-    def afferent_connections(self):
-        return [p for p in self.connections if p.src is not self]
-
+    def lateral_projections(self):
+        return [p for p in chain(*self.in_projections.values()) if p.src is self]
+    def afferent_projections(self):
+        return [p for p in chain(*self.in_projections.values()) if p.src is not self]
+  
     def reduce_cfsize(self, name, new_wt_bounds):
-        for proj in self.connections:
+        for proj in chain(*self.in_projections.values()):
             if proj.name == name:
                 proj.reduce_cfsize(new_wt_bounds)
                 return
@@ -108,7 +108,7 @@ class LISSOM(CFSheet):
     ### JABALERT: Should be able to eliminate this by just providing a 
     ### convenient way for callers to access projections.
     def change_learning_rate(self, name, new_alpha):
-        for proj in self.connections:
+        for proj in chain(*self.in_projections.values()):
             if proj.name == name:
                 proj.learning_rate = new_alpha
                 return
@@ -117,6 +117,6 @@ class LISSOM(CFSheet):
 
     # print the weights of a unit
     def printwts(self,x,y):
-        for proj in self.connections:
+        for proj in chain(*self.in_projections.values()):
             print proj.name, x, y
             print transpose(proj.cfs[x][y].weights)

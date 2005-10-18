@@ -188,7 +188,7 @@ class PlotEngine(TopoObject):
             if not isinstance(s,CFSheet):
                 self.warning('Requested weights view from other than CFSheet.')
             else:
-                for p in s.connections:
+                for p in set(flatten(s.in_projections.values())):
                     key = ('Weights',sheet_target,p.name,sheet_x,sheet_y)
                     v = p.src.sheet_view(key)
                     if v: projection_list += [(s,p,each) for each in v if each.projection.name == p.name]
@@ -235,7 +235,7 @@ class PlotEngine(TopoObject):
                         # Multiple Plots can be generated from one Sheet.
                         plot_list = plot_list + self.make_unitweights_plot(k,pt,each)
                 elif 'Density' in c and 'Projection_name' in c:            # Projections
-                    projection = each.get_projection_by_name(c['Projection_name'])
+                    projection = each.get_in_projection_by_name(c['Projection_name'])
                     if projection:
                         plot_list = plot_list + self.make_projection_plot(k,pt,projection[0].src)
                 else:
@@ -274,7 +274,7 @@ class PlotEngine(TopoObject):
         if not isinstance(s,CFSheet):
             self.warning('Requested weights view from other than CFSheet.')
         else:
-            for p in s.connections:
+            for p in set(flatten(s.in_projections.values())):
                 key = ('Weights',sheet_target,p.name,sheet_x,sheet_y)
                 v = p.src.sheet_view(key)
                 if v:

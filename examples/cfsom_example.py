@@ -43,7 +43,7 @@ s = Simulator()
 
 retina = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina')
 V1 = CFSOM(name='V1')
-s.connect(retina,V1,delay=1,projection_type=KernelProjection,projection_params={'name':'RtoV1'})
+s.connect(retina,V1,delay=1,connection_type=KernelProjection,connection_params={'name':'RtoV1'})
 
 s.run(1)
 #s.run(10000)

@@ -48,8 +48,8 @@ retina2 = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina2')
 V1 = CFSOM(name='V1')
 V2 = CFSOM(name='V2')
 
-s.connect(retina,V1,delay=0.5,projection_type=KernelProjection,projection_params={'name':'R1toV1'})
-s.connect(retina,V2,delay=0.5,projection_type=KernelProjection,projection_params={'name':'R1toV2'})
-s.connect(retina2,V2,delay=0.5,projection_type=KernelProjection,projection_params={'name':'R2toV2'})
+s.connect(retina,V1,delay=0.5,connection_type=KernelProjection,connection_params={'name':'R1toV1'})
+s.connect(retina,V2,delay=0.5,connection_type=KernelProjection,connection_params={'name':'R1toV2'})
+s.connect(retina2,V2,delay=0.5,connection_type=KernelProjection,connection_params={'name':'R2toV2'})
 
 s.run(1)

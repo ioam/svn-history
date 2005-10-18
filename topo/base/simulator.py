@@ -331,16 +331,16 @@ class Simulator(TopoObject):
                 dest=None,
                 src_port=None,
                 dest_port=None,
-                delay=0,projection_type=EPConnection,projection_params={},**extra_args):
+                delay=0,connection_type=EPConnection,connection_params={},**extra_args):
         """
         Connect the source to the destination, at the appropriate ports,
         if any are given.  If src and dest have not been added to the
         simulator, they will be added.
         """
         self.add(src,dest)
-        proj = projection_type(src=src,dest=dest,src_port=src_port,dest_port=dest_port,delay=delay,**projection_params)
-        src._connect_to(proj,**extra_args)
-        dest._connect_from(proj,**extra_args)
+        conn = connection_type(src=src,dest=dest,src_port=src_port,dest_port=dest_port,delay=delay,**connection_params)
+        src._connect_to(conn,**extra_args)
+        dest._connect_from(conn,**extra_args)
 
 
     def get_event_processors(self):
@@ -378,16 +378,21 @@ class EventProcessor(TopoObject):
     def __init__(self,**config):
         super(EventProcessor,self).__init__(**config)
 
-        # The connection db is a dictionary indexed by output port.  Each 
+        # The out_connection db is a dictionary indexed by output port.  Each 
         # output port refers to a list of EPConnection objects with that 
-        # output port.
+        # output port. This optimizes the lookup of the set of outgoing
+        # connections from the same port.
+        # The in_connection is just a general list. Subclass can use other
+        # data stuctures to optimize the operations specific to it
+        # by overriding _connect_from().
         
-        self.connections = []
+        self.in_connections = []
+        self.out_connections = {None:[]}
 
         # The simulator link is not set until the call to add()
         self.simulator = None
 
-    def _connect_to(self,proj,**args):
+    def _connect_to(self,conn,**args):
         """
         Add a connection to dest/port with a delay (default=0).
         Should only be called from Simulator.connect(). The extra
@@ -396,12 +401,13 @@ class EventProcessor(TopoObject):
         needed.  
         """
 
-        # connections contain unique projections, even for self-projections
-	if proj not in self.connections:
-            self.connections.append(proj)
+        if not conn.src_port in self.out_connections:
+            self.out_connections[conn.src_port] = []
+  
+        self.out_connections[conn.src_port].append(conn)
 
 
-    def _connect_from(self,proj,**args):
+    def _connect_from(self,conn,**args):
         """
         Add a connection from src/port with a delay (default=0).
         Should only be called from Simulator.connect().  The extra
@@ -410,8 +416,8 @@ class EventProcessor(TopoObject):
         needed.  
         """
 
-	if proj not in self.connections:
-            self.connections.append(proj)
+	if conn not in self.in_connections:
+            self.in_connections.append(conn)
 
     def start(self):
         """
@@ -424,9 +430,9 @@ class EventProcessor(TopoObject):
         """
         Send some data out to all connections on the given src_port.
         """
-        for proj in self.connections:
-            if proj.src is self and proj.src_port == src_port:
-                self.simulator.enqueue_event_rel(proj.delay,self,proj.dest,proj.src_port,proj.dest_port,data)
+        for conn in self.out_connections[src_port]:
+            self.simulator.enqueue_event_rel(conn.delay,self,conn.dest,conn.src_port,conn.dest_port,data)
+
 
     def input_event(self,src,src_port,dest_port,data):
         """
