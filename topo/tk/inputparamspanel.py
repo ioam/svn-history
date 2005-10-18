@@ -17,7 +17,7 @@ $Id$
 """
 import __main__
 import math, string, re
-import parameterframe
+import parametersframe
 import topo.base.patterngenerator
 import topo.plotting.plot
 import plotpanel
@@ -83,22 +83,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         self.parent = parent
         self.console = console
         self.learning = IntVar()
-        
-        ### JABHACKALERT!
-        ###
-        ### This being a Test Pattern window, not a Training Pattern
-        ### window, learning should most definitely be turned off by
-        ### default.  However, when I try to do that, I get an error
-        ### saying that there was a pop from an empty list.  This
-        ### appears to be due to _learning_toggle saving the state
-        ### when it is toggled, which seems clearly incorrect.
-        ### Instead, the event queue should presumably be saved before
-        ### the first test pattern is presented, and restored whenever
-        ### the next training pattern is presented.  Otherwise, I
-        ### can't see how one could ensure that the system is in the
-        ### correct state.
-        
-        self.learning.set(1)
+        self.learning.set(0)
 
         # Variables and widgets for maintaining the list of input sheets
         # that will be given the user defined stimuli.
@@ -106,10 +91,8 @@ class InputParamsPanel(plotpanel.PlotPanel):
         for (each,obj) in generator_eps(self.console.active_simulator()).items():
             self.in_ep_dict[each] = {'obj':obj,'state':True,'pattern':None} 
         self.input_box = Pmw.RadioSelect(parent, labelpos = 'w',
-                                command = self._input_change,
-                                label_text = 'Input Sheets:',
-                                frame_borderwidth = 2,
-                                frame_relief = 'ridge',
+                                command = self._input_change,label_text = 'Input Sheets:',
+                                frame_borderwidth = 2,frame_relief = 'ridge',
                                 selectmode = 'multiple')
         self.input_box.pack(fill = 'x', padx = 5)
         in_ep_names = self.in_ep_dict.keys()
@@ -119,11 +102,8 @@ class InputParamsPanel(plotpanel.PlotPanel):
             self.input_box.invoke(each)
 
         self.present_length = Pmw.EntryField(self,
-                labelpos = 'w',
-                label_text = 'Duration to Present:',
-                value = DEFAULT_PRESENTATION,
-                validate = {'validator' : 'real'},
-                )
+                labelpos = 'w',label_text = 'Duration to Present:',
+                value = DEFAULT_PRESENTATION,validate = {'validator' : 'real'})
         self.present_length.pack(fill='x', expand=1, padx=10, pady=5)
 
         buttonBox = Pmw.ButtonBox(self,orient = 'horizontal',padx=0,pady=0)
@@ -138,33 +118,17 @@ class InputParamsPanel(plotpanel.PlotPanel):
 
         # Define menu of valid PatternGenerator types
         self.input_types = patterngenerator_names()
-        
         self.input_type = StringVar()
         self.input_type.set(self.input_types[0])
-        Pmw.OptionMenu(self,
-                       command = self._refresh_sliders,
-                       labelpos = 'w',
-                       label_text = 'Input Type:',
+        Pmw.OptionMenu(self,command = self._refresh_sliders,
+                       labelpos = 'w',label_text = 'Input Type:',
                        menubutton_textvariable = self.input_type,
                        items = self.input_types
                        ).pack(side=TOP)
  
-        self.param_frame = parameterframe.ParameterFrame(self)
+        self.param_frame = parametersframe.ParametersFrame(self)
         self._refresh_sliders(self.input_type.get())
         self.param_frame.pack(side=TOP,expand=YES,fill=X)
-
-
-# How to access the list of non-hidden Parameters in a PatternGenerator object
-#        # Test to find the params and names.
-#        pgc = topo.base.registry.pattern_generators[kf_classname] 
-#        pg = pgc()
-#        plist = [(k,v)
-#                 for (k,v)  # ('name':'...', 'density':10000, ...)
-#                 in pg.get_paramobj_dict().items()
-#                 if not v.hidden
-#                 ]
-#        print plist
-
 
 
         # Hook to turn learning back on when Panel is closed.
@@ -187,9 +151,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
 
     def _learning_toggle(self):
         """
-        Invoked by the learning checkbox.  Requires that the initial
-        state is learning.  i.e. Trying to pop state off an empty
-        simulator event queue stack will causes problems.
+        Invoked by the learning checkbox.
         """
         learning = self.learning.get()
         sim = self.console.active_simulator()
@@ -199,12 +161,15 @@ class InputParamsPanel(plotpanel.PlotPanel):
                 if isinstance(each,Sheet):
                     each.learning = False
                     each.activity_push()
-        else: # Turn learning back on and restore
-            sim.state_pop()
+        else: # Turn learning on and restore if there is a saved state.
+            saved_state = sim.state_len()
+            if saved_state:
+                sim.state_pop()
             for each in sim.get_event_processors():
                 if isinstance(each,Sheet):
                     each.learning = True
-                    each.activity_pop()
+                    if saved_state:
+                        each.activity_pop()
             
 
     def _refresh_sliders(self,new_name):
@@ -305,7 +270,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         self._create_inputsheet_patterns()
         self._refresh_sliders(self.input_type.get())
         if self.auto_refresh: self.refresh()
-        if not self.learning.get():
+        if self.learning.get():
             self.learning_button.invoke()
 
 
@@ -371,7 +336,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         """
         if not self.learning.get():
             self.learning_button.invoke()
-            self.message("Learning re-enabled.")
+            self.debug("Learning re-enabled.")
             topo.tk.show_cmd_prompt()
         self.console.input_params_window = None
         self.parent.destroy()
