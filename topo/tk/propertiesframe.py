@@ -4,7 +4,7 @@ Class file for a properties page.
 $Id$
 """
 
-from Tkinter import Frame, StringVar, Entry, Message, Checkbutton, IntVar
+from Tkinter import Frame, StringVar, Entry, Message, Checkbutton, IntVar, N,S,E,W,X
 from taggedslider import TaggedSlider
 import Pmw, string
 
@@ -27,13 +27,13 @@ class PropertiesFrame(Frame):
 
     def add_property(self,name,var,control,value):
         p = Message(self,text=name,aspect=5000)
-        # p.grid(row=len(self.properties),column=0,padx=self.padding,
-        #        pady=self.padding,sticky=E)
-        # control.grid(row=len(self.properties),
-        #              column=1,
-        #              padx=self.padding,
-        #              pady=self.padding,
-        #              sticky=N+S+W+E)
+        p.grid(row=len(self.properties),column=0,padx=self.padding,
+               pady=self.padding,sticky=E)
+        control.grid(row=len(self.properties),
+                     column=1,
+                     padx=self.padding,
+                     pady=self.padding,
+                     sticky=N+S+W+E)
 
         self.properties[name] = var
         self.set_value(name,value)
