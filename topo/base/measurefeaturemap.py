@@ -4,6 +4,15 @@ MeasureFeatureMap class
 $Id$
 """
 
+# CEB,JBF
+# To do:
+# - namespace __main__, as in later comment 
+# - remove temporary testing code
+# - give the variables better names!
+#
+# - some i,j counting could probably be done better
+
+
 from featuremap import FeatureMap
 from sheet import Sheet
 from topo.sheets.generatorsheet import GeneratorSheet
@@ -11,32 +20,45 @@ from topo.sheets.generatorsheet import GeneratorSheet
 import __main__
 
 
-# to get rid of it
+## temporary ##
 from topo.patterns.basic import SineGratingGenerator
 from topo.patterns.patternpresent import *
+###############
 
 
-# 'If you need to generate the cross product of a variable number of lists, here is how to do it with an obscure one-liner instead of a nice and clean recursive function.' The function works on list of lists as well.
-#  http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/159975
+
+## to go to topo.base.utils ##
+"""
+Return the cross-product of a variable number of lists (e.g. of a list of lists).
+
+Use to obtain permutations, e.g.
+l1=[a,b]
+l2=[c,d]
+cross_product([l1,l2]) = 
+[[a,c], [a,d], [b,c], [b,d]]
+
+
+From:
+http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/159975
+"""
+# re-write so someone other than Python knows what might happen when this runs
 cross_product=lambda ss,row=[],level=0: len(ss)>1 \
    and reduce(lambda x,y:x+y,[cross_product(ss[1:],row+[i],level+1) for i in ss[0]]) \
    or [row+[i] for i in ss[0]]
 
 
 def frange(start, end=None, inc=None):
-    """A range function, that does accept float increments...
-
-
-Sadly missing in the Python standard library, this function
-allows to use ranges, just as the built-in function range(),
-but with float arguments.
-
-All thoretic restrictions apply, but in practice this is
-more useful than in theory.
-
-http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66472
     """
+    A range function that accepts float increments.
 
+    Otherwise, works just as the inbuilt range() function.
+
+    'All thoretic restrictions apply, but in practice this is
+    more useful than in theory.'
+
+    From:
+    http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66472
+    """
     if end == None:
         end = start + 0.0
         start = 0.0
@@ -55,62 +77,37 @@ http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66472
         
     return L
 
+##############################
 
-
-
-#def permutation_creator(permutation_list, list_param):
-#    
-#    """
-#    """
-#    if len(list_param)==0:
-#        return permutation_list
-#    else:
-#        resu_list=[]
-#        for list in permutation_list:
-#            for item in list_param[0]:
-#                copy_list=copy.deep_copy(list)
-#                resu_list.append(copy_list.append(item))
-#                list_param.pop(0)
-#                print resu_list
-#                permutation_creator(resu_list,list_param)
-                
-
-
-
-
-# "orientation": (range, feature_values, cyclic, keep_peak) 
 
 
 class MeasureFeatureMap(object):
-
     """
     """
-
-    def __init__(self, simulator,feature_param):
+    def __init__(self, simulator, feature_param):
         """
-    
-        pattern_generator: the pattern to be presented during measurement (e.g. SineGratingGenerator)
-        generator_sheets:  a list of the GeneratorSheets on which to draw the input patterns (e.g. Retina)
-        measured_sheet:    the sheet that will have its feature map(s) measured (e.g. V1)
-        feature_param:     {dimension_name: (range, step, cyclic)} where range is a tuple of the bounds
+        simulator: the variable name holding the simulator from which to get the sheets.
 
-
-        featuremaps: {dimension_name: FeatureMap}
-                     You can e.g. ask the FeatureMap for its map() or selectivity()
-
-        
-        
+        feature_param: a dictionary with features as keys and their parameters as values.
+                       {dimension_name: (range, values, cyclic, keep_peak)}
+                       range: the tuple (lower_bound, upper_bound)
+                       values: either a list of the values to use for the feature (list), or
+                                      a step size (float) to generate the list frange(lower_bound,upper_bound,values)
+                       cyclic: whether or not the feature is cyclic (see topo.base.distribution)
+                       keep_peak: whether or not to store and use only the peak value (see topo.base.distribution)
+                       e.g.    
+                       {'theta': (0.0,1.0), 0.10, True, True}  for cyclic theta in steps of 0.10 from 0.0 to 1.0
+                       {'x': (0.0,2.0), [0.0, 0.5, 0.6, 0.7, 1.0], False, True}  for the non-cyclic x values specified, which may
+                                                                                 only fall in the range [0.0,1.0].
         """
-
-
-        
+        # This dictionary will, for each sheet, contain a dictionary to hold the FeatureMap for each feature
+        # {sheet: {feature: FeatureMap()}}
         self.sheet_featuremaps = {}
 
         # the list of values to be presented for each feature
-        # (e.g. for 3 values of phase and 2 of orientation, [ [0.0, 0.5, 1.0], [0.0, 1.0] ]
         self.list_param = []
 
-        
+        # build self.list_param from the input feature_param
         for param in feature_param.values():
             if isinstance(param[1],type([])):               
                 self.list_param.append(param[1])
@@ -119,46 +116,35 @@ class MeasureFeatureMap(object):
                 step=param[1]
                 self.list_param.append(frange(low_bound,up_bound,step))
 
+        # find all the sheets that will have their feature maps measured (i.e. all Sheets that aren't GeneratorSheets)
         f= lambda x: not isinstance(x,GeneratorSheet)
         self.measured_sheets = filter(f,simulator.objects(Sheet).values())
-                
+
+        # now create the featuremaps for each sheet  
         for sheet in self.measured_sheets:
             self.sheet_featuremaps[sheet] = {}
             for feature, value in feature_param.items():
                 self.sheet_featuremaps[sheet].update({feature: FeatureMap(value[0], value[2], value[3],sheet.activity.shape)})
 
+        generator_sheets = simulator.objects(GeneratorSheet)
 
         self.simulator=simulator
-        
-        
 
-        
-        generator_sheets=simulator.objects(GeneratorSheet)
-        
-        # create the inputs dictionnary used by the pattern_present method
+        ## temporay ##
+        # create the inputs dictionary used by the pattern_present method
         # only used for testing with the default command
         self.inputs = dict().fromkeys(generator_sheets,SineGratingGenerator())
-
+        ##############
        
-       
-        
-
-
-
-           
         
     def pattern_present_update(self,input_command="pattern_present(self.inputs, 5.0, self.simulator, False)"):
-
         """
-        First create a list of all permutations of the feature values, then
-        present patterns with those specified values, and finally update the
-        feature maps.
-        
+        First create a list of all permutations of the feature values, then, for each permutation, set the
+        feature values in the namespace __main__ and execute the user's code (input_command) there too, updating
+        the feature maps.
+
+        Note: allows execution of arbitrary code.
         """
-
-        # 
-#        input_permutations = permutation_creator([[]],self.list_param)
-
         input_permutations = cross_product(self.list_param)
        
         for permutation in input_permutations:
@@ -170,7 +156,6 @@ class MeasureFeatureMap(object):
                     exec the in __main__.__dict__
                     exec input_command # in __main__.__dict__
                  
-           
                     self.sheet_featuremaps[sheet][feature].update(self.measured_sheets[j].activity, permutation[i])
                     j=j+1
 
