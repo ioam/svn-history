@@ -6,6 +6,7 @@ the goal of eventually turning into a more general file.
 $Id$
 """
 import propertiesframe
+import topo.base.registry
 from Tkinter import Frame, TOP, LEFT, RIGHT, BOTTOM, YES, N,S,E,W,X
 from topo.base.utils import eval_atof
 
@@ -16,6 +17,7 @@ class ParameterFrame(Frame):
         self.prop_frame = propertiesframe.PropertiesFrame(self.parent,string_translator=eval_atof)
         Frame.__init__(self,parent,config)
         self.tparams = {}
+        self.default_values = self.prop_frame.get_values()
 
         ### JABHACKALERT!
         ###
@@ -60,5 +62,47 @@ class ParameterFrame(Frame):
     def add_slider(self,name,min,max,init):
         return self.prop_frame.add_tagged_slider_property(name,init,
                  min_value=min,max_value=max,width=30,string_format='%.6f')
+
+    def reset_to_defaults(self):
+        self.prop_frame.set_values(self.default_values)
+
+
+    def refresh_sliders(self,new_name):
+        """
+        The visible TaggedSliders will be updated.  The old ones are
+        removed, and new ones are added to the screen.  The widgets
+        themselves do not change but the grid location does.
+        """
+        # How to wipe the widgets off the screen
+        for (s,c) in self.tparams.values():
+            s.grid_forget()
+            c.grid_forget()
+        # Make relevant parameters visible.
+        new_sliders = self.relevant_parameters(new_name)
+        for i in range(len(new_sliders)):
+            (s,c) = self.tparams[new_sliders[i]]
+            s.grid(row=i,column=0,padx=self.prop_frame.padding,
+                   pady=self.prop_frame.padding,sticky=E)
+            c.grid(row=i,
+                   column=1,
+                   padx=self.prop_frame.padding,
+                   pady=self.prop_frame.padding,
+                   sticky=N+S+W+E)
+
+
+    def relevant_parameters(self,kf_classname):
+        """
+        Pre:  kf_classname is the string name of a PatternGenerator subclass.
+        Post: List of strings that is the Intersection of kf_classname's
+              class member keys, and tparams.keys() entries.
+        """
+
+        kf_class_keylist = topo.base.registry.pattern_generators[kf_classname].__dict__.keys()
+        rlist = [s for s in self.tparams.keys() if s in kf_class_keylist]
+
+        return rlist
+
+
+
 
 
