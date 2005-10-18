@@ -11,7 +11,7 @@ from Tkinter import Frame, TOP, LEFT, RIGHT, BOTTOM, YES, N,S,E,W,X
 from topo.base.utils import eval_atof
 
 
-class ParameterFrame(Frame):
+class ParametersFrame(Frame):
     def __init__(self, parent=None,**config):
         self.parent = parent
         self.prop_frame = propertiesframe.PropertiesFrame(self.parent,string_translator=eval_atof)
