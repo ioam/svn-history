@@ -150,6 +150,8 @@ class InputParamsPanel(plotpanel.PlotPanel):
                        ).pack(side=TOP)
  
         self.param_frame = parameterframe.ParameterFrame(self)
+        self._refresh_sliders(self.input_type.get())
+        self.param_frame.pack(side=TOP,expand=YES,fill=X)
 
 
 # How to access the list of non-hidden Parameters in a PatternGenerator object
@@ -164,13 +166,11 @@ class InputParamsPanel(plotpanel.PlotPanel):
 #        print plist
 
 
-        self._refresh_sliders(self.input_type.get())
-        self.param_frame.pack(side=TOP,expand=YES,fill=X)
 
         # Hook to turn learning back on when Panel is closed.
         self.parent.protocol('WM_DELETE_WINDOW',self._reset_and_destroy)
 
-        self.default_values = self.param_frame.prop_frame.get_values()
+        #self.default_values = self.param_frame.prop_frame.get_values()
         self._create_inputsheet_patterns()
         self.refresh()
 
@@ -216,39 +216,9 @@ class InputParamsPanel(plotpanel.PlotPanel):
         the grid location does.
         """
         new_name = new_name.replace(' ','') + 'Generator'
-        # How to wipe the widgets off the screen
-        for (s,c) in self.param_frame.tparams.values():
-            s.grid_forget()
-            c.grid_forget()
-        # Make relevant parameters visible.
-        new_sliders = self.relevant_parameters(new_name,self.param_frame.tparams.keys())
-        for i in range(len(new_sliders)):
-            (s,c) = self.param_frame.tparams[new_sliders[i]]
-            s.grid(row=i,column=0,padx=self.padding,
-                   pady=self.padding,sticky=E)
-            c.grid(row=i,
-                   column=1,
-                   padx=self.padding,
-                   pady=self.padding,
-                   sticky=N+S+W+E)
+        self.param_frame.refresh_sliders(new_name)
         self._create_inputsheet_patterns()
         if self.auto_refresh: self.refresh()
-
-
-    def relevant_parameters(self,kf_classname,param_list):
-        """
-        Pre:  kf_classname is the string name of a PatternGenerator subclass.
-              param_list is a list of strings of parameter tagged sliders
-              that are viewable from the window.
-        Post: List of strings that is the Intersection of kf_classname's
-              class member keys, and param_list entries.
-        """
-
-        kf_class_keylist = topo.base.registry.pattern_generators[kf_classname].__dict__.keys()
-        rlist = [s for s in param_list if s in kf_class_keylist]
-
-        return rlist
-
 
 
     def present(self):
@@ -308,7 +278,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         kname = self.input_type.get() + 'Generator'
         kname = kname.replace(' ','')
         p = self.get_params()
-        rp = self.relevant_parameters(kname,self.param_frame.tparams.keys())
+        rp = self.param_frame.relevant_parameters(kname)
         ndict = {}
         ### JABHACKALERT!
         ###
@@ -326,7 +296,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
 
 
     def reset_to_defaults(self):
-        self.param_frame.prop_frame.set_values(self.default_values)
+        self.param_frame.reset_to_defaults()
         self.input_type.set(self.input_types[0])
         self.present_length.setvalue(DEFAULT_PRESENTATION)
         for each in self.in_ep_dict.keys():
@@ -342,24 +312,10 @@ class InputParamsPanel(plotpanel.PlotPanel):
     def get_params(self):
         """Get the property values as a dictionary."""
         params = self.param_frame.prop_frame.get_values()
-
-# With no Photograph option, this block is not useful.  Something similar
-# may have to go back in once Photograph patterns are created.
-#        if self.input_type.get() == 'Photograph':
-#            # The type is PGM and the file name is the Photograph
-#            params['type'] = 'PGM'
-#            params['filename'] = "'" + params['Photograph'] + "'"
-#        else:
-#            # Otherwise get the type from the input_type selector
-#            # and set the filename to null
-#            params['type'] = self.input_type.get()
-#            params['filename'] = ''
-
         if self.learning.get():
             params['learning'] = 'true'
         else:
             params['learning'] = 'false'
-        
         return params
 
 
