@@ -102,22 +102,6 @@ class ProjectionSheet(Sheet):
     The output_fn is a function s(A) that takes an activity matrix
     A and produces and identically shaped output matrix. The default
     is the identity function.
-
-    A Projection from another sheet takes two parameters:
-
-    connection_type: The type of projection to use for the connection.
-
-    connection_params: A dictionary of keyword arguments for the
-    Projection constructor (defaulting to the empty dictionary {}).
-
-    For instance, given a simulator sim, an input sheet s1 and a
-    ProjectionSheet s2, one might connect them thus:
-
-    sim.connect(s1,s2,connection_type=MyProjectionType,
-                      connection_params=dict(a=1,b=2))
-
-    s2 would then construct a new projection of type MyProjectionType
-    with the parameters (a=1,b=2).
     """
 
     # Should be changed to a OutputFunctionParameter
