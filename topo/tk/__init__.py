@@ -20,6 +20,7 @@ import projectionpanel
 import cfsheetplotpanel
 import inputparamspanel
 import preferencemappanel
+import parameterframe
 
 # For topo.tk.show_cmd_prompt() and start()
 import Pmw, sys, Tkinter
