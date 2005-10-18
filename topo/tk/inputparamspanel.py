@@ -17,7 +17,7 @@ $Id$
 """
 import __main__
 import math, string, re
-import propertiesframe
+import parameterframe
 import topo.base.patterngenerator
 import topo.plotting.plot
 import plotpanel
@@ -27,9 +27,9 @@ import topo.base.registry
 from Tkinter import IntVar, StringVar, Checkbutton
 from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
 from copy import deepcopy
+from topo.base.utils import eval_atof
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.sheet import BoundingBox, Sheet
-from topo.base.utils import eval_atof
 from topo.base.utils import find_classes_in_package
 from topo.base.patterngenerator import PatternGenerator
 from topo.patterns.patternpresent import generator_eps, pattern_present
@@ -149,45 +149,8 @@ class InputParamsPanel(plotpanel.PlotPanel):
                        items = self.input_types
                        ).pack(side=TOP)
  
-        self.prop_frame = propertiesframe.PropertiesFrame(self,string_translator=eval_atof)
+        self.param_frame = parameterframe.ParameterFrame(self)
 
-        ### JABHACKALERT!
-        ###
-        ### There can't be any list of valid parameters defined in
-        ### this class; the user needs to be able to add any arbitrary
-        ### parameter to a new PatternGenerator of his or her own design.
-        ### So all the information below needs to be stored with the
-        ### PatternGenerator or some lower-level entity, preferably as
-        ### part of the Parameter definition.  Some of the values here
-        ### are just hints, while others are absolute maximum or
-        ### minimums, and the Parameter definition would need to
-        ### distinguish between those two cases.
-        
-        self.tparams = {}
-        #                name          min-value    max-value  init-value
-        #
-        self.tparams['theta'] = \
-          self.add_slider( 'theta',         "0"       , "PI*2",  "0"      )
-        self.tparams['x'] = \
-          self.add_slider( 'x',             "-1"      , "1"   ,  "0"      )
-        self.tparams['y'] = \
-          self.add_slider( 'y',             "-1"      , "1"   , "0"       )
-        self.tparams['min'] = \
-          self.add_slider( 'min',           "0"       , "1"   , "0"       )
-        self.tparams['max'] = \
-          self.add_slider( 'max',           "0"       , "1"   , "1"       )
-        self.tparams['width'] = \
-          self.add_slider( 'width',         "0.000001", "1"   , "0.2"     )
-        self.tparams['height'] = \
-          self.add_slider( 'height',        "0.000001", "1"   , "0.2"     )
-        self.tparams['frequency'] = \
-          self.add_slider( 'frequency',     "0.01"    , "7"   ,  "5"      )
-        self.tparams['phase'] = \
-          self.add_slider( 'phase',         "0"       , "PI*2",  "PI/2"   )
-        self.tparams['disk_radius'] = \
-          self.add_slider( 'disk_radius',   "0"       , "1"   ,  "0.2"    )
-        self.tparams['gaussian_width'] = \
-          self.add_slider( 'gaussian_width',"0.000001", "1"   ,  "0.15"   )
 
 # How to access the list of non-hidden Parameters in a PatternGenerator object
 #        # Test to find the params and names.
@@ -202,12 +165,12 @@ class InputParamsPanel(plotpanel.PlotPanel):
 
 
         self._refresh_sliders(self.input_type.get())
-        self.prop_frame.pack(side=TOP,expand=YES,fill=X)
+        self.param_frame.pack(side=TOP,expand=YES,fill=X)
 
         # Hook to turn learning back on when Panel is closed.
         self.parent.protocol('WM_DELETE_WINDOW',self._reset_and_destroy)
 
-        self.default_values = self.prop_frame.get_values()
+        self.default_values = self.param_frame.prop_frame.get_values()
         self._create_inputsheet_patterns()
         self.refresh()
 
@@ -254,13 +217,13 @@ class InputParamsPanel(plotpanel.PlotPanel):
         """
         new_name = new_name.replace(' ','') + 'Generator'
         # How to wipe the widgets off the screen
-        for (s,c) in self.tparams.values():
+        for (s,c) in self.param_frame.tparams.values():
             s.grid_forget()
             c.grid_forget()
         # Make relevant parameters visible.
-        new_sliders = self.relevant_parameters(new_name,self.tparams.keys())
+        new_sliders = self.relevant_parameters(new_name,self.param_frame.tparams.keys())
         for i in range(len(new_sliders)):
-            (s,c) = self.tparams[new_sliders[i]]
+            (s,c) = self.param_frame.tparams[new_sliders[i]]
             s.grid(row=i,column=0,padx=self.padding,
                    pady=self.padding,sticky=E)
             c.grid(row=i,
@@ -286,11 +249,6 @@ class InputParamsPanel(plotpanel.PlotPanel):
 
         return rlist
 
-
-
-    def add_slider(self,name,min,max,init):
-        return self.prop_frame.add_tagged_slider_property(name,init,
-                 min_value=min,max_value=max,width=30,string_format='%.6f')
 
 
     def present(self):
@@ -350,7 +308,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         kname = self.input_type.get() + 'Generator'
         kname = kname.replace(' ','')
         p = self.get_params()
-        rp = self.relevant_parameters(kname,self.tparams.keys())
+        rp = self.relevant_parameters(kname,self.param_frame.tparams.keys())
         ndict = {}
         ### JABHACKALERT!
         ###
@@ -368,7 +326,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
 
 
     def reset_to_defaults(self):
-        self.prop_frame.set_values(self.default_values)
+        self.param_frame.prop_frame.set_values(self.default_values)
         self.input_type.set(self.input_types[0])
         self.present_length.setvalue(DEFAULT_PRESENTATION)
         for each in self.in_ep_dict.keys():
@@ -383,7 +341,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
 
     def get_params(self):
         """Get the property values as a dictionary."""
-        params = self.prop_frame.get_values()
+        params = self.param_frame.prop_frame.get_values()
 
 # With no Photograph option, this block is not useful.  Something similar
 # may have to go back in once Photograph patterns are created.
@@ -432,7 +390,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         Use the parent class refresh
         """
         self._create_inputsheet_patterns()
-        for entry in self.tparams.values():
+        for entry in self.param_frame.tparams.values():
             if entry[1].need_to_refresh_slider:
                 entry[1].set_slider_from_tag()
         super(InputParamsPanel,self).refresh()
