@@ -9,24 +9,11 @@ GUIs or other types of interfaces can also be used.
 $Id$
 """
 
-# For importing the tk GUI files
-import propertiesframe
-import taggedslider
-import topoconsole
-import plotpanel
-import basicplotpanel
-import unitweightspanel
-import projectionpanel
-import cfsheetplotpanel
-import inputparamspanel
-import preferencemappanel
-import parameterframe
-
-# For topo.tk.show_cmd_prompt() and start()
 import Pmw, sys, Tkinter
 import topo.base.simulator
 import topo.base.registry
 import topo.base.topoobject
+import topoconsole
 
 def show_cmd_prompt():
     """
