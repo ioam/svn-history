@@ -42,7 +42,6 @@ LIST_REVERSE = True
 # Default time to show in the Presentation duration box.
 DEFAULT_PRESENTATION = '1.0'
 
-
 # By default, none of the pattern types in topo/patterns/ are imported
 # in Topographica, but for the GUI, we want all of them to be
 # available as a list from which the user can select. To do this, we
@@ -53,9 +52,6 @@ from topo.patterns import *
 patternclasses=find_classes_in_package(topo.patterns,PatternGenerator)
 topo.base.registry.pattern_generators.update(patternclasses)
 
-
-
-    
 
 def patterngenerator_names():
     """
@@ -72,12 +68,9 @@ def patterngenerator_names():
 
 
 class InputParamsPanel(plotpanel.PlotPanel):
-
-    ### This function is too long, and should be broken up if at all possible.
     def __init__(self,parent,pengine,console=None,padding=2,**config):
         super(InputParamsPanel,self).__init__(parent,pengine,console,**config)
         self.plot_group.configure(tag_text='Preview')
-
         self.INITIAL_PLOT_WIDTH = 100
         self.padding = padding
         self.parent = parent
@@ -111,8 +104,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         buttonBox.add('Present', command = self.present)
         buttonBox.add('Reset to Defaults', command = self.reset_to_defaults)
         self.learning_button = Checkbutton(self,text='Network Learning',
-                                      variable=self.learning,
-                                      command=self._learning_toggle)
+                                      variable=self.learning)
         self.learning_button.pack(side=TOP)
         buttonBox.add('Use for future learning',command = self.use_for_learning)
 
@@ -130,11 +122,9 @@ class InputParamsPanel(plotpanel.PlotPanel):
         self._refresh_sliders(self.input_type.get())
         self.param_frame.pack(side=TOP,expand=YES,fill=X)
 
-
         # Hook to turn learning back on when Panel is closed.
         self.parent.protocol('WM_DELETE_WINDOW',self._reset_and_destroy)
 
-        #self.default_values = self.param_frame.prop_frame.get_values()
         self._create_inputsheet_patterns()
         self.refresh()
 
@@ -148,29 +138,6 @@ class InputParamsPanel(plotpanel.PlotPanel):
         """
         self.in_ep_dict[button_name]['state'] = checked
         
-
-    def _learning_toggle(self):
-        """
-        Invoked by the learning checkbox.
-        """
-        learning = self.learning.get()
-        sim = self.console.active_simulator()
-        if not learning:
-            sim.state_push()
-            for each in sim.get_event_processors():
-                if isinstance(each,Sheet):
-                    each.learning = False
-                    each.activity_push()
-        else: # Turn learning on and restore if there is a saved state.
-            saved_state = sim.state_len()
-            if saved_state:
-                sim.state_pop()
-            for each in sim.get_event_processors():
-                if isinstance(each,Sheet):
-                    each.learning = True
-                    if saved_state:
-                        each.activity_pop()
-            
 
     def _refresh_sliders(self,new_name):
         """
@@ -201,7 +168,27 @@ class InputParamsPanel(plotpanel.PlotPanel):
         new_patterns_dict = self._create_inputsheet_patterns()
         input_dict = dict([(name,d['pattern'])
                            for (name,d) in new_patterns_dict.items()])
-        pattern_present(input_dict,self.present_length.getvalue())
+
+        # Save the learning stack, and pop it off.
+        # This is here until a satisfactory substitute is written.
+        learning = self.learning.get()
+        sim = self.console.active_simulator()
+        if not learning:
+            sim.state_push()
+            for each in sim.get_event_processors():
+                if isinstance(each,Sheet):
+                    each.learning = False
+#                    each.activity_push()
+
+        pattern_present(input_dict,self.present_length.getvalue(),learning=self.learning.get())
+
+        if not learning:
+            sim.state_pop()
+            for each in sim.get_event_processors():
+                if isinstance(each,Sheet):
+                    each.learning = True
+#                    each.activity_pop()
+
         self.console.auto_refresh()
 
 
@@ -292,7 +279,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         don't need a completely new PlotGroup type for this temporary
         plot.
 
-        Post: self.pe_group contains a PlotGroup.
+        Return self.pe_group which contains a PlotGroup.
         """
         plist = []
         for each in self.in_ep_dict.keys():
@@ -330,14 +317,8 @@ class InputParamsPanel(plotpanel.PlotPanel):
         """
         There should only be one InputParamsPanel for the Simulator.
         When the window is made to go away, a new window should be
-        allowed.  More importantly, the learning needs to be turned
-        back on if the learning had been previously turned off by the
-        user.
+        allowed.  
         """
-        if not self.learning.get():
-            self.learning_button.invoke()
-            self.debug("Learning re-enabled.")
-            topo.tk.show_cmd_prompt()
         self.console.input_params_window = None
         self.parent.destroy()
 
