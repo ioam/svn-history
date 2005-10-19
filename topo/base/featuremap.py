@@ -1,5 +1,5 @@
 """
-FeatureMap
+FeatureMap class.
 
 $Id$
 """
@@ -8,79 +8,72 @@ from Numeric import array, zeros, add, Float  # need add?
 from distribution import Distribution
 
 
-def fm_add(activity_matrix,stimulus_value):
-    """
-    Procedure that transforms a matrix of activity to a matrix of dictionnaries
-    with a single key equal to stimulus_value
-
-    This is used by the update FeatureMap method,and enables to simply use the __add__
-    method of the Distribution class
-    """
-    
-    new_matrix=zeros(activity_matrix.shape,'O')
-    for i in range(len(activity_matrix)):
-        for j in range(len(activity_matrix[i])):
-                       new_matrix[i,j] = {stimulus_value:activity_matrix[i,j]}
-    return new_matrix
-
-
 class FeatureMap(object):
     """
+    A feature map for a stimulus dimension (e.g. Orientation) for one Sheet.
+
+    Given a set of activity matrices and associated parameter values,
+    constructs a preference map and a selectivity map for that parameter.
     """
 
-    def __init__(self, axis_range, cyclic, keep_peak, dim_activity_matrix):
-        """
-        The only attribute pf a FeatureMap is the matrix that stores the Distribution
-        object associating with the activity matrix that relates to this FeatureMap
-
+    def __init__(self, activity_matrix_dimensions, axis_range=(0.0,1.0), cyclic=False):
         
-        """
-        # get same Distribution object every time        
-        # self.distribution_matrix = array([[Distribution(axis_range, cyclic, keep_peak)]*cols]*rows)
-
-        rows, cols = dim_activity_matrix
-        self.distribution_matrix = zeros(dim_activity_matrix,'O')
+        # Initialize the internal data structure: a matrix of Distribution objects.
+        # It would be nice to do this using some sort of map() or apply() function...
+        rows, cols = activity_matrix_dimensions
+        self.distribution_matrix = zeros(activity_matrix_dimensions,'O')
         for i in range(rows):
             for j in range(cols):
-                self.distribution_matrix[i,j] = Distribution(axis_range,cyclic,keep_peak)
+                self.distribution_matrix[i,j] = Distribution(axis_range,cyclic,keep_peak=True)
        
 
-    def update(self, activity_matrix, stimulus_value):
+    def update(self, activity_matrix, feature_value):
+        """Add a new matrix of activity values for a given stimulus value."""
+        ### JABHACKALERT!  Need to override +=, not +, due to modifying argument
+        self.distribution_matrix + self.__make_pairs(activity_matrix,feature_value)
+
+
+    def __make_pairs(self,activity_matrix,feature_value):
         """
+        Transform an activity matrix to a matrix of dictionaries {feature_value:element}.
+    
+        Private method for use with the __add__ method of the Distribution class.
         """
         
-        self.distribution_matrix + fm_add(activity_matrix,stimulus_value)
+        new_matrix=zeros(activity_matrix.shape,'O')
+        for i in range(len(activity_matrix)):
+            for j in range(len(activity_matrix[i])):
+                           new_matrix[i,j] = {feature_value:activity_matrix[i,j]}
+        return new_matrix
 
-    def map(self):
-        """
-        """
+
+    def preference(self):
+        """Return the preference map for this feature as a matrix."""
 
         rows, cols = self.distribution_matrix.shape
         preference_matrix=zeros((rows, cols),Float) 
 
-        # preference_matrix = self.distribution_matrix
-        
         for i in range(rows):
             for j in range(cols):
                 preference_matrix[i,j]=self.distribution_matrix[i,j].weighted_average()
 
         return preference_matrix
         
+
     def selectivity(self):
-        """
-        """
+        """Return the selectivity map for this feature as a matrix."""
 
         rows, cols = self.distribution_matrix.shape
         selectivity_matrix=zeros((rows, cols),Float) 
 
-        # preference_matrix = self.distribution_matrix
-        
         for i in range(rows):
             for j in range(cols):
                 selectivity_matrix[i,j]=self.distribution_matrix[i,j].selectivity()
 
         return selectivity_matrix
          
+
+
 
 
         
