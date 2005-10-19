@@ -26,7 +26,6 @@ import topo.base.sheetview
 import topo.base.registry
 from Tkinter import IntVar, StringVar, Checkbutton
 from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
-from copy import deepcopy
 from topo.base.utils import eval_atof
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.sheet import BoundingBox, Sheet
@@ -51,20 +50,23 @@ DEFAULT_PRESENTATION = '1.0'
 from topo.patterns import *
 patternclasses=find_classes_in_package(topo.patterns,PatternGenerator)
 topo.base.registry.pattern_generators.update(patternclasses)
-
+from topo.base.keyedlist import KeyedList
 
 def patterngenerator_names():
     """
-    Return the existing list of PatternGenerator subclasses.  This list
-    will change based on the existing classes found in the registry,
-    and can be extended by the user.
+    Return the existing list of PatternGenerator names as a KeyedList.
+
+    In the returned dictionary the Keys are the viewable names, and
+    the Values are the class names.  This list will change based on
+    the existing classes found in the registry, and can be extended by
+    the user.
     """
     k = topo.base.registry.pattern_generators.keys()
-    k = [re.sub('Generator$','',name) for name in k]  # Cut off 'Generator'
+    k = [(re.sub('Generator$','',name),name) for name in k]  # Cut off 'Generator'
     for i in range(len(k)):        # Add spaces before capital leters
         for c in string.uppercase:
-            k[i] = k[i].replace(c,' '+c).strip()
-    return k
+            k[i] = (k[i][0].replace(c,' '+c).strip(),k[i][1])
+    return KeyedList(k)
 
 
 class InputParamsPanel(plotpanel.PlotPanel):
@@ -109,7 +111,8 @@ class InputParamsPanel(plotpanel.PlotPanel):
         buttonBox.add('Use for future learning',command = self.use_for_learning)
 
         # Define menu of valid PatternGenerator types
-        self.input_types = patterngenerator_names()
+        self.pg_name_dict = patterngenerator_names()
+        self.input_types = self.pg_name_dict.keys()
         self.input_type = StringVar()
         self.input_type.set(self.input_types[0])
         Pmw.OptionMenu(self,command = self._refresh_sliders,
@@ -122,16 +125,22 @@ class InputParamsPanel(plotpanel.PlotPanel):
         self._refresh_sliders(self.input_type.get())
         self.param_frame.pack(side=TOP,expand=YES,fill=X)
 
-        self.in_ep_dict = self._create_inputsheet_patterns(self.in_ep_dict)
+        self.in_ep_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         self.refresh()
+
+
+    def cur_pg_name(self):
+        """Readability furction to get the real name of the selected PatternGenerator"""
+        return self.pg_name_dict[self.input_type.get()]
 
 
     def _input_change(self,button_name, checked):
         """
-        Called by the input box.
         The variable checked records the state, either True or False.
-        The variable self.in_ep_dict records all input event
-        processors, and whether they are checked or not.
+
+        Called by the input box.  The variable self.in_ep_dict records
+        all input event processors, and whether they are checked or
+        not.
         """
         self.in_ep_dict[button_name]['state'] = checked
         
@@ -144,9 +153,9 @@ class InputParamsPanel(plotpanel.PlotPanel):
         added to the screen.  The widgets themselves do not change but
         the grid location does.
         """
-        new_name = new_name.replace(' ','') + 'Generator'
+        new_name = self.pg_name_dict[new_name]
         self.param_frame.refresh_sliders(new_name)
-        self.in_ep_dict = self._create_inputsheet_patterns(self.in_ep_dict)
+        self.in_ep_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         if self.auto_refresh: self.refresh()
 
 
@@ -162,7 +171,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         This function is run no matter if learning is enabled or
         disabled since run() will detect sheet attributes.
         """
-        new_patterns_dict = self._create_inputsheet_patterns(self.in_ep_dict)
+        new_patterns_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         input_dict = dict([(name,d['pattern'])
                            for (name,d) in new_patterns_dict.items()])
         pattern_present(input_dict,self.present_length.getvalue(),learning=self.learning.get())
@@ -182,46 +191,11 @@ class InputParamsPanel(plotpanel.PlotPanel):
 
         This function does run() the simulator but for 0.0 time.
         """
-        new_patterns_dict = self._create_inputsheet_patterns(self.in_ep_dict)
+        new_patterns_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         input_dict = dict([(name,d['pattern'])
                            for (name,d) in new_patterns_dict.items()])
         pattern_present(input_dict,0.0,sim=None,restore=False)
         self.console.auto_refresh()
-
-
-
-    ### JAB: It is not clear how this will need to be extended to support
-    ### objects with different parameters in the different eyes, e.g. to
-    ### test ocular dominance.
-    def _create_inputsheet_patterns(self,ep_dict):
-        """
-        Make an instantiation of the current user pattern in
-        preparation of passing in the set to the pattern presentation
-        function.  The new pattern generator will be placed in a
-        dictionary for the input sheet under the key 'pattern'.
-
-        If the 'state' is turned off (from a button on the Frame),
-        then do not change the currently stored generator.  This
-        allows eyes to have different presentation patterns.
-        """
-        kname = self.input_type.get() + 'Generator'
-        kname = kname.replace(' ','')
-        p = self.param_frame.prop_frame.get_values()
-        rp = self.param_frame.relevant_parameters(kname)
-        ndict = {}
-        ### JABHACKALERT!
-        ###
-        ### How will this work for photographs and other items that need non-numeric
-        ### input boxes?  It *seems* to be assuming that everything is a float.
-        for each in rp:
-            ndict[each] = eval_atof(p[each])
-        for each in ep_dict.keys():
-            if ep_dict[each]['state']:
-                ndict['density'] = ep_dict[each]['obj'].density
-                ndict['bounds'] = deepcopy(ep_dict[each]['obj'].bounds)
-                pg = topo.base.registry.pattern_generators[kname](**ndict)
-                ep_dict[each]['pattern'] = pg
-        return ep_dict  
 
 
     def reset_to_defaults(self):
@@ -231,7 +205,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         for each in self.in_ep_dict.keys():
             if not self.in_ep_dict[each]['state']:
                 self.input_box.invoke(each)
-        self.in_ep_dict = self._create_inputsheet_patterns(self.in_ep_dict)
+        self.in_ep_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         self._refresh_sliders(self.input_type.get())
         if self.auto_refresh: self.refresh()
         if self.learning.get():
@@ -264,7 +238,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         """
         Refresh this class and also call the parent class refresh.
         """
-        self.in_ep_dict = self._create_inputsheet_patterns(self.in_ep_dict)
+        self.in_ep_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         self.param_frame.refresh()
         super(InputParamsPanel,self).refresh()
 

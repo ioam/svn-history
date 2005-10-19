@@ -9,7 +9,7 @@ import propertiesframe
 import topo.base.registry
 from Tkinter import Frame, TOP, LEFT, RIGHT, BOTTOM, YES, N,S,E,W,X
 from topo.base.utils import eval_atof
-
+from copy import deepcopy
 
 class ParametersFrame(Frame):
     def __init__(self, parent=None,**config):
@@ -120,6 +120,38 @@ class ParametersFrame(Frame):
         rlist = [s for s in self.tparams.keys() if s in kf_class_keylist]
 
         return rlist
+
+
+    ### JAB: It is not clear how this will need to be extended to support
+    ### objects with different parameters in the different eyes, e.g. to
+    ### test ocular dominance.
+    def create_patterns(self,pg_name,ep_dict):
+        """
+        Make an instantiation of the current user patterns.
+
+        The new pattern generator will be placed in a passed in
+        dictionary for the input sheet under the key 'pattern'.
+
+        If the 'state' is turned off (from a button on the Frame),
+        then do not change the currently stored generator.  This
+        allows eyes to have different presentation patterns.
+        """
+        p = self.prop_frame.get_values()
+        rp = self.relevant_parameters(pg_name)
+        ndict = {}
+        ### JABHACKALERT!
+        ###
+        ### How will this work for photographs and other items that need non-numeric
+        ### input boxes?  It *seems* to be assuming that everything is a float.
+        for each in rp:
+            ndict[each] = eval_atof(p[each])
+        for each in ep_dict.keys():
+            if ep_dict[each]['state']:
+                ndict['density'] = ep_dict[each]['obj'].density
+                ndict['bounds'] = deepcopy(ep_dict[each]['obj'].bounds)
+                pg = topo.base.registry.pattern_generators[pg_name](**ndict)
+                ep_dict[each]['pattern'] = pg
+        return ep_dict  
 
 
 
