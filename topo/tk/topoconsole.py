@@ -334,18 +334,13 @@ class TopoConsole(Frame):
         """
         pe = self.active_plotengine()
         if pe:
-            if self.input_params_window == None:
-                self.input_params_window = GUIToplevel(self)
-                self.input_params_window.withdraw()
-                self.input_params_window.title('Test Pattern')
-                ripp = InputParamsPanel(self.input_params_window,pe,self)
-                ripp.pack(side=TOP,expand=YES,fill=BOTH)
-                self.input_params_window.deiconify()
-                self.messageBar.message('state', 'OK')
-            else:
-                self.input_params_window.deiconify()
-                self.input_params_window.lift()
-                self.input_params_window.focus_set()
+            self.input_params_window = GUIToplevel(self)
+            self.input_params_window.withdraw()
+            self.input_params_window.title('Test Pattern')
+            ripp = InputParamsPanel(self.input_params_window,pe,self)
+            ripp.pack(side=TOP,expand=YES,fill=BOTH)
+            self.input_params_window.deiconify()
+            self.messageBar.message('state', 'OK')
         else:
             self.messageBar.message('state', 'No active Simulator object.')
 
