@@ -6,6 +6,8 @@ $Id$
 
 # CEB,JBF
 # To do:
+# - add sheetview after each input presentation; this will also
+#   allow us to check the input patterns are as expected
 # - namespace __main__, as in later comment 
 # - remove temporary testing code
 # - give the variables better names!
@@ -20,6 +22,8 @@ from topo.sheets.generatorsheet import GeneratorSheet
 
 import __main__
 
+# this is depracated - find new function
+from string import capitalize
 
 ## temporary ##
 from topo.patterns.basic import SineGratingGenerator
@@ -90,16 +94,15 @@ class MeasureFeatureMap(object):
         simulator: the variable name holding the simulator from which to get the sheets.
 
         feature_param: a dictionary with features as keys and their parameters as values.
-                       {dimension_name: (range, values, cyclic, keep_peak)}
+                       {dimension_name: (range, values, cyclic)}
                        range: the tuple (lower_bound, upper_bound)
                        values: either a list of the values to use for the feature (list), or
                                       a step size (float) to generate the list frange(lower_bound,upper_bound,values)
                        cyclic: whether or not the feature is cyclic (see topo.base.distribution)
-                       keep_peak: whether or not to store and use only the peak value (see topo.base.distribution)
                        e.g.    
-                       {'theta': (0.0,1.0), 0.10, True, True}  for cyclic theta in steps of 0.10 from 0.0 to 1.0
-                       {'x': (0.0,2.0), [0.0, 0.5, 0.6, 0.7, 1.0], False, True}  for the non-cyclic x values specified, which may
-                                                                                 only fall in the range [0.0,1.0].
+                       {'theta': (0.0,1.0), 0.10, True}  for cyclic theta in steps of 0.10 from 0.0 to 1.0
+                       {'x': (0.0,2.0), [0.0, 0.5, 0.6, 0.7, 1.0], False}  for the non-cyclic x values specified, which may
+                                                                           only fall in the range [0.0,1.0].
         """
         # This dictionary will, for each sheet, contain a dictionary to hold the FeatureMap for each feature
         # {sheet: {feature: FeatureMap()}}
@@ -125,42 +128,49 @@ class MeasureFeatureMap(object):
         for sheet in self.measured_sheets:
             self.sheet_featuremaps[sheet] = {}
             for feature, value in feature_param.items():
-                self.sheet_featuremaps[sheet].update({feature: FeatureMap(value[0], value[2], value[3],sheet.activity.shape)})
+                self.sheet_featuremaps[sheet].update({feature: FeatureMap(activity_matrix_dimensions=sheet.activity.shape,
+                                                                          axis_range=value[0],
+                                                                          cyclic=value[2])})
 
-        generator_sheets = simulator.objects(GeneratorSheet)
-
+        # temp for testing        
+        self.generator_sheets = simulator.objects(GeneratorSheet)
         self.simulator=simulator
 
-        ## temporay ##
-        # create the inputs dictionary used by the pattern_present method
-        # only used for testing with the default command
-        self.inputs = dict().fromkeys(generator_sheets,SineGratingGenerator())
-        ##############
-       
-        
-    def pattern_present_update(self,input_command="pattern_present(self.inputs, 5.0, self.simulator, False)"):
+               
+    def pattern_present_update(self,input_command="pattern_present(inputs, 5.0, self.simulator, False)"):
         """
-        First create a list of all permutations of the feature values, then, for each permutation, set the
+        Create a list of all permutations of the feature values, then, for each permutation, set the
         feature values in the namespace __main__ and execute the user's code (input_command) there too, updating
         the feature maps.
 
         Note: allows execution of arbitrary code.
         """
         input_permutations = cross_product(self.list_param)
-       
+        print input_permutations
+
+        # just for testing
+        # exec "from topo.patterns.patternpresent import pattern_present" in __main__.__dict__
+
         for permutation in input_permutations:
-            i=0
             for sheet in self.measured_sheets:
-                j=0
-                for feature in self.sheet_featuremaps[sheet].keys():
-                    the = feature + "=" + repr(permutation[i])
-                    exec the in __main__.__dict__
-                    exec input_command # in __main__.__dict__
+                k=0
+                for feature in self.sheet_featuremaps[sheet].keys():                    
+                    set_feature_variables_cmd = feature + "=" + repr(permutation[k])
+
+                    ## temporaray - used for testing default input_command ##
+                    inputs = dict().fromkeys(self.generator_sheets,SineGratingGenerator())
+                    exec set_feature_variables_cmd #in __main__.__dict__
+                    exec input_command #in __main__.__dict__
                  
-                    self.sheet_featuremaps[sheet][feature].update(self.measured_sheets[j].activity, permutation[i])
-                    j=j+1
+                    self.sheet_featuremaps[sheet][feature].update(sheet.activity, permutation[k])
+                    k=k+1
 
-            i=i+1
+        for sheet in self.measured_sheets:
+            for feature in self.sheet_featuremaps[sheet].keys():
+                sheet.add_sheet_view(capitalize(feature)+'Preference', self.sheet_featuremaps[sheet][feature].preference())
+                sheet.add_sheet_view(capitalize(feature)+'Selectivity', self.sheet_featuremaps[sheet][feature].selectivity())
+            
+           
 
-                
-
+            
+            
