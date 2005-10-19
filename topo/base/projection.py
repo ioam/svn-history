@@ -114,15 +114,17 @@ class ProjectionSheet(Sheet):
         self.new_input = False
 
 
-    def _connect_from(self, proj, **args):
+    def _connect_from(self, conn, **args):
         """
         Accept a connection from src, on src_port, for dest_port.
         Contruct a dictionary of projections indexed by source name.
         """
-        #Sheet._connect_from(self, proj, **args)
-        if proj.src.name not in self.in_projections:
-            self.in_projections[proj.src.name] = []
-        self.in_projections[proj.src.name].append(proj)
+        Sheet._connect_from(self, conn, **args)
+
+        if isinstance(conn, Projection):
+            if conn.src.name not in self.in_projections:
+                self.in_projections[conn.src.name] = []
+            self.in_projections[conn.src.name].append(conn)
 
 
     def input_event(self,src,src_port,dest_port,data):
