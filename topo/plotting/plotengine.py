@@ -103,6 +103,14 @@ class PlotEngine(TopoObject):
         self.plot_group_dict = {}
 
 
+    ### JABHACKALERT!  (for Judah)
+    ###
+    ### This type of function occurs in a number of different places
+    ### throughout the code.  Please search for all calls to
+    ### get_event_processors(), and replace any of them that are just
+    ### selecting subclasses (like this one does) and replace it with a
+    ### call to simulator.objects(baseclass).  E.g. this function should
+    ### be deleted, with simulator.objects(Sheet) used instead.
     def _sheets(self):
         """
         Get the list of sheets from the event processor list attached

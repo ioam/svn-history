@@ -31,7 +31,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.sheet import BoundingBox, Sheet
 from topo.base.utils import find_classes_in_package
 from topo.base.patterngenerator import PatternGenerator
-from topo.patterns.patternpresent import generator_eps, pattern_present
+from topo.patterns.patternpresent import pattern_present
 
 # Hack to reverse the order of the input EventProcessor list and the
 # Preview plot list, so that it'll match the order that the plots appear
@@ -83,7 +83,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         # Variables and widgets for maintaining the list of input sheets
         # that will be given the user defined stimuli.
         self.in_ep_dict = {}
-        for (each,obj) in generator_eps(self.console.active_simulator()).items():
+        for (each,obj) in self.console.active_simulator().objects(GeneratorSheet).items():
             self.in_ep_dict[each] = {'obj':obj,'state':True,'pattern':None} 
         self.input_box = Pmw.RadioSelect(parent, labelpos = 'w',
                                 command = self._input_change,label_text = 'Input Sheets:',

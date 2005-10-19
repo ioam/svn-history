@@ -17,29 +17,6 @@ import topo.base.registry
 from topo.sheets.generatorsheet import GeneratorSheet
 
 
-### JABHACKALERT!  (for Judah)
-###
-### This type of function occurs in a number of different places
-### throughout the code.  Please search for all calls to
-### get_event_processors(), and replace any of them that are just
-### selecting subclasses (like this one does) and replace it with a
-### call to simulator.objects(baseclass).  E.g. this function should
-### be deleted, with sim.objects(GeneratorSheet) used instead.
-def generator_eps(sim):
-    """
-    Return a dictionary of event processors in the passed in simulator
-    that can have PatternGenerators added to them.
-
-    Post: Key = String name, Value = object.
-
-    Anything that is a GeneratorSheet will be added.
-    """
-    eps = sim.get_event_processors()
-    i_eps = dict([(i.name,i) for i in eps if isinstance(i,GeneratorSheet)])
-    return i_eps
-
-
-
 def _store_inputsheet_patterns(gen_eps_dict):
     """
     Store the patterns currently in the GeneratorSheets.  This allows
@@ -116,7 +93,7 @@ def pattern_present(inputs=None,duration=1.0,sim=None, restore=True, learning=Fa
                     each.learning = False
                     #each.activity_push()
 
-        gen_eps_list = generator_eps(sim)
+        gen_eps_list = sim.objects(GeneratorSheet)
         original_patterns = _store_inputsheet_patterns(gen_eps_list)
         _register_inputsheet_patterns(inputs,gen_eps_list)
         sim.run(duration)
