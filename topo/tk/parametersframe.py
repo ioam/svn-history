@@ -80,6 +80,12 @@ class ParametersFrame(Frame):
         self.prop_frame.set_values(self.default_values)
 
 
+    def refresh(self):
+        for entry in self.tparams.values():
+            if entry[1].need_to_refresh_slider:
+                entry[1].set_slider_from_tag()
+
+
     def refresh_sliders(self,new_name):
         """
         The visible TaggedSliders will be updated.  The old ones are
