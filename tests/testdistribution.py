@@ -1,4 +1,3 @@
-
 """
 Tests of distribution.py
 
@@ -7,7 +6,7 @@ $Id$
 
 # CEB:
 # This file is still being written
-
+#
 # To do:
 # - add comments
 # - clean up redundant tests
@@ -22,7 +21,7 @@ from math import pi, atan2, cos
 from topo.base.utils import arg
 
 
-class TestHistogram(unittest.TestCase):
+class TestDistribution(unittest.TestCase):
 
     def setUp(self):
         self.h = Distribution((0.0,5.0))
@@ -216,13 +215,7 @@ class TestHistogram(unittest.TestCase):
         self.assertAlmostEqual(self.d.selectivity(), 0.25) 
         
 
-        
-cases = [TestHistogram]
-
 suite = unittest.TestSuite()
-
-suite.addTests([unittest.makeSuite(case) for case in cases])
+suite.addTest(unittest.makeSuite(TestDistribution))
               
-if __name__ == '__main__':
-    unittest.TextTestRunner(verbosity=1).run(suite)
 
