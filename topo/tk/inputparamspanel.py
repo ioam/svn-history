@@ -122,10 +122,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         self._refresh_sliders(self.input_type.get())
         self.param_frame.pack(side=TOP,expand=YES,fill=X)
 
-        # Hook to turn learning back on when Panel is closed.
-        self.parent.protocol('WM_DELETE_WINDOW',self._reset_and_destroy)
-
-        self._create_inputsheet_patterns()
+        self.in_ep_dict = self._create_inputsheet_patterns(self.in_ep_dict)
         self.refresh()
 
 
@@ -149,7 +146,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         """
         new_name = new_name.replace(' ','') + 'Generator'
         self.param_frame.refresh_sliders(new_name)
-        self._create_inputsheet_patterns()
+        self.in_ep_dict = self._create_inputsheet_patterns(self.in_ep_dict)
         if self.auto_refresh: self.refresh()
 
 
@@ -165,30 +162,10 @@ class InputParamsPanel(plotpanel.PlotPanel):
         This function is run no matter if learning is enabled or
         disabled since run() will detect sheet attributes.
         """
-        new_patterns_dict = self._create_inputsheet_patterns()
+        new_patterns_dict = self._create_inputsheet_patterns(self.in_ep_dict)
         input_dict = dict([(name,d['pattern'])
                            for (name,d) in new_patterns_dict.items()])
-
-        # Save the learning stack, and pop it off.
-        # This is here until a satisfactory substitute is written.
-        learning = self.learning.get()
-        sim = self.console.active_simulator()
-        if not learning:
-            sim.state_push()
-            for each in sim.get_event_processors():
-                if isinstance(each,Sheet):
-                    each.learning = False
-#                    each.activity_push()
-
         pattern_present(input_dict,self.present_length.getvalue(),learning=self.learning.get())
-
-        if not learning:
-            sim.state_pop()
-            for each in sim.get_event_processors():
-                if isinstance(each,Sheet):
-                    each.learning = True
-#                    each.activity_pop()
-
         self.console.auto_refresh()
 
 
@@ -205,7 +182,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
 
         This function does run() the simulator but for 0.0 time.
         """
-        new_patterns_dict = self._create_inputsheet_patterns()
+        new_patterns_dict = self._create_inputsheet_patterns(self.in_ep_dict)
         input_dict = dict([(name,d['pattern'])
                            for (name,d) in new_patterns_dict.items()])
         pattern_present(input_dict,0.0,sim=None,restore=False)
@@ -216,7 +193,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
     ### JAB: It is not clear how this will need to be extended to support
     ### objects with different parameters in the different eyes, e.g. to
     ### test ocular dominance.
-    def _create_inputsheet_patterns(self):
+    def _create_inputsheet_patterns(self,ep_dict):
         """
         Make an instantiation of the current user pattern in
         preparation of passing in the set to the pattern presentation
@@ -229,7 +206,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         """
         kname = self.input_type.get() + 'Generator'
         kname = kname.replace(' ','')
-        p = self.get_params()
+        p = self.param_frame.prop_frame.get_values()
         rp = self.param_frame.relevant_parameters(kname)
         ndict = {}
         ### JABHACKALERT!
@@ -238,13 +215,13 @@ class InputParamsPanel(plotpanel.PlotPanel):
         ### input boxes?  It *seems* to be assuming that everything is a float.
         for each in rp:
             ndict[each] = eval_atof(p[each])
-        for each in self.in_ep_dict.keys():
-            if self.in_ep_dict[each]['state']:
-                ndict['density'] = self.in_ep_dict[each]['obj'].density
-                ndict['bounds'] = deepcopy(self.in_ep_dict[each]['obj'].bounds)
+        for each in ep_dict.keys():
+            if ep_dict[each]['state']:
+                ndict['density'] = ep_dict[each]['obj'].density
+                ndict['bounds'] = deepcopy(ep_dict[each]['obj'].bounds)
                 pg = topo.base.registry.pattern_generators[kname](**ndict)
-                self.in_ep_dict[each]['pattern'] = pg
-        return self.in_ep_dict  # Doesn't have to return it, but is explicit.
+                ep_dict[each]['pattern'] = pg
+        return ep_dict  
 
 
     def reset_to_defaults(self):
@@ -254,21 +231,11 @@ class InputParamsPanel(plotpanel.PlotPanel):
         for each in self.in_ep_dict.keys():
             if not self.in_ep_dict[each]['state']:
                 self.input_box.invoke(each)
-        self._create_inputsheet_patterns()
+        self.in_ep_dict = self._create_inputsheet_patterns(self.in_ep_dict)
         self._refresh_sliders(self.input_type.get())
         if self.auto_refresh: self.refresh()
         if self.learning.get():
             self.learning_button.invoke()
-
-
-    def get_params(self):
-        """Get the property values as a dictionary."""
-        params = self.param_frame.prop_frame.get_values()
-        if self.learning.get():
-            params['learning'] = 'true'
-        else:
-            params['learning'] = 'false'
-        return params
 
 
     def do_plot_cmd(self):
@@ -295,30 +262,9 @@ class InputParamsPanel(plotpanel.PlotPanel):
 
     def refresh(self):
         """
-        Use the parent class refresh
+        Refresh this class and also call the parent class refresh.
         """
-        self._create_inputsheet_patterns()
-        for entry in self.param_frame.tparams.values():
-            if entry[1].need_to_refresh_slider:
-                entry[1].set_slider_from_tag()
+        self.in_ep_dict = self._create_inputsheet_patterns(self.in_ep_dict)
+        self.param_frame.refresh()
         super(InputParamsPanel,self).refresh()
-
-    ### JABHACKALERT!
-    ### 
-    ### It should be perfectly ok to have multiple InputParamsPanels,
-    ### and would be very useful.  E.g. in one panel one could have
-    ### defined a horizontal test stimulus, and another a vertical
-    ### stimulus, and the user could present either one as he or she
-    ### wishes.  For this to work, some of the complicated state saving
-    ### and similar code in this file needs to be moved out of this
-    ### class, but that's a good idea anyway.  E.g. that code needs to
-    ### be available without a GUI, e.g. for measuring preference maps.
-    def _reset_and_destroy(self):
-        """
-        There should only be one InputParamsPanel for the Simulator.
-        When the window is made to go away, a new window should be
-        allowed.  
-        """
-        self.console.input_params_window = None
-        self.parent.destroy()
 
