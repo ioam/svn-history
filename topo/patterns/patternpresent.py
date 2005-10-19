@@ -11,6 +11,7 @@ of object.
 """
 
 from topo.base.topoobject import TopoObject
+from topo.base.sheet import Sheet
 import topo.base.simulator
 import topo.base.registry
 from topo.sheets.generatorsheet import GeneratorSheet
@@ -81,7 +82,7 @@ def _register_inputsheet_patterns(inputs,gen_eps_dict):
             TopoObject().warning('%s not a valid Sheet Name.' % each)
 
 
-def pattern_present(inputs=None,duration=1.0,sim=None, restore=True):
+def pattern_present(inputs=None,duration=1.0,sim=None, restore=True, learning=False):
     """
     Generalized function that grew out of the inputparamspanel.py
     code.  Move the user created patterns into the GeneratorSheets,
@@ -105,13 +106,30 @@ def pattern_present(inputs=None,duration=1.0,sim=None, restore=True):
     if not sim:
         sim = topo.base.registry.active_sim()
     if sim:
+
+        # Save the learning stack
+        # This is here until a satisfactory function substitute is written.
+        if not learning:
+            sim.state_push()
+            for each in sim.get_event_processors():
+                if isinstance(each,Sheet):
+                    each.learning = False
+                    #each.activity_push()
+
         gen_eps_list = generator_eps(sim)
         original_patterns = _store_inputsheet_patterns(gen_eps_list)
         _register_inputsheet_patterns(inputs,gen_eps_list)
-            
         sim.run(duration)
-            
         if restore:
             _register_inputsheet_patterns(original_patterns,gen_eps_list)
+
+        # Restore the event queue
+        if not learning:
+            sim.state_pop()
+            for each in sim.get_event_processors():
+                if isinstance(each,Sheet):
+                    each.learning = True
+                    #each.activity_pop()
+
     else:
         TopoObject().warning('No active Simulator.')
