@@ -174,7 +174,7 @@ class PatternGenerator(TopoObject):
     bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True)
     density = Parameter(default=10000,hidden=True)
 
-    theta = Parameter(default=0)
+    theta = Number(default=0,softbounds=(0.0,2*pi))
 
     def __call__(self,**params):
         self.verbose("params = ",params)
