@@ -17,10 +17,11 @@ class UniformRandomGenerator(PatternGenerator):
     """
     Uniform random noise pattern generator.
     """
-    x       = Number(default=0.0,softbounds=(-1.0,1.0))
-    y       = Number(default=0.0,softbounds=(-1.0,1.0))
-    min     = Number(default=0.0,bounds=(0.0,1.0),softbounds=(0.0,1.0))
-    max     = Number(default=1.0,bounds=(0.0,1.0),softbounds=(0.0,1.0))
+    x       = Number(hidden = True)
+    y       = Number(hidden = True)
+    theta   = Number(hidden = True)
+    min     = Number(default=0.0, hidden = True)  # CEB:
+    max     = Number(default=1.0, hidden = True)  # to be removed
     
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)
@@ -31,10 +32,13 @@ class UniformRandomGenerator(PatternGenerator):
         r = params.get('rows',0)
         c = params.get('cols',0)
 
+        # CEB:
+        # max and min will be calculated from scale and offset.
+
         if r == 0 and c == 0:
             r,c = bounds2shape( params.get('bounds',self.bounds),
                                 params.get('density',self.density))
 
-        return RandomArray.uniform( params.get('min',self.min),
+        return self.scale*RandomArray.uniform( params.get('min',self.min),
                                     params.get('max',self.max),
-                                    (r,c))
+                                    (r,c))+self.offset

@@ -174,7 +174,11 @@ class PatternGenerator(TopoObject):
     bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True)
     density = Parameter(default=10000,hidden=True)
 
+    x       = Number(default=0.0,softbounds=(-1.0,1.0))
+    y       = Number(default=0.0,softbounds=(-1.0,1.0))
     theta = Number(default=0,softbounds=(0.0,2*pi))
+    scale = Number(default=1.0,softbounds=(0.0,2.0))
+    offset = Number(default=0.0,softbounds=(-1.0,1.0))
 
     def __call__(self,**params):
         self.verbose("params = ",params)
@@ -185,13 +189,13 @@ class PatternGenerator(TopoObject):
                       params.get('theta',self.theta),
                       params.get('rows',0),
                       params.get('cols',0))
-        return self.function(**params)
+        return self.scale*self.function(**params)+self.offset
 
     def setup_xy(self,bounds,density,x,y,theta,rows,cols):
         self.verbose("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
         xm,ym = produce_pattern_matrices(bounds,density,rows,cols)
         self.pattern_x, self.pattern_y = transform_coordinates(xm-x,ym-y,theta)
-
+        
 
 ### JABHACKALERT!
 ###
@@ -206,11 +210,18 @@ class ConstantGenerator(PatternGenerator):
     """
     Constant pattern generator, i.e. a solid, uniform field of the same value.
     """
-    x       = Number(default=0.0,softbounds=(-1.0,1.0),hidden=True)
-    y       = Number(default=0.0,softbounds=(-1.0,1.0),hidden=True)
-
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)
+
+    # CEB:
+    # Whenever anything (e.g. the GUI) asks for the list of parameters,
+    # "hidden" ones won't be displayed to the user.
+    x       = Number(hidden = True)
+    y       = Number(hidden = True)
+    theta   = Number(hidden = True)
+
+    # CEB:
+    # these two functions could be combined into one? (see also same thing in random.py) 
     def __call__(self,**params):
         return self.function(**params)
 
@@ -221,4 +232,4 @@ class ConstantGenerator(PatternGenerator):
         if r == 0 and c == 0:
             r,c = bounds2shape(params.get('bounds',self.bounds),
                                params.get('density',self.density))
-        return ones((r,c), Float)
+        return self.scale*ones((r,c), Float)+self.offset
