@@ -7,7 +7,7 @@ import random
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.patterngenerator import BoundingBox
 from topo.projections.kernelprojection import KernelProjection
-from topo.base.parameter import Dynamic
+from topo.base.parameter import DynamicNumber
 from topo.sheets.cfsom import CFSOM
 from topo.patterns.random import UniformRandomGenerator
 from topo.patterns.basic import FuzzyLineGenerator
@@ -21,10 +21,10 @@ from topo.base.simulator import Simulator
 GeneratorSheet.period = 1.0
 GeneratorSheet.density = 30
 
-FuzzyLineGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-FuzzyLineGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+FuzzyLineGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+FuzzyLineGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 
-FuzzyLineGenerator.theta = Dynamic(lambda :random.uniform(-pi,pi))
+FuzzyLineGenerator.theta = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(-1.0,1.0))
 FuzzyLineGenerator.width = 0.02
 FuzzyLineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
