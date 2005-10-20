@@ -18,7 +18,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.kernelprojection import KernelProjection
 from topo.patterns.basic import GaussianGenerator
 from topo.base.sheet import BoundingBox
-from topo.base.parameter import Dynamic
+from topo.base.parameter import DynamicNumber
 from topo.responsefns.basic import CFDotProduct
 
 
@@ -64,10 +64,10 @@ fixedpoint.DEFAULT_PRECISION=3
 GeneratorSheet.density = RN
 GeneratorSheet.period = 1
 
-GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+GaussianGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+GaussianGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 
-GaussianGenerator.theta = Dynamic(lambda :random.uniform(-pi,pi))
+GaussianGenerator.theta = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(-pi,pi))
 GaussianGenerator.width = xsigma/RN
 GaussianGenerator.height = ysigma/RN
 GaussianGenerator.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
