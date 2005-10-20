@@ -76,6 +76,7 @@ class ParametersFrame(Frame):
         new_param_names = self.pg_parameters(new_name)
         self.make_sliders_from_params(new_param_names,self.tparams)
         new_sliders = dict(new_param_names).keys()
+        new_sliders.sort()
 #        new_sliders = self.relevant_parameters(new_name)
         for i in range(len(new_sliders)):
             (s,c) = self.tparams[new_sliders[i]]
