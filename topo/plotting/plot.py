@@ -222,8 +222,12 @@ class Plot(TopoObject):
                     self.name = 'Undefined'
                 else:
                     sv = self.source.sheet_view(each)
-                    self.channel_views.append(sv)
-                    self.view_info = sv.view_info
+                    if sv==None:
+                        self.warning('No sheet view named ' + each + ' in Sheet ' + self.source.name)
+                        self.channel_views.append(None)
+                    else:
+                        self.channel_views.append(sv)
+                        self.view_info = sv.view_info
 
             # Case 3: Channel entry is None.  Pass along.
             elif each == None:
@@ -260,7 +264,7 @@ class Plot(TopoObject):
             # Do the HSV-->RGB conversion, assume the caller will be
             # displaying the plot as an RGB.
             h,s,v = self.matrices
-
+            
             # V is [2]
             if self.normalize and max(max(v)) > 0:
                 v = divide(self.matrices[2],float(max(max(v))))
