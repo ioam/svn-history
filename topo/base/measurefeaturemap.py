@@ -32,6 +32,10 @@ from topo.patterns.basic import *
 from topo.patterns.patternpresent import *
 ###############
 
+## to see for creating the SheetView object
+
+from sheetview import SheetView
+
 
 
 ## to go to topo.base.utils ##
@@ -123,8 +127,14 @@ class MeasureFeatureMap(object):
                 self.list_param.append(frange(low_bound,up_bound,step))
 
         # find all the sheets that will have their feature maps measured (i.e. all Sheets that aren't GeneratorSheets)
-        f= lambda x: not isinstance(x,GeneratorSheet)
-        self.measured_sheets = filter(f,simulator.objects(Sheet).values())
+
+       ### 
+       # f= lambda x: not isinstance(x,GeneratorSheet)
+       # self.measured_sheets = filter(f,simulator.objects(Sheet).values())
+       ###
+       # above is the way to go normaly but because we want to plot we also needs to create
+       # sheet view for the Generator Sheet (plot does not work when nothing is the Retina)
+        self.measured_sheets = simulator.objects(Sheet).values()
 
         # now create the featuremaps for each sheet  
         for sheet in self.measured_sheets:
@@ -148,7 +158,9 @@ class MeasureFeatureMap(object):
         Note: allows execution of arbitrary code.
         """
         input_permutations = cross_product(self.list_param)
-        print input_permutations
+
+        # just for testing 
+        #print input_permutations
 
         # ### for testing ###
         # this will be user's code
@@ -182,11 +194,19 @@ class MeasureFeatureMap(object):
                     m = m + 1
 
         for sheet in self.measured_sheets:
-            for feature in self.sheet_featuremaps[sheet].keys():
-                sheet.add_sheet_view(capitalize(feature)+'Preference', self.sheet_featuremaps[sheet][feature].preference())
-                sheet.add_sheet_view(capitalize(feature)+'Selectivity', self.sheet_featuremaps[sheet][feature].selectivity())
-            
-           
+               
+                bounding_box = sheet.bounds
+                
+                for feature in self.sheet_featuremaps[sheet].keys():
 
-            
-            
+                    view_preference = SheetView((self.sheet_featuremaps[sheet][feature].preference(),bounding_box))
+                    print type(view_preference)
+                    print(view_preference)
+                    
+                
+                    view_selectivity = SheetView((self.sheet_featuremaps[sheet][feature].selectivity(),bounding_box))
+                    sheet.add_sheet_view(capitalize(feature)+'Preference', view_preference)
+                    sheet.add_sheet_view(capitalize(feature)+'Selectivity', view_selectivity)
+
+                
+ 
