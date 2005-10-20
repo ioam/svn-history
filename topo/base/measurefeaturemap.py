@@ -5,11 +5,13 @@ $Id$
 """
 
 # CEB,JBF
+
 # To do:
 # - add sheetview after each input presentation; this will also
 #   allow us to check the input patterns are as expected
 # - namespace __main__, as in later comment 
 # - remove temporary testing code
+# - will go into featuremap.py
 # - give the variables better names!
 # - make variables private as appropriate
 #
@@ -26,7 +28,7 @@ import __main__
 from string import capitalize
 
 ## temporary ##
-from topo.patterns.basic import SineGratingGenerator
+from topo.patterns.basic import *
 from topo.patterns.patternpresent import *
 ###############
 
@@ -148,22 +150,26 @@ class MeasureFeatureMap(object):
         input_permutations = cross_product(self.list_param)
         print input_permutations
 
-        # just for testing
+        # ### for testing ###
         # exec "from topo.patterns.patternpresent import pattern_present" in __main__.__dict__
+        zed = SineGratingGenerator()
+        inputs = dict().fromkeys(self.generator_sheets,zed)
+        #####################
 
         for permutation in input_permutations:
             for sheet in self.measured_sheets:
                 k=0
                 for feature in self.sheet_featuremaps[sheet].keys():                    
-                    set_feature_variables_cmd = feature + "=" + repr(permutation[k])
-
-                    ## temporaray - used for testing default input_command ##
-                    inputs = dict().fromkeys(self.generator_sheets,SineGratingGenerator())
-                    exec set_feature_variables_cmd #in __main__.__dict__
-                    exec input_command #in __main__.__dict__
-                 
+                    #set_feature_variables_cmd = feature + "=" + repr(permutation[k])
+                    
+                    # hacktastic
+                    update_generator_cmd = "zed." + feature + "=" + repr(permutation[k]) 
+                    ## temporary (to change) - used for testing default input_command ##
+                    #exec set_feature_variables_cmd #in __main__.__dict__
+                    exec update_generator_cmd
                     self.sheet_featuremaps[sheet][feature].update(sheet.activity, permutation[k])
                     k=k+1
+                exec input_command #in __main__.__dict__
 
         for sheet in self.measured_sheets:
             for feature in self.sheet_featuremaps[sheet].keys():
