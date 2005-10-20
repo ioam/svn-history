@@ -258,9 +258,11 @@ class Integer(Number):
       raise "Parameter must be an integer."
     super(Integer,self).__set__(obj,val)
 
+
 class Magnitude(Number):
   def __init__(self,default=1.0,softbounds=(None,None),doc="",**params):
     Number.__init__(self,default=default,bounds=(0.0,1.0),softbounds=softbounds,doc=doc,**params)
+
 
 class BooleanParameter(Parameter):
   def __init__(self,default=False,bounds=(0,1),doc="",**params):
@@ -275,6 +277,47 @@ class BooleanParameter(Parameter):
         raise "BooleanParameter must be True or False"
 
     super(BooleanParameter,self).__set__(obj,val)
+
+
+### Should this multiply inherit from Dynamic and Number?
+### (Currently mixed together by hand)
+class DynamicNumber(Number):
+  """
+  Dynamic version of Number parameter.
+
+  If set with a callable object, the bounds are checked when the number is
+  retrieved (generated), rather than when it is set.
+  """
+  def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),doc="",**params):
+    Parameter.__init__(self,default=default,doc=doc,**params)
+    self.bounds = bounds
+    self._softbounds = softbounds  
+    self._check_bounds(default)  # only create this number if the default value and bounds are consistent
+
+
+  def __get__(self,obj,objtype):
+    """
+    Get a parameter value.  If called on the class, produce the
+    default value.  If called on an instance, produce the instance's
+    value, if one has been set, otherwise produce the default value.
+    """
+    if not obj:
+        result = produce_value(self.default)
+    else:
+        result = produce_value(obj.__dict__.get(self.name,self.default))
+    self._check_bounds(result)
+    return result
+
+  def _check_bounds(self,val):
+    """
+    Except for callable values (assumed to be checked at get time), checks against bounds.
+
+    Non-callable values are checked to be numeric and within the hard
+    bounds.  If they are not, an exception is raised.
+    """
+
+    if not callable(val):
+      super(DynamicNumber,self)._check_bounds(val)
 
 
 class Dynamic(Parameter):
