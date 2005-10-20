@@ -18,59 +18,35 @@ class ParametersFrame(Frame):
         Frame.__init__(self,parent,config)
         self.tparams = {}
         self.default_values = self.prop_frame.get_values()
-
-        ### JABHACKALERT!
-        ###
-        ### There can't be any list of valid parameters defined in
-        ### this class; the user needs to be able to add any arbitrary
-        ### parameter to a new PatternGenerator of his or her own design.
-        ### So all the information below needs to be stored with the
-        ### PatternGenerator or some lower-level entity, preferably as
-        ### part of the Parameter definition.  Some of the values here
-        ### are just hints, while others are absolute maximum or
-        ### minimums, and the Parameter definition would need to
-        ### distinguish between those two cases.
-        
-        #                name          min-value    max-value  init-value
-        #
-        self.tparams['theta'] = \
-          self.add_slider( 'theta',         "0"       , "PI*2",  "0"      )
-        self.tparams['x'] = \
-          self.add_slider( 'x',             "-1"      , "1"   ,  "0"      )
-        self.tparams['y'] = \
-          self.add_slider( 'y',             "-1"      , "1"   , "0"       )
-        self.tparams['min'] = \
-          self.add_slider( 'min',           "0"       , "1"   , "0"       )
-        self.tparams['max'] = \
-          self.add_slider( 'max',           "0"       , "1"   , "1"       )
-        self.tparams['width'] = \
-          self.add_slider( 'width',         "0.000001", "1"   , "0.2"     )
-        self.tparams['height'] = \
-          self.add_slider( 'height',        "0.000001", "1"   , "0.2"     )
-        self.tparams['frequency'] = \
-          self.add_slider( 'frequency',     "0.01"    , "7"   ,  "5"      )
-        self.tparams['phase'] = \
-          self.add_slider( 'phase',         "0"       , "PI*2",  "PI/2"   )
-        self.tparams['disk_radius'] = \
-          self.add_slider( 'disk_radius',   "0"       , "1"   ,  "0.2"    )
-        self.tparams['gaussian_width'] = \
-          self.add_slider( 'gaussian_width',"0.000001", "1"   ,  "0.15"   )
-
         self.prop_frame.pack(side=TOP,expand=YES,fill=X)
 
 
-# How to access the list of non-hidden Parameters in a PatternGenerator object
-#        # Test to find the params and names.
-#        pgc = topo.base.registry.pattern_generators[kf_classname] 
-#        pg = pgc()
-#        plist = [(k,v)
-#                 for (k,v)  # ('name':'...', 'density':10000, ...)
-#                 in pg.get_paramobj_dict().items()
-#                 if not v.hidden
-#                 ]
-#        print plist
+    def pg_parameters(self,pg_classname):
+        """
+        Return the list of Parameter names and objects for the requested PatternGenerator name.
+        """
+        pgc = topo.base.registry.pattern_generators[pg_classname] 
+        pg = pgc()
+        plist = [(k,v)
+                 for (k,v)  # ('name':'...', 'density':10000, ...)
+                 in pg.get_paramobj_dict().items()
+                 if not v.hidden
+                 ]
+        print 'plist', plist
+        return plist
+    
 
-
+    def make_sliders_from_params(self,params,slider_dict):
+        """
+        Make a new slider for each name/value in the params list.
+        """
+        for (k,v) in params:
+            print '(k,v)', k, v
+            (low,high) = v.get_soft_bounds()
+            default = v.default
+            print 'slider: ',k,low,high,default
+            slider_dict[k] = self.add_slider(k,str(low),str(high),str(default))
+    
 
     def add_slider(self,name,min,max,init):
         return self.prop_frame.add_tagged_slider_property(name,init,
@@ -97,7 +73,10 @@ class ParametersFrame(Frame):
             s.grid_forget()
             c.grid_forget()
         # Make relevant parameters visible.
-        new_sliders = self.relevant_parameters(new_name)
+        new_param_names = self.pg_parameters(new_name)
+        self.make_sliders_from_params(new_param_names,self.tparams)
+        new_sliders = dict(new_param_names).keys()
+#        new_sliders = self.relevant_parameters(new_name)
         for i in range(len(new_sliders)):
             (s,c) = self.tparams[new_sliders[i]]
             s.grid(row=i,column=0,padx=self.prop_frame.padding,
@@ -109,17 +88,18 @@ class ParametersFrame(Frame):
                    sticky=N+S+W+E)
 
 
-    def relevant_parameters(self,kf_classname):
-        """
-        Pre:  kf_classname is the string name of a PatternGenerator subclass.
-        Post: List of strings that is the Intersection of kf_classname's
-              class member keys, and tparams.keys() entries.
-        """
-
-        kf_class_keylist = topo.base.registry.pattern_generators[kf_classname].__dict__.keys()
-        rlist = [s for s in self.tparams.keys() if s in kf_class_keylist]
-
-        return rlist
+# Preparing to remove
+#    def relevant_parameters(self,kf_classname):
+#        """
+#        Pre:  kf_classname is the string name of a PatternGenerator subclass.
+#        Post: List of strings that is the Intersection of kf_classname's
+#              class member keys, and tparams.keys() entries.
+#        """
+#
+#        kf_class_keylist = topo.base.registry.pattern_generators[kf_classname].__dict__.keys()
+#        rlist = [s for s in self.tparams.keys() if s in kf_class_keylist]
+#
+#        return rlist
 
 
     ### JAB: It is not clear how this will need to be extended to support
@@ -137,7 +117,8 @@ class ParametersFrame(Frame):
         allows eyes to have different presentation patterns.
         """
         p = self.prop_frame.get_values()
-        rp = self.relevant_parameters(pg_name)
+        # rp = self.relevant_parameters(pg_name)
+        rp = dict(self.pg_parameters(pg_name)).keys()
         ndict = {}
         ### JABHACKALERT!
         ###
