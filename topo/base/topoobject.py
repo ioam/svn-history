@@ -119,6 +119,7 @@ class TopoObject(object):
     __metaclass__ = TopoMetaclass
 
 
+    ### It might make sense to make the name be visible (not hidden) by default.
     name           = Parameter(default=None,hidden=True)
     print_level = Parameter(default=MESSAGE,hidden=True)
     
@@ -133,6 +134,7 @@ class TopoObject(object):
         self.__setup_params(**config)
         object_count += 1
 
+        self.nopickle = []
         self.verbose('Initialized',self)
 
     def __repr__(self):
@@ -179,6 +181,7 @@ class TopoObject(object):
         """
         self.__db_print(DEBUG,*args)
 
+
     def __setup_params(self,**config):
         for name,val in config.items():
             desc,desctype = self.__class__.get_param_descriptor(name)
@@ -187,6 +190,21 @@ class TopoObject(object):
             else:
                 self.warning("CANNOT SET non-parameter %s ="%name, val)
             setattr(self,name,val)
+
+    def get_param_values(self):
+        """Return a list of name,value pairs for all Parameters of this object"""
+        vals = []
+        for name in dir(self):
+            desc,desctype = self.__class__.get_param_descriptor(name)
+            if desc:
+                vals.append((name,getattr(self,name)))
+        vals.sort(key=lambda x:x[0])
+        return vals
+
+    def print_param_values(self):
+        for name,val in self.get_param_values():
+            print '%s.%s = %s' % (self.name,name,val)
+
 
     def __getstate__(self):
         import copy
@@ -197,8 +215,8 @@ class TopoObject(object):
                     del(state[x])
                 else:
                     desc,cls = type(self).get_param_descriptor(x)
-                    if desc and (desc.name in state):
-                        del(state[desc.name])
+                    if desc and (desc.get_name() in state):
+                        del(state[desc.get_name()])
                 
         except AttributeError,err:
             pass
@@ -219,8 +237,8 @@ class TopoObject(object):
     def unpickle(self):
         pass
 
-
-
+    ### Need to decide whether this is redundant with get_param_dict, and if
+    ### so which one to delete.
     def get_param_dict(self,**config):
         paramdict = {}
         for class_ in classlist(type(self)):
@@ -276,7 +294,7 @@ def descendents(class_):
 def print_all_param_defaults():
     print "===== Topographica Parameter Default Values ====="
     classes = descendents(TopoObject)
-    classes.sort(key=lambda c:c.__name__)
+    classes.sort(key=lambda x:x.__name__)
     for c in classes:
         c.print_param_defaults()
     print "==========================================="
