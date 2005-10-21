@@ -4,17 +4,14 @@ MeasureFeatureMap class
 $Id$
 """
 
-# CEB,JBF
+# CEB,JBFC
 
 # To do:
-# - add sheetview after each input presentation; this will also
-#   allow us to check the input patterns are as expected
 # - namespace __main__, as in later comment 
 # - remove temporary testing code
 # - will go into featuremap.py
 # - give the variables better names!
 # - make variables private as appropriate
-#
 # - some i,j counting could probably be done better
 
 
@@ -27,15 +24,13 @@ import __main__
 # this is depracated - find new function
 from string import capitalize
 
-## temporary ##
-from topo.patterns.basic import *
-from topo.patterns.patternpresent import *
-###############
-
-## to see for creating the SheetView object
 
 from sheetview import SheetView
 
+## temporary ##
+from topo.patterns.basic import GaussianGenerator, SineGratingGenerator
+from topo.patterns.patternpresent import pattern_present
+###############
 
 
 ## to go to topo.base.utils ##
@@ -144,6 +139,8 @@ class MeasureFeatureMap(object):
                                                                           axis_range=value[0],
                                                                           cyclic=value[2])})
 
+        
+
         # temp for testing        
         self.generator_sheets = simulator.objects(GeneratorSheet)
         self.simulator=simulator
@@ -164,9 +161,13 @@ class MeasureFeatureMap(object):
 
         # ### for testing ###
         # this will be user's code
+
         zed = GaussianGenerator()
         zed.height = 0.19
         zed.width = 0.075
+        #zed = SineGratingGenerator()
+        #zed.freq=5.0
+        #zed.scale=0.0606
         inputs = dict().fromkeys(self.generator_sheets,zed)
         #####################
 
@@ -199,12 +200,19 @@ class MeasureFeatureMap(object):
                 
                 for feature in self.sheet_featuremaps[sheet].keys():
 
-                    view_preference = SheetView((self.sheet_featuremaps[sheet][feature].preference(),bounding_box))
-                    print type(view_preference)
-                    print(view_preference)
+                    norm_factor = self.sheet_featuremaps[sheet][feature].distribution_matrix[0,0].axis_range
+
+                    view_preference = SheetView(((self.sheet_featuremaps[sheet][feature].preference())/norm_factor,bounding_box), sheet.name)
+
+                    # for testing: can be cut
+                    # print type(view_preference)
+                    # print(view_preference)
                     
-                
-                    view_selectivity = SheetView((self.sheet_featuremaps[sheet][feature].selectivity(),bounding_box))
+
+                    # hack_selectivity = ones(self.sheet_featuremaps[sheet][feature].selectivity().shape,Float)
+
+                    # view_selectivity = SheetView((hack_selectivity,bounding_box), sheet.name)
+                    view_selectivity = SheetView((self.sheet_featuremaps[sheet][feature].selectivity(),bounding_box), sheet.name)
                     sheet.add_sheet_view(capitalize(feature)+'Preference', view_preference)
                     sheet.add_sheet_view(capitalize(feature)+'Selectivity', view_selectivity)
 
