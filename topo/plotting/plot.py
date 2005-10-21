@@ -62,7 +62,6 @@ HSV = 'HSV'
 SHC = 'HSV'  # For now treat as an HSV, but reorder the channels.
 COLORMAP = 'COLORMAP'
 
-
 class PlotTemplate(TopoObject):
     """
     Container class for a plot object definition.  This is separate
@@ -85,6 +84,16 @@ class PlotTemplate(TopoObject):
         
 
 
+### JABHACKALERT!  This class should accept SheetViews, with no
+### reference to anything of type Sheet, and no plotting of anything
+### else.  It is ridiculously too difficult to understand and maintain
+### in its current form.  Any operation that depends on Sheet, such as
+### looking up SheetViews by name, or releasing SheetViews, should be
+### moved out of it.  PlotTemplate might be able to do such lookup,
+### because it's called for every Sheet, but if so it should always
+### map consisently from a name string to a SheetView, without trying
+### to handle all these special cases.  These classes are trying to be
+### way too smart; they should simply plot whatever they are given.
 class Plot(TopoObject):
     """
     Class that can construct a single bitmap plot from one or more
@@ -132,10 +141,6 @@ class Plot(TopoObject):
         self.source = sheet
 
         self.channels = (channel_1, channel_2, channel_3)
-        # Shuffle an SHC into HSV ordering:  SHC <- HSV
-        if plot_type == SHC:  
-            self.channels = (channel_2, channel_3, channel_1)
-
         self.plot_type = plot_type
         self.view_info = {}
         self.cropped = False
@@ -237,6 +242,7 @@ class Plot(TopoObject):
             else:
                 self.warning(each, 'not a String, Tuple, SheetView, or None')
 
+        ### JABALERT! Need to document what this code does.
         shape = (0,0)
         self.debug('self.channel_views = ' + str(self.channel_views))
         for each in self.channel_views:
@@ -246,16 +252,8 @@ class Plot(TopoObject):
                 shape = view_matrix[0].shape
             else:
                 self.matrices.append(None)
-        # Replace any Nones with a matrix of size 'shape' full of values.
-        if self.background == BLACK_BACKGROUND:
-            self.matrices = tuple([each or zeros(shape,Float)
-                                  for each in self.matrices])
-        else:
-            self.matrices = tuple([each or ones(shape,Float)
-                                  for each in self.matrices])
-            
-        
 
+                
         # By this point, self.matrices should be a triple of 2D
         # matrices trimmed and ready to go to the caller of this
         # function ... after a possible conversion to a different
@@ -263,22 +261,38 @@ class Plot(TopoObject):
         if self.plot_type == HSV:
             # Do the HSV-->RGB conversion, assume the caller will be
             # displaying the plot as an RGB.
-            h,s,v = self.matrices
             
-            # V is [2]
-            if self.normalize and max(max(v)) > 0:
-                v = divide(self.matrices[2],float(max(max(v))))
+            s,h,c = self.matrices
 
-            if max(h.flat) > 1 or max(s.flat) > 1 or max(v.flat) > 1:
+            zero=zeros(shape,Float)
+            one=ones(shape,Float)
+
+            ### JABHACKALERT Need to extend for white background; assumes black
+
+            # Determine appropriate defaults for each matrix
+            if s is None: s=one # Treat as full strength by default
+            if c is None: c=one # Treat as full confidence by default
+            if h is None: # No color -- should be changed to drop down to COLORMAP plot.
+                h=zero
+                c=zero
+
+            if self.normalize and max(max(s)) > 0:
+                s = divide(s,float(max(max(s))))
+
+            hue=h
+            sat=c
+            val=s
+            
+            if max(hue.flat) > 1 or max(sat.flat) > 1 or max(val.flat) > 1:
                 self.cropped = True
                 #self.warning('Plot: HSVMap inputs exceed 1. Clipping to 1.0')
-                if max(h.flat) > 0: h = MLab.clip(h,0.0,1.0)
-                if max(s.flat) > 0: s = MLab.clip(s,0.0,1.0)
-                if max(v.flat) > 0: v = MLab.clip(v,0.0,1.0)
+                if max(hue.flat) > 0: hue = MLab.clip(hue,0.0,1.0)
+                if max(sat.flat) > 0: sat = MLab.clip(sat,0.0,1.0)
+                if max(val.flat) > 0: val = MLab.clip(val,0.0,1.0)
             else:
                 self.cropped = False
 
-            self.matrices = matrix_hsv_to_rgb(h,s,v)
+            self.matrices = matrix_hsv_to_rgb(hue,sat,val)
 
         elif self.plot_type == COLORMAP:
             # Don't delete anything, maybe they want position #3, but
@@ -301,10 +315,17 @@ class Plot(TopoObject):
                 self.matrices = (single_map[0], single_map[0], single_map[0])
 
         elif self.plot_type == RGB:
-            # Do nothing, we're already in the RGB form.  Possibly
+            # Replace any Nones with a matrix of size 'shape' full of values.
+            if self.background == BLACK_BACKGROUND:
+                self.matrices = tuple([each or zeros(shape,Float)
+                                      for each in self.matrices])
+            else:
+                self.matrices = tuple([each or ones(shape,Float)
+                                      for each in self.matrices])
+
+            # Otherwise do nothing, we're already in the RGB form.  Possibly
             # change the order to make it match the Lissom order, OR
             # ADD BLACK_BACKGROUND, WHITE_BACKGROUND COLOR SHIFTS.
-            None
 
         else:
             self.warning('Unrecognized plot type')
