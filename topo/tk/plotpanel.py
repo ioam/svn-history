@@ -30,6 +30,8 @@ NYI = "Not Yet Implemented."
 
 def enum(seq):  return zip(range(len(seq)),seq)
 
+### JABHACKALERT! Shouldn't this be PlotGroupPanel, since it handles
+### one PlotGroup, not one Plot?
 class PlotPanel(Frame,topo.base.topoobject.TopoObject):
     """
     Abstract PlotPanel class for displaying bitmapped images to a TK
