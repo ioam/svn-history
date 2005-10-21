@@ -269,6 +269,11 @@ class Plot(TopoObject):
 
             ### JABHACKALERT Need to extend for white background; assumes black
 
+            # No plot; in the future should probably not be a warning
+            if (s==None and c==None and h==None):
+                self.message('Skipping empty plot.')
+                return None
+
             # Determine appropriate defaults for each matrix
             if s is None: s=one # Treat as full strength by default
             if c is None: c=one # Treat as full confidence by default

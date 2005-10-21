@@ -192,8 +192,7 @@ class PlotGroup(TopoObject):
         # done to each of the matrices that come in from the Plot
         # objects.
         generated_bitmap_list = [each.plot() for each in self.all_plots]
-
-        return generated_bitmap_list
+        return [each for each in generated_bitmap_list if each is not None]
 
 
 
@@ -309,11 +308,11 @@ pgt = PlotGroupTemplate([('Projection',
                                         'Normalize'       : True}))],
                         name='Projection')
 topo.base.registry.plotgroup_templates[pgt.name] = pgt
-pgt = PlotGroupTemplate([('Preference',
-                          PlotTemplate({'Strength'   : 'Activity',
-                                        'Hue'        : 'Activity',
-                                        'Confidence' : 'Activity'}))],
-                        name='Preference Map')
+pgt = PlotGroupTemplate([('Orientation Preference',
+                          PlotTemplate({'Strength'   : None,
+                                        'Hue'        : 'ThetaPreference',
+                                        'Confidence' : 'ThetaSelectivity'}))],
+                        name='Orientation Preference')
 topo.base.registry.plotgroup_templates[pgt.name] = pgt
 
 
