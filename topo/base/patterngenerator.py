@@ -216,9 +216,7 @@ class PatternGenerator(TopoObject):
 # needed.  The other concrete PatternGenerator classes are stored in
 # patterns/, to be imported as needed.
 class ConstantGenerator(PatternGenerator):
-    """
-    Constant pattern generator, i.e. a solid, uniform field of the same value.
-    """
+    """Constant pattern generator, i.e. a solid, uniform field of the same value."""
 
     # The standard x, y, and theta variables are currently ignored,
     # so they aren't shown in auto-generated lists of parameters (e.g. in the GUI)
@@ -228,13 +226,7 @@ class ConstantGenerator(PatternGenerator):
 
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)
-
-    # CEB:
-    # these two functions could be combined into one? (see also same thing in random.py) 
     def __call__(self,**params):
-        return self.function(**params)
-
-    def function(self,**params):
         r = params.get('rows',0)
 	c = params.get('cols',0)
 
