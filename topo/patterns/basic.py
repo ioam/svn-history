@@ -16,23 +16,21 @@ from topo.base.patterngenerator import ConstantGenerator
 
 
 class GaussianGenerator(PatternGenerator):
-    """
-    Gaussian pattern generator.
-    """
+    """2D Gaussian pattern generator."""
+    
     width   = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
 
     def function(self,**params):
-        return gaussian( self.pattern_x, 
-                         self.pattern_y, 
+        return gaussian( params.get('pattern_x',self.pattern_x), 
+                         params.get('pattern_y',self.pattern_y), 
                          params.get('width',self.width), 
                          params.get('height',self.height)) 
 
 
 class SineGratingGenerator(PatternGenerator):
-    """
-    Sine grating pattern generator.
-    """
+    """2D sine grating pattern generator."""
+    
     frequency = Number(default=5.0,bounds=(0.0,None),softbounds=(0.0,10.0))
     phase     = Number(default=pi/2,bounds=(0.0,None),softbounds=(0.0,2*pi))
 
@@ -44,24 +42,23 @@ class SineGratingGenerator(PatternGenerator):
         return 0.5 + 0.5*sin(frequency*2*pi*x + phase)
 
     def function(self,**params):
-        return self.sine_grating( self.pattern_x,
-                                  self.pattern_y,
+        return self.sine_grating( params.get('pattern_x',self.pattern_x),
+                                  params.get('pattern_y',self.pattern_y),
                                   params.get('frequency',self.frequency), 
                                   params.get('phase',self.phase)) 
 
 
 class GaborGenerator(PatternGenerator):
-    """
-    Gabor pattern generator.
-    """
+    """2D Gabor pattern generator."""
+    
     frequency = Number(default=5.0,bounds=(0.0,None),softbounds=(0.0,10.0))
     phase     = Number(default=pi/2,bounds=(0.0,None),softbounds=(0.0,2*pi))
     width   = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
 
     def function(self,**params):
-        return gabor( self.pattern_x,
-                      self.pattern_y,
+        return gabor( params.get('pattern_x',self.pattern_x),
+                      params.get('pattern_y',self.pattern_y),
                       params.get('width',self.width),
                       params.get('height',self.height),
                       params.get('frequency',self.frequency),
@@ -69,56 +66,50 @@ class GaborGenerator(PatternGenerator):
 
 
 class FuzzyLineGenerator(PatternGenerator):
-
-    """
-    Fuzzy line pattern generator.
-    """
+    """2D fuzzy line pattern generator."""
+    
     width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
     gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     
     def function(self,**params):
-        return fuzzy_line( self.pattern_x, 
-                           self.pattern_y,
+        return fuzzy_line( params.get('pattern_x',self.pattern_x), 
+                           params.get('pattern_y',self.pattern_y),
                            params.get('width',self.width),
                            params.get('gaussian_width',self.gaussian_width))
 
 
 class FuzzyDiskGenerator(PatternGenerator):
-
-    """
-    Fuzzy disk pattern generator.
-    """
+    """2D fuzzy disk pattern generator."""
+    
     width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
     disk_radius  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     
     def function(self,**params):
-        return fuzzy_disk( self.pattern_x, 
-                           self.pattern_y, 
+        return fuzzy_disk( params.get('pattern_x',self.pattern_x), 
+                           params.get('pattern_y',self.pattern_y), 
                            params.get('disk_radius',self.disk_radius), 
                            params.get('gaussian_width',self.gaussian_width))  
 
 
 class FuzzyRingGenerator(PatternGenerator):
-    """
-    Fuzzy ring pattern generator.
-    """
+    """2D fuzzy ring pattern generator."""
+    
     width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
     disk_radius  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
 
     def function(self,**params):
-        return fuzzy_ring(self.pattern_x, 
-                          self.pattern_y,
+        return fuzzy_ring(params.get('pattern_x',self.pattern_x), 
+                          params.get('pattern_y',self.pattern_y),
                           params.get('disk_radius',self.disk_radius),
                           params.get('width',self.width),
                           params.get('gaussian_width',self.gaussian_width))  
 
 
 class RectangleGenerator(PatternGenerator):
-    """
-    Rectangle pattern generator.
-    """
+    """2D rectangle pattern generator."""
+    
     width   = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
 
@@ -129,14 +120,13 @@ class RectangleGenerator(PatternGenerator):
     def function(self,**params):
         width = params.get('width',self.width)
         height= params.get('height',self.height)
-        return bitwise_and(abs(self.pattern_x)<=width/2.0,
-                           abs(self.pattern_y)<=height/2.0)
+        return bitwise_and(abs(params.get('pattern_x',self.pattern_x))<=width/2.0,
+                           abs(params.get('pattern_y',self.pattern_y))<=height/2.0)
 
 
 class SquareGratingGenerator(PatternGenerator):
-    """
-    Squarewave grating pattern generator.
-    """
+    """2D squarewave grating pattern generator."""
+    
     frequency = Number(default=5.0,bounds=(0.0,None),softbounds=(0.0,10.0))
     phase     = Number(default=pi/2,bounds=(0.0,None),softbounds=(0.0,2*pi))
 
@@ -152,8 +142,8 @@ class SquareGratingGenerator(PatternGenerator):
         return around(0.5 + 0.5*sin(frequency*2*pi*x + phase))
 
     def function(self,**params):
-        return self.square_grating( self.pattern_x,
-                                    self.pattern_y,
+        return self.square_grating( params.get('pattern_x',self.pattern_x),
+                                    params.get('pattern_y',self.pattern_y),
                                     params.get('frequency',self.frequency), 
                                     params.get('phase',self.phase)) 
 
