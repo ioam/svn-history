@@ -18,10 +18,11 @@ $Id$
 from featuremap import FeatureMap
 from sheet import Sheet
 from topo.sheets.generatorsheet import GeneratorSheet
-
+import topo.base.topoobject
 import __main__
+import topo.base.registry
 
-# this is depracated - find new function
+# this is deprecated - find new function
 from string import capitalize
 
 
@@ -141,7 +142,7 @@ class MeasureFeatureMap(object):
         self.simulator=simulator
 
                
-    def pattern_present_update(self,input_command="pattern_present(inputs, 1.0, self.simulator, False)"):
+    def pattern_present_update(self,input_command="pattern_present(inputs, 1.0, self.simulator, restore=True)"):
         """
         Create a list of all permutations of the feature values, then, for each permutation, set the
         feature values in the namespace __main__ and execute the user's code (input_command) there too, updating
@@ -151,66 +152,67 @@ class MeasureFeatureMap(object):
         """
         input_permutations = cross_product(self.list_param)
 
-        # just for testing 
-        #print input_permutations
-
         # ### for testing ###
         # this will be user's code
 
-        zed = GaussianGenerator()
-        zed.height = 0.19
-        zed.width = 0.075
-        #zed = SineGratingGenerator()
-        #zed.freq=5.0
-        #zed.scale=0.0606
-        #zed.offset=0.0        
+        # Create the input pattern
+        #zed = GaussianGenerator()
+        #zed.height = 0.19
+        #zed.width = 0.075
+        zed = SineGratingGenerator()
+        zed.freq=5.0
+        zed.scale=0.0606
+        zed.offset=0.0        
+        zed.offset=0.0
+        zed.get_paramobj_dict()['theta'].min_print_level = topo.base.topoobject.DEBUG
         inputs = dict().fromkeys(self.generator_sheets,zed)
+
         #####################
-
+        # Present the input pattern with various parameter settings,
+        # keeping track of the responses
         for permutation in input_permutations:
-            for sheet in self.measured_sheets:
-                k=0
-                # SET EACH FEATURE ON THE GENERATOR
-                for feature in self.sheet_featuremaps[sheet].keys():                    
-                    ## temporary (to change) - used for mock user's code ##
-                    update_generator_cmd = "zed." + feature + "=" + repr(permutation[k])                    
-                    exec update_generator_cmd                    
-                    k=k+1
-                    ## will be more like this...
-                    #set_feature_variables_cmd = feature + "=" + repr(permutation[k])
-                    #exec set_feature_variables_cmd in __main__.__dict__
+            sheet=self.measured_sheets[0] # Assumes that there is at least one sheet; needs fixing
+            k=0
+            # SET EACH FEATURE ON THE GENERATOR
+            for feature in self.sheet_featuremaps[sheet].keys():                    
+                ## temporary (to change) - used for mock user's code ##
+                update_generator_cmd = "zed." + feature + "=" + repr(permutation[k])
+                exec update_generator_cmd                    
+                k=k+1
+                ## will be more like this...
+                #set_feature_variables_cmd = feature + "=" + repr(permutation[k])
+                #exec set_feature_variables_cmd in __main__.__dict__
 
-                # DRAW THE PATTERN
-                exec input_command #in __main__.__dict__
+            # DRAW THE PATTERN
+            exec input_command #in __main__.__dict__
 
-                # NOW UPDATE EACH FEATUREMAP WITH (ACTIVITY,FEATURE_VALUE)
-                # is this right?
-                m = 0
-                for feature in self.sheet_featuremaps[sheet].keys():
-                    self.sheet_featuremaps[sheet][feature].update(sheet.activity, permutation[m])
-                    m = m + 1
+            # Temporary; refresh the display
+            debugmode=True
+            console=topo.base.registry.get_console()
+            if console and debugmode:
+               console.auto_refresh()
+            print permutation,zed.phase,zed.theta,sum(sum(self.measured_sheets[0].activity))
 
+            # NOW UPDATE EACH FEATUREMAP WITH (ACTIVITY,FEATURE_VALUE)
+            # is this right?
+            m = 0
+            for feature in self.sheet_featuremaps[sheet].keys():
+                self.sheet_featuremaps[sheet][feature].update(sheet.activity, permutation[m])
+                m = m + 1
+
+        #####################
+        # Now that the feature maps have been measured, construct the plots
         for sheet in self.measured_sheets:
-               
-                bounding_box = sheet.bounds
-                
-                for feature in self.sheet_featuremaps[sheet].keys():
-
-                    norm_factor = self.sheet_featuremaps[sheet][feature].distribution_matrix[0,0].axis_range
-
-                    view_preference = SheetView(((self.sheet_featuremaps[sheet][feature].preference())/norm_factor,bounding_box), sheet.name)
-
-                    # for testing: can be cut
-                    # print type(view_preference)
-                    # print(view_preference)
-                    
-
-                    # hack_selectivity = ones(self.sheet_featuremaps[sheet][feature].selectivity().shape,Float)
-
-                    # view_selectivity = SheetView((hack_selectivity,bounding_box), sheet.name)
-                    view_selectivity = SheetView((self.sheet_featuremaps[sheet][feature].selectivity(),bounding_box), sheet.name)
-                    sheet.add_sheet_view(capitalize(feature)+'Preference', view_preference)
-                    sheet.add_sheet_view(capitalize(feature)+'Selectivity', view_selectivity)
+            bounding_box = sheet.bounds
+            for feature in self.sheet_featuremaps[sheet].keys():
+            
+                norm_factor = self.sheet_featuremaps[sheet][feature].distribution_matrix[0,0].axis_range
+            
+                view_preference = SheetView(((self.sheet_featuremaps[sheet][feature].preference())/norm_factor,bounding_box), sheet.name)
+            
+                view_selectivity = SheetView((self.sheet_featuremaps[sheet][feature].selectivity(),bounding_box), sheet.name)
+                sheet.add_sheet_view(capitalize(feature)+'Preference', view_preference)
+                sheet.add_sheet_view(capitalize(feature)+'Selectivity', view_selectivity)
 
                 
  
