@@ -123,13 +123,8 @@ class MeasureFeatureMap(object):
 
         # find all the sheets that will have their feature maps measured (i.e. all Sheets that aren't GeneratorSheets)
 
-       ### 
-       # f= lambda x: not isinstance(x,GeneratorSheet)
-       # self.measured_sheets = filter(f,simulator.objects(Sheet).values())
-       ###
-       # above is the way to go normaly but because we want to plot we also needs to create
-       # sheet view for the Generator Sheet (plot does not work when nothing is the Retina)
-        self.measured_sheets = simulator.objects(Sheet).values()
+        f= lambda x: not isinstance(x,GeneratorSheet)
+        self.measured_sheets = filter(f,simulator.objects(Sheet).values())
 
         # now create the featuremaps for each sheet  
         for sheet in self.measured_sheets:
@@ -168,6 +163,7 @@ class MeasureFeatureMap(object):
         #zed = SineGratingGenerator()
         #zed.freq=5.0
         #zed.scale=0.0606
+        #zed.offset=0.0        
         inputs = dict().fromkeys(self.generator_sheets,zed)
         #####################
 
