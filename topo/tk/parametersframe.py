@@ -56,7 +56,7 @@ class ParametersFrame(Frame):
                  in pg.get_paramobj_dict().items()
                  if not v.hidden
                  ]
-        print 'plist', plist
+        #print 'plist', plist
         return plist
     
 
