@@ -24,7 +24,7 @@ GeneratorSheet.density = 20
 FuzzyLineGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 FuzzyLineGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 
-FuzzyLineGenerator.theta = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(-pi,pi))
+FuzzyLineGenerator.theta = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
 FuzzyLineGenerator.width = 0.02
 FuzzyLineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
