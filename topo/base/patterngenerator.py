@@ -195,7 +195,16 @@ class PatternGenerator(TopoObject):
         self.verbose("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
         xm,ym = produce_pattern_matrices(bounds,density,rows,cols)
         self.pattern_x, self.pattern_y = transform_coordinates(xm-x,ym-y,theta)
-        
+
+    def function(self,**params):
+        """
+        Subclasses will typically implement this function to draw a pattern.
+
+        The pattern will then be scaled and rotated automatically by __call__.
+        Alternatively, this function may be omitted and __call__ reimplemented,
+        e.g. if the automatic scaling and rotating is not appropriate.
+        """
+        raise NotImplementedError
 
 ### JABHACKALERT!
 ###
@@ -210,15 +219,15 @@ class ConstantGenerator(PatternGenerator):
     """
     Constant pattern generator, i.e. a solid, uniform field of the same value.
     """
-    # Optimization: We use a simpler __call__ method here to skip the
-    # coordinate transformations (which would have no effect anyway)
 
-    # CEB:
-    # Whenever anything (e.g. the GUI) asks for the list of parameters,
-    # "hidden" ones won't be displayed to the user.
+    # The standard x, y, and theta variables are currently ignored,
+    # so they aren't shown in auto-generated lists of parameters (e.g. in the GUI)
     x       = Number(hidden = True)
     y       = Number(hidden = True)
     theta   = Number(hidden = True)
+
+    # Optimization: We use a simpler __call__ method here to skip the
+    # coordinate transformations (which would have no effect anyway)
 
     # CEB:
     # these two functions could be combined into one? (see also same thing in random.py) 
