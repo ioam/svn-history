@@ -21,7 +21,7 @@ sheets is the unit square with its center at the origin.  i.e:
                        |    |    |
            (-0.5,-0.5) +----+----+ (0.5,-0.5)
 
-The default density is 100, giving the default sheet a 10x10
+The default density is 10, giving the default sheet a 10x10
 activity matrix.
 
 This scheme gives a Sheet two coordinate systems.  A pair of 'sheet
@@ -284,7 +284,7 @@ class Sheet(EventProcessor):
 
     bounds:   A BoundingBox object indicating the bounds of the sheet.
               [default  (-0.5,-0.5) to (0.5,0.5)]
-    density:  The linear density of the sheet [default 100]
+    density:  The linear density of the sheet [default 10]
 
     learning: Setting this to False tells the Sheet not to change its
               permanent state (e.g. any connection weights) based on
@@ -296,7 +296,7 @@ class Sheet(EventProcessor):
     """
 
     bounds  = Parameter(BoundingBox(points=((-0.5,-0.5),(0.5,0.5))))
-    density = Parameter(100)
+    density = Parameter(10)
     learning = BooleanParameter(True)
 
     def __init__(self,**params):
