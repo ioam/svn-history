@@ -308,10 +308,18 @@ pgt = PlotGroupTemplate([('Projection',
                                         'Normalize'       : True}))],
                         name='Projection')
 topo.base.registry.plotgroup_templates[pgt.name] = pgt
-pgt = PlotGroupTemplate([('Orientation Preference',
+pgt = PlotGroupTemplate([('OrientationPreference',
                           PlotTemplate({'Strength'   : None,
                                         'Hue'        : 'ThetaPreference',
-                                        'Confidence' : 'ThetaSelectivity'}))],
+                                        'Confidence' : None})),
+                         ('OrientationPreferenceAndSelectivity',
+                          PlotTemplate({'Strength'   : None,
+                                        'Hue'        : 'ThetaPreference',
+                                        'Confidence' : 'ThetaSelectivity'})),
+                         ('OrientationSelectivity',
+                          PlotTemplate({'Strength'   : 'ThetaSelectivity',
+                                        'Hue'        : None,
+                                        'Confidence' : None}))],
                         name='Orientation Preference')
 topo.base.registry.plotgroup_templates[pgt.name] = pgt
 
