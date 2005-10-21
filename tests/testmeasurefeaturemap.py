@@ -31,13 +31,13 @@ class TestMeasureFeatureMap(unittest.TestCase):
         self.s = Simulator()
         self.retina = GeneratorSheet(name='Retina')
         self.V1 = CFSOM(name='V1')
-        self.s.connect(self.retina,self.V1,delay=1,connection_type=KernelProjection,connection_params={'name':'RtoV1'})
+        self.s.connect(self.retina,self.V1,delay=0.5,connection_type=KernelProjection,connection_params={'name':'RtoV1'})
 
         self.V2 = CFSOM(name='V2')
 
 
         #self.s.connect(self.V1,self.V2,delay=1,connection_type=KernelProjection,connection_params={'name':'V1toV2'})
-        self.s.connect(self.retina,self.V2,delay=1,connection_type=KernelProjection,connection_params={'name':'RtoV2'})
+        self.s.connect(self.retina,self.V2,delay=0.5,connection_type=KernelProjection,connection_params={'name':'RtoV2'})
 
 
 
@@ -49,7 +49,7 @@ class TestMeasureFeatureMap(unittest.TestCase):
                               "phase": ( (0.0,1.0), [0.2,0.4,0.6], False)}
         
         self.x = MeasureFeatureMap(self.s, self.feature_param)
-
+        print self.V1.activity
 
         # This calls the default input_command in MeasureFeatureMap.
         # Also should test a user-defined input_command, but this depends
@@ -80,8 +80,10 @@ class TestMeasureFeatureMap(unittest.TestCase):
 
         print self.V1.sheet_view_dict.keys()
         print self.V2.sheet_view_dict.keys()
-	
-	
+
+	print self.x.sheet_featuremaps[self.V2]['theta'].preference()
+        print self.x.sheet_featuremaps[self.V1]['theta'].preference()
+        
 
 suite = unittest.TestSuite()
 suite.addTest(unittest.makeSuite(TestMeasureFeatureMap))
