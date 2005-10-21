@@ -206,11 +206,6 @@ class PatternGenerator(TopoObject):
         """
         raise NotImplementedError
 
-### JABHACKALERT!
-###
-### The variables x, y, etc. don't need to be declared in each of the
-### Generator subclasses (here and elsewhere), and should be moved to
-### PatternGenerator once inputparamspanel.py is fixed.
 
 # Trivial example of a PatternGenerator, provided for when a default is
 # needed.  The other concrete PatternGenerator classes are stored in
