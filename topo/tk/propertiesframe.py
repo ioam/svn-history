@@ -1,5 +1,7 @@
 """
-Class file for a properties page.
+Generic property list frame that can be used for any object's properties.
+
+Makes a frame and allows the caller to add properties of various types to it.
 
 $Id$
 """

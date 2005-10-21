@@ -14,9 +14,10 @@ import RandomArray
 
 
 class UniformRandomGenerator(PatternGenerator):
-    """
-    Uniform random noise pattern generator.
-    """
+    """2D uniform random noise pattern generator."""
+
+    # The standard x, y, and theta variables are currently ignored,
+    # so they aren't shown in auto-generated lists of parameters (e.g. in the GUI)
     x       = Number(hidden = True)
     y       = Number(hidden = True)
     theta   = Number(hidden = True)
