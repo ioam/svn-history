@@ -72,7 +72,7 @@ class Parameter(object):
           http://users.rcn.com/python/download/Descriptor.htm
   """
 
-  __slots__ = ['name','default','doc','hidden']
+  __slots__ = ['_name','default','doc','hidden']
   count = 0
   
   def __init__(self,default=None,doc="",hidden=False):
@@ -80,15 +80,10 @@ class Parameter(object):
     Initialize a new parameter.
 
 
-    Set the name of the parameter 
     Set the name of the parameter to a gensym, and initialize
     the default value.
     """
-    # CEB:
-    # parameter name should probably match the variable name, e.g.
-    # x = Parameter()
-    # x.name = 'x'
-    self.name = "_param" + `Parameter.count`
+    self._name = None
     self.doc = doc
     self.hidden=hidden
     Parameter.count += 1
@@ -103,7 +98,7 @@ class Parameter(object):
     if not obj:
         result = self.default
     else:
-        result = obj.__dict__.get(self.name,self.default)
+        result = obj.__dict__.get(self.get_name(obj),self.default)
     return result
 
 
@@ -112,18 +107,38 @@ class Parameter(object):
     Set a parameter value.  If called on a class parameter,
     set the default value, if on an instance, set the value of the
     parameter in the object, where the value is stored in the
-    instance's dictionary under the parameter's name gensym.
+    instance's dictionary under the parameter's _name gensym.
     """    
     if not obj:
         self.default = val
     else:
-        obj.__dict__[self.name] = val
+        obj.__dict__[self.get_name(obj)] = val
 
   def __delete__(self,obj):
     """
     Delete a parameter.  Raises an exception.
     """
     raise "Deleting parameters is not allowed."
+
+
+  def get_name(self,obj):
+    """
+    Return the name that the specified object has for this parameter.
+
+    The parameter instance itself does not store its name, and cannot
+    know what name the object that owns it might have for it.  However,
+    it can discover this if the owning object is passed to this function,
+    which looks for itself in the owning object and returns the name
+    assigned to it.    
+    """
+    if not hasattr(self,'_name') or not self._name:
+      class_ = obj.__class__
+      for attrib_name in dir(class_):
+        desc,desctype = class_.get_param_descriptor(attrib_name)
+        if desc is self:
+          self._name = '_%s_param_value'%attrib_name
+          break
+    return self._name
 
 
   def _get_doc(self):
@@ -222,7 +237,7 @@ class Number(Parameter):
     # CEB: all the following error messages should probably print out the parameter's name
     # ('x', 'theta', or whatever)
     if not (is_number(val)):
-      raise _NumberBoundsException("Parameter " + `self.name` + " (" + `self.__class__` + ") only takes a numeric value.")
+      raise _NumberBoundsException("Parameter " + `self._name` + " (" + `self.__class__` + ") only takes a numeric value.")
 
     min,max = self.bounds
     if min != None and max != None:
@@ -304,7 +319,7 @@ class DynamicNumber(Number):
     if not obj:
         result = produce_value(self.default)
     else:
-        result = produce_value(obj.__dict__.get(self.name,self.default))
+        result = produce_value(obj.__dict__.get(self.get_name(obj),self.default))
     self._check_bounds(result)
     return result
 
@@ -330,7 +345,7 @@ class Dynamic(Parameter):
     if not obj:
         result = produce_value(self.default)
     else:
-        result = produce_value(obj.__dict__.get(self.name,self.default))
+        result = produce_value(obj.__dict__.get(self.get_name(obj),self.default))
     return result
 
 
