@@ -53,8 +53,9 @@ class TestFeatureMap(unittest.TestCase):
             for j in range(2):
                 self.assertAlmostEqual(self.fm1.preference()[i,j], 0.6)
                 self.assertAlmostEqual(self.fm2.preference()[i,j],
-                                       (arg(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j)))/(2*pi)) 
-
+                                       1.0+(arg(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j)))/(2*pi)) 
+                                       # CEB: 
+                                       # added 1.0 because arg returns principle value (change here)
        
         self.fm1.update(self.a1,0.7)
         self.fm2.update(self.a1,0.7)
@@ -63,8 +64,9 @@ class TestFeatureMap(unittest.TestCase):
             for j in range(2):
                 self.assertAlmostEqual(self.fm1.preference()[i,j], 0.6)
                 self.assertAlmostEqual(self.fm2.preference()[i,j],
-                                       (arg(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/(2*pi)))
-
+                                       1.0+(arg(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/(2*pi)))
+                                       # CEB: 
+                                       # added 1.0 because arg returns principle value (change here)
                 
         self.a2 = array([[2,2], [2,2], [2,2]])
 

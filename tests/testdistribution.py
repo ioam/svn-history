@@ -112,16 +112,15 @@ class TestDistribution(unittest.TestCase):
         self.assertAlmostEqual(self.g.weighted_sum(), 28.0)
         # (should return _weighted_average:)
         self.assertAlmostEqual(self.g.weighted_average(), 28.0/sum(self.g.values()))
-        # Different from lissom's g because this is 0 to 5 where 0 and 5 are the same
-        self.assertAlmostEqual(self.g.vector_sum()[1], -0.59550095717251439) 
+        self.assertAlmostEqual(self.g.vector_sum()[1], 4.40449904283) 
 
 
         self.q = Distribution((0,4), cyclic=True)
         self.q.add({3:1})
         self.q.add({0:0, 1:0, 2:0, 4:0})                
         self.assertAlmostEqual(self.q.vector_sum()[0], 1.0)
-        self.assertAlmostEqual(self.q.weighted_average(), -1.0)
-        self.assertAlmostEqual(self.q.vector_sum()[1], -1.0)  # what do i do about that? (expect 3/4 but cyclic)
+        self.assertAlmostEqual(self.q.weighted_average(), 3.0)
+        self.assertAlmostEqual(self.q.vector_sum()[1], 3.0)  
 
         # Example where this matches LISSOM by using an empty bin at 5.
         self.rr = Distribution((0,5), cyclic=True)  # 5 because in the L. test example 0 and 4 are distinct
