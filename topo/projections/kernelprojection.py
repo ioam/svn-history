@@ -64,5 +64,6 @@ class KernelProjection(CFProjection):
         self.weights_bounds = new_wt_bounds
         rows,cols = self.get_shape()
         cfs = self.cfs
-
-
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cfs[r][c].reduce_radius(new_wt_bounds)
