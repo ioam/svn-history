@@ -67,7 +67,6 @@ $Id$
 """
 
 
-import sched
 from topoobject import TopoObject
 from parameter import Parameter
 from copy import copy, deepcopy
@@ -103,8 +102,8 @@ class EPConnection(TopoObject):
 #
 class Simulator(TopoObject):
     """
-    A simulator class that uses a simple sorted event list instead of a
-    sched.scheduler object to manage events and dispatching.
+    A simulator class that uses a simple sorted event list (instead of
+    e.g. a sched.scheduler object) to manage events and dispatching.
     """
     class Event:
         fn = Parameter(default=None,doc="Function to execute when the event is processed")
@@ -141,7 +140,6 @@ class Simulator(TopoObject):
         self._event_processors = []
         self._sleep_window = 0.0
         self._sleep_window_violation = False
-        self._scheduler = sched.scheduler(self.time,self.sleep)
         self._started = False
         if self.register:
             registry.set_active_sim(self)
