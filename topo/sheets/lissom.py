@@ -98,10 +98,12 @@ class LISSOM(CFSheet):
     def afferent_projections(self):
         return [p for p in chain(*self.in_projections.values()) if p.src is not self]
   
-    def reduce_cfsize(self, name, new_wt_bounds):
+    ### JABALERT: Should be able to eliminate this by just providing a 
+    ### convenient way for callers to access projections.
+    def change_bounds(self, name, new_wt_bounds):
         for proj in chain(*self.in_projections.values()):
             if proj.name == name:
-                proj.reduce_cfsize(new_wt_bounds)
+                proj.change_bounds(new_wt_bounds)
                 return
         self.warning("Can't find ", name)
 

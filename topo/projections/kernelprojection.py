@@ -11,7 +11,7 @@ $Id$
 ###
 ### Should eliminate import *.
 from topo.base.connectionfield import CFProjection
-from topo.base.parameter import Parameter
+from topo.base.parameter import Parameter,Constant
 from topo.patterns.random import UniformRandomGenerator
 from topo.base.boundingregion import Intersection,BoundingBox
 from topo.base.utils import *
@@ -56,13 +56,15 @@ class KernelProjection(CFProjection):
         self.activity = self.output_fn(self.activity)
 
 
-    def reduce_cfsize(self, new_wt_bounds):
+    def change_bounds(self, new_wt_bounds):
         """
-        Reduce the sizes of the connection fields contained in this object to
-        new_wt_bounds.
+        Change the bounding box for all ConnectionFields in this Projection.
+
+        Currently only allows reducing the size, but should be
+        extended to allow increasing as well.
         """
         if not self.weights_bounds.containsbb_exclusive(new_wt_bounds):
-            self.warning('reduce_cfsize: new weight bounds should be strictly smaller than the original weight bounds')
+            self.warning('Unable to change_bounds; currently allows reducing only.')
             return
 
         self.weights_bounds = new_wt_bounds
@@ -70,25 +72,37 @@ class KernelProjection(CFProjection):
         cfs = self.cfs
         for r in xrange(rows):
             for c in xrange(cols):
-                cfs[r][c].reduce_radius(new_wt_bounds)
+                cfs[r][c].change_bounds(new_wt_bounds)
+
+
+    def change_density(self, new_wt_density):
+        """
+        Rescales the weight matrix in place, interpolating or decimating as nececessary.
+
+        Not yet implemented.
+        """
+        raise NotImplementedError
+
 
 
 class KernelPointerProjection(KernelProjection):
     """
-    Same as KernelProjection, except that it contains extra data structures to
-    store the pointers to the weights and slice arrays of connection fields. It
-    needs to be used with the responsefn CFDotProductP() which uses these
-    pointers dicrectly, thus bypassing the slow Python/C API to access the
-    arrays.
+    Faster but less flexible version of KernelProjection.
+    
+    Same as KernelProjection except faster and limited to the special
+    case of the CFDotProductP response_fn.  Contains extra data
+    structures to store the pointers to the weights and slice arrays
+    of connection fields.  The response_fn CFDotProductP() uses these
+    pointers directly, thus bypassing the slow Python/C API for
+    accessing the arrays.
     """
 
     weight_ptrs = [] 
     slice_ptrs = []
+    response_fn = Constant(CFDotProductP())
 
     def __init__(self,**params):
         super(KernelPointerProjection,self).__init__(**params)
-	if not isinstance(self.response_fn, CFDotProductP):
-            self.warning('error: response_fn is not CFDotProductP()')
         # store the pointers to the weight and slice_array array in cf
         x,y = self.get_shape()
         self.weight_ptrs = ones((x,y), Int)
@@ -104,9 +118,9 @@ class KernelPointerProjection(KernelProjection):
         self.activity = self.output_fn(self.activity)
 
 
-    def reduce_cfsize(self, new_wt_bounds):
-        KernelProjection.reduce_cfsize(self, new_wt_bounds)
-	# the weight arrays have been change, so the pointer arrays have to be updated
+    def change_bounds(self, new_wt_bounds):
+        KernelProjection.change_bounds(self, new_wt_bounds)
+	# the weight arrays have been changed, so the pointer arrays have to be updated
         x,y = self.get_shape()
         self.weight_ptrs = ones((x,y), Int)
         setup_wp(self.cfs, self.weight_ptrs, x, y)

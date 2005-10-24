@@ -102,17 +102,26 @@ class ConnectionField(TopoObject):
     def contains(self,x,y):
         return self.bounds.contains(x,y)
 
+
     def get_input_matrix(self, activity):
         r1,r2,c1,c2 = self.slice
-
         return activity[r1:r2,c1:c2]
+
 
     ### JABHACKALERT! Need to figure out how to handle the normalization
     ### here once the learning functions handle that internally.
-    def reduce_radius(self, new_wt_bounds):
+    ###
+    ### JABALERT! Seems to have a strange definition of bounds, if it
+    ### is all relative to self.x and self.y.  Needs better documentation.
+    def change_bounds(self, new_wt_bounds):
         """
-        Reduce the radius of an existing connection field. Weights are copied
-        from the old weight array.
+        Change the bounding box for this existing ConnectionField.
+
+        Discards weights or adds new (zero) weights as necessary,
+        preserving existing values where possible.
+
+        Currently only supports reducing the size, not increasing, but
+        should be extended to support increasing as well.
         """
 
         slice = self.input_sheet.input_slice(new_wt_bounds, self.x, self.y)
@@ -133,6 +142,12 @@ class ConnectionField(TopoObject):
 
             if self.normalize:
                 self.normalize_fn(self.weights)
+
+
+    def change_density(self, new_wt_density):
+        """Rescale the weight matrix in place, interpolating or decimating as necessary."""
+        raise NotImplementedError
+
 
 
 ### JABALERT!  Is there a way to reduce the complexity of the argument list?
@@ -250,17 +265,22 @@ class CFProjection(Projection):
     strength = Number(default=1.0)
     activity = []
 
+
     def __init__(self,**params):
         super(Projection,self).__init__(**params)
         self.cfs = None
         self.input_buffer = None
         self.activity = Numeric.array(self.dest.activity)
 
+
     def cf(self,r,c):
+        """Return the specified ConnectionField"""
         return self.cfs[r][c]
+
 
     def set_cfs(self,cf_list):
         self.cfs = cf_list
+
 
     def get_shape(self):
         return len(self.cfs),len(self.cfs[0])
@@ -282,12 +302,23 @@ class CFProjection(Projection):
         assert matrix_data != None, "Projection Matrix is None"
         return UnitView((matrix_data,new_box),sheet_x,sheet_y,self,view_type='UnitView')
 
+
     def activate(self,input_activity,rows,cols):
         raise NotImplementedError
 
-    def reduce_cfsize(self, new_wt_bounds):
+
+    def change_bounds(self, new_wt_bounds):
+        """
+        Change the bounding box for this existing ConnectionField.
+
+        Discards weights or adds new (zero) weights as necessary.
+        """
         raise NotImplementedError
 
+
+    def change_density(self, new_wt_density):
+        """Rescales the weight matrix in place, interpolating or decimating as needed."""
+        raise NotImplementedError
 
 
 

@@ -93,30 +93,30 @@ V1 = LISSOM(name='V1')
 s.connect(retina,V1, delay = FixedPoint("0.05"),
           connection_type=KernelPointerProjection,
           connection_params = dict(strength = 1.0, name='Afferent0',
-                                   weights_bounds = afferent_weight_bounds, normalize = True, response_fn=CFDotProductP(),learning_rate=alpha_input))
+                                   weights_bounds = afferent_weight_bounds, normalize = True, learning_rate=alpha_input))
 
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
           connection_type=KernelPointerProjection,
           connection_params = dict(strength = gammaexc, name='LateralExcitatory',
-                                   weights_bounds = excitatory_weight_bounds, normalize = True, response_fn=CFDotProductP(),learning_rate=alpha_exc))
+                                   weights_bounds = excitatory_weight_bounds, normalize = True, learning_rate=alpha_exc))
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
           connection_type=KernelPointerProjection,
           connection_params = dict(strength = -gammainh, name='LateralInhibitory',
-                                   weights_bounds = inhibitory_weight_bounds, normalize = True, response_fn=CFDotProductP(),learning_rate=alpha_inh))
+                                   weights_bounds = inhibitory_weight_bounds, normalize = True, learning_rate=alpha_inh))
         
 
 #################################################
 # Schedule the changes of simulation parameters
 
-s.schedule_action(200, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.6/BaseN,-exc_rad*0.6/BaseN),(exc_rad*0.6/BaseN,exc_rad*0.6/BaseN))))
+s.schedule_action(200, V1.change_bounds, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.6/BaseN,-exc_rad*0.6/BaseN),(exc_rad*0.6/BaseN,exc_rad*0.6/BaseN))))
 
-s.schedule_action(500, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.42/BaseN,-exc_rad*0.42/BaseN),(exc_rad*0.42/BaseN,exc_rad*0.42/BaseN))))
+s.schedule_action(500, V1.change_bounds, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.42/BaseN,-exc_rad*0.42/BaseN),(exc_rad*0.42/BaseN,exc_rad*0.42/BaseN))))
 
-s.schedule_action(1000, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.336/BaseN,-exc_rad*0.336/BaseN),(exc_rad*0.336/BaseN,exc_rad*0.336/BaseN))))
+s.schedule_action(1000, V1.change_bounds, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.336/BaseN,-exc_rad*0.336/BaseN),(exc_rad*0.336/BaseN,exc_rad*0.336/BaseN))))
 
-s.schedule_action(2000, V1.reduce_cfsize, "LateralExcitatory", BoundingBox(points=((-2.0/BaseN,-2.0/BaseN),(2.0/BaseN,2.0/BaseN))))
+s.schedule_action(2000, V1.change_bounds, "LateralExcitatory", BoundingBox(points=((-2.0/BaseN,-2.0/BaseN),(2.0/BaseN,2.0/BaseN))))
 
 s.schedule_action(500, V1.change_learning_rate, "Afferent0", 0.005*acs)
 s.schedule_action(2000, V1.change_learning_rate, "Afferent0", 0.004*acs)
