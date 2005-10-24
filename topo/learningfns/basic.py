@@ -103,7 +103,7 @@ class DivisiveHebbian(CFLearningFunction):
     modification; the output_fn is not actually called from within
     this function.
     """
-    output_fn = Constant(default=DivisiveL1Normalize())
+    output_fn = Constant(DivisiveL1Normalize())
 
     def __init__(self,**params):
         super(DivisiveHebbian,self).__init__(**params)
