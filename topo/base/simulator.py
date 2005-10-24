@@ -77,7 +77,7 @@ from fixedpoint import FixedPoint
 SLEEP_EXCEPTION = "Sleep Exception"
 STOP = "Simulator Stopped"
 
-Forever = -1
+Forever = FixedPoint(-1)
 
 class EPConnection(TopoObject):
     """
@@ -179,16 +179,16 @@ class Simulator(TopoObject):
         if duration == Forever:
             stop_time = until
         elif until == Forever:
-            stop_time = self.time() + duration
+            stop_time = self._time + duration
         else:
-            stop_time = min(self.time()+duration,until)
+            stop_time = min(self._time+duration,until)
             
         did_event = False
-        while self.events and (stop_time == Forever or self.time() < stop_time):
+        while self.events and (stop_time == Forever or self._time < stop_time):
 
             # Loop while there are events and it's not time to stop.
             
-            if self.events[0].time < self.time():
+            if self.events[0].time < self._time:
 
                 # if the first event's time is less than the current time
                 # then the event is stale so print a warning and
@@ -197,9 +197,9 @@ class Simulator(TopoObject):
                 self.warning('Discarding stale event from',(self.events[0].src,self.events[0].src_port),
                              'to',(self.events[0].dest,self.events[0].dest_port),
                              'for time',self.events[0].time,
-                             '. Current time =',self.time())
+                             '. Current time =',self._time)
                 self.events.pop(0)
-            elif self.events[0].time > self.time():
+            elif self.events[0].time > self._time:
 
                 # If the first event's time is greater than the
                 # current time then it's time to sleep (i.e. increment
@@ -208,7 +208,7 @@ class Simulator(TopoObject):
 
                 if did_event:
                     did_event = False
-                    self.debug("Time to sleep. Current time =",self.time(),
+                    self.debug("Time to sleep. Current time =",self._time,
                                ".  Next event time =",self.events[0].time)
                     for ep in self._event_processors:
     #                    self.debug("Doing pre_sleep for",e)
@@ -247,7 +247,7 @@ class Simulator(TopoObject):
         Enqueue an event at an absolute simulator clock time.
         """
         self.debug("Enqueue absolute: from", (src,src_port),"to",(dest,dest_port),
-                   "at time",self.time(),"for time",time)
+                   "at time",self._time,"for time",time)
         new_e = Simulator.Event(time,src,dest,src_port,dest_port,data)
 
         if not self.events or time >= self.events[-1].time:
@@ -263,7 +263,7 @@ class Simulator(TopoObject):
         """
         Enqueue an event at a time relative to the current simulator clock.
         """
-        self.enqueue_event_abs(self.time()+float(delay),
+        self.enqueue_event_abs(self._time+delay,
                                src,dest,src_port,dest_port,data)
 
 
@@ -276,7 +276,7 @@ class Simulator(TopoObject):
 
         Usage: schedule_action(time, function name, param 1, param 2, ...)
         """
-        self.debug("Enqueue absolute action: ", fn, "at time",self.time(),"for time",time)
+        self.debug("Enqueue absolute action: ", fn, "at time",self._time,"for time",time)
         new_e = Simulator.Event(time,None,None,None,None,p,fn=fn)
 
         if not self.events or time >= self.events[-1].time:

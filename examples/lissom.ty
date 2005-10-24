@@ -15,11 +15,11 @@ from fixedpoint import FixedPoint  # Should probably bring this into Simulator n
 
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.projections.kernelprojection import KernelProjection
+from topo.projections.kernelprojection import KernelPointerProjection
 from topo.patterns.basic import GaussianGenerator
 from topo.base.sheet import BoundingBox
 from topo.base.parameter import DynamicNumber
-from topo.responsefns.basic import CFDotProduct
+from topo.responsefns.basic import CFDotProductP
 
 
 ###########################################
@@ -91,20 +91,20 @@ retina = GeneratorSheet(input_generator=GaussianGenerator(),name='Retina')
 V1 = LISSOM(name='V1')
 
 s.connect(retina,V1, delay = FixedPoint("0.05"),
-          connection_type=KernelProjection,
+          connection_type=KernelPointerProjection,
           connection_params = dict(strength = 1.0, name='Afferent0',
-                                   weights_bounds = afferent_weight_bounds, normalize = True, response_fn=CFDotProduct(),learning_rate=alpha_input))
+                                   weights_bounds = afferent_weight_bounds, normalize = True, response_fn=CFDotProductP(),learning_rate=alpha_input))
 
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
-          connection_type=KernelProjection,
+          connection_type=KernelPointerProjection,
           connection_params = dict(strength = gammaexc, name='LateralExcitatory',
-                                   weights_bounds = excitatory_weight_bounds, normalize = True, response_fn=CFDotProduct(),learning_rate=alpha_exc))
+                                   weights_bounds = excitatory_weight_bounds, normalize = True, response_fn=CFDotProductP(),learning_rate=alpha_exc))
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
-          connection_type=KernelProjection,
+          connection_type=KernelPointerProjection,
           connection_params = dict(strength = -gammainh, name='LateralInhibitory',
-                                   weights_bounds = inhibitory_weight_bounds, normalize = True, response_fn=CFDotProduct(),learning_rate=alpha_inh))
+                                   weights_bounds = inhibitory_weight_bounds, normalize = True, response_fn=CFDotProductP(),learning_rate=alpha_inh))
         
 
 #################################################
@@ -143,8 +143,8 @@ s.schedule_action(8000,  set_deltabeta, 0.23, 0.85)
 s.schedule_action(20000, set_deltabeta, 0.24, 0.88)
 
 # can either pass a number or FixedPoint object to s.run()
-#s.run(10)
-#s.run(FixedPoint(10))
+#s.run(1)
+#s.run(FixedPoint(1))
 
 
 # Set up performance profiling

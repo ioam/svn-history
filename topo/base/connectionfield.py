@@ -149,7 +149,7 @@ class CFResponseFunction(TopoObject):
     the arguments specified below, and must return a matrix the same
     size as the activity matrix supplied.
     """
-    def __call__(self,input_activity, rows, cols, activity, cfs, strength):
+    def __call__(self,input_activity, rows, cols, activity, cfs, strength, **params):
         raise NotImplementedError
 
 
