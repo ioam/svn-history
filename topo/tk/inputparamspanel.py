@@ -176,7 +176,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
                            for (name,d) in new_patterns_dict.items()])
         save_input_generators()
         pattern_present(input_dict,self.present_length.getvalue(),learning=self.learning.get())
-        restore_previous_input_generators()
+        restore_input_generators()
         self.console.auto_refresh()
 
 
