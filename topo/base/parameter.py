@@ -113,7 +113,7 @@ class Parameter(object):
         self.default = val
     else:
         obj.__dict__[self.get_name(obj)] = val
-
+ 
   def __delete__(self,obj):
     """
     Delete a parameter.  Raises an exception.
@@ -351,6 +351,7 @@ class Dynamic(Parameter):
 
 class Constant(Parameter):
   """Constant Parameter that can be constructed and used but not set."""
+  
   def __set__(self,obj,val):
     """Does not allow set commands."""
     raise "Constant parameter cannot be modified"
