@@ -208,3 +208,54 @@ def arg(z):
     z = add(z, complex())  # so that arg(z) also works for real z
 
     return arctan2(z.imag, z.real)
+
+
+
+"""
+Return the cross-product of a variable number of lists (e.g. of a list of lists).
+
+Use to obtain permutations, e.g.
+l1=[a,b]
+l2=[c,d]
+cross_product([l1,l2]) = 
+[[a,c], [a,d], [b,c], [b,d]]
+
+
+From:
+http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/159975
+"""
+# Need to re-write so someone other than Python knows what might happen when this runs
+cross_product=lambda ss,row=[],level=0: len(ss)>1 \
+   and reduce(lambda x,y:x+y,[cross_product(ss[1:],row+[i],level+1) for i in ss[0]]) \
+   or [row+[i] for i in ss[0]]
+
+
+def frange(start, end=None, inc=None):
+    """
+    A range function that accepts float increments.
+
+    Otherwise, works just as the inbuilt range() function.
+
+    'All thoretic restrictions apply, but in practice this is
+    more useful than in theory.'
+
+    From:
+    http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66472
+    """
+    if end == None:
+        end = start + 0.0
+        start = 0.0
+
+    if inc == None:
+        inc = 1.0
+
+    L = []
+    while 1:
+        next = start + len(L) * inc
+        if inc > 0 and next >= end:
+            break
+        elif inc < 0 and next <= end:
+            break
+        L.append(next)
+        
+    return L
