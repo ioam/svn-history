@@ -180,6 +180,11 @@ class PatternGenerator(TopoObject):
     scale = Number(default=1.0,softbounds=(0.0,2.0))
     offset = Number(default=0.0,softbounds=(-1.0,1.0))
 
+    ## CEB:
+    # Correct error that occurs in the GUI when scale is set to 0.
+    # This didn't happen originally; the error is likely to have been
+    # introduced when we were working on preference maps in the GUI.
+
     def __call__(self,**params):
         self.verbose("params = ",params)
         self.setup_xy(params.get('bounds',self.bounds),
