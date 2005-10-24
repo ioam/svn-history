@@ -1,6 +1,5 @@
 """
-Sheet for generating a series of patterns, e.g. by choosing
-parameters from a random distribution.
+GeneratorSheet class.
 
 $Id$
 """
@@ -16,35 +15,40 @@ from topo.base.parameter import Parameter, Dynamic
 from topo.base.patterngenerator import ConstantGenerator
 
 class GeneratorSheet(Sheet):
+    """
+    Sheet for generating a series of 2D patterns.
 
+    Typically generates the patterns by choosing parameters from a
+    random distribution, but can use any mechanism.
+    """
     period = Parameter(default=1)
     phase  = Parameter(default=0)
 
+    ### JABALERT!  What is this for?  Either document it or remove it.
     theta = Parameter(default=0)
 
     input_generator = Parameter(default=ConstantGenerator())
     
     def __init__(self,**params):
         super(GeneratorSheet,self).__init__(**params)
-
-        self.input_generator_stack = []  # maybe this should be a class
-                                         # variable like input_generator?
+        self.input_generator_stack = []
         self.set_input_generator(self.input_generator)
 
 
-    def set_input_generator(self,new_ig):
+    def set_input_generator(self,new_ig,push_existing=False):
         """
-        Allow assignment of a new pattern generator to this
-        GeneratorSheet.  Only one generator is linked at a time, so if
-        more than one is going to be used, the code driving the sheet
-        needs to keep tabs on which one is being used.
+        Set the input_generator, overwriting the existing one by default.
+
+        If push_existing is false, the existing input_generator is
+        discarded permanently.  Otherwise, the existing one is put
+        onto a stack, and can later be restored by calling
+        pop_input_generator.
         """
 
-        # add current generator to stack
-        #self.input_generator_stack.append(self.input_generator)
-        # set generator to be the one one
+        if push_existing:
+            push_input_generator(self.input_generator)
+
         self.input_generator = new_ig
-        
         self.input_generator.bounds = self.bounds
         ### JABHACKALERT!
         ###
@@ -56,25 +60,21 @@ class GeneratorSheet(Sheet):
         self.input_generator.density = self.density
 
 
-    def save_current_input_generator(self):
-        """
-        There's a stack of input_generators; you can add the current
-        input_generator to this stack for later retrieval with
-        restore_previous_input_generator().
-        """
+    def push_input_generator(self):
+        """Push the current input_generator onto a stack for future retrieval."""
         self.input_generator_stack.append(self.input_generator)
 
-
-    def restore_previous_input_generator(self):
+               
+    def pop_input_generator(self):
         """
-        Get an input_generator off the top of the stack of input_generators
-        and set it to be the current input_generator (if there were any -
-        otherwise do nothing).
+        Discard the current input_generator, and retrieve the previous one from the stack.
+
+        Warns if no input_generator is available on the stack.
         """
         if len(self.input_generator_stack) >= 1:
             self.set_input_generator(self.input_generator_stack.pop())
         else:
-            TopoObject().warning('There was no previous input generator.')
+            TopoObject().warning('There is no previous input generator to restore.')
 
                
     def start(self):

@@ -154,7 +154,7 @@ class MeasureFeatureMap(object):
 
         Note: allows execution of arbitrary code.
         """
-        save_current_input_generators(self.simulator) 
+        save_input_generators(self.simulator) 
 
         input_permutations = cross_product(self.list_param)
 
@@ -223,7 +223,7 @@ class MeasureFeatureMap(object):
                 sheet.add_sheet_view(capitalize(feature)+'Preference', view_preference)
                 sheet.add_sheet_view(capitalize(feature)+'Selectivity', view_selectivity)
 
-        restore_previous_input_generators(self.simulator)
+        restore_input_generators(self.simulator)
 
          
  

@@ -31,7 +31,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.sheet import BoundingBox, Sheet
 from topo.base.utils import find_classes_in_package
 from topo.base.patterngenerator import PatternGenerator
-from topo.patterns.patternpresent import pattern_present,save_current_input_generators,restore_previous_input_generators
+from topo.patterns.patternpresent import pattern_present,save_input_generators,restore_input_generators
 
 # Hack to reverse the order of the input EventProcessor list and the
 # Preview plot list, so that it'll match the order that the plots appear
@@ -174,7 +174,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         new_patterns_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         input_dict = dict([(name,d['pattern'])
                            for (name,d) in new_patterns_dict.items()])
-        save_current_input_generators()
+        save_input_generators()
         pattern_present(input_dict,self.present_length.getvalue(),learning=self.learning.get())
         restore_previous_input_generators()
         self.console.auto_refresh()
@@ -196,7 +196,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         new_patterns_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         input_dict = dict([(name,d['pattern'])
                            for (name,d) in new_patterns_dict.items()])
-        # a call to save_current_input_generators would allow recovery of earlier patterns
+        # a call to save_input_generators would allow recovery of earlier patterns
         pattern_present(input_dict,0.0,sim=None,learning=True)
         self.console.auto_refresh()
 
