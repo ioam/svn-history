@@ -7,12 +7,15 @@ $Id$
 # CEB,JBFC
 
 # To do:
+# - pattern_present_update should be broken up and written in an easier-to-follow way
+# e.g. some i,j counting could probably be done better (using zip)
+# - when creating SheetViews, pass not just "V1", but also preference, selectivity, etc.
 # - namespace __main__, as in later comment 
 # - remove temporary testing code
 # - will go into featuremap.py
 # - give the variables better names!
 # - make variables private as appropriate
-# - some i,j counting could probably be done better
+
 
 
 from featuremap import FeatureMap
@@ -30,7 +33,8 @@ from sheetview import SheetView
 
 ## temporary ##
 from topo.patterns.basic import GaussianGenerator, SineGratingGenerator
-from topo.patterns.patternpresent import pattern_present
+from topo.patterns.patternpresent import *
+# * but it's just pattern_present, restore_previous_input_generators, save_current_input_generators
 ###############
 
 
@@ -126,7 +130,7 @@ class MeasureFeatureMap(object):
 
         f= lambda x: not isinstance(x,GeneratorSheet)
         self.measured_sheets = filter(f,simulator.objects(Sheet).values())
-
+        
         # now create the featuremaps for each sheet  
         for sheet in self.measured_sheets:
             self.sheet_featuremaps[sheet] = {}
@@ -142,7 +146,7 @@ class MeasureFeatureMap(object):
         self.simulator=simulator
 
                
-    def pattern_present_update(self,input_command="pattern_present(inputs, 1.0, self.simulator, restore=True)"):
+    def pattern_present_update(self,input_command="pattern_present(inputs, 1.0, self.simulator, learning=False)"):
         """
         Create a list of all permutations of the feature values, then, for each permutation, set the
         feature values in the namespace __main__ and execute the user's code (input_command) there too, updating
@@ -150,6 +154,8 @@ class MeasureFeatureMap(object):
 
         Note: allows execution of arbitrary code.
         """
+        save_current_input_generators(self.simulator) 
+
         input_permutations = cross_product(self.list_param)
 
         # ### for testing ###
@@ -186,6 +192,7 @@ class MeasureFeatureMap(object):
             # DRAW THE PATTERN
             exec input_command #in __main__.__dict__
 
+
             # Temporary; refresh the display
             debugmode=True
             console=topo.base.registry.get_console()
@@ -195,24 +202,28 @@ class MeasureFeatureMap(object):
 
             # NOW UPDATE EACH FEATUREMAP WITH (ACTIVITY,FEATURE_VALUE)
             # is this right?
-            m = 0
-            for feature in self.sheet_featuremaps[sheet].keys():
-                self.sheet_featuremaps[sheet][feature].update(sheet.activity, permutation[m])
-                m = m + 1
+            for sheet in self.measured_sheets:
+                m = 0
+                for feature in self.sheet_featuremaps[sheet].keys():
+                    # debugging print statement
+                    print 'activity for ', sheet,'[0,0], ', feature, '=', permutation[m], ':',  sheet.activity[0,0]
+                    self.sheet_featuremaps[sheet][feature].update(sheet.activity, permutation[m])
+                    m = m + 1
 
         #####################
         # Now that the feature maps have been measured, construct the plots
         for sheet in self.measured_sheets:
             bounding_box = sheet.bounds
             for feature in self.sheet_featuremaps[sheet].keys():
-            
+                
                 norm_factor = self.sheet_featuremaps[sheet][feature].distribution_matrix[0,0].axis_range
-            
                 view_preference = SheetView(((self.sheet_featuremaps[sheet][feature].preference())/norm_factor,bounding_box), sheet.name)
-            
-                view_selectivity = SheetView((self.sheet_featuremaps[sheet][feature].selectivity(),bounding_box), sheet.name)
+                # note the temporary multiplication by 17 (just because I remember JAB saying it was something like that in LISSOM)
+                view_selectivity = SheetView((17*self.sheet_featuremaps[sheet][feature].selectivity(),bounding_box), sheet.name)
                 sheet.add_sheet_view(capitalize(feature)+'Preference', view_preference)
                 sheet.add_sheet_view(capitalize(feature)+'Selectivity', view_selectivity)
 
-                
+        restore_previous_input_generators(self.simulator)
+
+         
  
