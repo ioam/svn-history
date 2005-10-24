@@ -104,7 +104,7 @@ def pattern_present(inputs=None,duration=1.0,sim=None, learning=False):
                 if isinstance(each,Sheet):
                     each.learning = False
                     
-                gen_eps_list = sim.objects(GeneratorSheet)
+        gen_eps_list = sim.objects(GeneratorSheet)
         _register_inputsheet_patterns(inputs,gen_eps_list)
         sim.run(duration)
 
