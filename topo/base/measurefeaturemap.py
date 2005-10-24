@@ -30,11 +30,9 @@ from string import capitalize
 
 
 from sheetview import SheetView
+from topo.commands.basic import pattern_present, restore_input_generators, save_input_generators
 
-## temporary ##
 from topo.patterns.basic import GaussianGenerator, SineGratingGenerator
-from topo.patterns.patternpresent import pattern_present, restore_input_generators, save_input_generators
-###############
 
 
 ## to go to topo.base.utils ##

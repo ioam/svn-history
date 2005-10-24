@@ -31,7 +31,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.sheet import BoundingBox, Sheet
 from topo.base.utils import find_classes_in_package
 from topo.base.patterngenerator import PatternGenerator
-from topo.patterns.patternpresent import pattern_present,save_input_generators,restore_input_generators
+from topo.commands.basic import pattern_present,save_input_generators,restore_input_generators
 
 # Hack to reverse the order of the input EventProcessor list and the
 # Preview plot list, so that it'll match the order that the plots appear
