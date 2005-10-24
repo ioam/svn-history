@@ -25,7 +25,7 @@ then show up in the GUI menus as potential input patterns.
 $Id$
 """
 
-__all__ = ['base','sheets','projections','patterns','eps','plotting']
+__all__ = ['base','commands','sheets','projections','patterns','eps','plotting']
 
 # Enable automatic importing of .ty files, treating them just like .py
 import topo.base.tyimputil
