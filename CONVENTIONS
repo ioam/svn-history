@@ -244,7 +244,7 @@ Jim, before picking a unit arbitrarily.
 
 OBJECT-ORIENTED DESIGN
 
-The design of Topographica is in terms of a hierarchical sets of
+The design of Topographica is in terms of hierarchical sets of
 classes of objects (plus a few collections of unrelated but useful
 tidbits).  Most new code will take the form of a new class within an
 existing hierarchy, or a new method within an existing class.
@@ -271,20 +271,22 @@ ProgramObjects, because there are surely objects in the program that
 are not possible to resize.  Thus it would not normally be appropriate
 to have a ProgramObject.resize().  If such a method is required to
 solve a particular design problem, it would have to be documented
-heavily to ensure that the user only calls it on a Shape, which is
-something we would like to avoid if we can.
+heavily to ensure that the user only calls it on a Shape.  Such
+complexity should be avoided whenever possible, and so be sure not to
+add the code at a higher level than appropriate.
 
-When deciding where to add the code, be sure to think about the
-operation in the most general terms for which it makes sense.  That
-is, when solving a problem, try to solve it at the highest level
-possible, so that it applies to the largest appropriate class of
-objects.  For example, an operation change_rectangle_width() is
-clearly not applicable to all Shapes, yet if the idea is reinterpreted
-in general terms, i.e. resize(), it is clear that the method belongs
-in the Shape superclass.  The method then becomes a requirement for
-every subclass of Shape -- henceforth every variety of Shape must be
-able to be resize()d, and anything that cannot be resize()d cannot be
-a Shape, by definition.
+In any case, when deciding where to add the code, be sure to think
+about the operation in the most general terms for which it makes
+sense.  That is, when solving a problem, try interpret it broadly and
+solve it at the highest level possible, so that it applies to the
+largest appropriate class of objects.  For example, an operation
+change_rectangle_width() is clearly not applicable to all Shapes, yet
+if the idea is reinterpreted in appropriately general terms,
+i.e. resize(), it is clear that the method belongs in the Shape
+superclass.  The method then becomes a requirement for every subclass
+of Shape -- henceforth every variety of Shape must be able to be
+resize()d, and anything that cannot be resize()d cannot be a Shape, by
+definition.
 
 It is also extremely important to think about the appropriate name for
 an operation or class, so that it is clear how generally or
@@ -341,11 +343,11 @@ make the software much harder to maintain, understand, and use.
 
 To summarize: when adding new code, think (and discuss!) where it
 should go and what level of generality is appropriate.  Try to solve
-the problem for all time, if you can; otherwise, solve it for the
-largest class whose solution is clear.  Once the level has been
-chosen, make sure all documentation, comments, and names match that
-level, pretending that no lower levels exist except as possible
-examples.
+the problem for all time, if it is clear how to do so; otherwise,
+solve it for the largest class whose solution *is* clear.  Once the
+level has been chosen, make sure all documentation, comments, and
+names match that level, pretending that no lower levels exist except
+as possible examples.
 
 
 USING CONSISTENT NAMES
