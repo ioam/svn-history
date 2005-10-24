@@ -72,10 +72,8 @@ class ParametersFrame(Frame):
         Make a new slider for each name/value in the params list.
         """
         for (k,v) in params:
-            print '(k,v)', k, v
             (low,high) = v.get_soft_bounds()
             default = v.default
-            print 'slider: ',k,low,high,default
             slider_dict[k] = self.add_slider(k,str(low),str(high),str(default))
     
 
