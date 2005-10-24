@@ -33,8 +33,7 @@ from sheetview import SheetView
 
 ## temporary ##
 from topo.patterns.basic import GaussianGenerator, SineGratingGenerator
-from topo.patterns.patternpresent import *
-# * but it's just pattern_present, restore_previous_input_generators, save_current_input_generators
+from topo.patterns.patternpresent import pattern_present, restore_input_generators, save_input_generators
 ###############
 
 
