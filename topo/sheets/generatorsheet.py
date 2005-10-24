@@ -26,17 +26,25 @@ class GeneratorSheet(Sheet):
     
     def __init__(self,**params):
         super(GeneratorSheet,self).__init__(**params)
-        self.init_input_generator(self.input_generator)
+
+        self.input_generator_stack = []  # maybe this should be a class
+                                         # variable like input_generator?
+        self.set_input_generator(self.input_generator)
 
 
-    def init_input_generator(self,new_ig):
+    def set_input_generator(self,new_ig):
         """
         Allow assignment of a new pattern generator to this
         GeneratorSheet.  Only one generator is linked at a time, so if
         more than one is going to be used, the code driving the sheet
         needs to keep tabs on which one is being used.
         """
+
+        # add current generator to stack
+        #self.input_generator_stack.append(self.input_generator)
+        # set generator to be the one one
         self.input_generator = new_ig
+        
         self.input_generator.bounds = self.bounds
         ### JABHACKALERT!
         ###
@@ -48,27 +56,27 @@ class GeneratorSheet(Sheet):
         self.input_generator.density = self.density
 
 
-        ### JABALERT!
-        ###
-        ### These two functions should probably be rewritten to work as a stack, to 
-        ### reduce the complexity of client code.
-    def get_input_generator(self):
+    def save_current_input_generator(self):
         """
-        Return the existing input_generator Parameter.  If a temporary
-        input generator is going to be used, then this function will
-        be needed so that the old generator can be replaced when done.
+        There's a stack of input_generators; you can add the current
+        input_generator to this stack for later retrieval with
+        restore_previous_input_generator().
         """
-        return self.input_generator
+        self.input_generator_stack.append(self.input_generator)
 
 
-    def set_input_generator(self,new_generator):
+    def restore_previous_input_generator(self):
         """
-        Set the existing input_generator.  Does not store any previous
-        input generator information.  May store generators in the future.
+        Get an input_generator off the top of the stack of input_generators
+        and set it to be the current input_generator (if there were any -
+        otherwise do nothing).
         """
-        self.init_input_generator(new_generator)
-        
-        
+        if len(self.input_generator_stack) >= 1:
+            self.set_input_generator(self.input_generator_stack.pop())
+        else:
+            TopoObject().warning('There was no previous input generator.')
+
+               
     def start(self):
         assert self.simulator
 
