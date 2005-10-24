@@ -43,7 +43,7 @@ def restore_input_generators(sim=None):
 
 ### JABHACKALERT!  Should leave the state of all learning flags
 ### unchanged upon return; currently it's overwriting all of them.
-def pattern_present(inputs=None,duration=1.0,sim=None, learning=False):
+def pattern_present(inputs=None,duration=1.0,sim=None,learning=False,overwrite_previous=False):
     """
     Present the specified input patterns for the specified duration.
 
@@ -64,6 +64,10 @@ def pattern_present(inputs=None,duration=1.0,sim=None, learning=False):
     if not sim:
         sim = topo.base.registry.active_sim()
     if sim:
+
+        if not overwrite_previous:
+            save_input_generators(sim)
+            
         # turn off sheets' learning if learning=False
         if not learning:
             for each in sim.get_event_processors():
@@ -86,6 +90,9 @@ def pattern_present(inputs=None,duration=1.0,sim=None, learning=False):
             for each in sim.get_event_processors():
                 if isinstance(each,Sheet):
                     each.learning = True
+            
+        if not overwrite_previous:
+            restore_input_generators(sim)
 
     else:
         TopoObject().warning('No active Simulator.')

@@ -174,9 +174,8 @@ class InputParamsPanel(plotpanel.PlotPanel):
         new_patterns_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         input_dict = dict([(name,d['pattern'])
                            for (name,d) in new_patterns_dict.items()])
-        save_input_generators()
-        pattern_present(input_dict,self.present_length.getvalue(),learning=self.learning.get())
-        restore_input_generators()
+        pattern_present(input_dict,self.present_length.getvalue(),
+                        learning=self.learning.get(),overwrite_previous=False)
         self.console.auto_refresh()
 
 
