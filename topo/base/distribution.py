@@ -90,6 +90,11 @@ class Distribution(object):
         self.keep_peak = keep_peak
 
 
+
+    ### JABHACKALERT!  The semantics of this operation are incorrect, because
+    ### an expression like x+y should not modify x, while this does.  It could
+    ### be renamed __iadd__, to implement += (which has the correct semantics),
+    ### but it's not yet clear how to do that.
     def __add__(self,a):
         """
         Allows add() method to be used via the '+' operator; i.e.,
