@@ -15,13 +15,13 @@ class FeatureMap(object):
     Given a set of activity matrices and associated parameter values,
     constructs a preference map and a selectivity map for that parameter.
     """
-
-    def __init__(self, activity_matrix_dimensions, axis_range=(0.0,1.0), cyclic=False):
+    ### Remenber to change that so that to have a sheet instead of activity_matrix_dimension
+    def __init__(self, sheet, axis_range=(0.0,1.0), cyclic=False):
         
         # Initialize the internal data structure: a matrix of Distribution objects.
         # It would be nice to do this using some sort of map() or apply() function...
-        rows, cols = activity_matrix_dimensions
-        self.distribution_matrix = zeros(activity_matrix_dimensions,'O')
+        rows, cols = sheet.activity.shape
+        self.distribution_matrix = zeros(sheet.activity.shape,'O')
         for i in range(rows):
             for j in range(cols):
                 self.distribution_matrix[i,j] = Distribution(axis_range,cyclic,keep_peak=True)
@@ -29,6 +29,7 @@ class FeatureMap(object):
 
     def update(self, activity_matrix, feature_value):
         """Add a new matrix of activity values for a given stimulus value."""
+        
         ### JABHACKALERT!  Need to override +=, not +, due to modifying argument
         self.distribution_matrix + self.__make_pairs(activity_matrix,feature_value)
 
