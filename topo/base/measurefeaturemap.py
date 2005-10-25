@@ -7,14 +7,10 @@ $Id$
 # CEB,JBFC
 
 # To do:
-# - pattern_present_update should be broken up and written in an easier-to-follow way
-# e.g. some i,j counting could probably be done better (using zip)
-# - when creating SheetViews, pass not just "V1", but also preference, selectivity, etc.
-# - namespace __main__, as in later comment 
 # - remove temporary testing code
 # - will go into featuremap.py
 # - give the variables better names!
-# - make variables private as appropriate
+
 
 import topo.base.topoobject
 import __main__
@@ -78,41 +74,39 @@ class MeasureFeatureMap(object):
                        {'x': (0.0,2.0), [0.0, 0.5, 0.6, 0.7, 1.0], False}
                        for the non-cyclic x values specified, which may only fall in the range [0.0,1.0].
         """
-        # This dictionary will, for each sheet, contain a dictionary to hold the FeatureMap for each feature
-        # {sheet: {feature: FeatureMap()}}
-        self.sheet_featuremaps = {}
-
-        # the list of values to be presented for each feature
-        self.list_param = []
-
-        # build self.list_param from the input feature_param
-        for param in feature_param.values():
-            if isinstance(param[1],type([])):               
-                self.list_param.append(param[1])
-            else:
-                low_bound,up_bound=param[0]
-                step=param[1]
-                self.list_param.append(frange(low_bound,up_bound,step))
-
-        # find all the sheets that will have their feature maps measured (i.e. all Sheets that aren't GeneratorSheets)
-
-        f= lambda x: not isinstance(x,GeneratorSheet)
-        self.measured_sheets = filter(f,simulator.objects(Sheet).values())
-        
-        # now create the featuremaps for each sheet  
-        for sheet in self.measured_sheets:
-            self.sheet_featuremaps[sheet] = {}
-            for feature, value in feature_param.items():
-                self.sheet_featuremaps[sheet].update({feature: FeatureMap(sheet,
-                                                                          axis_range=value[0],
-                                                                          cyclic=value[2])})
-        
-        self.generator_sheets = simulator.objects(GeneratorSheet)
         self.simulator=simulator
 
-               
+        # This dictionary will contains (for each sheet) a dictionary to hold the FeatureMap for each feature
+        # {sheet: {feature: FeatureMap()}}
+        self.__featuremaps = {}
 
-    def pattern_present_update(self,user_function):
+        # the list of (list of) values to be presented for each feature
+        self.__featurevalues = []
+        
+        for param in feature_param.values():
+            # param can be either list or float (a step size)
+            if isinstance(param[1],type([])):               
+                self.__featurevalues.append(param[1])
+            else:
+                low_bound,up_bound = param[0]
+                step=param[1]
+                self.__featurevalues.append(frange(low_bound,up_bound,step))
+
+        # all the sheets that will have their feature maps measured
+        # (i.e. all Sheets that aren't GeneratorSheets)
+        f = lambda x: not isinstance(x,GeneratorSheet)
+        self.__measured_sheets = filter(f,simulator.objects(Sheet).values())
+        
+        # now create the featuremaps for each sheet    
+        for sheet in self.__measured_sheets:
+            self.__featuremaps[sheet] = {}
+            for feature, value in feature_param.items():
+                self.__featuremaps[sheet].update({feature: FeatureMap(sheet,
+                                                                          axis_range=value[0],
+                                                                          cyclic=value[2])})
+
+                
+    def measure_maps(self,user_function):
 
         """
         Create a list of all permutations of the feature values, then, for each permutation, set the
@@ -121,56 +115,51 @@ class MeasureFeatureMap(object):
 
         Note: allows execution of arbitrary code.
         """
-        save_input_generators(self.simulator) 
-
-        input_permutations = cross_product(self.list_param)
-
-      
-        # Present the input pattern with various parameter settings,
-        # keeping track of the responses
-        for permutation in input_permutations:
-            sheet=self.measured_sheets[0] # Assumes that there is at least one sheet; needs fixing
-            param_dict={}
-            k=0
-            # SET EACH FEATURE ON THE GENERATOR
-            for feature in self.sheet_featuremaps[sheet].keys():                    
-             
-                param_dict[feature]=permutation[k]
-                k=k+1
-                
-            # DRAW THE PATTERN: call to the user_function
-            user_function(param_dict,self.simulator)
-            
-            # Temporary; refresh the display
-            debugmode=True
-            console=topo.base.registry.get_console()
-            if console and debugmode:
-               console.auto_refresh()
-            
-
-            # NOW UPDATE EACH FEATUREMAP WITH (ACTIVITY,FEATURE_VALUE)
-            for sheet in self.measured_sheets:
-                m = 0
-                for feature in self.sheet_featuremaps[sheet].keys():
-                    # Temporary: debugging print statement
-                    # print 'activity for ', sheet,'[0,0], ', feature, '=', permutation[m], ':',  sheet.activity[0,0]
-                    self.sheet_featuremaps[sheet][feature].update(sheet.activity, permutation[m])
-                    m = m + 1
-
-        # Now that the feature maps have been measured, construct the plots
-        for sheet in self.measured_sheets:
-            bounding_box = sheet.bounds
-            for feature in self.sheet_featuremaps[sheet].keys():
-                
-                norm_factor = self.sheet_featuremaps[sheet][feature].distribution_matrix[0,0].axis_range
-                view_preference = SheetView(((self.sheet_featuremaps[sheet][feature].preference())/norm_factor,bounding_box), sheet.name + "_" + capitalize(feature)+'Preference')
-                # note the temporary multiplication by 17 (just because I remember JAB saying it was something like that in LISSOM)
-                view_selectivity = SheetView((17*self.sheet_featuremaps[sheet][feature].selectivity(),bounding_box), sheet.name + "_" + capitalize(feature)+'Selectivity')
-                sheet.add_sheet_view(capitalize(feature)+'Preference', view_preference)
-                sheet.add_sheet_view(capitalize(feature)+'Selectivity', view_selectivity)
+        save_input_generators(self.simulator)
+        
+        self.__present_input_patterns(user_function)
+        self.__construct_sheet_views()
 
         restore_input_generators(self.simulator)
 
 
+    def __present_input_patterns(self,user_function):
+        input_permutations = cross_product(self.__featurevalues)
 
-         
+        # Present the input pattern with various parameter settings,
+        # keeping track of the responses
+        for permutation in input_permutations:
+            sheet=self.__measured_sheets[0] # Assumes that there is at least one sheet; needs fixing
+            param_dict={}
+
+            # set each feature's value
+            for feature,value in zip(self.__featuremaps[sheet].keys(), permutation):
+                param_dict[feature] = value
+
+            # DRAW THE PATTERN: call to the user_function
+            user_function(param_dict,self.simulator)
+            
+            # NOW UPDATE EACH FEATUREMAP WITH (ACTIVITY,FEATURE_VALUE)
+            for sheet in self.__measured_sheets:
+                for feature,value in zip(self.__featuremaps[sheet].keys(), permutation):
+                    self.__featuremaps[sheet][feature].update(sheet.activity, value)
+        
+
+    def __construct_sheet_views(self):
+        for sheet in self.__measured_sheets:
+            bounding_box = sheet.bounds
+            
+            for feature in self.__featuremaps[sheet].keys():
+                
+                norm_factor = self.__featuremaps[sheet][feature].distribution_matrix[0,0].axis_range
+                preference_map = SheetView(((self.__featuremaps[sheet][feature].preference())/norm_factor,
+                                             bounding_box), sheet.name + "_" + capitalize(feature)+'Preference')
+                sheet.add_sheet_view(capitalize(feature)+'Preference', preference_map)
+
+                # note the temporary multiplication by 17
+                # (just because I remember JAB saying it was something like that in LISSOM)
+                selectivity_map = SheetView((17*self.__featuremaps[sheet][feature].selectivity(),
+                                              bounding_box), sheet.name + "_" + capitalize(feature)+'Selectivity')
+                sheet.add_sheet_view(capitalize(feature)+'Selectivity', selectivity_map)
+
+
