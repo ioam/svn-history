@@ -84,7 +84,6 @@ class Parameter(object):
         """
         Initialize a new parameter.
 
-
         Set the name of the parameter to a gensym, and initialize
         the default value.
         """
@@ -126,26 +125,6 @@ class Parameter(object):
         raise "Deleting parameters is not allowed."
 
 
-    # Pickle support
-    def __getstate__(self):
-        state={}
-        for c in classlist(type(self)):
-            try:
-                for k in c.__slots__:
-                    state[k] = getattr(self,k)
-            except AttributeError:
-                pass
-        return state
-
-    def __setstate__(self,state):
-        for k,v in state.items():
-            setattr(self,k,v)
-        self.unpickle()
-
-    def unpickle(self):
-        pass
-
-
     def get_name(self,obj):
         """
         Return the name that the specified object has for this parameter.
@@ -169,6 +148,7 @@ class Parameter(object):
     def _get_doc(self):
         return self.doc
     __doc__ = property(_get_doc)
+
 
 
 class Number(Parameter):
