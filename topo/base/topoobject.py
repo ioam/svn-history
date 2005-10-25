@@ -11,6 +11,7 @@ $Id$
 import sys
 
 from parameter import Parameter
+from utils import classlist,descendents
 from pprint import pprint
 
 SILENT  = 0
@@ -260,37 +261,6 @@ class TopoObject(object):
         return paramdict
 
 
-def classlist(class_):
-    """
-    Return a list of the class hierarchy above (and including) class_,
-    from least- to most-specific.
-    """
-    assert isinstance(class_, type)
-    q = [class_]
-    out = []
-    while len(q):
-        x = q.pop(0)
-        out.append(x)
-        for b in x.__bases__:
-            if b not in q and b not in out:
-                q.append(b)
-    out.reverse()
-    return out
-
-def descendents(class_):
-    assert isinstance(class_,type)
-    q = [class_]
-    out = []
-    while len(q):
-        x = q.pop(0)
-        out.insert(0,x)
-        for b in x.__subclasses__():
-            if b not in q and b not in out:
-                q.append(b)
-    return out[::-1]
-
-    
-    
 def print_all_param_defaults():
     print "===== Topographica Parameter Default Values ====="
     classes = descendents(TopoObject)

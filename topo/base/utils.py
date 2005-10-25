@@ -11,6 +11,11 @@ import math
 
 inf = (ones(1)/0.0)[0]
 
+### JABALERT! Need to separate the utilities that depend on Numeric
+### from the others, so that no caller will accidentally require
+### Numeric.  Presumably the Numeric-related functions would go into a
+### separate file arrayutils.py.
+
 
 def wrap(lower, upper, x):
     """
@@ -259,3 +264,42 @@ def frange(start, end=None, inc=None):
         L.append(next)
         
     return L
+
+
+def classlist(class_):
+    """
+    Return a list of the class hierarchy above (and including) class_.
+
+    The list is ordered from least- to most-specific.  Often useful in
+    functions to get and set the full state of an object, e.g. for
+    pickling.
+    """
+    assert isinstance(class_, type)
+    q = [class_]
+    out = []
+    while len(q):
+        x = q.pop(0)
+        out.append(x)
+        for b in x.__bases__:
+            if b not in q and b not in out:
+                q.append(b)
+    return out[::-1]
+
+
+def descendents(class_):
+    """
+    Return a list of the class hierarchy below (and including) class_.
+
+    The list is ordered from least- to most-specific.  Can be useful for
+    printing the contents of an entire class hierarchy.
+    """
+    assert isinstance(class_,type)
+    q = [class_]
+    out = []
+    while len(q):
+        x = q.pop(0)
+        out.insert(0,x)
+        for b in x.__subclasses__():
+            if b not in q and b not in out:
+                q.append(b)
+    return out[::-1]
