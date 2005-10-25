@@ -45,18 +45,23 @@ def restore_input_generators(sim=None):
 ### unchanged upon return; currently it's overwriting all of them.
 def pattern_present(inputs=None,duration=1.0,sim=None,learning=False,overwrite_previous=False):
     """
-    Present the specified input patterns for the specified duration.
+    Present the specified test patterns for the specified duration.
 
     Given a set of input patterns (dictionary of
     GeneratorSheetName:PatternGenerator pairs), installs them into the
     specified GeneratorSheets, runs the simulator for the specified
-    length of time, then restores the original patterns.
+    length of time, then restores the original patterns and the
+    original simulator time.  Thus this input is not considered part
+    of the regular simulation, and is usually for testing purposes.
 
     If a simulator is not provided, the active simulator, if one
     exists, is requested.
 
     If this process is interrupted by the user, the temporary patterns
     may still be installed on the retina.
+
+    If overwrite_previous is true, the given inputs overwrite those
+    previously defined.
 
     If learning is False, overwrites the existing values of Sheet.learning
     to disable learning, then reenables learning.
@@ -83,7 +88,9 @@ def pattern_present(inputs=None,duration=1.0,sim=None,learning=False,overwrite_p
             else:
                 TopoObject().warning('%s not a valid Sheet Name.' % each)
 
+        sim.state_push()
         sim.run(duration)
+        sim.state_pop()
 
         # turn sheets' learning back on if we turned it off before
         if not learning:
