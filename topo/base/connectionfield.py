@@ -237,7 +237,7 @@ class GenericCFLF(CFLearningFunction):
         super(GenericCFLF,self).__init__(**params)
 
     def __call__(self,input_activity, self_activity, rows, cols, len, cfs, alpha):
-        """Apply the specified learn_fn to every CF."""
+        """Apply the specified single_cf_fn to every CF."""
         for r in range(rows):
             for c in range(cols):
                 cf = cfs[r][c]
