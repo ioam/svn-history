@@ -13,7 +13,9 @@ $Id$
 from parameter import Parameter
 from Numeric import *
 from topoobject import TopoObject
+from utils import classlist
 
+### JABHACKALERT! Must replace this with the real exception NotImplementedError (easy)
 NYI = "Abstract method not implemented."
 
 class BoundingRegion(TopoObject):
@@ -173,9 +175,11 @@ class Intersection(BoundingRegion):
 
     def aarect(self):
         return self.__aarect
-    
+
+# JABALERT: Should probably remove top, bottom, etc. accessor functions,
+# and use the slot itself instead.
 ###################################################
-class AARectangle:
+class AARectangle(object):
     """
     Axis-aligned rectangle class.
 
@@ -184,42 +188,41 @@ class AARectangle:
 
     Usage:  aar = AARectangle( (x1,y1),(x2,y2), ... , (xN,yN) )
     """
-    __slots__ = ['__left','__bottom','__right','__top']
+    __slots__ = ['_left','_bottom','_right','_top']
     def __init__(self,*points):
-        self.__top = max([y for x,y in points])
-        self.__bottom = min([y for x,y in points])
-        self.__left = min([x for x,y in points])
-        self.__right = max([x for x,y in points])
-
+        self._top = max([y for x,y in points])
+        self._bottom = min([y for x,y in points])
+        self._left = min([x for x,y in points])
+        self._right = max([x for x,y in points])
 
     def top(self):
         """
         Return the y-coordinate of the top of the rectangle.
         """
-        return self.__top
+        return self._top
     def bottom(self):
         """
         Return the y-coordinate of the bottom of the rectangle.
         """
-        return self.__bottom
+        return self._bottom
     def left(self):
         """
         Return the x-coordinate of the left side of the rectangle.
         """
-        return self.__left
+        return self._left
     def right(self):
         """
         Return the x-coordinate of the right side of the rectangle.
         """
-        return self.__right
+        return self._right
     def lbrt(self):
         """
         Return (left,bottom,right,top) as a tuple
         """
-        return (self.__left,
-                self.__bottom,
-                self.__right,
-                self.__top)
+        return (self._left,
+                self._bottom,
+                self._right,
+                self._top)
 
     def centroid(self):
         """
@@ -242,12 +245,11 @@ class AARectangle:
         return AARectangle(points=((l,b),(r,t)))
 
     def width(self):
-        return self.__right - self.__left
+        return self._right - self._left
     def height(self):
-        return self.__top - self.__bottom
+        return self._top - self._bottom
 
     def empty(self):
         l,b,r,t = self.lbrt()
         return (r <= l) or (t <= b)
-        
-                         
+
