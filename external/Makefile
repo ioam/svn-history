@@ -233,7 +233,8 @@ weave-uninstall:
 FIXEDPT = fixedpoint-0.1.2
 FIXEDPT_UNINSTALL = ${PYTHON_LIB}/site-packages
 
-fixedpoint: ${FIXEDPT}.tgz python
+fixedpoint: ${FIXEDPT}.tgz python fixedpoint.diff fixedpoint_setup.py
+	rm -rf ${FIXEDPT}
 	tar xzf ${FIXEDPT}.tgz
 	mv fixedpoint ${FIXEDPT}
 	cp fixedpoint.diff ${FIXEDPT}
