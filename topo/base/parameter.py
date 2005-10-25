@@ -9,6 +9,9 @@ kind of class attribute.  See the Parameter class documentation for
 more details.
 """
 
+from utils import classlist
+
+
 class Parameter(object):
   """
   An attribute descriptor for declaring Topographica parameters.
@@ -119,6 +122,42 @@ class Parameter(object):
     Delete a parameter.  Raises an exception.
     """
     raise "Deleting parameters is not allowed."
+
+
+  # Pickle support
+  def __getstate__(self):
+      import copy
+      
+      try:
+          state = copy.copy(self.__dict__)
+          for x in self.nopickle:
+              if x in state:
+                  del(state[x])
+              else:
+                  desc,cls = type(self).get_param_descriptor(x)
+                  if desc and (desc.get_name() in state):
+                      del(state[desc.get_name()])
+
+      except AttributeError,err:
+          ## CEB: not clear why this was needed
+          state={}
+          pass
+
+      for c in classlist(type(self)):
+          try:
+              for k in c.__slots__:
+                  state[k] = getattr(self,k)
+          except AttributeError:
+              pass
+      return state
+
+  def __setstate__(self,state):
+      for k,v in state.items():
+          setattr(self,k,v)
+      self.unpickle()
+
+  def unpickle(self):
+      pass
 
 
   def get_name(self,obj):
