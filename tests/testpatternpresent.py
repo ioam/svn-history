@@ -13,7 +13,7 @@ from topo.patterns.random import UniformRandomGenerator
 from topo.projections.kernelprojection import KernelProjection
 import topo.base.topoobject
 from math import pi
-from topo.patterns.patternpresent import pattern_present
+from topo.commands.basic import pattern_present
 
 class TestPatternPresent(unittest.TestCase):
 
