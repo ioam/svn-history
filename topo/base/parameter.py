@@ -73,6 +73,8 @@ class Parameter(object):
   Note: See this HOW-TO document for a good intro to descriptors in
   Python:
           http://users.rcn.com/python/download/Descriptor.htm
+
+  (And the other items on http://www.python.org/doc/newstyle.html)
   """
 
   __slots__ = ['_name','default','doc','hidden']
@@ -126,23 +128,7 @@ class Parameter(object):
 
   # Pickle support
   def __getstate__(self):
-      import copy
-      
-      try:
-          state = copy.copy(self.__dict__)
-          for x in self.nopickle:
-              if x in state:
-                  del(state[x])
-              else:
-                  desc,cls = type(self).get_param_descriptor(x)
-                  if desc and (desc.get_name() in state):
-                      del(state[desc.get_name()])
-
-      except AttributeError,err:
-          ## CEB: not clear why this was needed
-          state={}
-          pass
-
+      state={}
       for c in classlist(type(self)):
           try:
               for k in c.__slots__:
