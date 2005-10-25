@@ -4,6 +4,13 @@ Tests of featuremap.py
 $Id$
 """
 
+"""
+TestFeatureMap
+
+$Id$
+
+"""
+
 # CEB:
 # This file is still being written
 
@@ -16,7 +23,7 @@ import unittest
 from topo.base.featuremap import FeatureMap
 
 
-from topo.base.utils import arg
+from topo.base.utils import arg, wrap
 from math import pi
 from Numeric import array, exp
 from topo.base.sheet import Sheet
@@ -31,7 +38,8 @@ class TestFeatureMap(unittest.TestCase):
 
         # simple activity arrays use to update the feature maps
         self.a1 = array([[1,1], [1,1], [1,1]])
-        self.a2 = array([[0,1], [0,1], [0,1]])
+        self.a2 = array([[3,3], [3,3], [3,3]])
+        self.a3 = array([[0,1], [0,1], [0,1]])
         
         # object to test for non-cyclic distributions
         self.fm1 = FeatureMap(sheet=test_sheet, axis_range=(0.0,1.0), cyclic=False)
@@ -45,7 +53,7 @@ class TestFeatureMap(unittest.TestCase):
     # need to add a test_update()    
 
 
-    def test_map(self):
+    def test_preference(self):
         
         for i in range(3):
             for j in range(2):
@@ -53,17 +61,17 @@ class TestFeatureMap(unittest.TestCase):
                 self.assertAlmostEqual(self.fm2.preference()[i,j], 0.5)
 
 
-             
+        # To test the update function     
         self.fm1.update(self.a1,0.7)
         self.fm2.update(self.a1,0.7)
 
         for i in range(3):
             for j in range(2):
                 self.assertAlmostEqual(self.fm1.preference()[i,j], 0.6)
-                self.assertAlmostEqual(self.fm2.preference()[i,j],
-                                       1.0+(arg(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j)))/(2*pi)) 
-                                       # CEB: 
-                                       # added 1.0 because arg returns principal value (change here)
+                vect_sum = wrap(0,1,arg(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/(2*pi)) 
+                self.assertAlmostEqual(self.fm2.preference()[i,j],vect_sum) 
+                                      
+                                      
 
         
         # To test the keep_peak=True 
@@ -73,27 +81,104 @@ class TestFeatureMap(unittest.TestCase):
         for i in range(3):
             for j in range(2):
                 self.assertAlmostEqual(self.fm1.preference()[i,j], 0.6)
-                self.assertAlmostEqual(self.fm2.preference()[i,j],
-                                       1.0+(arg(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/(2*pi)))
-                                       # CEB: 
-                                       # added 1.0 because arg returns principal value (change here)
-
-        
-        self.fm1.update(self.a2,0.9)
-        self.fm2.update(self.a2,0.9)
+                vect_sum =wrap(0,1,arg(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/(2*pi))
+                self.assertAlmostEqual(self.fm2.preference()[i,j],vect_sum)
+                                      
+        self.fm1.update(self.a2,0.7)
+        self.fm2.update(self.a2,0.7)
 
         for i in range(3):
-            self.assertAlmostEqual(self.fm1.preference()[i,0], 0.6)
+            for j in range(2):
+                self.assertAlmostEqual(self.fm1.preference()[i,j], 0.65)
+                vect_sum =wrap(0,1,arg(3*exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/(2*pi))
+                self.assertAlmostEqual(self.fm2.preference()[i,j],vect_sum)
+
+        # to even test more....
+        
+        self.fm1.update(self.a3,0.9)
+        self.fm2.update(self.a3,0.9)
+        
+        for i in range(3):
+            self.assertAlmostEqual(self.fm1.preference()[i,0], 0.65)
             self.assertAlmostEqual(self.fm1.preference()[i,1], 0.7)
-            self.assertAlmostEqual(self.fm2.preference()[i,0],
-                                   1.0+(arg(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/(2*pi)))
-            self.assertAlmostEqual(self.fm2.preference()[i,1],
-                                   1.0+(arg(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j)+exp(0.9*2*pi*1j))/(2*pi)))
-          
-         
-        # need to add the test........def test_selectivity
+            vect_sum = wrap(0,1,arg(3*exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/(2*pi))
+            self.assertAlmostEqual(self.fm2.preference()[i,0],vect_sum)
+            vect_sum = wrap(0,1,arg(3*exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j)+exp(0.9*2*pi*1j))/(2*pi))
+            self.assertAlmostEqual(self.fm2.preference()[i,1],vect_sum)
+            
+                                          
+    def test_selectivity(self):
+        
+        for i in range(3):
+            for j in range(2):
+                # when only one bin the selectivity is 1 (from C code)
+                self.assertAlmostEqual(self.fm1.selectivity()[i,j], 1.0)
+                self.assertAlmostEqual(self.fm2.selectivity()[i,j], 1.0)
 
+        # To test the update function     
+        self.fm1.update(self.a1,0.7)
+        self.fm2.update(self.a1,0.7)
 
+        for i in range(3):
+            for j in range(2):
+                proportion = 1.0/2.0
+                offset = 1.0/2.0
+                relative_selectivity = (proportion-offset)/(1.0-offset)  ## gives 0 ..?
+                self.assertAlmostEqual(self.fm1.selectivity()[i,j],relative_selectivity)
+                vect_sum = abs(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/2.0 
+                self.assertAlmostEqual(self.fm2.selectivity()[i,j],vect_sum) 
+                                      
+                                      
+
+        
+        # To test the keep_peak=True 
+        self.fm1.update(self.a1,0.7)
+        self.fm2.update(self.a1,0.7)
+
+        for i in range(3):
+            for j in range(2):
+                proportion = 1.0/2.0
+                offset = 1.0/2.0
+                relative_selectivity = (proportion-offset)/(1.0-offset)
+                self.assertAlmostEqual(self.fm1.selectivity()[i,j],relative_selectivity)
+                vect_sum = abs(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/2.0 
+                self.assertAlmostEqual(self.fm2.selectivity()[i,j],vect_sum) 
+
+                                                           
+        self.fm1.update(self.a2,0.7)
+        self.fm2.update(self.a2,0.7)
+
+        for i in range(3):
+            for j in range(2):
+                proportion = 3.0/4.0
+                offset = 1.0/2.0
+                relative_selectivity = (proportion-offset)/(1.0-offset)
+                #self.assertAlmostEqual(self.fm1.selectivity()[i,j],relative_selectivity)
+                vect_sum = abs(3*exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/4.0 
+                self.assertAlmostEqual(self.fm2.selectivity()[i,j],vect_sum) 
+                 
+        # to even test more....
+        
+        self.fm1.update(self.a3,0.9)
+        self.fm2.update(self.a3,0.9)
+        
+        for i in range(3):
+            proportion = 3.0/4.0
+            offset = 1.0/3.0 ### Carefull, do not create bins when it is 0
+            ### Check with Bednar what is num_bins in the original C-file and see what he wants
+            ### now for the selectivity ....
+            relative_selectivity = (proportion-offset)/(1.0-offset)
+            self.assertAlmostEqual(self.fm1.selectivity()[i,0], relative_selectivity)
+            proportion = 3.0/5.0
+            offset = 1.0/3.0
+            relative_selectivity = (proportion-offset)/(1.0-offset)
+            self.assertAlmostEqual(self.fm1.selectivity()[i,1], relative_selectivity)
+            
+            vect_sum = abs(3*exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/4.0
+            self.assertAlmostEqual(self.fm2.selectivity()[i,0],vect_sum)
+            vect_sum = abs(3*exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j)+exp(0.9*2*pi*1j))/5.0
+            self.assertAlmostEqual(self.fm2.selectivity()[i,1],vect_sum)
+             
 
 suite = unittest.TestSuite()
 suite.addTests(unittest.makeSuite(TestFeatureMap))
@@ -103,6 +188,7 @@ if __name__ == '__main__':
 
 
         
+
 
         
         
