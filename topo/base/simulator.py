@@ -94,6 +94,25 @@ class EPConnection(TopoObject):
         super(EPConnection,self).__init__(**params)
 
 
+class SimulatorEvent:
+    """Simulator event"""
+    fn = Parameter(default=None,doc="Function to execute when the event is processed")
+
+    def __init__(self,time,src,dest,src_port,dest_port,data,fn=None):
+        self.time = time
+        self.src = src
+        self.dest = dest
+        self.src_port = src_port
+        self.dest_port = dest_port
+        self.data = data
+        self.fn = fn
+
+    def __copy__(self):
+        new_copy = SimulatorEvent(self.time,self.src,self.dest, \
+                   self.src_port,self.dest_port,deepcopy(self.data))
+        return new_copy
+
+
 # Simulator stores its events in a linear-time priority queue (i.e a
 # sorted list.) For efficiency, e.g. for spiking neuron simulations,
 # we'll probably need to replace the linear priority queue with a more
@@ -105,23 +124,6 @@ class Simulator(TopoObject):
     A simulator class that uses a simple sorted event list (instead of
     e.g. a sched.scheduler object) to manage events and dispatching.
     """
-    class Event:
-        fn = Parameter(default=None,doc="Function to execute when the event is processed")
-
-        def __init__(self,time,src,dest,src_port,dest_port,data,fn=None):
-            self.time = time
-            self.src = src
-            self.dest = dest
-            self.src_port = src_port
-            self.dest_port = dest_port
-            self.data = data
-            self.fn = fn
-
-        def __copy__(self):
-            new_copy = Simulator.Event(self.time,self.src,self.dest, \
-                       self.src_port,self.dest_port,deepcopy(self.data))
-            return new_copy
-            
             
     step_mode = Parameter(default=False)
     register = Parameter(default=True)
@@ -246,7 +248,7 @@ class Simulator(TopoObject):
         """
         self.debug("Enqueue absolute: from", (src,src_port),"to",(dest,dest_port),
                    "at time",self._time,"for time",time)
-        new_e = Simulator.Event(time,src,dest,src_port,dest_port,data)
+        new_e = SimulatorEvent(time,src,dest,src_port,dest_port,data)
 
         if not self.events or time >= self.events[-1].time:
             self.events.append(new_e)
@@ -275,7 +277,7 @@ class Simulator(TopoObject):
         Usage: schedule_action(time, function name, param 1, param 2, ...)
         """
         self.debug("Enqueue absolute action: ", fn, "at time",self._time,"for time",time)
-        new_e = Simulator.Event(time,None,None,None,None,p,fn=fn)
+        new_e = SimulatorEvent(time,None,None,None,None,p,fn=fn)
 
         if not self.events or time >= self.events[-1].time:
             self.events.append(new_e)
