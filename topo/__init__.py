@@ -7,6 +7,7 @@ information, see the individual subpackages:
 
 base        - Core Topographica functions and classes
 plotting    - Visualization functions and classes
+analysis    - Analysis functions and classes (besides plotting)
 tk          - Tk-based graphical user interface (GUI)
 
 The Topographica primitives library consists of a family of classes
@@ -25,7 +26,7 @@ then show up in the GUI menus as potential input patterns.
 $Id$
 """
 
-__all__ = ['base','commands','sheets','projections','patterns','eps','plotting']
+__all__ = ['base','commands','sheets','projections','patterns','eps','plotting','analysis']
 
 # Enable automatic importing of .ty files, treating them just like .py
 import topo.base.tyimputil
