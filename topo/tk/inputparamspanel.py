@@ -192,6 +192,10 @@ class InputParamsPanel(plotpanel.PlotPanel):
 
         This function does run() the simulator but for 0.0 time.
         """
+        # CEB:
+        # The button on the GUI doesn't work (i.e. it doesn't install the
+        # pattern for future learning).
+        
         new_patterns_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         input_dict = dict([(name,d['pattern'])
                            for (name,d) in new_patterns_dict.items()])
