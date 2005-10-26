@@ -19,6 +19,9 @@ import topo.base.registry
 import topo.plotting.plotengine
 import topo.base.topoobject
 
+from topo.base.registry import set_active_sim, active_sim
+import pickle
+
 KNOWN_FILETYPES = [('Python Files','*.py'),('Topographica Files','*.ty'),('All Files','*')]
 
 
@@ -54,7 +57,6 @@ class PlotsMenuEntry(topo.base.topoobject.TopoObject):
         self.num_windows = 0
         self.title = ''
 
-#
 
     def command(self):
         self.num_windows = self.num_windows + 1
@@ -99,7 +101,8 @@ class TopoConsole(Frame):
         # One location to store and retrieve the Simulator object that
         # will be used for plot data.  Do not directly use these, but
         # go through the accessor functions.
-        self.__active_simulator_obj = None
+
+
         self.__active_plotengine_obj = None
         # Stores inactive simulator/plotengine pairs for relinking
         self.__plotengine_dict = {None: None}
@@ -127,11 +130,14 @@ class TopoConsole(Frame):
         #
         self.menubar.addmenu('Simulation','Simulation commands')
         self.menubar.addmenuitem('Simulation', 'command', 'Load script file',
-                                 label = 'Load',
+                                 label = 'Load script',
                                  command = self.load_network)
-        self.menubar.addmenuitem('Simulation', 'command', 'Reload script from disk',
-                                 label = 'Reload',
-                                 command = self.reload_network)
+        self.menubar.addmenuitem('Simulation', 'command', "Save simulator's state to disk",
+                                 label = 'Save snapshot',
+                                 command = self.save_snapshot)
+        self.menubar.addmenuitem('Simulation', 'command', 'Load the previously saved state',
+                                 label = 'Load snapshot',
+                                 command = self.load_snapshot)
         self.menubar.addmenuitem('Simulation', 'command', 'Reset the network',
                                  label = 'Reset',
                                  ## Gray out menu item ###########
@@ -238,9 +244,10 @@ class TopoConsole(Frame):
         passed in.  A matching PlotEngine will either be created, or
         pulled from a dictionary if the GUI has seen the Simulator before.
         """
+        
+
         assert isinstance(new_sim,simulator.Simulator) or new_sim == None, "Not a Simulator"
     
-        self.__active_simulator_obj = new_sim
         if self.__plotengine_dict.has_key(new_sim):
             self.__active_plotengine_obj = self.__plotengine_dict[new_sim]
         else:
@@ -250,7 +257,7 @@ class TopoConsole(Frame):
     
     def active_simulator(self):
         """Get the active_simulator object relative to the GUI"""
-        return self.__active_simulator_obj
+        return active_sim()
     
     def active_plotengine(self):
         """Get the active_plotengine object relative to the GUI"""
@@ -284,28 +291,41 @@ class TopoConsole(Frame):
                 self.messageBar.message('state', 'Failed to load ' + self.loaded_script)
         topo.tk.topo.tk.show_cmd_prompt()
 
-    def reload_network(self):
-        """
-        Reload the previously loaded file from disk.  Will not
-        prompt for new filename.  Currently does not flush any
-        existing environment variables, so the loaded script needs
-        to take that into account.  execfile() is run within the
-        globals() namespace.
 
-        WARNING: This function does not use the built-in reload()
-        function, so imports will not be reevaluated unless explicitly
-        commanded from within the loaded script.
+    ## CEB:
+    ## load_ and save_snapshot should be available as commands in general, so the pickling
+    ## will be moved out of here.
+
+    def load_snapshot(self):
         """
-        if self.loaded_script == None:
-            self.messageBar.message('state', 'No script to reload')
-        else:
-            result = self.load_script_file(self.loaded_script)
-            if result:
-                self.messageBar.message('state', 'Reloaded ' + self.loaded_script)
-            else:
-                self.messageBar.message('state', 'Failure reloading ' + self.loaded_script)
+        Returns a network to the state of the previously saved snapshot.
+
+        Only works if the snapshot corresponds to the network that
+        originally exists.
+        """
+        # should have an error check that is more than just checking the file exists!
+        try:
+            open('save.p','r')
+        except IOError:
+            self.messageBar.message('state', 'No snapshot available')
+            return None
+
+        self.exec_cmd("from topo.base.registry import set_active_sim; import pickle; set_active_sim(pickle.load(open('save.p')))")  # does it need to be in global namespace?
+        self.messageBar.message('state', 'Loaded snapshot')
         topo.tk.topo.tk.show_cmd_prompt()
-            
+
+
+    def save_snapshot(self):
+        """
+        Pickles the network to 'save.p'.
+
+        Only one snapshot can be used, currently 'save.p'.
+        """
+        # should have an error check
+        pickle.dump(active_sim(), open('save.p','w'))
+        self.messageBar.message('state', 'Simulator saved')
+        topo.tk.topo.tk.show_cmd_prompt()
+    
                 
     def reset_network(self):
 	self.messageBar.message('state', 'Reset not yet implemented')
@@ -422,7 +442,8 @@ class TopoConsole(Frame):
         A simulation object should be linked to the GUI before this
         learning command is issued on the Simulator object.
         """
-        s = self.active_simulator()
+        s = active_sim()
+        
         if s:
             i = float(count)
             s.run(i)
@@ -443,8 +464,8 @@ class TopoConsole(Frame):
         Create a main window title
         """
         title = "Topographica Console."
-        if self.active_simulator() != None:
-            title += "  Active = " + (self.active_simulator()).name
+        if active_sim() != None:
+            title += "  Active = " + (active_sim()).name
         self.parent.title(title)
 
         
