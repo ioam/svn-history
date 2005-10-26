@@ -473,4 +473,4 @@ class GUIToplevel(Toplevel):
 if __name__ != '__main__':
     topo.base.registry.plotpanel_classes['Unit Weights'] = UnitWeightsPanel
     topo.base.registry.plotpanel_classes['Projection'] = ProjectionPanel
-    topo.base.registry.plotpanel_classes['Preference Map'] = PreferenceMapPanel
+    topo.base.registry.plotpanel_classes['Orientation Map'] = PreferenceMapPanel
