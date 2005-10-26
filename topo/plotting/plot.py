@@ -228,7 +228,7 @@ class Plot(TopoObject):
                 else:
                     sv = self.source.sheet_view(each)
                     if sv==None:
-                        self.warning('No sheet view named ' + each + ' in Sheet ' + self.source.name)
+                        self.debug('No sheet view named ' + each + ' in Sheet ' + self.source.name)
                         self.channel_views.append(None)
                     else:
                         self.channel_views.append(sv)
@@ -271,7 +271,7 @@ class Plot(TopoObject):
 
             # No plot; in the future should probably not be a warning
             if (s==None and c==None and h==None):
-                self.message('Skipping empty plot.')
+                self.debug('Skipping empty plot.')
                 return None
 
             # Determine appropriate defaults for each matrix
