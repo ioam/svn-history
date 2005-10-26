@@ -21,6 +21,7 @@ from sheet import Sheet
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.utils import cross_product, frange
 from sheetview import SheetView
+from math import pi
 
 # this is deprecated - find new function
 from string import capitalize
@@ -29,28 +30,6 @@ from string import capitalize
 from topo.patterns.basic import GaussianGenerator, SineGratingGenerator
 from topo.commands.basic import pattern_present, restore_input_generators, save_input_generators
 ###############
-
-def sinegrating_present(features_values,sim):
-    """
-    Intermediate user function used by MeasureFeatureMap
-    """
-    zed = SineGratingGenerator()
-    zed.freq=5.0
-    zed.scale=0.0606
-    zed.offset=0.0        
-    inputs = dict().fromkeys(sim.objects(GeneratorSheet),zed)
-
-    # Temporary: kept that in case we neeed it again
-    #zed.get_paramobj_dict()['theta'].min_print_level = topo.base.topoobject.DEBUG
-    # print zed.phase, zed.theta
-
-    for feature,value in features_values.iteritems():
-        update_generator = "zed." + feature + "=" + repr(value)
-        exec update_generator
-
-    pattern_present(inputs, 1.0, sim, learning=False)
-         
-
 
 class MeasureFeatureMap(object):
     """
@@ -163,3 +142,64 @@ class MeasureFeatureMap(object):
                 sheet.add_sheet_view(capitalize(feature)+'Selectivity', selectivity_map)
 
 
+
+
+# Command for measuring the orientation map
+def measure_or_pref(sim=None, num_freq=0, num_phase=4, num_orientation=8):
+    
+    if not sim:
+        sim = topo.base.registry.active_sim()
+
+    if sim:
+
+        if num_freq==0:
+            step_freq=[]
+        else:
+            step_freq=2*pi/num_freq
+        if num_phase==0:
+            step_phase=[]
+        else:
+            step_phase=2*pi/num_phase
+        if num_orientation==0:
+            step_orientation=[]
+        else:
+            step_orientation=pi/num_orientation
+        
+        feature_values = {"theta": ( (0.0,pi), step_orientation, True),
+                         "phase": ( (0.0,2*pi),step_phase,True),
+                         "freq": ((0.0,2*pi),step_freq,False)}
+        
+        x=MeasureFeatureMap(sim,feature_values)
+        x.measure_maps(__sinegrating_present)
+
+    else:
+        TopoObject().warning('No active Simulator.')
+    
+
+
+
+# Intermediate user function that is passed as a parameter for measure_map in MeasureFeatureMap
+# It is used in measure_or_pref
+def __sinegrating_present(features_values,sim=None,scale=0.0606,offset=0.0,freq=5.0):
+    """
+    Intermediate user function used by MeasureFeatureMap
+    """
+    if not sim:
+         sim = topo.base.registry.active_sim()
+         
+    if sim:
+        
+        zed = SineGratingGenerator()
+        zed.freq= freq
+        zed.scale= scale
+        zed.offset= offset        
+        inputs = dict().fromkeys(sim.objects(GeneratorSheet),zed)
+              
+        for feature,value in features_values.iteritems():
+            update_generator = "zed." + feature + "=" + repr(value)
+            exec update_generator
+
+        pattern_present(inputs, 1.0, sim, learning=False)
+        
+    else:
+        TopoObject().warning('No active Simulator.')
