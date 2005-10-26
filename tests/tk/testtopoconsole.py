@@ -16,17 +16,17 @@ class TestTopoConsole(unittest.TestCase):
 
     def test_plotengine_dict(self):
         self.assertEqual(self.console.active_simulator(),None)
-        self.console.set_active_simulator(self.s)
+        topo.base.registry.set_active_sim(self.s)
         self.assertNotEqual(self.console.active_simulator(),None)
         self.assertNotEqual(self.console.active_plotengine(),None)
         self.assertNotEqual(self.console.active_plotengine(),self.pe)
         generated_pe = self.console.active_plotengine()
-        self.console.set_active_simulator(None)
+        topo.base.registry.set_active_sim(None)
         self.assertEqual(self.console.active_simulator(),None)
 
     def test_do_learning(self):
         run_time = 15.5
-        self.console.set_active_simulator(self.s)
+        topo.base.registry.set_active_sim(self.s)
         start_time = self.s.time()
         self.console.do_learning(str(run_time))
         end_time = self.s.time()
