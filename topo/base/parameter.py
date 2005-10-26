@@ -1,3 +1,4 @@
+
 """
 Module for handling experiment parameters and defaults.
 
@@ -117,6 +118,14 @@ class Parameter(object):
             self.default = val
         else:
             obj.__dict__[self.get_name(obj)] = val
+
+
+    # CEB:
+    # A parameter on its own cannot be pickled.
+    # Parameters owned by TopoObject get pickled.
+    # In the future, parameters might not get pickled:
+    # this should be fixed when pickling is sorted out.
+    
 
     def __delete__(self,obj):
         """
