@@ -1,5 +1,5 @@
 """
-MeasureFeatureMap class
+FeatureMap class, MeasureFeatureMap class and associated function (e.g measure_or_pref)
 
 $Id$
 """
@@ -8,19 +8,23 @@ $Id$
 
 # To do:
 # - remove temporary testing code
-# - will go into featuremap.py
 # - give the variables better names!
+# - get rid of non-used import statement
+
+from Numeric import array, zeros, Float 
+from topo.base.distribution import Distribution
+from topo.base.topoobject import TopoObject
 
 
-import topo.base.topoobject
-import __main__
+import topo.base.topoobject   # do we need that ?
+import __main__               # and that ?
 import topo.base.registry
 
-from featuremap import FeatureMap
-from sheet import Sheet
+
+from topo.base.sheet import Sheet
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.utils import cross_product, frange
-from sheetview import SheetView
+from topo.base.sheetview import SheetView
 from math import pi
 
 # this is deprecated - find new function
@@ -31,7 +35,137 @@ from topo.patterns.basic import GaussianGenerator, SineGratingGenerator
 from topo.commands.basic import pattern_present, restore_input_generators, save_input_generators
 ###############
 
-class MeasureFeatureMap(object):
+
+# Command for measuring the orientation map
+def measure_or_pref(sim=None, num_freq=0, num_phase=4, num_orientation=8):
+    
+    if not sim:
+        sim = topo.base.registry.active_sim()
+
+    if sim:
+
+        if num_freq==0:
+            step_freq=[]
+        else:
+            step_freq=2*pi/num_freq
+        if num_phase==0:
+            step_phase=[]
+        else:
+            step_phase=2*pi/num_phase
+        if num_orientation==0:
+            step_orientation=[]
+        else:
+            step_orientation=pi/num_orientation
+        
+        feature_values = {"theta": ( (0.0,pi), step_orientation, True),
+                         "phase": ( (0.0,2*pi),step_phase,True),
+                         "freq": ((0.0,2*pi),step_freq,False)}
+        
+        x=MeasureFeatureMap(sim,feature_values)
+        x.measure_maps(_sinegrating_present)
+
+    else:
+        TopoObject().warning('No active Simulator.')
+    
+
+
+
+# Intermediate user function that is passed as a parameter for measure_map in MeasureFeatureMap
+# It is used in measure_or_pref
+def _sinegrating_present(features_values,sim=None,scale=0.0606,offset=0.0,freq=5.0):
+    """
+    Intermediate user function used by MeasureFeatureMap
+    """
+    if not sim:
+         sim = topo.base.registry.active_sim()
+         
+    if sim:
+        
+        zed = SineGratingGenerator()
+        zed.freq= freq
+        zed.scale= scale
+        zed.offset= offset        
+        inputs = dict().fromkeys(sim.objects(GeneratorSheet),zed)
+              
+        for feature,value in features_values.iteritems():
+            update_generator = "zed." + feature + "=" + repr(value)
+            exec update_generator
+
+        pattern_present(inputs, 1.0, sim, learning=False)
+        
+    else:
+        TopoObject().warning('No active Simulator.')
+
+
+
+
+class FeatureMap(TopoObject):
+    """
+    A feature map for one stimulus dimension (e.g. Orientation) for one Sheet.
+
+    Given a set of activity matrices and associated parameter values,
+    constructs a preference map and a selectivity map for that parameter.
+    """
+    def __init__(self, sheet, axis_range=(0.0,1.0), cyclic=False):
+        
+        # Initialize the internal data structure: a matrix of Distribution objects.
+        # It would be nice to do this using some sort of map() or apply() function...
+        rows, cols = sheet.activity.shape
+        self.distribution_matrix = zeros(sheet.activity.shape,'O')
+        for i in range(rows):
+            for j in range(cols):
+                self.distribution_matrix[i,j] = Distribution(axis_range,cyclic,keep_peak=True)
+       
+
+    def update(self, activity_matrix, feature_value):
+        """Add a new matrix of activity values for a given stimulus value."""
+        
+        ### JABHACKALERT!  Need to override +=, not +, due to modifying argument,
+        ### or else use a different function name altogether (e.g. update(x,y)).
+        self.distribution_matrix + self.__make_pairs(activity_matrix,feature_value)
+
+
+    def __make_pairs(self,activity_matrix,feature_value):
+        """
+        Transform an activity matrix to a matrix of dictionaries {feature_value:element}.
+    
+        Private method for use with the __add__ method of the Distribution class.
+        """
+        
+        new_matrix=zeros(activity_matrix.shape,'O')
+        for i in range(len(activity_matrix)):
+            for j in range(len(activity_matrix[i])):
+                           new_matrix[i,j] = {feature_value:activity_matrix[i,j]}
+        return new_matrix
+
+
+    def preference(self):
+        """Return the preference map for this feature as a matrix."""
+
+        rows, cols = self.distribution_matrix.shape
+        preference_matrix=zeros((rows, cols),Float) 
+
+        for i in range(rows):
+            for j in range(cols):
+                preference_matrix[i,j]=self.distribution_matrix[i,j].weighted_average()
+
+        return preference_matrix
+        
+
+    def selectivity(self):
+        """Return the selectivity map for this feature as a matrix."""
+
+        rows, cols = self.distribution_matrix.shape
+        selectivity_matrix=zeros((rows, cols),Float) 
+
+        for i in range(rows):
+            for j in range(cols):
+                selectivity_matrix[i,j]=self.distribution_matrix[i,j].selectivity()
+
+        return selectivity_matrix
+         
+
+class MeasureFeatureMap(TopoObject):
     """
     """
     def __init__(self, simulator, feature_param):
@@ -144,62 +278,19 @@ class MeasureFeatureMap(object):
 
 
 
-# Command for measuring the orientation map
-def measure_or_pref(sim=None, num_freq=0, num_phase=4, num_orientation=8):
-    
-    if not sim:
-        sim = topo.base.registry.active_sim()
 
-    if sim:
 
-        if num_freq==0:
-            step_freq=[]
-        else:
-            step_freq=2*pi/num_freq
-        if num_phase==0:
-            step_phase=[]
-        else:
-            step_phase=2*pi/num_phase
-        if num_orientation==0:
-            step_orientation=[]
-        else:
-            step_orientation=pi/num_orientation
+
+
+
         
-        feature_values = {"theta": ( (0.0,pi), step_orientation, True),
-                         "phase": ( (0.0,2*pi),step_phase,True),
-                         "freq": ((0.0,2*pi),step_freq,False)}
-        
-        x=MeasureFeatureMap(sim,feature_values)
-        x.measure_maps(__sinegrating_present)
 
-    else:
-        TopoObject().warning('No active Simulator.')
     
 
 
 
-# Intermediate user function that is passed as a parameter for measure_map in MeasureFeatureMap
-# It is used in measure_or_pref
-def __sinegrating_present(features_values,sim=None,scale=0.0606,offset=0.0,freq=5.0):
-    """
-    Intermediate user function used by MeasureFeatureMap
-    """
-    if not sim:
-         sim = topo.base.registry.active_sim()
-         
-    if sim:
         
-        zed = SineGratingGenerator()
-        zed.freq= freq
-        zed.scale= scale
-        zed.offset= offset        
-        inputs = dict().fromkeys(sim.objects(GeneratorSheet),zed)
-              
-        for feature,value in features_values.iteritems():
-            update_generator = "zed." + feature + "=" + repr(value)
-            exec update_generator
 
-        pattern_present(inputs, 1.0, sim, learning=False)
-        
-    else:
-        TopoObject().warning('No active Simulator.')
+
+
+    
