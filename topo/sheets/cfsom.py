@@ -11,6 +11,7 @@ from topo.base.parameter import Parameter
 from Numeric import argmax,exp,floor
 from topo.base.connectionfield import CFSheet
 
+
 def gaussian(dist,radius):
     return exp( - dist/radius)
 
@@ -73,10 +74,13 @@ class CFSOM(CFSheet):
                             cf = proj.cf(r,c)
                             rate = self.alpha() * gaussian(lattice_dist,radius)
                             X = cf.get_input_matrix(proj.input_buffer)
+
+                            # CEB: hacktastic
+                            # This is for pickling - the savespace for cf.weights does
+                            # not appear to be pickled. 
+                            cf.weights.savespace(1)
+                
                             cf.weights += rate * (X - cf.weights)
-
-
-
     def winner(self):
         return argmax(self.activity.flat)
 

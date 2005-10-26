@@ -195,6 +195,24 @@ class AARectangle(object):
         self._left = min([x for x,y in points])
         self._right = max([x for x,y in points])
 
+    # Basic support for pickling
+    def __getstate__(self):
+        state={}
+        try: 
+            for k in self.__slots__:
+                state[k] = getattr(self,k)
+        except AttributeError:
+            pass
+        return state
+
+    def __setstate__(self,state):
+        for k,v in state.items():
+            setattr(self,k,v)
+        self.unpickle()
+
+    def unpickle(self):
+        pass
+
     def top(self):
         """
         Return the y-coordinate of the top of the rectangle.
