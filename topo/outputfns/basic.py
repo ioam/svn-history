@@ -47,9 +47,9 @@ class DivisiveL1Normalize(OutputFunction):
     """
     OutputFunction that divides an array by its sum (aka its L1 norm).
 
-    This operation keeps an array at a specified norm_value, rescaling
-    each value to make this true.  The array is unchanged if the sum
-    is zero.
+    This operation ensures that an array has a sum equal to the specified 
+    norm_value, rescaling each value to make this true.  The array is 
+    unchanged if the sum is zero.
     """
     norm_value = Number(default=1.0)
     
@@ -66,7 +66,7 @@ class DivisiveL1Normalize(OutputFunction):
 
 class DivisiveL2Normalize(OutputFunction):
     """
-    OutputFunction to divide an array by its Euclidean distance (aka its L2 norm).
+    OutputFunction to divide an array by its Euclidean length (aka its L2 norm).
 
     For a given array interpreted as a flattened vector, keeps the
     Euclidean length of the vector at a specified norm_value.
