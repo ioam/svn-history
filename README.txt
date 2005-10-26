@@ -1,6 +1,5 @@
-This is a pre-release version of the Topographica cortical map
-simulator; please do not trust this version of the code unless you
-have verified it yourself.  An updated version may be available from
+This version of the Topographica cortical map simulator is still under
+active development.  An updated version may be available from
 topographica.org.
 
 Copyright 2005 James A. Bednar, Yoonsuck Choe, Judah B.
@@ -118,13 +117,13 @@ have not yet documented how to do that.
 RUNNING TOPOGRAPHICA
 
 Topographica is still under very active development, and until a full
-public release, is probably not suitable for serious use unless you are
-coordinating such usage with the developers.  However, it already
-includes much useful code, including as a GUI version of a SOM-based
-orientation map network.  To start this code, go to your topographica/
-directory, and type e.g.:
+public release, is probably not suitable for serious use unless you
+are coordinating such usage with the developers.  However, it already
+includes much useful code, including a GUI versions of SOM-based and
+LISSOM-based orientation map networks.  To start this code, go to your
+topographica/ directory, and type e.g.:
 
-  ./topographica -g examples/gui_example.py
+  ./topographica -g examples/cfsom_example.py
 
 You should see a window appear that has similar options available as
 the one in the LISSOM tutorial at:
@@ -134,10 +133,12 @@ the one in the LISSOM tutorial at:
 The tutorial was written for our more polished but less flexible
 simulator LISSOM, also available from http://topographica.org, but you
 can follow many of the instructions in that tutorial.  As of 10/2005,
-the main differences are that all plots are grayscale, there is no
-orientation or ocular dominance map measurement available in the
-menus, the model does not have lateral connections or LGN cells, and
-no trained map is provided.
+the main differences are that all plots are grayscale, the model does
+not have multiple eyes or LGN cells, and a map will need to be trained
+in the GUI, then saved using Save Snapshot, rather than built
+beforehand.
+
+
 
 
 DOCUMENTATION AND FURTHER STUDY
