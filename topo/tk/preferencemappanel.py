@@ -13,6 +13,7 @@ import Pmw
 from topo.plotting.plot import PlotTemplate
 from topo.plotting.plotgroup import PlotGroupTemplate
 from topo.plotting.bitmap import WHITE_BACKGROUND, BLACK_BACKGROUND
+import topo.base.registry
 
 ### JAB: This class is not currently useful; it will need to be revisited once
 ### preference maps can be measured.
@@ -22,13 +23,13 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
 
         self.panel_num = self.console.num_orientation_windows
         
-        self.mapcmds = dict((('OrientationPreference',      'pass'),
-                             ('OcularPreference',           'pass')))
+        self.mapcmds = dict((('Orientation Preference',      'measure_or_pref()'),
+                             ('Ocular Preference',           'pass')))
 
         # Name of the plotgroup to plot
         self.mapname = StringVar()
-        self.mapname.set('OrientationPreference')
-
+        self.mapname.set('Orientation Preference')
+        
         # lissom command used to refresh the plot, if any
         self.cmdname = StringVar()
         self.cmdname.set(self.mapcmds[self.mapname.get()])
@@ -38,8 +39,8 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
         
         Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
                      entry_textvariable=self.mapname,
-                     scrolledlist_items=('OrientationPreference',
-                                         'OcularPreference')
+                     scrolledlist_items=('Orientation Preference',
+                                         'Ocular Preference')
                      ).pack(side=LEFT,expand=YES,fill=X)
 
         # Ideally, whenever self.mapname changes this selection would be 
@@ -47,8 +48,7 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
         # don't know how to set up such a callback. (jbednar@cs)
         Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
                      entry_textvariable=self.cmdname,
-                     scrolledlist_items=('pass',
-                                         'pass')
+                     scrolledlist_items=('measure_or_pref()')
                      ).pack(side=LEFT,expand=YES,fill=X)
 
         self.refresh()
@@ -72,15 +72,13 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
     ### documentation was incorrect (copied from another file).
     def do_plot_cmd(self):
         """
-        Currently plots Activity as an example, but needs fixing.
+        Needs fixing.
         """
         if self.console.active_simulator().get_event_processors():
-            pgt = PlotGroupTemplate([('ActivityPref',
-                  PlotTemplate({'background' : WHITE_BACKGROUND,
-                                'Strength'   : 'Activity',
-                                'Hue'        : 'Activity',
-                                'Confidence' : 'Activity'}))])
-            self.pe_group = self.pe.get_plot_group('ActivityHSV',pgt)
+            print 'mapname', self.mapname.get()
+            pgt = topo.base.registry.plotgroup_templates[self.mapname.get()]
+            print 'pgt',pgt
+            self.pe_group = self.pe.get_plot_group(self.mapname.get(),pgt)
             self.pe_group.do_plot_cmd()
             
 
