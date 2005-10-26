@@ -133,6 +133,13 @@ class PlotGroup(TopoObject):
         self.bitmaps = []
         for each in self.plots():
             (r,g,b) = each.matrices
+
+            # CEB: hacktastic
+            # when scale is 0, r is an array of zeros but g and/or b can be None
+            if g==None or b==None:
+                g=r
+                b=r
+            
             if r.shape != (0,0) and g.shape != (0,0) and b.shape != (0,0):
                 # Crop activity to a maximum of 1.  Will scale brighter
                 # or darker, depending.
@@ -191,6 +198,7 @@ class PlotGroup(TopoObject):
         # sufficient as outlining and other things will need to be
         # done to each of the matrices that come in from the Plot
         # objects.
+        
         generated_bitmap_list = [each.plot() for each in self.all_plots]
         return [each for each in generated_bitmap_list if each is not None]
 
