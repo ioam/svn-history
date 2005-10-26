@@ -18,8 +18,10 @@ import topo.base.registry
 ### We want to support any featuremap type defined in that file, and so import all of them here.
 from topo.analysis.featuremap import *
 
-### JAB: This class is not currently useful; it will need to be revisited once
-### preference maps can be measured.
+### JABHACKALERT: This class fully supports only Orientation Preferences plots
+### at present, and needs to be cleaned up a bit to work in general.
+### E.g. it probably shouldn't have the mapname ComboBox, and should instead
+### use the name from the pgt_name that it was called with.
 class PreferenceMapPanel(plotpanel.PlotPanel):
     def __init__(self,parent,pengine=None,console=None,plot_key='Activity',**config):
         plotpanel.PlotPanel.__init__(self,parent,pengine,console=console,plot_key=plot_key,pgt_name='Preference',**config)
