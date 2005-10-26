@@ -210,7 +210,7 @@ def arg(z):
 
     (z in radians.)
     """
-    z = add(z, complex())  # so that arg(z) also works for real z
+    z = z + complex()  # so that arg(z) also works for real z
 
     return arctan2(z.imag, z.real)
 

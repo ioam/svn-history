@@ -11,7 +11,7 @@ from math import pi
 from Numeric import where,maximum,exp,cos,sin,sqrt,less_equal
 
 
-# CEB: This is a hack.
+# CEBHACKALERT: 
 # For patternfns.py, this only needs to handle arguments that are of large
 # magnitude and negative. A better version of this function could be put in
 # utils for general use, returning 0.0 if there is underflow and Inf

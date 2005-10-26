@@ -134,8 +134,8 @@ class PlotGroup(TopoObject):
         for each in self.plots():
             (r,g,b) = each.matrices
 
-            # CEB: hacktastic
-            # when scale is 0, r is an array of zeros but g and/or b can be None
+            # CEBHACKALERT:
+            # when scale is 0, r is an array of zeros but g and b are None
             if g==None or b==None:
                 g=r
                 b=r

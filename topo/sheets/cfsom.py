@@ -75,7 +75,7 @@ class CFSOM(CFSheet):
                             rate = self.alpha() * gaussian(lattice_dist,radius)
                             X = cf.get_input_matrix(proj.input_buffer)
 
-                            # CEB: hacktastic
+                            # CEBHACKALERT: 
                             # This is for pickling - the savespace for cf.weights does
                             # not appear to be pickled. 
                             cf.weights.savespace(1)
