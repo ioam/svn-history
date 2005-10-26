@@ -2,13 +2,20 @@
 Family of two-dimensional functions indexed by x and y.
 
 All functions are written to be valid both for scalar x and y, and for
-Numeric arrays of x and y (in which case the result is also an array).
+Numeric arrays of x and y (in which case the result is also an array);
+the functions therefore have the same mathematical behaviour as Numeric.
 
 $Id$
 """
 
 from math import pi
-from Numeric import where,maximum,exp,cos,sin,sqrt,less_equal
+from Numeric import where,maximum,exp,cos,sin,sqrt,less_equal,divide
+
+# CEB:
+# Divide is imported from Numeric so that mathematical expressions such
+# as exp(-(3.0/0.0)) are evaluated correctly. Unfortunately this makes
+# such as expressions more difficult to read. How can Numeric's / operator
+# be made to override Python's / operator for scalars?
 
 
 # CEBHACKALERT: 
@@ -31,23 +38,21 @@ def safeexp(x):
 
     return exp(maximum(MIN_ARG,x))
 
+
 def gaussian(x, y, width, height):
     """
     Two-dimensional oriented Gaussian pattern (i.e., 2D version of a
     bell curve, like a normal distribution but without necessarily
     summing to 1.0).
     """
-    new_pattern = -(x / width)**2 + -(y / height)**2
-
-    return safeexp(new_pattern)
+    return safeexp(-(divide(x,width))**2 + -(divide(y,height))**2)
 
 
 def gabor(x, y, width, height, frequency, phase):
     """
     Gabor pattern (sine grating multiplied by a circular Gaussian).
-    """
- 
-    p = safeexp(-(x/width)**2-(y/height)**2)
+    """ 
+    p = safeexp(-(divide(x,width))**2-(divide(y,height))**2)
     return p * (0.5 + 0.5*cos(2*pi*frequency*x + phase))
 
 
@@ -59,7 +64,7 @@ def fuzzy_line(x, y, center_width, gaussian_width):
     gaussian_x_coord = distance_from_line - center_width/2
     
     return where(gaussian_x_coord<=0, 1.0,
-                 safeexp(-(gaussian_x_coord/gaussian_width)**2))
+                 safeexp(-(divide(gaussian_x_coord,gaussian_width))**2))
 
 
 def fuzzy_disk(x, y, disk_radius, gaussian_width):
@@ -68,7 +73,7 @@ def fuzzy_disk(x, y, disk_radius, gaussian_width):
     """
     distance_from_line = sqrt((x**2)+(y**2)) 
     gaussian_x_coord   = distance_from_line - disk_radius/2.0 
-    div_sigmasq = 1 / (gaussian_width*gaussian_width)
+    div_sigmasq = divide(1.0,(gaussian_width*gaussian_width))
 
     disk = less_equal(gaussian_x_coord,0)
     return maximum(disk, safeexp(-gaussian_x_coord*gaussian_x_coord*div_sigmasq)) 
@@ -82,7 +87,7 @@ def fuzzy_ring(x, y, disk_radius, ring_radius, gaussian_width):
     distance_from_line = abs(sqrt((x**2)+(y**2)) - disk_radius)
     inner_distance = distance_from_line - ring_radius
     outer_distance = distance_from_line + ring_radius
-    div_sigmasq = 1 / (gaussian_width*gaussian_width)
+    div_sigmasq = divide(1.0,(gaussian_width*gaussian_width))
 
     ring = less_equal(distance_from_line,ring_radius)
            
