@@ -15,6 +15,9 @@ from topo.plotting.plotgroup import PlotGroupTemplate
 from topo.plotting.bitmap import WHITE_BACKGROUND, BLACK_BACKGROUND
 import topo.base.registry
 
+### We want to support any featuremap type defined in that file, and so import all of them here.
+from topo.analysis.featuremap import *
+
 ### JAB: This class is not currently useful; it will need to be revisited once
 ### preference maps can be measured.
 class PreferenceMapPanel(plotpanel.PlotPanel):
@@ -39,16 +42,16 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
         
         Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
                      entry_textvariable=self.mapname,
-                     scrolledlist_items=('Orientation Preference',
-                                         'Ocular Preference')
+                     scrolledlist_items=(['Orientation Preference'])
                      ).pack(side=LEFT,expand=YES,fill=X)
+        ### There was 'Ocular Preference' in the list before, but does not work yet
 
         # Ideally, whenever self.mapname changes this selection would be 
         # updated automatically by looking in self.mapcmds.  However, I 
         # don't know how to set up such a callback. (jbednar@cs)
         Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
                      entry_textvariable=self.cmdname,
-                     scrolledlist_items=('measure_or_pref()')
+                     scrolledlist_items=(['measure_or_pref()'])
                      ).pack(side=LEFT,expand=YES,fill=X)
 
         self.refresh()
@@ -75,11 +78,13 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
         Needs fixing.
         """
         if self.console.active_simulator().get_event_processors():
-            print 'mapname', self.mapname.get()
+
+            exec self.mapcmds[self.mapname.get()]
             pgt = topo.base.registry.plotgroup_templates[self.mapname.get()]
-            print 'pgt',pgt
             self.pe_group = self.pe.get_plot_group(self.mapname.get(),pgt)
             self.pe_group.do_plot_cmd()
+
+            
             
 
     def display_labels(self):
