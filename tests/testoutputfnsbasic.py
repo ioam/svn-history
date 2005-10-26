@@ -40,7 +40,6 @@ class TestPiecewiseLinear(unittest.TestCase):
                         [4,3,11]])
 
         self.fn1 = PiecewiseLinear()
-        print self.fn1
         self.fn2 = PiecewiseLinear(lower_bound = 0.1,upper_bound = 0.5)    
         self.fn3 = PiecewiseLinear(lower_bound = 0, upper_bound = 10)
         
@@ -55,11 +54,11 @@ class TestPiecewiseLinear(unittest.TestCase):
         fn3_a2 = array([[0.1,0.0,0.7],
                        [0.4,0.3,1.0]])
 
-        for item1,item2 in zip(self.fn1.__call__(self.a1).flat,fn1_a1.flat):
+        for item1,item2 in zip(self.fn1(self.a1).flat,fn1_a1.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2.__call__(self.a1).flat,fn2_a1.flat):
+        for item1,item2 in zip(self.fn2(self.a1).flat,fn2_a1.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn3.__call__(self.a2).flat,fn3_a2.flat):
+        for item1,item2 in zip(self.fn3(self.a2).flat,fn3_a2.flat):
             self.assertAlmostEqual(item1, item2)
  
             
@@ -87,13 +86,13 @@ class TestDivisiveL1Normalize(unittest.TestCase):
 
         fn2_a2 = (self.a2/25.0)*4.0
 
-        for item1,item2 in zip(self.fn1.__call__(self.a1).flat,fn1_a1.flat):
+        for item1,item2 in zip(self.fn1(self.a1).flat,fn1_a1.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn1.__call__(self.a2).flat,fn1_a2.flat):
+        for item1,item2 in zip(self.fn1(self.a2).flat,fn1_a2.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2.__call__(self.a1).flat,fn2_a1.flat):
+        for item1,item2 in zip(self.fn2(self.a1).flat,fn2_a1.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2.__call__(self.a2).flat,fn2_a2.flat):
+        for item1,item2 in zip(self.fn2(self.a2).flat,fn2_a2.flat):
             self.assertAlmostEqual(item1, item2)    
 
 ## REMENBER: eventually, change the name of this function to DivisiveNormalizeLentgh (..?)     
@@ -121,13 +120,13 @@ class TestDivisiveL2Normalize(unittest.TestCase):
         fn2_a1 = (self.a1/eucl_norm_a1)*4.0
         fn2_a2 = (self.a2/sqrt(307))*4.0
 
-        for item1,item2 in zip(self.fn1.__call__(self.a1).flat,fn1_a1.flat):
+        for item1,item2 in zip(self.fn1(self.a1).flat,fn1_a1.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn1.__call__(self.a2).flat,fn1_a2.flat):
+        for item1,item2 in zip(self.fn1(self.a2).flat,fn1_a2.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2.__call__(self.a1).flat,fn2_a1.flat):
+        for item1,item2 in zip(self.fn2(self.a1).flat,fn2_a1.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2.__call__(self.a2).flat,fn2_a2.flat):
+        for item1,item2 in zip(self.fn2(self.a2).flat,fn2_a2.flat):
             self.assertAlmostEqual(item1, item2)
             
 class TestDivisiveMaxNormalize(unittest.TestCase):
@@ -148,17 +147,16 @@ class TestDivisiveMaxNormalize(unittest.TestCase):
         
         fn1_a1 = self.a1/0.8
         fn1_a2 = self.a2/11.0
-        print fn1_a2
         fn2_a1 = (self.a1/0.8)*3.0
         fn2_a2 = (self.a2/11.0)*3.0
 
-        for item1,item2 in zip(self.fn1.__call__(self.a1).flat,fn1_a1.flat):
+        for item1,item2 in zip(self.fn1(self.a1).flat,fn1_a1.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn1.__call__(self.a2).flat,fn1_a2.flat):
+        for item1,item2 in zip(self.fn1(self.a2).flat,fn1_a2.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2.__call__(self.a1).flat,fn2_a1.flat):
+        for item1,item2 in zip(self.fn2(self.a1).flat,fn2_a1.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2.__call__(self.a2).flat,fn2_a2.flat):
+        for item1,item2 in zip(self.fn2(self.a2).flat,fn2_a2.flat):
             self.assertAlmostEqual(item1, item2)
 
 class TestDivisiveLpNormalize(unittest.TestCase):
@@ -188,23 +186,23 @@ class TestDivisiveLpNormalize(unittest.TestCase):
         fn2_a1 = self.a1/l3norm_a1
         fn2_a2 = self.a2/l3norm_a2
 
-        for item1,item2 in zip(self.fn1.__call__(self.a1).flat,fn1_a1.flat):
+        for item1,item2 in zip(self.fn1(self.a1).flat,fn1_a1.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn1.__call__(self.a2).flat,fn1_a2.flat):
+        for item1,item2 in zip(self.fn1(self.a2).flat,fn1_a2.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2.__call__(self.a1).flat,fn2_a1.flat):
+        for item1,item2 in zip(self.fn2(self.a1).flat,fn2_a1.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2.__call__(self.a2).flat,fn2_a2.flat):
+        for item1,item2 in zip(self.fn2(self.a2).flat,fn2_a2.flat):
             self.assertAlmostEqual(item1, item2)  
 
         l4norm_a1 = pow(0.3**4+0.6**4+0.7**4+0.8**4+0.4**4+0.2**4,1.0/4.0)
         l4norm_a2 = pow(2.0+7.0**4+4.0**4+3.0**4+11.0**4+2.0**4+5.0**4+9.0**4,1.0/4.0)
-        fn3_a1 = self.a1/l4norm_a1
-        fn3_a2 = self.a2/l4norm_a2
+        fn3_a1 = (self.a1/l4norm_a1)*2.0
+        fn3_a2 = (self.a2/l4norm_a2)*2.0
 
-        for item1,item2 in zip(self.fn3.__call__(self.a1).flat,fn3_a1.flat):
+        for item1,item2 in zip(self.fn3(self.a1).flat,fn3_a1.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn3.__call__(self.a2).flat,fn3_a2.flat):
+        for item1,item2 in zip(self.fn3(self.a2).flat,fn3_a2.flat):
             self.assertAlmostEqual(item1, item2)  
 
 
@@ -221,6 +219,7 @@ suite.addTests(unittest.makeSuite(case) for case in cases)
               
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=1).run(suite)
+    
 
 
         
