@@ -61,7 +61,7 @@ def norm(v,p=2):
     """
     Returns the Lp norm of v, where p is arbitrary and defaults to 2.
     """
-    return sum(v**p)**(1.0/p)
+    return sum(abs(v)**p)**(1.0/p)
 
 
 def msum(m):
