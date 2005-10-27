@@ -160,7 +160,6 @@ def transform_coordinates(pattern_x, pattern_y, orientation):
     Each matrix is also rotated to match the Topographica Cartesian
     coordinates.
     """
-
     new_pattern_x = subtract.outer(cos(pi-orientation)*pattern_x, sin(pi-orientation)*pattern_y)
     new_pattern_y = add.outer(sin(pi-orientation)*pattern_x, cos(pi-orientation)*pattern_y)
 

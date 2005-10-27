@@ -56,7 +56,7 @@ def gabor(x, y, width, height, frequency, phase):
     return p * (0.5 + 0.5*cos(2*pi*frequency*x + phase))
 
 
-def fuzzy_line(x, y, center_width, gaussian_width):
+def fuzzy_line(x, center_width, gaussian_width):
     """
     Infinite-length line with a solid central region, then Gaussian fall-off at the edges.
     """

@@ -67,21 +67,26 @@ class GaborGenerator(PatternGenerator):
 
 class FuzzyLineGenerator(PatternGenerator):
     """2D fuzzy line pattern generator."""
+
+    # CEBHACKALERT:
+    # Set gaussian_width to zero for the cfsom_example and you can
+    # see a problem with fuzzy lines. The problem is either in
+    # the fuzzyline() function or in the generation of the matrices
+    # used to draw it.
     
     width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
     gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     
     def function(self,**params):
         return fuzzy_line( params.get('pattern_x',self.pattern_x), 
-                           params.get('pattern_y',self.pattern_y),
                            params.get('width',self.width),
                            params.get('gaussian_width',self.gaussian_width))
 
 
 class FuzzyDiskGenerator(PatternGenerator):
     """2D fuzzy disk pattern generator."""
-    
-    width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
+
+    theta   = Number(hidden = True)
     disk_radius  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     
@@ -95,6 +100,7 @@ class FuzzyDiskGenerator(PatternGenerator):
 class FuzzyRingGenerator(PatternGenerator):
     """2D fuzzy ring pattern generator."""
     
+    theta   = Number(hidden = True)
     width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
     disk_radius  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
