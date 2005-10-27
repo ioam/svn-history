@@ -62,9 +62,21 @@ def fuzzy_line(x, y, center_width, gaussian_width):
     """
     distance_from_line = abs(x)
     gaussian_x_coord = distance_from_line - center_width/2
-    
-    return where(gaussian_x_coord<=0, 1.0,
-                 safeexp(-(divide(gaussian_x_coord,gaussian_width))**2))
+
+    # CEBHACKALERT:
+    # temporary fix to avoid 0/0 error (see below).
+    if gaussian_width==0:
+        return where(gaussian_x_coord<=0.0,1.0,0.0)
+    else:
+        return where(gaussian_x_coord<=0.0, 1.0,
+                     safeexp(-(divide(gaussian_x_coord,gaussian_width))**2))
+        
+# CEB: the second "where" doesn't work on its own because where calculates safeexp for gaussian_x_coord==0.0,
+# even though it doesn't actually use it (it should return 1.0 in such cases). This is a problem because
+# if gaussian_width is also 0, then it tries 0/0 which is undefined.
+#
+# ( It seems that the where(test,pass_expression,fail_expression) function calculates fail_expression
+#   and pass_expression every time, though it will only return the result of pass_expression. )
 
 
 def fuzzy_disk(x, y, disk_radius, gaussian_width):
