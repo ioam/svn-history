@@ -34,35 +34,30 @@ from string import capitalize
 from topo.patterns.basic import GaussianGenerator, SineGratingGenerator
 from topo.commands.basic import pattern_present, restore_input_generators, save_input_generators
 ###############
-
+from topo.base.registry import * 
 
 # Command for measuring the orientation map
-def measure_or_pref(sim=None, num_freq=0, num_phase=4, num_orientation=8):
-    
+def measure_or_pref(sim=None, num_freq=1, num_phase=4, num_orientation=4):
+
     if not sim:
         sim = topo.base.registry.active_sim()
 
     if sim:
 
-        if num_freq==0:
-            step_freq=[]
+        if num_freq==0 or num_phase==0 or num_orientation==0:
+            raise ValueError("num_freq,num_phase and num_orientation should be different than 0")
+            
         else:
             step_freq=2*pi/num_freq
-        if num_phase==0:
-            step_phase=[]
-        else:
             step_phase=2*pi/num_phase
-        if num_orientation==0:
-            step_orientation=[]
-        else:
             step_orientation=pi/num_orientation
         
-        feature_values = {"theta": ( (0.0,pi), step_orientation, True),
-                         "phase": ( (0.0,2*pi),step_phase,True),
-                         "freq": ((0.0,2*pi),step_freq,False)}
+            feature_values = {"theta": ( (0.0,pi), step_orientation, True),
+                              "phase": ( (0.0,2*pi),step_phase,True),
+                              "freq": ((0.0,2*pi),step_freq,False)}
         
-        x=MeasureFeatureMap(sim,feature_values)
-        x.measure_maps(_sinegrating_present)
+            x=MeasureFeatureMap(sim,feature_values)
+            x.measure_maps(_sinegrating_present)
 
     else:
         TopoObject().warning('No active Simulator.')
@@ -72,7 +67,9 @@ def measure_or_pref(sim=None, num_freq=0, num_phase=4, num_orientation=8):
 
 # Intermediate user function that is passed as a parameter for measure_map in MeasureFeatureMap
 # It is used in measure_or_pref
-def _sinegrating_present(features_values,sim=None,scale=0.0606,offset=0.0,freq=5.0):
+
+## Previous value scale=0.0606 has been changed to do test with lissom
+def _sinegrating_present(features_values,sim=None,scale=0.06,offset=0.0,freq=5.0):
     """
     Intermediate user function used by MeasureFeatureMap
     """
@@ -251,6 +248,9 @@ class MeasureFeatureMap(TopoObject):
 
             # DRAW THE PATTERN: call to the user_function
             user_function(param_dict,self.simulator)
+            #get_console.auto_refresh_panels.remove(Preference Map)
+            #get_console().testfn()
+#cvs commit -m "Added a raise error when trying to use 0 feature values in measure_or_pref; added some debugging statement in an attempt to display the pattern presented when measuring the map"
             
             # NOW UPDATE EACH FEATUREMAP WITH (ACTIVITY,FEATURE_VALUE)
             for sheet in self.__measured_sheets:
