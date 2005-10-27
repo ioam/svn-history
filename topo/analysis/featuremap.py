@@ -250,7 +250,6 @@ class MeasureFeatureMap(TopoObject):
             user_function(param_dict,self.simulator)
             #get_console.auto_refresh_panels.remove(Preference Map)
             #get_console().testfn()
-#cvs commit -m "Added a raise error when trying to use 0 feature values in measure_or_pref; added some debugging statement in an attempt to display the pattern presented when measuring the map"
             
             # NOW UPDATE EACH FEATUREMAP WITH (ACTIVITY,FEATURE_VALUE)
             for sheet in self.__measured_sheets:
