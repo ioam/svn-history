@@ -12,6 +12,21 @@ from math import pi
 from Numeric import where,maximum,exp,cos,sin,sqrt,less_equal,divide
 
 # CEB:
+# There are three kinds of hack in this file. The first is safeexp: there
+# because Numeric gives an overflow error for e.g. exp(-800) (although it's
+# happy with exp(-inf) ).
+# The second is in gabor() and gaussian(). Numeric will return -inf*inf as -inf,
+# but -(inf**2) raises an error.
+# The third is in line(), disk(), and ring(). In line(), there could be
+# an attempt to do 0/0, which is undefined and raises an error. In disk and ring,
+# there could be attempts to calculate 0*inf, which is again undefined.
+# The hack in line() could be changed to be like that in disk() and ring() for
+# consistency, but probably there is a better solution than either.
+# E.g. SciPy supposedly returns nan and inf values properly in arrays. Then, where()
+# could be used to return either a value calculated with exp or the limit, as required.
+
+
+# CEB:
 # Divide is imported from Numeric so that mathematical expressions such
 # as exp(-(3.0/0.0)) are evaluated correctly. Unfortunately this makes
 # such as expressions more difficult to read. How can Numeric's / operator
@@ -45,14 +60,27 @@ def gaussian(x, y, width, height):
     bell curve, like a normal distribution but without necessarily
     summing to 1.0).
     """
-    return safeexp(-(divide(x,width))**2 + -(divide(y,height))**2)
+    # CEBHACKALERT:
+    # Allows exp(a^2) in the case that a is inf
+    x_arg = divide(x,width)
+    x_arg = -x_arg * x_arg
+    y_arg = divide(y,height)
+    y_arg = -y_arg * y_arg
+    return safeexp(x_arg + y_arg)
 
 
 def gabor(x, y, width, height, frequency, phase):
     """
     Gabor pattern (sine grating multiplied by a circular Gaussian).
     """ 
-    p = safeexp(-(divide(x,width))**2-(divide(y,height))**2)
+    # CEBHACKALERT:
+    # Allows exp(a^2) in the case that a is inf
+    x_arg = divide(x,width)
+    x_arg = -x_arg * x_arg
+    y_arg = divide(y,height)
+    y_arg = -y_arg * y_arg
+    p = safeexp(x_arg + y_arg)
+    
     return p * (0.5 + 0.5*cos(2*pi*frequency*x + phase))
 
 
@@ -87,8 +115,16 @@ def disk(x, y, disk_radius, gaussian_width):
     gaussian_x_coord   = distance_from_line - disk_radius/2.0 
     div_sigmasq = divide(1.0,(gaussian_width*gaussian_width))
 
+    # CEBHACKALERT:
+    # avoids math range error which would result from trying to do exp(0*inf) (0*inf being nan)
+    if gaussian_width == 0.0:
+        exp_arg = where(gaussian_x_coord==0.0,-float('inf'),-gaussian_x_coord*gaussian_x_coord*div_sigmasq)
+    else:
+        exp_arg = -gaussian_x_coord*gaussian_x_coord*div_sigmasq
+
     disk = less_equal(gaussian_x_coord,0)
-    return maximum(disk, safeexp(-gaussian_x_coord*gaussian_x_coord*div_sigmasq)) 
+    return maximum(disk, safeexp(exp_arg))
+
 
 
 def ring(x, y, disk_radius, ring_radius, gaussian_width):
@@ -102,9 +138,20 @@ def ring(x, y, disk_radius, ring_radius, gaussian_width):
     div_sigmasq = divide(1.0,(gaussian_width*gaussian_width))
 
     ring = less_equal(distance_from_line,ring_radius)
-           
+
+    # CEBHACKALERT:
+    # avoids math range error which would result from trying to do exp(0*inf) (0*inf being nan)
+    if gaussian_width == 0.0:
+        inner_exp_arg = where(inner_distance==0.0,-float('inf'),-inner_distance*inner_distance*div_sigmasq)
+        outer_exp_arg = where(outer_distance==0.0,-float('inf'),-outer_distance*outer_distance*div_sigmasq)
+    else:
+        inner_exp_arg = -inner_distance*inner_distance*div_sigmasq
+        outer_exp_arg = -outer_distance*outer_distance*div_sigmasq
+
+
     inner_g = safeexp(-inner_distance*inner_distance*div_sigmasq)
     outer_g = safeexp(-outer_distance*outer_distance*div_sigmasq)
+
     dring = maximum(inner_g,maximum(outer_g,ring))
     return dring
 
