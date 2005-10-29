@@ -9,7 +9,11 @@ from Numeric import sqrt,ones,dot,sum
 import __main__
 import math
 
+
+# CEBHACKALERT?
+# couldn't this use float('inf') or array([float('inf')])?
 inf = (ones(1)/0.0)[0]
+
 
 ### JABALERT! Need to separate the utilities that depend on Numeric
 ### from the others, so that no caller will accidentally require
