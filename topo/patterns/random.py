@@ -16,11 +16,11 @@ import RandomArray
 class UniformRandomGenerator(PatternGenerator):
     """2D uniform random noise pattern generator."""
 
-    # The standard x, y, and theta variables are currently ignored,
+    # The standard x, y, and orientation variables are currently ignored,
     # so they aren't shown in auto-generated lists of parameters (e.g. in the GUI)
     x       = Number(hidden = True)
     y       = Number(hidden = True)
-    theta   = Number(hidden = True)
+    orientation   = Number(hidden = True)
     
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)

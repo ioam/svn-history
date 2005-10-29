@@ -52,7 +52,7 @@ def measure_or_pref(sim=None, num_freq=1, num_phase=4, num_orientation=4):
             step_phase=2*pi/num_phase
             step_orientation=pi/num_orientation
         
-            feature_values = {"theta": ( (0.0,pi), step_orientation, True),
+            feature_values = {"orientation": ( (0.0,pi), step_orientation, True),
                               "phase": ( (0.0,2*pi),step_phase,True),
                               "freq": ((0.0,2*pi),step_freq,False)}
         

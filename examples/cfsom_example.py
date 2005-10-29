@@ -23,7 +23,7 @@ GeneratorSheet.density = 30
 
 GaussianGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 GaussianGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-GaussianGenerator.theta = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
+GaussianGenerator.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
 GaussianGenerator.width = 0.3*1.5/7
 GaussianGenerator.height = 0.3
 GaussianGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))

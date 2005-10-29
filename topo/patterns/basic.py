@@ -86,7 +86,7 @@ class FuzzyLineGenerator(PatternGenerator):
 class FuzzyDiskGenerator(PatternGenerator):
     """2D fuzzy disk pattern generator."""
 
-    theta   = Number(hidden = True)
+    orientation   = Number(hidden = True)
     disk_radius  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     
@@ -100,7 +100,7 @@ class FuzzyDiskGenerator(PatternGenerator):
 class FuzzyRingGenerator(PatternGenerator):
     """2D fuzzy ring pattern generator."""
     
-    theta   = Number(hidden = True)
+    orientation   = Number(hidden = True)
     width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
     disk_radius  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))

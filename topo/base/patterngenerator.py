@@ -132,14 +132,8 @@ def produce_pattern_matrices(bounds, density, r, c):
 
 ### JABHACKALERT!
 ### 
-### Instead of theta, any user-visible parameter should have a
-### readable name like "orientation" or "angle" (which is shorter but
-### not precisely correct).
-### 
-### JBD: This should be implemented in concert with changes to
-### inputparamspanel.py to make a dynamic parameter list.  Now (9/05)
-### the Python variable name must be the name displayed to the
-### InputParamsPanel sliders.
+### CEB: still have some user-visible variables to rename.
+
 
 ### JABHACKALERT!
 ### 
@@ -175,7 +169,7 @@ class PatternGenerator(TopoObject):
 
     x       = Number(default=0.0,softbounds=(-1.0,1.0))
     y       = Number(default=0.0,softbounds=(-1.0,1.0))
-    theta = Number(default=0,softbounds=(0.0,2*pi))
+    orientation = Number(default=0,softbounds=(0.0,2*pi))
     scale = Number(default=1.0,softbounds=(0.0,2.0))
     offset = Number(default=0.0,softbounds=(-1.0,1.0))
 
@@ -185,15 +179,15 @@ class PatternGenerator(TopoObject):
                       params.get('density',self.density),
                       params.get('x', self.x),
                       params.get('y',self.y),
-                      params.get('theta',self.theta),
+                      params.get('orientation',self.orientation),
                       params.get('rows',0),
                       params.get('cols',0))
         return self.scale*self.function(**params)+self.offset
 
-    def setup_xy(self,bounds,density,x,y,theta,rows,cols):
+    def setup_xy(self,bounds,density,x,y,orientation,rows,cols):
         self.verbose("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
         xm,ym = produce_pattern_matrices(bounds,density,rows,cols)
-        self.pattern_x, self.pattern_y = transform_coordinates(xm-x,ym-y,theta)
+        self.pattern_x, self.pattern_y = transform_coordinates(xm-x,ym-y,orientation)
 
     def function(self,**params):
         """
@@ -212,11 +206,11 @@ class PatternGenerator(TopoObject):
 class ConstantGenerator(PatternGenerator):
     """Constant pattern generator, i.e. a solid, uniform field of the same value."""
 
-    # The standard x, y, and theta variables are currently ignored,
+    # The standard x, y, and orientation variables are currently ignored,
     # so they aren't shown in auto-generated lists of parameters (e.g. in the GUI)
     x       = Number(hidden = True)
     y       = Number(hidden = True)
-    theta   = Number(hidden = True)
+    orientation   = Number(hidden = True)
 
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)
