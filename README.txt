@@ -134,9 +134,9 @@ The tutorial was written for our more polished but less flexible
 simulator LISSOM, also available from http://topographica.org, but you
 can follow many of the instructions in that tutorial.  As of 10/2005,
 the main differences are that all plots are grayscale, the model does
-not have multiple eyes or LGN cells, and a map will need to be trained
-in the GUI, then saved using Save Snapshot, rather than built
-beforehand.
+not have multiple eyes, LGN cells, or circular receptive fields, and a
+map will need to be trained in the GUI, then saved using Save
+Snapshot, rather than built offline beforehand.
 
 
 
