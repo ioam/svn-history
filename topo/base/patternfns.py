@@ -91,7 +91,7 @@ def disk(x, y, disk_radius, gaussian_width):
     return maximum(disk, safeexp(-gaussian_x_coord*gaussian_x_coord*div_sigmasq)) 
 
 
-def fuzzy_ring(x, y, disk_radius, ring_radius, gaussian_width):
+def ring(x, y, disk_radius, ring_radius, gaussian_width):
     """
     Circular ring (annulus) with Gaussian fall-off after the solid ring-shaped region.
     """    
