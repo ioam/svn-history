@@ -124,13 +124,13 @@ To reach milestone 2, we will need to:
   - Gradually reducing sigmoid parameters (done)
   - Multiple input areas (two eyes). (done) 
 
-- Add preference map measurement and plotting
+- Add preference map measurement and plotting (done)
 
 - Add a test pattern window (done)
 
 - Add bitmap colorizations (using palette.py)
 
-- Add state (weight) saving.
+- Add state (weight) saving. (done)
 
 RELATED (BUT NOT STRICTLY REQUIRED) ISSUES TO ADDRESS BEFORE THIS MILESTONE:
 
@@ -176,15 +176,15 @@ Subsystem 2. Visualizing array-based data as bitmaps
 - Add user-defined arbitrary colormaps ("KRYW", "BbKrR", etc.).
 
 - Add examples of colorizing one plot with another (e.g. OR-colored
-  activity plots).
+  activity plots). (done)
 
 Subsystem 3. LISSOM
-- Add parameter change schedules.
+- Add parameter change schedules. (done)
 
 - Add sheet edge buffers.
 
 Subsystem 4. ValueGenerators
-- Add examples of random, increment, reference, etc. value generators.
+- Add examples of random, increment, reference, etc. value generators. (done)
 
 Subsystem 5. Parameter handling, dictionaries, documentation
 - Add online help support. (done)
@@ -197,13 +197,13 @@ Subsystem 5. Parameter handling, dictionaries, documentation
 Subsystem 6. Binary file saving 
 - Implement binary file saving, using CDF, HDF, or something like it.
 
-- Consider whether pickling will do anything useful for us.
+- Consider whether pickling will do anything useful for us. (done)
 
 Subsystem 7. Measuring orientation and similar preference maps
-- Implement general-purpose map measurement routine, based on LISSOM's.
+- Implement general-purpose map measurement routine, based on LISSOM's. (done)
 
 Subsystem 8. Random number stream generators
-- Add examples of normal and other random number distributions.
+- Add examples of normal and other random number distributions. (done)
 
 Subsystem 9. Multi-processor support
 - Consider adding thread support to the Simulator and EventProcessor
@@ -215,7 +215,7 @@ Subsystem 9. Multi-processor support
   this milestone. 
 
 Subsystem 10. Histogram class
-- Add histogram class.
+- Add histogram class. (done)
 
 - Add histogram plots.
 
