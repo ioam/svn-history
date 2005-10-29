@@ -56,7 +56,7 @@ def gabor(x, y, width, height, frequency, phase):
     return p * (0.5 + 0.5*cos(2*pi*frequency*x + phase))
 
 
-def fuzzy_line(x, center_width, gaussian_width):
+def line(x, center_width, gaussian_width):
     """
     Infinite-length line with a solid central region, then Gaussian fall-off at the edges.
     """
@@ -69,7 +69,7 @@ def fuzzy_line(x, center_width, gaussian_width):
         return where(gaussian_x_coord<=0.0,1.0,0.0)
     else:
         return where(gaussian_x_coord<=0.0, 1.0,
-                     safeexp(-(divide(gaussian_x_coord,gaussian_width))**2))
+                 safeexp(-(divide(gaussian_x_coord,gaussian_width))**2))
         
 # CEB: the second "where" doesn't work on its own because where calculates safeexp for gaussian_x_coord==0.0,
 # even though it doesn't actually use it (it should return 1.0 in such cases). This is a problem because

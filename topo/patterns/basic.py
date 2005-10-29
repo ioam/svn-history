@@ -8,7 +8,7 @@ from math import pi
 from Numeric import around,bitwise_and,sqrt,sin,Float
 
 from topo.base.parameter import Number
-from topo.base.patternfns import gaussian,gabor,fuzzy_line,fuzzy_disk,fuzzy_ring
+from topo.base.patternfns import gaussian,gabor,line,fuzzy_disk,fuzzy_ring
 from topo.base.patterngenerator import PatternGenerator
 
 # Imported here so that all PatternGenerators will be in the same package
@@ -65,26 +65,31 @@ class GaborGenerator(PatternGenerator):
                       params.get('phase',self.phase))  
 
 
-class FuzzyLineGenerator(PatternGenerator):
-    """2D fuzzy line pattern generator."""
+class LineGenerator(PatternGenerator):
+    """2D line pattern generator."""
 
     # CEBHACKALERT:
     # Set gaussian_width to zero for the cfsom_example and you can
-    # see a problem with fuzzy lines. The problem is either in
-    # the fuzzyline() function or in the generation of the matrices
+    # see a problem with lines. The problem is either in
+    # the line() function or in the generation of the matrices
     # used to draw it.
     
     width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
     gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     
     def function(self,**params):
-        return fuzzy_line( params.get('pattern_x',self.pattern_x), 
+        return line( params.get('pattern_x',self.pattern_x), 
                            params.get('width',self.width),
                            params.get('gaussian_width',self.gaussian_width))
 
 
 class FuzzyDiskGenerator(PatternGenerator):
     """2D fuzzy disk pattern generator."""
+
+    # CEBALERT:
+    # Rather than a disk, this should be an ellipse, so fuzzy_disk should be
+    # changed.
+    # Rename it to Ellipse.
 
     orientation   = Number(hidden = True)
     disk_radius  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))

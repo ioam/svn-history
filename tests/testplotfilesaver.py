@@ -7,7 +7,7 @@ from topo.base.patterngenerator import ImageGenerator
 from topo.sheets.generatorsheet import *
 import Numeric, random, os
 from math import pi
-from topo.patterns.basic import FuzzyLineGenerator
+from topo.patterns.basic import LineGenerator
 from topo.patterns.random import UniformRandomGenerator
 import topo.base.topoobject
 from topo.sheets.cfsom import CFSOM
@@ -21,11 +21,11 @@ class TestPlotFileSaver(unittest.TestCase):
     def test_file_saving(self):
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 20
-        FuzzyLineGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        FuzzyLineGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        FuzzyLineGenerator.orientation = Dynamic(lambda :random.uniform(-pi,pi))
-        FuzzyLineGenerator.width = 0.02
-        FuzzyLineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+        LineGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+        LineGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+        LineGenerator.orientation = Dynamic(lambda :random.uniform(-pi,pi))
+        LineGenerator.width = 0.02
+        LineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
         CFSOM.density = 10
         CFSOM.learning_length = 10000
         CFSOM.radius_0 = 0.1
@@ -33,8 +33,8 @@ class TestPlotFileSaver(unittest.TestCase):
         topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
         self.s = topo.base.simulator.Simulator()
         
-        retina = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina')
-        retina2 = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina2')
+        retina = GeneratorSheet(input_generator=LineGenerator(),name='Retina')
+        retina2 = GeneratorSheet(input_generator=LineGenerator(),name='Retina2')
         V1 = CFSOM(name='V1')
         V2 = CFSOM(name='V2')
         retina.print_level = topo.base.topoobject.WARNING

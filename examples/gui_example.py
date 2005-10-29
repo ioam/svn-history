@@ -10,7 +10,7 @@ from topo.projections.kernelprojection import KernelProjection
 from topo.base.parameter import DynamicNumber
 from topo.sheets.cfsom import CFSOM
 from topo.patterns.random import UniformRandomGenerator
-from topo.patterns.basic import FuzzyLineGenerator
+from topo.patterns.basic import LineGenerator
 from topo.base.simulator import Simulator
 
 
@@ -21,12 +21,12 @@ from topo.base.simulator import Simulator
 GeneratorSheet.period = 1.0
 GeneratorSheet.density = 20
 
-FuzzyLineGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-FuzzyLineGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+LineGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+LineGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 
-FuzzyLineGenerator.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
-FuzzyLineGenerator.width = 0.02
-FuzzyLineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+LineGenerator.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
+LineGenerator.width = 0.02
+LineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
 # cortical sheet
 CFSOM.density = 10
@@ -43,8 +43,8 @@ KernelProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(p
 
 s = Simulator()
 
-Retina = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina')
-Retina2 = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina2')
+Retina = GeneratorSheet(input_generator=LineGenerator(),name='Retina')
+Retina2 = GeneratorSheet(input_generator=LineGenerator(),name='Retina2')
 V1 = CFSOM(name='V1')
 V2 = CFSOM(name='V2')
 

@@ -16,7 +16,7 @@ from math import pi
 from topo.base.parameter import Dynamic
 import random
 import pdb #debugger
-from topo.patterns.basic import GaussianGenerator,FuzzyLineGenerator
+from topo.patterns.basic import GaussianGenerator,LineGenerator
 
 class TestPlotPanel(unittest.TestCase):
 
@@ -104,11 +104,11 @@ class TestPlotPanel(unittest.TestCase):
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 30
         
-        FuzzyLineGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        FuzzyLineGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        FuzzyLineGenerator.orientation = Dynamic(lambda :random.uniform(-pi,pi))
-        FuzzyLineGenerator.width = 0.02
-        FuzzyLineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+        LineGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+        LineGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+        LineGenerator.orientation = Dynamic(lambda :random.uniform(-pi,pi))
+        LineGenerator.width = 0.02
+        LineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
         
         # rf som parameters
         CFSOM.density = 50
@@ -119,7 +119,7 @@ class TestPlotPanel(unittest.TestCase):
         # build simulation
         s = topo.base.simulator.Simulator()
         
-        retina = GeneratorSheet(input_generator=FuzzyLineGenerator(),name='Retina')
+        retina = GeneratorSheet(input_generator=LineGenerator(),name='Retina')
         retina.print_level = topo.base.topoobject.WARNING
         V1 = CFSOM(name='V1')
         V1.print_level = topo.base.topoobject.WARNING
