@@ -335,6 +335,10 @@ class Sheet(EventProcessor):
         ### Instead of this special coding for Activity, should make a
         ### function that populates the SheetView dictionaries with
         ### Activity plots, which will then be called before plotting.
+        ### This should all work the same as for preference maps: with
+        ### each plot template there will be associated code that will
+        ### be called just before plotting, which should install any
+        ### required SheetViews into the dictionary.
         if request == 'Activity':
             activity_copy = array(self.activity)
             new_view = sheetview.SheetView((activity_copy,self.bounds),
