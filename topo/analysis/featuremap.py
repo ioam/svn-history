@@ -44,8 +44,8 @@ def measure_or_pref(sim=None, num_freq=1, num_phase=4, num_orientation=4):
 
     if sim:
 
-        if num_freq==0 or num_phase==0 or num_orientation==0:
-            raise ValueError("num_freq,num_phase and num_orientation should be different than 0")
+        if num_freq <= 0 or num_phase <= 0 or num_orientation <= 0:
+            raise ValueError("num_freq, num_phase, and num_orientation must be greater than 0")
             
         else:
             step_freq=2*pi/num_freq
