@@ -8,7 +8,7 @@ from math import pi
 from Numeric import around,bitwise_and,sqrt,sin,Float
 
 from topo.base.parameter import Number
-from topo.base.patternfns import gaussian,gabor,line,fuzzy_disk,fuzzy_ring
+from topo.base.patternfns import gaussian,gabor,line,disk,fuzzy_ring
 from topo.base.patterngenerator import PatternGenerator
 
 # Imported here so that all PatternGenerators will be in the same package
@@ -83,11 +83,11 @@ class LineGenerator(PatternGenerator):
                            params.get('gaussian_width',self.gaussian_width))
 
 
-class FuzzyDiskGenerator(PatternGenerator):
+class DiskGenerator(PatternGenerator):
     """2D fuzzy disk pattern generator."""
 
     # CEBALERT:
-    # Rather than a disk, this should be an ellipse, so fuzzy_disk should be
+    # Rather than a disk, this should be an ellipse, so disk should be
     # changed.
     # Rename it to Ellipse.
 
@@ -96,7 +96,7 @@ class FuzzyDiskGenerator(PatternGenerator):
     gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     
     def function(self,**params):
-        return fuzzy_disk( params.get('pattern_x',self.pattern_x), 
+        return disk( params.get('pattern_x',self.pattern_x), 
                            params.get('pattern_y',self.pattern_y), 
                            params.get('disk_radius',self.disk_radius), 
                            params.get('gaussian_width',self.gaussian_width))  

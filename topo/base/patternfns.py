@@ -79,7 +79,7 @@ def line(x, center_width, gaussian_width):
 #   and pass_expression every time, though it will only return the result of pass_expression. )
 
 
-def fuzzy_disk(x, y, disk_radius, gaussian_width):
+def disk(x, y, disk_radius, gaussian_width):
     """
     Circular disk with Gaussian fall-off after the solid central region.
     """
