@@ -214,7 +214,7 @@ class TestMeasureFeatureMap(unittest.TestCase):
         """
         
         """
-        self.feature_param = {"theta": ( (0.0,1.0), 0.5, True),
+        self.feature_param = {"orientation": ( (0.0,1.0), 0.5, True),
                               "phase": ( (0.0,1.0), [0.2,0.4,0.6], False)}
         
         self.x = MeasureFeatureMap(self.s, self.feature_param)

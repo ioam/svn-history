@@ -35,7 +35,7 @@ class TestPlotPanel(unittest.TestCase):
         
         GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        GaussianGenerator.theta = Dynamic(lambda :random.uniform(-pi,pi))
+        GaussianGenerator.orientation = Dynamic(lambda :random.uniform(-pi,pi))
         GaussianGenerator.width = 0.02
         GaussianGenerator.height = 0.9
         GaussianGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
@@ -106,7 +106,7 @@ class TestPlotPanel(unittest.TestCase):
         
         FuzzyLineGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         FuzzyLineGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        FuzzyLineGenerator.theta = Dynamic(lambda :random.uniform(-pi,pi))
+        FuzzyLineGenerator.orientation = Dynamic(lambda :random.uniform(-pi,pi))
         FuzzyLineGenerator.width = 0.02
         FuzzyLineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
         

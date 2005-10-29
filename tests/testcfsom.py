@@ -66,7 +66,7 @@ class TestCFSom(unittest.TestCase):
         
         GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))        
-        GaussianGenerator.theta = Dynamic(lambda :random.uniform(-pi,pi))
+        GaussianGenerator.orientation = Dynamic(lambda :random.uniform(-pi,pi))
         
         GaussianGenerator.width = 0.02
         GaussianGenerator.height = 0.9

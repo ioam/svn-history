@@ -22,7 +22,7 @@ class TestPatternPresent(unittest.TestCase):
         GeneratorSheet.density = 20
         FuzzyLineGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         FuzzyLineGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        FuzzyLineGenerator.theta = Dynamic(lambda :random.uniform(-pi,pi))
+        FuzzyLineGenerator.orientation = Dynamic(lambda :random.uniform(-pi,pi))
         FuzzyLineGenerator.width = 0.02
         FuzzyLineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
         CFSOM.density = 10
