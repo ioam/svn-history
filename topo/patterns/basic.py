@@ -32,7 +32,7 @@ class SineGratingGenerator(PatternGenerator):
     """2D sine grating pattern generator."""
     
     frequency = Number(default=5.0,bounds=(0.0,None),softbounds=(0.0,10.0))
-    phase     = Number(default=pi/2,bounds=(0.0,None),softbounds=(0.0,2*pi))
+    phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi))
 
     ### JABHACKALERT!  Need to fold these two functions together.
     def sine_grating(self,x, y, frequency, phase):
@@ -52,7 +52,7 @@ class GaborGenerator(PatternGenerator):
     """2D Gabor pattern generator."""
     
     frequency = Number(default=5.0,bounds=(0.0,None),softbounds=(0.0,10.0))
-    phase     = Number(default=pi/2,bounds=(0.0,None),softbounds=(0.0,2*pi))
+    phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi))
     width   = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
 
@@ -69,18 +69,19 @@ class LineGenerator(PatternGenerator):
     """2D line pattern generator."""
 
     # CEBHACKALERT:
-    # Set gaussian_width to zero for the cfsom_example and you can
+    # Set fringe to zero for the cfsom_example and you can
     # see a problem with lines. The problem is either in
-    # the line() function or in the generation of the matrices
-    # used to draw it.
+    # the line() function, the generation of the matrices
+    # used to draw it, or just in the display; I have to look to
+    # see which.
     
-    width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
-    gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
+    width   = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5))
+    fringe = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5))
     
     def function(self,**params):
         return line( params.get('pattern_x',self.pattern_x), 
                            params.get('width',self.width),
-                           params.get('gaussian_width',self.gaussian_width))
+                           params.get('fringe',self.fringe))
 
 
 class DiskGenerator(PatternGenerator):
@@ -92,14 +93,14 @@ class DiskGenerator(PatternGenerator):
     # Rename it to Ellipse.
 
     orientation   = Number(hidden = True)
-    disk_radius  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
-    gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
+    radius  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
+    fringe = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5))
     
     def function(self,**params):
         return disk( params.get('pattern_x',self.pattern_x), 
                            params.get('pattern_y',self.pattern_y), 
-                           params.get('disk_radius',self.disk_radius), 
-                           params.get('gaussian_width',self.gaussian_width))  
+                           params.get('radius',self.radius), 
+                           params.get('fringe',self.fringe))  
 
 
 class RingGenerator(PatternGenerator):
@@ -109,23 +110,23 @@ class RingGenerator(PatternGenerator):
     # defaults make it look like a disk
     
     orientation   = Number(hidden = True)
-    width   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
-    disk_radius  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
-    gaussian_width = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
+    width   = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5))
+    radius  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
+    fringe = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5))
 
     def function(self,**params):
         return ring(params.get('pattern_x',self.pattern_x), 
                           params.get('pattern_y',self.pattern_y),
-                          params.get('disk_radius',self.disk_radius),
+                          params.get('radius',self.radius),
                           params.get('width',self.width),
-                          params.get('gaussian_width',self.gaussian_width))  
+                          params.get('fringe',self.fringe))  
 
 
 class RectangleGenerator(PatternGenerator):
     """2D rectangle pattern generator."""
     
     width   = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
-    height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
+    height  = Number(default=0.4,bounds=(0.0,None),softbounds=(0.0,1.0))
 
     # We will probably want to add Fuzzy-style anti-aliasing to this,
     # and there might be an easier way to do it than by cropping a
@@ -142,7 +143,7 @@ class SquareGratingGenerator(PatternGenerator):
     """2D squarewave grating pattern generator."""
     
     frequency = Number(default=5.0,bounds=(0.0,None),softbounds=(0.0,10.0))
-    phase     = Number(default=pi/2,bounds=(0.0,None),softbounds=(0.0,2*pi))
+    phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi))
 
     # We will probably want to add anti-aliasing to this,
     # and there might be an easier way to do it than by
