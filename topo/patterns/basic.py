@@ -69,19 +69,19 @@ class LineGenerator(PatternGenerator):
     """2D line pattern generator."""
 
     # CEBHACKALERT:
-    # Set fringe to zero for the cfsom_example and you can
+    # Set smoothing to zero for the cfsom_example and you can
     # see a problem with lines. The problem is either in
     # the line() function, the generation of the matrices
     # used to draw it, or just in the display; I have to look to
     # see which.
     
     width   = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5))
-    fringe = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5))
+    smoothing = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5))
     
     def function(self,**params):
         return line( params.get('pattern_x',self.pattern_x), 
                            params.get('width',self.width),
-                           params.get('fringe',self.fringe))
+                           params.get('smoothing',self.smoothing))
 
 
 class DiskGenerator(PatternGenerator):
@@ -94,13 +94,13 @@ class DiskGenerator(PatternGenerator):
 
     orientation   = Number(hidden = True)
     radius  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
-    fringe = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5))
+    smoothing = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5))
     
     def function(self,**params):
         return disk( params.get('pattern_x',self.pattern_x), 
                            params.get('pattern_y',self.pattern_y), 
                            params.get('radius',self.radius), 
-                           params.get('fringe',self.fringe))  
+                           params.get('smoothing',self.smoothing))  
 
 
 class RingGenerator(PatternGenerator):
@@ -112,14 +112,14 @@ class RingGenerator(PatternGenerator):
     orientation   = Number(hidden = True)
     width   = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5))
     radius  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
-    fringe = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5))
+    smoothing = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5))
 
     def function(self,**params):
         return ring(params.get('pattern_x',self.pattern_x), 
                           params.get('pattern_y',self.pattern_y),
                           params.get('radius',self.radius),
                           params.get('width',self.width),
-                          params.get('fringe',self.fringe))  
+                          params.get('smoothing',self.smoothing))  
 
 
 class RectangleGenerator(PatternGenerator):
