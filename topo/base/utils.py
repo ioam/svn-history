@@ -307,3 +307,26 @@ def descendents(class_):
             if b not in q and b not in out:
                 q.append(b)
     return out[::-1]
+
+
+import Numeric
+def exp(x):
+    """
+    Avoid overflow of Numeric.exp() for large-magnitude arguments (|x|>MAX_MAG).
+
+    Return  inf if x > MAX_MAG
+            0.0 if x < -MAX_MAG
+            x   otherwise
+
+    Numeric.exp() gives an OverflowError ('math range error') for 
+    arguments of magnitude greater than about 700 (on linux).
+
+    See e.g.
+    [Python-Dev] RE: Possible bug (was Re: numpy, overflow, inf, ieee, and rich comparison)
+    http://mail.python.org/pipermail/python-dev/2000-October/thread.html#9851
+    """
+    # CEBHACKALERT:
+    # This value works on the linuxes we all use, but what about on other platforms?
+    MAX_MAG = 700.0
+
+    return Numeric.exp(Numeric.where(abs(x)>MAX_MAG,Numeric.sign(x)*float('inf'),x))
