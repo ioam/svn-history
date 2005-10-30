@@ -127,11 +127,11 @@ pil-uninstall:
 ##############################################################
 # Numeric
 #
-NUMERIC = Numeric-23.0
+NUMERIC = Numeric-24.0
 NUMERIC_UNINSTALL =  ${PYTHON_LIB}/site-packages/Numeric
 
-numeric: ${NUMERIC}.tgz python
-	tar xzf ${NUMERIC}.tgz
+numeric: ${NUMERIC}.tar.gz python
+	tar xzf ${NUMERIC}.tar.gz
 	cd ${NUMERIC}; ${PREFIX}/bin/python setup.py install
 	touch numeric
 
