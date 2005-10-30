@@ -31,7 +31,7 @@ class Hebbian(CFLearningFunction):
     def __init__(self,**params):
         super(Hebbian,self).__init__(**params)
 
-    def __call__(self,input_activity, self_activity, rows, cols, len, cfs, alpha):
+    def __call__(self,input_activity, self_activity, rows, cols, len, cfs, alpha, **params):
         hebbian_code = """
             float *wi, *wj;
             double *x, *inpi, *inpj;
@@ -80,7 +80,7 @@ class Hebbian(CFLearningFunction):
             }
         """
         
-        weave.inline(hebbian_code, ['input_activity', 'self_activity', 'rows', 'cols', 'len', 'cfs', 'alpha'], extra_link_args=['-lstdc++'])
+        weave.inline(hebbian_code, ['input_activity', 'self_activity', 'rows', 'cols', 'len', 'cfs', 'alpha'], extra_compile_args=['-O2 -fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
 
         # Apply output_fn to each CF
         # (skipped entirely for no-op case, as an optimization)
@@ -88,7 +88,6 @@ class Hebbian(CFLearningFunction):
             for r in range(rows):
                 for c in range(cols):
                     cfs[r][c].weights = output_fn(cfs[r][c].weights)
-
 
 
 ### JABALERT!  Untested.
@@ -108,7 +107,7 @@ class DivisiveHebbian(CFLearningFunction):
     def __init__(self,**params):
         super(DivisiveHebbian,self).__init__(**params)
 
-    def __call__(self,input_activity, self_activity, rows, cols, len, cfs, alpha):
+    def __call__(self,input_activity, self_activity, rows, cols, len, cfs, alpha, **params):
         hebbian_div_norm_code = """
             float *wi, *wj;
             double *x, *inpi, *inpj;
@@ -120,7 +119,7 @@ class DivisiveHebbian(CFLearningFunction):
             PyObject *weights = PyString_FromString("weights");
             double load, delta;
             double totald;
-    
+
             x = self_activity;
             for (r=0; r<rows; ++r) {
                 cfsr = PyList_GetItem(cfs,r);
@@ -128,7 +127,7 @@ class DivisiveHebbian(CFLearningFunction):
                     load = *x++;
                     if (load != 0) {
                         load *= alpha;
-    
+
                         cf = PyList_GetItem(cfsr,l);
                         wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
                         wj = wi;
@@ -137,9 +136,9 @@ class DivisiveHebbian(CFLearningFunction):
                         rr2 = *slice++;
                         cc1 = *slice++;
                         cc2 = *slice;
-    
+
                         totald = 0.0;
-    
+
                         inpj = input_activity+len*rr1+cc1;
                         for (i=rr1; i<rr2; ++i) {
                             inpi = inpj;
@@ -152,12 +151,12 @@ class DivisiveHebbian(CFLearningFunction):
                             }
                             inpj += len;
                         }
-    
+
                         // normalize the weights
-                        totald += 1.0; 
+                        totald += 1.0;
                         totald = 1.0/totald;
                         rc = (rr2-rr1)*(cc2-cc1);
-    
+
                         for (i=0; i<rc; ++i) {
                             *wj *= totald;
                             ++wj;
@@ -166,7 +165,97 @@ class DivisiveHebbian(CFLearningFunction):
                 }
             }
         """
+
+        weave.inline(hebbian_div_norm_code, ['input_activity', 'self_activity','rows', 'cols', 'len', 'cfs', 'alpha'], extra_compile_args=['-O2 -fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
+
+
+
+
+### JABALERT!  Untested.
+class DivisiveHebbianP(CFLearningFunction):
+    """
+    CF-aware Hebbian learning rule with built-in divisive normalization.
+
+    Same as DivisiveHebbian except it takes 2 extra arguments, weights_ptrs
+    and slice_ptrs, in __call__. These 2 argument store the pointers to the
+    weight and slice_array, respectively, of each ConnectionField in
+    KernelPointerProjection. This class should only be used by a sheet that
+    only has KernelPointerProjections connected to it. 
+    """
+    output_fn = Constant(DivisiveL1Normalize())
+
+    def __init__(self,**params):
+        super(DivisiveHebbianP,self).__init__(**params)
+
+    def __call__(self,input_activity, self_activity, rows, cols, len, cfs, alpha, **params):
+
+        weight_ptrs = params['weight_ptrs']
+        slice_ptrs = params['slice_ptrs']
+
+        hebbian_div_norm_code = """
+            float *wi, *wj;
+            double *x, *inpi, *inpj;
+            int *slice;
+            int rr1, rr2, cc1, cc2;
+            int i, j, r, l;
+            double load, delta;
+            double totald;
+            float **wip = (float **)weight_ptrs;
+            int **sip = (int **)slice_ptrs;
+    
+            x = self_activity;
+            for (r=0; r<rows; ++r) {
+                for (l=0; l<cols; ++l) {
+                    load = *x++;
+                    if (load != 0) {
+                        load *= alpha;
+    
+                        wi = *wip;
+                        wj = wi;
+
+                        slice = *sip;
+                        rr1 = *slice++;
+                        rr2 = *slice++;
+                        cc1 = *slice++;
+                        cc2 = *slice;
+    
+                        totald = 0.0;
+    
+                        inpj = input_activity+len*rr1+cc1;
+
+                        const int rr1c = rr1;
+                        const int rr2c = rr2;
+                        const int cc1c = cc1;
+                        const int cc2c = cc2;
+
+                        for (i=rr1c; i<rr2c; ++i) {
+                            inpi = inpj;
+                            for (j=cc1c; j<cc2c; ++j) {
+                                delta = load * *inpi;
+                                *wi += delta;
+                                totald += delta;
+                                ++wi;
+                                ++inpi;
+                            }
+                            inpj += len;
+                        }
+    
+                        // normalize the weights
+                        totald += 1.0; 
+                        totald = 1.0/totald;
+                        const int rc = (rr2-rr1)*(cc2-cc1);
+    
+                        for (i=0; i<rc; ++i) {
+                            *wj *= totald;
+                            ++wj;
+                        }
+                    }
+                    ++wip;
+                    ++sip;
+                }
+            }
+        """
         
-        weave.inline(hebbian_div_norm_code, ['input_activity', 'self_activity', 'rows', 'cols', 'len', 'cfs', 'alpha'], extra_link_args=['-lstdc++'])
+        weave.inline(hebbian_div_norm_code, ['input_activity', 'self_activity', 'rows', 'cols', 'len', 'alpha','weight_ptrs','slice_ptrs'], extra_compile_args=['-fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
 
 

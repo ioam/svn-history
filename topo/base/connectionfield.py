@@ -212,7 +212,7 @@ class CFLearningFunction(TopoObject):
     Objects in this class must support being called as a function with
     the arguments specified below.
     """
-    def __call__(self,input_activity, self_activity, rows, cols, len, cfs, alpha):
+    def __call__(self,input_activity, self_activity, rows, cols, len, cfs, alpha, **params):
         raise NotImplementedError
 
 

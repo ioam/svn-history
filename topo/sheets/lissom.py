@@ -14,13 +14,13 @@ import topo
 from topo.base.connectionfield import CFSheet
 from topo.base.parameter import Parameter
 from topo.outputfns.basic import PiecewiseLinear
-from topo.learningfns.basic import DivisiveHebbian,GenericCFLF
+from topo.learningfns.basic import DivisiveHebbianP,GenericCFLF
 
 class LISSOM(CFSheet):
 
     # Should be changed to a OutputFunctionParameter
     output_fn = Parameter(default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
-    learning_fn = Parameter(default=DivisiveHebbian())
+    learning_fn = Parameter(default=DivisiveHebbianP())
 
     # modify weights after each activation?
     continuous_learning = Parameter(default=False)
@@ -28,7 +28,6 @@ class LISSOM(CFSheet):
     presleep_count = 0
 
     tsettle=8
-
 
     def input_event(self,src,src_port,dest_port,data):
         # On a new afferent input, clear the activity
@@ -56,7 +55,7 @@ class LISSOM(CFSheet):
 
         if self.new_input:
             self.new_input = False
-            self.activity *= 0.0
+            self.activity *= 0
             for name in self.in_projections:
                 for proj in self.in_projections[name]:
                     self.activity += proj.activity
@@ -90,7 +89,7 @@ class LISSOM(CFSheet):
 
                 cfs = proj.cfs
                 len, len2 = inp.shape
-                self.learning_fn(inp, self.activity, rows, cols, len, cfs, alpha)
+                self.learning_fn(inp, self.activity, rows, cols, len, cfs, alpha, weight_ptrs=proj.weight_ptrs, slice_ptrs=proj.slice_ptrs)
 
 
     def lateral_projections(self):

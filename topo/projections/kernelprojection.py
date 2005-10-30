@@ -114,6 +114,7 @@ class KernelPointerProjection(KernelProjection):
         """Activate using the specified response_fn and output_fn."""
         self.input_buffer = input_activity
         # need to pass the pointer arrays into the response function
+        #self.response_fn(input_activity, rows, cols, self.activity, self.cfs, self.strength)
         self.response_fn(input_activity, rows, cols, self.activity, self.cfs, self.strength, weight_ptrs=self.weight_ptrs, slice_ptrs=self.slice_ptrs)
         self.activity = self.output_fn(self.activity)
 
@@ -146,13 +147,12 @@ def setup_wp(cfs, wp, rows, cols):
             for (l=0; l<cols; ++l) {
                 cf = PyList_GetItem(cfsr,l);
                 wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
-                //*wj = (unsigned int)wi;
                 *wj = wi;
                 wj++;
             }
         }
     """
-    weave.inline(hebbian_code, ['cfs', 'wp', 'rows', 'cols'], extra_link_args=['-lstdc++'])
+    weave.inline(hebbian_code, ['cfs', 'wp', 'rows', 'cols'],  extra_compile_args=['-fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
 
 
 def setup_sp(cfs, sp, rows, cols):
@@ -173,11 +173,10 @@ def setup_sp(cfs, sp, rows, cols):
             for (l=0; l<cols; ++l) {
                 cf = PyList_GetItem(cfsr,l);
                 wi = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
-                //*wj = (unsigned int)wi;
                 *wj = wi;
                 wj++;
             }
         }
     """
-    weave.inline(hebbian_code, ['cfs', 'sp', 'rows', 'cols'], extra_link_args=['-lstdc++'])
+    weave.inline(hebbian_code, ['cfs', 'sp', 'rows', 'cols'],  extra_compile_args=['-fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
 

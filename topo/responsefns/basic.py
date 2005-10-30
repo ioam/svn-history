@@ -51,7 +51,7 @@ class CFDotProduct(CFResponseFunction):
     
         code = """
             double tot;
-            float *wi; 
+            float *wi, *wj; 
             double *xi, *xj, *xjtmp;
             double *tact = temp_act;
             int *slice;
@@ -61,11 +61,18 @@ class CFDotProduct(CFResponseFunction):
             PyObject *cf, *cfsr;
             PyObject *sarray = PyString_FromString("slice_array");
             PyObject *weights = PyString_FromString("weights");
+            int slice_cols;
+            int or2;
+            int *prev_act = (int *)malloc(cols*sizeof(int));
+
+            bzero(prev_act, cols*sizeof(int));
+            rr2 = 0;
     
             for (r=0; r<rows; ++r) {
                 cfsr = PyList_GetItem(cfs,r);
 		nonzero_act = 1;
 		cact = -1;
+                or2 = rr2;
                 for (l=0; l<cols; ++l) {
                     cf = PyList_GetItem(cfsr,l);
                     slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
@@ -73,7 +80,12 @@ class CFDotProduct(CFResponseFunction):
                     rr2 = *slice++;
                     cc1 = *slice++;
                     cc2 = *slice;
+
+                    slice_cols = cc2-cc1;
     
+                    if (prev_act[l] == 0)
+                        rr1 = or2;
+
                     // check if previous cf contains any activity
                     if (nonzero_act==0) {
                         // if previous cf is not active, only need to start
@@ -113,19 +125,24 @@ class CFDotProduct(CFResponseFunction):
                     }
                     // The input in the connection field is 0, so just set the 
                     // activity to 0 and continue.
+                    prev_act[l] = 0;
                     *tact = 0.0;
                     ++tact;
                     continue;
 
              need_compute:
+                    prev_act[l] = 1; 
                     tot = 0.0;
-                    wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
-                    wi += (it-rr1)*(cc2-cc1);
+                    wj = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
     
                     // computes the dot product
                     xj += (it-rr1)*len;
+                    wj += (it-rr1)*slice_cols - (cc2 - cc1);
+
                     for (i=it; i<rr2; ++i) {
                         xi = xj;
+                        wj += slice_cols;
+                        wi = wj;
                         for (j=cc1; j<cc2; ++j) {
                             tot += *wi * *xi;
                             ++wi;
@@ -138,6 +155,7 @@ class CFDotProduct(CFResponseFunction):
                     ++tact;
                 }
             }
+            free(prev_act);
         """
     
         weave.inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], extra_link_args=['-lstdc++'])
@@ -162,23 +180,30 @@ class CFDotProductP(CFResponseFunction):
         X = input_activity.flat
         weight_ptrs = params['weight_ptrs']
         slice_ptrs = params['slice_ptrs']
+        
     
         code = """
             double tot;
-            float *wi;
+            float *wi, *wj;
             double *xi, *xj, *xjtmp;
             double *tact = temp_act;
             int *slice;
             int rr1, rr2, cc1, cc2;
             int oc2, cact, nonzero_act;
             int i, j, r, l, it;
-            PyObject *cf, *cfsr;
             float **wip = (float **)weight_ptrs;
             int **sip = (int **)slice_ptrs;
+            int slice_cols;
+            int or2;
+            int *prev_act = (int *)malloc(cols*sizeof(int));
+
+            bzero(prev_act, cols*sizeof(int));
+            rr2 = 0;
 
             for (r=0; r<rows; ++r) {
                 nonzero_act = 1;
                 cact = -1;
+                or2 = rr2;
                 for (l=0; l<cols; ++l) {
                     slice = *sip;
                     sip++;
@@ -188,17 +213,26 @@ class CFDotProductP(CFResponseFunction):
                     cc1 = *slice++;
                     cc2 = *slice;
 
+                    slice_cols = cc2-cc1;
+
+                    // if the cf at column l in the previous row contains no
+                    // activation, we can skip those that are already covered
+                    // by that cf
+                    if (prev_act[l] == 0)
+                        rr1 = or2;
+
                     // check if previous cf contains any activity
+
                     if (nonzero_act==0) {
-                    // if previous cf is not active, only need to start
-                    // to check from the new column
+                        // if previous cf is not active, only need to start
+                        // to check from the new column
                         cc1 = oc2-1;
                         oc2 = cc2;
                     } else {
-                        oc2 = cc2;
                         // if there is activity at column cact, check if it is
                         // in the current cf, if so, jump to compute activity.
                         // NOTE: work for retangular cf only.
+                        oc2 = cc2;
                         if (cc1<=cact && cact<cc2) {
                             it = rr1;
                             xj = X+len*rr1+cc1;
@@ -208,6 +242,7 @@ class CFDotProductP(CFResponseFunction):
 
                     xj = X+len*rr1+cc1;
                     xjtmp = xj;
+
 
                     // parse through the cf to see if there is any activity
                     // If there isn't any, just don't bother to fetch the
@@ -227,35 +262,57 @@ class CFDotProductP(CFResponseFunction):
                     }
                     // The input in the connection field is 0, so just set the
                     // activity to 0 and continue.
+                    prev_act[l] = 0;
                     *tact = 0.0;
                     ++tact;
                     ++wip;
                     continue;
 
         need_compute:
+                    prev_act[l] = 1;
                     tot = 0.0;
-                    //wi = (float *)*wip;
-                    wi = *wip;
+                    wj = *wip;
                     wip++;
-                    wi += (it-rr1)*(cc2-cc1);
+                    wj += (it-rr1)*slice_cols - (cc2 - cc1);
 
                     // computes the dot product
-                    xj += (it-rr1)*len;
+                    xj += (it-rr1-1)*len;
+                    int count = cc2-cc1;
+                    const int m = (count+7)/8;
+
                     for (i=it; i<rr2; ++i) {
-                        xi = xj;
-                        for (j=cc1; j<cc2; ++j) {
-                            tot += *wi * *xi;
-                            ++wi;
-                            ++xi;
-                        }
                         xj += len;
+                        xi = xj;
+                        wj += slice_cols;
+                        wi = wj;
+                        int n = m;
+
+                        // manual loop unrolling using Duff's device
+                        // does the same thing as
+                        // for (j=cc1; j<cc2; ++j) {
+                        //     tot += *wi * *xi; ++wi; ++xi; }
+                        switch(count%8){
+                            case 0: do{ tot += *xi * *wi; ++wi; ++xi;
+                            case 7: tot += *xi * *wi; ++wi; ++xi;
+                            case 6: tot += *xi * *wi; ++wi; ++xi;
+                            case 5: tot += *xi * *wi; ++wi; ++xi;
+                            case 4: tot += *xi * *wi; ++wi; ++xi;
+                            case 3: tot += *xi * *wi; ++wi; ++xi;
+                            case 2: tot += *xi * *wi; ++wi; ++xi;
+                            case 1: tot += *xi * *wi; ++wi; ++xi;
+                                    }while(--n>0);
+
+                        }
+
                     }
 
                     *tact = tot*strength;
                     ++tact;
                 }
             }
+            free(prev_act);
+
         """
 
-        weave.inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows','weight_ptrs','slice_ptrs'], extra_link_args=['-lstdc++'])
+        weave.inline(code, ['X', 'strength', 'len', 'temp_act','cols','rows','weight_ptrs','slice_ptrs'], extra_compile_args=['-fomit-frame-pointer'], extra_link_args=['-lstdc++'])
 
