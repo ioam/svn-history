@@ -314,9 +314,9 @@ def exp(x):
     """
     Avoid overflow of Numeric.exp() for large-magnitude arguments (|x|>MAX_MAG).
 
-    Return  inf if x > MAX_MAG
-            0.0 if x < -MAX_MAG
-            x   otherwise
+    Return  Numeric.exp( inf)==inf  if x > MAX_MAG
+            Numeric.exp(-inf)==0.0  if x < -MAX_MAG
+                                 x  otherwise
 
     Numeric.exp() gives an OverflowError ('math range error') for 
     arguments of magnitude greater than about 700 (on linux).
