@@ -27,6 +27,8 @@ import MLab
 from itertools import chain
 from Numeric import transpose, array
 
+from topo.base.parameter import Parameter
+
 # Shape of the plotting display used by PlotGroup.  NOTE: INCOMPLETE,
 # THERE SHOULD BE MORE TYPES OF SHAPES SUCH AS SPECIFYING X ROWS, OR Y
 # COLUMNS, OR GIVING A LIST OF INTEGERS REPRESENTING NUMBER OF PLOTS
@@ -64,11 +66,16 @@ class PlotGroupTemplate(TopoObject):
     pgt.plot_templates['ActivityPref'] = newPlotTemplate
     """
 
+
+    command = Parameter(None)
     def __init__(self, plot_templates=None, **params):
         """
         plot_templates are of the form:
             ( (name_1, PlotTemplate_1), ... , (name_i, PlotTemplate_i) )
         """
+
+
+        
         super(PlotGroupTemplate,self).__init__(**params)
         if not plot_templates:
             self.plot_templates = KeyedList()
@@ -302,19 +309,22 @@ pgt = PlotGroupTemplate([('Activity',
                                         'Hue'        : None,
                                         'Confidence' : None,
                                         'Normalize'  : False}))],
-                        name='Activity')
+                        name='Activity',
+                        command='pass')
 topo.base.registry.plotgroup_templates[pgt.name] = pgt
 pgt = PlotGroupTemplate([('Unit Weights',
                           PlotTemplate({'Location'   : (0.0,0.0),
                                         'Normalize'  : True,
                                         'Sheet_name' : 'V1'}))],
-                        name='Unit Weights')
+                        name='Unit Weights',
+                        command='pass')
 topo.base.registry.plotgroup_templates[pgt.name] = pgt
 pgt = PlotGroupTemplate([('Projection',
                           PlotTemplate({'Density'         : 25,
                                         'Projection_name' : 'None',
                                         'Normalize'       : True}))],
-                        name='Projection')
+                        name='Projection',
+                        command='pass')
 topo.base.registry.plotgroup_templates[pgt.name] = pgt
 pgt = PlotGroupTemplate([('OrientationPreference',
                           PlotTemplate({'Strength'   : None,
@@ -328,5 +338,6 @@ pgt = PlotGroupTemplate([('OrientationPreference',
                           PlotTemplate({'Strength'   : 'OrientationSelectivity',
                                         'Hue'        : None,
                                         'Confidence' : None}))],
-                        name='Orientation Preference')
+                        name='Orientation Preference',
+                        command = 'measure_or_pref()')
 topo.base.registry.plotgroup_templates[pgt.name] = pgt
