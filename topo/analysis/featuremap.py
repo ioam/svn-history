@@ -33,8 +33,11 @@ from string import capitalize
 ## temporary ##
 from topo.patterns.basic import GaussianGenerator, SineGratingGenerator
 from topo.commands.basic import pattern_present, restore_input_generators, save_input_generators
-###############
-from topo.base.registry import * 
+
+
+############### For debugging: visualizing the presented pattern when measuring the map
+from topo.base.registry import get_console
+import topo.tk.topoconsole 
 
 # Command for measuring the orientation map
 def measure_or_pref(sim=None, num_freq=1, num_phase=4, num_orientation=4):
@@ -69,7 +72,7 @@ def measure_or_pref(sim=None, num_freq=1, num_phase=4, num_orientation=4):
 # It is used in measure_or_pref
 
 ## Previous value scale=0.0606 has been changed to do test with lissom
-def _sinegrating_present(features_values,sim=None,scale=0.06,offset=0.0,freq=5.0):
+def _sinegrating_present(features_values,sim=None,scale=0.0606,offset=0.0,freq=5.0):
     """
     Intermediate user function used by MeasureFeatureMap
     """
@@ -248,8 +251,14 @@ class MeasureFeatureMap(TopoObject):
 
             # DRAW THE PATTERN: call to the user_function
             user_function(param_dict,self.simulator)
-            #get_console.auto_refresh_panels.remove(Preference Map)
-            #get_console().testfn()
+
+            #### Debugging ####
+            #temp=topo.base.registry.plotgroup_templates['Activity']
+            #x = topo.tk.topoconsole.PlotsMenuEntry(get_console(),temp)
+            #panel = x.command()
+            #panel.toggle_auto_refresh()
+            #### Debugging end ####
+
             
             # NOW UPDATE EACH FEATUREMAP WITH (ACTIVITY,FEATURE_VALUE)
             for sheet in self.__measured_sheets:
