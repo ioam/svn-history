@@ -73,9 +73,10 @@ class PlotsMenuEntry(topo.base.topoobject.TopoObject):
             pn.refresh_title()
             win.deiconify()
             self.console.messageBar.message('state', 'OK')
+            return pn
         else:
             self.console.messageBar.message('state', 'No active Simulator object.')
-
+            return None
         
     
 
@@ -446,7 +447,7 @@ class TopoConsole(Frame):
         
         if s:
             i = float(count)
-            s.run(i)
+            s.run(i) 
             message = 'Ran ' + count + ' to time ' + str(s.time())
             self.auto_refresh()
         else:
