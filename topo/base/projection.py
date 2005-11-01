@@ -7,7 +7,7 @@ $Id$
 import Numeric
 
 from sheet import Sheet
-from parameter import Parameter, Number
+from parameter import Parameter, Number, BooleanParameter
 from simulator import EPConnection
 from topoobject import TopoObject
 
@@ -106,7 +106,7 @@ class ProjectionSheet(Sheet):
 
     # Should be changed to a OutputFunctionParameter
     output_fn = Parameter(default=Identity())
-
+    apply_output_fn=BooleanParameter(default=True)
                              
     def __init__(self,**params):
         super(ProjectionSheet,self).__init__(**params)
@@ -148,7 +148,8 @@ class ProjectionSheet(Sheet):
         for name in self.in_projections:
             for proj in self.in_projections[name]:
                 self.activity+= proj.activity
-        self.activity = self.output_fn(self.activity)
+        if self.apply_output_fn:
+            self.activity = self.output_fn(self.activity)
         self.send_output(data=self.activity)
 
         if self.learning:

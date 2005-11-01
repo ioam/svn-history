@@ -12,7 +12,7 @@ from itertools import chain
 import topo
 
 from topo.base.connectionfield import CFSheet
-from topo.base.parameter import Parameter
+from topo.base.parameter import Parameter, BooleanParameter
 from topo.outputfns.basic import PiecewiseLinear
 from topo.learningfns.basic import DivisiveHebbianP,GenericCFLF
 
@@ -21,9 +21,10 @@ class LISSOM(CFSheet):
     # Should be changed to a OutputFunctionParameter
     output_fn = Parameter(default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
     learning_fn = Parameter(default=DivisiveHebbianP())
-
+    apply_output_fn=BooleanParameter(default=True)
+    
     # modify weights after each activation?
-    continuous_learning = Parameter(default=False)
+    continuous_learning = BooleanParameter(default=False)
 
     presleep_count = 0
 
@@ -59,7 +60,8 @@ class LISSOM(CFSheet):
             for name in self.in_projections:
                 for proj in self.in_projections[name]:
                     self.activity += proj.activity
-            self.activity = self.output_fn(self.activity)
+            if self.apply_output_fn:
+                self.activity = self.output_fn(self.activity)
 
             # don't send output when an iteration has ended
             if not iteration_done: 

@@ -4,6 +4,7 @@ High-level user-level commands controlling the entire simulator.
 
 from topo.base.topoobject import TopoObject
 from topo.base.sheet import Sheet
+from topo.base.projection import ProjectionSheet
 import topo.base.simulator
 import topo.base.registry
 from topo.sheets.generatorsheet import GeneratorSheet
@@ -43,7 +44,7 @@ def restore_input_generators(sim=None):
 
 ### JABHACKALERT!  Should leave the state of all learning flags
 ### unchanged upon return; currently it's overwriting all of them.
-def pattern_present(inputs=None,duration=1.0,sim=None,learning=False,overwrite_previous=False):
+def pattern_present(inputs=None,duration=1.0,sim=None,learning=False,overwrite_previous=False,apply_output_fn=True):
     """
     Present the specified test patterns for the specified duration.
 
@@ -72,13 +73,21 @@ def pattern_present(inputs=None,duration=1.0,sim=None,learning=False,overwrite_p
 
         if not overwrite_previous:
             save_input_generators(sim)
+
+        ### JABALERT!  Should clean up how these are set on each
+        ### sheet; it overwrites any old values.
             
         # turn off sheets' learning if learning=False
         if not learning:
             for each in sim.get_event_processors():
                 if isinstance(each,Sheet):
                     each.learning = False
-                    
+
+        if not apply_output_fn:
+            for each in sim.get_event_processors():
+                if isinstance(each,ProjectionSheet):
+                    each.apply_output_fn = False
+
         gen_eps_list = sim.objects(GeneratorSheet)
         
         # Register the inputs on each input sheet
@@ -97,6 +106,11 @@ def pattern_present(inputs=None,duration=1.0,sim=None,learning=False,overwrite_p
             for each in sim.get_event_processors():
                 if isinstance(each,Sheet):
                     each.learning = True
+
+        if not apply_output_fn:
+            for each in sim.get_event_processors():
+                if isinstance(each,ProjectionSheet):
+                    each.apply_output_fn = True
             
         if not overwrite_previous:
             restore_input_generators(sim)
