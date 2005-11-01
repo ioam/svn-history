@@ -62,5 +62,5 @@ cleandocs:
 docs: topo/*.py
 	mkdir -p docs
 	./topographica topo/base/gendocs.py
-	mv docs/topo.__init__.html docs/index.html
+	cp docs/topo.html docs/index.html
 
