@@ -23,12 +23,59 @@ From the Makefile (Tabs have been stripped):
 $Id$
 """
 import pydoc, glob, os
+from os.path import isdir
+from re import search, sub
+from copy import copy
 
 TOPO = 'topo'   # Subdirectory with Topographica source
 DOCS = 'docs'   # Subdirectory to place Docs
 pydoc.writing = 1
 
 
+def _file_list(base_name):
+    """
+    Recursively generate a list of files and directories to document.
+
+    base_name is the relative path to add to directories and files.
+    Files that match CVS or __init__.py are ignored.
+    """
+    filelist = [f for f in glob.glob(base_name + '/*')
+                if (isdir(f) or search('.py$',f))
+                and not search('CVS',f) and not search('__init__.py',f)]
+    for f in copy(filelist):
+        if isdir(f):
+            filelist = filelist + _file_list(f)
+    return filelist
+
+def filename_to_docname(f):
+    """
+    Convert a path name into the PyDoc filename it will turn into.
+
+    If the path name ends in a .py, then it is cut off.  If there is no
+    extension, the name is assumed to be a directory.
+    """
+    f = sub('/','.',f)
+    if search('.py$',f):
+        f = sub('.py$','.html',f)
+    else:
+        f = f + '.html'
+    return f
+
+
+def filename_to_packagename(f):
+    """
+    Convert a path name into the Python dotted-notation package name.
+
+    If the name ends in a .py, then cut it off.  If there is no
+    extension, the name is assumed to be a directory, and nothing is done
+    other than to replace the '/' with '.'
+    """
+    f = sub('/','.',f)
+    if search('.py$',f):
+        f = sub('.py$','',f)
+    return f
+
+    
 def generate_docs():
     """
     Generate all pydoc documentation files within a docs directory under
@@ -39,14 +86,15 @@ def generate_docs():
     don't want to regenerate all the documentation each time a source
     file is changed.
     """
-    os.system('rm -rf ' + DOCS + '/*')
     # Generate the files once.  Skip if already generated.
-    filelist = glob.glob(TOPO + '/*.py')
+    # os.system('rm -rf ' + DOCS + '/*')
+    filelist =  _file_list(TOPO) + [TOPO]
     for i in filelist:
-        if not glob.glob(DOCS + '/' + TOPO + '.' + i[len(TOPO)+1:-3] + '.html'):
-            pydoc.writedoc('topo.' + i[len(TOPO)+1:-3])
-        if glob.glob(TOPO + '.' + i[len(TOPO)+1:-3] + '.html'):
-            cline = 'mv -f ' + TOPO + '.' + i[len(TOPO)+1:-3] + '.html ' + DOCS + '/'
+        f = filename_to_docname(i)
+        if not glob.glob(DOCS + '/' + f):
+            pydoc.writedoc(filename_to_packagename(i))
+        if glob.glob(f):
+            cline = 'mv -f ' + f + ' ' + DOCS + '/'
             os.system(cline)
         else:                   
             filelist.remove(i)  
