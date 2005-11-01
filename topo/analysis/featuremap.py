@@ -16,9 +16,8 @@ from topo.base.distribution import Distribution
 from topo.base.topoobject import TopoObject
 
 
-import topo.base.topoobject   # do we need that ?
-import __main__               # and that ?
-import topo.base.registry
+#import topo.base.topoobject   # do we need that ?
+#import __main__               # and that ?
 
 
 from topo.base.sheet import Sheet
@@ -30,18 +29,22 @@ from math import pi
 # this is deprecated - find new function
 from string import capitalize
 
-## temporary ##
+## temporary ...? ##
 from topo.patterns.basic import GaussianGenerator, SineGratingGenerator
 from topo.commands.basic import pattern_present, restore_input_generators, save_input_generators
 
-
-############### For debugging: visualizing the presented pattern when measuring the map
+import topo.base.registry
 from topo.base.registry import get_console
 import topo.tk.topoconsole 
 
-# Command for measuring the orientation map
-def measure_or_pref(sim=None, num_freq=1, num_phase=4, num_orientation=4):
 
+# Measure_or_pref: Command for measuring the orientation map
+def measure_or_pref(sim=None,num_freq=1,num_phase=4,num_orientation=4,
+                    scale=0.3,offset=0.0,freq=5.0,display=False,
+                    user_function='_sinegrating_present', apply_output_fn=True):
+    """    
+    """
+    
     if not sim:
         sim = topo.base.registry.active_sim()
 
@@ -60,19 +63,19 @@ def measure_or_pref(sim=None, num_freq=1, num_phase=4, num_orientation=4):
                               "freq": ((0.0,2*pi),step_freq,False)}
         
             x=MeasureFeatureMap(sim,feature_values)
-            x.measure_maps(_sinegrating_present)
+
+            param_dict = {"scale":scale,"offset":offset,"freq":freq}
+            
+            exec 'x.measure_maps(' + user_function+ ', param_dict,display, apply_output_fn)'
 
     else:
         TopoObject().warning('No active Simulator.')
     
 
 
-
 # Intermediate user function that is passed as a parameter for measure_map in MeasureFeatureMap
 # It is used in measure_or_pref
-
-## Previous value scale=0.0606 has been changed to do test with lissom
-def _sinegrating_present(features_values,sim=None,scale=0.0606,offset=0.0,freq=5.0):
+def _sinegrating_present(features_values,param_dict,sim=None,apply_output_fn=True):
     """
     Intermediate user function used by MeasureFeatureMap
     """
@@ -82,16 +85,20 @@ def _sinegrating_present(features_values,sim=None,scale=0.0606,offset=0.0,freq=5
     if sim:
         
         zed = SineGratingGenerator()
-        zed.freq= freq
-        zed.scale= scale
-        zed.offset= offset        
+        for param, value in param_dict.iteritems():
+            update_generator = "zed." + param + "=" + repr(value)
+            exec update_generator
+
         inputs = dict().fromkeys(sim.objects(GeneratorSheet),zed)
               
         for feature,value in features_values.iteritems():
             update_generator = "zed." + feature + "=" + repr(value)
             exec update_generator
 
-        pattern_present(inputs, 1.0, sim, learning=False)
+        ## Needs to do something so that we have a parmeter defined in Lissom.ty that set
+        ## duration to be 0.06. (For cfsom, at least 0.51 is required and so I left 1.0
+        ## so that it works in both case
+        pattern_present(inputs, 1.0, sim, learning=False,apply_output_fn=apply_output_fn)
         
     else:
         TopoObject().warning('No active Simulator.')
@@ -163,6 +170,7 @@ class FeatureMap(TopoObject):
                 selectivity_matrix[i,j]=self.distribution_matrix[i,j].selectivity()
 
         return selectivity_matrix
+
          
 
 class MeasureFeatureMap(TopoObject):
@@ -219,7 +227,7 @@ class MeasureFeatureMap(TopoObject):
                                                                           cyclic=value[2])})
 
                 
-    def measure_maps(self,user_function):
+    def measure_maps(self,user_function,param_dict,display=False,apply_output_fn=True):
 
         """
         Create a list of all permutations of the feature values, then, for each permutation, set the
@@ -230,34 +238,38 @@ class MeasureFeatureMap(TopoObject):
         """
         save_input_generators(self.simulator)
         
-        self.__present_input_patterns(user_function)
+        self.__present_input_patterns(user_function,param_dict,display,apply_output_fn)
         self.__construct_sheet_views()
 
         restore_input_generators(self.simulator)
 
 
-    def __present_input_patterns(self,user_function):
+    def __present_input_patterns(self,user_function,param_dict,display=False,apply_output_fn=True):
         input_permutations = cross_product(self.__featurevalues)
 
         # Present the input pattern with various parameter settings,
         # keeping track of the responses
         for permutation in input_permutations:
             sheet=self.__measured_sheets[0] # Assumes that there is at least one sheet; needs fixing
-            param_dict={}
+            feature_points={}
 
             # set each feature's value
             for feature,value in zip(self.__featuremaps[sheet].keys(), permutation):
-                param_dict[feature] = value
+                feature_points[feature] = value
 
             # DRAW THE PATTERN: call to the user_function
-            user_function(param_dict,self.simulator)
+            user_function(feature_points,param_dict,self.simulator,apply_output_fn=apply_output_fn)
 
-            #### Debugging ####
-            #temp=topo.base.registry.plotgroup_templates['Activity']
-            #x = topo.tk.topoconsole.PlotsMenuEntry(get_console(),temp)
-            #panel = x.command()
-            #panel.toggle_auto_refresh()
+
+            #### Debugging     ####
+            if display:
+                temp=topo.base.registry.plotgroup_templates['Activity']
+                x = topo.tk.topoconsole.PlotsMenuEntry(get_console(),temp)
+                panel = x.command()
+                panel.toggle_auto_refresh()
+            
             #### Debugging end ####
+
 
             
             # NOW UPDATE EACH FEATUREMAP WITH (ACTIVITY,FEATURE_VALUE)
