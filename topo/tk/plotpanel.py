@@ -269,12 +269,12 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
         # of canvases.  If the old canvases still can work, then reuse
         # them to prevent flicker.
         if self.canvases and len(self.zoomed_images) > 0:
-            first_new_width = str(self.zoomed_images[0].width())
-            first_old_width = self.canvases[0].config()['width'][-1]
+            new_widths = [str(zi.width()) for zi in self.zoomed_images]
+            old_widths = [zi.config()['width'][-1] for zi in self.canvases]
         else:
-            first_new_width, first_old_width = 0, 0
+            new_widths, old_widths = 0, 0
         if len(self.zoomed_images) != len(self.canvases) or \
-               first_new_width != first_old_width:
+               new_widths != old_widths:
             old_canvases = self.canvases
             self.canvases = [Canvas(self.plot_frame,
                                     width=image.width(),
