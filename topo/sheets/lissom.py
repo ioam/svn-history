@@ -83,6 +83,11 @@ class LISSOM(CFSheet):
         for proj in chain(*self.in_projections.values()):
             if proj.input_buffer:
                 alpha = proj.learning_rate
+
+                
+                ### JABALERT! What is the reason for this special case?
+                ### Why would the activity buffer be any different from
+                ### the input_buffer?
 		# Learning in lateral connections uses the most current activity
                 if proj.src == self: #lateral connection
                     inp = self.activity
@@ -128,10 +133,11 @@ class LISSOM(CFSheet):
 
 class LISSOMPointer(LISSOM):
     """
-    LISSOMPointer implements the same algorithm as LISSOM, but it uses
+    LISSOMPointer implements the same algorithm as LISSOM, but it uses a
     special learning function (DivisiveHebbianP) for faster execution time.
-    This requires all the connections between the sheets instances of 
+    This requires all the connections between the sheets are instances of 
     KernelPointerProjection (specified via connect()).
+    
     """
 
     learning_fn = Parameter(default=DivisiveHebbianP())
@@ -145,6 +151,9 @@ class LISSOMPointer(LISSOM):
         for proj in chain(*self.in_projections.values()):
             if proj.input_buffer:
                 alpha = proj.learning_rate
+                ### JABALERT! What is the reason for this special case?
+                ### Why would the activity buffer be any different from
+                ### the input_buffer?
 		# Learning in lateral connections uses the most current activity
                 if proj.src == self: #lateral connection
                     inp = self.activity
