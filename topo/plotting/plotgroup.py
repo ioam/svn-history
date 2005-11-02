@@ -306,11 +306,15 @@ import topo.base.registry
 from plot import PlotTemplate
 pgt = PlotGroupTemplate([('Activity',
                           PlotTemplate({'Strength'   : 'Activity',
-                                        'Hue'        : None,
+                                        'Hue'        : 'OrientationPreference',
                                         'Confidence' : None,
                                         'Normalize'  : False}))],
                         name='Activity',
                         command='pass')
+
+# CEBHACKALERT: putting OrientationPreference in Hue is ok while we are only
+# talking about orientation maps.
+
 topo.base.registry.plotgroup_templates[pgt.name] = pgt
 pgt = PlotGroupTemplate([('Unit Weights',
                           PlotTemplate({'Location'   : (0.0,0.0),
