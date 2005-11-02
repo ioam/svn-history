@@ -16,7 +16,7 @@ from topo.patterns.random import UniformRandomGenerator
 from topo.base.boundingregion import Intersection,BoundingBox
 from topo.base.utils import *
 from topo.base.projection import Identity
-from topo.responsefns.basic import CFDotProductP
+from topo.responsefns.basic import CFDotProduct, CFDotProductP
 from Numeric import ones, Int
 
 import weave
@@ -34,6 +34,7 @@ class KernelProjection(CFProjection):
 
     # Should be changed to a OutputFunctionParameter
     output_fn  = Parameter(default=Identity())
+    response_fn = Constant(CFDotProduct())
 
     def __init__(self,**params):
         super(KernelProjection,self).__init__(**params)

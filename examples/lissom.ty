@@ -5,6 +5,14 @@ simulator as closely as possible.
 $Id$
 """
 
+###############################################################################
+#                                                                             #
+# To use a faster implementation (that uses memory pointers to access data    #
+# structures instead of Python/C API), change all "LISSOM" to "LISSOMPointer" #
+# and "KernelProjection" to "KernelPointerProjection" in this file.           #
+#                                                                             #
+###############################################################################
+
 import random
 import fixedpoint
 #import pdb # debugger
@@ -13,13 +21,13 @@ from math import pi
 from itertools import chain
 from fixedpoint import FixedPoint  # Should probably bring this into Simulator namespace
 
+
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.projections.kernelprojection import KernelPointerProjection
+from topo.projections.kernelprojection import KernelProjection
 from topo.patterns.basic import GaussianGenerator
 from topo.base.sheet import BoundingBox
 from topo.base.parameter import DynamicNumber
-from topo.responsefns.basic import CFDotProductP
 
 
 ###########################################
@@ -42,8 +50,8 @@ rf_radius_scale=6.0/rf_radius
 #retina_area_scale=(BaseRN*area_scale/24.0*rf_radius_scale)*(BaseRN*area_scale/24.0*rf_radius_scale)
 #inputs_pereye=max(retina_area_scale,1)
 #uncorrelation=0.0 
-xsigma=6.0*rf_radius_scale
-ysigma=1.5*rf_radius_scale
+xsigma=6.0/rf_radius_scale
+ysigma=1.5/rf_radius_scale
 
 #scale_input=1.0
 retina_edge_buffer=0*(rf_radius+(BaseRN*area_scale/2))
@@ -91,18 +99,18 @@ retina = GeneratorSheet(input_generator=GaussianGenerator(),name='Retina')
 V1 = LISSOM(name='V1')
 
 s.connect(retina,V1, delay = FixedPoint("0.05"),
-          connection_type=KernelPointerProjection,
+          connection_type=KernelProjection,
           connection_params = dict(strength = 1.0, name='Afferent0',
                                    weights_bounds = afferent_weight_bounds, normalize = True, learning_rate=alpha_input))
 
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
-          connection_type=KernelPointerProjection,
+          connection_type=KernelProjection,
           connection_params = dict(strength = gammaexc, name='LateralExcitatory',
                                    weights_bounds = excitatory_weight_bounds, normalize = True, learning_rate=alpha_exc))
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
-          connection_type=KernelPointerProjection,
+          connection_type=KernelProjection,
           connection_params = dict(strength = -gammainh, name='LateralInhibitory',
                                    weights_bounds = inhibitory_weight_bounds, normalize = True, learning_rate=alpha_inh))
         
@@ -143,20 +151,20 @@ s.schedule_action(8000,  set_deltabeta, 0.23, 0.85)
 s.schedule_action(20000, set_deltabeta, 0.24, 0.88)
 
 # can either pass a number or FixedPoint object to s.run()
-s.run(1)
+#s.run(1)
 #s.run(FixedPoint(1))
 
 
 # Set up performance profiling
 #import hotshot,hotshot.stats
 #prof = hotshot.Profile("abc")
-#prof.runctx('s.run(50)',globals(),locals())
+#prof.runctx('s.run(10000)',globals(),locals())
 #prof.close()
 #
 #p = hotshot.stats.load("abc")
-#p.strip_dirs().sort_stats('time').print_stats()
+#p.strip_dirs().sort_stats('cumulative','time').print_stats()
 #
 #import profile,pstats
-#profile.runctx('s.run(2000)',globals(),locals(),"abc")
+#profile.runctx('s.run(10000)',globals(),locals(),"abc")
 #p = pstats.Stats('abc')
 #p.strip_dirs().sort_stats('cumulative').print_stats()

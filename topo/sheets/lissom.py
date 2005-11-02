@@ -14,13 +14,13 @@ import topo
 from topo.base.connectionfield import CFSheet
 from topo.base.parameter import Parameter, BooleanParameter
 from topo.outputfns.basic import PiecewiseLinear
-from topo.learningfns.basic import DivisiveHebbianP,GenericCFLF
+from topo.learningfns.basic import DivisiveHebbian,GenericCFLF,DivisiveHebbianP
 
 class LISSOM(CFSheet):
 
     # Should be changed to a OutputFunctionParameter
     output_fn = Parameter(default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
-    learning_fn = Parameter(default=DivisiveHebbianP())
+    learning_fn = Parameter(default=DivisiveHebbian())
     apply_output_fn=BooleanParameter(default=True)
     
     # modify weights after each activation?
@@ -91,7 +91,7 @@ class LISSOM(CFSheet):
 
                 cfs = proj.cfs
                 len, len2 = inp.shape
-                self.learning_fn(inp, self.activity, rows, cols, len, cfs, alpha, weight_ptrs=proj.weight_ptrs, slice_ptrs=proj.slice_ptrs)
+                self.learning_fn(inp, self.activity, rows, cols, len, cfs, alpha)
 
 
     def lateral_projections(self):
@@ -123,3 +123,35 @@ class LISSOM(CFSheet):
         for proj in chain(*self.in_projections.values()):
             print proj.name, x, y
             print transpose(proj.cfs[x][y].weights)
+
+
+
+class LISSOMPointer(LISSOM):
+    """
+    LISSOMPointer implements the same algorithm as LISSOM, but it uses
+    special learning function (DivisiveHebbianP) for faster execution time.
+    This requires all the connections between the sheets instances of 
+    KernelPointerProjection (specified via connect()).
+    """
+
+    learning_fn = Parameter(default=DivisiveHebbianP())
+
+    def __init__(self,**params):
+        super(LISSOMPointer,self).__init__(**params)
+
+
+    def learn(self):
+        rows,cols = self.activity.shape
+        for proj in chain(*self.in_projections.values()):
+            if proj.input_buffer:
+                alpha = proj.learning_rate
+		# Learning in lateral connections uses the most current activity
+                if proj.src == self: #lateral connection
+                    inp = self.activity
+                else:
+                    inp = proj.input_buffer
+
+                cfs = proj.cfs
+                len, len2 = inp.shape
+                self.learning_fn(inp, self.activity, rows, cols, len, cfs, alpha, weight_ptrs=proj.weight_ptrs, slice_ptrs=proj.slice_ptrs)
+
