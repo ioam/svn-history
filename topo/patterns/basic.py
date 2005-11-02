@@ -75,31 +75,27 @@ class LineGenerator(PatternGenerator):
     # used to draw it, or just in the display; I have to look to
     # see which.
     
-    width   = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5))
+    thickness   = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5))
     smoothing = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5))
     
     def function(self,**params):
         return line( params.get('pattern_x',self.pattern_x), 
-                           params.get('width',self.width),
+                           params.get('thickness',self.thickness),
                            params.get('smoothing',self.smoothing))
 
 
 class DiskGenerator(PatternGenerator):
     """2D disk pattern generator."""
 
-    # CEBALERT:
-    # Rather than a disk, this should be an ellipse, so disk() should be
-    # changed.
-    # Rename it to Ellipse.
-
-    orientation   = Number(hidden = True)
-    radius  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
+    width  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
+    height  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
     smoothing = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5))
     
     def function(self,**params):
         return disk( params.get('pattern_x',self.pattern_x), 
                            params.get('pattern_y',self.pattern_y), 
-                           params.get('radius',self.radius), 
+                           params.get('width',self.width),
+                           params.get('height',self.height),
                            params.get('smoothing',self.smoothing))  
 
 
@@ -109,16 +105,17 @@ class RingGenerator(PatternGenerator):
     # CEBALERT:
     # defaults make it look like a disk
     
-    orientation   = Number(hidden = True)
-    width   = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5))
-    radius  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
+    thickness   = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5))
+    width  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
+    height  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
     smoothing = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5))
 
     def function(self,**params):
         return ring(params.get('pattern_x',self.pattern_x), 
                           params.get('pattern_y',self.pattern_y),
-                          params.get('radius',self.radius),
                           params.get('width',self.width),
+                          params.get('height',self.height),
+                          params.get('thickness',self.thickness),
                           params.get('smoothing',self.smoothing))  
 
 
