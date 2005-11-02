@@ -13,7 +13,6 @@ from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry
 from plotpanel import PlotPanel
 from cfsheetplotpanel import CFSheetPlotPanel
 from topo.base.projection import ProjectionSheet
-from topo.base.utils import MakeStaticFunction
 import topo.base.registry as registry
 
 class UnitWeightsPanel(CFSheetPlotPanel):
@@ -48,6 +47,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         Message(params_frame,text="Y:",aspect=1000).pack(side=LEFT)
         Entry(params_frame,textvariable=self.y_str).pack(side=LEFT,expand=YES,fill=X,padx=5)
 
+    @staticmethod
     def valid_context():
         """
         Only open if ProjectionSheets are in the Simulator.
@@ -56,7 +56,6 @@ class UnitWeightsPanel(CFSheetPlotPanel):
             return True
         else:
             return False
-    valid_context = MakeStaticFunction(valid_context)
 
 
     def generate_plot_key(self):

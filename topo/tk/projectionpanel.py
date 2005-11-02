@@ -127,6 +127,7 @@ class ProjectionPanel(CFSheetPlotPanel):
         self.projection_menu.pack(side=LEFT)
 
 
+    @staticmethod
     def valid_context():
         """
         Only open if ProjectionSheets are in the Simulator.
@@ -135,8 +136,6 @@ class ProjectionPanel(CFSheetPlotPanel):
             return True
         else:
             return False
-    valid_context = MakeStaticFunction(valid_context)
-
 
 
     def projection_refresh(self,projection_name):

@@ -25,7 +25,6 @@ import Image
 import ImageTk
 import Numeric
 import MLab
-from topo.base.utils import MakeStaticFunction
 
 NYI = "Not Yet Implemented."
 
@@ -38,6 +37,8 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
     Abstract PlotPanel class for displaying bitmapped images to a TK
     GUI window.  Must be subclassed to be usable.
     """
+
+    @staticmethod
     def valid_context():
         """
         Test if this panel should be allowed to be opened by the TopoConsole.
@@ -47,7 +48,7 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
         will call this function before creating an instance.
         """
         return True
-    valid_context = MakeStaticFunction(valid_context)
+#    valid_context = MakeStaticFunction(valid_context)
 
     def __init__(self,parent=None,pengine=None,console=None,plot_key='None',
                  plotgroup_type='BasicPlotGroup',pgt_name='None',**config):
