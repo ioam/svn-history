@@ -25,7 +25,7 @@ LineGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1
 LineGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 
 LineGenerator.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
-LineGenerator.width = 0.02
+LineGenerator.thickness = 0.02
 LineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
 # cortical sheet

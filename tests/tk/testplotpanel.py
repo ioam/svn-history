@@ -107,7 +107,7 @@ class TestPlotPanel(unittest.TestCase):
         LineGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         LineGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
         LineGenerator.orientation = Dynamic(lambda :random.uniform(-pi,pi))
-        LineGenerator.width = 0.02
+        LineGenerator.thickness = 0.02
         LineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
         
         # rf som parameters
