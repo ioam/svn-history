@@ -52,7 +52,9 @@ def line(x, thickness, gaussian_width):
     
     return where(gaussian_x_coord<=0, 1.0, falloff)
 
-# CEB: why are falloffs smaller for ring and disk than for line?
+# CEBHACKALERT:
+# I think I have something wrong with gaussian falloffs for ring() and disk()
+# (c.f. line())
 
 def disk(x, y, width, height, gaussian_width):
     """
