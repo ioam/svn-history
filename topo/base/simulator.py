@@ -142,13 +142,13 @@ class Simulator(TopoObject):
         self._event_processors = []
         self._sleep_window = 0.0
         self._sleep_window_violation = False
-        self._started = False
         if self.register:
             registry.set_active_sim(self)
 
         self.events = []
         self._events_stack = []
-        
+
+
     def time(self):
         """
         Return the current simulation time as a FixedPoint object.
@@ -160,21 +160,13 @@ class Simulator(TopoObject):
     
     def run(self,duration=Forever,until=Forever):
         """
-        Run the simulator.   Call .start() for each EventProcessor if not
-        previously done, and start the event scheduler.
+        Run the simulator by starting the event scheduler.
+
         parameters:
           duration = time to run in simulator time. Default: run indefinitely.
           until    = time to stop in simulator time. Default: run indefinitely.
           (note if both duration and until are used, they both will apply.)
         """
-        if not self._started:
-            self._started = True
-            for node in self._event_processors:
-                node.start()
-        self.continue_(duration,until)
-
-    def continue_(self,duration=Forever,until=Forever):
-
         # Complicated expression for min(time+duration,until)
         if duration == Forever:
             stop_time = until
@@ -324,6 +316,7 @@ class Simulator(TopoObject):
             if not ep in self._event_processors:
                 self._event_processors.append(ep)
                 ep.simulator = self
+                ep.start()
 
 
     def connect(self,
@@ -391,7 +384,7 @@ class EventProcessor(TopoObject):
 
         # The simulator link is not set until the call to add()
         self.simulator = None
-
+        
     def _connect_to(self,conn,**args):
         """
         Add a connection to dest/port with a delay (default=0).
@@ -420,9 +413,11 @@ class EventProcessor(TopoObject):
             self.in_connections.append(conn)
 
     def start(self):
-        """
-        Called by the simulator when a new simulation starts.  By
-        default, does nothing. 
+        """        
+        Called by the simulator when the EventProcessor is add()ed to the simlulator.
+
+        If an EventProcessor needs to have any code run when it is added to the simulator,
+        it should be in this method.
         """
         pass
 
