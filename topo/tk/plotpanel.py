@@ -272,9 +272,9 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
         self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.zoom_factor))
                               for im in self.bitmaps]
 
-        # If the number of canvases has changed then create a new set
-        # of canvases.  If the old canvases still can work, then reuse
-        # them to prevent flicker.
+        # If the number of canvases or their sizes has changed, then
+        # create a new set of canvases.  If the old canvases still can
+        # work, then reuse them to prevent flicker.
         if self.canvases and len(self.zoomed_images) > 0:
             new_sizes = [(str(zi.width()),str(zi.height()))
                          for zi in self.zoomed_images]
