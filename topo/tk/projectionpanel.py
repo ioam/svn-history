@@ -141,11 +141,9 @@ class ProjectionPanel(CFSheetPlotPanel):
         """
         Called by the Pmw.OptionMenu when the menubutton_textvariable
         is updated.  The do_plot_cmd() already plots the correct
-        Projection but this will force a refresh() if auto_refresh if
-        it is enabled.
+        Projection but this will force a refresh().
         """
-        if self.auto_refresh:
-            self.refresh()
+        self.refresh()
         
         
     def region_refresh(self,sheet_name):
@@ -156,8 +154,7 @@ class ProjectionPanel(CFSheetPlotPanel):
         """
         self._create_projection_dict(sheet_name)
         self.projection_menu.setitems(self.projections.keys())
-        if self.auto_refresh:
-            self.refresh()
+        self.refresh()
 
 
     def refresh_title(self):

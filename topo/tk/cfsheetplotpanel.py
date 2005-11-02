@@ -56,10 +56,11 @@ class CFSheetPlotPanel(plotpanel.PlotPanel):
 
     def region_refresh(self, sheet_name):
         """
-        Only called by PMW.OptionMenu when the Sheet changes.  If
-        auto_refresh is set, then refresh the plot.  Subclasses
+        Only called by PMW.OptionMenu when the Sheet changes.  Subclasses
         can either leave this the way it is, or redefine.
         """
-        if self.auto_refresh:
-            self.refresh()
+        # When comfortable about the refresh behavior, remove this
+        # commented code.
+        #if self.auto_refresh: self.refresh()
+        self.refresh()
 

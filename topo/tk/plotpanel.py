@@ -166,7 +166,7 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
         pgt = registry.plotgroup_templates[self.pgt_name]
         for (k,each) in pgt.plot_templates:
             each.channels['Normalize'] = self.normalize
-        if self.auto_refresh: self.refresh()
+        self.refresh()
 
 
     def refresh(self):
