@@ -61,19 +61,24 @@ class PlotsMenuEntry(topo.base.topoobject.TopoObject):
     def command(self):
         self.num_windows = self.num_windows + 1
         self.title = '%s %d' % (self.label, self.num_windows)
-
+        #if 'valid_context' in dir(self.class_name):
         pe = self.console.active_plotengine()
         if pe:
-            win = GUIToplevel(self.console)
-            win.withdraw()
-            win.title(self.title)
-            pn = self.class_name(console=self.console,pengine=pe,parent=win,
-                                 plot_key=self.template,plotgroup_type=self.template)
-            pn.pack(expand=YES,fill=BOTH)
-            pn.refresh_title()
-            win.deiconify()
-            self.console.messageBar.message('state', 'OK')
-            return pn
+            if self.class_name.valid_context():
+                win = GUIToplevel(self.console)
+                win.withdraw()
+                win.title(self.title)
+                pn = self.class_name(console=self.console,pengine=pe,parent=win,
+                                     plot_key=self.template,plotgroup_type=self.template)
+                pn.pack(expand=YES,fill=BOTH)
+                pn.refresh_title()
+                win.deiconify()
+                self.console.messageBar.message('state', 'OK')
+                return pn
+            else:
+                self.console.messageBar.message('state',
+                            'Simulator does not have proper Sheet type.')
+                return None
         else:
             self.console.messageBar.message('state', 'No active Simulator object.')
             return None
@@ -355,13 +360,18 @@ class TopoConsole(Frame):
         """
         pe = self.active_plotengine()
         if pe:
-            self.input_params_window = GUIToplevel(self)
-            self.input_params_window.withdraw()
-            self.input_params_window.title('Test Pattern')
-            ripp = InputParamsPanel(self.input_params_window,pe,self)
-            ripp.pack(side=TOP,expand=YES,fill=BOTH)
-            self.input_params_window.deiconify()
-            self.messageBar.message('state', 'OK')
+            if InputParamsPanel.valid_context():
+                self.input_params_window = GUIToplevel(self)
+                self.input_params_window.withdraw()
+                self.input_params_window.title('Test Pattern')
+                ripp = InputParamsPanel(self.input_params_window,pe,self)
+                ripp.pack(side=TOP,expand=YES,fill=BOTH)
+                self.input_params_window.deiconify()
+                self.messageBar.message('state', 'OK')
+            else:
+                self.messageBar.message('state',
+                            'Simulator does not have proper Sheet type.')
+                return None
         else:
             self.messageBar.message('state', 'No active Simulator object.')
 
