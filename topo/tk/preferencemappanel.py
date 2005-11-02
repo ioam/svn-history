@@ -1,32 +1,32 @@
 """
-Plot that measures preference maps.  Should be designed so that other
-types of HSV based plots can be created either by using this or
-extending it.
+Plot for displaying preference maps.
 
 $Id$
 """
 
+### JABALERT!
+###
+### This file should be combined with BasicPlotPanel and perhaps
+### PlotPanel, so that all these plots use the same class by default.
+### In each case the class will accept a plotgrouptemplate and look in
+### it for a user-editable command used to update the plots, and will
+### just call the command and plot whatever comes back from the
+### template.
+###
+### If it does continue to exist, it should probably be renamed to
+### FeatureMapPanel.
+
+
+import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas
 import plotpanel
-import Pmw
-from topo.plotting.plot import PlotTemplate
-from topo.plotting.plotgroup import PlotGroupTemplate
-from topo.plotting.bitmap import WHITE_BACKGROUND, BLACK_BACKGROUND
 import topo.base.registry
 
-### We want to support any featuremap type defined in that file, and so import all of them here.
+### We want to support any featuremap type defined in that file, and
+### so import all of them here.
 from topo.analysis.featuremap import *
 
-
-### JCALERT! This alert is now irrelevant: the class now work in general according to the map_name
-### you pass to it: you can in the future create a similar panel for Ocular Dominance
-### if there is a corresponding group template for that
-
-### JABHACKALERT: This class fully supports only Orientation Preferences plots
-### at present, and needs to be cleaned up a bit to work in general.
-### E.g. it probably shouldn't have the mapname ComboBox, and should instead
-### use the name from the pgt_name that it was called with.
 
 class PreferenceMapPanel(plotpanel.PlotPanel):
     def __init__(self,parent,pengine=None,console=None,plot_key='Activity',map_name='Orientation Preference',**config):
@@ -40,7 +40,7 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
         self.mapname = StringVar()
         self.mapname.set(self.pgt.name)
                 
-        # lissom command used to refresh the plot, if any
+        # Command used to refresh the plot, if any
         self.cmdname = StringVar()
         
         #self.cmdname.set(self.mapcmds[self.mapname.get()])
@@ -50,10 +50,6 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
         params_frame = Frame(master=self)
         params_frame.pack(side=TOP,expand=YES,fill=X)
 
-        ### JCALERT! I think the following comment is now irrelevant:     
-        # Ideally, whenever self.mapname changes this selection would be 
-        # updated automatically by looking in self.mapcmds.  However, I 
-        # don't know how to set up such a callback. (jbednar@cs)
         Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
                      entry_textvariable=self.cmdname,
                      scrolledlist_items=([self.pgt.command])
@@ -65,28 +61,13 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
         # To make the auto-refresh button not on by default when opening the panel
         self.auto_refresh_checkbutton.invoke()
 
-        ### JCHACKALERT! Rewrites that so it returns the appropriate plot keys 
-    def generate_plot_key(self):
-        """
-        Key Format:  Tuple: (Color name, Strength name, Confidence name)
-        """
-        # g = __main__.__dict__
-        # ep = [ep for ep in self.console.active_simulator().get_event_processors()
-        #       if ep.name == self.region.get()][0]
-        # # This assumes that displaying the rectangle information is enough.
-        # l,b,r,t = ep.bounds.aarect().lbrt()
-        self.plot_key = ('Activity','Activity','Activity')
-
-    ### JCALERT! I think now there is only the doc to be fixed
-    ### JABHACKALERT!
-    ### 
-    ### This function needs to be fixed and/or documented; the old
-    ### documentation was incorrect (copied from another file).
     def do_plot_cmd(self):
         """
         Function that generates the plot for the panel.
-        It first executes the command typed in the command line.
-        Anytime refresh is performed, this method is executed.
+
+        When the panel is first created or refreshed, the specified
+        command is executed, then the plot is generated using the
+        specified PlotGroupTemplate.
         """
         if self.console.active_simulator().get_event_processors():
 
