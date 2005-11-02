@@ -9,7 +9,7 @@ from topo.base.patterngenerator import *
 from topo.base.simulator import *
 from topo.base.sheetview import *
 from topo.plotting.plotengine import *
-from topo.tk.basicplotpanel import *
+from topo.tk.plotpanel import BasicPlotPanel
 from topo.patterns.basic import GaussianGenerator
 
 

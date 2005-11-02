@@ -1,12 +1,9 @@
 """
+Plot panels to support GUI windows that display bitmap
+plots. Related classes include Plot, PlotGroup, and PlotEngine.
 
-Abstract Class PlotPanel to support GUI windows that display bitmap
-plots. PlotPanel should deal with the GUI, and as much as possible use
-GUI independent code from outside the topo.tk package.  See Plots,
-PlotGroups, and PlotEngine.
-
-basicplotpanel.py is the smallest class possible to create a new plot
-window.  Look at it as an example of creating additional subclasss.
+BasicPlotPanel is the smallest class possible to create a new plot
+window.  Look at it as an example of creating additional subclasses.
 
 $Id$
 """
@@ -26,8 +23,7 @@ import ImageTk
 import Numeric
 import MLab
 
-NYI = "Not Yet Implemented."
-
+### JABALERT! Shouldn't this file use enumerate from utils.py instead?
 def enum(seq):  return zip(range(len(seq)),seq)
 
 ### JABHACKALERT! Shouldn't this be PlotGroupPanel, since it handles
@@ -364,3 +360,18 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
         if self.auto_refresh:
             self.console.del_auto_refresh_panel(self)
         Frame.destroy(self)
+
+
+
+### JABHACKALERT!  This class should probably be deleted; see preferencemappanel.py
+class BasicPlotPanel(PlotPanel):
+    """
+    Activity Panel bitmap plot.  Inherits and extends PlotPanel, while
+    using a BasicPlotGroup.  Many defaults of the other class allows this
+    class to be small.
+    
+    $Id$
+    """
+    def __init__(self,parent,pengine=None,console=None,plot_key='Activity',pgt_name='Activity',**config):
+        PlotPanel.__init__(self,parent,pengine,console=console,plot_key=plot_key,pgt_name=pgt_name,**config)
+        self.refresh()
