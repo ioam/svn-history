@@ -50,8 +50,8 @@ DEFAULT_PRESENTATION = '1.0'
 from topo.patterns import *
 patternclasses=find_classes_in_package(topo.patterns,PatternGenerator)
 topo.base.registry.pattern_generators.update(patternclasses)
-from topo.base.keyedlist import KeyedList
 
+from topo.base.keyedlist import KeyedList
 def patterngenerator_names():
     """
     Return the existing list of PatternGenerator names as a KeyedList.
