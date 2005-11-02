@@ -14,7 +14,6 @@ from cfsheetplotpanel import CFSheetPlotPanel
 from plotpanel import PlotPanel
 from itertools import chain
 from topo.base.projection import ProjectionSheet
-from topo.base.utils import MakeStaticFunction
 
 UNIT_PADDING = 1
 
