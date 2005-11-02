@@ -9,7 +9,7 @@ $Id$
 """
 
 from math import pi
-from Numeric import where,maximum,cos,sin,sqrt,less_equal,divide
+from Numeric import where,maximum,cos,sin,sqrt,less_equal,divide,ones,greater_equal,bitwise_xor
 from utils import exp
 
 # CEB:
@@ -40,48 +40,59 @@ def gabor(x, y, width, height, frequency, phase):
     return p * (0.5 + 0.5*cos(2*pi*frequency*x + phase))
 
 
-def line(x, center_width, gaussian_width):
+def line(x, thickness, gaussian_width):
     """
     Infinite-length line with a solid central region, then Gaussian fall-off at the edges.
     """
     distance_from_line = abs(x)
-    gaussian_x_coord = distance_from_line - center_width/2
-    sigmasq = 2*gaussian_width*gaussian_width
+    gaussian_x_coord = distance_from_line - thickness/2.0
 
+    sigmasq = 2*gaussian_width*gaussian_width
     falloff = __exp(-gaussian_x_coord*gaussian_x_coord, sigmasq)
     
     return where(gaussian_x_coord<=0, 1.0, falloff)
 
+# CEB: why are falloffs smaller for ring and disk than for line?
 
-def disk(x, y, disk_radius, gaussian_width):
+def disk(x, y, width, height, gaussian_width):
     """
-    Circular disk with Gaussian fall-off after the solid central region.
+    Elliptical disk with Gaussian fall-off after the solid central region.
     """
-    distance_from_line = sqrt((x**2)+(y**2)) 
-    gaussian_x_coord   = distance_from_line - disk_radius/2.0 
-    disk = less_equal(gaussian_x_coord,0)
-    sigmasq = 2*gaussian_width*gaussian_width
+    ellipse = __ellipse(x,y,width/2.0,height/2.0)  
+    disk = greater_equal(ellipse,0)
 
-    falloff = __exp(-gaussian_x_coord*gaussian_x_coord, sigmasq)
+    sigmasq = 2.0*gaussian_width*gaussian_width
+    falloff = __exp(-ellipse*ellipse, sigmasq)
 
     return maximum(disk, falloff)
 
 
-def ring(x, y, radius, width, gaussian_width):
+def ring(x, y, width, height, thickness, gaussian_width):
     """
-    Circular ring (annulus) with Gaussian fall-off after the solid ring-shaped region.
+    Elliptical ring (annulus) with Gaussian fall-off after the solid ring-shaped region.
     """    
-    distance_from_line = abs(sqrt((x**2)+(y**2)) - radius/2.0)
-    ring = less_equal(distance_from_line,width)
+    ellipse = __ellipse(x,y,width/2.0,height/2.0)  
 
-    inner_distance = distance_from_line - width
-    outer_distance = distance_from_line + width
-    sigmasq = 2*gaussian_width*gaussian_width
+    inner = ellipse - thickness
+    outer = ellipse + thickness
 
-    inner_falloff = __exp(-inner_distance*inner_distance, sigmasq)
-    outer_falloff = __exp(-outer_distance*outer_distance, sigmasq)
+    ring = bitwise_xor(greater_equal(inner,0.0),greater_equal(outer,0.0)) 
+
+    sigmasq = 2.0*gaussian_width*gaussian_width
+    inner_falloff = __exp(-inner*inner, sigmasq)
+    outer_falloff = __exp(-outer*outer, sigmasq)
 
     return maximum(inner_falloff,maximum(outer_falloff,ring))
+
+
+def __ellipse(x,y,a,b):
+    """
+    Return the ellipse specified by (x/a)^2 + (y/b)^2 = 1.
+    """
+    x_a = divide(x,a)
+    y_b = divide(y,b)
+    
+    return 1.0 - (x_a*x_a + y_b*y_b)  
 
 
 def __exp(x,sigmasq):
