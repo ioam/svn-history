@@ -23,6 +23,18 @@ from topo.base.projection import OutputFunction
 from topo.base.projection import Identity
 
 
+## Rewrite the clip function of Numeric so that it does not create intermediate copy
+## Should go in topo/base/utils.py
+def clip(mat,lower_bound,upper_bound):
+    # What about the savespace being here
+    mat.savespace(1)
+    for element,i in zip(mat.flat,range(len(mat.flat))):
+        if element<lower_bound:
+            mat.flat[i] = lower_bound
+        elif element>upper_bound:
+            mat.flat[i] = upper_bound
+            
+    
 ### JABALERT!  Consider fixing these functions to modify their argument
 ### in place, to avoid creating temporaries.
 
@@ -37,10 +49,15 @@ class PiecewiseLinear(OutputFunction):
     def __init__(self,**params):
         super(PiecewiseLinear,self).__init__(**params)
 
+### JABHACKALERT! The x.savespace(1)  should not be here...
+### It would be nice to have it at an higher level        
     def __call__(self,x):
-        fact = 1.0/(self.upper_bound-self.lower_bound)
-        x = (x-self.lower_bound)*fact
-        x = Numeric.clip(x,0.0,1.0)
+        x.savespace(1)
+        fact = 1.0/(self.upper_bound-self.lower_bound)        
+        x -= self.lower_bound
+        x *= fact
+        #x = (x-self.lower_bound)*fact
+        clip(x,0.0,1.0)
         return x
 
 class DivisiveL1Normalize(OutputFunction):
@@ -57,10 +74,11 @@ class DivisiveL1Normalize(OutputFunction):
         super(DivisiveL1Normalize,self).__init__(**params)
 
     def __call__(self,x):
+        x.savespace(1)
         tot = 1.0*sum(x.flat)
         if tot != 0:
             factor = (self.norm_value/tot)
-            x = x*factor
+            x *= factor
         return x
 
 
@@ -80,7 +98,7 @@ class DivisiveL2Normalize(OutputFunction):
         tot = 1.0*L2norm(x.flat)
         if tot != 0:
             factor = (self.norm_value/tot)
-            x = x*factor
+            x *= factor
         return x
 
 
@@ -102,7 +120,7 @@ class DivisiveMaxNormalize(OutputFunction):
         tot = 1.0*max(abs(x.flat))
         if tot != 0:
             factor = (self.norm_value/tot)
-            x = x*factor
+            x *= factor
         return x
 
 
@@ -122,6 +140,7 @@ class DivisiveLpNormalize(OutputFunction):
         super(DivisiveLpNormalize,self).__init__(**params)
 
     def __call__(self,x):
+        x.savespace(1)
         tot = 1.0*norm(x.flat,self.p)
         if tot != 0:
             factor = (self.norm_value/tot)
