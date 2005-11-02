@@ -16,7 +16,7 @@ from itertools import chain
 from topo.base.projection import ProjectionSheet
 from topo.base.utils import MakeStaticFunction
 
-UNIT_PADDING = 0
+UNIT_PADDING = 1
 
 class ProjectionPanel(CFSheetPlotPanel):
     def __init__(self,parent,pengine,console=None,**config):
