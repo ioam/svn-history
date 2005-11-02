@@ -129,12 +129,6 @@ def produce_pattern_matrices(bounds, density, r, c):
     return pattern_x[:,0], pattern_y[:,1]
 
 
-
-### JABHACKALERT!
-### 
-### CEB: still have some user-visible variables to rename.
-
-
 ### JABHACKALERT!
 ### 
 ### Why do the matrices need to be "rotated to match the Topographica
