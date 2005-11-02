@@ -332,21 +332,3 @@ def exp(x):
     return Numeric.exp(Numeric.where(abs(x)>MAX_MAG,Numeric.sign(x)*float('inf'),x))
 
 
-class MakeStaticFunction:
-   """
-   Make a C++/Java style static function within a class definition.
-   Allows calling a function without having to define an instance.
-   
-   # toy-example usage:
-   class Class2:
-      def static2(name):
-         print "Hi there",name
-   static2 = Callable(static2)
-
-   # now, a call such as:
-   Class2.static2("Peter")
-   # works just fine, and as-expected
-   """
-   def __init__(self, anycallable):
-       self.__call__ = anycallable
-
