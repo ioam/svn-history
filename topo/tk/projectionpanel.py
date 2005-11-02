@@ -13,6 +13,8 @@ from math import ceil
 from cfsheetplotpanel import CFSheetPlotPanel
 from plotpanel import PlotPanel
 from itertools import chain
+from topo.base.projection import ProjectionSheet
+from topo.base.utils import MakeStaticFunction
 
 UNIT_PADDING = 0
 
@@ -123,6 +125,18 @@ class ProjectionPanel(CFSheetPlotPanel):
                        menubutton_textvariable = self.weight_name,
                        items = self.projections.keys())
         self.projection_menu.pack(side=LEFT)
+
+
+    def valid_context():
+        """
+        Only open if ProjectionSheets are in the Simulator.
+        """
+        if registry.active_sim().objects(ProjectionSheet).items():
+            return True
+        else:
+            return False
+    valid_context = MakeStaticFunction(valid_context)
+
 
 
     def projection_refresh(self,projection_name):

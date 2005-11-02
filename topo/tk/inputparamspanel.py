@@ -29,7 +29,7 @@ from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
 from topo.base.utils import eval_atof
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.sheet import BoundingBox, Sheet
-from topo.base.utils import find_classes_in_package
+from topo.base.utils import find_classes_in_package, MakeStaticFunction
 from topo.base.patterngenerator import PatternGenerator
 from topo.commands.basic import pattern_present,save_input_generators,restore_input_generators
 
@@ -128,6 +128,17 @@ class InputParamsPanel(plotpanel.PlotPanel):
         self.in_ep_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         self.refresh()
 
+
+    def valid_context():
+        """
+        Only open if GeneratorSheets are in the Simulator.
+        """
+        if topo.base.registry.active_sim().objects(GeneratorSheet).items():
+            return True
+        else:
+            return False
+    valid_context = MakeStaticFunction(valid_context)
+        
 
     def cur_pg_name(self):
         """Readability furction to get the real name of the selected PatternGenerator"""
