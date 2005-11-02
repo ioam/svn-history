@@ -34,7 +34,7 @@ class KernelProjection(CFProjection):
 
     # Should be changed to a OutputFunctionParameter
     output_fn  = Parameter(default=Identity())
-    response_fn = Constant(CFDotProduct())
+    response_fn = Parameter(default=CFDotProduct())
 
     def __init__(self,**params):
         super(KernelProjection,self).__init__(**params)
@@ -100,7 +100,7 @@ class KernelPointerProjection(KernelProjection):
 
     weight_ptrs = [] 
     slice_ptrs = []
-    response_fn = Constant(CFDotProductP())
+    response_fn = Parameter(default=CFDotProductP())
 
     def __init__(self,**params):
         super(KernelPointerProjection,self).__init__(**params)
