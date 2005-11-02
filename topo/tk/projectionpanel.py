@@ -14,6 +14,8 @@ from cfsheetplotpanel import CFSheetPlotPanel
 from plotpanel import PlotPanel
 from itertools import chain
 
+UNIT_PADDING = 0
+
 class ProjectionPanel(CFSheetPlotPanel):
     def __init__(self,parent,pengine,console=None,**config):
         super(ProjectionPanel,self).__init__(parent,pengine,console,pgt_name='Projection',**config)
@@ -203,7 +205,7 @@ class ProjectionPanel(CFSheetPlotPanel):
                                       self.zoomed_images,self.canvases):
                 canvas.grid(row=i//self.pe_group.shape[0],
                             column=i%self.pe_group.shape[1],
-                            padx=6,pady=6)
+                            padx=UNIT_PADDING,pady=UNIT_PADDING)
                 canvas.create_image(image.width()/2+2,image.height()/2+2,image=image)
     
             # Delete old ones.  This may resize the grid.
