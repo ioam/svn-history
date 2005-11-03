@@ -298,9 +298,12 @@ class TopoConsole(Frame):
         topo.tk.topo.tk.show_cmd_prompt()
 
 
-    ## CEB:
+    ## CEBHACKALERT:
     ## load_ and save_snapshot should be available as commands in general, so the pickling
     ## will be moved out of here.
+    ##
+    ## - should save and load in the GUI shut all open windows (such as activity)?
+    ## - save and load should be extended to offer choices about names
 
     def load_snapshot(self):
         """
