@@ -77,11 +77,13 @@ class LISSOM(CFSheet):
                         self.learn()
                    
 
-    def lateral_projections(self):
-        return [p for p in chain(*self.in_projections.values()) if p.src is self]
-    def afferent_projections(self):
-        return [p for p in chain(*self.in_projections.values()) if p.src is not self]
-  
+    def projections(self):
+        return dict([(p.name,p) for p in chain(*self.in_projections.values())])
+
+
+    # CEBHACKALERT: lissom.ty can be altered to set attributes on projections
+    # returned by projections() above. Then, these functions can be removed.
+    
     ### JABALERT: Should be able to eliminate this by just providing a 
     ### convenient way for callers to access projections.
     def change_bounds(self, name, new_wt_bounds):
