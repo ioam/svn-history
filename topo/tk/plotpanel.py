@@ -46,15 +46,32 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
         return True
 #    valid_context = MakeStaticFunction(valid_context)
 
-    def __init__(self,parent=None,pengine=None,console=None,plot_key='None',
-                 plotgroup_type='BasicPlotGroup',pgt_name='None',**config):
-        assert isinstance(pengine,plotengine.PlotEngine) or pengine == None, \
-               'Variable pengine not PlotEngine object.'
+    def __init__(self,parent,pengine,console,plot_key,pgt_name=None,
+                 plotgroup_type='BasicPlotGroup',**config):
+        """
+        parent:  it is the window (GUIToplevel()) that contains the panel.
+        pengine: is the associated PlotEngine; it might end up to be unnecessary, needs fixing.
+        console: is the associated console, (i.e. the TopoConsole that has this panel)
+        plot_key: defines the title of the panel.
+                  In the case of an activity plot or a feature map plot the title
+                  is only the name of template (pgt_name)
+                  In the case of projection and unit weights there is additional information
+                  that are added by the method generate_plt_key (e.g. density, unit coordinates...)
+        pgt_name: name of the PlotGroupTemplate associated with the panel
+        plot_group_type: type of the PlotGroup associated with the panel
+        
+        """
+        
+        #assert isinstance(pengine,plotengine.PlotEngine) or pengine == None, \
+        #       'Variable pengine not PlotEngine object.'
 
         Frame.__init__(self,parent,config)
         topo.plotting.plot.TopoObject.__init__(self,**config)
 
-        self.plot_key = plot_key
+        if pgt_name!=None:
+            self.plot_key = pgt_name
+        else:
+            self.plot_key=plot_key
         self.plotgroup_type = plotgroup_type
         self.pgt_name = pgt_name  #Plot Group Template name
 
@@ -372,6 +389,6 @@ class BasicPlotPanel(PlotPanel):
     
     $Id$
     """
-    def __init__(self,parent,pengine=None,console=None,plot_key='Activity',pgt_name='Activity',**config):
-        PlotPanel.__init__(self,parent,pengine,console=console,plot_key=plot_key,pgt_name=pgt_name,**config)
+    def __init__(self,parent,pengine,console,plot_key,pgt_name='Activity',**config):
+        PlotPanel.__init__(self,parent,pengine,console,plot_key=plot_key,pgt_name=pgt_name,**config)
         self.refresh()
