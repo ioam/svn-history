@@ -68,8 +68,8 @@ class PlotsMenuEntry(topo.base.topoobject.TopoObject):
                 win = GUIToplevel(self.console)
                 win.withdraw()
                 win.title(self.title)
-                pn = self.class_name(console=self.console,pengine=pe,parent=win,
-                                     plot_key=self.template,plotgroup_type=self.template)
+                pn = self.class_name(parent=win,pengine=pe,console=self.console,
+                                     plot_key=self.template.name,pgt_name=self.template.name,plotgroup_type=self.template)
                 pn.pack(expand=YES,fill=BOTH)
                 pn.refresh_title()
                 win.deiconify()
@@ -97,7 +97,7 @@ class TopoConsole(Frame):
     """
     def __init__(self, parent=None,**config):
         Frame.__init__(self,parent,config)
-
+        
         self.parent = parent
         self.num_activity_windows = 0
         self.num_orientation_windows = 0
