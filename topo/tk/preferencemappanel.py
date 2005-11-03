@@ -88,4 +88,4 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
 
 
     def refresh_title(self):
-        self.parent.title(self.mapname.get() + " %d." % self.panel_num)
+        self.parent.title(self.mapname.get() + " %d" % self.panel_num)
