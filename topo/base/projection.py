@@ -6,6 +6,8 @@ $Id$
 
 import Numeric
 
+from itertools import chain
+
 from sheet import Sheet
 from parameter import Parameter, Number, BooleanParameter
 from simulator import EPConnection
@@ -185,6 +187,19 @@ class ProjectionSheet(Sheet):
             if proj.dest_port == dest_port:
                 proj.activate(input_activity,rows,cols)
 		break
+
+
+    def projections(self):
+        """
+        Return a dictionary {projection_name, projection} of all the in_projections
+        for this Sheet.
+        """
+        return dict([(p.name,p) for p in chain(*self.in_projections.values())])
+
+# CEBHACKALERT:
+# Calls to the function below can be changed to call the one above once simulator.py
+# has been altered so that it does not allow creation of e.g. projections sharing the
+# same name. Then the function below can be removed.
 
     def get_in_projection_by_name(self,tname):
         """

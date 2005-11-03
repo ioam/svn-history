@@ -76,11 +76,6 @@ class LISSOM(CFSheet):
                         self.presleep_count = 0
                         self.learn()
                    
-    # CEBHACKALERT:
-    # this is going to projections.py...
-    def projections(self):
-        return dict([(p.name,p) for p in chain(*self.in_projections.values())])
-
 
     # print the weights of a unit
     def printwts(self,x,y):
