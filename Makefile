@@ -59,7 +59,7 @@ cleandocs:
 
 # Auto-generated Source Documentation
 # Uses an integrated python script named gendocs.py
-docs: topo/*.py
+docs: topo/*.py topo/*/*.py
 	mkdir -p docs
 	./topographica topo/base/gendocs.py
 	cp docs/topo.html docs/index.html
