@@ -49,6 +49,7 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
         
         params_frame = Frame(master=self)
         params_frame.pack(side=TOP,expand=YES,fill=X)
+        Message(params_frame,text="Update command:",aspect=1000).pack(side=LEFT)
 
         Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
                      entry_textvariable=self.cmdname,
