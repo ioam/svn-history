@@ -115,38 +115,28 @@ s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
                                    weights_bounds = inhibitory_weight_bounds, normalize = True, learning_rate=alpha_inh))
         
 
-#################################################
-# Schedule the changes of simulation parameters
+s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.6/BaseN,-exc_rad*0.6/BaseN),(exc_rad*0.6/BaseN,exc_rad*0.6/BaseN))))
 
-# CEBHACKALERT: see lissom.py
-# Change these.
-# e.g.
-# V1.change_learning_rate("Afferent0",0.005)
-# becomes
-# V1.projections()['Afferent0'].learning_rate=0.005
-# 
-# V1.change_bounds("LateralExcitatory", BoundingBox(...))
-# becomes
-# V1.projections()['LateralExcitatory'].change_bounds(BoundingBox(...))
-#
-# Then delete lissom.py's change_learning_rate() and change_bounds().
+s.schedule_action(500, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.42/BaseN,-exc_rad*0.42/BaseN),(exc_rad*0.42/BaseN,exc_rad*0.42/BaseN))))
+
+s.schedule_action(1000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.336/BaseN,-exc_rad*0.336/BaseN),(exc_rad*0.336/BaseN,exc_rad*0.336/BaseN))))
+
+s.schedule_action(2000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-2.0/BaseN,-2.0/BaseN),(2.0/BaseN,2.0/BaseN))))
 
 
+def set_learning_rate(projection_name, rate):
+    """
+    Set the learning rate on the named projection (of V1).
+    (Exists because Simulator.schedule_action() schedules function calls.)
+    """
+    V1.projections()[projection_name].learning_rate=rate
 
-s.schedule_action(200, V1.change_bounds, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.6/BaseN,-exc_rad*0.6/BaseN),(exc_rad*0.6/BaseN,exc_rad*0.6/BaseN))))
 
-s.schedule_action(500, V1.change_bounds, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.42/BaseN,-exc_rad*0.42/BaseN),(exc_rad*0.42/BaseN,exc_rad*0.42/BaseN))))
-
-s.schedule_action(1000, V1.change_bounds, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.336/BaseN,-exc_rad*0.336/BaseN),(exc_rad*0.336/BaseN,exc_rad*0.336/BaseN))))
-
-s.schedule_action(2000, V1.change_bounds, "LateralExcitatory", BoundingBox(points=((-2.0/BaseN,-2.0/BaseN),(2.0/BaseN,2.0/BaseN))))
-
-s.schedule_action(500, V1.change_learning_rate, "Afferent0", 0.005*acs)
-s.schedule_action(2000, V1.change_learning_rate, "Afferent0", 0.004*acs)
-s.schedule_action(4000, V1.change_learning_rate, "Afferent0", 0.003*acs)
-s.schedule_action(20000, V1.change_learning_rate, "Afferent0", 0.0015*acs)
-
-s.schedule_action(500, V1.change_learning_rate, "LateralExcitatory", 0.001*ecs)
+s.schedule_action(500, set_learning_rate, "Afferent0", 0.005*acs)
+s.schedule_action(2000, set_learning_rate, "Afferent0", 0.004*acs)
+s.schedule_action(4000, set_learning_rate, "Afferent0", 0.003*acs)
+s.schedule_action(20000, set_learning_rate, "Afferent0", 0.0015*acs)
+s.schedule_action(500, set_learning_rate, "LateralExcitatory", 0.001*ecs)
 
 
 #function that set delta and beta for the threshold function

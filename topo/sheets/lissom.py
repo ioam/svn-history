@@ -76,31 +76,10 @@ class LISSOM(CFSheet):
                         self.presleep_count = 0
                         self.learn()
                    
-
+    # CEBHACKALERT:
+    # this is going to projections.py...
     def projections(self):
         return dict([(p.name,p) for p in chain(*self.in_projections.values())])
-
-
-    # CEBHACKALERT: lissom.ty can be altered to set attributes on projections
-    # returned by projections() above. Then, these functions can be removed.
-    
-    ### JABALERT: Should be able to eliminate this by just providing a 
-    ### convenient way for callers to access projections.
-    def change_bounds(self, name, new_wt_bounds):
-        for proj in chain(*self.in_projections.values()):
-            if proj.name == name:
-                proj.change_bounds(new_wt_bounds)
-                return
-        self.warning("Can't find ", name)
-
-    ### JABALERT: Should be able to eliminate this by just providing a 
-    ### convenient way for callers to access projections.
-    def change_learning_rate(self, name, new_alpha):
-        for proj in chain(*self.in_projections.values()):
-            if proj.name == name:
-                proj.learning_rate = new_alpha
-                return
-        self.warning("Can't find ", name)
 
 
     # print the weights of a unit
