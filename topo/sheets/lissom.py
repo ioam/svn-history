@@ -41,7 +41,6 @@ class LISSOM(CFSheet):
         super(LISSOM,self).input_event(src,src_port,dest_port,data)
 
 
-    ### JABALERT: Should change to activate() instead
     def pre_sleep(self):
         """
         Pass the accumulated stimulation through self.output_fn and
@@ -51,53 +50,25 @@ class LISSOM(CFSheet):
         iteration_done = False
         self.presleep_count += 1
 
-	if self.presleep_count == self.tsettle+1: #end of an iteration
+	if self.presleep_count == self.tsettle+2: #end of an iteration
             iteration_done = True
 
-        if self.new_input:
+        if self.new_input: 
             self.new_input = False
-            self.activity *= 0
-            for name in self.in_projections:
-                for proj in self.in_projections[name]:
-                    self.activity += proj.activity
-            if self.apply_output_fn:
-                self.activity = self.output_fn(self.activity)
+            # The last iteration is for learning and does not need to compute
+	    # the activity.
+	    if not iteration_done:
+                self.activity *= 0
+                self.activate()
 
-            # don't send output when an iteration has ended
-            if not iteration_done: 
-                self.send_output(data=self.activity)
-
-        if self.learning:
-            if self.continuous_learning:
-                self.learn()
-            else:
-                if iteration_done:
-                    self.presleep_count = 0
+            if self.learning:
+                if self.continuous_learning:
                     self.learn()
-                    
-
-    ### JABHACKALERT! Can this function now be moved to the base class?
-    ### I.e., is there anything LISSOM-specific about it now?
-    def learn(self):
-        rows,cols = self.activity.shape
-        for proj in chain(*self.in_projections.values()):
-            if proj.input_buffer:
-                alpha = proj.learning_rate
-
-                
-                ### JABALERT! What is the reason for this special case?
-                ### Why would the activity buffer be any different from
-                ### the input_buffer?
-		# Learning in lateral connections uses the most current activity
-                if proj.src == self: #lateral connection
-                    inp = self.activity
                 else:
-                    inp = proj.input_buffer
-
-                cfs = proj.cfs
-                len, len2 = inp.shape
-                self.learning_fn(inp, self.activity, rows, cols, len, cfs, alpha)
-
+                    if iteration_done:
+                        self.presleep_count = 0
+                        self.learn()
+                   
 
     def lateral_projections(self):
         return [p for p in chain(*self.in_projections.values()) if p.src is self]
@@ -127,7 +98,7 @@ class LISSOM(CFSheet):
     def printwts(self,x,y):
         for proj in chain(*self.in_projections.values()):
             print proj.name, x, y
-            print transpose(proj.cfs[x][y].weights)
+            print proj.cfs[x][y].weights
 
 
 
@@ -151,14 +122,7 @@ class LISSOMPointer(LISSOM):
         for proj in chain(*self.in_projections.values()):
             if proj.input_buffer:
                 alpha = proj.learning_rate
-                ### JABALERT! What is the reason for this special case?
-                ### Why would the activity buffer be any different from
-                ### the input_buffer?
-		# Learning in lateral connections uses the most current activity
-                if proj.src == self: #lateral connection
-                    inp = self.activity
-                else:
-                    inp = proj.input_buffer
+                inp = proj.input_buffer
 
                 cfs = proj.cfs
                 len, len2 = inp.shape

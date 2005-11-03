@@ -28,6 +28,7 @@ from parameter import Parameter, Number, BooleanParameter
 from utils import mdot,hebbian,divisive_normalization
 from sheet import Sheet
 from sheetview import UnitView
+from itertools import chain
 
 
 ### JEFF's IMPLEMENTATION NOTES
@@ -321,6 +322,7 @@ class CFProjection(Projection):
         raise NotImplementedError
 
 
+from topo.learningfns.basic import DivisiveHebbian
 
 class CFSheet(ProjectionSheet):
     """
@@ -336,6 +338,18 @@ class CFSheet(ProjectionSheet):
     ConnectionFields for each unit.  A ProjectionSheet should work
     just the same as this sheet, except that it will not provide those routines.
     """
+
+    learning_fn = Parameter(default=DivisiveHebbian())
+    def learn(self):
+        rows,cols = self.activity.shape
+        for proj in chain(*self.in_projections.values()):
+            if proj.input_buffer:
+                alpha = proj.learning_rate
+                inp = proj.input_buffer
+                cfs = proj.cfs
+                len, len2 = inp.shape
+                self.learning_fn(inp, self.activity, rows, cols, len, cfs, alpha)
+
     
     ### JABALERT
     ###

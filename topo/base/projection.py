@@ -141,8 +141,6 @@ class ProjectionSheet(Sheet):
         """
         Collect activity from each projection, combine it to calculate
         the activity for this sheet, and send the result out.
-
-        If learning is enabled, also calls learn().
         """
         self.activity *= 0.0
         for name in self.in_projections:
@@ -152,8 +150,6 @@ class ProjectionSheet(Sheet):
             self.activity = self.output_fn(self.activity)
         self.send_output(data=self.activity)
 
-        if self.learning:
-            self.learn()
 
     def pre_sleep(self):
         """
@@ -165,6 +161,9 @@ class ProjectionSheet(Sheet):
         if self.new_input:
             self.activate()
             self.new_input = False
+            if self.learning:
+                self.learn()
+
 
     def learn(self):
         """
