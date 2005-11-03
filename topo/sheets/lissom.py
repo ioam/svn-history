@@ -21,7 +21,6 @@ class LISSOM(CFSheet):
     # Should be changed to a OutputFunctionParameter
     output_fn = Parameter(default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
     learning_fn = Parameter(default=DivisiveHebbian())
-    apply_output_fn=BooleanParameter(default=True)
     
     # modify weights after each activation?
     continuous_learning = BooleanParameter(default=False)
@@ -31,6 +30,15 @@ class LISSOM(CFSheet):
     tsettle=8
 
     def input_event(self,src,src_port,dest_port,data):
+        ### JABHACKALERT!  What is this?! We can't have any such
+        ### calculation based on the name of the src, because the user
+        ### can name the input sheet anything he likes!  What will
+        ### happen when there are multiple Retinas, or an LGN, or
+        ### hierarchical maps, or anything else like that?!?!  The
+        ### resetting needs to be done based on the tsettle value, or
+        ### something else that we can actually trust; we can't trust
+        ### the name of the input sheet in any way.
+        
         # On a new afferent input, clear the activity
         if src.name == 'Retina':
             self.activity *= 0.0
@@ -58,7 +66,6 @@ class LISSOM(CFSheet):
             # The last iteration is for learning and does not need to compute
 	    # the activity.
 	    if not iteration_done:
-                self.activity *= 0
                 self.activate()
 
             if self.learning:
