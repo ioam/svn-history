@@ -71,8 +71,8 @@ def patterngenerator_names():
 
 class InputParamsPanel(plotpanel.PlotPanel):
     def __init__(self,parent,pengine,console=None,padding=2,**config):
-        super(InputParamsPanel,self).__init__(parent,pengine,console,**config)
-        self.plot_group.configure(tag_text='Preview')
+        super(InputParamsPanel,self).__init__(parent,pengine,console,plot_key='Preview',**config)
+
         self.INITIAL_PLOT_WIDTH = 100
         self.padding = padding
         self.parent = parent

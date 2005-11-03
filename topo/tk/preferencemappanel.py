@@ -29,12 +29,12 @@ from topo.analysis.featuremap import *
 
 
 class PreferenceMapPanel(plotpanel.PlotPanel):
-    def __init__(self,parent,pengine=None,console=None,plot_key='Activity',map_name='Orientation Preference',**config):
-        plotpanel.PlotPanel.__init__(self,parent,pengine,console=console,plot_key=plot_key,pgt_name=map_name,**config)
+    def __init__(self,parent,pengine,console,pgt_name,**config):
+        plotpanel.PlotPanel.__init__(self,parent,pengine,console,pgt_name=pgt_name,**config)
 
         self.panel_num = self.console.num_orientation_windows
 
-        self.pgt = topo.base.registry.plotgroup_templates[map_name]
+        self.pgt = topo.base.registry.plotgroup_templates[pgt_name]
      
         # Name of the plotgroup to plot
         self.mapname = StringVar()

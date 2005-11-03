@@ -15,7 +15,7 @@ import topo.base.connectionfield
 
 class CFSheetPlotPanel(plotpanel.PlotPanel):
 
-    def __init__(self,parent,pengine,console=None,**config):
+    def __init__(self,parent,pengine,console,**config):
         plotpanel.PlotPanel.__init__(self,parent,pengine,console,**config)
 
         self.region = StringVar()
