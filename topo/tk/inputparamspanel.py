@@ -141,7 +141,7 @@ class InputParamsPanel(plotpanel.PlotPanel):
         
 
     def cur_pg_name(self):
-        """Readability furction to get the real name of the selected PatternGenerator"""
+        """Return the name of the selected PatternGenerator, as text."""
         return self.pg_name_dict[self.input_type.get()]
 
 
