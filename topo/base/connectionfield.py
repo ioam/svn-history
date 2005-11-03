@@ -31,6 +31,7 @@ from sheetview import UnitView
 from itertools import chain
 
 
+
 ### JEFF's IMPLEMENTATION NOTES
 ### 
 ### Non-rectangular ConnectionField bounds
@@ -322,8 +323,6 @@ class CFProjection(Projection):
         raise NotImplementedError
 
 
-from topo.learningfns.basic import DivisiveHebbian
-
 class CFSheet(ProjectionSheet):
     """
     A ProjectionSheet providing access to the ConnectionFields in its CFProjections.
@@ -339,7 +338,7 @@ class CFSheet(ProjectionSheet):
     just the same as this sheet, except that it will not provide those routines.
     """
 
-    learning_fn = Parameter(default=DivisiveHebbian())
+    learning_fn = Parameter(default=GenericCFLF())
     def learn(self):
         rows,cols = self.activity.shape
         for proj in chain(*self.in_projections.values()):
