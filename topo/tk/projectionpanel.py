@@ -160,7 +160,7 @@ class ProjectionPanel(CFSheetPlotPanel):
 
 
     def refresh_title(self):
-        self.parent.title("Projection %d (%s projection %s)" % (self.panel_num,self.region.get(),
+        self.parent.title("Projection %d, (%s projection %s)" % (self.panel_num,self.region.get(),
             self.weight_name.get()))
         
 

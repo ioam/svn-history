@@ -139,5 +139,5 @@ class UnitWeightsPanel(CFSheetPlotPanel):
     
         
     def refresh_title(self):
-        self.parent.title("Unit Weights %d. (x=%0.3f, y=%0.3f)" %
-                          (self.panel_num,self.displayed_x, self.displayed_y))
+        self.parent.title("Unit Weights %d, %s (%0.3f,%0.3f)" %
+                          (self.panel_num,self.region.get(),self.displayed_x, self.displayed_y))
