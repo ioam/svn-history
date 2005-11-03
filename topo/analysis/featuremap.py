@@ -15,11 +15,6 @@ from Numeric import array, zeros, Float
 from topo.base.distribution import Distribution
 from topo.base.topoobject import TopoObject
 
-
-#import topo.base.topoobject   # do we need that ?
-#import __main__               # and that ?
-
-
 from topo.base.sheet import Sheet
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.utils import cross_product, frange
@@ -38,12 +33,40 @@ from topo.base.registry import get_console
 import topo.tk.topoconsole 
 
 
-# Measure_or_pref: Command for measuring the orientation map
+# Intermediate user function that is passed as a parameter for measure_map in MeasureFeatureMap.
+# It is used in measure_or_pref.
+class SineGratingPresenter(object):
+    """Function object for presenting sine gratings."""
+    
+    def __init__(self,sim=None,apply_output_fn=True,duration=1.0):
+        self.sim=sim
+        self.apply_output_fn=apply_output_fn
+        self.duration=duration
+
+    def __call__(self,features_values,param_dict):
+        gen = SineGratingGenerator()
+
+        ### JABHACKALERT!  Should be able to do this more cleanly.
+        for param, value in param_dict.iteritems():
+            update_generator = "gen." + param + "=" + repr(value)
+            exec update_generator
+
+        inputs = dict().fromkeys(self.sim.objects(GeneratorSheet),gen)
+              
+        for feature,value in features_values.iteritems():
+            update_generator = "gen." + feature + "=" + repr(value)
+            exec update_generator
+
+        pattern_present(inputs, self.duration, self.sim, learning=False,
+                        apply_output_fn=self.apply_output_fn)
+
+
+
 def measure_or_pref(sim=None,num_freq=1,num_phase=4,num_orientation=4,
                     scale=0.3,offset=0.0,freq=5.0,display=False,
-                    user_function='_sinegrating_present', apply_output_fn=True):
-    """    
-    """
+                    user_function_class=SineGratingPresenter,
+                    apply_output_fn=False, duration=1.0):
+    """Measure orientation maps, using a sine grating by default."""
     
     if not sim:
         sim = topo.base.registry.active_sim()
@@ -54,6 +77,7 @@ def measure_or_pref(sim=None,num_freq=1,num_phase=4,num_orientation=4,
             raise ValueError("num_freq, num_phase, and num_orientation must be greater than 0")
             
         else:
+            user_function=user_function_class(sim,apply_output_fn, duration)
             step_freq=2*pi/num_freq
             step_phase=2*pi/num_phase
             step_orientation=pi/num_orientation
@@ -66,44 +90,11 @@ def measure_or_pref(sim=None,num_freq=1,num_phase=4,num_orientation=4,
 
             param_dict = {"scale":scale,"offset":offset,"freq":freq}
             
-            exec 'x.measure_maps(' + user_function+ ', param_dict,display, apply_output_fn)'
+            x.measure_maps(user_function, param_dict, display)
 
     else:
         TopoObject().warning('No active Simulator.')
     
-
-
-# Intermediate user function that is passed as a parameter for measure_map in MeasureFeatureMap
-# It is used in measure_or_pref
-def _sinegrating_present(features_values,param_dict,sim=None,apply_output_fn=True):
-    """
-    Intermediate user function used by MeasureFeatureMap
-    """
-    if not sim:
-         sim = topo.base.registry.active_sim()
-         
-    if sim:
-        
-        zed = SineGratingGenerator()
-        for param, value in param_dict.iteritems():
-            update_generator = "zed." + param + "=" + repr(value)
-            exec update_generator
-
-        inputs = dict().fromkeys(sim.objects(GeneratorSheet),zed)
-              
-        for feature,value in features_values.iteritems():
-            update_generator = "zed." + feature + "=" + repr(value)
-            exec update_generator
-
-        ## Needs to do something so that we have a parmeter defined in Lissom.ty that set
-        ## duration to be 0.06. (For cfsom, at least 0.51 is required and so I left 1.0
-        ## so that it works in both case
-        pattern_present(inputs, 1.0, sim, learning=False,apply_output_fn=apply_output_fn)
-        
-    else:
-        TopoObject().warning('No active Simulator.')
-
-
 
 
 class FeatureMap(TopoObject):
@@ -227,7 +218,7 @@ class MeasureFeatureMap(TopoObject):
                                                                           cyclic=value[2])})
 
                 
-    def measure_maps(self,user_function,param_dict,display=False,apply_output_fn=True):
+    def measure_maps(self,user_function,param_dict,display=False):
 
         """
         Create a list of all permutations of the feature values, then, for each permutation, set the
@@ -238,13 +229,13 @@ class MeasureFeatureMap(TopoObject):
         """
         save_input_generators(self.simulator)
         
-        self.__present_input_patterns(user_function,param_dict,display,apply_output_fn)
+        self.__present_input_patterns(user_function,param_dict,display)
         self.__construct_sheet_views()
 
         restore_input_generators(self.simulator)
 
 
-    def __present_input_patterns(self,user_function,param_dict,display=False,apply_output_fn=True):
+    def __present_input_patterns(self,user_function,param_dict,display=False):
         input_permutations = cross_product(self.__featurevalues)
 
         # Present the input pattern with various parameter settings,
@@ -258,7 +249,7 @@ class MeasureFeatureMap(TopoObject):
                 feature_points[feature] = value
 
             # DRAW THE PATTERN: call to the user_function
-            user_function(feature_points,param_dict,self.simulator,apply_output_fn=apply_output_fn)
+            user_function(feature_points,param_dict)
 
 
             #### Debugging     ####
