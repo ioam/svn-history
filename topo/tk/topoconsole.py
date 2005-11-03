@@ -483,9 +483,7 @@ class TopoConsole(Frame):
         """
         Create a main window title
         """
-        title = "Topographica Console."
-        if active_sim() != None:
-            title += "  Active = " + (active_sim()).name
+        title = "Topographica Console"
         self.parent.title(title)
 
         
