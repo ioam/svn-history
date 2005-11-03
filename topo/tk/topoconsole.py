@@ -71,6 +71,7 @@ class PlotsMenuEntry(topo.base.topoobject.TopoObject):
                 pn = self.class_name(parent=win,pengine=pe,console=self.console,
                                      plot_key=self.template.name,pgt_name=self.template.name,plotgroup_type=self.template)
                 pn.pack(expand=YES,fill=BOTH)
+
                 pn.refresh_title()
                 win.deiconify()
                 self.console.messageBar.message('state', 'OK')
@@ -118,9 +119,12 @@ class TopoConsole(Frame):
         self.auto_refresh_panels = []
 
         self._init_widgets()
+        # Doesn't work for providing icon for the window:
+        #parent.wm_iconbitmap('@/home/jbednar/research/topographica/topo.xpm')
 
 
     def _init_widgets(self):
+        
 	# Create the Balloon.
 	self.balloon = Pmw.Balloon(self)
 
