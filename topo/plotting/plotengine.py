@@ -5,7 +5,7 @@ file or for a GUI to display.
 This class should be the connection between the Simulator or GUI, and
 any Plot generation routines.
 
-PlotEngine will create the requeted plot group type from a plot_key
+PlotEngine will create the requested plot group type from a plot_key
 (dictionary key name for the SheetView dictionaries on each sheet) or
 a plot dictionary definition.
 
@@ -111,6 +111,7 @@ class PlotEngine(TopoObject):
     ### selecting subclasses (like this one does) and replace it with a
     ### call to simulator.objects(baseclass).  E.g. this function should
     ### be deleted, with simulator.objects(Sheet) used instead.
+
     def _sheets(self):
         """
         Get the list of sheets from the event processor list attached
@@ -154,66 +155,70 @@ class PlotEngine(TopoObject):
             requested_plot = self.make_plot_group(name,group_type,filter,class_type)
         return requested_plot
 
+     ### JCALERT! This function has been commented out because it does not seem to be of any use
+     ### It is called on a line that is commented out in make_plot_group at the end of the file
 
-    def lambda_flat_dynamic_list(self, name, filter_lam):
-        """
-        lambda_single_view_per_name() expanded so that the a
-        sheet_view dictionary key entry can have a list of SheetViews,
-        and not just one.  Each SheetView in the list will be set with
-        a Plot object.
-        """
-        sheet_list = [each for each in self._sheets() if filter_lam(each)]
-        self.debug('sheet_list =' + str(sheet_list) + 'name = ' + str(name))
+#     def lambda_flat_dynamic_list(self, name, filter_lam):
+#         """
+#         lambda_single_view_per_name() expanded so that the a
+#         sheet_view dictionary key entry can have a list of SheetViews,
+#         and not just one.  Each SheetView in the list will be set with
+#         a Plot object.
+#         """
+#         sheet_list = [each for each in self._sheets() if filter_lam(each)]
+#         self.debug('sheet_list =' + str(sheet_list) + 'name = ' + str(name))
 
-        view_list = [(each, each.sheet_view(name)) for each in sheet_list
-                     if each is not None]
+#         view_list = [(each, each.sheet_view(name)) for each in sheet_list
+#                      if each is not None]
         
-        ### A possible list from the Sheet.sheet_view dictionary is
-        ### converted into multiple Plot generation requests.
-        plot_list = []
-        for (sheet,views) in view_list:
-            if not isinstance(views,list):
-                views = [views]
-            for each in views:
-                if isinstance(each,SheetView):
-                    plot_list.append(Plot((each,None,None),COLORMAP,None))
-                else:
-                    plot_list.append(Plot((name,None,None),COLORMAP,sheet))
-        self.debug('plot_list =' + str(plot_list))
-        return plot_list
+#         ### A possible list from the Sheet.sheet_view dictionary is
+#         ### converted into multiple Plot generation requests.
+#         plot_list = []
+#         for (sheet,views) in view_list:
+#             if not isinstance(views,list):
+#                 views = [views]
+#             for each in views:
+#                 if isinstance(each,SheetView):
+#                     plot_list.append(Plot((each,None,None),COLORMAP,None))
+#                 else:
+#                     plot_list.append(Plot((name,None,None),COLORMAP,sheet))
+#         self.debug('plot_list =' + str(plot_list))
+#         return plot_list
 
+      ### JCALERT! This function has been commented out because it does not seem to be of any use
+      ### It is called on a line that is commented out in make_plot_group at the end of the file
 
-    def lambda_for_weight_view(self, (w,sheet_target,sheet_x,sheet_y), filter_lam):
-        """
-        To have the UnitViews stored on the Projection source sheet,
-        the weights must be requested from each Projection on the
-        target sheets.
-        """
-        sheet_list = [each for each in self._sheets() if filter_lam(each) and each.name == sheet_target]
+#     def lambda_for_weight_view(self, (w,sheet_target,sheet_x,sheet_y), filter_lam):
+#         """
+#         To have the UnitViews stored on the Projection source sheet,
+#         the weights must be requested from each Projection on the
+#         target sheets.
+#         """
+#         sheet_list = [each for each in self._sheets() if filter_lam(each) and each.name == sheet_target]
 
-        projection_list = []
-        for s in sheet_list:
-            if not isinstance(s,CFSheet):
-                self.warning('Requested weights view from other than CFSheet.')
-            else:
-                for p in set(flatten(s.in_projections.values())):
-                    key = ('Weights',sheet_target,p.name,sheet_x,sheet_y)
-                    v = p.src.sheet_view(key)
-                    if v: projection_list += [(s,p,each) for each in v if each.projection.name == p.name]
-        projection_list.sort(key=lambda x: x[2].name,reverse=True)
+#         projection_list = []
+#         for s in sheet_list:
+#             if not isinstance(s,CFSheet):
+#                 self.warning('Requested weights view from other than CFSheet.')
+#             else:
+#                 for p in set(flatten(s.in_projections.values())):
+#                     key = ('Weights',sheet_target,p.name,sheet_x,sheet_y)
+#                     v = p.src.sheet_view(key)
+#                     if v: projection_list += [(s,p,each) for each in v if each.projection.name == p.name]
+#         projection_list.sort(key=lambda x: x[2].name,reverse=True)
 
-        plot_list = []
-        for (sheet,projection,views) in projection_list:
-            if not isinstance(views,list):
-                views = [views]
-            for each in views:
-                if isinstance(each,SheetView):
-                    plot_list.append(Plot((each,None,None),COLORMAP,None))
-                else:
-                    key = ('Weights',sheet,projection,sheet_x,sheet_y)
-                    plot_list.append(Plot((key,None,None),COLORMAP,p.src))
-        self.debug('plot_list =' + str(plot_list))
-        return plot_list
+#         plot_list = []
+#         for (sheet,projection,views) in projection_list:
+#             if not isinstance(views,list):
+#                 views = [views]
+#             for each in views:
+#                 if isinstance(each,SheetView):
+#                     plot_list.append(Plot((each,None,None),COLORMAP,None))
+#                 else:
+#                     key = ('Weights',sheet,projection,sheet_x,sheet_y)
+#                     plot_list.append(Plot((key,None,None),COLORMAP,p.src))
+#         self.debug('plot_list =' + str(plot_list))
+#         return plot_list
 
 
     def lambda_for_templates(self, template, filter_lam):
@@ -318,6 +323,7 @@ class PlotEngine(TopoObject):
         p = Plot((strength,hue,confidence),SHC,sheet,n,name=k)
         return p
 
+
     def make_plot_group(self, name='None', group_type='BasicPlotGroup',
                              filter_lam=sheet_filter, class_type='BasicPlotGroup'):
         """
@@ -352,6 +358,10 @@ class PlotEngine(TopoObject):
             print 'Template was not passed in.  This code deprecated and disabled.'
             import inspect
             print inspect.stack(), '\n'
+
+            ### JCALERT! If you decide to uncomment these lines, you also have to uncomment
+            ### the two function that are commented out above
+            
             #if isinstance(name,tuple) and name[0] == 'Weights':
             #    dynamic_list = lambda : self.lambda_for_weight_view(name,filter_lam)
             #else:
