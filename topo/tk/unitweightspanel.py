@@ -43,9 +43,18 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         params_frame.pack(side=TOP,expand=YES,fill=X)
 
         Message(params_frame,text="Unit  X:",aspect=1000).pack(side=LEFT)
-        Entry(params_frame,textvariable=self.x_str).pack(side=LEFT,expand=YES,fill=X)
+        self.xe = Entry(params_frame,textvariable=self.x_str)
+        self.xe.bind('<FocusOut>', self.refresh)
+        self.xe.bind('<Return>', self.refresh)
+        self.xe.pack(side=LEFT,expand=YES,fill=X)
+
+        #self.tag.bind('<KeyRelease>', self.tag_keypress)
+
         Message(params_frame,text="Y:",aspect=1000).pack(side=LEFT)
-        Entry(params_frame,textvariable=self.y_str).pack(side=LEFT,expand=YES,fill=X,padx=5)
+        self.ye = Entry(params_frame,textvariable=self.y_str)
+        self.ye.bind('<FocusOut>', self.refresh)
+        self.ye.bind('<Return>', self.refresh)
+        self.ye.pack(side=LEFT,expand=YES,fill=X,padx=5)
 
     @staticmethod
     def valid_context():

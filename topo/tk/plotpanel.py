@@ -165,7 +165,7 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
         self.refresh()
 
 
-    def refresh(self):
+    def refresh(self,extra=None):
         """
         Main steps for generating plots in the Frame.  These functions
         must either be implemented, or overwritten.

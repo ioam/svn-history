@@ -38,8 +38,10 @@ class ProjectionPanel(CFSheetPlotPanel):
         pd = Message(self.params_frame1,text="Plotting Density:",aspect=1000)
         pd.pack(side=LEFT)
         self.balloon.bind(pd,'Number of units to plot per 1.0 distance in sheet coordinates')
-        Entry(self.params_frame1,
-              textvariable=self.density_str).pack(side=LEFT,expand=YES,fill=X,padx=2)
+        self.de = Entry(self.params_frame1,textvariable=self.density_str)
+        self.de.bind('<FocusOut>', self.refresh)
+        self.de.bind('<Return>', self.refresh)
+        self.de.pack(side=LEFT,expand=YES,fill=X,padx=2)
 
         self._add_projection_menu()
 
