@@ -56,12 +56,15 @@ def line(x, thickness, gaussian_width):
 # I think I have something wrong with gaussian falloffs for ring() and disk()
 # (c.f. line())
 
+# CEBHACKALERT:
+# I have used 'ellipse' in a confusing way. Change the variable and function names.
+
 def disk(x, y, width, height, gaussian_width):
     """
     Elliptical disk with Gaussian fall-off after the solid central region.
     """
-    disk_perimeter = ellipse(x,y,width/2.0,height/2.0)  
-    disk = greater_equal(dis_perimeter,0)
+    disk_perimeter = __ellipse(x,y,width/2.0,height/2.0)  
+    disk = greater_equal(disk_perimeter,0)
 
     sigmasq = 2.0*gaussian_width*gaussian_width
     falloff = __exp(-disk_perimeter*disk_perimeter, sigmasq)
@@ -73,7 +76,7 @@ def ring(x, y, width, height, thickness, gaussian_width):
     """
     Elliptical ring (annulus) with Gaussian fall-off after the solid ring-shaped region.
     """    
-    ellipse = ellipse(x,y,width/2.0,height/2.0)  
+    ellipse = __ellipse(x,y,width/2.0,height/2.0)  
 
     inner_perimeter = ellipse - thickness
     outer_perimeter = ellipse + thickness
@@ -82,12 +85,12 @@ def ring(x, y, width, height, thickness, gaussian_width):
 
     sigmasq = 2.0*gaussian_width*gaussian_width
     inner_falloff = __exp(-inner_perimeter*inner_perimeter, sigmasq)
-    outer_falloff = __exp(-outer_perimeter_perimeter*outer_perimeter, sigmasq)
+    outer_falloff = __exp(-outer_perimeter*outer_perimeter, sigmasq)
 
     return maximum(inner_falloff,maximum(outer_falloff,ring))
 
 
-def ellipse(x,y,a,b):
+def __ellipse(x,y,a,b):
     """
     Return the ellipse specified by (x/a)^2 + (y/b)^2 = 1.
     """
