@@ -27,7 +27,7 @@ def gaussian(x, y, width, height):
     """
     x_w = divide(x,width)
     y_h = divide(y,height)
-    return exp(-0.5*x_w*x_w + -0.5*y_h*y_h)
+    return exp(-x_w*x_w + -y_h*y_h)
 
 
 def gabor(x, y, width, height, frequency, phase):
@@ -47,7 +47,7 @@ def line(x, thickness, gaussian_width):
     distance_from_line = abs(x)
     gaussian_x_coord = distance_from_line - thickness/2.0
 
-    sigmasq = 2*gaussian_width*gaussian_width
+    sigmasq = gaussian_width*gaussian_width
     falloff = __exp(-gaussian_x_coord*gaussian_x_coord, sigmasq)
     
     return where(gaussian_x_coord<=0, 1.0, falloff)
@@ -66,7 +66,7 @@ def disk(x, y, width, height, gaussian_width):
     disk_perimeter = __ellipse(x,y,width/2.0,height/2.0)  
     disk = greater_equal(disk_perimeter,0)
 
-    sigmasq = 2.0*gaussian_width*gaussian_width
+    sigmasq = gaussian_width*gaussian_width
     falloff = __exp(-disk_perimeter*disk_perimeter, sigmasq)
 
     return maximum(disk, falloff)
@@ -83,7 +83,7 @@ def ring(x, y, width, height, thickness, gaussian_width):
 
     ring = bitwise_xor(greater_equal(inner_perimeter,0.0),greater_equal(outer_perimeter,0.0)) 
 
-    sigmasq = 2.0*gaussian_width*gaussian_width
+    sigmasq = gaussian_width*gaussian_width
     inner_falloff = __exp(-inner_perimeter*inner_perimeter, sigmasq)
     outer_falloff = __exp(-outer_perimeter*outer_perimeter, sigmasq)
 
