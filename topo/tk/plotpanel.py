@@ -61,9 +61,6 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
         plot_group_type: type of the PlotGroup associated with the panel
         
         """
-        
-        #assert isinstance(pengine,plotengine.PlotEngine) or pengine == None, \
-        #       'Variable pengine not PlotEngine object.'
 
         Frame.__init__(self,parent,config)
         topo.plotting.plot.TopoObject.__init__(self,**config)
