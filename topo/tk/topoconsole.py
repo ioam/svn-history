@@ -300,10 +300,11 @@ class TopoConsole(Frame):
 
     ## CEBHACKALERT:
     ## load_ and save_snapshot should be available as commands in general, so the pickling
-    ## will be moved out of here.
+    ## will be moved out of here. 
     ##
     ## - should save and load in the GUI shut all open windows (such as activity)?
     ## - save and load should be extended to offer choices about names
+
 
     def load_snapshot(self):
         """
@@ -332,6 +333,11 @@ class TopoConsole(Frame):
         """
         # should have an error check
         pickle.dump(active_sim(), open('save.p','w'))
+
+        # CEBHACKALERT:
+        # Protocol 2 is faster and results in smaller file sizes.
+        # I'll switch once we have LISSOM behaving realistically.
+        
         self.messageBar.message('state', 'Simulator saved')
         topo.tk.topo.tk.show_cmd_prompt()
     
