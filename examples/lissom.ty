@@ -132,8 +132,6 @@ s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
 # Then delete lissom.py's change_learning_rate() and change_bounds().
 
 
-V1.projections()['Afferent0'].learning_rate
-
 
 s.schedule_action(200, V1.change_bounds, "LateralExcitatory", BoundingBox(points=((-exc_rad*0.6/BaseN,-exc_rad*0.6/BaseN),(exc_rad*0.6/BaseN,exc_rad*0.6/BaseN))))
 
