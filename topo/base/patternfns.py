@@ -9,7 +9,7 @@ $Id$
 """
 
 from math import pi
-from Numeric import where,maximum,cos,sin,sqrt,less_equal,divide,ones,greater_equal,bitwise_xor
+from Numeric import where,maximum,cos,sin,sqrt,less_equal,divide,greater_equal,bitwise_xor
 from utils import exp
 
 # CEB:
@@ -60,11 +60,11 @@ def disk(x, y, width, height, gaussian_width):
     """
     Elliptical disk with Gaussian fall-off after the solid central region.
     """
-    ellipse = __ellipse(x,y,width/2.0,height/2.0)  
-    disk = greater_equal(ellipse,0)
+    disk_perimeter = ellipse(x,y,width/2.0,height/2.0)  
+    disk = greater_equal(dis_perimeter,0)
 
     sigmasq = 2.0*gaussian_width*gaussian_width
-    falloff = __exp(-ellipse*ellipse, sigmasq)
+    falloff = __exp(-disk_perimeter*disk_perimeter, sigmasq)
 
     return maximum(disk, falloff)
 
@@ -73,21 +73,21 @@ def ring(x, y, width, height, thickness, gaussian_width):
     """
     Elliptical ring (annulus) with Gaussian fall-off after the solid ring-shaped region.
     """    
-    ellipse = __ellipse(x,y,width/2.0,height/2.0)  
+    ellipse = ellipse(x,y,width/2.0,height/2.0)  
 
-    inner = ellipse - thickness
-    outer = ellipse + thickness
+    inner_perimeter = ellipse - thickness
+    outer_perimeter = ellipse + thickness
 
-    ring = bitwise_xor(greater_equal(inner,0.0),greater_equal(outer,0.0)) 
+    ring = bitwise_xor(greater_equal(inner_perimeter,0.0),greater_equal(outer_perimeter,0.0)) 
 
     sigmasq = 2.0*gaussian_width*gaussian_width
-    inner_falloff = __exp(-inner*inner, sigmasq)
-    outer_falloff = __exp(-outer*outer, sigmasq)
+    inner_falloff = __exp(-inner_perimeter*inner_perimeter, sigmasq)
+    outer_falloff = __exp(-outer_perimeter_perimeter*outer_perimeter, sigmasq)
 
     return maximum(inner_falloff,maximum(outer_falloff,ring))
 
 
-def __ellipse(x,y,a,b):
+def ellipse(x,y,a,b):
     """
     Return the ellipse specified by (x/a)^2 + (y/b)^2 = 1.
     """
