@@ -33,7 +33,7 @@ from topo.sheets.cfsom import CFSOM
 from topo.base.simulator import Simulator
 
 from topo.patterns import basic
-from topo.analysis.featuremap import FeatureMap, MeasureFeatureMap, _sinegrating_present
+from topo.analysis.featuremap import FeatureMap, MeasureFeatureMap
 
 
 class TestFeatureMap(unittest.TestCase):
