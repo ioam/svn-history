@@ -30,8 +30,6 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         self.y_str.set(0.0)
         self.displayed_x, self.displayed_y = 0, 0
 
-        self.panel_num = self.console.num_weights_windows
-
         self._add_xy_boxes()
         self.auto_refresh_checkbutton.invoke()
 
@@ -133,11 +131,12 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         display_labels().
         """
         new_title = 'Connection Fields of ' + self.region.get() + \
-                    ' unit (' + str(self.x) + ',' + str(self.y) + ')'
+                    ' unit (' + str(self.x) + ',' + str(self.y) + ') at time '\
+                    + str(self.pe.simulation.time())
         self.plot_group.configure(tag_text = new_title)
         super(UnitWeightsPanel,self).display_labels()
     
         
     def refresh_title(self):
-        self.parent.title("Unit Weights %d, %s (%0.3f,%0.3f)" %
-                          (self.panel_num,self.region.get(),self.displayed_x, self.displayed_y))
+        self.parent.title("Unit Weights  %s (%0.3f,%0.3f) time:%s" %
+                          (self.region.get(),self.displayed_x,self.displayed_y,self.pe.simulation.time()))

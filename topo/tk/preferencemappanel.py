@@ -23,6 +23,7 @@ from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
 import plotpanel
 import topo.base.registry
 
+
 ### We want to support any featuremap type defined in that file, and
 ### so import all of them here.
 from topo.analysis.featuremap import *
@@ -32,8 +33,7 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
     def __init__(self,parent,pengine,console,pgt_name,**config):
         plotpanel.PlotPanel.__init__(self,parent,pengine,console,pgt_name=pgt_name,**config)
 
-        self.panel_num = self.console.num_orientation_windows
-
+        # Plotgroup Template associated
         self.pgt = topo.base.registry.plotgroup_templates[pgt_name]
      
         # Name of the plotgroup to plot
@@ -80,12 +80,13 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
             
     def display_labels(self):
         """
-        Change the title of the grid group, then call PlotPanel's
-        display_labels().
+        Change the title of the grid group by refreshing the time simulator,
+        then call PlotPanel's display_labels().
         """
-        self.plot_group.configure(tag_text = self.mapname.get())
+        self.plot_group.configure(tag_text = self.mapname.get() + \
+                                  ' at time ' + str(self.pe.simulation.time()))
         super(PreferenceMapPanel,self).display_labels()
 
 
     def refresh_title(self):
-        self.parent.title(self.mapname.get() + " %d" % self.panel_num)
+        self.parent.title(self.mapname.get() + " time:%s" % (self.pe.simulation.time()))

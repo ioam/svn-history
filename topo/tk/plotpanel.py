@@ -9,7 +9,7 @@ $Id$
 """
 import Pmw, re, os, sys
 from Tkinter import Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
-     RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar
+     RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, StringVar
 import topo
 import topo.base.topoobject
 import topo.plotting.bitmap
@@ -65,11 +65,16 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
         Frame.__init__(self,parent,config)
         topo.plotting.plot.TopoObject.__init__(self,**config)
 
+        ### Usually the pgt_name is the plot_key by default,
+        ### but for inputparamspanel pgt_name = None and the plot_key is 'Preview'
+        ### passed by default when creating the class
         if pgt_name!=None:
             self.plot_key = pgt_name
         else:
             self.plot_key=plot_key
-        self.plotgroup_type = plotgroup_type
+
+            
+        self.plotgroup_type = plotgroup_type 
         self.pgt_name = pgt_name  #Plot Group Template name
 
         ### JABHACKALERT!
@@ -113,7 +118,8 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
         self.balloon = Pmw.Balloon(parent)
         self.canvases = []
 
-        self.panel_num = self.console.num_activity_windows
+        # I think we can get rid of that
+        #self.panel_num = self.console.num_activity_windows
 
         self.shared_control_frame = Frame(self)
         self.shared_control_frame.pack(side=TOP,expand=YES,fill=X)
@@ -203,7 +209,7 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
         Change the window title.  TopoConsole will call this on
         startup of window.  
         """
-        self.parent.title("%s %d" % (self.plot_key,self.panel_num))
+        self.parent.title("%s time:%s" % (self.plot_key,self.pe.simulation.time()))
 
 
     def do_plot_cmd(self):
@@ -391,6 +397,23 @@ class BasicPlotPanel(PlotPanel):
     
     $Id$
     """
+    
     def __init__(self,parent,pengine,console,plot_key,pgt_name='Activity',**config):
+        
         PlotPanel.__init__(self,parent,pengine,console,plot_key=plot_key,pgt_name=pgt_name,**config)
+        
+        self.pgt = registry.plotgroup_templates[pgt_name]
+     
+        # Name of the plotgroup to plot
+        self.mapname = StringVar()
+        self.mapname.set(self.pgt.name)
         self.refresh()
+        
+    def display_labels(self):
+        """
+        Change the title of the grid group by refreshing the simulator time
+        then call PlotPanel's display_labels().
+        """
+        self.plot_group.configure(tag_text = self.mapname.get()+ \
+                                  ' at time ' + str(self.pe.simulation.time()))
+        super(BasicPlotPanel,self).display_labels()

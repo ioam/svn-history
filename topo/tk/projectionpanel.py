@@ -23,7 +23,6 @@ class ProjectionPanel(CFSheetPlotPanel):
 
         self.MIN_PLOT_WIDTH = 1
         self.INITIAL_PLOT_WIDTH = 13
-        self.panel_num = self.console.num_weights_array_windows
 
         self.density_str = StringVar()
         self.density_str.set('10.0')
@@ -160,8 +159,8 @@ class ProjectionPanel(CFSheetPlotPanel):
 
 
     def refresh_title(self):
-        self.parent.title("Projection %d, (%s projection %s)" % (self.panel_num,self.region.get(),
-            self.weight_name.get()))
+        self.parent.title("Projection (%s projection %s) time:%s" % (self.region.get(),
+            self.weight_name.get(),self.pe.simulation.time()))
         
 
     def generate_plot_key(self):
@@ -232,7 +231,8 @@ class ProjectionPanel(CFSheetPlotPanel):
         if len(self.projections) > 0:
             src_name = self.projections[self.weight_name.get()].src.name
 
-            new_title = 'Projection ' + self.weight_name.get() + ' from ' + src_name + ' to ' + self.region.get()
+            new_title = 'Projection ' + self.weight_name.get() + ' from ' + src_name + ' to ' \
+                        + self.region.get() + ' at time ' + str(self.pe.simulation.time())
             self.plot_group.configure(tag_text = new_title)
         else:
             self.plot_group.configure(tag_text = 'No Projections')
