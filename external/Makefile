@@ -104,6 +104,7 @@ jpeg-clean:
 jpeg-uninstall:
 	rm -rf jpeg $(foreach f, ${JPEG_UNINSTALL}, ${PREFIX}/${f})
 
+
 ##############################################################
 # PIL
 #
@@ -124,6 +125,7 @@ pil-clean:
 pil-uninstall:
 	rm -rf pil $(foreach f, ${PIL_UNINSTALL}, ${PREFIX}/${f})
 
+
 ##############################################################
 # Numeric
 #
@@ -139,6 +141,8 @@ numeric-clean:
 	rm -rf ${NUMERIC} 
 numeric-uninstall:
 	rm -rf numeric $(foreach f, ${NUMERIC_UNINSTALL}, ${PREFIX}/${f})
+
+
 ##############################################################
 # MatPlotLib
 #
@@ -155,6 +159,8 @@ matplotlib-clean:
 	rm -rf ${MATPLOTLIB} 
 matplotlib-uninstall:
 	rm -rf matplotlib ${MATPLOTLIB} $(foreach f, ${MATPLOTLIB_UNINSTALL}, ${PREFIX}/${f})
+
+
 ##############################################################
 # PMW
 #
@@ -170,22 +176,6 @@ pmw-clean:
 	rm -rf ${PMW} 
 pmw-uninstall:
 	rm -rf pmw ${PREFIX}/${PMW_UNINSTALL}
-##############################################################
-# DISLIN
-#
-DISLIN = dislin-8.2
-DISLIN_UNINSTALL = lib/dislin
-
-dislin: ${DISLIN}.linux.tgz python
-	tar xzf ${DISLIN}.linux.tgz
-	mkdir -p ${PREFIX}/${DISLIN_UNINSTALL}
-	cd ${DISLIN}; env DISLIN=${PREFIX}/${DISLIN_UNINSTALL} ./INSTALL
-	touch dislin
-
-dislin-clean:
-	rm -rf ${DISLIN}
-dislin-uninstall:
-	rm -rf dislin ${DISLIN} ${PREFIX}/${DISLIN_UNINSTALL}
 
 
 ##############################################################
@@ -208,6 +198,7 @@ dislinpy-clean:
 
 dislinpy-uninstall: dislinpy-clean
 	rm -f dislinpy ${DISLIN_PYTHON_DIR}/dislinmodule.so
+
 
 ##############################################################
 # Scipy (weave)
@@ -246,6 +237,8 @@ fixedpoint-clean:
 	rm -rf ${FIXEDPT}
 fixedpoint-uninstall:
 	rm -rf fixedpoint ${FIXEDPT} ${FIXEDPT_UNINSTALL}/fixedpoint.*
+
+
 
 ##############################################################
 # pychecker

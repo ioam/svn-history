@@ -23,7 +23,6 @@ import testplotengine
 import testplotfilesaver
 import testsimulator
 import testpalette
-import testdislinplot
 import testcfsom
 import testpatterngenerator
 import testmatplotlib
