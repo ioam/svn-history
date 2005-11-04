@@ -31,7 +31,7 @@ class Hebbian(CFLearningFunction):
     def __init__(self,**params):
         super(Hebbian,self).__init__(**params)
 
-    def __call__(self, input_activity, output_activity, cfs, learning_rate, **params):
+    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
         len, len2 = input_activity.shape
 
@@ -110,7 +110,7 @@ class DivisiveHebbian(CFLearningFunction):
     def __init__(self,**params):
         super(DivisiveHebbian,self).__init__(**params)
 
-    def __call__(self, input_activity, output_activity, cfs, learning_rate, **params):
+    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
         len, len2 = input_activity.shape
 
@@ -193,7 +193,7 @@ class DivisiveHebbianP(CFLearningFunction):
     def __init__(self,**params):
         super(DivisiveHebbianP,self).__init__(**params)
 
-    def __call__(self, input_activity, output_activity, cfs, learning_rate, **params):
+    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         weight_ptrs = params['weight_ptrs']
         slice_ptrs = params['slice_ptrs']
         rows,cols = output_activity.shape

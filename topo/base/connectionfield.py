@@ -165,7 +165,7 @@ class CFResponseFunction(TopoObject):
     the arguments specified below, and must return a matrix the same
     size as the activity matrix supplied.
     """
-    def __call__(self,input_activity, activity, cfs, strength, **params):
+    def __call__(self, cfs, input_activity, activity, strength, **params):
         raise NotImplementedError
 
 
@@ -189,7 +189,7 @@ class GenericCFResponseFn(CFResponseFunction):
     def __init__(self,**params):
         super(GenericCFResponseFn,self).__init__(**params)
 
-    def __call__(self,input_activity, activity, cfs, strength):
+    def __call__(self, cfs, input_activity, activity, strength):
         rows,cols = activity.shape
         for r in xrange(rows):
             for c in xrange(cols):
@@ -212,7 +212,7 @@ class CFLearningFunction(TopoObject):
     Objects in this class must support being called as a function with
     the arguments specified below.
     """
-    def __call__(self, input_activity, output_activity, cfs, learning_rate, **params):
+    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         raise NotImplementedError
 
 
@@ -223,7 +223,7 @@ class IdentityCFLF(CFLearningFunction):
     def __init__(self,**params):
         super(IdentityCFLF,self).__init__(**params)
 
-    def __call__(self, input_activity, output_activity, cfs, learning_rate, **params):
+    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         pass
 
 
@@ -236,7 +236,7 @@ class GenericCFLF(CFLearningFunction):
     def __init__(self,**params):
         super(GenericCFLF,self).__init__(**params)
 
-    def __call__(self, input_activity, output_activity, cfs, learning_rate, **params):
+    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
         rows,cols = output_activity.shape
         for r in range(rows):
@@ -346,7 +346,7 @@ class CFSheet(ProjectionSheet):
                 inp = proj.input_buffer
                 cfs = proj.cfs
                 len, len2 = inp.shape
-                self.learning_fn(inp, self.activity, cfs, learning_rate)
+                self.learning_fn(cfs, inp, self.activity, learning_rate)
 
     
     ### JABALERT
