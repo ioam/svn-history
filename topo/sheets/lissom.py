@@ -103,5 +103,5 @@ class LISSOMPointer(LISSOM):
 
                 cfs = proj.cfs
                 len, len2 = inp.shape
-                self.learning_fn(inp, self.activity, rows, cols, len, cfs, alpha, weight_ptrs=proj.weight_ptrs, slice_ptrs=proj.slice_ptrs)
+                self.learning_fn(inp, self.activity, cfs, alpha, weight_ptrs=proj.weight_ptrs, slice_ptrs=proj.slice_ptrs)
 

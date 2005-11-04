@@ -75,7 +75,7 @@ class Projection(EPConnection):
         super(Projection,self).__init__(**params)
         self.activity = Numeric.array(self.dest.activity)
 
-    def activate(self,input_activity,rows,cols):
+    def activate(self,input_activity):
         raise NotImplementedError
 
 
@@ -181,11 +181,9 @@ class ProjectionSheet(Sheet):
         The sheet's own activity is not calculated until activite()
         is called.
         """
-        rows,cols = self.activity.shape
-
         for proj in self.in_projections[input_sheet.name]:
             if proj.dest_port == dest_port:
-                proj.activate(input_activity,rows,cols)
+                proj.activate(input_activity)
 		break
 
 

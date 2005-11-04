@@ -31,7 +31,10 @@ class Hebbian(CFLearningFunction):
     def __init__(self,**params):
         super(Hebbian,self).__init__(**params)
 
-    def __call__(self,input_activity, self_activity, rows, cols, len, cfs, alpha, **params):
+    def __call__(self, input_activity, self_activity, cfs, alpha, **params):
+        rows,cols = self_activity.shape
+        len, len2 = input_activity.shape
+
         hebbian_code = """
             float *wi, *wj;
             double *x, *inpi, *inpj;
@@ -107,7 +110,10 @@ class DivisiveHebbian(CFLearningFunction):
     def __init__(self,**params):
         super(DivisiveHebbian,self).__init__(**params)
 
-    def __call__(self,input_activity, self_activity, rows, cols, len, cfs, alpha, **params):
+    def __call__(self,input_activity, self_activity, cfs, alpha, **params):
+        rows,cols = self_activity.shape
+        len, len2 = input_activity.shape
+
         hebbian_div_norm_code = """
             float *wi, *wj;
             double *x, *inpi, *inpj;
@@ -165,7 +171,7 @@ class DivisiveHebbian(CFLearningFunction):
                 }
             }
         """
-
+        
         weave.inline(hebbian_div_norm_code, ['input_activity', 'self_activity','rows', 'cols', 'len', 'cfs', 'alpha'], extra_compile_args=['-O2 -fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
 
 
@@ -187,10 +193,11 @@ class DivisiveHebbianP(CFLearningFunction):
     def __init__(self,**params):
         super(DivisiveHebbianP,self).__init__(**params)
 
-    def __call__(self,input_activity, self_activity, rows, cols, len, cfs, alpha, **params):
-
+    def __call__(self,input_activity, self_activity, cfs, alpha, **params):
         weight_ptrs = params['weight_ptrs']
         slice_ptrs = params['slice_ptrs']
+        rows,cols = self_activity.shape
+        len, len2 = input_activity.shape
 
         hebbian_div_norm_code = """
             float *wi, *wj;

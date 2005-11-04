@@ -152,7 +152,6 @@ class ConnectionField(TopoObject):
 
 
 
-### JABALERT!  Is there a way to reduce the complexity of the argument list?
 class CFResponseFunction(TopoObject):
     """
     Map an input activity matrix into an output matrix using CFs.
@@ -166,7 +165,7 @@ class CFResponseFunction(TopoObject):
     the arguments specified below, and must return a matrix the same
     size as the activity matrix supplied.
     """
-    def __call__(self,input_activity, rows, cols, activity, cfs, strength, **params):
+    def __call__(self,input_activity, activity, cfs, strength, **params):
         raise NotImplementedError
 
 
@@ -190,7 +189,8 @@ class GenericCFResponseFn(CFResponseFunction):
     def __init__(self,**params):
         super(GenericCFResponseFn,self).__init__(**params)
 
-    def __call__(self,input_activity, rows, cols, activity, cfs, strength):
+    def __call__(self,input_activity, activity, cfs, strength):
+        rows,cols = activity.shape
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = cfs[r][c]
@@ -200,8 +200,6 @@ class GenericCFResponseFn(CFResponseFunction):
         activity *= strength
         
 
-### JABALERT!  Is there a way to reduce the complexity of the argument list?
-### E.g. the alpha should be made into a member variable.
 class CFLearningFunction(TopoObject):
     """
     Compute new CFs based on input and output activity values.
@@ -214,7 +212,7 @@ class CFLearningFunction(TopoObject):
     Objects in this class must support being called as a function with
     the arguments specified below.
     """
-    def __call__(self,input_activity, self_activity, rows, cols, len, cfs, alpha, **params):
+    def __call__(self,input_activity, self_activity, cfs, alpha, **params):
         raise NotImplementedError
 
 
@@ -225,7 +223,7 @@ class IdentityCFLF(CFLearningFunction):
     def __init__(self,**params):
         super(IdentityCFLF,self).__init__(**params)
 
-    def __call__(self, input_activity, self_activity, rows, cols, len, cfs, alpha):
+    def __call__(self, input_activity, self_activity, cfs, alpha, **params):
         pass
 
 
@@ -238,8 +236,9 @@ class GenericCFLF(CFLearningFunction):
     def __init__(self,**params):
         super(GenericCFLF,self).__init__(**params)
 
-    def __call__(self,input_activity, self_activity, rows, cols, len, cfs, alpha):
+    def __call__(self,input_activity, self_activity, cfs, alpha, **params):
         """Apply the specified single_cf_fn to every CF."""
+        rows,cols = self_activity.shape
         for r in range(rows):
             for c in range(cols):
                 cf = cfs[r][c]
@@ -254,7 +253,7 @@ class CFProjection(Projection):
 
     CFProjection computes its activity using a response_fn of type
     CFResponseFunction.  Any subclass has to implement the interface
-    activate(self,input_activity,rows,cols) that computes the response
+    activate(self,input_activity) that computes the response
     from the input and stores it in the activity array.
     """
 
@@ -305,7 +304,7 @@ class CFProjection(Projection):
         return UnitView((matrix_data,new_box),sheet_x,sheet_y,self,view_type='UnitView')
 
 
-    def activate(self,input_activity,rows,cols):
+    def activate(self,input_activity):
         raise NotImplementedError
 
 
@@ -347,7 +346,7 @@ class CFSheet(ProjectionSheet):
                 inp = proj.input_buffer
                 cfs = proj.cfs
                 len, len2 = inp.shape
-                self.learning_fn(inp, self.activity, rows, cols, len, cfs, alpha)
+                self.learning_fn(inp, self.activity, cfs, alpha)
 
     
     ### JABALERT

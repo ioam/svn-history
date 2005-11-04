@@ -50,10 +50,10 @@ class KernelProjection(CFProjection):
         self.set_cfs(cfs)
 
 
-    def activate(self,input_activity, rows, cols):
+    def activate(self,input_activity):
         """Activate using the specified response_fn and output_fn."""
         self.input_buffer = input_activity
-        self.response_fn(input_activity, rows, cols, self.activity, self.cfs, self.strength)
+        self.response_fn(input_activity, self.activity, self.cfs, self.strength)
         self.activity = self.output_fn(self.activity)
 
 
@@ -111,12 +111,11 @@ class KernelPointerProjection(KernelProjection):
         self.slice_ptrs = ones((x,y), Int)
         setup_sp(self.cfs, self.slice_ptrs, x, y)
         
-    def activate(self,input_activity, rows, cols):
+    def activate(self,input_activity):
         """Activate using the specified response_fn and output_fn."""
         self.input_buffer = input_activity
         # need to pass the pointer arrays into the response function
-        #self.response_fn(input_activity, rows, cols, self.activity, self.cfs, self.strength)
-        self.response_fn(input_activity, rows, cols, self.activity, self.cfs, self.strength, weight_ptrs=self.weight_ptrs, slice_ptrs=self.slice_ptrs)
+        self.response_fn(input_activity, self.activity, self.cfs, self.strength, weight_ptrs=self.weight_ptrs, slice_ptrs=self.slice_ptrs)
         self.activity = self.output_fn(self.activity)
 
 
