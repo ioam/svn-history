@@ -87,9 +87,9 @@ def mdot(m1,m2):
     return sum(a.flat)
 
 
-def hebbian(input_activity, unit_activity, weights, alpha):
+def hebbian(input_activity, unit_activity, weights, learning_rate):
     """Simple Hebbian learning for the weights of one single unit."""
-    weights += alpha * unit_activity * input_activity
+    weights += learning_rate * unit_activity * input_activity
 
 
 def divisive_normalization(weights):

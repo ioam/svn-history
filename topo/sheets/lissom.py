@@ -98,10 +98,10 @@ class LISSOMPointer(LISSOM):
         rows,cols = self.activity.shape
         for proj in chain(*self.in_projections.values()):
             if proj.input_buffer:
-                alpha = proj.learning_rate
+                learning_rate = proj.learning_rate
                 inp = proj.input_buffer
 
                 cfs = proj.cfs
                 len, len2 = inp.shape
-                self.learning_fn(inp, self.activity, cfs, alpha, weight_ptrs=proj.weight_ptrs, slice_ptrs=proj.slice_ptrs)
+                self.learning_fn(inp, self.activity, cfs, learning_rate, weight_ptrs=proj.weight_ptrs, slice_ptrs=proj.slice_ptrs)
 

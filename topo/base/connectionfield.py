@@ -212,7 +212,7 @@ class CFLearningFunction(TopoObject):
     Objects in this class must support being called as a function with
     the arguments specified below.
     """
-    def __call__(self,input_activity, self_activity, cfs, alpha, **params):
+    def __call__(self, input_activity, output_activity, cfs, learning_rate, **params):
         raise NotImplementedError
 
 
@@ -223,7 +223,7 @@ class IdentityCFLF(CFLearningFunction):
     def __init__(self,**params):
         super(IdentityCFLF,self).__init__(**params)
 
-    def __call__(self, input_activity, self_activity, cfs, alpha, **params):
+    def __call__(self, input_activity, output_activity, cfs, learning_rate, **params):
         pass
 
 
@@ -236,14 +236,14 @@ class GenericCFLF(CFLearningFunction):
     def __init__(self,**params):
         super(GenericCFLF,self).__init__(**params)
 
-    def __call__(self,input_activity, self_activity, cfs, alpha, **params):
+    def __call__(self, input_activity, output_activity, cfs, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
-        rows,cols = self_activity.shape
+        rows,cols = output_activity.shape
         for r in range(rows):
             for c in range(cols):
                 cf = cfs[r][c]
                 self.single_cf_fn(cf.get_input_matrix(input_activity),
-                                  self_activity[r,c], cf.weights, alpha)
+                                  output_activity[r,c], cf.weights, learning_rate)
                 cfs[r][c].weights=self.output_fn(cf.weights)
                 
 
@@ -342,11 +342,11 @@ class CFSheet(ProjectionSheet):
         rows,cols = self.activity.shape
         for proj in chain(*self.in_projections.values()):
             if proj.input_buffer:
-                alpha = proj.learning_rate
+                learning_rate = proj.learning_rate
                 inp = proj.input_buffer
                 cfs = proj.cfs
                 len, len2 = inp.shape
-                self.learning_fn(inp, self.activity, cfs, alpha)
+                self.learning_fn(inp, self.activity, cfs, learning_rate)
 
     
     ### JABALERT

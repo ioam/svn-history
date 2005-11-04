@@ -31,8 +31,8 @@ class Hebbian(CFLearningFunction):
     def __init__(self,**params):
         super(Hebbian,self).__init__(**params)
 
-    def __call__(self, input_activity, self_activity, cfs, alpha, **params):
-        rows,cols = self_activity.shape
+    def __call__(self, input_activity, output_activity, cfs, learning_rate, **params):
+        rows,cols = output_activity.shape
         len, len2 = input_activity.shape
 
         hebbian_code = """
@@ -47,13 +47,13 @@ class Hebbian(CFLearningFunction):
             double load, delta;
             double totald;
     
-            x = self_activity;
+            x = output_activity;
             for (r=0; r<rows; ++r) {
                 cfsr = PyList_GetItem(cfs,r);
                 for (l=0; l<cols; ++l) {
                     load = *x++;
                     if (load != 0) {
-                        load *= alpha;
+                        load *= learning_rate;
     
                         cf = PyList_GetItem(cfsr,l);
                         wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
@@ -83,7 +83,7 @@ class Hebbian(CFLearningFunction):
             }
         """
         
-        weave.inline(hebbian_code, ['input_activity', 'self_activity', 'rows', 'cols', 'len', 'cfs', 'alpha'], extra_compile_args=['-O2 -fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
+        weave.inline(hebbian_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'cfs', 'learning_rate'], extra_compile_args=['-O2 -fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
 
         # Apply output_fn to each CF
         # (skipped entirely for no-op case, as an optimization)
@@ -110,8 +110,8 @@ class DivisiveHebbian(CFLearningFunction):
     def __init__(self,**params):
         super(DivisiveHebbian,self).__init__(**params)
 
-    def __call__(self,input_activity, self_activity, cfs, alpha, **params):
-        rows,cols = self_activity.shape
+    def __call__(self, input_activity, output_activity, cfs, learning_rate, **params):
+        rows,cols = output_activity.shape
         len, len2 = input_activity.shape
 
         hebbian_div_norm_code = """
@@ -126,13 +126,13 @@ class DivisiveHebbian(CFLearningFunction):
             double load, delta;
             double totald;
 
-            x = self_activity;
+            x = output_activity;
             for (r=0; r<rows; ++r) {
                 cfsr = PyList_GetItem(cfs,r);
                 for (l=0; l<cols; ++l) {
                     load = *x++;
                     if (load != 0) {
-                        load *= alpha;
+                        load *= learning_rate;
 
                         cf = PyList_GetItem(cfsr,l);
                         wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
@@ -172,7 +172,7 @@ class DivisiveHebbian(CFLearningFunction):
             }
         """
         
-        weave.inline(hebbian_div_norm_code, ['input_activity', 'self_activity','rows', 'cols', 'len', 'cfs', 'alpha'], extra_compile_args=['-O2 -fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
+        weave.inline(hebbian_div_norm_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'learning_rate'], extra_compile_args=['-O2 -fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
 
 
 
@@ -193,10 +193,10 @@ class DivisiveHebbianP(CFLearningFunction):
     def __init__(self,**params):
         super(DivisiveHebbianP,self).__init__(**params)
 
-    def __call__(self,input_activity, self_activity, cfs, alpha, **params):
+    def __call__(self, input_activity, output_activity, cfs, learning_rate, **params):
         weight_ptrs = params['weight_ptrs']
         slice_ptrs = params['slice_ptrs']
-        rows,cols = self_activity.shape
+        rows,cols = output_activity.shape
         len, len2 = input_activity.shape
 
         hebbian_div_norm_code = """
@@ -210,12 +210,12 @@ class DivisiveHebbianP(CFLearningFunction):
             float **wip = (float **)weight_ptrs;
             int **sip = (int **)slice_ptrs;
     
-            x = self_activity;
+            x = output_activity;
             for (r=0; r<rows; ++r) {
                 for (l=0; l<cols; ++l) {
                     load = *x++;
                     if (load != 0) {
-                        load *= alpha;
+                        load *= learning_rate;
     
                         wi = *wip;
                         wj = wi;
@@ -263,6 +263,6 @@ class DivisiveHebbianP(CFLearningFunction):
             }
         """
         
-        weave.inline(hebbian_div_norm_code, ['input_activity', 'self_activity', 'rows', 'cols', 'len', 'alpha','weight_ptrs','slice_ptrs'], extra_compile_args=['-fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
+        weave.inline(hebbian_div_norm_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'learning_rate','weight_ptrs','slice_ptrs'], extra_compile_args=['-fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
 
 
