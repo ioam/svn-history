@@ -53,7 +53,7 @@ rf_radius_scale=6.0/rf_radius
 xsigma=6.0/rf_radius_scale
 ysigma=1.5/rf_radius_scale
 
-#scale_input=1.0
+scale_input=1.0
 retina_edge_buffer=0*(rf_radius+(BaseRN*area_scale/2))
 RN=BaseRN*area_scale+2*retina_edge_buffer
 
@@ -71,6 +71,8 @@ fixedpoint.DEFAULT_PRECISION=3
 # input generation params
 GeneratorSheet.density = RN
 GeneratorSheet.period = 1
+
+GaussianGenerator.scale = scale_input
 
 GaussianGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 GaussianGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
@@ -95,10 +97,10 @@ inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(
 
 s = topo.base.simulator.Simulator()
 
-retina = GeneratorSheet(input_generator=GaussianGenerator(),name='Retina')
+Retina = GeneratorSheet(input_generator=GaussianGenerator(),name='Retina')
 V1 = LISSOM(name='V1')
 
-s.connect(retina,V1, delay = FixedPoint("0.05"),
+s.connect(Retina,V1, delay = FixedPoint("0.05"),
           connection_type=KernelProjection,
           connection_params = dict(strength = 1.0, name='Afferent0',
                                    weights_bounds = afferent_weight_bounds, normalize = True, learning_rate=alpha_input))
