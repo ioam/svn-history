@@ -115,6 +115,50 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
 
         self.panel_num = self.console.num_activity_windows
 
+        self.shared_control_frame = Frame(self)
+        self.shared_control_frame.pack(side=TOP,expand=YES,fill=X)
+
+        # JAB: Because these three buttons are present in nearly every
+        # window, and aren't particularly important, we should
+        # probably use small icons for them instead of text.  That way
+        # they will form a visual group that users can typically
+        # ignore.  Of course, the icons will need to announce their
+        # names as help text if the mouse lingers over them, so that
+        # the user can figure them out the first time.
+        # 
+        # Refresh, Reduce, and Enlarge Buttons.
+        Button(self.shared_control_frame,text="Refresh",
+               command=self.refresh).pack(side=LEFT)
+        self.reduce_button = Button(self.shared_control_frame,text="Reduce",
+                                   state=DISABLED,
+                                   command=self.reduce)
+        self.reduce_button.pack(side=LEFT)
+        Button(self.shared_control_frame,text="Enlarge",
+               command=self.enlarge).pack(side=LEFT)        
+
+        # Default is to not have the window Auto-refresh, because some
+        # plots are very slow to generate (e.g. some preference map
+        # plots).  Call self.auto_refresh_checkbutton.invoke() to
+        # enable autorefresh in a subclassed constructor function.
+        self.auto_refresh = 0
+        self.auto_refresh_checkbutton = Checkbutton(self.shared_control_frame,
+                                                    text="Auto-refresh",
+                                                    command=self.toggle_auto_refresh)
+        self.auto_refresh_checkbutton.pack(side=LEFT)
+        self.auto_refresh_checkbutton.invoke()
+
+        # Normalization check button.
+        pgt = registry.plotgroup_templates[self.pgt_name]
+        if pgt:
+            ### JABALERT! Why is it checking the first template for this?            
+            self.normalize = pgt.plot_templates[0].channels.get('Normalize',False)
+            self.normalize_checkbutton = Checkbutton(self.shared_control_frame,
+                                                     text="Normalize",
+                                                     command=self.toggle_normalize)
+            if self.normalize:
+                self.normalize_checkbutton.select()
+            self.normalize_checkbutton.pack(side=LEFT)
+
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
         self.plot_group = Pmw.Group(self,tag_text=str(self.plot_key))
@@ -126,47 +170,8 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
         self.zoom_factor = self.min_zoom_factor = 1
         
         self.control_frame = Frame(self)
-        self.control_frame.pack(side=BOTTOM,expand=YES,fill=X)
+        self.control_frame.pack(side=TOP,expand=YES,fill=X)
 
-        # JAB: Because these three buttons are present in nearly every
-        # window, and aren't particularly important, we should
-        # probably use small icons for them instead of text.  That way
-        # they will form a visual group that users can typically
-        # ignore.  Of course, the icons will need to announce their
-        # names as help text if the mouse lingers over them, so that
-        # the user can figure them out the first time.
-        # 
-        # Refresh, Reduce, and Enlarge Buttons.
-        Button(self.control_frame,text="Refresh",
-               command=self.refresh).pack(side=LEFT)
-        self.reduce_button = Button(self.control_frame,text="Reduce",
-                                   state=DISABLED,
-                                   command=self.reduce)
-        self.reduce_button.pack(side=LEFT)
-        Button(self.control_frame,text="Enlarge",
-               command=self.enlarge).pack(side=LEFT)        
-
-        # Default is to not have the window Auto-refresh, because some
-        # plots are very slow to generate (e.g. some preference map
-        # plots).  Call self.auto_refresh_checkbutton.invoke() to
-        # enable autorefresh in a subclassed constructor function.
-        self.auto_refresh = 0
-        self.auto_refresh_checkbutton = Checkbutton(self.control_frame,
-                                                    text="Auto-refresh",
-                                                    command=self.toggle_auto_refresh)
-        self.auto_refresh_checkbutton.pack(side=LEFT)
-        self.auto_refresh_checkbutton.invoke()
-
-        # Normalization check button.
-        pgt = registry.plotgroup_templates[self.pgt_name]
-        if pgt:
-            self.normalize = pgt.plot_templates[0].channels.get('Normalize',False)
-            self.normalize_checkbutton = Checkbutton(self.control_frame,
-                                                     text="Normalize",
-                                                     command=self.toggle_normalize)
-            if self.normalize:
-                self.normalize_checkbutton.select()
-            self.normalize_checkbutton.pack(side=LEFT)
         # self.refresh()
 
 
