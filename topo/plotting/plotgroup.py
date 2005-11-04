@@ -160,6 +160,7 @@ class PlotGroup(TopoObject):
                                          g,
                                          b)
                 win.view_info = each.view_info
+               
                 self.bitmaps.append(win)
         return self.bitmaps
     
@@ -219,7 +220,6 @@ class BasicPlotGroup(PlotGroup):
     def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):
         super(BasicPlotGroup,self).__init__(plot_key,sheet_filter_lam,plot_list,
                                             **params)
-
 
 class UnitWeightsPlotGroup(PlotGroup):
     """
@@ -330,15 +330,15 @@ pgt = PlotGroupTemplate([('Projection',
                         name='Projection',
                         command='pass')
 topo.base.registry.plotgroup_templates[pgt.name] = pgt
-pgt = PlotGroupTemplate([('OrientationPreference',
+pgt = PlotGroupTemplate([('Orientation Preference',
                           PlotTemplate({'Strength'   : None,
                                         'Hue'        : 'OrientationPreference',
                                         'Confidence' : None})),
-                         ('OrientationPreferenceAndSelectivity',
+                         ('Orientation Preference&Selectivity',
                           PlotTemplate({'Strength'   : None,
                                         'Hue'        : 'OrientationPreference',
                                         'Confidence' : 'OrientationSelectivity'})),
-                         ('OrientationSelectivity',
+                         ('Orientation Selectivity',
                           PlotTemplate({'Strength'   : 'OrientationSelectivity',
                                         'Hue'        : None,
                                         'Confidence' : None}))],
