@@ -104,13 +104,8 @@ class SimulatorEvent:
         self.dest = dest
         self.src_port = src_port
         self.dest_port = dest_port
-        self.data = data
+        self.data = deepcopy(data)
         self.fn = fn
-
-    def __copy__(self):
-        new_copy = SimulatorEvent(self.time,self.src,self.dest, \
-                   self.src_port,self.dest_port,deepcopy(self.data))
-        return new_copy
 
 
 # Simulator stores its events in a linear-time priority queue (i.e a
@@ -288,8 +283,7 @@ class Simulator(TopoObject):
         of the scheduler includes a copy of all of the currently
         scheduled events.
         """
-        self._events_stack.append((self._time,self.events))
-        self.events = [copy(event) for event in self.events]
+        self._events_stack.append((self._time,[copy(event) for event in self.events]))
 
     def state_pop(self):
         """
