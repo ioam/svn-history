@@ -26,21 +26,14 @@ class LISSOM(CFSheet):
     continuous_learning = BooleanParameter(default=False)
 
     presleep_count = 0
+    new_iteration = True
 
     tsettle=8
 
     def input_event(self,src,src_port,dest_port,data):
-        ### JABHACKALERT!  What is this?! We can't have any such
-        ### calculation based on the name of the src, because the user
-        ### can name the input sheet anything he likes!  What will
-        ### happen when there are multiple Retinas, or an LGN, or
-        ### hierarchical maps, or anything else like that?!?!  The
-        ### resetting needs to be done based on the tsettle value, or
-        ### something else that we can actually trust; we can't trust
-        ### the name of the input sheet in any way.
-        
         # On a new afferent input, clear the activity
-        if src.name == 'Retina':
+        if self.new_iteration:
+            self.new_iteration = False
             self.activity *= 0.0
             for name in self.in_projections:
                 for proj in self.in_projections[name]:
@@ -60,6 +53,7 @@ class LISSOM(CFSheet):
 
 	if self.presleep_count == self.tsettle+2: #end of an iteration
             iteration_done = True
+            self.new_iteration = True # used by input_event when it is called
 
         if self.new_input: 
             self.new_input = False
