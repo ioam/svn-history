@@ -213,7 +213,8 @@ class Plot(TopoObject):
             if isinstance(each,SheetView):
                 self.channel_views.append(each)
                 self.view_info = each.view_info
-
+                
+                
             # Case 2: Entry is a string, or tuple that will be used as a
             #         key in the Sheet dictionary.
             elif isinstance(each,str) or isinstance(each,tuple):
@@ -232,8 +233,17 @@ class Plot(TopoObject):
                         self.channel_views.append(None)
                     else:
                         self.channel_views.append(sv)
-                        self.view_info = sv.view_info
+                        #self.view_info = sv.view_info
 
+                        ### JCALERT ! This is an hack so that the problem of displaying the right
+                        ### name under each map in activity and orientation map panel is solved
+                        ### It has to be checked than it will work in all cases
+                        ### or more restructuring of the code is required
+                        ### (i.e. handling of the SheetView and/or PlotGroupTemplate by PlotGroup/PlotEngine/Plot)
+                        self.view_info['src_name']= self.source.name + '\n' + self.name
+                        self.view_info['view_type']= self.name
+                        print self.view_info
+                        
             # Case 3: Channel entry is None.  Pass along.
             elif each == None:
                 self.channel_views.append(each)
