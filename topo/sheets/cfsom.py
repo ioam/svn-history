@@ -11,13 +11,10 @@ from topo.base.parameter import Parameter
 from Numeric import argmax,exp,floor
 from topo.base.connectionfield import CFSheet
 
-
+### JABALERT!  This function should be removed, replacing it
+### with the one from patternfns.py.
 def gaussian(dist,radius):
     return exp( - dist/radius)
-
-def decay(time,half_life):
-    return 0.5**(time/float(half_life))
-
 
 
 class CFSOM(CFSheet):
@@ -44,15 +41,22 @@ class CFSOM(CFSheet):
     def __init__(self,**params):
         super(CFSOM,self).__init__(**params)
         self.half_life = self.learning_length/8                      
-    def alpha(self):
-        return self.alpha_0 * decay(float(self.simulator.time()),self.half_life)
-    def radius(self):
-        return self.radius_0 * decay(float(self.simulator.time()),self.half_life)
 
+    def decay(self, time, half_life):
+        return 0.5**(time/float(half_life))
+
+    def alpha(self):
+        return self.alpha_0 * self.decay(float(self.simulator.time()),self.half_life)
+
+    def radius(self):
+        return self.radius_0 * self.decay(float(self.simulator.time()),self.half_life)
 
     ### JABHACKALERT!
     ###
-    ### Would it make sense to move any of this to learningfns/?  If not, document why not.
+    ### This function should be reimplemented like other CFSheet learning
+    ### rules, i.e. to do most of the work in the Projection so that
+    ### different Projection types can be combined.  Thus most of this
+    ### is likely to move to learningfns/.
     def learn(self):
 
         rows,cols = self.activity.shape
@@ -81,6 +85,7 @@ class CFSOM(CFSheet):
                             cf.weights.savespace(1)
                 
                             cf.weights += rate * (X - cf.weights)
+
     def winner(self):
         return argmax(self.activity.flat)
 
