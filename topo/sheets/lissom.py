@@ -53,6 +53,7 @@ class LISSOM(CFSheet):
 
 	if self.presleep_count == self.tsettle+2: #end of an iteration
             iteration_done = True
+            self.presleep_count = 0
             self.new_iteration = True # used by input_event when it is called
 
         if self.new_input: 
@@ -67,7 +68,6 @@ class LISSOM(CFSheet):
                     self.learn()
                 else:
                     if iteration_done:
-                        self.presleep_count = 0
                         self.learn()
                    
 
