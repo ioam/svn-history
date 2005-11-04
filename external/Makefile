@@ -1,11 +1,11 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-all: python jpeg pil numeric pmw matplotlib dislin  dislinpy weave fixedpoint pychecker common pylint
+all: python jpeg pil numeric pmw matplotlib weave fixedpoint pychecker common pylint
 
-clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean matplotlib-clean dislin-clean dislinpy-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean
+clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall dislin-uninstall dislinpy-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall
 
 ##############################################################
 # Python
@@ -176,28 +176,6 @@ pmw-clean:
 	rm -rf ${PMW} 
 pmw-uninstall:
 	rm -rf pmw ${PREFIX}/${PMW_UNINSTALL}
-
-
-##############################################################
-# Dislin/Pyton interface
-# Modified from the sample make script in ${DISLIN}/python
-#
-DISLIN_PYTHON_DIR = ${PREFIX}${DISLIN_UNINSTALL}/python
-DISLIN_PYTHON_SRC = ${DISLIN}.python.tar.gz
-DISLINPY_BUILD =${CC} -c -O -I${PREFIX}/${PYTHON_INC} -I${PREFIX}/${PYTHON_CONF} dislinmodule.c
-DISLINPY_LINK  = ${CC} -shared -Wl,-soname,dislinmodule.so -o dislinmodule.so *.o -L${PREFIX}/${DISLIN_UNINSTALL} -ldislnc
-
-dislinpy: dislin 
-	cd ${DISLIN_PYTHON_DIR}; tar xzf ${DISLIN_PYTHON_SRC}
-	cd ${DISLIN_PYTHON_DIR}; ${DISLINPY_BUILD}
-	cd ${DISLIN_PYTHON_DIR}; ${DISLINPY_LINK}
-	touch dislinpy
-
-dislinpy-clean:
-	cd ${DISLIN_PYTHON_DIR}; rm -f make_py README.PY dislin.h dislinmodule.{h,c,o}
-
-dislinpy-uninstall: dislinpy-clean
-	rm -f dislinpy ${DISLIN_PYTHON_DIR}/dislinmodule.so
 
 
 ##############################################################
