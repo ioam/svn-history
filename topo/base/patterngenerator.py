@@ -83,7 +83,7 @@ class ImageGenerator(Sheet):
                                  (image.size[1],image.size[0]))
 
 	self.verbose("Initialized %s activity from %s" % (NxN(self.activity.shape),self.filename))
-        max_val = float(max(max(self.activity)))
+        max_val = float(max(self.activity.flat)))
         self.activity = self.activity / max_val
 
 
