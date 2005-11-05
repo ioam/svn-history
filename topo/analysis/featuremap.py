@@ -7,6 +7,7 @@ $Id$
 # CEB,JBFC
 
 # To do:
+# - this file is difficult to understand!
 # - remove temporary testing code
 # - give the variables better names!
 # - get rid of non-used import statement
@@ -57,10 +58,10 @@ class SineGratingPresenter(object):
 
 
 
-def measure_or_pref(sim=None,num_phase=4,num_orientation=4,frequencies=[2.4],
+def measure_or_pref(sim=None,num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,
                     user_function_class=SineGratingPresenter,
-                    apply_output_fn=False, duration=1.0):
+                    apply_output_fn=False, duration=0.06):
     """Measure orientation maps, using a sine grating by default."""
     
     if not sim:
