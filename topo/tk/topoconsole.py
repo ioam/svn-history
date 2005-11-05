@@ -19,10 +19,14 @@ import topo.base.registry
 import topo.plotting.plotengine
 import topo.base.topoobject
 
-from topo.base.registry import set_active_sim, active_sim
-import pickle
+from topo.base.registry import active_sim
+import topo.commands.basic
 
-KNOWN_FILETYPES = [('Python Files','*.py'),('Topographica Files','*.ty'),('All Files','*')]
+
+SCRIPT_FILETYPES = [('Topographica scripts','*.ty'),('Python scripts','*.py'),('All files','*')]
+
+SAVED_FILE_EXTENSION = '.typ'
+SAVED_FILETYPES = [('Topographica saved networks','*'+SAVED_FILE_EXTENSION),('All files','*')]
 
 
 class PlotsMenuEntry(topo.base.topoobject.TopoObject):
@@ -289,7 +293,7 @@ class TopoConsole(Frame):
         Load a script file from disk and evaluate it.  The file is evaluated
         from within the globals() namespace.
         """
-        self.loaded_script = tkFileDialog.askopenfilename(filetypes=KNOWN_FILETYPES)
+        self.loaded_script = tkFileDialog.askopenfilename(filetypes=SCRIPT_FILETYPES)
         if self.loaded_script in ('',(),None):
             self.loaded_script = None
             self.messageBar.message('state', 'Load canceled')
@@ -302,47 +306,45 @@ class TopoConsole(Frame):
         topo.tk.topo.tk.show_cmd_prompt()
 
 
-    ## CEBHACKALERT:
-    ## load_ and save_snapshot should be available as commands in general, so the pickling
-    ## will be moved out of here. 
-    ##
-    ## - should save and load in the GUI shut all open windows (such as activity)?
-    ## - save and load should be extended to offer choices about names
-
-
+    # CEBHACKALERT:
+    # save_ and load_snapshot() and load_network() ought to close open windows such
+    # as Activity.
+    
     def load_snapshot(self):
         """
-        Returns a network to the state of the previously saved snapshot.
+        Return the current network to the state of the chosen snapshot.
 
-        Only works if the snapshot corresponds to the network that
-        originally exists.
+        See topo.commands.basic.load_snapshot().
         """
-        # should have an error check that is more than just checking the file exists!
-        try:
-            open('save.p','r')
-        except IOError:
-            self.messageBar.message('state', 'No snapshot available')
-            return None
+        snapshot_name = tkFileDialog.askopenfilename(filetypes=SAVED_FILETYPES)
 
-        self.exec_cmd("from topo.base.registry import set_active_sim; import pickle; set_active_sim(pickle.load(open('save.p')))")  # does it need to be in global namespace?
-        self.messageBar.message('state', 'Loaded snapshot')
+        if snapshot_name in ('',(),None):
+            self.messageBar.message('state','No snapshot loaded.')
+        else:
+            topo.commands.basic.load_snapshot(snapshot_name)
+            self.messageBar.message('state', 'Loaded snapshot ' + snapshot_name)
+        
         topo.tk.topo.tk.show_cmd_prompt()
 
 
     def save_snapshot(self):
         """
-        Pickles the network to 'save.p'.
+        Save a snapshot of the current network's state.
 
-        Only one snapshot can be used, currently 'save.p'.
+        See topo.commands.basic.save_snapshot().
+        save_snapshot() here adds the file extension  if not already present.
         """
-        # should have an error check
-        pickle.dump(active_sim(), open('save.p','w'))
+        snapshot_name = tkFileDialog.asksaveasfilename(filetypes=SAVED_FILETYPES)
 
-        # CEBHACKALERT:
-        # Protocol 2 is faster and results in smaller file sizes.
-        # I'll switch once we have LISSOM behaving realistically.
-        
-        self.messageBar.message('state', 'Simulator saved')
+        if snapshot_name in ('',(),None):
+            self.messageBar.message('state','No snapshot saved.')
+        else:
+            if not snapshot_name.endswith('.typ'):
+                snapshot_name = snapshot_name + SAVED_FILE_EXTENSION
+                
+            topo.commands.basic.save_snapshot(snapshot_name)
+            self.messageBar.message('state', 'Snapshot saved to ' + snapshot_name)
+
         topo.tk.topo.tk.show_cmd_prompt()
     
                 

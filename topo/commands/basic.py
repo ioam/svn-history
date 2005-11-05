@@ -9,6 +9,7 @@ import topo.base.simulator
 import topo.base.registry
 from topo.sheets.generatorsheet import GeneratorSheet
 
+import pickle
 
 ### JABALERT!  We're likely to have a lot of commands like this that
 ### need to work on the active simulator.  We should figure out a way
@@ -117,3 +118,38 @@ def pattern_present(inputs=None,duration=1.0,sim=None,learning=False,overwrite_p
 
     else:
         TopoObject().warning('No active Simulator.')
+    
+
+def load_snapshot(snapshot_name):
+    """
+    Return the current network to the state of the specified snapshot.
+
+    snapshot_name is the file name string.
+
+    The specified snapshot should correspond to the network
+    structure currently loaded, e.g. a snapshot saved from the
+    lissom_or.ty example should be loaded only if lissom_or.ty has
+    itself first been run. Otherwise, the loaded snapshot is likely
+    to have incorrect behaviour.
+    """
+    # CEBHACKALERT:
+    # Should there be a check that the right kind of network has
+    # been loaded? If so, add it and change docstring above.
+    saved_sim = pickle.load(open(snapshot_name))         
+    topo.base.registry.set_active_sim(saved_sim)
+
+
+def save_snapshot(snapshot_name):
+    """
+    Save a snapshot of the current network's state.
+
+    snapshot_name is the file name string.
+
+    Uses Python's 'pickle' module, so subject to the same limitations.
+    """
+    # CEBHACKALERT:
+    # Protocol 2 is faster and results in smaller file sizes.
+    # I'll switch once we have the tutorial working.
+    pickle.dump(topo.base.registry.active_sim(), open(snapshot_name,'w'))
+
+
