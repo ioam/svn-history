@@ -1,4 +1,7 @@
 """
+Simple example of defining a hierarchy of visual areas; does not 
+necessarily do anything useful.
+
 $Id$
 """
 
@@ -43,13 +46,26 @@ KernelProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(p
 
 s = Simulator()
 
-Retina = GeneratorSheet(input_generator=LineGenerator(),name='Retina')
-Retina2 = GeneratorSheet(input_generator=LineGenerator(),name='Retina2')
+# Sheets
+LeftRetina = GeneratorSheet(input_generator=LineGenerator(),name='LeftRetina')
+RightRetina = GeneratorSheet(input_generator=LineGenerator(),name='RightRetina')
 V1 = CFSOM(name='V1')
 V2 = CFSOM(name='V2')
+V3 = CFSOM(name='V3')
 
-s.connect(Retina,V1,delay=0.5,connection_type=KernelProjection,connection_params={'name':'R1toV1'})
-s.connect(Retina,V2,delay=0.5,connection_type=KernelProjection,connection_params={'name':'R1toV2'})
-s.connect(Retina2,V2,delay=0.5,connection_type=KernelProjection,connection_params={'name':'R2toV2'})
+# Projections to V1
+s.connect(LeftRetina,V1,delay=0.5,connection_type=KernelProjection,connection_params={'name':'AfferentLeft'})
+s.connect(RightRetina,V1,delay=0.5,connection_type=KernelProjection,connection_params={'name':'AfferentRight'})
+#s.connect(V2,V1,delay=0.5,connection_type=KernelProjection,connection_params={'name':'FeedbackFromV2'})
+
+
+# Projections to V2
+s.connect(LeftRetina,V2,delay=0.5,connection_type=KernelProjection,connection_params={'name':'AfferentLeft'})
+s.connect(RightRetina,V2,delay=0.5,connection_type=KernelProjection,connection_params={'name':'AfferentRight'})
+s.connect(V1,V2,delay=0.5,connection_type=KernelProjection,connection_params={'name':'AfferentV1'})
+s.connect(V3,V2,delay=0.5,connection_type=KernelProjection,connection_params={'name':'FeedbackFromV3'})
+
+# Projections to V3
+s.connect(V2,V3,delay=0.5,connection_type=KernelProjection,connection_params={'name':'Afferent'})
 
 s.run(1)
