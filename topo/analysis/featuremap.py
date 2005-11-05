@@ -21,9 +21,6 @@ from topo.base.utils import cross_product, frange
 from topo.base.sheetview import SheetView
 from math import pi
 
-# this is deprecated - find new function
-from string import capitalize
-
 ## temporary ...? ##
 from topo.patterns.basic import GaussianGenerator, SineGratingGenerator
 from topo.commands.basic import pattern_present, restore_input_generators, save_input_generators
@@ -274,17 +271,22 @@ class MeasureFeatureMap(TopoObject):
             bounding_box = sheet.bounds
             
             for feature in self.__featuremaps[sheet].keys():
+
+                
+                # CEBHACKALERT?
+                # Whatever I change the name strings below to, the GUI shows up with the same names even
+                # though the changes are reflected in the Sheet's sheet_view_dict etc.
                 
                 norm_factor = self.__featuremaps[sheet][feature].distribution_matrix[0,0].axis_range
                 preference_map = SheetView(((self.__featuremaps[sheet][feature].preference())/norm_factor,
-                                             bounding_box), sheet.name + "_" + capitalize(feature)+'Preference')
-                sheet.add_sheet_view(capitalize(feature)+'Preference', preference_map)
+                                             bounding_box), sheet.name + "_" + feature.capitalize()+'Preference')
+                sheet.add_sheet_view(feature.capitalize()+'Preference', preference_map)
 
                 # note the temporary multiplication by 17
                 # (just because I remember JAB saying it was something like that in LISSOM)
                 selectivity_map = SheetView((17*self.__featuremaps[sheet][feature].selectivity(),
-                                              bounding_box), sheet.name + "_" + capitalize(feature)+'Selectivity')
-                sheet.add_sheet_view(capitalize(feature)+'Selectivity', selectivity_map)
+                                              bounding_box), sheet.name + "_" + feature.capitalize()+'Selectivity')
+                sheet.add_sheet_view(feature.capitalize()+'Selectivity', selectivity_map)
 
 
 
