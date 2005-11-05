@@ -123,7 +123,7 @@ includes much useful code, including a GUI versions of SOM-based and
 LISSOM-based orientation map networks.  To start this code, go to your
 topographica/ directory, and type e.g.:
 
-  ./topographica -g examples/cfsom_example.py
+  ./topographica -g examples/cfsom_or.ty
 
 You should see a window appear that has similar options available as
 the one in the LISSOM tutorial at:
