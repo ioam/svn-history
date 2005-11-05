@@ -291,8 +291,8 @@ class Plot(TopoObject):
                 h=zero
                 c=zero
 
-            if self.normalize and max(max(s)) > 0:
-                s = divide(s,float(max(max(s))))
+            if self.normalize and max(s.flat) > 0:
+                s = divide(s,float(max(s.flat)))
 
             hue=h
             sat=c
@@ -325,8 +325,9 @@ class Plot(TopoObject):
                 self.warning('More than one channel requested for ' + \
                              'single-channel colormap')
             if single_map:
-                if self.normalize and max(max(single_map[0])) > 0:
-                    single_map[0] = single_map[0] / max(max(single_map[0]))
+                max_map = max(single_map[0].flat)
+                if self.normalize and max_map > 0:
+                    single_map[0] = single_map[0] / max_map
                 self.matrices = (single_map[0], single_map[0], single_map[0])
 
         elif self.plot_type == RGB:

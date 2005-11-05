@@ -275,10 +275,10 @@ class RGBMap(Bitmap):
         if max(rMapArray.flat) > 1.0:
             self.warning('RGBMap rMapArray not normalized to 1.  Normalizing.  Max:' + str(max(rMapArray.flat)))
             rMapArray = Numeric.divide(rMapArray,max(rMapArray.flat))
-        if max(max(gMapArray)) > 1.0:
+        if max(gMapArray.flat) > 1.0:
             self.warning('RGBMap gMapArray not normalized to 1.  Normalizing.  Max:' + str(max(gMapArray.flat)))
             gMapArray = Numeric.divide(gMapArray,max(gMapArray.flat))
-        if max(max(bMapArray)) > 1.0:
+        if max(bMapArray.flat) > 1.0:
             self.warning('RGBMap bMapArray not normalized to 1.  Normalizing.  Max:' + str(max(bMapArray.flat)))
             bMapArray = Numeric.divide(bMapArray,max(bMapArray.flat))
 
