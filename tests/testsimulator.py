@@ -8,17 +8,16 @@ from topo.eps.basic import *
 class TestSimulator(unittest.TestCase):
     def test_event_copy(self):
         """
-        Test to make sure a copy of a SimulatorEvent works, which is pointers to
-        all the sheets, but a deepcopy of the data.  The data is probably
-        an array, but it's not required.
+        Test to make sure that SimulatorEvent copies the underlying data
+        on construction.
         """
         s = Simulator(step_mode = 1)
         data = array([4,3])
         se = SimulatorEvent(1,2,3,4,5,data)
+        se.data[0] = 5
+        assert data[0] != se.data[0], 'Matrices should be different'
         se2 = copy(se)
         assert se != se2, 'Objects are the same'
-        se2.data[0] = 5
-        assert se.data[0] != se2.data[0], 'Matrices should be different'
 
     def test_state_stack(self):
         s = Simulator(step_mode = 1)
