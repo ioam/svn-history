@@ -1,5 +1,5 @@
 """
-FeatureMap class, MeasureFeatureMap class and associated function (e.g measure_or_pref)
+FeatureMap and associated functions and classes.
 
 $Id$
 """
@@ -30,10 +30,8 @@ from topo.base.registry import get_console
 import topo.tk.topoconsole 
 
 
-# Intermediate user function that is passed as a parameter for measure_map in MeasureFeatureMap.
-# It is used in measure_or_pref.
 class SineGratingPresenter(object):
-    """Function object for presenting sine gratings."""
+    """Function object for presenting sine gratings, for use with e.g. measure_or_pref."""
     
     def __init__(self,sim=None,apply_output_fn=True,duration=1.0):
         self.sim=sim

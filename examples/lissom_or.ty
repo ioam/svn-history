@@ -1,17 +1,19 @@
 """
-Example of a LISSOM simulation set up to match the C++ lissom
-simulator as closely as possible.
+Example of a LISSOM-based orientation map.
+
+This file is much more complex than necessary, because it is set up to
+match the C++ version of the LISSOM simulator as closely as possible.
+Most of the variables below are just temporary variables designed to
+match those in the other simulator.  Eventually, this file will be
+simplified to have only the variables needed for Topographica.
 
 $Id$
 """
 
-###############################################################################
-#                                                                             #
-# To use a faster implementation (that uses memory pointers to access data    #
-# structures instead of Python/C API), change all "LISSOM" to "LISSOMPointer" #
-# and "KernelProjection" to "KernelPointerProjection" in this file.           #
-#                                                                             #
-###############################################################################
+# To use a faster but more complex implementation (using memory
+# pointers to access data structures instead of the Python/C API),
+# change all instances of "LISSOM" to "LISSOMPointer", and
+# "KernelProjection" to "KernelPointerProjection" in this file.
 
 import random
 import fixedpoint
@@ -19,8 +21,7 @@ import fixedpoint
 
 from math import pi, sqrt
 from itertools import chain
-from fixedpoint import FixedPoint  # Should probably bring this into Simulator namespace
-
+from fixedpoint import FixedPoint
 
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
@@ -31,9 +32,8 @@ from topo.base.parameter import DynamicNumber
 
 
 ###########################################
-# Set parameters
+# Temporary variables designed to match the C++ version of LISSOM
 
-# Temporary variables designed to match the C++ version of lissom
 BaseN=72.0
 BaseRN=24.0
 area_scale=1.0
@@ -65,6 +65,10 @@ alpha_input=0.007*acs
 alpha_exc=0.002*ecs
 alpha_inh=0.00025*ics
 
+
+###########################################
+# Set parameters
+
 # Number of decimal places for simulator time
 fixedpoint.DEFAULT_PRECISION=3
 
@@ -73,20 +77,17 @@ GeneratorSheet.density = RN
 GeneratorSheet.period = 1
 
 GaussianGenerator.scale = scale_input
-
 GaussianGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 GaussianGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-
 GaussianGenerator.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
 
-# LISSOM used a definition of exp(-(x/s)^2) for a Gaussian. Topographica uses the conventional
-# exp(-0.5(x/s)^2), so the height and width must be adjusted to match LISSOM.
+# Corrects for differences between C++ and Topographica definition of Gaussian.
 GaussianGenerator.width = xsigma/RN/sqrt(2)
 GaussianGenerator.height = ysigma/RN/sqrt(2)
 GaussianGenerator.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 
 
-# lissom parameters
+# LISSOM parameters
 LISSOM.density = BaseN
 
 # Connection parameters
@@ -94,6 +95,7 @@ afferent_weight_bounds   = BoundingBox(points=((-rf_radius/RN,-rf_radius/RN),(rf
 excitatory_weight_bounds = BoundingBox(points=((-exc_rad/BaseN,-exc_rad/BaseN),(exc_rad/BaseN,exc_rad/BaseN)))
 inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(inh_rad/BaseN,inh_rad/BaseN)))
 
+# Specify weight initialization
 #KernelProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 #KernelProjection.weights_generator = ConstantGenerator()
 
@@ -132,35 +134,33 @@ s.schedule_action(1000,V1.projections()['LateralExcitatory'].change_bounds, Boun
 s.schedule_action(2000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-2.0/BaseN,-2.0/BaseN),(2.0/BaseN,2.0/BaseN))))
 
 
+# Schedule action requires a function, so we create a temporary one
 def set_learning_rate(projection_name, rate):
-    """
-    Set the learning rate on the named projection (of V1).
-    (Exists because Simulator.schedule_action() schedules function calls.)
-    """
+    """Set the learning rate on the named projection of V1."""
     V1.projections()[projection_name].learning_rate=rate
 
 
-s.schedule_action(500, set_learning_rate, "Afferent0", 0.005*acs)
-s.schedule_action(2000, set_learning_rate, "Afferent0", 0.004*acs)
-s.schedule_action(4000, set_learning_rate, "Afferent0", 0.003*acs)
+s.schedule_action(  500, set_learning_rate, "LateralExcitatory", 0.001*ecs)
+s.schedule_action(  500, set_learning_rate, "Afferent0", 0.005*acs)
+s.schedule_action( 2000, set_learning_rate, "Afferent0", 0.004*acs)
+s.schedule_action( 4000, set_learning_rate, "Afferent0", 0.003*acs)
 s.schedule_action(20000, set_learning_rate, "Afferent0", 0.0015*acs)
-s.schedule_action(500, set_learning_rate, "LateralExcitatory", 0.001*ecs)
 
 
-#function that set delta and beta for the threshold function
 def set_deltabeta(x,y):
+    """Set the threshold function limits on V1."""
     V1.output_fn.lower_bound=x
     V1.output_fn.upper_bound=y
 
-s.schedule_action(200,   set_deltabeta, 0.11, 0.66)
-s.schedule_action(500,   set_deltabeta, 0.12, 0.67)
-s.schedule_action(1000,  set_deltabeta, 0.15, 0.68)
-s.schedule_action(2000,  set_deltabeta, 0.18, 0.70)
-s.schedule_action(3000,  set_deltabeta, 0.20, 0.73)
-s.schedule_action(4000,  set_deltabeta, 0.20, 0.76)
-s.schedule_action(5000,  set_deltabeta, 0.21, 0.79)
-s.schedule_action(6500,  set_deltabeta, 0.22, 0.82)
-s.schedule_action(8000,  set_deltabeta, 0.23, 0.85)
+s.schedule_action(  200, set_deltabeta, 0.11, 0.66)
+s.schedule_action(  500, set_deltabeta, 0.12, 0.67)
+s.schedule_action( 1000, set_deltabeta, 0.15, 0.68)
+s.schedule_action( 2000, set_deltabeta, 0.18, 0.70)
+s.schedule_action( 3000, set_deltabeta, 0.20, 0.73)
+s.schedule_action( 4000, set_deltabeta, 0.20, 0.76)
+s.schedule_action( 5000, set_deltabeta, 0.21, 0.79)
+s.schedule_action( 6500, set_deltabeta, 0.22, 0.82)
+s.schedule_action( 8000, set_deltabeta, 0.23, 0.85)
 s.schedule_action(20000, set_deltabeta, 0.24, 0.88)
 
 # can either pass a number or FixedPoint object to s.run()

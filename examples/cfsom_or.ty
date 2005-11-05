@@ -1,4 +1,13 @@
 """
+Basic example of a SOM-based orientation map with ConnectionFields.
+
+Contains a Retina (2D Gaussian generator) and a V1 (CFSOM) sheet.
+Each V1 neuron receives input from a limited-size square area on the
+Retina, called its ConnectionField.
+
+Does not currently match any published simulation, but will probably
+be tailored one in the future.
+
 $Id$
 """
 
