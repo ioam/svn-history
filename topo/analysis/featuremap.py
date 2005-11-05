@@ -46,19 +46,19 @@ class SineGratingPresenter(object):
             update_generator = "gen." + param + "=" + repr(value)
             exec update_generator
 
-        inputs = dict().fromkeys(self.sim.objects(GeneratorSheet),gen)
-              
         for feature,value in features_values.iteritems():
             update_generator = "gen." + feature + "=" + repr(value)
             exec update_generator
+
+        inputs = dict().fromkeys(self.sim.objects(GeneratorSheet),gen)
 
         pattern_present(inputs, self.duration, self.sim, learning=False,
                         apply_output_fn=self.apply_output_fn)
 
 
 
-def measure_or_pref(sim=None,num_freq=1,num_phase=4,num_orientation=4,
-                    scale=0.3,offset=0.0,freq=5.0,display=False,
+def measure_or_pref(sim=None,num_phase=4,num_orientation=4,frequencies=[2.4],
+                    scale=0.3,offset=0.0,display=False,
                     user_function_class=SineGratingPresenter,
                     apply_output_fn=False, duration=1.0):
     """Measure orientation maps, using a sine grating by default."""
@@ -68,22 +68,21 @@ def measure_or_pref(sim=None,num_freq=1,num_phase=4,num_orientation=4,
 
     if sim:
 
-        if num_freq <= 0 or num_phase <= 0 or num_orientation <= 0:
-            raise ValueError("num_freq, num_phase, and num_orientation must be greater than 0")
+        if num_phase <= 0 or num_orientation <= 0:
+            raise ValueError("num_phase, and num_orientation must be greater than 0")
             
         else:
             user_function=user_function_class(sim,apply_output_fn, duration)
-            step_freq=2*pi/num_freq
             step_phase=2*pi/num_phase
             step_orientation=pi/num_orientation
         
             feature_values = {"orientation": ( (0.0,pi), step_orientation, True),
                               "phase": ( (0.0,2*pi),step_phase,True),
-                              "freq": ((0.0,2*pi),step_freq,False)}
-        
+                              "frequency": ((min(frequencies),max(frequencies)),frequencies,False)}
+
             x=MeasureFeatureMap(sim,feature_values)
 
-            param_dict = {"scale":scale,"offset":offset,"freq":freq}
+            param_dict = {"scale":scale,"offset":offset}
             
             x.measure_maps(user_function, param_dict, display)
 
