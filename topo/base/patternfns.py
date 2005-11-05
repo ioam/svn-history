@@ -27,7 +27,7 @@ def gaussian(x, y, width, height):
     """
     x_w = divide(x,width)
     y_h = divide(y,height)
-    return exp(-x_w*x_w + -y_h*y_h)
+    return exp(-0.5*x_w*x_w + -0.5*y_h*y_h)
 
 
 def gabor(x, y, width, height, frequency, phase):
@@ -48,7 +48,7 @@ def line(x, thickness, gaussian_width):
     gaussian_x_coord = distance_from_line - thickness/2.0
 
     sigmasq = gaussian_width*gaussian_width
-    falloff = __exp(-gaussian_x_coord*gaussian_x_coord, sigmasq)
+    falloff = __exp(-gaussian_x_coord*gaussian_x_coord, 2*sigmasq)
     
     return where(gaussian_x_coord<=0, 1.0, falloff)
 
@@ -67,7 +67,7 @@ def disk(x, y, width, height, gaussian_width):
     disk = greater_equal(disk_perimeter,0)
 
     sigmasq = gaussian_width*gaussian_width
-    falloff = __exp(-disk_perimeter*disk_perimeter, sigmasq)
+    falloff = __exp(-disk_perimeter*disk_perimeter, 2.0*sigmasq)
 
     return maximum(disk, falloff)
 
@@ -84,8 +84,8 @@ def ring(x, y, width, height, thickness, gaussian_width):
     ring = bitwise_xor(greater_equal(inner_perimeter,0.0),greater_equal(outer_perimeter,0.0)) 
 
     sigmasq = gaussian_width*gaussian_width
-    inner_falloff = __exp(-inner_perimeter*inner_perimeter, sigmasq)
-    outer_falloff = __exp(-outer_perimeter*outer_perimeter, sigmasq)
+    inner_falloff = __exp(-inner_perimeter*inner_perimeter, 2.0*sigmasq)
+    outer_falloff = __exp(-outer_perimeter*outer_perimeter, 2.0*sigmasq)
 
     return maximum(inner_falloff,maximum(outer_falloff,ring))
 
@@ -100,19 +100,19 @@ def __ellipse(x,y,a,b):
     return 1.0 - (x_a*x_a + y_b*y_b)  
 
 
-def __exp(x,sigmasq):
+def __exp(x,denom):
     """
     Special-case exp() function for some functions in this file:
 
-    Return  0.0             if x==0.0 and sigmasq==0
-            exp(x/sigmasq)  otherwise
+    Return  0.0             if x==0.0 and denom==0
+            exp(x/denom)    otherwise
 
-    Functions in this file that calculate an exp(x/sigmasq) need
+    Functions in this file that calculate an exp(x/denom) need
     to have well-defined behaviour when x is 0, whatever the value
-    of sigmasq.
+    of denom.
     """
-    # x/sigmasq is nan if x==sigmasq==0
-    return where(x!=0.0, exp(divide(x,sigmasq)),0.0)
+    # x/denom==nan if x==denom==0; 0 is returned in that case
+    return where(x!=0.0, exp(divide(x,denom)),0.0)
 
 
                 

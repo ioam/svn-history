@@ -17,7 +17,7 @@ import random
 import fixedpoint
 #import pdb # debugger
 
-from math import pi
+from math import pi, sqrt
 from itertools import chain
 from fixedpoint import FixedPoint  # Should probably bring this into Simulator namespace
 
@@ -78,8 +78,11 @@ GaussianGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds
 GaussianGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 
 GaussianGenerator.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
-GaussianGenerator.width = xsigma/RN
-GaussianGenerator.height = ysigma/RN
+
+# LISSOM used a definition of exp(-(x/s)^2) for a Gaussian. Topographica uses the conventional
+# exp(-0.5(x/s)^2), so the height and width must be adjusted to match LISSOM.
+GaussianGenerator.width = xsigma/RN/sqrt(2)
+GaussianGenerator.height = ysigma/RN/sqrt(2)
 GaussianGenerator.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 
 
