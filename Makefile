@@ -3,10 +3,12 @@ PREFIX =  ${CURDIR}/
 PYLINT = bin/pylint --parseable=yes --required-attributes=__version__ --min-name-length=1 --notes=FIXME,XXX,TODO,ALERT --max-line-length=200 --disable-msg=C0324
 PYCHECKER = bin/pychecker
 
+DOC    = doc/Reference_Manual
 
-all:  ext-packages topographica docs
 
-clean: cleandocs clean-ext-packages
+all:  ext-packages topographica doc
+
+clean: cleandoc clean-ext-packages
 
 FORCE:
 
@@ -54,13 +56,11 @@ lint:
 	${PYLINT} topo/*.py topo/*/*.py
 
 
-cleandocs:
-	- rm -r docs
+cleandoc:
+	make -C doc clean
 
 # Auto-generated Source Documentation
 # Uses an integrated python script named gendocs.py
-docs: topo/*.py topo/*/*.py
-	mkdir -p docs
+doc: topo/*.py topo/*/*.py
+	mkdir -p ${DOC}
 	./topographica topo/base/gendocs.py
-	cp docs/topo.html docs/index.html
-

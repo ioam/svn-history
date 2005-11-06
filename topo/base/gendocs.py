@@ -28,7 +28,7 @@ from re import search, sub
 from copy import copy
 
 TOPO = 'topo'   # Subdirectory with Topographica source
-DOCS = 'docs'   # Subdirectory to place Docs
+DOCS = 'doc/Reference_Manual'   # Subdirectory to place Docs
 pydoc.writing = 1
 
 
