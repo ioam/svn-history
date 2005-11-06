@@ -61,6 +61,6 @@ cleandoc:
 
 # Auto-generated Source Documentation
 # Uses an integrated python script named gendocs.py
-doc: topo/*.py topo/*/*.py
+doc: topo/*.py topo/*/*.py doc/Reference_Manual
 	mkdir -p ${DOC}
 	./topographica topo/base/gendocs.py
