@@ -20,6 +20,11 @@ default: all
 all: ${PHPHTML}
 
 clean:
+	${RM} Reference_Manual/topo*.html
+
+# Not removed by default, for people who do not have PHP locally
+clean-php:
 	${RM} ${PHPHTML}
 
-.PHONY: default all clean
+.PHONY: default all clean clean-php
+
