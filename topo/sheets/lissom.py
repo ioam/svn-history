@@ -85,7 +85,6 @@ class LISSOMPointer(LISSOM):
     special learning function (DivisiveHebbianP) for faster execution time.
     This requires all the connections between the sheets are instances of 
     KernelPointerProjection (specified via connect()).
-    
     """
 
     learning_fn = Parameter(default=DivisiveHebbianP())
