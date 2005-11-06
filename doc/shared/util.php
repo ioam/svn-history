@@ -39,7 +39,7 @@ function banner($fname) {
 <table width="100%" cellpadding="20"><tr><td bgcolor="'.$banner_bg_color.'">
 <CENTER>
 <IMG src="../images/'.$logofile.'" align="middle"
-     width="560" height="140" border="0" alt="Topographica logo">
+     width="497" height="138" border="0" alt="Topographica logo">
 <!-- &nbsp;
 <IMG src="../images/'.$logotext.'" align="middle"
      width="420" height="113" border="3" alt="Topographica"> -->
