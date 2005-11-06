@@ -24,7 +24,8 @@ include:
   <p><dt><a target="_top" href="http://faculty.cs.tamu.edu/choe/">Yoonsuck Choe</a>, 2002-</dt>
   <dd>Yoonsuck is an Assistant Professor at Texas A&amp;M University.
       He is responsible for implementing spiking neuron support,
-      primarily for integrate-and-fire neurons.
+      primarily for integrate-and-fire neurons, and contributes
+      significantly to the web site and other graphical design.
   <p><dt><a target="_top" href="http://porter.csres.utexas.edu/judah/">Judah De Paula</a>, 2004-</dt>
   <dd>Judah is a PhD student at the University of Texas (topic:
       modeling the development of color maps in LISSOM).  He's primarily
