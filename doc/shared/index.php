@@ -40,17 +40,16 @@
 	}
 
 	# 5. main text
-	print '<table border="0" cellpadding="10" width="100%"><tr><td valign="top" bgcolor="'.$banner_bg_color.'">';
+	print '<table border="0" cellpadding="10" width="100%"><tr><td valign="top" bgcolor="'.$menu_bg_color.'" width="145">';
 
-	# 5.1 main text column (left)
-	# Assumed to be in current directory
-	include('text.php');
-
-	# separator
-	print '</td><td width="145" valign="top" bgcolor="'.$menu_bg_color.'">';
-	
 	# 5.2 menu column (right)
 	menu_side($fname);
+
+	# separator
+	print '</td><td valign="top" bgcolor="'.$banner_bg_color.'">';
+	
+	# 5.1 main text column (left)
+	include('text.php');
 
 	# close table
 	print '</td></tr></table>';

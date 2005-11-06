@@ -16,7 +16,7 @@
 
 body {
   margin: 1em 1em 1em 1em;
-  font-family: sans-serif;
+  font-family: serif;
   color: black;
   background: #ffffff;
   background-position: top left;
@@ -43,17 +43,17 @@ a:active.button { color: #770000; background: transparent; font-size: 12; text-d
 a:hover.button { color: #227700; background: transparent; font-size: 12; text-decoration: none; text-weight: bold}
 
 th, td { /* ns 4 */
-  font-family: sans-serif;
+  font-family: serif;
 }
 
 h1, h2, h3, h4, h5, h6 { text-align: center }
 h2, h3, h4, h5, h6 { text-align: left }
-h1 { font: 170% sans-serif }
-h2 { font: 140% sans-serif }
-h3 { font: 120% sans-serif }
-h4 { font: bold 100% sans-serif }
-h5 { font: italic 100% sans-serif }
-h6 { font: small-caps 100% sans-serif }
+h1 { font: 170% serif }
+h2 { font: 140% serif }
+h3 { font: 120% serif }
+h4 { font: bold 100% serif }
+h5 { font: italic 100% serif }
+h6 { font: small-caps 100% serif }
 
 .hide { display: none }
 

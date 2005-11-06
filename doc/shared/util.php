@@ -94,7 +94,7 @@ function menu_side($fname) {
 		if ($link == "Home") {
 			$link = "../index.html";
 		}
-		print '    <tr><td bgcolor="'.$button_color.'"><a href="'.$link.'" class="button"><b>'.$key.'</b></a></td></tr>';
+		print '    <tr><td bgcolor="'.$button_color.'"><a href="'.$link.'" class="button"><font face="sans-serif"><b>'.$key.'</b></font></a></td></tr>';
 	}
 	print '  </table>';
 	print '</table>';

@@ -1,7 +1,7 @@
 <IMG src="../images/Topo-arch-white.jpg" 
      width="300" height="326" border="2" alt="Sample architecture" align="right"></A>
 
-<P><img src="../images/T-bg.png" width="43" height="50" align="left" alt="T" border="2">opographica is a software package for computational modeling of
+<P><!--img src="../images/T-bg.png" width="43" height="50" align="left" alt="T" border="2"-->Topographica is a software package for computational modeling of
 cortical maps.  It is being developed by the 
 <a target="_top" href="http://www.anc.ed.ac.uk">Institute for Adaptive and Neural Computation</a> 
 at the <a target="_top" href="http://www.ed.ac.uk">University of Edinburgh</a> and the 

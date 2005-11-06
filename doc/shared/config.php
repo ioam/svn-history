@@ -6,9 +6,9 @@ $color_scheme = "parchment";
 if ($color_scheme == "parchment") {
 
 	$main_bg_color = "#ffffff";
-	$button_color = "#d0d0b7";
-	$banner_bg_color  = "#efefd0";
-	$menu_bg_color = "#e7e7ca";
+	$button_color = "#ecd9b7";
+	$banner_bg_color  = "#f0e0c6";
+	$menu_bg_color = "#ece3c7";
 	$frame_color  = $menu_bg_color;
 	$logofile="topo-banner7.png";
 
