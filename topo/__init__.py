@@ -9,6 +9,7 @@ base        - Core Topographica functions and classes
 plotting    - Visualization functions and classes
 analysis    - Analysis functions and classes (besides plotting)
 tk          - Tk-based graphical user interface (GUI)
+commands    - High-level user commands
 
 The Topographica primitives library consists of a family of classes
 that can be used with the above functions and classes:
@@ -17,6 +18,10 @@ sheets      - Sheet classes: 2D arrays of processing units
 projections - Projection classes: connections between Sheets
 patterns    - PatternGenerator classes: 2D input or weight patterns 
 eps         - EventProcessor classes: other simulator objects
+outputfns   - Output functions, for e.g. normalization or squashing
+responsefns - Calculate the response of a Projection
+learningfns - Adjust weights for a Projection
+
 
 Each of the library directories can be extended with new classes of
 the appropriate type, just by adding a new .py file to that directory.
