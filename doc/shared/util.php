@@ -56,7 +56,7 @@ function banner($fname) {
 <table width="100%" cellpadding="20"><tr><td bgcolor="'.$banner_bg_color.'">
 <CENTER>
 <table border=0 width="400" height="102" background="../images/topo-subbanner-bg.png"><tr><td><center>
-<font size="+3" face="serif" font-style="italic"><i>'.$pwd.'</i></font></center>
+<font size="+3" face="serif" font-style="italic"><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$pwd.'</i></font></center>
 </td></tr></table>
 </CENTER>
 </td></tr></table>
@@ -77,7 +77,7 @@ function menu_side($fname) {
 		"Team Members" => "../Team_Members/index.html",
 		"Tutorial" => "../tutorial/index.html",
 		"User Manual" => "../User_Manual/index.html",
-		"Reference Manual" => "http://topographica.org/topographica/docs",
+		"Reference Manual" => "../Reference_Manual/index.html",
 		"Downloads" => "http://sourceforge.net/project/showfiles.php?group_id=53602",
 		"Mailing Lists" => "http://sourceforge.net/mail/?group_id=53602",
 		"Plans" => "../Plans/index.html",
