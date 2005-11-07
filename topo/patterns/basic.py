@@ -31,7 +31,7 @@ class GaussianGenerator(PatternGenerator):
 class SineGratingGenerator(PatternGenerator):
     """2D sine grating pattern generator."""
     
-    frequency = Number(default=5.0,bounds=(0.0,None),softbounds=(0.0,10.0))
+    frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0))
     phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi))
 
     ### JABHACKALERT!  Need to fold these two functions together.
