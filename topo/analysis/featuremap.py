@@ -3,6 +3,7 @@ FeatureMap and associated functions and classes.
 
 $Id$
 """
+__version__='$Revision$'
 
 # CEB,JBFC
 
