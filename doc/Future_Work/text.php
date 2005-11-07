@@ -178,6 +178,12 @@ in Neuron or Genesis instead.
 <H2>Eventually:</H2>
 <DL COMPACT>
 
+<P><DT>Pycheck/pylint</DT><DD>
+It would be helpful to go through the output from the pycheck and
+pylint programs (included with Topographica), fixing any suspicious
+things, and disabling the remaining warnings.  That way, new code
+could be automatically checked with those programs and the warnings
+would be likely to be meaningful.
 
 <P><DT>Plot histories</DT><DD>
 It would be nice if GUI plot windows could save a user-selectable
