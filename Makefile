@@ -5,8 +5,9 @@ PYCHECKER = bin/pychecker
 
 DOC    = doc/Reference_Manual
 
+default: ext-packages topographica doc
 
-all:  ext-packages topographica doc
+all:  default all-doc
 
 clean: cleandoc clean-ext-packages
 
@@ -64,3 +65,6 @@ cleandoc:
 doc: topo/*.py topo/*/*.py doc/Reference_Manual
 	mkdir -p ${DOC}
 	./topographica topo/base/gendocs.py
+
+all-doc:
+	make -C doc/
