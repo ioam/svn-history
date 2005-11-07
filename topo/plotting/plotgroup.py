@@ -158,9 +158,13 @@ class PlotGroup(TopoObject):
                 if max(r.flat) > 0: r = MLab.clip(r,0.0,1.0)
                 if max(g.flat) > 0: g = MLab.clip(g,0.0,1.0)
                 if max(b.flat) > 0: b = MLab.clip(b,0.0,1.0)
-                win = bitmap.RGBMap(r,
-                                         g,
-                                         b)
+
+                # Indirect test for NaN.  (Since NaN == NaN is False)
+                if not (max(r.flat) <= 1 and max(g.flat) <= 1 and max(b.flat) <= 1):
+                    self.warning('%s plot contains (%f %f %f)'
+                                 % (each.view_info, max(r.flat), max(g.flat), max(b.flat)))
+
+                win = bitmap.RGBMap(r, g, b)
                 win.view_info = each.view_info
                
                 self.bitmaps.append(win)
