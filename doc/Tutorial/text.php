@@ -148,22 +148,18 @@ neuron.  A similar procedure can be performed in the model by selecting
 <span class='t_item'>Orientation Preference</span> from the <span class='t_item'>Plot</span> menu:
 
 <p class="center">
-<img src="images/or_map.png" alt="Orientation map"
-align="middle" width="541" height="302">
-</p>
+<img src="images/or_map.png" alt="Orientation map" width="541" height="302">&nbsp;&nbsp;&nbsp;
+<img src="images/or_key_vert_transparent_topo.png" alt="Orientation key" height="302" width="24">
+</p><br>
 
+<P>
 (This will usually take about (**ten) seconds to complete.)
 The plot on the left is the orientation map for V1 in this network.
 Each neuron in the plot is color coded by its preferred orientation,
-according to the key:
-
-<p class="center">
-<img src="images/or_key_horiz_transparent.png" alt="Orientation key" align="middle" height="36" width="460">
+according to the key to the right.
 </p>
 
-
-
-((**UPDATE picture) If viewing a monochrome printout, see web page for the colors).  You
+<P>((**UPDATE picture) If viewing a monochrome printout, see web page for the colors).  You
 can see that nearby neurons have similar orientation preferences, as
 found in mammalian visual cortex.  The V1 plot on the right
 shows the relative selectivity of each neuron for orientation; you can
