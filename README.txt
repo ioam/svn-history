@@ -46,7 +46,9 @@ topographica/ directory.  The build process will take a while to
 complete (e.g. about 5-10 minutes on a 1.5GHz Pentium IV
 machine).  If all goes well, a script named "topographica" will be
 created in the topographica/ directory; you can use this to start
-Topographica as described below.
+Topographica as described below.  If you run into problems, you can
+try "make -k", which skips any packages that have errors; many of 
+these are not required for normal usage, and can safely be omitted.
 
 UNIX:
 
