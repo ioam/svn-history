@@ -56,7 +56,8 @@ function banner($fname) {
 <table width="100%" cellpadding="20"><tr><td bgcolor="'.$banner_bg_color.'">
 <CENTER>
 <table border=0 width="420" height="113" background="../images/topo-subbanner-bg.png"><tr><td><center>
-<font size="+3" face="serif" font-style="italic"><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$pwd.'</i></font></center>
+<font size="+11"><i>&nbsp;</font><!-- Moves text down slightly -->
+<font size="+3" face="serif" font-style="italic"><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$pwd.'</i></font></center>
 </td></tr></table>
 </CENTER>
 </td></tr></table>
