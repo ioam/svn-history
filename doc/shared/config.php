@@ -19,8 +19,6 @@ if ($color_scheme == "parchment") {
 	$banner_bg_color  = "#eeffff";
 	$menu_bg_color = "#eeffee";
 	$frame_color  = $menu_bg_color;
-	$logofile="logo_jb.png";
-	$logotext="logo-text.png";
 	$logofile="topo-banner3.png";
 
 }
