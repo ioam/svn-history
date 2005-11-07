@@ -120,6 +120,8 @@ def pattern_present(inputs=None,duration=1.0,sim=None,learning=False,overwrite_p
         TopoObject().warning('No active Simulator.')
     
 
+import __main__
+
 def load_snapshot(snapshot_name):
     """
     Return the current network to the state of the specified snapshot.
@@ -135,8 +137,18 @@ def load_snapshot(snapshot_name):
     # CEBHACKALERT:
     # Should there be a check that the right kind of network has
     # been loaded? If so, add it and change docstring above.
-    saved_sim = pickle.load(open(snapshot_name))         
+    
+    # CEBHACKALERT:
+    # Should this execute in __main__.__dict__?
+    # load_cmd = 'import pickle; saved_sim=pickle.load(open("'+snapshot_name+'","rb")); import topo.base.registry; topo.base.registry.set_active_sim(saved_sim)'
+    #  exec load_cmd in __main__.__dict__
+    #
+    # Also confusion that current simulator is left behind as e.g. s
+
+    saved_sim = pickle.load(open(snapshot_name,'rb'))         
     topo.base.registry.set_active_sim(saved_sim)
+    
+
 
 
 def save_snapshot(snapshot_name):
@@ -147,9 +159,6 @@ def save_snapshot(snapshot_name):
 
     Uses Python's 'pickle' module, so subject to the same limitations.
     """
-    # CEBHACKALERT:
-    # Protocol 2 is faster and results in smaller file sizes.
-    # I'll switch once we have the tutorial working.
-    pickle.dump(topo.base.registry.active_sim(), open(snapshot_name,'w'))
+    pickle.dump(topo.base.registry.active_sim(), open(snapshot_name,'wb'), 2)
 
 
