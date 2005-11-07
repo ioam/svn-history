@@ -6,6 +6,7 @@ PatternGenerator.
 
 $Id$
 """
+__version__='$Revision$'
 
 ### JABHACKALERT!
 ###
