@@ -9,6 +9,7 @@
 
 	include('../shared/config.php');
 
+        global $body_bg_color;
 	print '<BODY bgcolor="'.$body_bg_color.'">';
 
 	# 1. load the utility routines
@@ -49,7 +50,7 @@
 	print '</td><td valign="top" bgcolor="'.$banner_bg_color.'">';
 	
 	# 5.1 main text column (left)
-	include('text.php');
+	include('..'.$fname.'/text.php');
 
 	# close table
 	print '</td></tr></table>';

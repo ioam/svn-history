@@ -5,10 +5,8 @@
 ############################################################################
 function folder_name() {
 
-  $fname = $_SERVER[PHP_SELF];
-  $fname = preg_replace('|/../shared/index\.php|',"",$fname);
-  $fname = preg_replace('|../|',"/",$fname);
-
+  $fname = $_SERVER['PWD'];
+  $fname = preg_replace('|.*/|',"/",$fname);
   return $fname;
 }
 
@@ -17,11 +15,9 @@ function folder_name() {
 ############################################################################
 function bare_folder_name() {
 
-  $fname = $_SERVER[PHP_SELF];
-  $fname = preg_replace('|/../shared/index\.php|',"",$fname);
-  $fname = preg_replace('|../|',"",$fname);
+  $fname = $_SERVER['PWD'];
+  $fname = preg_replace('|.*/|',"",$fname);
   $fname = preg_replace('|_|'," ",$fname);
-
   return $fname;
 }
 
