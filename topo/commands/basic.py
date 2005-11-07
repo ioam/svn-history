@@ -1,6 +1,8 @@
 """
 High-level user-level commands controlling the entire simulator.
+$Id$
 """
+__version__='$Revision$'
 
 from topo.base.topoobject import TopoObject
 from topo.base.sheet import Sheet
