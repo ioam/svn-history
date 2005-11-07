@@ -335,3 +335,9 @@ def exp(x):
     return Numeric.exp(Numeric.where(abs(x)>MAX_MAG,Numeric.sign(x)*float('inf'),x))
 
 
+def dict_sort(d):
+    """ Simple and fast routine to sort a dictonary on key """
+    keys = d.keys()
+    keys.sort()
+    return map(d.get, keys)
+
