@@ -173,6 +173,8 @@ def flatten(l):
         return result
 
 
+# It might be good to handle some common exceptions specially,
+# generating warnings for them rather than suppressing them...
 def eval_atof(in_string,default_val = 0):
     """
     Create a float from a string by eval'ing it in the __main__
