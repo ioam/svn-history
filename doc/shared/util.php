@@ -39,7 +39,7 @@ function banner($fname) {
 <table width="100%" cellpadding="20"><tr><td bgcolor="'.$banner_bg_color.'">
 <CENTER>
 <IMG src="../images/'.$logofile.'" align="middle"
-     width="497" height="138" border="0" alt="Topographica logo">
+     width="497" height="134" border="0" alt="Topographica logo">
 <!-- &nbsp;
 <IMG src="../images/'.$logotext.'" align="middle"
      width="420" height="113" border="3" alt="Topographica"> -->
@@ -55,7 +55,7 @@ function banner($fname) {
 	print '
 <table width="100%" cellpadding="20"><tr><td bgcolor="'.$banner_bg_color.'">
 <CENTER>
-<table border=0 width="400" height="102" background="../images/topo-subbanner-bg.png"><tr><td><center>
+<table border=0 width="497" height="134" background="../images/topo-subbanner-bg.png"><tr><td><center>
 <font size="+3" face="serif" font-style="italic"><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$pwd.'</i></font></center>
 </td></tr></table>
 </CENTER>
