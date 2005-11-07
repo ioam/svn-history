@@ -1,3 +1,7 @@
+# Makefile for doc directory
+# Does not currently make the reference manual, so that
+# the documentation can be compiled even if the code won't.
+
 # $Id$
 
 RM                              = rm -f
