@@ -35,7 +35,7 @@ Kinds of PlotTemplates:
 
 $Id$
 """
-
+__version__='$Revision$'
 ### JABHACKALERT!
 ### 
 ### The code in this file has not yet been reviewed, and may need

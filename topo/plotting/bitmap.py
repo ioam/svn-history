@@ -39,6 +39,7 @@ The constructed Image is then in [BitmapObject].bitmap.
 
 $Id$
 """
+__version__='$Revision$'
 
 ### JABHACKALERT!
 ### 

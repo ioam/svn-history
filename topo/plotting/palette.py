@@ -39,6 +39,8 @@ etc.
 
 $Id$
 """
+__version__='$Revision$'
+
 from topo.base.topoobject import TopoObject
 from topo.base.parameter import Dynamic
 from bitmap import BLACK_BACKGROUND, WHITE_BACKGROUND

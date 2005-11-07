@@ -14,6 +14,7 @@ topo.sheets.cfsom and currently (9/2005) residing in topo.image
 
 $Id$
 """
+__version__='$Revision$'
 import topo
 import topo.base.topoobject
 import plotengine

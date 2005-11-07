@@ -4,6 +4,8 @@ a 2D matrix of data.
 
 $Id$
 """
+
+__version__='$Revision$'
 from topo.base.topoobject import *
 import types
 

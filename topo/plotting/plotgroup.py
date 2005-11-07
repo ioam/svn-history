@@ -8,6 +8,7 @@ displayed in a GUI window, as saved to a file.
 
 $Id$
 """
+__version__='$Revision$'
 
 ### JABHACKALERT!
 ### 
