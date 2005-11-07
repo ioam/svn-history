@@ -74,13 +74,13 @@ function menu_side($fname) {
 
 	# menu name and link
 	$menu_items = array("Home" => "../Home/index.html", 
-		"Team Members" => "../Team_Members/index.html",
 		"Tutorial" => "../Tutorial/index.html",
 		"User Manual" => "../User_Manual/index.html",
 		"Reference Manual" => "../Reference_Manual/index.html",
 		"Downloads" => "http://sourceforge.net/project/showfiles.php?group_id=53602",
 		"Lists, Forums" => "../Lists,_Forums/index.html",
-		"Plans" => "../Plans/index.html",
+		"Team Members" => "../Team_Members/index.html",
+		"Future Work" => "../Future_Work/index.html",
 		);
 
 	# 1. black border (using table)
