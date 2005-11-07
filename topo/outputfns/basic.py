@@ -11,6 +11,7 @@ scalars.
 
 $Id$
 """
+__version__='$Revision$'
 
 import Numeric
 from Numeric import clip
