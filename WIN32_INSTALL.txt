@@ -1,6 +1,9 @@
 INSTALLING TOPOGRAPHICA ON WINDOWS XP/2000/(NT?)
 ===================================================================
 
+(Not tested recently, as of 11/2005, and will likely need some
+modification).
+
 THE FAST WAY:
 
 1. Unpack the topographica archive into a temporary directory.
