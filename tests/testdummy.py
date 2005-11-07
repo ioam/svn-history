@@ -1,3 +1,11 @@
+"""
+$Id$
+"""
+
+### JCALERT: Does this file is of any interrest now?
+
+__version__='$Revision $'
+
 import unittest
 
 class TestDummy(unittest.TestCase):

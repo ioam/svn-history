@@ -1,3 +1,8 @@
+"""
+$Id$
+"""
+__version__='$Revision $'
+
 import unittest
 
 class TestMatPlotLib(unittest.TestCase):

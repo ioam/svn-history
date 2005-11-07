@@ -1,3 +1,9 @@
+"""
+Test for the PlotFileSaver class
+$Id$
+"""
+__version__='$Revision$'
+
 import unittest
 from pprint import pprint
 from topo.plotting import plot

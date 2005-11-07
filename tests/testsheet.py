@@ -3,6 +3,7 @@ Unit tests for sheet.py module.
 
 $Id$
 """
+__version__='$Revision$'
 
 import unittest
 import topo

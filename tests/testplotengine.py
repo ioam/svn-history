@@ -5,6 +5,8 @@ not functional.
 
 $Id$
 """
+__version__='$Revision$'
+
 import unittest
 from pprint import pprint
 from math import pi

@@ -1,3 +1,9 @@
+"""
+Unit test for Simulator
+$Id$
+"""
+__version__='$Revision$'
+
 import unittest
 import copy
 

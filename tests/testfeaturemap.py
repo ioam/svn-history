@@ -10,6 +10,9 @@ TestFeatureMap
 $Id$
 
 """
+__version__='$Revision $'
+
+
 
 # CEB:
 # This file is still being written

@@ -1,3 +1,11 @@
+"""
+
+$Id$
+"""
+__version__='$Revision $'
+
+### JCALERT Still to be written...
+
 import unittest
 
 import Numeric

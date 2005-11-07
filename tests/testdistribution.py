@@ -3,6 +3,7 @@ Tests of distribution.py
 
 $Id$
 """
+__version__='$Revision $'
 
 # CEB:
 # This file is still being written
@@ -10,7 +11,6 @@ $Id$
 # To do:
 # - add comments
 # - clean up redundant tests
-
 
 import unittest
 from topo.base.distribution import Distribution

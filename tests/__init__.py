@@ -3,6 +3,7 @@ Unit tests for Topographica
 
 $Id$
 """
+__version__='$Revision $'
 
 ### JABALERT!
 ###

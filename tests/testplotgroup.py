@@ -1,3 +1,9 @@
+"""
+Test for the PlotGroup class
+$Id$
+"""
+__version__='$Revision$'
+
 import unittest
 import topo.base.simulator
 import topo.plotting.plotengine

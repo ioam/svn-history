@@ -10,12 +10,13 @@ TestFeatureMap
 $Id$
 
 """
+__version__='$Revision$'
 
-# CEB:
-# This file is still being written
 
 # To do:
-# 
+# - Remove the commented line from when it was calling a function 
+# - finish to transform the call to be to a procedure in the last test
+# - Also clean up the original file to this purpose
 
 
 import unittest

@@ -3,6 +3,8 @@ Created to test the pattern presentation.
 
 $Id$
 """
+__version__='$Revision$'
+
 import unittest, random
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.parameter import Dynamic

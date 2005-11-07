@@ -3,6 +3,8 @@ Created to test the pattern input orientations.
 
 $Id$
 """
+__version__='$Revision$'
+
 import unittest
 from topo.base.patterngenerator import *
 from MLab import flipud, rot90
