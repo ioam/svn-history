@@ -2,8 +2,6 @@
 <META HTTP-EQUIV="content-type" CONTENT="text/html; charset=ISO-8859-1">
 <LINK rel="stylesheet" type="text/css" media="screen" href="../shared/topo.css">
 <TITLE>The Topographica Simulator</TITLE>
-<META  NAME="keywords" CONTENT="Topographica, neural network simulator">
-<META  NAME="description" CONTENT="Home page for the Topographica brain region simulator.">
 </HEAD>
 <?php
 
