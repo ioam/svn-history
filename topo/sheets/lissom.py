@@ -4,6 +4,8 @@ A Sheet class implementing the LISSOM algorithm
 
 $Id$
 """
+__version__='$Revision$'
+
 import weave
 import Numeric
 

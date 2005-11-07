@@ -5,6 +5,7 @@ a sheet class, but can also be useful.
 
 $Id$
 """
+__version__='$Revision$'
 
 from topo.base.sheet import Sheet
 from topo.base.utils import Struct, NxN

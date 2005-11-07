@@ -5,6 +5,7 @@ uses receptive fields.
 
 $Id$
 """
+__version__='$Revision$'
 
 from topo.base.utils import L2norm
 from topo.base.parameter import Parameter

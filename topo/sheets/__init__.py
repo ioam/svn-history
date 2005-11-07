@@ -8,6 +8,7 @@ automatically become available for any model.
 
 $Id$
 """
+__version__='$Revision$'
 
 # Automatically discover all .py files in this directory. 
 import re,os

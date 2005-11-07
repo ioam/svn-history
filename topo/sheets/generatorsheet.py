@@ -3,6 +3,7 @@ GeneratorSheet class.
 
 $Id$
 """
+__version__='$Revision$'
 
 from topo.base.sheet import Sheet 
 from topo.base.sheet import BoundingBox
