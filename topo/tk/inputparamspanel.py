@@ -62,6 +62,8 @@ def patterngenerator_names():
     the user.
     """
     k = topo.base.registry.pattern_generators.keys()
+    ### JABALERT: Should be made into a general-purpose function
+    ### (e.g. classname_repr) in utils.py for all to use. 
     k = [(re.sub('Generator$','',name),name) for name in k]  # Cut off 'Generator'
     for i in range(len(k)):        # Add spaces before capital leters
         for c in string.uppercase:
