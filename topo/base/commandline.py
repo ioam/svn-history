@@ -8,7 +8,7 @@ BANNER         = """
 Welcome to Topographica!
 
 Type help() for interactive help with python, help(topo) for general
-information about about Topographica, help(commandname) for info on a
+information about Topographica, help(commandname) for info on a
 specific command, or topo.about() for info on this release, including
 licensing information.
 """
