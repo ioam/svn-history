@@ -13,73 +13,31 @@ even the implied warranty of merchantability or fitness for a
 particular purpose.  See the GNU General Public License for more
 details, in the file COPYING.txt.
 
-
-OBTAINING THE CVS VERSION OF TOPOGRAPHICA
-
-The Topographica simulator source files are maintained using the CVS
-version control system, hosted by SourceForge.net.  See
-http://sourceforge.net/docman/display_doc.php?docid=14033&group_id=1
-for more details on CVS at SourceForge.
-
-Note that at any point the CVS files are likely to be somewhat out of
-sync with each other and with the documentation.  In particular, the
-latest revisions may not have been tested on all architectures or at
-all.  However, we do try to minimize the time that the CVS version of
-the simulator is broken while changes are being made.
-
-There are two ways to get your own local copy of the CVS files,
-depending on whether or not you are an official Topographica
-developer.  Non-developers can check out a read-only version of the
-repository, while developers can get read/write access so that they
-can make changes that become a permanent part of the project
-repository.  
-
-To get started, first change to a directory to which you have write
-access with sufficient space available, i.e., at least several hundred
-megabytes as of 10/2005.
-
-Then to get read-only access, log in to the CVS server using the UNIX
-command:
-
-  cvs -d :pserver:anonymous@cvs.sf.net:/cvsroot/topographica login
-
-When a password is requested, just press return.  Then change to
-wherever you want the files to be stored, and use the command:
-
-  cvs -d :pserver:anonymous@cvs.sf.net:/cvsroot/topographica checkout topographica
-
-The result will be a directory named "topographica" within your
-current directory.
-
-For read/write access, no login step is needed.  However, you may need
-to tell CVS to use ssh, because most systems default to rsh, which is 
-almost never supported anymore.  Just type "export CVS_RSH=ssh" for
-sh/bash or "setenv CVS_RSH ssh" for csh/tcsh; you may want to put this
-in your shell startup file.  The checkout
-command is:
-
-  cvs -d ':ext:uname@cvs.sourceforge.net:/cvsroot/topographica' checkout topographica
-
-where uname should be replaced with your SourceForge.net username.
-You will be asked for your SourceForge.net password.  If instead you
-get a message about rsh timing out, you have forgotten to do the
-CVS_RSH command.
-
-The download process make take quite a while over a slow link, due to
-the sizes of the files involved, but should only take a few minutes on
-a broadband connection.
+Before you start, make sure that you have a copy of Topographica in
+your home directory or some other directory in which you can write
+files, and that you have at least 500MB available.
 
 
-BUILDING THE CVS VERSION OF TOPOGRAPHICA
+BUILDING DOCUMENTATION
 
-The topographica directory you have now checked out includes the files
-necessary to build Topographica on most platforms.  To make the build
-process simpler on a variety of platforms, source code versions of the
-libraries needed are included, and are created as part of the build
-process.  This approach makes the initial compilation time longer and
+To read more about Topographica before trying to build it, you can
+build the documentation (apart from the Reference Manual) separately
+from compiling Topographica itself.  If PHP4 is installed on your
+system (as in most Linux distributions), just change to the
+topographica directory and type "make doc", then load doc/index.html
+into your web browser.  If there are any problems generating the local
+copy, you can instead use the web-based documentation at
+www.topographica.org.
+
+
+BUILDING TOPOGRAPHICA
+
+The topographica CVS directory includes the files necessary to build
+Topographica from source code on most platforms.  All non-standard
+external libraries are included and for most platforms are built from
+source.  This approach makes the initial compilation time longer and
 the simulator directory larger, but it minimizes the changes necessary
 for specific platforms and operating system versions.
-
 
 Linux: 
 
@@ -114,41 +72,9 @@ a native (Aqua) version of Python, which looks a bit nicer, but we
 have not yet documented how to do that.
 
 
-RUNNING TOPOGRAPHICA
+USING TOPOGRAPHICA
 
-Topographica is still under very active development, and until a full
-public release, is probably not suitable for serious use unless you
-are coordinating such usage with the developers.  However, it already
-includes much useful code, including a GUI versions of SOM-based and
-LISSOM-based orientation map networks.  To start this code, go to your
-topographica/ directory, and type e.g.:
-
-  ./topographica -g examples/cfsom_or.ty
-
-You should see a window appear that has similar options available as
-the one in the LISSOM tutorial at:
-
-  http://homepages.inf.ed.ac.uk/jbednar/pytutorial.html
-
-The tutorial was written for our more polished but less flexible
-simulator LISSOM, also available from http://topographica.org, but you
-can follow many of the instructions in that tutorial.  As of 10/2005,
-the main differences are that all plots are grayscale, the model does
-not have multiple eyes, LGN cells, or circular receptive fields, and a
-map will need to be trained in the GUI, then saved using Save
-Snapshot, rather than built offline beforehand.
-
-
-
-
-DOCUMENTATION AND FURTHER STUDY
-
-For practical use, please wait for the full public release of
-Topographica. Because of the fast pace of current development, there
-is very little documentation available, but the documentation for each
-file can be accessed by loading topographica/docs/index.html into your
-web browser, or by doing pydoc(modulename) from the Topographica prompt.
-
-If you are a Topographica developer, please read and follow the
-information in the CONVENTIONS file.  This will help keep everyones'
-changes compatible.
+See doc/Tutorial/index.html for examples of getting started with
+Topographica, and doc/index.html for all of the documentation.  You
+can also get online help from the Topographica command line using
+help(), or from the shell command line using "./bin/pydoc some-text".
