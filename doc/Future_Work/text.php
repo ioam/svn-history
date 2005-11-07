@@ -178,6 +178,11 @@ in Neuron or Genesis instead.
 <H2>Eventually:</H2>
 <DL COMPACT>
 
+<P><DT>More testing code</DT><DD>
+Topographica has a fairly complete test library, but there are still
+classes and functions without corresponding tests.  Eventually, there
+should be tests for everything.
+
 <P><DT>Pycheck/pylint</DT><DD>
 It would be helpful to go through the output from the pycheck and
 pylint programs (included with Topographica), fixing any suspicious
