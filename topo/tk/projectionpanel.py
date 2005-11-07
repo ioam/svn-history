@@ -17,6 +17,9 @@ from plotpanel import PlotPanel
 from itertools import chain
 from topo.base.projection import ProjectionSheet
 
+from topo.base.utils import dict_sort
+from topo.base.keyedlist import KeyedList
+
 UNIT_PADDING = 1
 
 class ProjectionPanel(CFSheetPlotPanel):
@@ -98,9 +101,18 @@ class ProjectionPanel(CFSheetPlotPanel):
         if self._sim_eps:
             self._sim_ep = [ep for ep in self._sim_eps
                             if ep.name == sheet_name][0]
-            self.projections = dict([(i.name, i) for i in
+            self.tmp_projections = dict([(i.name, i) for i in
                                      chain(*self._sim_ep.in_projections.values())])
 
+            ### JCHACKALERT! This has been done to solve the problem of the displaying order in
+            ### the projection panel: this way, we start to plot in the alphabetical order
+            ### which corresponds (luckily) to the order we want
+            self.projections = KeyedList()
+            sorted_list = self.tmp_projections.items()
+            sorted_list.sort()
+            for item in sorted_list:
+                self.projections.append((item[0],item[1]))
+                
         old_projection_name = self.weight_name.get()
         if len(self.projections.keys()) == 0:
             self.weight_name.set('None')
@@ -120,6 +132,7 @@ class ProjectionPanel(CFSheetPlotPanel):
 
         self._create_projection_dict(self.region.get())
 
+        
         self.projection_menu = Pmw.OptionMenu(self.params_frame2,
                        command = self.projection_refresh,
                        labelpos = 'w',
@@ -190,8 +203,7 @@ class ProjectionPanel(CFSheetPlotPanel):
             self.generate_plot_key()
             self.pe_group = self.pe.get_plot_group(self.plot_key,
                                                    registry.plotgroup_templates['Projection'],
-                                                   self.region.get(),
-                                                   'ProjectionPlotGroup')
+                                                   self.region.get(),'ProjectionPlotGroup')
             self.pe_group.do_plot_cmd()
             self.plots = self.pe_group.plots()
 
