@@ -1,16 +1,4 @@
-<html>
-
-   <head>
-      <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-      <link rel="stylesheet" type="text/css" media="screen" href="tutorial.css">
-
-      <title>Topographica Software Tutorial</title>
-   </head>
-
-
-<body>
-
-<h1>Topographica Software Tutorial</h1>
+<link rel="stylesheet" type="text/css" media="screen" href="tutorial.css">
 
 <!-- TO DO: fix indentation; make standards-compliant so it will -->
 <!-- display properly on different browsers (I'll fix spacing at the -->
@@ -90,7 +78,7 @@ Gaussian.
 <li>To see the result, select <span class='t_item'>Activity</span> from
 the <span class='t_item'>Plots</span> menu on the <span class='w_title'>Topographica Console</span> to get:
 <p class='center'>
-<img src="images/activity_gaussian.png" alt="Response to Gaussian" align="middle" height="259" width="948">
+<img src="images/activity_gaussian.png" alt="Response to Gaussian" align="middle" height="155" width="569">
 </p>
 
 
@@ -122,7 +110,7 @@ the neuron in the center of the cortex (by default):
 
 <p class="center">
 <img src="images/unit_weights_0_0.png" alt="Weights of one
-neuron" align="middle" width="745" height="607">
+neuron" align="middle" width="596" height="486">
 </p>
 
 <p>
@@ -374,8 +362,9 @@ documentation of the many commands that can be used in the
 (**update) <a href="http://topographica.org/docs/index.html">docs</a>
 directory within the <code>topographica/</code> directory itself (**
 or 'help' button?). Topographica and the commands to
-control it are written in Python, an (**easy-to-use something something language). Please contact
-<a href="mailto:jbednar@cs.utexas.edu?subject=Comments%20on%20Topographica%20tutorial">Jim Bednar</a> if you have questions or suggestions about
-the software or this tutorial.
 
-</body></html>
+control it are written in Python, an (**easy-to-use something
+something language). Please contact 
+<A HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107?subject=Comments%20on%20Topographica%20tutorial">&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107</a>
+if you have questions or suggestions about the software or this
+tutorial.
