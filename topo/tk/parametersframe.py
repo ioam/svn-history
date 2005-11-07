@@ -3,6 +3,8 @@ ParametersFrame class.
 
 $Id$
 """
+__version__='$Revision $'
+
 import propertiesframe
 import topo.base.registry
 from Tkinter import Frame, TOP, LEFT, RIGHT, BOTTOM, YES, N,S,E,W,X

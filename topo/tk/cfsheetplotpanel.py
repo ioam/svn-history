@@ -8,6 +8,8 @@ depends on the CFSheet class.
 
 $Id$
 """
+__version__='$Revision$'
+
 from Tkinter import StringVar, Frame, LEFT, RIGHT, TOP, BOTTOM, YES, X
 import Pmw
 import plotpanel

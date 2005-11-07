@@ -3,6 +3,7 @@ Plot for displaying preference maps.
 
 $Id$
 """
+__version__='$Revision $'
 
 ### JABALERT!
 ###

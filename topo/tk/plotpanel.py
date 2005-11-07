@@ -7,6 +7,8 @@ window.  Look at it as an example of creating additional subclasses.
 
 $Id$
 """
+__version__='$Revision $'
+
 import Pmw, re, os, sys
 from Tkinter import Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, StringVar

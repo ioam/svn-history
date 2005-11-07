@@ -8,6 +8,7 @@ GUIs or other types of interfaces can also be used.
 
 $Id$
 """
+__version__='$Revision $'
 
 import Pmw, sys, Tkinter
 import topo.base.simulator

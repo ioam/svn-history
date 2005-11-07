@@ -15,6 +15,8 @@ of using a PlotGroup subclass, creates a group on the fly.
 
 $Id$
 """
+__version__='$Revision$'
+
 import __main__
 import math, string, re
 import parametersframe

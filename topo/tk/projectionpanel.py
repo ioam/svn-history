@@ -3,6 +3,8 @@ Projection Panel for TK GUI visualization.
 
 $Id$
 """
+__version__='$Revision $'
+
 import __main__
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas
