@@ -176,7 +176,7 @@ class PlotEngine(TopoObject):
 #         the weights must be requested from each Projection on the
 #         target sheets.
 #         """
-#         sheet_list = [each for each in self.simulation.objects(Sheet).values()if filter_lam(each) and each.name== sheet_target]
+#         sheet_list = [each for each in self.simulation.objects(Sheet).values() if filter_lam(each) and each.name== sheet_target]
 
 #         projection_list = []
 #         for s in sheet_list:
@@ -299,6 +299,7 @@ class PlotEngine(TopoObject):
                     key = ('Weights',sheet,projection,sheet_x,sheet_y)
                     plot_list.append(Plot((key,None,None),COLORMAP,p.src,pt.channels['Normalize']))
         self.debug('plot_list =' + str(plot_list))
+        
         ### JCHACKALERT! This is an Hack so that the plot are appearing in alphabetical order
         ### which, luckily, corresponds to the order we want them to be displayed in
         ### This is something that needs more fixing (also see PatternGenerators and the JCHACKALERT!
