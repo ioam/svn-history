@@ -5,9 +5,10 @@ PYCHECKER = bin/pychecker
 
 DOC    = doc/Reference_Manual
 
-default: ext-packages topographica doc
+# Default does not include doc, in case user lacks PHP
+default: ext-packages topographica reference-manual
 
-all:  default all-doc
+all: default doc
 
 clean: cleandoc clean-ext-packages
 
@@ -60,11 +61,11 @@ lint:
 cleandoc:
 	make -C doc clean
 
-# Auto-generated Source Documentation
+# Auto-generated source code documentation
 # Uses an integrated python script named gendocs.py
-doc: topo/*.py topo/*/*.py doc/Reference_Manual
+reference-manual: topo/*.py topo/*/*.py doc/Reference_Manual
 	mkdir -p ${DOC}
 	./topographica topo/base/gendocs.py
 
-all-doc:
+doc: FORCE
 	make -C doc/
