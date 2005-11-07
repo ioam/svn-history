@@ -61,8 +61,16 @@ class SineGratingPresenter(object):
 def measure_or_pref(sim=None,num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,
                     user_function_class=SineGratingPresenter,
-                    apply_output_fn=False, duration=0.06):
+                    apply_output_fn=False, duration=1.0):
     """Measure orientation maps, using a sine grating by default."""
+
+    # CEBHACKALERT:
+    # Is there some way that lissom_or.ty could set the value of a variable
+    # that measure_or_pref reads, so that measure_or_pref could default to
+    # duration=1.0, but when LISSOM is loaded switches to 0.06?  Otherwise
+    # people playing around with CFSOM will think it doesn't work for
+    # orientation maps...
+
     
     if not sim:
         sim = topo.base.registry.active_sim()
@@ -70,7 +78,7 @@ def measure_or_pref(sim=None,num_phase=18,num_orientation=4,frequencies=[2.4],
     if sim:
 
         if num_phase <= 0 or num_orientation <= 0:
-            raise ValueError("num_phase, and num_orientation must be greater than 0")
+            raise ValueError("num_phase and num_orientation must be greater than 0")
             
         else:
             user_function=user_function_class(sim,apply_output_fn, duration)
@@ -99,6 +107,9 @@ class FeatureMap(TopoObject):
     Given a set of activity matrices and associated parameter values,
     constructs a preference map and a selectivity map for that parameter.
     """
+
+    
+
     def __init__(self, sheet, axis_range=(0.0,1.0), cyclic=False):
         
         # Initialize the internal data structure: a matrix of Distribution objects.
