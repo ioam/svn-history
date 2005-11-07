@@ -30,7 +30,4 @@ There are also two discussion forums (web boards) available:
 <DD>Forum for discussion of any topic related to Topographica.</DD>
 </DL>
 
-
-
-
-
+<!-- Add bug tracking and feature request tools from sf.net? -->
