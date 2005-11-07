@@ -8,6 +8,7 @@ other types of simulations.
 
 $Id$
 """
+__version__='$Revision$'
 
 ### JABHACKALERT!
 ###
