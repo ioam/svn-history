@@ -17,7 +17,12 @@ import os
 ### me (jbednar), to be simpler and have the necessary features.  It's
 ### clear that there's no reason to keep it even partially compatible
 ### with python's own command-line format, because that format is not
-### very useful.  See TODO.txt for some more details.
+### very useful.  In particular, it needs to be rewritten to allow
+### Topographica/Python commands to be passed to the interpreter, even
+### when a file is also being executed.  The current implementation
+### mirrors the Python standard: a file can be read, or a
+### command-string parsed, but not both.  We can probably continue to
+### pass such arguments, if we require '--' before them.
 
 # All valid Python 2.4 args, plus 'g' for topo.gui.start()
 VALID_OPTS     = 'ic:dEhOQ:StuvVW:xm:g'  
