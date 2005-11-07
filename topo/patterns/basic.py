@@ -3,6 +3,7 @@ Simple two-dimensional mathematical or geometrical pattern generators.
 
 $Id$
 """
+__version__='$Revision$'
 
 from math import pi
 from Numeric import around,bitwise_and,sqrt,sin,Float

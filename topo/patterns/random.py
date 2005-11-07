@@ -6,6 +6,7 @@ normal distributions or 1/f noise.
 
 $Id$
 """
+__version__='$Revision$'
 
 from topo.base.parameter import Number,Parameter
 from topo.base.patterngenerator import PatternGenerator
