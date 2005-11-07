@@ -22,6 +22,8 @@ discussion of the Topographica coordinate system.
 
 $Id$
 """
+__version__='$Revision$'
+
 ### JABHACKALERT!
 ###
 ### Should eliminate all "import *" commands if at all possible.

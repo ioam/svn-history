@@ -3,6 +3,7 @@ KeyedList sorted dictionary class.
 
 $Id$
 """
+__version__='$Revision$'
 
 class KeyedList(list):
     """

@@ -22,6 +22,8 @@ From the Makefile (Tabs have been stripped):
 
 $Id$
 """
+__version__='$Revision$'
+
 import pydoc, glob, os
 from os.path import isdir
 from re import search, sub

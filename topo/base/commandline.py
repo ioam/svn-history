@@ -2,7 +2,7 @@ import sys, __main__, math
 """
 $Id$
 """
-
+__version__='$Revision$'
 
 BANNER         = """
 Welcome to Topographica!

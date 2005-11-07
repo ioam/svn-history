@@ -4,6 +4,7 @@ General utility functions and classes for Topographica.
 
 $Id$
 """
+__version__='$Revision$'
 
 from Numeric import sqrt,ones,dot,sum
 import __main__

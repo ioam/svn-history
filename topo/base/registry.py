@@ -6,6 +6,7 @@ usually show up automatically in menus, online help, etc.
 
 $Id$
 """
+__version__='$Revision$'
 from keyedlist import KeyedList
 
 ############################################################

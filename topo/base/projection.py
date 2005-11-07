@@ -3,7 +3,7 @@ Projection and related classes.
 
 $Id$
 """
-
+__version__='$Revision$'
 import Numeric
 
 from itertools import chain

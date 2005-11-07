@@ -7,6 +7,7 @@ automatic parameter setting, message output, etc.
 
 $Id$
 """
+__version__='$Revision$'
 
 import sys
 

@@ -65,7 +65,7 @@ self connections might have src_port = 'recurrent'.
 
 $Id$
 """
-
+__version__='$Revision$'
 
 from topoobject import TopoObject
 from parameter import Parameter

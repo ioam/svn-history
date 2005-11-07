@@ -2,14 +2,14 @@
 """
 Module for handling experiment parameters and defaults.
 
-$Id$
-
 This module defines an attribute descriptor for experiment parameters.
 An experiment parameter is represented in Topographica as a special
 kind of class attribute.  See the Parameter class documentation for
 more details.
-"""
 
+$Id$
+"""
+__version__='$Revision$'
 from utils import classlist
 
 

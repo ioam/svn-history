@@ -7,6 +7,7 @@ the functions therefore have the same mathematical behaviour as Numeric.
 
 $Id$
 """
+__version__='$Revision$'
 
 from math import pi
 from Numeric import where,maximum,cos,sin,sqrt,less_equal,divide,greater_equal,bitwise_xor

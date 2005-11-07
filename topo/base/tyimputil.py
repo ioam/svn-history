@@ -19,6 +19,9 @@ Exported classes:
 
 $Id$
 """
+
+__version__='$Revision$'
+
 ### JABHACKALERT!
 ###
 ### What does "Replaced extension module with the full imputil once

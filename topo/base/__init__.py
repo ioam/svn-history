@@ -9,5 +9,6 @@ of this one are optional.
 
 $Id$
 """
+__version__='$Revision$'
 
 __all__ = ['registry','simulator','parameter','utils','commandline','sheetview','gendocs','patterngenerator','sheet','boundingregion']
