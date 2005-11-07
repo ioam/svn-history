@@ -10,6 +10,7 @@ Output will be in files name ImageSaver.*.
 
 $Id$
 """
+__version__='$Revision$'
 
 import sys
 from topo import * 

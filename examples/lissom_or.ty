@@ -9,6 +9,7 @@ simplified to have only the variables needed for Topographica.
 
 $Id$
 """
+__version__='$Revision$'
 
 # To use a faster but more complex implementation (using memory
 # pointers to access data structures instead of the Python/C API),
