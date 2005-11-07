@@ -27,7 +27,7 @@ function bare_folder_name() {
 function banner($fname) {
 
   include('config.php');
-
+    
   if ($fname == "/Home")  {
 	
 	# main page banner
@@ -36,9 +36,6 @@ function banner($fname) {
 <CENTER>
 <IMG src="../images/'.$logofile.'" align="middle"
      width="497" height="134" border="0" alt="Topographica logo">
-<!-- &nbsp;
-<IMG src="../images/'.$logotext.'" align="middle"
-     width="420" height="113" border="3" alt="Topographica"> -->
 </CENTER>
 </td></tr></table>
 ';
@@ -71,10 +68,12 @@ function menu_side($fname) {
 
 	# menu name and link
 	$menu_items = array("Home" => "../Home/index.html", 
+#		"Screenshots" => "../Screenshots/index.html",
 		"Tutorial" => "../Tutorial/index.html",
-		"User Manual" => "../User_Manual/index.html",
+#		"User Manual" => "../User_Manual/index.html",
 		"Reference Manual" => "../Reference_Manual/index.html",
-		"Downloads" => "http://sourceforge.net/project/showfiles.php?group_id=53602",
+#		"Developer Manual" => "../Developer_Manual/index.html",
+		"Downloads" => "../Downloads/index.html",
 		"Lists, Forums" => "../Lists,_Forums/index.html",
 		"Team Members" => "../Team_Members/index.html",
 		"Future Work" => "../Future_Work/index.html",
