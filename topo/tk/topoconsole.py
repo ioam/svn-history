@@ -24,12 +24,21 @@ import topo.base.topoobject
 from topo.base.registry import active_sim
 import topo.commands.basic
 
+import webbrowser
 
 SCRIPT_FILETYPES = [('Topographica scripts','*.ty'),('Python scripts','*.py'),('All files','*')]
 
 SAVED_FILE_EXTENSION = '.typ'
 SAVED_FILETYPES = [('Topographica saved networks','*'+SAVED_FILE_EXTENSION),('All files','*')]
 
+
+
+tut_path = 'doc/Tutorial/index.html'
+ref_man_path = 'doc/Reference_Manual/index.html'
+topo_www = 'http://www.topographica.org/'
+python_doc = 'http://www.python.org/doc/'
+
+        
 
 class PlotsMenuEntry(topo.base.topoobject.TopoObject):
     """
@@ -206,7 +215,25 @@ class TopoConsole(Frame):
                                  'Licensing and release information',
                                  label="About",
                                  command=self.new_about_window)
+         
+        self.menubar.addmenuitem('Help', 'command',
+                                 'Walk-through LISSOM example',
+                                 label="Tutorial",
+                                 command=(lambda url=tut_path: self.open_url(url,relative=True)))
+        self.menubar.addmenuitem('Help', 'command',
+                                 'Detailed documentation',
+                                 label="Reference Manual",
+                                 command=(lambda url=ref_man_path: self.open_url(url,relative=True)))
+        self.menubar.addmenuitem('Help', 'command',
+                                 'Python reference',
+                                 label="Python documentation",
+                                 command=(lambda url=python_doc: self.open_url(url)))
+        self.menubar.addmenuitem('Help', 'command',
+                                 'Topographica on the web',
+                                 label="Topographica.org",
+                                 command=(lambda url=topo_www: self.open_url(url)))
 
+        
         #
         # Command entry
         #
@@ -402,6 +429,19 @@ class TopoConsole(Frame):
         win.deiconify()
         self.messageBar.message('state', 'OK')
             
+    def open_url(self, location, relative=False):
+        """
+        """
+        
+        if relative:
+            location = os.path.join(os.getcwd(),location)
+            
+        try:
+            webbrowser.open(location,autoraise=True)
+            self.messageBar.message('state', 'Launched browser to '+location)
+        except Error:
+            self.messageBar.message('state', 'Unable to launch a browser')
+
 
     #
     # Command buttons.
