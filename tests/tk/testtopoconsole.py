@@ -48,3 +48,6 @@ suite = unittest.TestSuite()
 #  $DISPLAY is undefined.  Used mainly for GUI testing.
 suite.requires_display = True
 suite.addTest(unittest.makeSuite(TestTopoConsole))
+
+if __name__ == '__main__':
+    unittest.TextTestRunner(verbosity=2).run(suite)
