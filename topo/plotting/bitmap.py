@@ -172,7 +172,11 @@ class Bitmap(topo.base.topoobject.TopoObject):
         if max(inArray.flat) > 1:
             self.warning('arrayToImage inputs > 1. Normalizing.  Max value: ', max(inArray.flat))
             inArray = Numeric.divide(inArray,max(inArray.flat))
-        assert max(inArray.flat) <= 1, 'arrayToImage failed to Normalize'
+        if not max(inArray.flat) <= 1:
+            self.warning('arrayToImage failed to Normalize.  Possible NaN.  Using blank matrix.')
+            shape = inArray.shape
+            inArray = Numeric.zeros(shape)
+            
             
         # PIL 'L' Images use 0 to 255.  Have to scale up.
         inArray = (Numeric.floor(inArray * 255)).astype(Numeric.Int)
