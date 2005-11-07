@@ -299,6 +299,11 @@ class PlotEngine(TopoObject):
                     key = ('Weights',sheet,projection,sheet_x,sheet_y)
                     plot_list.append(Plot((key,None,None),COLORMAP,p.src,pt.channels['Normalize']))
         self.debug('plot_list =' + str(plot_list))
+        ### JCHACKALERT! This is an Hack so that the plot are appearing in alphabetical order
+        ### which, luckily, corresponds to the order we want them to be displayed in
+        ### This is something that needs more fixing (also see PatternGenerators and the JCHACKALERT!
+        ### alert above in the file for similar problem)
+        plot_list.sort(reverse=True)
         return plot_list
 
 
