@@ -38,6 +38,9 @@ allowing interruption or other activities during long computations.
   in IDLE, and will allow the GUI to be local while the simulator runs
   on a distant machine.
 -->
+In addition to the progress bars, it would be nice to have an estimate
+for the memory requirements of a large network, so that the user can
+verify that it is a reasonable simulation to run on his or her machine.
 
 <P><DT>Plotting</DT><DD>
 Two-dimensional bitmap plots are already supported, but will be
@@ -45,7 +48,8 @@ expanded significantly over the near term and longer term.  Immediate
 tasks include allowing the user to control plot brightness scaling if
 desired, and adding an "overload" or "cropped" indicator to show if
 some values are too large to be displayed in the selected range.  We
-will also be adding support for arbitrary user-defined colormaps.
+will also be adding support for arbitrary user-defined colormaps, and
+for numerical indications of the plotting scales.
 
 <P><DT>Input patterns</DT><DD>
 The support for drawing input patterns is fairly mature, but to handle
@@ -174,6 +178,14 @@ in Neuron or Genesis instead.
 <H2>Eventually:</H2>
 <DL COMPACT>
 
+
+<P><DT>Plot histories</DT><DD>
+It would be nice if GUI plot windows could save a user-selectable
+amount of history, so that one could scroll back and forth over time
+to compare the time-stamped plots.  Once this is done, it should be
+feasible to add animations of these plots over time, as a helpful
+visualization.
+
 <P><DT>Registry editor</DT><DD>
 In a large network with components of different types, each having
 various parameters and default values, it can be difficult to
@@ -198,8 +210,8 @@ values in the simulator to user-defined quantities for display.
 
 The reference manual is generated automatically from the source code,
 and needs significant attention to ensure that it is readable and
-consistent.
-
+consistent.  For instance, not all parameters are documented yet, but
+all will need to be.
 
 <P><DT>Parallelization</DT><DD>
 Due to their weakly interconnected graph structure, Topographica
