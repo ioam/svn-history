@@ -11,6 +11,7 @@ $Id$
 __version__='$Revision$'
 
 from Tkinter import StringVar, Frame, LEFT, RIGHT, TOP, BOTTOM, YES, X
+from topo.base.sheet import Sheet
 import Pmw
 import plotpanel
 import topo.base.connectionfield
@@ -39,7 +40,7 @@ class CFSheetPlotPanel(plotpanel.PlotPanel):
         # Create the item list for CFSheet 'Sheet'  This will not change
         # since this window will only examine one Simulator.
         sim = self.console.active_simulator()
-        self._sim_eps = [ep for ep in sim.get_event_processors()
+        self._sim_eps = [ep for ep in sim.objects(Sheet).values()
                   if isinstance(ep,topo.base.connectionfield.CFSheet)]
         sim_ep_names = [ep.name for ep in self._sim_eps]
         if len(sim_ep_names) > 0:

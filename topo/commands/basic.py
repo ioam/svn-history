@@ -82,14 +82,14 @@ def pattern_present(inputs=None,duration=1.0,sim=None,learning=False,overwrite_p
             
         # turn off sheets' learning if learning=False
         if not learning:
-            for each in sim.get_event_processors():
-                if isinstance(each,Sheet):
-                    each.learning = False
+            for each in sim.objects(Sheet).values():
+                 each.learning = False
+
 
         if not apply_output_fn:
-            for each in sim.get_event_processors():
-                if isinstance(each,ProjectionSheet):
-                    each.apply_output_fn = False
+            for each in sim.objects(Sheet).values():
+                 each.apply_output_fn = False
+
 
         gen_eps_list = sim.objects(GeneratorSheet)
         
@@ -106,14 +106,14 @@ def pattern_present(inputs=None,duration=1.0,sim=None,learning=False,overwrite_p
 
         # turn sheets' learning back on if we turned it off before
         if not learning:
-            for each in sim.get_event_processors():
-                if isinstance(each,Sheet):
-                    each.learning = True
+            for each in sim.objects(Sheet).values():
+                each.learning = True
+  
 
         if not apply_output_fn:
-            for each in sim.get_event_processors():
-                if isinstance(each,ProjectionSheet):
-                    each.apply_output_fn = True
+            for each in sim.objects(Sheet).values():
+                each.apply_output_fn = True
+ 
             
         if not overwrite_previous:
             restore_input_generators(sim)

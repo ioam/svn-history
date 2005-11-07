@@ -50,6 +50,7 @@ be protected as much as possible while remaining flexible.
 $Id$
 """
 __version__='$Revision$'
+
 ### JABHACKALERT!
 ### 
 ### The code in this file has not yet been reviewed, and may need
@@ -57,13 +58,13 @@ __version__='$Revision$'
 
 from copy import deepcopy
 from topo.base.topoobject import TopoObject
-from topo.base.utils import flatten
+from topo.base.utils import flatten, dict_sort
 from plot import Plot, SHC,HSV,RGB,COLORMAP
 from plotgroup import *
 from topo.base.sheet import Sheet
 from topo.base.connectionfield import CFSheet
 from topo.base.sheetview import SheetView
-
+from topo.base.sheet import Sheet
 
 def sheet_filter(sheet):
     """
@@ -101,25 +102,6 @@ class PlotEngine(TopoObject):
         super(PlotEngine,self).__init__(**params)
         self.simulation = simulation
         self.plot_group_dict = {}
-
-
-    ### JABHACKALERT!  (for Judah)
-    ###
-    ### This type of function occurs in a number of different places
-    ### throughout the code.  Please search for all calls to
-    ### get_event_processors(), and replace any of them that are just
-    ### selecting subclasses (like this one does) and replace it with a
-    ### call to simulator.objects(baseclass).  E.g. this function should
-    ### be deleted, with simulator.objects(Sheet) used instead.
-
-    def _sheets(self):
-        """
-        Get the list of sheets from the event processor list attached
-        to the local Simulation.
-        """
-        sheet_list = [each for each in self.simulation.get_event_processors()
-                      if isinstance(each,Sheet)]
-        return sheet_list
 
 
     def add_plot_group(self, name, group):
@@ -165,7 +147,7 @@ class PlotEngine(TopoObject):
 #         and not just one.  Each SheetView in the list will be set with
 #         a Plot object.
 #         """
-#         sheet_list = [each for each in self._sheets() if filter_lam(each)]
+#         sheet_list = [each for each in self.simulation.objects(Sheet).values() if filter_lam(each)]
 #         self.debug('sheet_list =' + str(sheet_list) + 'name = ' + str(name))
 
 #         view_list = [(each, each.sheet_view(name)) for each in sheet_list
@@ -194,7 +176,7 @@ class PlotEngine(TopoObject):
 #         the weights must be requested from each Projection on the
 #         target sheets.
 #         """
-#         sheet_list = [each for each in self._sheets() if filter_lam(each) and each.name == sheet_target]
+#         sheet_list = [each for each in self.simulation.objects(Sheet).values()if filter_lam(each) and each.name== sheet_target]
 
 #         projection_list = []
 #         for s in sheet_list:
@@ -232,7 +214,17 @@ class PlotEngine(TopoObject):
         SheetView.  The default behavior will be to only look at the
         first one and dispose of any others if they exist.
         """
-        sheet_list = [each for each in self._sheets() if filter_lam(each)]
+        ### JCHACKALERT! It was necessary here to sort the sheet (with the function sort_dict
+        ### so that (and by chance that our display is currently following the alphabetical order)
+        ### the plot are placed in a logical way from left to right (i.e. LeftRetina, RightRetina, V1, V2
+        ### but also Orientation Preference, Orientation Preference&Selectivity, Orientation Selectivity).
+        ### This has to be changed so that each classes has a number that roughly determine where we
+        ### wants it on the plot (i.e. GeneratorSheet: 5, CFSheet: 50)
+        ### Note that the same problem has to be solved for PatternGenerator in order to determine
+        ### in which order to display scale, offset...
+        ### (When the problem will be solved, it can be sapred to import dict_sort from topo/base/utils.py)
+        sheet_list = [each for each in dict_sort(self.simulation.objects(Sheet)) if filter_lam(each)]
+        
         # Loop over all sheets that passed the filter.
         #     Loop over each individual PlotTemplate:
         #         Loop over each channel in the Plot.  Add needed Nones.
