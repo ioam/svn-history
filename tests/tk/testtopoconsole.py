@@ -1,3 +1,10 @@
+"""
+Unit test for TopoConsole
+$Id$
+"""
+__version__='$Revision$'
+
+
 import unittest
 from topo.tk import *
 from topo.base.simulator import Simulator

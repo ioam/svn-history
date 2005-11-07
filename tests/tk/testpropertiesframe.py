@@ -3,6 +3,8 @@ Test cases for propertiesframe.py.
 
 $Id$
 """
+__version__='$Revision$
+
 import unittest
 from Tkinter import *
 from topo.tk import *

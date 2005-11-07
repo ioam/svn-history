@@ -1,3 +1,9 @@
+"""
+Unit test for PlotPanel
+$Id$
+"""
+__version__='$Revision$'
+
 import unittest, os
 import topo
 from topo.sheets.generatorsheet import *

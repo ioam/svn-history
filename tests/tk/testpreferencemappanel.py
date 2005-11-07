@@ -1,3 +1,10 @@
+"""
+Test for PreferenceMapPanel
+$Id$
+"""
+__version__='$Revision$'
+
+
 import unittest
 import topo
 import Numeric
@@ -12,6 +19,10 @@ from topo.base.sheetview import *
 from topo.plotting.plotengine import *
 from topo.tk.preferencemappanel import *
 
+### JCALERT: This test has to be written in order to test the new change in
+### the PreferenceMapPanel file
+### (It would be nice to re-write it when performing at the same time a re-organisation and
+### clean-up of the tk directory
 
 class TestPreferenceMapPanel(unittest.TestCase):
 

@@ -1,3 +1,9 @@
+"""
+Unit test for activity panel (BasicPlotPanel)
+$Id$
+"""
+__version__='$Revision$'
+
 import unittest
 import topo
 import Numeric

@@ -1,3 +1,9 @@
+"""
+Test directory for the tk package in topo/tk
+$Id$
+"""
+__version__='$Revision$'
+
 import os,unittest
 
 import testpropertiesframe

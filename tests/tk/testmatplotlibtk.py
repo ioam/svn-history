@@ -1,3 +1,9 @@
+"""
+Unit test for the matplot lib in tk
+$Id$
+"""
+__version__='$Revision$'
+
 import unittest
 import matplotlib
 
