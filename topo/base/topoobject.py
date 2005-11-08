@@ -11,7 +11,7 @@ __version__='$Revision$'
 
 import sys
 
-from parameter import Parameter
+from parameter import Parameter, Constant
 from utils import classlist,descendents
 from pprint import pprint
 
@@ -63,6 +63,9 @@ class TopoMetaclass(type):
         for key,val in self.__dict__.items():
             if isinstance(val,Parameter):
                 print self.__name__+'.'+key, '=', val.default
+
+
+import copy
 
 class TopoObject(object):
     """
@@ -209,27 +212,47 @@ class TopoObject(object):
 
 
     def __getstate__(self):
-        import copy
+        """
+        CEBHACKALERT: I will document this function.
+        """
+        state = {}
+        
+        # CEBHACKALERT: 
+        # what this ought to do is traverse the classes in order most general to specific to get the
+        # attributes, writing over more general ones with more specific.
+        # I have code that uses classlist() do that, but I know for certain that the current code does not affect
+        # the operation of LISSOM.
+        # The exclusion of Constant is because we currently load a script first, so Constants get set.
+        
+        # first get class-level attributes
+        c = self.__class__
+
+        for entry in c.__dict__.keys():
+            if isinstance(c.__dict__[entry], Parameter) and not isinstance(c.__dict__[entry], Constant):
+                state[entry] = getattr(self, entry)
+
+        # end CEBHACKALERT
+
+        # now get the object's __dict__
         try:
-            state = copy.copy(self.__dict__)
-            for x in self.nopickle:
-                if x in state:
-                    del(state[x])
-                else:
-                    desc,cls = type(self).get_param_descriptor(x)
-                    if desc and (desc.get_name() in state):
-                        del(state[desc.get_name()])
-                
+            state.update(copy.copy(self.__dict__))
+            
         except AttributeError,err:
+            # object doesn't have a __dict__
             pass
 
+        # get slots for this object's classes
         for c in classlist(type(self)):
             try:
                 for k in c.__slots__:
                     state[k] = getattr(self,k)
+                    
             except AttributeError:
+                # class doesn't have __slots__
                 pass
+
         return state
+
 
     def __setstate__(self,state):
         for k,v in state.items():
