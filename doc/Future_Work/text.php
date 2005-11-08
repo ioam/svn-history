@@ -298,4 +298,99 @@ contributions are very welcome!
      g
 -->
 
-</DL>
+<!-- Text from former MILESTONES file
+
+  - Add bitmap colorizations (using palette.py)
+
+  - Add state (weight) saving. (done)
+
+  - Verify/fix .ty file importing; it should work just like .py file
+    importing.  May need to send some changes to the Python maintainers.
+
+  - Verify that everything works on Windows and Mac.  
+
+  - Support composite objects (for multiple training inputs, face
+    patterns).
+
+  - Add linking objects between eyes (for e.g. ocular dominance).
+
+  - Add user-defined arbitrary colormaps ("KRYW", "BbKrR", etc.).
+
+  - Add sheet edge buffers.
+
+  - Implement binary file saving, using CDF, HDF, or something like it.
+
+  - Add histogram plots.
+
+  - Add remaining radial functions, if any, from both input generation
+    and kernel factory routines.
+
+  - Configure GUI to pop up a requestor for urgent-enough messages.
+  
+  - Consider supporting 1D and 3D line-based plotting such plots, using
+    e.g. Matplotlib or Pyx, though this can possibly be postponed to the
+    next milestone.
+  
+  - Add intersections and unions, which are needed when RFs extend past
+    the edge of a sheet. (intersections done)
+  
+  - Make sure that most parameters use bounded ranges.
+  
+  - Consider adding a general mechanism for scaling values from one
+    range to another, so that units can be specified as the user desires
+    and then converted to what the code expects. 
+  
+  - Add a mechanism to group Sheets into a logical unit for plotting,
+    analysis, etc.  For instance, it should be possible to group three
+    R,G,B sheets into one eye, two ON and OFF sheets into one LGN area,
+    and several V1 layers into one stack.  Such grouping should support
+    e.g. presenting a color bitmap to an Eye instead of to R, G, and B
+    separately, plotting the resulting activation from the three areas
+    in true color, combining ON and OFF plots into one bitmap (by
+    subtraction), and measuring a vertically summed orientation map for a
+    model using several layers.  This functionality may only be required for
+    later milestones, but is listed here in case it is required for ON/OFF
+    plots.
+  
+  - Unify random number generation, so that users can manipulate seeds
+    appropriately to play back a particular simulation.
+  
+  - Consider using the Python logger module as a back end for logging
+    messages.
+  
+  - Might, or might not, want to support LISSOM's backprojection fuctions.
+
+Milestone 4: Stable APIs. Finalize the user APIs, and port all
+categories of simulations from parts II and III of the LISSOM book
+(i.e. orientation maps, ocular dominance maps, direction maps,
+combined maps, face maps, and two-level maps) to Topographica.
+
+Reaching this milestone is primarily an issue of agreement between all
+developers that the API has matured to the point that it will be
+extensible in the directions we plan for Topographica to go, without
+breaking existing user code.  Of course, we won't be able to do this
+perfectly, and some changes to user code will be necessary, but after
+this point we will have to provide some way to convert old user code
+into something that will work with each new release.
+
+Once milestone 4 is released, we can make a full 1.0 public release,
+and we can stop using LISSOM for anything but retrieving historical
+results.
+
+
+Milestone 5: Advancing. Implement a large percentage of the features
+promised in the Topographica grant proposal, enough to clearly
+demonstrate that the software is a big advance over LISSOM
+5.0.
+
+Once milestone 5 has been reached, we can make another public
+release and start heavily marketing the software to all potential
+users, trying to convince them to switch from whatever they are
+currently using to Topographica.  
+
+See the Topographica grant proposal, and notes sent to Eyal Seidemann
+'Tue, 6 Sep 2005 18:16:52 +0100'.  This milestone will include things
+like GUI-based network building, algorithms other than LISSOM and SOM,
+libraries of other learning rules and neuron types, etc.
+
+-->
