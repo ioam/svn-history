@@ -247,7 +247,7 @@ control the width and height of e.g. Gaussians and rings
 </dt><dd> controls the brightness (try 0.5 for a sine grating).  Note
 that this relatively simple model is very sensitive to the scale, and
 scales higher than about 0.5 will result in a broad,
-orientation-selective response.  More complex models (and actual brains!)
+orientation-unselective response.  More complex models (and actual brains!)
 are less sensitive to the scale or contrast.
 </dd><dt><span class='t_item'>offset</span>                         </dt><dd> is added to every pixel
 </dd><dt><span class='t_item'>frequency</span>
