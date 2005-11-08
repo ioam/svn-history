@@ -358,7 +358,7 @@ class PlotEngine(TopoObject):
             print inspect.stack(), '\n'
 
             ### JCALERT! If you decide to uncomment these lines, you also have to uncomment
-            ### the two function that are commented out above
+            ### the two functions that are commented out above in the file.
             
             #if isinstance(name,tuple) and name[0] == 'Weights':
             #    dynamic_list = lambda : self.lambda_for_weight_view(name,filter_lam)
