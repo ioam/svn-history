@@ -31,17 +31,10 @@ clean-ext-packages:
 # Startup Script, in Python
 topographica: external Makefile
 	echo "#!${PREFIX}/bin/python" > topographica
-	echo "#  Wrapper for setting environment vars and execing commands" >> topographica
+	echo "#  Wrapper for setting environment vars and exec-ing commands" >> topographica
 	echo "import os,sys,topographica_script" >> topographica
 	echo "" >> topographica
 	echo "TOPO = '${PREFIX}'" >> topographica
-	echo "DISLIN = os.path.join(TOPO,'lib/dislin')" >> topographica
-	echo "" >> topographica
-	echo "os.putenv('DISLIN',DISLIN)" >> topographica
-	echo "os.putenv('LD_LIBRARY_PATH'," >> topographica
-	echo "          ':'.join((os.path.join(TOPO,'lib'),DISLIN,os.getenv('LD_LIBRARY_PATH',''))))" >> topographica
-	echo "os.putenv('PYTHONPATH',TOPO+':'+os.path.join(DISLIN,'python')+':'+os.getenv('PYTHONPATH',''))" >> topographica
-	echo "" >> topographica
 	echo "" >> topographica
 	echo "# exec" >> topographica
 	echo "cmd = os.path.join(TOPO,'bin/python')" >> topographica
