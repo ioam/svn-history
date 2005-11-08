@@ -40,7 +40,7 @@ from topo.base.parameter import DynamicNumber
 ###########################################
 # Temporary variables designed to match the C++ version of LISSOM
 
-BaseN=72.0
+BaseN=48.0
 BaseRN=24.0
 area_scale=1.0
 num_eyes=1
