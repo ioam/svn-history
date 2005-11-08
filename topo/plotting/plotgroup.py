@@ -43,6 +43,13 @@ from topo.base.parameter import Parameter
 FLAT = 'FLAT'
 
 
+
+def sort_plots(plot_list):
+    """ This a simple routine to sort a plot list according to their src_name"""
+    plot_list.sort(lambda x, y: cmp(x.view_info['src_name'], y.view_info['src_name']))
+    #return plot_list
+        
+
 class PlotGroupTemplate(TopoObject):
     """
     Container class for a PlotGroup object definition.  This is
@@ -194,7 +201,6 @@ class PlotGroup(TopoObject):
         for each in self.all_plots:
             each.release_sheetviews()
 
-
     def plots(self):
         """
         Generate the bitmap lists.
@@ -214,9 +220,16 @@ class PlotGroup(TopoObject):
         # objects.
         
         generated_bitmap_list = [each.plot() for each in self.all_plots]
-        return [each for each in generated_bitmap_list if each is not None]
-
-
+        generated_bitmap_list = [each for each in generated_bitmap_list if each is not None]
+        
+        ### JCALERT! For each plotgroup, we want the plot to be displayed
+        ### in the alphabetical order according to their view_info['src_name']
+        ### The only PlotGroup that does not have to do that is the projectionplotgroup
+        ### and that is why this function is overwritten
+        sort_plots(generated_bitmap_list)
+        return generated_bitmap_list
+    
+  
 
 class BasicPlotGroup(PlotGroup):
     """
@@ -302,7 +315,29 @@ class ProjectionPlotGroup(PlotGroup):
         # This is no longer correct now that the UnitViews are no
         # longer on the Projection target sheet.
         # for (x,y) in coords: self._sim_ep.release_unit_view(x,y)
+
+    ### JCALERT ! for the moment this function is re-implemented for ProjectionGroup
+    ### because we do not want the plots to be sorted according to their src_name in this caseXS
+    def plots(self):
+        """
+        Generate the bitmap lists.
+        """            
+        bitmap_list = []
+        if isinstance(self.plot_list,types.ListType):
+            self.debug('Static plotgroup')
+            self.all_plots = flatten(self.plot_list) + self.added_list
+        else:       # Assume it's a callable object that returns a list.
+            self.debug('Dynamic plotgroup')
+            self.all_plots = flatten(self.plot_list()) + self.added_list
+            self.debug('all_plots = ' + str(self.all_plots))
+
+        # Eventually a simple list comprehension is not going to be
+        # sufficient as outlining and other things will need to be
+        # done to each of the matrices that come in from the Plot
+        # objects.
         
+        generated_bitmap_list = [each.plot() for each in self.all_plots]
+        return [each for each in generated_bitmap_list if each is not None]
 
 
 
