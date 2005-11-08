@@ -8,7 +8,7 @@ DOC    = doc/Reference_Manual
 # Default does not include doc, in case user lacks PHP
 default: ext-packages topographica reference-manual
 
-all: default doc
+all: default doc tests examples
 
 clean: cleandoc clean-ext-packages
 
