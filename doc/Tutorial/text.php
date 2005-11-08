@@ -58,15 +58,15 @@ synaptic weights.
 
 <li> To see how this network responds to a simple visual image,
 select <span class='t_item'>Test pattern</span> from the <span class='t_item'>Simulation</span> menu to get the
-<span class='w_title'>Test Pattern</span> window, select a <span class='t_item'>Gaussian</span> <span class='t_item'>Input type</span>, then hit <span class='b_press'>Present</span>:
+<span class='w_title'>Test Pattern</span> window, select a <span class='t_item'>Line</span> <span class='t_item'>Input type</span>, then hit <span class='b_press'>Present</span>:
 
 <p class='center'>
 <img src="images/test_pattern.png" alt="Test Pattern window"
-align="middle" width="415" height="606">
+align="middle" width="415" height="603">
 </p>
 
 <p>
-This will present an an oriented 2D Gaussian.  
+This will present a horizontal line.  
 </p>
 
 <p></p>
@@ -75,7 +75,7 @@ This will present an an oriented 2D Gaussian.
 <li>To see the result, select <span class='t_item'>Activity</span> from
 the <span class='t_item'>Plots</span> menu on the <span class='w_title'>Topographica Console</span> to get:
 <p class='center'>
-<img src="images/activity_gaussian.png" alt="Response to Gaussian" align="middle" width="420" height="320">
+<img src="images/activity_line.png" alt="Response to a line" align="middle" width="420" height="317">
 </p>
 
 
@@ -88,9 +88,8 @@ and <span class='t_item'>V1</span> on the right.
 a pixel whose shade of grey codes the response level, increasing from black to
 white.  These patterns are what was specified in
 the <span class='w_title'>Test Pattern</span> window. At this stage, in V1, the response
-level is also coded in shades of grey. Note that the response is often patchy, as
+level is also coded in shades of grey. Note that the response is patchy, as
 explained below.
-<!-- Should say 'patchy', but this one is not -->
 
 </p>
 
@@ -108,7 +107,7 @@ the neuron in the center of the cortex (by default):
 
 <p class="center">
 <img src="images/unit_weights_0_0.png" alt="Weights of one
-neuron" align="middle" width="504" height="305">
+neuron" align="middle" width="504" height="302">
 </p>
 
 <p>
@@ -117,7 +116,7 @@ retina), followed by the  lateral excitatory and lateral inhibitory
 weights to that neuron from nearby neurons in V1. The afferent
 weights represent the retinal pattern that would most excite the neuron.
 For this particular neuron, the optimal retinal stimulus would be a
-bright line oriented at about 45 degrees (10 o'clock) in about the
+bright line oriented at about 20 degrees (2 o'clock) in about the
 center of the retina.
 </p><p></p></li><li>If all neurons had the same weight pattern, the response
 would not be patchy -- it would just be a blurred version of the
@@ -126,7 +125,7 @@ inputs). To see what the other neurons look like, select <span class='t_item'>Pr
 
 <p class="center">
 <img src="images/projection.png" alt="Afferent weights of many
-neurons" align="middle" width="548" height="468">
+neurons" align="middle" width="548" height="465">
 </p>
 
 This plot shows the afferent weights for every seventh neuron in each
@@ -146,8 +145,8 @@ neuron.  A similar procedure can be performed in the model by selecting
 <span class='t_item'>Orientation Preference</span> from the <span class='t_item'>Plots</span> menu:
 
 <p class="center">
-<img src="images/or_map.png" alt="Orientation map" width="551" height="294">&nbsp;&nbsp;&nbsp;
-<img src="images/or_key_vert_transparent_topo.png" alt="Orientation key" height="294" width="24">
+<img src="images/or_map.png" alt="Orientation map" width="551" height="291">&nbsp;&nbsp;&nbsp;
+<img src="images/or_key_vert_transparent_topo.png" alt="Orientation key" height="291" width="24">
 </p><br>
 
 <P>
@@ -185,8 +184,8 @@ on the <span class='w_title'>Test pattern</span> window and then looking
 at the refreshed image in the <span class='w_title'>Activity</span> window:
 
 <p class="center">
-<img src="images/activity_gaussian_or.png" alt="Sample Gaussian" width="420" height="320">
-<img src="images/or_key_vert_transparent_topo.png" alt="Orientation key" height="294" width="24">
+<img src="images/activity_line_or.png" alt="Color-coded response to a line" width="420" height="317">
+<img src="images/or_key_vert_transparent_topo.png" alt="Orientation key" height="317" width="24">
 </p><br>
 
 
@@ -226,7 +225,7 @@ the neurons around the center of the plot are primarily (**magenta (purple)) .)
 
 <li> Now that you have a feel for the various plots, you can try
 different input patterns, seeing how the cortex responds to each one.
-Just select an <span class='t_item'>Input type</span>, e.g.  <span class='t_item'>Line</span>,
+Just select an <span class='t_item'>Input type</span>, e.g.  <span class='t_item'>Gaussian</span>,
 <span class='t_item'>Disk</span>, or <span
 class='t_item'>SineGrating</span>, and then hit
 <span class='b_press'>Present</span>.
