@@ -69,7 +69,6 @@ class Projection(EPConnection):
     Sheet.  Other than that, a Projection may be of any type.
     """
     strength = Number(default=1.0)
-    activity = []
 
     def __init__(self,**params):
         super(Projection,self).__init__(**params)

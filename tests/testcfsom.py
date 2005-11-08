@@ -21,7 +21,7 @@ from topo.patterns.basic import GaussianGenerator
 from math import pi
 from topo.base.parameter import Dynamic
 import random
-from topo.projections.kernelprojection import KernelProjection
+from topo.base.connectionfield import CFProjection
 import pdb #debugger
 
 
@@ -51,7 +51,7 @@ class TestCFSom(unittest.TestCase):
         som = CFSOM()
         
         s.add(som,input,save)
-        s.connect(input,som,connection_type=KernelProjection)
+        s.connect(input,som,connection_type=CFProjection)
         s.connect(som,save)
         s.run(duration=10)
     
@@ -93,7 +93,7 @@ class TestCFSom(unittest.TestCase):
         V1 = CFSOM(name='V1')
         V1.print_level = topo.base.topoobject.WARNING
 
-        s.connect(retina,V1,delay=1,connection_type=KernelProjection,connection_params={'name':'RtoV1'})
+        s.connect(retina,V1,delay=1,connection_type=CFProjection,connection_params={'name':'RtoV1'})
         s.print_level = topo.base.topoobject.WARNING
 
         self.assertTrue(len(V1.get_in_projection_by_name('RtoV1')) == 1)

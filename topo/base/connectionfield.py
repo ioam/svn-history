@@ -29,6 +29,9 @@ from utils import mdot,hebbian,divisive_normalization
 from sheet import Sheet
 from sheetview import UnitView
 from itertools import chain
+from patterngenerator import ConstantGenerator
+from projection import Identity
+from boundingregion import BoundingBox
 
 
 
@@ -252,9 +255,10 @@ class CFProjection(Projection):
     A projection composed of ConnectionFields from a Sheet into a ProjectionSheet.
 
     CFProjection computes its activity using a response_fn of type
-    CFResponseFunction.  Any subclass has to implement the interface
-    activate(self,input_activity) that computes the response
-    from the input and stores it in the activity array.
+    CFResponseFunction (typically a CF-aware version of mdot) and output_fn 
+    (which is typically Identity). Any subclass has to implement the interface
+    activate(self,input_activity) that computes the response from the input 
+    and stores it in the activity array.
     """
 
     response_fn = Parameter(default=GenericCFResponseFn())
@@ -262,14 +266,25 @@ class CFProjection(Projection):
     normalize = BooleanParameter(default=False)
     normalize_fn = Parameter(default=divisive_normalization)
     weight_type = Parameter(default=Numeric.Float32)
+    weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+    weights_generator = Parameter(default=ConstantGenerator())
+    learning_rate = Parameter(default=0.0)
+    output_fn  = Parameter(default=Identity())
 
     strength = Number(default=1.0)
-    activity = []
-
 
     def __init__(self,**params):
-        super(Projection,self).__init__(**params)
-        self.cfs = None
+        super(CFProjection,self).__init__(**params)
+        # set up array of ConnectionFields translated to each x,y in the src sheet
+        cfs = []
+        for y in self.dest.sheet_rows()[::-1]:
+            row = []
+            for x in self.dest.sheet_cols():
+                row.append(self.cf_type(input_sheet=self.src,weight_bounds=self.weights_bounds,weights_generator=self.weights_generator,weight_type=self.weight_type,normalize=self.normalize,normalize_fn=self.normalize_fn,x=x,y=y))
+
+            cfs.append(row)
+
+        self.set_cfs(cfs)
         self.input_buffer = None
         self.activity = Numeric.array(self.dest.activity)
 
@@ -305,7 +320,11 @@ class CFProjection(Projection):
 
 
     def activate(self,input_activity):
-        raise NotImplementedError
+        """Activate using the specified response_fn and output_fn."""
+        self.input_buffer = input_activity
+        self.response_fn(self.cfs, input_activity, self.activity, self.strength)
+        self.activity = self.output_fn(self.activity)
+
 
 
     def change_bounds(self, new_wt_bounds):
@@ -313,12 +332,28 @@ class CFProjection(Projection):
         Change the bounding box for this existing ConnectionField.
 
         Discards weights or adds new (zero) weights as necessary.
+
+	Currently only allows reducing the size, but should be
+        extended to allow increasing as well.
         """
-        raise NotImplementedError
+        if not self.weights_bounds.containsbb_exclusive(new_wt_bounds):
+            self.warning('Unable to change_bounds; currently allows reducing onl y.')
+            return
+
+        self.weights_bounds = new_wt_bounds
+        rows,cols = self.get_shape()
+        cfs = self.cfs
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cfs[r][c].change_bounds(new_wt_bounds)
+
 
 
     def change_density(self, new_wt_density):
-        """Rescales the weight matrix in place, interpolating or decimating as needed."""
+        """Rescales the weight matrix in place, interpolating or decimating as needed.
+	
+	Not yet implemented.
+	"""
         raise NotImplementedError
 
 

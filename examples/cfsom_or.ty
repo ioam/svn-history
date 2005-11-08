@@ -16,12 +16,13 @@ import random
 
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.patterngenerator import BoundingBox
-from topo.projections.kernelprojection import KernelProjection
+from topo.base.connectionfield import CFProjection
 from topo.base.parameter import DynamicNumber
 from topo.sheets.cfsom import CFSOM
 from topo.patterns.random import UniformRandomGenerator
 from topo.patterns.basic import GaussianGenerator
 from topo.base.simulator import Simulator
+from topo.responsefns.basic import CFDotProduct
 
 
 ###########################################
@@ -44,7 +45,8 @@ CFSOM.density = 50
 CFSOM.learning_length = 10000
 CFSOM.radius_0 = 0.1
 
-KernelProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+CFProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+CFProjection.response_fn = CFDotProduct()
 
 
 ###########################################
@@ -54,7 +56,7 @@ s = Simulator()
 
 Retina = GeneratorSheet(input_generator=GaussianGenerator(),name='Retina')
 V1 = CFSOM(name='V1')
-s.connect(Retina,V1,delay=0.5,connection_type=KernelProjection,connection_params={'name':'RtoV1'})
+s.connect(Retina,V1,delay=0.5,connection_type=CFProjection,connection_params={'name':'RtoV1'})
 
 s.run(1)
 #s.run(10000)

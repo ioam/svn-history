@@ -13,7 +13,9 @@ import random
 
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.patterngenerator import BoundingBox
-from topo.projections.kernelprojection import KernelProjection
+#from topo.projections.kernelprojection import KernelProjection
+from topo.base.connectionfield import CFProjection
+from topo.responsefns.basic import CFDotProduct
 from topo.base.parameter import DynamicNumber
 from topo.sheets.cfsom import CFSOM
 from topo.patterns.random import UniformRandomGenerator
@@ -40,7 +42,8 @@ CFSOM.density = 10
 CFSOM.learning_length = 10000
 CFSOM.radius_0 = 0.1
 
-KernelProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+CFProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+CFProjection.response_fn = CFDotProduct()
 
 #topo.base.topoobject.min_print_level = topo.base.topoobject.MESSAGE
 
@@ -58,18 +61,18 @@ V2 = CFSOM(name='V2')
 V3 = CFSOM(name='V3')
 
 # Projections to V1
-s.connect(LeftRetina,V1,delay=0.5,connection_type=KernelProjection,connection_params={'name':'AfferentLeft'})
-s.connect(RightRetina,V1,delay=0.5,connection_type=KernelProjection,connection_params={'name':'AfferentRight'})
-#s.connect(V2,V1,delay=0.5,connection_type=KernelProjection,connection_params={'name':'FeedbackFromV2'})
+s.connect(LeftRetina,V1,delay=0.5,connection_type=CFProjection,connection_params={'name':'AfferentLeft'})
+s.connect(RightRetina,V1,delay=0.5,connection_type=CFProjection,connection_params={'name':'AfferentRight'})
+#s.connect(V2,V1,delay=0.5,connection_type=CFProjection,connection_params={'name':'FeedbackFromV2'})
 
 
 # Projections to V2
-s.connect(LeftRetina,V2,delay=0.5,connection_type=KernelProjection,connection_params={'name':'AfferentLeft'})
-s.connect(RightRetina,V2,delay=0.5,connection_type=KernelProjection,connection_params={'name':'AfferentRight'})
-s.connect(V1,V2,delay=0.5,connection_type=KernelProjection,connection_params={'name':'AfferentV1'})
-s.connect(V3,V2,delay=0.5,connection_type=KernelProjection,connection_params={'name':'FeedbackFromV3'})
+s.connect(LeftRetina,V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'AfferentLeft'})
+s.connect(RightRetina,V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'AfferentRight'})
+s.connect(V1,V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'AfferentV1'})
+s.connect(V3,V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'FeedbackFromV3'})
 
 # Projections to V3
-s.connect(V2,V3,delay=0.5,connection_type=KernelProjection,connection_params={'name':'Afferent'})
+s.connect(V2,V3,delay=0.5,connection_type=CFProjection,connection_params={'name':'Afferent'})
 
 s.run(1)

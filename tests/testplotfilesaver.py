@@ -20,7 +20,7 @@ from topo.sheets.cfsom import CFSOM
 import topo.base.connectionfield
 from topo.plotting.plotfilesaver import *
 from PIL import *
-from topo.projections.kernelprojection import KernelProjection
+from topo.base.connectionfield import CFProjection
 
 class TestPlotFileSaver(unittest.TestCase):
 
@@ -35,7 +35,7 @@ class TestPlotFileSaver(unittest.TestCase):
         CFSOM.density = 10
         CFSOM.learning_length = 10000
         CFSOM.radius_0 = 0.1
-        topo.projections.kernelprojection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+        CFProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
         topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
         self.s = topo.base.simulator.Simulator()
         
@@ -48,9 +48,9 @@ class TestPlotFileSaver(unittest.TestCase):
         V1.print_level = topo.base.topoobject.WARNING
         V2.print_level = topo.base.topoobject.WARNING
         
-        self.s.connect(retina,V1,delay=0.5,connection_type=KernelProjection,connection_params={'name':'R1toV1'})
-        self.s.connect(retina,V2,delay=0.5,connection_type=KernelProjection,connection_params={'name':'R1toV2'})
-        self.s.connect(retina2,V2,delay=0.5,connection_type=KernelProjection,connection_params={'name':'R2toV2'})
+        self.s.connect(retina,V1,delay=0.5,connection_type=CFProjection,connection_params={'name':'R1toV1'})
+        self.s.connect(retina,V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'R1toV2'})
+        self.s.connect(retina2,V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'R2toV2'})
         self.pe = topo.plotting.plotengine.PlotEngine(self.s)
         self.s.run(2)
 

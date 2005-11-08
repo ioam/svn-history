@@ -178,20 +178,20 @@ class DivisiveHebbian(CFLearningFunction):
 
 
 ### JABALERT!  Untested.
-class DivisiveHebbianP(CFLearningFunction):
+class DivisiveHebbian_CPointer(CFLearningFunction):
     """
     CF-aware Hebbian learning rule with built-in divisive normalization.
 
     Same as DivisiveHebbian except it takes 2 extra arguments, weights_ptrs
     and slice_ptrs, in __call__. These 2 argument store the pointers to the
     weight and slice_array, respectively, of each ConnectionField in
-    KernelPointerProjection. This class should only be used by a sheet that
-    only has KernelPointerProjections connected to it. 
+    CFProjection_CPointer. This class should only be used by a sheet that
+    only has CFProjection_CPointers connected to it. 
     """
     output_fn = Constant(DivisiveL1Normalize())
 
     def __init__(self,**params):
-        super(DivisiveHebbianP,self).__init__(**params)
+        super(DivisiveHebbian_CPointer,self).__init__(**params)
 
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         weight_ptrs = params['weight_ptrs']

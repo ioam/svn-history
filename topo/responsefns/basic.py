@@ -22,7 +22,7 @@ class CFDotProduct_Py(CFResponseFunction):
     def __init__(self,**params):
         super(CFDotProduct_Py,self).__init__(**params)
 
-    def __call__(self,input_activity, activity, cfs, strength, **params):
+    def __call__(self, cfs, input_activity, activity, strength, **params):
         rows,cols = activity.shape
         for r in xrange(rows):
             for c in xrange(cols):
@@ -46,7 +46,7 @@ class CFDotProduct(CFResponseFunction):
     def __init__(self,**params):
         super(CFDotProduct,self).__init__(**params)
 
-    def __call__(self,input_activity, activity, cfs, strength, **params):
+    def __call__(self, cfs, input_activity, activity, strength, **params):
         temp_act = activity
         rows,cols = activity.shape
         len, len2 = input_activity.shape
@@ -165,7 +165,7 @@ class CFDotProduct(CFResponseFunction):
 
 
 
-class CFDotProductP(CFResponseFunction):
+class CFDotProduct_CPointer(CFResponseFunction):
     """
     Dot-product response function.
 
@@ -175,9 +175,9 @@ class CFDotProductP(CFResponseFunction):
     """
 
     def __init__(self,**params):
-        super(CFDotProductP,self).__init__(**params)
+        super(CFDotProduct_CPointer,self).__init__(**params)
 
-    def __call__(self,input_activity, activity, cfs, strength, **params):
+    def __call__(self, cfs, input_activity, activity, strength, **params):
         temp_act = activity
         rows,cols = activity.shape
         len, len2 = input_activity.shape

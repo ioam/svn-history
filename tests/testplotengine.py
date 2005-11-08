@@ -162,7 +162,8 @@ class TestPlotEngine(unittest.TestCase):
         plot_list = plot_group.plots()
         pe.debug('Type of plot_group', type(plot_group))
 
-        s.verbose('Sheets: ', pe._sheets())
+	# yfsit: PlotEngine._sheets() is gone?
+        # s.verbose('Sheets: ', pe._sheets())
         for each in plot_group.plots():
             figure_tuple = each.matrices
             hist_tuple = each.histograms

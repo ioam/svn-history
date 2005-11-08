@@ -16,7 +16,7 @@ import topo
 from topo.base.connectionfield import CFSheet
 from topo.base.parameter import Parameter, BooleanParameter
 from topo.outputfns.basic import PiecewiseLinear
-from topo.learningfns.basic import DivisiveHebbian,GenericCFLF,DivisiveHebbianP
+from topo.learningfns.basic import DivisiveHebbian,GenericCFLF,DivisiveHebbian_CPointer
 
 class LISSOM(CFSheet):
 
@@ -81,18 +81,18 @@ class LISSOM(CFSheet):
 
 
 
-class LISSOMPointer(LISSOM):
+class LISSOM_CPointer(LISSOM):
     """
     LISSOMPointer implements the same algorithm as LISSOM, but it uses a
-    special learning function (DivisiveHebbianP) for faster execution time.
-    This requires all the connections between the sheets are instances of 
-    KernelPointerProjection (specified via connect()).
+    special learning function (DivisiveHebbian_CPointer) for faster execution 
+    time. This requires all the connections between the sheets are instances of 
+    CFProjection_CPointer (specified via connect()).
     """
 
-    learning_fn = Parameter(default=DivisiveHebbianP())
+    learning_fn = Parameter(default=DivisiveHebbian_CPointer())
 
     def __init__(self,**params):
-        super(LISSOMPointer,self).__init__(**params)
+        super(LISSOM_CPointer,self).__init__(**params)
 
 
     def learn(self):

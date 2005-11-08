@@ -12,7 +12,7 @@ __version__='$Revision$'
 from topo.base.connectionfield import CFProjection
 from topo.base.parameter import Parameter
 from topo.base.utils import *
-from topo.responsefns.basic import CFDotProductP
+from topo.responsefns.basic import CFDotProduct_CPointer
 from Numeric import ones, Int
 
 import weave
@@ -22,16 +22,16 @@ class CFProjection_CPointer(CFProjection):
     Faster but less flexible version of CFProjection.
     
     Same as CFProjection except faster and limited to the special
-    case of the CFDotProductP response_fn.  Contains extra data
+    case of the CFDotProduct_CPointer response_fn.  Contains extra data
     structures to store the pointers to the weights and slice arrays
-    of connection fields.  The response_fn CFDotProductP() uses these
+    of connection fields.  The response_fn CFDotProduct_CPointer() uses these
     pointers directly, thus bypassing the slow Python/C API for
     accessing the arrays.
     """
 
     weight_ptrs = [] 
     slice_ptrs = []
-    response_fn = Parameter(default=CFDotProductP())
+    response_fn = Parameter(default=CFDotProduct_CPointer())
 
     def __init__(self,**params):
         super(CFProjection_CPointer,self).__init__(**params)
