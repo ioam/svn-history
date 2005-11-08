@@ -88,8 +88,9 @@ and <span class='t_item'>V1</span> on the right.
 a pixel whose shade of grey codes the response level, increasing from black to
 white.  These patterns are what was specified in
 the <span class='w_title'>Test Pattern</span> window. At this stage, in V1, the response
-level is also coded in shades of grey. Note that the response is patchy, as
+level is also coded in shades of grey. Note that the response is often patchy, as
 explained below.
+<!-- Should say 'patchy', but this one is not -->
 
 </p>
 
@@ -111,7 +112,7 @@ neuron" align="middle" width="504" height="305">
 </p>
 
 <p>
-The plot shows the (**order) afferent weights to V1 (i.e., connections from the
+The plot shows the afferent weights to V1 (i.e., connections from the
 retina), followed by the  lateral excitatory and lateral inhibitory
 weights to that neuron from nearby neurons in V1. The afferent
 weights represent the retinal pattern that would most excite the neuron.
@@ -121,7 +122,7 @@ center of the retina.
 </p><p></p></li><li>If all neurons had the same weight pattern, the response
 would not be patchy -- it would just be a blurred version of the
 input (for inputs matching the weight pattern), or blank (for other
-inputs). To see what the other neurons look like, select <span class='t_item'>Projection</span> from the Plot menu:
+inputs). To see what the other neurons look like, select <span class='t_item'>Projection</span> from the <span class='t_item'>Plots</span> menu:
 
 <p class="center">
 <img src="images/projection.png" alt="Afferent weights of many
@@ -142,7 +143,7 @@ activity patterns are patchy.
 in experimental animals, optical imaging experiments present a variety
 of patterns and record the one most effective at stimulating each
 neuron.  A similar procedure can be performed in the model by selecting
-<span class='t_item'>Orientation Preference</span> from the <span class='t_item'>Plot</span> menu:
+<span class='t_item'>Orientation Preference</span> from the <span class='t_item'>Plots</span> menu:
 
 <p class="center">
 <img src="images/or_map.png" alt="Orientation map" width="551" height="294">&nbsp;&nbsp;&nbsp;
@@ -150,18 +151,25 @@ neuron.  A similar procedure can be performed in the model by selecting
 </p><br>
 
 <P>
-(This will usually take about 30 seconds to complete.)
+(This will usually take about 30 seconds to complete; it is normal
+for the Topographica windows not to refresh during this time.)
 The plot on the left is the orientation map for V1 in this network.
 Each neuron in the plot is color coded by its preferred orientation,
 according to the key to the right.
+(If viewing a monochrome printout, see web page for the colors).
 </p>
 
-<P>If viewing a monochrome printout, see web page for the colors).  You
-can see that nearby neurons have similar orientation preferences, as
-found in mammalian visual cortex.  The V1 plot on the right
+<P>You can see that nearby neurons have similar orientation
+preferences, as found in primate visual cortex.  Along the edges of
+the plots, the orientation preferences are parallel to the border due
+to receptive fields that are cut off by the edge of the retina; these
+can be ignored.  The V1 plot on the right
 shows the relative selectivity of each neuron for orientation; you can
-see that there are patches of neurons that are not very orientation
-selective, but that most are.  The V1 plot in the center shows
+see that there are patches of neurons near the borders that are not
+very orientation selective, and smaller patches in the center, but
+that most are selective.  The V1 plot in the center shows
+
+
 the two previously mentioned plots combined -- each neuron is colored
 with its preferred orientation, and the stronger the selectivity, the
 brighter the color.  From this plot it is clear that the unselective
@@ -177,9 +185,10 @@ on the <span class='w_title'>Test pattern</span> window and then looking
 at the refreshed image in the <span class='w_title'>Activity</span> window:
 
 <p class="center">
-<img src="images/activity_gaussian_or.png" alt="Sample Gaussian"
-align="middle" width="420" height="320">
-</p>
+<img src="images/activity_gaussian_or.png" alt="Sample Gaussian" width="420" height="320">
+<img src="images/or_key_vert_transparent_topo.png" alt="Orientation key" height="294" width="24">
+</p><br>
+
 
 (Alternatively, if you want to keep the old plot for comparison, you
 can make sure that <span class='t_item'>Auto-refresh</span> is not enabled in it, then
@@ -233,10 +242,14 @@ control its size, location, etc.:
 <span class='t_item'>height</span> </dt><dd>
 control the width and height of e.g. Gaussians and rings
 </dd><dt><span class='t_item'>smoothing</span>
-</dt><dd> controls the amount Gaussian-falloff around the edges of patterns such as rings and lines
+</dt><dd> controls the amount of Gaussian falloff around the edges of patterns such as rings and lines
 </dd><dt><span class='t_item'>scale</span>
-</dt><dd> controls the brightness (try 0.5 for a sine grating); this particular network is sensitive to the scale, so
-turning it too high does not result in realistic orientation detection. More full-featured networks cope with a wide range of scales, as do brains!
+
+</dt><dd> controls the brightness (try 0.5 for a sine grating).  Note
+that this relatively simple model is very sensitive to the scale, and
+scales higher than about 0.5 will result in a broad,
+orientation-selective response.  More complex models (and actual brains!)
+are less sensitive to the scale or contrast.
 </dd><dt><span class='t_item'>offset</span>                         </dt><dd> is added to every pixel
 </dd><dt><span class='t_item'>frequency</span>
 </dt><dd> controls frequency of a sine grating or Gabor 
@@ -277,10 +290,11 @@ processes can be studied with the LISSOM model in Topographica as follows.
 <p></p><li>First, select <span class='t_item'>Load script</span>
 from the <span class='t_item'>Simulation</span> menu, change to the <code>examples</code> directory, and
 select <code>lissom_or.ty</code>. This reverts the 
-network to its initial, disorganized state.
+network to its initial, disorganized state.  You will probably also
+want to close any open plotting windows, to avoid confusion.
 
-<p></p></li><li>Next, make sure that an <span class='w_title'>Activity</span> window is visible
-and has <span class='t_item'>Auto-refresh</span> enabled.  Unless your machine is
+<p></p></li><li>Next, open an <span class='w_title'>Activity</span> window 
+and make sure that it has <span class='t_item'>Auto-refresh</span> enabled.  Unless your machine is 
 very slow, also enable <span class='t_item'>Auto-refresh</span> in a
 <span class='w_title'>Projection</span> window.  On a very fast machine you could
 even <span class='t_item'>Auto-refresh</span> an <span class='w_title'>Orientation Preference</span> window
@@ -304,7 +318,7 @@ to a highly implausible level.  To do this, type:
 in the <span class='t_item'>Command</span> box or at the Topographica terminal prompt. The current learning rate is
 displayed by the terminal. Next, type:
 
-<blockquote><code class='to_type'>V1.projections()['Afferent0'].learning_rate=0.5</code></blockquote>
+<blockquote><code class='to_type'>V1.projections()['Afferent0'].learning_rate=0.1</code></blockquote>
 
 Now each new pattern generated in a
 training iteration will nearly wipe out any existing weights.
@@ -319,13 +333,13 @@ this input changes the weights, and can experiment with different inputs.
 
 <!--CEBHACKALERT: use for learning button not complete -->
 <!--
-<p></p></li><li>Once you have a particular input pattern designed, you can see
+<p><li>Once you have a particular input pattern designed, you can see
 how that pattern would affect the cortex over many iterations.  To do
 so, press the <span class='b_press'>Use for Training</span> button.  Now when you
 train for more iterations you'll see the new pattern and its effect on
 the weights.  (Note that the position and orientation of the new
 training pattern will always be (**FIXED!) for this simulation, and that
-training with (**UPDATE:) a photograph works only for photos named image.pgm.)
+training with (**UPDATE:) a photograph works only for photos named image.pgm.)</li></p>
 
 
 <p></p></li><li>After a few steps (or to do e.g. 20 steps in a row, change
@@ -353,10 +367,10 @@ patient, try doing 1000 iterations at a time instead before looking at
 an Orientation Map</b></span>.<p></p></li>
 -->
 
-<li> If you are <em>really</em> patient, you can
+<p><li> If you are <em>really</em> patient, you can
 change the number of units to something closer to real primate cortex,
 by quitting, editing the Python code file
-<code>examples/lissom_or_20000.ty</code> to contain
+<code>examples/lissom_or.ty</code> to contain
 the line <code>BaseN=150</code> rather than <code>BaseN=48</code>, and restarting.  You'll need at
 least 640MB of memory and a lot of time, but you can then step through
 the simulation as above.  The final result after 20000 iterations
