@@ -80,7 +80,7 @@ class LineGenerator(PatternGenerator):
     smoothing = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5))
     
     def function(self,**params):
-        return line( params.get('pattern_x',self.pattern_x), 
+        return line( params.get('pattern_y',self.pattern_y), 
                            params.get('thickness',self.thickness),
                            params.get('smoothing',self.smoothing))
 
