@@ -242,8 +242,7 @@ class Plot(TopoObject):
                         ### (i.e. handling of the SheetView and/or PlotGroupTemplate by PlotGroup/PlotEngine/Plot)
                         self.view_info['src_name']= self.source.name + '\n' + self.name
                         self.view_info['view_type']= self.name
-                        #print self.view_info
-                        
+                                                
             # Case 3: Channel entry is None.  Pass along.
             elif each == None:
                 self.channel_views.append(each)
