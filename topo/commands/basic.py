@@ -122,6 +122,10 @@ def pattern_present(inputs=None,duration=1.0,sim=None,learning=False,overwrite_p
         TopoObject().warning('No active Simulator.')
     
 
+# CEBHACKALERT: see below
+from topo.patterns.basic import GaussianGenerator
+from topo.patterns.random import UniformRandomGenerator
+from topo.base.sheet import Sheet
 import __main__
 
 def load_snapshot(snapshot_name):
@@ -149,9 +153,11 @@ def load_snapshot(snapshot_name):
 
     saved_sim = pickle.load(open(snapshot_name,'rb'))         
     topo.base.registry.set_active_sim(saved_sim)
-    
 
-
+    # CEBHACKALERT:
+    # Until I figure out how to pickle random properties of the GaussianGenerator properly...
+    hack = 'from topo.base.registry import active_sim; from topo.sheets.generatorsheet import GeneratorSheet; gs_list = active_sim().objects(GeneratorSheet).values();[gs.set_input_generator(GaussianGenerator()) for gs in gs_list]'
+    exec hack in __main__.__dict__
 
 def save_snapshot(snapshot_name):
     """
