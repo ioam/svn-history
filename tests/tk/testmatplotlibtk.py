@@ -1,5 +1,5 @@
 """
-Unit test for the matplot lib in tk
+Unit test for the matplot lib in tkgui
 $Id$
 """
 __version__='$Revision$'

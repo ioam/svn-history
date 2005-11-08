@@ -15,7 +15,7 @@ from topo.base.patterngenerator import *
 from topo.base.simulator import *
 from topo.base.sheetview import *
 from topo.plotting.plotengine import *
-from topo.tk.plotpanel import BasicPlotPanel
+from topo.tkgui.plotpanel import BasicPlotPanel
 from topo.patterns.basic import GaussianGenerator
 
 
@@ -102,7 +102,7 @@ class TestActivityPanel(unittest.TestCase):
         root = Tkinter.Tk()
         root.resizable(1,1)
         Pmw.initialise(root)
-        console = topo.tk.topoconsole.TopoConsole(parent=root)
+        console = topo.tkgui.topoconsole.TopoConsole(parent=root)
         console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
         console.set_active_simulator(self.s)
         #console.new_activity_window()

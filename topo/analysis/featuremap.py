@@ -29,7 +29,9 @@ from topo.commands.basic import pattern_present, restore_input_generators, save_
 
 import topo.base.registry
 from topo.base.registry import get_console
-import topo.tk.topoconsole 
+
+## Should only import this when using display option
+import topo.tkgui.topoconsole 
 
 
 class SineGratingPresenter(object):
@@ -262,7 +264,7 @@ class MeasureFeatureMap(TopoObject):
             #### Debugging     ####
             if display:
                 temp=topo.base.registry.plotgroup_templates['Activity']
-                x = topo.tk.topoconsole.PlotsMenuEntry(get_console(),temp)
+                x = topo.tkgui.topoconsole.PlotsMenuEntry(get_console(),temp)
                 panel = x.command()
                 panel.toggle_auto_refresh()
             

@@ -32,9 +32,9 @@ import testdistribution
 import testfeaturemap
 
 
-# tk import calls tk/__init__.py which should contain other test
+# tkgui import calls tkgui/__init__.py, which should contain other test
 # imports for that directory.
-import tk
+import tkgui
 
 suite = unittest.TestSuite()
 

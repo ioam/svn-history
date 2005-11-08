@@ -375,7 +375,7 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
         self.auto_refresh = not self.auto_refresh
 
         self.debug("Auto-refresh = ", self.auto_refresh)
-        topo.tk.show_cmd_prompt()
+        topo.tkgui.show_cmd_prompt()
 
         if self.auto_refresh:
             self.console.add_auto_refresh_panel(self)

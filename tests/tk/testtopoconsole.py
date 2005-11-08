@@ -6,7 +6,7 @@ __version__='$Revision$'
 
 
 import unittest
-from topo.tk import *
+from topo.tkgui import *
 from topo.base.simulator import Simulator
 from topo.plotting.plotengine import PlotEngine
 import topo.base.topoobject

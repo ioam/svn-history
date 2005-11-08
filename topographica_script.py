@@ -41,7 +41,7 @@ def generate_cmd_prefix(interactive=True,start_gui=False):
     cmd += 'import topo.base.commandline; topo.base.commandline.start(' \
            + str(interactive) + ');'
     if start_gui:
-        cmd += ' topo.gui_cmdline_flag = True; import topo.tk; topo.tk.start();'
+        cmd += ' topo.gui_cmdline_flag = True; import topo.tkgui; topo.tkgui.start();'
     else:
         cmd += ' topo.gui_cmdline_flag = False;'
 

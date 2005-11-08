@@ -7,15 +7,15 @@ __version__='$Revision$'
 import unittest, os
 import topo
 from topo.sheets.generatorsheet import *
-from topo.tk import *
+from topo.tkgui import *
 from topo.base.patterngenerator import *
 from topo.base.simulator import *
 from PIL import Image
 from topo.base.sheetview import *
 from topo.plotting.plotengine import *
 from topo.plotting.bitmap import *
-import topo.tk.topoconsole 
-import topo.tk.plotpanel
+import topo.tkgui.topoconsole 
+import topo.tkgui.plotpanel
 import Tkinter
 from topo.sheets.cfsom import CFSOM
 from math import pi
@@ -105,7 +105,7 @@ class TestPlotPanel(unittest.TestCase):
         interested in the weights of the receptive fields.
         """
         topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
-        topo.tk.plotpanel.PlotPanel.print_level = topo.base.topoobject.WARNING
+        topo.tkgui.plotpanel.PlotPanel.print_level = topo.base.topoobject.WARNING
         # input generation params
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 30
@@ -138,7 +138,7 @@ class TestPlotPanel(unittest.TestCase):
         root = Tkinter.Tk()
         root.resizable(1,1)
         Pmw.initialise(root)
-        console = topo.tk.topoconsole.TopoConsole(parent=root)
+        console = topo.tkgui.topoconsole.TopoConsole(parent=root)
         console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
         #console.new_weights_window()
         # console.mainloop()

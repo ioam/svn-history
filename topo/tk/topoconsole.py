@@ -60,8 +60,8 @@ class PlotsMenuEntry(topo.base.topoobject.TopoObject):
             description = template.description
         self.description = description
 
-        # Special cases.  These classes are specific to the topo/tk
-        # directory and therefore this link must be made within the tk
+        # Special cases.  These classes are specific to the topo/tkgui
+        # directory and therefore this link must be made within the tkgui
         # files.
         #
         # If users want to extend the Plot Panel classes, then add
@@ -332,7 +332,7 @@ class TopoConsole(Frame):
                 self.messageBar.message('state', 'Loaded ' + self.loaded_script)
             else:
                 self.messageBar.message('state', 'Failed to load ' + self.loaded_script)
-        topo.tk.topo.tk.show_cmd_prompt()
+        topo.tkgui.show_cmd_prompt()
 
 
     # CEBHACKALERT:
@@ -353,7 +353,7 @@ class TopoConsole(Frame):
             topo.commands.basic.load_snapshot(snapshot_name)
             self.messageBar.message('state', 'Loaded snapshot ' + snapshot_name)
         
-        topo.tk.topo.tk.show_cmd_prompt()
+        topo.tkgui.show_cmd_prompt()
 
 
     def save_snapshot(self):
@@ -374,7 +374,7 @@ class TopoConsole(Frame):
             topo.commands.basic.save_snapshot(snapshot_name)
             self.messageBar.message('state', 'Snapshot saved to ' + snapshot_name)
 
-        topo.tk.topo.tk.show_cmd_prompt()
+        topo.tkgui.show_cmd_prompt()
     
                 
     def reset_network(self):
@@ -455,7 +455,7 @@ class TopoConsole(Frame):
         """
         result = self.exec_cmd(cmd)
 	self.messageBar.message('state', result)
-        topo.tk.topo.tk.show_cmd_prompt()
+        topo.tkgui.show_cmd_prompt()
 
     def exec_cmd(self,cmd):
         """
@@ -521,7 +521,7 @@ class TopoConsole(Frame):
             message = 'Error: No active simulator.'
 
         self.messageBar.message('state', message)
-        topo.tk.topo.tk.show_cmd_prompt()
+        topo.tkgui.show_cmd_prompt()
 
         
     def dummy(self):

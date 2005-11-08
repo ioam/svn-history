@@ -8,7 +8,7 @@ information, see the individual subpackages:
 base        - Core Topographica functions and classes
 plotting    - Visualization functions and classes
 analysis    - Analysis functions and classes (besides plotting)
-tk          - Tk-based graphical user interface (GUI)
+tkgui       - Tk-based graphical user interface (GUI)
 commands    - High-level user commands
 
 The Topographica primitives library consists of a family of classes
