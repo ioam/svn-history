@@ -38,9 +38,8 @@ import topo.base.tyimputil
 
 
 ABOUT_TEXT = """
-Pre-release version of Topographica; please do not trust this version
-of the code unless you have verified it yourself.  An updated version
-may be available from topographica.org.
+Pre-release version of Topographica; an updated version may be
+available from topographica.org.
 
 Copyright 2005 James A. Bednar, Christopher Ball, Yoonsuck Choe,
 Julien Ciroux, Judah B.  De Paula, Jefferson Provost, Joseph
