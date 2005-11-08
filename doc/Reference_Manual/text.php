@@ -11,7 +11,7 @@ information, see the individual subpackages:
 <DD>Visualization functions and classes</DD>
 <P><DT><A href="topo.analysis.html"><strong>analysis</strong></A></DT>
 <DD>Analysis functions and classes (besides plotting)</DD>
-<P><DT><A href="topo.tk.html"><strong>tk</strong></A></DT>
+<P><DT><A href="topo.tkgui.html"><strong>tkgui</strong></A></DT>
 <DD>Tk-based graphical user interface (GUI)</DD>
 </dl>
 
