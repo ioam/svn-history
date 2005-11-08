@@ -76,8 +76,8 @@ class LineGenerator(PatternGenerator):
     # used to draw it, or just in the display; I have to look to
     # see which.
     
-    thickness   = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5))
-    smoothing = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5))
+    thickness   = Number(default=0.02,bounds=(0.0,None),softbounds=(0.0,0.075))
+    smoothing = Number(default=0.02,bounds=(0.0,None),softbounds=(0.0,0.075))
     
     def function(self,**params):
         return line( params.get('pattern_y',self.pattern_y), 
