@@ -51,7 +51,7 @@ class TestActivityPanel(unittest.TestCase):
 
         # Uses testbitmap.jpg.
         # Converts a JPG to a triple of arrays of [0 <= i <= 1].
-        miata = Image.open('tests/testbitmap.jpg')
+        miata = Image.open('topo/tests/testbitmap.jpg')
         miata = miata.resize((miata.size[0]/2,miata.size[1]/2))
         self.rIm, self.gIm, self.bIm = miata.split()
         self.rseq = self.rIm.getdata()

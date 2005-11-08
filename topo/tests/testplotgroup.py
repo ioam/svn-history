@@ -66,7 +66,7 @@ class TestPlotGroup(unittest.TestCase):
 
     def test_plotgroup(self):
         self.s2 = Sheet()
-        ig = ImageGenerator(filename='tests/testsheetview.ppm',
+        ig = ImageGenerator(filename='topo/tests/testsheetview.ppm',
                          density=100,
                          bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))))
         x = plot.Plot((None,None,ig.sheet_view('Activity')),plot.HSV)
