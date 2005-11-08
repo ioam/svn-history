@@ -74,7 +74,7 @@ function menu_side($fname) {
 		"Reference Manual" => "../Reference_Manual/index.html",
 #		"Developer Manual" => "../Developer_Manual/index.html",
 		"Downloads" => "../Downloads/index.html",
-		"Lists, Forums" => "../Lists,_Forums/index.html",
+		"Forums" => "../Forums/index.html",
 		"Team Members" => "../Team_Members/index.html",
 		"Future Work" => "../Future_Work/index.html",
 		);
