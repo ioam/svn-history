@@ -82,7 +82,7 @@ fixedpoint.DEFAULT_PRECISION=3
 GeneratorSheet.density = RN
 GeneratorSheet.period = 1
 
-random.seed(23)
+random.seed(1234)
 GaussianGenerator.scale = scale_input
 GaussianGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 GaussianGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
@@ -140,7 +140,7 @@ s.schedule_action(500, V1.projections()['LateralExcitatory'].change_bounds, Boun
 
 s.schedule_action(1000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.336/BaseN,-exc_rad*0.336/BaseN),(exc_rad*0.336/BaseN,exc_rad*0.336/BaseN))))
 
-s.schedule_action(2000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-2.0/BaseN,-2.0/BaseN),(2.0/BaseN,2.0/BaseN))))
+s.schedule_action(2000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-1.0/BaseN,-1.0/BaseN),(1.0/BaseN,1.0/BaseN))))
 
 
 # Schedule action requires a function, so we create a temporary one
