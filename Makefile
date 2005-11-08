@@ -35,6 +35,9 @@ topographica: external Makefile
 	echo "import os,sys,topographica_script" >> topographica
 	echo "" >> topographica
 	echo "TOPO = '${PREFIX}'" >> topographica
+	echo "os.putenv('LD_LIBRARY_PATH'," >> topographica
+	echo "          ':'.join((os.path.join(TOPO,'lib'),os.getenv('LD_LIBRARY_PATH',''))))" >> topographica
+	echo "os.putenv('PYTHONPATH',TOPO+':'+':'+os.getenv('PYTHONPATH',''))" >> topographica
 	echo "" >> topographica
 	echo "# exec" >> topographica
 	echo "cmd = os.path.join(TOPO,'bin/python')" >> topographica
