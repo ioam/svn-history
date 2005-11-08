@@ -1,5 +1,3 @@
-<!-- CEBHACKALERT -->
-<!-- THE IMAGES ARE FOR A 72x72 NETWORK -->
 
 <!-- TO DO: fix indentation; make standards-compliant so it will -->
 <!-- display properly on different browsers (I'll fix spacing at the -->
@@ -77,7 +75,7 @@ This will present an an oriented 2D Gaussian.
 <li>To see the result, select <span class='t_item'>Activity</span> from
 the <span class='t_item'>Plots</span> menu on the <span class='w_title'>Topographica Console</span> to get:
 <p class='center'>
-<img src="images/activity_gaussian.png" alt="Response to Gaussian" align="middle" height="344" width="420">
+<img src="images/activity_gaussian.png" alt="Response to Gaussian" align="middle" width="420" height="320">
 </p>
 
 
@@ -109,7 +107,7 @@ the neuron in the center of the cortex (by default):
 
 <p class="center">
 <img src="images/unit_weights_0_0.png" alt="Weights of one
-neuron" align="middle" width="504" height="354">
+neuron" align="middle" width="504" height="305">
 </p>
 
 <p>
@@ -147,12 +145,12 @@ neuron.  A similar procedure can be performed in the model by selecting
 <span class='t_item'>Orientation Preference</span> from the <span class='t_item'>Plot</span> menu:
 
 <p class="center">
-<img src="images/or_map.png" alt="Orientation map" width="553" height="294">&nbsp;&nbsp;&nbsp;
+<img src="images/or_map.png" alt="Orientation map" width="551" height="294">&nbsp;&nbsp;&nbsp;
 <img src="images/or_key_vert_transparent_topo.png" alt="Orientation key" height="294" width="24">
 </p><br>
 
 <P>
-(This will usually take about (**ten) seconds to complete.)
+(This will usually take about 30 seconds to complete.)
 The plot on the left is the orientation map for V1 in this network.
 Each neuron in the plot is color coded by its preferred orientation,
 according to the key to the right.
@@ -180,7 +178,7 @@ at the refreshed image in the <span class='w_title'>Activity</span> window:
 
 <p class="center">
 <img src="images/activity_gaussian_or.png" alt="Sample Gaussian"
-align="middle" width="420" height="344">
+align="middle" width="420" height="320">
 </p>
 
 (Alternatively, if you want to keep the old plot for comparison, you
