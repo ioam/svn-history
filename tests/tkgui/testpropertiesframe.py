@@ -7,8 +7,8 @@ __version__='$Revision$'
 
 import unittest
 from Tkinter import *
-from topo.tk import *
-from topo.tk.propertiesframe import *
+from topo.tkgui import *
+from topo.tkgui.propertiesframe import *
 
 class TestPropertiesFrame(unittest.TestCase):
     def test_PropertiesFrame(self):
