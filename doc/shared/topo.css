@@ -92,4 +92,48 @@ body {
 
 /* jbednar: Custom */
 
+
+/* command to be typed */
+
+.to_type {
+	 background: #d8d0b2;
+}
+
+
+
+/* button to be pressed */
+
+.b_press {
+	  background: #d8d8d8;
+          border-style: outset;
+	  font-weight: bold;
+	  font-size: small;
+}
+
+
+/* topo item */
+
+.t_item {
+	  background: #d8d8d8;
+	  font-weight: bold;
+	  font-size: small;
+}
+
+
+
+/* window title to look for */
+
+.w_title {
+	  background: #4464ac; 
+          color: #ffffff;
+	  font-size: small;
+	  font-weight: bold;
+}
+
+
+.center {
+	text-align: center;
+}
+
+
 /* */

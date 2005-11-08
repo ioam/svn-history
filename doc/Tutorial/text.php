@@ -1,6 +1,3 @@
-<link rel="stylesheet" type="text/css" media="screen" href="tutorial.css">
-
-
 <!-- CEBHACKALERT -->
 <!-- THE IMAGES ARE FOR A 72x72 NETWORK -->
 
