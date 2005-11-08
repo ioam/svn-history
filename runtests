@@ -11,7 +11,7 @@
 # not lengthy or large-scale functional tests)
 
 import unittest
-import tests
+import topo.tests
 import getopt,sys
 
 USAGE = """
@@ -46,7 +46,7 @@ if args:
     suite = unittest.TestSuite()
     suite.addTests([getattr(tests,module).suite for module in args])
 else:
-    suite = tests.suite
+    suite = topo.tests.suite
 
 unittest.TextTestRunner(verbosity=verbosity).run(suite)
 
