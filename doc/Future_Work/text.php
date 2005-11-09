@@ -14,7 +14,6 @@ other parts of the code before we have a chance to correct it.  We are
 working to correct all of these issues in the very near future.
 
 <P><DT>Windows and Mac versions</DT><DD> 
-
 Topographica is written in Python, which is available for many
 platforms.  We are committed to supporting the Windows version, and
 also plan to support the Mac OS X version.  Recent versions have so
@@ -41,6 +40,22 @@ allowing interruption or other activities during long computations.
 In addition to the progress bars, it would be nice to have an estimate
 for the memory requirements of a large network, so that the user can
 verify that it is a reasonable simulation to run on his or her machine.
+
+<P><DT>State saving</DT><DD>
+Model state saving is currently implemented using Python "pickling"
+(persistent storage).  Some important classes of objects cannot yet be
+pickled, including class attributes (defaults for a class rather than
+an object), functions scheduled using Simulator.schedule_action, and
+any variable holding a lambda function.  As a result, there can be
+cases when not all of the important properties of the network are
+restored, and we will be working to eliminate such cases.  In
+addition, pickling is not robust against changes to the class
+definitions for LISSOM, such as changes in names.  To reduce these
+problems, we are working on an alternative implementation of state
+saving using XML, which is designed to be an archival, readable
+format.  In the meantime, users should be aware that saved files will
+not necessarily be readable by future versions of Topographica, and
+should be considered temporary.
 
 <P><DT>Plotting</DT><DD>
 Two-dimensional bitmap plots are already supported, but will be
