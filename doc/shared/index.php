@@ -29,9 +29,9 @@
 <blockquote>
 <blockquote>
 <i>
-<b>News: (20 April 05)</b> Pre-release (development) version of Topographica 
- <a target="_top" href="#releases">available via CVS</a>.
-(<a target="_top" href="http://www.cs.utexas.edu/users/nn/web-pubs/lissom/screenshots/050423_Topographica_linuxscreenshot.png">Linux screenshot</a>)
+<b>News: (8 November 05)</b> New site launched, including a new 
+ <a target="_top" href="../Tutorial/index.html">Topographica tutorial</a>.
+(<a target="_top" href="../images/051107_topographica_screen_shot_white.png">Linux screenshot</a>)
 </i>
 </blockquote>
 </blockquote>
