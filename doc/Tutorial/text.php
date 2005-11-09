@@ -7,14 +7,15 @@
 This tutorial shows how to use the
 <a href="http://topographica.org/">Topographica</a> software to explore a
 simple orientation map simulation using weight plots and test pattern
-images.  Topographica is designed to be easily extensible, allowing
-flexible implementation of topographic models. This
-tutorial works through an example of a LISSOM model implemented in
-Topographica, and is based on an <a href="http://homepages.inf.ed.ac.uk/jbednar/pytutorial.html">
-earlier tutorial</a> for the original <a href="http://homepages.inf.ed.ac.uk/jbednar/software.html#lissom">LISSOM software</a>.
+images.  This particular example uses a <a
+href="http://nn.cs.utexas.edu/lookup?rflissom">LISSOM model</a>
+cortex, although Topographica is designed to be easily extensible to
+work with other models.
 </p>
 
-<p>This tutorial assumes that you have already followed the instructions for <a href="../Downloads/index.html">obtaining and installing</a> Topographica.</p>
+<p>This tutorial assumes that you have already followed the
+instructions for <a href="../Downloads/index.html">obtaining and
+installing</a> Topographica.</p>
 
 
 
@@ -139,8 +140,8 @@ the <span class='t_item'>LateralInhibitory</span> weights instead of
 activity patterns are patchy.
 
 </p><p></p></li><li>To visualize all the neurons at once
-in experimental animals, optical imaging experiments present a variety
-of patterns and record the one most effective at stimulating each
+in experimental animals, optical imaging experiments measure responses
+to a variety of patterns and record the one most effective at stimulating each
 neuron.  A similar procedure can be performed in the model by selecting
 <span class='t_item'>Orientation Preference</span> from the <span class='t_item'>Plots</span> menu:
 
@@ -167,8 +168,6 @@ shows the relative selectivity of each neuron for orientation; you can
 see that there are patches of neurons near the borders that are not
 very orientation selective, and smaller patches in the center, but
 that most are selective.  The V1 plot in the center shows
-
-
 the two previously mentioned plots combined -- each neuron is colored
 with its preferred orientation, and the stronger the selectivity, the
 brighter the color.  From this plot it is clear that the unselective
@@ -279,9 +278,9 @@ only looking at the center of the image on the Retina.
 <h2>Learning (optional)</h2>
 
 The previous examples all used a network trained previously, without
-any plasticity enabled.  Many researchers are interested mainly in the
-developmental process and in shorter-term adaptive phenomena.  These
-processes can be studied with the LISSOM model in Topographica as follows.
+any plasticity enabled.  Many researchers are interested in the
+processes of development and plasticity.  These processes can be
+studied using the LISSOM model in Topographica as follows.
 
 <p>
 </p><ol>
@@ -314,8 +313,9 @@ to a highly implausible level.  To do this, type:
 
 <blockquote><code class='to_type'>V1.projections()['Afferent0'].learning_rate</code></blockquote>
 
-in the <span class='t_item'>Command</span> box or at the Topographica terminal prompt. The current learning rate is
-displayed by the terminal. Next, type:
+in the <span class='t_item'>Command</span> box or at the Topographica
+terminal prompt. The current learning rate will be
+displayed in your terminal window. Next, type:
 
 <blockquote><code class='to_type'>V1.projections()['Afferent0'].learning_rate=0.1</code></blockquote>
 
