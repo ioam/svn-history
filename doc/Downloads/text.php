@@ -108,10 +108,6 @@ versions of UNIX as well, as long as they have standard GNU tools like
 make and GCC installed.  Just follow the Linux instructions, replacing
 <code>make</code> with <code>gmake</code> if that's the name of GNU make on your system.
 
-<P><B>Windows:</B>
-<!-- Need to move it into HTML! -->
-See <A HREF="../../WIN32_INSTALL.txt">WIN32_INSTALL.txt</A>.
-
 <P><B>Mac:</B>
 Topographica builds only under Mac OS X or later.  Topographica
 developers have only limited access to OS X machines, and so at any
@@ -121,7 +117,48 @@ although we do try to minimize them.
 If you have an X server installed, you can just build Topographica as
 described for Linux.  It is also possible to build Topographica using
 a native (Aqua) version of Python, which looks a bit nicer, but we
-have not yet documented how to do that.
+have not yet documented how to do that.  We have not necessarily
+tested the most recent version on the Mac, so there may be some small
+changes required.
+
+<P><B>Windows:</B>
+It is possible to build Topographica under Windows just as is done
+under UNIX, if you first install <A HREF="http://www.cygwin.com/">Cygwin</a>. 
+Alternatively, nearly all of the features of Topographica are available
+with a Win32-native Python, and if you choose this option then Cygwin
+is optional.  The basic steps for building the native version are:
+
+<ol>
+<li> Unpack the topographica archive into a temporary directory.
+<li> Double click on setup.bat
+<li> Follow the various installation prompts for the packages 
+     bundled with Topographica.
+</ol>
+
+<P>
+After installation you should now have an icon on your desktop that
+opens the directory where Topographica is installed.  There will be a
+new file association called ".ty" which are scripts that the
+Topographica program will execute when you double-click on them.
+
+<P>
+You can now test the installation by double-clicking on the
+topographica.bat file which will run the interactive Topographica
+shell and give you a "Topographica>" prompt.
+
+<P>If you experience the error:
+<pre>
+  File "C:\Python23\lib\string.py", line 220, in atoi 
+    return _int(s, base)
+TypeError: int() can't convert non-string with explicit base
+</pre>
+
+<p>Then you may be running an old version of Python.  Check your
+Environment Variables in "My Computer -> Properties" to make sure you
+don't have an old version of Python earlier in your path statement
+that is running first.  If you still have troubles, see the 
+WIN32_INSTALL.txt file included with the Topographica distribution.
+
 
 <H3>Running Topographica</H3>
 
