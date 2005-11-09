@@ -24,6 +24,27 @@ __version__='$Revision$'
 #
 # 3) Replace the line "from topo.base.connectionfield import CFProjection" with:
 # from topo.projections.optimized import CFProjection_CPointer.
+#
+#
+# To use code written purely in Python:
+#
+# 1) Change CFDotProduct to CFDotProduct_Py in the lines:
+#    - from topo.responsefns.basic import CFDotProduct_Py
+#    - CFProjection.response_fn=CFDotProduct()
+#    (i.e. everywhere in the file)
+#
+# 2) Comment out the line:
+#    - CFProjection.learning_fn=DivisiveHebbian()
+#    Then, CFProjection.learning_fn defaults to GenericCFLF w/hebbian.
+#    An alternative is to adjust that line to read:
+#    - CFProjection.learning_fn = GenericCFLF()
+#    and to add GenericCFLF to the imports:
+#    - from topo.base.connectionfield import GenericCFLF
+#
+# Note that the Python implementation is much slower than C one . You might want to
+# change BaseN and BaseRN to something smaller (e.g. 12.0 and 6.0) to test that
+# the changes have worked.
+# Note also that GenericCFLF is currently untested.
 
 
 
