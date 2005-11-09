@@ -62,7 +62,7 @@ select <span class='t_item'>Test pattern</span> from the <span class='t_item'>Si
 
 <p class='center'>
 <img src="images/test_pattern.png" alt="Test Pattern window"
-align="middle" width="415" height="603">
+align="middle" width="415" height="606">
 </p>
 
 <p>
@@ -75,7 +75,7 @@ This will present a horizontal line.
 <li>To see the result, select <span class='t_item'>Activity</span> from
 the <span class='t_item'>Plots</span> menu on the <span class='w_title'>Topographica Console</span> to get:
 <p class='center'>
-<img src="images/activity_line.png" alt="Response to a line" align="middle" width="420" height="317">
+<img src="images/activity_line.png" alt="Response to a line" align="middle" width="420" height="320">
 </p>
 
 
@@ -184,8 +184,8 @@ on the <span class='w_title'>Test pattern</span> window and then looking
 at the refreshed image in the <span class='w_title'>Activity</span> window:
 
 <p class="center">
-<img src="images/activity_line_or.png" alt="Color-coded response to a line" width="420" height="317">
-<img src="images/or_key_vert_transparent_topo.png" alt="Orientation key" height="317" width="24">
+<img src="images/activity_line_or.png" alt="Color-coded response to a line" width="420" height="320">
+<img src="images/or_key_vert_transparent_topo.png" alt="Orientation key" height="320" width="24">
 </p><br>
 
 
