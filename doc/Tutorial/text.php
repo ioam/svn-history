@@ -198,7 +198,9 @@ has been measured.  Each V1 neuron is now color coded by its
 orientation, with brighter colors indicating stronger activation.  We
 can now see that the neurons responding are indeed those that prefer
 orientations similar to the input pattern, and that the response is
-patchy because other nearby neurons do not respond.
+patchy because other nearby neurons do not respond.  To be sure of
+that, try rotating the image by adjusting the orientation, then present 
+it again -- the colors should be different, and match the orientation chosen.
 </p>
 <p></p>
 </li>
