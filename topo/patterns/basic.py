@@ -75,9 +75,15 @@ class LineGenerator(PatternGenerator):
     # the line() function, the generation of the matrices
     # used to draw it, or just in the display; I have to look to
     # see which.
-    
-    thickness   = Number(default=0.02,bounds=(0.0,None),softbounds=(0.0,0.075))
-    smoothing = Number(default=0.02,bounds=(0.0,None),softbounds=(0.0,0.075))
+
+    thickness   = Number(default=0.006,bounds=(0.0,None),softbounds=(0.0,0.075))
+    smoothing = Number(default=0.05,bounds=(0.0,None),softbounds=(0.0,0.075))
+
+    # CEBHACKALERT:
+    # scale does not need to be here. For the tutorial, having this scale
+    # allows users to see patchy responses to a line without needing to
+    # adjust it themselves.
+    scale = Number(default=0.7,softbounds=(0.0,2.0))
     
     def function(self,**params):
         return line( params.get('pattern_y',self.pattern_y), 
