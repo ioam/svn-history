@@ -90,7 +90,8 @@ class ImageGenerator(Sheet):
 
 
     def start(self):
-        self.send_output(data=self.activity)
+	assert self.simulator
+	self.simulator.enqueue_event_rel(0,self,self,data=self.activity)
 
     def input_event(self,src,src_port,dest_port,data):
         self.send_output(data=self.activity)

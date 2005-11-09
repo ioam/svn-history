@@ -30,7 +30,6 @@ from sheet import Sheet
 from sheetview import UnitView
 from itertools import chain
 from patterngenerator import ConstantGenerator
-from projection import Identity
 from boundingregion import BoundingBox
 
 
@@ -63,8 +62,7 @@ class ConnectionField(TopoObject):
     
     x = Parameter(default=0)
     y = Parameter(default=0)
-    normalize = BooleanParameter(default=False)
-    normalize_fn = Parameter(default=divisive_normalization)
+    normalize_fn = Parameter(default=Identity())
 
     weights = []
     slice_array = []
@@ -100,8 +98,7 @@ class ConnectionField(TopoObject):
 
         self.verbose("activity matrix shape: ",self.weights.shape)
 
-        if self.normalize:
-            self.normalize_fn(self.weights)
+        self.normalize_fn(self.weights)
 
 
     def contains(self,x,y):
@@ -145,8 +142,7 @@ class ConnectionField(TopoObject):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
             self.weights.savespace(1)
 
-            if self.normalize:
-                self.normalize_fn(self.weights)
+            self.normalize_fn(self.weights)
 
 
     def change_density(self, new_wt_density):
@@ -263,11 +259,10 @@ class CFProjection(Projection):
 
     response_fn = Parameter(default=GenericCFResponseFn())
     cf_type = Parameter(default=ConnectionField)
-    normalize = BooleanParameter(default=False)
-    normalize_fn = Parameter(default=divisive_normalization)
     weight_type = Parameter(default=Numeric.Float32)
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
     weights_generator = Parameter(default=ConstantGenerator())
+    learning_fn = Parameter(GenericCFLF())
     learning_rate = Parameter(default=0.0)
     output_fn  = Parameter(default=Identity())
 
@@ -280,7 +275,7 @@ class CFProjection(Projection):
         for y in self.dest.sheet_rows()[::-1]:
             row = []
             for x in self.dest.sheet_cols():
-                row.append(self.cf_type(input_sheet=self.src,weight_bounds=self.weights_bounds,weights_generator=self.weights_generator,weight_type=self.weight_type,normalize=self.normalize,normalize_fn=self.normalize_fn,x=x,y=y))
+                row.append(self.cf_type(input_sheet=self.src,weight_bounds=self.weights_bounds,weights_generator=self.weights_generator,weight_type=self.weight_type,normalize_fn=self.learning_fn.output_fn,x=x,y=y))
 
             cfs.append(row)
 
@@ -372,7 +367,6 @@ class CFSheet(ProjectionSheet):
     just the same as this sheet, except that it will not provide those routines.
     """
 
-    learning_fn = Parameter(default=GenericCFLF())
     def learn(self):
         rows,cols = self.activity.shape
         for proj in chain(*self.in_projections.values()):
@@ -381,7 +375,7 @@ class CFSheet(ProjectionSheet):
                 inp = proj.input_buffer
                 cfs = proj.cfs
                 len, len2 = inp.shape
-                self.learning_fn(cfs, inp, self.activity, learning_rate)
+                proj.learning_fn(cfs, inp, self.activity, learning_rate)
 
     
     ### JABALERT

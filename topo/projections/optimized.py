@@ -10,9 +10,10 @@ __version__='$Revision$'
 ###
 ### Should eliminate import *.
 from topo.base.connectionfield import CFProjection
-from topo.base.parameter import Parameter
+from topo.base.parameter import Parameter, Constant
 from topo.base.utils import *
 from topo.responsefns.basic import CFDotProduct_CPointer
+from topo.learningfns.basic import DivisiveHebbian_CPointer
 from Numeric import ones, Int
 
 import weave
@@ -31,7 +32,8 @@ class CFProjection_CPointer(CFProjection):
 
     weight_ptrs = [] 
     slice_ptrs = []
-    response_fn = Parameter(default=CFDotProduct_CPointer())
+    response_fn = Constant(default=CFDotProduct_CPointer())
+    learning_fn = Constant(default=DivisiveHebbian_CPointer())
 
     def __init__(self,**params):
         super(CFProjection_CPointer,self).__init__(**params)

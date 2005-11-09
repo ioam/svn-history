@@ -16,13 +16,12 @@ import topo
 from topo.base.connectionfield import CFSheet
 from topo.base.parameter import Parameter, BooleanParameter
 from topo.outputfns.basic import PiecewiseLinear
-from topo.learningfns.basic import DivisiveHebbian,GenericCFLF,DivisiveHebbian_CPointer
+#from topo.learningfns.basic import DivisiveHebbian,GenericCFLF,DivisiveHebbian_CPointer
 
 class LISSOM(CFSheet):
 
     # Should be changed to a OutputFunctionParameter
     output_fn = Parameter(default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
-    learning_fn = Parameter(default=DivisiveHebbian())
     
     # modify weights after each activation?
     continuous_learning = BooleanParameter(default=False)
@@ -89,8 +88,6 @@ class LISSOM_CPointer(LISSOM):
     CFProjection_CPointer (specified via connect()).
     """
 
-    learning_fn = Parameter(default=DivisiveHebbian_CPointer())
-
     def __init__(self,**params):
         super(LISSOM_CPointer,self).__init__(**params)
 
@@ -104,5 +101,5 @@ class LISSOM_CPointer(LISSOM):
 
                 cfs = proj.cfs
                 len, len2 = inp.shape
-                self.learning_fn(cfs, inp, self.activity, learning_rate, weight_ptrs=proj.weight_ptrs, slice_ptrs=proj.slice_ptrs)
+                proj.learning_fn(cfs, inp, self.activity, learning_rate, weight_ptrs=proj.weight_ptrs, slice_ptrs=proj.slice_ptrs)
 
