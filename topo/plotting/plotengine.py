@@ -137,71 +137,6 @@ class PlotEngine(TopoObject):
             requested_plot = self.make_plot_group(name,group_type,filter,class_type)
         return requested_plot
 
-     ### JCALERT! This function has been commented out because it does not seem to be of any use
-     ### It is called on a line that is commented out in make_plot_group at the end of the file
-
-#     def lambda_flat_dynamic_list(self, name, filter_lam):
-#         """
-#         lambda_single_view_per_name() expanded so that the a
-#         sheet_view dictionary key entry can have a list of SheetViews,
-#         and not just one.  Each SheetView in the list will be set with
-#         a Plot object.
-#         """
-#         sheet_list = [each for each in self.simulation.objects(Sheet).values() if filter_lam(each)]
-#         self.debug('sheet_list =' + str(sheet_list) + 'name = ' + str(name))
-
-#         view_list = [(each, each.sheet_view(name)) for each in sheet_list
-#                      if each is not None]
-        
-#         ### A possible list from the Sheet.sheet_view dictionary is
-#         ### converted into multiple Plot generation requests.
-#         plot_list = []
-#         for (sheet,views) in view_list:
-#             if not isinstance(views,list):
-#                 views = [views]
-#             for each in views:
-#                 if isinstance(each,SheetView):
-#                     plot_list.append(Plot((each,None,None),COLORMAP,None))
-#                 else:
-#                     plot_list.append(Plot((name,None,None),COLORMAP,sheet))
-#         self.debug('plot_list =' + str(plot_list))
-#         return plot_list
-
-      ### JCALERT! This function has been commented out because it does not seem to be of any use
-      ### It is called on a line that is commented out in make_plot_group at the end of the file
-
-#     def lambda_for_weight_view(self, (w,sheet_target,sheet_x,sheet_y), filter_lam):
-#         """
-#         To have the UnitViews stored on the Projection source sheet,
-#         the weights must be requested from each Projection on the
-#         target sheets.
-#         """
-#         sheet_list = [each for each in self.simulation.objects(Sheet).values() if filter_lam(each) and each.name== sheet_target]
-
-#         projection_list = []
-#         for s in sheet_list:
-#             if not isinstance(s,CFSheet):
-#                 self.warning('Requested weights view from other than CFSheet.')
-#             else:
-#                 for p in set(flatten(s.in_projections.values())):
-#                     key = ('Weights',sheet_target,p.name,sheet_x,sheet_y)
-#                     v = p.src.sheet_view(key)
-#                     if v: projection_list += [(s,p,each) for each in v if each.projection.name == p.name]
-#         projection_list.sort(key=lambda x: x[2].name,reverse=True)
-
-#         plot_list = []
-#         for (sheet,projection,views) in projection_list:
-#             if not isinstance(views,list):
-#                 views = [views]
-#             for each in views:
-#                 if isinstance(each,SheetView):
-#                     plot_list.append(Plot((each,None,None),COLORMAP,None))
-#                 else:
-#                     key = ('Weights',sheet,projection,sheet_x,sheet_y)
-#                     plot_list.append(Plot((key,None,None),COLORMAP,p.src))
-#         self.debug('plot_list =' + str(plot_list))
-#         return plot_list
-
 
     def lambda_for_templates(self, template, filter_lam):
         """
@@ -281,11 +216,11 @@ class PlotEngine(TopoObject):
         else:
             for p in set(flatten(s.in_projections.values())):
                 key = ('Weights',sheet_target,p.name,sheet_x,sheet_y)
-                v = p.src.sheet_view(key)
+                v = s.sheet_view(key)
                 if v:
                     projection_list += [(s,p,each) for each in v if each.projection.name == p.name]
-
-        # JUDAH HERE IS WHERE WE ADD ADDITIONAL SORTING INFORMATION.
+ 
+        # HERE IS WHERE WE (NEED TO?) ADD ADDITIONAL SORTING INFORMATION.
         projection_list.sort(key=lambda x: x[2].name,reverse=True)
 
         plot_list = []
@@ -356,21 +291,6 @@ class PlotEngine(TopoObject):
             print 'Template was not passed in.  This code deprecated and disabled.'
             import inspect
             print inspect.stack(), '\n'
-
-            ### JCALERT! If you decide to uncomment these lines, you also have to uncomment
-            ### the two functions that are commented out above in the file.
-            
-            #if isinstance(name,tuple) and name[0] == 'Weights':
-            #    dynamic_list = lambda : self.lambda_for_weight_view(name,filter_lam)
-            #else:
-            #    dynamic_list = lambda : self.lambda_flat_dynamic_list(name,filter_lam)
-            #try:
-            #    exec 'ptr = ' + group_type in globals()
-            #except Exception, e:
-            #    self.warning('Exception:', e)
-            #    self.warning('Invalid PlotGroup subclass: ', group_type)
-            #    return PlotGroup(dynamic_list)
-            #new_group = ptr(name,filter_lam,dynamic_list)
 
         self.debug('Type of new_group is', type(new_group))
         return new_group
