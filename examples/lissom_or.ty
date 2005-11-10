@@ -22,9 +22,6 @@ __version__='$Revision$'
 # CFProjection.response_fn=CFDotProduct()
 # CFProjection.learning_fn=DivisiveHebbian()
 #
-# 3) Replace the line "from topo.base.connectionfield import CFProjection" with:
-# from topo.projections.optimized import CFProjection_CPointer.
-#
 #
 # To use code written purely in Python:
 #
@@ -59,7 +56,7 @@ from fixedpoint import FixedPoint
 
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.connectionfield import CFProjection
+from topo.projections.optimized import CFProjection
 from topo.responsefns.basic import CFDotProduct
 from topo.patterns.basic import GaussianGenerator, ConstantGenerator
 from topo.patterns.random import UniformRandomGenerator
