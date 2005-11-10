@@ -332,7 +332,7 @@ class CFProjection(Projection):
         extended to allow increasing as well.
         """
         if not self.weights_bounds.containsbb_exclusive(new_wt_bounds):
-            self.warning('Unable to change_bounds; currently allows reducing onl y.')
+            self.warning('Unable to change_bounds; currently allows reducing only.')
             return
 
         self.weights_bounds = new_wt_bounds
