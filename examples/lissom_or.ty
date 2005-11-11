@@ -14,14 +14,18 @@ __version__='$Revision$'
 # To use a faster but more complex implementation (using memory
 # pointers to access data structures instead of the Python/C API):
 #
-# 1) Change all instances of "LISSOM" to "LISSOM_CPointer", "DivisiveHebbian"
-# to "DivisiveHebbian_CPointer", and "CFProjection" to "CFProjection_CPointer" 
-# in this file.
-#
-# 2) Remove the following 2 lines: 
+# 1) Remove the following 2 lines: 
 # CFProjection.response_fn=CFDotProduct()
 # CFProjection.learning_fn=DivisiveHebbian()
 #
+# 2) Change all instances of "LISSOM" to "LISSOM_CPointer", "DivisiveHebbian"
+# to "DivisiveHebbian_CPointer", and "CFProjection" to "CFProjection_CPointer" 
+# in this file.
+#
+# Note that the class CFProjection_CPointer will be used. The response_fn
+# and learning_fn of this class must be CFDotProduct_CPointer() and 
+# DivisiveHebbian_CPointer(), repectively. These are the default paramters
+# of CFProjection_CPointer, so you don't have to specify them in this file.
 #
 # To use code written purely in Python:
 #
