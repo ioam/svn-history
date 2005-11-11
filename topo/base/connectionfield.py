@@ -62,12 +62,11 @@ class ConnectionField(TopoObject):
     
     x = Parameter(default=0)
     y = Parameter(default=0)
-    normalize_fn = Parameter(default=Identity())
 
     weights = []
     slice_array = []
     
-    def __init__(self,input_sheet,weight_bounds,weights_generator,weight_type=Numeric.Float32,**params):
+    def __init__(self,input_sheet,weight_bounds,weights_generator,weight_type=Numeric.Float32,output_fn=Identity(),**params):
         super(ConnectionField,self).__init__(**params)
 
         self.input_sheet = input_sheet
@@ -98,7 +97,7 @@ class ConnectionField(TopoObject):
 
         self.verbose("activity matrix shape: ",self.weights.shape)
 
-        self.normalize_fn(self.weights)
+        output_fn(self.weights)
 
 
     def contains(self,x,y):
@@ -110,12 +109,9 @@ class ConnectionField(TopoObject):
         return activity[r1:r2,c1:c2]
 
 
-    ### JABHACKALERT! Need to figure out how to handle the normalization
-    ### here once the learning functions handle that internally.
-    ###
     ### JABALERT! Seems to have a strange definition of bounds, if it
     ### is all relative to self.x and self.y.  Needs better documentation.
-    def change_bounds(self, new_wt_bounds):
+    def change_bounds(self, new_wt_bounds, output_fn=Identity()):
         """
         Change the bounding box for this existing ConnectionField.
 
@@ -142,7 +138,7 @@ class ConnectionField(TopoObject):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
             self.weights.savespace(1)
 
-            self.normalize_fn(self.weights)
+            output_fn(self.weights)
 
 
     def change_density(self, new_wt_density):
@@ -275,7 +271,7 @@ class CFProjection(Projection):
         for y in self.dest.sheet_rows()[::-1]:
             row = []
             for x in self.dest.sheet_cols():
-                row.append(self.cf_type(input_sheet=self.src,weight_bounds=self.weights_bounds,weights_generator=self.weights_generator,weight_type=self.weight_type,normalize_fn=self.learning_fn.output_fn,x=x,y=y))
+                row.append(self.cf_type(input_sheet=self.src,weight_bounds=self.weights_bounds,weights_generator=self.weights_generator,weight_type=self.weight_type,output_fn=self.learning_fn.output_fn,x=x,y=y))
 
             cfs.append(row)
 
@@ -338,9 +334,10 @@ class CFProjection(Projection):
         self.weights_bounds = new_wt_bounds
         rows,cols = self.get_shape()
         cfs = self.cfs
+        output_fn = self.learning_fn.output_fn
         for r in xrange(rows):
             for c in xrange(cols):
-                cfs[r][c].change_bounds(new_wt_bounds)
+                cfs[r][c].change_bounds(new_wt_bounds,output_fn=output_fn)
 
 
 

@@ -10,7 +10,8 @@ __version__='$Revision$'
 ###
 ### Should eliminate import *.
 from topo.base.connectionfield import CFProjection
-from topo.base.parameter import Parameter, Constant
+from topo.base.parameter import Parameter
+from topo.base.projection import Identity
 from topo.base.utils import *
 from topo.responsefns.basic import CFDotProduct_CPointer
 from topo.learningfns.basic import DivisiveHebbian_CPointer
@@ -32,8 +33,8 @@ class CFProjection_CPointer(CFProjection):
 
     weight_ptrs = [] 
     slice_ptrs = []
-    response_fn = Constant(default=CFDotProduct_CPointer())
-    learning_fn = Constant(default=DivisiveHebbian_CPointer())
+    response_fn = Parameter(default=CFDotProduct_CPointer())
+    learning_fn = Parameter(default=DivisiveHebbian_CPointer())
 
     def __init__(self,**params):
         super(CFProjection_CPointer,self).__init__(**params)
@@ -52,8 +53,8 @@ class CFProjection_CPointer(CFProjection):
         self.activity = self.output_fn(self.activity)
 
 
-    def change_bounds(self, new_wt_bounds):
-        CFProjection.change_bounds(self, new_wt_bounds)
+    def change_bounds(self, new_wt_bounds, output_fn=Identity()):
+        CFProjection.change_bounds(self, new_wt_bounds, output_fn)
 	# the weight arrays have been changed, so the pointer arrays have to be updated
         x,y = self.get_shape()
         self.weight_ptrs = ones((x,y), Int)
