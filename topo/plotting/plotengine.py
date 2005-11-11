@@ -49,12 +49,12 @@ be protected as much as possible while remaining flexible.
 
 $Id$
 """
+### JABHACKALERT!  The documentation above needs substantial
+### clarification -- less detail, more sense.
+
+
 __version__='$Revision$'
 
-### JABHACKALERT!
-### 
-### The code in this file has not yet been reviewed, and may need
-### substantial changes.
 
 from copy import deepcopy
 from topo.base.topoobject import TopoObject
@@ -111,7 +111,9 @@ class PlotEngine(TopoObject):
         """
         self.plot_group_dict[name] = group
 
-
+        
+    ### JABALERT!  It is strange for this to call make_plot_group;
+    ### that call should either be justified or removed.
     def get_plot_group(self, name, group_type = 'BasicPlotGroup',
                        filter=sheet_filter, class_type='BasicPlotGroup'):
         """
@@ -138,6 +140,9 @@ class PlotEngine(TopoObject):
         return requested_plot
 
 
+    ### JABHACKALERT! This function needs a new name describing what
+    ### it actually does, i.e. why anyone would want to use it.  The
+    ### documentation needs to be clarified; it doesn't make much sense.
     def lambda_for_templates(self, template, filter_lam):
         """
         This assumes that a PlotGroupTemplate named 'template' has
@@ -149,15 +154,18 @@ class PlotEngine(TopoObject):
         SheetView.  The default behavior will be to only look at the
         first one and dispose of any others if they exist.
         """
-        ### JCHACKALERT! It was necessary here to sort the sheet (with the function sort_dict
-        ### so that (and by chance that our display is currently following the alphabetical order)
-        ### the plot are placed in a logical way from left to right (i.e. LeftRetina, RightRetina, V1, V2
-        ### but also Orientation Preference, Orientation Preference&Selectivity, Orientation Selectivity).
-        ### This has to be changed so that each classes has a number that roughly determine where we
+        ### JCHACKALERT! It was necessary here to sort the sheet (with
+        ### the function sort_dict so that (and by chance that our
+        ### display is currently following the alphabetical order) the
+        ### plot are placed in a logical way from left to right
+        ### (i.e. LeftRetina, RightRetina, V1, V2 but also Orientation
+        ### Preference, Orientation Preference&Selectivity,
+        ### Orientation Selectivity).  This has to be changed so that
+        ### each classes has a number that roughly determine where we
         ### wants it on the plot (i.e. GeneratorSheet: 5, CFSheet: 50)
-        ### Note that the same problem has to be solved for PatternGenerator in order to determine
-        ### in which order to display scale, offset...
-        ### (When the problem will be solved, it can be sapred to import dict_sort from topo/base/utils.py)
+        ### Note that the same problem has to be solved for
+        ### PatternGenerator in order to determine in which order to
+        ### display scale, offset...  
         sheet_list = [each for each in dict_sort(self.simulation.objects(Sheet)) if filter_lam(each)]
         
         # Loop over all sheets that passed the filter.
@@ -182,6 +190,7 @@ class PlotEngine(TopoObject):
                     self.warning("Only SHC, Unit Weights, and Projection plots currently implemented.")
         return plot_list
 
+    ### JABALERT! What does this function do?  Needs some documentation.
     def make_projection_plot(self, k, pt, s):
         """
         k is the name of the plot template passed in.
@@ -195,7 +204,7 @@ class PlotEngine(TopoObject):
         if not isinstance(view_list,list):
             view_list = [view_list]
         
-        ### A probable list from the Sheet.sheet_view dictionary is
+        ### A list from the Sheet.sheet_view dictionary is
         ### converted into multiple Plot generation requests.
         plot_list = []
         for each in view_list:
@@ -206,6 +215,7 @@ class PlotEngine(TopoObject):
         return plot_list
 
 
+    ### JABALERT! What does this function do?  Needs some documentation.
     def make_unitweights_plot(self, k, pt, s):
         sheet_target = pt.channels['Sheet_name']
         (sheet_x,sheet_y) = pt.channels['Location']
@@ -235,15 +245,18 @@ class PlotEngine(TopoObject):
                     plot_list.append(Plot((key,None,None),COLORMAP,p.src,pt.channels['Normalize']))
         self.debug('plot_list =' + str(plot_list))
         
-        ### JCHACKALERT! This is an Hack so that the plot are appearing in alphabetical order
-        ### which, luckily, corresponds to the order we want them to be displayed in
-        ### This is something that needs more fixing (also see PatternGenerators and the JCHACKALERT!
-        ### alert above in the file for similar problem)
+        ### JCHACKALERT! This is an Hack so that the plot are
+        ### appearing in alphabetical order which, luckily,
+        ### corresponds to the order we want them to be displayed in
+        ### This is something that needs more fixing (also see
+        ### PatternGenerators and the JCHACKALERT!  alert above in the
+        ### file for similar problem)
         plot_list.sort(reverse=True)
         return plot_list
 
 
 
+    ### JABALERT! What does this function do?  Needs some documentation.
     def make_SHC_plot(self, k, pt, sheet):
         """
         Create and return a single Plot object matching the passed in
@@ -257,6 +270,7 @@ class PlotEngine(TopoObject):
         return p
 
 
+    ### JABALERT! What does this function do?  Needs some documentation.
     def make_plot_group(self, name='None', group_type='BasicPlotGroup',
                              filter_lam=sheet_filter, class_type='BasicPlotGroup'):
         """

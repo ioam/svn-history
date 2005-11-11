@@ -320,9 +320,9 @@ class CFProjection(Projection):
 
     def change_bounds(self, new_wt_bounds):
         """
-        Change the bounding box for this existing ConnectionField.
+        Change the bounding box for all of the ConnectionFields in this Projection.
 
-        Discards weights or adds new (zero) weights as necessary.
+        Calls change_bounds() on each ConnectionField.
 
 	Currently only allows reducing the size, but should be
         extended to allow increasing as well.
@@ -342,7 +342,8 @@ class CFProjection(Projection):
 
 
     def change_density(self, new_wt_density):
-        """Rescales the weight matrix in place, interpolating or decimating as needed.
+        """
+        Rescales the weight matrix in place, interpolating or resampling as needed.
 	
 	Not yet implemented.
 	"""
@@ -361,7 +362,8 @@ class CFSheet(ProjectionSheet):
     ConnectionField connections on another Sheet (via CFProjections).
     It then provides an interface for visualizing or analyzing these
     ConnectionFields for each unit.  A ProjectionSheet should work
-    just the same as this sheet, except that it will not provide those routines.
+    just the same as this sheet, except that it will not provide those
+    routines.
     """
 
     def learn(self):
