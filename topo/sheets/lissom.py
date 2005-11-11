@@ -6,17 +6,14 @@ $Id$
 """
 __version__='$Revision$'
 
-import weave
 import Numeric
 
 from itertools import chain
 
-import topo
-
 from topo.base.connectionfield import CFSheet
 from topo.base.parameter import Parameter, BooleanParameter
 from topo.outputfns.basic import PiecewiseLinear
-#from topo.learningfns.basic import DivisiveHebbian,GenericCFLF,DivisiveHebbian_CPointer
+
 
 class LISSOM(CFSheet):
 
