@@ -1,8 +1,8 @@
 INSTALLING TOPOGRAPHICA ON WINDOWS XP/2000/(NT?)
 ===================================================================
 
-(Not tested recently, as of 11/2005, and will likely need some
-modification).
+(Installation procedure verified as of November 14, 2005)
+
 
 THE FAST WAY:
 
@@ -10,10 +10,6 @@ THE FAST WAY:
 2. Double click on setup.bat
 3. Follow the various installation prompts for the packages 
    bundled with Topographica.
-4. Add "DISLIN=C:\DISLIN" and "PYTHONPATH=C:\DISLIN\PYTHON"
-   to your System Variables.  To do so go to the [Control Panel], 
-   double click on [System], select the [Advanced] tab, and then 
-   the button [Environment Variables].
 
 After installation you should now have an icon on your desktop that
 opens the directory where Topographica is installed.  There will be a
@@ -21,7 +17,7 @@ new file association called ".ty" which are scripts that the
 Topographica program will execute when you double-click on them.
 
 You can now test the installation by double-clicking on the
-topographica.bat file which will run the interactive Topographica
+topographica.bat file.  This should run the interactive Topographica
 shell and give you a "Topographica>" prompt.
 
 
@@ -30,12 +26,6 @@ shell and give you a "Topographica>" prompt.
 IF THERE IS A PROBLEM
 
 Known issues: 
-
-Sometimes on Windows 2000 Machines the Dislin setup.exe program will
-not exit cleanly after the install.  The Topographica installation has
-completed successfully but the final notice that says to add the
-DISLIN and PYTHONPATH environment variables will not be displayed.
----
 
 If you experience the error:
   File "C:\Python23\lib\string.py", line 220, in atoi 
@@ -48,6 +38,10 @@ don't have an old version of Python earlier in your path statement
 that is running first.
 ---
 
+There is currently (11/2005) no Windows version of Weave (part of
+SciPy) for Python 2.4.  Some features of Topographica that require
+Weave will cause ImportErrors if attempted on a Windows platform.
+
 ===================================================================
 
 INSTALLING THE SLOW WAY
@@ -58,9 +52,9 @@ installed and do (a), (b), and (c) below.  See Note.
 
 Topographica is a Python 2.4 program and requires Python 2.4 to be
 installed.  The setup.bat script checks to see if the correct version
-exists and if an older version is the default Python associated with
+exists.  If an older version of Python is associated with
 Python Files then an included Python 2.4 installer located in
-\external\ will be run.
+\external\ will be executed.
 
 After Python has been installed or detected, the directory is changed
 to .\external\win32\ and following commands are run:
@@ -73,10 +67,11 @@ The 'setup.py install' does the following:
 
 a) Installs the following programs found in external\win32\
 
-   Numeric-23.7.win32-py2.4.exe Python Numeric Package
-   PIL-1.1.5b3.win32-py2.4.exe	Python Imaging Library
-   ..\Pmw.tgz                   Python Mega Widgets  (Contains a Read-Me)
-   dl_83_py.tar.gz              Dislin Plotting      (Runs setup.exe)
+   Numeric-23.7.win32-py2.4.exe    Python Numeric package
+   PIL-1.1.5b3.win32-py2.4.exe	   Python Imaging Library
+   matplotlib-0.81.win32-py2.4.exe PyLab Math and Plotting package
+   ..\Pmw.tgz                      Python Mega Widgets  (Contains a Read-Me)
+   fixedpoint-0.1.2_patched.tgz    FixedPoint number classes
 
 b) Copy the core Topographica files in \topo\* to the install location
    BASE_LOCATION\topo\
@@ -105,4 +100,4 @@ Note: The "Additional Tasks" of part (c) listed above are only for
 
 
 ---
-$Id$
+$Id:$
