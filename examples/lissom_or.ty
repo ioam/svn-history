@@ -18,7 +18,12 @@ __version__='$Revision$'
 # CFProjection.response_fn=CFDotProduct()
 # CFProjection.learning_fn=DivisiveHebbian()
 #
-# 2) Change all instances of "LISSOM" to "LISSOM_CPointer", "DivisiveHebbian"
+# 2) Replace the line
+#      from topo.base.connectionfield import CFProjection
+#    with
+#      from topo.projections.optimized import CFProjection_CPointer
+#
+# 3) Change all instances of "LISSOM" to "LISSOM_CPointer", "DivisiveHebbian"
 # to "DivisiveHebbian_CPointer", and "CFProjection" to "CFProjection_CPointer" 
 # in this file.
 #
@@ -60,7 +65,7 @@ from fixedpoint import FixedPoint
 
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.projections.optimized import CFProjection
+from topo.base.connectionfield import CFProjection
 from topo.responsefns.basic import CFDotProduct
 from topo.patterns.basic import GaussianGenerator, ConstantGenerator
 from topo.patterns.random import UniformRandomGenerator
