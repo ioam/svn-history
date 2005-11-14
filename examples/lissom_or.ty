@@ -15,13 +15,13 @@ __version__='$Revision$'
 # pointers to access data structures instead of the Python/C API):
 #
 # 1) Remove the following 2 lines: 
-# CFProjection.response_fn=CFDotProduct()
-# CFProjection.learning_fn=DivisiveHebbian()
+#    - CFProjection.response_fn=CFDotProduct()
+#    - CFProjection.learning_fn=DivisiveHebbian()
 #
 # 2) Replace the line
-#      from topo.base.connectionfield import CFProjection
+#    - from topo.base.connectionfield import CFProjection
 #    with
-#      from topo.projections.optimized import CFProjection_CPointer
+#    - from topo.projections.optimized import CFProjection_CPointer
 #
 # 3) Change all instances of "LISSOM" to "LISSOM_CPointer", "DivisiveHebbian"
 # to "DivisiveHebbian_CPointer", and "CFProjection" to "CFProjection_CPointer" 
@@ -34,10 +34,10 @@ __version__='$Revision$'
 #
 # To use code written purely in Python:
 #
-# 1) Change CFDotProduct to CFDotProduct_Py in the lines:
-#    - from topo.responsefns.basic import CFDotProduct_Py
+# 1) Comment out the lines:
+#    - from topo.responsefns.basic import CFDotProduct
 #    - CFProjection.response_fn=CFDotProduct()
-#    (i.e. everywhere in the file)
+#    default response_fn of CFProjection is dot product implemented in Python.
 #
 # 2) Comment out the line:
 #    - CFProjection.learning_fn=DivisiveHebbian()
@@ -46,6 +46,15 @@ __version__='$Revision$'
 #    - CFProjection.learning_fn = GenericCFLF()
 #    and to add GenericCFLF to the imports:
 #    - from topo.base.connectionfield import GenericCFLF
+#
+# 3) Add the following line under 2)
+#    - from topo.outputfns.basic import DivisiveL1Normalize
+#
+# 4) Comment out the following line:
+#    - CFProjection.learning_fn=DivisiveHebbian()
+#    and add this line after it
+#    - CFProjection.learning_fn.output_fn=DivisiveL1Normalize()
+#
 #
 # Note that the Python implementation is much slower than C one . You might want to
 # change BaseN and BaseRN to something smaller (e.g. 12.0 and 6.0) to test that
