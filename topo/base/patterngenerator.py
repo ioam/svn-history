@@ -24,14 +24,10 @@ $Id$
 """
 __version__='$Revision$'
 
-### JABHACKALERT!
-###
-### Should eliminate all "import *" commands if at all possible.
-import types
 from topoobject import TopoObject
 from boundingregion import BoundingBox
-from sheet import sheet2matrix, matrix2sheet, bounds2shape
-from Numeric import *
+from sheet import  matrix2sheet, bounds2shape
+from Numeric import add,subtract,cos,sin,array
 from MLab import flipud,rot90
 from parameter import Parameter,Number
 from math import pi
@@ -46,6 +42,8 @@ import registry
 # now it should be replaced by a PatternGenerator that will load in an
 # input file.  Currently (9/05) only used by cfsom.py and a couple of
 # test files.
+from Numeric import resize #this class also requires "array" but is about
+                           #to be removed, and "array" is imported above
 from sheet import Sheet
 from simulator import EventProcessor
 from utils import NxN
@@ -187,6 +185,8 @@ class PatternGenerator(TopoObject):
 # Trivial example of a PatternGenerator, provided for when a default is
 # needed.  The other concrete PatternGenerator classes are stored in
 # patterns/, to be imported as needed.
+from Numeric import ones, Float
+
 class ConstantGenerator(PatternGenerator):
     """Constant pattern generator, i.e. a solid, uniform field of the same value."""
 
