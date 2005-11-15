@@ -122,8 +122,6 @@ def produce_pattern_matrices(bounds, density, r, c):
     # TODO: this can generate output that may be off by one in terms of size,
     # for example most times this generates a 100x100 image, but sometimes
     # it generates a 101x100 
-    # TODO: Use sheet operations defined in sheet.py? I think we already
-    # do...
 
     pattern_y = array([matrix2sheet(r,0,bounds,density) for r in range(rows)])
     pattern_x = array([matrix2sheet(0,c,bounds,density) for c in range(cols)])
