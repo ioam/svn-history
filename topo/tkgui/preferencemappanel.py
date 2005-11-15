@@ -71,12 +71,11 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
         command is executed, then the plot is generated using the
         specified PlotGroupTemplate.
         """
-        if self.console.active_simulator().get_event_processors():
-
-            exec self.cmdname.get()
-            pgt = topo.base.registry.plotgroup_templates[self.mapname.get()]
-            self.pe_group = self.pe.get_plot_group(self.mapname.get(),pgt)
-            self.pe_group.do_plot_cmd()
+ 
+        exec self.cmdname.get()
+        pgt = topo.base.registry.plotgroup_templates[self.mapname.get()]
+        self.pe_group = self.pe.get_plot_group(self.mapname.get(),pgt)
+        self.pe_group.do_plot_cmd()
 
             
     def display_labels(self):

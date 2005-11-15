@@ -199,13 +199,13 @@ class ProjectionPanel(CFSheetPlotPanel):
         self.generate_plot_key() creates the density information needed for
         a ProjectionPlotGroup to create necessary Plots.
         """
-        if self.console.active_simulator().get_event_processors():
-            self.generate_plot_key()
-            self.pe_group = self.pe.get_plot_group(self.plot_key,
-                                                   registry.plotgroup_templates['Projection'],
-                                                   self.region.get(),'ProjectionPlotGroup')
-            self.pe_group.do_plot_cmd()
-            self.plots = self.pe_group.plots()
+  
+        self.generate_plot_key()
+        self.pe_group = self.pe.get_plot_group(self.plot_key,
+                                               registry.plotgroup_templates['Projection'],
+                                               self.region.get(),'ProjectionPlotGroup')
+        self.pe_group.do_plot_cmd()
+        self.plots = self.pe_group.plots()
 
 
     def display_plots(self):

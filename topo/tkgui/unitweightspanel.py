@@ -118,14 +118,14 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         PlotGroup is created, call its do_plot_cmd() to prepare
         the Plot objects.
         """
-        if self.console.active_simulator().get_event_processors():
-            self.generate_plot_key()
-            self.pe_group = self.pe.get_plot_group(self.plot_key,
-                                                   registry.plotgroup_templates['Unit Weights'],
-                                                   self.region.get(),
-                                                   'UnitWeightsPlotGroup')
-            self.pe_group.do_plot_cmd()
-            self.plots = self.pe_group.plots()
+
+
+        self.generate_plot_key()
+        self.pe_group = self.pe.get_plot_group(self.plot_key,
+                                               registry.plotgroup_templates['Unit Weights'],
+                                               self.region.get(),'UnitWeightsPlotGroup')
+        self.pe_group.do_plot_cmd()
+        self.plots = self.pe_group.plots()
 
 
     def display_labels(self):
