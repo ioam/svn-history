@@ -90,7 +90,7 @@ class PlotEngine(TopoObject):
         """
         Create a new plot engine that is linked to a particular
         simulation.  The link is necessary since the PlotEngine will
-        iterate over all the event processors in the simulation,
+        iterate over all the event_processor in the simulation,
         requesting Plots from all EPs that are also Sheets.  This
         approach ensures that new Plot objects will show up
         automatically even in previously defined PlotGroups.
@@ -114,6 +114,11 @@ class PlotEngine(TopoObject):
         
     ### JABALERT!  It is strange for this to call make_plot_group;
     ### that call should either be justified or removed.
+
+    ### JC: if the PlotGroup corresponding to the group has already been inserted in
+    ### the self.plot_group_dict, it is taken when requested;
+    ### otherwise, it seems necessary to create the PlotGroup
+        
     def get_plot_group(self, name, group_type = 'BasicPlotGroup',
                        filter=sheet_filter, class_type='BasicPlotGroup'):
         """
@@ -139,6 +144,57 @@ class PlotEngine(TopoObject):
             requested_plot = self.make_plot_group(name,group_type,filter,class_type)
         return requested_plot
 
+    
+ ### JABALERT! What does this function do?  Needs some documentation.
+    
+    ### JC: this function seems to create the make_plot_group if it is not already inserted
+    ### in the plot_group_dict
+    
+    def make_plot_group(self, name='None', group_type='BasicPlotGroup',
+                             filter_lam=sheet_filter, class_type='BasicPlotGroup'):
+        """
+        name : The key to look under in the SheetView dictionaries.
+        group_type: 2 Valid inputs:
+               1. The string name of the PlotGroup subclass to create.
+                  The actual name is passed in instead of a class
+                  pointer so the function can be used from the
+                  command-line, and also so a full list of class names
+                  is not required.
+               2. If group_type is a PlotGroupTemplate, then the
+                  lambda function to handle templates is called.
+        filter_lam: Optional lambda function to filter which sheets to
+               ask for SheetViews.
+        """
+        ### JCALERT ! What is the use of class_type? 
+        ### the problem is that you can pass a template in group_type, and in this case,
+        ### you need to also specify the PlotGroupType... It might be made simpler.
+        
+        if isinstance(group_type,PlotGroupTemplate):
+            dynamic_list = lambda: self.lambda_for_templates(group_type,filter_lam)
+            try:
+                exec 'ptr = ' + class_type in globals()
+                ### JCALERT! it does not seem to make sense to catch anty exception here
+                ### also it does not seem to make sense to execute that in globals
+                ### I am still working on it to see if it could be changed
+                
+            except Exception, e:
+                self.warning('Exception raised:', e)
+                self.warning('Invalid PlotGroup subclass: ', class_type)
+                return PlotGroup(dynamic_list)
+            new_group = ptr(name,filter_lam,dynamic_list)
+
+            # Just copying the pointer.  Not currently sure if we want to
+            # promote side-effects by not doing a deepcopy(), but assuming
+            # we do for now.  If not, use deepcopy(group_type).
+            new_group.template = group_type 
+            self.add_plot_group(name,new_group)
+        else:
+            print 'Template was not passed in.  This code deprecated and disabled.'
+            import inspect
+            print inspect.stack(), '\n'
+
+        self.debug('Type of new_group is', type(new_group))
+        return new_group
 
     ### JABHACKALERT! This function needs a new name describing what
     ### it actually does, i.e. why anyone would want to use it.  The
@@ -262,41 +318,4 @@ class PlotEngine(TopoObject):
         return p
 
 
-    ### JABALERT! What does this function do?  Needs some documentation.
-    def make_plot_group(self, name='None', group_type='BasicPlotGroup',
-                             filter_lam=sheet_filter, class_type='BasicPlotGroup'):
-        """
-        name : The key to look under in the SheetView dictionaries.
-        group_type: 2 Valid inputs:
-               1. The string name of the PlotGroup subclass to create.
-                  The actual name is passed in instead of a class
-                  pointer so the function can be used from the
-                  command-line, and also so a full list of class names
-                  is not required.
-               2. If group_type is a PlotGroupTemplate, then the
-                  lambda function to handle templates is called.
-        filter_lam: Optional lambda function to filter which sheets to
-               ask for SheetViews.  
-        """
-        if isinstance(group_type,PlotGroupTemplate):
-            dynamic_list = lambda: self.lambda_for_templates(group_type,filter_lam)
-            try:
-                exec 'ptr = ' + class_type in globals()
-            except Exception, e:
-                self.warning('Exception raised:', e)
-                self.warning('Invalid PlotGroup subclass: ', group_type)
-                return PlotGroup(dynamic_list)
-            new_group = ptr(name,filter_lam,dynamic_list)
-
-            # Just copying the pointer.  Not currently sure if we want to
-            # promote side-effects by not doing a deepcopy(), but assuming
-            # we do for now.  If not, use deepcopy(group_type).
-            new_group.template = group_type 
-            self.add_plot_group(name,new_group)
-        else:
-            print 'Template was not passed in.  This code deprecated and disabled.'
-            import inspect
-            print inspect.stack(), '\n'
-
-        self.debug('Type of new_group is', type(new_group))
-        return new_group
+   
