@@ -97,9 +97,6 @@ class ImageGenerator(Sheet):
         self.send_output(data=self.activity)
 
 
-### This should presumably be a private method of PatternGenerator.
-
-
 class PatternGenerator(TopoObject):
 
     bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True)
@@ -113,16 +110,16 @@ class PatternGenerator(TopoObject):
 
     def __call__(self,**params):
         self.verbose("params = ",params)
-        self.setup_xy(params.get('bounds',self.bounds),
-                      params.get('density',self.density),
-                      params.get('x', self.x),
-                      params.get('y',self.y),
-                      params.get('orientation',self.orientation),
-                      params.get('rows',0),
-                      params.get('cols',0))
+        self.__setup_xy(params.get('bounds',self.bounds),
+                        params.get('density',self.density),
+                        params.get('x', self.x),
+                        params.get('y',self.y),
+                        params.get('orientation',self.orientation),
+                        params.get('rows',0),
+                        params.get('cols',0))
         return self.scale*self.function(**params)+self.offset
 
-    def setup_xy(self,bounds,density,x,y,orientation,rows,cols):
+    def __setup_xy(self,bounds,density,x,y,orientation,rows,cols):
         self.verbose("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
         xm,ym = self.__produce_pattern_matrices(bounds,density,rows,cols)
         self.pattern_x, self.pattern_y = self.__transform_coordinates(xm-x,ym-y,orientation)
