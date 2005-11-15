@@ -27,7 +27,8 @@ system (as in most Linux distributions), just change to the
 topographica directory and type "make doc", then load doc/index.html
 into your web browser.  If there are any problems generating the local
 copy, you can instead use the web-based documentation at
-www.topographica.org.
+www.topographica.org.  (The doc/ directory is just a copy of the
+www.topographica.org site.)
 
 
 BUILDING TOPOGRAPHICA
