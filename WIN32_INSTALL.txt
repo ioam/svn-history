@@ -27,6 +27,15 @@ IF THERE IS A PROBLEM
 
 Known issues: 
 
+There is currently (11/2005) no Windows version of Weave (part of
+SciPy) for Python 2.4.  Some features of Topographica that require
+Weave will cause ImportErrors if attempted on a Windows platform.
+This includes many of the example network simulations in the
+/examples/ directory.  There are directions in /examples/lissom_or.ty
+for changing the code to not use the optimized Weave functions.
+
+---
+
 If you experience the error:
   File "C:\Python23\lib\string.py", line 220, in atoi 
     return _int(s, base)
@@ -36,11 +45,6 @@ Then you may be running an old version of Python.  Check your
 Environment Variables in "My Computer -> Properties" to make sure you
 don't have an old version of Python earlier in your path statement
 that is running first.
----
-
-There is currently (11/2005) no Windows version of Weave (part of
-SciPy) for Python 2.4.  Some features of Topographica that require
-Weave will cause ImportErrors if attempted on a Windows platform.
 
 ===================================================================
 
@@ -100,4 +104,4 @@ Note: The "Additional Tasks" of part (c) listed above are only for
 
 
 ---
-Last edited by Judah De Paula (judah@cs.utexas.edu), November 14, 2005
+Last edited by Judah De Paula (judah@cs.utexas.edu), November 15, 2005
