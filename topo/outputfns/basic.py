@@ -17,28 +17,19 @@ import Numeric
 from Numeric import clip
 from topo.base.topoobject import TopoObject
 from topo.base.parameter import Number
-from topo.base.utils import L2norm,norm
+from topo.base.utils import L2norm, norm, clip_in_place
 from topo.base.projection import OutputFunction
 
 # Imported here so that all OutputFunctions will be in the same package
 from topo.base.projection import Identity
 
+### JCALERT! The functions below have been re-written to work as procedure;
+### Nonetheless, I kept the return x statement in order to not be worry about
+### changing the call anywhere else in the code. That might have to be done later.
+### Note the last function DivisiveLpNormalize does not work as a procedure for
+### reasons not yet understood
+### Also note that the test file still test the method for both procedure and function calls
 
-### JABALERT!
-###
-### Should go in topo/base/utils.py, and if at all possible should be
-### rewritten to use matrix functions that eliminate the explicit for
-### loop.  The savespace() should probably also be eliminated.
-def clip_in_place(mat,lower_bound,upper_bound):
-    """Version of Numeric.clip that changes the argument in place, with no intermediate."""
-    mat.savespace(1)
-    for element,i in zip(mat.flat,range(len(mat.flat))):
-        if element<lower_bound:
-            mat.flat[i] = lower_bound
-        elif element>upper_bound:
-            mat.flat[i] = upper_bound
-            
-    
 class PiecewiseLinear(OutputFunction):
     """ 
     Piecewise-linear output function with lower and upper thresholds
@@ -50,10 +41,7 @@ class PiecewiseLinear(OutputFunction):
     def __init__(self,**params):
         super(PiecewiseLinear,self).__init__(**params)
 
-    ### JABHACKALERT! The x.savespace(1) should not be here, or elsewhere
-    ### in this file.  It needs to be at a higher level somewhere.
     def __call__(self,x):
-        x.savespace(1)
         fact = 1.0/(self.upper_bound-self.lower_bound)        
         x -= self.lower_bound
         x *= fact
@@ -75,7 +63,6 @@ class DivisiveL1Normalize(OutputFunction):
         super(DivisiveL1Normalize,self).__init__(**params)
 
     def __call__(self,x):
-        x.savespace(1)
         tot = 1.0*sum(x.flat)
         if tot != 0:
             factor = (self.norm_value/tot)
@@ -125,7 +112,9 @@ class DivisiveMaxNormalize(OutputFunction):
             x *= factor
         return x
 
-
+### JCALERT! This function has to be fixed to work as a procedure (see alert below)
+### still working as a function (with intermediate copy) at the moment
+    
 class DivisiveLpNormalize(OutputFunction):
     """
     OutputFunction to divide an array by its Lp-Norm, where p is specified.
@@ -143,9 +132,14 @@ class DivisiveLpNormalize(OutputFunction):
         super(DivisiveLpNormalize,self).__init__(**params)
 
     def __call__(self,x):
-        x.savespace(1)
         tot = 1.0*norm(x.flat,self.p)
         if tot != 0:
             factor = (self.norm_value/tot)
-            x = x*factor
+            
+            ### JCALERT! This does not work when just using the line x *= factor
+            ### I could not figure out why.
+            ### This has to be clean, as well as the corresponding test file testoutputfnsbasic.py
+            
+            x  = x * factor 
+            #x *= factor
         return x
