@@ -86,7 +86,7 @@ class LineGenerator(PatternGenerator):
     scale = Number(default=0.7,softbounds=(0.0,2.0))
     
     def function(self,**params):
-        return line( params.get('pattern_y',self.pattern_y), 
+        return line( params.get('pattern_x',self.pattern_x), 
                            params.get('thickness',self.thickness),
                            params.get('smoothing',self.smoothing))
 

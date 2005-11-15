@@ -132,12 +132,6 @@ def produce_pattern_matrices(bounds, density, r, c):
     return pattern_x[:,0], pattern_y[:,1]
 
 
-### JABHACKALERT!
-### 
-### Why do the matrices need to be "rotated to match the Topographica
-### Cartesian coordinates"? Is that why a line or grating of zero degrees
-### points upwards instead of to the right?  
-### 
 ### This should presumably be a private method of PatternGenerator.
 def transform_coordinates(pattern_x, pattern_y, orientation):
     """
@@ -147,15 +141,12 @@ def transform_coordinates(pattern_x, pattern_y, orientation):
     (separately), along with an orientation value.  Returns two Numeric
     matrices of the same shape, but with the coordinate values translated
     and rotated to have the specified origin and orientation.
-
-    Each matrix is also rotated to match the Topographica Cartesian
-    coordinates.
     """
     new_pattern_x = subtract.outer(cos(pi-orientation)*pattern_x, sin(pi-orientation)*pattern_y)
     new_pattern_y = add.outer(sin(pi-orientation)*pattern_x, cos(pi-orientation)*pattern_y)
 
-    new_pattern_x = flipud(rot90(new_pattern_x))
-    new_pattern_y = flipud(rot90(new_pattern_y))
+    new_pattern_x = flipud(new_pattern_x)
+    new_pattern_y = flipud(new_pattern_y)
     return new_pattern_x, new_pattern_y
 
 
