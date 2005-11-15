@@ -284,11 +284,6 @@ class MeasureFeatureMap(TopoObject):
             
             for feature in self.__featuremaps[sheet].keys():
 
-                
-                # CEBHACKALERT?
-                # Whatever I change the name strings below to, the GUI shows up with the same names even
-                # though the changes are reflected in the Sheet's sheet_view_dict etc.
-                
                 norm_factor = self.__featuremaps[sheet][feature].distribution_matrix[0,0].axis_range
                 preference_map = SheetView(((self.__featuremaps[sheet][feature].preference())/norm_factor,
                                              bounding_box), sheet.name + "_" + feature.capitalize()+'Preference')
