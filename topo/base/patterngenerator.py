@@ -98,21 +98,6 @@ class ImageGenerator(Sheet):
 
 
 ### This should presumably be a private method of PatternGenerator.
-def transform_coordinates(pattern_x, pattern_y, orientation):
-    """
-    Rotates and translates the given matrix coordinates.
-
-    Accepts Numeric matrices specifing the x and y coordinates
-    (separately), along with an orientation value.  Returns two Numeric
-    matrices of the same shape, but with the coordinate values translated
-    and rotated to have the specified origin and orientation.
-    """
-    new_pattern_x = subtract.outer(cos(pi-orientation)*pattern_x, sin(pi-orientation)*pattern_y)
-    new_pattern_y = add.outer(sin(pi-orientation)*pattern_x, cos(pi-orientation)*pattern_y)
-
-    new_pattern_x = flipud(-rot90(new_pattern_x))
-    new_pattern_y = flipud(rot90(new_pattern_y))
-    return new_pattern_x, new_pattern_y
 
 
 class PatternGenerator(TopoObject):
@@ -140,7 +125,7 @@ class PatternGenerator(TopoObject):
     def setup_xy(self,bounds,density,x,y,orientation,rows,cols):
         self.verbose("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
         xm,ym = self.__produce_pattern_matrices(bounds,density,rows,cols)
-        self.pattern_x, self.pattern_y = transform_coordinates(xm-x,ym-y,orientation)
+        self.pattern_x, self.pattern_y = self.__transform_coordinates(xm-x,ym-y,orientation)
 
     def function(self,**params):
         """
@@ -179,6 +164,23 @@ class PatternGenerator(TopoObject):
         assert len(pattern_x) == cols
         assert len(pattern_y) == rows
         return pattern_x[:,0], pattern_y[:,1]
+
+    def __transform_coordinates(self, pattern_x, pattern_y, orientation):
+        """
+        Rotates and translates the given matrix coordinates.
+
+        Accepts Numeric matrices specifing the x and y coordinates
+        (separately), along with an orientation value.  Returns two Numeric
+        matrices of the same shape, but with the coordinate values translated
+        and rotated to have the specified origin and orientation.
+        """
+        new_pattern_x = subtract.outer(cos(pi-orientation)*pattern_x, sin(pi-orientation)*pattern_y)
+        new_pattern_y = add.outer(sin(pi-orientation)*pattern_x, cos(pi-orientation)*pattern_y)
+
+        new_pattern_x = flipud(-rot90(new_pattern_x))
+        new_pattern_y = flipud(rot90(new_pattern_y))
+        return new_pattern_x, new_pattern_y
+
 
 
 
