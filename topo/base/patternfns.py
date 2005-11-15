@@ -38,7 +38,7 @@ def gabor(x, y, width, height, frequency, phase):
     x_w = divide(x,width)
     y_h = divide(y,height)
     p = exp(-0.5*x_w*x_w + -0.5*y_h*y_h)    
-    return p * (0.5 + 0.5*cos(2*pi*frequency*x + phase))
+    return p * (0.5 + 0.5*cos(2*pi*frequency*y + phase))
 
 
 def line(y, thickness, gaussian_width):
