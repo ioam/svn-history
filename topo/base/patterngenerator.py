@@ -97,39 +97,6 @@ class ImageGenerator(Sheet):
         self.send_output(data=self.activity)
 
 
-
-### JABHACKALERT!
-### 
-### This should presumably be a private method of PatternGenerator.
-def produce_pattern_matrices(bounds, density, r, c):
-    """
-    Generate vectors representing coordinates at which the pattern will be sampled.
-
-    Sets up two vectors for the x and y values based on a bounds and density.
-    The x and y vectors are lists of indexes at which to sample the pattern
-    function.
-    """       
-    if r == 0 and c == 0:
-        rows,cols = bounds2shape(bounds,density)
-    else:
-        rows = r
-        cols = c
-    
-    ### JABHACKALERT!
-    ### 
-    ### We must fix these things:
-    ### 
-    # TODO: this can generate output that may be off by one in terms of size,
-    # for example most times this generates a 100x100 image, but sometimes
-    # it generates a 101x100 
-
-    pattern_y = array([matrix2sheet(r,0,bounds,density) for r in range(rows)])
-    pattern_x = array([matrix2sheet(0,c,bounds,density) for c in range(cols)])
-    assert len(pattern_x) == cols
-    assert len(pattern_y) == rows
-    return pattern_x[:,0], pattern_y[:,1]
-
-
 ### This should presumably be a private method of PatternGenerator.
 def transform_coordinates(pattern_x, pattern_y, orientation):
     """
@@ -172,7 +139,7 @@ class PatternGenerator(TopoObject):
 
     def setup_xy(self,bounds,density,x,y,orientation,rows,cols):
         self.verbose("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
-        xm,ym = produce_pattern_matrices(bounds,density,rows,cols)
+        xm,ym = self.__produce_pattern_matrices(bounds,density,rows,cols)
         self.pattern_x, self.pattern_y = transform_coordinates(xm-x,ym-y,orientation)
 
     def function(self,**params):
@@ -184,6 +151,38 @@ class PatternGenerator(TopoObject):
         e.g. if the automatic scaling and rotating is not appropriate.
         """
         raise NotImplementedError
+
+    def __produce_pattern_matrices(self, bounds, density, r, c):
+        """
+        Generate vectors representing coordinates at which the pattern will be sampled.
+
+        Sets up two vectors for the x and y values based on a bounds and density.
+        The x and y vectors are lists of indexes at which to sample the pattern
+        function.
+        """       
+        if r == 0 and c == 0:
+            rows,cols = bounds2shape(bounds,density)
+        else:
+            rows = r
+            cols = c
+
+        ### JABHACKALERT!
+        ### 
+        ### We must fix these things:
+        ### 
+        # TODO: this can generate output that may be off by one in terms of size,
+        # for example most times this generates a 100x100 image, but sometimes
+        # it generates a 101x100 
+
+        pattern_y = array([matrix2sheet(r,0,bounds,density) for r in range(rows)])
+        pattern_x = array([matrix2sheet(0,c,bounds,density) for c in range(cols)])
+        assert len(pattern_x) == cols
+        assert len(pattern_y) == rows
+        return pattern_x[:,0], pattern_y[:,1]
+
+
+
+
 
 
 # Trivial example of a PatternGenerator, provided for when a default is
