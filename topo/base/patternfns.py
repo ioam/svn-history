@@ -41,17 +41,16 @@ def gabor(x, y, width, height, frequency, phase):
     return p * (0.5 + 0.5*cos(2*pi*frequency*x + phase))
 
 
-def line(x, thickness, gaussian_width):
+def line(y, thickness, gaussian_width):
     """
     Infinite-length line with a solid central region, then Gaussian fall-off at the edges.
     """
-    distance_from_line = abs(x)
-    gaussian_x_coord = distance_from_line - thickness/2.0
-
+    distance_from_line = abs(y)
+    gaussian_y_coord = distance_from_line - thickness/2.0
     sigmasq = gaussian_width*gaussian_width
-    falloff = __exp(-gaussian_x_coord*gaussian_x_coord, 2*sigmasq)
-    
-    return where(gaussian_x_coord<=0, 1.0, falloff)
+    falloff = __exp(-gaussian_y_coord*gaussian_y_coord, 2*sigmasq)
+    return where(gaussian_y_coord<=0, 1.0, falloff)
+
 
 # CEBHACKALERT:
 # I think I have something wrong with gaussian falloffs for ring() and disk()

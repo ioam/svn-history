@@ -36,15 +36,14 @@ class SineGratingGenerator(PatternGenerator):
     phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi))
 
     ### JABHACKALERT!  Need to fold these two functions together.
-    def sine_grating(self,x, y, frequency, phase):
+    def sine_grating(self, y, frequency, phase):
         """
         Sine grating pattern (two-dimensional sine wave).
         """
-        return 0.5 + 0.5*sin(frequency*2*pi*x + phase)
+        return 0.5 + 0.5*sin(frequency*2*pi*y + phase)
 
     def function(self,**params):
-        return self.sine_grating( params.get('pattern_x',self.pattern_x),
-                                  params.get('pattern_y',self.pattern_y),
+        return self.sine_grating( params.get('pattern_x',self.pattern_y),
                                   params.get('frequency',self.frequency), 
                                   params.get('phase',self.phase)) 
 
@@ -86,7 +85,7 @@ class LineGenerator(PatternGenerator):
     scale = Number(default=0.7,softbounds=(0.0,2.0))
     
     def function(self,**params):
-        return line( params.get('pattern_x',self.pattern_x), 
+        return line( params.get('pattern_y',self.pattern_y), 
                            params.get('thickness',self.thickness),
                            params.get('smoothing',self.smoothing))
 
