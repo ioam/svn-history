@@ -45,14 +45,17 @@ When a password is requested, just press return.  Then change to
 wherever you want the files to be stored, and use the command:
 
 <pre>
-  cvs -d :pserver:anonymous@cvs.sf.net:/cvsroot/topographica checkout -A -d -P -r LATEST_STABLE topographica
+  cvs -d :pserver:anonymous@cvs.sf.net:/cvsroot/topographica
+  checkout -A -d -P -r LATEST_STABLE topographica
 </pre>
 
-This process will likely take a few minutes, as there are some large
-files involved.  The <code>-r LATEST_STABLE</code> option selects the
-version that has most recently been declared to pass all tests.  That
-option can be omitted if you want the absolutely most up-to-date
-version, which may not always be usable due to work in progress.
+(where the entire command should be on a single line, even though it
+is broken into two lines above).  This process will likely take a few
+minutes, as there are some large files involved.  The <code>-r
+LATEST_STABLE</code> option selects the version that has most recently
+been declared to pass all tests.  That option can be omitted if you
+want the absolutely most up-to-date version, which may not always be
+usable due to work in progress.
 
 
 <H3>Read/write access</H3>
@@ -121,12 +124,14 @@ have not yet documented how to do that.  We have not necessarily
 tested the most recent version on the Mac, so there may be some small
 changes required.
 
-<P><B>Windows:</B>
-It is possible to build Topographica under Windows just as is done
-under UNIX, if you first install <A HREF="http://www.cygwin.com/">Cygwin</a>. 
-Alternatively, nearly all of the features of Topographica are available
-with a Win32-native Python, and if you choose this option then Cygwin
-is optional.  The basic steps for building the native version are:
+<P><B>Windows:</B> It should be possible to build Topographica under
+Windows just as is done under UNIX, if you first install <A
+HREF="http://www.cygwin.com/">Cygwin</a>, although as of 11/2005 the
+library versions available on Cygwin are a bit out of date.
+Alternatively, nearly all of the features of Topographica are
+available with a Win32-native Python, and if you choose this option
+then Cygwin is optional.  The basic steps for building the native
+version are:
 
 <ol>
 <li> Unpack the topographica archive into a temporary directory.
@@ -173,3 +178,16 @@ or
 
 If you use the latter, a good way to get started is to work through
 the <A HREF="../Tutorial/index.html">LISSOM tutorial</A>.
+
+<H3>Updating Topographica</H3>
+
+Once you have Topographica checked out, you can update to the latest
+stable version at any time by doing:
+
+<pre>
+  cd topographica
+  cvs update -A -d -P -r LATEST_STABLE
+</pre>
+
+As before, '-r LATEST_STABLE' can be omitted to get the very most
+recent version.
