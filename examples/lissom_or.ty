@@ -19,7 +19,7 @@ __version__='$Revision$'
 #    - CFProjection.learning_fn=DivisiveHebbian()
 #
 # 2) Replace the line
-#    - from topo.base.connectionfield import CFProjection
+#    - from topo.projections.basic import CFProjection
 #    with
 #    - from topo.projections.optimized import CFProjection_CPointer
 #
@@ -74,7 +74,7 @@ from fixedpoint import FixedPoint
 
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.connectionfield import CFProjection
+from topo.projections.basic import CFProjection
 from topo.responsefns.basic import CFDotProduct
 from topo.patterns.basic import GaussianGenerator, ConstantGenerator
 from topo.patterns.random import UniformRandomGenerator
