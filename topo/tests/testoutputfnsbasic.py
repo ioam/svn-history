@@ -50,7 +50,7 @@ class TestPiecewiseLinear(unittest.TestCase):
 
         self.fn1 = PiecewiseLinear()
         self.fn2 = PiecewiseLinear(lower_bound = 0.1,upper_bound = 0.5)    
-        self.fn3 = PiecewiseLinear(lower_bound = 0, upper_bound = 10)
+        self.fn3 = PiecewiseLinear(lower_bound = 0, upper_bound = 10.0)
         
     def test_piecewiselinear(self):
         # Test as a procedure
@@ -333,47 +333,55 @@ class TestDivisiveLpNormalize(unittest.TestCase):
         fn2_a1 = self.a1/l3norm_a1
         fn2_a2 = self.a2/l3norm_a2
 
-        for item1,item2 in zip(self.fn1(self.a1).flat,fn1_a1.flat):
-            self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn1(self.a2).flat,fn1_a2.flat):
-            self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2(self.a1).flat,fn2_a1.flat):
-            self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2(self.a2).flat,fn2_a2.flat):
-            self.assertAlmostEqual(item1, item2)
+#         for item1,item2 in zip(self.fn1(self.a1).flat,fn1_a1.flat):
+#             self.assertAlmostEqual(item1, item2)
+#         for item1,item2 in zip(self.fn1(self.a2).flat,fn1_a2.flat):
+#             self.assertAlmostEqual(item1, item2)
+#         for item1,item2 in zip(self.fn2(self.a1).flat,fn2_a1.flat):
+#             self.assertAlmostEqual(item1, item2)
+#         for item1,item2 in zip(self.fn2(self.a2).flat,fn2_a2.flat):
+#             self.assertAlmostEqual(item1, item2)
 
-        l4norm_a1 = pow(0.3**4+0.6**4+0.7**4+0.8**4+0.4**4+0.2**4,1.0/4.0)
-        l4norm_a2 = pow(1.0**4+1.0**4+7.0**4+4.0**4+3.0**4+11.0**4+2.0**4+5.0**4+9.0**4,1.0/4.0)
+        l4norm_a1 = pow(0.3**4.0+0.6**4.0+0.7**4.0+0.8**4.0+0.4**4.0+0.2**4.0,1.0/4.0)
+        l4norm_a2 = pow(1.0**4.0+1.0**4.0+7.0**4.0+4.0**4.0+3.0**4.0+11.0**4.0+2.0**4.0+5.0**4.0+9.0**4.0,1.0/4.0)
         fn3_a1 = (self.a1/l4norm_a1)*2.0
         fn3_a2 = (self.a2/l4norm_a2)*2.0
         
-        for item1,item2 in zip(self.fn3(self.a1).flat,fn3_a1.flat):
-            self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn3(self.a2).flat,fn3_a2.flat):
-            self.assertAlmostEqual(item1, item2)
+  #       for item1,item2 in zip(self.fn3(self.a1).flat,fn3_a1.flat):
+#             self.assertAlmostEqual(item1, item2)
+#         for item1,item2 in zip(self.fn3(self.a2).flat,fn3_a2.flat):
+#             self.assertAlmostEqual(item1, item2)
 
         # Test as a procedure to be fixed!
 
-#         self.fn1(self.a1)
-#         for item1,item2 in zip(self.a1.flat,fn1_a1.flat):
-#             self.assertAlmostEqual(item1, item2)
-#         self.fn1(self.a2)    
-#         for item1,item2 in zip(self.a2.flat,fn1_a2.flat):
-#             self.assertAlmostEqual(item1, item2)
-            
-#         self.a1 = array([[0.3,0.6,0.7],
-#                         [0.8,0.4,0.2]])
+	self.a1 = array([[0.3,0.6,0.7],
+                        [0.8,0.4,0.2]])
 
-#         self.a2 = array([[1.0,-1.0,7.0],
-#                          [4.0,3.0,-11.0],
-#                          [2.0,5.0,9.0]])
+        self.a2 = array([[1.0,-1.0,7.0],
+                         [4.0,3.0,-11.0],
+                         [2.0,5.0,9.0]])
         
-#         self.fn2(self.a1)
-#         for item1,item2 in zip(self.a1.flat,fn2_a1.flat):
-#             self.assertAlmostEqual(item1, item2)
-#         self.fn2(self.a2)    
-#         for item1,item2 in zip(self.a2.flat,fn2_a2.flat):
-#             self.assertAlmostEqual(item1, item2)      
+
+        self.fn1(self.a1)
+        for item1,item2 in zip(self.a1.flat,fn1_a1.flat):
+            self.assertAlmostEqual(item1, item2)
+        self.fn1(self.a2)    
+        for item1,item2 in zip(self.a2.flat,fn1_a2.flat):
+            self.assertAlmostEqual(item1, item2)
+            
+        self.a1 = array([[0.3,0.6,0.7],
+                        [0.8,0.4,0.2]])
+
+        self.a2 = array([[1.0,-1.0,7.0],
+                         [4.0,3.0,-11.0],
+                         [2.0,5.0,9.0]])
+        
+        self.fn2(self.a1)
+        for item1,item2 in zip(self.a1.flat,fn2_a1.flat):
+            self.assertAlmostEqual(item1, item2)
+        self.fn2(self.a2)    
+        for item1,item2 in zip(self.a2.flat,fn2_a2.flat):
+            self.assertAlmostEqual(item1, item2)      
 
        
         
@@ -384,12 +392,12 @@ class TestDivisiveLpNormalize(unittest.TestCase):
                          [4.0,3.0,-11.0],
                          [2.0,5.0,9.0]])
 
-#         self.fn3(self.a1)
-#         for item1,item2 in zip(self.a1.flat,fn3_a1.flat):
-#             self.assertAlmostEqual(item1, item2)
-#         self.fn3(self.a2)    
-#         for item1,item2 in zip(self.a2.flat,fn3_a2.flat):
-#             self.assertAlmostEqual(item1, item2)      
+        self.fn3(self.a1)
+        for item1,item2 in zip(self.a1.flat,fn3_a1.flat):
+            self.assertAlmostEqual(item1, item2)
+        self.fn3(self.a2)    
+        for item1,item2 in zip(self.a2.flat,fn3_a2.flat):
+            self.assertAlmostEqual(item1, item2)      
 
 
 cases = [TestPiecewiseLinear,

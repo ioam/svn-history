@@ -26,8 +26,6 @@ from topo.base.projection import Identity
 ### JCALERT! The functions below have been re-written to work as procedure;
 ### Nonetheless, I kept the return x statement in order to not be worry about
 ### changing the call anywhere else in the code. That might have to be done later.
-### Note the last function DivisiveLpNormalize does not work as a procedure for
-### reasons not yet understood
 ### Also note that the test file still test the method for both procedure and function calls
 
 class PiecewiseLinear(OutputFunction):
@@ -112,8 +110,6 @@ class DivisiveMaxNormalize(OutputFunction):
             x *= factor
         return x
 
-### JCALERT! This function has to be fixed to work as a procedure (see alert below)
-### still working as a function (with intermediate copy) at the moment
     
 class DivisiveLpNormalize(OutputFunction):
     """
@@ -135,11 +131,5 @@ class DivisiveLpNormalize(OutputFunction):
         tot = 1.0*norm(x.flat,self.p)
         if tot != 0:
             factor = (self.norm_value/tot)
-            
-            ### JCALERT! This does not work when just using the line x *= factor
-            ### I could not figure out why.
-            ### This has to be clean, as well as the corresponding test file testoutputfnsbasic.py
-            
-            x  = x * factor 
-            #x *= factor
-        return x
+            x *=factor 
+	return x
