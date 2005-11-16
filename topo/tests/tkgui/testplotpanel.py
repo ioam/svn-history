@@ -1,5 +1,5 @@
 """
-Unit test for PlotPanel
+Unit test for PlotGroupPanel
 $Id$
 """
 __version__='$Revision$'
@@ -24,7 +24,7 @@ import random
 import pdb #debugger
 from topo.patterns.basic import GaussianGenerator,LineGenerator
 
-class TestPlotPanel(unittest.TestCase):
+class TestPlotGroupPanel(unittest.TestCase):
 
     def setUp(self):
         """
@@ -105,7 +105,7 @@ class TestPlotPanel(unittest.TestCase):
         interested in the weights of the receptive fields.
         """
         topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
-        topo.tkgui.plotpanel.PlotPanel.print_level = topo.base.topoobject.WARNING
+        topo.tkgui.plotpanel.PlotGroupPanel.print_level = topo.base.topoobject.WARNING
         # input generation params
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 30
@@ -149,7 +149,7 @@ suite = unittest.TestSuite()
 #  Uncomment the following line of code, to not run the test if
 #  $DISPLAY is undefined.  Used mainly for GUI testing.
 suite.requires_display = True
-suite.addTest(unittest.makeSuite(TestPlotPanel))
+suite.addTest(unittest.makeSuite(TestPlotGroupPanel))
 
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(suite)

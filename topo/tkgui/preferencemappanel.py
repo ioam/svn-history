@@ -8,7 +8,7 @@ __version__='$Revision $'
 ### JABALERT!
 ###
 ### This file should be combined with BasicPlotPanel and perhaps
-### PlotPanel, so that all these plots use the same class by default.
+### PlotGroupPanel, so that all these plots use the same class by default.
 ### In each case the class will accept a plotgrouptemplate and look in
 ### it for a user-editable command used to update the plots, and will
 ### just call the command and plot whatever comes back from the
@@ -30,9 +30,9 @@ import topo.base.registry
 from topo.analysis.featuremap import *
 
 
-class PreferenceMapPanel(plotpanel.PlotPanel):
+class PreferenceMapPanel(plotpanel.PlotGroupPanel):
     def __init__(self,parent,pengine,console,pgt_name,**config):
-        plotpanel.PlotPanel.__init__(self,parent,pengine,console,pgt_name=pgt_name,**config)
+        plotpanel.PlotGroupPanel.__init__(self,parent,pengine,console,pgt_name=pgt_name,**config)
 
         # Plotgroup Template associated
         self.pgt = topo.base.registry.plotgroup_templates[pgt_name]
@@ -81,7 +81,7 @@ class PreferenceMapPanel(plotpanel.PlotPanel):
     def display_labels(self):
         """
         Change the title of the grid group by refreshing the time simulator,
-        then call PlotPanel's display_labels().
+        then call PlotGroupPanel's display_labels().
         """
         self.plot_group.configure(tag_text = self.mapname.get() + \
                                   ' at time ' + str(self.pe.simulation.time()))

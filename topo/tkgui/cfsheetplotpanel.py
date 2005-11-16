@@ -1,9 +1,9 @@
 """
 CFSheetPlotPanel must be subclassed to be used.
 
-Subclasses PlotPanel with additional buttons for Sheet access.
+Subclasses PlotGroupPanel with additional buttons for Sheet access.
 
-The Sheet menu was not included in PlotPanel itself, because it
+The Sheet menu was not included in PlotGroupPanel itself, because it
 depends on the CFSheet class.
 
 $Id$
@@ -16,10 +16,10 @@ import Pmw
 import plotpanel
 import topo.base.connectionfield
 
-class CFSheetPlotPanel(plotpanel.PlotPanel):
+class CFSheetPlotPanel(plotpanel.PlotGroupPanel):
 
     def __init__(self,parent,pengine,console,**config):
-        plotpanel.PlotPanel.__init__(self,parent,pengine,console,**config)
+        plotpanel.PlotGroupPanel.__init__(self,parent,pengine,console,**config)
 
         self.region = StringVar()
         self.region.set('None')

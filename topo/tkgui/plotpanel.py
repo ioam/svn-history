@@ -25,11 +25,13 @@ import ImageTk
 import Numeric
 import MLab
 
-### JABHACKALERT! Shouldn't this be PlotGroupPanel, since it handles
-### one PlotGroup, not one Plot?
-class PlotPanel(Frame,topo.base.topoobject.TopoObject):
+### JCALERT: the name has been changed from PlotPanel to PlotGroupPanel
+### I think we might also want to change the name of the subclasses (e.g. BasicPlotPanel...)
+### also, the file can be renamed plotgrouppanel.py (carefull the import statement in others files 
+### also have to be replaced
+class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
     """
-    Abstract PlotPanel class for displaying bitmapped images to a TK
+    Abstract PlotGroupPanel class for displaying bitmapped images to a TK
     GUI window.  Must be subclassed to be usable.
     """
 
@@ -213,7 +215,7 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
 
     def do_plot_cmd(self):
         """
-        Subclasses of PlotPanel will need to create this function to
+        Subclasses of PlotGroupPanel will need to create this function to
         generate the plots.
 
         See UnitWeightsPanel and ProjectionPanel for
@@ -388,9 +390,9 @@ class PlotPanel(Frame,topo.base.topoobject.TopoObject):
 
 
 ### JABHACKALERT!  This class should probably be deleted; see preferencemappanel.py
-class BasicPlotPanel(PlotPanel):
+class BasicPlotPanel(PlotGroupPanel):
     """
-    Activity Panel bitmap plot.  Inherits and extends PlotPanel, while
+    Activity Panel bitmap plot.  Inherits and extends PlotGroupPanel, while
     using a BasicPlotGroup.  Many defaults of the other class allows this
     class to be small.
     
@@ -399,7 +401,7 @@ class BasicPlotPanel(PlotPanel):
     
     def __init__(self,parent,pengine,console,plot_key,pgt_name='Activity',**config):
         
-        PlotPanel.__init__(self,parent,pengine,console,plot_key=plot_key,pgt_name=pgt_name,**config)
+        PlotGroupPanel.__init__(self,parent,pengine,console,plot_key=plot_key,pgt_name=pgt_name,**config)
         
         self.pgt = registry.plotgroup_templates[pgt_name]
      
@@ -411,7 +413,7 @@ class BasicPlotPanel(PlotPanel):
     def display_labels(self):
         """
         Change the title of the grid group by refreshing the simulator time
-        then call PlotPanel's display_labels().
+        then call PlotGroupPanel's display_labels().
         """
         self.plot_group.configure(tag_text = self.mapname.get()+ \
                                   ' at time ' + str(self.pe.simulation.time()))

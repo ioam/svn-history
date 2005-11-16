@@ -10,7 +10,7 @@ Parameter defined in the PatternGenerator subclass will be taken with the
 intersection of valid TaggedSlider types defined in this class and
 then shown in the window.
 
-The Preview panel draws heavily from the PlotPanel class, and instead
+The Preview panel draws heavily from the PlotGroupPanel class, and instead
 of using a PlotGroup subclass, creates a group on the fly.  
 
 $Id$
@@ -73,7 +73,7 @@ def patterngenerator_names():
     return KeyedList(k)
 
 
-class InputParamsPanel(plotpanel.PlotPanel):
+class InputParamsPanel(plotpanel.PlotGroupPanel):
     def __init__(self,parent,pengine,console=None,padding=2,**config):
         super(InputParamsPanel,self).__init__(parent,pengine,console,plot_key='Preview',**config)
 

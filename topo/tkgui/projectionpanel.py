@@ -13,7 +13,7 @@ import ImageTk
 import topo.base.registry as registry
 from math import ceil
 from cfsheetplotpanel import CFSheetPlotPanel
-from plotpanel import PlotPanel
+from plotpanel import PlotGroupPanel
 from itertools import chain
 from topo.base.projection import ProjectionSheet
 
@@ -210,7 +210,7 @@ class ProjectionPanel(CFSheetPlotPanel):
 
     def display_plots(self):
         """
-        This must be changed from PlotPanels version since
+        This must be changed from PlotGroupPanels version since
         ProjectionPanel requires a 2D grid of plots.
         """
         if self.pe_group:

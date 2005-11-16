@@ -309,7 +309,7 @@ class PlotEngine(TopoObject):
     ### (The plotgroup is returned by the function make_plot_Group, and it needs
     ### to build the associated plot list when creating the plotgroup)
     ### I think that having three function dealing separately with UnitWeight, 
-    ### Projection and all the others makes sense. (It would match the PlotPanel
+    ### Projection and all the others makes sense. (It would match the PlotGroupPanel
     ### structure when PreferenceMapPanel and BasicPlotPanel will be merged,
     ### the same could be done for PlotGroup)
     def make_projection_plot(self, k, pt, s):
@@ -349,14 +349,14 @@ class PlotEngine(TopoObject):
     ### (The plotgroup is returned by the function make_plot_Group, and it needs
     ### to build the associated plot list when creating the plotgroup)
     ### I think that having three function dealing separately with UnitWeight, 
-    ### Projection and all the others makes sense. (It would match the PlotPanel
+    ### Projection and all the others makes sense. (It would match the PlotGroupPanel
     ### structure when PreferenceMapPanel and BasicPlotPanel will be merged,
     ### the same could be done for PlotGroup)
     def make_unitweights_plot(self, k, pt, s):
 
 	### JCthe Sheet_name param ought to be in the plot key and not in the
         ### group template,  as well as the location: 
-        ###  Does it has to be changed when working on PlotPanel?
+        ###  Does it has to be changed when working on PlotGroupPanel?
         sheet_target = pt.channels['Sheet_name']
         (sheet_x,sheet_y) = pt.channels['Location']
 
@@ -400,7 +400,7 @@ class PlotEngine(TopoObject):
     ### (The plotgroup is returned by the function make_plot_Group, and it needs
     ### to build the associated plot list when creating the plotgroup)
     ### I think that having three function dealing separately with UnitWeight, 
-    ### Projection and all the others makes sense. (It would match the PlotPanel
+    ### Projection and all the others makes sense. (It would match the PlotGroupPanel
     ### structure when PreferenceMapPanel and BasicPlotPanel will be merged,
     ### the same could be done for PlotGroup)
     def make_SHC_plot(self, k, pt, sheet):

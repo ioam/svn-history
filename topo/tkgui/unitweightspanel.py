@@ -1,7 +1,7 @@
 """
 WeightsPanel object for GUI visualization.
 
-Subclasses CFSheetPlotPanel, which is basically a PlotPanel.
+Subclasses CFSheetPlotPanel, which is basically a PlotGroupPanel.
 
 Uses a WeightsPlotGroup to generate the plots displayed in the main
 widget.
@@ -12,7 +12,7 @@ __version__='$Revision $'
 
 import __main__
 from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry
-from plotpanel import PlotPanel
+from plotpanel import PlotGroupPanel
 from cfsheetplotpanel import CFSheetPlotPanel
 from topo.base.projection import ProjectionSheet
 import topo.base.registry as registry
@@ -130,7 +130,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
 
     def display_labels(self):
         """
-        Change the title of the grid group, then call PlotPanel's
+        Change the title of the grid group, then call PlotGroupPanel's
         display_labels().
         """
         new_title = 'Connection Fields of ' + self.region.get() + \
