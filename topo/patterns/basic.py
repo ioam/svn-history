@@ -153,15 +153,14 @@ class SquareGratingGenerator(PatternGenerator):
     # cropping a sine grating.
 
     ### JABHACKALERT!  Need to fold these two functions together.
-    def square_grating(self,x, y, frequency, phase):
+    def square_grating(self, y, frequency, phase):
         """
         Square-wave grating (alternating black and white bars).
         """
-        return around(0.5 + 0.5*sin(frequency*2*pi*x + phase))
+        return around(0.5 + 0.5*sin(frequency*2*pi*y + phase))
 
     def function(self,**params):
-        return self.square_grating( params.get('pattern_x',self.pattern_x),
-                                    params.get('pattern_y',self.pattern_y),
+        return self.square_grating( params.get('pattern_x',self.pattern_y),
                                     params.get('frequency',self.frequency), 
                                     params.get('phase',self.phase)) 
 
