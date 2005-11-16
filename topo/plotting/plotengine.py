@@ -66,6 +66,10 @@ from topo.base.connectionfield import CFSheet
 from topo.base.sheetview import SheetView
 from topo.base.sheet import Sheet
 
+### JC: does this function is really of any use?
+### even: does the parameter filter_lam in the method of PlotEngine are they
+### of any use? When do you actually call it with a filter
+
 def sheet_filter(sheet):
     """
     Example sheet filter that can be used to limit which sheets are
@@ -118,6 +122,7 @@ class PlotEngine(TopoObject):
     ### JC: if the PlotGroup corresponding to the group has already been inserted in
     ### the self.plot_group_dict, it is taken when requested;
     ### otherwise, it seems necessary to create the PlotGroup
+    ### also name is generally a plot_key for unitweight and projection panel
         
     def get_plot_group(self, name, group_type = 'BasicPlotGroup',
                        filter=sheet_filter, class_type='BasicPlotGroup'):
@@ -147,9 +152,14 @@ class PlotEngine(TopoObject):
     
  ### JABALERT! What does this function do?  Needs some documentation.
     
-    ### JC: this function seems to create the make_plot_group if it is not already inserted
+    ### JC: this function seems to create the plot_group if it is not already inserted
     ### in the plot_group_dict
     
+    ### JCALERT! I am not sure that this default name to None is required provided that this
+    ### function seems to be called only by get_plot_group above 
+    ### (it is, acording to a quick grep, just testplotgroup and testplotengine use it) 
+    ### (it seems definitely to work without it)
+    ### might be the same problem with group_type and class_type: no need default
     def make_plot_group(self, name='None', group_type='BasicPlotGroup',
                              filter_lam=sheet_filter, class_type='BasicPlotGroup'):
         """
@@ -171,23 +181,29 @@ class PlotEngine(TopoObject):
         
         if isinstance(group_type,PlotGroupTemplate):
             dynamic_list = lambda: self.lambda_for_templates(group_type,filter_lam)
-            try:
-                exec 'ptr = ' + class_type in globals()
+            #try:
+	    exec 'ptr = ' + class_type  in globals()
+
                 ### JCALERT! it does not seem to make sense to catch anty exception here
                 ### also it does not seem to make sense to execute that in globals
-                ### I am still working on it to see if it could be changed
+                ### I am still working on it to see if it could be changed (it seems to)
                 
-            except Exception, e:
-                self.warning('Exception raised:', e)
-                self.warning('Invalid PlotGroup subclass: ', class_type)
-                return PlotGroup(dynamic_list)
+            #except Exception, e:
+            #    self.warning('Exception raised:', e)
+            #    self.warning('Invalid PlotGroup subclass: ', class_type)
+            #    return PlotGroup(dynamic_list)
+
             new_group = ptr(name,filter_lam,dynamic_list)
 
             # Just copying the pointer.  Not currently sure if we want to
             # promote side-effects by not doing a deepcopy(), but assuming
             # we do for now.  If not, use deepcopy(group_type).
+
             new_group.template = group_type 
             self.add_plot_group(name,new_group)
+	    
+            ### JCALERT! is this useful to have the choice wether to pass a template or not
+            ### if it is for doing that?
         else:
             print 'Template was not passed in.  This code deprecated and disabled.'
             import inspect
@@ -199,6 +215,11 @@ class PlotEngine(TopoObject):
     ### JABHACKALERT! This function needs a new name describing what
     ### it actually does, i.e. why anyone would want to use it.  The
     ### documentation needs to be clarified; it doesn't make much sense.
+
+    ### JC: I would propose template_to_plot_group or plot_group_from_template
+    ### (It is only used by testplotgroup and testplotengine outside this file) 
+
+    ### JCALERT: the comment about SheetView is really confusing
     def lambda_for_templates(self, template, filter_lam):
         """
         This assumes that a PlotGroupTemplate named 'template' has
@@ -222,6 +243,8 @@ class PlotEngine(TopoObject):
         ### Note that the same problem has to be solved for
         ### PatternGenerator in order to determine in which order to
         ### display scale, offset...  
+
+	# We catch a list of all sheets in the simulator sorted alphabetically
         sheet_list = [each for each in dict_sort(self.simulation.objects(Sheet)) if filter_lam(each)]
         
         # Loop over all sheets that passed the filter.
@@ -229,9 +252,15 @@ class PlotEngine(TopoObject):
         #         Loop over each channel in the Plot.  Add needed Nones.
         #         Create new Plot and add to list.
         plot_list = []
+
         for each in sheet_list:
             for (k,pt) in template.plot_templates:
                 c = pt.channels
+
+         	### JC: here a change is required to get the plot in color for the weights 
+                ### for instance: instead of testing the channels of the plot_templates,
+                ### add an attribute name to PlotTemplate: Weight, Projection or SHC
+
                 if 'Strength' in c or 'Hue' in c or 'Confidence' in c:     # SHC
                     plot_list.append(self.make_SHC_plot(k,pt,each))
                 elif 'Location' in c and 'Sheet_name' in c:                # Unit Weights 
@@ -242,9 +271,18 @@ class PlotEngine(TopoObject):
                     projection = each.get_in_projection_by_name(c['Projection_name'])
                     if projection:
                         plot_list = plot_list + self.make_projection_plot(k,pt,projection[0].src)
+
                 else:
                     self.warning("Only SHC, Unit Weights, and Projection plots currently implemented.")
         return plot_list
+
+    ### JC: this three function below generate the list of plot for the group in both cases
+    ### projection, weight and SHC. I think it could stay like that because there is three distinct
+    ### cases at the plotgroup level. 
+    ### what should change is the call to Plot(strenght,hue,confidence) should always be the case:
+    ### (see in plot) 
+    ### also the name of the template should be passed here in the case of the preferencemappanel or
+    ### basic case in the other the name of the sheet_view can be passed
 
     ### JABALERT! What does this function do?  Needs some documentation.
     def make_projection_plot(self, k, pt, s):
