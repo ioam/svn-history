@@ -396,6 +396,13 @@ class PlotEngine(TopoObject):
 
 
     ### JABALERT! What does this function do?  Needs some documentation.
+    ### JC: this function return the list of plot for a BasicPlotGroup (Activity or Preference)
+    ### (The plotgroup is returned by the function make_plot_Group, and it needs
+    ### to build the associated plot list when creating the plotgroup)
+    ### I think that having three function dealing separately with UnitWeight, 
+    ### Projection and all the others makes sense. (It would match the PlotPanel
+    ### structure when PreferenceMapPanel and BasicPlotPanel will be merged,
+    ### the same could be done for PlotGroup)
     def make_SHC_plot(self, k, pt, sheet):
         """
         Create and return a single Plot object matching the passed in
