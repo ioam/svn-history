@@ -6,7 +6,7 @@ $Id$
 __version__='$Revision$'
 
 from math import pi
-from Numeric import around,bitwise_and,sqrt,sin,Float
+from Numeric import around,bitwise_and,sin,Float
 
 from topo.base.parameter import Number
 from topo.base.patternfns import gaussian,gabor,line,disk,ring
@@ -14,6 +14,13 @@ from topo.base.patterngenerator import PatternGenerator
 
 # Imported here so that all PatternGenerators will be in the same package
 from topo.base.patterngenerator import ConstantGenerator
+
+
+# CEB:
+# I don't understand why params.get() is used as it is here and
+# elsewhere.
+# E.g. how would "self.pattern_x" alone be any different from
+# "params.get('pattern_x', self.pattern_x)"?
 
 
 class GaussianGenerator(PatternGenerator):
@@ -35,17 +42,16 @@ class SineGratingGenerator(PatternGenerator):
     frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0))
     phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi))
 
-    ### JABHACKALERT!  Need to fold these two functions together.
-    def sine_grating(self, y, frequency, phase):
-        """
-        Sine grating pattern (two-dimensional sine wave).
-        """
-        return 0.5 + 0.5*sin(frequency*2*pi*y + phase)
-
     def function(self,**params):
-        return self.sine_grating( params.get('pattern_x',self.pattern_y),
-                                  params.get('frequency',self.frequency), 
-                                  params.get('phase',self.phase)) 
+        """
+        Return a sine grating pattern (two-dimensional sine wave).
+        """
+        y          = params.get('pattern_y',self.pattern_y)
+        frequency  = params.get('frequency',self.frequency)
+        phase      = params.get('phase',self.phase)
+        
+        return 0.5 + 0.5*sin(frequency*2*pi*y + phase)        
+
 
 
 class GaborGenerator(PatternGenerator):
@@ -132,8 +138,6 @@ class RectangleGenerator(PatternGenerator):
     height  = Number(default=0.4,bounds=(0.0,None),softbounds=(0.0,1.0))
 
     # We will probably want to add Fuzzy-style anti-aliasing to this,
-    # and there might be an easier way to do it than by cropping a
-    # sine grating.
 
     def function(self,**params):
         width = params.get('width',self.width)
@@ -152,15 +156,13 @@ class SquareGratingGenerator(PatternGenerator):
     # and there might be an easier way to do it than by
     # cropping a sine grating.
 
-    ### JABHACKALERT!  Need to fold these two functions together.
-    def square_grating(self, y, frequency, phase):
-        """
-        Square-wave grating (alternating black and white bars).
-        """
-        return around(0.5 + 0.5*sin(frequency*2*pi*y + phase))
-
     def function(self,**params):
-        return self.square_grating( params.get('pattern_x',self.pattern_y),
-                                    params.get('frequency',self.frequency), 
-                                    params.get('phase',self.phase)) 
+        """
+        Return a square-wave grating (alternating black and white bars).
+        """
+        y          = params.get('pattern_y',self.pattern_y)
+        frequency  = params.get('frequency',self.frequency)
+        phase      = params.get('phase',self.phase)
+        
+        return around(0.5 + 0.5*sin(frequency*2*pi*y + phase))
 
