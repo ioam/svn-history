@@ -254,26 +254,45 @@ class PlotEngine(TopoObject):
         plot_list = []
 
         for each in sheet_list:
+	    ### JCALERT! k should be rename pt_name 
+            ### (stay like that for the moment to keep Judah Code available when uncommented)
             for (k,pt) in template.plot_templates:
                 c = pt.channels
+
+		## JC: this is the new version
+
+		if k == 'Unit Weights':
+		    if c['Sheet_name'] == each.name:
+                        # Multiple Plots can be generated from one Sheet.
+                        plot_list = plot_list + self.make_unitweights_plot(k,pt,each)
+		elif k == 'Projection':
+		    projection = each.get_in_projection_by_name(c['Projection_name'])
+                    if projection:
+                        plot_list = plot_list + self.make_projection_plot(k,pt,projection[0].src)
+		else:
+		    plot_list.append(self.make_SHC_plot(k,pt,each))
 
          	### JC: here a change is required to get the plot in color for the weights 
                 ### for instance: instead of testing the channels of the plot_templates,
                 ### add an attribute name to PlotTemplate: Weight, Projection or SHC
 
-                if 'Strength' in c or 'Hue' in c or 'Confidence' in c:     # SHC
-                    plot_list.append(self.make_SHC_plot(k,pt,each))
-                elif 'Location' in c and 'Sheet_name' in c:                # Unit Weights 
-                    if c['Sheet_name'] == each.name:
-                        # Multiple Plots can be generated from one Sheet.
-                        plot_list = plot_list + self.make_unitweights_plot(k,pt,each)
-                elif 'Density' in c and 'Projection_name' in c:            # Projections
-                    projection = each.get_in_projection_by_name(c['Projection_name'])
-                    if projection:
-                        plot_list = plot_list + self.make_projection_plot(k,pt,projection[0].src)
+#                 if 'Strength' in c or 'Hue' in c or 'Confidence' in c:     # SHC
+#                     plot_list.append(self.make_SHC_plot(k,pt,each))
+#                 elif 'Location' in c and 'Sheet_name' in c:                # Unit Weights 
+#                     if c['Sheet_name'] == each.name:
+#                         # Multiple Plots can be generated from one Sheet.
+#                         plot_list = plot_list + self.make_unitweights_plot(k,pt,each)
+#                 elif 'Density' in c and 'Projection_name' in c:            # Projections
+#                     projection = each.get_in_projection_by_name(c['Projection_name'])
+#                     if projection:
+#                         plot_list = plot_list + self.make_projection_plot(k,pt,projection[0].src)
 
-                else:
-                    self.warning("Only SHC, Unit Weights, and Projection plots currently implemented.")
+		### JC: this warning should stay in a way: the new version assume that except for 
+                ### Unit Weights and Projection plots, they are all Preference map or Activity
+                ### bit we might want something else eventually.
+
+#                 else:
+#                     self.warning("Only SHC, Unit Weights, and Projection plots currently implemented.")
         return plot_list
 
     ### JC: this three function below generate the list of plot for the group in both cases
@@ -285,6 +304,14 @@ class PlotEngine(TopoObject):
     ### basic case in the other the name of the sheet_view can be passed
 
     ### JABALERT! What does this function do?  Needs some documentation.
+
+    ### JC: this function return the list of plot for a Projection PlotGroup
+    ### (The plotgroup is returned by the function make_plot_Group, and it needs
+    ### to build the associated plot list when creating the plotgroup)
+    ### I think that having three function dealing separately with UnitWeight, 
+    ### Projection and all the others makes sense. (It would match the PlotPanel
+    ### structure when PreferenceMapPanel and BasicPlotPanel will be merged,
+    ### the same could be done for PlotGroup)
     def make_projection_plot(self, k, pt, s):
         """
         k is the name of the plot template passed in.
@@ -293,9 +320,16 @@ class PlotEngine(TopoObject):
             It should be the source of the Projection connection.
         """
         c = pt.channels
+	### JC: here the hue and confidence ought to be taken and used later on
+        ### but a first work on plot.py is required to make these changes
+        ### hue = pt.channels['Hue']
+        ### confidence = pt.channels['Confidence']
+
+        ### JC apparently, the template carries the information for building
+        ### the plot_key. It might be difficult to change now. (also see make_unit_weights_plot)
         key = (k,c['Projection_name'],c['Density'])
         view_list = s.sheet_view(key)
-        if not isinstance(view_list,list):
+	if not isinstance(view_list,list):
             view_list = [view_list]
         
         ### A list from the Sheet.sheet_view dictionary is
@@ -310,9 +344,26 @@ class PlotEngine(TopoObject):
 
 
     ### JABALERT! What does this function do?  Needs some documentation.
+
+    ### JC: this function return the list of plot for a UnitWeight PlotGroup
+    ### (The plotgroup is returned by the function make_plot_Group, and it needs
+    ### to build the associated plot list when creating the plotgroup)
+    ### I think that having three function dealing separately with UnitWeight, 
+    ### Projection and all the others makes sense. (It would match the PlotPanel
+    ### structure when PreferenceMapPanel and BasicPlotPanel will be merged,
+    ### the same could be done for PlotGroup)
     def make_unitweights_plot(self, k, pt, s):
+
+	### JCthe Sheet_name param ought to be in the plot key and not in the
+        ### group template,  as well as the location: 
+        ###  Does it has to be changed when working on PlotPanel?
         sheet_target = pt.channels['Sheet_name']
         (sheet_x,sheet_y) = pt.channels['Location']
+
+	### JC: here the hue and confidence ought to be taken and used later on
+        ### but a first work on plot.py is required to make these changes
+        ### hue = pt.channels['Hue']
+        ### confidence = pt.channels['Confidence']
 
         projection_list = []
         if not isinstance(s,CFSheet):
@@ -333,7 +384,9 @@ class PlotEngine(TopoObject):
                 views = [views]
             for each in views:
                 if isinstance(each,SheetView):
-                    plot_list.append(Plot((each,None,None),COLORMAP,None,pt.channels['Normalize']))
+		    ### JC: here it needs to be changed: but plot.py also as to be fixed
+                    ### e.g. plot_list.append(Plot((each,hue,None),COLORMAP,s,pt.channels['Normalize']))
+		    plot_list.append(Plot((each,None,None),COLORMAP,None,pt.channels['Normalize']))
                 else:
                     key = ('Weights',sheet,projection,sheet_x,sheet_y)
                     plot_list.append(Plot((key,None,None),COLORMAP,p.src,pt.channels['Normalize']))
