@@ -6,7 +6,7 @@ $Id$
 __version__='$Revision$'
 
 from math import pi
-from Numeric import around,bitwise_and,sin,Float
+from Numeric import around,bitwise_and,sin
 
 from topo.base.parameter import Number
 from topo.base.patternfns import gaussian,gabor,line,disk,ring
@@ -114,9 +114,6 @@ class DiskGenerator(PatternGenerator):
 class RingGenerator(PatternGenerator):
     """2D ring pattern generator."""
 
-    # CEBALERT:
-    # defaults make it look like a disk
-    
     thickness   = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5))
     width  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
     height  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0))
@@ -137,7 +134,7 @@ class RectangleGenerator(PatternGenerator):
     width   = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0))
     height  = Number(default=0.4,bounds=(0.0,None),softbounds=(0.0,1.0))
 
-    # We will probably want to add Fuzzy-style anti-aliasing to this,
+    # We will probably want to add Fuzzy-style anti-aliasing to this.
 
     def function(self,**params):
         width = params.get('width',self.width)
