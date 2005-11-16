@@ -1,5 +1,5 @@
 """
-Unit test for activity panel (BasicPlotPanel)
+Unit test for activity panel (BasicPlotGroupPanel)
 $Id$
 """
 __version__='$Revision$'
@@ -15,7 +15,7 @@ from topo.base.patterngenerator import *
 from topo.base.simulator import *
 from topo.base.sheetview import *
 from topo.plotting.plotengine import *
-from topo.tkgui.plotpanel import BasicPlotPanel
+from topo.tkgui.preferencemappanel import BasicPlotGroupPanel
 from topo.patterns.basic import GaussianGenerator
 
 
@@ -97,7 +97,7 @@ class TestActivityPanel(unittest.TestCase):
         Test the creation the widgets
         """
         topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
-        BasicPlotPanel.print_level = topo.base.topoobject.WARNING
+        BasicPlotGroupPanel.print_level = topo.base.topoobject.WARNING
 
         root = Tkinter.Tk()
         root.resizable(1,1)

@@ -26,9 +26,10 @@ import Numeric
 import MLab
 
 ### JCALERT: the name has been changed from PlotPanel to PlotGroupPanel
-### I think we might also want to change the name of the subclasses (e.g. BasicPlotPanel...)
+### I think we might also want to change the name of the subclasses (e.g. UnitWeightPanel...)
 ### also, the file can be renamed plotgrouppanel.py (carefull the import statement in others files 
 ### also have to be replaced
+
 class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
     """
     Abstract PlotGroupPanel class for displaying bitmapped images to a TK
@@ -389,32 +390,3 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
 
 
 
-### JABHACKALERT!  This class should probably be deleted; see preferencemappanel.py
-class BasicPlotPanel(PlotGroupPanel):
-    """
-    Activity Panel bitmap plot.  Inherits and extends PlotGroupPanel, while
-    using a BasicPlotGroup.  Many defaults of the other class allows this
-    class to be small.
-    
-    $Id$
-    """
-    
-    def __init__(self,parent,pengine,console,plot_key,pgt_name='Activity',**config):
-        
-        PlotGroupPanel.__init__(self,parent,pengine,console,plot_key=plot_key,pgt_name=pgt_name,**config)
-        
-        self.pgt = registry.plotgroup_templates[pgt_name]
-     
-        # Name of the plotgroup to plot
-        self.mapname = StringVar()
-        self.mapname.set(self.pgt.name)
-        self.refresh()
-        
-    def display_labels(self):
-        """
-        Change the title of the grid group by refreshing the simulator time
-        then call PlotGroupPanel's display_labels().
-        """
-        self.plot_group.configure(tag_text = self.mapname.get()+ \
-                                  ' at time ' + str(self.pe.simulation.time()))
-        super(BasicPlotPanel,self).display_labels()

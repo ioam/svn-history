@@ -1,22 +1,19 @@
 """
-Plot for displaying preference maps.
+class BasicPlotGroupPanel
+Panel for displaying preference maps and activity plot groups.
 
 $Id$
 """
 __version__='$Revision $'
 
-### JABALERT!
-###
-### This file should be combined with BasicPlotPanel and perhaps
-### PlotGroupPanel, so that all these plots use the same class by default.
-### In each case the class will accept a plotgrouptemplate and look in
-### it for a user-editable command used to update the plots, and will
-### just call the command and plot whatever comes back from the
-### template.
-###
-### If it does continue to exist, it should probably be renamed to
-### FeatureMapPanel.
 
+### JCALERT! Now BasicPlotGroupPanel replace the former BasicPlotPanel and PreferenceMapPanel
+### As well PlotPanel is now PlotGroupPanel.
+### It remains to: - change the name of plotpanel.py to plotgrouppanel.py 
+###                - change the name of preferencemappanel.py to basicplotgrouppanel.py
+###                - change the import statements in any files using this two files
+###                - write a command for the activity panel to put in the scrolled-list 
+###                  (e.g. measure_activity(), it is pass for the moment )  
 
 import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
@@ -30,7 +27,7 @@ import topo.base.registry
 from topo.analysis.featuremap import *
 
 
-class PreferenceMapPanel(plotpanel.PlotGroupPanel):
+class BasicPlotGroupPanel(plotpanel.PlotGroupPanel):
     def __init__(self,parent,pengine,console,pgt_name,**config):
         plotpanel.PlotGroupPanel.__init__(self,parent,pengine,console,pgt_name=pgt_name,**config)
 
@@ -59,9 +56,12 @@ class PreferenceMapPanel(plotpanel.PlotGroupPanel):
 
 
         self.refresh()
-
+	
         # To make the auto-refresh button not on by default when opening the panel
-        self.auto_refresh_checkbutton.invoke()
+        # but it is not the case for the Activity PlotGroup
+	print self.mapname.get()
+	if self.mapname.get() != 'Activity':
+	    self.auto_refresh_checkbutton.invoke()
 
     def do_plot_cmd(self):
         """
@@ -85,7 +85,7 @@ class PreferenceMapPanel(plotpanel.PlotGroupPanel):
         """
         self.plot_group.configure(tag_text = self.mapname.get() + \
                                   ' at time ' + str(self.pe.simulation.time()))
-        super(PreferenceMapPanel,self).display_labels()
+        super(BasicPlotGroupPanel,self).display_labels()
 
 
     def refresh_title(self):

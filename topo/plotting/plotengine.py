@@ -310,8 +310,7 @@ class PlotEngine(TopoObject):
     ### to build the associated plot list when creating the plotgroup)
     ### I think that having three function dealing separately with UnitWeight, 
     ### Projection and all the others makes sense. (It would match the PlotGroupPanel
-    ### structure when PreferenceMapPanel and BasicPlotPanel will be merged,
-    ### the same could be done for PlotGroup)
+    ### and PlotGroup structure) 
     def make_projection_plot(self, k, pt, s):
         """
         k is the name of the plot template passed in.
@@ -350,8 +349,7 @@ class PlotEngine(TopoObject):
     ### to build the associated plot list when creating the plotgroup)
     ### I think that having three function dealing separately with UnitWeight, 
     ### Projection and all the others makes sense. (It would match the PlotGroupPanel
-    ### structure when PreferenceMapPanel and BasicPlotPanel will be merged,
-    ### the same could be done for PlotGroup)
+    ### and PlotGroup structure) 
     def make_unitweights_plot(self, k, pt, s):
 
 	### JCthe Sheet_name param ought to be in the plot key and not in the
@@ -401,8 +399,7 @@ class PlotEngine(TopoObject):
     ### to build the associated plot list when creating the plotgroup)
     ### I think that having three function dealing separately with UnitWeight, 
     ### Projection and all the others makes sense. (It would match the PlotGroupPanel
-    ### structure when PreferenceMapPanel and BasicPlotPanel will be merged,
-    ### the same could be done for PlotGroup)
+    ### and PlotGroup structure) 
     def make_SHC_plot(self, k, pt, sheet):
         """
         Create and return a single Plot object matching the passed in
