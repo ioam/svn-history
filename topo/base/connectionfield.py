@@ -109,11 +109,16 @@ class ConnectionField(TopoObject):
         return activity[r1:r2,c1:c2]
 
 
-    ### JABALERT! Seems to have a strange definition of bounds, if it
-    ### is all relative to self.x and self.y.  Needs better documentation.
     def change_bounds(self, new_wt_bounds, output_fn=Identity()):
         """
-        Change the bounding box for this existing ConnectionField.
+        Change the bounding box for this existing ConnectionField. The
+        new_wt_bounds should center at the sheet coordinate (0,0), just as
+        weight_bounds in __init__, i.e. new_wt_bounds only specifies the size 
+        of the new bounding box, but not the location. The exact location and 
+        extent of the new bounding box is found by translating the
+        center of new_wt_bounds to the center of this connection field. If
+        the new bound falls outside of the sheet, it is cropped to just cover
+        the sheet.
 
         Discards weights or adds new (zero) weights as necessary,
         preserving existing values where possible.

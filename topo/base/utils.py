@@ -355,8 +355,10 @@ def dict_sort(d):
 def clip_in_place(mat,lower_bound,upper_bound):
     """Version of Numeric.clip that changes the argument in place, with no intermediate."""
     mat.savespace(1)
-    for element,i in zip(mat.flat,range(len(mat.flat))):
+    mflat = mat.flat
+    for element,i in zip(mflat,range(len(mflat))):
         if element<lower_bound:
-            mat.flat[i] = lower_bound
+            mflat[i] = lower_bound
         elif element>upper_bound:
-            mat.flat[i] = upper_bound
+            mflat[i] = upper_bound
+
