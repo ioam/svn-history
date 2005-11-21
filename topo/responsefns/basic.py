@@ -68,7 +68,7 @@ class CFDotProduct(CFResponseFunction):
             int or2;
             int *prev_act = (int *)malloc(cols*sizeof(int));
 
-            bzero(prev_act, cols*sizeof(int));
+            memset(prev_act, 0, cols*sizeof(int));
             rr2 = 0;
     
             for (r=0; r<rows; ++r) {
@@ -201,7 +201,7 @@ class CFDotProduct_CPointer(CFResponseFunction):
             int or2;
             int *prev_act = (int *)malloc(cols*sizeof(int));
 
-            bzero(prev_act, cols*sizeof(int));
+            memset(prev_act, 0, cols*sizeof(int));
             rr2 = 0;
 
             for (r=0; r<rows; ++r) {
