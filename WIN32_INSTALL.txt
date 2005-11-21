@@ -9,7 +9,7 @@ THE FAST WAY:
 1. Unpack the topographica archive into a temporary directory.
 2. Double click on setup.bat
 3. Follow the various installation prompts for the packages 
-   bundled with Topographica.
+   bundled with Topographica. 
 
 After installation you should now have an icon on your desktop that
 opens the directory where Topographica is installed.  There will be a
@@ -33,6 +33,9 @@ Weave will cause ImportErrors if attempted on a Windows platform.
 This includes many of the example network simulations in the
 /examples/ directory.  There are directions in /examples/lissom_or.ty
 for changing the code to not use the optimized Weave functions.
+
+See below for directions on how to integrate Weave with Topographica
+on Windows.
 
 ---
 
@@ -103,5 +106,84 @@ Note: The "Additional Tasks" of part (c) listed above are only for
          [Python Location]\python.exe topographica.py script.py
 
 
+===================================================================
+
+INTEGRATING TOPOGRAPHICA AND WEAVE ON WINDOWS
+
+Topographica is under active development (11/2005) to make the Windows
+version of Topographica easier to install and use.  For now, these
+notes should be able to help you get Weave (www.scipy.org) built on
+Windows and integrated with Topographica.
+
+
+Building Weave:
+
+Since Weave does not have a pre-compiled Windows version that works
+with Python 2.4, you need to compile and install it yourself into the
+Python 2.4 site-packages directory.  You will not need the entire
+SciPy source, only the SciPy_core files.  Topographica has been tested
+with Scipy-0.3.2.
+
+Weave requires a C++ compiler for both compiling the weave package,
+and for executing the Python weave.inline() functions.  The MSVC
+development suite or MinGW can be used.  Topographica has been tested
+with MinGW, using the following package versions:
+    mingw-runtime-3.9
+    w32api-3.5
+    binutils-2.15.91
+    gcc-core-3.4.2
+    gcc-g++-3.4.2
+
+You may find it necessary to adjust your Windows system variables to
+find the MinGW paths before other gcc compilers, such as cygwin.  If
+you do not want to make a system-wide change, it is possible to create
+a .BAT file like the one below that will update environment variables
+for a single cmd window.  NOTE: The adjusted paths are also required
+when Topographica runs, since the inline statements use the compiler.
+
+    @ Must change paths so MinGW is seen instead of Cygwin compilers.
+    @ C:\mingw\minpath.bat  Also put in topographica.{bat,cmd}
+    @Echo Prepend the paths for MinGW
+    set PATH=C:\mingw\bin;%PATH%
+    set LIB=C:\mingw\lib;%LIB%
+    set INCLUDE=C:\mingw\include;%INCLUDE%
+
+From the Weave documentation, 
+Commands to compile weave.  (From the Weave documentation):
+    python setup.py build --compiler=mingw32
+    python setup.py --compiler=mingw32 install
+Commands to test weave:
+    python
+    >>> import weave
+    >>> scipy.test()
+
+
+Changes to the Topographica distribution:
+
+In topographica_script.py, it is necessary to have "import weave;"
+before "import topo.base.commandline" in topographica_script.py since
+importing these packages then importing weave causes a serious Windows
+error (asking if you would like to upload a bug-report to Microsoft.)
+Importing weave first allows things to continue.  
+
+A reference in base/utils.py to "float('inf')" needs to be changed to
+"inf".
+
+Because Python 2.4 is built with MSVC, weave by default looks for the
+msvc framework.  Each weave.inline() command must have
+"compiler='gcc'" added as a function parameter.  
+
+For some reason bzero() is not defined under MinGW, and an undefined
+function error is produced.  A function replacement is suggested here:
+bzero(p,s) --> memset(p,0,s)
+
+In the weave.inline parameter "extra_compile_args" found in the file
+learningfns\basic.py, there are three parameters in a single string
+inside a list.  These must be broken up into three strings inside the
+list, otherwise it's interpreted as a single parameter.
+
+
+examples/lissom_or.ty should now run with no errors.
+
 ---
-Last edited by Judah De Paula (judah@cs.utexas.edu), November 15, 2005
+Last edited by Judah De Paula (judah@cs.utexas.edu), November 21, 2005
