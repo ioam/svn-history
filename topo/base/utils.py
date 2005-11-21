@@ -356,7 +356,9 @@ def clip_in_place(mat,lower_bound,upper_bound):
     """Version of Numeric.clip that changes the argument in place, with no intermediate."""
     mat.savespace(1)
     mflat = mat.flat
-    for element,i in zip(mflat,range(len(mflat))):
+    size = len(mflat)
+    for i in xrange(size):
+        element = mflat[i]
         if element<lower_bound:
             mflat[i] = lower_bound
         elif element>upper_bound:
