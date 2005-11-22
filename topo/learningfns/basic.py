@@ -83,7 +83,7 @@ class Hebbian(CFLearningFunction):
             }
         """
         
-        weave.inline(hebbian_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'cfs', 'learning_rate'], extra_compile_args=['-O2 -fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
+        weave.inline(hebbian_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'cfs', 'learning_rate'], extra_compile_args=['-O2','-fomit-frame-pointer','-funroll-loops'], extra_link_args=['-lstdc++'])
 
         # Apply output_fn to each CF
         # (skipped entirely for no-op case, as an optimization)
@@ -172,7 +172,7 @@ class DivisiveHebbian(CFLearningFunction):
             }
         """
         
-        weave.inline(hebbian_div_norm_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'learning_rate'], extra_compile_args=['-O2 -fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
+        weave.inline(hebbian_div_norm_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'learning_rate'], extra_compile_args=['-O2','-fomit-frame-pointer','-funroll-loops'], extra_link_args=['-lstdc++'])
 
 
 
@@ -263,6 +263,6 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
             }
         """
         
-        weave.inline(hebbian_div_norm_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'learning_rate','weight_ptrs','slice_ptrs'], extra_compile_args=['-fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
+        weave.inline(hebbian_div_norm_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'learning_rate','weight_ptrs','slice_ptrs'], extra_compile_args=['-fomit-frame-pointer','-funroll-loops'], extra_link_args=['-lstdc++'])
 
 

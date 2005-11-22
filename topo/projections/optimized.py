@@ -86,7 +86,7 @@ def setup_wp(cfs, wp, rows, cols):
             }
         }
     """
-    weave.inline(hebbian_code, ['cfs', 'wp', 'rows', 'cols'],  extra_compile_args=['-fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
+    weave.inline(hebbian_code, ['cfs', 'wp', 'rows', 'cols'],  extra_compile_args=['-fomit-frame-pointer','-funroll-loops'], extra_link_args=['-lstdc++'])
 
 
 def setup_sp(cfs, sp, rows, cols):
@@ -112,5 +112,5 @@ def setup_sp(cfs, sp, rows, cols):
             }
         }
     """
-    weave.inline(hebbian_code, ['cfs', 'sp', 'rows', 'cols'],  extra_compile_args=['-fomit-frame-pointer -funroll-loops'], extra_link_args=['-lstdc++'])
+    weave.inline(hebbian_code, ['cfs', 'sp', 'rows', 'cols'],  extra_compile_args=['-fomit-frame-pointer','-funroll-loops'], extra_link_args=['-lstdc++'])
 
