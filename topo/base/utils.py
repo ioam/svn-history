@@ -11,8 +11,10 @@ import __main__
 import math
 
 
-# CEBHACKALERT?
-# couldn't this use float('inf') or array([float('inf')])?
+# Question: Couldn't this use float('inf') or array([float('inf')])?
+# Answer: No.  As of Python 2.4 only some platforms will support float('inf').
+#         In particular, Python 2.4 for Windows generates a cast error
+#         while the operation works under Linux.
 inf = (ones(1)/0.0)[0]
 
 
@@ -332,7 +334,7 @@ def exp(x):
     # This value works on the linuxes we all use, but what about on other platforms?
     MAX_MAG = 700.0
 
-    return Numeric.exp(Numeric.where(abs(x)>MAX_MAG,Numeric.sign(x)*float('inf'),x))
+    return Numeric.exp(Numeric.where(abs(x)>MAX_MAG,Numeric.sign(x)*inf,x))
 
 
 def dict_sort(d):
