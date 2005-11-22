@@ -13,7 +13,7 @@ $Id$
 
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.parameter import Parameter, Number
-from Numeric import array, transpose, zeros, floor, remainder, Float, divide
+from Numeric import array, transpose, zeros, floor, remainder, Float, divide, where
 import Image, ImageOps
 
 
@@ -51,7 +51,7 @@ class TopoImage(object):
         image_array.shape = (self.h, self.w) # ** getdata() returns transposed image?
 
         self.image_array = transpose(image_array)
-        
+        self.background_value = 0.0 # CEBHACKALERT: will become edge average.
 
     def resample(self, x, y, bounds, density, width=1.0, height=1.0):
         """
@@ -85,13 +85,12 @@ class TopoImage(object):
             for i in range(len(image_sample)):
                 for j in range(len(image_sample[i,:])):
                     # CEBHACKALERT:
-                    # Instead of replacing areas where there's no image with 0, it should be
-                    # with the edge average. I have to think about how is best to do that;
-                    # certainly a try/except statement is not the way!
-                    try:
+                    # having an if test here is bad news
+                    if x_scaled[i,j] < 0 or y_scaled[i,j] < 0:
+                        image_sample[i,j] = self.background_value
+                    else:
                         image_sample[i,j] = self.image_array[ x_scaled[i,j] , y_scaled[i,j] ]
-                    except IndexError:
-                        image_sample[i,j] = 0.0
+                        
 
         # CEBALERT:
         # It might make more sense for normalization to occur here rather than
@@ -117,6 +116,7 @@ class TopoImage(object):
         """
         x_scaled = (x+0.5) * scale_factor
         x_scaled = floor(x_scaled)
+        x_scaled = where(x_scaled>=num_pixels, -1, x_scaled)  # CEBHACKALERT: see note in resample()
         return x_scaled.astype(int)  # no rounding is done here
 
 
