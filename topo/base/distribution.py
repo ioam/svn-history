@@ -288,7 +288,10 @@ class Distribution(object):
             return self._relative_selectivity()
 
 
-    # not tested
+    # CEBHACKALERT: the definition of selectivity for non-cyclic
+    # quantities probably needs some more thought.
+    # Additionally, this fails the test in testfeaturemap
+    # (see the comment there).
     def _relative_selectivity(self):
         """
         Return max_value_bin()) as a proportion of the sum_value().
@@ -323,7 +326,6 @@ class Distribution(object):
             return 0.0
 
 
-    # not tested
     def _vector_selectivity(self):
         """
         Return the magnitude of the vector_sum() divided by the sum_value().
