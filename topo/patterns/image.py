@@ -61,11 +61,6 @@ class TopoImage(object):
         The Topographica coordinates are mapped to the Image ones by assuming the longest
         dimension of the Image should fit the default retinal dimension of 1.0. The other
         dimension is scaled by the same factor.
-
-        CEBHACKALERT: about to go...
-        Asking for coodinates outsides the Image causes the coordinates to be wrapped,
-        giving an image that is also wrapped
-        (so, along x: left edge -> image -> right edge -> left edge -> image ...)     
         """
         # fit longest dimension to default retina area (1.0)
         if self.h > self.w:
@@ -76,20 +71,27 @@ class TopoImage(object):
         x_scaled = self.__topo_coords_to_image(x, divide(stretch_factor,width), self.w)
         y_scaled = self.__topo_coords_to_image(y, divide(stretch_factor,height), self.h)
 
-        #assert x_scaled.shape == x.shape
-        #assert y_scaled.shape == y.shape 
+        assert x_scaled.shape == x.shape
+        assert y_scaled.shape == y.shape 
 
         image_sample = zeros(x_scaled.shape, Float)
         
         if self.h==0 or self.w==0 or width==0 or height==0:
-            # we had either a zero-sized image originally, or height/width is zero
+            # we either had a zero-sized image originally, or height/width is zero
             # either case gets zero activity
             return image_sample
         else:
             # sample image at the scaled (x,y) coordinates
             for i in range(len(image_sample)):
                 for j in range(len(image_sample[i,:])):
-                    image_sample[i,j] = self.image_array[ x_scaled[i,j] , y_scaled[i,j] ]
+                    # CEBHACKALERT:
+                    # Instead of replacing areas where there's no image with 0, it should be
+                    # with the edge average. I have to think about how is best to do that;
+                    # certainly a try/except statement is not the way!
+                    try:
+                        image_sample[i,j] = self.image_array[ x_scaled[i,j] , y_scaled[i,j] ]
+                    except IndexError:
+                        image_sample[i,j] = 0.0
 
         # CEBALERT:
         # It might make more sense for normalization to occur here rather than
@@ -100,8 +102,6 @@ class TopoImage(object):
         return image_sample
 
 
-    # CEBHACKALERT:
-    # instead of wrapping image, use average pixel value of edges.
     def __topo_coords_to_image(self,x,scale_factor,num_pixels):
         """
         Transform the given topographica abscissae/ordinates (x) to fit
@@ -115,10 +115,8 @@ class TopoImage(object):
         point numbers. The simplistic technique in this function uses floor() to
         map a range to a single number.
         """
-        # one way of scaling & wrapping:
         x_scaled = (x+0.5) * scale_factor
         x_scaled = floor(x_scaled)
-        x_scaled = x_scaled % num_pixels
         return x_scaled.astype(int)  # no rounding is done here
 
 
