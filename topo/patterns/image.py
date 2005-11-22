@@ -8,50 +8,38 @@ $Id$
 # CEB:
 # this file is still being written.
 
-# - bad image quality on rotate (only solution would be to use Image's own rotate)
+# - when resizing, image should remain centered
 
 
+from topo.base.topoobject import TopoObject
+from topo.outputfns.basic import DivisiveMaxNormalize
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.parameter import Parameter, Number
-from Numeric import array, transpose, zeros, floor, remainder, Float, divide, where
+from Numeric import array, transpose, zeros, floor, Float, divide, where
 import Image, ImageOps
 
 
-# CEBHACKALERT:
-# use normalization functions already available
-from Numeric import ravel
-def normalize(image_array):
-    """
-    Divide all values in the array by the maximum value.
-
-    If the maximum value is zero, return the original values.
-    """
-    max_val = float(max(ravel(image_array)))
-    
-    if max_val > 0.0:
-        return image_array/max_val
-    else:
-        return image_array
-
-
-
-class TopoImage(object):
+class TopoImage(TopoObject):
     """
     Stores a Numeric array representing a normalized Image. The Image is converted to and
     stored in grayscale. It is stored at its original size.
     """
+    output_fn = Parameter(default=DivisiveMaxNormalize())
+    
     def __init__(self, filename):
         """
         """
         image = ImageOps.grayscale(Image.open(filename))
         self.w, self.h = image.size 
 
-        image_array = array(image.getdata())
-        image_array = normalize(image_array)
+        image_array = array(image.getdata(),Float)
+        image_array = self.output_fn(image_array)
+        
         image_array.shape = (self.h, self.w) # ** getdata() returns transposed image?
-
         self.image_array = transpose(image_array)
+        
         self.background_value = 0.0 # CEBHACKALERT: will become edge average.
+
 
     def resample(self, x, y, bounds, density, width=1.0, height=1.0):
         """
@@ -90,14 +78,13 @@ class TopoImage(object):
                         image_sample[i,j] = self.background_value
                     else:
                         image_sample[i,j] = self.image_array[ x_scaled[i,j] , y_scaled[i,j] ]
-                        
 
         # CEBALERT:
         # It might make more sense for normalization to occur here rather than
         # in for the whole image. 
         # "That could be a useful option, i.e. to support both local and global
         # normalization."
-        
+                        
         return image_sample
 
 
