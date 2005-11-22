@@ -166,21 +166,9 @@ importing these packages then importing weave causes a serious Windows
 error (asking if you would like to upload a bug-report to Microsoft.)
 Importing weave first allows things to continue.  
 
-A reference in base/utils.py to "float('inf')" needs to be changed to
-"inf".
-
 Because Python 2.4 is built with MSVC, weave by default looks for the
 msvc framework.  Each weave.inline() command must have
 "compiler='gcc'" added as a function parameter.  
-
-For some reason bzero() is not defined under MinGW, and an undefined
-function error is produced.  A function replacement is suggested here:
-bzero(p,s) --> memset(p,0,s)
-
-In the weave.inline parameter "extra_compile_args" found in the file
-learningfns\basic.py, there are three parameters in a single string
-inside a list.  These must be broken up into three strings inside the
-list, otherwise it's interpreted as a single parameter.
 
 
 examples/lissom_or.ty should now run with no errors.
