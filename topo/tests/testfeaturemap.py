@@ -1,10 +1,4 @@
 """
-Tests of featuremap.py
-
-$Id$
-"""
-
-"""
 TestFeatureMap
 
 $Id$
