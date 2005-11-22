@@ -15,6 +15,8 @@ import math
 # Answer: No.  As of Python 2.4 only some platforms will support float('inf').
 #         In particular, Python 2.4 for Windows generates a cast error
 #         while the operation works under Linux.
+# (see http://www.python.org/peps/pep-0754.html)
+
 inf = (ones(1)/0.0)[0]
 
 
