@@ -28,14 +28,14 @@ import MLab
 ### JCALERT: the name has been changed from PlotPanel to PlotGroupPanel
 ### I think we might also want to change the name of the subclasses (e.g. UnitWeightPanel...)
 ### also, the file can be renamed plotgrouppanel.py (carefull the import statement in others files 
-### also have to be replaced
+### also have to be replaced...)
 
 class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
     """
     Abstract PlotGroupPanel class for displaying bitmapped images to a TK
     GUI window.  Must be subclassed to be usable.
     """
-
+    ### JCALERT! What is the use of this method? Will it be used sometimes?
     @staticmethod
     def valid_context():
         """
@@ -55,8 +55,8 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         pengine: is the associated PlotEngine; it might end up to be unnecessary, needs fixing.
         console: is the associated console, (i.e. the TopoConsole that has this panel)
         plot_key: defines the title of the panel.
-                  In the case of an activity plot or a feature map plot the title
-                  is only the name of template (pgt_name)
+                  In the case of an activity plot or a feature map plot (BasicGroupPanel) 
+		  the title is only the name of the template (pgt_name)
                   In the case of projection and unit weights there is additional information
                   that are added by the method generate_plt_key (e.g. density, unit coordinates...)
         pgt_name: name of the PlotGroupTemplate associated with the panel
@@ -70,10 +70,10 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         ### Usually the pgt_name is the plot_key by default,
         ### but for inputparamspanel pgt_name = None and the plot_key is 'Preview'
         ### passed by default when creating the class
-        if pgt_name!=None:
+        if pgt_name != None:
             self.plot_key = pgt_name
         else:
-            self.plot_key=plot_key
+            self.plot_key = plot_key
 
             
         self.plotgroup_type = plotgroup_type 
@@ -120,10 +120,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         self.balloon = Pmw.Balloon(parent)
         self.canvases = []
 
-        # I think we can get rid of that
-        #self.panel_num = self.console.num_activity_windows
-
-        self.shared_control_frame = Frame(self)
+	self.shared_control_frame = Frame(self)
         self.shared_control_frame.pack(side=TOP,expand=YES,fill=X)
 
         # JAB: Because these three buttons are present in nearly every
