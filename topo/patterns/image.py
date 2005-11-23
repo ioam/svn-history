@@ -1,5 +1,5 @@
 """
-Contains three classes: BoundedImage, TopoImage, and ImageGenerator.
+Contains two classes: TopoImage and ImageGenerator.
 
 
 $Id$
@@ -15,14 +15,36 @@ from topo.base.topoobject import TopoObject
 from topo.outputfns.basic import DivisiveMaxNormalize
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.parameter import Parameter, Number
-from Numeric import array, transpose, zeros, floor, Float, divide, where
+from Numeric import array, transpose, ones, floor, Float, divide, where
 import Image, ImageOps
+
+
+from Numeric import sum, ravel
+def edge_average(a):
+    """
+    Return the mean value around the edge of an array.
+    """
+    flat_a = ravel(a)
+    if len(flat_a) <= 4:
+        edge_sum = sum(flat_a)
+        num_values = len(flat_a)
+    else:
+        edge_sum = sum(a[0]) + sum(a[-1]) + sum(a[:,0]) + sum(a[:,-1]) - a[0,0] - a[0,-1] - a[-1,0] - a[-1,-1]
+        num_values = 2*len(a[0])+2*len(a[:,0]) - 4
+
+    return edge_sum/num_values
 
 
 class TopoImage(TopoObject):
     """
     Stores a Numeric array representing a normalized Image. The Image is converted to and
     stored in grayscale. It is stored at its original size.
+
+    There is also a background value, displayed at any point on the retina not covered by the
+    image. This background value is calculated by calculating the mean of the pixels around
+    the edge of the image. Black-bordered images therefore have a black background, and white-
+    bordered images have a white background, for example. Images with no border have a background
+    that is less of a contrast than a white or black one.
     """
     output_fn = Parameter(default=DivisiveMaxNormalize())
     
@@ -38,7 +60,7 @@ class TopoImage(TopoObject):
         image_array.shape = (self.h, self.w) # ** getdata() returns transposed image?
         self.image_array = transpose(image_array)
         
-        self.background_value = 0.0 # CEBHACKALERT: will become edge average.
+        self.background_value = edge_average(self.image_array)
 
 
     def resample(self, x, y, bounds, density, width=1.0, height=1.0):
@@ -60,31 +82,21 @@ class TopoImage(TopoObject):
         y_scaled = self.__topo_coords_to_image(y, divide(stretch_factor,height), self.h)
 
         assert x_scaled.shape == x.shape
-        assert y_scaled.shape == y.shape 
-
-        image_sample = zeros(x_scaled.shape, Float)
+        assert y_scaled.shape == y.shape
+        
+        image_sample = ones(x_scaled.shape, Float)*self.background_value
         
         if self.h==0 or self.w==0 or width==0 or height==0:
-            # we either had a zero-sized image originally, or height/width is zero
-            # either case gets zero activity
             return image_sample
         else:
             # sample image at the scaled (x,y) coordinates
-            for i in range(len(image_sample)):
-                for j in range(len(image_sample[i,:])):
-                    # CEBHACKALERT:
-                    # having an if test here is bad news
-                    if x_scaled[i,j] < 0 or y_scaled[i,j] < 0:
-                        image_sample[i,j] = self.background_value
-                    else:
-                        image_sample[i,j] = self.image_array[ x_scaled[i,j] , y_scaled[i,j] ]
+            for i in xrange(len(image_sample)):
+                for j in xrange(len(image_sample[i,:])):
+                    if x_scaled[i,j] >= 0 and y_scaled[i,j] >= 0:
+                        image_sample[i,j] = self.image_array[ x_scaled[i,j], y_scaled[i,j] ]
 
         # CEBALERT:
-        # It might make more sense for normalization to occur here rather than
-        # in for the whole image. 
-        # "That could be a useful option, i.e. to support both local and global
-        # normalization."
-                        
+        # Could be useful to allow local normalization here instead of global.             
         return image_sample
 
 
@@ -103,7 +115,7 @@ class TopoImage(TopoObject):
         """
         x_scaled = (x+0.5) * scale_factor
         x_scaled = floor(x_scaled)
-        x_scaled = where(x_scaled>=num_pixels, -1, x_scaled)  # CEBHACKALERT: see note in resample()
+        x_scaled = where(x_scaled>=num_pixels, -1, x_scaled)  
         return x_scaled.astype(int)  # no rounding is done here
 
 
