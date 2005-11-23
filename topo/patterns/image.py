@@ -46,6 +46,7 @@ class TopoImage(TopoObject):
     bordered images have a white background, for example. Images with no border have a background
     that is less of a contrast than a white or black one.
     """
+    ### JABALERT: Should eventually make this an OutputFunctionParameter
     output_fn = Parameter(default=DivisiveMaxNormalize())
     
     def __init__(self, filename):
@@ -72,6 +73,8 @@ class TopoImage(TopoObject):
         dimension of the Image should fit the default retinal dimension of 1.0. The other
         dimension is scaled by the same factor.
         """
+        # CEBHACKALERT:
+        # offer alternatives (shortest dimension to area, etc.)
         # fit longest dimension to default retina area (1.0)
         if self.h > self.w:
             stretch_factor = float(self.h)/1.0
@@ -99,7 +102,7 @@ class TopoImage(TopoObject):
         # Could be useful to allow local normalization here instead of global.             
         return image_sample
 
-
+    ### JABHACKALERT!  Should be unified with sheet2matrix in sheet.py
     def __topo_coords_to_image(self,x,scale_factor,num_pixels):
         """
         Transform the given topographica abscissae/ordinates (x) to fit
@@ -119,7 +122,9 @@ class TopoImage(TopoObject):
         return x_scaled.astype(int)  # no rounding is done here
 
 
-            
+# see PIL for documentation
+# color to grayscale, etc
+# rotation, resize just resample no interpolation
 class ImageGenerator(PatternGenerator):
     """2D image generator."""
 
@@ -130,7 +135,7 @@ class ImageGenerator(PatternGenerator):
     # Until parametersframe is changed to allow non-number parameters, etc,
     # this has to be hidden. Eventually could be 'default="a_file_name"' or
     # 'default=TopoImage_name', or whatever.
-    image = Parameter(default=TopoImage(filename='examples/ellen_arthur_square.pgm'), hidden=True)
+    image = Parameter(default=TopoImage(filename='examples/ellen_arthur.pgm'), hidden=True)
     
     def function(self,**params):
         bounds  = params.get('bounds', self.bounds)
