@@ -8,9 +8,9 @@ import os,unittest
 
 import testpropertiesframe
 import testtopoconsole
-import testplotpanel
+import testplotgrouppanel
 import testactivitypanel
-import testpreferencemappanel
+import testbasicplotgrouppanel
 import testmatplotlibtk
 
 suite = unittest.TestSuite()
