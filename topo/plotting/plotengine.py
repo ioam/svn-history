@@ -303,7 +303,7 @@ class PlotEngine(TopoObject):
     ### cases at the plotgroup level. 
     ### what should change is the call to Plot(strenght,hue,confidence) should always be the case:
     ### (see in plot) 
-    ### also the name of the template should be passed here in the case of the preferencemappanel or
+    ### also the name of the template should be passed here in the case of the basicplotgrouppanel or
     ### basic case in the other the name of the sheet_view can be passed
 
     ### JABALERT! What does this function do?  Needs some documentation.

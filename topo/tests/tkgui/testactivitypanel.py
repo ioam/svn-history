@@ -15,9 +15,10 @@ from topo.base.patterngenerator import *
 from topo.base.simulator import *
 from topo.base.sheetview import *
 from topo.plotting.plotengine import *
-from topo.tkgui.preferencemappanel import BasicPlotGroupPanel
+from topo.tkgui.basicplotgrouppanel import BasicPlotGroupPanel
 from topo.patterns.basic import GaussianGenerator
 
+### JCALERT! This test sould be in the testbasicgrouppanel.py.
 
 class TestActivityPanel(unittest.TestCase):
 

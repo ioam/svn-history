@@ -1,5 +1,5 @@
 """
-Test for PreferenceMapPanel
+Test for BasicGroupPanel
 $Id$
 """
 __version__='$Revision$'
@@ -17,7 +17,7 @@ from topo.base.patterngenerator import *
 from topo.base.simulator import *
 from topo.base.sheetview import *
 from topo.plotting.plotengine import *
-from topo.tkgui.preferencemappanel import *
+from topo.tkgui.basicplotgrouppanel import *
 
 ### JCALERT: This test has to be written in order to test the new change in
 ### the BasicPlotGroupPanel file

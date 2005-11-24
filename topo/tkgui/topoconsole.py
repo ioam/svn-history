@@ -9,11 +9,10 @@ from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, \
      LEFT, RIGHT, YES, BOTH, Label
 import Pmw, re, os, sys, code, traceback, __main__
 import tkFileDialog
-from preferencemappanel import BasicPlotGroupPanel
+from basicplotgrouppanel import BasicPlotGroupPanel
 from unitweightspanel import UnitWeightsPanel
 from projectionpanel import ProjectionPanel
 from inputparamspanel import InputParamsPanel
-from preferencemappanel import BasicPlotGroupPanel
 from topo.plotting.plotgroup import PlotGroupTemplate
 from topo.plotting.plot import PlotTemplate
 from topo.base import simulator
