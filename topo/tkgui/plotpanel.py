@@ -35,18 +35,19 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
     Abstract PlotGroupPanel class for displaying bitmapped images to a TK
     GUI window.  Must be subclassed to be usable.
     """
-    ### JCALERT! What is the use of this method? Will it be used sometimes?
+
     @staticmethod
     def valid_context():
         """
-        Test if this panel should be allowed to be opened by the TopoConsole.
+        Return true if there appears to be data available for this type of plot.
 
-        Given the existing Simulator definitions has no GeneratorSheets, or
-        no ProjectionSheets, some panels should not be opened.  TopoConsole
-        will call this function before creating an instance.
-        """
+        Some PlotGroupPanel classes plot only certain types of Sheets,
+        such as GeneratorSheets or ProjectionSheets.  To avoid
+        confusion and avoid errors later, callers can check this
+        static method before instantiating a plot of this type.
+        Subclasses should define this method to return false when it
+        is clear there is no appropriate data to plot."""
         return True
-#    valid_context = MakeStaticFunction(valid_context)
 
     def __init__(self,parent,pengine,console,plot_key,pgt_name=None,
                  plotgroup_type='BasicPlotGroup',**config):
