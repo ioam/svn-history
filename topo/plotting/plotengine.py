@@ -68,7 +68,7 @@ from topo.base.sheet import Sheet
 
 ### JC: does this function is really of any use?
 ### even: does the parameter filter_lam in the method of PlotEngine are they
-### of any use? When do you actually call it with a filter
+### of any use? When do you actually call it with a filter.
 
 def sheet_filter(sheet):
     """
@@ -94,7 +94,7 @@ class PlotEngine(TopoObject):
         """
         Create a new plot engine that is linked to a particular
         simulation.  The link is necessary since the PlotEngine will
-        iterate over all the event_processor in the simulation,
+        iterate over all the  in the simulation,
         requesting Plots from all EPs that are also Sheets.  This
         approach ensures that new Plot objects will show up
         automatically even in previously defined PlotGroups.
@@ -153,7 +153,7 @@ class PlotEngine(TopoObject):
  ### JABALERT! What does this function do?  Needs some documentation.
     
     ### JC: this function seems to create the plot_group if it is not already inserted
-    ### in the plot_group_dict
+    ### in the plot_group_dict.
     
     ### JCALERT! I am not sure that this default name to None is required provided that this
     ### function seems to be called only by get_plot_group above 
@@ -186,8 +186,10 @@ class PlotEngine(TopoObject):
 
                 ### JCALERT! it does not seem to make sense to catch anty exception here
                 ### also it does not seem to make sense to execute that in globals
-                ### I am still working on it to see if it could be changed (it seems to)
-                
+
+                ### I am still working on it to see if it could be changed
+                ### (Problem: how to get the plotengine from the simulator?)
+
             #except Exception, e:
             #    self.warning('Exception raised:', e)
             #    self.warning('Invalid PlotGroup subclass: ', class_type)
@@ -212,7 +214,8 @@ class PlotEngine(TopoObject):
         self.debug('Type of new_group is', type(new_group))
         return new_group
 
-    ### JABHACKALERT! This function needs a new name describing what
+    ### JABHACKALERT!
+    ### This function needs a new name describing what
     ### it actually does, i.e. why anyone would want to use it.  The
     ### documentation needs to be clarified; it doesn't make much sense.
 
@@ -394,6 +397,7 @@ class PlotEngine(TopoObject):
 
 
     ### JABALERT! What does this function do?  Needs some documentation.
+    ###
     ### JC: this function return the list of plot for a BasicPlotGroup (Activity or Preference)
     ### (The plotgroup is returned by the function make_plot_Group, and it needs
     ### to build the associated plot list when creating the plotgroup)
