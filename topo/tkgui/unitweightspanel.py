@@ -12,7 +12,7 @@ __version__='$Revision $'
 
 import __main__
 from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry
-from plotpanel import PlotGroupPanel
+from plotgrouppanel import PlotGroupPanel
 from cfsheetplotpanel import CFSheetPlotPanel
 from topo.base.projection import ProjectionSheet
 import topo.base.registry as registry

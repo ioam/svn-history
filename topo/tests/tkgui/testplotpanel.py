@@ -15,7 +15,7 @@ from topo.base.sheetview import *
 from topo.plotting.plotengine import *
 from topo.plotting.bitmap import *
 import topo.tkgui.topoconsole 
-import topo.tkgui.plotpanel
+import topo.tkgui.plotgrouppanel
 import Tkinter
 from topo.sheets.cfsom import CFSOM
 from math import pi
@@ -105,7 +105,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         interested in the weights of the receptive fields.
         """
         topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
-        topo.tkgui.plotpanel.PlotGroupPanel.print_level = topo.base.topoobject.WARNING
+        topo.tkgui.plotgrouppanel.PlotGroupPanel.print_level = topo.base.topoobject.WARNING
         # input generation params
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 30

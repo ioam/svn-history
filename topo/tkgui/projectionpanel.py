@@ -13,7 +13,7 @@ import ImageTk
 import topo.base.registry as registry
 from math import ceil
 from cfsheetplotpanel import CFSheetPlotPanel
-from plotpanel import PlotGroupPanel
+from plotgrouppanel import PlotGroupPanel
 from itertools import chain
 from topo.base.projection import ProjectionSheet
 

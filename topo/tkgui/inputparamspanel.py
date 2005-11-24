@@ -22,7 +22,7 @@ import math, string, re
 import parametersframe
 import topo.base.patterngenerator
 import topo.plotting.plot
-import plotpanel
+import plotgrouppanel
 import Pmw
 import topo.base.sheetview 
 import topo.base.registry
@@ -73,7 +73,7 @@ def patterngenerator_names():
     return KeyedList(k)
 
 
-class InputParamsPanel(plotpanel.PlotGroupPanel):
+class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
     def __init__(self,parent,pengine,console=None,padding=2,**config):
         super(InputParamsPanel,self).__init__(parent,pengine,console,plot_key='Preview',**config)
 

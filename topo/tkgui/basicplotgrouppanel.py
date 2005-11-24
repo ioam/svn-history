@@ -18,7 +18,7 @@ __version__='$Revision $'
 import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas
-import plotpanel
+import plotgrouppanel
 import topo.base.registry
 
 
@@ -27,9 +27,9 @@ import topo.base.registry
 from topo.analysis.featuremap import *
 
 
-class BasicPlotGroupPanel(plotpanel.PlotGroupPanel):
+class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
     def __init__(self,parent,pengine,console,pgt_name,**config):
-        plotpanel.PlotGroupPanel.__init__(self,parent,pengine,console,pgt_name=pgt_name,**config)
+        plotgrouppanel.PlotGroupPanel.__init__(self,parent,pengine,console,pgt_name=pgt_name,**config)
 
         # Plotgroup Template associated
         self.pgt = topo.base.registry.plotgroup_templates[pgt_name]

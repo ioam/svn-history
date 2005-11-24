@@ -13,13 +13,13 @@ __version__='$Revision$'
 from Tkinter import StringVar, Frame, LEFT, RIGHT, TOP, BOTTOM, YES, X
 from topo.base.sheet import Sheet
 import Pmw
-import plotpanel
+import plotgrouppanel
 import topo.base.connectionfield
 
-class CFSheetPlotPanel(plotpanel.PlotGroupPanel):
+class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
 
     def __init__(self,parent,pengine,console,**config):
-        plotpanel.PlotGroupPanel.__init__(self,parent,pengine,console,**config)
+        plotgrouppanel.PlotGroupPanel.__init__(self,parent,pengine,console,**config)
 
         self.region = StringVar()
         self.region.set('None')
