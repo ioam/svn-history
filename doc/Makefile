@@ -9,13 +9,22 @@ PHP                             = php -q
 SED                             = sed
 LN                              = ln -s
 
-PHPBASE = ${wildcard */text.php}
-PHPHTML = ${subst text.php,index.html,${PHPBASE}}
+PHPBASE = ${wildcard */*_text.php}
+PHPHTML = ${subst _text.php,.html,${PHPBASE}}
 
 
 # General rule based only on target filename and location
-%/index.html : %/text.php shared/*.php shared/*.css
-	cd $* ; ${PHP} ../shared/index.php > index.html
+
+# Old version: worked only for text.php -> index.html
+#%/index.html : %/text.php shared/*.php shared/*.css
+#	cd $* ; ${PHP} ../shared/index.php > index.html
+
+# Works for any *_text.php -> *.html
+# Hack: passes in text filename in an arbitrary php.ini option named
+# 'sendmail_from', because it's not clear how to pass in 
+# a user-defined variable value
+%.html : %_text.php shared/*.php shared/*.css
+	cd ${dir $@} ; ${PHP} -d sendmail_from=${notdir $<} ../shared/index.php > $(subst _text.php,.html,${notdir $<})
 
 # Generate HTML files from source versions
 default: all

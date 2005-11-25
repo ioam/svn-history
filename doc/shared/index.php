@@ -7,6 +7,11 @@
 
 	include('../shared/config.php');
 
+	# Hack: expects name of textfile to be passed in through the
+	# arbitrary php.ini option 'sendmail_from'.
+	$textfile = ini_get('sendmail_from');
+        global $textfile;
+
         global $body_bg_color;
 	print '<BODY bgcolor="'.$body_bg_color.'">';
 
@@ -48,7 +53,7 @@
 	print '</td><td valign="top" bgcolor="'.$banner_bg_color.'">';
 	
 	# 5.1 main text column (left)
-	include('..'.$fname.'/text.php');
+	include('..'.$fname.'/'.$textfile);
 
 	# close table
 	print '</td></tr></table>';
