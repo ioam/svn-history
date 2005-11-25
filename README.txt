@@ -60,7 +60,8 @@ make and GCC installed.  Just follow the Linux instructions, replacing
 
 Windows:
 
-See WIN32_INSTALL.txt.
+See doc/Downloads/win32.html (or the source file
+doc/Downloads/win32_text.php).
 
 Mac:
 

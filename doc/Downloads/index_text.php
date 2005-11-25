@@ -127,7 +127,8 @@ changes required.
 <P><B>Windows:</B> It should be possible to build Topographica under
 Windows just as is done under UNIX, if you first install <A
 HREF="http://www.cygwin.com/">Cygwin</a>, although as of 11/2005 the
-library versions available on Cygwin are a bit out of date.
+library versions available on Cygwin are a bit out of date and 
+thus this process does not currently go smoothly.
 Alternatively, nearly all of the features of Topographica are
 available with a Win32-native Python, and if you choose this option
 then Cygwin is optional.  The basic steps for building the native
@@ -151,18 +152,8 @@ You can now test the installation by double-clicking on the
 topographica.bat file which will run the interactive Topographica
 shell and give you a "Topographica>" prompt.
 
-<P>If you experience the error:
-<pre>
-  File "C:\Python23\lib\string.py", line 220, in atoi 
-    return _int(s, base)
-TypeError: int() can't convert non-string with explicit base
-</pre>
-
-<p>Then you may be running an old version of Python.  Check your
-Environment Variables in "My Computer -> Properties" to make sure you
-don't have an old version of Python earlier in your path statement
-that is running first.  If you still have troubles, see the 
-WIN32_INSTALL.txt file included with the Topographica distribution.
+<P>If you experience any problems, then please consult our detailed
+<a href="win32.html">Windows installation instructions</a>.
 
 
 <H3>Running Topographica</H3>
