@@ -221,9 +221,6 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         See UnitWeightsPanel and ProjectionPanel for
         examples.
         """
-	### JCALERT! here we could change that:
-	###      - pe_group is a PlotGroupObject but the list of plots have been created
-        ###        when the PlotGroup has been initialized, not in the plotengine.
 
         self.pe_group = self.pe.get_plot_group(self.plot_key,
                                                self.plotgroup_type)   
