@@ -59,7 +59,6 @@ class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
 	
         # To make the auto-refresh button not on by default when opening the panel
         # but it is not the case for the Activity PlotGroup
-	print self.mapname.get()
 	if self.mapname.get() != 'Activity':
 	    self.auto_refresh_checkbutton.invoke()
 
@@ -74,7 +73,7 @@ class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
  
         exec self.cmdname.get()
         pgt = topo.base.registry.plotgroup_templates[self.mapname.get()]
-        self.pe_group = self.pe.get_plot_group(self.mapname.get(),pgt)
+        self.pe_group = self.pe.get_plot_group(self.mapname.get(),pgt, class_type='BasicPlotGroup')
         self.pe_group.do_plot_cmd()
 
             
