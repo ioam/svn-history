@@ -2,6 +2,15 @@
 
 <p>(Installation procedure verified as of November 14, 2005)
 
+We are currently in the process of streamlining the installation
+process under Windows; the current method is much more difficult than
+on other platforms.  In any case, there is a relatively easy method
+that will usually work ("The fast way" below), and a more difficult
+method that will work in more cases ("The slow way").  Both of these
+methods will provide only a non-optimized version of Topographica,
+which will be quite slow; for an optimized version see "Integrating
+Topographica and weave" below.
+
 <h2>The fast way:</h2>
 
 <ol>
