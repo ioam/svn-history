@@ -70,7 +70,7 @@ function menu_side($fname) {
 	$menu_items = array("Home" => "../Home/index.html", 
 #		"Screenshots" => "../Screenshots/index.html",
 		"Tutorial" => "../Tutorial/index.html",
-#		"User Manual" => "../User_Manual/index.html",
+		"User Manual" => "../User_Manual/index.html",
 		"Reference Manual" => "../Reference_Manual/index.html",
 #		"Developer Manual" => "../Developer_Manual/index.html",
 		"Downloads" => "../Downloads/index.html",
