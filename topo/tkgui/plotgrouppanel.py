@@ -26,9 +26,7 @@ import Numeric
 import MLab
 
 ### JCALERT: the name has been changed from PlotPanel to PlotGroupPanel
-### I think we might also want to change the name of the subclasses (e.g. UnitWeightPanel...)
-### also, the file can be renamed plotgrouppanel.py (carefull the import statement in others files 
-### also have to be replaced...)
+### I think we might also want to change the name of all the subclasses (e.g. UnitWeightPanel...) but not necessarily.
 
 class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
     """
@@ -77,7 +75,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
             self.plot_key = plot_key
 
             
-        self.plotgroup_type = plotgroup_type 
+        self.plotgroup_type = plotgroup_type # type of the PlotGroup 
         self.pgt_name = pgt_name  #Plot Group Template name
 
         ### JABHACKALERT!
@@ -165,6 +163,9 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
                 self.normalize_checkbutton.select()
             self.normalize_checkbutton.pack(side=LEFT)
 
+	### JCALERT! I would change the variable name plot_group to
+        ### be something like plot_group_title or plot_group_name
+        ### or even plot_panel_title.
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
         self.plot_group = Pmw.Group(self,tag_text=str(self.plot_key))
@@ -220,8 +221,12 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         See UnitWeightsPanel and ProjectionPanel for
         examples.
         """
+	### JCALERT! here we could change that:
+	###      - pe_group is a PlotGroupObject but the list of plots have been created
+        ###        when the PlotGroup has been initialized, not in the plotengine.
+
         self.pe_group = self.pe.get_plot_group(self.plot_key,
-                                               self.plotgroup_type)
+                                               self.plotgroup_type)   
         self.pe_group.do_plot_cmd()
         self.plots = self.pe_group.plots()
     
