@@ -13,7 +13,8 @@ from copy import deepcopy
 
 class ParametersFrame(Frame):
     """
-    Property list frame for the Parameters of any TopoObject.
+    Property list frame for a PatternGenerator Parameter
+    (originally intended to be general)
     
     Automatically generates a PropertiesFrame containing all the
     Parameters for the TopoObject.
