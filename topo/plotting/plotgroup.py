@@ -17,7 +17,7 @@ __version__='$Revision$'
 
 import types
 from topo.base.topoobject import TopoObject
-from topo.base.utils import flatten
+from topo.base.utils import flatten, dict_sort
 from topo.base.keyedlist import KeyedList
 from topo.base.sheet import Sheet
 import bitmap
@@ -31,6 +31,13 @@ from Numeric import transpose, array
 
 from topo.base.parameter import Parameter
 
+### JC NEW VERSION
+from plot import Plot, SHC,HSV,RGB,COLORMAP
+from topo.base.connectionfield import CFSheet
+from topo.base.sheetview import SheetView
+
+###
+
 # Shape of the plotting display used by PlotGroup.  NOTE: INCOMPLETE,
 # THERE SHOULD BE MORE TYPES OF SHAPES SUCH AS SPECIFYING X ROWS, OR Y
 # COLUMNS, OR GIVING A LIST OF INTEGERS REPRESENTING NUMBER OF PLOTS
@@ -42,13 +49,26 @@ from topo.base.parameter import Parameter
 # or somesuch.
 FLAT = 'FLAT'
 
-
-
 def sort_plots(plot_list):
     """ This a simple routine to sort a plot list according to their src_name"""
     plot_list.sort(lambda x, y: cmp(x.view_info['src_name'], y.view_info['src_name']))
-    #return plot_list
-        
+
+   
+### JC: temporary. I think we do not need to copy that here, or even to import it.
+### I am actually pretty sure we can do without and also in the PlotEngine.
+    
+def sheet_filter(sheet):
+    """
+    Example sheet filter that can be used to limit which sheets are
+    displayed through make_plot_group().  Default filter used
+    by the built-in get_plot_group(..) when there is no plot of the
+    correct key name in the PlotGroup dictionary.
+
+    SHOULD BE EXPANDED OR REPLACED FOR MORE (ANY?) DEFAULT FUNCTIONALITY
+    """
+    if sheet == sheet:
+        return True
+     
 
 class PlotGroupTemplate(TopoObject):
     """
@@ -93,13 +113,28 @@ class PlotGroupTemplate(TopoObject):
         self.description = self.name
         
 
+### JCALERT! This file has been largely modified so that now, each PlotGroup creates
+### its plot_list itself, instead of the PlotEngine doing it. The PlotEngine only
+### creates and stores the PlotGroup in this current situation.It is the first version
+### and it still remains job to be done for clarifying and improving it.
+### Nevertheless, a lot of the current problem are notified by a JCALERT, and most of the
+### remaining job will be to clarify the way Plot are created both in this file and in plot.py
+
 class PlotGroup(TopoObject):
     """
     Container that has one or more Plots and also knows how to arrange
     the plots and other special parameters.
     """
 
-    def __init__(self,plot_key=None,sheet_filter_lam=None,plot_list=None,shape=FLAT,**params):
+    ### JCALERT: adding the template in the list of parameter to pass, for the moment it is
+    ###     initialized from plotengine. 
+    ###     also add a simulator parameter, when creating from the plot_engine it will be
+    ###     passed. Also plot_list will disappear.
+    ### + Get rid of the plot_list param.
+    ### + I left template=None so that the testPlotGroup does not crash anymore,
+    ### that will have to be re moved eventually.
+
+    def __init__(self,template=None,plot_key=None,sheet_filter_lam=None,plot_list=None,shape=FLAT,**params):
         """
         plot_list can be of two types: 
         1.  A list of Plot objects that can return bitmaps when requested.
@@ -107,15 +142,17 @@ class PlotGroup(TopoObject):
         that each time plot() is called, an updated list is created for the
         latest list of sheets in the simulation.
         """
-        super(PlotGroup,self).__init__(**params)
+        super(PlotGroup,self).__init__(**params)        
         self.plot_list = plot_list
         self.all_plots = []
         self.added_list = []
         self.shape = shape
         self.plot_key = plot_key
         self.bitmaps = []
-        self.template = None
+        self.template = template
 
+        ### JC: Because of that, we might be able to get rid of sheet_filter in the plotengine file.
+        
         if sheet_filter_lam:
             self.sheet_filter_lam = sheet_filter_lam
         else:
@@ -123,7 +160,38 @@ class PlotGroup(TopoObject):
 
         self.debug('Input type, ', type(self.plot_list))
  
+        ### JCALERT! we might want this function to be private.
+    def initialize_plot_list(self):
+        """
+        Procedure that is called when creating a PlotGroup, that return the plot_list attribute
+        i.e. the list of plot that are specified by the PlotGroup template.
 
+        This function calls create_plots, that is implemented in each PlotGroup subclasses.
+        (In particular, this needs to be different for UnitWeightsPlotGroup and ProjectionPlotGroup)
+        """
+
+	sheet_list = [each for each in dict_sort(self.simulator.objects(Sheet)) if self.sheet_filter_lam(each)]
+        
+        # Loop over all sheets that passed the filter.
+        #     Loop over each individual PlotTemplate:
+        #         Call the create_plots function to create the according plot
+        
+        plot_list = []
+
+        for each in sheet_list:
+	   
+            for (pt_name,pt) in self.template.plot_templates:
+		plot_list= plot_list+ self.create_plots(pt_name,pt,each)
+	return plot_list	
+
+
+    ###JCALERT! We may want to implement a create_plots in the PlotGroup class
+    ### Ask Jim about that.
+    #def create_plots(self):
+    # raise("Not Implemented for the super classe
+    #
+
+    
     ### JABHACKALERT!
     ###
     ### Shouldn't this raise NotImplementedError instead of passing?
@@ -236,21 +304,95 @@ class BasicPlotGroup(PlotGroup):
     PlotGroup for Activity SheetViews
     """
 
-    def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):
-        super(BasicPlotGroup,self).__init__(plot_key,sheet_filter_lam,plot_list,
+    def __init__(self,template,plot_key,sheet_filter_lam,plot_list,**params):
+        super(BasicPlotGroup,self).__init__(template,plot_key,sheet_filter_lam,plot_list,
                                             **params)
+
+        ### JCALERT! for the moment we take the active simulator, but later we might want to 
+        ### pass the simulator as a parameter of PlotGroup  
+	### so directly put this line into PlotGroup rather than BasicPlotGroup
+	
+	self.simulator = topo.base.registry.active_sim()
+
+        ### JC for basic PlotGroup, no need to create a "dynamic List"
+	self.plot_list = self.initialize_plot_list()
+
+    # default is the basic plot group:
+    # should be re-implemented in UnitWeightPlotGroup and ProjectionPlotGroup
+    ### JCALERT! maybe simply put that in the above function
+    def create_plots(self,pt_name,pt,sheet):
+	
+	strength = pt.channels.get('Strength',None)
+        hue = pt.channels.get('Hue',None)
+        confidence = pt.channels.get('Confidence',None)
+        n = pt.channels.get('Normalize',False)
+        p = Plot((strength,hue,confidence),SHC,sheet,n,name=pt_name)
+        return [p]
+
+	
 
 class UnitWeightsPlotGroup(PlotGroup):
     """
     PlotGroup for Weights UnitViews
     """
 
-    def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):
-        super(UnitWeightsPlotGroup,self).__init__(plot_key,sheet_filter_lam,plot_list,
+    def __init__(self,template,plot_key,sheet_filter_lam,plot_list,**params):
+        super(UnitWeightsPlotGroup,self).__init__(template,plot_key,sheet_filter_lam,plot_list,
                                               **params)
         self.x = float(plot_key[2])
         self.y = float(plot_key[3])
+ 
+        ### for the moment we take the active simulator, but later we might want to 
+        ### pass the simulator as a parameter of PlotGroup  
+	### so directly put this line into PlotGroup rather than BasicPlotGroup
+	
+	self.simulator = topo.base.registry.active_sim()
 
+	### JCALERT! I am not sure we need something dynamic here, to check
+	self.plot_list = lambda: self.initialize_plot_list()
+
+  
+    def create_plots(self,pt_name,pt,sheet):
+
+	### JCthe Sheet_name param ought to be in the plot key and not in the
+        ### group template,  as well as the location: 
+        ###  Does it has to be changed when working on PlotGroupPanel?
+        sheet_target = pt.channels['Sheet_name']
+        (sheet_x,sheet_y) = pt.channels['Location']
+
+	### JCALERT: here the hue and confidence ought to be taken and used later on
+        ### but a first work on plot.py is required to make these changes
+        ### hue = pt.channels['Hue']
+        ### confidence = pt.channels['Confidence']
+
+        projection_list = []
+        if not isinstance(sheet,CFSheet):
+            self.warning('Requested weights view from other than CFSheet.')
+        else:
+            for p in set(flatten(sheet.in_projections.values())):
+                key = ('Weights',sheet_target,p.name,sheet_x,sheet_y)
+                v = sheet.sheet_view(key)
+                if v:
+                    projection_list += [(sheet,p,each) for each in v if each.projection.name == p.name]
+ 
+        # HERE IS WHERE WE (NEED TO?) ADD ADDITIONAL SORTING INFORMATION.
+        projection_list.sort(key=lambda x: x[2].name,reverse=True)
+
+        plot_list = []
+        for (a_sheet,projection,views) in projection_list:
+            if not isinstance(views,list):
+                views = [views]
+            for each in views:
+                if isinstance(each,SheetView):
+		    ### JC: here it needs to be changed: but plot.py also as to be fixed
+                    ### e.g. plot_list.append(Plot((each,hue,None),COLORMAP,s,pt.channels['Normalize']))
+		    plot_list.append(Plot((each,None,None),COLORMAP,None,pt.channels['Normalize']))
+                else:
+                    key = ('Weights',a_sheet,projection,sheet_x,sheet_y)
+                    plot_list.append(Plot((key,None,None),COLORMAP,p.src,pt.channels['Normalize']))
+        self.debug('plot_list =' + str(plot_list))
+        return plot_list
+	
     def do_plot_cmd(self):
         """
         Lambda function passed in, that will filter out all sheets
@@ -261,14 +403,14 @@ class UnitWeightsPlotGroup(PlotGroup):
             if self.sheet_filter_lam(each):
                 each.unit_view(self.x,self.y)
 
-
+   
 class ProjectionPlotGroup(PlotGroup):
     """
     PlotGroup for Projection Plots
     """
 
-    def __init__(self,plot_key,sheet_filter_lam,plot_list,**params):
-        super(ProjectionPlotGroup,self).__init__(plot_key,sheet_filter_lam,
+    def __init__(self,template,plot_key,sheet_filter_lam,plot_list,**params):
+        super(ProjectionPlotGroup,self).__init__(template,plot_key,sheet_filter_lam,
                                                    plot_list,**params)
         self.weight_name = plot_key[1]
         self.density = float(plot_key[2])
@@ -276,6 +418,76 @@ class ProjectionPlotGroup(PlotGroup):
         self._sim_ep = [s for s in topo.base.registry.active_sim().objects(Sheet).values()
                         if self.sheet_filter_lam(s)][0]
         self._sim_ep_src = self._sim_ep.get_in_projection_by_name(self.weight_name)[0].src
+
+        ### JCALERT ! for the moment we take the active simulator, but later we might want to 
+        ### pass the simulator as a parameter of PlotGroup  
+	### so directly put this line into PlotGroup rather than BasicPlotGroup
+	
+	self.simulator = topo.base.registry.active_sim()
+
+	self.plot_list = lambda: self.initialize_plot_list()
+       
+
+    ### JCALERT! for the moment I did not manage to not re-implement an initialize_plot_list
+    ### method when dealing with ProjectionPlotGroup. I will solve that very soon
+        
+    def initialize_plot_list(self):
+        """
+        Procedure that is called when creating a PlotGroup, that return the plot_list attribute
+        i.e. the list of plot that are specified by the PlotGroup template.
+
+        This function calls create_plots, that is implemented in each PlotGroup subclasses.
+        (In particular, this needs to be different for UnitWeightsPlotGroup and ProjectionPlotGroup)
+        """
+
+        sheet_list = [each for each in dict_sort(self.simulator.objects(Sheet)) if self.sheet_filter_lam(each)]
+        
+        # Loop over all sheets that passed the filter.
+        #     Loop over each individual PlotTemplate:
+        #         Call the create_plots function to create the according plot
+        
+        plot_list = []
+
+        for each in sheet_list:
+            for (pt_name,pt) in self.template.plot_templates:
+                c = pt.channels
+                projection = each.get_in_projection_by_name(c['Projection_name'])
+                if projection:
+                    plot_list= plot_list + self.create_plots(pt_name,pt,projection[0].src)
+
+        return plot_list	
+ 
+    def create_plots(self,pt_name,pt,sheet):
+
+        c = pt.channels
+               
+        ### JC: here the hue and confidence ought to be taken and used later on
+        ### but a first work on plot.py is required to make these changes
+        ### hue = pt.channels['Hue']
+        ### confidence = pt.channels['Confidence']
+
+        ### JC apparently, the template carries the information for building
+        ### the plot_key. It might be difficult to change now. (also see make_unit_weights_plot)
+        key = (pt_name,c['Projection_name'],c['Density'])
+        view_list = sheet.sheet_view(key)
+        if not isinstance(view_list,list):
+            view_list = [view_list]
+            
+        plot_list=[]
+        ### A list from the Sheet.sheet_view dictionary is
+        ### converted into multiple Plot generation requests.
+
+        ### JCALERT! This was and still is boggus: what is name?
+        ### It is not worse than before because the bug was already here
+        ### Need to be fixed in some way.
+        for each in view_list:
+            if isinstance(each,SheetView):
+                plot_list.append(Plot((each,None,None),COLORMAP,None,pt.channels['Normalize']))
+            else:
+                ### JCALERT! bug from plotengine: name is not defined here.
+                plot_list.append(Plot((name,None,None),COLORMAP,sheet,pt.channels['Normalize']))
+
+        return plot_list
 
 
     def _generate_coords(self):
@@ -312,12 +524,15 @@ class ProjectionPlotGroup(PlotGroup):
 
         self._sim_ep_src.add_sheet_view(self.plot_key,filtered_list)
 
+        ### JCALERT! I do not understand this comment.
+        ### We might want to get rid of it
+
         # This is no longer correct now that the UnitViews are no
         # longer on the Projection target sheet.
         # for (x,y) in coords: self._sim_ep.release_unit_view(x,y)
 
-    ### JCALERT ! for the moment this function is re-implemented for ProjectionGroup
-    ### because we do not want the plots to be sorted according to their src_name in this caseXS
+    ### JCALERT ! for the moment this function is re-implemented only for ProjectionGroup
+    ### because we do not want the plots to be sorted according to their src_name in this case
     def plots(self):
         """
         Generate the bitmap lists.
@@ -386,3 +601,4 @@ pgt = PlotGroupTemplate([('Orientation Preference',
                         name='Orientation Preference',
                         command = 'measure_or_pref()')
 topo.base.registry.plotgroup_templates[pgt.name] = pgt
+
