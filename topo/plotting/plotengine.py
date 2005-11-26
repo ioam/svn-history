@@ -118,12 +118,16 @@ class PlotEngine(TopoObject):
     ### otherwise, it seems necessary to create the PlotGroup
     ### also name is generally a plot_key for unitweight and projection panel
 
-    ### JCALERT!!! I think we can get rid of default for group_typ and class_type,
+    ### JCALERT!!! We also might want to get rid of the default value for class_type,
     ### then changed the order and put filter at the end, and changing the call
     ### to any get_plot_group
     ### Also I would change group_type to be template or group_template
+    ### (Actually, if we want to just have a PlotGroup that we know has already been created,
+    ### it might be useful to call just with the name, In this case, we have to solve the problem
+    ### of catching the exception when there is no such PlotGroup in the dict and group_type=None.
+    ### Note that for the moment, such a call only happens in the testplotengine.py.)
         
-    def get_plot_group(self, name, group_type = 'BasicPlotGroup',
+    def get_plot_group(self, name, group_type= None,
                        filter=None, class_type='BasicPlotGroup'):
         """
         Return the PlotGroup registered in self.plot_group_dict with
