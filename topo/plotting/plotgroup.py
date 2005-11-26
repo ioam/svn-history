@@ -31,12 +31,10 @@ from Numeric import transpose, array
 
 from topo.base.parameter import Parameter
 
-### JC NEW VERSION
 from plot import Plot, SHC,HSV,RGB,COLORMAP
 from topo.base.connectionfield import CFSheet
 from topo.base.sheetview import SheetView
 
-###
 
 # Shape of the plotting display used by PlotGroup.  NOTE: INCOMPLETE,
 # THERE SHOULD BE MORE TYPES OF SHAPES SUCH AS SPECIFYING X ROWS, OR Y
@@ -103,6 +101,7 @@ class PlotGroupTemplate(TopoObject):
 ### and it still remains job to be done for clarifying and improving it.
 ### Nevertheless, a lot of the current problem are notified by a JCALERT, and most of the
 ### remaining job will be to clarify the way Plots are created both in this file and in plot.py
+### (also clarifying bitmap.py, plotfilesaver.py and the plotgrouppanel sub-classes at the same time)
 
 class PlotGroup(TopoObject):
     """
@@ -110,11 +109,9 @@ class PlotGroup(TopoObject):
     the plots and other special parameters.
     """
 
-    ### JCALERT: adding the template in the list of parameter to pass, for the moment it is
-    ###     initialized from plotengine. 
-    ###     also add a simulator parameter, when creating from the plot_engine it will be
-    ###     passed. Also plot_list will disappear.
-    ### + Get rid of the plot_list param.
+    ### JCALERT: adding the template in the list of parameter to pass. 
+    ###     also add a simulator parameter, that will be passed when creating from the plot_engine.
+    ### Also plot_list could disappear.
     ### + I left template=None so that the testPlotGroup does not crash anymore,
     ### that will have to be re moved eventually.
     ### re-arranged the order and look at the call in all panel classes (i.e. inputparampanel)
@@ -136,8 +133,8 @@ class PlotGroup(TopoObject):
         self.bitmaps = []
         self.template = template
 
-        ### JC: Because of that, we might be able to get rid of sheet_filter in the plotengine file.
-        
+        ### JC: Because of that, we might be able to get rid of some line about the filter
+        ###      in the plotengine file.        
         if sheet_filter_lam:
             self.sheet_filter_lam = sheet_filter_lam
         else:
@@ -176,14 +173,19 @@ class PlotGroup(TopoObject):
 
     ###JCALERT! We may want to implement a create_plots in the PlotGroup class
     ### Ask Jim about that.
+
     #def create_plots(self):
-    # raise("Not Implemented for the super classe
+    # raise("Method not Implemented for the super class")
     #
 
     ### JABHACKALERT!
     ###
     ### Shouldn't this raise NotImplementedError instead of passing?
     ### If implementing it is required, not optional, then it must.
+
+    ### JC: it is not clear what this function is doing anyway, or the name
+    ### should be changed or it should be spared
+
     def do_plot_cmd(self):
         """
         Command called when plots need to be generated.
@@ -192,6 +194,7 @@ class PlotGroup(TopoObject):
         """
         pass
     
+
 
     def load_images(self):
         """
@@ -262,6 +265,8 @@ class PlotGroup(TopoObject):
         Generate the bitmap lists.
         """
         bitmap_list = []
+	### JC: now it is always a dynamic list, that could be changed for it to
+        ### be a static list but it is probably good like that (Ask Jim)
         if isinstance(self.plot_list,types.ListType):
             self.debug('Static plotgroup')
             self.all_plots = flatten(self.plot_list) + self.added_list
@@ -331,9 +336,10 @@ class UnitWeightsPlotGroup(PlotGroup):
   
     def create_plots(self,pt_name,pt,sheet):
 
-	### JCthe Sheet_name param ought to be in the plot key and not in the
+	### JC: the Sheet_name param ought to be in the plot key and not in the
         ### group template,  as well as the location: 
         ###  Does it has to be changed when working on PlotGroupPanel?
+        ### (Passing parameter through the template has to be changed eventually)
         sheet_target = pt.channels['Sheet_name']
         (sheet_x,sheet_y) = pt.channels['Location']
 
@@ -353,6 +359,7 @@ class UnitWeightsPlotGroup(PlotGroup):
                     projection_list += [(sheet,p,each) for each in v if each.projection.name == p.name]
  
         # HERE IS WHERE WE (NEED TO?) ADD ADDITIONAL SORTING INFORMATION.
+	### JCALERT! What does that do?
         projection_list.sort(key=lambda x: x[2].name,reverse=True)
 
         plot_list = []
@@ -370,6 +377,7 @@ class UnitWeightsPlotGroup(PlotGroup):
         self.debug('plot_list =' + str(plot_list))
         return plot_list
 	
+    ### JCALERT! I am not sure this function is of any use here
     def do_plot_cmd(self):
         """
         Lambda function passed in, that will filter out all sheets
@@ -378,6 +386,12 @@ class UnitWeightsPlotGroup(PlotGroup):
         sheets = topo.base.registry.active_sim().objects(Sheet).values()
         for each in sheets:
             if self.sheet_filter_lam(each):
+		### JCALERT! It is confusing that the method unit_view is defined in the 
+                ### class connectionfield that does not inherit from Sheet, and that we are supposed to
+                ### manipulate sheets here.
+		### also, it is supposed to return a view, but here it is used as a procedure.
+                ### (procedure that is applied to a connectionfield and add the unit_view in the 
+                ### sheet_view_dict of its source sheet
                 each.unit_view(self.x,self.y)
 
    
@@ -414,7 +428,7 @@ class ProjectionPlotGroup(PlotGroup):
 
         ### JC apparently, the template carries the information for building
         ### the plot_key. It might be difficult to change now. (also see make_unit_weights_plot)
-	    key = (pt_name,c['Projection_name'],c['Density'])
+	    key = (pt_name,c['Projection_name'],c['Density'],sheet.name)
 	    view_list = src_sheet.sheet_view(key)
 	    if not isinstance(view_list,list):
 		view_list = [view_list]
@@ -430,7 +444,7 @@ class ProjectionPlotGroup(PlotGroup):
 		if isinstance(each,SheetView):
 		    plot_list.append(Plot((each,None,None),COLORMAP,None,pt.channels['Normalize']))
 		else:
-                ### JCALERT! bug from plotengine: name is not defined here.
+                ### JCALERT! bug from plotengine: name is not defined here.(I think he meant key)
 		    plot_list.append(Plot((name,None,None),COLORMAP,sheet,pt.channels['Normalize']))
 
         return plot_list

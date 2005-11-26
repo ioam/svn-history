@@ -178,16 +178,19 @@ class ProjectionPanel(CFSheetPlotPanel):
             self.weight_name.get(),self.pe.simulation.time()))
         
 
+    ### JCALERT! The doc below should be rewieved by Jim for the English.
     def generate_plot_key(self):
         """
         The plot_key for the ProjectionPanel will change depending
-        on the input within the window widgets.  This means that the
-        key needs to be regenerated at the appropriate times.
+        on the input within the window widgets. This is the key under which a PlotGroup
+        is stored in the PlotEngine.  This means that the
+        key needs to be re-generated at the appropriate times to retrieve (or create, when
+        first requesting the plot group) the PlotGroup in the PlotEngine.
 
-        Key Format:  Tuple: ('Projection', self.weight_name, self.density)
+        Key Format:  Tuple: ('Projection', self.weight_name,self.density, self.region)
         """
         self.density = float(eval(self.density_str.get(),__main__.__dict__))
-        self.plot_key = ('Projection',self.weight_name.get(),self.density)
+        self.plot_key = ('Projection',self.weight_name.get(),self.density,self.region.get())
 
         pt = registry.plotgroup_templates['Projection'].plot_templates['Projection']
         pt.channels['Density'] = self.density
