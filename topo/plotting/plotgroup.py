@@ -133,6 +133,7 @@ class PlotGroup(TopoObject):
     ### + Get rid of the plot_list param.
     ### + I left template=None so that the testPlotGroup does not crash anymore,
     ### that will have to be re moved eventually.
+    ### re-arranged the order and look at the call in all panel classes (i.e. inputparampanel)
 
     def __init__(self,template=None,plot_key=None,sheet_filter_lam=None,plot_list=None,shape=FLAT,**params):
         """
@@ -159,8 +160,13 @@ class PlotGroup(TopoObject):
             self.sheet_filter_lam = lambda : True
 
         self.debug('Input type, ', type(self.plot_list))
- 
-        ### JCALERT! we might want this function to be private.
+
+        ### JCALERT! for the moment we take the active simulator, but later we might want to 
+        ### pass the simulator as a parameter of PlotGroup  
+	### so directly put this line into PlotGroup rather than BasicPlotGroup
+	self.simulator = topo.base.registry.active_sim()
+
+    ### JCALERT! we might want this function to be private.
     def initialize_plot_list(self):
         """
         Procedure that is called when creating a PlotGroup, that return the plot_list attribute
@@ -182,8 +188,7 @@ class PlotGroup(TopoObject):
 	   
             for (pt_name,pt) in self.template.plot_templates:
 		plot_list= plot_list+ self.create_plots(pt_name,pt,each)
-	return plot_list	
-
+	return plot_list
 
     ###JCALERT! We may want to implement a create_plots in the PlotGroup class
     ### Ask Jim about that.
@@ -191,7 +196,6 @@ class PlotGroup(TopoObject):
     # raise("Not Implemented for the super classe
     #
 
-    
     ### JABHACKALERT!
     ###
     ### Shouldn't this raise NotImplementedError instead of passing?
@@ -308,12 +312,6 @@ class BasicPlotGroup(PlotGroup):
         super(BasicPlotGroup,self).__init__(template,plot_key,sheet_filter_lam,plot_list,
                                             **params)
 
-        ### JCALERT! for the moment we take the active simulator, but later we might want to 
-        ### pass the simulator as a parameter of PlotGroup  
-	### so directly put this line into PlotGroup rather than BasicPlotGroup
-	
-	self.simulator = topo.base.registry.active_sim()
-
         ### JC for basic PlotGroup, no need to create a "dynamic List"
 	self.plot_list = self.initialize_plot_list()
 
@@ -342,12 +340,7 @@ class UnitWeightsPlotGroup(PlotGroup):
         self.x = float(plot_key[2])
         self.y = float(plot_key[3])
  
-        ### for the moment we take the active simulator, but later we might want to 
-        ### pass the simulator as a parameter of PlotGroup  
-	### so directly put this line into PlotGroup rather than BasicPlotGroup
-	
-	self.simulator = topo.base.registry.active_sim()
-
+      	
 	### JCALERT! I am not sure we need something dynamic here, to check
 	self.plot_list = lambda: self.initialize_plot_list()
 
@@ -419,12 +412,7 @@ class ProjectionPlotGroup(PlotGroup):
                         if self.sheet_filter_lam(s)][0]
         self._sim_ep_src = self._sim_ep.get_in_projection_by_name(self.weight_name)[0].src
 
-        ### JCALERT ! for the moment we take the active simulator, but later we might want to 
-        ### pass the simulator as a parameter of PlotGroup  
-	### so directly put this line into PlotGroup rather than BasicPlotGroup
-	
-	self.simulator = topo.base.registry.active_sim()
-
+  
 	self.plot_list = lambda: self.initialize_plot_list()
        
 
