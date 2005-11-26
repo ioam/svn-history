@@ -398,41 +398,15 @@ class ProjectionPlotGroup(PlotGroup):
 
   
 	self.plot_list = lambda: self.initialize_plot_list()
-       
-
-    ### JCALERT! for the moment I did not manage to not re-implement an initialize_plot_list
-    ### method when dealing with ProjectionPlotGroup. I will solve that very soon
-        
-    def initialize_plot_list(self):
-        """
-        Procedure that is called when creating a PlotGroup, that return the plot_list attribute
-        i.e. the list of plot that are specified by the PlotGroup template.
-
-        This function calls create_plots, that is implemented in each PlotGroup subclasses.
-        (In particular, this needs to be different for UnitWeightsPlotGroup and ProjectionPlotGroup)
-        """
-
-        sheet_list = [each for each in dict_sort(self.simulator.objects(Sheet)) if self.sheet_filter_lam(each)]
-        
-        # Loop over all sheets that passed the filter.
-        #     Loop over each individual PlotTemplate:
-        #         Call the create_plots function to create the according plot
-        
-        plot_list = []
-
-        for each in sheet_list:
-            for (pt_name,pt) in self.template.plot_templates:
-                c = pt.channels
-                projection = each.get_in_projection_by_name(c['Projection_name'])
-                if projection:
-                    plot_list= plot_list + self.create_plots(pt_name,pt,projection[0].src)
-
-        return plot_list	
+      
  
     def create_plots(self,pt_name,pt,sheet):
 
         c = pt.channels
-               
+        projection = sheet.get_in_projection_by_name(c['Projection_name'])
+        if projection:
+	    src_sheet=projection[0].src
+                   
         ### JC: here the hue and confidence ought to be taken and used later on
         ### but a first work on plot.py is required to make these changes
         ### hue = pt.channels['Hue']
@@ -440,24 +414,24 @@ class ProjectionPlotGroup(PlotGroup):
 
         ### JC apparently, the template carries the information for building
         ### the plot_key. It might be difficult to change now. (also see make_unit_weights_plot)
-        key = (pt_name,c['Projection_name'],c['Density'])
-        view_list = sheet.sheet_view(key)
-        if not isinstance(view_list,list):
-            view_list = [view_list]
+	    key = (pt_name,c['Projection_name'],c['Density'])
+	    view_list = src_sheet.sheet_view(key)
+	    if not isinstance(view_list,list):
+		view_list = [view_list]
             
-        plot_list=[]
+	    plot_list=[]
         ### A list from the Sheet.sheet_view dictionary is
         ### converted into multiple Plot generation requests.
 
         ### JCALERT! This was and still is boggus: what is name?
         ### It is not worse than before because the bug was already here
         ### Need to be fixed in some way.
-        for each in view_list:
-            if isinstance(each,SheetView):
-                plot_list.append(Plot((each,None,None),COLORMAP,None,pt.channels['Normalize']))
-            else:
+	    for each in view_list:
+		if isinstance(each,SheetView):
+		    plot_list.append(Plot((each,None,None),COLORMAP,None,pt.channels['Normalize']))
+		else:
                 ### JCALERT! bug from plotengine: name is not defined here.
-                plot_list.append(Plot((name,None,None),COLORMAP,sheet,pt.channels['Normalize']))
+		    plot_list.append(Plot((name,None,None),COLORMAP,sheet,pt.channels['Normalize']))
 
         return plot_list
 
@@ -527,7 +501,7 @@ class ProjectionPlotGroup(PlotGroup):
         return [each for each in generated_bitmap_list if each is not None]
 
 
-
+### JCALERT! What about putting that in a special file for defining PlotGroupTemplate?
  
 # Populate the dynamic plot menu list registry
 import topo.base.registry
