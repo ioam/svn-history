@@ -53,22 +53,6 @@ def sort_plots(plot_list):
     """ This a simple routine to sort a plot list according to their src_name"""
     plot_list.sort(lambda x, y: cmp(x.view_info['src_name'], y.view_info['src_name']))
 
-   
-### JC: temporary. I think we do not need to copy that here, or even to import it.
-### I am actually pretty sure we can do without and also in the PlotEngine.
-    
-def sheet_filter(sheet):
-    """
-    Example sheet filter that can be used to limit which sheets are
-    displayed through make_plot_group().  Default filter used
-    by the built-in get_plot_group(..) when there is no plot of the
-    correct key name in the PlotGroup dictionary.
-
-    SHOULD BE EXPANDED OR REPLACED FOR MORE (ANY?) DEFAULT FUNCTIONALITY
-    """
-    if sheet == sheet:
-        return True
-     
 
 class PlotGroupTemplate(TopoObject):
     """
@@ -115,10 +99,10 @@ class PlotGroupTemplate(TopoObject):
 
 ### JCALERT! This file has been largely modified so that now, each PlotGroup creates
 ### its plot_list itself, instead of the PlotEngine doing it. The PlotEngine only
-### creates and stores the PlotGroup in this current situation.It is the first version
+### creates and stores the PlotGroup in this new version of the code.It is the first version
 ### and it still remains job to be done for clarifying and improving it.
 ### Nevertheless, a lot of the current problem are notified by a JCALERT, and most of the
-### remaining job will be to clarify the way Plot are created both in this file and in plot.py
+### remaining job will be to clarify the way Plots are created both in this file and in plot.py
 
 class PlotGroup(TopoObject):
     """

@@ -56,7 +56,8 @@ class TestPlotEngine(unittest.TestCase):
                                          'Hue'        : None,
                                          'Confidence' : None}))])
 
-        ag = self.engine.make_plot_group('ActivitySHC',pgt)
+	filter = lambda s: True
+        ag = self.engine.make_plot_group('ActivitySHC',pgt,filter,'BasicPlotGroup')
         
 
     def test_get_plot_group(self):
@@ -77,13 +78,12 @@ class TestPlotEngine(unittest.TestCase):
                                                 'Hue'        : None,
                                                 'Confidence' : None}))],
                                 name='Activity')
-        activity_group = self.engine.make_plot_group('Activity',pgt,filter_lam=sheet_filter)
-        activity_group2 = self.engine.make_plot_group('Activity',pgt,filter_lam=sheet_filter)
 
+	filter = lambda s: True
+        activity_group = self.engine.make_plot_group('Activity',pgt,filter,'BasicPlotGroup')
+        activity_group2 = self.engine.make_plot_group('Activity',pgt,filter,'BasicPlotGroup')
 
-    def test_sheet_filter(self):
-        assert(sheet_filter(self.sheetR))
-
+ 
     def test_plotengine(self):
         """
         Cut and paste of current topographica/examples/cfsom_example.py

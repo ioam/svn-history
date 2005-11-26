@@ -70,18 +70,6 @@ from topo.base.connectionfield import CFSheet
 from topo.base.sheetview import SheetView
 
 
-def sheet_filter(sheet):
-    """
-    Example sheet filter that can be used to limit which sheets are
-    displayed through make_plot_group().  Default filter used
-    by the built-in get_plot_group(..) when there is no plot of the
-    correct key name in the PlotGroup dictionary.
-
-    SHOULD BE EXPANDED OR REPLACED FOR MORE (ANY?) DEFAULT FUNCTIONALITY
-    """
-    if sheet == sheet:
-        return True
-
 ### JCALERT! The word "simulation" is used: is it better to use simulator?
 ### The comments in the whole file still have to be reviewed and corrected:
 ### Jim is probably the man for that.
@@ -136,7 +124,7 @@ class PlotEngine(TopoObject):
     ### Also I would change group_type to be template or group_template
         
     def get_plot_group(self, name, group_type = 'BasicPlotGroup',
-                       filter=sheet_filter, class_type='BasicPlotGroup'):
+                       filter=None, class_type='BasicPlotGroup'):
         """
         Return the PlotGroup registered in self.plot_group_dict with
         the provided key 'name'.  If the name does not exist, then
@@ -145,7 +133,7 @@ class PlotEngine(TopoObject):
         of the new plot.
         """
         if filter == None:
-            filter = sheet_filter
+            filter = lambda s: True
         elif isinstance(filter,str):     # Allow sheet string name as input.
             target_string = filter
             filter = lambda s: s.name == target_string
@@ -158,15 +146,9 @@ class PlotEngine(TopoObject):
         return requested_plot
 
     
-    ### JCALERT! I am not sure that this default name to None is required provided that this
-    ### function seems to be called only by get_plot_group above 
-    ### (it is, acording to a quick grep, just testplotgroup and testplotengine use it) 
-    ### (it seems definitely to work without it)
-    ### might be the same problem with group_type and class_type: no need default
-    ### Also I would change group_type to be template or group_template
+    ### JCALERT!  I would change group_type to be template or group_template
     
-    def make_plot_group(self, name='None', group_type='BasicPlotGroup',
-                             filter_lam=sheet_filter, class_type='BasicPlotGroup'):
+    def make_plot_group(self, name, group_type,filter_lam,class_type):
         """
         name : The key to look under in the SheetView dictionaries.
         group_type: 2 Valid inputs:
