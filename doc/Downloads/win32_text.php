@@ -9,14 +9,15 @@ that will usually work ("The fast way" below), and a more difficult
 method that will work in more cases ("The slow way").  Both of these
 methods will provide only a non-optimized version of Topographica,
 which will be quite slow; for an optimized version see "Integrating
-Topographica and weave" below.
+Topographica and Weave" below.
 
 <h2>The fast way:</h2>
 
 <ol>
 <li> Unpack the topographica archive into a temporary directory.<br>
 <li> Double click on setup.bat<br>
-<li> Follow the various installation prompts for the packages bundled with Topographica.<br>
+<li> Follow the various installation prompts for the packages 
+     bundled with Topographica.<br>
 </ol>
 
 <P>
@@ -38,9 +39,9 @@ Known issues:
 <hr>
 
 <p>As of 11/2005, the Weave (part of SciPy) C compiler linkage is not
-installed by default for Python 2.4.  Some features of Topographica that require
-Weave will cause ImportErrors if attempted on a Windows platform.
-This includes many of the example network simulations in the
+installed by default for Python 2.4.  Some features of Topographica 
+that require Weave will cause ImportErrors if attempted on a Windows 
+platform.  This includes many of the example network simulations in the
 /examples/ directory.  There are directions in /examples/lissom_or.ty
 for changing the code to not use the optimized Weave functions.
 
@@ -48,6 +49,7 @@ for changing the code to not use the optimized Weave functions.
 on Windows.
 
 <hr>
+
 <p>If you experience the error:
 <pre>
   File "C:\Python23\lib\string.py", line 220, in atoi 
