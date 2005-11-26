@@ -245,7 +245,7 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
                                           view_type='Pattern')
             plist.append(topo.plotting.plot.Plot((sv,None,None),topo.plotting.plot.COLORMAP))
         if LIST_REVERSE: plist.reverse()
-        self.pe_group = topo.plotting.plotgroup.PlotGroup('Preview',None,plist)
+        self.pe_group = topo.plotting.plotgroup.PlotGroup(plot_key='Preview',plot_list=plist)
 
 
     def refresh_title(self): pass
