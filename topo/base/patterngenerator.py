@@ -26,7 +26,7 @@ __version__='$Revision$'
 
 from topoobject import TopoObject
 from boundingregion import BoundingBox
-from sheet import  matrix2sheet, bounds2shape
+from sheet import  matrixidx2sheet, bounds2shape
 from Numeric import add,subtract,cos,sin,array
 from MLab import flipud,rot90
 from parameter import Parameter,Number
@@ -154,8 +154,8 @@ class PatternGenerator(TopoObject):
         # for example most times this generates a 100x100 image, but sometimes
         # it generates a 101x100 
 
-        pattern_y = array([matrix2sheet(r,0,bounds,density) for r in range(rows)])
-        pattern_x = array([matrix2sheet(0,c,bounds,density) for c in range(cols)])
+        pattern_y = array([matrixidx2sheet(r,0,bounds,density) for r in range(rows)])
+        pattern_x = array([matrixidx2sheet(0,c,bounds,density) for c in range(cols)])
         assert len(pattern_x) == cols
         assert len(pattern_y) == rows
         return pattern_x[:,0], pattern_y[:,1]

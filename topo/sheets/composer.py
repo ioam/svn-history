@@ -63,8 +63,8 @@ class Composer(Sheet):
         in_rows, in_cols = data.shape
 
         # compute the correct position of the input in the buffer
-        start_row,start_col = self.sheet2matrix(*self.inputs[(src.name,src_port)].origin)
-        row_adj,col_adj = src.sheet2matrix(0,0)
+        start_row,start_col = self.sheet2matrixidx(*self.inputs[(src.name,src_port)].origin)
+        row_adj,col_adj = src.sheet2matrixidx(0,0)
 
         self.debug("origin (row,col) = "+`(start_row,start_col)`)
         self.debug("adjust (row,col) = "+`(row_adj,col_adj)`)

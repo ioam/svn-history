@@ -22,36 +22,36 @@ class TestCoordinateTransforms(unittest.TestCase):
     def test_s2m_left_top(self):
         r,c = 0,0
         x,y = self.left,self.top
-        self.assertEqual(sheet2matrix(x,y,self.box,self.density), (r,c))
+        self.assertEqual(sheet2matrixidx(x,y,self.box,self.density), (r,c))
     def test_s2m_left_bottom(self):
-        r,c = self.rbound-1, 0
+        r,c = self.rbound, 0
         x,y = self.left, self.bottom
-        self.assertEqual(sheet2matrix(x,y,self.box,self.density),(r,c))
+        self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
     def test_s2m_right_top(self):
-        r,c = 0,self.cbound-1
+        r,c = 0,self.cbound
         x,y = self.right,self.top
-        self.assertEqual(sheet2matrix(x,y,self.box,self.density),(r,c))
+        self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
     def test_s2m_right_bottom(self):
-        r,c = self.rbound-1,self.cbound-1
+        r,c = self.rbound,self.cbound
         x,y = self.right,self.bottom
-        self.assertEqual(sheet2matrix(x,y,self.box,self.density),(r,c))
+        self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
 
     def test_m2s_left_top(self):
         r,c = 0,0
         x,y = self.left+self.half_unit,self.top-self.half_unit
-        self.assertEqual(matrix2sheet(r,c,self.box,self.density), (x,y))        
+        self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))        
     def test_m2s_left_bottom(self):
         r,c = self.rbound-1,0
         x,y = self.left+self.half_unit,self.bottom+self.half_unit
-        self.assertEqual(matrix2sheet(r,c,self.box,self.density), (x,y))        
+        self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))        
     def test_m2s_right_top(self):
-        r,c = 0,self.cbound
+        r,c = 0,self.cbound-1
         x,y = self.right-self.half_unit,self.top-self.half_unit
-        self.assertEqual(matrix2sheet(r,c,self.box,self.density), (x,y))        
+        self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))        
     def test_m2s_right_bottom(self):
         r,c = self.rbound-1,self.cbound-1
         x,y = self.right-self.half_unit,self.bottom+self.half_unit
-        self.assertEqual(matrix2sheet(r,c,self.box,self.density), (x,y))        
+        self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))        
     def test_sheet_view(self):
         s = Sheet()
         sview = s.sheet_view()
@@ -84,31 +84,31 @@ class TestCoordinateTransforms(unittest.TestCase):
         d = 16
         bounds = BoundingBox(points=((l,b),(r,t)))
         density = d
-        self.assertEqual(sheet2matrix(0.8,0.8,bounds,density),(0,24))
-        self.assertEqual(sheet2matrix(0.0,0.0,bounds,density),(12,12))
-        self.assertEqual(sheet2matrix(-0.8,-0.8,bounds,density),(24,0))
-        self.assertEqual(matrix2sheet(24,0,bounds,density),
+        self.assertEqual(sheet2matrixidx(0.8,0.8,bounds,density),(0,24+1))
+        self.assertEqual(sheet2matrixidx(0.0,0.0,bounds,density),(12,12))
+        self.assertEqual(sheet2matrixidx(-0.8,-0.8,bounds,density),(24+1,0))
+        self.assertEqual(matrixidx2sheet(24,0,bounds,density),
                          (((r-l) / int(d*(r-l)) / 2.0) + l,
                           (t-b) / int(d*(t-b)) / 2.0 + b))
-        self.assertEqual(matrix2sheet(0,0,bounds,density),
+        self.assertEqual(matrixidx2sheet(0,0,bounds,density),
                          (((r-l) / int(d*(r-l)) / 2.0) + l ,
                           (t-b) / int(d*(t-b)) * (int(d*(t-b)) - 0.5) + b))
 
-        xy = matrix2sheet(0,0,bounds,density)
+        xy = matrixidx2sheet(0,0,bounds,density)
         self.assertTrue(bounds.contains(xy[0],xy[1]))
-        self.assertEqual((0,0),sheet2matrix(xy[0],xy[1],bounds,density))
+        self.assertEqual((0,0),sheet2matrixidx(xy[0],xy[1],bounds,density))
 
-        xy = matrix2sheet(25,25,bounds,density)
+        xy = matrixidx2sheet(25,25,bounds,density)
         self.assertFalse(bounds.contains(xy[0],xy[1]))
-        self.assertNotEqual((24,24),sheet2matrix(xy[0],xy[1],bounds,density))
+        self.assertNotEqual((24,24),sheet2matrixidx(xy[0],xy[1],bounds,density))
 
-        xy = matrix2sheet(0,24,bounds,density)
+        xy = matrixidx2sheet(0,24,bounds,density)
         self.assertTrue(bounds.contains(xy[0],xy[1]))
-        self.assertEqual((0,24),sheet2matrix(xy[0],xy[1],bounds,density))
+        self.assertEqual((0,24),sheet2matrixidx(xy[0],xy[1],bounds,density))
 
-        xy = matrix2sheet(24,0,bounds,density)
+        xy = matrixidx2sheet(24,0,bounds,density)
         self.assertTrue(bounds.contains(xy[0],xy[1]))
-        self.assertEqual((24,0),sheet2matrix(xy[0],xy[1],bounds,density))
+        self.assertEqual((24,0),sheet2matrixidx(xy[0],xy[1],bounds,density))
 
 
 

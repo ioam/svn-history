@@ -101,27 +101,9 @@ from boundingregion import BoundingBox
 import sheetview 
 
 def sheet2matrix(x,y,bounds,density):
-    ### JABHACKALERT!
-    ### 
-    ### This implementation is not correct; it should return floats,
-    ### not ints, with no if statements or other corrections.  It
-    ### should just be a simple coordinate transformation,
-    ### implementable using a matrix as in computer graphics routines.
-    ### An additional function sheet2matrixint might be useful which
-    ### also crops to integer, but that function would be based on
-    ### this one.
-
     """
-    Convert a point (x,y) in sheet coordinates to the row and column
-    of the matrix cell in which that point falls given bounds and density.
-    Returns (row,column).  If the x,y is right on the edge of the sheet,
-    so that it would normally bump up to a matrix unit that does not exist,
-    it is knocked back one.  ie. If the right hand edge is 1.0, and the
-    passed in x is 1.0, then the math would give a col of 'density'
-    but with matrices indexed from 0, this is an invalid location, so
-    density - 1 is used.
-
-    NOTE: This is NOT the strict mathematical inverse of matrix2sheet!
+    Convert a point (x,y) in sheet coordinates to matrix coordinates given 
+    the sheet's bounds and density.
 
     When computing this transformation for an existing sheet foo, one
     should use the Sheet method foo.sheet2matrix(x,y).
@@ -129,58 +111,73 @@ def sheet2matrix(x,y,bounds,density):
 
     left,bottom,right,top = bounds.aarect().lbrt()
 
-    col = int((x-left) * density)
-    row = int((top-y)  * density)
+    # compute the true density along x and y. The true density does not equal
+    # to density argument when density*(right-left) or density*(top-bottom) is
+    # not an integer.
+    xdensity = int(density*(right-left)) / float((right-left))
+    ydensity = int(density*(top-bottom)) / float((top-bottom))
 
-    if col == int(density * (right-left)): col = col - 1
-    if row == int(density * (top-bottom)): row = row - 1
-
+    # First translate to (left,top), which is [0,0] in the matrix, then scale to
+    # the size of the matrix. y coodinate needs to flipped, because the points
+    # are moving down in the sheet as the y-index increases in the matrix.
+    col = (x-left) * xdensity
+    row = (top-y)  * ydensity
     return row, col
 
-    
-def matrix2sheet(row,col,bounds,density):
+def sheet2matrixidx(x,y,bounds,density):
     """
-    Convert a point (row,col) in matrix coordinates to its
+    Convert a point (x,y) in sheet coordinates to the row and column index
+    of the matrix cell in which that point falls given bounds and density.
+    Returns (row,column).  
+
+    NOTE: This is NOT the strict mathematical inverse of matrixidx2sheet.
+    NOTE2: If the coordinates along the left or bottom boundary are passed into
+    this function, the returned matrix coordinate of the boundary will be right
+    outside the matrix.
+    """
+
+    r,c = sheet2matrix(x,y,bounds,density)
+
+    return int(r), int(c)
+
+
+def matrix2sheet(mx,my,bounds,density):
+    """
+    Inverse of sheet2matrix.
+    
+    Convert a point (mx,my) in matrix coordinates to its
     corresponding point (x,y) in sheet coordinates given bounds and
     density.
+    """
 
+    left,bottom,right,top = bounds.aarect().lbrt()
+    xstep = float((right-left)) / int(density*(right-left))
+    ystep = float((top-bottom)) / int(density*(top-bottom))
+    x = mx*xstep + left
+    y = top - my*ystep
+    return x, y
+
+
+def matrixidx2sheet(row,col,bounds,density):
+    """
     Returns (x,y) where x and y are the floating point coordinates of
-    the CENTER of the given matrix cell.  If the matrix cell
+    the CENTER of the given matrix cell (row,col). If the matrix cell
     represents a 0.2 by 0.2 region, then the center location returned
     would be 0.1,0.1
 
-    NOTE: This is NOT the strict mathematical inverse of sheet2matrix.
+    NOTE: This is NOT the strict mathematical inverse of sheet2matrixidx.
     
     When computing this transformation for an existing sheet foo, one
-    should use the Sheet method foo.matrix2sheet(r,c).
+    should use the Sheet method foo.matrixidx2sheet(r,c).
     """
 
-    ### JABHACKALERT!
-    ### 
-    ### This implementation is not correct; it should not assume that
-    ### the arguments are integers, and should not contain any if
-    ### statements or other corrections.  It should just be a simple
-    ### coordinate transformation, implementable using a matrix as in
-    ### computer graphics routines.
-    
-    left,bottom,right,top = bounds.aarect().lbrt()
-    rows,cols = bounds2shape(bounds,density)
-    width = right-left
+    x,y = matrix2sheet((col+0.5), (row+0.5), bounds, density)
 
-    # Account for the coordinate transformation between Numeric arrays and
-    # Topographica x/y.
-    # 0 Indexed, and internal matrices are flipped.
-    row = (rows-1) - row
-    unit_size = float(width)  / cols
-
-    x = left + (col + 0.5) * unit_size 
-    y = bottom + (row + 0.5) * unit_size 
-    if x > right: x = x - unit_size
-    if y > top: y = y - unit_size
-
+    # Rounding is useful for comparing the result with a floating point number
+    # that we specify by typing the number out (e.g. fp = 0.5).
     # Round eliminates any precision errors that have been compounded
-    # via math.  This way, any representation errors left, will be
-    # minimum and will match coded floating points.
+    # via floating point operations so that the rounded number will better
+    # match the floating number that we type in.
     return round(x,10),round(y,10)
 
 
@@ -205,14 +202,16 @@ def input_slice(slice_bounds, input_bounds, input_density):
 
     left,bottom,right,top = slice_bounds.aarect().lbrt()
     rows,cols = bounds2shape(slice_bounds,input_density)
-    toprow,leftcol = sheet2matrix(left,top,input_bounds,input_density)
+    toprow,leftcol = sheet2matrixidx(left,top,input_bounds,input_density)
 
-    cr,cc = sheet2matrix((left+right)/2,(top+bottom)/2,input_bounds,input_density)
+    cr,cc = sheet2matrixidx((left+right)/2,(top+bottom)/2,input_bounds,input_density)
     toprow = cr - rows/2
     leftcol = cc - cols/2
 
-    maxrow,maxcol = sheet2matrix(input_bounds.aarect().right(),input_bounds.aarect().bottom(),input_bounds,input_density)
+    maxrow,maxcol = sheet2matrixidx(input_bounds.aarect().right(),input_bounds.aarect().bottom(),input_bounds,input_density)
 
+    maxrow = maxrow - 1
+    maxcol = maxcol - 1
     rstart = max(0,toprow)
     rbound = min(maxrow+1,cr+rows/2+1)
     cstart = max(0,leftcol)
@@ -233,15 +232,17 @@ def input_slice(slice_bounds, input_bounds, input_density, x, y):
     """
     rows,cols = bounds2shape(slice_bounds,input_density)
 
-    cr,cc = sheet2matrix(x, y, input_bounds, input_density)
+    cr,cc = sheet2matrixidx(x, y, input_bounds, input_density)
 
     toprow = cr - rows/2
     leftcol = cc - cols/2
 
-    maxrow,maxcol = sheet2matrix(input_bounds.aarect().right(),
+    maxrow,maxcol = sheet2matrixidx(input_bounds.aarect().right(),
                                  input_bounds.aarect().bottom(),
                                  input_bounds,input_density)
 
+    maxrow = maxrow - 1
+    maxcol = maxcol - 1
     rstart = max(0,toprow)
     rbound = min(maxrow+1,cr+rows/2+1)
     cstart = max(0,leftcol)
@@ -382,22 +383,22 @@ class Sheet(EventProcessor):
             del self.sheet_view_dict[view_name]
             
                 
-    def sheet2matrix(self,x,y):
+    def sheet2matrixidx(self,x,y):
         """
         Coordinate transformation: takes a point (x,y) in sheet
         coordinates and returns the (row,col) of the matrix cell it
         cooresponds to.
         """
-        return sheet2matrix(x,y,self.bounds,self.density)
+        return sheet2matrixidx(x,y,self.bounds,self.density)
 
 
-    def matrix2sheet(self,row,col):
+    def matrixidx2sheet(self,row,col):
         """
         Coordinate transformation: Takes the (row,col) of an element
         in the activity matrix and gives its (x,y) in sheet
         coordinates.
         """
-        return matrix2sheet(row,col,self.bounds,self.density)
+        return matrixidx2sheet(row,col,self.bounds,self.density)
 
     def sheet_offset(self):
         """
@@ -433,7 +434,7 @@ class Sheet(EventProcessor):
         the activity matrix of the sheet.
         """
         rows,cols = self.activity.shape
-        coords = [self.matrix2sheet(r,0) for r in range(rows-1,-1,-1)]
+        coords = [self.matrixidx2sheet(r,0) for r in range(rows-1,-1,-1)]
         return [y for (x,y) in coords]
 
     def sheet_cols(self):
@@ -442,7 +443,7 @@ class Sheet(EventProcessor):
         of the activity matrix of the sheet.
         """
         rows,cols = self.activity.shape
-        coords = [self.matrix2sheet(0,c) for c in range(cols)]
+        coords = [self.matrixidx2sheet(0,c) for c in range(cols)]
         return [x for (x,y) in coords]
 
 

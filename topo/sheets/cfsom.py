@@ -98,6 +98,6 @@ class CFSOM(CFSheet):
         if matrix_coords:
             return row,col
         else:
-            return self.matrix2sheet(row,col)
+            return self.matrixidx2sheet(row,col)
 
 

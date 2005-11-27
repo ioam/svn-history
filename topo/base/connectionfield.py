@@ -303,7 +303,7 @@ class CFProjection(Projection):
         Return a single connection field UnitView, for the unit
         located at sheet coordinate (sheet_x,sheet_y).
         """
-        (r,c) = (self.dest).sheet2matrix(sheet_x,sheet_y)
+        (r,c) = (self.dest).sheet2matrixidx(sheet_x,sheet_y)
         matrix_data = Numeric.array(self.cf(r,c).weights)
 
         ### JABHACKALERT!
