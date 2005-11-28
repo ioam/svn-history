@@ -60,6 +60,7 @@ __version__='$Revision$'
 ### Nevertheless, it still remains little alerts that need to be solved
 ### but it will be done very soon.
 
+### JCALERT! Get rid of the unused import statement.
 from copy import deepcopy
 from topo.base.topoobject import TopoObject
 from topo.base.utils import flatten, dict_sort
