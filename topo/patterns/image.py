@@ -5,18 +5,25 @@ Contains two classes: TopoImage and ImageGenerator.
 $Id$
 """
 
-# CEB:
-# this file is still being written.
-
-# - when resizing, image should remain centered
-
-
 from topo.base.topoobject import TopoObject
+from topo.base.sheet import bounds2shape
 from topo.outputfns.basic import DivisiveMaxNormalize
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.parameter import Parameter, Number
 from Numeric import array, transpose, ones, floor, Float, divide, where
 import Image, ImageOps
+
+
+# CEBHACKALERT:
+# The image is not scaled at all on loading.
+
+
+from topo.base.sheet import sheet2matrix
+def sheet2matrixidx_array(x,y,bounds,density):
+    """
+    """
+    row, col = sheet2matrix(x,y,bounds,density)
+    return row.astype(int),col.astype(int)
 
 
 from Numeric import sum,ravel
@@ -38,6 +45,7 @@ def edge_average(a):
         return float(edge_sum)/num_values
 
 
+
 class TopoImage(TopoObject):
     """
     Stores a Numeric array representing a normalized Image. The Image is converted to and
@@ -56,7 +64,7 @@ class TopoImage(TopoObject):
         """
         """
         image = ImageOps.grayscale(Image.open(filename))
-        self.w, self.h = image.size 
+        self.w, self.h = image.size
 
         image_array = array(image.getdata(),Float)
         image_array = self.output_fn(image_array)
@@ -67,7 +75,42 @@ class TopoImage(TopoObject):
         self.background_value = edge_average(self.image_array)
 
 
-    def resample(self, x, y, bounds, density, width=1.0, height=1.0):
+    ### JABHACKALERT!  Should be unified with sheet2matrix in sheet.py
+    def __topo_coords_to_image(self,x,y,bounds,density,width,height):
+        """
+        Transform the given topographica abscissae/ordinates (x) to fit
+        an image with num_pixels along that aspect.
+
+        - translate center (Image has (0,0) as top-left corner)
+        - scale x to match the size of the image, so e.g. x=3 corresponds
+          to pixel 3, and x=4 to pixel 4
+
+        An Image consists of discrete pixels, whereas the x values are floating-
+        point numbers. The simplistic technique in this function uses floor() to
+        map a range to a single number.
+
+        Maybe it would be better to put image into Sheet and use BoundingBocol functions, etc.
+        """
+        # CEBHACKALERT:
+        # offer alternatives (shortest dimension to area, etc.)
+        # fit longest dimension to default retina area (1.0)
+
+        x = x/width  
+        y = y/height
+
+        row, col = sheet2matrixidx_array(x,y,bounds,density)
+        n_rows,n_cols = bounds2shape(bounds,density)
+
+        col = col - n_cols/2.0 + self.w/2.0
+        row = row - n_rows/2.0 + self.h/2.0
+        
+        col = where(col>=self.w, -col, col)
+        row = where(row>=self.h, -row, row)
+
+        return col.astype(int), row.astype(int)
+
+
+    def __call__(self, x, y, bounds, density, width=1.0, height=1.0):
         """
         Return pixels from the image at the given Topographica (x,y) coordinates,
         with width/height multiplied as specified by the given width and height factors.
@@ -76,22 +119,11 @@ class TopoImage(TopoObject):
         dimension of the Image should fit the default retinal dimension of 1.0. The other
         dimension is scaled by the same factor.
         """
-        # CEBHACKALERT:
-        # offer alternatives (shortest dimension to area, etc.)
-        # fit longest dimension to default retina area (1.0)
-        if self.h > self.w:
-            stretch_factor = float(self.h)/1.0
-        else:
-            stretch_factor = float(self.w)/1.0
-
-        x_scaled = self.__topo_coords_to_image(x, divide(stretch_factor,width), self.w)
-        y_scaled = self.__topo_coords_to_image(y, divide(stretch_factor,height), self.h)
-
-        assert x_scaled.shape == x.shape
-        assert y_scaled.shape == y.shape
+ 
+        x_scaled, y_scaled = self.__topo_coords_to_image(x, y, bounds, density, width, height)
         
         image_sample = ones(x_scaled.shape, Float)*self.background_value
-        
+
         if self.h==0 or self.w==0 or width==0 or height==0:
             return image_sample
         else:
@@ -105,27 +137,9 @@ class TopoImage(TopoObject):
         # Could be useful to allow local normalization here instead of global.             
         return image_sample
 
-    ### JABHACKALERT!  Should be unified with sheet2matrix in sheet.py
-    def __topo_coords_to_image(self,x,scale_factor,num_pixels):
-        """
-        Transform the given topographica abscissae/ordinates (x) to fit
-        an image with num_pixels along that aspect.
-
-        - translate center (Image has (0,0) as top-left corner)
-        - scale x to match the size of the image, so e.g. x=3 corresponds
-          to pixel 3, and x=4 to pixel 4
-
-        An Image consists of discrete pixels, whereas the x values are floating-
-        point numbers. The simplistic technique in this function uses floor() to
-        map a range to a single number.
-        """
-        x_scaled = (x+0.5) * scale_factor
-        x_scaled = floor(x_scaled)
-        x_scaled = where(x_scaled>=num_pixels, -1, x_scaled)  
-        return x_scaled.astype(int)  # no rounding is done here
 
 
-# see PIL for documentation
+# xsee PIL for documentation
 # color to grayscale, etc
 # rotation, resize just resample no interpolation
 class ImageGenerator(PatternGenerator):
@@ -149,6 +163,6 @@ class ImageGenerator(PatternGenerator):
         height  = params.get('height',self.height)
         image   = params.get('image',self.image)
         
-        return image.resample(x,y,bounds,density, width, height)
+        return image(x,y,bounds,density, width, height)
 
 
