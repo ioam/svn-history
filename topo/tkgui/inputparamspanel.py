@@ -18,7 +18,7 @@ $Id$
 __version__='$Revision$'
 
 import __main__
-import math, string, re
+import math
 import parametersframe
 import topo.base.patterngenerator
 import topo.plotting.plot
@@ -31,10 +31,9 @@ from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
 from topo.base.utils import eval_atof
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.sheet import BoundingBox, Sheet
-from topo.base.utils import find_classes_in_package
+from topo.base.utils import find_classes_in_package, classname_repr
 from topo.base.patterngenerator import PatternGenerator
 from topo.commands.basic import pattern_present,save_input_generators,restore_input_generators
-
 from copy import deepcopy
 
 # Hack to reverse the order of the input EventProcessor list and the
@@ -55,24 +54,21 @@ from topo.patterns import *
 patternclasses=find_classes_in_package(topo.patterns,PatternGenerator)
 topo.base.registry.pattern_generators.update(patternclasses)
 
+
 from topo.base.keyedlist import KeyedList
 def patterngenerator_names():
     """
-    Return the existing list of PatternGenerator names as a KeyedList.
+    Return a KeyedList [(viewable_name, PatternGenerator_name)] from the registry's PatternGenerators. 
 
-    In the returned dictionary the Keys are the viewable names, and
-    the Values are the class names.  This list will change based on
-    the existing classes found in the registry, and can be extended by
-    the user.
+    The viewable_name is the PatternGenerator's name stripped of the Generator suffix, and with spaces
+    inserted between any capital letters in the name. PatternGenerator_name is the unaltered name.
     """
-    k = topo.base.registry.pattern_generators.keys()
-    ### JABALERT: Should be made into a general-purpose function
-    ### (e.g. classname_repr) in utils.py for all to use. 
-    k = [(re.sub('Generator$','',name),name) for name in k]  # Cut off 'Generator'
-    for i in range(len(k)):        # Add spaces before capital leters
-        for c in string.uppercase:
-            k[i] = (k[i][0].replace(c,' '+c).strip(),k[i][1])
-    return KeyedList(k)
+    k = KeyedList()
+    
+    for class_name in topo.base.registry.pattern_generators.keys():
+        k.append( (classname_repr(class_name, 'Generator'), class_name) )
+        
+    return k
 
 
 class InputParamsPanel(plotgrouppanel.PlotGroupPanel):

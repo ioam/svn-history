@@ -368,3 +368,18 @@ def clip_in_place(mat,lower_bound,upper_bound):
         elif element>upper_bound:
             mflat[i] = upper_bound
 
+
+
+import string, re
+def classname_repr(class_name, suffix_to_lose='Generator'):
+    """
+    Return class_name stripped of suffix_to_lose, and with spaces before any capital letters.
+    """
+    # Cut off 'suffix_to_lose'
+    viewable_name = re.sub(suffix_to_lose+'$','',class_name)
+
+    # Add spaces before capital leters
+    for c in string.uppercase:
+        viewable_name = viewable_name.replace(c,' '+c).strip()
+
+    return viewable_name
