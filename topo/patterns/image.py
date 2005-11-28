@@ -19,20 +19,23 @@ from Numeric import array, transpose, ones, floor, Float, divide, where
 import Image, ImageOps
 
 
-from Numeric import sum, ravel
+from Numeric import sum,ravel
 def edge_average(a):
     """
     Return the mean value around the edge of an array.
     """
-    flat_a = ravel(a)
-    if len(flat_a) <= 4:
-        edge_sum = sum(flat_a)
-        num_values = len(flat_a)
+    if len(ravel(a)) < 2:
+        return float(a[0])
     else:
-        edge_sum = sum(a[0]) + sum(a[-1]) + sum(a[:,0]) + sum(a[:,-1]) - a[0,0] - a[0,-1] - a[-1,0] - a[-1,-1]
-        num_values = 2*len(a[0])+2*len(a[:,0]) - 4
+        top_edge = a[0]
+        bottom_edge = a[-1]
+        left_edge = a[1:-1,0]
+        right_edge = a[1:-1,-1]
 
-    return edge_sum/num_values
+        edge_sum = sum(top_edge) + sum(bottom_edge) + sum(left_edge) + sum(right_edge)
+        num_values = len(top_edge)+len(bottom_edge)+len(left_edge)+len(right_edge)
+
+        return float(edge_sum)/num_values
 
 
 class TopoImage(TopoObject):
