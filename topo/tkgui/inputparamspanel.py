@@ -65,8 +65,8 @@ def patterngenerator_names():
     """
     k = KeyedList()
     
-    for class_name in topo.base.registry.pattern_generators.keys():
-        k.append( (classname_repr(class_name, 'Generator'), class_name) )
+    for pg_name in topo.base.registry.pattern_generators.keys():
+        k.append( (classname_repr(pg_name, 'Generator'), pg_name) )
         
     return k
 
