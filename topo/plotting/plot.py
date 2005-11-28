@@ -104,6 +104,8 @@ class Plot(TopoObject):
     background = Dynamic(default=BLACK_BACKGROUND)
     palette_ = Dynamic(default=palette.Monochrome)
 
+    ### JCALERT! We should pass a parameter sheet_view_list instead of passing it in the channel. 
+    
     def __init__(self, (channel_1, channel_2, channel_3), plot_type, sheet=None,
                  normalize=False, **params):
         """
@@ -138,9 +140,12 @@ class Plot(TopoObject):
         """
         super(Plot,self).__init__(**params)
 
-        self.source = sheet
+        ### JCALERT! What about if sheet is None?
+	self.source = sheet
 
         self.channels = (channel_1, channel_2, channel_3)
+
+	### Maybe we can get rid of plot_type
         self.plot_type = plot_type
         self.view_info = {}
         self.cropped = False
@@ -150,11 +155,13 @@ class Plot(TopoObject):
         self.normalize = normalize
 
 
+    ### JCALERT! Is it really a useful and meaningful function?
     def shape(self):
         """ Return the shape of the first matrix in the Plot """
         return self.matrices[0].shape
 
 
+    ### JCALERT! This function should go in another place but not in plot. (I think)
     def release_sheetviews(self):
         """
         Delete any Sheet.sheet_view_dict entries used by this plot, under
@@ -172,6 +179,7 @@ class Plot(TopoObject):
                     self.source.release_sheet_view(each)
 
 
+    ### JCALERT! This function ought to be simplified, and divided in smaller functions.
     def plot(self):
         """
         Get the SheetViews requested from each channel passed in at
@@ -194,8 +202,20 @@ class Plot(TopoObject):
                    'self.source = ' + str(self.source) + \
                    'type(self.source) = ' + str(type(self.source)))
 
-        self.channel_views = []
+        ### JCALERT! I think that can go (already defined above!)
+        ### but I do not know why, it lead to a bug with the testpattern window
+        ### This has to be fixed.
+	self.channel_views = []
         self.matrices = []
+
+
+	### JCALERT! Here it would be changed: maybe two different classes:
+	### main difference so far is if we pass the sheet_view_list or a sheet
+	### the channels can be used in all cases to define which plot we want
+
+	### or: first we do the work for the list of sheet_views, and then if there is a sheet
+        ### we do it as well.
+        
         #  Convert what is in the channels into SheetViews if not already
         for each in self.channels:
 
@@ -213,6 +233,8 @@ class Plot(TopoObject):
             if isinstance(each,SheetView):
                 self.channel_views.append(each)
                 self.view_info = each.view_info
+	    
+	    
                 
                 
             # Case 2: Entry is a string, or tuple that will be used as a
