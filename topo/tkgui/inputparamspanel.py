@@ -35,6 +35,8 @@ from topo.base.utils import find_classes_in_package
 from topo.base.patterngenerator import PatternGenerator
 from topo.commands.basic import pattern_present,save_input_generators,restore_input_generators
 
+from copy import deepcopy
+
 # Hack to reverse the order of the input EventProcessor list and the
 # Preview plot list, so that it'll match the order that the plots appear
 # in the Activity panel.
@@ -129,7 +131,7 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         self._refresh_sliders(self.input_type.get())
         self.param_frame.pack(side=TOP,expand=YES,fill=X)
 
-        self.in_ep_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
+        self.in_ep_dict = self.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         self.refresh()
 
 
@@ -170,7 +172,7 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         """
         new_name = self.pg_name_dict[new_name]
         self.param_frame.refresh_sliders(new_name)
-        self.in_ep_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
+        self.in_ep_dict = self.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         if self.auto_refresh: self.refresh()
 
 
@@ -186,7 +188,7 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         This function is run no matter if learning is enabled or
         disabled since run() will detect sheet attributes.
         """
-        new_patterns_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
+        new_patterns_dict = self.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         input_dict = dict([(name,d['pattern'])
                            for (name,d) in new_patterns_dict.items()])
         pattern_present(input_dict,self.present_length.getvalue(),
@@ -207,7 +209,7 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
 
         This function does run() the simulator but for 0.0 time.
         """
-        new_patterns_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
+        new_patterns_dict = self.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         input_dict = dict([(name,d['pattern'])
                            for (name,d) in new_patterns_dict.items()])
         pattern_present(input_dict,0.0,sim=None,learning=True,overwrite_previous=True)
@@ -221,7 +223,7 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         for each in self.in_ep_dict.keys():
             if not self.in_ep_dict[each]['state']:
                 self.input_box.invoke(each)
-        self.in_ep_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
+        self.in_ep_dict = self.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         self._refresh_sliders(self.input_type.get())
         if self.auto_refresh: self.refresh()
         if self.learning.get():
@@ -254,7 +256,42 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         """
         Refresh this class and also call the parent class refresh.
         """
-        self.in_ep_dict = self.param_frame.create_patterns(self.cur_pg_name(),self.in_ep_dict)
+        self.in_ep_dict = self.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         self.param_frame.refresh()
         super(InputParamsPanel,self).refresh()
+
+
+    ### JABHACKALERT! Ideally this would move out of tkgui/ altogether.
+    ###
+    ### JAB: It is not clear how this will need to be extended to support
+    ### objects with different parameters in the different eyes, e.g. to
+    ### test ocular dominance.
+    def create_patterns(self,pg_name,ep_dict):
+        """
+        Make an instantiation of the current user patterns.
+
+        The new pattern generator will be placed in a passed in
+        dictionary for the input sheet under the key 'pattern'.
+
+        If the 'state' is turned off (from a button on the Frame),
+        then do not change the currently stored generator.  This
+        allows eyes to have different presentation patterns.
+        """
+        p = self.param_frame.prop_frame.get_values()
+        rp = dict(self.param_frame.pg_parameters(pg_name)).keys()
+        ndict = {}
+        ### JABHACKALERT!
+        ###
+        ### How will this work for photographs and other items that need non-numeric
+        ### input boxes?  It *seems* to be assuming that everything is a float.
+        for each in rp:
+            ndict[each] = eval_atof(p[each])
+        for each in ep_dict.keys():
+            if ep_dict[each]['state']:
+                ndict['density'] = ep_dict[each]['obj'].density
+                ndict['bounds'] = deepcopy(ep_dict[each]['obj'].bounds)
+                pg = topo.base.registry.pattern_generators[pg_name](**ndict)
+                ep_dict[each]['pattern'] = pg
+        return ep_dict  
+
 

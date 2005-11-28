@@ -9,7 +9,6 @@ import propertiesframe
 import topo.base.registry
 from Tkinter import Frame, TOP, LEFT, RIGHT, BOTTOM, YES, N,S,E,W,X
 from topo.base.utils import eval_atof
-from copy import deepcopy
 
 class ParametersFrame(Frame):
     """
@@ -29,11 +28,11 @@ class ParametersFrame(Frame):
     ### described as) being for widgets instead, and so on.
     
     def __init__(self, parent=None,**config):
-        self.__prop_frame = propertiesframe.PropertiesFrame(parent,string_translator=eval_atof)
+        self.prop_frame = propertiesframe.PropertiesFrame(parent,string_translator=eval_atof)
         Frame.__init__(self,parent,config)
         self.__tparams = {}
-        self.__default_values = self.__prop_frame.get_values()
-        self.__prop_frame.pack(side=TOP,expand=YES,fill=X)
+        self.__default_values = self.prop_frame.get_values()
+        self.prop_frame.pack(side=TOP,expand=YES,fill=X)
 
     ### JABHACKALERT!  This should be made into part of a
     ### PatternGeneratorParameter widget.
@@ -47,7 +46,7 @@ class ParametersFrame(Frame):
     ### parameters of one single TopoObject.  At the moment it has a
     ### selection box for choosing such an object, and also includes
     ### its parameters, which is a mess.
-    def __pg_parameters(self,pg_classname):
+    def pg_parameters(self,pg_classname):
         """
         Return the list of Parameter names and objects for the requested PatternGenerator name.
         """
@@ -80,11 +79,11 @@ class ParametersFrame(Frame):
     
 
     def __add_slider(self,name,min,max,init):
-        return self.__prop_frame.add_tagged_slider_property(name,init,
+        return self.prop_frame.add_tagged_slider_property(name,init,
                  min_value=min,max_value=max,width=30,string_format='%.6f')
 
     def reset_to_defaults(self):
-        self.__prop_frame.set_values(self.__default_values)
+        self.prop_frame.set_values(self.__default_values)
 
 
     def refresh(self):
@@ -104,57 +103,21 @@ class ParametersFrame(Frame):
             s.grid_forget()
             c.grid_forget()
         # Make relevant parameters visible.
-        new_param_names = self.__pg_parameters(new_name)
+        new_param_names = self.pg_parameters(new_name)
         self.__make_sliders_from_params(new_param_names,self.__tparams)
         new_sliders = dict(new_param_names).keys()
         new_sliders.sort()
         for i in range(len(new_sliders)):
             (s,c) = self.__tparams[new_sliders[i]]
-            s.grid(row=i,column=0,padx=self.__prop_frame.padding,
-                   pady=self.__prop_frame.padding,sticky=E)
+            s.grid(row=i,column=0,padx=self.prop_frame.padding,
+                   pady=self.prop_frame.padding,sticky=E)
             c.grid(row=i,
                    column=1,
-                   padx=self.__prop_frame.padding,
-                   pady=self.__prop_frame.padding,
+                   padx=self.prop_frame.padding,
+                   pady=self.prop_frame.padding,
                    sticky=N+S+W+E)
 
 
-    ### JABHACKALERT!  What is this doing in this file?  It has no relevance
-    ### to ParametersFrame, and is only useful for inputparamspanel, not other
-    ### types of ParametersFrame!  Ideally it would move out of tk/ altogether,
-    ### but back into inputparamspanel would at least make more sense.
-    ###
-    ### JAB: It is not clear how this will need to be extended to support
-    ### objects with different parameters in the different eyes, e.g. to
-    ### test ocular dominance.
-    def create_patterns(self,pg_name,ep_dict):
-        """
-        Make an instantiation of the current user patterns.
-
-        The new pattern generator will be placed in a passed in
-        dictionary for the input sheet under the key 'pattern'.
-
-        If the 'state' is turned off (from a button on the Frame),
-        then do not change the currently stored generator.  This
-        allows eyes to have different presentation patterns.
-        """
-        p = self.__prop_frame.get_values()
-        # rp = self.relevant_parameters(pg_name)
-        rp = dict(self.__pg_parameters(pg_name)).keys()
-        ndict = {}
-        ### JABHACKALERT!
-        ###
-        ### How will this work for photographs and other items that need non-numeric
-        ### input boxes?  It *seems* to be assuming that everything is a float.
-        for each in rp:
-            ndict[each] = eval_atof(p[each])
-        for each in ep_dict.keys():
-            if ep_dict[each]['state']:
-                ndict['density'] = ep_dict[each]['obj'].density
-                ndict['bounds'] = deepcopy(ep_dict[each]['obj'].bounds)
-                pg = topo.base.registry.pattern_generators[pg_name](**ndict)
-                ep_dict[each]['pattern'] = pg
-        return ep_dict  
 
 
 
