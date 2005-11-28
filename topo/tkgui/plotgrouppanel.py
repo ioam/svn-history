@@ -204,6 +204,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         self.refresh_title()              # Update Frame title.
         Pmw.hidebusycursor()
 
+	### JCALERT! It would be nice to have this function put in the same order than 
 
     def refresh_title(self):
         """
@@ -225,6 +226,10 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         self.pe_group = self.pe.get_plot_group(self.plot_key,
                                                self.plotgroup_type)   
         self.pe_group.do_plot_cmd()
+
+        ### JCALERT! This line does not seem to be very useful. To check.
+        ### it definetly seems to be not useful because plots is called by load_images
+        ### in PlotGroup
         self.plots = self.pe_group.plots()
     
 

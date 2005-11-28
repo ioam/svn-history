@@ -115,6 +115,7 @@ class PlotGroup(TopoObject):
     ### + I left template=None so that the testPlotGroup does not crash anymore,
     ### that will have to be re moved eventually.
     ### re-arranged the order and look at the call in all panel classes (i.e. inputparampanel)
+    ### also review the doc of each functions.
 
     def __init__(self,template=None,plot_key=None,sheet_filter_lam=None,plot_list=None,shape=FLAT,**params):
         """
@@ -260,6 +261,11 @@ class PlotGroup(TopoObject):
         for each in self.all_plots:
             each.release_sheetviews()
 
+
+    ### JCALERT! The call to this function is done when we want the list.
+    ### so there is no need to explicitly call it from outside if not to use this list
+    ### (see the do_plot_cmd in most of the PlotGroupPanels). Therefore, the call
+    ### to this function can be removed in this files.    
     def plots(self):
         """
         Generate the bitmap lists.

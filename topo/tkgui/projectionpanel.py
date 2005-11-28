@@ -206,6 +206,9 @@ class ProjectionPanel(CFSheetPlotPanel):
                                                registry.plotgroup_templates['Projection'],
                                                self.region.get(),'ProjectionPlotGroup')
         self.pe_group.do_plot_cmd()
+
+	### JCALERT! This line could be spared if not for clarity. (it is the same in most
+        ### sub-classes of PlotGroupPanel and in PlotGroupPanel itself.
         self.plots = self.pe_group.plots()
 
 
