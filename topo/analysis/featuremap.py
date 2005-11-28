@@ -28,6 +28,7 @@ from topo.patterns.basic import GaussianGenerator, SineGratingGenerator
 from topo.commands.basic import pattern_present, restore_input_generators, save_input_generators
 
 import topo.base.registry
+from topo.base import sheetview
 from topo.base.registry import get_console
 
 ## Should only import this when using display option
@@ -100,6 +101,19 @@ def measure_or_pref(sim=None,num_phase=18,num_orientation=4,frequencies=[2.4],
 
     else:
         TopoObject().warning('No active Simulator.')
+
+
+def measure_activity():
+    """Measure an activity map. Command called when opening an activity plot group panel.
+    To be exact, just add the activity sheet_view for Sheets objects of the simulator
+    """
+    simulator = topo.base.registry.active_sim()
+    for sheet in simulator.objects(Sheet).values():
+        print sheet
+        activity_copy = array(sheet.activity)
+        new_view = sheetview.SheetView((activity_copy,sheet.bounds),
+                                        src_name=sheet.name,view_type='Activity')
+        sheet.add_sheet_view('Activity',new_view)
     
 
 
