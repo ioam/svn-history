@@ -16,12 +16,8 @@ from topo.base.patterngenerator import PatternGenerator
 from topo.base.patterngenerator import ConstantGenerator
 
 
-# CEB:
-# I don't understand why params.get() is used as it is here and
-# elsewhere.
-# E.g. how would "self.pattern_x" alone be any different from
-# "params.get('pattern_x', self.pattern_x)"?
-
+# CEBHACKALERT:
+# Document params.get()
 
 class GaussianGenerator(PatternGenerator):
     """2D Gaussian pattern generator."""
