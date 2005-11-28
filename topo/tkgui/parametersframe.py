@@ -29,12 +29,11 @@ class ParametersFrame(Frame):
     ### described as) being for widgets instead, and so on.
     
     def __init__(self, parent=None,**config):
-        self.parent = parent
-        self.prop_frame = propertiesframe.PropertiesFrame(self.parent,string_translator=eval_atof)
+        self.__prop_frame = propertiesframe.PropertiesFrame(parent,string_translator=eval_atof)
         Frame.__init__(self,parent,config)
-        self.tparams = {}
-        self.default_values = self.prop_frame.get_values()
-        self.prop_frame.pack(side=TOP,expand=YES,fill=X)
+        self.__tparams = {}
+        self.__default_values = self.__prop_frame.get_values()
+        self.__prop_frame.pack(side=TOP,expand=YES,fill=X)
 
     ### JABHACKALERT!  This should be made into part of a
     ### PatternGeneratorParameter widget.
@@ -48,7 +47,7 @@ class ParametersFrame(Frame):
     ### parameters of one single TopoObject.  At the moment it has a
     ### selection box for choosing such an object, and also includes
     ### its parameters, which is a mess.
-    def pg_parameters(self,pg_classname):
+    def __pg_parameters(self,pg_classname):
         """
         Return the list of Parameter names and objects for the requested PatternGenerator name.
         """
@@ -70,26 +69,26 @@ class ParametersFrame(Frame):
     ### they just get a non-slider widget.  *Any* parameter type
     ### should be allowed, using a default text entry expression
     ### widget in the most general case.
-    def make_sliders_from_params(self,params,slider_dict):
+    def __make_sliders_from_params(self,params,slider_dict):
         """
         Make a new slider for each name/value in the params list.
         """
         for (k,v) in params:
             (low,high) = v.get_soft_bounds()
             default = v.default
-            slider_dict[k] = self.add_slider(k,str(low),str(high),str(default))
+            slider_dict[k] = self.__add_slider(k,str(low),str(high),str(default))
     
 
-    def add_slider(self,name,min,max,init):
-        return self.prop_frame.add_tagged_slider_property(name,init,
+    def __add_slider(self,name,min,max,init):
+        return self.__prop_frame.add_tagged_slider_property(name,init,
                  min_value=min,max_value=max,width=30,string_format='%.6f')
 
     def reset_to_defaults(self):
-        self.prop_frame.set_values(self.default_values)
+        self.__prop_frame.set_values(self.__default_values)
 
 
     def refresh(self):
-        for entry in self.tparams.values():
+        for entry in self.__tparams.values():
             if entry[1].need_to_refresh_slider:
                 entry[1].set_slider_from_tag()
 
@@ -101,22 +100,22 @@ class ParametersFrame(Frame):
         themselves do not change but the grid location does.
         """
         # How to wipe the widgets off the screen
-        for (s,c) in self.tparams.values():
+        for (s,c) in self.__tparams.values():
             s.grid_forget()
             c.grid_forget()
         # Make relevant parameters visible.
-        new_param_names = self.pg_parameters(new_name)
-        self.make_sliders_from_params(new_param_names,self.tparams)
+        new_param_names = self.__pg_parameters(new_name)
+        self.__make_sliders_from_params(new_param_names,self.__tparams)
         new_sliders = dict(new_param_names).keys()
         new_sliders.sort()
         for i in range(len(new_sliders)):
-            (s,c) = self.tparams[new_sliders[i]]
-            s.grid(row=i,column=0,padx=self.prop_frame.padding,
-                   pady=self.prop_frame.padding,sticky=E)
+            (s,c) = self.__tparams[new_sliders[i]]
+            s.grid(row=i,column=0,padx=self.__prop_frame.padding,
+                   pady=self.__prop_frame.padding,sticky=E)
             c.grid(row=i,
                    column=1,
-                   padx=self.prop_frame.padding,
-                   pady=self.prop_frame.padding,
+                   padx=self.__prop_frame.padding,
+                   pady=self.__prop_frame.padding,
                    sticky=N+S+W+E)
 
 
@@ -139,9 +138,9 @@ class ParametersFrame(Frame):
         then do not change the currently stored generator.  This
         allows eyes to have different presentation patterns.
         """
-        p = self.prop_frame.get_values()
+        p = self.__prop_frame.get_values()
         # rp = self.relevant_parameters(pg_name)
-        rp = dict(self.pg_parameters(pg_name)).keys()
+        rp = dict(self.__pg_parameters(pg_name)).keys()
         ndict = {}
         ### JABHACKALERT!
         ###
