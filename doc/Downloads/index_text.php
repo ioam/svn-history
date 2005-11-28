@@ -101,7 +101,7 @@ machine with a local disk).  If all goes well, a script named
 Topographica as described in the <A
 HREF="../Tutorial/index.html">Tutorial</A>.  If you have PHP
 installed, you call also make local copies of the HTML documentation;
-to do so, type all" instead of (or after) "make".  "make all" will
+to do so, type "make all" instead of (or after) "make".  "make all" will
 also run the regression tests and example files, to ensure that
 everything is functioning properly on your system.
 
