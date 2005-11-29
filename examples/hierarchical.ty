@@ -27,6 +27,8 @@ from topo.base.simulator import Simulator
 # Set parameters
 
 # input patterns
+
+GeneratorSheet.bounds = BoundingBox(points=((-1.0,-0.5),(0.5,0.5)))
 GeneratorSheet.period = 1.0
 GeneratorSheet.density = 20
 
@@ -35,7 +37,7 @@ LineGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1
 
 LineGenerator.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
 LineGenerator.thickness = 0.02
-LineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+LineGenerator.bounds = BoundingBox(points=((-1.6,-0.8),(0.8,0.8)))
 
 # cortical sheet
 CFSOM.density = 10
