@@ -28,7 +28,7 @@ from topo.base.simulator import Simulator
 
 # input patterns
 
-GeneratorSheet.bounds = BoundingBox(points=((-1.0,-0.5),(0.5,0.5)))
+GeneratorSheet.bounds = BoundingBox(points=((-0.75,-0.5),(0.75,0.5)))
 GeneratorSheet.period = 1.0
 GeneratorSheet.density = 20
 
