@@ -4,6 +4,8 @@ Pattern Generator
 
 Defines a class to return Patterns
 
+CEBHACKALERT: update this when finished reorganizing parametersframe.py
+
 There is a registry dictionary called
 registry.pattern_generators that stores the class name as key,
 and a reference to the class definition as the value.  This dictionary
