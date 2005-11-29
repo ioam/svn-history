@@ -51,14 +51,19 @@ class GeneratorSheet(Sheet):
 
         self.input_generator = new_ig
         self.input_generator.bounds = self.bounds
+        self.input_generator.density = self.density
+        
         ### JABHACKALERT!
         ###
         ### Why is this hack necessary?  How can we eliminate it?
         ###
+        ### CEB: I don't think this does anything. It looks like it will
+        ### just set the BoundingBox back to what it was before. I think
+        ### it should be deleted.
         # PATTERNGENERATOR HACK PATCH TO GET THE X/Y RIGHT OUTSIDE OF KFS.
         (l,b,r,t) = self.bounds.aarect().lbrt()
         self.input_generator.bounds = BoundingBox(points=((b,l),(t,r)))
-        self.input_generator.density = self.density
+
 
 
     def push_input_generator(self):
