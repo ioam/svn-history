@@ -37,7 +37,19 @@ ref_man_path = 'doc/Reference_Manual/index.html'
 topo_www = 'http://www.topographica.org/'
 python_doc = 'http://www.python.org/doc/'
 
-        
+
+# CEBHACKALERT: finish this instruction after making base class for PatternGeneratorParameter etc. 
+# By default, none of the pattern types in topo/patterns/ are imported
+# in Topographica, but for the GUI, we want all of them to be
+# available as a list from which the user can select. To do this, we
+# import all of the PatternGenerator classes in all of the modules
+# mentioned in topo.patterns.__all__, and will also use any that the
+# user has defined and registered.
+
+# menus populated with full range of patterns
+# if you want to add, install your own file in one of the following namespaces...
+from topo.patterns import *
+
 
 class PlotsMenuEntry(topo.base.topoobject.TopoObject):
     """
