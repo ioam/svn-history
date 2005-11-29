@@ -29,9 +29,7 @@ $Id$
 # In case an outside package wants to know
 weave_imported = False
 
-# Set 'somefunction = UNIMPLEMENTED' for a default failure statement.
-def UNIMPLEMENTED: print 'Function not implemented.'
-def inline(*params): print 'inline() not implemented.'
+def inline(*params): raise NotImplementedError
 
 try:
     import weave
@@ -42,7 +40,12 @@ try:
     inline = inline_weave
 
 except ImportError:
-    print 'Caution: Unable to import Weave.  Some functionality may be disabled.'
+    print 'Caution: Unable to import Weave.  Will use non-optimized versions of most components.'
 
-inline('printf("Hello World!");')
+# Flag available for all to use to test whether to use the inline versions or not.
+optimized = weave_imported
+
+# Simple test
+if __name__ == '__main__':
+    inline('printf("Hello World!\\n");')
 
