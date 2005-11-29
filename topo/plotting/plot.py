@@ -57,6 +57,7 @@ import palette as palette
 import MLab
 
 ### JCALERT! look_up_dict could go in utils instead of sheet...
+### might even be erased and simply replaced by .get(key,None)
 from topo.base.sheet import look_up_dict
 
 ### JCALERT: that could go.
@@ -115,7 +116,7 @@ class Plot(TopoObject):
     ### but before, I have to solve the problem of the projection that stores
     ### lists of SheetView. (as well as for weights)
 
-    def __init__(self,(channel_1, channel_2, channel_3),sheet,
+    def __init__(self,(channel_1, channel_2, channel_3),sheet_view_dict,
                  normalize=False, **params):
         """
         channel_1, channel_2, and channel_3 all have one of two types:
@@ -149,7 +150,7 @@ class Plot(TopoObject):
         """
         super(Plot,self).__init__(**params)
 
-      	self.source = sheet
+      	self.view_dict = sheet_view_dict
 
         self.channels = (channel_1, channel_2, channel_3)
 
@@ -160,8 +161,8 @@ class Plot(TopoObject):
         self.matrices = []         # Will hold 3 2D matrices.
         self.normalize = normalize
 
-        if self.source == None:
-            raise ValueError("A Plot should be passed a sheet when created")
+        if self.view_dict == None:
+            raise ValueError("A Plot should be passed a sheet_view_dict when created")
   
 
     ### JCALERT! Is it really a useful and meaningful function?
@@ -180,12 +181,12 @@ class Plot(TopoObject):
         for each in self.channels:
             # Case 2 is the only time a Sheet holds a SheetView that needs
             # to be deleted.
-            if isinstance(each,str) or isinstance(each,tuple):
-                if self.source is None:
-                    self.warning('Plot Channel-type requires a Sheet, but None Sheet passed to Plot() object.')
-                    self.warning('channels = ' + str(self.channels) + ' type(self.source) = ' + str(type(self.source)))
-                else:
-                    self.source.release_sheet_view(each)
+
+	    #### JCALERT! To fix now that it is a dictionnary that is passed...
+            # if isinstance(each,str) or isinstance(each,tuple):
+#                     self.view_dict.release_sheet_view(each)
+            ### JC: it works like that view_dict is the same pointer than sheet_view_dict!
+	    del self.view_dict[each]
 
 
     ### JCALERT! This function is called by load_images in PlotGroup
@@ -208,9 +209,10 @@ class Plot(TopoObject):
                     labels and filenames.
         """
 
-        self.debug('plot() channels = ' + str(self.channels) + \
-                   'self.source = ' + str(self.source) + \
-                   'type(self.source) = ' + str(type(self.source)))
+	### JC: commented out now that we pass a dict instead of a sheet.
+      #   self.debug('plot() channels = ' + str(self.channels) + \
+#                    'self.view_dict = ' + repr(self.view_dict) + \
+#                    'type(self.source) = ' + str(type(self.source)))
 
         ### JCALERT! I think that can go (already defined above!)
         ### but I do not know why, it lead to a bug with the testpattern window
@@ -226,16 +228,18 @@ class Plot(TopoObject):
         ### (Note: it is also the case for unitweights: the UnitView comes back as a list
         ### which lead to the bad code in the hack below )
 
-	if isinstance(self.channels[0],SheetView):
-	    ### Then this function will go away.
-	    self.get_channels_view_from_sheet_view()
-	else:
-	    self.get_channels_view_from_sheet()
+# 	if isinstance(self.channels[0],SheetView):
+# 	    ### Then this function will go away.
+# 	    self.get_channels_view_from_sheet_view()
+# 	else:
+
+	self.get_channels_view_from_sheet()
 
         ### JABALERT! Need to document what this code does.
 
         ### JCALERT! The code below can be made clearer.
         ### Especially, the passing None in channel_views can be changed.
+	### Also, this can be put in another function...
             
         shape = (0,0)
         self.debug('self.channel_views = ' + str(self.channel_views))
@@ -307,13 +311,14 @@ class Plot(TopoObject):
                 
             ### JCALERT! This test has to be re-defined (Why Tuple?)
             elif isinstance(each,str) or isinstance(each,tuple):
-		### JCALERT! We could got rid of look_up_dict in sheet and use
+		### JCALERT! We could got rid of look_up_dict in sheet.py and use
 		### .get(key,None) instead?
-                # sv = look_up_dict(self.source.sheet_view_dict,each)
-                # that can be turned into:
-		sv = self.source.sheet_view_dict.get(each, None)
+                # sv = look_up_dict(self.view_dict,each)
+                # that can be turned into: (Ask Jim)
+		sv = self.view_dict.get(each, None)
                 if sv == None:
-                    self.debug('No sheet view named ' + repr(each) + ' in Sheet ' + self.source.name)
+		    ### JC: disabled momentarily. Can be spared now I think.
+                    #self.debug('No sheet view named ' + repr(each) + ' in Sheet_dict ' + repr(self.view_dict))
                     self.channel_views.append(None)
                 else:
 		   
@@ -328,16 +333,13 @@ class Plot(TopoObject):
                         ### It has to be changed so that it display what we want for each panel
 		        ### Also I think the name that is displayed should always be the plot_name
 		    
-                    self.view_info['src_name']  = self.source.name +"\n" + sv.view_info['src_name']
-                    self.view_info['view_type'] = sv.view_info['view_type']
+		    ### JCALERT! To fix now that this is a dictionnary being passed
+		    ### But it works fine with the vie_info['src_name'] apparently...
+		    # could be:
+		    self.view_info = sv.view_info
+		  #   self.view_info['src_name']  = sv.view_info['src_name']
+#                     self.view_info['view_type'] = sv.view_info['view_type']
                 
-    ### JC: this function will go when the problem of the projection plot will be solved.
-    def get_channels_view_from_sheet_view(self):
-
-	for each in self.channels:
-	    self.channel_views.append(each)
-	    if each != None:
-		self.view_info = each.view_info
 
 ### JC: if we keep the concept of having list of sheet_view in the sheet_view_dict (for projection, and also, 
 ### then an idea is to have a special function in the case of a list that return a list of 

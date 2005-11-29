@@ -331,7 +331,7 @@ class BasicPlotGroup(PlotGroup):
         hue = pt.channels.get('Hue',None)
         confidence = pt.channels.get('Confidence',None)
         n = pt.channels.get('Normalize',False)
-        p = Plot((strength,hue,confidence),sheet,n,name=pt_name)
+        p = Plot((strength,hue,confidence),sheet.sheet_view_dict,n,name=pt_name)
 	return [p]
 
 	
@@ -379,7 +379,7 @@ class UnitWeightsPlotGroup(PlotGroup):
 		### temporary debug print
 		#print "plotgorup key:",key
 		#print "sheet_view:" , p.src.sheet_view_dict[key].view_info
-		plot_list.append(Plot((key,hue,confidence),p.src,pt.channels['Normalize']))
+		plot_list.append(Plot((key,hue,confidence),p.src.sheet_view_dict,pt.channels['Normalize']))
 
         self.debug('plot_list =' + str(plot_list))
         return plot_list
@@ -453,7 +453,7 @@ class ProjectionPlotGroup(PlotGroup):
             ### no need to create a sheet_view that contains a list...!!
 	    for view in self.view_list:
 		key = ('Weights',sheet.name,projection.name,view.view_info['x'],view.view_info['y'])
-		plot_list.append(Plot((key,None,None),src_sheet,pt.channels['Normalize']))
+		plot_list.append(Plot((key,None,None),src_sheet.sheet_view_dict,pt.channels['Normalize']))
 		
         return plot_list
 

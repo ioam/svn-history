@@ -223,11 +223,15 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         Return self.pe_group which contains a PlotGroup.
         """
         plist = []
+        view_dict = {}
         for each in self.in_ep_dict.keys():
             k = self.in_ep_dict[each]['pattern']
             sv = topo.base.sheetview.SheetView((k(),k.bounds),src_name=each,
                                           view_type='Pattern')
-            plist.append(topo.plotting.plot.Plot((sv,None,None),topo.plotting.plot.COLORMAP))
+	    view_dict[each] = sv
+	    ### JCALERT ! This is working for the moment but that could be made simpler
+            ### (which is also true for most of the file!!)
+            plist.append(topo.plotting.plot.Plot((each,None,None),view_dict))
         if LIST_REVERSE: plist.reverse()
         self.pe_group = topo.plotting.plotgroup.PlotGroup(plot_key='Preview',plot_list=plist)
 
