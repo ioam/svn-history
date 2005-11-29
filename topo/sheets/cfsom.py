@@ -8,7 +8,7 @@ $Id$
 __version__='$Revision$'
 
 from topo.base.utils import L2norm
-from topo.base.parameter import Parameter
+from topo.base.parameter import Number
 from Numeric import argmax,exp,floor
 from topo.base.connectionfield import CFSheet
 
@@ -31,17 +31,17 @@ class CFSOM(CFSheet):
     around the winner.
 
     """
-    rmin = Parameter(0.0)
-    rmax = Parameter(1.0)
+    rmin = Number(0.0)
+    rmax = Number(1.0)
     
-    alpha_0 = Parameter(0.5)
-    radius_0 = Parameter(1.0)
+    alpha_0 = Number(0.5)
+    radius_0 = Number(1.0)
     
-    learning_length = Parameter(1000)
+    learning_length = Number(1000)
     
     def __init__(self,**params):
         super(CFSOM,self).__init__(**params)
-        self.half_life = self.learning_length/8                      
+        self.half_life = self.learning_length/8
 
     def decay(self, time, half_life):
         return 0.5**(time/float(half_life))
