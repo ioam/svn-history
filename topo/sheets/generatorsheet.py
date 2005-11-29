@@ -13,10 +13,7 @@ import copy
 
 from topo.base.parameter import Parameter, Dynamic
 
-# CEBHACKALERT: PatternGeneratorParameter will move (see parametersframe.py)
-from topo.tkgui.parametersframe import PatternGeneratorParameter
-
-from topo.base.patterngenerator import ConstantGenerator
+from topo.base.patterngenerator import ConstantGenerator, PatternGeneratorParameter
 
 class GeneratorSheet(Sheet):
     """

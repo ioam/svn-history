@@ -12,45 +12,6 @@ from topo.base.utils import eval_atof
 
 
 
-# CEBHACKALERT: this class will not be staying here.
-# (will probably go to patterngenerator.py)
-
-# CEBHACKALERT: see below
-from topo.base.keyedlist import KeyedList
-from topo.base.utils import find_classes_in_package,classname_repr
-# By default, none of the pattern types in topo/patterns/ are imported
-# in Topographica, but for the GUI, we want all of them to be
-# available as a list from which the user can select. To do this, we
-# import all of the PatternGenerator classes in all of the modules
-# mentioned in topo.patterns.__all__, and will also use any that the
-# user has defined and registered.
-from topo.base.patterngenerator import PatternGenerator
-from topo.patterns import *
-# end CEBHACKALERT
-
-from topo.base.parameter import Parameter
-class PatternGeneratorParameter(Parameter):
-    """
-    """
-    def __init__(self,default=None,doc="",**params):
-        """
-        """
-        Parameter.__init__(self,default=default,doc=doc,**params)
-
-    # CEBHACKALERT: temporary. This is probably not the best way to do this.
-    # Also, will be renamed and (e.g. range()) and implemented for all Parameters)
-    def available_types(self):
-        """
-        Return a KeyedList of PatternGenerators [(visible_name, <patterngenerator_class>)].
-        """
-        patternclasses = find_classes_in_package(topo.patterns, PatternGenerator)
-
-        k = KeyedList()
-    
-        for (pg_name,pg) in patternclasses.items():
-            k.append( (classname_repr(pg_name, 'Generator'), pg) )
-        
-        return k
 
 
 class ParametersFrame(Frame):
