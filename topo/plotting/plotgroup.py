@@ -378,7 +378,7 @@ class UnitWeightsPlotGroup(PlotGroup):
 
 		### temporary debug print
 		#print "plotgorup key:",key
-		#print "sheet_view:" , p.src.sheet_view_dict[key]
+		#print "sheet_view:" , p.src.sheet_view_dict[key].view_info
 		plot_list.append(Plot((key,hue,confidence),p.src,pt.channels['Normalize']))
 
         self.debug('plot_list =' + str(plot_list))
@@ -425,9 +425,15 @@ class ProjectionPlotGroup(PlotGroup):
     def create_plots(self,pt_name,pt,sheet):
 
         c = pt.channels
+
+	### JCALERT This has to be solved: projection is a list here!
+        ### for the moment the hack below deal with that.
+        ### Also, why do we pass the template here?
+
         projection = sheet.get_in_projection_by_name(c['Projection_name'])
         if projection:
 	    src_sheet=projection[0].src
+	    projection=projection[0]
                    
         ### JC: here the hue and confidence ought to be taken and used later on
         ### but a first work on plot.py is required to make these changes
@@ -442,11 +448,12 @@ class ProjectionPlotGroup(PlotGroup):
             ### This has to be changed, and so it is a temporary hack.
             ### Finally, it won't be possible to pass a sheet_view directly when creating a Plot
 
-	    # views = look_up_dict(src_sheet.sheet_view_dict,key)
-            ### JCALERT! I think it is better using: and get rid of look_up_dict
-            views = src_sheet.sheet_view_dict.get(key,None)
-	    for view in views:
-		plot_list.append(Plot((view,None,None),src_sheet,pt.channels['Normalize']))
+            #views = src_sheet.sheet_view_dict.get(key,None)
+	    ### JCALERT! replace that by an attribute view_list in ProjectionPlotGroup
+            ### no need to create a sheet_view that contains a list...!!
+	    for view in self.view_list:
+		key = ('Weights',sheet.name,projection.name,view.view_info['x'],view.view_info['y'])
+		plot_list.append(Plot((key,None,None),src_sheet,pt.channels['Normalize']))
 		
         return plot_list
 
@@ -484,10 +491,12 @@ class ProjectionPlotGroup(PlotGroup):
 	### JCALERT! The use of chain and nested list here and in 
         ### connectionfield.py (unit_view) can be spared or made simpler.
 
-        filtered_list = [view for view in chain(*full_unitview_list)
+        self.view_list = [view for view in chain(*full_unitview_list)
                          if view.projection.name == self.weight_name]
 
-        self._sim_ep_src.add_sheet_view(self.plot_key,filtered_list)
+        ### JC: I think is better to have an attribute self.filtered_list,
+        ### instead of recording a list of Sheet_View under this PlotKey
+        #self._sim_ep_src.add_sheet_view(self.plot_key,filtered_list)
 
         ### JCALERT! I do not understand this comment.
         ### We might want to get rid of it
