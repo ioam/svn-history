@@ -8,7 +8,7 @@ __version__='$Revision$'
 from math import pi
 from Numeric import around,bitwise_and,sin
 
-from topo.base.parameter import Number
+from topo.base.parameter import Number, Parameter
 from topo.base.patternfns import gaussian,gabor,line,disk,ring
 from topo.base.patterngenerator import PatternGenerator
 
@@ -159,3 +159,37 @@ class SquareGratingGenerator(PatternGenerator):
         
         return around(0.5 + 0.5*sin(frequency*2*pi*y + phase))
 
+
+
+# CEBHACKALERT: will be making a base class since this kind of class
+# will exist for output_fn,learning_fn,response_fn,patterngenerator
+
+from topo.base.keyedlist import KeyedList
+from topo.base.utils import find_classes_in_package,classname_repr
+class PatternGeneratorParameter(Parameter):
+    """
+    """
+    def __init__(self,default=None,doc="",**params):
+        """
+        """
+        Parameter.__init__(self,default=default,doc=doc,**params)
+
+    # CEBHACKALERT: temporary. This is probably not the best way to do this.
+    # Also, will be renamed and (e.g. range()) and implemented for all Parameters)
+    def available_types(self):
+        """
+        Return a KeyedList of PatternGenerators [(visible_name, <patterngenerator_class>)].
+
+        CEBHACKALERT:
+        Note about having to import things first
+        """
+        import topo
+        
+        patternclasses = find_classes_in_package(topo.patterns, PatternGenerator)
+        
+        k = KeyedList()
+    
+        for (pg_name,pg) in patternclasses.items():
+            k.append( (classname_repr(pg_name, 'Generator'), pg) )
+        
+        return k
