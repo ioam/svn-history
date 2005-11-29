@@ -13,7 +13,10 @@ import copy
 
 from topo.base.parameter import Parameter, Dynamic
 
-from topo.base.patterngenerator import ConstantGenerator, PatternGeneratorParameter
+from topo.base.patterngenerator import ConstantGenerator
+
+from topo.patterns.basic import PatternGeneratorParameter
+
 
 class GeneratorSheet(Sheet):
     """
