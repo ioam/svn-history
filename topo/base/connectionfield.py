@@ -427,6 +427,7 @@ class CFSheet(ProjectionSheet):
     ### Is it necessary to provide this special case?  It seems like
     ### the database can be populated beforehand so that this code
     ### can be basic and simple, but I may be forgetting something.
+
     def sheet_view(self,request='Activity'):
         """
         Check for 'Weights' or 'WeightsArray', but then call Sheet.sheet_view().  
@@ -440,7 +441,8 @@ class CFSheet(ProjectionSheet):
         if isinstance(request,tuple) and request[0] == 'Weights':
 	    ### JCALERT! This code is unnecessary, as well as the whole function
 	    ### we want eventually to get rid of sheet_view here and in sheet.py
-	    ### and only access the dictionnary.
+	    ### and only access the dictionnary. (sheet_view_dict).
+	    ### also it is confusing that it can return a list of UnitView 
 
             (name,s,p,x,y) = request
             return self.unit_view(x,y)

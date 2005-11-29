@@ -304,19 +304,15 @@ class Plot(TopoObject):
                 
             ### JCALERT! This test has to be re-defined (Why Tuple?)
             elif isinstance(each,str) or isinstance(each,tuple):
-                sv = self.source.sheet_view(each)
+                sv = self.source.sheet_view_dict[each]
                 if sv == None:
                     self.debug('No sheet view named ' + repr(each) + ' in Sheet ' + self.source.name)
                     self.channel_views.append(None)
                 else:
-		    ### JCALERT! Hack to deal with the fact that UnitWeights comes in a list:
-                    ### It has to be changed in unit_view from connectionfield.py
-		    if isinstance(sv,list):
-		    	sv=sv[0]
-		    ###
-		    
+		   
 		    ### temporary debug
-		    #print "sv",sv.view_info
+		    #print "sv",sv,sv.view_info
+
 		    self.channel_views.append(sv)
 
                         ### JCALERT ! That has to be changed.
