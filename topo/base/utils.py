@@ -370,6 +370,9 @@ def clip_in_place(mat,lower_bound,upper_bound):
 
 
 
+# CEBHACKALERT: should it also take full path to classname?
+# e.g. topo.base.patterngenerator.ConstantGenerator rather than ConstantGenerator
+# then keep to first "." from the right, or something.
 import string, re
 def classname_repr(class_name, suffix_to_lose='Generator'):
     """
