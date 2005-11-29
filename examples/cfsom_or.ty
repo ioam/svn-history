@@ -6,7 +6,7 @@ Each V1 neuron receives input from a limited-size square area on the
 Retina, called its ConnectionField.
 
 Does not currently match any published simulation, but will probably
-be tailored one in the future.
+be tailored to one in the future.
 
 $Id$
 """
