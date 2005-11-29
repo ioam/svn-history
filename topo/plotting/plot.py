@@ -56,6 +56,9 @@ from Numeric import array
 import palette as palette 
 import MLab
 
+### JCALERT! look_up_dict could go in utils instead of sheet...
+from topo.base.sheet import look_up_dict
+
 ### JCALERT: that could go.
 
 # Types of plots that Plot knows how to create from input matrices.
@@ -304,7 +307,11 @@ class Plot(TopoObject):
                 
             ### JCALERT! This test has to be re-defined (Why Tuple?)
             elif isinstance(each,str) or isinstance(each,tuple):
-                sv = self.source.sheet_view_dict[each]
+		### JCALERT! We could got rid of look_up_dict in sheet and use
+		### .get(key,None) instead?
+                # sv = look_up_dict(self.source.sheet_view_dict,each)
+                # that can be turned into:
+		sv = self.source.sheet_view_dict.get(each, None)
                 if sv == None:
                     self.debug('No sheet view named ' + repr(each) + ' in Sheet ' + self.source.name)
                     self.channel_views.append(None)

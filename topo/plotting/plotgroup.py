@@ -252,6 +252,9 @@ class PlotGroup(TopoObject):
             self.added_list.append(new_plot)
 
 
+    ### JCALERT ! It has to be redefined how this function release_sheet_view() works
+    ### here but also in sheet and connectionfield.
+
     def release_sheetviews(self):
         """
         Call release_sheetviews() on all Plots in plot list, to free
@@ -307,26 +310,21 @@ class BasicPlotGroup(PlotGroup):
         super(BasicPlotGroup,self).__init__(template,plot_key,sheet_filter_lam,plot_list,
                                             **params)
 
-        ### JC for basic PlotGroup, no need to create a "dynamic List"
+        ### JC: for basic PlotGroup, no need to create a "dynamic List"
+        ### even we could get rid of this dynamic list and systematically call
+        ### plots() before load_images (cf plotgrouppanel)?
 	self.plot_list = self.initialize_plot_list()
 
-    # default is the basic plot group:
-    # should be re-implemented in UnitWeightPlotGroup and ProjectionPlotGroup
-    ### JCALERT! maybe simply put that in the above function
+    ### JCALERT! Maybe copy this function in the superclass?
+    ### Maybe not, like that it has to be re-implemented ...? (see with Jim)
     def create_plots(self,pt_name,pt,sheet):
 	
 	strength = pt.channels.get('Strength',None)
         hue = pt.channels.get('Hue',None)
         confidence = pt.channels.get('Confidence',None)
         n = pt.channels.get('Normalize',False)
-        ### JCALERT! Should be changed to be:
         p = Plot((strength,hue,confidence),sheet,n,name=pt_name)
-        #p = Plot((strength,hue,confidence),SHC,sheet,n,name=pt_name)
-        
-        ### JCALERT! I think here we could take the sheet_view and pass it to plot
-        ### sheet_view_list = [sheet.sheet_view(strength)]
-        ### Actially no: that will be done in Plot
-        return [p]
+	return [p]
 
 	
 
@@ -342,7 +340,8 @@ class UnitWeightsPlotGroup(PlotGroup):
         self.y = float(plot_key[3])
  
       	
-	### JCALERT! I am not sure we need something dynamic here, to check
+	### JCALERT! I am not sure we need something dynamic here.
+        ### (cf similar alert in BasicPlotGroup.
 	self.plot_list = lambda: self.initialize_plot_list()
 
   
@@ -354,13 +353,17 @@ class UnitWeightsPlotGroup(PlotGroup):
         ### (Passing parameter through the template has to be changed eventually)
 
 	### JC: This line can go.
-        sheet_target = pt.channels['Sheet_name']
+        #sheet_target = pt.channels['Sheet_name']
+
         (sheet_x,sheet_y) = pt.channels['Location']
 
 	### JCALERT: here the hue and confidence ought to be taken and used later on
         ### but a first work on plot.py is required to make these changes
         ### hue = pt.channels['Hue']
         ### confidence = pt.channels['Confidence']
+
+	### JCALERT! The problem is that the unitview is from the src_sheet
+        ### but the OrientationPreference sheet_view is in the dest_sheet !!
 
 	plot_list = []
         if not isinstance(sheet,CFSheet):
@@ -372,7 +375,8 @@ class UnitWeightsPlotGroup(PlotGroup):
                 ### is the destination sheet.
                 key = ('Weights',sheet.name,p.name,sheet_x,sheet_y)
 		### temporary debug print
-		#print "plotgroup",key
+		#print "plotgorup key:",key
+		#print "sheet_view:" , p.src.sheet_view_dict[key]
 		plot_list.append(Plot((key,None,None),p.src,pt.channels['Normalize']))
 
         self.debug('plot_list =' + str(plot_list))
@@ -435,7 +439,10 @@ class ProjectionPlotGroup(PlotGroup):
 	    ### JCALERT! for the moment, the sheet_view for a projection is a list of UnitView
             ### This has to be changed, and so it is a temporary hack.
             ### Finally, it won't be possible to pass a sheet_view directly when creating a Plot
-	    views = src_sheet.sheet_view_dict[key]
+
+	    # views = look_up_dict(src_sheet.sheet_view_dict,key)
+            ### JCALERT! I think it is better using: and get rid of look_up_dict
+            views = src_sheet.sheet_view_dict.get(key,None)
 	    for view in views:
 		plot_list.append(Plot((view,None,None),src_sheet,pt.channels['Normalize']))
 		
@@ -531,7 +538,7 @@ topo.base.registry.plotgroup_templates[pgt.name] = pgt
 pgt = PlotGroupTemplate([('Unit Weights',
                           PlotTemplate({'Location'   : (0.0,0.0),
                                         'Normalize'  : True,
-                                        'Sheet_name' : 'V1'}))],
+					'Sheet_name' : 'V1'}))],
                         name='Unit Weights',
                         command='pass')
 topo.base.registry.plotgroup_templates[pgt.name] = pgt

@@ -271,13 +271,13 @@ def bounds2shape(bounds,density):
 ### the calls to sheet_view.
 ### Also, it might go into utils instead of staying here.
 
-def dict_look_up(dict,key):
+def look_up_dict(dict,requested_key):
     """
     Simple routine that return the object corresponding to key
     and None if there is no such key in the dictionnary.
     """
-    if dict.has_key(request):
-        item = dict[request]
+    if dict.has_key(requested_key):
+        item = dict[requested_key]
     else:
         item = None
     return item    
