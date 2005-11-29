@@ -1,0 +1,96 @@
+"""
+SOM-based orientation map based on Obermayer et al., PNAS 87, pp. 8345-8349, 1990.
+
+Contains a Retina (2D Gaussian generator) and a V1 (CFSOM) sheet.
+Each V1 neuron receives input from the entire Retina.
+
+Known differences from the reference simulation:
+
+  - The reference simulation uses periodic boundary conditions, so the
+    borders of our simulation will have edge effects not present in the
+    original.
+
+  - Currently only isotropic Gaussian neighborhood functions are supported.
+
+  - Not tested. :-)
+
+$Id$
+"""
+__version__='$Revision$'
+
+import random
+from math import sqrt
+
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.base.patterngenerator import BoundingBox
+from topo.base.connectionfield import CFProjection
+from topo.base.parameter import Number,DynamicNumber
+from topo.sheets.cfsom import CFSOM
+from topo.patterns.random import UniformRandomGenerator
+from topo.patterns.basic import GaussianGenerator
+from topo.base.simulator import Simulator
+from topo.responsefns.basic import CFDotProduct
+
+
+class ObermayerSOM(CFSOM):
+    """A variant of CFSOM that uses linear decay functions for alpha and radius."""
+
+    alpha_f = Number(0.01)
+    radius_f = Number(0.1)
+    
+    def alpha(self):
+        return self.alpha_0 + (self.alpha_f-self.alpha_0)/self.learning_length*float(self.simulator.time())
+
+    def radius(self):
+        return self.radius_0 + (self.alpha_f-self.alpha_0)/self.learning_length*float(self.simulator.time())
+
+
+
+###########################################
+# Set parameters
+
+# input patterns
+GeneratorSheet.period = 1.0
+GeneratorSheet.density = 30
+
+GaussianGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+GaussianGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+GaussianGenerator.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
+GaussianGenerator.width  = 0.23/sqrt(2)
+GaussianGenerator.height = 0.09/sqrt(2)
+GaussianGenerator.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+
+
+# cortical sheet
+ObermayerSOM.density = 25 #6
+ObermayerSOM.learning_length = 30000
+ObermayerSOM.radius_0 = (240.0/256.0)**2
+radius_at_15000 = (60.0/256.0)**2 # Used until 15000 ; see set_radius_f below for after 15000
+ObermayerSOM.radius_f = 2 * radius_at_15000 - ObermayerSOM.radius_0
+ObermayerSOM.alpha_0  = 0.09
+ObermayerSOM.alpha_f  = 0.02
+
+CFProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-1.0,-1.0),(1.0,1.0))))
+CFProjection.response_fn = CFDotProduct()
+# Weights should be initialized to sum to unity: (Will this work?)
+#CFProjection.learning_fn.output_fn=DivisiveL1Normalize()
+
+###########################################
+# build simulation
+
+s = Simulator()
+
+Retina = GeneratorSheet(input_generator=GaussianGenerator(),name='Retina')
+V1 = ObermayerSOM(name='V1')
+s.connect(Retina,V1,delay=0.5,connection_type=CFProjection,connection_params={'name':'RtoV1'})
+
+def set_radius_f(val): V1.radius_f=val
+s.schedule_action(15000, set_radius_f, (2.0/256.0)**2) # Used after 15000
+
+s.run(1)
+#s.run(30000)
+
+# import profile,pstats
+#
+# p = profile.Profile()
+# p.runctx('s.run(10)',locals(),globals())
