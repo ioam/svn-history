@@ -403,16 +403,18 @@ class CFSheet(ProjectionSheet):
 
         # Delete previous entry if it exists.  Allows appending in next block.
         for v in views:
-            key = ('Weights',v.projection.dest.name,v.projection.name,x,y)
+	    key = ('Weights',v.projection.dest.name,v.projection.name,x,y)
             if v.projection.src.sheet_view_dict.has_key(key):
                 v.projection.src.release_sheet_view(key)
 
         for v in views:
             src = v.projection.src
             key = ('Weights',v.projection.dest.name,v.projection.name,x,y)
+
+	    ### JCALERT! Why adding a list here? It has to be changed.
             unit_list = src.sheet_view_dict.get(key,[])
             unit_list.append(v)
-            src.add_sheet_view(key,unit_list)      # Will be adding a list
+	    src.add_sheet_view(key,unit_list)
             self.debug('Added to sheet_view_dict', views, 'at', key)
 
         return views
@@ -437,6 +439,10 @@ class CFSheet(ProjectionSheet):
         """
         self.debug('request = ' + str(request))
         if isinstance(request,tuple) and request[0] == 'Weights':
+	    ### JCALERT! This code is unnecessary, as well as the whole function
+	    ### we want eventually to get rid of sheet_view here and in sheet.py
+	    ### and only access the dictionnary.
+
             (name,s,p,x,y) = request
             return self.unit_view(x,y)
         else:

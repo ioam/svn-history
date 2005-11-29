@@ -56,6 +56,8 @@ from Numeric import array
 import palette as palette 
 import MLab
 
+### JCALERT: that could go.
+
 # Types of plots that Plot knows how to create from input matrices.
 RGB = 'RGB'
 HSV = 'HSV'
@@ -104,9 +106,13 @@ class Plot(TopoObject):
     background = Dynamic(default=BLACK_BACKGROUND)
     palette_ = Dynamic(default=palette.Monochrome)
 
-    ### JCALERT! We should pass a parameter sheet_view_list instead of passing it in the channel. 
-    
-    def __init__(self, (channel_1, channel_2, channel_3), plot_type, sheet=None,
+ 
+    ### JCALERT! Instead of passing the sheet, we want to pass the dictionnary
+    ### it will solve the problem with inputparampanel
+    ### but before, I have to solve the problem of the projection that stores
+    ### lists of SheetView. (as well as for weights)
+
+    def __init__(self,(channel_1, channel_2, channel_3),sheet,
                  normalize=False, **params):
         """
         channel_1, channel_2, and channel_3 all have one of two types:
@@ -140,13 +146,10 @@ class Plot(TopoObject):
         """
         super(Plot,self).__init__(**params)
 
-        ### JCALERT! What about if sheet is None?
-	self.source = sheet
+      	self.source = sheet
 
         self.channels = (channel_1, channel_2, channel_3)
 
-	### Maybe we can get rid of plot_type
-        self.plot_type = plot_type
         self.view_info = {}
         self.cropped = False
         self.histograms = []
@@ -154,6 +157,9 @@ class Plot(TopoObject):
         self.matrices = []         # Will hold 3 2D matrices.
         self.normalize = normalize
 
+        if self.source == None:
+            raise ValueError("A Plot should be passed a sheet when created")
+  
 
     ### JCALERT! Is it really a useful and meaningful function?
     def shape(self):
@@ -179,7 +185,8 @@ class Plot(TopoObject):
                     self.source.release_sheet_view(each)
 
 
-    ### JCALERT! This function ought to be simplified, and divided in smaller functions.
+    ### JCALERT! This function is called by load_images in PlotGroup
+                    
     def plot(self):
         """
         Get the SheetViews requested from each channel passed in at
@@ -209,168 +216,126 @@ class Plot(TopoObject):
         self.matrices = []
 
 
-	### JCALERT! Here it would be changed: maybe two different classes:
-	### main difference so far is if we pass the sheet_view_list or a sheet
-	### the channels can be used in all cases to define which plot we want
+	### JCALERT! For the moment, we still need to pass SheetViews directly when plotting
+        ### the projection. It is because the plot_key correspond to a list of SheetViews rather than
+        ### SheetViews. We might want to change that and only gather all the UnitViews just when
+        ### plotting the projection.
+        ### (Note: it is also the case for unitweights: the UnitView comes back as a list
+        ### which lead to the bad code in the hack below )
 
-	### or: first we do the work for the list of sheet_views, and then if there is a sheet
-        ### we do it as well.
-        
-        #  Convert what is in the channels into SheetViews if not already
-        for each in self.channels:
-
-            # It's possible for Plots to be accidentally passed in a
-            # list of SheetViews, but it should be avoided.  A warning
-            # will be displayed and the first one in the list will be
-            # used.
-            if isinstance(each,list) and len(each) > 0:
-                if len(each) > 1:
-                    self.warning('Plot Channel contains multiple entries, only plotting first: ' + str(each))
-                    each = each[0]
-
-            # Case 1: Simple SheetView with the view already embedded.
-            #         No need for a Sheet.
-            if isinstance(each,SheetView):
-                self.channel_views.append(each)
-                self.view_info = each.view_info
-	    
-	    
-                
-                
-            # Case 2: Entry is a string, or tuple that will be used as a
-            #         key in the Sheet dictionary.
-            elif isinstance(each,str) or isinstance(each,tuple):
-                if self.source is None:
-                    self.warning('Plot Channel-type requires a Sheet, '+ \
-                                 'but None Sheet passed to Plot() object.')
-                    self.warning('channels = ' + str(self.channels) + \
-                                 ' type(self.source) = ' + \
-                                 str(type(self.source)))
-                    self.channel_views.append(None)
-                    self.name = 'Undefined'
-                else:
-                    sv = self.source.sheet_view(each)
-                    if sv==None:
-                        self.debug('No sheet view named ' + each + ' in Sheet ' + self.source.name)
-                        self.channel_views.append(None)
-                    else:
-                        self.channel_views.append(sv)
-                        #self.view_info = sv.view_info
-
-                        ### JCALERT ! This is an hack so that the problem of displaying the right
-                        ### name under each map in activity and orientation map panel is solved
-                        ### It has to be checked than it will work in all cases
-                        ### or more restructuring of the code is required
-                        ### (i.e. handling of the SheetView and/or PlotGroupTemplate by PlotGroup/PlotEngine/Plot)
-                        self.view_info['src_name']= self.source.name + '\n' + self.name
-                        self.view_info['view_type']= self.name
-                                                
-            # Case 3: Channel entry is None.  Pass along.
-            elif each == None:
-                self.channel_views.append(each)
-
-            # Case 4: Undefined.
-            else:
-                self.warning(each, 'not a String, Tuple, SheetView, or None')
+	if isinstance(self.channels[0],SheetView):
+	    ### Then this function will go away.
+	    self.get_channels_view_from_sheet_view()
+	else:
+	    self.get_channels_view_from_sheet()
 
         ### JABALERT! Need to document what this code does.
+
+        ### JCALERT! The code below can be made clearer.
+        ### Especially, the passing None in channel_views can be changed.
+            
         shape = (0,0)
         self.debug('self.channel_views = ' + str(self.channel_views))
+               
         for each in self.channel_views:
-            if each != None:
-                view_matrix = each.view()
-                self.matrices.append(view_matrix[0]) # Discards boundingbox
-                shape = view_matrix[0].shape
-            else:
-                self.matrices.append(None)
 
-                
-        # By this point, self.matrices should be a triple of 2D
+	    if each != None:
+		view_matrix = each.view()
+		self.matrices.append(view_matrix[0]) # Discards boundingbox
+		shape = view_matrix[0].shape
+	    else:
+		self.matrices.append(None)
+
+
+        ### JC: For clarity, this could be another function.
+	    
+	    # By this point, self.matrices should be a triple of 2D
         # matrices trimmed and ready to go to the caller of this
         # function ... after a possible conversion to a different
         # palette form.
-        if self.plot_type == HSV:
-            # Do the HSV-->RGB conversion, assume the caller will be
-            # displaying the plot as an RGB.
-            
-            s,h,c = self.matrices
+        
+	s,h,c = self.matrices
 
-            zero=zeros(shape,Float)
-            one=ones(shape,Float)
+        zero=zeros(shape,Float)
+        one=ones(shape,Float)
 
-            ### JABHACKALERT Need to extend for white background; assumes black
+        ### JABHACKALERT Need to extend for white background; assumes black
 
-            # No plot; in the future should probably not be a warning
-            if (s==None and c==None and h==None):
-                self.debug('Skipping empty plot.')
-                return None
+        ### JCALERT! This part of the code could go. To see.
+        # No plot; in the future should probably not be a warning
+        if (s==None and c==None and h==None):
+            self.debug('Skipping empty plot.')
+            return None
 
             # Determine appropriate defaults for each matrix
-            if s is None: s=one # Treat as full strength by default
-            if c is None: c=one # Treat as full confidence by default
-            if h is None: # No color -- should be changed to drop down to COLORMAP plot.
-                h=zero
-                c=zero
+        if s is None: s=one # Treat as full strength by default
+        if c is None: c=one # Treat as full confidence by default
+        if h is None: # No color -- should be changed to drop down to COLORMAP plot.
+            h=zero
+            c=zero
 
-            if self.normalize and max(s.flat) > 0:
-                s = divide(s,float(max(s.flat)))
+        if self.normalize and max(s.flat) > 0:
+            s = divide(s,float(max(s.flat)))
 
-            hue=h
-            sat=c
-            val=s
+        hue=h
+        sat=c
+        val=s
             
-            if max(hue.flat) > 1 or max(sat.flat) > 1 or max(val.flat) > 1:
-                self.cropped = True
-                #self.warning('Plot: HSVMap inputs exceed 1. Clipping to 1.0')
-                if max(hue.flat) > 0: hue = MLab.clip(hue,0.0,1.0)
-                if max(sat.flat) > 0: sat = MLab.clip(sat,0.0,1.0)
-                if max(val.flat) > 0: val = MLab.clip(val,0.0,1.0)
-            else:
-                self.cropped = False
-
-            self.matrices = matrix_hsv_to_rgb(hue,sat,val)
-
-        elif self.plot_type == COLORMAP:
-            # Don't delete anything, maybe they want position #3, but
-            # do warn them if they have more than one channel
-            # requested.
-            #
-            # COLORMAP NOW GENERATES ONLY A GRAYSCALE IMAGE. WORK
-            # NEEDS TO BE DONE TO CHANGE THIS TO A SINGLE-CHANNEL
-            # MATRIX THAT TRANSLATES THROUGH A PALETTE OF 256 POSSIBLE
-            # COLORS THROUGH THE USE OF ColorMap and Palette.  WILL
-            # NEED TO PROBABLY WORK WITH PlotEngine SINCE IT CREATES
-            # THE FINAL IMAGES.
-            single_map = [each for each in self.matrices if each]
-            if len(single_map) > 1:
-                self.warning('More than one channel requested for ' + \
-                             'single-channel colormap')
-            if single_map:
-                max_map = max(single_map[0].flat)
-                if self.normalize and max_map > 0:
-                    single_map[0] = single_map[0] / max_map
-                self.matrices = (single_map[0], single_map[0], single_map[0])
-
-        elif self.plot_type == RGB:
-            # Replace any Nones with a matrix of size 'shape' full of values.
-            if self.background == BLACK_BACKGROUND:
-                self.matrices = tuple([each or zeros(shape,Float)
-                                      for each in self.matrices])
-            else:
-                self.matrices = tuple([each or ones(shape,Float)
-                                      for each in self.matrices])
-
-            # Otherwise do nothing, we're already in the RGB form.  Possibly
-            # change the order to make it match the Lissom order, OR
-            # ADD BLACK_BACKGROUND, WHITE_BACKGROUND COLOR SHIFTS.
-
+        if max(hue.flat) > 1 or max(sat.flat) > 1 or max(val.flat) > 1:
+            self.cropped = True
+        #self.warning('Plot: HSVMap inputs exceed 1. Clipping to 1.0')
+        if max(hue.flat) > 0: hue = MLab.clip(hue,0.0,1.0)
+        if max(sat.flat) > 0: sat = MLab.clip(sat,0.0,1.0)
+        if max(val.flat) > 0: val = MLab.clip(val,0.0,1.0)
         else:
-            self.warning('Unrecognized plot type')
+            self.cropped = False
 
-        # Construct a list of Histogram objects from the matrices that
-        # have been created and are waiting to go.  PROBABLY HAVE TO
-        # CHANGE ONCE HISTOGRAM DOES SOMETHING.
-        self.histograms = [Histogram(each) for each in self.matrices if each]
-        
+        self.matrices = matrix_hsv_to_rgb(hue,sat,val)
+
         return self
 
+
+    def get_channels_view_from_sheet(self):
+    
+        for each in self.channels:
+            
+            if each == None:
+                self.channel_views.append(None)
+                
+            ### JCALERT! This test has to be re-defined (Why Tuple?)
+            elif isinstance(each,str) or isinstance(each,tuple):
+                sv = self.source.sheet_view(each)
+                if sv == None:
+                    self.debug('No sheet view named ' + repr(each) + ' in Sheet ' + self.source.name)
+                    self.channel_views.append(None)
+                else:
+		    ### JCALERT! Hack to deal with the fact that UnitWeights comes in a list:
+                    ### It has to be changed in unit_view from connectionfield.py
+		    if isinstance(sv,list):
+		    	sv=sv[0]
+		    ###
+		    
+		    ### temporary debug
+		    #print "sv",sv.view_info
+		    self.channel_views.append(sv)
+
+                        ### JCALERT ! That has to be changed.
+                        ### JCALERT ! This is an hack so that the problem of displaying the right
+                        ### name under each map in activity and orientation map panel is solved
+                        ### It has to be changed so that it display what we want for each panel
+		        ### Also I think the name that is displayed should always be the plot_name
+		    
+                    self.view_info['src_name']  = self.source.name +"\n" + sv.view_info['src_name']
+                    self.view_info['view_type'] = sv.view_info['view_type']
+                
+    ### JC: this function will go when the problem of the projection plot will be solved.
+    def get_channels_view_from_sheet_view(self):
+
+	for each in self.channels:
+	    self.channel_views.append(each)
+	    if each != None:
+		self.view_info = each.view_info
+
+### JC: if we keep the concept of having list of sheet_view in the sheet_view_dict (for projection, and also, 
+### then an idea is to have a special function in the case of a list that return a list of 
+### Plots instead of a Plot. But I think it is not good idea anyway to have a list in the sheet_view_dict.              

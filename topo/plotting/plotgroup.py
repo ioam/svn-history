@@ -319,7 +319,13 @@ class BasicPlotGroup(PlotGroup):
         hue = pt.channels.get('Hue',None)
         confidence = pt.channels.get('Confidence',None)
         n = pt.channels.get('Normalize',False)
-        p = Plot((strength,hue,confidence),SHC,sheet,n,name=pt_name)
+        ### JCALERT! Should be changed to be:
+        p = Plot((strength,hue,confidence),sheet,n,name=pt_name)
+        #p = Plot((strength,hue,confidence),SHC,sheet,n,name=pt_name)
+        
+        ### JCALERT! I think here we could take the sheet_view and pass it to plot
+        ### sheet_view_list = [sheet.sheet_view(strength)]
+        ### Actially no: that will be done in Plot
         return [p]
 
 	
@@ -346,6 +352,8 @@ class UnitWeightsPlotGroup(PlotGroup):
         ### group template,  as well as the location: 
         ###  Does it has to be changed when working on PlotGroupPanel?
         ### (Passing parameter through the template has to be changed eventually)
+
+	### JC: This line can go.
         sheet_target = pt.channels['Sheet_name']
         (sheet_x,sheet_y) = pt.channels['Location']
 
@@ -354,32 +362,19 @@ class UnitWeightsPlotGroup(PlotGroup):
         ### hue = pt.channels['Hue']
         ### confidence = pt.channels['Confidence']
 
-        projection_list = []
+	plot_list = []
         if not isinstance(sheet,CFSheet):
             self.warning('Requested weights view from other than CFSheet.')
         else:
             for p in set(flatten(sheet.in_projections.values())):
-                key = ('Weights',sheet_target,p.name,sheet_x,sheet_y)
-                v = sheet.sheet_view(key)
-                if v:
-                    projection_list += [(sheet,p,each) for each in v if each.projection.name == p.name]
- 
-        # HERE IS WHERE WE (NEED TO?) ADD ADDITIONAL SORTING INFORMATION.
-	### JCALERT! What does that do?
-        projection_list.sort(key=lambda x: x[2].name,reverse=True)
+		### JCALERT! This has to be clarified: the sheet_view for a 
+		### weight belongs to the src_sheet, and the name in the key
+                ### is the destination sheet.
+                key = ('Weights',sheet.name,p.name,sheet_x,sheet_y)
+		### temporary debug print
+		#print "plotgroup",key
+		plot_list.append(Plot((key,None,None),p.src,pt.channels['Normalize']))
 
-        plot_list = []
-        for (a_sheet,projection,views) in projection_list:
-            if not isinstance(views,list):
-                views = [views]
-            for each in views:
-                if isinstance(each,SheetView):
-		    ### JC: here it needs to be changed: but plot.py also as to be fixed
-                    ### e.g. plot_list.append(Plot((each,hue,None),COLORMAP,s,pt.channels['Normalize']))
-		    plot_list.append(Plot((each,None,None),COLORMAP,None,pt.channels['Normalize']))
-                else:
-                    key = ('Weights',a_sheet,projection,sheet_x,sheet_y)
-                    plot_list.append(Plot((key,None,None),COLORMAP,p.src,pt.channels['Normalize']))
         self.debug('plot_list =' + str(plot_list))
         return plot_list
 	
@@ -397,7 +392,8 @@ class UnitWeightsPlotGroup(PlotGroup):
                 ### manipulate sheets here.
 		### also, it is supposed to return a view, but here it is used as a procedure.
                 ### (procedure that is applied to a connectionfield and add the unit_view in the 
-                ### sheet_view_dict of its source sheet
+                ### sheet_view_dict of its source sheet, that has to be fixed so that it put a UnitView
+                ### and not a list of unit_view)
                 each.unit_view(self.x,self.y)
 
    
@@ -434,25 +430,15 @@ class ProjectionPlotGroup(PlotGroup):
 
         ### JC apparently, the template carries the information for building
         ### the plot_key. It might be difficult to change now. (also see make_unit_weights_plot)
-	    key = (pt_name,c['Projection_name'],c['Density'],sheet.name)
-	    view_list = src_sheet.sheet_view(key)
-	    if not isinstance(view_list,list):
-		view_list = [view_list]
-            
+	    key = (pt_name,c['Projection_name'],c['Density'],sheet.name)            
 	    plot_list=[]
-        ### A list from the Sheet.sheet_view dictionary is
-        ### converted into multiple Plot generation requests.
-
-        ### JCALERT! This was and still is boggus: what is name?
-        ### It is not worse than before because the bug was already here
-        ### Need to be fixed in some way.
-	    for each in view_list:
-		if isinstance(each,SheetView):
-		    plot_list.append(Plot((each,None,None),COLORMAP,None,pt.channels['Normalize']))
-		else:
-                ### JCALERT! bug from plotengine: name is not defined here.(I think he meant key)
-		    plot_list.append(Plot((name,None,None),COLORMAP,sheet,pt.channels['Normalize']))
-
+	    ### JCALERT! for the moment, the sheet_view for a projection is a list of UnitView
+            ### This has to be changed, and so it is a temporary hack.
+            ### Finally, it won't be possible to pass a sheet_view directly when creating a Plot
+	    views = src_sheet.sheet_view_dict[key]
+	    for view in views:
+		plot_list.append(Plot((view,None,None),src_sheet,pt.channels['Normalize']))
+		
         return plot_list
 
 
@@ -485,6 +471,10 @@ class ProjectionPlotGroup(PlotGroup):
         coords = self._generate_coords()
         
         full_unitview_list = [self._sim_ep.unit_view(x,y) for (x,y) in coords]
+
+	### JCALERT! The use of chain and nested list here and in 
+        ### connectionfield.py (unit_view) can be spared or made simpler.
+
         filtered_list = [view for view in chain(*full_unitview_list)
                          if view.projection.name == self.weight_name]
 
@@ -532,7 +522,7 @@ pgt = PlotGroupTemplate([('Activity',
                                         'Confidence' : None,
                                         'Normalize'  : False}))],
                         name='Activity',
-                        command='pass')
+                        command='measure_activity()')
 
 # CEBHACKALERT: putting OrientationPreference in Hue is ok while we are only
 # talking about orientation maps.
