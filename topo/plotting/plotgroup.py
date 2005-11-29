@@ -134,8 +134,8 @@ class PlotGroup(TopoObject):
         self.bitmaps = []
         self.template = template
 
-        ### JC: Because of that, we might be able to get rid of some line about the filter
-        ###      in the plotengine file.        
+        ### JCALERT! Because of that, we might be able to get rid of some line about the filter
+        ###      in the plotengine file. (To do)       
         if sheet_filter_lam:
             self.sheet_filter_lam = sheet_filter_lam
         else:
@@ -147,6 +147,9 @@ class PlotGroup(TopoObject):
         ### pass the simulator as a parameter of PlotGroup  
 	### so directly put this line into PlotGroup rather than BasicPlotGroup
 	self.simulator = topo.base.registry.active_sim()
+
+	### JC: We do not call initialize_plot_list from the super class because we want the possibility
+        ### to create PlotGroup object from plot_list already built (cf InputParamPanel)
 
     ### JCALERT! we might want this function to be private.
     def initialize_plot_list(self):
@@ -175,17 +178,18 @@ class PlotGroup(TopoObject):
     ###JCALERT! We may want to implement a create_plots in the PlotGroup class
     ### Ask Jim about that.
 
-    #def create_plots(self):
-    # raise("Method not Implemented for the super class")
-    #
+    def create_plots(self):
+	raise NotImplementedError
+    
 
     ### JABHACKALERT!
     ###
     ### Shouldn't this raise NotImplementedError instead of passing?
     ### If implementing it is required, not optional, then it must.
 
-    ### JC: it is not clear what this function is doing anyway, or the name
-    ### should be changed or it should be spared
+    ### JCALERT! it is not clear what this function is doing anyway, or the name
+    ### should be changed or it should be spared. (To do)
+    ### That would require a re-organization of the way Plot are created in the sub-PlotGroup
 
     def do_plot_cmd(self):
         """
@@ -274,8 +278,11 @@ class PlotGroup(TopoObject):
         Generate the bitmap lists.
         """
         bitmap_list = []
-	### JC: now it is always a dynamic list, that could be changed for it to
-        ### be a static list but it is probably good like that (Ask Jim)
+
+	### JCALERT: now it is (almost) always a dynamic list (except the call from InputParamPanel..., 
+        ### that could be changed for it to be a static list ? (Ask Jim)
+        ### (It would require an explicit call to initialize_plot_list instead of the use of plot_list(),
+        ### in this case, the create_plots for the super-class will just be pass?)
         if isinstance(self.plot_list,types.ListType):
             self.debug('Static plotgroup')
             self.all_plots = flatten(self.plot_list) + self.added_list
@@ -284,6 +291,7 @@ class PlotGroup(TopoObject):
             self.all_plots = flatten(self.plot_list()) + self.added_list
             self.debug('all_plots = ' + str(self.all_plots))
 
+	### JCALERT! I don't understand this comment. I think it can go:
         # Eventually a simple list comprehension is not going to be
         # sufficient as outlining and other things will need to be
         # done to each of the matrices that come in from the Plot
@@ -295,7 +303,8 @@ class PlotGroup(TopoObject):
         ### JCALERT! For each plotgroup, we want the plot to be displayed
         ### in the alphabetical order according to their view_info['src_name']
         ### The only PlotGroup that does not have to do that is the projectionplotgroup
-        ### and that is why this function is overwritten
+        ### and that is why this function is overwritten. 
+        ### (It has to be fixed, as well as the handling of plot label in general)
         sort_plots(generated_bitmap_list)
         return generated_bitmap_list
     
@@ -312,11 +321,10 @@ class BasicPlotGroup(PlotGroup):
 
         ### JC: for basic PlotGroup, no need to create a "dynamic List"
         ### even we could get rid of this dynamic list and systematically call
-        ### plots() before load_images (cf plotgrouppanel)?
+        ### plots() before load_images (cf plotgrouppanel)?(cf JCALERT in plots() above)
 	self.plot_list = self.initialize_plot_list()
 
-    ### JCALERT! Maybe copy this function in the superclass?
-    ### Maybe not, like that it has to be re-implemented ...? (see with Jim)
+
     def create_plots(self,pt_name,pt,sheet):
 	
 	strength = pt.channels.get('Strength',None)
@@ -347,42 +355,37 @@ class UnitWeightsPlotGroup(PlotGroup):
   
     def create_plots(self,pt_name,pt,sheet):
 
-	### JC: the Sheet_name param ought to be in the plot key and not in the
-        ### group template,  as well as the location: 
-        ###  Does it has to be changed when working on PlotGroupPanel?
-        ### (Passing parameter through the template has to be changed eventually)
-
-	### JC: This line can go.
-        #sheet_target = pt.channels['Sheet_name']
-
-        (sheet_x,sheet_y) = pt.channels['Location']
-
 	### JCALERT: here the hue and confidence ought to be taken and used later on
         ### but a first work on plot.py is required to make these changes
-        ### hue = pt.channels['Hue']
-        ### confidence = pt.channels['Confidence']
+        hue = pt.channels.get('Hue',None)
+        confidence = pt.channels.get('Confidence',None)
 
 	### JCALERT! The problem is that the unitview is from the src_sheet
-        ### but the OrientationPreference sheet_view is in the dest_sheet !!
+        ### but the OrientationPreference sheet_view is in the dest_sheet
+        ### (I think I was wrong about that: we only colored lateral interactions?
+        ### anyway that does not work so far...)
 
 	plot_list = []
         if not isinstance(sheet,CFSheet):
             self.warning('Requested weights view from other than CFSheet.')
         else:
             for p in set(flatten(sheet.in_projections.values())):
+
 		### JCALERT! This has to be clarified: the sheet_view for a 
 		### weight belongs to the src_sheet, and the name in the key
                 ### is the destination sheet.
-                key = ('Weights',sheet.name,p.name,sheet_x,sheet_y)
+                key = ('Weights',sheet.name,p.name,self.x,self.y)
+
 		### temporary debug print
 		#print "plotgorup key:",key
 		#print "sheet_view:" , p.src.sheet_view_dict[key]
-		plot_list.append(Plot((key,None,None),p.src,pt.channels['Normalize']))
+		plot_list.append(Plot((key,hue,confidence),p.src,pt.channels['Normalize']))
 
         self.debug('plot_list =' + str(plot_list))
         return plot_list
 	
-    ### JCALERT! I am not sure this function is of any use here
+    ### JCALERT! I am not sure this function is of any use here, it should be put in another place...
+    ### or, change the name of it so that it is clearer when called for the PlotGroupPanels
     def do_plot_cmd(self):
         """
         Lambda function passed in, that will filter out all sheets
@@ -391,9 +394,8 @@ class UnitWeightsPlotGroup(PlotGroup):
         sheets = topo.base.registry.active_sim().objects(Sheet).values()
         for each in sheets:
             if self.sheet_filter_lam(each):
-		### JCALERT! It is confusing that the method unit_view is defined in the 
-                ### class connectionfield that does not inherit from Sheet, and that we are supposed to
-                ### manipulate sheets here.
+		### JCALERT! It is confusing that the method unit_view is only defined in the 
+                ### CFSheet class, and that we are supposed to manipulate sheets here.
 		### also, it is supposed to return a view, but here it is used as a procedure.
                 ### (procedure that is applied to a connectionfield and add the unit_view in the 
                 ### sheet_view_dict of its source sheet, that has to be fixed so that it put a UnitView
