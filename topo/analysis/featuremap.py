@@ -109,7 +109,6 @@ def measure_activity():
     """
     simulator = topo.base.registry.active_sim()
     for sheet in simulator.objects(Sheet).values():
-        print sheet
         activity_copy = array(sheet.activity)
         new_view = sheetview.SheetView((activity_copy,sheet.bounds),
                                         src_name=sheet.name,view_type='Activity')
