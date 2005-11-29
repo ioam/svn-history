@@ -193,6 +193,8 @@ def eval_atof(in_string,default_val = 0):
     return val
 
 
+# CEBHACKALERT: when a base class for PatternGeneratorParameter etc
+# exists, consider making this a method of that class.
 from inspect import ismodule
 def find_classes_in_package(package,parentclass):
     """
