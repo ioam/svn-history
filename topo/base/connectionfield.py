@@ -394,10 +394,13 @@ class CFSheet(ProjectionSheet):
     ### before doing a get_view, because only CFProjections support that call.
     def unit_view(self,x,y):
         """
-        Get a list of UnitView objects for a particular unit in this CFSheet.
-        
-        Can return multiple UnitView objects.
-        """
+	Creates the list of UnitView objects for a particular unit in this CFSheet,
+	(There is one UnitView for each projection to this CFSheet).
+
+	Each UnitView is then added to the sheet_view_dict of its source sheet.
+	It return the list of all UnitView for the given unit.
+	"""
+
         from itertools import chain
         views = [p.get_view(x,y) for p in chain(*self.in_projections.values())]
 
@@ -410,11 +413,7 @@ class CFSheet(ProjectionSheet):
         for v in views:
             src = v.projection.src
             key = ('Weights',v.projection.dest.name,v.projection.name,x,y)
-
-	    ### JCALERT! Why adding a list here? It has to be changed.
-            unit_list = src.sheet_view_dict.get(key,[])
-            unit_list.append(v)
-	    src.add_sheet_view(key,unit_list)
+	    src.add_sheet_view(key,v)
             self.debug('Added to sheet_view_dict', views, 'at', key)
 
         return views
