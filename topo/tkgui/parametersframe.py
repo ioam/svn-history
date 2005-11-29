@@ -10,6 +10,49 @@ import topo.base.registry
 from Tkinter import Frame, TOP, LEFT, RIGHT, BOTTOM, YES, N,S,E,W,X
 from topo.base.utils import eval_atof
 
+
+
+# CEBHACKALERT: this class will not be staying here.
+# (will probably go to patterngenerator.py)
+
+# CEBHACKALERT: see below
+from topo.base.keyedlist import KeyedList
+from topo.base.utils import find_classes_in_package,classname_repr
+# By default, none of the pattern types in topo/patterns/ are imported
+# in Topographica, but for the GUI, we want all of them to be
+# available as a list from which the user can select. To do this, we
+# import all of the PatternGenerator classes in all of the modules
+# mentioned in topo.patterns.__all__, and will also use any that the
+# user has defined and registered.
+from topo.base.patterngenerator import PatternGenerator
+from topo.patterns import *
+# end CEBHACKALERT
+
+from topo.base.parameter import Parameter
+class PatternGeneratorParameter(Parameter):
+    """
+    """
+    def __init__(self,default=None,doc="",**params):
+        """
+        """
+        Parameter.__init__(self,default=default,doc=doc,**params)
+
+    # CEBHACKALERT: temporary. This is probably not the best way to do this.
+    # Also, will be renamed and (e.g. range()) and implemented for all Parameters)
+    def available_types(self):
+        """
+        Return a KeyedList of PatternGenerators [(visible_name, <patterngenerator_class>)].
+        """
+        patternclasses = find_classes_in_package(topo.patterns, PatternGenerator)
+
+        k = KeyedList()
+    
+        for (pg_name,pg) in patternclasses.items():
+            k.append( (classname_repr(pg_name, 'Generator'), pg) )
+        
+        return k
+
+
 class ParametersFrame(Frame):
     """
     Property list frame for a PatternGenerator Parameter
@@ -28,6 +71,7 @@ class ParametersFrame(Frame):
     ### described as) being for widgets instead, and so on.
     
     def __init__(self, parent=None,**config):
+        self.parent = parent
         self.prop_frame = propertiesframe.PropertiesFrame(parent,string_translator=eval_atof)
         Frame.__init__(self,parent,config)
         self.__tparams = {}
@@ -46,20 +90,25 @@ class ParametersFrame(Frame):
     ### parameters of one single TopoObject.  At the moment it has a
     ### selection box for choosing such an object, and also includes
     ### its parameters, which is a mess.
-    def pg_parameters(self,pg_classname):
+    # CEB: I'm working on this.
+    def get_topo_class_parameters(self, topo_class):
         """
-        Return the list of Parameter names and objects for the requested PatternGenerator name.
+        Return a list of non-hidden Parameters for the specified class as (name, object)
         """
-        pgc = topo.base.registry.pattern_generators[pg_classname] 
-        pg = pgc()
+        topo_obj = topo_class()
         plist = [(k,v)
                  for (k,v)  # ('name':'...', 'density':10000, ...)
-                 in pg.get_paramobj_dict().items()
+                 in topo_obj.get_paramobj_dict().items()
                  if not v.hidden
                  ]
-        #print 'plist', plist
-        return plist
     
+        # for an object that has one parameter
+        # bob=Parameter()
+        # get back
+        # [('bob',<topo.base.parameter.Parameter object at ...>)]
+        return plist 
+
+
 
     ### JABHACKALERT!  Needs to be extended to support non-slider
     ### parameters, making a slider only for Numbers, and other
@@ -92,7 +141,7 @@ class ParametersFrame(Frame):
                 entry[1].set_slider_from_tag()
 
 
-    def refresh_sliders(self,new_name):
+    def refresh_sliders(self,topo_class_name):
         """
         The visible TaggedSliders will be updated.  The old ones are
         removed, and new ones are added to the screen.  The widgets
@@ -103,7 +152,9 @@ class ParametersFrame(Frame):
             s.grid_forget()
             c.grid_forget()
         # Make relevant parameters visible.
-        new_param_names = self.pg_parameters(new_name)
+        new_param_names = self.get_topo_class_parameters(topo_class_name)
+
+        
         self.__make_sliders_from_params(new_param_names,self.__tparams)
         new_sliders = dict(new_param_names).keys()
         new_sliders.sort()

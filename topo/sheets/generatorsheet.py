@@ -13,6 +13,9 @@ import copy
 
 from topo.base.parameter import Parameter, Dynamic
 
+# CEBHACKALERT: PatternGeneratorParameter will move (see parametersframe.py)
+from topo.tkgui.parametersframe import PatternGeneratorParameter
+
 from topo.base.patterngenerator import ConstantGenerator
 
 class GeneratorSheet(Sheet):
@@ -28,7 +31,7 @@ class GeneratorSheet(Sheet):
     ### JABALERT!  What is this for?  Either document it or remove it.
     theta = Parameter(default=0)
 
-    input_generator = Parameter(default=ConstantGenerator())
+    input_generator = PatternGeneratorParameter(default=ConstantGenerator())
     
     def __init__(self,**params):
         super(GeneratorSheet,self).__init__(**params)

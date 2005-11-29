@@ -9,18 +9,6 @@ $Id$
 __version__='$Revision$'
 from keyedlist import KeyedList
 
-############################################################
-# Registry for subclasses of PatternGenerator.  Users can add to this
-# list, and the GUI will automatically add them to the list of
-# PatternGenerator inputs possible.  Additional work may be necessary if
-# other than default Parameter names are used in the definition of the
-# PatternGenerator.
-# JAB: Please explain what that work might be, e.g. which files might
-# need to be edited...
-#
-# Format:   {'NewPatternGeneratorClassName':<NewPatternGeneratorClass>,....}
-pattern_generators = KeyedList()
-
 
 ############################################################
 # Global repository of plot templates, which can be augmented

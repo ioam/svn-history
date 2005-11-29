@@ -44,32 +44,6 @@ LIST_REVERSE = True
 # Default time to show in the Presentation duration box.
 DEFAULT_PRESENTATION = '1.0'
 
-# By default, none of the pattern types in topo/patterns/ are imported
-# in Topographica, but for the GUI, we want all of them to be
-# available as a list from which the user can select. To do this, we
-# import all of the PatternGenerator classes in all of the modules
-# mentioned in topo.patterns.__all__, and will also use any that the
-# user has defined and registered.
-from topo.patterns import *
-patternclasses=find_classes_in_package(topo.patterns,PatternGenerator)
-topo.base.registry.pattern_generators.update(patternclasses)
-
-
-from topo.base.keyedlist import KeyedList
-def patterngenerator_names():
-    """
-    Return a KeyedList [(viewable_name, PatternGenerator_name)] from the registry's PatternGenerators. 
-
-    The viewable_name is the PatternGenerator's name stripped of the Generator suffix, and with spaces
-    inserted between any capital letters in the name. PatternGenerator_name is the unaltered name.
-    """
-    k = KeyedList()
-    
-    for pg_name in topo.base.registry.pattern_generators.keys():
-        k.append( (classname_repr(pg_name, 'Generator'), pg_name) )
-        
-    return k
-
 
 class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
     def __init__(self,parent,pengine,console=None,padding=2,**config):
@@ -113,10 +87,21 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         buttonBox.add('Use for future learning',command = self.use_for_learning)
 
         # Define menu of valid PatternGenerator types
-        self.pg_name_dict = patterngenerator_names()
+
+        # CEBHACKALERT: this is just temporary while I reorganize these files.
+        # Take the list of PatternGenerators from the first GeneratorSheet's
+        # input_generator PatternGeneratorParameter for now.
+        for thing in self.in_ep_dict.values():
+            generator_sheet = thing['obj']
+            generator_sheet_params = generator_sheet.get_paramobj_dict()
+            self.pg_name_dict = generator_sheet_params['input_generator'].available_types()
+            break
+            
         self.input_types = self.pg_name_dict.keys()
         self.input_type = StringVar()
         self.input_type.set(self.input_types[0])
+
+
         Pmw.OptionMenu(self,command = self._refresh_sliders,
                        labelpos = 'w',label_text = 'Input Type:',
                        menubutton_textvariable = self.input_type,
@@ -166,8 +151,9 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         added to the screen.  The widgets themselves do not change but
         the grid location does.
         """
-        new_name = self.pg_name_dict[new_name]
-        self.param_frame.refresh_sliders(new_name)
+        pg_class = self.pg_name_dict[new_name]
+        
+        self.param_frame.refresh_sliders(pg_class)
         self.in_ep_dict = self.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         if self.auto_refresh: self.refresh()
 
@@ -274,7 +260,7 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         allows eyes to have different presentation patterns.
         """
         p = self.param_frame.prop_frame.get_values()
-        rp = dict(self.param_frame.pg_parameters(pg_name)).keys()
+        rp = dict(self.param_frame.get_topo_class_parameters(pg_name)).keys()
         ndict = {}
         ### JABHACKALERT!
         ###
@@ -286,7 +272,7 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
             if ep_dict[each]['state']:
                 ndict['density'] = ep_dict[each]['obj'].density
                 ndict['bounds'] = deepcopy(ep_dict[each]['obj'].bounds)
-                pg = topo.base.registry.pattern_generators[pg_name](**ndict)
+                pg = pg_name(**ndict)
                 ep_dict[each]['pattern'] = pg
         return ep_dict  
 
