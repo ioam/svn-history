@@ -127,6 +127,7 @@ class PlotEngine(TopoObject):
     ### it might be useful to call just with the name, In this case, we have to solve the problem
     ### of catching the exception when there is no such PlotGroup in the dict and group_type=None.
     ### Note that for the moment, such a call only happens in the testplotengine.py.)
+    ### I would change name to plot_key and group_type to template.
         
     def get_plot_group(self, name, group_type= None,
                        filter=None, class_type='BasicPlotGroup'):
@@ -152,6 +153,7 @@ class PlotEngine(TopoObject):
 
     
     ### JCALERT!  I would change group_type to be template or group_template
+    ### and name to be plot_key....
     
     def make_plot_group(self, name, group_type,filter_lam,class_type):
         """
