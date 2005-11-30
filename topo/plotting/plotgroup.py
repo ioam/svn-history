@@ -18,7 +18,6 @@ __version__='$Revision$'
 import types
 from topo.base.topoobject import TopoObject
 from topo.base.utils import flatten, dict_sort
-from topo.base.keyedlist import KeyedList
 from topo.base.sheet import Sheet
 import bitmap
 
@@ -29,9 +28,9 @@ import MLab
 from itertools import chain
 from Numeric import transpose, array
 
-from topo.base.parameter import Parameter
 
-from plot import Plot, SHC,HSV,RGB,COLORMAP
+
+from plot import Plot
 from topo.base.connectionfield import CFSheet
 from topo.base.sheetview import SheetView
 
@@ -51,49 +50,6 @@ def sort_plots(plot_list):
     """ This a simple routine to sort a plot list according to their src_name"""
     plot_list.sort(lambda x, y: cmp(x.view_info['src_name'], y.view_info['src_name']))
 
-
-class PlotGroupTemplate(TopoObject):
-    """
-    Container class for a PlotGroup object definition.  This is
-    separate from a PlotGroup object since it defines how to create a
-    PlotGroup object and should contain a series of PlotTemplates.
-    The PlotEngine will create the requested plot group type given a
-    group template definition.  The templates are used so that
-    standard plot types can be redefined at the users convenience.
-
-    The plot_templates member dictionary (KeyedList) can and should be
-    accessed directly by outside code.  It is a KeyedList (defined in
-    this file) so it can be treated like a dictionary using the []
-    notation, but it will preserve ordering.  An example definition:
-
-    pgt = PlotGroupTemplate([('ActivityPref',
-                              PlotTemplate({'Strength'   : 'Activity',
-                                            'Hue'        : 'Activity',
-                                            'Confidence' : 'Activity'}))],
-                            name='Activity SHC')
-
-    to change an entry in the above example:
-
-    pgt.plot_templates['ActivityPref'] = newPlotTemplate
-    """
-
-
-    command = Parameter(None)
-    def __init__(self, plot_templates=None, **params):
-        """
-        plot_templates are of the form:
-            ( (name_1, PlotTemplate_1), ... , (name_i, PlotTemplate_i) )
-        """
-
-
-        
-        super(PlotGroupTemplate,self).__init__(**params)
-        if not plot_templates:
-            self.plot_templates = KeyedList()
-        else:
-            self.plot_templates = KeyedList(plot_templates)
-        self.description = self.name
-        
 
 ### JCALERT! This file has been largely modified so that now, each PlotGroup creates
 ### its plot_list itself, instead of the PlotEngine doing it. The PlotEngine only
@@ -129,6 +85,8 @@ class PlotGroup(TopoObject):
         self.plot_list = plot_list
         self.all_plots = []
         self.added_list = []
+        
+        ### JCALERT! It has to redefined what self.shape is for. 
         self.shape = shape
         self.plot_key = plot_key
         self.bitmaps = []
@@ -529,50 +487,5 @@ class ProjectionPlotGroup(PlotGroup):
         return [each for each in generated_bitmap_list if each is not None]
 
 
-### JCALERT! What about putting that in a special file for defining PlotGroupTemplate?
- 
-# Populate the dynamic plot menu list registry
-import topo.base.registry
-from plot import PlotTemplate
-pgt = PlotGroupTemplate([('Activity',
-                          PlotTemplate({'Strength'   : 'Activity',
-                                        'Hue'        : 'OrientationPreference',
-                                        'Confidence' : None,
-                                        'Normalize'  : False}))],
-                        name='Activity',
-                        command='measure_activity()')
 
-# CEBHACKALERT: putting OrientationPreference in Hue is ok while we are only
-# talking about orientation maps.
-
-topo.base.registry.plotgroup_templates[pgt.name] = pgt
-pgt = PlotGroupTemplate([('Unit Weights',
-                          PlotTemplate({'Location'   : (0.0,0.0),
-                                        'Normalize'  : True,
-					'Sheet_name' : 'V1'}))],
-                        name='Unit Weights',
-                        command='pass')
-topo.base.registry.plotgroup_templates[pgt.name] = pgt
-pgt = PlotGroupTemplate([('Projection',
-                          PlotTemplate({'Density'         : 25,
-                                        'Projection_name' : 'None',
-                                        'Normalize'       : True}))],
-                        name='Projection',
-                        command='pass')
-topo.base.registry.plotgroup_templates[pgt.name] = pgt
-pgt = PlotGroupTemplate([('Orientation Preference',
-                          PlotTemplate({'Strength'   : None,
-                                        'Hue'        : 'OrientationPreference',
-                                        'Confidence' : None})),
-                         ('Orientation Preference&Selectivity',
-                          PlotTemplate({'Strength'   : None,
-                                        'Hue'        : 'OrientationPreference',
-                                        'Confidence' : 'OrientationSelectivity'})),
-                         ('Orientation Selectivity',
-                          PlotTemplate({'Strength'   : 'OrientationSelectivity',
-                                        'Hue'        : None,
-                                        'Confidence' : None}))],
-                        name='Orientation Preference',
-                        command = 'measure_or_pref()')
-topo.base.registry.plotgroup_templates[pgt.name] = pgt
 
