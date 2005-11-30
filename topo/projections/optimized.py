@@ -12,7 +12,7 @@ __version__='$Revision$'
 from topo.base.connectionfield import CFProjection
 from topo.base.parameter import Parameter
 from topo.base.projection import Identity
-from topo.base.utils import *
+#from topo.base.utils import *
 from topo.responsefns.basic import CFDotProduct_CPointer
 from topo.learningfns.basic import DivisiveHebbian_CPointer
 from Numeric import ones, Int
