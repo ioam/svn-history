@@ -1,45 +1,25 @@
 """
-Base Plot environment that manipulates SheetViews and has Histogram information
+Plot and PlotTemplate classes. Plot creates the 3 matrices necessary
+for plotting, from a three-tuple (channels) and a dictionnary of SheetViews.
 
-A plot contains information about one or more SheetViews that it combines
-to create a single matrix that can be displayed as a bitmap.  Associated with
-this single (constructed) box of information are multiple histograms that
-are stored within the base plot object.
+The channels specified the key to find the SheetViews that have to be retrieved
+for getting the 3 matrices necessary for plotting a RGB images. 
 
-The plot objects are clustered together within a PlotGroup Class which
-arranges multiple plots into a single figure on the screen.
+The plot objects are listed within a PlotGroup Class which then arranges
+multiple plots into a single figure in a PlotGroupPanel.
 
-The PlotEngine class uses PlotTemplate objects, embedded within
-PlotGroupTemplate objects to create the Plots that will generate the
-bitmaps that will be displayed on screen or saved to disk.  A
-PlotTemplate is essentially a dictionary of keyed information,
-containing sheet names, or channel settings.
-
-Kinds of PlotTemplates:
-    SHC Plots:
-        Keys:
-            Strength   - SheetView dictionary key
-            Hue        - SheetView dictionary key
-            Confidence - SheetView dictionary key
-    Unit Weights Plots:
-        Keys:
-            Location   - (x,y) tuple
-            Sheet_name - Name of sheet to pull unit weights
-    Projection Plots:
-        Keys:
-            Density    - Density to plot projection weights
-            Projection_name - Name of projection to plot.  Looks at
-                .src sheet_view_dict
-            
-
+Associated with this single (constructed) box of information are multiple histograms that
+are stored within the base plot object. (Not yet implemented)
 
 $Id$
 """
 __version__='$Revision$'
-### JABHACKALERT!
+
+
+### JCALERT!
 ### 
-### The code in this file has not yet been reviewed, and may need
-### substantial changes.
+### The code in this file is still being reviewed, and may still need
+### substantial changes. Particularly, the doc has to be reviewed.
 
 import sys
 import types
@@ -56,38 +36,16 @@ from Numeric import array
 import palette as palette 
 import MLab
 
-### JCALERT! look_up_dict could go in utils instead of sheet...
-### might even be erased and simply replaced by .get(key,None)
-from topo.base.sheet import look_up_dict
-
 ### JCALERT: that could go.
 
 # Types of plots that Plot knows how to create from input matrices.
-RGB = 'RGB'
-HSV = 'HSV'
-SHC = 'HSV'  # For now treat as an HSV, but reorder the channels.
-COLORMAP = 'COLORMAP'
+# RGB = 'RGB'
+# HSV = 'HSV'
+# SHC = 'HSV'  # For now treat as an HSV, but reorder the channels.
+# COLORMAP = 'COLORMAP'
 
-class PlotTemplate(TopoObject):
-    """
-    Container class for a plot object definition.  This is separate
-    from a Plot object since it defines how to create a Plot object
-    and should be contained within a PlotGroupTemplate.  The
-    PlotEngine will create the requested plot type given the template
-    definition.  The templates are used so that standard plot types
-    can be redefined at the users convenience.
 
-    For example, 'Activity' maps are defined as:
-    activity_template = PlotTemplate({'Strength'   : 'Activity',
-                                      'Hue'        : None,
-                                      'Confidence' : None})
-    """
 
-    def __init__(self, channels=None,**params):
-        super(PlotTemplate,self).__init__(**params)
-        #self.background = Dynamic(default=background)
-        self.channels = channels
-        
 
 
 ### JABHACKALERT!  This class should accept SheetViews, with no
@@ -100,6 +58,7 @@ class PlotTemplate(TopoObject):
 ### map consisently from a name string to a SheetView, without trying
 ### to handle all these special cases.  These classes are trying to be
 ### way too smart; they should simply plot whatever they are given.
+        
 class Plot(TopoObject):
     """
     Class that can construct a single bitmap plot from one or more
@@ -111,10 +70,7 @@ class Plot(TopoObject):
     palette_ = Dynamic(default=palette.Monochrome)
 
  
-    ### JCALERT! Instead of passing the sheet, we want to pass the dictionnary
-    ### it will solve the problem with inputparampanel
-    ### but before, I have to solve the problem of the projection that stores
-    ### lists of SheetView. (as well as for weights)
+    ### JCALERT! Pass the content of a template instead of channels.
 
     def __init__(self,(channel_1, channel_2, channel_3),sheet_view_dict,
                  normalize=False, **params):
@@ -123,13 +79,6 @@ class Plot(TopoObject):
         It is either a key that points to a stored SheetView on the
         variable sheet, or
         It is a SheetView object.
-
-        plot_type has three options: HSV, COLORMAP, or RGB.  HSV plots
-        will be converted to an RGB matrix triple.  COLORMAPs take in
-        a single channel, since each pixel should be a single value,
-        that should be selected from a palette.  RGB plots are
-        three-channel plots that are not mixed together like HSV,
-        since it is assumed the GUI display will be in RGB.
 
         sheet gives the object that the three channels will request
         SheetViews from if a String has been passed in.  Valid options
@@ -158,7 +107,7 @@ class Plot(TopoObject):
         self.cropped = False
         self.histograms = []
         self.channel_views = []
-        self.matrices = []         # Will hold 3 2D matrices.
+        self.matrices = []           # Will finally hold 3 2D matrices.
         self.normalize = normalize
 
         if self.view_dict == None:
@@ -297,6 +246,8 @@ class Plot(TopoObject):
         else:
             self.cropped = False
 
+
+        ### JCALERT! This function ought to be in Plot rather than bitmap.py
         self.matrices = matrix_hsv_to_rgb(hue,sat,val)
 
         return self
@@ -344,3 +295,4 @@ class Plot(TopoObject):
 ### JC: if we keep the concept of having list of sheet_view in the sheet_view_dict (for projection, and also, 
 ### then an idea is to have a special function in the case of a list that return a list of 
 ### Plots instead of a Plot. But I think it is not good idea anyway to have a list in the sheet_view_dict.              
+### JCALERT! The histograms should be implemented and an object histograms assign to a Plot()
