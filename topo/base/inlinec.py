@@ -25,6 +25,7 @@ the function is a stub.
 
 $Id$
 """
+from copy import copy
 
 # In case an outside package wants to know
 weave_imported = False
@@ -35,9 +36,18 @@ try:
     import weave
     weave_imported = True
 
+    # Default parameters to add to the inline_weave() call.
+    inline_named_params = {
+        'extra_compile_args':['-O2','-fomit-frame-pointer','-funroll-loops'],
+        'extra_link_args':['-lstdc++'],
+        'compiler':'gcc'
+        }
+
     def inline_weave(*params,**nparams):
-        print params, nparams
-        weave.inline(*params,**nparams)
+        named_params = copy(inline_named_params) # Make copy of defaults.
+        named_params.update(nparams)             # Add newly passed named parameters.
+        weave.inline(*params,**named_params)
+    # Not part of function.  Overwrites old definition with new.
     inline = inline_weave
 
 except ImportError:
@@ -48,5 +58,5 @@ optimized = weave_imported
 
 # Simple test
 if __name__ == '__main__':
-    inline('printf("Hello World!\\n");')
+    inline('printf("Hello World!!\\n");')
 
