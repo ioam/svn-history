@@ -29,14 +29,15 @@ $Id$
 # In case an outside package wants to know
 weave_imported = False
 
-def inline(*params): raise NotImplementedError
+def inline(*params,**nparams): raise NotImplementedError
 
 try:
     import weave
     weave_imported = True
 
-    def inline_weave(*params):
-        weave.inline(*params)
+    def inline_weave(*params,**nparams):
+        print params, nparams
+        weave.inline(*params,**nparams)
     inline = inline_weave
 
 except ImportError:
