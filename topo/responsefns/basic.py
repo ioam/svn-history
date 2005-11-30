@@ -10,7 +10,7 @@ __version__='$Revision $'
 
 from topo.base.connectionfield import CFResponseFunction
 from topo.base.parameter import Parameter
-import weave
+from topo.base.inlinec import inline
 
 class CFDotProduct_Py(CFResponseFunction):
     """
@@ -161,7 +161,7 @@ class CFDotProduct(CFResponseFunction):
             free(prev_act);
         """
     
-        weave.inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], extra_link_args=['-lstdc++'])
+        inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
 
 
@@ -318,5 +318,5 @@ class CFDotProduct_CPointer(CFResponseFunction):
 
         """
 
-        weave.inline(code, ['X', 'strength', 'len', 'temp_act','cols','rows','weight_ptrs','slice_ptrs'], extra_compile_args=['-fomit-frame-pointer'], extra_link_args=['-lstdc++'])
+        inline(code, ['X', 'strength', 'len', 'temp_act','cols','rows','weight_ptrs','slice_ptrs'], local_dict=locals())
 

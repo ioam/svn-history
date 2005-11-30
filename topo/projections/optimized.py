@@ -6,18 +6,13 @@ $Id$
 """
 __version__='$Revision$'
 
-### JABHACKALERT!
-###
-### Should eliminate import *.
 from topo.base.connectionfield import CFProjection
 from topo.base.parameter import Parameter
 from topo.base.projection import Identity
-#from topo.base.utils import *
 from topo.responsefns.basic import CFDotProduct_CPointer
 from topo.learningfns.basic import DivisiveHebbian_CPointer
+from topo.base.inlinec import inline
 from Numeric import ones, Int
-
-import weave
 
 class CFProjection_CPointer(CFProjection):
     """
@@ -86,7 +81,7 @@ def setup_wp(cfs, wp, rows, cols):
             }
         }
     """
-    weave.inline(hebbian_code, ['cfs', 'wp', 'rows', 'cols'],  extra_compile_args=['-fomit-frame-pointer','-funroll-loops'], extra_link_args=['-lstdc++'])
+    inline(hebbian_code, ['cfs', 'wp', 'rows', 'cols'], local_dict=locals())
 
 
 def setup_sp(cfs, sp, rows, cols):
@@ -112,5 +107,5 @@ def setup_sp(cfs, sp, rows, cols):
             }
         }
     """
-    weave.inline(hebbian_code, ['cfs', 'sp', 'rows', 'cols'],  extra_compile_args=['-fomit-frame-pointer','-funroll-loops'], extra_link_args=['-lstdc++'])
+    inline(hebbian_code, ['cfs', 'sp', 'rows', 'cols'], local_dict=locals())
 

@@ -5,8 +5,7 @@ $Id$
 """
 __version__ = "$Revision$"
 
-import weave
-
+from topo.base.inlinec import inline
 from topo.base.topoobject import TopoObject
 from topo.base.parameter import Parameter,Constant
 from topo.base.projection import Identity
@@ -83,7 +82,7 @@ class Hebbian(CFLearningFunction):
             }
         """
         
-        weave.inline(hebbian_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'cfs', 'learning_rate'], extra_compile_args=['-O2','-fomit-frame-pointer','-funroll-loops'], extra_link_args=['-lstdc++'])
+        inline(hebbian_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'cfs', 'learning_rate'],local_dict=locals())
 
         # Apply output_fn to each CF
         # (skipped entirely for no-op case, as an optimization)
@@ -172,7 +171,7 @@ class DivisiveHebbian(CFLearningFunction):
             }
         """
         
-        weave.inline(hebbian_div_norm_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'learning_rate'], extra_compile_args=['-O2','-fomit-frame-pointer','-funroll-loops'], extra_link_args=['-lstdc++'])
+        inline(hebbian_div_norm_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'learning_rate'], local_dict=locals())
 
 
 
@@ -263,6 +262,6 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
             }
         """
         
-        weave.inline(hebbian_div_norm_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'learning_rate','weight_ptrs','slice_ptrs'], extra_compile_args=['-fomit-frame-pointer','-funroll-loops'], extra_link_args=['-lstdc++'])
+        inline(hebbian_div_norm_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'learning_rate','weight_ptrs','slice_ptrs'], local_dict=locals())
 
 
