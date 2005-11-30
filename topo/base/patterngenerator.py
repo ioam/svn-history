@@ -29,7 +29,7 @@ __version__='$Revision$'
 from topoobject import TopoObject
 from boundingregion import BoundingBox
 from sheet import  matrixidx2sheet, bounds2shape
-from Numeric import add,subtract,cos,sin,array
+from Numeric import add,subtract,cos,sin,array,around
 from MLab import flipud,rot90
 from parameter import Parameter,Number
 from math import pi
@@ -115,14 +115,15 @@ class PatternGenerator(TopoObject):
                         params.get('x', self.x),
                         params.get('y',self.y),
                         params.get('orientation',self.orientation),
+                        # CEBHACKALERT: why are rows and cols here?
                         params.get('rows',0),
                         params.get('cols',0))
         return self.scale*self.function(**params)+self.offset
 
     def __setup_xy(self,bounds,density,x,y,orientation,rows,cols):
         self.verbose("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
-        xm,ym = self.__produce_pattern_matrices(bounds,density,rows,cols)
-        self.pattern_x, self.pattern_y = self.__transform_coordinates(xm-x,ym-y,orientation)
+        x_points,y_points = self.__produce_sampling_vectors(bounds,density,rows,cols)
+        self.pattern_x, self.pattern_y = self.__create_and_rotate_coordinates(x_points-x,y_points-y,orientation)
 
     def function(self,**params):
         """
@@ -134,14 +135,16 @@ class PatternGenerator(TopoObject):
         """
         raise NotImplementedError
 
-    def __produce_pattern_matrices(self, bounds, density, r, c):
+    def __produce_sampling_vectors(self, bounds, density, r, c):
         """
         Generate vectors representing coordinates at which the pattern will be sampled.
 
-        Sets up two vectors for the x and y values based on a bounds and density.
-        The x and y vectors are lists of indexes at which to sample the pattern
-        function.
+        pattern_x is a 1d-array of x-axis values at which to sample the pattern;
+        pattern_y contains the y-axis values.
+
+        Both contain smaller to larger values from left to right, i.e. they follow Cartesian convention.
         """       
+        # CEBHACKLERT: why is this here? (See alert above.)
         if r == 0 and c == 0:
             rows,cols = bounds2shape(bounds,density)
         else:
@@ -155,33 +158,27 @@ class PatternGenerator(TopoObject):
         # TODO: this can generate output that may be off by one in terms of size,
         # for example most times this generates a 100x100 image, but sometimes
         # it generates a 101x100 
-
+        # CEB: should this JABHACKALERT go now matrixidx2sheet has been fixed?
+        # Or if not, should this alert be moved to that function?
         pattern_y = array([matrixidx2sheet(r,0,bounds,density) for r in range(rows)])
         pattern_x = array([matrixidx2sheet(0,c,bounds,density) for c in range(cols)])
+
+        pattern_y = pattern_y[::-1,1]
+        pattern_x = pattern_x[:,0]
+
         assert len(pattern_x) == cols
         assert len(pattern_y) == rows
-        return pattern_x[:,0], pattern_y[:,1]
 
-    def __transform_coordinates(self, pattern_x, pattern_y, orientation):
+        return pattern_x, pattern_y
+
+    def __create_and_rotate_coordinates(self, x, y, orientation):
         """
-        Rotates and translates the given matrix coordinates.
-
-        Accepts Numeric matrices specifing the x and y coordinates
-        (separately), along with an orientation value.  Returns two Numeric
-        matrices of the same shape, but with the coordinate values translated
-        and rotated to have the specified origin and orientation.
+        Creates pattern matrices from x and y vectors, and rotates them to the specified orientation.
         """
-        new_pattern_x = subtract.outer(cos(pi-orientation)*pattern_x, sin(pi-orientation)*pattern_y)
-        new_pattern_y = add.outer(sin(pi-orientation)*pattern_x, cos(pi-orientation)*pattern_y)
+        pattern_y = subtract.outer(-cos(orientation)*y, sin(orientation)*x)
+        pattern_x = add.outer(-sin(orientation)*y, cos(orientation)*x)
 
-        new_pattern_x = flipud(-rot90(new_pattern_x))
-        new_pattern_y = flipud(rot90(new_pattern_y))
-        return new_pattern_x, new_pattern_y
-
-
-
-
-
+        return pattern_x, pattern_y
 
 
 # Trivial example of a PatternGenerator, provided for when a default is
