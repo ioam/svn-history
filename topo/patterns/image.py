@@ -9,7 +9,7 @@ from topo.base.topoobject import TopoObject
 from topo.base.sheet import bounds2shape
 from topo.outputfns.basic import DivisiveMaxNormalize
 from topo.base.patterngenerator import PatternGenerator
-from topo.base.parameter import Parameter, Number
+from topo.base.parameter import Filename, Number, Parameter
 from Numeric import array, transpose, ones, floor, Float, divide, where
 import Image, ImageOps
 
@@ -150,9 +150,8 @@ class ImageGenerator(PatternGenerator):
 
     # CEBHACKALERT:
     # Until parametersframe is changed to allow non-number parameters, etc,
-    # this has to be hidden. Eventually could be 'default="a_file_name"' or
-    # 'default=TopoImage_name', or whatever.
-    image = Parameter(default=TopoImage(filename='examples/ellen_arthur.pgm'), hidden=True)
+    # this has to be hidden. 
+    image_path = Filename(default='examples/ellen_arthur.pgm', hidden=True)
     
     def function(self,**params):
         bounds  = params.get('bounds', self.bounds)
@@ -161,8 +160,9 @@ class ImageGenerator(PatternGenerator):
         y       = params.get('pattern_y',self.pattern_y)
         width   = params.get('width',self.width)
         height  = params.get('height',self.height)
-        image   = params.get('image',self.image)
-        
+        image_path = params.get('image_path',self.image_path)
+
+        image = TopoImage(image_path)
         return image(x,y,bounds,density, width, height)
 
 

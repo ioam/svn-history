@@ -159,6 +159,31 @@ class Parameter(object):
     __doc__ = property(_get_doc)
 
 
+import os.path
+class Filename(Parameter):
+    """
+    Filename is a Parameter that takes a string specifying the
+    path to a file. When asked for its value, it returns
+    the path in the correct format for the operating system.
+    """
+    def __init__(self,default=None,**params):
+        Parameter.__init__(self,default,**params)
+
+    def __get__(self,obj,objtype):
+        """
+        Get a Filename value.  If called on the class, produce the
+        default value.  If called on an instance, produce the instance's
+        value, if one has been set, otherwise produce the default value.
+        """
+        if not obj:
+            result = self.default
+        else:
+            result = obj.__dict__.get(self.get_name(obj),self.default)
+        # CEBHACKALERT: os.path.join() is not the right method to turn the string
+        # 'result' into a path for the user's OS.
+        # Also, should this check that the file exists?
+        return os.path.join(result)
+
 
 class Number(Parameter):
     """
@@ -306,6 +331,7 @@ class BooleanParameter(Parameter):
             raise "BooleanParameter must be True or False"
 
         super(BooleanParameter,self).__set__(obj,val)
+
 
 
 ### Should this multiply inherit from Dynamic and Number?
