@@ -13,8 +13,7 @@ from basicplotgrouppanel import BasicPlotGroupPanel
 from unitweightspanel import UnitWeightsPanel
 from projectionpanel import ProjectionPanel
 from inputparamspanel import InputParamsPanel
-from topo.plotting.plotgroup import PlotGroupTemplate
-from topo.plotting.plot import PlotTemplate
+from topo.plotting.plotgrouptemplate import PlotGroupTemplate, PlotTemplate
 from topo.base import simulator
 import topo.base.registry
 import topo.plotting.plotengine

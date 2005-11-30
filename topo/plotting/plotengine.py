@@ -64,7 +64,6 @@ __version__='$Revision$'
 from copy import deepcopy
 from topo.base.topoobject import TopoObject
 from topo.base.utils import flatten, dict_sort
-from plot import Plot, SHC,HSV,RGB,COLORMAP
 from plotgroup import *
 from topo.base.sheet import Sheet
 from topo.base.connectionfield import CFSheet
