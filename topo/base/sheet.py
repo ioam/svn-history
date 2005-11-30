@@ -266,21 +266,6 @@ def bounds2shape(bounds,density):
     if cols == 0: cols = 1
     return rows,cols
 
-### JCALERT! That is done to replace what is currently done by sheet_view
-### When sheet_view will be erased, I will have to call this routine when replacing
-### the calls to sheet_view.
-### Also, it might go into utils instead of staying here.
-
-def look_up_dict(dict,requested_key):
-    """
-    Simple routine that return the object corresponding to key
-    and None if there is no such key in the dictionnary.
-    """
-    if dict.has_key(requested_key):
-        item = dict[requested_key]
-    else:
-        item = None
-    return item    
 
 class Sheet(EventProcessor):
     """
