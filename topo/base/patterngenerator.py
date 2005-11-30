@@ -29,11 +29,9 @@ __version__='$Revision$'
 from topoobject import TopoObject
 from boundingregion import BoundingBox
 from sheet import  matrixidx2sheet, bounds2shape
-from Numeric import add,subtract,cos,sin,array,around
-from MLab import flipud,rot90
+from Numeric import add,subtract,cos,sin,array
 from parameter import Parameter,Number
 from math import pi
-import registry
 
 ### JABHACKALERT!
 ### 
