@@ -28,7 +28,9 @@ import sys
 import types
 import MLab
 
+### JC: I think it can go, to check:
 from topo.base.sheetview import *
+
 from Numeric import zeros, ones, Float, divide
 from topo.base.topoobject import TopoObject
 from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
@@ -91,8 +93,6 @@ class Plot(TopoObject):
         self.cropped = False
         self.histograms = []
 
-	### Maybe changed the name of channel_views to be view_list?
-        self.channel_views = []
         self.matrices = []              # Will finally hold 3 matrices (or more?)
         self.normalize = normalize
 
@@ -122,43 +122,73 @@ class Plot(TopoObject):
                     the matrices is self.matrices. NOT YET IMPLEMENTED)           
         """
 
-	self._get_channel_views_from_view_dict()
+	self._get_matrices_from_view_dict()
 
-	### JC: write this function to cut the long code.
-	#self._get_matrices_from_channel_views()
+	### JCALERT ! The name should be changed...
+	hsv_matrices = self._make_hsv_matrices()
 
-        ### JABALERT! Need to document what this code does.
+	### JCALERT! Think about mae_hsv_matrices beeing a procedure
+        ### directly working on self.matrices and change matrix_hsv_to_rgb to
+        ### take a list of matrices or tuple of matrices. 
+	if hsv_matrices == None:
+	    ### JCALERT! Why are there empty plot when doing orientation map?
+            ### This should maybe not returned None in this case?
+            ### It should come from the PlotGroup that looks into all sheets in the simulator
+	    ### even the Retina...
+	    #print("Empty Plot")
+	    return None
+	else:
+	    (hue,sat,val)= hsv_matrices
 
-        ### JCALERT! The code below can be made clearer.
-        ### Especially, the passing None in channel_views can be changed.
-	### Also, this can be put in another function...
-            
-	shape = (0,0)
-        self.debug('self.channel_views = ' + str(self.channel_views))
-         
+	     ### JCALERT! This function ought to be in Plot rather than bitmap.py
+	    self.matrices = matrix_hsv_to_rgb(hue,sat,val)
+	    return self
+
+
+    def _get_matrices_from_view_dict(self):
+        """
+	sub-function of plot() that just retrieve the views from the view_dict
+	as specified by the channels, and create its matrices attribute accordingly 
+	(list of view matrices from SheetView.view() ).
+
+	(It just deals with the fact that channels can be None, or that the keys
+	specified by channels can potentially refer to no SheetViews in the dict).
+        """  
 	self.matrices=[]
-        for each in self.channel_views:
-
-	    if each != None:
-		view_matrix = each.view()
-		self.matrices.append(view_matrix[0]) # Discards boundingbox
-		shape = view_matrix[0].shape
-	    else:
+        for each in self.channels:
+	    ### JCALERT! Presumably, if each == None then there is no key equal to None in the 
+            ### dict and then sv==None. Ask Jim if it is alright, because it is always possible that
+            ### some mad man has done dict[None]=who_knows_what ?
+	    sv = self.view_dict.get(each, None)
+	    if sv == None:
 		self.matrices.append(None)
-		
-	
-# 	if self.matrices[0] == None:
-# 	    raise ValueError("EmptyPlot")
-# 	else:
-# 	    shape = self.matrices[0].shape
+	    else:
+		view_matrix = sv.view()
+		self.matrices.append(view_matrix[0]) # discard boudingbox  
 
-        ### JC: For clarity, this could be another function.
-	    
-	    # By this point, self.matrices should be a triple of 2D
-        # matrices trimmed and ready to go to the caller of this
-        # function ... after a possible conversion to a different
-        # palette form.
-        
+	    ### JCALERT ! This is an hack so that the problem of displaying the right
+	    ### name under each map in activity and orientation map panel is solved
+	    ### It has to be changed so that it display what we want for each panel
+	    ### Also I think the name that is displayed should always be the plot name
+            ### (Also see in create_plots for each PlotGroup sub-classes)
+            ### This should not be in this function at all	
+		self.view_info['src_name'] = sv.view_info['src_name'] + self.name
+		self.view_info['view_type'] = sv.view_info['view_type']
+
+
+    ### JCALERT! The doc has to be reviewed (as well as the code by the way...)
+    ### The function should be made as a procedure working on self.matrices directly...
+    def _make_hsv_matrices(self):
+	""" 
+	Sub-function that return the h,s,v matrices corresponding to
+        self.matrices,
+        also applying normalizing of the plot if required.
+	"""
+	shape=(0,0)
+	for mat in self.matrices:
+	    if mat != None:
+		shape = mat.shape
+
 	s,h,c = self.matrices
 
         zero=zeros(shape,Float)
@@ -195,39 +225,10 @@ class Plot(TopoObject):
         else:
             self.cropped = False
 
+	
+	return (hue,sat,val)
 
-        ### JCALERT! This function ought to be in Plot rather than bitmap.py
-        self.matrices = matrix_hsv_to_rgb(hue,sat,val)
-
-        return self
-
-
-    def _get_channel_views_from_view_dict(self):
-        """sub-function of plot() that just retrieve the views from the view_dict
-           as specified by the channels, and create channel_views (list of sheet_view).
-
-           (It just deal with the fact that channels can be None, or that the keys
-            specified by channels can potentially refer to no SheetViews in the dict).
-        """  
-	self.channel_views=[]
-        for each in self.channels:
-	    ### JCALERT! Presumably, if each == None then there is no key equal to None in the 
-            ### dict and then sv==None. Ask Jim if it is alright, because it is always possible that
-            ### some mad man has done dict[None]=who_knows_what ?
-	    sv = self.view_dict.get(each, None)
-	    if sv == None:
-		self.channel_views.append(None)
-	    else:
-		self.channel_views.append(sv)       
-	    ### JCALERT ! This is an hack so that the problem of displaying the right
-	    ### name under each map in activity and orientation map panel is solved
-	    ### It has to be changed so that it display what we want for each panel
-	    ### Also I think the name that is displayed should always be the plot name
-            ### (Also see in create_plots for each PlotGroup sub-classes)	
-		self.view_info['src_name'] = sv.view_info['src_name'] + self.name
-		self.view_info['view_type'] = sv.view_info['view_type']
-
-		
+	
     ### JCALERT! Actually, this function can be used this way.
     ### It is called from release_sheetviews in PlotGroup and enable to
     ### free memory space when we don't need the SheetViews entry anymore.
