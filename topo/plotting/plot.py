@@ -1,15 +1,17 @@
 """
-Plot and PlotTemplate classes. Plot creates the 3 matrices necessary
-for plotting, from a three-tuple (channels) and a dictionnary of SheetViews.
+Plot and PlotTemplate classes. 
 
-The channels specified the key to find the SheetViews that have to be retrieved
-for getting the 3 matrices necessary for plotting a RGB images. 
+Plot creates the 3 matrices necessary for plotting a RGB image, 
+from a three-tuple (channels) and a dictionnary of SheetViews.
+
+The channels specify the key to find the SheetViews that have to be retrieved
+for this purpose. 
 
 The plot objects are listed within a PlotGroup Class which then arranges
 multiple plots into a single figure in a PlotGroupPanel.
 
 Associated with this single (constructed) box of information are multiple histograms that
-are stored within the base plot object. (Not yet implemented)
+are stored within the base plot object. (Not yet implemented.)
 
 $Id$
 """
@@ -25,28 +27,19 @@ import sys
 import types
 
 from Numeric import zeros, ones, Float, divide
-
 from topo.base.topoobject import TopoObject
 from topo.base.utils import flatten
-from topo.base.sheetview import *
+
+### I think this import statement can go now...
+#from topo.base.sheetview import *
+
 from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
+
 from histogram import Histogram
 from topo.base.parameter import Dynamic
 from Numeric import array
 import palette as palette 
 import MLab
-
-### JCALERT: that could go.
-
-# Types of plots that Plot knows how to create from input matrices.
-# RGB = 'RGB'
-# HSV = 'HSV'
-# SHC = 'HSV'  # For now treat as an HSV, but reorder the channels.
-# COLORMAP = 'COLORMAP'
-
-
-
-
 
 ### JABHACKALERT!  This class should accept SheetViews, with no
 ### reference to anything of type Sheet, and no plotting of anything
@@ -58,11 +51,15 @@ import MLab
 ### map consisently from a name string to a SheetView, without trying
 ### to handle all these special cases.  These classes are trying to be
 ### way too smart; they should simply plot whatever they are given.
-        
+
+
+### JCALERT! WHAT about histograms? (ask Jim)  
+### JCALERT! The histograms should be implemented and an object histograms assign to a Plot() 
+### WHAT does bitmap really mean here? (ask Jim and review the doc)     
 class Plot(TopoObject):
     """
-    Class that can construct a single bitmap plot from one or more
-    SheetViews, optionally including a Histogram.  The bitmap is just
+    Class that constructs a bitmap plot from one or more
+    SheetViews (optionally including a Histogram).  The bitmap is just
     stored for future use, e.g. as part of a PlotGroup of related
     plots displayed within one GUI window.
     """
@@ -70,98 +67,72 @@ class Plot(TopoObject):
     palette_ = Dynamic(default=palette.Monochrome)
 
  
-    ### JCALERT! Pass the content of a template instead of channels.
+    ### JCALERT! - Pass the content of a template instead of channels?
+    ### Or pass a list of three tuples? To be fixed with Jim.
+    ### Also: - put normalize in PlotGroup?
 
     def __init__(self,(channel_1, channel_2, channel_3),sheet_view_dict,
                  normalize=False, **params):
         """
-        channel_1, channel_2, and channel_3 all have one of two types:
-        It is either a key that points to a stored SheetView on the
-        variable sheet, or
-        It is a SheetView object.
+        (channel_1, channel_2, channel_3) are keys that point to a stored 
+        SheetView in sheet_view_dict, as specified in a PlotTemplate.
+        None is also possible if the Plot is only built from one or two
+        SheetViews.
 
-        sheet gives the object that the three channels will request
-        SheetViews from if a String has been passed in.  Valid options
-        are: None, Single Sheet, or None.
-        TODO: TRIPLE OF SHEETS, ONE FOR EACH CHANNEL, IS CURRENTLY NOT
-        IMPLEMENTED.  CURRENT IMPLEMENTATION REQUIRES THAT ALL
-        CHANNELS DERIVE FROM THE SAME SHEET.  SHOULD EXTEND
-        self.source SO THAT DIFFERENT SHEET INPUTS ARE POSSIBLE
-        (7/2005)
+	sheet_view_dict is a dictionary of SheetViews, generally belonging 
+        to a Sheet object but not necessarily.
 
-        If each of the channels are preconstructed SheetViews, there
-        is no reason to pass in the sheet, and therefore it can be
-        left blank.
+	normalize specified is the Plot is normalized or not.
+        
+        a 'name' parameter is inherited from TopoObject.
+           
+        TODO: implement the possibility to pass more than three 
+        SheetView keys for more complicated plots (12/01/05)
+        """   
+        ### JCALERT! That was in the doc: WHAT ABOUT BOUNDINGREGIONS?
+        ### Is it important? (Ask Jim)
 
-        Named parameter 'name' is being inherited from TopoObject
-
-        WHAT ABOUT BOUNDINGREGIONS?
-        """
         super(Plot,self).__init__(**params)
 
       	self.view_dict = sheet_view_dict
-
         self.channels = (channel_1, channel_2, channel_3)
 
+	### JC: maybe we can use the parameter name instead of having a view_info?
         self.view_info = {}
+
         self.cropped = False
         self.histograms = []
+
+	### Maybe changed the name of channel_views to be view_list?
         self.channel_views = []
-        self.matrices = []           # Will finally hold 3 2D matrices.
+        self.matrices = []              # Will finally hold 3 matrices (or more?)
         self.normalize = normalize
 
         if self.view_dict == None:
             raise ValueError("A Plot should be passed a sheet_view_dict when created")
-  
 
-    ### JCALERT! Is it really a useful and meaningful function?
-    def shape(self):
-        """ Return the shape of the first matrix in the Plot """
-        return self.matrices[0].shape
+	### JCALERT! maybe also raise something when channels are all None?    
 
-
-    ### JCALERT! This function should go in another place but not in plot. (I think)
-    def release_sheetviews(self):
-        """
-        Delete any Sheet.sheet_view_dict entries used by this plot, under
-        the assumption that this Plot is the only object that references
-        the SheetView on the Sheet with that dictionary key.
-        """
-        for each in self.channels:
-            # Case 2 is the only time a Sheet holds a SheetView that needs
-            # to be deleted.
-
-	    #### JCALERT! To fix now that it is a dictionnary that is passed...
-            # if isinstance(each,str) or isinstance(each,tuple):
-#                     self.view_dict.release_sheet_view(each)
-            ### JC: it works like that view_dict is the same pointer than sheet_view_dict!
-	    del self.view_dict[each]
-
-
-    ### JCALERT! This function is called by load_images in PlotGroup
-                    
+    # JC: This function is called by load_images in PlotGroup and sub-classes.  
+    ### Maybe it should just be called from __init__ ?             
     def plot(self):
         """
         Get the SheetViews requested from each channel passed in at
-        creation, combines them as necessary, and generates the
-        Histograms.  plot() is here to allow dynamic creation of plots,
-        even after the creation of the Plot object.  See the input
-        parameters to the Plot object constructor.
-        
+        creation, combines them as necessary, (and generates the
+        Histograms, not yet implemented).  plot() is here to allow dynamic creation of plots,
+        even after the creation of the Plot object. 
+            
         Returns: self (Plot)
-            Important features of this object are:
-                self.matrices: Triple of 2D Matrices mapping to the
-                    R/G/B channels.
-                self.histograms: List of Histogram objects associated with
-                    the matrices is self.matrices.
-                self.view_info: Name information that can be used to create
-                    labels and filenames.
-        """
 
-	### JC: commented out now that we pass a dict instead of a sheet.
-      #   self.debug('plot() channels = ' + str(self.channels) + \
-#                    'self.view_dict = ' + repr(self.view_dict) + \
-#                    'type(self.source) = ' + str(type(self.source)))
+        Important features of this object are:
+
+	   self.matrices: Triple of Matrices mapping to the
+	                  R/G/B channels.
+           self.view_info: Name information that can be used to create
+                           labels and filenames.
+           (self.histograms: List of Histogram objects associated with
+                    the matrices is self.matrices. NOT YET IMPLEMENTED)           
+        """
 
         ### JCALERT! I think that can go (already defined above!)
         ### but I do not know why, it lead to a bug with the testpattern window
@@ -169,20 +140,10 @@ class Plot(TopoObject):
 	self.channel_views = []
         self.matrices = []
 
+	self._get_channel_views_from_view_dict()
 
-	### JCALERT! For the moment, we still need to pass SheetViews directly when plotting
-        ### the projection. It is because the plot_key correspond to a list of SheetViews rather than
-        ### SheetViews. We might want to change that and only gather all the UnitViews just when
-        ### plotting the projection.
-        ### (Note: it is also the case for unitweights: the UnitView comes back as a list
-        ### which lead to the bad code in the hack below )
-
-# 	if isinstance(self.channels[0],SheetView):
-# 	    ### Then this function will go away.
-# 	    self.get_channels_view_from_sheet_view()
-# 	else:
-
-	self.get_channels_view_from_sheet()
+	### JC: write this function to cut the long code.
+	#self._get_matrices_from_channel_views()
 
         ### JABALERT! Need to document what this code does.
 
@@ -253,23 +214,23 @@ class Plot(TopoObject):
         return self
 
 
-    def get_channels_view_from_sheet(self):
+    def _get_channel_views_from_view_dict(self):
+        """sub-function of plot() that just retrieve the views from the view_dict
+           as specified by the channels, and create channel_views (list of sheet_view).
+
+           (It just deal with the fact that channels can be None, or that the keys
+            specified by channels can potentially refer to no SheetViews in the dict).
+        """
     
         for each in self.channels:
             
             if each == None:
                 self.channel_views.append(None)
-                
+               
             ### JCALERT! This test has to be re-defined (Why Tuple?)
             elif isinstance(each,str) or isinstance(each,tuple):
-		### JCALERT! We could got rid of look_up_dict in sheet.py and use
-		### .get(key,None) instead?
-                # sv = look_up_dict(self.view_dict,each)
-                # that can be turned into: (Ask Jim)
 		sv = self.view_dict.get(each, None)
                 if sv == None:
-		    ### JC: disabled momentarily. Can be spared now I think.
-                    #self.debug('No sheet view named ' + repr(each) + ' in Sheet_dict ' + repr(self.view_dict))
                     self.channel_views.append(None)
                 else:
 		   
@@ -278,7 +239,8 @@ class Plot(TopoObject):
 
 		    self.channel_views.append(sv)
 
-                        ### JCALERT ! That has to be changed.
+
+	                ### JCALERT ! That may have to be changed.
                         ### JCALERT ! This is an hack so that the problem of displaying the right
                         ### name under each map in activity and orientation map panel is solved
                         ### It has to be changed so that it display what we want for each panel
@@ -290,9 +252,18 @@ class Plot(TopoObject):
 		    self.view_info = sv.view_info
 		  #   self.view_info['src_name']  = sv.view_info['src_name']
 #                     self.view_info['view_type'] = sv.view_info['view_type']
-                
+    
+            
+		
+    ### JCALERT! Actually, this function can be used this way.
+    ### It is called from release_sheetviews in PlotGroup and enable to
+    ### free memory space when we don't need the SheetViews entry anymore.
+    def release_sheetviews(self):
+        """
+        Delete any sheet_view_dict entries used by this plot, under
+        the assumption that this Plot is the only object that use the 
+        the SheetView in the sheet_view_dict  with that dictionary key.
+        """
+        for each in self.channels:
+	    del self.view_dict[each]
 
-### JC: if we keep the concept of having list of sheet_view in the sheet_view_dict (for projection, and also, 
-### then an idea is to have a special function in the case of a list that return a list of 
-### Plots instead of a Plot. But I think it is not good idea anyway to have a list in the sheet_view_dict.              
-### JCALERT! The histograms should be implemented and an object histograms assign to a Plot()
