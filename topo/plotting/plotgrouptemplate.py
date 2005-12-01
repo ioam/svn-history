@@ -4,7 +4,7 @@ PlotTemplate and PlotGroupTemplate classes.
 It is also the file where the different PlotGroupTemplate currently
 in used are defined and registered in the topo.base.registry.
 
-The user is then supposed to define new PlotGroupTemplate in this place.
+The user is then supposed to define new PlotGroupTemplate at his convenience.
 
 $Id$
 """
@@ -111,7 +111,6 @@ class PlotGroupTemplate(TopoObject):
 
 ### JCALERT! Review the doc here or at the top of the file...
 ### maybe put the import at the top
-### make a nice place for user to find easily.
         
 ### Populate the dynamic plot menu list registry.
         
