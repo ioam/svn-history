@@ -99,7 +99,21 @@ class Plot(TopoObject):
         if self.view_dict == None:
             raise ValueError("A Plot should be passed a sheet_view_dict when created")
 
-	### JCALERT! maybe also raise something when channels are all None?    
+	### JCALERT! maybe also raise something when channels are all None? 
+
+    ### JCALERT! Actually, this function can be used this way.
+    ### It is called from release_sheetviews in PlotGroup and enable to
+    ### free memory space when we don't need the SheetViews entry anymore.
+    def release_sheetviews(self):
+        """
+        Delete any sheet_view_dict entries used by this plot, under
+        the assumption that this Plot is the only object that use the 
+        the SheetView in the sheet_view_dict  with that dictionary key.
+        """
+        for each in self.channels:
+	    del self.view_dict[each]
+
+
 
     # JC: This function is called by load_images in PlotGroup and sub-classes.  
     ### Maybe it should just be called from __init__ ?             
@@ -229,15 +243,4 @@ class Plot(TopoObject):
 	return (hue,sat,val)
 
 	
-    ### JCALERT! Actually, this function can be used this way.
-    ### It is called from release_sheetviews in PlotGroup and enable to
-    ### free memory space when we don't need the SheetViews entry anymore.
-    def release_sheetviews(self):
-        """
-        Delete any sheet_view_dict entries used by this plot, under
-        the assumption that this Plot is the only object that use the 
-        the SheetView in the sheet_view_dict  with that dictionary key.
-        """
-        for each in self.channels:
-	    del self.view_dict[each]
-
+   
