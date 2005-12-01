@@ -151,7 +151,7 @@ class ImageGenerator(PatternGenerator):
     # CEBHACKALERT:
     # Until parametersframe is changed to allow non-number parameters, etc,
     # this has to be hidden. 
-    image_path = Filename(default='examples/ellen_arthur.pgm', hidden=True)
+    filename = Filename(default='examples/ellen_arthur.pgm', hidden=False)
     
     def function(self,**params):
         bounds  = params.get('bounds', self.bounds)
@@ -160,9 +160,9 @@ class ImageGenerator(PatternGenerator):
         y       = params.get('pattern_y',self.pattern_y)
         width   = params.get('width',self.width)
         height  = params.get('height',self.height)
-        image_path = params.get('image_path',self.image_path)
+        filename = params.get('filename',self.filename)
 
-        image = TopoImage(image_path)
+        image = TopoImage(filename)
         return image(x,y,bounds,density, width, height)
 
 
