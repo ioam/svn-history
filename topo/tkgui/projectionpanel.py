@@ -178,17 +178,17 @@ class ProjectionPanel(CFSheetPlotPanel):
             self.weight_name.get(),self.pe.simulation.time()))
         
 
-    def generate_plot_key(self):
+    def generate_plot_group_key(self):
         """
         Generate the key used to look up the PlotGroup for this Projection.
 
-        The plot_key for retrieving the PlotGroup depends on the
+        The plot_group_key for retrieving the PlotGroup depends on the
         values entered in the window widgets.  This method generates
         the appropriate key based on those values, using a tuple like:
         ('Projection', self.weight_name, self.density, self.region).
         """
         self.density = float(eval(self.density_str.get(),__main__.__dict__))
-        self.plot_key = ('Projection',self.weight_name.get(),self.density,self.region.get())
+        self.plot_group_key = ('Projection',self.weight_name.get(),self.density,self.region.get())
 
         pt = registry.plotgroup_templates['Projection'].plot_templates['Projection']
         pt.channels['Density'] = self.density
@@ -197,12 +197,12 @@ class ProjectionPanel(CFSheetPlotPanel):
 
     def do_plot_cmd(self):
         """
-        self.generate_plot_key() creates the density information needed for
+        self.generate_plot_group_key() creates the density information needed for
         a ProjectionPlotGroup to create necessary Plots.
         """
   
-        self.generate_plot_key()
-        self.pe_group = self.pe.get_plot_group(self.plot_key,
+        self.generate_plot_group_key()
+        self.pe_group = self.pe.get_plot_group(self.plot_group_key,
                                                registry.plotgroup_templates['Projection'],
                                                self.region.get(),'ProjectionPlotGroup')
         self.pe_group.do_plot_cmd()

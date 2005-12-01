@@ -4,13 +4,13 @@ Construct and stores the PlotGroups used for saving to a file or for a GUI to di
 This class is the connection between the Simulator or GUI, and the
 PlotGroup objects in plotting.
 
-When first created, a PlotGroup, PlotEngine stores it in a dictionary,using a plot_key as a key.
+When first created, a PlotGroup, PlotEngine stores it in a dictionary,using a plot_group_key as a key.
 The PlotGroup can then be retrieved in the dictionnary.
 
-The plot_key is the simple name of the PlotGroupTemplate for a BasicPlotGroupPanel PlotGroup
+The plot_group_key is the simple name of the PlotGroupTemplate for a BasicPlotGroupPanel PlotGroup
 (i.e. A Preference Map panel or an Activity panel)
-The plot_key is more complicated for UnitWeightsPlotGroup and ProjectionPlotGroup
-(see the corresponding UnitWeightsPanel and ProjectionPanel generate_plot_key methods)
+The plot_group_key is more complicated for UnitWeightsPlotGroup and ProjectionPlotGroup
+(see the corresponding UnitWeightsPanel and ProjectionPanel generate_plot_group_key methods)
 
 A PlotGroup that contains the old LISSOM style plot information, (in a
 different displayed form):
@@ -116,7 +116,7 @@ class PlotEngine(TopoObject):
     ### JC: if the PlotGroup corresponding to the group has already been inserted in
     ### the self.plot_group_dict, it is taken when requested;
     ### otherwise, it seems necessary to create the PlotGroup
-    ### also name is generally a plot_key for unitweight and projection panel
+    ### also name is generally a plot_group_key for unitweight and projection panel
 
     ### JCALERT!!! We also might want to get rid of the default value for class_type,
     ### then changed the order and put filter at the end, and changing the call
@@ -126,7 +126,7 @@ class PlotEngine(TopoObject):
     ### it might be useful to call just with the name, In this case, we have to solve the problem
     ### of catching the exception when there is no such PlotGroup in the dict and group_type=None.
     ### Note that for the moment, such a call only happens in the testplotengine.py.)
-    ### I would change name to plot_key and group_type to template.
+    ### I would change name to plot_group_key and group_type to template.
         
     def get_plot_group(self, name, group_type= None,
                        filter=None, class_type='BasicPlotGroup'):
@@ -152,7 +152,7 @@ class PlotEngine(TopoObject):
 
     
     ### JCALERT!  I would change group_type to be template or group_template
-    ### and name to be plot_key....
+    ### and name to be plot_group_key....
     
     def make_plot_group(self, name, group_type,filter_lam,class_type):
         """

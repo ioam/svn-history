@@ -4,7 +4,7 @@ Panel for displaying preference maps and activity plot groups.
 
 $Id$
 """
-__version__='$Revision $'
+__version__='$Revision$'
 
 
 ### JCALERT! Now BasicPlotGroupPanel replace the former BasicPlotPanel and PreferenceMapPanel

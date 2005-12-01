@@ -73,7 +73,7 @@ class PlotGroup(TopoObject):
     ### re-arranged the order and look at the call in all panel classes (i.e. inputparampanel)
     ### also review the doc of each functions.
 
-    def __init__(self,template=None,plot_key=None,sheet_filter_lam=None,plot_list=None,shape=FLAT,**params):
+    def __init__(self,template=None,plot_group_key=None,sheet_filter_lam=None,plot_list=None,shape=FLAT,**params):
         """
         plot_list can be of two types: 
         1.  A list of Plot objects that can return bitmaps when requested.
@@ -88,7 +88,7 @@ class PlotGroup(TopoObject):
         
         ### JCALERT! It has to redefined what self.shape is for. 
         self.shape = shape
-        self.plot_key = plot_key
+        self.plot_group_key = plot_group_key
         self.bitmaps = []
         self.template = template
 
@@ -273,8 +273,8 @@ class BasicPlotGroup(PlotGroup):
     PlotGroup for Activity SheetViews
     """
 
-    def __init__(self,template,plot_key,sheet_filter_lam,plot_list,**params):
-        super(BasicPlotGroup,self).__init__(template,plot_key,sheet_filter_lam,plot_list,
+    def __init__(self,template,plot_group_key,sheet_filter_lam,plot_list,**params):
+        super(BasicPlotGroup,self).__init__(template,plot_group_key,sheet_filter_lam,plot_list,
                                             **params)
 
         ### JC: for basic PlotGroup, no need to create a "dynamic List"
@@ -300,11 +300,11 @@ class UnitWeightsPlotGroup(PlotGroup):
     PlotGroup for Weights UnitViews
     """
 
-    def __init__(self,template,plot_key,sheet_filter_lam,plot_list,**params):
-        super(UnitWeightsPlotGroup,self).__init__(template,plot_key,sheet_filter_lam,plot_list,
+    def __init__(self,template,plot_group_key,sheet_filter_lam,plot_list,**params):
+        super(UnitWeightsPlotGroup,self).__init__(template,plot_group_key,sheet_filter_lam,plot_list,
                                               **params)
-        self.x = float(plot_key[2])
-        self.y = float(plot_key[3])
+        self.x = float(plot_group_key[2])
+        self.y = float(plot_group_key[3])
  
       	
 	### JCALERT! I am not sure we need something dynamic here.
@@ -369,11 +369,11 @@ class ProjectionPlotGroup(PlotGroup):
     PlotGroup for Projection Plots
     """
 
-    def __init__(self,template,plot_key,sheet_filter_lam,plot_list,**params):
-        super(ProjectionPlotGroup,self).__init__(template,plot_key,sheet_filter_lam,
+    def __init__(self,template,plot_group_key,sheet_filter_lam,plot_list,**params):
+        super(ProjectionPlotGroup,self).__init__(template,plot_group_key,sheet_filter_lam,
                                                    plot_list,**params)
-        self.weight_name = plot_key[1]
-        self.density = float(plot_key[2])
+        self.weight_name = plot_group_key[1]
+        self.density = float(plot_group_key[2])
         self.shape = (0,0)
         self._sim_ep = [s for s in topo.base.registry.active_sim().objects(Sheet).values()
                         if self.sheet_filter_lam(s)][0]
@@ -402,7 +402,7 @@ class ProjectionPlotGroup(PlotGroup):
         ### confidence = pt.channels['Confidence']
 
         ### JC apparently, the template carries the information for building
-        ### the plot_key. It might be difficult to change now. (also see make_unit_weights_plot)
+        ### the sheet_view__key. It might be difficult to change now. (also see make_unit_weights_plot)
 	    key = (pt_name,c['Projection_name'],c['Density'],sheet.name)            
 	    plot_list=[]
 	    ### JCALERT! for the moment, the sheet_view for a projection is a list of UnitView
@@ -454,10 +454,6 @@ class ProjectionPlotGroup(PlotGroup):
 
         self.view_list = [view for view in chain(*full_unitview_list)
                          if view.projection.name == self.weight_name]
-
-        ### JC: I think is better to have an attribute self.filtered_list,
-        ### instead of recording a list of Sheet_View under this PlotKey
-        #self._sim_ep_src.add_sheet_view(self.plot_key,filtered_list)
 
         ### JCALERT! I do not understand this comment.
         ### We might want to get rid of it

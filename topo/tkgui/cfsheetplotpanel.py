@@ -16,6 +16,11 @@ import Pmw
 import plotgrouppanel
 import topo.base.connectionfield
 
+### JCALERT! It might be clearer to get rid of this class and just add its functionnality
+### to both projectionpanel and unitweightpanel. Or it might need another name that
+### make you understand what it does (i.e. take care of the sheet menu and enable to switch
+### from what sheet to another by modifying the attribute region).
+
 class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
 
     def __init__(self,parent,pengine,console,**config):

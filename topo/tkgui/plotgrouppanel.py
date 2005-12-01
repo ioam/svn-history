@@ -47,13 +47,13 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         is clear there is no appropriate data to plot."""
         return True
 
-    def __init__(self,parent,pengine,console,plot_key,pgt_name=None,
+    def __init__(self,parent,pengine,console,plot_group_key,pgt_name=None,
                  plotgroup_type='BasicPlotGroup',**config):
         """
         parent:  it is the window (GUIToplevel()) that contains the panel.
         pengine: is the associated PlotEngine; it might end up to be unnecessary, needs fixing.
         console: is the associated console, (i.e. the TopoConsole that has this panel)
-        plot_key: defines the title of the panel.
+        plot_group_key: defines the title of the panel.
                   In the case of an activity plot or a feature map plot (BasicGroupPanel) 
 		  the title is only the name of the template (pgt_name)
                   In the case of projection and unit weights there is additional information
@@ -66,13 +66,14 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         Frame.__init__(self,parent,config)
         topo.plotting.plot.TopoObject.__init__(self,**config)
 
-        ### Usually the pgt_name is the plot_key by default,
-        ### but for inputparamspanel pgt_name = None and the plot_key is 'Preview'
+	### JCALERT! Check if this makes sense in the general case...
+        ### Usually the pgt_name is the plot_group_key by default,
+        ### but for inputparamspanel pgt_name = None and the plot_group_key is 'Preview'
         ### passed by default when creating the class
         if pgt_name != None:
-            self.plot_key = pgt_name
+            self.plot_group_key = pgt_name
         else:
-            self.plot_key = plot_key
+            self.plot_group_key = plot_group_key
 
             
         self.plotgroup_type = plotgroup_type # type of the PlotGroup 
@@ -168,7 +169,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         ### or even plot_panel_title.
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
-        self.plot_group = Pmw.Group(self,tag_text=str(self.plot_key))
+        self.plot_group = Pmw.Group(self,tag_text=str(self.plot_group_key))
         self.plot_group.pack(side=TOP,expand=YES,fill=BOTH,padx=5,pady=5)
         self.plot_frame = self.plot_group.interior()
 
@@ -211,7 +212,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         Change the window title.  TopoConsole will call this on
         startup of window.  
         """
-        self.parent.title("%s time:%s" % (self.plot_key,self.pe.simulation.time()))
+        self.parent.title("%s time:%s" % (self.plot_group_key,self.pe.simulation.time()))
 
 
     def do_plot_cmd(self):
@@ -223,7 +224,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         examples.
         """
 
-        self.pe_group = self.pe.get_plot_group(self.plot_key,
+        self.pe_group = self.pe.get_plot_group(self.plot_group_key,
                                                self.plotgroup_type)   
         self.pe_group.do_plot_cmd()
 

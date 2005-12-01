@@ -68,9 +68,9 @@ class UnitWeightsPanel(CFSheetPlotPanel):
             return False
 
 
-    def generate_plot_key(self):
+    def generate_plot_group_key(self):
         """
-        The plot_key for the UnitWeightsPanel will change depending on the
+        The plot_group_key for the UnitWeightsPanel will change depending on the
         input within the window widgets.  This means that the key
         needs to be regenerated at the appropriate times.
 
@@ -88,7 +88,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         l,b,r,t = ep.bounds.aarect().lbrt()
 
         if ep.bounds.contains(self.x,self.y):
-            self.plot_key = ('Weights',self.region.get(),self.x,self.y)
+            self.plot_group_key = ('Weights',self.region.get(),self.x,self.y)
             self.displayed_x, self.displayed_y = self.x, self.y
 
             # The PlotTemplate mechanism requires updating the Unit
@@ -120,8 +120,8 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         """
 
 
-        self.generate_plot_key()
-        self.pe_group = self.pe.get_plot_group(self.plot_key,
+        self.generate_plot_group_key()
+        self.pe_group = self.pe.get_plot_group(self.plot_group_key,
                                                registry.plotgroup_templates['Unit Weights'],
                                                self.region.get(),'UnitWeightsPlotGroup')
         self.pe_group.do_plot_cmd()

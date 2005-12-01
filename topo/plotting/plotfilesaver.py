@@ -5,7 +5,7 @@ STATUS 6/18/05: Little more than a stub, with one class that calls a
 subroutine depending on the type of plot requested.  Not yet clear if
 this class should be desined with the command-line interface in mind
 (IE: minimal typing, function parameters, etc.)  Additional: With the
-new Plot Template mechanism the plot_keys are not as critical as they
+new Plot Template mechanism the plot_group_keys are not as critical as they
 used to be.
 
 Note: Inspiration may be found from the ImageSaver class written for
@@ -76,7 +76,7 @@ class UnitWeightsFile(PlotFileSaver):
         self.region = region
         self.name['region'] = '%s_%01.03f_%01.03f' % (region, x, y)
         self.name['type'] = 'Weights'
-        self.plot_key = ('Weights',self.region,x,y)
+        self.plot_group_key = ('Weights',self.region,x,y)
 
         pt = topo.base.registry.plotgroup_templates['Unit Weights'].plot_templates['Unit Weights']
         pt.channels['Sheet_name'] = region
@@ -86,7 +86,7 @@ class UnitWeightsFile(PlotFileSaver):
         self.save_to_disk()
 
     def create_bitmaps(self):
-        pg = self.pe.get_plot_group(self.plot_key,
+        pg = self.pe.get_plot_group(self.plot_group_key,
                                     topo.base.registry.plotgroup_templates['Unit Weights'],
                                     self.region)
         self.bitmaps = pg.load_images()
@@ -99,7 +99,7 @@ class ProjectionFile(PlotFileSaver):
         self.region = region
         self.name['region'] = '%s_%s' % (region, projection)
         self.name['type'] = 'WeightsArray'
-        self.plot_key = ('WeightsArray',projection,density)
+        self.plot_group_key = ('WeightsArray',projection,density)
 
         pt = topo.base.registry.plotgroup_templates['Projection'].plot_templates['Projection']
         pt.channels['Density'] = density
@@ -110,7 +110,7 @@ class ProjectionFile(PlotFileSaver):
 
 
     def create_bitmaps(self):
-        pg = self.pe.get_plot_group(self.plot_key,
+        pg = self.pe.get_plot_group(self.plot_group_key,
                                     topo.base.registry.plotgroup_templates['Projection'],
                                     self.region)
         pg.do_plot_cmd()

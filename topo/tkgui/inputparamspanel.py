@@ -47,7 +47,7 @@ DEFAULT_PRESENTATION = '1.0'
 
 class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
     def __init__(self,parent,pengine,console=None,padding=2,**config):
-        super(InputParamsPanel,self).__init__(parent,pengine,console,plot_key='Preview',**config)
+        super(InputParamsPanel,self).__init__(parent,pengine,console,plot_group_key='Preview',**config)
 
         self.INITIAL_PLOT_WIDTH = 100
         self.padding = padding
@@ -233,7 +233,7 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
             ### (which is also true for most of the file!!)
             plist.append(topo.plotting.plot.Plot((each,None,None),view_dict, name=''))
         if LIST_REVERSE: plist.reverse()
-        self.pe_group = topo.plotting.plotgroup.PlotGroup(plot_key='Preview',plot_list=plist)
+        self.pe_group = topo.plotting.plotgroup.PlotGroup(plot_group_key='Preview',plot_list=plist)
 
 
     def refresh_title(self): pass
