@@ -298,16 +298,17 @@ class MeasureFeatureMap(TopoObject):
             for feature in self.__featuremaps[sheet].keys():
 
                 norm_factor = self.__featuremaps[sheet][feature].distribution_matrix[0,0].axis_range
-		### JCALERT! There is an hack in the for the view_name (adding a \n)
+		### JCALERT! There is an hack in the for the view_name (which is only the name of the sheet)
+                ### it enables the proper display in plot.py (see corresponding alert)
                 ### It might have to be changed when the name display is fixed in plot.py (ask Jim)
                 preference_map = SheetView(((self.__featuremaps[sheet][feature].preference())/norm_factor,
-                                             bounding_box), sheet.name + "\n" + feature.capitalize()+'Preference')
+                                             bounding_box), sheet.name )
                 sheet.add_sheet_view(feature.capitalize()+'Preference', preference_map)
 
                 # note the temporary multiplication by 17
                 # (just because I remember JAB saying it was something like that in LISSOM)
                 selectivity_map = SheetView((17*self.__featuremaps[sheet][feature].selectivity(),
-                                              bounding_box), sheet.name + "\n" + feature.capitalize()+'Selectivity')
+                                              bounding_box), sheet.name )
                 sheet.add_sheet_view(feature.capitalize()+'Selectivity', selectivity_map)
 
 

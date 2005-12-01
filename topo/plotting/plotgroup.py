@@ -289,7 +289,8 @@ class BasicPlotGroup(PlotGroup):
         hue = pt.channels.get('Hue',None)
         confidence = pt.channels.get('Confidence',None)
         n = pt.channels.get('Normalize',False)
-        p = Plot((strength,hue,confidence),sheet.sheet_view_dict,n,name=pt_name)
+	plot_name = '\n'+pt_name
+        p = Plot((strength,hue,confidence),sheet.sheet_view_dict,n,name=plot_name)
 	return [p]
 
 	
@@ -337,7 +338,9 @@ class UnitWeightsPlotGroup(PlotGroup):
 		### temporary debug print
 		#print "plotgorup key:",key
 		#print "sheet_view:" , p.src.sheet_view_dict[key].view_info
-		plot_list.append(Plot((key,hue,confidence),p.src.sheet_view_dict,pt.channels['Normalize']))
+		plot_name = '\n(from ' + p.src.name +')' 
+		plot_list.append(Plot((key,hue,confidence),p.src.sheet_view_dict,
+				      pt.channels['Normalize'], name=plot_name))
 
         self.debug('plot_list =' + str(plot_list))
         return plot_list

@@ -41,21 +41,11 @@ from Numeric import array
 import palette as palette 
 import MLab
 
-### JABHACKALERT!  This class should accept SheetViews, with no
-### reference to anything of type Sheet, and no plotting of anything
-### else.  It is ridiculously too difficult to understand and maintain
-### in its current form.  Any operation that depends on Sheet, such as
-### looking up SheetViews by name, or releasing SheetViews, should be
-### moved out of it.  PlotTemplate might be able to do such lookup,
-### because it's called for every Sheet, but if so it should always
-### map consisently from a name string to a SheetView, without trying
-### to handle all these special cases.  These classes are trying to be
-### way too smart; they should simply plot whatever they are given.
-
 
 ### JCALERT! WHAT about histograms? (ask Jim)  
 ### JCALERT! The histograms should be implemented and an object histograms assign to a Plot() 
-### WHAT does bitmap really mean here? (ask Jim and review the doc)     
+### WHAT does bitmap really mean here? (ask Jim and review the doc) 
+    
 class Plot(TopoObject):
     """
     Class that constructs a bitmap plot from one or more
@@ -133,12 +123,6 @@ class Plot(TopoObject):
            (self.histograms: List of Histogram objects associated with
                     the matrices is self.matrices. NOT YET IMPLEMENTED)           
         """
-
-        ### JCALERT! I think that can go (already defined above!)
-        ### but I do not know why, it lead to a bug with the testpattern window
-        ### This has to be fixed.
-	self.channel_views = []
-        self.matrices = []
 
 	self._get_channel_views_from_view_dict()
 
@@ -220,40 +204,24 @@ class Plot(TopoObject):
 
            (It just deal with the fact that channels can be None, or that the keys
             specified by channels can potentially refer to no SheetViews in the dict).
-        """
-    
+        """  
         for each in self.channels:
-            
-            if each == None:
-                self.channel_views.append(None)
-               
-            ### JCALERT! This test has to be re-defined (Why Tuple?)
-            elif isinstance(each,str) or isinstance(each,tuple):
-		sv = self.view_dict.get(each, None)
-                if sv == None:
-                    self.channel_views.append(None)
-                else:
-		   
-		    ### temporary debug
-		    #print "sv",sv,sv.view_info
-
-		    self.channel_views.append(sv)
-
-
-	                ### JCALERT ! That may have to be changed.
-                        ### JCALERT ! This is an hack so that the problem of displaying the right
-                        ### name under each map in activity and orientation map panel is solved
-                        ### It has to be changed so that it display what we want for each panel
-		        ### Also I think the name that is displayed should always be the plot_name
-		    
-		    ### JCALERT! To fix now that this is a dictionnary being passed
-		    ### But it works fine with the vie_info['src_name'] apparently...
-		    # could be:
-		    self.view_info = sv.view_info
-		  #   self.view_info['src_name']  = sv.view_info['src_name']
-#                     self.view_info['view_type'] = sv.view_info['view_type']
-    
-            
+	    ### JCALERT! Presumably, if each == None then there is no key equal to None in the 
+            ### dict and then sv==None. Ask Jim if it is alright, because it is always possible that
+            ### some mad man has done dict[None]=who_knows_what ?
+	    sv = self.view_dict.get(each, None)
+	    if sv == None:
+		self.channel_views.append(None)
+	    else:
+		self.channel_views.append(sv)       
+	    ### JCALERT ! This is an hack so that the problem of displaying the right
+	    ### name under each map in activity and orientation map panel is solved
+	    ### It has to be changed so that it display what we want for each panel
+	    ### Also I think the name that is displayed should always be the plot name
+            ### (Also see in create_plots for each PlotGroup sub-classes)	
+		self.view_info['src_name'] = sv.view_info['src_name'] + self.name
+		self.view_info['view_type'] = sv.view_info['view_type']
+		
 		
     ### JCALERT! Actually, this function can be used this way.
     ### It is called from release_sheetviews in PlotGroup and enable to
