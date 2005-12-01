@@ -159,31 +159,30 @@ class Parameter(object):
     __doc__ = property(_get_doc)
 
 
-import os.path
+# CEBHACKALERT: at the moment, the path must be relative to Topographica's path.
+from os.path import normpath
 class Filename(Parameter):
     """
     Filename is a Parameter that takes a string specifying the
-    path to a file. When asked for its value, it returns
-    the path in the correct format for the operating system.
+    path of a file and stores it in the format of the user's operating system.
+
+    The path must be relative to Topographica's own path.
+
+    To make your code work on all platforms, you should specify paths in UNIX format
+    (e.g. examples/ellen_arthur.pgm). You can specify paths in your operating
+    system's format, but only code that uses UNIX-style paths will run on all operating
+    systems.
     """
-    def __init__(self,default=None,**params):
+    def __init__(self,default='',**params):
+        default = normpath(default)
         Parameter.__init__(self,default,**params)
 
-    def __get__(self,obj,objtype):
+    def __set__(self,obj,val):
         """
-        Get a Filename value.  If called on the class, produce the
-        default value.  If called on an instance, produce the instance's
-        value, if one has been set, otherwise produce the default value.
+        Call Parameter's __set__ with the os-specific path.
         """
-        if not obj:
-            result = self.default
-        else:
-            result = obj.__dict__.get(self.get_name(obj),self.default)
-        # CEBHACKALERT: os.path.join() is not the right method to turn the string
-        # 'result' into a path for the user's OS.
-        # Also, should this check that the file exists?
-        return os.path.join(result)
-
+        super(Filename,self).__set__(obj,normpath(val))
+        
 
 class Number(Parameter):
     """
