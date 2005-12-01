@@ -23,26 +23,24 @@ __version__='$Revision$'
 ### The code in this file is still being reviewed, and may still need
 ### substantial changes. Particularly, the doc has to be reviewed.
 
+### JCALERT! Are these 3 import statements really used?
 import sys
 import types
-
-from Numeric import zeros, ones, Float, divide
-from topo.base.topoobject import TopoObject
-from topo.base.utils import flatten
-
-### I think this import statement can go now...
-#from topo.base.sheetview import *
-
-from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
-
-from histogram import Histogram
-from topo.base.parameter import Dynamic
-from Numeric import array
-import palette as palette 
 import MLab
 
+from topo.base.sheetview import *
+from Numeric import zeros, ones, Float, divide
+from topo.base.topoobject import TopoObject
+from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
+from topo.base.parameter import Dynamic
+import palette as palette 
 
-### JCALERT! WHAT about histograms? (ask Jim)  
+### JC: I think it can go...
+from Numeric import array
+
+### JCALERT! WHAT about histograms? (ask Jim) 
+#from histogram import Histogram 
+
 ### JCALERT! The histograms should be implemented and an object histograms assign to a Plot() 
 ### WHAT does bitmap really mean here? (ask Jim and review the doc) 
     
@@ -135,9 +133,10 @@ class Plot(TopoObject):
         ### Especially, the passing None in channel_views can be changed.
 	### Also, this can be put in another function...
             
-        shape = (0,0)
+	shape = (0,0)
         self.debug('self.channel_views = ' + str(self.channel_views))
-               
+         
+	self.matrices=[]
         for each in self.channel_views:
 
 	    if each != None:
@@ -146,7 +145,12 @@ class Plot(TopoObject):
 		shape = view_matrix[0].shape
 	    else:
 		self.matrices.append(None)
-
+		
+	
+# 	if self.matrices[0] == None:
+# 	    raise ValueError("EmptyPlot")
+# 	else:
+# 	    shape = self.matrices[0].shape
 
         ### JC: For clarity, this could be another function.
 	    
@@ -205,6 +209,7 @@ class Plot(TopoObject):
            (It just deal with the fact that channels can be None, or that the keys
             specified by channels can potentially refer to no SheetViews in the dict).
         """  
+	self.channel_views=[]
         for each in self.channels:
 	    ### JCALERT! Presumably, if each == None then there is no key equal to None in the 
             ### dict and then sv==None. Ask Jim if it is alright, because it is always possible that
@@ -221,7 +226,7 @@ class Plot(TopoObject):
             ### (Also see in create_plots for each PlotGroup sub-classes)	
 		self.view_info['src_name'] = sv.view_info['src_name'] + self.name
 		self.view_info['view_type'] = sv.view_info['view_type']
-		
+
 		
     ### JCALERT! Actually, this function can be used this way.
     ### It is called from release_sheetviews in PlotGroup and enable to
