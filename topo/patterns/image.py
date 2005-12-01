@@ -147,11 +147,7 @@ class ImageGenerator(PatternGenerator):
 
     width  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0))
     height  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0))
-
-    # CEBHACKALERT:
-    # Until parametersframe is changed to allow non-number parameters, etc,
-    # this has to be hidden. 
-    filename = Filename(default='examples/ellen_arthur.pgm', hidden=False)
+    filename = Filename(default='examples/ellen_arthur.pgm')
     
     def function(self,**params):
         bounds  = params.get('bounds', self.bounds)
