@@ -264,14 +264,23 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         allows eyes to have different presentation patterns.
         """
         p = self.param_frame.prop_frame.get_values()
-        rp = dict(self.param_frame.get_topo_class_parameters(pg_name)).keys()
+        rp = dict(self.param_frame.get_topo_class_parameters(pg_name))
+
         ndict = {}
         ### JABHACKALERT!
         ###
         ### How will this work for photographs and other items that need non-numeric
         ### input boxes?  It *seems* to be assuming that everything is a float.
-        for each in rp:
-            ndict[each] = eval_atof(p[each])
+        for (name,parameter) in rp.items():
+
+            if type(parameter)==topo.base.parameter.Number:
+                ndict[name] = eval_atof(p[name])
+            else:
+                ndict[name] = p[name]
+
+            #type(parameter)==topo.base.parameter.Filename:
+                
+    
         for each in ep_dict.keys():
             if ep_dict[each]['state']:
                 ndict['density'] = ep_dict[each]['obj'].density

@@ -78,15 +78,34 @@ class ParametersFrame(Frame):
     ### they just get a non-slider widget.  *Any* parameter type
     ### should be allowed, using a default text entry expression
     ### widget in the most general case.
-    def __make_sliders_from_params(self,params,slider_dict):
-        """
-        Make a new slider for each name/value in the params list.
-        """
-        for (k,v) in params:
-            (low,high) = v.get_soft_bounds()
-            default = v.default
-            slider_dict[k] = self.__add_slider(k,str(low),str(high),str(default))
     
+    # CEB: this is still being re-written
+    def __make_widgets(self,parameters,widget_dict):
+        """
+        """
+        for (parameter_name, parameter) in parameters:
+
+            if type(parameter)==topo.base.parameter.Number:
+
+                try:
+                    (low,high) = parameter.get_soft_bounds()
+                    default = parameter.default
+                    widget_dict[parameter_name] = self.__add_slider(parameter_name,str(low),str(high),str(default))
+                except AttributeError:
+                    widget_dict[parameter_name] = self.__add_text_box(parameter_name,value)
+                    
+            # default to text entry    
+            else:
+                # should i use default?
+                value = parameter.default                
+                widget_dict[parameter_name] = self.__add_text_box(parameter_name,value)
+                
+            
+
+                
+
+    def __add_text_box(self,name,value):
+        return self.prop_frame.add_text_property(name,value)
 
     def __add_slider(self,name,min,max,init):
         return self.prop_frame.add_tagged_slider_property(name,init,
@@ -96,10 +115,14 @@ class ParametersFrame(Frame):
         self.prop_frame.set_values(self.__default_values)
 
 
+    # need to refresh things other than sliders - do this properly
     def refresh(self):
-        for entry in self.__tparams.values():
-            if entry[1].need_to_refresh_slider:
-                entry[1].set_slider_from_tag()
+        try: 
+            for entry in self.__tparams.values():
+                if entry[1].need_to_refresh_slider:
+                    entry[1].set_slider_from_tag()
+        except AttributeError:
+            pass
 
 
     def refresh_sliders(self,topo_class_name):
@@ -116,7 +139,7 @@ class ParametersFrame(Frame):
         new_param_names = self.get_topo_class_parameters(topo_class_name)
 
         
-        self.__make_sliders_from_params(new_param_names,self.__tparams)
+        self.__make_widgets(new_param_names,self.__tparams)
         new_sliders = dict(new_param_names).keys()
         new_sliders.sort()
         for i in range(len(new_sliders)):
