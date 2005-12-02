@@ -15,6 +15,10 @@ from utils import classlist
 
 # CEBHACKALERT: what does objtype exist for in __get__()? Isn't it unused?
 
+# CEBHACKALERT: does every subclass of Parameter really need doc=''?
+# If someone did 'Number(doc="documentation")' wouldn't it work even without passing through doc
+# because of passing through **params?
+
 class Parameter(object):
     """
     An attribute descriptor for declaring Topographica parameters.
@@ -80,7 +84,7 @@ class Parameter(object):
     (And the other items on http://www.python.org/doc/newstyle.html)
     """
 
-    __slots__ = ['_name','default','doc','hidden', 'precedence']
+    __slots__ = ['_name','default','doc','hidden','precedence']
     count = 0
 
     def __init__(self,default=None,doc="",hidden=False,precedence=0.5):
