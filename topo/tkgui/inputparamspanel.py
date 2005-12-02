@@ -31,7 +31,7 @@ from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
 from topo.base.utils import eval_atof
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.sheet import BoundingBox, Sheet
-from topo.base.utils import find_classes_in_package, classname_repr
+from topo.base.utils import find_classes_in_package, classname_repr, class_parameters
 from topo.base.patterngenerator import PatternGenerator
 from topo.commands.basic import pattern_present,save_input_generators,restore_input_generators
 from copy import deepcopy
@@ -102,14 +102,14 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         self.input_type.set(self.input_types[0])
 
 
-        Pmw.OptionMenu(self,command = self._refresh_sliders,
+        Pmw.OptionMenu(self,command = self._refresh_widgets,
                        labelpos = 'w',label_text = 'Input Type:',
                        menubutton_textvariable = self.input_type,
                        items = self.input_types
                        ).pack(side=TOP)
  
         self.param_frame = parametersframe.ParametersFrame(self)
-        self._refresh_sliders(self.input_type.get())
+        self._refresh_widgets(self.input_type.get())
         self.param_frame.pack(side=TOP,expand=YES,fill=X)
 
         self.in_ep_dict = self.create_patterns(self.cur_pg_name(),self.in_ep_dict)
@@ -143,7 +143,7 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         self.in_ep_dict[button_name]['state'] = checked
         
 
-    def _refresh_sliders(self,new_name):
+    def _refresh_widgets(self,new_name):
         """
         Called by the Pmw.OptionMenu object when the user selects a
         PatternGenerator type from the menu.  The visible TaggedSliders
@@ -153,7 +153,7 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         """
         pg_class = self.pg_name_dict[new_name]
         
-        self.param_frame.refresh_sliders(pg_class)
+        self.param_frame.refresh_widgets(pg_class)
         self.in_ep_dict = self.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         if self.auto_refresh: self.refresh()
 
@@ -206,7 +206,7 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
             if not self.in_ep_dict[each]['state']:
                 self.input_box.invoke(each)
         self.in_ep_dict = self.create_patterns(self.cur_pg_name(),self.in_ep_dict)
-        self._refresh_sliders(self.input_type.get())
+        self._refresh_widgets(self.input_type.get())
         if self.auto_refresh: self.refresh()
         if self.learning.get():
             self.learning_button.invoke()
@@ -263,8 +263,8 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         then do not change the currently stored generator.  This
         allows eyes to have different presentation patterns.
         """
-        p = self.param_frame.prop_frame.get_values()
-        rp = dict(self.param_frame.get_topo_class_parameters(pg_name))
+        p = self.param_frame.get_values()
+        rp = dict(class_parameters(pg_name))
 
         ndict = {}
         ### JABHACKALERT!
@@ -273,13 +273,10 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         ### input boxes?  It *seems* to be assuming that everything is a float.
         for (name,parameter) in rp.items():
 
-            if type(parameter)==topo.base.parameter.Number:
+            if isinstance(parameter, topo.base.parameter.Number):
                 ndict[name] = eval_atof(p[name])
             else:
-                ndict[name] = p[name]
-
-            #type(parameter)==topo.base.parameter.Filename:
-                
+                ndict[name] = p[name]                
     
         for each in ep_dict.keys():
             if ep_dict[each]['state']:
