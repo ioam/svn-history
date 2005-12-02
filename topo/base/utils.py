@@ -341,11 +341,26 @@ def exp(x):
     return Numeric.exp(Numeric.where(abs(x)>MAX_MAG,Numeric.sign(x)*inf,x))
 
 
+# CEBHACKALERT: I think this function should be renamed to sorted_keys() or sorted_dict_keys() or something
+# like that.
 def dict_sort(d):
     """ Simple and fast routine to sort a dictonary on key """
     keys = d.keys()
     keys.sort()
     return map(d.get, keys)
+
+
+def keys_sorted_by_value(d):
+    """
+    Return the keys of dictionary d sorted by their values.
+
+    By Daniel Schult, 2004/01/23
+    Posted at http://aspn.activestate.com/ASPN/Python/Cookbook/Recipe/52306
+    """
+    items=d.items()
+    backitems=[ [v[1],v[0]] for v in items]
+    backitems.sort()
+    return [ backitems[i][1] for i in range(0,len(backitems))]
 
 
 ### JABALERT!
@@ -389,3 +404,31 @@ def classname_repr(class_name, suffix_to_lose=''):
         viewable_name = viewable_name.replace(c,' '+c).strip()
 
     return viewable_name
+
+
+
+def class_parameters(topo_class):
+    """
+    Return the non-hidden Parameters of the specified class as a list of 2-tuples (parameter_name, parameter).
+
+    E.g. for an object that has one parameter
+    bob=Parameter()
+    this function returns
+    [('bob',<topo.base.parameter.Parameter object at ...>)]
+
+    The specified class must be of type TopoObject.
+    """
+    assert isinstance(topo_class, type)
+    topo_obj = topo_class()
+    
+    import topo.base.topoobject
+    if not isinstance(topo_obj,topo.base.topoobject.TopoObject):
+        # CEBHACKALERT: what's the proper error?
+        raise "Can only get Parameters for a class derived from TopoObject."
+    
+    parameters = [(parameter_name,parameter)
+                  for (parameter_name,parameter)
+                  in topo_obj.get_paramobj_dict().items()
+                  if not parameter.hidden
+                 ]
+    return parameters
