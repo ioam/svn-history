@@ -145,9 +145,9 @@ class TopoImage(TopoObject):
 class ImageGenerator(PatternGenerator):
     """2D image generator."""
 
-    width  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0))
-    height  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0))
-    filename = Filename(default='examples/ellen_arthur.pgm')
+    width  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.2)
+    height  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.21)
+    filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.05)
     
     def function(self,**params):
         bounds  = params.get('bounds', self.bounds)
