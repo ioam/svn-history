@@ -19,6 +19,12 @@ from utils import classlist
 # If someone did 'Number(doc="documentation")' wouldn't it work even without passing through doc
 # because of passing through **params?
 
+# CEBHACKALERT: say for example the Number 'x' in the PatternGenerator is declared to be hidden.
+# It ought not to show up in the GUI. However, in hierarchical.ty, LineGenerator.x is set. This
+# results in 'x' appearing in the GUI for Line but not for any other pattern. There is the same
+# problem for the precedence attribute.
+
+
 class Parameter(object):
     """
     An attribute descriptor for declaring Topographica parameters.
