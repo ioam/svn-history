@@ -13,6 +13,8 @@ __version__='$Revision$'
 from utils import classlist
 
 
+# CEBHACKALERT: what does objtype exist for in __get__()? Isn't it unused?
+
 class Parameter(object):
     """
     An attribute descriptor for declaring Topographica parameters.
@@ -78,10 +80,10 @@ class Parameter(object):
     (And the other items on http://www.python.org/doc/newstyle.html)
     """
 
-    __slots__ = ['_name','default','doc','hidden']
+    __slots__ = ['_name','default','doc','hidden', 'precedence']
     count = 0
 
-    def __init__(self,default=None,doc="",hidden=False):
+    def __init__(self,default=None,doc="",hidden=False,precedence=0.5):
         """
         Initialize a new parameter.
 
@@ -91,6 +93,7 @@ class Parameter(object):
         self._name = None
         self.doc = doc
         self.hidden=hidden
+        self.precedence = precedence
         Parameter.count += 1
         self.default = default
 
@@ -119,13 +122,6 @@ class Parameter(object):
         else:
             obj.__dict__[self.get_name(obj)] = val
 
-
-    # CEB:
-    # A parameter on its own cannot be pickled.
-    # Parameters owned by TopoObject get pickled.
-    # In the future, parameters might not get pickled:
-    # this should be fixed when pickling is sorted out.
-    
 
     def __delete__(self,obj):
         """
@@ -174,8 +170,7 @@ class Filename(Parameter):
     systems.
     """
     def __init__(self,default='',**params):
-        default = normpath(default)
-        Parameter.__init__(self,default,**params)
+        Parameter.__init__(self,normpath(default),**params)
 
     def __set__(self,obj,val):
         """
