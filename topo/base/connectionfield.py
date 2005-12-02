@@ -372,13 +372,11 @@ class CFSheet(ProjectionSheet):
     """
 
     def learn(self):
-        rows,cols = self.activity.shape
         for proj in chain(*self.in_projections.values()):
             if proj.input_buffer:
                 learning_rate = proj.learning_rate
                 inp = proj.input_buffer
                 cfs = proj.cfs
-                len, len2 = inp.shape
                 proj.learning_fn(cfs, inp, self.activity, learning_rate)
 
     

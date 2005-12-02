@@ -11,11 +11,7 @@ from topo.base.utils import L2norm
 from topo.base.parameter import Number
 from Numeric import argmax,exp,floor
 from topo.base.connectionfield import CFSheet
-
-### JABALERT!  This function should be removed, replacing it
-### with the one from patternfns.py.
-def gaussian(dist,radius):
-    return exp( - dist/radius)
+from itertools import chain
 
 
 class CFSOM(CFSheet):
@@ -52,40 +48,18 @@ class CFSOM(CFSheet):
     def radius(self):
         return self.radius_0 * self.decay(float(self.simulator.time()),self.half_life)
 
-    ### JABHACKALERT!
-    ###
-    ### This function should be reimplemented like other CFSheet learning
-    ### rules, i.e. to do most of the work in the Projection so that
-    ### different Projection types can be combined.  Thus most of this
-    ### is likely to move to learningfns/.
     def learn(self):
-
         rows,cols = self.activity.shape
         wr,wc = self.winner_coords(matrix_coords=True)
-
         radius = self.radius() * self.density
         
-        cmin = int(max(0,wc-radius))
-        cmax = int(min(wc+radius,cols))
-        rmin = int(max(0,wr-radius))
-        rmax = int(min(wr+radius,rows))
-
-        for r in range(rmin,rmax):
-            for c in range(cmin,cmax):
-                lattice_dist = L2norm((wc-c,wr-r))
-                for proj_list in self.in_projections.values():
-                    for proj in proj_list:
-                        if lattice_dist <= radius:
-                            cf = proj.cf(r,c)
-                            rate = self.alpha() * gaussian(lattice_dist,radius)
-                            X = cf.get_input_matrix(proj.input_buffer)
-
-                            # CEBHACKALERT: 
-                            # This is for pickling - the savespace for cf.weights does
-                            # not appear to be pickled. 
-                            cf.weights.savespace(1)
-                
-                            cf.weights += rate * (X - cf.weights)
+        learning_rate = self.alpha()
+        for proj in chain(*self.in_projections.values()):
+            if proj.input_buffer:
+                inp = proj.input_buffer
+                cfs = proj.cfs
+                proj.learning_fn(cfs, inp, self.activity, learning_rate, winner_r=wr, winner_c=wc, radius=radius)
+        
 
     def winner(self):
         return argmax(self.activity.flat)

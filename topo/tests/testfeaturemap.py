@@ -28,6 +28,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.connectionfield import CFProjection
 from topo.sheets.cfsom import CFSOM
 from topo.base.simulator import Simulator
+from topo.learningfns.basic import HebbianSOM
 
 from topo.patterns import basic
 from topo.analysis.featuremap import FeatureMap, MeasureFeatureMap
@@ -197,13 +198,13 @@ class TestMeasureFeatureMap(unittest.TestCase):
         self.s = Simulator()
         self.retina = GeneratorSheet(name='Retina')
         self.V1 = CFSOM(name='V1')
-        self.s.connect(self.retina,self.V1,delay=0.5,connection_type=CFProjection,connection_params={'name':'RtoV1'})
+        self.s.connect(self.retina,self.V1,delay=0.5,connection_type=CFProjection,connection_params={'name':'RtoV1','learning_fn':HebbianSOM()})
 
         self.V2 = CFSOM(name='V2')
 
 
         #self.s.connect(self.V1,self.V2,delay=1,connection_type=CFProjection,connection_params={'name':'V1toV2'})
-        self.s.connect(self.retina,self.V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'RtoV2'})
+        self.s.connect(self.retina,self.V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'RtoV2','learning_fn':HebbianSOM()})
 
 
 

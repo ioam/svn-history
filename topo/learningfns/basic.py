@@ -11,6 +11,9 @@ from topo.base.parameter import Parameter,Constant
 from topo.base.projection import Identity
 from topo.base.connectionfield import CFLearningFunction
 from topo.outputfns.basic import DivisiveL1Normalize
+from topo.base.utils import L2norm
+from Numeric import exp
+
 
 # Imported here so that all CFLearningFunctions will be in the same package
 from topo.base.connectionfield import IdentityCFLF,GenericCFLF
@@ -86,6 +89,7 @@ class Hebbian(CFLearningFunction):
 
         # Apply output_fn to each CF
         # (skipped entirely for no-op case, as an optimization)
+        output_fn = self.output_fn
         if type(output_fn) is not Identity:
             for r in range(rows):
                 for c in range(cols):
@@ -264,4 +268,48 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
         
         inline(hebbian_div_norm_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'learning_rate','weight_ptrs','slice_ptrs'], local_dict=locals())
 
+
+
+class HebbianSOM(CFLearningFunction):
+    """
+    CF-aware Hebbian learning rule in Self-Organizing Maps. Only the winner
+    unit (matrix coordinates in the input_activity specified by winner_r and 
+    winner_c in __call__) and its surrounds will learn. The radius of the 
+    surround is specified by the named parameter radius in __call_.
+    """
+    output_fn = Parameter(default=Identity())
+    
+    def __init__(self,**params):
+        super(HebbianSOM,self).__init__(**params)
+
+    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+        wr = params['winner_r']
+        wc = params['winner_c']
+        radius = params['radius']
+
+        rows,cols = output_activity.shape
+        output_fn = self.output_fn
+
+        # find out the bounding box around the winner in which weights will
+        # be changed. This is just to make the code run faster.
+        cmin = int(max(0,wc-radius))
+        cmax = int(min(wc+radius,cols))
+        rmin = int(max(0,wr-radius))
+        rmax = int(min(wr+radius,rows))
+
+        for r in range(rmin,rmax):
+            for c in range(cmin,cmax):
+                lattice_dist = L2norm((wc-c,wr-r))
+		if lattice_dist <= radius:
+                    cf = cfs[r][c]
+                    rate = learning_rate * exp(-lattice_dist/radius)
+		    X = cf.get_input_matrix(input_activity)
+
+                    # CEBHACKALERT:
+                    # This is for pickling - the savespace for cf.weights does
+                    # not appear to be pickled.
+                    cf.weights.savespace(1)
+                    cf.weights += rate * (X - cf.weights)
+                    if type(output_fn) is not Identity:
+                        cf.weights=self.output_fn(cf.weights)
 

@@ -22,6 +22,7 @@ from math import pi
 from topo.base.parameter import Dynamic
 import random
 from topo.base.connectionfield import CFProjection
+from topo.learningfns.basic import HebbianSOM
 import pdb #debugger
 
 
@@ -51,7 +52,7 @@ class TestCFSom(unittest.TestCase):
         som = CFSOM()
         
         s.add(som,input,save)
-        s.connect(input,som,connection_type=CFProjection)
+        s.connect(input,som,connection_type=CFProjection,connection_params={'learning_fn':HebbianSOM()})
         s.connect(som,save)
         s.run(duration=10)
     
@@ -93,7 +94,7 @@ class TestCFSom(unittest.TestCase):
         V1 = CFSOM(name='V1')
         V1.print_level = topo.base.topoobject.WARNING
 
-        s.connect(retina,V1,delay=1,connection_type=CFProjection,connection_params={'name':'RtoV1'})
+        s.connect(retina,V1,delay=1,connection_type=CFProjection,connection_params={'name':'RtoV1','learning_fn':HebbianSOM()})
         s.print_level = topo.base.topoobject.WARNING
 
         self.assertTrue(len(V1.get_in_projection_by_name('RtoV1')) == 1)
