@@ -100,11 +100,11 @@ class PatternGenerator(TopoObject):
     bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True)
     density = Parameter(default=10000,hidden=True)
 
-    x       = Number(default=0.0,softbounds=(-1.0,1.0))
-    y       = Number(default=0.0,softbounds=(-1.0,1.0))
-    orientation = Number(default=0,softbounds=(0.0,2*pi))
-    scale = Number(default=1.0,softbounds=(0.0,2.0))
-    offset = Number(default=0.0,softbounds=(-1.0,1.0))
+    x       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.9)
+    y       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.91)
+    orientation = Number(default=0,softbounds=(0.0,2*pi),precedence=0.89)
+    scale = Number(default=1.0,softbounds=(0.0,2.0),precedence=0.8)
+    offset = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.81)
 
     def __call__(self,**params):
         self.verbose("params = ",params)
