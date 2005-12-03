@@ -361,9 +361,9 @@ on Sheets, so everything should call a Sheet a Sheet, not a Region,
 Area, or Layer.
 
 In particular, when writing user interface code, think about what you
-letting the user plot or manipulate, and ask whether that's one of the
-concepts for which we have (laboriously!) worked out a specific term.
-Examples of acceptable, well-defined terms:
+are letting the user plot or manipulate, and ask whether that's one of 
+the concepts for which we have (laboriously!) worked out a specific 
+term. Examples of acceptable, well-defined terms:
 
   Sheet
   Unit
@@ -445,7 +445,7 @@ different:
      please use comments for things that are not obvious, such as the
      reason a particular approach was chosen, descriptions of things
      that would be nice to add but haven't been done yet, high-level
-     explanations of a long-section of low-level code, etc.  Do not
+     explanations of a long section of low-level code, etc.  Do not
      include things relevant to the user; such things go into docstrings.
 
 To summarize, please use code, docstrings, and comments appropriately.
