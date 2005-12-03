@@ -33,6 +33,7 @@ should any changes be made to that ordering here.
 
 $Id$
 """
+# CEBHACKALERT: if anyone can think of a better way, please say!
 SC_PREC = 0.10
 OF_PREC = 0.11
 X_PREC = 0.20
