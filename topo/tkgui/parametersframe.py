@@ -45,8 +45,7 @@ class ParametersFrame(Frame):
         self.__properties_frame.set_values(self.__default_values)
 
 
-    # CEBHACKALERT: See HACKALERT in TaggedSlider.
-    # I'd like to remove this idea from here and TaggedSlider.
+    # CEBHACKALERT: it would be better if the TaggedSliders looked after themselves.
     def refresh(self):
         """
         """

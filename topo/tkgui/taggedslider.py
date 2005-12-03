@@ -9,6 +9,10 @@ from Tkinter import Frame, IntVar, Scale, Entry
 from Tkinter import LEFT, RIGHT, TOP, BOTTOM, YES, BOTH
 import string
 
+# CEBHACKALERT: somewhere there has to be better handling of bad input.
+# e.g. "cat" gives orientation zero, as does "pI/4".
+# Typing "1," leads to a really annoying error too.
+
 class TaggedSlider(Frame):
     """
     Widget for manipulating a numeric value using either a slider or a
@@ -91,10 +95,7 @@ class TaggedSlider(Frame):
         new_string = self.fmt % self.get_slider_value()
         self.tag_val.set(new_string)
 
-    # CEBHACKALERT: detection of pressing 'return' in the box doesn't work
-    # on my system. The slider is updated whenever I type anything in the
-    # box.
-        
+         
     def set_slider_from_tag(self,evchar=None):
         # Attempt to update the sliders only on return.
         if not self.first_slider_command \
