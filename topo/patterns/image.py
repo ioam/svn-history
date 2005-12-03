@@ -9,6 +9,7 @@ from topo.base.topoobject import TopoObject
 from topo.base.sheet import bounds2shape
 from topo.outputfns.basic import DivisiveMaxNormalize
 from topo.base.patterngenerator import PatternGenerator
+from topo.patterns.basic import W_PREC, H_PREC
 from topo.base.parameter import Filename, Number, Parameter
 from Numeric import array, transpose, ones, floor, Float, divide, where
 import Image, ImageOps
@@ -145,9 +146,9 @@ class TopoImage(TopoObject):
 class ImageGenerator(PatternGenerator):
     """2D image generator."""
 
-    width  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.2)
-    height  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.21)
-    filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.05)
+    width  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=W_PREC)
+    height  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=H_PREC)
+    filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9)
     
     def function(self,**params):
         bounds  = params.get('bounds', self.bounds)
