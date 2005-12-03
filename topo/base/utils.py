@@ -238,29 +238,6 @@ def descendents(class_):
     return out[::-1]
 
 
-import Numeric
-def exp(x):
-    """
-    Avoid overflow of Numeric.exp() for large-magnitude arguments (|x|>MAX_MAG).
-
-    Return  Numeric.exp( inf)==inf  if x > MAX_MAG
-            Numeric.exp(-inf)==0.0  if x < -MAX_MAG
-                                 x  otherwise
-
-    Numeric.exp() gives an OverflowError ('math range error') for 
-    arguments of magnitude greater than about 700 (on linux).
-
-    See e.g.
-    [Python-Dev] RE: Possible bug (was Re: numpy, overflow, inf, ieee, and rich comparison)
-    http://mail.python.org/pipermail/python-dev/2000-October/thread.html#9851
-    """
-    # CEBHACKALERT:
-    # This value works on the linuxes we all use, but what about on other platforms?
-    MAX_MAG = 700.0
-
-    return Numeric.exp(Numeric.where(abs(x)>MAX_MAG,Numeric.sign(x)*inf,x))
-
-
 # CEBHACKALERT: I think this function should be renamed to sorted_keys() or sorted_dict_keys() or something
 # like that.
 
@@ -294,6 +271,7 @@ def keys_sorted_by_value(d):
 ### It has been tried to change the function so that to get rid of the for
 ### loop, but no satisfying matrix function has been found to perform it.
 
+# shouldn't this be in arrayutils?
 def clip_in_place(mat,lower_bound,upper_bound):
     """Version of Numeric.clip that changes the argument in place, with no intermediate."""
     mat.savespace(1)
@@ -344,8 +322,7 @@ def class_parameters(topo_class):
     
     import topo.base.topoobject
     if not isinstance(topo_obj,topo.base.topoobject.TopoObject):
-        # CEBHACKALERT: what's the proper error?
-        raise "Can only get Parameters for a class derived from TopoObject."
+        raise TypeError("Can only get Parameters for a class derived from TopoObject.")
     
     parameters = [(parameter_name,parameter)
                   for (parameter_name,parameter)
