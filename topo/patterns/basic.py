@@ -16,9 +16,6 @@ from topo.base.patterngenerator import PatternGenerator
 from topo.base.patterngenerator import ConstantGenerator
 
 
-# CEBHACKALERT:
-# Document params.get()
-
 class GaussianGenerator(PatternGenerator):
     """2D Gaussian pattern generator."""
     
