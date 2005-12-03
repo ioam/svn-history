@@ -3,10 +3,10 @@ Simple two-dimensional mathematical or geometrical pattern generators.
 
 
 Additionally, this module defines precedences
-FR_PREC, PH_PREC, W_PREC, H_PREC, TH_PREC, SM_PREC
+W_PREC, H_PREC, FR_PREC, PH_PREC, TH_PREC, SM_PREC
 which can be used by subclasses that use one of the typical Parameters
-(frequency, phase, width, height, thickness, smooting) and wish to maintain the same order
-frequency > phase > width > height > thickness > smoothing
+(frequency, phase, width, height, thickness, smoothing) and wish to maintain the same order
+width > height > frequency > phase > thickness > smoothing
 should any changes be made to that ordering here.
 
 $Id$
@@ -24,13 +24,12 @@ from topo.base.patterngenerator import PatternGenerator, SC_PREC
 from topo.base.patterngenerator import ConstantGenerator
 
 # precedence constants for ordering
-# scale,offset,orientation,x,y
-FR_PREC = 0.1
-PH_PREC = 0.11
-W_PREC = 0.2
-H_PREC = 0.21
-TH_PREC = 0.3
-SM_PREC = 0.4
+W_PREC = 0.30
+H_PREC = 0.31
+FR_PREC = 0.50
+PH_PREC = 0.51
+TH_PREC = 0.60
+SM_PREC = 0.61
 
 
 class GaussianGenerator(PatternGenerator):

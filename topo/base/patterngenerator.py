@@ -25,14 +25,20 @@ discussion of the Topographica coordinate system.
 
 
 Additionally, this module defines precedences
-SC_PREC, OF_PREC, OR_PREC, X_PREC, Y_PREC
+SC_PREC, OF_PREC, X_PREC, Y_PREC, OR_PREC
 which can be used by subclasses that override one of the standard Parameters
 (x,y,orientation,scale,offset) and wish to maintain the same order
-scale > offset > orientation > x > y
+scale > offset > x > y > orientation 
 should any changes be made to that ordering here.
 
 $Id$
 """
+SC_PREC = 0.10
+OF_PREC = 0.11
+X_PREC = 0.20
+Y_PREC = 0.21
+OR_PREC = 0.40
+
 __version__='$Revision$'
 
 from topoobject import TopoObject
@@ -105,12 +111,11 @@ class ImageGenerator(Sheet):
 
 
 # precedence constants for ordering
-# scale,offset,orientation,x,y
-SC_PREC = 0.8
-OF_PREC = 0.81
-OR_PREC = 0.89
-X_PREC = 0.9
-Y_PREC = 0.91
+SC_PREC = 0.10
+OF_PREC = 0.11
+X_PREC = 0.20
+Y_PREC = 0.21
+OR_PREC = 0.40
 
 class PatternGenerator(TopoObject):
     """
