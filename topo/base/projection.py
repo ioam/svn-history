@@ -47,9 +47,6 @@ class Identity(OutputFunction):
     derive other classes from this object, modify it to have different
     behavior, add side effects, or anything of that nature.
     """
-    ### JABALERT! Can this function be omitted entirely?
-    def __init__(self,**params):
-        super(Identity,self).__init__(**params)
 
     def __call__(self,x):
         return x

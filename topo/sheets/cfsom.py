@@ -7,7 +7,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.utils import L2norm
+from topo.base.arrayutils import L2norm
 from topo.base.parameter import Number
 from Numeric import argmax,exp,floor
 from topo.base.connectionfield import CFSheet

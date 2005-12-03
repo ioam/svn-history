@@ -25,7 +25,7 @@ __version__='$Revision$'
 # are needed for some of the statistical functions (e.g. vector sum).
 from math import pi
 from Numeric import innerproduct, array, exp, argmax
-from utils import arg
+from arrayutils import arg
 
 from utils import wrap
 

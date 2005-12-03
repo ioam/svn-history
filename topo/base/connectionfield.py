@@ -25,7 +25,8 @@ import Numeric
 from topoobject import TopoObject
 from projection import Projection,ProjectionSheet,Identity
 from parameter import Parameter, Number, BooleanParameter
-from utils import mdot,hebbian,divisive_normalization
+from utils import hebbian
+from arrayutils import mdot,divisive_normalization
 from sheet import Sheet
 from sheetview import UnitView
 from itertools import chain
@@ -218,10 +219,6 @@ class CFLearningFunction(TopoObject):
 
 class IdentityCFLF(CFLearningFunction):
     """CFLearningFunction performing no learning."""
-
-    ### JABALERT! Can this function be omitted entirely?
-    def __init__(self,**params):
-        super(IdentityCFLF,self).__init__(**params)
 
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         pass

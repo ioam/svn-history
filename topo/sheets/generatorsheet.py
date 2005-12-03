@@ -27,9 +27,6 @@ class GeneratorSheet(Sheet):
     period = Parameter(default=1)
     phase  = Parameter(default=0)
 
-    ### JABALERT!  What is this for?  Either document it or remove it.
-    theta = Parameter(default=0)
-
     input_generator = PatternGeneratorParameter(default=ConstantGenerator())
     
     def __init__(self,**params):
@@ -86,12 +83,6 @@ class GeneratorSheet(Sheet):
         self.verbose("Received %s input from %s." % (NxN(data.shape),src))
         self.verbose("Generating a new pattern...")
 
-        ### JABHACKALERT!
-        ###
-        ### What does this comment mean?  Either remove it or clarify it.
-        ###
-        # TODO: Pass a dictionary to this function to avoid having all of the
-        # subclasses below
         self.activity = self.input_generator()
         
         self.send_output(data=self.activity)

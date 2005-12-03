@@ -17,7 +17,8 @@ __version__='$Revision $'
 
 import unittest
 
-from topo.base.utils import arg, wrap
+from topo.base.utils import wrap
+from topo.base.arrayutils import arg
 from math import pi
 from Numeric import array, exp
 from topo.base.sheet import Sheet

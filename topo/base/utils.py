@@ -6,24 +6,9 @@ $Id$
 """
 __version__='$Revision$'
 
-from Numeric import sqrt,ones,dot,sum
 import __main__
 import math
 
-
-# Question: Couldn't this use float('inf') or array([float('inf')])?
-# Answer: No.  As of Python 2.4 only some platforms will support float('inf').
-#         In particular, Python 2.4 for Windows generates a cast error
-#         while the operation does work under Linux.
-#         (see http://www.python.org/peps/pep-0754.html)
-
-inf = (ones(1)/0.0)[0]
-
-
-### JABALERT! Need to separate the utilities that depend on Numeric
-### from the others, so that no caller will accidentally require
-### Numeric.  Presumably the Numeric-related functions would go into a
-### separate file arrayutils.py.
 
 
 def wrap(lower, upper, x):
@@ -59,50 +44,11 @@ def enumerate(seq):
 enum = enumerate
 
 
-def L2norm(v):
-    """
-    Return the L2 norm of the vector v.
-    """    
-    return sqrt(dot(v,v))
-
-
-def norm(v,p=2):
-    """
-    Returns the Lp norm of v, where p is arbitrary and defaults to 2.
-    """
-    return sum(abs(v)**p)**(1.0/p)
-
-
-def msum(m):
-    """
-    Returns the sum of elements in a 2D matrix.  Works in cases where
-    sum(a.flat) fails, e.g, with matrix slices or submatrices.
-    """
-    return sum(sum(m))
-
-
-### JAB: Could be rewritten using weave.blitz to avoid creating a temporary
-def mdot(m1,m2):
-    """
-    Returns the sum of the element-by-element product of two 2D
-    arrays.  Works in cases where dot(a.flat,b.flat) fails, e.g, with
-    matrix slices or submatrices.
-    """
-    a = m1*m2
-    return sum(a.flat)
-
-
 def hebbian(input_activity, unit_activity, weights, learning_rate):
     """Simple Hebbian learning for the weights of one single unit."""
     weights += learning_rate * unit_activity * input_activity
 
 
-def divisive_normalization(weights):
-    """Divisively normalize an array to sum to 1.0"""
-    s = sum(weights.flat)
-    if s != 0:
-        factor = 1.0/s
-        weights *= factor
 
 class Struct:
     """
@@ -135,20 +81,6 @@ def flat_indices(shape):
         return [(r,c) for r in range(rows) for c in range(cols)]
         
     
-def add_border(matrix,width=1,value=0.0):
-    """
-    Returns a new matrix consisting of the given matrix with a border
-    or margin of the given width filled with the given value.
-    """
-    from Numeric import concatenate as join,array
-    rows,cols = matrix.shape
-
-    hborder = array([ [value]*(cols+2*width) ]*width)
-    vborder = array([ [value]*width ] * rows)
-
-    temp = join( (vborder,matrix,vborder), axis=1)
-    return join( (hborder,temp,hborder) )
-
 
 def flatten(l):
     """
@@ -214,18 +146,6 @@ def find_classes_in_package(package,parentclass):
                     and v2 is not parentclass):
                     result[v2.__name__] = v2
     return result
-
-
-from Numeric import add, arctan2
-def arg(z):
-    """
-    Return the complex argument (phase) of z.
-
-    (z in radians.)
-    """
-    z = z + complex()  # so that arg(z) also works for real z
-
-    return arctan2(z.imag, z.real)
 
 
 
@@ -343,6 +263,7 @@ def exp(x):
 
 # CEBHACKALERT: I think this function should be renamed to sorted_keys() or sorted_dict_keys() or something
 # like that.
+
 def dict_sort(d):
     """ Simple and fast routine to sort a dictonary on key """
     keys = d.keys()

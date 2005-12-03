@@ -16,8 +16,8 @@ __version__='$Revision$'
 import unittest
 
 
-from topo.outputfns.basic import PiecewiseLinear, DivisiveL1Normalize
-from topo.outputfns.basic import DivisiveL2Normalize, DivisiveMaxNormalize
+from topo.outputfns.basic import PiecewiseLinear, DivisiveSumNormalize
+from topo.outputfns.basic import DivisiveLengthNormalize, DivisiveMaxNormalize
 from topo.outputfns.basic import DivisiveLpNormalize
 
 from Numeric import array
@@ -90,8 +90,7 @@ class TestPiecewiseLinear(unittest.TestCase):
            self.assertAlmostEqual(item1, item2)
  
             
-## REMENBER: eventually, change the name of this function to DivisiveNormalizeSum     
-class TestDivisiveL1Normalize(unittest.TestCase):
+class TestDivisiveSumNormalize(unittest.TestCase):
     
     def setUp(self):
 
@@ -101,10 +100,10 @@ class TestDivisiveL1Normalize(unittest.TestCase):
         self.a2 = array([[1.0,-1.0,7.0],
                         [4.0,3.0,11.0]])
 
-        self.fn1 = DivisiveL1Normalize()
-        self.fn2 = DivisiveL1Normalize(norm_value=4.0)
+        self.fn1 = DivisiveSumNormalize()
+        self.fn2 = DivisiveSumNormalize(norm_value=4.0)
                
-    def test_divisive_l1_normalize(self):
+    def test_divisive_sum_normalize(self):
         # Test as a procedure
 
         fn1_a1 = self.a1/3.0
@@ -156,8 +155,7 @@ class TestDivisiveL1Normalize(unittest.TestCase):
         for item1,item2 in zip(self.fn2(self.a2).flat,fn2_a2.flat):
            self.assertAlmostEqual(item1, item2)    
 
-## REMENBER: eventually, change the name of this function to DivisiveNormalizeLentgh (..?)     
-class TestDivisiveL2Normalize(unittest.TestCase):
+class TestDivisiveLengthNormalize(unittest.TestCase):
     
     def setUp(self):
 
@@ -168,10 +166,10 @@ class TestDivisiveL2Normalize(unittest.TestCase):
                          [4.0,3.0,11.0],
                          [2.0,5.0,9.0]])
 
-        self.fn1 = DivisiveL2Normalize()        
-        self.fn2 = DivisiveL2Normalize(norm_value=4.0)
+        self.fn1 = DivisiveLengthNormalize()        
+        self.fn2 = DivisiveLengthNormalize(norm_value=4.0)
                
-    def test_divisive_l2_normalize(self):
+    def test_divisive_length_normalize(self):
         # Test as a procedure
         
         eucl_norm_a1 = sqrt(0.3**2+0.6**2+0.7**2+0.8**2+0.4**2+0.2**2)
@@ -411,8 +409,8 @@ class TestDivisiveLpNormalize(unittest.TestCase):
 
 
 cases = [TestPiecewiseLinear,
-         TestDivisiveL1Normalize,
-         TestDivisiveL2Normalize,
+         TestDivisiveSumNormalize,
+         TestDivisiveLengthNormalize,
          TestDivisiveMaxNormalize,
          TestDivisiveLpNormalize]
 

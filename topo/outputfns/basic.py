@@ -17,7 +17,8 @@ import Numeric
 from Numeric import clip
 from topo.base.topoobject import TopoObject
 from topo.base.parameter import Number
-from topo.base.utils import L2norm, norm, clip_in_place
+from topo.base.utils import clip_in_place
+from topo.base.arrayutils import L2norm, norm
 from topo.base.projection import OutputFunction
 
 # Imported here so that all OutputFunctions will be in the same package
@@ -46,8 +47,7 @@ class PiecewiseLinear(OutputFunction):
         clip_in_place(x,0.0,1.0)
         return x
 
-### JABALERT! Should be renamed to DivisiveSumNormalize
-class DivisiveL1Normalize(OutputFunction):
+class DivisiveSumNormalize(OutputFunction):
     """
     OutputFunction that divides an array by its sum (aka its L1 norm).
 
@@ -58,7 +58,7 @@ class DivisiveL1Normalize(OutputFunction):
     norm_value = Number(default=1.0)
     
     def __init__(self,**params):
-        super(DivisiveL1Normalize,self).__init__(**params)
+        super(DivisiveSumNormalize,self).__init__(**params)
 
     def __call__(self,x):
         tot = 1.0*sum(x.flat)
@@ -68,8 +68,7 @@ class DivisiveL1Normalize(OutputFunction):
         return x
 
 
-### JABALERT! Should be renamed to DivisiveLengthNormalize
-class DivisiveL2Normalize(OutputFunction):
+class DivisiveLengthNormalize(OutputFunction):
     """
     OutputFunction to divide an array by its Euclidean length (aka its L2 norm).
 
@@ -79,7 +78,7 @@ class DivisiveL2Normalize(OutputFunction):
     norm_value = Number(default=1.0)
     
     def __init__(self,**params):
-        super(DivisiveL2Normalize,self).__init__(**params)
+        super(DivisiveLengthNormalize,self).__init__(**params)
 
     def __call__(self,x):
         tot = 1.0*L2norm(x.flat)
@@ -119,7 +118,7 @@ class DivisiveLpNormalize(OutputFunction):
     vector, keeps the Lp-norm of the vector at a specified norm_value.
     Faster versions are provided separately for the typical L1-norm
     and L2-norm cases.  Defaults to be the same as an L2-norm, i.e.,
-    DivisiveL2Normalize.
+    DivisiveLengthNormalize.
     """
     p = Number(default=2)
     norm_value = Number(default=1.0)

@@ -11,7 +11,7 @@ __version__='$Revision$'
 
 from math import pi
 from Numeric import where,maximum,cos,sin,sqrt,less_equal,divide,greater_equal,bitwise_xor
-from utils import exp
+from arrayutils import exp
 
 # CEB:
 # Divide is imported from Numeric so that mathematical expressions with scalars

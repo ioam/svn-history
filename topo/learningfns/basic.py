@@ -10,8 +10,8 @@ from topo.base.topoobject import TopoObject
 from topo.base.parameter import Parameter,Constant
 from topo.base.projection import Identity
 from topo.base.connectionfield import CFLearningFunction
-from topo.outputfns.basic import DivisiveL1Normalize
-from topo.base.utils import L2norm
+from topo.outputfns.basic import DivisiveSumNormalize
+from topo.base.arrayutils import L2norm
 from Numeric import exp
 
 
@@ -102,13 +102,13 @@ class DivisiveHebbian(CFLearningFunction):
     CF-aware Hebbian learning rule with built-in divisive normalization.
 
     Implemented in C for speed.  Should be equivalent to
-    GenericCFLF(single_cf_fn=hebbian,output_fn=DivisiveL1Normalize()),
+    GenericCFLF(single_cf_fn=hebbian,output_fn=DivisiveSumNormalize()),
     except faster.  The output_fn cannot be modified, because the
     divisive normalization is performed in C while doing the weight
     modification; the output_fn is not actually called from within
     this function.
     """
-    output_fn = Constant(DivisiveL1Normalize())
+    output_fn = Constant(DivisiveSumNormalize())
 
     def __init__(self,**params):
         super(DivisiveHebbian,self).__init__(**params)
@@ -191,7 +191,7 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
     CFProjection_CPointer. This class should only be used by a sheet that
     only has CFProjection_CPointers connected to it. 
     """
-    output_fn = Constant(DivisiveL1Normalize())
+    output_fn = Constant(DivisiveSumNormalize())
 
     def __init__(self,**params):
         super(DivisiveHebbian_CPointer,self).__init__(**params)

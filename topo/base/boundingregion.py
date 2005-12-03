@@ -17,9 +17,9 @@ from parameter import Parameter
 from Numeric import *
 from topoobject import TopoObject
 from utils import classlist
+from arrayutils import inf
 
-### JABHACKALERT! Must replace this with the real exception NotImplementedError (easy)
-NYI = "Abstract method not implemented."
+NYI = NotImplementedError
 
 class BoundingRegion(TopoObject):
     """
@@ -139,7 +139,7 @@ class BoundingCircle(BoundingRegion):
         r = self.radius
         return AARectangle((xc-r,yc-r),(xc+r,yc+r))
 
-inf = array(1)/0.0
+#inf = array(1)/0.0
 class Unbounded(BoundingRegion):
     def __init__(self,**args):
         super(Unbounded,self).__init__(**args)

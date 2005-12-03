@@ -114,6 +114,13 @@ class PatternGenerator(TopoObject):
                         params.get('y',self.y),
                         params.get('orientation',self.orientation),
                         # CEBHACKALERT: why are rows and cols here?
+                        # yfsit: sometimes rows and cols are already known 
+                        #        before the patterngenerator is called, so
+                        #        we can just provide this information without
+			#        having them recomputed again. And sometimes
+			#        rows and cols are not found by simply calling
+			#        bound2shape() so we need to pass them in. 
+			#        (see ConnectionField.init())
                         params.get('rows',0),
                         params.get('cols',0))
         return self.scale*self.function(**params)+self.offset
@@ -142,7 +149,6 @@ class PatternGenerator(TopoObject):
 
         Both contain smaller to larger values from left to right, i.e. they follow Cartesian convention.
         """       
-        # CEBHACKLERT: why is this here? (See alert above.)
         if r == 0 and c == 0:
             rows,cols = bounds2shape(bounds,density)
         else:
@@ -158,6 +164,9 @@ class PatternGenerator(TopoObject):
         # it generates a 101x100 
         # CEB: should this JABHACKALERT go now matrixidx2sheet has been fixed?
         # Or if not, should this alert be moved to that function?
+	# yfsit: The above TODO is not true now. If row and cols are not 
+	#        supplied, bounds2shape will still return the same size given
+	#        the same bounds and density.
         pattern_y = array([matrixidx2sheet(r,0,bounds,density) for r in range(rows)])
         pattern_x = array([matrixidx2sheet(0,c,bounds,density) for c in range(cols)])
 
