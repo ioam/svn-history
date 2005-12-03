@@ -24,12 +24,12 @@ discussion of the Topographica coordinate system.
 
 
 
-    Additionally, this module defines precedences
-    SC_PREC, OF_PREC, OR_PREC, X_PREC, Y_PREC
-    which can be used by subclasses that override one of the standard Parameters
-    (x,y,orientation,scale,offset) and wish to maintain the same order should any changes
-    be made to the precedences here.
-
+Additionally, this module defines precedences
+SC_PREC, OF_PREC, OR_PREC, X_PREC, Y_PREC
+which can be used by subclasses that override one of the standard Parameters
+(x,y,orientation,scale,offset) and wish to maintain the same order
+scale > offset > orientation > x > y
+should any changes be made to that ordering here.
 
 $Id$
 """
