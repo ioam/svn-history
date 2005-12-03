@@ -88,6 +88,12 @@ class Parameter(object):
         http://users.rcn.com/python/download/Descriptor.htm
 
     (And the other items on http://www.python.org/doc/newstyle.html)
+
+
+    Note about pickling:
+    Parameters are usually used inside TopoObjects, and as so are pickled even though
+    Parameter has no explicit support for pickling (usually if a class has __slots__ it
+    can't be pickled without additional support: see the Pickle module documentation).
     """
 
     __slots__ = ['_name','default','doc','hidden','precedence']
