@@ -153,7 +153,7 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         """
         pg_class = self.pg_name_dict[new_name]
         
-        self.param_frame.refresh_widgets(pg_class)
+        self.param_frame.create_widgets(pg_class)
         self.in_ep_dict = self.create_patterns(self.cur_pg_name(),self.in_ep_dict)
         if self.auto_refresh: self.refresh()
 
