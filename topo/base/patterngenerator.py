@@ -107,25 +107,30 @@ class PatternGenerator(TopoObject):
     offset = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.81)
 
     def __call__(self,**params):
+        """
+        # CEBHACKALERT: I still have documentation to write, including explaining
+        params.get().
+
+        Sometimes rows and cols are already known before the PatternGenerator is called, so
+        we can just provide this information without having them recomputed. And sometimes
+        rows and cols are not found by simply calling bound2shape() so we need to pass them in
+	(e.g. see ConnectionField.init()).
+        """
         self.verbose("params = ",params)
         self.__setup_xy(params.get('bounds',self.bounds),
                         params.get('density',self.density),
                         params.get('x', self.x),
                         params.get('y',self.y),
                         params.get('orientation',self.orientation),
-                        # CEBHACKALERT: why are rows and cols here?
-                        # yfsit: sometimes rows and cols are already known 
-                        #        before the patterngenerator is called, so
-                        #        we can just provide this information without
-			#        having them recomputed again. And sometimes
-			#        rows and cols are not found by simply calling
-			#        bound2shape() so we need to pass them in. 
-			#        (see ConnectionField.init())
                         params.get('rows',0),
                         params.get('cols',0))
         return self.scale*self.function(**params)+self.offset
 
     def __setup_xy(self,bounds,density,x,y,orientation,rows,cols):
+        """
+        Produce the pattern matrices from the bounds and density (or rows and cols), and transform according
+        to x,y, and orientation.
+        """
         self.verbose("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
         x_points,y_points = self.__produce_sampling_vectors(bounds,density,rows,cols)
         self.pattern_x, self.pattern_y = self.__create_and_rotate_coordinates(x_points-x,y_points-y,orientation)
@@ -140,12 +145,13 @@ class PatternGenerator(TopoObject):
         """
         raise NotImplementedError
 
+
     def __produce_sampling_vectors(self, bounds, density, r, c):
         """
         Generate vectors representing coordinates at which the pattern will be sampled.
 
-        pattern_x is a 1d-array of x-axis values at which to sample the pattern;
-        pattern_y contains the y-axis values.
+        x is a 1d-array of x-axis values at which to sample the pattern;
+        y contains the y-axis values.
 
         Both contain smaller to larger values from left to right, i.e. they follow Cartesian convention.
         """       
@@ -155,28 +161,16 @@ class PatternGenerator(TopoObject):
             rows = r
             cols = c
 
-        ### JABHACKALERT!
-        ### 
-        ### We must fix these things:
-        ### 
-        # TODO: this can generate output that may be off by one in terms of size,
-        # for example most times this generates a 100x100 image, but sometimes
-        # it generates a 101x100 
-        # CEB: should this JABHACKALERT go now matrixidx2sheet has been fixed?
-        # Or if not, should this alert be moved to that function?
-	# yfsit: The above TODO is not true now. If row and cols are not 
-	#        supplied, bounds2shape will still return the same size given
-	#        the same bounds and density.
-        pattern_y = array([matrixidx2sheet(r,0,bounds,density) for r in range(rows)])
-        pattern_x = array([matrixidx2sheet(0,c,bounds,density) for c in range(cols)])
+        y = array([matrixidx2sheet(r,0,bounds,density) for r in range(rows)])
+        x = array([matrixidx2sheet(0,c,bounds,density) for c in range(cols)])
 
-        pattern_y = pattern_y[::-1,1]
-        pattern_x = pattern_x[:,0]
+        y = y[::-1,1]
+        x = x[:,0]
 
-        assert len(pattern_x) == cols
-        assert len(pattern_y) == rows
+        assert len(x) == cols
+        assert len(y) == rows
 
-        return pattern_x, pattern_y
+        return x, y
 
     def __create_and_rotate_coordinates(self, x, y, orientation):
         """
