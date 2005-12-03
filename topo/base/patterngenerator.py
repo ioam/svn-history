@@ -22,6 +22,15 @@ the orientation of the pattern matrices have the same orientation
 maintained by the Sheet classes.  Refer to sheet.py for a longer
 discussion of the Topographica coordinate system.
 
+
+
+    Additionally, this module defines precedences
+    SC_PREC, OF_PREC, OR_PREC, X_PREC, Y_PREC
+    which can be used by subclasses that override one of the standard Parameters
+    (x,y,orientation,scale,offset) and wish to maintain the same order should any changes
+    be made to the precedences here.
+
+
 $Id$
 """
 __version__='$Revision$'
@@ -95,16 +104,31 @@ class ImageGenerator(Sheet):
         self.send_output(data=self.activity)
 
 
+# precedence constants for ordering
+# scale,offset,orientation,x,y
+SC_PREC = 0.8
+OF_PREC = 0.81
+OR_PREC = 0.89
+X_PREC = 0.9
+Y_PREC = 0.91
+
 class PatternGenerator(TopoObject):
+    """
+
+    A PatternGenerator's Parameters can make use of Parameter's precedence attribute
+    to specify the order in which they should appear e.g. on a GUI. The precedence
+    attribute is based on the range 0.0 to 1.0, with ordering going from 0.0 (first)
+    to 1.0 (last).    
+    """
 
     bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True)
     density = Parameter(default=10000,hidden=True)
 
-    x       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.9)
-    y       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.91)
-    orientation = Number(default=0,softbounds=(0.0,2*pi),precedence=0.89)
-    scale = Number(default=1.0,softbounds=(0.0,2.0),precedence=0.8)
-    offset = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.81)
+    x       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=X_PREC)
+    y       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=Y_PREC)
+    orientation = Number(default=0,softbounds=(0.0,2*pi),precedence=OR_PREC)
+    scale = Number(default=1.0,softbounds=(0.0,2.0),precedence=SC_PREC)
+    offset = Number(default=0.0,softbounds=(-1.0,1.0),precedence=OF_PREC)
 
     def __call__(self,**params):
         """
