@@ -45,10 +45,10 @@ class ParametersFrame(Frame):
         self.__properties_frame.set_values(self.__default_values)
 
 
-    # need to refresh things other than sliders - do this properly
+    # CEBHACKALERT: See HACKALERT in TaggedSlider.
+    # I'd like to remove this idea from here and TaggedSlider.
     def refresh(self):
         """
-        something like, this makes slider match tag or whatever - who knows?
         """
         try: 
             for entry in self.__widgets.values():
@@ -67,15 +67,10 @@ class ParametersFrame(Frame):
 
         Widgets for Parameters are added in order or Parameters' precedence.
         """
-
-        # self.__widgets is
-        # {parameter_name: (Tkinter.Message instance, widget)
-                            # (name,Parameter) 
         for (s,c) in self.__widgets.values():
             s.grid_forget()
             c.grid_forget()
 
-        # find class' Parameters
         parameters = class_parameters(topo_class)
         self.__widgets = self.__make_widgets(parameters)
 

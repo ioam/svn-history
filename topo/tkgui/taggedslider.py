@@ -80,7 +80,7 @@ class TaggedSlider(Frame):
         else:
             self.first_slider_command = 0
         
-        
+     
     def tag_keypress(self,ev):
         #print 'tag_keypress: '+ev.char
         if ev.char != '\r':
@@ -90,7 +90,10 @@ class TaggedSlider(Frame):
     def set_tag_from_slider(self):
         new_string = self.fmt % self.get_slider_value()
         self.tag_val.set(new_string)
-##
+
+    # CEBHACKALERT: detection of pressing 'return' in the box doesn't work
+    # on my system. The slider is updated whenever I type anything in the
+    # box.
         
     def set_slider_from_tag(self,evchar=None):
         # Attempt to update the sliders only on return.
