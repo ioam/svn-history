@@ -12,6 +12,8 @@ from topo.base.parameter import Number
 from Numeric import argmax,exp,floor
 from topo.base.connectionfield import CFSheet
 from itertools import chain
+from topo.learningfns.basic import HebbianSOM
+from topo.base.parameter import Number
 
 
 class CFSOM(CFSheet):
@@ -56,9 +58,11 @@ class CFSOM(CFSheet):
         learning_rate = self.alpha()
         for proj in chain(*self.in_projections.values()):
             if proj.input_buffer:
+                if isinstance(proj.learning_fn, HebbianSOM):
+                    proj.learning_fn.learning_radius = radius
                 inp = proj.input_buffer
                 cfs = proj.cfs
-                proj.learning_fn(cfs, inp, self.activity, learning_rate, winner_r=wr, winner_c=wc, radius=radius)
+                proj.learning_fn(cfs, inp, self.activity, learning_rate)
         
 
     def winner(self):
