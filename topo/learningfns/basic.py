@@ -19,6 +19,9 @@ from topo.base.patternfns import gaussian
 # Imported here so that all CFLearningFunctions will be in the same package
 from topo.base.connectionfield import IdentityCFLF,GenericCFLF
 
+### JABHACKALERT! Most of these need move to a new file optimized.py,
+### because they use weave.
+
 
 ### JABALERT!  Untested.
 class Hebbian(CFLearningFunction):
@@ -97,7 +100,6 @@ class Hebbian(CFLearningFunction):
                     cfs[r][c].weights = output_fn(cfs[r][c].weights)
 
 
-### JABALERT!  Untested.
 class DivisiveHebbian(CFLearningFunction):
     """
     CF-aware Hebbian learning rule with built-in divisive normalization.
@@ -181,7 +183,6 @@ class DivisiveHebbian(CFLearningFunction):
 
 
 
-### JABALERT!  Untested.
 class DivisiveHebbian_CPointer(CFLearningFunction):
     """
     CF-aware Hebbian learning rule with built-in divisive normalization.
@@ -273,9 +274,11 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
 
 class HebbianSOM(CFLearningFunction):
     """
-    CF-aware Hebbian learning rule in Self-Organizing Maps. Only the winner
-    unit its surrounds will learn. The radius of the 
-    surround is specified by the named parameter radius in __call_.
+    CF-aware Hebbian learning rule in Self-Organizing Maps. Only the
+    winner unit and those surrounding it will learn. The radius of the
+    surround is specified by the parameter learning_radius, which
+    should be set before using __call__.  The shape of the surround is
+    determined by the neighborhood_fn, and can be any radial function.
     """
 
     learning_radius = Number(default=0.0)
@@ -292,12 +295,22 @@ class HebbianSOM(CFLearningFunction):
         output_fn = self.output_fn
 
         # find out the matrix coordinates of the winner
-	# NOTE: the coordinates could be calculated more efficiently within the 
-        # Sheet, e.g. by CFSOM.winnder_coords(), and pass them in, but
-	# that doesn't save much time and makes it harder to mix and match
-	# Projections and learning rules.
+        #
+	# NOTE: when there are multiple projections, it would be more
+        # efficient to calculate the winner coordinates within the
+        # Sheet, e.g. by moving winner_coords() to CFSOM and passing
+        # in the results here.  However, finding the coordinates
+        # does not take much time, and requiring the winner to be
+        # passed in would make it harder to mix and match Projections
+        # and learning rules.
         wr,wc = self.winner_coords(output_activity,cols)
 
+        ### JABHACKALERT!  Is updating only within this radius really
+        ### valid?  E.g. a Gaussian is still quite strong one sigma
+        ### away from the center; it's probably not near zero until at
+        ### least two or three radii away.  But maybe that's what is
+        ### usually done for a SOM, and it works ok?
+        
         # find out the bounding box around the winner in which weights will
         # be changed. This is just to make the code run faster.
         cmin = int(max(0,wc-radius))
