@@ -220,6 +220,7 @@ class CFLearningFunction(TopoObject):
 class IdentityCFLF(CFLearningFunction):
     """CFLearningFunction performing no learning."""
 
+    output_fn = Parameter(default=Identity())
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         pass
 
@@ -228,7 +229,6 @@ class IdentityCFLF(CFLearningFunction):
 class GenericCFLF(CFLearningFunction):
     """CFLearningFunction applying the specified single_cf_fn to each CF."""
     single_cf_fn = Parameter(default=hebbian)
-    output_fn = Parameter(default=Identity())
     
     def __init__(self,**params):
         super(GenericCFLF,self).__init__(**params)

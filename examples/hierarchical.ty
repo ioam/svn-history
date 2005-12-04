@@ -21,6 +21,7 @@ from topo.sheets.cfsom import CFSOM
 from topo.patterns.random import UniformRandomGenerator
 from topo.patterns.basic import LineGenerator
 from topo.base.simulator import Simulator
+from topo.learningfns.basic import HebbianSOM
 
 
 ###########################################
@@ -46,6 +47,7 @@ CFSOM.radius_0 = 0.1
 
 CFProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 CFProjection.response_fn = CFDotProduct()
+CFProjection.learning_fn = HebbianSOM()
 
 #topo.base.topoobject.min_print_level = topo.base.topoobject.MESSAGE
 
