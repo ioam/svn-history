@@ -3,6 +3,8 @@ InputParamsPanel
 
 Sliders panel for inputs
 
+# CEBHACKALERT: I will update this.
+
 The list of valid Input Types is retrieved from the registry, and
 would normally contain an automatically generated list of
 PatternGenerator subclasses found in topo.base.patterngenerator.  Every
@@ -25,7 +27,7 @@ import topo.plotting.plot
 import plotgrouppanel
 import Pmw
 import topo.base.sheetview 
-import topo.base.registry
+import topoconsole
 from Tkinter import IntVar, StringVar, Checkbutton
 from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
 from topo.base.utils import eval_atof
@@ -59,7 +61,7 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         # Variables and widgets for maintaining the list of input sheets
         # that will be given the user defined stimuli.
         self.in_ep_dict = {}
-        for (each,obj) in self.console.active_simulator().objects(GeneratorSheet).items():
+        for (each,obj) in topoconsole.active_sim().objects(GeneratorSheet).items():
             self.in_ep_dict[each] = {'obj':obj,'state':True,'pattern':None} 
         self.input_box = Pmw.RadioSelect(parent, labelpos = 'w',
                                 command = self._input_change,label_text = 'Input Sheets:',
@@ -121,7 +123,8 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         """
         Only open if GeneratorSheets are in the Simulator.
         """
-        if topo.base.registry.active_sim().objects(GeneratorSheet).items():
+        sim = topoconsole.active_sim()
+        if sim.objects(GeneratorSheet).items():
             return True
         else:
             return False

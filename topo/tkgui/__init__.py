@@ -11,7 +11,6 @@ $Id$
 __version__='$Revision $'
 
 import Pmw, sys, Tkinter
-import topo.base.simulator
 import topo.base.registry
 import topo.base.topoobject
 import topoconsole
@@ -27,29 +26,19 @@ def show_cmd_prompt():
         print "\n", sys.ps1,
         sys.stdout.flush()
     
-def start(sim=None, mainloop=False):
+def start(mainloop=False):
     """
     Startup code for GUI.
-
-    sim: Adds a simulation object into the GUI's active_simulator
-    variable. The GUI will request plots and other types of data
-    from this simulator.
 
     mainloop: If True, then the command-line is frozen while the GUI
     is open.  If False, then commands can be entered at the command-line
     even while the GUI is operational.  Default is False.
     """
-    assert isinstance(sim,topo.base.simulator.Simulator) or sim == None, 'sim is not a Simulator object'
-
     root = Tkinter.Tk()
     root.resizable(1,1)
     Pmw.initialise(root)
     console = topoconsole.TopoConsole(parent=root)
     console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
-    if sim is None:
-        console.set_active_simulator(topo.base.registry.active_sim())
-    else:
-        console.set_active_simulator(sim)
 
     topo.base.registry.set_console(console)
 

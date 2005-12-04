@@ -16,7 +16,7 @@ from cfsheetplotpanel import CFSheetPlotPanel
 from plotgrouppanel import PlotGroupPanel
 from itertools import chain
 from topo.base.projection import ProjectionSheet
-
+import topoconsole
 from topo.base.utils import dict_sort
 from topo.base.keyedlist import KeyedList
 
@@ -147,7 +147,7 @@ class ProjectionPanel(CFSheetPlotPanel):
         """
         Only open if ProjectionSheets are in the Simulator.
         """
-        if registry.active_sim().objects(ProjectionSheet).items():
+        if topoconsole.active_sim().objects(ProjectionSheet).items():
             return True
         else:
             return False

@@ -17,6 +17,7 @@ from cfsheetplotpanel import CFSheetPlotPanel
 from topo.base.projection import ProjectionSheet
 import topo.base.registry as registry
 from topo.base.sheet import Sheet
+import topoconsole
 
 class UnitWeightsPanel(CFSheetPlotPanel):
     def __init__(self,parent,pengine,console=None,**config):
@@ -62,7 +63,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         """
         Only open if ProjectionSheets are in the Simulator.
         """
-        if registry.active_sim().objects(ProjectionSheet).items():
+        if topoconsole.active_sim().objects(ProjectionSheet).items():
             return True
         else:
             return False
@@ -82,7 +83,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         if isinstance(self.x,int): self.x = float(self.x)
         if isinstance(self.y,int): self.y = float(self.y)
 
-        ep = [ep for ep in self.console.active_simulator().objects(Sheet).values()
+        ep = [ep for ep in topoconsole.active_sim().objects(Sheet).values()
               if ep.name == self.region.get()][0]
         # This assumes that displaying the rectangle information is enough.
         l,b,r,t = ep.bounds.aarect().lbrt()

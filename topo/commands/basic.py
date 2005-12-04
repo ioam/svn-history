@@ -18,11 +18,13 @@ import pickle
 ### to avoid duplicating all this code about if sim, not sim, else,
 ### etc.; is there some way to write that only once and just have all
 ### commands use it?
-            
+
+# CEBHACKALERT: it's confusing to pass sim like this. I intend to remove that from
+# functions such as this one unless anyone has a better idea...
 def save_input_generators(sim=None):
     """Save a copy of the current input_generators for all GeneratorSheets."""
     if not sim:
-        sim = topo.base.registry.active_sim()
+        sim = topo.base.simulator.active_sim
 
     if sim:
         generator_sheets = sim.objects(GeneratorSheet).values()
@@ -35,7 +37,7 @@ def save_input_generators(sim=None):
 def restore_input_generators(sim=None):
     """Restore previously saved input_generators for all GeneratorSheets."""
     if not sim:
-        sim = topo.base.registry.active_sim()
+        sim = topo.base.simulator.active_sim
 
     if sim:
         generator_sheets = sim.objects(GeneratorSheet).values()
@@ -71,7 +73,7 @@ def pattern_present(inputs=None,duration=1.0,sim=None,learning=False,overwrite_p
     to disable learning, then reenables learning.
     """
     if not sim:
-        sim = topo.base.registry.active_sim()
+        sim = topo.base.simulator.active_sim
     if sim:
 
         if not overwrite_previous:
@@ -152,11 +154,11 @@ def load_snapshot(snapshot_name):
     # Also confusion that current simulator is left behind as e.g. s
 
     saved_sim = pickle.load(open(snapshot_name,'rb'))         
-    topo.base.registry.set_active_sim(saved_sim)
+    topo.base.simulator.active_sim = saved_sim
 
     # CEBHACKALERT:
     # Until I figure out how to pickle random properties of the GaussianGenerator properly...
-    hack = 'from topo.base.registry import active_sim; from topo.sheets.generatorsheet import GeneratorSheet; gs_list = active_sim().objects(GeneratorSheet).values();[gs.set_input_generator(GaussianGenerator()) for gs in gs_list]'
+    hack = 'from topo.base.simulator import active_sim; from topo.sheets.generatorsheet import GeneratorSheet; gs_list = active_sim.objects(GeneratorSheet).values();[gs.set_input_generator(GaussianGenerator()) for gs in gs_list]'
     exec hack in __main__.__dict__
 
 def save_snapshot(snapshot_name):
@@ -167,6 +169,6 @@ def save_snapshot(snapshot_name):
 
     Uses Python's 'pickle' module, so subject to the same limitations.
     """
-    pickle.dump(topo.base.registry.active_sim(), open(snapshot_name,'wb'), 2)
+    pickle.dump(topo.base.simulator.active_sim, open(snapshot_name,'wb'), 2)
 
 

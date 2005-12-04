@@ -31,6 +31,8 @@ import topo.base.registry
 from topo.base import sheetview
 from topo.base.registry import get_console
 
+import topo.base.simulator
+
 ## Should only import this when using display option
 import topo.tkgui.topoconsole 
 
@@ -77,7 +79,7 @@ def measure_or_pref(sim=None,num_phase=18,num_orientation=4,frequencies=[2.4],
 
     
     if not sim:
-        sim = topo.base.registry.active_sim()
+        sim = topo.base.simulator.active_sim
 
     if sim:
 
@@ -107,7 +109,7 @@ def measure_activity():
     """Measure an activity map. Command called when opening an activity plot group panel.
     To be exact, just add the activity sheet_view for Sheets objects of the simulator
     """
-    simulator = topo.base.registry.active_sim()
+    simulator = topo.base.simulator.active_sim
     for sheet in simulator.objects(Sheet).values():
         activity_copy = array(sheet.activity)
         new_view = sheetview.SheetView((activity_copy,sheet.bounds),

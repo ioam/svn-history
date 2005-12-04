@@ -70,13 +70,17 @@ __version__='$Revision$'
 from topoobject import TopoObject
 from parameter import Parameter
 from copy import copy, deepcopy
-import registry
 from fixedpoint import FixedPoint
 
 SLEEP_EXCEPTION = "Sleep Exception"
 STOP = "Simulator Stopped"
 
 Forever = FixedPoint(-1)
+
+# CEBHACKALERT: I haven't implemented this properly.
+# It should be a singleton variable (as it was in
+# the registry)...with accessor methods?
+active_sim = None
 
 class EPConnection(TopoObject):
     """
@@ -137,8 +141,17 @@ class Simulator(TopoObject):
         self._event_processors = []
         self._sleep_window = 0.0
         self._sleep_window_violation = False
+
+        global active_sim
         if self.register:
-            registry.set_active_sim(self)
+            active_sim = self
+
+        # CEBHACKALERT: this isn't staying.
+        # Previously, calling topo.base.registry.set_active_sim()
+        # did this.
+        import topo.base.registry
+        topo.base.registry.link_console_to_active_sim()
+        # end HACKALERT
 
         self.events = []
         self._events_stack = []

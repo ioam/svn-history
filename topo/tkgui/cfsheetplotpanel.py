@@ -15,6 +15,7 @@ from topo.base.sheet import Sheet
 import Pmw
 import plotgrouppanel
 import topo.base.connectionfield
+import topoconsole
 
 ### JCALERT! It might be clearer to get rid of this class and just add its functionnality
 ### to both projectionpanel and unitweightpanel. Or it might need another name that
@@ -44,7 +45,7 @@ class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
 
         # Create the item list for CFSheet 'Sheet'  This will not change
         # since this window will only examine one Simulator.
-        sim = self.console.active_simulator()
+        sim = topoconsole.active_sim()
         self._sim_eps = [ep for ep in sim.objects(Sheet).values()
                   if isinstance(ep,topo.base.connectionfield.CFSheet)]
         sim_ep_names = [ep.name for ep in self._sim_eps]

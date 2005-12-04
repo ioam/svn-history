@@ -14,13 +14,15 @@ from unitweightspanel import UnitWeightsPanel
 from projectionpanel import ProjectionPanel
 from inputparamspanel import InputParamsPanel
 from topo.plotting.plotgrouptemplate import PlotGroupTemplate, PlotTemplate
-from topo.base import simulator
+import topo.base.simulator
 import topo.base.registry
 import topo.plotting.plotengine
 import topo.base.topoobject
 
-from topo.base.registry import active_sim
 import topo.commands.basic
+
+
+
 
 import webbrowser
 
@@ -35,6 +37,13 @@ tut_path = 'doc/Tutorial/index.html'
 ref_man_path = 'doc/Reference_Manual/index.html'
 topo_www = 'http://www.topographica.org/'
 python_doc = 'http://www.python.org/doc/'
+
+
+def active_sim():
+    """
+    """
+    return topo.base.simulator.active_sim
+
 
 
 # CEBHACKALERT: finish this instruction after making base class for PatternGeneratorParameter etc. 
@@ -116,10 +125,7 @@ class TopoConsole(Frame):
     TopoConsole class file.
     
     Primary window for the Tk-based GUI.  Loads, saves, calls other window
-    frames in plotframe.py.  Keeps tabs on the active Simulation, and
-    which PlotEngine is driving it.  If the active simulation is switched,
-    then the PlotEngine is changed, but the old PlotEngine is stored and
-    reactivated if the old Simulator is reactivated as well.
+    frames in plotframe.py.
     """
     def __init__(self, parent=None,**config):
         Frame.__init__(self,parent,config)
@@ -136,8 +142,6 @@ class TopoConsole(Frame):
 
 
         self.__active_plotengine_obj = None
-        # Stores inactive simulator/plotengine pairs for relinking
-        self.__plotengine_dict = {None: None}
         
         self.loaded_script = None
         self.input_params_window = None
@@ -285,33 +289,19 @@ class TopoConsole(Frame):
             menubar.addmenuitem('Plots','command',
                                 obj.description,label=label,
                                 command=entry.command)
-
-
-
+    
     #
     # Accessors for the GUI's active simulator and active plotengine objects.
     #
-    def set_active_simulator(self, new_sim):
+    def set_active_simulator(self):
         """
-        Set the active_simulator that the GUI will use to the variable
-        passed in.  A matching PlotEngine will either be created, or
-        pulled from a dictionary if the GUI has seen the Simulator before.
         """
-        
-
-        assert isinstance(new_sim,simulator.Simulator) or new_sim == None, "Not a Simulator"
-    
-        if self.__plotengine_dict.has_key(new_sim):
-            self.__active_plotengine_obj = self.__plotengine_dict[new_sim]
-        else:
-            self.__active_plotengine_obj = topo.plotting.plotengine.PlotEngine(new_sim)
-            self.__plotengine_dict[new_sim] = self.__active_plotengine_obj
+        # CEBHACKALERT: this method will at least have its name changed, but
+        # it might change more than that.
+        sim = active_sim()
+        self.__active_plotengine_obj = topo.plotting.plotengine.PlotEngine(sim)
         self.refresh_title()
-    
-    def active_simulator(self):
-        """Get the active_simulator object relative to the GUI"""
-        return active_sim()
-    
+        
     def active_plotengine(self):
         """Get the active_plotengine object relative to the GUI"""
         return self.__active_plotengine_obj
