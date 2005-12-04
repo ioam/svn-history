@@ -28,8 +28,6 @@ import sys
 import types
 import MLab
 
-### JC: I think it can go, to check:
-from topo.base.sheetview import *
 
 from Numeric import zeros, ones, Float, divide
 from topo.base.topoobject import TopoObject
@@ -37,19 +35,15 @@ from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
 from topo.base.parameter import Dynamic
 import palette as palette 
 
-### JC: I think it can go...
-from Numeric import array
 
 ### JCALERT! WHAT about histograms? (ask Jim) 
 #from histogram import Histogram 
-
 ### JCALERT! The histograms should be implemented and an object histograms assign to a Plot() 
-### WHAT does bitmap really mean here? (ask Jim and review the doc) 
     
 class Plot(TopoObject):
     """
     Class that constructs a bitmap plot from one or more
-    SheetViews (optionally including a Histogram).  The bitmap is just
+    one or mor SheetViews. The bitmap is just
     stored for future use, e.g. as part of a PlotGroup of related
     plots displayed within one GUI window.
     """
@@ -99,7 +93,8 @@ class Plot(TopoObject):
         if self.view_dict == None:
             raise ValueError("A Plot should be passed a sheet_view_dict when created")
 
-	### JCALERT! maybe also raise something when channels are all None? 
+	### JCALERT! maybe also raise something when channels are all None?
+        ### Not necessarily, it depends when we cactch the empy plot exception. 
 
     ### JCALERT! Actually, this function can be used this way.
     ### It is called from release_sheetviews in PlotGroup and enable to
@@ -138,22 +133,17 @@ class Plot(TopoObject):
 
 	self._get_matrices_from_view_dict()
 
-	### JCALERT ! The name should be changed...
 	hsv_matrices = self._make_hsv_matrices()
 
-	### JCALERT! Think about mae_hsv_matrices beeing a procedure
+	### JCALERT! Think about make_hsv_matrices beeing a procedure
         ### directly working on self.matrices and change matrix_hsv_to_rgb to
         ### take a list of matrices or tuple of matrices. 
 	if hsv_matrices == None:
-	    ### JCALERT! Why are there empty plot when doing orientation map?
-            ### This should maybe not returned None in this case?
-            ### It should come from the PlotGroup that looks into all sheets in the simulator
-	    ### even the Retina...
+	    ### JCALERT! Ask Jim what does he wants to do with empty plot.
 	    #print("Empty Plot")
 	    return None
 	else:
 	    (hue,sat,val)= hsv_matrices
-
 	     ### JCALERT! This function ought to be in Plot rather than bitmap.py
 	    self.matrices = matrix_hsv_to_rgb(hue,sat,val)
 	    return self
@@ -161,7 +151,7 @@ class Plot(TopoObject):
 
     def _get_matrices_from_view_dict(self):
         """
-	sub-function of plot() that just retrieve the views from the view_dict
+	sub-function of plot() that just retrieves the views from the view_dict
 	as specified by the channels, and create its matrices attribute accordingly 
 	(list of view matrices from SheetView.view() ).
 
@@ -191,56 +181,64 @@ class Plot(TopoObject):
 
 
     ### JCALERT! The doc has to be reviewed (as well as the code by the way...)
-    ### The function should be made as a procedure working on self.matrices directly...
+    ### The function should be made as a procedure working on self.matrices directly..
+    ### The code inside has to be made clearer.
     def _make_hsv_matrices(self):
 	""" 
-	Sub-function that return the h,s,v matrices corresponding to
-        self.matrices,
-        also applying normalizing of the plot if required.
-	"""
-	shape=(0,0)
-	for mat in self.matrices:
-	    if mat != None:
-		shape = mat.shape
+	Sub-function of plot() that return the h,s,v matrices corresponding to
+        self.matrices. They specified a bitmap in hsv coordinate.
 
+        Also applying normalizing and croping if required.
+	"""
+
+	### JCALERT! What if the order is not the same?
+        ### Maybe passing a dictionnary instead of a triple in the first place?
 	s,h,c = self.matrices
 
-        zero=zeros(shape,Float)
-        one=ones(shape,Float)
-
-        ### JABHACKALERT Need to extend for white background; assumes black
-
-        ### JCALERT! This part of the code could go. To see.
-        # No plot; in the future should probably not be a warning
         if (s==None and c==None and h==None):
             self.debug('Skipping empty plot.')
             return None
 
-            # Determine appropriate defaults for each matrix
-        if s is None: s=one # Treat as full strength by default
-        if c is None: c=one # Treat as full confidence by default
-        if h is None: # No color -- should be changed to drop down to COLORMAP plot.
-            h=zero
-            c=zero
+	else:
+	    shape=(0,0)
+             ### JCALERT! Think about a best way to catch the shape...
+            ### also it should raise an Error if the shape is different for 
+            ### the three matrices!
+	    for mat in self.matrices:
+		if mat != None:
+		    shape = mat.shape
+	    
+	    zero=zeros(shape,Float)
+	    one=ones(shape,Float)
 
-        if self.normalize and max(s.flat) > 0:
-            s = divide(s,float(max(s.flat)))
+	    ### JC: The code below may be improved.
+	    # Determine appropriate defaults for each matrix
+	    if s is None: s=one # Treat as full strength by default
+	    if c is None: c=one # Treat as full confidence by default
+	    if h is None: # No color -- should be changed to drop down to COLORMAP plot.
+		h=zero
+		c=zero
 
-        hue=h
-        sat=c
-        val=s
+	    if self.normalize and max(s.flat)>0:
+		s = divide(s,float(max(s.flat)))
+
+	    hue,sat,val=h,c,s
+		 
             
-        if max(hue.flat) > 1 or max(sat.flat) > 1 or max(val.flat) > 1:
-            self.cropped = True
-        #self.warning('Plot: HSVMap inputs exceed 1. Clipping to 1.0')
-        if max(hue.flat) > 0: hue = MLab.clip(hue,0.0,1.0)
-        if max(sat.flat) > 0: sat = MLab.clip(sat,0.0,1.0)
-        if max(val.flat) > 0: val = MLab.clip(val,0.0,1.0)
-        else:
-            self.cropped = False
+	    if max(hue.flat) > 1 or max(sat.flat) > 1 or max(val.flat) > 1:
+		self.cropped = True
+	    #self.warning('Plot: HSVMap inputs exceed 1. Clipping to 1.0')
+	    ### JCALERT! It seems to me that this should be > 1?
+	    if max(hue.flat) > 0: hue = MLab.clip(hue,0.0,1.0)
+	    if max(sat.flat) > 0: sat = MLab.clip(sat,0.0,1.0)
+	    if max(val.flat) > 0: val = MLab.clip(val,0.0,1.0)
+	    else:
+		self.cropped = False
 
 	
-	return (hue,sat,val)
+	    return (hue,sat,val)
+
+
 
 	
    
