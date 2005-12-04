@@ -277,8 +277,10 @@ class HebbianSOM(CFLearningFunction):
     unit its surrounds will learn. The radius of the 
     surround is specified by the named parameter radius in __call_.
     """
-    output_fn = Parameter(default=Identity())
+
     learning_radius = Number(default=0.0)
+    output_fn = Parameter(default=Identity())
+    neighborhood_fn = Parameter(default=gaussian)
     
     def __init__(self,**params):
         super(HebbianSOM,self).__init__(**params)
@@ -303,13 +305,13 @@ class HebbianSOM(CFLearningFunction):
         rmin = int(max(0,wr-radius))
         rmax = int(min(wr+radius+1,rows))
 
+        neighborhood_fn = self.neighborhood_fn
         for r in range(rmin,rmax):
             for c in range(cmin,cmax):
                 lattice_dist = L2norm((wc-c,wr-r))
 		if lattice_dist <= radius:
                     cf = cfs[r][c]
-                    #rate = learning_rate * exp(-lattice_dist/radius)
-                    rate = learning_rate * gaussian(lattice_dist,lattice_dist,radius,radius)
+                    rate = learning_rate * neighborhood_fn(lattice_dist,lattice_dist,radius,radius)
 		    X = cf.get_input_matrix(input_activity)
 
                     # CEBHACKALERT:
