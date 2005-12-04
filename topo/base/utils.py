@@ -263,15 +263,14 @@ def keys_sorted_by_value(d):
 
 ### JABALERT!
 ###
-### Should go in topo/base/utils.py, and if at all possible should be
-### rewritten to use matrix functions that eliminate the explicit for
-### loop.  The savespace() should probably also be eliminated.
-
-### JC:
-### It has been tried to change the function so that to get rid of the for
-### loop, but no satisfying matrix function has been found to perform it.
-
-# shouldn't this be in arrayutils?
+### If at all possible should be rewritten to use matrix functions
+### that eliminate the explicit for loop.  The savespace() should
+### probably also be eliminated. 
+### JC: It has been tried to change the function so that to get rid of
+### the for loop, but no satisfying matrix function has been found to
+### perform it.
+###
+### Should move to arrayutils.
 def clip_in_place(mat,lower_bound,upper_bound):
     """Version of Numeric.clip that changes the argument in place, with no intermediate."""
     mat.savespace(1)
