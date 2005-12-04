@@ -19,8 +19,6 @@ from topoobject import TopoObject
 from utils import classlist
 from arrayutils import inf
 
-NYI = NotImplementedError
-
 class BoundingRegion(TopoObject):
     """
     Abstract bounding region class, for any portion of a 2D plane.
@@ -31,16 +29,16 @@ class BoundingRegion(TopoObject):
     def __init__(self,**args):
         super(BoundingRegion,self).__init__(**args)
     def contains(self,x,y):
-        raise NYI
+        raise NotImplementedError
     def scale(self,xs,ys):
-        raise NYI
+        raise NotImplementedError
     def translate(self,xoff,yoff):
         l,b,r,t = self.aarect().lbrt()
         self._aarect = AARectangle((l+xoff,b+yoff),(r+xoff,t+yoff))
     def rotate(self,theta):
-        raise NYI
+        raise NotImplementedError
     def aarect(self):
-        raise NYI
+        raise NotImplementedError
 
 
 class BoundingBox(BoundingRegion):
