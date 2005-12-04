@@ -23,10 +23,14 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.sheetview import SheetView
 from topo.plotting.bitmap import matrix_hsv_to_rgb
 import MLab
+import RandomArray
+
+
 from random import random
 
 
-### JCALERT! This file has to be re-written when the fundamental changes in plot.py
+### JCALERT! there is still some part to be written in this file 
+###  when the fundamental changes in plot.py
 ### plotengine.py and plotgroup.py will be finished.
 ### for the moment, the tests are commented out...
 
@@ -40,7 +44,7 @@ class TestPlot(unittest.TestCase):
 
 	### SheetView1:
 	### Find a way to assign randomly the matrix.
-	self.matrix1 = zeros((10,10),Float) + random()
+	self.matrix1 = zeros((10,10),Float) + RandomArray.random((10,10))
 	self.bounds1 = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 	self.sheet_view1 = SheetView((self.matrix1,self.bounds1),
 				      src_name='TestInputParam',view_type='Pattern')
@@ -58,11 +62,11 @@ class TestPlot(unittest.TestCase):
 
         ### SheetView3:
 	### Find a way to assign randomly the matrix.
-	self.matrix3 = zeros((10,10),Float) + random()
+	self.matrix3 = zeros((10,10),Float) + RandomArray.random((10,10))
 	self.bounds3 = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 	self.sheet_view3 = SheetView((self.matrix3,self.bounds3),
 				      src_name='TestInputParam',view_type='Pattern')
-	self.key3 = ('sv3',0,'salut',(10,0))
+	self.key3 = ('sv3',0,'hello',(10,0))
 	self.view_dict[self.key3] = self.sheet_view3
 
         ### SheetView4: for testing clipping + different bounding box
@@ -113,8 +117,20 @@ class TestPlot(unittest.TestCase):
 
 	### also makes a sheet to test realease_sheetviews
 
+	self.sheet = Sheet()
+	self.sheet.sheet_view_dict[self.key1]=self.sheet_view1
+	self.sheet.sheet_view_dict[self.key2]=self.sheet_view2
+	self.sheet.sheet_view_dict[self.key3]=self.sheet_view3
+	self.sheet.sheet_view_dict[self.key4]=self.sheet_view4
+
+	self.plot9 = Plot((self.key1,self.key2,self.key3),self.sheet.sheet_view_dict,name='plot9')
+
+	
+	
+
     def test_plot(self):
 
+	### JCALERT! make a test for plot0
 
 	# plot 1
 	self.plot1.plot()
@@ -128,7 +144,9 @@ class TestPlot(unittest.TestCase):
 	val = self.matrix1
 
 	test = matrix_hsv_to_rgb(hue,sat,val)
-	self.assertEqual(self.plot2.matrices,test)  
+	for each1,each2 in zip(self.plot2.matrices,test):
+	    for each3,each4 in zip(each1.flat,each2.flat):
+		self.assertAlmostEqual(each3,each4)
 
 	# plot 3
         self.plot3.plot()
@@ -137,7 +155,9 @@ class TestPlot(unittest.TestCase):
 	val = self.matrix1
 
 	test = matrix_hsv_to_rgb(hue,sat,val)
-	self.assertEqual(self.plot3.matrices,test)  
+	for each1,each2 in zip(self.plot3.matrices,test):
+	    for each3,each4 in zip(each1.flat,each2.flat):
+		self.assertAlmostEqual(each3,each4)  
 
 	# plot 4
 	self.plot4.plot()
@@ -146,7 +166,9 @@ class TestPlot(unittest.TestCase):
 	val = self.matrix1
 
 	test = matrix_hsv_to_rgb(hue,sat,val)
-	self.assertEqual(self.plot4.matrices,test)  
+	for each1,each2 in zip(self.plot4.matrices,test):
+	    for each3,each4 in zip(each1.flat,each2.flat):
+		self.assertAlmostEqual(each3,each4)  
 
 	# plot 5
 	self.plot5.plot()
@@ -155,7 +177,9 @@ class TestPlot(unittest.TestCase):
 	val = self.matrix1
 
 	test = matrix_hsv_to_rgb(hue,sat,val)
-	self.assertEqual(self.plot5.matrices,test)  
+	for each1,each2 in zip(self.plot5.matrices,test):
+	    for each3,each4 in zip(each1.flat,each2.flat):
+		self.assertAlmostEqual(each3,each4)
 
 	# plot 6
 	self.plot6.plot()
@@ -164,7 +188,9 @@ class TestPlot(unittest.TestCase):
 	val = ones((10,10),Float) 
 
 	test = matrix_hsv_to_rgb(hue,sat,val)
-	self.assertEqual(self.plot6.matrices,test)  
+	for each1,each2 in zip(self.plot6.matrices,test):
+	    for each3,each4 in zip(each1.flat,each2.flat):
+		self.assertAlmostEqual(each3,each4)  
     
 	# plot 7
 	self.plot7.plot()
@@ -175,7 +201,10 @@ class TestPlot(unittest.TestCase):
         val = MLab.clip(val,0.0,1.0)
 	
 	test = matrix_hsv_to_rgb(hue,sat,val)
-	self.assertEqual(self.plot7.matrices,test)  
+	for each1,each2 in zip(self.plot7.matrices,test):
+	    for each3,each4 in zip(each1.flat,each2.flat):
+		self.assertAlmostEqual(each3,each4)
+	
 
 	# plot 8
 	self.plot8.plot()
@@ -184,17 +213,46 @@ class TestPlot(unittest.TestCase):
 	val = self.matrix1
 
 	val = divide(val,float(max(val.flat)))
-        val = MLab.clip(val,0.0,1.0)
 	
 	test = matrix_hsv_to_rgb(hue,sat,val)
-	self.assertEqual(self.plot7.matrices,test)  
+
+	for each1,each2 in zip(self.plot8.matrices,test):
+	    for each3,each4 in zip(each1.flat,each2.flat):
+		self.assertAlmostEqual(each3,each4)
 
 
 
-#### Think about doing a plot test using sheet_dict?
+
+	# plot 9
+	self.plot9.plot()
+	sat = self.matrix3 
+	hue = zeros((10,10),Float) + 0.3 
+	val = self.matrix1
 	
+	test = matrix_hsv_to_rgb(hue,sat,val)
+	for each1,each2 in zip(self.plot9.matrices,test):
+	    for each3,each4 in zip(each1.flat,each2.flat):
+		self.assertAlmostEqual(each3,each4)  
+
+#### Think about doing a plot test using sheet_dict and a sheet?
+### Ask Jim if it is really necessary...
+
+def test_release_sheetviews(self):
+
+    self.plot9.release_sheetviews()
+
+    test=self.sheet.sheet_view_dict.get(self.key1,None)
+    self.assertEqual(test,None)
+    test=self.sheet.sheet_view_dict.get(self.key2,None)
+    self.assertEqual(test,None)
+    test=self.sheet.sheet_view_dict.get(self.key3,None)
+    self.assertEqual(test,None)
+    test=self.sheet.sheet_view_dict.get(self.key4,None)
+    self.assertEqual(test,self.sv4)
+
+
+### JC: THIS CODE IS LEFT TEMPORARY IN CASE IT IS OF ANY USE IN NEAR FUTURE
     
-#         self.s2 = Sheet()
 #         x = plot.Plot(('Activity',None,None),plot.COLORMAP,self.s2)
 #         for o in dir():
 #             # pprint(o)
