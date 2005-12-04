@@ -3,7 +3,7 @@ ParametersFrame class.
 
 $Id$
 """
-__version__='$Revision $'
+__version__='$Revision$'
 
 from propertiesframe import PropertiesFrame
 from Tkinter import Frame, TOP, YES, N,S,E,W,X
