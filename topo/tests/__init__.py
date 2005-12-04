@@ -30,6 +30,7 @@ import testmatplotlib
 import testpatternpresent
 import testdistribution
 import testfeaturemap
+import testoutputfnsbasic
 
 
 # tkgui import calls tkgui/__init__.py, which should contain other test
