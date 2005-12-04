@@ -1,5 +1,6 @@
 """
-Test for the Plot class
+Test for the Plot class.
+
 $Id$
 """
 __version__='$Revision$'
@@ -11,10 +12,19 @@ from topo.plotting import plot
 from topo.base.sheet import *
 from topo.plotting.bitmap import RGBMap, HSVMap
 from topo.base.patterngenerator import ImageGenerator
-import Numeric
-from Numeric import divide
 
 SHOW_PLOTS = False
+
+
+### JC: My new imports
+from topo.plotting.plot import Plot
+from Numeric import zeros, divide, Float, ones
+from topo.base.boundingregion import BoundingBox
+from topo.base.sheetview import SheetView
+from topo.plotting.bitmap import matrix_hsv_to_rgb
+import MLab
+from random import random
+
 
 ### JCALERT! This file has to be re-written when the fundamental changes in plot.py
 ### plotengine.py and plotgroup.py will be finished.
@@ -22,8 +32,167 @@ SHOW_PLOTS = False
 
 class TestPlot(unittest.TestCase):
 
+    def setUp(self):
+
+	### Simple case: we only pass a dictionnary to Plot()
+        ### that does not belong to a Sheet:
+	self.view_dict = {}
+
+	### SheetView1:
+	### Find a way to assign randomly the matrix.
+	self.matrix1 = zeros((10,10),Float) + random()
+	self.bounds1 = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+	self.sheet_view1 = SheetView((self.matrix1,self.bounds1),
+				      src_name='TestInputParam',view_type='Pattern')
+	self.key1 = 'sv1'
+	self.view_dict[self.key1] = self.sheet_view1
+
+        ### SheetView2:
+	### Find a way to assign randomly the matrix.
+	self.matrix2 = zeros((10,10),Float) + 0.3
+	self.bounds2 = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+	self.sheet_view2 = SheetView((self.matrix2,self.bounds2),
+				      src_name='TestInputParam',view_type='Pattern')
+	self.key2 = ('sv2',0,10)
+	self.view_dict[self.key2] = self.sheet_view2
+
+        ### SheetView3:
+	### Find a way to assign randomly the matrix.
+	self.matrix3 = zeros((10,10),Float) + random()
+	self.bounds3 = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+	self.sheet_view3 = SheetView((self.matrix3,self.bounds3),
+				      src_name='TestInputParam',view_type='Pattern')
+	self.key3 = ('sv3',0,'salut',(10,0))
+	self.view_dict[self.key3] = self.sheet_view3
+
+        ### SheetView4: for testing clipping + different bounding box
+	### Find a way to assign randomly the matrix.
+	self.matrix4 = zeros((10,10),Float) + 1.6
+	self.bounds4 = BoundingBox(points=((-0.7,-0.7),(0.7,0.7)))
+	self.sheet_view4 = SheetView((self.matrix4,self.bounds4),
+				      src_name='TestInputParam',view_type='Pattern')
+	self.key4 = 'sv4'
+	self.view_dict[self.key4] = self.sheet_view4
+
+	### JCALERT! for the moment we can only pass a triple when creating plot
+        ### adding more sheetView to test when plot will be fixed for accepting
+        ### as much as you want.
+
+	# plot0: empty plot + no sheetviewdict passed: error or empty plot?
+        ### JCALERT! It has to be fixed what to do in this case in plot..
+        ### disabled test for the moment.
+       	#self.plot0 = Plot((None,None,None),None,name='plot0')
+	### CATCH EXCEPTION
+
+	# plot1: empty plot 
+	self.plot1 = Plot((None,None,None),self.view_dict,name='plot1')
+				   
+        # plot2: sheetView 1, no normalize, no clipping
+	self.plot2 = Plot((self.key1,None,None),self.view_dict,name='plot2')
+ 
+	# plot3: sheetView 1+2, no normalize, no clipping
+	self.plot3 = Plot((self.key1,self.key2,None),self.view_dict,name='plot3')
+
+	# plot4: sheetView 1+2+3, no normalize , no clipping 
+	self.plot4 = Plot((self.key1,self.key2,self.key3),self.view_dict,name='plot4')
+
+	# plot5: sheetView 1+3, no normalize, no clipping
+	self.plot5 = Plot((self.key1,None,self.key3),self.view_dict,name='plot5')
+
+	# plot6: sheetView 2+3, no normalize , no clipping 
+	self.plot6 = Plot((None,self.key2,self.key3),self.view_dict,name='plot6')
+
+	# plot7: sheetView 1+2+3, no normalize , clipping 
+	self.plot7 = Plot((self.key4,self.key2,self.key3),self.view_dict,name='plot7')
+
+	# plot8: sheetView 1+2+3, normalize , no clipping 
+	self.plot8 = Plot((self.key1,self.key2,self.key3),self.view_dict,normalize=True,name='plot8')
+
+	### JCALERT! FOR THE MOMENT I TAKE THE DEFAULT FOR NORMALIZE.
+        ### WE WILL SEE IF IT REMAINS IN PLOT FIRST.
+
+	### also makes a sheet to test realease_sheetviews
+
     def test_plot(self):
-        pass
+
+
+	# plot 1
+	self.plot1.plot()
+	test = [None,None,None]
+	self.assertEqual(self.plot1.matrices,test)
+
+	# plot 2
+	self.plot2.plot()
+	sat = zeros((10,10),Float) 
+	hue = zeros((10,10),Float)
+	val = self.matrix1
+
+	test = matrix_hsv_to_rgb(hue,sat,val)
+	self.assertEqual(self.plot2.matrices,test)  
+
+	# plot 3
+        self.plot3.plot()
+	sat = ones((10,10),Float) 
+	hue = zeros((10,10),Float) + 0.3
+	val = self.matrix1
+
+	test = matrix_hsv_to_rgb(hue,sat,val)
+	self.assertEqual(self.plot3.matrices,test)  
+
+	# plot 4
+	self.plot4.plot()
+	sat = self.matrix3 
+	hue = zeros((10,10),Float) + 0.3
+	val = self.matrix1
+
+	test = matrix_hsv_to_rgb(hue,sat,val)
+	self.assertEqual(self.plot4.matrices,test)  
+
+	# plot 5
+	self.plot5.plot()
+	sat = zeros((10,10),Float) 
+	hue = zeros((10,10),Float) 
+	val = self.matrix1
+
+	test = matrix_hsv_to_rgb(hue,sat,val)
+	self.assertEqual(self.plot5.matrices,test)  
+
+	# plot 6
+	self.plot6.plot()
+	sat = self.matrix3 
+	hue = zeros((10,10),Float) + 0.3 
+	val = ones((10,10),Float) 
+
+	test = matrix_hsv_to_rgb(hue,sat,val)
+	self.assertEqual(self.plot6.matrices,test)  
+    
+	# plot 7
+	self.plot7.plot()
+	sat = self.matrix3 
+	hue = zeros((10,10),Float) + 0.3 
+	val = self.matrix4
+
+        val = MLab.clip(val,0.0,1.0)
+	
+	test = matrix_hsv_to_rgb(hue,sat,val)
+	self.assertEqual(self.plot7.matrices,test)  
+
+	# plot 8
+	self.plot8.plot()
+	sat = self.matrix3 
+	hue = zeros((10,10),Float) + 0.3 
+	val = self.matrix1
+
+	val = divide(val,float(max(val.flat)))
+        val = MLab.clip(val,0.0,1.0)
+	
+	test = matrix_hsv_to_rgb(hue,sat,val)
+	self.assertEqual(self.plot7.matrices,test)  
+
+
+
+#### Think about doing a plot test using sheet_dict?
+	
     
 #         self.s2 = Sheet()
 #         x = plot.Plot(('Activity',None,None),plot.COLORMAP,self.s2)
@@ -71,3 +240,5 @@ class TestPlot(unittest.TestCase):
 
 suite = unittest.TestSuite()
 suite.addTest(unittest.makeSuite(TestPlot))
+if __name__ == '__main__':
+    unittest.TextTestRunner(verbosity=2).run(suite)
