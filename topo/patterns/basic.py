@@ -130,12 +130,12 @@ class RingGenerator(PatternGenerator):
 
     def function(self,**params):
         return ring(params.get('pattern_x',self.pattern_x), 
-                          params.get('pattern_y',self.pattern_y),
-                          params.get('width',self.width),
-                          params.get('height',self.height),
-                          params.get('thickness',self.thickness),
-                          params.get('smoothing',self.smoothing))  
-
+                    params.get('pattern_y',self.pattern_y),
+                    params.get('width',self.width),
+                    params.get('height',self.height),
+                    params.get('thickness',self.thickness),
+                    params.get('smoothing',self.smoothing))  
+    
 
 class RectangleGenerator(PatternGenerator):
     """2D rectangle pattern generator."""
