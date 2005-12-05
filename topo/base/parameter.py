@@ -12,16 +12,10 @@ $Id$
 __version__='$Revision$'
 from utils import classlist
 
-
-# CEBHACKALERT: does every subclass of Parameter really need doc=''?
-# If someone did 'Number(doc="documentation")' wouldn't it work even without passing through doc
-# because of passing through **params?
-
 # CEBHACKALERT: say for example the Number 'x' in the PatternGenerator is declared to be hidden.
 # It ought not to show up in the GUI. However, in hierarchical.ty, LineGenerator.x is set. This
 # results in 'x' appearing in the GUI for Line but not for any other pattern. There is the same
 # problem for the precedence attribute.
-
 
 class Parameter(object):
     """
@@ -225,8 +219,8 @@ class Number(Parameter):
     Example of creating a Number:
     AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
     """
-    def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),doc="",**params):
-        Parameter.__init__(self,default=default,doc=doc,**params)
+    def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),**params):
+        Parameter.__init__(self,default=default,**params)
         self.bounds = bounds
         self._softbounds = softbounds  
         self._check_bounds(default)  # only create this number if the default value and bounds are consistent
@@ -327,13 +321,13 @@ class Integer(Number):
 
 
 class Magnitude(Number):
-    def __init__(self,default=1.0,softbounds=(None,None),doc="",**params):
-        Number.__init__(self,default=default,bounds=(0.0,1.0),softbounds=softbounds,doc=doc,**params)
+    def __init__(self,default=1.0,softbounds=(None,None),**params):
+        Number.__init__(self,default=default,bounds=(0.0,1.0),softbounds=softbounds,**params)
 
 
 class BooleanParameter(Parameter):
-    def __init__(self,default=False,bounds=(0,1),doc="",**params):
-        Parameter.__init__(self,default=default,doc=doc,**params)
+    def __init__(self,default=False,bounds=(0,1),**params):
+        Parameter.__init__(self,default=default,**params)
         self.bounds = bounds
 
     def __set__(self,obj,val):
@@ -356,8 +350,8 @@ class DynamicNumber(Number):
     If set with a callable object, the bounds are checked when the number is
     retrieved (generated), rather than when it is set.
     """
-    def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),doc="",**params):
-        Parameter.__init__(self,default=default,doc=doc,**params)
+    def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),**params):
+        Parameter.__init__(self,default=default,**params)
         self.bounds = bounds
         self._softbounds = softbounds  
         self._check_bounds(default)  # only create this number if the default value and bounds are consistent
