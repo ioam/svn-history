@@ -5,13 +5,16 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEB,JBFC
 
-# To do:
-# - this file is difficult to understand!
+# CEBHACKALERT: every time I have to change something in this file
+# it is very painful. There are always multiple copies of the same
+# thing! 
+# e.g. a Simulator was being passed around but then found
+# from somewhere else anyway. It was (and maybe still is?) possible
+# to pass feature parameters in at too many stages.
+# I have to clean it up!
 # - remove temporary testing code
-# - give the variables better names!
-# - get rid of non-used import statement
+# - get rid of unused import statements
 
 from Numeric import array, zeros, Float 
 from topo.base.distribution import Distribution
@@ -40,8 +43,9 @@ import topo.tkgui.topoconsole
 class SineGratingPresenter(object):
     """Function object for presenting sine gratings, for use with e.g. measure_or_pref."""
     
-    def __init__(self,sim=None,apply_output_fn=True,duration=1.0):
-        self.sim=sim
+    def __init__(self,apply_output_fn=True,duration=1.0):
+        # CEBHACKALERT: see alert in topo/commands/basic.py about testing there is an active_sim
+        self.sim=topo.base.simulator.get_active_sim()
         self.apply_output_fn=apply_output_fn
         self.duration=duration
 
@@ -64,7 +68,7 @@ class SineGratingPresenter(object):
 
 
 
-def measure_or_pref(sim=None,num_phase=18,num_orientation=4,frequencies=[2.4],
+def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,
                     user_function_class=SineGratingPresenter,
                     apply_output_fn=False, duration=1.0):
@@ -78,39 +82,32 @@ def measure_or_pref(sim=None,num_phase=18,num_orientation=4,frequencies=[2.4],
     # orientation maps...
 
     
-    if not sim:
-        sim = topo.base.simulator.get_active_sim()
-
-    if sim:
-
-        if num_phase <= 0 or num_orientation <= 0:
-            raise ValueError("num_phase and num_orientation must be greater than 0")
-            
-        else:
-            user_function=user_function_class(sim,apply_output_fn, duration)
-            step_phase=2*pi/num_phase
-            step_orientation=pi/num_orientation
-        
-            feature_values = {"orientation": ( (0.0,pi), step_orientation, True),
-                              "phase": ( (0.0,2*pi),step_phase,True),
-                              "frequency": ((min(frequencies),max(frequencies)),frequencies,False)}
-
-            x=MeasureFeatureMap(sim,feature_values)
-
-            param_dict = {"scale":scale,"offset":offset}
-            
-            x.measure_maps(user_function, param_dict, display)
+    if num_phase <= 0 or num_orientation <= 0:
+        raise ValueError("num_phase and num_orientation must be greater than 0")
 
     else:
-        TopoObject().warning('No active Simulator.')
+        user_function=user_function_class(apply_output_fn, duration)
+        step_phase=2*pi/num_phase
+        step_orientation=pi/num_orientation
+
+        feature_values = {"orientation": ( (0.0,pi), step_orientation, True),
+                          "phase": ( (0.0,2*pi),step_phase,True),
+                          "frequency": ((min(frequencies),max(frequencies)),frequencies,False)}
+
+        x=MeasureFeatureMap(feature_values)
+
+        param_dict = {"scale":scale,"offset":offset}
+
+        x.measure_maps(user_function, param_dict, display)
+
 
 
 def measure_activity():
     """Measure an activity map. Command called when opening an activity plot group panel.
     To be exact, just add the activity sheet_view for Sheets objects of the simulator
     """
-    simulator = topo.base.simulator.get_active_sim()
-    for sheet in simulator.objects(Sheet).values():
+    sim = topo.base.simulator.get_active_sim()
+    for sheet in sim.objects(Sheet).values():
         activity_copy = array(sheet.activity)
         new_view = sheetview.SheetView((activity_copy,sheet.bounds),
                                         src_name=sheet.name,view_type='Activity')
@@ -191,10 +188,8 @@ class FeatureMap(TopoObject):
 class MeasureFeatureMap(TopoObject):
     """
     """
-    def __init__(self, simulator, feature_param):
+    def __init__(self, feature_param):
         """
-        simulator: the variable name holding the simulator from which to get the sheets.
-
         feature_param: a dictionary with sheets as keys and a dictionnary: 
                        {feature_name: (range, values, cyclic)} as values
                        
@@ -210,8 +205,9 @@ class MeasureFeatureMap(TopoObject):
                        {'x': (0.0,2.0), [0.0, 0.5, 0.6, 0.7, 1.0], False}
                        for the non-cyclic x values specified, which may only fall in the range [0.0,1.0].
         """
-        self.simulator=simulator
-
+        # CEBHACKALERT: see alert in topo/commands/basic.py about testing there is an active_sim
+        self.simulator=topo.base.simulator.get_active_sim()
+        
         # This dictionary will contains (for each sheet) a dictionary to hold the FeatureMap for each feature
         # {sheet: {feature: FeatureMap()}}
         self.__featuremaps = {}
@@ -231,7 +227,7 @@ class MeasureFeatureMap(TopoObject):
         # all the sheets that will have their feature maps measured
         # (i.e. all Sheets that aren't GeneratorSheets)
         f = lambda x: not isinstance(x,GeneratorSheet)
-        self.__measured_sheets = filter(f,simulator.objects(Sheet).values())
+        self.__measured_sheets = filter(f,self.simulator.objects(Sheet).values())
         
         # now create the featuremaps for each sheet    
         for sheet in self.__measured_sheets:
