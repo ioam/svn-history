@@ -4,6 +4,12 @@ A family of high-level user commands acting on the entire simulator.
 Any new commands added to this directory will automatically become
 available for any program.
 
+Commands here should be 'bullet-proof' and work 'from scratch'.
+That is, they should print warnings if required but should not raise
+errors that would interrupt e.g. a long batch run of simulation work.
+Therefore, commands should check that, for instance, the active_sim
+is not None before using Simulator methods. 
+
 $Id$
 """
 __version__='$Revision$'
