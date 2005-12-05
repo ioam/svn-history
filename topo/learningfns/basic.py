@@ -275,21 +275,29 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
 class SOMLF(CFLearningFunction):
     """
     An abstract base class of learning functions for Self-Organizing Maps.
+    
+    These objects have a parameter learning_radius that is expected to
+    be kept up to date, either by the Sheet to which they are
+    connected or explicitly by the user.  The learning_radius
+    specifies the radius of the neighborhood function used during
+    learning.
     """
     learning_radius = Number(default=0.0)
 
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
-            raise NotImplementedError
+        raise NotImplementedError
 
 
 
 class HebbianSOMLF(SOMLF):
     """
-    CF-aware Hebbian learning rule in Self-Organizing Maps. Only the
-    winner unit and those surrounding it will learn. The radius of the
-    surround is specified by the parameter learning_radius, which
-    should be set before using __call__.  The shape of the surround is
-    determined by the neighborhood_fn, and can be any radial function.
+    CF-aware Hebbian learning rule for Projections to Self-Organizing Maps.
+
+    Only the winner unit and those surrounding it will learn. The
+    radius of the surround is specified by the parameter
+    learning_radius, which should be set before using __call__.  The
+    shape of the surround is determined by the neighborhood_fn, and
+    can be any radial function.
     """
 
     learning_radius = Number(default=0.0)
@@ -304,13 +312,13 @@ class HebbianSOMLF(SOMLF):
 
         # find out the matrix coordinates of the winner
         #
-	# NOTE: when there are multiple projections, it would be more
-        # efficient to calculate the winner coordinates within the
-        # Sheet, e.g. by moving winner_coords() to CFSOM and passing
-        # in the results here.  However, finding the coordinates
-        # does not take much time, and requiring the winner to be
-        # passed in would make it harder to mix and match Projections
-        # and learning rules.
+	# NOTE: when there are multiple projections, it would be
+        # slightly more efficient to calculate the winner coordinates
+        # within the Sheet, e.g. by moving winner_coords() to CFSOM
+        # and passing in the results here.  However, finding the
+        # coordinates does not take much time, and requiring the
+        # winner to be passed in would make it harder to mix and match
+        # Projections and learning rules with different Sheets.
         wr,wc = self.winner_coords(output_activity,cols)
 
         ### JABHACKALERT!  Is updating only within this radius really
