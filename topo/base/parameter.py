@@ -99,11 +99,11 @@ class Parameter(object):
         the default value.
         """
         self._name = None
-        self.doc = doc
         self.hidden=hidden
         self.precedence = precedence
         Parameter.count += 1
         self.default = default
+        self.__doc__ = doc
 
     def __get__(self,obj,objtype):
         """
@@ -163,9 +163,15 @@ class Parameter(object):
         return self._name
 
 
+    # Make __doc__ work as it usually does for other objects, even
+    # though there is no dictionary for this type of object.  The
+    # actual value of __doc__ is stored in the doc slot, which
+    # can be overridden by subclasses or instances.
+    def _set_doc(self,doc):
+        self.doc=doc
     def _get_doc(self):
         return self.doc
-    __doc__ = property(_get_doc)
+    __doc__ = property(_get_doc,_set_doc)
 
 
 # CEBHACKALERT: at the moment, the path must be relative to Topographica's path.
