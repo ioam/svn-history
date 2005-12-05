@@ -4,51 +4,57 @@ Construct and stores the PlotGroups used for saving to a file or for a GUI to di
 This class is the connection between the Simulator or GUI, and the
 PlotGroup objects in plotting.
 
-When first created, a PlotGroup, PlotEngine stores it in a dictionary,using a plot_group_key as a key.
-The PlotGroup can then be retrieved in the dictionnary.
+When first creating a PlotGroup, PlotEngine stores it in a dictionary,using a plot_group_key as a key.
+
+The PlotGroup can then be retrieved in the dictionnary for later use.
 
 The plot_group_key is the simple name of the PlotGroupTemplate for a BasicPlotGroupPanel PlotGroup
 (i.e. A Preference Map panel or an Activity panel)
 The plot_group_key is more complicated for UnitWeightsPlotGroup and ProjectionPlotGroup
 (see the corresponding UnitWeightsPanel and ProjectionPanel generate_plot_group_key methods)
-
-A PlotGroup that contains the old LISSOM style plot information, (in a
-different displayed form):
-
-Define PlotGroup HuePreference
-    Define Plot HuePref
-        Channels:
-            Strength   = Null
-	    Hue        = HueP   (Predefined SheetView)
-	    Confidence = Null
-    Define Plot HuePrefAndSel
-        Channels:
-	    Strength   = HueSel (Predefined SheetView)
-	    Hue        = HueP   (Predefined SheetView)
-	    Confidence = Null 
-    Define Plot HueSelect
-        Channels:
-	    Strength   = HueSel (Predefined SheetView)
-	    Hue	       = Null
-	    Confidence = Null
-
-in the new syntax would look like:
-
-    hue_template = PlotGroupTemplate( 
-        [('HuePreference', PlotTemplate({'Strength'   : None,
-                                   'Hue'        : 'HueP',
-                                   'Confidence' : None})),
-         ('HuePrefAndSel', PlotTemplate({'Strength'   : 'HueSel',  
-                                         'Hue'        : 'HueP',
-                                         'Confidence' : None})),
-         ('HueSelectivity', PlotTemplate({'Strength'   : 'HueSel',
-                                     'Hue'        : None,
-                                     'Confidence' : None}))],
-                                     name=HueMap,
-                                     command=measure_hue_pref)
+It is then possible to imagine other type of plot_group_key, as soon as it identified
+a single PlotGroup.
 
 $Id$ 
 """
+### JCALERT ! what is below was in the doc: ask Jim if I should include this reference to LISSOM
+### in PlotGroupTemplate doc
+
+# A PlotGroup that contains the old LISSOM style plot information, (in a
+# different displayed form):
+# Define PlotGroup HuePreference
+#     Define Plot HuePref
+#         Channels:
+#             Strength   = Null
+# 	    Hue        = HueP   (Predefined SheetView)
+# 	    Confidence = Null
+#     Define Plot HuePrefAndSel
+#         Channels:
+# 	    Strength   = HueSel (Predefined SheetView)
+# 	    Hue        = HueP   (Predefined SheetView)
+# 	    Confidence = Null 
+#     Define Plot HueSelect
+#         Channels:
+# 	    Strength   = HueSel (Predefined SheetView)
+# 	    Hue	       = Null
+# 	    Confidence = Null
+
+# in the new syntax would look like:
+
+#     hue_template = PlotGroupTemplate( 
+#         [('HuePreference', PlotTemplate({'Strength'   : None,
+#                                    'Hue'        : 'HueP',
+#                                    'Confidence' : None})),
+#          ('HuePrefAndSel', PlotTemplate({'Strength'   : 'HueSel',  
+#                                          'Hue'        : 'HueP',
+#                                          'Confidence' : None})),
+#          ('HueSelectivity', PlotTemplate({'Strength'   : 'HueSel',
+#                                      'Hue'        : None,
+#                                      'Confidence' : None}))],
+#                                      name=HueMap,
+#                                      command=measure_hue_pref)
+
+
 ### JABHACKALERT!  The documentation above needs substantial
 ### clarification -- less detail, more sense.
 ### JC: I think I improved it a bit, but still need some work.
@@ -60,14 +66,10 @@ __version__='$Revision$'
 ### Nevertheless, it still remains little alerts that need to be solved
 ### but it will be done very soon.
 
-### JCALERT! Get rid of the unused import statement.
-from copy import deepcopy
 from topo.base.topoobject import TopoObject
-from topo.base.utils import flatten, dict_sort
+
+### JCALERT! import *: I don't know how to do it otherwise...
 from plotgroup import *
-from topo.base.sheet import Sheet
-from topo.base.connectionfield import CFSheet
-from topo.base.sheetview import SheetView
 
 
 ### JCALERT! The word "simulation" is used: is it better to use simulator?
