@@ -13,8 +13,6 @@ __version__='$Revision$'
 from utils import classlist
 
 
-# CEBHACKALERT: what does objtype exist for in __get__()? Isn't it unused?
-
 # CEBHACKALERT: does every subclass of Parameter really need doc=''?
 # If someone did 'Number(doc="documentation")' wouldn't it work even without passing through doc
 # because of passing through **params?
@@ -119,6 +117,11 @@ class Parameter(object):
         default value.  If called on an instance, produce the instance's
         value, if one has been set, otherwise produce the default value.
         """
+
+        # For documentation on __get__() see 'Implementing Descriptors'
+        # in the Python reference manual
+        # (http://www.python.org/doc/2.4.2/ref/descriptors.html)
+
         if not obj:
             result = self.default
         else:
