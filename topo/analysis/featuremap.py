@@ -15,6 +15,8 @@ __version__='$Revision$'
 # I have to clean it up!
 # - remove temporary testing code
 # - get rid of unused import statements
+# - a Simulator should be passed in; this code shouldn't look for
+#   active_sim
 
 from Numeric import array, zeros, Float 
 from topo.base.distribution import Distribution
