@@ -42,7 +42,7 @@ python_doc = 'http://www.python.org/doc/'
 def active_sim():
     """
     """
-    return topo.base.simulator.active_sim
+    return topo.base.simulator.get_active_sim()
 
 
 

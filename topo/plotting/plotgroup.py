@@ -107,7 +107,7 @@ class PlotGroup(TopoObject):
         ### JCALERT! for the moment we take the active simulator, but later we might want to 
         ### pass the simulator as a parameter of PlotGroup  
 	### so directly put this line into PlotGroup rather than BasicPlotGroup
-	self.simulator = topo.base.simulator.active_sim
+	self.simulator = topo.base.simulator.get_active_sim()
 
 	### JC: We do not call initialize_plot_list from the super class because we want the possibility
         ### to create PlotGroup object from plot_list already built (cf InputParamPanel)
@@ -356,7 +356,7 @@ class UnitWeightsPlotGroup(PlotGroup):
         Lambda function passed in, that will filter out all sheets
         except the one with the name being looked for.
         """
-        sheets = topo.base.simulator.active_sim.objects(Sheet).values()
+        sheets = topo.base.simulator.get_active_sim().objects(Sheet).values()
         for each in sheets:
             if self.sheet_filter_lam(each):
 		### JCALERT! It is confusing that the method unit_view is only defined in the 
@@ -379,7 +379,7 @@ class ProjectionPlotGroup(PlotGroup):
         self.weight_name = plot_group_key[1]
         self.density = float(plot_group_key[2])
         self.shape = (0,0)
-        self._sim_ep = [s for s in topo.base.simulator.active_sim.objects(Sheet).values()
+        self._sim_ep = [s for s in topo.base.simulator.get_active_sim().objects(Sheet).values()
                         if self.sheet_filter_lam(s)][0]
         self._sim_ep_src = self._sim_ep.get_in_projection_by_name(self.weight_name)[0].src
 

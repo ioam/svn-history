@@ -30,7 +30,7 @@ from topo.base.utils import *
 class PlotFileSaver(topo.base.topoobject.TopoObject):
     def __init__(self,**config):
         super(PlotFileSaver,self).__init__(**config)
-        self.sim = topo.base.simulator.active_sim
+        self.sim = topo.base.simulator.get_active_sim()
         self.pe = plotengine.PlotEngine(self.sim)
         self.bitmaps = []
         self.files = []

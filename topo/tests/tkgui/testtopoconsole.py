@@ -25,7 +25,7 @@ class TestTopoConsole(unittest.TestCase):
 
     def test_do_learning(self):
         run_time = 15.5
-        topo.base.simulator.active_sim = self.s
+        topo.base.simulator.set_active_sim(self.s)
         start_time = self.s.time()
         self.console.do_learning(str(run_time))
         end_time = self.s.time()

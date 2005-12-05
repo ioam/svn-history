@@ -77,10 +77,23 @@ STOP = "Simulator Stopped"
 
 Forever = FixedPoint(-1)
 
-# CEBHACKALERT: I haven't implemented this properly.
-# It should be a singleton variable (as it was in
-# the registry)...with accessor methods?
-active_sim = None
+
+__active_sim = None
+
+def get_active_sim():
+    """
+    """
+    if __active_sim == None:
+        TopoObject().warning('No active Simulator.')
+        
+    return __active_sim
+
+def set_active_sim(sim):
+    """
+    """
+    global __active_sim
+    __active_sim = sim
+
 
 class EPConnection(TopoObject):
     """
@@ -142,9 +155,8 @@ class Simulator(TopoObject):
         self._sleep_window = 0.0
         self._sleep_window_violation = False
 
-        global active_sim
         if self.register:
-            active_sim = self
+            set_active_sim(self)
 
         # CEBHACKALERT: this isn't staying.
         # Previously, calling topo.base.registry.set_active_sim()
