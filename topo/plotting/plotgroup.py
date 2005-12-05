@@ -92,11 +92,15 @@ class PlotGroup(TopoObject):
         self.template = template
 
         ### JCALERT! Because of that, we might be able to get rid of some line about the filter
-        ###      in the plotengine file. (To do)       
+        ###      in the plotengine file. (To do)  
+	### Also: do we leave the possibility here to pass a string. In this case, change it in plot_engine?
         if sheet_filter_lam:
-            self.sheet_filter_lam = sheet_filter_lam
+	    if isinstance(sheet_filter_lam,str):
+		self.sheet_filter_lam = lambda s: s.name == sheet_filter_lam
+	    else:
+		self.sheet_filter_lam = sheet_filter_lam
         else:
-            self.sheet_filter_lam = lambda : True
+            self.sheet_filter_lam = lambda s : True
 
         self.debug('Input type, ', type(self.plot_list))
 
@@ -272,6 +276,7 @@ class BasicPlotGroup(PlotGroup):
     PlotGroup for Activity SheetViews
     """
 
+    ### JCALERT! See what to do for the default value (sheet_filter_lam =None, plot_list=None)
     def __init__(self,template,plot_group_key,sheet_filter_lam,plot_list,**params):
         super(BasicPlotGroup,self).__init__(template,plot_group_key,sheet_filter_lam,plot_list,
                                             **params)
