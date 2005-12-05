@@ -133,10 +133,10 @@ the end of the command:
 </pre>
 
 
-<h2>Integrating Topographica and weave on Windows</h2>
+<h2>Integrating Topographica and Weave on Windows</h2>
 
 <p>
-Topographica is under active development (11/2005) to make the Windows
+Topographica is under active development (12/2005) to make the Windows
 version of Topographica easier to install and use.  For now, these
 notes should be able to help you get Weave (www.scipy.org) built on
 Windows and integrated with Topographica.
@@ -172,8 +172,8 @@ for a single cmd window.  NOTE: The adjusted paths are also required
 when Topographica runs, since the inline statements use the compiler.
 
 <pre>
-    @ Must change paths so MinGW is seen instead of Cygwin compilers.
-    @ C:\mingw\minpath.bat  Also put in topographica.{bat,cmd}
+    REM Must change paths so MinGW is seen instead of Cygwin compilers.
+    REM C:\mingw\minpath.bat  Also put in topographica.{bat,cmd}
     @Echo Prepend the paths for MinGW
     set PATH=C:\mingw\bin;%PATH%
     set LIB=C:\mingw\lib;%LIB%
@@ -197,16 +197,9 @@ Commands to test weave:
 Changes to the Topographica distribution:
 
 <p>
-In topographica_script.py, it is necessary to have "import weave;"
-before "import topo.base.commandline" in topographica_script.py since
-importing these packages then importing weave causes a serious Windows
-error (asking if you would like to upload a bug-report to Microsoft.)
-Importing weave first allows things to continue.  
-
-<p>
-Because Python 2.4 is built with MSVC, weave by default looks for the
-msvc framework.  Each weave.inline() command must have
-"compiler='gcc'" added as a function parameter.  
+Topographica has been designed to work with the gcc compiler.  If you
+wish to use MS Visual C++ instead, then the compiler option in 
+topo/base/inlinec.py must be changed from "compiler='gcc'" to "compiler='msvc'".
 
 <p>
 examples/lissom_or.ty should now run with no errors.
