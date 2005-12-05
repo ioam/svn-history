@@ -7,6 +7,8 @@ $Id$
 """
 __version__='$Revision$'
 
+
+### JCALERT! got rid of unused import statements!
 import unittest
 from pprint import pprint
 from math import pi
@@ -31,7 +33,17 @@ import ImageTk
 import random
 import pdb #debugger
 
-
+### My new import statement: JC
+import topo.base.registry
+from topo.base.simulator import Simulator
+from topo.plotting.plotengine import PlotEngine
+from topo.plotting.plotgroup import BasicPlotGroup
+from topo.sheets.cfsom import CFSOM
+from topo.patterns.random import UniformRandomGenerator
+from topo.learningfns.basic import HebbianSOM
+from topo.base.connectionfield import CFProjection
+from topo.responsefns.basic import CFDotProduct
+from topo.base.patterngenerator import BoundingBox
 
 ### JCALERT! This file has to be re-written when the fundamental changes in plot.py
 ### plotengine.py and plotgroup.py will be finished.
@@ -40,7 +52,87 @@ import pdb #debugger
 class TestPlotEngine(unittest.TestCase):
 
       def setUp(self):
-          pass
+
+          self.sim = Simulator()
+
+          CFSOM.density = 10
+          
+          V1 = CFSOM(name='V1')
+          V2 = CFSOM(name='V2')
+          V3 = CFSOM(name='V3')
+
+          CFProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+          CFProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+          CFProjection.response_fn = CFDotProduct()
+          CFProjection.learning_fn = HebbianSOM()
+
+          self.sim.connect(V1,V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'V1toV2'})
+          self.sim.connect(V3,V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'V2toV3'})
+
+          self.pe = PlotEngine(self.sim)
+
+      def test_add_plot_group(self):
+      
+          pgt = topo.base.registry.plotgroup_templates['Activity']
+          plot_group = BasicPlotGroup(pgt,'Activity',None,None)
+          self.pe.add_plot_group('Activity',plot_group)
+          test = self.pe.plot_group_dict.get('Activity',None)
+          self.assertEqual(test,plot_group)
+
+      def test_make_plot_group(self):
+
+          ### Activity PlotGroup
+          pgt1 = topo.base.registry.plotgroup_templates['Activity']
+
+          self.pe.make_plot_group('Activity',pgt1,None,'BasicPlotGroup')
+          test_plot_group = BasicPlotGroup(pgt1,'Activity',None,None)
+          test = self.pe.plot_group_dict.get('Activity',None)
+
+          ### JCALERT! HOW TO TEST THAT TWO PLOTGROUP ARE THE SAME?
+          #self.assertEqual(test_plot_group,test)
+          
+          ### Orientation Preference PlotGroup
+          pgt2 = topo.base.registry.plotgroup_templates['Orientation Preference']
+
+          self.pe.make_plot_group('Orientation Preference',pgt2,None,'BasicPlotGroup')
+          test_plot_group = BasicPlotGroup(pgt2,'Orientation Preference',None,None)
+          test = self.pe.plot_group_dict.get('Orientation Preference',None)
+          #self.assertEqual(test_plot_group,test)
+
+          ### UnitWeight PlotGroup
+          pgt3 = topo.base.registry.plotgroup_templates['Unit Weights']
+
+          pg_key1=('Weights','V1',0,0)
+          pg_key2=('Weights','V2',0.4,0.4)
+          pg_key3=('Weights','V3',0.1,0.1)
+          self.pe.make_plot_group(pg_key1,pgt3,'V1','UnitWeightsPlotGroup')
+          self.pe.make_plot_group(pg_key2,pgt3,'V2','UnitWeightsPlotGroup')
+          self.pe.make_plot_group(pg_key3,pgt3,'V3','UnitWeightsPlotGroup')
+          
+          test_plot_group1 = UnitWeightsPlotGroup(pgt3,pg_key1,'V1',None)
+          test_lambda = lambda s: s.name == 'V2'
+          test_plot_group2 = UnitWeightsPlotGroup(pgt3,pg_key2,test_lambda,None)
+          test_plot_group3 = UnitWeightsPlotGroup(pgt3,pg_key3,'V3',None)
+
+
+          test1 = self.pe.plot_group_dict.get(pg_key1,None)
+          #self.assertEqual(test_plot_group1,test1)
+
+          test2 = self.pe.plot_group_dict.get(pg_key2,None)
+          #self.assertEqual(test_plot_group2,test2)
+
+          test3 = self.pe.plot_group_dict.get(pg_key3,None)
+          #self.assertEqual(test_plot_group3,test3)
+          
+
+
+          pgt4 = topo.base.registry.plotgroup_templates['Projection']
+
+
+
+          
+
+          
 #         self.s = Simulator(step_mode = 1)
 #         self.engine = PlotEngine(self.s)
 #         self.sheetR = Sheet()
