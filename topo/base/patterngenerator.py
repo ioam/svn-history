@@ -81,7 +81,7 @@ class ImageGenerator(Sheet):
     images, it must have a self-connection.  More elegant, however,
     would be to convert the ImageGenerator from a sheet to a generator
     function suitable for use with the GeneratorSheet class (see
-    topo/sheets/generatorsheet.py). 
+    topo/sheets/generatorsheet.py).
 
     """
     filename = Parameter(None)
@@ -120,31 +120,37 @@ OR_PREC = 0.40
 
 class PatternGenerator(TopoObject):
     """
-
-    A PatternGenerator's Parameters can make use of Parameter's precedence attribute
-    to specify the order in which they should appear e.g. on a GUI. The precedence
-    attribute is based on the range 0.0 to 1.0, with ordering going from 0.0 (first)
-    to 1.0 (last).    
+    A PatternGenerator's Parameters can make use of Parameter's
+    precedence attribute to specify the order in which they should
+    appear e.g. on a GUI. The precedence attribute is based on the
+    range 0.0 to 1.0, with ordering going from 0.0 (first) to 1.0
+    (last).
     """
 
     bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True)
     density = Parameter(default=10000,hidden=True)
 
-    x       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=X_PREC)
-    y       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=Y_PREC)
-    orientation = Number(default=0,softbounds=(0.0,2*pi),precedence=OR_PREC)
-    scale = Number(default=1.0,softbounds=(0.0,2.0),precedence=SC_PREC)
-    offset = Number(default=0.0,softbounds=(-1.0,1.0),precedence=OF_PREC)
+    x       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=X_PREC,
+                     doc="x-coordinate location of pattern center")
+    y       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=Y_PREC,
+                     doc="y-coordinate location of pattern center")
+    orientation = Number(default=0,softbounds=(0.0,2*pi),precedence=OR_PREC,
+                         doc="Polar angle of pattern, i.e. the orientation in Cartesian coordinate\nsystem, with zero at 3 o'clock and increasing counterclockwise")
+    scale = Number(default=1.0,softbounds=(0.0,2.0),precedence=SC_PREC,
+                   doc="Multiplicative strength of input pattern, defaulting to 1.0")
+    offset = Number(default=0.0,softbounds=(-1.0,1.0),precedence=OF_PREC,
+                    doc="Additive offset to input pattern, defaulting to 0.0")
 
     def __call__(self,**params):
         """
         # CEBHACKALERT: I still have documentation to write, including explaining
         params.get().
 
-        Sometimes rows and cols are already known before the PatternGenerator is called, so
-        we can just provide this information without having them recomputed. And sometimes
-        rows and cols are not found by simply calling bound2shape() so we need to pass them in
-	(e.g. see ConnectionField.init()).
+        Sometimes rows and cols are already known before the
+	PatternGenerator is called, so we can just provide this
+	information without having them recomputed. And sometimes rows
+	and cols are not found by simply calling bound2shape() so we
+	need to pass them in (e.g. see ConnectionField.init()).
         """
         self.verbose("params = ",params)
         self.__setup_xy(params.get('bounds',self.bounds),
@@ -158,8 +164,9 @@ class PatternGenerator(TopoObject):
 
     def __setup_xy(self,bounds,density,x,y,orientation,rows,cols):
         """
-        Produce the pattern matrices from the bounds and density (or rows and cols), and transform according
-        to x,y, and orientation.
+        Produce the pattern matrices from the bounds and density (or
+        rows and cols), and transform according to x, y, and
+        orientation.
         """
         self.verbose("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
         x_points,y_points = self.__produce_sampling_vectors(bounds,density,rows,cols)
@@ -169,9 +176,10 @@ class PatternGenerator(TopoObject):
         """
         Subclasses will typically implement this function to draw a pattern.
 
-        The pattern will then be scaled and rotated automatically by __call__.
-        Alternatively, this function may be omitted and __call__ reimplemented,
-        e.g. if the automatic scaling and rotating is not appropriate.
+        The pattern will then be scaled and rotated automatically by
+        __call__.  Alternatively, this function may be omitted and
+        __call__ reimplemented, e.g. if the automatic scaling and
+        rotating is not appropriate.
         """
         raise NotImplementedError
 
@@ -183,7 +191,8 @@ class PatternGenerator(TopoObject):
         x is a 1d-array of x-axis values at which to sample the pattern;
         y contains the y-axis values.
 
-        Both contain smaller to larger values from left to right, i.e. they follow Cartesian convention.
+        Both contain smaller to larger values from left to right,
+        i.e. they follow Cartesian convention.
         """       
         if r == 0 and c == 0:
             rows,cols = bounds2shape(bounds,density)
