@@ -3,7 +3,7 @@ Class file for a TaggedSlider widget.
 
 $Id$
 """
-__version__='$Revision $'
+__version__='$Revision$'
 
 from Tkinter import Frame, IntVar, Scale, Entry
 from Tkinter import LEFT, RIGHT, TOP, BOTTOM, YES, BOTH

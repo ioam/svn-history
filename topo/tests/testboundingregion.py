@@ -4,7 +4,7 @@ Test cases for the boundingregion module.
 
 $Id$
 """
-__version__='$Revision $'
+__version__='$Revision$'
 
 import unittest
 import topo

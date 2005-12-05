@@ -2,7 +2,7 @@
 
 $Id$
 """
-__version__='$Revision $'
+__version__='$Revision$'
 
 ### JCALERT Still to be written...
 

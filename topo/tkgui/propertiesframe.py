@@ -5,7 +5,7 @@ Makes a frame and allows the caller to add properties of various types to it.
 
 $Id$
 """
-__version__='$Revision $'
+__version__='$Revision$'
 
 from Tkinter import Frame, StringVar, Entry, Message, Checkbutton, IntVar, N,S,E,W,X
 from taggedslider import TaggedSlider

@@ -6,7 +6,7 @@ pattern and a set of ConnectionField objects.
 
 $Id$
 """
-__version__='$Revision $'
+__version__='$Revision$'
 
 from topo.base.connectionfield import CFResponseFunction
 from topo.base.parameter import Parameter

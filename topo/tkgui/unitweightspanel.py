@@ -8,7 +8,7 @@ widget.
 
 $Id$
 """
-__version__='$Revision $'
+__version__='$Revision$'
 
 import __main__
 from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry

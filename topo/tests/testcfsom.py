@@ -4,7 +4,7 @@ the PlotEngine system from a simulation.
 
 $Id$
 """
-__version__='$Revision $'
+__version__='$Revision$'
 
 import unittest
 from topo.sheets.cfsom import CFSOM

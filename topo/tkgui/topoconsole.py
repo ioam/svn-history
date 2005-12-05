@@ -3,7 +3,7 @@ TopoConsole class file.
 
 $Id$
 """
-__version__='$Revision $'
+__version__='$Revision$'
 
 from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, \
      LEFT, RIGHT, YES, BOTH, Label

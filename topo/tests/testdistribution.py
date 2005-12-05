@@ -3,7 +3,7 @@ Tests of distribution.py
 
 $Id$
 """
-__version__='$Revision $'
+__version__='$Revision$'
 
 # CEB:
 # This file is still being written

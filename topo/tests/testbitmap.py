@@ -11,7 +11,7 @@ classes.
 
 $Id$
 """
-__version__='$Revision $'
+__version__='$Revision$'
 
 import topo
 from topo.plotting.bitmap import *
