@@ -40,7 +40,7 @@ from topo.plotting.plotengine import PlotEngine
 from topo.plotting.plotgroup import BasicPlotGroup
 from topo.sheets.cfsom import CFSOM
 from topo.patterns.random import UniformRandomGenerator
-from topo.learningfns.basic import HebbianSOM
+from topo.learningfns.basic import HebbianSOMLF
 from topo.base.connectionfield import CFProjection
 from topo.responsefns.basic import CFDotProduct
 from topo.base.patterngenerator import BoundingBox
@@ -64,7 +64,7 @@ class TestPlotEngine(unittest.TestCase):
           CFProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
           CFProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
           CFProjection.response_fn = CFDotProduct()
-          CFProjection.learning_fn = HebbianSOM()
+          CFProjection.learning_fn = HebbianSOMLF()
 
           self.sim.connect(V1,V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'V1toV2'})
           self.sim.connect(V3,V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'V2toV3'})

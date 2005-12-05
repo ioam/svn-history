@@ -12,7 +12,7 @@ from topo.base.parameter import Number
 from Numeric import argmax,exp,floor
 from topo.base.connectionfield import CFSheet
 from itertools import chain
-from topo.learningfns.basic import HebbianSOM
+from topo.learningfns.basic import SOMLF
 from topo.base.parameter import Number
 
 
@@ -58,7 +58,7 @@ class CFSOM(CFSheet):
         learning_rate = self.alpha()
         for proj in chain(*self.in_projections.values()):
             if proj.input_buffer:
-                if isinstance(proj.learning_fn, HebbianSOM):
+                if isinstance(proj.learning_fn, SOMLF):
                     proj.learning_fn.learning_radius = radius
                 inp = proj.input_buffer
                 cfs = proj.cfs

@@ -16,7 +16,7 @@ from topo.base.connectionfield import CFProjection
 import topo.base.topoobject
 from math import pi
 from topo.commands.basic import pattern_present
-from topo.learningfns.basic import HebbianSOM
+from topo.learningfns.basic import HebbianSOMLF
 
 class TestPatternPresent(unittest.TestCase):
 
@@ -32,7 +32,7 @@ class TestPatternPresent(unittest.TestCase):
         CFSOM.learning_length = 10000
         CFSOM.radius_0 = 0.1
         CFProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
-	CFProjection.learning_fn=HebbianSOM()
+	CFProjection.learning_fn=HebbianSOMLF()
         topo.base.topoobject.min_print_level = topo.base.topoobject.MESSAGE
         s = topo.base.simulator.Simulator()
         retina = GeneratorSheet(input_generator=LineGenerator(),name='Retina')

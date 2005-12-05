@@ -272,7 +272,18 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
 
 
 
-class HebbianSOM(CFLearningFunction):
+class SOMLF(CFLearningFunction):
+    """
+    An abstract base class of learning functions for Self-Organizing Maps.
+    """
+    learning_radius = Number(default=0.0)
+
+    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+            raise NotImplementedError
+
+
+
+class HebbianSOMLF(SOMLF):
     """
     CF-aware Hebbian learning rule in Self-Organizing Maps. Only the
     winner unit and those surrounding it will learn. The radius of the
@@ -285,9 +296,6 @@ class HebbianSOM(CFLearningFunction):
     output_fn = Parameter(default=Identity())
     neighborhood_fn = Parameter(default=gaussian)
     
-    def __init__(self,**params):
-        super(HebbianSOM,self).__init__(**params)
-
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
 
         rows,cols = output_activity.shape

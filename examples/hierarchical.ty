@@ -21,7 +21,7 @@ from topo.sheets.cfsom import CFSOM
 from topo.patterns.random import UniformRandomGenerator
 from topo.patterns.basic import LineGenerator
 from topo.base.simulator import Simulator
-from topo.learningfns.basic import HebbianSOM
+from topo.learningfns.basic import HebbianSOMLF
 from topo.outputfns.basic import PiecewiseLinear
 
 
@@ -50,7 +50,7 @@ CFSOM.output_fn = PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
 
 CFProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 CFProjection.response_fn = CFDotProduct()
-CFProjection.learning_fn = HebbianSOM()
+CFProjection.learning_fn = HebbianSOMLF()
 
 #topo.base.topoobject.min_print_level = topo.base.topoobject.MESSAGE
 
