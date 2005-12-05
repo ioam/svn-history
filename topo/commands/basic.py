@@ -13,38 +13,28 @@ from topo.sheets.generatorsheet import GeneratorSheet
 
 import pickle
 
-### JABALERT!  We're likely to have a lot of commands like this that
-### need to work on the active simulator.  We should figure out a way
-### to avoid duplicating all this code about if sim, not sim, else,
-### etc.; is there some way to write that only once and just have all
-### commands use it?
+def save_input_generators():
+    """Save a copy of the active_sim's current input_generators for all GeneratorSheets."""
+    sim = topo.base.simulator.get_active_sim()
 
-# CEBHACKALERT: it's confusing to pass sim like this. I intend to remove that from
-# functions such as this one unless anyone has a better idea...
-def save_input_generators(sim=None):
-    """Save a copy of the current input_generators for all GeneratorSheets."""
-    if not sim:
-        sim = topo.base.simulator.get_active_sim()
-
+    # CEBHACKALERT: do we need to test that there is a sim (here and elsewhere like this)?
+    # get_active_sim() prints a warning if there isn't, and then the code in the if
+    # block below will raise an error like 'none doesn't have objects()'.
+    # Which is better: warning then no action, or warning then error?
     if sim:
         generator_sheets = sim.objects(GeneratorSheet).values()
         for sheet in generator_sheets:
             sheet.push_input_generator()
-    else:
-        TopoObject().warning('No active Simulator.')
 
 
-def restore_input_generators(sim=None):
-    """Restore previously saved input_generators for all GeneratorSheets."""
-    if not sim:
-        sim = topo.base.simulator.get_active_sim()
+def restore_input_generators():
+    """Restore previously saved input_generators for all of active_sim's GeneratorSheets."""
+    sim = topo.base.simulator.get_active_sim()
 
     if sim:
         generator_sheets = sim.objects(GeneratorSheet).values()
         for sheet in generator_sheets:
             sheet.pop_input_generator()
-    else:
-        TopoObject().warning('No active Simulator.')
 
 
 ### JABHACKALERT!  Should leave the state of all learning flags
@@ -72,12 +62,12 @@ def pattern_present(inputs=None,duration=1.0,sim=None,learning=False,overwrite_p
     If learning is False, overwrites the existing values of Sheet.learning
     to disable learning, then reenables learning.
     """
-    if not sim:
-        sim = topo.base.simulator.get_active_sim()
+    sim = topo.base.simulator.get_active_sim()
+
     if sim:
 
         if not overwrite_previous:
-            save_input_generators(sim)
+            save_input_generators()
 
         ### JABALERT!  Should clean up how these are set on each
         ### sheet; it overwrites any old values.
@@ -118,11 +108,8 @@ def pattern_present(inputs=None,duration=1.0,sim=None,learning=False,overwrite_p
  
             
         if not overwrite_previous:
-            restore_input_generators(sim)
+            restore_input_generators()
 
-    else:
-        TopoObject().warning('No active Simulator.')
-    
 
 # CEBHACKALERT: see below
 from topo.patterns.basic import GaussianGenerator

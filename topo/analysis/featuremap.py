@@ -251,12 +251,12 @@ class MeasureFeatureMap(TopoObject):
 
         Note: allows execution of arbitrary code.
         """
-        save_input_generators(self.simulator)
+        save_input_generators()
         
         self.__present_input_patterns(user_function,param_dict,display)
         self.__construct_sheet_views()
 
-        restore_input_generators(self.simulator)
+        restore_input_generators()
 
 
     def __present_input_patterns(self,user_function,param_dict,display=False):
