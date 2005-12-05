@@ -43,7 +43,13 @@ def generate_cmd_prefix(interactive=True,start_gui=False):
     # generate a serious system error.  However, importing weave first
     # does not cause problems.  This is why the first thing done in
     # 'cmd' is to 'import topo.base.inlinec'.
-    cmd += 'import topo.base.inlinec; import topo.base.commandline; topo.base.commandline.start(' \
+    try:
+        import weave
+        cmd += 'import weave; '
+    except:
+        pass
+    
+    cmd += 'import topo.base.commandline; topo.base.commandline.start(' \
            + str(interactive) + ');'
     if start_gui:
         cmd += ' topo.gui_cmdline_flag = True; import topo.tkgui; topo.tkgui.start();'
