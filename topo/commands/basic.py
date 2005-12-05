@@ -17,10 +17,6 @@ def save_input_generators():
     """Save a copy of the active_sim's current input_generators for all GeneratorSheets."""
     sim = topo.base.simulator.get_active_sim()
 
-    # CEBHACKALERT: do we need to test that there is a sim (here and elsewhere like this)?
-    # get_active_sim() prints a warning if there isn't, and then the code in the if
-    # block below will raise an error like 'none doesn't have objects()'.
-    # Which is better: warning then no action, or warning then error?
     if sim:
         generator_sheets = sim.objects(GeneratorSheet).values()
         for sheet in generator_sheets:
@@ -156,6 +152,9 @@ def save_snapshot(snapshot_name):
 
     Uses Python's 'pickle' module, so subject to the same limitations.
     """
-    pickle.dump(topo.base.simulator.get_active_sim(), open(snapshot_name,'wb'), 2)
+    sim = topo.base.simulator.get_active_sim()
+
+    if sim != None:
+        pickle.dump(sim, open(snapshot_name,'wb'), 2)
 
 
