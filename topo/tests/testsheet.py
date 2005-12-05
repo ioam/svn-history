@@ -11,6 +11,7 @@ from topo.base.sheet import *
 import topo.base.topoobject
 import Numeric
 from topo.base import boundingregion
+from topo.base.sheetview import SheetView
 
 
 class TestCoordinateTransforms(unittest.TestCase):
@@ -51,32 +52,18 @@ class TestCoordinateTransforms(unittest.TestCase):
     def test_m2s_right_bottom(self):
         r,c = self.rbound-1,self.cbound-1
         x,y = self.right-self.half_unit,self.bottom+self.half_unit
-        self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))        
-    def test_sheet_view(self):
-        s = Sheet()
-        sview = s.sheet_view()
-        sview = s.sheet_view('Activity')
-        log_level = s.print_level
-        minlog_level = topo.base.topoobject.min_print_level
-
-        s.print_level = topo.base.topoobject.SILENT
-        topo.base.topoobject.min_print_level = topo.base.topoobject.SILENT
-        s.sheet_view('Orientation')
-        s.print_level = log_level
-        topo.base.topoobject.min_print_level = minlog_level
-
-        s.add_sheet_view('Orientation',sview)
-        sview = s.sheet_view('Orientation')
+        self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))    
 
     def test_sheetview_release(self):
         self.s = Sheet()
         self.s.activity = Numeric.array([[1,2],[3,4]])
         # Call s.sheet_view(..) with a parameter
-        sv2 = self.s.sheet_view('Activity')
+	sv2 = SheetView((self.s.activity,self.s.bounds),
+                          src_name=self.s.name,view_type='Activity')
         self.assertEqual(len(self.s.sheet_view_dict.keys()),0)
-        self.s.add_sheet_view('key',sv2)
+        self.s.add_sheet_view('Activity',sv2)
         self.assertEqual(len(self.s.sheet_view_dict.keys()),1)
-        self.s.release_sheet_view('key')
+        self.s.release_sheet_view('Activity')
         self.assertEqual(len(self.s.sheet_view_dict.keys()),0)
 
     def test_coordinate_position(self):

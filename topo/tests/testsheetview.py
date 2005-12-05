@@ -18,6 +18,11 @@ from topo.plotting.bitmap import BWMap
 # included as part of the system unit testing.
 DEV = False
 
+
+### JCALERT! This testfile has to be finished (I would say entirely reviewed)
+### It does not really test efficiently has it is now.
+### Also, it should be included in tests/__init__.py
+
 class TestSheetView(unittest.TestCase):
 
     def setUp(self):
@@ -25,11 +30,18 @@ class TestSheetView(unittest.TestCase):
         self.s.activity = Numeric.array([[1,2],[3,4]])
         self.s2 = Sheet()
         self.s2.activity = Numeric.array([[4,3],[2,1]])
+
     def test_init(self):
+
+	sv1 = SheetView((self.s.activity,self.s.bounds),
+                          src_name=self.s.name,view_type='Activity')
         # s.sheet_view() returns a SheetView
-        sv = self.s.sheet_view()
-        # Call s.sheet_view(..) with a parameter
-        sv2 = self.s.sheet_view('Activity')
+        self.s.add_sheet_view('sv1',sv1)
+	sv2 = SheetView((self.s.activity,self.s.bounds),
+                                 src_name=self.s.name,view_type='Activity')
+        # s.sheet_view() returns a SheetView
+        self.s.add_sheet_view('sv2',sv2)
+	
         # Define a type 1 SheetView, with matrix and bounding box.
         sv3 = SheetView((self.s.activity, self.s.bounds))
         sv4 = SheetView((self.s2.activity,self.s2.bounds))
@@ -54,7 +66,9 @@ class TestSheetView(unittest.TestCase):
         input = ImageGenerator(filename='topo/tests/testsheetview.ppm',
                         density=100,
                         bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))))
-        sv = input.sheet_view('Activity')
+	sv = SheetView((input.activity,input.bounds),
+                          src_name=input.name,view_type='Activity')
+        input.add_sheet_view('Activity',sv)
         sv_tuple = sv.view()
         map = BWMap(sv_tuple[0])
         # map.show()
@@ -74,3 +88,6 @@ class TestSheetView(unittest.TestCase):
 
 suite = unittest.TestSuite()
 suite.addTest(unittest.makeSuite(TestSheetView))
+
+if __name__ == '__main__':
+    unittest.TextTestRunner(verbosity=2).run(suite)

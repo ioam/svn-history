@@ -295,12 +295,18 @@ class CFProjection(Projection):
         return len(self.cfs),len(self.cfs[0])
 
 
+    ### JCALERT! This function has to be review, so that the size of the UnitView
+    ### matrix is actually the same size as the sheet.
+    ### Like that it would be possible to color unitView with Orientation Preference 
+    ### for instance.
     def get_view(self,sheet_x, sheet_y):
         """
         Return a single connection field UnitView, for the unit
         located at sheet coordinate (sheet_x,sheet_y).
         """
         (r,c) = (self.dest).sheet2matrixidx(sheet_x,sheet_y)
+
+	### JCALERT! Here it should be self.cf, and somehow passing the bound to the view...
         matrix_data = Numeric.array(self.cf(r,c).weights)
 
         ### JABHACKALERT!
@@ -417,30 +423,3 @@ class CFSheet(ProjectionSheet):
         self.release_sheet_view(('Weights',x,y))
 
     
-    ### JABALERT
-    ###
-    ### Is it necessary to provide this special case?  It seems like
-    ### the database can be populated beforehand so that this code
-    ### can be basic and simple, but I may be forgetting something.
-
-    def sheet_view(self,request='Activity'):
-        """
-        Check for 'Weights' or 'WeightsArray', but then call Sheet.sheet_view().  
-
-        The addition of unit_view() means that it's now possible for
-        one sheet_view request to return multiple UnitView objects,
-        which are subclasses of SheetViews.
-
-        """
-        self.debug('request = ' + str(request))
-        if isinstance(request,tuple) and request[0] == 'Weights':
-	    ### JCALERT! This code is unnecessary, as well as the whole function
-	    ### we want eventually to get rid of sheet_view here and in sheet.py
-	    ### and only access the dictionnary. (sheet_view_dict).
-	    ### also it is confusing that it can return a list of UnitView 
-
-            (name,s,p,x,y) = request
-            return self.unit_view(x,y)
-        else:
-            return Sheet.sheet_view(self,request)
-        

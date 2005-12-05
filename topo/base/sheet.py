@@ -316,49 +316,6 @@ class Sheet(EventProcessor):
         self.sheet_view_dict = {}
 
 
-    ### JCALERT! This function should be erased, when the changes will
-    ### be made to call to this function outside of this file.
-        
-    def sheet_view(self,request='Activity'):
-        ### JABHACKALERT!
-        ### 
-        ### Shouldn't the name for an Activity View be a tuple, not
-        ### a string concatenating the sheet and view names?
-        """
-        Create a SheetView object of the current activity of the
-        Sheet.  Current implementation gives the raw activity
-        matrix.  Uses self.sheet_view_dict if the request is not
-        the default.
-
-        The name for an Activity View should be the Sheet name plus
-        '_Activity', e.g. 'Sheet0002_Activity'.
-
-        Returns None if the View does not exist in this sheet.
-        """
-        ### JABHACKALERT!
-        ### 
-        ### Instead of this special coding for Activity, should make a
-        ### function that populates the SheetView dictionaries with
-        ### Activity plots, which will then be called before plotting.
-        ### This should all work the same as for preference maps: with
-        ### each plot template there will be associated code that will
-        ### be called just before plotting, which should install any
-        ### required SheetViews into the dictionary.
-
-
-        ### JCALERT! This part should be gone now. To do.
-        if request == 'Activity':
-            activity_copy = array(self.activity)
-            new_view = sheetview.SheetView((activity_copy,self.bounds),
-                                 src_name=self.name,view_type='Activity')
-        ###
-        elif self.sheet_view_dict.has_key(request):
-            new_view = self.sheet_view_dict[request]
-        else:
-            new_view = None
-        return new_view
-
-
     def add_sheet_view(self,view_name,sheet_view):
         """
         Add a SheetView to the view database in this Sheet object.
@@ -375,20 +332,14 @@ class Sheet(EventProcessor):
         """
         self.sheet_view_dict[view_name] = sheet_view
 
-    ### JABHACKALERT!
-    ### 
-    ### Instead of this special coding for Activity, should make a
-    ### function that populates the SheetView dictionaries with
-    ### Activity plots, which will then be called before plotting.
+  
     def release_sheet_view(self,view_name):
         """
         Delete the dictionary entry with key entry 'view_name' to save
         memory.
         """
-        if view_name == 'Activity':
-            pass
-        elif self.sheet_view_dict.has_key(view_name):        
-            del self.sheet_view_dict[view_name]
+	if self.sheet_view_dict.has_key(view_name):   
+	    del self.sheet_view_dict[view_name]
             
                 
     def sheet2matrixidx(self,x,y):
