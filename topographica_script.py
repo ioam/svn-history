@@ -38,6 +38,11 @@ def generate_cmd_prefix(interactive=True,start_gui=False):
     if os.name == 'nt': cmd = '"'
     else: cmd = ''
 
+    # (As of 12/2005) With Python 2.4 compiled and run on Windows XP,
+    # trying to import Weave after starting the topo command-line will
+    # generate a serious system error.  However, importing weave first
+    # does not cause problems.  This is why the first thing done in
+    # 'cmd' is to 'import topo.base.inlinec'.
     cmd += 'import topo.base.inlinec; import topo.base.commandline; topo.base.commandline.start(' \
            + str(interactive) + ');'
     if start_gui:
