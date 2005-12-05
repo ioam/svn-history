@@ -107,6 +107,9 @@ class PlotGroup(TopoObject):
         ### JCALERT! for the moment we take the active simulator, but later we might want to 
         ### pass the simulator as a parameter of PlotGroup  
 	### so directly put this line into PlotGroup rather than BasicPlotGroup
+        # CEB: yes, this file (which I don't know anything about...) should accept a Simulator
+        # and not look it up iself from topo.base.simulator. This alert also applies to other
+        # places in this file where the simulator is looked up.
 	self.simulator = topo.base.simulator.get_active_sim()
 
 	### JC: We do not call initialize_plot_list from the super class because we want the possibility
