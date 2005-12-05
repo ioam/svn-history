@@ -156,7 +156,7 @@ class PlotEngine(TopoObject):
     ### JCALERT!  I would change group_type to be template or group_template
     ### and name to be plot_group_key....
     
-    def make_plot_group(self, name, group_type,filter_lam,class_type):
+    def make_plot_group(self,name, group_type,filter_lam,class_type):
         """
         name : The key to look under in the SheetView dictionaries.
         group_type: 2 Valid inputs:
@@ -178,7 +178,7 @@ class PlotEngine(TopoObject):
         ### JCALERT! I think we can spare the in globals.
         exec 'ptr = ' + class_type  in globals()
 
-        new_group = ptr(group_type,name,filter_lam,dynamic_list)
+        new_group = ptr(self.simulation,group_type,name,filter_lam,dynamic_list)
 
         ### JCALERT! I left this comment but does not understand it...
         # Just copying the pointer.  Not currently sure if we want to

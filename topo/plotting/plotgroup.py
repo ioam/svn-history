@@ -15,6 +15,7 @@ __version__='$Revision$'
 ### The code in this file has not yet been reviewed, and may need
 ### substantial changes.
 
+
 import types
 from topo.base.topoobject import TopoObject
 from topo.base.utils import flatten, dict_sort
@@ -64,15 +65,14 @@ class PlotGroup(TopoObject):
     the plots and other special parameters.
     """
 
-    ### JCALERT: adding the template in the list of parameter to pass. 
-    ###     also add a simulator parameter, that will be passed when creating from the plot_engine.
-    ### Also plot_list could disappear.
+    ### JCALERT: 
+    ### plot_list could maybe disappear.
     ### + I left template=None so that the testPlotGroup does not crash anymore,
-    ### that will have to be re moved eventually.
+    ### that will have to be re-moved eventually.
     ### re-arranged the order and look at the call in all panel classes (i.e. inputparampanel)
     ### also review the doc of each functions.
 
-    def __init__(self,template=None,plot_group_key=None,sheet_filter_lam=None,plot_list=None,shape=FLAT,**params):
+    def __init__(self,simulator,template=None,plot_group_key=None,sheet_filter_lam=None,plot_list=None,shape=FLAT,**params):
         """
         plot_list can be of two types: 
         1.  A list of Plot objects that can return bitmaps when requested.
@@ -104,13 +104,7 @@ class PlotGroup(TopoObject):
 
         self.debug('Input type, ', type(self.plot_list))
 
-        ### JCALERT! for the moment we take the active simulator, but later we might want to 
-        ### pass the simulator as a parameter of PlotGroup  
-	### so directly put this line into PlotGroup rather than BasicPlotGroup
-        # CEB: yes, this file (which I don't know anything about...) should accept a Simulator
-        # and not look it up iself from topo.base.simulator. This alert also applies to other
-        # places in this file where the simulator is looked up.
-	self.simulator = topo.base.simulator.get_active_sim()
+	self.simulator = simulator
 
 	### JC: We do not call initialize_plot_list from the super class because we want the possibility
         ### to create PlotGroup object from plot_list already built (cf InputParamPanel)
@@ -280,8 +274,8 @@ class BasicPlotGroup(PlotGroup):
     """
 
     ### JCALERT! See what to do for the default value (sheet_filter_lam =None, plot_list=None)
-    def __init__(self,template,plot_group_key,sheet_filter_lam,plot_list,**params):
-        super(BasicPlotGroup,self).__init__(template,plot_group_key,sheet_filter_lam,plot_list,
+    def __init__(self,simulator,template,plot_group_key,sheet_filter_lam,plot_list,**params):
+        super(BasicPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,plot_list,
                                             **params)
 
         ### JC: for basic PlotGroup, no need to create a "dynamic List"
@@ -307,8 +301,8 @@ class UnitWeightsPlotGroup(PlotGroup):
     PlotGroup for Weights UnitViews
     """
 
-    def __init__(self,template,plot_group_key,sheet_filter_lam,plot_list,**params):
-        super(UnitWeightsPlotGroup,self).__init__(template,plot_group_key,sheet_filter_lam,plot_list,
+    def __init__(self,simulator,template,plot_group_key,sheet_filter_lam,plot_list,**params):
+        super(UnitWeightsPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,plot_list,
                                               **params)
         self.x = float(plot_group_key[2])
         self.y = float(plot_group_key[3])
@@ -359,7 +353,7 @@ class UnitWeightsPlotGroup(PlotGroup):
         Lambda function passed in, that will filter out all sheets
         except the one with the name being looked for.
         """
-        sheets = topo.base.simulator.get_active_sim().objects(Sheet).values()
+        sheets = self.simulator.objects(Sheet).values()
         for each in sheets:
             if self.sheet_filter_lam(each):
 		### JCALERT! It is confusing that the method unit_view is only defined in the 
@@ -376,13 +370,13 @@ class ProjectionPlotGroup(PlotGroup):
     PlotGroup for Projection Plots
     """
 
-    def __init__(self,template,plot_group_key,sheet_filter_lam,plot_list,**params):
-        super(ProjectionPlotGroup,self).__init__(template,plot_group_key,sheet_filter_lam,
+    def __init__(self,simulator,template,plot_group_key,sheet_filter_lam,plot_list,**params):
+        super(ProjectionPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,
                                                    plot_list,**params)
         self.weight_name = plot_group_key[1]
         self.density = float(plot_group_key[2])
         self.shape = (0,0)
-        self._sim_ep = [s for s in topo.base.simulator.get_active_sim().objects(Sheet).values()
+        self._sim_ep = [s for s in self.simulator.objects(Sheet).values()
                         if self.sheet_filter_lam(s)][0]
         self._sim_ep_src = self._sim_ep.get_in_projection_by_name(self.weight_name)[0].src
 

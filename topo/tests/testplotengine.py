@@ -74,7 +74,7 @@ class TestPlotEngine(unittest.TestCase):
       def test_add_plot_group(self):
       
           pgt = topo.base.registry.plotgroup_templates['Activity']
-          plot_group = BasicPlotGroup(pgt,'Activity',None,None)
+          plot_group = BasicPlotGroup(self.sim,pgt,'Activity',None,None)
           self.pe.add_plot_group('Activity',plot_group)
           test = self.pe.plot_group_dict.get('Activity',None)
           self.assertEqual(test,plot_group)
@@ -85,7 +85,7 @@ class TestPlotEngine(unittest.TestCase):
           pgt1 = topo.base.registry.plotgroup_templates['Activity']
 
           self.pe.make_plot_group('Activity',pgt1,None,'BasicPlotGroup')
-          test_plot_group = BasicPlotGroup(pgt1,'Activity',None,None)
+          test_plot_group = BasicPlotGroup(self.sim,pgt1,'Activity',None,None)
           test = self.pe.plot_group_dict.get('Activity',None)
 
           ### JCALERT! HOW TO TEST THAT TWO PLOTGROUP ARE THE SAME?
@@ -95,7 +95,7 @@ class TestPlotEngine(unittest.TestCase):
           pgt2 = topo.base.registry.plotgroup_templates['Orientation Preference']
 
           self.pe.make_plot_group('Orientation Preference',pgt2,None,'BasicPlotGroup')
-          test_plot_group = BasicPlotGroup(pgt2,'Orientation Preference',None,None)
+          test_plot_group = BasicPlotGroup(self.sim,pgt2,'Orientation Preference',None,None)
           test = self.pe.plot_group_dict.get('Orientation Preference',None)
           #self.assertEqual(test_plot_group,test)
 
@@ -109,10 +109,10 @@ class TestPlotEngine(unittest.TestCase):
           self.pe.make_plot_group(pg_key2,pgt3,'V2','UnitWeightsPlotGroup')
           self.pe.make_plot_group(pg_key3,pgt3,'V3','UnitWeightsPlotGroup')
           
-          test_plot_group1 = UnitWeightsPlotGroup(pgt3,pg_key1,'V1',None)
+          test_plot_group1 = UnitWeightsPlotGroup(self.sim,pgt3,pg_key1,'V1',None)
           test_lambda = lambda s: s.name == 'V2'
-          test_plot_group2 = UnitWeightsPlotGroup(pgt3,pg_key2,test_lambda,None)
-          test_plot_group3 = UnitWeightsPlotGroup(pgt3,pg_key3,'V3',None)
+          test_plot_group2 = UnitWeightsPlotGroup(self.sim,pgt3,pg_key2,test_lambda,None)
+          test_plot_group3 = UnitWeightsPlotGroup(self.sim,pgt3,pg_key3,'V3',None)
 
 
           test1 = self.pe.plot_group_dict.get(pg_key1,None)

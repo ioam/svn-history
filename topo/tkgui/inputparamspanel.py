@@ -236,7 +236,7 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
             ### (which is also true for most of the file!!)
             plist.append(topo.plotting.plot.Plot((each,None,None),view_dict, name=''))
         if LIST_REVERSE: plist.reverse()
-        self.pe_group = topo.plotting.plotgroup.PlotGroup(plot_group_key='Preview',plot_list=plist)
+        self.pe_group = topo.plotting.plotgroup.PlotGroup(self.pe.simulation,plot_group_key='Preview',plot_list=plist)
 
 
     def refresh_title(self): pass
