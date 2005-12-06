@@ -1,5 +1,7 @@
 @ECHO OFF
 ECHO This will install Topographica and its package dependencies.
+if "%1"=="" ECHO If default path is not acceptable, enter path as parameter to setup.bat
+if NOT "%1"=="" ECHO Target is %1\Topographica\
 
 REM Developer's Note: Install Python then call the setup.py script
 REM inside the external/win32 directory.
@@ -27,7 +29,7 @@ start /wait external\win32\python-2.4.msi
 cd external\win32
 cd
 start /wait setup.py configure
-start /wait setup.py install
+start /wait /B setup.py install %1
 
 :EXIT
 ECHO Install Complete
