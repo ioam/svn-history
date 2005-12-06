@@ -51,6 +51,57 @@ class TopoMetaclass(type):
     class.
     """
 
+    # CEBHACKALERT: the contents of this could well be going to
+    # __setattr__...
+    def __init__(self,name,bases,dict):
+        """
+        """
+        # When a Parameter is defined in a TopoObject class, there are
+        # two places from which it could make sense to inherit
+        # attributes (i.e. slots in this case). The first is from the
+        # super class(es) of the Parameter, as one would expect. For
+        # example, Number inherits its 'hidden' attribute from
+        # Parameter. However, for a Parameter in a TopoClass, the
+        # second place to inherit from would be a Parameter with the
+        # same name in the TopoClass' super class. This code achieves
+        # that by going up the TopoObject's class hierarchy until it
+        # finds a Parameter with the same name whose slot value is not
+        # None.
+        
+        type.__init__(self,name,bases,dict)
+
+        # Get a list of all objects of type Parameter that are defined in this class
+        parameters = [(name,obj) for (name,obj) in dict.items() if isinstance(obj,Parameter)]
+
+        for param_name,param in parameters:
+            for slot in param.__slots__:
+
+                # CEBHACKALERT: sort this out in Parameter
+                if slot=='doc':
+                    slot='__doc__'
+
+                base_classes = iter(bases)
+
+                # CEBHACKALERT: there's probably a better way than while
+                # and an iterator...
+                # getattr(param,slot) is param.slot: keep going up
+                # the hierarchy until param.slot!=None, or the top
+                # of the hierarchy is reached
+                while getattr(param,slot)==None:
+                    try:
+                        param_base_class = base_classes.next()
+                    except StopIteration:
+                        break
+
+                    # high enough up the hierarchy, classes will stop
+                    # having the Parameter we're looking for,
+                    # so new_param can be None
+                    new_param = param_base_class.__dict__.get(param_name)
+                    if new_param != None:
+                        new_value = getattr(new_param,slot)
+                        setattr(param,slot,new_value)
+
+
     def __setattr__(self,name,value):
         from copy import copy
         desc,class_ = self.get_param_descriptor(name)
