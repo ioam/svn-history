@@ -49,10 +49,7 @@ class TopoMetaclass(type):
     initializes the *class* object, while the __init__ method defined
     in each TopoObject class is called for each new instance of that
     class.
-    """
-
-    # CEBHACKALERT: the contents of this could well be going to
-    # __setattr__...
+    """   
     def __init__(self,name,bases,dict):
         """
         """
@@ -66,40 +63,14 @@ class TopoMetaclass(type):
         # same name in the TopoClass' super class. This code achieves
         # that by going up the TopoObject's class hierarchy until it
         # finds a Parameter with the same name whose slot value is not
-        # None.
-        
+        # None.        
         type.__init__(self,name,bases,dict)
 
-        # Get a list of all objects of type Parameter that are defined in this class
+        # All objects (with their names) of type Parameter that are defined in this class
         parameters = [(name,obj) for (name,obj) in dict.items() if isinstance(obj,Parameter)]
 
         for param_name,param in parameters:
-            for slot in param.__slots__:
-
-                # CEBHACKALERT: sort this out in Parameter
-                if slot=='doc':
-                    slot='__doc__'
-
-                base_classes = iter(bases)
-
-                # CEBHACKALERT: there's probably a better way than while
-                # and an iterator...
-                # getattr(param,slot) is param.slot: keep going up
-                # the hierarchy until param.slot!=None, or the top
-                # of the hierarchy is reached
-                while getattr(param,slot)==None:
-                    try:
-                        param_base_class = base_classes.next()
-                    except StopIteration:
-                        break
-
-                    # high enough up the hierarchy, classes will stop
-                    # having the Parameter we're looking for,
-                    # so new_param can be None
-                    new_param = param_base_class.__dict__.get(param_name)
-                    if new_param != None:
-                        new_value = getattr(new_param,slot)
-                        setattr(param,slot,new_value)
+            self.__param_inheritance(param_name,param,bases)
 
 
     def __setattr__(self,name,value):
@@ -118,6 +89,39 @@ class TopoMetaclass(type):
                        % (self.__name__,name,`value`))
                                    
             type.__setattr__(self,name,value)
+            
+
+    def __param_inheritance(self,param_name,param,bases):
+        """
+        CEBHACKALERT: move documentation
+        """
+        for slot in param.__slots__:
+
+            # CEBHACKALERT: sort this out in Parameter
+            if slot=='doc':
+                slot='__doc__'
+
+            base_classes = iter(bases)
+
+            # CEBHACKALERT: there's probably a better way than while
+            # and an iterator...
+            # getattr(param,slot) is param.slot: keep going up
+            # the hierarchy until param.slot!=None, or the top
+            # of the hierarchy is reached
+            while getattr(param,slot)==None:
+                try:
+                    param_base_class = base_classes.next()
+                except StopIteration:
+                    break
+
+                # high enough up the hierarchy, classes will stop
+                # having the Parameter we're looking for,
+                # so new_param can be None
+                new_param = param_base_class.__dict__.get(param_name)
+                if new_param != None:
+                    new_value = getattr(new_param,slot)
+                    setattr(param,slot,new_value)
+
         
     def get_param_descriptor(self,param_name):
         classes = classlist(self)
