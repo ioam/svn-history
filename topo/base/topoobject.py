@@ -72,7 +72,8 @@ class TopoMetaclass(type):
         for param_name,param in parameters:
             self.__param_inheritance(param_name,param,bases)
 
-    def __setattr__(self,name,value):
+
+    def __setattr__(self,attribute_name,value):
     # CEBHACKALERT: document this function more clearly, then add some
     # version of the following code to the end (once you're sure
     # that's the right place). This will do the inheritance if a
@@ -81,20 +82,22 @@ class TopoMetaclass(type):
     #            bases = classlist(self)[::-1]
     #            self.__param_inheritance(name,self.__dict__[name],bases)
         from copy import copy
-        desc,class_ = self.get_param_descriptor(name)
-        if desc and not isinstance(value,Parameter):
+
+        parameter,owning_class = self.get_param_descriptor(attribute_name)
+
+        if parameter and not isinstance(value,Parameter):
             # If the attribute already has a Parameter descriptor,
             # assign the value to the descriptor.
-            if class_ != self:
-                type.__setattr__(self,name,copy(desc)) 
-            self.__dict__[name].__set__(None,value)            
+            if owning_class != self:
+                type.__setattr__(self,attribute_name,copy(parameter)) 
+            self.__dict__[attribute_name].__set__(None,value)            
         else:
             # in all other cases set the attribute normally
             if not isinstance(value,Parameter):
                 print (" ##WARNING## Setting non-parameter class attribute %s.%s = %s "
-                       % (self.__name__,name,`value`))
+                       % (self.__name__,attribute_name,`value`))
                                    
-            type.__setattr__(self,name,value)
+            type.__setattr__(self,attribute_name,value)
 
             
 
@@ -131,6 +134,13 @@ class TopoMetaclass(type):
 
         
     def get_param_descriptor(self,param_name):
+        """
+        Goes up the class hierarchy (starting from the current class)
+        looking for a class attribute param_name. As soon as a
+        Parameter called param_name is found as a class attribute,
+        that Parameter is returned along with the class in which it is
+        declared.
+        """
         classes = classlist(self)
         for c in classes[::-1]:
             attribute = c.__dict__.get(param_name)
