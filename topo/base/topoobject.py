@@ -72,8 +72,14 @@ class TopoMetaclass(type):
         for param_name,param in parameters:
             self.__param_inheritance(param_name,param,bases)
 
-
     def __setattr__(self,name,value):
+    # CEBHACKALERT: document this function more clearly, then add some
+    # version of the following code to the end (once you're sure
+    # that's the right place). This will do the inheritance if a
+    # TopoObject's Parameter gets set to a new one.
+    #        if isinstance(self.__dict__[name],Parameter):
+    #            bases = classlist(self)[::-1]
+    #            self.__param_inheritance(name,self.__dict__[name],bases)
         from copy import copy
         desc,class_ = self.get_param_descriptor(name)
         if desc and not isinstance(value,Parameter):
@@ -89,6 +95,7 @@ class TopoMetaclass(type):
                        % (self.__name__,name,`value`))
                                    
             type.__setattr__(self,name,value)
+
             
 
     def __param_inheritance(self,param_name,param,bases):
