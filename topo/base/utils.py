@@ -316,6 +316,8 @@ def class_parameters(topo_class):
 
     The specified class must be of type TopoObject.
     """
+    # CEBHACKALERT: why create the object? Just use the class's __dict__!
+
     assert isinstance(topo_class, type)
     topo_obj = topo_class()
     
