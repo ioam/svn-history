@@ -204,7 +204,7 @@ class ProjectionPanel(CFSheetPlotPanel):
         self.generate_plot_group_key()
         self.pe_group = self.pe.get_plot_group(self.plot_group_key,
                                                registry.plotgroup_templates['Projection'],
-                                               self.region.get(),'ProjectionPlotGroup')
+                                               'ProjectionPlotGroup',self.region.get())
         self.pe_group.do_plot_cmd()
 
 	### JCALERT! This line could be spared if not for clarity. (it is the same in most

@@ -76,7 +76,7 @@ class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         exec self.cmdname.get()
 
         pgt = topo.base.registry.plotgroup_templates[self.mapname.get()]
-        self.pe_group = self.pe.get_plot_group(self.mapname.get(),pgt, class_type='BasicPlotGroup')
+        self.pe_group = self.pe.get_plot_group(self.mapname.get(),pgt,class_type='BasicPlotGroup')
 
             
     def display_labels(self):

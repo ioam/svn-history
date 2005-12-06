@@ -17,42 +17,6 @@ a single PlotGroup.
 
 $Id$ 
 """
-### JCALERT ! what is below was in the doc: ask Jim if I should include this reference to LISSOM
-### in PlotGroupTemplate doc
-
-# A PlotGroup that contains the old LISSOM style plot information, (in a
-# different displayed form):
-# Define PlotGroup HuePreference
-#     Define Plot HuePref
-#         Channels:
-#             Strength   = Null
-# 	    Hue        = HueP   (Predefined SheetView)
-# 	    Confidence = Null
-#     Define Plot HuePrefAndSel
-#         Channels:
-# 	    Strength   = HueSel (Predefined SheetView)
-# 	    Hue        = HueP   (Predefined SheetView)
-# 	    Confidence = Null 
-#     Define Plot HueSelect
-#         Channels:
-# 	    Strength   = HueSel (Predefined SheetView)
-# 	    Hue	       = Null
-# 	    Confidence = Null
-
-# in the new syntax would look like:
-
-#     hue_template = PlotGroupTemplate( 
-#         [('HuePreference', PlotTemplate({'Strength'   : None,
-#                                    'Hue'        : 'HueP',
-#                                    'Confidence' : None})),
-#          ('HuePrefAndSel', PlotTemplate({'Strength'   : 'HueSel',  
-#                                          'Hue'        : 'HueP',
-#                                          'Confidence' : None})),
-#          ('HueSelectivity', PlotTemplate({'Strength'   : 'HueSel',
-#                                      'Hue'        : None,
-#                                      'Confidence' : None}))],
-#                                      name=HueMap,
-#                                      command=measure_hue_pref)
 
 
 ### JABHACKALERT!  The documentation above needs substantial
@@ -117,8 +81,8 @@ class PlotEngine(TopoObject):
     ### Note that for the moment, such a call only happens in the testplotengine.py.)
     ### I would change name to plot_group_key and group_type to template.
         
-    def get_plot_group(self, name, group_type= None,
-                       filter=None, class_type='BasicPlotGroup'):
+    def get_plot_group(self, plot_group_key, plot_group_template,
+                       class_type='BasicPlotGroup',filter=None):
         """
         Return the PlotGroup registered in self.plot_group_dict with
         the provided key 'name'.  If the name does not exist, then
@@ -131,18 +95,18 @@ class PlotEngine(TopoObject):
             target_string = filter
             filter = lambda s: s.name == target_string
         
-        if self.plot_group_dict.has_key(name):
-            self.debug(name, "key match in PlotEngine's PlotGroup list")
-            requested_plot = self.plot_group_dict[name]
+        if self.plot_group_dict.has_key(plot_group_key):
+            self.debug(plot_group_key, "key match in PlotEngine's PlotGroup list")
+            requested_plot = self.plot_group_dict[plot_group_key]
         else:
-            requested_plot = self.make_plot_group(name,group_type,filter,class_type)
+            requested_plot = self.make_plot_group(plot_group_key,plot_group_template,class_type,filter)
         return requested_plot
 
     
     ### JCALERT!  I would change group_type to be template or group_template
     ### and name to be plot_group_key....
     
-    def make_plot_group(self,name, group_type,filter_lam,class_type):
+    def make_plot_group(self,plot_group_key,plot_group_template,class_type,filter):
         """
         name : The key to look under in the SheetView dictionaries.
         group_type: 2 Valid inputs:
@@ -164,14 +128,14 @@ class PlotEngine(TopoObject):
         ### JCALERT! I think we can spare the in globals.
         exec 'ptr = ' + class_type  in globals()
 
-        new_group = ptr(self.simulation,group_type,name,filter_lam,dynamic_list)
+        new_group = ptr(self.simulation,plot_group_template,plot_group_key,filter,dynamic_list)
 
         ### JCALERT! I left this comment but does not understand it...
         # Just copying the pointer.  Not currently sure if we want to
         # promote side-effects by not doing a deepcopy(), but assuming
         # we do for now.  If not, use deepcopy(group_type).
 
-        self.add_plot_group(name,new_group)
+        self.add_plot_group(plot_group_key,new_group)
 	    
         self.debug('Type of new_group is', type(new_group))
         return new_group

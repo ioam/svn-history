@@ -224,7 +224,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         """
 	pgt = topo.base.registry.plotgroup_templates[self.pgt_name]
         self.pe_group = self.pe.get_plot_group(self.plot_group_key,pgt,None,
-                                               class_type=self.plotgroup_type)
+                                               self.plotgroup_type,None)
 
 	### JCALERT! That should be make uniform with the basicplotgrouppanel and then eventually maybe
         ### get rid of the basicplotgrouppanel. (i.E. merged plotgrouppanel and basicplotgrouppanel)

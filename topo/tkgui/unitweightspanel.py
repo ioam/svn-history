@@ -124,7 +124,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         self.generate_plot_group_key()
         self.pe_group = self.pe.get_plot_group(self.plot_group_key,
                                                registry.plotgroup_templates['Unit Weights'],
-                                               self.region.get(),'UnitWeightsPlotGroup')
+                                               'UnitWeightsPlotGroup',self.region.get())
         self.pe_group.do_plot_cmd()
         self.plots = self.pe_group.plots()
 
