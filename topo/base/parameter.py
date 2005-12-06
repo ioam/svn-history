@@ -1,4 +1,3 @@
-
 """
 Module for handling experiment parameters and defaults.
 
@@ -16,6 +15,7 @@ from utils import classlist
 # It ought not to show up in the GUI. However, in hierarchical.ty, LineGenerator.x is set. This
 # results in 'x' appearing in the GUI for Line but not for any other pattern. There is the same
 # problem for the precedence attribute.
+# Solution? Change __setattr__ in topo meta class to contain init's stuff
 
 class Parameter(object):
     """
@@ -83,20 +83,25 @@ class Parameter(object):
 
 
     Note about pickling:
-    Parameters are usually used inside TopoObjects, and as so are pickled even though
+    Parameters are usually used inside TopoObjects, and so are pickled even though
     Parameter has no explicit support for pickling (usually if a class has __slots__ it
     can't be pickled without additional support: see the Pickle module documentation).
     """
+    # CEBHACKALERT: document what each slot is for!
+    # precedence:
+    # defines e.g. an order for display in a gui's list
 
     __slots__ = ['_name','default','doc','hidden','precedence']
     count = 0
 
-    def __init__(self,default=None,doc="",hidden=False,precedence=0.5):
+    def __init__(self,default=None,doc=None,hidden=False,precedence=None):
         """
         Initialize a new parameter.
 
         Set the name of the parameter to a gensym, and initialize
         the default value.
+
+        CEBHACKALERT: why slots default to None...
         """
         self._name = None
         self.hidden=hidden
