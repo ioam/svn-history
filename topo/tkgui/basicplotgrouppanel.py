@@ -71,10 +71,12 @@ class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         specified PlotGroupTemplate.
         """
  
+	### JCALERT! That could replace the call to pe_group.do_plot_cmd gor 
+        ### UnitWeight and Projection Panel...
         exec self.cmdname.get()
+
         pgt = topo.base.registry.plotgroup_templates[self.mapname.get()]
         self.pe_group = self.pe.get_plot_group(self.mapname.get(),pgt, class_type='BasicPlotGroup')
-        self.pe_group.do_plot_cmd()
 
             
     def display_labels(self):
