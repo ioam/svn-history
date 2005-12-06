@@ -4,14 +4,14 @@ Plot and PlotTemplate classes.
 Plot creates the 3 matrices necessary for plotting a RGB image, 
 from a three-tuple (channels) and a dictionnary of SheetViews.
 
-The channels specify the key to find the SheetViews that have to be retrieved
-for this purpose. 
+The channels specify the key for finding the SheetViews that 
+have to be retrieved for this purpose. 
 
 The plot objects are listed within a PlotGroup Class which then arranges
-multiple plots into a single figure in a PlotGroupPanel.
+multiple plots into a single figure displayed in a PlotGroupPanel.
 
-Associated with this single (constructed) box of information are multiple histograms that
-are stored within the base plot object. (Not yet implemented.)
+(Associated with this single (constructed) box of information are multiple histograms that
+are stored within the base plot object. (Not yet implemented.))
 
 $Id$
 """
