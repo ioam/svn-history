@@ -24,21 +24,9 @@ discussion of the Topographica coordinate system.
 
 
 
-Additionally, this module defines precedences
-SC_PREC, OF_PREC, X_PREC, Y_PREC, OR_PREC
-which can be used by subclasses that override one of the standard Parameters
-(x,y,orientation,scale,offset) and wish to maintain the same order
-scale > offset > x > y > orientation 
-should any changes be made to that ordering here.
 
 $Id$
 """
-# CEBHACKALERT: if anyone can think of a better way, please say!
-SC_PREC = 0.10
-OF_PREC = 0.11
-X_PREC = 0.20
-Y_PREC = 0.21
-OR_PREC = 0.40
 
 __version__='$Revision$'
 
@@ -111,13 +99,6 @@ class ImageGenerator(Sheet):
         self.send_output(data=self.activity)
 
 
-# precedence constants for ordering
-SC_PREC = 0.10
-OF_PREC = 0.11
-X_PREC = 0.20
-Y_PREC = 0.21
-OR_PREC = 0.40
-
 class PatternGenerator(TopoObject):
     """
     A PatternGenerator's Parameters can make use of Parameter's
@@ -130,16 +111,17 @@ class PatternGenerator(TopoObject):
     bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True)
     density = Parameter(default=10000,hidden=True)
 
-    x       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=X_PREC,
+    x       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.20,
                      doc="x-coordinate location of pattern center")
-    y       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=Y_PREC,
+    y       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.21,
                      doc="y-coordinate location of pattern center")
-    orientation = Number(default=0,softbounds=(0.0,2*pi),precedence=OR_PREC,
+    orientation = Number(default=0,softbounds=(0.0,2*pi),precedence=0.40,
                          doc="Polar angle of pattern, i.e. the orientation in Cartesian coordinate\nsystem, with zero at 3 o'clock and increasing counterclockwise")
-    scale = Number(default=1.0,softbounds=(0.0,2.0),precedence=SC_PREC,
+    scale = Number(default=1.0,softbounds=(0.0,2.0),precedence=0.10,
                    doc="Multiplicative strength of input pattern, defaulting to 1.0")
-    offset = Number(default=0.0,softbounds=(-1.0,1.0),precedence=OF_PREC,
+    offset = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.11,
                     doc="Additive offset to input pattern, defaulting to 0.0")
+
 
     def __call__(self,**params):
         """
