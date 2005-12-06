@@ -27,11 +27,28 @@ object_count = 0
 
 
 class TopoMetaclass(type):
-
     """
-    The metaclass of TopoObject (and all its descendents).  The
-    metaclass overrides type.__setattr__ to allow us to set Parameter
-    values on classes without overwriting the attribute descriptor.
+    The metaclass of TopoObject (and all its descendents).
+
+    The metaclass overrides type.__setattr__ to allow us to set
+    Parameter values on classes without overwriting the attribute
+    descriptor.  That is, for a TopoObject of type X with a Parameter
+    y, the user can type X.y=3, which sets the default value of
+    Parameter y to be 3, rather than overwriting y with the constant
+    value 3 (and thereby losing all other info about that Parameter,
+    such as the doc string, bounds, etc.)
+
+    The other methods get_param_descriptor and print_param_defaults
+    could perhaps be made into static functions, because all they
+    (appear to) do is to provide a way to call the functions without
+    having a specific object available.  Perhaps they do something
+    else that requires them to be in the metaclass, though?
+
+    The __init__ method is used when defining a TopoObject class for
+    the first time in this session.  That is, the __init__ below
+    initializes the *class* object, while the __init__ method defined
+    in each TopoObject class is called for each new instance of that
+    class.
     """
 
     def __setattr__(self,name,value):
