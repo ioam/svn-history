@@ -18,7 +18,7 @@ from Numeric import around,bitwise_and,sin
 
 from topo.base.parameter import Number, Parameter
 from topo.base.patternfns import gaussian,gabor,line,disk,ring
-from topo.base.patterngenerator import PatternGenerator, SC_PREC
+from topo.base.patterngenerator import PatternGenerator
 
 # Imported here so that all PatternGenerators will be in the same package
 from topo.base.patterngenerator import ConstantGenerator
@@ -97,7 +97,7 @@ class LineGenerator(PatternGenerator):
     # scale does not need to be here. For the tutorial, having this scale
     # allows users to see patchy responses to a line without needing to
     # adjust it themselves.
-    scale = Number(default=0.7,softbounds=(0.0,2.0),precedence=SC_PREC)
+    scale = Number(default=0.7,softbounds=(0.0,2.0))
     
     def function(self,**params):
         return line( params.get('pattern_y',self.pattern_y), 
