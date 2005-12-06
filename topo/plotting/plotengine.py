@@ -64,17 +64,14 @@ __version__='$Revision$'
 
 ### JCALERT! This file has been clarified a lot.
 ### Nevertheless, it still remains little alerts that need to be solved
-### but it will be done very soon.
+### and the doc still have to be corrested and reviewed
 
 from topo.base.topoobject import TopoObject
-
 ### JCALERT! import *: I don't know how to do it otherwise...
+### (It has to import any possible PlotGroup...)
 from plotgroup import *
 
 
-### JCALERT! The word "simulation" is used: is it better to use simulator?
-### The comments in the whole file still have to be reviewed and corrected:
-### Jim is probably the man for that.
 class PlotEngine(TopoObject):
     """
     Creates and stores the main list of PlotGroup available to a simulation.
@@ -82,21 +79,11 @@ class PlotEngine(TopoObject):
 
     def __init__(self, simulation, **params):
         """
-        Create a new plot engine that is linked to a particular
+        Creates a new plot engine that is linked to a particular
         simulation.  The link is necessary since the PlotEngine will
         iterate over all the Sheets  in the simulation, requesting SheetViews
         when necessary.
         """
-
-#       JCALERT: Line below were previously in the doc, but I am not so sure about that:
-
-#       This approach ensures that new Plots objects will show up
-#         automatically even in previously defined PlotGroups.
-
-#         Example calling style:
-#             s = topo.simulation.Simulation()
-#             new_plot_engine = plotengine.PlotEngine(s)
-        
         super(PlotEngine,self).__init__(**params)
 	### JCALERT! maybe change simulation to be simulator 
         ### (carefull to also change the call to it in any other files) 
@@ -137,8 +124,7 @@ class PlotEngine(TopoObject):
         the provided key 'name'.  If the name does not exist, then
         creates the requested by calling make_plot_group, and then add it
         to the dictionnary for later reuse. 
-        of the new plot.
-        """
+	"""
         if filter == None:
             filter = lambda s: True
         elif isinstance(filter,str):     # Allow sheet string name as input.
