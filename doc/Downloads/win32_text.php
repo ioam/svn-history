@@ -21,6 +21,12 @@ Topographica and Weave" below.
 </ol>
 
 <P>
+If you do not wish to install to the default Windows program files
+directory, you will need to run setup.bat from the command-line, with
+the target base path as the first parameter.  For example, to install
+to D:\Topographica, the command would be: "setup D:"
+
+<P>
 After installation you should now have an icon on your desktop that
 opens the directory where Topographica is installed.  There will be a
 new file association called ".ty" which are scripts that the
