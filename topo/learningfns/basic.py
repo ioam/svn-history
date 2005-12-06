@@ -14,6 +14,9 @@ from topo.outputfns.basic import DivisiveSumNormalize
 from topo.base.arrayutils import L2norm
 from Numeric import exp, argmax
 from topo.base.patternfns import gaussian
+from topo.base.boundingregion import BoundingBox
+from topo.patterns.basic import GaussianGenerator
+from math import ceil
 
 
 # Imported here so that all CFLearningFunctions will be in the same package
@@ -296,13 +299,13 @@ class HebbianSOMLF(SOMLF):
     Only the winner unit and those surrounding it will learn. The
     radius of the surround is specified by the parameter
     learning_radius, which should be set before using __call__.  The
-    shape of the surround is determined by the neighborhood_fn, and
-    can be any radial function.
+    shape of the surround is determined by the neighborhood_kernel_generator, 
+    and can be any radial function.
     """
 
     learning_radius = Number(default=0.0)
     output_fn = Parameter(default=Identity())
-    neighborhood_fn = Parameter(default=gaussian)
+    neighborhood_kernel_generator = Parameter(default=GaussianGenerator)
     
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
 
@@ -334,13 +337,23 @@ class HebbianSOMLF(SOMLF):
         rmin = int(max(0,wr-radius))
         rmax = int(min(wr+radius+1,rows))
 
-        neighborhood_fn = self.neighborhood_fn
+        # generate the neighborhood kernel matrix so that the values
+        # can be read off easily using matrix coordinates.
+        nk_generator = self.neighborhood_kernel_generator
+        radius_int = int(ceil(radius))
+        rbound = radius_int + 0.5
+        bb = BoundingBox(points=((-rbound,-rbound), (rbound,rbound)))
+        gen = nk_generator(bounds=bb,density=1,width=radius,height=radius)
+        neighborhood_matrix = gen()
+
         for r in range(rmin,rmax):
             for c in range(cmin,cmax):
-                lattice_dist = L2norm((wc-c,wr-r))
+                cwc = c - wc 
+                rwr = r - wr 
+                lattice_dist = L2norm((cwc,rwr))
 		if lattice_dist <= radius:
                     cf = cfs[r][c]
-                    rate = learning_rate * neighborhood_fn(lattice_dist,lattice_dist,radius,radius)
+                    rate = learning_rate * neighborhood_matrix[rwr+radius_int,cwc+radius_int]
 		    X = cf.get_input_matrix(input_activity)
 
                     # CEBHACKALERT:
