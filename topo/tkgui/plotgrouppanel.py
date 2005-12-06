@@ -51,9 +51,10 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
                  plotgroup_type='BasicPlotGroup',**config):
         """
         parent:  it is the window (GUIToplevel()) that contains the panel.
-        pengine: is the associated PlotEngine; it might end up to be unnecessary, needs fixing.
+        pengine: is the associated PlotEngine; it stores the different PlotGroup available to
+                 the simulation and creates them when first requested. 
         console: is the associated console, (i.e. the TopoConsole that has this panel)
-        plot_group_key: defines the title of the panel.
+        plot_group_key: defines a key for the panel (for storage by PlotEngine).
                   In the case of an activity plot or a feature map plot (BasicGroupPanel) 
 		  the title is only the name of the template (pgt_name)
                   In the case of projection and unit weights there is additional information
@@ -155,7 +156,10 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         # Normalization check button.
         pgt = registry.plotgroup_templates[self.pgt_name]
         if pgt:
-            ### JABALERT! Why is it checking the first template for this?            
+            ### JABALERT! Why is it checking the first template for this? 
+	    ### JC: I think a way to fix it is to pass a parameter normalize when creating a 
+            ### a plotgrouppanel.py (after all, this is a feature of the plotgrouppanel.py
+            ### to know if we want to normalize or not...)
             self.normalize = pgt.plot_templates[0].channels.get('Normalize',False)
             self.normalize_checkbutton = Checkbutton(self.shared_control_frame,
                                                      text="Normalize",
@@ -182,7 +186,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
 
         # self.refresh()
 
-
+    ### JCALERT! Normalize shouldn't be passed by the template.
     def toggle_normalize(self):
         """Function called by Widget when check-box clicked"""
         self.normalize = not self.normalize
@@ -205,16 +209,11 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         self.refresh_title()              # Update Frame title.
         Pmw.hidebusycursor()
 
-	### JCALERT! It would be nice to have this function put in the same order than 
-
-    def refresh_title(self):
-        """
-        Change the window title.  TopoConsole will call this on
-        startup of window.  
-        """
-        self.parent.title("%s time:%s" % (self.plot_group_key,self.pe.simulation.time()))
 
 
+    ### JCALERT! This function has to be re-written to match the last changes!
+    ### It is actually always re-implemented....
+    ### It can also be made so that we spared the basicplotgrouppanel re-implementation...
     def do_plot_cmd(self):
         """
         Subclasses of PlotGroupPanel will need to create this function to
@@ -223,15 +222,13 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         See UnitWeightsPanel and ProjectionPanel for
         examples.
         """
+	pgt = topo.base.registry.plotgroup_templates[self.pgt_name]
+        self.pe_group = self.pe.get_plot_group(self.plot_group_key,pgt,None,
+                                               class_type=self.plotgroup_type)
 
-        self.pe_group = self.pe.get_plot_group(self.plot_group_key,
-                                               self.plotgroup_type)   
+	### JCALERT! That should be make uniform with the basicplotgrouppanel and then eventually maybe
+        ### get rid of the basicplotgrouppanel. (i.E. merged plotgrouppanel and basicplotgrouppanel)
         self.pe_group.do_plot_cmd()
-
-        ### JCALERT! This line does not seem to be very useful. To check.
-        ### it definetly seems to be not useful because plots is called by load_images
-        ### in PlotGroup
-        self.plots = self.pe_group.plots()
     
 
     def load_images(self):
@@ -356,7 +353,14 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         else:  # Same number of labels; reuse to avoid flickering.
             for i in range(len(self.labels)):
                 self.labels[i].configure(text=self.bitmaps[i].view_info['src_name']) 
-                 
+       
+    def refresh_title(self):
+        """
+        Change the window title.  TopoConsole will call this on
+        startup of window.  
+        """
+        self.parent.title("%s time:%s" % (self.plot_group_key,self.pe.simulation.time()))
+          
 
     def reduce(self):
         """Function called by Widget to reduce the zoom factor"""
