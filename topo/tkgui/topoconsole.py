@@ -32,11 +32,13 @@ SAVED_FILE_EXTENSION = '.typ'
 SAVED_FILETYPES = [('Topographica saved networks','*'+SAVED_FILE_EXTENSION),('All files','*')]
 
 
+# CEBHACKALERT: will there be "not found" errors if they
+# didn't build doc/ (for which they need php...)?
+tutorial_url         = 'doc/Tutorial/index.html'
+reference_manual_url = 'doc/Reference_Manual/index.html'
 
-tut_path = 'doc/Tutorial/index.html'
-ref_man_path = 'doc/Reference_Manual/index.html'
-topo_www = 'http://www.topographica.org/'
-python_doc = 'http://www.python.org/doc/'
+python_doc_url       = 'http://www.python.org/doc/'
+topo_www_url         = 'http://www.topographica.org/'
 
 
 def active_sim():
@@ -229,19 +231,19 @@ class TopoConsole(Frame):
         self.menubar.addmenuitem('Help', 'command',
                                  'Walk-through LISSOM example',
                                  label="Tutorial",
-                                 command=(lambda url=tut_path: self.open_url(url,relative=True)))
+                                 command=(lambda url=tutorial_url: self.open_url(url,relative=True)))
         self.menubar.addmenuitem('Help', 'command',
                                  'Detailed documentation',
                                  label="Reference Manual",
-                                 command=(lambda url=ref_man_path: self.open_url(url,relative=True)))
+                                 command=(lambda url=reference_manual_url: self.open_url(url,relative=True)))
         self.menubar.addmenuitem('Help', 'command',
                                  'Python reference',
                                  label="Python documentation",
-                                 command=(lambda url=python_doc: self.open_url(url)))
+                                 command=(lambda url=python_doc_url: self.open_url(url)))
         self.menubar.addmenuitem('Help', 'command',
                                  'Topographica on the web',
                                  label="Topographica.org",
-                                 command=(lambda url=topo_www: self.open_url(url)))
+                                 command=(lambda url=topo_www_url: self.open_url(url)))
 
         
         #
