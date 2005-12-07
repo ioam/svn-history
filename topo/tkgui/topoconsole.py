@@ -58,6 +58,7 @@ def active_sim():
 
 # menus populated with full range of patterns
 # if you want to add, install your own file in one of the following namespaces...
+# should this be in tkgui/__init__.py?
 from topo.patterns import *
 
 
@@ -315,6 +316,10 @@ class TopoConsole(Frame):
             sys.exit()
 
 
+    # CEBHACKALERT: the way this works might surprise a user, because previously
+    # defined things stay around. E.g. load hierarchical.ty, then lissom_or.ty.
+    # Because the BoundingBox is set for GeneratorSheet in hierarchical.ty but
+    # not lissom_or.ty, LISSOM is loaded with a rectangular retina.
     def load_network(self):
         """
         Load a script file from disk and evaluate it.  The file is evaluated
