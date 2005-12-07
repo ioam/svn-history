@@ -149,7 +149,7 @@ excitatory_weight_bounds = BoundingBox(points=((-exc_rad/BaseN,-exc_rad/BaseN),(
 inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(inh_rad/BaseN,inh_rad/BaseN)))
 
 # Specify weight initialization
-CFProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+CFProjection.weights_generator = UniformRandomGenerator()
 #CFProjection.weights_generator = ConstantGenerator()
 
 # Specify the response function

@@ -63,7 +63,7 @@ GaussianGenerator.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 
 
 # cortical sheet
-ObermayerSOM.density = 256
+ObermayerSOM.density = 25 #6
 ObermayerSOM.learning_length = 30000
 ObermayerSOM.radius_0 = (240.0/256.0)**2
 radius_at_15000 = (60.0/256.0)**2 # Used until 15000 ; see set_radius_f below for after 15000
@@ -71,7 +71,8 @@ ObermayerSOM.radius_f = 30000/15000 * radius_at_15000 - ObermayerSOM.radius_0
 ObermayerSOM.alpha_0  = 0.09
 ObermayerSOM.alpha_f  = 0.02
 
-CFProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-1.0,-1.0),(1.0,1.0))))
+CFProjection.weights_generator = UniformRandomGenerator()
+CFProjection.weights_bounds = BoundingBox(points=((-1.0,-1.0),(1.0,1.0)))
 CFProjection.response_fn = CFDotProduct()
 CFProjection.learning_fn=HebbianSOMLF()
 # Weights should be initialized to sum to unity: (Will this work?)

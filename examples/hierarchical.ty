@@ -48,7 +48,8 @@ CFSOM.radius_0 = 0.1
 # sheet activation saturates at 1
 CFSOM.output_fn = PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
 
-CFProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+CFProjection.weights_generator = UniformRandomGenerator()
+CFProjection.weights_bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1)))
 CFProjection.response_fn = CFDotProduct()
 CFProjection.learning_fn = HebbianSOMLF()
 
