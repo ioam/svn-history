@@ -11,11 +11,6 @@ $Id$
 __version__='$Revision$'
 from utils import classlist
 
-# CEBHACKALERT: say for example the Number 'x' in the PatternGenerator is declared to be hidden.
-# It ought not to show up in the GUI. However, in hierarchical.ty, LineGenerator.x is set. This
-# results in 'x' appearing in the GUI for Line but not for any other pattern. There is the same
-# problem for the precedence attribute.
-# Solution? Change __setattr__ in topo meta class to contain init's stuff
 
 class Parameter(object):
     """
@@ -201,7 +196,7 @@ class Filename(Parameter):
         Call Parameter's __set__ with the os-specific path.
         """
         super(Filename,self).__set__(obj,normpath(val))
-        
+
 
 class Number(Parameter):
     """
