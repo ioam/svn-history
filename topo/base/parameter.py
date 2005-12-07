@@ -70,6 +70,22 @@ class Parameter(object):
         read their values from a file or other external source.
 
 
+    One of the key benefits of __slots__ is given in the reference manual
+    at http://www.python.org/doc/2.4/ref/slots.html:
+    
+        By default, instances of both old and new-style classes have a
+        dictionary for attribute storage. This wastes space for
+        objects having very few instance variables. The space
+        consumption can become acute when creating large numbers of
+        instances.
+
+        The default can be overridden by defining __slots__ in a
+        new-style class definition. The __slots__ declaration takes a
+        sequence of instance variables and reserves just enough space
+        in each instance to hold a value for each variable. Space is
+        saved because __dict__ is not created for each instance.
+
+
     Note: See this HOW-TO document for a good intro to descriptors in
     Python:
         http://users.rcn.com/python/download/Descriptor.htm
@@ -77,11 +93,19 @@ class Parameter(object):
     (And the other items on http://www.python.org/doc/newstyle.html)
 
 
-    Note about pickling:
-    Parameters are usually used inside TopoObjects, and so are pickled even though
-    Parameter has no explicit support for pickling (usually if a class has __slots__ it
-    can't be pickled without additional support: see the Pickle module documentation).
+    Note about pickling: Parameters are usually used inside
+    TopoObjects, and so are pickled even though Parameter has no
+    explicit support for pickling (usually if a class has __slots__ it
+    can't be pickled without additional support: see the Pickle module
+    documentation).
     """
+
+    # CEBHACKALERT: to get the benefit of slots, subclasses must
+    # themselves define __slots__. See the reference manual: The
+    # action of a __slots__ declaration is limited to the class where
+    # it is defined. As a result, subclasses will have a __dict__
+    # unless they also define __slots__.
+
     # CEBHACKALERT: document what each slot is for!
     # precedence:
     # defines e.g. an order for display in a gui's list
