@@ -293,17 +293,19 @@ class SOMLF(CFLearningFunction):
 
 class HebbianSOMLF(SOMLF):
     """
-    CF-aware Hebbian learning rule for Projections to Self-Organizing Maps.
+    Hebbian learning rule for CFProjections to Self-Organizing Maps.
 
     Only the winner unit and those surrounding it will learn. The
     radius of the surround is specified by the parameter
     learning_radius, which should be set before using __call__.  The
     shape of the surround is determined by the neighborhood_kernel_generator, 
-    and can be any radial function.
+    and can be any PatternGenerator instance, or any function accepting
+    bounds, density, radius, and height to return a kernel matrix.
     """
 
     learning_radius = Number(default=0.0)
     output_fn = Parameter(default=Identity())
+    # JABALERT: Should be a PatternGeneratorParameter eventually
     neighborhood_kernel_generator = Parameter(default=GaussianGenerator())
     
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
@@ -327,7 +329,8 @@ class HebbianSOMLF(SOMLF):
         ### valid?  E.g. a Gaussian is still quite strong one sigma
         ### away from the center; it's probably not near zero until at
         ### least two or three radii away.  But maybe that's what is
-        ### usually done for a SOM, and it works ok?
+        ### usually done for a SOM, and it works ok?  In any case, it
+        ### might be better to let the user decide which bounds to use.
         
         # find out the bounding box around the winner in which weights will
         # be changed. This is just to make the code run faster.
