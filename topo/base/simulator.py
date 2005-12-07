@@ -63,6 +63,19 @@ events to itself than it sends out to other EPs.  In this case the
 self connections might have src_port = 'recurrent'.
 
 
+Active Simulator
+
+The active Simulator is the last Simulator to have been created
+with register=True (the default).
+
+Often, external objects will need to know when the active Simulator
+has changed, e.g. to update a GUI.  Any object added to the list
+objects_to_notify_of_active_sim is assumed to have a
+notify_of_active_sim() method, which will be called whenever a new
+Simulator is created with register=True (the default) so that such
+objects can take action if they wish.
+
+
 $Id$
 """
 __version__='$Revision$'
@@ -80,24 +93,19 @@ Forever = FixedPoint(-1)
 __active_sim = None
 def get_active_sim():
     """
+    Return the active simulator, which could be None.
+    
+    If there is no active simulator a warning is printed.
     """
     if __active_sim==None:
         TopoObject().warning('No active Simulator.')
-        
     return __active_sim
 
 def set_active_sim(sim):
-    """
-    """
+    """Set the active simulator."""
     global __active_sim
     __active_sim = sim
 
-
-# Often, external objects will need to know when the active simulator
-# has changed, e.g. to update a GUI.  Any object added to this list
-# is assumed to have a notify_of_active_sim() method, which will be
-# called whenever a new Simulator is created with register=True so that
-# such objects can take action if they wish.
 objects_to_notify_of_active_sim=[]
 
 
@@ -141,6 +149,13 @@ class Simulator(TopoObject):
     """
     A simulator class that uses a simple sorted event list (instead of
     e.g. a sched.scheduler object) to manage events and dispatching.
+
+    The Parameter 'register' indicates whether or not to register the
+    Simulator as being part of Topographica; that is, register would
+    be false for use of the Simulator outside Topographica. With
+    register True, the Simulator is set to be the 'active_sim', which
+    other Topographica commands and classes might look for or want to
+    be informed about.
     """
             
     step_mode = Parameter(default=False)
@@ -163,6 +178,9 @@ class Simulator(TopoObject):
 
         if self.register:
             set_active_sim(self)
+            # CEBALERT: we might want to print a warning
+            # if obj doesn't exist any more rather than
+            # getting an error?
             for obj in objects_to_notify_of_active_sim:
                 obj.notify_of_active_sim()
 
