@@ -23,7 +23,6 @@ from topo.base.sheet import Sheet
 import bitmap
 
 import topo
-import topo.base.simulator
 import MLab
 from itertools import chain
 from Numeric import transpose, array
