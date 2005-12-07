@@ -77,13 +77,11 @@ STOP = "Simulator Stopped"
 
 Forever = FixedPoint(-1)
 
-
 __active_sim = None
-
 def get_active_sim():
     """
     """
-    if __active_sim == None:
+    if __active_sim==None:
         TopoObject().warning('No active Simulator.')
         
     return __active_sim
@@ -93,6 +91,14 @@ def set_active_sim(sim):
     """
     global __active_sim
     __active_sim = sim
+
+
+# Often, external objects will need to know when the active simulator
+# has changed, e.g. to update a GUI.  Any object added to this list
+# is assumed to have a notify_of_active_sim() method, which will be
+# called whenever a new Simulator is created with register=True so that
+# such objects can take action if they wish.
+objects_to_notify_of_active_sim=[]
 
 
 class EPConnection(TopoObject):
@@ -157,13 +163,8 @@ class Simulator(TopoObject):
 
         if self.register:
             set_active_sim(self)
-
-        # CEBHACKALERT: this isn't staying.
-        # Previously, calling topo.base.registry.set_active_sim()
-        # did this.
-        import topo.base.registry
-        topo.base.registry.link_console_to_active_sim()
-        # end HACKALERT
+            for obj in objects_to_notify_of_active_sim:
+                obj.notify_of_active_sim()
 
         self.events = []
         self._events_stack = []

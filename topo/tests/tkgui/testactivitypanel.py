@@ -105,7 +105,9 @@ class TestActivityPanel(unittest.TestCase):
         Pmw.initialise(root)
         console = topo.tkgui.topoconsole.TopoConsole(parent=root)
         console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
-        console.set_active_simulator()
+        # CEBHACKALERT: what was this testing?
+        #console.set_active_simulator()
+
         #console.new_activity_window()
         # console.mainloop()
 

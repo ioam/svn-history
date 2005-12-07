@@ -34,12 +34,14 @@ from topo.commands.basic import pattern_present, restore_input_generators, save_
 
 import topo.base.registry
 from topo.base import sheetview
-from topo.base.registry import get_console
+
+# see HACKALERT below "if display"
+# from topo.base.registry import get_console
+## Should only import this when using display option
+# import topo.tkgui.topoconsole 
 
 import topo.base.simulator
 
-## Should only import this when using display option
-import topo.tkgui.topoconsole 
 
 
 class SineGratingPresenter(object):
@@ -274,13 +276,14 @@ class MeasureFeatureMap(TopoObject):
             user_function(feature_points,param_dict)
 
 
+            # CEBHACKALERT: I've temporarily removed this feature. There must be a better
+            # way than this!
             #### Debugging     ####
-            if display:
-                temp=topo.base.registry.plotgroup_templates['Activity']
-                x = topo.tkgui.topoconsole.PlotsMenuEntry(get_console(),temp)
-                panel = x.command()
-                panel.toggle_auto_refresh()
-            
+##             if display:
+##                 temp=topo.base.registry.plotgroup_templates['Activity']
+##                 x = topo.tkgui.topoconsole.PlotsMenuEntry(get_console(),temp)
+##                 panel = x.command()
+##                 panel.toggle_auto_refresh()
             #### Debugging end ####
 
 

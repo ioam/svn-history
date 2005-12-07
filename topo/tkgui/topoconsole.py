@@ -20,17 +20,12 @@ import topo.plotting.plotengine
 import topo.base.topoobject
 
 import topo.commands.basic
-
-
-
-
 import webbrowser
 
 SCRIPT_FILETYPES = [('Topographica scripts','*.ty'),('Python scripts','*.py'),('All files','*')]
 
 SAVED_FILE_EXTENSION = '.typ'
 SAVED_FILETYPES = [('Topographica saved networks','*'+SAVED_FILE_EXTENSION),('All files','*')]
-
 
 # CEBHACKALERT: will there be "not found" errors if they
 # didn't build doc/ (for which they need php...)?
@@ -39,14 +34,6 @@ reference_manual_url = 'doc/Reference_Manual/index.html'
 
 python_doc_url       = 'http://www.python.org/doc/'
 topo_www_url         = 'http://www.topographica.org/'
-
-
-def active_sim():
-    """
-    """
-    return topo.base.simulator.get_active_sim()
-
-
 
 # CEBHACKALERT: finish this instruction after making base class for PatternGeneratorParameter etc. 
 # By default, none of the pattern types in topo/patterns/ are imported
@@ -60,6 +47,13 @@ def active_sim():
 # if you want to add, install your own file in one of the following namespaces...
 # should this be in tkgui/__init__.py?
 from topo.patterns import *
+# should this go into __init__?
+
+
+# CEBHACKALERT: lose this and get TopoConsole.simulator instead
+def active_sim():
+    return topo.base.simulator.get_active_sim()
+
 
 
 class PlotsMenuEntry(topo.base.topoobject.TopoObject):
@@ -99,13 +93,13 @@ class PlotsMenuEntry(topo.base.topoobject.TopoObject):
         self.num_windows = self.num_windows + 1
         self.title = '%s %d' % (self.label, self.num_windows)
         #if 'valid_context' in dir(self.class_name):
-        pe = self.console.active_plotengine()
-        if pe:
+
+        if self.console.plot_engine:
             if self.class_name.valid_context():
                 win = GUIToplevel(self.console)
                 win.withdraw()
                 win.title(self.title)
-                pn = self.class_name(parent=win,pengine=pe,console=self.console,
+                pn = self.class_name(parent=win,pengine=self.console.plot_engine,console=self.console,
                                      plot_group_key=self.template.name,pgt_name=self.template.name,plotgroup_type=self.template)
                 pn.pack(expand=YES,fill=BOTH)
 
@@ -121,7 +115,6 @@ class PlotsMenuEntry(topo.base.topoobject.TopoObject):
             self.console.messageBar.message('state', 'No active Simulator object.')
             return None
         
-    
 
 class TopoConsole(Frame):
     """
@@ -132,13 +125,24 @@ class TopoConsole(Frame):
     """
     def __init__(self, parent=None,**config):
         Frame.__init__(self,parent,config)
-        
+
         self.parent = parent
         self.num_activity_windows = 0
         self.num_orientation_windows = 0
         self.num_weights_windows = 0
         self.num_weights_array_windows = 0
-        self.__active_plotengine_obj = None
+
+        self.plot_engine = None
+        self.simulator = None
+        # Ask simulator to tell this console if the active_sim changes
+        topo.base.simulator.objects_to_notify_of_active_sim.append(self)
+        # CEBHACKALERT: this adds itself to the list above, but unless
+        # 'quit' is selected from the menu, it leaves itself behind in
+        # the list (e.g. if X is clicked to shut the window). Do I have
+        # to worry about that or will Python later remove it anyway? I
+        # think I have to worry...I need to find an 'on close' or similar
+        # method.
+
         self.loaded_script = None
         self.input_params_window = None
         self.auto_refresh_panels = []
@@ -148,8 +152,6 @@ class TopoConsole(Frame):
 
         title = "Topographica Console"
         self.parent.title(title)
-
-
 
     def _init_widgets(self):
         
@@ -214,6 +216,8 @@ class TopoConsole(Frame):
         self.populate_plots_menu(self.menubar)
 
         self.menubar.addmenuitem('Plots','separator')
+
+        # CEBHACKALERT: what's this?
         self.menubar.addmenuitem('Plots', 'command',
                                  'Refresh auto-refresh plots',
                                  label="Refresh",
@@ -289,26 +293,18 @@ class TopoConsole(Frame):
                                 obj.description,label=label,
                                 command=entry.command)
     
-    #
-    # Accessors for the GUI's active simulator and active plotengine objects.
-    #
-    def set_active_simulator(self):
+    def notify_of_active_sim(self):
+        """        
         """
-        """
-        # CEBHACKALERT: this method will at least have its name changed, but
-        # it might change more than that.
-        sim = active_sim()
-        self.__active_plotengine_obj = topo.plotting.plotengine.PlotEngine(sim)
-
-        
-    def active_plotengine(self):
-        """Get the active_plotengine object relative to the GUI"""
-        return self.__active_plotengine_obj
+        self.simulator = topo.base.simulator.get_active_sim()
+        self.plot_engine = topo.plotting.plotengine.PlotEngine(self.simulator)
 
 
+    # CEBHACKALERT: this *does* exit the interpreter if topographica was
+    # started with -g.
     def quit(self):
         """Close the main GUI window.  Does not exit Topographica interpreter."""
-        topo.base.registry.set_console(None)
+        topo.base.simulator.objects_to_notify_of_active_sim.remove(self)
         Frame.quit(self)
         Frame.destroy(self)     # Get rid of widgets
         self.parent.destroy()   # Get rid of window
@@ -316,7 +312,7 @@ class TopoConsole(Frame):
             sys.exit()
 
 
-    # CEBHACKALERT: the way this works might surprise a user, because previously
+    # CEBHACKALERT: the way this works might be a surprise, because previously
     # defined things stay around. E.g. load hierarchical.ty, then lissom_or.ty.
     # Because the BoundingBox is set for GeneratorSheet in hierarchical.ty but
     # not lissom_or.ty, LISSOM is loaded with a rectangular retina.
@@ -405,13 +401,13 @@ class TopoConsole(Frame):
         """
         Test Pattern Window.  
         """
-        pe = self.active_plotengine()
-        if pe:
+        if self.simulator: #CEBHACKALERT & plot_engine?
             if InputParamsPanel.valid_context():
                 self.input_params_window = GUIToplevel(self)
                 self.input_params_window.withdraw()
                 self.input_params_window.title('Test Pattern')
-                ripp = InputParamsPanel(self.input_params_window,pe,self)
+                # CEBHACKALERT: alter this...don't need to pass self & self.plot_engine
+                ripp = InputParamsPanel(self.input_params_window,self.plot_engine,self)
                 ripp.pack(side=TOP,expand=YES,fill=BOTH)
                 self.input_params_window.deiconify()
                 self.messageBar.message('state', 'OK')

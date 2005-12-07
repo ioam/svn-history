@@ -11,7 +11,6 @@ $Id$
 __version__='$Revision$'
 
 import Pmw, sys, Tkinter
-import topo.base.registry
 import topo.base.topoobject
 import topoconsole
 
@@ -39,8 +38,6 @@ def start(mainloop=False):
     Pmw.initialise(root)
     console = topoconsole.TopoConsole(parent=root)
     console.pack(expand=Tkinter.YES,fill=Tkinter.BOTH)
-
-    topo.base.registry.set_console(console)
 
     # mainloop() freezes the commandline until the GUI window exits.
     # Without this line the command-line remains responsive.
