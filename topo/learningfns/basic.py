@@ -13,7 +13,6 @@ from topo.base.connectionfield import CFLearningFunction
 from topo.outputfns.basic import DivisiveSumNormalize
 from topo.base.arrayutils import L2norm
 from Numeric import exp, argmax
-from topo.base.patternfns import gaussian
 from topo.base.boundingregion import BoundingBox
 from topo.patterns.basic import GaussianGenerator
 from math import ceil
@@ -305,7 +304,7 @@ class HebbianSOMLF(SOMLF):
 
     learning_radius = Number(default=0.0)
     output_fn = Parameter(default=Identity())
-    neighborhood_kernel_generator = Parameter(default=GaussianGenerator)
+    neighborhood_kernel_generator = Parameter(default=GaussianGenerator())
     
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
 
@@ -343,8 +342,7 @@ class HebbianSOMLF(SOMLF):
         radius_int = int(ceil(radius))
         rbound = radius_int + 0.5
         bb = BoundingBox(points=((-rbound,-rbound), (rbound,rbound)))
-        gen = nk_generator(bounds=bb,density=1,width=radius,height=radius)
-        neighborhood_matrix = gen()
+        neighborhood_matrix = nk_generator(bounds=bb,density=1,width=radius,height=radius)
 
         for r in range(rmin,rmax):
             for c in range(cmin,cmax):
@@ -370,3 +368,4 @@ class HebbianSOMLF(SOMLF):
         r = pos/cols
         c = pos%cols
         return r,c
+
