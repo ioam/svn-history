@@ -52,58 +52,71 @@ class TopoMetaclass(type):
     """   
     def __init__(self,name,bases,dict):
         """
+        Initialize the class object.
+        
+        This involves setting the class attributes. For any class attribute
+        that is a Parameter, make sure
+        it inherits from any class-attribute Parameter of this class'
+        superclasses that has the same name (see __param_inheritance()).
         """
-        # When a Parameter is defined in a TopoObject class, there are
-        # two places from which it could make sense to inherit
-        # attributes (i.e. slots in this case). The first is from the
-        # super class(es) of the Parameter, as one would expect. For
-        # example, Number inherits its 'hidden' attribute from
-        # Parameter. However, for a Parameter in a TopoClass, the
-        # second place to inherit from would be a Parameter with the
-        # same name in the TopoClass' super class. This code achieves
-        # that by going up the TopoObject's class hierarchy until it
-        # finds a Parameter with the same name whose slot value is not
-        # None.        
         type.__init__(self,name,bases,dict)
 
         # All objects (with their names) of type Parameter that are defined in this class
         parameters = [(name,obj) for (name,obj) in dict.items() if isinstance(obj,Parameter)]
-
+        
         for param_name,param in parameters:
             self.__param_inheritance(param_name,param,bases)
 
 
     def __setattr__(self,attribute_name,value):
-    # CEBHACKALERT: document this function more clearly, then add some
-    # version of the following code to the end (once you're sure
-    # that's the right place). This will do the inheritance if a
-    # TopoObject's Parameter gets set to a new one.
-    #        if isinstance(self.__dict__[name],Parameter):
-    #            bases = classlist(self)[::-1]
-    #            self.__param_inheritance(name,self.__dict__[name],bases)
+        """
+        Do 'self.attribute_name=value' but with some complications.
+        
+        If attribute_name already has a Parameter descriptor, and the
+        new value isn't a Parameter, assign that value to the
+        descriptor.
+
+        In all other cases set the attribute normally (i.e. overwrite
+        the descriptor), but if the new value is a Parameter make sure
+        it inherits from any class-attribute Parameter of this class'
+        superclasses that has the same name (see __param_inheritance()).
+        """        
         from copy import copy
 
+        # Find out if there's a Parameter called attribute_name as a class attribute
+        # of this class - if not, parameter is None.
         parameter,owning_class = self.get_param_descriptor(attribute_name)
 
         if parameter and not isinstance(value,Parameter):
-            # If the attribute already has a Parameter descriptor,
-            # assign the value to the descriptor.
             if owning_class != self:
-                type.__setattr__(self,attribute_name,copy(parameter)) 
-            self.__dict__[attribute_name].__set__(None,value)            
-        else:
-            # in all other cases set the attribute normally
-            if not isinstance(value,Parameter):
-                print (" ##WARNING## Setting non-parameter class attribute %s.%s = %s "
-                       % (self.__name__,attribute_name,`value`))
-                                   
+                type.__setattr__(self,attribute_name,copy(parameter))
+            self.__dict__[attribute_name].__set__(None,value)
+
+        else:    
             type.__setattr__(self,attribute_name,value)
-
             
+            if isinstance(value,Parameter):
+                bases = classlist(self)[::-1]
+                self.__param_inheritance(attribute_name,value,bases)
+            else:
+                print (" ##WARNING## Setting non-Parameter class attribute %s.%s = %s "
+                       % (self.__name__,attribute_name,`value`))
 
+                
     def __param_inheritance(self,param_name,param,bases):
         """
-        CEBHACKALERT: move documentation
+        When a Parameter is defined in a TopoObject class, there are
+        two places from which it could make sense to inherit
+        attributes (i.e. slots in this case). The first is from the
+        super class(es) of the Parameter, as one would expect. For
+        example, a Number inherits its 'hidden' attribute from
+        Parameter if it's not defined when the Number is declared.
+        However, for a Parameter in a TopoObject class, the
+        second place to inherit from is a Parameter with the
+        same name in the TopoObject class' super class. This code achieves
+        that by going up this TopoObject class' class hierarchy until it
+        finds a Parameter with the same name whose slot value is not
+        None.        
         """
         for slot in param.__slots__:
 
@@ -126,7 +139,7 @@ class TopoMetaclass(type):
 
                 # high enough up the hierarchy, classes will stop
                 # having the Parameter we're looking for,
-                # so new_param can be None
+                # so new_param can be None - in which case we're not interested
                 new_param = param_base_class.__dict__.get(param_name)
                 if new_param != None:
                     new_value = getattr(new_param,slot)
@@ -136,7 +149,7 @@ class TopoMetaclass(type):
     def get_param_descriptor(self,param_name):
         """
         Goes up the class hierarchy (starting from the current class)
-        looking for a class attribute param_name. As soon as a
+        looking for a Parameter class attribute param_name. As soon as a
         Parameter called param_name is found as a class attribute,
         that Parameter is returned along with the class in which it is
         declared.
