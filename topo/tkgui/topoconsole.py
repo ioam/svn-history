@@ -135,21 +135,17 @@ class TopoConsole(Frame):
         self.num_orientation_windows = 0
         self.num_weights_windows = 0
         self.num_weights_array_windows = 0
-
-        # One location to store and retrieve the Simulator object that
-        # will be used for plot data.  Do not directly use these, but
-        # go through the accessor functions.
-
-
         self.__active_plotengine_obj = None
-        
         self.loaded_script = None
         self.input_params_window = None
         self.auto_refresh_panels = []
-
         self._init_widgets()
         # Doesn't work for providing icon for the window:
         #parent.wm_iconbitmap('@/home/jbednar/research/topographica/topo.xpm')
+
+        title = "Topographica Console"
+        self.parent.title(title)
+
 
 
     def _init_widgets(self):
@@ -300,7 +296,7 @@ class TopoConsole(Frame):
         # it might change more than that.
         sim = active_sim()
         self.__active_plotengine_obj = topo.plotting.plotengine.PlotEngine(sim)
-        self.refresh_title()
+
         
     def active_plotengine(self):
         """Get the active_plotengine object relative to the GUI"""
@@ -526,14 +522,6 @@ class TopoConsole(Frame):
         
     def dummy(self):
         print "Button pressed in ", self
-
-    def refresh_title(self):
-        """
-        Create a main window title
-        """
-        title = "Topographica Console"
-        self.parent.title(title)
-
         
         
 class GUIToplevel(Toplevel):
