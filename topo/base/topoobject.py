@@ -61,8 +61,11 @@ class TopoMetaclass(type):
         """
         type.__init__(self,name,bases,dict)
 
-        # All objects (with their names) of type Parameter that are defined in this class
-        parameters = [(name,obj) for (name,obj) in dict.items() if isinstance(obj,Parameter)]
+        # All objects (with their names) of type Parameter that are
+        # defined in this class
+        parameters = [(name,obj)
+                      for (name,obj) in dict.items()
+                      if isinstance(obj,Parameter)]
         
         for param_name,param in parameters:
             self.__param_inheritance(param_name,param,bases)
@@ -83,8 +86,8 @@ class TopoMetaclass(type):
         """        
         from copy import copy
 
-        # Find out if there's a Parameter called attribute_name as a class attribute
-        # of this class - if not, parameter is None.
+        # Find out if there's a Parameter called attribute_name as a
+        # class attribute of this class - if not, parameter is None.
         parameter,owning_class = self.get_param_descriptor(attribute_name)
 
         if parameter and not isinstance(value,Parameter):
@@ -111,12 +114,11 @@ class TopoMetaclass(type):
         super class(es) of the Parameter, as one would expect. For
         example, a Number inherits its 'hidden' attribute from
         Parameter if it's not defined when the Number is declared.
-        However, for a Parameter in a TopoObject class, the
-        second place to inherit from is a Parameter with the
-        same name in the TopoObject class' super class. This code achieves
-        that by going up this TopoObject class' class hierarchy until it
-        finds a Parameter with the same name whose slot value is not
-        None.        
+        However, for a Parameter in a TopoObject class, the second
+        place to inherit from is a Parameter with the same name in the
+        TopoObject class' super class. This code achieves that by
+        going up this TopoObject class' class hierarchy until it finds
+        a Parameter with the same name whose slot value is not None.
         """
         for slot in param.__slots__:
 
