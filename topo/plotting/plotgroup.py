@@ -130,6 +130,7 @@ class PlotGroup(TopoObject):
 	   
             for (pt_name,pt) in self.template.plot_templates:
 		plot_list= plot_list+ self.create_plots(pt_name,pt,each)
+                
 	return plot_list
 
     ###JCALERT! We may want to implement a create_plots in the PlotGroup class
@@ -392,6 +393,7 @@ class ProjectionPlotGroup(PlotGroup):
         ### Also, why do we pass the template here?
 
         projection = sheet.get_in_projection_by_name(c['Projection_name'])
+        plot_list=[]
         if projection:
 	    src_sheet=projection[0].src
 	    projection=projection[0]
@@ -404,7 +406,6 @@ class ProjectionPlotGroup(PlotGroup):
         ### JC apparently, the template carries the information for building
         ### the sheet_view__key. It might be difficult to change now. (also see make_unit_weights_plot)
 	    key = (pt_name,c['Projection_name'],c['Density'],sheet.name)            
-	    plot_list=[]
 	    ### JCALERT! for the moment, the sheet_view for a projection is a list of UnitView
             ### This has to be changed, and so it is a temporary hack.
             ### Finally, it won't be possible to pass a sheet_view directly when creating a Plot

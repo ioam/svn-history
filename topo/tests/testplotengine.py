@@ -83,7 +83,7 @@ class TestPlotEngine(unittest.TestCase):
           ### Activity PlotGroup
           pgt1 = plotgroup_templates['Activity']
 
-          self.pe.make_plot_group('Activity',pgt1,None,'BasicPlotGroup')
+          self.pe.make_plot_group('Activity',pgt1,'BasicPlotGroup',None)
           test_plot_group = BasicPlotGroup(self.sim,pgt1,'Activity',None,None)
           test = self.pe.plot_group_dict.get('Activity',None)
 
@@ -93,7 +93,7 @@ class TestPlotEngine(unittest.TestCase):
           ### Orientation Preference PlotGroup
           pgt2 = plotgroup_templates['Orientation Preference']
 
-          self.pe.make_plot_group('Orientation Preference',pgt2,None,'BasicPlotGroup')
+          self.pe.make_plot_group('Orientation Preference',pgt2,'BasicPlotGroup',None)
           test_plot_group = BasicPlotGroup(self.sim,pgt2,'Orientation Preference',None,None)
           test = self.pe.plot_group_dict.get('Orientation Preference',None)
           #self.assertEqual(test_plot_group,test)
@@ -104,9 +104,9 @@ class TestPlotEngine(unittest.TestCase):
           pg_key1=('Weights','V1',0,0)
           pg_key2=('Weights','V2',0.4,0.4)
           pg_key3=('Weights','V3',0.1,0.1)
-          self.pe.make_plot_group(pg_key1,pgt3,'V1','UnitWeightsPlotGroup')
-          self.pe.make_plot_group(pg_key2,pgt3,'V2','UnitWeightsPlotGroup')
-          self.pe.make_plot_group(pg_key3,pgt3,'V3','UnitWeightsPlotGroup')
+          self.pe.make_plot_group(pg_key1,pgt3,'UnitWeightsPlotGroup','V1')
+          self.pe.make_plot_group(pg_key2,pgt3,'UnitWeightsPlotGroup','V2')
+          self.pe.make_plot_group(pg_key3,pgt3,'UnitWeightsPlotGroup','V3')
           
           test_plot_group1 = UnitWeightsPlotGroup(self.sim,pgt3,pg_key1,'V1',None)
           test_lambda = lambda s: s.name == 'V2'
