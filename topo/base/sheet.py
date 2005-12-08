@@ -141,7 +141,7 @@ def sheet2matrixidx(x,y,bounds,density):
     return int(r), int(c)
 
 
-def matrix2sheet(mx,my,bounds,density):
+def matrix2sheet(float_row,float_col,bounds,density):
     """
     Inverse of sheet2matrix.
     
@@ -153,8 +153,8 @@ def matrix2sheet(mx,my,bounds,density):
     left,bottom,right,top = bounds.aarect().lbrt()
     xstep = float((right-left)) / int(density*(right-left))
     ystep = float((top-bottom)) / int(density*(top-bottom))
-    x = mx*xstep + left
-    y = top - my*ystep
+    x = float_col*xstep + left
+    y = top - float_row*ystep
     return x, y
 
 
@@ -171,7 +171,7 @@ def matrixidx2sheet(row,col,bounds,density):
     should use the Sheet method foo.matrixidx2sheet(r,c).
     """
 
-    x,y = matrix2sheet((col+0.5), (row+0.5), bounds, density)
+    x,y = matrix2sheet((row+0.5), (col+0.5), bounds, density)
 
     # Rounding is useful for comparing the result with a floating point number
     # that we specify by typing the number out (e.g. fp = 0.5).
