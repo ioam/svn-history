@@ -69,11 +69,9 @@ class ConnectionField(TopoObject):
     
     def __init__(self,input_sheet,weight_bounds,weights_generator,weight_type=Numeric.Float32,output_fn=Identity(),**params):
         super(ConnectionField,self).__init__(**params)
-
         self.input_sheet = input_sheet
-        self.bounds = weight_bounds
 
-        self.slice = self.input_sheet.input_slice(self.bounds,self.x,self.y)
+        self.slice = self.input_sheet.input_slice(weight_bounds,self.x,self.y)
         r1,r2,c1,c2 = self.slice
 
 
@@ -89,7 +87,7 @@ class ConnectionField(TopoObject):
 
 
         # set up the weights
-        w = weights_generator(x=0,y=0,bounds=self.bounds,density=self.input_sheet.density,theta=0,rows=r2-r1,cols=c2-c1)
+        w = weights_generator(x=0,y=0,bounds=weight_bounds,density=self.input_sheet.density,theta=0,rows=r2-r1,cols=c2-c1)
         self.weights = w.astype(weight_type)
 
         # Maintain the original type throughout operations, i.e. do not
@@ -99,10 +97,6 @@ class ConnectionField(TopoObject):
         self.verbose("activity matrix shape: ",self.weights.shape)
 
         output_fn(self.weights)
-
-
-    def contains(self,x,y):
-        return self.bounds.contains(x,y)
 
 
     def get_input_matrix(self, activity):
@@ -131,7 +125,6 @@ class ConnectionField(TopoObject):
         slice = self.input_sheet.input_slice(new_wt_bounds, self.x, self.y)
 
         if slice != self.slice:
-            self.bounds = new_wt_bounds
             or1,or2,oc1,oc2 = self.slice
             self.slice = slice
             r1,r2,c1,c2 = slice
