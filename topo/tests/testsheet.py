@@ -13,6 +13,7 @@ import Numeric
 from topo.base import boundingregion
 from topo.base.sheetview import SheetView
 
+### JABHACKALERT! Needs to test matrix2sheet and sheet2matrix.
 
 class TestCoordinateTransforms(unittest.TestCase):
     def makeBox(self):
