@@ -1,32 +1,9 @@
 """
-
-Pattern Generator
-
-Defines a class to return Patterns
-
-CEBHACKALERT: update this when finished reorganizing parametersframe.py
-
-There is a registry dictionary called
-registry.pattern_generators that stores the class name as key,
-and a reference to the class definition as the value.  This dictionary
-is used in the GUI Input Parameter Panel to dynamically generate the
-list of valid PatternGenerators that can be presented.  A user can
-define a new subclass of PatternGenerator anywhere, and then add an entry
-to this dictionary, and the GUI will then add it to the list of
-presentation types.
-
-Pattern Matrix Orientations:
-
-These patterns work closely with Sheets and have been written so that
-the orientation of the pattern matrices have the same orientation
-maintained by the Sheet classes.  Refer to sheet.py for a longer
-discussion of the Topographica coordinate system.
-
-
-
+PatternGenerator abstract class and sample ConstantGenerator concrete class.
 
 $Id$
 """
+
 
 __version__='$Revision$'
 
@@ -100,12 +77,23 @@ class ImageGenerator(Sheet):
 
 
 class PatternGenerator(TopoObject):
+    # CEBHACKALERT: update this documentation when finished reorganizing parametersframe.py
     """
+    A class hierarchy for callable objects that can generate 2D patterns.
+
+    Once initialized, PatternGenerators can be called to generate a
+    value or a matrix of values from a 2D function, typically
+    accepting at least x and y.
+    
     A PatternGenerator's Parameters can make use of Parameter's
     precedence attribute to specify the order in which they should
     appear e.g. on a GUI. The precedence attribute is based on the
     range 0.0 to 1.0, with ordering going from 0.0 (first) to 1.0
     (last).
+
+    The orientation of the pattern matrices have the same orientation
+    maintained by the Sheet classes; see sheet.py for more details of
+    the Topographica coordinate system.
     """
 
     bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True)

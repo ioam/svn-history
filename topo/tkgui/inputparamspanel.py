@@ -5,12 +5,11 @@ Sliders panel for inputs
 
 # CEBHACKALERT: I will update this.
 
-The list of valid Input Types is retrieved from the registry, and
-would normally contain an automatically generated list of
-PatternGenerator subclasses found in topo.base.patterngenerator.  Every
-Parameter defined in the PatternGenerator subclass will be taken with the
-intersection of valid TaggedSlider types defined in this class and
-then shown in the window.
+The list of valid Input Types is automatically generated from the
+PatternGenerator subclasses found in topo.base.patterngenerator (which
+can be extended by the user by setting a variable in that namespace to
+the name of their new class).  Every Parameter defined in the
+PatternGenerator subclass will be shown in the window.
 
 The Preview panel draws heavily from the PlotGroupPanel class, and instead
 of using a PlotGroup subclass, creates a group on the fly.  
