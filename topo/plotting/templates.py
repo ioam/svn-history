@@ -10,7 +10,7 @@ $Id$
 __version__='$Revision$'
 
 from topo.base.topoobject import TopoObject
-from topo.base.keyedlist import KeyedList
+from topo.misc.keyedlist import KeyedList
 from topo.base.parameter import Parameter
 
 ### JCALERT! Fill the doc when the PlotTemplates for UnitWeight and Projection

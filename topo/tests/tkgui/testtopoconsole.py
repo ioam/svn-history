@@ -10,7 +10,6 @@ from topo.tkgui import *
 from topo.base.simulator import Simulator
 from topo.plotting.plotengine import PlotEngine
 import topo.base.topoobject
-import topo.base.registry
 import topo.base.simulator
 
 class TestTopoConsole(unittest.TestCase):
