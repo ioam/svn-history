@@ -181,14 +181,17 @@ def matrixidx2sheet(row,col,bounds,density):
     return round(x,10),round(y,10)
 
 
-def activity_submatrix(slice_bounds,activity,activity_bounds,density):
+def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density):
     """
-    Returns a submatrix of an activity matrix defined by bounding
-    rectangle. Uses sheet.input_slice().  Does not copy the
-    submatrix!
+    Given a sheet's matrix, bounds, and density, return the submatrix in the specified bounds.
+
+    Effectively, does the intersection between the sheet_bounds and
+    the bounds, and returns the corresponding submatrix of the given
+    sheet_matrix.  The submatrix is just a view into the sheet_matrix;
+    it's not an independent copy.
     """
-    r1,r2,c1,c2 = input_slice(slice_bounds,activity_bounds,density)
-    return activity[r1:r2,c1:c2]
+    r1,r2,c1,c2 = input_slice(bounds,sheet_bounds,sheet_density)
+    return sheet_matrix[r1:r2,c1:c2]
 
 def input_slice(slice_bounds, input_bounds, input_density):
     """
@@ -374,18 +377,6 @@ class Sheet(EventProcessor):
         originating from this sheet can be sliced like this M[a:b,c:d]
         """
         return input_slice(slice_bounds,self.bounds,self.density,x,y)
-
-    def activity_submatrix(self,slice_bounds,activity=None):
-        """
-        Returns a submatrix of an activity matrix that originated
-        from this sheet.  If no activity matrix is given, the
-        sheet's current activity is used.  Does not copy the
-        submatrix!  It is a true slice of the given matrix.
-        """
-        if not activity:
-            activity = self.activity
-
-        return activity_submatrix(slice_bounds,activity,self.bounds,self.density)
 
     def sheet_rows(self):
         """
