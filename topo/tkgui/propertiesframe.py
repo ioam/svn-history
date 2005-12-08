@@ -43,11 +43,14 @@ class PropertiesFrame(Frame):
         return (p,control)
 
 
+    # CEBHACKALERT: some documentation would be nice and at the same
+    # time remove some of the things that are passed around but not
+    # used.
+
     def add_text_property(self,name,value="",**kw):
         var = StringVar()
         control = Entry(self,textvariable = var,width=50)
         return self.add_property(name,var,control,value,**kw)
-        
 
     def add_checkbutton_property(self,name,value=0,**kw):
         var = IntVar()
@@ -60,11 +63,16 @@ class PropertiesFrame(Frame):
         control = TaggedSlider(self,tagvariable=var,string_translator=self.string_translator,**kw)
         return self.add_property(name,var,control,value)
 
-    def add_combobox_property(self,name,value='',**kw):
+    def add_combobox_property(self,name,default='',itms=[],**kw):
+        # CEBHACKALERT: typing text does nothing.
         var = StringVar()
-        var.set(value)
-        control = Pmw.ComboBox(self,entry_textvariable=var,dropdown=1,**kw)
-        return self.add_property(name,var,control,value)
+        var.set(default)
+        control = Pmw.ComboBox(self,
+                               selectioncommand = (lambda value: self.set_value(name,value)), 
+                               scrolledlist_items = itms,
+                               **kw)
+        control.selectitem(default)
+        return self.add_property(name,var,control,default)
 
     def get_value(self,name):
         return self.properties[name].get()
@@ -76,10 +84,11 @@ class PropertiesFrame(Frame):
         result = {}
         for (k,v) in self.properties.items():
             result[k] = v.get()
-
         return result
 
 
     def set_values(self,values):
         for (name,value) in values.items():
             self.set_value(name,value)
+
+        

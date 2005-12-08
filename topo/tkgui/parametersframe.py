@@ -10,6 +10,8 @@ from Tkinter import Frame, TOP, YES, N,S,E,W,X
 from topo.base.utils import eval_atof, class_parameters, keys_sorted_by_value
 import topo
 
+# CEBHACKALERT: this file is still being reorganized
+
 class ParametersFrame(Frame):
     """
     Frame for all non-hidden Parameters of a TopoObject class.
@@ -104,6 +106,10 @@ class ParametersFrame(Frame):
         for (parameter_name, parameter) in parameters:
 
             value = str(parameter.default)
+
+            import topo.base.parameter
+            # CEBHACKALERT: rather than this if test where the Parameters are imported,
+            # make Parameter have some method that would work for these subclasses 
             if isinstance(parameter, topo.base.parameter.Number):
                 try:
                     low_bound,high_bound = parameter.get_soft_bounds()
@@ -114,13 +120,19 @@ class ParametersFrame(Frame):
                 except AttributeError:
                     # has no soft bounds
                     widget_dict[parameter_name] = self.__add_text_box(parameter_name,value)
+            elif isinstance(parameter, topo.base.parameter.EnumeratedParameter):
+                itms = parameter.available
+                widget_dict[parameter_name] = self.__add_combo_box(
+                    parameter_name,value,itms) 
             else:
                 # default to text entry    
                 widget_dict[parameter_name] = self.__add_text_box(parameter_name,value)
-
         return widget_dict
                 
-            
+    def __add_combo_box(self, name, value, itms):
+        return self.__properties_frame.add_combobox_property(
+            name,value,itms)
+    
     def __add_text_box(self,name,value):
         return self.__properties_frame.add_text_property(name,value)
 

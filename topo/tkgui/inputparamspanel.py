@@ -273,6 +273,8 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         ###
         ### How will this work for photographs and other items that need non-numeric
         ### input boxes?  It *seems* to be assuming that everything is a float.
+        # CEB: not any more, but it's not a whole lot better.
+        import topo.base.parameter
         for (name,parameter) in rp.items():
 
             if isinstance(parameter, topo.base.parameter.Number):

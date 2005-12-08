@@ -5,20 +5,21 @@ Contains two classes: TopoImage and ImageGenerator.
 $Id$
 """
 
+# CEBHACKALERT: I have to go over this file. The main reason for the
+# last set of changes is to test having an EnumeratedParameter in the
+# GUI, not to get ImageGenerator correct.
+
 from topo.base.topoobject import TopoObject
 from topo.base.sheet import bounds2shape
 from topo.outputfns.basic import DivisiveMaxNormalize
 from topo.base.patterngenerator import PatternGenerator
 from topo.patterns.basic import W_PREC, H_PREC
-from topo.base.parameter import Filename, Number, Parameter
+from topo.base.parameter import Filename, Number, Parameter, EnumeratedParameter
 from Numeric import array, transpose, ones, floor, Float, divide, where
 import Image, ImageOps
 
 
-# CEBHACKALERT:
-# The image is not scaled at all on loading.
-
-
+# CEBHACKALERT: this is sheet's, but for arrays
 from topo.base.sheet import sheet2matrix
 def sheet2matrixidx_array(x,y,bounds,density):
     """
@@ -46,17 +47,49 @@ def edge_average(a):
         return float(edge_sum)/num_values
 
 
+def stretch_to_fit(x,y,n_rows,n_cols,height,width):
+    """
+    """
+    y_sf = divide(float(n_rows),height)
+    x_sf = divide(float(n_cols),width)
+    return x/x_sf, y/y_sf        
+
+
+# CEBHACKALERT:
+# instead of fitting to this particular retina,
+# should fit to 1.0 ?
+def fit_shortest(x,y,n_rows,n_cols,height,width):
+    """
+    """
+    longest_r_dim = max(n_rows,n_cols)
+    shortest_i_dim = min(height,width)
+    sf = divide(float(longest_r_dim),shortest_i_dim)
+    return x/sf, y/sf
+
+def fit_longest(x,y,n_rows,n_cols,height,width):
+    """
+    """
+    shortest_r_dim = min(n_rows,n_cols)
+    longest_i_dim = max(height,width)
+    sf = divide(float(shortest_r_dim),longest_i_dim)
+    return x/sf, y/sf
+
 
 class TopoImage(TopoObject):
     """
-    Stores a Numeric array representing a normalized Image. The Image is converted to and
-    stored in grayscale. It is stored at its original size.
 
-    There is also a background value, displayed at any point on the retina not covered by the
-    image. This background value is calculated by calculating the mean of the pixels around
-    the edge of the image. Black-bordered images therefore have a black background, and white-
-    bordered images have a white background, for example. Images with no border have a background
-    that is less of a contrast than a white or black one.
+    Stores a Numeric array representing a normalized Image. The Image
+    is converted to and stored in grayscale. It is stored at its
+    original size.
+
+    There is also a background value, displayed at any point on the
+    retina not covered by the image. This background value is
+    calculated by calculating the mean of the pixels around the edge
+    of the image. Black-bordered images therefore have a black
+    background, and white- bordered images have a white background,
+    for example. Images with no border have a background that is less
+    of a contrast than a white or black one.
+
     """
     ### JABALERT: Should eventually make this an OutputFunctionParameter
     output_fn = Parameter(default=DivisiveMaxNormalize())
@@ -76,8 +109,8 @@ class TopoImage(TopoObject):
         self.background_value = edge_average(self.image_array)
 
 
-    ### JABHACKALERT!  Should be unified with sheet2matrix in sheet.py
-    def __topo_coords_to_image(self,x,y,bounds,density,width,height):
+    # CEBHACKALERT: the name and documentation have to be changed.
+    def __topo_coords_to_image(self,x,y,bounds,density,width,height,scaling):
         """
         Transform the given topographica abscissae/ordinates (x) to fit
         an image with num_pixels along that aspect.
@@ -92,36 +125,44 @@ class TopoImage(TopoObject):
 
         Maybe it would be better to put image into Sheet and use BoundingBocol functions, etc.
         """
-        # CEBHACKALERT:
-        # offer alternatives (shortest dimension to area, etc.)
-        # fit longest dimension to default retina area (1.0)
+        n_rows,n_cols = bounds2shape(bounds,density)
 
-        x = x/width  
+        if scaling=='fit_shortest':
+            x,y = fit_shortest(x,y,n_rows,n_cols,self.h,self.w)
+        elif scaling=='fit_longest':
+            x,y = fit_longest(x,y,n_rows,n_cols,self.h,self.w)
+        elif scaling=='stretch_to_fit':
+            x,y = stretch_to_fit(x,y,n_rows,n_cols,self.h,self.w)
+        elif scaling=='original':
+            pass
+        
+        x = x/width
         y = y/height
 
         row, col = sheet2matrixidx_array(x,y,bounds,density)
-        n_rows,n_cols = bounds2shape(bounds,density)
-
+        
         col = col - n_cols/2.0 + self.w/2.0
         row = row - n_rows/2.0 + self.h/2.0
-        
+
         col = where(col>=self.w, -col, col)
         row = where(row>=self.h, -row, row)
 
         return col.astype(int), row.astype(int)
 
 
-    def __call__(self, x, y, bounds, density, width=1.0, height=1.0):
+    def __call__(self, x, y, bounds, density, scaling, width=1.0, height=1.0):
         """
-        Return pixels from the image at the given Topographica (x,y) coordinates,
-        with width/height multiplied as specified by the given width and height factors.
+        Return pixels from the image at the given Topographica
+        (x,y) coordinates, with width/height multiplied as specified
+        by the given width and height factors.
 
-        The Topographica coordinates are mapped to the Image ones by assuming the longest
-        dimension of the Image should fit the default retinal dimension of 1.0. The other
-        dimension is scaled by the same factor.
+        The Topographica coordinates are mapped to the Image ones by
+        assuming the longest dimension of the Image should fit the
+        default retinal dimension of 1.0. The other dimension is
+        scaled by the same factor.
         """
  
-        x_scaled, y_scaled = self.__topo_coords_to_image(x, y, bounds, density, width, height)
+        x_scaled, y_scaled = self.__topo_coords_to_image(x, y, bounds, density, width, height, scaling)
         
         image_sample = ones(x_scaled.shape, Float)*self.background_value
 
@@ -149,6 +190,9 @@ class ImageGenerator(PatternGenerator):
     width  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=W_PREC)
     height  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=H_PREC)
     filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9)
+
+    size_normalization = EnumeratedParameter(default='fit_shortest', available=['fit_shortest','fit_longest','stretch_to_fit','original'])
+    
     
     def function(self,**params):
         bounds  = params.get('bounds', self.bounds)
@@ -158,8 +202,9 @@ class ImageGenerator(PatternGenerator):
         width   = params.get('width',self.width)
         height  = params.get('height',self.height)
         filename = params.get('filename',self.filename)
+        size_normalization = params.get('scaling',self.size_normalization)
 
         image = TopoImage(filename)
-        return image(x,y,bounds,density, width, height)
+        return image(x,y,bounds,density, size_normalization,width, height)
 
 
