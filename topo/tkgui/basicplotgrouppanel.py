@@ -19,8 +19,7 @@ import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas
 import plotgrouppanel
-import topo.base.registry
-
+from topo.plotting.plotgrouptemplate import plotgroup_templates
 
 ### We want to support any featuremap type defined in that file, and
 ### so import all of them here.
@@ -32,7 +31,7 @@ class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         plotgrouppanel.PlotGroupPanel.__init__(self,parent,pengine,console,pgt_name=pgt_name,**config)
 
         # Plotgroup Template associated
-        self.pgt = topo.base.registry.plotgroup_templates[pgt_name]
+        self.pgt = plotgroup_templates[pgt_name]
      
         # Name of the plotgroup to plot
         self.mapname = StringVar()
@@ -75,7 +74,7 @@ class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         ### UnitWeight and Projection Panel...
         exec self.cmdname.get()
 
-        pgt = topo.base.registry.plotgroup_templates[self.mapname.get()]
+        pgt = plotgroup_templates[self.mapname.get()]
         self.pe_group = self.pe.get_plot_group(self.mapname.get(),pgt,class_type='BasicPlotGroup')
 
             

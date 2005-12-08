@@ -17,8 +17,8 @@ import topo.base.topoobject
 import topo.plotting.bitmap
 import topo.base.simulator as simulator
 import topo.plotting.plotengine as plotengine
-import topo.base.registry as registry
 import topo.plotting.plotgroup
+from topo.plotting.plotgrouptemplate import plotgroup_templates
 import PIL
 import Image
 import ImageTk
@@ -154,7 +154,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         self.auto_refresh_checkbutton.invoke()
 
         # Normalization check button.
-        pgt = registry.plotgroup_templates[self.pgt_name]
+        pgt = plotgroup_templates[self.pgt_name]
         if pgt:
             ### JABALERT! Why is it checking the first template for this? 
 	    ### JC: I think a way to fix it is to pass a parameter normalize when creating a 
@@ -190,7 +190,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
     def toggle_normalize(self):
         """Function called by Widget when check-box clicked"""
         self.normalize = not self.normalize
-        pgt = registry.plotgroup_templates[self.pgt_name]
+        pgt = plotgroup_templates[self.pgt_name]
         for (k,each) in pgt.plot_templates:
             each.channels['Normalize'] = self.normalize
         self.refresh()
@@ -222,7 +222,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         See UnitWeightsPanel and ProjectionPanel for
         examples.
         """
-	pgt = topo.base.registry.plotgroup_templates[self.pgt_name]
+	pgt = plotgroup_templates[self.pgt_name]
         self.pe_group = self.pe.get_plot_group(self.plot_group_key,pgt,None,
                                                self.plotgroup_type,None)
 

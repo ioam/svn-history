@@ -18,10 +18,10 @@ __version__='$Revision$'
 import topo
 import topo.base.topoobject
 import plotengine
-import topo.base.registry
 import topo.base.simulator
 from topo.base.utils import *
-
+from topo.plotting.plotgrouptemplate import plotgroup_templates
+ 
 ### JABHACKALERT!
 ### 
 ### Not yet properly implemented; all the code in this file needs to
@@ -65,7 +65,7 @@ class ActivityFile(PlotFileSaver):
 
     def create_bitmaps(self):
         pg = self.pe.get_plot_group('Activity',
-                                    topo.base.registry.plotgroup_templates['Activity'],
+                                    plotgroup_templates['Activity'],
                                     self.region)
         self.bitmaps = pg.load_images()
         
@@ -79,7 +79,7 @@ class UnitWeightsFile(PlotFileSaver):
         self.name['type'] = 'Weights'
         self.plot_group_key = ('Weights',self.region,x,y)
 
-        pt = topo.base.registry.plotgroup_templates['Unit Weights'].plot_templates['Unit Weights']
+        pt = plotgroup_templates['Unit Weights'].plot_templates['Unit Weights']
         pt.channels['Sheet_name'] = region
         pt.channels['Location'] = (x, y)
 
@@ -88,7 +88,7 @@ class UnitWeightsFile(PlotFileSaver):
 
     def create_bitmaps(self):
         pg = self.pe.get_plot_group(self.plot_group_key,
-                                    topo.base.registry.plotgroup_templates['Unit Weights'],
+                                    plotgroup_templates['Unit Weights'],
                                     self.region)
         self.bitmaps = pg.load_images()
 
@@ -102,7 +102,7 @@ class ProjectionFile(PlotFileSaver):
         self.name['type'] = 'WeightsArray'
         self.plot_group_key = ('WeightsArray',projection,density)
 
-        pt = topo.base.registry.plotgroup_templates['Projection'].plot_templates['Projection']
+        pt = plotgroup_templates['Projection'].plot_templates['Projection']
         pt.channels['Density'] = density
         pt.channels['Projection_name'] = region
 
@@ -112,7 +112,7 @@ class ProjectionFile(PlotFileSaver):
 
     def create_bitmaps(self):
         pg = self.pe.get_plot_group(self.plot_group_key,
-                                    topo.base.registry.plotgroup_templates['Projection'],
+                                    plotgroup_templates['Projection'],
                                     self.region)
         pg.do_plot_cmd()
         self.bitmaps = pg.load_images()

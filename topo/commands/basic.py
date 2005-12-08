@@ -8,7 +8,6 @@ from topo.base.topoobject import TopoObject
 from topo.base.sheet import Sheet
 from topo.base.projection import ProjectionSheet
 import topo.base.simulator
-import topo.base.registry
 from topo.sheets.generatorsheet import GeneratorSheet
 
 import pickle
@@ -131,7 +130,7 @@ def load_snapshot(snapshot_name):
     
     # CEBHACKALERT:
     # Should this execute in __main__.__dict__?
-    # load_cmd = 'import pickle; saved_sim=pickle.load(open("'+snapshot_name+'","rb")); import topo.base.registry; topo.base.registry.set_active_sim(saved_sim)'
+    # load_cmd = 'import pickle; saved_sim=pickle.load(open("'+snapshot_name+'","rb")); import topo.base.simulator; topo.base.simulator.set_active_sim(saved_sim)'
     #  exec load_cmd in __main__.__dict__
     #
     # Also confusion that current simulator is left behind as e.g. s

@@ -32,10 +32,10 @@ from math import pi
 from topo.patterns.basic import GaussianGenerator, SineGratingGenerator
 from topo.commands.basic import pattern_present, restore_input_generators, save_input_generators
 
-import topo.base.registry
 from topo.base import sheetview
 
 # see HACKALERT below "if display"
+# from topo.plotting.plotgrouptemplate import plotgroup_templates
 # from topo.base.registry import get_console
 ## Should only import this when using display option
 # import topo.tkgui.topoconsole 
@@ -280,7 +280,7 @@ class MeasureFeatureMap(TopoObject):
             # way than this!
             #### Debugging     ####
 ##             if display:
-##                 temp=topo.base.registry.plotgroup_templates['Activity']
+##                 temp=plotgroup_templates['Activity']
 ##                 x = topo.tkgui.topoconsole.PlotsMenuEntry(get_console(),temp)
 ##                 panel = x.command()
 ##                 panel.toggle_auto_refresh()

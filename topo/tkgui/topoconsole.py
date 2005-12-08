@@ -13,7 +13,7 @@ from basicplotgrouppanel import BasicPlotGroupPanel
 from unitweightspanel import UnitWeightsPanel
 from projectionpanel import ProjectionPanel
 from inputparamspanel import InputParamsPanel
-from topo.plotting.plotgrouptemplate import PlotGroupTemplate, PlotTemplate
+from topo.plotting.plotgrouptemplate import PlotGroupTemplate, PlotTemplate, plotgroup_templates
 import topo.base.simulator
 import topo.base.registry
 import topo.plotting.plotengine
@@ -287,7 +287,7 @@ class TopoConsole(Frame):
                              label="Activity",
                              command=self.new_activity_window)
         """
-        for (label,obj) in topo.base.registry.plotgroup_templates.items():
+        for (label,obj) in plotgroup_templates.items():
             entry = PlotsMenuEntry(self,obj,label=label)            
             menubar.addmenuitem('Plots','command',
                                 obj.description,label=label,

@@ -15,7 +15,7 @@ from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry
 from plotgrouppanel import PlotGroupPanel
 from cfsheetplotpanel import CFSheetPlotPanel
 from topo.base.projection import ProjectionSheet
-import topo.base.registry as registry
+from topo.plotting.plotgrouptemplate import plotgroup_templates
 from topo.base.sheet import Sheet
 import topoconsole
 
@@ -95,7 +95,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
             # The PlotTemplate mechanism requires updating the Unit
             # Weight plots so that the PlotEngine will poll the
             # correct unit view.
-            pt = registry.plotgroup_templates['Unit Weights'].plot_templates['Unit Weights']
+            pt = plotgroup_templates['Unit Weights'].plot_templates['Unit Weights']
             pt.channels['Sheet_name'] = self.region.get()
             pt.channels['Location'] = (self.x, self.y)
         else:
@@ -123,7 +123,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
 
         self.generate_plot_group_key()
         self.pe_group = self.pe.get_plot_group(self.plot_group_key,
-                                               registry.plotgroup_templates['Unit Weights'],
+                                               plotgroup_templates['Unit Weights'],
                                                'UnitWeightsPlotGroup',self.region.get())
         self.pe_group.do_plot_cmd()
         self.plots = self.pe_group.plots()

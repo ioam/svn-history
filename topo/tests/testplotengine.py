@@ -33,11 +33,10 @@ import ImageTk
 import random
 import pdb #debugger
 
-### My new import statement: JC
-import topo.base.registry
 from topo.base.simulator import Simulator
 from topo.plotting.plotengine import PlotEngine
 from topo.plotting.plotgroup import BasicPlotGroup
+from topo.plotting.plotgrouptemplate import plotgroup_templates
 from topo.sheets.cfsom import CFSOM
 from topo.patterns.random import UniformRandomGenerator
 from topo.learningfns.basic import HebbianSOMLF
@@ -73,7 +72,7 @@ class TestPlotEngine(unittest.TestCase):
 
       def test_add_plot_group(self):
       
-          pgt = topo.base.registry.plotgroup_templates['Activity']
+          pgt = plotgroup_templates['Activity']
           plot_group = BasicPlotGroup(self.sim,pgt,'Activity',None,None)
           self.pe.add_plot_group('Activity',plot_group)
           test = self.pe.plot_group_dict.get('Activity',None)
@@ -82,7 +81,7 @@ class TestPlotEngine(unittest.TestCase):
       def test_make_plot_group(self):
 
           ### Activity PlotGroup
-          pgt1 = topo.base.registry.plotgroup_templates['Activity']
+          pgt1 = plotgroup_templates['Activity']
 
           self.pe.make_plot_group('Activity',pgt1,None,'BasicPlotGroup')
           test_plot_group = BasicPlotGroup(self.sim,pgt1,'Activity',None,None)
@@ -92,7 +91,7 @@ class TestPlotEngine(unittest.TestCase):
           #self.assertEqual(test_plot_group,test)
           
           ### Orientation Preference PlotGroup
-          pgt2 = topo.base.registry.plotgroup_templates['Orientation Preference']
+          pgt2 = plotgroup_templates['Orientation Preference']
 
           self.pe.make_plot_group('Orientation Preference',pgt2,None,'BasicPlotGroup')
           test_plot_group = BasicPlotGroup(self.sim,pgt2,'Orientation Preference',None,None)
@@ -100,7 +99,7 @@ class TestPlotEngine(unittest.TestCase):
           #self.assertEqual(test_plot_group,test)
 
           ### UnitWeight PlotGroup
-          pgt3 = topo.base.registry.plotgroup_templates['Unit Weights']
+          pgt3 = plotgroup_templates['Unit Weights']
 
           pg_key1=('Weights','V1',0,0)
           pg_key2=('Weights','V2',0.4,0.4)
@@ -126,7 +125,7 @@ class TestPlotEngine(unittest.TestCase):
           
 
 
-          pgt4 = topo.base.registry.plotgroup_templates['Projection']
+          pgt4 = plotgroup_templates['Projection']
 
 
 

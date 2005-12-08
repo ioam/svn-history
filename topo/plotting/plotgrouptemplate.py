@@ -1,15 +1,13 @@
 """
-PlotTemplate and PlotGroupTemplate classes.
+PlotTemplate and PlotGroupTemplate classes, and global repository of such objects.
 
-It is also the file where the different PlotGroupTemplate currently
-in used are defined and registered in the topo.base.registry.
-
-The user is then supposed to define new PlotGroupTemplate at his convenience.
+The plotgroup_template list of PlotGroupTemplate objects included in
+this file can be extended or modified by the user as desired, and will
+be available for any plotting purposes.
 
 $Id$
 """
 __version__='$Revision$'
-
 
 from topo.base.topoobject import TopoObject
 from topo.base.keyedlist import KeyedList
@@ -109,12 +107,17 @@ class PlotGroupTemplate(TopoObject):
         self.description = self.name
         
 
-### JCALERT! Review the doc here or at the top of the file...
-### maybe put the import at the top
-        
-### Populate the dynamic plot menu list registry.
-        
-import topo.base.registry
+
+###############################################################################
+# Specific PlotGroupTemplates are stored in this repository,
+# to which users can add their own as needed
+plot_templates = {} # JABHACKALERT! What is this for?
+plotgroup_templates = KeyedList()
+
+
+
+###############################################################################
+# Sample plots; users can override any of these as necessary
 
 pgt = PlotGroupTemplate([('Activity',
                           PlotTemplate({'Strength'   : 'Activity',
@@ -123,26 +126,26 @@ pgt = PlotGroupTemplate([('Activity',
                                         'Normalize'  : False}))],
                         name='Activity',
                         command='measure_activity()')
+# CEBHACKALERT: putting OrientationPreference in Hue is ok while we
+# are only talking about orientation maps, but needs to be cleaned up
+# to work well in general.
+plotgroup_templates[pgt.name] = pgt
 
 
-# CEBHACKALERT: putting OrientationPreference in Hue is ok while we are only
-# talking about orientation maps.
-
-topo.base.registry.plotgroup_templates[pgt.name] = pgt
 pgt = PlotGroupTemplate([('Unit Weights',
                           PlotTemplate({'Location'   : (0.0,0.0),
                                         'Normalize'  : True,
 					'Sheet_name' : 'V1'}))],
                         name='Unit Weights',
                         command='pass')
-topo.base.registry.plotgroup_templates[pgt.name] = pgt
+plotgroup_templates[pgt.name] = pgt
 pgt = PlotGroupTemplate([('Projection',
                           PlotTemplate({'Density'         : 25,
                                         'Projection_name' : 'None',
                                         'Normalize'       : True}))],
                         name='Projection',
                         command='pass')
-topo.base.registry.plotgroup_templates[pgt.name] = pgt
+plotgroup_templates[pgt.name] = pgt
 pgt = PlotGroupTemplate([('Orientation Preference',
                           PlotTemplate({'Strength'   : None,
                                         'Hue'        : 'OrientationPreference',
@@ -157,4 +160,4 @@ pgt = PlotGroupTemplate([('Orientation Preference',
                                         'Confidence' : None}))],
                         name='Orientation Preference',
                         command = 'measure_or_pref()')
-topo.base.registry.plotgroup_templates[pgt.name] = pgt
+plotgroup_templates[pgt.name] = pgt

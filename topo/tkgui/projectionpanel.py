@@ -10,7 +10,7 @@ from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas
 import Pmw
 import ImageTk
-import topo.base.registry as registry
+from topo.plotting.plotgrouptemplate import plotgroup_templates
 from math import ceil
 from cfsheetplotpanel import CFSheetPlotPanel
 from plotgrouppanel import PlotGroupPanel
@@ -190,7 +190,7 @@ class ProjectionPanel(CFSheetPlotPanel):
         self.density = float(eval(self.density_str.get(),__main__.__dict__))
         self.plot_group_key = ('Projection',self.weight_name.get(),self.density,self.region.get())
 
-        pt = registry.plotgroup_templates['Projection'].plot_templates['Projection']
+        pt = plotgroup_templates['Projection'].plot_templates['Projection']
         pt.channels['Density'] = self.density
         pt.channels['Projection_name'] = self.weight_name.get()
         
@@ -203,7 +203,7 @@ class ProjectionPanel(CFSheetPlotPanel):
   
         self.generate_plot_group_key()
         self.pe_group = self.pe.get_plot_group(self.plot_group_key,
-                                               registry.plotgroup_templates['Projection'],
+                                               plotgroup_templates['Projection'],
                                                'ProjectionPlotGroup',self.region.get())
         self.pe_group.do_plot_cmd()
 
