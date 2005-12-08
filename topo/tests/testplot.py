@@ -11,7 +11,7 @@ from pprint import pprint
 from topo.plotting import plot
 from topo.base.sheet import *
 from topo.plotting.bitmap import RGBMap, HSVMap
-from topo.base.patterngenerator import ImageGenerator
+from testsheetview import ImageGenerator
 
 SHOW_PLOTS = False
 

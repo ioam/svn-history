@@ -39,7 +39,7 @@ class TestCFSom(unittest.TestCase):
         Code moved from __main__ block of cfsom.py.  Gives a tight example
         of running a cfsom simulation.
         """
-        from topo.base.patterngenerator import ImageGenerator
+        from testsheetview import ImageGenerator
         from topo.plotting.plotfilesaver import ImageSaver
         
         s = Simulator(step_mode=True)

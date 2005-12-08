@@ -14,68 +14,7 @@ from Numeric import add,subtract,cos,sin,array
 from parameter import Parameter,Number
 from math import pi
 
-### JABHACKALERT!
-### 
-### The code from here to the end of ImageGenerator needs to be
-### reworked into a proper PatternGenerator for rendering images.
-
-# Judah: The class ImageGenerator was originally written by Jeff, but
-# now it should be replaced by a PatternGenerator that will load in an
-# input file.  Currently (9/05) only used by cfsom.py and a couple of
-# test files.
-from Numeric import resize #this class also requires "array" but is about
-                           #to be removed, and "array" is imported above
-from sheet import Sheet
-from simulator import EventProcessor
-from utils import NxN
-from pprint import *
-import Image, ImageOps
-class ImageGenerator(Sheet):
-    """
-
-    parameters:
-
-      filename = The path to the image file.
-
-    A sheet that reads a pixel map and uses it to generate an activity
-    matrix.  The image is converted to grayscale and scaled to match
-    the bounds and density of the sheet.
-
-    NOTE: A bare ImageGenerator only sends a single event, containing
-    its image when it gets the .start() call, to repeatedly generate
-    images, it must have a self-connection.  More elegant, however,
-    would be to convert the ImageGenerator from a sheet to a generator
-    function suitable for use with the GeneratorSheet class (see
-    topo/sheets/generatorsheet.py).
-
-    """
-    filename = Parameter(None)
-    
-    def __init__(self,**config):
-
-        super(ImageGenerator,self).__init__(**config)
-
-        self.verbose("filename = " + self.filename)
-
-        image = Image.open(self.filename)
-        image = ImageOps.grayscale(image)
-        image = image.resize(self.activity.shape)
-        self.activity = resize(array([x for x in image.getdata()]),
-                                 (image.size[1],image.size[0]))
-
-	self.verbose("Initialized %s activity from %s" % (NxN(self.activity.shape),self.filename))
-        max_val = float(max(self.activity.flat))
-        self.activity = self.activity / max_val
-
-
-    def start(self):
-	assert self.simulator
-	self.simulator.enqueue_event_rel(0,self,self,data=self.activity)
-
-    def input_event(self,src,src_port,dest_port,data):
-        self.send_output(data=self.activity)
-
-
+ 
 class PatternGenerator(TopoObject):
     # CEBHACKALERT: update this documentation when finished reorganizing parametersframe.py
     """
