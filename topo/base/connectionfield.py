@@ -27,7 +27,7 @@ from projection import Projection,ProjectionSheet,Identity
 from parameter import Parameter, Number, BooleanParameter
 from utils import hebbian
 from arrayutils import mdot,divisive_normalization
-from sheet import Sheet
+from sheet import Sheet, matrix2sheet
 from sheetview import UnitView
 from itertools import chain
 from patterngenerator import ConstantGenerator
@@ -121,6 +121,11 @@ class ConnectionField(TopoObject):
         self.slice_array[1] = r2
         self.slice_array[2] = c1
         self.slice_array[3] = c2
+
+        # Construct and store the bounds exactly enclosing this slice
+        bottom, left = matrix2sheet(r2-0.5,c1-0.5,self.input_sheet.bounds,self.input_sheet.density)
+        top, right   = matrix2sheet(r1+0.5,c2+0.5,self.input_sheet.bounds,self.input_sheet.density)
+        self.bounds = BoundingBox(points=((left,bottom),(right,top)))
 
         return self.slice
     
