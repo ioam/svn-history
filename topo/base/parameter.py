@@ -85,6 +85,9 @@ class Parameter(object):
         in each instance to hold a value for each variable. Space is
         saved because __dict__ is not created for each instance.
 
+    # CEBHACKALERT: document that actual value is stored in the owning
+    object's __dict__, not the parameter object itself.
+
 
     Note: See this HOW-TO document for a good intro to descriptors in
     Python:
@@ -135,7 +138,6 @@ class Parameter(object):
         default value.  If called on an instance, produce the instance's
         value, if one has been set, otherwise produce the default value.
         """
-
         # For documentation on __get__() see 'Implementing Descriptors'
         # in the Python reference manual
         # (http://www.python.org/doc/2.4.2/ref/descriptors.html)
@@ -220,6 +222,34 @@ class Filename(Parameter):
         Call Parameter's __set__ with the os-specific path.
         """
         super(Filename,self).__set__(obj,normpath(val))
+
+
+# CEBHACKALERT: document! Sort out getting _name
+class EnumeratedParameter(Parameter):
+    """
+    """
+    def __init__(self, default='', available={}, **params):
+        # check it was a list you got
+        # and that default is in available
+        Parameter.__init__(self,default=default,**params)
+        if not type(available)==list:
+            raise ValueError("EnumeratedParameter must be created with a list of available types.")
+        self.available = available
+        self.__check_value(default)
+        
+    def __set__(self,obj,val):
+        """
+        Set to the given value, raising an exception if not in available
+        """
+        self.__check_value(val)
+        super(EnumeratedParameter,self).__set__(obj,val)
+
+    def __check_value(self,val):
+        """
+        """
+        if not self.available.count(val) >= 1:
+            raise ValueError("EnumeratedParamater '" + "CEBHACKALERT" + "' can't be set to '" + val + "' because that's not in the list of available values " + repr(self.available) + ".")
+
 
 
 class Number(Parameter):
