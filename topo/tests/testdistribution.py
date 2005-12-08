@@ -13,7 +13,7 @@ __version__='$Revision$'
 # - clean up redundant tests
 
 import unittest
-from topo.base.distribution import Distribution
+from topo.misc.distribution import Distribution
 import copy 
 
 # for testing the statistics

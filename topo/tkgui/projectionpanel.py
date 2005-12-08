@@ -18,7 +18,7 @@ from itertools import chain
 from topo.base.projection import ProjectionSheet
 import topoconsole
 from topo.base.utils import dict_sort
-from topo.base.keyedlist import KeyedList
+from topo.misc.keyedlist import KeyedList
 
 UNIT_PADDING = 1
 

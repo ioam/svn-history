@@ -11,7 +11,7 @@ from topo.base.parameter import Parameter
 from topo.base.projection import Identity
 from topo.responsefns.basic import CFDotProduct_CPointer
 from topo.learningfns.basic import DivisiveHebbian_CPointer
-from topo.base.inlinec import inline
+from topo.misc.inlinec import inline
 from Numeric import ones, Int
 
 class CFProjection_CPointer(CFProjection):

@@ -17,7 +17,7 @@ from math import pi
 from Numeric import around,bitwise_and,sin
 
 from topo.base.parameter import Number, Parameter
-from topo.base.patternfns import gaussian,gabor,line,disk,ring
+from topo.misc.patternfns import gaussian,gabor,line,disk,ring
 from topo.base.patterngenerator import PatternGenerator
 
 # Imported here so that all PatternGenerators will be in the same package
@@ -177,7 +177,7 @@ class SquareGratingGenerator(PatternGenerator):
 # CEBHACKALERT: will be making a base class since this kind of class
 # will exist for output_fn,learning_fn,response_fn,patterngenerator
 
-from topo.base.keyedlist import KeyedList
+from topo.misc.keyedlist import KeyedList
 from topo.base.utils import find_classes_in_package,classname_repr
 class PatternGeneratorParameter(Parameter):
     """

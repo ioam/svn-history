@@ -5,7 +5,7 @@ $Id$
 """
 __version__ = "$Revision$"
 
-from topo.base.inlinec import inline
+from topo.misc.inlinec import inline
 from topo.base.topoobject import TopoObject
 from topo.base.parameter import Parameter,Constant,Number
 from topo.base.projection import Identity

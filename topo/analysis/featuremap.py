@@ -19,7 +19,7 @@ __version__='$Revision$'
 #   active_sim
 
 from Numeric import array, zeros, Float 
-from topo.base.distribution import Distribution
+from topo.misc.distribution import Distribution
 from topo.base.topoobject import TopoObject
 
 from topo.base.sheet import Sheet
@@ -201,7 +201,7 @@ class MeasureFeatureMap(TopoObject):
                        values: either a list of the values to use for the feature (list), or
                                       a step size (float) to generate the list
                                       (i.e. frange(lower_bound,upper_bound,values))
-                       cyclic: whether or not the feature is cyclic (see topo.base.distribution)
+                       cyclic: whether or not the feature is cyclic (see topo.misc.distribution)
 
                        e.g.    
                        {'theta': (0.0,1.0), 0.10, True}

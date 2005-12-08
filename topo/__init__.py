@@ -34,7 +34,7 @@ __version__='$Revision $'
 __all__ = ['base','commands','sheets','projections','patterns','eps','plotting','analysis']
 
 # Enable automatic importing of .ty files, treating them just like .py
-import topo.base.tyimputil
+import topo.misc.tyimputil
 
 
 ABOUT_TEXT = """
