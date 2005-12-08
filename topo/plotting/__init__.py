@@ -20,4 +20,4 @@ bitmap','plot','plotengine','histogram','palette','plotgroup','plotfilesaver']
 $Id$
 """
 __version__='$Revision$'
-__all__ = ['bitmap','plot','plotengine','histogram','palette','plotgroup','plotfilesaver']
+__all__ = ['bitmap','plot','plotengine','histogram','palette','plotgroup','plotfilesaver','templates']

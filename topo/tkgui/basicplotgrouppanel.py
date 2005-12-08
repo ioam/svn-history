@@ -19,7 +19,7 @@ import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas
 import plotgrouppanel
-from topo.plotting.plotgrouptemplate import plotgroup_templates
+from topo.plotting.templates import plotgroup_templates
 
 ### We want to support any featuremap type defined in that file, and
 ### so import all of them here.

@@ -35,7 +35,7 @@ from topo.commands.basic import pattern_present, restore_input_generators, save_
 from topo.base import sheetview
 
 # see HACKALERT below "if display"
-# from topo.plotting.plotgrouptemplate import plotgroup_templates
+# from topo.plotting.templates import plotgroup_templates
 # from topo.base.registry import get_console
 ## Should only import this when using display option
 # import topo.tkgui.topoconsole 

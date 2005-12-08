@@ -20,7 +20,7 @@ import topo.base.topoobject
 import plotengine
 import topo.base.simulator
 from topo.base.utils import *
-from topo.plotting.plotgrouptemplate import plotgroup_templates
+from topo.plotting.templates import plotgroup_templates
  
 ### JABHACKALERT!
 ### 

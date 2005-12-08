@@ -11,7 +11,7 @@ from pprint import pprint
 from topo.plotting import plot
 from topo.base.sheet import *
 from topo.plotting.plotgroup import *
-from topo.plotting.plotgrouptemplate import PlotGroupTemplate, PlotTemplate
+from topo.plotting.templates import PlotGroupTemplate, PlotTemplate
 from topo.plotting.bitmap import RGBMap
 from topo.base.patterngenerator import ImageGenerator
 import Numeric

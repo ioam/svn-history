@@ -15,7 +15,7 @@ from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry
 from plotgrouppanel import PlotGroupPanel
 from cfsheetplotpanel import CFSheetPlotPanel
 from topo.base.projection import ProjectionSheet
-from topo.plotting.plotgrouptemplate import plotgroup_templates
+from topo.plotting.templates import plotgroup_templates
 from topo.base.sheet import Sheet
 import topoconsole
 

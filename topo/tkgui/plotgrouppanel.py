@@ -18,7 +18,7 @@ import topo.plotting.bitmap
 import topo.base.simulator as simulator
 import topo.plotting.plotengine as plotengine
 import topo.plotting.plotgroup
-from topo.plotting.plotgrouptemplate import plotgroup_templates
+from topo.plotting.templates import plotgroup_templates
 import PIL
 import Image
 import ImageTk

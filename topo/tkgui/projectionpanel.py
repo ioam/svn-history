@@ -10,7 +10,7 @@ from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas
 import Pmw
 import ImageTk
-from topo.plotting.plotgrouptemplate import plotgroup_templates
+from topo.plotting.templates import plotgroup_templates
 from math import ceil
 from cfsheetplotpanel import CFSheetPlotPanel
 from plotgrouppanel import PlotGroupPanel
