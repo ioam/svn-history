@@ -15,7 +15,6 @@ from projectionpanel import ProjectionPanel
 from inputparamspanel import InputParamsPanel
 from topo.plotting.plotgrouptemplate import PlotGroupTemplate, PlotTemplate, plotgroup_templates
 import topo.base.simulator
-import topo.base.registry
 import topo.plotting.plotengine
 import topo.base.topoobject
 
@@ -55,6 +54,13 @@ def active_sim():
     return topo.base.simulator.get_active_sim()
 
 
+# If a particular plotgroup_template needs (or works better with) a
+# specific subclass of PlotPanel, the writer of the new subclass
+# or the plotgroup_template can declare here that that template
+# should use a specific PlotPanel subclass.  For example:
+#   plotpanel_classes['Hue Pref Map'] = HuePreferencePanel
+plotpanel_classes = {}
+
 
 class PlotsMenuEntry(topo.base.topoobject.TopoObject):
     """
@@ -80,10 +86,10 @@ class PlotsMenuEntry(topo.base.topoobject.TopoObject):
         # directory and therefore this link must be made within the tkgui
         # files.
         #
-        # If users want to extend the Plot Panel classes, then add
-        # entries to topo.base.registry.plotpanel_classes.  If no dictionary
+        # If users want to extend the Plot Panel classes, then they
+        # should add entries to plotpanel_classes.  If no dictionary
         # entry is defined then the default class is used.
-        self.class_name = topo.base.registry.plotpanel_classes.get(self.label,class_name)
+        self.class_name = plotpanel_classes.get(self.label,class_name)
 
         self.num_windows = 0
         self.title = ''
@@ -549,6 +555,6 @@ class GUIToplevel(Toplevel):
 
 
 if __name__ != '__main__':
-    topo.base.registry.plotpanel_classes['Unit Weights'] = UnitWeightsPanel
-    topo.base.registry.plotpanel_classes['Projection'] = ProjectionPanel
-    topo.base.registry.plotpanel_classes['Orientation Preference'] = BasicPlotGroupPanel
+    plotpanel_classes['Unit Weights'] = UnitWeightsPanel
+    plotpanel_classes['Projection'] = ProjectionPanel
+    plotpanel_classes['Orientation Preference'] = BasicPlotGroupPanel
