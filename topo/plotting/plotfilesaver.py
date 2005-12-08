@@ -66,7 +66,7 @@ class ActivityFile(PlotFileSaver):
     def create_bitmaps(self):
         pg = self.pe.get_plot_group('Activity',
                                     plotgroup_templates['Activity'],
-                                    self.region)
+                                    'BasicPlotGroup',self.region)
         self.bitmaps = pg.load_images()
         
 
@@ -89,7 +89,7 @@ class UnitWeightsFile(PlotFileSaver):
     def create_bitmaps(self):
         pg = self.pe.get_plot_group(self.plot_group_key,
                                     plotgroup_templates['Unit Weights'],
-                                    self.region)
+                                    'UnitWeightsPlotGroup',self.region)
         self.bitmaps = pg.load_images()
 
 
@@ -103,6 +103,7 @@ class ProjectionFile(PlotFileSaver):
         self.plot_group_key = ('WeightsArray',projection,density)
 
         pt = plotgroup_templates['Projection'].plot_templates['Projection']
+        
         pt.channels['Density'] = density
         pt.channels['Projection_name'] = region
 
@@ -113,7 +114,7 @@ class ProjectionFile(PlotFileSaver):
     def create_bitmaps(self):
         pg = self.pe.get_plot_group(self.plot_group_key,
                                     plotgroup_templates['Projection'],
-                                    self.region)
+                                    'ProjectionPlotGroup', self.region)
         pg.do_plot_cmd()
         self.bitmaps = pg.load_images()
 
