@@ -59,6 +59,10 @@ opposed to those from C++ or Java):
   subclass     (although 'derived class' is also ok)
   superclass   (although 'base class' is also ok)
 
+Typically, classes are named with InitialCapitalLetters, member
+functions and attributes (variables and parameters) are lower_case,
+and filenames are lowercasewithnounderscores.py.
+
 
 
 USER-LEVEL AND SIMULATOR CODE
