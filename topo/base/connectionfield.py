@@ -61,35 +61,36 @@ class ConnectionField(TopoObject):
     including many other ConnectionFields.
     """
     
-    x = Parameter(default=0)
-    y = Parameter(default=0)
+    x = Parameter(default=0,doc='The x coordinate of the location of the center of this ConnectionField\non the input Sheet, e.g. for use when determining where the weight matrix\nlines up with the input Sheet matrix.')
+    y = Parameter(default=0,doc='The y coordinate of the location of the center of this ConnectionField\non the input Sheet, e.g. for use when determining where the weight matrix\nlines up with the input Sheet matrix.')
 
+    # Weights matrix; not yet initialized.
     weights = []
+
+    ### JABHACKALERT!  Why is this code relevant only for the
+    ### optimized C versions here, in the base ConnectionField class?
+    ### Surely it should only be in a subclass that has been
+    ### optimized, so that the base class is readable and general.
+    
+    # Stores a copy of the slice as an array that can be read easily from C,
+    # for use in optimized C versions of functions using this object.
     slice_array = []
     
-    def __init__(self,input_sheet,weight_bounds,weights_generator,weight_type=Numeric.Float32,output_fn=Identity(),**params):
+    def __init__(self,input_sheet,weights_bound_template,
+                 weights_generator,weight_type=Numeric.Float32,
+                 output_fn=Identity(),**params):
         super(ConnectionField,self).__init__(**params)
         self.input_sheet = input_sheet
 
-        self.slice = self.input_sheet.input_slice(weight_bounds,self.x,self.y)
-        r1,r2,c1,c2 = self.slice
+        r1,r2,c1,c2 = self.__initialize_slice(weights_bound_template)
 
-
-        # Numeric.Int32 is specified explicitly here to avoid having it
-        # default to Numeric.Int.  Numeric.Int works on 32-bit platforms,
-        # but does not work properly with the optimized C activation and
-        # learning functions on 64-bit machines.
-        self.slice_array = Numeric.zeros((4), Numeric.Int32)
-        self.slice_array[0] = r1
-        self.slice_array[1] = r2
-        self.slice_array[2] = c1
-        self.slice_array[3] = c2
-
-
-        # set up the weights
-        w = weights_generator(x=0,y=0,bounds=weight_bounds,density=self.input_sheet.density,theta=0,rows=r2-r1,cols=c2-c1)
+        # set up the weights centered around 0,0 to avoid problems
+        # with different-sized results at different floating-point
+        # locations in the Sheet
+        w = weights_generator(x=0,y=0,bounds=weights_bound_template,
+                              density=self.input_sheet.density,theta=0,
+                              rows=r2-r1,cols=c2-c1)
         self.weights = w.astype(weight_type)
-
         # Maintain the original type throughout operations, i.e. do not
         # promote to double.
         self.weights.savespace(1)
@@ -99,21 +100,46 @@ class ConnectionField(TopoObject):
         output_fn(self.weights)
 
 
+    def __initialize_slice(self,weights_bound_template):
+        """
+        Calculate the slice specifying the submatrix of the sheet's to which
+        this connection field connects.
+
+        The given weights_bound_template is offset to the (x,y) location of
+        this unit, and the bounds are calculated around that point.
+        """
+        
+        self.slice = self.input_sheet.input_slice(weights_bound_template,self.x,self.y)
+
+        # Numeric.Int32 is specified explicitly here to avoid having it
+        # default to Numeric.Int.  Numeric.Int works on 32-bit platforms,
+        # but does not work properly with the optimized C activation and
+        # learning functions on 64-bit machines.
+        r1,r2,c1,c2 = self.slice
+        self.slice_array = Numeric.zeros((4), Numeric.Int32)
+        self.slice_array[0] = r1
+        self.slice_array[1] = r2
+        self.slice_array[2] = c1
+        self.slice_array[3] = c2
+
+        return self.slice
+    
     def get_input_matrix(self, activity):
         r1,r2,c1,c2 = self.slice
         return activity[r1:r2,c1:c2]
 
 
-    def change_bounds(self, new_wt_bounds, output_fn=Identity()):
+    def change_bounds(self, weights_bound_template, output_fn=Identity()):
         """
         Change the bounding box for this existing ConnectionField. The
-        new_wt_bounds should center at the sheet coordinate (0,0), just as
-        weight_bounds in __init__, i.e. new_wt_bounds only specifies the size 
-        of the new bounding box, but not the location. The exact location and 
+        weights_bound_template should center at the sheet coordinate
+        (0,0), just as weights_bound_template in __init__,
+        i.e. weights_bound_template only specifies the size of the new
+        bounding box, but not the location. The exact location and
         extent of the new bounding box is found by translating the
-        center of new_wt_bounds to the center of this connection field. If
-        the new bound falls outside of the sheet, it is cropped to just cover
-        the sheet.
+        center of weights_bound_template to the center of this
+        connection field. If the new bound falls outside of the sheet,
+        it is cropped to just cover the sheet.
 
         Discards weights or adds new (zero) weights as necessary,
         preserving existing values where possible.
@@ -122,21 +148,13 @@ class ConnectionField(TopoObject):
         should be extended to support increasing as well.
         """
 
-        slice = self.input_sheet.input_slice(new_wt_bounds, self.x, self.y)
+        old_slice=self.slice
+        or1,or2,oc1,oc2 = old_slice
+        r1,r2,c1,c2 = self.__initialize_slice(weights_bound_template)
 
-        if slice != self.slice:
-            or1,or2,oc1,oc2 = self.slice
-            self.slice = slice
-            r1,r2,c1,c2 = slice
-
-            self.slice_array[0] = r1
-            self.slice_array[1] = r2
-            self.slice_array[2] = c1
-            self.slice_array[3] = c2
-
+        if self.slice != old_slice:
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
             self.weights.savespace(1)
-
             output_fn(self.weights)
 
 
@@ -260,13 +278,30 @@ class CFProjection(Projection):
     strength = Number(default=1.0)
 
     def __init__(self,**params):
+        """
+        Initialize the Projection with a set of cf_type objects
+        (typically ConnectionFields), each located at the location
+        in the source sheet corresponding to the unit in the target
+        sheet.
+        """
         super(CFProjection,self).__init__(**params)
         # set up array of ConnectionFields translated to each x,y in the src sheet
         cfs = []
         for y in self.dest.sheet_rows()[::-1]:
             row = []
             for x in self.dest.sheet_cols():
-                row.append(self.cf_type(input_sheet=self.src,weight_bounds=self.weights_bounds,weights_generator=self.weights_generator,weight_type=self.weight_type,output_fn=self.learning_fn.output_fn,x=x,y=y))
+                # JABALERT: Currently computes the location of the
+                # ConnectionField as the exact location in the input
+                # sheet corresponding to the unit in the destination
+                # sheet.  Instead, we will need to add the ability to
+                # use some other type of mapping, e.g. to add jitter
+                # in the initial mapping.
+                row.append(self.cf_type(input_sheet=self.src,
+                                        weights_bound_template=self.weights_bounds,
+                                        weights_generator=self.weights_generator,
+                                        weight_type=self.weight_type,
+                                        output_fn=self.learning_fn.output_fn,
+                                        x=x,y=y))
 
             cfs.append(row)
 
@@ -319,7 +354,7 @@ class CFProjection(Projection):
 
 
 
-    def change_bounds(self, new_wt_bounds):
+    def change_bounds(self, weights_bound_template):
         """
         Change the bounding box for all of the ConnectionFields in this Projection.
 
@@ -328,17 +363,17 @@ class CFProjection(Projection):
 	Currently only allows reducing the size, but should be
         extended to allow increasing as well.
         """
-        if not self.weights_bounds.containsbb_exclusive(new_wt_bounds):
+        if not self.weights_bounds.containsbb_exclusive(weights_bound_template):
             self.warning('Unable to change_bounds; currently allows reducing only.')
             return
 
-        self.weights_bounds = new_wt_bounds
+        self.weights_bounds = weights_bound_template
         rows,cols = self.get_shape()
         cfs = self.cfs
         output_fn = self.learning_fn.output_fn
         for r in xrange(rows):
             for c in xrange(cols):
-                cfs[r][c].change_bounds(new_wt_bounds,output_fn=output_fn)
+                cfs[r][c].change_bounds(weights_bound_template,output_fn=output_fn)
 
 
 
