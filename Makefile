@@ -61,7 +61,7 @@ cleandoc:
 # Uses an integrated python script named gendocs.py
 reference-manual: topo/*.py topo/*/*.py doc/Reference_Manual
 	mkdir -p ${DOC}
-	./topographica topo/base/gendocs.py
+	./topographica topo/misc/gendocs.py
 
 doc: FORCE
 	make -C doc/
