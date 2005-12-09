@@ -123,8 +123,8 @@ class ConnectionField(TopoObject):
         self.slice_array[3] = c2
 
         # Construct and store the bounds exactly enclosing this slice
-        bottom, left = matrix2sheet(r2-0.5,c1-0.5,self.input_sheet.bounds,self.input_sheet.density)
-        top, right   = matrix2sheet(r1+0.5,c2+0.5,self.input_sheet.bounds,self.input_sheet.density)
+        left,bottom = matrix2sheet(r2,c1,self.input_sheet.bounds,self.input_sheet.density)
+        right, top   = matrix2sheet(r1,c2,self.input_sheet.bounds,self.input_sheet.density)
         self.bounds = BoundingBox(points=((left,bottom),(right,top)))
 
         return self.slice
@@ -339,14 +339,17 @@ class CFProjection(Projection):
         """
         (r,c) = (self.dest).sheet2matrixidx(sheet_x,sheet_y)
 
-	### JCALERT! Here it should be self.cf, and somehow passing the bound to the view...
         matrix_data = Numeric.array(self.cf(r,c).weights)
 
-        ### JABHACKALERT!
-        ###
-        ### The bounds are currently set to a default; what should
-        ### they really be set to?
-        new_box = self.dest.bounds
+        new_box = self.cf(r,c).bounds
+	### JC: debug
+	#print "bounding_box",new_box.aarect().lbrt()
+	# r1,r2,c1,c2 = self.cf(r,c).slice
+# 	print "slice",r1,r2,c1,c2
+# 	x=self.cf(r,c).x
+# 	y=self.cf(r,c).y
+# 	print "x,y",x,y
+	###
         assert matrix_data != None, "Projection Matrix is None"
         return UnitView((matrix_data,new_box),sheet_x,sheet_y,self,view_type='UnitView')
 
