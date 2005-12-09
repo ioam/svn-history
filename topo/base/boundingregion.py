@@ -8,13 +8,11 @@ __version__='$Revision$'
 
 ### JABHACKALERT!
 ###
-### Should eliminate all "import *" commands if at all possible.
 ### The aarect information should probably be rewritten in matrix
 ### notation, not list notation, so that it can be scaled,
 ### translated, etc. easily.
 ###
 from parameter import Parameter
-from Numeric import *
 from topoobject import TopoObject
 from utils import classlist
 from arrayutils import inf
