@@ -38,6 +38,7 @@ __version__='$Revision$'
 #    - from topo.responsefns.basic import CFDotProduct
 #    - CFProjection.response_fn=CFDotProduct()
 #    default response_fn of CFProjection is dot product implemented in Python.
+#    response_fn is a Parameter.
 #
 # 2) Comment out the line:
 #    - CFProjection.learning_fn=DivisiveHebbian()
