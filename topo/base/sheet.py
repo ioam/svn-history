@@ -159,7 +159,6 @@ def matrix2sheet(float_row,float_col,bounds,density):
     xstep = float((right-left)) / int(density*(right-left))
     ystep = float((top-bottom)) / int(density*(top-bottom))
     x = float_col*xstep + left
-    #y = bottom + float_row*ystep
     y = top - float_row*ystep
     return x, y
 
