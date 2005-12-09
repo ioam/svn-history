@@ -98,26 +98,25 @@ class TopoImage(TopoObject):
         """
         """
         image = ImageOps.grayscale(Image.open(filename))
-        self.w, self.h = image.size
+        self.n_image_cols, self.n_image_rows = image.size
 
         image_array = array(image.getdata(),Float)
         image_array = self.output_fn(image_array)
         
-        image_array.shape = (self.h, self.w) # ** getdata() returns transposed image?
+        image_array.shape = (self.n_image_rows, self.n_image_cols) # ** getdata() returns transposed image?
         self.image_array = transpose(image_array)
         
         self.background_value = edge_average(self.image_array)
 
 
     # CEBHACKALERT: the name and documentation have to be changed.
-    def __topo_coords_to_image(self,x,y,bounds,density,width,height,scaling):
+    def __sheet_to_image(self,x,y,bounds,density,width,height,scaling):
         """
         Transform the given topographica abscissae/ordinates (x) to fit
         an image with num_pixels along that aspect.
 
-        - translate center (Image has (0,0) as top-left corner)
-        - scale x to match the size of the image, so e.g. x=3 corresponds
-          to pixel 3, and x=4 to pixel 4
+        - translate center (Image has (0,0) as top-left corner, whereas Sheet has
+        (0,0) in the center).
 
         An Image consists of discrete pixels, whereas the x values are floating-
         point numbers. The simplistic technique in this function uses floor() to
@@ -125,14 +124,19 @@ class TopoImage(TopoObject):
 
         Maybe it would be better to put image into Sheet and use BoundingBocol functions, etc.
         """
-        n_rows,n_cols = bounds2shape(bounds,density)
+        n_sheet_rows,n_sheet_cols = bounds2shape(bounds,density)
 
+        # Initial image scaling (size_normalization)
+        
+        # CEBALERT: instead of an if-test, could have a class of this
+        # type of function and generate the list from that
+        # (c.f. PatternGeneratorParameter).
         if scaling=='fit_shortest':
-            x,y = fit_shortest(x,y,n_rows,n_cols,self.h,self.w)
+            x,y = fit_shortest(x,y,n_sheet_rows,n_sheet_cols,self.n_image_rows,self.n_image_cols)
         elif scaling=='fit_longest':
-            x,y = fit_longest(x,y,n_rows,n_cols,self.h,self.w)
+            x,y = fit_longest(x,y,n_sheet_rows,n_sheet_cols,self.n_image_rows,self.n_image_cols)
         elif scaling=='stretch_to_fit':
-            x,y = stretch_to_fit(x,y,n_rows,n_cols,self.h,self.w)
+            x,y = stretch_to_fit(x,y,n_sheet_rows,n_sheet_cols,self.n_image_rows,self.n_image_cols)
         elif scaling=='original':
             pass
         
@@ -140,36 +144,38 @@ class TopoImage(TopoObject):
         y = y/height
 
         row, col = sheet2matrixidx_array(x,y,bounds,density)
-        
-        col = col - n_cols/2.0 + self.w/2.0
-        row = row - n_rows/2.0 + self.h/2.0
 
-        col = where(col>=self.w, -col, col)
-        row = where(row>=self.h, -row, row)
+        # CEBALERT:
+        # Instead of doing this kind of thing, could make TopoImage a
+        # Sheet and then do this with BoundingBoxes.
+        col = col - n_sheet_cols/2.0 + self.n_image_cols/2.0
+        row = row - n_sheet_rows/2.0 + self.n_image_rows/2.0
+
+        # document what this is
+        col = where(col>=self.n_image_cols, -col, col)
+        row = where(row>=self.n_image_rows, -row, row)
 
         return col.astype(int), row.astype(int)
 
 
     def __call__(self, x, y, bounds, density, scaling, width=1.0, height=1.0):
         """
-        Return pixels from the image at the given Topographica
-        (x,y) coordinates, with width/height multiplied as specified
+        Return pixels from the image (size-normalized according to scaling) at the given Sheet (x,y) coordinates, with width/height multiplied as specified
         by the given width and height factors.
 
-        The Topographica coordinates are mapped to the Image ones by
-        assuming the longest dimension of the Image should fit the
-        default retinal dimension of 1.0. The other dimension is
-        scaled by the same factor.
+        
         """
  
-        x_scaled, y_scaled = self.__topo_coords_to_image(x, y, bounds, density, width, height, scaling)
+        x_scaled, y_scaled = self.__sheet_to_image(x, y, bounds, density, width, height, scaling)
         
         image_sample = ones(x_scaled.shape, Float)*self.background_value
 
-        if self.h==0 or self.w==0 or width==0 or height==0:
+        if self.n_image_rows==0 or self.n_image_cols==0 or width==0 or height==0:
             return image_sample
         else:
-            # sample image at the scaled (x,y) coordinates
+            # CEBALERT: Sample image at the scaled (x,y)
+            # coordinates. You'd think there'd be a Numeric way to do
+            # this.
             for i in xrange(len(image_sample)):
                 for j in xrange(len(image_sample[i,:])):
                     if x_scaled[i,j] >= 0 and y_scaled[i,j] >= 0:
@@ -191,7 +197,8 @@ class ImageGenerator(PatternGenerator):
     height  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=H_PREC)
     filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9)
 
-    size_normalization = Enumeration(default='fit_shortest', available=['fit_shortest','fit_longest','stretch_to_fit','original'])
+    size_normalization = Enumeration(default='fit_shortest',
+                                     available=['fit_shortest','fit_longest','stretch_to_fit','original'])
     
     
     def function(self,**params):
