@@ -39,7 +39,7 @@ class TestSimulator(unittest.TestCase):
         self.assertEqual(s.state_len(),0)
         
 
-    def test_get_event_processors(self):
+    def test_get_objects(self):
         s = Simulator(step_mode = 1)
 
         pulse1 = PulseGenerator(period = 1)
@@ -50,10 +50,10 @@ class TestSimulator(unittest.TestCase):
 
         s.connect(pulse1,sum,delay=1)
         s.connect(pulse2,sum,delay=1)
-        t1 = s.get_event_processors()
-        e1 = [ep for ep in t1 if isinstance(ep,PulseGenerator) and ep.name == n1]
-        t2 = s.get_event_processors()
-        e2 = [ep for ep in t2 if isinstance(ep,PulseGenerator) and ep.name == n2]
+        t1 = s.objects()
+        e1 = [ep for ep in t1.values() if isinstance(ep,PulseGenerator) and ep.name == n1]
+        t2 = s.objects()
+        e2 = [ep for ep in t2.values() if isinstance(ep,PulseGenerator) and ep.name == n2]
         assert e1.pop().name == n1, 'Object names do not match'
         assert e2.pop().name == n2, 'Object names do not match'
         

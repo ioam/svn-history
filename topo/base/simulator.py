@@ -109,6 +109,91 @@ def set_active_sim(sim):
 objects_to_notify_of_active_sim=[]
 
 
+class EventProcessor(TopoObject):
+    """
+    Base class for EventProcessors, i.e. objects that can accept and
+    handle events.  This base class handles the basic mechanics of
+    connections and sending events, and store both incoming and outgoing
+    connections. 
+    """
+    def __init__(self,**config):
+        super(EventProcessor,self).__init__(**config)
+
+        # The out_connection db is a dictionary indexed by output port.  Each 
+        # output port refers to a list of EPConnection objects with that 
+        # output port. This optimizes the lookup of the set of outgoing
+        # connections from the same port.
+        # The in_connection is just a general list. Subclass can use other
+        # data stuctures to optimize the operations specific to it
+        # by overriding _connect_from().
+        
+        self.in_connections = []
+        self.out_connections = {None:[]}
+
+        # The simulator link is not set until the call to add()
+        self.simulator = None
+        
+    def _connect_to(self,conn,**args):
+        """
+        Add a connection to dest/port with a delay (default=0).
+        Should only be called from Simulator.connect(). The extra
+        keyword arguments in **args contain arbitrary connection
+        parameters that can be interpreted by EP subclasses as
+        needed.  
+        """
+
+        if not conn.src_port in self.out_connections:
+            self.out_connections[conn.src_port] = []
+  
+        self.out_connections[conn.src_port].append(conn)
+
+
+    def _connect_from(self,conn,**args):
+        """
+        Add a connection from src/port with a delay (default=0).
+        Should only be called from Simulator.connect().  The extra
+        keyword arguments in **args contain arbitrary connection
+        parameters that can be interpreted by EP subclasses as
+        needed.  
+        """
+
+	if conn not in self.in_connections:
+            self.in_connections.append(conn)
+
+    def start(self):
+        """        
+        Called by the simulator when the EventProcessor is add()ed to the simlulator.
+
+        If an EventProcessor needs to have any code run when it is added to the simulator,
+        it should be in this method.
+        """
+        pass
+
+    def send_output(self,src_port=None,data=None):
+        """
+        Send some data out to all connections on the given src_port.
+        """
+        for conn in self.out_connections[src_port]:
+            self.simulator.enqueue_event_rel(conn.delay,self,conn.dest,conn.src_port,conn.dest_port,data)
+
+
+    def input_event(self,src,src_port,dest_port,data):
+        """
+        Called by the simulator to dispatch an event on the given port
+        from src.  (By default, does nothing.)
+        """
+        pass
+    
+    def pre_sleep(self):
+        """
+        Called by the simulator before sleeping.  Allows the event processor
+        to send any events that must be sent before time advances.
+        (By default, does nothing.)
+        """
+        pass
+    
+
+
 class EPConnection(TopoObject):
     """
     EPConnection stores basic information for a connection between
@@ -374,21 +459,11 @@ class Simulator(TopoObject):
         dest._connect_from(conn,**extra_args)
 
 
-    def get_event_processors(self):
-        """Return the list of event processors such as Sheets."""
-        return self._event_processors
-
-
     ### It might be possible to come up with a more expressive name
     ### for this function.  It should mean 'anything that exists in
     ### the simulator universe, i.e. all EventProcessors'.
     ###
-    ### JABALERT!
-    ###
-    ### It would be nice to have baseclass default to EventProcessor,
-    ### but that would be a forward reference.  If it can be done,
-    ### it may be possible to eliminate get_event_processors.
-    def objects(self,baseclass):
+    def objects(self,baseclass=EventProcessor):
         """
         Return a list of simulator objects having the specified base
         class.  All simulator objects have a base class of
@@ -397,89 +472,4 @@ class Simulator(TopoObject):
         """
         return dict([(i.name,i) for i in self._event_processors \
                      if isinstance(i,baseclass)])
-
-
-class EventProcessor(TopoObject):
-    """
-    Base class for EventProcessors, i.e. objects that can accept and
-    handle events.  This base class handles the basic mechanics of
-    connections and sending events, and store both incoming and outgoing
-    connections. 
-    """
-    def __init__(self,**config):
-        super(EventProcessor,self).__init__(**config)
-
-        # The out_connection db is a dictionary indexed by output port.  Each 
-        # output port refers to a list of EPConnection objects with that 
-        # output port. This optimizes the lookup of the set of outgoing
-        # connections from the same port.
-        # The in_connection is just a general list. Subclass can use other
-        # data stuctures to optimize the operations specific to it
-        # by overriding _connect_from().
-        
-        self.in_connections = []
-        self.out_connections = {None:[]}
-
-        # The simulator link is not set until the call to add()
-        self.simulator = None
-        
-    def _connect_to(self,conn,**args):
-        """
-        Add a connection to dest/port with a delay (default=0).
-        Should only be called from Simulator.connect(). The extra
-        keyword arguments in **args contain arbitrary connection
-        parameters that can be interpreted by EP subclasses as
-        needed.  
-        """
-
-        if not conn.src_port in self.out_connections:
-            self.out_connections[conn.src_port] = []
-  
-        self.out_connections[conn.src_port].append(conn)
-
-
-    def _connect_from(self,conn,**args):
-        """
-        Add a connection from src/port with a delay (default=0).
-        Should only be called from Simulator.connect().  The extra
-        keyword arguments in **args contain arbitrary connection
-        parameters that can be interpreted by EP subclasses as
-        needed.  
-        """
-
-	if conn not in self.in_connections:
-            self.in_connections.append(conn)
-
-    def start(self):
-        """        
-        Called by the simulator when the EventProcessor is add()ed to the simlulator.
-
-        If an EventProcessor needs to have any code run when it is added to the simulator,
-        it should be in this method.
-        """
-        pass
-
-    def send_output(self,src_port=None,data=None):
-        """
-        Send some data out to all connections on the given src_port.
-        """
-        for conn in self.out_connections[src_port]:
-            self.simulator.enqueue_event_rel(conn.delay,self,conn.dest,conn.src_port,conn.dest_port,data)
-
-
-    def input_event(self,src,src_port,dest_port,data):
-        """
-        Called by the simulator to dispatch an event on the given port
-        from src.  (By default, does nothing.)
-        """
-        pass
-    
-    def pre_sleep(self):
-        """
-        Called by the simulator before sleeping.  Allows the event processor
-        to send any events that must be sent before time advances.
-        (By default, does nothing.)
-        """
-        pass
-    
 
