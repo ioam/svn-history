@@ -10,6 +10,8 @@ $Id$
 __version__='$Revision$'
 
 import sys
+import copy
+
 
 from parameter import Parameter, Constant
 from utils import classlist,descendents
@@ -44,20 +46,19 @@ class TopoMetaclass(type):
     having a specific object available.  Perhaps they do something
     else that requires them to be in the metaclass, though?
 
-    The __init__ method is used when defining a TopoObject class for
-    the first time in this session.  That is, the __init__ below
+    The __init__ method is used when defining a TopoObject class,
+    usually when the module where that class is located is imported
+    for the first time.  That is, the __init__ in this metaclass
     initializes the *class* object, while the __init__ method defined
     in each TopoObject class is called for each new instance of that
     class.
     """   
     def __init__(self,name,bases,dict):
         """
-        Initialize the class object.
-        
-        This involves setting the class attributes. For any class attribute
-        that is a Parameter, make sure
-        it inherits from any class-attribute Parameter of this class'
-        superclasses that has the same name (see __param_inheritance()).
+        Initialize the class object (not an instance of the class, but the class itself).
+
+        Initializes all the Parameters by looking up appropriate
+        default values; see __param_inheritance().
         """
         type.__init__(self,name,bases,dict)
 
@@ -73,18 +74,18 @@ class TopoMetaclass(type):
 
     def __setattr__(self,attribute_name,value):
         """
-        Do 'self.attribute_name=value' but with some complications.
-        
-        If attribute_name already has a Parameter descriptor, and the
-        new value isn't a Parameter, assign that value to the
-        descriptor.
+        Implements 'self.attribute_name=value' in a way that also supports Parameters.
 
+        If there is already a descriptor named attribute_name, and
+        that descriptor is a Parameter, and the new value is *not* a
+        Parameter, then call that Parameter's __set__ method with the
+        specified value.
+        
         In all other cases set the attribute normally (i.e. overwrite
-        the descriptor), but if the new value is a Parameter make sure
-        it inherits from any class-attribute Parameter of this class'
-        superclasses that has the same name (see __param_inheritance()).
+        the descriptor).  If the new value is a Parameter, once it has
+        been set we make sure that the value is inherited from
+        TopoObject superclasses as described in __param_inheritance().
         """        
-        from copy import copy
 
         # Find out if there's a Parameter called attribute_name as a
         # class attribute of this class - if not, parameter is None.
@@ -92,7 +93,7 @@ class TopoMetaclass(type):
 
         if parameter and not isinstance(value,Parameter):
             if owning_class != self:
-                type.__setattr__(self,attribute_name,copy(parameter))
+                type.__setattr__(self,attribute_name,copy.copy(parameter))
             self.__dict__[attribute_name].__set__(None,value)
 
         else:    
@@ -108,35 +109,40 @@ class TopoMetaclass(type):
                 
     def __param_inheritance(self,param_name,param,bases):
         """
-        When a Parameter is defined in a TopoObject class, there are
-        two places from which it could make sense to inherit
-        attributes (i.e. slots in this case). The first is from the
-        super class(es) of the Parameter, as one would expect. For
-        example, a Number inherits its 'hidden' attribute from
-        Parameter if it's not defined when the Number is declared.
-        However, for a Parameter in a TopoObject class, the second
-        place to inherit from is a Parameter with the same name in the
-        TopoObject class' super class. This code achieves that by
-        going up this TopoObject class' class hierarchy until it finds
-        a Parameter with the same name whose slot value is not None.
+        Look for Parameter values in superclasses of this TopoObject.
+
+        Ordinarily, when a Python object is instantiated, attributes
+        not given values in the constructor will inherit the value
+        given in the object's class, or in its superclasses.  For
+        Parameters owned by TopoObjects, we have implemented an
+        additional level of default lookup, should this ordinary
+        lookup return only None.
+
+        In such a case, i.e. when no non-None value was found for a
+        Parameter by the usual inheritance mechanisms, we explicitly
+        look for Parameters with the same name in superclasses of this
+        TopoObject, and use the first such value that we find.
+
+        The goal is to be able to set the default value (or other
+        slots) of a Parameter within a TopoObject, just as we can set
+        values for non-Parameter objects in TopoObjects, and have the
+        values inherited through the TopoObject hierarchy as usual.
         """
         for slot in param.__slots__:
             base_classes = iter(bases)
 
-            # CEBHACKALERT: there's probably a better way than while
-            # and an iterator...
-            # getattr(param,slot) is param.slot: keep going up
-            # the hierarchy until param.slot!=None, or the top
-            # of the hierarchy is reached
+            # Search up the hierarchy until param.slot (which
+            # has to be obtained using getattr(param,slot))
+            # is not None, or we run out of classes to search.
+            #
+            # CEBALERT: there's probably a better way than while
+            # and an iterator, but it works.
             while getattr(param,slot)==None:
                 try:
                     param_base_class = base_classes.next()
                 except StopIteration:
                     break
 
-                # high enough up the hierarchy, classes will stop
-                # having the Parameter we're looking for,
-                # so new_param can be None - in which case we're not interested
                 new_param = param_base_class.__dict__.get(param_name)
                 if new_param != None:
                     new_value = getattr(new_param,slot)
@@ -146,10 +152,9 @@ class TopoMetaclass(type):
     def get_param_descriptor(self,param_name):
         """
         Goes up the class hierarchy (starting from the current class)
-        looking for a Parameter class attribute param_name. As soon as a
-        Parameter called param_name is found as a class attribute,
-        that Parameter is returned along with the class in which it is
-        declared.
+        looking for a Parameter class attribute param_name. As soon as
+        one is found as a class attribute, that Parameter is returned
+        along with the class in which it is declared.
         """
         classes = classlist(self)
         for c in classes[::-1]:
@@ -163,8 +168,6 @@ class TopoMetaclass(type):
             if isinstance(val,Parameter):
                 print self.__name__+'.'+key, '=', val.default
 
-
-import copy
 
 class TopoObject(object):
     """
