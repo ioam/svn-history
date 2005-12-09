@@ -120,7 +120,7 @@ class ParametersFrame(Frame):
                 except AttributeError:
                     # has no soft bounds
                     widget_dict[parameter_name] = self.__add_text_box(parameter_name,value)
-            elif isinstance(parameter, topo.base.parameter.EnumeratedParameter):
+            elif isinstance(parameter, topo.base.parameter.Enumeration):
                 itms = parameter.available
                 widget_dict[parameter_name] = self.__add_combo_box(
                     parameter_name,value,itms) 

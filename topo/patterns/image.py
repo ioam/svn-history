@@ -6,7 +6,7 @@ $Id$
 """
 
 # CEBHACKALERT: I have to go over this file. The main reason for the
-# last set of changes is to test having an EnumeratedParameter in the
+# last set of changes is to test having an Enumeration in the
 # GUI, not to get ImageGenerator correct.
 
 from topo.base.topoobject import TopoObject
@@ -14,7 +14,7 @@ from topo.base.sheet import bounds2shape
 from topo.outputfns.basic import DivisiveMaxNormalize
 from topo.base.patterngenerator import PatternGenerator
 from topo.patterns.basic import W_PREC, H_PREC
-from topo.base.parameter import Filename, Number, Parameter, EnumeratedParameter
+from topo.base.parameter import Filename, Number, Parameter, Enumeration
 from Numeric import array, transpose, ones, floor, Float, divide, where
 import Image, ImageOps
 
@@ -191,7 +191,7 @@ class ImageGenerator(PatternGenerator):
     height  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=H_PREC)
     filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9)
 
-    size_normalization = EnumeratedParameter(default='fit_shortest', available=['fit_shortest','fit_longest','stretch_to_fit','original'])
+    size_normalization = Enumeration(default='fit_shortest', available=['fit_shortest','fit_longest','stretch_to_fit','original'])
     
     
     def function(self,**params):
