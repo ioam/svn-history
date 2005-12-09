@@ -123,6 +123,11 @@ def sheet2matrix(x,y,bounds,density):
     col = (x-left) * xdensity
     row = (top-y)  * ydensity
     return row, col
+    ### JCALERT! If this just below the limit, it will be wrongly rounded afterwards....
+    ### The following call is an hack that solve the problem (for plotting purpose,
+    ### but it has to be made better, i.e. round())
+    #return row+0.1, col+0.1
+
 
 def sheet2matrixidx(x,y,bounds,density):
     """
@@ -154,6 +159,7 @@ def matrix2sheet(float_row,float_col,bounds,density):
     xstep = float((right-left)) / int(density*(right-left))
     ystep = float((top-bottom)) / int(density*(top-bottom))
     x = float_col*xstep + left
+    #y = bottom + float_row*ystep
     y = top - float_row*ystep
     return x, y
 
@@ -190,10 +196,10 @@ def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density):
     sheet_matrix.  The submatrix is just a view into the sheet_matrix;
     it's not an independent copy.
     """
-    r1,r2,c1,c2 = input_slice(bounds,sheet_bounds,sheet_density)
+    r1,r2,c1,c2 = bounds_to_slice(bounds,sheet_bounds,sheet_density)
     return sheet_matrix[r1:r2,c1:c2]
 
-def input_slice(slice_bounds, input_bounds, input_density):
+def bounds_to_slice(slice_bounds, input_bounds, input_density):
     """
     Gets the parameters for slicing an activity matrix given the
     slice bounds, activity bounds, and density of the activity
@@ -222,6 +228,32 @@ def input_slice(slice_bounds, input_bounds, input_density):
 
     return rstart,rbound,cstart,cbound
 
+ ### JCALERT! For the moment, bounds to slice is only used by submatrix, that is only used in 
+ ### plot to get the submatrix corresponding  weights bounds
+ ### the code below, associated with the correstion notified in sheet2matrix, makes it work to 
+ ### re-transform the bounds to the original slice of the weight
+ ### the original version (above) does not. I think that for eliminating the problem of different
+ ### weight size, it is good to use cc-rows/2,.... but here what we want is a reliable transformation
+ ### function from slice to bounds and bounds to slice (by the way write slice_to_bounds here and call
+ ### it from connectionfield.)
+
+   #  left,bottom,right,top = slice_bounds.aarect().lbrt()
+#     toprow,leftcol = sheet2matrixidx(left,top,input_bounds,input_density)
+#     botrow, rightcol =sheet2matrixidx(right,bottom,input_bounds,input_density)
+   
+#     maxrow,maxcol = sheet2matrixidx(input_bounds.aarect().right(),input_bounds.aarect().bottom(),input_bounds,input_density)
+
+#     maxrow = maxrow - 1
+#     maxcol = maxcol - 1
+#     rstart = max(0,toprow)
+#     rbound = min(maxrow+1,botrow)
+#     cstart = max(0,leftcol)
+#     cbound = min(maxcol+1,rightcol)
+
+#     return rstart,rbound,cstart,cbound
+
+####
+ 
 
 
 def input_slice(slice_bounds, input_bounds, input_density, x, y):
