@@ -289,13 +289,22 @@ def bounds2shape(bounds,density):
     """
     Gives the matrix shape in rows and columns specified by the given
     bounds and density.  Returns (rows,columns).
+    Always return at least shape=(1,1).
     """
-    left,bottom,right,top = bounds.aarect().lbrt()
-    width = right-left
-    height = top-bottom
-    rows = int(height*density)
-    cols = int(width*density)
 
+    ### JCALERT! New version of bounds2shape. It has to be checked that we
+    ### really want to use sheet2matrixidx().
+    ### The other solution would be to use sheet2matrix(),makes the difference, and
+    ### apply int directly on the difference.Nevertheless, I think this way is the more
+    ### consistent with what we do for the inverse situation
+
+    left,bottom,right,top = bounds.aarect().lbrt()
+    toprow,leftcol = sheet2matrixidx(left,top,bounds,density)
+    botrow, rightcol = sheet2matrixidx(right,bottom,bounds,density)
+
+    rows = botrow - toprow
+    cols = rightcol - leftcol
+        
     if rows == 0: rows = 1
     if cols == 0: cols = 1
     return rows,cols
