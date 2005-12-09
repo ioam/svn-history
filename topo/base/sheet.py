@@ -150,7 +150,7 @@ def matrix2sheet(float_row,float_col,bounds,density):
     """
     Inverse of sheet2matrix.
     
-    Convert a point (mx,my) in matrix coordinates to its
+    Convert a point (float_row,float_col) in matrix coordinates to its
     corresponding point (x,y) in sheet coordinates given bounds and
     density.
     """
@@ -210,13 +210,13 @@ def bounds_to_slice(slice_bounds, input_bounds, input_density):
 
     left,bottom,right,top = slice_bounds.aarect().lbrt()
     rows,cols = bounds2shape(slice_bounds,input_density)
-    toprow,leftcol = sheet2matrixidx(left,top,input_bounds,input_density)
 
     cr,cc = sheet2matrixidx((left+right)/2,(top+bottom)/2,input_bounds,input_density)
     toprow = cr - rows/2
     leftcol = cc - cols/2
 
-    maxrow,maxcol = sheet2matrixidx(input_bounds.aarect().right(),input_bounds.aarect().bottom(),input_bounds,input_density)
+    maxrow,maxcol = sheet2matrixidx(input_bounds.aarect().right(),input_bounds.aarect().bottom(),
+                                    input_bounds,input_density)
 
     maxrow = maxrow - 1
     maxcol = maxcol - 1
