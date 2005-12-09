@@ -32,7 +32,7 @@ from sheetview import UnitView
 from itertools import chain
 from patterngenerator import ConstantGenerator
 from boundingregion import BoundingBox
-
+import topo.misc.inlinec as inlinec
 
 
 ### JEFF's IMPLEMENTATION NOTES
@@ -271,7 +271,13 @@ class CFProjection(Projection):
     and stores it in the activity array.
     """
 
-    response_fn = Parameter(default=GenericCFResponseFn())
+    if inlinec.optimized:
+        from topo.responsefns.basic import CFDotProduct
+        response_fn = Parameter(default=CFDotProduct())
+    else:
+        response_fn = Parameter(default=GenericCFResponseFn())
+        self.verbose('CFProjection using non-optimized GenericCFResponseFn()')
+
     cf_type = Parameter(default=ConnectionField)
     weight_type = Parameter(default=Numeric.Float32)
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
