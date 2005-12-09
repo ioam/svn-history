@@ -144,7 +144,7 @@ class Parameter(object):
         self.precedence = precedence
         Parameter.count += 1
         self.default = default
-        self.__doc__ = doc
+        self.doc = doc
 
     def __get__(self,obj,objtype):
         """
@@ -202,19 +202,33 @@ class Parameter(object):
                     break
         return self._name
 
-    # CEBHACKALERT: how does the doc slot work with __doc__ attribute,
-    # really? See the corresponding HACKALERT in TopoMetaclass.
+    # When a Parameter is owned by a TopoObject, we want the
+    # documentation for that object to print the doc slot for this
+    # parameter, not the __doc__ value for the Parameter class or
+    # subclass.  For instance, if we have a TopoObject class X with
+    # parameters y(doc="All about y") and z(doc="More about z"),
+    # help(X) should include "All about y" in the section describing
+    # y, and "More about z" in the section about z.
+    #
+    # We currently achieve this by making __doc__ return the value of
+    # self.doc, using the code below.
+    #
+    # NOTE: This code must also be copied to any subclass of
+    # Parameter, or else the documentation for y and z above will
+    # be the documentation for their Parameter class, not those
+    # specific parameters.
+    #
+    # JABHACKALERT: Unfortunately, this trick makes the documentation
+    # for Parameter and its subclasses invisible, so that e.g.
+    # help(Parameter) and help(Number) do not include the usual
+    # docstring defined in those classes.  We could save a copy of
+    # that docstring in a class attribute, and it *may* be possible
+    # somehow to return that for help(Parameter), without breaking the
+    # current support for help(X) (where X is a TopoObject and help(X)
+    # describes X's specific Parameters).  Seems difficult, though.
+    __doc__ = property((lambda self: self.doc))
     
-    # Make __doc__ work as it usually does for other objects, even
-    # though there is no dictionary for this type of object.  The
-    # actual value of __doc__ is stored in the doc slot, which
-    # can be overridden by subclasses or instances.
-    def _set_doc(self,doc):
-        self.doc=doc
-    def _get_doc(self):
-        return self.doc
-    __doc__ = property(_get_doc,_set_doc)
-
+        
     
 # CEBHACKALERT: at the moment, the path must be relative to Topographica's path.
 from os.path import normpath
@@ -230,6 +244,8 @@ class Filename(Parameter):
     system's format, but only code that uses UNIX-style paths will run on all operating
     systems.
     """
+    __doc__ = property((lambda self: self.doc))
+    
     def __init__(self,default='',**params):
         Parameter.__init__(self,normpath(default),**params)
 
@@ -246,6 +262,8 @@ class Enumeration(Parameter):
 
     An Enumeration's value is always one from its list of available values.
     """
+    __doc__ = property((lambda self: self.doc))
+
     def __init__(self, default=None, available=[], **params):
         """
         Creates an Enumeration, checking that 'default' is in 'available'.
@@ -302,6 +320,8 @@ class Number(Parameter):
     Example of creating a Number:
     AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
     """
+    __doc__ = property((lambda self: self.doc))
+ 
     def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),**params):
         Parameter.__init__(self,default=default,**params)
         self.bounds = bounds
@@ -397,6 +417,8 @@ class Number(Parameter):
 
 
 class Integer(Number):
+    __doc__ = property((lambda self: self.doc))
+
     def __set__(self,obj,val):
         if not isinstance(val,int):
             raise "Parameter must be an integer."
@@ -404,11 +426,15 @@ class Integer(Number):
 
 
 class Magnitude(Number):
+    __doc__ = property((lambda self: self.doc))
+
     def __init__(self,default=1.0,softbounds=(None,None),**params):
         Number.__init__(self,default=default,bounds=(0.0,1.0),softbounds=softbounds,**params)
 
 
 class BooleanParameter(Parameter):
+    __doc__ = property((lambda self: self.doc))
+
     def __init__(self,default=False,bounds=(0,1),**params):
         Parameter.__init__(self,default=default,**params)
         self.bounds = bounds
@@ -424,8 +450,8 @@ class BooleanParameter(Parameter):
 
 
 
-### Should this multiply inherit from Dynamic and Number?
-### (Currently mixed together by hand)
+# This could multiply inherit from Dynamic and Number, but it's
+# currently mixed together by hand for simplicity.
 class DynamicNumber(Number):
     """
     Dynamic version of Number parameter.
@@ -433,6 +459,8 @@ class DynamicNumber(Number):
     If set with a callable object, the bounds are checked when the number is
     retrieved (generated), rather than when it is set.
     """
+    __doc__ = property((lambda self: self.doc))
+
     def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),**params):
         Parameter.__init__(self,default=default,**params)
         self.bounds = bounds
@@ -466,6 +494,8 @@ class DynamicNumber(Number):
 
 
 class Dynamic(Parameter):
+    __doc__ = property((lambda self: self.doc))
+    
     def __get__(self,obj,objtype):
         """
         Get a parameter value.  If called on the class, produce the
@@ -481,7 +511,8 @@ class Dynamic(Parameter):
 
 class Constant(Parameter):
     """Constant Parameter that can be constructed and used but not set."""
-
+    __doc__ = property((lambda self: self.doc))
+    
     def __set__(self,obj,val):
         """Does not allow set commands."""
         raise "Constant parameter cannot be modified"

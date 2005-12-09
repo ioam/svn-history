@@ -121,11 +121,6 @@ class TopoMetaclass(type):
         a Parameter with the same name whose slot value is not None.
         """
         for slot in param.__slots__:
-
-            # CEBHACKALERT: sort this out in Parameter
-            if slot=='doc':
-                slot='__doc__'
-
             base_classes = iter(bases)
 
             # CEBHACKALERT: there's probably a better way than while
