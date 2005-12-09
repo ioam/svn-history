@@ -85,11 +85,10 @@ class Parameter(object):
         in each instance to hold a value for each variable. Space is
         saved because __dict__ is not created for each instance.
 
-    # CEBHACKALERT: document that actual value is stored in the owning
-    object's __dict__, not the parameter object itself.
+    Note that the actual value of a Parameter is not stored in the
+    Parameter object itself, but in the owning object's __dict__.
 
-
-    Note: See this HOW-TO document for a good intro to descriptors in
+    See this HOW-TO document for a good intro to descriptors in
     Python:
         http://users.rcn.com/python/download/Descriptor.htm
 
@@ -103,15 +102,13 @@ class Parameter(object):
     documentation).
     """
 
-    # CEBHACKALERT: to get the benefit of slots, subclasses must
-    # themselves define __slots__. See the reference manual: The
-    # action of a __slots__ declaration is limited to the class where
-    # it is defined. As a result, subclasses will have a __dict__
-    # unless they also define __slots__.
-
-    # CEBHACKALERT: document what each slot is for!
-    # precedence:
-    # defines e.g. an order for display in a gui's list
+    # CEBHACKALERT: to get the benefit of slots, subcclasses must
+    # themselves define __slots__, whether or not they define attributes
+    # not present in the base Parameter class. 
+    # See the reference manual:
+    # The action of a __slots__ declaration is limited to the class
+    # where it is defined. As a result, subclasses will have a
+    # __dict__ unless they also define __slots__.
 
     __slots__ = ['_name','default','doc','hidden','precedence']
     count = 0
@@ -123,7 +120,24 @@ class Parameter(object):
         Set the name of the parameter to a gensym, and initialize
         the default value.
 
-        CEBHACKALERT: why slots default to None...
+        _name stores the Parameter's name. This is
+        created automatically by TopoObject, but can also be passed in
+        (see TopoObject).
+
+        default is the value of Parameter p that is returned if
+        TopoObject_class.p is requested, or if TopoObject_object.p is
+        requested but has not been set.
+
+        hidden is a flag that allows objects using Parameters to know
+        whether or not to display them to the user (e.g. in GUI menus).
+
+        precedence is a value, usually in the range 0.0 to 1.0, that
+        allows the order of Parameters in a class to be defined (again
+        for e.g. in GUI menus).
+
+        default, doc, and precedence default to None. This is to allow
+        inheritance of Parameter slots (attributes) from the owning-class'
+        class hierarchy (see TopoMetaclass).
         """
         self._name = None
         self.hidden=hidden
@@ -188,7 +202,9 @@ class Parameter(object):
                     break
         return self._name
 
-
+    # CEBHACKALERT: how does the doc slot work with __doc__ attribute,
+    # really? See the corresponding HACKALERT in TopoMetaclass.
+    
     # Make __doc__ work as it usually does for other objects, even
     # though there is no dictionary for this type of object.  The
     # actual value of __doc__ is stored in the doc slot, which
@@ -199,7 +215,7 @@ class Parameter(object):
         return self.doc
     __doc__ = property(_get_doc,_set_doc)
 
-
+    
 # CEBHACKALERT: at the moment, the path must be relative to Topographica's path.
 from os.path import normpath
 class Filename(Parameter):
@@ -223,32 +239,39 @@ class Filename(Parameter):
         """
         super(Filename,self).__set__(obj,normpath(val))
 
+        
+class Enumeration(Parameter):
+    """
+    Enumeration is a Parameter with a list of available values.
 
-# CEBHACKALERT: document! Sort out getting _name
-class EnumeratedParameter(Parameter):
+    An Enumeration's value is always one from its list of available values.
     """
-    """
-    def __init__(self, default='', available={}, **params):
-        # check it was a list you got
-        # and that default is in available
+    def __init__(self, default=None, available=[], **params):
+        """
+        Creates an Enumeration, checking that 'default' is in 'available'.
+        """
         Parameter.__init__(self,default=default,**params)
         if not type(available)==list:
-            raise ValueError("EnumeratedParameter must be created with a list of available types.")
+            raise ValueError("Enumeration must be created with a list of available values.")
         self.available = available
-        self.__check_value(default)
+        self.__check_value(default) 
         
     def __set__(self,obj,val):
         """
-        Set to the given value, raising an exception if not in available
+        Set to the given value, raising an exception if that value is
+        not in the list of available ones.
         """
         self.__check_value(val)
-        super(EnumeratedParameter,self).__set__(obj,val)
+        super(Enumeration,self).__set__(obj,val)
 
     def __check_value(self,val):
         """
+        Raises an error if the given value isn't in the list of available ones.
         """
+        # CEBHACKALERT: it would be good to print the Parameter's name
+        # here (see also Number and elsewhere in this file.
         if not self.available.count(val) >= 1:
-            raise ValueError("EnumeratedParamater '" + "CEBHACKALERT" + "' can't be set to '" + val + "' because that's not in the list of available values " + repr(self.available) + ".")
+            raise ValueError("EnumeratedParamater can't be set to '" + repr(val) + "' because that's not in the list of available values " + repr(self.available) + ".")
 
 
 
