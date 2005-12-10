@@ -139,7 +139,9 @@ def sheet2matrix(x,y,bounds,density):
     # corresponds to float_col=3.0.  float_col=3.0 is not inside the
     # matrix representing this Sheet, which has the three columns
     # (0,1,2). That is, x=-0.5 is inside the BoundingBox but x=0.5 is
-    # outside.
+    # outside. Similarly, y=0.5 is inside (at row 0) but y=-0.5 is
+    # outside (at row 3) (it's the other way round for y because the
+    # matrix row runs antiparallel to y).
 
 
 def sheet2matrixidx(x,y,bounds,density):
@@ -153,9 +155,9 @@ def sheet2matrixidx(x,y,bounds,density):
     this function, the returned matrix coordinate of the boundary will be right
     outside the matrix.
 
-    CEBHACKALERT: I think that coordinates on the left or bottom edge
-    of the Sheet's BoundingBox ARE inside the matrix that represents
-    the Sheet - coordinates on the top and bottom edge will be outside
+    CEBHACKALERT: I think that coordinates on the left or top edge
+    of the Sheet's BoundingBox are inside the matrix that represents
+    the Sheet - coordinates on the right or bottom edge will be outside
     (see my comment in matrix2sheet).
     """
 
