@@ -96,7 +96,7 @@ __version__ = '$Revision$'
 
 from simulator import EventProcessor
 from parameter import Parameter, BooleanParameter
-from Numeric import zeros,array
+from Numeric import zeros,array,floor
 from boundingregion import BoundingBox
 import sheetview 
 
@@ -146,34 +146,33 @@ def sheet2matrix(x,y,bounds,density):
 
 def sheet2matrixidx(x,y,bounds,density):
     """
-    Convert a point (x,y) in sheet coordinates to the row and column index
-    of the matrix cell in which that point falls given bounds and density.
-    Returns (row,column).  
+    Convert a point (x,y) in Sheet coordinates to the row and column
+    of the matrix that corresponds to the BoundingBox and density of the Sheet.
 
-    NOTE: This is NOT the strict mathematical inverse of matrixidx2sheet.
+    Works for scalar x and y as well as array x and y.
+    
+    NOTE: This is NOT the strict mathematical inverse of matrixidx2sheet because
+    that function returns the point (x,y) corresponding to the center of the
+    matrix cell.
+
     NOTE2: If the coordinates along the left or bottom boundary are passed into
     this function, the returned matrix coordinate of the boundary will be right
     outside the matrix.
 
-    CEBHACKALERT: I think that coordinates on the left or top edge
-    of the Sheet's BoundingBox are inside the matrix that represents
-    the Sheet - coordinates on the right or bottom edge will be outside
-    (see my comment in matrix2sheet).
+    CEBHACKALERT (referring to NOTE2): I think that coordinates on the
+    left or top edge of the Sheet's BoundingBox are inside the matrix
+    that represents the Sheet - coordinates on the right or bottom
+    edge will be outside (see my comment in matrix2sheet).
     """
-
     r,c = sheet2matrix(x,y,bounds,density)
-
-    # CEBHACKALERT: I think this is incorrect for r<0 or c<0.
-    # e.g. 
-    # 1 <= r < 2 is returned as 1
-    # 0 <= r < 1 is returned as 0
-    # but
-    # -1 < r < 0 is returned as 0
-    # when it ought to be returned as -1
-    # (i.e. it is outside the matrix)
-    
+    r = floor(r)
+    c = floor(c)
+    # CEBHACKALERT: this would work for arrays if it weren't necessary
+    # to return int values - could callers do that if they require it?
+    # (This function would return e.g. 12.0 instead of 12.) I guess the
+    # times ints are needed is when these values are used as indexes
+    # for Numeric arrays, which are required to be of type int.
     return int(r), int(c)
-
 
 def matrix2sheet(float_row,float_col,bounds,density):
     """
