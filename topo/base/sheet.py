@@ -149,8 +149,6 @@ def sheet2matrixidx(x,y,bounds,density):
     Convert a point (x,y) in Sheet coordinates to the row and column
     of the matrix that corresponds to the BoundingBox and density of the Sheet.
 
-    Works for scalar x and y as well as array x and y.
-    
     NOTE: This is NOT the strict mathematical inverse of matrixidx2sheet because
     that function returns the point (x,y) corresponding to the center of the
     matrix cell.
