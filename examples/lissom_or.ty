@@ -76,7 +76,8 @@ from fixedpoint import FixedPoint
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection
-from topo.responsefns.basic import CFDotProduct
+# inlinec.optimized should make this unnecessary.
+#from topo.responsefns.basic import CFDotProduct
 from topo.patterns.basic import GaussianGenerator, ConstantGenerator
 from topo.patterns.random import UniformRandomGenerator
 from topo.base.sheet import BoundingBox
@@ -154,7 +155,8 @@ CFProjection.weights_generator = UniformRandomGenerator()
 #CFProjection.weights_generator = ConstantGenerator()
 
 # Specify the response function
-CFProjection.response_fn=CFDotProduct()
+# inlinec.optimized should make this unnecessary.
+# CFProjection.response_fn=CFDotProduct()
 
 # Specify learning function
 CFProjection.learning_fn=DivisiveHebbian()

@@ -15,7 +15,6 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.patterngenerator import BoundingBox
 #from topo.projections.kernelprojection import KernelProjection
 from topo.base.connectionfield import CFProjection
-from topo.responsefns.basic import CFDotProduct
 from topo.base.parameter import DynamicNumber
 from topo.sheets.cfsom import CFSOM
 from topo.patterns.random import UniformRandomGenerator
@@ -50,7 +49,6 @@ CFSOM.output_fn = PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
 
 CFProjection.weights_generator = UniformRandomGenerator()
 CFProjection.weights_bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1)))
-CFProjection.response_fn = CFDotProduct()
 CFProjection.learning_fn = HebbianSOMLF()
 
 #topo.base.topoobject.min_print_level = topo.base.topoobject.MESSAGE

@@ -29,7 +29,6 @@ from topo.sheets.cfsom import CFSOM
 from topo.patterns.random import UniformRandomGenerator
 from topo.patterns.basic import GaussianGenerator
 from topo.base.simulator import Simulator
-from topo.responsefns.basic import CFDotProduct
 from topo.learningfns.basic import HebbianSOMLF
 
 
@@ -73,7 +72,6 @@ ObermayerSOM.alpha_f  = 0.02
 
 CFProjection.weights_generator = UniformRandomGenerator()
 CFProjection.weights_bounds = BoundingBox(points=((-1.0,-1.0),(1.0,1.0)))
-CFProjection.response_fn = CFDotProduct()
 CFProjection.learning_fn=HebbianSOMLF()
 # Weights should be initialized to sum to unity: (Will this work?)
 #CFProjection.learning_fn.output_fn=DivisiveL1Normalize()
