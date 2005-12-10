@@ -163,6 +163,15 @@ def sheet2matrixidx(x,y,bounds,density):
 
     r,c = sheet2matrix(x,y,bounds,density)
 
+    # CEBHACKALERT: I think this is incorrect for r<0 or c<0.
+    # e.g. 
+    # 1 <= r < 2 is returned as 1
+    # 0 <= r < 1 is returned as 0
+    # but
+    # -1 < r < 0 is returned as 0
+    # when it ought to be returned as -1
+    # (i.e. it is outside the matrix)
+    
     return int(r), int(c)
 
 
