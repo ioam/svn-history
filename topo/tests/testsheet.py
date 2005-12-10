@@ -13,11 +13,10 @@ import Numeric
 from topo.base import boundingregion
 from topo.base.sheetview import SheetView
 
-### JABHACKALERT! Needs to test matrix2sheet.
 # CEB: midx2s tests haven't been reviewed yet
 
 class TestCoordinateTransforms(unittest.TestCase):
-    """
+    """    
     """    
     def makeBox(self):
         self.box = boundingregion.BoundingBox(points=((self.left,self.bottom),
@@ -37,9 +36,12 @@ class TestCoordinateTransforms(unittest.TestCase):
         self.cbound = self.density*(self.right-self.left)
 
 
+
+    ### sheet2matrix() tests
+    #
     def test_sheet2matrix_center(self):
         """
-        Check that the center of the BoundingBox corresponds to the center
+        Check that the center of the Sheet corresponds to the center
         of the matrix.
         """
         x_center = self.left+(self.right-self.left)/2.0
@@ -47,13 +49,24 @@ class TestCoordinateTransforms(unittest.TestCase):
         row, col = sheet2matrix(x_center,y_center,self.box,self.density)
         self.assertEqual((row,col),(self.rbound/2.0,self.cbound/2.0))
 
+
     def test_sheet2matrix_left_top(self):
+        """
+        Check that the top-left of the Sheet is [0,0] in matrix
+        coordinates.
+        """
         row, col = sheet2matrix(self.left,self.top,self.box,self.density)
         self.assertEqual((row,col),(0,0))
 
+
     def test_sheet2matrix_right_bottom(self):
+        """
+        Check that the bottom-right of the Sheet is [rbound,cbound] in matrix
+        coordinates.
+        """
         row, col = sheet2matrix(self.right,self.bottom,self.box,self.density)
         self.assertEqual((row,col),(self.rbound,self.cbound))
+
         
     def test_s2m_m2s(self):
         """
@@ -69,6 +82,10 @@ class TestCoordinateTransforms(unittest.TestCase):
         x_left, y_bottom = matrix2sheet(row,col,self.box,self.density)
         self.assertEqual((x_left,y_bottom),(self.left,self.bottom)) 
 
+
+
+    ### sheet2matrixidx() tests
+    #    
     def test_s2midx_left_top(self):
         """
         Test a point just inside the top-left corner of the BoundingBox, and
@@ -133,7 +150,29 @@ class TestCoordinateTransforms(unittest.TestCase):
         self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
 
 
+    ### matrix2sheet() tests
+    # CEBHACKALERT: redundant with testing sheet2matrix & that matrix2sheet is the inverse
+    # of sheet2matrix?
+    def test_matrix2sheet_left_top(self):
+        """
+        Check that Sheet's (0,0) is the top-left of the matrix.
+        """
+        x,y = matrix2sheet(0,0,self.box,self.density)
+        self.assertEqual((x,y), (self.left,self.top))
+    
 
+    def test_matrix2sheet_right_bottom(self):
+        """
+        Check that Sheet's (right,bottom) is the bottom-right in
+        matrix coordinates i.e. [rbound,cbound]
+        """
+        x,y = matrix2sheet(self.rbound,self.cbound,self.box,self.density)
+        self.assertEqual((x,y), (self.right,self.bottom))
+
+
+
+    ### matrixidx2sheet() tests
+    #
     def test_midx2s_left_top(self):
         r,c = 0,0
         x,y = self.left+self.half_unit,self.top-self.half_unit
@@ -165,7 +204,15 @@ class TestCoordinateTransforms(unittest.TestCase):
         self.s.release_sheet_view('Activity')
         self.assertEqual(len(self.s.sheet_view_dict.keys()),0)
 
+
+        
+    ####
+    #
     def test_coordinate_position(self):
+        """
+        CEBHACKALERT: check these and document why they aren't
+        repeating earlier tests.
+        """
         l,b,r,t = (-0.8,-0.8,0.8,0.8)
         d = 16
         bounds = BoundingBox(points=((l,b),(r,t)))
@@ -201,7 +248,7 @@ class TestCoordinateTransforms(unittest.TestCase):
 class TestBox1Coordinates(TestCoordinateTransforms):
     """
     Test coordinate transformations using the standard, origin-centered unit box
-    with density 10.
+    with density 10.    
     """
     def setUp(self):
         self.left = -0.5
@@ -218,10 +265,11 @@ class TestBox1Coordinates(TestCoordinateTransforms):
         self.last_col = 9
 
 
+
 class TestBox2Coordinates(TestCoordinateTransforms):
     """
     Test coordinate transformations on the box defined by (1,1), (3,4),
-    with density 8.
+    with density 8.    
     """
     def setUp(self):
         self.left = 1
@@ -236,6 +284,7 @@ class TestBox2Coordinates(TestCoordinateTransforms):
         # safer than a calculation...
         self.last_row = 23
         self.last_col = 15
+
 
 
 cases = [TestBox1Coordinates,
