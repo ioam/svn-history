@@ -102,11 +102,13 @@ import sheetview
 
 def sheet2matrix(x,y,bounds,density):
     """
-    Convert a point (x,y) in sheet coordinates to matrix coordinates given 
-    the sheet's bounds and density.
+    Convert a point (x,y) in Sheet coordinates to continuous matrix coordinates given 
+    the Sheet's bounds and density.
 
-    When computing this transformation for an existing sheet foo, one
-    should use the Sheet method foo.sheet2matrix(x,y).
+    float_row corresponds to y, and float_col to x.
+
+    When computing this transformation for an existing Sheet foo, use the Sheet method
+    foo.sheet2matrix(x,y).
     """
 
     left,bottom,right,top = bounds.aarect().lbrt()
@@ -120,13 +122,24 @@ def sheet2matrix(x,y,bounds,density):
     # First translate to (left,top), which is [0,0] in the matrix, then scale to
     # the size of the matrix. y coodinate needs to flipped, because the points
     # are moving down in the sheet as the y-index increases in the matrix.
-    col = (x-left) * xdensity
-    row = (top-y)  * ydensity
-    return row, col
+    float_col = (x-left) * xdensity
+    float_row = (top-y)  * ydensity
+    return float_row, float_col
     ### JCALERT! If this just below the limit, it will be wrongly rounded afterwards....
     ### The following call is an hack that solve the problem (for plotting purpose,
     ### but it has to be made better, i.e. round())
     #return row+0.1, col+0.1
+    # CEB: I don't understand that comment - I think this function
+    # shouldn't be changed.  Can you explain what you meant further?
+
+    # I think it might be worth including something like this in the
+    # docstring (here or for Sheet):
+    # For a Sheet with BoundingBox(points=((-0.5,-0.5),(0.5,0.5))) and
+    # density=3, x=-0.5 corresponds to float_col=0.0 and x=0.5
+    # corresponds to float_col=3.0.  float_col=3.0 is not inside the
+    # matrix representing this Sheet, which has the three columns
+    # (0,1,2). That is, x=-0.5 is inside the BoundingBox but x=0.5 is
+    # outside.
 
 
 def sheet2matrixidx(x,y,bounds,density):
@@ -139,6 +152,11 @@ def sheet2matrixidx(x,y,bounds,density):
     NOTE2: If the coordinates along the left or bottom boundary are passed into
     this function, the returned matrix coordinate of the boundary will be right
     outside the matrix.
+
+    CEBHACKALERT: I think that coordinates on the left or bottom edge
+    of the Sheet's BoundingBox ARE inside the matrix that represents
+    the Sheet - coordinates on the top and bottom edge will be outside
+    (see my comment in matrix2sheet).
     """
 
     r,c = sheet2matrix(x,y,bounds,density)
