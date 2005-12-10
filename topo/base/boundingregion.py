@@ -6,10 +6,8 @@ $Id$
 
 __version__='$Revision$'
 
-### JABHACKALERT!
-###
-### The aarect information should probably be rewritten in matrix
-### notation, not list notation, so that it can be scaled,
+### JABALERT: The aarect information should probably be rewritten in
+### matrix notation, not list notation, so that it can be scaled,
 ### translated, etc. easily.
 ###
 from parameter import Parameter
@@ -151,20 +149,24 @@ class Unbounded(BoundingRegion):
         return AARectangle((-inf,-inf),(inf,inf))
 
 
-### JABHACKALERT!
-###
-### Where is the actual intersection calculated here? I can see how
-### the aarect() is calculated, but the contains() function appears to
-### be missing.  Presumably it needs to be implemented as a logical OR
-### of the contains() of all the regions.  Scale, rotate, and
-### translate should presumably work fine if applied to the individual
-### regions.
-class Intersection(BoundingRegion):
-    def __init__(self,*regions,**params):
-        super(Intersection,self).__init__(**params)
-        self.regions = regions
+### This class is valid only for BoundingBoxes, because it
+### only deals with the aarect(), ignoring arbitrarily shaped
+### BoundingRegions.  To be a real Intersection(BoundingRegion) class,
+### it would need to have a contains() function that computes a
+### logical AND of the contains() for each of the regions supplied.
+### Scale, rotate, and translate would also need to be applied to the
+### individual regions each time.
+class BoundingBoxIntersection(BoundingBox):
+    """A BoundingBox initialized as the intersection of the supplied list of BoundingBoxes."""
+    
+    def __init__(self,*boxes,**params):
+        """
+        Given a list of BoundingBoxes, computes a new BoundingBox that is
+        the intersection of all of the supplied boxes.
+        """
+        super(BoundingBoxIntersection,self).__init__(**params)
 
-        bounds = [r.aarect().lbrt() for r in self.regions]
+        bounds = [r.aarect().lbrt() for r in boxes]
         left = max([l for (l,b,r,t) in bounds])
         bottom = max([b for (l,b,r,t) in bounds])
         right = min([r for (l,b,r,t) in bounds])
@@ -174,6 +176,7 @@ class Intersection(BoundingRegion):
 
     def aarect(self):
         return self.__aarect
+
 
 # JABALERT: Should probably remove top, bottom, etc. accessor functions,
 # and use the slot itself instead.
