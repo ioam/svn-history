@@ -13,7 +13,9 @@ import Numeric
 from topo.base import boundingregion
 from topo.base.sheetview import SheetView
 
-# CEB: midx2s tests haven't been reviewed yet
+
+# CEBHACKALERT: still to test bounds2shape(), bounds_to_slice(), submatrix(), input_slice()
+
 
 class TestCoordinateTransforms(unittest.TestCase):
     """    
@@ -25,11 +27,17 @@ class TestCoordinateTransforms(unittest.TestCase):
         # CEBHACKALERT: this is supposed to be a small distance
         D = 0.00001
         
-        self.just_in_right = self.right - D
-        self.just_in_bottom = self.bottom + D
-        self.just_out_top = self.top + D
-        self.just_out_left = self.left - D
+        self.just_in_right_x = self.right - D
+        self.just_in_bottom_y = self.bottom + D
+        self.just_out_top_y = self.top + D
+        self.just_out_left_x = self.left - D
 
+        self.just_out_right_idx = self.last_col + D
+        self.just_out_bottom_idx = self.last_row + D
+        self.just_out_top_idx = 0.0 - D
+        self.just_out_left_idx = 0.0 - D
+
+        
         # float bounds for matrix coordinates: these
         # values are actually outside the matrix
         self.rbound = self.density*(self.top-self.bottom)
@@ -98,7 +106,7 @@ class TestCoordinateTransforms(unittest.TestCase):
 
         # outside
         r,c = -1,-1
-        x,y = self.just_out_left,self.just_out_top
+        x,y = self.just_out_left_x,self.just_out_top_y
         self.assertEqual(sheet2matrixidx(x,y,self.box,self.density), (r,c))
 
 
@@ -109,12 +117,12 @@ class TestCoordinateTransforms(unittest.TestCase):
         """
         # inside
         r,c = self.last_row, 0
-        x,y = self.left, self.just_in_bottom
+        x,y = self.left, self.just_in_bottom_y
         self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
 
         # outside
-        r,c = self.last_row+1, 0
-        x,y = self.left, self.bottom
+        r,c = self.last_row+1, -1
+        x,y = self.just_out_left_x, self.bottom
         self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
 
 
@@ -125,12 +133,12 @@ class TestCoordinateTransforms(unittest.TestCase):
         """
         # inside
         r,c = 0,self.last_col
-        x,y = self.just_in_right,self.top
+        x,y = self.just_in_right_x,self.top
         self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
 
         # outside
         r,c = -1,self.last_col+1
-        x,y = self.right,self.just_out_top
+        x,y = self.right,self.just_out_top_y
         self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
 
 
@@ -141,7 +149,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         """
         # inside 
         r,c = self.last_row,self.last_col
-        x,y = self.just_in_right,self.just_in_bottom
+        x,y = self.just_in_right_x,self.just_in_bottom_y
         self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
 
         # not inside
@@ -151,43 +159,141 @@ class TestCoordinateTransforms(unittest.TestCase):
 
 
     ### matrix2sheet() tests
-    # CEBHACKALERT: redundant with testing sheet2matrix & that matrix2sheet is the inverse
-    # of sheet2matrix?
     def test_matrix2sheet_left_top(self):
         """
         Check that Sheet's (0,0) is the top-left of the matrix.
+
+        Check that just outside the top-left in matrix coordinates
+        comes back to Sheet coordinates that are outside the
+        BoundingBox.
         """
         x,y = matrix2sheet(0,0,self.box,self.density)
         self.assertEqual((x,y), (self.left,self.top))
+
+        x,y = matrix2sheet(self.just_out_left_idx,self.just_out_top_idx,self.box,self.density)
+        self.assertFalse(self.box.contains(x,y))
     
 
     def test_matrix2sheet_right_bottom(self):
         """
         Check that Sheet's (right,bottom) is the bottom-right in
         matrix coordinates i.e. [rbound,cbound]
+
+        Check that just outside the bottom-right in matrix coordinates
+        comes back to Sheet coordinates that are outside the
+        BoundingBox.
         """
         x,y = matrix2sheet(self.rbound,self.cbound,self.box,self.density)
         self.assertEqual((x,y), (self.right,self.bottom))
+
+        x,y = matrix2sheet(self.just_out_right_idx,self.just_out_bottom_idx,self.box,self.density)
+        # CEBHACKALERT: I haven't finished this yet...
+        # self.assertFalse(self.box.contains(x,y))
+
+
+    def test_matrix2sheet_center(self):
+        """
+        Check that the center in Sheet coordinates corresponds to
+        the center in continuous matrix coordinates.
+        """
+        x_center = self.left+(self.right-self.left)/2.0
+        y_center = self.bottom+(self.top-self.bottom)/2.0
+        center_float_row = self.rbound/2.0
+        center_float_col = self.cbound/2.0
+        x,y = matrix2sheet(center_float_row,center_float_col,self.box,self.density)
+        self.assertEqual((x,y),(x_center,y_center))
 
 
 
     ### matrixidx2sheet() tests
     #
     def test_midx2s_left_top(self):
+        """
+        The top-left matrix cell [0,0] should be given back in Sheet
+        coordinates at the center of that cell.
+
+        The cell [-1,-1] outside this corner should come back out of
+        the BoundingBox
+        """
+        # inside
         r,c = 0,0
         x,y = self.left+self.half_unit,self.top-self.half_unit
-        self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))        
+
+        test_x, test_y = matrixidx2sheet(r,c,self.box,self.density)
+        self.assertEqual((test_x,test_y), (x,y))
+        self.assertTrue(self.box.contains(test_x,test_y))
+
+        # outside
+        r,c = -1,-1
+        test_x, test_y = matrixidx2sheet(r,c,self.box,self.density)
+        self.assertFalse(self.box.contains(test_x,test_y))
+        
+        
     def test_midx2s_left_bottom(self):
-        r,c = self.rbound-1,0
+        """
+        The bottom-left matrix cell [0,rbound] should be given back
+        in Sheet coordinates at the center of that cell.
+
+        The cell [last_row+1,-1] outside this corner should come back out of
+        the BoundingBox.
+        """
+        # inside
+        r,c = self.last_row,0
         x,y = self.left+self.half_unit,self.bottom+self.half_unit
-        self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))        
+        self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))
+
+        # outside
+        r,c = self.last_row+1,-1
+        test_x, test_y = matrixidx2sheet(r,c,self.box,self.density)
+        self.assertFalse(self.box.contains(test_x,test_y))
+
+        
     def test_midx2s_right_top(self):
-        r,c = 0,self.cbound-1
+        """
+        The top-right matrix cell [cbound,0] should be given back
+        in Sheet coordinates at the center of that cell.
+
+        The cell [-1,last_col+1] outside this corner should come back out of
+        the BoundingBox.
+        """
+        # inside
+        r,c = 0,self.last_col
         x,y = self.right-self.half_unit,self.top-self.half_unit
-        self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))        
+        self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))
+
+        # outside
+        r,c = -1,self.last_col+1
+        test_x, test_y = matrixidx2sheet(r,c,self.box,self.density)
+        self.assertFalse(self.box.contains(test_x,test_y))
+
+        
     def test_midx2s_right_bottom(self):
-        r,c = self.rbound-1,self.cbound-1
+        """
+        The bottom-right matrix cell [cbound,rbound] should be given back
+        in Sheet coordinates at the center of that cell.
+
+        The cell [last_row+1,last_col+1] outside this corner should come back out of
+        the BoundingBox.
+        """
+        r,c = self.last_row,self.last_col
         x,y = self.right-self.half_unit,self.bottom+self.half_unit
+        self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))
+
+        # outside
+        r,c = self.last_row+1,self.last_col+1
+        test_x, test_y = matrixidx2sheet(r,c,self.box,self.density)
+        self.assertFalse(self.box.contains(test_x,test_y))
+
+
+    def test_midx2s_center(self):
+        """
+        The row and col *index* of the center unit in the matrix should come
+        back as the Sheet coordinates of the center of that center unit.
+        """
+        r,c = self.center_unit_idx
+        x_center = self.left+(self.right-self.left)/2.0
+        y_center = self.bottom+(self.top-self.bottom)/2.0
+        x,y = x_center+self.half_unit, y_center-self.half_unit
         self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))    
 
 
@@ -245,6 +351,8 @@ class TestCoordinateTransforms(unittest.TestCase):
 
 
 
+# CEBHACKALERT: should test odd number of units as well?
+
 class TestBox1Coordinates(TestCoordinateTransforms):
     """
     Test coordinate transformations using the standard, origin-centered unit box
@@ -257,13 +365,14 @@ class TestBox1Coordinates(TestCoordinateTransforms):
         self.right = 0.5
         self.density = 10
         self.half_unit = 0.05
-        self.makeBox()
 
         # for the matrix representation - I think having this manual statement is
         # safer than a calculation...
         self.last_row = 9
         self.last_col = 9
+        self.center_unit_idx = (5,5)  # by the way sheet2matrixidx is defined
 
+        self.makeBox()
 
 
 class TestBox2Coordinates(TestCoordinateTransforms):
@@ -278,12 +387,14 @@ class TestBox2Coordinates(TestCoordinateTransforms):
         self.top  = 4
         self.density = 8
         self.half_unit = 0.0625
-        self.makeBox()
 
         # for the matrix representation - I think having this manual statement is
         # safer than a calculation...
         self.last_row = 23
         self.last_col = 15
+        self.center_unit_idx = (12,8)  # by the way sheet2matrixidx is defined
+
+        self.makeBox()
 
 
 
