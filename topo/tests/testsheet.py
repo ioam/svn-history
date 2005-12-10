@@ -13,47 +13,145 @@ import Numeric
 from topo.base import boundingregion
 from topo.base.sheetview import SheetView
 
-### JABHACKALERT! Needs to test matrix2sheet and sheet2matrix.
+### JABHACKALERT! Needs to test matrix2sheet.
+# CEB: midx2s tests haven't been reviewed yet
 
 class TestCoordinateTransforms(unittest.TestCase):
+    """
+    """    
     def makeBox(self):
         self.box = boundingregion.BoundingBox(points=((self.left,self.bottom),
                                                       (self.right,self.top)))
-        self.rbound = int(self.density*(self.top-self.bottom))
-        self.cbound = int(self.density*(self.right-self.left))
-    def test_s2m_left_top(self):
+
+        # CEBHACKALERT: this is supposed to be a small distance
+        D = 0.00001
+        
+        self.just_in_right = self.right - D
+        self.just_in_bottom = self.bottom + D
+        self.just_out_top = self.top + D
+        self.just_out_left = self.left - D
+
+        # float bounds for matrix coordinates: these
+        # values are actually outside the matrix
+        self.rbound = self.density*(self.top-self.bottom)
+        self.cbound = self.density*(self.right-self.left)
+
+
+    def test_sheet2matrix_center(self):
+        """
+        Check that the center of the BoundingBox corresponds to the center
+        of the matrix.
+        """
+        x_center = self.left+(self.right-self.left)/2.0
+        y_center = self.bottom+(self.top-self.bottom)/2.0
+        row, col = sheet2matrix(x_center,y_center,self.box,self.density)
+        self.assertEqual((row,col),(self.rbound/2.0,self.cbound/2.0))
+
+    def test_sheet2matrix_left_top(self):
+        row, col = sheet2matrix(self.left,self.top,self.box,self.density)
+        self.assertEqual((row,col),(0,0))
+
+    def test_sheet2matrix_right_bottom(self):
+        row, col = sheet2matrix(self.right,self.bottom,self.box,self.density)
+        self.assertEqual((row,col),(self.rbound,self.cbound))
+        
+    def test_s2m_m2s(self):
+        """
+        Check that sheet2matrix() is the inverse of matrix2sheet().
+        """
+        # top-right corner
+        row, col = sheet2matrix(self.right,self.top,self.box,self.density)
+        x_right, y_top = matrix2sheet(row,col,self.box,self.density)
+        self.assertEqual((x_right,y_top),(self.right,self.top)) 
+
+        # bottom-left corner
+        row, col = sheet2matrix(self.left,self.bottom,self.box,self.density)
+        x_left, y_bottom = matrix2sheet(row,col,self.box,self.density)
+        self.assertEqual((x_left,y_bottom),(self.left,self.bottom)) 
+
+    def test_s2midx_left_top(self):
+        """
+        Test a point just inside the top-left corner of the BoundingBox, and
+        one just outside.
+        """
+        # inside
         r,c = 0,0
         x,y = self.left,self.top
         self.assertEqual(sheet2matrixidx(x,y,self.box,self.density), (r,c))
-    def test_s2m_left_bottom(self):
-        r,c = self.rbound, 0
+
+        # outside
+        r,c = -1,-1
+        x,y = self.just_out_left,self.just_out_top
+        self.assertEqual(sheet2matrixidx(x,y,self.box,self.density), (r,c))
+
+
+    def test_s2midx_left_bottom(self):
+        """
+        Test a point just inside the left-bottom corner of the BoundingBox, and
+        one just outside.
+        """
+        # inside
+        r,c = self.last_row, 0
+        x,y = self.left, self.just_in_bottom
+        self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
+
+        # outside
+        r,c = self.last_row+1, 0
         x,y = self.left, self.bottom
         self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
-    def test_s2m_right_top(self):
-        r,c = 0,self.cbound
-        x,y = self.right,self.top
+
+
+    def test_s2midx_right_top(self):
+        """
+        Test a point just inside the top-right corner of the BoundingBox, and
+        one just outside.
+        """
+        # inside
+        r,c = 0,self.last_col
+        x,y = self.just_in_right,self.top
         self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
-    def test_s2m_right_bottom(self):
-        r,c = self.rbound,self.cbound
+
+        # outside
+        r,c = -1,self.last_col+1
+        x,y = self.right,self.just_out_top
+        self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
+
+
+    def test_s2midx_right_bottom(self):
+        """
+        Test a point just inside the bottom-right corner of the BoundingBox,
+        and the corner itself - which should not be inside.
+        """
+        # inside 
+        r,c = self.last_row,self.last_col
+        x,y = self.just_in_right,self.just_in_bottom
+        self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
+
+        # not inside
+        r,c = self.last_row+1,self.last_col+1
         x,y = self.right,self.bottom
         self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
 
-    def test_m2s_left_top(self):
+
+
+    def test_midx2s_left_top(self):
         r,c = 0,0
         x,y = self.left+self.half_unit,self.top-self.half_unit
         self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))        
-    def test_m2s_left_bottom(self):
+    def test_midx2s_left_bottom(self):
         r,c = self.rbound-1,0
         x,y = self.left+self.half_unit,self.bottom+self.half_unit
         self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))        
-    def test_m2s_right_top(self):
+    def test_midx2s_right_top(self):
         r,c = 0,self.cbound-1
         x,y = self.right-self.half_unit,self.top-self.half_unit
         self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))        
-    def test_m2s_right_bottom(self):
+    def test_midx2s_right_bottom(self):
         r,c = self.rbound-1,self.cbound-1
         x,y = self.right-self.half_unit,self.bottom+self.half_unit
         self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))    
+
+
 
     def test_sheetview_release(self):
         self.s = Sheet()
@@ -100,7 +198,6 @@ class TestCoordinateTransforms(unittest.TestCase):
 
 
 
-
 class TestBox1Coordinates(TestCoordinateTransforms):
     """
     Test coordinate transformations using the standard, origin-centered unit box
@@ -114,6 +211,12 @@ class TestBox1Coordinates(TestCoordinateTransforms):
         self.density = 10
         self.half_unit = 0.05
         self.makeBox()
+
+        # for the matrix representation - I think having this manual statement is
+        # safer than a calculation...
+        self.last_row = 9
+        self.last_col = 9
+
 
 class TestBox2Coordinates(TestCoordinateTransforms):
     """
@@ -129,8 +232,15 @@ class TestBox2Coordinates(TestCoordinateTransforms):
         self.half_unit = 0.0625
         self.makeBox()
 
+        # for the matrix representation - I think having this manual statement is
+        # safer than a calculation...
+        self.last_row = 23
+        self.last_col = 15
+
+
 cases = [TestBox1Coordinates,
          TestBox2Coordinates]
+
 
 suite = unittest.TestSuite()
 suite.addTests([unittest.makeSuite(case) for case in cases])
