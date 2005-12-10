@@ -271,12 +271,12 @@ class CFProjection(Projection):
     and stores it in the activity array.
     """
 
+    from topo.responsefns.basic import CFDotProduct, CFDotProduct_Py
     if inlinec.optimized:
-        from topo.responsefns.basic import CFDotProduct
         response_fn = Parameter(default=CFDotProduct())
     else:
-        response_fn = Parameter(default=GenericCFResponseFn())
-        self.verbose('CFProjection using non-optimized GenericCFResponseFn()')
+        response_fn = Parameter(default=CFDotProduct_Py)
+        self.verbose('CFProjection using non-optimized CFDotProduct_Py()')
 
     cf_type = Parameter(default=ConnectionField)
     weight_type = Parameter(default=Numeric.Float32)
