@@ -10,10 +10,6 @@ $Id$
 """
 __version__='$Revision$'
 
-### JABHACKALERT!
-###
-### Should be rewritten to avoid 'import *'.
-###
 from topo.base.parameter import Parameter
 from topo.base.simulator import EventProcessor
 

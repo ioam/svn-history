@@ -82,7 +82,7 @@ from topo.patterns.basic import GaussianGenerator, ConstantGenerator
 from topo.patterns.random import UniformRandomGenerator
 from topo.base.sheet import BoundingBox
 from topo.base.parameter import DynamicNumber
-from topo.learningfns.basic import DivisiveHebbian
+from topo.learningfns.optimized import DivisiveHebbian
 
 
 ###########################################
