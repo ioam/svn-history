@@ -234,24 +234,24 @@ def bounds_to_slice(slice_bounds, input_bounds, input_density):
     that an activity matrix M can be sliced using M[a:b,c:d].
     """
 
-    left,bottom,right,top = slice_bounds.aarect().lbrt()
-    rows,cols = bounds2shape(slice_bounds,input_density)
+   #  left,bottom,right,top = slice_bounds.aarect().lbrt()
+#     rows,cols = bounds2shape(slice_bounds,input_density)
 
-    cr,cc = sheet2matrixidx((left+right)/2,(top+bottom)/2,input_bounds,input_density)
-    toprow = cr - rows/2
-    leftcol = cc - cols/2
+#     cr,cc = sheet2matrixidx((left+right)/2,(top+bottom)/2,input_bounds,input_density)
+#     toprow = cr - rows/2
+#     leftcol = cc - cols/2
 
-    maxrow,maxcol = sheet2matrixidx(input_bounds.aarect().right(),input_bounds.aarect().bottom(),
-                                    input_bounds,input_density)
+#     maxrow,maxcol = sheet2matrixidx(input_bounds.aarect().right(),input_bounds.aarect().bottom(),
+#                                     input_bounds,input_density)
 
-    maxrow = maxrow - 1
-    maxcol = maxcol - 1
-    rstart = max(0,toprow)
-    rbound = min(maxrow+1,cr+rows/2+1)
-    cstart = max(0,leftcol)
-    cbound = min(maxcol+1,cc+cols/2+1)
+#     maxrow = maxrow - 1
+#     maxcol = maxcol - 1
+#     rstart = max(0,toprow)
+#     rbound = min(maxrow+1,cr+rows/2+1)
+#     cstart = max(0,leftcol)
+#     cbound = min(maxcol+1,cc+cols/2+1)
 
-    return rstart,rbound,cstart,cbound
+#     return rstart,rbound,cstart,cbound
 
  ### JCALERT! For the moment, bounds to slice is only used by submatrix, that is only used in 
  ### plot to get the submatrix corresponding  weights bounds
@@ -262,20 +262,20 @@ def bounds_to_slice(slice_bounds, input_bounds, input_density):
  ### function from slice to bounds and bounds to slice (by the way write slice_to_bounds here and call
  ### it from connectionfield.)
 
-   #  left,bottom,right,top = slice_bounds.aarect().lbrt()
-#     toprow,leftcol = sheet2matrixidx(left,top,input_bounds,input_density)
-#     botrow, rightcol =sheet2matrixidx(right,bottom,input_bounds,input_density)
+    left,bottom,right,top = slice_bounds.aarect().lbrt()
+    toprow,leftcol = sheet2matrixidx(left,top,input_bounds,input_density)
+    botrow, rightcol =sheet2matrixidx(right,bottom,input_bounds,input_density)
    
-#     maxrow,maxcol = sheet2matrixidx(input_bounds.aarect().right(),input_bounds.aarect().bottom(),input_bounds,input_density)
+    maxrow,maxcol = sheet2matrixidx(input_bounds.aarect().right(),input_bounds.aarect().bottom(),input_bounds,input_density)
 
-#     maxrow = maxrow - 1
-#     maxcol = maxcol - 1
-#     rstart = max(0,toprow)
-#     rbound = min(maxrow+1,botrow)
-#     cstart = max(0,leftcol)
-#     cbound = min(maxcol+1,rightcol)
+    maxrow = maxrow - 1
+    maxcol = maxcol - 1
+    rstart = max(0,toprow+1)
+    rbound = min(maxrow+1,botrow)
+    cstart = max(0,leftcol+1)
+    cbound = min(maxcol+1,rightcol)
 
-#     return rstart,rbound,cstart,cbound
+    return rstart,rbound,cstart,cbound
 
 ####
  
@@ -323,16 +323,17 @@ def bounds2shape(bounds,density):
 
     ### JCALERT! New version of bounds2shape. It has to be checked that we
     ### really want to use sheet2matrixidx().
-    ### The other solution would be to use sheet2matrix(),makes the difference, and
-    ### apply int directly on the difference.Nevertheless, I think this way is the more
-    ### consistent with what we do for the inverse situation
+    ### The other solution would be to use sheet2matrixidx(), and directly make the difference
+    ### Nevertheless, I think both methods are equivalent for implementing bounds2shape
+    ### Furthermore, using one or the other does not lead to inconsistencies in the way we switch
+    ### from slice to bound and bound to slice.
 
     left,bottom,right,top = bounds.aarect().lbrt()
-    toprow,leftcol = sheet2matrixidx(left,top,bounds,density)
-    botrow, rightcol = sheet2matrixidx(right,bottom,bounds,density)
+    toprow,leftcol = sheet2matrix(left,top,bounds,density)
+    botrow, rightcol = sheet2matrix(right,bottom,bounds,density)
 
-    rows = botrow - toprow
-    cols = rightcol - leftcol
+    rows = int(botrow - toprow)
+    cols = int(rightcol - leftcol)
 
     # Enforce minimum size
     if rows == 0: rows = 1
