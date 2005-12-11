@@ -25,7 +25,7 @@ import bitmap
 import topo
 import MLab
 from itertools import chain
-from Numeric import transpose, array
+from Numeric import transpose, array, ravel
 
 
 
@@ -137,6 +137,8 @@ class PlotGroup(TopoObject):
     ### Ask Jim about that.
 
     def create_plots(self):
+        """This function need to be re-implemented in the subclass."""
+        
 	raise NotImplementedError
     
 
@@ -171,7 +173,7 @@ class PlotGroup(TopoObject):
         self.bitmaps = []
         for each in self.plots():
             (r,g,b) = each.matrices
-
+            
             # CEBHACKALERT:
             # when scale is 0, r is an array of zeros but g and b are None
             if g==None or b==None:
@@ -184,14 +186,14 @@ class PlotGroup(TopoObject):
                 #
                 # Should report that cropping took place.
                 #
-                if max(r.flat) > 0: r = MLab.clip(r,0.0,1.0)
-                if max(g.flat) > 0: g = MLab.clip(g,0.0,1.0)
-                if max(b.flat) > 0: b = MLab.clip(b,0.0,1.0)
+                if max(ravel(r)) > 0: r = MLab.clip(r,0.0,1.0)
+                if max(ravel(g)) > 0: g = MLab.clip(g,0.0,1.0)
+                if max(ravel(b)) > 0: b = MLab.clip(b,0.0,1.0)
 
                 # Indirect test for NaN.  (Since NaN == NaN is False)
-                if not (max(r.flat) <= 1 and max(g.flat) <= 1 and max(b.flat) <= 1):
+                if not (max(ravel(r)) <= 1 and max(ravel(g)) <= 1 and max(ravel(b)) <= 1):
                     self.warning('%s plot contains (%f %f %f)'
-                                 % (each.view_info, max(r.flat), max(g.flat), max(b.flat)))
+                                 % (each.view_info, max(ravel(r)), max(ravel(g)), max(ravel(b))))
 
                 win = bitmap.RGBMap(r, g, b)
                 win.view_info = each.view_info
@@ -291,7 +293,7 @@ class BasicPlotGroup(PlotGroup):
         confidence = pt.channels.get('Confidence',None)
         n = pt.channels.get('Normalize',False)
 	plot_name = '\n'+pt_name
-        p = Plot((strength,hue,confidence),sheet.sheet_view_dict,n,name=plot_name)
+        p = Plot((strength,hue,confidence),sheet.sheet_view_dict,sheet.density,sheet.bounds,n,name=plot_name)
 	return [p]
 
 	
@@ -335,13 +337,9 @@ class UnitWeightsPlotGroup(PlotGroup):
 		### weight belongs to the src_sheet, and the name in the key
                 ### is the destination sheet.
                 key = ('Weights',sheet.name,p.name,self.x,self.y)
-
-		### temporary debug print
-		#print "plotgorup key:",key
-		#print "sheet_view:" , p.src.sheet_view_dict[key].view_info
-		plot_name = '\n(from ' + p.src.name +')' 
-		plot_list.append(Plot((key,hue,confidence),p.src.sheet_view_dict,
-				      pt.channels['Normalize'], name=plot_name))
+		plot_name = '\n(from ' + p.src.name +')'
+		plot_list.append(Plot((key,hue,confidence),p.src.sheet_view_dict,p.src.density,
+				      p.src.bounds,pt.channels['Normalize'],name=plot_name))
 
         self.debug('plot_list =' + str(plot_list))
         return plot_list
@@ -387,6 +385,8 @@ class ProjectionPlotGroup(PlotGroup):
     def create_plots(self,pt_name,pt,sheet):
 
         c = pt.channels
+        hue = c.get("Hue",None)
+        confidence = c.get("confidence",None)
 
 	### JCALERT This has to be solved: projection is a list here!
         ### for the moment the hack below deal with that.
@@ -405,6 +405,7 @@ class ProjectionPlotGroup(PlotGroup):
 
         ### JC apparently, the template carries the information for building
         ### the sheet_view__key. It might be difficult to change now. (also see make_unit_weights_plot)
+	    # key = (pt_name,c['Projection_name'],c['Density'],sheet.name)            
 	    key = (pt_name,c['Projection_name'],c['Density'],sheet.name)            
 	    ### JCALERT! for the moment, the sheet_view for a projection is a list of UnitView
             ### This has to be changed, and so it is a temporary hack.
@@ -415,7 +416,8 @@ class ProjectionPlotGroup(PlotGroup):
             ### no need to create a sheet_view that contains a list...!!
 	    for view in self.view_list:
 		key = ('Weights',sheet.name,projection.name,view.view_info['x'],view.view_info['y'])
-		plot_list.append(Plot((key,None,None),src_sheet.sheet_view_dict,pt.channels['Normalize']))
+		plot_list.append(Plot((key,hue,confidence),src_sheet.sheet_view_dict,
+                                      src_sheet.density,src_sheet.bounds,pt.channels['Normalize']))
 		
         return plot_list
 
@@ -442,6 +444,8 @@ class ProjectionPlotGroup(PlotGroup):
         for j in rev(range(self.shape[1])):
             for i in range(self.shape[0]):
                 coords.append((x_step*i + l, y_step*j + b))
+
+	#print "plotgroup",coords
         return coords
 
 
@@ -461,7 +465,7 @@ class ProjectionPlotGroup(PlotGroup):
 
         # This is no longer correct now that the UnitViews are no
         # longer on the Projection target sheet.
-        # for (x,y) in coords: self._sim_ep.release_unit_view(x,y)
+        #for (x,y) in coords: self._sim_ep.release_unit_view(x,y)
 
     ### JCALERT ! for the moment this function is re-implemented only for ProjectionGroup
     ### because we do not want the plots to be sorted according to their src_name in this case

@@ -29,11 +29,12 @@ import types
 import MLab
 
 
-from Numeric import zeros, ones, Float, divide
+from Numeric import zeros, ones, Float, divide,ravel
 from topo.base.topoobject import TopoObject
 from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
 from topo.base.parameter import Dynamic
-import palette as palette 
+import palette as palette
+from topo.base.sheet import submatrix, bounds2slice
 
 
 ### JCALERT! WHAT about histograms? (ask Jim) 
@@ -55,8 +56,10 @@ class Plot(TopoObject):
     ### Or pass a list of three tuples? To be fixed with Jim.
     ### Also: - put normalize in PlotGroup?
 
-    def __init__(self,(channel_1, channel_2, channel_3),sheet_view_dict,
-                 normalize=False, **params):
+    ### Re-write the test file taking the new changes into account.
+
+    def __init__(self,(channel_1, channel_2, channel_3),sheet_view_dict,density=None,
+                 plot_bounding_box=None,normalize=False,situated=False, **params):
         """
         (channel_1, channel_2, channel_3) are keys that point to a stored 
         SheetView in sheet_view_dict, as specified in a PlotTemplate.
@@ -80,6 +83,8 @@ class Plot(TopoObject):
 
       	self.view_dict = sheet_view_dict
         self.channels = (channel_1, channel_2, channel_3)
+        self.plot_bounding_box = plot_bounding_box
+        self.density = density
 
 	### JC: maybe we can use the parameter name instead of having a view_info?
         self.view_info = {}
@@ -87,7 +92,8 @@ class Plot(TopoObject):
         self.cropped = False
         self.histograms = []
 
-        self.matrices = []              # Will finally hold 3 matrices (or more?)
+        self.matrices = [] # Will finally hold 3 matrices (or more?)
+        self.box=[]
         self.normalize = normalize
 
         if self.view_dict == None:
@@ -95,6 +101,7 @@ class Plot(TopoObject):
 
 	### JCALERT! maybe also raise something when channels are all None?
         ### Not necessarily, it depends when we cactch the empy plot exception. 
+
 
     ### JCALERT! Actually, this function can be used this way.
     ### It is called from release_sheetviews in PlotGroup and enable to
@@ -144,7 +151,7 @@ class Plot(TopoObject):
 	    return None
 	else:
 	    (hue,sat,val)= hsv_matrices
-	     ### JCALERT! This function ought to be in Plot rather than bitmap.py
+            ### JCALERT! This function ought to be in Plot rather than bitmap.py
 	    self.matrices = matrix_hsv_to_rgb(hue,sat,val)
 	    return self
 
@@ -159,6 +166,7 @@ class Plot(TopoObject):
 	specified by channels can potentially refer to no SheetViews in the dict).
         """  
 	self.matrices=[]
+        self.box=[]
         for each in self.channels:
 	    ### JCALERT! Presumably, if each == None then there is no key equal to None in the 
             ### dict and then sv==None. Ask Jim if it is alright, because it is always possible that
@@ -166,9 +174,11 @@ class Plot(TopoObject):
 	    sv = self.view_dict.get(each, None)
 	    if sv == None:
 		self.matrices.append(None)
+                self.box.append(None)
 	    else:
 		view_matrix = sv.view()
-		self.matrices.append(view_matrix[0]) # discard boudingbox  
+		self.matrices.append(view_matrix[0])
+                self.box.append(view_matrix[1])
 
 	    ### JCALERT ! This is an hack so that the problem of displaying the right
 	    ### name under each map in activity and orientation map panel is solved
@@ -182,7 +192,8 @@ class Plot(TopoObject):
 
     ### JCALERT! The doc has to be reviewed (as well as the code by the way...)
     ### The function should be made as a procedure working on self.matrices directly..
-    ### The code inside has to be made clearer.
+    ### The code inside has still to be made clearer.
+
     def _make_hsv_matrices(self):
 	""" 
 	Sub-function of plot() that return the h,s,v matrices corresponding to
@@ -194,23 +205,57 @@ class Plot(TopoObject):
 	### JCALERT! What if the order is not the same?
         ### Maybe passing a dictionnary instead of a triple in the first place?
 	s,h,c = self.matrices
+        #print "self.matrices",self.matrices
 
         if (s==None and c==None and h==None):
             self.debug('Skipping empty plot.')
             return None
 
 	else:
-	    shape=(0,0)
              ### JCALERT! Think about a best way to catch the shape...
             ### also it should raise an Error if the shape is different for 
             ### the three matrices!
-	    for mat in self.matrices:
+	    ### Also it should go in a separate part of the code:
+            ### _make_non_situated_matrices or _make_situated_matrices
+
+            l_shape = []
+            l_box = []
+            slicing_box = None                # this is the smaller box of the plot
+	    for mat,box in zip(self.matrices,self.box):
 		if mat != None:
-		    shape = mat.shape
-	    
+		    l_shape.append(mat.shape)
+                    l_box.append(box)
+
+            if l_shape != []:
+                shape = l_shape[0]
+                slicing_box = l_box[0]
+                for sh,b in zip(l_shape,l_box):
+                    if (sh[0]+sh[1]) < (shape[0]+shape[1]):
+			#print "b",b._aarect.lbrt()
+                        shape = sh
+                        slicing_box = b       
+
 	    zero=zeros(shape,Float)
 	    one=ones(shape,Float)
 
+            ### JCALERT! How do I get the density?
+            
+	    #print "slicing_box",slicing_box._aarect.lbrt(),slicing_box
+
+            #r1,r2,c1,c2 = bounds2slice(slicing_box,self.plot_bounding_box,self.density)
+            #print "r1,r2,c1,c2", r1,r2,c1,c2
+	    
+            new_matrices =[]
+	    for mat in self.matrices:
+		if mat != None and mat.shape != shape:
+		    sub_mat = submatrix(slicing_box,mat,self.plot_bounding_box,self.density)
+		    new_matrices.append(sub_mat)
+		    #new_matrices.append(mat[r1:r2,c1:c2])
+		else:
+		    new_matrices.append(mat)
+
+		
+            s,h,c = new_matrices
 	    ### JC: The code below may be improved.
 	    # Determine appropriate defaults for each matrix
 	    if s is None: s=one # Treat as full strength by default
@@ -223,15 +268,17 @@ class Plot(TopoObject):
 		s = divide(s,float(max(s.flat)))
 
 	    hue,sat,val=h,c,s
-		 
-            
-	    if max(hue.flat) > 1 or max(sat.flat) > 1 or max(val.flat) > 1:
+	    #print "hue",hue
+#             print "sat",sat
+	    #print "val",val
+       
+	    if max(ravel(hue)) > 1 or max(ravel(sat)) > 1 or max(ravel(val)) > 1:
 		self.cropped = True
 	    #self.warning('Plot: HSVMap inputs exceed 1. Clipping to 1.0')
 	    ### JCALERT! It seems to me that this should be > 1?
-	    if max(hue.flat) > 0: hue = MLab.clip(hue,0.0,1.0)
-	    if max(sat.flat) > 0: sat = MLab.clip(sat,0.0,1.0)
-	    if max(val.flat) > 0: val = MLab.clip(val,0.0,1.0)
+	    if max(ravel(hue)) > 0: hue = MLab.clip(hue,0.0,1.0)
+	    if max(ravel(sat)) > 0: sat = MLab.clip(sat,0.0,1.0)
+	    if max(ravel(val)) > 0: val = MLab.clip(val,0.0,1.0)
 	    else:
 		self.cropped = False
 
