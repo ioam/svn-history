@@ -221,10 +221,10 @@ def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density):
     sheet_matrix.  The submatrix is just a view into the sheet_matrix;
     it is not an independent copy.
     """
-    r1,r2,c1,c2 = bounds_to_slice(bounds,sheet_bounds,sheet_density)
+    r1,r2,c1,c2 = bounds2slice(bounds,sheet_bounds,sheet_density)
     return sheet_matrix[r1:r2,c1:c2]
 
-def bounds_to_slice(slice_bounds, input_bounds, input_density):
+def bounds2slice(slice_bounds, input_bounds, input_density):
     """
     Convert a bounding box into an array slice suitable for computing a submatrix.
     
@@ -279,38 +279,6 @@ def bounds_to_slice(slice_bounds, input_bounds, input_density):
 
 ####
  
-
-
-def input_slice(slice_bounds, input_bounds, input_density, x, y):
-    """
-    Offset a bounding box and convert into an array slice.
-
-    Given a slice_bounds centered at the origin, offsets the bounds to
-    the given (x,y) location and returns a specification for slicing
-    the matrix to return the portion within the bounds.  Returns
-    (a,b,c,d), such that an activity matrix M can be sliced using
-    M[a:b,c:d].
-    """
-    rows,cols = bounds2shape(slice_bounds,input_density)
-
-    cr,cc = sheet2matrixidx(x, y, input_bounds, input_density)
-
-    toprow = cr - rows/2
-    leftcol = cc - cols/2
-
-    maxrow,maxcol = sheet2matrixidx(input_bounds.aarect().right(),
-                                 input_bounds.aarect().bottom(),
-                                 input_bounds,input_density)
-
-    maxrow = maxrow - 1
-    maxcol = maxcol - 1
-    rstart = max(0,toprow)
-    rbound = min(maxrow+1,cr+rows/2+1)
-    cstart = max(0,leftcol)
-    cbound = min(maxcol+1,cc+cols/2+1)
-
-    return rstart,rbound,cstart,cbound
-
 
 def bounds2shape(bounds,density):
     """
@@ -442,14 +410,6 @@ class Sheet(EventProcessor):
         """
         return -self.bounds.aarect().left(),-self.bounds.aarect().bottom()
 
-    def input_slice(self,slice_bounds,x,y):
-        """
-        Get the parameters for slicing the sheet's activity matrix.
-
-        returns a,b,c,d -- such that an activaiton matrix M
-        originating from this sheet can be sliced like this M[a:b,c:d]
-        """
-        return input_slice(slice_bounds,self.bounds,self.density,x,y)
 
     def sheet_rows(self):
         """
