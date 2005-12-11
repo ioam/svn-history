@@ -23,26 +23,41 @@ from topo.base.patterngenerator import PatternGenerator
 # Imported here so that all PatternGenerators will be in the same package
 from topo.base.patterngenerator import ConstantGenerator
 
+# CEBHACKALERT: need size, aspect ratio, frequency, etc. to be defined
+# somewhere that all the uses here can inherit from. Otherwise, doc,
+# precedence etc. have to be written out several times or some system
+# of constants as below for precedence has to be used (which is really
+# not an ideal solution).
+
 # precedence constants for ordering
-W_PREC = 0.30
-H_PREC = 0.31
+SI_PREC = 0.30
+AR_PREC = 0.31
 FR_PREC = 0.50
 PH_PREC = 0.51
 TH_PREC = 0.60
 SM_PREC = 0.61
 
+# To go into documentation for the Parameters:
+#
+# size: (really this is height) 
+# aspect_ratio: gives ratio of pattern's width:height; i.e. width/height 
+# 
+
 
 class GaussianGenerator(PatternGenerator):
     """2D Gaussian pattern generator."""
     
-    width   = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0),precedence=W_PREC)
-    height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0),precedence=H_PREC)
+    aspect_ratio   = Number(default=0.3,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
+    size  = Number(default=0.25,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
 
     def function(self,**params):
+        height = params.get('size',self.size)
+        width = (params.get('aspect_ratio',self.aspect_ratio))*height
+
         return gaussian( params.get('pattern_x',self.pattern_x), 
                          params.get('pattern_y',self.pattern_y), 
-                         params.get('width',self.width), 
-                         params.get('height',self.height)) 
+                         width,
+                         height)
 
 
 class SineGratingGenerator(PatternGenerator):
@@ -66,16 +81,19 @@ class SineGratingGenerator(PatternGenerator):
 class GaborGenerator(PatternGenerator):
     """2D Gabor pattern generator."""
     
-    frequency = Number(default=5.0,bounds=(0.0,None),softbounds=(0.0,10.0),precedence=FR_PREC)
+    frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),precedence=FR_PREC)
     phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),precedence=PH_PREC)
-    width   = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0),precedence=W_PREC)
-    height  = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0),precedence=H_PREC)
+    aspect_ratio   = Number(default=0.3,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
+    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
 
     def function(self,**params):
+        height = params.get('size',self.size)
+        width = (params.get('aspect_ratio',self.aspect_ratio))*height
+        
         return gabor( params.get('pattern_x',self.pattern_x),
                       params.get('pattern_y',self.pattern_y),
-                      params.get('width',self.width),
-                      params.get('height',self.height),
+                      width,
+                      height,
                       params.get('frequency',self.frequency),
                       params.get('phase',self.phase))  
 
@@ -108,31 +126,37 @@ class LineGenerator(PatternGenerator):
 class DiskGenerator(PatternGenerator):
     """2D disk pattern generator."""
 
-    width  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0),precedence=W_PREC)
-    height  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0),precedence=H_PREC)
+    aspect_ratio  = Number(default=1.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
+    size  = Number(default=0.75,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
     smoothing = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5),precedence=SM_PREC)
     
     def function(self,**params):
+        height = params.get('size',self.size)
+        width = (params.get('aspect_ratio',self.aspect_ratio))*height
+
         return disk( params.get('pattern_x',self.pattern_x), 
-                           params.get('pattern_y',self.pattern_y), 
-                           params.get('width',self.width),
-                           params.get('height',self.height),
-                           params.get('smoothing',self.smoothing))  
+                     params.get('pattern_y',self.pattern_y), 
+                     width,
+                     height,
+                     params.get('smoothing',self.smoothing))  
 
 
 class RingGenerator(PatternGenerator):
     """2D ring pattern generator."""
 
     thickness   = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5),precedence=TH_PREC)
-    width  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0),precedence=W_PREC)
-    height  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,1.0),precedence=H_PREC)
     smoothing = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5),precedence=SM_PREC)
+    aspect_ratio  = Number(default=1.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
+    size  = Number(default=0.75,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
 
     def function(self,**params):
+        height = params.get('size',self.size)
+        width = (params.get('aspect_ratio',self.aspect_ratio))*height
+        
         return ring(params.get('pattern_x',self.pattern_x), 
                     params.get('pattern_y',self.pattern_y),
-                    params.get('width',self.width),
-                    params.get('height',self.height),
+                    width,
+                    height,
                     params.get('thickness',self.thickness),
                     params.get('smoothing',self.smoothing))  
     
@@ -140,14 +164,15 @@ class RingGenerator(PatternGenerator):
 class RectangleGenerator(PatternGenerator):
     """2D rectangle pattern generator."""
     
-    width   = Number(default=0.2,bounds=(0.0,None),softbounds=(0.0,1.0),precedence=W_PREC)
-    height  = Number(default=0.4,bounds=(0.0,None),softbounds=(0.0,1.0),precedence=H_PREC)
+    aspect_ratio   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
+    size  = Number(default=0.75,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
 
     # We will probably want to add Fuzzy-style anti-aliasing to this.
 
     def function(self,**params):
-        width = params.get('width',self.width)
-        height= params.get('height',self.height)
+        height = params.get('size',self.size)
+        width = (params.get('aspect_ratio',self.aspect_ratio))*height
+        
         return bitwise_and(abs(params.get('pattern_x',self.pattern_x))<=width/2.0,
                            abs(params.get('pattern_y',self.pattern_y))<=height/2.0)
 
@@ -155,7 +180,7 @@ class RectangleGenerator(PatternGenerator):
 class SquareGratingGenerator(PatternGenerator):
     """2D squarewave grating pattern generator."""
     
-    frequency = Number(default=5.0,bounds=(0.0,None),softbounds=(0.0,10.0),precedence=FR_PREC)
+    frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),precedence=FR_PREC)
     phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),precedence=PH_PREC)
 
     # We will probably want to add anti-aliasing to this,

@@ -13,7 +13,7 @@ from topo.base.topoobject import TopoObject
 from topo.base.sheet import bounds2shape
 from topo.outputfns.basic import DivisiveMaxNormalize
 from topo.base.patterngenerator import PatternGenerator
-from topo.patterns.basic import W_PREC, H_PREC
+from topo.patterns.basic import AR_PREC, SI_PREC
 from topo.base.parameter import Filename, Number, Parameter, Enumeration
 from Numeric import array, transpose, ones, floor, Float, divide, where
 import Image, ImageOps
@@ -162,10 +162,11 @@ class TopoImage(TopoObject):
         col = col - n_sheet_cols/2.0 + self.n_image_cols/2.0
         row = row - n_sheet_rows/2.0 + self.n_image_rows/2.0
 
-        # document what this is
+        # document what this is...
         col = where(col>=self.n_image_cols, -col, col)
         row = where(row>=self.n_image_rows, -row, row)
 
+        # ...and don't do this
         return col.astype(int), row.astype(int)
 
 
@@ -204,8 +205,8 @@ class TopoImage(TopoObject):
 class ImageGenerator(PatternGenerator):
     """2D image generator."""
 
-    width  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=W_PREC)
-    height  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=H_PREC)
+    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
+    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
     filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9)
 
     size_normalization = Enumeration(default='fit_shortest',
@@ -217,10 +218,11 @@ class ImageGenerator(PatternGenerator):
         density = params.get('density', self.density)
         x       = params.get('pattern_x',self.pattern_x)
         y       = params.get('pattern_y',self.pattern_y)
-        width   = params.get('width',self.width)
-        height  = params.get('height',self.height)
         filename = params.get('filename',self.filename)
         size_normalization = params.get('scaling',self.size_normalization)
+
+        height = params.get('size',self.size)
+        width = (params.get('aspect_ratio',self.aspect_ratio))*height
 
         image = TopoImage(filename)
         return image(x,y,bounds,density, size_normalization,width, height)
