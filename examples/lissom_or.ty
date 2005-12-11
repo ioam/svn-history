@@ -49,12 +49,12 @@ __version__='$Revision$'
 #    - from topo.base.connectionfield import GenericCFLF
 #
 # 3) Add the following line under 2)
-#    - from topo.outputfns.basic import DivisiveL1Normalize
+#    - from topo.outputfns.basic import DivisiveSumNormalize
 #
 # 4) Comment out the following line:
 #    - CFProjection.learning_fn=DivisiveHebbian()
 #    and add this line after it
-#    - CFProjection.learning_fn.output_fn=DivisiveL1Normalize()
+#    - CFProjection.learning_fn.output_fn=DivisiveSumNormalize()
 #
 #
 # Note that the Python implementation is much slower than C one . You might want to

@@ -74,7 +74,7 @@ CFProjection.weights_generator = UniformRandomGenerator()
 CFProjection.weights_bounds = BoundingBox(points=((-1.0,-1.0),(1.0,1.0)))
 CFProjection.learning_fn=HebbianSOMLF()
 # Weights should be initialized to sum to unity: (Will this work?)
-#CFProjection.learning_fn.output_fn=DivisiveL1Normalize()
+#CFProjection.learning_fn.output_fn=DivisiveSumNormalize()
 
 ###########################################
 # build simulation
