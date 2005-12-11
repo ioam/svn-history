@@ -27,12 +27,12 @@ from projection import Projection,ProjectionSheet,Identity
 from parameter import Parameter, Number, BooleanParameter
 from utils import hebbian
 from arrayutils import mdot,divisive_normalization
-from sheet import Sheet, matrix2sheet
+from sheet import Sheet, matrix2sheet, bounds_to_slice,bounds2shape,sheet2matrixidx
 from sheetview import UnitView
 from itertools import chain
 from patterngenerator import ConstantGenerator
 from boundingregion import BoundingBox
-import topo.misc.inlinec as inlinec
+
 
 
 ### JEFF's IMPLEMENTATION NOTES
@@ -108,8 +108,27 @@ class ConnectionField(TopoObject):
         The given weights_bound_template is offset to the (x,y) location of
         this unit, and the bounds are calculated around that point.
         """
-        
-        self.slice = self.input_sheet.input_slice(weights_bound_template,self.x,self.y)
+
+        rows,cols = bounds2shape(weights_bound_template,self.input_sheet.density)
+
+        cr,cc = sheet2matrixidx(self.x, self.y,
+                                self.input_sheet.bounds, self.input_sheet.density)
+
+        toprow = cr - rows/2
+        leftcol = cc - cols/2
+
+        maxrow,maxcol = sheet2matrixidx(self.input_sheet.bounds.aarect().right(),
+                                 self.input_sheet.bounds.aarect().bottom(),
+                                 self.input_sheet.bounds,self.input_sheet.density)
+        maxrow = maxrow - 1
+        maxcol = maxcol - 1
+        rstart = max(0,toprow)
+        rbound = min(maxrow+1,cr+rows/2+1)
+        cstart = max(0,leftcol)
+        cbound = min(maxcol+1,cc+cols/2+1)
+
+        self.slice = rstart,rbound,cstart,cbound
+
 
         # Numeric.Int32 is specified explicitly here to avoid having it
         # default to Numeric.Int.  Numeric.Int works on 32-bit platforms,
@@ -123,9 +142,16 @@ class ConnectionField(TopoObject):
         self.slice_array[3] = c2
 
         # Construct and store the bounds exactly enclosing this slice
-        left,bottom = matrix2sheet(r2,c1,self.input_sheet.bounds,self.input_sheet.density)
-        right, top   = matrix2sheet(r1,c2,self.input_sheet.bounds,self.input_sheet.density)
-        self.bounds = BoundingBox(points=((left,bottom),(right,top)))
+        input_density = self.input_sheet.density
+        left,bottom = matrix2sheet(r2,c1,self.input_sheet.bounds,input_density)
+        right, top   = matrix2sheet(r1,c2,self.input_sheet.bounds,input_density)
+        xstep = float((right-left)) / int(input_density*(right-left))
+        ystep = float((top-bottom)) / int(input_density*(top-bottom))
+
+        ### JC, I think we should replace the 20 by 4...
+        fact = 20
+        self.bounds = BoundingBox(points=((left-xstep/fact,bottom-xstep/fact),
+                                          (right+ystep/fact,top+ystep/fact)))
 
         return self.slice
     
@@ -241,6 +267,7 @@ class IdentityCFLF(CFLearningFunction):
         pass
 
 
+### JABALERT! Untested.
 class GenericCFLF(CFLearningFunction):
     """CFLearningFunction applying the specified single_cf_fn to each CF."""
     single_cf_fn = Parameter(default=hebbian)
@@ -270,13 +297,7 @@ class CFProjection(Projection):
     and stores it in the activity array.
     """
 
-    from topo.responsefns.basic import CFDotProduct, CFDotProduct_Py
-    if inlinec.optimized:
-        response_fn = Parameter(default=CFDotProduct())
-    else:
-        response_fn = Parameter(default=CFDotProduct_Py)
-        self.verbose('CFProjection using non-optimized CFDotProduct_Py()')
-
+    response_fn = Parameter(default=GenericCFResponseFn())
     cf_type = Parameter(default=ConnectionField)
     weight_type = Parameter(default=Numeric.Float32)
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
@@ -347,13 +368,18 @@ class CFProjection(Projection):
         matrix_data = Numeric.array(self.cf(r,c).weights)
 
         new_box = self.cf(r,c).bounds
-	### JC: debug
-	#print "bounding_box",new_box.aarect().lbrt()
-	# r1,r2,c1,c2 = self.cf(r,c).slice
-# 	print "slice",r1,r2,c1,c2
-# 	x=self.cf(r,c).x
-# 	y=self.cf(r,c).y
-# 	print "x,y",x,y
+	### JC: tempoarary debug
+
+# 	print "bounding_box",new_box.aarect().lbrt()
+#  	r1,r2,c1,c2 = self.cf(r,c).slice
+#   	print "slice",r1,r2,c1,c2
+#  	x=self.cf(r,c).x
+#  	y=self.cf(r,c).y
+#  	print "x,y",x,y
+#         a,b,c,d = bounds_to_slice(new_box,self.cf(r,c).input_sheet.bounds,
+#                                   self.cf(r,c).input_sheet.density)
+#         print "new_slice",a,b,c,d
+
 	###
         assert matrix_data != None, "Projection Matrix is None"
         return UnitView((matrix_data,new_box),sheet_x,sheet_y,self,view_type='UnitView')
