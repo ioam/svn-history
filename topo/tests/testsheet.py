@@ -29,6 +29,10 @@ class TestCoordinateTransforms(unittest.TestCase):
         self.rbound = self.density*(self.top-self.bottom)
         self.cbound = self.density*(self.right-self.left)
 
+        #self.cbound = int(self.density*(self.right-self.left)) / float((self.right-self.left))
+        #self.rbound = int(self.density*(self.top-self.bottom)) / float((self.top-self.bottom))
+
+
         # CEBHACKALERT: this is supposed to be a small distance
         D = 0.00001
 
@@ -326,6 +330,15 @@ class TestCoordinateTransforms(unittest.TestCase):
         self.assertEqual((bottom_row,left_col),(float(self.last_row),float(0)))
 
     ### JC This test might have to be re-written
+    # CEBHACKALERT: it's not too important, but this test (like
+    # test_coordinate_position() below) will run three times,
+    # identically.  All these test_* functions are run for each of the
+    # classes in the cases list below. So, this should be re-written
+    # as Julien says.  However, my opinion is that this kind of setup
+    # is restrictive (Julien and whoever wrote
+    # test_coordinate_position() must agree because they ignored it!),
+    # so it might be better not to rewrite this function and to use a
+    # different format for the testing in the first place.
     def test_slice2bounds_bounds2slice(self):
 
 	bb = boundingregion.BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
@@ -537,7 +550,6 @@ class TestBox3Coordinates(TestCoordinateTransforms):
         self.center_unit_idx = (12,12)  # by the way sheet2matrixidx is defined
 
         self.makeBox()
-
 
 
 # CEB: still making tests for TestBox3Coordinates...
