@@ -27,7 +27,7 @@ from projection import Projection,ProjectionSheet,Identity
 from parameter import Parameter, Number, BooleanParameter
 from utils import hebbian
 from arrayutils import mdot,divisive_normalization
-from sheet import Sheet, matrix2sheet, bounds2slice,bounds2shape,sheet2matrixidx
+from sheet import Sheet, matrix2sheet,bounds2slice,bounds2shape,sheet2matrixidx,slice2bounds
 from sheetview import UnitView
 from itertools import chain
 from patterngenerator import ConstantGenerator
@@ -148,17 +148,9 @@ class ConnectionField(TopoObject):
         self.slice_array[2] = c1
         self.slice_array[3] = c2
 
-        # Construct and store the bounds exactly enclosing this slice
-        input_density = self.input_sheet.density
-        left,bottom = matrix2sheet(r2,c1,self.input_sheet.bounds,input_density)
-        right, top   = matrix2sheet(r1,c2,self.input_sheet.bounds,input_density)
-        xstep = float((right-left)) / int(input_density*(right-left))
-        ystep = float((top-bottom)) / int(input_density*(top-bottom))
-
-        ### JC, I think we should replace the 20 by 4...
-        fact = 20
-        self.bounds = BoundingBox(points=((left-xstep/fact,bottom-xstep/fact),
-                                          (right+ystep/fact,top+ystep/fact)))
+	# constructs and store the boundingbox corresponding to the slice.
+	self.bounds = slice2bounds(self.slice, self.input_sheet.bounds,
+				   self.input_sheet.density)
 
         return self.slice
     
@@ -375,8 +367,8 @@ class CFProjection(Projection):
         matrix_data = Numeric.array(self.cf(r,c).weights)
 
         new_box = self.cf(r,c).bounds
-	### JC: tempoarary debug
 
+	### JC: tempoarary debug (to get rid of pretty soon)
 # 	print "bounding_box",new_box.aarect().lbrt()
 #  	r1,r2,c1,c2 = self.cf(r,c).slice
 #   	print "slice",r1,r2,c1,c2
@@ -386,8 +378,8 @@ class CFProjection(Projection):
 #         a,b,c,d = bounds2slice(new_box,self.cf(r,c).input_sheet.bounds,
 #                                   self.cf(r,c).input_sheet.density)
 #         print "new_slice",a,b,c,d
-
 	###
+
         assert matrix_data != None, "Projection Matrix is None"
         return UnitView((matrix_data,new_box),sheet_x,sheet_y,self,view_type='UnitView')
 
