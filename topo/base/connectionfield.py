@@ -32,6 +32,7 @@ from sheetview import UnitView
 from itertools import chain
 from patterngenerator import ConstantGenerator
 from boundingregion import BoundingBox
+import topo.misc.inlinec as inlinec
 
 
 
@@ -154,6 +155,7 @@ class ConnectionField(TopoObject):
 
         return self.slice
     
+
     def get_input_matrix(self, activity):
         r1,r2,c1,c2 = self.slice
         return activity[r1:r2,c1:c2]
@@ -266,7 +268,6 @@ class IdentityCFLF(CFLearningFunction):
         pass
 
 
-### JABALERT! Untested.
 class GenericCFLF(CFLearningFunction):
     """CFLearningFunction applying the specified single_cf_fn to each CF."""
     single_cf_fn = Parameter(default=hebbian)
@@ -295,8 +296,13 @@ class CFProjection(Projection):
     activate(self,input_activity) that computes the response from the input 
     and stores it in the activity array.
     """
+    from topo.responsefns.basic import CFDotProduct, CFDotProduct_Py
+    if inlinec.optimized:
+	response_fn = Parameter(default=CFDotProduct())
+    else:
+	response_fn = Parameter(default=CFDotProduct_Py)
+	self.verbose('CFProjection using non-optimized CFDotProduct_Py()')
 
-    response_fn = Parameter(default=GenericCFResponseFn())
     cf_type = Parameter(default=ConnectionField)
     weight_type = Parameter(default=Numeric.Float32)
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
