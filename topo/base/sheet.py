@@ -102,36 +102,32 @@ import sheetview
 
 def sheet2matrix(x,y,bounds,density):
     """
-    Convert a point (x,y) in Sheet coordinates to continuous matrix coordinates given 
-    the Sheet's bounds and density.
+    Convert a point (x,y) in Sheet coordinates to continuous matrix coordinates.
 
-    float_row corresponds to y, and float_col to x.
-
-    When computing this transformation for an existing Sheet foo, use the Sheet method
-    foo.sheet2matrix(x,y).
+    The conversion is calculated from the sheet's bounds and density.
+    When computing this transformation for an existing sheet foo, one
+    should use the Sheet method foo.sheet2matrix(x,y).  Returns
+    (float_row,float_col), where float_row corresponds to y, and
+    float_col to x.
     """
 
     left,bottom,right,top = bounds.aarect().lbrt()
 
-    # compute the true density along x and y. The true density does not equal
-    # to density argument when density*(right-left) or density*(top-bottom) is
-    # not an integer.
+    # Compute the true density along x and y. The true density does
+    # not equal to the 'density' argument when density*(right-left) or
+    # density*(top-bottom) is not an integer.
     xdensity = int(density*(right-left)) / float((right-left))
     ydensity = int(density*(top-bottom)) / float((top-bottom))
 
-    # First translate to (left,top), which is [0,0] in the matrix, then scale to
-    # the size of the matrix. y coodinate needs to flipped, because the points
-    # are moving down in the sheet as the y-index increases in the matrix.
+    # First translate to (left,top), which is [0,0] in the matrix,
+    # then scale to the size of the matrix. The y coordinate needs to
+    # flipped, because the points are moving down in the sheet as the
+    # y-index increases in the matrix.
     float_col = (x-left) * xdensity
     float_row = (top-y)  * ydensity
     return float_row, float_col
-    ### JCALERT! If this just below the limit, it will be wrongly rounded afterwards....
-    ### The following call is an hack that solve the problem (for plotting purpose,
-    ### but it has to be made better, i.e. round())
-    #return row+0.1, col+0.1
-    # CEB: I don't understand that comment - I think this function
-    # shouldn't be changed.  Can you explain what you meant further?
 
+    # CEB: 
     # I think it might be worth including something like this in the
     # docstring (here or for Sheet):
     # For a Sheet with BoundingBox(points=((-0.5,-0.5),(0.5,0.5))) and
@@ -146,21 +142,14 @@ def sheet2matrix(x,y,bounds,density):
 
 def sheet2matrixidx(x,y,bounds,density):
     """
-    Convert a point (x,y) in Sheet coordinates to the row and column
-    of the matrix that corresponds to the BoundingBox and density of the Sheet.
+    Convert a point (x,y) in sheet coordinates to the integer row and
+    column index of the matrix cell in which that point falls, given a
+    bounds and density.  Returns (row,column).
 
-    NOTE: This is NOT the strict mathematical inverse of matrixidx2sheet because
-    that function returns the point (x,y) corresponding to the center of the
-    matrix cell.
-
-    NOTE2: If the coordinates along the left or bottom boundary are passed into
-    this function, the returned matrix coordinate of the boundary will be right
-    outside the matrix.
-
-    CEBHACKALERT (referring to NOTE2): I think that coordinates on the
-    left or top edge of the Sheet's BoundingBox are inside the matrix
-    that represents the Sheet - coordinates on the right or bottom
-    edge will be outside (see my comment in matrix2sheet).
+    Note that if coordinates along the right or bottom boundary are
+    passed into this function, the returned matrix coordinate of the
+    boundary will be just outside the matrix, because the right and
+    bottom boundaries are exclusive.
     """
     r,c = sheet2matrix(x,y,bounds,density)
     r = floor(r)
@@ -174,11 +163,11 @@ def sheet2matrixidx(x,y,bounds,density):
 
 def matrix2sheet(float_row,float_col,bounds,density):
     """
-    Inverse of sheet2matrix.
+    Convert a floating-point location (float_row,float_col) in matrix
+    coordinates to its corresponding location (x,y) in sheet
+    coordinates, given a bounds and density.
     
-    Convert a point (float_row,float_col) in matrix coordinates to its
-    corresponding point (x,y) in sheet coordinates given bounds and
-    density.
+    Inverse of sheet2matrix.
     """
 
     left,bottom,right,top = bounds.aarect().lbrt()
@@ -191,12 +180,14 @@ def matrix2sheet(float_row,float_col,bounds,density):
 
 def matrixidx2sheet(row,col,bounds,density):
     """
-    Returns (x,y) where x and y are the floating point coordinates of
-    the CENTER of the given matrix cell (row,col). If the matrix cell
+    Return (x,y) where x and y are the floating point coordinates of
+    the *center* of the given matrix cell (row,col). If the matrix cell
     represents a 0.2 by 0.2 region, then the center location returned
-    would be 0.1,0.1
+    would be 0.1,0.1.
 
-    NOTE: This is NOT the strict mathematical inverse of sheet2matrixidx.
+    NOTE: This is NOT the strict mathematical inverse of
+    sheet2matrixidx, because sheet2matrixidx discards all but the integer
+    portion of the Sheet coordinate.
     
     When computing this transformation for an existing sheet foo, one
     should use the Sheet method foo.matrixidx2sheet(r,c).
@@ -214,24 +205,24 @@ def matrixidx2sheet(row,col,bounds,density):
 
 def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density):
     """
-    Given a sheet's matrix, bounds, and density, return the submatrix in the specified bounds.
+    Return the submatrix of a sheet_matrix specified by a bounds.
 
-    Effectively, does the intersection between the sheet_bounds and
-    the bounds, and returns the corresponding submatrix of the given
+    Effectively computes the intersection between the sheet_bounds and
+    the new bounds, returning the corresponding submatrix of the given
     sheet_matrix.  The submatrix is just a view into the sheet_matrix;
-    it's not an independent copy.
+    it is not an independent copy.
     """
     r1,r2,c1,c2 = bounds_to_slice(bounds,sheet_bounds,sheet_density)
     return sheet_matrix[r1:r2,c1:c2]
 
 def bounds_to_slice(slice_bounds, input_bounds, input_density):
     """
-    Gets the parameters for slicing an activity matrix given the
-    slice bounds, activity bounds, and density of the activity
-    matrix.
-
-    returns a,b,c,d -- such that an activity matrix M
-    can be sliced like this: M[a:b,c:d]
+    Convert a bounding box into an array slice suitable for computing a submatrix.
+    
+    Given a slice bounding box, activity bounding box, and the density
+    of a sheet matrix, returns a specification for slicing the matrix
+    to return the portion within the bounds.  Returns (a,b,c,d), such
+    that an activity matrix M can be sliced using M[a:b,c:d].
     """
 
     left,bottom,right,top = slice_bounds.aarect().lbrt()
@@ -283,12 +274,13 @@ def bounds_to_slice(slice_bounds, input_bounds, input_density):
 
 def input_slice(slice_bounds, input_bounds, input_density, x, y):
     """
-    Gets the parameters for slicing an activity matrix given the
-    slice bounds, activity bounds, and density of the activity
-    matrix.
+    Offset a bounding box and convert into an array slice.
 
-    returns a,b,c,d -- such that an activity matrix M
-    can be sliced like this: M[a:b,c:d]    
+    Given a slice_bounds centered at the origin, offsets the bounds to
+    the given (x,y) location and returns a specification for slicing
+    the matrix to return the portion within the bounds.  Returns
+    (a,b,c,d), such that an activity matrix M can be sliced using
+    M[a:b,c:d].
     """
     rows,cols = bounds2shape(slice_bounds,input_density)
 
@@ -313,9 +305,11 @@ def input_slice(slice_bounds, input_bounds, input_density, x, y):
 
 def bounds2shape(bounds,density):
     """
-    Gives the matrix shape in rows and columns specified by the given
-    bounds and density.  Returns (rows,columns).
-    Always return at least shape=(1,1).
+    Return the matrix shape specified by the given bounds and density.
+
+    Always returns a matrix shape with at least one element, even if the
+    bounding box is smaller than one matrix element for this density.
+    Returns (rows,columns).
     """
 
     ### JCALERT! New version of bounds2shape. It has to be checked that we
@@ -330,9 +324,11 @@ def bounds2shape(bounds,density):
 
     rows = botrow - toprow
     cols = rightcol - leftcol
-        
+
+    # Enforce minimum size
     if rows == 0: rows = 1
     if cols == 0: cols = 1
+    
     return rows,cols
 
 
@@ -355,6 +351,7 @@ class Sheet(EventProcessor):
 
     bounds:   A BoundingBox object indicating the bounds of the sheet.
               [default  (-0.5,-0.5) to (0.5,0.5)]
+              
     density:  The linear density of the sheet [default 10]
 
     learning: Setting this to False tells the Sheet not to change its
@@ -430,14 +427,14 @@ class Sheet(EventProcessor):
 
     def sheet_offset(self):
         """
-        Returns the offset of the sheet origin from the lower-left
+        Return the offset of the sheet origin from the lower-left
         corner of the sheet, in sheet coordinates.
         """
         return -self.bounds.aarect().left(),-self.bounds.aarect().bottom()
 
     def input_slice(self,slice_bounds,x,y):
         """
-        Gets the parameters for slicing the sheet's activity matrix.
+        Get the parameters for slicing the sheet's activity matrix.
 
         returns a,b,c,d -- such that an activaiton matrix M
         originating from this sheet can be sliced like this M[a:b,c:d]
@@ -446,7 +443,7 @@ class Sheet(EventProcessor):
 
     def sheet_rows(self):
         """
-        Returns a list of Y-coordinates corresponding to the rows of
+        Return a list of Y-coordinates corresponding to the rows of
         the activity matrix of the sheet.
         """
         rows,cols = self.activity.shape
@@ -455,7 +452,7 @@ class Sheet(EventProcessor):
 
     def sheet_cols(self):
         """
-        Returns a list of X-coordinates corresponding to the columns
+        Return a list of X-coordinates corresponding to the columns
         of the activity matrix of the sheet.
         """
         rows,cols = self.activity.shape
@@ -464,9 +461,7 @@ class Sheet(EventProcessor):
 
 
     def activity_push(self):
-        """
-        Save the current sheet activity to an internal stack.
-        """
+        """Save the current sheet activity to an internal stack."""
         self.__saved_activity.append(array(self.activity))
 
     def activity_pop(self,restore_activity=True):
@@ -481,7 +476,7 @@ class Sheet(EventProcessor):
         return old_act
 
     def activity_len(self):
-        """Return length of elements in the __saved_activity stack."""
+        """Return the number of items in pushed into the activity stack."""
         return len(self.__saved_activity)
         
 
