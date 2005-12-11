@@ -24,27 +24,28 @@ class TestCoordinateTransforms(unittest.TestCase):
         self.box = boundingregion.BoundingBox(points=((self.left,self.bottom),
                                                       (self.right,self.top)))
 
-        # CEBHACKALERT: this is supposed to be a small distance
-        D = 0.00001
-        
-        self.just_in_right_x = self.right - D
-        self.just_in_bottom_y = self.bottom + D
-        self.just_out_top_y = self.top + D
-        self.just_out_left_x = self.left - D
-
-        self.just_out_right_idx = self.last_col + D
-        self.just_out_bottom_idx = self.last_row + D
-        self.just_out_top_idx = 0.0 - D
-        self.just_out_left_idx = 0.0 - D
-
-        
         # float bounds for matrix coordinates: these
         # values are actually outside the matrix
         self.rbound = self.density*(self.top-self.bottom)
         self.cbound = self.density*(self.right-self.left)
 
+        # CEBHACKALERT: this is supposed to be a small distance
+        D = 0.00001
+
+        # Sheet values around the edge of the BoundingBox
+        self.just_in_right_x = self.right - D
+        self.just_in_bottom_y = self.bottom + D
+        self.just_out_top_y = self.top + D
+        self.just_out_left_x = self.left - D
+
+        # Matrix values around the edge of the matrix
+        self.just_out_right_idx = self.rbound + D
+        self.just_out_bottom_idx = self.cbound + D
+        self.just_out_top_idx = 0.0 - D
+        self.just_out_left_idx = 0.0 - D
 
 
+        
     ### sheet2matrix() tests
     #
     def test_sheet2matrix_center(self):
@@ -187,8 +188,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         self.assertEqual((x,y), (self.right,self.bottom))
 
         x,y = matrix2sheet(self.just_out_right_idx,self.just_out_bottom_idx,self.box,self.density)
-        # CEBHACKALERT: I haven't finished this yet...
-        # self.assertFalse(self.box.contains(x,y))
+        self.assertFalse(self.box.contains(x,y))
 
 
     def test_matrix2sheet_center(self):
@@ -320,38 +320,39 @@ class TestCoordinateTransforms(unittest.TestCase):
         repeating earlier tests.
         """
         l,b,r,t = (-0.8,-0.8,0.8,0.8)
-        d = 16
+        density = 16
         bounds = BoundingBox(points=((l,b),(r,t)))
-        density = d
+        
         self.assertEqual(sheet2matrixidx(0.8,0.8,bounds,density),(0,24+1))
         self.assertEqual(sheet2matrixidx(0.0,0.0,bounds,density),(12,12))
         self.assertEqual(sheet2matrixidx(-0.8,-0.8,bounds,density),(24+1,0))
         self.assertEqual(matrixidx2sheet(24,0,bounds,density),
-                         (((r-l) / int(d*(r-l)) / 2.0) + l,
-                          (t-b) / int(d*(t-b)) / 2.0 + b))
+                         (((r-l) / int(density*(r-l)) / 2.0) + l,
+                          (t-b) / int(density*(t-b)) / 2.0 + b))
         self.assertEqual(matrixidx2sheet(0,0,bounds,density),
-                         (((r-l) / int(d*(r-l)) / 2.0) + l ,
-                          (t-b) / int(d*(t-b)) * (int(d*(t-b)) - 0.5) + b))
+                         (((r-l) / int(density*(r-l)) / 2.0) + l ,
+                          (t-b) / int(density*(t-b)) * (int(density*(t-b)) - 0.5) + b))
 
-        xy = matrixidx2sheet(0,0,bounds,density)
-        self.assertTrue(bounds.contains(xy[0],xy[1]))
-        self.assertEqual((0,0),sheet2matrixidx(xy[0],xy[1],bounds,density))
+        x,y = matrixidx2sheet(0,0,bounds,density)
+        self.assertTrue(bounds.contains(x,y))
+        self.assertEqual((0,0),sheet2matrixidx(x,y,bounds,density))
 
-        xy = matrixidx2sheet(25,25,bounds,density)
-        self.assertFalse(bounds.contains(xy[0],xy[1]))
-        self.assertNotEqual((24,24),sheet2matrixidx(xy[0],xy[1],bounds,density))
+        x,y = matrixidx2sheet(25,25,bounds,density)
+        self.assertFalse(bounds.contains(x,y))
+        self.assertNotEqual((24,24),sheet2matrixidx(x,y,bounds,density))
 
-        xy = matrixidx2sheet(0,24,bounds,density)
-        self.assertTrue(bounds.contains(xy[0],xy[1]))
-        self.assertEqual((0,24),sheet2matrixidx(xy[0],xy[1],bounds,density))
+        x,y = matrixidx2sheet(0,24,bounds,density)
+        self.assertTrue(bounds.contains(x,y))
+        self.assertEqual((0,24),sheet2matrixidx(x,y,bounds,density))
 
-        xy = matrixidx2sheet(24,0,bounds,density)
-        self.assertTrue(bounds.contains(xy[0],xy[1]))
-        self.assertEqual((24,0),sheet2matrixidx(xy[0],xy[1],bounds,density))
+        x,y = matrixidx2sheet(24,0,bounds,density)
+        self.assertTrue(bounds.contains(x,y))
+        self.assertEqual((24,0),sheet2matrixidx(x,y,bounds,density))
 
 
 
 # CEBHACKALERT: should test odd number of units as well?
+#             + non-int left-right or top-bottom
 
 class TestBox1Coordinates(TestCoordinateTransforms):
     """
@@ -378,7 +379,7 @@ class TestBox1Coordinates(TestCoordinateTransforms):
 class TestBox2Coordinates(TestCoordinateTransforms):
     """
     Test coordinate transformations on the box defined by (1,1), (3,4),
-    with density 8.    
+    with density 8.
     """
     def setUp(self):
         self.left = 1
@@ -395,7 +396,6 @@ class TestBox2Coordinates(TestCoordinateTransforms):
         self.center_unit_idx = (12,8)  # by the way sheet2matrixidx is defined
 
         self.makeBox()
-
 
 
 cases = [TestBox1Coordinates,
