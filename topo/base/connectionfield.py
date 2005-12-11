@@ -27,7 +27,7 @@ from projection import Projection,ProjectionSheet,Identity
 from parameter import Parameter, Number, BooleanParameter
 from utils import hebbian
 from arrayutils import mdot,divisive_normalization
-from sheet import Sheet, matrix2sheet, bounds_to_slice,bounds2shape,sheet2matrixidx
+from sheet import Sheet, matrix2sheet, bounds2slice,bounds2shape,sheet2matrixidx
 from sheetview import UnitView
 from itertools import chain
 from patterngenerator import ConstantGenerator
@@ -105,9 +105,16 @@ class ConnectionField(TopoObject):
         Calculate the slice specifying the submatrix of the sheet's to which
         this connection field connects.
 
-        The given weights_bound_template is offset to the (x,y) location of
-        this unit, and the bounds are calculated around that point.
-        """
+    	Given a bounds centered at the origin, offsets the bounds to
+	The given weights_bound_template is offset to the (x,y) location of
+        this unit, and the slices that specifies the weight matrix is generated.
+	(The special routine used for this purpose ensure that the weight matrix
+         are all of the same size, when not to close of the borders.)
+
+        Then, the bounding-box specifying the weight matrix is calculated around the 
+        location of the unit, and it will allow to retrieve the slice from the bounding box by
+        using the reversed function bounds2slice.
+	"""
 
         rows,cols = bounds2shape(weights_bound_template,self.input_sheet.density)
 
@@ -376,7 +383,7 @@ class CFProjection(Projection):
 #  	x=self.cf(r,c).x
 #  	y=self.cf(r,c).y
 #  	print "x,y",x,y
-#         a,b,c,d = bounds_to_slice(new_box,self.cf(r,c).input_sheet.bounds,
+#         a,b,c,d = bounds2slice(new_box,self.cf(r,c).input_sheet.bounds,
 #                                   self.cf(r,c).input_sheet.density)
 #         print "new_slice",a,b,c,d
 
