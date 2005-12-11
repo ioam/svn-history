@@ -102,13 +102,24 @@ import sheetview
 
 def sheet2matrix(x,y,bounds,density):
     """
-    Convert a point (x,y) in Sheet coordinates to continuous matrix coordinates.
+    Convert a point (x,y) in Sheet coordinates to continuous matrix
+    coordinates.
 
-    The conversion is calculated from the sheet's bounds and density.
-    When computing this transformation for an existing sheet foo, one
-    should use the Sheet method foo.sheet2matrix(x,y).  Returns
-    (float_row,float_col), where float_row corresponds to y, and
-    float_col to x.
+    Returns (float_row,float_col), where float_row corresponds to y,
+    and float_col to x.
+
+    When computing this transformation for an existing sheet foo,
+    use the Sheet method foo.sheet2matrix(x,y).    
+
+    Please consider the following point about boundaries:
+    For a Sheet with BoundingBox(points=((-0.5,-0.5),(0.5,0.5))) and
+    density=3, x=-0.5 corresponds to float_col=0.0 and x=0.5
+    corresponds to float_col=3.0.  float_col=3.0 is not inside the
+    matrix representing this Sheet, which has the three columns
+    (0,1,2). That is, x=-0.5 is inside the BoundingBox but x=0.5 is
+    outside. Similarly, y=0.5 is inside (at row 0) but y=-0.5 is
+    outside (at row 3) (it's the other way round for y because the
+    matrix row index increases as y decreases).
     """
 
     left,bottom,right,top = bounds.aarect().lbrt()
@@ -126,19 +137,7 @@ def sheet2matrix(x,y,bounds,density):
     float_col = (x-left) * xdensity
     float_row = (top-y)  * ydensity
     return float_row, float_col
-
-    # CEB: 
-    # I think it might be worth including something like this in the
-    # docstring (here or for Sheet):
-    # For a Sheet with BoundingBox(points=((-0.5,-0.5),(0.5,0.5))) and
-    # density=3, x=-0.5 corresponds to float_col=0.0 and x=0.5
-    # corresponds to float_col=3.0.  float_col=3.0 is not inside the
-    # matrix representing this Sheet, which has the three columns
-    # (0,1,2). That is, x=-0.5 is inside the BoundingBox but x=0.5 is
-    # outside. Similarly, y=0.5 is inside (at row 0) but y=-0.5 is
-    # outside (at row 3) (it's the other way round for y because the
-    # matrix row runs antiparallel to y).
-
+  
 
 def sheet2matrixidx(x,y,bounds,density):
     """
@@ -150,16 +149,14 @@ def sheet2matrixidx(x,y,bounds,density):
     passed into this function, the returned matrix coordinate of the
     boundary will be just outside the matrix, because the right and
     bottom boundaries are exclusive.
+
+    Valid only for scalar x and y.
     """
     r,c = sheet2matrix(x,y,bounds,density)
     r = floor(r)
     c = floor(c)
-    # CEBHACKALERT: this would work for arrays if it weren't necessary
-    # to return int values - could callers do that if they require it?
-    # (This function would return e.g. 12.0 instead of 12.) I guess the
-    # times ints are needed is when these values are used as indexes
-    # for Numeric arrays, which are required to be of type int.
     return int(r), int(c)
+
 
 def matrix2sheet(float_row,float_col,bounds,density):
     """
@@ -167,7 +164,7 @@ def matrix2sheet(float_row,float_col,bounds,density):
     coordinates to its corresponding location (x,y) in sheet
     coordinates, given a bounds and density.
     
-    Inverse of sheet2matrix.
+    Inverse of sheet2matrix().
     """
 
     left,bottom,right,top = bounds.aarect().lbrt()
@@ -186,11 +183,13 @@ def matrixidx2sheet(row,col,bounds,density):
     would be 0.1,0.1.
 
     NOTE: This is NOT the strict mathematical inverse of
-    sheet2matrixidx, because sheet2matrixidx discards all but the integer
-    portion of the Sheet coordinate.
+    sheet2matrixidx(), because sheet2matrixidx() discards all but the integer
+    portion of the continuous matrix coordinate.
     
     When computing this transformation for an existing sheet foo, one
     should use the Sheet method foo.matrixidx2sheet(r,c).
+
+    Valid only for scalar x and y.
     """
 
     x,y = matrix2sheet((row+0.5), (col+0.5), bounds, density)
@@ -200,6 +199,8 @@ def matrixidx2sheet(row,col,bounds,density):
     # Round eliminates any precision errors that have been compounded
     # via floating point operations so that the rounded number will better
     # match the floating number that we type in.
+    # (CEB: if someone wishes to use array x and y, changing this to around()
+    # would work.)
     return round(x,10),round(y,10)
 
 
