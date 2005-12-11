@@ -386,7 +386,7 @@ class ProjectionPlotGroup(PlotGroup):
 
         c = pt.channels
         hue = c.get("Hue",None)
-        confidence = c.get("confidence",None)
+        confidence = c.get("Confidence",None)
 
 	### JCALERT This has to be solved: projection is a list here!
         ### for the moment the hack below deal with that.
