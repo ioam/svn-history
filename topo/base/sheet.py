@@ -111,7 +111,7 @@ def sheet2matrix(x,y,bounds,density):
     When computing this transformation for an existing sheet foo,
     use the Sheet method foo.sheet2matrix(x,y).    
 
-    Please consider the following point about boundaries:
+    Bounds
     For a Sheet with BoundingBox(points=((-0.5,-0.5),(0.5,0.5))) and
     density=3, x=-0.5 corresponds to float_col=0.0 and x=0.5
     corresponds to float_col=3.0.  float_col=3.0 is not inside the
@@ -120,6 +120,12 @@ def sheet2matrix(x,y,bounds,density):
     outside. Similarly, y=0.5 is inside (at row 0) but y=-0.5 is
     outside (at row 3) (it's the other way round for y because the
     matrix row index increases as y decreases).
+
+    Density
+    When density*(left-right) or density*(top-bottom) is not an integer,
+    the supplied density argument is not used as the exact density for
+    the matrix. The matrix needs to tile the plane exactly,
+    and for that to work the density may need to be adjusted.
     """
 
     left,bottom,right,top = bounds.aarect().lbrt()
@@ -127,6 +133,8 @@ def sheet2matrix(x,y,bounds,density):
     # Compute the true density along x and y. The true density does
     # not equal to the 'density' argument when density*(right-left) or
     # density*(top-bottom) is not an integer.
+    # (These true densities could be cached by a Sheet if that would
+    # speed things up.)
     xdensity = int(density*(right-left)) / float((right-left))
     ydensity = int(density*(top-bottom)) / float((top-bottom))
 
