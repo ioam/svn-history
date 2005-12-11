@@ -14,7 +14,7 @@ from topo.base import boundingregion
 from topo.base.sheetview import SheetView
 
 
-# CEBHACKALERT: still to test bounds2shape(), bounds_to_slice(), submatrix(), input_slice()
+# CEBHACKALERT: still to test bounds_to_slice(), submatrix(), input_slice()
 
 
 class TestCoordinateTransforms(unittest.TestCase):
@@ -297,6 +297,15 @@ class TestCoordinateTransforms(unittest.TestCase):
         self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))    
 
 
+    def test_bounds2shape(self):
+        """
+        Check that the shape of the matrix based on the BoundingBox and
+        density is correct.
+        """
+        n_rows,n_cols = bounds2shape(self.box,self.density)
+        self.assertEqual((n_rows,n_cols),(self.last_row+1,self.last_col+1))
+
+
 
     def test_sheetview_release(self):
         self.s = Sheet()
@@ -316,8 +325,14 @@ class TestCoordinateTransforms(unittest.TestCase):
     #
     def test_coordinate_position(self):
         """
-        CEBHACKALERT: check these and document why they aren't
-        repeating earlier tests.
+        CEBHACKALERT: these tests duplicate those above
+        except these use a matrix with non-integer
+        (right-left) and (top-bottom). This is an important
+        test case for the definition of density; without it,
+        the tests above could be passed by a variety of
+        sheet2matrix, bounds2shape functions, etc.
+        So, transfer the box to TestBox3Coordinates and have
+        these tests run like the others.
         """
         l,b,r,t = (-0.8,-0.8,0.8,0.8)
         density = 16
