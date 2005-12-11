@@ -71,8 +71,10 @@ class TestCFSom(unittest.TestCase):
         GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))        
         GaussianGenerator.orientation = Dynamic(lambda :random.uniform(-pi,pi))
         
-        GaussianGenerator.width = 0.02
-        GaussianGenerator.height = 0.9
+        gaussian_width = 0.02
+        gaussian_height = 0.9
+        GaussianGenerator.scale = gaussian_height
+        GaussianGenerator.aspect_ratio = gaussian_width/gaussian_height
         GaussianGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
         # cf som parameters

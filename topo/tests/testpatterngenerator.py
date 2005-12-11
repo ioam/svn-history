@@ -25,7 +25,10 @@ class TestPatternGenerator(unittest.TestCase):
                         [0, 0, 0, 0, 0, 0]])
         bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
         density = 16
-        rect = RectangleGenerator(width=0.3,height=0.9,
+
+        rect_width = 0.3
+        rect_height = 0.9
+        rect = RectangleGenerator(scale=0.9,aspect_ratio=(rect_width/rect_height),
                                 density=4,bounds=bounds)
         self.assertEqual(rect(),target)
 #        print rect()
