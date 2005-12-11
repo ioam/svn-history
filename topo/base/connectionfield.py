@@ -241,7 +241,6 @@ class IdentityCFLF(CFLearningFunction):
         pass
 
 
-### JABALERT! Untested.
 class GenericCFLF(CFLearningFunction):
     """CFLearningFunction applying the specified single_cf_fn to each CF."""
     single_cf_fn = Parameter(default=hebbian)
