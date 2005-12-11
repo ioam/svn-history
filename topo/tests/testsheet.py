@@ -366,13 +366,12 @@ class TestCoordinateTransforms(unittest.TestCase):
 
 
 
-# CEBHACKALERT: should test odd number of units as well?
-#             + non-int left-right or top-bottom
-
 class TestBox1Coordinates(TestCoordinateTransforms):
     """
     Test coordinate transformations using the standard, origin-centered unit box
-    with density 10.    
+    with density 10.
+
+    A 10x10 matrix.
     """
     def setUp(self):
         self.left = -0.5
@@ -395,6 +394,8 @@ class TestBox2Coordinates(TestCoordinateTransforms):
     """
     Test coordinate transformations on the box defined by (1,1), (3,4),
     with density 8.
+
+    A 24 x 16 matrix.
     """
     def setUp(self):
         self.left = 1
@@ -413,8 +414,33 @@ class TestBox2Coordinates(TestCoordinateTransforms):
         self.makeBox()
 
 
+
+class TestBox3Coordinates(TestCoordinateTransforms):
+    """
+    """
+    def setUp(self):        
+        self.left = -0.8
+        self.bottom = -0.8
+        self.top = 0.8
+        self.right = 0.8
+        self.density = 16
+        self.half_unit = 0.03125
+
+        # for the matrix representation - I think having this manual statement is
+        # safer than a calculation...
+        self.last_row = 24
+        self.last_col = 24
+        self.center_unit_idx = (12,12)  # by the way sheet2matrixidx is defined
+
+        self.makeBox()
+
+
+
+# CEB: still making tests for TestBox3Coordinates...
 cases = [TestBox1Coordinates,
          TestBox2Coordinates]
+#         TestBox3Coordinates]
+         
 
 
 suite = unittest.TestSuite()
