@@ -234,33 +234,10 @@ def bounds2slice(slice_bounds, input_bounds, input_density):
     that an activity matrix M can be sliced using M[a:b,c:d].
     """
 
-   #  left,bottom,right,top = slice_bounds.aarect().lbrt()
-#     rows,cols = bounds2shape(slice_bounds,input_density)
-
-#     cr,cc = sheet2matrixidx((left+right)/2,(top+bottom)/2,input_bounds,input_density)
-#     toprow = cr - rows/2
-#     leftcol = cc - cols/2
-
-#     maxrow,maxcol = sheet2matrixidx(input_bounds.aarect().right(),input_bounds.aarect().bottom(),
-#                                     input_bounds,input_density)
-
-#     maxrow = maxrow - 1
-#     maxcol = maxcol - 1
-#     rstart = max(0,toprow)
-#     rbound = min(maxrow+1,cr+rows/2+1)
-#     cstart = max(0,leftcol)
-#     cbound = min(maxcol+1,cc+cols/2+1)
-
-#     return rstart,rbound,cstart,cbound
-
- ### JCALERT! For the moment, bounds to slice is only used by submatrix, that is only used in 
- ### plot to get the submatrix corresponding  weights bounds
- ### the code below, associated with the correstion notified in sheet2matrix, makes it work to 
- ### re-transform the bounds to the original slice of the weight
- ### the original version (above) does not. I think that for eliminating the problem of different
- ### weight size, it is good to use cc-rows/2,.... but here what we want is a reliable transformation
- ### function from slice to bounds and bounds to slice (by the way write slice_to_bounds here and call
- ### it from connectionfield.)
+    ### JCALERT! For the moment, bounds to slice is only used by submatrix, that is only used in 
+    ### plot to get the submatrix corresponding  weights bounds
+    ### the code below, associated with the slice2bounds function notified constitute an exact transformation
+    ### from slice to bounds and bounds to slice 
 
     left,bottom,right,top = slice_bounds.aarect().lbrt()
     toprow,leftcol = sheet2matrixidx(left,top,input_bounds,input_density)
@@ -277,8 +254,38 @@ def bounds2slice(slice_bounds, input_bounds, input_density):
 
     return rstart,rbound,cstart,cbound
 
-####
- 
+
+def slice2bounds(slice,sheet_bounds,sheet_density):
+    """
+    Construct the bounds that corresponds to the given slice, with a small
+    margin that enables to solve the rounding problem that is produced when turning
+    float into int when retrieving the slice from the bounds (with bounds2slice).
+    This way, this function is an exact transform of bounds2slice. That enables to retrieve
+    the slice information from the bounding box.
+    """
+    r1,r2,c1,c2 = slice
+    
+    left,bottom = matrix2sheet(r2,c1,sheet_bounds,sheet_density)
+    right, top   = matrix2sheet(r1,c2,sheet_bounds,sheet_density)
+
+    if (int(sheet_density*(right-left)) <= 0):
+	xstep = float((right-left)) / int(sheet_density)
+    else:
+	xstep = float((right-left)) / int(sheet_density*(right-left))
+
+    if (int(sheet_density*(top-bottom)) <= 0):
+	ystep = float((top-bottom)) / int(sheet_density)
+    else:
+	ystep = float((top-bottom)) / int(sheet_density*(top-bottom))
+
+    ### JCALERT!, 20 is an arbitrary value, but it has to be check that
+    ### any value is alright  (anything is supposed to work) to see with Jim
+    fact = 20
+    bounds = BoundingBox(points=((left-xstep/fact,bottom-xstep/fact),
+                                 (right+ystep/fact,top+ystep/fact)))
+
+    return bounds
+
 
 def bounds2shape(bounds,density):
     """
