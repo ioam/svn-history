@@ -14,7 +14,7 @@ from topo.base import boundingregion
 from topo.base.sheetview import SheetView
 
 
-# CEBHACKALERT: still to test bounds_to_slice(), submatrix(), input_slice()
+# CEBHACKALERT: still to test bounds2slice(), submatrix()
 
 
 class TestCoordinateTransforms(unittest.TestCase):
@@ -324,6 +324,78 @@ class TestCoordinateTransforms(unittest.TestCase):
         x,y = matrixidx2sheet(float(self.last_row),float(0),self.box,self.density)
         bottom_row,left_col = sheet2matrixidx(x,y,self.box,self.density)
         self.assertEqual((bottom_row,left_col),(float(self.last_row),float(0)))
+
+    ### JC This test might have to be re-written
+    def test_slice2bounds_bounds2slice(self):
+
+	bb = boundingregion.BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+
+	slice =(0,3,7,8)
+	bounds = slice2bounds(slice,bb,10)
+        test_slice = bounds2slice(bounds,bb,10)
+
+	for a,b in zip(slice,test_slice):
+	    self.assertEqual(a,b)
+
+	slice =(4,7,8,10)
+	bounds = slice2bounds(slice,bb,10)
+        test_slice = bounds2slice(bounds,bb,10)
+
+	for a,b in zip(slice,test_slice):
+	    self.assertEqual(a,b)
+
+	slice =(2,3,4,8)
+	bounds = slice2bounds(slice,bb,10)
+        test_slice = bounds2slice(bounds,bb,10)
+
+	for a,b in zip(slice,test_slice):
+	    self.assertEqual(a,b)
+
+	slice =(0,3,9,10)
+	bounds = slice2bounds(slice,bb,10)
+        test_slice = bounds2slice(bounds,bb,10)
+
+	for a,b in zip(slice,test_slice):
+	    self.assertEqual(a,b)
+
+	bb = boundingregion.BoundingBox(points=((-0.75,-0.5),(0.75,0.5)))
+
+	slice =(9,14,27,29)
+	bounds = slice2bounds(slice,bb,20)
+        test_slice = bounds2slice(bounds,bb,20)
+
+	for a,b in zip(slice,test_slice):
+	    self.assertEqual(a,b)
+
+	slice =(0,6,0,7)
+	bounds = slice2bounds(slice,bb,20)
+        test_slice = bounds2slice(bounds,bb,20)
+
+	for a,b in zip(slice,test_slice):
+	    self.assertEqual(a,b)
+
+	slice =(6,10,11,29)
+	bounds = slice2bounds(slice,bb,20)
+        test_slice = bounds2slice(bounds,bb,20)
+
+	for a,b in zip(slice,test_slice):
+	    self.assertEqual(a,b)
+
+	bb = boundingregion.BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+
+	slice =(4,7,2,3)
+	bounds = slice2bounds(slice,bb,7)
+        test_slice = bounds2slice(bounds,bb,7)
+
+	for a,b in zip(slice,test_slice):
+	    self.assertEqual(a,b)
+
+	slice =(0,7,0,7)
+	bounds = slice2bounds(slice,bb,7)
+        test_slice = bounds2slice(bounds,bb,7)
+
+	for a,b in zip(slice,test_slice):
+	    self.assertEqual(a,b)
 
 
 
