@@ -94,8 +94,9 @@ class Plot(TopoObject):
 	# Will finally hold 3 matrices (JC: or more?)
         self.matrices = [] 
 
-	# The bounding box list associated with this plot.
+	# The list of the bounding box of the SheetViews associated with this plot.
         self.box=[]
+
         self.normalize = normalize
 
         if self.view_dict == None:
@@ -140,19 +141,18 @@ class Plot(TopoObject):
                     the matrices is self.matrices. NOT YET IMPLEMENTED)           
         """
 
+	### JC: It might be clearer to call:
+        ### self.matrices = self._get_matrices_from_view
 	self._get_matrices_from_view_dict()
 
-	hsv_matrices = self._make_hsv_matrices()
-
-	### JCALERT! Think about make_hsv_matrices beeing a procedure
-        ### directly working on self.matrices and change matrix_hsv_to_rgb to
-        ### take a list of matrices or tuple of matrices. 
-	if hsv_matrices == None:
-	    ### JCALERT! Ask Jim what does he wants to do with empty plot.
-	    #print("Empty Plot")
-	    return None
+        ### JCALERT! What if the order is not the same?
+        ### Maybe passing a dictionnary instead of a triple in the first place?
+	s,h,c = self.matrices
+        if (s==None and c==None and h==None):
+            self.debug('Skipping empty plot.')
+            return None
 	else:
-	    (hue,sat,val)= hsv_matrices
+	    (hue,sat,val)= self._make_hsv_matrices()	    
             ### JCALERT! This function ought to be in Plot rather than bitmap.py
 	    self.matrices = matrix_hsv_to_rgb(hue,sat,val)
 	    return self
@@ -191,7 +191,7 @@ class Plot(TopoObject):
 		self.view_info['src_name'] = sv.view_info['src_name'] + self.name
 		self.view_info['view_type'] = sv.view_info['view_type']
 
-
+ 
     ### JCALERT! The doc has to be reviewed (as well as the code by the way...)
     ### The function should be made as a procedure working on self.matrices directly..
     ### The code inside has still to be made clearer.
@@ -203,76 +203,67 @@ class Plot(TopoObject):
 
         Also applying normalizing and croping if required.
 	"""
-
-	### JCALERT! What if the order is not the same?
-        ### Maybe passing a dictionnary instead of a triple in the first place?
-	s,h,c = self.matrices
-       
-        if (s==None and c==None and h==None):
-            self.debug('Skipping empty plot.')
-            return None
-
-	else:
-             ### JCALERT! Think about a best way to catch the shape...
+        ### JCALERT! Think about a best way to catch the shape...
             ### also it should raise an Error if the shape is different for 
             ### the three matrices!
 	    ### Also it should go in a separate part of the code:
             ### _make_non_situated_matrices or _make_situated_matrices
 
-            l_shape = []
-            l_box = []
-            slicing_box = None                # this is the smaller box of the plot
-	    for mat,box in zip(self.matrices,self.box):
-		if mat != None:
-		    l_shape.append(mat.shape)
-                    l_box.append(box)
+	l_shape = []
+	l_box = []
+        slicing_box = None                # this is the smaller box of the plot
+	for mat,box in zip(self.matrices,self.box):
+	    if mat != None:
+		l_shape.append(mat.shape)
+		l_box.append(box)
 
-            if l_shape != []:
-                shape = l_shape[0]
-                slicing_box = l_box[0]
-                for sh,b in zip(l_shape,l_box):
-                    if (sh[0]+sh[1]) < (shape[0]+shape[1]):
-			shape = sh
-                        slicing_box = b       
+	### This test is probably unuseful...
+	if l_shape != []:
+	    shape = l_shape[0]
+	    slicing_box = l_box[0]
+	    for sh,b in zip(l_shape,l_box):
+		if (sh[0]+sh[1]) < (shape[0]+shape[1]):
+		    shape = sh
+		    slicing_box = b       
 
-	    zero=zeros(shape,Float)
-	    one=ones(shape,Float)
+	zero=zeros(shape,Float)
+	one=ones(shape,Float)
 	    
-            new_matrices =[]
-	    for mat in self.matrices:
-		if mat != None and mat.shape != shape:
-		    sub_mat = submatrix(slicing_box,mat,self.plot_bounding_box,self.density)
-		    new_matrices.append(sub_mat)
-		else:
-		    new_matrices.append(mat)
+	new_matrices =[]
+	for mat in self.matrices:
+	    if mat != None and mat.shape != shape:
+		sub_mat = submatrix(slicing_box,mat,self.plot_bounding_box,self.density)
+		new_matrices.append(sub_mat)
+	    else:
+		new_matrices.append(mat)
 
 		
-            s,h,c = new_matrices
-	    ### JC: The code below may be improved.
-	    # Determine appropriate defaults for each matrix
-	    if s is None: s=one # Treat as full strength by default
-	    if c is None: c=one # Treat as full confidence by default
-	    if h is None: # No color -- should be changed to drop down to COLORMAP plot.
-		h=zero
-		c=zero
+	s,h,c = new_matrices
+        ### JC: The code below may be improved.
+	# Determine appropriate defaults for each matrix
+	if s is None: s=one # Treat as full strength by default
+	if c is None: c=one # Treat as full confidence by default
+	if h is None: # No color -- should be changed to drop down to COLORMAP plot.
+	    h=zero
+	    c=zero
 
-	    if self.normalize and max(s.flat)>0:
-		s = divide(s,float(max(s.flat)))
+	if self.normalize and max(s.flat)>0:
+	    s = divide(s,float(max(s.flat)))
 
-	    hue,sat,val=h,c,s
+	hue,sat,val=h,c,s
        
-	    if max(ravel(hue)) > 1.0 or max(ravel(sat)) > 1.0 or max(ravel(val)) > 1.0:
-		self.cropped = True
-		### JCALERT! In which case this is occuring? Because it may not need a warning...
-		#self.warning('Plot: HSVMap inputs exceed 1. Clipping to 1.0')
-		if max(ravel(hue)) > 1.0: hue = MLab.clip(hue,0.0,1.0)
-		if max(ravel(sat)) > 1.0: sat = MLab.clip(sat,0.0,1.0)
-		if max(ravel(val)) > 1.0: val = MLab.clip(val,0.0,1.0)
-	    else:
-		self.cropped = False
+	if max(ravel(hue)) > 1.0 or max(ravel(sat)) > 1.0 or max(ravel(val)) > 1.0:
+	    self.cropped = True
+	    ### JCALERT! In which case is this occuring? Because it may not need a warning...
+	    #self.warning('Plot: HSVMap inputs exceed 1. Clipping to 1.0')
+	    if max(ravel(hue)) > 1.0: hue = MLab.clip(hue,0.0,1.0)
+	    if max(ravel(sat)) > 1.0: sat = MLab.clip(sat,0.0,1.0)
+	    if max(ravel(val)) > 1.0: val = MLab.clip(val,0.0,1.0)
+	else:
+	    self.cropped = False
 
 	
-	    return (hue,sat,val)
+	return (hue,sat,val)
 
 
 
