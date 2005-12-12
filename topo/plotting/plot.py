@@ -28,8 +28,7 @@ import sys
 import types
 import MLab
 
-
-from Numeric import zeros, ones, Float, divide,ravel
+from Numeric import zeros, ones, Float, divide, ravel
 from topo.base.topoobject import TopoObject
 from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
 from topo.base.parameter import Dynamic
@@ -40,13 +39,14 @@ from topo.base.sheet import submatrix, bounds2slice
 ### JCALERT! WHAT about histograms? (ask Jim) 
 #from histogram import Histogram 
 ### JCALERT! The histograms should be implemented and an object histograms assign to a Plot() 
+
     
 class Plot(TopoObject):
     """
     Class that constructs a bitmap plot from one or more
-    one or mor SheetViews. The bitmap is just
-    stored for future use, e.g. as part of a PlotGroup of related
-    plots displayed within one GUI window.
+    SheetViews. The bitmap is just stored for future use, 
+    e.g. as part of a PlotGroup of related plots displayed 
+    within one GUI window.
     """
     background = Dynamic(default=BLACK_BACKGROUND)
     palette_ = Dynamic(default=palette.Monochrome)
@@ -55,8 +55,7 @@ class Plot(TopoObject):
     ### JCALERT! - Pass the content of a template instead of channels?
     ### Or pass a list of three tuples? To be fixed with Jim.
     ### Also: - put normalize in PlotGroup?
-
-    ### Re-write the test file taking the new changes into account.
+    ###       - Re-write the test file, taking the new changes into account.
 
     def __init__(self,(channel_1, channel_2, channel_3),sheet_view_dict,density=None,
                  plot_bounding_box=None,normalize=False,situated=False, **params):
@@ -90,9 +89,12 @@ class Plot(TopoObject):
         self.view_info = {}
 
         self.cropped = False
-        self.histograms = []
 
-        self.matrices = [] # Will finally hold 3 matrices (or more?)
+	# The list of matrices that constitutes the plot.
+	# Will finally hold 3 matrices (JC: or more?)
+        self.matrices = [] 
+
+	# The bounding box list associated with this plot.
         self.box=[]
         self.normalize = normalize
 
@@ -205,8 +207,7 @@ class Plot(TopoObject):
 	### JCALERT! What if the order is not the same?
         ### Maybe passing a dictionnary instead of a triple in the first place?
 	s,h,c = self.matrices
-        #print "self.matrices",self.matrices
-
+       
         if (s==None and c==None and h==None):
             self.debug('Skipping empty plot.')
             return None
@@ -231,26 +232,17 @@ class Plot(TopoObject):
                 slicing_box = l_box[0]
                 for sh,b in zip(l_shape,l_box):
                     if (sh[0]+sh[1]) < (shape[0]+shape[1]):
-			#print "b",b._aarect.lbrt()
-                        shape = sh
+			shape = sh
                         slicing_box = b       
 
 	    zero=zeros(shape,Float)
 	    one=ones(shape,Float)
-
-            ### JCALERT! How do I get the density?
-            
-	    #print "slicing_box",slicing_box._aarect.lbrt(),slicing_box
-
-            #r1,r2,c1,c2 = bounds2slice(slicing_box,self.plot_bounding_box,self.density)
-            #print "r1,r2,c1,c2", r1,r2,c1,c2
 	    
             new_matrices =[]
 	    for mat in self.matrices:
 		if mat != None and mat.shape != shape:
 		    sub_mat = submatrix(slicing_box,mat,self.plot_bounding_box,self.density)
 		    new_matrices.append(sub_mat)
-		    #new_matrices.append(mat[r1:r2,c1:c2])
 		else:
 		    new_matrices.append(mat)
 
@@ -268,17 +260,14 @@ class Plot(TopoObject):
 		s = divide(s,float(max(s.flat)))
 
 	    hue,sat,val=h,c,s
-	    #print "hue",hue
-#             print "sat",sat
-	    #print "val",val
        
-	    if max(ravel(hue)) > 1 or max(ravel(sat)) > 1 or max(ravel(val)) > 1:
+	    if max(ravel(hue)) > 1.0 or max(ravel(sat)) > 1.0 or max(ravel(val)) > 1.0:
 		self.cropped = True
-	    #self.warning('Plot: HSVMap inputs exceed 1. Clipping to 1.0')
-	    ### JCALERT! It seems to me that this should be > 1?
-	    if max(ravel(hue)) > 0: hue = MLab.clip(hue,0.0,1.0)
-	    if max(ravel(sat)) > 0: sat = MLab.clip(sat,0.0,1.0)
-	    if max(ravel(val)) > 0: val = MLab.clip(val,0.0,1.0)
+		### JCALERT! In which case this is occuring? Because it may not need a warning...
+		#self.warning('Plot: HSVMap inputs exceed 1. Clipping to 1.0')
+		if max(ravel(hue)) > 1.0: hue = MLab.clip(hue,0.0,1.0)
+		if max(ravel(sat)) > 1.0: sat = MLab.clip(sat,0.0,1.0)
+		if max(ravel(val)) > 1.0: val = MLab.clip(val,0.0,1.0)
 	    else:
 		self.cropped = False
 
