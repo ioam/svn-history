@@ -11,7 +11,8 @@ __version__='$Revision$'
 
 import Pmw, re, os, sys
 from Tkinter import Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
-     RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, StringVar
+     RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, \
+     StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE
 import topo
 import topo.base.topoobject
 import topo.plotting.bitmap
@@ -24,6 +25,9 @@ import Image
 import ImageTk
 import Numeric
 import MLab
+
+BORDERWIDTH = 2
+
 
 ### JCALERT: the name has been changed from PlotPanel to PlotGroupPanel
 ### I think we might also want to change the name of all the subclasses (e.g. UnitWeightPanel...) but not necessarily.
@@ -322,7 +326,9 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
                              for image in self.zoomed_images]
             for i,image,canvas in zip(range(len(self.zoomed_images)),
                                       self.zoomed_images,self.canvases):
-                canvas.create_image(image.width()/2,image.height()/2,image=image)
+                canvas.create_image(image.width()/2+BORDERWIDTH+2,
+                                    image.height()/2+BORDERWIDTH+2,image=image)
+                canvas.config(borderwidth=BORDERWIDTH,relief=RIDGE)
                 canvas.grid(row=0,column=i,padx=5)
             for c in old_canvases:
                 c.grid_forget()

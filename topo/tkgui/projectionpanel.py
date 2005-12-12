@@ -7,7 +7,7 @@ __version__='$Revision$'
 
 import __main__
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
-     Entry, Canvas
+     Entry, Canvas, RIDGE
 import Pmw
 import ImageTk
 from topo.plotting.templates import plotgroup_templates
@@ -21,6 +21,7 @@ from topo.base.utils import dict_sort
 from topo.misc.keyedlist import KeyedList
 
 UNIT_PADDING = 1
+BORDERWIDTH = 2
 
 class ProjectionPanel(CFSheetPlotPanel):
     def __init__(self,parent,pengine,console=None,**config):
@@ -234,7 +235,11 @@ class ProjectionPanel(CFSheetPlotPanel):
                 canvas.grid(row=i//self.pe_group.shape[0],
                             column=i%self.pe_group.shape[1],
                             padx=UNIT_PADDING,pady=UNIT_PADDING)
-                canvas.create_image(image.width()/2+2,image.height()/2+2,image=image)
+                canvas.create_image(image.width()/2+BORDERWIDTH+2,
+                                    image.height()/2+BORDERWIDTH+2,
+                                    image=image)
+                canvas.config(borderwidth=BORDERWIDTH,relief=RIDGE)
+
     
             # Delete old ones.  This may resize the grid.
             for c in old_canvases:
