@@ -296,7 +296,7 @@ class CFProjection(Projection):
     activate(self,input_activity) that computes the response from the input 
     and stores it in the activity array.
     """
-    response_fn = Parameter(default=CFDotProduct_Py())
+    response_fn = Parameter(default=GenericCFResponseFn())
     cf_type = Parameter(default=ConnectionField)
     weight_type = Parameter(default=Numeric.Float32)
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
