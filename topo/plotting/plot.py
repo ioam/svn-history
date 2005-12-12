@@ -208,27 +208,21 @@ class Plot(TopoObject):
             ### the three matrices!
 	    ### Also it should go in a separate part of the code:
             ### _make_non_situated_matrices or _make_situated_matrices
-
+		
 	l_shape = []
 	l_box = []
-        slicing_box = None                # this is the smaller box of the plot
 	for mat,box in zip(self.matrices,self.box):
 	    if mat != None:
 		l_shape.append(mat.shape)
 		l_box.append(box)
 
-	### This test is probably unuseful...
-	if l_shape != []:
-	    shape = l_shape[0]
-	    slicing_box = l_box[0]
-	    for sh,b in zip(l_shape,l_box):
-		if (sh[0]+sh[1]) < (shape[0]+shape[1]):
-		    shape = sh
-		    slicing_box = b       
+	shape = l_shape[0]
+	slicing_box = l_box[0]               # this is the smaller box of the plot
+	for sh,b in zip(l_shape,l_box):
+	    if (sh[0]+sh[1]) < (shape[0]+shape[1]):
+		shape = sh
+		slicing_box = b       
 
-	zero=zeros(shape,Float)
-	one=ones(shape,Float)
-	    
 	new_matrices =[]
 	for mat in self.matrices:
 	    if mat != None and mat.shape != shape:
@@ -237,7 +231,10 @@ class Plot(TopoObject):
 	    else:
 		new_matrices.append(mat)
 
-		
+
+	zero=zeros(shape,Float)
+	one=ones(shape,Float)	
+
 	s,h,c = new_matrices
         ### JC: The code below may be improved.
 	# Determine appropriate defaults for each matrix
