@@ -76,7 +76,6 @@ from fixedpoint import FixedPoint
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection
-# inlinec.optimized should make this unnecessary.
 from topo.responsefns.basic import CFDotProduct
 from topo.patterns.basic import GaussianGenerator, ConstantGenerator
 from topo.patterns.random import UniformRandomGenerator
