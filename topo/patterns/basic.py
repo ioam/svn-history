@@ -164,7 +164,7 @@ class RingGenerator(PatternGenerator):
 class RectangleGenerator(PatternGenerator):
     """2D rectangle pattern generator."""
     
-    aspect_ratio   = Number(default=0.5,bounds=(0.0,None))#,softbounds=(0.0,2.0),precedence=AR_PREC)
+    aspect_ratio   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
     size  = Number(default=0.75,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
 
     # We will probably want to add Fuzzy-style anti-aliasing to this.
