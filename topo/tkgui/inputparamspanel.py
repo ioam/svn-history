@@ -95,7 +95,7 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         for thing in self.in_ep_dict.values():
             generator_sheet = thing['obj']
             generator_sheet_params = generator_sheet.get_paramobj_dict()
-            self.pg_name_dict = generator_sheet_params['input_generator'].available_types()
+            self.pg_name_dict = generator_sheet_params['input_generator'].range()
             break
             
         self.input_types = self.pg_name_dict.keys()

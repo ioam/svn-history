@@ -16,7 +16,7 @@ __version__='$Revision$'
 from math import pi
 from Numeric import around,bitwise_and,sin
 
-from topo.base.parameter import Number, Parameter
+from topo.base.parameter import Number, Parameter, PackageParameter
 from topo.misc.patternfns import gaussian,gabor,line,disk,ring
 from topo.base.patterngenerator import PatternGenerator
 
@@ -164,7 +164,7 @@ class RingGenerator(PatternGenerator):
 class RectangleGenerator(PatternGenerator):
     """2D rectangle pattern generator."""
     
-    aspect_ratio   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
+    aspect_ratio   = Number(default=0.5,bounds=(0.0,None))#,softbounds=(0.0,2.0),precedence=AR_PREC)
     size  = Number(default=0.75,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
 
     # We will probably want to add Fuzzy-style anti-aliasing to this.
@@ -199,28 +199,18 @@ class SquareGratingGenerator(PatternGenerator):
 
 
 
-# CEBHACKALERT: will be making a base class since this kind of class
-# will exist for output_fn,learning_fn,response_fn,patterngenerator
 
 from topo.misc.keyedlist import KeyedList
 from topo.base.utils import find_classes_in_package,classname_repr
-class PatternGeneratorParameter(Parameter):
+class PatternGeneratorParameter(PackageParameter):
     """
     """
-    def __init__(self,default=None,doc="",**params):
-        """
-        """
-        Parameter.__init__(self,default=default,doc=doc,**params)
-
-    # CEBHACKALERT: temporary. This is probably not the best way to do this.
-    # Also, will be renamed and (e.g. range()) and implemented for all Parameters)
-    def available_types(self):
+    def range(self):
         """
         Return a KeyedList of PatternGenerators [(visible_name, <patterngenerator_class>)].
-
-        CEBHACKALERT:
-        Note about having to import things first
         """
+
+        # CEBHACKALERT: here why now?
         import topo
         
         patternclasses = find_classes_in_package(topo.patterns, PatternGenerator)

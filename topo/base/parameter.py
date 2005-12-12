@@ -582,5 +582,22 @@ def is_number(obj):
 
 
 
+# CEBHACKALERT: will be making a base class since this kind of class
+# will exist for output_fn,learning_fn,response_fn,patterngenerator
+class PackageParameter(Parameter):
+    """
+    """
+    __doc__ = property((lambda self: self.doc))
+    
+    def __init__(self,default=None,doc="",**params):
+        """
+        """
+        Parameter.__init__(self,default=default,doc=doc,**params)
+
+    def range(self):
+        """
+        """
+        raise NotImplementedError
+
 
 
