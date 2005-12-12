@@ -12,6 +12,13 @@ __version__='$Revision$'
 from utils import classlist
 
 
+# CEBHACKALERT: much of the documentation for Parameter subclasses
+# that ought to be in the class docstring is in the __init__
+# docstring so that it shows up. In some cases there is
+# some repetition.
+# See JABHACKALERT by __doc__.
+
+
 class Parameter(object):
     """
     An attribute descriptor for declaring Topographica parameters.
@@ -246,7 +253,15 @@ class Filename(Parameter):
     """
     __doc__ = property((lambda self: self.doc))
     
-    def __init__(self,default='',**params):
+    def __init__(self,default=None,**params):
+        """
+        Create a Filename Parameter with the specified string.
+        
+        The string is stored in the path format of the user's
+        operating system.
+
+        The path must be relative to Topographica's own path.
+        """
         Parameter.__init__(self,normpath(default),**params)
 
     def __set__(self,obj,val):
@@ -266,7 +281,7 @@ class Enumeration(Parameter):
 
     def __init__(self, default=None, available=[], **params):
         """
-        Creates an Enumeration, checking that 'default' is in 'available'.
+        Create an Enumeration, checking that 'default' is in 'available'.
         """
         Parameter.__init__(self,default=default,**params)
         if not type(available)==list:
@@ -295,34 +310,39 @@ class Enumeration(Parameter):
 
 class Number(Parameter):
     """
-    Number is a numeric parameter. Numbers have a default value, and
-    bounds.  There are two types of bounds: `bounds' and
-    `softbounds'.`bounds' are hard bounds: the parameter must have a
-    value within the specified range.  The default bounds are
-    (None,None), meaning there are actually no hard bounds.  One or both
-    bounds can be set by specifying a value (e.g. bounds=(None,10) means
-    there is no lower bound, and an upper bound of 10).
-
-    Bounds are checked when a Number is created or set. Using a default
-    value outside the hard bounds, or one that is not numeric, results
-    in an exception. It is therefore not possible to create a parameter
-    with a default value that is inconsistent with the bounds.
-
-    A separate function set_in_bounds() is provided that will silently
-    crop the given value into the legal range, for use in, for instance,
-    a GUI.
-
-    `softbounds' are present to indicate the typical range of the
-    parameter, but are not enforced. Setting the soft bounds allows, for
-    instance, a GUI to know what values to display on sliders for the
-    Number.
-
-    Example of creating a Number:
-    AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
     """
     __doc__ = property((lambda self: self.doc))
  
     def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),**params):
+        """
+        Number is a numeric parameter. Numbers have a default value,
+        and bounds.  There are two types of bounds: `bounds' and
+        `softbounds'.`bounds' are hard bounds: the parameter must have
+        a value within the specified range.  The default bounds are
+        (None,None), meaning there are actually no hard bounds.  One
+        or both bounds can be set by specifying a value
+        (e.g. bounds=(None,10) means there is no lower bound, and an
+        upper bound of 10).
+
+        Bounds are checked when a Number is created or set. Using a
+        default value outside the hard bounds, or one that is not
+        numeric, results in an exception. It is therefore not possible
+        to create a parameter with a default value that is
+        inconsistent with the bounds.
+
+        A separate function set_in_bounds() is provided that will
+        silently crop the given value into the legal range, for use
+        in, for instance, a GUI.
+
+        `softbounds' are present to indicate the typical range of the
+        parameter, but are not enforced. Setting the soft bounds
+        allows, for instance, a GUI to know what values to display on
+        sliders for the Number.
+
+        Example of creating a Number:
+        AB = Number(default=0.5, bounds=(None,10),
+                    softbounds=(0,1), doc='Distance from A to B.')
+        """
         Parameter.__init__(self,default=default,**params)
         self.bounds = bounds
         self._softbounds = softbounds  
@@ -454,14 +474,16 @@ class BooleanParameter(Parameter):
 # currently mixed together by hand for simplicity.
 class DynamicNumber(Number):
     """
-    Dynamic version of Number parameter.
-
-    If set with a callable object, the bounds are checked when the number is
-    retrieved (generated), rather than when it is set.
     """
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),**params):
+        """
+        Create Dynamic version of Number parameter.
+
+        If set with a callable object, the bounds are checked when the
+        number is retrieved (generated), rather than when it is set.
+        """
         Parameter.__init__(self,default=default,**params)
         self.bounds = bounds
         self._softbounds = softbounds  
