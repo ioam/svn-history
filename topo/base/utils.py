@@ -8,7 +8,7 @@ __version__='$Revision$'
 
 import __main__
 import math
-import topoobject
+
 
 
 def wrap(lower, upper, x):
@@ -316,6 +316,11 @@ def class_parameters(topo_class):
 
     The specified class must be of type TopoObject.
     """
+    # CEBHACKALERT: I'm not sure why this can't be imported at the module
+    # level. If imported at the module level it causes an error on the tests,
+    # but otherwise seems to work fine.
+    import topoobject
+
     assert isinstance(topo_class, type)
 
     # Create the object so that Parameters of any superclasses are also present.
