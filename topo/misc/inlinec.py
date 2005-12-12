@@ -27,7 +27,8 @@ $Id$
 """
 from copy import copy
 
-# In case an outside package wants to know
+# In case an outside package wants to know.  Try block will turn true
+# if it happens.
 weave_imported = False
 
 def inline(*params,**nparams): raise NotImplementedError
@@ -53,7 +54,8 @@ try:
 except ImportError:
     print 'Caution: Unable to import Weave.  Will use non-optimized versions of most components.'
 
-# Flag available for all to use to test whether to use the inline versions or not.
+# Flag available for all to use to test whether to use the inline
+# versions or not.
 optimized = weave_imported
 
 # Simple test
