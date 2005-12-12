@@ -9,9 +9,10 @@ __version__='$Revision$'
 from topo.base.connectionfield import CFProjection
 from topo.base.parameter import Parameter
 from topo.base.projection import Identity
+from topo.base.topoobject import TopoObject
 from topo.responsefns.basic import CFDotProduct_CPointer
 from topo.learningfns.optimized import DivisiveHebbian_CPointer
-from topo.misc.inlinec import inline
+from topo.misc.inlinec import inline, optimized
 from Numeric import ones, Int
 
 class CFProjection_CPointer(CFProjection):
@@ -56,6 +57,12 @@ class CFProjection_CPointer(CFProjection):
         setup_wp(self.cfs, self.weight_ptrs, x, y)
         self.slice_ptrs = ones((x,y), Int)
         setup_sp(self.cfs, self.slice_ptrs, x, y)
+
+# Optimized version overwrites the unoptimized version name if the
+# code is in the optimized state.
+if not optimized:
+    CFProjection_CPointer = CFProjection
+    TopoObject().message('Optimized CFProjection not being used.')
         
 
 def setup_wp(cfs, wp, rows, cols):

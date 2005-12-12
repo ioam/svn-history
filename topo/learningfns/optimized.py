@@ -6,7 +6,7 @@ $Id$
 """
 __version__ = "$Revision$"
 
-from topo.misc.inlinec import inline
+from topo.misc.inlinec import inline, optimized
 from topo.base.topoobject import TopoObject
 from topo.base.parameter import Parameter,Constant,Number
 from topo.base.projection import Identity
@@ -93,6 +93,11 @@ class Hebbian(CFLearningFunction):
                 for c in range(cols):
                     cfs[r][c].weights = output_fn(cfs[r][c].weights)
 
+# Cannot currently create a python Hebbian since the object creation
+# requires a "GenericCFLF(single_cf_fn=hebbian)" which is not a direct
+# class-name reassignment.
+
+
 
 class DivisiveHebbian(CFLearningFunction):
     """
@@ -173,6 +178,12 @@ class DivisiveHebbian(CFLearningFunction):
         """
         
         inline(hebbian_div_norm_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'learning_rate'], local_dict=locals())
+
+# Optimized version overwrites the unoptimized version name if the
+# code is in the optimized state.
+if not optimized:
+    DivisiveHebbian = GenericCFLF
+    TopoObject().message('Optimized DivisiveHebbian not being used.')
 
 
 
@@ -264,4 +275,10 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
         
         inline(hebbian_div_norm_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'learning_rate','weight_ptrs','slice_ptrs'], local_dict=locals())
 
+# Optimized version overwrites the unoptimized version name if the
+# code is in the optimized state.
+if not optimized:
+    DivisiveHebbian_CPointer = GenericCFLF
+    TopoObject().message('Optimized DivisiveHebbian_CPointer not being used.')
+    
 
