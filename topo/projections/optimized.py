@@ -49,8 +49,8 @@ class CFProjection_CPointer(CFProjection):
         self.activity = self.output_fn(self.activity)
 
 
-    def change_bounds(self, new_wt_bounds, output_fn=Identity()):
-        CFProjection.change_bounds(self, new_wt_bounds, output_fn)
+    def change_bounds(self, new_wt_bounds):
+        CFProjection.change_bounds(self, new_wt_bounds)
 	# the weight arrays have been changed, so the pointer arrays have to be updated
         x,y = self.get_shape()
         self.weight_ptrs = ones((x,y), Int)
