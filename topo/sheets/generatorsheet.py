@@ -14,7 +14,7 @@ from topo.base.parameter import Parameter, Dynamic
 
 from topo.base.patterngenerator import ConstantGenerator
 
-from topo.patterns.basic import PatternGeneratorParameter
+from topo.patterns import PatternGeneratorParameter
 
 
 class GeneratorSheet(Sheet):

@@ -15,6 +15,7 @@ from topo.outputfns.basic import DivisiveMaxNormalize
 from topo.base.patterngenerator import PatternGenerator
 from topo.patterns.basic import AR_PREC, SI_PREC
 from topo.base.parameter import Filename, Number, Parameter, Enumeration
+from topo.outputfns import OutputFunctionParameter
 from Numeric import array, transpose, ones, floor, Float, divide, where
 import Image, ImageOps
 
@@ -101,18 +102,15 @@ class TopoImage(TopoObject):
     for example. Images with no border have a background that is less
     of a contrast than a white or black one.
 
-    """
-    ### JABALERT: Should eventually make this an OutputFunctionParameter
-    output_fn = Parameter(default=DivisiveMaxNormalize())
-    
-    def __init__(self, filename):
+    """    
+    def __init__(self, filename, output_fn):
         """
         """
         image = ImageOps.grayscale(Image.open(filename))
         self.n_image_cols, self.n_image_rows = image.size
 
         image_array = array(image.getdata(),Float)
-        image_array = self.output_fn(image_array)
+        image_array = output_fn(image_array)
         
         image_array.shape = (self.n_image_rows, self.n_image_cols) # ** getdata() returns transposed image?
         self.image_array = transpose(image_array)
@@ -210,8 +208,11 @@ class ImageGenerator(PatternGenerator):
     filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9)
 
     size_normalization = Enumeration(default='fit_shortest',
-                                     available=['fit_shortest','fit_longest','stretch_to_fit','original'])
-    
+                                     available=['fit_shortest','fit_longest','stretch_to_fit','original'],
+                                     precedence=0.95,
+                                     doc='How to scale the initial image size relative to the default area of 1.0.')
+
+    output_fn = OutputFunctionParameter(default=DivisiveMaxNormalize(),precedence=0.96,doc='How to normalize the value of each image pixel.')
     
     def function(self,**params):
         bounds  = params.get('bounds', self.bounds)
@@ -220,11 +221,12 @@ class ImageGenerator(PatternGenerator):
         y       = params.get('pattern_y',self.pattern_y)
         filename = params.get('filename',self.filename)
         size_normalization = params.get('scaling',self.size_normalization)
+        output_fn = params.get('output_fn',self.output_fn)
 
         height = params.get('size',self.size)
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
 
-        image = TopoImage(filename)
+        image = TopoImage(filename, output_fn)
         return image(x,y,bounds,density, size_normalization,width, height)
 
 

@@ -200,24 +200,3 @@ class SquareGratingGenerator(PatternGenerator):
 
 
 
-from topo.misc.keyedlist import KeyedList
-from topo.base.utils import find_classes_in_package,classname_repr
-class PatternGeneratorParameter(PackageParameter):
-    """
-    """
-    def range(self):
-        """
-        Return a KeyedList of PatternGenerators [(visible_name, <patterngenerator_class>)].
-        """
-
-        # CEBHACKALERT: here why now?
-        import topo
-        
-        patternclasses = find_classes_in_package(topo.patterns, PatternGenerator)
-        
-        k = KeyedList()
-    
-        for (pg_name,pg) in patternclasses.items():
-            k.append( (classname_repr(pg_name, 'Generator'), pg) )
-        
-        return k

@@ -272,6 +272,9 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
             if isinstance(parameter, topo.base.parameter.Number):
                 # Numbers are changed back from string to float
                 new_parameter_values[name] = eval_atof(input_values[name])
+            elif isinstance(parameter, topo.base.parameter.PackageParameter):
+                parameter.set_from_key(input_values[name])
+                new_parameter_values[name] = parameter.default
             else:
                 new_parameter_values[name] = input_values[name]                
 

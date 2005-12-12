@@ -13,3 +13,17 @@ __version__='$Revision$'
 import re,os
 __all__ = [re.sub('\.py$','',f) for f in os.listdir(__path__[0])
            if re.match('^[^_].*\.py$',f)]
+
+
+# CEBHACKALERT: see topo/outputfns/__init__.py
+import topo
+from topo.base.patterngenerator import PatternGenerator
+from topo.base.parameter import PackageParameter
+class PatternGeneratorParameter(PackageParameter):
+    """
+    """
+    def __init__(self,default=None,doc='',**params):
+        """
+        """
+        super(PatternGeneratorParameter,self).__init__(topo.patterns,PatternGenerator,to_lose='Generator',default=default,doc=doc,**params)
+

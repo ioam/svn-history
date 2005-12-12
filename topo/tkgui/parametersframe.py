@@ -132,7 +132,13 @@ class ParametersFrame(Frame):
                 # an Enumeration gets a ComboBox
                 items = parameter.available
                 widget_dict[parameter_name] = self.__properties_frame.add_combobox_property(
-                    parameter_name,parameter.default,items) 
+                    parameter_name,parameter.default,items)
+
+            elif isinstance(parameter, topo.base.parameter.PackageParameter):
+                items = parameter.range().keys()
+                widget_dict[parameter_name] = self.__properties_frame.add_combobox_property(
+                    parameter_name,parameter.get_default_class_name(),items)
+
             else:
                 # everything else gets a textbox   
                 widget_dict[parameter_name] = self.__properties_frame.add_text_property(
