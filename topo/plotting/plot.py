@@ -228,16 +228,27 @@ class Plot(TopoObject):
 		l_box.append(box)
 
 	shape = l_shape[0]
+	outer_box = l_box[0]               # this is the outer box of the plot
 	slicing_box = l_box[0]               # this is the smaller box of the plot
 	for sh,b in zip(l_shape,l_box):
 	    if (sh[0]+sh[1]) < (shape[0]+shape[1]):
 		shape = sh
-		slicing_box = b       
-		
+		slicing_box = b    
+	    else:
+		outer_box = b
+
+	### JCALERT! Ask Jim about that: is it reasonnable to assume so?
+        ### (what it means is that if we have to slice it will be sheetviews,
+        ### and so the slicing_box will be from a UnitView and the outer box from
+        ### a SheetView, which is required when calling submatrix. Bounding_box for sheetviews
+        ### does not have the slight margin that UnitView boxes have; but that could be changed by
+        ### inserting this margin to the function bounds2slice....)
+	# At this point we assume that if there is matrix of different sizes
+        # the outer_box will be a sheet bounding_box....
 	new_matrices =[]
 	for mat in self.matrices:
 	    if mat != None and mat.shape != shape:
-		sub_mat = submatrix(slicing_box,mat,self.plot_bounding_box,self.density)
+		sub_mat = submatrix(slicing_box,mat,outer_box,self.density)
 		new_matrices.append(sub_mat)
 	    else:
 		new_matrices.append(mat)
