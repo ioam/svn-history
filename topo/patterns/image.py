@@ -5,9 +5,8 @@ Contains two classes: TopoImage and ImageGenerator.
 $Id$
 """
 
-# CEBHACKALERT: I have to go over this file. The main reason for the
-# last set of changes is to test having an Enumeration in the
-# GUI, not to get ImageGenerator correct.
+# CEBHACKALERT: I have to go over this file. It should be considered
+# untested.
 
 from topo.base.topoobject import TopoObject
 from topo.base.sheet import bounds2shape
