@@ -27,8 +27,8 @@ class TaggedSlider(Frame):
 
     def __init__(self,root,
                  tagvariable=None,
-                 min_value='0',
-                 max_value='100',
+                 min_value=0,
+                 max_value=100,
                  string_format = '%f',
                  tag_width=10,
                  string_translator=string.atof,
@@ -37,8 +37,13 @@ class TaggedSlider(Frame):
         Frame.__init__(self,root,**config)
         self.root = root
 
-        self.min_value = string_translator(min_value)
-        self.max_value = string_translator(max_value)
+        # CEBHACKALERT: in parametersframe, bounds are no longer
+        # converted to strings, so I think this is ok...
+        self.min_value = min_value
+        self.max_value = max_value
+        #self.min_value = string_translator(min_value)
+        #self.max_value = string_translator(max_value)
+        
         self.fmt = string_format
 
         self.need_to_refresh_slider = True

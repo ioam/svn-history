@@ -110,13 +110,21 @@ class ParametersFrame(Frame):
 
             value = str(parameter.default)
 
+
+            # find the appropriate entry widget for the parameter...
+            
             if isinstance(parameter, topo.base.parameter.Number):
                 try:
                     low_bound,high_bound = parameter.get_soft_bounds()
+
+                    # well it doesn't really have softbounds!
+                    if low_bound==None or high_bound==None:
+                        raise AttributeError
+                    
                     # a Number with softbounds gets a slider
                     widget_dict[parameter_name] = self.__add_slider(parameter_name,
-                                                                    str(low_bound),
-                                                                    str(high_bound),
+                                                                    low_bound,
+                                                                    high_bound,
                                                                     value)
                 except AttributeError:
                     # a Number with no softbounds gets a textbox
