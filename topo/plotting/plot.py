@@ -56,6 +56,12 @@ class Plot(TopoObject):
     ### Or pass a list of three tuples? To be fixed with Jim.
     ### Also: - put normalize in PlotGroup?
     ###       - Re-write the test file, taking the new changes into account.
+    ###       - Added the option situated, to situate the plot
+    ###         (the problem is how to define plot_bounding_box: we 
+    ###          need it to be the slice of the sheet in get_slice but if we want to pass
+    ###           whatever bounds to situate into?)
+    ###          Note: solution would be to get the shape of the bigger bounding box before
+    ###                calling submatrix in _get_slice()
 
     def __init__(self,(channel_1, channel_2, channel_3),sheet_view_dict,density=None,
                  plot_bounding_box=None,normalize=False,situated=False, **params):
@@ -69,6 +75,12 @@ class Plot(TopoObject):
         to a Sheet object but not necessarily.
 
 	normalize specified is the Plot is normalized or not.
+
+	density is the density of the sheet that contains the different views
+        constituting the plot.
+
+	plot_bounding_box is the outer bounding_box of the plot
+        (for the moment, it has to be the sheet.bounds...)
         
         a 'name' parameter is inherited from TopoObject.
            
