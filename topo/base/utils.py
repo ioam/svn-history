@@ -8,7 +8,7 @@ __version__='$Revision$'
 
 import __main__
 import math
-
+import topoobject
 
 
 def wrap(lower, upper, x):
@@ -309,20 +309,19 @@ def class_parameters(topo_class):
     """
     Return the non-hidden Parameters of the specified class as a list of 2-tuples (parameter_name, parameter).
 
-    E.g. for an object that has one parameter
-    bob=Parameter()
+    E.g. for a class that has one Parameter
+    x=Number()
     this function returns
-    [('bob',<topo.base.parameter.Parameter object at ...>)]
+    [('x',<topo.base.parameter.Number object at ...>)]
 
     The specified class must be of type TopoObject.
     """
-    # CEBHACKALERT: why create the object? Just use the class's __dict__!
-
     assert isinstance(topo_class, type)
+
+    # Create the object so that Parameters of any superclasses are also present.
     topo_obj = topo_class()
     
-    import topo.base.topoobject
-    if not isinstance(topo_obj,topo.base.topoobject.TopoObject):
+    if not isinstance(topo_obj,topoobject.TopoObject):
         raise TypeError("Can only get Parameters for a class derived from TopoObject.")
     
     parameters = [(parameter_name,parameter)
