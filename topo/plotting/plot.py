@@ -97,6 +97,11 @@ class Plot(TopoObject):
 	# The list of the bounding box of the SheetViews associated with this plot.
         self.box=[]
 
+	# shape (dimension) of the plotting area
+        self.shape = (0,0)
+	# bounds of the plotting area
+	self.bounds = None        
+
         self.normalize = normalize
 
         if self.view_dict == None:
@@ -152,7 +157,8 @@ class Plot(TopoObject):
             self.debug('Skipping empty plot.')
             return None
 	else:
-	    (hue,sat,val)= self._make_hsv_matrices()	    
+	    self._slice_matrices()
+	    (hue,sat,val) = self._make_hsv_matrices()	    
             ### JCALERT! This function ought to be in Plot rather than bitmap.py
 	    self.matrices = matrix_hsv_to_rgb(hue,sat,val)
 	    return self
@@ -191,25 +197,18 @@ class Plot(TopoObject):
 		self.view_info['src_name'] = sv.view_info['src_name'] + self.name
 		self.view_info['view_type'] = sv.view_info['view_type']
 
- 
-    ### JCALERT! The doc has to be reviewed (as well as the code by the way...)
-    ### The function should be made as a procedure working on self.matrices directly..
-    ### The code inside has still to be made clearer.
-
-    def _make_hsv_matrices(self):
-	""" 
-	Sub-function of plot() that return the h,s,v matrices corresponding to
-        self.matrices. They specified a bitmap in hsv coordinate.
-
-        Also applying normalizing and croping if required.
+    def _slice_matrices(self):
+	"""
+	Sub-function used by plot: get the submatrix of the matrices in self.matrices 
+        corresponding to the slice of the smallest sheetview matrix belonging to the plot.
+        e.g. for coloring Weight matrix with a preference sheetview, we need to slice
+        the preference matrix region that corresponds to the weight matrix. 
+	Also set the attribute self.shape and self.bounds accordingly.
 	"""
         ### JCALERT! Think about a best way to catch the shape...
-            ### also it should raise an Error if the shape is different for 
-            ### the three matrices!
-	    ### Also it should go in a separate part of the code:
-            ### _make_non_situated_matrices or _make_situated_matrices
-		
-	l_shape = []
+        ### also it should raise an Error if the shape is different for 
+        ### the three matrices!
+ 	l_shape = []
 	l_box = []
 	for mat,box in zip(self.matrices,self.box):
 	    if mat != None:
@@ -222,7 +221,7 @@ class Plot(TopoObject):
 	    if (sh[0]+sh[1]) < (shape[0]+shape[1]):
 		shape = sh
 		slicing_box = b       
-
+		
 	new_matrices =[]
 	for mat in self.matrices:
 	    if mat != None and mat.shape != shape:
@@ -231,11 +230,27 @@ class Plot(TopoObject):
 	    else:
 		new_matrices.append(mat)
 
+        ### JCALERT shape and slicing_box should be added to the doc.
+	self.shape = shape
+	self.bounds = slicing_box
+	self.matrices = new_matrices
 
-	zero=zeros(shape,Float)
-	one=ones(shape,Float)	
+    ### JCALERT! The doc has to be reviewed (as well as the code by the way...)
+    ### The function should be made as a procedure working on self.matrices directly..
+    ### The code inside has still to be made clearer.
 
-	s,h,c = new_matrices
+    def _make_hsv_matrices(self):
+	""" 
+	Sub-function of plot() that return the h,s,v matrices corresponding 
+	to the current self.matrices. 
+	The result specified a bitmap in hsv coordinate.
+    
+        Also applying normalizing and croping if required.
+	"""
+	zero=zeros(self.shape,Float)
+	one=ones(self.shape,Float)	
+
+	s,h,c = self.matrices
         ### JC: The code below may be improved.
 	# Determine appropriate defaults for each matrix
 	if s is None: s=one # Treat as full strength by default
