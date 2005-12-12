@@ -29,11 +29,11 @@ import topo.base.sheetview
 import topoconsole
 from Tkinter import IntVar, StringVar, Checkbutton
 from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
-from topo.base.utils import eval_atof
+import topo.base.parameter
+from topo.base.utils import eval_atof,find_classes_in_package, classname_repr, class_parameters
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.sheet import BoundingBox, Sheet
-from topo.base.utils import find_classes_in_package, classname_repr, class_parameters
-from topo.base.patterngenerator import PatternGenerator
+from topo.base.sheet import Sheet
+
 from topo.commands.basic import pattern_present,save_input_generators,restore_input_generators
 from copy import deepcopy
 
@@ -258,35 +258,32 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
         """
         Make an instantiation of the current user patterns.
 
-        The new pattern generator will be placed in a passed in
-        dictionary for the input sheet under the key 'pattern'.
+        Gets the values set on the panel, and creates the PatternGenerator
+        pg_name with its Parameters set to those values.
 
-        If the 'state' is turned off (from a button on the Frame),
-        then do not change the currently stored generator.  This
-        allows eyes to have different presentation patterns.
+        Also does some other things...
         """
-        p = self.param_frame.get_values()
-        rp = dict(class_parameters(pg_name))
-
-        ndict = {}
-        ### JABHACKALERT!
-        ###
-        ### How will this work for photographs and other items that need non-numeric
-        ### input boxes?  It *seems* to be assuming that everything is a float.
-        # CEB: not any more, but it's not a whole lot better.
-        import topo.base.parameter
-        for (name,parameter) in rp.items():
-
+        parameters = dict(class_parameters(pg_name))
+        input_values = self.param_frame.get_values()
+        
+        new_parameter_values = {}
+        
+        for (name,parameter) in parameters.items():
             if isinstance(parameter, topo.base.parameter.Number):
-                ndict[name] = eval_atof(p[name])
+                # Numbers are changed back from string to float
+                new_parameter_values[name] = eval_atof(input_values[name])
             else:
-                ndict[name] = p[name]                
-    
+                new_parameter_values[name] = input_values[name]                
+
+
+        # If the 'state' is turned off (from a button on the Frame),
+        # then do not change the currently stored generator.  This
+        # allows eyes to have different presentation patterns.
         for each in ep_dict.keys():
             if ep_dict[each]['state']:
-                ndict['density'] = ep_dict[each]['obj'].density
-                ndict['bounds'] = deepcopy(ep_dict[each]['obj'].bounds)
-                pg = pg_name(**ndict)
+                new_parameter_values['density'] = ep_dict[each]['obj'].density
+                new_parameter_values['bounds'] = deepcopy(ep_dict[each]['obj'].bounds)
+                pg = pg_name(**new_parameter_values)
                 ep_dict[each]['pattern'] = pg
         return ep_dict  
 

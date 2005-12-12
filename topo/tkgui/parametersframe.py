@@ -9,6 +9,7 @@ from propertiesframe import PropertiesFrame
 from Tkinter import Frame, TOP, YES, N,S,E,W,X
 from topo.base.utils import eval_atof, class_parameters, keys_sorted_by_value
 import topo
+import topo.base.parameter
 
 # CEBHACKALERT: this file is still being reorganized
 
@@ -100,43 +101,43 @@ class ParametersFrame(Frame):
         Create a dictionary of widgets representing the Parameters.
 
         Each Parameter gets a suitable widget (e.g. a slider for a Number with
-        soft_bounds). The default widget is a text_box.
+        soft_bounds). The default widget is a text box.
+
+        parameters must be Parameter objects.
         """
         widget_dict = {}
         for (parameter_name, parameter) in parameters:
 
             value = str(parameter.default)
 
-            import topo.base.parameter
-            # CEBHACKALERT: rather than this if test where the Parameters are imported,
-            # make Parameter have some method that would work for these subclasses 
             if isinstance(parameter, topo.base.parameter.Number):
                 try:
                     low_bound,high_bound = parameter.get_soft_bounds()
+                    # a Number with softbounds gets a slider
                     widget_dict[parameter_name] = self.__add_slider(parameter_name,
                                                                     str(low_bound),
                                                                     str(high_bound),
                                                                     value)
                 except AttributeError:
-                    # has no soft bounds
-                    widget_dict[parameter_name] = self.__add_text_box(parameter_name,value)
+                    # a Number with no softbounds gets a textbox
+                    widget_dict[parameter_name] = self.__properties_frame.add_text_property(parameter_name,value)
+                    
             elif isinstance(parameter, topo.base.parameter.Enumeration):
-                itms = parameter.available
-                widget_dict[parameter_name] = self.__add_combo_box(
-                    parameter_name,value,itms) 
+                # an Enumeration gets a ComboBox
+                items = parameter.available
+                widget_dict[parameter_name] = self.__properties_frame.add_combobox_property(
+                    parameter_name,value,items) 
             else:
-                # default to text entry    
-                widget_dict[parameter_name] = self.__add_text_box(parameter_name,value)
+                # everything else gets a textbox   
+                widget_dict[parameter_name] = self.__properties_frame.add_text_property(parameter_name,value)
         return widget_dict
                 
-    def __add_combo_box(self, name, value, itms):
-        return self.__properties_frame.add_combobox_property(
-            name,value,itms)
-    
-    def __add_text_box(self,name,value):
-        return self.__properties_frame.add_text_property(name,value)
 
     def __add_slider(self,name,min,max,init):
+        """
+        Call the propertiesframe's add_tagged_slider_property(), but with
+        a particular width and string format.
+        """
         return self.__properties_frame.add_tagged_slider_property(name,init,
                  min_value=min,max_value=max,width=30,string_format='%.6f')
 
