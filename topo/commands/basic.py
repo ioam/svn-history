@@ -140,7 +140,7 @@ def load_snapshot(snapshot_name):
 
     # CEBHACKALERT:
     # Until I figure out how to pickle random properties of the GaussianGenerator properly...
-    hack = 'from topo.base.simulator import active_sim; from topo.sheets.generatorsheet import GeneratorSheet; gs_list = active_sim.objects(GeneratorSheet).values();[gs.set_input_generator(GaussianGenerator()) for gs in gs_list]'
+    hack = 'from topo.base.simulator import get_active_sim; from topo.sheets.generatorsheet import GeneratorSheet; gs_list = get_active_sim().objects(GeneratorSheet).values();[gs.set_input_generator(GaussianGenerator()) for gs in gs_list]'
     exec hack in __main__.__dict__
 
 def save_snapshot(snapshot_name):
