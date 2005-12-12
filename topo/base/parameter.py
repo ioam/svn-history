@@ -406,18 +406,18 @@ class Number(Parameter):
         # CEB: all the following error messages should probably print out the parameter's name
         # ('x', 'theta', or whatever)
         if not (is_number(val)):
-            raise _NumberBoundsException("Parameter " + `self._name` + " (" + `self.__class__` + ") only takes a numeric value.")
+            raise ValueError("Parameter " + `self._name` + " (" + `self.__class__` + ") only takes a numeric value.")
 
         min,max = self.bounds
         if min != None and max != None:
             if not (min <= val <= max):
-                raise _NumberBoundsException("Parameter must be between " + `min` + ' and ' + `max` + ' (inclusive).')
+                raise ValueError("Parameter must be between " + `min` + ' and ' + `max` + ' (inclusive).')
         elif min != None:
             if not min <= val: 
-                raise _NumberBoundsException("Parameter must be at least " + `min` + '.')
+                raise ValueError("Parameter must be at least " + `min` + '.')
         elif max != None:
             if not val <= max:
-                raise _NumberBoundsException("Parameter must be at most " + `min` + '.')
+                raise ValueError("Parameter must be at most " + `min` + '.')
 
     def get_soft_bounds(self):
         """
@@ -538,18 +538,6 @@ class Constant(Parameter):
     def __set__(self,obj,val):
         """Does not allow set commands."""
         raise "Constant parameter cannot be modified"
-
-
-### JABALERT! Should this be replaced with simply ValueError?
-class _NumberBoundsException(Exception):
-    """
-    This exception should be raised when there is an attempt
-    to create a Number with a default outside its hard bounds.
-    """
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
 
 
 def produce_value(value_obj):
