@@ -9,7 +9,7 @@ more details.
 $Id$
 """
 __version__='$Revision$'
-from utils import classlist
+from utils import classlist,find_classes_in_package,classname_repr
 
 
 # CEBHACKALERT: much of the documentation for Parameter subclasses
@@ -302,7 +302,7 @@ class Enumeration(Parameter):
         Raises an error if the given value isn't in the list of available ones.
         """
         # CEBHACKALERT: it would be good to print the Parameter's name
-        # here (see also Number and elsewhere in this file.
+        # here (see also Number and elsewhere in this file).
         if not self.available.count(val) >= 1:
             raise ValueError("EnumeratedParamater can't be set to '" + repr(val) + "' because that's not in the list of available values " + repr(self.available) + ".")
 
@@ -582,22 +582,44 @@ def is_number(obj):
 
 
 
-# CEBHACKALERT: will be making a base class since this kind of class
-# will exist for output_fn,learning_fn,response_fn,patterngenerator
+# CEBHACKALERT: base class for ones in output_fn,learning_fn,response_fn,
+# patterngenerator. Only output_fn, patterngenerator done so far.
+# this isn't finished yet.
 class PackageParameter(Parameter):
     """
     """
     __doc__ = property((lambda self: self.doc))
     
-    def __init__(self,default=None,doc="",**params):
+    def __init__(self,package,class_,to_lose='',default=None,doc="",**params):
         """
         """
         Parameter.__init__(self,default=default,doc=doc,**params)
+        self.package = package
+        self.class_ = class_
+        self.to_lose = to_lose
+
+    def get_default_class_name(self):
+        """
+        """
+        return classname_repr(self.default.__class__.__name__)
 
     def range(self):
         """
+        e.g. Return a dict of OutputFunctions {visible_name: <outputfn_class>}.
         """
-        raise NotImplementedError
+        k = {}
+        classes = find_classes_in_package(self.package, self.class_)    
+        for (name,class_) in classes.items():
+            k[classname_repr(name, self.to_lose)] = class_
+        return k
 
+    # do better than a separate set method
+    def set_from_key(self,key):
+        """
+        """
+        try:
+            self.default = self.range()[key]()
+        except KeyError:
+            raise ValueError("Can't set PackageParameter to a class it doesn't know about...")
 
 
