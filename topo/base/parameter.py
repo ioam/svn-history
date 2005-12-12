@@ -607,6 +607,10 @@ class PackageParameter(Parameter):
         """
         e.g. Return a dict of OutputFunctions {visible_name: <outputfn_class>}.
         """
+        # CEBHACKALERT: e.g. PatternGenerators come out in GUI in the arbitrary
+        # order of the keys of this dict. They used to come out at least in the
+        # same order every time because it was a keyedlist. Don't forget to fix
+        # that.
         k = {}
         classes = find_classes_in_package(self.package, self.class_)    
         for (name,class_) in classes.items():
