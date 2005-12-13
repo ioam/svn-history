@@ -32,8 +32,6 @@ from sheetview import UnitView
 from itertools import chain
 from patterngenerator import ConstantGenerator
 from boundingregion import BoundingBox
-import topo.misc.inlinec as inlinec
-
 
 
 ### JEFF's IMPLEMENTATION NOTES
