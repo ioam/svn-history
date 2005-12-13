@@ -1,34 +1,32 @@
 """
-Construct and stores the PlotGroups used for saving to a file or for a GUI to display.
+Constructs and stores the PlotGroups used for saving to a file or for a GUI to display.
 
 This class is the connection between the Simulator or GUI, and the
 PlotGroup objects in plotting.
 
-When first creating a PlotGroup, PlotEngine stores it in a dictionary,using a plot_group_key as a key.
+When first creating a PlotGroup, PlotEngine stores it in a dictionary, using a plot_group_key.
+The PlotGroup can then be retrieved in the dictionnary for later re-use.
 
-The PlotGroup can then be retrieved in the dictionnary for later use.
-
-The plot_group_key is the simple name of the PlotGroupTemplate for a BasicPlotGroupPanel PlotGroup
-(i.e. A Preference Map panel or an Activity panel)
+The plot_group_key is the simple name of the PlotGroupTemplate for a BasicPlotGroup
+(i.e. displayed in a preference map panel or an activity panel).
 The plot_group_key is more complicated for UnitWeightsPlotGroup and ProjectionPlotGroup
 (see the corresponding UnitWeightsPanel and ProjectionPanel generate_plot_group_key methods)
-It is then possible to imagine other type of plot_group_key, as soon as it identified
-a single PlotGroup.
+It is then possible to imagine other type of plot_group_key, as soon as it allows to
+identify a single PlotGroup.
 
 $Id$ 
 """
-
 
 ### JABHACKALERT!  The documentation above needs substantial
 ### clarification -- less detail, more sense.
 ### JC: I think I improved it a bit, but still need some work.
 
-
 __version__='$Revision$'
+
 
 ### JCALERT! This file has been clarified a lot.
 ### Nevertheless, it still remains little alerts that need to be solved
-### and the doc still have to be corrested and reviewed
+### and the doc still have to be corrected and reviewed
 
 from topo.base.topoobject import TopoObject
 ### JCALERT! import *: I don't know how to do it otherwise...
