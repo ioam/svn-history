@@ -10,7 +10,7 @@ __version__='$Revision$'
 
 from topo.base.connectionfield import CFResponseFunction
 from topo.base.parameter import Parameter
-from topo.misc.inlinec import inline
+from topo.misc.inlinec import inline, optimized
 
 class CFDotProduct_Py(CFResponseFunction):
     """
