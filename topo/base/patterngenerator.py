@@ -99,9 +99,6 @@ class PatternGenerator(TopoObject):
 
         x is a 1d-array of x-axis values at which to sample the pattern;
         y contains the y-axis values.
-
-        Both contain smaller to larger values from left to right,
-        i.e. they follow Cartesian convention.
         """       
         if r == 0 and c == 0:
             rows,cols = bounds2shape(bounds,density)
@@ -112,7 +109,11 @@ class PatternGenerator(TopoObject):
         y = array([matrixidx2sheet(r,0,bounds,density) for r in range(rows)])
         x = array([matrixidx2sheet(0,c,bounds,density) for c in range(cols)])
 
-        y = y[::-1,1]
+        # x increases from left to right; y decreases from left to right.
+        # For this function to make sense on its own, y should probably be
+        # reversed, but y would then have to be reversed again in
+        # __create_and_rotate_coordinates().
+        y = y[:,1]
         x = x[:,0]
 
         assert len(x) == cols
@@ -124,9 +125,8 @@ class PatternGenerator(TopoObject):
         """
         Creates pattern matrices from x and y vectors, and rotates them to the specified orientation.
         """
-        pattern_y = subtract.outer(-cos(orientation)*y, sin(orientation)*x)
-        pattern_x = add.outer(-sin(orientation)*y, cos(orientation)*x)
-
+        pattern_y = subtract.outer(cos(orientation)*y, sin(orientation)*x)
+        pattern_x = add.outer(sin(orientation)*y, cos(orientation)*x)
         return pattern_x, pattern_y
 
 
