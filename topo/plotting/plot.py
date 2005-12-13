@@ -295,6 +295,7 @@ class Plot(TopoObject):
         ### it is linked to that.
 	shape = bounds2shape(outer_box,self.density)
 	r1,r2,c1,c2 = bounds2slice(self.slicing_box,outer_box,self.density)
+        ### raise an error when r2-r1 > shape[1] or c2=c1 > shape[0]
 	new_matrices = []
 	for mat in self.matrices:
 	    new_mat = zeros(shape,Float)
