@@ -179,11 +179,11 @@ class DivisiveHebbian(CFLearningFunction):
         
         inline(hebbian_div_norm_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'learning_rate'], local_dict=locals())
 
-# Optimized version overwrites the unoptimized version name if the
-# code is in the optimized state.
+# Optimized version is overwritten by the unoptimized version if the
+# code does not have optimized set.
 if not optimized:
     DivisiveHebbian = GenericCFLF
-    TopoObject().message('Optimized DivisiveHebbian not being used.')
+    TopoObject().message('Inline-optimized components not available; using GenericCFLF instead of DivisiveHebbian.')
 
 
 
@@ -275,10 +275,10 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
         
         inline(hebbian_div_norm_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'learning_rate','weight_ptrs','slice_ptrs'], local_dict=locals())
 
-# Optimized version overwrites the unoptimized version name if the
-# code is in the optimized state.
+# Optimized version is overwritten by the unoptimized version if the
+# code does not have optimized set.
 if not optimized:
     DivisiveHebbian_CPointer = GenericCFLF
-    TopoObject().message('Optimized DivisiveHebbian_CPointer not being used.')
+    TopoObject().message('Inline-optimized components not available; using GenericCFLF instead of DivisiveHebbian_CPointer.')
     
 
