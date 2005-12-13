@@ -93,9 +93,22 @@ class Hebbian(CFLearningFunction):
                 for c in range(cols):
                     cfs[r][c].weights = output_fn(cfs[r][c].weights)
 
-# Cannot currently create a python Hebbian since the object creation
-# requires a "GenericCFLF(single_cf_fn=hebbian)" which is not a direct
-# class-name reassignment.
+
+class Hebbian_Py(GenericCFLF):
+    """
+    CF-aware Hebbian learning rule.
+
+    Equivalent to GenericCFLF(single_cf_fn=hebbian)
+    Wrapper written to allow transparent non-optimized fallback.
+    """
+    def __init__(self,**params):
+        super(Hebbian_Py,self).__init__(single_cf_fn=hebbian,**params)
+        
+# Optimized version is overwritten by the unoptimized version if the
+# code does not have optimized set.
+if not optimized:
+    Hebbian = Hebbian_Py
+    TopoObject().message('Inline-optimized components not available; using Hebbian_Py instead of Hebbian.')
 
 
 
