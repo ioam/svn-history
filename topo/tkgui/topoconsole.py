@@ -357,7 +357,8 @@ class TopoConsole(Frame):
         else:
             topo.commands.basic.load_snapshot(snapshot_name)
             self.messageBar.message('state', 'Loaded snapshot ' + snapshot_name)
-        
+
+        self.notify_of_active_sim()
         topo.tkgui.show_cmd_prompt()
 
 
