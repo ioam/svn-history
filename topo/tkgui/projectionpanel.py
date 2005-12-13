@@ -19,6 +19,7 @@ from topo.base.projection import ProjectionSheet
 import topoconsole
 from topo.base.utils import dict_sort
 from topo.misc.keyedlist import KeyedList
+from math import ceil
 
 UNIT_PADDING = 1
 BORDERWIDTH = 2
@@ -224,8 +225,8 @@ class ProjectionPanel(CFSheetPlotPanel):
                                   for im in self.pe_group.bitmaps]
             old_canvases = self.canvases
             self.canvases = [Canvas(self.plot_frame,
-                                    width=image.width(),
-                                    height=image.height(),
+                                    width=image.width()+1,
+                                    height=image.height()+1,
                                     bd=0)
                              for image in self.zoomed_images]
     
@@ -235,10 +236,16 @@ class ProjectionPanel(CFSheetPlotPanel):
                 canvas.grid(row=i//self.pe_group.shape[0],
                             column=i%self.pe_group.shape[1],
                             padx=UNIT_PADDING,pady=UNIT_PADDING)
-                canvas.create_image(image.width()/2+BORDERWIDTH+2,
-                                    image.height()/2+BORDERWIDTH+2,
+                # BORDERWIDTH is added because the border is drawn on the
+                # canvas, overwriting anything underneath it.
+                # The +1 is necessary since the TKinter Canvas object
+                # has a problem with axis alignment, and 1 produces
+                # the best result.
+                canvas.create_image(image.width()/2+BORDERWIDTH+1,
+                                    image.height()/2+BORDERWIDTH+1,
                                     image=image)
-                canvas.config(borderwidth=BORDERWIDTH,relief=RIDGE)
+                canvas.config(highlightthickness=0,borderwidth=BORDERWIDTH,
+                              relief=RIDGE)
 
     
             # Delete old ones.  This may resize the grid.

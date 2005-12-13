@@ -320,15 +320,21 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
                new_sizes != old_sizes:
             old_canvases = self.canvases
             self.canvases = [Canvas(self.plot_frame,
-                                    width=image.width(),
-                                    height=image.height(),
+                                    width=image.width()+1,
+                                    height=image.height()+1,
                                     bd=0)
                              for image in self.zoomed_images]
             for i,image,canvas in zip(range(len(self.zoomed_images)),
                                       self.zoomed_images,self.canvases):
-                canvas.create_image(image.width()/2+BORDERWIDTH+2,
-                                    image.height()/2+BORDERWIDTH+2,image=image)
-                canvas.config(borderwidth=BORDERWIDTH,relief=RIDGE)
+                # BORDERWIDTH is added because the border is drawn on the
+                # canvas, overwriting anything underneath it.
+                # The +1 is necessary since the TKinter Canvas object
+                # has a problem with axis alignment, and 1 produces
+                # the best result.
+                canvas.create_image(image.width()/2+BORDERWIDTH+1,
+                                    image.height()/2+BORDERWIDTH+1,image=image)
+                canvas.config(highlightthickness=0,borderwidth=BORDERWIDTH,
+                              relief=RIDGE)
                 canvas.grid(row=0,column=i,padx=5)
             for c in old_canvases:
                 c.grid_forget()
