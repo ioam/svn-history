@@ -144,10 +144,8 @@ class TopoConsole(Frame):
         topo.base.simulator.objects_to_notify_of_active_sim.append(self)
         # CEBHACKALERT: this adds itself to the list above, but unless
         # 'quit' is selected from the menu, it leaves itself behind in
-        # the list (e.g. if X is clicked to shut the window). Do I have
-        # to worry about that or will Python later remove it anyway? I
-        # think I have to worry...I need to find an 'on close' or similar
-        # method.
+        # the list (e.g. if X is clicked to shut the window).
+        # I need to find an 'on close' or similar method.
 
         self.loaded_script = None
         self.input_params_window = None
@@ -223,11 +221,15 @@ class TopoConsole(Frame):
 
         self.menubar.addmenuitem('Plots','separator')
 
+
         # CEBHACKALERT: what's this?
+        # See CEBHACKALERT by auto_refresh(self) below
         self.menubar.addmenuitem('Plots', 'command',
                                  'Refresh auto-refresh plots',
                                  label="Refresh",
                                  command=self.auto_refresh)
+        
+
 
 
         #
@@ -306,10 +308,12 @@ class TopoConsole(Frame):
         self.plot_engine = topo.plotting.plotengine.PlotEngine(self.simulator)
 
 
-    # CEBHACKALERT: this *does* exit the interpreter if topographica was
-    # started with -g.
     def quit(self):
-        """Close the main GUI window.  Does not exit Topographica interpreter."""
+        """
+        Close the main GUI window.
+
+        Exits the Topographica interpreter.
+        """
         topo.base.simulator.objects_to_notify_of_active_sim.remove(self)
         Frame.quit(self)
         Frame.destroy(self)     # Get rid of widgets
@@ -387,9 +391,20 @@ class TopoConsole(Frame):
 	self.messageBar.message('state', 'Reset not yet implemented')
 
 
-    #
+
+    # CEBHACKALERT: I propose to remove these functions and their use
+    # in plotgrouppanel.
+    # Here is what they provide: for any (registered) window
+    # that's open and has had auto-refresh switched off (so it is not
+    # displaying the most up-to-date image), turning back on
+    # auto-refresh and then clicking this refresh menu item will
+    # update it (and all such windows) to the most recent image.  I
+    # say the complication is not worth it. But maybe for lots of open
+    # windows, halving the number of clicks a user has to make is
+    # worthwhile (they still have to turn back on auto-refresh on each
+    # window first.
+    
     # auto-refresh handling
-    #
     def auto_refresh(self):
         for win in self.auto_refresh_panels:
             win.refresh()
