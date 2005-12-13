@@ -33,7 +33,7 @@ from topo.base.topoobject import TopoObject
 from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
 from topo.base.parameter import Dynamic
 import palette as palette
-from topo.base.sheet import submatrix, bounds2slice
+from topo.base.sheet import submatrix, bounds2slice, bounds2shape
 
 
 ### JCALERT! WHAT about histograms? (ask Jim) 
@@ -63,6 +63,7 @@ class Plot(TopoObject):
     ###          Note: solution would be to get the shape of the bigger bounding box before
     ###                calling submatrix in _get_slice()
 
+    ### JCALERT! I have to change the order: situated, plot_bb and (normalize)
     def __init__(self,(channel_1, channel_2, channel_3),sheet_view_dict,density=None,
                  plot_bounding_box=None,normalize=False,situated=False, **params):
         """
@@ -80,7 +81,10 @@ class Plot(TopoObject):
         constituting the plot.
 
 	plot_bounding_box is the outer bounding_box of the plot
-        (for the moment, it has to be the sheet.bounds...)
+        to apply if situating the plot (if not specified it will be
+        the self.bounds of the plot, i.e. bounds of the sheet) 
+        
+	situated specified if we want to situate the plot.
         
         a 'name' parameter is inherited from TopoObject.
            
@@ -94,7 +98,6 @@ class Plot(TopoObject):
 
       	self.view_dict = sheet_view_dict
         self.channels = (channel_1, channel_2, channel_3)
-        self.plot_bounding_box = plot_bounding_box
         self.density = density
 
 	### JC: maybe we can use the parameter name instead of having a view_info?
@@ -105,15 +108,17 @@ class Plot(TopoObject):
 	# The list of matrices that constitutes the plot.
 	# Will finally hold 3 matrices (JC: or more?)
         self.matrices = [] 
-
 	# The list of the bounding box of the SheetViews associated with this plot.
         self.box=[]
 
 	# shape (dimension) of the plotting area
         self.shape = (0,0)
-	# bounds of the plotting area
-	self.bounds = None        
+	# bounds of the situated plotting area 
+	self.plot_bounding_box = plot_bounding_box
+	# bounds of the sliced area
+        self.slicing_box = None
 
+	self.situated = situated
         self.normalize = normalize
 
         if self.view_dict == None:
@@ -173,6 +178,12 @@ class Plot(TopoObject):
 	    (hue,sat,val) = self._make_hsv_matrices()	    
             ### JCALERT! This function ought to be in Plot rather than bitmap.py
 	    self.matrices = matrix_hsv_to_rgb(hue,sat,val)
+	    if self.situated:
+		if self.plot_bounding_box == None:
+		    raise ValueError("the plot_bounding_box must be specified for situating the plot")
+		else:
+		    self._situating_plot(self.plot_bounding_box)
+		    
 	    return self
 
 
@@ -255,7 +266,7 @@ class Plot(TopoObject):
 
         ### JCALERT shape and slicing_box should be added to the doc.
 	self.shape = shape
-	self.bounds = slicing_box
+	self.slicing_box=slicing_box
 	self.matrices = new_matrices
 
     ### JCALERT! The doc has to be reviewed (as well as the code by the way...)
@@ -300,7 +311,23 @@ class Plot(TopoObject):
 	
 	return (hue,sat,val)
 
+    ### JCALERT! In this function, we assume that the slicing box is contained in the 
+    ### outer box. Otherwise there will be an error
+    def _situating_plot(self,outer_box):
 
+	### JCALERT! It has to be tested that bounds2shape returns the right answer for this purpose
+        ### There seems to have a variation in the size of the plot, study this "bug" to see of
+        ### it is linked to that.
+	shape = bounds2shape(outer_box,self.density)
+	r1,r2,c1,c2 = bounds2slice(self.slicing_box,outer_box,self.density)
+	new_matrices = []
+	for mat in self.matrices:
+	    new_mat = zeros(shape,Float)
+	    new_mat[r1:r2,c1:c2] = mat
+	    new_matrices.append(new_mat)
 
+	self.matrices = new_matrices    
+	    
+	
 	
    
