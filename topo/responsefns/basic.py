@@ -35,7 +35,7 @@ class CFDotProduct_Py(CFResponseFunction):
                 activity[r,c] = sum(a.flat)
         activity *= strength
 
-
+### JABHACKALERT!  This needs to move to a new file optimized.py
 class CFDotProduct(CFResponseFunction):
     """
     Dot-product response function.
