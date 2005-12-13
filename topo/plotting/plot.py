@@ -6,9 +6,7 @@ $Id$
 __version__='$Revision$'
 
 
-### JABALERT: Should this be replaced with Numeric.clip()?
-import MLab # Used for MLab.clip()
-from Numeric import zeros, ones, Float, divide, ravel
+from Numeric import zeros, ones, Float, divide, ravel,clip
 
 from topo.base.topoobject import TopoObject
 from topo.base.parameter import Dynamic
@@ -273,13 +271,15 @@ class Plot(TopoObject):
 
 	hue,sat,val=h,c,s
        
+	### JCALERT! This re-done in matrix_hsv_to_rgb...so we could get rid of one of these tests?
+        ### Furthermore self.cropped does not seem to be used....
 	if max(ravel(hue)) > 1.0 or max(ravel(sat)) > 1.0 or max(ravel(val)) > 1.0:
 	    self.cropped = True
 	    ### JCALERT! In which case is this occuring? Because it may not need a warning...
 	    #self.warning('Plot: HSVMap inputs exceed 1. Clipping to 1.0')
-	    if max(ravel(hue)) > 1.0: hue = MLab.clip(hue,0.0,1.0)
-	    if max(ravel(sat)) > 1.0: sat = MLab.clip(sat,0.0,1.0)
-	    if max(ravel(val)) > 1.0: val = MLab.clip(val,0.0,1.0)
+	    if max(ravel(hue)) > 1.0: hue = clip(hue,0.0,1.0)
+	    if max(ravel(sat)) > 1.0: sat = clip(sat,0.0,1.0)
+	    if max(ravel(val)) > 1.0: val = clip(val,0.0,1.0)
 	else:
 	    self.cropped = False
 
