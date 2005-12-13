@@ -163,6 +163,13 @@ class CFDotProduct(CFResponseFunction):
     
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
+# Optimized version is overwritten by the unoptimized version if the
+# code does not have optimized set.
+if not optimized:
+    CFDotProduct = CFDotProduct_Py
+    TopoObject().message('Inline-optimized components not available; using CFDotProduct_Py instead of CFDotProduct.')
+        
+
 
 
 class CFDotProduct_CPointer(CFResponseFunction):
@@ -320,3 +327,9 @@ class CFDotProduct_CPointer(CFResponseFunction):
 
         inline(code, ['X', 'strength', 'len', 'temp_act','cols','rows','weight_ptrs','slice_ptrs'], local_dict=locals())
 
+# Optimized version is overwritten by the unoptimized version if the
+# code does not have optimized set.
+if not optimized:
+    CFDotProduct_CPointer = CFDotProduct_Py
+    TopoObject().message('Inline-optimized components not available; using CFDotProduct_Py instead of CFDotProduct_CPointer.')
+        
