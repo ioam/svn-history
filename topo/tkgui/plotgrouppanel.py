@@ -29,7 +29,7 @@ import MLab
 BORDERWIDTH = 1
 
 # Unfortunately, the canvas creation, border placement, and image
-# positioning of Tkiner are very fragile.  This value boosts the size
+# positioning of Tkinter are very fragile.  This value boosts the size
 # of the canvas that the plot image is displayed on.  Too large and
 # the border will not be close, too small, and some of the image is
 # not displayed.  
