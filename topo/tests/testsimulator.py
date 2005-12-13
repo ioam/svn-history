@@ -11,6 +11,9 @@ from Numeric import array
 from topo.base.simulator import *
 from topo.eps.basic import *
 
+
+# CEBHACKALERT: not a complete test of simulator
+
 class TestSimulator(unittest.TestCase):
     def test_event_copy(self):
         """

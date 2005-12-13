@@ -33,6 +33,9 @@ import testfeaturemap
 import testoutputfnsbasic
 
 
+# CEBHACKALERT: no test for patterns/image.py
+
+
 # tkgui import calls tkgui/__init__.py, which should contain other test
 # imports for that directory.
 import tkgui
