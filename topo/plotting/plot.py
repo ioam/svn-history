@@ -1,69 +1,47 @@
 """
-Plot and PlotTemplate classes. 
-
-Plot creates the 3 matrices necessary for plotting a RGB image, 
-from a three-tuple (channels) and a dictionnary of SheetViews.
-
-The channels specify the key for finding the SheetViews that 
-have to be retrieved for this purpose. 
-
-The plot objects are listed within a PlotGroup Class which then arranges
-multiple plots into a single figure displayed in a PlotGroupPanel.
-
-(Associated with this single (constructed) box of information are multiple histograms that
-are stored within the base plot object. (Not yet implemented.))
+Plot class.
 
 $Id$
 """
 __version__='$Revision$'
 
 
-### JCALERT!
-### 
-### The code in this file is still being reviewed, and may still need
-### substantial changes. Particularly, the doc has to be reviewed.
-
-### JCALERT! Are these 3 import statements really used?
-import sys
-import types
-import MLab
-
+### JABALERT: Should this be replaced with Numeric.clip()?
+import MLab # Used for MLab.clip()
 from Numeric import zeros, ones, Float, divide, ravel
+
 from topo.base.topoobject import TopoObject
-from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
 from topo.base.parameter import Dynamic
-import palette as palette
 from topo.base.sheet import submatrix, bounds2slice, bounds2shape
 
+from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
+import palette as palette
 
-### JCALERT! WHAT about histograms? (ask Jim) 
-#from histogram import Histogram 
-### JCALERT! The histograms should be implemented and an object histograms assign to a Plot() 
 
-    
 class Plot(TopoObject):
     """
-    Class that constructs a bitmap plot from one or more
-    SheetViews. The bitmap is just stored for future use, 
-    e.g. as part of a PlotGroup of related plots displayed 
-    within one GUI window.
+    Constructs and stores a bitmap from one or more SheetViews.
+
+    The bitmap is then available for future use, e.g. as part of a
+    PlotGroup of related plots displayed within one GUI window.
+
+    Plot creates the 3 matrices necessary for plotting a RGB image,
+    from a three-tuple (channels) and a dictionary of SheetViews.
+    Eventually, plots more complex than simple bitmaps will be
+    supported, including overlaid outlines, contours, vector fields,
+    histograms, etc., and the overall architecture should be designed
+    to make this feasible.
     """
     background = Dynamic(default=BLACK_BACKGROUND)
     palette_ = Dynamic(default=palette.Monochrome)
-
  
-    ### JCALERT! - Pass the content of a template instead of channels?
-    ### Or pass a list of three tuples? To be fixed with Jim.
-    ### Also: - put normalize in PlotGroup?
-    ###       - Re-write the test file, taking the new changes into account.
-    ###       - Added the option situated, to situate the plot
-    ###         (the problem is how to define plot_bounding_box: we 
-    ###          need it to be the slice of the sheet in get_slice but if we want to pass
-    ###           whatever bounds to situate into?)
-    ###          Note: solution would be to get the shape of the bigger bounding box before
-    ###                calling submatrix in _get_slice()
-
-    ### JCALERT! I have to change the order: situated, plot_bb and (normalize)
+    ### JCALERT!
+    ### - Pass the content of a template, as a dictionary, instead of 3 fixed channels.
+    ### - Re-write the test file, taking the new changes into account.
+    ### - I have to change the order: situated, plot_bb and (normalize)
+    ### - There should be a way to associate the density explicitly
+    ###   with the sheet_view_dict, because it must match all SheetViews
+    ###   in that dictionary.  Maybe as a tuple?
     def __init__(self,(channel_1, channel_2, channel_3),sheet_view_dict,density=None,
                  plot_bounding_box=None,normalize=False,situated=False, **params):
         """
@@ -81,33 +59,33 @@ class Plot(TopoObject):
         constituting the plot.
 
 	plot_bounding_box is the outer bounding_box of the plot
-        to apply if situating the plot (if not specified it will be
-        the self.bounds of the plot, i.e. bounds of the sheet) 
+        to apply if the plot is situated.  If not situated, the
+        bounds of the smallest SheetView are used.
         
-	situated specified if we want to situate the plot.
+	situated specifies if we want to situate the plot, i.e.,
+        whether to plot the entire Sheet (or other area specified by
+        the plot_bounding_box), or only the smallest plot (usually a
+        Weights plot).
         
-        a 'name' parameter is inherited from TopoObject.
-           
-        TODO: implement the possibility to pass more than three 
-        SheetView keys for more complicated plots (12/01/05)
+        name (inherited from TopoObject) specifies the name to use for
+        this plot.
         """   
-        ### JCALERT! That was in the doc: WHAT ABOUT BOUNDINGREGIONS?
-        ### Is it important? (Ask Jim)
-
         super(Plot,self).__init__(**params)
 
       	self.view_dict = sheet_view_dict
         self.channels = (channel_1, channel_2, channel_3)
         self.density = density
 
-	### JC: maybe we can use the parameter name instead of having a view_info?
+	### JCALERT: Fix view_info here, and in SheetView
         self.view_info = {}
 
         self.cropped = False
 
+        ### JABALERT: Should probably be a dictionary (or, more likely, KeyedList).
 	# The list of matrices that constitutes the plot.
-	# Will finally hold 3 matrices (JC: or more?)
-        self.matrices = [] 
+        self.matrices = []
+
+        ### JABALERT: Please explain this better, or clean it up.
 	# The list of the bounding box of the SheetViews associated with this plot.
         self.box=[]
 
@@ -115,22 +93,17 @@ class Plot(TopoObject):
         self.shape = (0,0)
 	# bounds of the situated plotting area 
 	self.plot_bounding_box = plot_bounding_box
+
+        ### JABALERT: Please explain this better.
 	# bounds of the sliced area
         self.slicing_box = None
 
 	self.situated = situated
         self.normalize = normalize
 
-        if self.view_dict == None:
-            raise ValueError("A Plot should be passed a sheet_view_dict when created")
 
-	### JCALERT! maybe also raise something when channels are all None?
-        ### Not necessarily, it depends when we cactch the empy plot exception. 
-
-
-    ### JCALERT! Actually, this function can be used this way.
-    ### It is called from release_sheetviews in PlotGroup and enable to
-    ### free memory space when we don't need the SheetViews entry anymore.
+    ### JABALERT: This does not seem appropriate -- Plot should not delete
+    ### any SheetViews that it did not put there itself.
     def release_sheetviews(self):
         """
         Delete any sheet_view_dict entries used by this plot, under
@@ -141,9 +114,8 @@ class Plot(TopoObject):
 	    del self.view_dict[each]
 
 
-
+    ### JCALERT: This should just be moved to __init__.
     # JC: This function is called by load_images in PlotGroup and sub-classes.  
-    ### Maybe it should just be called from __init__ ?             
     def plot(self):
         """
         Get the SheetViews requested from each channel passed in at
@@ -164,12 +136,15 @@ class Plot(TopoObject):
         """
 
 	### JC: It might be clearer to call:
-        ### self.matrices = self._get_matrices_from_view
+        ### self.matrices = self._get_matrices_from_view_dict()
 	self._get_matrices_from_view_dict()
 
         ### JCALERT! What if the order is not the same?
-        ### Maybe passing a dictionnary instead of a triple in the first place?
+        ### Maybe passing a dictionary instead of a triple in the first place?
 	s,h,c = self.matrices
+        ### JABALERT: When moving this to __init__, may be better to
+        ### raise an exception to be caught by the instantiator
+        ### instead.
         if (s==None and c==None and h==None):
             self.debug('Skipping empty plot.')
             return None
@@ -199,9 +174,9 @@ class Plot(TopoObject):
 	self.matrices=[]
         self.box=[]
         for each in self.channels:
-	    ### JCALERT! Presumably, if each == None then there is no key equal to None in the 
-            ### dict and then sv==None. Ask Jim if it is alright, because it is always possible that
-            ### some mad man has done dict[None]=who_knows_what ?
+            ### Note that this logic will fail if someone happens to
+            ### have put an item with the key None into the
+            ### dictionary, but that should be unlikely.
 	    sv = self.view_dict.get(each, None)
 	    if sv == None:
 		self.matrices.append(None)

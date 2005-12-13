@@ -29,9 +29,6 @@ import MLab
 BORDERWIDTH = 2
 
 
-### JCALERT: the name has been changed from PlotPanel to PlotGroupPanel
-### I think we might also want to change the name of all the subclasses (e.g. UnitWeightPanel...) but not necessarily.
-
 class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
     """
     Abstract PlotGroupPanel class for displaying bitmapped images to a TK

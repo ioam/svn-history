@@ -78,6 +78,8 @@ class SheetView(TopoObject):
         """
         super(SheetView,self).__init__(**params)
 
+        ### JABALERT/JCALERT: What is a view_info?  Please describe more
+        ### fully, clean up, or eliminate.
         # View information goes here:
         self.view_info = {'src_name':src_name,'view_type':view_type}
         
