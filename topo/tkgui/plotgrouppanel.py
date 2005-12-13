@@ -26,12 +26,12 @@ import ImageTk
 import Numeric
 import MLab
 
-BORDERWIDTH = 2
-# JDALERT The canvas creation, border placement, and image
-# positioning, of Tkiner is very fragile.  This value boosts the size
+BORDERWIDTH = 1
+# JDALERT: The canvas creation, border placement, and image
+# positioning of Tkiner is very fragile.  This value boosts the size
 # of the canvas that the plot image is displayed on.  Too large and
 # the border will not be close, too small, and some of the image is
-# not displayed.
+# not displayed.  
 CANVASBUFFER = 1
 
 
@@ -313,8 +313,8 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         # create a new set of canvases.  If the old canvases still can
         # work, then reuse them to prevent flicker.
         if self.canvases and len(self.zoomed_images) > 0:
-            new_sizes = [(str(zi.width()+CANVASBUFFER),
-                          str(zi.height()+CANVASBUFFER))
+            new_sizes = [(str(zi.width()+BORDERWIDTH*2+CANVASBUFFER),
+                          str(zi.height()+BORDERWIDTH*2+CANVASBUFFER))
                          for zi in self.zoomed_images]
             old_sizes = [(zi.config()['width'][-1],zi.config()['height'][-1])
                          for zi in self.canvases]
@@ -324,9 +324,9 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
                new_sizes != old_sizes:
             old_canvases = self.canvases
             self.canvases = [Canvas(self.plot_frame,
-                                    width=image.width()+CANVASBUFFER,
-                                    height=image.height()+CANVASBUFFER,
-                                    bd=0)
+                               width=image.width()+BORDERWIDTH*2+CANVASBUFFER,
+                               height=image.height()+BORDERWIDTH*2+CANVASBUFFER,
+                               bd=0)
                              for image in self.zoomed_images]
             for i,image,canvas in zip(range(len(self.zoomed_images)),
                                       self.zoomed_images,self.canvases):
@@ -335,11 +335,13 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
                 # The +1 is necessary since the TKinter Canvas object
                 # has a problem with axis alignment, and 1 produces
                 # the best result.
+                canvas.create_rectangle(1, 1, image.width()+BORDERWIDTH*2,
+                                        image.height()+BORDERWIDTH*2,
+                                        width=BORDERWIDTH,outline="black")
                 canvas.create_image(image.width()/2+BORDERWIDTH+1,
                                     image.height()/2+BORDERWIDTH+1,
                                     image=image)
-                canvas.config(highlightthickness=0,borderwidth=BORDERWIDTH,
-                              relief=RIDGE)
+                canvas.config(highlightthickness=0,borderwidth=0,relief=FLAT)
                 canvas.grid(row=0,column=i,padx=5)
             for c in old_canvases:
                 c.grid_forget()

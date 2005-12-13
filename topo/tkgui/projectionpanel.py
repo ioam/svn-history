@@ -7,7 +7,7 @@ __version__='$Revision$'
 
 import __main__
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
-     Entry, Canvas, RIDGE
+     Entry, Canvas, FLAT
 import Pmw
 import ImageTk
 from topo.plotting.templates import plotgroup_templates
@@ -22,8 +22,8 @@ from topo.misc.keyedlist import KeyedList
 from math import ceil
 
 UNIT_PADDING = 1
-BORDERWIDTH = 2
-# JDALERT The canvas creation, border placement, and image
+BORDERWIDTH = 1
+# JDALERT: The canvas creation, border placement, and image
 # positioning, of Tkiner is very fragile.  This value boosts the size
 # of the canvas that the plot image is displayed on.  Too large and
 # the border will not be close, too small, and some of the image is
@@ -231,9 +231,9 @@ class ProjectionPanel(CFSheetPlotPanel):
                                   for im in self.pe_group.bitmaps]
             old_canvases = self.canvases
             self.canvases = [Canvas(self.plot_frame,
-                                    width=image.width()+CANVASBUFFER,
-                                    height=image.height()+CANVASBUFFER,
-                                    bd=0)
+                               width=image.width()+BORDERWIDTH*2+CANVASBUFFER,
+                               height=image.height()+BORDERWIDTH*2+CANVASBUFFER,
+                               bd=0)
                              for image in self.zoomed_images]
     
             # Lay out images
@@ -250,8 +250,10 @@ class ProjectionPanel(CFSheetPlotPanel):
                 canvas.create_image(image.width()/2+BORDERWIDTH+1,
                                     image.height()/2+BORDERWIDTH+1,
                                     image=image)
-                canvas.config(highlightthickness=0,borderwidth=BORDERWIDTH,
-                              relief=RIDGE)
+                canvas.config(highlightthickness=0,borderwidth=0,relief=FLAT)
+                canvas.create_rectangle(1, 1, image.width()+BORDERWIDTH*2,
+                                        image.height()+BORDERWIDTH*2,
+                                        width=BORDERWIDTH,outline="black")
 
     
             # Delete old ones.  This may resize the grid.
