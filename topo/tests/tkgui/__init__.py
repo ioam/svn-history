@@ -13,6 +13,10 @@ import testactivitypanel
 import testbasicplotgrouppanel
 import testmatplotlibtk
 
+
+# CEBHACKALERT:
+# no tests for parametersframe, inputparamspanel, taggedslider
+
 suite = unittest.TestSuite()
 
 display_loc = os.getenv('DISPLAY')

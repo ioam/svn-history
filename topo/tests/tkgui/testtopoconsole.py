@@ -5,6 +5,8 @@ $Id$
 __version__='$Revision$'
 
 
+# CEBHACKALERT: doesn't test topoconsole completely.
+
 import unittest
 from topo.tkgui import *
 from topo.base.simulator import Simulator

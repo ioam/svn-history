@@ -5,12 +5,9 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEB:
-# This file is still being written
-#
-# To do:
-# - add comments
-# - clean up redundant tests
+# CEBHACKALERT: almost finished. Clean up redundant tests, comment,
+# and test selectivity for non-cyclic quantities once that has been
+# finished in distribution.
 
 import unittest
 from topo.misc.distribution import Distribution

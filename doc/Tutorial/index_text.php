@@ -150,6 +150,9 @@ neuron.  A similar procedure can be performed in the model by selecting
 <img src="images/or_key_vert_transparent_topo.png" alt="Orientation key" height="291" width="24">
 </p><br>
 
+<!-- CEBHACKALERT: make sure to update the orientation key when
+     screenshots are taken from the current topographica -->
+
 <P>
 (This will usually take about 30 seconds to complete; it is normal
 for the Topographica windows not to refresh during this time.)

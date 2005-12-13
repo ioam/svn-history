@@ -7,9 +7,11 @@ __version__='$Revision$'
 
 import unittest
 from topo.base.patterngenerator import *
-from MLab import flipud, rot90
-from Numeric import *
+from Numeric import array
 from topo.patterns.basic import RectangleGenerator
+
+# CEBHACKALERT: needs writing so that it tests PatternGenerator properly!
+
 
 class TestPatternGenerator(unittest.TestCase):
 

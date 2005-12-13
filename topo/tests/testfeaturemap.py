@@ -8,11 +8,7 @@ __version__='$Revision$'
 
 
 
-# CEB:
-# This file is still being written
-
-# To do:
-# 
+# CEBHACKALERT: this isn't finished.
 
 
 import unittest

@@ -5,6 +5,9 @@ $Id$
 """
 __version__='$Revision$'
 
+
+# CEBHACKALERT: this does not test PropertiesFrame completely.
+
 import unittest
 from Tkinter import *
 from topo.tkgui import *
