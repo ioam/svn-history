@@ -269,6 +269,7 @@ class IdentityCFLF(CFLearningFunction):
 class GenericCFLF(CFLearningFunction):
     """CFLearningFunction applying the specified single_cf_fn to each CF."""
     single_cf_fn = Parameter(default=hebbian)
+    output_fn = Parameter(default=Identity())
     
     def __init__(self,**params):
         super(GenericCFLF,self).__init__(**params)
