@@ -102,8 +102,9 @@ class LISSOM_CPointer(LISSOM):
                 len, len2 = inp.shape
                 proj.learning_fn(cfs, inp, self.activity, learning_rate, weight_ptrs=proj.weight_ptrs, slice_ptrs=proj.slice_ptrs)
 
-# Optimized version overwrites the unoptimized version name if the
-# code is in the optimized state.
+
+# Optimized version is overwritten by the unoptimized version if the
+# code does not have optimized set.
 if not optimized:
     LISSOM_CPointer = LISSOM
-    TopoObject().message('Optimized LISSOM_CPointer not being used.')
+    TopoObject().message('Inline-optimized components not available; using LISSOM instead of LISSOM_CPointer.')
