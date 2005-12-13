@@ -23,6 +23,12 @@ from math import ceil
 
 UNIT_PADDING = 1
 BORDERWIDTH = 2
+# JDALERT The canvas creation, border placement, and image
+# positioning, of Tkiner is very fragile.  This value boosts the size
+# of the canvas that the plot image is displayed on.  Too large and
+# the border will not be close, too small, and some of the image is
+# not displayed.
+CANVASBUFFER = 1
 
 class ProjectionPanel(CFSheetPlotPanel):
     def __init__(self,parent,pengine,console=None,**config):
@@ -225,8 +231,8 @@ class ProjectionPanel(CFSheetPlotPanel):
                                   for im in self.pe_group.bitmaps]
             old_canvases = self.canvases
             self.canvases = [Canvas(self.plot_frame,
-                                    width=image.width()+1,
-                                    height=image.height()+1,
+                                    width=image.width()+CANVASBUFFER,
+                                    height=image.height()+CANVASBUFFER,
                                     bd=0)
                              for image in self.zoomed_images]
     
