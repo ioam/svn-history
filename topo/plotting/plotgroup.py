@@ -58,6 +58,7 @@ def sort_plots(plot_list):
 ### remaining job will be to clarify the way Plots are created both in this file and in plot.py
 ### (also clarifying bitmap.py, plotfilesaver.py and the plotgrouppanel sub-classes at the same time)
 
+
 class PlotGroup(TopoObject):
     """
     Container that has one or more Plots and also knows how to arrange
@@ -66,7 +67,7 @@ class PlotGroup(TopoObject):
 
     ### JCALERT: 
     ### plot_list could maybe disappear.
-    ### + I left template=None so that the testPlotGroup does not crash anymore,
+    ### I left template=None so that the testPlotGroup does not crash anymore,
     ### that will have to be re-moved eventually.
     ### re-arranged the order and look at the call in all panel classes (i.e. inputparampanel)
     ### also review the doc of each functions.
@@ -135,7 +136,6 @@ class PlotGroup(TopoObject):
 
     ###JCALERT! We may want to implement a create_plots in the PlotGroup class
     ### Ask Jim about that.
-
     def create_plots(self):
         """This function need to be re-implemented in the subclass."""
         
@@ -186,6 +186,7 @@ class PlotGroup(TopoObject):
                 #
                 # Should report that cropping took place.
                 #
+                ### JCALERT! It should be 1.0, and anyway, it is already supposed to be done in plot...?
                 if max(ravel(r)) > 0: r = MLab.clip(r,0.0,1.0)
                 if max(ravel(g)) > 0: g = MLab.clip(g,0.0,1.0)
                 if max(ravel(b)) > 0: b = MLab.clip(b,0.0,1.0)
@@ -202,7 +203,7 @@ class PlotGroup(TopoObject):
         return self.bitmaps
     
 
-
+    
     def add(self,new_plot):
         """
         new_plot can be a single Plot, or it can be a list of plots.
@@ -231,8 +232,7 @@ class PlotGroup(TopoObject):
 
     ### JCALERT! The call to this function is done when we want the list.
     ### so there is no need to explicitly call it from outside if not to use this list
-    ### (see the do_plot_cmd in most of the PlotGroupPanels). Therefore, the call
-    ### to this function can be removed in this files.    
+    ### (see the do_plot_cmd in most of the PlotGroupPanels).     
     def plots(self):
         """
         Generate the bitmap lists.
@@ -280,6 +280,7 @@ class BasicPlotGroup(PlotGroup):
         super(BasicPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,plot_list,
                                             **params)
 
+
         ### JC: for basic PlotGroup, no need to create a "dynamic List"
         ### even we could get rid of this dynamic list and systematically call
         ### plots() before load_images (cf plotgrouppanel)?(cf JCALERT in plots() above)
@@ -317,32 +318,24 @@ class UnitWeightsPlotGroup(PlotGroup):
   
     def create_plots(self,pt_name,pt,sheet):
 
-	### JCALERT: here the hue and confidence ought to be taken and used later on
-        ### but a first work on plot.py is required to make these changes
         hue = pt.channels.get('Hue',None)
         confidence = pt.channels.get('Confidence',None)
-
-	### JCALERT! The problem is that the unitview is from the src_sheet
-        ### but the OrientationPreference sheet_view is in the dest_sheet
-        ### (I think I was wrong about that: we only colored lateral interactions?
-        ### anyway that does not work so far...)
-
+        
 	plot_list = []
         if not isinstance(sheet,CFSheet):
             self.warning('Requested weights view from other than CFSheet.')
         else:
             for p in set(flatten(sheet.in_projections.values())):
-
-		### JCALERT! This has to be clarified: the sheet_view for a 
+		### JCALERT! This has to be clarified somewhere: the sheet_view for a 
 		### weight belongs to the src_sheet, and the name in the key
                 ### is the destination sheet.
                 key = ('Weights',sheet.name,p.name,self.x,self.y)
 		plot_name = '\n(from ' + p.src.name +')'
 		plot_list.append(Plot((key,hue,confidence),p.src.sheet_view_dict,p.src.density,
 				      p.src.bounds,pt.channels['Normalize'],name=plot_name))
-
         self.debug('plot_list =' + str(plot_list))
         return plot_list
+
 	
     ### JCALERT! I am not sure this function is of any use here, it should be put in another place...
     ### or, change the name of it so that it is clearer when called for the PlotGroupPanels
@@ -357,9 +350,6 @@ class UnitWeightsPlotGroup(PlotGroup):
 		### JCALERT! It is confusing that the method unit_view is only defined in the 
                 ### CFSheet class, and that we are supposed to manipulate sheets here.
 		### also, it is supposed to return a view, but here it is used as a procedure.
-                ### (procedure that is applied to a connectionfield and add the unit_view in the 
-                ### sheet_view_dict of its source sheet, that has to be fixed so that it put a UnitView
-                ### and not a list of unit_view)
                 each.unit_view(self.x,self.y)
 
    
