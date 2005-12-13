@@ -133,21 +133,25 @@ plotgroup_templates[pgt.name] = pgt
 
 
 pgt = PlotGroupTemplate([('Unit Weights',
-                          PlotTemplate({'Location'   : (0.0,0.0),
-                                        'Normalize'  : True,
-					'Hue'        : 'OrientationPreference',
-					'Sheet_name' : 'V1'}))],
+                          PlotTemplate({'Strength'   : 'Weights',
+                                        'Hue'        : 'OrientationPreference',
+                                        'Confidence' : None,
+                                        'Normalize'  : True}))],
                         name='Unit Weights',
                         command='pass')
 plotgroup_templates[pgt.name] = pgt
+
 pgt = PlotGroupTemplate([('Projection',
-                          PlotTemplate({'Density'         : 25,
-                                        'Projection_name' : 'None',
-					'Hue'        : 'OrientationPreference',
-				        'Normalize'       : True}))],
+                          PlotTemplate({'Strength'        : 'Weights',
+					'Hue'             : 'OrientationPreference',
+                                        'Confidence'      : None,
+                                        'Normalize'       : True,
+                                        'Density'         : 25,
+                                        'Projection_name' : 'None'}))],
                         name='Projection',
                         command='pass')
 plotgroup_templates[pgt.name] = pgt
+
 pgt = PlotGroupTemplate([('Orientation Preference',
                           PlotTemplate({'Strength'   : None,
                                         'Hue'        : 'OrientationPreference',
