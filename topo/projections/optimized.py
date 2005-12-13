@@ -58,11 +58,11 @@ class CFProjection_CPointer(CFProjection):
         self.slice_ptrs = ones((x,y), Int)
         setup_sp(self.cfs, self.slice_ptrs, x, y)
 
-# Optimized version overwrites the unoptimized version name if the
-# code is in the optimized state.
+# Optimized version is overwritten by the unoptimized version if the
+# code does not have optimized set.
 if not optimized:
     CFProjection_CPointer = CFProjection
-    TopoObject().message('Optimized CFProjection not being used.')
+    TopoObject().message('Inline-optimized components not available; using CFProjection instead of CFProjection_CPointer.')
         
 
 def setup_wp(cfs, wp, rows, cols):
