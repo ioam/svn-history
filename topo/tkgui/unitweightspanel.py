@@ -91,13 +91,6 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         if ep.bounds.contains(self.x,self.y):
             self.plot_group_key = ('Weights',self.region.get(),self.x,self.y)
             self.displayed_x, self.displayed_y = self.x, self.y
-
-            # The PlotTemplate mechanism requires updating the Unit
-            # Weight plots so that the PlotEngine will poll the
-            # correct unit view.
-            pt = plotgroup_templates['Unit Weights'].plot_templates['Unit Weights']
-            pt.channels['Sheet_name'] = self.region.get()
-            pt.channels['Location'] = (self.x, self.y)
         else:
             self.dialog = Pmw.Dialog(self.parent,title = 'Error')
             message = 'The x/y coordinates are outside the bounding region.\n'\
