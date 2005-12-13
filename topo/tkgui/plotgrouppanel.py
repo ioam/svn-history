@@ -27,6 +27,12 @@ import Numeric
 import MLab
 
 BORDERWIDTH = 2
+# JDALERT The canvas creation, border placement, and image
+# positioning, of Tkiner is very fragile.  This value boosts the size
+# of the canvas that the plot image is displayed on.  Too large and
+# the border will not be close, too small, and some of the image is
+# not displayed.
+CANVASBUFFER = 1
 
 
 class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
@@ -307,7 +313,8 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         # create a new set of canvases.  If the old canvases still can
         # work, then reuse them to prevent flicker.
         if self.canvases and len(self.zoomed_images) > 0:
-            new_sizes = [(str(zi.width()),str(zi.height()))
+            new_sizes = [(str(zi.width()+CANVASBUFFER),
+                          str(zi.height()+CANVASBUFFER))
                          for zi in self.zoomed_images]
             old_sizes = [(zi.config()['width'][-1],zi.config()['height'][-1])
                          for zi in self.canvases]
@@ -317,8 +324,8 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
                new_sizes != old_sizes:
             old_canvases = self.canvases
             self.canvases = [Canvas(self.plot_frame,
-                                    width=image.width()+1,
-                                    height=image.height()+1,
+                                    width=image.width()+CANVASBUFFER,
+                                    height=image.height()+CANVASBUFFER,
                                     bd=0)
                              for image in self.zoomed_images]
             for i,image,canvas in zip(range(len(self.zoomed_images)),
@@ -329,7 +336,8 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
                 # has a problem with axis alignment, and 1 produces
                 # the best result.
                 canvas.create_image(image.width()/2+BORDERWIDTH+1,
-                                    image.height()/2+BORDERWIDTH+1,image=image)
+                                    image.height()/2+BORDERWIDTH+1,
+                                    image=image)
                 canvas.config(highlightthickness=0,borderwidth=BORDERWIDTH,
                               relief=RIDGE)
                 canvas.grid(row=0,column=i,padx=5)
@@ -338,7 +346,8 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         else:  # Width of first plot still same, and same number of images.
             for i,image,canvas in zip(range(len(self.zoomed_images)),
                                       self.zoomed_images,self.canvases):
-                canvas.create_image(image.width()/2,image.height()/2,image=image)
+                canvas.create_image(image.width()/2+BORDERWIDTH+1,
+                                    image.height()/2+BORDERWIDTH+1,image=image)
                 canvas.grid(row=0,column=i,padx=5)
             
 
