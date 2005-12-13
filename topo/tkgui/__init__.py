@@ -14,6 +14,17 @@ import Pmw, sys, Tkinter
 import topo.base.topoobject
 import topoconsole
 
+
+# By default, none of the pattern types in topo/patterns/ is imported
+# in Topographica, but for the GUI, we want all of them to be
+# available as a list from which the user can select. To do this, we
+# import all of the PatternGenerator classes in all of the modules
+# mentioned in topo.patterns.__all__, and will also use any that the
+# user has defined and registered...
+# CEBHACKALERT:  ... in the right namespace
+from topo.patterns import *
+
+
 def show_cmd_prompt():
     """
     Small helper to print the sys.ps1 prompt to the command-line.
