@@ -30,9 +30,10 @@ import topoconsole
 from Tkinter import IntVar, StringVar, Checkbutton
 from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
 import topo.base.parameter
-from topo.base.utils import eval_atof,find_classes_in_package, classname_repr, class_parameters
+from topo.base.utils import eval_atof,find_classes_in_package, classname_repr
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.sheet import Sheet
+from topo.base.topoobject import class_parameters
 
 from topo.commands.basic import pattern_present,save_input_generators,restore_input_generators
 from copy import deepcopy

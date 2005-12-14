@@ -396,3 +396,30 @@ def print_all_param_defaults():
     print "==========================================="
 
     
+
+
+def class_parameters(topo_class):
+    """
+    Return the non-hidden Parameters of the specified TopoObject class as a list of 2-tuples (parameter_name, parameter).
+
+    E.g. for a class that has one Parameter
+    x=Number()
+    this function returns
+    [('x',<topo.base.parameter.Number object at ...>)]
+
+    The specified class must be of type TopoObject.
+    """
+    assert isinstance(topo_class, type)
+
+    # Create the object so that Parameters of any superclasses are also present.
+    topo_obj = topo_class()
+    
+    if not isinstance(topo_obj,TopoObject):
+        raise TypeError("Can only get Parameters for a class derived from TopoObject.")
+    
+    parameters = [(parameter_name,parameter)
+                  for (parameter_name,parameter)
+                  in topo_obj.get_paramobj_dict().items()
+                  if not parameter.hidden
+                 ]
+    return parameters

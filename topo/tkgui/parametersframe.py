@@ -7,9 +7,10 @@ __version__='$Revision$'
 
 from propertiesframe import PropertiesFrame
 from Tkinter import Frame, TOP, YES, N,S,E,W,X
-from topo.base.utils import class_parameters, keys_sorted_by_value
+from topo.base.utils import keys_sorted_by_value
 import topo
 import topo.base.parameter
+from topo.base.topoobject import class_parameters
 
 # CEBHACKALERT: this file is still being reorganized
 
