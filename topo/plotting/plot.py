@@ -142,7 +142,7 @@ class Plot(TopoObject):
 		if self.plot_bounding_box == None:
 		    raise ValueError("the plot_bounding_box must be specified for situating the plot")
 		else:
-		    self.matrices = self.__situating_plot(self.plot_bounding_box, slicing_box)
+		    self.matrices = self.__situate_plot(self.plot_bounding_box, slicing_box)
 	
 
 
@@ -247,7 +247,7 @@ class Plot(TopoObject):
 	to the current self.matrices. 
 	The result specified a bitmap in hsv coordinate.
     
-        Also applying normalizing and croping if required.
+        Also applying normalizing and cropping if required.
 	"""
 	zero=zeros(shape,Float)
 	one=ones(shape,Float)	
@@ -286,7 +286,7 @@ class Plot(TopoObject):
 
     ### JCALERT! In this function, we assume that the slicing box is contained in the 
     ### outer box. Otherwise there will be an error
-    def __situating_plot(self,outer_box,slicing_box):
+    def __situate_plot(self,outer_box,slicing_box):
 
 	### JCALERT! It has to be tested that bounds2shape returns the right answer for this purpose
         ### There seems to have a variation in the size of the plot, study this "bug" to see of
