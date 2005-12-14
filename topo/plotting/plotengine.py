@@ -19,7 +19,7 @@ $Id$
 
 ### JABHACKALERT!  The documentation above needs substantial
 ### clarification -- less detail, more sense.
-### JC: I think I improved it a bit, but still need some work.
+### JC: I think I improved it, but it still needs some work.
 
 __version__='$Revision$'
 
@@ -47,18 +47,11 @@ class PlotEngine(TopoObject):
         when necessary.
         """
         super(PlotEngine,self).__init__(**params)
+
 	### JCALERT! maybe change simulation to be simulator 
         ### (carefull to also change the call to it in any other files) 
         self.simulation = simulation
         self.plot_group_dict = {}
-
-
-    def add_plot_group(self, name, group):
-        """
-        Add a constructed PlotGroup to the local PlotEngine dictionary for later
-        reuse.  User defined plots should be stored here for later use.
-        """
-        self.plot_group_dict[name] = group
 
         
     ### JABALERT!  It is strange for this to call make_plot_group;
@@ -132,8 +125,7 @@ class PlotEngine(TopoObject):
         # Just copying the pointer.  Not currently sure if we want to
         # promote side-effects by not doing a deepcopy(), but assuming
         # we do for now.  If not, use deepcopy(group_type).
-
-        self.add_plot_group(plot_group_key,new_group)
+        self.plot_group_dict[plot_group_key]=new_group
 	    
         self.debug('Type of new_group is', type(new_group))
         return new_group

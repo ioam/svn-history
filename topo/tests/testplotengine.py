@@ -33,6 +33,8 @@ import ImageTk
 import random
 import pdb #debugger
 
+
+### JC: My new statements.
 from topo.base.simulator import Simulator
 from topo.plotting.plotengine import PlotEngine
 from topo.plotting.plotgroup import BasicPlotGroup
@@ -69,14 +71,6 @@ class TestPlotEngine(unittest.TestCase):
           self.sim.connect(V3,V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'V2toV3'})
 
           self.pe = PlotEngine(self.sim)
-
-      def test_add_plot_group(self):
-      
-          pgt = plotgroup_templates['Activity']
-          plot_group = BasicPlotGroup(self.sim,pgt,'Activity',None,None)
-          self.pe.add_plot_group('Activity',plot_group)
-          test = self.pe.plot_group_dict.get('Activity',None)
-          self.assertEqual(test,plot_group)
 
       def test_make_plot_group(self):
 
@@ -123,8 +117,6 @@ class TestPlotEngine(unittest.TestCase):
           test3 = self.pe.plot_group_dict.get(pg_key3,None)
           #self.assertEqual(test_plot_group3,test3)
           
-
-
           pgt4 = plotgroup_templates['Projection']
 
 
