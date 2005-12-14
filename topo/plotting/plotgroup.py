@@ -160,7 +160,11 @@ class PlotGroup(TopoObject):
         pass
     
 
-
+    ### JABHACKALERT!  There is no apparent reason why this code
+    ### should be constructing any bitmaps here.  The Plot should be
+    ### able to return a Bitmap (e.g. using a function bitmap(), and
+    ### the type of that Bitmap might be anything (RGBBitmap,
+    ### HSVBitmap, etc., rather than RGBBitmap as assumed here).
     def load_images(self):
         """
         Pre:  do_plot_cmd() has already been called, so plots() will return
