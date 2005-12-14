@@ -265,7 +265,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 
         Also does some other things...
         """
-        parameters = dict(class_parameters(pg_name))
+        parameters = class_parameters(pg_name)
         input_values = self.param_frame.get_values()
         
         new_parameter_values = {}

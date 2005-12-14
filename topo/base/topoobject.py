@@ -399,12 +399,12 @@ def print_all_param_defaults():
 
 def class_parameters(topo_class):
     """
-    Return the non-hidden Parameters of the specified TopoObject class as a list of 2-tuples (parameter_name, parameter).
+    Return the non-hidden Parameters of the specified TopoObject class as {parameter_name: parameter}.
 
     E.g. for a class that has one Parameter
     x=Number()
     this function returns
-    [('x',<topo.base.parameter.Number object at ...>)]
+    {'x':<topo.base.parameter.Number object at ...>}
 
     The specified class must be of type TopoObject.
     """
@@ -421,4 +421,5 @@ def class_parameters(topo_class):
                   in topo_obj.get_paramobj_dict().items()
                   if not parameter.hidden
                  ]
-    return parameters
+                 
+    return dict(parameters)
