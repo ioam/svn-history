@@ -54,9 +54,8 @@ class ParametersFrame(Frame):
         """
         """
         try: 
-            for entry in self.__widgets.values():
-                if entry[1].need_to_refresh_slider:
-                    entry[1].set_slider_from_tag()
+            for (msg,widget) in self.__widgets.values():
+                widget.set_slider_from_tag()
         except AttributeError:
             pass
 
@@ -116,13 +115,13 @@ class ParametersFrame(Frame):
                     low_bound,high_bound = parameter.get_soft_bounds()
 
                     # well it doesn't really have softbounds!
-                    if low_bound==None or high_bound==None:
+                    if low_bound==None or high_bound==None or low_bound==high_bound:
                         raise AttributeError
                     
                     # a Number with softbounds gets a slider
                     widget_dict[parameter_name] = self.__add_slider(parameter_name,
-                                                                    low_bound,
-                                                                    high_bound,
+                                                                    str(low_bound),
+                                                                    str(high_bound),
                                                                     parameter.default)
                 except AttributeError:
                     # a Number with no softbounds gets a textbox
