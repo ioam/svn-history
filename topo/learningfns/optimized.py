@@ -192,20 +192,21 @@ class DivisiveHebbian(CFLearningFunction):
         
         inline(hebbian_div_norm_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'learning_rate'], local_dict=locals())
 
-class DivisiveHebbian_Fallback(GenericCFLF):
+class DivisiveHebbian_Py(GenericCFLF):
     """
-    Fallback wrapper for when inlinec.optimized is not set.
-    Creates a GenericCFLF with a different default learning function.
+    Same as GenericCFLF, but with a default output_fn of DivisiveSumNormalize.
+
+    Acts as a an exact (but much, much slower) replacement for
+    DivisiveHebbian, to declare what DivisiveHebbian implements and to
+    allow fallback when inline-optimized components are not available.
     """
     def __init__(self,**params):
-        super(DivisiveHebbian_Fallback,self).__init__(**params)
+        super(DivisiveHebbian_Py,self).__init__(**params)
         self.output_fn = DivisiveSumNormalize()
         
-# Optimized version is overwritten by the unoptimized version if the
-# code does not have optimized set.
 if not optimized:
-    DivisiveHebbian = DivisiveHebbian_Fallback
-    TopoObject().message('Inline-optimized components not available; using DivisiveHebbianFallback instead of DivisiveHebbian.')
+    DivisiveHebbian = DivisiveHebbian_Py
+    TopoObject().message('Inline-optimized components not available; using DivisiveHebbian_Py instead of DivisiveHebbian.')
 
 
 
@@ -297,19 +298,8 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
         
         inline(hebbian_div_norm_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'learning_rate','weight_ptrs','slice_ptrs'], local_dict=locals())
 
-class DivisiveHebbian_CPointer_Fallback(GenericCFLF):
-    """
-    Fallback wrapper for when inlinec.optimized is not set.
-    Creates a GenericCFLF with a different default learning function.
-    """
-    def __init__(self,**params):
-        super(DivisiveHebbian_CPointer_Fallback,self).__init__(**params)
-        self.output_fn = DivisiveSumNormalize()
-
-# Optimized version is overwritten by the unoptimized version if the
-# code does not have optimized set.
 if not optimized:
-    DivisiveHebbian_CPointer = DivisiveHebbian_CPointer_Fallback
-    TopoObject().message('Inline-optimized components not available; using GenericCFLF instead of DivisiveHebbian_CPointer.')
+    DivisiveHebbian_CPointer = DivisiveHebbian_Py
+    TopoObject().message('Inline-optimized components not available; using DivisiveHebbian_Py instead of DivisiveHebbian_CPointer.')
     
 
