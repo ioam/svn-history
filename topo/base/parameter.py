@@ -661,11 +661,11 @@ class PackageParameter(Parameter):
         return k
 
     # do better than a separate set method
-    def set_from_name(self,key):
+    def set_from_key(self,key):
         """
         """
         try:
-            self.default = self.range()[name]()
+            self.default = self.range()[key]()
         except KeyError:
             raise ValueError("Can't set PackageParameter to a class it doesn't know about...")
 
