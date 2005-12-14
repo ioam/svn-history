@@ -208,17 +208,6 @@ class TopoConsole(Frame):
 
         self.menubar.addmenuitem('Plots','separator')
 
-
-        # CEBHACKALERT: what's this?
-        # See CEBHACKALERT by auto_refresh(self) below
-        self.menubar.addmenuitem('Plots', 'command',
-                                 'Refresh auto-refresh plots',
-                                 label="Refresh",
-                                 command=self.auto_refresh)
-        
-
-
-
         #
         # Help menu
         #
@@ -378,30 +367,18 @@ class TopoConsole(Frame):
 	self.messageBar.message('state', 'Reset not yet implemented')
 
 
-
-    # CEBHACKALERT: I propose to remove these functions and their use
-    # in plotgrouppanel.
-    # Here is what they provide: for any (registered) window
-    # that's open and has had auto-refresh switched off (so it is not
-    # displaying the most up-to-date image), turning back on
-    # auto-refresh and then clicking this refresh menu item will
-    # update it (and all such windows) to the most recent image.  I
-    # say the complication is not worth it. But maybe for lots of open
-    # windows, halving the number of clicks a user has to make is
-    # worthwhile (they still have to turn back on auto-refresh on each
-    # window first.
-    
     # auto-refresh handling
     def auto_refresh(self):
+        """
+        Refresh all windows in auto_refresh_panels.
+        
+        Panels can add and remove themselves to the list; those in the list
+        will have their refresh() method called whenever this console's
+        autorefresh() is called.
+        """
         for win in self.auto_refresh_panels:
             win.refresh()
 
-    def add_auto_refresh_panel(self,panel):
-        self.auto_refresh_panels.append(panel)
-
-    def del_auto_refresh_panel(self,panel):
-        self.auto_refresh_panels.remove(panel)
-    
 
     #
     # New plot windows

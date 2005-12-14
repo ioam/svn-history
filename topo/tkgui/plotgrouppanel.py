@@ -409,14 +409,20 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         topo.tkgui.show_cmd_prompt()
 
         if self.auto_refresh:
-            self.console.add_auto_refresh_panel(self)
+            self.console.auto_refresh_panels.append(self)
         else:
-            self.console.del_auto_refresh_panel(self)
+            self.console.auto_refresh_panels.remove(self)
+
+        # JAB: it might make sense for turning on auto-refresh
+        # to do a refresh automatically, though that might have
+        # unexpected behavior for a preference map calculation
+        # (where it would do unnecessary, and potentially lengthy,
+        # recalculation).
 
 
     def destroy(self):
         if self.auto_refresh:
-            self.console.del_auto_refresh_panel(self)
+            self.console.auto_refresh_panels.remove(self)
         Frame.destroy(self)
 
 
