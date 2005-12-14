@@ -77,7 +77,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
 
 	### JCALERT! Check if this makes sense in the general case...
         ### Usually the pgt_name is the plot_group_key by default,
-        ### but for inputparamspanel pgt_name = None and the plot_group_key is 'Preview'
+        ### but for testpattern pgt_name = None and the plot_group_key is 'Preview'
         ### passed by default when creating the class
         if pgt_name != None:
             self.plot_group_key = pgt_name

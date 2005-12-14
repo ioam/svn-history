@@ -12,7 +12,7 @@ import tkFileDialog
 from basicplotgrouppanel import BasicPlotGroupPanel
 from unitweightspanel import UnitWeightsPanel
 from projectionpanel import ProjectionPanel
-from inputparamspanel import InputParamsPanel
+from testpattern import TestPattern
 from topo.plotting.templates import PlotGroupTemplate, PlotTemplate, plotgroup_templates
 import topo.base.simulator
 import topo.plotting.plotengine
@@ -388,12 +388,12 @@ class TopoConsole(Frame):
         Test Pattern Window.  
         """
         if self.simulator: #CEBHACKALERT & plot_engine?
-            if InputParamsPanel.valid_context():
+            if TestPattern.valid_context():
                 self.input_params_window = GUIToplevel(self)
                 self.input_params_window.withdraw()
                 self.input_params_window.title('Test Pattern')
                 # CEBHACKALERT: alter this...don't need to pass self & self.plot_engine
-                ripp = InputParamsPanel(self.input_params_window,self.plot_engine,self)
+                ripp = TestPattern(self.input_params_window,self.plot_engine,self)
                 ripp.pack(side=TOP,expand=YES,fill=BOTH)
                 self.input_params_window.deiconify()
                 self.messageBar.message('state', 'OK')

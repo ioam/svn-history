@@ -21,7 +21,7 @@ class ParametersFrame(Frame):
 
     CEBHACKALERT: shouldn't this be associated with one class all the time it exists,
     rather than specifying the class of interest each time in create_widgets()?
-    We'll see this when we do InputParamsPanel, I guess.
+    We'll see this when we do TestPattern, I guess.
     """
 
     def __init__(self, parent=None,**config):

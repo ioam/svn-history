@@ -15,7 +15,7 @@ import testmatplotlibtk
 
 
 # CEBHACKALERT:
-# no tests for parametersframe, inputparamspanel, taggedslider
+# no tests for parametersframe, testpattern, taggedslider
 
 suite = unittest.TestSuite()
 
