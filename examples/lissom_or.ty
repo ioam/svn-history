@@ -140,8 +140,10 @@ gaussian_width = xsigma/RN/sqrt(2)
 gaussian_height = ysigma/RN/sqrt(2)
 GaussianGenerator.size = gaussian_height
 GaussianGenerator.aspect_ratio = gaussian_width/gaussian_height
-GaussianGenerator.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
-
+input_bounds = BoundingBox(points=((-0.5-rf_radius/RN,-0.5-rf_radius/RN),
+                                   ( 0.5+rf_radius/RN, 0.5+rf_radius/RN)))
+GaussianGenerator.bounds = input_bounds
+                                               
 
 # LISSOM parameters
 LISSOM.density = BaseN
@@ -167,7 +169,8 @@ CFProjection.learning_fn=DivisiveHebbian()
 
 s = topo.base.simulator.Simulator()
 
-Retina = GeneratorSheet(input_generator=GaussianGenerator(),name='Retina')
+Retina = GeneratorSheet(input_generator=GaussianGenerator(),
+                        name='Retina', bounds=input_bounds)
 V1 = LISSOM(name='V1')
 
 s.connect(Retina,V1, delay = FixedPoint("0.05"),
