@@ -13,8 +13,7 @@ import sys
 import copy
 
 
-from parameter import Parameter, Constant
-from utils import classlist,descendents
+from parameter import Parameter, Constant, classlist, descendents
 from pprint import pprint
 
 SILENT  = 0
