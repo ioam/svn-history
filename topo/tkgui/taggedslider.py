@@ -52,12 +52,13 @@ class TaggedSlider(Frame):
         self.slider.pack(side=LEFT,expand=YES,fill=BOTH)
 
         # see self.slider_command below
-        self.first_slider_command = 1
+        self.first_slider_command = True
 
         # Add the tag
         self.tag_val = tagvariable
         self.tag = Entry(self,textvariable=self.tag_val,width=tag_width)
 
+        # slider updates on return and on losing focus
         self.tag.bind('<FocusOut>', self.refresh)
         self.tag.bind('<Return>', self.refresh)
         
@@ -65,9 +66,13 @@ class TaggedSlider(Frame):
 
         self.set_slider_from_tag()
 
+
     def refresh(self,e):
         self.root.optional_refresh()
-        
+
+
+    # CEBALERT: the comment is true, this is required. But
+    # maybe there's a cleaner way?
     def slider_command(self,arg):
         """
         When this frame is first shown, it calls the slider callback,
@@ -78,7 +83,7 @@ class TaggedSlider(Frame):
             self.set_tag_from_slider()
             self.root.optional_refresh()
         else:
-            self.first_slider_command = 0
+            self.first_slider_command = False
         
      
 
