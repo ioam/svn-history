@@ -29,7 +29,7 @@ class TestPropertiesFrame(unittest.TestCase):
     
         pp.add_tagged_slider_property("Volume",value='5',
                                       string_format='%d',
-                                      min_value=0,max_value=11)
+                                      min_value="0",max_value="11")
     
         # CEBHACKALERT: "I fix this another day"
         #pp.add_combobox_property("File",value='xxx',

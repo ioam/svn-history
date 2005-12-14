@@ -7,11 +7,11 @@ __version__='$Revision$'
 
 from Tkinter import Frame, IntVar, Scale, Entry
 from Tkinter import LEFT, RIGHT, TOP, BOTTOM, YES, BOTH
-import string
+from topo.base.utils import eval_atof
 
 # CEBHACKALERT: somewhere there has to be better handling of bad input.
 # e.g. "cat" gives orientation zero, as does "pI/4".
-# Typing "1," leads to a really annoying error too.
+
 
 class TaggedSlider(Frame):
     """
@@ -31,22 +31,17 @@ class TaggedSlider(Frame):
                  max_value=100,
                  string_format = '%f',
                  tag_width=10,
-                 string_translator=string.atof,
+                 string_translator=eval_atof,
                  **config):
 
         Frame.__init__(self,root,**config)
         self.root = root
 
-        # CEBHACKALERT: in parametersframe, bounds are no longer
-        # converted to strings, so I think this is ok...
-        self.min_value = min_value
-        self.max_value = max_value
-        #self.min_value = string_translator(min_value)
-        #self.max_value = string_translator(max_value)
+        self.min_value = string_translator(min_value)
+        self.max_value = string_translator(max_value)
         
         self.fmt = string_format
 
-        self.need_to_refresh_slider = True
         self.string_translator = string_translator
 
         # Add the slider
@@ -62,20 +57,27 @@ class TaggedSlider(Frame):
         # Add the tag
         self.tag_val = tagvariable
         self.tag = Entry(self,textvariable=self.tag_val,width=tag_width)
-        self.tag.bind('<Return>', self.refresh)
+
         self.tag.bind('<FocusOut>', self.refresh)
+        self.tag.bind('<Return>', self.refresh)
         
         self.tag.pack(side=LEFT)
 
         self.tag_val.trace_variable('w',self.tag_val_callback)
-        #print 'self.tag_val = ' + self.tag_val.get()
         self.set_slider_from_tag()
 
     def refresh(self,e):
         self.root.optional_refresh()
 
     def tag_val_callback(self,*args):
+        """
+        Whenever the value in the tag changes, call set_slider_from_tag().
+
+        (The value changes whenever a key is pressed while the tag
+        has the focus.)
+        """
         self.set_slider_from_tag()
+
         
     def slider_command(self,arg):
         """
@@ -92,30 +94,31 @@ class TaggedSlider(Frame):
      
 
     def set_tag_from_slider(self):
-        new_string = self.fmt % self.get_slider_value()
+        new_string = self.fmt % self.__get_slider_value()
         self.tag_val.set(new_string)
 
          
-    def set_slider_from_tag(self,evchar=None):
-        try:
-            if self.need_to_refresh_slider: 
+    def set_slider_from_tag(self):
+        """
+        Set the slider (including its limits) to match the tag value.
 
-                val = self.string_translator(self.tag_val.get())
-                if val > self.max_value:
-                    self.max_value = val
-                elif val < self.min_value:
-                    self.min_value = val
-                        
-                self.set_slider_value(val)
+        Because the slider is updated dynamically, partial input to
+        the tag is evaluated (i.e. key presses are evaluated immediately).
+        """
+        val = self.string_translator(self.tag_val.get())
+        if val > self.max_value:
+            self.max_value = val
+        elif val < self.min_value:
+            self.min_value = val
 
-        except ValueError:
-            pass
+        self.__set_slider_value(val)
+
         
-    def get_slider_value(self):
+    def __get_slider_value(self):
         range = self.max_value - self.min_value
         return self.min_value + (self.slider_val.get()/10000.0 * range)
     
-    def set_slider_value(self,val):
+    def __set_slider_value(self,val):
         range = self.max_value - self.min_value
         new_val = 10000 * (val - self.min_value)/range
         self.slider_val.set(int(new_val))
