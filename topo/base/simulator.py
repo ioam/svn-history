@@ -451,13 +451,15 @@ class Simulator(TopoObject):
         """
         Connect the source to the destination, at the appropriate ports,
         if any are given.  If src and dest have not been added to the
-        simulator, they will be added.
+        simulator, they will be added.  Returns the connection that
+        was created.
         """
         self.add(src,dest)
         conn = connection_type(src=src,dest=dest,src_port=src_port,dest_port=dest_port,delay=delay,**connection_params)
         src._connect_to(conn,**extra_args)
         dest._connect_from(conn,**extra_args)
-
+        return conn
+    
 
     ### It might be possible to come up with a more expressive name
     ### for this function.  It should mean 'anything that exists in
