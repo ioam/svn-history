@@ -149,9 +149,9 @@ class Parameter(object):
     documentation).
     """
 
-    # CEBHACKALERT: to get the benefit of slots, subcclasses must
-    # themselves define __slots__, whether or not they define attributes
-    # not present in the base Parameter class. 
+    # To get the benefit of slots, subclasses must themselves define
+    # __slots__, whether or not they define attributes not present in
+    # the base Parameter class.
     # See the reference manual:
     # The action of a __slots__ declaration is limited to the class
     # where it is defined. As a result, subclasses will have a
@@ -291,6 +291,7 @@ class Filename(Parameter):
     system's format, but only code that uses UNIX-style paths will run on all operating
     systems.
     """
+    __slots__ = []
     __doc__ = property((lambda self: self.doc))
     
     def __init__(self,default=None,**params):
@@ -317,6 +318,7 @@ class Enumeration(Parameter):
 
     An Enumeration's value is always one from its list of available values.
     """
+    __slots__ = ['available']
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self, default=None, available=[], **params):
@@ -351,6 +353,7 @@ class Enumeration(Parameter):
 class Number(Parameter):
     """
     """
+    __slots__ = ['bounds','_softbounds']
     __doc__ = property((lambda self: self.doc))
  
     def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),**params):
@@ -477,6 +480,7 @@ class Number(Parameter):
 
 
 class Integer(Number):
+    __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
     def __set__(self,obj,val):
@@ -486,6 +490,7 @@ class Integer(Number):
 
 
 class Magnitude(Number):
+    __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=1.0,softbounds=(None,None),**params):
@@ -493,6 +498,7 @@ class Magnitude(Number):
 
 
 class BooleanParameter(Parameter):
+    __slots__ = ['bounds']
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=False,bounds=(0,1),**params):
@@ -515,6 +521,7 @@ class BooleanParameter(Parameter):
 class DynamicNumber(Number):
     """
     """
+    __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),**params):
@@ -556,6 +563,7 @@ class DynamicNumber(Number):
 
 
 class Dynamic(Parameter):
+    __slots__ = []
     __doc__ = property((lambda self: self.doc))
     
     def __get__(self,obj,objtype):
@@ -573,6 +581,7 @@ class Dynamic(Parameter):
 
 class Constant(Parameter):
     """Constant Parameter that can be constructed and used but not set."""
+    __slots__ = []
     __doc__ = property((lambda self: self.doc))
     
     def __set__(self,obj,val):
@@ -619,6 +628,7 @@ def is_number(obj):
 class PackageParameter(Parameter):
     """
     """
+    __slots__ = ['package','class_','to_lose']
     __doc__ = property((lambda self: self.doc))
     
     def __init__(self,package,class_,to_lose='',default=None,doc="",**params):
