@@ -12,7 +12,6 @@ __version__='$Revision$'
 ###
 from parameter import Parameter
 from topoobject import TopoObject
-from utils import classlist
 from arrayutils import inf
 
 class BoundingRegion(TopoObject):
