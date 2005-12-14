@@ -9,7 +9,7 @@ more details.
 $Id$
 """
 __version__='$Revision$'
-from utils import classlist,find_classes_in_package,classname_repr
+from utils import find_classes_in_package,classname_repr
 
 
 # CEBHACKALERT: much of the documentation for Parameter subclasses
@@ -17,6 +17,46 @@ from utils import classlist,find_classes_in_package,classname_repr
 # docstring so that it shows up. In some cases there is
 # some repetition.
 # See JABHACKALERT by __doc__.
+
+
+def classlist(class_):
+    """
+    Return a list of the class hierarchy above (and including) class_.
+
+    The list is ordered from least- to most-specific.  Often useful in
+    functions to get and set the full state of an object, e.g. for
+    pickling.
+    """
+    assert isinstance(class_, type)
+    q = [class_]
+    out = []
+    while len(q):
+        x = q.pop(0)
+        out.append(x)
+        for b in x.__bases__:
+            if b not in q and b not in out:
+                q.append(b)
+    return out[::-1]
+
+
+def descendents(class_):
+    """
+    Return a list of the class hierarchy below (and including) class_.
+
+    The list is ordered from least- to most-specific.  Can be useful for
+    printing the contents of an entire class hierarchy.
+    """
+    assert isinstance(class_,type)
+    q = [class_]
+    out = []
+    while len(q):
+        x = q.pop(0)
+        out.insert(0,x)
+        for b in x.__subclasses__():
+            if b not in q and b not in out:
+                q.append(b)
+    return out[::-1]
+
 
 
 class Parameter(object):
@@ -573,6 +613,9 @@ def is_number(obj):
 # CEBHACKALERT: base class for ones in output_fn,learning_fn,response_fn,
 # patterngenerator. Only output_fn, patterngenerator done so far.
 # this isn't finished yet.
+
+# CEBHACKALERT: wouldn't need to use a dictionary to store name-parameter pairs,
+# if every TopoObject class had a nice name for when it's to be displayed
 class PackageParameter(Parameter):
     """
     """
@@ -585,6 +628,8 @@ class PackageParameter(Parameter):
         self.package = package
         self.class_ = class_
         self.to_lose = to_lose
+
+        # check it's in range
 
     def get_default_class_name(self):
         """
@@ -606,11 +651,11 @@ class PackageParameter(Parameter):
         return k
 
     # do better than a separate set method
-    def set_from_key(self,key):
+    def set_from_name(self,key):
         """
         """
         try:
-            self.default = self.range()[key]()
+            self.default = self.range()[name]()
         except KeyError:
             raise ValueError("Can't set PackageParameter to a class it doesn't know about...")
 
