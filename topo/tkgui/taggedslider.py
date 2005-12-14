@@ -90,9 +90,6 @@ class TaggedSlider(Frame):
     def set_slider_from_tag(self):
         """
         Set the slider (including its limits) to match the tag value.
-
-        Because the slider is updated dynamically, partial input to
-        the tag is evaluated (i.e. key presses are evaluated immediately).
         """
         val = self.string_translator(self.tag_val.get())
         if val > self.max_value:
