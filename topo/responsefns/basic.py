@@ -28,7 +28,11 @@ class CFDotProduct_Py(CFResponseFunction):
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = cfs[r][c]
-                r1,r2,c1,c2 = cf.slice
+                sa = cf.slice_array
+                r1 = sa[0]
+                r2 = sa[1]
+                c1 = sa[2]
+                c2 = sa[3]
                 X = input_activity[r1:r2,c1:c2]
         
                 a = X*cf.weights

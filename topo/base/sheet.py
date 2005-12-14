@@ -255,6 +255,14 @@ def bounds2slice(slice_bounds, input_bounds, input_density):
     return rstart,rbound,cstart,cbound
 
 
+def bounds2slicearray(slice_bounds, input_bounds, input_density):
+    """
+    Same as bounds2slice(), but return a Numeric array instead of a tuple.
+    """
+    r1,r2,c1,c2 = bounds2slice(slice_bounds,input_bounds,input_density)
+    return array([r1,r2,c1,c2])
+
+
 def slice2bounds(slice,sheet_bounds,sheet_density):
     """
     Construct the bounds that corresponds to the given slice, with a small
@@ -285,6 +293,14 @@ def slice2bounds(slice,sheet_bounds,sheet_density):
                                  (right+ystep/fact,top+ystep/fact)))
 
     return bounds
+
+
+def slicearray2bounds(slicearray,sheet_bounds,sheet_density):
+    """
+    Same as slice2bounds, but the slice is an array instead of a tuple.
+    """
+    return slice2bounds((slicearray[0],slicearray[1],slicearray[2],slicearray[3]), sheet_bounds, sheet_density)
+
 
 
 def bounds2shape(bounds,density):

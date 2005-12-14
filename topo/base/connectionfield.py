@@ -27,7 +27,7 @@ from projection import Projection,ProjectionSheet,Identity
 from parameter import Parameter, Number, BooleanParameter
 from utils import hebbian
 from arrayutils import mdot,divisive_normalization
-from sheet import Sheet, matrix2sheet,bounds2slice,bounds2shape,sheet2matrixidx,slice2bounds
+from sheet import Sheet, matrix2sheet,bounds2slice,bounds2shape,sheet2matrixidx,slicearray2bounds
 from sheetview import UnitView
 from itertools import chain
 from patterngenerator import ConstantGenerator
@@ -81,7 +81,12 @@ class ConnectionField(TopoObject):
         super(ConnectionField,self).__init__(**params)
         self.input_sheet = input_sheet
 
-        r1,r2,c1,c2 = self.__initialize_slice(weights_bound_template)
+        self.__initialize_slice_array(weights_bound_template)
+
+        r1 = self.slice_array[0]
+        r2 = self.slice_array[1]
+        c1 = self.slice_array[2]
+        c2 = self.slice_array[3]
 
         # set up the weights centered around 0,0 to avoid problems
         # with different-sized results at different floating-point
@@ -99,7 +104,7 @@ class ConnectionField(TopoObject):
         output_fn(self.weights)
 
 
-    def __initialize_slice(self,weights_bound_template):
+    def __initialize_slice_array(self,weights_bound_template):
         """
         Calculate the slice specifying the submatrix of the sheet's to which
         this connection field connects.
@@ -133,29 +138,25 @@ class ConnectionField(TopoObject):
         cstart = max(0,leftcol)
         cbound = min(maxcol+1,cc+cols/2+1)
 
-        self.slice = rstart,rbound,cstart,cbound
-
 
         # Numeric.Int32 is specified explicitly here to avoid having it
         # default to Numeric.Int.  Numeric.Int works on 32-bit platforms,
         # but does not work properly with the optimized C activation and
         # learning functions on 64-bit machines.
-        r1,r2,c1,c2 = self.slice
         self.slice_array = Numeric.zeros((4), Numeric.Int32)
-        self.slice_array[0] = r1
-        self.slice_array[1] = r2
-        self.slice_array[2] = c1
-        self.slice_array[3] = c2
+        self.slice_array[0] = rstart
+        self.slice_array[1] = rbound
+        self.slice_array[2] = cstart
+        self.slice_array[3] = cbound
 
 	# constructs and store the boundingbox corresponding to the slice.
-	self.bounds = slice2bounds(self.slice, self.input_sheet.bounds,
-				   self.input_sheet.density)
-
-        return self.slice
-    
+	self.bounds = slicearray2bounds(self.slice_array, self.input_sheet.bounds, self.input_sheet.density)
 
     def get_input_matrix(self, activity):
-        r1,r2,c1,c2 = self.slice
+        r1 = self.slice_array[0]
+        r2 = self.slice_array[1]
+        c1 = self.slice_array[2]
+        c2 = self.slice_array[3]
         return activity[r1:r2,c1:c2]
 
 
@@ -178,11 +179,19 @@ class ConnectionField(TopoObject):
         should be extended to support increasing as well.
         """
 
-        old_slice=self.slice
-        or1,or2,oc1,oc2 = old_slice
-        r1,r2,c1,c2 = self.__initialize_slice(weights_bound_template)
+        old_slice_array=Numeric.array(self.slice_array)
+        or1 = old_slice_array[0]
+        or2 = old_slice_array[1]
+        oc1 = old_slice_array[2]
+        oc2 = old_slice_array[3]
 
-        if self.slice != old_slice:
+        self.__initialize_slice_array(weights_bound_template)
+        r1 = self.slice_array[0]
+        r2 = self.slice_array[1]
+        c1 = self.slice_array[2]
+        c2 = self.slice_array[3]
+
+        if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
             self.weights.savespace(1)
             output_fn(self.weights)
@@ -236,7 +245,11 @@ class GenericCFResponseFn(CFResponseFunction):
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = cfs[r][c]
-                r1,r2,c1,c2 = cf.slice
+		sa = cf.slice_array
+                r1 = sa[0]
+                r2 = sa[1]
+                c1 = sa[2]
+                c2 = sa[3]
                 X = input_activity[r1:r2,c1:c2]
                 activity[r,c] = self.single_cf_fn(X,cf.weights)
         activity *= strength
