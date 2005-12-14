@@ -214,10 +214,9 @@ class ProjectionPanel(CFSheetPlotPanel):
                                                plotgroup_templates['Projection'],
                                                'ProjectionPlotGroup',self.region.get())
         self.pe_group.do_plot_cmd()
+        ### JCALERT: Hack temporary
+	self.pe_group.plot_list=self.pe_group.initialize_plot_list()
 
-	### JCALERT! This line could be spared if not for clarity. (it is the same in most
-        ### sub-classes of PlotGroupPanel and in PlotGroupPanel itself.
-        self.plots = self.pe_group.plots()
 
 
     def display_plots(self):

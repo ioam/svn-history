@@ -77,6 +77,10 @@ class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         pgt = plotgroup_templates[self.mapname.get()]
         self.pe_group = self.pe.get_plot_group(self.mapname.get(),pgt,class_type='BasicPlotGroup')
 
+	### JCALERT this is an hack for the moment, it has to be changed in PlotGroup
+	self.pe_group.plot_list=self.pe_group.initialize_plot_list()
+
+
             
     def display_labels(self):
         """

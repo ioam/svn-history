@@ -118,8 +118,12 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         self.pe_group = self.pe.get_plot_group(self.plot_group_key,
                                                plotgroup_templates['Unit Weights'],
                                                'UnitWeightsPlotGroup',self.region.get())
+
         self.pe_group.do_plot_cmd()
-        self.plots = self.pe_group.plots()
+
+        ### JCALERT: Hack temporary
+	self.pe_group.plot_list=self.pe_group.initialize_plot_list()
+       
 
 
     def display_labels(self):
