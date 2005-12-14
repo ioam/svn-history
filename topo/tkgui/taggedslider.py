@@ -63,21 +63,10 @@ class TaggedSlider(Frame):
         
         self.tag.pack(side=LEFT)
 
-        self.tag_val.trace_variable('w',self.tag_val_callback)
         self.set_slider_from_tag()
 
     def refresh(self,e):
         self.root.optional_refresh()
-
-    def tag_val_callback(self,*args):
-        """
-        Whenever the value in the tag changes, call set_slider_from_tag().
-
-        (The value changes whenever a key is pressed while the tag
-        has the focus.)
-        """
-        self.set_slider_from_tag()
-
         
     def slider_command(self,arg):
         """
