@@ -44,10 +44,23 @@ class Plot(TopoObject):
     def __init__(self,channels,sheet_view_dict,density=None,
                  plot_bounding_box=None,normalize=False,situated=False, **params):
         """
-        (channel_1, channel_2, channel_3) are keys that point to a stored 
-        SheetView in sheet_view_dict, as specified in a PlotTemplate.
-        None is also possible if the Plot is only built from one or two
-        SheetViews.
+        Get the SheetViews requested from each channel passed in at
+        creation, combines them as necessary, (and generates the
+        Histograms, not yet implemented). 
+            
+	Important features of this object are:
+
+	   self.matrices: Triple of Matrices mapping to the
+	                  R/G/B channels.
+           self.view_info: Name information that can be used to create
+                           labels and filenames.
+           (self.histograms: List of Histogram objects associated with
+                    the matrices is self.matrices. NOT YET IMPLEMENTED) 
+          
+        channels is a dictionary with keys (i.e. 'Strength','Hue','Confidence' ...)
+        that point to a stored SheetView in sheet_view_dict, as specified 
+	in a PlotTemplate. None is also possible if the Plot is only built 
+        from one or two SheetViews.   
 
 	sheet_view_dict is a dictionary of SheetViews, generally belonging 
         to a Sheet object but not necessarily.
@@ -99,6 +112,35 @@ class Plot(TopoObject):
 	self.situated = situated
         self.normalize = normalize
 
+	# Construction of the plot bitmap: self.matrices
+
+	matrices_dict, boxes_dict = self._get_matrices_from_view_dict()
+
+	s = matrices_dict['Strength']
+	h = matrices_dict['Hue']
+	c = matrices_dict['Confidence'] 
+
+        ### JABALERT
+        ### raise an exception to be caught by the instantiator
+        ### instead.
+        if (s==None and c==None and h==None):
+            self.debug('Skipping empty plot.')
+	    self.matrices = [None,None,None]
+	    self = None
+	else:
+	    s, b, sliced_matrices_dict = self._slice_matrices(matrices_dict,boxes_dict)
+	    self.shape = s
+	    self.slicing_box = b
+	    (hue,sat,val) = self._make_hsv_matrices(sliced_matrices_dict)	    
+            ### JCALERT! This function ought to be in Plot rather than bitmap.py
+	    self.matrices = matrix_hsv_to_rgb(hue,sat,val)
+	    if self.situated:
+		if self.plot_bounding_box == None:
+		    raise ValueError("the plot_bounding_box must be specified for situating the plot")
+		else:
+		    self.matrices = self._situating_plot(self.plot_bounding_box)
+	
+
 
     ### JABALERT: This does not seem appropriate -- Plot should not delete
     ### any SheetViews that it did not put there itself.
@@ -111,57 +153,6 @@ class Plot(TopoObject):
         for each in self.channels.value():
 	    del self.view_dict[each]
 
-
-    ### JCALERT: This should just be moved to __init__.
-    # JC: This function is called by load_images in PlotGroup and sub-classes.  
-    def plot(self):
-        """
-        Get the SheetViews requested from each channel passed in at
-        creation, combines them as necessary, (and generates the
-        Histograms, not yet implemented).  plot() is here to allow dynamic creation of plots,
-        even after the creation of the Plot object. 
-            
-        Returns: self (Plot)
-
-        Important features of this object are:
-
-	   self.matrices: Triple of Matrices mapping to the
-	                  R/G/B channels.
-           self.view_info: Name information that can be used to create
-                           labels and filenames.
-           (self.histograms: List of Histogram objects associated with
-                    the matrices is self.matrices. NOT YET IMPLEMENTED)           
-        """
-
-	matrices_dict, boxes_dict = self._get_matrices_from_view_dict()
-
-	s = matrices_dict['Strength']
-	h = matrices_dict['Hue']
-	c = matrices_dict['Confidence'] 
-
-        ### JABALERT: When moving this to __init__, may be better to
-        ### raise an exception to be caught by the instantiator
-        ### instead.
-        if (s==None and c==None and h==None):
-            self.debug('Skipping empty plot.')
-	    self.matrices = [None,None,None]
-            return None
-
-	else:
-
-	    s, b, sliced_matrices_dict = self._slice_matrices(matrices_dict,boxes_dict)
-	    self.shape = s
-	    self.slicing_box = b
-	    (hue,sat,val) = self._make_hsv_matrices(sliced_matrices_dict)	    
-            ### JCALERT! This function ought to be in Plot rather than bitmap.py
-	    self.matrices = matrix_hsv_to_rgb(hue,sat,val)
-	    if self.situated:
-		if self.plot_bounding_box == None:
-		    raise ValueError("the plot_bounding_box must be specified for situating the plot")
-		else:
-		    self.matrices = self._situating_plot(self.plot_bounding_box)
-		    
-	    return self
 
 
     def _get_matrices_from_view_dict(self):

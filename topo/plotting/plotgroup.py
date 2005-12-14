@@ -257,8 +257,9 @@ class PlotGroup(TopoObject):
         # done to each of the matrices that come in from the Plot
         # objects.
         
-        generated_bitmap_list = [each.plot() for each in self.all_plots]
-        generated_bitmap_list = [each for each in generated_bitmap_list if each is not None]
+	### JCALERT! Instead of testing each.matrices != [None,None,None]
+        ### Catch the exeption risen for empty plots...
+        generated_bitmap_list = [each for each in self.all_plots if (each.matrices != [None,None,None])]
         
         ### JCALERT! For each plotgroup, we want the plot to be displayed
         ### in the alphabetical order according to their view_info['src_name']
@@ -266,6 +267,7 @@ class PlotGroup(TopoObject):
         ### and that is why this function is overwritten. 
         ### (It has to be fixed, as well as the handling of plot label in general)
         sort_plots(generated_bitmap_list)
+
         return generated_bitmap_list
     
   
@@ -476,8 +478,9 @@ class ProjectionPlotGroup(PlotGroup):
         # sufficient as outlining and other things will need to be
         # done to each of the matrices that come in from the Plot
         # objects.
-        
-        generated_bitmap_list = [each.plot() for each in self.all_plots]
+	### JCALERT! Instead of testing each.matrices != [None,None,None]
+        ### Catch the exeption risen for empty plots...
+        generated_bitmap_list = [each for each in self.all_plots if (each.matrices != [None,None,None])]
         return [each for each in generated_bitmap_list if each is not None]
 
 

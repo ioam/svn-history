@@ -142,12 +142,10 @@ class TestPlot(unittest.TestCase):
 	### JCALERT! make a test for plot0
 
 	# plot 1
-	self.plot1.plot()
 	test = [None,None,None]
 	self.assertEqual(self.plot1.matrices,test)
 
 	# plot 2
-	self.plot2.plot()
 	sat = zeros((10,10),Float) 
 	hue = zeros((10,10),Float)
 	val = self.matrix1
@@ -158,7 +156,6 @@ class TestPlot(unittest.TestCase):
 		self.assertAlmostEqual(each3,each4)
 
 	# plot 3
-        self.plot3.plot()
 	sat = ones((10,10),Float) 
 	hue = zeros((10,10),Float) + 0.3
 	val = self.matrix1
@@ -169,7 +166,6 @@ class TestPlot(unittest.TestCase):
 		self.assertAlmostEqual(each3,each4)  
 
 	# plot 4
-	self.plot4.plot()
 	sat = self.matrix3 
 	hue = zeros((10,10),Float) + 0.3
 	val = self.matrix1
@@ -180,7 +176,6 @@ class TestPlot(unittest.TestCase):
 		self.assertAlmostEqual(each3,each4)  
 
 	# plot 5
-	self.plot5.plot()
 	sat = zeros((10,10),Float) 
 	hue = zeros((10,10),Float) 
 	val = self.matrix1
@@ -191,7 +186,6 @@ class TestPlot(unittest.TestCase):
 		self.assertAlmostEqual(each3,each4)
 
 	# plot 6
-	self.plot6.plot()
 	sat = self.matrix3 
 	hue = zeros((10,10),Float) + 0.3 
 	val = ones((10,10),Float) 
@@ -202,7 +196,6 @@ class TestPlot(unittest.TestCase):
 		self.assertAlmostEqual(each3,each4)  
     
 	# plot 7
-	self.plot7.plot()
 	sat = self.matrix3 
 	hue = zeros((10,10),Float) + 0.3 
 	val = self.matrix4
@@ -216,7 +209,6 @@ class TestPlot(unittest.TestCase):
 	
 
 	# plot 8
-	self.plot8.plot()
 	sat = self.matrix3 
 	hue = zeros((10,10),Float) + 0.3 
 	val = self.matrix1
@@ -233,7 +225,6 @@ class TestPlot(unittest.TestCase):
 
 
 	# plot 9
-	self.plot9.plot()
 	sat = self.matrix3 
 	hue = zeros((10,10),Float) + 0.3 
 	val = self.matrix1
