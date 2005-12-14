@@ -233,7 +233,8 @@ class InputParamsPanel(plotgrouppanel.PlotGroupPanel):
 	    view_dict[each] = sv
 	    ### JCALERT ! This is working for the moment but that could be made simpler
             ### (which is also true for most of the file!!)
-            plist.append(topo.plotting.plot.Plot((each,None,None),view_dict, name=''))
+	    channels = {'Strength':each,'Hue':None,'Confidence':None}
+            plist.append(topo.plotting.plot.Plot(channels,view_dict, name=''))
         if LIST_REVERSE: plist.reverse()
         self.pe_group = topo.plotting.plotgroup.PlotGroup(self.pe.simulation,plot_group_key='Preview',plot_list=plist)
 

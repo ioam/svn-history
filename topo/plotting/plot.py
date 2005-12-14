@@ -24,7 +24,7 @@ class Plot(TopoObject):
     PlotGroup of related plots displayed within one GUI window.
 
     Plot creates the 3 matrices necessary for plotting a RGB image,
-    from a three-tuple (channels) and a dictionary of SheetViews.
+    from a channel dictionary and a dictionary of SheetViews.
     Eventually, plots more complex than simple bitmaps will be
     supported, including overlaid outlines, contours, vector fields,
     histograms, etc., and the overall architecture should be designed
@@ -34,13 +34,14 @@ class Plot(TopoObject):
     palette_ = Dynamic(default=palette.Monochrome)
  
     ### JCALERT!
-    ### - Pass the content of a template, as a dictionary, instead of 3 fixed channels.
     ### - Re-write the test file, taking the new changes into account.
     ### - I have to change the order: situated, plot_bb and (normalize)
     ### - There should be a way to associate the density explicitly
     ###   with the sheet_view_dict, because it must match all SheetViews
     ###   in that dictionary.  Maybe as a tuple?
-    def __init__(self,(channel_1, channel_2, channel_3),sheet_view_dict,density=None,
+    ### - Make the subfunction of plot() really private.
+
+    def __init__(self,channels,sheet_view_dict,density=None,
                  plot_bounding_box=None,normalize=False,situated=False, **params):
         """
         (channel_1, channel_2, channel_3) are keys that point to a stored 
@@ -71,7 +72,7 @@ class Plot(TopoObject):
         super(Plot,self).__init__(**params)
 
       	self.view_dict = sheet_view_dict
-        self.channels = (channel_1, channel_2, channel_3)
+        self.channels = channels
         self.density = density
 
 	### JCALERT: Fix view_info here, and in SheetView
@@ -80,18 +81,17 @@ class Plot(TopoObject):
         self.cropped = False
 
         ### JABALERT: Should probably be a dictionary (or, more likely, KeyedList).
+        ## JC: it is still a list because it is the way it is returned by matrix_hsv_to_rgb
+        ## I do not think that for this purpose we will need more anyway!
+        ## It is possible to create an attribute self.matrices_dict that would be constructed 
+        ## by _get_matrices_from_view. Also it should maybe be renamed bitmap
 	# The list of matrices that constitutes the plot.
         self.matrices = []
-
-        ### JABALERT: Please explain this better, or clean it up.
-	# The list of the bounding box of the SheetViews associated with this plot.
-        self.box=[]
 
 	# shape (dimension) of the plotting area
         self.shape = (0,0)
 	# bounds of the situated plotting area 
 	self.plot_bounding_box = plot_bounding_box
-
         ### JABALERT: Please explain this better.
 	# bounds of the sliced area
         self.slicing_box = None
@@ -108,7 +108,7 @@ class Plot(TopoObject):
         the assumption that this Plot is the only object that use the 
         the SheetView in the sheet_view_dict  with that dictionary key.
         """
-        for each in self.channels:
+        for each in self.channels.value():
 	    del self.view_dict[each]
 
 
@@ -133,29 +133,33 @@ class Plot(TopoObject):
                     the matrices is self.matrices. NOT YET IMPLEMENTED)           
         """
 
-	### JC: It might be clearer to call:
-        ### self.matrices = self._get_matrices_from_view_dict()
-	self._get_matrices_from_view_dict()
+	matrices_dict, boxes_dict = self._get_matrices_from_view_dict()
 
-        ### JCALERT! What if the order is not the same?
-        ### Maybe passing a dictionary instead of a triple in the first place?
-	s,h,c = self.matrices
+	s = matrices_dict['Strength']
+	h = matrices_dict['Hue']
+	c = matrices_dict['Confidence'] 
+
         ### JABALERT: When moving this to __init__, may be better to
         ### raise an exception to be caught by the instantiator
         ### instead.
         if (s==None and c==None and h==None):
             self.debug('Skipping empty plot.')
+	    self.matrices = [None,None,None]
             return None
+
 	else:
-	    self._slice_matrices()
-	    (hue,sat,val) = self._make_hsv_matrices()	    
+
+	    s, b, sliced_matrices_dict = self._slice_matrices(matrices_dict,boxes_dict)
+	    self.shape = s
+	    self.slicing_box = b
+	    (hue,sat,val) = self._make_hsv_matrices(sliced_matrices_dict)	    
             ### JCALERT! This function ought to be in Plot rather than bitmap.py
 	    self.matrices = matrix_hsv_to_rgb(hue,sat,val)
 	    if self.situated:
 		if self.plot_bounding_box == None:
 		    raise ValueError("the plot_bounding_box must be specified for situating the plot")
 		else:
-		    self._situating_plot(self.plot_bounding_box)
+		    self.matrices = self._situating_plot(self.plot_bounding_box)
 		    
 	    return self
 
@@ -163,26 +167,23 @@ class Plot(TopoObject):
     def _get_matrices_from_view_dict(self):
         """
 	sub-function of plot() that just retrieves the views from the view_dict
-	as specified by the channels, and create its matrices attribute accordingly 
-	(list of view matrices from SheetView.view() ).
-
+	as specified by the channels, and create a dictionnary of matrices and 
+        of the corresponding bounding_boxes accordingly .
+    
 	(It just deals with the fact that channels can be None, or that the keys
 	specified by channels can potentially refer to no SheetViews in the dict).
         """  
-	self.matrices=[]
-        self.box=[]
-        for each in self.channels:
-            ### Note that this logic will fail if someone happens to
-            ### have put an item with the key None into the
-            ### dictionary, but that should be unlikely.
-	    sv = self.view_dict.get(each, None)
+	matrices_dict = {}
+	boxes_dict = {}
+	for key,value in self.channels.items():
+	    sv = self.view_dict.get(value, None)
 	    if sv == None:
-		self.matrices.append(None)
-                self.box.append(None)
+		matrices_dict[key] = None
+		boxes_dict[key] = None
 	    else:
 		view_matrix = sv.view()
-		self.matrices.append(view_matrix[0])
-                self.box.append(view_matrix[1])
+ 		matrices_dict[key] = view_matrix[0]
+	        boxes_dict[key] = view_matrix[1]
 
 	    ### JCALERT ! This is an hack so that the problem of displaying the right
 	    ### name under each map in activity and orientation map panel is solved
@@ -193,20 +194,25 @@ class Plot(TopoObject):
 		self.view_info['src_name'] = sv.view_info['src_name'] + self.name
 		self.view_info['view_type'] = sv.view_info['view_type']
 
-    def _slice_matrices(self):
+	return matrices_dict, boxes_dict
+	    
+
+    def _slice_matrices(self,matrices_dict,boxes_dict):
 	"""
-	Sub-function used by plot: get the submatrix of the matrices in self.matrices 
+	Sub-function used by plot: get the submatrix of the matrices in matrices_dict 
         corresponding to the slice of the smallest sheetview matrix belonging to the plot.
         e.g. for coloring Weight matrix with a preference sheetview, we need to slice
         the preference matrix region that corresponds to the weight matrix. 
-	Also set the attribute self.shape and self.bounds accordingly.
-	"""
+
+	It returns the new matrices dictionnary that contains the submatrices,
+        and the corresponding shape and bounds of the sliced matrices.
+    	"""
         ### JCALERT! Think about a best way to catch the shape...
         ### also it should raise an Error if the shape is different for 
         ### the three matrices!
  	l_shape = []
 	l_box = []
-	for mat,box in zip(self.matrices,self.box):
+	for mat,box in zip(matrices_dict.values(),boxes_dict.values()):
 	    if mat != None:
 		l_shape.append(mat.shape)
 		l_box.append(box)
@@ -229,24 +235,18 @@ class Plot(TopoObject):
         ### inserting this margin to the function bounds2slice....)
 	# At this point we assume that if there is matrix of different sizes
         # the outer_box will be a sheet bounding_box....
-	new_matrices =[]
-	for mat in self.matrices:
+	new_matrices_dict = {} 
+	for key,mat in matrices_dict.items():
 	    if mat != None and mat.shape != shape:
 		sub_mat = submatrix(slicing_box,mat,outer_box,self.density)
-		new_matrices.append(sub_mat)
+		new_matrices_dict[key] = sub_mat
 	    else:
-		new_matrices.append(mat)
+		new_matrices_dict[key] = mat
 
-        ### JCALERT shape and slicing_box should be added to the doc.
-	self.shape = shape
-	self.slicing_box=slicing_box
-	self.matrices = new_matrices
+	return shape,slicing_box,new_matrices_dict
 
-    ### JCALERT! The doc has to be reviewed (as well as the code by the way...)
-    ### The function should be made as a procedure working on self.matrices directly..
-    ### The code inside has still to be made clearer.
 
-    def _make_hsv_matrices(self):
+    def _make_hsv_matrices(self, sliced_matrices_dict):
 	""" 
 	Sub-function of plot() that return the h,s,v matrices corresponding 
 	to the current self.matrices. 
@@ -257,7 +257,10 @@ class Plot(TopoObject):
 	zero=zeros(self.shape,Float)
 	one=ones(self.shape,Float)	
 
-	s,h,c = self.matrices
+	s = sliced_matrices_dict['Strength']
+	h = sliced_matrices_dict['Hue']
+	c = sliced_matrices_dict['Confidence'] 
+
         ### JC: The code below may be improved.
 	# Determine appropriate defaults for each matrix
 	if s is None: s=one # Treat as full strength by default
@@ -300,9 +303,9 @@ class Plot(TopoObject):
 	for mat in self.matrices:
 	    new_mat = zeros(shape,Float)
 	    new_mat[r1:r2,c1:c2] = mat
-	    new_matrices.append(new_mat)
+	    new_matrices.append(new_mat) 
 
-	self.matrices = new_matrices    
+	return new_matrices    
 	    
 	
 	

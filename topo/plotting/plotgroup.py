@@ -289,12 +289,14 @@ class BasicPlotGroup(PlotGroup):
 
     def create_plots(self,pt_name,pt,sheet):
 	
-	strength = pt.channels.get('Strength',None)
-        hue = pt.channels.get('Hue',None)
-        confidence = pt.channels.get('Confidence',None)
+	plot_channels = {}
+	
+	plot_channels['Strength'] = pt.channels.get('Strength',None)
+        plot_channels['Hue'] = pt.channels.get('Hue',None)
+        plot_channels['Confidence'] = pt.channels.get('Confidence',None)
         n = pt.channels.get('Normalize',False)
 	plot_name = '\n'+pt_name
-        p = Plot((strength,hue,confidence),sheet.sheet_view_dict,sheet.density,sheet.bounds,n,name=plot_name)
+        p = Plot(plot_channels,sheet.sheet_view_dict,sheet.density,sheet.bounds,n,name=plot_name)
 	return [p]
 
 	
@@ -318,21 +320,27 @@ class UnitWeightsPlotGroup(PlotGroup):
   
     def create_plots(self,pt_name,pt,sheet):
 
-        hue = pt.channels.get('Hue',None)
-        confidence = pt.channels.get('Confidence',None)
-        
 	plot_list = []
         if not isinstance(sheet,CFSheet):
             self.warning('Requested weights view from other than CFSheet.')
         else:
-            for p in set(flatten(sheet.in_projections.values())):
+            for p in set(flatten(sheet.in_projections.values())):	
 		### JCALERT! This has to be clarified somewhere: the sheet_view for a 
 		### weight belongs to the src_sheet, and the name in the key
                 ### is the destination sheet.
+	        plot_channels = {}
+	        plot_channels['Strength'] = pt.channels.get('Strength',None)
+                plot_channels['Hue'] = pt.channels.get('Hue',None)
+                plot_channels['Confidence'] = pt.channels.get('Confidence',None)
+
+	        ### JCALERT! do the plot_channels['Strength'] == 'weights' test
+                ### here and in projectionplotgroup
                 key = ('Weights',sheet.name,p.name,self.x,self.y)
 		plot_name = '\n(from ' + p.src.name +')'
-		plot_list.append(Plot((key,hue,confidence),p.src.sheet_view_dict,p.src.density,
+		plot_channels['Strength'] = key			       
+		plot_list.append(Plot(plot_channels,p.src.sheet_view_dict,p.src.density,
 				      p.src.bounds,pt.channels['Normalize'],name=plot_name))
+
         self.debug('plot_list =' + str(plot_list))
         return plot_list
 
@@ -374,29 +382,16 @@ class ProjectionPlotGroup(PlotGroup):
  
     def create_plots(self,pt_name,pt,sheet):
 
-        c = pt.channels
-        hue = c.get("Hue",None)
-        confidence = c.get("Confidence",None)
-
 	### JCALERT This has to be solved: projection is a list here!
         ### for the moment the hack below deal with that.
         ### Also, why do we pass the template here?
-
-        projection = sheet.get_in_projection_by_name(c['Projection_name'])
+	
+        projection = sheet.get_in_projection_by_name(pt.channels['Projection_name'])
         plot_list=[]
         if projection:
 	    src_sheet=projection[0].src
 	    projection=projection[0]
-                   
-        ### JC: here the hue and confidence ought to be taken and used later on
-        ### but a first work on plot.py is required to make these changes
-        ### hue = pt.channels['Hue']
-        ### confidence = pt.channels['Confidence']
-
-        ### JC apparently, the template carries the information for building
-        ### the sheet_view__key. It might be difficult to change now. (also see make_unit_weights_plot)
-	    # key = (pt_name,c['Projection_name'],c['Density'],sheet.name)            
-	    key = (pt_name,c['Projection_name'],c['Density'],sheet.name)            
+	         
 	    ### JCALERT! for the moment, the sheet_view for a projection is a list of UnitView
             ### This has to be changed, and so it is a temporary hack.
             ### Finally, it won't be possible to pass a sheet_view directly when creating a Plot
@@ -405,8 +400,13 @@ class ProjectionPlotGroup(PlotGroup):
 	    ### JCALERT! replace that by an attribute view_list in ProjectionPlotGroup
             ### no need to create a sheet_view that contains a list...!!
 	    for view in self.view_list:
+		plot_channels = {}
+		plot_channels['Strength'] = pt.channels.get('Strength',None)
+		plot_channels['Hue'] = pt.channels.get('Hue',None)
+	        plot_channels['Confidence'] = pt.channels.get('Confidence',None)     
 		key = ('Weights',sheet.name,projection.name,view.view_info['x'],view.view_info['y'])
-		plot_list.append(Plot((key,hue,confidence),src_sheet.sheet_view_dict,
+		plot_channels['Strength'] = key
+		plot_list.append(Plot(plot_channels,src_sheet.sheet_view_dict,
                                       src_sheet.density,src_sheet.bounds,pt.channels['Normalize']))
 		
         return plot_list
