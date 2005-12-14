@@ -12,6 +12,7 @@ import topo
 import topo.base.parameter
 from topo.base.topoobject import class_parameters
 
+import Pmw
 # CEBHACKALERT: this file is still being reorganized
 
 class ParametersFrame(Frame):
@@ -33,6 +34,8 @@ class ParametersFrame(Frame):
         self.__widgets = {}
         self.__default_values = self.__properties_frame.get_values()
         self.__properties_frame.pack(side=TOP,expand=YES,fill=X)
+
+        self.__help_balloon = Pmw.Balloon(parent)
 
 
     def get_values(self):
@@ -78,7 +81,7 @@ class ParametersFrame(Frame):
 
         # sort Parameters by precedence (oops actually reverse of precedence!)
         parameter_precedences = {}
-        for name,parameter in parameters:
+        for name,parameter in parameters.items():
             parameter_precedences[name] = parameter.precedence
         parameter_names = keys_sorted_by_value(parameter_precedences)
 
@@ -88,13 +91,17 @@ class ParametersFrame(Frame):
             (s,c) = self.__widgets[parameter_name]
             s.grid(row=i,column=0,padx=self.__properties_frame.padding,
                    pady=self.__properties_frame.padding,sticky=E)
+
+            help_text = parameters[parameter_name].__doc__
+            self.__help_balloon.bind(s, help_text)
+
             c.grid(row=i,
                    column=1,
                    padx=self.__properties_frame.padding,
                    pady=self.__properties_frame.padding,
                    sticky=N+S+W+E)
             i += 1
-
+            
 
     def __make_widgets(self,parameters):
         """
@@ -106,7 +113,7 @@ class ParametersFrame(Frame):
         parameters must be Parameter objects.
         """
         widget_dict = {}
-        for (parameter_name, parameter) in parameters:
+        for (parameter_name, parameter) in parameters.items():
 
             # find the appropriate entry widget for the parameter...
             
