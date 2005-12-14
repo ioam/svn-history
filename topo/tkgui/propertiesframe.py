@@ -25,7 +25,7 @@ class PropertiesFrame(Frame):
         self.string_translator = string_translator
         Frame.__init__(self,parent,config)
 
-    def optional_refresh(self):
+    def optional_refresh(self,CEBHACKALERT=None):
         if self.parent.auto_refresh:
             self.parent.refresh()
 
@@ -52,6 +52,7 @@ class PropertiesFrame(Frame):
         """
         var = StringVar()
         control = Entry(self,textvariable=var,width=width)
+        control.bind('<Return>', self.optional_refresh)
         return self.add_property(name,var,control,value,**kw)
 
     def add_checkbutton_property(self,name,value=0,**kw):
@@ -83,6 +84,7 @@ class PropertiesFrame(Frame):
                                scrolledlist_items = items,
                                **kw)
         control.selectitem(value)
+        control.bind('<Return>', self.optional_refresh)
         return self.add_property(name,var,control,value)
 
     def get_value(self,name):
