@@ -62,7 +62,7 @@ class TaggedSlider(Frame):
         # Add the tag
         self.tag_val = tagvariable
         self.tag = Entry(self,textvariable=self.tag_val,width=tag_width)
-        self.tag.bind('<KeyRelease>', self.tag_keypress)
+        self.tag.bind('<Return>', self.refresh)
         self.tag.bind('<FocusOut>', self.refresh)
         
         self.tag.pack(side=LEFT)
@@ -90,11 +90,6 @@ class TaggedSlider(Frame):
             self.first_slider_command = 0
         
      
-    def tag_keypress(self,ev):
-        #print 'tag_keypress: '+ev.char
-        if ev.char != '\r':
-            self.need_to_refresh_slider = True
-        self.set_slider_from_tag(ev.char)
 
     def set_tag_from_slider(self):
         new_string = self.fmt % self.get_slider_value()
@@ -102,14 +97,8 @@ class TaggedSlider(Frame):
 
          
     def set_slider_from_tag(self,evchar=None):
-        # Attempt to update the sliders only on return.
-        if not self.first_slider_command \
-               and evchar == '\r' and self.need_to_refresh_slider:
-            self.need_to_refresh_slider = False
-            self.root.optional_refresh()
         try:
             if self.need_to_refresh_slider: 
-                #print 'tag_keypress: '+evchar
 
                 val = self.string_translator(self.tag_val.get())
                 if val > self.max_value:
