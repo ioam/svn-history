@@ -85,60 +85,64 @@ class Plot(TopoObject):
         super(Plot,self).__init__(**params)
 
       	self.view_dict = sheet_view_dict
-        self.channels = channels
         self.density = density
 
 	### JCALERT: Fix view_info here, and in SheetView
         self.view_info = {}
 
+	### JCALERT: it has to be checked if that is ever used at the moment.
         self.cropped = False
+     
+	# bounds of the situated plotting area 
+	self.plot_bounding_box = plot_bounding_box
+
+	self.situated = situated
+        self.normalize = normalize
+
+	# Remaining of the code are the steps to construct the plot bitmap (self.matrices)
 
         ### JABALERT: Should probably be a dictionary (or, more likely, KeyedList).
         ## JC: it is still a list because it is the way it is returned by matrix_hsv_to_rgb
         ## I do not think that for this purpose we will need more anyway!
         ## It is possible to create an attribute self.matrices_dict that would be constructed 
         ## by _get_matrices_from_view. Also it should maybe be renamed bitmap
-	# The list of matrices that constitutes the plot.
+	## The list of matrices that constitutes the plot.
         self.matrices = []
 
-	# shape (dimension) of the plotting area
-        self.shape = (0,0)
-	# bounds of the situated plotting area 
-	self.plot_bounding_box = plot_bounding_box
-        ### JABALERT: Please explain this better.
-	# bounds of the sliced area
-        self.slicing_box = None
+	# return a dictionary of view matrices and a dictionary of bounding_boxes,
+        # as specified by channels
+	matrices_dict, boxes_dict = self.__extract_view_dict_info(channels)
 
-	self.situated = situated
-        self.normalize = normalize
-
-	# Construction of the plot bitmap: self.matrices
-
-	matrices_dict, boxes_dict = self._get_matrices_from_view_dict()
-
+	# catching the empty plot exception
 	s = matrices_dict['Strength']
 	h = matrices_dict['Hue']
 	c = matrices_dict['Confidence'] 
 
         ### JABALERT
         ### raise an exception to be caught by the instantiator
-        ### instead.
+        ### instead. Which exception?
         if (s==None and c==None and h==None):
             self.debug('Skipping empty plot.')
 	    self.matrices = [None,None,None]
-	    self = None
 	else:
-	    s, b, sliced_matrices_dict = self._slice_matrices(matrices_dict,boxes_dict)
-	    self.shape = s
-	    self.slicing_box = b
-	    (hue,sat,val) = self._make_hsv_matrices(sliced_matrices_dict)	    
+	    # If the plot is not empty: get the submatrix of each sheetview,
+            # that corresponds to the smallest one and return them in a new matrix dictionary
+            # along with their corresponding shape and bounding_box. 
+	    shape, slicing_box, sliced_matrices_dict = self.__slice_matrices(matrices_dict,boxes_dict)
+
+	    # Construct the hsv bitmap corresponding to the dictionary of matrices
+	    (hue,sat,val) = self.__make_hsv_matrices(sliced_matrices_dict,shape)
+	    
             ### JCALERT! This function ought to be in Plot rather than bitmap.py
+	    # Convert the hsv bitmap in rgb
 	    self.matrices = matrix_hsv_to_rgb(hue,sat,val)
+
+	    # Situate the plot if required
 	    if self.situated:
 		if self.plot_bounding_box == None:
 		    raise ValueError("the plot_bounding_box must be specified for situating the plot")
 		else:
-		    self.matrices = self._situating_plot(self.plot_bounding_box)
+		    self.matrices = self.__situating_plot(self.plot_bounding_box, slicing_box)
 	
 
 
@@ -155,7 +159,7 @@ class Plot(TopoObject):
 
 
 
-    def _get_matrices_from_view_dict(self):
+    def __extract_view_dict_info(self,channels):
         """
 	sub-function of plot() that just retrieves the views from the view_dict
 	as specified by the channels, and create a dictionnary of matrices and 
@@ -166,7 +170,7 @@ class Plot(TopoObject):
         """  
 	matrices_dict = {}
 	boxes_dict = {}
-	for key,value in self.channels.items():
+	for key,value in channels.items():
 	    sv = self.view_dict.get(value, None)
 	    if sv == None:
 		matrices_dict[key] = None
@@ -188,7 +192,7 @@ class Plot(TopoObject):
 	return matrices_dict, boxes_dict
 	    
 
-    def _slice_matrices(self,matrices_dict,boxes_dict):
+    def __slice_matrices(self,matrices_dict,boxes_dict):
 	"""
 	Sub-function used by plot: get the submatrix of the matrices in matrices_dict 
         corresponding to the slice of the smallest sheetview matrix belonging to the plot.
@@ -237,7 +241,7 @@ class Plot(TopoObject):
 	return shape,slicing_box,new_matrices_dict
 
 
-    def _make_hsv_matrices(self, sliced_matrices_dict):
+    def __make_hsv_matrices(self, sliced_matrices_dict,shape):
 	""" 
 	Sub-function of plot() that return the h,s,v matrices corresponding 
 	to the current self.matrices. 
@@ -245,8 +249,8 @@ class Plot(TopoObject):
     
         Also applying normalizing and croping if required.
 	"""
-	zero=zeros(self.shape,Float)
-	one=ones(self.shape,Float)	
+	zero=zeros(shape,Float)
+	one=ones(shape,Float)	
 
 	s = sliced_matrices_dict['Strength']
 	h = sliced_matrices_dict['Hue']
@@ -282,13 +286,13 @@ class Plot(TopoObject):
 
     ### JCALERT! In this function, we assume that the slicing box is contained in the 
     ### outer box. Otherwise there will be an error
-    def _situating_plot(self,outer_box):
+    def __situating_plot(self,outer_box,slicing_box):
 
 	### JCALERT! It has to be tested that bounds2shape returns the right answer for this purpose
         ### There seems to have a variation in the size of the plot, study this "bug" to see of
         ### it is linked to that.
 	shape = bounds2shape(outer_box,self.density)
-	r1,r2,c1,c2 = bounds2slice(self.slicing_box,outer_box,self.density)
+	r1,r2,c1,c2 = bounds2slice(slicing_box,outer_box,self.density)
         ### raise an error when r2-r1 > shape[1] or c2=c1 > shape[0]
 	new_matrices = []
 	for mat in self.matrices:
