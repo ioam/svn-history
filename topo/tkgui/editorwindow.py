@@ -283,8 +283,7 @@ editing canvas and inserts the three-option toolbar in a Frame along the left si
 window. 
 """
 class ModelEditor :
-        ### ALALERT: Should move this code into a constructor.
-    
+    def __init__(self):
 	# editor window
 	root = Tk()
 	root.title("Model Editor") # set title bar
