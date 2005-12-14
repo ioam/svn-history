@@ -25,7 +25,6 @@ import Numeric
 from topoobject import TopoObject
 from projection import Projection,ProjectionSheet,Identity
 from parameter import Parameter, Number, BooleanParameter
-from utils import hebbian
 from arrayutils import mdot,divisive_normalization
 from sheet import Sheet, matrix2sheet,bounds2slice,bounds2shape,sheet2matrixidx,slicearray2bounds
 from sheetview import UnitView
@@ -49,6 +48,12 @@ from boundingregion import BoundingBox
 ### which weights actually belong in the ConnectionField.  After doing the
 ### learning step, do cf.weights *= cf.mask. jbednar: See MaskedArray
 ### for an alternative.
+
+
+def hebbian(input_activity, unit_activity, weights, learning_rate):
+    """Simple Hebbian learning for the weights of one single unit."""
+    weights += learning_rate * unit_activity * input_activity
+
 
 
 class ConnectionField(TopoObject):
@@ -500,4 +505,8 @@ class CFSheet(ProjectionSheet):
     def release_unit_view(self,x,y):
         self.release_sheet_view(('Weights',x,y))
 
+
     
+
+
+

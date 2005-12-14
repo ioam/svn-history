@@ -44,12 +44,6 @@ def enumerate(seq):
 enum = enumerate
 
 
-def hebbian(input_activity, unit_activity, weights, learning_rate):
-    """Simple Hebbian learning for the weights of one single unit."""
-    weights += learning_rate * unit_activity * input_activity
-
-
-
 class Struct:
     """
     A simple structure class, taking keyword args and assigning them to attributes.
