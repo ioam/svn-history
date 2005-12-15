@@ -24,7 +24,7 @@ import Numeric
 
 from topoobject import TopoObject
 from projection import Projection,ProjectionSheet,Identity
-from parameter import Parameter, Number, BooleanParameter
+from parameter import Parameter, Number, BooleanParameter, Constant
 from arrayutils import mdot,divisive_normalization
 from sheet import Sheet, matrix2sheet,bounds2slice,bounds2shape,sheet2matrixidx,slicearray2bounds
 from sheetview import UnitView
@@ -441,6 +441,112 @@ class CFProjection(Projection):
         raise NotImplementedError
 
 
+
+class SharedWeightCFResponseFn(TopoObject):
+    """
+    Response function accepting a single CF applied to all units.
+    Otherwise similar to GenericCFResponseFn.
+    """
+    ### JABALERT: It may be possible to eliminate this, and instead
+    ### implemented a wrapper around the cfs argument of
+    ### GenericCFResponseFn, so that GenericCFResponseFn will work
+    ### whether there is an actual full set of cfs or not.
+    single_cf_fn = Parameter(default=mdot)
+    
+    def __init__(self,**params):
+        super(SharedWeightCFResponseFn,self).__init__(**params)
+
+    def __call__(self, cf, input_activity, activity, strength):
+        rows,cols = activity.shape
+        for r in xrange(rows):
+            for c in xrange(cols):
+                ### JABHACKALERT: Need to offset the slice
+                ### array to the appropriate location for
+                ### each unit, instead of always using the
+                ### center as it is now.
+		sa = cf.slice_array
+                r1 = sa[0]
+                r2 = sa[1]
+                c1 = sa[2]
+                c2 = sa[3]
+                X = input_activity[r1:r2,c1:c2]
+                activity[r,c] = self.single_cf_fn(X,cf.weights)
+        activity *= strength
+        
+
+
+class SharedWeightProjection(Projection):
+    """
+    A Projection with a single ConnectionField shared by all units.
+
+    Otherwise similar to CFProjection, except that learning is
+    currently disabled.
+    """
+    response_fn = Parameter(default=SharedWeightCFResponseFn())
+    cf_type = Parameter(default=ConnectionField)
+    weight_type = Parameter(default=Numeric.Float32)
+    weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+    weights_generator = Parameter(default=ConstantGenerator())
+    ### JABHACKALERT: Learning won't actually work yet.
+    learning_fn = Constant(IdentityCFLF)
+    learning_rate = Parameter(default=0.0)
+    ### JABHACKALERT: cfs is a dummy, here only so that learning will
+    ### run without an exception
+    cfs = None 
+    output_fn  = Parameter(default=Identity())
+
+    strength = Number(default=1.0)
+
+    def __init__(self,**params):
+        """
+        Initialize the Projection with a set of cf_type objects
+        (typically ConnectionFields), each located at the location
+        in the source sheet corresponding to the unit in the target
+        sheet.
+        """
+        super(SharedWeightProjection,self).__init__(**params)
+        self.sharedcf=self.cf_type(input_sheet=self.src,
+                                   weights_bound_template=self.weights_bounds,
+                                   weights_generator=self.weights_generator,
+                                   weight_type=self.weight_type,
+                                   output_fn=self.learning_fn.output_fn,
+                                   x=0,y=0)
+
+        self.input_buffer = None
+        self.activity = Numeric.array(self.dest.activity)
+
+
+    def cf(self,r,c):
+        """Return the shared ConnectionField, for all coordinates."""
+        return self.sharedcf
+
+
+    def get_view(self,sheet_x, sheet_y):
+        """
+        Return the shared ConnectionField as a UnitView, but with
+        the appropriate bounding box depending on the
+        sheet coordinate (sheet_x,sheet_y).
+        """
+        (r,c) = (self.dest).sheet2matrixidx(sheet_x,sheet_y)
+
+        matrix_data = Numeric.array(self.sharedcf.weights)
+
+        ### JABHACKALERT: Need to compute this appropriately for each unit;
+        ### currently the result is always at the center
+        new_box = self.sharedcf.bounds
+
+        assert matrix_data != None, "Projection Matrix is None"
+        return UnitView((matrix_data,new_box),sheet_x,sheet_y,self,view_type='UnitView')
+
+    
+    def activate(self,input_activity):
+        """Activate using the specified response_fn and output_fn."""
+        self.input_buffer = input_activity
+        self.response_fn(self.sharedcf, input_activity, self.activity, self.strength)
+        self.activity = self.output_fn(self.activity)
+
+
+
 class CFSheet(ProjectionSheet):
     """
     A ProjectionSheet providing access to the ConnectionFields in its CFProjections.
@@ -461,6 +567,9 @@ class CFSheet(ProjectionSheet):
         for proj in chain(*self.in_projections.values()):
             if proj.input_buffer:
                 learning_rate = proj.learning_rate
+                ### JABALERT: This code should be moved into a learn()
+                ### function in Projection, so that individual projections
+                ### can use different arguments to their learning functions.
                 inp = proj.input_buffer
                 cfs = proj.cfs
                 proj.learning_fn(cfs, inp, self.activity, learning_rate)

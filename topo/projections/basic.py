@@ -13,3 +13,6 @@ $Id$
 __version__ = "$Revision$"
 
 from topo.base.connectionfield import CFProjection
+
+# JABALERT: Uncomment this when SharedWeightProjection is ready for prime time
+#from topo.base.connectionfield import SharedWeightProjection
