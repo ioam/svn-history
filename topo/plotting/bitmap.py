@@ -152,17 +152,6 @@ class ColorMap(Bitmap):
 
 
 
-class BWMap(ColorMap):
-    """
-    The name has been changed to make the code more intuitive to read
-    when wishing to use B/W maps.  Just calls ColorMap with the default
-    palette.
-    """
-    def __init__(self,inArray):
-        super(BWMap,self).__init__(inArray)
-        
-
-        
 class HSVMap(Bitmap):
     """
     HSV Map inputs, converts to RGB image.  3 matrices expected, each should
