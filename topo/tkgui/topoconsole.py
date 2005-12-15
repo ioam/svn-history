@@ -17,6 +17,7 @@ from topo.plotting.templates import PlotGroupTemplate, PlotTemplate, plotgroup_t
 import topo.base.simulator
 import topo.plotting.plotengine
 import topo.base.topoobject
+from topo.tkgui.editorwindow import ModelEditor
 
 import topo.commands.basic
 import webbrowser
@@ -185,6 +186,8 @@ class TopoConsole(Frame):
                                  # activebackground = 'Light Gray',#
                                  #################################
                                  command = self.open_plot_params_window)
+	self.menubar.addmenuitem('Simulation', 'command', 'Open the model editor',
+				 label = 'Model Editor', command = self.open_model_editor)
         self.menubar.addmenuitem('Simulation', 'separator')
         self.menubar.addmenuitem('Simulation', 'command', 'Close the GUI window',
                                  label = 'Quit',
@@ -376,6 +379,11 @@ class TopoConsole(Frame):
         """
         for win in self.auto_refresh_panels:
             win.refresh()
+
+    # open the model editor window
+    def open_model_editor(self) :
+	ModelEditor()
+
 
 
     #
