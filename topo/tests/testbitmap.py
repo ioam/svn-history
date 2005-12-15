@@ -73,31 +73,7 @@ class TestBitmap(unittest.TestCase):
         self.assertEqual(g,0.01)
         self.assertEqual(b,0.01)
 
-    def test_matrix_hsv_to_rgb2(self):
-        h = Numeric.array([[0.0,0.0],[0.0,0.0]])
-        s = Numeric.array([[0.0,0.0],[0.0,0.0]])
-        v = Numeric.array([[0.5,0.5],[0.5,0.5]])
-        h_orig = Numeric.array(h)
-        s_orig = Numeric.array(s)
-        v_orig = Numeric.array(v)
-        r,g,b = matrix_hsv_to_rgb(h,s,v)
-        rgb_target = Numeric.array([[0.5,0.5],[0.5,0.5]])
-        self.assertEqual(h,h_orig)
-        self.assertEqual(s,s_orig)
-        self.assertEqual(v,v_orig)
-        
-
-    def test_matrix_hsv_to_rgb(self):
-        a = [j for i in range(256) for j in range(256)]
-        b = [i for i in range(256) for j in range(256)]
-        c = [max(i,j) for i in range(256) for j in range(256)]
-        a = Numeric.reshape(a,(256,256)) / 255.0
-        b = Numeric.reshape(b,(256,256)) / 255.0
-        c = Numeric.reshape(c,(256,256)) / 255.0
-        (h,s,v) = matrix_hsv_to_rgb(a,b,c)
-        rgb = RGBMap(h,s,v)
-        # rgb.show()
-    
+ 
 
     def test_RGBMap(self):
         rgb = RGBMap(self.ra,self.ga,self.ba)

@@ -17,11 +17,11 @@ SHOW_PLOTS = False
 
 
 ### JC: My new imports
-from topo.plotting.plot import Plot
-from Numeric import zeros, divide, Float, ones
+from topo.plotting.plot import Plot, matrix_hsv_to_rgb
+import Numeric
+from Numeric import zeros, divide, Float, ones,reshape,array
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheetview import SheetView
-from topo.plotting.bitmap import matrix_hsv_to_rgb
 import MLab
 import RandomArray
 
@@ -237,19 +237,44 @@ class TestPlot(unittest.TestCase):
 #### Think about doing a plot test using sheet_dict and a sheet?
 ### Ask Jim if it is really necessary...
 
-def test_release_sheetviews(self):
+    def test_release_sheetviews(self):
 
-    self.plot9.release_sheetviews()
+	self.plot9.release_sheetviews()
 
-    test=self.sheet.sheet_view_dict.get(self.key1,None)
-    self.assertEqual(test,None)
-    test=self.sheet.sheet_view_dict.get(self.key2,None)
-    self.assertEqual(test,None)
-    test=self.sheet.sheet_view_dict.get(self.key3,None)
-    self.assertEqual(test,None)
-    test=self.sheet.sheet_view_dict.get(self.key4,None)
-    self.assertEqual(test,self.sv4)
+	test=self.sheet.sheet_view_dict.get(self.key1,None)
+	self.assertEqual(test,None)
+	test=self.sheet.sheet_view_dict.get(self.key2,None)
+	self.assertEqual(test,None)
+	test=self.sheet.sheet_view_dict.get(self.key3,None)
+	self.assertEqual(test,None)
+	test=self.sheet.sheet_view_dict.get(self.key4,None)
+	self.assertEqual(test,self.sheet_view4)
 
+
+    def test_matrix_hsv_to_rgb(self):
+        a = [j for i in range(256) for j in range(256)]
+        b = [i for i in range(256) for j in range(256)]
+        c = [max(i,j) for i in range(256) for j in range(256)]
+        a = Numeric.reshape(a,(256,256)) / 255.0
+        b = Numeric.reshape(b,(256,256)) / 255.0
+        c = Numeric.reshape(c,(256,256)) / 255.0
+        (h,s,v) = matrix_hsv_to_rgb(a,b,c)
+        rgb = RGBMap(h,s,v)
+        # rgb.show()
+
+    def test_matrix_hsv_to_rgb2(self):
+        h = Numeric.array([[0.0,0.0],[0.0,0.0]])
+        s = Numeric.array([[0.0,0.0],[0.0,0.0]])
+        v = Numeric.array([[0.5,0.5],[0.5,0.5]])
+        h_orig = Numeric.array(h)
+        s_orig = Numeric.array(s)
+        v_orig = Numeric.array(v)
+        r,g,b = matrix_hsv_to_rgb(h,s,v)
+        rgb_target = Numeric.array([[0.5,0.5],[0.5,0.5]])
+        self.assertEqual(h,h_orig)
+        self.assertEqual(s,s_orig)
+        self.assertEqual(v,v_orig)
+    
 
 ### JC: THIS CODE IS LEFT TEMPORARY IN CASE IT IS OF ANY USE IN NEAR FUTURE
     

@@ -5,14 +5,79 @@ $Id$
 """
 __version__='$Revision$'
 
-from Numeric import zeros, ones, Float, divide, ravel,clip
+from Numeric import zeros, ones, Float, divide, ravel,clip,array
 
 from topo.base.topoobject import TopoObject
 from topo.base.parameter import Dynamic
 from topo.base.sheet import submatrix, bounds2slice, bounds2shape
 
-from bitmap import matrix_hsv_to_rgb, WHITE_BACKGROUND, BLACK_BACKGROUND
+
+### JCALERT! Maybe instead of importing that from bitmap, just define it here...
+from bitmap import WHITE_BACKGROUND, BLACK_BACKGROUND
 import palette as palette
+from colorsys import hsv_to_rgb
+
+
+def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
+    """
+    First matrix sets the Hue (Color).
+    Second marix sets the Sauration (How much color)
+    Third matrix sets the Value (How bright the pixel will be)
+
+    The three input matrices should all be the same size, and have
+    been normalized to 1.  There should be no side-effects on the
+    original input matrices.
+    """
+    
+    shape = hMapArray.shape
+    rmat = array(hMapArray,Float)
+    gmat = array(sMapArray,Float)
+    bmat = array(vMapArray,Float)
+    
+## This code should never be seen.  It means that calling code did
+          ## not take the precaution of clipping the input matrices.
+    if max(rmat.flat) > 1 or max(gmat.flat) > 1 or max(bmat.flat) > 1:
+	topo.base.topoobject.TopoObject().warning('HSVMap inputs exceed 1. Clipping to 1.0')
+	if max(rmat.flat) > 0: rmat = clip(rmat,0.0,1.0)
+	if max(gmat.flat) > 0: gmat = clip(gmat,0.0,1.0)
+	if max(bmat.flat) > 0: bmat = clip(bmat,0.0,1.0)
+
+    ### JABHACKALERT!
+    ###
+    ### The PreferenceMap panel currently prints the message above,
+    ### but this should really be handled some other way.  The messages
+    ### fill the console with information that may not be relevant to
+    ### anyone, because it can be entirely legal to plot something with
+    ### a range higher than 1.0.  E.g. very often we deliberately plot
+    ### selectivity with the brightness turned up so high that many of
+    ### the brighter pixels get cropped off, to accentuate the shape
+    ### of the few remaining areas that are poorly selective.  We should 
+    ### have some way of printing a message once, saying where to check
+    ### to see if further cropping has occurred.  E.g. there could be 
+    ### a variable associated with each plot that says what the maximum
+    ### value before cropping was, and a message could be printed the 
+    ### first time any plot reaches that maximum, listing the variable
+    ### that can be checked to find out the cropping on any particular 
+    ### plot.
+    ### 
+    ### In any case, we should never be using "print" directly; we need
+    ### all messages to be handled by the sharedfacility in TopoObject
+    ### so that the user can turn them on and off, etc.  If the facilities
+    ### in TopoObject are not sufficient, e.g. if there needs to be some
+    ### way to use them outside of a TopoObject, then such an interface 
+    ### to those shared messaging routines should be provided and then
+    ### used consistently.
+
+    # List comprehensions were not used because they were slower.
+    for j in range(shape[0]):
+	for i in range(shape[1]):
+	    rgb = hsv_to_rgb(rmat[j,i],gmat[j,i],bmat[j,i])
+	    rmat[j,i] = rgb[0]
+	    gmat[j,i] = rgb[1]
+	    bmat[j,i] = rgb[2]
+                
+    return (rmat, gmat, bmat)
+    
 
 
 class Plot(TopoObject):
@@ -90,14 +155,16 @@ class Plot(TopoObject):
         self.view_info = {}
 	### JCALERT: it has to be checked if that is ever used at the moment.
         self.cropped = False
+        ### JCALERT: This has to stay because of release_sheetviews. Get rid of both...
+        self.channels=channels
      
 	# bounds of the situated plotting area 
 	self.plot_bounding_box = plot_bounding_box
 
 	# Remaining of the code are the steps to construct the plot bitmap (self.matrices)
 
-        ### JABALERT: make self.matrices a Tuple.
-        self.matrices = []
+        ### JABALERT: make self.matrices a Tuple. Rename it rgb_matrices
+        self.matrices = [None,None,None]
 
 	# return a dictionary of view matrices and a dictionary of bounding_boxes,
         # as specified by channels
@@ -113,7 +180,6 @@ class Plot(TopoObject):
         ### instead. Which exception?
         if (s==None and c==None and h==None):
             self.debug('Skipping empty plot.')
-	    self.matrices = [None,None,None]
 	else:
 	    # If the plot is not empty: get the submatrix of each sheetview,
             # that corresponds to the smallest one and return them in a new matrix dictionary
@@ -123,7 +189,6 @@ class Plot(TopoObject):
 	    # Construct the hsv bitmap corresponding to the dictionary of matrices
 	    (hue,sat,val) = self.__make_hsv_matrices(sliced_matrices_dict,shape,normalize)
 	    
-            ### JCALERT! This function ought to be in Plot rather than bitmap.py
 	    # Convert the hsv bitmap in rgb
 	    self.matrices = matrix_hsv_to_rgb(hue,sat,val)
 
@@ -144,7 +209,7 @@ class Plot(TopoObject):
         the assumption that this Plot is the only object that use the 
         the SheetView in the sheet_view_dict  with that dictionary key.
         """
-        for each in self.channels.value():
+        for each in self.channels.values():
 	    del self.view_dict[each]
 
 
@@ -273,6 +338,7 @@ class Plot(TopoObject):
 
 	
 	return (hue,sat,val)
+
 
     ### JCALERT! In this function, we assume that the slicing box is contained in the 
     ### outer box. Otherwise there will be an error
