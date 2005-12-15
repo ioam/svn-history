@@ -206,8 +206,6 @@ class TopoConsole(Frame):
         self.menubar.addmenu('Plots','Assorted plot displays')
         self.populate_plots_menu(self.menubar)
 
-        self.menubar.addmenuitem('Plots','separator')
-
         #
         # Help menu
         #
