@@ -263,7 +263,7 @@ class PlotGroup(TopoObject):
         
 	### JCALERT! Instead of testing each.matrices != [None,None,None]
         ### Catch the exeption risen for empty plots...
-        generated_bitmap_list = [each for each in self.all_plots if (each.matrices != [None,None,None])]
+        generated_bitmap_list = [each for each in self.all_plots if (each.matrices != (None,None,None))]
         
         ### JCALERT! For each plotgroup, we want the plot to be displayed
         ### in the alphabetical order according to their view_info['src_name']
@@ -456,12 +456,6 @@ class ProjectionPlotGroup(PlotGroup):
         self.view_list = [view for view in chain(*full_unitview_list)
                          if view.projection.name == self.weight_name]
 
-        ### JCALERT! I do not understand this comment.
-        ### We might want to get rid of it
-
-        # This is no longer correct now that the UnitViews are no
-        # longer on the Projection target sheet.
-        #for (x,y) in coords: self._sim_ep.release_unit_view(x,y)
 
     ### JCALERT ! for the moment this function is re-implemented only for ProjectionGroup
     ### because we do not want the plots to be sorted according to their src_name in this case
@@ -484,7 +478,7 @@ class ProjectionPlotGroup(PlotGroup):
         # objects.
 	### JCALERT! Instead of testing each.matrices != [None,None,None]
         ### Catch the exeption risen for empty plots...
-        generated_bitmap_list = [each for each in self.all_plots if (each.matrices != [None,None,None])]
+        generated_bitmap_list = [each for each in self.all_plots if (each.matrices != (None,None,None))]
         return [each for each in generated_bitmap_list if each is not None]
 
 

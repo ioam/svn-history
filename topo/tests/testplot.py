@@ -142,7 +142,7 @@ class TestPlot(unittest.TestCase):
 	### JCALERT! make a test for plot0
 
 	# plot 1
-	test = [None,None,None]
+	test = (None,None,None)
 	self.assertEqual(self.plot1.matrices,test)
 
 	# plot 2

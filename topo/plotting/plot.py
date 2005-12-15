@@ -164,7 +164,7 @@ class Plot(TopoObject):
 	# Remaining of the code are the steps to construct the plot bitmap (self.matrices)
 
         ### JABALERT: make self.matrices a Tuple. Rename it rgb_matrices
-        self.matrices = [None,None,None]
+        self.matrices = (None,None,None)
 
 	# return a dictionary of view matrices and a dictionary of bounding_boxes,
         # as specified by channels
