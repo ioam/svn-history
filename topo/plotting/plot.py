@@ -5,7 +5,6 @@ $Id$
 """
 __version__='$Revision$'
 
-
 from Numeric import zeros, ones, Float, divide, ravel,clip
 
 from topo.base.topoobject import TopoObject
@@ -35,14 +34,14 @@ class Plot(TopoObject):
  
     ### JCALERT!
     ### - Re-write the test file, taking the new changes into account.
-    ### - I have to change the order: situated, plot_bb and (normalize)
+    ### - I have to change the order: situate, plot_bb and (normalize)
     ### - There should be a way to associate the density explicitly
     ###   with the sheet_view_dict, because it must match all SheetViews
     ###   in that dictionary.  Maybe as a tuple?
     ### - Make the subfunction of plot() really private.
 
     def __init__(self,channels,sheet_view_dict,density=None,
-                 plot_bounding_box=None,normalize=False,situated=False, **params):
+                 plot_bounding_box=None,normalize=False,situate=False, **params):
         """
         Get the SheetViews requested from each channel passed in at
         creation, combines them as necessary, (and generates the
@@ -74,7 +73,7 @@ class Plot(TopoObject):
         to apply if the plot is situated.  If not situated, the
         bounds of the smallest SheetView are used.
         
-	situated specifies if we want to situate the plot, i.e.,
+	situate specifies if we want to situate the plot, i.e.,
         whether to plot the entire Sheet (or other area specified by
         the plot_bounding_box), or only the smallest plot (usually a
         Weights plot).
@@ -89,24 +88,15 @@ class Plot(TopoObject):
 
 	### JCALERT: Fix view_info here, and in SheetView
         self.view_info = {}
-
 	### JCALERT: it has to be checked if that is ever used at the moment.
         self.cropped = False
      
 	# bounds of the situated plotting area 
 	self.plot_bounding_box = plot_bounding_box
 
-	self.situated = situated
-        self.normalize = normalize
-
 	# Remaining of the code are the steps to construct the plot bitmap (self.matrices)
 
-        ### JABALERT: Should probably be a dictionary (or, more likely, KeyedList).
-        ## JC: it is still a list because it is the way it is returned by matrix_hsv_to_rgb
-        ## I do not think that for this purpose we will need more anyway!
-        ## It is possible to create an attribute self.matrices_dict that would be constructed 
-        ## by _get_matrices_from_view. Also it should maybe be renamed bitmap
-	## The list of matrices that constitutes the plot.
+        ### JABALERT: make self.matrices a Tuple.
         self.matrices = []
 
 	# return a dictionary of view matrices and a dictionary of bounding_boxes,
@@ -131,14 +121,14 @@ class Plot(TopoObject):
 	    shape, slicing_box, sliced_matrices_dict = self.__slice_matrices(matrices_dict,boxes_dict)
 
 	    # Construct the hsv bitmap corresponding to the dictionary of matrices
-	    (hue,sat,val) = self.__make_hsv_matrices(sliced_matrices_dict,shape)
+	    (hue,sat,val) = self.__make_hsv_matrices(sliced_matrices_dict,shape,normalize)
 	    
             ### JCALERT! This function ought to be in Plot rather than bitmap.py
 	    # Convert the hsv bitmap in rgb
 	    self.matrices = matrix_hsv_to_rgb(hue,sat,val)
 
 	    # Situate the plot if required
-	    if self.situated:
+	    if situate:
 		if self.plot_bounding_box == None:
 		    raise ValueError("the plot_bounding_box must be specified for situating the plot")
 		else:
@@ -241,7 +231,7 @@ class Plot(TopoObject):
 	return shape,slicing_box,new_matrices_dict
 
 
-    def __make_hsv_matrices(self, sliced_matrices_dict,shape):
+    def __make_hsv_matrices(self, sliced_matrices_dict,shape,normalize):
 	""" 
 	Sub-function of plot() that return the h,s,v matrices corresponding 
 	to the current self.matrices. 
@@ -264,7 +254,7 @@ class Plot(TopoObject):
 	    h=zero
 	    c=zero
 
-	if self.normalize and max(s.flat)>0:
+	if normalize and max(s.flat)>0:
 	    s = divide(s,float(max(s.flat)))
 
 	hue,sat,val=h,c,s
