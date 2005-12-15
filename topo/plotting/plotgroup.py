@@ -316,8 +316,10 @@ class UnitWeightsPlotGroup(PlotGroup):
                                               **params)
         self.x = float(plot_group_key[2])
         self.y = float(plot_group_key[3])
- 
-      	
+
+        # Decides wether the plots of the UnitWeightPlotGroup are situated or not
+      	self.situate = False
+        
 	### JCALERT! I am not sure we need something dynamic here.
         ### (cf similar alert in BasicPlotGroup.
 	self.plot_list = lambda: self.initialize_plot_list()
@@ -344,7 +346,7 @@ class UnitWeightsPlotGroup(PlotGroup):
 		plot_name = '\n(from ' + p.src.name +')'
 		plot_channels['Strength'] = key			       
 		plot_list.append(Plot(plot_channels,p.src.sheet_view_dict,p.src.density,
-				      p.src.bounds,pt.channels['Normalize'],name=plot_name))
+				      p.src.bounds,pt.channels['Normalize'],self.situate,name=plot_name))
 
         self.debug('plot_list =' + str(plot_list))
         return plot_list
@@ -365,6 +367,16 @@ class UnitWeightsPlotGroup(PlotGroup):
 		### also, it is supposed to return a view, but here it is used as a procedure.
                 each.unit_view(self.x,self.y)
 
+
+    def set_situate(self,situate):
+        """ Function that just set the value of self.situate.
+            self.situate is a boolean parameter specifying if we want to situate the
+            UnitView plots constituting the UnitViewPlotGroup.
+            It is set from CFSheetPlotPanel, when clicking on the situate Checkbutton
+        """
+        self.situate = situate
+
+
    
 class ProjectionPlotGroup(PlotGroup):
     """
@@ -381,7 +393,9 @@ class ProjectionPlotGroup(PlotGroup):
                         if self.sheet_filter_lam(s)][0]
         self._sim_ep_src = self._sim_ep.get_in_projection_by_name(self.weight_name)[0].src
 
-  
+        # Decides wether the plots of the ProjectionPlotGroup are situated or not
+        self.situate = False
+        
 	self.plot_list = lambda: self.initialize_plot_list()
       
  
@@ -412,7 +426,7 @@ class ProjectionPlotGroup(PlotGroup):
 		key = ('Weights',sheet.name,projection.name,view.view_info['x'],view.view_info['y'])
 		plot_channels['Strength'] = key
 		plot_list.append(Plot(plot_channels,src_sheet.sheet_view_dict,
-                                      src_sheet.density,src_sheet.bounds,pt.channels['Normalize']))
+                                      src_sheet.density,src_sheet.bounds,pt.channels['Normalize'],self.situate))
 		
         return plot_list
 
@@ -440,7 +454,6 @@ class ProjectionPlotGroup(PlotGroup):
             for i in range(self.shape[0]):
                 coords.append((x_step*i + l, y_step*j + b))
 
-	#print "plotgroup",coords
         return coords
 
 
@@ -482,4 +495,10 @@ class ProjectionPlotGroup(PlotGroup):
 
 
 
-
+    def set_situate(self,situate):
+        """ Function that just set the value of self.situate.
+            self.situate is a boolean parameter specifying if we want to situate the
+            UnitView plots constituting the ProjectionPlotGroup.
+            It is set from CFSheetPlotPanel, when clicking on the situate Checkbutton
+        """
+        self.situate = situate

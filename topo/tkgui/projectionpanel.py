@@ -57,15 +57,6 @@ class ProjectionPanel(CFSheetPlotPanel):
 
         self._add_projection_menu()
 
-        # Situate currently not implemented!  When implemented, should
-        # have each unit plotted within a frame that shows the
-        # sensitivity region on the source Sheet.
-        #
-        # self.situate = StringVar()
-        # self.situate.set(0)
-        # Checkbutton(self.params_frame1,text="Situate",variable=self.situate,
-        #             command=self.refresh).pack(side=LEFT)
-
         self.auto_refresh_checkbutton.invoke()
         self.refresh()
 
@@ -214,7 +205,10 @@ class ProjectionPanel(CFSheetPlotPanel):
                                                plotgroup_templates['Projection'],
                                                'ProjectionPlotGroup',self.region.get())
         self.pe_group.do_plot_cmd()
-        ### JCALERT: Hack temporary
+        
+        # self.situate is defined in the super class CFSheetPlotPanel
+        self.pe_group.set_situate(self.situate)
+        ### JCALERT: temporary Hack
 	self.pe_group.plot_list=self.pe_group.initialize_plot_list()
 
 

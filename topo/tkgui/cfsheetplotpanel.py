@@ -10,7 +10,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import StringVar, Frame, LEFT, RIGHT, TOP, BOTTOM, YES, X
+from Tkinter import StringVar, Frame, LEFT, RIGHT, TOP, BOTTOM, YES, X, Checkbutton, DISABLED
 from topo.base.sheet import Sheet
 import Pmw
 import plotgrouppanel
@@ -30,7 +30,12 @@ class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
         self.region = StringVar()
         self.region.set('None')
 
+        self.__params_frame = Frame(master=self)
+        self.__params_frame.pack(side=LEFT,expand=YES,fill=X)
+
+        self._add_situate_button()
         self._add_region_menu()
+        
 
 
     def _add_region_menu(self):
@@ -40,8 +45,6 @@ class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
         _region_refresh() is called.  It can either call the refresh()
         funcion, or update another menu, and so on.
         """
-        self.__params_frame = Frame(master=self)
-        self.__params_frame.pack(side=LEFT,expand=YES,fill=X)
 
         # Create the item list for CFSheet 'Sheet'  This will not change
         # since this window will only examine one Simulator.
@@ -62,6 +65,22 @@ class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
                        items = sim_ep_names)
         self.opt_menu.pack(side=LEFT)
 
+    def _add_situate_button(self):
+        
+        self.situate = 0
+        self.situate_checkbutton = Checkbutton(self.__params_frame,
+                                                    text="Situate",
+                                                    command=self.toggle_situate)
+        self.situate_checkbutton.pack(side=LEFT)
+
+    def toggle_situate(self):
+        """Set the attribute situate"""
+        self.situate = not self.situate
+        if self.pe_group != None:
+            self.pe_group.set_situate(self.situate)
+        self.initial_plot = True
+        self.zoom_factor = self.min_zoom_factor = 1
+        self.refresh()
 
     def region_refresh(self, sheet_name):
         """
@@ -73,3 +92,4 @@ class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
         #if self.auto_refresh: self.refresh()
         self.refresh()
 
+    

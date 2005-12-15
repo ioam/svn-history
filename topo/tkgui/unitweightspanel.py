@@ -104,6 +104,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
             w.pack(expand = 1, fill = 'both', padx = 4, pady = 4)
         
 
+
     def do_plot_cmd(self):
         """
         Create the right Plot Key that will define the needed
@@ -118,8 +119,10 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         self.pe_group = self.pe.get_plot_group(self.plot_group_key,
                                                plotgroup_templates['Unit Weights'],
                                                'UnitWeightsPlotGroup',self.region.get())
-
         self.pe_group.do_plot_cmd()
+
+        # self.situate is defined in the super class CFSheetPlotPanel
+        self.pe_group.set_situate(self.situate)
 
         ### JCALERT: Hack temporary
 	self.pe_group.plot_list=self.pe_group.initialize_plot_list()
