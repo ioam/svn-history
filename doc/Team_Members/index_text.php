@@ -11,7 +11,12 @@ include:
       simulator, but entirely reimplemented in Python for
       extensibility and generality.  Jim reviews all code and is the
       last word on the design and features.
-  <br><br>
+  <p><dt><a target="_top" href="http://www.cs.utexas.edu/users/risto">Risto 
+      Miikkulainen</a>, Principal investigator, 2002-</dt>
+  <dd>Risto is a Professor of Computer Science at the University of
+      Texas at Austin.
+  <br>
+  <br>
   <p><dt>Chris Ball, September 2005-</dt>
   <dd>Chris recently received an MSc from the University of Edinburgh
       (topic: modeling motion aftereffects in LISSOM), and previously had a
