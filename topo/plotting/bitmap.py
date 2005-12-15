@@ -7,7 +7,6 @@ as a bitmap image without needing to know about PIL proper.
 There are three different base image Classes which inherit Bitmap:
 
 ColorMap  - 1 2D Matrix, 1 1D Color Map
-BWMap     - 1 2D Matrix.  Defaults to a Luminance palette.
 HSVMap    - 3 2D Matrices, Color (H), Confidence (S), Strength (V)
 RGBMap    - 3 2D Matrices, Red, Green, Blue Channels.
 
