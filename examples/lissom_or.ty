@@ -107,7 +107,8 @@ xsigma=6.0/rf_radius_scale
 ysigma=1.5/rf_radius_scale
 
 scale_input=1.0
-retina_edge_buffer=0*(rf_radius+(BaseRN*area_scale/2))
+
+retina_edge_buffer=rf_radius-1 # JABALERT: Need to check this calculation.
 RN=BaseRN*area_scale+2*retina_edge_buffer
 
 acs=6.5*6.5/rf_radius/rf_radius
@@ -126,7 +127,7 @@ alpha_inh=0.00025*ics
 fixedpoint.DEFAULT_PRECISION=3
 
 # input generation params
-GeneratorSheet.density = RN
+GeneratorSheet.density = BaseRN*area_scale
 GeneratorSheet.period = 1
 
 random.seed(1234)
@@ -140,8 +141,8 @@ gaussian_width = xsigma/RN/sqrt(2)
 gaussian_height = ysigma/RN/sqrt(2)
 GaussianGenerator.size = gaussian_height
 GaussianGenerator.aspect_ratio = gaussian_width/gaussian_height
-input_bounds = BoundingBox(points=((-0.5-rf_radius/RN,-0.5-rf_radius/RN),
-                                   ( 0.5+rf_radius/RN, 0.5+rf_radius/RN)))
+input_bounds = BoundingBox(points=((-RN/(BaseRN*area_scale)/2.0,-RN/(BaseRN*area_scale)/2.0),
+				   ( RN/(BaseRN*area_scale)/2.0, RN/(BaseRN*area_scale)/2.0)))
 GaussianGenerator.bounds = input_bounds
                                                
 
