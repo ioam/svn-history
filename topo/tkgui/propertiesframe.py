@@ -87,9 +87,6 @@ class PropertiesFrame(Frame):
         control.bind('<Return>', self.optional_refresh)
         return self.add_property(name,var,control,value)
 
-    def get_value(self,name):
-        return self.properties[name].get()
-
     def get_values(self):
         result = {}
         for (k,v) in self.properties.items():
