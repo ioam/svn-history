@@ -19,11 +19,8 @@ class ParametersFrame(Frame):
     """
     Frame for all non-hidden Parameters of a TopoObject class.
 
-    Makes a PropertiesFrame containing all the specified class' Parameters.
 
-    CEBHACKALERT: shouldn't this be associated with one class all the time it exists,
-    rather than specifying the class of interest each time in create_widgets()?
-    We'll see this when we do TestPattern, I guess.
+    When asked to create wigets, ... makes a PropertiesFrame containing all the specified class' Parameters.
     """
 
     def __init__(self, parent=None,**config):
@@ -63,7 +60,7 @@ class ParametersFrame(Frame):
             pass
 
 
-    def create_widgets(self,topo_class):
+    def create_widgets(self, topo_class):
         """
         Create widgets for all non-hidden Parameters of the given class.
 
@@ -72,9 +69,9 @@ class ParametersFrame(Frame):
 
         Widgets for Parameters are added in order or Parameters' precedence.
         """
-        for (s,c) in self.__widgets.values():
-            s.grid_forget()
-            c.grid_forget()
+        for (label,widget) in self.__widgets.values():
+            label.grid_forget()
+            widget.grid_forget()
 
         parameters = class_parameters(topo_class)
         self.__widgets = self.__make_widgets(parameters)
@@ -83,24 +80,28 @@ class ParametersFrame(Frame):
         parameter_precedences = {}
         for name,parameter in parameters.items():
             parameter_precedences[name] = parameter.precedence
-        parameter_names = keys_sorted_by_value(parameter_precedences)
+
+        sorted_parameter_names = keys_sorted_by_value(parameter_precedences)
 
         # add widgets to control Parameters
-        i = 0  # CEBHACKALERT: lose the i counting
-        for parameter_name in parameter_names: 
-            (s,c) = self.__widgets[parameter_name]
-            s.grid(row=i,column=0,padx=self.__properties_frame.padding,
-                   pady=self.__properties_frame.padding,sticky=E)
-
+        rows = range(len(sorted_parameter_names))
+        for (row,parameter_name) in zip(rows,sorted_parameter_names): 
+            (label,widget) = self.__widgets[parameter_name]
             help_text = parameters[parameter_name].__doc__
-            self.__help_balloon.bind(s, help_text)
 
-            c.grid(row=i,
-                   column=1,
-                   padx=self.__properties_frame.padding,
-                   pady=self.__properties_frame.padding,
-                   sticky=N+S+W+E)
-            i += 1
+            label.grid(row=row,
+                       column=0,
+                       padx=self.__properties_frame.padding,
+                       pady=self.__properties_frame.padding,
+                       sticky=E)
+
+            widget.grid(row=row,
+                        column=1,
+                        padx=self.__properties_frame.padding,
+                        pady=self.__properties_frame.padding,
+                        sticky=N+S+W+E)
+            
+            self.__help_balloon.bind(label, help_text)
             
 
     def __make_widgets(self,parameters):
