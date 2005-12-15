@@ -301,6 +301,3 @@ class ModelEditor :
 	canvas.pack(fill = BOTH, expand = YES) # pack the canvas and allow it to be expanded
 	canvFrame.pack(fill = BOTH, expand = YES) # pack the canvas frame into the window; expandable
 	canvas.setToolBars(arrbar, conbar, objbar) # give the canvas a reference to the toolbars
-	
-	# start the main loop.
-	mainloop()
