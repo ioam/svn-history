@@ -242,7 +242,8 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 	    channels = {'Strength':each,'Hue':None,'Confidence':None}
             plist.append(topo.plotting.plot.Plot(channels,view_dict, name=''))
         if LIST_REVERSE: plist.reverse()
-        self.pe_group = topo.plotting.plotgroup.PlotGroup(self.pe.simulation,plot_group_key='Preview',plot_list=plist)
+        ### JCALERT! It is the only call to PlotGroup with template is None. Need to change.
+        self.pe_group = topo.plotting.plotgroup.PlotGroup(self.pe.simulation,None,plot_group_key='Preview',plot_list=plist)
 
 
     def refresh_title(self): pass
