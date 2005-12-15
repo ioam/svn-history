@@ -15,6 +15,19 @@ from topo.base.topoobject import class_parameters
 import Pmw
 # CEBHACKALERT: this file is still being reorganized
 
+
+# CEBHACKALERT: there used to be a 'reset_to_defaults' method, which
+# didn't work. When Parameters can be set and then maintained between
+# classes (e.g. for PatternGenerators), reset_to_defaults() should be
+# re-implemented so that Parameters can be returned to default values
+# for the current class.
+# To maintain values of Parameters between classes, the object using
+# the ParametersFrame will need to do something like pass
+# ParametersFrame a dictionary of {parameter:value} pairs, which
+# ParametersFrame should be able to use selectively (i.e. use if
+# relevant to the current class but ignore otherwise).
+
+
 class ParametersFrame(Frame):
     """
     Frame for all non-hidden Parameters of a TopoObject class.
@@ -29,7 +42,6 @@ class ParametersFrame(Frame):
         self.__properties_frame = PropertiesFrame(parent)
         Frame.__init__(self,parent,config)
         self.__widgets = {}
-        self.__default_values = self.__properties_frame.get_values()
         self.__properties_frame.pack(side=TOP,expand=YES,fill=X)
 
         self.__help_balloon = Pmw.Balloon(parent)
@@ -40,13 +52,6 @@ class ParametersFrame(Frame):
         Return a dictionary of Parameter names:values.
         """
         return self.__properties_frame.get_values()
-
-
-    def reset_to_defaults(self):
-        """
-        Reset the Parameters to their original values.
-        """
-        self.__properties_frame.set_values(self.__default_values)
 
 
     # CEBHACKALERT: it would be better if the TaggedSliders looked after themselves.

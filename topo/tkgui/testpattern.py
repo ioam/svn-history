@@ -98,7 +98,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
             generator_sheet_params = generator_sheet.get_paramobj_dict()
             self.pg_name_dict = generator_sheet_params['input_generator'].range()
             break
-            
+
         self.input_types = self.pg_name_dict.keys()
         self.input_type = StringVar()
         self.input_type.set(self.input_types[0])
@@ -202,8 +202,13 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 
 
     def reset_to_defaults(self):
-        self.param_frame.reset_to_defaults()
-        self.input_type.set(self.input_types[0])
+
+        # CEBHACKALERT: I think ParametersFrame should be doing the reseting of
+        # the Parameters, but in fact it's currently done by this method.
+        # See also the CEBHACKALERT in ParametersFrame.
+        
+        # self.param_frame.reset_to_defaults()
+        # self.input_type.set(self.input_types[0])
         self.present_length.setvalue(DEFAULT_PRESENTATION)
         for each in self.in_ep_dict.keys():
             if not self.in_ep_dict[each]['state']:
