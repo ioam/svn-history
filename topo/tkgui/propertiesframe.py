@@ -40,7 +40,7 @@ class PropertiesFrame(Frame):
                      sticky=N+S+W+E)
 
         self.properties[name] = var
-        self.set_value(name,value)
+        self.properties[name].set(value)
         return (p,control)
 
 
@@ -80,7 +80,7 @@ class PropertiesFrame(Frame):
         """        
         var = StringVar()
         control = Pmw.ComboBox(self,
-                               selectioncommand = (lambda value: self.set_value(name,value)), 
+                               selectioncommand = (lambda value: self.properties[name].set(value)), 
                                scrolledlist_items = items,
                                **kw)
         control.selectitem(value)
@@ -89,9 +89,6 @@ class PropertiesFrame(Frame):
 
     def get_value(self,name):
         return self.properties[name].get()
-
-    def set_value(self,name,value):
-        self.properties[name].set(value)
 
     def get_values(self):
         result = {}
@@ -102,6 +99,6 @@ class PropertiesFrame(Frame):
 
     def set_values(self,values):
         for (name,value) in values.items():
-            self.set_value(name,value)
+            self.properties[name].set(value)
 
         
