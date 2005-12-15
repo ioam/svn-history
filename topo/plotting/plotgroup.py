@@ -176,7 +176,7 @@ class PlotGroup(TopoObject):
         """
         self.bitmaps = []
         for each in self.plots():
-            (r,g,b) = each.matrices
+            (r,g,b) = each.rgb_matrices
             
             # CEBHACKALERT:
             # when scale is 0, r is an array of zeros but g and b are None
@@ -261,9 +261,9 @@ class PlotGroup(TopoObject):
         # done to each of the matrices that come in from the Plot
         # objects.
         
-	### JCALERT! Instead of testing each.matrices != [None,None,None]
-        ### Catch the exeption risen for empty plots...
-        generated_bitmap_list = [each for each in self.all_plots if (each.matrices != (None,None,None))]
+	### JCALERT! Instead of testing each.rgb_matrices != (None,None,None)
+        ### Catch the exeption raised for empty plots...
+        generated_bitmap_list = [each for each in self.all_plots if (each.rgb_matrices != (None,None,None))]
         
         ### JCALERT! For each plotgroup, we want the plot to be displayed
         ### in the alphabetical order according to their view_info['src_name']
@@ -345,7 +345,7 @@ class UnitWeightsPlotGroup(PlotGroup):
 		plot_name = '\n(from ' + p.src.name +')'
 		plot_channels['Strength'] = key			       
 		plot_list.append(Plot(plot_channels,p.src.sheet_view_dict,p.src.density,
-				      p.src.bounds,pt.channels['Normalize'],name=plot_name))
+				      p.src.bounds,pt.channels['Normalize'],True,name=plot_name))
 
         self.debug('plot_list =' + str(plot_list))
         return plot_list
@@ -476,9 +476,9 @@ class ProjectionPlotGroup(PlotGroup):
         # sufficient as outlining and other things will need to be
         # done to each of the matrices that come in from the Plot
         # objects.
-	### JCALERT! Instead of testing each.matrices != [None,None,None]
+	### JCALERT! Instead of testing each.rgb_matrices != (None,None,None)
         ### Catch the exeption risen for empty plots...
-        generated_bitmap_list = [each for each in self.all_plots if (each.matrices != (None,None,None))]
+        generated_bitmap_list = [each for each in self.all_plots if (each.rgb_matrices != (None,None,None))]
         return [each for each in generated_bitmap_list if each is not None]
 
 

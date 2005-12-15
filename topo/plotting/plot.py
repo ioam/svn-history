@@ -155,16 +155,16 @@ class Plot(TopoObject):
         self.view_info = {}
 	### JCALERT: it has to be checked if that is ever used at the moment.
         self.cropped = False
-        ### JCALERT: This has to stay because of release_sheetviews. Get rid of both...
+        ### JCALERT: This has to stay because of release_sheetviews(). Get rid of both...
         self.channels=channels
      
 	# bounds of the situated plotting area 
 	self.plot_bounding_box = plot_bounding_box
 
-	# Remaining of the code are the steps to construct the plot bitmap (self.matrices)
+	# Remaining of the code are the steps to construct the plot bitmap (self.rgb_matrices)
 
         ### JABALERT: make self.matrices a Tuple. Rename it rgb_matrices
-        self.matrices = (None,None,None)
+        self.rgb_matrices = (None,None,None)
 
 	# return a dictionary of view matrices and a dictionary of bounding_boxes,
         # as specified by channels
@@ -190,14 +190,14 @@ class Plot(TopoObject):
 	    (hue,sat,val) = self.__make_hsv_matrices(sliced_matrices_dict,shape,normalize)
 	    
 	    # Convert the hsv bitmap in rgb
-	    self.matrices = matrix_hsv_to_rgb(hue,sat,val)
+	    self.rgb_matrices = matrix_hsv_to_rgb(hue,sat,val)
 
 	    # Situate the plot if required
 	    if situate:
 		if self.plot_bounding_box == None:
 		    raise ValueError("the plot_bounding_box must be specified for situating the plot")
 		else:
-		    self.matrices = self.__situate_plot(self.plot_bounding_box, slicing_box)
+		    self.rgb_matrices = self.__situate_plot(self.plot_bounding_box, slicing_box)
 	
 
 
@@ -299,10 +299,11 @@ class Plot(TopoObject):
     def __make_hsv_matrices(self, sliced_matrices_dict,shape,normalize):
 	""" 
 	Sub-function of plot() that return the h,s,v matrices corresponding 
-	to the current self.matrices. 
+	to the current matrices in sliced_matrices_dict. The shape of the matrices
+        in the dict is passed, as well as the normalize boolean parameter.
 	The result specified a bitmap in hsv coordinate.
     
-        Also applying normalizing and cropping if required.
+        Applies normalizing and cropping if required.
 	"""
 	zero=zeros(shape,Float)
 	one=ones(shape,Float)	
@@ -350,13 +351,14 @@ class Plot(TopoObject):
 	shape = bounds2shape(outer_box,self.density)
 	r1,r2,c1,c2 = bounds2slice(slicing_box,outer_box,self.density)
         ### raise an error when r2-r1 > shape[1] or c2=c1 > shape[0]
-	new_matrices = []
-	for mat in self.matrices:
-	    new_mat = zeros(shape,Float)
-	    new_mat[r1:r2,c1:c2] = mat
-	    new_matrices.append(new_mat) 
+	r = zeros(shape,Float)
+	r[r1:r2,c1:c2] = self.rgb_matrices[0]
+	g = zeros(shape,Float)
+	g[r1:r2,c1:c2] = self.rgb_matrices[1]
+	b = zeros(shape,Float)
+	b[r1:r2,c1:c2] = self.rgb_matrices[2]
 
-	return new_matrices    
+	return (r,g,b)  
 	    
 	
 	

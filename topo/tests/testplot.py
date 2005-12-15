@@ -143,7 +143,7 @@ class TestPlot(unittest.TestCase):
 
 	# plot 1
 	test = (None,None,None)
-	self.assertEqual(self.plot1.matrices,test)
+	self.assertEqual(self.plot1.rgb_matrices,test)
 
 	# plot 2
 	sat = zeros((10,10),Float) 
@@ -151,7 +151,7 @@ class TestPlot(unittest.TestCase):
 	val = self.matrix1
 
 	test = matrix_hsv_to_rgb(hue,sat,val)
-	for each1,each2 in zip(self.plot2.matrices,test):
+	for each1,each2 in zip(self.plot2.rgb_matrices,test):
 	    for each3,each4 in zip(each1.flat,each2.flat):
 		self.assertAlmostEqual(each3,each4)
 
@@ -161,7 +161,7 @@ class TestPlot(unittest.TestCase):
 	val = self.matrix1
 
 	test = matrix_hsv_to_rgb(hue,sat,val)
-	for each1,each2 in zip(self.plot3.matrices,test):
+	for each1,each2 in zip(self.plot3.rgb_matrices,test):
 	    for each3,each4 in zip(each1.flat,each2.flat):
 		self.assertAlmostEqual(each3,each4)  
 
@@ -171,7 +171,7 @@ class TestPlot(unittest.TestCase):
 	val = self.matrix1
 
 	test = matrix_hsv_to_rgb(hue,sat,val)
-	for each1,each2 in zip(self.plot4.matrices,test):
+	for each1,each2 in zip(self.plot4.rgb_matrices,test):
 	    for each3,each4 in zip(each1.flat,each2.flat):
 		self.assertAlmostEqual(each3,each4)  
 
@@ -181,7 +181,7 @@ class TestPlot(unittest.TestCase):
 	val = self.matrix1
 
 	test = matrix_hsv_to_rgb(hue,sat,val)
-	for each1,each2 in zip(self.plot5.matrices,test):
+	for each1,each2 in zip(self.plot5.rgb_matrices,test):
 	    for each3,each4 in zip(each1.flat,each2.flat):
 		self.assertAlmostEqual(each3,each4)
 
@@ -191,7 +191,7 @@ class TestPlot(unittest.TestCase):
 	val = ones((10,10),Float) 
 
 	test = matrix_hsv_to_rgb(hue,sat,val)
-	for each1,each2 in zip(self.plot6.matrices,test):
+	for each1,each2 in zip(self.plot6.rgb_matrices,test):
 	    for each3,each4 in zip(each1.flat,each2.flat):
 		self.assertAlmostEqual(each3,each4)  
     
@@ -203,7 +203,7 @@ class TestPlot(unittest.TestCase):
         val = MLab.clip(val,0.0,1.0)
 	
 	test = matrix_hsv_to_rgb(hue,sat,val)
-	for each1,each2 in zip(self.plot7.matrices,test):
+	for each1,each2 in zip(self.plot7.rgb_matrices,test):
 	    for each3,each4 in zip(each1.flat,each2.flat):
 		self.assertAlmostEqual(each3,each4)
 	
@@ -217,7 +217,7 @@ class TestPlot(unittest.TestCase):
 	
 	test = matrix_hsv_to_rgb(hue,sat,val)
 
-	for each1,each2 in zip(self.plot8.matrices,test):
+	for each1,each2 in zip(self.plot8.rgb_matrices,test):
 	    for each3,each4 in zip(each1.flat,each2.flat):
 		self.assertAlmostEqual(each3,each4)
 
@@ -230,7 +230,7 @@ class TestPlot(unittest.TestCase):
 	val = self.matrix1
 	
 	test = matrix_hsv_to_rgb(hue,sat,val)
-	for each1,each2 in zip(self.plot9.matrices,test):
+	for each1,each2 in zip(self.plot9.rgb_matrices,test):
 	    for each3,each4 in zip(each1.flat,each2.flat):
 		self.assertAlmostEqual(each3,each4)  
 
