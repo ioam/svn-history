@@ -66,13 +66,12 @@ class PlotGroup(TopoObject):
     """
 
     ### JCALERT: 
-    ### plot_list could maybe disappear.
-    ### I left template=None so that the testPlotGroup does not crash anymore,
-    ### that will have to be re-moved eventually.
-    ### re-arranged the order and look at the call in all panel classes (i.e. inputparampanel)
+    ### - plot_list may disappear. For that we need to work on the special case of inputparampanel.
+    ### - re-arranged the order and look at the call in all panel classes (i.e. inputparampanel)
     ### also review the doc of each functions.
+    ### - rewrite the test file.
 
-    def __init__(self,simulator,template=None,plot_group_key=None,sheet_filter_lam=None,plot_list=None,shape=FLAT,**params):
+    def __init__(self,simulator,template,plot_group_key,sheet_filter_lam=None,plot_list=None,shape=FLAT,**params):
         """
         plot_list can be of two types: 
         1.  A list of Plot objects that can return bitmaps when requested.
@@ -345,7 +344,7 @@ class UnitWeightsPlotGroup(PlotGroup):
 		plot_name = '\n(from ' + p.src.name +')'
 		plot_channels['Strength'] = key			       
 		plot_list.append(Plot(plot_channels,p.src.sheet_view_dict,p.src.density,
-				      p.src.bounds,pt.channels['Normalize'],True,name=plot_name))
+				      p.src.bounds,pt.channels['Normalize'],name=plot_name))
 
         self.debug('plot_list =' + str(plot_list))
         return plot_list
