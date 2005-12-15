@@ -94,8 +94,10 @@ class PropertiesFrame(Frame):
         return result
 
 
-    def set_values(self,values):
-        for (name,value) in values.items():
-            self.properties[name].set(value)
+    # CEBHACKALERT: currently unused, but could be used in the future to set the
+    # properties from a dictionary (see CEBHACKALERT in ParametersFrame).
+##     def set_values(self,values):
+##         for (name,value) in values.items():
+##             self.properties[name].set(value)
 
         
