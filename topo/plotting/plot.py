@@ -34,39 +34,13 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     gmat = array(sMapArray,Float)
     bmat = array(vMapArray,Float)
     
-## This code should never be seen.  It means that calling code did
-          ## not take the precaution of clipping the input matrices.
+    ## This code should never be seen.  It means that calling code did
+    ## not take the precaution of clipping the input matrices.
     if max(rmat.flat) > 1 or max(gmat.flat) > 1 or max(bmat.flat) > 1:
 	topo.base.topoobject.TopoObject().warning('HSVMap inputs exceed 1. Clipping to 1.0')
 	if max(rmat.flat) > 0: rmat = clip(rmat,0.0,1.0)
 	if max(gmat.flat) > 0: gmat = clip(gmat,0.0,1.0)
 	if max(bmat.flat) > 0: bmat = clip(bmat,0.0,1.0)
-
-    ### JABHACKALERT!
-    ###
-    ### The PreferenceMap panel currently prints the message above,
-    ### but this should really be handled some other way.  The messages
-    ### fill the console with information that may not be relevant to
-    ### anyone, because it can be entirely legal to plot something with
-    ### a range higher than 1.0.  E.g. very often we deliberately plot
-    ### selectivity with the brightness turned up so high that many of
-    ### the brighter pixels get cropped off, to accentuate the shape
-    ### of the few remaining areas that are poorly selective.  We should 
-    ### have some way of printing a message once, saying where to check
-    ### to see if further cropping has occurred.  E.g. there could be 
-    ### a variable associated with each plot that says what the maximum
-    ### value before cropping was, and a message could be printed the 
-    ### first time any plot reaches that maximum, listing the variable
-    ### that can be checked to find out the cropping on any particular 
-    ### plot.
-    ### 
-    ### In any case, we should never be using "print" directly; we need
-    ### all messages to be handled by the sharedfacility in TopoObject
-    ### so that the user can turn them on and off, etc.  If the facilities
-    ### in TopoObject are not sufficient, e.g. if there needs to be some
-    ### way to use them outside of a TopoObject, then such an interface 
-    ### to those shared messaging routines should be provided and then
-    ### used consistently.
 
     # List comprehensions were not used because they were slower.
     for j in range(shape[0]):
@@ -77,7 +51,37 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
 	    bmat[j,i] = rgb[2]
                 
     return (rmat, gmat, bmat)
-    
+
+
+### JABHACKALERT: Making Plots of various types from a template would
+### probably work much more cleanly like:
+###  
+###  def make_plot(channels,sheet_view_dict,density=None,
+###                plot_bounding_box=None,normalize=False,situate=False, **params):
+###      plot_types=[HSVPlot,RGBPlot,ColormapPlot]
+###      for pt in plot_types:
+###          plot=pt(...arguments...)
+###          if plot.bitmap != None
+###             return plot
+###      print "Warning: No plot defined"
+###  
+###  
+###  
+###  class Plot(TopoObject):
+###     bitmap=None
+###     def annotated_bitmap(self):  .... using bitmap ... construct annotated version
+###     ...
+###     
+###  class HSVPlot(Plot):
+###     ... ask for Hue, Strength, Confidence; if enough are there, make a plot.
+###  
+###  class RGBPlot(Plot):    
+###     ... ask for Red, Green, Blue; if enough are there, make a plot.
+###  
+###     
+###  class ColormapPlot(Plot):    
+###     ... ask for Strength and Colormap; if Strength is present, make a plot.
+
 
 
 class Plot(TopoObject):
@@ -163,7 +167,6 @@ class Plot(TopoObject):
 
 	# Remaining of the code are the steps to construct the plot bitmap (self.rgb_matrices)
 
-        ### JABALERT: make self.matrices a Tuple. Rename it rgb_matrices
         self.rgb_matrices = (None,None,None)
 
 	# return a dictionary of view matrices and a dictionary of bounding_boxes,
