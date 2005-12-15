@@ -1,53 +1,43 @@
 """
-PlotGroups are containers of Plots that store specific information
-about different plot types.  Specifically, a PlotGroup contains the
-do_plot_cmd() function that knows how to generate plots.  All
-information in these classes must be medium independent.  That is to
-say, the bitmaps produced by the groups of plots should be as easily
-displayed in a GUI window, as saved to a file.
+Hierarchy of PlotGroup classes, i.e. output-device-independent sets of plots.
+
+Includes PlotGroups for standard plots of anything in a Sheet database,
+plus weight plots for one unit, and projections.
 
 $Id$
 """
 __version__='$Revision$'
+
+import types
+from itertools import chain
+
+### JABALERT: Use Numeric's clip instead?
+import MLab
+from Numeric import transpose, array, ravel
+
+from topo.base.utils import flatten, dict_sort
+from topo.base.topoobject import TopoObject
+from topo.base.sheet import Sheet
+from topo.base.sheetview import SheetView
+from topo.base.connectionfield import CFSheet
+
+from plot import Plot
+import bitmap
+
+### JABALERT: This constant should be removed for now, though it may
+### be reinstated some day.
+FLAT = 'FLAT'
+
+def sort_plots(plot_list):
+    """Sort a plot list according to the src_names."""
+    plot_list.sort(lambda x, y: cmp(x.view_info['src_name'], y.view_info['src_name']))
+
 
 ### JABHACKALERT!
 ### 
 ### The code in this file has not yet been reviewed, and may need
 ### substantial changes.
 
-
-import types
-from topo.base.topoobject import TopoObject
-from topo.base.utils import flatten, dict_sort
-from topo.base.sheet import Sheet
-import bitmap
-
-import topo
-import MLab
-from itertools import chain
-from Numeric import transpose, array, ravel
-
-
-
-from plot import Plot
-from topo.base.connectionfield import CFSheet
-from topo.base.sheetview import SheetView
-
-
-# Shape of the plotting display used by PlotGroup.  NOTE: INCOMPLETE,
-# THERE SHOULD BE MORE TYPES OF SHAPES SUCH AS SPECIFYING X ROWS, OR Y
-# COLUMNS, OR GIVING A LIST OF INTEGERS REPRESENTING NUMBER OF PLOTS
-# FOR EACH ROW.  Proposed format: If three columns are desired with
-# the plots laid out from left to right, then use (None, 3).  If three
-# rows are desired then (3, None).  Another method that would work is
-# [3,2,4] would have the first row with 3, the second row with 2, the
-# third row with 4, etc.  A key should be used to represent (None, INF)
-# or somesuch.
-FLAT = 'FLAT'
-
-def sort_plots(plot_list):
-    """ This a simple routine to sort a plot list according to their src_name"""
-    plot_list.sort(lambda x, y: cmp(x.view_info['src_name'], y.view_info['src_name']))
 
 
 ### JCALERT! This file has been largely modified so that now, each PlotGroup creates
@@ -83,9 +73,24 @@ class PlotGroup(TopoObject):
         self.plot_list = plot_list
         self.all_plots = []
         self.added_list = []
-        
-        ### JCALERT! It has to redefined what self.shape is for. 
+
+
+        # Shape of the plotting display used by PlotGroup.
+        #
+        # Allowable shapes include:
+        ### JABALERT: What shapes are already supported, right now?
+        #
+        # In the future, it might be good to be able to specify the
+        # plot rows and columns using tuples.  For instance, if three
+        # columns are desired with the plots laid out from left to
+        # right, we could use (None, 3).  If three rows are desired
+        # then (3, None).  Another method that would work is [3,2,4]
+        # would have the first row with 3, the second row with 2, the
+        # third row with 4, etc.  The default left-to-right ordering
+        # in one row could perhaps be represented as (None, Inf).
         self.shape = shape
+
+        
         self.plot_group_key = plot_group_key
         self.bitmaps = []
         self.template = template
@@ -317,8 +322,8 @@ class UnitWeightsPlotGroup(PlotGroup):
         self.x = float(plot_group_key[2])
         self.y = float(plot_group_key[3])
 
-        # Decides wether the plots of the UnitWeightPlotGroup are situated or not
-        # Its value is depending on the Situate button defined in CFSheetPlotPanel.
+        # Decides wether the plots of the UnitWeightPlotGroup are situated on
+        # a plot of the full source sheet, or not.
       	self.situate = False
         
 	### JCALERT! I am not sure we need something dynamic here.
@@ -385,8 +390,6 @@ class ProjectionPlotGroup(PlotGroup):
                         if self.sheet_filter_lam(s)][0]
         self._sim_ep_src = self._sim_ep.get_in_projection_by_name(self.weight_name)[0].src
 
-        # Decides wether the plots of the ProjectionPlotGroup are situated or not
-        # Its value is depending on the Situate button defined in CFSheetPlotPanel.
         self.situate = False
         
 	self.plot_list = lambda: self.initialize_plot_list()
