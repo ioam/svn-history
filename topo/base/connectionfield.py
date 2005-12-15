@@ -111,7 +111,7 @@ class ConnectionField(TopoObject):
 
     def __initialize_slice_array(self,weights_bound_template):
         """
-        Calculate the slice specifying the submatrix of the sheet's to which
+        Calculate the slice specifying the submatrix of the sheets to which
         this connection field connects.
 
     	Given a bounds centered at the origin, offsets the bounds to
