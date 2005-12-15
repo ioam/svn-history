@@ -23,9 +23,6 @@ bitmap1 = ColorMap(inArray,palette)
     inArray: 2D Array
     palette: 768 integers (3x256 of RGB ranged 0-255).
 
-bitmap2 = BWMap(inArray)
-    Calls ColorMap with the default Luminosity palette.
-
 bitmap3 = RGBMap(rMapArray,gMapArray,bMapArray)
     Three matrices that are combined into one image, where each matrix
     represents a different color channel.

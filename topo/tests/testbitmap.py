@@ -45,11 +45,6 @@ class TestBitmap(unittest.TestCase):
          # cmap.show()
 
 
-    def test_BWMap(self):
-        bwmap = BWMap(self.ra)
-        # bwmap.show()
-
-    
     def test_HSVMap(self):
         a = [j for i in range(256) for j in range(256)]
         b = [i for i in range(256) for j in range(256)]
