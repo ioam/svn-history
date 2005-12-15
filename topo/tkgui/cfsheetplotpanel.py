@@ -77,7 +77,7 @@ class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
         """Set the attribute situate"""
         self.situate = not self.situate
         if self.pe_group != None:
-            self.pe_group.set_situate(self.situate)
+            self.pe_group.situate = self.situate
         self.initial_plot = True
         self.zoom_factor = self.min_zoom_factor = 1
         self.refresh()

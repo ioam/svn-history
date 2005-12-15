@@ -318,6 +318,7 @@ class UnitWeightsPlotGroup(PlotGroup):
         self.y = float(plot_group_key[3])
 
         # Decides wether the plots of the UnitWeightPlotGroup are situated or not
+        # Its value is depending on the Situate button defined in CFSheetPlotPanel.
       	self.situate = False
         
 	### JCALERT! I am not sure we need something dynamic here.
@@ -368,15 +369,6 @@ class UnitWeightsPlotGroup(PlotGroup):
                 each.unit_view(self.x,self.y)
 
 
-    def set_situate(self,situate):
-        """ Function that just set the value of self.situate.
-            self.situate is a boolean parameter specifying if we want to situate the
-            UnitView plots constituting the UnitViewPlotGroup.
-            It is set from CFSheetPlotPanel, when clicking on the situate Checkbutton
-        """
-        self.situate = situate
-
-
    
 class ProjectionPlotGroup(PlotGroup):
     """
@@ -394,6 +386,7 @@ class ProjectionPlotGroup(PlotGroup):
         self._sim_ep_src = self._sim_ep.get_in_projection_by_name(self.weight_name)[0].src
 
         # Decides wether the plots of the ProjectionPlotGroup are situated or not
+        # Its value is depending on the Situate button defined in CFSheetPlotPanel.
         self.situate = False
         
 	self.plot_list = lambda: self.initialize_plot_list()
@@ -494,11 +487,3 @@ class ProjectionPlotGroup(PlotGroup):
         return [each for each in generated_bitmap_list if each is not None]
 
 
-
-    def set_situate(self,situate):
-        """ Function that just set the value of self.situate.
-            self.situate is a boolean parameter specifying if we want to situate the
-            UnitView plots constituting the ProjectionPlotGroup.
-            It is set from CFSheetPlotPanel, when clicking on the situate Checkbutton
-        """
-        self.situate = situate
