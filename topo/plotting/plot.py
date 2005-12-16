@@ -5,17 +5,15 @@ $Id$
 """
 __version__='$Revision$'
 
+from colorsys import hsv_to_rgb
+
 from Numeric import zeros, ones, Float, divide, ravel,clip,array
 
 from topo.base.topoobject import TopoObject
 from topo.base.parameter import Dynamic
 from topo.base.sheet import submatrix, bounds2slice, bounds2shape
 
-
-### JCALERT! Maybe instead of importing that from bitmap, just define it here...
-from bitmap import WHITE_BACKGROUND, BLACK_BACKGROUND
-import palette as palette
-from colorsys import hsv_to_rgb
+import palette
 
 
 ### JCALERT! I will get rid of this function when BitMap is sure and tested
