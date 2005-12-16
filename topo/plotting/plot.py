@@ -67,20 +67,19 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
 ### JCALERT! This function has to be better documented
 def make_plot(channels,sheet_view_dict,density=None,
               plot_bounding_box=None,normalize=False,situate=False,name=None):
-     """ 
-     Function called when requesting a Plot Object.
+     """
+     Factory function called when requesting a Plot Object.
      It is what should always be used when requesting a Plot
      rather than a direct call to one of the Plot sub-classes.
      """
      plot_types=[HSVPlot,RGBPlot,ColormapPlot]
      for pt in plot_types:
-	 #exec 'ptr = ' + pt  in globals()
          resu = pt(channels,sheet_view_dict,density,plot_bounding_box,normalize,situate,name)
          if resu.rgb_matrices != None:
 	     return resu
-     ### JC:Figure out what to do in this case. Cos that print a warning in some normal cases...
-     #print "Warning: No plot defined"
-
+     
+     #TopoObject(name="make_plot").verbose('No plot defined')
+     return None
 
 
 class Plot(TopoObject):
@@ -329,7 +328,7 @@ class HSVPlot(Plot):
 
 	    
 
-### JCALERT! DOCUMENTATION
+### JCALERT! DOCUMENTATION, and make into a simple function called 3 times from RGB and 3 from HSV
     def __slice_matrices(self,shc_matrices,shape,slicing_box,outer_box,density):
 	"""
         Get the submatrices.
