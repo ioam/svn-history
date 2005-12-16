@@ -7,7 +7,6 @@ __version__='$Revision$'
 
 
 import unittest
-from topo.plotting.bitmap import BLACK_BACKGROUND, WHITE_BACKGROUND
 from topo.plotting.palette import *
 
 class TestPalette(unittest.TestCase):

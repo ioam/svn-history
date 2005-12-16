@@ -43,13 +43,17 @@ __version__='$Revision$'
 
 from topo.base.topoobject import TopoObject
 from topo.base.parameter import Dynamic
-from bitmap import BLACK_BACKGROUND, WHITE_BACKGROUND
 import plot
 
 ### JABHACKALERT!
 ### 
 ### Not yet properly implemented; all the code in this file needs to
 ### be either implemented or removed.
+
+# Supported background types, used for such things as determining
+# what color to be used for outlines, fills, etc.
+BLACK_BACKGROUND = 0
+WHITE_BACKGROUND = 1
 
 class Palette(TopoObject):
     """

@@ -37,11 +37,6 @@ $Id$
 """
 __version__='$Revision$'
 
-### JABHACKALERT!
-### 
-### The code in this file has not yet been reviewed, and may need
-### substantial changes.
-
 from colorsys import hsv_to_rgb
 import Numeric, Image, math
 from Numeric import Float
@@ -49,11 +44,6 @@ from topo.base.parameter import Parameter
 import topo.base.topoobject
 import MLab
 
-# Background type.  Decides to fill dead areas with 0s or with 1s
-BLACK_BACKGROUND = 0
-WHITE_BACKGROUND = 1
-MONITOR_BASED_PLOTS = BLACK_BACKGROUND
-PAPER_BASED_PLOTS = WHITE_BACKGROUND
 
 class Bitmap(topo.base.topoobject.TopoObject):
     """
