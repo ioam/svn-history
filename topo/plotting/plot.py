@@ -38,7 +38,7 @@ def make_plot(channels,sheet_view_dict,density=None,
      """
      plot_types=[HSVPlot,RGBPlot,ColormapPlot]
      for pt in plot_types:
-         plot = pt(channels,sheet_view_dict,density,plot_bounding_box,normalize,situate,name)
+         plot = pt(channels,sheet_view_dict,density,plot_bounding_box,normalize,situate,name=name)
          if plot.bitmap != None:
 	     return plot
      
@@ -49,7 +49,7 @@ def make_plot(channels,sheet_view_dict,density=None,
 class Plot(TopoObject):
 
     def __init__(self,channels,sheet_view_dict,density,
-                 plot_bounding_box,normalize,situate,name,**params):
+                 plot_bounding_box,normalize,situate,**params):
 	"""
         Get the SheetViews requested from each channel passed in at
         creation, combines them as necessary.
@@ -87,7 +87,9 @@ class Plot(TopoObject):
         
         name (inherited from TopoObject) specifies the name to use for
         this plot.
-        """   
+        """ 
+        super(Plot,self).__init__(**params) 
+       
         self.bitmap = None
         ### JCALERT: Fix view_info here, and in SheetView
 	self.view_info = {}
@@ -96,9 +98,6 @@ class Plot(TopoObject):
 	self.view_dict = sheet_view_dict
 	# bounds of the situated plotting area 
 	self.plot_bounding_box = plot_bounding_box
-
-	### JCALERT! Temporary, can get rid of when it is understood how to pass the name from make_plot
-	self.name = name
 
         ### JCALERT ! This is an hack so that the problem of displaying the right
         ### name under each map in activity and orientation map panel is solved
@@ -244,10 +243,10 @@ class Plot(TopoObject):
 class HSVPlot(Plot):
 
     def __init__(self,channels,sheet_view_dict,density,
-                 plot_bounding_box,normalize,situate,name,**params):
+                 plot_bounding_box,normalize,situate,**params):
 
 	super(HSVPlot,self).__init__(channels,sheet_view_dict,density, 
-				   plot_bounding_box,normalize,situate,name,**params)
+				   plot_bounding_box,normalize,situate,**params)
 
 	# catching the empty plot exception
 	s_mat = self._get_matrix('Strength')
@@ -366,20 +365,20 @@ class HSVPlot(Plot):
 
 class RGBPlot(Plot):
 
-  def __init__(self,channels,sheet_view_dict,density=None,
-                 plot_bounding_box=None,normalize=False,situate=False,name=None,**params):
+  def __init__(self,channels,sheet_view_dict,density,
+                 plot_bounding_box,normalize,situate,**params):
 
       super(RGBPlot,self).__init__(channels,sheet_view_dict,density, 
-				   plot_bounding_box,normalize,situate,name, **params)
+				   plot_bounding_box,normalize,situate,**params)
 
 
 class ColormapPlot(Plot):
 
-  def __init__(self,channels,sheet_view_dict,density=None,
-                 plot_bounding_box=None,normalize=False,situate=False,name=None,**params):
+  def __init__(self,channels,sheet_view_dict,density,
+                 plot_bounding_box,normalize,situate,**params):
 
       super(ColormapPlot,self).__init__(channels,sheet_view_dict,density, 
-				   plot_bounding_box,normalize,situate,name, **params)
+				   plot_bounding_box,normalize,situate,**params)
 
 
 
