@@ -38,14 +38,16 @@ $Id$
 __version__='$Revision$'
 
 from colorsys import hsv_to_rgb
-import Numeric, Image, math
-from Numeric import Float
-from topo.base.parameter import Parameter
-import topo.base.topoobject
+### JABALERT: Should probably change this to Numeric.clip()
 import MLab
 
+import Numeric, Image, math
 
-class Bitmap(topo.base.topoobject.TopoObject):
+from topo.base.parameter import Parameter
+from topo.base.topoobject import TopoObject
+
+
+class Bitmap(TopoObject):
     """
     Wrapper class for the PIL Image class.  Only slightly hides PILs extra
     functionality since the encapsulated Image (self.bitmap) can be accessed
@@ -158,7 +160,7 @@ class HSVMap(Bitmap):
         ## This code should never be seen.  It means that calling code did
         ## not take the precaution of clipping the input matrices.
         if max(hFlat) > 1 or max(sFlat) > 1 or max(vFlat) > 1:
-            topo.base.topoobject.TopoObject().warning('HSVMap inputs exceed 1. Clipping to 1.0')
+            TopoObject().warning('HSVMap inputs exceed 1. Clipping to 1.0')
             if max(hFlat) > 0: hFlat = MLab.clip(hFlat,0.0,1.0)
             if max(sFlat) > 0: sFlat = MLab.clip(sFlat,0.0,1.0)
             if max(vFlat) > 0: vFlat = MLab.clip(vFlat,0.0,1.0)
@@ -200,7 +202,7 @@ class RGBMap(Bitmap):
         ## This code should never be seen.  It means that calling code did
         ## not take the precaution of clipping the input matrices.
         if max(rMapArray.flat) > 1 or max(gMapArray.flat) > 1 or max(bMapArray.flat) > 1:
-            topo.base.topoobject.TopoObject().warning('RGBMap inputs exceed 1. Clipping to 1.0')
+            TopoObject().warning('RGBMap inputs exceed 1. Clipping to 1.0')
             rMapArray = MLab.clip(rMapArray,0.0,1.0)
             gMapArray = MLab.clip(gMapArray,0.0,1.0)
             bMapArray = MLab.clip(bMapArray,0.0,1.0)

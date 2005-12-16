@@ -21,6 +21,7 @@ from topo.patterns.basic import GaussianGenerator
 from math import pi
 from topo.base.parameter import Dynamic
 import random
+import topo.base.topoobject
 from topo.base.connectionfield import CFProjection
 from topo.learningfns.basic import HebbianSOMLF
 import pdb #debugger
