@@ -181,11 +181,9 @@ class PlotGroup(TopoObject):
         self.bitmaps = []
         for each in self.plots():
 
-            (r,g,b) = each.rgb_matrices
-            win = bitmap.RGBMap(r, g, b)
-
-            
+            win = each.bitmap                      
             win.view_info = each.view_info
+            
             self.bitmaps.append(win)
         return self.bitmaps
     
@@ -244,8 +242,6 @@ class PlotGroup(TopoObject):
         # done to each of the matrices that come in from the Plot
         # objects.
         
-	### JCALERT! Instead of testing each.rgb_matrices != (None,None,None)
-        ### Catch the exeption raised for empty plots...
         generated_bitmap_list = [each for each in self.all_plots if each != None]
         ### JCALERT! For each plotgroup, we want the plot to be displayed
         ### in the alphabetical order according to their view_info['src_name']
@@ -460,9 +456,7 @@ class ProjectionPlotGroup(PlotGroup):
         # sufficient as outlining and other things will need to be
         # done to each of the matrices that come in from the Plot
         # objects.
-	### JCALERT! Instead of testing each.rgb_matrices != (None,None,None)
-        ### Catch the exeption risen for empty plots...
-        generated_bitmap_list = [each for each in self.all_plots]
-        return [each for each in generated_bitmap_list if each is not None]
+        generated_bitmap_list = [each for each in self.all_plots if each !=None]
+        return generated_bitmap_list
 
 

@@ -5,6 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
+
 from colorsys import hsv_to_rgb
 
 from Numeric import zeros, ones, Float, divide, ravel,clip,array
@@ -13,6 +14,7 @@ from topo.base.topoobject import TopoObject
 from topo.base.parameter import Dynamic
 from topo.base.sheet import submatrix, bounds2slice, bounds2shape
 
+from bitmap import HSVMap
 import palette
 
 
@@ -75,7 +77,7 @@ def make_plot(channels,sheet_view_dict,density=None,
      plot_types=[HSVPlot,RGBPlot,ColormapPlot]
      for pt in plot_types:
          resu = pt(channels,sheet_view_dict,density,plot_bounding_box,normalize,situate,name)
-         if resu.rgb_matrices != None:
+         if resu.bitmap != None:
 	     return resu
      
      #TopoObject(name="make_plot").verbose('No plot defined')
@@ -127,8 +129,8 @@ class Plot(TopoObject):
         """   
   
         ### JCALERT! Change the name to bitmap.
-        # self.bimapt=None
-	self.rgb_matrices = None
+        self.bitmap = None
+	#self.rgb_matrices = None
 	self.channels = channels
 	self.view_dict = sheet_view_dict
 
@@ -211,7 +213,7 @@ class Plot(TopoObject):
         return box
 
 
-   ### JCALERT! This function is probably temporary and will change when fixing the display of Plot Name
+   ### JCALERT! This function is probably temporary: will change when fixing the display of Plot Name
     def _set_view_info(self):
 	for key in ('Strength','Hue','Confidence'):
 	    sheet_view_key = self.channels.get(key,None)
@@ -260,7 +262,7 @@ class Plot(TopoObject):
 
     ### JCALERT! In this function, we assume that the slicing box is contained in the 
     ### outer box. Otherwise there will be an error
-    def _situate_plot(self,outer_box,slicing_box,density):
+    def _situate_plot(self,hue,sat,val,outer_box,slicing_box,density):
 
 	### JCALERT! It has to be tested that bounds2shape returns the right answer for this purpose
         ### There seems to have a variation in the size of the plot, study this "bug" to see of
@@ -268,14 +270,14 @@ class Plot(TopoObject):
 	shape = bounds2shape(outer_box,density)
 	r1,r2,c1,c2 = bounds2slice(slicing_box,outer_box,density)
         ### raise an error when r2-r1 > shape[1] or c2=c1 > shape[0]
-	r = zeros(shape,Float)
-	r[r1:r2,c1:c2] = self.rgb_matrices[0]
-	g = zeros(shape,Float)
-	g[r1:r2,c1:c2] = self.rgb_matrices[1]
-	b = zeros(shape,Float)
-	b[r1:r2,c1:c2] = self.rgb_matrices[2]
+	h = zeros(shape,Float)
+	h[r1:r2,c1:c2] = hue
+	s = zeros(shape,Float)
+	s[r1:r2,c1:c2] = sat
+	v = zeros(shape,Float)
+	v[r1:r2,c1:c2] = val
 
-	return (r,g,b)  
+	return (h,s,v)  
 
 
 
@@ -315,7 +317,8 @@ class HSVPlot(Plot):
             #self.bitmap = HSVMap(hsv_matrices)
             #self.bitmap = matrix_hsv_to_rgb(hue,sat,val)
             ### JCALERT! change the name to bitmap later (here and later and in Plot...)
-	    self.rgb_matrices = matrix_hsv_to_rgb(hue,sat,val)
+            
+            self.bitmap = HSVMap(hue,sat,val)
         
 
             #    Situate the plot if required
@@ -324,7 +327,9 @@ class HSVPlot(Plot):
 		    raise ValueError("the plot_bounding_box must be specified for situating the plot")
 		else:
                     #self.bitmap = self.__situate_plot(self.plot_bounding_box, slicing_box)
-		    self.rgb_matrices = self._situate_plot(self.plot_bounding_box, slicing_box,density)
+		    hue,sat,val = self._situate_plot(hue, sat, val, self.plot_bounding_box,
+                                                     slicing_box, density)
+                    self.bitmap = HSVMap(hue,sat,val)
 
 	    
 
