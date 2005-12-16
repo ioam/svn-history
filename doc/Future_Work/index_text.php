@@ -317,6 +317,8 @@ contributions are very welcome!
 
   - Add bitmap colorizations (using palette.py)
 
+  - Add black and white background options.
+
   - Add state (weight) saving. (done)
 
   - Verify/fix .ty file importing; it should work just like .py file
