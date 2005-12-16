@@ -15,7 +15,6 @@ from topo.plotting.bitmap import *
 from topo.base.sheet import Sheet
 from topo.sheets.generatorsheet import *
 from topo.base.simulator import *
-from topo.plotting.plotfilesaver import ImageSaver
 from topo.base import patterngenerator
 from topo.patterns.basic import GaussianGenerator
 from math import pi
@@ -25,6 +24,80 @@ import topo.base.topoobject
 from topo.base.connectionfield import CFProjection
 from topo.learningfns.basic import HebbianSOMLF
 import pdb #debugger
+
+
+### Only for ImageSaver
+from Numeric import resize,array,zeros
+from topo.base.simulator import EventProcessor
+from topo.base.parameter import Parameter
+from topo.base.utils import NxN
+from pprint import *
+import Image, ImageOps
+
+
+### JABALERT: The ImageSaver class should probably be deleted,
+### but it is currently used in this test.
+class ImageSaver(EventProcessor):
+    """
+
+    A Sheet that receives activity matrices and saves them as bitmaps.
+    Each time an ImageSaver sheet receives an input event on any input
+    port, it saves it to a file.  The file name is determined by:
+
+      <file_prefix><name>_<port>_<time>.<file_format>
+
+    Where <name> is the name of the ImageSaver object, <port> is the
+    name of the input port used, and <time> is the current simulation time.
+
+    Parameters:
+      file_prefix = (default '') A path or other prefix for the
+                    filename.
+      file_format = (default 'ppm') The file type to use when saving
+                    the image. (can be any image format understood by PIL)
+      time_format = (default '%f') The format string for the time.
+      pixel_scale = (default 255) The amount to scale the
+                     activity. Used as parameter to PIL's Image.putdata().
+      pixel_offset = (default 0) The zero-offset for each pixel. Used as
+                     parameter to PIL's Image.putdata()
+                     
+    """
+
+    file_prefix = Parameter('')
+    file_format = Parameter('ppm')
+    time_format = Parameter('%f')
+    pixel_scale = Parameter(255)
+    pixel_offset = Parameter(0)
+
+
+
+    def input_event(self,src,src_port,dest_port,data):
+
+        self.verbose("Received %s  input from %s" % (NxN(data.shape),src))
+        self.verbose("input max value = %d" % max(data.flat))
+
+        # assemble the filename
+        filename = self.file_prefix + self.name
+        if dest_port:
+            filename += "_" + str(dest_port)
+        filename += "_" + (self.time_format % self.simulator.time())
+        filename += "." + self.file_format
+
+        self.verbose("filename = '%s'" % filename)
+        
+        # make and populate the image
+        im = Image.new('L',(data.shape[1],data.shape[0]))
+        self.verbose("image size = %s" % NxN(im.size))
+        im.putdata(data.flat,
+                   scale=self.pixel_scale,
+                   offset=self.pixel_offset)
+
+        self.verbose("put image data.")
+
+        #save the image
+        f = open(filename,'w')
+        im.save(f,self.file_format)
+        f.close()
+
 
 
 class TestCFSom(unittest.TestCase):
@@ -41,7 +114,6 @@ class TestCFSom(unittest.TestCase):
         of running a cfsom simulation.
         """
         from testsheetview import ImageGenerator
-        from topo.plotting.plotfilesaver import ImageSaver
         
         s = Simulator(step_mode=True)
     
