@@ -36,7 +36,7 @@ class PatternGenerator(TopoObject):
     """
 
     bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True)
-    density = Parameter(default=10000,hidden=True)
+    density = Parameter(default=10,hidden=True)
 
     x       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.20,
                      doc="x-coordinate location of pattern center")
