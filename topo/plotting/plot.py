@@ -18,44 +18,6 @@ from bitmap import HSVMap
 import palette
 
 
-### JCALERT! I will get rid of this function when BitMap is sure and tested
-def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
-    """
-    First matrix sets the Hue (Color).
-    Second marix sets the Sauration (How much color)
-    Third matrix sets the Value (How bright the pixel will be)
-
-    The three input matrices should all be the same size, and have
-    been normalized to 1.  There should be no side-effects on the
-    original input matrices.
-    """
-    
-    shape = hMapArray.shape
-    rmat = array(hMapArray,Float)
-    gmat = array(sMapArray,Float)
-    bmat = array(vMapArray,Float)
-    
-    ## This code should never be seen.  It means that calling code did
-    ## not take the precaution of clipping the input matrices.
-    if max(rmat.flat) > 1 or max(gmat.flat) > 1 or max(bmat.flat) > 1:
-	topo.base.topoobject.TopoObject().warning('HSVMap inputs exceed 1. Clipping to 1.0')
-	if max(rmat.flat) > 0: rmat = clip(rmat,0.0,1.0)
-	if max(gmat.flat) > 0: gmat = clip(gmat,0.0,1.0)
-	if max(bmat.flat) > 0: bmat = clip(bmat,0.0,1.0)
-
-    # List comprehensions were not used because they were slower.
-    for j in range(shape[0]):
-	for i in range(shape[1]):
-	    rgb = hsv_to_rgb(rmat[j,i],gmat[j,i],bmat[j,i])
-	    rmat[j,i] = rgb[0]
-	    gmat[j,i] = rgb[1]
-	    bmat[j,i] = rgb[2]
-                
-    return (rmat, gmat, bmat)
-
-
-
-
 ### JCALERT!
 ### - Re-write the test file, taking the new changes into account.
 ### - I have to change the order: situate, plot_bb and (normalize)
@@ -76,9 +38,9 @@ def make_plot(channels,sheet_view_dict,density=None,
      """
      plot_types=[HSVPlot,RGBPlot,ColormapPlot]
      for pt in plot_types:
-         resu = pt(channels,sheet_view_dict,density,plot_bounding_box,normalize,situate,name)
-         if resu.bitmap != None:
-	     return resu
+         plot = pt(channels,sheet_view_dict,density,plot_bounding_box,normalize,situate,name)
+         if plot.bitmap != None:
+	     return plot
      
      #TopoObject(name="make_plot").verbose('No plot defined')
      return None
@@ -86,31 +48,28 @@ def make_plot(channels,sheet_view_dict,density=None,
 
 class Plot(TopoObject):
 
-    def __init__(self,channels,sheet_view_dict,density=None,
-                 plot_bounding_box=None,normalize=False,situate=False,name=None,**params):
+    def __init__(self,channels,sheet_view_dict,density,
+                 plot_bounding_box,normalize,situate,name,**params):
 	"""
         Get the SheetViews requested from each channel passed in at
-        creation, combines them as necessary, (and generates the
-        Histograms, not yet implemented). 
+        creation, combines them as necessary.
             
 	Important features of this object are:
 
-	   self.matrices: Triple of Matrices mapping to the
-	                  R/G/B channels.
+	   self.bitmap: Bitmap object associated with the Plot and 
+                        ready to display in the GUI.
+        
            self.view_info: Name information that can be used to create
                            labels and filenames.
-           (self.histograms: List of Histogram objects associated with
-                    the matrices is self.matrices. NOT YET IMPLEMENTED) 
-          
+              
         channels is a dictionary with keys (i.e. 'Strength','Hue','Confidence' ...)
         that point to a stored SheetView in sheet_view_dict, as specified 
 	in a PlotTemplate. None is also possible if the Plot is only built 
-        from one or two SheetViews.   
+        from one or two SheetViews. Also the code support the possibility for channels
+        to store other objects than SheetViews.   
 
 	sheet_view_dict is a dictionary of SheetViews, generally belonging 
         to a Sheet object but not necessarily.
-
-	normalize specified is the Plot is normalized or not.
 
 	density is the density of the sheet that contains the different views
         constituting the plot.
@@ -118,6 +77,8 @@ class Plot(TopoObject):
 	plot_bounding_box is the outer bounding_box of the plot
         to apply if the plot is situated.  If not situated, the
         bounds of the smallest SheetView are used.
+
+	normalize specified if the Plot is normalized or not.
         
 	situate specifies if we want to situate the plot, i.e.,
         whether to plot the entire Sheet (or other area specified by
@@ -127,23 +88,17 @@ class Plot(TopoObject):
         name (inherited from TopoObject) specifies the name to use for
         this plot.
         """   
-  
-        ### JCALERT! Change the name to bitmap.
         self.bitmap = None
-	#self.rgb_matrices = None
-	self.channels = channels
-	self.view_dict = sheet_view_dict
-
         ### JCALERT: Fix view_info here, and in SheetView
 	self.view_info = {}
-        ### JCALERT: it has to be checked if that is ever used at the moment.
-	self.cropped = False
-        ### JCALERT: This has to stay because of release_sheetviews(). Get rid of both...
-	self.channels=channels
-     
+
+	self.channels = channels
+	self.view_dict = sheet_view_dict
 	# bounds of the situated plotting area 
 	self.plot_bounding_box = plot_bounding_box
 
+        ### JCALERT: it has to be checked if that is ever used at the moment.
+	self.cropped = False
 
 	### JCALERT! Temporary, can get rid of when it is understood how to pass the name from make_plot
 	self.name = name
@@ -175,10 +130,13 @@ class Plot(TopoObject):
 
     def _get_matrix(self,key):
         """
-	sub-function of plot() that just retrieves the views from the view_dict
-	as specified by the channels, and create a dictionnary of matrices and 
-        of the corresponding bounding_boxes accordingly .
-    
+	Private Plot routine that just retrieves the matrix view (if any)
+        associated with a given key in the Plot.channels.
+
+	If the key is in channels, the corresponding sheetviews is looked 
+        for in the view_dict, and its associated matrix is returned if found.
+        None is returned otherwise.
+        
 	(It just deals with the fact that channels can be None, or that the keys
 	specified by channels can potentially refer to no SheetViews in the dict).
         """
@@ -195,10 +153,13 @@ class Plot(TopoObject):
 
     def _get_box(self,key):
         """
-	sub-function of plot() that just retrieves the views from the view_dict
-	as specified by the channels, and create a dictionnary of matrices and 
-        of the corresponding bounding_boxes accordingly .
-    
+        Private Plot routine that just retrieves the bounding box (if any)
+        associated with a given key in the Plot.channels.
+
+	If the key is in channels, the corresponding sheetviews is looked 
+        for in the view_dict, and its associated bounds are returned if found.
+        None is returned otherwise.
+        
 	(It just deals with the fact that channels can be None, or that the keys
 	specified by channels can potentially refer to no SheetViews in the dict).
         """ 
@@ -215,6 +176,7 @@ class Plot(TopoObject):
 
    ### JCALERT! This function is probably temporary: will change when fixing the display of Plot Name
     def _set_view_info(self):
+	""" Set the Plot view_info. Call when Plot is created"""
 	for key in ('Strength','Hue','Confidence'):
 	    sheet_view_key = self.channels.get(key,None)
 	    sv = self.view_dict.get(sheet_view_key, None)
@@ -428,6 +390,9 @@ class ColormapPlot(Plot):
 
       super(ColormapPlot,self).__init__(channels,sheet_view_dict,density, 
 				   plot_bounding_box,normalize,situate,name, **params)
+
+
+
 
 
 
