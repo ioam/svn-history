@@ -7,7 +7,7 @@ __version__='$Revision$'
 
 from propertiesframe import PropertiesFrame
 from Tkinter import Frame, TOP, YES, N,S,E,W,X
-from topo.base.utils import keys_sorted_by_value
+from topo.base.utils import keys_sorted_by_value, eval_atof
 import topo
 import topo.base.parameter
 from topo.base.topoobject import class_parameters
@@ -41,17 +41,11 @@ class ParametersFrame(Frame):
         """
         self.__properties_frame = PropertiesFrame(parent)
         Frame.__init__(self,parent,config)
-        self.__widgets = {}
+        self.widgets = {}
         self.__properties_frame.pack(side=TOP,expand=YES,fill=X)
 
         self.__help_balloon = Pmw.Balloon(parent)
 
-
-    def get_values(self):
-        """
-        Return a dictionary of Parameter names:values.
-        """
-        return self.__properties_frame.get_values()
 
 
     # CEBHACKALERT: it would be better if the TaggedSliders looked after themselves.
@@ -59,7 +53,7 @@ class ParametersFrame(Frame):
         """
         """
         try: 
-            for (msg,widget) in self.__widgets.values():
+            for (msg,widget) in self.widgets.values():
                 widget.set_slider_from_tag()
         except AttributeError:
             pass
@@ -69,17 +63,17 @@ class ParametersFrame(Frame):
         """
         Create widgets for all non-hidden Parameters of the given class.
 
-        Any current widgets are first removed from the screen, then new widgets are
-        added for all non-hidden Parameters of topo_class.
+        Any current widgets are first removed from the dictionary of widgets, then
+        new ones are added for all non-hidden Parameters of topo_class.
 
-        Widgets for Parameters are added in order or Parameters' precedence.
+        Widgets are added in order of Parameters' precedence.
         """
-        for (label,widget) in self.__widgets.values():
+        for (label,widget) in self.widgets.values():
             label.grid_forget()
             widget.grid_forget()
 
         parameters = class_parameters(topo_class)
-        self.__widgets = self.__make_widgets(parameters)
+        self.widgets = self.__make_widgets(parameters)
 
         # sort Parameters by precedence (oops actually reverse of precedence!)
         parameter_precedences = {}
@@ -91,7 +85,7 @@ class ParametersFrame(Frame):
         # add widgets to control Parameters
         rows = range(len(sorted_parameter_names))
         for (row,parameter_name) in zip(rows,sorted_parameter_names): 
-            (label,widget) = self.__widgets[parameter_name]
+            (label,widget) = self.widgets[parameter_name]
             help_text = parameters[parameter_name].__doc__
 
             label.grid(row=row,
@@ -118,6 +112,9 @@ class ParametersFrame(Frame):
 
         parameters must be Parameter objects.
         """
+
+        # CEBHACKALERT: this is changing...
+        
         widget_dict = {}
         for (parameter_name, parameter) in parameters.items():
 
@@ -131,11 +128,13 @@ class ParametersFrame(Frame):
                     if low_bound==None or high_bound==None or low_bound==high_bound:
                         raise AttributeError
                     
-                    # a Number with softbounds gets a slider
+                    # a Number with softbounds gets a slider; sliders always
+                    # use eval_atof since they're numeric
                     widget_dict[parameter_name] = self.__add_slider(parameter_name,
                                                                     str(low_bound),
                                                                     str(high_bound),
                                                                     parameter.default)
+
                 except AttributeError:
                     # a Number with no softbounds gets a textbox
                     widget_dict[parameter_name] = self.__properties_frame.add_text_property(
@@ -145,17 +144,24 @@ class ParametersFrame(Frame):
                 # an Enumeration gets a ComboBox
                 items = parameter.available
                 widget_dict[parameter_name] = self.__properties_frame.add_combobox_property(
-                    parameter_name,parameter.default,items)
+                    parameter_name,
+                    None,
+                    parameter.default,
+                    items)
 
             elif isinstance(parameter, topo.base.parameter.PackageParameter):
-                items = parameter.range().keys()
                 widget_dict[parameter_name] = self.__properties_frame.add_combobox_property(
-                    parameter_name,parameter.get_default_class_name(),items)
+                    parameter_name,
+                    parameter.get_from_key,
+                    parameter.get_default_class_name(),
+                    parameter.range().keys())
 
             else:
                 # everything else gets a textbox   
                 widget_dict[parameter_name] = self.__properties_frame.add_text_property(
-                    parameter_name,parameter.default)
+                    parameter_name,
+                    None,
+                    parameter.default)
         return widget_dict
                 
 

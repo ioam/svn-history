@@ -272,20 +272,12 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         Also does some other things...
         """
         parameters = class_parameters(pg_name)
-        input_values = self.param_frame.get_values()
-        
+
         new_parameter_values = {}
         
         for (name,parameter) in parameters.items():
-            if isinstance(parameter, topo.base.parameter.Number):
-                # Numbers are changed back from string to float
-                new_parameter_values[name] = eval_atof(input_values[name])
-            elif isinstance(parameter, topo.base.parameter.PackageParameter):
-                parameter.set_from_key(input_values[name])
-                new_parameter_values[name] = parameter.default
-            else:
-                new_parameter_values[name] = input_values[name]                
-
+            w = self.param_frame.widgets[name][1]
+            new_parameter_values[name] = w.get_value()
 
         # If the 'state' is turned off (from a button on the Frame),
         # then do not change the currently stored generator.  This

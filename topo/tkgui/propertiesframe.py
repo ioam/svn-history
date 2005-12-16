@@ -8,9 +8,8 @@ $Id$
 __version__='$Revision$'
 
 from Tkinter import Frame, StringVar, Entry, Message, Checkbutton, IntVar, N,S,E,W,X
-from taggedslider import TaggedSlider
-import Pmw
-from topo.base.utils import eval_atof
+from taggedslider import TaggedSlider,EntryEval,ComboBoxEval
+
 
 class PropertiesFrame(Frame):
     """
@@ -18,11 +17,10 @@ class PropertiesFrame(Frame):
     object.  This class is very general, and could be used for
     manipulating any object that has enumerable properties.
     """
-    def __init__(self, parent=None, padding=2,string_translator=eval_atof,**config):
+    def __init__(self, parent=None, padding=2,**config):
         self.parent = parent
         self.properties = {}
         self.padding = padding
-        self.string_translator = string_translator
         Frame.__init__(self,parent,config)
 
     def optional_refresh(self,CEBHACKALERT=None):
@@ -44,24 +42,23 @@ class PropertiesFrame(Frame):
         return (p,control)
 
 
-    def add_text_property(self,name,value="",width=20,**kw):
+    def add_text_property(self,name,string_translator,value="",width=20):
         """
         Create a TKInter.Entry box and add it to self.properties.
 
         This property stores its value in a TKInter StringVar.
         """
         var = StringVar()
-        control = Entry(self,textvariable=var,width=width)
-        control.bind('<Return>', self.optional_refresh)
-        return self.add_property(name,var,control,value,**kw)
-
-    def add_checkbutton_property(self,name,value=0,**kw):
-        # not used so far: not tested
-        var = IntVar()
-        control = Checkbutton(self,text="",variable=var,**kw)
-        return self.add_property(name,var,control,value)
+        control = EntryEval(self,
+                            textvariable = var,
+                            string_translator = string_translator,
+                            width=width)
         
-    def add_tagged_slider_property(self,name,value='0',**kw):
+        control.bind('<Return>', self.optional_refresh)
+        return self.add_property(name,var,control,value)
+
+        
+    def add_tagged_slider_property(self,name,value="",**kw):
         """
         Create a TaggedSlider and add it to self.properties.
         
@@ -69,29 +66,26 @@ class PropertiesFrame(Frame):
         The TaggedSlider gets this object's string translator.
         """
         var = StringVar()
-        control = TaggedSlider(self,tagvariable=var,string_translator=self.string_translator,**kw)
+        control = TaggedSlider(self,tagvariable=var,**kw)
         return self.add_property(name,var,control,value)
 
-    def add_combobox_property(self,name,value='',items=[],**kw):
+
+    def add_combobox_property(self,name,string_translator, value='',items=[]):
         """
         Create a Pmw.ComboBox and add it to self.properties.
         
         This property stores its value in a TKInter StringVar.
         """        
         var = StringVar()
-        control = Pmw.ComboBox(self,
-                               selectioncommand = (lambda value: self.properties[name].set(value)), 
+        control = ComboBoxEval(self,
+                               selectioncommand=(lambda value: self.properties[name].set(value)),
                                scrolledlist_items = items,
-                               **kw)
+                               string_translator = string_translator)
+                
         control.selectitem(value)
         control.bind('<Return>', self.optional_refresh)
         return self.add_property(name,var,control,value)
 
-    def get_values(self):
-        result = {}
-        for (k,v) in self.properties.items():
-            result[k] = v.get()
-        return result
 
 
     # CEBHACKALERT: currently unused, but could be used in the future to set the

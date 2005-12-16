@@ -22,7 +22,6 @@ class TestPropertiesFrame(unittest.TestCase):
         
         pp.add_text_property('Name', 'Jefferson Provost')
         pp.add_text_property('Addr', '1601 Faro Dr. #1504')
-        pp.add_checkbutton_property('Student', 1)
     
         for i in range(5):
             pp.add_text_property('Prop'+`i`, `i`)

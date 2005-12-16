@@ -9,6 +9,11 @@ from Tkinter import Frame, IntVar, Scale, Entry
 from Tkinter import LEFT, RIGHT, TOP, BOTTOM, YES, BOTH
 from topo.base.utils import eval_atof
 
+
+# CEBHACKALERT: sometime in the day or two before 15/12 I introduced
+# a bug where Image's taggedsliders for size and aspect ratio are
+# not right to begin with (ie slider doesn't match tag).
+
 # CEBHACKALERT: somewhere there has to be better handling of bad input.
 # e.g. "cat" gives orientation zero, as does "pI/4".
 
@@ -37,12 +42,14 @@ class TaggedSlider(Frame):
         Frame.__init__(self,root,**config)
         self.root = root
 
-        self.min_value = string_translator(min_value)
-        self.max_value = string_translator(max_value)
+        self.string_translator = string_translator
+
+        self.min_value = self.string_translator(min_value)
+        self.max_value = self.string_translator(max_value)
         
         self.fmt = string_format
 
-        self.string_translator = string_translator
+
 
         # Add the slider
         
@@ -115,5 +122,50 @@ class TaggedSlider(Frame):
         self.slider_val.set(int(new_val))
         
 
+    def get_value(self):
+        return self.string_translator(self.tag_val.get())
         
                  
+
+
+# CEBHACKALERT: much here is temporary .This file needs to be renamed.
+# There should be a base class which has things like get_value(),
+# self.string_translator, other common stuff we need the widgets to
+# have, and so on and so on.
+
+class EntryEval(Entry):
+
+    # fuck you don't need master?
+    def __init__(self, master=None, textvariable=None,width=10,string_translator=eval_atof):
+        Entry.__init__(self,master=master,textvariable=textvariable,width=width)
+        self.string_translator = string_translator
+
+    def get_value(self):
+        if self.string_translator != None:
+            return self.string_translator(self.get())
+        else:
+            return self.get()
+
+
+# what's the difference between master and parent? at least be consistent.
+
+from Pmw import ComboBox
+class ComboBoxEval(ComboBox):
+
+    def __init__(self,
+                 master=None,
+                 selectioncommand=None,
+                 scrolledlist_items=[],
+                 string_translator=None):
+        
+        ComboBox.__init__(self,
+                          master,
+                          selectioncommand=selectioncommand,
+                          scrolledlist_items=scrolledlist_items)
+        self.string_translator = string_translator
+
+    def get_value(self):
+        if self.string_translator != None:
+            return self.string_translator(self.get())
+        else:
+            return self.get()

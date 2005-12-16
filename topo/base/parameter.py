@@ -350,6 +350,9 @@ class Enumeration(Parameter):
 
 
 
+
+
+
 class Number(Parameter):
     """
     """
@@ -621,10 +624,9 @@ def is_number(obj):
 
 # CEBHACKALERT: base class for ones in output_fn,learning_fn,response_fn,
 # patterngenerator. Only output_fn, patterngenerator done so far.
-# this isn't finished yet.
 
-# CEBHACKALERT: wouldn't need to use a dictionary to store name-parameter pairs,
-# if every TopoObject class had a nice name for when it's to be displayed
+# this isn't finished yet. Also rename to ClassSelectorParameter
+
 class PackageParameter(Parameter):
     """
     """
@@ -660,13 +662,9 @@ class PackageParameter(Parameter):
             k[classname_repr(name, self.to_lose)] = class_
         return k
 
-    # do better than a separate set method
-    def set_from_key(self,key):
+    # temporary
+    def get_from_key(self,key):
         """
         """
-        try:
-            self.default = self.range()[key]()
-        except KeyError:
-            raise ValueError("Can't set PackageParameter to a class it doesn't know about...")
-
+        return self.range()[key]()
 
