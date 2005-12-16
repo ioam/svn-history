@@ -166,7 +166,7 @@ class ColorMap(Bitmap):
         super(ColorMap,self).__init__(newImage)
 
 
-### JABALERT: Should be HSVBitmap
+### JCALERT: should be HSVBitmap.
 class HSVMap(Bitmap):
     """
     HSV Map inputs, converts to RGB image.  3 matrices expected, each should
@@ -179,32 +179,35 @@ class HSVMap(Bitmap):
         Second marix sets the Sauration (How much color)
         Third matrix sets the Value (How bright the pixel will be)
         """
-        newImage = Image.new('RGB',hMapArray.shape,None)
-        hFlat = hMapArray.flat
-        sFlat = sMapArray.flat
-        vFlat = vMapArray.flat
+        shape = hMapArray.shape
+        rmat = Numeric.array(hMapArray,Numeric.Float)
+        gmat = Numeric.array(sMapArray,Numeric.Float)
+        bmat = Numeric.array(vMapArray,Numeric.Float)
 
         ### JABALERT: This class should not be clipping anything.
+        ### That should go in arrayToImage...
         ## This code should never be seen.  It means that calling code did
         ## not take the precaution of clipping the input matrices.
-        if max(hFlat) > 1 or max(sFlat) > 1 or max(vFlat) > 1:
-            TopoObject().warning('HSVMap inputs exceed 1. Clipping to 1.0')
-            if max(hFlat) > 0: hFlat = MLab.clip(hFlat,0.0,1.0)
-            if max(sFlat) > 0: sFlat = MLab.clip(sFlat,0.0,1.0)
-            if max(vFlat) > 0: vFlat = MLab.clip(vFlat,0.0,1.0)
+        if max(rmat.flat) > 1 or max(gmat.flat) > 1 or max(bmat.flat) > 1:
+            topo.base.topoobject.TopoObject().warning('HSVMap inputs exceed 1. Clipping to 1.0')
+            if max(rmat.flat) > 1.0: rmat = clip(rmat,0.0,1.0)
+            if max(gmat.flat) > 1.0: gmat = clip(gmat,0.0,1.0)
+            if max(bmat.flat) > 1.0: bmat = clip(bmat,0.0,1.0)
 
-        ### JABALERT: Replace this with a call to some version of
-        ### matrix_hsv_to_rgb, followed by the code from RGBMap.
-        buffer = []
-        for i in range(len(hFlat)):
-            (r, g, b) = hsv_to_rgb(hFlat[i],sFlat[i],vFlat[i])
-            pixel = (int(math.floor(r * 255)),
-                     int(math.floor(g * 255)),
-                     int(math.floor(b * 255)))
-            buffer.append(pixel)
+        
+        # List comprehensions were not used because they were slower.
+        for j in range(shape[0]):
+            for i in range(shape[1]):
+                rgb = hsv_to_rgb(rmat[j,i],gmat[j,i],bmat[j,i])
+                rmat[j,i] = rgb[0]
+                gmat[j,i] = rgb[1]
+                bmat[j,i] = rgb[2]
+                   
+        rImage = self._arrayToImage(rmat)
+        gImage = self._arrayToImage(gmat)
+        bImage = self._arrayToImage(bmat)
 
-        newImage.putdata(buffer)
-        super(HSVMap,self).__init__(newImage)
+        super(HSVMap,self).__init__(Image.merge('RGB',(rImage,gImage,bImage)))
 
 
 
