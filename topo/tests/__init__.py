@@ -17,7 +17,6 @@ import testdummy
 import testbitmap
 import testsheet
 import testsheetview
-import testhistogram
 import testplot
 import testplotgroup
 import testplotengine
