@@ -21,8 +21,9 @@ from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
 from topo.base.connectionfield import CFSheet
 
-from plot import Plot
+from plot import Plot, make_plot
 import bitmap
+
 
 ### JABALERT: This constant should be removed for now, though it may
 ### be reinstated some day.
@@ -135,8 +136,7 @@ class PlotGroup(TopoObject):
 	   
             for (pt_name,pt) in self.template.plot_templates:
 		plot_list= plot_list+ self.create_plots(pt_name,pt,each)
-                
-	return plot_list
+    	return plot_list
 
     ###JCALERT! We may want to implement a create_plots in the PlotGroup class
     ### Ask Jim about that.
@@ -180,6 +180,10 @@ class PlotGroup(TopoObject):
         """
         self.bitmaps = []
         for each in self.plots():
+
+	    
+
+
             (r,g,b) = each.rgb_matrices
             
             # CEBHACKALERT:
@@ -267,8 +271,7 @@ class PlotGroup(TopoObject):
         
 	### JCALERT! Instead of testing each.rgb_matrices != (None,None,None)
         ### Catch the exeption raised for empty plots...
-        generated_bitmap_list = [each for each in self.all_plots if (each.rgb_matrices != (None,None,None))]
-        
+        generated_bitmap_list = [each for each in self.all_plots if each != None]
         ### JCALERT! For each plotgroup, we want the plot to be displayed
         ### in the alphabetical order according to their view_info['src_name']
         ### The only PlotGroup that does not have to do that is the projectionplotgroup
@@ -284,12 +287,10 @@ class BasicPlotGroup(PlotGroup):
     """
     PlotGroup for Activity SheetViews
     """
-
     ### JCALERT! See what to do for the default value (sheet_filter_lam =None, plot_list=None)
     def __init__(self,simulator,template,plot_group_key,sheet_filter_lam,plot_list,**params):
         super(BasicPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,plot_list,
                                             **params)
-
 
         ### JC: for basic PlotGroup, no need to create a "dynamic List"
         ### even we could get rid of this dynamic list and systematically call
@@ -306,7 +307,7 @@ class BasicPlotGroup(PlotGroup):
         plot_channels['Confidence'] = pt.channels.get('Confidence',None)
         n = pt.channels.get('Normalize',False)
 	plot_name = '\n'+pt_name
-        p = Plot(plot_channels,sheet.sheet_view_dict,sheet.density,sheet.bounds,n,name=plot_name)
+        p = make_plot(plot_channels,sheet.sheet_view_dict,sheet.density,sheet.bounds,n,False,name=plot_name)
 	return [p]
 
 	
@@ -351,7 +352,7 @@ class UnitWeightsPlotGroup(PlotGroup):
                 key = ('Weights',sheet.name,p.name,self.x,self.y)
 		plot_name = '\n(from ' + p.src.name +')'
 		plot_channels['Strength'] = key			       
-		plot_list.append(Plot(plot_channels,p.src.sheet_view_dict,p.src.density,
+		plot_list.append(make_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
 				      p.src.bounds,pt.channels['Normalize'],self.situate,name=plot_name))
 
         self.debug('plot_list =' + str(plot_list))
@@ -421,7 +422,7 @@ class ProjectionPlotGroup(PlotGroup):
 	        plot_channels['Confidence'] = pt.channels.get('Confidence',None)     
 		key = ('Weights',sheet.name,projection.name,view.view_info['x'],view.view_info['y'])
 		plot_channels['Strength'] = key
-		plot_list.append(Plot(plot_channels,src_sheet.sheet_view_dict,
+		plot_list.append(make_plot(plot_channels,src_sheet.sheet_view_dict,
                                       src_sheet.density,src_sheet.bounds,pt.channels['Normalize'],self.situate))
 		
         return plot_list
@@ -486,7 +487,7 @@ class ProjectionPlotGroup(PlotGroup):
         # objects.
 	### JCALERT! Instead of testing each.rgb_matrices != (None,None,None)
         ### Catch the exeption risen for empty plots...
-        generated_bitmap_list = [each for each in self.all_plots if (each.rgb_matrices != (None,None,None))]
+        generated_bitmap_list = [each for each in self.all_plots]
         return [each for each in generated_bitmap_list if each is not None]
 
 

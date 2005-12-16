@@ -22,7 +22,8 @@ import __main__
 import math
 import parametersframe
 import topo.base.patterngenerator
-import topo.plotting.plot
+
+from topo.plotting.plot import make_plot
 import plotgrouppanel
 import Pmw
 import topo.base.sheetview 
@@ -240,7 +241,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 	    ### JCALERT ! This is working for the moment but that could be made simpler
             ### (which is also true for most of the file!!)
 	    channels = {'Strength':each,'Hue':None,'Confidence':None}
-            plist.append(topo.plotting.plot.Plot(channels,view_dict, name=''))
+            plist.append(make_plot(channels,view_dict,name=''))
         if LIST_REVERSE: plist.reverse()
         ### JCALERT! It is the only call to PlotGroup with template is None. Need to change.
         self.pe_group = topo.plotting.plotgroup.PlotGroup(self.pe.simulation,None,plot_group_key='Preview',plot_list=plist)

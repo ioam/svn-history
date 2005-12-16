@@ -18,6 +18,7 @@ import palette as palette
 from colorsys import hsv_to_rgb
 
 
+### JCALERT! I will get rid of this function when BitMap is sure and tested
 def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     """
     First matrix sets the Hue (Color).
@@ -53,65 +54,42 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     return (rmat, gmat, bmat)
 
 
-### JABHACKALERT: Making Plots of various types from a template would
-### probably work much more cleanly like:
-###  
-###  def make_plot(channels,sheet_view_dict,density=None,
-###                plot_bounding_box=None,normalize=False,situate=False, **params):
-###      plot_types=[HSVPlot,RGBPlot,ColormapPlot]
-###      for pt in plot_types:
-###          plot=pt(...arguments...)
-###          if plot.bitmap != None
-###             return plot
-###      print "Warning: No plot defined"
-###  
-###  
-###  
-###  class Plot(TopoObject):
-###     bitmap=None
-###     def annotated_bitmap(self):  .... using bitmap ... construct annotated version
-###     ...
-###     
-###  class HSVPlot(Plot):
-###     ... ask for Hue, Strength, Confidence; if enough are there, make a plot.
-###  
-###  class RGBPlot(Plot):    
-###     ... ask for Red, Green, Blue; if enough are there, make a plot.
-###  
-###     
-###  class ColormapPlot(Plot):    
-###     ... ask for Strength and Colormap; if Strength is present, make a plot.
+
+
+### JCALERT!
+### - Re-write the test file, taking the new changes into account.
+### - I have to change the order: situate, plot_bb and (normalize)
+### - There should be a way to associate the density explicitly
+###   with the sheet_view_dict, because it must match all SheetViews
+###   in that dictionary.  Maybe as a tuple?
+### - Make the subfunction of plot() really private.
+
+
+
+### JCALERT! This function has to be better documented
+def make_plot(channels,sheet_view_dict,density=None,
+              plot_bounding_box=None,normalize=False,situate=False,name=None):
+     """ 
+     Function called when requesting a Plot Object.
+     It is what should always be used when requesting a Plot
+     rather than a direct call to one of the Plot sub-classes.
+     """
+     plot_types=[HSVPlot,RGBPlot,ColormapPlot]
+     for pt in plot_types:
+	 #exec 'ptr = ' + pt  in globals()
+         resu = pt(channels,sheet_view_dict,density,plot_bounding_box,normalize,situate,name)
+         if resu.rgb_matrices != None:
+	     return resu
+     ### JC:Figure out what to do in this case. Cos that print a warning in some normal cases...
+     #print "Warning: No plot defined"
 
 
 
 class Plot(TopoObject):
-    """
-    Constructs and stores a bitmap from one or more SheetViews.
-
-    The bitmap is then available for future use, e.g. as part of a
-    PlotGroup of related plots displayed within one GUI window.
-
-    Plot creates the 3 matrices necessary for plotting a RGB image,
-    from a channel dictionary and a dictionary of SheetViews.
-    Eventually, plots more complex than simple bitmaps will be
-    supported, including overlaid outlines, contours, vector fields,
-    histograms, etc., and the overall architecture should be designed
-    to make this feasible.
-    """
-    background = Dynamic(default=BLACK_BACKGROUND)
-    palette_ = Dynamic(default=palette.Monochrome)
- 
-    ### JCALERT!
-    ### - Re-write the test file, taking the new changes into account.
-    ### - I have to change the order: situate, plot_bb and (normalize)
-    ### - There should be a way to associate the density explicitly
-    ###   with the sheet_view_dict, because it must match all SheetViews
-    ###   in that dictionary.  Maybe as a tuple?
-    ### - Make the subfunction of plot() really private.
 
     def __init__(self,channels,sheet_view_dict,density=None,
-                 plot_bounding_box=None,normalize=False,situate=False, **params):
-        """
+                 plot_bounding_box=None,normalize=False,situate=False,name=None,**params):
+	"""
         Get the SheetViews requested from each channel passed in at
         creation, combines them as necessary, (and generates the
         Histograms, not yet implemented). 
@@ -150,59 +128,39 @@ class Plot(TopoObject):
         name (inherited from TopoObject) specifies the name to use for
         this plot.
         """   
-        super(Plot,self).__init__(**params)
+  
+        ### JCALERT! Change the name to bitmap.
+        # self.bimapt=None
+	self.rgb_matrices = None
+	self.channels = channels
+	self.view_dict = sheet_view_dict
 
-      	self.view_dict = sheet_view_dict
-        self.density = density
-
-	### JCALERT: Fix view_info here, and in SheetView
-        self.view_info = {}
-	### JCALERT: it has to be checked if that is ever used at the moment.
-        self.cropped = False
+        ### JCALERT: Fix view_info here, and in SheetView
+	self.view_info = {}
+        ### JCALERT: it has to be checked if that is ever used at the moment.
+	self.cropped = False
         ### JCALERT: This has to stay because of release_sheetviews(). Get rid of both...
-        self.channels=channels
+	self.channels=channels
      
 	# bounds of the situated plotting area 
 	self.plot_bounding_box = plot_bounding_box
 
-	# Remaining of the code are the steps to construct the plot bitmap (self.rgb_matrices)
 
-        self.rgb_matrices = (None,None,None)
+	### JCALERT! Temporary, can get rid of when it is understood how to pass the name from make_plot
+	self.name = name
 
-	# return a dictionary of view matrices and a dictionary of bounding_boxes,
-        # as specified by channels
-	matrices_dict, boxes_dict = self.__extract_view_dict_info(channels)
+        ### JCALERT ! This is an hack so that the problem of displaying the right
+        ### name under each map in activity and orientation map panel is solved
+        ### It has to be changed so that it display what we want for each panel
+        ### Also I think the name that is displayed should always be the plot name
+        ### (Also see in create_plots for each PlotGroup sub-classes)
+        ### This should not be in this function at all
+	self._set_view_info()
 
-	# catching the empty plot exception
-	s = matrices_dict['Strength']
-	h = matrices_dict['Hue']
-	c = matrices_dict['Confidence'] 
-
-        ### JABALERT
-        ### raise an exception to be caught by the instantiator
-        ### instead. Which exception?
-        if (s==None and c==None and h==None):
-            self.debug('Skipping empty plot.')
-	else:
-	    # If the plot is not empty: get the submatrix of each sheetview,
-            # that corresponds to the smallest one and return them in a new matrix dictionary
-            # along with their corresponding shape and bounding_box. 
-	    shape, slicing_box, sliced_matrices_dict = self.__slice_matrices(matrices_dict,boxes_dict)
-
-	    # Construct the hsv bitmap corresponding to the dictionary of matrices
-	    (hue,sat,val) = self.__make_hsv_matrices(sliced_matrices_dict,shape,normalize)
-	    
-	    # Convert the hsv bitmap in rgb
-	    self.rgb_matrices = matrix_hsv_to_rgb(hue,sat,val)
-
-	    # Situate the plot if required
-	    if situate:
-		if self.plot_bounding_box == None:
-		    raise ValueError("the plot_bounding_box must be specified for situating the plot")
-		else:
-		    self.rgb_matrices = self.__situate_plot(self.plot_bounding_box, slicing_box)
+	### Note: for supporting other type of plots (e.g vector fields...)
+	# def annotated_bitmap(self):  
+        # enable other construction....
 	
-
 
     ### JABALERT: This does not seem appropriate -- Plot should not delete
     ### any SheetViews that it did not put there itself.
@@ -216,8 +174,7 @@ class Plot(TopoObject):
 	    del self.view_dict[each]
 
 
-
-    def __extract_view_dict_info(self,channels):
+    def _get_matrix(self,key):
         """
 	sub-function of plot() that just retrieves the views from the view_dict
 	as specified by the channels, and create a dictionnary of matrices and 
@@ -225,32 +182,53 @@ class Plot(TopoObject):
     
 	(It just deals with the fact that channels can be None, or that the keys
 	specified by channels can potentially refer to no SheetViews in the dict).
-        """  
-	matrices_dict = {}
-	boxes_dict = {}
-	for key,value in channels.items():
-	    sv = self.view_dict.get(value, None)
-	    if sv == None:
-		matrices_dict[key] = None
-		boxes_dict[key] = None
-	    else:
-		view_matrix = sv.view()
- 		matrices_dict[key] = view_matrix[0]
-	        boxes_dict[key] = view_matrix[1]
+        """
+        sheet_view_key = self.channels.get(key,None)
+	sv = self.view_dict.get(sheet_view_key, None)
+        if sv == None:
+	    matrix = None
+	else:
+	    view = sv.view()
+	    matrix = view[0]
 
-	    ### JCALERT ! This is an hack so that the problem of displaying the right
-	    ### name under each map in activity and orientation map panel is solved
-	    ### It has to be changed so that it display what we want for each panel
-	    ### Also I think the name that is displayed should always be the plot name
-            ### (Also see in create_plots for each PlotGroup sub-classes)
-            ### This should not be in this function at all	
-		self.view_info['src_name'] = sv.view_info['src_name'] + self.name
-		self.view_info['view_type'] = sv.view_info['view_type']
+        return matrix
 
-	return matrices_dict, boxes_dict
-	    
 
-    def __slice_matrices(self,matrices_dict,boxes_dict):
+    def _get_box(self,key):
+        """
+	sub-function of plot() that just retrieves the views from the view_dict
+	as specified by the channels, and create a dictionnary of matrices and 
+        of the corresponding bounding_boxes accordingly .
+    
+	(It just deals with the fact that channels can be None, or that the keys
+	specified by channels can potentially refer to no SheetViews in the dict).
+        """ 
+        sheet_view_key = self.channels.get(key,None)
+	sv = self.view_dict.get(sheet_view_key, None)
+        if sv == None:
+	    box = None
+	else:
+	    view = sv.view()
+	    box = view[1]
+
+        return box
+
+
+   ### JCALERT! This function is probably temporary and will change when fixing the display of Plot Name
+    def _set_view_info(self):
+	for key in ('Strength','Hue','Confidence'):
+	    sheet_view_key = self.channels.get(key,None)
+	    sv = self.view_dict.get(sheet_view_key, None)
+	    if sv != None :
+		if self.name == None:
+		    self.view_info['src_name'] = sv.view_info['src_name'] + repr(self.name)
+		else:
+		    self.view_info['src_name'] = sv.view_info['src_name'] + self.name
+		    self.view_info['view_type'] = sv.view_info['view_type']
+
+     
+
+    def _get_shape_and_boxes(self,matrices,boxes):
 	"""
 	Sub-function used by plot: get the submatrix of the matrices in matrices_dict 
         corresponding to the slice of the smallest sheetview matrix belonging to the plot.
@@ -265,21 +243,99 @@ class Plot(TopoObject):
         ### the three matrices!
  	l_shape = []
 	l_box = []
-	for mat,box in zip(matrices_dict.values(),boxes_dict.values()):
+	for mat,box in zip(matrices,boxes):
 	    if mat != None:
 		l_shape.append(mat.shape)
 		l_box.append(box)
 
-	shape = l_shape[0]
-	outer_box = l_box[0]               # this is the outer box of the plot
-	slicing_box = l_box[0]               # this is the smaller box of the plot
+	shape = l_shape[0]              
+	slicing_box = l_box[0]              # this is the smaller box of the plot
+        outer_box = l_box[0]
 	for sh,b in zip(l_shape,l_box):
 	    if (sh[0]+sh[1]) < (shape[0]+shape[1]):
 		shape = sh
-		slicing_box = b    
-	    else:
-		outer_box = b
+		slicing_box = b 
+            else:
+                outer_box=b	   
 
+        return shape,slicing_box,outer_box
+
+
+    ### JCALERT! In this function, we assume that the slicing box is contained in the 
+    ### outer box. Otherwise there will be an error
+    def _situate_plot(self,outer_box,slicing_box,density):
+
+	### JCALERT! It has to be tested that bounds2shape returns the right answer for this purpose
+        ### There seems to have a variation in the size of the plot, study this "bug" to see of
+        ### it is linked to that.
+	shape = bounds2shape(outer_box,density)
+	r1,r2,c1,c2 = bounds2slice(slicing_box,outer_box,density)
+        ### raise an error when r2-r1 > shape[1] or c2=c1 > shape[0]
+	r = zeros(shape,Float)
+	r[r1:r2,c1:c2] = self.rgb_matrices[0]
+	g = zeros(shape,Float)
+	g[r1:r2,c1:c2] = self.rgb_matrices[1]
+	b = zeros(shape,Float)
+	b[r1:r2,c1:c2] = self.rgb_matrices[2]
+
+	return (r,g,b)  
+
+
+
+   
+class HSVPlot(Plot):
+
+    def __init__(self,channels,sheet_view_dict,density,
+                 plot_bounding_box,normalize,situate,name,**params):
+
+	super(HSVPlot,self).__init__(channels,sheet_view_dict,density, 
+				   plot_bounding_box,normalize,situate,name,**params)
+
+	# catching the empty plot exception
+	s_mat = self._get_matrix('Strength')
+	h_mat = self._get_matrix('Hue')
+	c_mat = self._get_matrix('Confidence') 
+
+        ### JABALERT
+        ### raise an exception to be caught by the instantiator
+        ### instead. Which exception?
+        if (s_mat==None and c_mat==None and h_mat==None):
+	    self.debug('Empty plot.')
+
+	else:
+	  
+	    s_box = self._get_box('Strength')
+	    h_box = self._get_box('Hue')
+	    c_box = self._get_box('Confidence')
+	    shc_boxes = (s_box,h_box,c_box)
+	    shc_matrices = (s_mat,h_mat,c_mat)
+
+	    shape, slicing_box, outer_box = self._get_shape_and_boxes(shc_matrices,shc_boxes)
+	    shc_matrices = self.__slice_matrices(shc_matrices,shape,slicing_box,outer_box,density)
+	    hue,sat,val = self.__make_hsv_matrices(shc_matrices,shape,normalize)
+        
+            ### JCALERT! Use hsv_to_rgb first, and then fix bitmap and use HSVMap directly
+            #self.bitmap = HSVMap(hsv_matrices)
+            #self.bitmap = matrix_hsv_to_rgb(hue,sat,val)
+            ### JCALERT! change the name to bitmap later (here and later and in Plot...)
+	    self.rgb_matrices = matrix_hsv_to_rgb(hue,sat,val)
+        
+
+            #    Situate the plot if required
+	    if situate:
+		if self.plot_bounding_box == None:
+		    raise ValueError("the plot_bounding_box must be specified for situating the plot")
+		else:
+                    #self.bitmap = self.__situate_plot(self.plot_bounding_box, slicing_box)
+		    self.rgb_matrices = self._situate_plot(self.plot_bounding_box, slicing_box,density)
+
+	    
+
+### JCALERT! DOCUMENTATION
+    def __slice_matrices(self,shc_matrices,shape,slicing_box,outer_box,density):
+	"""
+        Get the submatrices.
+        """
 	### JCALERT! Ask Jim about that: is it reasonnable to assume so?
         ### (what it means is that if we have to slice it will be sheetviews,
         ### and so the slicing_box will be from a UnitView and the outer box from
@@ -287,19 +343,29 @@ class Plot(TopoObject):
         ### does not have the slight margin that UnitView boxes have; but that could be changed by
         ### inserting this margin to the function bounds2slice....)
 	# At this point we assume that if there is matrix of different sizes
-        # the outer_box will be a sheet bounding_box....
-	new_matrices_dict = {} 
-	for key,mat in matrices_dict.items():
-	    if mat != None and mat.shape != shape:
-		sub_mat = submatrix(slicing_box,mat,outer_box,self.density)
-		new_matrices_dict[key] = sub_mat
-	    else:
-		new_matrices_dict[key] = mat
+        # the outer_box will be a sheet bounding_box.... 
+        s = shc_matrices[0]
+        if s!=None and s.shape != shape:
+	    new_s = submatrix(slicing_box,s,outer_box,density)
+        else:
+	    new_s = s
 
-	return shape,slicing_box,new_matrices_dict
+        h = shc_matrices[1]
+        if h!=None and h.shape != shape:
+	    new_h = submatrix(slicing_box,h,outer_box,density)
+        else:
+	    new_h = h
+
+        c = shc_matrices[2]
+        if c!=None and c.shape != shape:
+	    new_c = submatrix(slicing_box,c,outer_box,density)
+        else:
+	    new_c=c
+
+	return (new_s,new_h,new_c)
 
 
-    def __make_hsv_matrices(self, sliced_matrices_dict,shape,normalize):
+    def __make_hsv_matrices(self, hsc_matrices,shape,normalize):
 	""" 
 	Sub-function of plot() that return the h,s,v matrices corresponding 
 	to the current matrices in sliced_matrices_dict. The shape of the matrices
@@ -311,9 +377,7 @@ class Plot(TopoObject):
 	zero=zeros(shape,Float)
 	one=ones(shape,Float)	
 
-	s = sliced_matrices_dict['Strength']
-	h = sliced_matrices_dict['Hue']
-	c = sliced_matrices_dict['Confidence'] 
+	s,h,c = hsc_matrices
 
         ### JC: The code below may be improved.
 	# Determine appropriate defaults for each matrix
@@ -342,27 +406,56 @@ class Plot(TopoObject):
 
 	
 	return (hue,sat,val)
-
-
-    ### JCALERT! In this function, we assume that the slicing box is contained in the 
-    ### outer box. Otherwise there will be an error
-    def __situate_plot(self,outer_box,slicing_box):
-
-	### JCALERT! It has to be tested that bounds2shape returns the right answer for this purpose
-        ### There seems to have a variation in the size of the plot, study this "bug" to see of
-        ### it is linked to that.
-	shape = bounds2shape(outer_box,self.density)
-	r1,r2,c1,c2 = bounds2slice(slicing_box,outer_box,self.density)
-        ### raise an error when r2-r1 > shape[1] or c2=c1 > shape[0]
-	r = zeros(shape,Float)
-	r[r1:r2,c1:c2] = self.rgb_matrices[0]
-	g = zeros(shape,Float)
-	g[r1:r2,c1:c2] = self.rgb_matrices[1]
-	b = zeros(shape,Float)
-	b[r1:r2,c1:c2] = self.rgb_matrices[2]
-
-	return (r,g,b)  
-	    
-	
-	
    
+       
+
+
+class RGBPlot(Plot):
+
+  def __init__(self,channels,sheet_view_dict,density=None,
+                 plot_bounding_box=None,normalize=False,situate=False,name=None,**params):
+
+      super(RGBPlot,self).__init__(channels,sheet_view_dict,density, 
+				   plot_bounding_box,normalize,situate,name, **params)
+
+
+class ColormapPlot(Plot):
+
+  def __init__(self,channels,sheet_view_dict,density=None,
+                 plot_bounding_box=None,normalize=False,situate=False,name=None,**params):
+
+      super(ColormapPlot,self).__init__(channels,sheet_view_dict,density, 
+				   plot_bounding_box,normalize,situate,name, **params)
+
+
+
+
+### JC: I kept that as an indication of what remains to do
+### JABHACKALERT: Making Plots of various types from a template would
+### probably work much more cleanly like:
+###  
+###  def make_plot(channels,sheet_view_dict,density=None,
+###                plot_bounding_box=None,normalize=False,situate=False, **params):
+###      plot_types=[HSVPlot,RGBPlot,ColormapPlot]
+###      for pt in plot_types:
+###          plot=pt(...arguments...)
+###          if plot.bitmap != None
+###             return plot
+###      print "Warning: No plot defined"
+###  
+###  
+###  
+###  class Plot(TopoObject):
+###     bitmap=None
+###     #def annotated_bitmap(self):  .... using bitmap ... construct annotated version
+###     ...
+###     
+###  class HSVPlot(Plot):
+###     ... ask for Hue, Strength, Confidence; if enough are there, make a plot.
+###  
+###  class RGBPlot(Plot):    
+###     ... ask for Red, Green, Blue; if enough are there, make a plot.
+###  
+###     
+###  class ColormapPlot(Plot):    
+###     ... ask for Strength and Colormap; if Strength is present, make a plot.
