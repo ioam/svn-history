@@ -630,16 +630,16 @@ def is_number(obj):
 class PackageParameter(Parameter):
     """
     """
-    __slots__ = ['package','class_','to_lose']
+    __slots__ = ['package','class_','suffix_to_lose']
     __doc__ = property((lambda self: self.doc))
     
-    def __init__(self,package,class_,to_lose='',default=None,doc="",**params):
+    def __init__(self,package,class_,suffix_to_lose='',default=None,doc="",**params):
         """
         """
         Parameter.__init__(self,default=default,doc=doc,**params)
         self.package = package
         self.class_ = class_
-        self.to_lose = to_lose
+        self.suffix_to_lose = suffix_to_lose
 
         # check it's in range
 
@@ -659,7 +659,7 @@ class PackageParameter(Parameter):
         k = {}
         classes = find_classes_in_package(self.package, self.class_)    
         for (name,class_) in classes.items():
-            k[classname_repr(name, self.to_lose)] = class_
+            k[classname_repr(name, self.suffix_to_lose)] = class_
         return k
 
     # temporary

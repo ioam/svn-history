@@ -12,6 +12,7 @@ import unittest
 from Tkinter import *
 from topo.tkgui import *
 from topo.tkgui.propertiesframe import *
+import string
 
 class TestPropertiesFrame(unittest.TestCase):
     def test_PropertiesFrame(self):
@@ -26,9 +27,10 @@ class TestPropertiesFrame(unittest.TestCase):
         for i in range(5):
             pp.add_text_property('Prop'+`i`, `i`)
     
-        pp.add_tagged_slider_property("Volume",value='5',
-                                      string_format='%d',
-                                      min_value="0",max_value="11")
+#        pp.add_tagged_slider_property("Volume",value='5',
+#                                      string_format='%d',
+#                                      min_value="0",max_value="11",
+#                                      string_translator=string.atof)
     
         # CEBHACKALERT: "I fix this another day"
         #pp.add_combobox_property("File",value='xxx',

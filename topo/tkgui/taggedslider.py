@@ -7,7 +7,7 @@ __version__='$Revision$'
 
 from Tkinter import Frame, IntVar, Scale, Entry
 from Tkinter import LEFT, RIGHT, TOP, BOTTOM, YES, BOTH
-from topo.base.utils import eval_atof
+import string
 
 
 # CEBHACKALERT: sometime in the day or two before 15/12 I introduced
@@ -36,7 +36,7 @@ class TaggedSlider(Frame):
                  max_value=100,
                  string_format = '%f',
                  tag_width=10,
-                 string_translator=eval_atof,
+                 string_translator=string.atof,
                  **config):
 
         Frame.__init__(self,root,**config)
@@ -135,8 +135,11 @@ class TaggedSlider(Frame):
 
 class EntryEval(Entry):
 
-    # fuck you don't need master?
-    def __init__(self, master=None, textvariable=None,width=10,string_translator=eval_atof):
+    # get rid of stuff like width from here.
+    def __init__(self, master=None, textvariable="",string_translator=None, width=20):
+        """
+        String translator defaults to None because default is text.
+        """
         Entry.__init__(self,master=master,textvariable=textvariable,width=width)
         self.string_translator = string_translator
 
@@ -147,19 +150,21 @@ class EntryEval(Entry):
             return self.get()
 
 
-# what's the difference between master and parent? at least be consistent.
 
 from Pmw import ComboBox
 class ComboBoxEval(ComboBox):
 
     def __init__(self,
-                 master=None,
+                 parent,
                  selectioncommand=None,
                  scrolledlist_items=[],
                  string_translator=None):
-        
+        """
+        String translator defaults to None because default is text.
+        """
+
         ComboBox.__init__(self,
-                          master,
+                          parent,
                           selectioncommand=selectioncommand,
                           scrolledlist_items=scrolledlist_items)
         self.string_translator = string_translator

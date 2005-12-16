@@ -42,7 +42,9 @@ class PropertiesFrame(Frame):
         return (p,control)
 
 
-    def add_text_property(self,name,string_translator,value="",width=20):
+    # CEBHACKALERT: re-implement checkbox
+
+    def add_text_property(self,name,value="",string_translator=None,width=20):
         """
         Create a TKInter.Entry box and add it to self.properties.
 
@@ -58,23 +60,23 @@ class PropertiesFrame(Frame):
         return self.add_property(name,var,control,value)
 
         
-    def add_tagged_slider_property(self,name,value="",**kw):
+    def add_tagged_slider_property(self, name, value="", string_translator=None, **kw):
         """
         Create a TaggedSlider and add it to self.properties.
         
         This property stores its value in a TKInter StringVar.
-        The TaggedSlider gets this object's string translator.
         """
         var = StringVar()
-        control = TaggedSlider(self,tagvariable=var,**kw)
+        control = TaggedSlider(self,
+                               tagvariable=var,
+                               string_translator=string_translator,
+                               **kw)
         return self.add_property(name,var,control,value)
 
 
-    def add_combobox_property(self,name,string_translator, value='',items=[]):
+    def add_combobox_property(self,name,value='',items=[], string_translator=None):
         """
-        Create a Pmw.ComboBox and add it to self.properties.
-        
-        This property stores its value in a TKInter StringVar.
+        Create a ComboBox that can convert its string variable using the given string_translator and add it to self.properties.
         """        
         var = StringVar()
         control = ComboBoxEval(self,
