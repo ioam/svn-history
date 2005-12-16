@@ -107,27 +107,15 @@ class Bitmap(TopoObject):
         Values larger than 1.0 are silently cropped.  Returns a one-channel
         (monochrome) Image.
         """
-        ### JABHACKALERT: Should not be normalizing anything here.  Instead,
-        ### this function should silently crop and plot whatever is passed in.
-        ### Any normalization should be done where it's clear that's
-        ### the right thing to do; users will be very surprised if
-        ### things suddenly get normalized at this point.
-        ### Similarly, this function needs to clip the matrix, because
-        ### the Image class accepts values only up to 255.  Clipping
-        ### elsewhere is redundant.
-        
-        if max(inArray.flat) > 1:
-            self.warning('arrayToImage inputs > 1. Normalizing.  Max value: ', max(inArray.flat))
-            inArray = Numeric.divide(inArray,max(inArray.flat))
-        if not max(inArray.flat) <= 1:
-            self.warning('arrayToImage failed to Normalize.  Possible NaN.  Using blank matrix.')
-            shape = inArray.shape
-            inArray = Numeric.zeros(shape)
-            
             
         # PIL 'L' Images use 0 to 255.  Have to scale up.
         inArray = (Numeric.floor(inArray * 255)).astype(Numeric.Int)
-        # JABALERT: This is probably where clipping should go, to 255 max.
+
+        # Clipping if some values are > 255
+	if max(inArray.flat) > 255:
+	    inArray = Numeric.clip(inArray,0,255)
+	    self.debug("clipping is performed")
+
         r,c = inArray.shape
         # size is (width,height), so we swap r and c:
         newImage = Image.new('L',(c,r),None)
@@ -183,17 +171,6 @@ class HSVMap(Bitmap):
         rmat = Numeric.array(hMapArray,Numeric.Float)
         gmat = Numeric.array(sMapArray,Numeric.Float)
         bmat = Numeric.array(vMapArray,Numeric.Float)
-
-        ### JABALERT: This class should not be clipping anything.
-        ### That should go in arrayToImage...
-        ## This code should never be seen.  It means that calling code did
-        ## not take the precaution of clipping the input matrices.
-        if max(rmat.flat) > 1 or max(gmat.flat) > 1 or max(bmat.flat) > 1:
-            topo.base.topoobject.TopoObject().warning('HSVMap inputs exceed 1. Clipping to 1.0')
-            if max(rmat.flat) > 1.0: rmat = clip(rmat,0.0,1.0)
-            if max(gmat.flat) > 1.0: gmat = clip(gmat,0.0,1.0)
-            if max(bmat.flat) > 1.0: bmat = clip(bmat,0.0,1.0)
-
         
         # List comprehensions were not used because they were slower.
         for j in range(shape[0]):

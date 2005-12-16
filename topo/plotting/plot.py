@@ -97,9 +97,6 @@ class Plot(TopoObject):
 	# bounds of the situated plotting area 
 	self.plot_bounding_box = plot_bounding_box
 
-        ### JCALERT: it has to be checked if that is ever used at the moment.
-	self.cropped = False
-
 	### JCALERT! Temporary, can get rid of when it is understood how to pass the name from make_plot
 	self.name = name
 
@@ -354,20 +351,13 @@ class HSVPlot(Plot):
 	if normalize and max(s.flat)>0:
 	    s = divide(s,float(max(s.flat)))
 
-	hue,sat,val=h,c,s
-       
-	### JCALERT! This re-done in matrix_hsv_to_rgb...so we could get rid of one of these tests?
-        ### Furthermore self.cropped does not seem to be used....
-	if max(ravel(hue)) > 1.0 or max(ravel(sat)) > 1.0 or max(ravel(val)) > 1.0:
-	    self.cropped = True
-	    ### JCALERT! In which case is this occuring? Because it may not need a warning...
-	    #self.warning('Plot: HSVMap inputs exceed 1. Clipping to 1.0')
-	    if max(ravel(hue)) > 1.0: hue = clip(hue,0.0,1.0)
-	    if max(ravel(sat)) > 1.0: sat = clip(sat,0.0,1.0)
-	    if max(ravel(val)) > 1.0: val = clip(val,0.0,1.0)
-	else:
-	    self.cropped = False
+        ### JCALERT! I think we need that here (it is not anymore caught from bitmap). Ask Jim
+        ### Lead to a bug in testpattern (Disk) but maybe because of a problem in testpattern... 
+       #  if not max(s.flat)<=1.0:
+#              self.warning('arrayToImage failed to Normalize.  Possible NaN.  Using blank matrix.')
+#              self.zeros
 
+	hue,sat,val=h,c,s
 	
 	return (hue,sat,val)
    
