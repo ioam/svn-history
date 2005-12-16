@@ -181,37 +181,12 @@ class PlotGroup(TopoObject):
         self.bitmaps = []
         for each in self.plots():
 
-	    
-
-
             (r,g,b) = each.rgb_matrices
-            
-            # CEBHACKALERT:
-            # when scale is 0, r is an array of zeros but g and b are None
-            if g==None or b==None:
-                g=r
-                b=r
-            
-            if r.shape != (0,0) and g.shape != (0,0) and b.shape != (0,0):
-                # Crop activity to a maximum of 1.  Will scale brighter
-                # or darker, depending.
-                #
-                # Should report that cropping took place.
-                #
-                ### JCALERT! It should be 1.0, and anyway, it is already supposed to be done in plot...?
-                if max(ravel(r)) > 0: r = MLab.clip(r,0.0,1.0)
-                if max(ravel(g)) > 0: g = MLab.clip(g,0.0,1.0)
-                if max(ravel(b)) > 0: b = MLab.clip(b,0.0,1.0)
+            win = bitmap.RGBMap(r, g, b)
 
-                # Indirect test for NaN.  (Since NaN == NaN is False)
-                if not (max(ravel(r)) <= 1 and max(ravel(g)) <= 1 and max(ravel(b)) <= 1):
-                    self.warning('%s plot contains (%f %f %f)'
-                                 % (each.view_info, max(ravel(r)), max(ravel(g)), max(ravel(b))))
-
-                win = bitmap.RGBMap(r, g, b)
-                win.view_info = each.view_info
-               
-                self.bitmaps.append(win)
+            
+            win.view_info = each.view_info
+            self.bitmaps.append(win)
         return self.bitmaps
     
 
