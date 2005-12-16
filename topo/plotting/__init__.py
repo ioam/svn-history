@@ -15,9 +15,7 @@ require any editing for any particular model.
 
 For more information, see the various modules in this package.
 
-bitmap','plot','plotengine','histogram','palette','plotgroup','plotfilesaver']
-
 $Id$
 """
 __version__='$Revision$'
-__all__ = ['bitmap','plot','plotengine','histogram','palette','plotgroup','plotfilesaver','templates']
+__all__ = ['bitmap','plot','plotengine','palette','plotgroup','plotfilesaver','templates']
