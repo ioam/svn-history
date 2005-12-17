@@ -24,7 +24,8 @@ import palette
 ### - There should be a way to associate the density explicitly
 ###   with the sheet_view_dict, because it must match all SheetViews
 ###   in that dictionary.  Maybe as a tuple?
-### - Make the subfunction of plot() really private.
+### - Fix the plot name handling along with the view_info sheetview attribute
+### - Get rid of release_sheetviews.
 
 
 
@@ -182,7 +183,6 @@ class Plot(TopoObject):
 		    self.view_info['view_type'] = sv.view_info['view_type']
 
      
-
     def _get_shape_and_boxes(self,matrices,boxes):
 	"""
 	Sub-function used by plot: get the shape of the matrix that corresponds 
@@ -216,6 +216,27 @@ class Plot(TopoObject):
 
         return shape,slicing_box,outer_box
 
+
+    def _slice_matrix(self,matrix,shape,slicing_box,outer_box,density):
+	"""
+        Private plot routine that given a matrix, a shape, a slicing_box,
+        an outer_box and a sheet density, return the corresponding submatrix.
+        It is assumed that the outer_box contained the slicing_box and that the shape 
+        correponds to the slicing_box.
+        """
+	### JCALERT! Bounding_box for sheetviews
+        ### does not have the slight margin that UnitView boxes have; but that could be changed by
+        ### inserting this margin to the function bounds2slice....)
+	# At this point we assume that if there is matrix of different sizes
+        # the outer_box will be a sheet bounding_box.... 
+        if matrix !=None and matrix.shape != shape:
+	    new_matrix = submatrix(slicing_box,matrix,outer_box,density)
+        else:
+	    new_matrix = matrix
+
+	return new_matrix
+
+   
 
     ### JCALERT! In this function, we assume that the slicing box is contained in the 
     ### outer box. Otherwise there will be an error
@@ -258,12 +279,14 @@ class HSVPlot(Plot):
 	    s_box = self._get_box('Strength')
 	    h_box = self._get_box('Hue')
 	    c_box = self._get_box('Confidence')
-	    shc_boxes = (s_box,h_box,c_box)
-	    shc_matrices = (s_mat,h_mat,c_mat)
 
-	    shape, slicing_box, outer_box = self._get_shape_and_boxes(shc_matrices,shc_boxes)
-	    shc_matrices = self.__slice_matrices(shc_matrices,shape,slicing_box,outer_box,density)
-	    hue,sat,val = self.__make_hsv_matrices(shc_matrices,shape,normalize)
+	    shape,slicing_box,outer_box = self._get_shape_and_boxes((s_mat,h_mat,c_mat),(s_box,h_box,c_box))
+	   
+            s_mat = self._slice_matrix(s_mat,shape,slicing_box,outer_box,density)
+            h_mat = self._slice_matrix(h_mat,shape,slicing_box,outer_box,density)
+            c_mat = self._slice_matrix(c_mat,shape,slicing_box,outer_box,density)
+
+	    hue,sat,val = self.__make_hsv_matrices((s_mat,h_mat,c_mat),shape,normalize)
             
             self.bitmap = HSVMap(hue,sat,val)
         
@@ -276,41 +299,6 @@ class HSVPlot(Plot):
 		    hue,sat,val = self._situate_plot(hue, sat, val, self.plot_bounding_box,
                                                      slicing_box, density)
                     self.bitmap = HSVMap(hue,sat,val)
-
-	    
-
-### JCALERT! DOCUMENTATION, and make into a simple function called 3 times from RGB and 3 from HSV
-    def __slice_matrices(self,shc_matrices,shape,slicing_box,outer_box,density):
-	"""
-        Get the submatrices.
-        """
-	### JCALERT! Ask Jim about that: is it reasonnable to assume so?
-        ### (what it means is that if we have to slice it will be sheetviews,
-        ### and so the slicing_box will be from a UnitView and the outer box from
-        ### a SheetView, which is required when calling submatrix. Bounding_box for sheetviews
-        ### does not have the slight margin that UnitView boxes have; but that could be changed by
-        ### inserting this margin to the function bounds2slice....)
-	# At this point we assume that if there is matrix of different sizes
-        # the outer_box will be a sheet bounding_box.... 
-        s = shc_matrices[0]
-        if s!=None and s.shape != shape:
-	    new_s = submatrix(slicing_box,s,outer_box,density)
-        else:
-	    new_s = s
-
-        h = shc_matrices[1]
-        if h!=None and h.shape != shape:
-	    new_h = submatrix(slicing_box,h,outer_box,density)
-        else:
-	    new_h = h
-
-        c = shc_matrices[2]
-        if c!=None and c.shape != shape:
-	    new_c = submatrix(slicing_box,c,outer_box,density)
-        else:
-	    new_c=c
-
-	return (new_s,new_h,new_c)
 
 
     def __make_hsv_matrices(self, hsc_matrices,shape,normalize):
