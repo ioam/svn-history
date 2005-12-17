@@ -46,7 +46,7 @@ class PlotFileSaver(topo.base.topoobject.TopoObject):
                            int(d['presentation']), d['region'], d['type'],i)
                            
                 #self.message('Saving', filename)
-                self.bitmaps[i].bitmap.save(filename)
+                self.bitmaps[i].image.save(filename)
                 self.files.append(filename)
 
 

@@ -57,10 +57,9 @@ class Bitmap(TopoObject):
     """
     normalize = Parameter(default=0)
     
-    def __init__(self,newMap):
-        ### JABALERT: The bitmap parameter should probably renamed to
-        ### image, because it is an instance of the PIL Image class.
-        self.bitmap = newMap
+    def __init__(self,image):
+
+        self.image = image
 
         ### JABALERT: Should presumably be deleted; seems to be an
         ### extra copy of the Plot's view_info
@@ -73,7 +72,7 @@ class Bitmap(TopoObject):
         Return a copy of the encapsulated image so the original is
         preserved.
         """
-        return self.bitmap.copy()
+        return self.image.copy()
     
 
     ### JABALERT: Should presumably be deleted, if bitmap stays public.
@@ -81,11 +80,11 @@ class Bitmap(TopoObject):
         """
         Renaming of Image.show() for the Bitmap.bitmap attribute.
         """
-        self.bitmap.show()
+        self.image.show()
 
     ### JABALERT: Should presumably be deleted, if bitmap stays public.
-    def width(self): return self.bitmap.size[0]
-    def height(self): return self.bitmap.size[1]
+    def width(self): return self.image.size[0]
+    def height(self): return self.image.size[1]
 
     def zoom(self, factor):
         """
@@ -94,9 +93,9 @@ class Bitmap(TopoObject):
         and width, 0.5 is 1/2 the original size.  The original Image
         is not changed.
         """
-        x,y = self.bitmap.size
+        x,y = self.image.size
         zx, zy = x*factor, y*factor
-        return self.bitmap.resize((zx,zy))
+        return self.image.resize((zx,zy))
 
     def _arrayToImage(self, inArray):
         """
