@@ -39,20 +39,20 @@ class TestBitmap(unittest.TestCase):
         self.ba = Numeric.reshape(self.bar,miata.size) / 255.0
 
 
-    def test_ColorMap(self):
+    def test_PaletteBitmap(self):
         p = [j and i for i in range(256) for j in (1,0,0)]
-        cmap = ColorMap(self.ra,p)
+        cmap = PaletteBitmap(self.ra,p)
          # cmap.show()
 
 
-    def test_HSVMap(self):
+    def test_HSVBitmap(self):
         a = [j for i in range(256) for j in range(256)]
         b = [i for i in range(256) for j in range(256)]
         c = [max(i,j) for i in range(256) for j in range(256)]
         a = Numeric.reshape(a,(256,256)) / 255.0
         b = Numeric.reshape(b,(256,256)) / 255.0
         c = Numeric.reshape(c,(256,256)) / 255.0
-        hsv = HSVMap(a,b,c)
+        hsv = HSVBitmap(a,b,c)
         # hsv.show()
 
     def test_hsv_to_rgb(self):
@@ -70,8 +70,8 @@ class TestBitmap(unittest.TestCase):
 
  
 
-    def test_RGBMap(self):
-        rgb = RGBMap(self.ra,self.ga,self.ba)
+    def test_RGBBitmap(self):
+        rgb = RGBBitmap(self.ra,self.ga,self.ba)
         # rgb.show()
 
 

@@ -11,7 +11,7 @@ import Numeric
 from topo.base.sheet import Sheet
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheetview import *
-from topo.plotting.bitmap import ColorMap
+from topo.plotting.bitmap import PaletteBitmap
 
 # Turn False once development is complete and this module is to be
 # included as part of the system unit testing.
@@ -69,7 +69,7 @@ class TestSheetView(unittest.TestCase):
                           src_name=input.name,view_type='Activity')
         input.add_sheet_view('Activity',sv)
         sv_tuple = sv.view()
-        map = ColorMap(sv_tuple[0])
+        map = PaletteBitmap(sv_tuple[0])
         # map.show()
 
 

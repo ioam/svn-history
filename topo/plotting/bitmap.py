@@ -6,9 +6,9 @@ as a bitmap image without needing to know about PIL proper.
 
 There are three different base image Classes which inherit Bitmap:
 
-ColorMap  - 1 2D Matrix, 1 1D Color Map
-HSVMap    - 3 2D Matrices, Color (H), Confidence (S), Strength (V)
-RGBMap    - 3 2D Matrices, Red, Green, Blue Channels.
+PaletteBitmap  - 1 2D Matrix, 1 1D Color Map
+HSVBitmap    - 3 2D Matrices, Color (H), Confidence (S), Strength (V)
+RGBBitmap    - 3 2D Matrices, Red, Green, Blue Channels.
 
 All maps are assumed to be normalized to 1.  Matrices are passed in as
 part of the constructor and the image is generaed.
@@ -18,16 +18,16 @@ The encapsulated PIL Image is accessible through the .bitmap attribute.
 ---
 Creating new Bitmaps:
 
-bitmap1 = ColorMap(inArray,palette)
+bitmap1 = PaletteBitmap(inArray,palette)
     inArray: 2D Array
     palette: 768 integers (3x256 of RGB ranged 0-255).
 
-bitmap3 = RGBMap(rMapArray,gMapArray,bMapArray)
+bitmap3 = RGBBitmap(rMapArray,gMapArray,bMapArray)
     Three matrices that are combined into one image, where each matrix
     represents a different color channel.
     3 matrices expected, each should have been normalized to 1.
 
-bitmap4 = HSVMap(hMapArray,sMapArray,vMapArray)
+bitmap4 = HSVBitmap(hMapArray,sMapArray,vMapArray)
     HSV Map inputs, converts to RGB image.
     3 matrices expected, each should have been normalized to 1.
 
@@ -38,8 +38,6 @@ $Id$
 __version__='$Revision$'
 
 
-### JABALERT: Should probably change this to Numeric.clip()
-import MLab
 from colorsys import hsv_to_rgb
 
 import Numeric, Image, math
@@ -123,8 +121,7 @@ class Bitmap(TopoObject):
         return newImage
         
 
-### JABALERT: Should be PaletteBitmap
-class ColorMap(Bitmap):
+class PaletteBitmap(Bitmap):
     """
     A Bitmap constructed using a single 2D array.
 
@@ -151,11 +148,11 @@ class ColorMap(Bitmap):
             palette = [i for i in range(256) for j in range(3)]
         newImage.putpalette(palette)
         newImage = newImage.convert('P')
-        super(ColorMap,self).__init__(newImage)
+        super(PaletteBitmap,self).__init__(newImage)
 
 
-### JCALERT: should be HSVBitmap.
-class HSVMap(Bitmap):
+
+class HSVBitmap(Bitmap):
     """
     HSV Map inputs, converts to RGB image.  3 matrices expected, each should
     have been normalized to 1.
@@ -184,39 +181,18 @@ class HSVMap(Bitmap):
         gImage = self._arrayToImage(gmat)
         bImage = self._arrayToImage(bmat)
 
-        super(HSVMap,self).__init__(Image.merge('RGB',(rImage,gImage,bImage)))
+        super(HSVBitmap,self).__init__(Image.merge('RGB',(rImage,gImage,bImage)))
 
 
 
-### JABALERT: Should be RGBBitmap
-class RGBMap(Bitmap):
+class RGBBitmap(Bitmap):
     """A Bitmap constructed using three 2D arrays, for Red, Green, and Blue."""
 
     def __init__(self,rMapArray,gMapArray,bMapArray):
         """Each matrix must be the same size, with values in the range 0.0 to 1.0."""
 
-
-        ### JABALERT: This class should not be normalizing or clipping anything.
-        if max(rMapArray.flat) > 1.0:
-            self.warning('RGBMap rMapArray not normalized to 1.  Normalizing.  Max:' + str(max(rMapArray.flat)))
-            rMapArray = Numeric.divide(rMapArray,max(rMapArray.flat))
-        if max(gMapArray.flat) > 1.0:
-            self.warning('RGBMap gMapArray not normalized to 1.  Normalizing.  Max:' + str(max(gMapArray.flat)))
-            gMapArray = Numeric.divide(gMapArray,max(gMapArray.flat))
-        if max(bMapArray.flat) > 1.0:
-            self.warning('RGBMap bMapArray not normalized to 1.  Normalizing.  Max:' + str(max(bMapArray.flat)))
-            bMapArray = Numeric.divide(bMapArray,max(bMapArray.flat))
-
-        ## This code should never be seen.  It means that calling code did
-        ## not take the precaution of clipping the input matrices.
-        if max(rMapArray.flat) > 1 or max(gMapArray.flat) > 1 or max(bMapArray.flat) > 1:
-            TopoObject().warning('RGBMap inputs exceed 1. Clipping to 1.0')
-            rMapArray = MLab.clip(rMapArray,0.0,1.0)
-            gMapArray = MLab.clip(gMapArray,0.0,1.0)
-            bMapArray = MLab.clip(bMapArray,0.0,1.0)
-
         rImage = self._arrayToImage(rMapArray)
         gImage = self._arrayToImage(gMapArray)
         bImage = self._arrayToImage(bMapArray)
 
-        super(RGBMap,self).__init__(Image.merge('RGB',(rImage,gImage,bImage)))
+        super(RGBBitmap,self).__init__(Image.merge('RGB',(rImage,gImage,bImage)))

@@ -14,7 +14,6 @@ from pprint import pprint
 from math import pi
 from topo.plotting import plot
 from topo.base import topoobject
-from topo.plotting.bitmap import *
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
 from topo.plotting.plotgroup import *

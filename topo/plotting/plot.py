@@ -14,7 +14,7 @@ from topo.base.topoobject import TopoObject
 from topo.base.parameter import Dynamic
 from topo.base.sheet import submatrix, bounds2slice, bounds2shape
 
-from bitmap import HSVMap
+from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap
 import palette
 
 
@@ -288,7 +288,7 @@ class HSVPlot(Plot):
 
 	    hue,sat,val = self.__make_hsv_matrices((s_mat,h_mat,c_mat),shape,normalize)
             
-            self.bitmap = HSVMap(hue,sat,val)
+            self.bitmap = HSVBitmap(hue,sat,val)
         
             # Situate the plot if required
 	    if situate:
@@ -298,7 +298,7 @@ class HSVPlot(Plot):
                     #self.bitmap = self.__situate_plot(self.plot_bounding_box, slicing_box)
 		    hue,sat,val = self._situate_plot(hue, sat, val, self.plot_bounding_box,
                                                      slicing_box, density)
-                    self.bitmap = HSVMap(hue,sat,val)
+                    self.bitmap = HSVBitmap(hue,sat,val)
 
 
     def __make_hsv_matrices(self, hsc_matrices,shape,normalize):
@@ -349,8 +349,8 @@ class RGBPlot(Plot):
 				   plot_bounding_box,normalize,situate,**params)
 
 ###     
-###  class ColormapPlot(Plot):    
-###     ... ask for Strength and Colormap; if Strength is present, make a plot.
+###  class PalettePlot(Plot):    
+###     ... ask for Strength and Palette; if Strength is present, make a plot.
 
 class ColormapPlot(Plot):
 

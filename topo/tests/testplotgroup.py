@@ -12,7 +12,6 @@ from topo.plotting import plot
 from topo.base.sheet import *
 from topo.plotting.plotgroup import *
 from topo.plotting.templates import PlotGroupTemplate, PlotTemplate
-from topo.plotting.bitmap import RGBMap
 from testsheetview import ImageGenerator
 import Numeric
 from Numeric import divide
