@@ -101,10 +101,8 @@ class Plot(TopoObject):
 
         ### JCALERT ! This is an hack so that the problem of displaying the right
         ### name under each map in activity and orientation map panel is solved
-        ### It has to be changed so that it display what we want for each panel
-        ### Also I think the name that is displayed should always be the plot name
-        ### (Also see in create_plots for each PlotGroup sub-classes)
-        ### This should not be in this function at all
+        ### It could be done in a more satisfying way, fixing view_info in SheetViews
+        ### and finding a good way to handle sheetview and plot name
 	self._set_view_info()
 
 	### Note: for supporting other type of plots (e.g vector fields...)
@@ -187,13 +185,14 @@ class Plot(TopoObject):
 
     def _get_shape_and_boxes(self,matrices,boxes):
 	"""
-	Sub-function used by plot: get the submatrix of the matrices in matrices_dict 
-        corresponding to the slice of the smallest sheetview matrix belonging to the plot.
+	Sub-function used by plot: get the shape of the matrix that corresponds 
+        to  the smallest sheetview matrix contained in matrices.
+        Also get the box corresponding to this same sheetview (slicing_box), and the box
+        of the larger one (outer_box). 
+     
         e.g. for coloring Weight matrix with a preference sheetview, we need to slice
-        the preference matrix region that corresponds to the weight matrix. 
-
-	It returns the new matrices dictionnary that contains the submatrices,
-        and the corresponding shape and bounds of the sliced matrices.
+        the preference matrix region that corresponds to the weight matrix. shape,
+        slicing_box and outer_box are used for this purpose.
     	"""
         ### JCALERT! Think about a best way to catch the shape...
         ### also it should raise an Error if the shape is different for 
@@ -222,9 +221,6 @@ class Plot(TopoObject):
     ### outer box. Otherwise there will be an error
     def _situate_plot(self,hue,sat,val,outer_box,slicing_box,density):
 
-	### JCALERT! It has to be tested that bounds2shape returns the right answer for this purpose
-        ### There seems to have a variation in the size of the plot, study this "bug" to see of
-        ### it is linked to that.
 	shape = bounds2shape(outer_box,density)
 	r1,r2,c1,c2 = bounds2slice(slicing_box,outer_box,density)
         ### raise an error when r2-r1 > shape[1] or c2=c1 > shape[0]
@@ -253,14 +249,12 @@ class HSVPlot(Plot):
 	h_mat = self._get_matrix('Hue')
 	c_mat = self._get_matrix('Confidence') 
 
-        ### JABALERT
-        ### raise an exception to be caught by the instantiator
-        ### instead. Which exception?
+        # If it is an empty plot: self.bitmap=None
         if (s_mat==None and c_mat==None and h_mat==None):
 	    self.debug('Empty plot.')
 
-	else:
-	  
+        # Otherwise, we construct self.bitmap according to what is specified by the channels.
+	else:	  
 	    s_box = self._get_box('Strength')
 	    h_box = self._get_box('Hue')
 	    c_box = self._get_box('Confidence')
@@ -270,16 +264,10 @@ class HSVPlot(Plot):
 	    shape, slicing_box, outer_box = self._get_shape_and_boxes(shc_matrices,shc_boxes)
 	    shc_matrices = self.__slice_matrices(shc_matrices,shape,slicing_box,outer_box,density)
 	    hue,sat,val = self.__make_hsv_matrices(shc_matrices,shape,normalize)
-        
-            ### JCALERT! Use hsv_to_rgb first, and then fix bitmap and use HSVMap directly
-            #self.bitmap = HSVMap(hsv_matrices)
-            #self.bitmap = matrix_hsv_to_rgb(hue,sat,val)
-            ### JCALERT! change the name to bitmap later (here and later and in Plot...)
             
             self.bitmap = HSVMap(hue,sat,val)
         
-
-            #    Situate the plot if required
+            # Situate the plot if required
 	    if situate:
 		if self.plot_bounding_box == None:
 		    raise ValueError("the plot_bounding_box must be specified for situating the plot")
@@ -338,29 +326,30 @@ class HSVPlot(Plot):
 	one=ones(shape,Float)	
 
 	s,h,c = hsc_matrices
-
-        ### JC: The code below may be improved.
 	# Determine appropriate defaults for each matrix
 	if s is None: s=one # Treat as full strength by default
 	if c is None: c=one # Treat as full confidence by default
-	if h is None: # No color -- should be changed to drop down to COLORMAP plot.
+	if h is None:       # No color, gray-scale plot.
 	    h=zero
 	    c=zero
 
 	if normalize and max(s.flat)>0:
 	    s = divide(s,float(max(s.flat)))
-
         ### JCALERT! I think we need that here (it is not anymore caught from bitmap). Ask Jim
         ### Lead to a bug in testpattern (Disk) but maybe because of a problem in testpattern... 
        #  if not max(s.flat)<=1.0:
 #              self.warning('arrayToImage failed to Normalize.  Possible NaN.  Using blank matrix.')
 #              self.zeros
 
-	hue,sat,val=h,c,s
-	
+	hue,sat,val=h,c,s	
 	return (hue,sat,val)
    
-       
+
+
+    
+###  class RGBPlot(Plot):    
+###     ... ask for Red, Green, Blue; if enough are there, make a plot.
+###        
 
 
 class RGBPlot(Plot):
@@ -371,6 +360,9 @@ class RGBPlot(Plot):
       super(RGBPlot,self).__init__(channels,sheet_view_dict,density, 
 				   plot_bounding_box,normalize,situate,**params)
 
+###     
+###  class ColormapPlot(Plot):    
+###     ... ask for Strength and Colormap; if Strength is present, make a plot.
 
 class ColormapPlot(Plot):
 
@@ -386,32 +378,6 @@ class ColormapPlot(Plot):
 
 
 
-### JC: I kept that as an indication of what remains to do
-### JABHACKALERT: Making Plots of various types from a template would
-### probably work much more cleanly like:
-###  
-###  def make_plot(channels,sheet_view_dict,density=None,
-###                plot_bounding_box=None,normalize=False,situate=False, **params):
-###      plot_types=[HSVPlot,RGBPlot,ColormapPlot]
-###      for pt in plot_types:
-###          plot=pt(...arguments...)
-###          if plot.bitmap != None
-###             return plot
-###      print "Warning: No plot defined"
-###  
-###  
-###  
-###  class Plot(TopoObject):
-###     bitmap=None
-###     #def annotated_bitmap(self):  .... using bitmap ... construct annotated version
-###     ...
-###     
-###  class HSVPlot(Plot):
-###     ... ask for Hue, Strength, Confidence; if enough are there, make a plot.
-###  
-###  class RGBPlot(Plot):    
-###     ... ask for Red, Green, Blue; if enough are there, make a plot.
-###  
-###     
-###  class ColormapPlot(Plot):    
-###     ... ask for Strength and Colormap; if Strength is present, make a plot.
+
+
+
