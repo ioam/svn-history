@@ -45,6 +45,10 @@ import Numeric, Image, math
 from topo.base.parameter import Parameter
 from topo.base.topoobject import TopoObject
 
+### TO DO: - Update the test file.
+###        - Write PaletteBitmap when the Palette class is fixed
+###        - Get rid of view_info
+###        - Get rid of accessing function (copy, show...), though it is not crucial.
 
 class Bitmap(TopoObject):
     """
