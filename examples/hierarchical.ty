@@ -23,7 +23,7 @@ from topo.patterns.basic import LineGenerator
 from topo.base.simulator import Simulator
 from topo.learningfns.basic import HebbianSOMLF
 from topo.outputfns.basic import PiecewiseLinear
-
+from topo.patterns import PatternGeneratorParameter
 
 ###########################################
 # Set parameters
@@ -34,12 +34,17 @@ GeneratorSheet.bounds = BoundingBox(points=((-0.75,-0.5),(0.75,0.5)))
 GeneratorSheet.period = 1.0
 GeneratorSheet.density = 20
 
+
+
 LineGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 LineGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 
 LineGenerator.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
 LineGenerator.thickness = 0.02
 LineGenerator.bounds = BoundingBox(points=((-1.05,-0.8),(1.05,0.8)))
+
+
+PatternGeneratorParameter.default=LineGenerator
 
 # cortical sheet
 CFSOM.density = 10
@@ -82,5 +87,6 @@ s.connect(V3,V2,delay=0.5,connection_type=CFProjection,connection_params={'name'
 
 # Projections to V3
 s.connect(V2,V3,delay=0.5,connection_type=CFProjection,connection_params={'name':'Afferent'})
+
 
 s.run(1)
