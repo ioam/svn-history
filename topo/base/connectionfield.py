@@ -88,10 +88,7 @@ class ConnectionField(TopoObject):
 
         self.__initialize_slice_array(weights_bound_template)
 
-        r1 = self.slice_array[0]
-        r2 = self.slice_array[1]
-        c1 = self.slice_array[2]
-        c2 = self.slice_array[3]
+        r1,r2,c1,c2 = self.slice_tuple()
 
         # set up the weights centered around 0,0 to avoid problems
         # with different-sized results at different floating-point
@@ -149,19 +146,13 @@ class ConnectionField(TopoObject):
         # but does not work properly with the optimized C activation and
         # learning functions on 64-bit machines.
         self.slice_array = Numeric.zeros((4), Numeric.Int32)
-        self.slice_array[0] = rstart
-        self.slice_array[1] = rbound
-        self.slice_array[2] = cstart
-        self.slice_array[3] = cbound
+	self.set_slice_array(rstart, rbound, cstart, cbound)
 
 	# constructs and store the boundingbox corresponding to the slice.
 	self.bounds = slicearray2bounds(self.slice_array, self.input_sheet.bounds, self.input_sheet.density)
 
     def get_input_matrix(self, activity):
-        r1 = self.slice_array[0]
-        r2 = self.slice_array[1]
-        c1 = self.slice_array[2]
-        c2 = self.slice_array[3]
+        r1,r2,c1,c2 = self.slice_tuple()
         return activity[r1:r2,c1:c2]
 
 
@@ -184,22 +175,26 @@ class ConnectionField(TopoObject):
         should be extended to support increasing as well.
         """
 
-        old_slice_array=Numeric.array(self.slice_array)
-        or1 = old_slice_array[0]
-        or2 = old_slice_array[1]
-        oc1 = old_slice_array[2]
-        oc2 = old_slice_array[3]
+        or1,or2,oc1,oc2 = self.slice_tuple()
 
         self.__initialize_slice_array(weights_bound_template)
-        r1 = self.slice_array[0]
-        r2 = self.slice_array[1]
-        c1 = self.slice_array[2]
-        c2 = self.slice_array[3]
+        r1,r2,c1,c2 = self.slice_tuple()
 
         if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
             self.weights.savespace(1)
             output_fn(self.weights)
+
+
+    def slice_tuple(self):
+        return self.slice_array[0],self.slice_array[1],self.slice_array[2],self.slice_array[3]
+
+
+    def set_slice_array(self, r1, r2, c1, c2):
+        self.slice_array[0] = r1
+        self.slice_array[1] = r2
+        self.slice_array[2] = c1
+        self.slice_array[3] = c2
 
 
     def change_density(self, new_wt_density):
@@ -250,11 +245,7 @@ class GenericCFResponseFn(CFResponseFunction):
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = cfs[r][c]
-		sa = cf.slice_array
-                r1 = sa[0]
-                r2 = sa[1]
-                c1 = sa[2]
-                c2 = sa[3]
+                r1,r2,c1,c2 = cf.slice_tuple()
                 X = input_activity[r1:r2,c1:c2]
                 activity[r,c] = self.single_cf_fn(X,cf.weights)
         activity *= strength
@@ -465,10 +456,7 @@ class SharedWeightCFResponseFn(TopoObject):
                 ### each unit, instead of always using the
                 ### center as it is now.
 		sa = cf.slice_array
-                r1 = sa[0]
-                r2 = sa[1]
-                c1 = sa[2]
-                c2 = sa[3]
+                r1,r2,c1,c2 = cf.slice_tuple()
                 X = input_activity[r1:r2,c1:c2]
                 activity[r,c] = self.single_cf_fn(X,cf.weights)
         activity *= strength
