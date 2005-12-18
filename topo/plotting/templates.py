@@ -14,15 +14,6 @@ from topo.misc.keyedlist import KeyedList
 from topo.base.parameter import Parameter
 
 
-### JABHACKALERT: Should just eliminate this class, and pass the dictionaries
-### themselves around for consistency.
-class PlotTemplate(TopoObject):
-    def __init__(self, channels=None,**params):
-        super(PlotTemplate,self).__init__(**params)
-        #self.background = Dynamic(default=background)
-        self.channels = channels
-
-
 class PlotGroupTemplate(TopoObject):
     """
     Class specifying how to construct a PlotGroup from the objects in a Simulator.
@@ -93,8 +84,6 @@ class PlotGroupTemplate(TopoObject):
             self.plot_templates = KeyedList()
         else:
             self.plot_templates = KeyedList(plot_templates)
-        ### JABALERT: Why on earth do we copy name to description?
-        self.description = self.name
         
 
 
@@ -119,49 +108,52 @@ plotgroup_templates = KeyedList()
 # accepting a single plot and adding it to a PlotGroupTemplate (which
 # is created the first time it is needed).
 
-pgt = PlotGroupTemplate([('Activity',
-                          PlotTemplate({'Strength'   : 'Activity',
-                                        'Hue'        : 'OrientationPreference',
-                                        'Confidence' : None,
-                                        'Normalize'  : False}))],
-                        name='Activity',
-                        command='measure_activity()')
+pgt = PlotGroupTemplate(name='Activity',
+			command='measure_activity()',
+			plot_templates= [('Activity',
+					  {'Strength'   : 'Activity',
+					   'Hue' : 'OrientationPreference',
+					   'Confidence'  : None,
+					   'Normalize'  : False})])
 plotgroup_templates[pgt.name] = pgt
 
 
-pgt = PlotGroupTemplate([('Unit Weights',
-                          PlotTemplate({'Strength'   : 'Weights',
-                                        'Hue'        : 'OrientationPreference',
-                                        'Confidence' : None,
-                                        'Normalize'  : True}))],
-                        name='Unit Weights',
-                        command='pass')
+pgt = PlotGroupTemplate(name='Unit Weights',
+                        command='pass',
+			plot_templates= [('Unit Weights',
+					  {'Strength'   : 'Weights',
+					   'Hue'        : 'OrientationPreference',
+					   'Confidence' : None,
+					   'Normalize'  : True})])
 plotgroup_templates[pgt.name] = pgt
+
 
 ### JCALERT: I will remove Density and Projection_name at some point.
-pgt = PlotGroupTemplate([('Projection',
-                          PlotTemplate({'Strength'        : 'Weights',
-					'Hue'             : 'OrientationPreference',
-                                        'Confidence'      : None,
-                                        'Normalize'       : True,
-                                        'Density'         : 25,
-                                        'Projection_name' : 'None'}))],
-                        name='Projection',
-                        command='pass')
+### Also implement the test for 'Weights' in PlotGroup.
+pgt = PlotGroupTemplate(name='Projection',
+                        command='pass',
+			plot_templates=[('Projection',
+					 {'Strength'      : 'Weights',
+					  'Hue'           : 'OrientationPreference',
+					  'Confidence'    : None,
+                                          'Normalize'       : True,
+                                          'Density'         : 25,
+                                          'Projection_name' : 'None'})])                     
 plotgroup_templates[pgt.name] = pgt
 
-pgt = PlotGroupTemplate([('Orientation Preference',
-                          PlotTemplate({'Strength'   : None,
-                                        'Hue'        : 'OrientationPreference',
-                                        'Confidence' : None})),
-                         ('Orientation Preference&Selectivity',
-                          PlotTemplate({'Strength'   : None,
-                                        'Hue'        : 'OrientationPreference',
-                                        'Confidence' : 'OrientationSelectivity'})),
-                         ('Orientation Selectivity',
-                          PlotTemplate({'Strength'   : 'OrientationSelectivity',
-                                        'Hue'        : None,
-                                        'Confidence' : None}))],
-                        name='Orientation Preference',
-                        command = 'measure_or_pref()')
+
+pgt = PlotGroupTemplate(name='Orientation Preference',
+                        command = 'measure_or_pref()',
+			plot_templates= [('Orientation Preference',
+                                          {'Strength'   : None,
+                                           'Hue'        : 'OrientationPreference',
+                                           'Confidence' : None}),
+                                         ('Orientation Preference&Selectivity',
+                                          {'Strength'   : None,
+                                           'Hue'        : 'OrientationPreference',
+                                           'Confidence' : 'OrientationSelectivity'}),
+                                         ('Orientation Selectivity',
+                                          {'Strength'   : 'OrientationSelectivity',
+                                           'Hue'        : None,
+                                           'Confidence' : None})])                       
 plotgroup_templates[pgt.name] = pgt

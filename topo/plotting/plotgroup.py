@@ -11,8 +11,6 @@ __version__='$Revision$'
 import types
 from itertools import chain
 
-### JABALERT: Use Numeric's clip instead?
-import MLab
 from Numeric import transpose, array, ravel
 
 from topo.base.utils import flatten, dict_sort
@@ -24,7 +22,6 @@ from topo.base.connectionfield import CFSheet
 from plot import Plot, make_plot
 import bitmap
 
-
 ### JABALERT: This constant should be removed for now, though it may
 ### be reinstated some day.
 FLAT = 'FLAT'
@@ -34,20 +31,10 @@ def sort_plots(plot_list):
     plot_list.sort(lambda x, y: cmp(x.view_info['src_name'], y.view_info['src_name']))
 
 
-### JABHACKALERT!
-### 
-### The code in this file has not yet been reviewed, and may need
-### substantial changes.
-
-
-
 ### JCALERT! This file has been largely modified so that now, each PlotGroup creates
 ### its plot_list itself, instead of the PlotEngine doing it. The PlotEngine only
 ### creates and stores the PlotGroup in this new version of the code.It is the first version
 ### and it still remains job to be done for clarifying and improving it.
-### Nevertheless, a lot of the current problem are notified by a JCALERT, and most of the
-### remaining job will be to clarify the way Plots are created both in this file and in plot.py
-### (also clarifying bitmap.py, plotfilesaver.py and the plotgrouppanel sub-classes at the same time)
 
 
 class PlotGroup(TopoObject):
@@ -271,14 +258,14 @@ class BasicPlotGroup(PlotGroup):
 
     def create_plots(self,pt_name,pt,sheet):
 	
-	plot_channels = {}
+# 	plot_channels = {}
 	
-	plot_channels['Strength'] = pt.channels.get('Strength',None)
-        plot_channels['Hue'] = pt.channels.get('Hue',None)
-        plot_channels['Confidence'] = pt.channels.get('Confidence',None)
-        n = pt.channels.get('Normalize',False)
+# 	plot_channels['Strength'] = pt.channels.get('Strength',None)
+#         plot_channels['Hue'] = pt.channels.get('Hue',None)
+#         plot_channels['Confidence'] = pt.channels.get('Confidence',None)
+        n = pt.get('Normalize',False)
 	plot_name = '\n'+pt_name
-        p = make_plot(plot_channels,sheet.sheet_view_dict,sheet.density,sheet.bounds,n,False,name=plot_name)
+        p = make_plot(pt,sheet.sheet_view_dict,sheet.density,sheet.bounds,n,False,name=plot_name)
 	return [p]
 
 	
@@ -313,10 +300,10 @@ class UnitWeightsPlotGroup(PlotGroup):
 		### JCALERT! This has to be clarified somewhere: the sheet_view for a 
 		### weight belongs to the src_sheet, and the name in the key
                 ### is the destination sheet.
-	        plot_channels = {}
-	        plot_channels['Strength'] = pt.channels.get('Strength',None)
-                plot_channels['Hue'] = pt.channels.get('Hue',None)
-                plot_channels['Confidence'] = pt.channels.get('Confidence',None)
+	        plot_channels = pt
+	  #       plot_channels['Strength'] = pt.channels.get('Strength',None)
+#                 plot_channels['Hue'] = pt.channels.get('Hue',None)
+#                 plot_channels['Confidence'] = pt.channels.get('Confidence',None)
 
 	        ### JCALERT! do the plot_channels['Strength'] == 'weights' test
                 ### here and in projectionplotgroup
@@ -324,7 +311,7 @@ class UnitWeightsPlotGroup(PlotGroup):
 		plot_name = '\n(from ' + p.src.name +')'
 		plot_channels['Strength'] = key			       
 		plot_list.append(make_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
-				      p.src.bounds,pt.channels['Normalize'],self.situate,name=plot_name))
+				      p.src.bounds,pt['Normalize'],self.situate,name=plot_name))
 
         self.debug('plot_list =' + str(plot_list))
         return plot_list
@@ -373,7 +360,7 @@ class ProjectionPlotGroup(PlotGroup):
         ### for the moment the hack below deal with that.
         ### Also, why do we pass the template here?
 	
-        projection = sheet.get_in_projection_by_name(pt.channels['Projection_name'])
+        projection = sheet.get_in_projection_by_name(pt['Projection_name'])
         plot_list=[]
         if projection:
 	    src_sheet=projection[0].src
@@ -387,14 +374,14 @@ class ProjectionPlotGroup(PlotGroup):
 	    ### JCALERT! replace that by an attribute view_list in ProjectionPlotGroup
             ### no need to create a sheet_view that contains a list...!!
 	    for view in self.view_list:
-		plot_channels = {}
-		plot_channels['Strength'] = pt.channels.get('Strength',None)
-		plot_channels['Hue'] = pt.channels.get('Hue',None)
-	        plot_channels['Confidence'] = pt.channels.get('Confidence',None)     
+		plot_channels = pt
+	# 	plot_channels['Strength'] = pt.channels.get('Strength',None)
+# 		plot_channels['Hue'] = pt.channels.get('Hue',None)
+# 	        plot_channels['Confidence'] = pt.channels.get('Confidence',None)     
 		key = ('Weights',sheet.name,projection.name,view.view_info['x'],view.view_info['y'])
 		plot_channels['Strength'] = key
 		plot_list.append(make_plot(plot_channels,src_sheet.sheet_view_dict,
-                                      src_sheet.density,src_sheet.bounds,pt.channels['Normalize'],self.situate))
+                                      src_sheet.density,src_sheet.bounds,pt['Normalize'],self.situate))
 		
         return plot_list
 

@@ -13,7 +13,7 @@ from basicplotgrouppanel import BasicPlotGroupPanel
 from unitweightspanel import UnitWeightsPanel
 from projectionpanel import ProjectionPanel
 from testpattern import TestPattern
-from topo.plotting.templates import PlotGroupTemplate, PlotTemplate, plotgroup_templates
+from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
 import topo.base.simulator
 import topo.plotting.plotengine
 import topo.base.topoobject
@@ -67,7 +67,7 @@ class PlotsMenuEntry(topo.base.topoobject.TopoObject):
             label = template.name
         self.label = label
         if not description:
-            description = template.description
+            description = template.name
         self.description = description
 
         # Special cases.  These classes are specific to the topo/tkgui
@@ -275,7 +275,7 @@ class TopoConsole(Frame):
         for (label,obj) in plotgroup_templates.items():
             entry = PlotsMenuEntry(self,obj,label=label)            
             menubar.addmenuitem('Plots','command',
-                                obj.description,label=label,
+                                obj.name,label=label,
                                 command=entry.command)
     
     def notify_of_active_sim(self):

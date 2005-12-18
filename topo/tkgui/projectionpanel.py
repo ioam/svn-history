@@ -190,8 +190,8 @@ class ProjectionPanel(CFSheetPlotPanel):
         self.plot_group_key = ('Projection',self.weight_name.get(),self.density,self.region.get())
 
         pt = plotgroup_templates['Projection'].plot_templates['Projection']
-        pt.channels['Density'] = self.density
-        pt.channels['Projection_name'] = self.weight_name.get()
+        pt['Density'] = self.density
+        pt['Projection_name'] = self.weight_name.get()
         
 
     def do_plot_cmd(self):

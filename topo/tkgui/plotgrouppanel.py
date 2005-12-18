@@ -168,7 +168,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
 	    ### JC: I think a way to fix it is to pass a parameter normalize when creating a 
             ### a plotgrouppanel.py (after all, this is a feature of the plotgrouppanel.py
             ### to know if we want to normalize or not...)
-            self.normalize = pgt.plot_templates[0].channels.get('Normalize',False)
+            self.normalize = pgt.plot_templates[0].get('Normalize',False)
             self.normalize_checkbutton = Checkbutton(self.shared_control_frame,
                                                      text="Normalize",
                                                      command=self.toggle_normalize)
@@ -200,7 +200,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         self.normalize = not self.normalize
         pgt = plotgroup_templates[self.pgt_name]
         for (k,each) in pgt.plot_templates:
-            each.channels['Normalize'] = self.normalize
+            each['Normalize'] = self.normalize
         self.refresh()
 
 

@@ -77,8 +77,8 @@ class UnitWeightsFile(PlotFileSaver):
         self.plot_group_key = ('Weights',self.region,x,y)
 
         pt = plotgroup_templates['Unit Weights'].plot_templates['Unit Weights']
-        pt.channels['Sheet_name'] = region
-        pt.channels['Location'] = (x, y)
+        pt['Sheet_name'] = region
+        pt['Location'] = (x, y)
 
         self.create_bitmaps()
         self.save_to_disk()
@@ -101,8 +101,8 @@ class ProjectionFile(PlotFileSaver):
 
         pt = plotgroup_templates['Projection'].plot_templates['Projection']
         
-        pt.channels['Density'] = density
-        pt.channels['Projection_name'] = region
+        pt['Density'] = density
+        pt['Projection_name'] = region
 
         self.create_bitmaps()
         self.save_to_disk()

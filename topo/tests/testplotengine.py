@@ -17,7 +17,7 @@ from topo.base import topoobject
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
 from topo.plotting.plotgroup import *
-from topo.plotting.templates import PlotTemplate, PlotGroupTemplate
+from topo.plotting.templates import PlotGroupTemplate
 from topo.plotting.plotengine import *
 from topo.sheets.generatorsheet import *
 from topo.base.simulator import *
