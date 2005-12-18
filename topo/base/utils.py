@@ -194,8 +194,8 @@ def frange(start, end=None, inc=None):
 
 
 
-# CEBHACKALERT: I think this function should be renamed to sorted_keys() or sorted_dict_keys() or something
-# like that.
+# CEBHACKALERT: I think this function should be renamed to values_sorted_by_key() or something
+# like that. The name's misleading: it doesn't sort the actual dictionary, it just returns the values sorted by key - right?
 
 def dict_sort(d):
     """ Simple and fast routine to sort a dictonary on key """
