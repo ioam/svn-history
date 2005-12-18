@@ -58,11 +58,16 @@ class Bitmap(TopoObject):
     interface for defining bitmaps constructed in various different
     ways.  The resulting bitmap is a PIL Image object that can be
     accessed using the normal PIL interface.
+
+    If subclasses use the _arrayToImage() function provided, any
+    pixels larger than the maximum that can be displayed will
+    be counted before they are clipped; these are stored in the
+    clipped_pixels attribute.
     """
     normalize = Parameter(default=0)
+    clipped_pixels = 0
     
     def __init__(self,image):
-
         self.image = image
 
         ### JABALERT: Should presumably be deleted; seems to be an
@@ -105,17 +110,22 @@ class Bitmap(TopoObject):
         """
         Generate a 1-channel PIL Image from an array of values from 0 to 1.0.
 
-        Values larger than 1.0 are silently cropped.  Returns a one-channel
-        (monochrome) Image.
+        Values larger than 1.0 are clipped, after adding them to the total
+        clipped_pixels.  Returns a one-channel (monochrome) Image.
         """
-            
-        # PIL 'L' Images use 0 to 255.  Have to scale up.
-        inArray = (Numeric.floor(inArray * 255)).astype(Numeric.Int)
+        
+        # PIL 'L' Images use a range of 0 to 255, so we scale the
+        # input array to match
+        max_pixel_value=255
+        ### JABALERT: Shouldn't this scale by max_pixel_value+1 (256), not max_pixel_value (255)?
+        inArray = (Numeric.floor(inArray * max_pixel_value)).astype(Numeric.Int)
 
-        # Clipping if some values are > 255
-	if max(inArray.flat) > 255:
-	    inArray = Numeric.clip(inArray,0,255)
-	    self.debug("clipping is performed")
+        # Clip any values that are still larger than max_pixel_value
+        to_clip = sum(Numeric.greater(inArray.flat,max_pixel_value))
+	if (to_clip>0):
+            self.clipped_pixels = self.clipped_pixels + to_clip
+	    inArray = Numeric.clip(inArray,0,max_pixel_value)
+	    self.verbose("Bitmap: clipped",to_clip,"image pixels that were out of range")
 
         r,c = inArray.shape
         # size is (width,height), so we swap r and c:
