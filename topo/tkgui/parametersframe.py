@@ -14,7 +14,8 @@ import topo.base.parameter
 #from topo.base.topoobject import class_parameters
 
 import Pmw
-# CEBHACKALERT: this file is still being reorganized
+# CEBHACKALERT: this file is still being reorganized; there are still
+# temporary methods.
 
 
 # CEBHACKALERT: there used to be a 'reset_to_defaults' method, which
@@ -44,14 +45,22 @@ class ParametersFrame(Frame):
         Frame.__init__(self,parent,config)
         self.__properties_frame.pack(side=TOP,expand=YES,fill=X)
 
+        # CEBHACKALERT: these buttons should be stacked on the window or
+        # something, but I don't know how to do that.
+        
         # buttons for setting/(restoring) class Parameter values.
         pattern_buttonBox = Pmw.ButtonBox(self,orient = 'horizontal',padx=0,pady=0)
-        pattern_buttonBox.pack(side=TOP)
         pattern_buttonBox.add('Install as class defaults',
                               command=self.install_as_class_defaults)
+        #pattern_buttonBox.add('Revert to class defaults',
+        #                      command=self.revert_to_class_defaults)
+
         # CEBHACKALERT: need this to revert to defaults in the file...
-        #pattern_buttonBox.add('Restore original class defaults',
-        #                      command=self.revert_class_defaults)
+        #pattern_buttonBox.add('Restore class defaults',
+        #                      command=self.restore_class_defaults)
+
+        pattern_buttonBox.pack(side=TOP)
+
 
         self.__help_balloon = Pmw.Balloon(parent)
         
@@ -71,7 +80,13 @@ class ParametersFrame(Frame):
             setattr(t,name,w.get_value())
 
 
-    def revert_class_defaults(self):
+    # CEBHACKALERT
+    def revert_to_class_defaults(self):
+        pass
+        
+
+    # CEBHACKALERT
+    def restore_class_defaults(self):
         """
         """
         pass
@@ -86,18 +101,6 @@ class ParametersFrame(Frame):
             setattr(self.topo_obj,name,w.get_value())
        
 
-
-    # CEBHACKALERT: it would be better if the TaggedSliders looked after themselves.
-    def refresh(self):
-        """
-        """
-        try: 
-            for (msg,widget) in self.widgets.values():
-                widget.set_slider_from_tag()
-        except AttributeError:
-            pass
-
-
     def create_widgets(self, topo_obj):
         """
         Create widgets for all non-hidden Parameters of the current topo_obj.
@@ -107,7 +110,7 @@ class ParametersFrame(Frame):
 
         Widgets are added in order of the Parameters' precedences.
         """
-        self.topo_obj = topo_obj
+        self.topo_obj=topo_obj
         
         for (label,widget) in self.widgets.values():
             label.grid_forget()

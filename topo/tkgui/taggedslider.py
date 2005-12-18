@@ -41,40 +41,39 @@ class TaggedSlider(Frame):
 
         Frame.__init__(self,root,**config)
         self.root = root
-
-        self.string_translator = string_translator
-
-        self.min_value = self.string_translator(min_value)
-        self.max_value = self.string_translator(max_value)
-        
         self.fmt = string_format
-
-
-
-        # Add the slider
+        self.string_translator = string_translator
         
-        self.slider_val = IntVar(0)
-        self.slider = Scale(self,showvalue=0,from_=0,to=10000,orient='horizontal',
-                           variable=self.slider_val, command=self.slider_command)
-        self.slider.pack(side=LEFT,expand=YES,fill=BOTH)
-
-        # see self.slider_command below
-        self.first_slider_command = True
-
         # Add the tag
         self.tag_val = tagvariable
         self.tag = Entry(self,textvariable=self.tag_val,width=tag_width)
 
-        # slider updates on return and on losing focus
-        self.tag.bind('<FocusOut>', self.refresh)
-        self.tag.bind('<Return>', self.refresh)
+        self.min_value = self.string_translator(min_value)
+        self.max_value = self.string_translator(max_value)
+        
+
+        # Add the slider        
+        self.slider_val = IntVar(0)
+        self.slider = Scale(self,showvalue=0,from_=0,to=10000,orient='horizontal',
+                           variable=self.slider_val, command=self.slider_command)
+        self.slider.pack(side=LEFT,expand=YES,fill=BOTH)
+        self.set_slider_from_tag()
+        self.first_slider_command = True          # see self.slider_command below
+
+        
+
+
+        self.tag.bind('<FocusOut>', self.refresh) # slider is updated on tag return... 
+        self.tag.bind('<Return>', self.refresh)   # ...and on tag losing focus
+
         
         self.tag.pack(side=LEFT)
 
+        
+
+
+    def refresh(self,e=None):
         self.set_slider_from_tag()
-
-
-    def refresh(self,e):
         self.root.optional_refresh()
 
 

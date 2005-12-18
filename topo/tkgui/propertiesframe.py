@@ -23,9 +23,10 @@ class PropertiesFrame(Frame):
         self.padding = padding
         Frame.__init__(self,parent,config)
 
+
     def optional_refresh(self,CEBHACKALERT=None):
-        if self.parent.auto_refresh:
-            self.parent.refresh()
+        if self.parent.auto_refresh: self.parent.refresh()
+
 
     def add_property(self,name,var,control,value):
         p = Message(self,text=name,aspect=5000)
@@ -67,6 +68,7 @@ class PropertiesFrame(Frame):
         This property stores its value in a TKInter StringVar.
         """
         var = StringVar()
+        var.set(value)
         control = TaggedSlider(self,
                                tagvariable=var,
                                string_translator=string_translator,

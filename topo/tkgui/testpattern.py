@@ -18,27 +18,29 @@ $Id$
 """
 __version__='$Revision$'
 
-import __main__
-import math
-import parametersframe
+import copy
+import Pmw
+
 import topo.base.patterngenerator
+import topo.base.sheetview
+
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.commands.basic import pattern_present
+
+from topo.misc.keyedlist import KeyedList
+
+import parametersframe
+import plotgrouppanel
+import topoconsole
 
 from topo.plotting.plot import make_plot
-import plotgrouppanel
-import Pmw
-import topo.base.sheetview 
-import topoconsole
+
+
 from Tkinter import IntVar, StringVar, Checkbutton
 from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
-import topo.base.parameter
-from topo.base.utils import eval_atof,find_classes_in_package, classname_repr
-from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.sheet import Sheet
-from topo.base.topoobject import class_parameters
 
-from topo.commands.basic import pattern_present,save_input_generators,restore_input_generators
-from copy import deepcopy
 
+# CEBHACKALERT: find out what this is.
 # Hack to reverse the order of the input EventProcessor list and the
 # Preview plot list, so that it'll match the order that the plots appear
 # in the Activity panel.
@@ -56,85 +58,106 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         self.padding = padding
         self.parent = parent
         self.console = console
+
+
+        ### Find the GeneratorSheets in the simulator, set up generator_sheet_patterns dictionary
+        #
+        # generator_sheets_patterns = 
+        # {generator_sheet_name:  { 'generator_sheet': <gs_obj>,
+        #                           'editing': True/False,
+        #                           'pattern_generator': <pg_obj> }
+        #                         }    
+        self.generator_sheets_patterns = {}
+        for (gen_sheet_name,gen_sheet) in topoconsole.active_sim().objects(GeneratorSheet).items():
+            self.generator_sheets_patterns[gen_sheet_name] = {'generator_sheet': gen_sheet,
+                                                              'editing': True,
+                                                              'pattern_generator': None} 
+
+        ### learning buttons
+        #
+        # CEBHACKALERT: I think this doesn't work at the moment
         self.learning = IntVar()
         self.learning.set(0)
+        self.learning_button = Checkbutton(self,text='Network Learning',
+                                      variable=self.learning)
+        self.learning_button.pack(side=TOP)
+        # buttonBox.add('Use for future learning',command = self.use_for_learning)
 
-        # Variables and widgets for maintaining the list of input sheets
-        # that will be given the user defined stimuli.
-        self.gen_sheets = {}
-        for (gen_sheet_name,gen_sheet) in topoconsole.active_sim().objects(GeneratorSheet).items():
-            self.gen_sheets[gen_sheet_name] = {'obj':gen_sheet,'state':True,'pattern':None} 
 
-        # duration to present stuff
+        ### 'Duration to present' box
+        #
         self.present_length = Pmw.EntryField(self,
                 labelpos = 'w',label_text = 'Duration to Present:',
                 value = DEFAULT_PRESENTATION,validate = {'validator' : 'real'})
         self.present_length.pack(fill='x', expand=1, padx=10, pady=5)
 
-        # Draw on GeneratorSheet boxes
-        # CEBHACKALERT: (1) these don't work (temporarily: the system of
-        # creating the patterns to draw will be changed first).
-        # (2) don't want these boxes up so high on window, should be lower
-        #self.input_box = Pmw.RadioSelect(parent, labelpos = 'w',
-        #                        command = self._input_change,label_text = 'Draw on:',
-        #                        frame_borderwidth = 2,frame_relief = 'ridge',
-        #                        selectmode = 'multiple')
-        #self.input_box.pack(fill = 'x', padx = 5)
 
-        #gen_sheet_names = self.gen_sheets.keys()
-        #if LIST_REVERSE: gen_sheet_names.reverse() # what?
-        #for gen_sheet_name in gen_sheet_names:
-        #    self.input_box.add(gen_sheet_name)
-        #    self.input_box.invoke(gen_sheet_name)
-
-        # buttons relating to generator sheets
+        ### 'Present'/'reset to defaults' buttons  (i.e. re: patterns themselves)
+        #
         buttonBox = Pmw.ButtonBox(self,orient = 'horizontal',padx=0,pady=0)
         buttonBox.pack(side=TOP)
         buttonBox.add('Present', command=self.present)
         buttonBox.add('Reset to defaults', command=self.reset_to_defaults)
 
-        # learning buttons
-        # CEBHACKALERT: I think this doesn't work at the moment
-        self.learning_button = Checkbutton(self,text='Network Learning',
-                                      variable=self.learning)
-        self.learning_button.pack(side=TOP)
-        # buttonBox.add('Use for future learning',command = self.use_for_learning)
-        
 
-        # Define menu of valid PatternGenerator types
-
-        # CEBHACKALERT: this is just temporary while I reorganize these files.
+        ### Menu of PatternGenerator types
+        #
+        # CEBHACKALERT: this way is just temporary while I reorganize these files.
         # Take the list of PatternGenerators from the first GeneratorSheet's
         # input_generator PatternGeneratorParameter for now.
-        for thing in self.gen_sheets.values():
-            generator_sheet = thing['obj']
-            generator_sheet_params = generator_sheet.get_paramobj_dict()
-            self.pg_name_dict = generator_sheet_params['input_generator'].range()
+        #
+        # pattern_generators = {'Pattern': <PatternGenerator_obj>}
+        for generator_sheet_name in self.generator_sheets_patterns.values():
+            generator_sheet_params = generator_sheet_name['generator_sheet'].get_paramobj_dict()
+            pattern_generators = generator_sheet_params['input_generator'].range()
             break
+        self.pattern_generators = KeyedList()
+        self.pattern_generators.update(pattern_generators)
+        self.pattern_generators.sort()  # sorted so the pgs appear alphabetically
+        ## END CEBHACKALERT
+        
 
-        self.pattern_generators = self.pg_name_dict.keys()
-        self.pattern_generator = StringVar()
-        self.pattern_generator.set(self.pattern_generators[0])
+        # Set initial PatternGenerator to PatternGeneratorParameter.default
+        self.__current_pattern_generator = (generator_sheet_params['input_generator'].default)()
+        self.__current_pattern_generator_name = StringVar()
+        # CEBHACKALERT: you can set the current pg from the name in a better way
+        for (pg_name,pg) in self.pattern_generators.items():
+            if pg==type(self.__current_pattern_generator):
+                self.__current_pattern_generator_name.set(pg_name)
+                self.__default_pattern_generator_name = pg_name #CEBHACKALERT: don't need to store this
 
         # PatternGenerator choice box
-        Pmw.OptionMenu(self,command = self._refresh_widgets,
-                       labelpos = 'w',label_text = 'Pattern generator:',
-                       menubutton_textvariable = self.pattern_generator,
-                       items = self.pattern_generators
-                       ).pack(side=TOP)
- 
-        # ParametersFrame
-        self.param_frame = parametersframe.ParametersFrame(self)
+        self.pg_choice_box = Pmw.OptionMenu(self,
+                                            command = self.__change_pattern_generator,
+                                            labelpos = 'w',
+                                            label_text = 'Pattern generator:',
+                                            menubutton_textvariable = self.__current_pattern_generator_name,
+                                            items = self.pattern_generators.keys())
+        self.pg_choice_box.pack(side=TOP)
 
 
-        self._refresh_widgets(self.pattern_generator.get())
+        ### The ParametersFrame
+        #
+        self.__params_frame = parametersframe.ParametersFrame(self)
+        self.__params_frame.pack(side=TOP,expand=YES,fill=X)
+        self.__params_frame.create_widgets(self.__current_pattern_generator)
 
-        self.param_frame.pack(side=TOP,expand=YES,fill=X)
 
-        self.gen_sheets = self.create_patterns(self.gen_sheets)
+        ### 'Edit patterns in' boxes
+        #
+        # CEBHACKALERT: don't want these boxes up so high on window, should be lower
+        self.__input_box = Pmw.RadioSelect(parent, labelpos = 'w',
+                                command = self._input_change,label_text = 'Apply to pattern in:',
+                                frame_borderwidth = 2,frame_relief = 'ridge',
+                                selectmode = 'multiple')
+        self.__input_box.pack(fill = 'x', padx = 5)
 
+        for generator_sheet_name in self.generator_sheets_patterns.keys():
+            self.__input_box.add(generator_sheet_name)
+            self.__input_box.invoke(generator_sheet_name)
+        
 
-        self.refresh()
+        self.__change_pattern_generator(self.__current_pattern_generator_name.get())
 
 
     @staticmethod
@@ -148,28 +171,46 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         else:
             return False
 
+
+    def refresh(self):
+        """
+        Change the pattern generator objects as required
+
+        Also call the parent class refresh.
+        """
+        self.__setup_pattern_generators()
+        super(TestPattern,self).refresh()
+
+
         
     def _input_change(self,button_name, checked):
         """
         The variable checked records the state, either True or False.
 
-        Called by the input box.  The variable self.gen_sheets records
+        Called by the input box.  The variable self.generator_sheets_patterns records
         all input event processors, and whether they are checked or
         not.
         """
-        self.gen_sheets[button_name]['state'] = checked
+        self.generator_sheets_patterns[button_name]['editing'] = checked
+
+        if not self.generator_sheets_patterns[button_name]['editing']:
+            self.generator_sheets_patterns[button_name]['pattern_generator'] = copy.copy(self.__current_pattern_generator)
+        else:
+            if self.auto_refresh:
+                self.__setup_pattern_generators()
+                self.refresh()
         
 
-    def _refresh_widgets(self,new_name):
+    def __change_pattern_generator(self,pattern_generator_name):
         """
-        Called by the Pmw.OptionMenu object when the user selects a
-        PatternGenerator type from the menu.  The visible TaggedSliders
-        will be updated.  The old ones are removed, and new ones are
-        added to the screen.  
+        Change to the selected PatternGenerator.
+
+        Set the current PatternGenerator to the one selected and get the
+        ParametersFrame to draw the relevant widgets
         """
-        self.pg = self.pg_name_dict[new_name]()
-        self.param_frame.create_widgets(self.pg)
-        self.gen_sheets = self.create_patterns(self.gen_sheets)
+        self.__current_pattern_generator = self.pattern_generators[pattern_generator_name]()
+        self.__params_frame.create_widgets(self.__current_pattern_generator)
+
         if self.auto_refresh: self.refresh()
 
 
@@ -185,9 +226,9 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         This function is run no matter if learning is enabled or
         disabled since run() will detect sheet attributes.
         """
-        new_patterns_dict = self.create_patterns(self.gen_sheets)
-        input_dict = dict([(name,d['pattern'])
-                           for (name,d) in new_patterns_dict.items()])
+        self.__setup_pattern_generators()
+        input_dict = dict([(name,d['pattern_generator'])
+                           for (name,d) in self.generator_sheets_patterns.items()])
         pattern_present(input_dict,self.present_length.getvalue(),
                         learning=self.learning.get(),overwrite_previous=False)
         self.console.auto_refresh()
@@ -206,26 +247,23 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 
         This function does run() the simulator but for 0.0 time.
         """
-        new_patterns_dict = self.create_patterns(self.gen_sheets)
-        input_dict = dict([(name,d['pattern'])
-                           for (name,d) in new_patterns_dict.items()])
-        pattern_present(input_dict,0.0,sim=None,learning=True,overwrite_previous=True)
-        self.console.auto_refresh()
+        #self.__setup_pattern_generators()
+        #input_dict = dict([(name,d['pattern_generator'])
+        #                   for (name,d) in new_patterns_dict.items()])
+        #pattern_present(input_dict,0.0,sim=None,learning=True,overwrite_previous=True)
+        #self.console.auto_refresh()
+        pass
 
 
-    # CEBHACKALERT
-    def reset_to_defaults(self):        
-        # self.param_frame.reset_to_defaults()
-        # self.pattern_generator.set(self.pattern_generators[0])
+
+    def reset_to_defaults(self):
+        """
+        Reset to default presentation length, no learning, and the original PatternGenerator.
+        """
         self.present_length.setvalue(DEFAULT_PRESENTATION)
-        for each in self.gen_sheets.keys():
-            if not self.gen_sheets[each]['state']:
-                self.input_box.invoke(each)
-        self.gen_sheets = self.create_patterns(self.gen_sheets)        
-        self._refresh_widgets(self.pattern_generator.get())
+        self.learning_button.deselect()
+        self.pg_choice_box.invoke(self.__default_pattern_generator_name)
         if self.auto_refresh: self.refresh()
-        if self.learning.get():
-            self.learning_button.invoke()
 
 
     def do_plot_cmd(self):
@@ -239,30 +277,19 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         Return self.pe_group which contains a PlotGroup.
         """
         plist = []
-        view_dict = {}
-        for each in self.gen_sheets.keys():
-            k = self.gen_sheets[each]['pattern']
-            sv = topo.base.sheetview.SheetView((k(),k.bounds),src_name=each,
-                                          view_type='Pattern')
-	    view_dict[each] = sv
+        
+        for each in self.generator_sheets_patterns.keys():
+            view_dict = {}
+            k = self.generator_sheets_patterns[each]['pattern_generator']
+	    view_dict[each] = topo.base.sheetview.SheetView((k(),k.bounds),src_name=each)
 	    ### JCALERT ! This is working for the moment but that could be made simpler
             ### (which is also true for most of the file!!)
-	    channels = {'Strength':each,'Hue':None,'Confidence':None}
+            channels = {'Strength':each,'Hue':None,'Confidence':None}
             plist.append(make_plot(channels,view_dict,name=''))
-        if LIST_REVERSE: plist.reverse()
         ### JCALERT! It is the only call to PlotGroup with template is None. Need to change.
         self.pe_group = topo.plotting.plotgroup.PlotGroup(self.pe.simulation,None,plot_group_key='Preview',plot_list=plist)
 
 
-    def refresh_title(self): pass
-
-    def refresh(self):
-        """
-        Refresh this class and also call the parent class refresh.
-        """
-        self.gen_sheets = self.create_patterns(self.gen_sheets)
-        self.param_frame.refresh()
-        super(TestPattern,self).refresh()
 
 
 
@@ -271,7 +298,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
     ### JAB: It is not clear how this will need to be extended to support
     ### objects with different parameters in the different eyes, e.g. to
     ### test ocular dominance.
-    def create_patterns(self,ep_dict):
+    def __setup_pattern_generators(self):
         """
         Make an instantiation of the current user patterns.
 
@@ -280,17 +307,12 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 
         # CEBHACKALERT: this method (still) sets bounds and density
         # every time the pattern's redrawn.
+        # This method will change.
 
-        # This whole system will be changed significanly. For one thing,
-        # these lines need only run once, until the patterngenerator is
-        # changed again.
+        self.__params_frame.set_obj_params()
 
-        self.param_frame.set_obj_params()
-        pg = self.param_frame.topo_obj
-
-        for each in ep_dict.keys():
-            setattr(pg,'bounds',deepcopy(ep_dict[each]['obj'].bounds))
-            setattr(pg,'density', ep_dict[each]['obj'].density)
-            ep_dict[each]['pattern'] = pg
-
-        return ep_dict
+        for (gs_name,o_s_p) in self.generator_sheets_patterns.items():
+            if o_s_p['editing']==True:
+                o_s_p['pattern_generator'] = self.__params_frame.topo_obj
+                setattr(o_s_p['pattern_generator'],'bounds',copy.deepcopy(o_s_p['generator_sheet'].bounds))
+                setattr(o_s_p['pattern_generator'],'density', o_s_p['generator_sheet'].density)                
