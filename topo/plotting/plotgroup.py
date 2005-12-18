@@ -43,8 +43,7 @@ class PlotGroup(TopoObject):
     the plots and other special parameters.
     """
 
-    ### JCALERT: 
-    ### - plot_list may disappear. For that we need to work on the special case of inputparampanel.
+    ###JCALERT:
     ### - re-arranged the order and look at the call in all panel classes (i.e. inputparampanel)
     ### also review the doc of each functions.
     ### - rewrite the test file.
@@ -61,7 +60,6 @@ class PlotGroup(TopoObject):
         self.all_plots = []
         self.added_list = []
 
-
         # Shape of the plotting display used by PlotGroup.
         #
         # Allowable shapes include:
@@ -76,7 +74,6 @@ class PlotGroup(TopoObject):
         # third row with 4, etc.  The default left-to-right ordering
         # in one row could perhaps be represented as (None, Inf).
         self.shape = shape
-
         
         self.plot_group_key = plot_group_key
         self.bitmaps = []
@@ -90,11 +87,10 @@ class PlotGroup(TopoObject):
 
 	self.simulator = simulator
 
-	self.plot_list = lambda: self.initialize_plot_list(plot_list)
+	self.plot_list = lambda: self._initialize_plot_list(plot_list)
 
 
-    ### JCALERT! we might want this function to be private.
-    def initialize_plot_list(self,plot_list):
+    def _initialize_plot_list(self,plot_list):
         """
         Procedure that is called when creating a PlotGroup, that return the plot_list attribute
         i.e. the list of plot that are specified by the PlotGroup template.
@@ -102,18 +98,16 @@ class PlotGroup(TopoObject):
         This function calls create_plots, that is implemented in each PlotGroup subclasses.
         (In particular, this needs to be different for UnitWeightsPlotGroup and ProjectionPlotGroup)
         """
-
-	sheet_list = [each for each in dict_sort(self.simulator.objects(Sheet)) if self.sheet_filter_lam(each)]
-        
+	sheet_list = [each for each in dict_sort(self.simulator.objects(Sheet)) if self.sheet_filter_lam(each)]      
         # Loop over all sheets that passed the filter.
         #     Loop over each individual PlotTemplate:
         #         Call the create_plots function to create the according plot
         for each in sheet_list:
 	    ### JCALERT! This test can be later removed when improving testpattern.py
+            ### (for the moment call to PlotGroup from testpattern lead to self.template=None
 	    if self.template != None :
 		for (pt_name,pt) in self.template.plot_templates:
 		    plot_list= plot_list + self.create_plots(pt_name,pt,each)
-
     	return plot_list
 
   
@@ -122,20 +116,17 @@ class PlotGroup(TopoObject):
 	This function need to be re-implemented in the subclass.
 	As it is implemented here, it leaves the possibility of passing a plot_list
         of already created plots when creating a PlotGroup.
-	"""
-        
+	"""       
 	return []
     
 
-    ### JABHACKALERT!
-    ###
-    ### Shouldn't this raise NotImplementedError instead of passing?
-    ### If implementing it is required, not optional, then it must.
-
-    ### JCALERT! it is not clear what this function is doing anyway, or the name
-    ### should be changed or it should be spared. (To do, I will get rid of it)
-    ### That would require a re-organization of the way Plot are created in the sub-PlotGroup
-
+    ### JCALERT! do_plot_cmd() should be deleted here and in all sub-classes
+    ### and be replaced by the command assigned from the PlotGroupTemplate
+    ### (e.g measure_or_pref,measure_activity) and executed from the panel class.
+    ### All these function will have to go in a special separate file  
+    ### (measure_or_pref and measure_activity being in analysis/featuremap.py for the moment). 
+    ### That will also enable to makes the different panel acting more uniformly,
+    ### and might allow to delete basicplotgrouppanel.py
     def do_plot_cmd(self):
         """
         Command called when plots need to be generated.
@@ -156,24 +147,19 @@ class PlotGroup(TopoObject):
         """
         self.bitmaps = []
         for each in self.plots():
-
             win = each.bitmap                      
-            win.view_info = each.view_info
-            
+            win.view_info = each.view_info            
             self.bitmaps.append(win)
         return self.bitmaps
     
-
     
     def add(self,new_plot):
         """
         new_plot can be a single Plot, or it can be a list of plots.
         Either way, it will be properly added to the end of self.plot_list.
-        """
-       
+        """     
 	self.added_list.extend(new_plot)
       
-
 
     ### JCALERT ! It has to be redefined how this function release_sheet_view() works
     ### here but also in sheet and connectionfield and Plot.
@@ -195,18 +181,14 @@ class PlotGroup(TopoObject):
         Generate the bitmap lists.
         """
         bitmap_list = []
-
 	self.all_plots = flatten(self.plot_list()) + self.added_list
-        
         generated_bitmap_list = [each for each in self.all_plots if each != None]
-
         ### JCALERT! For each plotgroup, we want the plot to be displayed
         ### in the alphabetical order according to their view_info['src_name']
         ### The only PlotGroup that does not have to do that is the projectionplotgroup
         ### and that is why this function is overwritten. 
         ### (It has to be fixed, as well as the handling of plot label in general)
         sort_plots(generated_bitmap_list)
-
         return generated_bitmap_list
     
   
@@ -222,9 +204,9 @@ class BasicPlotGroup(PlotGroup):
 
     def create_plots(self,pt_name,pt,sheet):
 
-	### JCALERT! Normalize should be directly get from plot_channels in Plot instead of here
-        ### Same Alert in UnitWeight and Projection PlotGroup.
 	plot_channels = pt
+        ### JCALERT! Normalize should be directly get from plot_channels in Plot instead of here
+        ### Same thing in UnitWeight and Projection PlotGroup.
         n = pt.get('Normalize',False)
 	plot_name = '\n'+pt_name
         p = make_plot(plot_channels,sheet.sheet_view_dict,sheet.density,sheet.bounds,n,False,name=plot_name)
