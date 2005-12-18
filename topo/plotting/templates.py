@@ -79,18 +79,14 @@ class PlotGroupTemplate(TopoObject):
         """
         
         super(PlotGroupTemplate,self).__init__(**params)
-        ### JABALERT: Why would plot_templates ever be None?
-        if not plot_templates:
-            self.plot_templates = KeyedList()
-        else:
-            self.plot_templates = KeyedList(plot_templates)
+       
+	self.plot_templates = KeyedList(plot_templates)
         
 
 
 ###############################################################################
 # Specific PlotGroupTemplates are stored in this repository,
 # to which users can add their own as needed
-plot_templates = {} # JABHACKALERT! What is this for?
 plotgroup_templates = KeyedList()
 
 
