@@ -151,11 +151,6 @@ class PlotGroup(TopoObject):
         pass
     
 
-    ### JABHACKALERT!  There is no apparent reason why this code
-    ### should be constructing any bitmaps here.  The Plot should be
-    ### able to return a Bitmap (e.g. using a function bitmap(), and
-    ### the type of that Bitmap might be anything (RGBBitmap,
-    ### HSVBitmap, etc., rather than RGBBitmap as assumed here).
     def load_images(self):
         """
         Pre:  do_plot_cmd() has already been called, so plots() will return
@@ -190,8 +185,7 @@ class PlotGroup(TopoObject):
 
 
     ### JCALERT ! It has to be redefined how this function release_sheet_view() works
-    ### here but also in sheet and connectionfield.
-
+    ### here but also in sheet and connectionfield and Plot.
     def release_sheetviews(self):
         """
         Call release_sheetviews() on all Plots in plot list, to free
@@ -222,14 +216,9 @@ class PlotGroup(TopoObject):
             self.debug('Dynamic plotgroup')
             self.all_plots = flatten(self.plot_list()) + self.added_list
             self.debug('all_plots = ' + str(self.all_plots))
-
-	### JCALERT! I don't understand this comment. I think it can go:
-        # Eventually a simple list comprehension is not going to be
-        # sufficient as outlining and other things will need to be
-        # done to each of the matrices that come in from the Plot
-        # objects.
         
         generated_bitmap_list = [each for each in self.all_plots if each != None]
+
         ### JCALERT! For each plotgroup, we want the plot to be displayed
         ### in the alphabetical order according to their view_info['src_name']
         ### The only PlotGroup that does not have to do that is the projectionplotgroup
@@ -257,15 +246,13 @@ class BasicPlotGroup(PlotGroup):
 
 
     def create_plots(self,pt_name,pt,sheet):
-	
-# 	plot_channels = {}
-	
-# 	plot_channels['Strength'] = pt.channels.get('Strength',None)
-#         plot_channels['Hue'] = pt.channels.get('Hue',None)
-#         plot_channels['Confidence'] = pt.channels.get('Confidence',None)
+
+	### JCALERT! Normalize should be directly get from plot_channels in Plot instead of here
+        ### Same Alert in UnitWeight and Projection PlotGroup.
+	plot_channels = pt
         n = pt.get('Normalize',False)
 	plot_name = '\n'+pt_name
-        p = make_plot(pt,sheet.sheet_view_dict,sheet.density,sheet.bounds,n,False,name=plot_name)
+        p = make_plot(plot_channels,sheet.sheet_view_dict,sheet.density,sheet.bounds,n,False,name=plot_name)
 	return [p]
 
 	
@@ -285,8 +272,6 @@ class UnitWeightsPlotGroup(PlotGroup):
         # a plot of the full source sheet, or not.
       	self.situate = False
         
-	### JCALERT! I am not sure we need something dynamic here.
-        ### (cf similar alert in BasicPlotGroup.
 	self.plot_list = lambda: self.initialize_plot_list()
 
   
@@ -301,9 +286,6 @@ class UnitWeightsPlotGroup(PlotGroup):
 		### weight belongs to the src_sheet, and the name in the key
                 ### is the destination sheet.
 	        plot_channels = pt
-	  #       plot_channels['Strength'] = pt.channels.get('Strength',None)
-#                 plot_channels['Hue'] = pt.channels.get('Hue',None)
-#                 plot_channels['Confidence'] = pt.channels.get('Confidence',None)
 
 	        ### JCALERT! do the plot_channels['Strength'] == 'weights' test
                 ### here and in projectionplotgroup
@@ -365,19 +347,10 @@ class ProjectionPlotGroup(PlotGroup):
         if projection:
 	    src_sheet=projection[0].src
 	    projection=projection[0]
-	         
-	    ### JCALERT! for the moment, the sheet_view for a projection is a list of UnitView
-            ### This has to be changed, and so it is a temporary hack.
-            ### Finally, it won't be possible to pass a sheet_view directly when creating a Plot
 
-            #views = src_sheet.sheet_view_dict.get(key,None)
-	    ### JCALERT! replace that by an attribute view_list in ProjectionPlotGroup
-            ### no need to create a sheet_view that contains a list...!!
 	    for view in self.view_list:
 		plot_channels = pt
-	# 	plot_channels['Strength'] = pt.channels.get('Strength',None)
-# 		plot_channels['Hue'] = pt.channels.get('Hue',None)
-# 	        plot_channels['Confidence'] = pt.channels.get('Confidence',None)     
+		### JCALERT! Do the test pt['Strength']='Weights' here
 		key = ('Weights',sheet.name,projection.name,view.view_info['x'],view.view_info['y'])
 		plot_channels['Strength'] = key
 		plot_list.append(make_plot(plot_channels,src_sheet.sheet_view_dict,
@@ -439,10 +412,6 @@ class ProjectionPlotGroup(PlotGroup):
             self.all_plots = flatten(self.plot_list()) + self.added_list
             self.debug('all_plots = ' + str(self.all_plots))
 
-        # Eventually a simple list comprehension is not going to be
-        # sufficient as outlining and other things will need to be
-        # done to each of the matrices that come in from the Plot
-        # objects.
         generated_bitmap_list = [each for each in self.all_plots if each !=None]
         return generated_bitmap_list
 
