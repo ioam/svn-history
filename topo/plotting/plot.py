@@ -39,7 +39,7 @@ def make_plot(channels,sheet_view_dict,density=None,
      one of the Plot subclasses automatically.  See Plot.__init__ for
      a description of the arguments.
      """
-     plot_types=[HSVPlot,RGBPlot,ColormapPlot]
+     plot_types=[SHCPlot,RGBPlot,PalettePlot]
      for pt in plot_types:
          plot = pt(channels,sheet_view_dict,density,plot_bounding_box,normalize,situate,name=name)
          if plot.bitmap != None:
@@ -268,8 +268,7 @@ class Plot(TopoObject):
 
 
 
-### JABALERT: Should be renamed SHC plot for clarity.   
-class HSVPlot(Plot):
+class SHCPlot(Plot):
     """
     Bitmap plot based on Strength, Hue, and Confidence matrices.
 
@@ -279,7 +278,7 @@ class HSVPlot(Plot):
 
     def __init__(self,channels,sheet_view_dict,density,
                  plot_bounding_box,normalize,situate,**params):
-	super(HSVPlot,self).__init__(channels,sheet_view_dict,density, 
+	super(SHCPlot,self).__init__(channels,sheet_view_dict,density, 
 				   plot_bounding_box,normalize,situate,**params)
         
 	# catching the empty plot exception
@@ -341,6 +340,7 @@ class HSVPlot(Plot):
         max_s = max(s.flat)
 	if normalize and max_s>0:
 	    s = divide(s,float(max_s))
+
         ### JCALERT! I think we need that here (it is not anymore caught from bitmap). Ask Jim
         ### Lead to a bug in testpattern (Disk) but maybe because of a problem in testpattern... 
        #  if not max(s.flat)<=1.0:
@@ -374,8 +374,7 @@ class RGBPlot(Plot):
 
 
 
-### JABALERT: Need to rename to PalettePlot(Plot):    
-class ColormapPlot(Plot):
+class PalettePlot(Plot):
   """
   Bitmap plot based on a Strength matrices, with optional colorization.  
 
@@ -388,7 +387,7 @@ class ColormapPlot(Plot):
   def __init__(self,channels,sheet_view_dict,density,
                  plot_bounding_box,normalize,situate,**params):
 
-      super(ColormapPlot,self).__init__(channels,sheet_view_dict,density, 
+      super(PalettePlot,self).__init__(channels,sheet_view_dict,density, 
 				   plot_bounding_box,normalize,situate,**params)
 
       ### JABALERT: To implement the class: If Strength is present,
