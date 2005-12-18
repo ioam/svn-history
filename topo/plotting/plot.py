@@ -29,13 +29,15 @@ import palette
 
 
 
-### JCALERT! This function has to be better documented
 def make_plot(channels,sheet_view_dict,density=None,
               plot_bounding_box=None,normalize=False,situate=False,name=None):
      """
-     Factory function called when requesting a Plot Object.
-     It is what should always be used when requesting a Plot
-     rather than a direct call to one of the Plot sub-classes.
+     Factory function for constructing a Plot object whose type is not yet known.
+
+     Typically, a Plot will be constructed through this call, because
+     it selects the appropriate type automatically, rather than calling
+     one of the Plot subclasses automatically.  See Plot.__init__ for
+     a description of the arguments.
      """
      plot_types=[HSVPlot,RGBPlot,ColormapPlot]
      for pt in plot_types:
@@ -48,47 +50,56 @@ def make_plot(channels,sheet_view_dict,density=None,
 
 
 class Plot(TopoObject):
+    """
+    A bitmap-based plot of one Sheet.
 
+    Once constructed, the Plot contains a bitmap (which is None if no
+    plot could be built) that is ready to display, and a view_info
+    data structure that can be used to create labels and filenames.
+    """
+    
     def __init__(self,channels,sheet_view_dict,density,
                  plot_bounding_box,normalize,situate,**params):
 	"""
-        Get the SheetViews requested from each channel passed in at
-        creation, combines them as necessary.
-            
-	Important features of this object are:
-
-	   self.bitmap: Bitmap object associated with the Plot and 
-                        ready to display in the GUI.
+        Build a plot out of a set of SheetViews as determined by a plot_template.
         
-           self.view_info: Name information that can be used to create
-                           labels and filenames.
-              
-        channels is a dictionary with keys (i.e. 'Strength','Hue','Confidence' ...)
-        that point to a stored SheetView in sheet_view_dict, as specified 
-	in a PlotTemplate. None is also possible if the Plot is only built 
-        from one or two SheetViews. Also the code support the possibility for channels
-        to store other objects than SheetViews.   
+        channels is a plot_template, i.e. a dictionary with keys
+        (i.e. 'Strength','Hue','Confidence' ...).  Each key typically
+        has a string value naming specifies a SheetView in
+        sheet_view_dict, though specific channels may contain other
+        types of information as required by specific Plot subclasses.
+        channels that are not used by a particular Plot subclass will
+        silently be ignored.
 
-	sheet_view_dict is a dictionary of SheetViews, generally belonging 
-        to a Sheet object but not necessarily.
+	sheet_view_dict is a dictionary of SheetViews, generally (but
+        not necessarily) belonging to a Sheet object.
 
-	density is the density of the sheet that contains the different views
-        constituting the plot.
+	density is the density of the Sheet whose sheet_view_dict was
+	passed.
 
-	plot_bounding_box is the outer bounding_box of the plot
-        to apply if the plot is situated.  If not situated, the
-        bounds of the smallest SheetView are used.
+	plot_bounding_box is the outer bounding_box of the plot to
+        apply if the plot is situated.  If not situated, the bounds of
+        the smallest SheetView are used.
 
-	normalize specified if the Plot is normalized or not.
+	normalize specifies whether the Plot should be normalized to
+	fill the maximum dynamic range, i.e. 0.0 to 1.0.  If not
+        normalized, values are clipped at 1.0.
         
 	situate specifies if we want to situate the plot, i.e.,
         whether to plot the entire Sheet (or other area specified by
-        the plot_bounding_box), or only the smallest plot (usually a
-        Weights plot).
+        the plot_bounding_box), or only the smallest plot.  The
+        situate parameter is usually useful only for a Weights plot.
         
-        name (inherited from TopoObject) specifies the name to use for
-        this plot.
-        """ 
+        name (which is inherited from TopoObject) specifies the name
+        to use for this plot.
+        """
+
+        ### JABHACKALERT: In the channels documentation, used to say
+        ### 'None is also possible if the Plot is only built from one
+        ### or two SheetViews'.  Is that a useful case?  Seems simpler
+        ### to just have a default template that we can use in such
+        ### cases, if they arise.
+
         super(Plot,self).__init__(**params) 
        
         self.bitmap = None
@@ -106,7 +117,8 @@ class Plot(TopoObject):
         ### and finding a good way to handle sheetview and plot name
 	self._set_view_info()
 
-	### Note: for supporting other type of plots (e.g vector fields...)
+	# # Eventually: support other type of plots (e.g vector fields...) using
+        # # something like:
 	# def annotated_bitmap(self):  
         # enable other construction....
 	
@@ -239,7 +251,7 @@ class Plot(TopoObject):
    
 
     ### JCALERT! In this function, we assume that the slicing box is contained in the 
-    ### outer box. Otherwise there will be an error
+    ### outer box. Otherwise there will be an error.
     def _situate_plot(self,hue,sat,val,outer_box,slicing_box,density):
 
 	shape = bounds2shape(outer_box,density)
@@ -256,15 +268,20 @@ class Plot(TopoObject):
 
 
 
-   
+### JABALERT: Should be renamed SHC plot for clarity.   
 class HSVPlot(Plot):
+    """
+    Bitmap plot based on Strength, Hue, and Confidence matrices.
+
+    Constructs an HSV (hue, saturation, and value) plot by choosing
+    the appropriate matrix for each channel.
+    """
 
     def __init__(self,channels,sheet_view_dict,density,
                  plot_bounding_box,normalize,situate,**params):
-
 	super(HSVPlot,self).__init__(channels,sheet_view_dict,density, 
 				   plot_bounding_box,normalize,situate,**params)
-
+        
 	# catching the empty plot exception
 	s_mat = self._get_matrix('Strength')
 	h_mat = self._get_matrix('Hue')
@@ -321,51 +338,59 @@ class HSVPlot(Plot):
 	    h=zero
 	    c=zero
 
-	if normalize and max(s.flat)>0:
-	    s = divide(s,float(max(s.flat)))
+        max_s = max(s.flat)
+	if normalize and max_s>0:
+	    s = divide(s,float(max_s))
         ### JCALERT! I think we need that here (it is not anymore caught from bitmap). Ask Jim
         ### Lead to a bug in testpattern (Disk) but maybe because of a problem in testpattern... 
        #  if not max(s.flat)<=1.0:
 #              self.warning('arrayToImage failed to Normalize.  Possible NaN.  Using blank matrix.')
 #              self.zeros
 
-	hue,sat,val=h,c,s	
+        # This translation from SHC to HSV is valid only for black backgrounds;
+        # it will need to be extended also to support white backgrounds.
+	hue,sat,val=h,c,s
 	return (hue,sat,val)
    
 
-
     
-###  class RGBPlot(Plot):    
-###     ... ask for Red, Green, Blue; if enough are there, make a plot.
-###        
-
-
 class RGBPlot(Plot):
+  """
+  Bitmap plot based on Red, Green, and Blue matrices.
+  
+  Not yet implemented.
 
+  When implemented, construct an RGB (red, green, and blue) plot from
+  the Red, Green, and Blue channels.
+  """
   def __init__(self,channels,sheet_view_dict,density,
                  plot_bounding_box,normalize,situate,**params):
-
       super(RGBPlot,self).__init__(channels,sheet_view_dict,density, 
 				   plot_bounding_box,normalize,situate,**params)
 
-###     
-###  class PalettePlot(Plot):    
-###     ... ask for Strength and Palette; if Strength is present, make a plot.
+      ### JABALERT: To implement the class: If any of Red, Green, or
+      ### Blue are present, make an RGBBitmap (using 0 for any missing
+      ### ones).
 
+
+
+### JABALERT: Need to rename to PalettePlot(Plot):    
 class ColormapPlot(Plot):
+  """
+  Bitmap plot based on a Strength matrices, with optional colorization.  
 
+  Not yet implemented.
+
+  When implemented, construct an RGB plot from a Strength channel,
+  optionally colorized using a specified Palette.
+  """
+  
   def __init__(self,channels,sheet_view_dict,density,
                  plot_bounding_box,normalize,situate,**params):
 
       super(ColormapPlot,self).__init__(channels,sheet_view_dict,density, 
 				   plot_bounding_box,normalize,situate,**params)
 
-
-
-
-
-
-
-
-
+      ### JABALERT: To implement the class: If Strength is present,
+      ### ask for Palette if it's there, and make a PaletteBitmap.
 
