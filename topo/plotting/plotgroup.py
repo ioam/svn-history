@@ -49,7 +49,7 @@ class PlotGroup(TopoObject):
     ### also review the doc of each functions.
     ### - rewrite the test file.
 
-    def __init__(self,simulator,template,plot_group_key,sheet_filter_lam=None,plot_list=None,shape=FLAT,**params):
+    def __init__(self,simulator,template,plot_group_key,sheet_name=None,plot_list=None,shape=FLAT,**params):
         """
         plot_list can be of two types: 
         1.  A list of Plot objects that can return bitmaps when requested.
@@ -83,14 +83,9 @@ class PlotGroup(TopoObject):
         self.bitmaps = []
         self.template = template
 
-        ### JCALERT! Because of that, we might be able to get rid of some line about the filter
-        ###      in the plotengine file. (To do)  
-	### Also: do we leave the possibility here to pass a string. In this case, change it in plot_engine?
-        if sheet_filter_lam:
-	    if isinstance(sheet_filter_lam,str):
-		self.sheet_filter_lam = lambda s: s.name == sheet_filter_lam
-	    else:
-		self.sheet_filter_lam = sheet_filter_lam
+	# If no sheet_name is defined, the sheet_filter_lam accepts all sheets
+        if sheet_name:
+	    self.sheet_filter_lam = lambda s: s.name == sheet_name
         else:
             self.sheet_filter_lam = lambda s : True
 

@@ -73,31 +73,25 @@ class PlotEngine(TopoObject):
     ### I would change name to plot_group_key and group_type to template.
         
     def get_plot_group(self, plot_group_key, plot_group_template,
-                       class_type='BasicPlotGroup',filter=None):
+                       class_type='BasicPlotGroup',sheet_name=None):
         """
         Return the PlotGroup registered in self.plot_group_dict with
         the provided key 'name'.  If the name does not exist, then
         creates the requested by calling make_plot_group, and then add it
         to the dictionnary for later reuse. 
 	"""
-        if filter == None:
-            filter = lambda s: True
-        elif isinstance(filter,str):     # Allow sheet string name as input.
-            target_string = filter
-            filter = lambda s: s.name == target_string
-        
         if self.plot_group_dict.has_key(plot_group_key):
             self.debug(plot_group_key, "key match in PlotEngine's PlotGroup list")
             requested_plot = self.plot_group_dict[plot_group_key]
         else:
-            requested_plot = self.make_plot_group(plot_group_key,plot_group_template,class_type,filter)
+            requested_plot = self.make_plot_group(plot_group_key,plot_group_template,class_type,sheet_name)
         return requested_plot
 
     
     ### JCALERT!  I would change group_type to be template or group_template
     ### and name to be plot_group_key....
     
-    def make_plot_group(self,plot_group_key,plot_group_template,class_type,filter):
+    def make_plot_group(self,plot_group_key,plot_group_template,class_type,sheet_name):
         """
         name : The key to look under in the SheetView dictionaries.
         group_type: 2 Valid inputs:
@@ -119,7 +113,7 @@ class PlotEngine(TopoObject):
         ### JCALERT! I think we can spare the in globals.
         exec 'ptr = ' + class_type  in globals()
 
-        new_group = ptr(self.simulation,plot_group_template,plot_group_key,filter,dynamic_list)
+        new_group = ptr(self.simulation,plot_group_template,plot_group_key,sheet_name,dynamic_list)
 
         ### JCALERT! I left this comment but does not understand it...
         # Just copying the pointer.  Not currently sure if we want to
