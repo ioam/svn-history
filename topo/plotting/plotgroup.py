@@ -31,11 +31,6 @@ def sort_plots(plot_list):
     plot_list.sort(lambda x, y: cmp(x.view_info['src_name'], y.view_info['src_name']))
 
 
-### JCALERT! This file has been largely modified so that now, each PlotGroup creates
-### its plot_list itself, instead of the PlotEngine doing it. The PlotEngine only
-### creates and stores the PlotGroup in this new version of the code.It is the first version
-### and it still remains job to be done for clarifying and improving it.
-
 
 class PlotGroup(TopoObject):
     """
@@ -162,7 +157,7 @@ class PlotGroup(TopoObject):
       
 
     ### JCALERT ! It has to be redefined how this function release_sheet_view() works
-    ### here but also in sheet and connectionfield and Plot.
+    ### here but also in sheet and connectionfield and Plot. We might get rid of it.
     def release_sheetviews(self):
         """
         Call release_sheetviews() on all Plots in plot list, to free
@@ -172,10 +167,7 @@ class PlotGroup(TopoObject):
         for each in self.all_plots:
             each.release_sheetviews()
 
-
-    ### JCALERT! The call to this function is done when we want the list.
-    ### so there is no need to explicitly call it from outside if not to use this list
-    ### (see the do_plot_cmd in most of the PlotGroupPanels).     
+    # Call from load_images() as a dynamic list to regenerate all_plots anytime (allowing refreshing)
     def plots(self):
         """
         Generate the bitmap lists.
@@ -197,7 +189,7 @@ class BasicPlotGroup(PlotGroup):
     """
     PlotGroup for Activity SheetViews
     """
-    ### JCALERT! See what to do for the default value (sheet_filter_lam =None, plot_list=None)
+
     def __init__(self,simulator,template,plot_group_key,sheet_filter_lam,plot_list,**params):
         super(BasicPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,plot_list,
                                             **params)
@@ -255,8 +247,7 @@ class UnitWeightsPlotGroup(PlotGroup):
         return plot_list
 
 	
-    ### JCALERT! I am not sure this function is of any use here, it should be put in another place...
-    ### or, change the name of it so that it is clearer when called for the PlotGroupPanels
+    ### JCALERT! Should disappear (see alert in PlotGroup)
     def do_plot_cmd(self):
         """
         Lambda function passed in, that will filter out all sheets
@@ -340,7 +331,7 @@ class ProjectionPlotGroup(PlotGroup):
 
         return coords
 
-
+    ### JCALERT! Should disappear (see alert in PlotGroup)
     def do_plot_cmd(self):
         coords = self._generate_coords()
         
@@ -348,7 +339,6 @@ class ProjectionPlotGroup(PlotGroup):
 
 	### JCALERT! The use of chain and nested list here and in 
         ### connectionfield.py (unit_view) can be spared or made simpler.
-
         self.view_list = [view for view in chain(*full_unitview_list)
                          if view.projection.name == self.weight_name]
 
