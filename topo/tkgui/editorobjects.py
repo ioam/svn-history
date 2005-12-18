@@ -8,7 +8,6 @@ __version__='$Revision$'
 
 # JABALERT: Please try to eliminate import *
 from Tkinter import *
-import Pmw # ALALERT: Is this necessary?
 
 class EditorObject :
     """
@@ -254,7 +253,7 @@ class EditorProjection(EditorConnection) :
 	self.label = None
 
     ############ Draw methods ############################
-    def draw(self) :
+    def draw(self, receptiveFields = True) :
 	# determine if connected to a second node, and find the correct posFrom
 	for id in self.id : # remove the old connection
 		self.canvas.delete(id)
@@ -284,10 +283,17 @@ class EditorProjection(EditorConnection) :
 		# draw name label beside arrow head
 		self.label = self.canvas.create_text(mid[0] - 
 			     (20 + len(self.name)*3), mid[1] - (30 + dev) , text = self.name)
-	else : # connection between distinct nodes
-		# create a line between the nodes - use 2 to make arrow in centre.
-	    	self.id = (self.canvas.create_line(posFrom, mid , arrow = LAST, fill = col),
-	    		self.canvas.create_line(mid, posTo, fill = col))
+	else :  # connection between distinct nodes
+		if (receptiveFields) : # if receptive fields are to be drawn
+			x1, y1 = posTo
+			x2, y2 = posFrom
+			self.id = (self.canvas.create_line(x1,y1,x2-10,y2, fill = col),
+				   self.canvas.create_line(x1,y1,x2+10,y2, fill = col),
+				   self.canvas.create_oval(x2-10,y2-5,x2+10,y2+5, fill = col))
+		else :
+			# create a line between the nodes - use 2 to make arrow in centre.
+	    		self.id = (self.canvas.create_line(posFrom, mid , arrow = LAST, fill = col),
+	    			  self.canvas.create_line(mid, posTo, fill = col))
 		# draw name label beside arrow head
 		self.label = self.canvas.create_text(mid[0] - 
 			     (10 + len(self.name)*3), mid[1], text = self.name)
