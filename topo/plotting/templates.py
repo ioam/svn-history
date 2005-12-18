@@ -159,9 +159,9 @@ plotgroup_templates[pgt.name] = pgt
 ### PlotGroupTemplate, and then it will over-write the othe 'Activity' plotgrouptemplate.
 ### The activity panel will then use this template (Blue Activity)
 
-pgt = PlotGroupTemplate(name='Activity',
+pgt = PlotGroupTemplate(name='Activity_Blue',
 			command='measure_activity()',
-			plot_templates= [('Activity_Blue',
+			plot_templates= [('Activity',
 					  {'Red'   : 'OrientationPreference',
 					   'Green' : 'OrientationPreference',
 					   'Blue'  : 'Activity',
