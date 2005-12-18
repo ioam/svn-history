@@ -115,9 +115,9 @@ class Bitmap(TopoObject):
         """
         
         # PIL 'L' Images use a range of 0 to 255, so we scale the
-        # input array to match
+        # input array to match.  The pixels are scaled by 255, not
+        # 256, so that 1.0 maps to fully white.
         max_pixel_value=255
-        ### JABALERT: Shouldn't this scale by max_pixel_value+1 (256), not max_pixel_value (255)?
         inArray = (Numeric.floor(inArray * max_pixel_value)).astype(Numeric.Int)
 
         # Clip any values that are still larger than max_pixel_value
@@ -128,7 +128,7 @@ class Bitmap(TopoObject):
 	    self.verbose("Bitmap: clipped",to_clip,"image pixels that were out of range")
 
         r,c = inArray.shape
-        # size is (width,height), so we swap r and c:
+        # The size is (width,height), so we swap r and c:
         newImage = Image.new('L',(c,r),None)
         newImage.putdata(inArray.flat)
         return newImage
@@ -136,29 +136,35 @@ class Bitmap(TopoObject):
 
 class PaletteBitmap(Bitmap):
     """
-    A Bitmap constructed using a single 2D array.
-
-    By default, the Image constructed will be monochrome.  More
-    colorful Images can be constructed by specifying a Palette.
+    Bitmap constructed using a single 2D array.
+ 
+    The image is monochrome by default, but more colorful images can
+    be constructed by specifying a Palette.
     """
 
     def __init__(self,inArray,palette=None):
         """
-        inArray should have values in the range from 0 and 1.
+        inArray should have values in the range from 0.0 to 1.0.
         
         Palette can be any color scale depending on the type of ColorMap
-        desired.
-        [0,0,0 ... 255,255,255] = Grayscale
-        [0,0,0 ... 255,0,0] = Grayscale but through a Red filter.
+        desired.  Examples:
+        
+        [0,0,0 ... 255,255,255] = grayscale
+        [0,0,0 ... 255,0,0] = grayscale but through a Red filter.
 
-        If palette is not passed as parameter, Grayscale is default.
+        The default palette is grayscale, with 0.0 mapping to black
+        and 1.0 mapping to white.
         """
-        ### JABALERT: Should accept a Palette class, not a data structure,
-        ### or we should get rid of the Palette classes.
+        ### JABALERT: Should accept a Palette class, not a data
+        ### structure, unless for some reason we want to get rid of
+        ### the Palette classes and always use data structures
+        ### instead.
+
+        max_pixel_value=255
 
         newImage = self._arrayToImage(inArray)
         if palette == None:
-            palette = [i for i in range(256) for j in range(3)]
+            palette = [i for i in range(max_pixel_value+1) for j in range(3)]
         newImage.putpalette(palette)
         newImage = newImage.convert('P')
         super(PaletteBitmap,self).__init__(newImage)
@@ -167,22 +173,25 @@ class PaletteBitmap(Bitmap):
 
 class HSVBitmap(Bitmap):
     """
-    HSV Map inputs, converts to RGB image.  3 matrices expected, each should
-    have been normalized to 1.
+    Bitmap constructed from 3 2D arrays, for hue, saturation, and value.
+
+    The hue matrix determines the pixel colors.  The saturation matrix
+    determines how strongly the pixels are saturated for each hue,
+    i.e. how colorful the pixels appear.  The value matrix determines
+    how bright each pixel is.
+
+    An RGB image is constructed from the HSV matrices using
+    hsv_to_rgb; the resulting image is of the same type that is
+    constructed by RGBBitmap, and can be used in the same way.
     """
 
     def __init__(self,hMapArray,sMapArray,vMapArray):
-        """
-        First matrix sets the Hue (Color).
-        Second marix sets the Sauration (How much color)
-        Third matrix sets the Value (How bright the pixel will be)
-        """
+        """Each matrix must be the same size, with values in the range 0.0 to 1.0."""
         shape = hMapArray.shape
         rmat = Numeric.array(hMapArray,Numeric.Float)
         gmat = Numeric.array(sMapArray,Numeric.Float)
         bmat = Numeric.array(vMapArray,Numeric.Float)
         
-        # List comprehensions were not used because they were slower.
         for j in range(shape[0]):
             for i in range(shape[1]):
                 rgb = hsv_to_rgb(rmat[j,i],gmat[j,i],bmat[j,i])
@@ -199,11 +208,14 @@ class HSVBitmap(Bitmap):
 
 
 class RGBBitmap(Bitmap):
-    """A Bitmap constructed using three 2D arrays, for Red, Green, and Blue."""
+    """
+    Bitmap constructed from three 2D arrays, for red, green, and blue.
+
+    Each matrix is used as the corresponding channel of an RGB image.
+    """
 
     def __init__(self,rMapArray,gMapArray,bMapArray):
         """Each matrix must be the same size, with values in the range 0.0 to 1.0."""
-
         rImage = self._arrayToImage(rMapArray)
         gImage = self._arrayToImage(gMapArray)
         bImage = self._arrayToImage(bMapArray)
