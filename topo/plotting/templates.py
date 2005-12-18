@@ -155,11 +155,9 @@ pgt = PlotGroupTemplate(name='Orientation Preference',
 plotgroup_templates[pgt.name] = pgt
 
 
-### JCALERT! Temporary template used for testing RGBPlot. To do that, delete '_Blue' in this
-### PlotGroupTemplate, and then it will over-write the othe 'Activity' plotgrouptemplate.
-### The activity panel will then use this template (Blue Activity)
+### JCALERT! Temporary template used for testing RGBPlot. 
 
-pgt = PlotGroupTemplate(name='Activity_Blue',
+pgt = PlotGroupTemplate(name='TestinPanel_for_RGB_Activity',
 			command='measure_activity()',
 			plot_templates= [('Activity',
 					  {'Red'   : 'OrientationPreference',
