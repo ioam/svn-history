@@ -311,7 +311,6 @@ class SHCPlot(Plot):
 		if self.plot_bounding_box == None:
 		    raise ValueError("the plot_bounding_box must be specified for situating the plot")
 		else:
-                    #self.bitmap = self.__situate_plot(self.plot_bounding_box, slicing_box)
 		    hue,sat,val = self._situate_plot(hue, sat, val, self.plot_bounding_box,
                                                      slicing_box, density)
                     self.bitmap = HSVBitmap(hue,sat,val)
@@ -400,7 +399,6 @@ class RGBPlot(Plot):
 		if self.plot_bounding_box == None:
 		    raise ValueError("the plot_bounding_box must be specified for situating the plot")
 		else:
-                    #self.bitmap = self.__situate_plot(self.plot_bounding_box, slicing_box)
 		    red,green,blue = self._situate_plot(red, green, blue, self.plot_bounding_box,
                                                      slicing_box, density)
                     self.bitmap = RGBBitmap(red,green,blue)
