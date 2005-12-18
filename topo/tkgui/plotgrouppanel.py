@@ -236,6 +236,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
 
 	### JCALERT! That should be make uniform with the basicplotgrouppanel and then eventually maybe
         ### get rid of the basicplotgrouppanel. (i.E. merged plotgrouppanel and basicplotgrouppanel)
+	self.pe_group.initialize_plot_list(plot_list=[])
         self.pe_group.do_plot_cmd()
     
 

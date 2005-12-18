@@ -209,7 +209,7 @@ class ProjectionPanel(CFSheetPlotPanel):
         # self.situate is defined in the super class CFSheetPlotPanel
         self.pe_group.situate= self.situate
         ### JCALERT: temporary Hack
-	self.pe_group.plot_list=self.pe_group.initialize_plot_list()
+	self.pe_group.plot_list=self.pe_group.initialize_plot_list(plot_list=[])
 
 
 

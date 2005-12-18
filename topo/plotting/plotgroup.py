@@ -49,7 +49,7 @@ class PlotGroup(TopoObject):
     ### also review the doc of each functions.
     ### - rewrite the test file.
 
-    def __init__(self,simulator,template,plot_group_key,sheet_name=None,plot_list=None,shape=FLAT,**params):
+    def __init__(self,simulator,template,plot_group_key,sheet_name=None,plot_list=[],shape=FLAT,**params):
         """
         plot_list can be of two types: 
         1.  A list of Plot objects that can return bitmaps when requested.
@@ -58,7 +58,6 @@ class PlotGroup(TopoObject):
         latest list of sheets in the simulation.
         """
         super(PlotGroup,self).__init__(**params)        
-        self.plot_list = plot_list
         self.all_plots = []
         self.added_list = []
 
@@ -89,15 +88,12 @@ class PlotGroup(TopoObject):
         else:
             self.sheet_filter_lam = lambda s : True
 
-        self.debug('Input type, ', type(self.plot_list))
-
 	self.simulator = simulator
 
-	### JC: We do not call initialize_plot_list from the super class because we want the possibility
-        ### to create PlotGroup object from plot_list already built (cf InputParamPanel)
+	self.plot_list = lambda: self.initialize_plot_list(plot_list)
 
     ### JCALERT! we might want this function to be private.
-    def initialize_plot_list(self):
+    def initialize_plot_list(self,plot_list):
         """
         Procedure that is called when creating a PlotGroup, that return the plot_list attribute
         i.e. the list of plot that are specified by the PlotGroup template.
@@ -111,21 +107,25 @@ class PlotGroup(TopoObject):
         # Loop over all sheets that passed the filter.
         #     Loop over each individual PlotTemplate:
         #         Call the create_plots function to create the according plot
-        
-        plot_list = []
 
         for each in sheet_list:
-	   
-            for (pt_name,pt) in self.template.plot_templates:
-		plot_list= plot_list+ self.create_plots(pt_name,pt,each)
+	    ### JCALERT! This test can be later removed when improving testpattern.py
+	    if self.template != None :
+		for (pt_name,pt) in self.template.plot_templates:
+		    plot_list= plot_list + self.create_plots(pt_name,pt,each)
+
     	return plot_list
 
     ###JCALERT! We may want to implement a create_plots in the PlotGroup class
     ### Ask Jim about that.
     def create_plots(self):
-        """This function need to be re-implemented in the subclass."""
+        """
+	This function need to be re-implemented in the subclass.
+	As it is implemented here, it leaves the possibility of passing a plot_list
+        of already created plots when creating a PlotGroup.
+	"""
         
-	raise NotImplementedError
+	return []
     
 
     ### JABHACKALERT!
@@ -234,12 +234,6 @@ class BasicPlotGroup(PlotGroup):
         super(BasicPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,plot_list,
                                             **params)
 
-        ### JC: for basic PlotGroup, no need to create a "dynamic List"
-        ### even we could get rid of this dynamic list and systematically call
-        ### plots() before load_images (cf plotgrouppanel)?(cf JCALERT in plots() above)
-	self.plot_list = self.initialize_plot_list()
-
-
     def create_plots(self,pt_name,pt,sheet):
 
 	### JCALERT! Normalize should be directly get from plot_channels in Plot instead of here
@@ -258,8 +252,7 @@ class UnitWeightsPlotGroup(PlotGroup):
     """
 
     def __init__(self,simulator,template,plot_group_key,sheet_filter_lam,plot_list,**params):
-        super(UnitWeightsPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,plot_list,
-                                              **params)
+                                                     
         self.x = float(plot_group_key[2])
         self.y = float(plot_group_key[3])
 
@@ -267,8 +260,8 @@ class UnitWeightsPlotGroup(PlotGroup):
         # a plot of the full source sheet, or not.
       	self.situate = False
         
-	self.plot_list = lambda: self.initialize_plot_list()
-
+	super(UnitWeightsPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,plot_list,
+						  **params)
   
     def create_plots(self,pt_name,pt,sheet):
 
@@ -317,19 +310,18 @@ class ProjectionPlotGroup(PlotGroup):
     """
 
     def __init__(self,simulator,template,plot_group_key,sheet_filter_lam,plot_list,**params):
-        super(ProjectionPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,
-                                                   plot_list,**params)
+       
         self.weight_name = plot_group_key[1]
         self.density = float(plot_group_key[2])
         self.shape = (0,0)
+	self.situate = False
+        super(ProjectionPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,
+                                                   plot_list,**params)
+	
         self._sim_ep = [s for s in self.simulator.objects(Sheet).values()
                         if self.sheet_filter_lam(s)][0]
         self._sim_ep_src = self._sim_ep.get_in_projection_by_name(self.weight_name)[0].src
 
-        self.situate = False
-        
-	self.plot_list = lambda: self.initialize_plot_list()
-      
  
     def create_plots(self,pt_name,pt,sheet):
 
