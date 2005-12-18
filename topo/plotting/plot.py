@@ -184,7 +184,7 @@ class Plot(TopoObject):
    ### JCALERT! This function is probably temporary: will change when fixing the display of Plot Name
     def _set_view_info(self):
 	""" Set the Plot view_info. Call when Plot is created"""
-	for key in ('Strength','Hue','Confidence'):
+	for key in self.channels:
 	    sheet_view_key = self.channels.get(key,None)
 	    sv = self.view_dict.get(sheet_view_key, None)
 	    if sv != None :
@@ -365,12 +365,72 @@ class RGBPlot(Plot):
   """
   def __init__(self,channels,sheet_view_dict,density,
                  plot_bounding_box,normalize,situate,**params):
-      super(RGBPlot,self).__init__(channels,sheet_view_dict,density, 
+
+       super(RGBPlot,self).__init__(channels,sheet_view_dict,density, 
 				   plot_bounding_box,normalize,situate,**params)
 
-      ### JABALERT: To implement the class: If any of Red, Green, or
-      ### Blue are present, make an RGBBitmap (using 0 for any missing
-      ### ones).
+
+       # catching the empty plot exception
+       r_mat = self._get_matrix('Red')
+       g_mat = self._get_matrix('Green')
+       b_mat = self._get_matrix('Blue') 
+
+       # If it is an empty plot: self.bitmap=None
+       if (r_mat==None and g_mat==None and b_mat==None):
+            self.debug('Empty plot.')
+
+            # Otherwise, we construct self.bitmap according to what is specified by the channels.
+       else:
+            r_box = self._get_box('Red')
+	    g_box = self._get_box('Green')
+	    b_box = self._get_box('Blue')
+
+	    shape,slicing_box,outer_box = self._get_shape_and_boxes((r_mat,g_mat,b_mat),(r_box,g_box,b_box))
+	   
+            r_mat = self._slice_matrix(r_mat,shape,slicing_box,outer_box,density)
+            g_mat = self._slice_matrix(g_mat,shape,slicing_box,outer_box,density)
+            b_mat = self._slice_matrix(b_mat,shape,slicing_box,outer_box,density)
+
+	    red,green,blue = self.__make_rgb_matrices((r_mat,g_mat,b_mat),shape,normalize)
+            
+            self.bitmap = RGBBitmap(red,green,blue)
+        
+            # Situate the plot if required
+	    if situate:
+		if self.plot_bounding_box == None:
+		    raise ValueError("the plot_bounding_box must be specified for situating the plot")
+		else:
+                    #self.bitmap = self.__situate_plot(self.plot_bounding_box, slicing_box)
+		    red,green,blue = self._situate_plot(red, green, blue, self.plot_bounding_box,
+                                                     slicing_box, density)
+                    self.bitmap = RGBBitmap(red,green,blue)
+
+
+  def __make_rgb_matrices(self, rgb_matrices,shape,normalize):
+	""" 
+	Sub-function of plot() that return the h,s,v matrices corresponding 
+	to the current matrices in sliced_matrices_dict. The shape of the matrices
+        in the dict is passed, as well as the normalize boolean parameter.
+	The result specified a bitmap in hsv coordinate.
+    
+        Applies normalizing and cropping if required.
+	"""
+	zero=zeros(shape,Float)
+	one=ones(shape,Float)	
+
+	r,g,b = rgb_matrices
+	# Determine appropriate defaults for each matrix
+	if r is None: r=zero 
+	if g is None: g=zero 
+	if b is None: b=zero 
+	
+        ### JCALERT! Also implement for the BlackBackground case...
+
+        ### JCALERT! What about Normalize fro RGB Plot?
+
+	return (r,g,b)
+   
+
 
 
 

@@ -112,8 +112,8 @@ pgt = PlotGroupTemplate(name='Activity',
 			command='measure_activity()',
 			plot_templates= [('Activity',
 					  {'Strength'   : 'Activity',
-					   'Hue' : 'OrientationPreference',
-					   'Confidence'  : None,
+					   'Hue'        : 'OrientationPreference',
+					   'Confidence' :  None,
 					   'Normalize'  : False})])
 plotgroup_templates[pgt.name] = pgt
 
@@ -156,4 +156,18 @@ pgt = PlotGroupTemplate(name='Orientation Preference',
                                           {'Strength'   : 'OrientationSelectivity',
                                            'Hue'        : None,
                                            'Confidence' : None})])                       
+plotgroup_templates[pgt.name] = pgt
+
+
+### JCALERT! Temporary template used for testing RGBPlot. To do that, delete '_Blue' in this
+### PlotGroupTemplate, and then it will over-write the othe 'Activity' plotgrouptemplate.
+### The activity panel will then use this template (Blue Activity)
+
+pgt = PlotGroupTemplate(name='Activity',
+			command='measure_activity()',
+			plot_templates= [('Activity_Blue',
+					  {'Red'   : 'OrientationPreference',
+					   'Green' : 'OrientationPreference',
+					   'Blue'  : 'Activity',
+					   'Normalize'  : False})])
 plotgroup_templates[pgt.name] = pgt
