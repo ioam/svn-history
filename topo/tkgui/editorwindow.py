@@ -11,19 +11,18 @@ __version__='$Revision$'
 # Binding Mouse Action
 
 from Tkinter import *
-from editortools import ArrowToolbar, ObjectToolbar, ConToolbar
+from editortools import ArrowTool, NodeTool, ConTool
 from topo.base.simulator import get_active_sim
 
-""" TopoGUICanvas extends the Tk Canvas class.
+class EditorCanvas(Canvas) :
+    """ 
+    EditorCanvas extends the Tk Canvas class.
     There are 3 modes that determine the effect of mouse events in the Canvas
     A Canvas can accept new objects, move objects and make connections 
     between them. The intended use of this class is as the main
-    canvas in a Topographica model-editing GUI. """
-
-class GUICanvas(Canvas) :
-
+    canvas in a Topographica model-editing GUI. 
+    """
     ############ Constructor ####################################
-
     def __init__(self, root = None, width = 600, height = 600) :
         # Superclass call
         Canvas.__init__(self, root, width = width, height = height, bg = "white", bd = 2, relief = SUNKEN)
@@ -188,7 +187,7 @@ class GUICanvas(Canvas) :
     ########### Object Methods ######################################
 
     def createObject(self, x, y) : # create a new object
-	self.addObject(self.objbar.createObject(x, y))
+	self.addObject(self.objbar.createNode(x, y))
 
     def addObject(self, obj) : # add a new object to the Canvas
 	self.objectList = self.objectList + [obj]
@@ -277,12 +276,12 @@ class GUICanvas(Canvas) :
 
 ####################################################################
 
-"""
-This class constructs the main editor window. It uses a instance of GUICanvas as the main
-editing canvas and inserts the three-option toolbar in a Frame along the left side of the
-window. 
-"""
 class ModelEditor :
+    """
+    This class constructs the main editor window. It uses a instance of GUICanvas as the main
+    editing canvas and inserts the three-option toolbar in a Frame along the left side of the
+    window. 
+    """
     def __init__(self):
 	# editor window
 	root = Tk()
@@ -290,13 +289,13 @@ class ModelEditor :
 	
 	# create a GUICanvas and place it in a frame
 	canvFrame = Frame(root, bg = 'white')
-	canvas = GUICanvas(canvFrame)
+	canvas = EditorCanvas(canvFrame)
 
 	# create the three toolbar items and place them into a frame
 	frame = Frame(root, bg = 'light grey')
-	arrbar = ArrowToolbar(canvas, frame) # movement arrow toolbar item
-	objbar = ObjectToolbar(canvas, frame) # object creation toolbar item
-	conbar = ConToolbar(canvas, frame) # connection toolbar item
+	arrbar = ArrowTool(canvas, frame) # movement arrow toolbar item
+	objbar = NodeTool(canvas, frame) # object creation toolbar item
+	conbar = ConTool(canvas, frame) # connection toolbar item
 	frame.pack(side = LEFT, fill = BOTH) # pack the toolbar on the left
 	canvas.pack(fill = BOTH, expand = YES) # pack the canvas and allow it to be expanded
 	canvFrame.pack(fill = BOTH, expand = YES) # pack the canvas frame into the window; expandable

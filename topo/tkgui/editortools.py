@@ -7,26 +7,22 @@ $Id$
 __version__='$Revision$'
 
 from Tkinter import *
-from editorobjects import GUISheet
+from editorobjects import EditorSheet, EditorProjection
 import topo.sheets
 from topo.sheets import *
 from topo.base.utils import find_classes_in_package
 from topo.base.sheet import Sheet
-from editorobjects import GuiProjection
 import topo.projections
 from topo.projections import *
 from topo.base.utils import find_classes_in_package
 from topo.base.projection import Projection
 
-### JABALERT: Should change these names to ArrowTool, etc.
-
-class ArrowToolbar(Frame) :
+class ArrowTool(Frame) :
     """
-    ArrowToolbar is a selectable frame containing an arrow icon and a label. It is a
+    ArrowTool is a selectable frame containing an arrow icon and a label. It is a
     toolbar item in a ModelEditor that allows the user to change the GUICanvas to 
     'ARROW' mode. 
     """
-
     ############ Constructor ####################################
 
     def __init__(self, canvas,  parent = None) :
@@ -66,14 +62,13 @@ class ArrowToolbar(Frame) :
 
 ###############################################################################
 
-class ObjectToolbar(Frame) :
+class NodeTool(Frame) :
      """
-     SheetToolbar extends Frame. It is expected to be included in a topographica
-     model development GUI and functions as a self populating Object toolbar.
-     The available Sheet types are supplied to be selected from. The Toolbar supplies
-     a suitable GUI cover for an object and creates the topo object(Sheet).
+     NodeTool extends Frame. It is expected to be included in a topographica
+     model development GUI and functions as a self populating Node tool.
+     The available Sheet types are supplied to be selected from. This Tool supplies
+     a suitable Editor cover for a node and creates the corresponding topo object.
      """
-
      ############ Constructor ####################################
 
      def __init__(self, canvas,  parent = None) :
@@ -87,11 +82,6 @@ class ObjectToolbar(Frame) :
 	# gets list of all the available sheets.
 	self.sheetList = self.getSheetList()
 	sheetList = self.sheetList.keys()
-	# create a dictionary with an entry for each sheet option. This will act as a count
-	# giving a convenient way of forming default sheet names.
-	self.cntDict = {}
-	for name in sheetList :
-		self.cntDict[name] = 0
 	# sets up a reference to the string associated with the current menu selection.
 	self.currentOp = StringVar()
 	self.currentOp.set(sheetList[0])
@@ -107,7 +97,7 @@ class ObjectToolbar(Frame) :
      ####### Focus Methods ####################################################
 	
      def changeMode(self, event) :
-	# changes the GUICanvas mode to 'MAKE'
+	# changes the EditorCanvas mode to 'MAKE'
 	self.canvas.changeMode('m') 
 
      def setFocus(self, focus) :
@@ -121,20 +111,15 @@ class ObjectToolbar(Frame) :
 	self.opMenu.config(bg = col)
 	self.titleLabel.config(bg = col)
 
-     ####### Object Methods ###################################################
+     ####### Node Methods ###################################################
 
-     def createObject(self, x, y) :
+     def createNode(self, x, y) :
 	# get the current selection
 	curOp = self.currentOp.get()
 	# create the new topo object
 	sheet = self.sheetList[curOp]()
-	# get the count for this sheet type and increment the count
-	count = self.cntDict[curOp]
-	self.cntDict[curOp] += 1
 	# create the cover for the sheet and return it.
-	guiSheet = GUISheet(self.canvas, sheet, (x, y), (curOp + " " + str(count)))
-	return guiSheet
-	
+	return EditorSheet(self.canvas, sheet, (x, y), sheet.name)
 
      ####### Util Methods #####################################################
      def getSheetList(self ) :	
@@ -143,20 +128,20 @@ class ObjectToolbar(Frame) :
 
 ###############################################################################
 
-""" ConToolbar extends Frame. It is expected to be included in a topographica
-    model development GUI and functions as a self populating Connection toolbar.
-    The available Connection types are listed and the user can select one.
-    When a connection is formed between two sheets a topo.projection of the
-    specified type is instantiated and a reference to it is stored in it's GUI
-    cover. Allows user to change the GUICanvas mode to 'CONNECTION' mode."""
-
 # NOTE currently only searches for topo.projections (connections have not been implemented yet).
 
-class ConToolbar(Frame) :
-
+class ConTool(Frame) :
+     """ 
+     ConTool extends Frame. It is expected to be included in a topographica
+     model development GUI and functions as a self populating Connection toolbar.
+     The available Connection types are listed and the user can select one.
+     When a connection is formed between two nodes a topo.projection of the
+     specified type is instantiated and a reference to it is stored in it's Editor
+     cover. Allows user to change the EditorCanvas mode to 'CONNECTION' mode.
+     """
      ############ Constructor ####################################
 
-     def __init__(self, canvas,  parent = None) :
+     def __init__(self, canvas, parent = None) :
 	# super constructor call.
 	Frame.__init__(self, parent, bg = 'light grey', bd = 2, relief = GROOVE)
 	self.canvas = canvas # hold canvas reference.
@@ -184,26 +169,24 @@ class ConToolbar(Frame) :
      ########## Canvas Topo Linking Methods #########################################
 
      def newCover(self, fromObj) :
-	# create a GUIProjection and return it. If more than one representation for 
+	# create a EditorProjection and return it. If more than one representation for 
 	# connections/projections the returned object will depend on current selection.
-	return GuiProjection(self.canvas, fromObj)
+	return EditorProjection("", self.canvas, fromObj)
 
-     def createConnection(self, guiCon, obj) :
-	# connects the gui connection. Will also form correct connection in the
+     def createConnection(self, edCon, node) :
+	# connects the ed connection. Will also form correct connection in the
 	# topo simulator.
 	sim = self.canvas.simulator
-	obj1 = guiCon.objectFrom.sheet
-	obj2 = obj.sheet
+	node1 = edCon.nodeFrom.sheet
+	node2 = node.sheet
 	conType = self.projList[self.currentOp.get()]
-	name = guiCon.objectFrom.name + " TO " + obj.sheet.name
-	sim.connect(obj1, obj2, connection_type = conType, connection_params={'name': name})
-	con = None
-	guiCon.connect(obj, con)
+	con = sim.connect(node1, node2, connection_type = conType)
+	edCon.connect(node, con)
 
      ########## Focus Methods #######################################################
 	
      def changeMode(self, event) :
-	# changes the GUICanvas mode to 'CONNECTION'
+	# changes the EditorCanvas mode to 'CONNECTION'
 	self.canvas.changeMode('c') 
 
      def setFocus(self, focus) :
