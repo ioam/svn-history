@@ -27,7 +27,7 @@ import bitmap
 FLAT = 'FLAT'
 
 def sort_plots(plot_list):
-    """Sort a plot list according to the src_names."""
+    """Sort a (static) plot list according to the src_names."""
     plot_list.sort(lambda x, y: cmp(x.view_info['src_name'], y.view_info['src_name']))
 
 
@@ -92,6 +92,7 @@ class PlotGroup(TopoObject):
 
 	self.plot_list = lambda: self.initialize_plot_list(plot_list)
 
+
     ### JCALERT! we might want this function to be private.
     def initialize_plot_list(self,plot_list):
         """
@@ -107,7 +108,6 @@ class PlotGroup(TopoObject):
         # Loop over all sheets that passed the filter.
         #     Loop over each individual PlotTemplate:
         #         Call the create_plots function to create the according plot
-
         for each in sheet_list:
 	    ### JCALERT! This test can be later removed when improving testpattern.py
 	    if self.template != None :
@@ -116,8 +116,7 @@ class PlotGroup(TopoObject):
 
     	return plot_list
 
-    ###JCALERT! We may want to implement a create_plots in the PlotGroup class
-    ### Ask Jim about that.
+  
     def create_plots(self):
         """
 	This function need to be re-implemented in the subclass.
@@ -134,7 +133,7 @@ class PlotGroup(TopoObject):
     ### If implementing it is required, not optional, then it must.
 
     ### JCALERT! it is not clear what this function is doing anyway, or the name
-    ### should be changed or it should be spared. (To do)
+    ### should be changed or it should be spared. (To do, I will get rid of it)
     ### That would require a re-organization of the way Plot are created in the sub-PlotGroup
 
     def do_plot_cmd(self):
@@ -171,12 +170,9 @@ class PlotGroup(TopoObject):
         new_plot can be a single Plot, or it can be a list of plots.
         Either way, it will be properly added to the end of self.plot_list.
         """
-        if isinstance(new_plot,types.ListType):
-            if not isinstance(self.plot_list,types.ListType):
-                self.warning('Adding to PlotGroup that uses dynamic plotlist')
-            self.added_list.extend(new_plot)
-        else:
-            self.added_list.append(new_plot)
+       
+	self.added_list.extend(new_plot)
+      
 
 
     ### JCALERT ! It has to be redefined how this function release_sheet_view() works
@@ -200,17 +196,7 @@ class PlotGroup(TopoObject):
         """
         bitmap_list = []
 
-	### JCALERT: now it is (almost) always a dynamic list (except the call from InputParamPanel..., 
-        ### that could be changed for it to be a static list ? (Ask Jim)
-        ### (It would require an explicit call to initialize_plot_list instead of the use of plot_list(),
-        ### in this case, the create_plots for the super-class will just be pass?)
-        if isinstance(self.plot_list,types.ListType):
-            self.debug('Static plotgroup')
-            self.all_plots = flatten(self.plot_list) + self.added_list
-        else:       # Assume it's a callable object that returns a list.
-            self.debug('Dynamic plotgroup')
-            self.all_plots = flatten(self.plot_list()) + self.added_list
-            self.debug('all_plots = ' + str(self.all_plots))
+	self.all_plots = flatten(self.plot_list()) + self.added_list
         
         generated_bitmap_list = [each for each in self.all_plots if each != None]
 
@@ -315,6 +301,7 @@ class ProjectionPlotGroup(PlotGroup):
         self.density = float(plot_group_key[2])
         self.shape = (0,0)
 	self.situate = False
+
         super(ProjectionPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,
                                                    plot_list,**params)
 	
@@ -391,13 +378,10 @@ class ProjectionPlotGroup(PlotGroup):
         Generate the bitmap lists.
         """            
         bitmap_list = []
-        if isinstance(self.plot_list,types.ListType):
-            self.debug('Static plotgroup')
-            self.all_plots = flatten(self.plot_list) + self.added_list
-        else:       # Assume it's a callable object that returns a list.
-            self.debug('Dynamic plotgroup')
-            self.all_plots = flatten(self.plot_list()) + self.added_list
-            self.debug('all_plots = ' + str(self.all_plots))
+      
+	self.debug('Dynamic plotgroup')
+	self.all_plots = flatten(self.plot_list()) + self.added_list
+	self.debug('all_plots = ' + str(self.all_plots))
 
         generated_bitmap_list = [each for each in self.all_plots if each !=None]
         return generated_bitmap_list

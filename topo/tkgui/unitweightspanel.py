@@ -123,10 +123,6 @@ class UnitWeightsPanel(CFSheetPlotPanel):
 
         # self.situate is defined in the super class CFSheetPlotPanel
         self.pe_group.situate = self.situate
-        
-        ### JCALERT: Hack temporary
-	self.pe_group.plot_list=self.pe_group.initialize_plot_list(plot_list=[])
-       
 
 
     def display_labels(self):
