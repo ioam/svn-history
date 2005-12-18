@@ -145,7 +145,8 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 
         ### 'Edit patterns in' boxes
         #
-        # CEBHACKALERT: don't want these boxes up so high on window, should be lower
+        # CEBHACKALERT: don't want these boxes up so high on window, should be lower.
+        # Also, boxes are in the wrong order (need to match the plots).
         self.__input_box = Pmw.RadioSelect(parent, labelpos = 'w',
                                 command = self._input_change,label_text = 'Apply to pattern in:',
                                 frame_borderwidth = 2,frame_relief = 'ridge',
