@@ -289,7 +289,7 @@ class EditorProjection(EditorConnection) :
 			x2, y2 = posFrom
 			self.id = (self.canvas.create_line(x1,y1,x2-10,y2, fill = col),
 				   self.canvas.create_line(x1,y1,x2+10,y2, fill = col),
-				   self.canvas.create_oval(x2-10,y2-5,x2+10,y2+5, fill = col))
+				   self.canvas.create_oval(x2-10,y2-5,x2+10,y2+5))
 		else :
 			# create a line between the nodes - use 2 to make arrow in centre.
 	    		self.id = (self.canvas.create_line(posFrom, mid , arrow = LAST, fill = col),
