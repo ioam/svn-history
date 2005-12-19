@@ -118,7 +118,10 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         
 
         # Set initial PatternGenerator to PatternGeneratorParameter.default
-        self.__current_pattern_generator = (generator_sheet_params['input_generator'].default)()
+        # 
+        assert isinstance(generator_sheet_params['input_generator'].default,topo.base.patterngenerator.PatternGenerator) #CEBHACKALERT: and if that isn't to be True, this file might need changing (check that)
+        self.__current_pattern_generator = generator_sheet_params['input_generator'].default
+        
         self.__current_pattern_generator_name = StringVar()
         # CEBHACKALERT: you can set the current pg from the name in a better way
         for (pg_name,pg) in self.pattern_generators.items():

@@ -146,7 +146,7 @@ input_bounds = BoundingBox(points=((-RN/(BaseRN*area_scale)/2.0,-RN/(BaseRN*area
 GaussianGenerator.bounds = input_bounds
 
 
-PatternGeneratorParameter.default=GaussianGenerator
+PatternGeneratorParameter.default=GaussianGenerator()
 
 
 # LISSOM parameters

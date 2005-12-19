@@ -44,7 +44,7 @@ LineGenerator.thickness = 0.02
 LineGenerator.bounds = BoundingBox(points=((-1.05,-0.8),(1.05,0.8)))
 
 
-PatternGeneratorParameter.default=LineGenerator
+PatternGeneratorParameter.default=LineGenerator()
 
 # cortical sheet
 CFSOM.density = 10
