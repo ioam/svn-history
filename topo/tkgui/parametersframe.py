@@ -178,11 +178,18 @@ class ParametersFrame(Frame):
                         raise AttributeError
                     
                     # a Number with softbounds gets a slider
+                    # CEBHACKALERT: revert to previous behaviour for DynamicNumber
+                    # until we figure out how to do it properly.
+                    if isinstance(parameter, topo.base.parameter.DynamicNumber):
+                        v = parameter.default
+                    else:
+                        v = getattr(self.topo_obj,parameter_name)
+                        
                     widget_dict[parameter_name] = self.__add_slider(
                         parameter_name,
                         str(low_bound),
                         str(high_bound),
-                        getattr(self.topo_obj,parameter_name))
+                        v)
 
                 except AttributeError:
                     # a Number with no softbounds gets a textbox that can translate
