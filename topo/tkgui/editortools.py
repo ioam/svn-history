@@ -7,6 +7,7 @@ $Id$
 __version__='$Revision$'
 
 from Tkinter import *
+import Pmw
 from editorobjects import EditorSheet, EditorProjection
 import topo.sheets
 from topo.sheets import *
@@ -34,7 +35,7 @@ class ArrowTool(Frame) :
 	self.titleLabel.bind('<Button-1>', self.changeMode)
 	self.titleLabel.pack()
 	# arrow icon
-	self.icon = Canvas(self, bg = 'light grey', width = 35, height = 30, bd = 0)
+	self.icon = Canvas(self, bg = 'light grey', width = 35, height = 30)
 	self.icon.create_polygon(10,0, 10,22, 16,17, 22,29, 33,22, 25,13, 33,8, 
 						fill = 'black', outline = 'white')
 	self.icon.pack()
@@ -75,30 +76,25 @@ class NodeTool(Frame) :
 	# super constructor call.
 	Frame.__init__(self, parent, bg = 'light grey', bd = 2, relief = GROOVE)
 	self.canvas = canvas # hold canvas reference.
-	# label sets canvas mode.
-	self.titleLabel = Label(self, text="Object:", bg ='light grey')
-	self.titleLabel.bind('<Button-1>', self.changeMode)
-	self.titleLabel.pack()
+	# pack in toolbar at top and fill out in X direction
+	self.pack(side = TOP, fill = X)
 	# gets list of all the available sheets.
 	self.sheetList = self.getSheetList()
 	sheetList = self.sheetList.keys()
-	# sets up a reference to the string associated with the current menu selection.
-	self.currentOp = StringVar()
-	self.currentOp.set(sheetList[0])
 	# populate the menu with the available sheet list.
-	self.opMenu = apply(OptionMenu, (self, self.currentOp) + tuple(sheetList))
-	self.opMenu.config(bg = 'light grey')
+	self.opMenu = Pmw.ComboBox(self, label_text = 'Sheet :', labelpos = 'nw',
+				   selectioncommand = self.setOption, scrolledlist_items = sheetList)
 	self.opMenu.pack()
 	self.opMenu.bind('<Button-1>', self.changeMode)
-	# pack in toolbar at top and fill out in X direction; click changes canvas mode
-	self.pack(side = TOP, fill = X)
-	self.bind('<Button-1>', self.changeMode)
+	# select the initial selection
+	self.opMenu.selectitem(sheetList[0])
+	self.currentOp = sheetList[0]
 
      ####### Focus Methods ####################################################
 	
-     def changeMode(self, event) :
+     def changeMode(self, option) :
 	# changes the EditorCanvas mode to 'MAKE'
-	self.canvas.changeMode('m') 
+	self.canvas.changeMode('m')
 
      def setFocus(self, focus) :
 	# change the background highlight to reflect whether this toolbar item is selected or not
@@ -106,18 +102,14 @@ class NodeTool(Frame) :
 		col = 'dark grey'
 	else :
 		col = 'light grey'
-		
 	self.config(bg = col)
 	self.opMenu.config(bg = col)
-	self.titleLabel.config(bg = col)
 
      ####### Node Methods ###################################################
 
      def createNode(self, x, y) :
-	# get the current selection
-	curOp = self.currentOp.get()
-	# create the new topo object
-	sheet = self.sheetList[curOp]()
+	# get the current selection and create the new topo object
+	sheet = self.sheetList[self.currentOp]()
 	# create the cover for the sheet and return it.
 	return EditorSheet(self.canvas, sheet, (x, y), sheet.name)
 
@@ -125,6 +117,10 @@ class NodeTool(Frame) :
      def getSheetList(self ) :	
 	# find all subclasses of Sheet defined in topo/sheets
 	return find_classes_in_package(topo.sheets, Sheet)
+
+     def setOption(self, option) :
+	self.currentOp = option
+	self.changeMode(None)
 
 ###############################################################################
 
@@ -145,26 +141,19 @@ class ConTool(Frame) :
 	# super constructor call.
 	Frame.__init__(self, parent, bg = 'light grey', bd = 2, relief = GROOVE)
 	self.canvas = canvas # hold canvas reference.
+	# pack in toolbar at top and fill out in X direction
+	self.pack(side = TOP, fill = X)
 	# gets list of all the available projections.
 	self.projList = self.getProjList()
 	projList = self.projList.keys() # gets the class names.
-	# label sets canvas mode.
-	self.titleLabel = Label(self, text = "Connect:", bg = 'light grey')
-	self.titleLabel.pack()
-	self.titleLabel.bind('<ButtonRelease-1>', self.changeMode)
-	# sets up a reference to the string associated with the current menu selection.
-	self.currentOp = StringVar()
-	self.currentOp.set(projList[0])
 	# populate the menu with the available projection list.
-	self.opMenu = apply(OptionMenu, (self, self.currentOp) + tuple(projList))
-	self.opMenu.config(bg = 'light grey')
+	self.opMenu = Pmw.ComboBox(self, label_text = 'Projections :', labelpos = 'nw',
+				   selectioncommand = self.setOption, scrolledlist_items = projList)
+	self.opMenu.bind('<Button-1>', self.changeMode)
 	self.opMenu.pack()
-	self.opMenu.bind('<Button-1>', self.changeMode) # menu sets canvas mode.
-	self.width = 200
-	self.height = 100
-	# pack in toolbar at top and fill out in X direction; click changes canvas mode
-	self.pack(side = TOP, fill = X)
-	self.bind('<Button-1>', self.changeMode)
+	# select the initial selection
+	self.opMenu.selectitem(projList[0])
+	self.currentOp = projList[0]
 
      ########## Canvas Topo Linking Methods #########################################
 
@@ -179,13 +168,16 @@ class ConTool(Frame) :
 	sim = self.canvas.simulator
 	node1 = edCon.nodeFrom.sheet
 	node2 = node.sheet
-	conType = self.projList[self.currentOp.get()]
+	conType = self.projList[self.currentOp]
 	con = sim.connect(node1, node2, connection_type = conType)
 	edCon.connect(node, con)
+     
+     def setOption(self, option) :
+	self.currentOp = option
+	self.changeMode(None)
 
      ########## Focus Methods #######################################################
-	
-     def changeMode(self, event) :
+     def changeMode(self, option) :
 	# changes the EditorCanvas mode to 'CONNECTION'
 	self.canvas.changeMode('c') 
 
@@ -198,7 +190,6 @@ class ConTool(Frame) :
 	
 	self.config(bg = col)
 	self.opMenu.config(bg = col)
-	self.titleLabel.config(bg = col)
 
      ########### Util Methods ########################################################
      def getProjList(self ) :
