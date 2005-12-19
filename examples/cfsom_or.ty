@@ -15,7 +15,7 @@ __version__='$Revision$'
 import random
 
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.sheet import BoundingBox
+from topo.base.boundingregion import BoundingBox
 from topo.base.connectionfield import CFProjection
 from topo.base.parameter import DynamicNumber
 from topo.sheets.cfsom import CFSOM
