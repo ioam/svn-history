@@ -26,8 +26,6 @@ class EditorCanvas(Canvas) :
     def __init__(self, root = None, width = 600, height = 600) :
         # Superclass call
         Canvas.__init__(self, root, width = width, height = height, bg = "white", bd = 2, relief = SUNKEN)
-	# give focus (mainly to listen for key presses)
-	self.focus_set()
 	self.curObj = None
 	self.curCon = None
 	self.focus = None
@@ -274,6 +272,7 @@ class EditorCanvas(Canvas) :
 	return sim
 
 
+
 ####################################################################
 
 class ModelEditor :
@@ -282,6 +281,7 @@ class ModelEditor :
     editing canvas and inserts the three-option toolbar in a Frame along the left side of the
     window. 
     """
+
     def __init__(self):
 	# editor window
 	root = Tk()
@@ -290,7 +290,6 @@ class ModelEditor :
 	# create a GUICanvas and place it in a frame
 	canvFrame = Frame(root, bg = 'white')
 	canvas = EditorCanvas(canvFrame)
-
 	# create the three toolbar items and place them into a frame
 	frame = Frame(root, bg = 'light grey')
 	arrbar = ArrowTool(canvas, frame) # movement arrow toolbar item
@@ -300,3 +299,48 @@ class ModelEditor :
 	canvas.pack(fill = BOTH, expand = YES) # pack the canvas and allow it to be expanded
 	canvFrame.pack(fill = BOTH, expand = YES) # pack the canvas frame into the window; expandable
 	canvas.setToolBars(arrbar, conbar, objbar) # give the canvas a reference to the toolbars
+	# give the canvas focus 
+	canvas.focus_set()
+	self.canvas = canvas
+	self.importModel()
+
+    def importModel(self) :
+	from topo.base.sheet import Sheet
+	from topo.base.projection import Projection
+	from editorobjects import EditorSheet, EditorProjection
+
+	# used for generating random positions if a topo sheet has no gui coords
+	from random import Random, random
+	randGen = Random() 
+	minDis = 75; maxScale = 500
+
+	sim = self.canvas.simulator
+	nodeDict = sim.objects(Sheet)
+	nodeList = nodeDict.values()
+	# create the editor covers for the nodes
+	for node in nodeList :
+		dictEnts = node.__dict__.keys()
+		if (('guiX' in dictEnts) and ('guiY' in dictEnts)) :
+			x, y = node.guiX, node.guiY
+		else :
+			x = minDis + randGen.random() * maxScale 
+			y = minDis + randGen.random() * maxScale
+		guiNode = EditorSheet(self.canvas, node, (x, y), node.name)
+		self.canvas.addObject(guiNode)
+	# create the editor covers for the connections
+	for guiNode in self.canvas.objectList :
+		node = guiNode.sheet
+		for conList in node.out_connections.values() :
+			for con in conList :
+				guiCon = EditorProjection("", self.canvas, guiNode)
+				guiNode.attatchCon(guiCon, guiCon.FROM)
+				for guiNDest in self.canvas.objectList :
+					if (guiNDest.sheet == con.dest) :
+						dest = guiNDest
+						break
+				else :
+					print "Incomplete connection : ", con
+				guiCon.connect(dest, con)
+				dest.attatchCon(guiCon, guiCon.TO)
+				dest.draw()
+		guiNode.draw()
