@@ -1,5 +1,5 @@
 """
-Topographica Bitmap Class
+Topographica Bitmap Class.
 
 Encapsulates the PIL Image class so that an input matrix can be displayed
 as a bitmap image without needing to know about PIL proper.
@@ -11,27 +11,10 @@ HSVBitmap    - 3 2D Matrices, Color (H), Confidence (S), Strength (V)
 RGBBitmap    - 3 2D Matrices, Red, Green, Blue Channels.
 
 All maps are assumed to be normalized to 1.  Matrices are passed in as
-part of the constructor and the image is generaed.
+part of the constructor and the image is generaed.  For more information,
+see the documentation for each of the Bitmap classes.
 
 The encapsulated PIL Image is accessible through the .bitmap attribute.
-
----
-Creating new Bitmaps:
-
-bitmap1 = PaletteBitmap(inArray,palette)
-    inArray: 2D Array
-    palette: 768 integers (3x256 of RGB ranged 0-255).
-
-bitmap3 = RGBBitmap(rMapArray,gMapArray,bMapArray)
-    Three matrices that are combined into one image, where each matrix
-    represents a different color channel.
-    3 matrices expected, each should have been normalized to 1.
-
-bitmap4 = HSVBitmap(hMapArray,sMapArray,vMapArray)
-    HSV Map inputs, converts to RGB image.
-    3 matrices expected, each should have been normalized to 1.
-
-The constructed Image is then in [BitmapObject].bitmap.
 
 $Id$
 """
@@ -45,7 +28,8 @@ import Numeric, Image, math
 from topo.base.parameter import Parameter
 from topo.base.topoobject import TopoObject
 
-### TO DO: - Update the test file.
+### JCALERT: To do:
+###        - Update the test file.
 ###        - Write PaletteBitmap when the Palette class is fixed
 ###        - Get rid of view_info
 ###        - Get rid of accessing function (copy, show...), though it is not crucial.
@@ -75,7 +59,6 @@ class Bitmap(TopoObject):
         self.view_info = {}
 
 
-    ### JABALERT: Should presumably be deleted, if bitmap stays public.
     def copy(self):
         """
         Return a copy of the encapsulated image so the original is
@@ -84,14 +67,12 @@ class Bitmap(TopoObject):
         return self.image.copy()
     
 
-    ### JABALERT: Should presumably be deleted, if bitmap stays public.
     def show(self):
         """
         Renaming of Image.show() for the Bitmap.bitmap attribute.
         """
         self.image.show()
 
-    ### JABALERT: Should presumably be deleted, if bitmap stays public.
     def width(self): return self.image.size[0]
     def height(self): return self.image.size[1]
 
@@ -191,7 +172,11 @@ class HSVBitmap(Bitmap):
         rmat = Numeric.array(hMapArray,Numeric.Float)
         gmat = Numeric.array(sMapArray,Numeric.Float)
         bmat = Numeric.array(vMapArray,Numeric.Float)
-        
+
+        # Note: should someday file a feature request for PIL
+        # for them to accept an image of type 'HSV', so that
+        # they will do this conversion themselves, without us
+        # needing an explicit loop here.
         for j in range(shape[0]):
             for i in range(shape[1]):
                 rgb = hsv_to_rgb(rmat[j,i],gmat[j,i],bmat[j,i])

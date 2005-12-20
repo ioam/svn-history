@@ -45,7 +45,7 @@ def make_plot(channels,sheet_view_dict,density=None,
          if plot.bitmap != None:
 	     return plot
      
-     #TopoObject(name="make_plot").verbose('No plot defined')
+     TopoObject(name="make_plot").verbose('No',name,'plot constructed for this Sheet')
      return None
 
 
@@ -93,12 +93,6 @@ class Plot(TopoObject):
         name (which is inherited from TopoObject) specifies the name
         to use for this plot.
         """
-
-        ### JABHACKALERT: In the channels documentation, used to say
-        ### 'None is also possible if the Plot is only built from one
-        ### or two SheetViews'.  Is that a useful case?  Seems simpler
-        ### to just have a default template that we can use in such
-        ### cases, if they arise.
 
         super(Plot,self).__init__(**params) 
        
@@ -197,18 +191,21 @@ class Plot(TopoObject):
      
     def _get_shape_and_boxes(self,matrices,boxes):
 	"""
-	Sub-function used by plot: get the shape of the matrix that corresponds 
-        to  the smallest sheetview matrix contained in matrices.
-        Also get the box corresponding to this same sheetview (slicing_box), and the box
-        of the larger one (outer_box). 
+	Sub-function used by plot: get the shape of the matrix that
+        corresponds to the smallest sheetview matrix contained in
+        matrices.  Also get the box corresponding to this same
+        sheetview (slicing_box), and the box of the larger one
+        (outer_box).
      
-        e.g. for coloring Weight matrix with a preference sheetview, we need to slice
-        the preference matrix region that corresponds to the weight matrix. shape,
-        slicing_box and outer_box are used for this purpose.
+        For instance, for coloring Weight matrix with a preference
+        sheetview, we need to slice the preference matrix region that
+        corresponds to the weight matrix. shape, slicing_box and
+        outer_box are used for this purpose.
     	"""
         ### JCALERT! Think about a best way to catch the shape...
         ### also it should raise an Error if the shape is different for 
         ### the three matrices!
+        ### JABALERT: Should use BoundingBoxIntersection to compute the intersection.
  	l_shape = []
 	l_box = []
 	for mat,box in zip(matrices,boxes):
@@ -229,6 +226,7 @@ class Plot(TopoObject):
         return shape,slicing_box,outer_box
 
 
+    # JABALERT: Is there some reason not to remove this?  If so, document.
     def _slice_matrix(self,matrix,shape,slicing_box,outer_box,density):
 	"""
         Private plot routine that given a matrix, a shape, a slicing_box,
@@ -340,12 +338,6 @@ class SHCPlot(Plot):
 	if normalize and max_s>0:
 	    s = divide(s,float(max_s))
 
-        ### JCALERT! I think we need that here (it is not anymore caught from bitmap). Ask Jim
-        ### Lead to a bug in testpattern (Disk) but maybe because of a problem in testpattern... 
-       #  if not max(s.flat)<=1.0:
-#              self.warning('arrayToImage failed to Normalize.  Possible NaN.  Using blank matrix.')
-#              self.zeros
-
         # This translation from SHC to HSV is valid only for black backgrounds;
         # it will need to be extended also to support white backgrounds.
 	hue,sat,val=h,c,s
@@ -357,10 +349,8 @@ class RGBPlot(Plot):
   """
   Bitmap plot based on Red, Green, and Blue matrices.
   
-  Not yet implemented.
-
-  When implemented, construct an RGB (red, green, and blue) plot from
-  the Red, Green, and Blue channels.
+  Construct an RGB (red, green, and blue) plot from the Red, Green,
+  and Blue channels.
   """
   def __init__(self,channels,sheet_view_dict,density,
                  plot_bounding_box,normalize,situate,**params):
@@ -406,10 +396,11 @@ class RGBPlot(Plot):
 
   def __make_rgb_matrices(self, rgb_matrices,shape,normalize):
 	""" 
-	Sub-function of plot() that return the h,s,v matrices corresponding 
-	to the current matrices in sliced_matrices_dict. The shape of the matrices
-        in the dict is passed, as well as the normalize boolean parameter.
-	The result specified a bitmap in hsv coordinate.
+	Sub-function of plot() that return the h,s,v matrices
+	corresponding to the current matrices in
+	sliced_matrices_dict. The shape of the matrices in the dict is
+	passed, as well as the normalize boolean parameter.  The
+	result specified a bitmap in hsv coordinate.
     
         Applies normalizing and cropping if required.
 	"""
@@ -421,10 +412,8 @@ class RGBPlot(Plot):
 	if r is None: r=zero 
 	if g is None: g=zero 
 	if b is None: b=zero 
-	
-        ### JCALERT! Also implement for the BlackBackground case...
 
-        ### JCALERT! What about Normalize fro RGB Plot?
+        ### JCALERT! Should normalize all of them if normalize is on
 
 	return (r,g,b)
    
@@ -448,6 +437,6 @@ class PalettePlot(Plot):
       super(PalettePlot,self).__init__(channels,sheet_view_dict,density, 
 				   plot_bounding_box,normalize,situate,**params)
 
-      ### JABALERT: To implement the class: If Strength is present,
+      ### JABHACKALERT: To implement the class: If Strength is present,
       ### ask for Palette if it's there, and make a PaletteBitmap.
 

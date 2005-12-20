@@ -155,6 +155,8 @@ class Unbounded(BoundingRegion):
 ### logical AND of the contains() for each of the regions supplied.
 ### Scale, rotate, and translate would also need to be applied to the
 ### individual regions each time.
+### Could be simpler to write this as a function, because it just
+### ends up with a simple BoundingBox after construction.
 class BoundingBoxIntersection(BoundingBox):
     """A BoundingBox initialized as the intersection of the supplied list of BoundingBoxes."""
     
@@ -171,6 +173,9 @@ class BoundingBoxIntersection(BoundingBox):
         right = min([r for (l,b,r,t) in bounds])
         top = min([t for (l,b,r,t) in bounds])
 
+        # JABHACKALERT: Why is this one __aarect, and BoundingBox
+        # _aarect?  Probably should change this one to _aarect and
+        # eliminate aarect(self).
         self.__aarect = AARectangle((left,bottom),(right,top))
 
     def aarect(self):

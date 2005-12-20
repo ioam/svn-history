@@ -22,8 +22,8 @@ from topo.base.connectionfield import CFSheet
 from plot import Plot, make_plot
 import bitmap
 
-### JABALERT: This constant should be removed for now, though it may
-### be reinstated some day.
+### JABALERT: This constant (and PlotGroup.shape) should be removed
+### for now, though it may be reinstated some day.
 FLAT = 'FLAT'
 
 def sort_plots(plot_list):
@@ -72,8 +72,20 @@ class PlotGroup(TopoObject):
         
         self.plot_group_key = plot_group_key
         self.bitmaps = []
-        self.template = template
 
+        ### JABALERT: This class hierarchy would be simpler to
+        ### understand if all the template, lambda, sheet_name,
+        ### etc. stuff moves to BasicPlotGroup, which would be renamed
+        ### to TemplatePlotGroup.  That way the base class PlotGroup
+        ### would be simple -- just working with a static list of
+        ### plots, using a member function like plots() (a merger of
+        ### initialize_plot_list() and the current plots()) that for a
+        ### PlotGroup returns the static list, but for a
+        ### TemplatePlotGroup generates the list anew each time, based
+        ### on the template.
+        
+        self.template = template
+        
 	# If no sheet_name is defined, the sheet_filter_lam accepts all sheets
         if sheet_name:
 	    self.sheet_filter_lam = lambda s: s.name == sheet_name
@@ -200,6 +212,8 @@ class BasicPlotGroup(PlotGroup):
         ### JCALERT! Normalize should be directly get from plot_channels in Plot instead of here
         ### Same thing in UnitWeight and Projection PlotGroup.
         n = pt.get('Normalize',False)
+        ### JABALERT: The newline should not be in the plot_name
+        ### itself, but somewhere where it's eventually formatted.
 	plot_name = '\n'+pt_name
         p = make_plot(plot_channels,sheet.sheet_view_dict,sheet.density,sheet.bounds,n,False,name=plot_name)
 	return [p]
@@ -208,16 +222,17 @@ class BasicPlotGroup(PlotGroup):
 
 class UnitWeightsPlotGroup(PlotGroup):
     """
-    PlotGroup for Weights UnitViews
+    PlotGroup for Weights UnitViews.  
+
+    Attributes:
+      x: x-coordinate of the unit to plot
+      y: y-coordinate of the unit to plot
+      situate: Whether to situate the plot on the full source sheet, or just show the weights.
     """
 
     def __init__(self,simulator,template,plot_group_key,sheet_filter_lam,plot_list,**params):
-                                                     
         self.x = float(plot_group_key[2])
         self.y = float(plot_group_key[3])
-
-        # Decides wether the plots of the UnitWeightPlotGroup are situated on
-        # a plot of the full source sheet, or not.
       	self.situate = False
         
 	super(UnitWeightsPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,plot_list,
@@ -272,6 +287,7 @@ class ProjectionPlotGroup(PlotGroup):
        
         self.weight_name = plot_group_key[1]
         self.density = float(plot_group_key[2])
+        # JABALERT: Should probably rename this because there is a shape in PlotGroup also.
         self.shape = (0,0)
 	self.situate = False
 

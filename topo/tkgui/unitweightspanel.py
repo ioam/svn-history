@@ -69,6 +69,10 @@ class UnitWeightsPanel(CFSheetPlotPanel):
             return False
 
 
+    ### JABALERT: This looks like too much intelligence to include in
+    ### the GUI code; this function should probably just be calling a
+    ### PlotGroup (or subclass) function to generate the key.  This
+    ### file should have only GUI-specific stuff.
     def generate_plot_group_key(self):
         """
         The plot_group_key for the UnitWeightsPanel will change depending on the
