@@ -110,11 +110,13 @@ class NodeTool(Frame) :
      def createNode(self, x, y) :
 	# get the current selection and create the new topo object
 	sheet = self.sheetList[self.currentOp]()
+	sim = self.canvas.simulator # get the current simulator
+	sim.add(sheet)
 	# create the cover for the sheet and return it.
 	return EditorSheet(self.canvas, sheet, (x, y), sheet.name)
 
      ####### Util Methods #####################################################
-     def getSheetList(self ) :	
+     def getSheetList(self) :	
 	# find all subclasses of Sheet defined in topo/sheets
 	return find_classes_in_package(topo.sheets, Sheet)
 
