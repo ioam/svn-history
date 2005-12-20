@@ -137,8 +137,8 @@ GaussianGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds
 GaussianGenerator.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
 
 # Corrects for differences between C++ and Topographica definition of Gaussian.
-gaussian_width = xsigma/RN/sqrt(2)
-gaussian_height = ysigma/RN/sqrt(2)
+gaussian_width = xsigma/BaseRN/sqrt(2)
+gaussian_height = ysigma/BaseRN/sqrt(2)
 GaussianGenerator.size = gaussian_height
 GaussianGenerator.aspect_ratio = gaussian_width/gaussian_height
 input_bounds = BoundingBox(points=((-RN/(BaseRN*area_scale)/2.0,-RN/(BaseRN*area_scale)/2.0),
@@ -153,7 +153,7 @@ PatternGeneratorParameter.default=GaussianGenerator()
 LISSOM.density = BaseN
 
 # Connection parameters
-afferent_weight_bounds   = BoundingBox(points=((-rf_radius/RN,-rf_radius/RN),(rf_radius/RN,rf_radius/RN)))
+afferent_weight_bounds   = BoundingBox(points=((-rf_radius/BaseRN,-rf_radius/BaseRN),(rf_radius/BaseRN,rf_radius/BaseRN)))
 excitatory_weight_bounds = BoundingBox(points=((-exc_rad/BaseN,-exc_rad/BaseN),(exc_rad/BaseN,exc_rad/BaseN)))
 inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(inh_rad/BaseN,inh_rad/BaseN)))
 
