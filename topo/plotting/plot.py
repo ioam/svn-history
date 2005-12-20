@@ -252,8 +252,13 @@ class Plot(TopoObject):
     ### outer box. Otherwise there will be an error.
     def _situate_plot(self,hue,sat,val,outer_box,slicing_box,density):
 
-	shape = bounds2shape(outer_box,density)
-	r1,r2,c1,c2 = bounds2slice(slicing_box,outer_box,density)
+        left,bottom,right,top = outer_box.aarect().lbrt()
+        xdensity = int(density*(right-left)) / float((right-left))
+        ydensity = int(density*(top-bottom)) / float((top-bottom))
+
+	shape = bounds2shape(outer_box,xdensity,ydensity)
+
+	r1,r2,c1,c2 = bounds2slice(slicing_box,outer_box,xdensity,ydensity)
         ### raise an error when r2-r1 > shape[1] or c2=c1 > shape[0]
 	h = zeros(shape,Float)
 	h[r1:r2,c1:c2] = hue

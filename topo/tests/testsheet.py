@@ -59,7 +59,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         """
         x_center = self.left+(self.right-self.left)/2.0
         y_center = self.bottom+(self.top-self.bottom)/2.0
-        row, col = sheet2matrix(x_center,y_center,self.box,self.density)
+        row, col = sheet2matrix(x_center,y_center,self.box,self.xdensity,self.ydensity)
         self.assertEqual((row,col),(self.rbound/2.0,self.cbound/2.0))
 
 
@@ -68,7 +68,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         Check that the top-left of the Sheet is [0,0] in matrix
         coordinates.
         """
-        row, col = sheet2matrix(self.left,self.top,self.box,self.density)
+        row, col = sheet2matrix(self.left,self.top,self.box,self.xdensity,self.ydensity)
         self.assertEqual((row,col),(0,0))
 
 
@@ -77,7 +77,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         Check that the bottom-right of the Sheet is [rbound,cbound] in matrix
         coordinates.
         """
-        row, col = sheet2matrix(self.right,self.bottom,self.box,self.density)
+        row, col = sheet2matrix(self.right,self.bottom,self.box,self.xdensity,self.ydensity)
         self.assertEqual((row,col),(self.rbound,self.cbound))
 
         
@@ -86,13 +86,13 @@ class TestCoordinateTransforms(unittest.TestCase):
         Check that matrix2sheet() is the inverse of sheet2matrix().
         """
         # top-right corner
-        row, col = sheet2matrix(self.right,self.top,self.box,self.density)
-        x_right, y_top = matrix2sheet(row,col,self.box,self.density)
+        row, col = sheet2matrix(self.right,self.top,self.box,self.xdensity,self.ydensity)
+        x_right, y_top = matrix2sheet(row,col,self.box,self.xdensity,self.ydensity)
         self.assertEqual((x_right,y_top),(self.right,self.top)) 
 
         # bottom-left corner
-        row, col = sheet2matrix(self.left,self.bottom,self.box,self.density)
-        x_left, y_bottom = matrix2sheet(row,col,self.box,self.density)
+        row, col = sheet2matrix(self.left,self.bottom,self.box,self.xdensity,self.ydensity)
+        x_left, y_bottom = matrix2sheet(row,col,self.box,self.xdensity,self.ydensity)
         self.assertEqual((x_left,y_bottom),(self.left,self.bottom)) 
 
 
@@ -101,13 +101,13 @@ class TestCoordinateTransforms(unittest.TestCase):
         Check that sheet2matrix() is the inverse of matrix2sheet().
         """
         # top-right corner
-        x,y = matrix2sheet(float(0),float(self.last_col),self.box,self.density)
-        top_row,right_col = sheet2matrix(x,y,self.box,self.density)
+        x,y = matrix2sheet(float(0),float(self.last_col),self.box,self.xdensity,self.ydensity)
+        top_row,right_col = sheet2matrix(x,y,self.box,self.xdensity,self.ydensity)
         self.assertEqual((top_row,right_col),(float(0),float(self.last_col))) 
 
         # bottom-left corner
-        x,y = matrix2sheet(float(self.last_row),float(0),self.box,self.density)
-        bottom_row,left_col = sheet2matrix(x,y,self.box,self.density)
+        x,y = matrix2sheet(float(self.last_row),float(0),self.box,self.xdensity,self.ydensity)
+        bottom_row,left_col = sheet2matrix(x,y,self.box,self.xdensity,self.ydensity)
         self.assertEqual((bottom_row,left_col),(float(self.last_row),float(0)))
 
         
@@ -121,12 +121,12 @@ class TestCoordinateTransforms(unittest.TestCase):
         # inside
         r,c = 0,0
         x,y = self.left,self.top
-        self.assertEqual(sheet2matrixidx(x,y,self.box,self.density), (r,c))
+        self.assertEqual(sheet2matrixidx(x,y,self.box,self.xdensity,self.ydensity), (r,c))
 
         # outside
         r,c = -1,-1
         x,y = self.just_out_left_x,self.just_out_top_y
-        self.assertEqual(sheet2matrixidx(x,y,self.box,self.density), (r,c))
+        self.assertEqual(sheet2matrixidx(x,y,self.box,self.xdensity,self.ydensity), (r,c))
 
 
     def test_sheet2matrixidx_left_bottom(self):
@@ -137,12 +137,12 @@ class TestCoordinateTransforms(unittest.TestCase):
         # inside
         r,c = self.last_row, 0
         x,y = self.left, self.just_in_bottom_y
-        self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
+        self.assertEqual(sheet2matrixidx(x,y,self.box,self.xdensity,self.ydensity),(r,c))
 
         # outside
         r,c = self.last_row+1, -1
         x,y = self.just_out_left_x, self.bottom
-        self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
+        self.assertEqual(sheet2matrixidx(x,y,self.box,self.xdensity,self.ydensity),(r,c))
 
 
     def test_sheet2matrixidx_right_top(self):
@@ -153,12 +153,12 @@ class TestCoordinateTransforms(unittest.TestCase):
         # inside
         r,c = 0,self.last_col
         x,y = self.just_in_right_x,self.top
-        self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
+        self.assertEqual(sheet2matrixidx(x,y,self.box,self.xdensity,self.ydensity),(r,c))
 
         # outside
         r,c = -1,self.last_col+1
         x,y = self.right,self.just_out_top_y
-        self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
+        self.assertEqual(sheet2matrixidx(x,y,self.box,self.xdensity,self.ydensity),(r,c))
 
 
     def test_sheet2matrixidx_right_bottom(self):
@@ -169,12 +169,12 @@ class TestCoordinateTransforms(unittest.TestCase):
         # inside 
         r,c = self.last_row,self.last_col
         x,y = self.just_in_right_x,self.just_in_bottom_y
-        self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
+        self.assertEqual(sheet2matrixidx(x,y,self.box,self.xdensity,self.ydensity),(r,c))
 
         # not inside
         r,c = self.last_row+1,self.last_col+1
         x,y = self.right,self.bottom
-        self.assertEqual(sheet2matrixidx(x,y,self.box,self.density),(r,c))
+        self.assertEqual(sheet2matrixidx(x,y,self.box,self.xdensity,self.ydensity),(r,c))
 
 
     ### matrix2sheet() tests
@@ -187,10 +187,10 @@ class TestCoordinateTransforms(unittest.TestCase):
         comes back to Sheet coordinates that are outside the
         BoundingBox.
         """
-        x,y = matrix2sheet(0,0,self.box,self.density)
+        x,y = matrix2sheet(0,0,self.box,self.xdensity,self.ydensity)
         self.assertEqual((x,y), (self.left,self.top))
 
-        x,y = matrix2sheet(self.just_out_left_idx,self.just_out_top_idx,self.box,self.density)
+        x,y = matrix2sheet(self.just_out_left_idx,self.just_out_top_idx,self.box,self.xdensity,self.ydensity)
         self.assertFalse(self.box.contains(x,y))
     
 
@@ -203,10 +203,10 @@ class TestCoordinateTransforms(unittest.TestCase):
         comes back to Sheet coordinates that are outside the
         BoundingBox.
         """
-        x,y = matrix2sheet(self.rbound,self.cbound,self.box,self.density)
+        x,y = matrix2sheet(self.rbound,self.cbound,self.box,self.xdensity,self.ydensity)
         self.assertEqual((x,y), (self.right,self.bottom))
 
-        x,y = matrix2sheet(self.just_out_right_idx,self.just_out_bottom_idx,self.box,self.density)
+        x,y = matrix2sheet(self.just_out_right_idx,self.just_out_bottom_idx,self.box,self.xdensity,self.ydensity)
         self.assertFalse(self.box.contains(x,y))
 
 
@@ -219,7 +219,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         y_center = self.bottom+(self.top-self.bottom)/2.0
         center_float_row = self.rbound/2.0
         center_float_col = self.cbound/2.0
-        x,y = matrix2sheet(center_float_row,center_float_col,self.box,self.density)
+        x,y = matrix2sheet(center_float_row,center_float_col,self.box,self.xdensity,self.ydensity)
         self.assertEqual((x,y),(x_center,y_center))
 
 
@@ -238,13 +238,13 @@ class TestCoordinateTransforms(unittest.TestCase):
         r,c = 0,0
         x,y = self.left+self.half_unit,self.top-self.half_unit
 
-        test_x, test_y = matrixidx2sheet(r,c,self.box,self.density)
+        test_x, test_y = matrixidx2sheet(r,c,self.box,self.xdensity,self.ydensity)
         self.assertEqual((test_x,test_y), (x,y))
         self.assertTrue(self.box.contains(test_x,test_y))
 
         # outside
         r,c = -1,-1
-        test_x, test_y = matrixidx2sheet(r,c,self.box,self.density)
+        test_x, test_y = matrixidx2sheet(r,c,self.box,self.xdensity,self.ydensity)
         self.assertFalse(self.box.contains(test_x,test_y))
         
         
@@ -259,11 +259,11 @@ class TestCoordinateTransforms(unittest.TestCase):
         # inside
         r,c = self.last_row,0
         x,y = self.left+self.half_unit,self.bottom+self.half_unit
-        self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))
+        self.assertEqual(matrixidx2sheet(r,c,self.box,self.xdensity,self.ydensity), (x,y))
 
         # outside
         r,c = self.last_row+1,-1
-        test_x, test_y = matrixidx2sheet(r,c,self.box,self.density)
+        test_x, test_y = matrixidx2sheet(r,c,self.box,self.xdensity,self.ydensity)
         self.assertFalse(self.box.contains(test_x,test_y))
 
         
@@ -278,11 +278,11 @@ class TestCoordinateTransforms(unittest.TestCase):
         # inside
         r,c = 0,self.last_col
         x,y = self.right-self.half_unit,self.top-self.half_unit
-        self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))
+        self.assertEqual(matrixidx2sheet(r,c,self.box,self.xdensity,self.ydensity), (x,y))
 
         # outside
         r,c = -1,self.last_col+1
-        test_x, test_y = matrixidx2sheet(r,c,self.box,self.density)
+        test_x, test_y = matrixidx2sheet(r,c,self.box,self.xdensity,self.ydensity)
         self.assertFalse(self.box.contains(test_x,test_y))
 
         
@@ -296,11 +296,11 @@ class TestCoordinateTransforms(unittest.TestCase):
         """
         r,c = self.last_row,self.last_col
         x,y = self.right-self.half_unit,self.bottom+self.half_unit
-        self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))
+        self.assertEqual(matrixidx2sheet(r,c,self.box,self.xdensity,self.ydensity), (x,y))
 
         # outside
         r,c = self.last_row+1,self.last_col+1
-        test_x, test_y = matrixidx2sheet(r,c,self.box,self.density)
+        test_x, test_y = matrixidx2sheet(r,c,self.box,self.xdensity,self.ydensity)
         self.assertFalse(self.box.contains(test_x,test_y))
 
 
@@ -313,20 +313,20 @@ class TestCoordinateTransforms(unittest.TestCase):
         x_center = self.left+(self.right-self.left)/2.0
         y_center = self.bottom+(self.top-self.bottom)/2.0
         x,y = x_center+self.half_unit, y_center-self.half_unit
-        self.assertEqual(matrixidx2sheet(r,c,self.box,self.density), (x,y))    
+        self.assertEqual(matrixidx2sheet(r,c,self.box,self.xdensity,self.ydensity), (x,y))    
 
     def test_matrixidx2sheet_sheet2matrixidx(self):
         """
         Check that sheet2matrixidx() is the inverse of matrix2sheetidx().
         """
         # top-right corner
-        x,y = matrixidx2sheet(float(0),float(self.last_col),self.box,self.density)
-        top_row,right_col = sheet2matrixidx(x,y,self.box,self.density)
+        x,y = matrixidx2sheet(float(0),float(self.last_col),self.box,self.xdensity,self.ydensity)
+        top_row,right_col = sheet2matrixidx(x,y,self.box,self.xdensity,self.ydensity)
         self.assertEqual((top_row,right_col),(float(0),float(self.last_col))) 
 
         # bottom-left corner
-        x,y = matrixidx2sheet(float(self.last_row),float(0),self.box,self.density)
-        bottom_row,left_col = sheet2matrixidx(x,y,self.box,self.density)
+        x,y = matrixidx2sheet(float(self.last_row),float(0),self.box,self.xdensity,self.ydensity)
+        bottom_row,left_col = sheet2matrixidx(x,y,self.box,self.xdensity,self.ydensity)
         self.assertEqual((bottom_row,left_col),(float(self.last_row),float(0)))
 
     ### JC This test might have to be re-written
@@ -344,29 +344,29 @@ class TestCoordinateTransforms(unittest.TestCase):
 	bb = boundingregion.BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 
 	slice =(0,3,7,8)
-	bounds = slice2bounds(slice,bb,10)
-        test_slice = bounds2slice(bounds,bb,10)
+	bounds = slice2bounds(slice,bb,10,10)
+        test_slice = bounds2slice(bounds,bb,10,10)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(4,7,8,10)
-	bounds = slice2bounds(slice,bb,10)
-        test_slice = bounds2slice(bounds,bb,10)
+	bounds = slice2bounds(slice,bb,10,10)
+        test_slice = bounds2slice(bounds,bb,10,10)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(2,3,4,8)
-	bounds = slice2bounds(slice,bb,10)
-        test_slice = bounds2slice(bounds,bb,10)
+	bounds = slice2bounds(slice,bb,10,10)
+        test_slice = bounds2slice(bounds,bb,10,10)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(0,3,9,10)
-	bounds = slice2bounds(slice,bb,10)
-        test_slice = bounds2slice(bounds,bb,10)
+	bounds = slice2bounds(slice,bb,10,10)
+        test_slice = bounds2slice(bounds,bb,10,10)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
@@ -374,22 +374,22 @@ class TestCoordinateTransforms(unittest.TestCase):
 	bb = boundingregion.BoundingBox(points=((-0.75,-0.5),(0.75,0.5)))
 
 	slice =(9,14,27,29)
-	bounds = slice2bounds(slice,bb,20)
-        test_slice = bounds2slice(bounds,bb,20)
+	bounds = slice2bounds(slice,bb,20,20)
+        test_slice = bounds2slice(bounds,bb,20,20)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(0,6,0,7)
-	bounds = slice2bounds(slice,bb,20)
-        test_slice = bounds2slice(bounds,bb,20)
+	bounds = slice2bounds(slice,bb,20,20)
+        test_slice = bounds2slice(bounds,bb,20,20)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(6,10,11,29)
-	bounds = slice2bounds(slice,bb,20)
-        test_slice = bounds2slice(bounds,bb,20)
+	bounds = slice2bounds(slice,bb,20,20)
+        test_slice = bounds2slice(bounds,bb,20,20)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
@@ -397,15 +397,15 @@ class TestCoordinateTransforms(unittest.TestCase):
 	bb = boundingregion.BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 
 	slice =(4,7,2,3)
-	bounds = slice2bounds(slice,bb,7)
-        test_slice = bounds2slice(bounds,bb,7)
+	bounds = slice2bounds(slice,bb,7,7)
+        test_slice = bounds2slice(bounds,bb,7,7)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(0,7,0,7)
-	bounds = slice2bounds(slice,bb,7)
-        test_slice = bounds2slice(bounds,bb,7)
+	bounds = slice2bounds(slice,bb,7,7)
+        test_slice = bounds2slice(bounds,bb,7,7)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
@@ -419,7 +419,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         Check that the shape of the matrix based on the BoundingBox and
         density is correct.
         """
-        n_rows,n_cols = bounds2shape(self.box,self.density)
+        n_rows,n_cols = bounds2shape(self.box,self.xdensity,self.ydensity)
         self.assertEqual((n_rows,n_cols),(self.last_row+1,self.last_col+1))
 
 
@@ -453,33 +453,36 @@ class TestCoordinateTransforms(unittest.TestCase):
         """
         l,b,r,t = (-0.8,-0.8,0.8,0.8)
         density = 16
+        xdensity = int(density*(r-l)) / float(r-l)
+        ydensity = int(density*(t-b)) / float(t-b)
+
         bounds = BoundingBox(points=((l,b),(r,t)))
         
-        self.assertEqual(sheet2matrixidx(0.8,0.8,bounds,density),(0,24+1))
-        self.assertEqual(sheet2matrixidx(0.0,0.0,bounds,density),(12,12))
-        self.assertEqual(sheet2matrixidx(-0.8,-0.8,bounds,density),(24+1,0))
-        self.assertEqual(matrixidx2sheet(24,0,bounds,density),
+        self.assertEqual(sheet2matrixidx(0.8,0.8,bounds,xdensity,ydensity),(0,24+1))
+        self.assertEqual(sheet2matrixidx(0.0,0.0,bounds,xdensity,ydensity),(12,12))
+        self.assertEqual(sheet2matrixidx(-0.8,-0.8,bounds,xdensity,ydensity),(24+1,0))
+        self.assertEqual(matrixidx2sheet(24,0,bounds,xdensity,ydensity),
                          (((r-l) / int(density*(r-l)) / 2.0) + l,
                           (t-b) / int(density*(t-b)) / 2.0 + b))
-        self.assertEqual(matrixidx2sheet(0,0,bounds,density),
+        self.assertEqual(matrixidx2sheet(0,0,bounds,xdensity,ydensity),
                          (((r-l) / int(density*(r-l)) / 2.0) + l ,
                           (t-b) / int(density*(t-b)) * (int(density*(t-b)) - 0.5) + b))
 
-        x,y = matrixidx2sheet(0,0,bounds,density)
+        x,y = matrixidx2sheet(0,0,bounds,xdensity,ydensity)
         self.assertTrue(bounds.contains(x,y))
-        self.assertEqual((0,0),sheet2matrixidx(x,y,bounds,density))
+        self.assertEqual((0,0),sheet2matrixidx(x,y,bounds,xdensity,ydensity))
 
-        x,y = matrixidx2sheet(25,25,bounds,density)
+        x,y = matrixidx2sheet(25,25,bounds,xdensity,ydensity)
         self.assertFalse(bounds.contains(x,y))
-        self.assertNotEqual((24,24),sheet2matrixidx(x,y,bounds,density))
+        self.assertNotEqual((24,24),sheet2matrixidx(x,y,bounds,xdensity,ydensity))
 
-        x,y = matrixidx2sheet(0,24,bounds,density)
+        x,y = matrixidx2sheet(0,24,bounds,xdensity,ydensity)
         self.assertTrue(bounds.contains(x,y))
-        self.assertEqual((0,24),sheet2matrixidx(x,y,bounds,density))
+        self.assertEqual((0,24),sheet2matrixidx(x,y,bounds,xdensity,ydensity))
 
-        x,y = matrixidx2sheet(24,0,bounds,density)
+        x,y = matrixidx2sheet(24,0,bounds,xdensity,ydensity)
         self.assertTrue(bounds.contains(x,y))
-        self.assertEqual((24,0),sheet2matrixidx(x,y,bounds,density))
+        self.assertEqual((24,0),sheet2matrixidx(x,y,bounds,xdensity,ydensity))
 
 
 
@@ -497,6 +500,9 @@ class TestBox1Coordinates(TestCoordinateTransforms):
         self.right = 0.5
         self.density = 10
         self.half_unit = 0.05
+
+        self.xdensity = int(self.density*(self.right-self.left)) / float(self.right-self.left)
+        self.ydensity = int(self.density*(self.top-self.bottom)) / float(self.top-self.bottom)
 
         # for the matrix representation - I think having this manual statement is
         # safer than a calculation...
@@ -522,6 +528,9 @@ class TestBox2Coordinates(TestCoordinateTransforms):
         self.density = 8
         self.half_unit = 0.0625
 
+        self.xdensity = int(self.density*(self.right-self.left)) / float(self.right-self.left)
+        self.ydensity = int(self.density*(self.top-self.bottom)) / float(self.top-self.bottom)
+
         # for the matrix representation - I think having this manual statement is
         # safer than a calculation...
         self.last_row = 23
@@ -542,6 +551,9 @@ class TestBox3Coordinates(TestCoordinateTransforms):
         self.right = 0.8
         self.density = 16
         self.half_unit = 0.03125
+
+        self.xdensity = int(self.density*(self.right-self.left)) / float(self.right-self.left)
+        self.ydensity = int(self.density*(self.top-self.bottom)) / float(self.top-self.bottom)
 
         # for the matrix representation - I think having this manual statement is
         # safer than a calculation...

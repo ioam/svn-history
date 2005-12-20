@@ -29,9 +29,15 @@ class UniformRandomGenerator(PatternGenerator):
         r = params.get('rows',0)
         c = params.get('cols',0)
 
+        bounds = params.get('bounds',self.bounds)
+        density = params.get('density',self.density)
+
+        left,bottom,right,top = bounds.aarect().lbrt()
+        xdensity = int(density*(right-left)) / float((right-left))
+        ydensity = int(density*(top-bottom)) / float((top-bottom))
+
         if r == 0 and c == 0:
-            r,c = bounds2shape( params.get('bounds',self.bounds),
-                                params.get('density',self.density))
+            r,c = bounds2shape(bounds, xdensity, ydensity)
 
         offset_=params.get('offset',self.offset)
         scale_=params.get('scale',self.scale)

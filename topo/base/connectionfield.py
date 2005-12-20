@@ -26,7 +26,7 @@ from topoobject import TopoObject
 from projection import Projection,ProjectionSheet,Identity
 from parameter import Parameter, Number, BooleanParameter, Constant
 from arrayutils import mdot,divisive_normalization
-from sheet import Sheet, matrix2sheet,bounds2slice,bounds2shape,sheet2matrixidx,slicearray2bounds
+from sheet import Sheet,bounds2slice,bounds2shape,sheet2matrixidx,slicearray2bounds
 from sheetview import UnitView
 from itertools import chain
 from patterngenerator import ConstantGenerator
@@ -122,17 +122,17 @@ class ConnectionField(TopoObject):
         using the reversed function bounds2slice.
 	"""
 
-        rows,cols = bounds2shape(weights_bound_template,self.input_sheet.density)
+        rows,cols = bounds2shape(weights_bound_template,self.input_sheet.xdensity,self.input_sheet.ydensity)
 
         cr,cc = sheet2matrixidx(self.x, self.y,
-                                self.input_sheet.bounds, self.input_sheet.density)
+                                self.input_sheet.bounds, self.input_sheet.xdensity, self.input_sheet.ydensity)
 
         toprow = cr - rows/2
         leftcol = cc - cols/2
 
         maxrow,maxcol = sheet2matrixidx(self.input_sheet.bounds.aarect().right(),
                                  self.input_sheet.bounds.aarect().bottom(),
-                                 self.input_sheet.bounds,self.input_sheet.density)
+                                 self.input_sheet.bounds,self.input_sheet.xdensity,self.input_sheet.ydensity)
         maxrow = maxrow - 1
         maxcol = maxcol - 1
         rstart = max(0,toprow)
@@ -149,7 +149,7 @@ class ConnectionField(TopoObject):
 	self.set_slice_array(rstart, rbound, cstart, cbound)
 
 	# constructs and store the boundingbox corresponding to the slice.
-	self.bounds = slicearray2bounds(self.slice_array, self.input_sheet.bounds, self.input_sheet.density)
+	self.bounds = slicearray2bounds(self.slice_array, self.input_sheet.bounds, self.input_sheet.xdensity, self.input_sheet.ydensity)
 
     def get_input_matrix(self, activity):
         r1,r2,c1,c2 = self.slice_tuple()
@@ -324,6 +324,7 @@ class CFProjection(Projection):
         """
         super(CFProjection,self).__init__(**params)
         # set up array of ConnectionFields translated to each x,y in the src sheet
+        
         cfs = []
         for y in self.dest.sheet_rows()[::-1]:
             row = []

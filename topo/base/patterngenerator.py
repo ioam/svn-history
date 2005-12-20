@@ -109,14 +109,19 @@ class PatternGenerator(TopoObject):
         x is a 1d-array of x-axis values at which to sample the pattern;
         y contains the y-axis values.
         """       
+
+        left,bottom,right,top = bounds.aarect().lbrt()
+        xdensity = int(density*(right-left)) / float((right-left))
+        ydensity = int(density*(top-bottom)) / float((top-bottom))
+
         if r == 0 and c == 0:
-            rows,cols = bounds2shape(bounds,density)
+            rows,cols = bounds2shape(bounds,xdensity,ydensity)
         else:
             rows = r
             cols = c
 
-        y = array([matrixidx2sheet(r,0,bounds,density) for r in range(rows)])
-        x = array([matrixidx2sheet(0,c,bounds,density) for c in range(cols)])
+        y = array([matrixidx2sheet(r,0,bounds,xdensity,ydensity) for r in range(rows)])
+        x = array([matrixidx2sheet(0,c,bounds,xdensity,ydensity) for c in range(cols)])
 
         # x increases from left to right; y decreases from left to right.
         # For this function to make sense on its own, y should probably be
@@ -159,9 +164,15 @@ class ConstantGenerator(PatternGenerator):
         r = params.get('rows',0)
 	c = params.get('cols',0)
 
+        bounds = params.get('bounds',self.bounds)
+        density = params.get('density',self.density)
+
+        left,bottom,right,top = bounds.aarect().lbrt()
+        xdensity = int(density*(right-left)) / float((right-left))
+        ydensity = int(density*(top-bottom)) / float((top-bottom))
+
         if r == 0 and c == 0:
-            r,c = bounds2shape(params.get('bounds',self.bounds),
-                               params.get('density',self.density))
+            r,c = bounds2shape(bounds,xdensity,ydensity)
         return self.scale*ones((r,c), Float)+self.offset
 
 

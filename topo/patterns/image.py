@@ -33,7 +33,12 @@ def sheet2matrixidx_array(x,y,bounds,density):
     boundary will be just outside the matrix, because the right and
     bottom boundaries are exclusive.
     """
-    r,c = sheet2matrix(x,y,bounds,density)
+
+    left,bottom,right,top = bounds.aarect().lbrt()
+    xdensity = int(density*(right-left)) / float((right-left))
+    ydensity = int(density*(top-bottom)) / float((top-bottom))
+
+    r,c = sheet2matrix(x,y,bounds,xdensity,ydensity)
     r = floor(r)
     c = floor(c)
     return r, c
@@ -132,7 +137,12 @@ class TopoImage(TopoObject):
 
         Maybe it would be better to put image into Sheet and use BoundingBocol functions, etc.
         """
-        n_sheet_rows,n_sheet_cols = bounds2shape(bounds,density)
+
+        left,bottom,right,top = bounds.aarect().lbrt()
+        xdensity = int(density*(right-left)) / float((right-left))
+        ydensity = int(density*(top-bottom)) / float((top-bottom))
+
+        n_sheet_rows,n_sheet_cols = bounds2shape(bounds,xdensity,ydensity)
 
         # Initial image scaling (size_normalization)
         

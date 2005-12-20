@@ -100,7 +100,7 @@ from Numeric import zeros,array,floor
 from boundingregion import BoundingBox
 import sheetview 
 
-def sheet2matrix(x,y,bounds,density):
+def sheet2matrix(x,y,bounds,xdensity,ydensity):
     """
     Convert a point (x,y) in Sheet coordinates to continuous matrix
     coordinates.
@@ -135,8 +135,8 @@ def sheet2matrix(x,y,bounds,density):
     # density*(top-bottom) is not an integer.
     # (These true densities could be cached by a Sheet if that would
     # speed things up.)
-    xdensity = int(density*(right-left)) / float((right-left))
-    ydensity = int(density*(top-bottom)) / float((top-bottom))
+    #xdensity = int(density*(right-left)) / float((right-left))
+    #ydensity = int(density*(top-bottom)) / float((top-bottom))
 
     # First translate to (left,top), which is [0,0] in the matrix,
     # then scale to the size of the matrix. The y coordinate needs to
@@ -147,7 +147,7 @@ def sheet2matrix(x,y,bounds,density):
     return float_row, float_col
   
 
-def sheet2matrixidx(x,y,bounds,density):
+def sheet2matrixidx(x,y,bounds,xdensity,ydensity):
     """
     Convert a point (x,y) in sheet coordinates to the integer row and
     column index of the matrix cell in which that point falls, given a
@@ -160,13 +160,13 @@ def sheet2matrixidx(x,y,bounds,density):
 
     Valid only for scalar x and y.
     """
-    r,c = sheet2matrix(x,y,bounds,density)
+    r,c = sheet2matrix(x,y,bounds,xdensity,ydensity)
     r = floor(r)
     c = floor(c)
     return int(r), int(c)
 
 
-def matrix2sheet(float_row,float_col,bounds,density):
+def matrix2sheet(float_row,float_col,bounds,xdensity,ydensity):
     """
     Convert a floating-point location (float_row,float_col) in matrix
     coordinates to its corresponding location (x,y) in sheet
@@ -176,14 +176,15 @@ def matrix2sheet(float_row,float_col,bounds,density):
     """
 
     left,bottom,right,top = bounds.aarect().lbrt()
-    xstep = float((right-left)) / int(density*(right-left))
-    ystep = float((top-bottom)) / int(density*(top-bottom))
+
+    xstep = 1.0 / xdensity
+    ystep = 1.0 / ydensity
     x = float_col*xstep + left
     y = top - float_row*ystep
     return x, y
 
 
-def matrixidx2sheet(row,col,bounds,density):
+def matrixidx2sheet(row,col,bounds,xdensity,ydensity):
     """
     Return (x,y) where x and y are the floating point coordinates of
     the *center* of the given matrix cell (row,col). If the matrix cell
@@ -200,7 +201,7 @@ def matrixidx2sheet(row,col,bounds,density):
     Valid only for scalar x and y.
     """
 
-    x,y = matrix2sheet((row+0.5), (col+0.5), bounds, density)
+    x,y = matrix2sheet((row+0.5), (col+0.5), bounds, xdensity, ydensity)
 
     # Rounding is useful for comparing the result with a floating point number
     # that we specify by typing the number out (e.g. fp = 0.5).
@@ -221,10 +222,15 @@ def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density):
     sheet_matrix.  The submatrix is just a view into the sheet_matrix;
     it is not an independent copy.
     """
-    r1,r2,c1,c2 = bounds2slice(bounds,sheet_bounds,sheet_density)
+
+    left,bottom,right,top = sheet_bounds.aarect().lbrt()
+    xdensity = int(sheet_density*(right-left)) / float((right-left))
+    ydensity = int(sheet_density*(top-bottom)) / float((top-bottom))
+
+    r1,r2,c1,c2 = bounds2slice(bounds,sheet_bounds,xdensity,ydensity)
     return sheet_matrix[r1:r2,c1:c2]
 
-def bounds2slice(slice_bounds, input_bounds, input_density):
+def bounds2slice(slice_bounds, input_bounds, input_xdensity, input_ydensity):
     """
     Convert a bounding box into an array slice suitable for computing a submatrix.
     
@@ -240,10 +246,10 @@ def bounds2slice(slice_bounds, input_bounds, input_density):
     ### from slice to bounds and bounds to slice 
 
     left,bottom,right,top = slice_bounds.aarect().lbrt()
-    toprow,leftcol = sheet2matrixidx(left,top,input_bounds,input_density)
-    botrow, rightcol =sheet2matrixidx(right,bottom,input_bounds,input_density)
+    toprow,leftcol = sheet2matrixidx(left,top,input_bounds,input_xdensity,input_ydensity)
+    botrow, rightcol =sheet2matrixidx(right,bottom,input_bounds,input_xdensity,input_ydensity)
    
-    maxrow,maxcol = sheet2matrixidx(input_bounds.aarect().right(),input_bounds.aarect().bottom(),input_bounds,input_density)
+    maxrow,maxcol = sheet2matrixidx(input_bounds.aarect().right(),input_bounds.aarect().bottom(),input_bounds,input_xdensity,input_ydensity)
 
     maxrow = maxrow - 1
     maxcol = maxcol - 1
@@ -255,15 +261,15 @@ def bounds2slice(slice_bounds, input_bounds, input_density):
     return rstart,rbound,cstart,cbound
 
 
-def bounds2slicearray(slice_bounds, input_bounds, input_density):
+def bounds2slicearray(slice_bounds, input_bounds, input_xdensity, input_ydensity):
     """
     Same as bounds2slice(), but return a Numeric array instead of a tuple.
     """
-    r1,r2,c1,c2 = bounds2slice(slice_bounds,input_bounds,input_density)
+    r1,r2,c1,c2 = bounds2slice(slice_bounds,input_bounds,input_xdensity,input_ydensity)
     return array([r1,r2,c1,c2])
 
 
-def slice2bounds(slice,sheet_bounds,sheet_density):
+def slice2bounds(slice,sheet_bounds,sheet_xdensity,sheet_ydensity):
     """
     Construct the bounds that corresponds to the given slice, with a small
     margin that enables to solve the rounding problem that is produced when turning
@@ -272,19 +278,26 @@ def slice2bounds(slice,sheet_bounds,sheet_density):
     the slice information from the bounding box.
     """
     r1,r2,c1,c2 = slice
+
+    xdensity = sheet_xdensity
+    ydensity = sheet_ydensity
     
-    left,bottom = matrix2sheet(r2,c1,sheet_bounds,sheet_density)
-    right, top   = matrix2sheet(r1,c2,sheet_bounds,sheet_density)
+    left,bottom = matrix2sheet(r2,c1,sheet_bounds,xdensity,ydensity)
+    right, top   = matrix2sheet(r1,c2,sheet_bounds,xdensity,ydensity)
 
-    if (int(sheet_density*(right-left)) <= 0):
-	xstep = float((right-left)) / int(sheet_density)
-    else:
-	xstep = float((right-left)) / int(sheet_density*(right-left))
+    xstep = 1.0 / xdensity
+    ystep = 1.0 / ydensity
 
-    if (int(sheet_density*(top-bottom)) <= 0):
-	ystep = float((top-bottom)) / int(sheet_density)
-    else:
-	ystep = float((top-bottom)) / int(sheet_density*(top-bottom))
+    # yfsit: why do we need to check for <= 0?
+    #if (int(sheet_density*(right-left)) <= 0):
+    #   xstep = float((right-left)) / int(sheet_density)
+    #else:
+    #   xstep = float((right-left)) / int(sheet_density*(right-left))
+    #
+    #if (int(sheet_density*(top-bottom)) <= 0):
+    #   ystep = float((top-bottom)) / int(sheet_density)
+    #else:
+    #   ystep = float((top-bottom)) / int(sheet_density*(top-bottom))
 
     ### JCALERT!, 20 is an arbitrary value, but it has to be check that
     ### any value is alright  (anything is supposed to work) to see with Jim
@@ -295,15 +308,15 @@ def slice2bounds(slice,sheet_bounds,sheet_density):
     return bounds
 
 
-def slicearray2bounds(slicearray,sheet_bounds,sheet_density):
+def slicearray2bounds(slicearray,sheet_bounds,sheet_xdensity,sheet_ydensity):
     """
     Same as slice2bounds, but the slice is an array instead of a tuple.
     """
-    return slice2bounds((slicearray[0],slicearray[1],slicearray[2],slicearray[3]), sheet_bounds, sheet_density)
+    return slice2bounds((slicearray[0],slicearray[1],slicearray[2],slicearray[3]), sheet_bounds, sheet_xdensity,sheet_ydensity)
 
 
 
-def bounds2shape(bounds,density):
+def bounds2shape(bounds,xdensity,ydensity):
     """
     Return the matrix shape specified by the given bounds and density.
 
@@ -320,8 +333,8 @@ def bounds2shape(bounds,density):
     ### from slice to bound and bound to slice.
 
     left,bottom,right,top = bounds.aarect().lbrt()
-    toprow,leftcol = sheet2matrix(left,top,bounds,density)
-    botrow, rightcol = sheet2matrix(right,bottom,bounds,density)
+    toprow,leftcol = sheet2matrix(left,top,bounds,xdensity,ydensity)
+    botrow, rightcol = sheet2matrix(right,bottom,bounds,xdensity,ydensity)
 
     rows = int(botrow - toprow)
     cols = int(rightcol - leftcol)
@@ -377,6 +390,11 @@ class Sheet(EventProcessor):
         width,height = right-left,top-bottom
         rows = int(height*self.density)
         cols = int(width*self.density)
+
+        # The real densities along x and y of the sheet
+        self.xdensity = cols / float(right-left)
+        self.ydensity = rows / float(top-bottom)
+        
         self.activity = zeros((rows,cols)) + 0.0
         self.__saved_activity = []          # For non-learning inputs
         self.debug('activity.shape =',self.activity.shape)
@@ -415,7 +433,7 @@ class Sheet(EventProcessor):
         coordinates and returns the (row,col) of the matrix cell it
         cooresponds to.
         """
-        return sheet2matrixidx(x,y,self.bounds,self.density)
+        return sheet2matrixidx(x,y,self.bounds,self.xdensity,self.ydensity)
 
 
     def matrixidx2sheet(self,row,col):
@@ -424,7 +442,7 @@ class Sheet(EventProcessor):
         in the activity matrix and gives its (x,y) in sheet
         coordinates.
         """
-        return matrixidx2sheet(row,col,self.bounds,self.density)
+        return matrixidx2sheet(row,col,self.bounds,self.xdensity,self.ydensity)
 
     def sheet_offset(self):
         """
