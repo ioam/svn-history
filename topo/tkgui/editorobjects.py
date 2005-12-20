@@ -31,7 +31,7 @@ class EditorObject :
     def setFocus(self, focus) : # set focus
 	self.focus = focus
 
-    def move(self, x, y) :
+    def move(self) :
 	# update position of object and redraw
 	pass
 
@@ -109,6 +109,7 @@ class EditorSheet(EditorNode) :
 	# super constructor call
 	EditorNode.__init__(self, canvas, pos, name)
 	self.sheet = sheet # the topo sheet that this object represents
+	sheet.guiX, sheet.guiY = self.x, self.y # store the ed coords in the topo sheet
 	self.width = 50.0 # set the width and height parameters for this object
 	self.height = 25.0
 	self.initDraw(self.colours[1]) # create a new paralellogram
@@ -150,7 +151,6 @@ class EditorSheet(EditorNode) :
 		self.canvas.move(self.label, x, y)
 	except IndexError :
 		print("Out of Canvas")
-		
 	# redraw the connections
 	for con in self.toCon : 
 		con.move()
@@ -175,6 +175,7 @@ class EditorSheet(EditorNode) :
 	old = self.x, self.y
 	self.x = x
 	self.y = y
+	self.sheet.guiX, self.sheet.guiY = x, y # update topo sheet position
 	self.draw(self.x - old[0], self.y - old[1])
 
     ############ Util methods ##############################
@@ -208,7 +209,7 @@ class EditorConnection(EditorObject) :
     ############ Draw methods ############################
 
     def setFocus(self, focus) : # give this connection the focus
-     	self.focus = focus
+     	EditorObject.setFocus(self, focus)
 	self.draw()
 
     ############ Update methods ############################ 
