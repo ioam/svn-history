@@ -113,7 +113,9 @@ pgt = PlotGroupTemplate(name='Activity',
 					   'Normalize'  : False})])
 plotgroup_templates[pgt.name] = pgt
 
-
+### JABALERT: Maybe this should change to a "ConnectionField" plot,
+### (and also in the menu), for consistency, so that the plot labels
+### can always be done the same way.
 pgt = PlotGroupTemplate(name='Unit Weights',
                         command='pass',
 			plot_templates= [('Unit Weights',
@@ -157,11 +159,11 @@ plotgroup_templates[pgt.name] = pgt
 
 ### JCALERT! Temporary template used for testing RGBPlot. 
 
-pgt = PlotGroupTemplate(name='TestinPanel_for_RGB_Activity',
+pgt = PlotGroupTemplate(name='TestingPanel_for_RGB_Activity',
 			command='measure_activity()',
 			plot_templates= [('Activity',
 					  {'Red'   : 'OrientationPreference',
 					   'Green' : 'OrientationPreference',
 					   'Blue'  : 'Activity',
 					   'Normalize'  : False})])
-plotgroup_templates[pgt.name] = pgt
+#plotgroup_templates[pgt.name] = pgt
