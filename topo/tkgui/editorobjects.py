@@ -8,6 +8,7 @@ __version__='$Revision$'
 
 # JABALERT: Please try to eliminate import *
 from Tkinter import *
+from parametersframe import ParametersFrame
 
 class EditorObject :
     """
@@ -27,6 +28,17 @@ class EditorObject :
     def draw(self) :
 	# draw the object at the current x, y position
 	pass
+
+    def showProperties(self) :
+	# show parameters frame for object
+	paramWindow = Toplevel()
+	Label(paramWindow, text = self.name).pack(side = TOP)
+	self.paramFrame = ParametersFrame(paramWindow)
+	updateButton = Button(paramWindow, text = 'Update', command = self.updateParameters)
+	updateButton.pack(side = BOTTOM)
+
+    def updateParameters(self) :
+	self.paramFrame.set_obj_params()
 
     def setFocus(self, focus) : # set focus
 	self.focus = focus
@@ -96,6 +108,9 @@ class EditorNode(EditorObject) :
     def getPos(self) :
 	return (self.x, self.y) # return center point of node
 
+    def showProperties(self) :
+	EditorObject.showProperties(self)
+	self.paramFrame.create_widgets(self.sheet)
 
 
 class EditorSheet(EditorNode) :
@@ -234,6 +249,11 @@ class EditorConnection(EditorObject) :
 	self.nodeFrom.attatchCon(self, self.FROM) # tell the sheets that they are connected.
 	self.nodeTo.attatchCon(self, self.TO)
 	self.posTo = None
+
+    ############ Util methods ##############################
+    def showProperties(self) :
+	EditorObject.showProperties(self)
+	self.paramFrame.create_widgets(self.connection)
 
 
 class EditorProjection(EditorConnection) :

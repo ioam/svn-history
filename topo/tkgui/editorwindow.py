@@ -214,11 +214,9 @@ class EditorCanvas(Canvas) :
     ########### Properties Method ##################################
 
     def showProperties(self, focus) :
-        # <auto> remove right click hang list
-	print("Properties of ", focus)
 	if (focus != None) :
+		focus.showProperties()
 		focus.setFocus(False)
-	# create window with ParameterFrame(focus) included
         
     ########### Delete GUI Object Method ###########################
 
@@ -340,6 +338,7 @@ class ModelEditor :
 						break
 				else :
 					print "Incomplete connection : ", con
+					break
 				guiCon.connect(dest, con)
 				dest.attatchCon(guiCon, guiCon.TO)
 				dest.draw()
