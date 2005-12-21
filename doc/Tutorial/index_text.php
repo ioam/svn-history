@@ -63,7 +63,7 @@ select <span class='t_item'>Test pattern</span> from the <span class='t_item'>Si
 
 <p class='center'>
 <img src="images/test_pattern.png" alt="Test Pattern window"
-align="middle" width="415" height="606">
+align="middle" width="342" height="612">
 </p>
 
 <p>
@@ -76,7 +76,7 @@ This will present a horizontal line.
 <li>To see the result, select <span class='t_item'>Activity</span> from
 the <span class='t_item'>Plots</span> menu on the <span class='w_title'>Topographica Console</span> to get:
 <p class='center'>
-<img src="images/activity_line.png" alt="Response to a line" align="middle" width="420" height="320">
+<img src="images/activity_line.png" alt="Response to a line" align="middle" width="426" height="340">
 </p>
 
 
@@ -102,13 +102,13 @@ the weights to V1 neurons.  These weights were learned previously, by
 presenting 20000 inputs like the one we just saw but at random angles
 and positions.  To plot a single neuron, select 
 <span class='t_item'>Unit weights</span> from the <span class='t_item'>Plots</span> menu. This will plot the synaptic strengths of
-the neuron in the center of the cortex (by default):
+the neuron in the center of the cortex by default. On this particular map, this neuron is not clearly selective for a particular orientation. Instead, try for example the unit at x=0.2 and y=0.0 by changing <span class='t_item'>Unit X:</span> to 0.2:
 
 
 
 <p class="center">
-<img src="images/unit_weights_0_0.png" alt="Weights of one
-neuron" align="middle" width="504" height="302">
+<img src="images/unit_weights_0.2_0.0.png" alt="Weights of one
+neuron" align="middle" width="576" height="348">
 </p>
 
 <p>
@@ -117,8 +117,8 @@ retina), followed by the  lateral excitatory and lateral inhibitory
 weights to that neuron from nearby neurons in V1. The afferent
 weights represent the retinal pattern that would most excite the neuron.
 For this particular neuron, the optimal retinal stimulus would be a
-bright line oriented at about 20 degrees (2 o'clock) in about the
-center of the retina.
+bright line oriented at about -45 degrees (10 o'clock) to the right
+of the retina's center.
 </p><p></p></li><li>If all neurons had the same weight pattern, the response
 would not be patchy -- it would just be a blurred version of the
 input (for inputs matching the weight pattern), or blank (for other
@@ -126,7 +126,7 @@ inputs). To see what the other neurons look like, select <span class='t_item'>Pr
 
 <p class="center">
 <img src="images/projection.png" alt="Afferent weights of many
-neurons" align="middle" width="548" height="465">
+neurons" align="middle" width="623" height="499">
 </p>
 
 This plot shows the afferent weights for every seventh neuron in each
@@ -146,12 +146,11 @@ neuron.  A similar procedure can be performed in the model by selecting
 <span class='t_item'>Orientation Preference</span> from the <span class='t_item'>Plots</span> menu:
 
 <p class="center">
-<img src="images/or_map.png" alt="Orientation map" width="551" height="291">&nbsp;&nbsp;&nbsp;
+<img src="images/or_map.png" alt="Orientation map" width="553" height="292">&nbsp;&nbsp;&nbsp;
 <img src="images/or_key_vert_transparent_topo.png" alt="Orientation key" height="291" width="24">
 </p><br>
 
-<!-- CEBHACKALERT: make sure to update the orientation key when
-     screenshots are taken from the current topographica -->
+<!-- CEBHACKALERT: orientation key is wrong -->
 
 <P>
 (This will usually take about 30 seconds to complete; it is normal
@@ -186,7 +185,7 @@ on the <span class='w_title'>Test pattern</span> window and then looking
 at the refreshed image in the <span class='w_title'>Activity</span> window:
 
 <p class="center">
-<img src="images/activity_line_or.png" alt="Color-coded response to a line" width="420" height="320">
+<img src="images/activity_line_or.png" alt="Color-coded response to a line" width="426" height="340">
 <img src="images/or_key_vert_transparent_topo.png" alt="Orientation key" height="320" width="24">
 </p><br>
 
@@ -208,24 +207,22 @@ it again -- the colors should be different, and match the orientation chosen.
 <p></p>
 </li>
 
-<!-- CEBHACKALERT: weight plots aren't yet colorized -->
-<!--
 <li> If you now <span class='b_press'>Refresh</span> the
 <span class='w_title'>Unit weights</span>
-window, you can ('t! ** UPDATE) see that the neuron whose weights we plotted is
+window, you can see that the neuron whose weights we plotted is
 located in a patch of neurons responding to similar orientations:
 
 
 <p class="center">
-<img src="images/unit_weights_0_0_or.png" alt="Weights of
-one neuron" align="middle" height="354" width="504">
+<img src="images/unit_weights_0.2_0.0_or.png" alt="Colorized weights of
+one neuron" align="middle" width="576" height="348" >
 </p>
-
- ((**UPDATE picture) Look at the <span class='t_item'>LateralInhibitory</span> weights, which shows that
-the neurons around the center of the plot are primarily (**magenta (purple)) .) 
+<p>
+Look at the <span class='t_item'>LateralInhibitory</span> weights, which show that
+the neurons around the location to the right of the retina's center are primarily purple. 
 </p>
 <p></p></li>
--->
+
 
 <li> Now that you have a feel for the various plots, you can try
 different input patterns, seeing how the cortex responds to each one.
