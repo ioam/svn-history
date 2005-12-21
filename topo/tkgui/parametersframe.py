@@ -98,7 +98,6 @@ class ParametersFrame(Frame):
         # go through, get parameters, set them on the topo_obj
         for (name,parameter) in self.visible_parameters.items():
             w = self.widgets[name][1]
-            print "[start] try to set",self.topo_obj ,name,  "to", w.get_value(), "[end]"
             setattr(self.topo_obj,name,w.get_value())
        
 
