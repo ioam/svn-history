@@ -107,8 +107,8 @@ def pattern_present(inputs=None,duration=1.0,sim=None,learning=False,overwrite_p
 
 
 # CEBHACKALERT: see below
-from topo.patterns.basic import GaussianGenerator
-from topo.patterns.random import UniformRandomGenerator
+import topo.patterns.basic
+import topo.patterns.random
 from topo.base.sheet import Sheet
 import __main__
 
@@ -139,7 +139,7 @@ def load_snapshot(snapshot_name):
     topo.base.simulator.set_active_sim(saved_sim)
 
     # CEBHACKALERT:
-    # Until I figure out how to pickle random properties of the GaussianGenerator properly...
+    # Until I figure out how to pickle random properties of the topo.patterns.basic.Gaussian properly...
 
 
     hack = """
@@ -147,7 +147,7 @@ from topo.base.simulator import get_active_sim
 from topo.sheets.generatorsheet import GeneratorSheet
 gs_list = get_active_sim().objects(GeneratorSheet).values()
 try:
-    [gs.set_input_generator(GaussianGenerator()) for gs in gs_list]
+    [gs.set_input_generator(topo.patterns.basic.Gaussian()) for gs in gs_list]
 except NameError:
     pass
 """

@@ -1,5 +1,5 @@
 """
-Contains two classes: TopoImage and ImageGenerator.
+Contains two classes: TopoImage and Image.
 
 
 $Id$
@@ -209,7 +209,7 @@ class TopoImage(TopoObject):
 # xsee PIL for documentation
 # color to grayscale, etc
 # rotation, resize just resample no interpolation
-class ImageGenerator(PatternGenerator):
+class Image(PatternGenerator):
     """2D image generator."""
 
     aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)

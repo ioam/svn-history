@@ -14,7 +14,7 @@ from topo.base.sheet import bounds2shape
 import RandomArray
 
 
-class UniformRandomGenerator(PatternGenerator):
+class UniformRandom(PatternGenerator):
     """2D uniform random noise pattern generator."""
 
     # The standard x, y, and orientation variables are currently ignored,

@@ -17,9 +17,9 @@ from topo.base.patterngenerator import BoundingBox
 from topo.base.connectionfield import CFProjection
 from topo.base.parameter import DynamicNumber
 from topo.sheets.cfsom import CFSOM
-from topo.patterns.random import UniformRandomGenerator
+import topo.patterns.random
 from topo.responsefns.basic import CFDotProduct
-from topo.patterns.basic import LineGenerator
+import topo.patterns.basic
 from topo.base.simulator import Simulator
 from topo.learningfns.basic import HebbianSOMLF
 from topo.outputfns.basic import PiecewiseLinear
@@ -36,15 +36,15 @@ GeneratorSheet.density = 20
 
 
 
-LineGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-LineGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Line.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Line.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 
-LineGenerator.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
-LineGenerator.thickness = 0.02
-LineGenerator.bounds = BoundingBox(points=((-1.05,-0.8),(1.05,0.8)))
+topo.patterns.basic.Line.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
+topo.patterns.basic.Line.thickness = 0.02
+topo.patterns.basic.Line.bounds = BoundingBox(points=((-1.05,-0.8),(1.05,0.8)))
 
 
-PatternGeneratorParameter.default=LineGenerator()
+PatternGeneratorParameter.default=topo.patterns.basic.Line()
 
 # cortical sheet
 CFSOM.density = 10
@@ -53,7 +53,7 @@ CFSOM.radius_0 = 0.1
 # sheet activation saturates at 1
 CFSOM.output_fn = PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
 
-CFProjection.weights_generator = UniformRandomGenerator()
+CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 CFProjection.weights_bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1)))
 CFProjection.learning_fn = HebbianSOMLF()
 CFProjection.response_fn = CFDotProduct()
@@ -67,8 +67,8 @@ CFProjection.response_fn = CFDotProduct()
 s = Simulator()
 
 # Sheets
-LeftRetina = GeneratorSheet(input_generator=LineGenerator(),name='LeftRetina')
-RightRetina = GeneratorSheet(input_generator=LineGenerator(),name='RightRetina')
+LeftRetina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='LeftRetina')
+RightRetina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='RightRetina')
 V1 = CFSOM(name='V1')
 V2 = CFSOM(name='V2')
 V3 = CFSOM(name='V3')

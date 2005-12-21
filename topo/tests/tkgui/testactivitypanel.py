@@ -16,7 +16,7 @@ from topo.base.simulator import *
 from topo.base.sheetview import *
 from topo.plotting.plotengine import *
 from topo.tkgui.basicplotgrouppanel import BasicPlotGroupPanel
-from topo.patterns.basic import GaussianGenerator
+import topo.patterns.basic
 
 ### JCALERT! This test sould be in the testbasicgrouppanel.py.
 
@@ -35,15 +35,15 @@ class TestActivityPanel(unittest.TestCase):
 #        base.print_level = topo.base.topoobject.WARNING
 #        GeneratorSheet.print_level = topo.base.topoobject.WARNING
         
-        GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        GaussianGenerator.orientation = Dynamic(lambda :random.uniform(-pi,pi))
+        topo.patterns.basic.Gaussian.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+        topo.patterns.basic.Gaussian.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+        topo.patterns.basic.Gaussian.orientation = Dynamic(lambda :random.uniform(-pi,pi))
 
         width = 0.02
         height = 0.9
-        GaussianGenerator.size = height
-        GaussianGenerator.aspect_ratio = (width/height)
-        GaussianGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+        topo.patterns.basic.Gaussian.size = height
+        topo.patterns.basic.Gaussian.aspect_ratio = (width/height)
+        topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
         ###########################################
         # build simulation
@@ -71,7 +71,7 @@ class TestActivityPanel(unittest.TestCase):
         sheetR = Sheet()
         sheetG = Sheet()
         sheetB = Sheet()
-        retina = GeneratorSheet(input_generator=GaussianGenerator())
+        retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian())
         retina.print_level = topo.base.topoobject.WARNING
 
         # For a new sheet_group named Miata:

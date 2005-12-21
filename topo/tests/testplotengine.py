@@ -22,7 +22,7 @@ from topo.plotting.plotengine import *
 from topo.sheets.generatorsheet import *
 from topo.base.simulator import *
 from topo.base import patterngenerator
-from topo.patterns.basic import GaussianGenerator
+import topo.patterns.basic
 from topo.base.parameter import Dynamic
 from topo.sheets.cfsom import CFSOM
 from Tkinter import *
@@ -39,7 +39,7 @@ from topo.plotting.plotengine import PlotEngine
 from topo.plotting.plotgroup import BasicPlotGroup
 from topo.plotting.templates import plotgroup_templates
 from topo.sheets.cfsom import CFSOM
-from topo.patterns.random import UniformRandomGenerator
+import topo.patterns.random
 from topo.learningfns.basic import HebbianSOMLF
 from topo.base.connectionfield import CFProjection
 from topo.responsefns.basic import CFDotProduct
@@ -61,8 +61,8 @@ class TestPlotEngine(unittest.TestCase):
           V2 = CFSOM(name='V2')
           V3 = CFSOM(name='V3')
 
-          CFProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
-          CFProjection.weights_generator = UniformRandomGenerator(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+          CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
+          CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
           CFProjection.response_fn = CFDotProduct()
           CFProjection.learning_fn = HebbianSOMLF()
 
@@ -181,12 +181,12 @@ class TestPlotEngine(unittest.TestCase):
 #         GeneratorSheet.period = 1.0
 #         GeneratorSheet.density = 30
         
-#         GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-#         GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-#         GaussianGenerator.orientation = Dynamic(lambda :random.uniform(-pi,pi))
-#         GaussianGenerator.width = 0.02
-#         GaussianGenerator.height = 0.9
-#         GaussianGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+#         topo.patterns.basic.Gaussian.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+#         topo.patterns.basic.Gaussian.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+#         topo.patterns.basic.Gaussian.orientation = Dynamic(lambda :random.uniform(-pi,pi))
+#         topo.patterns.basic.Gaussian.width = 0.02
+#         topo.patterns.basic.Gaussian.height = 0.9
+#         topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
 #         ###########################################
 #         # build simulation
@@ -215,7 +215,7 @@ class TestPlotEngine(unittest.TestCase):
 #         sheetR = Sheet()
 #         sheetG = Sheet()
 #         sheetB = Sheet()
-#         retina = GeneratorSheet(input_generator=GaussianGenerator())
+#         retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian())
 #         retina.print_level = topo.base.topoobject.WARNING
 
 

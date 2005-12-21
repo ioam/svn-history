@@ -21,7 +21,7 @@ from topo.misc.patternfns import gaussian,gabor,line,disk,ring
 from topo.base.patterngenerator import PatternGenerator
 
 # Imported here so that all PatternGenerators will be in the same package
-from topo.base.patterngenerator import ConstantGenerator
+from topo.base.patterngenerator import Constant
 
 # CEBHACKALERT: need size, aspect ratio, frequency, etc. to be defined
 # somewhere that all the uses here can inherit from. Otherwise, doc,
@@ -44,7 +44,7 @@ SM_PREC = 0.61
 # 
 
 
-class GaussianGenerator(PatternGenerator):
+class Gaussian(PatternGenerator):
     """2D Gaussian pattern generator."""
     
     aspect_ratio   = Number(default=0.3,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
@@ -60,7 +60,7 @@ class GaussianGenerator(PatternGenerator):
                          height)
 
 
-class SineGratingGenerator(PatternGenerator):
+class SineGrating(PatternGenerator):
     """2D sine grating pattern generator."""
     
     frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),precedence=FR_PREC)
@@ -78,7 +78,7 @@ class SineGratingGenerator(PatternGenerator):
 
 
 
-class GaborGenerator(PatternGenerator):
+class Gabor(PatternGenerator):
     """2D Gabor pattern generator."""
     
     frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),precedence=FR_PREC)
@@ -98,7 +98,7 @@ class GaborGenerator(PatternGenerator):
                       params.get('phase',self.phase))  
 
 
-class LineGenerator(PatternGenerator):
+class Line(PatternGenerator):
     """2D line pattern generator."""
 
     # CEBHACKALERT:
@@ -123,7 +123,7 @@ class LineGenerator(PatternGenerator):
                            params.get('smoothing',self.smoothing))
 
 
-class DiskGenerator(PatternGenerator):
+class Disk(PatternGenerator):
     """2D disk pattern generator."""
 
     aspect_ratio  = Number(default=1.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
@@ -141,7 +141,7 @@ class DiskGenerator(PatternGenerator):
                      params.get('smoothing',self.smoothing))  
 
 
-class RingGenerator(PatternGenerator):
+class Ring(PatternGenerator):
     """2D ring pattern generator."""
 
     thickness   = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5),precedence=TH_PREC)
@@ -161,7 +161,7 @@ class RingGenerator(PatternGenerator):
                     params.get('smoothing',self.smoothing))  
     
 
-class RectangleGenerator(PatternGenerator):
+class Rectangle(PatternGenerator):
     """2D rectangle pattern generator."""
     
     aspect_ratio   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
@@ -177,7 +177,7 @@ class RectangleGenerator(PatternGenerator):
                            abs(params.get('pattern_y',self.pattern_y))<=height/2.0)
 
 
-class SquareGratingGenerator(PatternGenerator):
+class SquareGrating(PatternGenerator):
     """2D squarewave grating pattern generator."""
     
     frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),precedence=FR_PREC)

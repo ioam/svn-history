@@ -22,7 +22,7 @@ from math import pi
 from topo.base.parameter import Dynamic
 import random
 import pdb #debugger
-from topo.patterns.basic import GaussianGenerator,LineGenerator
+import topo.patterns.basic
 
 class TestPlotGroupPanel(unittest.TestCase):
 
@@ -39,15 +39,15 @@ class TestPlotGroupPanel(unittest.TestCase):
 #        base.print_level = topo.base.topoobject.WARNING
 #        GeneratorSheet.print_level = topo.base.topoobject.WARNING
         
-        GaussianGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        GaussianGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        GaussianGenerator.orientation = Dynamic(lambda :random.uniform(-pi,pi))
+        topo.patterns.basic.Gaussian.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+        topo.patterns.basic.Gaussian.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+        topo.patterns.basic.Gaussian.orientation = Dynamic(lambda :random.uniform(-pi,pi))
 
         width = 0.02
         height = 0.9
-        GaussianGenerator.size = height
-        GaussianGenerator.aspect_ratio = width/height
-        GaussianGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+        topo.patterns.basic.Gaussian.size = height
+        topo.patterns.basic.Gaussian.aspect_ratio = width/height
+        topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
         ###########################################
         # build simulation
@@ -75,7 +75,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         sheetR = Sheet()
         sheetG = Sheet()
         sheetB = Sheet()
-        retina = GeneratorSheet(input_generator=GaussianGenerator())
+        retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian())
         retina.print_level = topo.base.topoobject.WARNING
 
         # For a new sheet_group named Miata:
@@ -113,11 +113,11 @@ class TestPlotGroupPanel(unittest.TestCase):
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 30
         
-        LineGenerator.x = Dynamic(lambda : random.uniform(-0.5,0.5))
-        LineGenerator.y = Dynamic(lambda : random.uniform(-0.5,0.5))
-        LineGenerator.orientation = Dynamic(lambda :random.uniform(-pi,pi))
-        LineGenerator.thickness = 0.02
-        LineGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+        topo.patterns.basic.Line.x = Dynamic(lambda : random.uniform(-0.5,0.5))
+        topo.patterns.basic.Line.y = Dynamic(lambda : random.uniform(-0.5,0.5))
+        topo.patterns.basic.Line.orientation = Dynamic(lambda :random.uniform(-pi,pi))
+        topo.patterns.basic.Line.thickness = 0.02
+        topo.patterns.basic.Line.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
         
         # rf som parameters
         CFSOM.density = 50
@@ -128,7 +128,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         # build simulation
         s = topo.base.simulator.Simulator()
         
-        retina = GeneratorSheet(input_generator=LineGenerator(),name='Retina')
+        retina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina')
         retina.print_level = topo.base.topoobject.WARNING
         V1 = CFSOM(name='V1')
         V1.print_level = topo.base.topoobject.WARNING

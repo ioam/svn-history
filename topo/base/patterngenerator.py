@@ -1,5 +1,6 @@
 """
-PatternGenerator abstract class and sample ConstantGenerator concrete class.
+PatternGenerator abstract class and sample Constant(PatternGenerator)
+concrete class.
 
 $Id$
 """
@@ -149,7 +150,7 @@ class PatternGenerator(TopoObject):
 # patterns/, to be imported as needed.
 from Numeric import ones, Float
 
-class ConstantGenerator(PatternGenerator):
+class Constant(PatternGenerator):
     """Constant pattern generator, i.e. a solid, uniform field of the same value."""
 
     # The standard x, y, and orientation variables are currently ignored,

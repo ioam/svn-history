@@ -27,8 +27,8 @@ from topo.base.connectionfield import CFProjection
 from topo.responsefns.basic import CFDotProduct
 from topo.base.parameter import Number,DynamicNumber
 from topo.sheets.cfsom import CFSOM
-from topo.patterns.random import UniformRandomGenerator
-from topo.patterns.basic import GaussianGenerator
+import topo.patterns.random
+import topo.patterns.basic
 from topo.base.simulator import Simulator
 from topo.learningfns.basic import HebbianSOMLF
 
@@ -54,15 +54,15 @@ class ObermayerSOM(CFSOM):
 GeneratorSheet.period = 1.0
 GeneratorSheet.density = 30
 
-GaussianGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-GaussianGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-GaussianGenerator.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
+topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
 
 gaussian_width = 0.23/sqrt(2)
 gaussian_height = 0.09/sqrt(2)
-GaussianGenerator.size  = gaussian_height
-GaussianGenerator.aspect_ratio = gaussian_width/gaussian_height
-GaussianGenerator.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+topo.patterns.basic.Gaussian.size  = gaussian_height
+topo.patterns.basic.Gaussian.aspect_ratio = gaussian_width/gaussian_height
+topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 
 
 # cortical sheet
@@ -74,7 +74,7 @@ ObermayerSOM.radius_f = 30000/15000 * radius_at_15000 - ObermayerSOM.radius_0
 ObermayerSOM.alpha_0  = 0.09
 ObermayerSOM.alpha_f  = 0.02
 
-CFProjection.weights_generator = UniformRandomGenerator()
+CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 CFProjection.weights_bounds = BoundingBox(points=((-1.0,-1.0),(1.0,1.0)))
 CFProjection.response_fn = CFDotProduct()
 CFProjection.learning_fn=HebbianSOMLF()
@@ -86,7 +86,7 @@ CFProjection.learning_fn=HebbianSOMLF()
 
 s = Simulator()
 
-Retina = GeneratorSheet(input_generator=GaussianGenerator(),name='Retina')
+Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),name='Retina')
 V1 = ObermayerSOM(name='V1')
 s.connect(Retina,V1,delay=0.5,connection_type=CFProjection,connection_params={'name':'RtoV1'})
 

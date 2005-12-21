@@ -8,7 +8,7 @@ __version__='$Revision$'
 import unittest
 from topo.base.patterngenerator import *
 from Numeric import array
-from topo.patterns.basic import RectangleGenerator
+import topo.patterns.basic
 
 # CEBHACKALERT: needs writing so that it tests PatternGenerator properly!
 
@@ -30,7 +30,7 @@ class TestPatternGenerator(unittest.TestCase):
 
         rect_width = 0.3
         rect_height = 0.9
-        rect = RectangleGenerator(scale=0.9,aspect_ratio=(rect_width/rect_height),
+        rect = topo.patterns.basic.Rectangle(scale=0.9,aspect_ratio=(rect_width/rect_height),
                                 density=4,bounds=bounds)
         self.assertEqual(rect(),target)
 #        print rect()

@@ -12,7 +12,7 @@ from topo.base.connectionfield import CFLearningFunction
 from topo.base.arrayutils import L2norm
 from Numeric import exp, argmax
 from topo.base.boundingregion import BoundingBox
-from topo.patterns.basic import GaussianGenerator
+import topo.patterns.basic
 from math import ceil
 
 
@@ -52,7 +52,7 @@ class HebbianSOMLF(SOMLF):
     learning_radius = Number(default=0.0)
     output_fn = Parameter(default=Identity())
     # JABALERT: Should be a PatternGeneratorParameter eventually
-    neighborhood_kernel_generator = Parameter(default=GaussianGenerator())
+    neighborhood_kernel_generator = Parameter(default=topo.patterns.basic.Gaussian())
     
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
 

@@ -77,8 +77,8 @@ from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection
 from topo.responsefns.basic import CFDotProduct
-from topo.patterns.basic import GaussianGenerator, ConstantGenerator
-from topo.patterns.random import UniformRandomGenerator
+import topo.patterns.basic
+import topo.patterns.random
 from topo.base.sheet import BoundingBox
 from topo.base.parameter import DynamicNumber
 from topo.learningfns.optimized import DivisiveHebbian
@@ -135,20 +135,20 @@ GeneratorSheet.period = 1
 GeneratorSheet.bounds = input_bounds
 
 random.seed(1234)
-GaussianGenerator.scale = scale_input
-GaussianGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-GaussianGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-GaussianGenerator.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
+topo.patterns.basic.Gaussian.scale = scale_input
+topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
 
 # Corrects for differences between C++ and Topographica definition of Gaussian.
 gaussian_width = xsigma/BaseRN/sqrt(2)
 gaussian_height = ysigma/BaseRN/sqrt(2)
-GaussianGenerator.size = gaussian_height
-GaussianGenerator.aspect_ratio = gaussian_width/gaussian_height
-GaussianGenerator.bounds = input_bounds
+topo.patterns.basic.Gaussian.size = gaussian_height
+topo.patterns.basic.Gaussian.aspect_ratio = gaussian_width/gaussian_height
+topo.patterns.basic.Gaussian.bounds = input_bounds
 
 
-PatternGeneratorParameter.default=GaussianGenerator()
+PatternGeneratorParameter.default=topo.patterns.basic.Gaussian()
 
 
 # LISSOM parameters
@@ -160,8 +160,8 @@ excitatory_weight_bounds = BoundingBox(points=((-exc_rad/BaseN,-exc_rad/BaseN),(
 inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(inh_rad/BaseN,inh_rad/BaseN)))
 
 # Specify weight initialization
-CFProjection.weights_generator = UniformRandomGenerator()
-#CFProjection.weights_generator = ConstantGenerator()
+CFProjection.weights_generator = topo.patterns.random.UniformRandom()
+#CFProjection.weights_generator = topo.patterns.basic.Constant()
 
 # Specify the response function
 # inlinec.optimized should make this unnecessary.
@@ -176,7 +176,7 @@ CFProjection.learning_fn=DivisiveHebbian()
 s = topo.base.simulator.Simulator()
 
 
-Retina = GeneratorSheet(input_generator=GaussianGenerator(),
+Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),
                         name='Retina')
 V1 = LISSOM(name='V1')
 

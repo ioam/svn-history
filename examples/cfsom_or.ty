@@ -20,8 +20,8 @@ from topo.base.connectionfield import CFProjection
 from topo.base.parameter import DynamicNumber
 from topo.sheets.cfsom import CFSOM
 from topo.responsefns.basic import CFDotProduct
-from topo.patterns.random import UniformRandomGenerator
-from topo.patterns.basic import GaussianGenerator
+import topo.patterns.random
+import topo.patterns.basic
 from topo.base.simulator import Simulator
 from topo.learningfns.basic import HebbianSOMLF
 
@@ -33,12 +33,12 @@ from topo.learningfns.basic import HebbianSOMLF
 GeneratorSheet.period = 1.0
 GeneratorSheet.density = 30
 
-GaussianGenerator.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-GaussianGenerator.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-GaussianGenerator.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
-GaussianGenerator.size = 0.3*1.5/7.0
-GaussianGenerator.aspect_ratio = 7.0/1.5
-GaussianGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
+topo.patterns.basic.Gaussian.size = 0.3*1.5/7.0
+topo.patterns.basic.Gaussian.aspect_ratio = 7.0/1.5
+topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
 
 # cortical sheet
@@ -46,7 +46,7 @@ CFSOM.density = 50
 CFSOM.learning_length = 10000
 CFSOM.radius_0 = 0.1
 
-CFProjection.weights_generator = UniformRandomGenerator()
+CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 CFProjection.weights_bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1)))
 CFProjection.response_fn = CFDotProduct()
 CFProjection.learning_fn=HebbianSOMLF()
@@ -55,7 +55,7 @@ CFProjection.learning_fn=HebbianSOMLF()
 
 s = Simulator()
 
-Retina = GeneratorSheet(input_generator=GaussianGenerator(),name='Retina')
+Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),name='Retina')
 V1 = CFSOM(name='V1')
 s.connect(Retina,V1,delay=0.5,connection_type=CFProjection,connection_params={'name':'RtoV1'})
 

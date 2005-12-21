@@ -242,7 +242,7 @@ def clip_in_place(mat,lower_bound,upper_bound):
 
 
 # CEBHACKALERT: should it also take full path to classname?
-# e.g. topo.base.patterngenerator.ConstantGenerator rather than ConstantGenerator
+# e.g. topo.base.patterngenerator.Constant rather than Constant
 # then keep to first "." from the right, or something.
 # I also don't know how it works.
 import string, re

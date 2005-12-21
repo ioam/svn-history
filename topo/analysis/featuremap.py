@@ -29,7 +29,7 @@ from topo.base.sheetview import SheetView
 from math import pi
 
 ## temporary ...? ##
-from topo.patterns.basic import GaussianGenerator, SineGratingGenerator
+import topo.patterns.basic
 from topo.commands.basic import pattern_present, restore_input_generators, save_input_generators
 
 from topo.base import sheetview
@@ -54,7 +54,7 @@ class SineGratingPresenter(object):
         self.duration=duration
 
     def __call__(self,features_values,param_dict):
-        gen = SineGratingGenerator()
+        gen = topo.patterns.basic.SineGrating()
 
         ### JABHACKALERT!  Should be able to do this more cleanly.
         for param, value in param_dict.iteritems():
