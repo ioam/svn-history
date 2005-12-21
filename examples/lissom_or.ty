@@ -127,8 +127,12 @@ alpha_inh=0.00025*ics
 fixedpoint.DEFAULT_PRECISION=3
 
 # input generation params
+input_bounds = BoundingBox(points=((-RN/(BaseRN*area_scale)/2.0,-RN/(BaseRN*area_scale)/2.0),
+				   ( RN/(BaseRN*area_scale)/2.0, RN/(BaseRN*area_scale)/2.0)))
+
 GeneratorSheet.density = BaseRN*area_scale
 GeneratorSheet.period = 1
+GeneratorSheet.bounds = input_bounds
 
 random.seed(1234)
 GaussianGenerator.scale = scale_input
@@ -141,8 +145,6 @@ gaussian_width = xsigma/BaseRN/sqrt(2)
 gaussian_height = ysigma/BaseRN/sqrt(2)
 GaussianGenerator.size = gaussian_height
 GaussianGenerator.aspect_ratio = gaussian_width/gaussian_height
-input_bounds = BoundingBox(points=((-RN/(BaseRN*area_scale)/2.0,-RN/(BaseRN*area_scale)/2.0),
-				   ( RN/(BaseRN*area_scale)/2.0, RN/(BaseRN*area_scale)/2.0)))
 GaussianGenerator.bounds = input_bounds
 
 
@@ -173,8 +175,9 @@ CFProjection.learning_fn=DivisiveHebbian()
 
 s = topo.base.simulator.Simulator()
 
+
 Retina = GeneratorSheet(input_generator=GaussianGenerator(),
-                        name='Retina', bounds=input_bounds)
+                        name='Retina')
 V1 = LISSOM(name='V1')
 
 s.connect(Retina,V1, delay = FixedPoint("0.05"),
