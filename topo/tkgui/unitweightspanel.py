@@ -36,7 +36,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
 
         self._add_xy_boxes()
         self.auto_refresh_checkbutton.invoke()
-
+        self.toggle_situate()
         self.refresh()
 
 
