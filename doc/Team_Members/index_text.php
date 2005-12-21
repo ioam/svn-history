@@ -18,10 +18,7 @@ include:
   <br>
   <br>
   <p><dt>Chris Ball, September 2005-</dt>
-  <dd>Chris recently received an MSc from the University of Edinburgh
-      (topic: modeling motion aftereffects in LISSOM), and previously had a
-      background in physics.  He is currently working on 
-      input pattern types and related issues.
+  <dd>Chris recently worked on <a href="http://homepages.inf.ed.ac.uk/s0454615/mae/lissom/">modeling motion aftereffects in LISSOM</a>, and now works on Topographica.
   <p><dt>Julien Ciroux, October 2005-</dt>
   <dd>Julien recently received an MSc from the University of Edinburgh
       (topic: modeling McCollough effect in LISSOM).  He is currently
