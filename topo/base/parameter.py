@@ -583,13 +583,20 @@ class Dynamic(Parameter):
 
 
 class Constant(Parameter):
-    """Constant Parameter that can be constructed and used but not set."""
+    """
+    Constant Parameter that can be constructed and used but not set on an object.
+
+    The value of the Parameter can, however, be set on a class.
+    """
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
     
     def __set__(self,obj,val):
         """Does not allow set commands."""
-        raise "Constant parameter cannot be modified"
+        if obj==None:
+            super(Constant,self).__set__(obj,val)
+        else:
+            raise "Constant parameter cannot be modified"
 
 
 def produce_value(value_obj):
