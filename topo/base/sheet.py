@@ -95,7 +95,7 @@ $Id$
 __version__ = '$Revision$'
 
 from simulator import EventProcessor
-from parameter import Parameter, BooleanParameter
+from parameter import Constant, BooleanParameter
 from Numeric import zeros,array,floor
 from boundingregion import BoundingBox
 import sheetview 
@@ -377,8 +377,8 @@ class Sheet(EventProcessor):
     code.
     """
 
-    bounds  = Parameter(BoundingBox(points=((-0.5,-0.5),(0.5,0.5))))
-    density = Parameter(10)
+    bounds  = Constant(default=BoundingBox(points=((-0.5,-0.5),(0.5,0.5))))
+    density = Constant(default=10)
     learning = BooleanParameter(True)
 
     def __init__(self,**params):
