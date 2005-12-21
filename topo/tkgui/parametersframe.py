@@ -96,9 +96,17 @@ class ParametersFrame(Frame):
         """
         """
         # go through, get parameters, set them on the topo_obj
-        for (name,parameter) in self.visible_parameters.items():
+        parameters_to_modify = [ (name,parameter)
+                                 for (name,parameter)
+                                 in self.visible_parameters.items()
+                                 if not type(parameter)==topo.base.parameter.Constant]
+        
+        for (name,parameter) in parameters_to_modify:
             w = self.widgets[name][1]
+            # print "[", self.topo_obj,name,w.get_value()  ,"]" 
             setattr(self.topo_obj,name,w.get_value())
+
+        
        
 
     def create_widgets(self, topo_obj):
@@ -170,8 +178,17 @@ class ParametersFrame(Frame):
         for (parameter_name, parameter) in self.visible_parameters.items():
 
             # find the appropriate entry widget for the parameter...
+
+            # CEBHACKALERT: not going to help if it's the class and you want to
+            # make this for the first time
+            if isinstance(parameter, topo.base.parameter.Constant):
+                
+                widget_dict[parameter_name] = self.__properties_frame.add_text_property(
+                    parameter_name,
+                    value = getattr(self.topo_obj,parameter_name),
+                    state="readonly")
             
-            if isinstance(parameter, topo.base.parameter.Number):
+            elif isinstance(parameter, topo.base.parameter.Number):
                 try:
                     low_bound,high_bound = parameter.get_soft_bounds()
 

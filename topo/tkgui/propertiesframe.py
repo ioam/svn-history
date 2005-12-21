@@ -7,7 +7,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import Frame, StringVar, Message, IntVar, N,S,E,W,X
+from Tkinter import Frame, StringVar, Message, IntVar, N,S,E,W,X, NORMAL
 from taggedslider import TaggedSlider,EntryEval,ComboBoxEval,CheckbuttonEval
 
 
@@ -49,7 +49,7 @@ class PropertiesFrame(Frame):
 
     # CEBHACKALERT: re-implement checkbox
 
-    def add_text_property(self,name,value="",string_translator=None,width=20):
+    def add_text_property(self,name,value="",string_translator=None,width=20,state=NORMAL):
         """
         Create a TKInter.Entry box and add it to self.properties.
 
@@ -59,7 +59,8 @@ class PropertiesFrame(Frame):
         control = EntryEval(self,
                             textvariable = var,
                             string_translator = string_translator,
-                            width=width)
+                            width=width,
+                            state=state)
         
         control.bind('<Return>', self.optional_refresh)
         return self.add_property(name,var,control,value)

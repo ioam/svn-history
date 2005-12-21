@@ -6,7 +6,7 @@ $Id$
 __version__='$Revision$'
 
 from Tkinter import Frame, IntVar, Scale, Entry, Checkbutton
-from Tkinter import LEFT, RIGHT, TOP, BOTTOM, YES, BOTH
+from Tkinter import LEFT, RIGHT, TOP, BOTTOM, YES, BOTH, NORMAL
 import string
 
 
@@ -135,11 +135,12 @@ class TaggedSlider(Frame):
 class EntryEval(Entry):
 
     # get rid of stuff like width from here.
-    def __init__(self, master=None, textvariable="",string_translator=None, width=20):
+    def __init__(self, master=None, textvariable="",string_translator=None, width=20, state=NORMAL):
         """
         String translator defaults to None because default is text.
         """
-        Entry.__init__(self,master=master,textvariable=textvariable,width=width)
+        # CEBALERT: someone might want to pick a better color.
+        Entry.__init__(self,master=master,textvariable=textvariable,width=width,state=state,readonlybackground="pink")
         self.string_translator = string_translator
 
     def get_value(self):
