@@ -6,7 +6,7 @@ $Id$
 __version__ = "$Revision$"
 
 from topo.base.topoobject import TopoObject
-from topo.base.parameter import Parameter,Constant,Number
+from topo.base.parameter import Parameter,Number
 from topo.base.projection import Identity
 from topo.base.connectionfield import CFLearningFunction
 from topo.base.arrayutils import L2norm
