@@ -151,7 +151,7 @@ try:
 except NameError:
     pass
 """
-#    exec hack in __main__.__dict__
+    exec hack in __main__.__dict__
 
 def save_snapshot(snapshot_name):
     """
