@@ -49,9 +49,9 @@ class ParametersFrame(Frame):
         # something, but I don't know how to do that.
         
         # buttons for setting/(restoring) class Parameter values.
-        pattern_buttonBox = Pmw.ButtonBox(self,orient = 'horizontal',padx=0,pady=0)
-        pattern_buttonBox.add('Install as class defaults',
-                              command=self.install_as_class_defaults)
+        #pattern_buttonBox = Pmw.ButtonBox(self,orient = 'horizontal',padx=0,pady=0)
+        #pattern_buttonBox.add('Install as class defaults',
+        #                      command=self.install_as_class_defaults)
         #pattern_buttonBox.add('Revert to class defaults',
         #                      command=self.revert_to_class_defaults)
 
@@ -59,7 +59,7 @@ class ParametersFrame(Frame):
         #pattern_buttonBox.add('Restore class defaults',
         #                      command=self.restore_class_defaults)
 
-        pattern_buttonBox.pack(side=TOP)
+        #pattern_buttonBox.pack(side=TOP)
 
 
         self.__help_balloon = Pmw.Balloon(parent)
