@@ -7,8 +7,8 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import Frame, StringVar, Entry, Message, Checkbutton, IntVar, N,S,E,W,X
-from taggedslider import TaggedSlider,EntryEval,ComboBoxEval
+from Tkinter import Frame, StringVar, Message, IntVar, N,S,E,W,X
+from taggedslider import TaggedSlider,EntryEval,ComboBoxEval,CheckbuttonEval
 
 
 class PropertiesFrame(Frame):
@@ -25,7 +25,11 @@ class PropertiesFrame(Frame):
 
 
     def optional_refresh(self,CEBHACKALERT=None):
-        if self.parent.auto_refresh: self.parent.refresh()
+        try:
+            if self.parent.auto_refresh: self.parent.refresh()
+        except AttributeError:
+            pass
+        
 
 
     def add_property(self,name,var,control,value):
@@ -90,6 +94,14 @@ class PropertiesFrame(Frame):
         control.bind('<Return>', self.optional_refresh)
         return self.add_property(name,var,control,value)
 
+
+    # CEBHACKALERT: who knows why I pass text="" all the way through...
+    def add_checkbutton_property(self,name,value=0,**kw):
+         """
+         """
+         var = IntVar()
+         control = CheckbuttonEval(self,text="",variable=var,**kw)
+         return self.add_property(name,var,control,value)
 
 
     # CEBHACKALERT: currently unused, but could be used in the future to set the

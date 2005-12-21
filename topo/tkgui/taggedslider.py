@@ -5,7 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import Frame, IntVar, Scale, Entry
+from Tkinter import Frame, IntVar, Scale, Entry, Checkbutton
 from Tkinter import LEFT, RIGHT, TOP, BOTTOM, YES, BOTH
 import string
 
@@ -173,3 +173,20 @@ class ComboBoxEval(ComboBox):
             return self.string_translator(self.get())
         else:
             return self.get()
+
+
+class CheckbuttonEval(Checkbutton):
+
+    def __init__(self, master=None, text="",variable=None, **kw):
+        """
+        String translator defaults to None because default is text.
+        """
+        Checkbutton.__init__(self,master=master,text=text,variable=variable,**kw)
+        self.var = variable
+
+    # CEBHACKALERT: surely I don't have to do this.
+    def get_value(self):
+        if self.var.get()==1:
+            return True
+        else:
+            return False

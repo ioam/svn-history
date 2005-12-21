@@ -98,6 +98,7 @@ class ParametersFrame(Frame):
         # go through, get parameters, set them on the topo_obj
         for (name,parameter) in self.visible_parameters.items():
             w = self.widgets[name][1]
+            print "[start] try to set",self.topo_obj ,name,  "to", w.get_value(), "[end]"
             setattr(self.topo_obj,name,w.get_value())
        
 
@@ -163,7 +164,9 @@ class ParametersFrame(Frame):
         parameters must be Parameter objects.
         """
 
-        # CEBHACKALERT: this will change
+        # CEBHACKALERT: this will change (to a dictionary
+        # mapping parameter types to methods)
+        
         widget_dict = {}
         for (parameter_name, parameter) in self.visible_parameters.items():
 
@@ -213,6 +216,11 @@ class ParametersFrame(Frame):
                     value = parameter.get_default_class_name(), #.getattr(self.topo_obj,parameter_name),
                     items = parameter.range().keys(),
                     string_translator = parameter.get_from_key)
+            elif isinstance(parameter, topo.base.parameter.BooleanParameter):
+                widget_dict[parameter_name] = self.__properties_frame.add_checkbutton_property(
+                    parameter_name,
+                    value = getattr(self.topo_obj,parameter_name))
+
 
             else:
                 # everything else gets a textbox   
