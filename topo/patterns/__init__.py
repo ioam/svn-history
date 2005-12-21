@@ -25,5 +25,5 @@ class PatternGeneratorParameter(PackageParameter):
     def __init__(self,default=None,doc='',**params):
         """
         """
-        super(PatternGeneratorParameter,self).__init__(topo.patterns,PatternGenerator,suffix_to_lose='Generator',default=default,doc=doc,**params)
+        super(PatternGeneratorParameter,self).__init__(topo.patterns,PatternGenerator,default=default,doc=doc,**params)
 
