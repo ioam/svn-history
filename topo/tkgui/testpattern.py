@@ -39,13 +39,6 @@ from topo.plotting.plot import make_plot
 from Tkinter import IntVar, StringVar, Checkbutton
 from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
 
-
-# CEBHACKALERT: find out what this is.
-# Hack to reverse the order of the input EventProcessor list and the
-# Preview plot list, so that it'll match the order that the plots appear
-# in the Activity panel.
-LIST_REVERSE = True
-
 # Default time to show in the Presentation duration box.
 DEFAULT_PRESENTATION = '1.0'
 
@@ -156,7 +149,9 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
                                 selectmode = 'multiple')
         self.__input_box.pack(fill = 'x', padx = 5)
 
-        for generator_sheet_name in self.generator_sheets_patterns.keys():
+        CEBHACKALERT = copy.copy(self.generator_sheets_patterns.keys())
+        CEBHACKALERT.reverse()
+        for generator_sheet_name in CEBHACKALERT:
             self.__input_box.add(generator_sheet_name)
             self.__input_box.invoke(generator_sheet_name)
         
