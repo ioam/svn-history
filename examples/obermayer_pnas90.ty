@@ -31,6 +31,7 @@ import topo.patterns.random
 import topo.patterns.basic
 from topo.base.simulator import Simulator
 from topo.learningfns.basic import HebbianSOMLF
+from topo.patterns import PatternGeneratorParameter
 
 
 class ObermayerSOM(CFSOM):
@@ -64,6 +65,7 @@ topo.patterns.basic.Gaussian.size  = gaussian_height
 topo.patterns.basic.Gaussian.aspect_ratio = gaussian_width/gaussian_height
 topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 
+PatternGeneratorParameter.default=topo.patterns.basic.Gaussian()
 
 # cortical sheet
 ObermayerSOM.density = 25 #6

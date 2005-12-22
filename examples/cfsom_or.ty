@@ -24,6 +24,7 @@ import topo.patterns.random
 import topo.patterns.basic
 from topo.base.simulator import Simulator
 from topo.learningfns.basic import HebbianSOMLF
+from topo.patterns import PatternGeneratorParameter
 
 
 ###########################################
@@ -39,6 +40,8 @@ topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(
 topo.patterns.basic.Gaussian.size = 0.3*1.5/7.0
 topo.patterns.basic.Gaussian.aspect_ratio = 7.0/1.5
 topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+
+PatternGeneratorParameter.default=topo.patterns.basic.Gaussian()
 
 
 # cortical sheet
