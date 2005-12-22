@@ -5,6 +5,9 @@ PYCHECKER = bin/pychecker
 
 DOC    = doc/Reference_Manual
 
+RELEASE = 0.8.0
+RELEASE_TAG = release_0_8_0
+
 # Default does not include doc, in case user lacks PHP
 default: ext-packages topographica reference-manual
 
@@ -38,6 +41,7 @@ topographica: external Makefile
 	echo "os.putenv('LD_LIBRARY_PATH'," >> topographica
 	echo "          ':'.join((os.path.join(TOPO,'lib'),os.getenv('LD_LIBRARY_PATH',''))))" >> topographica
 	echo "os.putenv('PYTHONPATH',TOPO+':'+':'+os.getenv('PYTHONPATH',''))" >> topographica
+	echo "os.putenv('TOPORELEASE','${RELEASE}')" >> topographica
 	echo "" >> topographica
 	echo "# exec" >> topographica
 	echo "cmd = os.path.join(TOPO,'bin/python')" >> topographica
@@ -65,3 +69,21 @@ reference-manual: topo/*.py topo/*/*.py doc/Reference_Manual
 
 doc: FORCE
 	make -C doc/
+
+
+
+## Code releases, currently handled via CVS.
+## Run these from a relatively clean copy of the topographica directory 
+## (without stray files, especially in doc/).
+
+cvs-release: LATEST_STABLE sf-web-site
+
+# Make a new LATEST_STABLE on the web, using the currently checked-out version
+LATEST_STABLE:
+	cvs tag -c LATEST_STABLE
+	cvs tag -c ${RELEASE_TAG}
+
+# Update Topographica.org web site
+sf-web-site:
+	rsync -v -arHz -e ssh doc/. topographica.sf.net:/home/groups/t/to/topographica/htdocs/.
+
