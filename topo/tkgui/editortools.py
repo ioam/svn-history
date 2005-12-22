@@ -82,7 +82,7 @@ class NodeTool(Frame) :
 	self.sheetList = self.getSheetList()
 	sheetList = self.sheetList.keys()
 	# populate the menu with the available sheet list.
-	self.opMenu = Pmw.ComboBox(self, label_text = 'Sheet :', labelpos = 'nw',
+	self.opMenu = Pmw.ComboBox(self, label_text = 'Add sheet of type:', labelpos = 'nw',
 				   selectioncommand = self.setOption, scrolledlist_items = sheetList)
 	self.opMenu.pack()
 	self.opMenu.bind('<Button-1>', self.changeMode)
@@ -149,7 +149,7 @@ class ConTool(Frame) :
 	self.projList = self.getProjList()
 	projList = self.projList.keys() # gets the class names.
 	# populate the menu with the available projection list.
-	self.opMenu = Pmw.ComboBox(self, label_text = 'Projections :', labelpos = 'nw',
+	self.opMenu = Pmw.ComboBox(self, label_text = 'Add projection of type:', labelpos = 'nw',
 				   selectioncommand = self.setOption, scrolledlist_items = projList)
 	self.opMenu.bind('<Button-1>', self.changeMode)
 	self.opMenu.pack()
