@@ -62,9 +62,10 @@ class TestSheetView(unittest.TestCase):
 
 
     def test_view(self):
-        input = ImageGenerator(filename='topo/tests/testsheetview.ppm',
-                        density=100,
-                        bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))))
+        ImageGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+        ImageGenerator.density = 100
+        
+        input = ImageGenerator(filename='topo/tests/testsheetview.ppm')
 	sv = SheetView((input.activity,input.bounds),
                           src_name=input.name,view_type='Activity')
         input.add_sheet_view('Activity',sv)

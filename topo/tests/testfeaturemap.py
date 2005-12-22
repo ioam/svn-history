@@ -35,9 +35,10 @@ class TestFeatureMap(unittest.TestCase):
 
     def setUp(self):
 
-        # sheet to test. As it is, its activity matrix dimension is (3,2) 
-        test_sheet = Sheet(density= 1, bounds= BoundingBox(points=((-1,-2),(1,1))))
-
+        # sheet to test. As it is, its activity matrix dimension is (3,2)
+        Sheet.density = 1
+        Sheet.bounds = BoundingBox(points=((-1,-2),(1,1)))
+        test_sheet = Sheet()
         # simple activity arrays use to update the feature maps
         self.a1 = array([[1,1], [1,1], [1,1]])
         self.a2 = array([[3,3], [3,3], [3,3]])

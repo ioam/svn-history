@@ -116,9 +116,10 @@ class TestCFSom(unittest.TestCase):
         from testsheetview import ImageGenerator
         
         s = Simulator(step_mode=True)
-    
-        input = ImageGenerator(filename='examples/main.ppm',density=100,
-                               bounds=BoundingBox(points=((-0.8,-0.8),(0.8,0.8))))
+
+        ImageGenerator.density = 100
+        ImageGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+        input = ImageGenerator(filename='examples/main.ppm')
     
     
         save = ImageSaver(pixel_scale=1.5)
