@@ -52,7 +52,7 @@ selecting <span class='t_item'>Load snapshot</span> from the
 <span class='t_item'>Simulation</span> menu and selecting <code>examples/lissom_or_20000.typ</code>. This
 simulation is a small orientation map, with a 24x24
 retina and a 48x48 V1 with about two million
-synaptic weights. The layout can be viewed in the <span class='w_title'>Model Editor</span> window (which can be selected from the <span class='t_item'>Simulation</span> menu), but is also shown below:
+synaptic weights. The architecture can be viewed in the <span class='w_title'>Model Editor</span> window (which can be selected from the <span class='t_item'>Simulation</span> menu), but is also shown below:
 <p class='center'>
 <img src="images/lissom_network_diagram.png" alt="LISSOM network."
 align="middle" width="270" height="397">
