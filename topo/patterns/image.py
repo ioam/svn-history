@@ -16,7 +16,12 @@ from topo.patterns.basic import AR_PREC, SI_PREC
 from topo.base.parameter import Filename, Number, Parameter, Enumeration
 from topo.outputfns import OutputFunctionParameter
 from Numeric import array, transpose, ones, floor, Float, divide, where
-import Image, ImageOps
+
+# CEBHACKALERT: this is a tragic hack. Who would have thought that the
+# word Image would already have been used by someone else? And in a
+# file about images, too.
+import Image as pImage
+import ImageOps
 
 
 # CEBHACKALERT: this is sheet's, but for arrays
@@ -110,7 +115,7 @@ class TopoImage(TopoObject):
     def __init__(self, filename, output_fn):
         """
         """
-        image = ImageOps.grayscale(Image.open(filename))
+        image = ImageOps.grayscale(pImage.open(filename))
         self.n_image_cols, self.n_image_rows = image.size
 
         image_array = array(image.getdata(),Float)
