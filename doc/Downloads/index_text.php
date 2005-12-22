@@ -188,6 +188,7 @@ stable version at any time by doing:
 <pre>
   cd topographica
   cvs update -d -P -r LATEST_STABLE
+  make all
 </pre>
 
 As before, <code>-r LATEST_STABLE</code> can be omitted to get the
