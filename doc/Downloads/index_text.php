@@ -192,4 +192,6 @@ stable version at any time by doing:
 </pre>
 
 As before, <code>-r LATEST_STABLE</code> can be omitted to get the
-very most recent version.
+very most recent version.  Note that updating the examples/
+subdirectory sometimes takes a long time, if the sample saved snapshot
+has been updated.
