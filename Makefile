@@ -80,6 +80,7 @@ cvs-release: LATEST_STABLE sf-web-site
 
 # Make a new LATEST_STABLE on the web, using the currently checked-out version
 LATEST_STABLE:
+	cvs rtag -d LATEST_STABLE topographica
 	cvs tag -F -c LATEST_STABLE
 	cvs tag -F -c ${RELEASE_TAG}
 

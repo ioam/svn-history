@@ -46,7 +46,7 @@ wherever you want the files to be stored, and use the command:
 
 <pre>
   cvs -d :pserver:anonymous@cvs.sf.net:/cvsroot/topographica
-  checkout -A -P -r LATEST_STABLE topographica
+  checkout -P -r LATEST_STABLE topographica
 </pre>
 
 (where the entire command should be on a single line, even though it
@@ -187,7 +187,7 @@ stable version at any time by doing:
 
 <pre>
   cd topographica
-  cvs update -d -A -P -r LATEST_STABLE
+  cvs update -d -P -r LATEST_STABLE
 </pre>
 
 As before, <code>-r LATEST_STABLE</code> can be omitted to get the
