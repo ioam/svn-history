@@ -88,5 +88,11 @@ s.connect(V3,V2,delay=0.5,connection_type=CFProjection,connection_params={'name'
 # Projections to V3
 s.connect(V2,V3,delay=0.5,connection_type=CFProjection,connection_params={'name':'Afferent'})
 
+# Set default locations for the Model Editor
+V1.guiX=135          ; V1.guiY=320
+V2.guiX=500          ; V2.guiY=230
+V3.guiX=500          ; V3.guiY=90
+LeftRetina.guiX=151  ; LeftRetina.guiY=520
+RightRetina.guiX=369 ; RightRetina.guiY=520
 
 s.run(1)
