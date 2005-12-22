@@ -83,8 +83,8 @@ class Gabor(PatternGenerator):
     
     frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),precedence=FR_PREC)
     phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),precedence=PH_PREC)
-    aspect_ratio   = Number(default=0.3,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
-    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
+    aspect_ratio   = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
+    size  = Number(default=0.25,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
 
     def function(self,**params):
         height = params.get('size',self.size)
@@ -108,8 +108,8 @@ class Line(PatternGenerator):
     # used to draw it, or just in the display; I have to look to
     # see which.
 
-    thickness   = Number(default=0.006,bounds=(0.0,None),softbounds=(0.0,0.075),precedence=TH_PREC)
-    smoothing = Number(default=0.05,bounds=(0.0,None),softbounds=(0.0,0.075),precedence=SM_PREC)
+    thickness   = Number(default=0.006,bounds=(0.0,None),softbounds=(0.0,1.0),precedence=TH_PREC)
+    smoothing = Number(default=0.05,bounds=(0.0,None),softbounds=(0.0,0.5),precedence=SM_PREC)
 
     # CEBHACKALERT:
     # scale does not need to be here. For the tutorial, having this scale
@@ -126,9 +126,9 @@ class Line(PatternGenerator):
 class Disk(PatternGenerator):
     """2D disk pattern generator."""
 
-    aspect_ratio  = Number(default=1.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
-    size  = Number(default=0.75,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
-    smoothing = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5),precedence=SM_PREC)
+    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
+    size  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
+    smoothing = Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),precedence=SM_PREC)
     
     def function(self,**params):
         height = params.get('size',self.size)
@@ -145,9 +145,9 @@ class Ring(PatternGenerator):
     """2D ring pattern generator."""
 
     thickness   = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5),precedence=TH_PREC)
-    smoothing = Number(default=0.07,bounds=(0.0,None),softbounds=(0.0,0.5),precedence=SM_PREC)
-    aspect_ratio  = Number(default=1.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
-    size  = Number(default=0.75,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
+    smoothing = Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),precedence=SM_PREC)
+    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
+    size  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
 
     def function(self,**params):
         height = params.get('size',self.size)
@@ -164,8 +164,8 @@ class Ring(PatternGenerator):
 class Rectangle(PatternGenerator):
     """2D rectangle pattern generator."""
     
-    aspect_ratio   = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
-    size  = Number(default=0.75,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
+    aspect_ratio   = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
+    size  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
 
     # We will probably want to add Fuzzy-style anti-aliasing to this.
 
