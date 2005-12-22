@@ -146,18 +146,18 @@ neuron.  A similar procedure can be performed in the model by selecting
 <span class='t_item'>Orientation Preference</span> from the <span class='t_item'>Plots</span> menu:
 
 <p class="center">
-<img src="images/or_map.png" alt="Orientation map" width="553" height="292">&nbsp;&nbsp;&nbsp;
-<img src="images/or_key_vert_transparent_topo.png" alt="Orientation key" height="291" width="24">
+<img src="images/or_map.png" alt="Orientation map" width="553" height="292">
+<br />
+<img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="44" width="553">
 </p><br>
 
-<!-- CEBHACKALERT: orientation key is wrong -->
 
 <P>
 (This will usually take about 30 seconds to complete; it is normal
 for the Topographica windows not to refresh during this time.)
 The plot on the left is the orientation map for V1 in this network.
 Each neuron in the plot is color coded by its preferred orientation,
-according to the key to the right.
+according to the key beneath the image.
 (If viewing a monochrome printout, see web page for the colors).
 </p>
 
@@ -185,8 +185,8 @@ on the <span class='w_title'>Test pattern</span> window and then looking
 at the refreshed image in the <span class='w_title'>Activity</span> window:
 
 <p class="center">
-<img src="images/activity_line_or.png" alt="Color-coded response to a line" width="426" height="340">
-<img src="images/or_key_vert_transparent_topo.png" alt="Orientation key" height="320" width="24">
+<img src="images/activity_line_or.png" alt="Color-coded response to a line" width="426" height="340"><br />
+<img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="34" width="426">
 </p><br>
 
 
