@@ -24,8 +24,8 @@ SourceForge documentation</A> for more details or if you have any
 difficulties.
 
 <P> To get started, first change to a directory to which you have
-write access with sufficient space available, i.e., about 500
-megabytes as of 11/2005.  There are two ways to get your own local
+write access with sufficient space available, i.e., about 400
+megabytes as of 12/2005.  There are two ways to get your own local
 copy of the CVS files, depending on whether or not you are an official
 Topographica developer.  Non-developers can check out a read-only
 version of the repository, while developers have read/write access so
@@ -62,7 +62,7 @@ usable due to work in progress.
 
 For developers wanting read/write access, no login step is needed.
 However, you may need to tell CVS to use <code>ssh</code>, because
-most systems default to rsh, which is almost never supported anymore.
+most systems default to rsh, yet rsh is almost never supported in practice.
 Just type <code>export CVS_RSH=ssh</code> for <code>sh/bash</code> or
 <code>setenv CVS_RSH ssh</code> for csh/tcsh; you may wish to put this
 in your shell startup file.  The checkout command is then:
@@ -83,7 +83,7 @@ most up-to-date version for editing.
 
 The <code>topographica</code> directory you have now checked out
 includes the files necessary to build Topographica on most platforms.
-To make the build process simpler for developers using multiple of
+To make the build process simpler for developers using multiple
 platforms, source code versions of the libraries needed are included,
 and are created as part of the build process.  This approach makes the
 initial compilation time longer and the simulator directory larger,
@@ -161,11 +161,21 @@ shell and give you a "Topographica>" prompt.
 Once you have the code installed and built, go to your
 topographica/ directory and type e.g.:
 
+<pre>
   ./topographica -g examples/cfsom_or.ty
+</pre>
 
 or
 
+<pre>
+  ./topographica -g examples/hierarchical.ty
+</pre>
+
+or
+
+<pre>
   ./topographica -g examples/lissom_or.ty
+</pre>
 
 If you use the latter, a good way to get started is to work through
 the <A HREF="../Tutorial/index.html">LISSOM tutorial</A>.
@@ -180,5 +190,5 @@ stable version at any time by doing:
   cvs update -d -A -P -r LATEST_STABLE
 </pre>
 
-As before, '-r LATEST_STABLE' can be omitted to get the very most
-recent version.
+As before, <code>-r LATEST_STABLE</code> can be omitted to get the
+very most recent version.

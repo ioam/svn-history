@@ -2,7 +2,7 @@
 below, a large number of changes and new features are scheduled over
 the next few months, as well as over the next few years.
 
-<H2>Most urgent (2005):</H2>
+<H2>Most urgent (First quarter 2006):</H2>
 <DL COMPACT>
 <DT>ALERTs</DT><DD>
 There are a large number of relatively small problems noted in the
@@ -20,8 +20,9 @@ also plan to support the Mac OS X version.  Recent versions have so
 far been tested only on Linux, and due to the rapid pace of
 development, some changes are expected to be needed for non-Linux
 platforms.  We will announce when these changes have been made,
-although it is possible for individual users to get Topographica
-working on those platforms before we have had a chance to look at
+although it is not usually difficult for individual tech-savvy users
+to get Topographica working on those platforms before we have had a
+chance to look at them.
 
 <P><DT></DT><DD>
 The GUI and the simulation run should be asynchronous, either using
@@ -53,9 +54,9 @@ addition, pickling is not robust against changes to the class
 definitions for LISSOM, such as changes in names.  To reduce these
 problems, we are working on an alternative implementation of state
 saving using XML, which is designed to be an archival, readable
-format.  In the meantime, users should be aware that saved files will
-not necessarily be readable by future versions of Topographica, and
-should be considered temporary.
+format.  In the meantime, users should be aware that saved snapshot
+files will not necessarily be readable by future versions of
+Topographica, and should be considered temporary.
 
 <P><DT>Plotting</DT><DD>
 Two-dimensional bitmap plots are already supported, but will be
@@ -81,7 +82,8 @@ parameters will be redefined to be expressed in density-independent terms.
 
 <P><DT>Circular CFs</DT><DD>
 Currently, only square ConnectionFields are implemented, but support
-for circular (or any arbitrary shape) ConnectionFields will be added soon. 
+for circular (or any arbitrary shape) ConnectionFields is currently 
+in development. 
 <!-- Also should consider sparse layers with patch distribution of units -->
 
 <P><DT>Convolution Projections</DT><DD>
@@ -99,10 +101,22 @@ more complex commands than necessary.  These items will be simplified
 and made more appropriate for command-line and batch use, to make
 using larger networks more practical.
 
+<P><DT>GUI model editor</DT><DD>
+
+The Topographica GUI supports plotting and analysis of existing
+networks, and now includes a network construction GUI that allows
+primitives to be selected from the library and connected into a model
+network.  Parameters and options can then be set on these components,
+thus defining a simulation without requiring coding (except to add new
+primitives if desired).  This facility is still under development, and
+is still missing some crucial functionality required for the graphical
+approach to be useful, such as the ability to set object parameters
+before they are constructed.  These limitations will be removed very
+soon, allowing the editor to be used to construct useful models.
 </DL>
 
 
-<H2>Near future (early 2006):</H2>
+<H2>Near future (first half 2006):</H2>
 <DL COMPACT>
 
 <P><DT>Example models</DT><DD>
@@ -126,10 +140,8 @@ HREF="http://matplotlib.sourceforge.net/screenshots/pcolor_demo_large.png">conto
 or vector field overlay on top of a bitmap, e.g. for joint preference
 maps (such as direction arrows on topo of an orientation bitmap plot).
 
-<P>Other minor changes planned include adding a "Situate" option to
-weights plots (to show where the ConnectionField is located on the
-input Sheet), outlining of ConnectionField extents, and adding
-histograms for each bitmap.
+<P>Other minor changes planned include adding outlining of
+ConnectionField extents, and plotting histograms for each bitmap.
 
 <P><DT>Selecting units for plotting or analysis</DT><DD>
 In many of the GUI displays, a large number of units are shown.  These
@@ -141,22 +153,13 @@ individual units are not labeled or individually selectable.  We plan
 to make all such plots "live", so that individual units or
 ConnectionFields can be selected and analyzed.
 
-<P><DT>Network design GUI</DT><DD>
-The Topographica GUI supports plotting and analysis of existing
-networks.  However, the networks themselves must be implemented using
-the Python scripting language.  We are currently designing a network
-construction GUI that will allow primitives to be selected from the
-library and connected into a model network.  Parameters and options
-can then be set on these components, thus defining a simulation
-without requiring coding (except to add new primitives if desired).
-
 <P><DT>Command console</DT><DD>
 At the moment, the Topographica console GUI window provides a single 
 command-line widget, allowing arbitrary Python commands to be executed.
 However, the output from those commands goes into the shell window
 from which Topographica was launched, which can be confusing, because
 the commands themselves do not appear there.  It would be good to add
-a visible command i/o history that shows both the commands executed
+a visible command I/O history that shows both the commands executed
 and their output, either as a single shell-editor component (like IDLE
 or MatLab) or as a separate pane (not a drop-down).  
 <!--
@@ -288,7 +291,8 @@ It will be crucial to provide easy-to-use interfaces for exchanging
 data and calling code in other simulators, such as Matlab.  These will
 be used both for analyzing Topographica data, and for allowing
 connection patterns and/or map organization to be specified from
-experimental data.
+experimental data.  Meanwhile, the Python command-line interface can
+be used to display or save any element of the model.
 
 <P><DT>Lesion support</DT><DD>
 Eventually, all components will be temporarily lesionable, i.e.,

@@ -11,9 +11,20 @@ information, see the individual subpackages:
 <DD>Visualization functions and classes</DD>
 <P><DT><A href="topo.analysis.html"><strong>analysis</strong></A></DT>
 <DD>Analysis functions and classes (besides plotting)</DD>
+<P><DT><A href="topo.misc.html"><strong>misc</strong></A></DT>
+<DD>Miscellaneous independent utility functions and classes</DD>
 <P><DT><A href="topo.tkgui.html"><strong>tkgui</strong></A></DT>
 <DD>Tk-based graphical user interface (GUI)</DD>
 </dl>
+
+The <strong>base</strong> directory contains the most fundamental
+Topographica classes, implementing basic functionality such as
+Parameters (user-controllable attributes), Sheets (arrays of units),
+Projections (large groups of connections between Sheets,
+ConnectionFields (spatially localized groups of connections to one
+unit), and the event-driven Simulator.  All of these files are
+independent of the rest of the files in topo/, and act as the primary
+programming interface for Topographica.
 
 
 <H2>Library</H2>
@@ -47,9 +58,9 @@ affecting the code in any of the main packages.
 
 <P> Each of the library directories can be extended with new classes
 of the appropriate type, just by adding a new .py file to that
-directory.  E.g. new PatternGenerator classes can be added to
-patterns/, and will then show up in the GUI menus as potential input
-patterns.
+directory.  E.g. a file of new PatternGenerator classes can be copied
+into patterns/, and will then show up in the GUI menus as potential
+input patterns.
 
 <!-- JABALERT! This should probably move to its own page. -->
 <H2>External Packages</H2>
@@ -61,7 +72,7 @@ documentation:
 <!-- Should we make these point to the local copy instead? -->
 <P><DL COMPACT>
 
-<P><DT><A href="http://python.org/doc/"></A>Python</DT>
+<P><DT><A href="http://python.org/doc/">Python</A></DT>
 <DD>Topographica command and scripting language (essential!).  For a
 good basic introduction, check out the <A
 HREF="http://docs.python.org/tut/tut.html">Python tutorial</A>.  There

@@ -1,17 +1,20 @@
 <IMG src="../images/Topo-arch-white.jpg" 
      width="300" height="326" border="2" alt="Sample architecture" align="right"></A>
 
-<P><!--img src="../images/T-bg.png" width="43" height="50" align="left" alt="T" border="2"-->Topographica is a software package for computational modeling of
-cortical maps, developed by the 
-<a target="_top" href="http://www.anc.ed.ac.uk">Institute for Adaptive and Neural Computation</a> 
-at the <a target="_top" href="http://www.ed.ac.uk">University of Edinburgh</a> and the 
+<P><!--img src="../images/T-bg.png" width="43" height="50" align="left" alt="T" border="2"-->Topographica 
+
+is a software package for computational modeling of neural maps, developed by the 
+<a target="_top" href="http://www.anc.ed.ac.uk">Institute for Adaptive and Neural Computation</a>
+at the 
+<a target="_top" href="http://www.ed.ac.uk">University of Edinburgh</a> and the 
 <a target="_top" href="http://www.cs.utexas.edu/users/nn">Neural Networks Research
-Group</a> at the <a target="_top" href="http://www.utexas.edu">University of Texas
-at Austin</a>.  The project is funded by the 
-<a target="_top" href="http://www.nimh.nih.gov/neuroinformatics/index.cfm">NIMH
-Human Brain Project</a> under grant 1R01-MH66991.  The goal is to help
-researchers understand brain function at the level of the topographic
-maps that make up sensory and motor systems.
+Group</a> at the 
+<a target="_top" href="http://www.utexas.edu">University of Texas at Austin</a>.  
+The project is funded by the 
+<a target="_top" href="http://www.nimh.nih.gov/neuroinformatics/index.cfm">NIMH Human Brain Project</a> 
+under grant 1R01-MH66991.  The goal is to help researchers understand
+brain function at the level of the topographic maps that make up
+sensory and motor systems.
 
 <P>Topographica is intended to complement the many good low-level
 neuron simulators that are available, such as
@@ -27,12 +30,12 @@ organization of visual orientation and motion direction maps, and
 object segmentation and grouping processes.
 
 <P>To make such models practical, in Topographica the fundamental unit
-is a map rather than a neuron or a part of a neuron.  For most
-simulations, the maps can be implemented at a high level, consisting
+is a sheet of neurons, rather than a neuron or a part of a neuron.  For most
+simulations, the sheets can be implemented at a high level, consisting
 of abstract firing-rate or integrate-and-fire neurons.  When required
 for validation or for specific phenomena, Topographica will also
-support interfaces to maps developed using more detailed neuron models
-in other simulators.  Less-detailed maps can also be used temporarily,
+support interfaces to sheets developed using more detailed neuron models
+in other simulators.  Less-detailed sheets can also be used temporarily,
 e.g. when interacting with the model in real time.  Throughout,
 Topographica makes it simple to use an appropriate level of detail and
 complexity, as determined by the available computing power, phenomena

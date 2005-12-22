@@ -9,8 +9,8 @@ This tutorial shows how to use the
 simple orientation map simulation using weight plots and test pattern
 images.  This particular example uses a <a
 href="http://nn.cs.utexas.edu/lookup?rflissom">LISSOM model</a>
-cortex, although Topographica is designed to be easily extensible to
-work with other models.
+cortex, although Topographica supports other models and is easily
+extensible for models not yet supported.
 </p>
 
 <p>This tutorial assumes that you have already followed the
@@ -152,7 +152,7 @@ neuron.  A similar procedure can be performed in the model by selecting
 <p class="center">
 <img src="images/or_map.png" alt="Orientation map" width="553" height="292">
 <br />
-<img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="44" width="553">
+<img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
 
@@ -188,7 +188,7 @@ at the refreshed image in the <span class='w_title'>Activity</span> window:
 
 <p class="center">
 <img src="images/activity_line_or.png" alt="Color-coded response to a line" width="426" height="340"><br />
-<img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="34" width="426">
+<img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
 
@@ -218,7 +218,7 @@ located in a patch of neurons responding to similar orientations:
 <p class="center">
 <img src="images/unit_weights_0.2_0.0_or.png" alt="Colorized weights of
 one neuron" align="middle" width="576" height="348" ><br />
-<img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="46" width="576">
+<img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 
 
 </p>
@@ -390,7 +390,8 @@ function should be similar.
 <p> Topographica comes with
 additional examples, and more are currently being added. Any valid Python code can
 be used to control and extend Topographica; documentation for Python and existing Topographica commands
-can be accessed from the <span class='t_item'>Help</span> menu.
+can be accessed from the <span class='t_item'>Help</span> menu of the
+<span class='w_title'>Topographica Console</span> window.
 <p>
  Please contact 
 <A HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107?subject=Comments%20on%20Topographica%20tutorial">&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107</a>
