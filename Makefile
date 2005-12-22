@@ -5,8 +5,8 @@ PYCHECKER = bin/pychecker
 
 DOC    = doc/Reference_Manual
 
-RELEASE = 0.8.0
-RELEASE_TAG = release_0_8_0
+RELEASE = 0.8.1
+RELEASE_TAG = release_0_8_1
 
 # Default does not include doc, in case user lacks PHP
 default: ext-packages topographica reference-manual
