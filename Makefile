@@ -84,6 +84,6 @@ LATEST_STABLE:
 	cvs tag -c ${RELEASE_TAG}
 
 # Update Topographica.org web site
-sf-web-site:
+sf-web-site: reference-manual doc
 	rsync -v -arHz -e ssh doc/. topographica.sf.net:/home/groups/t/to/topographica/htdocs/.
 
