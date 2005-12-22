@@ -52,7 +52,11 @@ selecting <span class='t_item'>Load snapshot</span> from the
 <span class='t_item'>Simulation</span> menu and selecting <code>examples/lissom_or_20000.typ</code>. This
 simulation is a small orientation map, with a 24x24
 retina and a 48x48 V1 with about two million
-synaptic weights. 
+synaptic weights. The layout can be viewed in the <span class='w_title'>Model Editor</span> window (which can be selected from the <span class='t_item'>Simulation</span> menu), but is also shown below:
+<p class='center'>
+<img src="images/lissom_network_diagram.png" alt="LISSOM network."
+align="middle" width="270" height="397">
+</p>
 
 <p></p>
 </li>
@@ -161,20 +165,18 @@ according to the key beneath the image.
 (If viewing a monochrome printout, see web page for the colors).
 </p>
 
-<P>You can see that nearby neurons have similar orientation
-preferences, as found in primate visual cortex.  Along the edges of
-the plots, the orientation preferences are parallel to the border due
-to receptive fields that are cut off by the edge of the retina; these
-can be ignored.  The V1 plot on the right
-shows the relative selectivity of each neuron for orientation; you can
-see that there are patches of neurons near the borders that are not
-very orientation selective, and smaller patches in the center, but
-that most are selective.  The V1 plot in the center shows
-the two previously mentioned plots combined -- each neuron is colored
-with its preferred orientation, and the stronger the selectivity, the
-brighter the color.  From this plot it is clear that the unselective
-patches tend to lie between patches of different colors
-(i.e. different preferred orientations).  
+<p>
+You can see that nearby neurons have similar orientation preferences,
+as found in primate visual cortex. The V1 plot on the right shows the
+relative selectivity of each neuron for orientation; you can see that
+there are patches of neurons near the borders that are not very
+orientation selective, and smaller patches in the center, but that
+most are selective.  The V1 plot in the center shows the two
+previously mentioned plots combined -- each neuron is colored with its
+preferred orientation, and the stronger the selectivity, the brighter
+the color.  From this plot it is clear that the unselective patches
+tend to lie between patches of different colors (i.e. different
+preferred orientations).
 
 </p><p>
 </p></li>
