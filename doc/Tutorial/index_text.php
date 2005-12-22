@@ -215,7 +215,10 @@ located in a patch of neurons responding to similar orientations:
 
 <p class="center">
 <img src="images/unit_weights_0.2_0.0_or.png" alt="Colorized weights of
-one neuron" align="middle" width="576" height="348" >
+one neuron" align="middle" width="576" height="348" ><br />
+<img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="46" width="576">
+
+
 </p>
 <p>
 Look at the <span class='t_item'>LateralInhibitory</span> weights, which show that
