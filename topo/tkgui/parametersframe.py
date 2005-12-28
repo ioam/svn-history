@@ -186,7 +186,7 @@ class ParametersFrame(Frame):
                 widget_dict[parameter_name] = self.__properties_frame.add_text_property(
                     parameter_name,
                     value = getattr(self.topo_obj,parameter_name),
-                    state="readonly")
+                    readonly = True)
             
             elif isinstance(parameter, topo.base.parameter.Number):
                 try:

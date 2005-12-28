@@ -5,10 +5,11 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import Frame, IntVar, Scale, Entry, Checkbutton
+from Tkinter import Frame, IntVar, Scale, Entry, Checkbutton, Label
 from Tkinter import LEFT, RIGHT, TOP, BOTTOM, YES, BOTH, NORMAL
+from Pmw import ComboBox
 import string
-
+import tkFont
 
 # CEBHACKALERT: sometime in the day or two before 15/12 I introduced
 # a bug where Image's taggedsliders for size and aspect ratio are
@@ -135,12 +136,11 @@ class TaggedSlider(Frame):
 class EntryEval(Entry):
 
     # get rid of stuff like width from here.
-    def __init__(self, master=None, textvariable="",string_translator=None, width=20, state=NORMAL):
+    def __init__(self, master=None, textvariable="",string_translator=None, width=20):
         """
         String translator defaults to None because default is text.
         """
-        # CEBALERT: someone might want to pick a better color.
-        Entry.__init__(self,master=master,textvariable=textvariable,width=width,state=state,readonlybackground="pink")
+        Entry.__init__(self,master=master,textvariable=textvariable,width=width)
         self.string_translator = string_translator
 
     def get_value(self):
@@ -150,8 +150,18 @@ class EntryEval(Entry):
             return self.get()
 
 
+# CEBHACKALERT: I don't understand how the default font etc. is specified.
+# I just want to specify here that the font shouldn't be bold here (unlike
+# the other labels), but otherwise it should be the same.
+class LabelEval(Label):
 
-from Pmw import ComboBox
+    def __init__(self,master=None,textvariable=""):
+        Label.__init__(self,master=master,textvariable=textvariable, font=tkFont.Font(weight=tkFont.NORMAL))
+
+    def get_value(self):
+        return self.get()
+
+
 class ComboBoxEval(ComboBox):
 
     def __init__(self,
