@@ -89,8 +89,7 @@ class CheckbuttonTranslator(Checkbutton,TranslatorWidget):
             return False
     
 
-# CEBHACKALERT: need to update with TranslatorWidget
-class TaggedSlider(Frame):
+class TaggedSlider(Frame,TranslatorWidget):
     """
     Widget for manipulating a numeric value using either a slider or a
     text-entry box, keeping the two values in sync.
@@ -111,89 +110,90 @@ class TaggedSlider(Frame):
                  **config):
 
         Frame.__init__(self,root,**config)
+        TranslatorWidget.__init__(self,translator=translator)
+
         self.root = root
-        self.fmt = string_format
-        self.translator = translator
+        self.__string_format = string_format
         
         # Add the tag
-        self.tag_val = tagvariable
-        self.tag = Entry(self,textvariable=self.tag_val,width=tag_width)
+        self.__tag_val = tagvariable
+        self.__tag = Entry(self,textvariable=self.__tag_val,width=tag_width)
+        self.__tag.bind('<FocusOut>', self.refresh) # slider is updated on tag return... 
+        self.__tag.bind('<Return>', self.refresh)   # ...and on tag losing focus
+        self.__tag.pack(side=LEFT)
 
-        self.min_value = self.translator(min_value)
-        self.max_value = self.translator(max_value)
+        self.__min_value = self.translator(min_value)
+        self.__max_value = self.translator(max_value)
         
-
         # Add the slider        
-        self.slider_val = IntVar(0)
-        self.slider = Scale(self,showvalue=0,from_=0,to=10000,orient='horizontal',
-                           variable=self.slider_val, command=self.slider_command)
-        self.slider.pack(side=LEFT,expand=YES,fill=BOTH)
-        self.set_slider_from_tag()
-        self.first_slider_command = True          # see self.slider_command below
-
-        
+        self.__slider_val = IntVar(0)
+        self.__slider = Scale(self,showvalue=0,from_=0,to=10000,orient='horizontal',
+                           variable=self.__slider_val, command=self.__slider_command)
+        self.__slider.pack(side=LEFT,expand=YES,fill=BOTH)
+        self.__set_slider_from_tag()
+        self.__first_slider_command = True          # see self.__slider_command below
 
 
-        self.tag.bind('<FocusOut>', self.refresh) # slider is updated on tag return... 
-        self.tag.bind('<Return>', self.refresh)   # ...and on tag losing focus
-
-        
-        self.tag.pack(side=LEFT)
 
         
 
 
     def refresh(self,e=None):
-        self.set_slider_from_tag()
+        self.__set_slider_from_tag()
         self.root.optional_refresh()
 
 
     # CEBALERT: the comment is true, this is required. But
     # maybe there's a cleaner way?
-    def slider_command(self,arg):
+    def __slider_command(self,arg):
         """
         When this frame is first shown, it calls the slider callback,
         which would overwrite the initial string value with a string
         translation (e.g. 'PI' -> '3.142').  This code prevents that.
         """
-        if not self.first_slider_command:
-            self.set_tag_from_slider()
+        if not self.__first_slider_command:
+            self.__set_tag_from_slider()
             self.root.optional_refresh()
         else:
-            self.first_slider_command = False
-        
+            self.__first_slider_command = False
+
+
+    def get(self):
+        """
+        Return the (string) value stored in the tag.
+        """
+        return self.__tag_val.get()
+
      
 
-    def set_tag_from_slider(self):
-        new_string = self.fmt % self.__get_slider_value()
-        self.tag_val.set(new_string)
+    def __set_tag_from_slider(self):
+        new_string = self.__string_format % self.__get_slider_value()
+        self.__tag_val.set(new_string)
 
          
-    def set_slider_from_tag(self):
+    def __set_slider_from_tag(self):
         """
-        Set the slider (including its limits) to match the tag value.
+        Set the slider (including its movement limits) to match the tag value.
         """
-        val = self.translator(self.tag_val.get())
-        if val > self.max_value:
-            self.max_value = val
-        elif val < self.min_value:
-            self.min_value = val
+        val = self.translator(self.__tag_val.get())
+        if val > self.__max_value:
+            self.__max_value = val
+        elif val < self.__min_value:
+            self.__min_value = val
 
         self.__set_slider_value(val)
 
         
     def __get_slider_value(self):
-        range = self.max_value - self.min_value
-        return self.min_value + (self.slider_val.get()/10000.0 * range)
+        range = self.__max_value - self.__min_value
+        return self.__min_value + (self.__slider_val.get()/10000.0 * range)
     
     def __set_slider_value(self,val):
-        range = self.max_value - self.min_value
-        new_val = 10000 * (val - self.min_value)/range
-        self.slider_val.set(int(new_val))
+        range = self.__max_value - self.__min_value
+        new_val = 10000 * (val - self.__min_value)/range
+        self.__slider_val.set(int(new_val))
         
 
-    def get_value(self):
-        return self.translator(self.tag_val.get())
         
 
 
