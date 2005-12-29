@@ -7,50 +7,120 @@ __version__='$Revision$'
 
 from Tkinter import Frame, IntVar, Scale, Entry, Checkbutton, Label
 from Tkinter import LEFT, RIGHT, TOP, BOTTOM, YES, BOTH, NORMAL
-from Pmw import ComboBox
+import Pmw
 import string
-import tkFont
 
-# CEBHACKALERT: sometime in the day or two before 15/12 I introduced
-# a bug where Image's taggedsliders for size and aspect ratio are
-# not right to begin with (ie slider doesn't match tag).
+
+# CEBHACKALERT: This file needs to be renamed.
 
 # CEBHACKALERT: somewhere there has to be better handling of bad input.
 # e.g. "cat" gives orientation zero, as does "pI/4".
 
 
+# CEBHACKALERT: this should be an abstract class.
+# Something isn't quite right because this isn't actually a widget,
+# it just assumes that when instantiated the object will also be a widget.
+class TranslatorWidget(object):
+    """
+    Abstract superclass for a widget that represents its true value with a string.
+    """
+    def __init__(self, translator=None):
+        self.translator = translator
+
+
+    def get_value(self):
+        """
+        Method called by clients to get the real value that this widget
+        is representing.
+
+        Although a widget will typically display its contents as
+        a string, the underlying variable could be any type. Clients
+        can call this method to get that variable's value.
+        """
+        # the get() method should come with being a widget...
+        assert hasattr(self,'get'),\
+               'Subclasses of TranslatorWidget must have a get() method. '+repr(self)
+        
+        if self.translator != None:
+            return self.translator(self.get())
+        else:
+            return self.get()
+
+
+
+class EntryTranslator(Entry,TranslatorWidget):
+    """
+    Tkinter Entry widget with a translator.
+    """
+    def __init__(self, master, textvariable="", translator=None, **kw):
+        Entry.__init__(self, master=master, textvariable=textvariable, **kw)
+        TranslatorWidget.__init__(self, translator=translator)
+
+
+
+class ComboBoxTranslator(Pmw.ComboBox,TranslatorWidget):
+    """
+    A Pmw ComboBox with a translator.
+    """
+    def __init__(self, parent,selectioncommand=None,scrolledlist_items=[],
+                 translator=None, **kw):
+        Pmw.ComboBox.__init__(self, parent,
+                              selectioncommand=selectioncommand,
+                              scrolledlist_items=scrolledlist_items, **kw)
+        TranslatorWidget.__init__(self,translator=translator)
+
+
+
+class CheckbuttonTranslator(Checkbutton,TranslatorWidget):
+    """
+    A Tkinter Checkbutton...
+    """
+    # CEBHACKALERT: surely I don't have to do self.var=variable and get()?
+    # Look at Checkbutton documentation
+    def __init__(self, master, variable, **kw):
+        self.var = variable
+        Checkbutton.__init__(self,master=master,variable=variable,**kw)        
+        TranslatorWidget.__init__(self,translator=None)
+
+    def get(self):
+        if self.var.get()==1:
+            return True
+        else:
+            return False
+    
+
+# CEBHACKALERT: need to update with TranslatorWidget
 class TaggedSlider(Frame):
     """
     Widget for manipulating a numeric value using either a slider or a
     text-entry box, keeping the two values in sync.
 
     The expressions typed into the text-entry box are evaluated using
-    the given string_translator, which can be overridden with a custom
+    the given translator, which can be overridden with a custom
     expression evaluator (e.g. to do a Python eval() in the namespace
     of a particular object.)
 
     """
-
     def __init__(self,root,
                  tagvariable=None,
                  min_value=0,
                  max_value=100,
                  string_format = '%f',
                  tag_width=10,
-                 string_translator=string.atof,
+                 translator=string.atof,
                  **config):
 
         Frame.__init__(self,root,**config)
         self.root = root
         self.fmt = string_format
-        self.string_translator = string_translator
+        self.translator = translator
         
         # Add the tag
         self.tag_val = tagvariable
         self.tag = Entry(self,textvariable=self.tag_val,width=tag_width)
 
-        self.min_value = self.string_translator(min_value)
-        self.max_value = self.string_translator(max_value)
+        self.min_value = self.translator(min_value)
+        self.max_value = self.translator(max_value)
         
 
         # Add the slider        
@@ -103,7 +173,7 @@ class TaggedSlider(Frame):
         """
         Set the slider (including its limits) to match the tag value.
         """
-        val = self.string_translator(self.tag_val.get())
+        val = self.translator(self.tag_val.get())
         if val > self.max_value:
             self.max_value = val
         elif val < self.min_value:
@@ -123,81 +193,8 @@ class TaggedSlider(Frame):
         
 
     def get_value(self):
-        return self.string_translator(self.tag_val.get())
+        return self.translator(self.tag_val.get())
         
-                 
 
 
-# CEBHACKALERT: much here is temporary .This file needs to be renamed.
-# There should be a base class which has things like get_value(),
-# self.string_translator, other common stuff we need the widgets to
-# have, and so on and so on.
 
-class EntryEval(Entry):
-
-    # get rid of stuff like width from here.
-    def __init__(self, master=None, textvariable="",string_translator=None, width=20):
-        """
-        String translator defaults to None because default is text.
-        """
-        Entry.__init__(self,master=master,textvariable=textvariable,width=width)
-        self.string_translator = string_translator
-
-    def get_value(self):
-        if self.string_translator != None:
-            return self.string_translator(self.get())
-        else:
-            return self.get()
-
-
-# CEBHACKALERT: I don't understand how the default font etc. is specified.
-# I just want to specify here that the font shouldn't be bold here (unlike
-# the other labels), but otherwise it should be the same.
-class LabelEval(Label):
-
-    def __init__(self,master=None,textvariable=""):
-        Label.__init__(self,master=master,textvariable=textvariable, font=tkFont.Font(weight=tkFont.NORMAL))
-
-    def get_value(self):
-        return self.get()
-
-
-class ComboBoxEval(ComboBox):
-
-    def __init__(self,
-                 parent,
-                 selectioncommand=None,
-                 scrolledlist_items=[],
-                 string_translator=None):
-        """
-        String translator defaults to None because default is text.
-        """
-
-        ComboBox.__init__(self,
-                          parent,
-                          selectioncommand=selectioncommand,
-                          scrolledlist_items=scrolledlist_items)
-        self.string_translator = string_translator
-
-    def get_value(self):
-        if self.string_translator != None:
-            return self.string_translator(self.get())
-        else:
-            return self.get()
-
-
-class CheckbuttonEval(Checkbutton):
-
-    def __init__(self, master=None, text="",variable=None, **kw):
-        """
-        String translator defaults to None because default is text.
-        """
-        Checkbutton.__init__(self,master=master,text=text,variable=variable,**kw)
-        self.var = variable
-
-    # CEBHACKALERT: surely I don't have to do this.
-    def get_value(self):
-        if self.var.get()==1:
-            return True
-        else:
-            return False

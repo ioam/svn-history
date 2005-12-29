@@ -216,7 +216,7 @@ class ParametersFrame(Frame):
                     widget_dict[parameter_name] = self.__properties_frame.add_text_property(
                         parameter_name,
                         value = getattr(self.topo_obj,parameter_name),
-                        string_translator = topo.base.utils.eval_atof)
+                        translator = topo.base.utils.eval_atof)
                     
             elif isinstance(parameter, topo.base.parameter.Enumeration):
                 # an Enumeration gets a ComboBox
@@ -231,7 +231,7 @@ class ParametersFrame(Frame):
                     parameter_name,
                     value = parameter.get_default_class_name(), #.getattr(self.topo_obj,parameter_name),
                     items = parameter.range().keys(),
-                    string_translator = parameter.get_from_key)
+                    translator = parameter.get_from_key)
             elif isinstance(parameter, topo.base.parameter.BooleanParameter):
                 widget_dict[parameter_name] = self.__properties_frame.add_checkbutton_property(
                     parameter_name,
@@ -249,7 +249,7 @@ class ParametersFrame(Frame):
     def __add_slider(self,name,min_value,max_value,initial_value):
         """
         Call the propertiesframe's add_tagged_slider_property(), but with
-        a particular width, string format, and string_translator.
+        a particular width, string format, and translator.
         """
         return self.__properties_frame.add_tagged_slider_property(
             name,
@@ -258,7 +258,7 @@ class ParametersFrame(Frame):
             max_value=max_value,
             width=30,
             string_format='%.6f',
-            string_translator=topo.base.utils.eval_atof)  # sliders are always numeric
+            translator=topo.base.utils.eval_atof)  # sliders are always numeric
 
 
 

@@ -7,8 +7,9 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import Frame, StringVar, Message, IntVar, N,S,E,W,X, NORMAL
-from taggedslider import TaggedSlider,EntryEval,ComboBoxEval,CheckbuttonEval,LabelEval
+from Tkinter import Frame, StringVar, Message, Label, IntVar, N,S,E,W,X, NORMAL
+import tkFont
+from taggedslider import TaggedSlider,EntryTranslator,ComboBoxTranslator,CheckbuttonTranslator
 
 
 class PropertiesFrame(Frame):
@@ -47,63 +48,60 @@ class PropertiesFrame(Frame):
         return (p,control)
 
 
-    def add_text_property(self,name,value="",string_translator=None,width=20,readonly=False):
+    def add_text_property(self,name,value="",translator=None,width=20,readonly=False):
         """
-        Create a TKInter.Entry box and add it to self.properties.
-
-        This property stores its value in a TKInter StringVar.
+        Create a TKInter.Entry box and add it to self.properties, unless readonly is
+        True - in which case create a Tkinter.Label.
         """
         var = StringVar()
 
         if readonly:
-            control = LabelEval(self,
-                                textvariable=var)
+            control = Label(self,
+                            textvariable = var,
+                            font=tkFont.Font(weight=tkFont.NORMAL))
         else:
-            control = EntryEval(self,
+            control = EntryTranslator(self,
                                 textvariable = var,
-                                string_translator = string_translator,
+                                translator = translator,
                                 width=width)
             control.bind('<Return>', self.optional_refresh)
             
         return self.add_property(name,var,control,value)
 
         
-    def add_tagged_slider_property(self, name, value="", string_translator=None, **kw):
+    def add_tagged_slider_property(self, name, value="", translator=None, **kw):
         """
         Create a TaggedSlider and add it to self.properties.
-        
-        This property stores its value in a TKInter StringVar.
         """
         var = StringVar()
         var.set(value)
         control = TaggedSlider(self,
                                tagvariable=var,
-                               string_translator=string_translator,
+                               translator=translator,
                                **kw)
         return self.add_property(name,var,control,value)
 
 
-    def add_combobox_property(self,name,value='',items=[], string_translator=None):
+    def add_combobox_property(self,name,value='',items=[], translator=None):
         """
-        Create a ComboBox that can convert its string variable using the given string_translator and add it to self.properties.
+        Create a ComboBox that can convert its string variable using the given translator and add it to self.properties.
         """        
         var = StringVar()
-        control = ComboBoxEval(self,
+        control = ComboBoxTranslator(self,
                                selectioncommand=(lambda value: self.properties[name].set(value)),
                                scrolledlist_items = items,
-                               string_translator = string_translator)
+                               translator = translator)
                 
         control.selectitem(value)
         control.bind('<Return>', self.optional_refresh)
         return self.add_property(name,var,control,value)
 
 
-    # CEBHACKALERT: who knows why I pass text="" all the way through...
     def add_checkbutton_property(self,name,value=0,**kw):
          """
          """
          var = IntVar()
-         control = CheckbuttonEval(self,text="",variable=var,**kw)
+         control = CheckbuttonTranslator(self, variable=var, **kw)
          return self.add_property(name,var,control,value)
 
 
