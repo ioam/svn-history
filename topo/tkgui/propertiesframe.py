@@ -69,7 +69,7 @@ class PropertiesFrame(Frame):
         return self.add_property(name,var,control,value)
 
         
-    def add_tagged_slider_property(self, name, value="", translator=None, **kw):
+    def add_tagged_slider_property(self, name, value, **kw):
         """
         Create a TaggedSlider and add it to self.properties.
         """
@@ -77,7 +77,6 @@ class PropertiesFrame(Frame):
         var.set(value)
         control = TaggedSlider(self,
                                tagvariable=var,
-                               translator=translator,
                                **kw)
         return self.add_property(name,var,control,value)
 

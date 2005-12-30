@@ -40,7 +40,7 @@ class TranslatorWidget(object):
         # the get() method should come with being a widget...
         assert hasattr(self,'get'),\
                'Subclasses of TranslatorWidget must have a get() method. '+repr(self)
-        
+
         if self.translator != None:
             return self.translator(self.get())
         else:
@@ -89,6 +89,8 @@ class CheckbuttonTranslator(Checkbutton,TranslatorWidget):
             return False
     
 
+# CEBHACKALERT: make TaggedSlider accept either numeric or string
+# values (including for max_value and min_value).
 class TaggedSlider(Frame,TranslatorWidget):
     """
     Widget for manipulating a numeric value using either a slider or a
@@ -99,11 +101,13 @@ class TaggedSlider(Frame,TranslatorWidget):
     expression evaluator (e.g. to do a Python eval() in the namespace
     of a particular object.)
 
+    point out it only expects strings to come in, converts internally.
+
     """
     def __init__(self,root,
                  tagvariable=None,
-                 min_value=0,
-                 max_value=100,
+                 min_value="0.0",
+                 max_value="1.0",
                  string_format = '%f',
                  tag_width=10,
                  translator=string.atof,
@@ -190,6 +194,7 @@ class TaggedSlider(Frame,TranslatorWidget):
     
     def __set_slider_value(self,val):
         range = self.__max_value - self.__min_value
+        assert range!=0, "A TaggedSlider cannot have a maximum value equal to its minimum value."
         new_val = 10000 * (val - self.__min_value)/range
         self.__slider_val.set(int(new_val))
         
