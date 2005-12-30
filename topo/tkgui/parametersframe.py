@@ -40,11 +40,11 @@ class ParametersFrame(Frame):
     When asked to create wigets, ... makes a PropertiesFrame containing all the specified class' Parameters.
     """
 
-    def __init__(self, parent=None, topo_obj=None, **config):
+    def __init__(self, parent=None, **config):
         """
         """
-        self.__properties_frame = PropertiesFrame(parent)
         Frame.__init__(self,parent,config)
+        self.__properties_frame = PropertiesFrame(parent)
         self.__properties_frame.pack(side=TOP,expand=YES,fill=X)
 
         # CEBHACKALERT: these buttons should be stacked on the window or
@@ -63,12 +63,12 @@ class ParametersFrame(Frame):
 
         #pattern_buttonBox.pack(side=TOP)
 
+        self.topo_obj = None
 
         self.__help_balloon = Pmw.Balloon(parent)
         
         self.__widgets = {} # should it be none?
-        self.topo_obj = topo_obj
-        self.visible_parameters = None
+        self.__visible_parameters = {}
 
         # The dictionary of parameter_type:property_to_add pairs.
         self.__parameter_property = {
@@ -83,10 +83,12 @@ class ParametersFrame(Frame):
     def install_as_class_defaults(self):
         """
         """
+        assert self.topo_obj!=None, "ParametersFrame must be associated with a TopoObj()."
+        
         # go through, get parameters, set them on the classobj
         t = type(self.topo_obj)
         
-        for (name,parameter) in self.visible_parameters.items():
+        for (name,parameter) in self.__visible_parameters.items():
             w = self.__widgets[name][1]
             setattr(t,name,w.get_value())
 
@@ -103,59 +105,65 @@ class ParametersFrame(Frame):
         pass
 
 
+    # CEBHACKALERT: rename to set_object_parameters, probably.
     def set_obj_params(self):
         """
+        For all non-Constant Parameters of the currently set TopoObject(),
+        set the values of the Parameters to those specified by the widgets.
         """
-        # go through, get parameters, set them on the topo_obj
+        assert self.topo_obj!=None, "ParametersFrame must be associated with a TopoObj()."
+        
         parameters_to_modify = [ (name,parameter)
                                  for (name,parameter)
-                                 in self.visible_parameters.items()
+                                 in self.__visible_parameters.items()
                                  if not type(parameter)==topo.base.parameter.Constant]
         
         for (name,parameter) in parameters_to_modify:
-            w = self.__widgets[name][1]
-#            print "[", self.topo_obj,name,w.get_value(),type(w.get_value())  ,"]" 
+            w = self.__widgets[name][1]  # [0] is label (Message), [1] is widget
             setattr(self.topo_obj,name,w.get_value())
 
         
-       
-
     def create_widgets(self, topo_obj):
         """
-        Create widgets for all non-hidden Parameters of the current topo_obj.
+        Create widgets for all non-hidden Parameters of topo_obj and add them
+        to the screen.
 
-        Any current widgets are first removed from the dictionary of widgets, then
-        new ones are added for all non-hidden Parameters of topo_class.
+        Each Parameter gets a suitable widget (e.g. a slider for a Number with
+        soft_bounds). The default widget is a text box.
+
+        parameters must be Parameter objects.
 
         Widgets are added in order of the Parameters' precedences.
         """
         self.topo_obj=topo_obj
-        
+
+        # wipe old labels and widgets from screen
         for (label,widget) in self.__widgets.values():
             label.grid_forget()
             widget.grid_forget()
 
         # find visible parameters for topo_obj
-        # {name:parameter}
-        self.visible_parameters = dict([(parameter_name,parameter)
+        self.__visible_parameters = dict([(parameter_name,parameter)
                                         for (parameter_name,parameter)
                                         in self.topo_obj.get_paramobj_dict().items()
                                         if not parameter.hidden])
 
         # create the widgets
-        self.__create_widget_dict()
-                      
+        self.__widgets = {}
+        for (parameter_name, parameter) in self.__visible_parameters.items():
+            self.__add_property_for_parameter(parameter_name,parameter)
+
         # sort Parameters by precedence (oops actually reverse of precedence!)
         parameter_precedences = {}
-        for name,parameter in self.visible_parameters.items():
+        for name,parameter in self.__visible_parameters.items():
             parameter_precedences[name] = parameter.precedence
         sorted_parameter_names = keys_sorted_by_value(parameter_precedences)
 
-        # add widgets to control Parameters
+        # add widgets to screen
         rows = range(len(sorted_parameter_names))
         for (row,parameter_name) in zip(rows,sorted_parameter_names): 
             (label,widget) = self.__widgets[parameter_name]
-            help_text = self.visible_parameters[parameter_name].__doc__
+            help_text = self.__visible_parameters[parameter_name].__doc__
 
             label.grid(row=row,
                        column=0,
@@ -174,40 +182,26 @@ class ParametersFrame(Frame):
 
     def __add_property_for_parameter(self,parameter_name,parameter):
         """
-        Find the correct property for the given parameter.
+        Find the correct property type for the given parameter.
 
-        If the parameter's type is not listed, the first matching
-        superclass's type is used as the key **REPHRASE!**...until nothing,
-        then it just gets a textbox.
+        If the parameter's type is not listed in
+        self.__parameter_property, the class hierarchy is traversed until
+        a match is found. If no match is found, the Parameter just gets a
+        textbox. 
         """
-
         for c in topo.base.parameter.classlist(type(parameter))[::-1]:
             if self.__parameter_property.has_key(c):
+                # find the right method...
                 property_to_add = self.__parameter_property[c]
+                # ...then call it
                 property_to_add(parameter_name,parameter)
                 return
         # no match: use text box
         self.__add_text_property(parameter_name,parameter)
             
 
-    # let's lose this method, or stop using so many self's
-    def __create_widget_dict(self):
-        """
-        Create a dictionary of widgets representing the Parameters.
-
-        Each Parameter gets a suitable widget (e.g. a slider for a Number with
-        soft_bounds). The default widget is a text box.
-
-        parameters must be Parameter objects.
-        """
-        self.__widgets = {}
-        for (parameter_name, parameter) in self.visible_parameters.items():
-            self.__add_property_for_parameter(parameter_name,parameter)
-
-
-
-
-    # CEBHACKALERT: don't need to pass parameter...get it from the topo_obj
+    # CEBHACKALERT: don't need to pass parameter. See HACKALERT below
+    # about DynamicNumber
     def __add_text_property(self,parameter_name,parameter):
         """
         Add a text property to the properties_frame.
