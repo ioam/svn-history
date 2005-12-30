@@ -271,7 +271,7 @@ class ParametersFrame(Frame):
         self.__widgets[parameter_name] = self.__properties_frame.add_combobox_property(
                     parameter_name,
                     value = getattr(self.topo_obj,parameter_name),
-                    items = parameter.available)
+                    scrolledlist_items = parameter.available)
 
     def __add_package_property(self,parameter_name,parameter):
         """
@@ -281,7 +281,7 @@ class ParametersFrame(Frame):
         self.__widgets[parameter_name] = self.__properties_frame.add_combobox_property(
                     parameter_name,
                     value = parameter.get_default_class_name(), #.getattr(self.topo_obj,parameter_name),
-                    items = parameter.range().keys(),
+                    scrolledlist_items = parameter.range().keys(),
                     translator = parameter.get_from_key)
 
     def __add_boolean_property(self,parameter_name,parameter):

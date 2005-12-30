@@ -25,7 +25,7 @@ class PropertiesFrame(Frame):
         Frame.__init__(self,parent,config)
 
 
-    def optional_refresh(self,CEBHACKALERT=None):
+    def optional_refresh(self,event=None):
         try:
             if self.parent.auto_refresh: self.parent.refresh()
         except AttributeError:
@@ -48,7 +48,7 @@ class PropertiesFrame(Frame):
         return (p,control)
 
 
-    def add_text_property(self,name,value="",translator=None,width=20,readonly=False):
+    def add_text_property(self,name,value="",readonly=False,**kw):
         """
         Create a TKInter.Entry box and add it to self.properties, unless readonly is
         True - in which case create a Tkinter.Label.
@@ -58,12 +58,12 @@ class PropertiesFrame(Frame):
         if readonly:
             control = Label(self,
                             textvariable = var,
-                            font=tkFont.Font(weight=tkFont.NORMAL))
+                            font=tkFont.Font(weight=tkFont.NORMAL),
+                            **kw)
         else:
             control = EntryTranslator(self,
                                 textvariable = var,
-                                translator = translator,
-                                width=width)
+                                **kw)
             control.bind('<Return>', self.optional_refresh)
             
         return self.add_property(name,var,control,value)
@@ -81,15 +81,13 @@ class PropertiesFrame(Frame):
         return self.add_property(name,var,control,value)
 
 
-    def add_combobox_property(self,name,value='',items=[], translator=None):
+    def add_combobox_property(self,name,value='',**kw):
         """
         Create a ComboBox that can convert its string variable using the given translator and add it to self.properties.
         """        
         var = StringVar()
         control = ComboBoxTranslator(self,
-                               selectioncommand=(lambda value: self.properties[name].set(value)),
-                               scrolledlist_items = items,
-                               translator = translator)
+                               selectioncommand=(lambda value: self.properties[name].set(value)),**kw)
                 
         control.selectitem(value)
         control.bind('<Return>', self.optional_refresh)
