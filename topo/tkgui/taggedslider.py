@@ -91,6 +91,11 @@ class CheckbuttonTranslator(Checkbutton,TranslatorWidget):
 
 # CEBHACKALERT: make TaggedSlider accept either numeric or string
 # values (including for max_value and min_value).
+
+# CEBHACKALERT: make slider:tag space ratio about 2:1 (if it's
+# possible to have relative sizes like that - then we don't have
+# widths specified everywhere).
+
 class TaggedSlider(Frame,TranslatorWidget):
     """
     Widget for manipulating a numeric value using either a slider or a
