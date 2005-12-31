@@ -75,8 +75,8 @@ class ParametersFrame(Frame):
             topo.base.parameter.Constant:         self.__add_readonly_text_property,
             topo.base.parameter.Number:           self.__add_numeric_property,
             topo.base.parameter.Enumeration:      self.__add_enumeration_property,
-            topo.base.parameter.PackageParameter: self.__add_package_property,
-            topo.base.parameter.BooleanParameter: self.__add_boolean_property}
+            topo.base.parameter.BooleanParameter: self.__add_boolean_property,
+            topo.base.parameter.ClassSelectorParameter: self.__add_class_selector_property}
 
 
 
@@ -267,7 +267,7 @@ class ParametersFrame(Frame):
                     value = getattr(self.topo_obj,parameter_name),
                     scrolledlist_items = parameter.available)
 
-    def __add_package_property(self,parameter_name,parameter):
+    def __add_class_selector_property(self,parameter_name,parameter):
         """
         Add a package property to the properties_frame by representing it
         with a ComboBox.

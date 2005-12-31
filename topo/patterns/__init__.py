@@ -18,8 +18,8 @@ __all__ = [re.sub('\.py$','',f) for f in os.listdir(__path__[0])
 # CEBHACKALERT: see topo/outputfns/__init__.py
 import topo
 from topo.base.patterngenerator import PatternGenerator
-from topo.base.parameter import PackageParameter
-class PatternGeneratorParameter(PackageParameter):
+from topo.base.parameter import ClassSelectorParameter
+class PatternGeneratorParameter(ClassSelectorParameter):
     """
     """
     def __init__(self,default=None,doc='',**params):

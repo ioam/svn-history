@@ -21,8 +21,8 @@ __all__ = [re.sub('\.py$','',f) for f in os.listdir(__path__[0])
 # CEBHACKALERT: intermediate state (see HACKALERT in topo/base/utils.py)
 import topo
 from topo.base.projection import OutputFunction
-from topo.base.parameter import PackageParameter
-class OutputFunctionParameter(PackageParameter):
+from topo.base.parameter import ClassSelectorParameter
+class OutputFunctionParameter(ClassSelectorParameter):
     """
     """
     def __init__(self,default=None,doc='',**params):

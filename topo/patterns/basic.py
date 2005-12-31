@@ -16,7 +16,7 @@ __version__='$Revision$'
 from math import pi
 from Numeric import around,bitwise_and,sin
 
-from topo.base.parameter import Number, Parameter, PackageParameter
+from topo.base.parameter import Number, Parameter, ClassSelectorParameter
 from topo.misc.patternfns import gaussian,gabor,line,disk,ring
 from topo.base.patterngenerator import PatternGenerator
 
