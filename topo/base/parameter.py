@@ -452,7 +452,7 @@ class Number(Parameter):
         # CEB: all the following error messages should probably print out the parameter's name
         # ('x', 'theta', or whatever)
         if not (is_number(val)):
-            raise ValueError("Parameter " + `self._name` + " (" + `self.__class__` + ") only takes a numeric value.")
+            raise ValueError("Parameter " + `self._name` + " (" + `self.__class__` + ") only takes a numeric value; " + `type(val)` + " is not numeric.")
 
         min,max = self.bounds
         if min != None and max != None:
@@ -634,7 +634,7 @@ def is_number(obj):
 
 # this isn't finished yet. Also rename to ClassSelectorParameter
 
-class PackageParameter(Parameter):
+class ClassSelectorParameter(Parameter):
     """
     """
     __slots__ = ['package','class_','suffix_to_lose']
