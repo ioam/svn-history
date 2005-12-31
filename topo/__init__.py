@@ -31,6 +31,8 @@ then show up in the GUI menus as potential input patterns.
 $Id$
 """
 __version__='$Revision $'
+
+# CEBHACKALERT: what about responsefns, outputfns, and so on?
 __all__ = ['base','commands','sheets','projections','patterns','eps','plotting','analysis']
 
 # Enable automatic importing of .ty files, treating them just like .py
