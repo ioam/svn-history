@@ -80,29 +80,29 @@ class ParametersFrame(Frame):
 
 
 
-    def install_as_class_defaults(self):
-        """
-        """
-        assert self.topo_obj!=None, "ParametersFrame must be associated with a TopoObj()."
+##     def install_as_class_defaults(self):
+##         """
+##         """
+##         assert self.topo_obj!=None, "ParametersFrame must be associated with a TopoObj()."
         
-        # go through, get parameters, set them on the classobj
-        t = type(self.topo_obj)
+##         # go through, get parameters, set them on the classobj
+##         t = type(self.topo_obj)
         
-        for (name,parameter) in self.__visible_parameters.items():
-            w = self.__widgets[name][1]
-            setattr(t,name,w.get_value())
+##         for (name,parameter) in self.__visible_parameters.items():
+##             w = self.__widgets[name][1]
+##             setattr(t,name,w.get_value())
 
 
-    # CEBHACKALERT
-    def revert_to_class_defaults(self):
-        pass
+##     # CEBHACKALERT
+##     def revert_to_class_defaults(self):
+##         pass
         
 
-    # CEBHACKALERT
-    def restore_class_defaults(self):
-        """
-        """
-        pass
+##     # CEBHACKALERT
+##     def restore_class_defaults(self):
+##         """
+##         """
+##         pass
 
 
     # CEBHACKALERT: rename to set_object_parameters, probably.
