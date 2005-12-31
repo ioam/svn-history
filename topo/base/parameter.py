@@ -632,23 +632,32 @@ def is_number(obj):
 # CEBHACKALERT: base class for ones in output_fn,learning_fn,response_fn,
 # patterngenerator. Only output_fn, patterngenerator done so far.
 
-# this isn't finished yet. Also rename to ClassSelectorParameter
+# - slots
+# - make slots private?
+# - documentation
 
 class ClassSelectorParameter(Parameter):
     """
     """
-    __slots__ = ['package','class_','suffix_to_lose']
+    #__slots__ = ['packages','class_']
     __doc__ = property((lambda self: self.doc))
+
+    packages = []
     
-    def __init__(self,package,class_,suffix_to_lose='',default=None,doc="",**params):
+    def __init__(self,class_,default=None,doc="",**params):
         """
         """
         Parameter.__init__(self,default=default,doc=doc,**params)
-        self.package = package
         self.class_ = class_
-        self.suffix_to_lose = suffix_to_lose
 
         # check it's in range
+
+##     def add_packages(self, packages):
+##         """
+##         """
+##         # assert they are packages?
+##         self.packages.append(packages)
+        
 
     def get_default_class_name(self):
         """
@@ -657,17 +666,30 @@ class ClassSelectorParameter(Parameter):
 
     def range(self):
         """
+
+            (If pgp is a PatternGeneratorParameter, ofp.range() gives this
+    list. Note that only classes from the currently imported modules are
+    added, so to make all OutputFunctions available, it would first be necessary
+    to do 'from topo.ouputfns import *'.)
+        
         e.g. Return a dict of OutputFunctions {visible_name: <outputfn_class>}.
+
+        If range is empty, returns the default
         """
         # CEBHACKALERT: e.g. PatternGenerators come out in GUI in the arbitrary
         # order of the keys of this dict. They used to come out at least in the
         # same order every time because it was a keyedlist. Don't forget to fix
         # that.
         k = {}
-        classes = find_classes_in_package(self.package, self.class_)    
-        for (name,class_) in classes.items():
-            k[classname_repr(name, self.suffix_to_lose)] = class_
-        return k
+        for package in self.packages:
+            classes = find_classes_in_package(package, self.class_)
+            for (name,class_) in classes.items():
+                k[classname_repr(name)] = class_
+
+        if len(k)==0:
+            return {self.get_default_class_name():self.default}
+        else:
+            return k
 
     # temporary
     def get_from_key(self,key):

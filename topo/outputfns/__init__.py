@@ -18,15 +18,15 @@ __all__ = [re.sub('\.py$','',f) for f in os.listdir(__path__[0])
            if re.match('^[^_].*\.py$',f)]
 
 
-# CEBHACKALERT: intermediate state (see HACKALERT in topo/base/utils.py)
+
 import topo
-from topo.base.projection import OutputFunction
-from topo.base.parameter import ClassSelectorParameter
-class OutputFunctionParameter(ClassSelectorParameter):
+from topo.base.projection import OutputFunctionParameter
+def make_classes_from_all_imported_modules_available():
     """
+    Add all OutputFunction classes from the currently imported modules in
+    the topo.outputfns namespace to the list of available OutputFunctions.
+
+    See topo.base.parameter.ClassSelectorParameter.range().
     """
-    def __init__(self,default=None,doc='',**params):
-        """
-        """
-        super(OutputFunctionParameter,self).__init__(topo.outputfns,OutputFunction,default=default,doc=doc,**params)        
+    OutputFunctionParameter.packages.append(topo.outputfns)
 

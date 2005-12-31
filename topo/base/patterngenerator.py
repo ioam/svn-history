@@ -12,7 +12,7 @@ from topoobject import TopoObject
 from boundingregion import BoundingBox
 from sheet import  matrixidx2sheet, bounds2shape
 from Numeric import add,subtract,cos,sin,array
-from parameter import Parameter,Number
+from parameter import Parameter,Number,ClassSelectorParameter
 from math import pi
 
 
@@ -175,6 +175,16 @@ class Constant(PatternGenerator):
         if r == 0 and c == 0:
             r,c = bounds2shape(bounds,xdensity,ydensity)
         return self.scale*ones((r,c), Float)+self.offset
+
+
+# CEBHACKALERT: don't need to pass through doc etc.
+class PatternGeneratorParameter(ClassSelectorParameter):
+    """
+    """
+    def __init__(self,default=Constant(),doc='',**params):
+        """
+        """
+        super(PatternGeneratorParameter,self).__init__(PatternGenerator,default=default,doc=doc,**params)
 
 
 

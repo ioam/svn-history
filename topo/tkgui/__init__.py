@@ -14,15 +14,32 @@ import Pmw, sys, Tkinter
 import topo.base.topoobject
 import topoconsole
 
+# CEBHACKALERT:
 
-# By default, none of the pattern types in topo/patterns/ is imported
-# in Topographica, but for the GUI, we want all of them to be
-# available as a list from which the user can select. To do this, we
-# import all of the PatternGenerator classes in all of the modules
-# mentioned in topo.patterns.__all__, and will also use any that the
-# user has defined and registered...
+# PatternGenerators, OutputFunctions (, LearningFunctions, ...)
+# ------------------------------------------------------------
+#
+# By default, none of the classes in the separate Topographica
+# packages is imported. For example,
+# none of the pattern types in topo/patterns/ is imported
+# in Topographica by default.
+# But for the GUI, we want all such [things] to be
+# available as lists from which the user can select.
+# To do this, we
+# import all of the PatternGenerator [etc] classes in all of the modules
+# mentioned in topo.patterns [etc.] .__all__, and will also use any that the
+# user has defined and registered.
+
+# See topo.base.parameter.ClassSelectorParameter ? or topo.patterns__init etc?
+
 # CEBHACKALERT:  ... in the right namespace
+# and so on for other things
+
 from topo.patterns import *
+topo.patterns.make_classes_from_all_imported_modules_available()
+
+from topo.outputfns import *
+topo.outputfns.make_classes_from_all_imported_modules_available()
 
 
 def show_cmd_prompt():

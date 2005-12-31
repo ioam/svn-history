@@ -15,17 +15,17 @@ __all__ = [re.sub('\.py$','',f) for f in os.listdir(__path__[0])
            if re.match('^[^_].*\.py$',f)]
 
 
-# CEBHACKALERT: see topo/outputfns/__init__.py
 import topo
-from topo.base.patterngenerator import PatternGenerator
-from topo.base.parameter import ClassSelectorParameter
-class PatternGeneratorParameter(ClassSelectorParameter):
+from topo.base.patterngenerator import PatternGeneratorParameter
+def make_classes_from_all_imported_modules_available():
     """
+    Add all PatternGenerator classes from the currently imported modules in
+    the topo.patterns namespace to the list of available PatternGenerators.
+
+    See topo.base.parameter.ClassSelectorParameter.range().
     """
-    def __init__(self,default=None,doc='',**params):
-        """
-        """
-        super(PatternGeneratorParameter,self).__init__(topo.patterns,PatternGenerator,default=default,doc=doc,**params)
+    PatternGeneratorParameter.packages.append(topo.patterns)
+
 
 
 # CEBHACKALERT: Parameters such as density need to be set the same in the others that

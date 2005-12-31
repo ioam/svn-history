@@ -14,9 +14,6 @@ from topo.base.parameter import Parameter, Dynamic
 
 import topo.base.patterngenerator
 
-# CEBHACKALERT
-from topo.patterns import PatternGeneratorParameter
-
 
 class GeneratorSheet(Sheet):
     """
@@ -28,7 +25,7 @@ class GeneratorSheet(Sheet):
     period = Parameter(default=1)
     phase  = Parameter(default=0)
 
-    input_generator = PatternGeneratorParameter(default=topo.base.patterngenerator.Constant())
+    input_generator = topo.base.patterngenerator.PatternGeneratorParameter()
     
     def __init__(self,**params):
         super(GeneratorSheet,self).__init__(**params)

@@ -9,7 +9,7 @@ import Numeric
 from itertools import chain
 
 from sheet import Sheet
-from parameter import Parameter, Number, BooleanParameter
+from parameter import Parameter, Number, BooleanParameter, ClassSelectorParameter
 from simulator import EPConnection
 from topoobject import TopoObject
 
@@ -211,3 +211,12 @@ class ProjectionSheet(Sheet):
 
         return prjns
 
+
+# CEBHACKALERT: don't need to pass through stuff like doc because of **params
+class OutputFunctionParameter(ClassSelectorParameter):
+    """
+    """
+    def __init__(self,default=Identity(),doc='',**params):
+        """
+        """
+        super(OutputFunctionParameter,self).__init__(OutputFunction,default=default,doc=doc,**params)        
