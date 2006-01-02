@@ -118,6 +118,10 @@ class PatternGenerator(TopoObject):
         if r == 0 and c == 0:
             rows,cols = bounds2shape(bounds,xdensity,ydensity)
         else:
+            # CEBHACKALERT: say rows=0,cols=3 is passed when a PatternGenerator is
+            # called. Then, there will be an error at the line 'x = x[:,0]' below.
+            # Either assert r>0 and c>0 here, or have an if test for those lines
+            # below.
             rows = r
             cols = c
 

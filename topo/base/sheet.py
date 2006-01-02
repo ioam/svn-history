@@ -177,6 +177,11 @@ def matrix2sheet(float_row,float_col,bounds,xdensity,ydensity):
 
     left,bottom,right,top = bounds.aarect().lbrt()
 
+    # CEBHACKALERT: xdensity and/or ydensity could be zero (with a small
+    # BoundingBox or low density). Either that should be dealt with here,
+    # or it should be disallowed earlier.
+    # This problem arises in several places (e.g. see PatternGenerator).
+
     xstep = 1.0 / xdensity
     ystep = 1.0 / ydensity
     x = float_col*xstep + left
