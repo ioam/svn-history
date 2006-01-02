@@ -52,6 +52,16 @@ class Identity(OutputFunction):
         return x
 
 
+# CEBHACKALERT: don't need to pass through stuff like doc because of **params
+class OutputFunctionParameter(ClassSelectorParameter):
+    """
+    """
+    def __init__(self,default=Identity(),doc='',**params):
+        """
+        """
+        super(OutputFunctionParameter,self).__init__(OutputFunction,default=default,doc=doc,**params)        
+
+
 ### JABALERT
 ###
 ### Need to provide a way to visualize the activity of a Projection,
@@ -101,9 +111,7 @@ class ProjectionSheet(Sheet):
     A and produces and identically shaped output matrix. The default
     is the identity function.
     """
-
-    # Should be changed to a OutputFunctionParameter
-    output_fn = Parameter(default=Identity())
+    output_fn = OutputFunctionParameter()
     apply_output_fn=BooleanParameter(default=True)
                              
     def __init__(self,**params):
@@ -212,11 +220,3 @@ class ProjectionSheet(Sheet):
         return prjns
 
 
-# CEBHACKALERT: don't need to pass through stuff like doc because of **params
-class OutputFunctionParameter(ClassSelectorParameter):
-    """
-    """
-    def __init__(self,default=Identity(),doc='',**params):
-        """
-        """
-        super(OutputFunctionParameter,self).__init__(OutputFunction,default=default,doc=doc,**params)        
