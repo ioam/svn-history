@@ -163,6 +163,8 @@ class ParametersFrame(Frame):
         rows = range(len(sorted_parameter_names))
         for (row,parameter_name) in zip(rows,sorted_parameter_names): 
             (label,widget) = self.__widgets[parameter_name]
+
+            # CEBHACKALERT: known not to be working.
             help_text = self.__visible_parameters[parameter_name].__doc__
 
             label.grid(row=row,
