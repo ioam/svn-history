@@ -91,7 +91,11 @@ class HebbianSOMLF(SOMLF):
         radius_int = int(ceil(radius))
         rbound = radius_int + 0.5
         bb = BoundingBox(points=((-rbound,-rbound), (rbound,rbound)))
-        neighborhood_matrix = nk_generator(bounds=bb,density=1,width=radius,height=radius)
+        # CEBHACKALERT: specifying aspect_ratio and size here won't work
+        # for all patterns.
+        # CEBHACKALERT: warnings should be printed if a non-parameter attribute
+        # is set this way (e.g. try adding height=4).
+        neighborhood_matrix = nk_generator(bounds=bb,density=1,aspect_ratio=1.0,size=radius)
 
         for r in range(rmin,rmax):
             for c in range(cmin,cmax):
