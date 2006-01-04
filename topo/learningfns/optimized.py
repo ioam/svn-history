@@ -89,6 +89,7 @@ class Hebbian(CFLearningFunction):
         # (skipped entirely for no-op case, as an optimization)
         output_fn = self.output_fn
         if type(output_fn) is not Identity:
+            # CEBHACKALERT: what about using xrange()?
             for r in range(rows):
                 for c in range(cols):
                     cfs[r][c].weights = output_fn(cfs[r][c].weights)
