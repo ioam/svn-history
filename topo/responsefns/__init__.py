@@ -15,3 +15,15 @@ __version__='$Revision$'
 import re,os
 __all__ = [re.sub('\.py$','',f) for f in os.listdir(__path__[0])
            if re.match('^[^_].*\.py$',f)]
+
+
+import topo
+from topo.base.connectionfield import ResponseFunctionParameter
+def make_classes_from_all_imported_modules_available():
+    """
+    Add all ResponseFunction classes from the currently imported modules in
+    the topo.learningfns namespace to the list of available ResponseFunctions.
+
+    See topo.base.parameter.ClassSelectorParameter.range().
+    """
+    ResponseFunctionParameter.packages.append(topo.responsefns)
