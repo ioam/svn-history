@@ -245,6 +245,8 @@ def clip_in_place(mat,lower_bound,upper_bound):
 # e.g. topo.base.patterngenerator.Constant rather than Constant
 # then keep to first "." from the right, or something.
 # I also don't know how it works.
+# CEBHACKALERT: splitting on capital letters doesn't work
+# for e.g. SOMLF.
 import string, re
 def classname_repr(class_name, suffix_to_lose=''):
     """
