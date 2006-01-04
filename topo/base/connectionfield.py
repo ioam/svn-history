@@ -23,12 +23,13 @@ __version__ = '$Revision$'
 import Numeric
 
 from topoobject import TopoObject
-from projection import Projection,ProjectionSheet,Identity
-from parameter import Parameter, Number, BooleanParameter, Constant
+from projection import Projection,ProjectionSheet,Identity,OutputFunctionParameter
+from parameter import Parameter, Number, BooleanParameter, Constant, ClassSelectorParameter
 from arrayutils import mdot,divisive_normalization
 from sheet import Sheet,bounds2slice,bounds2shape,sheet2matrixidx,slicearray2bounds
 from sheetview import UnitView
 from itertools import chain
+from topo.base.patterngenerator import PatternGeneratorParameter
 import topo.base.patterngenerator
 from boundingregion import BoundingBox
 
@@ -249,7 +250,17 @@ class GenericCFResponseFn(CFResponseFunction):
                 X = input_activity[r1:r2,c1:c2]
                 activity[r,c] = self.single_cf_fn(X,cf.weights)
         activity *= strength
-        
+
+
+# CEBHACKALERT: don't need to pass through stuff like doc because of **params
+class ResponseFunctionParameter(ClassSelectorParameter):
+    """
+    """
+    def __init__(self,default=GenericCFResponseFn(),doc='',**params):
+        """
+        """
+        super(ResponseFunctionParameter,self).__init__(CFResponseFunction,default=default,doc=doc,**params)        
+
 
 class CFLearningFunction(TopoObject):
     """
@@ -273,6 +284,16 @@ class IdentityCFLF(CFLearningFunction):
     output_fn = Parameter(default=Identity())
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         pass
+
+
+# CEBHACKALERT: don't need to pass through stuff like doc because of **params
+class LearningFunctionParameter(ClassSelectorParameter):
+    """
+    """
+    def __init__(self,default=IdentityCFLF(),doc='',**params):
+        """
+        """
+        super(LearningFunctionParameter,self).__init__(CFLearningFunction,default=default,doc=doc,**params)        
 
 
 class GenericCFLF(CFLearningFunction):
@@ -304,14 +325,14 @@ class CFProjection(Projection):
     activate(self,input_activity) that computes the response from the input 
     and stores it in the activity array.
     """
-    response_fn = Parameter(default=GenericCFResponseFn())
+    response_fn = ResponseFunctionParameter(default=GenericCFResponseFn())
     cf_type = Parameter(default=ConnectionField)
     weight_type = Parameter(default=Numeric.Float32)
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
-    weights_generator = Parameter(default=topo.base.patterngenerator.Constant())
-    learning_fn = Parameter(GenericCFLF())
+    weights_generator = PatternGeneratorParameter(default=topo.base.patterngenerator.Constant())
+    learning_fn = LearningFunctionParameter(default=GenericCFLF())
     learning_rate = Parameter(default=0.0)
-    output_fn  = Parameter(default=Identity())
+    output_fn  = OutputFunctionParameter(default=Identity())
 
     strength = Number(default=1.0)
 
@@ -471,18 +492,18 @@ class SharedWeightProjection(Projection):
     Otherwise similar to CFProjection, except that learning is
     currently disabled.
     """
-    response_fn = Parameter(default=SharedWeightCFResponseFn())
+    response_fn = ResponseFunctionParameter(default=SharedWeightCFResponseFn())
     cf_type = Parameter(default=ConnectionField)
     weight_type = Parameter(default=Numeric.Float32)
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
-    weights_generator = Parameter(default=topo.base.patterngenerator.Constant())
+    weights_generator = PatternGeneratorParameter(default=topo.base.patterngenerator.Constant())
     ### JABHACKALERT: Learning won't actually work yet.
     learning_fn = Constant(IdentityCFLF)
     learning_rate = Parameter(default=0.0)
     ### JABHACKALERT: cfs is a dummy, here only so that learning will
     ### run without an exception
     cfs = None 
-    output_fn  = Parameter(default=Identity())
+    output_fn  = PatternGeneratorParameter(default=Identity())
 
     strength = Number(default=1.0)
 
