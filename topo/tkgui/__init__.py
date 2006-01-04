@@ -41,6 +41,12 @@ topo.patterns.make_classes_from_all_imported_modules_available()
 from topo.outputfns import *
 topo.outputfns.make_classes_from_all_imported_modules_available()
 
+from topo.learningfns import *
+topo.learningfns.make_classes_from_all_imported_modules_available()
+
+from topo.responsefns import *
+topo.responsefns.make_classes_from_all_imported_modules_available()
+
 
 def show_cmd_prompt():
     """
