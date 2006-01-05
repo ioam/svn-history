@@ -12,6 +12,16 @@ __version__='$Revision$'
 from utils import find_classes_in_package,classname_repr
 
 
+# CEBHACKALERT: is there a problem with inheritance of default
+# values for Parameters?
+# For example, in CFProjection there is the class attribute
+# weights_shape = PatternGeneratorParameter(patterngenerator.Constant())
+# If at some point I later type 
+# PatternGeneratorParameter.default = topo.patterns.basic.Gaussian()
+# then weights_shape will become topo.patterns.basic.Gaussian()
+# (This is a reminder for me to look - I haven't investigated yet.)
+
+
 # CEBHACKALERT: much of the documentation for Parameter subclasses
 # that ought to be in the class docstring is in the __init__
 # docstring so that it shows up. In some cases there is
