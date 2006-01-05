@@ -362,7 +362,7 @@ class CFProjection(Projection):
         """
         super(CFProjection,self).__init__(**params)
         # set up array of ConnectionFields translated to each x,y in the src sheet
-        
+
         cfs = []
         for y in self.dest.sheet_rows()[::-1]:
             row = []
@@ -515,6 +515,7 @@ class SharedWeightProjection(Projection):
     weight_type = Parameter(default=Numeric.Float32)
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
     weights_generator = PatternGeneratorParameter(default=patterngenerator.Constant())
+    weights_shape = PatternGeneratorParameter(default=patterngenerator.Constant())
     ### JABHACKALERT: Learning won't actually work yet.
     learning_fn = Constant(IdentityCFLF)
     learning_rate = Parameter(default=0.0)
