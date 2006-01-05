@@ -34,6 +34,7 @@ import patterngenerator
 from boundingregion import BoundingBox
 
 
+import simulator
 ### JEFF's IMPLEMENTATION NOTES
 ### 
 ### Non-rectangular ConnectionField bounds
@@ -71,7 +72,7 @@ class ConnectionField(TopoObject):
 
     # Weights matrix; not yet initialized.
     weights = []
-
+   
     ### JABHACKALERT!  Why is this code relevant only for the
     ### optimized C versions here, in the base ConnectionField class?
     ### Surely it should only be in a subclass that has been
@@ -82,7 +83,7 @@ class ConnectionField(TopoObject):
     slice_array = []
     
     def __init__(self,input_sheet,weights_bound_template,
-                 weights_generator,weight_type=Numeric.Float32,
+                 weights_generator,weights_shape,weight_type=Numeric.Float32,
                  output_fn=Identity(),**params):
         super(ConnectionField,self).__init__(**params)
         self.input_sheet = input_sheet
@@ -102,9 +103,19 @@ class ConnectionField(TopoObject):
         # promote to double.
         self.weights.savespace(1)
 
+        # CEBHACKALERT: why 'activity matrix' shape?
         self.verbose("activity matrix shape: ",self.weights.shape)
+        
+        # CEBHACKALERT: weights_shape and mask aren't Parameters, but
+        # should I have declared them as class attributes?
+        self.weights_shape = weights_shape
+        m = weights_shape(x=0,y=0,bounds=weights_bound_template,
+                          density=self.input_sheet.density,theta=0,
+                          rows=r2-r1,cols=c2-c1)
+        self.mask = m.astype(int)
 
         output_fn(self.weights)
+        self.weights *= self.mask        
 
 
     def __initialize_slice_array(self,weights_bound_template):
@@ -184,7 +195,12 @@ class ConnectionField(TopoObject):
         if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
             self.weights.savespace(1)
+
+            # CEBHACKALERT: I think this isn't right. E.g. if the mask is a Disk the
+            self.mask = (Numeric.array(self.mask[r1-or1:r2-or1,c1-oc1:c2-oc1],typecode=Int,copy=1))
+            
             output_fn(self.weights)
+            self.weights *= self.mask
 
 
     def slice_tuple(self):
@@ -313,6 +329,7 @@ class GenericCFLF(CFLearningFunction):
                 self.single_cf_fn(cf.get_input_matrix(input_activity),
                                   output_activity[r,c], cf.weights, learning_rate)
                 cf.weights=self.output_fn(cf.weights)
+                cf.weights *= cf.mask
                 
 
 class CFProjection(Projection):
@@ -330,10 +347,10 @@ class CFProjection(Projection):
     weight_type = Parameter(default=Numeric.Float32)
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
     weights_generator = PatternGeneratorParameter(default=patterngenerator.Constant())
+    weights_shape = PatternGeneratorParameter(default=patterngenerator.Constant())
     learning_fn = LearningFunctionParameter(default=GenericCFLF())
     learning_rate = Parameter(default=0.0)
     output_fn  = OutputFunctionParameter(default=Identity())
-
     strength = Number(default=1.0)
 
     def __init__(self,**params):
@@ -359,6 +376,7 @@ class CFProjection(Projection):
                 row.append(self.cf_type(input_sheet=self.src,
                                         weights_bound_template=self.weights_bounds,
                                         weights_generator=self.weights_generator,
+                                        weights_shape=self.weights_shape,
                                         weight_type=self.weight_type,
                                         output_fn=self.learning_fn.output_fn,
                                         x=x,y=y))

@@ -85,14 +85,16 @@ class Hebbian(CFLearningFunction):
         
         inline(hebbian_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'cfs', 'learning_rate'],local_dict=locals())
 
-        # Apply output_fn to each CF
-        # (skipped entirely for no-op case, as an optimization)
+        # Apply output_fn to each CF, followed by mask
+        # (output_fn skipped for no-op case, as an optimization) 
         output_fn = self.output_fn
-        if type(output_fn) is not Identity:
-            # CEBHACKALERT: what about using xrange()?
-            for r in range(rows):
-                for c in range(cols):
-                    cfs[r][c].weights = output_fn(cfs[r][c].weights)
+        # CEBHACKALERT: can this be done in the c?
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+                if type(output_fn) is not Identity:
+                    cf.weights = output_fn(cf.weights)
+                cf.weights *= cf.mask
 
 
 class Hebbian_Py(GenericCFLF):
@@ -192,6 +194,13 @@ class DivisiveHebbian(CFLearningFunction):
         """
         
         inline(hebbian_div_norm_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'learning_rate'], local_dict=locals())
+        # CEBHACKALERT: can this be done in the c?
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+                cf.weights *= cf.mask
+
+
 
 class DivisiveHebbian_Py(GenericCFLF):
     """
@@ -298,6 +307,13 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
         """
         
         inline(hebbian_div_norm_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'learning_rate','weight_ptrs','slice_ptrs'], local_dict=locals())
+
+        # CEBHACKALERT: can this be done in the c?
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+                cf.weights *= cf.mask
+
 
 if not optimized:
     DivisiveHebbian_CPointer = DivisiveHebbian_Py

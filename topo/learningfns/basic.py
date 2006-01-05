@@ -114,6 +114,7 @@ class HebbianSOMLF(SOMLF):
                     cf.weights += rate * (X - cf.weights)
                     if type(output_fn) is not Identity:
                         cf.weights=self.output_fn(cf.weights)
+                    cf.weights *= cf.mask
 
 
     def winner_coords(self, activity, cols):

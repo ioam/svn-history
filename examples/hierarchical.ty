@@ -43,8 +43,11 @@ topo.patterns.basic.Line.orientation = DynamicNumber(lambda :random.uniform(-pi,
 topo.patterns.basic.Line.thickness = 0.02
 topo.patterns.basic.Line.bounds = BoundingBox(points=((-1.05,-0.8),(1.05,0.8)))
 
+# CEBHACKALERT: something isn't working about using e.g.
+# PatternGeneratorParameter(default=X) in various places in the code
+# so I've temporarily commented out this line.
+# PatternGeneratorParameter.default=topo.patterns.basic.Line()
 
-PatternGeneratorParameter.default=topo.patterns.basic.Line()
 
 # cortical sheet
 CFSOM.density = 10

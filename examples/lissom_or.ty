@@ -147,8 +147,10 @@ topo.patterns.basic.Gaussian.size = gaussian_height
 topo.patterns.basic.Gaussian.aspect_ratio = gaussian_width/gaussian_height
 topo.patterns.basic.Gaussian.bounds = input_bounds
 
-
-PatternGeneratorParameter.default=topo.patterns.basic.Gaussian()
+# CEBHACKALERT: something isn't working about using e.g.
+# PatternGeneratorParameter(default=X) in various places in the code
+# so I've temporarily commented out this line.
+# PatternGeneratorParameter.default=topo.patterns.basic.Gaussian()
 
 
 # LISSOM parameters
@@ -162,6 +164,12 @@ inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(
 # Specify weight initialization
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 #CFProjection.weights_generator = topo.patterns.basic.Constant()
+
+## Shape of the ConnectionFields for all CFProjections
+## CFProjection.weights_shape = topo.patterns.basic.Disk(size=0.4,aspect_ratio=1.0,
+##                                                       scale=1.0,offset=0.0,
+##                                                       smoothing=0.0)
+
 
 # Specify the response function
 # inlinec.optimized should make this unnecessary.
