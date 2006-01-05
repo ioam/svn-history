@@ -29,8 +29,8 @@ from arrayutils import mdot,divisive_normalization
 from sheet import Sheet,bounds2slice,bounds2shape,sheet2matrixidx,slicearray2bounds
 from sheetview import UnitView
 from itertools import chain
-from topo.base.patterngenerator import PatternGeneratorParameter
-import topo.base.patterngenerator
+from patterngenerator import PatternGeneratorParameter
+import patterngenerator
 from boundingregion import BoundingBox
 
 
@@ -329,7 +329,7 @@ class CFProjection(Projection):
     cf_type = Parameter(default=ConnectionField)
     weight_type = Parameter(default=Numeric.Float32)
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
-    weights_generator = PatternGeneratorParameter(default=topo.base.patterngenerator.Constant())
+    weights_generator = PatternGeneratorParameter(default=patterngenerator.Constant())
     learning_fn = LearningFunctionParameter(default=GenericCFLF())
     learning_rate = Parameter(default=0.0)
     output_fn  = OutputFunctionParameter(default=Identity())
@@ -496,7 +496,7 @@ class SharedWeightProjection(Projection):
     cf_type = Parameter(default=ConnectionField)
     weight_type = Parameter(default=Numeric.Float32)
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
-    weights_generator = PatternGeneratorParameter(default=topo.base.patterngenerator.Constant())
+    weights_generator = PatternGeneratorParameter(default=patterngenerator.Constant())
     ### JABHACKALERT: Learning won't actually work yet.
     learning_fn = Constant(IdentityCFLF)
     learning_rate = Parameter(default=0.0)
