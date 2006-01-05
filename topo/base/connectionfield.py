@@ -312,7 +312,7 @@ class GenericCFLF(CFLearningFunction):
                 cf = cfs[r][c]
                 self.single_cf_fn(cf.get_input_matrix(input_activity),
                                   output_activity[r,c], cf.weights, learning_rate)
-                cfs[r][c].weights=self.output_fn(cf.weights)
+                cf.weights=self.output_fn(cf.weights)
                 
 
 class CFProjection(Projection):
