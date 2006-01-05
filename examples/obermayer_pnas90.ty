@@ -65,7 +65,11 @@ topo.patterns.basic.Gaussian.size  = gaussian_height
 topo.patterns.basic.Gaussian.aspect_ratio = gaussian_width/gaussian_height
 topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 
-PatternGeneratorParameter.default=topo.patterns.basic.Gaussian()
+# CEBHACKALERT: something isn't working about using e.g.
+# PatternGeneratorParameter(default=X) in various places in the code
+# so I've temporarily commented out this line.
+# PatternGeneratorParameter.default=topo.patterns.basic.Gaussian()
+
 
 # cortical sheet
 ObermayerSOM.density = 25 #6
