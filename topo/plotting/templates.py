@@ -105,7 +105,7 @@ plotgroup_templates = KeyedList()
 # is created the first time it is needed).
 
 pgt = PlotGroupTemplate(name='Activity',
-			command='measure_activity()',
+			command='update_activity()',
 			plot_templates= [('Activity',
 					  {'Strength'   : 'Activity',
 					   'Hue'        : 'OrientationPreference',
@@ -117,7 +117,7 @@ plotgroup_templates[pgt.name] = pgt
 ### (and also in the menu), for consistency, so that the plot labels
 ### can always be done the same way.
 pgt = PlotGroupTemplate(name='Unit Weights',
-                        command='pass',
+                        command='update_weight()',
 			plot_templates= [('Unit Weights',
 					  {'Strength'   : 'Weights',
 					   'Hue'        : 'OrientationPreference',

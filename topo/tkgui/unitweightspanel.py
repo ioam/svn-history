@@ -10,6 +10,7 @@ $Id$
 """
 __version__='$Revision$'
 
+import Pmw
 import __main__
 from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry
 from plotgrouppanel import PlotGroupPanel
@@ -19,9 +20,12 @@ from topo.plotting.templates import plotgroup_templates
 from topo.base.sheet import Sheet
 import topoconsole
 
+from topo.analysis.updatecommands import *
+import topo.analysis.updatecommands
+
 class UnitWeightsPanel(CFSheetPlotPanel):
-    def __init__(self,parent,pengine,console=None,**config):
-        super(UnitWeightsPanel,self).__init__(parent,pengine,console,**config)
+    def __init__(self,parent,pengine,console=None,plot_group_key=None,pgt_name=None,**config):
+        super(UnitWeightsPanel,self).__init__(parent,pengine,console,plot_group_key,pgt_name,**config)
 
         # Receptive Fields are generally tiny.  Boost it up to make it visible.
         self.WEIGHT_PLOT_INITIAL_SIZE = 30
@@ -36,7 +40,34 @@ class UnitWeightsPanel(CFSheetPlotPanel):
 
         self._add_xy_boxes()
         self.auto_refresh_checkbutton.invoke()
+
+
+	###########################################
+	### JCALERT! Eventually all this code should go only in PlotGroupPanel
+        ### and BasicPlotGroupPanel should be spared.
+	self.pgt = plotgroup_templates[pgt_name]
+	# Command used to refresh the plot, if any
+        self.cmdname = StringVar()
+        
+        #self.cmdname.set(self.mapcmds[self.mapname.get()])
+        self.cmdname.set(self.pgt.command)
+
+	params_frame = Frame(master=self)
+        params_frame.pack(side=TOP,expand=YES,fill=X)
+        Message(params_frame,text="Update command:",aspect=1000).pack(side=LEFT)
+
+        Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
+                     entry_textvariable=self.cmdname,
+                     scrolledlist_items=([self.pgt.command])
+                     ).pack(side=LEFT,expand=YES,fill=X)
+
+	###########################################
+	
+
+	# By default, the UnitWeight Plots are situated.
         self.toggle_situate()
+	self.situate_checkbutton.select()
+
         self.refresh()
 
 
@@ -100,7 +131,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
             message = 'The x/y coordinates are outside the bounding region.\n'\
                     + '  ' + str(l) + ' < X < ' + str(r) + '\n' \
                     + '  ' + str(b) + ' < Y < ' + str(t)
-            w = Tkinter.Label(self.dialog.interior(),
+	    w = Tkinter.Label(self.dialog.interior(),
                               text = message,
                               background = 'black',
                               foreground = 'white',
@@ -117,13 +148,17 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         PlotGroup is created, call its do_plot_cmd() to prepare
         the Plot objects.
         """
-
-
+	 
         self.generate_plot_group_key()
+	
+	topo.analysis.updatecommands.coordinate = (self.x,self.y)
+	topo.analysis.updatecommands.sheet_name = self.region.get()
+
+        exec self.cmdname.get()
+
         self.pe_group = self.pe.get_plot_group(self.plot_group_key,
                                                plotgroup_templates['Unit Weights'],
                                                'UnitWeightsPlotGroup',self.region.get())
-        self.pe_group.do_plot_cmd()
 
         # self.situate is defined in the super class CFSheetPlotPanel
         self.pe_group.situate = self.situate

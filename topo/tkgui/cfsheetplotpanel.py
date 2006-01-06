@@ -24,8 +24,8 @@ import topoconsole
 
 class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
 
-    def __init__(self,parent,pengine,console,**config):
-        plotgrouppanel.PlotGroupPanel.__init__(self,parent,pengine,console,**config)
+    def __init__(self,parent,pengine,console,plot_group_key=None,pgt_name=None,**config):
+        plotgrouppanel.PlotGroupPanel.__init__(self,parent,pengine,console,plot_group_key=None,pgt_name=None,**config)
 
         self.region = StringVar()
         self.region.set('None')
