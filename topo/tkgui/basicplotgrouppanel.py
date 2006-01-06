@@ -23,7 +23,7 @@ from topo.plotting.templates import plotgroup_templates
 
 ### We want to support any featuremap type defined in that file, and
 ### so import all of them here.
-from topo.analysis.featuremap import *
+from topo.analysis.updatecommands import *
 
 
 class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
@@ -40,7 +40,6 @@ class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         # Command used to refresh the plot, if any
         self.cmdname = StringVar()
         
-        #self.cmdname.set(self.mapcmds[self.mapname.get()])
         self.cmdname.set(self.pgt.command)
 
         
