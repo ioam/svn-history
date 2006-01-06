@@ -108,12 +108,15 @@ class ConnectionField(TopoObject):
         
         # CEBHACKALERT: weights_shape and mask aren't Parameters, but
         # should I have declared them as class attributes?
+        # CEBHACKALERT: the thresholding of mask values done in the where line
+        # should be done so that the threshold can be set by the user (see
+        # also change_bounds), and to avoid duplicating this code.
         self.weights_shape = weights_shape
         m = weights_shape(x=0,y=0,bounds=weights_bound_template,
                           density=self.input_sheet.density,theta=0,
                           rows=r2-r1,cols=c2-c1)
-        self.mask = m.astype(int)
-
+        self.mask = Numeric.where(m>=0.5,m,0.0)
+        
         output_fn(self.weights)
         self.weights *= self.mask        
 
@@ -197,7 +200,8 @@ class ConnectionField(TopoObject):
             self.weights.savespace(1)
 
             # CEBHACKALERT: I think this isn't right. E.g. if the mask is a Disk the
-            self.mask = (Numeric.array(self.mask[r1-or1:r2-or1,c1-oc1:c2-oc1],typecode=Numeric.Int32,copy=1))
+            m = (Numeric.array(self.mask[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1))
+            self.mask = Numeric.where(m>=0.5,m,0.0)
             
             output_fn(self.weights)
             self.weights *= self.mask
@@ -537,6 +541,7 @@ class SharedWeightProjection(Projection):
         self.sharedcf=self.cf_type(input_sheet=self.src,
                                    weights_bound_template=self.weights_bounds,
                                    weights_generator=self.weights_generator,
+                                   weights_shape=self.weights_shape,
                                    weight_type=self.weight_type,
                                    output_fn=self.learning_fn.output_fn,
                                    x=0,y=0)
@@ -642,9 +647,3 @@ class CFSheet(ProjectionSheet):
 
     def release_unit_view(self,x,y):
         self.release_sheet_view(('Weights',x,y))
-
-
-    
-
-
-
