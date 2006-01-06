@@ -97,6 +97,7 @@ class Plot(TopoObject):
         super(Plot,self).__init__(**params) 
        
         self.bitmap = None
+        
         ### JCALERT: Fix view_info here, and in SheetView
 	self.view_info = {}
 
@@ -115,18 +116,6 @@ class Plot(TopoObject):
         # # something like:
 	# def annotated_bitmap(self):  
         # enable other construction....
-	
-
-    ### JABALERT: This does not seem appropriate -- Plot should not delete
-    ### any SheetViews that it did not put there itself.
-    def release_sheetviews(self):
-        """
-        Delete any sheet_view_dict entries used by this plot, under
-        the assumption that this Plot is the only object that use the 
-        the SheetView in the sheet_view_dict  with that dictionary key.
-        """
-        for each in self.channels.values():
-	    del self.view_dict[each]
 
 
     def _get_matrix(self,key):

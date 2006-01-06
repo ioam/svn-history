@@ -168,17 +168,6 @@ class PlotGroup(TopoObject):
 	self.added_list.extend(new_plot)
       
 
-    ### JCALERT ! It has to be redefined how this function release_sheet_view() works
-    ### here but also in sheet and connectionfield and Plot. We might get rid of it.
-    def release_sheetviews(self):
-        """
-        Call release_sheetviews() on all Plots in plot list, to free
-        up Sheet.sheet_view_dict entries and save memory.  Note, not
-        all plots use SheetViews stored in a Sheet dictionary.
-        """
-        for each in self.all_plots:
-            each.release_sheetviews()
-
     # Call from load_images() as a dynamic list to regenerate all_plots anytime (allowing refreshing)
     def plots(self):
         """
