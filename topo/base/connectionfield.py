@@ -197,7 +197,7 @@ class ConnectionField(TopoObject):
             self.weights.savespace(1)
 
             # CEBHACKALERT: I think this isn't right. E.g. if the mask is a Disk the
-            self.mask = (Numeric.array(self.mask[r1-or1:r2-or1,c1-oc1:c2-oc1],typecode=Int,copy=1))
+            self.mask = (Numeric.array(self.mask[r1-or1:r2-or1,c1-oc1:c2-oc1],typecode=Numeric.Int32,copy=1))
             
             output_fn(self.weights)
             self.weights *= self.mask
