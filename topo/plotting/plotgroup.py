@@ -282,7 +282,11 @@ class ProjectionPlotGroup(PlotGroup):
 
         super(ProjectionPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,
                                                    plot_list,**params)
-	
+
+	### JABHACKALERT!  This should not be a list whose first
+        ### element is taken; instead, there should only ever be one
+        ### object with the given name, and that unique object (if
+        ### any) should be returned.
         self._sim_ep = [s for s in self.simulator.objects(Sheet).values()
                         if self.sheet_filter_lam(s)][0]
         self._sim_ep_src = self._sim_ep.get_in_projection_by_name(self.weight_name)[0].src
@@ -343,7 +347,7 @@ class ProjectionPlotGroup(PlotGroup):
         full_unitview_list = [self._sim_ep.unit_view(x,y) for (x,y) in coords]
 
 	### JCALERT! The use of chain and nested list here and in 
-        ### connectionfield.py (unit_view) can be spared or made simpler.
+        ### connectionfield.py (unit_view) can be omitted or made simpler.
         self.view_list = [view for view in chain(*full_unitview_list)
                          if view.projection.name == self.weight_name]
 

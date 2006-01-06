@@ -324,6 +324,20 @@ class GenericCFLF(CFLearningFunction):
     def __init__(self,**params):
         super(GenericCFLF,self).__init__(**params)
 
+    ### JABHACKALERT!  The learning_rate currently has very different
+    ### effects when the density changes, and lissom_or.ty calculates
+    ### corrections for that.  Instead, this code (and EVERY OTHER
+    ### GenericCFLF) should accept a learning_rate specified as if
+    ### there is a single unit in the connection field.  That is, the
+    ### learning_rate specifies the total change across the
+    ### ConnectionField, assuming that all units in the CF are equally
+    ### activated (which is a reasonable default assumption on
+    ### average).  Thus the user-specified learning rate should be
+    ### divided by the number of units in the CF before the single_cf_fn
+    ### is called here.  In general, every GenericCFLF would do such
+    ### calculation before the learning_rate is used to calculate any
+    ### new weight.
+    ### Something like: single_cf_learning_rate=learning_rate/number_of_units_in_the(cf)
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
         rows,cols = output_activity.shape
@@ -506,7 +520,8 @@ class SharedWeightCFResponseFn(TopoObject):
         activity *= strength
         
 
-
+### JABALERT: This should move to topo/projections/basic.py, because
+### nothing actually relies on it in base.
 class SharedWeightProjection(Projection):
     """
     A Projection with a single ConnectionField shared by all units.
@@ -618,7 +633,19 @@ class CFSheet(ProjectionSheet):
     ### JABHACKALERT!
     ###
     ### This code should be checking to see if the projection is a CFProjection
-    ### before doing a get_view, because only CFProjections support that call.
+    ###
+    ### This code is outdated, because it was originally meant to
+    ### retrieve a unit view from the database, and had to be
+    ### different from sheet_view() because of needing to supply x,y.
+    ### Now, the sheet_view_dict accepts keys of any type, and
+    ### UnitView keys encode the x,y directly.  Thus the lookup
+    ### function is no longer needed.  Instead, this code is now used
+    ### for installing UnitViews in the sheet_view_dict, and so it
+    ### should be renamed to update_unit_view(self,x,y), or something
+    ### like that.  In addition, it should probably accept a
+    ### projection parameter so that individual projections can be
+    ### updated; otherwise a Projection plot will result in a huge
+    ### number of wasted UnitView additions.
     def unit_view(self,x,y):
         """
 	Creates the list of UnitView objects for a particular unit in this CFSheet,

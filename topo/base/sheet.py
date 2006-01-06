@@ -406,6 +406,7 @@ class Sheet(EventProcessor):
         self.sheet_view_dict = {}
 
 
+    ### JABALERT: This should be deleted now that sheet_view_dict is public
     def add_sheet_view(self,view_name,sheet_view):
         """
         Add a SheetView to the view database in this Sheet object.
@@ -423,6 +424,7 @@ class Sheet(EventProcessor):
         self.sheet_view_dict[view_name] = sheet_view
 
   
+    ### JABALERT: This should be deleted now that sheet_view_dict is public
     def release_sheet_view(self,view_name):
         """
         Delete the dictionary entry with key entry 'view_name' to save
