@@ -165,12 +165,6 @@ inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 #CFProjection.weights_generator = topo.patterns.basic.Constant()
 
-## Shape of the ConnectionFields for all CFProjections
-## CFProjection.weights_shape = topo.patterns.basic.Disk(size=0.4,aspect_ratio=1.0,
-##                                                       scale=1.0,offset=0.0,
-##                                                       smoothing=0.0)
-
-
 # Specify the response function
 # inlinec.optimized should make this unnecessary.
 CFProjection.response_fn=CFDotProduct()
@@ -191,18 +185,35 @@ V1 = LISSOM(name='V1')
 s.connect(Retina,V1, delay = FixedPoint("0.05"),
           connection_type=CFProjection,
           connection_params = dict(strength = 1.0, name='Afferent0',
-                                   weights_bounds = afferent_weight_bounds, learning_rate=alpha_input))
-
+                                   weights_bounds = afferent_weight_bounds,
+##                                    weights_shape = topo.patterns.basic.Disk(
+##                                                      size=rf_radius/BaseRN,
+##                                                      aspect_ratio=1.0,
+##                                                      scale=1.0,offset=0.0,
+##                                                      smoothing=0.0),
+                                   learning_rate=alpha_input))
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
           connection_type=CFProjection,
           connection_params = dict(strength = gammaexc, name='LateralExcitatory',
-                                   weights_bounds = excitatory_weight_bounds, learning_rate=alpha_exc))
+                                   weights_bounds = excitatory_weight_bounds,
+##                                    weights_shape = topo.patterns.basic.Disk(
+##                                                      size=exc_rad/BaseN,
+##                                                      aspect_ratio=1.0,
+##                                                      scale=1.0,offset=0.0,
+##                                                      smoothing=0.0),
+                                   learning_rate=alpha_exc))
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
           connection_type=CFProjection,
           connection_params = dict(strength = -gammainh, name='LateralInhibitory',
-                                   weights_bounds = inhibitory_weight_bounds, learning_rate=alpha_inh))
+                                   weights_bounds = inhibitory_weight_bounds,
+##                                    weights_shape = topo.patterns.basic.Disk(
+##                                                      size=inh_rad/BaseN,
+##                                                      aspect_ratio=1.0,
+##                                                      scale=1.0,offset=0.0,
+##                                                      smoothing=0.0),
+                                   learning_rate=alpha_inh))
         
 
 s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.6/BaseN,-exc_rad*0.6/BaseN),(exc_rad*0.6/BaseN,exc_rad*0.6/BaseN))))
