@@ -10,6 +10,7 @@ plotting    - Visualization functions and classes
 analysis    - Analysis functions and classes (besides plotting)
 tkgui       - Tk-based graphical user interface (GUI)
 commands    - High-level user commands
+misc        - Various useful independent modules
 
 The Topographica primitives library consists of a family of classes
 that can be used with the above functions and classes:
@@ -32,8 +33,20 @@ $Id$
 """
 __version__='$Revision $'
 
-# CEBHACKALERT: what about responsefns, outputfns, and so on?
-__all__ = ['base','commands','sheets','projections','patterns','eps','plotting','analysis']
+# The tests and the GUI are omitted from this list, and have to be
+# imported explicitly if desired.
+__all__ = ['analysis',
+           'base',
+           'commands',
+           'eps',
+           'learningfns',
+           'misc',
+           'outputfns',
+           'patterns',
+           'plotting',
+           'projections',
+           'responsefns',
+           'sheets']
 
 # Enable automatic importing of .ty files, treating them just like .py
 import topo.misc.tyimputil
