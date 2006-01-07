@@ -97,6 +97,8 @@ def update_activity():
 coordinate = (0,0)
 sheet_name = ''
 
+### JABALERT! Presumably this should be called update_weights?  Or maybe update_cfs?
+### Or update_unit_views?  It definitely does not update only a single weight.
 def update_weight():
     """
     Lambda function passed in, that will filter out all sheets
