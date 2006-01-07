@@ -66,6 +66,7 @@ __version__='$Revision$'
 
 
 import random
+import RandomArray
 import fixedpoint
 #import pdb # debugger
 
@@ -162,6 +163,7 @@ excitatory_weight_bounds = BoundingBox(points=((-exc_rad/BaseN,-exc_rad/BaseN),(
 inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(inh_rad/BaseN,inh_rad/BaseN)))
 
 # Specify weight initialization
+RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 #CFProjection.weights_generator = topo.patterns.basic.Constant()
 
