@@ -182,6 +182,9 @@ Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),
                         name='Retina')
 V1 = LISSOM(name='V1')
 
+# CEBHACKALERT: the commented-out 'weights_shape' code in each of the following
+# connect sections makes the ConnectionFields circular.
+
 s.connect(Retina,V1, delay = FixedPoint("0.05"),
           connection_type=CFProjection,
           connection_params = dict(strength = 1.0, name='Afferent0',
@@ -192,6 +195,22 @@ s.connect(Retina,V1, delay = FixedPoint("0.05"),
 ##                                                      scale=1.0,offset=0.0,
 ##                                                      smoothing=0.0),
                                    learning_rate=alpha_input))
+
+# CEBHACKALERT: temporary - uncomment to see a SharedWeightProjection
+## from topo.base.connectionfield import CFSheet,SharedWeightProjection
+## SharedWeightProjection.weights_generator = topo.patterns.random.UniformRandom()
+## TestSheet = CFSheet(name='TestSheet')
+## s.connect(Retina,TestSheet, delay = FixedPoint("0.05"),
+##           connection_type=SharedWeightProjection,
+##           connection_params = dict(strength = 1.0, name='TestSWProjection',
+##                                    weights_bounds = afferent_weight_bounds,
+## ##                                    weights_shape = topo.patterns.basic.Disk(
+## ##                                                      size=rf_radius/BaseRN,
+## ##                                                      aspect_ratio=1.0,
+## ##                                                      scale=1.0,offset=0.0,
+## ##                                                      smoothing=0.0)
+##                                    ))
+
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
           connection_type=CFProjection,
