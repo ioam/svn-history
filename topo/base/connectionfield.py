@@ -73,13 +73,10 @@ class ConnectionField(TopoObject):
     # Weights matrix; not yet initialized.
     weights = []
 
-    ### JABHACKALERT!  Why is this code relevant only for the
-    ### optimized C versions here, in the base ConnectionField class?
-    ### Surely it should only be in a subclass that has been
-    ### optimized, so that the base class is readable and general.
-    
-    # Stores a copy of the slice as an array that can be read easily from C,
-    # for use in optimized C versions of functions using this object.
+    # Specifies how to get a submatrix from the source sheet that is aligned
+    # properly with this weight matrix.  The information is stored as an
+    # array for speed of access from optimized C components; use
+    # self.slice_tuple() for a nicer Python access method.
     slice_array = []
     
     def __init__(self,input_sheet,weights_bound_template,
@@ -103,8 +100,7 @@ class ConnectionField(TopoObject):
         # promote to double.
         self.weights.savespace(1)
 
-        # CEBHACKALERT: why 'activity matrix' shape?
-        self.verbose("activity matrix shape: ",self.weights.shape)
+        self.verbose("weights shape: ",self.weights.shape)
         
         # CEBHACKALERT: weights_shape and mask aren't Parameters, but
         # should I have declared them as class attributes?
@@ -331,7 +327,7 @@ class GenericCFLF(CFLearningFunction):
     ### JABHACKALERT!  The learning_rate currently has very different
     ### effects when the density changes, and lissom_or.ty calculates
     ### corrections for that.  Instead, this code (and EVERY OTHER
-    ### GenericCFLF) should accept a learning_rate specified as if
+    ### CFLearningFunction) should accept a learning_rate specified as if
     ### there is a single unit in the connection field.  That is, the
     ### learning_rate specifies the total change across the
     ### ConnectionField, assuming that all units in the CF are equally
