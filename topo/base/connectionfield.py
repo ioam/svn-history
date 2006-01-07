@@ -72,7 +72,7 @@ class ConnectionField(TopoObject):
 
     # Weights matrix; not yet initialized.
     weights = []
-   
+
     ### JABHACKALERT!  Why is this code relevant only for the
     ### optimized C versions here, in the base ConnectionField class?
     ### Surely it should only be in a subclass that has been
@@ -87,8 +87,8 @@ class ConnectionField(TopoObject):
                  output_fn=Identity(),**params):
         super(ConnectionField,self).__init__(**params)
         self.input_sheet = input_sheet
-
-        self.__initialize_slice_array(weights_bound_template)
+        self.__weights_bound_template = weights_bound_template
+        self.initialize_slice_array()
 
         r1,r2,c1,c2 = self.slice_tuple()
 
@@ -110,7 +110,8 @@ class ConnectionField(TopoObject):
         # should I have declared them as class attributes?
         # CEBHACKALERT: the thresholding of mask values done in the where line
         # should be done so that the threshold can be set by the user (see
-        # also change_bounds), and to avoid duplicating this code.
+        # also change_bounds), and to avoid duplicating this code. Also this
+        # probably slows simulation startup time (and time when bounds are changed).
         self.weights_shape = weights_shape
         m = weights_shape(x=0,y=0,bounds=weights_bound_template,
                           density=self.input_sheet.density,theta=0,
@@ -121,7 +122,7 @@ class ConnectionField(TopoObject):
         self.weights *= self.mask        
 
 
-    def __initialize_slice_array(self,weights_bound_template):
+    def initialize_slice_array(self):
         """
         Calculate the slice specifying the submatrix of the sheets to which
         this connection field connects.
@@ -137,7 +138,7 @@ class ConnectionField(TopoObject):
         using the reversed function bounds2slice.
 	"""
 
-        rows,cols = bounds2shape(weights_bound_template,self.input_sheet.xdensity,self.input_sheet.ydensity)
+        rows,cols = bounds2shape(self.__weights_bound_template,self.input_sheet.xdensity,self.input_sheet.ydensity)
 
         cr,cc = sheet2matrixidx(self.x, self.y,
                                 self.input_sheet.bounds, self.input_sheet.xdensity, self.input_sheet.ydensity)
@@ -192,7 +193,8 @@ class ConnectionField(TopoObject):
 
         or1,or2,oc1,oc2 = self.slice_tuple()
 
-        self.__initialize_slice_array(weights_bound_template)
+        self.__weights_bound_template = weights_bound_template
+        self.initialize_slice_array()
         r1,r2,c1,c2 = self.slice_tuple()
 
         if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
@@ -201,6 +203,7 @@ class ConnectionField(TopoObject):
 
             # CEBHACKALERT: I think this isn't right. E.g. if the mask is a Disk the
             m = (Numeric.array(self.mask[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1))
+            # CEBHACKALERT: see alert in __init__
             self.mask = Numeric.where(m>=0.5,m,0.0)
             
             output_fn(self.weights)
@@ -263,6 +266,7 @@ class GenericCFResponseFn(CFResponseFunction):
 
     def __call__(self, cfs, input_activity, activity, strength):
         rows,cols = activity.shape
+        
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = cfs[r][c]
@@ -430,6 +434,8 @@ class CFProjection(Projection):
         """
         (r,c) = (self.dest).sheet2matrixidx(sheet_x,sheet_y)
 
+        # CEBHACKALERT: why is this necessary? Isn't cf[r][c].weights
+        # already a Numeric array? (Same in SharedWeightProjection.)
         matrix_data = Numeric.array(self.cf(r,c).weights)
 
         new_box = self.cf(r,c).bounds
@@ -505,17 +511,15 @@ class SharedWeightCFResponseFn(TopoObject):
     def __init__(self,**params):
         super(SharedWeightCFResponseFn,self).__init__(**params)
 
-    def __call__(self, cf, input_activity, activity, strength):
+    def __call__(self, cf, cf_slice_and_bounds, input_activity, activity, strength):
         rows,cols = activity.shape
         for r in xrange(rows):
             for c in xrange(cols):
-                ### JABHACKALERT: Need to offset the slice
-                ### array to the appropriate location for
-                ### each unit, instead of always using the
-                ### center as it is now.
-		sa = cf.slice_array
-                r1,r2,c1,c2 = cf.slice_tuple()
+                r1,r2,c1,c2 = (cf_slice_and_bounds[r][c])[0]
                 X = input_activity[r1:r2,c1:c2]
+                
+                assert cf.weights.shape==X.shape, "sharedcf at (" + str(cf.x) + "," + str(cf.y) + ") has an input_matrix slice that is not the same shape as the sharedcf.weights matrix weight matrix (" + repr(X.shape) + " vs. " + repr(cf.weights.shape) + ")."
+                
                 activity[r,c] = self.single_cf_fn(X,cf.weights)
         activity *= strength
         
@@ -536,13 +540,13 @@ class SharedWeightProjection(Projection):
     weights_generator = PatternGeneratorParameter(default=patterngenerator.Constant())
     weights_shape = PatternGeneratorParameter(default=patterngenerator.Constant())
     ### JABHACKALERT: Learning won't actually work yet.
-    learning_fn = Constant(IdentityCFLF)
+    learning_fn = Constant(IdentityCFLF())
     learning_rate = Parameter(default=0.0)
     ### JABHACKALERT: cfs is a dummy, here only so that learning will
     ### run without an exception
-    cfs = None 
+    cfs = None
+    cf_slice_and_bounds = []
     output_fn  = PatternGeneratorParameter(default=Identity())
-
     strength = Number(default=1.0)
 
     def __init__(self,**params):
@@ -560,6 +564,21 @@ class SharedWeightProjection(Projection):
                                    weight_type=self.weight_type,
                                    output_fn=self.learning_fn.output_fn,
                                    x=0,y=0)
+        
+        # calculate the slice array and bounds for the location of each unit
+        # CEBHACKALERT: uses the existing function initialize_slice_array()
+        # and calculates the slices and bounds just once, but maybe there
+        # is a cleaner way? Leaves the sharedcf with (x,y) of last unit
+        # instead of (0,0) as before, but (x,y) is meaningless anyway for
+        # the sharedcf.
+        cf = self.sharedcf
+        for y in self.dest.sheet_rows()[::-1]:
+            row = []
+            for x in self.dest.sheet_cols():
+                cf.x,cf.y = x,y
+                cf.initialize_slice_array()
+                row.append((cf.slice_tuple(),cf.bounds))
+            self.cf_slice_and_bounds.append(row)
 
         self.input_buffer = None
         self.activity = Numeric.array(self.dest.activity)
@@ -578,11 +597,11 @@ class SharedWeightProjection(Projection):
         """
         (r,c) = (self.dest).sheet2matrixidx(sheet_x,sheet_y)
 
+        # CEBHACKALERT: see get_view() in CFProjection
         matrix_data = Numeric.array(self.sharedcf.weights)
 
-        ### JABHACKALERT: Need to compute this appropriately for each unit;
-        ### currently the result is always at the center
-        new_box = self.sharedcf.bounds
+        # get weights bounds for each unit
+        new_box = (self.cf_slice_and_bounds[r][c])[1]
 
         assert matrix_data != None, "Projection Matrix is None"
         return UnitView((matrix_data,new_box),sheet_x,sheet_y,self,view_type='UnitView')
@@ -591,7 +610,7 @@ class SharedWeightProjection(Projection):
     def activate(self,input_activity):
         """Activate using the specified response_fn and output_fn."""
         self.input_buffer = input_activity
-        self.response_fn(self.sharedcf, input_activity, self.activity, self.strength)
+        self.response_fn(self.sharedcf, self.cf_slice_and_bounds, input_activity, self.activity, self.strength)
         self.activity = self.output_fn(self.activity)
 
 
