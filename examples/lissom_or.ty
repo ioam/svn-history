@@ -185,6 +185,8 @@ V1 = LISSOM(name='V1')
 # CEBHACKALERT: the commented-out 'weights_shape' code in each of the following
 # connect sections makes the ConnectionFields circular.
 
+# CEBHACKALERT: the radius is too small (size=rf_radius/BaseRN)
+
 s.connect(Retina,V1, delay = FixedPoint("0.05"),
           connection_type=CFProjection,
           connection_params = dict(strength = 1.0, name='Afferent0',
