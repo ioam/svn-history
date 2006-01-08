@@ -381,7 +381,11 @@ class CFProjection(Projection):
         super(CFProjection,self).__init__(**params)
         # set up array of ConnectionFields translated to each x,y in the src sheet
 
-        cfs = []
+        ### JABALERT: Should make cfs semi-private, since it has an
+        ### accessor function and isn't always the same format
+        ### (e.g. for SharedWeightProjection).  Could also make it
+        ### be a class attribute; not sure.
+        cflist = []
         for y in self.dest.sheet_rows()[::-1]:
             row = []
             for x in self.dest.sheet_cols():
@@ -399,9 +403,10 @@ class CFProjection(Projection):
                                         output_fn=self.learning_fn.output_fn,
                                         x=x,y=y))
 
-            cfs.append(row)
+            cflist.append(row)
 
-        self.set_cfs(cfs)
+        self.cfs = cflist
+
         self.input_buffer = None
         self.activity = Numeric.array(self.dest.activity)
 
@@ -409,10 +414,6 @@ class CFProjection(Projection):
     def cf(self,r,c):
         """Return the specified ConnectionField"""
         return self.cfs[r][c]
-
-
-    def set_cfs(self,cf_list):
-        self.cfs = cf_list
 
 
     def get_shape(self):
@@ -521,8 +522,9 @@ class SharedWeightCFResponseFn(TopoObject):
         
 
 ### JABALERT: This should move to topo/projections/basic.py, because
-### nothing actually relies on it in base.
-class SharedWeightProjection(Projection):
+### nothing actually relies on it in base.  Also, could change the
+### name to SharedWeightCFProjection for consistency.
+class SharedWeightProjection(CFProjection):
     """
     A Projection with a single ConnectionField shared by all units.
 
@@ -530,17 +532,8 @@ class SharedWeightProjection(Projection):
     currently disabled.
     """
     response_fn = ResponseFunctionParameter(default=SharedWeightCFResponseFn())
-    cf_type = Parameter(default=ConnectionField)
-    weight_type = Parameter(default=Numeric.Float32)
-    weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
-    weights_generator = PatternGeneratorParameter(default=patterngenerator.Constant())
-    weights_shape = PatternGeneratorParameter(default=patterngenerator.Constant())
     ### JABHACKALERT: Learning won't actually work yet.
     learning_fn = Constant(IdentityCFLF())
-    learning_rate = Parameter(default=0.0)
-    ### JABHACKALERT: cfs is a dummy, here only so that learning will
-    ### run without an exception
-    cfs = None
     cf_slice_and_bounds = []
     output_fn  = PatternGeneratorParameter(default=Identity())
     strength = Number(default=1.0)
@@ -552,7 +545,20 @@ class SharedWeightProjection(Projection):
         in the source sheet corresponding to the unit in the target
         sheet.
         """
-        super(SharedWeightProjection,self).__init__(**params)
+        ### Skips call to super(SharedWeightProjection,self), because
+        ### we don't want the whole set of cfs initialized, but we
+        ### do want anything that Projection defines.
+        ###
+        ### JABHACKALERT: This approach might lead to problems later
+        ### if someone adds code to CFProjection, because we won't
+        ### inherit that.  Instead, we might want to add a flag to
+        ### CFProjection.__init__ to allow the weight intialization
+        ### to be selectively disabled, which is all we really need.
+        CFProjection.__init__(self,**params)
+        
+        ### JABHACKALERT: cfs is a dummy, here only so that learning will
+        ### run without an exception
+        self.cfs = []
         self.sharedcf=self.cf_type(input_sheet=self.src,
                                    weights_bound_template=self.weights_bounds,
                                    weights_generator=self.weights_generator,
@@ -608,6 +614,24 @@ class SharedWeightProjection(Projection):
         self.input_buffer = input_activity
         self.response_fn(self.sharedcf, self.cf_slice_and_bounds, input_activity, self.activity, self.strength)
         self.activity = self.output_fn(self.activity)
+
+
+    def change_bounds(self, weights_bound_template):
+        """
+        Change the bounding box for all of the ConnectionFields in this Projection.
+
+	Not yet implemented.
+	"""
+        raise NotImplementedError
+
+
+    def change_density(self, new_wt_density):
+        """
+        Rescales the weight matrix in place, interpolating or resampling as needed.
+	
+	Not yet implemented.
+	"""
+        raise NotImplementedError
 
 
 
