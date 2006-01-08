@@ -187,17 +187,15 @@ V1 = LISSOM(name='V1')
 # CEBHACKALERT: the commented-out 'weights_shape' code in each of the following
 # connect sections makes the ConnectionFields circular.
 
-# CEBHACKALERT: the radius is too small (size=rf_radius/BaseRN)
-
 s.connect(Retina,V1, delay = FixedPoint("0.05"),
           connection_type=CFProjection,
           connection_params = dict(strength = 1.0, name='Afferent0',
                                    weights_bounds = afferent_weight_bounds,
-##                                    weights_shape = topo.patterns.basic.Disk(
-##                                                      size=rf_radius/BaseRN,
-##                                                      aspect_ratio=1.0,
-##                                                      scale=1.0,offset=0.0,
-##                                                      smoothing=0.0),
+##                                     weights_shape = topo.patterns.basic.Disk(
+##                                                       size=2*rf_radius/BaseRN,
+##                                                       aspect_ratio=1.0,
+##                                                       scale=1.0,offset=0.0,
+##                                                       smoothing=0.0),
                                    learning_rate=alpha_input))
 
 # CEBHACKALERT: temporary - uncomment to see a ON-cell SharedWeightProjection
@@ -226,22 +224,22 @@ s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
           connection_type=CFProjection,
           connection_params = dict(strength = gammaexc, name='LateralExcitatory',
                                    weights_bounds = excitatory_weight_bounds,
-##                                    weights_shape = topo.patterns.basic.Disk(
-##                                                      size=exc_rad/BaseN,
-##                                                      aspect_ratio=1.0,
-##                                                      scale=1.0,offset=0.0,
-##                                                      smoothing=0.0),
+##                                     weights_shape = topo.patterns.basic.Disk(
+##                                                       size=2*exc_rad/BaseN,
+##                                                       aspect_ratio=1.0,
+##                                                       scale=1.0,offset=0.0,
+##                                                       smoothing=0.0),
                                    learning_rate=alpha_exc))
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
           connection_type=CFProjection,
           connection_params = dict(strength = -gammainh, name='LateralInhibitory',
                                    weights_bounds = inhibitory_weight_bounds,
-##                                    weights_shape = topo.patterns.basic.Disk(
-##                                                      size=inh_rad/BaseN,
-##                                                      aspect_ratio=1.0,
-##                                                      scale=1.0,offset=0.0,
-##                                                      smoothing=0.0),
+##                                     weights_shape = topo.patterns.basic.Disk(
+##                                                       size=2*inh_rad/BaseN,
+##                                                       aspect_ratio=1.0,
+##                                                       scale=1.0,offset=0.0,
+##                                                       smoothing=0.0),
                                    learning_rate=alpha_inh))
         
 
