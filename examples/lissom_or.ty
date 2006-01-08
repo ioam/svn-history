@@ -200,20 +200,26 @@ s.connect(Retina,V1, delay = FixedPoint("0.05"),
 ##                                                      smoothing=0.0),
                                    learning_rate=alpha_input))
 
-# CEBHACKALERT: temporary - uncomment to see a SharedWeightProjection
+# CEBHACKALERT: temporary - uncomment to see a ON-cell SharedWeightProjection
+## from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
 ## from topo.base.connectionfield import CFSheet,SharedWeightProjection
-## SharedWeightProjection.weights_generator = topo.patterns.random.UniformRandom()
-## TestSheet = CFSheet(name='TestSheet')
-## s.connect(Retina,TestSheet, delay = FixedPoint("0.05"),
-##           connection_type=SharedWeightProjection,
-##           connection_params = dict(strength = 1.0, name='TestSWProjection',
-##                                    weights_bounds = afferent_weight_bounds,
-## ##                                    weights_shape = topo.patterns.basic.Disk(
-## ##                                                      size=rf_radius/BaseRN,
-## ##                                                      aspect_ratio=1.0,
-## ##                                                      scale=1.0,offset=0.0,
-## ##                                                      smoothing=0.0)
-##                                    ))
+## LGNOn = CFSheet(name='LGNOn',output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
+## LGNOn_center = s.connect(Retina,LGNOn, delay = FixedPoint("0.05"),
+##                          connection_type=SharedWeightProjection,
+##                          connection_params = dict(strength = 1.0, name='Center',
+##                                                   weights_bounds = afferent_weight_bounds,
+##                                                   weights_generator = topo.patterns.basic.Gaussian(size=0.25*rf_radius/BaseRN,aspect_ratio=1),
+##                                                   ))
+## LGNOn_center.learning_fn.output_fn=DivisiveSumNormalize()
+## 
+## LGNOn_surround = s.connect(Retina,LGNOn, delay = FixedPoint("0.05"),
+##                            connection_type=SharedWeightProjection,
+##                            connection_params = dict(strength = -1.0, name='Surround',
+##                                                     weights_bounds = afferent_weight_bounds,
+##                                                     weights_generator = topo.patterns.basic.Gaussian(size=rf_radius/BaseRN,aspect_ratio=1),
+##                                                     ))
+## LGNOn_surround.learning_fn.output_fn=DivisiveSumNormalize()
+
 
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
