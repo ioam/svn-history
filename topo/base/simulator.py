@@ -132,7 +132,13 @@ class EventProcessor(TopoObject):
 
         # The simulator link is not set until the call to add()
         self.simulator = None
-        
+
+    ### JABHACKALERT! The **args arguments here and in _connect_from
+    ### can be deleted for now, and if necessary a dictionary
+    ### parameter can be added to the Simulator.connect() method to
+    ### hold such items should they prove necessary.  Instead, the
+    ### extra_args of Simulator.connect() should be used for what the
+    ### connection_params argument now holds.
     def _connect_to(self,conn,**args):
         """
         Add a connection to dest/port with a delay (default=0).

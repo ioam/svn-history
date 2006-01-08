@@ -23,6 +23,8 @@ import topoconsole
 from topo.analysis.updatecommands import *
 import topo.analysis.updatecommands
 
+### JABALERT!  Why isn't there a Normalize button on this and
+### ProjectionPanel like there is on ActivityPanel?
 class UnitWeightsPanel(CFSheetPlotPanel):
     def __init__(self,parent,pengine,console=None,plot_group_key=None,pgt_name=None,**config):
         super(UnitWeightsPanel,self).__init__(parent,pengine,console,plot_group_key,pgt_name,**config)
