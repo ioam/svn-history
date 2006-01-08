@@ -34,7 +34,8 @@ class EditorObject :
 	paramWindow = Toplevel()
 	Label(paramWindow, text = self.name).pack(side = TOP)
 	self.paramFrame = ParametersFrame(paramWindow)
-	updateButton = Button(paramWindow, text = 'Update', command = self.updateParameters)
+        #JABHACKALERT: We also need an OK button that applies and then closes the window
+	updateButton = Button(paramWindow, text = 'Apply', command = self.updateParameters)
 	updateButton.pack(side = BOTTOM)
 
     def updateParameters(self) :
