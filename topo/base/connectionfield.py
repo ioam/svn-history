@@ -113,7 +113,14 @@ class ConnectionField(TopoObject):
                           density=self.input_sheet.density,theta=0,
                           rows=r2-r1,cols=c2-c1)
         self.mask = Numeric.where(m>=0.5,m,0.0)
-        
+
+        # CEBHACKALERT: applying the mask after the output_fn is no good (e.g.
+        # it would destroy any normalization done by the output_fn). Applying
+        # the mask before the output_fn would work for multiplicative output_fns
+        # only. However, the C code for the optimized learning_fns applies the
+        # output_fn at the time it does the learning, so neither of these
+        # approaches is actually ok - the mask needs to be respected by the
+        # output_fns themselves.
         output_fn(self.weights)
         self.weights *= self.mask   
 
