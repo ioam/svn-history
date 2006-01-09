@@ -45,7 +45,9 @@ class ObermayerSOM(CFSOM):
         return self.alpha_0 + (self.alpha_f-self.alpha_0)/self.learning_length*float(self.simulator.time())
 
     def radius(self):
-        return self.radius_0 + (self.alpha_f-self.alpha_0)/self.learning_length*float(self.simulator.time())
+	### JCALERT! Necessary to make the simulation match the 
+	### new changes in learning rate handling (i.E. division by 900)
+        return self.radius_0 + (self.alpha_f/900-self.alpha_0/900)/self.learning_length*float(self.simulator.time())
 
 
 
@@ -79,8 +81,11 @@ ObermayerSOM.learning_length = 30000
 ObermayerSOM.radius_0 = (240.0/256.0)**2
 radius_at_15000 = (60.0/256.0)**2 # Used until 15000 ; see set_radius_f below for after 15000
 ObermayerSOM.radius_f = 30000/15000 * radius_at_15000 - ObermayerSOM.radius_0
-ObermayerSOM.alpha_0  = 0.09
-ObermayerSOM.alpha_f  = 0.02
+
+### JCALERT! We multiply by 30: number of unit in the weight matrix.
+### It has been tested for 25 density but should not change for 256...
+ObermayerSOM.alpha_0  = 0.09*900
+ObermayerSOM.alpha_f  = 0.02*900
 
 RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()

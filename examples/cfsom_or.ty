@@ -53,9 +53,10 @@ topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8))
 CFSOM.density = 50
 CFSOM.learning_length = 10000
 CFSOM.radius_0 = 0.1
+CFSOM.alpha_0 = 0.5*49
 
 RandomArray.seed(500,500)
-CFProjection.weights_generator = topo.patterns.random.UniformRandom()
+CFProjection.weights_generator = topo.patterns.random.UniformRandom() #basic.Disk(size=0.22,aspect_ratio=1.0,smoothing=0.0) 
 CFProjection.weights_bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1)))
 CFProjection.response_fn = CFDotProduct()
 CFProjection.learning_fn=HebbianSOMLF()
@@ -66,7 +67,7 @@ s = Simulator()
 
 Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),name='Retina')
 V1 = CFSOM(name='V1')
-s.connect(Retina,V1,delay=0.5,connection_type=CFProjection,connection_params={'name':'RtoV1'})
+s.connect(Retina,V1,delay=0.5,connection_type=CFProjection,connection_params=dict(name = 'RtoV1'))
 
 s.run(1)
 #s.run(10000)

@@ -115,7 +115,7 @@ class ConnectionField(TopoObject):
         self.mask = Numeric.where(m>=0.5,m,0.0)
         
         output_fn(self.weights)
-        self.weights *= self.mask        
+        self.weights *= self.mask   
 
 
     def initialize_slice_array(self):
@@ -294,6 +294,19 @@ class CFLearningFunction(TopoObject):
     Objects in this class must support being called as a function with
     the arguments specified below.
     """
+    ### JCALERT! Might change the name (already a set_learning_rate function in the scripts)
+    def set_learning_rate(self,cfs,learning_rate,rows,cols):
+
+        ### JCALERT! To check with Jim: we take the number of unit at the center of the matrix
+        ### That would be the best way to go, but it is not possible to acces the 
+        ### sheet_density and bounds from here without more important changes
+        #center_r,center_c = sheet2matrixidx(0,0,bounds,xdensity,ydensity)
+	cf = cfs[cols/2][rows/2]
+        # The number of units in the mask 
+	nb_unit = len(Numeric.nonzero(Numeric.ravel(cf.mask)))
+	new_learning_rate=learning_rate/(nb_unit)
+	return new_learning_rate
+
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         raise NotImplementedError
 
@@ -341,11 +354,12 @@ class GenericCFLF(CFLearningFunction):
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
         rows,cols = output_activity.shape
-        for r in range(rows):
+	single_cf_learning_rate = self.set_learning_rate(cfs,learning_rate,rows,cols)
+	for r in range(rows):
             for c in range(cols):
                 cf = cfs[r][c]
                 self.single_cf_fn(cf.get_input_matrix(input_activity),
-                                  output_activity[r,c], cf.weights, learning_rate)
+                                  output_activity[r,c], cf.weights, single_cf_learning_rate)
                 cf.weights=self.output_fn(cf.weights)
                 cf.weights *= cf.mask
                 
@@ -436,19 +450,7 @@ class CFProjection(Projection):
         matrix_data = Numeric.array(self.cf(r,c).weights)
 
         new_box = self.cf(r,c).bounds
-
-	### JC: tempoarary debug (to get rid of pretty soon)
-# 	print "bounding_box",new_box.aarect().lbrt()
-#  	r1,r2,c1,c2 = self.cf(r,c).slice
-#   	print "slice",r1,r2,c1,c2
-#  	x=self.cf(r,c).x
-#  	y=self.cf(r,c).y
-#  	print "x,y",x,y
-#         a,b,c,d = bounds2slice(new_box,self.cf(r,c).input_sheet.bounds,
-#                                   self.cf(r,c).input_sheet.density)
-#         print "new_slice",a,b,c,d
-	###
-
+	
         assert matrix_data != None, "Projection Matrix is None"
         return UnitView((matrix_data,new_box),sheet_x,sheet_y,self,view_type='UnitView')
 

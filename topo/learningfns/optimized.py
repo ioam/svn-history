@@ -33,6 +33,9 @@ class Hebbian(CFLearningFunction):
 
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
+	### JCALERT! Maybe change the name to single_cf_learning_rate 
+	### and change the variable name in the C code. (same in DivisiveHebbian)
+	learning_rate = self.set_learning_rate(cfs,learning_rate,rows,cols)
         len, len2 = input_activity.shape
 
         hebbian_code = """
@@ -133,6 +136,7 @@ class DivisiveHebbian(CFLearningFunction):
 
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
+	learning_rate = self.set_learning_rate(cfs,learning_rate,rows,cols)
         len, len2 = input_activity.shape
 
         hebbian_div_norm_code = """
@@ -240,6 +244,7 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
         weight_ptrs = params['weight_ptrs']
         slice_ptrs = params['slice_ptrs']
         rows,cols = output_activity.shape
+	single_cf_learning_rate = self.set_learning_rate(cfs,learning_rate,rows,cols)
         len, len2 = input_activity.shape
 
         hebbian_div_norm_code = """

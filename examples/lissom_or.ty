@@ -116,9 +116,9 @@ acs=6.5*6.5/rf_radius/rf_radius
 ecs=19.5*19.5/exc_rad/exc_rad
 ics=47.5*47.5/inh_rad/inh_rad
 
-alpha_input=0.007*acs
-alpha_exc=0.002*ecs
-alpha_inh=0.00025*ics
+alpha_input=0.007*121*acs
+alpha_exc=0.002*ecs*81
+alpha_inh=0.00025*ics*529
 
 
 ###########################################
@@ -258,11 +258,21 @@ def set_learning_rate(projection_name, rate):
     V1.projections()[projection_name].learning_rate=rate
 
 
-s.schedule_action(  500, set_learning_rate, "LateralExcitatory", 0.001*ecs)
-s.schedule_action(  500, set_learning_rate, "Afferent0", 0.005*acs)
-s.schedule_action( 2000, set_learning_rate, "Afferent0", 0.004*acs)
-s.schedule_action( 4000, set_learning_rate, "Afferent0", 0.003*acs)
-s.schedule_action(20000, set_learning_rate, "Afferent0", 0.0015*acs)
+### JC: to match the new changes in the learning rate
+s.schedule_action(  200, set_learning_rate, "LateralExcitatory", 0.007*ecs*25)
+###
+
+s.schedule_action(  500, set_learning_rate, "LateralExcitatory", 0.001*ecs*25)
+
+### JC: to match the new changes in the learning rate
+s.schedule_action(  1000, set_learning_rate, "LateralExcitatory", 0.001*ecs*9)
+s.schedule_action(  2000, set_learning_rate, "LateralExcitatory", 0.001*ecs*9)
+###
+
+s.schedule_action(  500, set_learning_rate, "Afferent0", 0.005*acs*121)
+s.schedule_action( 2000, set_learning_rate, "Afferent0", 0.004*acs*121)
+s.schedule_action( 4000, set_learning_rate, "Afferent0", 0.003*acs*121)
+s.schedule_action(20000, set_learning_rate, "Afferent0", 0.0015*acs*121)
 
 
 def set_deltabeta(x,y):
