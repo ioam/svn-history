@@ -178,6 +178,20 @@ class ProjectionSheet(Sheet):
         """
         pass
 
+    # CEBHACKALERT: if the dest_port is passed in as None, this will
+    # activate only the first Projection that has dest_port=None. If a
+    # user specifies what he thinks are two different connections (he
+    # gives them different names) but they have the same source and
+    # destination sheets, and he forgets to use different ports, he
+    # will not realize that only one of the projections is being
+    # activated (and that it gets activated twice). Similarly, if
+    # different projections have ports that share a name and it's
+    # equal to dest_port, only one of the two (who knows which?) will
+    # be activated. There should be some checking of these things
+    # when they are created.
+    #
+    # In any case, whatever the correct behavior was supposed to be,
+    # it does not match the documentation here.
     def present_input(self,input_activity,input_sheet,dest_port):
         """
         Provide the given input_activity to all projections from the
