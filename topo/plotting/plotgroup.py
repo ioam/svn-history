@@ -250,21 +250,6 @@ class UnitWeightsPlotGroup(PlotGroup):
         self.debug('plot_list =' + str(plot_list))
         return plot_list
 
-	
-    ### JCALERT! Should disappear (see alert in PlotGroup)
-    def do_plot_cmd(self):
-        """
-        Lambda function passed in, that will filter out all sheets
-        except the one with the name being looked for.
-        """
-        sheets = self.simulator.objects(Sheet).values()
-        for each in sheets:
-            if self.sheet_filter_lam(each):
-		### JCALERT! It is confusing that the method unit_view is only defined in the 
-                ### CFSheet class, and that we are supposed to manipulate sheets here.
-		### also, it is supposed to return a view, but here it is used as a procedure.
-                each.unit_view(self.x,self.y)
-
 
    
 class ProjectionPlotGroup(PlotGroup):
@@ -276,6 +261,7 @@ class ProjectionPlotGroup(PlotGroup):
        
         self.weight_name = plot_group_key[1]
         self.density = float(plot_group_key[2])
+
         # JABALERT: Should probably rename this because there is a shape in PlotGroup also.
         self.shape = (0,0)
 	self.situate = False
@@ -283,12 +269,12 @@ class ProjectionPlotGroup(PlotGroup):
         super(ProjectionPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,
                                                    plot_list,**params)
 
-	### JABHACKALERT!  This should not be a list whose first
-        ### element is taken; instead, there should only ever be one
-        ### object with the given name, and that unique object (if
-        ### any) should be returned.
-        self._sim_ep = [s for s in self.simulator.objects(Sheet).values()
-                        if self.sheet_filter_lam(s)][0]
+	### JCALERT! It is a bit confusing, but in the case of the projection
+        ### sheet_filter_lam filter to one single sheet...
+	for s in self.simulator.objects(Sheet).values():
+	    if self.sheet_filter_lam(s):
+		self._sim_ep = s
+
         self._sim_ep_src = self._sim_ep.get_in_projection_by_name(self.weight_name)[0].src
 
  
@@ -296,25 +282,25 @@ class ProjectionPlotGroup(PlotGroup):
 
 	### JCALERT This has to be solved: projection is a list here!
         ### for the moment the hack below deal with that.
-        ### Also, why do we pass the template here?
-	
+        ### Also, why do we pass the template here?	
         projection = sheet.get_in_projection_by_name(pt['Projection_name'])
         plot_list=[]
         if projection:
 	    src_sheet=projection[0].src
 	    projection=projection[0]
 
-	    for view in self.view_list:
+	    coords = self._generate_coords()
+	    for x,y in coords:
 		plot_channels = pt
 		### JCALERT! Do the test pt['Strength']='Weights' here
-		key = ('Weights',sheet.name,projection.name,view.view_info['x'],view.view_info['y'])
+		key = ('Weights',sheet.name,projection.name,x,y)
 		plot_channels['Strength'] = key
 		plot_list.append(make_plot(plot_channels,src_sheet.sheet_view_dict,
                                       src_sheet.density,src_sheet.bounds,pt['Normalize'],self.situate))
 		
         return plot_list
 
-
+    ### JCALERT! Try to move that in projectionpanel...?
     def _generate_coords(self):
         """
         Evenly space out the units within the sheet bounding box, so
@@ -343,14 +329,9 @@ class ProjectionPlotGroup(PlotGroup):
     ### JCALERT! Should disappear (see alert in PlotGroup)
     def do_plot_cmd(self):
         coords = self._generate_coords()
+	for x,y in coords:
+	    self._sim_ep.unit_view(x,y)
         
-        full_unitview_list = [self._sim_ep.unit_view(x,y) for (x,y) in coords]
-
-	### JCALERT! The use of chain and nested list here and in 
-        ### connectionfield.py (unit_view) can be omitted or made simpler.
-        self.view_list = [view for view in chain(*full_unitview_list)
-                         if view.projection.name == self.weight_name]
-
 
     ### JCALERT ! for the moment this function is re-implemented only for ProjectionGroup
     ### because we do not want the plots to be sorted according to their src_name in this case
