@@ -117,7 +117,7 @@ plotgroup_templates[pgt.name] = pgt
 ### (and also in the menu), for consistency, so that the plot labels
 ### can always be done the same way.
 pgt = PlotGroupTemplate(name='Unit Weights',
-                        command='update_weight()',
+                        command='update_weights()',
 			plot_templates= [('Unit Weights',
 					  {'Strength'   : 'Weights',
 					   'Hue'        : 'OrientationPreference',
@@ -129,7 +129,7 @@ plotgroup_templates[pgt.name] = pgt
 ### JCALERT: I will remove Density and Projection_name at some point.
 ### Also implement the test for 'Weights' in PlotGroup.
 pgt = PlotGroupTemplate(name='Projection',
-                        command='pass',
+                        command='update_projections()',
 			plot_templates=[('Projection',
 					 {'Strength'      : 'Weights',
 					  'Hue'           : 'OrientationPreference',

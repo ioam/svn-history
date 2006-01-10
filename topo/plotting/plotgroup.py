@@ -267,9 +267,8 @@ class ProjectionPlotGroup(PlotGroup):
        
         self.weight_name = plot_group_key[1]
         self.density = float(plot_group_key[2])
-
-        # JABALERT: Should probably rename this because there is a shape in PlotGroup also.
-        self.shape = (0,0)
+	self.coords = [(0,0)]
+    
 	self.situate = False
 
         super(ProjectionPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,
@@ -295,8 +294,7 @@ class ProjectionPlotGroup(PlotGroup):
 	    src_sheet=projection[0].src
 	    projection=projection[0]
 
-	    coords = self._generate_coords()
-	    for x,y in coords:
+	    for x,y in self.coords:
 		plot_channels = pt
 		### JCALERT! Do the test pt['Strength']='Weights' here
 		key = ('Weights',sheet.name,projection.name,x,y)
@@ -306,38 +304,6 @@ class ProjectionPlotGroup(PlotGroup):
 		
         return plot_list
 
-    ### JCALERT! Try to move that in projectionpanel...?
-    def _generate_coords(self):
-        """
-        Evenly space out the units within the sheet bounding box, so
-        that it doesn't matter which corner the measurements start
-        from.  A 4 unit grid needs 5 segments.  List is in left-to-right,
-        from top-to-bottom.
-        """
-        def rev(x): y = x; y.reverse(); return y
-        
-        aarect = self._sim_ep.bounds.aarect()
-        (l,b,r,t) = aarect.lbrt()
-        x = float(r - l) 
-        y = float(t - b)
-        x_step = x / (int(x * self.density) + 1)
-        y_step = y / (int(y * self.density) + 1)
-        l = l + x_step
-        b = b + y_step
-        coords = []
-        self.shape = (int(x * self.density), int(y * self.density))
-        for j in rev(range(self.shape[1])):
-            for i in range(self.shape[0]):
-                coords.append((x_step*i + l, y_step*j + b))
-
-        return coords
-
-    ### JCALERT! Should disappear (see alert in PlotGroup)
-    def do_plot_cmd(self):
-        coords = self._generate_coords()
-	for x,y in coords:
-	    self._sim_ep.unit_view(x,y)
-        
 
     ### JCALERT ! for the moment this function is re-implemented only for ProjectionGroup
     ### because we do not want the plots to be sorted according to their src_name in this case

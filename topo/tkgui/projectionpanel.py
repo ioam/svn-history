@@ -20,7 +20,7 @@ import topoconsole
 from topo.base.utils import dict_sort
 from topo.misc.keyedlist import KeyedList
 from math import ceil
-
+from topo.analysis.updatecommands import *
 
 from topo.plotting.plotgroup import plotgroup_dict, ProjectionPlotGroup
 UNIT_PADDING = 1
@@ -56,6 +56,12 @@ class ProjectionPanel(CFSheetPlotPanel):
         self.de.bind('<FocusOut>', self.refresh)
         self.de.bind('<Return>', self.refresh)
         self.de.pack(side=LEFT,expand=YES,fill=X,padx=2)
+
+	### JCALERT! This parameter is temporary, it could be replaced by accessing the activity
+        ###  matrix of the Sheet corresponding to the parameter self.region
+        ### It has to be changed in CfSheetPlotPanel to have a parameter region that is a Sheet Object
+        ### and then access its name.
+	self.shape=(0,0)
 
         self._add_projection_menu()
 
@@ -194,7 +200,34 @@ class ProjectionPanel(CFSheetPlotPanel):
         pt = plotgroup_templates['Projection'].plot_templates['Projection']
         pt['Density'] = self.density
         pt['Projection_name'] = self.weight_name.get()
+
+
+    def _generate_coords(self):
+        """
+        Evenly space out the units within the sheet bounding box, so
+        that it doesn't matter which corner the measurements start
+        from.  A 4 unit grid needs 5 segments.  List is in left-to-right,
+        from top-to-bottom.
+        """
+        def rev(x): y = x; y.reverse(); return y
         
+        aarect = self._sim_ep.bounds.aarect()
+        (l,b,r,t) = aarect.lbrt()
+        x = float(r - l) 
+        y = float(t - b)
+        x_step = x / (int(x * self.density) + 1)
+        y_step = y / (int(y * self.density) + 1)
+        l = l + x_step
+        b = b + y_step
+        coords = []
+	### JCALERT! See alert about the parameter shape and how to set it.
+        self.shape = (int(x * self.density), int(y * self.density))
+        for j in rev(range(self.shape[1])):
+            for i in range(self.shape[0]):
+                coords.append((x_step*i + l, y_step*j + b))
+
+        return coords   
+
 
     def do_plot_cmd(self):
         """
@@ -202,15 +235,20 @@ class ProjectionPanel(CFSheetPlotPanel):
         a ProjectionPlotGroup to create necessary Plots.
         """
   
-        self.generate_plot_group_key()
+	self.generate_plot_group_key()
+	coords = self._generate_coords()
 
+	topo.analysis.updatecommands.proj_coords = coords
+	topo.analysis.updatecommands.sheet_name = self.region.get()
+
+        exec self.cmdname.get()
 	self.pe_group = plotgroup_dict.get(self.plot_group_key,None)
 	if self.pe_group == None:
 	    self.pe_group = ProjectionPlotGroup(self.console.simulator,self.pgt,self.plot_group_key,
 					         self.region.get(),[])
+	### JCALERT! Think of a better way of doing that.
+	self.pe_group.coords = coords
 
-        self.pe_group.do_plot_cmd()
-        
         # self.situate is defined in the super class CFSheetPlotPanel
         self.pe_group.situate= self.situate
  
@@ -234,8 +272,8 @@ class ProjectionPanel(CFSheetPlotPanel):
             # Lay out images
             for i,image,canvas in zip(range(len(self.zoomed_images)),
                                       self.zoomed_images,self.canvases):
-                canvas.grid(row=i//self.pe_group.shape[0],
-                            column=i%self.pe_group.shape[1],
+                canvas.grid(row=i//self.shape[0],
+                            column=i%self.shape[1],
                             padx=UNIT_PADDING,pady=UNIT_PADDING)
                 # BORDERWIDTH is added because the border is drawn on the
                 # canvas, overwriting anything underneath it.
