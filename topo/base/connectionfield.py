@@ -99,8 +99,6 @@ class ConnectionField(TopoObject):
         # promote to double.
         self.weights.savespace(1)
 
-        self.verbose("weights shape: ",self.weights.shape)
-        
         # CEBHACKALERT: weights_shape and mask aren't Parameters, but
         # should I have declared them as class attributes?
         # CEBHACKALERT: the thresholding of mask values done in the where line
