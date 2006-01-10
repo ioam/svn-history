@@ -47,16 +47,26 @@ class PiecewiseLinear(OutputFunction):
         clip_in_place(x,0.0,1.0)
         return x
 
+
 class DivisiveSumNormalize(OutputFunction):
     """
     OutputFunction that divides an array by its sum (aka its L1 norm).
+
+    # CEBHACKALERT: I think the L1 norm is the sum of the absolute
+    # values. Is this supposed to be DivisiveSumNormalize or
+    # DivisiveL1Normalize?
 
     This operation ensures that an array has a sum equal to the specified 
     norm_value, rescaling each value to make this true.  The array is 
     unchanged if the sum is zero.
     """
     norm_value = Number(default=1.0)
-    
+
+    # re. HACKALERT above:
+    # In that case, should norm_value have bounds set so it's >=0 ?
+    # If this gets changed, change instances in lissom_or.ty where
+    # DivisiveSumNormalize is called with norm_value=-1.0.
+
     def __init__(self,**params):
         super(DivisiveSumNormalize,self).__init__(**params)
 
