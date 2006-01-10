@@ -44,7 +44,6 @@ class PiecewiseLinear(OutputFunction):
         fact = 1.0/(self.upper_bound-self.lower_bound)        
         x -= self.lower_bound
         x *= fact
-        # CEBHACKALERT: why doesn't Numeric.clip() work here?
         clip_in_place(x,0.0,1.0)
         return x
 
