@@ -14,11 +14,12 @@ $Id$
 __version__='$Revision$'
 
 import Numeric
-from Numeric import clip
+
 from topo.base.topoobject import TopoObject
 from topo.base.parameter import Number
 from topo.base.arrayutils import L2norm, norm
 from topo.base.projection import OutputFunction
+from topo.base.utils import clip_in_place
 
 # Imported here so that all OutputFunctions will be in the same package
 from topo.base.projection import Identity
@@ -43,11 +44,8 @@ class PiecewiseLinear(OutputFunction):
         fact = 1.0/(self.upper_bound-self.lower_bound)        
         x -= self.lower_bound
         x *= fact
-        # CEBHACKALERT: Numeric.clip() is really a lot faster than
-        # utils.clip_in_place() so I changed it. Was there
-        # a special reason for not using Numeric.clip()?
-        # Is it because internally it creates a new array?
-        clip(x,0.0,1.0)
+        # CEBHACKALERT: why doesn't Numeric.clip() work here?
+        clip_in_place(x,0.0,1.0)
         return x
 
 class DivisiveSumNormalize(OutputFunction):
