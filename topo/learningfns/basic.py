@@ -97,7 +97,7 @@ class HebbianSOMLF(SOMLF):
         # CEBHACKALERT: warnings should be printed if a non-parameter attribute
         # is set this way (e.g. try adding height=4).
         neighborhood_matrix = nk_generator(bounds=bb,density=1,aspect_ratio=1.0,size=radius)
-
+        output_fn = self.output_fn
         for r in range(rmin,rmax):
             for c in range(cmin,cmax):
                 cwc = c - wc 
@@ -114,7 +114,7 @@ class HebbianSOMLF(SOMLF):
                     cf.weights.savespace(1)
                     cf.weights += rate * (X - cf.weights)
                     if type(output_fn) is not Identity:
-                        cf.weights=self.output_fn(cf.weights)
+                        output_fn(cf.weights)
                     cf.weights *= cf.mask
 
 
