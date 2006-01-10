@@ -34,7 +34,6 @@ import patterngenerator
 from boundingregion import BoundingBox
 
 
-import simulator
 ### JEFF's IMPLEMENTATION NOTES
 ### 
 ### Non-rectangular ConnectionField bounds
