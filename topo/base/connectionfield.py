@@ -269,13 +269,14 @@ class GenericCFResponseFn(CFResponseFunction):
 
     def __call__(self, cfs, input_activity, activity, strength):
         rows,cols = activity.shape
-        
+
+        single_cf_fn = self.single_cf_fn
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = cfs[r][c]
                 r1,r2,c1,c2 = cf.slice_tuple()
                 X = input_activity[r1:r2,c1:c2]
-                activity[r,c] = self.single_cf_fn(X,cf.weights)
+                activity[r,c] = single_cf_fn(X,cf.weights)
         activity *= strength
 
 
@@ -362,12 +363,15 @@ class GenericCFLF(CFLearningFunction):
         """Apply the specified single_cf_fn to every CF."""
         rows,cols = output_activity.shape
 	single_cf_learning_rate = self.set_learning_rate(cfs,learning_rate,rows,cols)
-	for r in range(rows):
-            for c in range(cols):
+        # avoid evaluating these references each time in the loop
+        output_fn = self.output_fn
+        single_cf_fn = self.single_cf_fn
+	for r in xrange(rows):
+            for c in xrange(cols):
                 cf = cfs[r][c]
-                self.single_cf_fn(cf.get_input_matrix(input_activity),
-                                  output_activity[r,c], cf.weights, single_cf_learning_rate)
-                cf.weights=self.output_fn(cf.weights)
+                single_cf_fn(cf.get_input_matrix(input_activity),
+                             output_activity[r,c], cf.weights, single_cf_learning_rate)
+                output_fn(cf.weights)
                 cf.weights *= cf.mask
                 
 
@@ -519,6 +523,7 @@ class SharedWeightCFResponseFn(TopoObject):
 
     def __call__(self, cf, cf_slice_and_bounds, input_activity, activity, strength):
         rows,cols = activity.shape
+        single_cf_fn = self.single_cf_fn
         for r in xrange(rows):
             for c in xrange(cols):
                 r1,r2,c1,c2 = (cf_slice_and_bounds[r][c])[0]
@@ -526,7 +531,7 @@ class SharedWeightCFResponseFn(TopoObject):
                 
                 assert cf.weights.shape==X.shape, "sharedcf at (" + str(cf.x) + "," + str(cf.y) + ") has an input_matrix slice that is not the same shape as the sharedcf.weights matrix weight matrix (" + repr(X.shape) + " vs. " + repr(cf.weights.shape) + ")."
                 
-                activity[r,c] = self.single_cf_fn(X,cf.weights)
+                activity[r,c] = single_cf_fn(X,cf.weights)
         activity *= strength
         
 
