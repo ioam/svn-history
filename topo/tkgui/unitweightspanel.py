@@ -16,7 +16,7 @@ from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry
 from plotgrouppanel import PlotGroupPanel
 from cfsheetplotpanel import CFSheetPlotPanel
 from topo.base.projection import ProjectionSheet
-from topo.plotting.templates import plotgroup_templates
+from topo.plotting.plotgroup import plotgroup_dict, UnitWeightsPlotGroup
 from topo.base.sheet import Sheet
 import topoconsole
 
@@ -26,8 +26,8 @@ import topo.analysis.updatecommands
 ### JABALERT!  Why isn't there a Normalize button on this and
 ### ProjectionPanel like there is on ActivityPanel?
 class UnitWeightsPanel(CFSheetPlotPanel):
-    def __init__(self,parent,pengine,console=None,plot_group_key=None,pgt_name=None,**config):
-        super(UnitWeightsPanel,self).__init__(parent,pengine,console,plot_group_key,pgt_name,**config)
+    def __init__(self,parent,console=None,plot_group_key=None,pgt_name=None,**config):
+        super(UnitWeightsPanel,self).__init__(parent,console,plot_group_key,pgt_name,**config)
 
         # Receptive Fields are generally tiny.  Boost it up to make it visible.
         self.WEIGHT_PLOT_INITIAL_SIZE = 30
@@ -42,28 +42,6 @@ class UnitWeightsPanel(CFSheetPlotPanel):
 
         self._add_xy_boxes()
         self.auto_refresh_checkbutton.invoke()
-
-
-	###########################################
-	### JCALERT! Eventually all this code should go only in PlotGroupPanel
-        ### and BasicPlotGroupPanel should be spared.
-	self.pgt = plotgroup_templates[pgt_name]
-	# Command used to refresh the plot, if any
-        self.cmdname = StringVar()
-        
-        #self.cmdname.set(self.mapcmds[self.mapname.get()])
-        self.cmdname.set(self.pgt.command)
-
-	params_frame = Frame(master=self)
-        params_frame.pack(side=TOP,expand=YES,fill=X)
-        Message(params_frame,text="Update command:",aspect=1000).pack(side=LEFT)
-
-        Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
-                     entry_textvariable=self.cmdname,
-                     scrolledlist_items=([self.pgt.command])
-                     ).pack(side=LEFT,expand=YES,fill=X)
-
-	###########################################
 	
 
 	# By default, the UnitWeight Plots are situated.
@@ -157,10 +135,11 @@ class UnitWeightsPanel(CFSheetPlotPanel):
 	topo.analysis.updatecommands.sheet_name = self.region.get()
 
         exec self.cmdname.get()
-
-        self.pe_group = self.pe.get_plot_group(self.plot_group_key,
-                                               plotgroup_templates['Unit Weights'],
-                                               'UnitWeightsPlotGroup',self.region.get())
+		
+	self.pe_group = plotgroup_dict.get(self.plot_group_key,None)
+	if self.pe_group == None:
+	    self.pe_group = UnitWeightsPlotGroup(self.console.simulator,self.pgt,self.plot_group_key,
+					         self.region.get(),[])
 
         # self.situate is defined in the super class CFSheetPlotPanel
         self.pe_group.situate = self.situate
@@ -173,11 +152,11 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         """
         new_title = 'Connection Fields of ' + self.region.get() + \
                     ' unit (' + str(self.x) + ',' + str(self.y) + ') at time '\
-                    + str(self.pe.simulation.time())
+                    + str(self.console.simulator.time())
         self.plot_group.configure(tag_text = new_title)
         super(UnitWeightsPanel,self).display_labels()
     
         
     def refresh_title(self):
         self.parent.title("Unit Weights  %s (%0.3f,%0.3f) time:%s" %
-                          (self.region.get(),self.displayed_x,self.displayed_y,self.pe.simulation.time()))
+                          (self.region.get(),self.displayed_x,self.displayed_y,self.console.simulator.time()))

@@ -15,7 +15,6 @@ from projectionpanel import ProjectionPanel
 from testpattern import TestPattern
 from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
 import topo.base.simulator
-import topo.plotting.plotengine
 import topo.base.topoobject
 from topo.tkgui.editorwindow import ModelEditor
 
@@ -88,26 +87,27 @@ class PlotsMenuEntry(topo.base.topoobject.TopoObject):
         self.title = '%s %d' % (self.label, self.num_windows)
         #if 'valid_context' in dir(self.class_name):
 
-        if self.console.plot_engine:
-            if self.class_name.valid_context():
-                win = GUIToplevel(self.console)
-                win.withdraw()
-                win.title(self.title)
-                pn = self.class_name(parent=win,pengine=self.console.plot_engine,console=self.console,
-                                     plot_group_key=self.template.name,pgt_name=self.template.name,plotgroup_type=self.template)
-                pn.pack(expand=YES,fill=BOTH)
+        if self.console.simulator:
+	    if self.class_name.valid_context():
+		win = GUIToplevel(self.console)
+		win.withdraw()
+		win.title(self.title)
+		pn = self.class_name(parent=win,console=self.console,plot_group_key=self.template.name,
+				     pgt_name=self.template.name,plotgroup_type=self.template)
+		pn.pack(expand=YES,fill=BOTH)
 
-                pn.refresh_title()
-                win.deiconify()
-                self.console.messageBar.message('state', 'OK')
-                return pn
-            else:
-                self.console.messageBar.message('state',
-                            'Simulator does not have proper Sheet type.')
-                return None
-        else:
-            self.console.messageBar.message('state', 'No active Simulator object.')
-            return None
+		pn.refresh_title()
+		win.deiconify()
+		self.console.messageBar.message('state', 'OK')
+		return pn
+	    else:
+		self.console.messageBar.message('state',
+						'Simulator does not have proper Sheet type.')
+		return None
+
+	else:
+	    self.console.messageBar.message('state', 'No active Simulator object.')
+	    return None
         
 
 class TopoConsole(Frame):
@@ -126,7 +126,6 @@ class TopoConsole(Frame):
         self.num_weights_windows = 0
         self.num_weights_array_windows = 0
 
-        self.plot_engine = None
         self.simulator = None
         # Ask simulator to tell this console if the active_sim changes
         topo.base.simulator.objects_to_notify_of_active_sim.append(self)
@@ -282,7 +281,7 @@ class TopoConsole(Frame):
         """        
         """
         self.simulator = topo.base.simulator.get_active_sim()
-        self.plot_engine = topo.plotting.plotengine.PlotEngine(self.simulator)
+    
 
 
     def quit(self):
@@ -393,13 +392,12 @@ class TopoConsole(Frame):
         """
         Test Pattern Window.  
         """
-        if self.simulator: #CEBHACKALERT & plot_engine?
+        if self.simulator: 
             if TestPattern.valid_context():
                 self.input_params_window = GUIToplevel(self)
                 self.input_params_window.withdraw()
                 self.input_params_window.title('Test Pattern')
-                # CEBHACKALERT: alter this...don't need to pass self & self.plot_engine
-                ripp = TestPattern(self.input_params_window,self.plot_engine,self)
+                ripp = TestPattern(self.input_params_window,self)
                 ripp.pack(side=TOP,expand=YES,fill=BOTH)
                 self.input_params_window.deiconify()
                 self.messageBar.message('state', 'OK')

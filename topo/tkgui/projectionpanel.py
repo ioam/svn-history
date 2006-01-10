@@ -21,6 +21,8 @@ from topo.base.utils import dict_sort
 from topo.misc.keyedlist import KeyedList
 from math import ceil
 
+
+from topo.plotting.plotgroup import plotgroup_dict, ProjectionPlotGroup
 UNIT_PADDING = 1
 BORDERWIDTH = 1
 # JDALERT: The canvas creation, border placement, and image
@@ -31,8 +33,8 @@ BORDERWIDTH = 1
 CANVASBUFFER = 1
 
 class ProjectionPanel(CFSheetPlotPanel):
-    def __init__(self,parent,pengine,console=None,**config):
-        super(ProjectionPanel,self).__init__(parent,pengine,console,**config)
+    def __init__(self,parent,console=None,plot_group_key=None,pgt_name=None,**config):
+        super(ProjectionPanel,self).__init__(parent,console,plot_group_key,pgt_name,**config)
 
         self.MIN_PLOT_WIDTH = 1
         self.INITIAL_PLOT_WIDTH = 13
@@ -174,7 +176,7 @@ class ProjectionPanel(CFSheetPlotPanel):
 
     def refresh_title(self):
         self.parent.title("Projection (%s projection %s) time:%s" % (self.region.get(),
-            self.weight_name.get(),self.pe.simulation.time()))
+            self.weight_name.get(),self.console.simulator.time()))
         
 
     def generate_plot_group_key(self):
@@ -201,9 +203,12 @@ class ProjectionPanel(CFSheetPlotPanel):
         """
   
         self.generate_plot_group_key()
-        self.pe_group = self.pe.get_plot_group(self.plot_group_key,
-                                               plotgroup_templates['Projection'],
-                                               'ProjectionPlotGroup',self.region.get())
+
+	self.pe_group = plotgroup_dict.get(self.plot_group_key,None)
+	if self.pe_group == None:
+	    self.pe_group = ProjectionPlotGroup(self.console.simulator,self.pgt,self.plot_group_key,
+					         self.region.get(),[])
+
         self.pe_group.do_plot_cmd()
         
         # self.situate is defined in the super class CFSheetPlotPanel
@@ -260,7 +265,7 @@ class ProjectionPanel(CFSheetPlotPanel):
             src_name = self.projections[self.weight_name.get()].src.name
 
             new_title = 'Projection ' + self.weight_name.get() + ' from ' + src_name + ' to ' \
-                        + self.region.get() + ' at time ' + str(self.pe.simulation.time())
+                        + self.region.get() + ' at time ' + str(self.console.simulator.time())
             self.plot_group.configure(tag_text = new_title)
         else:
             self.plot_group.configure(tag_text = 'No Projections')

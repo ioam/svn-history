@@ -12,7 +12,6 @@ from topo.base.patterngenerator import *
 from topo.base.simulator import *
 from PIL import Image
 from topo.base.sheetview import *
-from topo.plotting.plotengine import *
 from topo.plotting.bitmap import *
 import topo.tkgui.topoconsole 
 import topo.tkgui.plotgrouppanel
@@ -32,7 +31,6 @@ class TestPlotGroupPanel(unittest.TestCase):
         have data within them that can then be used by the GUI tests.
         Two objects created after completion:
             self.s   Sample simulation with a couple of sheets
-            self.pe  Plot engine watching self.s
         """
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 30
@@ -97,7 +95,6 @@ class TestPlotGroupPanel(unittest.TestCase):
         self.s.add(sheetB)
         self.s.add(retina)
 
-        self.pe = PlotEngine(self.s)
         # s.run(1)
 
 

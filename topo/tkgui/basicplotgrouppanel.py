@@ -20,28 +20,32 @@ from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas
 import plotgrouppanel
 from topo.plotting.templates import plotgroup_templates
+from topo.plotting.plotgroup import plotgroup_dict, BasicPlotGroup
 
 ### We want to support any featuremap type defined in that file, and
 ### so import all of them here.
 from topo.analysis.updatecommands import *
 
 
+### JCALERT! Get rid of the pengine parameter.
 class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
-    def __init__(self,parent,pengine,console,pgt_name,**config):
-        plotgrouppanel.PlotGroupPanel.__init__(self,parent,pengine,console,pgt_name=pgt_name,**config)
+    def __init__(self,parent,console,pgt_name,**config):
+        plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,pgt_name=pgt_name,**config)
 
         # Plotgroup Template associated
         self.pgt = plotgroup_templates[pgt_name]
      
-        # Name of the plotgroup to plot
-        self.mapname = StringVar()
-        self.mapname.set(self.pgt.name)
-                
         # Command used to refresh the plot, if any
         self.cmdname = StringVar()
         
         self.cmdname.set(self.pgt.command)
 
+	### JCALERT! We might get rid of that, as it is redundant with plotgroup_key
+        self.mapname = StringVar()       
+        self.mapname.set(self.pgt.name)
+
+	# For a BasicPlotGroup, the plot_group_key is the name of the template
+	self.plot_group_key=self.pgt.name
         
         params_frame = Frame(master=self)
         params_frame.pack(side=TOP,expand=YES,fill=X)
@@ -69,11 +73,12 @@ class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         specified PlotGroupTemplate.
         """
  
-	### JCALERT! That could replace the call to pe_group.do_plot_cmd gor 
-        ### UnitWeight and Projection Panel...
         exec self.cmdname.get()
-        pgt = plotgroup_templates[self.mapname.get()]
-        self.pe_group = self.pe.get_plot_group(self.mapname.get(),pgt,class_type='BasicPlotGroup')
+
+	self.pe_group = plotgroup_dict.get(self.plot_group_key,None)
+	if self.pe_group == None:
+	    self.pe_group = BasicPlotGroup(self.console.simulator,self.pgt,self.plot_group_key,
+					   None,[])
 
             
     def display_labels(self):
@@ -82,9 +87,9 @@ class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         then call PlotGroupPanel's display_labels().
         """
         self.plot_group.configure(tag_text = self.mapname.get() + \
-                                  ' at time ' + str(self.pe.simulation.time()))
+                                  ' at time ' + str(self.console.simulator.time()))
         super(BasicPlotGroupPanel,self).display_labels()
 
 
     def refresh_title(self):
-        self.parent.title(self.mapname.get() + " time:%s" % (self.pe.simulation.time()))
+        self.parent.title(self.mapname.get() + " time:%s" % (self.console.simulator.time()))

@@ -17,7 +17,6 @@ import topo
 import topo.base.topoobject
 import topo.plotting.bitmap
 import topo.base.simulator as simulator
-import topo.plotting.plotengine as plotengine
 import topo.plotting.plotgroup
 from topo.plotting.templates import plotgroup_templates
 import PIL
@@ -55,7 +54,8 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         is clear there is no appropriate data to plot."""
         return True
 
-    def __init__(self,parent,pengine,console,plot_group_key,pgt_name=None,
+
+    def __init__(self,parent,console,plot_group_key,pgt_name=None,
                  plotgroup_type='BasicPlotGroup',**config):
         """
         parent:  it is the window (GUIToplevel()) that contains the panel.
@@ -117,7 +117,6 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         self.MIN_PLOT_WIDTH = 1
         self.INITIAL_PLOT_WIDTH = 60
 
-        self.pe = pengine
         self.pe_group = None
         self.plots = []
         self.bitmaps = []
@@ -231,7 +230,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         examples.
         """
 	pgt = plotgroup_templates[self.pgt_name]
-        self.pe_group = self.pe.get_plot_group(self.plot_group_key,pgt,None,
+        self.pe_group = self.PlotGroup(self.plot_group_key,pgt,None,
                                                self.plotgroup_type,None)
 
 	### JCALERT! That should be make uniform with the basicplotgrouppanel and then eventually maybe
@@ -381,7 +380,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         Change the window title.  TopoConsole will call this on
         startup of window.  
         """
-        self.parent.title("%s time:%s" % (self.plot_group_key,self.pe.simulation.time()))
+        self.parent.title("%s time:%s" % (self.plot_group_key,self.console.simulator.time()))
           
 
     def reduce(self):

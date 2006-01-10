@@ -35,7 +35,6 @@ import topoconsole
 
 from topo.plotting.plot import make_plot
 
-
 from Tkinter import IntVar, StringVar, Checkbutton
 from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
 
@@ -44,8 +43,8 @@ DEFAULT_PRESENTATION = '1.0'
 
 
 class TestPattern(plotgrouppanel.PlotGroupPanel):
-    def __init__(self,parent,pengine,console=None,padding=2,**config):
-        super(TestPattern,self).__init__(parent,pengine,console,plot_group_key='Preview',**config)
+    def __init__(self,parent,console=None,padding=2,**config):
+        super(TestPattern,self).__init__(parent,console,plot_group_key='Preview',**config)
 
         self.INITIAL_PLOT_WIDTH = 100
         self.padding = padding
@@ -286,7 +285,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
             channels = {'Strength':each,'Hue':None,'Confidence':None}
             plist.append(make_plot(channels,view_dict,name=''))
         ### JCALERT! It is the only call to PlotGroup with template is None. Need to change.
-        self.pe_group = topo.plotting.plotgroup.PlotGroup(self.pe.simulation,None,plot_group_key='Preview',plot_list=plist)
+        self.pe_group = topo.plotting.plotgroup.PlotGroup(self.console.simulator,None,plot_group_key='Preview',plot_list=plist)
 
 
 

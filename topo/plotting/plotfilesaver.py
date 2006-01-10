@@ -21,14 +21,13 @@ import topo.base.topoobject
 import topo.base.simulator
 from topo.base.utils import *
 from topo.plotting.templates import plotgroup_templates
+from topo.plotting.plotgroup import plotgroup_dict, BasicPlotGroup, UnitWeightsPlotGroup,ProjectionPlotGroup 
 
-import plotengine
  
 class PlotFileSaver(topo.base.topoobject.TopoObject):
     def __init__(self,**config):
         super(PlotFileSaver,self).__init__(**config)
         self.sim = topo.base.simulator.get_active_sim()
-        self.pe = plotengine.PlotEngine(self.sim)
         self.bitmaps = []
         self.files = []
         self.name = {'base':self.sim.name, 'iteration':self.sim.time(), \
@@ -61,9 +60,14 @@ class ActivityFile(PlotFileSaver):
         self.save_to_disk()
 
     def create_bitmaps(self):
-        pg = self.pe.get_plot_group('Activity',
-                                    plotgroup_templates['Activity'],
-                                    'BasicPlotGroup',self.region)
+	
+	pg = plotgroup_dict.get('Activity',None)
+	
+	if pg == None:
+	    pgt = plotgroup_templates['Activity']
+	    pg = BasicPlotGroup(self.sim,pgt,'Activity',
+				None,[])
+
         self.bitmaps = pg.load_images()
         
 
@@ -76,17 +80,17 @@ class UnitWeightsFile(PlotFileSaver):
         self.name['type'] = 'Weights'
         self.plot_group_key = ('Weights',self.region,x,y)
 
-        pt = plotgroup_templates['Unit Weights'].plot_templates['Unit Weights']
-        pt['Sheet_name'] = region
-        pt['Location'] = (x, y)
-
         self.create_bitmaps()
         self.save_to_disk()
 
     def create_bitmaps(self):
-        pg = self.pe.get_plot_group(self.plot_group_key,
-                                    plotgroup_templates['Unit Weights'],
-                                    'UnitWeightsPlotGroup',self.region)
+
+	pg = plotgroup_dict.get(self.plot_group_key,None)	
+	if pg == None:
+	    pgt = plotgroup_templates['Unit Weights']
+	    pg = UnitWeightsPlotGroup(self.sim,pgt,self.plot_group_key,
+				      self.region,[])
+	
         self.bitmaps = pg.load_images()
 
 
@@ -96,8 +100,8 @@ class ProjectionFile(PlotFileSaver):
         super(ProjectionFile,self).__init__(**config)
         self.region = region
         self.name['region'] = '%s_%s' % (region, projection)
-        self.name['type'] = 'WeightsArray'
-        self.plot_group_key = ('WeightsArray',projection,density)
+        self.name['type'] = 'Projection'
+        self.plot_group_key = ('Projection',projection,density,self.region)
 
         pt = plotgroup_templates['Projection'].plot_templates['Projection']
         
@@ -109,9 +113,13 @@ class ProjectionFile(PlotFileSaver):
 
 
     def create_bitmaps(self):
-        pg = self.pe.get_plot_group(self.plot_group_key,
-                                    plotgroup_templates['Projection'],
-                                    'ProjectionPlotGroup', self.region)
+
+	pg = plotgroup_dict.get(self.plot_group_key,None)	
+	if pg == None:
+	    pgt = plotgroup_templates['Projection']
+	    pg = ProjectionPlotGroup(self.sim,pgt,self.plot_group_key,
+				self.region,[])
+
         pg.do_plot_cmd()
         self.bitmaps = pg.load_images()
         

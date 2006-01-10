@@ -10,12 +10,13 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import StringVar, Frame, LEFT, RIGHT, TOP, BOTTOM, YES, X, Checkbutton, DISABLED
+from Tkinter import StringVar, Frame, LEFT, RIGHT, TOP, BOTTOM, YES, X, Checkbutton, DISABLED, Message
 from topo.base.sheet import Sheet
 import Pmw
 import plotgrouppanel
 import topo.base.connectionfield
 import topoconsole
+from topo.plotting.templates import plotgroup_templates
 
 ### JCALERT! It might be clearer to get rid of this class and just add its functionnality
 ### to both projectionpanel and unitweightpanel. Or it might need another name that
@@ -24,8 +25,8 @@ import topoconsole
 
 class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
 
-    def __init__(self,parent,pengine,console,plot_group_key=None,pgt_name=None,**config):
-        plotgrouppanel.PlotGroupPanel.__init__(self,parent,pengine,console,plot_group_key=None,pgt_name=None,**config)
+    def __init__(self,parent,console,plot_group_key=None,pgt_name=None,**config):
+        plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,plot_group_key=None,pgt_name=None,**config)
 
         self.region = StringVar()
         self.region.set('None')
@@ -35,6 +36,28 @@ class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
 
         self._add_situate_button()
         self._add_region_menu()
+
+	###########################################
+	### JCALERT! Eventually all this code should go only in PlotGroupPanel
+        ### and BasicPlotGroupPanel should be spared.
+	self.pgt = plotgroup_templates[pgt_name]
+	# Command used to refresh the plot, if any
+        self.cmdname = StringVar()
+        
+        #self.cmdname.set(self.mapcmds[self.mapname.get()])
+        self.cmdname.set(self.pgt.command)
+
+	params_frame = Frame(master=self)
+        params_frame.pack(side=TOP,expand=YES,fill=X)
+        Message(params_frame,text="Update command:",aspect=1000).pack(side=LEFT)
+
+        Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
+                     entry_textvariable=self.cmdname,
+                     scrolledlist_items=([self.pgt.command])
+                     ).pack(side=LEFT,expand=YES,fill=X)
+
+	###########################################
+
         
 
 

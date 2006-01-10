@@ -9,7 +9,6 @@ $Id$
 __version__='$Revision$'
 
 import types
-from itertools import chain
 
 from Numeric import transpose, array, ravel
 
@@ -29,6 +28,10 @@ FLAT = 'FLAT'
 def sort_plots(plot_list):
     """Sort a (static) plot list according to the src_names."""
     plot_list.sort(lambda x, y: cmp(x.view_info['src_name'], y.view_info['src_name']))
+
+#### REPLACING Plotengine #########
+
+plotgroup_dict = {}
 
 
 
@@ -95,6 +98,9 @@ class PlotGroup(TopoObject):
 	self.simulator = simulator
 
 	self.plot_list = lambda: self._initialize_plot_list(plot_list)
+
+	# record the PlotGroup in plot_group_dict
+	plotgroup_dict[plot_group_key]=self
 
 
     def _initialize_plot_list(self,plot_list):
