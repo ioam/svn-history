@@ -198,16 +198,17 @@ s.connect(Retina,V1, delay = FixedPoint("0.05"),
 ##                                                       smoothing=0.0),
                                    learning_rate=alpha_input))
 
-## # CEBHACKALERT: temporary - uncomment to see ON- and OFF-cell SharedWeightProjections
+## # CEBHACKALERT: temporary - uncomment to see ON- and OFF-cell SharedWeightCFProjections
 ## from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
-## from topo.base.connectionfield import CFSheet,SharedWeightProjection
+## from topo.base.connectionfield import CFSheet
+## from topo.projections.basic import SharedWeightCFProjection
 
 ## ###  ON 
 ## #
 ## #
 ## LGNOn = CFSheet(name='LGNOn',output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
 ## LGNOn_center = s.connect(Retina,LGNOn,dest_port="center",delay = FixedPoint("0.05"),
-##                          connection_type=SharedWeightProjection,
+##                          connection_type=SharedWeightCFProjection,
 ##                          connection_params = dict(strength = 1.0, name='Center',
 ##                                                   weights_bounds = afferent_weight_bounds,
 ##                                                   weights_generator = topo.patterns.basic.Gaussian(size=2*0.25*rf_radius/BaseRN,aspect_ratio=1),
@@ -215,7 +216,7 @@ s.connect(Retina,V1, delay = FixedPoint("0.05"),
 ## LGNOn_center.output_fn = DivisiveSumNormalize()
 
 ## LGNOn_surround = s.connect(Retina,LGNOn,dest_port="surround",delay = FixedPoint("0.05"),
-##                            connection_type=SharedWeightProjection,
+##                            connection_type=SharedWeightCFProjection,
 ##                            connection_params = dict(strength = -1.0, name='Surround',
 ##                                                     weights_bounds = afferent_weight_bounds,
 ##                                                     weights_generator = topo.patterns.basic.Gaussian(size=2*rf_radius/BaseRN,aspect_ratio=1),
@@ -228,7 +229,7 @@ s.connect(Retina,V1, delay = FixedPoint("0.05"),
 ## #
 ## LGNOff = CFSheet(name='LGNOff',output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
 ## LGNOff_center = s.connect(Retina,LGNOff,dest_port="center",delay = FixedPoint("0.05"),
-##                          connection_type=SharedWeightProjection,
+##                          connection_type=SharedWeightCFProjection,
 ##                          connection_params = dict(strength = -1.0, name='Center',
 ##                                                   weights_bounds = afferent_weight_bounds,
 ##                                                   weights_generator = topo.patterns.basic.Gaussian(size=0.25*rf_radius/BaseRN,aspect_ratio=1),
@@ -236,7 +237,7 @@ s.connect(Retina,V1, delay = FixedPoint("0.05"),
 ## LGNOff_center.output_fn = DivisiveSumNormalize(norm_value=-1.0)
 
 ## LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoint("0.05"),
-##                            connection_type=SharedWeightProjection,
+##                            connection_type=SharedWeightCFProjection,
 ##                            connection_params = dict(strength = 1.0, name='Surround',
 ##                                                     weights_bounds = afferent_weight_bounds,
 ##                                                     weights_generator = topo.patterns.basic.Gaussian(size=rf_radius/BaseRN,aspect_ratio=1),
