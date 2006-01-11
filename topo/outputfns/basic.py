@@ -29,6 +29,8 @@ from topo.base.projection import Identity
 ### changing the call anywhere else in the code. That might have to be done later.
 ### Also note that the test file still test the method for both procedure and function calls
 
+# CEBHACKALERT: these need to respect the mask - which will be passed in.
+
 class PiecewiseLinear(OutputFunction):
     """ 
     Piecewise-linear output function with lower and upper thresholds
