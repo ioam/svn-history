@@ -29,6 +29,7 @@ class CFProjection_CPointer(CFProjection):
 
     weight_ptrs = [] 
     slice_ptrs = []
+    mask_ptrs = []
     response_fn = Parameter(default=CFDotProduct_CPointer())
     learning_fn = Parameter(default=DivisiveHebbian_CPointer())
 
@@ -40,12 +41,15 @@ class CFProjection_CPointer(CFProjection):
         setup_wp(self.cfs, self.weight_ptrs, x, y)
         self.slice_ptrs = ones((x,y), Int)
         setup_sp(self.cfs, self.slice_ptrs, x, y)
+        self.mask_ptrs = ones((x,y), Int)
+        setup_mp(self.cfs, self.mask_ptrs, x, y)
+
         
     def activate(self,input_activity):
         """Activate using the specified response_fn and output_fn."""
         self.input_buffer = input_activity
         # need to pass the pointer arrays into the response function
-        self.response_fn(self.cfs, input_activity, self.activity, self.strength, weight_ptrs=self.weight_ptrs, slice_ptrs=self.slice_ptrs)
+        self.response_fn(self.cfs, input_activity, self.activity, self.strength, weight_ptrs=self.weight_ptrs, slice_ptrs=self.slice_ptrs,mask_ptrs=self.mask_ptrs)
         self.activity = self.output_fn(self.activity)
 
 
@@ -57,6 +61,9 @@ class CFProjection_CPointer(CFProjection):
         setup_wp(self.cfs, self.weight_ptrs, x, y)
         self.slice_ptrs = ones((x,y), Int)
         setup_sp(self.cfs, self.slice_ptrs, x, y)
+        self.mask_ptrs = ones((x,y), Int)
+        setup_mp(self.cfs, self.mask_ptrs, x, y)
+
 
 # Optimized version is overwritten by the unoptimized version if the
 # code does not have optimized set.
@@ -116,3 +123,28 @@ def setup_sp(cfs, sp, rows, cols):
     """
     inline(hebbian_code, ['cfs', 'sp', 'rows', 'cols'], local_dict=locals())
 
+
+def setup_mp(cfs, mp, rows, cols):
+    """
+    Find out the pointer to the weight array in each connection field in cfs
+    and store it in wp.
+    """
+    hebbian_code = """
+        float *wi;
+        float **wj;
+        int i, j, r, l;
+        PyObject *cf, *cfsr;
+        PyObject *mask = PyString_FromString("mask");
+
+        wj = (float **)mp;
+        for (r=0; r<rows; ++r) {
+            cfsr = PyList_GetItem(cfs,r);
+            for (l=0; l<cols; ++l) {
+                cf = PyList_GetItem(cfsr,l);
+                wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,mask))->data);
+                *wj = wi;
+                wj++;
+            }
+        }
+    """
+    inline(hebbian_code, ['cfs', 'mp', 'rows', 'cols'], local_dict=locals())

@@ -101,7 +101,7 @@ class LISSOM_CPointer(LISSOM):
 
                 cfs = proj.cfs
                 len, len2 = inp.shape
-                proj.learning_fn(cfs, inp, self.activity, learning_rate, weight_ptrs=proj.weight_ptrs, slice_ptrs=proj.slice_ptrs)
+                proj.learning_fn(cfs, inp, self.activity, learning_rate, weight_ptrs=proj.weight_ptrs, slice_ptrs=proj.slice_ptrs, mask_ptrs=proj.mask_ptrs)
 
 
 # Optimized version is overwritten by the unoptimized version if the
