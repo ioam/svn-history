@@ -17,6 +17,7 @@ from topo.base.parameter import Parameter,Number,Constant
 from topo.base.arrayutils import mdot
 from topo.base.connectionfield import CFProjection,IdentityCFLF,ResponseFunctionParameter
 from topo.base.patterngenerator import PatternGeneratorParameter
+from topo.base.sheetview import UnitView
 
 from topo.outputfns.basic import Identity
 
