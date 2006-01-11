@@ -33,7 +33,7 @@ class Hebbian(CFLearningFunction):
 
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
-	### JCALERT! Maybe change the name to single_cf_learning_rate 
+	### JCALERT! Maybe change the name to single_connection_learning_rate 
 	### and change the variable name in the C code. (same in DivisiveHebbian)
 	learning_rate = self.set_learning_rate(cfs,learning_rate,rows,cols)
         len, len2 = input_activity.shape
@@ -117,7 +117,8 @@ if not optimized:
     TopoObject().message('Inline-optimized components not available; using Hebbian_Py instead of Hebbian.')
 
 
-
+# CEBHACKALERT: ought to be DivisiveL1Hebbian (assuming DivisiveSumNormalize
+# is changed to DivisiveL1Normalize). Same for similarly named functions.
 class DivisiveHebbian(CFLearningFunction):
     """
     CF-aware Hebbian learning rule with built-in divisive normalization.
@@ -140,7 +141,7 @@ class DivisiveHebbian(CFLearningFunction):
         len, len2 = input_activity.shape
 
         hebbian_div_norm_code = """
-            float *wi, *wj;
+            float *wi, *wj, *m, *wk;
             double *x, *inpi, *inpj;
             int *slice;
             int rr1, rr2, cc1, cc2, rc;
@@ -148,6 +149,7 @@ class DivisiveHebbian(CFLearningFunction):
             PyObject *cf, *cfsr;
             PyObject *sarray = PyString_FromString("slice_array");
             PyObject *weights = PyString_FromString("weights");
+            PyObject *mask = PyString_FromString("mask");
             double load, delta;
             double totald;
 
@@ -162,6 +164,7 @@ class DivisiveHebbian(CFLearningFunction):
                         cf = PyList_GetItem(cfsr,l);
                         wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
                         wj = wi;
+                        wk = wi;
                         slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
                         rr1 = *slice++;
                         rr2 = *slice++;
@@ -183,6 +186,16 @@ class DivisiveHebbian(CFLearningFunction):
                             inpj += len;
                         }
 
+                        // apply the mask
+                        m = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,mask))->data);
+                        for (i=rr1; i<rr2; ++i) {
+                            for (j=cc1; j<cc2; ++j) {
+                               *wk *= *m;
+                               ++wk;
+                               ++m;
+                               }
+                        }
+
                         // normalize the weights
                         totald += 1.0;
                         totald = 1.0/totald;
@@ -198,12 +211,7 @@ class DivisiveHebbian(CFLearningFunction):
         """
         
         inline(hebbian_div_norm_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'learning_rate'], local_dict=locals())
-        # CEBHACKALERT: can this be done in the c?
-        for r in xrange(rows):
-            for c in xrange(cols):
-                cf = cfs[r][c]
-                cf.weights *= cf.mask
-
+       
 
 
 class DivisiveHebbian_Py(GenericCFLF):
