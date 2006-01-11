@@ -248,7 +248,7 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
         weight_ptrs = params['weight_ptrs']
         slice_ptrs = params['slice_ptrs']
         rows,cols = output_activity.shape
-	single_cf_learning_rate = self.set_learning_rate(cfs,learning_rate,rows,cols)
+	learning_rate = self.set_learning_rate(cfs,learning_rate,rows,cols)
         len, len2 = input_activity.shape
 
         hebbian_div_norm_code = """
