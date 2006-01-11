@@ -327,12 +327,6 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
         
         inline(hebbian_div_norm_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'learning_rate','weight_ptrs','slice_ptrs','mask_ptrs'], local_dict=locals())
 
-        # CEBHACKALERT: can this be done in the c?
-        for r in xrange(rows):
-            for c in xrange(cols):
-                cf = cfs[r][c]
-                cf.weights *= cf.mask
-
 
 if not optimized:
     DivisiveHebbian_CPointer = DivisiveHebbian_Py
