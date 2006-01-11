@@ -99,8 +99,11 @@ class ConnectionField(TopoObject):
         # promote to double.
         self.weights.savespace(1)
 
-        # CEBHACKALERT: weights_shape and mask aren't Parameters, but
-        # should I have declared them as class attributes?
+        # CEBHACKALERT:
+        # We must save this because change_bounds uses Numeric.where() on the mask,
+        # which changes the typecode!
+        self.weight_type = weight_type
+
         # CEBHACKALERT: the thresholding of mask values done in the where line
         # should be done so that the threshold can be set by the user (see
         # also change_bounds), and to avoid duplicating this code. Also this
@@ -109,8 +112,10 @@ class ConnectionField(TopoObject):
         m = weights_shape(x=0,y=0,bounds=weights_bound_template,
                           density=self.input_sheet.density,theta=0,
                           rows=r2-r1,cols=c2-c1)
-        self.mask = Numeric.where(m>=0.5,m,0.0)
-
+        m = Numeric.where(m>=0.5,m,0.0)
+        self.mask = m.astype(weight_type)
+        self.mask.savespace(1)
+        
         # CEBHACKALERT: applying the mask after the output_fn is no good (e.g.
         # it would destroy any normalization done by the output_fn). Applying
         # the mask before the output_fn would work for multiplicative output_fns
@@ -199,11 +204,12 @@ class ConnectionField(TopoObject):
 
         if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
-
-            # CEBHACKALERT: I think this isn't right. E.g. if the mask is a Disk the
-            m = (Numeric.array(self.mask[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1))
+            
+            # CEBHACKALERT: I have to check this.
+            self.mask = Numeric.array(self.mask[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
             # CEBHACKALERT: see alert in __init__
-            self.mask = Numeric.where(m>=0.5,m,0.0)
+            self.mask = Numeric.where(self.mask>=0.5,self.mask,0.0).astype(self.weight_type)
+            self.mask.savespace(1)
             
             output_fn(self.weights)
             self.weights *= self.mask
