@@ -178,10 +178,9 @@ class DivisiveHebbian(CFLearningFunction):
                             inpi = inpj;
                             for (j=cc1; j<cc2; ++j) {
                                 delta = load * *inpi;
-                                *wi += delta;
+                                *(wi++) += delta;
                                 totald += delta;
-                                ++wi;
-                                ++inpi;
+                                 ++inpi;
                             }
                             inpj += len;
                         }
@@ -190,9 +189,7 @@ class DivisiveHebbian(CFLearningFunction):
                         m = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,mask))->data);
                         for (i=rr1; i<rr2; ++i) {
                             for (j=cc1; j<cc2; ++j) {
-                               *wk *= *m;
-                               ++wk;
-                               ++m;
+                               *(wk++) *= *(m++);
                                }
                         }
 
@@ -202,8 +199,7 @@ class DivisiveHebbian(CFLearningFunction):
                         rc = (rr2-rr1)*(cc2-cc1);
 
                         for (i=0; i<rc; ++i) {
-                            *wj *= totald;
-                            ++wj;
+                            *(wj++) *= totald;
                         }
                     }
                 }
