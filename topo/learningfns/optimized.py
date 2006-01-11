@@ -294,11 +294,9 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
                         for (i=rr1c; i<rr2c; ++i) {
                             inpi = inpj;
                             for (j=cc1c; j<cc2c; ++j) {
-                                delta = load * *inpi;
-                                *wi += delta;
+                                delta = load * *(inpi++);
+                                *(wi++) += delta;
                                 totald += delta;
-                                ++wi;
-                                ++inpi;
                             }
                             inpj += len;
                         }
@@ -317,8 +315,7 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
                         const int rc = (rr2-rr1)*(cc2-cc1);
     
                         for (i=0; i<rc; ++i) {
-                            *wj *= totald;
-                            ++wj;
+                            *(wj++) *= totald;
                         }
                     }
                     ++mip;
