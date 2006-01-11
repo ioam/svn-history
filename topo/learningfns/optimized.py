@@ -91,13 +91,14 @@ class Hebbian(CFLearningFunction):
         # Apply output_fn to each CF, followed by mask
         # (output_fn skipped for no-op case, as an optimization) 
         output_fn = self.output_fn
-        # CEBHACKALERT: can this be done in the c?
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = cfs[r][c]
+                # CEBHACKALERT: see ConnectionField.__init__()
+                cf.weights *= cf.mask
                 if type(output_fn) is not Identity:
                     cf.weights = output_fn(cf.weights)
-                cf.weights *= cf.mask
+                
 
 
 class Hebbian_Py(GenericCFLF):

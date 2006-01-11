@@ -113,9 +113,12 @@ class HebbianSOMLF(SOMLF):
                     # not appear to be pickled.
                     cf.weights.savespace(1)
                     cf.weights += rate * (X - cf.weights)
+
+                    # CEBHACKALERT: see ConnectionField.__init__()
+                    cf.weights *= cf.mask
                     if type(output_fn) is not Identity:
                         output_fn(cf.weights)
-                    cf.weights *= cf.mask
+
 
 
     def winner_coords(self, activity, cols):

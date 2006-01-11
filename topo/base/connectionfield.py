@@ -115,16 +115,11 @@ class ConnectionField(TopoObject):
         m = Numeric.where(m>=0.5,m,0.0)
         self.mask = m.astype(weight_type)
         self.mask.savespace(1)
-        
-        # CEBHACKALERT: applying the mask after the output_fn is no good (e.g.
-        # it would destroy any normalization done by the output_fn). Applying
-        # the mask before the output_fn would work for multiplicative output_fns
-        # only. However, the C code for the optimized learning_fns applies the
-        # output_fn at the time it does the learning, so neither of these
-        # approaches is actually ok - the mask needs to be respected by the
-        # output_fns themselves.
-        output_fn(self.weights)
+
+        # CEBHACKALERT: this works for now, while the output_fns are all multiplicative.
         self.weights *= self.mask   
+        output_fn(self.weights)
+        
 
 
     def initialize_slice_array(self):
@@ -210,10 +205,10 @@ class ConnectionField(TopoObject):
             # CEBHACKALERT: see alert in __init__
             self.mask = Numeric.where(self.mask>=0.5,self.mask,0.0).astype(self.weight_type)
             self.mask.savespace(1)
-            
-            output_fn(self.weights)
-            self.weights *= self.mask
 
+            # CEBHACKALERT: see __init__
+            self.weights *= self.mask
+            output_fn(self.weights)
 
     def slice_tuple(self):
         return self.slice_array[0],self.slice_array[1],self.slice_array[2],self.slice_array[3]
@@ -373,8 +368,9 @@ class GenericCFLF(CFLearningFunction):
                 cf = cfs[r][c]
                 single_cf_fn(cf.get_input_matrix(input_activity),
                              output_activity[r,c], cf.weights, single_cf_learning_rate)
-                output_fn(cf.weights)
+                # CEBHACKALERT: see ConnectionField.__init__()
                 cf.weights *= cf.mask
+                output_fn(cf.weights)
                 
 
 class CFProjection(Projection):
