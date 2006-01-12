@@ -179,12 +179,15 @@ class DivisiveHebbian(CFLearningFunction):
                         for (i=rr1; i<rr2; ++i) {
                             inpi = inpj;
                             for (j=cc1; j<cc2; ++j) {
-                                if (*(m++) >= 0) {
+                                // CEBHACKALERT: the mask is an array of
+                                // Numeric.Float32 values. 0 does not appear to transfer
+                                // as 0.
+                                if (*(m++) >= 0.000001) {
                                     delta = load * *inpi;
                                     *wi += delta;
                                     totald += delta;
                                 }
-                                *wi++;
+                                ++wi;
                                 ++inpi;
                             }
                             inpj += len;
