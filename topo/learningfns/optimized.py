@@ -33,9 +33,7 @@ class Hebbian(CFLearningFunction):
 
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
-	### JCALERT! Maybe change the name to single_connection_learning_rate 
-	### and change the variable name in the C code. (same in DivisiveHebbian)
-	learning_rate = self.set_learning_rate(cfs,learning_rate,rows,cols)
+	single_connection_learning_rate = self.single_connection_learning_rate(cfs,learning_rate,rows,cols)
         len, len2 = input_activity.shape
 
         hebbian_code = """
@@ -56,7 +54,7 @@ class Hebbian(CFLearningFunction):
                 for (l=0; l<cols; ++l) {
                     load = *x++;
                     if (load != 0) {
-                        load *= learning_rate;
+                        load *= single_connection_learning_rate;
     
                         cf = PyList_GetItem(cfsr,l);
                         wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
@@ -86,7 +84,7 @@ class Hebbian(CFLearningFunction):
             }
         """
         
-        inline(hebbian_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'cfs', 'learning_rate'],local_dict=locals())
+        inline(hebbian_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'cfs', 'single_connection_learning_rate'],local_dict=locals())
 
         # Apply output_fn to each CF, followed by mask
         # (output_fn skipped for no-op case, as an optimization) 
@@ -138,7 +136,7 @@ class DivisiveHebbian(CFLearningFunction):
 
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
-	learning_rate = self.set_learning_rate(cfs,learning_rate,rows,cols)
+	single_connection_learning_rate = self.single_connection_learning_rate(cfs,learning_rate,rows,cols)
         len, len2 = input_activity.shape
 
         hebbian_div_norm_code = """
@@ -160,7 +158,7 @@ class DivisiveHebbian(CFLearningFunction):
                 for (l=0; l<cols; ++l) {
                     load = *x++;
                     if (load != 0) {
-                        load *= learning_rate;
+                        load *= single_connection_learning_rate;
 
                         cf = PyList_GetItem(cfsr,l);
                         wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
@@ -212,7 +210,7 @@ class DivisiveHebbian(CFLearningFunction):
             }
         """
         
-        inline(hebbian_div_norm_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'learning_rate'], local_dict=locals())
+        inline(hebbian_div_norm_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
        
 
 
@@ -255,7 +253,7 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
         slice_ptrs = params['slice_ptrs']
         mask_ptrs = params['mask_ptrs']
         rows,cols = output_activity.shape
-	learning_rate = self.set_learning_rate(cfs,learning_rate,rows,cols)
+	single_connection_learning_rate = self.single_connection_learning_rate(cfs,learning_rate,rows,cols)
         len, len2 = input_activity.shape
 
         hebbian_div_norm_code = """
@@ -276,7 +274,7 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
                 for (l=0; l<cols; ++l) {
                     load = *x++;
                     if (load != 0) {
-                        load *= learning_rate;
+                        load *= single_connection_learning_rate;
     
                         wi = *wip;
                         wj = wi;
@@ -331,7 +329,7 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
             }
         """
         
-        inline(hebbian_div_norm_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'learning_rate','weight_ptrs','slice_ptrs','mask_ptrs'], local_dict=locals())
+        inline(hebbian_div_norm_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'single_connection_learning_rate','weight_ptrs','slice_ptrs','mask_ptrs'], local_dict=locals())
 
 
 if not optimized:

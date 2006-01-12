@@ -34,9 +34,9 @@ import patterngenerator
 from boundingregion import BoundingBox
 
 
-def hebbian(input_activity, unit_activity, weights, learning_rate):
+def hebbian(input_activity, unit_activity, weights, single_connection_learning_rate):
     """Simple Hebbian learning for the weights of one single unit."""
-    weights += learning_rate * unit_activity * input_activity
+    weights += single_connection_learning_rate * unit_activity * input_activity
 
 
 
@@ -282,9 +282,13 @@ class CFLearningFunction(TopoObject):
     Objects in this class must support being called as a function with
     the arguments specified below.
     """
-    ### JCALERT! Might change the name (already a set_learning_rate function in the scripts)
-    def set_learning_rate(self,cfs,learning_rate,rows,cols):
-
+ 
+    def single_connection_learning_rate(self,cfs,learning_rate,rows,cols):
+	""" 
+	return the learning rate for a single connection according to the total learning_rate,
+        the number of rows and cols of the output_activity matrix and the connection fields
+	matrix cfs.
+	"""      
         ### JCALERT! To check with Jim: we take the number of unit at the center of the matrix
         ### That would be the best way to go, but it is not possible to acces the 
         ### sheet_density and bounds from here without more important changes
@@ -292,8 +296,8 @@ class CFLearningFunction(TopoObject):
 	cf = cfs[cols/2][rows/2]
         # The number of units in the mask 
 	nb_unit = len(Numeric.nonzero(Numeric.ravel(cf.mask)))
-	new_learning_rate=learning_rate/(nb_unit)
-	return new_learning_rate
+	single_connection_learning_rate=learning_rate/(nb_unit)
+	return single_connection_learning_rate
 
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         raise NotImplementedError
@@ -325,24 +329,11 @@ class GenericCFLF(CFLearningFunction):
     def __init__(self,**params):
         super(GenericCFLF,self).__init__(**params)
 
-    ### JABHACKALERT!  The learning_rate currently has very different
-    ### effects when the density changes, and lissom_or.ty calculates
-    ### corrections for that.  Instead, this code (and EVERY OTHER
-    ### CFLearningFunction) should accept a learning_rate specified as if
-    ### there is a single unit in the connection field.  That is, the
-    ### learning_rate specifies the total change across the
-    ### ConnectionField, assuming that all units in the CF are equally
-    ### activated (which is a reasonable default assumption on
-    ### average).  Thus the user-specified learning rate should be
-    ### divided by the number of units in the CF before the single_cf_fn
-    ### is called here.  In general, every GenericCFLF would do such
-    ### calculation before the learning_rate is used to calculate any
-    ### new weight.
-    ### Something like: single_cf_learning_rate=learning_rate/number_of_units_in_the(cf)
+   
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
         rows,cols = output_activity.shape
-	single_cf_learning_rate = self.set_learning_rate(cfs,learning_rate,rows,cols)
+	single_connection_learning_rate = self.single_connection_learning_rate(cfs,learning_rate,rows,cols)
         # avoid evaluating these references each time in the loop
         output_fn = self.output_fn
         single_cf_fn = self.single_cf_fn
@@ -350,7 +341,7 @@ class GenericCFLF(CFLearningFunction):
             for c in xrange(cols):
                 cf = cfs[r][c]
                 single_cf_fn(cf.get_input_matrix(input_activity),
-                             output_activity[r,c], cf.weights, single_cf_learning_rate)
+                             output_activity[r,c], cf.weights, single_connection_learning_rate)
                 # CEBHACKALERT: see ConnectionField.__init__()
                 cf.weights *= cf.mask
                 output_fn(cf.weights)
@@ -538,6 +529,7 @@ class CFSheet(ProjectionSheet):
     ### projection parameter so that individual projections can be
     ### updated; otherwise a Projection plot will result in a huge
     ### number of wasted UnitView additions.
+    ### When None is chosen, it is done for all the projection.
     def unit_view(self,x,y):
         """
 	Creates the list of UnitView objects for a particular unit in this CFSheet,

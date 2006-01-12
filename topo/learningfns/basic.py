@@ -57,7 +57,7 @@ class HebbianSOMLF(SOMLF):
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
 
         rows,cols = output_activity.shape
-	single_cf_learning_rate = self.set_learning_rate(cfs,learning_rate,rows,cols)
+	single_connection_learning_rate = self.single_connection_learning_rate(cfs,learning_rate,rows,cols)
         radius = self.learning_radius
         output_fn = self.output_fn
 
@@ -105,7 +105,7 @@ class HebbianSOMLF(SOMLF):
                 lattice_dist = L2norm((cwc,rwr))
 		if lattice_dist <= radius:
                     cf = cfs[r][c]
-                    rate = single_cf_learning_rate * neighborhood_matrix[rwr+radius_int,cwc+radius_int]
+                    rate = single_connection_learning_rate * neighborhood_matrix[rwr+radius_int,cwc+radius_int]
 		    X = cf.get_input_matrix(input_activity)
 
                     # CEBHACKALERT:
