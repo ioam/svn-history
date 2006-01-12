@@ -419,10 +419,6 @@ class CFProjection(Projection):
         return len(self.cfs),len(self.cfs[0])
 
 
-    ### JCALERT! This function has to be review, so that the size of the UnitView
-    ### matrix is actually the same size as the sheet.
-    ### Like that it would be possible to color unitView with Orientation Preference 
-    ### for instance.
     def get_view(self,sheet_x, sheet_y):
         """
         Return a single connection field UnitView, for the unit
