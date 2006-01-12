@@ -115,38 +115,37 @@ make and GCC installed.  Just follow the Linux instructions, replacing
 Topographica builds only under Mac OS X or later.  Topographica
 developers have only limited access to OS X machines, and so at any
 time there are likely to be some issues with the OS X version,
-although we do try to minimize them.  
+although we do try to minimize them.
 
-If you have an X server installed, you can just build Topographica as
-described for Linux.  It is also possible to build Topographica using
-a native (Aqua) version of Python, which looks a bit nicer, but we
-have not yet documented how to do that.  We have not necessarily
-tested the most recent version on the Mac, so there may be some small
-changes required.
+<P>These instructions assume that you have an X server installed.  It
+is also possible to build Topographica using a native (Aqua) version
+of Python, which looks a bit nicer, but we have not yet documented how
+to do that.
 
-<P>
-Topographica has recently been installed on the last Mac OS X  10.4 (Tiger). 
-The basic steps for building the native version are:
+<P>To install under Mac OS X 10.4 (Tiger):
 
 <ol>
-<li> From the Apple developper web site, download 
+<li> From the Apple developer web site, download 
 <A HREF="http://developer.apple.com/tools/xcode/index.html">XCode_Tool2.2</a>
-(among other developping utilities, it provides the required gcc compiler).
+(among other development utilities, it provides the gcc C/C++
+compiler for Topographica to use).
+<li> Specify gcc 3.3 using: <code>sudo gcc_select 3.3</code>.  The
+default 4.0 compiler is fine for most of the included packages, but
+some people have reported that SciPy (weave) does not work with gcc 4.0.
 <li> Download and install the <A HREF="http://fink.sourceforge.net/download/">Fink</a> package.
-Also install the FinkCommander GUI (it allows finding and installing Unix software
-more conveniently).
+Also install the FinkCommander GUI, which makes finding and installing Unix software
+more convenient.
 <li> With Fink, find and install the following packages: <code>libpng</code> and 
-<code>freetype219</code> (they allow repectively the PNG format handling and the 
-matplotlib library installation required to run Topographica).
+<code>freetype219</code> (they provide, repectively, the PNG format
+handling and the matplotlib library installation required to run
+Topographica).
 <li> If CVS is not already installed on your Mac, find and install <code>cvsup</code>
-(and associated server, library and client) with Fink.
-<li> Get and unpack Topographica using CVS, in the working directory of your choice.
-<li> Type <code>make</code> into the /topographica directory.
-<li> Note that on Tiger, some encounter problems trying to build SciPy (weave) with gcc 4.0.
- If so, try specifying gcc 3.3 before building by the following command:
- <code>sudo gcc_select 3.3</code>
+(and the associated library and client) with Fink.
+<li> Get, unpack, and make Topographica using CVS as described above.
 </ol>
 
+<P> Other OS X versions may require small changes to this procedure,
+to make sure that compatible libraries are available.
 
 <P><B>Windows:</B> It should be possible to build Topographica under
 Windows just as is done under UNIX, if you first install <A
