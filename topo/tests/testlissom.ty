@@ -1,0 +1,201 @@
+"""
+Test LISSOM.
+
+$Id$
+"""
+__version__='$Revision$'
+
+
+
+
+
+import unittest
+
+
+# CEBHACKALERT:
+# - This test is not set out properly at the moment.
+#   It's just temporary.
+#
+# - When there's a lissom_or and a reference lissom in examples,
+#   this could be based on either. Basing it on the reference
+#   one would allow this file to match output from the matching
+#   c++ lissom. At the moment, the values held to be true are just
+#   from an earlier copy of Topographica (as it was on 2006/01/11 0800).
+#
+# 
+# - Should test change_bounds, and so on.
+
+
+
+import random
+import RandomArray
+import fixedpoint
+#import pdb # debugger
+
+from math import pi, sqrt
+from itertools import chain
+from fixedpoint import FixedPoint
+
+from topo.sheets.lissom import LISSOM
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.projections.basic import CFProjection
+from topo.responsefns.basic import CFDotProduct
+import topo.patterns.basic
+import topo.patterns.random
+from topo.base.sheet import BoundingBox
+from topo.base.parameter import DynamicNumber
+from topo.learningfns.optimized import DivisiveHebbian
+from topo.patterns import PatternGeneratorParameter
+
+
+fixedpoint.DEFAULT_PRECISION=3
+
+GeneratorSheet.density = 10
+GeneratorSheet.period = 1
+GeneratorSheet.bounds = BoundingBox(points=((-0.7,-0.7),(0.7,0.7)))
+
+random.seed(1234)
+topo.patterns.basic.Gaussian.scale = 1.0
+topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
+topo.patterns.basic.Gaussian.size = 0.5
+topo.patterns.basic.Gaussian.aspect_ratio = 0.1/0.5
+topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+
+
+LISSOM.density = 10
+LISSOM.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+
+afferent_weight_bounds   = BoundingBox(points=((-0.1,-0.1),(0.1,0.1)))
+excitatory_weight_bounds = BoundingBox(points=((-0.1,-0.1),(0.1,0.1)))
+inhibitory_weight_bounds = BoundingBox(points=((-0.1,-0.1),(0.1,0.1)))
+
+RandomArray.seed(500,500)
+CFProjection.weights_generator = topo.patterns.random.UniformRandom()
+CFProjection.response_fn=CFDotProduct()
+CFProjection.learning_fn=DivisiveHebbian()
+
+###########################################
+# build simulation
+
+s = topo.base.simulator.Simulator()
+
+
+Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),
+                        name='Retina')
+V1 = LISSOM(name='V1')
+
+# CEBHACKALERT: the commented-out 'weights_shape' code in each of the following
+# connect sections makes the ConnectionFields circular.
+
+s.connect(Retina,V1, delay = FixedPoint("0.05"),
+          connection_type=CFProjection,
+          connection_params = dict(strength = 1.0, name='Afferent0',
+                                   weights_bounds = afferent_weight_bounds,
+##                                     weights_shape = topo.patterns.basic.Disk(
+##                                                       size=2*rf_radius/BaseRN,
+##                                                       aspect_ratio=1.0,
+##                                                       scale=1.0,offset=0.0,
+##                                                       smoothing=0.0),
+                                   learning_rate=0.1))
+
+s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
+          connection_type=CFProjection,
+          connection_params = dict(strength = 1.0, name='LateralExcitatory',
+                                   weights_bounds = excitatory_weight_bounds,
+##                                     weights_shape = topo.patterns.basic.Disk(
+##                                                       size=2*exc_rad/BaseN,
+##                                                       aspect_ratio=1.0,
+##                                                       scale=1.0,offset=0.0,
+##                                                       smoothing=0.0),
+                                   learning_rate=0.1))
+
+s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
+          connection_type=CFProjection,
+          connection_params = dict(strength = -1.0, name='LateralInhibitory',
+                                   weights_bounds = inhibitory_weight_bounds,
+##                                     weights_shape = topo.patterns.basic.Disk(
+##                                                       size=2*inh_rad/BaseN,
+##                                                       aspect_ratio=1.0,
+##                                                       scale=1.0,offset=0.0,
+##                                                       smoothing=0.0),
+                                   learning_rate=0.1))
+        
+
+s.run(1)
+
+
+
+## TRUE VALUES
+from Numeric import array
+trueV1activity_1 = array(
+      [[ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.27334569,  0.        ,  0.08261373],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.        ,  0.92471562,  0.76125124],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.37926973,  0.65741177,  0.86127129],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.40083992,  0.68895827,  0.97197144],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.06022173,  0.94942304,  1.        ],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.18467671,  0.69651897,  1.        ],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.60182853,  0.54907107,  0.8932266 ],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.13728769,  0.52079846,  1.        ],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.        ,  0.64268149,  0.82713208],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.20107687,  0.92360782,  0.74979364]])
+
+trueV1activity_2 = array(
+      [[ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.34362498,  1.        ,  0.61645583,  0.53369893],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.06773135,  0.99414616,  1.        ],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.38280148,  0.85836342,  0.86401622],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.21070959,  0.16071593,  0.63698357],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.        ,  0.19718553,  0.37481717],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.        ,  0.        ,  0.22101698],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.        ,  0.        ,  0.        ],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.        ,  0.        ,  0.        ],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.        ,  0.        ,  0.        ],
+       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
+              0.        ,  0.        ,  0.        ,  0.        ]])
+
+
+
+class TestLissom(unittest.TestCase):
+
+
+    def test_activity(self):
+        """
+        """
+        n_rows,n_cols = V1.activity.shape
+        for i in range(n_rows):
+            for j in range(n_cols):
+                self.assertEqual(V1.activity[i,j],trueV1activity_1[i,j])
+
+        s.run(1)
+        for i in range(n_rows):
+            for j in range(n_cols):
+                self.assertEqual(V1.activity[i,j],trueV1activity_2[i,j])
+
+
+        
+
+suite = unittest.TestSuite()
+suite.addTest(unittest.makeSuite(TestLissom))
+
+if __name__ == '__main__':
+    unittest.TextTestRunner(verbosity=2).run(suite)
