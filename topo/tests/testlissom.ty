@@ -11,6 +11,30 @@ __version__='$Revision$'
 import unittest
 
 
+### CEBHACKALERT:
+#
+# This file is not supposed to match lissom_or_reference, it's just
+# supposed to test the lissom (and associated) code. Maybe it just
+# ought to be done identically to lissom_or_reference because of the
+# following problem...if it is a problem?
+#
+# From release_0_8_1 (about 22 December), up until about 1300 on 9th
+# January (detail later), the tests in version 1.7 of this file pass
+# (using testlissom.data revision 1.3).  Changes to connectionfield.py
+# and lissom_or.ty (*) committed between 1310 and 1315 on 9th January
+# cause these tests to fail - the activity values in V1 differ slightly.
+# However, there appears to be no change to V1 activity in
+# lissom_or.ty over this period. That is, its parameters must have been
+# adjusted correctly to match.
+#
+# Therefore, I will use the data from 1315 as the new reference data in
+# versions of testlissom.data later than 1.3. It will be simpler to use
+# data from C++ lissom, but I think this is ok for now.
+#
+# (* Julien's changes to how the learning rate works.)
+
+
+
 # CEBHACKALERT:
 # - This test is not set out properly at the moment.
 #   It's just temporary.
