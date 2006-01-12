@@ -142,7 +142,7 @@ class DivisiveHebbian(CFLearningFunction):
         len, len2 = input_activity.shape
 
         hebbian_div_norm_code = """
-            float *wi, *wj, *m, *wk;
+            float *wi, *wj, *m;
             double *x, *inpi, *inpj;
             int *slice;
             int rr1, rr2, cc1, cc2, rc;
@@ -165,34 +165,36 @@ class DivisiveHebbian(CFLearningFunction):
                         cf = PyList_GetItem(cfsr,l);
                         wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
                         wj = wi;
-                        wk = wi;
                         slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
                         rr1 = *slice++;
                         rr2 = *slice++;
                         cc1 = *slice++;
                         cc2 = *slice;
+                        m = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,mask))->data);
 
                         totald = 0.0;
 
+                        // modify non-masked weights
                         inpj = input_activity+len*rr1+cc1;
                         for (i=rr1; i<rr2; ++i) {
                             inpi = inpj;
                             for (j=cc1; j<cc2; ++j) {
-                                delta = load * *inpi;
-                                *(wi++) += delta;
-                                totald += delta;
-                                 ++inpi;
+                                if (*(m++) >= 0) {
+                                    delta = load * *inpi;
+                                    *wi += delta;
+                                    totald += delta;
+                                }
+                                *wi++;
+                                ++inpi;
                             }
                             inpj += len;
                         }
 
-                        // apply the mask
-                        m = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,mask))->data);
-                        for (i=rr1; i<rr2; ++i) {
-                            for (j=cc1; j<cc2; ++j) {
-                               *(wk++) *= *(m++);
-                               }
-                        }
+                        // CEBHACKALERT: it might be better just to sum the current weights
+                        // in the loop above and use this in the normalization. It would be
+                        // clearer and would probably behave better numerically (maybe
+                        // it's not currently summing to 1 exactly). But then it wouldn't
+                        // match C++ LISSOM so clearly.
 
                         // normalize the weights
                         totald += 1.0;
