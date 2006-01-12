@@ -283,7 +283,7 @@ class CFLearningFunction(TopoObject):
     the arguments specified below.
     """
  
-    def single_connection_learning_rate(self,cfs,learning_rate,rows,cols):
+    def single_connection_learning_rate(self,cfs,learning_rate):
 	""" 
 	return the learning rate for a single connection according to the total learning_rate,
         the number of rows and cols of the output_activity matrix and the connection fields
@@ -293,6 +293,8 @@ class CFLearningFunction(TopoObject):
         ### That would be the best way to go, but it is not possible to acces the 
         ### sheet_density and bounds from here without more important changes
         #center_r,center_c = sheet2matrixidx(0,0,bounds,xdensity,ydensity)
+	rows = len(cfs)
+	cols = len(cfs[0])
 	cf = cfs[cols/2][rows/2]
         # The number of units in the mask 
 	nb_unit = len(Numeric.nonzero(Numeric.ravel(cf.mask)))
@@ -333,7 +335,7 @@ class GenericCFLF(CFLearningFunction):
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
         rows,cols = output_activity.shape
-	single_connection_learning_rate = self.single_connection_learning_rate(cfs,learning_rate,rows,cols)
+	single_connection_learning_rate = self.single_connection_learning_rate(cfs,learning_rate)
         # avoid evaluating these references each time in the loop
         output_fn = self.output_fn
         single_cf_fn = self.single_cf_fn

@@ -57,7 +57,7 @@ class HebbianSOMLF(SOMLF):
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
 
         rows,cols = output_activity.shape
-	single_connection_learning_rate = self.single_connection_learning_rate(cfs,learning_rate,rows,cols)
+	single_connection_learning_rate = self.single_connection_learning_rate(cfs,learning_rate)
         radius = self.learning_radius
         output_fn = self.output_fn
 
