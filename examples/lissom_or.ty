@@ -1,77 +1,17 @@
 """
 Example of a LISSOM-based orientation map.
 
-This file is much more complex than necessary, because it is set up to
-match the C++ version of the LISSOM simulator as closely as possible.
-Most of the variables below are just temporary variables designed to
-match those in the other simulator.  Eventually, this file will be
-simplified to have only the variables needed for Topographica.
-
 $Id$
 """
 __version__='$Revision$'
 
-# To use a faster but more complex implementation (using memory
-# pointers to access data structures instead of the Python/C API):
-#
-# 1) Remove the following 2 lines: 
-#    - CFProjection.response_fn=CFDotProduct()
-#    - CFProjection.learning_fn=DivisiveHebbian()
-#
-# 2) Replace the line
-#    - from topo.projections.basic import CFProjection
-#    with
-#    - from topo.projections.optimized import CFProjection_CPointer
-#
-# 3) Change all instances of "LISSOM" to "LISSOM_CPointer", "DivisiveHebbian"
-# to "DivisiveHebbian_CPointer", and "CFProjection" to "CFProjection_CPointer" 
-# in this file.
-#
-# Note that the class CFProjection_CPointer will be used. The response_fn
-# and learning_fn of this class must be CFDotProduct_CPointer() and 
-# DivisiveHebbian_CPointer(), repectively. These are the default paramters
-# of CFProjection_CPointer, so you don't have to specify them in this file.
-#
-# To use code written purely in Python:
-#
-# 1) Comment out the lines:
-#    - from topo.responsefns.basic import CFDotProduct
-#    - CFProjection.response_fn=CFDotProduct()
-#    default response_fn of CFProjection is dot product implemented in Python.
-#    response_fn is a Parameter.
-#
-# 2) Comment out the line:
-#    - CFProjection.learning_fn=DivisiveHebbian()
-#    Then, CFProjection.learning_fn defaults to GenericCFLF w/hebbian.
-#    An alternative is to adjust that line to read:
-#    - CFProjection.learning_fn = GenericCFLF()
-#    and to add GenericCFLF to the imports:
-#    - from topo.base.connectionfield import GenericCFLF
-#
-# 3) Add the following line under 2)
-#    - from topo.outputfns.basic import DivisiveSumNormalize
-#
-# 4) Comment out the following line:
-#    - CFProjection.learning_fn=DivisiveHebbian()
-#    and add this line after it
-#    - CFProjection.learning_fn.output_fn=DivisiveSumNormalize()
-#
-#
-# Note that the Python implementation is much slower than C one . You might want to
-# change BaseN and BaseRN to something smaller (e.g. 12.0 and 6.0) to test that
-# the changes have worked.
-# Note also that GenericCFLF is currently untested.
-
-
-
-
 import random
 import RandomArray
 import fixedpoint
-#import pdb # debugger
 
 from math import pi, sqrt
-from itertools import chain
+### JCALERT: Unused parameter
+#from itertools import chain
 from fixedpoint import FixedPoint
 
 from topo.sheets.lissom import LISSOM
@@ -86,86 +26,40 @@ from topo.learningfns.optimized import DivisiveHebbian
 from topo.patterns import PatternGeneratorParameter
 
 ###########################################
-# Temporary variables designed to match the C++ version of LISSOM
-
-BaseN=48.0
-BaseRN=24.0
-area_scale=1.0
-num_eyes=1
-rf_radius=BaseRN/5.0+0.5
-inh_rad=max(2.0,(BaseN/4.0-1.5)+0.5)
-exc_rad=max(2.0,(BaseN/10.0-0.5)+0.5)
-default_afferent_size_scale=BaseN/BaseRN
-gammaexc=0.9
-gammainh=0.9
-#min_exc_rad=max(1,BaseN/44+0.5)
-
-rf_radius_scale=5.0/rf_radius
-#retina_area_scale=(BaseRN*area_scale/24.0*rf_radius_scale)*(BaseRN*area_scale/24.0*rf_radius_scale)
-#inputs_pereye=max(retina_area_scale,1)
-#uncorrelation=0.0 
-xsigma=6.0/rf_radius_scale
-ysigma=1.5/rf_radius_scale
-
-scale_input=1.0
-
-retina_edge_buffer=rf_radius-1 # JABALERT: Need to check this calculation.
-RN=BaseRN*area_scale+2*retina_edge_buffer
-
-acs=6.5*6.5/rf_radius/rf_radius
-ecs=19.5*19.5/exc_rad/exc_rad
-ics=47.5*47.5/inh_rad/inh_rad
-
-alpha_input=0.007*121*acs
-alpha_exc=0.002*ecs*81
-alpha_inh=0.00025*ics*529
-
-
-###########################################
 # Set parameters
 
-# Number of decimal places for simulator time
-fixedpoint.DEFAULT_PRECISION=3
+input_bounds = BoundingBox(points=((-0.6791666666666667,-0.6791666666666667),
+				   ( 0.6791666666666667, 0.6791666666666667)))
 
-# input generation params
-input_bounds = BoundingBox(points=((-RN/(BaseRN*area_scale)/2.0,-RN/(BaseRN*area_scale)/2.0),
-				   ( RN/(BaseRN*area_scale)/2.0, RN/(BaseRN*area_scale)/2.0)))
-
-GeneratorSheet.density = BaseRN*area_scale
+GeneratorSheet.density = 24.0 
 GeneratorSheet.period = 1
 GeneratorSheet.bounds = input_bounds
 
+
 random.seed(1234)
-topo.patterns.basic.Gaussian.scale = scale_input
+topo.patterns.basic.Gaussian.scale = 1.0    
 topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
 
 # Corrects for differences between C++ and Topographica definition of Gaussian.
-gaussian_width = xsigma/BaseRN/sqrt(2)
-gaussian_height = ysigma/BaseRN/sqrt(2)
-topo.patterns.basic.Gaussian.size = gaussian_height
-topo.patterns.basic.Gaussian.aspect_ratio = gaussian_width/gaussian_height
+topo.patterns.basic.Gaussian.size = 0.06625/sqrt(2)  
+topo.patterns.basic.Gaussian.aspect_ratio = 4.0      
 topo.patterns.basic.Gaussian.bounds = input_bounds
 
-# CEBHACKALERT: something isn't working about using e.g.
-# PatternGeneratorParameter(default=X) in various places in the code
-# so I've temporarily commented out this line.
-# PatternGeneratorParameter.default=topo.patterns.basic.Gaussian()
-
-
 # LISSOM parameters
-LISSOM.density = BaseN
+LISSOM.density = 48.0    #BaseN
 
 # Connection parameters
-afferent_weight_bounds   = BoundingBox(points=((-rf_radius/BaseRN,-rf_radius/BaseRN),(rf_radius/BaseRN,rf_radius/BaseRN)))
-excitatory_weight_bounds = BoundingBox(points=((-exc_rad/BaseN,-exc_rad/BaseN),(exc_rad/BaseN,exc_rad/BaseN)))
-inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(inh_rad/BaseN,inh_rad/BaseN)))
+
+afferent_weight_bounds   = BoundingBox(points=((-0.22083333333333333,-0.22083333333333333),(0.22083333333333333,0.22083333333333333)))
+excitatory_weight_bounds = BoundingBox(points=((-0.1,-0.1),(0.1,0.1)))
+inhibitory_weight_bounds = BoundingBox(points=((-11.0/48.0,-11.0/48.0),(11.0/48.0,11.0/48.0)))
+
 
 # Specify weight initialization
 RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()
-#CFProjection.weights_generator = topo.patterns.basic.Constant()
 
 # Specify the response function
 # inlinec.optimized should make this unnecessary.
@@ -184,102 +78,36 @@ Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),
                         name='Retina')
 V1 = LISSOM(name='V1')
 
-# CEBHACKALERT: the commented-out 'weights_shape' code in each of the following
-# connect sections makes the ConnectionFields circular.
 
+input_learning_rate = 1.2739676041295835
 s.connect(Retina,V1, delay = FixedPoint("0.05"),
           connection_type=CFProjection,
           connection_params = dict(strength = 1.0, name='Afferent0',
                                    weights_bounds = afferent_weight_bounds,
-##                                     weights_shape = topo.patterns.basic.Disk(
-##                                                       size=2*rf_radius/BaseRN,
-##                                                       aspect_ratio=1.0,
-##                                                       scale=1.0,offset=0.0,
-##                                                       smoothing=0.0),
-                                   learning_rate=alpha_input))
-
-## # CEBHACKALERT: temporary - uncomment to see ON- and OFF-cell SharedWeightCFProjections
-## from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
-## from topo.base.connectionfield import CFSheet
-## from topo.projections.basic import SharedWeightCFProjection
-
-## ###  ON 
-## #
-## #
-## LGNOn = CFSheet(name='LGNOn',output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
-## LGNOn_center = s.connect(Retina,LGNOn,dest_port="center",delay = FixedPoint("0.05"),
-##                          connection_type=SharedWeightCFProjection,
-##                          connection_params = dict(strength = 1.0, name='Center',
-##                                                   weights_bounds = afferent_weight_bounds,
-##                                                   weights_generator = topo.patterns.basic.Gaussian(size=2*0.25*rf_radius/BaseRN,aspect_ratio=1),
-##                                                   ))
-## LGNOn_center.output_fn = DivisiveSumNormalize()
-
-## LGNOn_surround = s.connect(Retina,LGNOn,dest_port="surround",delay = FixedPoint("0.05"),
-##                            connection_type=SharedWeightCFProjection,
-##                            connection_params = dict(strength = -1.0, name='Surround',
-##                                                     weights_bounds = afferent_weight_bounds,
-##                                                     weights_generator = topo.patterns.basic.Gaussian(size=2*rf_radius/BaseRN,aspect_ratio=1),
-##                                                     ))
-## LGNOn_surround.output_fn = DivisiveSumNormalize(norm_value=-1.0)
+                                   learning_rate=input_learning_rate))  
 
 
-## ### OFF
-## #
-## #
-## LGNOff = CFSheet(name='LGNOff',output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
-## LGNOff_center = s.connect(Retina,LGNOff,dest_port="center",delay = FixedPoint("0.05"),
-##                          connection_type=SharedWeightCFProjection,
-##                          connection_params = dict(strength = -1.0, name='Center',
-##                                                   weights_bounds = afferent_weight_bounds,
-##                                                   weights_generator = topo.patterns.basic.Gaussian(size=0.25*rf_radius/BaseRN,aspect_ratio=1),
-##                                                   ))
-## LGNOff_center.output_fn = DivisiveSumNormalize(norm_value=-1.0)
-
-## LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoint("0.05"),
-##                            connection_type=SharedWeightCFProjection,
-##                            connection_params = dict(strength = 1.0, name='Surround',
-##                                                     weights_bounds = afferent_weight_bounds,
-##                                                     weights_generator = topo.patterns.basic.Gaussian(size=rf_radius/BaseRN,aspect_ratio=1),
-##                                                     ))
-## LGNOff_surround.output_fn = DivisiveSumNormalize()
-
-
-
-
-
-
-
+### JCALERT: Decide between both.
+#exc_learning_rate = 2.6736328125000002
+exc_learning_rate = 0.002*81*19.5*19.5/4.8/4.8
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
           connection_type=CFProjection,
-          connection_params = dict(strength = gammaexc, name='LateralExcitatory',
+          connection_params = dict(strength = 0.9, name='LateralExcitatory',
                                    weights_bounds = excitatory_weight_bounds,
-##                                     weights_shape = topo.patterns.basic.Disk(
-##                                                       size=2*exc_rad/BaseN,
-##                                                       aspect_ratio=1.0,
-##                                                       scale=1.0,offset=0.0,
-##                                                       smoothing=0.0),
-                                   learning_rate=alpha_exc))
+                                   learning_rate=exc_learning_rate))             
 
+inh_learning_rate = 2.4660253099173555
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
           connection_type=CFProjection,
-          connection_params = dict(strength = -gammainh, name='LateralInhibitory',
+          connection_params = dict(strength = -0.9, name='LateralInhibitory',
                                    weights_bounds = inhibitory_weight_bounds,
-##                                     weights_shape = topo.patterns.basic.Disk(
-##                                                       size=2*inh_rad/BaseN,
-##                                                       aspect_ratio=1.0,
-##                                                       scale=1.0,offset=0.0,
-##                                                       smoothing=0.0),
-                                   learning_rate=alpha_inh))
-        
+                                   learning_rate=inh_learning_rate))         
 
-s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.6/BaseN,-exc_rad*0.6/BaseN),(exc_rad*0.6/BaseN,exc_rad*0.6/BaseN))))
 
-s.schedule_action(500, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.42/BaseN,-exc_rad*0.42/BaseN),(exc_rad*0.42/BaseN,exc_rad*0.42/BaseN))))
-
-s.schedule_action(1000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.336/BaseN,-exc_rad*0.336/BaseN),(exc_rad*0.336/BaseN,exc_rad*0.336/BaseN))))
-
-s.schedule_action(2000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-1.0/BaseN,-1.0/BaseN),(1.0/BaseN,1.0/BaseN))))
+s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.06,-0.06),(0.06,0.06))))
+s.schedule_action(500, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.042,-0.042),(0.042,0.042))))
+s.schedule_action(1000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.0336,-0.0336),(0.0336,0.0336))))
+s.schedule_action(2000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-1.0/48.0,-1.0/48.0),(1.0/48.0,1.0/48.0))))
 
 
 # Schedule action requires a function, so we create a temporary one
@@ -288,21 +116,16 @@ def set_learning_rate(projection_name, rate):
     V1.projections()[projection_name].learning_rate=rate
 
 
-### JC: to match the new changes in the learning rate
-s.schedule_action(  200, set_learning_rate, "LateralExcitatory", 0.007*ecs*25)
-###
 
-s.schedule_action(  500, set_learning_rate, "LateralExcitatory", 0.001*ecs*25)
+s.schedule_action(  200, set_learning_rate, "LateralExcitatory", exc_learning_rate*25.0*7.0/(81.0*4.0))
+s.schedule_action(  500, set_learning_rate, "LateralExcitatory", exc_learning_rate*25.0/(81.0*4.0))
+s.schedule_action(  1000, set_learning_rate, "LateralExcitatory", exc_learning_rate/(9.0*2.0))
 
-### JC: to match the new changes in the learning rate
-s.schedule_action(  1000, set_learning_rate, "LateralExcitatory", 0.001*ecs*9)
-s.schedule_action(  2000, set_learning_rate, "LateralExcitatory", 0.001*ecs*9)
-###
 
-s.schedule_action(  500, set_learning_rate, "Afferent0", 0.005*acs*121)
-s.schedule_action( 2000, set_learning_rate, "Afferent0", 0.004*acs*121)
-s.schedule_action( 4000, set_learning_rate, "Afferent0", 0.003*acs*121)
-s.schedule_action(20000, set_learning_rate, "Afferent0", 0.0015*acs*121)
+s.schedule_action(  500, set_learning_rate, "Afferent0", input_learning_rate*0.005/0.007)
+s.schedule_action( 2000, set_learning_rate, "Afferent0", input_learning_rate*0.004/0.007)
+s.schedule_action( 4000, set_learning_rate, "Afferent0", input_learning_rate*0.003/007)
+s.schedule_action(20000, set_learning_rate, "Afferent0", input_learning_rate*0.0015/0.007)
 
 
 def set_deltabeta(x,y):
@@ -324,18 +147,3 @@ s.schedule_action(20000, set_deltabeta, 0.24, 0.88)
 # can either pass a number or FixedPoint object to s.run()
 s.run(1)
 #s.run(FixedPoint(1))
-
-
-# Set up performance profiling
-#import hotshot,hotshot.stats
-#prof = hotshot.Profile("abc")
-#prof.runctx('s.run(10000)',globals(),locals())
-#prof.close()
-
-#p = hotshot.stats.load("abc")
-#p.strip_dirs().sort_stats('cumulative','time').print_stats()
-#
-#import profile,pstats
-#profile.runctx('s.run(10000)',globals(),locals(),"abc")
-#p = pstats.Stats('abc')
-#p.strip_dirs().sort_stats('cumulative').print_stats()
