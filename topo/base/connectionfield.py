@@ -34,23 +34,6 @@ import patterngenerator
 from boundingregion import BoundingBox
 
 
-### JEFF's IMPLEMENTATION NOTES
-### 
-### Non-rectangular ConnectionField bounds
-### 
-### Under the current implementation, I don't think learning rules like
-### the one in lissom.ty will work correctly with non-rectangular
-### ConnectionField bounds.  The learning rule is written to update each
-### ConnectionField's entire weight matrix in a single step, and it will
-### (I think) modify weights that are outside the bounds.  One way to
-### handle this without having to call bounds.contains(x,y) for each and
-### every weight value is to augment the current ConnectionField
-### implementation with a 'mask' matrix of zeroes and ones indicating
-### which weights actually belong in the ConnectionField.  After doing the
-### learning step, do cf.weights *= cf.mask. jbednar: See MaskedArray
-### for an alternative.
-
-
 def hebbian(input_activity, unit_activity, weights, learning_rate):
     """Simple Hebbian learning for the weights of one single unit."""
     weights += learning_rate * unit_activity * input_activity
@@ -525,7 +508,7 @@ class CFSheet(ProjectionSheet):
         for proj in chain(*self.in_projections.values()):
             if proj.input_buffer:
                 learning_rate = proj.learning_rate
-                ### JABALERT: This code should be moved into a learn()
+                ### JABHACKALERT: This code should be moved into a learn()
                 ### function in Projection, so that individual projections
                 ### can use different arguments to their learning functions.
                 inp = proj.input_buffer
@@ -561,7 +544,7 @@ class CFSheet(ProjectionSheet):
 	(There is one UnitView for each projection to this CFSheet).
 
 	Each UnitView is then added to the sheet_view_dict of its source sheet.
-	It return the list of all UnitView for the given unit.
+	It returns the list of all UnitView for the given unit.
 	"""
 
         from itertools import chain
