@@ -117,8 +117,14 @@ acs=6.5*6.5/rf_radius/rf_radius
 ecs=19.5*19.5/exc_rad/exc_rad
 ics=47.5*47.5/inh_rad/inh_rad
 
-alpha_input=0.007*121*acs
+# 121 is the number of unit in the afferent CF (for the one at the center)
+# (as a result of the afferent weight bounds setting)
+#(it had to be added to match the former situation,
+# i.e. when the learning rate was not divided by the number of unit in the CF)
+alpha_input=0.007*acs*121
+# 81 is the number of unit in the excitatory CF (for the one at the center)
 alpha_exc=0.002*ecs*81
+# 529 is the number of unit in the inhibitory CF (for the one at the center)
 alpha_inh=0.00025*ics*529
 
 
@@ -247,10 +253,6 @@ s.connect(Retina,V1, delay = FixedPoint("0.05"),
 
 
 
-
-
-
-
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
           connection_type=CFProjection,
           connection_params = dict(strength = gammaexc, name='LateralExcitatory',
@@ -289,16 +291,13 @@ def set_learning_rate(projection_name, rate):
     V1.projections()[projection_name].learning_rate=rate
 
 
-### JC: to match the new changes in the learning rate
+# 25 is the new number of unit in the excitatory CF after re-sizing (both at 200 and at 500)
 s.schedule_action(  200, set_learning_rate, "LateralExcitatory", 0.007*ecs*25)
-###
-
 s.schedule_action(  500, set_learning_rate, "LateralExcitatory", 0.001*ecs*25)
 
-### JC: to match the new changes in the learning rate
+# 9 is the new number of unit in the excitatory CF after re-sizing (both at 1000 and at 2000)
 s.schedule_action(  1000, set_learning_rate, "LateralExcitatory", 0.001*ecs*9)
 s.schedule_action(  2000, set_learning_rate, "LateralExcitatory", 0.001*ecs*9)
-###
 
 s.schedule_action(  500, set_learning_rate, "Afferent0", 0.005*acs*121)
 s.schedule_action( 2000, set_learning_rate, "Afferent0", 0.004*acs*121)
