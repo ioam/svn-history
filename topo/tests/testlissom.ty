@@ -1,6 +1,9 @@
 """
 Test LISSOM.
 
+The values held to be true are those from Topographica release_0_8_1.
+
+
 $Id$
 """
 __version__='$Revision$'
@@ -12,18 +15,12 @@ import unittest
 # - This test is not set out properly at the moment.
 #   It's just temporary.
 #
-# - When there's a lissom_or and a reference lissom in examples,
-#   this could be based on either. Basing it on the reference
-#   one would allow this file to match output from the matching
-#   c++ lissom. At the moment, the values held to be true are just
-#   from an earlier copy of Topographica (release_0_8_1)
-#
-# 
 # - Should test change_bounds, and so on.
 
 import random
 import RandomArray
 import fixedpoint
+import pickle
 
 from math import pi, sqrt
 from fixedpoint import FixedPoint
@@ -91,96 +88,36 @@ s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
 s.run(1)
 
 
-## ## TRUE VALUES
-## from Numeric import array
-## trueV1activity_1 = array(
-##       [[ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.27334571,  0.        ,  0.08261366],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.        ,  0.92471568,  0.76125122],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.37926973,  0.65741174,  0.86127125],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.40083991,  0.68895828,  0.97197146],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.06022174,  0.94942304,  1.        ],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.18467671,  0.69651897,  1.        ],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.60182853,  0.54907107,  0.8932266 ],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.13728769,  0.52079846,  1.        ],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.        ,  0.64268149,  0.82713208],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.20107687,  0.92360782,  0.74979364]])
-
-## trueV1activity_2 = array(
-##       [[ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.34538472,  1.        ,  0.61657538,  0.53988732],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.06416103,  1.        ,  1.        ],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.36923233,  0.82861631,  0.9012422 ],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.18332895,  0.20969981,  0.65344508],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.        ,  0.17814224,  0.3666562 ],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.        ,  0.        ,  0.18075178],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.        ,  0.        ,  0.        ],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.        ,  0.        ,  0.        ],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.        ,  0.        ,  0.        ],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.        ,  0.        ,  0.        ]])
-
-## trueV1activity_100 = array(
-##       [[ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.0429653 ,
-##               0.37711795,  0.69355468,  0.75251413,  0.30554503],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.23883142,  0.71327684,  1.        ,  0.89351008],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.11273628,  0.64297123,  1.        ,  1.        ],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.48084402,  1.        ,  1.        ],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.27324687,  0.83362933,  1.        ],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.15434021,  0.63631241,  0.99712805],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.05253128,  0.45349255,  0.809277  ],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.        ,  0.25930858,  0.59356242],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.        ,  0.09876822,  0.41083722],
-##        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-##               0.        ,  0.        ,  0.00516545,  0.25693518]])
-
-
 class TestLissom(unittest.TestCase):
 
 
     def test_activity(self):
         """
         """
+        # {time: activity}
+        trueV1activities = pickle.load(open("topo/tests/testlissom.data","r"))
+        
         n_rows,n_cols = V1.activity.shape
         for i in range(n_rows):
             for j in range(n_cols):
-                pass#self.assertEqual(V1.activity[i,j],trueV1activity_1[i,j])
+                self.assertEqual(V1.activity[i,j],trueV1activities[1][i,j])
 
         s.run(1)
         for i in range(n_rows):
             for j in range(n_cols):
-                pass#self.assertEqual(V1.activity[i,j],trueV1activity_2[i,j])
+                self.assertEqual(V1.activity[i,j],trueV1activities[2][i,j])
 
         s.run(98)
         for i in range(n_rows):
             for j in range(n_cols):
-                pass#self.assertEqual(V1.activity[i,j],trueV1activity_100[i,j])
+                self.assertEqual(V1.activity[i,j],trueV1activities[100][i,j])
 
+        # guard against testlissom.data just pointing to current V1.activity!
+        V1.activity*=3
+        self.assertNotEqual(sum(V1.activity.flat),sum(trueV1activities[100].flat))
+
+
+        
 
 suite = unittest.TestSuite()
 suite.addTest(unittest.makeSuite(TestLissom))
