@@ -51,7 +51,7 @@ topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5))
 
 LISSOM.density = 10.0
 
-afferent_weight_bounds   = BoundingBox(points=((-0.1,-0.1),(0.1,0.1)))
+afferent_weight_bounds   = BoundingBox(points=((-0.2,-0.2),(0.2,0.2)))
 excitatory_weight_bounds = BoundingBox(points=((-0.1,-0.1),(0.1,0.1)))
 inhibitory_weight_bounds = BoundingBox(points=((-0.1,-0.1),(0.1,0.1)))
 
@@ -115,8 +115,6 @@ class TestLissom(unittest.TestCase):
         # guard against testlissom.data just pointing to current V1.activity!
         V1.activity*=3
         self.assertNotEqual(sum(V1.activity.flat),sum(trueV1activities[100].flat))
-
-
         
 
 suite = unittest.TestSuite()
