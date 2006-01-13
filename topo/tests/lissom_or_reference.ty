@@ -110,7 +110,9 @@ ysigma=1.5/rf_radius_scale
 
 scale_input=1.0
 
-retina_edge_buffer=rf_radius-1 # JABALERT: Need to check this calculation.
+# CEBHACKALERT: need to check this calculation.
+#retina_edge_buffer=rf_radius-1
+retina_edge_buffer=rf_radius
 
 RN=BaseRN*area_scale+2*retina_edge_buffer
 
@@ -148,9 +150,10 @@ random.seed(1234)
 topo.patterns.basic.Gaussian.scale = scale_input
 # take the input pattern position parameters from the log file output of the equivalent c++ simulation
 n_inputs,input_x,input_y,input_orientation = topo.tests.lissom_log_parser.get_input_params(log_file="topo/tests/or_map_topo.log")
+
 print "Number of patterns available for learning iterations:",n_inputs
-topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : input_x.next()/BaseRN-0.5)
-topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : input_y.next()/BaseRN-0.5)
+topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : input_x.next()/BaseRN-0.5-retina_edge_buffer/BaseRN)
+topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : input_y.next()/BaseRN-0.5-retina_edge_buffer/BaseRN)
 topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda : 2.0*pi*input_orientation.next()/360.0)
 
 # Corrects for differences between C++ and Topographica definition of Gaussian.
