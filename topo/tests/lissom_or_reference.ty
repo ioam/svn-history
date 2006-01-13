@@ -176,8 +176,7 @@ inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(
 
 # Specify weight initialization
 RandomArray.seed(500,500)
-CFProjection.weights_generator = topo.patterns.random.UniformRandom()
-#CFProjection.weights_generator = topo.patterns.basic.Constant()
+CFProjection.weights_generator = topo.patterns.basic.Constant()
 
 # Specify the response function
 # inlinec.optimized should make this unnecessary.
