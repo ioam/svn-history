@@ -150,6 +150,8 @@ random.seed(1234)
 topo.patterns.basic.Gaussian.scale = scale_input
 # take the input pattern position parameters from the log file output of the equivalent c++ simulation
 n_inputs,input_x,input_y,input_orientation = topo.tests.lissom_log_parser.get_input_params(log_file="topo/tests/or_map_topo.log")
+# CEBHACKALERT: I seem to have to skip the first of C++ LISSOM's inputs?
+n_inputs-=1;input_x.next();input_y.next();input_orientation.next()
 
 print "Number of patterns available for learning iterations:",n_inputs
 topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : input_x.next()/BaseRN-0.5-retina_edge_buffer/BaseRN)
