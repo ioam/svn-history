@@ -234,9 +234,9 @@ class EditorCanvas(Canvas) :
 	focus = self.getXY(self.canvasx(event.x), self.canvasy(event.y)) 
 	if (focus != None) :
 		focus.setFocus(True) # give it the focus
-	self.focus = focus
-	# create the popup menu at current mouse coord
-	self.menu.tk_popup(event.x_root, event.y_root)
+		self.focus = focus
+		# create the popup menu at current mouse coord
+		self.menu.tk_popup(event.x_root, event.y_root)
         
     ############## Util ############################################
 
@@ -331,7 +331,6 @@ class ModelEditor :
 		for conList in node.out_connections.values() :
 			for con in conList :
 				guiCon = EditorProjection("", self.canvas, guiNode)
-				guiNode.attatchCon(guiCon, guiCon.FROM)
 				for guiNDest in self.canvas.objectList :
 					if (guiNDest.sheet == con.dest) :
 						dest = guiNDest
@@ -340,6 +339,5 @@ class ModelEditor :
 					print "Incomplete connection : ", con
 					break
 				guiCon.connect(dest, con)
-				dest.attatchCon(guiCon, guiCon.TO)
 				dest.draw()
 		guiNode.draw()
