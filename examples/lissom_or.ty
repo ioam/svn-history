@@ -77,8 +77,7 @@ Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),
 V1 = LISSOM(name='V1')
 
 
-### temporary comment for developpers only: original value was 1.2749676041295835
-input_learning_rate = 1.274       
+### temporary comment for developpers only: original value for learning rate was 1.2749676041295835
 s.connect(Retina,V1, delay = FixedPoint("0.05"),
           connection_type=CFProjection,
           connection_params = dict(strength = 1.0, name='Afferent0',
@@ -119,11 +118,14 @@ s.schedule_action(  500, set_learning_rate, "LateralExcitatory", 0.205)
 s.schedule_action(  1000, set_learning_rate, "LateralExcitatory", 0.149) 
 
 
-
-s.schedule_action(  500, set_learning_rate, "Afferent0", input_learning_rate*0.7142857142857143)
-s.schedule_action( 2000, set_learning_rate, "Afferent0", input_learning_rate*0.5714285714285714)
-s.schedule_action( 4000, set_learning_rate, "Afferent0", input_learning_rate*0.42857142857142855)
-s.schedule_action(20000, set_learning_rate, "Afferent0", input_learning_rate*0.21428571428571427)
+### temporary comment for developpers only: original value was 0.91069114580684529
+s.schedule_action(  500, set_learning_rate, "Afferent0", 0.911)
+### temporary comment for developpers only: original value was 0.72855291664547617
+s.schedule_action( 2000, set_learning_rate, "Afferent0", 0.729)
+### temporary comment for developpers only: original value was 0.54641468748410715
+s.schedule_action( 4000, set_learning_rate, "Afferent0", 0.545)
+### temporary comment for developpers only: original value was 0.27320734374205358
+s.schedule_action(20000, set_learning_rate, "Afferent0", 0.273)
 
 
 def set_deltabeta(x,y):
