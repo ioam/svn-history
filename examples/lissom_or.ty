@@ -83,23 +83,21 @@ s.connect(Retina,V1, delay = FixedPoint("0.05"),
           connection_type=CFProjection,
           connection_params = dict(strength = 1.0, name='Afferent0',
                                    weights_bounds = afferent_weight_bounds,
-                                   learning_rate=input_learning_rate))  
+                                   learning_rate=1.274))  
 
-### temporary comment for developpers only: original value was 2.6736328125000002   
-exc_learning_rate = 2.674          
+### temporary comment for developpers only: original value for learning_rate was 2.6736328125000002   
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
           connection_type=CFProjection,
           connection_params = dict(strength = 0.9, name='LateralExcitatory',
                                    weights_bounds = excitatory_weight_bounds,
-                                   learning_rate=exc_learning_rate)) 
+                                   learning_rate=2.674)) 
             
-### temporary comment for developpers only: original value was 2.4660253099173555
-inh_learning_rate = 2.466
+### temporary comment for developpers only: original value for learning rate was 2.4660253099173555
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
           connection_type=CFProjection,
           connection_params = dict(strength = -0.9, name='LateralInhibitory',
                                    weights_bounds = inhibitory_weight_bounds,
-                                   learning_rate=inh_learning_rate))         
+                                   learning_rate=2.466))         
 
 
 s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.06,-0.06),(0.06,0.06))))
@@ -114,9 +112,12 @@ def set_learning_rate(projection_name, rate):
 
 
 ### temporary comment for developpers only: original value was 1.444091796875
-s.schedule_action(  200, set_learning_rate, "LateralExcitatory", exc_learning_rate*0.54012345679012341)
-s.schedule_action(  500, set_learning_rate, "LateralExcitatory", exc_learning_rate*0.07716049382716049)
-s.schedule_action(  1000, set_learning_rate, "LateralExcitatory", exc_learning_rate*0.055555555555555552) 
+s.schedule_action(  200, set_learning_rate, "LateralExcitatory", 1.445)
+### temporary comment for developpers only: original value was 0.206298828125
+s.schedule_action(  500, set_learning_rate, "LateralExcitatory", 0.205)
+### temporary comment for developpers only: original value was 0.14853515624999999
+s.schedule_action(  1000, set_learning_rate, "LateralExcitatory", 0.149) 
+
 
 
 s.schedule_action(  500, set_learning_rate, "Afferent0", input_learning_rate*0.7142857142857143)
