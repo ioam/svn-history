@@ -52,7 +52,7 @@ LISSOM.density = 48.0
 
 afferent_weight_bounds   = BoundingBox(points=((-0.22083333333333333,-0.22083333333333333),(0.22083333333333333,0.22083333333333333)))
 excitatory_weight_bounds = BoundingBox(points=((-0.1,-0.1),(0.1,0.1)))
-inhibitory_weight_bounds = BoundingBox(points=((-11.0/48.0,-11.0/48.0),(11.0/48.0,11.0/48.0)))
+inhibitory_weight_bounds = BoundingBox(points=((-0.22916666666666666,-0.22916666666666666),(0.22916666666666666,0.22916666666666666)))
 
 
 # Specify weight initialization
@@ -85,7 +85,7 @@ s.connect(Retina,V1, delay = FixedPoint("0.05"),
                                    learning_rate=input_learning_rate))  
 
 
-exc_learning_rate = 2.6736328125000002   #0.002*81*19.5*19.5/4.8/4.8
+exc_learning_rate = 2.6736328125000002   
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
           connection_type=CFProjection,
           connection_params = dict(strength = 0.9, name='LateralExcitatory',
@@ -103,7 +103,7 @@ s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
 s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.06,-0.06),(0.06,0.06))))
 s.schedule_action(500, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.042,-0.042),(0.042,0.042))))
 s.schedule_action(1000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.0336,-0.0336),(0.0336,0.0336))))
-s.schedule_action(2000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-1.0/48.0,-1.0/48.0),(1.0/48.0,1.0/48.0))))
+s.schedule_action(2000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.020833333333333332,-0.020833333333333332),(0.020833333333333332,0.020833333333333332))))
 
 
 # Schedule action requires a function, so we create a temporary one
@@ -113,15 +113,15 @@ def set_learning_rate(projection_name, rate):
 
 
 
-s.schedule_action(  200, set_learning_rate, "LateralExcitatory", exc_learning_rate*25.0*7.0/(81.0*4.0))
-s.schedule_action(  500, set_learning_rate, "LateralExcitatory", exc_learning_rate*25.0/(81.0*4.0))
-s.schedule_action(  1000, set_learning_rate, "LateralExcitatory", exc_learning_rate/(9.0*2.0))
+s.schedule_action(  200, set_learning_rate, "LateralExcitatory", exc_learning_rate*0.54012345679012341)
+s.schedule_action(  500, set_learning_rate, "LateralExcitatory", exc_learning_rate*0.07716049382716049)
+s.schedule_action(  1000, set_learning_rate, "LateralExcitatory", exc_learning_rate*0.055555555555555552) 
 
 
-s.schedule_action(  500, set_learning_rate, "Afferent0", input_learning_rate*0.005/0.007)
-s.schedule_action( 2000, set_learning_rate, "Afferent0", input_learning_rate*0.004/0.007)
-s.schedule_action( 4000, set_learning_rate, "Afferent0", input_learning_rate*0.003/007)
-s.schedule_action(20000, set_learning_rate, "Afferent0", input_learning_rate*0.0015/0.007)
+s.schedule_action(  500, set_learning_rate, "Afferent0", input_learning_rate*0.7142857142857143)
+s.schedule_action( 2000, set_learning_rate, "Afferent0", input_learning_rate*0.5714285714285714)
+s.schedule_action( 4000, set_learning_rate, "Afferent0", input_learning_rate*0.42857142857142855)
+s.schedule_action(20000, set_learning_rate, "Afferent0", input_learning_rate*0.21428571428571427)
 
 
 def set_deltabeta(x,y):
