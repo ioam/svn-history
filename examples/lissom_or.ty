@@ -26,8 +26,8 @@ from topo.patterns import PatternGeneratorParameter
 ###########################################
 # Set parameters
 
-input_bounds = BoundingBox(points=((-0.6791666666666667,-0.6791666666666667),
-				   ( 0.6791666666666667, 0.6791666666666667)))
+input_bounds = BoundingBox(points=((-0.6792,-0.6792),
+				   ( 0.6792, 0.6792))) 
 
 GeneratorSheet.density = 24.0 
 GeneratorSheet.period = 1
@@ -41,7 +41,7 @@ topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : random.uniform(-0.5,0.5)
 topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
 
 # Corrects for differences between C++ and Topographica definition of Gaussian.
-topo.patterns.basic.Gaussian.size = 0.06625/sqrt(2)  
+topo.patterns.basic.Gaussian.size = 0.046845824253608774  
 topo.patterns.basic.Gaussian.aspect_ratio = 4.0      
 topo.patterns.basic.Gaussian.bounds = input_bounds
 
