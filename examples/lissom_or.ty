@@ -50,7 +50,7 @@ LISSOM.density = 48.0
 
 # Connection parameters
 
-afferent_weight_bounds   = BoundingBox(points=((-0.22083333333333333,-0.22083333333333333),(0.22083333333333333,0.22083333333333333)))
+afferent_weight_bounds   = BoundingBox(points=((-0.22,-0.22),(0.22,0.22)))
 excitatory_weight_bounds = BoundingBox(points=((-0.1,-0.1),(0.1,0.1)))
 inhibitory_weight_bounds = BoundingBox(points=((-0.22916666666666666,-0.22916666666666666),(0.22916666666666666,0.22916666666666666)))
 
