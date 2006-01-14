@@ -77,22 +77,24 @@ Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),
 V1 = LISSOM(name='V1')
 
 
-input_learning_rate = 1.2739676041295835
+### temporary comment for developpers only: original value was 1.2749676041295835
+input_learning_rate = 1.274       
 s.connect(Retina,V1, delay = FixedPoint("0.05"),
           connection_type=CFProjection,
           connection_params = dict(strength = 1.0, name='Afferent0',
                                    weights_bounds = afferent_weight_bounds,
                                    learning_rate=input_learning_rate))  
 
-
-exc_learning_rate = 2.6736328125000002   
+### temporary comment for developpers only: original value was 2.6736328125000002   
+exc_learning_rate = 2.674          
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
           connection_type=CFProjection,
           connection_params = dict(strength = 0.9, name='LateralExcitatory',
                                    weights_bounds = excitatory_weight_bounds,
-                                   learning_rate=exc_learning_rate))             
-
-inh_learning_rate = 2.4660253099173555
+                                   learning_rate=exc_learning_rate)) 
+            
+### temporary comment for developpers only: original value was 2.4660253099173555
+inh_learning_rate = 2.466
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
           connection_type=CFProjection,
           connection_params = dict(strength = -0.9, name='LateralInhibitory',
@@ -111,7 +113,7 @@ def set_learning_rate(projection_name, rate):
     V1.projections()[projection_name].learning_rate=rate
 
 
-
+### temporary comment for developpers only: original value was 1.444091796875
 s.schedule_action(  200, set_learning_rate, "LateralExcitatory", exc_learning_rate*0.54012345679012341)
 s.schedule_action(  500, set_learning_rate, "LateralExcitatory", exc_learning_rate*0.07716049382716049)
 s.schedule_action(  1000, set_learning_rate, "LateralExcitatory", exc_learning_rate*0.055555555555555552) 
