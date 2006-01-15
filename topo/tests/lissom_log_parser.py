@@ -1,3 +1,5 @@
+# CEBHACKALERT: filename should change...
+
 def get_input_params(log_file='or_map_topo.log'):
     """
     Return iterators over list of float values for C++ LISSOM's cx, cy, and theta.
@@ -30,3 +32,28 @@ def get_input_params(log_file='or_map_topo.log'):
     return n_inputs,iter(x),iter(y),iter(orientation)
 
 
+# CEBHACKALERT: this kind of function probably exists somewhere
+# already. In any case, needs to print out meaningful errors.
+def get_matrix(matrix_file,dim):
+    """
+    """
+    f = open(matrix_file)
+
+    n_rows_read = 0
+
+    matrix = []
+    
+    for line in f.readlines():
+        row = []
+        
+        if not line.startswith('#'):
+            values = line.split()
+            assert len(values)==dim[0]
+            for v in values:
+                row.append(float(v))
+            n_rows_read+=1
+            matrix.append(row)
+
+    assert n_rows_read==dim[1]
+
+    return matrix
