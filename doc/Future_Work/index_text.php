@@ -253,8 +253,8 @@ significant changes to the simulator.
 <!-- 
   Should be able to do this without significant
   changes to the code, by adding a parallel Simulator class and proxies
-  for the EPs.  E.g. for shared memory threads, need two new classes
-  ThreadedSimulator and EPThreadProxy:
+  for the EPs and Connections. E.g. for shared memory threads, need
+  two new classes ThreadedSimulator and EPThreadProxy:
 
   - Each time an EP is added to  the simulator it's wrapped in an
     EPThreadProxy that intercepts all calls between the Simulator
@@ -268,7 +268,8 @@ significant changes to the simulator.
 -->
 
 <P>Fine-grained parallelism is also possible, distributing computation
-for different units or subregions of a single Sheet across different
+for different units or subregions of a single Sheet, or different
+parts of a Projection across different
 processors.  This has been implemented on a prototype version for a
 shared-memory Cray MPP machine, and may be brought into the main
 release if it can be made more general.  Such fine-grained parallelism
@@ -348,12 +349,12 @@ contributions are very welcome!
 
   - Configure GUI to pop up a requestor for urgent-enough messages.
   
-  - Consider supporting 1D and 3D line-based plotting such plots, using
-    e.g. Matplotlib or Pyx, though this can possibly be postponed to the
-    next milestone.
+  - Consider supporting 1D and 3D line-based plotting, using
+    e.g. Matplotlib or Pyx, though this can possibly be postponed to
+    the next milestone.
   
-  - Add intersections and unions, which are needed when RFs extend past
-    the edge of a sheet. (intersections done)
+  - Add bounding intersections and unions, which are needed when RFs
+    extend past the edge of a sheet. (intersections done)
   
   - Make sure that most parameters use bounded ranges.
   
@@ -409,9 +410,99 @@ release and start heavily marketing the software to all potential
 users, trying to convince them to switch from whatever they are
 currently using to Topographica.  
 
-See the Topographica grant proposal, and notes sent to Eyal Seidemann
-'Tue, 6 Sep 2005 18:16:52 +0100'.  This milestone will include things
-like GUI-based network building, algorithms other than LISSOM and SOM,
-libraries of other learning rules and neuron types, etc.
+Also see the Topographica grant proposal.  This milestone will include
+things like GUI-based network building, algorithms other than LISSOM
+and SOM, libraries of other learning rules and neuron types, etc.
 
+_______________________________________________________________________________
+
+From Tue Sep  6 15:32:25 BST 2005 meeting with Eyal
+
+Major issues
+------------
+
+Overall, the documentation and software need to separate 'Learning and
+self-organization' from 'Representing signals in topographic maps' and
+'Understanding topographic maps'.
+
+Should allow the user to specify the parameters and network setup
+themselves, instead of having a learned map.  (E.g. select tuning
+width, connection types, etc.)  
+
+It should also be possible to import a map measured in the lab into
+Topographica, then allow the user to try it out by synthesizing a
+network based on that data.
+
+More ambitiously, could start out with the above rough sketch of a
+network, then auto-optimize parameters to match a set of behavioral
+observations.  --> Longer-term project; will need ways to explore the
+space of possible models matching those observations.
+
+In general, it would be useful to start with a set of observations,
+and select parameters that match that. 
+
+Should be able to specify (parametrically?) the tuning properties, and
+of course measure and display those.
+
+Need to have some representation of receptive fields, mapped onto
+actual size units in the world.
+
+Need to be able to map things to millimeters of cortex, and degrees of
+visual angle.  E.g. need to be able to map measured locations in the
+visual cortex into the model, or even map the measured retinotopic
+grid directly into the model.
+
+Color lookup tables for plotting -- user needs to pick them, and need
+to have keys shown as a color bar.  Also needs to control the
+baseline, clipping range, etc. and to have a clipping warning light.
+
+For Eyal's work, adding realistic dynamics is key, including being
+able to control the time course, e.g. with various delays.  E.g. it
+would be great to have a movie showing the time course of an
+activation.  Usually they look at an array of activation patterns, 10
+images per row, and then average groups of e.g. 10 frames or subsample
+them.  They would usually want to simulate to match the measurement
+interval, e.g. 100 Hz, then average for display...
+
+Should study how to add noise to the system.  Both neural noise and
+measurement noise are important, including e.g. spatial correlations
+(due to lateral connections or feedback?) in spontaneous or evoked
+activity, and e.g. how they vary with different assumptions about the
+connectivity.
+
+In general, it's an open issue how to have a network with a good
+dynamic range but still stable, given background levels of activity,
+spontaneous activity in darkness, etc.; will be worth studying.
+
+
+Less crucial points
+-------------------
+
+For the display, will be useful to have the units displayed on screen,
+etc.
+
+For plotting styles, check Shmuel and Grinvald and Fitzpatrick lab
+(e.g. does anyone else have OR-colored activity patterns?).
+
+Array of curves plots:
+If they start with an image of 1000x1000 pixels, they bin the data to
+100x100 pixel blocks, then plot the average time course of the
+response, as a single curve for each condition (x is time, y is change
+in fluorescence).  Then each of 100 panels will show 5 or 6 different
+curves for different experimental conditions.  (Similar to EEG data --
+shows spatial location of small differences between conditions.)
+
+Need good plots of receptive fields -- with the location and size
+plotted on the retina.
+
+Minor points for the tutorial:
+
+   When we show the plots, we have white outlines around the lateral
+   connections, but don't ever explain them. (easily fixed)
+  
+   Should show a color bar, and allow user to modify the clipping
+   range, etc. (not likely to be fixed in LISSOM, but will be done in
+   Topographica).
+  
+   Explain some of the parameters better (should be easily fixed)
 -->
