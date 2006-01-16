@@ -90,7 +90,7 @@ def update_activity():
         activity_copy = array(sheet.activity)
         new_view = SheetView((activity_copy,sheet.bounds),
                               src_name=sheet.name,view_type='Activity')
-        sheet.add_sheet_view('Activity',new_view)
+        sheet.sheet_view_dict['Activity']=new_view
     
 
 
