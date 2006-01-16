@@ -504,55 +504,43 @@ class CFSheet(ProjectionSheet):
                 cfs = proj.cfs
                 proj.learning_fn(cfs, inp, self.activity, learning_rate)
 
-    
-    ### JABALERT
-    ###
-    ### Need to figure whether this code (and sheet_view) is ok,
-    ### i.e. whether there really is any need to handle multiple views
-    ### from the same call.
-    ###
-    ### JABHACKALERT!
-    ###
-    ### This code should be checking to see if the projection is a CFProjection
-    ###
-    ### This code is outdated, because it was originally meant to
-    ### retrieve a unit view from the database, and had to be
-    ### different from sheet_view() because of needing to supply x,y.
-    ### Now, the sheet_view_dict accepts keys of any type, and
-    ### UnitView keys encode the x,y directly.  Thus the lookup
-    ### function is no longer needed.  Instead, this code is now used
-    ### for installing UnitViews in the sheet_view_dict, and so it
-    ### should be renamed to update_unit_view(self,x,y), or something
-    ### like that.  In addition, it should probably accept a
-    ### projection parameter so that individual projections can be
-    ### updated; otherwise a Projection plot will result in a huge
-    ### number of wasted UnitView additions.
-    ### When None is chosen, it is done for all the projection.
-    def unit_view(self,x,y):
+
+                
+    def update_unit_view(self,x,y,projection_name=None):
         """
 	Creates the list of UnitView objects for a particular unit in this CFSheet,
 	(There is one UnitView for each projection to this CFSheet).
 
 	Each UnitView is then added to the sheet_view_dict of its source sheet.
 	It returns the list of all UnitView for the given unit.
-	"""
-
+	"""     
+        ### JCALERT! The use of the chain function (here and in projection.py)
+        ### could be deleted after re-organizing the way projections are stored
+        ### in self.in_projections. I think there is no need to store a list at all.
+        ### (see ProjectionSheet in projection.py)
         from itertools import chain
-        views = [p.get_view(x,y) for p in chain(*self.in_projections.values())]
+        in_projections = [p for p in chain(*self.in_projections.values())]
 
-        # Delete previous entry if it exists.  Allows appending in next block.
-        for v in views:
-	    key = ('Weights',v.projection.dest.name,v.projection.name,x,y)
-            if v.projection.src.sheet_view_dict.has_key(key):
-                v.projection.src.release_sheet_view(key)
+        # We check that all the projections are CFProjection
+        for p in in_projections:
+            if not isinstance(p,CFProjection):
+                ### JCALERT! Choose if we raise an error or if we just delete the
+                ### Non-CFProjection from the in_projection list.
+                raise ValueError("projection has to be a CFProjection in order to build UnitView.")
+            
+        if projection_name == None:
+            projection_filter = lambda p: True
+        else:
+            projection_filter = lambda p: p.name==projection_name
+            
+        views = [p.get_view(x,y) for p in in_projections if projection_filter(p)]
 
         for v in views:
             src = v.projection.src
             key = ('Weights',v.projection.dest.name,v.projection.name,x,y)
-	    src.add_sheet_view(key,v)
-            self.debug('Added to sheet_view_dict', views, 'at', key)
-
-        return views
-
+            src.sheet_view_dict[key] = v
+       
+        
+    ### JCALERT! This should probably be deleted...
     def release_unit_view(self,x,y):
         self.release_sheet_view(('Weights',x,y))
