@@ -63,12 +63,6 @@ class ProjectionPanel(CFSheetPlotPanel):
         self.de.bind('<Return>', self.refresh)
         self.de.pack(side=LEFT,expand=YES,fill=X,padx=2)
 
-	### JCALERT! This parameter is temporary, it could be replaced by accessing the activity
-        ###  matrix of the Sheet corresponding to the parameter self.region
-        ### It has to be changed in CfSheetPlotPanel to have a parameter region that is a Sheet Object
-        ### and then access its name.
-	self.shape=(0,0)
-
         self._add_projection_menu()
 
         self.auto_refresh_checkbutton.invoke()
