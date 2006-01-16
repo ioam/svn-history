@@ -214,7 +214,12 @@ stable version at any time by doing:
   make all
 </pre>
 
-As before, <code>-r LATEST_STABLE</code> can be omitted to get the
-very most recent version.  Note that updating the examples/
-subdirectory sometimes takes a long time, if the sample saved snapshot
-has been updated.
+If you want the very most recent version, stable or not, replace
+<code>-r LATEST_STABLE</code> with <code>-A</code> to force a complete
+update.  Note that updating the examples/ subdirectory sometimes takes
+a long time, if the sample saved snapshot has been updated.
+Similarly, updating the external/ subdirectory sometimes takes a long
+time, if some of the external packages have been upgraded, and in that
+case the "make all" can also take some time to build.
+
+
