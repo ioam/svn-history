@@ -21,16 +21,12 @@ from topo.base.connectionfield import CFSheet
 from plot import Plot, make_plot
 import bitmap
 
-### JABALERT: This constant (and PlotGroup.shape) should be removed
-### for now, though it may be reinstated some day.
-FLAT = 'FLAT'
 
 def sort_plots(plot_list):
     """Sort a (static) plot list according to the src_names."""
     plot_list.sort(lambda x, y: cmp(x.view_info['src_name'], y.view_info['src_name']))
 
-#### REPLACING Plotengine #########
-
+# PlotGroup used by the simulation are stored in this dictionnary
 plotgroup_dict = {}
 
 
@@ -46,7 +42,7 @@ class PlotGroup(TopoObject):
     ### also review the doc of each functions.
     ### - rewrite the test file.
 
-    def __init__(self,simulator,template,plot_group_key,sheet_name=None,plot_list=[],shape=FLAT,**params):
+    def __init__(self,simulator,template,plot_group_key,sheet_name=None,plot_list=[],**params):
         """
         plot_list can be of two types: 
         1.  A list of Plot objects that can return bitmaps when requested.
@@ -58,11 +54,6 @@ class PlotGroup(TopoObject):
         self.all_plots = []
         self.added_list = []
 
-        # Shape of the plotting display used by PlotGroup.
-        #
-        # Allowable shapes include:
-        ### JABALERT: What shapes are already supported, right now?
-        #
         # In the future, it might be good to be able to specify the
         # plot rows and columns using tuples.  For instance, if three
         # columns are desired with the plots laid out from left to
@@ -71,7 +62,6 @@ class PlotGroup(TopoObject):
         # would have the first row with 3, the second row with 2, the
         # third row with 4, etc.  The default left-to-right ordering
         # in one row could perhaps be represented as (None, Inf).
-        self.shape = shape
         
         self.plot_group_key = plot_group_key
         self.bitmaps = []
@@ -84,9 +74,8 @@ class PlotGroup(TopoObject):
         ### plots, using a member function like plots() (a merger of
         ### initialize_plot_list() and the current plots()) that for a
         ### PlotGroup returns the static list, but for a
-        ### TemplatePlotGroup generates the list anew each time, based
-        ### on the template.
-        
+        ### TemplatePlotGroup generates the list a new each time, based
+        ### on the template.      
         self.template = template
         
 	# If no sheet_name is defined, the sheet_filter_lam accepts all sheets
@@ -96,10 +85,10 @@ class PlotGroup(TopoObject):
             self.sheet_filter_lam = lambda s : True
 
 	self.simulator = simulator
-
+        
 	self.plot_list = lambda: self._initialize_plot_list(plot_list)
-
-	# record the PlotGroup in plot_group_dict
+        
+	# store the PlotGroup in plot_group_dict
 	plotgroup_dict[plot_group_key]=self
 
 
@@ -109,7 +98,6 @@ class PlotGroup(TopoObject):
         i.e. the list of plot that are specified by the PlotGroup template.
 
         This function calls create_plots, that is implemented in each PlotGroup subclasses.
-        (In particular, this needs to be different for UnitWeightsPlotGroup and ProjectionPlotGroup)
         """
 	sheet_list = [each for each in dict_sort(self.simulator.objects(Sheet)) if self.sheet_filter_lam(each)]      
         # Loop over all sheets that passed the filter.
@@ -117,7 +105,7 @@ class PlotGroup(TopoObject):
         #         Call the create_plots function to create the according plot
         for each in sheet_list:
 	    ### JCALERT! This test can be later removed when improving testpattern.py
-            ### (for the moment call to PlotGroup from testpattern lead to self.template=None
+            ### (for the moment call to PlotGroup from testpattern lead to self.template=None)
 	    if self.template != None :
 		for (pt_name,pt) in self.template.plot_templates:
 		    plot_list= plot_list + self.create_plots(pt_name,pt,each)
@@ -131,22 +119,6 @@ class PlotGroup(TopoObject):
         of already created plots when creating a PlotGroup.
 	"""       
 	return []
-    
-
-    ### JCALERT! do_plot_cmd() should be deleted here and in all sub-classes
-    ### and be replaced by the command assigned from the PlotGroupTemplate
-    ### (e.g measure_or_pref,measure_activity) and executed from the panel class.
-    ### All these function will have to go in a special separate file  
-    ### (measure_or_pref and measure_activity being in analysis/featuremap.py for the moment). 
-    ### That will also enable to makes the different panel acting more uniformly,
-    ### and might allow to delete basicplotgrouppanel.py
-    def do_plot_cmd(self):
-        """
-        Command called when plots need to be generated.
-        
-        Subclasses of PlotGroup will need to create this function.
-        """
-        pass
     
 
     def load_images(self):
