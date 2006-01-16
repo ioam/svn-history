@@ -120,7 +120,6 @@ class ProjectionFile(PlotFileSaver):
 	    pg = ProjectionPlotGroup(self.sim,pgt,self.plot_group_key,
 				self.region,[])
 
-        pg.do_plot_cmd()
         self.bitmaps = pg.load_images()
         
 
