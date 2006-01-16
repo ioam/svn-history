@@ -218,6 +218,7 @@ class ProjectionPanel(CFSheetPlotPanel):
         coords = self.pe_group.generate_coords()
         topo.analysis.updatecommands.proj_coords = coords
 	topo.analysis.updatecommands.sheet_name = self.region.get()
+        topo.analysis.updatecommands.proj_name = self.weight_name.get()
         exec self.cmdname.get()      
         # self.situate is defined in the super class CFSheetPlotPanel
         self.pe_group.situate= self.situate

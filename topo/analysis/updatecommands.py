@@ -96,7 +96,6 @@ def update_activity():
 
 coordinate = (0,0)
 sheet_name = ''
-
 ### JACALERT! This function, as well as update_projections have to be simplified.
 ### Particularly, having to retrieve the Sheet object from the sheet_name is an issue:
 ### It might be better to have access to the Sheet object directly rather then the name 
@@ -106,7 +105,6 @@ def update_weights():
     Lambda function passed in, that will filter out all sheets
     except the one with the name being looked for.
     """
-    ### JCALERT! Talk with Chris to see if we can keep the call to active_sim here
     simulator=topo.base.simulator.get_active_sim()
     sheets = simulator.objects(Sheet).values()
     x = coordinate[0]
@@ -116,15 +114,16 @@ def update_weights():
             ### JCALERT! It is confusing that the method unit_view is only defined in the 
             ### CFSheet class, and that we are supposed to manipulate sheets here.
             ### also, it is supposed to return a view, but here it is used as a procedure.
-	    each.unit_view(x,y)
+	    each.update_unit_view(x,y)
+
 
 
 proj_coords=[(0,0)]
+proj_name =''
 def update_projections():
-    ### JCALERT! Talk with Chris to see if we can keep the call to active_sim here
     simulator=topo.base.simulator.get_active_sim()
     sheets = simulator.objects(Sheet).values()
     for each in sheets:
 	if (each.name == sheet_name):
 	    for x,y in proj_coords:
-		each.unit_view(x,y)
+		each.update_unit_view(x,y,proj_name)
