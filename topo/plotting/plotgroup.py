@@ -252,12 +252,11 @@ class UnitWeightsPlotGroup(PlotGroup):
 		plot_channels['Strength'] = key			       
 		plot_list.append(make_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
 				      p.src.bounds,pt['Normalize'],self.situate,name=plot_name))
-
         self.debug('plot_list =' + str(plot_list))
         return plot_list
 
 
-   
+
 class ProjectionPlotGroup(PlotGroup):
     """
     PlotGroup for Projection Plots
@@ -267,13 +266,15 @@ class ProjectionPlotGroup(PlotGroup):
        
         self.weight_name = plot_group_key[1]
         self.density = float(plot_group_key[2])
-	self.coords = [(0,0)]
-    
-	self.situate = False
 
+        ### JCALERT! shape determined by the plotting density
+        ### This is set by self.generate_coords()
+        self.proj_plotting_shape = (0,0)
+
+	self.situate = False
+        
         super(ProjectionPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,
                                                    plot_list,**params)
-
 	### JCALERT! It is a bit confusing, but in the case of the projection
         ### sheet_filter_lam filter to one single sheet...
 	for s in self.simulator.objects(Sheet).values():
@@ -294,7 +295,7 @@ class ProjectionPlotGroup(PlotGroup):
 	    src_sheet=projection[0].src
 	    projection=projection[0]
 
-	    for x,y in self.coords:
+	    for x,y in self.generate_coords():
 		plot_channels = pt
 		### JCALERT! Do the test pt['Strength']='Weights' here
 		key = ('Weights',sheet.name,projection.name,x,y)
@@ -305,6 +306,32 @@ class ProjectionPlotGroup(PlotGroup):
         return plot_list
 
 
+    def generate_coords(self):
+        """
+        Evenly space out the units within the sheet bounding box, so
+        that it doesn't matter which corner the measurements start
+        from.  A 4 unit grid needs 5 segments.  List is in left-to-right,
+        from top-to-bottom.
+        """
+        def rev(x): y = x; y.reverse(); return y
+        
+        aarect = self._sim_ep.bounds.aarect()
+        (l,b,r,t) = aarect.lbrt()
+        x = float(r - l) 
+        y = float(t - b)
+        x_step = x / (int(x * self.density) + 1)
+        y_step = y / (int(y * self.density) + 1)
+        l = l + x_step
+        b = b + y_step
+        coords = []
+        self.proj_plotting_shape = (int(x * self.density), int(y * self.density))
+        for j in rev(range(self.proj_plotting_shape[1])):
+            for i in range(self.proj_plotting_shape[0]):
+                coords.append((x_step*i + l, y_step*j + b))
+
+        return coords
+
+    
     ### JCALERT ! for the moment this function is re-implemented only for ProjectionGroup
     ### because we do not want the plots to be sorted according to their src_name in this case
     def plots(self):
@@ -316,7 +343,7 @@ class ProjectionPlotGroup(PlotGroup):
 	self.debug('Dynamic plotgroup')
 	self.all_plots = flatten(self.plot_list()) + self.added_list
 	self.debug('all_plots = ' + str(self.all_plots))
-
+        
         generated_bitmap_list = [each for each in self.all_plots if each !=None]
         return generated_bitmap_list
 
