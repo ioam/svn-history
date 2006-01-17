@@ -20,7 +20,7 @@ PYTHON_UNINSTALL += bin/idle bin/python bin/pydoc bin/python2.4
 PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.4
 
 
-python: ${PYTHON}.tgz tk
+python: ${PYTHON}.tgz tk matplotlib
 	tar xzf ${PYTHON}.tgz
 	cd ${PYTHON}; ./configure --prefix=${PREFIX}
 	env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib make -C ${PYTHON} install
