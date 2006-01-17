@@ -23,7 +23,6 @@ class SineGratingPresenter(object):
     """Function object for presenting sine gratings, for use with e.g. measure_or_pref."""
     
     def __init__(self,apply_output_fn=True,duration=1.0):
-        # CEBHACKALERT: see alert in topo/commands/basic.py about testing there is an active_sim
         self.apply_output_fn=apply_output_fn
         self.duration=duration
 
@@ -48,8 +47,7 @@ class SineGratingPresenter(object):
 
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,
-                    user_function_class=SineGratingPresenter,
-                    apply_output_fn=False, duration=1.0):
+                    user_function=SineGratingPresenter(False,1.0)):
     """Measure orientation maps, using a sine grating by default."""
 
     # CEBHACKALERT:
@@ -64,7 +62,6 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         raise ValueError("num_phase and num_orientation must be greater than 0")
 
     else:
-        user_function=user_function_class(apply_output_fn, duration)
         step_phase=2*pi/num_phase
         step_orientation=pi/num_orientation
 
