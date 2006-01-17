@@ -12,7 +12,7 @@ from topo.base.sheetview import SheetView
 from topo.base.sheet import Sheet
 from topo.sheets.generatorsheet import GeneratorSheet
 
-from topo.patterns.basic import SineGrating
+from topo.patterns.basic import SineGrating, Gaussian
 
 from topo.commands.basic import pattern_present
 
@@ -87,6 +87,27 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         x=MeasureFeatureMap(feature_values)
 
         param_dict = {"scale":scale,"offset":offset}
+
+        x.measure_maps(user_function, param_dict, display)
+
+
+
+def measure_cog(divisions=6,size=0.1,scale=0.3,offset=0.0,display=False,
+                user_function=PatternPresenter(Gaussian(aspect_ratio=1.0),False,1.0)):
+    """Measure center-of-gravity (cog) map, using a Gaussian by default."""
+
+    if divisions <= 0:
+        raise ValueError("divisions must be greater than 0")
+
+    else:
+        step=1.0/divisions
+
+        feature_values = {"x": ( (-0.5,0.5), step, False),
+                          "y": ( (-0.5,0.5), step, False)}
+
+        x=MeasureFeatureMap(feature_values)
+
+        param_dict = {"size":size,"scale":scale,"offset":offset}
 
         x.measure_maps(user_function, param_dict, display)
 
