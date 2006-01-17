@@ -248,7 +248,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         #self.__setup_pattern_generators()
         #input_dict = dict([(name,d['pattern_generator'])
         #                   for (name,d) in new_patterns_dict.items()])
-        #pattern_present(input_dict,0.0,sim=None,learning=True,overwrite_previous=True)
+        #pattern_present(input_dict,0.0,learning=True,overwrite_previous=True)
         #self.console.auto_refresh()
         pass
 

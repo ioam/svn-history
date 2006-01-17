@@ -42,7 +42,7 @@ class SineGratingPresenter(object):
 
         inputs = dict().fromkeys(self.sim.objects(GeneratorSheet),gen)
 
-        pattern_present(inputs, self.duration, self.sim, learning=False,
+        pattern_present(inputs, self.duration, learning=False,
                         apply_output_fn=self.apply_output_fn)
 
 
