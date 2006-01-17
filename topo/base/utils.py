@@ -161,33 +161,37 @@ cross_product=lambda ss,row=[],level=0: len(ss)>1 \
    and reduce(lambda x,y:x+y,[cross_product(ss[1:],row+[i],level+1) for i in ss[0]]) \
    or [row+[i] for i in ss[0]]
 
-
-def frange(start, end=None, inc=None):
+def frange(start, end=None, inc=1.0, inclusive=False):
     """
     A range function that accepts float increments.
 
-    Otherwise, works just as the inbuilt range() function.
-
-    'All thoretic restrictions apply, but in practice this is
+    Otherwise, works just as the inbuilt range() function.  If
+    inclusive is False, as in the default, the range is exclusive (not
+    including the end value), as in the inbuilt range(). If inclusive
+    is true, the range may include the end value.
+        
+    'All theoretic restrictions apply, but in practice this is
     more useful than in theory.'
 
-    From:
-    http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66472
+    From: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66472
     """
     if end == None:
         end = start + 0.0
         start = 0.0
 
-    if inc == None:
-        inc = 1.0
-
+    # Increments of zero would lead to an infinite loop, which can happen if
+    # this is mistakenly called with a integer-based rational expression like 1/2.
+    assert ((inc>0 and start<=end) or (inc<0 and start>=end))
+    
     L = []
     while 1:
         next = start + len(L) * inc
-        if inc > 0 and next >= end:
-            break
-        elif inc < 0 and next <= end:
-            break
+        if inclusive:
+          if inc > 0 and next > end: break
+          elif inc < 0 and next < end: break
+        else:
+          if inc > 0 and next >= end: break
+          elif inc < 0 and next <= end: break
         L.append(next)
         
     return L
