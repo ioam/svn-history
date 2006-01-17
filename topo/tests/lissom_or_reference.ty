@@ -62,6 +62,7 @@ scale_input=1.0
 
 retina_edge_buffer=rf_radius-1 # JABALERT: Need to check this calculation.
 RN=float(int(BaseRN*area_scale+2*retina_edge_buffer))
+RN=32.0 #CEBHACKALERT: the calculation above gives this but just in case...
 acs=6.5*6.5/rf_radius/rf_radius
 ecs=19.5*19.5/exc_rad/exc_rad
 ics=47.5*47.5/inh_rad/inh_rad
@@ -231,12 +232,11 @@ c_aff_weights = c_aff_weights[7:18,22:32]
 assert c_aff_weights.shape==topo_aff_weights.shape
 c_aff_weights = c_aff_weights.tolist()
 
-
 c_latexc_weights = topo.tests.lissom_log_parser.get_matrix("topo/tests/or_map_topo.000001.wts.Primary.LateralExcitatory.0"+str(unit_i)+"_0"+str(unit_j)+".matrix",(BaseN,BaseN)) 
 c_latexc_weights = Numeric.array(c_latexc_weights)
 c_latexc_weights = c_latexc_weights[17:31,63:71]
-c_latexc_weights = c_latexc_weights.tolist()
 assert c_latexc_weights.shape==topo_latexc_weights.shape
+c_latexc_weights = c_latexc_weights.tolist()
 # end CEBHACKALERT
 
 compare_elements(topo_aff_weights,c_aff_weights,7,"V1 afferent weights")
