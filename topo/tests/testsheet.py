@@ -410,6 +410,15 @@ class TestCoordinateTransforms(unittest.TestCase):
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
+    def test_bounds2slice(self):
+        # incomplete test
+        
+        # test that if you ask to slice the matrix with the sheet's BoundingBox, you
+        # get back the whole matrix
+        bb = boundingregion.BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+        slice = bounds2slice(bb,bb,10,10)
+        true_slice = (0,10,0,10) # inclusive left boundary, exclusive right boundary
+        self.assertEqual(slice,true_slice) # CEBHACKALERT: failing right now
 
 
     # bounds2shape() tests
