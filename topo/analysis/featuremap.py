@@ -198,7 +198,7 @@ class MeasureFeatureMap(TopoObject):
                 feature_points[feature] = value
 
             # DRAW THE PATTERN: call to the user_function
-            user_function(feature_points,param_dict)
+            user_function(self.simulator,feature_points,param_dict)
 
 
             # CEBHACKALERT: I've temporarily removed this feature. There must be a better

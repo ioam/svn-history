@@ -24,11 +24,10 @@ class SineGratingPresenter(object):
     
     def __init__(self,apply_output_fn=True,duration=1.0):
         # CEBHACKALERT: see alert in topo/commands/basic.py about testing there is an active_sim
-        self.sim=topo.base.simulator.get_active_sim()
         self.apply_output_fn=apply_output_fn
         self.duration=duration
 
-    def __call__(self,features_values,param_dict):
+    def __call__(self,sim,features_values,param_dict):
         gen = SineGrating()
 
         ### JABHACKALERT!  Should be able to do this more cleanly.
@@ -40,7 +39,7 @@ class SineGratingPresenter(object):
             update_generator = "gen." + feature + "=" + repr(value)
             exec update_generator
 
-        inputs = dict().fromkeys(self.sim.objects(GeneratorSheet),gen)
+        inputs = dict().fromkeys(sim.objects(GeneratorSheet),gen)
 
         pattern_present(inputs, self.duration, learning=False,
                         apply_output_fn=self.apply_output_fn)
