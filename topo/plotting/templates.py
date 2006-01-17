@@ -157,13 +157,20 @@ pgt = PlotGroupTemplate(name='Orientation Preference',
 plotgroup_templates[pgt.name] = pgt
 
 
-### JCALERT! Temporary template used for testing RGBPlot. 
+pgt = PlotGroupTemplate(name='Center of Gravity',
+                        command = 'measure_cog()',
+			plot_templates= [('XPreference',
+                                          {'Strength'   : 'XPreference',
+                                           'Hue'        : None,
+                                           'Confidence' : None}),
+                                         ('YPreference',
+                                          {'Strength'   : 'YPreference',
+                                           'Hue'        : None,
+                                           'Confidence' : None}),
+                                         ('CoGPreference',
+                                          {'Red'   : 'XPreference',
+                                           'Green' : 'YPreference',
+                                           'Blue'  : None,
+                                           'Normalize'  : False})])
+plotgroup_templates[pgt.name] = pgt
 
-pgt = PlotGroupTemplate(name='TestingPanel_for_RGB_Activity',
-			command='measure_activity()',
-			plot_templates= [('Activity',
-					  {'Red'   : 'OrientationPreference',
-					   'Green' : 'OrientationPreference',
-					   'Blue'  : 'Activity',
-					   'Normalize'  : False})])
-#plotgroup_templates[pgt.name] = pgt
