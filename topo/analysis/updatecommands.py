@@ -31,7 +31,20 @@ class PatternPresenter(object):
         self.gen = patterngenerator
 
     def __call__(self,sim,features_values,param_dict):
-        ### JABHACKALERT!  Should be able to do this more cleanly using gen's __dict__.
+        ### JABHACKALERT!  Should be able to do this more cleanly using gen's __dict__,
+        # with something like:
+        #
+        #self.gen.__dict__.update(param_dict)
+        #self.gen.__dict__.update(features_values)
+        #
+        # or
+        #
+        #for param,value in param_dict.iteritems():
+        #    self.gen.__dict__[param]=value
+        #
+        #for feature,value in features_values.iteritems():
+        #    self.gen.__dict__[feature]=value
+
         for param, value in param_dict.iteritems():
             update_generator = "self.gen." + param + "=" + repr(value)
             exec update_generator
