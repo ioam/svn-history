@@ -18,30 +18,20 @@ __version__='$Revision$'
 # - a Simulator should be passed in; this code shouldn't look for
 #   active_sim
 
-from Numeric import array, zeros, Float 
-from topo.misc.distribution import Distribution
-from topo.base.topoobject import TopoObject
-
-from topo.base.sheet import Sheet
-from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.utils import cross_product, frange
-from topo.base.sheetview import SheetView
 from math import pi
 
-## temporary ...? ##
-import topo.patterns.basic
-from topo.commands.basic import pattern_present, restore_input_generators, save_input_generators
+from Numeric import array, zeros, Float 
 
 from topo.base import sheetview
-
-# see HACKALERT below "if display"
-# from topo.plotting.templates import plotgroup_templates
-# from topo.base.registry import get_console
-## Should only import this when using display option
-# import topo.tkgui.topoconsole 
+from topo.base.sheet import Sheet
+from topo.base.sheetview import SheetView
+from topo.base.topoobject import TopoObject
+from topo.base.utils import cross_product, frange
+from topo.commands.basic import pattern_present, restore_input_generators, save_input_generators
+from topo.misc.distribution import Distribution
+from topo.sheets.generatorsheet import GeneratorSheet
 
 import topo.base.simulator
-
 
 
 class FeatureMap(TopoObject):
@@ -52,7 +42,6 @@ class FeatureMap(TopoObject):
     constructs a preference map and a selectivity map for that parameter.
     """
 
-    
 
     def __init__(self, sheet, axis_range=(0.0,1.0), cyclic=False):
         
@@ -118,8 +107,12 @@ class MeasureFeatureMap(TopoObject):
     """
     """
     def __init__(self, feature_param):
+        ### JABALERT: The feature_param structure is pretty
+        ### complicated; surely it should be an object or something
+        ### less fragile than a list assumed to have three elements as
+        ### it is here.
         """
-        feature_param: a dictionary with sheets as keys and a dictionnary: 
+        feature_param: a dictionary with sheets as keys and a dictionary: 
                        {feature_name: (range, values, cyclic)} as values
                        
                        range: the tuple (lower_bound, upper_bound)
@@ -137,7 +130,7 @@ class MeasureFeatureMap(TopoObject):
         # CEBHACKALERT: see alert in topo/commands/basic.py about testing there is an active_sim
         self.simulator=topo.base.simulator.get_active_sim()
         
-        # This dictionary will contains (for each sheet) a dictionary to hold the FeatureMap for each feature
+        # This dictionary will contain (for each sheet) a dictionary to hold the FeatureMap for each feature
         # {sheet: {feature: FeatureMap()}}
         self.__featuremaps = {}
 
@@ -151,7 +144,8 @@ class MeasureFeatureMap(TopoObject):
             else:
                 low_bound,up_bound = param[0]
                 step=param[1]
-                self.__featurevalues.append(frange(low_bound,up_bound,step))
+                cyclic=param[2]
+                self.__featurevalues.append(frange(low_bound,up_bound,step,not cyclic))
 
         # all the sheets that will have their feature maps measured
         # (i.e. all Sheets that aren't GeneratorSheets)
@@ -201,14 +195,21 @@ class MeasureFeatureMap(TopoObject):
             user_function(self.simulator,feature_points,param_dict)
 
 
-            # CEBHACKALERT: I've temporarily removed this feature. There must be a better
-            # way than this!
+            # CEBHACKALERT: I've temporarily removed this feature,
+            # i.e. plotting each pattern. There must be a better way
+            # than this!
+            #
+            # JC: For it to work, uncomment this and pass in display=True
+            # (or change display to 1 below)
             #### Debugging     ####
-##             if display:
-##                 temp=plotgroup_templates['Activity']
-##                 x = topo.tkgui.topoconsole.PlotsMenuEntry(get_console(),temp)
-##                 panel = x.command()
-##                 panel.toggle_auto_refresh()
+            #import topo.tkgui.topoconsole 
+            #from topo.plotting.templates import plotgroup_templates
+            #if display:
+            #    temp=plotgroup_templates['Activity']
+            #    console = topo.tkgui.topoconsole.dict_console['console']
+            #    x = topo.tkgui.topoconsole.PlotsMenuEntry(console,temp)
+            #    panel = x.command()
+            #    panel.toggle_auto_refresh()
             #### Debugging end ####
 
 
