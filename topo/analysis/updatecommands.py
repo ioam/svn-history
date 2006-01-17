@@ -19,26 +19,28 @@ from topo.commands.basic import pattern_present
 from featuremap import MeasureFeatureMap
 
 
-class SineGratingPresenter(object):
-    """Function object for presenting sine gratings, for use with e.g. measure_or_pref."""
+class PatternPresenter(object):
+    """
+    Function object for presenting PatternGenerator-created patterns,
+    for use with map measurement commands like measure_or_pref.
+    """
     
-    def __init__(self,apply_output_fn=True,duration=1.0):
+    def __init__(self,patterngenerator,apply_output_fn=True,duration=1.0):
         self.apply_output_fn=apply_output_fn
         self.duration=duration
+        self.gen = patterngenerator
 
     def __call__(self,sim,features_values,param_dict):
-        gen = SineGrating()
-
-        ### JABHACKALERT!  Should be able to do this more cleanly.
+        ### JABHACKALERT!  Should be able to do this more cleanly using gen's __dict__.
         for param, value in param_dict.iteritems():
-            update_generator = "gen." + param + "=" + repr(value)
+            update_generator = "self.gen." + param + "=" + repr(value)
             exec update_generator
 
         for feature,value in features_values.iteritems():
-            update_generator = "gen." + feature + "=" + repr(value)
+            update_generator = "self.gen." + feature + "=" + repr(value)
             exec update_generator
 
-        inputs = dict().fromkeys(sim.objects(GeneratorSheet),gen)
+        inputs = dict().fromkeys(sim.objects(GeneratorSheet),self.gen)
 
         pattern_present(inputs, self.duration, learning=False,
                         apply_output_fn=self.apply_output_fn)
@@ -47,7 +49,7 @@ class SineGratingPresenter(object):
 
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,
-                    user_function=SineGratingPresenter(False,1.0)):
+                    user_function=PatternPresenter(SineGrating(),False,1.0)):
     """Measure orientation maps, using a sine grating by default."""
 
     # CEBHACKALERT:
