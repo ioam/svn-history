@@ -20,7 +20,7 @@ PYTHON_UNINSTALL += bin/idle bin/python bin/pydoc bin/python2.4
 PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.4
 
 
-python: ${PYTHON}.tgz tk matplotlib
+python: ${PYTHON}.tgz tk
 	tar xzf ${PYTHON}.tgz
 	cd ${PYTHON}; ./configure --prefix=${PREFIX}
 	env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib make -C ${PYTHON} install
@@ -149,7 +149,7 @@ numeric-uninstall:
 MATPLOTLIB = matplotlib-0.81
 MATPLOTLIB_UNINSTALL =  ${PYTHON_LIB}/site-packages/matplotlib
 
-matplotlib: ${MATPLOTLIB}.tgz
+matplotlib: ${MATPLOTLIB}.tgz python
 	tar xzf ${MATPLOTLIB}.tgz
 	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build
 	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
