@@ -108,7 +108,18 @@ class PlotsMenuEntry(topo.base.topoobject.TopoObject):
 	else:
 	    self.console.messageBar.message('state', 'No active Simulator object.')
 	    return None
-        
+
+
+
+### JABHACKALERT/JCHACKALERT:
+### This variable is used for displaying patterns presented in
+### MeasureFeatureMap, but should be eliminated (here and later in
+### this file) when MeasureFeatureMap is updated to save plots
+### directly to disk without the GUI.
+###
+### In any case, it's not clear why it needed to be a dictionary and
+### not an ordinary variable.
+dict_console={}
 
 class TopoConsole(Frame):
     """
@@ -143,6 +154,7 @@ class TopoConsole(Frame):
 
         title = "Topographica Console"
         self.parent.title(title)
+        dict_console['console']=self
 
     def _init_widgets(self):
         
