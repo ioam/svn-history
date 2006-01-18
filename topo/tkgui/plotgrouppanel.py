@@ -200,7 +200,8 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         pgt = plotgroup_templates[self.pgt_name]
         for (k,each) in pgt.plot_templates:
             each['Normalize'] = self.normalize
-        self.refresh()
+        self.load_images()
+        self.display_plots()
 
 
     def refresh(self,extra=None):
