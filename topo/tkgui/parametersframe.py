@@ -276,6 +276,8 @@ class ParametersFrame(Frame):
         """
         self.__widgets[parameter_name] = self.__properties_frame.add_combobox_property(
                     parameter_name,
+                    ### ALHACKALERT: Displays the default class name,
+                    ### but it should be displaying the actual current value.
                     value = parameter.get_default_class_name(), #.getattr(self.topo_obj,parameter_name),
                     scrolledlist_items = parameter.range().keys(),
                     translator = parameter.get_from_key)
