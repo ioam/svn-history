@@ -28,7 +28,7 @@ class ArrowTool(Frame) :
 
     def __init__(self, canvas,  parent = None) :
 	# super constructor call
-	Frame.__init__(self, parent, bg = 'light grey', bd = 2, relief = GROOVE)
+	Frame.__init__(self, parent, bg = 'light grey', bd = 4, relief = RAISED)
 	self.canvas = canvas # hold canvas reference
 	# label sets canvas mode
 	self.titleLabel = Label(self, text="Move:", bg ='light grey')
@@ -53,11 +53,11 @@ class ArrowTool(Frame) :
     def setFocus(self, focus) :
 	# change the background highlight to reflect whether this toolbar item is selected or not
 	if (focus) :
-		col = 'dark grey'
+		col = 'dark grey'; relief = GROOVE
 	else :
-		col = 'light grey'
+		col = 'light grey'; relief = RAISED
 		
-	self.config(bg = col)
+	self.config(bg = col, relief = relief)
 	self.titleLabel.config(bg = col)
 	self.icon.config(bg = col)
 
@@ -74,16 +74,20 @@ class NodeTool(Frame) :
 
      def __init__(self, canvas,  parent = None) :
 	# super constructor call.
-	Frame.__init__(self, parent, bg = 'light grey', bd = 2, relief = GROOVE)
+	Frame.__init__(self, parent, bg = 'light grey', bd = 4, relief = RAISED)
 	self.canvas = canvas # hold canvas reference.
-	# pack in toolbar at top and fill out in X direction
+	# bind clicks, pack in toolbar at top and fill out in X direction
+	self.bind('<Button-1>', self.changeMode)
 	self.pack(side = TOP, fill = X)
+	# label sets canvas mode
+	self.titleLabel = Label(self, text="Add sheet of type:", bg ='light grey')
+	self.titleLabel.bind('<Button-1>', self.changeMode)
+	self.titleLabel.pack()
 	# gets list of all the available sheets.
 	self.sheetList = self.getSheetList()
 	sheetList = self.sheetList.keys()
 	# populate the menu with the available sheet list.
-	self.opMenu = Pmw.ComboBox(self, label_text = 'Add sheet of type:', labelpos = 'nw',
-				   selectioncommand = self.setOption, scrolledlist_items = sheetList)
+	self.opMenu = Pmw.ComboBox(self, selectioncommand = self.setOption, scrolledlist_items = sheetList)
 	self.opMenu.pack()
 	self.opMenu.bind('<Button-1>', self.changeMode)
 	# select the initial selection
@@ -99,10 +103,11 @@ class NodeTool(Frame) :
      def setFocus(self, focus) :
 	# change the background highlight to reflect whether this toolbar item is selected or not
 	if (focus) :
-		col = 'dark grey'
+		col = 'dark grey'; relief = GROOVE
 	else :
-		col = 'light grey'
-	self.config(bg = col)
+		col = 'light grey'; relief = RAISED
+	self.config(bg = col, relief = relief)
+	self.titleLabel.config(bg = col)
 	self.opMenu.config(bg = col)
 
      ####### Node Methods ###################################################
@@ -141,16 +146,20 @@ class ConTool(Frame) :
 
      def __init__(self, canvas, parent = None) :
 	# super constructor call.
-	Frame.__init__(self, parent, bg = 'light grey', bd = 2, relief = GROOVE)
+	Frame.__init__(self, parent, bg = 'light grey', bd = 4, relief = RAISED)
 	self.canvas = canvas # hold canvas reference.
-	# pack in toolbar at top and fill out in X direction
+	# bind clicks, pack in toolbar at top and fill out in X direction
+	self.bind('<Button-1>', self.changeMode)
 	self.pack(side = TOP, fill = X)
+	# label sets canvas mode
+	self.titleLabel = Label(self, text="Add projection of type:", bg ='light grey')
+	self.titleLabel.bind('<Button-1>', self.changeMode)
+	self.titleLabel.pack()
 	# gets list of all the available projections.
 	self.projList = self.getProjList()
 	projList = self.projList.keys() # gets the class names.
 	# populate the menu with the available projection list.
-	self.opMenu = Pmw.ComboBox(self, label_text = 'Add projection of type:', labelpos = 'nw',
-				   selectioncommand = self.setOption, scrolledlist_items = projList)
+	self.opMenu = Pmw.ComboBox(self, selectioncommand = self.setOption, scrolledlist_items = projList)
 	self.opMenu.bind('<Button-1>', self.changeMode)
 	self.opMenu.pack()
 	# select the initial selection
@@ -186,11 +195,12 @@ class ConTool(Frame) :
      def setFocus(self, focus) :
 	# change the background highlight to reflect whether this toolbar item is selected or not
 	if (focus) :
-		col = 'dark grey'
+		col = 'dark grey'; relief = GROOVE
 	else :
-		col = 'light grey'
+		col = 'light grey'; relief = RAISED
 	
-	self.config(bg = col)
+	self.config(bg = col, relief = relief)
+	self.titleLabel.config(bg = col)
 	self.opMenu.config(bg = col)
 
      ########### Util Methods ########################################################
