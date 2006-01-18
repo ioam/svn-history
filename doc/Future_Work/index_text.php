@@ -505,4 +505,9 @@ Minor points for the tutorial:
    Topographica).
   
    Explain some of the parameters better (should be easily fixed)
+
+
+Need to add color keys to the Preference Map panels, e.g. by having a
+slot for it in the template.
+
 -->
