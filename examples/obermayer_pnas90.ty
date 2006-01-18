@@ -33,21 +33,31 @@ import topo.patterns.basic
 from topo.base.simulator import Simulator
 from topo.learningfns.basic import HebbianSOMLF
 from topo.patterns import PatternGeneratorParameter
+from topo.outputfns.basic import DivisiveSumNormalize
 
 
 class ObermayerSOM(CFSOM):
     """A variant of CFSOM that uses linear decay functions for alpha and radius."""
 
-    alpha_f = Number(0.01)
-    radius_f = Number(0.1)
+    # These values have been adjusted to convert from Obermayer's per-unit learning rates
+    # to Topographica's per-CF learning rates, assuming a 30x30 ConnectionField.
+    alpha_0 = Number(0.09*(30*30))
+    alpha_f = Number(0.02*(30*30))
+
+    radius_0 = Number(240.0/256.0)  # Value at the beginning of learning
+    radius_m = Number(60.0/256.0)   # Value at the midpoint of learning
+    radius_f = Number(2.0/256.0)    # Value at the end of learning
+    midpoint = 15000
     
     def alpha(self):
         return self.alpha_0 + (self.alpha_f-self.alpha_0)/self.learning_length*float(self.simulator.time())
-
+    
     def radius(self):
-	### JCALERT! Necessary to make the simulation match the 
-	### new changes in learning rate handling (i.E. division by 900)
-        return self.radius_0 + (self.alpha_f/900-self.alpha_0/900)/self.learning_length*float(self.simulator.time())
+       """Two-part piecewise-linear decay function."""
+       if self.simulator.time() < self.midpoint:
+         return self.radius_0 + (self.radius_m-self.radius_0)/self.midpoint*float(self.simulator.time())
+       else:
+         return self.radius_m + (self.radius_f-self.radius_m)/(self.learning_length-self.midpoint)*float(self.simulator.time()-self.midpoint)
 
 
 
@@ -78,22 +88,15 @@ topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5))
 # cortical sheet
 ObermayerSOM.density = 25 #6
 ObermayerSOM.learning_length = 30000
-ObermayerSOM.radius_0 = (240.0/256.0)**2
-radius_at_15000 = (60.0/256.0)**2 # Used until 15000 ; see set_radius_f below for after 15000
-ObermayerSOM.radius_f = 30000/15000 * radius_at_15000 - ObermayerSOM.radius_0
-
-### JCALERT! We multiply by 30: number of unit in the weight matrix.
-### It has been tested for 25 density but should not change for 256...
-ObermayerSOM.alpha_0  = 0.09*900
-ObermayerSOM.alpha_f  = 0.02*900
 
 RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 CFProjection.weights_bounds = BoundingBox(points=((-1.0,-1.0),(1.0,1.0)))
 CFProjection.response_fn = CFDotProduct()
 CFProjection.learning_fn=HebbianSOMLF()
+
 # Weights should be initialized to sum to unity: (Will this work?)
-#CFProjection.learning_fn.output_fn=DivisiveSumNormalize()
+CFProjection.learning_fn.output_fn=DivisiveSumNormalize()
 
 ###########################################
 # build simulation
@@ -103,9 +106,6 @@ s = Simulator()
 Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),name='Retina')
 V1 = ObermayerSOM(name='V1')
 s.connect(Retina,V1,delay=0.5,connection_type=CFProjection,connection_params={'name':'RtoV1'})
-
-def set_radius_f(val): V1.radius_f=val
-s.schedule_action(15000, set_radius_f, (2.0/256.0)**2) # Used after 15000
 
 s.run(1)
 #s.run(30000)
