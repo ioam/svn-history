@@ -328,9 +328,14 @@ class SHCPlot(Plot):
 	    h=zero
 	    c=zero
 
-        max_s = max(s.flat)
-	if normalize and max_s>0:
-	    s = divide(s,float(max_s))
+
+        # If normalizing, offset the matrix so that the minimum
+        # value is 0.0 and then scale to make the maximum 1.0
+        if normalize:
+             s_offset = s-min(s.flat)
+             max_s_offset = max(s_offset.flat)
+             if max_s_offset>0:
+                  s = divide(s_offset,float(max_s_offset))
 
         # This translation from SHC to HSV is valid only for black backgrounds;
         # it will need to be extended also to support white backgrounds.
