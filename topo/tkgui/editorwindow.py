@@ -206,7 +206,9 @@ class EditorCanvas(Canvas) :
 
     def getConXY(self, x, y) :
 	for obj in self.objectList : # return connection at given x, y (None if no connection)
-		for con in obj.fromCon :
+		conList = obj.fromCon[:]
+		conList.reverse()
+		for con in conList :
 			if (con.inBounds(x, y)) :
 				return con
 	return None
