@@ -333,10 +333,12 @@ class EditorProjection(EditorConnection) :
 
     """
     Represents any topo projection. It is a subclass of EditorConnection and fills 
-    in the methods that are not defined. It is represented by a either a line with
-    an arrow head in the middle, or a circle if representing a lateral projection.
-    Uses bounding box to determine if x,y coord is within a boundary around the 
-    arrow head.
+    in the methods that are not defined. Can be represented by a representation of a
+    projection's receptive field or by a line with an arrow head in the middle;
+    lateral projections are represented by a dotted ellipse around the centre.
+    Can determine if x,y coord is within the triangular receptive field or within an
+    area around the arrow head. The same can be determined for a lateral projection 
+    ellipse
     """	
     def __init__(self, name, canvas, nodeFrom) :
 	EditorConnection.__init__(self, name, canvas, nodeFrom)
@@ -359,14 +361,16 @@ class EditorProjection(EditorConnection) :
 	posFrom = self.nodeFrom.getPos() # get the centre points of the two nodes
 	if (self.nodeTo == None) :  # if not connected yet, use temporary point.
 		posTo = self.posTo
-		latCol = self.nodeFrom.currentCol
 	else :
 		posTo = self.nodeTo.getPos()
-		latCol = self.nodeTo.currentCol
 
 	# set the colour to be used depending on whether connection has the focus.
-	if (self.focus) : col = 'slate blue'
-	else : col = 'black'
+	if (self.focus) : 
+		col = 'slate blue'
+		latCol = self.nodeFrom.colours[0]
+	else : 
+		col = 'black'
+		latCol = self.nodeFrom.currentCol
 	# midpoint of line
 	mid = self.getMid(posFrom, posTo)
 	if (posTo == posFrom) : # connection to and from the same node
