@@ -40,7 +40,7 @@ class EditorObject :
 	self.buttonPanel = Frame(paramWindow)
 	self.buttonPanel.pack(side = BOTTOM)
         #JABHACKALERT: We also need an OK button that applies and then closes the window
-	updateButton = Button(self.buttonPanel, text = 'Update', command = self.updateParameters)
+	updateButton = Button(self.buttonPanel, text = 'Apply', command = self.updateParameters)
 	updateButton.pack(side = LEFT)
 
     def updateParameters(self) :
@@ -149,7 +149,7 @@ class EditorNode(EditorObject) :
 		con.paramFrame.create_widgets(con.connection)
 		buttonPanel = Frame(frame)
 		buttonPanel.pack(side = BOTTOM)
-		Button(buttonPanel, text = 'Update', 
+		Button(buttonPanel, text = 'Apply', 
 				command = con.updateParameters).pack(side = LEFT)
 		Button(buttonPanel, text = 'Delete',
 				command = con.remove).pack(side = RIGHT)
@@ -169,7 +169,7 @@ class EditorSheet(EditorNode) :
 	self.width = 70.0 # set the width and height parameters for this object
 	self.height = 35.0
 	col = self.colours[1]
-	self.initDraw(col) # create a new paralellogram
+	self.initDraw(col, False) # create a new paralellogram
 	self.currentCol = col
 	self.gradient = 1
 
@@ -181,14 +181,7 @@ class EditorSheet(EditorNode) :
 	self.canvas.delete(self.label) # remove label
 	if (focus) : col = self.colours[0]
 	else : 	       col = self.colours[1]
-	self.initDraw(col) # create new one with correct colour
-	"""
-	Try something like this instead..
-	if focus : 
-		col = self.colours[0]
-	else :
-		col = self.colours[1]
-	self.canvas.config(self.id, fill = col)"""
+	self.initDraw(col, focus) # create new one with correct colour
 	self.currentCol = col
 	# redraw the connections
 	for con in self.toCon : 
@@ -196,7 +189,9 @@ class EditorSheet(EditorNode) :
 	for con in self.fromCon :
 		con.move()
 
-    def initDraw(self, colour) :
+    def initDraw(self, colour, focus) :
+	if (focus) : col = colour
+	else : col = 'black'
 	# get the parallelogram points
 	x1 = self.x - (1.5 * self.width)
 	y1 = self.y - self.height
@@ -206,7 +201,8 @@ class EditorSheet(EditorNode) :
 	try :
 		self.id = (self.canvas.create_polygon(x1, y2, (x1 + midx), y1, (x2 + midx), y1,
 							x2, y2, fill = colour , outline = "black"))
-		self.label = self.canvas.create_text(self.x - (60 + len(self.name)*3), self.y, text = self.name)
+		self.label = self.canvas.create_text(self.x - 75 , self.y, anchor = E,
+							fill = col, text = self.name)
 	
 	except IndexError :
 		print("Out of Canvas")
@@ -220,7 +216,11 @@ class EditorSheet(EditorNode) :
 		print("Out of Canvas")
 	# redraw the connections
 	for con in self.toCon : 
-		con.move()
+		if (con.nodeFrom == con.nodeTo) :
+			con.move()
+	for con in self.toCon :
+		if (not(con.nodeFrom == con.nodeTo)) :
+			con.move()
 	for con in self.fromCon :
 		if (not(con.nodeFrom == con.nodeTo)) :
 			con.move()
@@ -386,8 +386,7 @@ class EditorProjection(EditorConnection) :
 		self.label = self.canvas.create_text(mid[0] - 
 			     (20 + len(self.name)*3), mid[1] - (30 + dev) , text = self.name)
 		"""
-		n = 0.7 * self.drawIndex
-		fact = (15 / (1 + n))  
+		fact = self.getFact() 
 		x1 = posTo[0] - (2 * fact)
 		y1 = posTo[1] + fact
 		x2 = posTo[0] + (2 * fact)
@@ -400,7 +399,7 @@ class EditorProjection(EditorConnection) :
 		if (receptiveFields) : # if receptive fields are to be drawn
 			x1, y1 = posTo
 			x2, y2 = posFrom
-			x1 += self.dev
+			#x1 += self.dev
 			x2 += self.dev
 			rad = self.radius
 			self.id = (self.canvas.create_line(x1,y1,x2-rad,y2, fill = col),
@@ -411,10 +410,10 @@ class EditorProjection(EditorConnection) :
 	    		self.id = (self.canvas.create_line(posFrom, mid , arrow = LAST, fill = col),
 	    			  self.canvas.create_line(mid, posTo, fill = col))
 		# draw name label
-		dX = (10 + len(self.name)*3)
+		dX = 40
 		dY = self.drawIndex * 20
 		self.label = self.canvas.create_text(mid[0] - dX,
-			     mid[1] - dY, text = self.name)
+			     mid[1] - dY, fill = col, text = self.name, anchor = E)
 	
 	
     ############ Update methods ############################ 
@@ -431,10 +430,15 @@ class EditorProjection(EditorConnection) :
     def getMid(self, pos1, pos2) : # returns the middle of two points
 	return (pos1[0] + (pos2[0] - pos1[0])*0.5, pos1[1] + (pos2[1] - pos1[1])*0.5)
 
+    def getFact(self) :
+	n = 0.7 * self.drawIndex
+	return (15 / (1 + n)) 
+
     def calcGradient(self) :
 	posTo = (self.nodeTo.x, self.nodeTo.y)
 	posFrom = (self.nodeFrom.x, self.nodeFrom.y)
-	A = (posTo[0] + self.dev ,posTo[1])
+	A = (posTo[0] #+ self.dev 
+	,posTo[1])
 	T = (posFrom[0] + self.dev ,posFrom[1])
 	B = (T[0] - self.radius, T[1])
 	C = (T[0] + self.radius, T[1])
@@ -449,11 +453,22 @@ class EditorProjection(EditorConnection) :
 	# returns true if x, y lie inside the triangular receptive field representing this projection
 	if (receptiveFields) :
 		if (self.nodeTo == None or self.nodeTo == self.nodeFrom) :
-			return False
+			fact = self.getFact()
+			x, y = x - self.nodeTo.getPos()[0], y - self.nodeTo.getPos()[1]
+			a = 2 * fact; b = fact
+			if (x > a or x < -a) :
+				return False
+			import math
+			pY = math.sqrt(pow(b,2) * (1 - (pow(x,2)/pow(a,2))))
+			if (y > pY or y < -pY) :
+				return False
+			return True
+			
 		# get the points of the triangular receptive field, centered around the x, y point given
 		posTo = (self.nodeTo.x, self.nodeTo.y)
 		posFrom = (self.nodeFrom.x, self.nodeFrom.y)
-		A = (posTo[0] + self.dev - x, posTo[1] - y)
+		A = (posTo[0] #+ self.dev 
+			- x, posTo[1] - y)
 		T = (posFrom[0] + self.dev - x, posFrom[1] - y)
 		B = (T[0] - self.radius, T[1])
 		C = (T[0] + self.radius, T[1])
