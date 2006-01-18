@@ -22,7 +22,7 @@ IF ERRORLEVEL 0 GOTO :RUN_SETUP
 
 :INSTALL_PYTHON
 ECHO Python file associations not detected: Installing Python 2.4
-start /wait external\win32\python-2.4.msi
+start /wait external\win32\python-2.4.2.msi
 
 
 :RUN_SETUP
