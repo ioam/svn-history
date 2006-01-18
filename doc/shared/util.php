@@ -72,7 +72,7 @@ function menu_side($fname) {
 		"Tutorial" => "../Tutorial/index.html",
 		"User Manual" => "../User_Manual/index.html",
 		"Reference Manual" => "../Reference_Manual/index.html",
-#		"Developer Manual" => "../Developer_Manual/index.html",
+		"Developer Manual" => "../Developer_Manual/index.html",
 		"Downloads" => "../Downloads/index.html",
 		"Forums" => "../Forums/index.html",
 		"Team Members" => "../Team_Members/index.html",
