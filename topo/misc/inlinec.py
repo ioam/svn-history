@@ -25,7 +25,9 @@ the function is a stub.
 
 $Id$
 """
+import os
 from copy import copy
+from topographica_script import WIN_IMPORT_WEAVE
 
 # In case an outside package wants to know.  Try block will turn true
 # if it happens.
@@ -34,8 +36,9 @@ weave_imported = False
 def inline(*params,**nparams): raise NotImplementedError
 
 try:
-    import weave
-    weave_imported = True
+    if WIN_IMPORT_WEAVE or os.name != 'nt':
+        import weave
+        weave_imported = True
 
     # Default parameters to add to the inline_weave() call.
     inline_named_params = {
