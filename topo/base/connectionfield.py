@@ -69,14 +69,8 @@ class ConnectionField(TopoObject):
         self.__weights_bound_template = weights_bound_template
         self.initialize_slice_array()
 
-        r1,r2,c1,c2 = self.slice_tuple()
-
-        # set up the weights centered around 0,0 to avoid problems
-        # with different-sized results at different floating-point
-        # locations in the Sheet
-        w = weights_generator(x=0,y=0,bounds=weights_bound_template,
-                              density=self.input_sheet.density,theta=0,
-                              rows=r2-r1,cols=c2-c1)
+        w = weights_generator(x=self.x,y=self.y,bounds=self.bounds,
+                              density=self.input_sheet.density,theta=0)
         self.weights = w.astype(weight_type)
         # Maintain the original type throughout operations, i.e. do not
         # promote to double.
@@ -92,9 +86,11 @@ class ConnectionField(TopoObject):
         # also change_bounds), and to avoid duplicating this code. Also this
         # probably slows simulation startup time (and time when bounds are changed).
         self.weights_shape = weights_shape
-        m = weights_shape(x=0,y=0,bounds=weights_bound_template,
-                          density=self.input_sheet.density,theta=0,
-                          rows=r2-r1,cols=c2-c1)
+        # CEBHACKALERT: the user might specify a size based on the weights_bounds
+        # they also specified. Do we want to adjust that size if the weights_bounds
+        # have been adjusted too?
+        m = weights_shape(x=self.x,y=self.y,bounds=self.bounds,
+                          density=self.input_sheet.density,theta=0)
         m = Numeric.where(m>=0.5,m,0.0)
         self.mask = m.astype(weight_type)
         self.mask.savespace(1)
@@ -120,7 +116,9 @@ class ConnectionField(TopoObject):
         location of the unit, and it will allow to retrieve the slice from the bounding box by
         using the reversed function bounds2slice.
 	"""
-
+        # CEBHACKALERT: we might want to make Sheet's bounds2slice() and slice2bounds() work more like this,
+        # or at least have methods to perform what this does in Sheet.
+        
         rows,cols = bounds2shape(self.__weights_bound_template,self.input_sheet.xdensity,self.input_sheet.ydensity)
 
         cr,cc = sheet2matrixidx(self.x, self.y,
