@@ -39,12 +39,17 @@ class EditorObject :
 	self.paramFrame = ParametersFrame(paramWindow)
 	self.buttonPanel = Frame(paramWindow)
 	self.buttonPanel.pack(side = BOTTOM)
-        #JABHACKALERT: We also need an OK button that applies and then closes the window
 	updateButton = Button(self.buttonPanel, text = 'Apply', command = self.updateParameters)
+	okayButton = Button(self.buttonPanel, text = 'Ok', command = lambda : self.okParameters(paramWindow))
 	updateButton.pack(side = LEFT)
+	okayButton.pack(side = RIGHT)
 
     def updateParameters(self) :
 	self.paramFrame.set_obj_params()
+
+    def okParameters(self, paramWindow) :
+	self.updateParameters()
+	paramWindow.destroy()
 
     def setFocus(self, focus) : # set focus
 	self.focus = focus
