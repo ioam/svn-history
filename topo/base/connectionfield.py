@@ -61,10 +61,13 @@ class ConnectionField(TopoObject):
     # self.slice_tuple() for a nicer Python access method.
     slice_array = []
     
-    def __init__(self,input_sheet,weights_bound_template,
+    def __init__(self,x,y,input_sheet,weights_bound_template,
                  weights_generator,weights_shape,weight_type=Numeric.Float32,
                  output_fn=Identity(),**params):
+
         super(ConnectionField,self).__init__(**params)
+
+        self.x = x; self.y = y
         self.input_sheet = input_sheet
         self.__weights_bound_template = weights_bound_template
         self.initialize_slice_array()
@@ -392,13 +395,13 @@ class CFProjection(Projection):
                 # sheet.  Instead, we will need to add the ability to
                 # use some other type of mapping, e.g. to add jitter
                 # in the initial mapping.
-                row.append(self.cf_type(input_sheet=self.src,
-                                        weights_bound_template=self.weights_bounds,
-                                        weights_generator=self.weights_generator,
-                                        weights_shape=self.weights_shape,
-                                        weight_type=self.weight_type,
-                                        output_fn=self.learning_fn.output_fn,
-                                        x=x,y=y))
+                row.append(self.cf_type(x,y,
+                                        self.src,
+                                        self.weights_bounds,
+                                        self.weights_generator,
+                                        self.weights_shape,
+                                        self.weight_type,
+                                        self.learning_fn.output_fn))
 
             cflist.append(row)
 
