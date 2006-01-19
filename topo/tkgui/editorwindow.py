@@ -10,7 +10,7 @@ __version__='$Revision$'
 # Alan Lindsay
 # Binding Mouse Action
 
-from Tkinter import *
+from Tkinter import Canvas, Frame, Tk, Menu, Scrollbar, SUNKEN, YES, BOTH, LEFT, END, RIGHT, BOTTOM, X, Y
 from editortools import ArrowTool, NodeTool, ConTool
 from topo.base.simulator import get_active_sim
 

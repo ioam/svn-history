@@ -6,7 +6,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import *
+from Tkinter import Frame, Label, Canvas, TOP, X, GROOVE, RAISED
 import Pmw
 from editorobjects import EditorSheet, EditorProjection
 import topo.sheets

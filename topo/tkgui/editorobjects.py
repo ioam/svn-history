@@ -6,8 +6,7 @@ $Id$
 """
 __version__='$Revision$'
 
-# JABALERT: Please try to eliminate import *
-from Tkinter import *
+from Tkinter import Button, Label, Frame, Toplevel, TOP, LEFT, RIGHT, BOTTOM, E
 import Pmw
 import math
 
@@ -41,8 +40,8 @@ class EditorObject :
 	self.buttonPanel.pack(side = BOTTOM)
 	updateButton = Button(self.buttonPanel, text = 'Apply', command = self.updateParameters)
 	okayButton = Button(self.buttonPanel, text = 'Ok', command = lambda : self.okParameters(paramWindow))
-	updateButton.pack(side = LEFT)
 	okayButton.pack(side = RIGHT)
+	updateButton.pack(side = RIGHT)
 
     def updateParameters(self) :
 	self.paramFrame.set_obj_params()
@@ -185,7 +184,7 @@ class EditorSheet(EditorNode) :
 	self.canvas.delete(self.id) # remove the current parallelogram
 	self.canvas.delete(self.label) # remove label
 	if (focus) : col = self.colours[0]
-	else : 	       col = self.colours[1]
+	else : col = self.colours[1]
 	self.initDraw(col, focus) # create new one with correct colour
 	self.currentCol = col
 	# redraw the connections
@@ -439,10 +438,15 @@ class EditorProjection(EditorConnection) :
     def getMid(self, pos1, pos2) : # returns the middle of two points
 	return (pos1[0] + (pos2[0] - pos1[0])*0.5, pos1[1] + (pos2[1] - pos1[1])*0.5)
 
+    # returns the size of the semiminor axis of the ellipse representing the drawIndex-th
+    # lateral projection. The ovals decrease in size as their drawIndex increases. The
+    # semimajor axis is calculated as 2 * semiminor axis.
     def getFact(self) :
 	n = 0.7 * self.drawIndex
 	return (15 / (1 + n)) 
 
+    # returns the gradients of the two lines making the opening 'v' part of the receptive field. 
+    # this depends on the drawIndex, as it determines where the projection's representation begins.
     def calcGradient(self) :
 	posTo = (self.nodeTo.x, self.nodeTo.y)
 	posFrom = (self.nodeFrom.x, self.nodeFrom.y)
@@ -459,8 +463,9 @@ class EditorProjection(EditorConnection) :
 	return (MBA, MCA)
 
     def inBounds(self, x, y, receptiveFields = True) : # returns true if point lies in a bounding box
-	# returns true if x, y lie inside the triangular receptive field representing this projection
+
 	if (receptiveFields) :
+		# returns true if x, y lie inside the oval representing this lateral projection
 		if (self.nodeTo == None or self.nodeTo == self.nodeFrom) :
 			fact = self.getFact()
 			x, y = x - self.nodeTo.getPos()[0], y - self.nodeTo.getPos()[1]
@@ -472,7 +477,7 @@ class EditorProjection(EditorConnection) :
 			if (y > pY or y < -pY) :
 				return False
 			return True
-			
+		# returns true if x, y lie inside the triangular receptive field representing this projection
 		# get the points of the triangular receptive field, centered around the x, y point given
 		posTo = (self.nodeTo.x, self.nodeTo.y)
 		posFrom = (self.nodeFrom.x, self.nodeFrom.y)
