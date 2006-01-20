@@ -411,7 +411,6 @@ class TestCoordinateTransforms(unittest.TestCase):
 	    self.assertEqual(a,b)
 
     def test_bounds2slice(self):
-        # incomplete test
         
         # test that if you ask to slice the matrix with the sheet's BoundingBox, you
         # get back the whole matrix
@@ -420,41 +419,110 @@ class TestCoordinateTransforms(unittest.TestCase):
         true_slice = (0,10,0,10) # inclusive left boundary, exclusive right boundary
         self.assertEqual(slice,true_slice) 
 
+	# for the following tests, the values have been all computed by hand and then
+        # tested (by JC). The boundingbox and density tested have been chosen randomly,
+        # then drawn to get the slice from it.
+       
+	# Test with 20 density. 
+
         bb = boundingregion.BoundingBox(points=((-0.05,-0.20),(0.20,0.05)))
         slice = bounds2slice(bb,sheet_bb,20,20)
-        true_slice = (9,14,9,14) # inclusive left boundary, exclusive right boundary
+        true_slice = (9,14,9,14) 
         self.assertEqual(slice,true_slice)
 
 	bb = boundingregion.BoundingBox(points=((-0.40,0),(-0.30,0.30)))
         slice = bounds2slice(bb,sheet_bb,20,20)
-        true_slice = (4,10,2,4) # inclusive left boundary, exclusive right boundary
+        true_slice = (4,10,2,4) 
         self.assertEqual(slice,true_slice)
 
 	bb = boundingregion.BoundingBox(points=((0.15,0.10),(0.30,0.30)))
         slice = bounds2slice(bb,sheet_bb,20,20)
-        true_slice = (4,8,13,16) # inclusive left boundary, exclusive right boundary
+        true_slice = (4,8,13,16) 
         self.assertEqual(slice,true_slice)
 
 	bb = boundingregion.BoundingBox(points=((-0.05,-0.45),(0.10,-0.25)))
         slice = bounds2slice(bb,sheet_bb,20,20)
-        true_slice = (15,19,9,12) # inclusive left boundary, exclusive right boundary
+        true_slice = (15,19,9,12) 
         self.assertEqual(slice,true_slice)
 	
 	# test with 7 density sheet.
 	
 	bb = boundingregion.BoundingBox(points=((-0.5+2.0/7.0,0.5-2.0/7.0),(-0.5+4.0/7.0,0.5)))
         slice = bounds2slice(bb,sheet_bb,7,7)
-        true_slice = (0,2,2,4) # inclusive left boundary, exclusive right boundary
+        true_slice = (0,2,2,4) 
         self.assertEqual(slice,true_slice)
 
 	# test with xdensity=7 and ydensity=10
 	
 	bb = boundingregion.BoundingBox(points=((-0.5+2.0/7.0,0.30),(-0.5+4.0/7.0,0.5)))
         slice = bounds2slice(bb,sheet_bb,7,10)
-        true_slice = (0,2,2,4) # inclusive left boundary, exclusive right boundary
+        true_slice = (0,2,2,4) 
         self.assertEqual(slice,true_slice)
 	
+    def test_slice2bounds(self):
 
+	# test that if you ask to slice the matrix with the sheet's BoundingBox, you
+        # get back the whole matrix 
+        # (I chose to use a 7 density, I don't know why I like 7 so much, it is kind of mystical)
+	
+	sheet_bb = boundingregion.BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+	slice = (0,7,0,7)
+	bounds = slice2bounds(slice,sheet_bb,7,7)
+	true_bounds_lbrt = (-0.5,-0.5,0.5,0.5)
+	for a,b in zip(bounds.aarect().lbrt(),true_bounds_lbrt):
+	    self.assertAlmostEqual(a,b)
+
+	# for the following tests, the values have been all computed by hand and then
+        # tested (by JC). The boundingbox and density tested have been chosen randomly,
+        # then drawn to get the slice from it.
+       	
+	# Test for 10 density
+
+	slice = (0,9,1,5)
+	bounds = slice2bounds(slice,sheet_bb,10,10)
+	true_bounds_lbrt = (-0.4,-0.4,0,0.5)
+	for a,b in zip(bounds.aarect().lbrt(),true_bounds_lbrt):
+	    self.assertAlmostEqual(a,b)
+
+	slice = (2,3,7,10)
+	bounds = slice2bounds(slice,sheet_bb,10,10)
+	true_bounds_lbrt = (0.2,0.2,0.5,0.3)
+	for a,b in zip(bounds.aarect().lbrt(),true_bounds_lbrt):
+	    self.assertAlmostEqual(a,b)
+	
+       	# Test for 7 density
+
+	slice = (3,7,2,5)
+	bounds = slice2bounds(slice,sheet_bb,7,7)
+	true_bounds_lbrt = (-0.5+2.0/7.0,-0.5,-0.5+5.0/7.0,0.5-3.0/7.0)
+	for a,b in zip(bounds.aarect().lbrt(),true_bounds_lbrt):
+	    self.assertAlmostEqual(a,b)
+
+	slice = (2,6,0,1)
+	bounds = slice2bounds(slice,sheet_bb,7,7)
+	true_bounds_lbrt = (-0.5,0.5-6.0/7.0,-0.5+1.0/7.0,0.5-2.0/7.0)
+	for a,b in zip(bounds.aarect().lbrt(),true_bounds_lbrt):
+	    self.assertAlmostEqual(a,b)
+
+	# Test for 25 density
+
+	slice = (0,25,4,10)
+	bounds = slice2bounds(slice,sheet_bb,25,25)
+	true_bounds_lbrt = (-0.5+4.0/25.0,-0.5,-0.5+10.0/25.0,0.5)
+	for a,b in zip(bounds.aarect().lbrt(),true_bounds_lbrt):
+	    self.assertAlmostEqual(a,b)
+	
+
+	slice = (7,18,3,11)
+	bounds = slice2bounds(slice,sheet_bb,25,25)
+	true_bounds_lbrt = (-0.5+3.0/25.0,0.5-18.0/25.0,-0.5+11.0/25.0,0.5-7.0/25.0)
+	for a,b in zip(bounds.aarect().lbrt(),true_bounds_lbrt):
+	    self.assertAlmostEqual(a,b)
+
+	
+
+	    
+	    
 
     # bounds2shape() tests
     #
