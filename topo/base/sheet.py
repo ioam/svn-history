@@ -413,6 +413,9 @@ class Sheet(EventProcessor):
 
 
     ### JABALERT: This should be deleted now that sheet_view_dict is public
+    ### JC: shouldn't we keep that, or at list write a function in utils that delete
+    ### a value in a dictinnary without returning an error if the key is not in the dict?
+    ### I leave for the moment, and have to ask Jim advise.
     def release_sheet_view(self,view_name):
         """
         Delete the dictionary entry with key entry 'view_name' to save
