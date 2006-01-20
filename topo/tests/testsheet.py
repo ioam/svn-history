@@ -415,10 +415,45 @@ class TestCoordinateTransforms(unittest.TestCase):
         
         # test that if you ask to slice the matrix with the sheet's BoundingBox, you
         # get back the whole matrix
-        bb = boundingregion.BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
-        slice = bounds2slice(bb,bb,10,10)
+        sheet_bb = boundingregion.BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+        slice = bounds2slice(sheet_bb,sheet_bb,10,10)
         true_slice = (0,10,0,10) # inclusive left boundary, exclusive right boundary
-        self.assertEqual(slice,true_slice) # CEBHACKALERT: failing right now
+        self.assertEqual(slice,true_slice) 
+
+        bb = boundingregion.BoundingBox(points=((-0.05,-0.20),(0.20,0.05)))
+        slice = bounds2slice(bb,sheet_bb,20,20)
+        true_slice = (9,14,9,14) # inclusive left boundary, exclusive right boundary
+        self.assertEqual(slice,true_slice)
+
+	bb = boundingregion.BoundingBox(points=((-0.40,0),(-0.30,0.30)))
+        slice = bounds2slice(bb,sheet_bb,20,20)
+        true_slice = (4,10,2,4) # inclusive left boundary, exclusive right boundary
+        self.assertEqual(slice,true_slice)
+
+	bb = boundingregion.BoundingBox(points=((0.15,0.10),(0.30,0.30)))
+        slice = bounds2slice(bb,sheet_bb,20,20)
+        true_slice = (4,8,13,16) # inclusive left boundary, exclusive right boundary
+        self.assertEqual(slice,true_slice)
+
+	bb = boundingregion.BoundingBox(points=((-0.05,-0.45),(0.10,-0.25)))
+        slice = bounds2slice(bb,sheet_bb,20,20)
+        true_slice = (15,19,9,12) # inclusive left boundary, exclusive right boundary
+        self.assertEqual(slice,true_slice)
+	
+	# test with 7 density sheet.
+	
+	bb = boundingregion.BoundingBox(points=((-0.5+2.0/7.0,0.5-2.0/7.0),(-0.5+4.0/7.0,0.5)))
+        slice = bounds2slice(bb,sheet_bb,7,7)
+        true_slice = (0,2,2,4) # inclusive left boundary, exclusive right boundary
+        self.assertEqual(slice,true_slice)
+
+	# test with xdensity=7 and ydensity=10
+	
+	bb = boundingregion.BoundingBox(points=((-0.5+2.0/7.0,0.30),(-0.5+4.0/7.0,0.5)))
+        slice = bounds2slice(bb,sheet_bb,7,10)
+        true_slice = (0,2,2,4) # inclusive left boundary, exclusive right boundary
+        self.assertEqual(slice,true_slice)
+	
 
 
     # bounds2shape() tests
