@@ -31,7 +31,7 @@ class PlotGroupTemplate(TopoObject):
     
     command = Parameter(None)
     
-    def __init__(self, plot_templates=None, **params):
+    def __init__(self, plot_templates=[], **params):
         """
         A PlotGroupTemplate is constructed from a name, an (optional)
         command that the user specifies should be called before using the
@@ -81,7 +81,14 @@ class PlotGroupTemplate(TopoObject):
         super(PlotGroupTemplate,self).__init__(**params)
        
 	self.plot_templates = KeyedList(plot_templates)
+
+    def add_plot_template(self,name,specification_tuple_list):
+	dict={}
+	for key,value in specification_tuple_list:
+	    dict[key]=value
+	self.plot_templates.append((name,dict))
         
+
 
 
 ###############################################################################
@@ -105,13 +112,20 @@ plotgroup_templates = KeyedList()
 # is created the first time it is needed).
 
 pgt = PlotGroupTemplate(name='Activity',
-			command='update_activity()',
-			plot_templates= [('Activity',
-					  {'Strength'   : 'Activity',
-					   'Hue'        : 'OrientationPreference',
-					   'Confidence' :  None,
-					   'Normalize'  : False})])
+			command='update_activity()')
+### JCALERT! There is no real need to specify 'Confidence':None
+pgt.add_plot_template('Activity',[('Strength','Activity'),('Hue','OrientationPreference'),('Normalize',False)])
+
+# pgt = PlotGroupTemplate(name='Activity',
+# 			command='update_activity()',
+# 			plot_templates= [('Activity',
+# 					  {'Strength'   : 'Activity',
+# 					   'Hue'        : 'OrientationPreference',
+# 					   'Confidence' :  None,
+# 					   'Normalize'  : False})])
+
 plotgroup_templates[pgt.name] = pgt
+
 
 ### JABALERT: Maybe this should change to a "ConnectionField" plot,
 ### (and also in the menu), for consistency, so that the plot labels
@@ -156,21 +170,25 @@ pgt = PlotGroupTemplate(name='Orientation Preference',
                                            'Confidence' : None})])                       
 plotgroup_templates[pgt.name] = pgt
 
-
+### JCALERT! We should not need to specify normalize in each plot_template,
+### but rather directly for the whole PlotGroupTemplate. (Anyway the way normalize works
+### should be changed in the panels...)
 pgt = PlotGroupTemplate(name='Center of Gravity',
                         command = 'measure_cog()',
 			plot_templates= [('XPreference',
                                           {'Strength'   : 'XPreference',
                                            'Hue'        : None,
-                                           'Confidence' : None}),
+                                           'Confidence' : None,
+					   'Normalize' : True}),
                                          ('YPreference',
                                           {'Strength'   : 'YPreference',
                                            'Hue'        : None,
-                                           'Confidence' : None}),
+                                           'Confidence' : None,
+					   'Normalize'  : True}),
                                          ('CoGPreference',
                                           {'Red'   : 'XPreference',
                                            'Green' : 'YPreference',
                                            'Blue'  : None,
-                                           'Normalize'  : False})])
+                                           'Normalize'  : True})])
 plotgroup_templates[pgt.name] = pgt
 
