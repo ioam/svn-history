@@ -72,8 +72,14 @@ class ConnectionField(TopoObject):
         self.__weights_bound_template = weights_bound_template
         self.initialize_slice_array()
 
+	r1=self.slice_array[0]
+        r2=self.slice_array[1]
+        c1=self.slice_array[2]
+        c2=self.slice_array[3]
+
         w = weights_generator(x=self.x,y=self.y,bounds=self.bounds,
-                              density=self.input_sheet.density,theta=0)
+                              density=self.input_sheet.density,theta=0,
+			      rows=r2-r1,cols=c2-c1)
         self.weights = w.astype(weight_type)
         # Maintain the original type throughout operations, i.e. do not
         # promote to double.
@@ -93,7 +99,8 @@ class ConnectionField(TopoObject):
         # they also specified. Do we want to adjust that size if the weights_bounds
         # have been adjusted too?
         m = weights_shape(x=self.x,y=self.y,bounds=self.bounds,
-                          density=self.input_sheet.density,theta=0)
+                          density=self.input_sheet.density,theta=0,
+			  rows=r2-r1,cols=c2-c1)
         m = Numeric.where(m>=0.5,m,0.0)
         self.mask = m.astype(weight_type)
         self.mask.savespace(1)

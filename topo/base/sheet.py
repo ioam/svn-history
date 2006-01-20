@@ -245,17 +245,32 @@ def bounds2slice(slice_bounds, input_bounds, input_xdensity, input_ydensity):
     that an activity matrix M can be sliced using M[a:b,c:d].
     """
 
-    ### JCALERT! For the moment, bounds to slice is only used by submatrix, that is only used in 
-    ### plot to get the submatrix corresponding  weights bounds
-    ### the code below, associated with the slice2bounds function notified constitute an exact transformation
-    ### from slice to bounds and bounds to slice 
-
+    ### JCALERT! In order to get the exact result for the slices, I still use the margin method:
+    ### I add a slight margin to the bounds in order to get around rounding problems when using int
+    ### It has to be changed to use the "center method": if the center of a cell is within the bounds,
+    ### this cell belongs to the slice.
+    ### Nevertheless, this function, associated with the slice2bounds function 
+    ### still provide an exact transformation from slice to bounds and bounds to slice.
+ 
     left,bottom,right,top = slice_bounds.aarect().lbrt()
+
+    # calculate xstep and ystep
+    xstep = 1.0 / input_xdensity
+    ystep = 1.0 / input_ydensity
+    # This is arbitrary.
+    fact = 20
+    # construct the margin (which depend on the density)
+    left = left-xstep/fact
+    right = right+ystep/fact
+    bottom = bottom-xstep/fact
+    top = top+ystep/fact
+
     toprow,leftcol = sheet2matrixidx(left,top,input_bounds,input_xdensity,input_ydensity)
     botrow, rightcol =sheet2matrixidx(right,bottom,input_bounds,input_xdensity,input_ydensity)
    
     maxrow,maxcol = sheet2matrixidx(input_bounds.aarect().right(),input_bounds.aarect().bottom(),input_bounds,input_xdensity,input_ydensity)
 
+    ### JCALERT! This has to be understood and changed (why do we use maxrow..?)
     maxrow = maxrow - 1
     maxcol = maxcol - 1
     rstart = max(0,toprow+1)
@@ -284,14 +299,11 @@ def slice2bounds(slice,sheet_bounds,sheet_xdensity,sheet_ydensity):
     """
     r1,r2,c1,c2 = slice
 
-    xdensity = sheet_xdensity
-    ydensity = sheet_ydensity
-    
-    left,bottom = matrix2sheet(r2,c1,sheet_bounds,xdensity,ydensity)
-    right, top   = matrix2sheet(r1,c2,sheet_bounds,xdensity,ydensity)
+    left,bottom = matrix2sheet(r2,c1,sheet_bounds,sheet_xdensity,sheet_ydensity)
+    right, top   = matrix2sheet(r1,c2,sheet_bounds,sheet_xdensity,sheet_ydensity)
 
-    xstep = 1.0 / xdensity
-    ystep = 1.0 / ydensity
+    bounds = BoundingBox(points=((left,bottom),
+                                  (right,top)))
 
     # yfsit: why do we need to check for <= 0?
     #if (int(sheet_density*(right-left)) <= 0):
@@ -303,12 +315,6 @@ def slice2bounds(slice,sheet_bounds,sheet_xdensity,sheet_ydensity):
     #   ystep = float((top-bottom)) / int(sheet_density)
     #else:
     #   ystep = float((top-bottom)) / int(sheet_density*(top-bottom))
-
-    ### JCALERT!, 20 is an arbitrary value, but it has to be check that
-    ### any value is alright  (anything is supposed to work) to see with Jim
-    fact = 20
-    bounds = BoundingBox(points=((left-xstep/fact,bottom-xstep/fact),
-                                 (right+ystep/fact,top+ystep/fact)))
 
     return bounds
 
