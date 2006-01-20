@@ -92,7 +92,7 @@ class EditorNode(EditorObject) :
 		self.fromCon = self.fromCon + [con]
 	else :
 		self.toCon = self.toCon + [con]
-	self.draw()
+	self.canvas.redrawObjects()
 	
     def removeCon(self, con, fromTo) : # remove a connection to or from this node
 	if (fromTo) :
@@ -116,7 +116,7 @@ class EditorNode(EditorObject) :
 			con.drawIndex -= 1
 			if (not(con.nodeTo == con.nodeFrom)) :
 				con.connectToCoord(self.width)
-	self.draw()
+	self.canvas.redrawObjects()
 
     def getConCount(self, node) :
 	count = 0
@@ -176,6 +176,7 @@ class EditorSheet(EditorNode) :
 	self.initDraw(col, False) # create a new paralellogram
 	self.currentCol = col
 	self.gradient = 1
+	self.canvas.redrawObjects()
 
     ############ Draw methods ############################
 
@@ -187,11 +188,12 @@ class EditorSheet(EditorNode) :
 	else : col = self.colours[1]
 	self.initDraw(col, focus) # create new one with correct colour
 	self.currentCol = col
+	self.canvas.redrawObjects()
 	# redraw the connections
-	for con in self.toCon : 
-		con.move()
-	for con in self.fromCon :
-		con.move()
+	#for con in self.toCon : 
+	#	con.move()
+	#for con in self.fromCon :
+	#	con.move()
 
     def initDraw(self, colour, focus) :
 	if (focus) : col = colour
@@ -216,6 +218,8 @@ class EditorSheet(EditorNode) :
 	try :
 		self.canvas.move(self.id, x, y)
 		self.canvas.move(self.label, x, y)
+		self.canvas.tag_raise(self.id)
+		self.canvas.tag_raise(self.label)
 	except IndexError :
 		print("Out of Canvas")
 	# redraw the connections
@@ -241,6 +245,7 @@ class EditorSheet(EditorNode) :
 	self.canvas.delete(self.id) # remove the sheet and label from the draw area
 	self.canvas.delete(self.label)
 	self.canvas.removeObject(self) # remove from canvas' object list
+	self.canvas.redrawObjects()
 
     def move(self, x, y) :
 	# the connections position is updated
@@ -249,6 +254,7 @@ class EditorSheet(EditorNode) :
 	self.y = y
 	self.sheet.guiX, self.sheet.guiY = x, y # update topo sheet position
 	self.draw(self.x - old[0], self.y - old[1])
+	self.canvas.redrawObjects()
 
     ############ Util methods ##############################
 
@@ -426,12 +432,13 @@ class EditorProjection(EditorConnection) :
 	
     ############ Update methods ############################ 
     def remove(self) :
-	for id in self.id : # remove the representation from the canvas
-		self.canvas.delete(id)
 	self.canvas.delete(self.label)
 	if (self.nodeTo != None) : # if a connection had been made then remove it from the 'to' node
 		self.nodeTo.removeCon(self, self.TO)
 	self.nodeFrom.removeCon(self, self.FROM) # and remove from 'from' node
+	for id in self.id : # remove the representation from the canvas
+		self.canvas.delete(id)
+	self.canvas.delete(self.label)
 
 
     ############ Util methods ##############################

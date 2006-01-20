@@ -36,8 +36,12 @@ class EditorCanvas(Canvas) :
 	self.menu = Menu(self)
 	# add proporty and delete entries in the menu.
 	self.menu.insert_command(END, label = 'Properties', command = lambda: self.showProperties(self.focus))
+	self.menu.insert_command(END, label = 'Move Forward', command = lambda: self.moveForward(self.focus))
+	self.menu.insert_command(END, label = 'Move to Front', command = lambda: self.moveToFront(self.focus))
+	self.menu.insert_command(END, label = 'Move to Back', command = lambda: self.moveToBack(self.focus))
 	self.menu.insert_command(END, label = 'Delete', command = lambda: self.deleteXY(self.focus))
-        # bind keyPress events in canvas.
+        self.objInds = [1,2,3]
+	# bind keyPress events in canvas.
         self.bind('<KeyPress>', self.keyPress)
         # bind the possible left button events to the canvas.
         self.bind('<Button-1>', self.leftClick)
@@ -190,6 +194,9 @@ class EditorCanvas(Canvas) :
     def addObject(self, obj) : # add a new object to the Canvas
 	self.objectList = self.objectList + [obj]
 
+    def addObjectToBack(self, obj) : # add a new object to the Canvas at front of list
+	self.objectList = [obj] + self.objectList
+
     def removeObject(self, obj) : # remove an object from the canvas
 	for i in range(len(self.objectList)) : # find object index in list
 		if (obj == self.objectList[i]) : break
@@ -197,10 +204,11 @@ class EditorCanvas(Canvas) :
 	del self.objectList[i] # delete object from list
 
     def getObjectXY(self, x, y) : # return object at given x, y (None if no object)
+	theObj = None
 	for obj in self.objectList :
 		if (obj.inBounds(x, y)) :
-			return obj
-	return None
+			theObj = obj
+	return theObj
 
     ########### Connection Methods #################################
 
@@ -228,12 +236,50 @@ class EditorCanvas(Canvas) :
 	else :
 		focus.remove()
 
+    ########### Object Order Methods ###############################
+    
+    def redrawObjects(self) :
+	for obj in self.objectList :
+		obj.draw()
+    
+    def moveToFront(self, obj) :
+	self.removeObject(obj)
+	self.addObject(obj)
+	self.redrawObjects()
+
+    def moveForward(self, obj) :
+	for i in range(len(self.objectList)) : # find object index in list
+		if (obj == self.objectList[i]) : break
+	else : return # object was not found
+	a = self.objectList[i : (i+2)]
+	a.reverse()
+	self.objectList[i:(i+2)] = a
+	self.redrawObjects()
+
+    def moveToBack(self, obj) :
+	self.removeObject(obj)
+	self.addObjectToBack(obj)
+	self.redrawObjects()
+
     ########### Hang List Methods ##################################
 
     def showHangList(self, event) :
         self.changeMode('a') # change to ARROW mode
+	x, y = self.canvasx(event.x), self.canvasy(event.y)
 	# gets object or connection at this point
-	focus = self.getXY(self.canvasx(event.x), self.canvasy(event.y)) 
+	focus = self.getConXY(x, y) # checks bounds of connections
+	if (focus == None) :
+		# checks bounds of objects
+    		focus = self.getObjectXY(x, y)
+	else :
+		for i in self.objInds :
+			self.menu.entryconfig(i,
+			## Gray out menu item ###########
+                	foreground = 'Gray',            #
+                	activeforeground = 'Gray',      #
+                	activebackground = 'Light Gray' #
+                	#################################
+			)
 	if (focus != None) :
 		focus.setFocus(True) # give it the focus
 		self.focus = focus
