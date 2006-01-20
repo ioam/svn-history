@@ -271,13 +271,19 @@ class EditorCanvas(Canvas) :
 	if (focus == None) :
 		# checks bounds of objects
     		focus = self.getObjectXY(x, y)
+		for i in self.objInds :
+			self.menu.entryconfig(i,
+			## Fill in menu item ############
+                	foreground = 'Black',            #
+			activeforeground = 'Black'       #
+                	#################################
+			)
 	else :
 		for i in self.objInds :
 			self.menu.entryconfig(i,
 			## Gray out menu item ###########
                 	foreground = 'Gray',            #
-                	activeforeground = 'Gray',      #
-                	activebackground = 'Light Gray' #
+                	activeforeground = 'Gray'       #
                 	#################################
 			)
 	if (focus != None) :
