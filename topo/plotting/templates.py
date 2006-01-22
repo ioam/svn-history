@@ -178,7 +178,7 @@ plotgroup_templates[pgt.name] = pgt
 ### but rather directly for the whole PlotGroupTemplate. (Anyway the way normalize works
 ### should be changed in the panels...)
 pgt = PlotGroupTemplate(name='Center of Gravity',
-                        command = 'measure_cog()',
+                        command = 'measure_cog() ; topographic_grid()',
 			plot_templates= [('XPreference',
                                           {'Strength'   : 'XPreference',
                                            'Hue'        : None,

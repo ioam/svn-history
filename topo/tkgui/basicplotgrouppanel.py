@@ -24,8 +24,12 @@ from topo.plotting.plotgroup import plotgroup_dict, BasicPlotGroup
 
 ### We want to support any featuremap type defined in that file, and
 ### so import all of them here.
-from topo.commands.analysis import *
+import matplotlib
+matplotlib.use('TkAgg')
 
+from topo.commands.analysis import *
+from topo.commands.basic import *
+from topo.commands.lineplotting import *
 
 ### JCALERT! Get rid of the pengine parameter.
 class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
