@@ -289,7 +289,8 @@ particularly helpful.
 
 <P><DT>Data import/export</DT><DD>
 It will be crucial to provide easy-to-use interfaces for exchanging
-data and calling code in other simulators, such as Matlab.  These will
+data and calling code in other simulators, such as Matlab (see
+pymat.sourceforge.net).  These will
 be used both for analyzing Topographica data, and for allowing
 connection patterns and/or map organization to be specified from
 experimental data.  Meanwhile, the Python command-line interface can
