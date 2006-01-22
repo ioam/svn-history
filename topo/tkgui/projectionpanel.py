@@ -25,7 +25,7 @@ from plotgrouppanel import PlotGroupPanel
 import topoconsole
 
 ### JCALERT! See if we could delete this import * and replace it...
-from topo.analysis.updatecommands import *
+from topo.commands.analysis import *
 
 
 
@@ -216,9 +216,9 @@ class ProjectionPanel(CFSheetPlotPanel):
 	    self.pe_group = ProjectionPlotGroup(self.console.simulator,self.pgt,self.plot_group_key,
 					         self.region.get(),[])
         coords = self.pe_group.generate_coords()
-        topo.analysis.updatecommands.proj_coords = coords
-	topo.analysis.updatecommands.sheet_name = self.region.get()
-        topo.analysis.updatecommands.proj_name = self.weight_name.get()
+        topo.commands.analysis.proj_coords = coords
+	topo.commands.analysis.sheet_name = self.region.get()
+        topo.commands.analysis.proj_name = self.weight_name.get()
         exec self.cmdname.get()      
         # self.situate is defined in the super class CFSheetPlotPanel
         self.pe_group.situate= self.situate

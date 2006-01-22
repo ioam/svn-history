@@ -24,7 +24,7 @@ from topo.plotting.plotgroup import plotgroup_dict, BasicPlotGroup
 
 ### We want to support any featuremap type defined in that file, and
 ### so import all of them here.
-from topo.analysis.updatecommands import *
+from topo.commands.analysis import *
 
 
 ### JCALERT! Get rid of the pengine parameter.

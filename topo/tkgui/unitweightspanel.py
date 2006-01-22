@@ -20,8 +20,8 @@ from topo.plotting.plotgroup import plotgroup_dict, UnitWeightsPlotGroup
 from topo.base.sheet import Sheet
 import topoconsole
 
-from topo.analysis.updatecommands import *
-import topo.analysis.updatecommands
+from topo.commands.analysis import *
+import topo.commands.analysis
 
 ### JABALERT!  Why isn't there a Normalize button on this and
 ### ProjectionPanel like there is on ActivityPanel?
@@ -131,8 +131,8 @@ class UnitWeightsPanel(CFSheetPlotPanel):
 	 
         self.generate_plot_group_key()
 	
-	topo.analysis.updatecommands.coordinate = (self.x,self.y)
-	topo.analysis.updatecommands.sheet_name = self.region.get()
+	topo.commands.analysis.coordinate = (self.x,self.y)
+	topo.commands.analysis.sheet_name = self.region.get()
 
         exec self.cmdname.get()
 		

@@ -8,15 +8,12 @@ from math import pi
 
 import topo.base.simulator
 
-from topo.base.sheetview import SheetView
+from topo.analysis.featuremap import MeasureFeatureMap
 from topo.base.sheet import Sheet
-from topo.sheets.generatorsheet import GeneratorSheet
-
-from topo.patterns.basic import SineGrating, Gaussian
-
+from topo.base.sheetview import SheetView
 from topo.commands.basic import pattern_present
-
-from featuremap import MeasureFeatureMap
+from topo.patterns.basic import SineGrating, Gaussian
+from topo.sheets.generatorsheet import GeneratorSheet
 
 
 class PatternPresenter(object):
