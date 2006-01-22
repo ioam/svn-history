@@ -5,7 +5,6 @@ $Id$
 """
 
 
-import re, os
 from Numeric import array
 from math import pi
 
@@ -108,21 +107,6 @@ def measure_cog(divisions=6,size=0.1,scale=0.3,offset=0.0,display=False,
         x=MeasureFeatureMap(feature_values)
         param_dict = {"size":size,"scale":scale,"offset":offset}
         x.measure_maps(user_function, param_dict, display)
-
-
-def plot_cog():
-    """
-    Plot the CoG for all Sheets for which measure_cog returned results,
-    using the external command 'topogrid'.
-    """
-    sim = topo.base.simulator.get_active_sim()    
-    for sheet in sim.objects(Sheet).values():
-        if (('XPreference' in sheet.sheet_view_dict) and
-            ('YPreference' in sheet.sheet_view_dict)):
-            octave_output("XPreference.matrix",sheet.sheet_view_dict['XPreference'].view()[0],"XPreference",sheet.name)
-            octave_output("YPreference.matrix",sheet.sheet_view_dict['YPreference'].view()[0],"YPreference",sheet.name)
-            topogrid=re.sub('::','/external/topogrid',os.getenv('PYTHONPATH'))
-            os.system(topogrid+" XPreference.matrix YPreference.matrix")
 
 
 def update_activity():
