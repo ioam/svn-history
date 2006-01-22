@@ -76,7 +76,9 @@ order from most general to most specific:
       (usually with relative pathslike <CODE>sheet</CODE>)
 </OL>
 
-<P>A blank line separates each of these sections.  For example:
+<P>A blank line separates each of these sections, and items in the
+sections are typically ordered alphabetically (at least if there is a
+long list).  For example:
 
 <PRE>
   import types
@@ -84,9 +86,9 @@ order from most general to most specific:
   
   from Numeric import transpose, array
   
-  from topo.base.utils import flatten, dict_sort
-  from topo.base.topoobject import TopoObject
   from topo.base.connectionfield import CFSheet
+  from topo.base.topoobject import TopoObject
+  from topo.base.utils import flatten, dict_sort
   
   from plot import Plot
   import bitmap
