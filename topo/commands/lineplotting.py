@@ -49,15 +49,18 @@ def topographic_grid():
             # The "k-" means plot in black using solid lines; see matplotlib for
             # more info.
             #pylab.plot(x,y,"k-",transpose(x),transpose(y),"k-")
+            isint=pylab.isinteractive() # Temporarily make non-interactive for plotting
+            pylab.ioff()
             for r,c in zip(y,x):
                 pylab.plot(c,r,"k-")
             for r,c in zip(transpose(y),transpose(x)):
                 pylab.plot(c,r,"k-")
+            if isint: pylab.ion()
             
             pylab.xlabel('x')
             pylab.ylabel('y')
             
-            pylab.title('Topographic mapping to '+sheet.name)
+            pylab.title('Topographic mapping to '+sheet.name+' at time '+str(sim.time()))
 
             # Will need to provide a way to save this output
             # when there is no GUI
