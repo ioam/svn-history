@@ -5,14 +5,17 @@ $Id$
 """
 __version__ = "$Revision$"
 
-from Numeric import sqrt,ones,dot,sum,arctan2
+import re
 
-# Question: Couldn't this use float('inf') or array([float('inf')])?
-# Answer: No.  As of Python 2.4 only some platforms will support float('inf').
-#         In particular, Python 2.4 for Windows generates a cast error
-#         while the operation does work under Linux.
-#         (see http://www.python.org/peps/pep-0754.html)
+from Numeric import sqrt, ones, dot, sum, arctan2, array2string
 
+
+# One might think we could use float('inf') or array([float('inf')]) here,
+# but as of Python 2.4 only some platforms will support float('inf').
+# 
+# In particular, Python 2.4 for Windows generates a cast error even though
+# the operation works under Linux.
+# (see http://www.python.org/peps/pep-0754.html)
 inf = (ones(1)/0.0)[0]
 
 def L2norm(v):
@@ -96,5 +99,27 @@ def exp(x):
     # This value works on the linuxes we all use, but what about on other platforms?
     MAX_MAG = 700.0
     return Numeric.exp(Numeric.where(abs(x)>MAX_MAG,Numeric.sign(x)*inf,x))
+
+
+def octave_str(mat,name="mat",owner=""):
+   """
+   Print the given Numeric matrix in Octave format, listing the given
+   matrix name and the object that owns it (if any).
+   """
+   # This just prints the string version of the matrix and does search/replace
+   # to convert it; there may be a faster or easier way.
+   mstr=array2string(mat)
+   mstr=re.sub('\n','',mstr)
+   mstr=re.sub('[[]','',mstr)
+   mstr=re.sub('[]]','\n',mstr)
+   return ("# Created from %s %s\n# name: %s\n# type: matrix\n# rows: %s\n# columns: %s\n%s" %
+          (owner,name,name,mat.shape[0],mat.shape[1],mstr))
+
+
+def octave_output(filename,mat,name="mat",owner=""):
+   """Writes the given matrix to a new file of the given name, in Octave format."""
+   f = open(filename,'w')
+   f.write(octave_str(mat,name,owner))
+   f.close()
 
 
