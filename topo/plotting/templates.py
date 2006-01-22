@@ -110,6 +110,10 @@ plotgroup_templates = KeyedList()
 # For instance, we can implement an add_plot_template function,
 # accepting a single plot and adding it to a PlotGroupTemplate (which
 # is created the first time it is needed).
+#
+# We should also be able to store things like the Normalize option setting
+# (currently ignored?) and a documentation string describing each plot
+# (for hovering help text) within each template.
 
 pgt = PlotGroupTemplate(name='Activity',
 			command='update_activity()')
