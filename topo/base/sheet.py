@@ -235,7 +235,8 @@ def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density):
     r1,r2,c1,c2 = bounds2slice(bounds,sheet_bounds,xdensity,ydensity)
     return sheet_matrix[r1:r2,c1:c2]
 
-def bounds2slice(slice_bounds, input_bounds, input_xdensity, input_ydensity):
+
+def bounds2slice(slice_bounds, sheet_bounds, xdensity, ydensity):
     """
     Convert a bounding box into an array slice suitable for computing a submatrix.
     
@@ -255,8 +256,8 @@ def bounds2slice(slice_bounds, input_bounds, input_xdensity, input_ydensity):
     left,bottom,right,top = slice_bounds.aarect().lbrt()
 
     # calculate xstep and ystep
-    xstep = 1.0 / input_xdensity
-    ystep = 1.0 / input_ydensity
+    xstep = 1.0 / xdensity
+    ystep = 1.0 / ydensity
     # This is arbitrary.
     fact = 20
     # construct the margin (which depend on the density)
@@ -265,10 +266,10 @@ def bounds2slice(slice_bounds, input_bounds, input_xdensity, input_ydensity):
     bottom = bottom-xstep/fact
     top = top+ystep/fact
 
-    toprow,leftcol = sheet2matrixidx(left,top,input_bounds,input_xdensity,input_ydensity)
-    botrow, rightcol =sheet2matrixidx(right,bottom,input_bounds,input_xdensity,input_ydensity)
+    toprow,leftcol = sheet2matrixidx(left,top,sheet_bounds,xdensity,ydensity)
+    botrow, rightcol =sheet2matrixidx(right,bottom,sheet_bounds,xdensity,ydensity)
    
-    maxrow,maxcol = sheet2matrixidx(input_bounds.aarect().right(),input_bounds.aarect().bottom(),input_bounds,input_xdensity,input_ydensity)
+    maxrow,maxcol = sheet2matrixidx(sheet_bounds.aarect().right(),sheet_bounds.aarect().bottom(),sheet_bounds,xdensity,ydensity)
 
     ### JCALERT! This has to be understood and changed (why do we use maxrow..?)
     maxrow = maxrow - 1
