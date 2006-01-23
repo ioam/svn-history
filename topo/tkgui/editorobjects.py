@@ -89,9 +89,15 @@ class EditorNode(EditorObject) :
 
     def attachCon(self, con, fromTo) :
 	if (fromTo == self.FROM) :
-		self.fromCon = self.fromCon + [con]
+		if (con.nodeFrom == con.nodeTo) :
+			self.fromCon = [con] + self.fromCon
+		else :
+			self.fromCon = self.fromCon + [con]
 	else :
-		self.toCon = self.toCon + [con]
+		if (con.nodeFrom == con.nodeTo) :
+			self.toCon = [con] + self.toCon
+		else :
+			self.toCon = self.toCon + [con]
 	self.canvas.redrawObjects()
 	
     def removeCon(self, con, fromTo) : # remove a connection to or from this node
@@ -320,7 +326,9 @@ class EditorConnection(EditorObject) :
 	if (self.name == "") :
 		self.name = con.name
 	self.drawIndex = self.nodeFrom.getConCount(nodeTo)
-	if (not (self.nodeFrom == nodeTo)) :
+	if (self.nodeFrom == nodeTo) :
+		self.fact = self.getFact() 
+	else :
 		self.connectToCoord(self.nodeFrom.width - 10)
 	self.nodeTo = nodeTo # store a reference to the node this is connected to
 	self.nodeFrom.attachCon(self, self.FROM) # tell the sheets that they are connected.
@@ -336,7 +344,7 @@ class EditorConnection(EditorObject) :
     def connectToCoord(self, width) :
 	n = self.drawIndex
 	sign = math.pow(-1, n)
-	self.dev = sign * width + (-sign) * math.pow(0.5, math.ceil(0.5 * (n + 1))) * width
+	self.dev = sign * width + (-sign) * math.pow(0.5, math.ceil(0.5 * (n))) * width
 
 
 class EditorProjection(EditorConnection) :
@@ -361,6 +369,7 @@ class EditorProjection(EditorConnection) :
 	self.id = (None,None)
 	self.label = None
 	self.balloon = Pmw.Balloon(canvas)
+	self.fact = self.getFact() 
 
     ############ Draw methods ############################
     def draw(self, receptiveFields = True) :
@@ -400,7 +409,7 @@ class EditorProjection(EditorConnection) :
 		self.label = self.canvas.create_text(mid[0] - 
 			     (20 + len(self.name)*3), mid[1] - (30 + dev) , text = self.name)
 		"""
-		fact = self.getFact() 
+		fact = self.fact
 		x1 = posTo[0] - (2 * fact)
 		y1 = posTo[1] + fact
 		x2 = posTo[0] + (2 * fact)
@@ -424,7 +433,7 @@ class EditorProjection(EditorConnection) :
 	    		self.id = (self.canvas.create_line(posFrom, mid , arrow = LAST, fill = col),
 	    			  self.canvas.create_line(mid, posTo, fill = col))
 		# draw name label
-		dX = 40
+		dX = 20
 		dY = self.drawIndex * 20
 		self.label = self.canvas.create_text(mid[0] - dX,
 			     mid[1] - dY, fill = col, text = self.name, anchor = E)
@@ -432,10 +441,9 @@ class EditorProjection(EditorConnection) :
 	
     ############ Update methods ############################ 
     def remove(self) :
-	self.canvas.delete(self.label)
 	if (self.nodeTo != None) : # if a connection had been made then remove it from the 'to' node
 		self.nodeTo.removeCon(self, self.TO)
-	self.nodeFrom.removeCon(self, self.FROM) # and remove from 'from' node
+		self.nodeFrom.removeCon(self, self.FROM) # and remove from 'from' node
 	for id in self.id : # remove the representation from the canvas
 		self.canvas.delete(id)
 	self.canvas.delete(self.label)
@@ -449,8 +457,10 @@ class EditorProjection(EditorConnection) :
     # lateral projection. The ovals decrease in size as their drawIndex increases. The
     # semimajor axis is calculated as 2 * semiminor axis.
     def getFact(self) :
-	n = 0.7 * self.drawIndex
-	return (15 / (1 + n)) 
+	#n = 0.7 * self.drawIndex
+	#return (15 / (1 + n))
+	a = 8; n = (self.nodeFrom.width / 2) - 10; b = (n - a)
+	return a + (b * (1 - pow(0.8, self.drawIndex)))
 
     # returns the gradients of the two lines making the opening 'v' part of the receptive field. 
     # this depends on the drawIndex, as it determines where the projection's representation begins.
