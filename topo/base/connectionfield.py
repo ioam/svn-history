@@ -77,7 +77,7 @@ class ConnectionField(TopoObject):
         c1=self.slice_array[2]
         c2=self.slice_array[3]
 
-        w = weights_generator(x=self.x,y=self.y,bounds=self.bounds,
+        w = weights_generator(x=0.0,y=0.0,bounds=weights_bound_template,
                               density=self.input_sheet.density,theta=0,
 			      rows=r2-r1,cols=c2-c1)
         self.weights = w.astype(weight_type)
@@ -98,7 +98,7 @@ class ConnectionField(TopoObject):
         # CEBHACKALERT: the user might specify a size based on the weights_bounds
         # they also specified. Do we want to adjust that size if the weights_bounds
         # have been adjusted too?
-        m = weights_shape(x=self.x,y=self.y,bounds=self.bounds,
+        m = weights_shape(x=0.0,y=0.0,bounds=weights_bound_template,
                           density=self.input_sheet.density,theta=0,
 			  rows=r2-r1,cols=c2-c1)
         m = Numeric.where(m>=0.5,m,0.0)
