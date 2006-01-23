@@ -27,6 +27,10 @@ from topo.patterns import PatternGeneratorParameter
 ###########################################
 # Set parameters
 
+# CEBHACKALERT: these bounds aren't quite large enough to
+# allow all the ConnectionFields to have full weights
+# matrices. Really this is an alert for lissom_or_reference,
+# but it's here for now to remind me.
 input_bounds = BoundingBox(points=((-0.6792,-0.6792),
 				   ( 0.6792, 0.6792))) 
 
