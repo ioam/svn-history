@@ -120,18 +120,21 @@ class TestLissom(unittest.TestCase):
         """
         # {time: activity}
         trueV1activities = pickle.load(open("topo/tests/testlissom.data","r"))
-        
+
+        self.assertEqual(V1.activity.shape,trueV1activities[1].shape)
         n_rows,n_cols = V1.activity.shape
         for i in range(n_rows):
             for j in range(n_cols):
                 self.assertEqual(V1.activity[i,j],trueV1activities[1][i,j])
 
         s.run(1)
+        self.assertEqual(V1.activity.shape,trueV1activities[2].shape)
         for i in range(n_rows):
             for j in range(n_cols):
                 self.assertEqual(V1.activity[i,j],trueV1activities[2][i,j])
 
         s.run(98)
+        self.assertEqual(V1.activity.shape,trueV1activities[100].shape)
         for i in range(n_rows):
             for j in range(n_cols):
                 self.assertEqual(V1.activity[i,j],trueV1activities[100][i,j])
