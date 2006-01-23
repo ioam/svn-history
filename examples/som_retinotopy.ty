@@ -1,0 +1,105 @@
+"""
+Basic example of a fully connected SOM retinotopic map with ConnectionFields.
+
+Contains a Retina (2D Gaussian generator) and a V1 (CFSOM) sheet.
+Each V1 neuron receives input from a the full square area on the
+Retina, called its ConnectionField.
+
+Match the retinotopic simulation from the book page 53-59.
+
+$Id$
+"""
+__version__='$Revision$'
+
+import random
+import RandomArray
+from math import exp
+
+from topo.base.parameter import Number
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.base.boundingregion import BoundingBox
+from topo.base.connectionfield import CFProjection
+from topo.base.parameter import DynamicNumber
+from topo.sheets.cfsom import CFSOM
+from topo.responsefns.basic import CFDotProduct
+import topo.patterns.random
+import topo.patterns.basic
+from topo.base.simulator import Simulator
+from topo.learningfns.basic import HebbianSOMLF
+from topo.patterns import PatternGeneratorParameter
+
+### JCALERT! For the moment, I used a super-class of CFSOM in order to override the 
+### decay (and alpha) function. It would be good to make them Parameter in CFSOM,
+### so that we can delete that here and in obermayer, and still override the decay and 
+### alpha function.
+class RetinotopicSOM(CFSOM):
+    """A variant of CFSOM that uses linear decay functions for alpha and radius."""
+    ### JCALERT: maybe I should have used the parameter learninglength
+    ending_time=Number(40000) # time at the end of the simulation
+    ending_radius=Number(0.5) # radius at the end of the simulation
+
+    def alpha(self):
+        return self.alpha_0*exp(-6.0*(self.simulator.time()/self.ending_time))
+    
+    def radius(self):
+       """Saturated decay function."""
+       decayed_radius = self.radius_0*exp(-5.0*self.simulator.time()/self.ending_time)
+       return max(decayed_radius,self.ending_radius)
+
+
+
+###########################################
+# Set parameters
+
+# input patterns
+GeneratorSheet.period = 1.0
+GeneratorSheet.density = 24
+
+random.seed(1234)
+topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
+
+### JCALERT! This parameter seems to match the figure in the book, 
+### nevertheless it is a Gaussian width of 0.08, as opposed to 2.19, as specified in the errata on line
+topo.patterns.basic.Gaussian.size = 0.08
+topo.patterns.basic.Gaussian.aspect_ratio = 1.0
+topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+
+# CEBHACKALERT: something isn't working about using e.g.
+# PatternGeneratorParameter(default=X) in various places in the code
+# so I've temporarily commented out this line.
+# PatternGeneratorParameter.default=topo.patterns.basic.Gaussian()
+
+# cortical sheet
+RetinotopicSOM.density = 40
+RetinotopicSOM.learning_length = 10000
+RetinotopicSOM.radius_0 = 13.3
+# divide by 24*24 = 576: the number of unit in the receptive field, in order to compensate for 
+# the learning rate being divided by the number of units, and still match previous simulations.
+RetinotopicSOM.alpha_0 = 0.42*576  
+
+RandomArray.seed(500,500)
+CFProjection.weights_generator = topo.patterns.random.UniformRandom() #basic.Disk(size=0.22,aspect_ratio=1.0,smoothing=0.0) 
+### JCALERT! It has to be this bounding box to have a real fully connected network.
+CFProjection.weights_bounds=BoundingBox(points=((-1.0,-1.0),(1.0,1.0))) # fully connected network.
+CFProjection.response_fn = CFDotProduct()
+CFProjection.learning_fn=HebbianSOMLF()
+
+
+###########################################
+# build simulation
+
+s = Simulator()
+
+Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),name='Retina')
+V1 = RetinotopicSOM(name='V1')
+s.connect(Retina,V1,delay=0.5,connection_type=CFProjection,connection_params=dict(name = 'RtoV1'))
+
+s.run(1)
+#s.run(10000)
+
+# import profile,pstats
+#
+# p = profile.Profile()
+# p.runctx('s.run(10)',locals(),globals())
