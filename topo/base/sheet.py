@@ -238,20 +238,25 @@ def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density):
 
 def bounds2slice(slice_bounds, sheet_bounds, xdensity, ydensity):
     """
-    Convert a bounding box into an array slice suitable for computing a submatrix.
+    Convert a bounding box into an array slice suitable for computing
+    a submatrix.
     
-    Given a slice bounding box, activity bounding box, and the density
-    of a sheet matrix, returns a specification for slicing the matrix
-    to return the portion within the bounds.  Returns (a,b,c,d), such
-    that an activity matrix M can be sliced using M[a:b,c:d].
+    Given a slice bounding box, the Sheet's bounding box, and the
+    Sheet's density, returns a specification for slicing the Sheet's
+    matrix to give a submatrix that represents the intersection of the
+    two bounding boxes.
+
+    Returns (a,b,c,d) such that a matrix M can be sliced using M[a:b,c:d].
     """
 
-    ### JCALERT! In order to get the exact result for the slices, I still use the margin method:
-    ### I add a slight margin to the bounds in order to get around rounding problems when using int
-    ### It has to be changed to use the "center method": if the center of a cell is within the bounds,
-    ### this cell belongs to the slice.
-    ### Nevertheless, this function, associated with the slice2bounds function 
-    ### still provide an exact transformation from slice to bounds and bounds to slice.
+    ### JCALERT! In order to get the exact result for the slices, I
+    ### still use the margin method: I add a slight margin to the
+    ### bounds in order to get around rounding problems when using int
+    ### It has to be changed to use the "center method": if the center
+    ### of a cell is within the bounds, this cell belongs to the
+    ### slice.  Nevertheless, this function, associated with the
+    ### slice2bounds function still provide an exact transformation
+    ### from slice to bounds and bounds to slice.
  
     left,bottom,right,top = slice_bounds.aarect().lbrt()
 
@@ -268,16 +273,18 @@ def bounds2slice(slice_bounds, sheet_bounds, xdensity, ydensity):
 
     toprow,leftcol = sheet2matrixidx(left,top,sheet_bounds,xdensity,ydensity)
     botrow, rightcol =sheet2matrixidx(right,bottom,sheet_bounds,xdensity,ydensity)
-   
-    maxrow,maxcol = sheet2matrixidx(sheet_bounds.aarect().right(),sheet_bounds.aarect().bottom(),sheet_bounds,xdensity,ydensity)
 
-    ### JCALERT! This has to be understood and changed (why do we use maxrow..?)
-    maxrow = maxrow - 1
-    maxcol = maxcol - 1
+    # right and bottom bounds are exclusive so are correct for the slice
+    maxrow,maxcol = sheet2matrixidx(sheet_bounds.aarect().right(),
+                                    sheet_bounds.aarect().bottom(),
+                                    sheet_bounds,xdensity,ydensity)
+
+    # 1 is added to toprow and to leftcol because the margin means sheet2matrixidx()
+    # returns 1 unit to the left/above the correct one.
     rstart = max(0,toprow+1)
-    rbound = min(maxrow+1,botrow)
+    rbound = min(maxrow,botrow)
     cstart = max(0,leftcol+1)
-    cbound = min(maxcol+1,rightcol)
+    cbound = min(maxcol,rightcol)
 
     return rstart,rbound,cstart,cbound
 
