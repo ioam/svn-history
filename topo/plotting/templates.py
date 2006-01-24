@@ -126,14 +126,13 @@ pgt.add_plot('Activity',[('Strength','Activity'),('Hue','OrientationPreference')
 
 ### JCALERT! unitweightpanel could be re-named Connectionfields panel...?
 ### Also, the situate option could be specified in the template.
+### Also implement the test for 'Weights' in PlotGroup.
 pgt = new_plotgroup_template(name='Connection Field',command='update_connectionfields()',normalize='True')
 pgt.add_plot('Connection Field',[('Strength','Weights'),('Hue','OrientationPreference'),('Normalize',True)])
 
-### JCALERT: I will remove Density and Projection_name at some point.
-### Also implement the test for 'Weights' in PlotGroup.
+
 pgt = new_plotgroup_template(name='Projection',command='update_projections()',normalize='True')
-pgt.add_plot('Projection',[('Strength','Weights'),('Hue','OrientationPreference'),('Normalize',True),
-			 ('Density',25),('Projection_name',None)])
+pgt.add_plot('Projection',[('Strength','Weights'),('Hue','OrientationPreference'),('Normalize',True)])
 
 
 pgt = new_plotgroup_template(name='Orientation Preference',command='measure_or_pref()')

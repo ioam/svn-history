@@ -261,7 +261,7 @@ class ProjectionPlotGroup(PlotGroup):
 	### JCALERT This has to be solved: projection is a list here!
         ### for the moment the hack below deal with that.
         ### Also, why do we pass the template here?	
-        projection = sheet.get_in_projection_by_name(pt['Projection_name'])
+        projection = sheet.get_in_projection_by_name(self.weight_name)
         plot_list=[]
         if projection:
 	    src_sheet=projection[0].src

@@ -103,11 +103,6 @@ class ProjectionFile(PlotFileSaver):
         self.name['type'] = 'Projection'
         self.plot_group_key = ('Projection',projection,density,self.region)
 
-        pt = plotgroup_templates['Projection'].plot_templates['Projection']
-        
-        pt['Density'] = density
-        pt['Projection_name'] = region
-
         self.create_bitmaps()
         self.save_to_disk()
 
