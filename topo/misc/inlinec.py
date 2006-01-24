@@ -27,7 +27,10 @@ $Id$
 """
 import os
 from copy import copy
-from topographica_script import WIN_IMPORT_WEAVE
+
+# Attempt to import weave.  This can be forced off for special
+# circumstances, such as incomplete or broken weave installs.
+import_weave = True
 
 # In case an outside package wants to know.  Try block will turn true
 # if it happens.
@@ -36,7 +39,7 @@ weave_imported = False
 def inline(*params,**nparams): raise NotImplementedError
 
 try:
-    if WIN_IMPORT_WEAVE or os.name != 'nt':
+    if import_weave:
         import weave
         weave_imported = True
 

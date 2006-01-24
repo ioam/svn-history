@@ -10,6 +10,7 @@ $Id$
 """
 from getopt import getopt,GetoptError
 import os
+from topo.misc.inlinec import import_weave
 
 ### JABHACKALERT!
 ### 
@@ -27,8 +28,6 @@ import os
 # All valid Python 2.4 args, plus 'g' for topo.gui.start()
 VALID_OPTS     = 'ic:dEhOQ:StuvVW:xm:g'  
 
-# Attempt to import weave on Windows
-WIN_IMPORT_WEAVE = False
 
 def generate_cmd_prefix(interactive=True,start_gui=False):
     """
@@ -46,7 +45,7 @@ def generate_cmd_prefix(interactive=True,start_gui=False):
     # generate a serious system error.  However, importing weave first
     # does not cause problems.  
     try:
-        if WIN_IMPORT_WEAVE or os.name != 'nt':
+        if import_weave:
             import weave    
             cmd += 'import weave; '
     except:
