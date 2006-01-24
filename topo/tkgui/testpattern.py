@@ -285,7 +285,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
             channels = {'Strength':each,'Hue':None,'Confidence':None}
             plist.append(make_plot(channels,view_dict,name=''))
         ### JCALERT! It is the only call to PlotGroup with template is None. Need to change.
-        self.pe_group = topo.plotting.plotgroup.PlotGroup(self.console.simulator,None,plot_group_key='Preview',plot_list=plist)
+        self.pe_group = topo.plotting.plotgroup.PlotGroup(self.console.simulator,None,plot_group_key='Preview',normalize=False,plot_list=plist)
 
 
 

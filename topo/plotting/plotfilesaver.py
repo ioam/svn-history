@@ -66,7 +66,7 @@ class ActivityFile(PlotFileSaver):
 	if pg == None:
 	    pgt = plotgroup_templates['Activity']
 	    pg = BasicPlotGroup(self.sim,pgt,'Activity',
-				None,[])
+				pgt.normalize,None,[])
 
         self.bitmaps = pg.load_images()
         
@@ -87,9 +87,9 @@ class UnitWeightsFile(PlotFileSaver):
 
 	pg = plotgroup_dict.get(self.plot_group_key,None)	
 	if pg == None:
-	    pgt = plotgroup_templates['Unit Weights']
+	    pgt = plotgroup_templates['Connection Field']
 	    pg = UnitWeightsPlotGroup(self.sim,pgt,self.plot_group_key,
-				      self.region,[])
+				      pgt.normalize,self.region,[])
 	
         self.bitmaps = pg.load_images()
 
@@ -113,7 +113,7 @@ class ProjectionFile(PlotFileSaver):
 	if pg == None:
 	    pgt = plotgroup_templates['Projection']
 	    pg = ProjectionPlotGroup(self.sim,pgt,self.plot_group_key,
-				self.region,[])
+				pgt.normalize,self.region,[])
 
         self.bitmaps = pg.load_images()
         

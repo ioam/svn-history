@@ -42,7 +42,7 @@ class PlotGroup(TopoObject):
     ### also review the doc of each functions.
     ### - rewrite the test file.
 
-    def __init__(self,simulator,template,plot_group_key,sheet_name=None,plot_list=[],**params):
+    def __init__(self,simulator,template,plot_group_key,normalize,sheet_name=None,plot_list=[],**params):
         """
         plot_list can be of two types: 
         1.  A list of Plot objects that can return bitmaps when requested.
@@ -85,6 +85,8 @@ class PlotGroup(TopoObject):
             self.sheet_filter_lam = lambda s : True
 
 	self.simulator = simulator
+
+	self.normalize = normalize
         
 	self.plot_list = lambda: self._initialize_plot_list(plot_list)
         
@@ -169,20 +171,17 @@ class BasicPlotGroup(PlotGroup):
     PlotGroup for Activity SheetViews
     """
 
-    def __init__(self,simulator,template,plot_group_key,sheet_filter_lam,plot_list,**params):
-        super(BasicPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,plot_list,
+    def __init__(self,simulator,template,plot_group_key,normalize,sheet_filter_lam,plot_list,**params):
+        super(BasicPlotGroup,self).__init__(simulator,template,plot_group_key,normalize,sheet_filter_lam,plot_list,
                                             **params)
 
     def create_plots(self,pt_name,pt,sheet):
 
 	plot_channels = pt
-        ### JCALERT! Normalize should be directly get from plot_channels in Plot instead of here
-        ### Same thing in UnitWeight and Projection PlotGroup.
-        n = pt.get('Normalize',False)
         ### JABALERT: The newline should not be in the plot_name
         ### itself, but somewhere where it's eventually formatted.
 	plot_name = '\n'+pt_name
-        p = make_plot(plot_channels,sheet.sheet_view_dict,sheet.density,sheet.bounds,n,False,name=plot_name)
+        p = make_plot(plot_channels,sheet.sheet_view_dict,sheet.density,sheet.bounds,self.normalize,False,name=plot_name)
 	return [p]
 
 	
@@ -197,12 +196,12 @@ class UnitWeightsPlotGroup(PlotGroup):
       situate: Whether to situate the plot on the full source sheet, or just show the weights.
     """
 
-    def __init__(self,simulator,template,plot_group_key,sheet_filter_lam,plot_list,**params):
+    def __init__(self,simulator,template,plot_group_key,normalize,sheet_filter_lam,plot_list,**params):
         self.x = float(plot_group_key[2])
         self.y = float(plot_group_key[3])
       	self.situate = False
         
-	super(UnitWeightsPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,plot_list,
+	super(UnitWeightsPlotGroup,self).__init__(simulator,template,plot_group_key,normalize,sheet_filter_lam,plot_list,
 						  **params)
   
     def create_plots(self,pt_name,pt,sheet):
@@ -223,7 +222,7 @@ class UnitWeightsPlotGroup(PlotGroup):
 		plot_name = '\n(from ' + p.src.name +')'
 		plot_channels['Strength'] = key			       
 		plot_list.append(make_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
-				      p.src.bounds,pt['Normalize'],self.situate,name=plot_name))
+				      p.src.bounds,self.normalize,self.situate,name=plot_name))
         self.debug('plot_list =' + str(plot_list))
         return plot_list
 
@@ -234,7 +233,7 @@ class ProjectionPlotGroup(PlotGroup):
     PlotGroup for Projection Plots
     """
 
-    def __init__(self,simulator,template,plot_group_key,sheet_filter_lam,plot_list,**params):
+    def __init__(self,simulator,template,plot_group_key,normalize,sheet_filter_lam,plot_list,**params):
        
         self.weight_name = plot_group_key[1]
         self.density = float(plot_group_key[2])
@@ -245,7 +244,7 @@ class ProjectionPlotGroup(PlotGroup):
 
 	self.situate = False
         
-        super(ProjectionPlotGroup,self).__init__(simulator,template,plot_group_key,sheet_filter_lam,
+        super(ProjectionPlotGroup,self).__init__(simulator,template,plot_group_key,normalize,sheet_filter_lam,
                                                    plot_list,**params)
 	### JCALERT! It is a bit confusing, but in the case of the projection
         ### sheet_filter_lam filter to one single sheet...
@@ -273,7 +272,7 @@ class ProjectionPlotGroup(PlotGroup):
 		key = ('Weights',sheet.name,projection.name,x,y)
 		plot_channels['Strength'] = key
 		plot_list.append(make_plot(plot_channels,src_sheet.sheet_view_dict,
-                                      src_sheet.density,src_sheet.bounds,pt['Normalize'],self.situate))
+                                      src_sheet.density,src_sheet.bounds,self.normalize,self.situate))
 		
         return plot_list
 

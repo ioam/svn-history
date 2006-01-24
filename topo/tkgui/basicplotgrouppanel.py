@@ -82,7 +82,7 @@ class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
 	self.pe_group = plotgroup_dict.get(self.plot_group_key,None)
 	if self.pe_group == None:
 	    self.pe_group = BasicPlotGroup(self.console.simulator,self.pgt,self.plot_group_key,
-					   None,[])
+					   self.normalize,None,[])
 
             
     def display_labels(self):

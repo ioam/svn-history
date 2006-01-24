@@ -186,14 +186,12 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         self.control_frame = Frame(self)
         self.control_frame.pack(side=TOP,expand=YES,fill=X)
 
-        # self.refresh()
 
     ### JCALERT! Normalize shouldn't be passed by the template.
     def toggle_normalize(self):
         """Function called by Widget when check-box clicked"""
         self.normalize = not self.normalize
-        for (k,each) in self.pgt.plot_templates:
-            each['Normalize'] = self.normalize
+	self.pe_group.normalize = self.normalize
         self.load_images()
         self.display_plots()
 
@@ -224,9 +222,8 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         See UnitWeightsPanel and ProjectionPanel for
         examples.
         """
-        self.pe_group = self.PlotGroup(self.plot_group_key,self.pgt,None,
-                                               self.plotgroup_type,None)
-
+        self.pe_group = self.PlotGroup(self.console.simulator,self.plot_group_key,self.pgt,
+				       self.normalize,None,[])
 	### JCALERT! That should be make uniform with the basicplotgrouppanel and then eventually maybe
         ### get rid of the basicplotgrouppanel. (i.E. merged plotgrouppanel and basicplotgrouppanel)
 	self.pe_group.initialize_plot_list(plot_list=[])
