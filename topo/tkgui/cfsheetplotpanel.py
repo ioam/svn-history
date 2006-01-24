@@ -26,7 +26,7 @@ from topo.plotting.templates import plotgroup_templates
 class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
 
     def __init__(self,parent,console,plot_group_key=None,pgt_name=None,**config):
-        plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,plot_group_key=None,pgt_name=None,**config)
+        plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,plot_group_key,pgt_name,**config)
 
         self.region = StringVar()
         self.region.set('None')
