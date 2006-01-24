@@ -115,13 +115,14 @@ plotgroup_templates = KeyedList()
 # (currently ignored?) and a documentation string describing each plot
 # (for hovering help text) within each template.
 # JC: we should also maybe add the situate option (and auto-refresh?)
+### we might want to pass a plotgroup_type to the template
+### (see corresponding alert in PlotGroupPanel)
 
 def new_plotgroup_template(name,command,normalize=False):
     pgt = PlotGroupTemplate(name=name,command=command,normalize=normalize)
     plotgroup_templates[pgt.name]=pgt
     return pgt
 
-### JCALERT! I have to change the way Normalize is working.
 pgt = new_plotgroup_template(name='Activity',command='update_activity()')
 pgt.add_plot('Activity',[('Strength','Activity'),('Hue','OrientationPreference')])
 
@@ -143,9 +144,6 @@ pgt.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference
 pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
 
 
-### JCALERT! We should not need to specify normalize in each plot_template,
-### but rather directly for the whole PlotGroupTemplate. (Anyway the way normalize works
-### should be changed in the panels...)
 pgt = new_plotgroup_template(name='Center Of Gravity',command='measure_cog() ; topographic_grid()',normalize=True)
 pgt.add_plot('X Preference',[('Strength','XPreference')])
 pgt.add_plot('Y Preference',[('Strength','YPreference')])
