@@ -54,15 +54,17 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         is clear there is no appropriate data to plot."""
         return True
 
+    ### JCALERT! Get rid of the parameter plot_group_key when creating the panel!
+    ### it should be only created from the panel and passed when creating the PlotGroup.
+    ### (it has still to be solve for the special case of testpattern.py).
+    ### We might also get rid of plotgroup_type...
 
     def __init__(self,parent,console,plot_group_key,pgt_name=None,
                  plotgroup_type='BasicPlotGroup',**config):
         """
         parent:  it is the window (GUIToplevel()) that contains the panel.
-        pengine: is the associated PlotEngine; it stores the different PlotGroup available to
-                 the simulation and creates them when first requested. 
         console: is the associated console, (i.e. the TopoConsole that has this panel)
-        plot_group_key: defines a key for the panel (for storage by PlotEngine).
+        plot_group_key: defines a key for the panel.
                   In the case of an activity plot or a feature map plot (BasicGroupPanel) 
 		  the title is only the name of the template (pgt_name)
                   In the case of projection and unit weights there is additional information
@@ -71,9 +73,14 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         plot_group_type: type of the PlotGroup associated with the panel
         
         """
-
+	### JCALERT! what is config and why is it passed to both TopoObject and Frame?
         Frame.__init__(self,parent,config)
         topo.plotting.plot.TopoObject.__init__(self,**config)
+
+	self.console = console
+        self.parent = parent
+        self.balloon = Pmw.Balloon(parent)
+        self.canvases = []
 
 	### JCALERT! Check if this makes sense in the general case...
         ### Usually the pgt_name is the plot_group_key by default,
@@ -82,11 +89,10 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         if pgt_name != None:
             self.plot_group_key = pgt_name
         else:
-            self.plot_group_key = plot_group_key
-
-            
+            self.plot_group_key = 'Preview' #plot_group_key
+         
         self.plotgroup_type = plotgroup_type # type of the PlotGroup 
-        self.pgt_name = pgt_name  #Plot Group Template name
+        self.pgt = plotgroup_templates.get(pgt_name,None)
 
         ### JABHACKALERT!
         ###
@@ -117,16 +123,12 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         self.MIN_PLOT_WIDTH = 1
         self.INITIAL_PLOT_WIDTH = 60
 
+
         self.pe_group = None
         self.plots = []
         self.bitmaps = []
         self.labels = []
         self.__num_labels = 0
-
-        self.console = console
-        self.parent = parent
-        self.balloon = Pmw.Balloon(parent)
-        self.canvases = []
 
 	self.shared_control_frame = Frame(self)
         self.shared_control_frame.pack(side=TOP,expand=YES,fill=X)
@@ -161,19 +163,16 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         self.auto_refresh_checkbutton.invoke()
 
         # Normalization check button.
-        pgt = plotgroup_templates[self.pgt_name]
-        if pgt:
-            ### JABALERT! Why is it checking the first template for this? 
-	    ### JC: I think a way to fix it is to pass a parameter normalize when creating a 
-            ### a plotgrouppanel.py (after all, this is a feature of the plotgrouppanel.py
-            ### to know if we want to normalize or not...)
-            self.normalize = pgt.plot_templates[0].get('Normalize',False)
+	### JCALERT! Do we want to always pass a template (for the moment, the exception is testpattern?
+        if self.pgt:        
             self.normalize_checkbutton = Checkbutton(self.shared_control_frame,
                                                      text="Normalize",
                                                      command=self.toggle_normalize)
+	    self.normalize_checkbutton.pack(side=LEFT)
+	    self.normalize = self.pgt.normalize    
             if self.normalize:
                 self.normalize_checkbutton.select()
-            self.normalize_checkbutton.pack(side=LEFT)
+            
 
 	### JCALERT! I would change the variable name plot_group to
         ### be something like plot_group_title or plot_group_name
@@ -197,8 +196,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
     def toggle_normalize(self):
         """Function called by Widget when check-box clicked"""
         self.normalize = not self.normalize
-        pgt = plotgroup_templates[self.pgt_name]
-        for (k,each) in pgt.plot_templates:
+        for (k,each) in self.pgt.plot_templates:
             each['Normalize'] = self.normalize
         self.load_images()
         self.display_plots()
@@ -230,8 +228,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         See UnitWeightsPanel and ProjectionPanel for
         examples.
         """
-	pgt = plotgroup_templates[self.pgt_name]
-        self.pe_group = self.PlotGroup(self.plot_group_key,pgt,None,
+        self.pe_group = self.PlotGroup(self.plot_group_key,self.pgt,None,
                                                self.plotgroup_type,None)
 
 	### JCALERT! That should be make uniform with the basicplotgrouppanel and then eventually maybe
