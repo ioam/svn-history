@@ -63,15 +63,9 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         """
         parent:  it is the window (GUIToplevel()) that contains the panel.
         console: is the associated console, (i.e. the TopoConsole that has this panel)
-        plot_group_key: defines a key for the panel.
-                  In the case of an activity plot or a feature map plot (BasicGroupPanel) 
-		  the title is only the name of the template (pgt_name)
-                  In the case of projection and unit weights there is additional information
-                  that are added by the method generate_plt_key (e.g. density, unit coordinates...)
         pgt_name: name of the PlotGroupTemplate associated with the panel
-        plot_group_type: type of the PlotGroup associated with the panel
-        
-        """
+	"""
+
 	### JCALERT! what is config and why is it passed to both TopoObject and Frame?
         Frame.__init__(self,parent,config)
         topo.plotting.plot.TopoObject.__init__(self,**config)
@@ -96,9 +90,8 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         ### could all be done from the template.
         ### Also, do we want to associate panel and plotgroup: in which case, we could only specified a panel
         ### for a template and then creating a single type of PlotGroup for any panel (as it is now)
-        #self.plotgroup_type = plotgroup_type # type of the PlotGroup 
 
-        
+        #self.plotgroup_type = plotgroup_type # type of the PlotGroup 
 
         ### JABHACKALERT!
         ###
@@ -194,7 +187,6 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         self.control_frame.pack(side=TOP,expand=YES,fill=X)
 
 
-    ### JCALERT! Normalize shouldn't be passed by the template.
     def toggle_normalize(self):
         """Function called by Widget when check-box clicked"""
         self.normalize = not self.normalize
@@ -218,8 +210,8 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
 
 
 
-    ### JCALERT! This function has to be re-written to match the last changes!
-    ### It is actually always re-implemented....
+    ### JCALERT! 
+    ### This function is actually always re-implemented....
     ### It can also be made so that we spared the basicplotgrouppanel re-implementation...
     def do_plot_cmd(self):
         """
