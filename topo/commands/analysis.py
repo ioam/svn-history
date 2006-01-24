@@ -128,7 +128,7 @@ sheet_name = ''
 ### Particularly, having to retrieve the Sheet object from the sheet_name is an issue:
 ### It might be better to have access to the Sheet object directly rather then the name 
 ### in the CFSheetPlotpanels.
-def update_weights():
+def update_connectionfields():
     """
     Lambda function passed in, that will filter out all sheets
     except the one with the name being looked for.
