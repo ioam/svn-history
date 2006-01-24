@@ -1,60 +1,60 @@
 <h1>Installing Topographica on Windows XP/2000</h1>
 
-<p>(Installation procedure verified as of November 14, 2005)
+<p>(Installation procedure verified as of January 24th, 2006) We are currently in the process of streamlining the installation process under Windows.  If there is a problem with the setup.bat installation, the below method will provide only a non-optimized version of Topographica, which will be quite slow.  For an optimized version see &quot;Integrating Topographica and Weave&quot; below.
 
-We are currently in the process of streamlining the installation
-process under Windows; the current method is much more difficult than
-on other platforms.  In any case, there is a relatively easy method
-that will usually work ("The fast way" below), and a more difficult
-method that will work in more cases ("The slow way").  Both of these
-methods will provide only a non-optimized version of Topographica,
-which will be quite slow; for an optimized version see "Integrating
-Topographica and Weave" below.
-
-<h2>The fast way:</h2>
-
-<ol>
-<li> Unpack the topographica archive into a temporary directory.<br>
-<li> Double click on setup.bat<br>
-<li> Follow the various installation prompts for the packages 
-     bundled with Topographica.<br>
-</ol>
-
-<P>
-If you do not wish to install to the default Windows program files
-directory, you will need to run setup.bat from the command-line, with
-the target base path as the first parameter.  For example, to install
-to D:\Topographica, the command would be: "setup D:"
-
-<P>
-After installation you should now have an icon on your desktop that
-opens the directory where Topographica is installed.  There will be a
-new file association called ".ty" which are scripts that the
-Topographica program will execute when you double-click on them.
-
-<P>
-You can now test the installation by double-clicking on the
-topographica.bat file.  This should run the interactive Topographica
-shell and give you a "Topographica>" prompt.
-
-
-<h2>If there is a problem:</h2>
-
+<hr>
 Known issues:
 
+
+<p>As of 1/2006, the Weave (part of SciPy) C compiler linkage is not installed by default for Python 2.4.2. Some features of Topographica that require Weave will be disabled if attempted on a Windows platform. This affects many of the example network simulations in the /examples/ directory.  A warning message about using slower non-optimized functions will be displayed.
+
+<p>See below for directions on how to integrate Weave with Topographica on Windows.  
+<p>Warning: If Weave is installed but your C compiler is not installed or configured properly then Topographica may fail to run properly. If this is the case, you will need to set the <tt>import_weave</tt> variable in topo/misc/inlinec.py to False.</p>
 <hr>
+<h2>Manually Installing Topographica on Windows:</h2>
 
-<p>As of 11/2005, the Weave (part of SciPy) C compiler linkage is not
-installed by default for Python 2.4.  Some features of Topographica 
-that require Weave will cause ImportErrors if attempted on a Windows 
-platform.  This includes many of the example network simulations in the
-/examples/ directory.  There are directions in /examples/lissom_or.ty
-for changing the code to not use the optimized Weave functions.
+<p>Topographica is a Python 2.4.2 program and requires Python 2.4.2 to be installed. The automatic setup.bat script checks to see if the correct version exists. If an older version of Python is associated with Python Files then an included Python 2.4.2 installer located in \external\ should be executed.<p>After Python has been installed or detected, change the directory to .\external\win32\ and run the following commands:<pre>
+   start /wait setup.py configure     % Verifies Python 2.4 installed.
+   start /wait setup.py install
+</pre>
+<p>The 'setup.py install' does the following, if case you need to do this steps manually:<p>
+a) Installs the following programs found in external\win32\<br>
 
-<p>See below for directions on how to integrate Weave with Topographica
-on Windows.
+<pre>
+   Numeric-23.7.win32-py2.4.exe    Python Numeric package
+   PIL-1.1.5b3.win32-py2.4.exe     Python Imaging Library
+   matplotlib-0.81.win32-py2.4.exe PyLab Math and Plotting package
+   ..\Pmw.tgz                      Python Mega Widgets  (Contains a Read-Me)
+   fixedpoint-0.1.2_patched.tgz    FixedPoint number classes
+</pre>
+<p>
+b) Copy the core Topographica files in \topo\* to the install location
+   BASE_LOCATION\topo\
+<p>
+c) Additional tasks in the script include (in no particular order):
+<ol>
+<li> Associate Topographica File extensions (.ty).
+<li> Give .ty Files a pretty icon.
+<li> Construct a Topographica run command that is named topographica.py.
+     This can be run directly, or through topographica.bat:
+<li> Create a topographica.bat wrapper for running Topographica.
+<li> Create a Desktop CMD file to open the Install location of Topographica
+</ol>   
+
+<p>Note: The &quot;Additional Tasks&quot; of part (c) are only for streamlining the Topographica user interface and are not needed to run the system. If there is a problem with the install script and (c) does not complete then Topographica can still be executed by issuing the following command from a Shell window that is in the root location of the Topographica installation:<pre>
+   [Python Location]\python.exe topographica.py
+</pre>
+
+To execute an existing Topographica script add the filename to
+the end of the command:
+
+<pre>
+   [Python Location]\python.exe topographica.py script.py
+</pre>
 
 <hr>
+<h2>If there is a problem:</h2>
+
 
 <p>If you experience the error:
 <pre>
@@ -68,87 +68,11 @@ Environment Variables in "My Computer -> Properties" to make sure you
 don't have an old version of Python earlier in your path statement
 that is running first.
 
-
-<h2>Installing the slow way:</h2>
-
-<p>To install the Topographica parts by hand, be sure Python 2.4 is
-installed and do (a), (b), and (c) below.  See Note.
-
-
-<p>
-Topographica is a Python 2.4 program and requires Python 2.4 to be
-installed.  The setup.bat script checks to see if the correct version
-exists.  If an older version of Python is associated with
-Python Files then an included Python 2.4 installer located in
-\external\ will be executed.
-
-<p>
-After Python has been installed or detected, the directory is changed
-to .\external\win32\ and following commands are run:
-
-<pre>
-   start /wait setup.py configure     % Verifies Python 2.4 installed.
-   start /wait setup.py install
-</pre>
-
-
-<p>
-The 'setup.py install' does the following:
-
-<p>
-a) Installs the following programs found in external\win32\<br>
-<pre>
-   Numeric-23.7.win32-py2.4.exe    Python Numeric package
-   PIL-1.1.5b3.win32-py2.4.exe	   Python Imaging Library
-   matplotlib-0.81.win32-py2.4.exe PyLab Math and Plotting package
-   ..\Pmw.tgz                      Python Mega Widgets  (Contains a Read-Me)
-   fixedpoint-0.1.2_patched.tgz    FixedPoint number classes
-</pre>
-
-<p>
-b) Copy the core Topographica files in \topo\* to the install location
-   BASE_LOCATION\topo\
-
-c) Additional tasks in the script include (in no particular order):
-<ol>
-<li> Associate Topographica File extensions (.ty).
-<li> Give .ty Files a pretty icon.
-<li> Construct a Topographica run command that is named topographica.py.
-     This can be run directly, or through topographica.bat:
-<li> Create a topographica.bat wrapper for running Topographica.
-<li> Create a Desktop CMD file to open the Install location of Topographica
-</ol>   
-
-<p>
-Note: The "Additional Tasks" of part (c) listed above are only for
-streamlining the Topographica user interface and are not needed
-to run the system.  If there is a problem with the install
-script and (c) does not complete then Topographica can still be
-executed by issuing the following command from a Shell window
-that is in the root location of the Topographica installation:
-
-<pre>
-   [Python Location]\python.exe topographica.py
-</pre>
-
-To execute an existing Topographica script add the filename to
-the end of the command:
-
-<pre>
-   [Python Location]\python.exe topographica.py script.py
-</pre>
-
+<hr>
 
 <h2>Integrating Topographica and Weave on Windows</h2>
 
-<p>
-Topographica is under active development (12/2005) to make the Windows
-version of Topographica easier to install and use.  For now, these
-notes should be able to help you get Weave (www.scipy.org) built on
-Windows and integrated with Topographica.
-
-
-<p>Building Weave:
+<p>Topographica is under active development (1/2006) to make the Windows version of Topographica easier to install and use. For now, these notes should be able to help you get Weave (www.scipy.org) built on Windows and integrated with Topographica.<p>Building Weave:
 
 <p>
 Since Weave does not have a pre-compiled Windows version that works
@@ -207,9 +131,8 @@ Topographica has been designed to work with the gcc compiler.  If you
 wish to use MS Visual C++ instead, then the compiler option in 
 topo/base/inlinec.py must be changed from "compiler='gcc'" to "compiler='msvc'".
 
-<p>
-examples/lissom_or.ty should now run with no errors.
-
-<br> <p> Once you have the Windows version working, please return to
+<p>examples/lissom_or.ty should now run with no errors or warnings.<br> 
+<hr>
+<p> Once you have the Windows version working, please return to
 the <a href="index.html">Downloads</a> page for the usual information
 about running Topographica and updating it later.

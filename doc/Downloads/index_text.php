@@ -23,16 +23,7 @@ essentials for using CVS at SourceForge are described below; see the
 SourceForge documentation</A> for more details or if you have any
 difficulties.
 
-<P> To get started, first change to a directory to which you have
-write access with sufficient space available, i.e., about 400
-megabytes as of 12/2005.  There are two ways to get your own local
-copy of the CVS files, depending on whether or not you are an official
-Topographica developer.  Non-developers can check out a read-only
-version of the repository, while developers have read/write access so
-that they can make changes that become a permanent part of the project
-repository.  Please follow the appropriate set of instructions below.
-
-<H3>Read-only access</H3>
+<P>To get started, first change to a directory to which you have write access with sufficient space available, i.e., about 400 megabytes as of 2/2006. There are two ways to get your own local copy of the CVS files, depending on whether or not you are an official Topographica developer. Non-developers can check out a read-only version of the repository, while developers have read/write access so that they can make changes that become a permanent part of the project repository. Please follow the appropriate set of instructions below.<H3>Read-only access</H3>
 
 For read-only access, log in to the CVS server using the UNIX
 command:
@@ -149,15 +140,7 @@ to make sure that compatible libraries are available.
 
 <P><B>Windows:</B> It should be possible to build Topographica under
 Windows just as is done under UNIX, if you first install <A
-HREF="http://www.cygwin.com/">Cygwin</a>, although as of 11/2005 the
-library versions available on Cygwin are a bit out of date and 
-thus this process does not currently go smoothly.
-Alternatively, nearly all of the features of Topographica are
-available with a Win32-native Python, and if you choose this option
-then Cygwin is optional.  The basic steps for building the native
-version are:
-
-<ol>
+HREF="http://www.cygwin.com/">Cygwin</a>, although as of 2/2006 the library versions available on Cygwin are a bit out of date and thus this process does not currently go smoothly. Alternatively, nearly all of the features of Topographica are available with a Win32-native Python, and if you choose this option then Cygwin is optional. The basic steps for building the native version are:<ol>
 <li> Unpack the topographica archive into a temporary directory.
 <li> Double click on setup.bat
 <li> Follow the various installation prompts for the packages 
@@ -165,18 +148,18 @@ version are:
 </ol>
 
 <P>
+If you do not wish to install to the default Windows program files
+directory, you will need to run setup.bat from the command-line, with
+the target base path as the first parameter.  For example, to install
+to D:\Topographica, the command would be: "setup D:"
+
+<P>
 After installation you should now have an icon on your desktop that
 opens the directory where Topographica is installed.  There will be a
 new file association called ".ty" which are scripts that the
 Topographica program will execute when you double-click on them.
 
-<P>
-You can now test the installation by double-clicking on the
-topographica.bat file which will run the interactive Topographica
-shell and give you a "Topographica>" prompt.
-
-<P>If you experience any problems, then please consult our detailed
-<a href="win32.html">Windows installation instructions</a>.
+<P>You can now test the installation by double-clicking on the topographica.bat file which will run the interactive Topographica shell and give you a &quot;Topographica&gt;&quot; prompt.  You can also double-click on some of the .ty files in the examples directory.<P>If you experience any problems, or wish to install Weave to enable the C-optimized functions, then please consult our detailed <a href="win32.html">Windows installation/troubleshooting instructions</a>.
 
 
 <H3>Running Topographica</H3>
