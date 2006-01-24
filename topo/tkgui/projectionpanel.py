@@ -270,9 +270,9 @@ class ProjectionPanel(CFSheetPlotPanel):
 
             new_title = 'Projection ' + self.weight_name.get() + ' from ' + src_name + ' to ' \
                         + self.region.get() + ' at time ' + str(self.console.simulator.time())
-            self.plot_group.configure(tag_text = new_title)
+            self.plot_group_title.configure(tag_text = new_title)
         else:
-            self.plot_group.configure(tag_text = 'No Projections')
+            self.plot_group_title.configure(tag_text = 'No Projections')
         
 
 

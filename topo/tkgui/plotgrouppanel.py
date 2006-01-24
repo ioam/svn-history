@@ -173,15 +173,11 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
             if self.normalize:
                 self.normalize_checkbutton.select()
             
-
-	### JCALERT! I would change the variable name plot_group to
-        ### be something like plot_group_title or plot_group_name
-        ### or even plot_panel_title.
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
-        self.plot_group = Pmw.Group(self,tag_text=str(self.plot_group_key))
-        self.plot_group.pack(side=TOP,expand=YES,fill=BOTH,padx=5,pady=5)
-        self.plot_frame = self.plot_group.interior()
+        self.plot_group_title = Pmw.Group(self,tag_text=str(self.plot_group_key))
+        self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH,padx=5,pady=5)
+        self.plot_frame = self.plot_group_title.interior()
 
         # For the first plot, use the INITIAL_PLOT_WIDTH to calculate zoom.
         self.initial_plot = True

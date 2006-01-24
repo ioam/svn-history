@@ -154,7 +154,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
         new_title = 'Connection Fields of ' + self.region.get() + \
                     ' unit (' + str(self.x) + ',' + str(self.y) + ') at time '\
                     + str(self.console.simulator.time())
-        self.plot_group.configure(tag_text = new_title)
+        self.plot_group_title.configure(tag_text = new_title)
         super(UnitWeightsPanel,self).display_labels()
     
         

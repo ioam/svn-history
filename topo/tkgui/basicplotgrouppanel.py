@@ -90,7 +90,7 @@ class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         Change the title of the grid group by refreshing the time simulator,
         then call PlotGroupPanel's display_labels().
         """
-        self.plot_group.configure(tag_text = self.mapname.get() + \
+        self.plot_group_title.configure(tag_text = self.mapname.get() + \
                                   ' at time ' + str(self.console.simulator.time()))
         super(BasicPlotGroupPanel,self).display_labels()
 
