@@ -9,21 +9,26 @@ $Id$
 """
 __version__='$Revision$'
 
+
+import Numeric
+import MLab
+
+import PIL
+import Image
+import ImageTk
 import Pmw, re, os, sys
 from Tkinter import Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, \
      StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE
-import topo
+
+import topo.tkgui
 import topo.base.topoobject
-import topo.plotting.bitmap
 import topo.base.simulator as simulator
+
+import topo.plotting.bitmap
 import topo.plotting.plotgroup
 from topo.plotting.templates import plotgroup_templates
-import PIL
-import Image
-import ImageTk
-import Numeric
-import MLab
+
 
 BORDERWIDTH = 1
 
@@ -395,15 +400,12 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
     def toggle_auto_refresh(self):
         """Function called by Widget when check-box clicked"""
         self.auto_refresh = not self.auto_refresh
-
         self.debug("Auto-refresh = ", self.auto_refresh)
         topo.tkgui.show_cmd_prompt()
-
         if self.auto_refresh:
             self.console.auto_refresh_panels.append(self)
         else:
             self.console.auto_refresh_panels.remove(self)
-
         # JAB: it might make sense for turning on auto-refresh
         # to do a refresh automatically, though that might have
         # unexpected behavior for a preference map calculation
