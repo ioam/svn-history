@@ -30,6 +30,7 @@ class PlotGroupTemplate(TopoObject):
     """
     
     command = Parameter(None)
+    normalize = Parameter('False')
     
     def __init__(self, plot_templates=[], **params):
         """
@@ -82,7 +83,7 @@ class PlotGroupTemplate(TopoObject):
        
 	self.plot_templates = KeyedList(plot_templates)
 
-    def add_plot_template(self,name,specification_tuple_list):
+    def add_plot(self,name,specification_tuple_list):
 	dict={}
 	for key,value in specification_tuple_list:
 	    dict[key]=value
@@ -106,93 +107,49 @@ plotgroup_templates = KeyedList()
 # measure_or_pref or somewhere like that.  That way, there will be no special
 # treatment of any particular input feature.
 
-# JABALERT: This interface needs some cleanup to make it easier to use.
-# For instance, we can implement an add_plot_template function,
-# accepting a single plot and adding it to a PlotGroupTemplate (which
-# is created the first time it is needed).
-#
+# JABALERT:
 # We should also be able to store things like the Normalize option setting
 # (currently ignored?) and a documentation string describing each plot
 # (for hovering help text) within each template.
 
-pgt = PlotGroupTemplate(name='Activity',
-			command='update_activity()')
-### JCALERT! There is no real need to specify 'Confidence':None
-pgt.add_plot_template('Activity',[('Strength','Activity'),('Hue','OrientationPreference'),('Normalize',False)])
+def new_plotgroup_template(name,command,normalize=False):
+    pgt = PlotGroupTemplate(name=name,command=command,normalize=normalize)
+    plotgroup_templates[pgt.name]=pgt
+    return pgt
 
-# pgt = PlotGroupTemplate(name='Activity',
-# 			command='update_activity()',
-# 			plot_templates= [('Activity',
-# 					  {'Strength'   : 'Activity',
-# 					   'Hue'        : 'OrientationPreference',
-# 					   'Confidence' :  None,
-# 					   'Normalize'  : False})])
-
-plotgroup_templates[pgt.name] = pgt
+### JCALERT! I have to change the way Normalize is working.
+pgt = new_plotgroup_template(name='Activity',command='update_activity()')
+pgt.add_plot('Activity',[('Strength','Activity'),('Hue','OrientationPreference'),('Normalize',False)])
 
 
 ### JABALERT: Maybe this should change to a "ConnectionField" plot,
 ### (and also in the menu), for consistency, so that the plot labels
 ### can always be done the same way.
-pgt = PlotGroupTemplate(name='Unit Weights',
-                        command='update_weights()',
-			plot_templates= [('Unit Weights',
-					  {'Strength'   : 'Weights',
-					   'Hue'        : 'OrientationPreference',
-					   'Confidence' : None,
-					   'Normalize'  : True})])
-plotgroup_templates[pgt.name] = pgt
+pgt = new_plotgroup_template(name='Unit Weights',command='update_connectionfields()',normalize='True')
+pgt.add_plot('Unit Weights',[('Strength','Weights'),('Hue','OrientationPreference'),('Normalize',True)])
+
 
 
 ### JCALERT: I will remove Density and Projection_name at some point.
 ### Also implement the test for 'Weights' in PlotGroup.
-pgt = PlotGroupTemplate(name='Projection',
-                        command='update_projections()',
-			plot_templates=[('Projection',
-					 {'Strength'      : 'Weights',
-					  'Hue'           : 'OrientationPreference',
-					  'Confidence'    : None,
-                                          'Normalize'       : True,
-                                          'Density'         : 25,
-                                          'Projection_name' : 'None'})])                     
-plotgroup_templates[pgt.name] = pgt
+pgt = new_plotgroup_template(name='Projection',command='update_projections()',normalize='True')
+pgt.add_plot('Projection',[('Strength','Weights'),('Hue','OrientationPreference'),('Normalize',True),
+			 ('Density',25),('Projection_name',None)])
 
 
-pgt = PlotGroupTemplate(name='Orientation Preference',
-                        command = 'measure_or_pref()',
-			plot_templates= [('Orientation Preference',
-                                          {'Strength'   : None,
-                                           'Hue'        : 'OrientationPreference',
-                                           'Confidence' : None}),
-                                         ('Orientation Preference&Selectivity',
-                                          {'Strength'   : None,
-                                           'Hue'        : 'OrientationPreference',
-                                           'Confidence' : 'OrientationSelectivity'}),
-                                         ('Orientation Selectivity',
-                                          {'Strength'   : 'OrientationSelectivity',
-                                           'Hue'        : None,
-                                           'Confidence' : None})])                       
-plotgroup_templates[pgt.name] = pgt
+pgt = new_plotgroup_template(name='Orientation Preference',command='measure_or_pref()')
+pgt.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
+pgt.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
+						   ('Confidence','OrientationSelectivity')])
+pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
+
 
 ### JCALERT! We should not need to specify normalize in each plot_template,
 ### but rather directly for the whole PlotGroupTemplate. (Anyway the way normalize works
 ### should be changed in the panels...)
-pgt = PlotGroupTemplate(name='Center of Gravity',
-                        command = 'measure_cog() ; topographic_grid()',
-			plot_templates= [('XPreference',
-                                          {'Strength'   : 'XPreference',
-                                           'Hue'        : None,
-                                           'Confidence' : None,
-					   'Normalize' : True}),
-                                         ('YPreference',
-                                          {'Strength'   : 'YPreference',
-                                           'Hue'        : None,
-                                           'Confidence' : None,
-					   'Normalize'  : True}),
-                                         ('CoGPreference',
-                                          {'Red'   : 'XPreference',
-                                           'Green' : 'YPreference',
-                                           'Blue'  : None,
-                                           'Normalize'  : True})])
-plotgroup_templates[pgt.name] = pgt
+pgt = new_plotgroup_template(name='Center Of Gravity',command='measure_cog() ; topographic_grid()',normalize=True)
+pgt.add_plot('X Preference',[('Strength','XPreference'),('Normalize',True)])
+pgt.add_plot('Y Preference',[('Strength','YPreference'),('Normalize',True)])
+pgt.add_plot('CoG Preference',[('Red','XPreference'),('Green','YPreference'),('Normalize',True)])
+
 
