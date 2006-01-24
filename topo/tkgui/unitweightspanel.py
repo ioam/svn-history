@@ -25,6 +25,7 @@ import topo.commands.analysis
 
 ### JABALERT!  Why isn't there a Normalize button on this and
 ### ProjectionPanel like there is on ActivityPanel?
+### JCALERT! It could also be re-named ConnectionFieldsPanel?
 class UnitWeightsPanel(CFSheetPlotPanel):
     def __init__(self,parent,console=None,plot_group_key=None,pgt_name=None,**config):
         super(UnitWeightsPanel,self).__init__(parent,console,plot_group_key,pgt_name,**config)
@@ -158,5 +159,5 @@ class UnitWeightsPanel(CFSheetPlotPanel):
     
         
     def refresh_title(self):
-        self.parent.title("Unit Weights  %s (%0.3f,%0.3f) time:%s" %
+        self.parent.title(self.pgt.name + " %s (%0.3f,%0.3f) time:%s" %
                           (self.region.get(),self.displayed_x,self.displayed_y,self.console.simulator.time()))

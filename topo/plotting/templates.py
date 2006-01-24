@@ -83,6 +83,9 @@ class PlotGroupTemplate(TopoObject):
        
 	self.plot_templates = KeyedList(plot_templates)
 
+    ### JCALERT! We might eventually write this function 'Python-like'
+    ### by using keyword argument to specify each channel a,d then get the dictionnary 
+    ### of all remaining argument....
     def add_plot(self,name,specification_tuple_list):
 	dict={}
 	for key,value in specification_tuple_list:
@@ -121,14 +124,10 @@ def new_plotgroup_template(name,command,normalize=False):
 pgt = new_plotgroup_template(name='Activity',command='update_activity()')
 pgt.add_plot('Activity',[('Strength','Activity'),('Hue','OrientationPreference'),('Normalize',False)])
 
-
-### JABALERT: Maybe this should change to a "ConnectionField" plot,
-### (and also in the menu), for consistency, so that the plot labels
-### can always be done the same way.
-pgt = new_plotgroup_template(name='Unit Weights',command='update_connectionfields()',normalize='True')
-pgt.add_plot('Unit Weights',[('Strength','Weights'),('Hue','OrientationPreference'),('Normalize',True)])
-
-
+### JCALERT! unitweightpanel could be re-named Connectionfields panel...?
+### Also, the situate option could be specified in the template.
+pgt = new_plotgroup_template(name='Connection Field',command='update_connectionfields()',normalize='True')
+pgt.add_plot('Connection Field',[('Strength','Weights'),('Hue','OrientationPreference'),('Normalize',True)])
 
 ### JCALERT: I will remove Density and Projection_name at some point.
 ### Also implement the test for 'Weights' in PlotGroup.
