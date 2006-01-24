@@ -96,7 +96,7 @@ __version__ = '$Revision$'
 
 from simulator import EventProcessor
 from parameter import Constant, BooleanParameter
-from Numeric import zeros,array,floor
+from Numeric import zeros,array,floor,ceil
 from boundingregion import BoundingBox
 import sheetview 
 
@@ -240,51 +240,33 @@ def bounds2slice(slice_bounds, sheet_bounds, xdensity, ydensity):
     """
     Convert a bounding box into an array slice suitable for computing
     a submatrix.
-    
-    Given a slice bounding box, the Sheet's bounding box, and the
-    Sheet's density, returns a specification for slicing the Sheet's
-    matrix to give a submatrix that represents the intersection of the
-    two bounding boxes.
 
+    Includes all units whose centers are within the specified sheet
+    coordinate bounding box slice_bounds and also in the specified
+    sheet_bounds.
+    
     Returns (a,b,c,d) such that a matrix M can be sliced using M[a:b,c:d].
     """
+    # convert bounds to a slice, disregarding the sheet bounds
+    l,b,r,t = slice_bounds.aarect().lbrt()
+    
+    t_m,l_m = sheet2matrix(l,t,sheet_bounds,xdensity,ydensity)
+    b_m,r_m = sheet2matrix(r,b,sheet_bounds,xdensity,ydensity)
 
-    ### JCALERT! In order to get the exact result for the slices, I
-    ### still use the margin method: I add a slight margin to the
-    ### bounds in order to get around rounding problems when using int
-    ### It has to be changed to use the "center method": if the center
-    ### of a cell is within the bounds, this cell belongs to the
-    ### slice.  Nevertheless, this function, associated with the
-    ### slice2bounds function still provide an exact transformation
-    ### from slice to bounds and bounds to slice.
- 
-    left,bottom,right,top = slice_bounds.aarect().lbrt()
-
-    # calculate xstep and ystep
-    xstep = 1.0 / xdensity
-    ystep = 1.0 / ydensity
-    # This is arbitrary.
-    fact = 20
-    # construct the margin (which depend on the density)
-    left = left-xstep/fact
-    right = right+ystep/fact
-    bottom = bottom-xstep/fact
-    top = top+ystep/fact
-
-    toprow,leftcol = sheet2matrixidx(left,top,sheet_bounds,xdensity,ydensity)
-    botrow, rightcol =sheet2matrixidx(right,bottom,sheet_bounds,xdensity,ydensity)
-
-    # right and bottom bounds are exclusive so are correct for the slice
+    l_idx = ceil(l_m-0.5)
+    t_idx = ceil(t_m-0.5)
+    r_idx = floor(r_m+0.5)
+    b_idx = floor(b_m+0.5)
+                  
+    # crop to the sheet bounds
     maxrow,maxcol = sheet2matrixidx(sheet_bounds.aarect().right(),
                                     sheet_bounds.aarect().bottom(),
                                     sheet_bounds,xdensity,ydensity)
 
-    # 1 is added to toprow and to leftcol because the margin means sheet2matrixidx()
-    # returns 1 unit to the left/above the correct one.
-    rstart = max(0,toprow+1)
-    rbound = min(maxrow,botrow)
-    cstart = max(0,leftcol+1)
-    cbound = min(maxcol,rightcol)
+    rstart = max(0,t_idx)
+    rbound = min(maxrow,b_idx)
+    cstart = max(0,l_idx)
+    cbound = min(maxcol,r_idx)
 
     return rstart,rbound,cstart,cbound
 
