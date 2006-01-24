@@ -18,4 +18,4 @@ For more information, see the various modules in this package.
 $Id$
 """
 __version__='$Revision$'
-__all__ = ['bitmap','plot','plotengine','palette','plotgroup','plotfilesaver','templates']
+__all__ = ['bitmap','plot','palette','plotgroup','plotfilesaver','templates']
