@@ -258,6 +258,13 @@ class Plot(TopoObject):
 
 	return (h,s,v)  
 
+    def _normalize(self,a):
+        a_offset = a-min(a.flat)
+        max_a_offset = max(a_offset.flat)
+        if max_a_offset>0:
+             a = divide(a_offset,float(max_a_offset))
+        return a
+
 
 
 class SHCPlot(Plot):
@@ -332,10 +339,8 @@ class SHCPlot(Plot):
         # If normalizing, offset the matrix so that the minimum
         # value is 0.0 and then scale to make the maximum 1.0
         if normalize:
-             s_offset = s-min(s.flat)
-             max_s_offset = max(s_offset.flat)
-             if max_s_offset>0:
-                  s = divide(s_offset,float(max_s_offset))
+             s=self._normalize(s)
+            
 
         # This translation from SHC to HSV is valid only for black backgrounds;
         # it will need to be extended also to support white backgrounds.
@@ -412,7 +417,10 @@ class RGBPlot(Plot):
 	if g is None: g=zero 
 	if b is None: b=zero 
 
-        ### JCALERT! Should normalize all of them if normalize is on
+        if normalize:
+             r = self._normalize(r)
+             g = self._normalize(g)
+             b = self._normalize(b)
 
 	return (r,g,b)
    
