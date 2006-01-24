@@ -23,7 +23,7 @@ from Tkinter import Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
 
 import topo.tkgui
 import topo.base.topoobject
-import topo.base.simulator as simulator
+import topo.base.simulator 
 
 import topo.plotting.bitmap
 import topo.plotting.plotgroup
@@ -59,13 +59,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         is clear there is no appropriate data to plot."""
         return True
 
-    ### JCALERT! Get rid of the parameter plot_group_key when creating the panel!
-    ### it should be only created from the panel and passed when creating the PlotGroup.
-    ### (it has still to be solve for the special case of testpattern.py).
-    ### We might also get rid of plotgroup_type...
-
-    def __init__(self,parent,console,plot_group_key,pgt_name=None,
-                 plotgroup_type='BasicPlotGroup',**config):
+    def __init__(self,parent,console,pgt_name,**config):
         """
         parent:  it is the window (GUIToplevel()) that contains the panel.
         console: is the associated console, (i.e. the TopoConsole that has this panel)
@@ -87,17 +81,24 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         self.balloon = Pmw.Balloon(parent)
         self.canvases = []
 
-	### JCALERT! Check if this makes sense in the general case...
-        ### Usually the pgt_name is the plot_group_key by default,
-        ### but for testpattern pgt_name = None and the plot_group_key is 'Preview'
-        ### passed by default when creating the class
-        if pgt_name != None:
-            self.plot_group_key = pgt_name
-        else:
-            self.plot_group_key = 'Preview' #plot_group_key
+	self.pgt = plotgroup_templates.get(pgt_name,None)
+
+	# By default, the plot_group_key is the pgt_name.
+	# for testpattern it is 'Preview' that does not corresponds to any template.
+        # for connectionfield and projection panel, the plotgroup_key is re-generated
+	self.plot_group_key = pgt_name
          
-        self.plotgroup_type = plotgroup_type # type of the PlotGroup 
-        self.pgt = plotgroup_templates.get(pgt_name,None)
+	### JCALERT! This is not used for the moment, but it could:
+        ### if the template specified an associated PlotGroup, we could do
+	### self.plotgroup_type = self.pgt.plotgroup_type
+        ### and then used that in the do_plot_cmd to create the PlotGroup.
+        ### this has to be discussed, as well as the topoconsole line that associate template with panel:
+        ### could all be done from the template.
+        ### Also, do we want to associate panel and plotgroup: in which case, we could only specified a panel
+        ### for a template and then creating a single type of PlotGroup for any panel (as it is now)
+        #self.plotgroup_type = plotgroup_type # type of the PlotGroup 
+
+        
 
         ### JABHACKALERT!
         ###
@@ -168,7 +169,8 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         self.auto_refresh_checkbutton.invoke()
 
         # Normalization check button.
-	### JCALERT! Do we want to always pass a template (for the moment, the exception is testpattern?
+	### JCALERT! Do we want to always pass a template (for the moment, the exception is testpattern?)
+        ### there is no normalize button for the testpattern... is this right?
         if self.pgt:        
             self.normalize_checkbutton = Checkbutton(self.shared_control_frame,
                                                      text="Normalize",

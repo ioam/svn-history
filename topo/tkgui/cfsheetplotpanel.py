@@ -25,8 +25,8 @@ from topo.plotting.templates import plotgroup_templates
 
 class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
 
-    def __init__(self,parent,console,plot_group_key=None,pgt_name=None,**config):
-        plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,plot_group_key,pgt_name,**config)
+    def __init__(self,parent,console,pgt_name=None,**config):
+        plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,pgt_name,**config)
 
         self.region = StringVar()
         self.region.set('None')
@@ -40,7 +40,8 @@ class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
 	###########################################
 	### JCALERT! Eventually all this code should go only in PlotGroupPanel
         ### and BasicPlotGroupPanel should be spared.
-	self.pgt = plotgroup_templates[pgt_name]
+
+	self.pgt = plotgroup_templates.get(pgt_name,None)
 	# Command used to refresh the plot, if any
         self.cmdname = StringVar()
         

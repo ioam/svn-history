@@ -31,10 +31,10 @@ from topo.commands.analysis import *
 from topo.commands.basic import *
 from topo.commands.lineplotting import *
 
-### JCALERT! Get rid of the pengine parameter.
+
 class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
     def __init__(self,parent,console,pgt_name,**config):
-        plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,pgt_name=pgt_name,**config)
+        plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,pgt_name,**config)
 
         # Plotgroup Template associated
         self.pgt = plotgroup_templates[pgt_name]
@@ -81,6 +81,10 @@ class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
 
 	self.pe_group = plotgroup_dict.get(self.plot_group_key,None)
 	if self.pe_group == None:
+	    ### JCALERT! Maybe if the template specified a PlotGroup, we could
+            ### take the one that is specified.
+            ### Otherwise, we could assume that each panel is associated with a PlotGroup
+            ### and then specify a panel for each template. (as it is done from topoconsole)
 	    self.pe_group = BasicPlotGroup(self.console.simulator,self.pgt,self.plot_group_key,
 					   self.normalize,None,[])
 

@@ -92,8 +92,7 @@ class PlotsMenuEntry(topo.base.topoobject.TopoObject):
 		win = GUIToplevel(self.console)
 		win.withdraw()
 		win.title(self.title)
-		pn = self.class_name(parent=win,console=self.console,plot_group_key=self.template.name,
-				     pgt_name=self.template.name,plotgroup_type=self.template)
+		pn = self.class_name(parent=win,console=self.console,pgt_name=self.template.name)
 		pn.pack(expand=YES,fill=BOTH)
 
 		pn.refresh_title()

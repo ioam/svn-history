@@ -27,8 +27,8 @@ import topo.commands.analysis
 ### ProjectionPanel like there is on ActivityPanel?
 ### JCALERT! It could also be re-named ConnectionFieldsPanel?
 class UnitWeightsPanel(CFSheetPlotPanel):
-    def __init__(self,parent,console=None,plot_group_key=None,pgt_name=None,**config):
-        super(UnitWeightsPanel,self).__init__(parent,console,plot_group_key,pgt_name,**config)
+    def __init__(self,parent,console=None,pgt_name=None,**config):
+        super(UnitWeightsPanel,self).__init__(parent,console,pgt_name,**config)
 
         # Receptive Fields are generally tiny.  Boost it up to make it visible.
         self.WEIGHT_PLOT_INITIAL_SIZE = 30

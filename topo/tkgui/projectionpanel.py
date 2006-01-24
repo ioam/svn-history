@@ -39,8 +39,8 @@ BORDERWIDTH = 1
 CANVASBUFFER = 1
 
 class ProjectionPanel(CFSheetPlotPanel):
-    def __init__(self,parent,console=None,plot_group_key=None,pgt_name=None,**config):
-        super(ProjectionPanel,self).__init__(parent,console,plot_group_key,pgt_name,**config)
+    def __init__(self,parent,console=None,pgt_name=None,**config):
+        super(ProjectionPanel,self).__init__(parent,console,pgt_name,**config)
 
         self.MIN_PLOT_WIDTH = 1
         self.INITIAL_PLOT_WIDTH = 13
