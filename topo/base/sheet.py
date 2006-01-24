@@ -253,10 +253,10 @@ def bounds2slice(slice_bounds, sheet_bounds, xdensity, ydensity):
     t_m,l_m = sheet2matrix(l,t,sheet_bounds,xdensity,ydensity)
     b_m,r_m = sheet2matrix(r,b,sheet_bounds,xdensity,ydensity)
 
-    l_idx = ceil(l_m-0.5)
-    t_idx = ceil(t_m-0.5)
-    r_idx = floor(r_m+0.5)
-    b_idx = floor(b_m+0.5)
+    l_idx = int(ceil(l_m-0.5))
+    t_idx = int(ceil(t_m-0.5))
+    r_idx = int(floor(r_m+0.5))
+    b_idx = int(floor(b_m+0.5))
                   
     # crop to the sheet bounds
     maxrow,maxcol = sheet2matrixidx(sheet_bounds.aarect().right(),
