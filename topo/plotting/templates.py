@@ -114,6 +114,7 @@ plotgroup_templates = KeyedList()
 # We should also be able to store things like the Normalize option setting
 # (currently ignored?) and a documentation string describing each plot
 # (for hovering help text) within each template.
+# JC: we should also maybe add the situate option (and auto-refresh?)
 
 def new_plotgroup_template(name,command,normalize=False):
     pgt = PlotGroupTemplate(name=name,command=command,normalize=normalize)
@@ -122,17 +123,17 @@ def new_plotgroup_template(name,command,normalize=False):
 
 ### JCALERT! I have to change the way Normalize is working.
 pgt = new_plotgroup_template(name='Activity',command='update_activity()')
-pgt.add_plot('Activity',[('Strength','Activity'),('Hue','OrientationPreference'),('Normalize',False)])
+pgt.add_plot('Activity',[('Strength','Activity'),('Hue','OrientationPreference')])
 
 ### JCALERT! unitweightpanel could be re-named Connectionfields panel...?
 ### Also, the situate option could be specified in the template.
 ### Also implement the test for 'Weights' in PlotGroup.
 pgt = new_plotgroup_template(name='Connection Field',command='update_connectionfields()',normalize='True')
-pgt.add_plot('Connection Field',[('Strength','Weights'),('Hue','OrientationPreference'),('Normalize',True)])
+pgt.add_plot('Connection Field',[('Strength','Weights'),('Hue','OrientationPreference')])
 
 
 pgt = new_plotgroup_template(name='Projection',command='update_projections()',normalize='True')
-pgt.add_plot('Projection',[('Strength','Weights'),('Hue','OrientationPreference'),('Normalize',True)])
+pgt.add_plot('Projection',[('Strength','Weights'),('Hue','OrientationPreference')])
 
 
 pgt = new_plotgroup_template(name='Orientation Preference',command='measure_or_pref()')
@@ -146,8 +147,8 @@ pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
 ### but rather directly for the whole PlotGroupTemplate. (Anyway the way normalize works
 ### should be changed in the panels...)
 pgt = new_plotgroup_template(name='Center Of Gravity',command='measure_cog() ; topographic_grid()',normalize=True)
-pgt.add_plot('X Preference',[('Strength','XPreference'),('Normalize',True)])
-pgt.add_plot('Y Preference',[('Strength','YPreference'),('Normalize',True)])
-pgt.add_plot('CoG Preference',[('Red','XPreference'),('Green','YPreference'),('Normalize',True)])
+pgt.add_plot('X Preference',[('Strength','XPreference')])
+pgt.add_plot('Y Preference',[('Strength','YPreference')])
+pgt.add_plot('CoG Preference',[('Red','XPreference'),('Green','YPreference')])
 
 
