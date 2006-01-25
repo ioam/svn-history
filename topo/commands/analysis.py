@@ -14,6 +14,7 @@ from topo.analysis.featuremap import MeasureFeatureMap
 from topo.base.arrayutils import octave_output
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
+import topo.base.patterngenerator
 from topo.commands.basic import pattern_present
 from topo.patterns.basic import SineGrating, Gaussian
 from topo.sheets.generatorsheet import GeneratorSheet
@@ -32,32 +33,18 @@ class PatternPresenter(object):
         self.gen = patterngenerator
 
     def __call__(self,sim,features_values,param_dict):
-        ### JABHACKALERT!  Should be able to do this more cleanly using gen's __dict__,
-        # with something like:
-        #
-        #self.gen.__dict__.update(param_dict)
-        #self.gen.__dict__.update(features_values)
-        #
-        # or
-        #
-        #for param,value in param_dict.iteritems():
-        #    self.gen.__dict__[param]=value
-        #
-        #for feature,value in features_values.iteritems():
-        #    self.gen.__dict__[feature]=value
-
-        for param, value in param_dict.iteritems():
-            update_generator = "self.gen." + param + "=" + repr(value)
-            exec update_generator
-
+    
+        for param,value in param_dict.iteritems():
+           self.gen.__setattr__(param,value)
+        
         for feature,value in features_values.iteritems():
-            update_generator = "self.gen." + feature + "=" + repr(value)
-            exec update_generator
+           self.gen.__setattr__(feature,value)
 
         inputs = dict().fromkeys(sim.objects(GeneratorSheet),self.gen)
 
         pattern_present(inputs, self.duration, learning=False,
                         apply_output_fn=self.apply_output_fn)
+
 
 
 
