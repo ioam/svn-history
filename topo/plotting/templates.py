@@ -144,9 +144,9 @@ pgt.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference
 pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
 
 
-pgt = new_plotgroup_template(name='Center Of Gravity',command='measure_cog() ; topographic_grid()',normalize=True)
+pgt = new_plotgroup_template(name='Position Preference',command='measure_position_pref() ; topographic_grid()',normalize=True)
 pgt.add_plot('X Preference',[('Strength','XPreference')])
 pgt.add_plot('Y Preference',[('Strength','YPreference')])
-pgt.add_plot('CoG Preference',[('Red','XPreference'),('Green','YPreference')])
+pgt.add_plot('Position Preference',[('Red','XPreference'),('Green','YPreference')])
 
 

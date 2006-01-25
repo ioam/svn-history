@@ -80,7 +80,7 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
 
 
-def measure_cog(divisions=6,size=0.1,scale=0.3,offset=0.0,display=False,
+def measure_position_pref(divisions=6,size=0.1,scale=0.3,offset=0.0,display=False,
                 user_function=PatternPresenter(Gaussian(aspect_ratio=1.0),False,1.0)):
     """Measure center-of-gravity (CoG) map, using a Gaussian by default."""
 
