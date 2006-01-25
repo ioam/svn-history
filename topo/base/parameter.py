@@ -592,6 +592,11 @@ class Dynamic(Parameter):
         return result
 
 
+### JABHACKALERT: This seems also to disallow setting the parameter in
+### the constructor for the object, which was most definitely not
+### intentional.  The result is that Constant parameters like 'bounds'
+### can only be set on the class, not when constructing the object,
+### and they need to be settable when constructing the object.
 class Constant(Parameter):
     """
     Constant Parameter that can be constructed and used but not set on an object.
