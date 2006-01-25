@@ -13,7 +13,7 @@ __version__='$Revision$'
 
 import random
 import RandomArray
-from math import exp
+from math import exp, sqrt
 
 from topo.base.parameter import Number
 from topo.sheets.generatorsheet import GeneratorSheet
@@ -34,17 +34,21 @@ from topo.patterns import PatternGeneratorParameter
 ### alpha function.
 class RetinotopicSOM(CFSOM):
     """A variant of CFSOM that uses linear decay functions for alpha and radius."""
-    ### JCALERT: maybe I should have used the parameter learninglength
-    ending_time=Number(40000) # time at the end of the simulation
-    ending_radius=Number(0.5) # radius at the end of the simulation
+
+    radius_min=Number(0) # radius at the end of the simulation
+
+    def __init__(self,**params):
+        super(RetinotopicSOM,self).__init__(**params)
+        # assumes X and Y density are equal
+        self.radius_min=1.25/self.xdensity # radius at the end of the simulation
 
     def alpha(self):
-        return self.alpha_0*exp(-6.0*(self.simulator.time()/self.ending_time))
+        return self.alpha_0*exp(-6.0*(self.simulator.time()/self.learning_length))
     
     def radius(self):
        """Saturated decay function."""
-       decayed_radius = self.radius_0*exp(-5.0*self.simulator.time()/self.ending_time)
-       return max(decayed_radius,self.ending_radius)
+       decayed_radius = self.radius_0*exp(-5.0*self.simulator.time()/self.learning_length)
+       return max(decayed_radius,self.radius_min)
 
 
 
@@ -62,9 +66,9 @@ topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(
 
 ### JCALERT! This parameter seems to match the figure in the book, 
 ### nevertheless it is a Gaussian width of 0.08, as opposed to 2.19, as specified in the errata on line
-topo.patterns.basic.Gaussian.size = 0.08
+topo.patterns.basic.Gaussian.size = sqrt(2.0*0.1*24.0)/24.0
 topo.patterns.basic.Gaussian.aspect_ratio = 1.0
-topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 
 # CEBHACKALERT: something isn't working about using e.g.
 # PatternGeneratorParameter(default=X) in various places in the code
@@ -72,16 +76,16 @@ topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8))
 # PatternGeneratorParameter.default=topo.patterns.basic.Gaussian()
 
 # cortical sheet
-RetinotopicSOM.density = 40
-RetinotopicSOM.learning_length = 10000
-RetinotopicSOM.radius_0 = 13.3
-# divide by 24*24 = 576: the number of unit in the receptive field, in order to compensate for 
+RetinotopicSOM.density = 10 #it should be 40
+RetinotopicSOM.learning_length = 40000
+RetinotopicSOM.radius_0 = 13.3/24
+# divide by 24*24: the number of unit in the receptive field, in order to compensate for 
 # the learning rate being divided by the number of units, and still match previous simulations.
-RetinotopicSOM.alpha_0 = 0.42*576  
+RetinotopicSOM.alpha_0 = 0.42*24*24 
 
 RandomArray.seed(500,500)
-CFProjection.weights_generator = topo.patterns.random.UniformRandom() #basic.Disk(size=0.22,aspect_ratio=1.0,smoothing=0.0) 
-### JCALERT! It has to be this bounding box to have a real fully connected network.
+CFProjection.weights_generator = topo.patterns.random.UniformRandom() 
+
 CFProjection.weights_bounds=BoundingBox(points=((-1.0,-1.0),(1.0,1.0))) # fully connected network.
 CFProjection.response_fn = CFDotProduct()
 CFProjection.learning_fn=HebbianSOMLF()
