@@ -30,8 +30,8 @@ from topo.base.utils import frange
 
 def topographic_grid():
     """
-    Plot the CoG for all Sheets for which measure_cog returned results,
-    using MatPlotLib.
+    Plot the XPosition and YPosition preferences for all Sheets
+    for which they are defined, using MatPlotLib.
     """
     sim = topo.base.simulator.get_active_sim()
     for sheet in sim.objects(Sheet).values():
@@ -59,7 +59,10 @@ def topographic_grid():
             
             pylab.xlabel('x')
             pylab.ylabel('y')
-            
+            # Currently sets the input range arbitrarily; should presumably figure out
+            # what the actual possible range is for this simulation (which would presumably
+            # be the maximum size of any GeneratorSheet?).
+            pylab.axis([-0.5,0.5,-0.5,0.5])
             pylab.title('Topographic mapping to '+sheet.name+' at time '+str(sim.time()))
 
             # Will need to provide a way to save this output
