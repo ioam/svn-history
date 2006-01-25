@@ -38,7 +38,7 @@ class PlotGroup(TopoObject):
     """
 
     ###JCALERT:
-    ### - re-arranged the order and look at the call in all panel classes (i.e. inputparampanel)
+    ### - re-arranged the order and look at the call in all panel classes (i.e. testpattern)
     ### also review the doc of each functions.
     ### - rewrite the test file.
 
@@ -116,7 +116,7 @@ class PlotGroup(TopoObject):
   
     def create_plots(self):
         """
-	This function need to be re-implemented in the subclass.
+	This function needs to be re-implemented in the subclasses.
 	As it is implemented here, it leaves the possibility of passing a plot_list
         of already created plots when creating a PlotGroup.
 	"""       
@@ -215,7 +215,6 @@ class UnitWeightsPlotGroup(PlotGroup):
 		### weight belongs to the src_sheet, and the name in the key
                 ### is the destination sheet.
 	        plot_channels = pt
-
 	        ### JCALERT! do the plot_channels['Strength'] == 'weights' test
                 ### here and in projectionplotgroup
                 key = ('Weights',sheet.name,p.name,self.x,self.y)
