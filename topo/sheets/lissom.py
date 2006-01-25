@@ -43,6 +43,12 @@ class LISSOM(CFSheet):
         super(LISSOM,self).input_event(src,src_port,dest_port,data)
 
 
+    ### JABHACKALERT!  There should be some sort of warning when
+    ### tsettle times the input delay is larger than the input period.
+    ### Right now it seems to do strange things in that case (settle
+    ### at all after the first iteration?), but of course that is
+    ### arguably an error condition anyway (and should thus be
+    ### flagged).
     def pre_sleep(self):
         """
         Pass the accumulated stimulation through self.output_fn and
