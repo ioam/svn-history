@@ -1,3 +1,431 @@
+2006-01-25  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/lineplotting.py 1.3: Enforced minimum size of
+	topographic map plots
+
+2006-01-25  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.6, topo/plotting/templates.py 1.23:
+	Changed the name of the template CoG Preference to be Position
+	Preference. Also changed measure_cog() to be named
+	measure_position_pref().
+
+2006-01-25  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/learningfns/basic.py 1.34: Added question about proper
+	scaling for a SOM learning rate
+
+	* topo/sheets/lissom.py 1.36: Added tsettle alert
+
+	* examples/cfsom_or.ty 1.22, examples/hierarchical.ty 1.22,
+	examples/lissom_or.ty 1.57, examples/som_retinotopy.ty 1.5:
+	Changed all parameter files to remove initial iteration so that
+	the user can inspect an untrained network
+
+	* topo/base/parameter.py 1.42: Added alert
+
+	* doc/shared/util.php 1.16: Minor tweak
+
+2006-01-25  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.45: bounds2shape() uses bounds2slice() to
+	get the matrix shape.
+
+	* topo/patterns/random.py 1.16, topo/base/connectionfield.py 1.86,
+	topo/base/patterngenerator.py 1.57: PatternGenerator no longer
+	uses bounds2shape(); instead, it uses bounds2slice(). If the slice
+	is already known, it can be passed in (as an optimization, like
+	rows and cols could be passed in before). There should be no
+	visible changes.
+
+2006-01-25  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* examples/som_retinotopy.ty 1.4: Corrected an error in last
+	commit.
+
+	* examples/som_retinotopy.ty 1.3: Version that appears to match
+	the parameter in the book, but still does not give the expected
+	results with Topographica.
+
+	* topo/commands/analysis.py 1.5: Improved the code in
+	PatternPresenter: now use the __setattr__ method rather than an
+	exec to update the pattern generator attributes.
+
+	* examples/som_retinotopy.ty 1.2: Adjusted the parameters to match
+	the simulation in the book.
+
+	* topo/plotting/plotgroup.py 1.74: Minor cleaning.
+
+2006-01-24  jdepaula  <jdepaula@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/index_text.php 1.12, doc/Downloads/win32_text.php
+	1.6: Updated documentation for Windows port
+
+2006-01-24  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/__init__.py 1.7: Deleted plotengine from the
+	plotting/__init__.py file.
+
+	* topo/plotting/templates.py 1.22: Cleaned up old alerts.
+
+	* topo/tkgui/plotgrouppanel.py 1.29: Cleaned up comments and old
+	alerts.
+
+2006-01-24  jdepaula  <jdepaula@lodestar.inf.ed.ac.uk>
+
+	* external/win32/setup.py 1.22: Added header information about the
+	different steps within setup.py
+
+	* external/win32/README.txt 1.4: Moved what the code in setup.py
+	does, into setup.py
+
+2006-01-24  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/basicplotgrouppanel.py 1.18,
+	topo/tkgui/cfsheetplotpanel.py 1.11, topo/tkgui/projectionpanel.py
+	1.34, topo/tkgui/testpattern.py 1.16, topo/tkgui/topoconsole.py
+	1.28, topo/tkgui/unitweightspanel.py 1.26,
+	topo/tkgui/plotgrouppanel.py 1.28: Deleted the parameter
+	plotgroup_type and plotgroup_key when creating a PlotGroupPanel.
+
+2006-01-24  jdepaula  <jdepaula@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/inlinec.py 1.4, topographica_script.py 1.20: Changed
+	direction of importing.  Lowercased variable.
+
+2006-01-24  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.27: Re-organized import
+	statements.
+
+	* topo/plotting/plot.py 1.64: Added the normalizing for the
+	RGBPlot.
+
+	* topo/tkgui/cfsheetplotpanel.py 1.10: Got rid of unused default
+	value.
+
+	* topo/plotting/templates.py 1.21: Deleted the normalize field in
+	the plot_templates. Now, normalize is only specified for a
+	PlotGroupTemplate.
+
+	* topo/plotting/plotfilesaver.py 1.18, topo/plotting/plotgroup.py
+	1.73, topo/tkgui/basicplotgrouppanel.py 1.17,
+	topo/tkgui/plotgrouppanel.py 1.26, topo/tkgui/projectionpanel.py
+	1.33, topo/tkgui/testpattern.py 1.15,
+	topo/tkgui/unitweightspanel.py 1.25: Added a parameter normalize
+	to be passed to a PlotGroup. Now the information normalize is no
+	longer passed through the template but rather by modifying the
+	PlotGroup.normalize attribute.
+
+2006-01-24  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.44: bounds2slice() always returns int
+	values.
+
+2006-01-24  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/basicplotgrouppanel.py 1.16,
+	topo/tkgui/projectionpanel.py 1.32, topo/tkgui/unitweightspanel.py
+	1.24, topo/tkgui/plotgrouppanel.py 1.25: Renamed the
+	PlotGroupPanel attribute plot_group to plot_group_title.
+
+	* topo/tkgui/plotgrouppanel.py 1.24: Started a re-organization of
+	the file. Moved code around to made it clearer. Added alert about
+	how to improve the file, and take the normalize information from
+	the template rather than the first plot_template. (This has been
+	tested with version 1.42 of sheet.py because the new version 1.43
+	has introduced an error in the slicing of the sheetviews.)
+
+2006-01-24  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.43: bounds2slice() returns the slice that
+	includes all units whose centres are within the specified bounds
+	(and within the sheet's bounds).
+
+2006-01-24  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotfilesaver.py 1.17, topo/plotting/plotgroup.py
+	1.72, topo/plotting/templates.py 1.20,
+	topo/tkgui/projectionpanel.py 1.31: Got rid of the now un-used
+	Density and Projection_name fields in the Projection
+	PlotGroupTemplate.
+
+	* topo/commands/analysis.py 1.4: Omitted in previous commit:
+	changed the name of update_weights() to update_connectionfields().
+
+	* topo/tkgui/topoconsole.py 1.27, topo/tkgui/unitweightspanel.py
+	1.23, topo/plotting/templates.py 1.19: Renamed the Unit Weights
+	template to Connection Field; made the corresponding change in
+	topoconsole. Also modified the way labels is display from the
+	UnitWeightsPanel to display the name of the template (as it is
+	defined in templates.py). I think we might renamed
+	UnitWeightsPanel to ConnectionFieldPanel, it has to be decided.
+
+	* topo/plotting/templates.py 1.18: Added a function
+	new_plotgroup_template to create and store a
+	PlotGroupTemplate. Renamed add_plot_template() to add_plot(), and
+	re-write all the template creation using new_plotgroup_template()
+	and add_plot().
+
+2006-01-23  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_or.ty 1.56: Added a note about the input_bounds.
+
+2006-01-23  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* examples/cfsom_or.ty 1.21: Added a comment to explain how to
+	find the learning rate.
+
+	* examples/som_retinotopy.ty 1.1: Added the skeleton for the
+	retinotopic map simulation. It has to be modifiedf so that the
+	parameters exactly match the simulation published in the book.
+
+2006-01-23  alan_lindsay  <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorobjects.py 1.14: 1st receptive field in centre
+	and labels are closer to middle.
+
+2006-01-23  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testlissom.ty 1.8: Added test for activity matrix
+	size.
+
+	* topo/base/connectionfield.py 1.85: No visible change for
+	networks that use weight generators like COnstat() or
+	UniformRandom(): weights patterns drawn at the center of the sheet
+	rather than at the ConnectionField's x and y location (as used to
+	be the case).
+
+	* topo/base/sheet.py 1.42: No visible change. Removed redundant
+	'maxrow+1', clarified 'toprow+1'. Cleaned up docstring.
+
+	* topo/base/sheet.py 1.41: No visible change. Altered variable
+	names in bounds2slice().
+
+2006-01-22  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/obermayer_pnas90.ty 1.17: Made initial state be clean
+
+	* topo/commands/lineplotting.py 1.2: Minor tweaks
+
+	* topo/commands/analysis.py 1.3: Removed temporary plot_cog()
+	command
+
+	* topo/commands/lineplotting.py 1.1, topo/plotting/templates.py
+	1.17, topo/tkgui/basicplotgrouppanel.py 1.15: Added
+	topographic_grid plot
+
+	* topo/commands/analysis.py 1.2: Temporary commit to preserve
+	octave-based topographic-grid plotting; requires external command
+	topogrid in ./external/
+
+	* topo/analysis/updatecommands.py 1.12, topo/commands/analysis.py
+	1.1, topo/tkgui/basicplotgrouppanel.py 1.14,
+	topo/tkgui/projectionpanel.py 1.30, topo/tkgui/unitweightspanel.py
+	1.22: Moved topo/analysis/updatecommands to topo/commands/analysis
+
+	* doc/Developer_Manual/imports_text.php 1.2: Minor tweak
+
+	* topo/base/arrayutils.py 1.2: Added octave_str and octave_output
+	commands
+
+	* doc/Future_Work/index_text.php 1.6: Added link to pymat
+
+	* topo/plotting/templates.py 1.16: Added a few notes
+
+2006-01-20  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.40: Added a comment about a
+	JABALERT./topographica -g examples/cfsom_or.ty I need Jim's advise
+	before getting rid of it.
+
+	* topo/plotting/templates.py 1.15: Wrote an add_plot_template()
+	function in PlotGroupTemplate in order to create them more
+	conveniently. I did not change the current way templates are
+	defined because I am waiting for Jim reviewing the function and
+	confirming it is OK.
+
+	* topo/base/sheet.py 1.39, topo/tests/testplotgroup.py 1.11,
+	topo/tests/testsheet.py 1.18, topo/tests/testsheetview.py 1.8,
+	topo/tests/tkgui/testactivitypanel.py 1.10: Got rid of
+	add_sheet_view() in Sheet now that the sheet_view_dict is public.
+
+	* topo/tests/testsheet.py 1.17: Wrote a slice2bounds test. Now
+	there is a pretty heavy testing of: bounds2slice,slice2bounds and
+	also slice2bounds_to_bounds2slice (that test that both function
+	combined together provide an identity function).
+
+2006-01-20  alan_lindsay  <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorwindow.py 1.11: Fixed a few wee bugs in the
+	popup menu.
+
+	* topo/tkgui/editorobjects.py 1.13, topo/tkgui/editorwindow.py
+	1.10: Add order to objects drawn in the canvas. Allow for order to
+	be changed, in popup menu.
+
+2006-01-20  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testsheet.py 1.16: Finished to write the test for
+	bounds2slice. I think it is enough testing for this function now.
+
+	* topo/base/connectionfield.py 1.84, topo/base/sheet.py 1.38:
+	Modified slice2bounds and bounds2slice so that the bounds returned
+	by slice2bounds do not have any additional margins; the margin is
+	now built internally to bounds2slice, and therefore slice2bounds
+	return the exact bounds. I had to slightly (and temporarily,
+	because Chris is still working on it) modified connectionfield.py.
+
+2006-01-19  alan_lindsay  <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorobjects.py 1.12, topo/tkgui/editortools.py 1.7,
+	topo/tkgui/editorwindow.py 1.9: All possible import * occurrences
+	omitted
+
+	* topo/tkgui/editorobjects.py 1.11: Ok button added to objects
+	properties window. Updates and closes.
+
+2006-01-19  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.83: No visible change. Altered
+	call to ConnectionField.__init__().
+
+2006-01-18  alan_lindsay  <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorobjects.py 1.10: Lateral Connections colour
+	when they have the focus.
+
+	* topo/tkgui/editorobjects.py 1.9: Connections from a sheet from
+	one neuron. Lateral connection ovals can be selected and their
+	properties obtained. Labels highlight when their object is
+	selected and they sit (right justified) on the left of their
+	object.
+
+	* topo/tkgui/editorwindow.py 1.8: Order of boundary search changed
+	to allow lateral connections to be selected.
+
+	* topo/tkgui/editortools.py 1.6: More distinct display of focus
+
+2006-01-18  jdepaula  <jdepaula@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/inlinec.py 1.3, topographica_script.py 1.19: Make
+	loading weave on Windows non-default
+
+	* external/win32/setup.py 1.21: Now uses Python 2.4.2
+
+	* external/win32/python-2.4.2.msi 1.1: Upgrade Python 2.4 to 2.4.2
+
+	* setup.bat 1.10: Upgrade Python 2.4.2 for Windows
+
+2006-01-18  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/parametersframe.py 1.41: Added ALERT
+
+	* doc/shared/util.php 1.15: Converted CONVENTIONS into a developer
+	manual
+
+	* doc/Future_Work/index_text.php 1.5: Added Judith's suggestion
+
+	* CONVENTIONS 1.22, doc/Developer_Manual/.cvsignore 1.1,
+	doc/Developer_Manual/communication_text.php 1.1,
+	doc/Developer_Manual/gui_text.php 1.1,
+	doc/Developer_Manual/imports_text.php 1.1,
+	doc/Developer_Manual/index_text.php 1.1,
+	doc/Developer_Manual/naming_text.php 1.1,
+	doc/Developer_Manual/ood_text.php 1.1,
+	doc/Developer_Manual/optimization_text.php 1.1,
+	doc/Developer_Manual/parameters_text.php 1.1,
+	doc/Developer_Manual/python_text.php 1.1,
+	doc/Developer_Manual/refactoring_text.php 1.1,
+	doc/Developer_Manual/revisioncontrol_text.php 1.1,
+	doc/Developer_Manual/testing_text.php 1.1: Converted CONVENTIONS
+	into a developer manual
+
+2006-01-18  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.23: Changed the code for toggle
+	normalize so that it just regenerate the normalized plots but not
+	re-run the do_plot command.
+
+	* topo/plotting/plot.py 1.63: Changed the code for normalizing,
+	introduced an offset so that the minimum value of the matirx is
+	zero.
+
+2006-01-18  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.82: Weight (and mask) patterns
+	are setup using the bounds as calculated by
+	initialize_slice_array(). This corrects the weights near the edges
+	of sheets. There should be no visible change to simulations that
+	were using a weights_generator or weights_shape that was a
+	pattern such as UniformRandom() or Constant() (as opposed to a
+	Disk() or Gaussian(), which were being incorrectly calculated at
+	the edge of Sheets).
+
+2006-01-18  louisem  <louisem@lodestar.inf.ed.ac.uk>
+
+	* examples/obermayer_pnas90.ty 1.16: Cleaned up alpha and radius;
+	might work now.  Enabled DivisiveSumNormalize
+
+2006-01-18  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topographica_script.py 1.18: Undid previous change -
+	commandline.py is in topo/misc/, not topo/base/.
+
+2006-01-18  jdepaula  <jdepaula@lodestar.inf.ed.ac.uk>
+
+	* topographica_script.py 1.17: Someone missed this file when they
+	moved commandline.py
+
+2006-01-17  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testsheet.py 1.15: Added a partial test of
+	bounds2slice(). I think bounds2slice() might be incorrect - needs
+	to be investigated (I might be confused).
+
+2006-01-17  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/templates.py 1.14: Replaced testing version of RGB
+	plot with a real RGB CoG plot
+
+	* topo/analysis/featuremap.py 1.34: Cleaned up imports and minor
+	spelling errors.  Cleaned up commented-out display functions, and
+	Julien made them work with the current version of the GUI (though
+	they still aren't clean enough to leave uncommented). Fixed
+	non-cyclic features to use an inclusive frange.
+
+	* topo/analysis/updatecommands.py 1.11: Added measure_cog command
+
+	* topo/base/utils.py 1.53: Added inclusive option to frange
+
+	* topo/tkgui/topoconsole.py 1.26: Added hack useful for
+	MeasureFeatureMap
+
+	* topo/analysis/updatecommands.py 1.10: Expanded HACKALERT
+	description
+
+	* topo/analysis/updatecommands.py 1.9: Changed
+	SineGratingPresenter to be a general PatternPresenter class that
+	accepts any PatternGenerator
+
+	* topo/analysis/updatecommands.py 1.8: Changed measure_or_pref to
+	accept a presenter object instead of a presenter class
+
+	* topo/analysis/featuremap.py 1.33,
+	topo/analysis/updatecommands.py 1.7: Moved sim argument out of
+	SineGratingPresenter __init__ and put it in __call__ instead
+
+	* external/Makefile 1.30: Fixed bug in previous commit
+
+	* topo/analysis/updatecommands.py 1.6, topo/commands/basic.py
+	1.18, topo/tkgui/testpattern.py 1.14: Removed unused sim argument
+	in pattern_present
+
+	* external/Makefile 1.29: Forced matplotlib to be remade when
+	Python changes, because it seems to require that
+
+	* ChangeLog 1.1: Up-to-date version of changes
+
 2006-01-17  ceball  <ceball@lodestar.inf.ed.ac.uk>
 
 	* topo/tests/lissom_or_reference.ty 1.8: Minor correction plus put
