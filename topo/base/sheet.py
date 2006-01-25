@@ -326,25 +326,18 @@ def bounds2shape(bounds,xdensity,ydensity):
     Returns (rows,columns).
     """
 
-    ### JCALERT! New version of bounds2shape. It has to be checked that we
-    ### really want to use sheet2matrixidx().
-    ### The other solution would be to use sheet2matrixidx(), and directly make the difference
-    ### Nevertheless, I think both methods are equivalent for implementing bounds2shape
-    ### Furthermore, using one or the other does not lead to inconsistencies in the way we switch
-    ### from slice to bound and bound to slice.
+    r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
 
-    left,bottom,right,top = bounds.aarect().lbrt()
-    toprow,leftcol = sheet2matrix(left,top,bounds,xdensity,ydensity)
-    botrow, rightcol = sheet2matrix(right,bottom,bounds,xdensity,ydensity)
+    n_rows=r2-r1; n_cols=c2-c1
 
-    rows = int(botrow - toprow)
-    cols = int(rightcol - leftcol)
-
-    # Enforce minimum size
-    if rows == 0: rows = 1
-    if cols == 0: cols = 1
+    # CEBHACKALERT: can we document why this should be done?
+    # Do we really need this function?
     
-    return rows,cols
+    # Enforce minimum size
+    if n_rows == 0: n_rows = 1
+    if n_cols == 0: n_cols = 1
+    
+    return n_rows,n_cols
 
 
 class Sheet(EventProcessor):
