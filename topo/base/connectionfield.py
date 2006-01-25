@@ -72,14 +72,9 @@ class ConnectionField(TopoObject):
         self.__weights_bound_template = weights_bound_template
         self.initialize_slice_array()
 
-	r1=self.slice_array[0]
-        r2=self.slice_array[1]
-        c1=self.slice_array[2]
-        c2=self.slice_array[3]
-
         w = weights_generator(x=0.0,y=0.0,bounds=weights_bound_template,
                               density=self.input_sheet.density,theta=0,
-			      rows=r2-r1,cols=c2-c1)
+			      slice_array=self.slice_array)
         self.weights = w.astype(weight_type)
         # Maintain the original type throughout operations, i.e. do not
         # promote to double.
@@ -100,7 +95,7 @@ class ConnectionField(TopoObject):
         # have been adjusted too?
         m = weights_shape(x=0.0,y=0.0,bounds=weights_bound_template,
                           density=self.input_sheet.density,theta=0,
-			  rows=r2-r1,cols=c2-c1)
+			  slice_array=self.slice_array)
         m = Numeric.where(m>=0.5,m,0.0)
         self.mask = m.astype(weight_type)
         self.mask.savespace(1)

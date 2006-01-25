@@ -10,7 +10,7 @@ __version__='$Revision$'
 
 from topoobject import TopoObject
 from boundingregion import BoundingBox
-from sheet import  matrixidx2sheet, bounds2shape
+from sheet import  matrixidx2sheet, bounds2slice
 from Numeric import add,subtract,cos,sin,array
 from parameter import Parameter,Number,ClassSelectorParameter
 from math import pi
@@ -65,11 +65,9 @@ class PatternGenerator(TopoObject):
         # CEBHACKALERT: I still have documentation to write, including explaining
         params.get().
 
-        Sometimes rows and cols are already known before the
-	PatternGenerator is called, so we can just provide this
-	information without having them recomputed. And sometimes rows
-	and cols are not found by simply calling bound2shape() so we
-	need to pass them in (e.g. see ConnectionField.init()).
+        Sometimes the slice is already known before PatternGenerator
+	is called, so we can just provide this information without
+	having the slice recomputed from the bounds.
         """
         self.verbose("params = ",params)
         self.__setup_xy(params.get('bounds',self.bounds),
@@ -77,18 +75,17 @@ class PatternGenerator(TopoObject):
                         params.get('x', self.x),
                         params.get('y',self.y),
                         params.get('orientation',self.orientation),
-                        params.get('rows',0),
-                        params.get('cols',0))
+                        params.get('slice_array',None))
         return self.scale*self.function(**params)+self.offset
 
-    def __setup_xy(self,bounds,density,x,y,orientation,rows,cols):
+    def __setup_xy(self,bounds,density,x,y,orientation,slice_array):
         """
         Produce the pattern matrices from the bounds and density (or
         rows and cols), and transform according to x, y, and
         orientation.
         """
         self.verbose("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
-        x_points,y_points = self.__produce_sampling_vectors(bounds,density,rows,cols)
+        x_points,y_points = self.__produce_sampling_vectors(bounds,density,slice_array)
         self.pattern_x, self.pattern_y = self.__create_and_rotate_coordinates(x_points-x,y_points-y,orientation)
 
     def function(self,**params):
@@ -103,30 +100,31 @@ class PatternGenerator(TopoObject):
         raise NotImplementedError
 
 
-    def __produce_sampling_vectors(self, bounds, density, r, c):
+    def __produce_sampling_vectors(self, bounds, density, slice_array):
         """
         Generate vectors representing coordinates at which the pattern will be sampled.
 
         x is a 1d-array of x-axis values at which to sample the pattern;
         y contains the y-axis values.
-        """       
+        """
 
+        # CEBHACKALERT: only Sheet should have to know about xdensity etc.
         left,bottom,right,top = bounds.aarect().lbrt()
         xdensity = int(density*(right-left)) / float((right-left))
         ydensity = int(density*(top-bottom)) / float((top-bottom))
 
-        if r == 0 and c == 0:
-            rows,cols = bounds2shape(bounds,xdensity,ydensity)
+        # avoid calculating the slice if it's been done elsewhere        
+        if slice_array==None:
+            # a slice to get the matrix corresponding to the whole bounds
+            r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
         else:
-            # CEBHACKALERT: say rows=0,cols=3 is passed when a PatternGenerator is
-            # called. Then, there will be an error at the line 'x = x[:,0]' below.
-            # Either assert r>0 and c>0 here, or have an if test for those lines
-            # below.
-            rows = r
-            cols = c
+            r1,r2,c1,c2 = slice_array
 
-        y = array([matrixidx2sheet(r,0,bounds,xdensity,ydensity) for r in range(rows)])
-        x = array([matrixidx2sheet(0,c,bounds,xdensity,ydensity) for c in range(cols)])
+        rows = array(range(r1,r2))
+        cols = array(range(c1,c2))
+
+        y = array([matrixidx2sheet(r,0,bounds,xdensity,ydensity) for r in rows])
+        x = array([matrixidx2sheet(0,c,bounds,xdensity,ydensity) for c in cols])
 
         # x increases from left to right; y decreases from left to right.
         # For this function to make sense on its own, y should probably be
@@ -135,10 +133,8 @@ class PatternGenerator(TopoObject):
         y = y[:,1]
         x = x[:,0]
 
-        assert len(x) == cols
-        assert len(y) == rows
-
         return x, y
+
 
     def __create_and_rotate_coordinates(self, x, y, orientation):
         """
@@ -166,9 +162,7 @@ class Constant(PatternGenerator):
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)
     def __call__(self,**params):
-        r = params.get('rows',0)
-	c = params.get('cols',0)
-
+        slice_array = params.get('slice_array',None)
         bounds = params.get('bounds',self.bounds)
         density = params.get('density',self.density)
 
@@ -176,9 +170,14 @@ class Constant(PatternGenerator):
         xdensity = int(density*(right-left)) / float((right-left))
         ydensity = int(density*(top-bottom)) / float((top-bottom))
 
-        if r == 0 and c == 0:
-            r,c = bounds2shape(bounds,xdensity,ydensity)
-        return self.scale*ones((r,c), Float)+self.offset
+        # avoid calculating the slice if it's been done elsewhere        
+        if slice_array==None:
+            # a slice to get the matrix corresponding to the whole bounds
+            r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
+        else:
+            r1,r2,c1,c2 = slice_array
+
+        return self.scale*ones((r2-r1,c2-c1), Float)+self.offset
 
 
 # CEBHACKALERT: don't need to pass through doc etc.
