@@ -107,4 +107,4 @@ V3.guiX=500          ; V3.guiY=90
 LeftRetina.guiX=151  ; LeftRetina.guiY=520
 RightRetina.guiX=369 ; RightRetina.guiY=520
 
-s.run(1)
+s.run(0)

@@ -130,4 +130,4 @@ s.schedule_action( 6500, set_deltabeta, 0.22, 0.82)
 s.schedule_action( 8000, set_deltabeta, 0.23, 0.85)
 s.schedule_action(20000, set_deltabeta, 0.24, 0.88)
 
-s.run(1)
+s.run(0)
