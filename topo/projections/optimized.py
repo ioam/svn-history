@@ -10,7 +10,7 @@ from topo.base.connectionfield import CFProjection
 from topo.base.parameter import Parameter
 from topo.base.projection import Identity
 from topo.base.topoobject import TopoObject
-from topo.responsefns.basic import CFDotProduct_CPointer
+from topo.responsefns.optimized import CFDotProduct_CPointer
 from topo.learningfns.optimized import DivisiveHebbian_CPointer
 from topo.misc.inlinec import inline, optimized
 from Numeric import ones, Int

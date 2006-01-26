@@ -160,7 +160,7 @@ from topo.sheets.cfsom import CFSOM
 import topo.patterns.random
 from topo.learningfns.basic import HebbianSOMLF
 from topo.base.connectionfield import CFProjection
-from topo.responsefns.basic import CFDotProduct
+from topo.responsefns.optimized import CFDotProduct
 from topo.base.patterngenerator import BoundingBox
 
 ### JCALERT! This file has to be re-written when the fundamental changes in plot.py

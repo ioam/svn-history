@@ -19,7 +19,7 @@ from topo.base.connectionfield import CFProjection
 from topo.base.parameter import DynamicNumber
 from topo.sheets.cfsom import CFSOM
 import topo.patterns.random
-from topo.responsefns.basic import CFDotProduct
+from topo.responsefns.optimized import CFDotProduct
 import topo.patterns.basic
 from topo.base.simulator import Simulator
 from topo.learningfns.basic import HebbianSOMLF

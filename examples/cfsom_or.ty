@@ -20,7 +20,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.connectionfield import CFProjection
 from topo.base.parameter import DynamicNumber
 from topo.sheets.cfsom import CFSOM
-from topo.responsefns.basic import CFDotProduct
+from topo.responsefns.optimized import CFDotProduct
 import topo.patterns.random
 import topo.patterns.basic
 from topo.base.simulator import Simulator
