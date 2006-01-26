@@ -16,6 +16,10 @@ $Id$
 __version__='$Revision$'
 
 import matplotlib
+### JABHACKALERT: Need to figure out how to use Agg by default, but
+### override it with TkAgg, so that the documentation file for this
+### file can be generated.  It's apparently not as simple as just
+### doing "matplotlib.use('Agg')" here.
 import pylab
 import re, os
 
