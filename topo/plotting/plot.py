@@ -223,9 +223,6 @@ class Plot(TopoObject):
         It is assumed that the outer_box contained the slicing_box and that the shape 
         correponds to the slicing_box.
         """
-	### JCALERT! Bounding_box for sheetviews
-        ### does not have the slight margin that UnitView boxes have; but that could be changed by
-        ### inserting this margin to the function bounds2slice....)
 	# At this point we assume that if there is matrix of different sizes
         # the outer_box will be a sheet bounding_box.... 
         if matrix !=None and matrix.shape != shape:
@@ -263,6 +260,8 @@ class Plot(TopoObject):
         max_a_offset = max(a_offset.flat)
         if max_a_offset>0:
              a = divide(a_offset,float(max_a_offset))
+        else:
+             a = ones(a.shape,Float)
         return a
 
 
