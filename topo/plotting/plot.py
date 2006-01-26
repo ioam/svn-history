@@ -231,13 +231,15 @@ class Plot(TopoObject):
 	    new_matrix = matrix
 
 	return new_matrix
-
+        
    
 
     ### JCALERT! In this function, we assume that the slicing box is contained in the 
     ### outer box. Otherwise there will be an error.
     def _situate_plot(self,hue,sat,val,outer_box,slicing_box,density):
-
+        """
+        situate the plot within the outer_box of the plot.
+        """
         left,bottom,right,top = outer_box.aarect().lbrt()
         xdensity = int(density*(right-left)) / float((right-left))
         ydensity = int(density*(top-bottom)) / float((top-bottom))
@@ -256,6 +258,11 @@ class Plot(TopoObject):
 	return (h,s,v)  
 
     def _normalize(self,a):
+        """ 
+        Normalize an array s.
+        In case of a constant array, ones is returned for value greater than zero,
+        and zeros in case of value inferior or equal to zero.
+        """
         a_offset = a-min(a.flat)
         max_a_offset = max(a_offset.flat)
         if max_a_offset>0:
@@ -264,7 +271,7 @@ class Plot(TopoObject):
              if min(a.flat)<=0:
                   a=zeros(a.shape,Float)
              else:
-                  a = ones(a.shape,Float)
+                  a=ones(a.shape,Float)
         return a
 
 
