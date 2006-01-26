@@ -10,6 +10,7 @@ from Tkinter import Button, Label, Frame, Toplevel, TOP, LEFT, RIGHT, BOTTOM, E
 import Pmw
 import math
 
+from topo.commands.analysis import update_activity
 from parametersframe import ParametersFrame
 
 class EditorObject :
@@ -52,6 +53,9 @@ class EditorObject :
 
     def setFocus(self, focus) : # set focus
 	self.focus = focus
+
+    def showActivity(self) : # set whether activity should be displayed.
+	pass
 
     def move(self) :
 	# update position of object and redraw
@@ -171,6 +175,8 @@ class EditorSheet(EditorNode) :
     Canvas. The colours used for drawing can be set. Uses bounding box to
     determine if x, y coord is within its boundary.
     """
+    sheet_moving = False
+
     def __init__(self, canvas, sheet, pos, name) :
 	# super constructor call
 	EditorNode.__init__(self, canvas, pos, name)
@@ -178,54 +184,80 @@ class EditorSheet(EditorNode) :
 	sheet.guiX, sheet.guiY = self.x, self.y # store the ed coords in the topo sheet
 	self.width = 70.0 # set the width and height parameters for this object
 	self.height = 35.0
+	self.activity = False
 	col = self.colours[1]
 	self.initDraw(col, False) # create a new paralellogram
 	self.currentCol = col
 	self.gradient = 1
+	self.elCount = self.matrixElementCount()
 	self.canvas.redrawObjects()
 
     ############ Draw methods ############################
 
     def setFocus(self, focus) :
+	EditorSheet.sheet_moving = focus
+	for id in self.id :
+			self.canvas.delete(id)
+	self.canvas.delete(self.label) # remove label	
 	EditorNode.setFocus(self, focus) # call to super's set focus
-	self.canvas.delete(self.id) # remove the current parallelogram
-	self.canvas.delete(self.label) # remove label
 	if (focus) : col = self.colours[0]
 	else : col = self.colours[1]
 	self.initDraw(col, focus) # create new one with correct colour
 	self.currentCol = col
-	self.canvas.redrawObjects()
+	self.draw()
 	# redraw the connections
 	#for con in self.toCon : 
 	#	con.move()
 	#for con in self.fromCon :
 	#	con.move()
 
+    def showActivity(self) :
+	if self.activity :
+		self.activity = False
+	else :
+		self.activity = True
+
     def initDraw(self, colour, focus) :
-	if (focus) : col = colour
-	else : col = 'black'
-	# get the parallelogram points
-	x1 = self.x - (1.5 * self.width)
-	y1 = self.y - self.height
-	x2 = self.x + (0.5 * self.width)
-	y2 = self.y + self.height
-	midx = 0.5 * (x2 - x1) # mid x coord
-	try :
-		self.id = (self.canvas.create_polygon(x1, y2, (x1 + midx), y1, (x2 + midx), y1,
-							x2, y2, fill = colour , outline = "black"))
-		self.label = self.canvas.create_text(self.x - 75 , self.y, anchor = E,
-							fill = col, text = self.name)
-	
-	except IndexError :
-		print("Out of Canvas")
+	self.id = []
+	if focus : labCol = colour
+	else : labCol = 'black'
+	h, w = self.height, self.width
+	if (not self.focus and (self.activity)) :
+		colour = ''
+		h, w = self.height, self.width
+		x, y = self.x - (1.5 * w), self.y + h
+		update_activity()
+		m = self.sheet.sheet_view_dict['Activity'].view()[0]
+		wM, hM = self.elCount
+		dX, dY = w*2 / wM, h*2 / hM
+		for j in range(int(hM)) :
+			for i in range(int(wM)) :
+				a = j * dY
+				x1, y1 = x + a + (i * dX), y - a
+				x2, y2 = x1 + dY, y1 - dY
+				x3, x4 = x2 + dX, x1 + dX
+				col = '#'+str(hex(int(m[j][i]*255))[2:])*3
+				self.id = self.id + [self.canvas.create_polygon
+					(x1, y1, x2, y2, x3, y2, x4, y1, fill = col, outline = col)]
+	x, y = self.x, self.y
+	x1,y1 = (x - (1.5 * w), y + h)
+	x2,y2 = (x - (0.5 * w), y - h)
+	x3,y3 = (x + (1.5 * w), y - h)
+	x4,y4 = (x + (0.5 * w), y + h)
+	self.id = self.id + [self.canvas.create_polygon(x1, y1, x2, y2, x3, y3, x4, y4, 
+						fill = colour , outline = "black")]
+	self.label = self.canvas.create_text(x - 75 , y, anchor = E, fill = labCol, text = self.name)
 
     def draw(self, x = 0, y = 0) :
 	# move the parallelogram and label by the given x, y coords (default redraw)
 	try :
-		self.canvas.move(self.id, x, y)
-		self.canvas.move(self.label, x, y)
-		self.canvas.tag_raise(self.id)
-		self.canvas.tag_raise(self.label)
+		if not(x == y == 0) :
+			for id in self.id :
+				self.canvas.move(id, x, y)
+			self.canvas.move(self.label, x, y)
+		for id in self.id :
+			self.canvas.tag_raise(id)
+			self.canvas.tag_raise(self.label)
 	except IndexError :
 		print("Out of Canvas")
 	# redraw the connections
@@ -248,7 +280,8 @@ class EditorSheet(EditorNode) :
 	l = len(self.toCon)
 	for index in range(l) :
 		self.toCon[0].remove()
-	self.canvas.delete(self.id) # remove the sheet and label from the draw area
+	for id in self.id :
+		self.canvas.delete(self.id)
 	self.canvas.delete(self.label)
 	self.canvas.removeObject(self) # remove from canvas' object list
 	self.canvas.redrawObjects()
@@ -260,7 +293,6 @@ class EditorSheet(EditorNode) :
 	self.y = y
 	self.sheet.guiX, self.sheet.guiY = x, y # update topo sheet position
 	self.draw(self.x - old[0], self.y - old[1])
-	self.canvas.redrawObjects()
 
     ############ Util methods ##############################
 
@@ -284,6 +316,11 @@ class EditorSheet(EditorNode) :
 		return True
 	return False
 
+    def matrixElementCount(self) :
+	# returns the length and width of the matrix that holds this sheet's plot values
+	lbrt = self.sheet.bounds.aarect().lbrt()
+	den = self.sheet.density
+	return den *(lbrt[2] - lbrt[0]), den *(lbrt[3] - lbrt[1])
 
 ####################################################################
 

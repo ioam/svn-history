@@ -11,7 +11,7 @@ __version__='$Revision$'
 # Binding Mouse Action
 
 from Tkinter import Canvas, Frame, Tk, Menu, Scrollbar, SUNKEN, YES, BOTH, LEFT, END, RIGHT, BOTTOM, X, Y
-from editortools import ArrowTool, NodeTool, ConTool
+from editortools import ArrowTool, NodeTool, ConTool, ParametersTool
 from topo.base.simulator import get_active_sim
 
 class EditorCanvas(Canvas) :
@@ -36,11 +36,13 @@ class EditorCanvas(Canvas) :
 	self.menu = Menu(self)
 	# add proporty and delete entries in the menu.
 	self.menu.insert_command(END, label = 'Properties', command = lambda: self.showProperties(self.focus))
+	self.menu.insert_command(END, label = 'Show Activity', 
+		command = lambda: self.showActivity(self.focus))
 	self.menu.insert_command(END, label = 'Move Forward', command = lambda: self.moveForward(self.focus))
 	self.menu.insert_command(END, label = 'Move to Front', command = lambda: self.moveToFront(self.focus))
 	self.menu.insert_command(END, label = 'Move to Back', command = lambda: self.moveToBack(self.focus))
 	self.menu.insert_command(END, label = 'Delete', command = lambda: self.deleteXY(self.focus))
-        self.objInds = [1,2,3]
+        self.objInds = [1,2,3,4]
 	# bind keyPress events in canvas.
         self.bind('<KeyPress>', self.keyPress)
         # bind the possible left button events to the canvas.
@@ -157,6 +159,7 @@ class EditorCanvas(Canvas) :
 	if (self.curObj != None) :
 		self.curObj.setFocus(False)
 		self.curObj.move(x, y)
+	self.redrawObjects()
 	self.curObj = None
 
     ############ Connection methods ########################
@@ -202,6 +205,10 @@ class EditorCanvas(Canvas) :
 		if (obj == self.objectList[i]) : break
 	else : return # object was not found
 	del self.objectList[i] # delete object from list
+
+    def showActivity(self, focus) : # toggle whether the activity of an object is plotted
+	focus.showActivity()
+
 
     def getObjectXY(self, x, y) : # return object at given x, y (None if no object)
 	theObj = None
@@ -344,9 +351,10 @@ class ModelEditor :
 	canvas = EditorCanvas(canvFrame)
 	# create the three toolbar items and place them into a frame
 	frame = Frame(root, bg = 'light grey')
-	arrbar = ArrowTool(canvas, frame) # movement arrow toolbar item
-	objbar = NodeTool(canvas, frame) # object creation toolbar item
-	conbar = ConTool(canvas, frame) # connection toolbar item
+	paramTool = ParametersTool(frame) # parameter editor toolbar item
+	arrbar = ArrowTool(canvas, paramTool, frame) # movement arrow toolbar item
+	objbar = NodeTool(canvas, paramTool, frame) # object creation toolbar item
+	conbar = ConTool(canvas, paramTool, frame) # connection toolbar item
 	frame.pack(side = LEFT, fill = BOTH) # pack the toolbar on the left
 	canvas.pack(fill = BOTH, expand = YES) # pack the canvas and allow it to be expanded
 	canvFrame.pack(fill = BOTH, expand = YES) # pack the canvas frame into the window; expandable
