@@ -1,24 +1,36 @@
 <h1>Installing Topographica on Windows XP/2000</h1>
 
-<p>(Installation procedure verified as of January 24th, 2006) We are currently in the process of streamlining the installation process under Windows.  If there is a problem with the setup.bat installation, the below method will provide only a non-optimized version of Topographica, which will be quite slow.  For an optimized version see &quot;Integrating Topographica and Weave&quot; below.
+<p>(Installation procedure verified as of January 26th, 2006) We plan
+   to offer an self-extracting installer to make the installation
+   process go more smoothly under Windows, but these instructions
+   should work in the meantime.<p>If there is a problem with the
+   automatic setup.bat installation, the below method will install
+   Topographica. After Topographica is installed you can optionally
+   install the optimized C functions by going to &quot;Step 3)
+   Integrating Topographica and Weave&quot; below.
+</p>
 
-<hr>
-Known issues:
-
-
-<p>As of 1/2006, the Weave (part of SciPy) C compiler linkage is not installed by default for Python 2.4.2. Some features of Topographica that require Weave will be disabled if attempted on a Windows platform. This affects many of the example network simulations in the /examples/ directory.  A warning message about using slower non-optimized functions will be displayed.
-
-<p>See below for directions on how to integrate Weave with Topographica on Windows.  
-<p>Warning: If Weave is installed but your C compiler is not installed or configured properly then Topographica may fail to run properly. If this is the case, you will need to set the <tt>import_weave</tt> variable in topo/misc/inlinec.py to False.</p>
-<hr>
 <h2>Manually Installing Topographica on Windows:</h2>
 
-<p>Topographica is a Python 2.4.2 program and requires Python 2.4.2 to be installed. The automatic setup.bat script checks to see if the correct version exists. If an older version of Python is associated with Python Files then an included Python 2.4.2 installer located in \external\ should be executed.<p>After Python has been installed or detected, change the directory to .\external\win32\ and run the following commands:<pre>
-   start /wait setup.py configure     % Verifies Python 2.4 installed.
-   start /wait setup.py install
-</pre>
-<p>The 'setup.py install' does the following, if case you need to do this steps manually:<p>
-a) Installs the following programs found in external\win32\<br>
+<p><b>Step 1)</b> Topographica is a Python 2.4.2 program and requires
+   Python 2.4.2 to be installed. If an older version of Python is
+   associated with Python Files then the included Python 2.4.2
+   installer located in \external\ should be executed.
+</p>
+
+<p><b>Step 2)</b> After Python has been installed or detected, change
+   the directory to .\external\win32\ and run the following commands:
+</p>
+
+<pre>
+   start /wait setup.py configure % Verifies Python 2.4 installed.
+   start /wait setup.py install </pre>
+
+<p>If the 'setup.py install' does not finish correctly then you will
+   need to do the steps <b>2a-c</b> manually, if it worked fine go to
+   step <b>3</b>.<p><b>Step 2a)</b> Install the following programs
+   found in external\win32\<br>
+</p>
 
 <pre>
    Numeric-23.7.win32-py2.4.exe    Python Numeric package
@@ -27,36 +39,121 @@ a) Installs the following programs found in external\win32\<br>
    ..\Pmw.tgz                      Python Mega Widgets  (Contains a Read-Me)
    fixedpoint-0.1.2_patched.tgz    FixedPoint number classes
 </pre>
-<p>
-b) Copy the core Topographica files in \topo\* to the install location
-   BASE_LOCATION\topo\
-<p>
-c) Additional tasks in the script include (in no particular order):
-<ol>
-<li> Associate Topographica File extensions (.ty).
-<li> Give .ty Files a pretty icon.
-<li> Construct a Topographica run command that is named topographica.py.
-     This can be run directly, or through topographica.bat:
-<li> Create a topographica.bat wrapper for running Topographica.
-<li> Create a Desktop CMD file to open the Install location of Topographica
-</ol>   
 
-<p>Note: The &quot;Additional Tasks&quot; of part (c) are only for streamlining the Topographica user interface and are not needed to run the system. If there is a problem with the install script and (c) does not complete then Topographica can still be executed by issuing the following command from a Shell window that is in the root location of the Topographica installation:<pre>
-   [Python Location]\python.exe topographica.py
+<p><b>Step 2b)</b> Copy the core Topographica files in \topo\* to the
+   install location BASE_LOCATION\topo\
+</p>
+
+<p><b>Step 2c)</b> Topographica can now be executed by issuing the
+   following command from a Shell window that is in the root location
+   of the Topographica installation:
+</p>
+
+<pre> [Python Location]\python.exe topographica.py</pre>
+
+<p>To execute an existing Topographica script add the filename to the
+   end of the command:
+</p>
+
+<pre>     [Python Location]\python.exe topographica.py script.py
 </pre>
 
-To execute an existing Topographica script add the filename to
-the end of the command:
+<h2>Step 3) Integrating Topographica and Weave on Windows</h2>
+
+<p>As of 1/2006, the Weave (part of SciPy) C compiler linkage is not
+   installed by default for Python 2.4.2. Some optimized features of
+   Topographica that require Weave will be disabled, and a warning
+   message about using slower non-optimized functions will be
+   displayed.  This affects many of the example network simulations in
+   the /examples/ directory.  Installing Weave will auto-enable the
+   optimized functions within Topographica.
+</p>
+
+<p><b>Downloading Weave and a C++ compiler:</b></p>
+
+<p>Since Weave does not have a pre-compiled Windows version that works
+   with Python 2.4.2, you need to compile and install it yourself.
+   Topographica has been tested with Scipy-0.3.2, which can be
+   downloaded from the SciPy website <a
+   href="http://www.scipy.org">http://www.scipy.org</a> .  You will
+   not need the entire SciPy source, only the SciPy_core files.
+</p>
+
+<p>Weave also requires a C++ compiler for both compiling the weave
+   package, and for executing the Python weave.inline() functions. The
+   MSVC development suite or MinGW can be used. Topographica has been
+   tested with MinGW, using the following package versions from <a
+   href="http://www.mingw.org">http://www.mingw.org</a> :
+</p>
 
 <pre>
-   [Python Location]\python.exe topographica.py script.py
+    mingw-runtime-3.9
+    w32api-3.5
+    binutils-2.15.91
+    gcc-core-3.4.2
+    gcc-g++-3.4.2
 </pre>
 
-<hr>
+<p><b>Compiling Weave:</b></p>
+
+<p>Follow the directions on SciPy.org for compiling Weave: <a
+   href="http://www.scipy.org/documentation/buildscipywin32.txt">http://www.scipy.org/documentation/buildscipywin32.txt</a></p>
+
+<p>Commands to compile weave: (From the Weave documentation link above)</p>
+
+<pre>    python setup.py build --compiler=mingw32
+    python setup.py --compiler=mingw32 install
+</pre>
+
+<p><b>Helpful tip:</b> You may find it necessary to adjust your
+   Windows system variables to find the MinGW paths before other gcc
+   compilers, such as cygwin. If you do not want to make a system-wide
+   change, it is possible to create a .BAT file like the one below
+   that will update environment variables for a single cmd window. The
+   adjusted paths are also required when Topographica runs, since the
+   inline statements use the compiler.
+</p>
+
+<pre>
+    REM Must change paths so MinGW is seen instead of Cygwin compilers.
+    REM This file: C:\mingw\minpath.bat  Also put in topographica.{bat,cmd}
+    @Echo Prepend the paths for MinGW
+    set PATH=C:\mingw\bin;%PATH%
+    set LIB=C:\mingw\lib;%LIB%
+    set INCLUDE=C:\mingw\include;%INCLUDE%
+</pre>
+
+<p><b>Step 4)</b> Test that weave is working correctly:</p>
+
+<pre>
+    python
+    >>> import weave
+    >>> scipy.test()
+</pre>
+
+<p>Topographica has been designed to work with the gcc compiler.  If
+   you wish to use MS Visual C++ instead, then the compiler option in
+   topo/base/inlinec.py must be changed from "compiler='gcc'" to
+   "compiler='msvc'".
+</p>
+
+
+<p>If Weave is installed but your C compiler is not installed or
+   configured properly then Topographica may fail to perform
+   correctly. If this is the case, you will need to set the
+   <tt>import_weave</tt> variable in topo/misc/inlinec.py to False to
+   disable the Weave auto-detection process.
+</p>
+
+<p><b>Step 5) </b> examples/lissom_or.ty should now run with no errors
+   or warnings.</p> 
+
+<hr> 
+
 <h2>If there is a problem:</h2>
 
+<p>If you experience the error:</p>
 
-<p>If you experience the error:
 <pre>
   File "C:\Python23\lib\string.py", line 220, in atoi 
     return _int(s, base)
@@ -66,73 +163,13 @@ TypeError: int() can't convert non-string with explicit base
 then you may be running an old version of Python.  Check your
 Environment Variables in "My Computer -> Properties" to make sure you
 don't have an old version of Python earlier in your path statement
-that is running first.
+that is running first.  
+</p>
 
 <hr>
 
-<h2>Integrating Topographica and Weave on Windows</h2>
+<p>Once you have the Windows version working, please return to the <a
+   href="index.html">Downloads</a> page for the usual information
+   about running Topographica and updating it later.
+</p>
 
-<p>Topographica is under active development (1/2006) to make the Windows version of Topographica easier to install and use. For now, these notes should be able to help you get Weave (www.scipy.org) built on Windows and integrated with Topographica.<p>Building Weave:
-
-<p>
-Since Weave does not have a pre-compiled Windows version that works
-with Python 2.4, you need to compile and install it yourself into the
-Python 2.4 site-packages directory.  You will not need the entire
-SciPy source, only the SciPy_core files.  Topographica has been tested
-with Scipy-0.3.2.
-
-<p>
-Weave requires a C++ compiler for both compiling the weave package,
-and for executing the Python weave.inline() functions.  The MSVC
-development suite or MinGW can be used.  Topographica has been tested
-with MinGW, using the following package versions:
-<pre>
-    mingw-runtime-3.9
-    w32api-3.5
-    binutils-2.15.91
-    gcc-core-3.4.2
-    gcc-g++-3.4.2
-</pre>
-
-<p>You may find it necessary to adjust your Windows system variables to
-find the MinGW paths before other gcc compilers, such as cygwin.  If
-you do not want to make a system-wide change, it is possible to create
-a .BAT file like the one below that will update environment variables
-for a single cmd window.  NOTE: The adjusted paths are also required
-when Topographica runs, since the inline statements use the compiler.
-
-<pre>
-    REM Must change paths so MinGW is seen instead of Cygwin compilers.
-    REM C:\mingw\minpath.bat  Also put in topographica.{bat,cmd}
-    @Echo Prepend the paths for MinGW
-    set PATH=C:\mingw\bin;%PATH%
-    set LIB=C:\mingw\lib;%LIB%
-    set INCLUDE=C:\mingw\include;%INCLUDE%
-</pre>
-
-<p>From the Weave documentation, commands to compile weave:
-<pre>
-    python setup.py build --compiler=mingw32
-    python setup.py --compiler=mingw32 install
-</pre>
-
-Commands to test weave:
-<pre>
-    python
-    >>> import weave
-    >>> scipy.test()
-</pre>
-
-<p>
-Changes to the Topographica distribution:
-
-<p>
-Topographica has been designed to work with the gcc compiler.  If you
-wish to use MS Visual C++ instead, then the compiler option in 
-topo/base/inlinec.py must be changed from "compiler='gcc'" to "compiler='msvc'".
-
-<p>examples/lissom_or.ty should now run with no errors or warnings.<br> 
-<hr>
-<p> Once you have the Windows version working, please return to
-the <a href="index.html">Downloads</a> page for the usual information
-about running Topographica and updating it later.
