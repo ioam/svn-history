@@ -11,7 +11,7 @@ __version__='$Revision$'
 # Binding Mouse Action
 
 from Tkinter import Canvas, Frame, Tk, Menu, Scrollbar, SUNKEN, YES, BOTH, LEFT, END, RIGHT, BOTTOM, X, Y
-from editortools import ArrowTool, NodeTool, ConTool, ParametersTool
+from editortools import ArrowTool, NodeTool, ConTool #CEBHACKALERT: , ParametersTool
 from topo.base.simulator import get_active_sim
 
 class EditorCanvas(Canvas) :
