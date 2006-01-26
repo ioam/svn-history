@@ -261,7 +261,10 @@ class Plot(TopoObject):
         if max_a_offset>0:
              a = divide(a_offset,float(max_a_offset))
         else:
-             a = ones(a.shape,Float)
+             if min(a.flat)<=0:
+                  a=zeros(a.shape,Float)
+             else:
+                  a = ones(a.shape,Float)
         return a
 
 
