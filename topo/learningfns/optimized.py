@@ -1,6 +1,7 @@
 """
-Learning functions written with C code to optimize performance. Needs the
-package weave to run.
+Learning functions written in C to optimize performance. 
+
+Requires the weave package; without it unoptimized versions are used.
 
 $Id$
 """
@@ -96,24 +97,21 @@ class Hebbian(CFLearningFunction):
                 cf.weights *= cf.mask
                 if type(output_fn) is not Identity:
                     cf.weights = output_fn(cf.weights)
-                
-
 
 class Hebbian_Py(GenericCFLF):
     """
     CF-aware Hebbian learning rule.
 
-    Equivalent to GenericCFLF(single_cf_fn=hebbian)
-    Wrapper written to allow transparent non-optimized fallback.
+    Wrapper written to allow transparent non-optimized fallback; 
+    equivalent to GenericCFLF(single_cf_fn=hebbian)
     """
     def __init__(self,**params):
         super(Hebbian_Py,self).__init__(single_cf_fn=hebbian,**params)
-        
-# Optimized version is overwritten by the unoptimized version if the
-# code does not have optimized set.
+
 if not optimized:
     Hebbian = Hebbian_Py
     TopoObject().message('Inline-optimized components not available; using Hebbian_Py instead of Hebbian.')
+
 
 
 # CEBHACKALERT: ought to be DivisiveL1Hebbian (assuming DivisiveSumNormalize
@@ -213,7 +211,6 @@ class DivisiveHebbian(CFLearningFunction):
         inline(hebbian_div_norm_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
        
 
-
 class DivisiveHebbian_Py(GenericCFLF):
     """
     Same as GenericCFLF, but with a default output_fn of DivisiveSumNormalize.
@@ -225,7 +222,7 @@ class DivisiveHebbian_Py(GenericCFLF):
     def __init__(self,**params):
         super(DivisiveHebbian_Py,self).__init__(**params)
         self.output_fn = DivisiveSumNormalize()
-        
+
 if not optimized:
     DivisiveHebbian = DivisiveHebbian_Py
     TopoObject().message('Inline-optimized components not available; using DivisiveHebbian_Py instead of DivisiveHebbian.')
