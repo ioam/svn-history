@@ -279,6 +279,7 @@ def bounds2slicearray(slice_bounds, input_bounds, input_xdensity, input_ydensity
     return array([r1,r2,c1,c2])
 
 
+# CEBHACKALERT: slice is a Python type.
 def slice2bounds(slice,sheet_bounds,sheet_xdensity,sheet_ydensity):
     """
     Construct the bounds that corresponds to the given slice, with a small
@@ -325,8 +326,20 @@ def bounds2shape(bounds,xdensity,ydensity):
     bounding box is smaller than one matrix element for this density.
     Returns (rows,columns).
     """
+    
+    # CEBHACKALERT: To get the full slice for some combinations of
+    # bounds and density, the right and bottom edges must be moved
+    # outwards a little. Presumably they are more sensitive to a
+    # floating point problem because they're exclusive.  This is
+    # surely not the way to confront this problem. And this hack
+    # should probably be in bounds2slice() anyway.
+    
+    fact = 0.00001
+    l,b,r,t = bounds.aarect().lbrt()
+    b = BoundingBox(points=((l,b-fact),(r+fact,t)))
 
-    r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
+    
+    r1,r2,c1,c2 = bounds2slice(bounds,b,xdensity,ydensity)
 
     n_rows=r2-r1; n_cols=c2-c1
 
