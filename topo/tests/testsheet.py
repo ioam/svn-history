@@ -410,6 +410,31 @@ class TestCoordinateTransforms(unittest.TestCase):
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
+
+    # CEBHACKALERT: this test should probably be somewhere else and
+    # called something different
+    def test_connection_field_like(self):
+        # test a ConnectionField-like example
+        sheet = Sheet()
+        cf_bounds = boundingregion.BoundingBox(points=((0.3,0.3),(0.6,0.6)))
+
+        slice_ = bounds2slice(cf_bounds,sheet.bounds,sheet.xdensity,sheet.ydensity)
+
+        # check it's been cropped to fit onto sheet...
+        self.assertEqual(slice_,(0,2,8,10))
+
+        # now check that it gives the correct bounds...
+        cropped_bounds = slice2bounds(slice_,sheet.bounds,sheet.xdensity,sheet.ydensity)
+        true_cropped_bounds = boundingregion.BoundingBox(points=((0.3,0.3),(0.50,0.5)))
+        for a,b in zip(cropped_bounds.aarect().lbrt(),true_cropped_bounds.aarect().lbrt()):
+            self.assertAlmostEqual(a,b)
+
+        # and that bounds2shape() gets the correct size
+        rows,cols = bounds2shape(cropped_bounds,sheet.xdensity,sheet.ydensity)
+        self.assertEqual((rows,cols),(2,2))
+
+        
+
     def test_bounds2slice(self):
         
         # test that if you ask to slice the matrix with the sheet's BoundingBox, you
@@ -518,10 +543,6 @@ class TestCoordinateTransforms(unittest.TestCase):
 	true_bounds_lbrt = (-0.5+3.0/25.0,0.5-18.0/25.0,-0.5+11.0/25.0,0.5-7.0/25.0)
 	for a,b in zip(bounds.aarect().lbrt(),true_bounds_lbrt):
 	    self.assertAlmostEqual(a,b)
-
-	
-
-	    
 	    
 
     # bounds2shape() tests
@@ -533,6 +554,8 @@ class TestCoordinateTransforms(unittest.TestCase):
         """
         n_rows,n_cols = bounds2shape(self.box,self.xdensity,self.ydensity)
         self.assertEqual((n_rows,n_cols),(self.last_row+1,self.last_col+1))
+
+        
 
 
 
