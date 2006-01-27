@@ -9,7 +9,7 @@ $Id$
 # untested.
 
 from topo.base.topoobject import TopoObject
-from topo.base.sheet import bounds2shape
+#from topo.base.sheet import bounds2shape
 from topo.outputfns.basic import DivisiveMaxNormalize
 from topo.base.patterngenerator import PatternGenerator
 from topo.patterns.basic import AR_PREC, SI_PREC
@@ -147,7 +147,9 @@ class TopoImage(TopoObject):
         xdensity = int(density*(right-left)) / float((right-left))
         ydensity = int(density*(top-bottom)) / float((top-bottom))
 
-        n_sheet_rows,n_sheet_cols = bounds2shape(bounds,xdensity,ydensity)
+        # CEBHACKALERT: temporarily broken while the sheet functions change
+        #n_sheet_rows,n_sheet_cols = bounds2shape(bounds,xdensity,ydensity)
+        n_sheet_rows,n_sheet_cols = 10,10
 
         # Initial image scaling (size_normalization)
         
