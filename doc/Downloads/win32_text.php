@@ -3,7 +3,8 @@
 <p>(Installation procedure verified as of January 26th, 2006) We plan
    to offer an self-extracting installer to make the installation
    process go more smoothly under Windows, but these instructions
-   should work in the meantime.<p>If there is a problem with the
+   should work in the meantime.
+<p>If there is a problem with the
    automatic setup.bat installation, the below method will install
    Topographica. After Topographica is installed you can optionally
    install the optimized C functions by going to &quot;Step 3)
@@ -28,8 +29,8 @@
 
 <p>If the 'setup.py install' does not finish correctly then you will
    need to do the steps <b>2a-c</b> manually, if it worked fine go to
-   step <b>3</b>.<p><b>Step 2a)</b> Install the following programs
-   found in external\win32\<br>
+   step <b>3</b>.
+<p><b>Step 2a)</b> Install the following programs found in external\win32\<br>
 </p>
 
 <pre>
@@ -100,14 +101,15 @@
    href="http://www.scipy.org/documentation/buildscipywin32.txt">http://www.scipy.org/documentation/buildscipywin32.txt</a></p>
 
 <p>Commands to compile weave: (From the Weave documentation link above)</p>
-
-<pre>    python setup.py build --compiler=mingw32
+<pre>
+    python setup.py build --compiler=mingw32
     python setup.py --compiler=mingw32 install
 </pre>
 
 <p><b>Helpful tip:</b> You may find it necessary to adjust your
    Windows system variables to find the MinGW paths before other gcc
-   compilers, such as cygwin. If you do not want to make a system-wide
+   compilers you may have installed, such as cygwin. If you do not
+   want to make a system-wide
    change, it is possible to create a .BAT file like the one below
    that will update environment variables for a single cmd window. The
    adjusted paths are also required when Topographica runs, since the
@@ -116,7 +118,7 @@
 
 <pre>
     REM Must change paths so MinGW is seen instead of Cygwin compilers.
-    REM This file: C:\mingw\minpath.bat  Also put in topographica.{bat,cmd}
+    REM This file: C:\mingw\minpath.bat  Also put in topographica.{bat,cmd}
     @Echo Prepend the paths for MinGW
     set PATH=C:\mingw\bin;%PATH%
     set LIB=C:\mingw\lib;%LIB%
@@ -131,18 +133,20 @@
     >>> scipy.test()
 </pre>
 
-<p>Topographica has been designed to work with the gcc compiler.  If
-   you wish to use MS Visual C++ instead, then the compiler option in
-   topo/base/inlinec.py must be changed from "compiler='gcc'" to
-   "compiler='msvc'".
+<p>By default, Topographica is configured to use a gcc compiler such
+   as MinGW.  If you wish to use MS Visual C++ instead, then the
+   compiler option in topo/base/inlinec.py must be changed from
+   "compiler='gcc'" to "compiler='msvc'".
 </p>
 
 
 <p>If Weave is installed but your C compiler is not installed or
-   configured properly then Topographica may fail to perform
-   correctly. If this is the case, you will need to set the
+   configured properly then Topographica will abort with an error
+   when you try to run it. If you are unable to fix the C compiler,
+   but still want to run Topographica, you can set the
    <tt>import_weave</tt> variable in topo/misc/inlinec.py to False to
-   disable the Weave auto-detection process.
+   disable the Weave auto-detection process.  Note, however, that most
+   models will execute much more slowly in this case.
 </p>
 
 <p><b>Step 5) </b> examples/lissom_or.ty should now run with no errors
