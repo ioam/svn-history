@@ -12,7 +12,7 @@ from Numeric import zeros, ones, Float, divide, ravel,clip,array
 
 from topo.base.topoobject import TopoObject
 from topo.base.parameter import Dynamic
-from topo.base.sheet import submatrix, bounds2slice, bounds2shape
+from topo.base.sheet import submatrix, bounds2slice, slice2matrixshape
 
 from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap
 import palette
@@ -244,16 +244,17 @@ class Plot(TopoObject):
         xdensity = int(density*(right-left)) / float((right-left))
         ydensity = int(density*(top-bottom)) / float((top-bottom))
 
-	shape = bounds2shape(outer_box,xdensity,ydensity)
-
-	r1,r2,c1,c2 = bounds2slice(slicing_box,outer_box,xdensity,ydensity)
+        # CEBHACKALERT: verify this
+	slice_ = bounds2slice(slicing_box,outer_box,xdensity,ydensity)
+        r,c = slice2matrixshape(slice_)
+      
         ### raise an error when r2-r1 > shape[1] or c2=c1 > shape[0]
-	h = zeros(shape,Float)
-	h[r1:r2,c1:c2] = hue
+	h = zeros((r,c),Float)
+	h[0:r,0:c] = hue
 	s = zeros(shape,Float)
-	s[r1:r2,c1:c2] = sat
+	s[0:r,0:c] = sat
 	v = zeros(shape,Float)
-	v[r1:r2,c1:c2] = val
+	v[0:r,0:c] = val
 
 	return (h,s,v)  
 
