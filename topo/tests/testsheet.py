@@ -430,8 +430,8 @@ class TestCoordinateTransforms(unittest.TestCase):
             self.assertAlmostEqual(a,b)
 
         # and that bounds2shape() gets the correct size
-        rows,cols = bounds2shape(cropped_bounds,sheet.xdensity,sheet.ydensity)
-        self.assertEqual((rows,cols),(2,2))
+#        rows,cols = bounds2shape(cropped_bounds,sheet.xdensity,sheet.ydensity)
+#        self.assertEqual((rows,cols),(2,2))
 
         
 
@@ -545,15 +545,15 @@ class TestCoordinateTransforms(unittest.TestCase):
 	    self.assertAlmostEqual(a,b)
 	    
 
-    # bounds2shape() tests
-    #
-    def test_bounds2shape(self):
-        """
-        Check that the shape of the matrix based on the BoundingBox and
-        density is correct.
-        """
-        n_rows,n_cols = bounds2shape(self.box,self.xdensity,self.ydensity)
-        self.assertEqual((n_rows,n_cols),(self.last_row+1,self.last_col+1))
+##     # bounds2shape() tests
+##     #
+##     def test_bounds2shape(self):
+##         """
+##         Check that the shape of the matrix based on the BoundingBox and
+##         density is correct.
+##         """
+##         n_rows,n_cols = bounds2shape(self.box,self.xdensity,self.ydensity)
+##         self.assertEqual((n_rows,n_cols),(self.last_row+1,self.last_col+1))
 
         
 
