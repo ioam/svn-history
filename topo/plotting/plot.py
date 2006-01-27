@@ -251,9 +251,9 @@ class Plot(TopoObject):
         ### raise an error when r2-r1 > shape[1] or c2=c1 > shape[0]
 	h = zeros((r,c),Float)
 	h[0:r,0:c] = hue
-	s = zeros(shape,Float)
+	s = zeros((r,c),Float)
 	s[0:r,0:c] = sat
-	v = zeros(shape,Float)
+	v = zeros((r,c),Float)
 	v[0:r,0:c] = val
 
 	return (h,s,v)  
