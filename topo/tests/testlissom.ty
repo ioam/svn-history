@@ -52,7 +52,7 @@ from fixedpoint import FixedPoint
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection
-from topo.responsefns.basic import CFDotProduct
+from topo.responsefns.optimized import CFDotProduct
 import topo.patterns.basic
 import topo.patterns.random
 from topo.base.sheet import BoundingBox
