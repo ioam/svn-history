@@ -236,18 +236,20 @@ def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density):
     return sheet_matrix[r1:r2,c1:c2]
 
 
-def bounds2slice(slice_bounds, sheet_bounds, xdensity, ydensity):
+# CEBHACKALERT: crop=True is a temporary hack. This function will
+# always crop.
+def bounds2slice(slice_bounds, sheet_bounds, xdensity, ydensity, crop=True):
     """
     Convert a bounding box into an array slice suitable for computing
     a submatrix.
 
     Includes all units whose centers are within the specified sheet
-    coordinate bounding box slice_bounds and also in the specified
+    coordinate bounding box slice_bounds, and within the specified
     sheet_bounds.
     
     Returns (a,b,c,d) such that a matrix M can be sliced using M[a:b,c:d].
     """
-    # convert bounds to a slice, disregarding the sheet bounds
+    # convert bounds to a slice, disregarding the sheet_bounds
     l,b,r,t = slice_bounds.aarect().lbrt()
     
     t_m,l_m = sheet2matrix(l,t,sheet_bounds,xdensity,ydensity)
@@ -257,18 +259,20 @@ def bounds2slice(slice_bounds, sheet_bounds, xdensity, ydensity):
     t_idx = int(ceil(t_m-0.5))
     r_idx = int(floor(r_m+0.5))
     b_idx = int(floor(b_m+0.5))
-                  
-    # crop to the sheet bounds
-    maxrow,maxcol = sheet2matrixidx(sheet_bounds.aarect().right(),
-                                    sheet_bounds.aarect().bottom(),
-                                    sheet_bounds,xdensity,ydensity)
 
-    rstart = max(0,t_idx)
-    rbound = min(maxrow,b_idx)
-    cstart = max(0,l_idx)
-    cbound = min(maxcol,r_idx)
+    if not crop:
+        return (t_idx,b_idx,l_idx,r_idx)
+    else:        
+        # then crop to the sheet_bounds
+        maxrow,maxcol = sheet2matrixidx(sheet_bounds.aarect().right(),
+                                        sheet_bounds.aarect().bottom(),
+                                        sheet_bounds,xdensity,ydensity)
+        rstart = max(0,t_idx)
+        rbound = min(maxrow,b_idx)
+        cstart = max(0,l_idx)
+        cbound = min(maxcol,r_idx)
 
-    return rstart,rbound,cstart,cbound
+        return (rstart,rbound,cstart,cbound)
 
 
 def bounds2slicearray(slice_bounds, input_bounds, input_xdensity, input_ydensity):
@@ -317,40 +321,13 @@ def slicearray2bounds(slicearray,sheet_bounds,sheet_xdensity,sheet_ydensity):
     return slice2bounds((slicearray[0],slicearray[1],slicearray[2],slicearray[3]), sheet_bounds, sheet_xdensity,sheet_ydensity)
 
 
-
-def bounds2shape(bounds,xdensity,ydensity):
+# CEBHACKALERT: will get rid of this function.
+def slice2matrixshape(slice_):
     """
-    Return the matrix shape specified by the given bounds and density.
-
-    Always returns a matrix shape with at least one element, even if the
-    bounding box is smaller than one matrix element for this density.
-    Returns (rows,columns).
+    Return the shape of the matrix defined by the given slice.
     """
-    
-    # CEBHACKALERT: To get the full slice for some combinations of
-    # bounds and density, the right and bottom edges must be moved
-    # outwards a little. Presumably they are more sensitive to a
-    # floating point problem because they're exclusive.  This is
-    # surely not the way to confront this problem. And this hack
-    # should probably be in bounds2slice() anyway.
-    
-    fact = 0.00001
-    l,b,r,t = bounds.aarect().lbrt()
-    b = BoundingBox(points=((l,b-fact),(r+fact,t)))
-
-    
-    r1,r2,c1,c2 = bounds2slice(bounds,b,xdensity,ydensity)
-
-    n_rows=r2-r1; n_cols=c2-c1
-
-    # CEBHACKALERT: can we document why this should be done?
-    # Do we really need this function?
-    
-    # Enforce minimum size
-    if n_rows == 0: n_rows = 1
-    if n_cols == 0: n_cols = 1
-    
-    return n_rows,n_cols
+    r1,r2,c1,c2 = slice_
+    return (r2-r1,c2-c1)
 
 
 class Sheet(EventProcessor):

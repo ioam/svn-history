@@ -26,7 +26,7 @@ from topoobject import TopoObject
 from projection import Projection,ProjectionSheet,Identity,OutputFunctionParameter
 from parameter import Parameter, Number, BooleanParameter,ClassSelectorParameter
 from arrayutils import mdot,divisive_normalization
-from sheet import Sheet,bounds2slice,bounds2shape,sheet2matrixidx,slicearray2bounds
+from sheet import Sheet,bounds2slice,slice2matrixshape,sheet2matrixidx,slicearray2bounds
 from sheetview import UnitView
 from itertools import chain
 from patterngenerator import PatternGeneratorParameter
@@ -121,10 +121,14 @@ class ConnectionField(TopoObject):
         location of the unit, and it will allow to retrieve the slice from the bounding box by
         using the reversed function bounds2slice.
 	"""
-        # CEBHACKALERT: we might want to make Sheet's bounds2slice() and slice2bounds() work more like this,
-        # or at least have methods to perform what this does in Sheet.
+        # CEBHACKALERT: this function will change. Hack added to
+        # bounds2slice() so that this function is currently identical to how
+        # it used to be.
+        #rows,cols = bounds2shape(self.__weights_bound_template,self.input_sheet.xdensity,self.input_sheet.ydensity)
+        slice_ = bounds2slice(self.__weights_bound_template,self.input_sheet.bounds,self.input_sheet.xdensity,self.input_sheet.ydensity,crop=False)
+        rows,cols = slice2matrixshape(slice_)
         
-        rows,cols = bounds2shape(self.__weights_bound_template,self.input_sheet.xdensity,self.input_sheet.ydensity)
+        
 
         cr,cc = sheet2matrixidx(self.x, self.y,
                                 self.input_sheet.bounds, self.input_sheet.xdensity, self.input_sheet.ydensity)
