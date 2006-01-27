@@ -26,7 +26,7 @@ from topoobject import TopoObject
 from projection import Projection,ProjectionSheet,Identity,OutputFunctionParameter
 from parameter import Parameter, Number, BooleanParameter,ClassSelectorParameter
 from arrayutils import mdot,divisive_normalization
-from sheet import Sheet,bounds2slice,slice2matrixshape,sheet2matrixidx,slicearray2bounds
+from sheet import Sheet,bounds2slice,sheet2matrixidx,slicearray2bounds,crop_slice_to_sheet_bounds
 from sheetview import UnitView
 from itertools import chain
 from patterngenerator import PatternGeneratorParameter
@@ -72,9 +72,11 @@ class ConnectionField(TopoObject):
         self.__weights_bound_template = weights_bound_template
         self.initialize_slice_array()
 
-        w = weights_generator(x=0.0,y=0.0,bounds=weights_bound_template,
-                              density=self.input_sheet.density,theta=0,
-			      slice_array=self.slice_array)
+        # CEBHACKALERT: to change when there's one density
+        density = (self.input_sheet.xdensity,self.input_sheet.ydensity)
+
+        w = weights_generator(x=self.x,y=self.y,bounds=self.bounds,
+                              density=density,theta=0)
         self.weights = w.astype(weight_type)
         # Maintain the original type throughout operations, i.e. do not
         # promote to double.
@@ -93,15 +95,18 @@ class ConnectionField(TopoObject):
         # CEBHACKALERT: the user might specify a size based on the weights_bounds
         # they also specified. Do we want to adjust that size if the weights_bounds
         # have been adjusted too?
-        m = weights_shape(x=0.0,y=0.0,bounds=weights_bound_template,
-                          density=self.input_sheet.density,theta=0,
-			  slice_array=self.slice_array)
+        m = weights_shape(x=self.x,y=self.y,bounds=self.bounds,
+                          density=density,theta=0)
         m = Numeric.where(m>=0.5,m,0.0)
         self.mask = m.astype(weight_type)
         self.mask.savespace(1)
 
         # CEBHACKALERT: this works for now, while the output_fns are all multiplicative.
         self.weights *= self.mask   
+
+        # CEBHACKALERT: incorporate such a test into testconnectionfield.
+#        assert self.weights.shape==(self.slice_array[1]-self.slice_array[0],self.slice_array[3]-self.slice_array[2]),str(self.weights.shape)+" "+str((self.slice_array[1]-self.slice_array[0],self.slice_array[3]-self.slice_array[2])) 
+
         output_fn(self.weights)
         
 
@@ -121,15 +126,18 @@ class ConnectionField(TopoObject):
         location of the unit, and it will allow to retrieve the slice from the bounding box by
         using the reversed function bounds2slice.
 	"""
-        # CEBHACKALERT: this function will change. Hack added to
-        # bounds2slice() so that this function is currently identical to how
-        # it used to be.
-        #rows,cols = bounds2shape(self.__weights_bound_template,self.input_sheet.xdensity,self.input_sheet.ydensity)
-        slice_ = bounds2slice(self.__weights_bound_template,self.input_sheet.bounds,self.input_sheet.xdensity,self.input_sheet.ydensity,crop=False)
-        rows,cols = slice2matrixshape(slice_)
-        
-        
+        # CEBHACKALERT: this function will change.
+#        rows,cols = bounds2matrixshape(self.__weights_bound_template,self.input_sheet.xdensity,self.input_sheet.ydensity)
 
+        slice_ = bounds2slice(self.__weights_bound_template,self.__weights_bound_template,self.input_sheet.xdensity,self.input_sheet.ydensity)
+
+        r1,r2,c1,c2 = crop_slice_to_sheet_bounds(slice_,self.input_sheet.bounds,self.input_sheet.xdensity,self.input_sheet.ydensity)
+        
+        rows=r2-r1
+        cols=c2-c1
+
+        # got to crop to sheet bounds
+        
         cr,cc = sheet2matrixidx(self.x, self.y,
                                 self.input_sheet.bounds, self.input_sheet.xdensity, self.input_sheet.ydensity)
 

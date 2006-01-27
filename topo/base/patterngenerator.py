@@ -74,18 +74,17 @@ class PatternGenerator(TopoObject):
                         params.get('density',self.density),
                         params.get('x', self.x),
                         params.get('y',self.y),
-                        params.get('orientation',self.orientation),
-                        params.get('slice_array',None))
+                        params.get('orientation',self.orientation))
         return self.scale*self.function(**params)+self.offset
 
-    def __setup_xy(self,bounds,density,x,y,orientation,slice_array):
+    def __setup_xy(self,bounds,density,x,y,orientation):
         """
         Produce the pattern matrices from the bounds and density (or
         rows and cols), and transform according to x, y, and
         orientation.
         """
         self.verbose("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
-        x_points,y_points = self.__produce_sampling_vectors(bounds,density,slice_array)
+        x_points,y_points = self.__produce_sampling_vectors(bounds,density)
         self.pattern_x, self.pattern_y = self.__create_and_rotate_coordinates(x_points-x,y_points-y,orientation)
 
     def function(self,**params):
@@ -100,31 +99,28 @@ class PatternGenerator(TopoObject):
         raise NotImplementedError
 
 
-    def __produce_sampling_vectors(self, bounds, density, slice_array):
+    def __produce_sampling_vectors(self, bounds, density):
         """
         Generate vectors representing coordinates at which the pattern will be sampled.
 
         x is a 1d-array of x-axis values at which to sample the pattern;
         y contains the y-axis values.
         """
-
-        # CEBHACKALERT: only Sheet should have to know about xdensity etc.
-        left,bottom,right,top = bounds.aarect().lbrt()
-        xdensity = int(density*(right-left)) / float((right-left))
-        ydensity = int(density*(top-bottom)) / float((top-bottom))
-
-        # avoid calculating the slice if it's been done elsewhere        
-        if slice_array==None:
-            # a slice to get the matrix corresponding to the whole bounds
-            r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
+        # CEBHACKALERT: temporary, density will become one again soon...
+        if type(density)!=tuple:
+            xdensity=density
+            ydensity=density
         else:
-            r1,r2,c1,c2 = slice_array
+            xdensity,ydensity = density
 
-        rows = array(range(r1,r2))
-        cols = array(range(c1,c2))
-
-        y = array([matrixidx2sheet(r,0,bounds,xdensity,ydensity) for r in rows])
-        x = array([matrixidx2sheet(0,c,bounds,xdensity,ydensity) for c in cols])
+        # CEBHACKALERT: doesn't evaluate pattern at correct location on the sheet.
+        # But this is a start (it's simpler than before) - and matches previous
+        # topographica behavior for lissom_or_reference.
+        r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
+        n_rows=r2-r1; n_cols=c2-c1
+        
+        y = array([matrixidx2sheet(r,0,bounds,xdensity,ydensity) for r in range(n_rows)])
+        x = array([matrixidx2sheet(0,c,bounds,xdensity,ydensity) for c in range(n_cols)])
 
         # x increases from left to right; y decreases from left to right.
         # For this function to make sense on its own, y should probably be
@@ -162,22 +158,20 @@ class Constant(PatternGenerator):
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)
     def __call__(self,**params):
-        slice_array = params.get('slice_array',None)
         bounds = params.get('bounds',self.bounds)
         density = params.get('density',self.density)
 
-        left,bottom,right,top = bounds.aarect().lbrt()
-        xdensity = int(density*(right-left)) / float((right-left))
-        ydensity = int(density*(top-bottom)) / float((top-bottom))
-
-        # avoid calculating the slice if it's been done elsewhere        
-        if slice_array==None:
-            # a slice to get the matrix corresponding to the whole bounds
-            r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
+        # CEBHACKALERT: temporary, density will become one again soon...
+        if type(density)!=tuple:
+            xdensity=density
+            ydensity=density
         else:
-            r1,r2,c1,c2 = slice_array
+            xdensity,ydensity = density
 
-        return self.scale*ones((r2-r1,c2-c1), Float)+self.offset
+        r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
+        shape = (r2-r1,c2-c1)
+
+        return self.scale*ones(shape, Float)+self.offset
 
 
 # CEBHACKALERT: don't need to pass through doc etc.

@@ -9,7 +9,7 @@ $Id$
 # untested.
 
 from topo.base.topoobject import TopoObject
-#from topo.base.sheet import bounds2shape
+from topo.base.sheet import bounds2slice
 from topo.outputfns.basic import DivisiveMaxNormalize
 from topo.base.patterngenerator import PatternGenerator
 from topo.patterns.basic import AR_PREC, SI_PREC
@@ -143,14 +143,21 @@ class TopoImage(TopoObject):
         Maybe it would be better to put image into Sheet and use BoundingBocol functions, etc.
         """
 
-        left,bottom,right,top = bounds.aarect().lbrt()
-        xdensity = int(density*(right-left)) / float((right-left))
-        ydensity = int(density*(top-bottom)) / float((top-bottom))
+        # CEBHACKALERT: temporary, density will become one again soon...
+        if type(density)!=tuple:
+            xdensity=density
+            ydensity=density
+        else:
+            xdensity,ydensity = density
 
-        # CEBHACKALERT: temporarily broken while the sheet functions change
+
+        # CEBHACKALERT: just made it work - this needs to be changed now
+        # that sheet and patterngenerator are different.
         #n_sheet_rows,n_sheet_cols = bounds2shape(bounds,xdensity,ydensity)
-        n_sheet_rows,n_sheet_cols = 10,10
+        r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
+        n_sheet_rows,n_sheet_cols = r2-r1,c2-c1
 
+        
         # Initial image scaling (size_normalization)
         
         # CEBALERT: instead of an if-test, could have a class of this

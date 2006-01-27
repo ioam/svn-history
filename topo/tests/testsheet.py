@@ -419,13 +419,14 @@ class TestCoordinateTransforms(unittest.TestCase):
         cf_bounds = boundingregion.BoundingBox(points=((0.3,0.3),(0.6,0.6)))
 
         slice_ = bounds2slice(cf_bounds,sheet.bounds,sheet.xdensity,sheet.ydensity)
+        slice_ = crop_slice_to_sheet_bounds(slice_,sheet.bounds,sheet.xdensity,sheet.ydensity)
 
         # check it's been cropped to fit onto sheet...
         self.assertEqual(slice_,(0,2,8,10))
 
         # now check that it gives the correct bounds...
         cropped_bounds = slice2bounds(slice_,sheet.bounds,sheet.xdensity,sheet.ydensity)
-        true_cropped_bounds = boundingregion.BoundingBox(points=((0.3,0.3),(0.50,0.5)))
+        true_cropped_bounds = boundingregion.BoundingBox(points=((0.3,0.3),(0.5,0.5)))
         for a,b in zip(cropped_bounds.aarect().lbrt(),true_cropped_bounds.aarect().lbrt()):
             self.assertAlmostEqual(a,b)
 
