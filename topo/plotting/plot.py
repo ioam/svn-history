@@ -12,7 +12,7 @@ from Numeric import zeros, ones, Float, divide, ravel,clip,array
 
 from topo.base.topoobject import TopoObject
 from topo.base.parameter import Dynamic
-from topo.base.sheet import submatrix, bounds2slice, slice2matrixshape
+from topo.base.sheet import submatrix, bounds2slice, crop_slice_to_sheet_bounds
 
 from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap
 import palette
@@ -240,13 +240,16 @@ class Plot(TopoObject):
         """
         situate the plot within the outer_box of the plot.
         """
+        # CEBHACKALERT: like in other places, this needs to be
+        # cleaned up.
         left,bottom,right,top = outer_box.aarect().lbrt()
         xdensity = int(density*(right-left)) / float((right-left))
         ydensity = int(density*(top-bottom)) / float((top-bottom))
 
         # CEBHACKALERT: verify this
 	slice_ = bounds2slice(slicing_box,outer_box,xdensity,ydensity)
-        r,c = slice2matrixshape(slice_)
+        r1,r2,c1,c2 = crop_slice_to_sheet_bounds(slice_,outer_box,xdensity,ydensity)
+        r=r2-r1; c=c2-c1
       
         ### raise an error when r2-r1 > shape[1] or c2=c1 > shape[0]
 	h = zeros((r,c),Float)
