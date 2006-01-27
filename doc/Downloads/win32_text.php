@@ -1,3 +1,5 @@
+<!-- $Id$ -->
+
 <h1>Installing Topographica on Windows XP/2000</h1>
 
 <p>(Installation procedure verified as of January 26th, 2006) We plan
