@@ -26,12 +26,13 @@ from topo.base.connectionfield import CFProjection
 from topo.base.parameter import DynamicNumber
 from topo.sheets.cfsom import CFSOM
 from topo.responsefns.optimized import CFDotProduct
+from topo.responsefns.basic import CFEuclideanDistance_Py, CFDotProduct_Py
 from topo.base.simulator import Simulator
 from topo.learningfns.basic import HebbianSOMLF
 from topo.outputfns.basic import DivisiveSumNormalize
 from topo.patterns import PatternGeneratorParameter
 
-### JCALERT! For the moment, I used a super-class of CFSOM in order to override the 
+### JCALERT! For the moment, I use a super-class of CFSOM in order to override the 
 ### decay (and alpha) function. It would be good to make them Parameter in CFSOM,
 ### so that we can delete that here and in obermayer, and still override the decay and 
 ### alpha function.
@@ -72,10 +73,17 @@ topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(
 topo.patterns.basic.Gaussian.size = sqrt(2.0*0.1*24.0)/24.0
 topo.patterns.basic.Gaussian.aspect_ratio = 1.0
 
+### JC: maybe adding a parameter scale to the gaussian, it would affect learning.
+#topo.patterns.basic.Gaussian.scale=1.5
+
 # cortical sheet
-RetinotopicSOM.density = 40 
+RetinotopicSOM.density = 10 #40 
 RetinotopicSOM.learning_length = 40000
-RetinotopicSOM.radius_0 = 13.3/40
+
+### JCALERT! check that it is alright:
+### the radius is multiplied again by the density in the cfsom.learn().
+RetinotopicSOM.radius_0 = 13.3/40 
+
 # Here we multiply by 24*24, which is the number of unit in the receptive field.
 # (The book specifies learning rates per connection, while SOMLF accepts a learning
 # rate for the entire CF at once, and then divides it by the number of connections.)
@@ -85,8 +93,8 @@ RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom() 
 
 CFProjection.weights_bounds=BoundingBox(points=((-1.0,-1.0),(1.0,1.0))) # fully connected network.
-CFProjection.response_fn = CFDotProduct()
-CFProjection.learning_fn=HebbianSOMLF()
+CFProjection.response_fn = CFEuclideanDistance_Py() # CFDotProduct() # 
+CFProjection.learning_fn = HebbianSOMLF()
 #CFProjection.learning_fn.output_fn=DivisiveSumNormalize() # Book doesn't mention normalization
 
 
