@@ -79,7 +79,9 @@
    Topographica has been tested with Scipy-0.3.2, which can be
    downloaded from the SciPy website <a
    href="http://www.scipy.org">http://www.scipy.org</a> .  You will
-   not need the entire SciPy source, only the SciPy_core files.
+   not need the entire SciPy source, only the SciPy_core files which
+   has already been included in the /external/ directory of the 
+   Topographica distribution.
 </p>
 
 <p>Weave also requires a C++ compiler for both compiling the weave
