@@ -126,18 +126,17 @@ class PlotGroup(TopoObject):
     
   
 
-class BasicPlotGroup(PlotGroup):
+class TemplatePlotGroup(PlotGroup):
     """
     PlotGroup for Activity SheetViews
     """
 
     def __init__(self,plot_group_key,plot_list,normalize,simulator,template,sheet_name,**params):
 
-        super(BasicPlotGroup,self).__init__(plot_group_key,plot_list,normalize,**params)
+        super(TemplatePlotGroup,self).__init__(plot_group_key,plot_list,normalize,**params)
 	
 	self.template = template
 	self.simulator=simulator
-
 	# If no sheet_name is defined, the sheet_filter_lam accepts all sheets
         if sheet_name:
 	    self.sheet_filter_lam = lambda s: s.name == sheet_name
@@ -174,7 +173,7 @@ class BasicPlotGroup(PlotGroup):
 
 	
 
-class UnitWeightsPlotGroup(BasicPlotGroup):
+class UnitWeightsPlotGroup(TemplatePlotGroup):
     """
     PlotGroup for Weights UnitViews.  
 
@@ -215,7 +214,7 @@ class UnitWeightsPlotGroup(BasicPlotGroup):
 
 
 
-class ProjectionPlotGroup(BasicPlotGroup):
+class ProjectionPlotGroup(TemplatePlotGroup):
     """
     PlotGroup for Projection Plots
     """

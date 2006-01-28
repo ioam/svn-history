@@ -154,7 +154,7 @@ class TestPlotGroup(unittest.TestCase):
 ### JC: My new statements.
 import unittest
 from topo.base.simulator import Simulator
-from topo.plotting.plotgroup import BasicPlotGroup, UnitWeightsPlotGroup
+from topo.plotting.plotgroup import TemplatePlotGroup, UnitWeightsPlotGroup
 from topo.plotting.templates import plotgroup_templates
 from topo.sheets.cfsom import CFSOM
 import topo.patterns.random

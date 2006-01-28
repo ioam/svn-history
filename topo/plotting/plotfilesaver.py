@@ -21,7 +21,7 @@ import topo.base.topoobject
 import topo.base.simulator
 from topo.base.utils import *
 from topo.plotting.templates import plotgroup_templates
-from topo.plotting.plotgroup import plotgroup_dict, BasicPlotGroup, UnitWeightsPlotGroup,ProjectionPlotGroup 
+from topo.plotting.plotgroup import plotgroup_dict, TemplatePlotGroup, UnitWeightsPlotGroup,ProjectionPlotGroup 
 
  
 class PlotFileSaver(topo.base.topoobject.TopoObject):
@@ -66,7 +66,7 @@ class ActivityFile(PlotFileSaver):
 	
 	if pg == None:
 	    pgt = plotgroup_templates['Activity']
-	    pg = BasicPlotGroup('Activity',[],pgt.normalize,
+	    pg = TemplatePlotGroup('Activity',[],pgt.normalize,
 				self.sim,pgt,None)
 				
 

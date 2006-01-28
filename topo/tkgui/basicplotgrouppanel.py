@@ -20,7 +20,7 @@ from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas
 import plotgrouppanel
 from topo.plotting.templates import plotgroup_templates
-from topo.plotting.plotgroup import plotgroup_dict, BasicPlotGroup
+from topo.plotting.plotgroup import plotgroup_dict, TemplatePlotGroup
 
 ### We want to support any featuremap type defined in that file, and
 ### so import all of them here.
@@ -85,7 +85,7 @@ class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
             ### take the one that is specified.
             ### Otherwise, we could assume that each panel is associated with a PlotGroup
             ### and then specify a panel for each template. (as it is done from topoconsole)
-	    self.pe_group = BasicPlotGroup(self.plot_group_key,[],self.normalize,
+	    self.pe_group = TemplatePlotGroup(self.plot_group_key,[],self.normalize,
 					   self.console.simulator,self.pgt,None)
 
             
