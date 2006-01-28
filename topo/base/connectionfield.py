@@ -127,16 +127,10 @@ class ConnectionField(TopoObject):
         using the reversed function bounds2slice.
 	"""
         # CEBHACKALERT: this function will change.
-#        rows,cols = bounds2matrixshape(self.__weights_bound_template,self.input_sheet.xdensity,self.input_sheet.ydensity)
+        r1,r2,c1,c2 = bounds2slice(self.__weights_bound_template,self.__weights_bound_template,self.input_sheet.xdensity,self.input_sheet.ydensity)
 
-        slice_ = bounds2slice(self.__weights_bound_template,self.__weights_bound_template,self.input_sheet.xdensity,self.input_sheet.ydensity)
-
-        r1,r2,c1,c2 = crop_slice_to_sheet_bounds(slice_,self.input_sheet.bounds,self.input_sheet.xdensity,self.input_sheet.ydensity)
-        
         rows=r2-r1
         cols=c2-c1
-
-        # got to crop to sheet bounds
         
         cr,cc = sheet2matrixidx(self.x, self.y,
                                 self.input_sheet.bounds, self.input_sheet.xdensity, self.input_sheet.ydensity)
@@ -144,6 +138,7 @@ class ConnectionField(TopoObject):
         toprow = cr - rows/2
         leftcol = cc - cols/2
 
+        # crop to sheet bounds if necessary
         maxrow,maxcol = sheet2matrixidx(self.input_sheet.bounds.aarect().right(),
                                  self.input_sheet.bounds.aarect().bottom(),
                                  self.input_sheet.bounds,self.input_sheet.xdensity,self.input_sheet.ydensity)
