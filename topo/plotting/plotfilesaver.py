@@ -36,6 +36,7 @@ class PlotFileSaver(topo.base.topoobject.TopoObject):
     def create_bitmaps(self):
         raise NotImplementedError
 
+
     def save_to_disk(self):
         if self.bitmaps:
             for i in range(len(self.bitmaps)):
@@ -65,8 +66,9 @@ class ActivityFile(PlotFileSaver):
 	
 	if pg == None:
 	    pgt = plotgroup_templates['Activity']
-	    pg = BasicPlotGroup(self.sim,pgt,'Activity',
-				pgt.normalize,None,[])
+	    pg = BasicPlotGroup('Activity',[],pgt.normalize,
+				self.sim,pgt,None)
+				
 
         self.bitmaps = pg.load_images()
         
@@ -88,8 +90,9 @@ class UnitWeightsFile(PlotFileSaver):
 	pg = plotgroup_dict.get(self.plot_group_key,None)	
 	if pg == None:
 	    pgt = plotgroup_templates['Connection Field']
-	    pg = UnitWeightsPlotGroup(self.sim,pgt,self.plot_group_key,
-				      pgt.normalize,self.region,[])
+	    pg = UnitWeightsPlotGroup(self.plot_group_key,[],pgt.normalize,
+				self.sim,pgt,self.region)
+			
 	
         self.bitmaps = pg.load_images()
 
@@ -112,8 +115,8 @@ class ProjectionFile(PlotFileSaver):
 	pg = plotgroup_dict.get(self.plot_group_key,None)	
 	if pg == None:
 	    pgt = plotgroup_templates['Projection']
-	    pg = ProjectionPlotGroup(self.sim,pgt,self.plot_group_key,
-				pgt.normalize,self.region,[])
+	    pg = ProjectionPlotGroup(self.plot_group_key,[],pgt.normalize,
+				self.sim,pgt,self.region)
 
         self.bitmaps = pg.load_images()
         

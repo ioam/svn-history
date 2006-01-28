@@ -221,8 +221,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         See UnitWeightsPanel and ProjectionPanel for
         examples.
         """
-        self.pe_group = self.PlotGroup(self.console.simulator,self.plot_group_key,self.pgt,
-				       self.normalize,None,[])
+        self.pe_group = self.PlotGroup(self.plot_group_key,[],self.normalize)
 	### JCALERT! That should be make uniform with the basicplotgrouppanel and then eventually maybe
         ### get rid of the basicplotgrouppanel. (i.E. merged plotgrouppanel and basicplotgrouppanel)
 	self.pe_group.initialize_plot_list(plot_list=[])

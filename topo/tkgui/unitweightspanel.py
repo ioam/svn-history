@@ -139,8 +139,8 @@ class UnitWeightsPanel(CFSheetPlotPanel):
 		
 	self.pe_group = plotgroup_dict.get(self.plot_group_key,None)
 	if self.pe_group == None:
-	    self.pe_group = UnitWeightsPlotGroup(self.console.simulator,self.pgt,self.plot_group_key,
-					         self.normalize,self.region.get(),[])
+	    self.pe_group = UnitWeightsPlotGroup(self.plot_group_key,[],self.normalize,
+						 self.console.simulator,self.pgt,self.region.get())
 
         # self.situate is defined in the super class CFSheetPlotPanel
         self.pe_group.situate = self.situate

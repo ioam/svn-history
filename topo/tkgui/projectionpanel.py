@@ -208,8 +208,8 @@ class ProjectionPanel(CFSheetPlotPanel):
 
 	self.pe_group = plotgroup_dict.get(self.plot_group_key,None)
 	if self.pe_group == None:
-	    self.pe_group = ProjectionPlotGroup(self.console.simulator,self.pgt,self.plot_group_key,
-					         self.normalize,self.region.get(),[])
+	    self.pe_group = ProjectionPlotGroup(self.plot_group_key,[],self.normalize,
+						 self.console.simulator,self.pgt,self.region.get())
         coords = self.pe_group.generate_coords()
         topo.commands.analysis.proj_coords = coords
 	topo.commands.analysis.sheet_name = self.region.get()

@@ -85,8 +85,8 @@ class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
             ### take the one that is specified.
             ### Otherwise, we could assume that each panel is associated with a PlotGroup
             ### and then specify a panel for each template. (as it is done from topoconsole)
-	    self.pe_group = BasicPlotGroup(self.console.simulator,self.pgt,self.plot_group_key,
-					   self.normalize,None,[])
+	    self.pe_group = BasicPlotGroup(self.plot_group_key,[],self.normalize,
+					   self.console.simulator,self.pgt,None)
 
             
     def display_labels(self):

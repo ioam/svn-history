@@ -42,7 +42,8 @@ class PlotGroup(TopoObject):
     ### also review the doc of each functions.
     ### - rewrite the test file.
 
-    def __init__(self,simulator,template,plot_group_key,normalize,sheet_name=None,plot_list=[],**params):
+    def __init__(self, plot_group_key, plot_list, normalize,**params):
+    
         """
         plot_list can be of two types: 
         1.  A list of Plot objects that can return bitmaps when requested.
@@ -50,9 +51,21 @@ class PlotGroup(TopoObject):
         that each time plot() is called, an updated list is created for the
         latest list of sheets in the simulation.
         """
-        super(PlotGroup,self).__init__(**params)        
+        super(PlotGroup,self).__init__(**params)  
+
+	self.plot_group_key = plot_group_key
+	### JCALERT:Normalize is no really used by PlotGroup for the moment
+        ### But it will be when sorted out what to do with TestPattern
+	self.normalize = normalize
+
+	self.plot_list = plot_list  
+        
+	# store the PlotGroup in plot_group_dict
+	plotgroup_dict[plot_group_key]=self
+
         self.all_plots = []
         self.added_list = []
+	self.bitmaps = []
 
         # In the future, it might be good to be able to specify the
         # plot rows and columns using tuples.  For instance, if three
@@ -62,66 +75,13 @@ class PlotGroup(TopoObject):
         # would have the first row with 3, the second row with 2, the
         # third row with 4, etc.  The default left-to-right ordering
         # in one row could perhaps be represented as (None, Inf).
-        
-        self.plot_group_key = plot_group_key
-        self.bitmaps = []
 
-        ### JABALERT: This class hierarchy would be simpler to
-        ### understand if all the template, lambda, sheet_name,
-        ### etc. stuff moves to BasicPlotGroup, which would be renamed
-        ### to TemplatePlotGroup.  That way the base class PlotGroup
-        ### would be simple -- just working with a static list of
-        ### plots, using a member function like plots() (a merger of
-        ### initialize_plot_list() and the current plots()) that for a
-        ### PlotGroup returns the static list, but for a
-        ### TemplatePlotGroup generates the list a new each time, based
-        ### on the template.      
-        self.template = template
-        
-	# If no sheet_name is defined, the sheet_filter_lam accepts all sheets
-        if sheet_name:
-	    self.sheet_filter_lam = lambda s: s.name == sheet_name
-        else:
-            self.sheet_filter_lam = lambda s : True
+    def _plot_list(self):
+	"""
+	function that returns the plot_list.
+	"""
+	return self.plot_list
 
-	self.simulator = simulator
-
-	self.normalize = normalize
-        
-	self.plot_list = lambda: self._initialize_plot_list(plot_list)
-        
-	# store the PlotGroup in plot_group_dict
-	plotgroup_dict[plot_group_key]=self
-
-
-    def _initialize_plot_list(self,plot_list):
-        """
-        Procedure that is called when creating a PlotGroup, that return the plot_list attribute
-        i.e. the list of plot that are specified by the PlotGroup template.
-
-        This function calls create_plots, that is implemented in each PlotGroup subclasses.
-        """
-	sheet_list = [each for each in dict_sort(self.simulator.objects(Sheet)) if self.sheet_filter_lam(each)]      
-        # Loop over all sheets that passed the filter.
-        #     Loop over each individual PlotTemplate:
-        #         Call the create_plots function to create the according plot
-        for each in sheet_list:
-	    ### JCALERT! This test can be later removed when improving testpattern.py
-            ### (for the moment call to PlotGroup from testpattern lead to self.template=None)
-	    if self.template != None :
-		for (pt_name,pt) in self.template.plot_templates:
-		    plot_list= plot_list + self.create_plots(pt_name,pt,each)
-    	return plot_list
-
-  
-    def create_plots(self):
-        """
-	This function needs to be re-implemented in the subclasses.
-	As it is implemented here, it leaves the possibility of passing a plot_list
-        of already created plots when creating a PlotGroup.
-	"""       
-	return []
-    
 
     def load_images(self):
         """
@@ -154,7 +114,7 @@ class PlotGroup(TopoObject):
         Generate the bitmap lists.
         """
         bitmap_list = []
-	self.all_plots = flatten(self.plot_list()) + self.added_list
+	self.all_plots = flatten(self._plot_list()) + self.added_list
         generated_bitmap_list = [each for each in self.all_plots if each != None]
         ### JCALERT! For each plotgroup, we want the plot to be displayed
         ### in the alphabetical order according to their view_info['src_name']
@@ -171,9 +131,37 @@ class BasicPlotGroup(PlotGroup):
     PlotGroup for Activity SheetViews
     """
 
-    def __init__(self,simulator,template,plot_group_key,normalize,sheet_filter_lam,plot_list,**params):
-        super(BasicPlotGroup,self).__init__(simulator,template,plot_group_key,normalize,sheet_filter_lam,plot_list,
-                                            **params)
+    def __init__(self,plot_group_key,plot_list,normalize,simulator,template,sheet_name,**params):
+
+        super(BasicPlotGroup,self).__init__(plot_group_key,plot_list,normalize,**params)
+	
+	self.template = template
+	self.simulator=simulator
+
+	# If no sheet_name is defined, the sheet_filter_lam accepts all sheets
+        if sheet_name:
+	    self.sheet_filter_lam = lambda s: s.name == sheet_name
+        else:
+            self.sheet_filter_lam = lambda s : True
+
+	
+    def _plot_list(self):
+        """
+        Procedure that is called when creating a PlotGroup, that return the plot_list attribute
+        i.e. the list of plot that are specified by the PlotGroup template.
+
+        This function calls create_plots, that is implemented in each PlotGroup subclasses.
+        """
+	sheet_list = [each for each in dict_sort(self.simulator.objects(Sheet)) if self.sheet_filter_lam(each)]      
+	plot_list=self.plot_list
+        # Loop over all sheets that passed the filter.
+        #     Loop over each individual PlotTemplate:
+        #         Call the create_plots function to create the according plot
+        for each in sheet_list:
+	    for (pt_name,pt) in self.template.plot_templates:
+		plot_list = plot_list + self.create_plots(pt_name,pt,each)
+    	return plot_list
+
 
     def create_plots(self,pt_name,pt,sheet):
 
@@ -186,7 +174,7 @@ class BasicPlotGroup(PlotGroup):
 
 	
 
-class UnitWeightsPlotGroup(PlotGroup):
+class UnitWeightsPlotGroup(BasicPlotGroup):
     """
     PlotGroup for Weights UnitViews.  
 
@@ -196,13 +184,13 @@ class UnitWeightsPlotGroup(PlotGroup):
       situate: Whether to situate the plot on the full source sheet, or just show the weights.
     """
 
-    def __init__(self,simulator,template,plot_group_key,normalize,sheet_filter_lam,plot_list,**params):
+    def __init__(self,plot_group_key,plot_list,normalize,simulator,template,sheet_name,**params):
         self.x = float(plot_group_key[2])
         self.y = float(plot_group_key[3])
       	self.situate = False
         
-	super(UnitWeightsPlotGroup,self).__init__(simulator,template,plot_group_key,normalize,sheet_filter_lam,plot_list,
-						  **params)
+	super(UnitWeightsPlotGroup,self).__init__(plot_group_key,plot_list,normalize,
+						  simulator,template,sheet_name,**params)
   
     def create_plots(self,pt_name,pt,sheet):
 
@@ -227,12 +215,12 @@ class UnitWeightsPlotGroup(PlotGroup):
 
 
 
-class ProjectionPlotGroup(PlotGroup):
+class ProjectionPlotGroup(BasicPlotGroup):
     """
     PlotGroup for Projection Plots
     """
 
-    def __init__(self,simulator,template,plot_group_key,normalize,sheet_filter_lam,plot_list,**params):
+    def __init__(self,plot_group_key,plot_list,normalize,simulator,template,sheet_name,**params):
        
         self.weight_name = plot_group_key[1]
         self.density = float(plot_group_key[2])
@@ -243,8 +231,8 @@ class ProjectionPlotGroup(PlotGroup):
 
 	self.situate = False
         
-        super(ProjectionPlotGroup,self).__init__(simulator,template,plot_group_key,normalize,sheet_filter_lam,
-                                                   plot_list,**params)
+        super(ProjectionPlotGroup,self).__init__(plot_group_key,plot_list,normalize,
+                                                  simulator,template,sheet_name,**params)
 	### JCALERT! It is a bit confusing, but in the case of the projection
         ### sheet_filter_lam filter to one single sheet...
 	for s in self.simulator.objects(Sheet).values():
@@ -311,7 +299,7 @@ class ProjectionPlotGroup(PlotGroup):
         bitmap_list = []
       
 	self.debug('Dynamic plotgroup')
-	self.all_plots = flatten(self.plot_list()) + self.added_list
+	self.all_plots = flatten(self._plot_list()) + self.added_list
 	self.debug('all_plots = ' + str(self.all_plots))
         
         generated_bitmap_list = [each for each in self.all_plots if each !=None]
