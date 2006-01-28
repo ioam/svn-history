@@ -459,3 +459,36 @@ class Sheet(EventProcessor):
         return len(self.__saved_activity)
         
 
+
+# CEBHACKALERT: unfinished, unused, untested.
+class Slice(object):
+    """
+    """
+    def __init__(self,slice_bounds,sheet):
+        """
+        Create the matrix slice that corresponds to the sheet coordinate slice_bounds.
+        """
+        self.slice_array = sheet.bounds2slice(slice_bounds)
+        self.sheet = sheet
+
+    def sheet_coordinate_bounds(self):
+        """
+        Return the sheet coordinate bounding box of this Slice.
+        """
+        return self.sheet.slice2bounds(self.slice_array)
+
+    def lbrt(self):
+        """
+        Return the matrix idx coordinate slice as a tuple.
+        """
+        return (self.slice_array[2],self.slice_array[1],self.slice_array[3],self.slice_array[0])
+
+    def submatrix(self,M):
+        """
+        Return the submatrix of M defined by this Slice.
+        """
+        r1=self.slice_array[0]
+        r2=self.slice_array[1]
+        c1=self.slice_array[2]
+        c2=self.slice_array[3]
+        return M[r1:r2,c1:c2]
