@@ -246,20 +246,27 @@ class Plot(TopoObject):
         xdensity = int(density*(right-left)) / float((right-left))
         ydensity = int(density*(top-bottom)) / float((top-bottom))
 
-        # CEBHACKALERT: verify this
+        # CEBHACKALERT: not checked - looks like it works
+
+        # get slicing_box's slice (cropped to the outer_box's bounds)
 	slice_ = bounds2slice(slicing_box,outer_box,xdensity,ydensity)
         r1,r2,c1,c2 = crop_slice_to_sheet_bounds(slice_,outer_box,xdensity,ydensity)
-        r=r2-r1; c=c2-c1
+
+        # get shape of outer_box
+        top_row,bot_row,left_col,right_col = bounds2slice(outer_box,outer_box,
+                                                          xdensity,ydensity)
+        sheet_shape = (bot_row,right_col)
       
         ### raise an error when r2-r1 > shape[1] or c2=c1 > shape[0]
-	h = zeros((r,c),Float)
-	h[0:r,0:c] = hue
-	s = zeros((r,c),Float)
-	s[0:r,0:c] = sat
-	v = zeros((r,c),Float)
-	v[0:r,0:c] = val
+	h = zeros(sheet_shape,Float)
+	h[r1:r2,c1:c2] = hue
+	s = zeros(sheet_shape,Float)
+	s[r1:r2,c1:c2] = sat
+	v = zeros(sheet_shape,Float)
+	v[r1:r2,c1:c2] = val
 
 	return (h,s,v)  
+
 
     def _normalize(self,a):
         """ 
