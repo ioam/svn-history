@@ -8,6 +8,9 @@ $Id$
 """
 __version__='$Revision$'
 
+from Numeric import zeros, Float, ravel
+
+from topo.base.arrayutils import L2norm
 from topo.base.connectionfield import CFResponseFunction
 from topo.base.parameter import Parameter
 from topo.base.topoobject import TopoObject
@@ -33,4 +36,31 @@ class CFDotProduct_Py(CFResponseFunction):
         
                 a = X*cf.weights
                 activity[r,c] = sum(a.flat)
+        activity *= strength
+
+
+class CFEuclideanDistance_Py(CFResponseFunction):
+    """
+    Euclidean-distance--based response function.
+    """
+    def __init__(self,**params):
+        super(CFEuclideanDistance_Py,self).__init__(**params)
+
+    def __call__(self, cfs, input_activity, activity, strength, **params):
+        rows,cols = activity.shape
+	euclidean_dist_mat = zeros((rows,cols),Float)
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+                r1,r2,c1,c2 = cf.slice_tuple()
+                X = input_activity[r1:r2,c1:c2]
+		diff = ravel(X) - ravel(cf.weights)
+		euclidean_dist_mat[r,c] = L2norm(diff)
+	### JCALERT! temporary loop. will be changed to:
+        # activity = max(euclidean_dist_mat.flat) - euclidean_dist_mat
+        ### when understood why it does not work like that...
+	for r in xrange(rows):
+            for c in xrange(cols):
+		activity[r,c] = max(euclidean_dist_mat.flat) - euclidean_dist_mat[r,c]
+
         activity *= strength
