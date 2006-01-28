@@ -141,7 +141,7 @@ to make sure that compatible libraries are available.
 <P><B>Windows:</B> It should be possible to build Topographica under
 Windows just as is done under UNIX, if you first install <A
 HREF="http://www.cygwin.com/">Cygwin</a>, although as of 2/2006 the library versions available on Cygwin are a bit out of date and thus this process does not currently go smoothly. Alternatively, nearly all of the features of Topographica are available with a Win32-native Python, and if you choose this option then Cygwin is optional. The basic steps for building the native version are:<ol>
-<li> Unpack the topographica archive into a temporary directory.
+<li> Retrieve the topographica distribution via CVS.
 <li> Double click on setup.bat
 <li> Follow the various installation prompts for the packages 
      bundled with Topographica.
