@@ -599,7 +599,8 @@ class Dynamic(Parameter):
 ### and they need to be settable when constructing the object.
 class Constant(Parameter):
     """
-    Constant Parameter that can be constructed and used but not set on an object.
+    Constant Parameter that can be constructed and used but not set on an
+    initialized object.
 
     The value of the Parameter can, however, be set on a class.
     """
@@ -607,8 +608,11 @@ class Constant(Parameter):
     __doc__ = property((lambda self: self.doc))
     
     def __set__(self,obj,val):
-        """Does not allow set commands."""
-        if obj==None:
+        """
+        Does not allow set commands except on the classobj or
+        on an uninitialized TopoObject.
+        """
+        if obj==None or obj.initialized==False:
             super(Constant,self).__set__(obj,val)
         else:
             raise "Constant parameter cannot be modified"

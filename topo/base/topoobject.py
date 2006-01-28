@@ -236,12 +236,17 @@ class TopoObject(object):
         """        
         global object_count
 
+        # Flag that can be tested to see if e.g. Constant Parameters
+        # can still be set
+        self.initialized=False
         self.name = '%s%05d' % (self.__class__.__name__ ,object_count)
         self.__setup_params(**config)
         object_count += 1
 
         self.nopickle = []
         self.verbose('Initialized',self)
+
+        self.initialized=True
 
     def __repr__(self):
         """
