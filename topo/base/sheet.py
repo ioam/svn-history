@@ -291,11 +291,9 @@ def bounds2slicearray(slice_bounds, input_bounds, input_xdensity, input_ydensity
 # CEBHACKALERT: slice is a Python type.
 def slice2bounds(slice,sheet_bounds,sheet_xdensity,sheet_ydensity):
     """
-    Construct the bounds that corresponds to the given slice, with a small
-    margin that enables to solve the rounding problem that is produced when turning
-    float into int when retrieving the slice from the bounds (with bounds2slice).
-    This way, this function is an exact transform of bounds2slice. That enables to retrieve
-    the slice information from the bounding box.
+    Construct the bounds that corresponds to the given slice.
+    This way, this function is an exact transform of bounds2slice. 
+    That enables to retrieve the slice information from the bounding box.
     """
     r1,r2,c1,c2 = slice
 
