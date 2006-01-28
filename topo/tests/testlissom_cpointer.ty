@@ -17,7 +17,7 @@ from fixedpoint import FixedPoint
 from topo.sheets.lissom import LISSOM_CPointer
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.optimized import CFProjection_CPointer
-from topo.responsefns.basic import CFDotProduct
+from topo.responsefns.optimized import CFDotProduct
 import topo.patterns.basic
 import topo.patterns.random
 from topo.base.sheet import BoundingBox
@@ -84,7 +84,7 @@ topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(
 # Corrects for differences between C++ and Topographica definition of Gaussian.
 gaussian_width = xsigma/BaseRN/sqrt(2)
 gaussian_height = ysigma/BaseRN/sqrt(2)
-topo.patterns.basic.Gaussian.size = gaussian_height
+topo.patterns.basic.Gaussian.size = 2*gaussian_height
 topo.patterns.basic.Gaussian.aspect_ratio = gaussian_width/gaussian_height
 topo.patterns.basic.Gaussian.bounds = input_bounds
 

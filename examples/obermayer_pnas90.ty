@@ -75,7 +75,7 @@ topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(
 
 gaussian_width = 0.23/sqrt(2)
 gaussian_height = 0.09/sqrt(2)
-topo.patterns.basic.Gaussian.size  = gaussian_height
+topo.patterns.basic.Gaussian.size  = 2*gaussian_height
 topo.patterns.basic.Gaussian.aspect_ratio = gaussian_width/gaussian_height
 topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 

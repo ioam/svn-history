@@ -51,7 +51,7 @@ class Gaussian(PatternGenerator):
     size  = Number(default=0.25,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
 
     def function(self,**params):
-        height = params.get('size',self.size)
+        height = params.get('size',self.size)/2
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
 
         return gaussian(self.pattern_x,self.pattern_y,width,height)

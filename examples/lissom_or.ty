@@ -44,7 +44,7 @@ topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : random.uniform(-0.5,0.5)
 topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
 
-topo.patterns.basic.Gaussian.size = 0.0468      
+topo.patterns.basic.Gaussian.size = 2*0.0468      
 topo.patterns.basic.Gaussian.aspect_ratio = 4.0      
 topo.patterns.basic.Gaussian.bounds = input_bounds
 

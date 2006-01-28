@@ -91,7 +91,7 @@ topo.patterns.basic.Gaussian.scale = scale_input
 
 gaussian_width = xsigma/BaseRN/sqrt(2.0)
 gaussian_height = ysigma/BaseRN/sqrt(2.0)
-topo.patterns.basic.Gaussian.size = gaussian_height
+topo.patterns.basic.Gaussian.size = 2*gaussian_height
 topo.patterns.basic.Gaussian.aspect_ratio = gaussian_width/gaussian_height
 input_bounds = BoundingBox(points=((-RN/(BaseRN*area_scale)/2.0,-RN/(BaseRN*area_scale)/2.0),
                                    ( RN/(BaseRN*area_scale)/2.0, RN/(BaseRN*area_scale)/2.0)))

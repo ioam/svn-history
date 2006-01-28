@@ -70,7 +70,7 @@ topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : random.uniform(-0.5,0.5)
 topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
 
-topo.patterns.basic.Gaussian.size = sqrt(2.0*0.1*24.0)/24.0
+topo.patterns.basic.Gaussian.size = 2*sqrt(2.0*0.1*24.0)/24.0
 topo.patterns.basic.Gaussian.aspect_ratio = 1.0
 
 ### JC: maybe adding a parameter scale to the gaussian, it would affect learning.
