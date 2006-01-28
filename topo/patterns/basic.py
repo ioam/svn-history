@@ -54,10 +54,7 @@ class Gaussian(PatternGenerator):
         height = params.get('size',self.size)
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
 
-        return gaussian( params.get('pattern_x',self.pattern_x), 
-                         params.get('pattern_y',self.pattern_y), 
-                         width,
-                         height)
+        return gaussian(self.pattern_x,self.pattern_y,width,height)
 
 
 class SineGrating(PatternGenerator):
@@ -70,11 +67,10 @@ class SineGrating(PatternGenerator):
         """
         Return a sine grating pattern (two-dimensional sine wave).
         """
-        y          = params.get('pattern_y',self.pattern_y)
         frequency  = params.get('frequency',self.frequency)
         phase      = params.get('phase',self.phase)
         
-        return 0.5 + 0.5*sin(frequency*2*pi*y + phase)        
+        return 0.5 + 0.5*sin(frequency*2*pi*self.pattern_y + phase)        
 
 
 
@@ -90,8 +86,8 @@ class Gabor(PatternGenerator):
         height = params.get('size',self.size)
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
         
-        return gabor( params.get('pattern_x',self.pattern_x),
-                      params.get('pattern_y',self.pattern_y),
+        return gabor( self.pattern_x,
+                      self.pattern_y,
                       width,
                       height,
                       params.get('frequency',self.frequency),
@@ -118,9 +114,9 @@ class Line(PatternGenerator):
     scale = Number(default=0.7,softbounds=(0.0,2.0))
     
     def function(self,**params):
-        return line( params.get('pattern_y',self.pattern_y), 
-                           params.get('thickness',self.thickness),
-                           params.get('smoothing',self.smoothing))
+        return line(self.pattern_y, 
+                    params.get('thickness',self.thickness),
+                    params.get('smoothing',self.smoothing))
 
 
 class Disk(PatternGenerator):
@@ -134,8 +130,8 @@ class Disk(PatternGenerator):
         height = params.get('size',self.size)
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
 
-        return disk( params.get('pattern_x',self.pattern_x), 
-                     params.get('pattern_y',self.pattern_y), 
+        return disk( self.pattern_x, 
+                     self.pattern_y, 
                      width,
                      height,
                      params.get('smoothing',self.smoothing))  
@@ -153,8 +149,8 @@ class Ring(PatternGenerator):
         height = params.get('size',self.size)
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
         
-        return ring(params.get('pattern_x',self.pattern_x), 
-                    params.get('pattern_y',self.pattern_y),
+        return ring(self.pattern_x, 
+                    self.pattern_y,
                     width,
                     height,
                     params.get('thickness',self.thickness),
@@ -173,8 +169,8 @@ class Rectangle(PatternGenerator):
         height = params.get('size',self.size)
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
         
-        return bitwise_and(abs(params.get('pattern_x',self.pattern_x))<=width/2.0,
-                           abs(params.get('pattern_y',self.pattern_y))<=height/2.0)
+        return bitwise_and(abs(self.pattern_x)<=width/2.0,
+                           abs(self.pattern_y)<=height/2.0)
 
 
 class SquareGrating(PatternGenerator):
@@ -191,11 +187,10 @@ class SquareGrating(PatternGenerator):
         """
         Return a square-wave grating (alternating black and white bars).
         """
-        y          = params.get('pattern_y',self.pattern_y)
         frequency  = params.get('frequency',self.frequency)
         phase      = params.get('phase',self.phase)
         
-        return around(0.5 + 0.5*sin(frequency*2*pi*y + phase))
+        return around(0.5 + 0.5*sin(frequency*2*pi*self.pattern_y + phase))
 
 
 
