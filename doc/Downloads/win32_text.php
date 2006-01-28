@@ -107,7 +107,7 @@
 <p>Commands to compile weave: (From the Weave documentation link above)</p>
 <pre>
     python setup.py build --compiler=mingw32
-    python setup.py --compiler=mingw32 install
+    python setup.py build --compiler=mingw32 install
 </pre>
 
 <p><b>Helpful tip:</b> You may find it necessary to adjust your
