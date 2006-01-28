@@ -48,7 +48,7 @@ class Gaussian(PatternGenerator):
     """2D Gaussian pattern generator."""
     
     aspect_ratio   = Number(default=0.3,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
-    size  = Number(default=0.25,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
+    size  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
 
     def function(self,**params):
         height = params.get('size',self.size)/2
