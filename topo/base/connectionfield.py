@@ -21,12 +21,13 @@ __version__ = '$Revision$'
 
 
 import Numeric
+import copy
 
 from topoobject import TopoObject
 from projection import Projection,ProjectionSheet,Identity,OutputFunctionParameter
 from parameter import Parameter, Number, BooleanParameter,ClassSelectorParameter
 from arrayutils import mdot,divisive_normalization
-from sheet import Sheet,bounds2slice,sheet2matrixidx,slicearray2bounds,crop_slice_to_sheet_bounds
+from sheet import Sheet,bounds2slice,sheet2matrixidx,crop_slice_to_sheet_bounds,slice2bounds
 from sheetview import UnitView
 from itertools import chain
 from patterngenerator import PatternGeneratorParameter
@@ -61,7 +62,7 @@ class ConnectionField(TopoObject):
     # self.slice_tuple() for a nicer Python access method.
     slice_array = []
     
-    def __init__(self,x,y,input_sheet,weights_bound_template,
+    def __init__(self,x,y,input_sheet,weights_bounds_template,
                  weights_generator,weights_shape,weight_type=Numeric.Float32,
                  output_fn=Identity(),**params):
 
@@ -69,12 +70,14 @@ class ConnectionField(TopoObject):
 
         self.x = x; self.y = y
         self.input_sheet = input_sheet
-        self.__weights_bound_template = weights_bound_template
-        self.initialize_slice_array()
+        self.initialize_bounds(weights_bounds_template)
 
         # CEBHACKALERT: to change when there's one density
         density = (self.input_sheet.xdensity,self.input_sheet.ydensity)
 
+        # CEBHACKALERT: weight_generator gets passed a size that
+        # was for weight_bounds specified by user, so might not fill
+        # bounds.
         w = weights_generator(x=self.x,y=self.y,bounds=self.bounds,
                               density=density,theta=0)
         self.weights = w.astype(weight_type)
@@ -110,84 +113,75 @@ class ConnectionField(TopoObject):
         output_fn(self.weights)
         
 
-
-    def initialize_slice_array(self):
+    def initialize_bounds(self,bounds):
         """
-        Calculate the slice specifying the submatrix of the sheets to which
-        this connection field connects.
+        Given bounds centered on the sheet matrix, offset them to this
+        cf's location and store the result as self.bounds.
 
-    	Given a bounds centered at the origin, offsets the bounds to
-	The given weights_bound_template is offset to the (x,y) location of
-        this unit, and the slices that specifies the weight matrix is generated.
-	(The special routine used for this purpose ensure that the weight matrix
-         are all of the same size, when not to close of the borders.)
+        The weights_bounds specified by the user are not necessarily
+        the actual bounds for the cf's weights, because the bounds
+        must be fit to the Sheet's matrix, and because the weights
+        matrix needs to have odd dimensions.
 
-        Then, the bounding-box specifying the weight matrix is calculated around the 
-        location of the unit, and it will allow to retrieve the slice from the bounding box by
-        using the reversed function bounds2slice.
+        Also stores the slice_array for access by C.
 	"""
-        # CEBHACKALERT: this function will change.
-        r1,r2,c1,c2 = bounds2slice(self.__weights_bound_template,self.__weights_bound_template,self.input_sheet.xdensity,self.input_sheet.ydensity)
+        # convert weight_bounds to a slice (ensuring the slice has odd dimensions)
+        slice_ = bounds2slice(bounds,bounds,
+                              self.input_sheet.xdensity,self.input_sheet.ydensity)
+        n_rows=slice_[1]-slice_[0]; n_cols=slice_[3]-slice_[2]
 
-        rows=r2-r1
-        cols=c2-c1
+        sheet_center_row,sheet_center_col = self.input_sheet.sheet2matrixidx(0.0,0.0)
         
-        cr,cc = sheet2matrixidx(self.x, self.y,
-                                self.input_sheet.bounds, self.input_sheet.xdensity, self.input_sheet.ydensity)
+        r1 = sheet_center_row - n_rows/2
+        c1 = sheet_center_col - n_cols/2
+        r2 = sheet_center_row + n_rows/2 +1
+        c2 = sheet_center_col + n_cols/2 +1
 
-        toprow = cr - rows/2
-        leftcol = cc - cols/2
+        # translate to this cf's location
+        center_row,center_col = self.input_sheet.sheet2matrixidx(self.x,self.y)
 
-        # crop to sheet bounds if necessary
-        maxrow,maxcol = sheet2matrixidx(self.input_sheet.bounds.aarect().right(),
-                                 self.input_sheet.bounds.aarect().bottom(),
-                                 self.input_sheet.bounds,self.input_sheet.xdensity,self.input_sheet.ydensity)
-        maxrow = maxrow - 1
-        maxcol = maxcol - 1
-        rstart = max(0,toprow)
-        rbound = min(maxrow+1,cr+rows/2+1)
-        cstart = max(0,leftcol)
-        cbound = min(maxcol+1,cc+cols/2+1)
+        row_offset = center_row-sheet_center_row
+        col_offset = center_col-sheet_center_col
+        r1+=row_offset; r2+=row_offset
+        c1+=col_offset; c2+=col_offset
 
+        # crop to the sheet's bounds
+        r1,r2,c1,c2 = crop_slice_to_sheet_bounds((r1,r2,c1,c2),self.input_sheet.bounds,
+                                                 self.input_sheet.xdensity,self.input_sheet.ydensity)
 
+        # store the resulting bounds
+	self.bounds = slice2bounds((r1,r2,c1,c2), self.input_sheet.bounds, self.input_sheet.xdensity, self.input_sheet.ydensity)
+
+        # Finally, store also the array for direct access by C.
         # Numeric.Int32 is specified explicitly here to avoid having it
         # default to Numeric.Int.  Numeric.Int works on 32-bit platforms,
         # but does not work properly with the optimized C activation and
         # learning functions on 64-bit machines.
-        self.slice_array = Numeric.zeros((4), Numeric.Int32)
-	self.set_slice_array(rstart, rbound, cstart, cbound)
+        self.slice_array = Numeric.array([r1,r2,c1,c2],typecode=Numeric.Int32)
 
-	# constructs and store the boundingbox corresponding to the slice.
-	self.bounds = slicearray2bounds(self.slice_array, self.input_sheet.bounds, self.input_sheet.xdensity, self.input_sheet.ydensity)
 
     def get_input_matrix(self, activity):
         r1,r2,c1,c2 = self.slice_tuple()
         return activity[r1:r2,c1:c2]
 
 
-    def change_bounds(self, weights_bound_template, output_fn=Identity()):
+    def change_bounds(self, weights_bounds_template, output_fn=Identity()):
         """
-        Change the bounding box for this existing ConnectionField. The
-        weights_bound_template should center at the sheet coordinate
-        (0,0), just as weights_bound_template in __init__,
-        i.e. weights_bound_template only specifies the size of the new
-        bounding box, but not the location. The exact location and
-        extent of the new bounding box is found by translating the
-        center of weights_bound_template to the center of this
-        connection field. If the new bound falls outside of the sheet,
-        it is cropped to just cover the sheet.
+        Change the bounding box for this existing ConnectionField.
 
+        weights_bounds_template is assumed to be centered at (0,0)
+        in sheet coordinates -- see offset_bounds().
+        
         Discards weights or adds new (zero) weights as necessary,
         preserving existing values where possible.
 
         Currently only supports reducing the size, not increasing, but
         should be extended to support increasing as well.
         """
-
+        # CEBHACKALERT: re-write to allow arbitrary resizing
         or1,or2,oc1,oc2 = self.slice_tuple()
 
-        self.__weights_bound_template = weights_bound_template
-        self.initialize_slice_array()
+        self.initialize_bounds(weights_bounds_template)
         r1,r2,c1,c2 = self.slice_tuple()
 
         if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
@@ -205,14 +199,6 @@ class ConnectionField(TopoObject):
 
     def slice_tuple(self):
         return self.slice_array[0],self.slice_array[1],self.slice_array[2],self.slice_array[3]
-
-
-    def set_slice_array(self, r1, r2, c1, c2):
-        self.slice_array[0] = r1
-        self.slice_array[1] = r2
-        self.slice_array[2] = c1
-        self.slice_array[3] = c2
-
 
     def change_density(self, new_wt_density):
         """Rescale the weight matrix in place, interpolating or decimating as necessary."""
@@ -389,7 +375,7 @@ class CFProjection(Projection):
         """
         super(CFProjection,self).__init__(**params)
         # set up array of ConnectionFields translated to each x,y in the src sheet
-
+        
         ### JABALERT: Should make cfs semi-private, since it has an
         ### accessor function and isn't always the same format
         ### (e.g. for SharedWeightProjection).  Could also make it
@@ -406,7 +392,7 @@ class CFProjection(Projection):
                 # in the initial mapping.
                 row.append(self.cf_type(x,y,
                                         self.src,
-                                        self.weights_bounds,
+                                        copy.copy(self.weights_bounds),
                                         self.weights_generator,
                                         self.weights_shape,
                                         self.weight_type,
