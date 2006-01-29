@@ -74,7 +74,7 @@ topo.patterns.basic.Gaussian.size = 2*sqrt(2.0*0.1*24.0)/24.0
 topo.patterns.basic.Gaussian.aspect_ratio = 1.0
 
 # cortical sheet
-RetinotopicSOM.density = 10 #40 
+RetinotopicSOM.density = 40
 RetinotopicSOM.learning_length = 40000
 
 RetinotopicSOM.radius_0 = 13.3/40 
