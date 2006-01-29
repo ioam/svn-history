@@ -20,23 +20,23 @@ from topo.base.arrayutils import exp
 # be made to override Python's / operator for scalars?
 
 
-def gaussian(x, y, width, height):
+def gaussian(x, y, xsigma, ysigma):
     """
     Two-dimensional oriented Gaussian pattern (i.e., 2D version of a
     bell curve, like a normal distribution but without necessarily
     summing to 1.0).
     """
-    x_w = divide(x,width)
-    y_h = divide(y,height)
+    x_w = divide(x,xsigma)
+    y_h = divide(y,ysigma)
     return exp(-0.5*x_w*x_w + -0.5*y_h*y_h)
 
 
-def gabor(x, y, width, height, frequency, phase):
+def gabor(x, y, xsigma, ysigma, frequency, phase):
     """
     Gabor pattern (sine grating multiplied by a circular Gaussian).
     """ 
-    x_w = divide(x,width)
-    y_h = divide(y,height)
+    x_w = divide(x,xsigma)
+    y_h = divide(y,ysigma)
     p = exp(-0.5*x_w*x_w + -0.5*y_h*y_h)    
     return p * (0.5 + 0.5*cos(2*pi*frequency*y + phase))
 

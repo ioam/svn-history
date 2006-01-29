@@ -45,16 +45,28 @@ SM_PREC = 0.61
 
 
 class Gaussian(PatternGenerator):
-    """2D Gaussian pattern generator."""
+    """
+    2D Gaussian pattern generator.
+
+    The sigmas of the Gaussian are calculated from the size and
+    aspect_ratio parameters:
+
+      ysigma=size/2
+      xsigma=ysigma*aspect_ratio
+
+    The Gaussian is then computed for the given (x,y) values as:
+    
+      exp(-x^2/(2*xsigma^2) - y^2/(2*ysigma^2)
+    """
     
     aspect_ratio   = Number(default=0.3,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
     size  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
 
     def function(self,**params):
-        height = params.get('size',self.size)/2
-        width = (params.get('aspect_ratio',self.aspect_ratio))*height
+        ysigma = params.get('size',self.size)/2.0
+        xsigma = params.get('aspect_ratio',self.aspect_ratio)*ysigma
 
-        return gaussian(self.pattern_x,self.pattern_y,width,height)
+        return gaussian(self.pattern_x,self.pattern_y,xsigma,ysigma)
 
 
 class SineGrating(PatternGenerator):
@@ -83,7 +95,7 @@ class Gabor(PatternGenerator):
     size  = Number(default=0.25,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
 
     def function(self,**params):
-        height = params.get('size',self.size)
+        height = params.get('size',self.size)/2.0
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
         
         return gabor( self.pattern_x,
