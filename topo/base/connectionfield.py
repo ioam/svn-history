@@ -108,7 +108,7 @@ class ConnectionField(TopoObject):
         if hasattr(weights_shape,'size'):
             l,b,r,t = weights_bounds_template.aarect().lbrt()
             weights_shape.size = t-b
-            weights_shape.aspect_ratio = (r-l)/size
+            weights_shape.aspect_ratio = (r-l)/weights_shape.size
         
         m = weights_shape(x=self.x,y=self.y,bounds=self.bounds,
                           density=density,theta=0)
