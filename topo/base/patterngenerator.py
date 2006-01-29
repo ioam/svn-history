@@ -16,15 +16,6 @@ from parameter import Parameter,Number,ClassSelectorParameter
 from math import pi
 
 
-# CEBHACKALERT: doesn't work as you might expect for
-# boundingregions. This code assumes the underlying pattern is
-# centered at (0,0) in Sheet coordinates. Supplying bounds that are
-# not centered results in a sample of the (0,0)-centered pattern in
-# this off-center region, rather than having the pattern centered in
-# the supplied region. Shouldn't the pattern be created in such a way
-# that it's always centered in the supplied boundingregion?
-
- 
 class PatternGenerator(TopoObject):
     # CEBHACKALERT: update this documentation when finished reorganizing parametersframe.py
     """
