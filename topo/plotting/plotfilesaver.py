@@ -20,6 +20,9 @@ import topo
 import topo.base.topoobject
 import topo.base.simulator
 from topo.base.utils import *
+
+from topo.commands.analysis import *
+
 from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import plotgroup_dict, TemplatePlotGroup, UnitWeightsPlotGroup,ProjectionPlotGroup 
 
@@ -39,20 +42,46 @@ class PlotFileSaver(topo.base.topoobject.TopoObject):
 
     def save_to_disk(self):
         if self.bitmaps:
-            for i in range(len(self.bitmaps)):
-                d = self.name
-                filename = '%s.%06d.p%03d.%s_%s_%d.png' % \
-                           (d['base'], int(d['iteration']), \
-                           int(d['presentation']), d['region'], d['type'],i)
-                           
+	    d = self.name
+	  
+            for bitmap in self.bitmaps:               
                 #self.message('Saving', filename)
-                self.bitmaps[i].image.save(filename)
-                self.files.append(filename)
+		d['title']=bitmap.view_info['src_name']
+		filename = '%s.%06d.p%03d.%s_%s_%s.png' % \
+                           (d['base'], int(d['iteration']), \
+                           int(d['presentation']), d['region'], d['type'],d['title'])
+		f = open(filename,'w')                           
+                bitmap.image.save(f,"png")
+	    f.close()
+	    self.files.append(filename)
+
+
+
+
+class TemplateFile(PlotFileSaver):
+    def __init__(self,pgt_name,**config):
+
+        super(TemplateFile,self).__init__(**config)
+        self.pgt = plotgroup_templates.get(pgt_name,None)
+        self.name['region'] = 'All_region'
+        self.name['type'] = self.pgt.name
+        self.create_bitmaps()
+        self.save_to_disk()
+
+    def create_bitmaps(self):
+		
+	pg = plotgroup_dict.get(self.pgt.name,None)
+	exec(self.pgt.command)
+	if pg == None:
+	    pg = TemplatePlotGroup(self.pgt.name,[],self.pgt.normalize,
+				self.sim,self.pgt,None)
+        self.bitmaps = pg.load_images()
+        
 
 
 
 class ActivityFile(PlotFileSaver):
-    def __init__(self,region,**config):
+    def __init__(self,region=None,**config):
         super(ActivityFile,self).__init__(**config)
         self.region = region
         self.name['region'] = region
@@ -62,15 +91,16 @@ class ActivityFile(PlotFileSaver):
 
     def create_bitmaps(self):
 	
+	pgt = plotgroup_templates['Activity']
 	pg = plotgroup_dict.get('Activity',None)
 	
 	if pg == None:
 	    pgt = plotgroup_templates['Activity']
 	    pg = TemplatePlotGroup('Activity',[],pgt.normalize,
 				self.sim,pgt,None)
-				
-
+	    
         self.bitmaps = pg.load_images()
+	
         
 
 
