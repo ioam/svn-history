@@ -32,12 +32,12 @@ from topo.learningfns.basic import HebbianSOMLF
 from topo.outputfns.basic import DivisiveSumNormalize
 from topo.patterns import PatternGeneratorParameter
 
-### JCALERT! For the moment, I use a super-class of CFSOM in order to override the 
-### decay (and alpha) function. It would be good to make them Parameter in CFSOM,
-### so that we can delete that here and in obermayer, and still override the decay and 
-### alpha function.
+### JCALERT! For the moment, I use a super-class of CFSOM in order to
+### override the decay (and alpha) function. It would be good to make
+### them Parameters in CFSOM, so that we can delete that here and in
+### obermayer, yet still override the decay and alpha function.
 class RetinotopicSOM(CFSOM):
-    """A variant of CFSOM that uses linear decay functions for alpha and radius."""
+    """A variant of CFSOM that uses exponential decay functions for alpha and radius."""
 
     # Minimum radius to allow
     radius_min=Number(0)
@@ -73,15 +73,10 @@ topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(
 topo.patterns.basic.Gaussian.size = 2*sqrt(2.0*0.1*24.0)/24.0
 topo.patterns.basic.Gaussian.aspect_ratio = 1.0
 
-### JC: maybe adding a parameter scale to the gaussian, it would affect learning.
-#topo.patterns.basic.Gaussian.scale=1.5
-
 # cortical sheet
 RetinotopicSOM.density = 10 #40 
 RetinotopicSOM.learning_length = 40000
 
-### JCALERT! check that it is alright:
-### the radius is multiplied again by the density in the cfsom.learn().
 RetinotopicSOM.radius_0 = 13.3/40 
 
 # Here we multiply by 24*24, which is the number of unit in the receptive field.
