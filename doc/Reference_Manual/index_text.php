@@ -20,11 +20,11 @@ information, see the individual subpackages:
 The <strong>base</strong> directory contains the most fundamental
 Topographica classes, implementing basic functionality such as
 Parameters (user-controllable attributes), Sheets (arrays of units),
-Projections (large groups of connections between Sheets,
+Projections (large groups of connections between Sheets),
 ConnectionFields (spatially localized groups of connections to one
 unit), and the event-driven Simulator.  All of these files are
 independent of the rest of the files in topo/, and act as the primary
-programming interface for Topographica.
+programming interface on which Topographica is built.
 
 
 <H2>Library</H2>
@@ -88,9 +88,11 @@ options are similar to Matlab and other high-level array languages.
 </DD>
 
 <P><DT><A href="http://matplotlib.sourceforge.net/">MatPlotLib</A></DT>
-<DD>Although not yet used by Topographica itself, MatPlotLib is included
-in the distributions and can be used for making Matlab-style 1D (line)
-and 2D (plane) plots, including contours and vector fields.</DD>
+<DD>Matplotlib is used for generating 1D (line)
+and 2D (plane) plots, such as topographic grid plots.  It provides
+a very general Matlab-like interface to creating plots of any quantities
+one might wish to visualize, including any array or vector in the program.
+</DD>
 
 <P><DT><A href="http://www.pythonware.com/products/pil/">PIL</A></DT>
 <DD>Topographica uses the Python Imaging Library for reading and
