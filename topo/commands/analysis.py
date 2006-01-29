@@ -5,14 +5,15 @@ $Id$
 """
 
 
-from Numeric import array
+from Numeric import array, zeros, Float
 from math import pi
 
 import topo.base.simulator
 
 from topo.analysis.featuremap import MeasureFeatureMap
-from topo.base.arrayutils import octave_output
-from topo.base.sheet import Sheet
+from topo.base.arrayutils import octave_output, centroid
+from topo.base.connectionfield import CFSheet
+from topo.base.sheet import Sheet, matrix2sheet
 from topo.base.sheetview import SheetView
 import topo.base.patterngenerator
 from topo.commands.basic import pattern_present
@@ -80,21 +81,56 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
 
 
-def measure_position_pref(divisions=6,size=0.1,scale=0.3,offset=0.0,display=False,
-                user_function=PatternPresenter(Gaussian(aspect_ratio=1.0),False,1.0)):
+def measure_position_pref(divisions=6,size=0.2,scale=0.3,offset=0.0,display=False,
+                          user_function=PatternPresenter(Gaussian(aspect_ratio=1.0),False,1.0),
+                          x_range=(-0.5,0.5),y_range=(-0.5,0.5)):
     """Measure position preference map, using Gaussian patterns by default."""
 
     if divisions <= 0:
         raise ValueError("divisions must be greater than 0")
 
     else:
-        step=1.0/divisions
-        feature_values = {"x": ( (-0.5,0.5), step, False),
-                          "y": ( (-0.5,0.5), step, False)}
+        # JABALERT: Will probably need some work to support multiple input regions
+        feature_values = {"x": ( x_range, (1.0*x_range[1]-x_range[0])/divisions, False),
+                          "y": ( y_range, (1.0*y_range[1]-y_range[0])/divisions, False)}
         x=MeasureFeatureMap(feature_values)
         param_dict = {"size":size,"scale":scale,"offset":offset}
         x.measure_maps(user_function, param_dict, display)
 
+
+
+def measure_cog():
+    """Calculate center of gravity for each CF of each unit in each CFSheet."""
+
+    sim = topo.base.simulator.get_active_sim()
+    for sheet in sim.objects(CFSheet).values():
+        for projlist in sheet.in_projections.values():
+            for proj in projlist:
+                rows,cols=sheet.activity.shape
+                xpref=zeros((rows,cols),Float)
+                ypref=zeros((rows,cols),Float)
+                for r in xrange(rows):
+                    for c in xrange(cols):
+                        cf=proj.cfs[r][c]
+                        r1,r2,c1,c2 = cf.slice_tuple()
+                        row_centroid,col_centroid = centroid(cf.weights)
+                        xcentroid ,ycentroid = matrix2sheet(r1+row_centroid+0.5,
+                                                            c1+col_centroid+0.5,
+                                                            proj.src.bounds,
+                                                            proj.src.xdensity,
+                                                            proj.src.ydensity)
+                        xpref[r][c]= xcentroid
+                        ypref[r][c]= ycentroid
+
+                ### JCALERT: This will need to be extended to work when there are multiple
+                ### projections to this sheet; right now only the last one in the list
+                ### will show up.
+                new_view = SheetView((xpref,sheet.bounds), src_name=sheet.name,view_type='CoG')
+                sheet.sheet_view_dict['XCoG']=new_view
+                new_view = SheetView((ypref,sheet.bounds), src_name=sheet.name,view_type='CoG')
+                sheet.sheet_view_dict['YCoG']=new_view
+    
+                
 
 def update_activity():
     """Measure an activity map. Command called when opening an activity plot group panel.
