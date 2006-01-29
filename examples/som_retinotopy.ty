@@ -1,12 +1,12 @@
 """
 Basic example of a fully connected SOM retinotopic map with ConnectionFields.
 
-Contains a Retina (2D Gaussian generator) and a V1 (CFSOM) sheet.
-Each V1 neuron receives input from the full square area on the
-Retina, called its ConnectionField.
+Contains a Retina (2D Gaussian generator) fully connected to a V1
+(CFSOM) sheet, with no initial ordering for topography.
 
-Intended to match the retinotopic simulation from the book page 53-59,
-but not yet verified.
+Constructed to match the retinotopic simulation from page 53-59 of
+Miikkulainen, Bednar, Choe, and Sirosh (2005), Computational Maps in
+the Visual Cortex, Springer.
 
 $Id$
 """
