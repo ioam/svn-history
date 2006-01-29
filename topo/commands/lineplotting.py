@@ -32,34 +32,36 @@ from topo.base.sheet import Sheet
 from topo.base.utils import frange
 
 
-def topographic_grid():
+def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreference'):
     """
-    Plot the XPosition and YPosition preferences for all Sheets
-    for which they are defined, using MatPlotLib.
+    By default, plot the XPreference and YPreference preferences for all
+    Sheets for which they are defined, using MatPlotLib.
+
+    If sheet_views other than XPreference and YPreference are desired,
+    the names of these can be passed in as arguments.
     """
     sim = topo.base.simulator.get_active_sim()
     for sheet in sim.objects(Sheet).values():
-        if (('XPreference' in sheet.sheet_view_dict) and
-            ('YPreference' in sheet.sheet_view_dict)):
+        if ((xsheet_view_name in sheet.sheet_view_dict) and
+            (ysheet_view_name in sheet.sheet_view_dict)):
 
-            x = sheet.sheet_view_dict['XPreference'].view()[0]
-            y = sheet.sheet_view_dict['YPreference'].view()[0]
+            x = sheet.sheet_view_dict[xsheet_view_name].view()[0]
+            y = sheet.sheet_view_dict[ysheet_view_name].view()[0]
 
             pylab.figure(figsize=(6,6))
 
             # This one-liner works in Octave, but in matplotlib it
             # results in lines that are all connected across rows and columns,
-            # so here we plot each line separately.
-            # The "k-" means plot in black using solid lines; see matplotlib for
-            # more info.
-            #pylab.plot(x,y,"k-",transpose(x),transpose(y),"k-")
+            # so here we plot each line separately:
+            #   pylab.plot(x,y,"k-",transpose(x),transpose(y),"k-")
+            # Here, the "k-" means plot in black using solid lines;
+            # see matplotlib for more info.
             isint=pylab.isinteractive() # Temporarily make non-interactive for plotting
             pylab.ioff()
             for r,c in zip(y,x):
                 pylab.plot(c,r,"k-")
             for r,c in zip(transpose(y),transpose(x)):
                 pylab.plot(c,r,"k-")
-            if isint: pylab.ion()
             
             pylab.xlabel('x')
             pylab.ylabel('y')
@@ -73,6 +75,8 @@ def topographic_grid():
             # when there is no GUI
             #pylab.savefig('simple_plot')
 
+            if isint: pylab.ion()
+            
             # Allow multiple concurrent plots; there may be a
             # cleaner way to do this...
             pylab.show._needmain = False 
