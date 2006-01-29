@@ -98,6 +98,18 @@ class ConnectionField(TopoObject):
         # CEBHACKALERT: the user might specify a size based on the weights_bounds
         # they also specified. Do we want to adjust that size if the weights_bounds
         # have been adjusted too?
+
+        # CEBHACKALERT: mask will be generated once and passed in.
+        # Then it will get the corrrect bounds (using weights_bounds_template
+        # leaves the situation the same as before)
+        # CEBHACKALERT: allow user to override this.
+
+        # calculate the size & aspect_ratio of the mask if appropriate
+        if hasattr(weights_shape,'size'):
+            l,b,r,t = weights_bounds_template.aarect().lbrt()
+            weights_shape.size = t-b
+            weights_shape.aspect_ratio = (r-l)/size
+        
         m = weights_shape(x=self.x,y=self.y,bounds=self.bounds,
                           density=density,theta=0)
         m = Numeric.where(m>=0.5,m,0.0)
