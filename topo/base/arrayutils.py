@@ -123,3 +123,25 @@ def octave_output(filename,mat,name="mat",owner=""):
    f.close()
 
 
+def centroid(array_2D):
+    """Return the centroid (center of gravity) for a 2D array."""
+
+    rows,cols = array_2D.shape
+    rsum=0
+    csum=0
+    rmass_sum=0
+    cmass_sum=0
+    for r in xrange(rows):
+        row_sum = sum(array_2D[r,:])
+        rsum += r*row_sum
+        rmass_sum += row_sum
+    
+    for c in xrange(cols):
+        col_sum = sum(array_2D[:,c])
+        csum += c*col_sum
+        cmass_sum += col_sum
+        
+    row_centroid= rsum/rmass_sum
+    col_centroid= csum/cmass_sum
+
+    return row_centroid, col_centroid
