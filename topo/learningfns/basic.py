@@ -50,7 +50,7 @@ class HebbianSOMLF(SOMLF):
     """
 
     learning_radius = Number(default=0.0,doc="Radius for the neighborhood function.")
-    crop_radius_multiplier = Number(default=1.0,doc="Factor by which the radius should be multiplied when deciding how far from the winner to keep updating the weights.")
+    crop_radius_multiplier = Number(default=3.0,doc="Factor by which the radius should be multiplied when deciding how far from the winner to keep updating the weights.")
     # JABALERT: Should be a PatternGeneratorParameter eventually
     neighborhood_kernel_generator = Parameter(default=topo.patterns.basic.Gaussian(),
                                               doc="Neighborhood function")
@@ -103,6 +103,10 @@ class HebbianSOMLF(SOMLF):
         radius_int = int(ceil(crop_radius))
         rbound = radius_int + 0.5
         bb = BoundingBox(points=((-rbound,-rbound), (rbound,rbound)))
+
+        # Print parameters designed to match fm2d's output
+        #print "rad= %d std= %f alpha= %f" % (radius_int, radius, single_connection_learning_rate)
+
         # CEBHACKALERT: specifying aspect_ratio and size here won't work
         # for all patterns.
         # CEBHACKALERT: warnings should be printed if a non-parameter attribute
