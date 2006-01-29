@@ -377,6 +377,7 @@ class Sheet(EventProcessor):
         self.activity = zeros((rows,cols)) + 0.0
         self.__saved_activity = []          # For non-learning inputs
         self.debug('activity.shape =',self.activity.shape)
+        ### JABALERT: Should perhaps rename this to view_dict
         self.sheet_view_dict = {}
 
 
