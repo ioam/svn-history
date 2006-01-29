@@ -56,11 +56,9 @@ class CFEuclideanDistance_Py(CFResponseFunction):
                 X = input_activity[r1:r2,c1:c2]
 		diff = ravel(X) - ravel(cf.weights)
 		euclidean_dist_mat[r,c] = L2norm(diff)
-	### JCALERT! temporary loop. will be changed to:
-        # activity = max(euclidean_dist_mat.flat) - euclidean_dist_mat
-        ### when understood why it does not work like that...
-	for r in xrange(rows):
-            for c in xrange(cols):
-		activity[r,c] = max(euclidean_dist_mat.flat) - euclidean_dist_mat[r,c]
 
+        max_dist = max(euclidean_dist_mat.flat)
+        activity *= 0.0
+        activity += (max_dist - euclidean_dist_mat)
         activity *= strength
+        #print max_dist,min(activity.flat)
