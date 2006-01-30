@@ -12,9 +12,7 @@ $Id$
 __version__='$Revision$'
 
 
-# CEBHACKALERT: currently does not match C++ LISSOM.
-# weights_shape size is wrong
-
+# CEBHACKALERT: not yet tested to see if it matches C++ LISSOM.
 
 import random
 import fixedpoint

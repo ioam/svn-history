@@ -436,7 +436,6 @@ class CFProjection(Projection):
             l,b,r,t = self.weights_bounds.aarect().lbrt()
             self.weights_shape.size = t-b
             self.weights_shape.aspect_ratio = (r-l)/self.weights_shape.size
-        # CEBHACKALERT: ** the mask size doesn't appear to be correct **
 
         # CEBHACKALERT: mask centered to matrixidx center
         center_r,center_c = self.src.sheet2matrixidx(0,0)
