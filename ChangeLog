@@ -1,4 +1,335 @@
+2006-01-30  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/bitmap.py 1.21, topo/analysis/featuremap.py 1.35:
+	Modified featuremap so that in the case of a cyclic value the
+	preference matrix is normalized, but not in the case of a
+	non-cyclic value. It solves the problem of the position preference
+	plot shrinking when increasing the range of values. Though it
+	might be an alright reasoning, an hack alert has been added in
+	FeatureMap and in bitmap.py, because it made me realised that if
+	this normalization is not performed for a sheetview that will be
+	used as the hue key in an HSV plot, an error will occur in
+	bitmap. Therefore, we should think about this case, and decide
+	what to do to avoid unexpected errors in the future.
+
+	* topo/commands/analysis.py 1.9: Corrected a mistyped parenthesis.
+
+2006-01-30  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.98: Mask is resized by
+	change_bounds() in a way that is consistent with how it's
+	generated in the first place. Not sure if it's the right way
+	though - these changes have not yet been verified (but the
+	resizing is better than before, in any case).
+
+	* topo/base/connectionfield.py 1.97: ConnectionField.__init__()'s
+	mask creation code is moved to a subroutine.
+
+	* topo/base/connectionfield.py 1.96: Moved CFProjection's mask
+	creation code to a subroutine.
+
+	* topo/base/connectionfield.py 1.95: weight_type no longer an
+	attribute of CFProjection (and no longer passed to
+	ConnectionField). Instead, it's a global variable.
+
+	* topo/base/connectionfield.py 1.94: Corrected variable name error
+	in previous commit. Updated a HACKALERT.
+
+	* topo/tests/lissom_or_reference.ty 1.11: Changed to circular
+	ConnectionFields.
+
+	* topo/base/connectionfield.py 1.93: Mask pattern is generated in
+	CFProjection and passed to each ConnectionField. A ConnectionField
+	takes the correct submatrix of this mask (which is all of the
+	mask, unless it is near an edge. The way this is done needs to be
+	simplified, but is currently working. The size calculated for a
+	mask that is e.g. a Disk does not appear to be correct.
+
+2006-01-30  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/random.py 1.18: Made RandomGenerator base class to
+	make it simpler to add other Random classes.  Added GaussianRandom
+
+2006-01-29  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/som_retinotopy.ty 1.11: Cleaned up comments
+
+	* examples/som_retinotopy.ty 1.10: Changed density to match
+	lissombook
+
+	* topo/learningfns/basic.py 1.37: Changed crop_radius_multiplier
+	to match fm2d; will make simulations much slower but much more
+	likely to work.  Also added commented-out print function printing
+	parameters in the format of fm2d
+
+	* topo/learningfns/basic.py 1.36: Added radius_crop_multiplier.
+	Shouldn't have changed the behavior at all yet.
+
+2006-01-29  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.92: Corrected mistake in previous
+	version.
+
+	* examples/hierarchical.ty 1.24, topo/base/connectionfield.py
+	1.91: Masks are setup with the size of the
+	weights_bounds_template. This is an intermediate checkin for how
+	it will work, but the specification of the weights_shape at the
+	user level code won't change. hierarchical contains a
+	commented-out example.
+
+2006-01-29  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/som_retinotopy.ty 1.9: Cleaned up comments and
+	documentation
+
+	* topo/learningfns/basic.py 1.35: Fixed to match recent change in
+	definition of Gaussian PatternGenerator size
+
+	* topo/plotting/templates.py 1.24: Added CoG plot
+
+	* topo/commands/lineplotting.py 1.5: Added user-controllable
+	sheet_view names for x and y preferences in topographic_grid.
+	Suppressed annoying plotting display glitch.
+
+	* topo/commands/analysis.py 1.8: Added measure_cog function.
+	Added user-controllable x_range and y_range parameters to
+	measure_position_pref.
+
+	* topo/base/arrayutils.py 1.3: Added centroid function written by
+	Julien
+
+	* topo/responsefns/basic.py 1.22: Improved CFEuclideanDistance_Py
+
+	* topo/base/sheet.py 1.51: Added alert
+
+2006-01-29  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.90: initialize_slice_array()
+	changed to initialize_bounds(). initialize_bounds() takes the
+	centered bounds, converts them to a slice at the origin of the
+	sheet, then translates that slice to the cf's location, and
+	finally stores the corresponding bounding box (and slice_array
+	for access by C). Removed set_slice_array().
+
+	* topo/base/patterngenerator.py 1.59: Removed a CEBHACKALERT,
+	which was out of date.
+
+2006-01-29  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/basic.py 1.52: Changed name of height and width
+	for gaussian and gabor to xsigma and ysigma, to avoid confusion
+	(since they are radii and not actual widths and heights)
+
+	* doc/Reference_Manual/index_text.php 1.3: Minor updates
+
+	* topo/misc/patternfns.py 1.2: Changed name of height and width
+	for gaussian and gabor to xsigma and ysigma, to avoid confusion
+	(since they are radii and not actual widths and heights)
+
+2006-01-29  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotfilesaver.py 1.21: Added a class TemplateFile
+	to plotfilesaver. It is just a first try for implementing
+	plotfilesaver. Just committed for my convenience (i.e. beeing able
+	to work on it at the office.)
+
+2006-01-28  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/win32_text.php 1.11: Corrected scipy install
+	command.
+
+2006-01-28  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotfilesaver.py 1.20, topo/plotting/plotgroup.py
+	1.76, topo/tests/testplotgroup.py 1.13,
+	topo/tkgui/basicplotgrouppanel.py 1.20: Renamed BasicPlotGroup to
+	TemplatePlotGroup.
+
+	* topo/patterns/basic.py 1.51: Changed the default size value for
+	the Gaussian to be 0.5 (to match recent changes in Gaussian size
+	definition).
+
+	* topo/tkgui/basicplotgrouppanel.py 1.19,
+	topo/tkgui/plotgrouppanel.py 1.30, topo/tkgui/testpattern.py 1.17,
+	topo/plotting/plotfilesaver.py 1.19, topo/plotting/plotgroup.py
+	1.75, topo/tkgui/projectionpanel.py 1.35,
+	topo/tkgui/unitweightspanel.py 1.27: Changed the hierarchy of the
+	PlotGroup classes: now PlotGroup is a simpler class that works by
+	passing it a plot_list of plots, while BasicPlotGroup (soon to be
+	renamed TemplatePlotGroup) implements the generation of the
+	plot_list according to a template specification; others PlotGroup
+	classes now inherit from BasicPlotGroup.
+
+	* examples/cfsom_or.ty 1.24, examples/som_retinotopy.ty 1.8,
+	topo/tests/lissom_or_reference.ty 1.10, topo/tests/testlissom.ty
+	1.10, topo/tests/testlissom_cpointer.ty 1.2, examples/lissom_or.ty
+	1.59, examples/obermayer_pnas90.ty 1.19, topo/patterns/basic.py
+	1.50: Modified the size parameter for a Gaussian so that it
+	corresponds to the real size (and it is consistent with the
+	definition of the size for,e.g. a disk or rectangle). The width of
+	the Gaussian (sigma) corresponds to half the size.
+
+	* topo/base/sheet.py 1.50: Updated doc for slice2bounds().
+
+	* examples/som_retinotopy.ty 1.7: Added some commentary; working
+	version for switching from CFDotProduct to CFEuclideanDistance_Py
+	response function. Left with a density of 10, used during testing.
+
+	* topo/responsefns/basic.py 1.21: First version of an
+	euclidean-distance response function. This is supposed to be used
+	by the som_retinotopy example, but did not allow to achieve the
+	expected result yet.
+
+2006-01-28  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.89: Removed line left in by
+	mistake in the previous commit.
+
+2006-01-28  jdepaula  <jdepaula@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/index_text.php 1.13: Changed line about Windows
+	install to use CVS
+
+	* doc/Downloads/win32_text.php 1.10: added that scipy_core is
+	already in external
+
+2006-01-28  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plot.py 1.71: Restored situate, but haven't
+	checked it's correct.
+
+	* topo/base/sheet.py 1.49: Added initial version of Slice object;
+	currently unused and untested.
+
+	* topo/patterns/basic.py 1.49: Simplified a little - nobody would
+	be passing in pattern_x and pattern_y as parameters.
+
+	* topo/base/parameter.py 1.43, topo/base/topoobject.py 1.18: A
+	TopoObject is 'uninitialized' until its __init__() method
+	completes. A Constant Parameter can be set on an uninitialized
+	TopoObject.
+
+2006-01-27  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plot.py 1.70: slice2matrixshape() removed and
+	replaced with current functions from sheet (bounds2slice() with
+	crop_slice_to_sheet_bounds),
+
+	* topo/base/sheet.py 1.48, topo/patterns/image.py 1.26,
+	topo/patterns/random.py 1.17, topo/tests/testsheet.py 1.21,
+	topo/base/connectionfield.py 1.88, topo/base/patterngenerator.py
+	1.58: PatternGenerator no longer takes slice_array from
+	ConnectionField. Now, it is passed the ConnectionField's bounds
+	and x and y location. PatternGenerator still evaluates the pattern
+	in the center rather than at the ConnectionField's
+	location. bounds2slice()-type functions are tidied up a bit in
+	sheet. lissom_or_reference behavior is unchanged.
+
+	* topo/tests/lissom_or_reference.ty 1.9: Updated to current
+	Topographica code (had been setup for 2005/12/21 code). Actual
+	tests commented out.
+
+	* topo/plotting/plot.py 1.69: Accidentally checked in a
+	half-finished version previously.
+
+	* topo/plotting/plot.py 1.68: Changed to work with different
+	functions in sheet.py. The changes will probably need updating
+	after work on sheet.py is finished.
+
+	* topo/base/connectionfield.py 1.87, topo/base/sheet.py 1.47: No
+	visible changes. Removed bounds2shape(). Temporary modification to
+	bounds2slice() allowing it to skip cropping the slice to the
+	sheet. Temporarily added slice2matrixshape(). ConnectionField
+	temporarily modified so its behavior is unchanged.
+
+	* topo/patterns/image.py 1.25: Removed use of bounds2shape()
+	function. Image is now broken, but does not cause errors. To be
+	fixed after modification of sheet.py is finished.
+
+	* topo/tests/testsheet.py 1.20: Commented-out bounds2shape()
+	tests. They will be replaced with an equivalent test.
+
+	* topo/tests/testlissom.ty 1.9: CFDotProduct moved to
+	topo/responsefns/optimized.py
+
+2006-01-27  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/win32_text.php 1.9: Added Id tag
+
+	* doc/Downloads/win32_text.php 1.8: Minor updates
+
+2006-01-26  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorwindow.py 1.13: Removed an import that was
+	preventing the tests from running.
+
+	* topo/base/sheet.py 1.46: Temporary hack (I'm sorry) in
+	bounds2shape() to get round a problem (which only occurs for some
+	bounds and densities) in bounds2slice() - I think it's a floating
+	point issue.
+
+2006-01-26  jdepaula  <jdepaula@lodestar.inf.ed.ac.uk>
+
+	* doc/Downloads/win32_text.php 1.7: Extensive revision to
+	directions, turned into steps, and Weave is now more of a natural
+	part of the installation process.
+
+2006-01-26  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testsheet.py 1.19: Added a test that involves the
+	kind of situation that exists in creating a connection field. The
+	test fails because bounds2shape() returns the wrong shape. Is the
+	problem a floating point issue?
+
+2006-01-26  alan_lindsay  <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorobjects.py 1.15, topo/tkgui/editorwindow.py
+	1.12: Activity of a sheet can be displayed in the Editor,
+	upsidedown..
+
+2006-01-26  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/lineplotting.py 1.4: Added ALERT
+
+	* examples/lissom_or_20000.typ 1.10: This version was
+	self-organized again, instead of just editing the file to change
+	the path (though that seemed to work fine)
+
+	* examples/lissom_or_20000.typ 1.9: Moved inlinec-dependent
+	functions from responsefns/basic.py to responsefns/optimized.py
+
+2006-01-26  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plot.py 1.67: Added doc for _normalize() and
+	_situate_plot().
+
+	* topo/plotting/plot.py 1.66: Corrected normalize again: in case
+	of a negative or zero constant, a zero matrix is returned; in case
+	of a positive value, a one matrix is returned.
+
+2006-01-26  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.7: Fixed docstring
+
+2006-01-26  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plot.py 1.65: Corrected _normalize() so that it
+	returns a one matrix in case of a constant.
+
+2006-01-26  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/cfsom_or.ty 1.23, examples/hierarchical.ty 1.23,
+	examples/lissom_or.ty 1.58, examples/obermayer_pnas90.ty 1.18,
+	examples/som_retinotopy.ty 1.6, topo/projections/optimized.py
+	1.13, topo/tests/testplotgroup.py 1.12, topo/responsefns/basic.py
+	1.20, topo/responsefns/optimized.py 1.1: Moved inlinec-dependent
+	functions from basic.py to optimized.py
+
+	* topo/learningfns/optimized.py 1.21: Minor documentation cleanup
+
 2006-01-25  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* ChangeLog 1.2: Updated with recent changes
 
 	* topo/commands/lineplotting.py 1.3: Enforced minimum size of
 	topographic map plots
