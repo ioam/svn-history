@@ -97,16 +97,33 @@ class ConnectionField(TopoObject):
         # promote to double.
         self.weights.savespace(1)
 
-
         # Now we have to get the right submatrix of the mask (in case it is near an edge)
+        m = self.slice_mask(mask_template,weights_bounds_template)
+        
+        self.mask = m.astype(weight_type)
+        self.mask.savespace(1)
 
-        ### CEBHACKALERT: there is presumably a better way than this.
+        # CEBHACKALERT: this works for now, while the output_fns are all multiplicative.
+        self.weights *= self.mask   
+        output_fn(self.weights)
+        
+        # CEBHACKALERT: incorporate such a test into testconnectionfield.
+#        assert self.weights.shape==(self.slice_array[1]-self.slice_array[0],self.slice_array[3]-self.slice_array[2]),str(self.weights.shape)+" "+str((self.slice_array[1]-self.slice_array[0],self.slice_array[3]-self.slice_array[2])) 
+
+
+    ### CEBHACKALERT: there is presumably a better way than this.
+    def slice_mask(self,mask_template,weights_bounds_template):
+        """
+        Return the correct submatrix of mask_template for this
+        ConnectionField's location on the sheet.
+        """
         # get size of sheet (=self.input_sheet.activity.shape)
         sr1,sr2,sc1,sc2 = bounds2slice(self.input_sheet.bounds,self.input_sheet.bounds,self.input_sheet.xdensity,self.input_sheet.ydensity)
         sheet_rows = sr2-sr1; sheet_cols = sc2-sc1
 
         # get size of weights matrix
-        r1,r2,c1,c2 = bounds2slice(weights_bounds_template,self.input_sheet.bounds,density[0],density[1])
+        r1,r2,c1,c2 = bounds2slice(weights_bounds_template,self.input_sheet.bounds,
+                                   self.input_sheet.xdensity,self.input_sheet.ydensity)
         n_rows=r2-r1; n_cols=c2-c1
 
         # get submatrix
@@ -116,21 +133,7 @@ class ConnectionField(TopoObject):
         r1 = -min(0, center_row-n_rows/2)  # for top and bottom
         c2 = -max(-n_cols, center_col-sheet_cols-n_cols/2)
         r2 = -max(-n_rows, center_row-sheet_rows-n_rows/2)
-        m = mask_template[r1:r2,c1:c2]
-        ### end CEBHACKALERT
-        
-        self.mask = m.astype(weight_type)
-        self.mask.savespace(1)
-
-        # CEBHACKALERT: this works for now, while the output_fns are all multiplicative.
-        self.weights *= self.mask   
-        output_fn(self.weights)
-
-        
-        # CEBHACKALERT: incorporate such a test into testconnectionfield.
-#        assert self.weights.shape==(self.slice_array[1]-self.slice_array[0],self.slice_array[3]-self.slice_array[2]),str(self.weights.shape)+" "+str((self.slice_array[1]-self.slice_array[0],self.slice_array[3]-self.slice_array[2])) 
-
-        
+        return mask_template[r1:r2,c1:c2]
         
 
     def offset_bounds(self,bounds):
