@@ -34,7 +34,9 @@ from patterngenerator import PatternGeneratorParameter
 import patterngenerator
 from boundingregion import BoundingBox
 
-# CEBHACKALERT: make weight_type a global variable
+# Specified explicitly when creating weights matrix - required
+# for optimized C functions.
+weight_type = Numeric.Float32
 
 
 def hebbian(input_activity, unit_activity, weights, single_connection_learning_rate):
@@ -65,7 +67,7 @@ class ConnectionField(TopoObject):
     slice_array = []
     
     def __init__(self,x,y,input_sheet,weights_bounds_template,
-                 weights_generator,mask_template,weight_type=Numeric.Float32,
+                 weights_generator,mask_template,
                  output_fn=Identity(),**params):
         """
 
@@ -93,11 +95,6 @@ class ConnectionField(TopoObject):
         # Maintain the original type throughout operations, i.e. do not
         # promote to double.
         self.weights.savespace(1)
-
-        # CEBHACKALERT:
-        # We must save this because change_bounds uses Numeric.where() on the mask,
-        # which changes the typecode!
-        self.weight_type = weight_type
 
 
         # Now we have to get the right submatrix of the mask (in case it is near an edge)
@@ -166,7 +163,7 @@ class ConnectionField(TopoObject):
         # default to Numeric.Int.  Numeric.Int works on 32-bit platforms,
         # but does not work properly with the optimized C activation and
         # learning functions on 64-bit machines.
-        self.slice_array = Numeric.array((r1,r2,c1,c2),typecode=Numeric.Int32) # CEBHACKALERT: is a variable somewhere! But about to be replaced by a global variable anyway
+        self.slice_array = Numeric.array((r1,r2,c1,c2),typecode=Numeric.Int32) 
 
 
     def get_input_matrix(self, activity):
@@ -199,7 +196,7 @@ class ConnectionField(TopoObject):
             # CEBHACKALERT: this is not how to resize the mask!
             self.mask = Numeric.array(self.mask[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
             # CEBHACKALERT: see alert in __init__
-            self.mask = Numeric.where(self.mask>=0.5,self.mask,0.0).astype(self.weight_type)
+            self.mask = Numeric.where(self.mask>=0.5,self.mask,0.0).astype(weight_type)
             self.mask.savespace(1)
 
             # CEBHACKALERT: see __init__
@@ -366,7 +363,6 @@ class CFProjection(Projection):
     """
     response_fn = ResponseFunctionParameter(default=GenericCFResponseFn())
     cf_type = Parameter(default=ConnectionField)
-    weight_type = Parameter(default=Numeric.Float32)
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
     weights_generator = PatternGeneratorParameter(default=patterngenerator.Constant())
     weights_shape = PatternGeneratorParameter(default=patterngenerator.Constant())
@@ -431,7 +427,6 @@ class CFProjection(Projection):
                                         copy.copy(self.weights_bounds),
                                         self.weights_generator,
                                         copy.copy(mask_template),
-                                        self.weight_type,
                                         self.learning_fn.output_fn))
             cflist.append(row)
 
