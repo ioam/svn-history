@@ -91,8 +91,8 @@ def measure_position_pref(divisions=6,size=0.2,scale=0.3,offset=0.0,display=Fals
 
     else:
         # JABALERT: Will probably need some work to support multiple input regions
-        feature_values = {"x": ( x_range, (1.0*x_range[1]-x_range[0])/divisions, False),
-                          "y": ( y_range, (1.0*y_range[1]-y_range[0])/divisions, False)}
+        feature_values = {"x": ( x_range, 1.0*(x_range[1]-x_range[0])/divisions, False),
+                          "y": ( y_range, 1.0*(y_range[1]-y_range[0])/divisions, False)}
         x=MeasureFeatureMap(feature_values)
         param_dict = {"size":size,"scale":scale,"offset":offset}
         x.measure_maps(user_function, param_dict, display)
