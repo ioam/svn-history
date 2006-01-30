@@ -175,7 +175,7 @@ class ConnectionField(TopoObject):
         return activity[r1:r2,c1:c2]
 
 
-    def change_bounds(self, weights_bounds, output_fn=Identity()):
+    def change_bounds(self, weights_bounds, mask_template, output_fn=Identity()):
         """
         Change the bounding box for this ConnectionField.
 
@@ -196,11 +196,9 @@ class ConnectionField(TopoObject):
 
         if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
-            
-            # CEBHACKALERT: this is not how to resize the mask!
-            self.mask = Numeric.array(self.mask[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
-            # CEBHACKALERT: see alert in __init__
-            self.mask = Numeric.where(self.mask>=0.5,self.mask,0.0).astype(weight_type)
+
+            m = self.slice_mask(mask_template,weights_bounds)
+            self.mask = m.astype(weight_type)
             self.mask.savespace(1)
 
             # CEBHACKALERT: see __init__
@@ -521,12 +519,15 @@ class CFProjection(Projection):
             return
 
         self.weights_bounds = weights_bounds
+
+        mask_template = self.create_mask_template()
+        
         rows,cols = self.get_shape()
         cfs = self.cfs
         output_fn = self.learning_fn.output_fn
         for r in xrange(rows):
             for c in xrange(cols):
-                cfs[r][c].change_bounds(copy.copy(weights_bounds),output_fn=output_fn)
+                cfs[r][c].change_bounds(copy.copy(weights_bounds),copy.copy(mask_template),output_fn=output_fn)
 
 
 
