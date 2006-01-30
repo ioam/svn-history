@@ -287,11 +287,11 @@ class CFLearningFunction(TopoObject):
     the arguments specified below.
     """
  
-    def single_connection_learning_rate(self,cfs,learning_rate):
+    def constant_sum_connection_rate(self,cfs,learning_rate):
 	""" 
 	return the learning rate for a single connection according to the total learning_rate,
         the number of rows and cols of the output_activity matrix and the connection fields
-	matrix cfs.
+	matrix cfs. Keep the sum of the single connection learning rate constant.
 	"""      
         ### JCALERT! To check with Jim: we take the number of unit at the center of the matrix
         ### That would be the best way to go, but it is not possible to acces the 
@@ -302,8 +302,8 @@ class CFLearningFunction(TopoObject):
 	cf = cfs[cols/2][rows/2]
         # The number of units in the mask 
 	nb_unit = len(Numeric.nonzero(Numeric.ravel(cf.mask)))
-	single_connection_learning_rate=learning_rate/(nb_unit)
-	return single_connection_learning_rate
+	constant_sum_connection_rate=learning_rate/(nb_unit)
+	return constant_sum_connection_rate
 
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         raise NotImplementedError
@@ -339,7 +339,7 @@ class GenericCFLF(CFLearningFunction):
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
         rows,cols = output_activity.shape
-	single_connection_learning_rate = self.single_connection_learning_rate(cfs,learning_rate)
+	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
         # avoid evaluating these references each time in the loop
         output_fn = self.output_fn
         single_cf_fn = self.single_cf_fn

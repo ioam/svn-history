@@ -65,15 +65,8 @@ class HebbianSOMLF(SOMLF):
         ### some other type of scaling, perhaps based on the total
         ### length and not the sum?  The math needs to be checked to
         ### see if the result is truly comparable (in terms of
-        ### activation and learning) at different densities.
-        ###
-        ### In any case, maybe we should rename
-        ### single_connection_learning_rate() to something that
-        ### indicates it scales based on keeping the sum constant,
-        ### such as constant_sum_connection_rate(), which would leave
-        ### it open for adding other types of connection_rate()
-        ### functions.
-	single_connection_learning_rate = self.single_connection_learning_rate(cfs,learning_rate)
+        ### activation and learning) at different densities.    
+	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
         radius = self.learning_radius
         crop_radius = radius*self.crop_radius_multiplier
         output_fn = self.output_fn

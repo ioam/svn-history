@@ -34,7 +34,7 @@ class Hebbian(CFLearningFunction):
 
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
-	single_connection_learning_rate = self.single_connection_learning_rate(cfs,learning_rate)
+	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
         len, len2 = input_activity.shape
 
         hebbian_code = """
@@ -134,7 +134,7 @@ class DivisiveHebbian(CFLearningFunction):
 
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
-	single_connection_learning_rate = self.single_connection_learning_rate(cfs,learning_rate)
+	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
         len, len2 = input_activity.shape
 
         hebbian_div_norm_code = """
@@ -250,7 +250,7 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
         slice_ptrs = params['slice_ptrs']
         mask_ptrs = params['mask_ptrs']
         rows,cols = output_activity.shape
-	single_connection_learning_rate = self.single_connection_learning_rate(cfs,learning_rate)
+	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
         len, len2 = input_activity.shape
 
         hebbian_div_norm_code = """
