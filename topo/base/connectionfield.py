@@ -196,7 +196,7 @@ class ConnectionField(TopoObject):
         if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
             
-            # CEBHACKALERT: I have to check this.
+            # CEBHACKALERT: this is not how to resize the mask!
             self.mask = Numeric.array(self.mask[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
             # CEBHACKALERT: see alert in __init__
             self.mask = Numeric.where(self.mask>=0.5,self.mask,0.0).astype(self.weight_type)
@@ -498,7 +498,7 @@ class CFProjection(Projection):
 
 
 
-    def change_bounds(self, weights_bound_template):
+    def change_bounds(self, weights_bounds_template):
         """
         Change the bounding box for all of the ConnectionFields in this Projection.
 
