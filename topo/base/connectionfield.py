@@ -65,7 +65,8 @@ class ConnectionField(TopoObject):
     # array for speed of access from optimized C components; use
     # self.slice_tuple() for a nicer Python access method.
     slice_array = []
-    
+
+    # CEBHACKALERT: add some default values
     def __init__(self,x,y,input_sheet,weights_bounds_template,
                  weights_generator,mask_template,
                  output_fn=Identity(),**params):
@@ -394,20 +395,9 @@ class CFProjection(Projection):
 
         # adjust the weights to fit the sheet, and to be odd.
         self.weights_bounds = self.initialize_bounds(self.weights_bounds)
+
+        mask_template = self.create_mask_template()
         
-        # CEBHACKALERT: allow user to override this.
-        # calculate the size & aspect_ratio of the mask if appropriate
-        if hasattr(self.weights_shape, 'size'):
-            l,b,r,t = self.weights_bounds.aarect().lbrt()
-            self.weights_shape.size = t-b
-            self.weights_shape.aspect_ratio = (r-l)/self.weights_shape.size
-        # CEBHACKALERT: ** the mask size doesn't appear to be correct **
-
-        density = (self.src.xdensity,self.src.ydensity)
-        mask_template = self.weights_shape(x=0.0,y=0.0,bounds=self.weights_bounds,density=density)
-        # CEBHACKALERT: threshold should be settable by user
-        mask_template = Numeric.where(mask_template>=0.5,mask_template,0.0)
-
         ### JABALERT: Should make cfs semi-private, since it has an
         ### accessor function and isn't always the same format
         ### (e.g. for SharedWeightProjection).  Could also make it
@@ -435,6 +425,25 @@ class CFProjection(Projection):
         self.input_buffer = None
         self.activity = Numeric.array(self.dest.activity)
 
+
+    def create_mask_template(self):
+        """
+        """
+        # CEBHACKALERT: allow user to override this.
+        # calculate the size & aspect_ratio of the mask if appropriate
+        if hasattr(self.weights_shape, 'size'):
+            l,b,r,t = self.weights_bounds.aarect().lbrt()
+            self.weights_shape.size = t-b
+            self.weights_shape.aspect_ratio = (r-l)/self.weights_shape.size
+        # CEBHACKALERT: ** the mask size doesn't appear to be correct **
+
+        density = (self.src.xdensity,self.src.ydensity)
+        mask_template = self.weights_shape(x=0.0,y=0.0,bounds=self.weights_bounds,density=density)
+        # CEBHACKALERT: threshold should be settable by user
+        mask_template = Numeric.where(mask_template>=0.5,mask_template,0.0)
+
+        return mask_template
+        
 
     def initialize_bounds(self,bounds):
         """
