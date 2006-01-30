@@ -173,6 +173,13 @@ class HSVBitmap(Bitmap):
         gmat = Numeric.array(sMapArray,Numeric.Float)
         bmat = Numeric.array(vMapArray,Numeric.Float)
 
+
+	### JCALERT! We sould do a cropping here, before requesting hsv_to_rgb
+        ### This function fail when the value are not in the range [0,1] for the hue
+        ### Which fails if it is not normalized....
+        ### For the moment there is an hack in featuremap, that does normalize the value to
+        ### 1 in case of a cyclic value and not for a non-cyclic.
+        ### Nevertheless, I think we should catch this case here....Or think a bit more about it...
         # Note: should someday file a feature request for PIL
         # for them to accept an image of type 'HSV', so that
         # they will do this conversion themselves, without us

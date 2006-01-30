@@ -202,16 +202,15 @@ class MeasureFeatureMap(TopoObject):
             # JC: For it to work, uncomment this and pass in display=True
             # (or change display to 1 below)
             #### Debugging     ####
-            #import topo.tkgui.topoconsole 
-            #from topo.plotting.templates import plotgroup_templates
-            #if display:
-            #    temp=plotgroup_templates['Activity']
-            #    console = topo.tkgui.topoconsole.dict_console['console']
-            #    x = topo.tkgui.topoconsole.PlotsMenuEntry(console,temp)
-            #    panel = x.command()
-            #    panel.toggle_auto_refresh()
+           #  import topo.tkgui.topoconsole 
+#             from topo.plotting.templates import plotgroup_templates
+#             if display:
+#                temp=plotgroup_templates['Activity']
+#                console = topo.tkgui.topoconsole.dict_console['console']
+#                x = topo.tkgui.topoconsole.PlotsMenuEntry(console,temp)
+#                panel = x.command()
+#                panel.toggle_auto_refresh()
             #### Debugging end ####
-
 
             
             # NOW UPDATE EACH FEATUREMAP WITH (ACTIVITY,FEATURE_VALUE)
@@ -226,7 +225,18 @@ class MeasureFeatureMap(TopoObject):
             
             for feature in self.__featuremaps[sheet].keys():
 
-                norm_factor = self.__featuremaps[sheet][feature].distribution_matrix[0,0].axis_range
+		### JCHACKALERT! This is temporary to avoid the positionpref plot to shrink
+                ### Nevertheless we should think more about this (see alert in bitmap.py)
+                ### When passing a sheet_view that is not croped to 1 in the parameter hue of hsv_to_rgb
+                ### it does not work... The normalization seems to be necessary in this case.
+                ### I guess it is always cyclic value that we will color with hue in an hsv plot
+                ### but still we should catch the error.
+                ### Also, what happens in case of negative values?
+		if self.__featuremaps[sheet][feature].distribution_matrix[0,0].cyclic == True:
+		    norm_factor = self.__featuremaps[sheet][feature].distribution_matrix[0,0].axis_range
+		else:
+		    norm_factor = 1.0
+
 		### JCALERT! There is an hack in the for the view_name (which is only the name of the sheet)
                 ### it enables the proper display in plot.py (see corresponding alert)
                 ### It might have to be changed when the name display is fixed in plot.py (ask Jim)
