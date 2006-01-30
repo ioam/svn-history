@@ -36,7 +36,7 @@ import topo.tests.lissom_log_parser
 ###########################################
 # Temporary variables designed to match the C++ version of LISSOM
 
-BaseN=48.0
+BaseN=72.0
 BaseRN=24.0
 area_scale=1.0
 num_eyes=1
