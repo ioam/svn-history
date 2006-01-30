@@ -12,6 +12,10 @@ $Id$
 __version__='$Revision$'
 
 
+# CEBHACKALERT: currently does not match C++ LISSOM.
+# weights_shape size is wrong
+
+
 import random
 import fixedpoint
 #import pdb # debugger
@@ -105,6 +109,9 @@ LISSOM.density = BaseN
 afferent_weight_bounds   = BoundingBox(points=((-rf_radius/BaseRN,-rf_radius/BaseRN),(rf_radius/BaseRN,rf_radius/BaseRN)))
 excitatory_weight_bounds = BoundingBox(points=((-exc_rad/BaseN,-exc_rad/BaseN),(exc_rad/BaseN,exc_rad/BaseN)))
 inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(inh_rad/BaseN,inh_rad/BaseN)))
+
+# Circular ConnectionFields
+CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
 
 # Specify weight initialization
 CFProjection.weights_generator = topo.patterns.basic.Constant()
