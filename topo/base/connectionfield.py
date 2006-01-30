@@ -438,8 +438,14 @@ class CFProjection(Projection):
             self.weights_shape.aspect_ratio = (r-l)/self.weights_shape.size
         # CEBHACKALERT: ** the mask size doesn't appear to be correct **
 
+        # CEBHACKALERT: mask centered to matrixidx center
+        center_r,center_c = self.src.sheet2matrixidx(0,0)
+        center_x,center_y = self.src.matrixidx2sheet(center_r,center_c)
+        
         density = (self.src.xdensity,self.src.ydensity)
-        mask_template = self.weights_shape(x=0.0,y=0.0,bounds=self.weights_bounds,density=density)
+        mask_template = self.weights_shape(x=center_x,y=center_y,
+                                           bounds=self.weights_bounds,
+                                           density=density)
         # CEBHACKALERT: threshold should be settable by user
         mask_template = Numeric.where(mask_template>=0.5,mask_template,0.0)
 
