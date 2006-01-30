@@ -103,6 +103,8 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
             generator_sheet_params = generator_sheet_name['generator_sheet'].get_paramobj_dict()
             pattern_generators = generator_sheet_params['input_generator'].range()
             break
+        pattern_generators.pop("Random Generator") # CEBHACKALERT! See that class
+        
         self.pattern_generators = KeyedList()
         self.pattern_generators.update(pattern_generators)
         self.pattern_generators.sort()  # sorted so the pgs appear alphabetically
