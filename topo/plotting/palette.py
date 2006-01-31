@@ -158,6 +158,44 @@ import plot
 BLACK_BACKGROUND = 0
 WHITE_BACKGROUND = 1
 
+
+
+########################  JC: starting new implementation #############
+from Numeric import zeros
+
+class StringBasedPalette(TopoObject):
+    
+    ### JCALERT: What is the default scale?
+    def __init__(spec="KRYW",num_colors=0,scale=1.0):
+
+        steps = len(spec)
+        ### JCALERT! I am not sure about that...
+        ### I have to check again with the C++ code
+        if num_colors>0:
+            colors = zeros(num_colors,'O')
+        else:
+            colors = array(252,'O')
+
+        if steps>1:
+            stepsize = len(colors)/(steps-1)
+        else:
+            stepsize = len(colors)
+            
+        for i,start in zip(range(steps-1),range(0,(steps-1)*stepsize,stepsize)):
+            interpolate(start,start+stepsize,color(spec[i]),color(spec[i+1]))
+
+        ### JCALERT! I do not really understand the last line
+        interpolate(start,len(colors),color(spec[steps-1]),color(spec[steps-1]))
+        
+###    start,i
+###    for (i=0,start=0; i<steps-1; i++,start+=stepsize)
+###      interpolate(start, start+stepsize,color(spec[i]), color(spec[i+1]))
+###    interpolate(start, colors.size(),color(spec[i]), color(spec[steps-1]))
+
+
+
+
+
 ### JABHACKALERT: Needs significant cleanup -- should be much more
 ### straightforward, taking some specification and immediately
 ### constructing a usable object (without e.g. requiring set() to be
