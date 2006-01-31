@@ -64,9 +64,9 @@ acs=6.5*6.5/rf_radius/rf_radius
 ecs=19.5*19.5/exc_rad/exc_rad
 ics=47.5*47.5/inh_rad/inh_rad
 
-alpha_input=0.007*acs
-alpha_exc=0.002*ecs
-alpha_inh=0.00025*ics
+alpha_input=0.007*121*acs
+alpha_exc=0.002*ecs*81
+alpha_inh=0.00025*ics*529
 
 
 ###########################################
