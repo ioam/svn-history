@@ -22,6 +22,8 @@ from topo.base.sheetview import UnitView
 from topo.outputfns.basic import Identity
 
 
+# CEBHACKALERT: not yet tested
+
 class SharedWeightCFResponseFn(TopoObject):
     """
     Response function accepting a single CF applied to all units.
@@ -43,7 +45,8 @@ class SharedWeightCFResponseFn(TopoObject):
             for c in xrange(cols):
                 r1,r2,c1,c2 = (cf_slice_and_bounds[r][c])[0]
                 X = input_activity[r1:r2,c1:c2]
-                
+
+                # CEBHACKALERT: instead, take right slice
                 assert cf.weights.shape==X.shape, "sharedcf at (" + str(cf.x) + "," + str(cf.y) + ") has an input_matrix slice that is not the same shape as the sharedcf.weights matrix weight matrix (" + repr(X.shape) + " vs. " + repr(cf.weights.shape) + ")."
                 
                 activity[r,c] = single_cf_fn(X,cf.weights)
@@ -81,17 +84,23 @@ class SharedWeightCFProjection(CFProjection):
         ### CFProjection.__init__ to allow the weight intialization
         ### to be selectively disabled, which is all we really need.
         CFProjection.__init__(self,**params)
-        
+
+        # adjust the weights to fit the sheet, and to be odd.
+        self.weights_bounds = self.initialize_bounds(self.weights_bounds)
+
+        mask_template = self.create_mask_template()
+
+
         ### JABHACKALERT: cfs is a dummy, here only so that learning will
         ### run without an exception
         self.cfs = []
-        self.sharedcf=self.cf_type(input_sheet=self.src,
-                                   weights_bound_template=self.weights_bounds,
-                                   weights_generator=self.weights_generator,
-                                   weights_shape=self.weights_shape,
-                                   weight_type=self.weight_type,
-                                   output_fn=self.learning_fn.output_fn,
-                                   x=0,y=0)
+        self.sharedcf=self.cf_type(0,0,
+                                   self.src,
+                                   self.weights_bounds,
+                                   self.weights_generator,
+                                   mask_template,
+                                   self.learning_fn.output_fn)
+
         
         # calculate the slice array and bounds for the location of each unit
         # CEBHACKALERT: uses the existing function initialize_slice_array()
@@ -104,7 +113,7 @@ class SharedWeightCFProjection(CFProjection):
             row = []
             for x in self.dest.sheet_cols():
                 cf.x,cf.y = x,y
-                cf.initialize_slice_array()
+                cf.offset_bounds(self.weights_bounds)
                 row.append((cf.slice_tuple(),cf.bounds))
             self.cf_slice_and_bounds.append(row)
 
