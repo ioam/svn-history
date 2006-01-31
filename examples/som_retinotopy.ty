@@ -44,8 +44,7 @@ class RetinotopicSOM(CFSOM):
 
     def __init__(self,**params):
         super(RetinotopicSOM,self).__init__(**params)
-        # assumes X and Y density are equal
-        self.radius_min=1.25/self.xdensity
+        self.radius_min=1.25/40
 
     def alpha(self):
        """Exponential decay."""
@@ -63,7 +62,7 @@ class RetinotopicSOM(CFSOM):
 
 # input patterns
 GeneratorSheet.period = 1.0
-GeneratorSheet.density = 24
+GeneratorSheet.density = 40
 
 random.seed(1234)
 topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
@@ -77,12 +76,8 @@ topo.patterns.basic.Gaussian.aspect_ratio = 1.0
 RetinotopicSOM.density = 40
 RetinotopicSOM.learning_length = 40000
 
-RetinotopicSOM.radius_0 = 13.3/40 
-
-# Here we multiply by 24*24, which is the number of unit in the receptive field.
-# (The book specifies learning rates per connection, while SOMLF accepts a learning
-# rate for the entire CF at once, and then divides it by the number of connections.)
-RetinotopicSOM.alpha_0 = 0.42*24*24
+RetinotopicSOM.radius_0 = 13.3/40 # *1.5 works for RetinotopicSOM.density = 10
+RetinotopicSOM.alpha_0  = 0.42
 
 RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom() 

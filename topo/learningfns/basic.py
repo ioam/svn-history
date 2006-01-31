@@ -60,15 +60,11 @@ class HebbianSOMLF(SOMLF):
 
         rows,cols = output_activity.shape
 
-        ### JABHACKALERT! Does the default type of learning rate
-        ### scaling really make sense for a SOM?  Should it instead be
-        ### some other type of scaling, perhaps based on the total
-        ### length and not the sum?  The math needs to be checked to
-        ### see if the result is truly comparable (in terms of
-        ### activation and learning) at different densities.    
-	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
+        # This learning function does not need to scale the learning
+        # rate like some do, so it does not use constant_sum_connection_rate()
+	single_connection_learning_rate = learning_rate
         radius = self.learning_radius
-        crop_radius = radius*self.crop_radius_multiplier
+        crop_radius = max(1.25,radius*self.crop_radius_multiplier)
         output_fn = self.output_fn
 
         # find out the matrix coordinates of the winner
