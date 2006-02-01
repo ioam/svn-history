@@ -282,11 +282,9 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
             view_dict = {}
             k = self.generator_sheets_patterns[each]['pattern_generator']
 	    view_dict[each] = topo.base.sheetview.SheetView((k(),k.bounds),src_name=each)
-	    ### JCALERT ! This is working for the moment but that could be made simpler
-            ### (which is also true for most of the file!!)
             channels = {'Strength':each,'Hue':None,'Confidence':None}
+	    ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
             plist.append(make_plot(channels,view_dict,name=''))
-        ### JCALERT! It is the only call to PlotGroup with template is None. Need to change.
         self.pe_group = topo.plotting.plotgroup.PlotGroup(plot_group_key='Preview',plot_list=plist,normalize=False)
 
 
