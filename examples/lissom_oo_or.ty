@@ -38,7 +38,7 @@ from topo.patterns import PatternGeneratorParameter
 input_bounds = BoundingBox(points=((-0.6792,-0.6792),
 				   ( 0.6792, 0.6792))) 
 
-GeneratorSheet.density = 48.0 
+GeneratorSheet.density = 24.0 
 GeneratorSheet.period = 1
 GeneratorSheet.bounds = input_bounds
 
@@ -53,7 +53,7 @@ topo.patterns.basic.Gaussian.aspect_ratio = 4.0
 topo.patterns.basic.Gaussian.bounds = input_bounds
 
 # LISSOM parameters
-LISSOM.density = 24.0    
+LISSOM.density = 48.0    
 
 # Connection parameters
 
@@ -80,6 +80,8 @@ V1 = LISSOM(name='V1')
 from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
 from topo.base.connectionfield import CFSheet
 from topo.projections.basic import SharedWeightCFProjection
+
+CFSheet.density = 24.0
 
 ## ON 
 #
@@ -123,11 +125,25 @@ LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoin
 LGNOff_surround.output_fn = DivisiveSumNormalize()
 
 
-s.connect(Retina,V1, delay = FixedPoint("0.05"),
+# CEBHACKALERT: setting strength=75 is temporary
+
+s.connect(LGNOn,V1,delay=FixedPoint("0.05"),
           connection_type=CFProjection,
-          connection_params = dict(strength = 1.0, name='Afferent0',
-                                   weights_bounds = afferent_weight_bounds,
-                                   learning_rate=1.274))
+          connection_params = dict(strength=75, name='R_LGNOn',
+                                   weights_bounds=afferent_weight_bounds))
+
+s.connect(LGNOff,V1,delay=FixedPoint("0.05"),
+          connection_type=CFProjection,
+          connection_params = dict(strength=75, name='R_LGNOff',
+                                   weights_bounds=afferent_weight_bounds))
+
+          
+
+## s.connect(Retina,V1, delay = FixedPoint("0.05"),
+##           connection_type=CFProjection,
+##           connection_params = dict(strength = 1.0, name='Afferent0',
+##                                    weights_bounds = afferent_weight_bounds,
+##                                    learning_rate=1.274))
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
           connection_type=CFProjection,
