@@ -16,7 +16,7 @@ from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry,Label,NS
 from plotgrouppanel import PlotGroupPanel
 from cfsheetplotpanel import CFSheetPlotPanel
 from topo.base.projection import ProjectionSheet
-from topo.plotting.plotgroup import plotgroup_dict, UnitWeightsPlotGroup
+from topo.plotting.plotgroup import plotgroup_dict, ConnectionFieldsPlotGroup
 from topo.base.sheet import Sheet
 import topoconsole
 
@@ -139,7 +139,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
 		
 	self.pe_group = plotgroup_dict.get(self.plot_group_key,None)
 	if self.pe_group == None:
-	    self.pe_group = UnitWeightsPlotGroup(self.plot_group_key,[],self.normalize,
+	    self.pe_group = ConnectionFieldsPlotGroup(self.plot_group_key,[],self.normalize,
 						 self.console.simulator,self.pgt,self.region.get())
 
         # self.situate is defined in the super class CFSheetPlotPanel

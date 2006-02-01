@@ -24,7 +24,7 @@ from topo.base.utils import *
 from topo.commands.analysis import *
 
 from topo.plotting.templates import plotgroup_templates
-from topo.plotting.plotgroup import plotgroup_dict, TemplatePlotGroup, UnitWeightsPlotGroup,ProjectionPlotGroup 
+from topo.plotting.plotgroup import plotgroup_dict, TemplatePlotGroup, ConnectionFieldsPlotGroup,ProjectionPlotGroup 
 
  
 class PlotFileSaver(topo.base.topoobject.TopoObject):
@@ -119,9 +119,9 @@ class UnitWeightsFile(PlotFileSaver):
 
 	pg = plotgroup_dict.get(self.plot_group_key,None)	
 	if pg == None:
-	    pgt = plotgroup_templates['Connection Field']
-	    pg = UnitWeightsPlotGroup(self.plot_group_key,[],pgt.normalize,
-				self.sim,pgt,self.region)
+	    pgt = plotgroup_templates['Connection Fields']
+	    pg = ConnectionFieldsPlotGroup(self.plot_group_key,[],pgt.normalize,
+					   self.sim,pgt,self.region)
 			
 	
         self.bitmaps = pg.load_images()

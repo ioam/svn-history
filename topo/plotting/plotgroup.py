@@ -172,7 +172,7 @@ class TemplatePlotGroup(PlotGroup):
 
 	
 
-class UnitWeightsPlotGroup(TemplatePlotGroup):
+class ConnectionFieldsPlotGroup(TemplatePlotGroup):
     """
     PlotGroup for Weights UnitViews.  
 
@@ -187,7 +187,7 @@ class UnitWeightsPlotGroup(TemplatePlotGroup):
         self.y = float(plot_group_key[3])
       	self.situate = False
         
-	super(UnitWeightsPlotGroup,self).__init__(plot_group_key,plot_list,normalize,
+	super(ConnectionFieldsPlotGroup,self).__init__(plot_group_key,plot_list,normalize,
 						  simulator,template,sheet_name,**params)
   
     def create_plots(self,pt_name,pt,sheet):
