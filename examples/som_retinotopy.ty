@@ -44,7 +44,7 @@ class RetinotopicSOM(CFSOM):
 
     def __init__(self,**params):
         super(RetinotopicSOM,self).__init__(**params)
-        self.radius_min=1.25/40
+        self.radius_min=0.5/40
 
     def alpha(self):
        """Exponential decay."""
