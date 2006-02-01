@@ -98,7 +98,8 @@ class ConnectionField(TopoObject):
         self.weights.savespace(1)
 
         # Now we have to get the right submatrix of the mask (in case it is near an edge)
-        m = self.slice_mask(mask_template,weights_bounds_template)
+        r1,r2,c1,c2 =  self.get_slice(weights_bounds_template)
+        m = mask_template[r1:r2,c1:c2]
         
         self.mask = m.astype(weight_type)
         self.mask.savespace(1)
@@ -112,10 +113,12 @@ class ConnectionField(TopoObject):
 
 
     ### CEBHACKALERT: there is presumably a better way than this.
-    def slice_mask(self,mask_template,weights_bounds_template):
+    def get_slice(self,weights_bounds_template):
         """
-        Return the correct submatrix of mask_template for this
-        ConnectionField's location on the sheet.
+        Return the correct slice for a weights/mask matrix at this
+        ConnectionField's location on the sheet (i.e. for getting
+        the correct submatrix of the weights or mask in case the
+        unit is near the edge of the sheet).
         """
         # get size of sheet (=self.input_sheet.activity.shape)
         sr1,sr2,sc1,sc2 = bounds2slice(self.input_sheet.bounds,self.input_sheet.bounds,self.input_sheet.xdensity,self.input_sheet.ydensity)
@@ -126,14 +129,14 @@ class ConnectionField(TopoObject):
                                    self.input_sheet.xdensity,self.input_sheet.ydensity)
         n_rows=r2-r1; n_cols=c2-c1
 
-        # get submatrix
+        # get slice for the submatrix
         center_row,center_col = self.input_sheet.sheet2matrixidx(self.x,self.y)
         
         c1 = -min(0, center_col-n_cols/2)  # assume odd weight matrix so can use n_cols/2 
         r1 = -min(0, center_row-n_rows/2)  # for top and bottom
         c2 = -max(-n_cols, center_col-sheet_cols-n_cols/2)
         r2 = -max(-n_rows, center_row-sheet_rows-n_rows/2)
-        return mask_template[r1:r2,c1:c2]
+        return (r1,r2,c1,c2)
         
 
     def offset_bounds(self,bounds):
@@ -197,7 +200,8 @@ class ConnectionField(TopoObject):
         if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
 
-            m = self.slice_mask(mask_template,weights_bounds)
+            mr1,mr2,mc1,mc2 = self.get_slice(weights_bounds)
+            m = mask_template[mr1:mr2,mc1:mc2]
             self.mask = m.astype(weight_type)
             self.mask.savespace(1)
 
