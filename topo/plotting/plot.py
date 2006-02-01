@@ -98,20 +98,20 @@ class Plot(TopoObject):
        
         self.bitmap = None
         
-        ### JCALERT: Fix view_info here, and in SheetView
-	self.view_info = {}
 
 	self.channels = channels
 	self.view_dict = sheet_view_dict
 	# bounds of the situated plotting area 
 	self.plot_bounding_box = plot_bounding_box
 
-        ### JCALERT ! This is an hack so that the problem of displaying the right
-        ### name under each map in activity and orientation map panel is solved
-        ### It could be done in a more satisfying way, fixing view_info in SheetViews
-        ### and finding a good way to handle sheetview and plot name
-	self._set_view_info()
 
+        ### JCALERT ! The problem of displaying the right plot name is still reviewed
+        # set the name of the sheet that provides the SheetViews
+        # combined with the self.name parameter when creating the plot (which is generally
+        # the name of the plot_template), it provides the necessary information for displaying plot label
+	self._set_plot_src_name()
+
+        
 	# # Eventually: support other type of plots (e.g vector fields...) using
         # # something like:
 	# def annotated_bitmap(self):  
@@ -165,16 +165,16 @@ class Plot(TopoObject):
 
 
    ### JCALERT! This function is probably temporary: will change when fixing the display of Plot Name
-    def _set_view_info(self):
+    def _set_plot_src_name(self):
 	""" Set the Plot view_info. Call when Plot is created"""
 	for key in self.channels:
 	    sheet_view_key = self.channels.get(key,None)
 	    sv = self.view_dict.get(sheet_view_key, None)
 	    if sv != None :
 		if self.name == None:
-		    self.view_info['src_name'] = sv.src_name + repr(self.name)
+		    self.plot_src_name = sv.src_name + repr(self.name)
 		else:
-		    self.view_info['src_name'] = sv.src_name + self.name
+		    self.plot_src_name = sv.src_name + self.name
 
      
     def _get_shape_and_boxes(self,matrices,boxes):

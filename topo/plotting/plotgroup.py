@@ -24,7 +24,7 @@ import bitmap
 
 def sort_plots(plot_list):
     """Sort a (static) plot list according to the src_names."""
-    plot_list.sort(lambda x, y: cmp(x.view_info['src_name'], y.view_info['src_name']))
+    plot_list.sort(lambda x, y: cmp(x.plot_src_name,y.plot_src_name))
 
 # PlotGroup used by the simulation are stored in this dictionnary
 plotgroup_dict = {}
@@ -95,7 +95,7 @@ class PlotGroup(TopoObject):
         self.bitmaps = []
         for each in self.plots():
             win = each.bitmap                      
-            win.view_info = each.view_info            
+            win.view_info['src_name'] = each.plot_src_name            
             self.bitmaps.append(win)
         return self.bitmaps
     
