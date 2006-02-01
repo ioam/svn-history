@@ -106,6 +106,8 @@ class Plot(TopoObject):
 
 
         ### JCALERT ! The problem of displaying the right plot name is still reviewed
+        ### at the moment we have the plot_src_name and name attribute that are used for the label.
+        ### generally the name is set to the plot_template name, except for connection
         # set the name of the sheet that provides the SheetViews
         # combined with the self.name parameter when creating the plot (which is generally
         # the name of the plot_template), it provides the necessary information for displaying plot label
@@ -164,17 +166,13 @@ class Plot(TopoObject):
         return box
 
 
-   ### JCALERT! This function is probably temporary: will change when fixing the display of Plot Name
     def _set_plot_src_name(self):
-	""" Set the Plot view_info. Call when Plot is created"""
+	""" Set the Plot plot_src_name. Called when Plot is created"""
 	for key in self.channels:
 	    sheet_view_key = self.channels.get(key,None)
 	    sv = self.view_dict.get(sheet_view_key, None)
 	    if sv != None :
-		if self.name == None:
-		    self.plot_src_name = sv.src_name + repr(self.name)
-		else:
-		    self.plot_src_name = sv.src_name + self.name
+                 self.plot_src_name = sv.src_name 
 
      
     def _get_shape_and_boxes(self,matrices,boxes):

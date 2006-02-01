@@ -12,7 +12,7 @@ __version__='$Revision$'
 
 import Pmw
 import __main__
-from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry
+from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry,Label,NSEW
 from plotgrouppanel import PlotGroupPanel
 from cfsheetplotpanel import CFSheetPlotPanel
 from topo.base.projection import ProjectionSheet
@@ -155,7 +155,20 @@ class UnitWeightsPanel(CFSheetPlotPanel):
                     ' unit (' + str(self.x) + ',' + str(self.y) + ') at time '\
                     + str(self.console.simulator.time())
         self.plot_group_title.configure(tag_text = new_title)
-        super(UnitWeightsPanel,self).display_labels()
+
+	if self._num_labels != len(self.canvases):
+	    old_labels = self.labels
+            self.labels = [Label(self.plot_frame,text=(each.plot_src_name + '\n(from' + each.name+')') )
+				 for each in self.bitmaps]
+            for i in range(len(self.labels)):
+                self.labels[i].grid(row=1,column=i,sticky=NSEW)
+            for l in old_labels:
+                l.grid_forget()
+            self._num_labels = len(self.canvases)
+        else:  # Same number of labels; reuse to avoid flickering.
+            for i in range(len(self.labels)):
+                self.labels[i].configure(text=self.bitmaps[i].plot_src_name +'\n(from' + self.bitmaps[i].name+')') 
+
     
         
     def refresh_title(self):

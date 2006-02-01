@@ -54,9 +54,10 @@ class Bitmap(TopoObject):
     def __init__(self,image):
         self.image = image
 
-        ### JABALERT: Should presumably be deleted; seems to be an
-        ### extra copy of the Plot's view_info
-        self.view_info = {}
+	# copy of the plot plot_src_name, used for displaying label along with self.name
+        self.plot_src_name = None
+	### JCALERT! maybe renamed self.view_info, the same for the plot...
+	self.name = None
 
 
     def copy(self):

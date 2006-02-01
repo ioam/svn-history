@@ -95,7 +95,8 @@ class PlotGroup(TopoObject):
         self.bitmaps = []
         for each in self.plots():
             win = each.bitmap                      
-            win.view_info['src_name'] = each.plot_src_name            
+            win.plot_src_name = each.plot_src_name   
+	    win.name = each.name
             self.bitmaps.append(win)
         return self.bitmaps
     
@@ -165,9 +166,7 @@ class TemplatePlotGroup(PlotGroup):
     def create_plots(self,pt_name,pt,sheet):
 
 	plot_channels = pt
-        ### JABALERT: The newline should not be in the plot_name
-        ### itself, but somewhere where it's eventually formatted.
-	plot_name = '\n'+pt_name
+	plot_name = pt_name
         p = make_plot(plot_channels,sheet.sheet_view_dict,sheet.density,sheet.bounds,self.normalize,False,name=plot_name)
 	return [p]
 
@@ -205,7 +204,7 @@ class UnitWeightsPlotGroup(TemplatePlotGroup):
 	        ### JCALERT! do the plot_channels['Strength'] == 'weights' test
                 ### here and in projectionplotgroup
                 key = ('Weights',sheet.name,p.name,self.x,self.y)
-		plot_name = '\n(from ' + p.src.name +')'
+		plot_name = p.src.name 
 		plot_channels['Strength'] = key			       
 		plot_list.append(make_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
 				      p.src.bounds,self.normalize,self.situate,name=plot_name))

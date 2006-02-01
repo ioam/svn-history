@@ -127,7 +127,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         self.plots = []
         self.bitmaps = []
         self.labels = []
-        self.__num_labels = 0
+        self._num_labels = 0
 
 	self.shared_control_frame = Frame(self)
         self.shared_control_frame.pack(side=TOP,expand=YES,fill=X)
@@ -351,18 +351,18 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         it may be useful to make this function a stub, and display the
         labels at the same time the images are displayed.
         """
-        if self.__num_labels != len(self.canvases):
+        if self._num_labels != len(self.canvases):
             old_labels = self.labels
-            self.labels = [Label(self.plot_frame,text=each.view_info['src_name'])
-                           for each in self.bitmaps]
+            self.labels = [Label(self.plot_frame,text=each.plot_src_name + '\n' + each.name)
+				 for each in self.bitmaps]
             for i in range(len(self.labels)):
                 self.labels[i].grid(row=1,column=i,sticky=NSEW)
             for l in old_labels:
                 l.grid_forget()
-            self.__num_labels = len(self.canvases)
+            self._num_labels = len(self.canvases)
         else:  # Same number of labels; reuse to avoid flickering.
             for i in range(len(self.labels)):
-                self.labels[i].configure(text=self.bitmaps[i].view_info['src_name']) 
+                self.labels[i].configure(text=self.bitmaps[i].plot_src_name +'\n' + self.bitmaps[i].name) 
        
     def refresh_title(self):
         """
