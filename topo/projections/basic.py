@@ -141,7 +141,7 @@ class SharedWeightCFProjection(CFProjection):
         new_box = (self.cf_slice_and_bounds[r][c])[1]
 
         assert matrix_data != None, "Projection Matrix is None"
-        return UnitView((matrix_data,new_box),sheet_x,sheet_y,self,view_type='UnitView')
+        return UnitView((matrix_data,new_box),sheet_x,sheet_y,self)
 
     
     def activate(self,input_activity):

@@ -82,7 +82,7 @@ class TestPlot(unittest.TestCase):
 	self.matrix1 = zeros((10,10),Float) + RandomArray.random((10,10))
 	self.bounds1 = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 	self.sheet_view1 = SheetView((self.matrix1,self.bounds1),
-				      src_name='TestInputParam',view_type='Pattern')
+				      src_name='TestInputParam')
 	self.key1 = 'sv1'
 	self.view_dict[self.key1] = self.sheet_view1
 
@@ -91,7 +91,7 @@ class TestPlot(unittest.TestCase):
 	self.matrix2 = zeros((10,10),Float) + 0.3
 	self.bounds2 = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 	self.sheet_view2 = SheetView((self.matrix2,self.bounds2),
-				      src_name='TestInputParam',view_type='Pattern')
+				      src_name='TestInputParam')
 	self.key2 = ('sv2',0,10)
 	self.view_dict[self.key2] = self.sheet_view2
 
@@ -100,7 +100,7 @@ class TestPlot(unittest.TestCase):
 	self.matrix3 = zeros((10,10),Float) + RandomArray.random((10,10))
 	self.bounds3 = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 	self.sheet_view3 = SheetView((self.matrix3,self.bounds3),
-				      src_name='TestInputParam',view_type='Pattern')
+				      src_name='TestInputParam')
 	self.key3 = ('sv3',0,'hello',(10,0))
 	self.view_dict[self.key3] = self.sheet_view3
 
@@ -109,7 +109,7 @@ class TestPlot(unittest.TestCase):
 	self.matrix4 = zeros((10,10),Float) + 1.6
 	self.bounds4 = BoundingBox(points=((-0.7,-0.7),(0.7,0.7)))
 	self.sheet_view4 = SheetView((self.matrix4,self.bounds4),
-				      src_name='TestInputParam',view_type='Pattern')
+				      src_name='TestInputParam')
 	self.key4 = 'sv4'
 	self.view_dict[self.key4] = self.sheet_view4
 

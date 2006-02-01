@@ -565,7 +565,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         self.s.activity = Numeric.array([[1,2],[3,4]])
         # Call s.sheet_view(..) with a parameter
 	sv2 = SheetView((self.s.activity,self.s.bounds),
-                          src_name=self.s.name,view_type='Activity')
+                          src_name=self.s.name)
         self.assertEqual(len(self.s.sheet_view_dict.keys()),0)
         self.s.sheet_view_dict['Activity']=sv2
         self.assertEqual(len(self.s.sheet_view_dict.keys()),1)

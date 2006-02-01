@@ -172,10 +172,9 @@ class Plot(TopoObject):
 	    sv = self.view_dict.get(sheet_view_key, None)
 	    if sv != None :
 		if self.name == None:
-		    self.view_info['src_name'] = sv.view_info['src_name'] + repr(self.name)
+		    self.view_info['src_name'] = sv.src_name + repr(self.name)
 		else:
-		    self.view_info['src_name'] = sv.view_info['src_name'] + self.name
-		    self.view_info['view_type'] = sv.view_info['view_type']
+		    self.view_info['src_name'] = sv.src_name + self.name
 
      
     def _get_shape_and_boxes(self,matrices,boxes):

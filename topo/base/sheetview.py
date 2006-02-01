@@ -48,8 +48,11 @@ class SheetView(TopoObject):
     sheet, the other is by combining the matrices from multiple
     matrices or SheetViews.
     """
-
-    def __init__(self, (term_1, term_2), src_name=None, view_type=None, **params):
+    
+    ### JCALERT! term_1 and term_2 should be more explicit...
+    ### the 3 cases described in the doc, are they really useful?
+    ### shouldn't it be simplified?
+    def __init__(self, (term_1, term_2), src_name=None,**params):
         """
         __init__(self, input_tuple, **params)
 
@@ -78,10 +81,8 @@ class SheetView(TopoObject):
         """
         super(SheetView,self).__init__(**params)
 
-        ### JABALERT/JCALERT: What is a view_info?  Please describe more
-        ### fully, clean up, or eliminate.  What is view_type ever used for?
-        # View information goes here:
-        self.view_info = {'src_name':src_name,'view_type':view_type}
+	### JCALERT! Think about it: shouldn't we have a src attribute? src beeing a Sheet?
+	self.src_name = src_name
         
         # Assume there's no such thing as an operator that can be mistaken
         # for a matrix_data element.  This is true as long as the real
@@ -168,9 +169,7 @@ class UnitView(SheetView):
         self.x = x
         self.y = y
         self.projection = projection
-        self.view_info['src_name'] = self.projection.name
-        self.view_info['x'] = x
-        self.view_info['y'] = y
+	self.src_name = self.projection.name
 
 
 

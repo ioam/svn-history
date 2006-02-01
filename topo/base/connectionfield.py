@@ -497,7 +497,7 @@ class CFProjection(Projection):
         new_box = self.cf(r,c).bounds
 	
         assert matrix_data != None, "Projection Matrix is None"
-        return UnitView((matrix_data,new_box),sheet_x,sheet_y,self,view_type='UnitView')
+        return UnitView((matrix_data,new_box),sheet_x,sheet_y,self)
 
 
     def activate(self,input_activity):
