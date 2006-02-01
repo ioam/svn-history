@@ -1,5 +1,5 @@
 """
-Unit test for activity panel (BasicPlotGroupPanel)
+Unit test for activity panel (TemplatePlotGroupPanel)
 $Id$
 """
 __version__='$Revision$'
@@ -14,7 +14,7 @@ from topo.sheets.generatorsheet import *
 from topo.base.patterngenerator import *
 from topo.base.simulator import *
 from topo.base.sheetview import *
-from topo.tkgui.basicplotgrouppanel import BasicPlotGroupPanel
+from topo.tkgui.basicplotgrouppanel import TemplatePlotGroupPanel
 import topo.patterns.basic
 
 ### JCALERT! This test sould be in the testbasicgrouppanel.py.
@@ -99,7 +99,7 @@ class TestActivityPanel(unittest.TestCase):
         Test the creation the widgets
         """
         topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
-        BasicPlotGroupPanel.print_level = topo.base.topoobject.WARNING
+        TemplatePlotGroupPanel.print_level = topo.base.topoobject.WARNING
 
         root = Tkinter.Tk()
         root.resizable(1,1)

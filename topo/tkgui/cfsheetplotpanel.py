@@ -39,7 +39,6 @@ class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
 
 	###########################################
 	### JCALERT! Eventually all this code should go only in PlotGroupPanel
-        ### and BasicPlotGroupPanel should be spared.
 
 	self.pgt = plotgroup_templates.get(pgt_name,None)
 	# Command used to refresh the plot, if any

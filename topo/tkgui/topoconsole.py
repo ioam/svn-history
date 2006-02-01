@@ -9,7 +9,7 @@ from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, \
      LEFT, RIGHT, YES, BOTH, Label
 import Pmw, re, os, sys, code, traceback, __main__
 import tkFileDialog
-from basicplotgrouppanel import BasicPlotGroupPanel
+from basicplotgrouppanel import TemplatePlotGroupPanel
 from unitweightspanel import UnitWeightsPanel
 from projectionpanel import ProjectionPanel
 from testpattern import TestPattern
@@ -57,7 +57,7 @@ class PlotsMenuEntry(topo.base.topoobject.TopoObject):
     different for each plot type since this will include Activity,
     Unit Weights, Projection grids, Preference Maps and more.
     """
-    def __init__(self,console,template,class_name=BasicPlotGroupPanel,label=None,description=None,**config):
+    def __init__(self,console,template,class_name=TemplatePlotGroupPanel,label=None,description=None,**config):
         super(PlotsMenuEntry,self).__init__(**config)
         self.console = console
         self.template = template
@@ -552,4 +552,4 @@ class GUIToplevel(Toplevel):
 if __name__ != '__main__':
     plotpanel_classes['Connection Fields'] = UnitWeightsPanel
     plotpanel_classes['Projection'] = ProjectionPanel
-    plotpanel_classes['Orientation Preference'] = BasicPlotGroupPanel
+ 

@@ -1,5 +1,5 @@
 """
-class BasicPlotGroupPanel
+class TemplatePlotGroupPanel
 Panel for displaying preference maps and activity plot groups.
 
 $Id$
@@ -7,8 +7,7 @@ $Id$
 __version__='$Revision$'
 
 
-### JCALERT! Now BasicPlotGroupPanel replace the former BasicPlotPanel and PreferenceMapPanel
-### As well PlotPanel is now PlotGroupPanel.
+### JCALERT!
 ### It remains to: - change the name of plotpanel.py to plotgrouppanel.py 
 ###                - change the name of preferencemappanel.py to basicplotgrouppanel.py
 ###                - change the import statements in any files using this two files
@@ -32,7 +31,7 @@ from topo.commands.basic import *
 from topo.commands.lineplotting import *
 
 
-class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
+class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
     def __init__(self,parent,console,pgt_name,**config):
         plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,pgt_name,**config)
 
@@ -96,7 +95,7 @@ class BasicPlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         """
         self.plot_group_title.configure(tag_text = self.mapname.get() + \
                                   ' at time ' + str(self.console.simulator.time()))
-        super(BasicPlotGroupPanel,self).display_labels()
+        super(TemplatePlotGroupPanel,self).display_labels()
 
 
     def refresh_title(self):
