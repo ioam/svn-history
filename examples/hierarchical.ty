@@ -80,9 +80,9 @@ s = Simulator()
 LeftRetina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='LeftRetina')
 RightRetina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='RightRetina')
 
-V1 = CFSOM(name='V1',alpha_0 = 0.5*25)
-V2 = CFSOM(name='V2',alpha_0 = 0.5*25)
-V3 = CFSOM(name='V3',alpha_0 = 0.5*9)
+V1 = CFSOM(name='V1',alpha_0 = 0.5)
+V2 = CFSOM(name='V2',alpha_0 = 0.5)
+V3 = CFSOM(name='V3',alpha_0 = 0.5)
 
 # Projections to V1
 s.connect(LeftRetina,V1,delay=0.5,connection_type=CFProjection,connection_params={'name':'AfferentLeft'})

@@ -53,9 +53,8 @@ topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8))
 CFSOM.density = 50
 CFSOM.learning_length = 10000
 CFSOM.radius_0 = 0.1
-# divide by 7*7 = 49: the number of unit in the receptive field, in order to compensate for 
-# the learning rate being divided by the number of units, and still match previous simulations.
-CFSOM.alpha_0 = 0.5*49
+
+CFSOM.alpha_0 = 0.5
 
 RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom() #basic.Disk(size=0.22,aspect_ratio=1.0,smoothing=0.0) 
