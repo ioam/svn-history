@@ -550,6 +550,6 @@ class GUIToplevel(Toplevel):
 
 
 if __name__ != '__main__':
-    plotpanel_classes['Connection Field'] = UnitWeightsPanel
+    plotpanel_classes['Connection Fields'] = UnitWeightsPanel
     plotpanel_classes['Projection'] = ProjectionPanel
     plotpanel_classes['Orientation Preference'] = BasicPlotGroupPanel

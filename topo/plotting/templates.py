@@ -129,7 +129,7 @@ pgt.add_plot('Activity',[('Strength','Activity'),('Hue','OrientationPreference')
 ### JCALERT! unitweightpanel could be re-named Connectionfields panel...?
 ### Also, the situate option could be specified in the template.
 ### Also implement the test for 'Weights' in PlotGroup.
-pgt = new_plotgroup_template(name='Connection Field',command='update_connectionfields()',normalize='True')
+pgt = new_plotgroup_template(name='Connection Fields',command='update_connectionfields()',normalize='True')
 pgt.add_plot('Connection Field',[('Strength','Weights'),('Hue','OrientationPreference')])
 
 
