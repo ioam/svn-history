@@ -247,4 +247,20 @@ def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
 
 
 
+# Performance profiling
+#
+# Example 1
+#import hotshot,hotshot.stats
+#prof = hotshot.Profile("abc")
+#prof.runctx('s.run(10000)',globals(),locals())
+#prof.close()
+#
+#p = hotshot.stats.load("abc")
+#p.strip_dirs().sort_stats('cumulative','time').print_stats()
+#
+# Example 2
+#import profile,pstats
+#profile.runctx('s.run(10000)',globals(),locals(),"abc")
+#p = pstats.Stats('abc')
+#p.strip_dirs().sort_stats('cumulative').print_stats()
 
