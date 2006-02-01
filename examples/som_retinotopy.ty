@@ -25,7 +25,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.connectionfield import CFProjection
 from topo.base.parameter import DynamicNumber
 from topo.sheets.cfsom import CFSOM
-from topo.responsefns.optimized import CFDotProduct
+from topo.responsefns.optimized import CFDotProduct, CFEuclideanDistance
 from topo.responsefns.basic import CFEuclideanDistance_Py, CFDotProduct_Py
 from topo.base.simulator import Simulator
 from topo.learningfns.basic import HebbianSOMLF
@@ -62,7 +62,7 @@ class RetinotopicSOM(CFSOM):
 
 # input patterns
 GeneratorSheet.period = 1.0
-GeneratorSheet.density = 40
+GeneratorSheet.density = 24
 
 random.seed(1234)
 topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
@@ -83,9 +83,8 @@ RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom() 
 
 CFProjection.weights_bounds=BoundingBox(points=((-1.0,-1.0),(1.0,1.0))) # fully connected network.
-CFProjection.response_fn = CFEuclideanDistance_Py() # CFDotProduct() # 
+CFProjection.response_fn = CFEuclideanDistance() 
 CFProjection.learning_fn = HebbianSOMLF()
-#CFProjection.learning_fn.output_fn=DivisiveSumNormalize() # Book doesn't mention normalization
 
 
 ###########################################
