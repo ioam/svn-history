@@ -43,13 +43,14 @@ class SharedWeightCFResponseFn(TopoObject):
         single_cf_fn = self.single_cf_fn
         for r in xrange(rows):
             for c in xrange(cols):
-                r1,r2,c1,c2 = (cf_slice_and_bounds[r][c])[0]
-                X = input_activity[r1:r2,c1:c2]
+                # get right submatrix from input_activity
+                act_r1,act_r2,act_c1,act_c2 = (cf_slice_and_bounds[r][c])[0]
+                X = input_activity[act_r1:act_r2,act_c1:act_c2]
+                # get right submatrix from weights
+                w_r1,w_r2,w_c1,w_c2 = (cf_slice_and_bounds[r][c])[2]
+                weights = cf.weights[w_r1:w_r2,w_c1:w_c2]
 
-                # CEBHACKALERT: instead, take right slice
-                assert cf.weights.shape==X.shape, "sharedcf at (" + str(cf.x) + "," + str(cf.y) + ") has an input_matrix slice that is not the same shape as the sharedcf.weights matrix weight matrix (" + repr(X.shape) + " vs. " + repr(cf.weights.shape) + ")."
-                
-                activity[r,c] = single_cf_fn(X,cf.weights)
+                activity[r,c] = single_cf_fn(X,weights)
         activity *= strength
         
 
@@ -101,20 +102,25 @@ class SharedWeightCFProjection(CFProjection):
                                    mask_template,
                                    self.learning_fn.output_fn)
 
-        
-        # calculate the slice array and bounds for the location of each unit
-        # CEBHACKALERT: uses the existing function initialize_slice_array()
-        # and calculates the slices and bounds just once, but maybe there
-        # is a cleaner way? Leaves the sharedcf with (x,y) of last unit
-        # instead of (0,0) as before, but (x,y) is meaningless anyway for
-        # the sharedcf.
+        # CEBHACKALERT: Calculate and store the the slice of the
+        # sheet, the bounds, and the slice of the weights matrix for
+        # each unit. Although there is only one cf here in the code,
+        # it is used to represent units all round the sheet - and
+        # units around the edge might not be able to have the full
+        # matrix. To avoid calculating the correct slice of the
+        # weights matrix to take at each activation, it's stored
+        # in cf.slice_and_bounds[2]. The bounds are also stored for
+        # access by plotting routines in [1]. The slice of the sheet to
+        # which these bounds correspond is stored in [0].
         cf = self.sharedcf
         for y in self.dest.sheet_rows()[::-1]:
             row = []
             for x in self.dest.sheet_cols():
                 cf.x,cf.y = x,y
                 cf.offset_bounds(self.weights_bounds)
-                row.append((cf.slice_tuple(),cf.bounds))
+                weights_slice = cf.get_slice(self.weights_bounds)
+                sheet_slice = cf.slice_tuple()
+                row.append((sheet_slice,cf.bounds,weights_slice))
             self.cf_slice_and_bounds.append(row)
 
         self.input_buffer = None
