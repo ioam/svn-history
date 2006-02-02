@@ -16,7 +16,7 @@ from topo.sheets.generatorsheet import *
 from topo.base.patterngenerator import *
 from topo.base.simulator import *
 from topo.base.sheetview import *
-from topo.tkgui.basicplotgrouppanel import *
+from topo.tkgui.templateplotgrouppanel import *
 
 ### JCALERT: This test has to be written in order to test the new change in
 ### the TemplatePlotGroupPanel file
