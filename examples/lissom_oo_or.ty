@@ -88,19 +88,17 @@ CFSheet.density = 24.0
 #
 LGNOn = CFSheet(name='LGNOn',output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
 LGNOn_center = s.connect(Retina,LGNOn,dest_port="center",delay = FixedPoint("0.05"),
-                         connection_type=SharedWeightCFProjection,
-                         connection_params = dict(strength = 1.0, name='Center',
-                                                  weights_bounds = afferent_weight_bounds,
-                                                  weights_generator = topo.patterns.basic.Gaussian(size=0.25*0.44,aspect_ratio=1),
-                                                  ))
+                         connection_type=SharedWeightCFProjection,strength=1.0,
+                         name='Center',weights_bounds=afferent_weight_bounds,
+                         weights_generator=topo.patterns.basic.Gaussian(size=0.25*0.44,aspect_ratio=1))
+
 LGNOn_center.output_fn = DivisiveSumNormalize()
 
 LGNOn_surround = s.connect(Retina,LGNOn,dest_port="surround",delay = FixedPoint("0.05"),
-                           connection_type=SharedWeightCFProjection,
-                           connection_params = dict(strength = -1.0, name='Surround',
-                                                    weights_bounds = afferent_weight_bounds,
-                                                    weights_generator = topo.patterns.basic.Gaussian(size=0.44,aspect_ratio=1),
-                                                    ))
+                           connection_type=SharedWeightCFProjection,strength=-1.0,
+                           name='Surround',weights_bounds=afferent_weight_bounds,
+                           weights_generator=topo.patterns.basic.Gaussian(size=0.44,aspect_ratio=1))
+
 LGNOn_surround.output_fn = DivisiveSumNormalize(norm_value=-1.0)
 
 
@@ -109,33 +107,28 @@ LGNOn_surround.output_fn = DivisiveSumNormalize(norm_value=-1.0)
 #
 LGNOff = CFSheet(name='LGNOff',output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
 LGNOff_center = s.connect(Retina,LGNOff,dest_port="center",delay = FixedPoint("0.05"),
-                         connection_type=SharedWeightCFProjection,
-                         connection_params = dict(strength = -1.0, name='Center',
-                                                  weights_bounds = afferent_weight_bounds,
-                                                  weights_generator = topo.patterns.basic.Gaussian(size=0.25*0.44,aspect_ratio=1),
-                                                  ))
+                          connection_type=SharedWeightCFProjection,strength=-1.0,
+                          name='Center',weights_bounds=afferent_weight_bounds,
+                          weights_generator=topo.patterns.basic.Gaussian(size=0.25*0.44,aspect_ratio=1))
+
 LGNOff_center.output_fn = DivisiveSumNormalize(norm_value=-1.0)
 
 LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoint("0.05"),
-                           connection_type=SharedWeightCFProjection,
-                           connection_params = dict(strength = 1.0, name='Surround',
-                                                    weights_bounds = afferent_weight_bounds,
-                                                    weights_generator = topo.patterns.basic.Gaussian(size=0.44,aspect_ratio=1),
-                                                    ))
+                            connection_type=SharedWeightCFProjection,strength=1.0,
+                            name='Surround',weights_bounds=afferent_weight_bounds,
+                            weights_generator=topo.patterns.basic.Gaussian(size=0.44,aspect_ratio=1))
 LGNOff_surround.output_fn = DivisiveSumNormalize()
 
 
 # CEBHACKALERT: setting strength=75 is temporary
 
 s.connect(LGNOn,V1,delay=FixedPoint("0.05"),
-          connection_type=CFProjection,
-          connection_params = dict(strength=75, name='R_LGNOn',
-                                   weights_bounds=afferent_weight_bounds))
+          connection_type=CFProjection,strength=75,name='R_LGNOn',
+          weights_bounds=afferent_weight_bounds)
 
 s.connect(LGNOff,V1,delay=FixedPoint("0.05"),
-          connection_type=CFProjection,
-          connection_params = dict(strength=75, name='R_LGNOff',
-                                   weights_bounds=afferent_weight_bounds))
+          connection_type=CFProjection,strength=75,name='R_LGNOff',
+          weights_bounds=afferent_weight_bounds)
 
           
 
@@ -145,17 +138,13 @@ s.connect(LGNOff,V1,delay=FixedPoint("0.05"),
 ##                                    weights_bounds = afferent_weight_bounds,
 ##                                    learning_rate=1.274))
 
-s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
-          connection_type=CFProjection,
-          connection_params = dict(strength = 0.9, name='LateralExcitatory',
-                                   weights_bounds = excitatory_weight_bounds,
-                                   learning_rate=2.674)) 
+s.connect(V1,V1,delay=FixedPoint("0.05"),dest_port="exc",
+          connection_type=CFProjection,strength=0.9,name='LateralExcitatory',
+          weights_bounds=excitatory_weight_bounds,learning_rate=2.674) 
             
-s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
-          connection_type=CFProjection,
-          connection_params = dict(strength = -0.9, name='LateralInhibitory',
-                                   weights_bounds = inhibitory_weight_bounds,
-                                   learning_rate=2.466))         
+s.connect(V1,V1,delay=FixedPoint("0.05"), dest_port="inh",
+          connection_type=CFProjection,strength=-0.9,name='LateralInhibitory',
+          weights_bounds=inhibitory_weight_bounds,learning_rate=2.466))         
 
 
 s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.06,-0.06),(0.06,0.06))))

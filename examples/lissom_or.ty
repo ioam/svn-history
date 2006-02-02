@@ -73,22 +73,16 @@ Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(), name='Re
 V1 = LISSOM(name='V1')
 
 s.connect(Retina,V1, delay = FixedPoint("0.05"),
-          connection_type=CFProjection,
-          connection_params = dict(strength = 1.0, name='Afferent0',
-                                   weights_bounds = afferent_weight_bounds,
-                                   learning_rate=1.274))
+          connection_type=CFProjection,strength=1.0,name='Afferent0',
+          weights_bounds=afferent_weight_bounds,learning_rate=1.274)
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
-          connection_type=CFProjection,
-          connection_params = dict(strength = 0.9, name='LateralExcitatory',
-                                   weights_bounds = excitatory_weight_bounds,
-                                   learning_rate=2.674)) 
+          connection_type=CFProjection,strength = 0.9, name='LateralExcitatory',
+          weights_bounds = excitatory_weight_bounds,learning_rate=2.674)
             
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
-          connection_type=CFProjection,
-          connection_params = dict(strength = -0.9, name='LateralInhibitory',
-                                   weights_bounds = inhibitory_weight_bounds,
-                                   learning_rate=2.466))         
+          connection_type=CFProjection,strength = -0.9, name='LateralInhibitory',
+          weights_bounds = inhibitory_weight_bounds,learning_rate=2.466)         
 
 
 s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.06,-0.06),(0.06,0.06))))

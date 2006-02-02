@@ -49,9 +49,9 @@ class TestPlotFileSaver(unittest.TestCase):
         V1.print_level = topo.base.topoobject.WARNING
         V2.print_level = topo.base.topoobject.WARNING
         
-        self.s.connect(retina,V1,delay=0.5,connection_type=CFProjection,connection_params={'name':'R1toV1'})
-        self.s.connect(retina,V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'R1toV2'})
-        self.s.connect(retina2,V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'R2toV2'})
+        self.s.connect(retina,V1,delay=0.5,connection_type=CFProjection,name='R1toV1')
+        self.s.connect(retina,V2,delay=0.5,connection_type=CFProjection,name='R1toV2')
+        self.s.connect(retina2,V2,delay=0.5,connection_type=CFProjection,name='R2toV2')
         self.s.run(2)
 
         af = ActivityFile('Retina')

@@ -94,7 +94,7 @@ s = Simulator()
 
 Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),name='Retina')
 V1 = RetinotopicSOM(name='V1')
-s.connect(Retina,V1,delay=0.5,connection_type=CFProjection,connection_params=dict(name = 'RtoV1'))
+s.connect(Retina,V1,delay=0.5,connection_type=CFProjection,name='RtoV1'))
 
 s.run(0)
 #s.run(10000)

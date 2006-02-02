@@ -184,8 +184,8 @@ from topo.base.patterngenerator import BoundingBox
 #           CFProjection.response_fn = CFDotProduct()
 #           CFProjection.learning_fn = HebbianSOMLF()
 
-#           self.sim.connect(V1,V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'V1toV2'})
-#           self.sim.connect(V3,V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'V2toV3'})
+#           self.sim.connect(V1,V2,delay=0.5,connection_type=CFProjection,name='V1toV2')
+#           self.sim.connect(V3,V2,delay=0.5,connection_type=CFProjection,name='V2toV3')
 
 #           self.pe = PlotEngine(self.sim)
 

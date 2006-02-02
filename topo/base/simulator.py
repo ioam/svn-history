@@ -133,19 +133,14 @@ class EventProcessor(TopoObject):
         # The simulator link is not set until the call to add()
         self.simulator = None
 
-    ### JABHACKALERT! The **args arguments here and in _connect_from
-    ### can be deleted for now, and if necessary a dictionary
-    ### parameter can be added to the Simulator.connect() method to
-    ### hold such items should they prove necessary.  Instead, the
-    ### extra_args of Simulator.connect() should be used for what the
-    ### connection_params argument now holds.
-    def _connect_to(self,conn,**args):
+
+    # if extra parameters are required for an EP subclass, a
+    # dictionary could be added to Simulator.connect() to hold
+    # them, and passed on here
+    def _connect_to(self,conn):
         """
         Add a connection to dest/port with a delay (default=0).
-        Should only be called from Simulator.connect(). The extra
-        keyword arguments in **args contain arbitrary connection
-        parameters that can be interpreted by EP subclasses as
-        needed.  
+        Should only be called from Simulator.connect().
         """
 
         if not conn.src_port in self.out_connections:
@@ -154,7 +149,7 @@ class EventProcessor(TopoObject):
         self.out_connections[conn.src_port].append(conn)
 
 
-    def _connect_from(self,conn,**args):
+    def _connect_from(self,conn):
         """
         Add a connection from src/port with a delay (default=0).
         Should only be called from Simulator.connect().  The extra
@@ -453,7 +448,7 @@ class Simulator(TopoObject):
                 dest=None,
                 src_port=None,
                 dest_port=None,
-                delay=0,connection_type=EPConnection,connection_params={},**extra_args):
+                delay=0,connection_type=EPConnection,**connection_params):
         """
         Connect the source to the destination, at the appropriate ports,
         if any are given.  If src and dest have not been added to the
@@ -462,8 +457,8 @@ class Simulator(TopoObject):
         """
         self.add(src,dest)
         conn = connection_type(src=src,dest=dest,src_port=src_port,dest_port=dest_port,delay=delay,**connection_params)
-        src._connect_to(conn,**extra_args)
-        dest._connect_from(conn,**extra_args)
+        src._connect_to(conn)
+        dest._connect_from(conn)
         return conn
     
 

@@ -196,13 +196,15 @@ class TestMeasureFeatureMap(unittest.TestCase):
         self.s = Simulator()
         self.retina = GeneratorSheet(name='Retina')
         self.V1 = CFSOM(name='V1')
-        self.s.connect(self.retina,self.V1,delay=0.5,connection_type=CFProjection,connection_params={'name':'RtoV1','learning_fn':HebbianSOMLF()})
+        self.s.connect(self.retina,self.V1,delay=0.5,connection_type=CFProjection,
+                       name='RtoV1',learning_fn=HebbianSOMLF())
 
         self.V2 = CFSOM(name='V2')
 
 
-        #self.s.connect(self.V1,self.V2,delay=1,connection_type=CFProjection,connection_params={'name':'V1toV2'})
-        self.s.connect(self.retina,self.V2,delay=0.5,connection_type=CFProjection,connection_params={'name':'RtoV2','learning_fn':HebbianSOMLF()})
+        #self.s.connect(self.V1,self.V2,delay=1,connection_type=CFProjection,name='V1toV2')
+        self.s.connect(self.retina,self.V2,delay=0.5,connection_type=CFProjection,
+                       name='RtoV2',learning_fn=HebbianSOMLF())
 
 
 

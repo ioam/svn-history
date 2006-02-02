@@ -39,12 +39,9 @@ class TestPatternPresent(unittest.TestCase):
         retina2 = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina2')
         V1 = CFSOM(name='V1')
         V2 = CFSOM(name='V2')
-        s.connect(retina,V1,delay=0.5,connection_type=CFProjection,
-                  connection_params={'name':'R1toV1'})
-        s.connect(retina,V2,delay=0.5,connection_type=CFProjection,
-                  connection_params={'name':'R1toV2'})
-        s.connect(retina2,V2,delay=0.5,connection_type=CFProjection,
-                  connection_params={'name':'R2toV2'})
+        s.connect(retina,V1,delay=0.5,connection_type=CFProjection,name='R1toV1')
+        s.connect(retina,V2,delay=0.5,connection_type=CFProjection,name='R1toV2')
+        s.connect(retina2,V2,delay=0.5,connection_type=CFProjection,name='R2toV2')
         s.run(2)
 
         # Want to temporarily replace this:
