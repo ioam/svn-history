@@ -317,6 +317,29 @@ contributions are very welcome!
      Pyro (Robotics)
      logger
      g
+
+Should add simple timing functions -- what was the total time to run?
+What components are taking a long time to run?  Guide the user for
+optimization, focusing on the components we expect to be the
+bottlenecks.
+
+Should add ability to add arbitrary image to a PlotGroupTemplate (see
+plot.py).
+
+Consider adding a main Documentation page, which describes each of the
+manuals and who should read which one.
+
+Web site with results of unit tests, updated nightly?
+
+From Geisler meeting 7/1/2005:
+  Should support additive noise, with lots of places where it could be added
+  Package as a Matlab toolbox to get the right people to use it?
+  Package it as an easy-to-use out-of-the-box optical imaging simulator
+    -- need to tell it what stimulus, what eccentricity, what cortical patch
+  Be able to look at the effects of attention
+  Add specific models for intrinsic or voltage-sensitive-dye imaging 
+  Would be great if the software would support exploring the role of 
+   different types of noise, before doing experiments
 -->
 
 <!-- Text from former MILESTONES file
