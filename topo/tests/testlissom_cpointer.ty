@@ -25,6 +25,11 @@ from topo.base.parameter import DynamicNumber
 from topo.learningfns.optimized import DivisiveHebbian_CPointer
 from topo.patterns import PatternGeneratorParameter
 
+
+# CEBHACKALERT: this has become a little out of date.
+
+
+
 ###########################################
 # Temporary variables designed to match the C++ version of LISSOM
 
@@ -124,93 +129,21 @@ Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),
                         name='Retina')
 V1 = LISSOM_CPointer(name='V1')
 
-# CEBHACKALERT: the commented-out 'weights_shape' code in each of the following
-# connect sections makes the ConnectionFields circular.
 
 s.connect(Retina,V1, delay = FixedPoint("0.05"),
-          connection_type=CFProjection_CPointer,
-          connection_params = dict(strength = 1.0, name='Afferent0',
-                                   weights_bounds = afferent_weight_bounds,
-##                                     weights_shape = topo.patterns.basic.Disk(
-##                                                       size=2*rf_radius/BaseRN,
-##                                                       aspect_ratio=1.0,
-##                                                       scale=1.0,offset=0.0,
-##                                                       smoothing=0.0),
-                                   learning_rate=alpha_input))
-
-## # CEBHACKALERT: temporary - uncomment to see ON- and OFF-cell SharedWeightCFProjections
-## from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
-## from topo.base.connectionfield import CFSheet
-## from topo.projections.basic import SharedWeightCFProjection
-
-## ###  ON 
-## #
-## #
-## LGNOn = CFSheet(name='LGNOn',output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
-## LGNOn_center = s.connect(Retina,LGNOn,dest_port="center",delay = FixedPoint("0.05"),
-##                          connection_type=SharedWeightCFProjection,
-##                          connection_params = dict(strength = 1.0, name='Center',
-##                                                   weights_bounds = afferent_weight_bounds,
-##                                                   weights_generator = topo.patterns.basic.Gaussian(size=2*0.25*rf_radius/BaseRN,aspect_ratio=1),
-##                                                   ))
-## LGNOn_center.output_fn = DivisiveSumNormalize()
-
-## LGNOn_surround = s.connect(Retina,LGNOn,dest_port="surround",delay = FixedPoint("0.05"),
-##                            connection_type=SharedWeightCFProjection,
-##                            connection_params = dict(strength = -1.0, name='Surround',
-##                                                     weights_bounds = afferent_weight_bounds,
-##                                                     weights_generator = topo.patterns.basic.Gaussian(size=2*rf_radius/BaseRN,aspect_ratio=1),
-##                                                     ))
-## LGNOn_surround.output_fn = DivisiveSumNormalize(norm_value=-1.0)
-
-
-## ### OFF
-## #
-## #
-## LGNOff = CFSheet(name='LGNOff',output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
-## LGNOff_center = s.connect(Retina,LGNOff,dest_port="center",delay = FixedPoint("0.05"),
-##                          connection_type=SharedWeightCFProjection,
-##                          connection_params = dict(strength = -1.0, name='Center',
-##                                                   weights_bounds = afferent_weight_bounds,
-##                                                   weights_generator = topo.patterns.basic.Gaussian(size=0.25*rf_radius/BaseRN,aspect_ratio=1),
-##                                                   ))
-## LGNOff_center.output_fn = DivisiveSumNormalize(norm_value=-1.0)
-
-## LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoint("0.05"),
-##                            connection_type=SharedWeightCFProjection,
-##                            connection_params = dict(strength = 1.0, name='Surround',
-##                                                     weights_bounds = afferent_weight_bounds,
-##                                                     weights_generator = topo.patterns.basic.Gaussian(size=rf_radius/BaseRN,aspect_ratio=1),
-##                                                     ))
-## LGNOff_surround.output_fn = DivisiveSumNormalize()
-
-
-
-
-
+          connection_type=CFProjection_CPointer,strength = 1.0, name='Afferent0',
+          weights_bounds = afferent_weight_bounds,learning_rate=alpha_input)
 
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
-          connection_type=CFProjection_CPointer,
-          connection_params = dict(strength = gammaexc, name='LateralExcitatory',
-                                   weights_bounds = excitatory_weight_bounds,
-##                                     weights_shape = topo.patterns.basic.Disk(
-##                                                       size=2*exc_rad/BaseN,
-##                                                       aspect_ratio=1.0,
-##                                                       scale=1.0,offset=0.0,
-##                                                       smoothing=0.0),
-                                   learning_rate=alpha_exc))
+          connection_type=CFProjection_CPointer,strength=gammaexc,
+          name='LateralExcitatory',weights_bounds = excitatory_weight_bounds,
+          learning_rate=alpha_exc)
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
-          connection_type=CFProjection_CPointer,
-          connection_params = dict(strength = -gammainh, name='LateralInhibitory',
-                                   weights_bounds = inhibitory_weight_bounds,
-##                                     weights_shape = topo.patterns.basic.Disk(
-##                                                       size=2*inh_rad/BaseN,
-##                                                       aspect_ratio=1.0,
-##                                                       scale=1.0,offset=0.0,
-##                                                       smoothing=0.0),
-                                   learning_rate=alpha_inh))
+          connection_type=CFProjection_CPointer,strength=-gammainh,
+          name='LateralInhibitory',weights_bounds = inhibitory_weight_bounds,
+          learning_rate=alpha_inh)
         
 
 s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.6/BaseN,-exc_rad*0.6/BaseN),(exc_rad*0.6/BaseN,exc_rad*0.6/BaseN))))
