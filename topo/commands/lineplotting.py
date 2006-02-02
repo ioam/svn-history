@@ -48,7 +48,7 @@ def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreferenc
             x = sheet.sheet_view_dict[xsheet_view_name].view()[0]
             y = sheet.sheet_view_dict[ysheet_view_name].view()[0]
 
-            pylab.figure(figsize=(6,6))
+            pylab.figure(figsize=(5,5))
 
             # This one-liner works in Octave, but in matplotlib it
             # results in lines that are all connected across rows and columns,
