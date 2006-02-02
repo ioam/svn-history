@@ -38,6 +38,8 @@ BORDERWIDTH = 1
 # not displayed.
 CANVASBUFFER = 1
 
+### JABALERT: Maybe this should be called CFProjectionPanel instead,
+### since it is only valid for CFProjections.
 class ProjectionPanel(CFSheetPlotPanel):
     def __init__(self,parent,console=None,pgt_name=None,**config):
         super(ProjectionPanel,self).__init__(parent,console,pgt_name,**config)

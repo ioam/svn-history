@@ -28,7 +28,10 @@ import palette
 ### - Get rid of release_sheetviews.
 
 
-
+### JABALERT: Should add support for another plot_type: bitmap, where
+### the user specifies the filename or other path to an image, which is
+### inserted directly into the plot.  Immediately useful for orientation keys,
+### but also useful in general.
 def make_plot(channels,sheet_view_dict,density=None,
               plot_bounding_box=None,normalize=False,situate=False,name=None):
      """
