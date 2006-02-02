@@ -1,3 +1,9 @@
+This reference manual contains detailed documentation of each
+component making up Topographica, assuming that the user is already
+familiar with basic Topographica usage.  See the
+<A HREF="../User_Manual/index.html">User Manual</A> and
+<A HREF="../Tutorial/index.html">Tutorial</A> for such a introduction.
+
 <H2>Main packages</H2>
 
 <P>Topographica is designed as a collection of packages from which
