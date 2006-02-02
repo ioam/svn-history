@@ -41,8 +41,8 @@ class ObermayerSOM(CFSOM):
 
     # These values have been adjusted to convert from Obermayer's per-unit learning rates
     # to Topographica's per-CF learning rates, assuming a 30x30 ConnectionField.
-    alpha_0 = Number(0.09*(30*30))
-    alpha_f = Number(0.02*(30*30))
+    alpha_0 = Number(0.09)
+    alpha_f = Number(0.02)
 
     radius_0 = Number(240.0/256.0)  # Value at the beginning of learning
     radius_m = Number(60.0/256.0)   # Value at the midpoint of learning
