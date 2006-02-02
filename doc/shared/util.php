@@ -1,5 +1,12 @@
 <?php
 
+### JABALERT: 
+### Should add a function to fill in the appropriate href file 
+### extension (.php or .html), overridable from the command line.
+### Then pages could be served either statically, as now, or 
+### dynamically.
+
+
 ############################################################################
 #       find current folder name
 ############################################################################
