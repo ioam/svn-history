@@ -141,7 +141,7 @@ def sheet2matrix(x,y,bounds,xdensity,ydensity):
     # First translate to (left,top), which is [0,0] in the matrix,
     # then scale to the size of the matrix. The y coordinate needs to
     # flipped, because the points are moving down in the sheet as the
-    # y-index increases in the matrix.
+    # y index increases in the matrix.
     float_col = (x-left) * xdensity
     float_row = (top-y)  * ydensity
     return float_row, float_col
