@@ -9,8 +9,7 @@ import os,unittest
 import testpropertiesframe
 import testtopoconsole
 import testplotgrouppanel
-import testactivitypanel
-import testbasicplotgrouppanel
+import testtemplateplotgrouppanel
 import testmatplotlibtk
 
 

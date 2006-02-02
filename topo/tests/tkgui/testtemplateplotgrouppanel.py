@@ -1,8 +1,9 @@
 """
-Unit test for activity panel (TemplatePlotGroupPanel)
+Test for TemplatePlotGroupPanel
 $Id$
 """
 __version__='$Revision$'
+
 
 import unittest
 import topo
@@ -17,7 +18,18 @@ from topo.base.sheetview import *
 from topo.tkgui.templateplotgrouppanel import TemplatePlotGroupPanel
 import topo.patterns.basic
 
-### JCALERT! This test sould be in the testbasicgrouppanel.py.
+
+### JCALERT: This test has to be written in order to test the new change in
+### the TemplatePlotGroupPanel file
+### (It would be nice to re-write it when performing at the same time a re-organisation and
+### clean-up of the tkgui directory)
+
+class TestTemplatePlotGroupPanel(unittest.TestCase):
+
+
+    def test_preference_plot(self):
+        pass
+
 
 class TestActivityPanel(unittest.TestCase):
 
@@ -112,8 +124,18 @@ class TestActivityPanel(unittest.TestCase):
         #console.new_activity_window()
         # console.mainloop()
 
+
+
+cases = [TestTemplatePlotGroupPanel,
+         TestActivityPanel]
+
 suite = unittest.TestSuite()
 #  Uncomment the following line of code, to not run the test if
 #  $DISPLAY is undefined.  Used mainly for GUI testing.
 suite.requires_display = True
-suite.addTest(unittest.makeSuite(TestActivityPanel))
+suite.addTest(unittest.makeSuite(case) for case in cases)
+
+
+### JCALERT! I don't know why but this does not work...?
+# if __name__ == '__main__':
+#     unittest.TextTestRunner(verbosity=2).run(suite)
