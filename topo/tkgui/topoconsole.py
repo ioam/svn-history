@@ -9,7 +9,7 @@ from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, \
      LEFT, RIGHT, YES, BOTH, Label
 import Pmw, re, os, sys, code, traceback, __main__
 import tkFileDialog
-from basicplotgrouppanel import TemplatePlotGroupPanel
+from templateplotgrouppanel import TemplatePlotGroupPanel
 from unitweightspanel import UnitWeightsPanel
 from projectionpanel import ProjectionPanel
 from testpattern import TestPattern

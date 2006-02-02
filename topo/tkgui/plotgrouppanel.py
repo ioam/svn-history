@@ -212,7 +212,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
 
     ### JCALERT! 
     ### This function is actually always re-implemented....
-    ### It can also be made so that we spared the basicplotgrouppanel re-implementation...
+    ### It can also be made so that we spared the templateplotgrouppanel re-implementation...
     def do_plot_cmd(self):
         """
         Subclasses of PlotGroupPanel will need to create this function to
@@ -222,7 +222,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         examples.
         """
         self.pe_group = self.PlotGroup(self.plot_group_key,[],self.normalize)
-	### JCALERT! That should be make uniform with the basicplotgrouppanel and then eventually maybe
+	### JCALERT! That should be make uniform with the templateplotgrouppanel and then eventually maybe
         ### get rid of the basicplotgrouppanel. (i.E. merged plotgrouppanel and basicplotgrouppanel)
 	self.pe_group.initialize_plot_list(plot_list=[])
         self.pe_group.do_plot_cmd()

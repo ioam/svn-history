@@ -7,13 +7,6 @@ $Id$
 __version__='$Revision$'
 
 
-### JCALERT!
-### It remains to: - change the name of plotpanel.py to plotgrouppanel.py 
-###                - change the name of preferencemappanel.py to basicplotgrouppanel.py
-###                - change the import statements in any files using this two files
-###                - write a command for the activity panel to put in the scrolled-list 
-###                  (e.g. measure_activity(), it is pass for the moment )  
-
 import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas
