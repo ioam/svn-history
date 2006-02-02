@@ -24,7 +24,8 @@ import bitmap
 
 def sort_plots(plot_list):
     """Sort a (static) plot list according to the src_names."""
-    plot_list.sort(lambda x, y: cmp(x.plot_src_name,y.plot_src_name))
+    plot_list.sort(lambda x, y: cmp((x.plot_src_name+x.name),(y.plot_src_name+y.name)))
+
 
 # PlotGroup used by the simulation are stored in this dictionnary
 plotgroup_dict = {}
@@ -38,24 +39,30 @@ class PlotGroup(TopoObject):
     """
 
     ###JCALERT:
-    ### - re-arranged the order and look at the call in all panel classes (i.e. testpattern)
-    ### also review the doc of each functions.
+    ### - renamed plot_group_key to plotgroup_key.
+    ### - fix the sorting of the plot for display.
+    ### - clean up the doc.
     ### - rewrite the test file.
+
 
     def __init__(self, plot_group_key, plot_list, normalize,**params):
     
         """
-        plot_list can be of two types: 
-        1.  A list of Plot objects that can return bitmaps when requested.
-        2.  Can also be a function that returns a list of plots so
-        that each time plot() is called, an updated list is created for the
-        latest list of sheets in the simulation.
+	plot_group_key is a key for storing the PlotGroup in the plotgroup_dict.
+	It is then stored and identified under this key.
+
+	plot_list is a static list specifying the Plot objects belonging to the PlotGroup.
+
+	normalize specified if the Plot in the PlotGroup should be normalized by default.       
         """
         super(PlotGroup,self).__init__(**params)  
 
 	self.plot_group_key = plot_group_key
 	### JCALERT:Normalize is no really used by PlotGroup for the moment
-        ### But it will be when sorted out what to do with TestPattern
+        ### But it will be when sorted out what to do with TestPattern.
+        ### the problem is that for a PlotGroup the plot_list is static...
+        ### so it is hard to re-generate the plot if normalize change...
+        ### (it is already used by sub-classes though)
 	self.normalize = normalize
 
 	self.plot_list = plot_list  
@@ -85,8 +92,8 @@ class PlotGroup(TopoObject):
 
     def load_images(self):
         """
-        Pre:  do_plot_cmd() has already been called, so plots() will return
-              valid plots.
+        Pre: the update command that load the SheetView corresponding to the PlotGroup
+             has to be called.
         Post: self.bitmaps contains a list of topo.bitmap objects or None if
               no valid maps were available.
 
@@ -129,7 +136,7 @@ class PlotGroup(TopoObject):
 
 class TemplatePlotGroup(PlotGroup):
     """
-    PlotGroup for Activity SheetViews
+    PlotGroup that is built as specified by a PlotGroupTemplate.
     """
 
     def __init__(self,plot_group_key,plot_list,normalize,simulator,template,sheet_name,**params):
@@ -139,6 +146,7 @@ class TemplatePlotGroup(PlotGroup):
 	self.template = template
 	self.simulator=simulator
 	# If no sheet_name is defined, the sheet_filter_lam accepts all sheets
+        # (i.e the PlotGroup will try to build a Plot object for each Sheet in the simulation)
         if sheet_name:
 	    self.sheet_filter_lam = lambda s: s.name == sheet_name
         else:
@@ -155,7 +163,7 @@ class TemplatePlotGroup(PlotGroup):
 	sheet_list = [each for each in dict_sort(self.simulator.objects(Sheet)) if self.sheet_filter_lam(each)]      
 	plot_list=self.plot_list
         # Loop over all sheets that passed the filter.
-        #     Loop over each individual PlotTemplate:
+        #     Loop over each individual plot template:
         #         Call the create_plots function to create the according plot
         for each in sheet_list:
 	    for (pt_name,pt) in self.template.plot_templates:
@@ -164,7 +172,10 @@ class TemplatePlotGroup(PlotGroup):
 
 
     def create_plots(self,pt_name,pt,sheet):
-
+	""" 
+	Sub-function of _plot_list().
+	Creates a plot corresponding to a plot_template and its name, and a sheet.
+	"""
 	plot_channels = pt
 	plot_name = pt_name
         p = make_plot(plot_channels,sheet.sheet_view_dict,sheet.density,sheet.bounds,self.normalize,False,name=plot_name)
@@ -174,7 +185,7 @@ class TemplatePlotGroup(PlotGroup):
 
 class ConnectionFieldsPlotGroup(TemplatePlotGroup):
     """
-    PlotGroup for Weights UnitViews.  
+    PlotGroup for Connection Fields UnitViews.  
 
     Attributes:
       x: x-coordinate of the unit to plot
@@ -243,8 +254,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
     def create_plots(self,pt_name,pt,sheet):
 
 	### JCALERT This has to be solved: projection is a list here!
-        ### for the moment the hack below deal with that.
-        ### Also, why do we pass the template here?	
+        ### for the moment the hack below deal with that.	
         projection = sheet.get_in_projection_by_name(self.weight_name)
         plot_list=[]
         if projection:
@@ -290,6 +300,10 @@ class ProjectionPlotGroup(TemplatePlotGroup):
     
     ### JCALERT ! for the moment this function is re-implemented only for ProjectionGroup
     ### because we do not want the plots to be sorted according to their src_name in this case
+    ### To avoid this problem, the sorting should be done from the panel according to the bitmap
+    ### src_name and name + a computation level number that sould be added to Sheet and then SheetView, indicating
+    ### a hierarchy (e.g Retina: level 0, V1: level 1, V2: level 2... this has obviously has to be defined by
+    ### the user.)
     def plots(self):
         """
         Generate the bitmap lists.
