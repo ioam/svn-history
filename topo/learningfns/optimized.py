@@ -229,7 +229,8 @@ if not optimized:
 
 
 
-
+# CEBHACKALERT: this code applies the mask wrongly - needs to be made
+# more like code above
 class DivisiveHebbian_CPointer(CFLearningFunction):
     """
     CF-aware Hebbian learning rule with built-in divisive normalization.
