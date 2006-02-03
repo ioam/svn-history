@@ -107,7 +107,7 @@ class TestActivityPanel(unittest.TestCase):
         """
         topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
         TemplatePlotGroupPanel.print_level = topo.base.topoobject.WARNING
-	assert 1==2
+
         root = Tkinter.Tk()
         root.resizable(1,1)
         Pmw.initialise(root)
