@@ -32,6 +32,36 @@ from topo.base.sheet import Sheet
 from topo.base.utils import frange
 
 
+def vectorplot(vec):
+    """
+    Simple line plotting for any vector or list of numbers.
+
+    Intended for interactive debugging or analyzing from the command
+    prompt.  See MatPlotLib's pylab functions to create more elaborate
+    or customized plots; this is just a simple example.
+    """
+    pylab.plot(vec)
+    pylab.grid(True)
+    pylab.show._needmain = False
+    pylab.show()
+
+
+def matrixplot(mat):
+    """
+    Simple plotting for any matrix as a bitmap with axes.
+
+    Like MatLab's imagesc, scales the values to fit in the range 0 to 1.0.
+    Intended for interactive debugging or analyzing from the command
+    prompt.  See MatPlotLib's pylab functions to create more elaborate
+    or customized plots; this is just a simple example.
+    """
+    pylab.gray()
+    pylab.figure(figsize=(5,5))
+    pylab.imshow(mat,interpolation='nearest')
+    pylab.show._needmain = False     
+    pylab.show()
+
+
 def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreference'):
     """
     By default, plot the XPreference and YPreference preferences for all
