@@ -14,7 +14,7 @@ $Id$
 __version__='$Revision$'
 
 from math import pi
-from Numeric import around,bitwise_and,sin
+from Numeric import around,bitwise_and,sin,add
 
 from topo.base.parameter import Number, Parameter, ClassSelectorParameter
 from topo.misc.patternfns import gaussian,gabor,line,disk,ring
@@ -206,4 +206,23 @@ class SquareGrating(PatternGenerator):
 
 
 
+class CompositePatternGenerator(PatternGenerator):
+    """
+    PatternGenerator that accepts a list of other PatternGenerators.
+    To create a new pattern, asks each of the PatternGenerators in the
+    list to create a pattern, then it combines the patterns to create a 
+    single pattern that it returns.
+    """
+	# CPHACKALERT: these should be a Parameters
+    operator = add
+    generatorlist = []
 
+    def __init__(self,generatorlist=[Disk(x=-0.3),Disk(x=0.3)],**params):
+        super(CompositePatternGenerator,self).__init__(**params)
+        self.generatorlist = generatorlist
+
+    # Or should it be: def __call__(self,**params): ?
+    def function(self,**params):
+    	patterns = [pg(bounds=params.get('bounds',self.bounds),density=params.get('density',self.density))
+                    for pg in self.generatorlist]
+        return self.operator.reduce(patterns)
