@@ -9,7 +9,7 @@ FIGPDFS  = ${subst .fig,.pdf,${FIGFILES}}
 FIGPNGS  = ${subst .fig,.png,${FIGFILES}}
 
 # Default targets 
-all: figoutput
+all: figoutput measuring-map.v3.png
 
 figoutput: ${FIGPNGS}
 
@@ -36,7 +36,7 @@ clean:
 	$(RM) *~
 
 output_clean:
-	${RM} ${FIGEPSS} ${FIGPDFS}
+	${RM} ${FIGEPSS} ${FIGPDFS} ${FIGPNGS} measuring-map.v3.png
 
 really_clean: clean output_clean
 
