@@ -82,19 +82,22 @@ but it minimizes the changes necessary for specific platforms and
 operating system versions.
 
 <P><B>Linux:</B>
-To build Topographica under Linux, just type <code>make</code> from within the
-<code>topographica/</code> directory.  The build process will take a
+To build Topographica under Linux, just type <code>make</code> from
+within the <code>topographica/</code> directory.  The build process
+will take a while to complete (e.g. about 5-10 minutes on a 1.5GHz
+Pentium IV machine with a local disk).  If you have PHP installed, you
+can also make local copies of the HTML documentation from the web
+site; to do so, type "make all" instead of (or after) "make".  "make
+all" will also run the regression tests and example files, to ensure
+that everything is functioning properly on your system.  At the
+moment, be sure that you do this compilation on a machine with a
+functioning DISPLAY, i.e., not a remote text-only session, or there
+will be errors involving Tk.
 
-while to complete (e.g. about 5-10 minutes on a 1.5GHz Pentium IV
-machine with a local disk).  If all goes well, a script named
-<code>topographica</code> will be created in the
-<code>topographica/</code> directory; you can use this to start
-Topographica as described in the <A
-HREF="../Tutorials/index.html">Tutorials</A>.  If you have PHP
-installed, you call also make local copies of the HTML documentation;
-to do so, type "make all" instead of (or after) "make".  "make all" will
-also run the regression tests and example files, to ensure that
-everything is functioning properly on your system.
+<P>If all goes well, a script named <code>topographica</code> will be
+created in the <code>topographica/</code> directory; you can use this
+to start Topographica as described in the
+<A HREF="../Tutorials/index.html">Tutorials</A>.  
 
 <P><B>UNIX:</B>
 Topographica is developed under Linux, but should work on other
