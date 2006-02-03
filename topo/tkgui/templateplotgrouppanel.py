@@ -19,9 +19,11 @@ from topo.plotting.plotgroup import plotgroup_dict, TemplatePlotGroup
 import matplotlib
 matplotlib.use('TkAgg')
 
+### JABALERT: Should change this to discover and import all the
+### commands/*.py files automatically
 from topo.commands.analysis import *
 from topo.commands.basic import *
-from topo.commands.lineplotting import *
+from topo.commands.pylabplots import *
 
 
 class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
