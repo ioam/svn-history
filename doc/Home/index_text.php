@@ -52,7 +52,7 @@ motor areas.
 <P>Topographica is freely available for downloading, and is an open
 source project whose capabilities can be extended and modified by any
 user.  The project is under active development, but as shown in the
-Tutorial it is already suitable for running visual cortex simulations.
+Tutorials it is already suitable for running visual cortex simulations.
 
 Also see our 
 <A target="_top" HREF="http://nn.cs.utexas.edu/area-view.php?RECORD_KEY%28Areas%29=AreaID&AreaID(Areas)=11">

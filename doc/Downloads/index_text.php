@@ -90,7 +90,7 @@ machine with a local disk).  If all goes well, a script named
 <code>topographica</code> will be created in the
 <code>topographica/</code> directory; you can use this to start
 Topographica as described in the <A
-HREF="../Tutorial/index.html">Tutorial</A>.  If you have PHP
+HREF="../Tutorials/index.html">Tutorials</A>.  If you have PHP
 installed, you call also make local copies of the HTML documentation;
 to do so, type "make all" instead of (or after) "make".  "make all" will
 also run the regression tests and example files, to ensure that
@@ -185,7 +185,7 @@ or
 </pre>
 
 If you use the latter, a good way to get started is to work through
-the <A HREF="../Tutorial/index.html">LISSOM tutorial</A>.
+the <A HREF="../Tutorials/lissom_or.html">LISSOM tutorial</A>.
 
 <H3>Updating Topographica</H3>
 

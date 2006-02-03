@@ -76,7 +76,7 @@ function menu_side($fname) {
 	# menu name and link
 	$menu_items = array("Home" => "../Home/index.html", 
 #		"Screenshots" => "../Screenshots/index.html",
-		"Tutorial" => "../Tutorial/index.html",
+		"Tutorials" => "../Tutorials/index.html",
 		"User Manual" => "../User_Manual/index.html",
 		"Reference Manual" => "../Reference_Manual/index.html",
 		"Developer Manual" => "../Developer_Manual/index.html",

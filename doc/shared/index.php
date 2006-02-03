@@ -44,7 +44,7 @@ model editor.  <!-- Plus SOMs with selectable Projections -->
 
 <p><b>8 November 05:</b> New site launched with Topographica version
 0.8.0, including a new
- <a target="_top" href="../Tutorial/index.html">Topographica tutorial</a>.
+ <a target="_top" href="../Tutorials/index.html">Topographica tutorial</a>.
 (<a target="_top" href="../images/051107_topographica_screen_shot_white.png">Linux screenshot</a>).
 
 </i>
