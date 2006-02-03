@@ -1,3 +1,5 @@
+<H1>SOM Retinotopic Map</H1>
+
 <p>
 This tutorial shows how to use the
 <a href="http://topographica.org/">Topographica</a> software to explore a
