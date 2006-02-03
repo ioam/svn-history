@@ -274,11 +274,16 @@ class ParametersFrame(Frame):
         Add a package property to the properties_frame by representing it
         with a ComboBox.
         """
+        attr = getattr(self.topo_obj, parameter_name).__class__
+        paramrange = parameter.range()
+        for key in paramrange.keys() :
+            if paramrange[key] == attr :
+                value = key
+                break
+        else : value = ''
         self.__widgets[parameter_name] = self.__properties_frame.add_combobox_property(
                     parameter_name,
-                    ### ALHACKALERT: Displays the default class name,
-                    ### but it should be displaying the actual current value.
-                    value = parameter.get_default_class_name(), #.getattr(self.topo_obj,parameter_name),
+                    value = value,
                     scrolledlist_items = parameter.range().keys(),
                     translator = parameter.get_from_key)
 
