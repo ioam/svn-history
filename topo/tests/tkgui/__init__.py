@@ -9,7 +9,8 @@ import os,unittest
 import testpropertiesframe
 import testtopoconsole
 import testplotgrouppanel
-import testtemplateplotgrouppanel
+# CEBHACKALERT: is this test broken?
+#import testtemplateplotgrouppanel 
 import testmatplotlibtk
 
 
