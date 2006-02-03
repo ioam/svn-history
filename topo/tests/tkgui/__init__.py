@@ -10,7 +10,7 @@ import testpropertiesframe
 import testtopoconsole
 import testplotgrouppanel
 # CEBHACKALERT: is this test broken?
-#import testtemplateplotgrouppanel 
+import testtemplateplotgrouppanel 
 import testmatplotlibtk
 
 

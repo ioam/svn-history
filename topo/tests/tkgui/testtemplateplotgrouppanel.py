@@ -1,11 +1,13 @@
 """
 Test for TemplatePlotGroupPanel
+
 $Id$
 """
 __version__='$Revision$'
 
 
 import unittest
+
 import topo
 import Numeric
 import Tkinter
@@ -15,20 +17,13 @@ from topo.sheets.generatorsheet import *
 from topo.base.patterngenerator import *
 from topo.base.simulator import *
 from topo.base.sheetview import *
-from topo.tkgui.templateplotgrouppanel import TemplatePlotGroupPanel
+from topo.tkgui.templateplotgrouppanel import *
 import topo.patterns.basic
 
 
 ### JCALERT: This test has to be written in order to test the new change in
 ### the TemplatePlotGroupPanel file
-### (It would be nice to re-write it when performing at the same time a re-organisation and
-### clean-up of the tkgui directory)
 
-class TestTemplatePlotGroupPanel(unittest.TestCase):
-
-
-    def test_preference_plot(self):
-        pass
 
 
 class TestActivityPanel(unittest.TestCase):
@@ -103,7 +98,7 @@ class TestActivityPanel(unittest.TestCase):
         self.s.add(sheetG)
         self.s.add(sheetB)
         self.s.add(retina)
-
+	
         # s.run(1)
 
     def test_activity_plot(self):
@@ -112,7 +107,7 @@ class TestActivityPanel(unittest.TestCase):
         """
         topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
         TemplatePlotGroupPanel.print_level = topo.base.topoobject.WARNING
-
+	assert 1==2
         root = Tkinter.Tk()
         root.resizable(1,1)
         Pmw.initialise(root)
@@ -125,17 +120,21 @@ class TestActivityPanel(unittest.TestCase):
         # console.mainloop()
 
 
+class TestTemplatePlotGroupPanel(unittest.TestCase):
 
-cases = [TestTemplatePlotGroupPanel,
-         TestActivityPanel]
+
+    def test_preference_plot(self):
+        pass
+
 
 suite = unittest.TestSuite()
 #  Uncomment the following line of code, to not run the test if
 #  $DISPLAY is undefined.  Used mainly for GUI testing.
 suite.requires_display = True
-suite.addTest(unittest.makeSuite(case) for case in cases)
+suite.addTest(unittest.makeSuite(TestActivityPanel))
+suite.addTest(unittest.makeSuite(TestTemplatePlotGroupPanel))
 
 
 ### JCALERT! I don't know why but this does not work...?
-# if __name__ == '__main__':
-#     unittest.TextTestRunner(verbosity=2).run(suite)
+if __name__ == '__main__':
+    unittest.TextTestRunner(verbosity=1).run(suite)
