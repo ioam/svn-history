@@ -28,7 +28,7 @@ develops a mapping of the input space.
   to work in <code>~/cnv</code> in UNIX, you would type:
 <pre>
   $ cd ~/cnv/
-  $ cp /home/jbednar/public/topographica/som_retinotopy.ty .
+  $ cp /home/jbednar/public/topographica/examples/som_retinotopy.ty .
 </pre>
 
 <P><li>Next, you will usually want to edit the <code>som_retinotopy.ty</code> file to make it
@@ -57,7 +57,7 @@ develops a mapping of the input space.
 <P><li> Next, start the Topographica GUI, telling it to load the
 SOM retinotopy simulation:
 <pre>
-  ./topographica -g examples/som_retinotopy.ty
+  /home/jbednar/public/topographica/topographica -g som_retinotopy.ty
 </pre>
 
 <p></p>
@@ -308,9 +308,13 @@ V1.density and Retina.density cannot be changed after the simulation
 has started; to change those edit the <code>som_retinotopy.ty</code>
 file as described in the initial steps above.
 
-<P>The input pattern can also be changed; e.g. if an oriented pattern
-is used, with random orientations, neurons will become selective for
-orientation and not just position.  See the
+<P>You can also try changing the random.seed() value in the .ty file,
+to get a different stream of inputs, or RandomArray.seed(), to get a
+different set of initial weights.
+
+<P>Of course, the input pattern can also be changed.  E.g. if an
+oriented pattern is used, with random orientations, neurons will
+become selective for orientation and not just position.  See the
 <code>obermayer_pnas90.ty</code> file for more details.
 
 
