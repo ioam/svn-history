@@ -218,7 +218,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         Subclasses of PlotGroupPanel will need to create this function to
         generate the plots.
 
-        See UnitWeightsPanel and ProjectionPanel for
+        See ConnectionFieldsPanel and ProjectionPanel for
         examples.
         """
         self.pe_group = self.PlotGroup(self.plot_group_key,[],self.normalize)

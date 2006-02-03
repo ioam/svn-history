@@ -26,9 +26,9 @@ import topo.commands.analysis
 ### JABALERT!  Why isn't there a Normalize button on this and
 ### ProjectionPanel like there is on ActivityPanel?
 ### JCALERT! It could also be re-named ConnectionFieldsPanel?
-class UnitWeightsPanel(CFSheetPlotPanel):
+class ConnectionFieldsPanel(CFSheetPlotPanel):
     def __init__(self,parent,console=None,pgt_name=None,**config):
-        super(UnitWeightsPanel,self).__init__(parent,console,pgt_name,**config)
+        super(ConnectionFieldsPanel,self).__init__(parent,console,pgt_name,**config)
 
         # Receptive Fields are generally tiny.  Boost it up to make it visible.
         self.WEIGHT_PLOT_INITIAL_SIZE = 30
@@ -87,7 +87,7 @@ class UnitWeightsPanel(CFSheetPlotPanel):
     ### file should have only GUI-specific stuff.
     def generate_plot_group_key(self):
         """
-        The plot_group_key for the UnitWeightsPanel will change depending on the
+        The plot_group_key for the ConnectionFieldsPanel will change depending on the
         input within the window widgets.  This means that the key
         needs to be regenerated at the appropriate times.
 

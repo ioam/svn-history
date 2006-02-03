@@ -10,7 +10,7 @@ from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, \
 import Pmw, re, os, sys, code, traceback, __main__
 import tkFileDialog
 from templateplotgrouppanel import TemplatePlotGroupPanel
-from unitweightspanel import UnitWeightsPanel
+from unitweightspanel import ConnectionFieldsPanel
 from projectionpanel import ProjectionPanel
 from testpattern import TestPattern
 from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
@@ -55,7 +55,7 @@ class PlotsMenuEntry(topo.base.topoobject.TopoObject):
     pulldown requires a name and a function to call when the item is
     selected.  self.command is used for that.  self.command has to be
     different for each plot type since this will include Activity,
-    Unit Weights, Projection grids, Preference Maps and more.
+    Connection Fields, Projection grids, Preference Maps and more.
     """
     def __init__(self,console,template,class_name=TemplatePlotGroupPanel,label=None,description=None,**config):
         super(PlotsMenuEntry,self).__init__(**config)
@@ -550,6 +550,6 @@ class GUIToplevel(Toplevel):
 
 
 if __name__ != '__main__':
-    plotpanel_classes['Connection Fields'] = UnitWeightsPanel
+    plotpanel_classes['Connection Fields'] = ConnectionFieldsPanel
     plotpanel_classes['Projection'] = ProjectionPanel
  
