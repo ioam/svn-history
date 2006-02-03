@@ -10,7 +10,7 @@ from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, \
 import Pmw, re, os, sys, code, traceback, __main__
 import tkFileDialog
 from templateplotgrouppanel import TemplatePlotGroupPanel
-from unitweightspanel import ConnectionFieldsPanel
+from connectionfieldspanel import ConnectionFieldsPanel
 from projectionpanel import ProjectionPanel
 from testpattern import TestPattern
 from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
