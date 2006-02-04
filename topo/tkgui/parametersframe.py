@@ -6,7 +6,7 @@ $Id$
 __version__='$Revision$'
 
 from propertiesframe import PropertiesFrame
-from Tkinter import Frame, TOP, YES, N,S,E,W,X
+from Tkinter import Frame, Button, RIGHT, TOP, BOTTOM, END, YES, N,S,E,W,X, Menu, Toplevel, Label
 import topo.base.utils
 from topo.base.utils import keys_sorted_by_value
 import topo
@@ -64,6 +64,11 @@ class ParametersFrame(Frame):
         #pattern_buttonBox.pack(side=TOP)
 
         self.topo_obj = None
+
+        self.option_add("*Menu.tearOff", "0") 
+        self.menu = Menu(self)
+        self.menu.insert_command(END, label = 'Properties', command = lambda: 
+            self.showParamProperties(self.show_my_parameters))
 
         self.__help_balloon = Pmw.Balloon(parent)
         
@@ -274,10 +279,14 @@ class ParametersFrame(Frame):
         Add a package property to the properties_frame by representing it
         with a ComboBox.
         """
-        attr = getattr(self.topo_obj, parameter_name).__class__
+        # ALALERT The keys are mapped to classes, so a new instance is created when set_obj_params
+        # is called. This means that any changes made to one of the properties of the class fields 
+        # is lost. 
+        attr = getattr(self.topo_obj, parameter_name)
+        attr_class = attr.__class__
         paramrange = parameter.range()
         for key in paramrange.keys() :
-            if paramrange[key] == attr :
+            if paramrange[key] == attr_class :
                 value = key
                 break
         else : value = ''
@@ -286,6 +295,28 @@ class ParametersFrame(Frame):
                     value = value,
                     scrolledlist_items = parameter.range().keys(),
                     translator = parameter.get_from_key)
+        self.__widgets[parameter_name][1]._entryWidget.bind('<Button-3>', 
+            lambda event, attr = attr: self.rightClick(event, attr))
+
+    def rightClick(self, event, attr) :
+        self.show_my_parameters = attr
+        self.menu.tk_popup(event.x_root, event.y_root)
+
+    def showParamProperties(self, obj) : 
+        paramWindow = Toplevel()
+        Label(paramWindow, text = obj.name).pack(side = TOP)
+        paramFrame = ParametersFrame(paramWindow)
+        paramFrame.create_widgets(obj)
+        buttonPanel = Frame(paramWindow)
+        buttonPanel.pack(side = BOTTOM)
+        Button(buttonPanel, text = 'Apply', 
+            command = paramFrame.set_obj_params).pack(side = RIGHT)
+        Button(buttonPanel, text = 'Ok', command = lambda frame=paramFrame, win=paramWindow: 
+            self.paramPropertiesOk(frame, win)).pack(side = RIGHT)
+
+    def paramPropertiesOk(self,frame, win) :
+        frame.set_obj_params()
+        win.destroy()
 
     def __add_boolean_property(self,parameter_name,parameter):
         """
