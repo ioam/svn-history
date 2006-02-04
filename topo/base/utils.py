@@ -118,6 +118,13 @@ def eval_atof(in_string,default_val = 0):
         val = default_val
     return val
 
+def dict_translator(in_string, trdict = {}) :
+    try :
+        val = trdict[in_string]
+    except Exception:
+        val = in_string
+    return val
+
 
 # CEBHACKALERT: when a base class for PatternGeneratorParameter etc
 # exists, consider making this a method of that class.
