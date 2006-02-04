@@ -117,18 +117,25 @@ class ParametersFrame(Frame):
         set the values of the Parameters to those specified by the widgets.
         """
         assert self.topo_obj!=None, "ParametersFrame must be associated with a TopoObj()."
-        
         parameters_to_modify = [ (name,parameter)
                                  for (name,parameter)
                                  in self.__visible_parameters.items()
                                  if not type(parameter)==topo.base.parameter.Constant]
-        
+
         for (name,parameter) in parameters_to_modify:
             w = self.__widgets[name][1]  # [0] is label (Message), [1] is widget
             setattr(self.topo_obj,name,w.get_value())
+            """if self.translator_dictionary == {} :
+                setattr(self.topo_obj,name,w.get_value())
+            else :
+                for key in self.translator_dictionary.keys() :
+                    if (key == w.get_value()) :
+                        setattr(self.topo_obj,name,self.translator_dictionary[key])
+                        break
+                else :
+                    setattr(self.topo_obj,name,w.get_value())"""
 
-        
-    def create_widgets(self, topo_obj):
+    def create_widgets(self, topo_obj, translator_dictionary = {}):
         """
         Create widgets for all non-hidden Parameters of topo_obj and add them
         to the screen.
@@ -141,7 +148,7 @@ class ParametersFrame(Frame):
         Widgets are added in order of the Parameters' precedences.
         """
         self.topo_obj=topo_obj
-
+        self.translator_dictionary = translator_dictionary
         # wipe old labels and widgets from screen
         for (label,widget) in self.__widgets.values():
             label.grid_forget()
@@ -163,7 +170,6 @@ class ParametersFrame(Frame):
         for name,parameter in self.__visible_parameters.items():
             parameter_precedences[name] = parameter.precedence
         sorted_parameter_names = keys_sorted_by_value(parameter_precedences)
-
         # add widgets to screen
         rows = range(len(sorted_parameter_names))
         for (row,parameter_name) in zip(rows,sorted_parameter_names): 
@@ -281,28 +287,63 @@ class ParametersFrame(Frame):
         """
         # ALALERT The keys are mapped to classes, so a new instance is created when set_obj_params
         # is called. This means that any changes made to one of the properties of the class fields 
-        # is lost. 
-        attr = getattr(self.topo_obj, parameter_name)
-        attr_class = attr.__class__
-        paramrange = parameter.range()
-        for key in paramrange.keys() :
-            if paramrange[key] == attr_class :
+        # is lost.
+        
+        """
+        if self.translator_dictionary == {} :
+            rangeDict = parameter.range()
+            translator = parameter.get_from_key
+            attr = attr.__class__
+        else :
+            rangeDict = self.translator_dictionary
+            c
+            translator = lambda in_string: dict_translator(in_string, trdict = rangeDict)
+        
+        items = rangeDict.keys()
+        for key in items :
+            if rangeDict[key] == attr :
                 value = key
                 break
         else : value = ''
+        """
+        attr = getattr(self.topo_obj, parameter_name)
+        translator_dictionary = {}
+        for key in parameter.range().keys() :
+            paramEntry = parameter.range()[key]
+            for entry in self.translator_dictionary.keys() :
+                try :
+                    if (self.translator_dictionary[entry].__class__ == paramEntry) :
+                        translator_dictionary[key] = self.translator_dictionary[entry]
+                        break
+                except Exception: pass
+            else :
+                if paramEntry == attr.__class__ :
+                    translator_dictionary[key] = attr
+                else :
+                    translator_dictionary[key] = parameter.range()[key]
+
+        for key in translator_dictionary :
+            if translator_dictionary[key] == attr :
+                value = key
+                break
+        else :
+            value = ''
+        from topo.base.utils import dict_translator
+        translator = lambda in_string: dict_translator(in_string, trdict = translator_dictionary)
         self.__widgets[parameter_name] = self.__properties_frame.add_combobox_property(
                     parameter_name,
                     value = value,
-                    scrolledlist_items = parameter.range().keys(),
-                    translator = parameter.get_from_key)
-        self.__widgets[parameter_name][1]._entryWidget.bind('<Button-3>', 
-            lambda event, attr = attr: self.rightClick(event, attr))
+                    scrolledlist_items = translator_dictionary.keys(),
+                    translator = translator)
+        w = self.__widgets[parameter_name][1]
+        w._entryWidget.bind('<Button-3>', 
+            lambda event, w = w: self.rightClick(event, w))
 
-    def rightClick(self, event, attr) :
-        self.show_my_parameters = attr
+    def rightClick(self, event, widget) :
+        self.show_my_parameters = widget.get_value()
         self.menu.tk_popup(event.x_root, event.y_root)
 
-    def showParamProperties(self, obj) : 
+    def showParamProperties(self, obj) :
         paramWindow = Toplevel()
         Label(paramWindow, text = obj.name).pack(side = TOP)
         paramFrame = ParametersFrame(paramWindow)
