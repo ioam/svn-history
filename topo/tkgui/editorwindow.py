@@ -237,6 +237,7 @@ class EditorCanvas(Canvas) :
     def showActivity(self, focus) : 
         # toggle whether the activity of an object is plotted
         focus.showActivity()
+        focus.setFocus(False)
 
     def getObjectXY(self, x, y) : 
         # return object at given x, y (None if no object)
