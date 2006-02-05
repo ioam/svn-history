@@ -8,7 +8,7 @@ __version__='$Revision$'
 from propertiesframe import PropertiesFrame
 from Tkinter import Frame, Button, RIGHT, TOP, BOTTOM, END, YES, N,S,E,W,X, Menu, Toplevel, Label
 import topo.base.utils
-from topo.base.utils import keys_sorted_by_value
+from topo.base.utils import keys_sorted_by_value, dict_translator
 import topo
 import topo.base.parameter
 import Pmw
@@ -19,17 +19,12 @@ import Pmw
 
 # CEBHACKALERT: doesn't work for TopoObject class.
 
-
 # CEBHACKALERT: there used to be a 'reset_to_defaults' method, which
 # didn't work. When Parameters can be set and then maintained between
 # classes (e.g. for PatternGenerators), reset_to_defaults() should be
 # re-implemented so that Parameters can be returned to default values
 # for the current class.
-# To maintain values of Parameters between classes, the object using
-# the ParametersFrame will need to do something like pass
-# ParametersFrame a dictionary of {parameter:value} pairs, which
-# ParametersFrame should be able to use selectively (i.e. use if
-# relevant to the current class but ignore otherwise).
+
 
 
 class ParametersFrame(Frame):
@@ -125,15 +120,6 @@ class ParametersFrame(Frame):
         for (name,parameter) in parameters_to_modify:
             w = self.__widgets[name][1]  # [0] is label (Message), [1] is widget
             setattr(self.topo_obj,name,w.get_value())
-            """if self.translator_dictionary == {} :
-                setattr(self.topo_obj,name,w.get_value())
-            else :
-                for key in self.translator_dictionary.keys() :
-                    if (key == w.get_value()) :
-                        setattr(self.topo_obj,name,self.translator_dictionary[key])
-                        break
-                else :
-                    setattr(self.topo_obj,name,w.get_value())"""
 
     def create_widgets(self, topo_obj, translator_dictionary = {}):
         """
@@ -146,6 +132,12 @@ class ParametersFrame(Frame):
         parameters must be Parameter objects.
 
         Widgets are added in order of the Parameters' precedences.
+
+        If a dictionary is passed in when create_widgets is called __add_class_selector_property
+        will attempt to get dictionary[parameter_name]. It expects these entries to be lists of 
+        relevant objects to cover the selectable classes. It updates the lists and it can be 
+        retrieved from self.translator_dictionary when set_obj_params is called and used on 
+        subsequent uses.
         """
         self.topo_obj=topo_obj
         self.translator_dictionary = translator_dictionary
@@ -160,7 +152,6 @@ class ParametersFrame(Frame):
                                         for (parameter_name,parameter)
                                         in self.topo_obj.get_paramobj_dict().items()
                                         if not parameter.hidden])
-
         # create the widgets
         self.__widgets = {}
         for (parameter_name, parameter) in self.__visible_parameters.items():
@@ -220,9 +211,18 @@ class ParametersFrame(Frame):
         """
         Add a text property to the properties_frame.
         """
+        attr = getattr(self.topo_obj,parameter_name)
+        str_attr = str(attr)
+        if attr == str_attr :
+            translator = None
+            value = attr
+        else :
+            translator = lambda in_string: dict_translator(in_string, trdict = {str_attr:attr})
+            value = str_attr
         self.__widgets[parameter_name] = self.__properties_frame.add_text_property(
             parameter_name,
-            value = getattr(self.topo_obj,parameter_name))
+            translator = translator,
+            value = value)
 
     def __add_readonly_text_property(self,parameter_name,parameter):
         """
@@ -311,11 +311,15 @@ class ParametersFrame(Frame):
                         except Exception: pass # if entry does not have a class field
                     else :
                         # if no suitable objects, make a new object of the class
-                        translator_dictionary[key] = parameter.range()[key]()
-                except KeyError : # if there is no list entry for this field 
-                    translator_dictionary[key] = parameter.range()[key]()
+                        try : # ALALERT This means if an object of this class cannot be instantiated here
+                              # it can't be selected in this selector
+                            translator_dictionary[key] = parameter.range()[key]()
+                        except Exception : pass
+                except KeyError : # if there is no list entry for this field
+                        try :# ALALERT This needs to be dealt with properly; as above
+                            translator_dictionary[key] = parameter.range()[key]()
+                        except Exception : pass
 
-        from topo.base.utils import dict_translator
         # maps the class key to the object found above. 
         translator = lambda in_string: dict_translator(in_string, trdict = translator_dictionary)
         self.__widgets[parameter_name] = self.__properties_frame.add_combobox_property(
