@@ -12,7 +12,7 @@ from topo.base.parameter import Parameter
 from topo.base.topoobject import TopoObject
 from topo.misc.inlinec import inline, optimized
 
-from topo.responsefns.basic import CFDotProduct_Py
+from topo.responsefns.basic import CFDotProduct_Py, CFEuclideanDistance_Py
 
 
 class CFDotProduct(CFResponseFunction):
