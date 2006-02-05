@@ -149,6 +149,7 @@ class ParametersFrame(Frame):
         """
         self.topo_obj=topo_obj
         self.translator_dictionary = translator_dictionary
+        self.object_dictionary = {}
         # wipe old labels and widgets from screen
         for (label,widget) in self.__widgets.values():
             label.grid_forget()
@@ -285,50 +286,37 @@ class ParametersFrame(Frame):
         Add a package property to the properties_frame by representing it
         with a ComboBox.
         """
-        # ALALERT The keys are mapped to classes, so a new instance is created when set_obj_params
-        # is called. This means that any changes made to one of the properties of the class fields 
-        # is lost.
-        
-        """
-        if self.translator_dictionary == {} :
-            rangeDict = parameter.range()
-            translator = parameter.get_from_key
-            attr = attr.__class__
-        else :
-            rangeDict = self.translator_dictionary
-            c
-            translator = lambda in_string: dict_translator(in_string, trdict = rangeDict)
-        
-        items = rangeDict.keys()
-        for key in items :
-            if rangeDict[key] == attr :
-                value = key
-                break
-        else : value = ''
-        """
+        # get the current value of this field
         attr = getattr(self.topo_obj, parameter_name)
         translator_dictionary = {}
+        value = ''
+        # for each of the classes that this selector can select between loop through
+        # and find if there is a suitable object already instantiated in either the
+        # current value or in the dictionary passed in.
         for key in parameter.range().keys() :
             paramEntry = parameter.range()[key]
-            for entry in self.translator_dictionary.keys() :
-                try :
-                    if (self.translator_dictionary[entry].__class__ == paramEntry) :
-                        translator_dictionary[key] = self.translator_dictionary[entry]
-                        break
-                except Exception: pass
-            else :
-                if paramEntry == attr.__class__ :
-                    translator_dictionary[key] = attr
-                else :
-                    translator_dictionary[key] = parameter.range()[key]
-
-        for key in translator_dictionary :
-            if translator_dictionary[key] == attr :
+            if paramEntry == attr.__class__ :
+                # if the class is the same as the class of the current value, use the
+                # this as the cover for this class; note that this is the current selection
+                translator_dictionary[key] = attr
                 value = key
-                break
-        else :
-            value = ''
+            else :
+                try :
+                    # loop through the passed in list for this field and if an entry is of the
+                    # correct class, use it as a cover for the class
+                    for entry in self.translator_dictionary[parameter_name] :
+                        try :
+                            if (self.translator_dictionary[entry].__class__ == paramEntry) :
+                                translator_dictionary[key] = self.translator_dictionary[entry]
+                        except Exception: pass # if entry does not have a class field
+                    else :
+                        # if no suitable objects, make a new object of the class
+                        translator_dictionary[key] = parameter.range()[key]()
+                except KeyError : # if there is no list entry for this field 
+                    translator_dictionary[key] = parameter.range()[key]()
+
         from topo.base.utils import dict_translator
+        # maps the class key to the object found above. 
         translator = lambda in_string: dict_translator(in_string, trdict = translator_dictionary)
         self.__widgets[parameter_name] = self.__properties_frame.add_combobox_property(
                     parameter_name,
@@ -336,6 +324,9 @@ class ParametersFrame(Frame):
                     scrolledlist_items = translator_dictionary.keys(),
                     translator = translator)
         w = self.__widgets[parameter_name][1]
+        # this could be retained and passed back, to retain the values of all object
+        self.translator_dictionary[parameter_name] = translator_dictionary.values()
+        # bind right click to allow the selected classes properties to be changed.
         w._entryWidget.bind('<Button-3>', 
             lambda event, w = w: self.rightClick(event, w))
 
