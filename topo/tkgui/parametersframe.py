@@ -319,7 +319,11 @@ class ParametersFrame(Frame):
                         try :# ALALERT This needs to be dealt with properly; as above
                             translator_dictionary[key] = parameter.range()[key]()
                         except Exception : pass
-
+        # if the current value lies outwith the recognised classes, then add the class to the list, with
+        # the current value as the object.
+        if (value == '') :
+            translator_dictionary[attr.name] = attr
+            value = attr.name
         # maps the class key to the object found above. 
         translator = lambda in_string: dict_translator(in_string, trdict = translator_dictionary)
         self.__widgets[parameter_name] = self.__properties_frame.add_combobox_property(
