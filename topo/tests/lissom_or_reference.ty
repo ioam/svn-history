@@ -107,6 +107,11 @@ assert round(alpha_inh/529,8)==0.00195177
 assert tsettle == 8
 
 
+# c++ lissom first takes the integer part of rf_radius, I think?
+# So we do that here, although we want to keep it as a float
+# for the calculations in this file.
+rf_radius = float(int(rf_radius))
+
 ###########################################
 # Set parameters
 
