@@ -18,7 +18,7 @@ of 1.0 centered at (0.0,0.0):
 <P><CENTER><IMG BORDER="2" WIDTH="388" HEIGHT="381" SRC="images/sheet_coords.png"></CENTER>
 
 <P>Locations in a Sheet are specified using floating-point Sheet
-coordinates (x,y) contained with the Sheet's <?php
+coordinates (x,y) contained within the Sheet's <?php
 classref('topo.base.boundingregion','BoundingBox') ?>.  The thick
 black line in the figure above shows the BoundingBox of the default
 Sheet, which extends from (-0.5,-0.5) to (0.5,0.5) in Sheet
@@ -36,6 +36,8 @@ units (matrix elements) in the matrix correspond to a unit length in
 Sheet coordinates.  For instance, the default Sheet above with a
 density of 5 corresponds to the following matrix:
 
+<!-- JCALERT: Should add a copy of the Sheet coordinates, marking the -->
+<!-- given point in both plots -->
 <P><CENTER><IMG BORDER="2" WIDTH="372" HEIGHT="369" SRC="images/matrix_coords.png"></CENTER>
 
 <P>Here, the 1.0x1.0 area of Sheet coordinates is represented with a
@@ -45,7 +47,7 @@ belongs.  Each floating-point location (x,y) in Sheet coordinates
 corresponds uniquely to a floating-point location (r,c) in
 floating-point matrix coordinates.  For the example Sheet
 above, location (0.5,1.5) in matrix coordinates corresponds exactly to
-location (0.1,0.3) in Sheet coordinates.  Notice that matrix
+location (-0.2,0.4) in Sheet coordinates.  Notice that matrix
 coordinates start at (0.0,0.0) in the upper left and increase down and
 to the right (as is the accepted convention for matrices), while
 Sheet coordinates start at the center and increase up and to the right
@@ -65,7 +67,7 @@ density of 10 instead, the corresponding matrix would be:
 
 <P><CENTER><IMG BORDER="2" WIDTH="377" HEIGHT="397" SRC="images/matrix_coords_hidensity.png"></CENTER>
 
-<P>Using this higher density, Sheet coordinate (0.1,0.3) now
+<P>Using this higher density, Sheet coordinate (-0.2,0.4) now
 corresponds to the matrix coordinate (1.0,3.0).  As long as the user
 interface specifies all units in Sheet coordinates and converts these
 to matrix coordinates appropriately, the user can use different
@@ -83,9 +85,11 @@ BoundingBox.  The units contained within a ConnectionField are those
 whose centers lie within that BoundingBox.
 
 <P>For instance, if the user specifies a ConnectionField with Sheet bounds from
-(0.5125,0.2250) to (0.2,0.525) for a sheet with a density of 10, the
-corresponding matrix bounds are (5.125,2.250) to (2.0,5.25):
+(-0.275,-0.0125) to (0.025,0.2885) for a sheet with a density of 10, the
+corresponding matrix coordinate bounds are (5.125,2.250) to (2.125,5.25):
 
+<!-- JCALERT: Should add a copy of the Sheet coordinates, marking the -->
+<!-- given box in both plots -->
 <P><CENTER><IMG BORDER="2" WIDTH="377" HEIGHT="397" SRC="images/connection_field.png"></CENTER>
 
 <P>Here the medium black outline shows the BoundingBox in matrix
