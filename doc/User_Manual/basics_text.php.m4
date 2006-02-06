@@ -5,15 +5,10 @@ m4_include(shared/bib2html.m4)m4_bib2html_init[[]]m4_dnl
 <A HREF="basics.html">Topographica basics</A><BR>
 <A HREF="background.html">Background</A><BR>
 <A HREF="features.html">Topographica features</A><BR>
-<A HREF="about.html">About Topographica</A><BR>
 
 <P><IMG src="../images/Topo-arch-white.jpg" width="300" height="326" border="2" alt="Sample architecture"><BR>
 
 <P><img border="2" width="649" height="529" src="images/toplevel.png"><BR> <!-- Also, _bare -->
-<P><img border="2" width="388" height="381" src="images/sheet_coords.png"><BR>
-<P><img border="2" width="372" height="369" src="images/matrix_coords.png"><BR>
-<P><img border="2" width="372" height="397" src="images/connection_field.png"><BR>
-<P><img border="2" width="509" height="505" src="images/retina_edge_buffer.png"><BR>
 
 <HR>
 
@@ -25,12 +20,9 @@ Should present brief background, then point to the book.
 
 Overview of basic design:
 
-  Event-driven simulator, time scale
   Sheets
-  sheet coordinates, densities, bounding boxes
   class parameters
   instance/constructor parameters
-  How to define a new simulator
   Hierarchy diagram: the major classes that matter
   Lots of examples
 
