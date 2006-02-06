@@ -1,9 +1,3 @@
-<?php
-function classref($module,$class) {
-  print "<a href=\"../Reference_Manual/$module.html#$class\">$class</a>";
-}
-?>
-
 <H1>Topographica coordinate systems</H1>
 
 Topographica allows simulation parameters to be specified in units

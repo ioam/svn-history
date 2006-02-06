@@ -104,4 +104,9 @@ function menu_side($fname) {
 ';
 }
 
+# Refer and link to a class in a specific module in the Reference Manual
+function classref($module,$class) {
+  print "<a href=\"../Reference_Manual/$module.html#$class\">$class</a>";
+}
+
 ?>
