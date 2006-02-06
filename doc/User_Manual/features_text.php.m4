@@ -52,7 +52,7 @@ Parallel-processor support planned
 Building and Testing Models
 Topographica Models
 
-<IMG WIDTH="400" HEIGHT="433" SRC="generic-cortical-hierarchy-model.png">
+<IMG WIDTH="400" HEIGHT="433" SRC="images/generic-cortical-hierarchy-model.png">
 
 Models are composed of interconnected maps
 Each brain region can be represented by multiple overlaid maps (e.g. ON and OFF LGN cells)
