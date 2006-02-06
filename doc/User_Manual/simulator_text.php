@@ -1,4 +1,4 @@
-<H1>Simulating physical processes</H1>
+<H1>Topographica representations of time</H1>
 
 Topographica is designed to support both clocked and event-driven
 simulations.  This section describes these types of simulation, and
@@ -6,13 +6,14 @@ then explains the structure of Topographica simulations of both types.
 
 <H2>Clocked simulations</H2>
 
-<P>Computer simulations of causal physical processes are typically
-either <i>clocked</i> or <i>event-driven</i>.  A clocked simulation
-quantizes time into discrete steps, typically equally spaced.  Such an
-approach is a good way to approximate a continuous process, as long as
-the timestep is small enough.  For instance, a clocked simulator could
-use a timebase of 1 millisecond (ms), and would simulate the
-properties of the physical system at 0 ms, 1 ms, etc:
+<P>Computer simulations of causal physical processes happening over a
+time periodare typically either <i>clocked</i> or <i>event-driven</i>.
+A clocked simulation quantizes time into discrete steps, typically
+equally spaced.  Such an approach is a good way to approximate a
+continuous process, as long as the timestep is small enough.  For
+instance, a clocked simulator could use a timebase of 1 millisecond
+(ms), and would simulate the properties of the physical system at 0
+ms, 1 ms, etc:
 
 <P><CENTER><IMG BORDER="2" WIDTH="354" HEIGHT="43" SRC="images/clocked-timeline.png"></CENTER>
 

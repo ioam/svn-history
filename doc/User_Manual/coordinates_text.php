@@ -1,9 +1,10 @@
-<H1>Topographica coordinate systems</H1>
+<H1>Topographica spatial coordinate systems</H1>
 
 Topographica allows simulation parameters to be specified in units
 that are independent of the level of detail used in any particular run
 of the simulation.  To achieve this, Topographica provides multiple
-coordinate systems, called <i>Sheet</i> and <i>matrix</i> coordinates.
+spatial coordinate systems, called <i>Sheet</i> and <i>matrix</i>
+coordinates.
 
 
 <H2><A NAME="sheet-coords">Sheet coordinates</A></H2>

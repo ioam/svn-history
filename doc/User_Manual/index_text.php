@@ -7,8 +7,8 @@ usable.  Sections that are ready so far include:
 
 <P>
 <!-- <A HREF="basics.html">Topographica basics</A><BR> -->
-<A HREF="simulator.html">Simulating physical processes in Topographica</A><BR>
-<A HREF="coordinates.html">Coordinate systems used in Topographica</A><BR>
 <!-- <A HREF="background.html">Background</A><BR> -->
+<A HREF="simulator.html">Representing time in Topographica</A><BR>
+<A HREF="coordinates.html">Representing space in Topographica (coordinate systems)</A><BR>
 <!-- <A HREF="features.html">Topographica features</A><BR> -->
 <A HREF="about.html">About Topographica</A><BR>
