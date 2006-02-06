@@ -331,13 +331,12 @@ class CFEuclideanDistance(CFResponseFunction):
             double *tact = temp_act;
             int *slice;
             int rr1, rr2, cc1, cc2;
-            int oc2, cact, nonzero_act;
+            int cact, nonzero_act;
             int i, j, r, l, it;
             PyObject *cf, *cfsr;
             PyObject *sarray = PyString_FromString("slice_array");
             PyObject *weights = PyString_FromString("weights");
             int slice_cols;
-            int or2;
             int *prev_act = (int *)malloc(cols*sizeof(int));
 	    double max_dist, euclidean_distance;
 
@@ -349,7 +348,6 @@ class CFEuclideanDistance(CFResponseFunction):
                 cfsr = PyList_GetItem(cfs,r);
 		nonzero_act = 1;
 		cact = -1;
-                or2 = rr2;
                 for (l=0; l<cols; ++l) {
                     cf = PyList_GetItem(cfsr,l);
                     slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
@@ -360,25 +358,14 @@ class CFEuclideanDistance(CFResponseFunction):
 
                     slice_cols = cc2-cc1;
     
-                    if (prev_act[l] == 0)
-                        rr1 = or2;
-
-                    // check if previous cf contains any activity
-                    if (nonzero_act==0) {
-                        // if previous cf is not active, only need to start
-                        // to check from the new column
-                        cc1 = oc2-1;
-                        oc2 = cc2;
-                    } else {
-                        oc2 = cc2;
-                        // if there is activity at column cact, check if it is
-                        // in the current cf, if so, jump to compute activity.
-                        // NOTE: work for retangular cf only.
-                        if (cc1<=cact && cact<cc2) {
-                            it = rr1;
-                            xj = X+len*rr1+cc1;
-                            goto need_compute;
-                        }
+                    // if there is activity at column cact, check if it is
+                    // in the current cf, if so, jump to compute activity.
+                    // NOTE: work for retangular cf only.
+                    // CB: see CFDotProduct
+                    if (cc1<=cact && cact<cc2) {
+                        it = rr1;
+                        xj = X+len*rr1+cc1;
+                        goto need_compute;
                     }
 
                     xj = X+len*rr1+cc1;
