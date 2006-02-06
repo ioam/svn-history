@@ -1,4 +1,8 @@
-The \textit{Topographica} project aims to make computational modeling of
+m4_dnl Must be preprocessed by m4 to handle the citations
+m4_include(shared/bib2html.m4)m4_bib2html_init[[]]m4_dnl
+m4_bib2html_cite_named(deangelis:jnp93,[[DeAngelis et al 1993]],deangelis:tins95,[[1995]]).
+
+The Topographica project aims to make computational modeling of
 cortical maps a viable research focus in behavioral neuroscience.
 In the project, a set of software tools for large-scale
 computational modeling of the structure, development, and function
@@ -24,12 +28,12 @@ The goal is to create a simulator that is user programmable,
 generalizes to different network arrangements and phenomena of
 different sizes, is interoperable with general-purpose analysis
 and visualization tools and low-level neuron simulators, and runs
-on PCs as well as parallel supercomputers. With \textit{Topographica},
+on PCs as well as parallel supercomputers. With Topographica,
 models can be built that focus on structural, functional, or
 integrative phenomena, either in the visual cortex or in other
-sensory cortices.  The first full release of \textit{Topographica} is
+sensory cortices.  The first full release of Topographica is
 scheduled for late 2004, and it will be freely available over the
-internet at \texttt{topographica.org}.
+internet at <A HREF="http://topographica.org">topographica.org</A>.
 
 
 
@@ -60,7 +64,7 @@ Maps can be connected internally with lateral connections
 Simulating Environment and Test Patterns:
 
 Map-scale models require spatially coherent input patterns to
-drive learning and test responses.  \textit{Topographica} provides
+drive learning and test responses.  Topographica provides
 facilities for generating and presenting visual inputs,
 spontaneous activity, test patterns, etc.:
   User-definable streams of random (and other) distributions for controlling inputs
@@ -79,10 +83,10 @@ Models can be constructed using primitives from the following
 partial list:
 
 Unit Models:
-  Firing-rate neurons \cite{wilson:biophysj72}
-  Spiking (leaky integrate-and-fire) neurons \cite{lapicque:jppg1907}
-  BCM \cite{bienenstock:theory}
-  Pipeline model \cite{geisler:nato99}
+  Firing-rate neurons m4_bib2html_cite_named(wilson:biophysj72,[[Wilson et al. 1972]])
+  Spiking (leaky integrate-and-fire) neurons m4_bib2html_cite_named(lapicque:jppg1907,[[Lapique 1907]])
+  BCM m4_bib2html_cite_named(bienenstock:theory,[[Bienenstock et al.]])
+  Pipeline model m4_bib2html_cite_named(geisler:nato99,[[Geisler et al. 1999]])
   External neuron plugins (GENESIS, NEURON)
   Arbitrary user-specified unit model in Python
   Activation function options for most of these types:  sigmoid, linear, bounded linear, arbitrary Python function
@@ -90,35 +94,35 @@ Unit Models:
 
   Connection Types
       Mechanism: additive or multiplicative
-      Effect: modulate activity (typical), or plasticity (learning gate) \cite{kirkwood:jneuro94}
+      Effect: modulate activity (typical), or plasticity (learning gate) m4_bib2html_cite_named(kirkwood:jneuro94,[[Kirkwood et al. 1994]])
       Time delays: none, fixed, learned
       Fixed or initial weight configuration: specified via arbitrary 2D function
       Relative strength: sign determines excitatory or inhibitory; value and sign can be fixed, or a Python function of the current activation level
-      %% (fn is e.g.\ for \cite{stemmler:lateral}.)
+      %% (fn is e.g.\ for m4_bib2html_cite_named(stemmler:lateral,[[Stemmler et al.]]).)
       %% What about an offset as well as this scale?  (For e.g.\ centering around zero.)
       %% What would it mean for the scale and/or offset to be learnable?
-      Storage location: instar \cite{grossberg:kybernetik72},
-      outstar \cite{grossberg:pnas68}
+      Storage location: instar m4_bib2html_cite_named(grossberg:kybernetik72,[[Grossberg et al. 1972]]),
+      outstar m4_bib2html_cite_named(grossberg:pnas68,[[Grossberg et al. 1968]])
       Areal target or source: any region of any map, including self
-    \end{tabular}
 
  Plasticity rules
       Hebbian,
       Anti-Hebbian,
-      Covariance \cite{dayan:book01}
-      BCM \cite{bienenstock:theory},
-      \emcite{oja:analyzer} rule
-      Spike-Timing--Dependent Plasticity \cite{markram:science97}
-      %%    Trace learning\someday{} \cite{wallis:pnb97foldiak:nc91}
-      %%    Supervised rules\someday{} (perceptron learning, delta/Widrow-Hoff)
-      Synaptic depression/facilitation \cite{finlayson:ebr95}
-      SOM learning rule \cite{kohonen:original}
-      %%    Rules with weight decay term\someday{}
-      %%    Elastic net\someday{}
-      %%    Dynamic link matching\someday{}
+      Covariance m4_bib2html_cite_named(dayan:book01,[[Dayan et al. 2001]])
+      BCM m4_bib2html_cite_named(bienenstock:theory,[[Bienenstock et al.]]),
+      m4_bib2html_cite_named(oja:analyzer,[[Oja]]) rule
+      Spike-Timing--Dependent Plasticity m4_bib2html_cite_named(markram:science97,[[Markram et al. 1997]])
+      %%    Trace learning m4_bib2html_cite_named(wallis:pnb97,[[Wallis et al. 1997]]),
+      m4_bib2html_cite_named(foldiak:nc91,[[Foldiak et al. 1991]])
+      %%    Supervised rules (perceptron learning, delta/Widrow-Hoff)
+      Synaptic depression/facilitation m4_bib2html_cite_named(finlayson:ebr95,[[Finlayson et al. 1995]])
+      SOM learning rule m4_bib2html_cite_named(kohonen:original,[[Kohonen]])
+      %%    Rules with weight decay term
+      %%    Elastic net
+      %%    Dynamic link matching
       Arbitrary user-specified plasticity rules
       Normalization: none, divisive, subtractive, saturation,
-      %%    \ \ sum-of-weight-squares subtractive\someday{}, sum-of-weight-squares divisive\someday{},
+      %%    \ \ sum-of-weight-squares subtractive, sum-of-weight-squares divisive,
       arbitrary Python function from weights to weights\\[1.5ex]
 
 Column models
@@ -148,3 +152,6 @@ Interfacing spiking and firing-rate neurons:
   Firing-rate $\rightarrow$ spiking: Generate spike trains
   Spiking $\rightarrow$ firing-rate: Running average, other ways to extract scalar from temporal codes
   Will use set of glue/bridge classes
+
+<HR>
+m4_bib2html_bibliography(topographica)

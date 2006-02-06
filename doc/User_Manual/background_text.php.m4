@@ -1,4 +1,5 @@
-m4_include(m4_bib2html_file)m4_bib2html_init[[]]m4_dnl
+m4_dnl Must be preprocessed by m4 to handle the citations
+m4_include(shared/bib2html.m4)m4_bib2html_init[[]]m4_dnl
 m4_bib2html_cite_named(deangelis:jnp93,[[DeAngelis et al 1993]],deangelis:tins95,[[1995]]).
 
 <p>Abstract: The biological function of cortical neurons can often be
@@ -25,7 +26,7 @@ Understanding these maps is crucial for neuroscience<BR>
 <img border="2" WIDTH="427" HEIGHT="189" src="images/measuring-map.v3.png"><BR>
 In each area, optical imaging can be used to determine maps of
 preference for different types of stimuli
-E.g. \npcite{blasdel:differential,chapman:jn96,crair:science98,weliky:nature96}
+E.g. m4_bib2html_npcite_named(blasdel:differential,[[Blasdel 1992]],chapman:jn96,[[(Chapman et al. 1996]],crair:science98,[[(Crair et al. 1998]],weliky:nature96,[[(Weliky et al. 1996]])
 
 Orientation and Ocular Dominance
 Canonical map examples
@@ -35,8 +36,8 @@ Maps interact in non-trivial ways
 Organization not visible if measuring only a few (or a few hundred) neurons
   
 Other Maps::
-Direction preference \smalltag{\cite{weliky:nature96,shmuel:jneuro96}}
-Spatial frequency \smalltag{\cite{issa:jn01}}
+Direction preference m4_bib2html_cite_named(weliky:nature96,[[(Weliky et al.,1996)]],shmuel:jneuro96,[[(Shmuel et al. 1996)]])
+Spatial frequency m4_bib2html_cite_named(issa:jn01,[[(Issa et al. 2001)]])
 Disparity?
 
 Motor:
@@ -98,9 +99,9 @@ Individual unit models:
 
 Synapses typically represented by a single number
 Also: Continuous analytical approximations (rare)\\
- \cite{amari:topographic,roquedasilvafilho:phd92}
+ m4_bib2html_cite_named(amari:topographic,[[Amari]],roquedasilvafilho:phd92,[[(Roquedasilvafilho et al. 1992]])
     
-See \emcite{swindale:network96,erwin:models} for review
+See m4_bib2html_cite_named(swindale:network96,[[(Swindale et al. 1996]],erwin:models,[[Erwin et al.]]) for review
 
 Conclusions
 
@@ -112,5 +113,5 @@ Suitable for testing both function and development
 Extensible to greater detail
 
     
-m4_horizontal_rule
-m4_bib2html_bibliography(nnstrings,nn)
+<HR>
+m4_bib2html_bibliography(topographica)
