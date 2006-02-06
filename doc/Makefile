@@ -37,8 +37,11 @@ PHPHTML = ${subst _text.php,.html,${PHPBASE}}
 
 
 # Generate HTML files from source versions
-default: bib2html all
+default: bib2html imagedirs all
 all: ${PHPHTML}
+
+imagedirs:
+	${MAKE} -C User_Manual/images/
 
 
 bib2html:
