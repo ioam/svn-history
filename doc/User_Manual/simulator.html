@@ -99,13 +99,27 @@ sent out over the Connections, at which point the EventProcessors will
 likely create new Events and send them out over their own connections,
 leading to a cascade of activity.
 
+<P>For instance, in this example, if the event queue were initally
+empty but the Retina generated an event at time zero, the next
+computation would occur at simulated time d1 or d2, when the first
+event arrives at the ON or OFF sheet.  Subsequent events would be
+delivered along each of the connections, causing each Sheet to be
+activated in turn.
+
 <P>Event-driven simulations are nearly identical to this, except that
 instead of a regular stream of input events they will be given an
 irregular stream consisting of only the important events.
 EventProcessors will then calculate their state at each event based on
-the preceding events and the elapsed time.
+the preceding events and the elapsed time.  Events will still
+propagate as before, but not on any regular timebase.
 
-
+<P>By convention, the delays in clocked Topographica simulations are
+typically set up so that the user-visible state is visible on even
+multiples of 1.0 time. For instance, a two-Sheet simulation with a
+Retina and V1 might be set up to have a Connection with delay 0.5, so
+that the event is generated in the retina at time zero, delivered to
+V1 at time 0.5, so that V1's response will be ready for visualization
+by time 1.0.
 </td></tr></table>
 <P>
 <table border="0" cellpadding="0" width="100%"><tr><td bgcolor="black">
