@@ -102,6 +102,6 @@ propagate as before, but not on any regular timebase.
 typically set up so that the user-visible state is visible on even
 multiples of 1.0 time. For instance, a two-Sheet simulation with a
 Retina and V1 might be set up to have a Connection with delay 0.5, so
-that the event is generated in the retina at time zero, delivered to
+that the event is generated in the retina at time zero, then delivered to
 V1 at time 0.5, so that V1's response will be ready for visualization
 by time 1.0.
