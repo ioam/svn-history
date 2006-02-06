@@ -8,8 +8,12 @@ RM                              = rm -f
 PHP                             = php -q
 SED                             = sed
 LN                              = ln -s
+M4                              = m4 -P
+MAKE                            = make
 
-PHPBASE = ${wildcard */*_text.php}
+M4BASE = ${wildcard */*_text.php.m4}
+
+PHPBASE = ${wildcard */*_text.php} ${subst .php.m4,.php,${M4BASE}}
 PHPHTML = ${subst _text.php,.html,${PHPBASE}}
 
 
@@ -26,9 +30,19 @@ PHPHTML = ${subst _text.php,.html,${PHPBASE}}
 %.html : %_text.php shared/*.php shared/*.css
 	cd ${dir $@} ; ${PHP} -d sendmail_from=${notdir $<} ../shared/index.php > $(subst _text.php,.html,${notdir $<})
 
+
+# PHP files can be preprocessed with M4 if desired.
+%.php : %.php.m4 shared/bib2html.m4
+	${M4} $< > $@
+
+
 # Generate HTML files from source versions
-default: all
+default: bib2html all
 all: ${PHPHTML}
+
+
+bib2html:
+	${MAKE} -C shared/bib2html/
 
 clean:
 	${RM} Reference_Manual/topo*.html
