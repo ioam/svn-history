@@ -6,15 +6,13 @@ $Id$
 __version__='$Revision$'
 
 
-from colorsys import hsv_to_rgb
-
 from Numeric import zeros, ones, Float, divide, ravel,clip,array
 
 from topo.base.topoobject import TopoObject
 from topo.base.parameter import Dynamic
 from topo.base.sheet import submatrix, bounds2slice, crop_slice_to_sheet_bounds
 
-from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap
+from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap, FileBitmap
 import palette
 
 
@@ -42,7 +40,7 @@ def make_plot(channels,sheet_view_dict,density=None,
      one of the Plot subclasses automatically.  See Plot.__init__ for
      a description of the arguments.
      """
-     plot_types=[SHCPlot,RGBPlot,PalettePlot]
+     plot_types=[SHCPlot,RGBPlot,PalettePlot,BitmapPlot]
      for pt in plot_types:
          plot = pt(channels,sheet_view_dict,density,plot_bounding_box,normalize,situate,name=name)
          if plot.bitmap != None:
@@ -174,8 +172,9 @@ class Plot(TopoObject):
 	for key in self.channels:
 	    sheet_view_key = self.channels.get(key,None)
 	    sv = self.view_dict.get(sheet_view_key, None)
-	    if sv != None :
+	    if sv != None:
                  self.plot_src_name = sv.src_name 
+
 
      
     def _get_shape_and_boxes(self,matrices,boxes):
@@ -449,21 +448,44 @@ class RGBPlot(Plot):
 
 
 class PalettePlot(Plot):
-  """
-  Bitmap plot based on a Strength matrices, with optional colorization.  
+     """
+     Bitmap plot based on a Strength matrices, with optional colorization.  
 
-  Not yet implemented.
+     Not yet implemented.
 
-  When implemented, construct an RGB plot from a Strength channel,
-  optionally colorized using a specified Palette.
-  """
+     When implemented, construct an RGB plot from a Strength channel,
+     optionally colorized using a specified Palette.
+     """
   
-  def __init__(self,channels,sheet_view_dict,density,
-                 plot_bounding_box,normalize,situate,**params):
+     def __init__(self,channels,sheet_view_dict,density,
+                  plot_bounding_box,normalize,situate,**params):
 
-      super(PalettePlot,self).__init__(channels,sheet_view_dict,density, 
-				   plot_bounding_box,normalize,situate,**params)
+          super(PalettePlot,self).__init__(channels,sheet_view_dict,density, 
+                                           plot_bounding_box,normalize,situate,**params)
 
-      ### JABHACKALERT: To implement the class: If Strength is present,
-      ### ask for Palette if it's there, and make a PaletteBitmap.
+          ### JABHACKALERT: To implement the class: If Strength is present,
+          ### ask for Palette if it's there, and make a PaletteBitmap.
 
+
+
+class BitmapPlot(Plot):
+     """
+     Simple display of a bitmap specified as a file path.
+     """
+     def __init__(self,channels,sheet_view_dict,density,
+                  plot_bounding_box,normalize,situate,**params):
+
+          super(BitmapPlot,self).__init__(channels,sheet_view_dict,density, 
+                                           plot_bounding_box,normalize,situate,**params)
+     
+          ### JCALERT! temporary hack for displaying the right label
+          self.plot_src_name = ''
+          # catching the empty plot exception
+          filename = channels.get('Filename',None)
+
+          # If it is an empty plot: self.bitmap=None
+          if (filename==None):
+               self.debug('Empty plot.')
+          else:
+               self.bitmap = FileBitmap(filename)
+ 
