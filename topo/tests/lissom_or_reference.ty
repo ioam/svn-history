@@ -190,8 +190,12 @@ s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
           weights_bounds = inhibitory_weight_bounds, learning_rate=alpha_inh)
         
 
-# CEBHACKALERT: clarify why times have been decremented by 1
 
+# Times are 1 less than the or_map_topo.param c++ lissom simulation because that one uses
+# "hook before_input" to schedule events. So, an event at t=200 is executed before t=200's
+# input pattern is presented. In Topographica, an event scheduled at t=0 is executed
+# after time=0's input pattern is presented. So one at t=199 is executed before t=200's
+# input pattern is presented, and is therefore  equivalent to or_map_topo's event scheduled at t=200.
 s.schedule_action(199, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.6/BaseN,-exc_rad*0.6/BaseN),(exc_rad*0.6/BaseN,exc_rad*0.6/BaseN))))
 
 s.schedule_action(499, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.42/BaseN,-exc_rad*0.42/BaseN),(exc_rad*0.42/BaseN,exc_rad*0.42/BaseN))))
