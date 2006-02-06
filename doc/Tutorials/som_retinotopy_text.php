@@ -84,6 +84,10 @@ sheet and one cortical sheet. The architecture can be viewed in the
 align="middle" WIDTH="232" HEIGHT="198" border=2>
 </p>
 
+<P>Note that the model editor representation of this network does not
+currently reflect that the units are fully connected; this should
+change in the future.
+
 <p></p>
 </li>
 
@@ -112,7 +116,7 @@ cortical space by selecting <span class='t_item'>Center of Gravity</span> from
 the <span class='t_item'>Plots</span> menu on the <span
 class='w_title'>Topographica Console</span> to get several plots.
 These plots show the results of computing the <i>center of gravity</i>
-(a.k.a. <i>centroid</i> or <i>center of mass</i> of the set of input
+(a.k.a. <i>centroid</i> or <i>center of mass</i>) of the set of input
 weights for each neuron.  For instance, in
 the <span class='w_title'>Center of Gravity</span>
 plot window:
@@ -163,7 +167,11 @@ the <span class='t_item'>Plots</span> menu to get the following plot:
 
 <p>This window shows the response for each Sheet in the model, which
 is zero at the start of the simulation (and thus both plots are
-black).
+black).  Note that these responses are best thought of as Euclidean
+proximity, not distance.  This formulation of the SOM response
+function actually subtracts the distances from the max distance, to
+ensure that the response will be larger for smaller Euclidean
+distances (as one intuitively expects for a neural response).
 
 <P><li>To run one input generation, presentation, activation, and
 learning iteration, click in the <span class='t_item'>Learning
@@ -204,9 +212,17 @@ align="middle" WIDTH="583" HEIGHT="389">
 
 (You should probably turn on the <span
 class='t_item'>Auto-refresh</span> button so that this plot will stay
-updated for the rest of this session.)  The weights are now different,
-because a few neurons around the winning unit at the middle right have
-had their weights updated.  Continue pressing return in the <span
+updated for the rest of this session.)  Some of the weights have now
+changed due to learning.  In the SOM algorithm, the unit with the
+maximum response (i.e., the minimum Euclidean distance between its
+weight vector and the input pattern) is chosen, and the weights of
+units within a circular area defined by a Gaussian-shaped
+<i>neighborhood function</i> around this neuron are updated.
+
+<P>This effect is visible in the <span
+class='w_title'>Projection</span> plot -- a few neurons around the
+winning unit at the middle right have changed their weights.
+Continue pressing return in the <span
 class='t_item'>Learning iterations</span> field to learn a few more
 patterns, each time noticing that a new input pattern is generated and
 the weights are updated.  After a few iterations it should be clear
@@ -303,7 +319,7 @@ global ordering is unlikely to happen, and one can expect the
 topographic grid not to flatten out (despite local order in patches).
 
 <P>Similarly, consider changing the
-neighborhood radius from <code>V1.alpha_0=0.42</code> to e.g. 1.0.
+learning rate from <code>V1.alpha_0=0.42</code> to e.g. 1.0.
 V1.density and Retina.density cannot be changed after the simulation
 has started; to change those edit the <code>som_retinotopy.ty</code>
 file as described in the initial steps above.
