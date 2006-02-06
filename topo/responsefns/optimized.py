@@ -15,6 +15,12 @@ from topo.misc.inlinec import inline, optimized
 from topo.responsefns.basic import CFDotProduct_Py, CFEuclideanDistance_Py
 
 
+# CEBHACKALERT: I removed an optimization from this function that seemed
+# to be causing spurious activity. The results of running this function
+# now appear to be the same as before, but without this spurious activity.
+
+# Julien is going to clean up this function now, along with the same problem
+# in CFEuclideanDistance.
 class CFDotProduct(CFResponseFunction):
     """
     Dot-product response function.
@@ -66,25 +72,18 @@ class CFDotProduct(CFResponseFunction):
 
                     slice_cols = cc2-cc1;
     
-                    if (prev_act[l] == 0)
-                        rr1 = or2;
+                    oc2 = cc2;
 
-                    // check if previous cf contains any activity
-                    if (nonzero_act==0) {
-                        // if previous cf is not active, only need to start
-                        // to check from the new column
-                        cc1 = oc2-1;
-                        oc2 = cc2;
-                    } else {
-                        oc2 = cc2;
-                        // if there is activity at column cact, check if it is
-                        // in the current cf, if so, jump to compute activity.
-                        // NOTE: work for retangular cf only.
-                        if (cc1<=cact && cact<cc2) {
-                            it = rr1;
-                            xj = X+len*rr1+cc1;
-                            goto need_compute;
-                        }
+                    // if there is activity at column cact, check if it is
+                    // in the current cf, if so, jump to compute activity.
+                    // NOTE: work for retangular cf only.
+                    // CB: not a problem? Because e.g. a disk will be inside the
+                    // rectangle, so although there may be more computations than
+                    // necessary it will not give incorrect results?
+                    if (cc1<=cact && cact<cc2) {
+                        it = rr1;
+                        xj = X+len*rr1+cc1;
+                        goto need_compute;
                     }
 
                     xj = X+len*rr1+cc1;
