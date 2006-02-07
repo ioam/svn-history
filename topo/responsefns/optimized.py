@@ -58,9 +58,7 @@ class CFDotProduct(CFResponseFunction):
     
             for (r=0; r<rows; ++r) {
                 cfsr = PyList_GetItem(cfs,r);
-		nonzero_act = 1;
-		cact = -1;
-                for (l=0; l<cols; ++l) {
+		for (l=0; l<cols; ++l) {
                     cf = PyList_GetItem(cfsr,l);
                     slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
                     rr1 = *slice++;
@@ -69,71 +67,30 @@ class CFDotProduct(CFResponseFunction):
                     cc2 = *slice;
 
                     slice_cols = cc2-cc1;
-    
-                    // if there is activity at column cact, check if it is
-                    // in the current cf, if so, jump to compute activity.
-                    // NOTE: work for retangular cf only.
-                    // CB: not a problem? Because e.g. a disk will be inside the
-                    // rectangle, so although there may be more computations than
-                    // necessary it will not give incorrect results?
-                    if (cc1<=cact && cact<cc2) {
-                        it = rr1;
-                        xj = X+len*rr1+cc1;
-                        goto need_compute;
-                    }
-
-                    xj = X+len*rr1+cc1;
-                    xjtmp = xj;
-
-                    // parse through the cf to see if there is any activity
-                    // If there isn't any, just don't bother to fetch the
-                    // weight object and compute the result (which is 0).
-                    for (it=rr1; it<rr2; ++it) {
-                        xi = xjtmp;
-			nonzero_act = 0;
-                        for (j=cc1; j<cc2; ++j) {
-			    if (*xi != 0) {
-			        cact = j;
-				nonzero_act = 1;
-				goto need_compute;
-			    }
-                            ++xi;
-                        }
-                        xjtmp += len;
-                    }
-                    // The input in the connection field is 0, so just set the 
-                    // activity to 0 and continue.
-                    prev_act[l] = 0;
-                    *tact = 0.0;
-                    ++tact;
-                    continue;
-
-             need_compute:
-                    prev_act[l] = 1; 
-                    tot = 0.0;
+                       
+		    tot = 0.0;
                     wj = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
-    
-                    // computes the dot product
-                    xj += (it-rr1)*len;
-                    wj += (it-rr1)*slice_cols - (cc2 - cc1);
+		    xj = X+len*rr1+cc1;
 
-                    for (i=it; i<rr2; ++i) {
+                    // computes the dot product
+    
+                    for (i=rr1; i<rr2; ++i) {
                         xi = xj;
-                        wj += slice_cols;
-                        wi = wj;
-                        for (j=cc1; j<cc2; ++j) {
+			wi = wj;
+                       
+			for (j=cc1; j<cc2; ++j) {
                             tot += *wi * *xi;
                             ++wi;
                             ++xi;
                         }
                         xj += len;
+			wj += slice_cols;
                     }
     
                     *tact = tot*strength;
                     ++tact;
                 }
             }
-            free(prev_act);
         """
     
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
@@ -141,8 +98,6 @@ class CFDotProduct(CFResponseFunction):
 if not optimized:
     CFDotProduct = CFDotProduct_Py
     TopoObject().message('Inline-optimized components not available; using CFDotProduct_Py instead of CFDotProduct.')
-        
-
 
 
 class CFDotProduct_CPointer(CFResponseFunction):
