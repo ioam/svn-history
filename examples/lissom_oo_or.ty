@@ -5,9 +5,6 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEBHACKALERT:
-# - delta,beta
-
 import random
 import RandomArray
 import fixedpoint
@@ -81,7 +78,7 @@ LGNOff = CFSheet(name='LGNOff',output_fn=PiecewiseLinear(lower_bound=0.0,
                                                          upper_bound=1.0))
 V1 = LISSOM(name='V1')
 V1.output_fn.lower_bound=0.083
-V1.output_fn.upper_bound=0.083+0.55
+V1.output_fn.upper_bound=0.633
 
 # LGN ON channel
 LGNOn_center = s.connect(Retina,LGNOn,dest_port="center",delay = FixedPoint("0.05"),
@@ -166,15 +163,15 @@ def set_deltabeta(x,y):
     V1.output_fn.lower_bound=x
     V1.output_fn.upper_bound=y
 
-s.schedule_action(  200, set_deltabeta, 0.11, 0.66)
-s.schedule_action(  500, set_deltabeta, 0.12, 0.67)
-s.schedule_action( 1000, set_deltabeta, 0.15, 0.68)
-s.schedule_action( 2000, set_deltabeta, 0.18, 0.70)
-s.schedule_action( 3000, set_deltabeta, 0.20, 0.73)
-s.schedule_action( 4000, set_deltabeta, 0.20, 0.76)
-s.schedule_action( 5000, set_deltabeta, 0.21, 0.79)
-s.schedule_action( 6500, set_deltabeta, 0.22, 0.82)
-s.schedule_action( 8000, set_deltabeta, 0.23, 0.85)
-s.schedule_action(20000, set_deltabeta, 0.24, 0.88)
+s.schedule_action(  200, set_deltabeta,0.093 , 0.643)
+s.schedule_action(  500, set_deltabeta,0.103 , 0.653)
+s.schedule_action( 1000, set_deltabeta,0.133 , 0.663)
+s.schedule_action( 2000, set_deltabeta,0.163 , 0.683)
+s.schedule_action( 3000, set_deltabeta,0.183 , 0.713)
+s.schedule_action( 4000, set_deltabeta,0.183 , 0.743)
+s.schedule_action( 5000, set_deltabeta,0.193 , 0.773)
+s.schedule_action( 6500, set_deltabeta,0.203 , 0.803)
+s.schedule_action( 8000, set_deltabeta,0.213 , 0.833)
+s.schedule_action(20000, set_deltabeta,0.223 , 0.863)
 
 s.run(0)
