@@ -198,9 +198,9 @@ s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
 # input pattern is presented, and is therefore  equivalent to or_map_topo's event scheduled at t=200.
 s.schedule_action(199, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.6/BaseN,-exc_rad*0.6/BaseN),(exc_rad*0.6/BaseN,exc_rad*0.6/BaseN))))
 
-s.schedule_action(499, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.42/BaseN,-exc_rad*0.42/BaseN),(exc_rad*0.42/BaseN,exc_rad*0.42/BaseN))))
+s.schedule_action(499, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.7/BaseN,-exc_rad*0.7/BaseN),(exc_rad*0.7/BaseN,exc_rad*0.7/BaseN))))
 
-s.schedule_action(999,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.336/BaseN,-exc_rad*0.336/BaseN),(exc_rad*0.336/BaseN,exc_rad*0.336/BaseN))))
+s.schedule_action(999,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.8/BaseN,-exc_rad*0.8/BaseN),(exc_rad*0.8/BaseN,exc_rad*0.8/BaseN))))
 
 s.schedule_action(1999,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-2.0/BaseN,-2.0/BaseN),(2.0/BaseN,2.0/BaseN))))
 
@@ -210,8 +210,10 @@ def set_learning_rate(projection_name, rate):
     """Set the learning rate on the named projection of V1."""
     V1.projections()[projection_name].learning_rate=rate
 
-
+s.schedule_action(  199, set_learning_rate, "LateralExcitatory", 0.002*ecs)
 s.schedule_action(  499, set_learning_rate, "LateralExcitatory", 0.001*ecs)
+
+s.schedule_action(  199, set_learning_rate, "Afferent0", 0.007*acs)
 s.schedule_action(  499, set_learning_rate, "Afferent0", 0.005*acs)
 s.schedule_action( 1999, set_learning_rate, "Afferent0", 0.004*acs)
 s.schedule_action( 3999, set_learning_rate, "Afferent0", 0.003*acs)
