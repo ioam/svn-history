@@ -27,12 +27,13 @@ from topo.patterns import PatternGeneratorParameter
 ###########################################
 # Set parameters
 
-# CEBHACKALERT: these bounds aren't quite large enough to
-# allow all the ConnectionFields to have full weights
-# matrices. Really this is an alert for lissom_or_reference,
-# but it's here for now to remind me.
+# CEBHACKALERT: ##C lines to replace nearby equivalents
+# when code verified with circular connection fields.
 input_bounds = BoundingBox(points=((-0.6792,-0.6792),
-				   ( 0.6792, 0.6792))) 
+          			   ( 0.6792, 0.6792))) 
+
+##C input_bounds = BoundingBox(points=((-0.7917,-0.7917),
+##C   				       ( 0.7917, 0.7917))) 
 
 GeneratorSheet.density = 24.0 
 GeneratorSheet.period = 1
@@ -53,7 +54,8 @@ LISSOM.density = 48.0
 
 # Connection parameters
 
-afferent_weight_bounds   = BoundingBox(points=((-0.22,-0.22),(0.22,0.22)))
+##C afferent_weight_bounds   = BoundingBox(points=((-0.22,-0.22),(0.22,0.22)))
+afferent_weight_bounds   = BoundingBox(points=((-0.25,-0.25),(0.25,0.25)))
 excitatory_weight_bounds = BoundingBox(points=((-0.10,-0.10),(0.10,0.10)))
 inhibitory_weight_bounds = BoundingBox(points=((-0.23,-0.23),(0.23,0.23))) 
 
@@ -61,6 +63,7 @@ inhibitory_weight_bounds = BoundingBox(points=((-0.23,-0.23),(0.23,0.23)))
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()
+##C CFProjection.weights_shape = topo.patterns.basic.Disk()
 CFProjection.response_fn=CFDotProduct()
 CFProjection.learning_fn=DivisiveHebbian()
 
