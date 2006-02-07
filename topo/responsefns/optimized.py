@@ -14,13 +14,6 @@ from topo.misc.inlinec import inline, optimized
 
 from topo.responsefns.basic import CFDotProduct_Py, CFEuclideanDistance_Py
 
-
-# CEBHACKALERT: I removed an optimization from this function that seemed
-# to be causing spurious activity. The results of running this function
-# now appear to be the same as before, but without this spurious activity.
-
-# Julien is going to clean up this function now, along with the same problem
-# in CFEuclideanDistance.
 class CFDotProduct(CFResponseFunction):
     """
     Dot-product response function.
@@ -85,6 +78,8 @@ class CFDotProduct(CFResponseFunction):
 if not optimized:
     CFDotProduct = CFDotProduct_Py
     TopoObject().message('Inline-optimized components not available; using CFDotProduct_Py instead of CFDotProduct.')
+
+
 
 
 class CFDotProduct_CPointer(CFResponseFunction):
@@ -247,7 +242,9 @@ if not optimized:
     TopoObject().message('Inline-optimized components not available; using CFDotProduct_Py instead of CFDotProduct_CPointer.')
    
 
-     
+ 
+
+    
 class CFEuclideanDistance(CFResponseFunction):
     """
     Euclidean-distance response function.
@@ -267,30 +264,20 @@ class CFEuclideanDistance(CFResponseFunction):
     
         code = """
 	    #include <math.h>
-            double tot;
             float  *wi, *wj; 
-            double *xi, *xj, *xjtmp;
+            double *xi, *xj;
             double *tact = temp_act;
             int *slice;
             int rr1, rr2, cc1, cc2;
-            int cact, nonzero_act;
-            int i, j, r, l, it;
-            PyObject *cf, *cfsr;
+	    PyObject *cf, *cfsr;
             PyObject *sarray = PyString_FromString("slice_array");
             PyObject *weights = PyString_FromString("weights");
-            int slice_cols;
-            int *prev_act = (int *)malloc(cols*sizeof(int));
-	    double max_dist, euclidean_distance;
-
-            memset(prev_act, 0, cols*sizeof(int));
-            rr2 = 0;
-	    max_dist=0.0;
+	    double euclidean_distance, tot;
+ 	    double max_dist=0.0;
     
-            for (r=0; r<rows; ++r) {
+            for (int r=0; r<rows; ++r) {
                 cfsr = PyList_GetItem(cfs,r);
-		nonzero_act = 1;
-		cact = -1;
-                for (l=0; l<cols; ++l) {
+                for (int l=0; l<cols; ++l) {
                     cf = PyList_GetItem(cfsr,l);
                     slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
                     rr1 = *slice++;
@@ -298,64 +285,22 @@ class CFEuclideanDistance(CFResponseFunction):
                     cc1 = *slice++;
                     cc2 = *slice;
 
-                    slice_cols = cc2-cc1;
-    
-                    // if there is activity at column cact, check if it is
-                    // in the current cf, if so, jump to compute activity.
-                    // NOTE: work for retangular cf only.
-                    // CB: see CFDotProduct
-                    if (cc1<=cact && cact<cc2) {
-                        it = rr1;
-                        xj = X+len*rr1+cc1;
-                        goto need_compute;
-                    }
-
                     xj = X+len*rr1+cc1;
-                    xjtmp = xj;
-
-                    // parse through the cf to see if there is any activity
-                    // If there isn't any, just don't bother to fetch the
-                    // weight object and compute the result (which is 0).
-                    for (it=rr1; it<rr2; ++it) {
-                        xi = xjtmp;
-			nonzero_act = 0; 
-                        for (j=cc1; j<cc2; ++j) {
-			    if (*xi != 0) {
-			        cact = j;
-				nonzero_act = 1;
-				goto need_compute;
-			    }
-                            ++xi;
-                        }
-                        xjtmp += len;
-                    }
-                    // The input in the connection field is 0, so just set the 
-                    // activity to 0 and continue.
-                    prev_act[l] = 0; 
-                    *tact = 0.0;
-                    ++tact;
-                    continue;
-
-             need_compute:
-                    prev_act[l] = 1; 
-                    tot = 0.0;
-                    wj = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
+		    wj = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
     
                     // computes the dot product
-                    xj += (it-rr1)*len;
-                    wj += (it-rr1)*slice_cols - (cc2 - cc1);
-
-                    for (i=it; i<rr2; ++i) {
-                        xi = xj;
-                        wj += slice_cols;
+		    tot = 0.0;
+                    for (int i=rr1; i<rr2; ++i) {
+                        xi = xj;                        
                         wi = wj;
-                        for (j=cc1; j<cc2; ++j) {
+                        for (int j=cc1; j<cc2; ++j) {
 			    // JCALERT! find power notation in C.
                             tot += (*wi - *xi) * (*wi - *xi);
                             ++wi;
                             ++xi;
                         }
                         xj += len;
+			wj += cc2-cc1;
                     }
 		    euclidean_distance = sqrt(tot); 
 		    if (euclidean_distance>max_dist) {
@@ -366,13 +311,12 @@ class CFEuclideanDistance(CFResponseFunction):
                 }
             }
 	    tact = temp_act;
-	    for (r=0; r<rows; ++r) {
-	        for (l=0; l<cols; ++l) {
+	    for (int r=0; r<rows; ++r) {
+	        for (int l=0; l<cols; ++l) {
     		    *tact = strength*(max_dist - *tact);
 		    ++tact;
                 }
             }	
-            free(prev_act);
         """
 
 	
