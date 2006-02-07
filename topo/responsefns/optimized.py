@@ -41,52 +41,39 @@ class CFDotProduct(CFResponseFunction):
         code = """
             double tot;
             float *wi, *wj; 
-            double *xi, *xj, *xjtmp;
+            double *xi, *xj;
             double *tact = temp_act;
-            int *slice;
-            int rr1, rr2, cc1, cc2;
-            int cact, nonzero_act;
-            int i, j, r, l, it;
+            int *slice;            
+	    int rr1, rr2, cc1, cc2;
             PyObject *cf, *cfsr;
             PyObject *sarray = PyString_FromString("slice_array");
             PyObject *weights = PyString_FromString("weights");
-            int slice_cols;
-            int *prev_act = (int *)malloc(cols*sizeof(int));
-
-            memset(prev_act, 0, cols*sizeof(int));
-            rr2 = 0;
     
-            for (r=0; r<rows; ++r) {
+            for (int r=0; r<rows; ++r) {
                 cfsr = PyList_GetItem(cfs,r);
-		for (l=0; l<cols; ++l) {
+		for (int l=0; l<cols; ++l) {
                     cf = PyList_GetItem(cfsr,l);
                     slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
                     rr1 = *slice++;
                     rr2 = *slice++;
                     cc1 = *slice++;
                     cc2 = *slice;
-
-                    slice_cols = cc2-cc1;
-                       
 		    tot = 0.0;
                     wj = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
 		    xj = X+len*rr1+cc1;
 
                     // computes the dot product
-    
-                    for (i=rr1; i<rr2; ++i) {
+		    for (int i=rr1; i<rr2; ++i) {
                         xi = xj;
-			wi = wj;
-                       
-			for (j=cc1; j<cc2; ++j) {
+			wi = wj;                       
+			for (int j=cc1; j<cc2; ++j) {
                             tot += *wi * *xi;
                             ++wi;
                             ++xi;
                         }
                         xj += len;
-			wj += slice_cols;
-                    }
-    
+			wj += cc2-cc1;
+                    }  
                     *tact = tot*strength;
                     ++tact;
                 }
