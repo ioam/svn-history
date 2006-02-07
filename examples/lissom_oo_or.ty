@@ -6,9 +6,7 @@ $Id$
 __version__='$Revision$'
 
 # CEBHACKALERT:
-# - learning rates
-# - input_bounds etc for circular rather than square cfs
-
+# - delta,beta
 
 import random
 import RandomArray
@@ -34,12 +32,9 @@ from topo.patterns import PatternGeneratorParameter
 ###########################################
 # Set parameters
 
-# CEBHACKALERT: these bounds aren't quite large enough to
-# allow all the ConnectionFields to have full weights
-# matrices. Really this is an alert for lissom_or_reference,
-# but it's here for now to remind me.
-input_bounds = BoundingBox(points=((-0.6792,-0.6792),
-				   ( 0.6792, 0.6792))) 
+input_bounds = BoundingBox(points=((-0.7917,-0.7917),
+  				   ( 0.7917, 0.7917))) 
+
 
 GeneratorSheet.density = 24.0 
 GeneratorSheet.period = 1
@@ -62,7 +57,7 @@ LISSOM.density = 48.0
 
 # Connection parameters
 lgn_weight_bounds = BoundingBox(points=((-1.0/12.0*4.7,-1.0/12.0*4.7),(1.0/12.0*4.7,1.0/12.0*4.7)))
-afferent_weight_bounds   = BoundingBox(points=((-0.22,-0.22),(0.22,0.22)))
+afferent_weight_bounds   = BoundingBox(points=((-0.25,-0.25),(0.22,0.22)))
 excitatory_weight_bounds = BoundingBox(points=((-0.10,-0.10),(0.10,0.10)))
 inhibitory_weight_bounds = BoundingBox(points=((-0.23,-0.23),(0.23,0.23))) 
 
@@ -85,7 +80,8 @@ LGNOn = CFSheet(name='LGNOn',output_fn=PiecewiseLinear(lower_bound=0.0,
 LGNOff = CFSheet(name='LGNOff',output_fn=PiecewiseLinear(lower_bound=0.0,
                                                          upper_bound=1.0))
 V1 = LISSOM(name='V1')
-
+V1.output_fn.lower_bound=0.083
+V1.output_fn.upper_bound=0.083+0.55
 
 # LGN ON channel
 LGNOn_center = s.connect(Retina,LGNOn,dest_port="center",delay = FixedPoint("0.05"),
