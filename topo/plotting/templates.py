@@ -32,7 +32,7 @@ class PlotGroupTemplate(TopoObject):
     command = Parameter(None)
     normalize = Parameter('False')
     
-    def __init__(self, plot_templates=[], **params):
+    def __init__(self, plot_templates=[], static_images = [],**params):
         """
         A PlotGroupTemplate is constructed from a name, an (optional)
         command that the user specifies should be called before using the
@@ -82,6 +82,7 @@ class PlotGroupTemplate(TopoObject):
         super(PlotGroupTemplate,self).__init__(**params)
        
 	self.plot_templates = KeyedList(plot_templates)
+	self.static_images = KeyedList(static_images)
 
     ### JCALERT! We might eventually write this function 'Python-like'
     ### by using keyword argument to specify each channel a,d then get the dictionnary 
@@ -91,6 +92,12 @@ class PlotGroupTemplate(TopoObject):
 	for key,value in specification_tuple_list:
 	    dict[key]=value
 	self.plot_templates.append((name,dict))
+
+    ### JCALERT! We might eventually write this function 'Python-like'
+    ### by using keyword argument to specify each channel a,d then get the dictionnary 
+    ### of all remaining argument....
+    def add_static_image(self,name,file_path):
+	self.static_images.append((name,file_path))
         
 
 
@@ -130,7 +137,7 @@ pgt.add_plot('Activity',[('Strength','Activity'),('Hue','OrientationPreference')
 ### Also, the situate option could be specified in the template.
 ### Also implement the test for 'Weights' in PlotGroup.
 pgt = new_plotgroup_template(name='Connection Fields',command='update_connectionfields()',normalize='True')
-pgt.add_plot('Connection Field',[('Strength','Weights'),('Hue','OrientationPreference')])
+pgt.add_plot('Connection Fields',[('Strength','Weights'),('Hue','OrientationPreference')])
 
 
 pgt = new_plotgroup_template(name='Projection',command='update_projections()',normalize='True')
@@ -142,6 +149,9 @@ pgt.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pgt.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
 pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
+# This line is commented out while the re-sizing is being fixed in plotgrouppanel.py
+#pgt.add_static_image('Color Key','color_key.png')
+
 
 
 pgt = new_plotgroup_template(name='Position Preference',command='measure_position_pref() ; topographic_grid()',normalize=True)
@@ -155,5 +165,6 @@ pgt = new_plotgroup_template(name='Center of Gravity',command='measure_cog() ; t
 pgt.add_plot('X CoG',[('Strength','XCoG')])
 pgt.add_plot('Y CoG',[('Strength','YCoG')])
 pgt.add_plot('CoG',[('Red','XCoG'),('Green','YCoG')])
+
 
 
