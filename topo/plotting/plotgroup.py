@@ -12,13 +12,15 @@ import types
 
 from Numeric import transpose, array, ravel
 
+import Image
+
 from topo.base.utils import flatten, dict_sort
 from topo.base.topoobject import TopoObject
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
 from topo.base.connectionfield import CFSheet
 
-from plot import make_template_plot
+from plot import make_template_plot, Plot
 import bitmap
 
 
@@ -152,6 +154,8 @@ class TemplatePlotGroup(PlotGroup):
         else:
             self.sheet_filter_lam = lambda s : True
 
+        self._add_static_images()
+
 	
     def _plot_list(self):
         """
@@ -181,7 +185,16 @@ class TemplatePlotGroup(PlotGroup):
         p = make_template_plot(plot_channels,sheet.sheet_view_dict,sheet.density,sheet.bounds,self.normalize,False,name=plot_name)
 	return [p]
 
-	
+    ### JCALERT! We have to decide what to do with the added_list concept in PlotGroup
+    ### (as well as the add function...which shouldn't take a list...)
+    def _add_static_images(self):
+        """
+        Construct the static image Plot (e.g. color key for Orientation Preference map.
+        """        
+        for image_name,file_path in self.template.static_images :
+            image = Image.open(file_path)
+            self.add([Plot(image,name=image_name)])
+            
 
 class ConnectionFieldsPlotGroup(TemplatePlotGroup):
     """
