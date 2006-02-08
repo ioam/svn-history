@@ -41,9 +41,12 @@ import topo.tests.lissom_log_parser
 ### (1)
 BaseN=48.0
 BaseRN=24.0
+BaseLN=24.0
 area_scale=1.0
 #num_eyes=1
 rf_radius=BaseRN/4.0+0.5
+
+
 inh_rad=max(2.5,BaseN/4.0-1.0)
 exc_rad=max(2.5,BaseN/10.0)
 #default_afferent_size_scale=BaseN/BaseRN
@@ -77,6 +80,12 @@ alpha_exc=0.002*ecs*137
 alpha_inh=0.00025*ics*97
 
 tsettle=8
+
+
+sigma_c = 0.5 # radius of LGN DoG center Gaussian
+sigma_s = 4*sigma_c # radius of LGN DoG surround Gaussian
+
+r_L = 4.7*sigma_s
 
 assert RN == 38
 assert retina_edge_buffer == 7
@@ -113,6 +122,7 @@ assert tsettle == 8
 # So we do that here, although we want to keep it as a float
 # for the calculations in this file.
 rf_radius = float(int(rf_radius))
+r_L = float(int(r_L))
 
 ###########################################
 # Set parameters
@@ -153,7 +163,7 @@ LISSOM.density = BaseN
 #LISSOM.tsettle=tsettle
 
 # Connection parameters
-lgn_weight_bounds = BoundingBox(points=((-1.0/12.0*4.7,-1.0/12.0*4.7),(1.0/12.0*4.7,1.0/12.0*4.7)))
+lgn_weight_bounds = BoundingBox(points=((-r_L/BaseLN,-r_L/BaseLN),(r_L/BaseLN,r_L/BaseLN)))
 afferent_weight_bounds   = BoundingBox(points=((-rf_radius/BaseRN,-rf_radius/BaseRN),(rf_radius/BaseRN,rf_radius/BaseRN)))
 excitatory_weight_bounds = BoundingBox(points=((-exc_rad/BaseN,-exc_rad/BaseN),(exc_rad/BaseN,exc_rad/BaseN)))
 inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(inh_rad/BaseN,inh_rad/BaseN)))
@@ -180,9 +190,12 @@ GeneratorSheet.bounds = input_bounds
 Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),
                         name='Retina')
 
-LGNOn = CFSheet(name='LGNOn',output_fn=PiecewiseLinear(lower_bound=0.0,
+#CFSheet.bounds=input_bounds
+
+
+LGNOn = CFSheet(bounds=input_bounds,name='LGNOn',output_fn=PiecewiseLinear(lower_bound=0.0,
                                                        upper_bound=1.0))
-LGNOff = CFSheet(name='LGNOff',output_fn=PiecewiseLinear(lower_bound=0.0,
+LGNOff = CFSheet(bounds=input_bounds,name='LGNOff',output_fn=PiecewiseLinear(lower_bound=0.0,
                                                          upper_bound=1.0))
 V1 = LISSOM(name='V1')
 
@@ -190,14 +203,14 @@ V1 = LISSOM(name='V1')
 LGNOn_center = s.connect(Retina,LGNOn,dest_port="center",delay = FixedPoint("0.05"),
                          connection_type=SharedWeightCFProjection,strength=2.33,
                          name='Center',weights_bounds=lgn_weight_bounds,
-                         weights_generator=topo.patterns.basic.Gaussian(size=1.0/24.0,aspect_ratio=1))
+                         weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_c/BaseRN,aspect_ratio=1))
 
 LGNOn_center.learning_fn.output_fn = DivisiveSumNormalize()
 
 LGNOn_surround = s.connect(Retina,LGNOn,dest_port="surround",delay = FixedPoint("0.05"),
                            connection_type=SharedWeightCFProjection,strength=-2.33,
                            name='Surround',weights_bounds=lgn_weight_bounds,
-                           weights_generator=topo.patterns.basic.Gaussian(size=1.0/6.0,aspect_ratio=1))
+                           weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_s/BaseRN,aspect_ratio=1))
 
 LGNOn_surround.learning_fn.output_fn = DivisiveSumNormalize()
 
@@ -206,24 +219,24 @@ LGNOn_surround.learning_fn.output_fn = DivisiveSumNormalize()
 LGNOff_center = s.connect(Retina,LGNOff,dest_port="center",delay = FixedPoint("0.05"),
                           connection_type=SharedWeightCFProjection,strength=-2.33,
                           name='Center',weights_bounds=lgn_weight_bounds,
-                          weights_generator=topo.patterns.basic.Gaussian(size=1.0/24.0,aspect_ratio=1))
+                          weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_c/BaseRN,aspect_ratio=1))
 
 LGNOff_center.learning_fn.output_fn = DivisiveSumNormalize()
 
 LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoint("0.05"),
                             connection_type=SharedWeightCFProjection,strength=2.33,
                             name='Surround',weights_bounds=lgn_weight_bounds,
-                            weights_generator=topo.patterns.basic.Gaussian(size=1.0/6.0,aspect_ratio=1))
+                            weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_s/BaseRN,aspect_ratio=1))
 LGNOff_surround.learning_fn.output_fn = DivisiveSumNormalize()
 
 
 
 s.connect(LGNOn,V1,delay=FixedPoint("0.05"),dest_port="on",
-          connection_type=CFProjection,strength=1.0,name='LGNOnAfferent',
+          connection_type=CFProjection,strength=1.0/2.0,name='LGNOnAfferent',
           weights_bounds=afferent_weight_bounds,learning_rate=1.274)
 
 s.connect(LGNOff,V1,delay=FixedPoint("0.05"),dest_port="off",
-          connection_type=CFProjection,strength=1.0,name='LGNOffAfferent',
+          connection_type=CFProjection,strength=1.0/2.0,name='LGNOffAfferent',
           weights_bounds=afferent_weight_bounds,learning_rate=1.274)
 
 
