@@ -12,7 +12,7 @@ from topo.base.topoobject import TopoObject
 from topo.base.parameter import Dynamic
 from topo.base.sheet import submatrix, bounds2slice, crop_slice_to_sheet_bounds
 
-from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap, FileBitmap
+from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap
 import palette
 
 

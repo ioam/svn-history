@@ -216,12 +216,5 @@ class RGBBitmap(Bitmap):
         super(RGBBitmap,self).__init__(Image.merge('RGB',(rImage,gImage,bImage)))
 
 
-class FileBitmap(Bitmap):
-    """
-    Bitmap constructed from file.
-    """
-    def __init__(self,filename):
-
-	super(FileBitmap,self).__init__(Image.open(filename))
 
 	
