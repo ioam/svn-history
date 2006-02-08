@@ -1,0 +1,393 @@
+"""
+
+$Id$
+"""
+__version__='$Revision$'
+
+# CEBHACKALERT: initial version; parameters not yet setup to match
+
+
+# CEBHACKALERT: learning rates need to be adjusted
+# for 72x72 network. I have correct ones for initial
+# weight sizes, but haven't been through to adjust
+# them as bounds change.
+
+
+# Current matching status:
+
+
+
+import random
+import fixedpoint
+#import pdb # debugger
+
+from math import pi, sqrt
+from itertools import chain
+from fixedpoint import FixedPoint
+
+from topo.sheets.lissom import LISSOM
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.projections.basic import CFProjection,SharedWeightCFProjection
+from topo.responsefns.optimized import CFDotProduct
+import topo.patterns.basic
+from topo.base.sheet import BoundingBox
+from topo.base.parameter import DynamicNumber
+from topo.base.connectionfield import CFSheet
+from topo.learningfns.optimized import DivisiveHebbian
+from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
+from topo.patterns import PatternGeneratorParameter
+import topo.tests.lissom_log_parser
+
+###########################################
+# Variables to match the C++ version of LISSOM
+
+### (1)
+BaseN=48.0
+BaseRN=24.0
+area_scale=1.0
+#num_eyes=1
+rf_radius=BaseRN/4.0+0.5
+inh_rad=max(2.5,BaseN/4.0-1.0)
+exc_rad=max(2.5,BaseN/10.0)
+#default_afferent_size_scale=BaseN/BaseRN
+gammaexc=0.9
+gammainh=0.9
+delta=0.1
+beta=0.65
+
+
+### (2)
+randomness = 0.0
+#smooth_circular_radius_trim = -0.25
+
+rf_radius_scale=5.0/rf_radius
+#retina_area_scale = (BaseRN*area_scale/24.0*rf_radius_scale)*(BaseRN*area_scale/24.0*rf_radius_scale)
+#inputs_pereye=max(retina_area_scale,1)
+xsigma=6.0
+ysigma=1.5
+scale_input=1.0
+
+retina_edge_buffer=round((rf_radius+(randomness*BaseRN*area_scale/2.0)),0)
+RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
+
+
+### (3)
+acs=6.5*6.5/rf_radius/rf_radius
+ecs=19.5*19.5/exc_rad/exc_rad
+ics=47.5*47.5/inh_rad/inh_rad
+alpha_input=0.007*121*acs
+alpha_exc=0.002*ecs*81
+alpha_inh=0.00025*ics*529
+
+tsettle=8
+
+
+## assert RN == 38
+## assert retina_edge_buffer == 7
+## assert xsigma == 6
+## assert ysigma == 1.5
+## #assert inputs_pereye == 1
+## #assert round(retina_area_scale,6) == 0.591716
+## assert rf_radius == 6.5
+## assert delta == 0.1
+## assert beta == 0.65
+## #assert default_afferent_size_scale == 3
+## assert rf_radius == 6.5
+## assert inh_rad == 17
+## assert exc_rad == 7.2
+## assert area_scale == 1
+## assert BaseRN == 24
+## assert BaseN == 48
+## #assert num_eyes==1
+## assert gammaexc==0.9
+## assert gammainh==0.9
+## assert randomness == 0.0
+## assert round(rf_radius_scale,6)==0.769231
+## assert scale_input==1.0
+## assert acs==1
+## assert round(ecs,5)==7.33507
+## assert round(ics,5)==7.80709
+## assert round(alpha_input/121,3)==0.007
+## assert round(alpha_exc/81,7)==0.0146701
+## assert round(alpha_inh/529,8)==0.00195177
+## assert tsettle == 8
+
+
+# c++ lissom first takes the integer part of rf_radius, I think?
+# So we do that here, although we want to keep it as a float
+# for the calculations in this file.
+rf_radius = float(int(rf_radius))
+
+###########################################
+# Set parameters
+
+# Number of decimal places for simulator time
+fixedpoint.DEFAULT_PRECISION=3
+random.seed(1234)
+
+# input generation params
+GeneratorSheet.density = BaseRN*area_scale
+GeneratorSheet.period = 1
+
+# take the input pattern position parameters from the log file output of the equivalent c++ simulation
+n_inputs,input_x,input_y,input_orientation = topo.tests.lissom_log_parser.get_input_params(log_file="topo/tests/oo_or_map_topo.log")
+n_inputs-=1;input_x.next();input_y.next();input_orientation.next() # c++ lissom's first iteration is just a test
+
+print "Number of patterns available for learning iterations:",n_inputs
+## CEBHACKALERT: gaussian parameters set at end of file because
+## gaussian weights otherwise steal the dynamic numbers. Should
+## set the parameters on the generator sheet's input_generator
+## instead.
+topo.patterns.basic.Gaussian.scale = scale_input
+
+gaussian_width = xsigma/BaseRN/sqrt(2.0)
+gaussian_height = ysigma/BaseRN/sqrt(2.0)
+topo.patterns.basic.Gaussian.size = 2*gaussian_height
+topo.patterns.basic.Gaussian.aspect_ratio = gaussian_width/gaussian_height
+input_bounds = BoundingBox(points=((-RN/(BaseRN*area_scale)/2.0,-RN/(BaseRN*area_scale)/2.0),
+                                   ( RN/(BaseRN*area_scale)/2.0, RN/(BaseRN*area_scale)/2.0)))
+topo.patterns.basic.Gaussian.bounds = input_bounds
+                                               
+
+CFSheet.density=24.0
+
+# LISSOM parameters
+LISSOM.output_fn = PiecewiseLinear(lower_bound=delta,upper_bound=beta)
+LISSOM.density = BaseN
+#LISSOM.tsettle=tsettle
+
+# Connection parameters
+lgn_weight_bounds = BoundingBox(points=((-1.0/12.0*4.7,-1.0/12.0*4.7),(1.0/12.0*4.7,1.0/12.0*4.7)))
+afferent_weight_bounds   = BoundingBox(points=((-rf_radius/BaseRN,-rf_radius/BaseRN),(rf_radius/BaseRN,rf_radius/BaseRN)))
+excitatory_weight_bounds = BoundingBox(points=((-exc_rad/BaseN,-exc_rad/BaseN),(exc_rad/BaseN,exc_rad/BaseN)))
+inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(inh_rad/BaseN,inh_rad/BaseN)))
+
+# Circular ConnectionFields
+CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
+
+# Specify weight initialization
+CFProjection.weights_generator = topo.patterns.basic.Constant()
+
+# Specify the response function
+# inlinec.optimized should make this unnecessary.
+CFProjection.response_fn=CFDotProduct()
+
+# Specify learning function
+CFProjection.learning_fn=DivisiveHebbian()
+
+###########################################
+# build simulation
+
+s = topo.base.simulator.Simulator()
+
+GeneratorSheet.bounds = input_bounds
+Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),
+                        name='Retina')
+
+LGNOn = CFSheet(name='LGNOn',output_fn=PiecewiseLinear(lower_bound=0.0,
+                                                       upper_bound=1.0))
+LGNOff = CFSheet(name='LGNOff',output_fn=PiecewiseLinear(lower_bound=0.0,
+                                                         upper_bound=1.0))
+V1 = LISSOM(name='V1')
+V1.output_fn.lower_bound=0.083
+V1.output_fn.upper_bound=0.633
+
+# LGN ON channel
+LGNOn_center = s.connect(Retina,LGNOn,dest_port="center",delay = FixedPoint("0.05"),
+                         connection_type=SharedWeightCFProjection,strength=2.33,
+                         name='Center',weights_bounds=lgn_weight_bounds,
+                         weights_generator=topo.patterns.basic.Gaussian(size=1.0/24.0,aspect_ratio=1))
+
+LGNOn_center.learning_fn.output_fn = DivisiveSumNormalize()
+
+LGNOn_surround = s.connect(Retina,LGNOn,dest_port="surround",delay = FixedPoint("0.05"),
+                           connection_type=SharedWeightCFProjection,strength=-2.33,
+                           name='Surround',weights_bounds=lgn_weight_bounds,
+                           weights_generator=topo.patterns.basic.Gaussian(size=1.0/6.0,aspect_ratio=1))
+
+LGNOn_surround.learning_fn.output_fn = DivisiveSumNormalize()
+
+
+# LGN OFF channel
+LGNOff_center = s.connect(Retina,LGNOff,dest_port="center",delay = FixedPoint("0.05"),
+                          connection_type=SharedWeightCFProjection,strength=-2.33,
+                          name='Center',weights_bounds=lgn_weight_bounds,
+                          weights_generator=topo.patterns.basic.Gaussian(size=1.0/24.0,aspect_ratio=1))
+
+LGNOff_center.learning_fn.output_fn = DivisiveSumNormalize()
+
+LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoint("0.05"),
+                            connection_type=SharedWeightCFProjection,strength=2.33,
+                            name='Surround',weights_bounds=lgn_weight_bounds,
+                            weights_generator=topo.patterns.basic.Gaussian(size=1.0/6.0,aspect_ratio=1))
+LGNOff_surround.learning_fn.output_fn = DivisiveSumNormalize()
+
+
+
+s.connect(LGNOn,V1,delay=FixedPoint("0.05"),dest_port="on",
+          connection_type=CFProjection,strength=1.0,name='LGNOnAfferent',
+          weights_bounds=afferent_weight_bounds,learning_rate=1.274)
+
+s.connect(LGNOff,V1,delay=FixedPoint("0.05"),dest_port="off",
+          connection_type=CFProjection,strength=1.0,name='LGNOffAfferent',
+          weights_bounds=afferent_weight_bounds,learning_rate=1.274)
+
+
+s.connect(V1,V1,delay=FixedPoint("0.05"),dest_port="exc",
+          connection_type=CFProjection,strength=0.9,name='LateralExcitatory',
+          weights_bounds=excitatory_weight_bounds,learning_rate=2.674) 
+            
+s.connect(V1,V1,delay=FixedPoint("0.05"), dest_port="inh",
+          connection_type=CFProjection,strength=-0.9,name='LateralInhibitory',
+          weights_bounds=inhibitory_weight_bounds,learning_rate=2.466)         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Times are 1 less than the or_map_topo.param c++ lissom simulation because that one uses
+# "hook before_input" to schedule events. So, an event at t=200 is executed before t=200's
+# input pattern is presented. In Topographica, an event scheduled at t=0 is executed
+# after time=0's input pattern is presented. So one at t=199 is executed before t=200's
+# input pattern is presented, and is therefore  equivalent to or_map_topo's event scheduled at t=200.
+s.schedule_action(199, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.6/BaseN,-exc_rad*0.6/BaseN),(exc_rad*0.6/BaseN,exc_rad*0.6/BaseN))))
+
+s.schedule_action(499, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.42/BaseN,-exc_rad*0.42/BaseN),(exc_rad*0.42/BaseN,exc_rad*0.42/BaseN))))
+
+s.schedule_action(999,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.336/BaseN,-exc_rad*0.336/BaseN),(exc_rad*0.336/BaseN,exc_rad*0.336/BaseN))))
+
+s.schedule_action(1999,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-2.0/BaseN,-2.0/BaseN),(2.0/BaseN,2.0/BaseN))))
+
+
+# Schedule action requires a function, so we create a temporary one
+def set_learning_rate(projection_name, rate):
+    """Set the learning rate on the named projection of V1."""
+    V1.projections()[projection_name].learning_rate=rate
+
+
+s.schedule_action(  499, set_learning_rate, "LateralExcitatory", 0.001*ecs)
+s.schedule_action(  499, set_learning_rate, "Afferent0", 0.005*acs)
+s.schedule_action( 1999, set_learning_rate, "Afferent0", 0.004*acs)
+s.schedule_action( 3999, set_learning_rate, "Afferent0", 0.003*acs)
+s.schedule_action(19999, set_learning_rate, "Afferent0", 0.0015*acs)
+
+
+def set_deltabeta(x,y):
+    """Set the threshold function limits on V1."""
+    V1.output_fn.lower_bound=x
+    V1.output_fn.upper_bound=y
+
+s.schedule_action(  199, set_deltabeta, 0.11, 0.66)
+s.schedule_action(  499, set_deltabeta, 0.12, 0.67)
+s.schedule_action(  999, set_deltabeta, 0.15, 0.68)
+s.schedule_action( 1999, set_deltabeta, 0.18, 0.70)
+s.schedule_action( 2999, set_deltabeta, 0.20, 0.73)
+s.schedule_action( 3999, set_deltabeta, 0.20, 0.76)
+s.schedule_action( 4999, set_deltabeta, 0.21, 0.79)
+s.schedule_action( 6499, set_deltabeta, 0.22, 0.82)
+s.schedule_action( 7999, set_deltabeta, 0.23, 0.85)
+s.schedule_action(19999, set_deltabeta, 0.24, 0.88)
+
+
+## see earlier CEBHACKALERT about setting these parameters.
+topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : input_x.next()/BaseRN - 0.5*RN/BaseRN)
+topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : input_y.next()/BaseRN - 0.5*RN/BaseRN)
+topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda : round(2*pi*input_orientation.next()/360.0,1))
+
+
+
+
+
+# CEBHACKALERT: actual tests commented out.
+
+def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
+    """
+    Go through the two matrices element-by-element and check for match to the specified
+    number of decimal places (dp).
+    """
+    r,c = topo_matrix.shape
+    for i in range(r):
+        for j in range(c):
+            t_value = round(topo_matrix[i,j],dp)
+            l_value = round(lissom_matrix[i][j],dp)
+            # CEBHACKALERT: will become some kind of assert
+            if t_value != l_value:
+                print "\n" + topo_matrix_name + " element ("+str(i)+","+str(j)+") didn't match to " + str(dp) + " decimal places.\nTopographica value="+str(t_value)+", C++ LISSOM value="+str(l_value)
+
+    
+## # CEBHACKALERT: will check values at different iterations (including after change_bounds() etc).
+## # Also will be putting data files in a reference/ subdirectory
+## s.run(1)
+
+## # compare C++ LISSOM and Topogrpahica activity values in the Retina and V1
+## c_retina_act = topo.tests.lissom_log_parser.get_matrix("topo/tests/or_map_topo.000001p000.Eye0_Activity.matrix",(RN,RN))
+## c_v1_act = topo.tests.lissom_log_parser.get_matrix("topo/tests/or_map_topo.000001p000.Primary_Activity.matrix",(BaseN,BaseN))
+## compare_elements(Retina.activity,c_retina_act,6,Retina.name)
+## compare_elements(V1.activity,c_v1_act,5,V1.name)
+
+
+## # compare weights 
+## unit_i,unit_j = 24,70
+
+## topo_aff_weights = V1.in_connections[0].cfs[unit_i][unit_j].weights
+## topo_latexc_weights = V1.in_connections[1].cfs[unit_i][unit_j].weights
+## topo_latinh_weights = V1.in_connections[2].cfs[unit_i][unit_j].weights
+
+## # CEBHACKALERT: turning off situate in c++ lissom appears to make the weight plot unsituated but
+## # leaves the matrix output situated! So I take the right slice. I will automate this in the
+## # get_matrix() function (unless the C could be changed easily?). Then almost all these lines will go.
+## import Numeric
+## c_aff_weights = topo.tests.lissom_log_parser.get_matrix("topo/tests/or_map_topo.000001.wts.Primary.Afferent0.0"+str(unit_i)+"_0"+str(unit_j)+".matrix",(RN,RN)) 
+## c_aff_weights = Numeric.array(c_aff_weights)
+## c_aff_weights = c_aff_weights[7:18,22:32]
+## assert c_aff_weights.shape==topo_aff_weights.shape
+## c_aff_weights = c_aff_weights.tolist()
+
+## c_latexc_weights = topo.tests.lissom_log_parser.get_matrix("topo/tests/or_map_topo.000001.wts.Primary.LateralExcitatory.0"+str(unit_i)+"_0"+str(unit_j)+".matrix",(BaseN,BaseN)) 
+## c_latexc_weights = Numeric.array(c_latexc_weights)
+## c_latexc_weights = c_latexc_weights[17:31,63:71]
+## assert c_latexc_weights.shape==topo_latexc_weights.shape
+## c_latexc_weights = c_latexc_weights.tolist()
+## # end CEBHACKALERT
+
+## compare_elements(topo_aff_weights,c_aff_weights,7,"V1 afferent weights")
+## compare_elements(topo_latexc_weights,c_latexc_weights,7,"V1 lateral excitatory weights")
+
+
+
+
+# Performance profiling
+#
+# Example 1
+#import hotshot,hotshot.stats
+#prof = hotshot.Profile("abc")
+#prof.runctx('s.run(10000)',globals(),locals())
+#prof.close()
+#
+#p = hotshot.stats.load("abc")
+#p.strip_dirs().sort_stats('cumulative','time').print_stats()
+#
+# Example 2
+#import profile,pstats
+#profile.runctx('s.run(10000)',globals(),locals(),"abc")
+#p = pstats.Stats('abc')
+#p.strip_dirs().sort_stats('cumulative').print_stats()
