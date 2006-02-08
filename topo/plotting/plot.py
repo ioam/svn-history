@@ -12,7 +12,7 @@ from topo.base.topoobject import TopoObject
 from topo.base.parameter import Dynamic
 from topo.base.sheet import submatrix, bounds2slice, crop_slice_to_sheet_bounds
 
-from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap
+from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap, Bitmap
 import palette
 
 
@@ -30,16 +30,14 @@ class Plot(TopoObject):
      """
      Simple Plot object constructed from a specified image.
      """
-     def __init__(self,image):
+     def __init__(self,image,**params):
           
+          ### JCALERT! Should we leave super(Plot,self) in TemplatePlot
+          ### Also sort out plot_src_name
+          super(Plot,self).__init__(**params) 
           self.bitmap = Bitmap(image)
+          self.plot_src_name = ''
           
-
-
-
-
-
-
 
 def make_template_plot(channels,sheet_view_dict,density=None,
               plot_bounding_box=None,normalize=False,situate=False,name=None):
