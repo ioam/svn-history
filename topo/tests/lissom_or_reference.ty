@@ -12,9 +12,7 @@ $Id$
 __version__='$Revision$'
 
 # CEBHACKALERT: learning rates need to be adjusted
-# for 72x72 network. I have correct ones for initial
-# weight sizes, but haven't been through to adjust
-# them as bounds change.
+# for 72x72 network. 
 
 
 # Current matching status:
@@ -22,7 +20,8 @@ __version__='$Revision$'
 # after 100 iterations to the same precision that the
 # retinal input activities match between the two (about
 # 6 decimal places for activity values). Haven't checked
-# after more because learning rates not updated yet.
+# after more because learning rates not updated yet (used
+# correct learning rates for the 100-iterations test).
 # - With circular receptive fields, the disks are slightly
 # different shapes between c++ and topographica.
 
