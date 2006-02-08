@@ -11,6 +11,22 @@ $Id$
 """
 __version__='$Revision$'
 
+# CEBHACKALERT: learning rates need to be adjusted
+# for 72x72 network. I have correct ones for initial
+# weight sizes, but haven't been through to adjust
+# them as bounds change.
+
+
+# Current matching status:
+# - With square receptive fields, matches c++ lissom
+# after 100 iterations to the same precision that the
+# retinal input activities match between the two (about
+# 6 decimal places for activity values). Haven't checked
+# after more because learning rates not updated yet.
+# - With circular receptive fields, the disks are slightly
+# different shapes between c++ and topographica.
+
+
 
 import random
 import fixedpoint
