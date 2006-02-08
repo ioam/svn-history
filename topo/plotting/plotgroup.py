@@ -18,7 +18,7 @@ from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
 from topo.base.connectionfield import CFSheet
 
-from plot import Plot, make_plot
+from plot import make_template_plot
 import bitmap
 
 
@@ -178,7 +178,7 @@ class TemplatePlotGroup(PlotGroup):
 	"""
 	plot_channels = pt
 	plot_name = pt_name
-        p = make_plot(plot_channels,sheet.sheet_view_dict,sheet.density,sheet.bounds,self.normalize,False,name=plot_name)
+        p = make_template_plot(plot_channels,sheet.sheet_view_dict,sheet.density,sheet.bounds,self.normalize,False,name=plot_name)
 	return [p]
 
 	
@@ -217,7 +217,7 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
                 key = ('Weights',sheet.name,p.name,self.x,self.y)
 		plot_name = p.src.name 
 		plot_channels['Strength'] = key			       
-		plot_list.append(make_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
+		plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
 				      p.src.bounds,self.normalize,self.situate,name=plot_name))
         self.debug('plot_list =' + str(plot_list))
         return plot_list
@@ -266,7 +266,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 		### JCALERT! Do the test pt['Strength']='Weights' here
 		key = ('Weights',sheet.name,projection.name,x,y)
 		plot_channels['Strength'] = key
-		plot_list.append(make_plot(plot_channels,src_sheet.sheet_view_dict,
+		plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,
                                       src_sheet.density,src_sheet.bounds,self.normalize,self.situate))
 		
         return plot_list

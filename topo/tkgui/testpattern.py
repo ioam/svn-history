@@ -33,7 +33,7 @@ import parametersframe
 import plotgrouppanel
 import topoconsole
 
-from topo.plotting.plot import make_plot
+from topo.plotting.plot import make_template_plot
 
 from Tkinter import IntVar, StringVar, Checkbutton
 from Tkinter import TOP, LEFT, RIGHT, BOTTOM, YES, N, S, E, W, X
@@ -284,7 +284,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 	    view_dict[each] = topo.base.sheetview.SheetView((k(),k.bounds),src_name=each)
             channels = {'Strength':each,'Hue':None,'Confidence':None}
 	    ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
-            plist.append(make_plot(channels,view_dict,name=''))
+            plist.append(make_template_plot(channels,view_dict,name=''))
         self.pe_group = topo.plotting.plotgroup.PlotGroup(plot_group_key='Preview',plot_list=plist,normalize=False)
 
 

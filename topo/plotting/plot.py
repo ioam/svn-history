@@ -36,7 +36,12 @@ class Plot(TopoObject):
           
 
 
-def make_plot(channels,sheet_view_dict,density=None,
+
+
+
+
+
+def make_template_plot(channels,sheet_view_dict,density=None,
               plot_bounding_box=None,normalize=False,situate=False,name=None):
      """
      Factory function for constructing a Plot object whose type is not yet known.
@@ -52,7 +57,7 @@ def make_plot(channels,sheet_view_dict,density=None,
          if plot.bitmap != None:
 	     return plot
      
-     TopoObject(name="make_plot").verbose('No',name,'plot constructed for this Sheet')
+     TopoObject(name="make_template_plot").verbose('No',name,'plot constructed for this Sheet')
      return None
 
 
