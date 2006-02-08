@@ -26,10 +26,16 @@ import palette
 ### - Get rid of release_sheetviews.
 
 
-### JABALERT: Should add support for another plot_type: bitmap, where
-### the user specifies the filename or other path to an image, which is
-### inserted directly into the plot.  Immediately useful for orientation keys,
-### but also useful in general.
+class Plot(TopoObject):
+     """
+     Simple Plot object constructed from a specified image.
+     """
+     def __init__(self,image):
+          
+          self.bitmap = Bitmap(image)
+          
+
+
 def make_plot(channels,sheet_view_dict,density=None,
               plot_bounding_box=None,normalize=False,situate=False,name=None):
      """
@@ -40,7 +46,7 @@ def make_plot(channels,sheet_view_dict,density=None,
      one of the Plot subclasses automatically.  See Plot.__init__ for
      a description of the arguments.
      """
-     plot_types=[SHCPlot,RGBPlot,PalettePlot,BitmapPlot]
+     plot_types=[SHCPlot,RGBPlot,PalettePlot]
      for pt in plot_types:
          plot = pt(channels,sheet_view_dict,density,plot_bounding_box,normalize,situate,name=name)
          if plot.bitmap != None:
@@ -50,7 +56,9 @@ def make_plot(channels,sheet_view_dict,density=None,
      return None
 
 
-class Plot(TopoObject):
+
+
+class TemplatePlot(Plot):
     """
     A bitmap-based plot of one Sheet.
 
@@ -286,7 +294,7 @@ class Plot(TopoObject):
 
 
 
-class SHCPlot(Plot):
+class SHCPlot(TemplatePlot):
     """
     Bitmap plot based on Strength, Hue, and Confidence matrices.
 
@@ -368,7 +376,7 @@ class SHCPlot(Plot):
    
 
     
-class RGBPlot(Plot):
+class RGBPlot(TemplatePlot):
   """
   Bitmap plot based on Red, Green, and Blue matrices.
   
@@ -447,7 +455,7 @@ class RGBPlot(Plot):
 
 
 
-class PalettePlot(Plot):
+class PalettePlot(TemplatePlot):
      """
      Bitmap plot based on a Strength matrices, with optional colorization.  
 
@@ -468,24 +476,4 @@ class PalettePlot(Plot):
 
 
 
-class BitmapPlot(Plot):
-     """
-     Simple display of a bitmap specified as a file path.
-     """
-     def __init__(self,channels,sheet_view_dict,density,
-                  plot_bounding_box,normalize,situate,**params):
 
-          super(BitmapPlot,self).__init__(channels,sheet_view_dict,density, 
-                                           plot_bounding_box,normalize,situate,**params)
-     
-          ### JCALERT! temporary hack for displaying the right label
-          self.plot_src_name = ''
-          # catching the empty plot exception
-          filename = channels.get('Filename',None)
-
-          # If it is an empty plot: self.bitmap=None
-          if (filename==None):
-               self.debug('Empty plot.')
-          else:
-               self.bitmap = FileBitmap(filename)
- 
