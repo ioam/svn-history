@@ -4,14 +4,11 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEBHACKALERT: initial version; parameters not yet setup to match
+# CEBHACKALERT: parameters not all yet setup to match
 
 
 # CEBHACKALERT: learning rates need to be adjusted
-# for 72x72 network. I have correct ones for initial
-# weight sizes, but haven't been through to adjust
-# them as bounds change.
-
+# for all the times the bounds change.
 
 # Current matching status:
 
@@ -52,8 +49,8 @@ exc_rad=max(2.5,BaseN/10.0)
 #default_afferent_size_scale=BaseN/BaseRN
 gammaexc=0.9
 gammainh=0.9
-delta=0.1
-beta=0.65
+delta=0.083
+beta=0.633
 
 
 ### (2)
@@ -75,42 +72,41 @@ RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
 acs=6.5*6.5/rf_radius/rf_radius
 ecs=19.5*19.5/exc_rad/exc_rad
 ics=47.5*47.5/inh_rad/inh_rad
-alpha_input=0.007*121*acs
-alpha_exc=0.002*ecs*81
-alpha_inh=0.00025*ics*529
+alpha_input=0.007*137*acs
+alpha_exc=0.002*ecs*137
+alpha_inh=0.00025*ics*97
 
 tsettle=8
 
-
-## assert RN == 38
-## assert retina_edge_buffer == 7
-## assert xsigma == 6
-## assert ysigma == 1.5
-## #assert inputs_pereye == 1
-## #assert round(retina_area_scale,6) == 0.591716
-## assert rf_radius == 6.5
-## assert delta == 0.1
-## assert beta == 0.65
-## #assert default_afferent_size_scale == 3
-## assert rf_radius == 6.5
-## assert inh_rad == 17
-## assert exc_rad == 7.2
-## assert area_scale == 1
-## assert BaseRN == 24
-## assert BaseN == 48
-## #assert num_eyes==1
-## assert gammaexc==0.9
-## assert gammainh==0.9
-## assert randomness == 0.0
-## assert round(rf_radius_scale,6)==0.769231
-## assert scale_input==1.0
-## assert acs==1
-## assert round(ecs,5)==7.33507
-## assert round(ics,5)==7.80709
-## assert round(alpha_input/121,3)==0.007
-## assert round(alpha_exc/81,7)==0.0146701
-## assert round(alpha_inh/529,8)==0.00195177
-## assert tsettle == 8
+assert RN == 38
+assert retina_edge_buffer == 7
+assert xsigma == 6
+assert ysigma == 1.5
+#assert inputs_pereye == 1
+#assert round(retina_area_scale,6) == 0.591716
+assert rf_radius == 6.5
+assert delta == 0.083
+assert beta == 0.633
+#assert default_afferent_size_scale == 3
+assert rf_radius == 6.5
+assert inh_rad == 11
+assert exc_rad == 4.8
+assert area_scale == 1
+assert BaseRN == 24
+assert BaseN == 48
+#assert num_eyes==1
+assert gammaexc==0.9
+assert gammainh==0.9
+assert randomness == 0.0
+assert round(rf_radius_scale,6)==0.769231
+assert scale_input==1.0
+assert acs==1
+assert round(ecs,4)==16.5039
+assert round(ics,4)==18.6467
+assert round(alpha_input/137,3)==0.007
+assert round(alpha_exc/137,7)==0.0330078
+assert round(alpha_inh/97,8)==0.00466167
+assert tsettle == 8
 
 
 # c++ lissom first takes the integer part of rf_radius, I think?
@@ -189,8 +185,6 @@ LGNOn = CFSheet(name='LGNOn',output_fn=PiecewiseLinear(lower_bound=0.0,
 LGNOff = CFSheet(name='LGNOff',output_fn=PiecewiseLinear(lower_bound=0.0,
                                                          upper_bound=1.0))
 V1 = LISSOM(name='V1')
-V1.output_fn.lower_bound=0.083
-V1.output_fn.upper_bound=0.633
 
 # LGN ON channel
 LGNOn_center = s.connect(Retina,LGNOn,dest_port="center",delay = FixedPoint("0.05"),
@@ -240,28 +234,6 @@ s.connect(V1,V1,delay=FixedPoint("0.05"),dest_port="exc",
 s.connect(V1,V1,delay=FixedPoint("0.05"), dest_port="inh",
           connection_type=CFProjection,strength=-0.9,name='LateralInhibitory',
           weights_bounds=inhibitory_weight_bounds,learning_rate=2.466)         
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Times are 1 less than the or_map_topo.param c++ lissom simulation because that one uses
