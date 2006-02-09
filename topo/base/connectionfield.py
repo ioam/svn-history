@@ -631,6 +631,5 @@ def wt_bounds(radius,min_radius=0.0):
     by passing min_radius=1.25/density, a BoundingBox
     of at least 3x3 matrix units can be guaranteed.
     """
-    print "r",radius,"min",min_radius
     r = max(radius,min_radius)
     return BoundingBox(points=((-r,-r),(r,r)))
