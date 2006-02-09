@@ -16,7 +16,7 @@ neural units.  A Sheet corresponds to a rectangular portion of a
 continuous two-dimensional plane.  The default Sheet has a square area
 of 1.0 centered at (0.0,0.0):
 
-<P><CENTER><IMG BORDER="2" WIDTH="388" HEIGHT="381" SRC="images/sheet_coords.png"></CENTER>
+<P><CENTER><IMG BORDER="2" WIDTH="324" HEIGHT="325" SRC="images/sheet_coords.png"></CENTER>
 
 <P>Locations in a Sheet are specified using floating-point Sheet
 coordinates (x,y) contained within the Sheet's <?php
@@ -34,39 +34,44 @@ representations of the continuous Sheet, in practice, Sheets are
 typically implemented using some finite matrix of units.  Each Sheet
 has a parameter called its <i>density</i>, which specifies how many
 units (matrix elements) in the matrix correspond to a unit length in
-Sheet coordinates.  For instance, the default Sheet above with a
-density of 5 corresponds to the following matrix:
+Sheet coordinates.  For instance, the default Sheet above
+with a density of 5 corresponds to the matrix on the
+left below:
 
-<!-- JCALERT: Should add a copy of the Sheet coordinates, marking the -->
-<!-- given point in both plots -->
-<P><CENTER><IMG BORDER="2" WIDTH="372" HEIGHT="369" SRC="images/matrix_coords.png"></CENTER>
+<P><CENTER>
+<IMG BORDER="2" WIDTH="324" HEIGHT="325" SRC="images/matrix_coords.png">
+<IMG BORDER="2" WIDTH="324" HEIGHT="325" SRC="images/sheet_coords_-0.2_0.4.png">
+</CENTER>
 
-<P>Here, the 1.0x1.0 area of Sheet coordinates is represented with a
-5x5 matrix, whose BoundingBox (represented by a thick black line)
+<P>Here, the 1.0x1.0 area of Sheet coordinates is represented by a 5x5
+matrix, whose BoundingBox (represented by a thick black line)
 corresponds exactly to the BoundingBox of the Sheet to which it
 belongs.  Each floating-point location (x,y) in Sheet coordinates
 corresponds uniquely to a floating-point location (r,c) in
-floating-point matrix coordinates.  For the example Sheet
-above, location (0.5,1.5) in matrix coordinates corresponds exactly to
-location (-0.2,0.4) in Sheet coordinates.  Notice that matrix
-coordinates start at (0.0,0.0) in the upper left and increase down and
-to the right (as is the accepted convention for matrices), while
-Sheet coordinates start at the center and increase up and to the right
-(as is the accepted convention for Cartesian coordinates).
+floating-point matrix coordinates, and vice versa.  Individual units
+or elements in this array are accessed using integer <i>matrix
+index</i> coordinates, which can be calculated from the matrix
+coordinate <code>(r,c)</code> as
+(<code>floor(int(r))</code>,<code>floor(int(c))</code>).
 
-<P>Individual units or elements in this array are accessed using
-integer <i>matrix index</i> coordinates, which can be calculated from
-the matrix coordinate as
-(<code>floor(int(r))</code>,<code>floor(int(c))</code>).  In this
-example, the unit whose center is at matrix coordinate (0.5,1.5) has
-the matrix index coordinate (0,1).
+<P>For the example shown, the center of the unit with matrix index
+(0,1) is at location (0.5,1.5) in matrix coordinates and (-0.2,0.4) in
+Sheet coordinates.  Notice that matrix and matrix index coordinates
+start at (0.0,0.0) in the upper left and increase down and to the
+right (as is the accepted convention for matrices), while Sheet
+coordinates start at the center and increase up and to the right (as
+is the accepted convention for Cartesian coordinates).
 
 <P>The reason for having multiple sets of coordinates is that the same
 Sheet can at another time be implemented using a different matrix
 specified by a different density.  For instance, if this Sheet had a
 density of 10 instead, the corresponding matrix would be:
 
-<P><CENTER><IMG BORDER="2" WIDTH="377" HEIGHT="397" SRC="images/matrix_coords_hidensity.png"></CENTER>
+<P><CENTER>
+<IMG BORDER="2" WIDTH="324" HEIGHT="325" SRC="images/matrix_coords_hidensity.png">
+<IMG BORDER="2" WIDTH="324" HEIGHT="325" SRC="images/sheet_coords_-0.2_0.4.png">
+</CENTER>
+
 
 <P>Using this higher density, Sheet coordinate (-0.2,0.4) now
 corresponds to the matrix coordinate (1.0,3.0).  As long as the user
@@ -87,18 +92,29 @@ whose centers lie within that BoundingBox.
 
 <P>For instance, if the user specifies a ConnectionField with Sheet bounds from
 (-0.275,-0.0125) to (0.025,0.2885) for a sheet with a density of 10, the
-corresponding matrix coordinate bounds are (5.125,2.250) to (2.125,5.25):
+corresponding matrix coordinate bounds are (5.125,2.250) to (2.125,5.250):
 
-<!-- JCALERT: Should add a copy of the Sheet coordinates, marking the -->
-<!-- given box in both plots -->
-<P><CENTER><IMG BORDER="2" WIDTH="377" HEIGHT="397" SRC="images/connection_field.png"></CENTER>
+<P><CENTER>
+<IMG BORDER="2" WIDTH="324" HEIGHT="325" SRC="images/connection_field.png">
+<IMG BORDER="2" WIDTH="324" HEIGHT="325" SRC="images/sheet_coords_-0.275_-0.0125_0.025_0.2885.png">
+</CENTER>
 
-<P>Here the medium black outline shows the BoundingBox in matrix
-coordinates.  The units contained in this ConnectionField are (4,2) to
-(2,4) (inclusive; shown by black dots with a yellow background).
-Notice that the Sheet area of the ConnectionField will not
-necessarily correspond exactly to the user-specified BoundingBox,
-because the matrix is discrete.
+<P>Here the medium black outline shows the user-specified
+ConnectionField BoundingBox in matrix and Sheet coordinates.  The
+units contained in this ConnectionField are (4,2) to (2,4) (inclusive;
+shown by black dots with a yellow background).  Notice that the Sheet
+area of the ConnectionField will not necessarily correspond exactly to
+the user-specified BoundingBox, because the matrix is discrete.
+
+<P>Note that a ConnectionField is similar to the biological concept of
+a receptive field (RF), but the two concepts are the same only for
+models with one input sheet and one cortical sheet.  When there is
+more than one hierarchical level, the ConnectionField of a top-level
+unit is a set of weights on the previous Sheet, while the receptive
+field is an area of the input sheet to which the unit responds.  Thus
+a ConnectionField is a lower-level concept than a receptive field, and
+RFs can be thought of as constructed from CFs.
+
 
 <H2><A NAME="edge-buffers">Edge buffering</A></H2>
 
@@ -116,7 +132,7 @@ on lower-level Sheet L, neurons near the border of U will have up to
 this, the BoundingBox of L can be extended by 0.2 units Sheet
 coordinates in each direction:
 
-<P><CENTER><IMG BORDER="2" WIDTH="509" HEIGHT="505" SRC="images/retina_edge_buffer.png"></CENTER>
+<P><CENTER><IMG BORDER="2" WIDTH="407" HEIGHT="404" SRC="images/retina_edge_buffer.png"></CENTER>
 
 <P>Here, the thick black line shows the calculated size of L to avoid
 edge cropping, and the dotted line shows the size of U for reference.

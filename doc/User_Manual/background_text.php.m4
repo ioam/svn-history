@@ -22,8 +22,7 @@ Cortical surface is nearly two dimensional<BR>
 Divided up into many roughly topographic maps<BR>
 Understanding these maps is crucial for neuroscience<BR>
 
-
-<img border="2" WIDTH="427" HEIGHT="189" src="images/measuring-map.v3.png"><BR>
+<P><CENTER><IMG BORDER="2" WIDTH="427" HEIGHT="189" SRC="images/measuring-map.v3.png"></CENTER>
 In each area, optical imaging can be used to determine maps of
 preference for different types of stimuli
 E.g. m4_bib2html_npcite_named(blasdel:differential,[[Blasdel 1992]],chapman:jn96,[[(Chapman et al. 1996]],crair:science98,[[(Crair et al. 1998]],weliky:nature96,[[(Weliky et al. 1996]])
@@ -64,7 +63,9 @@ How can we link phenomena at the map level to activity of single units?
 Goal: understanding cortex at a scale relevant to behavior
 
 Map-Scale Models
-<IMG WIDTH="400" HEIGHT="433" SRC="images/generic-cortical-hierarchy-model.png">
+<P><CENTER><IMG BORDER="2" WIDTH="320" HEIGHT="346" SRC="images/generic-cortical-hierarchy-model.png"></CENTER>
+
+
 Map models focus on patches of cortex several mm^2 in size (and above)
 Emphasis is on 2D structure
 Usually driven by optical imaging results

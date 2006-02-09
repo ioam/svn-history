@@ -27,7 +27,7 @@ figoutput: ${FIGPNGS}
 
 # Native xfig exporting to png
 %.png : %.fig
-	fig2dev -L png -S 4 -b 10 -m 0.75 $< > $@
+	fig2dev -L png -S 4 -b 10 -m 0.60 $< > $@
 
 
 # Cleanup

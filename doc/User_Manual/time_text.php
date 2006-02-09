@@ -15,7 +15,7 @@ instance, a clocked simulator could use a timebase of 1 millisecond
 (ms), and would simulate the properties of the physical system at 0
 ms, 1 ms, etc:
 
-<P><CENTER><IMG BORDER="2" WIDTH="354" HEIGHT="43" SRC="images/clocked-timeline.png"></CENTER>
+<P><CENTER><IMG BORDER="2" WIDTH="283" HEIGHT="034" SRC="images/clocked-timeline.png"></CENTER>
 
 <P>At each multiple of the timestep, the state of the system is
 explicitly represented, and then used to calculate the state one time
@@ -42,7 +42,7 @@ extra time in between.  For instance, such a simulator might
 explicitly calculate only the points listed here, skipping the times
 in between:
 
-<P><CENTER><IMG BORDER="2" WIDTH="354" HEIGHT="43" SRC="images/event-driven-timeline.png"></CENTER>
+<P><CENTER><IMG BORDER="2" WIDTH="283" HEIGHT="034" SRC="images/event-driven-timeline.png"></CENTER>
 
 <H2>Topographica simulations</H2>
 
@@ -76,7 +76,7 @@ vice versa.
 a set of <?php classref('topo.base.sheet','Sheet') ?>s connected into
 a graph with fixed delays:
 
-<P><CENTER><IMG BORDER="2" WIDTH="433" HEIGHT="353" SRC="images/toplevel.png"></CENTER>
+<P><CENTER><IMG BORDER="2" WIDTH="519" HEIGHT="424" SRC="images/toplevel.png"></CENTER>
 
 <P>For a clocked simulation, at least one of these EventProcessors
 (typically an input Sheet like the Retina in this example) will

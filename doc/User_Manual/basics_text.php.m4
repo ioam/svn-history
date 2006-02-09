@@ -178,8 +178,7 @@ be used to advance the field of computational neuroscience.
 
 <H1>Scope and modeling approach</H1>
 
-
-<IMG WIDTH="400" HEIGHT="433" SRC="images/generic-cortical-hierarchy-model.png">
+<P><CENTER><IMG BORDER="2" WIDTH="320" HEIGHT="346" SRC="images/generic-cortical-hierarchy-model.png"></CENTER>
   Topographica models
     This figure shows a sample Topographica model of the early visual
     system m4_bib2html_cite_named(bednar:nc03,[[Bednar et al. 2003]],bednar:neurocomputing03,[[Bednar et al. 2003]]).
@@ -262,7 +261,7 @@ types currently supported.  This figure is a screenshot from a
 prototype version of Topographica, available for download at
 <A HREF="http://topographica.org">topographica.org</A>.
 %
-<IMG WIDTH="400" HEIGHT="433" SRC="images/lissom.4.0_linuxscreenshot2_white.png">
+<!-- <IMG WIDTH="400" HEIGHT="433" SRC="../images/lissom.4.0_linuxscreenshot2_white.png"> -->
   Software screenshot
     This image shows a sample session of a prototype version of
     Topographica that is available freely at 
