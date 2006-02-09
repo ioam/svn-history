@@ -150,8 +150,7 @@ pgt.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference
 						   ('Confidence','OrientationSelectivity')])
 pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
 # This line is commented out while the re-sizing is being fixed in plotgrouppanel.py
-#pgt.add_static_image('Color Key','color_key.png')
-
+pgt.add_static_image('Color Key','doc/images/color_key.png')
 
 
 pgt = new_plotgroup_template(name='Position Preference',command='measure_position_pref() ; topographic_grid()',normalize=True)
