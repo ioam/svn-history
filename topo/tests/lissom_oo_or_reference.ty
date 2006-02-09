@@ -76,9 +76,9 @@ RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
 acs=6.5*6.5/rf_radius/rf_radius
 ecs=19.5*19.5/exc_rad/exc_rad
 ics=47.5*47.5/inh_rad/inh_rad
-alpha_input=0.007*137*acs
-alpha_exc=0.002*ecs*137
-alpha_inh=0.00025*ics*97
+alpha_input=0.007*acs
+alpha_exc=0.002*ecs
+alpha_inh=0.00025*ics
 
 tsettle=8
 
@@ -113,9 +113,9 @@ assert scale_input==1.0
 assert acs==1
 assert round(ecs,4)==16.5039
 assert round(ics,4)==18.6467
-assert round(alpha_input/137,3)==0.007
-assert round(alpha_exc/137,7)==0.0330078
-assert round(alpha_inh/97,8)==0.00466167
+assert round(alpha_input,3)==0.007
+assert round(alpha_exc,7)==0.0330078
+assert round(alpha_inh,8)==0.00466167
 assert tsettle == 8
 assert round(min_exc_rad,5) == 1.59091
 
@@ -171,9 +171,9 @@ min_exc_radius = min_exc_rad/BaseN
 
 # Connection parameters
 lgn_weight_bounds = wt_bounds(r_L/BaseLN)
-afferent_weight_bounds   = wt_bounds(rf_radius/BaseRN)
-excitatory_weight_bounds = wt_bounds(exc_rad/BaseN, min_exc_radius)
-inhibitory_weight_bounds = wt_bounds(inh_rad/BaseN)
+afferent_weight_bounds   = wt_bounds(rf_radius/BaseRN)               # 137 units
+excitatory_weight_bounds = wt_bounds(exc_rad/BaseN, min_exc_radius)  # 97 units
+inhibitory_weight_bounds = wt_bounds(inh_rad/BaseN)                  # 421 units
 
 # Circular ConnectionFields
 CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
@@ -237,20 +237,20 @@ LGNOff_surround.learning_fn.output_fn = DivisiveSumNormalize()
 
 s.connect(LGNOn,V1,delay=FixedPoint("0.05"),dest_port="on",
           connection_type=CFProjection,strength=1.0/2.0,name='LGNOnAfferent',
-          weights_bounds=afferent_weight_bounds,learning_rate=1.274)
+          weights_bounds=afferent_weight_bounds,learning_rate=alpha_input*137)
 
 s.connect(LGNOff,V1,delay=FixedPoint("0.05"),dest_port="off",
           connection_type=CFProjection,strength=1.0/2.0,name='LGNOffAfferent',
-          weights_bounds=afferent_weight_bounds,learning_rate=1.274)
+          weights_bounds=afferent_weight_bounds,learning_rate=alpha_input*137)
 
 
 s.connect(V1,V1,delay=FixedPoint("0.05"),dest_port="exc",
           connection_type=CFProjection,strength=0.9,name='LateralExcitatory',
-          weights_bounds=excitatory_weight_bounds,learning_rate=2.674) 
+          weights_bounds=excitatory_weight_bounds,learning_rate=alpha_exc*97) 
             
 s.connect(V1,V1,delay=FixedPoint("0.05"), dest_port="inh",
           connection_type=CFProjection,strength=-0.9,name='LateralInhibitory',
-          weights_bounds=inhibitory_weight_bounds,learning_rate=2.466)         
+          weights_bounds=inhibitory_weight_bounds,learning_rate=alpha_inh*421)         
 
 
 # Times are 1 less than the or_map_topo.param c++ lissom simulation because that one uses
@@ -260,12 +260,12 @@ s.connect(V1,V1,delay=FixedPoint("0.05"), dest_port="inh",
 # input pattern is presented, and is therefore  equivalent to or_map_topo's event scheduled at t=200.
 
 
-
+# this results in 37 units
 s.schedule_action(199, V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.6*exc_rad/BaseN,min_exc_radius))
 
+# and this results in 21 units
 s.schedule_action(499, V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.42*exc_rad/BaseN,min_exc_radius))
 
-s.schedule_action(999,V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.336*exc_rad/BaseN,min_exc_radius))
 
 
 # Schedule action requires a function, so we create a temporary one
@@ -274,16 +274,22 @@ def set_learning_rate(projection_name, rate):
     V1.projections()[projection_name].learning_rate=rate
 
 
-s.schedule_action(  499, set_learning_rate, "LateralExcitatory", 0.001*ecs)
-s.schedule_action(  499, set_learning_rate, "LGNOnAfferent", 0.005*acs)
-s.schedule_action( 1999, set_learning_rate, "LGNOnAfferent", 0.004*acs)
-s.schedule_action( 3999, set_learning_rate, "LGNOnAfferent", 0.003*acs)
-s.schedule_action(19999, set_learning_rate, "LGNOnAfferent", 0.0015*acs)
+# number of units changes with the bounds change
+s.schedule_action(  199, set_learning_rate, "LateralExcitatory", alpha_exc*37)
 
-s.schedule_action(  499, set_learning_rate, "LGNOffAfferent", 0.005*acs)
-s.schedule_action( 1999, set_learning_rate, "LGNOffAfferent", 0.004*acs)
-s.schedule_action( 3999, set_learning_rate, "LGNOffAfferent", 0.003*acs)
-s.schedule_action(19999, set_learning_rate, "LGNOffAfferent", 0.0015*acs)
+# scheduled change AND number of units changes with bounds change
+s.schedule_action(  499, set_learning_rate, "LateralExcitatory", 0.001*ecs*21)
+
+
+s.schedule_action(  499, set_learning_rate, "LGNOnAfferent", 0.005*acs*137)
+s.schedule_action( 1999, set_learning_rate, "LGNOnAfferent", 0.004*acs*137)
+s.schedule_action( 3999, set_learning_rate, "LGNOnAfferent", 0.003*acs*137)
+s.schedule_action(19999, set_learning_rate, "LGNOnAfferent", 0.0015*acs*137)
+
+s.schedule_action(  499, set_learning_rate, "LGNOffAfferent", 0.005*acs*137)
+s.schedule_action( 1999, set_learning_rate, "LGNOffAfferent", 0.004*acs*137)
+s.schedule_action( 3999, set_learning_rate, "LGNOffAfferent", 0.003*acs*137)
+s.schedule_action(19999, set_learning_rate, "LGNOffAfferent", 0.0015*acs*137)
 
 
 def set_deltabeta(x,y):
