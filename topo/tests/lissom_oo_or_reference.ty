@@ -267,8 +267,6 @@ s.schedule_action(499, V1.projections()['LateralExcitatory'].change_bounds, wt_b
 
 s.schedule_action(999,V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.336*exc_rad/BaseN,min_exc_radius))
 
-s.schedule_action(1999,V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(2.0/BaseN,min_exc_radius))
-
 
 # Schedule action requires a function, so we create a temporary one
 def set_learning_rate(projection_name, rate):
