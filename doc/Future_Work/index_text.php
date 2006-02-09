@@ -139,6 +139,9 @@ SheetView(s) to be used as a <A
 HREF="http://matplotlib.sourceforge.net/screenshots/pcolor_demo_large.png">contour</A>
 or vector field overlay on top of a bitmap, e.g. for joint preference
 maps (such as direction arrows on topo of an orientation bitmap plot).
+<!-- Plan: Templates accept a Contours parameter, which can be a list of 
+(sheetview, threshold) pairs, which will be drawn in order. -->
+
 
 <P>Other minor changes planned include adding outlining of
 ConnectionField extents, and plotting histograms for each bitmap.
