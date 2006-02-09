@@ -181,7 +181,8 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
 
         # For the first plot, use the INITIAL_PLOT_WIDTH to calculate zoom.
         self.initial_plot = True
-        self.zoom_factor = self.min_zoom_factor = 1
+        self.zoom_factor = 1
+	self.min_zoom_factor = 1
         
         self.control_frame = Frame(self)
         self.control_frame.pack(side=TOP,expand=YES,fill=X)
@@ -226,13 +227,14 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         ### get rid of the basicplotgrouppanel. (i.E. merged plotgrouppanel and basicplotgrouppanel)
 	self.pe_group.initialize_plot_list(plot_list=[])
         self.pe_group.do_plot_cmd()
-    
-
+  
+  
+    ### JCALERT! Re-write the doc for this function
     def load_images(self):
-        """
-        Pre:  self.pe_group contains a PlotGroup
+	"""
+	Pre:  self.pe_group contains a PlotGroup
               self.plots contains a list of plots following the
-                  format provided by PlotGroup.plots()
+	      format provided by PlotGroup.plots()
         Post: self.bitmaps contains a list of Bitmap Images ready for display.
 
         No geometry or Sheet information is necessary to perform the
@@ -240,47 +242,27 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         will need to be redefined from a subclass.  It is assumed that
         the PlotGroup code has not scaled the bitmap to the size currently
         desired by the GUI.
+	"""
 
-        Image scaling is automatically done, as well as adjusted by the
-        user.  self.MIN_PLOT_WIDTH is the number of pixels wide the
-        smallest plot figure can be, and self.INITIAL_PLOT_WIDTH is the
-        number of pixels wide the smallest plot figure will be on the
-        first display.
-        """
-        # need to calculate the old min width, so we know if we need to reset
-        # the zoom factors
-        if self.bitmaps:
-            old_min_width = reduce(min,[im.width() for im in self.bitmaps])
-        else:
-            old_min_width = -1
+	self.bitmaps = self.pe_group.load_images()
 
-        if self.pe_group:
-            self.bitmaps = self.pe_group.load_images()
-        
-        if self.bitmaps:
-            min_width = reduce(min,[im.width() for im in self.bitmaps])
-        else:
-            min_width = 0
+	min_width = reduce(min,[im.width() for im in self.bitmaps if im.resize])
+	max_height = float(reduce(max,[im.height() for im in self.bitmaps if im.resize]))
+	tmp_list = []
 
-        # If the min width changed, then recalculate the zoom factor
-        # If no plots, then no window.
-        if old_min_width != min_width:
-            if self.initial_plot and min_width != 0 and self.INITIAL_PLOT_WIDTH != None:
-                self.zoom_factor = int(self.INITIAL_PLOT_WIDTH/min_width) + 1
-                if self.zoom_factor < self.min_zoom_factor:
-                    self.zoom_factor = self.min_zoom_factor
-                self.initial_plot = False
-            if self.MIN_PLOT_WIDTH > min_width and min_width != 0:
-                self.min_zoom_factor = int(self.MIN_PLOT_WIDTH/min_width) + 1
-                if self.zoom_factor < self.min_zoom_factor:
-                    self.zoom_factor = self.min_zoom_factor
-            else:
-                self.min_zoom_factor = 1
-
-            if self.zoom_factor > self.min_zoom_factor:
-                self.reduce_button.config(state=NORMAL)
-            else:
-                self.reduce_button.config(state=DISABLED)
+	### JCALERT! We should work on this part in order to find a way to ensure a correct minimum size...
+        ### it should be in a sub-function in order to override it from projectionpanel.py
+	if ((self.initial_plot == True) and (min_width != 0)):
+	    self.zoom_factor = int(self.INITIAL_PLOT_WIDTH/min_width) + 1
+	    self.initial_plot=False
+	    
+	for bitmap in self.bitmaps:
+	    if not bitmap.resize:
+		tmp_list = tmp_list + [bitmap.zoom(self.zoom_factor*max_height/bitmap.height())]
+	    else:
+		tmp_list = tmp_list + [bitmap.zoom(self.zoom_factor*int(max_height/bitmap.height()+0.5))]
+	    
+	self.zoomed_images = [ImageTk.PhotoImage(im) for im in tmp_list]
 
         
     def display_plots(self):
@@ -296,9 +278,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         This function shuld be redefined in subclasses for interesting
         things such as 2D grids.
         """
-        self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.zoom_factor))
-                              for im in self.bitmaps]
-
+      
         # If the number of canvases or their sizes has changed, then
         # create a new set of canvases.  If the old canvases still can
         # work, then reuse them to prevent flicker.
@@ -379,7 +359,8 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
 
         if self.zoom_factor == self.min_zoom_factor:
             self.reduce_button.config(state=DISABLED)
-            
+         
+	self.load_images()
         self.display_plots()
 
     
@@ -387,6 +368,8 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         """Function called by Widget to increase the zoom factor"""
         self.reduce_button.config(state=NORMAL)
         self.zoom_factor = self.zoom_factor + 1
+
+	self.load_images()
         self.display_plots()
 
 
