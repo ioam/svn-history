@@ -58,6 +58,7 @@ class Bitmap(TopoObject):
         self.plot_src_name = None
 	### JCALERT! maybe renamed self.view_info, the same for the plot...
 	self.name = None
+	self.resize = True
 
 
     def copy(self):
