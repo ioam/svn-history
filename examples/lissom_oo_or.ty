@@ -31,10 +31,6 @@ from topo.patterns import PatternGeneratorParameter
 
 input_bounds = wt_bounds(0.7917)
 
-GeneratorSheet.density = 24.0 
-GeneratorSheet.period = 1
-GeneratorSheet.bounds = input_bounds
-
 random.seed(1234)
 topo.patterns.basic.Gaussian.scale = 1.0    
 topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
@@ -45,13 +41,9 @@ topo.patterns.basic.Gaussian.size = 2*0.0468
 topo.patterns.basic.Gaussian.aspect_ratio = 4.0      
 topo.patterns.basic.Gaussian.bounds = input_bounds
 
-CFSheet.density = 24.0
-
-# LISSOM parameters
-LISSOM.density = 48.0    
 
 # Connection parameters
-lgn_weight_bounds = wt_bounds(-1.0/12.0*4.7)
+lgn_weight_bounds = wt_bounds(0.375)
 afferent_weight_bounds   = wt_bounds(0.25)
 excitatory_weight_bounds = wt_bounds(0.10)
 inhibitory_weight_bounds = wt_bounds(0.23)
@@ -69,12 +61,12 @@ CFProjection.learning_fn=DivisiveHebbian()
 # build simulation
 
 s = topo.base.simulator.Simulator()
-Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),name='Retina')
-LGNOn = CFSheet(name='LGNOn',output_fn=PiecewiseLinear(lower_bound=0.0,
-                                                       upper_bound=1.0))
-LGNOff = CFSheet(name='LGNOff',output_fn=PiecewiseLinear(lower_bound=0.0,
-                                                         upper_bound=1.0))
-V1 = LISSOM(name='V1')
+Retina = GeneratorSheet(name='Retina',density=24.0,bounds=input_bounds,input_generator=topo.patterns.basic.Gaussian())
+LGNOn = CFSheet(name='LGNOn',density=24.0,
+                output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
+LGNOff = CFSheet(name='LGNOff',density=24.0,
+                 output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
+V1 = LISSOM(name='V1',density=48.0)
 V1.output_fn.lower_bound=0.083
 V1.output_fn.upper_bound=0.633
 
@@ -82,14 +74,14 @@ V1.output_fn.upper_bound=0.633
 LGNOn_center = s.connect(Retina,LGNOn,dest_port="center",delay = FixedPoint("0.05"),
                          connection_type=SharedWeightCFProjection,strength=2.33,
                          name='Center',weights_bounds=lgn_weight_bounds,
-                         weights_generator=topo.patterns.basic.Gaussian(size=1.0/24.0,aspect_ratio=1))
+                         weights_generator=topo.patterns.basic.Gaussian(size=0.0417,aspect_ratio=1))
 
 LGNOn_center.learning_fn.output_fn = DivisiveSumNormalize()
 
 LGNOn_surround = s.connect(Retina,LGNOn,dest_port="surround",delay = FixedPoint("0.05"),
                            connection_type=SharedWeightCFProjection,strength=-2.33,
                            name='Surround',weights_bounds=lgn_weight_bounds,
-                           weights_generator=topo.patterns.basic.Gaussian(size=1.0/6.0,aspect_ratio=1))
+                           weights_generator=topo.patterns.basic.Gaussian(size=0.1667,aspect_ratio=1))
 
 LGNOn_surround.learning_fn.output_fn = DivisiveSumNormalize()
 
@@ -98,24 +90,23 @@ LGNOn_surround.learning_fn.output_fn = DivisiveSumNormalize()
 LGNOff_center = s.connect(Retina,LGNOff,dest_port="center",delay = FixedPoint("0.05"),
                           connection_type=SharedWeightCFProjection,strength=-2.33,
                           name='Center',weights_bounds=lgn_weight_bounds,
-                          weights_generator=topo.patterns.basic.Gaussian(size=1.0/24.0,aspect_ratio=1))
-
+                          weights_generator=topo.patterns.basic.Gaussian(size=0.0417,aspect_ratio=1))
 LGNOff_center.learning_fn.output_fn = DivisiveSumNormalize()
 
 LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoint("0.05"),
                             connection_type=SharedWeightCFProjection,strength=2.33,
                             name='Surround',weights_bounds=lgn_weight_bounds,
-                            weights_generator=topo.patterns.basic.Gaussian(size=1.0/6.0,aspect_ratio=1))
+                            weights_generator=topo.patterns.basic.Gaussian(size=0.1667,aspect_ratio=1))
 LGNOff_surround.learning_fn.output_fn = DivisiveSumNormalize()
 
 
 
 s.connect(LGNOn,V1,delay=FixedPoint("0.05"),dest_port="on",
-          connection_type=CFProjection,strength=1.0,name='LGNOnAfferent',
+          connection_type=CFProjection,strength=0.5,name='LGNOnAfferent',
           weights_bounds=afferent_weight_bounds,learning_rate=1.274)
 
 s.connect(LGNOff,V1,delay=FixedPoint("0.05"),dest_port="off",
-          connection_type=CFProjection,strength=1.0,name='LGNOffAfferent',
+          connection_type=CFProjection,strength=0.5,name='LGNOffAfferent',
           weights_bounds=afferent_weight_bounds,learning_rate=1.274)
 
 
@@ -128,10 +119,13 @@ s.connect(V1,V1,delay=FixedPoint("0.05"), dest_port="inh",
           weights_bounds=inhibitory_weight_bounds,learning_rate=2.466)         
 
 
-s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.06)
-s.schedule_action(500, V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.042)
-s.schedule_action(1000,V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.0336)
-s.schedule_action(2000,V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.021)
+# CEBHACKALERT: adjust learning rates, add missing scheduled actions
+
+
+s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.06))
+s.schedule_action(500, V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.042))
+s.schedule_action(1000,V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.0336))
+s.schedule_action(2000,V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.021))
 
 
 # Schedule action requires a function, so we create a temporary one
