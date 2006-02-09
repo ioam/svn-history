@@ -29,7 +29,7 @@ from topo.responsefns.optimized import CFDotProduct
 import topo.patterns.basic
 from topo.base.sheet import BoundingBox
 from topo.base.parameter import DynamicNumber
-from topo.base.connectionfield import CFSheet
+from topo.base.connectionfield import CFSheet, wt_bounds
 from topo.learningfns.optimized import DivisiveHebbian
 from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
 from topo.patterns import PatternGeneratorParameter
@@ -49,6 +49,7 @@ rf_radius=BaseRN/4.0+0.5
 
 inh_rad=max(2.5,BaseN/4.0-1.0)
 exc_rad=max(2.5,BaseN/10.0)
+min_exc_rad=max(1.0,BaseN/44+0.5)
 #default_afferent_size_scale=BaseN/BaseRN
 gammaexc=0.9
 gammainh=0.9
@@ -116,6 +117,7 @@ assert round(alpha_input/137,3)==0.007
 assert round(alpha_exc/137,7)==0.0330078
 assert round(alpha_inh/97,8)==0.00466167
 assert tsettle == 8
+assert round(min_exc_rad,5) == 1.59091
 
 
 # c++ lissom first takes the integer part of rf_radius, I think?
@@ -123,6 +125,7 @@ assert tsettle == 8
 # for the calculations in this file.
 rf_radius = float(int(rf_radius))
 r_L = float(int(r_L))
+
 
 ###########################################
 # Set parameters
@@ -150,8 +153,8 @@ gaussian_width = xsigma/BaseRN/sqrt(2.0)
 gaussian_height = ysigma/BaseRN/sqrt(2.0)
 topo.patterns.basic.Gaussian.size = 2*gaussian_height
 topo.patterns.basic.Gaussian.aspect_ratio = gaussian_width/gaussian_height
-input_bounds = BoundingBox(points=((-RN/(BaseRN*area_scale)/2.0,-RN/(BaseRN*area_scale)/2.0),
-                                   ( RN/(BaseRN*area_scale)/2.0, RN/(BaseRN*area_scale)/2.0)))
+input_bounds = wt_bounds( RN/(2.0*BaseRN*area_scale) )
+
 topo.patterns.basic.Gaussian.bounds = input_bounds
                                                
 
@@ -162,11 +165,15 @@ LISSOM.output_fn = PiecewiseLinear(lower_bound=delta,upper_bound=beta)
 LISSOM.density = BaseN
 #LISSOM.tsettle=tsettle
 
+# division done here once for convenience
+min_exc_radius = min_exc_rad/BaseN
+
+
 # Connection parameters
-lgn_weight_bounds = BoundingBox(points=((-r_L/BaseLN,-r_L/BaseLN),(r_L/BaseLN,r_L/BaseLN)))
-afferent_weight_bounds   = BoundingBox(points=((-rf_radius/BaseRN,-rf_radius/BaseRN),(rf_radius/BaseRN,rf_radius/BaseRN)))
-excitatory_weight_bounds = BoundingBox(points=((-exc_rad/BaseN,-exc_rad/BaseN),(exc_rad/BaseN,exc_rad/BaseN)))
-inhibitory_weight_bounds = BoundingBox(points=((-inh_rad/BaseN,-inh_rad/BaseN),(inh_rad/BaseN,inh_rad/BaseN)))
+lgn_weight_bounds = wt_bounds(r_L/BaseLN)
+afferent_weight_bounds   = wt_bounds(rf_radius/BaseRN)
+excitatory_weight_bounds = wt_bounds(exc_rad/BaseN, min_exc_radius)
+inhibitory_weight_bounds = wt_bounds(inh_rad/BaseN)
 
 # Circular ConnectionFields
 CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
@@ -189,9 +196,6 @@ s = topo.base.simulator.Simulator()
 GeneratorSheet.bounds = input_bounds
 Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),
                         name='Retina')
-
-#CFSheet.bounds=input_bounds
-
 
 LGNOn = CFSheet(bounds=input_bounds,name='LGNOn',output_fn=PiecewiseLinear(lower_bound=0.0,
                                                        upper_bound=1.0))
@@ -254,13 +258,16 @@ s.connect(V1,V1,delay=FixedPoint("0.05"), dest_port="inh",
 # input pattern is presented. In Topographica, an event scheduled at t=0 is executed
 # after time=0's input pattern is presented. So one at t=199 is executed before t=200's
 # input pattern is presented, and is therefore  equivalent to or_map_topo's event scheduled at t=200.
-s.schedule_action(199, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.6/BaseN,-exc_rad*0.6/BaseN),(exc_rad*0.6/BaseN,exc_rad*0.6/BaseN))))
 
-s.schedule_action(499, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.42/BaseN,-exc_rad*0.42/BaseN),(exc_rad*0.42/BaseN,exc_rad*0.42/BaseN))))
 
-s.schedule_action(999,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.336/BaseN,-exc_rad*0.336/BaseN),(exc_rad*0.336/BaseN,exc_rad*0.336/BaseN))))
 
-s.schedule_action(1999,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-2.0/BaseN,-2.0/BaseN),(2.0/BaseN,2.0/BaseN))))
+s.schedule_action(199, V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.6*exc_rad/BaseN,min_exc_radius))
+
+s.schedule_action(499, V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.42*exc_rad/BaseN,min_exc_radius))
+
+s.schedule_action(999,V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.336*exc_rad/BaseN,min_exc_radius))
+
+s.schedule_action(1999,V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(2.0/BaseN,min_exc_radius))
 
 
 # Schedule action requires a function, so we create a temporary one
