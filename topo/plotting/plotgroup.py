@@ -193,7 +193,9 @@ class TemplatePlotGroup(PlotGroup):
         """        
         for image_name,file_path in self.template.static_images :
             image = Image.open(file_path)
-            self.add([Plot(image,name=image_name)])
+	    plot = Plot(image,name=image_name)
+	    plot.bitmap.resize=False
+            self.add([plot])
             
 
 class ConnectionFieldsPlotGroup(TemplatePlotGroup):
