@@ -12,7 +12,9 @@ $Id$
 __version__='$Revision$'
 
 # CEBHACKALERT: learning rates need to be adjusted
-# for 72x72 network. 
+# for 72x72 network.
+# Also, check all relevant scheduled events are
+# here.
 
 
 # Current matching status:
