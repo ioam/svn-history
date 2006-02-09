@@ -88,6 +88,12 @@ s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
           weights_bounds = inhibitory_weight_bounds,learning_rate=2.466)         
 
 
+# CEBHACKALERT: scheduled events are missing. e.g. change_bounds are ok for this density,
+# but for higher ones there are others that would make a difference. Now we can have
+# a minimum radius for the bounds, we can include those events. (From c++ lissom's or_defs.)
+# Also applies to lissom_oo_or.ty.
+
+
 s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.06,-0.06),(0.06,0.06))))
 s.schedule_action(500, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.042,-0.042),(0.042,0.042))))
 s.schedule_action(1000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.0336,-0.0336),(0.0336,0.0336))))
