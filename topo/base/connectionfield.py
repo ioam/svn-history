@@ -523,6 +523,8 @@ class CFProjection(Projection):
         """
         weights_bounds = self.initialize_bounds(weights_bounds_template)
 
+        # CEBHACKALERT: should only warn if new bounds are actually larger - right
+        # now it warns if bounds stay the same size.
         if not self.weights_bounds.containsbb_exclusive(weights_bounds):
             self.warning('Unable to change_bounds; currently allows reducing only.')
             return
@@ -617,3 +619,18 @@ class CFSheet(ProjectionSheet):
     ### JCALERT! This should probably be deleted...
     def release_unit_view(self,x,y):
         self.release_sheet_view(('Weights',x,y))
+
+
+
+def wt_bounds(radius,min_radius=0.0):
+    """
+    Create a BoundingBox with the specified radius.
+
+    If min_radius is given, the BoundingBox will
+    use min_radius if it's larger than radius - so
+    by passing min_radius=1.25/density, a BoundingBox
+    of at least 3x3 matrix units can be guaranteed.
+    """
+    print "r",radius,"min",min_radius
+    r = max(radius,min_radius)
+    return BoundingBox(points=((-r,-r),(r,r)))
