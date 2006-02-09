@@ -270,10 +270,15 @@ def set_learning_rate(projection_name, rate):
 
 
 s.schedule_action(  499, set_learning_rate, "LateralExcitatory", 0.001*ecs)
-s.schedule_action(  499, set_learning_rate, "Afferent0", 0.005*acs)
-s.schedule_action( 1999, set_learning_rate, "Afferent0", 0.004*acs)
-s.schedule_action( 3999, set_learning_rate, "Afferent0", 0.003*acs)
-s.schedule_action(19999, set_learning_rate, "Afferent0", 0.0015*acs)
+s.schedule_action(  499, set_learning_rate, "LGNOnAfferent", 0.005*acs)
+s.schedule_action( 1999, set_learning_rate, "LGNOnAfferent", 0.004*acs)
+s.schedule_action( 3999, set_learning_rate, "LGNOnAfferent", 0.003*acs)
+s.schedule_action(19999, set_learning_rate, "LGNOnAfferent", 0.0015*acs)
+
+s.schedule_action(  499, set_learning_rate, "LGNOffAfferent", 0.005*acs)
+s.schedule_action( 1999, set_learning_rate, "LGNOffAfferent", 0.004*acs)
+s.schedule_action( 3999, set_learning_rate, "LGNOffAfferent", 0.003*acs)
+s.schedule_action(19999, set_learning_rate, "LGNOffAfferent", 0.0015*acs)
 
 
 def set_deltabeta(x,y):
@@ -376,3 +381,4 @@ def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
 #profile.runctx('s.run(10000)',globals(),locals(),"abc")
 #p = pstats.Stats('abc')
 #p.strip_dirs().sort_stats('cumulative').print_stats()
+
