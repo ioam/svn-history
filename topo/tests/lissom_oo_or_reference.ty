@@ -158,8 +158,6 @@ input_bounds = wt_bounds( RN/(2.0*BaseRN*area_scale) )
 topo.patterns.basic.Gaussian.bounds = input_bounds
                                                
 
-CFSheet.density=24.0
-
 # LISSOM parameters
 LISSOM.output_fn = PiecewiseLinear(lower_bound=delta,upper_bound=beta)
 LISSOM.density = BaseN
@@ -198,9 +196,9 @@ Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),
                         name='Retina')
 
 LGNOn = CFSheet(bounds=input_bounds,name='LGNOn',output_fn=PiecewiseLinear(lower_bound=0.0,
-                                                       upper_bound=1.0))
+                                                       upper_bound=1.0),density=24.0)
 LGNOff = CFSheet(bounds=input_bounds,name='LGNOff',output_fn=PiecewiseLinear(lower_bound=0.0,
-                                                         upper_bound=1.0))
+                                                         upper_bound=1.0),density=24.0)
 V1 = LISSOM(name='V1')
 
 # LGN ON channel
