@@ -38,13 +38,6 @@ input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size = 2*0.0468,aspect_ra
                                     y=DynamicNumber(lambda : random.uniform(-0.5,0.5)),
                                     orientation=DynamicNumber(lambda :random.uniform(-pi,pi)))
                                  
-# Connection parameters
-lgn_weight_bounds = radial_bounds(0.375)
-afferent_weight_bounds   = radial_bounds(0.25)
-excitatory_weight_bounds = radial_bounds(0.10)
-inhibitory_weight_bounds = radial_bounds(0.23)
-
-
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()
@@ -68,6 +61,7 @@ V1.output_fn.lower_bound=0.083
 V1.output_fn.upper_bound=0.633
 
 # LGN ON channel
+lgn_weight_bounds = radial_bounds(0.375)
 LGNOn_center = s.connect(Retina,LGNOn,dest_port="center",delay = FixedPoint("0.05"),
                          connection_type=SharedWeightCFProjection,strength=2.33,
                          name='Center',weights_bounds=lgn_weight_bounds,
@@ -97,7 +91,7 @@ LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoin
 LGNOff_surround.learning_fn.output_fn = DivisiveSumNormalize()
 
 
-
+afferent_weight_bounds = radial_bounds(0.25)
 s.connect(LGNOn,V1,delay=FixedPoint("0.05"),dest_port="on",
           connection_type=CFProjection,strength=0.5,name='LGNOnAfferent',
           weights_bounds=afferent_weight_bounds,learning_rate=0.9590)
@@ -109,11 +103,11 @@ s.connect(LGNOff,V1,delay=FixedPoint("0.05"),dest_port="off",
 
 s.connect(V1,V1,delay=FixedPoint("0.05"),dest_port="exc",
           connection_type=CFProjection,strength=0.9,name='LateralExcitatory',
-          weights_bounds=excitatory_weight_bounds,learning_rate=3.2018) 
+          weights_bounds=radial_bounds(0.10),learning_rate=3.2018) 
             
 s.connect(V1,V1,delay=FixedPoint("0.05"), dest_port="inh",
           connection_type=CFProjection,strength=-0.9,name='LateralInhibitory',
-          weights_bounds=inhibitory_weight_bounds,learning_rate=1.9626)         
+          weights_bounds=radial_bounds(0.23),learning_rate=1.9626)         
 
 # CEBHACKALERT: add missing scheduled actions
 
