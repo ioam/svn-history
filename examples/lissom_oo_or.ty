@@ -30,10 +30,24 @@ from topo.patterns import PatternGeneratorParameter
 
 random.seed(1234)
 
+
+# CEBHACKALERT: will go to wherever DynamicValue is
+class UniformRandomValue(object):
+    """
+    When called, return the next value from random.uniform within the
+    designated bounds.
+    """
+    def __init__(self,bounds=(0.0,1.0)):
+        self.bounds=bounds
+                 
+    def __call__(self):
+        return random.uniform(self.bounds[0],self.bounds[1])
+
+
 input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size = 2*0.0468,aspect_ratio=4.0,
-                                    x=DynamicNumber(lambda : random.uniform(-0.5,0.5)),
-                                    y=DynamicNumber(lambda : random.uniform(-0.5,0.5)),
-                                    orientation=DynamicNumber(lambda :random.uniform(-pi,pi)))
+                                    x=DynamicNumber(UniformRandomValue((-0.5,0.5))),
+                                    y=DynamicNumber(UniformRandomValue((-0.5,0.5))),
+                                    orientation=DynamicNumber(UniformRandomValue((-pi,pi))))
                                  
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)
@@ -147,5 +161,12 @@ s.schedule_action( 5000, set_deltabeta,0.193 , 0.773)
 s.schedule_action( 6500, set_deltabeta,0.203 , 0.803)
 s.schedule_action( 8000, set_deltabeta,0.213 , 0.833)
 s.schedule_action(20000, set_deltabeta,0.223 , 0.863)
+
+
+# default locations for model editor
+V1.guiX=306.0; V1.guiY=225.0
+LGNOn.guiX=432.0; LGNOn.guiY=345.0
+LGNOff.guiX=150.0; LGNOff.guiY=345.0
+Retina.guiX=279.0; Retina.guiY=486.0
 
 s.run(0)
