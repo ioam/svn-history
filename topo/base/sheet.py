@@ -358,6 +358,7 @@ class Sheet(EventProcessor):
 
     bounds  = Constant(default=BoundingBox(points=((-0.5,-0.5),(0.5,0.5))))
     density = Constant(default=10)
+    # JABALERT: Should be set per-projection, not per-Sheet, right?
     learning = BooleanParameter(True)
 
     def __init__(self,**params):

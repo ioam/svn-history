@@ -257,6 +257,8 @@ class Simulator(TopoObject):
         super(Simulator,self).__init__(**config)
 
         # time is a fixed-point number
+        # JABHACKALERT! Shouldn't this be at least 4 decimal places by default?
+        # (Either using ,4 or setting the FixedPoint default precision to 4?)
         self._time = FixedPoint("0.0")
         self._event_processors = []
         self._sleep_window = 0.0
