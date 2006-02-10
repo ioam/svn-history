@@ -19,7 +19,6 @@ from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFDotProduct
-from topo.base.sheet import BoundingBox
 from topo.base.parameter import DynamicNumber
 from topo.base.connectionfield import CFSheet, radial_bounds
 from topo.learningfns.optimized import DivisiveHebbian
@@ -28,8 +27,6 @@ from topo.patterns import PatternGeneratorParameter
 
 ###########################################
 # Set parameters
-
-input_bounds = radial_bounds(0.7917)
 
 random.seed(1234)
 
@@ -50,28 +47,27 @@ CFProjection.learning_fn=DivisiveHebbian()
 # build simulation
 
 s = topo.base.simulator.Simulator()
-Retina = GeneratorSheet(name='Retina',density=24.0,bounds=input_bounds,
+Retina = GeneratorSheet(name='Retina',density=24.0,bounds=radial_bounds(0.7917),
                         input_generator=input_pattern)
-LGNOn = CFSheet(name='LGNOn',density=24.0,bounds=input_bounds,
+LGNOn = CFSheet(name='LGNOn',density=24.0,bounds=radial_bounds(0.7917),
                 output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
-LGNOff = CFSheet(name='LGNOff',density=24.0,bounds=input_bounds,
+LGNOff = CFSheet(name='LGNOff',density=24.0,bounds=radial_bounds(0.7917),
                  output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
 V1 = LISSOM(name='V1',density=48.0)
 V1.output_fn.lower_bound=0.083
 V1.output_fn.upper_bound=0.633
 
 # LGN ON channel
-lgn_weight_bounds = radial_bounds(0.375)
 LGNOn_center = s.connect(Retina,LGNOn,dest_port="center",delay = FixedPoint("0.05"),
                          connection_type=SharedWeightCFProjection,strength=2.33,
-                         name='Center',weights_bounds=lgn_weight_bounds,
+                         name='Center',weights_bounds=radial_bounds(0.375),
                          weights_generator=topo.patterns.basic.Gaussian(size=0.0417,aspect_ratio=1))
 
 LGNOn_center.learning_fn.output_fn = DivisiveSumNormalize()
 
 LGNOn_surround = s.connect(Retina,LGNOn,dest_port="surround",delay = FixedPoint("0.05"),
                            connection_type=SharedWeightCFProjection,strength=-2.33,
-                           name='Surround',weights_bounds=lgn_weight_bounds,
+                           name='Surround',weights_bounds=radial_bounds(0.375),
                            weights_generator=topo.patterns.basic.Gaussian(size=0.1667,aspect_ratio=1))
 
 LGNOn_surround.learning_fn.output_fn = DivisiveSumNormalize()
@@ -80,25 +76,23 @@ LGNOn_surround.learning_fn.output_fn = DivisiveSumNormalize()
 # LGN OFF channel
 LGNOff_center = s.connect(Retina,LGNOff,dest_port="center",delay = FixedPoint("0.05"),
                           connection_type=SharedWeightCFProjection,strength=-2.33,
-                          name='Center',weights_bounds=lgn_weight_bounds,
+                          name='Center',weights_bounds=radial_bounds(0.375),
                           weights_generator=topo.patterns.basic.Gaussian(size=0.0417,aspect_ratio=1))
 LGNOff_center.learning_fn.output_fn = DivisiveSumNormalize()
 
 LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoint("0.05"),
                             connection_type=SharedWeightCFProjection,strength=2.33,
-                            name='Surround',weights_bounds=lgn_weight_bounds,
+                            name='Surround',weights_bounds=radial_bounds(0.375),
                             weights_generator=topo.patterns.basic.Gaussian(size=0.1667,aspect_ratio=1))
 LGNOff_surround.learning_fn.output_fn = DivisiveSumNormalize()
 
-
-afferent_weight_bounds = radial_bounds(0.25)
 s.connect(LGNOn,V1,delay=FixedPoint("0.05"),dest_port="on",
           connection_type=CFProjection,strength=0.5,name='LGNOnAfferent',
-          weights_bounds=afferent_weight_bounds,learning_rate=0.9590)
+          weights_bounds=radial_bounds(0.25),learning_rate=0.9590)
 
 s.connect(LGNOff,V1,delay=FixedPoint("0.05"),dest_port="off",
           connection_type=CFProjection,strength=0.5,name='LGNOffAfferent',
-          weights_bounds=afferent_weight_bounds,learning_rate=0.9590)
+          weights_bounds=radial_bounds(0.25),learning_rate=0.9590)
 
 
 s.connect(V1,V1,delay=FixedPoint("0.05"),dest_port="exc",
