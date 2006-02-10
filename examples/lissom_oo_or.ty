@@ -33,9 +33,11 @@ input_bounds = wt_bounds(0.7917)
 
 random.seed(1234)
 
-# CEBHACKALERT: see end of file for setting up learning input
-# pattern.
-
+input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size = 2*0.0468,aspect_ratio=4.0,
+                                    x=DynamicNumber(lambda : random.uniform(-0.5,0.5)),
+                                    y=DynamicNumber(lambda : random.uniform(-0.5,0.5)),
+                                    orientation=DynamicNumber(lambda :random.uniform(-pi,pi)))
+                                 
 # Connection parameters
 lgn_weight_bounds = wt_bounds(0.375)
 afferent_weight_bounds   = wt_bounds(0.25)
@@ -55,7 +57,8 @@ CFProjection.learning_fn=DivisiveHebbian()
 # build simulation
 
 s = topo.base.simulator.Simulator()
-Retina = GeneratorSheet(name='Retina',density=24.0,bounds=input_bounds,input_generator=topo.patterns.basic.Gaussian())
+Retina = GeneratorSheet(name='Retina',density=24.0,bounds=input_bounds,
+                        input_generator=input_pattern)
 LGNOn = CFSheet(name='LGNOn',density=24.0,bounds=input_bounds,
                 output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
 LGNOff = CFSheet(name='LGNOff',density=24.0,bounds=input_bounds,
@@ -154,18 +157,5 @@ s.schedule_action( 5000, set_deltabeta,0.193 , 0.773)
 s.schedule_action( 6500, set_deltabeta,0.203 , 0.803)
 s.schedule_action( 8000, set_deltabeta,0.213 , 0.833)
 s.schedule_action(20000, set_deltabeta,0.223 , 0.863)
-
-
-# CEBHACKALERT: should not be set on class - problem with
-# DynamicNumber. Should be earlier in file to make sense.
-topo.patterns.basic.Gaussian.scale = 1.0    
-topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
-
-topo.patterns.basic.Gaussian.size = 2*0.0468      
-topo.patterns.basic.Gaussian.aspect_ratio = 4.0      
-
-
 
 s.run(0)
