@@ -147,7 +147,8 @@ larger system.
 <P>Of course, this technique cannot help you avoid such cropping for
 lateral connections within U or feedback connections from areas above
 U.  In some simulators, periodic boundary conditions can be enforced
-such that such connections wrap around like a torus, but such wrapping
-is not practical in Topographica because it focuses on drawing
-realistic input patterns like photographs, which cannot be rendered
-properly on a torus.
+such that such connections wrap around like a torus, avoiding these
+issues. However, such wrapping is not practical in Topographica, which
+focuses on drawing realistic input patterns like photographs, which
+cannot be rendered properly on a torus.
+
