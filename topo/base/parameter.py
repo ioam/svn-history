@@ -217,6 +217,17 @@ class Parameter(object):
             result = self.default
         else:
             result = obj.__dict__.get(self.get_name(obj),self.default)
+
+            # CEBHACKALERT: allows a DynamicNumber to have been set as the
+            # value of a Number parameter of a TopoObject. If we will
+            # continue to do this, we probably want one DynamicValue parameter
+            # and not DynamicNumber etc.
+            # This code shouldn't have any effect on existing uses of
+            # DynamicNumber - they all overwrite the original Number
+            # parameter anyway.
+            # (See also Number.__set__().)
+            if type(result)==DynamicNumber:
+                result=result.__get__(obj,objtype)
         return result
 
 
@@ -408,7 +419,11 @@ class Number(Parameter):
         """
         Set to the given value, raising an exception if out of bounds.
         """
-        self._check_bounds(val)
+        # CEBHACKALERT: see Parameter.__get__().
+        # A DynamicNumber does not currently respect the bounds
+        # of the Number. (Before it couldn't have bounds at all.)
+        if type(val)!=DynamicNumber:
+            self._check_bounds(val)
         super(Number,self).__set__(obj,val)
 
     def set_in_bounds(self,obj,val):
@@ -549,7 +564,6 @@ class DynamicNumber(Number):
         self._softbounds = softbounds  
         self._check_bounds(default)  # only create this number if the default value and bounds are consistent
 
-
     def __get__(self,obj,objtype):
         """
         Get a parameter value.  If called on the class, produce the
@@ -585,6 +599,7 @@ class Dynamic(Parameter):
         default value.  If called on an instance, produce the instance's
         value, if one has been set, otherwise produce the default value.
         """
+        
         if not obj:
             result = produce_value(self.default)
         else:
