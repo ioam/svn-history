@@ -147,9 +147,15 @@ class MeasureFeatureMap(TopoObject):
                 cyclic=param[2]
                 self.__featurevalues.append(frange(low_bound,up_bound,step,not cyclic))
 
-        # all the sheets that will have their feature maps measured
-        # (i.e. all Sheets that aren't GeneratorSheets)
-        f = lambda x: not isinstance(x,GeneratorSheet)
+        # Sheets that have the attribure measure_maps and have it set True
+        # get their maps measured.
+        # CEBHACKALERT: we might want to measure the map on a sheet due
+        # to a specific projection, rather than measure the map due
+        # to all projections.
+        # The Sheet 'learning' parameter should be per projection
+        # (see alert in sheet.py), and we will have a per projection plastic
+        # attribure, too.
+        f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
         self.__measured_sheets = filter(f,self.simulator.objects(Sheet).values())
         
         # now create the featuremaps for each sheet    
