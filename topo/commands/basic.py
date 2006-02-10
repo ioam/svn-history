@@ -140,9 +140,17 @@ def load_snapshot(snapshot_name):
 
     # CEBHACKALERT:
     # Until I figure out how to pickle random properties of the topo.patterns.basic.Gaussian properly...
+    # There are two hacks here now, because there are two different ways that we use lambda functions to generate random numbers in scripts. lissom_oo_or.ty uses one way; the other scripts use a different way.
 
-
-    hack = """
+    if snapshot_name.find("lissom_oo_or_20000.typ")>0:
+        hack = """
+from topo.base.simulator import get_active_sim
+from topo.base.sheet import Sheet
+r=get_active_sim().objects(Sheet)['Retina']
+r.input_generator=input_pattern
+"""
+    else:
+        hack = """
 from topo.base.simulator import get_active_sim
 from topo.sheets.generatorsheet import GeneratorSheet
 gs_list = get_active_sim().objects(GeneratorSheet).values()
@@ -151,6 +159,7 @@ try:
 except NameError:
     pass
 """
+        
     exec hack in __main__.__dict__
 
 def save_snapshot(snapshot_name):
