@@ -622,7 +622,7 @@ class CFSheet(ProjectionSheet):
 
 
 
-def wt_bounds(radius,min_radius=0.0):
+def radial_bounds(radius,min_radius=0.0):
     """
     Create a BoundingBox with the specified radius.
 

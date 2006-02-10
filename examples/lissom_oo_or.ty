@@ -21,7 +21,7 @@ from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFDotProduct
 from topo.base.sheet import BoundingBox
 from topo.base.parameter import DynamicNumber
-from topo.base.connectionfield import CFSheet, wt_bounds
+from topo.base.connectionfield import CFSheet, radial_bounds
 from topo.learningfns.optimized import DivisiveHebbian
 from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
 from topo.patterns import PatternGeneratorParameter
@@ -29,7 +29,7 @@ from topo.patterns import PatternGeneratorParameter
 ###########################################
 # Set parameters
 
-input_bounds = wt_bounds(0.7917)
+input_bounds = radial_bounds(0.7917)
 
 random.seed(1234)
 
@@ -39,10 +39,10 @@ input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size = 2*0.0468,aspect_ra
                                     orientation=DynamicNumber(lambda :random.uniform(-pi,pi)))
                                  
 # Connection parameters
-lgn_weight_bounds = wt_bounds(0.375)
-afferent_weight_bounds   = wt_bounds(0.25)
-excitatory_weight_bounds = wt_bounds(0.10)
-inhibitory_weight_bounds = wt_bounds(0.23)
+lgn_weight_bounds = radial_bounds(0.375)
+afferent_weight_bounds   = radial_bounds(0.25)
+excitatory_weight_bounds = radial_bounds(0.10)
+inhibitory_weight_bounds = radial_bounds(0.23)
 
 
 # Specify weight initialization, response function, and learning function
@@ -117,8 +117,8 @@ s.connect(V1,V1,delay=FixedPoint("0.05"), dest_port="inh",
 
 # CEBHACKALERT: add missing scheduled actions
 
-s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.06))
-s.schedule_action(500, V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.042))
+s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, radial_bounds(0.06))
+s.schedule_action(500, V1.projections()['LateralExcitatory'].change_bounds, radial_bounds(0.042))
 
 
 # Schedule action requires a function, so we create a temporary one
