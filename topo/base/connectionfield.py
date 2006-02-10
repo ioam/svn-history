@@ -568,6 +568,8 @@ class CFSheet(ProjectionSheet):
     routines.
     """
 
+    measure_maps = BooleanParameter(True)
+
     def learn(self):
         for proj in chain(*self.in_projections.values()):
             if proj.input_buffer:
