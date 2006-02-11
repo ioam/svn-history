@@ -5,6 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
+from math import fmod,floor
 from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, \
      LEFT, RIGHT, YES, BOTH, Label
 import Pmw, re, os, sys, code, traceback, __main__
@@ -513,9 +514,25 @@ class TopoConsole(Frame):
         s = active_sim()
         
         if s:
-            i = float(count)
-            s.run(i) 
-            message = 'Ran ' + count + ' to time ' + str(s.time())
+            # Could simply do s.run(float(count)), but instead breaks
+            # it up so that we can update the display after every 1.0
+            # time steps, then do any fractional part remaining.
+            # 
+            # Should replace with a progress bar; see
+            # http://tkinter.unpythonic.net/bwidget/
+            # http://tkinter.unpythonic.net/wiki/ProgressBar
+            fcount = float(count)
+            step   = 2.0
+            iters  = int(floor(fcount/step))
+            remain = fmod(fcount, step)
+            for i in xrange(iters):
+                s.run(step)
+                percent = 100.0*i/fcount
+                message = 'Time ' + str(s.time()) + ': ' + str(int(percent)) + '% of '  + str(fcount) + ' completed.'
+                self.messageBar.message('state', message)
+                self.update_idletasks()
+            s.run(remain)
+            message = 'Ran ' + str(fcount) + ' to time ' + str(s.time())
             self.auto_refresh()
         else:
             message = 'Error: No active simulator.'
