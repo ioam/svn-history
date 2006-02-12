@@ -9,6 +9,9 @@ more details.
 $Id$
 """
 __version__='$Revision$'
+
+import copy
+
 from utils import find_classes_in_package,classname_repr
 
 
@@ -617,20 +620,41 @@ class Constant(Parameter):
     Constant Parameter that can be constructed and used but not set on an
     initialized object.
 
-    The value of the Parameter can, however, be set on a class.
+    The default value of the Parameter can, however, be set on a class.
     """
-    __slots__ = []
+    __slots__ = ['value']
     __doc__ = property((lambda self: self.doc))
-    
+
+    def __init__(self,default,**params):
+        """
+        This Constant gets a deepcopy of the value passed in when it is declared.
+        """
+        self.value=copy.deepcopy(default)
+        Parameter.__init__(self,default=default,**params)
+             
     def __set__(self,obj,val):
         """
-        Does not allow set commands except on the classobj or
-        on an uninitialized TopoObject.
+        Does not allow set commands for an object, unless that object is
+        not yet initialized.
+
+        If called on e.g. a class or an uninitialized object, sets this Constant's value;
+        otherwise, raises an error.
         """
         if obj==None or obj.initialized==False:
-            super(Constant,self).__set__(obj,val)
+            self.value=val
         else:
             raise "Constant parameter cannot be modified"
+
+    def __get__(self,obj,objtype):
+        """
+        Return this Constant's value if called on an object; otherwise, return the
+        class' value.
+        """
+        if obj:
+            return self.value
+        else:
+            return self.default
+
 
 
 def produce_value(value_obj):
