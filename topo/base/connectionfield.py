@@ -379,7 +379,7 @@ class CFProjection(Projection):
 
 
 
-    def __init__(self,**params):
+    def __init__(self,initialize_cfs=True,**params):
         """
         Initialize the Projection with a set of cf_type objects
         (typically ConnectionFields), each located at the location
@@ -396,36 +396,39 @@ class CFProjection(Projection):
         to the size of the altered weights_bounds.
         """
         super(CFProjection,self).__init__(**params)
-        # set up array of ConnectionFields translated to each x,y in the src sheet
 
         # adjust the weights to fit the sheet, and to be odd.
         self.weights_bounds = self.initialize_bounds(self.weights_bounds)
 
-        mask_template = self.create_mask_template()
+        self.mask_template = self.create_mask_template()
         
-        ### JABALERT: Should make cfs semi-private, since it has an
-        ### accessor function and isn't always the same format
-        ### (e.g. for SharedWeightProjection).  Could also make it
-        ### be a class attribute; not sure.
-        cflist = []
-        for y in self.dest.sheet_rows()[::-1]:
-            row = []
-            for x in self.dest.sheet_cols():
-                # JABALERT: Currently computes the location of the
-                # ConnectionField as the exact location in the input
-                # sheet corresponding to the unit in the destination
-                # sheet.  Instead, we will need to add the ability to
-                # use some other type of mapping, e.g. to add jitter
-                # in the initial mapping.
-                row.append(self.cf_type(x,y,
-                                        self.src,
-                                        copy.copy(self.weights_bounds),
-                                        self.weights_generator,
-                                        copy.copy(mask_template),
-                                        self.learning_fn.output_fn))
-            cflist.append(row)
 
-        self.cfs = cflist
+        if initialize_cfs:            
+            # set up array of ConnectionFields translated to each x,y in the src sheet
+            cflist = []
+            for y in self.dest.sheet_rows()[::-1]:
+                row = []
+                for x in self.dest.sheet_cols():
+                    # JABALERT: Currently computes the location of the
+                    # ConnectionField as the exact location in the input
+                    # sheet corresponding to the unit in the destination
+                    # sheet.  Instead, we will need to add the ability to
+                    # use some other type of mapping, e.g. to add jitter
+                    # in the initial mapping.
+                    row.append(self.cf_type(x,y,
+                                            self.src,
+                                            copy.copy(self.weights_bounds),
+                                            self.weights_generator,
+                                            copy.copy(self.mask_template), 
+                                            self.learning_fn.output_fn))
+                cflist.append(row)
+
+
+            ### JABALERT: Should make cfs semi-private, since it has an
+            ### accessor function and isn't always the same format
+            ### (e.g. for SharedWeightProjection).  Could also make it
+            ### be a class attribute; not sure.
+            self.cfs = cflist
 
         self.input_buffer = None
         self.activity = Numeric.array(self.dest.activity)

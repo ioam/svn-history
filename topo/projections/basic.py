@@ -70,26 +70,12 @@ class SharedWeightCFProjection(CFProjection):
 
     def __init__(self,**params):
         """
-        Initialize the Projection with a set of cf_type objects
-        (typically ConnectionFields), each located at the location
-        in the source sheet corresponding to the unit in the target
-        sheet.
+        Initialize the Projection with a single cf_type object
+        (typically a ConnectionField),
         """
-        ### Skips call to super(SharedWeightProjection,self), because
-        ### we don't want the whole set of cfs initialized, but we
-        ### do want anything that Projection defines.
-        ###
-        ### JABHACKALERT: This approach might lead to problems later
-        ### if someone adds code to CFProjection, because we won't
-        ### inherit that.  Instead, we might want to add a flag to
-        ### CFProjection.__init__ to allow the weight intialization
-        ### to be selectively disabled, which is all we really need.
-        CFProjection.__init__(self,**params)
-
-        # adjust the weights to fit the sheet, and to be odd.
-        self.weights_bounds = self.initialize_bounds(self.weights_bounds)
-
-        mask_template = self.create_mask_template()
+        # we don't want the whole set of cfs initialized, but we
+        # do want anything that Projection defines.
+        super(SharedWeightCFProjection,self).__init__(initialize_cfs=False,**params)
 
 
         ### JABHACKALERT: cfs is a dummy, here only so that learning will
@@ -99,7 +85,7 @@ class SharedWeightCFProjection(CFProjection):
                                    self.src,
                                    self.weights_bounds,
                                    self.weights_generator,
-                                   mask_template,
+                                   self.mask_template,
                                    self.learning_fn.output_fn)
 
         # CEBHACKALERT: Calculate and store the the slice of the
@@ -122,9 +108,6 @@ class SharedWeightCFProjection(CFProjection):
                 sheet_slice = cf.slice_tuple()
                 row.append((sheet_slice,cf.bounds,weights_slice))
             self.cf_slice_and_bounds.append(row)
-
-        self.input_buffer = None
-        self.activity = Numeric.array(self.dest.activity)
 
 
     def cf(self,r,c):
