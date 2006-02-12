@@ -638,7 +638,7 @@ class Constant(Parameter):
         if obj==None or obj.initialized==False:
             self.value=val
         else:
-            raise "Constant parameter cannot be modified"
+            raise TypeError("Constant parameter cannot be modified.")
 
     def __get__(self,obj,objtype):
         """
