@@ -1,15 +1,15 @@
-<H1>Implementing GUI elements</H1>
+<H1>Implementing the GUI</H1>
 
 <P>When coding, the GUI should be considered an optional component.
 No part of Topographica should import GUI files, rely on the presence
 of a particular GUI or any GUI at all, or assume that the data it
 generates will be used only by a GUI unless it is absolutely
 necessary, e.g. for the actual GUI implementation.  This is a special
-case of the general principles of object-oriented design discussed
-above.
+case of the <A HREF="ood.html">general principles of object-oriented design</A>
+discussed elsewhere.
 
 <P>Many components that would at first glance seem to be GUI-related
-are in fact much more general, and should be written for the general
+are, in, fact much more general.  Such code should be written for the general
 case, not in terms of the GUI (and not even with names or comments
 that suggest they are in any way limited to being part of a GUI).
 
@@ -19,7 +19,7 @@ of this code is not specific to a GUI, i.e. it does not require a user
 to actually move a mouse or manipulate widgets.  E.g. a SheetView is a
 bitmap representation of a Sheet; the resulting bitmap can of course
 be displayed in a GUI window, but it could also be saved to a file,
-and in batch mode or unit tests often *will* be saved directly to a
+and in batch mode or unit tests often <i>will</i> be saved directly to a
 file, with no GUI window ever created.  Most of the important code for
 plotting is independent of the output device, and any such code should
 be written using general terminology like Plotting, not GUI.
@@ -48,6 +48,6 @@ and across platforms.  To be able to maintain our code over the long
 term, we need to minimize the amount of our code that depends on such
 varying details.  Finally, this approach ensures that scientific users
 can ignore all of the GUI details, which are irrelevant to what
-Topographica actually computes.  Allowing them to do so is absolutely
-crucial for them to be able to understand and trust what they are
-actually simulating.
+Topographica actually computes.  Allowing users to focus on the core
+code is absolutely crucial for them to be able to understand and trust
+what they are actually simulating.

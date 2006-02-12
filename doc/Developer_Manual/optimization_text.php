@@ -2,7 +2,7 @@
 
 <P>According to Knuth, "Premature optimization is the root of all
 evil".  Although the performance of Topographica is critically
-important, the way to achieve high performance is by spending *all* of
+important, the way to achieve high performance is by spending <i>all</i> of
 our optimization efforts on the very small portion of the code that
 accounts for nearly all of the run time, i.e., the bottlenecks.  The
 overall architecture of Topographica is designed explicitly to

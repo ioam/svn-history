@@ -9,29 +9,21 @@ in the simulator, which use different conventions.
 
 
 <P><DL COMPACT>
-<P><DT><A href="python.html"><strong>How to write code in Python</strong></A></DT>
+<P><DT><A href="coding.html"><strong>General guidelines</strong></A></DT>
 <DD>General info on writing Python, plus Topographica-specific
-conventions such as ALERTs</DD>
-
-<P><DT><A href="communication.html"><strong>Communication: code, documentation, and comments</strong></A></DT>
-<DD>Where to put information and ideas for the computer, the users,
-and other programmers to read</DD>
+conventions such as guidelines for naming, comments, documentation,
+parameters, units, and external imports.
 
 <P><DT><A href="ood.html"><strong>Object-oriented design</strong></A></DT>
-<DD>Tips on how to design well-structured code</DD>
+<DD>How to design well-structured code</DD>
 
-<P><DT><A href="naming.html"><strong>Naming</strong></A></DT>
-<DD>What to call various entities in the code, to be consistent with 
-the rest of the code and documentation</DD>
+<P><DT><A href="imports.html"><strong>Importing files and packages</strong></A></DT>
+<DD>How to import Topographica and external code</DD>
 
-<P><DT><A href="parameters.html"><strong>Parameters, bounds, and units</strong></A></DT>
-<DD>How to add user-settable parameters, their bounds, and what units
-parameters and other user-visible quantities should have.</DD>
+<P><DT><A href="alerts.html"><strong>ALERTs</strong></A></DT>
+<DD>How to flag incorrect or confusing code or documentation</DD>
 
-<P><DT><A href="imports.html"><strong>Importing external files and functions</strong></A></DT>
-<DD>How and when to import functions from external files</DD>
-
-<P><DT><A href="gui.html"><strong>Implementing GUI elements</strong></A></DT>
+<P><DT><A href="gui.html"><strong>GUI programming</strong></A></DT>
 <DD>How to add functionality to the GUI</DD>
 
 <P><DT><A href="optimization.html"><strong>Optimization</strong></A></DT>

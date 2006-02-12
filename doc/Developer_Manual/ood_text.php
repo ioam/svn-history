@@ -20,11 +20,13 @@ Shape.  It may not actually be possible to implement resize() for all
 shapes with the same program code, and in that case Shape.resize()
 would be written as an abstract method (i.e., would simply return
 NotImplementedError).  The resize() function would then be implemented
-for each particular shape.
+for each particular shape.  But the semantics of resize() should be
+clear for all conceivable Shapes, and thus providing the operation
+should be done at the Shape level.
 
 <P>Conversely, it is not appropriate to add resize() to all
 ProgramObjects, because there are surely objects in the program that
-are not possible to resize.  Thus it would not normally be appropriate
+are not meaningful to resize.  Thus it would not normally be appropriate
 to have a ProgramObject.resize().  If such a method is required to
 solve a particular design problem, it would have to be documented
 heavily to ensure that the user only calls it on a Shape.  Such
@@ -99,9 +101,9 @@ Such extra functions make everyone's lives more difficult, because they
 make the software much harder to maintain, understand, and use.
 
 <P>To summarize: when adding new code, think (and discuss!) where it
-should go and what level of generality is appropriate.  Try to solve
-the problem for all time, if it is clear how to do so; otherwise,
-solve it for the largest class whose solution *is* clear.  Once the
-level has been chosen, make sure all documentation, comments, and
-names match that level, pretending that no lower levels exist except
-as possible examples.
+should go and what level of generality is appropriate.  If it is clear
+how to solve the problem for all time, please do so!  Otherwise, solve
+it for the largest class whose solution <i>is</i> clear.  Once an
+appropriate level has been chosen, make sure all documentation,
+comments, and names match that level, pretending that no lower levels
+exist except as possible examples.

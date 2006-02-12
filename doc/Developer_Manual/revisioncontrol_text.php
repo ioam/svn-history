@@ -42,13 +42,13 @@ procedure:
 
 <PRE>
   cvs commit .	  # Commit all outstanding edits
-  runtests	  # Verify that things work when you start
+  make tests	  # Verify that things work when you start
   emacs		  # Refactor old code, not changing behavior at all
-  runtests	  # Verify that nothing has been broken
+  make tests      # Verify that nothing has been broken
   cvs diff        # Will have many widespread changes
   cvs commit -m    "No visible changes" .
   emacs		  # Add new feature and new test for it
-  runtests	  # See if tests still work, fixing if necessary
+  make tests      # See if tests still work, fixing if necessary
   cvs diff	  # Short list: only the new code
   cvs commit -m    "Added feature Y" .
 </PRE>
@@ -62,7 +62,7 @@ the source of a bug, or whether it was all those other changes that
 <i>shouldn't</i> have changed anything.
 
 
-<H1>Revision info</H1>
+<H2>Revision info</H2>
 
 <P>Every readable file (i.e. text, source code, html, etc.) should
 include an <CODE>&#36;Id&#36;</CODE> tag so that the CVS revision
