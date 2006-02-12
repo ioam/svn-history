@@ -1,4 +1,931 @@
+2006-02-12  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or.ty 1.20: Updated gui attribute names to
+	match Alan's recent changes
+
+2006-02-12  alan_lindsay  <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/parametersframe.py 1.48: Allows class constants to be
+	set, crudely. A dictionary of dictionaries, holding only the
+	objects changed by the user is used to allow values to be
+	maintained after closing the parametersframe.
+
+	* topo/tkgui/editorobjects.py 1.16, topo/tkgui/editortools.py 1.8,
+	topo/tkgui/editorwindow.py 1.16: Changed method and variable names
+	to coincide with the rest of Topographica. Activity plots are now
+	mapped correctly onto sheets and the shape and size of a sheet's
+	bounding box is represented by the editor sheet.
+
+	* topo/base/utils.py 1.55: Added extra translator functions for
+	features in ParameterFrame.
+
+	* examples/hierarchical.ty 1.27: ModelEditor uses gui_x instead of
+	guiX; same for y.
+
+2006-02-12  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or_20000.typ 1.4: New version from Chris
+
+2006-02-11  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.34: Added simple progress reporting
+	(just a sketch)
+
+2006-02-10  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or_20000.typ 1.3: Removed - something went
+	wrong with the previous commit. Will replace.
+
+	* examples/lissom_oo_or_20000.typ 1.2: Slied in measure_maps code
+	and change to input_generator.
+
+	* doc/Tutorials/lissom_oo_or_text.php 1.1: Initial version -
+	unchecked.
+
+	* doc/Tutorials/images/natural_image_oo_or.png 1.1,
+	doc/Tutorials/images/oo_or_map.png 1.1,
+	doc/Tutorials/images/projection_oo.png 1.1,
+	doc/Tutorials/images/test_pattern_oo.png 1.1,
+	doc/Tutorials/images/unit_weights_0_0_oo.png 1.1,
+	doc/Tutorials/images/unit_weights_0_0_oo_or.png 1.1,
+	doc/Tutorials/images/unit_weights_0_0_or.png 1.2,
+	doc/Tutorials/images/activity_line_oo.png 1.1,
+	doc/Tutorials/images/activity_line_oo_or.png 1.1,
+	doc/Tutorials/images/lissom_network_diagram_oo.png 1.1: New image
+	for oo_or tutorial.
+
+	* examples/lissom_oo_or.ty 1.19: Positioned network for model
+	editor. Replaced lambda functions for getting random.uniform value
+	with a class (to allow pickling); this class will be moved.
+
+	* examples/lissom_oo_or.ty 1.18: LGN declared with
+	measure_maps=False.
+
+	* topo/analysis/featuremap.py 1.36: Sheets with a measure_maps
+	attribute, and with it set True, get their maps measured - others
+	do not.
+
+	* topo/base/connectionfield.py 1.107: Added a 'measure_maps'
+	attribute to CFSheet.
+
+	* examples/lissom_oo_or.ty 1.17: No longer have
+	afferent_weight_bounds, lgn_weight_bounds, and
+	input_bounds. Instead, bounds are just created by radial_bounds().
+
+2006-02-10  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/space_text.php 1.3: Minor clarification
+
+2006-02-10  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or.ty 1.16: Eliminated inhibitory_ and
+	excitatory_weight_bounds variables, instead just creating the
+	bounds where the projection is defined.
+
+	* examples/lissom_oo_or.ty 1.15, topo/base/connectionfield.py
+	1.106: Renamed wt_bounds() to radial_bounds().
+
+	* examples/lissom_oo_or.ty 1.14: Gaussian class' parameters are
+	not now set; instead, parameters on the Retina's input_generator
+	are set.
+
+	* topo/base/parameter.py 1.44: Added a hack to allow
+	DynamicNumbers to work when they are set on an object.
+
+	* topo/commands/basic.py 1.19: Hacked the hack in load_snapshot to
+	allow examples/lissom_oo_or_20000.typ to keep its dynamic input
+	pattern numbers. Because the unpickleable lambda functions for
+	generating random numbers are used in two different ways now,
+	there are two different hacks here. Once we eliminate those lambda
+	functions, it should all be ok.
+
+2006-02-10  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.53, topo/base/simulator.py 1.23: Added
+	ALERTs
+
+2006-02-10  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or_20000.typ 1.1: Initial version.
+
+2006-02-09  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or.ty 1.13: Updates to match
+	lissom_oo_or_reference.ty.
+
+	* topo/tests/lissom_oo_or_reference.ty 1.9: delta and beta values
+	corrected.
+
+2006-02-09  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/templates.py 1.27: Added the color_key to the
+	Orientation Preference PlotGroupTemplate.
+
+	* topo/tkgui/plotgrouppanel.py 1.34: Changed the function
+	load_image; now, all topographica plot are resized to be the close
+	as possible to the height of the biggest topographica plot; then,
+	the static_images are resized to be of this height. There is still
+	a warning about using the image.resize function with floats that
+	we need to take care about.
+
+	* topo/plotting/plotgroup.py 1.83: Set the resize parameter to
+	False when creating static image plot.
+
+	* topo/plotting/bitmap.py 1.25: Added a resize attribute for a
+	bitmap; it is set to True by default. It is a flag that allows
+	distinguishing between topographica plot and static external
+	images when resizing them.
+
+	* doc/images/color_key.png 1.1: Added the color_key png file in
+	doc/images.
+
+2006-02-09  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/lissom_oo_or_reference.ty 1.8: Corrected setting
+	LGN's density - I probably re-introduced accidentally setting it
+	on the CFSheet class.
+
+	* topo/tests/lissom_oo_or_reference.ty 1.7: Removed bounds change
+	that has no effect at this density. Updated learning rates.
+
+	* examples/lissom_oo_or.ty 1.11: Updated parameters to match the
+	ones in lissom_oo_or_reference.ty. There are more to go...
+
+	* examples/lissom_oo_or.ty 1.10: Simplified weights bounds
+	specification with wt_bounds().
+
+	* topo/tests/lissom_oo_or_reference.ty 1.6: Removed last
+	change_bounds for lateral excitatory connection because it
+	wouldn't occur anyway for this density.
+
+	* topo/tests/lissom_or_reference.ty 1.25: Added note to myself.
+
+	* examples/lissom_or.ty 1.63: Added a HACAKLERT about missing
+	scheduled events.
+
+	* topo/tests/lissom_oo_or_reference.ty 1.5: Use wt_bounds()
+	function to set weight bounds. Included min_exc_rad parameter.
+
+	* topo/base/connectionfield.py 1.105: Removed print statement
+	accidentally left in previous commit.
+
+	* topo/base/connectionfield.py 1.104: Added wt_bounds(), which
+	allows a bounding box to be created with simple syntax from a
+	radius. Also allows specification of a minimum radius. Added a
+	HACKALERT about the change_bounds warning.
+
+	* topo/tests/oo_or_map_topo.log 1.2: About 20000 iterations from
+	the equivalent c++ lissom simulation.
+
+	* topo/tests/lissom_oo_or_reference.ty 1.4: Learning rates set on
+	correct projections.
+
+2006-02-09  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/images/.cvsignore 1.5: More to ignore
+
+	* doc/User_Manual/images/connection_field.fig 1.4,
+	doc/User_Manual/images/matrix_coords.fig 1.4,
+	doc/User_Manual/images/matrix_coords_hidensity.fig 1.2,
+	doc/User_Manual/images/sheet_coords.fig 1.3,
+	doc/User_Manual/images/sheet_coords_-0.275_-0.0125_0.025_0.2885.fig
+	1.1, doc/User_Manual/images/sheet_coords_-0.2_0.4.fig 1.1: Made
+	images line up; added some missing elements and removed some stray
+	ones, and added markings for similar features in different plots
+
+	* doc/User_Manual/background_text.php.m4 1.2,
+	doc/User_Manual/basics_text.php.m4 1.3,
+	doc/User_Manual/features_text.php.m4 1.3,
+	doc/User_Manual/images/Makefile 1.3,
+	doc/User_Manual/space_text.php 1.2, doc/User_Manual/time_text.php
+	1.2: Reduced image sizes to allow two side by side, and added such
+	plots where appropriate
+
+	* doc/Future_Work/index_text.php 1.8: More work
+
+2006-02-08  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/lissom_oo_or_reference.ty 1.3: LGNOn and LGNOff to V1
+	connection strengths halved. LGNOn and LGNOff sheet bounds
+	adjusted. (Chris)
+
+2006-02-08  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.82: Added a function
+	_add_static_images() in TemplatePlotGroup. It creates the Plot
+	specified by the static_images attribute of the PlotGroupTemplate,
+	and add them to the added_list of Plot (This will still need some
+	clean up).
+
+	* topo/plotting/templates.py 1.26: Added an attribute
+	static_images to the PlotGroupTemplate and a method
+	add_static_image; static_images is a KeyedList of tuple
+	(name,file_path) specifying a Plot from an image file. It will
+	enable specifying additional static plots to a PlotGroupTemplate
+	(e.g. color key for Orientation Preference). There is no images
+	added to a template yet, because the re-sizing needs to be fixed
+	in PlotGroupPanel; therefore, the line is commented out for the
+	moment.
+
+	* topo/plotting/plot.py 1.80: Added a missing import statement;
+	added a call to the super class in the Plot __init__.
+
+	* topo/plotting/bitmap.py 1.24, topo/plotting/plot.py 1.79:
+	Deleted the unuseful FileBitmap class.
+
+	* topo/plotting/plot.py 1.78, topo/plotting/plotgroup.py 1.81,
+	topo/tests/testplot.py 1.16, topo/tkgui/testpattern.py 1.20:
+	Renamed make_plot() to make_template_plot().
+
+	* topo/plotting/plot.py 1.77: Changed the Plot hierarchy: now the
+	Plot class is really simple and just creates its bitmap from an
+	image; the former Plot class has been renamed TemplatePlot, and
+	others sub-classes inherit from it. It remains to re-name the
+	make_plot function to make_template_plot. Also deleted the
+	BitmapPlot class which is now replaced by the simple Plot class.
+
+2006-02-08  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/lissom_or_reference.ty 1.24: Change to a comment.
+
+	* topo/tests/lissom_oo_or_reference.ty 1.2: Updates to parameters
+	and learning rates.
+
+	* topo/tests/lissom_oo_or_reference.ty 1.1: Initial version;
+	parameters don't yet match the equivalent c++ simulation.
+
+	* topo/tests/oo_or_map_topo.log 1.1: log file from
+	oo_or_map_topo.param c++ simulation.
+
+	* topo/tests/lissom_or_reference.ty 1.23: Added some comments.
+
+	* examples/lissom_oo_or.ty 1.9: Corrected typo in
+	afferent_weight_bounds.
+
+2006-02-07  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/responsefns/optimized.py 1.9: Simplified the
+	CFEuclideanDistance function; got rid of the optimization in the
+	code.
+
+2006-02-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or.ty 1.8: Updated alpha and beta
+	(V1.outputfn bounds).
+
+2006-02-07  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/responsefns/optimized.py 1.8: Continued to clean up the
+	CFDotProduct() code, using C++ syntax.
+
+2006-02-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or.ty 1.7: Changed bounding boxes for
+	circular rfs.
+
+2006-02-07  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/responsefns/optimized.py 1.7: Simplified version of
+	CFDotProduct().It still needs some clean up (e.g using C++
+	syntax). It seems to perform a bit better than the previous
+	optimized version; in any case it does not do worse (most of the
+	times, the profiling statistics are better for the new version).
+
+2006-02-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_or.ty 1.62: Last commit contained an error -
+	switched commented afferent_weights_bounds with uncommented.
+
+	* examples/lissom_or.ty 1.61: No visible change. Committed
+	commented-out code for circular connection fields (including
+	adjustments to input_bounds.
+
+	* topo/tests/lissom_or_reference.ty 1.22: Undid previous
+	changes. I didn't notice that in c++ lissom the changes to
+	e.g. exc_radius were accumulating.
+
+	* topo/tests/lissom_or_reference.ty 1.21: Altered to match
+	equivalent c++ lissom simulation: scheduled lateral excitatory
+	bounds changes, scheduled lateral excitatory learning rates,
+	scheduled afferent learning rates.
+
+	* topo/tests/or_map_topo.log 1.7: 20001 iterations from c++
+	lissom's or_map_topo.param
+
+	* examples/lissom_oo_or.ty 1.6: Added learning rates and scheduled
+	changes to them for LGN ON/OFF afferents. Added some comments.
+
+2006-02-06  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/simulator.html 1.3: Not sure why this was
+	checked in
+
+	* doc/User_Manual/.cvsignore 1.3: More to ignore
+
+	* doc/User_Manual/coordinates_text.php 1.5,
+	doc/User_Manual/index_text.php 1.10,
+	doc/User_Manual/simulator_text.php 1.4,
+	doc/User_Manual/space_text.php 1.1, doc/User_Manual/time_text.php
+	1.1: Renamed files to reflect their contents
+
+	* doc/User_Manual/coordinates_text.php 1.4,
+	doc/User_Manual/index_text.php 1.9,
+	doc/User_Manual/simulator_text.php 1.3: Clarified distinction
+	between time and space topics
+
+	* doc/User_Manual/coordinates_text.php 1.3: Fixed Sheet coordinate
+	errors found by Julien
+
+2006-02-06  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/lissom_or_reference.ty 1.20: Removed a HACKALERT -
+	clarified why scheduled events are at one time-step less than the
+	equivalent or_map_topo's.
+
+2006-02-06  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/som_retinotopy_text.php 1.3: Fixed typos;
+	clarified SOM algorithm
+
+2006-02-06  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/responsefns/optimized.py 1.6: Same change to
+	CFEuclideanDistance as to CFProjection (i.e. same changes as were
+	made to CFProjection in the previous two commits).
+
+	* topo/responsefns/optimized.py 1.5: Removed the variables or and
+	oc (that were having no effect and should have been removed in the
+	previous version).
+
+	* topo/responsefns/optimized.py 1.4: Removed an apparently
+	problematicoptimization from CFProjection, but it needs to be done
+	properly. Julien is going to do this, and make the same change to
+	CFEuclideanDistance.
+
+2006-02-06  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/simulator_text.php 1.2: Minor clarification
+
+	* doc/User_Manual/coordinates.html 1.2: Not sure why this
+	generated file was ever checked in
+
+2006-02-06  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plot.py 1.76: New class BitmapPlot that is just a
+	Plot constructed by specifying a file path.
+
+	* topo/plotting/bitmap.py 1.23: New class FileBitmap that just
+	creates a Bitmap from a file path.
+
+2006-02-06  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/simulator.html 1.2: Clarification
+
+	* doc/User_Manual/simulator_text.php 1.1: Initial version
+
+	* doc/User_Manual/basics_text.php.m4 1.2: Removed items now
+	implemented elsewhere
+
+	* doc/User_Manual/images/.cvsignore 1.4: More to ignore
+
+	* doc/User_Manual/index_text.php 1.8: Added link to simulator.html
+
+	* doc/User_Manual/simulator.html 1.1,
+	doc/User_Manual/coordinates.html 1.1: Initial version
+
+	* doc/User_Manual/images/connection_field_master.fig 1.2,
+	doc/User_Manual/images/event-driven-timeline.fig 1.1,
+	doc/User_Manual/images/matrix_coords.fig 1.3,
+	doc/User_Manual/images/matrix_coords_hidensity.fig 1.1,
+	doc/User_Manual/images/sheet_coords.fig 1.2,
+	doc/User_Manual/images/sheet_matrix_master.fig 1.3,
+	doc/User_Manual/images/sheet_matrix_master_hidensity.fig 1.3,
+	doc/User_Manual/images/clocked-timeline.fig 1.1,
+	doc/User_Manual/images/connection_field.fig 1.3: Sorted labels in
+	order for easier editing
+
+	* doc/User_Manual/coordinates_text.php 1.2, doc/shared/util.php
+	1.19: Moved classref function to shared utils file
+
+	* doc/User_Manual/coordinates_text.php 1.1,
+	doc/User_Manual/index_text.php 1.7: Added coordinates page
+
+	* doc/User_Manual/images/connection_field.fig 1.2,
+	doc/User_Manual/images/matrix_coords.fig 1.2,
+	doc/User_Manual/images/sheet_matrix_master.fig 1.2,
+	doc/User_Manual/images/sheet_matrix_master_hidensity.fig 1.2:
+	Fixed bogus labels
+
+	* doc/Makefile 1.8: Added automatic making of images
+
+	* doc/User_Manual/features_text.php.m4 1.2: Fixed path
+
+	* doc/User_Manual/features_text.php 1.2,
+	doc/User_Manual/background_text.php 1.2,
+	doc/User_Manual/background_text.php.m4 1.1,
+	doc/User_Manual/basics_text.php 1.2,
+	doc/User_Manual/basics_text.php.m4 1.1,
+	doc/User_Manual/features_text.php.m4 1.1: Moved .php files to .m4
+	files for now
+
+	* doc/.cvsignore 1.1, doc/Makefile 1.7,
+	doc/shared/topographica.bib 1.1: Added m4 preprocessing and
+	bib2html support for .php.m4 files
+
+2006-02-05  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/shared/bib2html.m4 1.1: Copied from
+	lib/nn/tex/bib2html/bib2html.m4
+
+	* doc/shared/bib2html/.cvsignore 1.1, doc/shared/bib2html/README
+	1.1, doc/shared/bib2html/bib2html 1.1,
+	doc/shared/bib2html/bib2html.m4 1.1,
+	doc/shared/bib2html/bib2html.man 1.1,
+	doc/shared/bib2html/bibsearch 1.1, doc/shared/bib2html/gen-bst
+	1.1, doc/shared/bib2html/html-btxbst.doc 1.1,
+	doc/shared/bib2html/makefile 1.1: Initial version
+
+2006-02-05  alan_lindsay  <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/parametersframe.py 1.47: Allows the current value to
+	belong to a class that is not one of the usual classes for a given
+	parameter. This allows CFProjections to be manipulated.
+
+	* topo/tkgui/parametersframe.py 1.46: Seems to allow updating of
+	connections and sheets and selected classes within fields of
+	these.
+
+	* topo/tkgui/parametersframe.py 1.45: Allows a dictionary, with a
+	list entry for fields of the object, to be passed in; these lists
+	are searched for object covers for each of the possible classes of
+	a class selector item. Works for sheets.
+
+2006-02-05  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/or_map_topo.log 1.6: About 200 iterations from
+	current c++ reference.
+
+	* topo/tests/lissom_or_reference.ty 1.19: Use only integer part of
+	rf_radius, as c++ LISSOM does.
+
+	* topo/responsefns/optimized.py 1.3: Added missing import
+	statement.
+
+2006-02-04  alan_lindsay  <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/base/utils.py 1.54: a method that takes a dictionary and a
+	key and returns dictionary[key] or key if it doesn't exist.
+
+	* topo/tkgui/parametersframe.py 1.44: First attempt at allowing a
+	translator dictionary to be passed to parameter frame, has broken
+	embedded class property windows though.
+
+	* topo/tkgui/editorwindow.py 1.15: Displays activity as soon as
+	you set it. Does not need refreshed anymore.
+
+	* topo/tkgui/parametersframe.py 1.43: Class selector fields can
+	have there properties modified. These are lost as soon as the
+	original object is updated. Works for TestPatterns.
+
+2006-02-03  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/som_retinotopy_text.php 1.2: Fixed paths
+
+2006-02-03  alan_lindsay  <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/parametersframe.py 1.42: The object's current value
+	is now selected in ComboBox.
+
+2006-02-03  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/som_retinotopy.ty 1.16: Fixed typo in last checkin
+
+	* doc/Downloads/index_text.php 1.16: Clarified issue found by
+	Yoonsuck
+
+2006-02-03  chrispalmer  <chrispalmer@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/basic.py 1.53: Added initial version of
+	CompositePatternGenerator. There seems to be a problem with
+	Parameter, which needs to be investigated.
+
+2006-02-03  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/connectionfieldspanel.py 1.1: Renamed
+	unitweightspanel to connectionfieldspanel.
+
+	* topo/tkgui/topoconsole.py 1.33, topo/tkgui/unitweightspanel.py
+	1.31: topo/tkgui/connectionfieldspanel.py
+
+	* topo/tests/tkgui/testtemplateplotgrouppanel.py 1.3: Forgotten
+	assert line in previous commit.
+
+	* topo/tests/tkgui/__init__.py 1.7,
+	topo/tests/tkgui/testtemplateplotgrouppanel.py 1.2: Corrected a
+	strange bug in testtemplateplotgrouppanel.py. The 'case' notation
+	was not working there.. maybe because the tests/tkgui/ directory
+	is a sub-directory?
+
+2006-02-03  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/tkgui/__init__.py 1.6: Commented out import of test
+	that doesn't seem to run properly. It's not clear why it doesn't
+	run.
+
+2006-02-03  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.33, topo/tkgui/topoconsole.py
+	1.32, topo/tkgui/unitweightspanel.py 1.30: Renamed the class
+	UnitWeightsPanel to ConnectionFieldsPanel.
+
+2006-02-03  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/about_text.php 1.1,
+	doc/User_Manual/background_text.php 1.1,
+	doc/User_Manual/basics_text.php 1.1,
+	doc/User_Manual/features_text.php 1.1,
+	doc/User_Manual/index_text.php 1.6: Moved material in comments
+	into other unlinked files
+
+	* doc/User_Manual/.cvsignore 1.2: More to ignore
+
+	* doc/User_Manual/images/Makefile 1.2: Added special handling for
+	one PDF->PNG conversion
+
+2006-02-03  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or.ty 1.5: Still not tested. Changed LGN
+	connections.
+
+2006-02-03  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/images/Makefile 1.1,
+	doc/User_Manual/images/epstopdf 1.1: Initial version
+
+	* doc/User_Manual/images/.cvsignore 1.3: More to ignore
+
+	* doc/User_Manual/images/face-blurred-off-stretched-sheared.gif
+	1.1, doc/User_Manual/images/face-blurred-on-stretched-sheared.gif
+	1.1, doc/User_Manual/images/face-blurred-stretched-sheared.gif
+	1.1, doc/User_Manual/images/measuring-map.v3.pdf 1.1: Version from
+	book
+
+2006-02-03  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/or_map_topo.log 1.5: Updated for changes to c++
+	lissom's params file.
+
+	* topo/tests/lissom_or_reference.ty 1.18: Changed rf_radius,
+	inh_rad, and exc_rad. Changed retina_edge_buffer and RN. Altered
+	layout at start of file to look more like equivalent c++ lissom
+	params file. The input pattern is identical to C++ lissom, but the
+	activity in V1 has not yet been matched (the parameters aren't
+	all being used correctly).
+
+2006-02-03  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/images/.cvsignore 1.2: Ignore PNG too
+
+	* doc/User_Manual/images/.cvsignore 1.1,
+	doc/User_Manual/images/connection_field.fig 1.1,
+	doc/User_Manual/images/connection_field_master.fig 1.1,
+	doc/User_Manual/images/generic-cortical-hierarchy-model.fig 1.1,
+	doc/User_Manual/images/matrix_coords.fig 1.1,
+	doc/User_Manual/images/retina_edge_buffer.fig 1.1,
+	doc/User_Manual/images/sheet_coords.fig 1.1,
+	doc/User_Manual/images/sheet_matrix_master.fig 1.1,
+	doc/User_Manual/images/sheet_matrix_master_hidensity.fig 1.1,
+	doc/User_Manual/images/toplevel.fig 1.1,
+	doc/User_Manual/images/toplevel_bare.fig 1.1: Initial version
+
+	* topo/commands/pylabplots.py 1.2: Added simple vector and matrix
+	plots for the command line
+
+	* topo/tkgui/templateplotgrouppanel.py 1.2,
+	topo/commands/lineplotting.py 1.7, topo/commands/pylabplots.py
+	1.1: Renamed lineplotting.py to pylabplots.py in anticipation of
+	new non-line-based plot
+
+	* doc/Downloads/index_text.php 1.15, doc/Home/index_text.php 1.3,
+	doc/Reference_Manual/index_text.php 1.5, doc/shared/index.php 1.8,
+	doc/shared/util.php 1.18, doc/Tutorial/.cvsignore 1.3,
+	doc/Tutorial/images/activity_gaussian.png 1.4,
+	doc/Tutorial/images/activity_gaussian_or.png 1.4,
+	doc/Tutorial/images/activity_line.png 1.4,
+	doc/Tutorial/images/activity_line_or.png 1.4,
+	doc/Tutorial/images/lissom_network_diagram.png 1.2,
+	doc/Tutorial/images/or_key_horiz_transparent.png 1.3,
+	doc/Tutorial/images/or_key_vert_transparent_topo.png 1.2,
+	doc/Tutorial/images/or_map.png 1.6,
+	doc/Tutorial/images/projection.png 1.6,
+	doc/Tutorial/images/som_activity_000000.png 1.2,
+	doc/Tutorial/images/som_activity_000001.png 1.2,
+	doc/Tutorial/images/som_activity_000006.png 1.2,
+	doc/Tutorial/images/som_cog_000000.png 1.2,
+	doc/Tutorial/images/som_cog_000100.png 1.2,
+	doc/Tutorial/images/som_grid_000000.png 1.2,
+	doc/Tutorial/images/som_grid_000100.png 1.2,
+	doc/Tutorial/images/som_grid_010000.png 1.2,
+	doc/Tutorial/images/som_grid_040000.png 1.2,
+	doc/Tutorial/images/som_network_diagram.png 1.2,
+	doc/Tutorial/images/som_projection_000000.png 1.2,
+	doc/Tutorial/images/som_projection_000001.png 1.2,
+	doc/Tutorial/images/som_projection_000006.png 1.2,
+	doc/Tutorial/images/som_projection_040000.png 1.2,
+	doc/Tutorial/images/test_pattern.png 1.6,
+	doc/Tutorial/images/topographica_console.png 1.3,
+	doc/Tutorial/images/unit_weights_0.2_0.0.png 1.2,
+	doc/Tutorial/images/unit_weights_0.2_0.0_or.png 1.2,
+	doc/Tutorial/images/unit_weights_0_0.png 1.6,
+	doc/Tutorial/images/unit_weights_0_0_or.png 1.3,
+	doc/Tutorial/index_text.php 1.9,
+	doc/Tutorial/som_retinotopy_text.php 1.2, doc/Tutorials/.cvsignore
+	1.1, doc/Tutorials/images/activity_gaussian.png 1.1,
+	doc/Tutorials/images/activity_gaussian_or.png 1.1,
+	doc/Tutorials/images/activity_line.png 1.1,
+	doc/Tutorials/images/activity_line_or.png 1.1,
+	doc/Tutorials/images/lissom_network_diagram.png 1.1,
+	doc/Tutorials/images/or_key_horiz_transparent.png 1.1,
+	doc/Tutorials/images/or_key_vert_transparent_topo.png 1.1,
+	doc/Tutorials/images/or_map.png 1.1,
+	doc/Tutorials/images/projection.png 1.1,
+	doc/Tutorials/images/som_activity_000000.png 1.1,
+	doc/Tutorials/images/som_activity_000001.png 1.1,
+	doc/Tutorials/images/som_activity_000006.png 1.1,
+	doc/Tutorials/images/som_cog_000000.png 1.1,
+	doc/Tutorials/images/som_cog_000100.png 1.1,
+	doc/Tutorials/images/som_grid_000000.png 1.1,
+	doc/Tutorials/images/som_grid_000100.png 1.1,
+	doc/Tutorials/images/som_grid_010000.png 1.1,
+	doc/Tutorials/images/som_grid_040000.png 1.1,
+	doc/Tutorials/images/som_network_diagram.png 1.1,
+	doc/Tutorials/images/som_projection_000000.png 1.1,
+	doc/Tutorials/images/som_projection_000001.png 1.1,
+	doc/Tutorials/images/som_projection_000006.png 1.1,
+	doc/Tutorials/images/som_projection_040000.png 1.1,
+	doc/Tutorials/images/test_pattern.png 1.1,
+	doc/Tutorials/images/topographica_console.png 1.1,
+	doc/Tutorials/images/unit_weights_0.2_0.0.png 1.1,
+	doc/Tutorials/images/unit_weights_0.2_0.0_or.png 1.1,
+	doc/Tutorials/images/unit_weights_0_0.png 1.1,
+	doc/Tutorials/images/unit_weights_0_0_or.png 1.1,
+	doc/Tutorials/index_text.php 1.1, doc/Tutorials/lissom_or_text.php
+	1.1, doc/Tutorials/som_retinotopy_text.php 1.1: Moved Tutorial to
+	Tutorials now that there are more than one
+
+2006-02-02  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* examples/obermayer_pnas90.ty 1.21: Corrected the initial and
+	final learning rate value, according to the new changes in
+	learning rate computation in HebbianSOMLF().
+
+	* topo/plotting/plotgroup.py 1.80: Fixed sort_plot() according to
+	the new changes in Plot. Cleaned up comments and doc.
+
+	* topo/tests/tkgui/__init__.py 1.5,
+	topo/tests/tkgui/testactivitypanel.py 1.13,
+	topo/tests/tkgui/testbasicplotgrouppanel.py 1.5,
+	topo/tests/tkgui/testtemplateplotgrouppanel.py 1.1: Renamed
+	testbasicplotgrouppanel.py to testtemplateplotgrouppanel.py. Also
+	deleted testactivitypanel.py and put the code that was in it into
+	testtemplateplotgrouppanel.py.
+
+	* topo/tests/tkgui/testbasicplotgrouppanel.py 1.4: Forgotten in
+	previous commit.
+
+	* topo/tests/tkgui/testactivitypanel.py 1.12,
+	topo/tkgui/basicplotgrouppanel.py 1.22,
+	topo/tkgui/plotgrouppanel.py 1.32,
+	topo/tkgui/templateplotgrouppanel.py 1.1,
+	topo/tkgui/topoconsole.py 1.31: Renamed basicplotgrouppanel.py to
+	templateplotgrouppanel.py.
+
+2006-02-02  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or.ty 1.4: Rearranged file to make more sense
+	- no visible change.
+
+	* topo/learningfns/optimized.py 1.23: Added HACKALERT about C
+	pointer version of DivisiveHebbian.
+
+	* topo/tests/testlissom_cpointer.ty 1.3: Cleaned up connecitions
+	(removed connection_params, but also sharedweight projection
+	code). Added a HACKALERT.
+
+	* examples/obermayer_pnas90.ty 1.20, examples/som_retinotopy.ty
+	1.15, topo/base/simulator.py 1.22,
+	topo/tests/lissom_or_reference.ty 1.17, topo/tests/testcfsom.py
+	1.11, topo/tests/testfeaturemap.py 1.10, topo/tests/testlissom.ty
+	1.11, topo/tests/testpatternpresent.py 1.5,
+	topo/tests/testplotfilesaver.py 1.9, topo/tests/testplotgroup.py
+	1.15, examples/lissom_oo_or.ty 1.3, examples/lissom_or.ty 1.60,
+	examples/hierarchical.ty 1.26, examples/cfsom_or.ty 1.26: Made
+	syntax to specificy connections simpler by removing
+	'connection_params' and using a dictionary of keywords. Left a
+	note by Simulator.connect() about adding a dictionary back in for
+	extra parameters should they later be required.
+
+2006-02-02  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorial/.cvsignore 1.2: More to ignore
+
+	* topo/commands/lineplotting.py 1.6: Reduced default topographic
+	grid figure size
+
+	* doc/Tutorial/som_retinotopy_text.php 1.1,
+	doc/Tutorial/images/som_network_diagram.png 1.1,
+	doc/Tutorial/images/som_projection_000000.png 1.1,
+	doc/Tutorial/images/som_projection_000001.png 1.1,
+	doc/Tutorial/images/som_projection_000006.png 1.1,
+	doc/Tutorial/images/som_projection_040000.png 1.1,
+	doc/Tutorial/images/som_activity_000000.png 1.1,
+	doc/Tutorial/images/som_activity_000001.png 1.1,
+	doc/Tutorial/images/som_activity_000006.png 1.1,
+	doc/Tutorial/images/som_cog_000000.png 1.1,
+	doc/Tutorial/images/som_cog_000100.png 1.1,
+	doc/Tutorial/images/som_grid_000000.png 1.1,
+	doc/Tutorial/images/som_grid_000100.png 1.1,
+	doc/Tutorial/images/som_grid_010000.png 1.1,
+	doc/Tutorial/images/som_grid_040000.png 1.1: Initial version
+
+	* doc/shared/util.php 1.17: Added alert
+
+	* topo/plotting/plot.py 1.75, topo/tkgui/projectionpanel.py 1.36:
+	Added an alert
+
+	* topo/base/sheet.py 1.52: Fixed typo
+
+	* doc/Reference_Manual/index_text.php 1.4: Added explanation of
+	why to read or avoid this manual
+
+	* doc/Future_Work/index_text.php 1.7: Added notes from meetings,
+	etc.
+
+	* doc/Downloads/index_text.php 1.14: Added note about CVS
+
+2006-02-01  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testplotgroup.py 1.14,
+	topo/tests/tkgui/testactivitypanel.py 1.11,
+	topo/tests/tkgui/testbasicplotgrouppanel.py 1.3,
+	topo/tkgui/cfsheetplotpanel.py 1.12,
+	topo/tkgui/basicplotgrouppanel.py 1.21, topo/tkgui/topoconsole.py
+	1.30: Renamed BasicPlotGroupPanel to TemplatePlotGroupPanel.
+
+2006-02-01  alan_lindsay  <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorwindow.py 1.14: Tidied and some of the methods
+	written a little nicer.
+
+2006-02-01  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotfilesaver.py 1.23, topo/plotting/plotgroup.py
+	1.79, topo/tkgui/unitweightspanel.py 1.29: Renamed
+	UnitWeightsPlotGroup to ConnectionFieldsPlotGroup, for consistency
+	with the template name. Nevertheless, I realised that it might be
+	confusing from a developper point of view: the concept of CF is
+	different that the weights of a unit, i.e. we can have sheets with
+	no CF and still vizualize the weights of a unit.
+
+	* topo/plotting/templates.py 1.25, topo/tkgui/topoconsole.py 1.29:
+	Renamed the Connection Field template to Connection Fields
+	(plural).
+
+	* topo/tkgui/testpattern.py 1.19: Deleted two old ALERTS and wrote
+	a new one.
+
+	* topo/plotting/plot.py 1.74, topo/plotting/plotfilesaver.py 1.22,
+	topo/plotting/plotgroup.py 1.78, topo/tkgui/plotgrouppanel.py
+	1.31, topo/tkgui/unitweightspanel.py 1.28, topo/plotting/bitmap.py
+	1.22: Replaced the Bitmap's view_info attribute by a name and
+	plot_src_name attributes; they are copies of the plot's attributes
+	of the same name. Now, the string that has to be displayed is
+	built from these two attributes in PlotGroupPanel's
+	display_labels(). The UnitWeightPanel() display_labels method has
+	to be modified: connection fields panel and projection's panel do
+	not handle labels as a normal BasicPlotGroupPanel.
+
+2006-02-01  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or.ty 1.2: Changed V1's density to
+	48. Changed CFSheet's density to 24. Connected on and off LGN
+	sheets to V1, though not properly.
+
+	* topo/projections/basic.py 1.8: If a unit is near the sheet edge,
+	the shared weights matrix will not necessarily be the right matrix
+	- the correct submatrix is needed. Added code to do that.
+
+	* topo/base/connectionfield.py 1.103: Changed the function that
+	was for slicing the mask matrix to one that returns the slice.
+
+2006-02-01  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plot.py 1.73, topo/plotting/plotgroup.py 1.77:
+	Replaced the Plot attribute view_info (a dict) by a single
+	plot_src_name. It has still to be changed in future commit.
+
+	* topo/tests/testplot.py 1.15, topo/tests/testsheet.py 1.22,
+	topo/tests/testsheetview.py 1.9, topo/base/connectionfield.py
+	1.102, topo/base/sheetview.py 1.9, topo/commands/analysis.py 1.10,
+	topo/plotting/plot.py 1.72, topo/projections/basic.py 1.7: Deleted
+	the attribute view_info of a SheetView, replaced by a single
+	src_name attribute. Deleted the parameter view_type that wasn't of
+	any use. Also added two ALERT in sheetview.py that will have to be
+	examined.
+
+2006-02-01  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/lissom_or_reference.ty 1.16: Added performance
+	profiling code examples back in (they're commented out).
+
+2006-02-01  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* examples/hierarchical.ty 1.25, examples/cfsom_or.ty 1.25:
+	Corrected the learning rate now that the HebbianSOMLF function
+	does not use the constant_sum_connection_rate() anymore.
+
+	* examples/som_retinotopy.ty 1.14: Adapted the min radius to be
+	set like in the book (0.5/40 in sheet coordinates), now that there
+	is a crop_radius. It gives a good result (with the same parameters
+	than in the book: 40 units and so on...), but I did not compared
+	it with our previous result with a radius of 1.25/40.
+
+	* examples/som_retinotopy.ty 1.13: Made the simulation use the new
+	C coded CFEuclideanDistance() function; also corrected the
+	generator sheet density to be 24 (it has been committed with a
+	value of 40, by mistake). Also got rid of unused commented out
+	code.
+
+	* topo/responsefns/optimized.py 1.2: C version of the
+	CFEuclideanDistance reponse function. It is mostly based on the C
+	version of CFDotProduct().It does seem to be about 1.5 times
+	faster (when it took 1mn it now takes 40s). It could probably be
+	even faster (as well as the CFDotProduct() C version, I think) but
+	would need more work.
+
+2006-01-31  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/palette.py 1.7: Started an implementation of the
+	String-Based Palette class. It is just committed for my
+	convenience, but there is nothing finished at all; it shouldn't
+	affect anything to commit it though.
+
+	* examples/som_retinotopy.ty 1.12, topo/learningfns/basic.py 1.39:
+	Fixed afferent learning rate scaling for SOMs; i.e, don't need
+	scaling at all for this learning function.  Changed the
+	crop_radius for the neighborhood function to have a minimum
+	radius, to ensure that it covers at least a neighboring unit in
+	each direction
+
+2006-01-31  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or.ty 1.1: Initial version -
+	incomplete. Based on lissom_or.ty, but with circular
+	connectionfields.
+
+	* topo/projections/basic.py 1.6: Updated SharedWeightCFProjection
+	to match changes in connectionfield and cfprojection. Not yet
+	tested.
+
+	* topo/tests/or_map_topo.log 1.4: 20009 iterations from c++
+	lissom.
+
+	* topo/tests/lissom_or_reference.ty 1.15: Updated learning rates
+	to correct ones from lissom_or.ty before it was split into
+	lissom_or.ty and lissom_or_reference.ty. THey were lost when
+	lissom_or_reference was reverted to 21st December 2005 code.
+
+2006-01-30  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/lissom_or_reference.ty 1.14: Back to the previous
+	network size (BaseN=72).
+
+	* topo/tests/or_map_topo.log 1.3: 200 iterations from c++ lissom
+
+	* topo/tests/lissom_or_reference.ty 1.13: Using a smaller network.
+
+	* topo/base/connectionfield.py 1.101,
+	topo/tests/lissom_or_reference.ty 1.12: Altered some hackalerts.
+
+	* topo/base/connectionfield.py 1.100: Mask centered on matrixidx
+	center.
+
+	* topo/tkgui/testpattern.py 1.18: Added hack to remove Random
+	Generator from the list of PatternGenerators in the test pattern
+	window. But it will still appear in other menus.
+
+2006-01-30  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* ChangeLog 1.3: Updated with recent changes
+
 2006-01-30  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.99, topo/learningfns/basic.py
+	1.38, topo/learningfns/optimized.py 1.22: Renamed the
+	single_connection_learning_rate() to
+	constant_sum_connection_rate(); it indicates that the learning
+	rate is scaled based on keeping the sum constant,which leaving it
+	open for adding other types of connection_rate() functions.
 
 	* topo/plotting/bitmap.py 1.21, topo/analysis/featuremap.py 1.35:
 	Modified featuremap so that in the case of a cyclic value the
@@ -20,7 +947,7 @@
 	change_bounds() in a way that is consistent with how it's
 	generated in the first place. Not sure if it's the right way
 	though - these changes have not yet been verified (but the
-	resizing is better than before, in any case).
+	resizing is better than before, in any case).
 
 	* topo/base/connectionfield.py 1.97: ConnectionField.__init__()'s
 	mask creation code is moved to a subroutine.
@@ -42,7 +969,7 @@
 	CFProjection and passed to each ConnectionField. A ConnectionField
 	takes the correct submatrix of this mask (which is all of the
 	mask, unless it is near an edge. The way this is done needs to be
-	simplified, but is currently working. The size calculated for a
+	simplified, but is currently working. The size calculated for a
 	mask that is e.g. a Disk does not appear to be correct.
 
 2006-01-30  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
@@ -108,7 +1035,7 @@
 	changed to initialize_bounds(). initialize_bounds() takes the
 	centered bounds, converts them to a slice at the origin of the
 	sheet, then translates that slice to the cf's location, and
-	finally stores the corresponding bounding box (and slice_array
+	finally stores the corresponding bounding box (and slice_array
 	for access by C). Removed set_slice_array().
 
 	* topo/base/patterngenerator.py 1.59: Removed a CEBHACKALERT,
@@ -688,7 +1615,7 @@
 	are setup using the bounds as calculated by
 	initialize_slice_array(). This corrects the weights near the edges
 	of sheets. There should be no visible change to simulations that
-	were using a weights_generator or weights_shape that was a
+	were using a weights_generator or weights_shape that was a
 	pattern such as UniformRandom() or Constant() (as opposed to a
 	Disk() or Gaussian(), which were being incorrectly calculated at
 	the edge of Sheets).
@@ -779,7 +1706,7 @@
 	Sheet.sheet_view_dict, instead of the add_sheet_view function to
 	store the feature preference and selectivity sheetviews. The
 	function add_sheet_view will be soon deleted when all similar
-	calls (in other files) will have been replaced.
+	calls (in other files) will have been replaced.
 
 2006-01-16  ceball  <ceball@lodestar.inf.ed.ac.uk>
 
@@ -806,7 +1733,7 @@
 	CFSheet so that it only installs UnitView in the sheet_view_dict
 	but does not do any look_up or does not return any UnitView
 	object. Also added a test for making sure that we request UnitView
-	from CFProjections only, and added the possibility to pass a
+	from CFProjections only, and added the possibility to pass a
 	projection name to only request UnitViews from the requested
 	projection (or for all of them if projection_name == None).
 
@@ -992,7 +1919,7 @@
 	different results each time. I have no idea why - the random and
 	RandomArray seeds were set. I replaced all the lissom code again
 	and it seems to run with the same results every time now. Test
-	values to follow...
+	values to follow...
 
 2006-01-12  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
 
@@ -1030,7 +1957,7 @@
 	previous version of DivisiveHebbian where even unmasked values
 	were used to calculate the total weight change. Made application
 	of the mask simpler and more efficient by doing it in the same
-	loop as the weight modification. Added HACKALERT about how to
+	loop as the weight modification. Added HACKALERT about how to
 	make the code clearer.
 
 2006-01-12  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
@@ -1372,7 +2299,7 @@
 	and aspect ratio (I missed when I made the change from height and
 	width to size and aspect_ratio. Added notes about (1) specifying
 	size and aspect_ratio here in the first place and (2) there being
-	no warning when the non-parameter attributes height and width
+	no warning when the non-parameter attributes height and width
 	were being set (I spent a long, long time finding this bug).
 
 2006-01-02  ceball  <ceball@lodestar.inf.ed.ac.uk>
@@ -1614,7 +2541,7 @@
 	'Generator' cut off their name in menus. Either we rename
 	PatternGenerator to Pattern (so LineGenerator to Line, and all the
 	rest), or we do something like alter the name attribute of the
-	PatternGenerator class. Or someone has a better idea...
+	PatternGenerator class. Or someone has a better idea...
 
 	* topo/tkgui/parametersframe.py 1.30: Removed print statement left
 	in by accident.
