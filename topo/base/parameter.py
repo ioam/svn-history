@@ -620,11 +620,11 @@ class Constant(Parameter):
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
-    def __init__(self,default,**params):
+    def __init__(self,value,**params):
         """
         This Constant gets a deepcopy of the value passed in when it is declared.
         """
-        Parameter.__init__(self,default=copy.deepcopy(default),**params)
+        Parameter.__init__(self,default=copy.deepcopy(value),**params)
 
     def __set__(self,obj,val):
         """
