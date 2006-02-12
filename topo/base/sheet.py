@@ -95,8 +95,9 @@ $Id$
 __version__ = '$Revision$'
 
 from simulator import EventProcessor
-from parameter import Constant, BooleanParameter
+from parameter import Constant, BooleanParameter, Number
 from Numeric import zeros,array,floor,ceil,Float
+
 from boundingregion import BoundingBox
 import sheetview 
 
@@ -360,6 +361,9 @@ class Sheet(EventProcessor):
     density = Constant(default=10)
     # JABALERT: Should be set per-projection, not per-Sheet, right?
     learning = BooleanParameter(True)
+    precedence = Number(default = 0.1, softbounds=(0.0,1.0),
+			doc='Allows defining a sorting order on Sheet objects.')
+
 
     def __init__(self,**params):
 

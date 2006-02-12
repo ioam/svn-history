@@ -35,7 +35,7 @@ class CFSOM(CFSheet):
     
     alpha_0 = Number(0.5)
     radius_0 = Number(1.0)
-    
+    precedence = Number(0.6)
     learning_length = Number(1000)
     
     def __init__(self,**params):

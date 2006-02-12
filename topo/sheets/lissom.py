@@ -11,7 +11,7 @@ import Numeric
 from itertools import chain
 
 from topo.base.connectionfield import CFSheet
-from topo.base.parameter import BooleanParameter
+from topo.base.parameter import BooleanParameter,Number
 from topo.base.projection import OutputFunctionParameter
 from topo.base.topoobject import TopoObject
 from topo.misc.inlinec import optimized
@@ -29,6 +29,7 @@ class LISSOM(CFSheet):
     presleep_count = 0
     new_iteration = True
 
+    precedence = Number(0.6)
     tsettle=8
 
     def input_event(self,src,src_port,dest_port,data):
