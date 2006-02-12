@@ -10,6 +10,7 @@ from Numeric import zeros, ones, Float, divide, ravel,clip,array
 
 from topo.base.topoobject import TopoObject
 from topo.base.parameter import Dynamic
+from topo.base.sheetview import SheetView
 from topo.base.sheet import submatrix, bounds2slice, crop_slice_to_sheet_bounds
 
 from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap, Bitmap
@@ -37,6 +38,7 @@ class Plot(TopoObject):
           super(Plot,self).__init__(**params) 
           self.bitmap = Bitmap(image)
           self.plot_src_name = ''
+          self.precedence = 0.0
           
 
 def make_template_plot(channels,sheet_view_dict,density=None,
@@ -184,7 +186,8 @@ class TemplatePlot(Plot):
 	    sheet_view_key = self.channels.get(key,None)
 	    sv = self.view_dict.get(sheet_view_key, None)
 	    if sv != None:
-                 self.plot_src_name = sv.src_name 
+                 self.plot_src_name = sv.src_name
+                 self.precedence = sv.precedence
 
 
      
