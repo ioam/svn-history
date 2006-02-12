@@ -121,13 +121,14 @@ class EditorNode(EditorObject) :
             node = con.to_node
         index = con.draw_index
         # Decrease the indexes of the connections between the same nodes and with a higher index.
-        for con in self.from_connections :
-            if (node == con.to_node and con.draw_index > index) :
-                con.draw_index -= 1
-                if con.to_node == con.from_node :
-                    con.get_factor()
-                else :
-                    con.connect_to_coord((self.width / 2) - 10)
+        for connection in self.from_connections :
+            if (node == connection.to_node and connection.draw_index > index) :
+                connection.decrement_draw_index()
+            if connection.to_node == connection.from_node : return
+        for connection in self.to_connections :       
+            if (node == connection.from_node and connection.draw_index > index) :
+                connection.decrement_draw_index()
+
 
     def get_connection_count(self, node) :
         count = 0
@@ -137,6 +138,7 @@ class EditorNode(EditorObject) :
         for con in self.to_connections :
             if (con.from_node == node) :
                 count += 1
+        if node == self : count /= 2
         return count
 
     ############ Util methods ##############################
@@ -510,6 +512,12 @@ class EditorProjection(EditorConnection) :
             self.canvas.delete(id)
         self.canvas.delete(self.label)
 
+    def decrement_draw_index(self) :
+        self.draw_index -= 1
+        if self.to_node == self.from_node :
+            self.update_factor()
+        else: 
+            self.connect_to_coord((self.width / 2) - 10)
 
     ############ Util methods ##############################
     def get_middle(self, pos1, pos2) : # returns the middle of two points
@@ -524,6 +532,9 @@ class EditorProjection(EditorConnection) :
         a = 20 * (h / w); n = (h / 2) - 10; b = (n - a)
         minor = a + (b * (1 - pow(0.8, self.draw_index)))
         return major, minor
+
+    def update_factor(self) :
+        self.factor = self.get_factor()
     # returns the gradients of the two lines making the opening 'v' part of the receptive field. 
     # this depends on the draw_index, as it determines where the projection's representation begins.
     def calculate_gradient(self) :
