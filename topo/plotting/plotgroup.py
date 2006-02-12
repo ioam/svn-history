@@ -23,10 +23,21 @@ from topo.base.connectionfield import CFSheet
 from plot import make_template_plot, Plot
 import bitmap
 
+def cmp_plot(plot1,plot2):
+    """
+    Comparison function for Plots.
+    It compares the precedence number first and then the src_name and name attributes.
+    """
+    if plot1.precedence != plot2.precedence:
+	return cmp(plot1.precedence,plot2.precedence)
+    else:
+	return cmp((plot1.plot_src_name+plot1.name),
+		   (plot2.plot_src_name+plot2.name))
+
 
 def sort_plots(plot_list):
     """Sort a (static) plot list according to the src_names."""
-    plot_list.sort(lambda x, y: cmp((x.plot_src_name+x.name),(y.plot_src_name+y.name)))
+    plot_list.sort(cmp_plot)
 
 
 # PlotGroup used by the simulation are stored in this dictionnary
