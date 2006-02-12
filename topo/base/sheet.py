@@ -96,7 +96,7 @@ __version__ = '$Revision$'
 
 from simulator import EventProcessor
 from parameter import Constant, BooleanParameter
-from Numeric import zeros,array,floor,ceil
+from Numeric import zeros,array,floor,ceil,Float
 from boundingregion import BoundingBox
 import sheetview 
 
@@ -366,16 +366,17 @@ class Sheet(EventProcessor):
         super(Sheet,self).__init__(**params)
 
         self.debug("density = ",self.density)
-        left,bottom,right,top = self.bounds.aarect().lbrt()
-        width,height = right-left,top-bottom
-        rows = int(height*self.density)
-        cols = int(width*self.density)
 
+        # CEBHACKALERT: clean this up (see also plot.py,image.py)
+        left,bottom,right,top = self.bounds.aarect().lbrt()
         # The real densities along x and y of the sheet
-        self.xdensity = cols / float(right-left)
-        self.ydensity = rows / float(top-bottom)
-        
-        self.activity = zeros((rows,cols)) + 0.0
+        self.xdensity = int(self.density*(right-left)) / float((right-left))
+        self.ydensity = int(self.density*(top-bottom)) / float((top-bottom))
+
+        # setup the activity matrix
+        r1,r2,c1,c2 = bounds2slice(self.bounds,self.bounds,self.xdensity,self.ydensity)
+        self.activity = zeros((r2-r1,c2-c1),Float)
+
         self.__saved_activity = []          # For non-learning inputs
         self.debug('activity.shape =',self.activity.shape)
         ### JABALERT: Should perhaps rename this to view_dict
