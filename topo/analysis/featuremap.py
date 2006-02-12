@@ -247,13 +247,13 @@ class MeasureFeatureMap(TopoObject):
                 ### it enables the proper display in plot.py (see corresponding alert)
                 ### It might have to be changed when the name display is fixed in plot.py (ask Jim)
                 preference_map = SheetView(((self.__featuremaps[sheet][feature].preference())/norm_factor,
-                                             bounding_box), sheet.name )
+                                             bounding_box), sheet.name ,sheet.precedence)
                 sheet.sheet_view_dict[feature.capitalize()+'Preference']=preference_map
 
                 # note the temporary multiplication by 17
                 # (just because I remember JAB saying it was something like that in LISSOM)
                 selectivity_map = SheetView((17*self.__featuremaps[sheet][feature].selectivity(),
-                                              bounding_box), sheet.name )
+                                              bounding_box), sheet.name , sheet.precedence)
                 sheet.sheet_view_dict[feature.capitalize()+'Selectivity']=selectivity_map
 
 

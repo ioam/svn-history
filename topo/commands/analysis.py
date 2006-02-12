@@ -125,9 +125,9 @@ def measure_cog():
                 ### JCALERT: This will need to be extended to work when there are multiple
                 ### projections to this sheet; right now only the last one in the list
                 ### will show up.
-                new_view = SheetView((xpref,sheet.bounds), src_name=sheet.name)
+                new_view = SheetView((xpref,sheet.bounds), sheet.name,sheet.precedence)
                 sheet.sheet_view_dict['XCoG']=new_view
-                new_view = SheetView((ypref,sheet.bounds), src_name=sheet.name)
+                new_view = SheetView((ypref,sheet.bounds), sheet.name,sheet.precedence)
                 sheet.sheet_view_dict['YCoG']=new_view
     
                 
@@ -140,7 +140,7 @@ def update_activity():
     for sheet in sim.objects(Sheet).values():
         activity_copy = array(sheet.activity)
         new_view = SheetView((activity_copy,sheet.bounds),
-                              src_name=sheet.name)
+                              sheet.name,sheet.precedence)
         sheet.sheet_view_dict['Activity']=new_view
     
 
@@ -177,4 +177,4 @@ def update_projections():
     for each in sheets:
 	if (each.name == sheet_name):
 	    for x,y in proj_coords:
-		each.update_unit_view(x,y,proj_name)
+		each.update_unit_view(x,y,proj_name,)

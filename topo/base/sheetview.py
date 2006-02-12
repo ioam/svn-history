@@ -52,7 +52,7 @@ class SheetView(TopoObject):
     ### JCALERT! term_1 and term_2 should be more explicit...
     ### the 3 cases described in the doc, are they really useful?
     ### shouldn't it be simplified?
-    def __init__(self, (term_1, term_2), src_name=None,**params):
+    def __init__(self, (term_1, term_2), src_name=None, precedence = 0.0,**params):
         """
         __init__(self, input_tuple, **params)
 
@@ -81,8 +81,8 @@ class SheetView(TopoObject):
         """
         super(SheetView,self).__init__(**params)
 
-	### JCALERT! Think about it: shouldn't we have a src attribute? src beeing a Sheet?
 	self.src_name = src_name
+	self.precedence = precedence
         
         # Assume there's no such thing as an operator that can be mistaken
         # for a matrix_data element.  This is true as long as the real
@@ -161,15 +161,15 @@ class UnitView(SheetView):
     accessed by any valid key.
     """
 
-    def __init__(self, term_tuple, x, y, projection, **params):
+    ### JCALERT! UnitView (as well as SheetView have to be reviewed.
+    def __init__(self, term_tuple, x, y, projection,**params):
         """
         Subclass of SheetView.  Contains additional x,y member data.
         """
-        super(UnitView,self).__init__(term_tuple, **params)
+        super(UnitView,self).__init__(term_tuple, projection.name,**params)
         self.x = x
         self.y = y
         self.projection = projection
-	self.src_name = self.projection.name
 
 
 
