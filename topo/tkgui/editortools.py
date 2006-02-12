@@ -6,9 +6,10 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import Frame, Label, Canvas, TOP, X, GROOVE, RAISED
+from Tkinter import Frame, Button, Label, Canvas, TOP, X, GROOVE, RAISED, BOTTOM
 import Pmw
-from editorobjects import EditorSheet, EditorProjection
+import tkFont
+
 import topo.sheets
 from topo.sheets import *
 from topo.base.utils import find_classes_in_package
@@ -18,6 +19,9 @@ from topo.projections import *
 from topo.base.utils import find_classes_in_package
 from topo.base.projection import Projection
 
+from editorobjects import EditorSheet, EditorProjection
+from parametersframe import ParametersFrame
+
 class ArrowTool(Frame) :
     """
     ArrowTool is a selectable frame containing an arrow icon and a label. It is a
@@ -26,185 +30,236 @@ class ArrowTool(Frame) :
     """
     ############ Constructor ####################################
 
-    def __init__(self, canvas,  parent = None) :
-	# super constructor call
-	Frame.__init__(self, parent, bg = 'light grey', bd = 4, relief = RAISED)
-	self.canvas = canvas # hold canvas reference
-	# label sets canvas mode
-	self.titleLabel = Label(self, text="Move:", bg ='light grey')
-	self.titleLabel.bind('<Button-1>', self.changeMode)
-	self.titleLabel.pack()
-	# arrow icon
-	self.icon = Canvas(self, bg = 'light grey', width = 35, height = 30)
-	self.icon.create_polygon(10,0, 10,22, 16,17, 22,29, 33,22, 25,13, 33,8, 
-						fill = 'black', outline = 'white')
-	self.icon.pack()
-	self.icon.bind('<Button-1>', self.changeMode) # icon sets canvas mode
-	# pack in toolbar at top and fill out in X direction; click changes canvas mode
-	self.pack(side = TOP, fill = X)
-	self.bind('<Button-1>', self.changeMode)
+    def __init__(self, canvas,  parent = None, parambar = None) :
+        # super constructor call
+        Frame.__init__(self, parent, bg = 'light grey', bd = 4, relief = RAISED)
+        self.canvas = canvas # hold canvas reference
+        self.parameter_tool = parambar # To display class properties and name
+        # label sets canvas mode
+        self.title_label = Label(self, text="Move:", bg ='light grey')
+        self.title_label.bind('<Button-1>', self.change_mode)
+        self.title_label.pack()
+        self.doc = 'Use the arrow tool to select and\nmove objects in the canvas around'
+        # arrow icon
+        self.icon = Canvas(self, bg = 'light grey', width = 35, height = 30)
+        self.icon.create_polygon(10,0, 10,22, 16,17, 22,29, 33,22, 25,13, 33,8, 
+            fill = 'black', outline = 'white')
+        self.icon.pack()
+        self.icon.bind('<Button-1>', self.change_mode) # icon sets canvas mode
+        # pack in toolbar at top and fill out in X direction; click changes canvas mode
+        self.pack(side = TOP, fill = X)
+        self.bind('<Button-1>', self.change_mode)
 	
     ####### Focus Methods ####################################################
 	
-    def changeMode(self, event) :
-	# change the canvas mode to 'ARROW'.
-	self.canvas.changeMode('a')
+    def change_mode(self, event) :
+        # change the canvas mode to 'ARROW'.
+        self.canvas.change_mode('a')
 
-    def setFocus(self, focus) :
-	# change the background highlight to reflect whether this toolbar item is selected or not
-	if (focus) :
-		col = 'dark grey'; relief = GROOVE
-	else :
-		col = 'light grey'; relief = RAISED
-		
-	self.config(bg = col, relief = relief)
-	self.titleLabel.config(bg = col)
-	self.icon.config(bg = col)
+    def set_focus(self, focus) :
+        # change the background highlight to reflect whether this toolbar item is selected or not
+        if (focus) :
+             col = 'dark grey'; relief = GROOVE
+             if not(self.parameter_tool == None) :
+                 self.parameter_tool.set_focus('Arrow', None, self.doc)
+        else :
+            col = 'light grey'; relief = RAISED
+
+        self.config(bg = col, relief = relief)
+        self.title_label.config(bg = col)
+        self.icon.config(bg = col)
 
 ###############################################################################
 
 class NodeTool(Frame) :
-     """
-     NodeTool extends Frame. It is expected to be included in a topographica
-     model development GUI and functions as a self populating Node tool.
-     The available Sheet types are supplied to be selected from. This Tool supplies
-     a suitable Editor cover for a node and creates the corresponding topo object.
-     """
-     ############ Constructor ####################################
+    """
+    NodeTool extends Frame. It is expected to be included in a topographica
+    model development GUI and functions as a self populating Node tool.
+    The available Sheet types are supplied to be selected from. This Tool supplies
+    a suitable Editor cover for a node and creates the corresponding topo object.
+    """
+    ############ Constructor ####################################
 
-     def __init__(self, canvas,  parent = None) :
-	# super constructor call.
-	Frame.__init__(self, parent, bg = 'light grey', bd = 4, relief = RAISED)
-	self.canvas = canvas # hold canvas reference.
-	# bind clicks, pack in toolbar at top and fill out in X direction
-	self.bind('<Button-1>', self.changeMode)
-	self.pack(side = TOP, fill = X)
-	# label sets canvas mode
-	self.titleLabel = Label(self, text="Add sheet of type:", bg ='light grey')
-	self.titleLabel.bind('<Button-1>', self.changeMode)
-	self.titleLabel.pack()
-	# gets list of all the available sheets.
-	self.sheetList = self.getSheetList()
-	sheetList = self.sheetList.keys()
-	# populate the menu with the available sheet list.
-	self.opMenu = Pmw.ComboBox(self, selectioncommand = self.setOption, scrolledlist_items = sheetList)
-	self.opMenu.pack()
-	self.opMenu.bind('<Button-1>', self.changeMode)
-	# select the initial selection
-	self.opMenu.selectitem(sheetList[0])
-	self.currentOp = sheetList[0]
+    def __init__(self, canvas,  parent = None, parambar = None) :
+        # super constructor call.
+        Frame.__init__(self, parent, bg = 'light grey', bd = 4, relief = RAISED)
+        self.canvas = canvas # hold canvas reference.
+        self.parameter_tool = parambar # To display class properties and name
+        # bind clicks, pack in toolbar at top and fill out in X direction
+        self.bind('<Button-1>', self.change_mode)
+        self.pack(side = TOP, fill = X)
+        # label sets canvas mode
+        self.title_label = Label(self, text="Add sheet of type:", bg ='light grey')
+        self.title_label.bind('<Button-1>', self.change_mode)
+        self.title_label.pack()
+        self.doc = 'Use the sheet tool to click a\nsheet object into the canvas.'
+        # gets list of all the available sheets.
+        self.sheet_list = self.get_sheet_list()
+        sheet_list = self.sheet_list.keys()
+        # populate the menu with the available sheet list.
+        self.option_menu = Pmw.ComboBox(self, selectioncommand = 
+            self.set_option, scrolledlist_items = sheet_list)
+        self.option_menu.pack()
+        self.option_menu.bind('<Button-1>', self.change_mode)
+        # select the initial selection
+        self.option_menu.selectitem(sheet_list[0])
+        self.current_option = sheet_list[0]
 
-     ####### Focus Methods ####################################################
+    ####### Focus Methods ####################################################
 	
-     def changeMode(self, option) :
-	# changes the EditorCanvas mode to 'MAKE'
-	self.canvas.changeMode('m')
+    def change_mode(self, option) :
+        # changes the EditorCanvas mode to 'MAKE'
+        self.canvas.change_mode('m')
 
-     def setFocus(self, focus) :
-	# change the background highlight to reflect whether this toolbar item is selected or not
-	if (focus) :
-		col = 'dark grey'; relief = GROOVE
-	else :
-		col = 'light grey'; relief = RAISED
-	self.config(bg = col, relief = relief)
-	self.titleLabel.config(bg = col)
-	self.opMenu.config(bg = col)
+    def set_focus(self, focus) :
+        # change the background highlight to reflect whether this toolbar item is selected or not
+        if (focus) :
+            col = 'dark grey'; relief = GROOVE
+            if not(self.parameter_tool == None) :
+                current_option = self.sheet_list[self.current_option]
+                name = str(current_option).split('.')[-1][:-2]
+                self.parameter_tool.set_focus(name, current_option, self.doc)
+        else :
+            col = 'light grey'; relief = RAISED
+        self.config(bg = col, relief = relief)
+        self.title_label.config(bg = col)
+        self.option_menu.config(bg = col)
 
-     ####### Node Methods ###################################################
+    ####### Node Methods ###################################################
 
-     def createNode(self, x, y) :
-	# get the current selection and create the new topo object
-	sheet = self.sheetList[self.currentOp]()
-	sim = self.canvas.simulator # get the current simulator
-	sim.add(sheet)
-	# create the cover for the sheet and return it.
-	return EditorSheet(self.canvas, sheet, (x, y), sheet.name)
+    def create_node(self, x, y) :
+        # get the current selection and create the new topo object
+        sheet = self.sheet_list[self.current_option]()
+        sim = self.canvas.simulator # get the current simulator
+        sim.add(sheet)
+        # create the cover for the sheet and return it.
+        return EditorSheet(self.canvas, sheet, (x, y), sheet.name)
 
-     ####### Util Methods #####################################################
-     def getSheetList(self) :	
-	# find all subclasses of Sheet defined in topo/sheets
-	return find_classes_in_package(topo.sheets, Sheet)
+    ####### Util Methods #####################################################
+    def get_sheet_list(self) :	
+        # find all subclasses of Sheet defined in topo/sheets
+        return find_classes_in_package(topo.sheets, Sheet)
 
-     def setOption(self, option) :
-	self.currentOp = option
-	self.changeMode(None)
+    def set_option(self, option) :
+        self.current_option = option
+        self.change_mode(None)
 
 ###############################################################################
 
 # NOTE currently only searches for topo.projections (connections have not been implemented yet).
 
-class ConTool(Frame) :
-     """ 
-     ConTool extends Frame. It is expected to be included in a topographica
-     model development GUI and functions as a self populating Connection toolbar.
-     The available Connection types are listed and the user can select one.
-     When a connection is formed between two nodes a topo.projection of the
-     specified type is instantiated and a reference to it is stored in it's Editor
-     cover. Allows user to change the EditorCanvas mode to 'CONNECTION' mode.
-     """
-     ############ Constructor ####################################
+class ConnectionTool(Frame) :
+    """ 
+    ConnectionTool extends Frame. It is expected to be included in a topographica
+    model development GUI and functions as a self populating Connection toolbar.
+    The available Connection types are listed and the user can select one.
+    When a connection is formed between two nodes a topo.projection of the
+    specified type is instantiated and a reference to it is stored in it's Editor
+    cover. Allows user to change the EditorCanvas mode to 'CONNECTION' mode.
+    """
+    ############ Constructor ####################################
 
-     def __init__(self, canvas, parent = None) :
-	# super constructor call.
-	Frame.__init__(self, parent, bg = 'light grey', bd = 4, relief = RAISED)
-	self.canvas = canvas # hold canvas reference.
-	# bind clicks, pack in toolbar at top and fill out in X direction
-	self.bind('<Button-1>', self.changeMode)
-	self.pack(side = TOP, fill = X)
-	# label sets canvas mode
-	self.titleLabel = Label(self, text="Add projection of type:", bg ='light grey')
-	self.titleLabel.bind('<Button-1>', self.changeMode)
-	self.titleLabel.pack()
-	# gets list of all the available projections.
-	self.projList = self.getProjList()
-	projList = self.projList.keys() # gets the class names.
-	# populate the menu with the available projection list.
-	self.opMenu = Pmw.ComboBox(self, selectioncommand = self.setOption, scrolledlist_items = projList)
-	self.opMenu.bind('<Button-1>', self.changeMode)
-	self.opMenu.pack()
-	# select the initial selection
-	self.opMenu.selectitem(projList[0])
-	self.currentOp = projList[0]
+    def __init__(self, canvas, parent = None, parambar = None) :
+        # super constructor call.
+        Frame.__init__(self, parent, bg = 'light grey', bd = 4, relief = RAISED)
+        self.canvas = canvas # hold canvas reference.
+        self.parameter_tool = parambar # To display class properties and name
+        # bind clicks, pack in toolbar at top and fill out in X direction
+        self.bind('<Button-1>', self.change_mode)
+        self.pack(side = TOP, fill = X)
+        # label sets canvas mode
+        self.title_label = Label(self, text="Add projection of type:", bg ='light grey')
+        self.title_label.bind('<Button-1>', self.change_mode)
+        self.title_label.pack()
+        self.doc = 'Use the connection tool to\ndrag connections between objects'
+        # gets list of all the available projections.
+        self.proj_list = self.get_proj_list()
+        proj_list = self.proj_list.keys() # gets the class names.
+        # populate the menu with the available projection list.
+        self.option_menu = Pmw.ComboBox(self, selectioncommand = 
+            self.set_option, scrolledlist_items = proj_list)
+        self.option_menu.bind('<Button-1>', self.change_mode)
+        self.option_menu.pack()
+        # select the initial selection
+        self.option_menu.selectitem(proj_list[0])
+        self.current_option = proj_list[0]
 
-     ########## Canvas Topo Linking Methods #########################################
+    ########## Canvas Topo Linking Methods #########################################
 
-     def newCover(self, fromObj) :
-	# create a EditorProjection and return it. If more than one representation for 
-	# connections/projections the returned object will depend on current selection.
-	return EditorProjection("", self.canvas, fromObj)
+    def new_cover(self, from_node) :
+        # create a EditorProjection and return it. If more than one representation for 
+        # connections/projections the returned object will depend on current selection.
+        return EditorProjection("", self.canvas, from_node)
 
-     def createConnection(self, edCon, node) :
-	# connects the ed connection. Will also form correct connection in the
-	# topo simulator.
-	sim = self.canvas.simulator
-	node1 = edCon.nodeFrom.sheet
-	node2 = node.sheet
-	conType = self.projList[self.currentOp]
-	con = sim.connect(node1, node2, connection_type = conType)
-	edCon.connect(node, con)
-     
-     def setOption(self, option) :
-	self.currentOp = option
-	self.changeMode(None)
+    def createConnection(self, editor_connection, node) :
+        # connects the ed connection. Will also form correct connection in the
+        # topo simulator.
+        sim = self.canvas.simulator
+        from_node = editor_connection.from_node.sheet
+        to_node = node.sheet
+        con_type = self.proj_list[self.current_option]
+        con = sim.connect(from_node, to_node, connection_type = con_type)
+        editor_connection.connect(node, con)
 
-     ########## Focus Methods #######################################################
-     def changeMode(self, option) :
-	# changes the EditorCanvas mode to 'CONNECTION'
-	self.canvas.changeMode('c') 
+    def set_option(self, option) :
+        self.current_option = option
+        self.change_mode(None)
 
-     def setFocus(self, focus) :
-	# change the background highlight to reflect whether this toolbar item is selected or not
-	if (focus) :
-		col = 'dark grey'; relief = GROOVE
-	else :
-		col = 'light grey'; relief = RAISED
-	
-	self.config(bg = col, relief = relief)
-	self.titleLabel.config(bg = col)
-	self.opMenu.config(bg = col)
+    ########## Focus Methods #######################################################
+    def change_mode(self, option) :
+        # changes the EditorCanvas mode to 'CONNECTION'
+        self.canvas.change_mode('c') 
 
-     ########### Util Methods ########################################################
-     def getProjList(self ) :
-	# find all subclasses of Projection defined in topo/projections
-	return find_classes_in_package(topo.projections, Projection)
+    def set_focus(self, focus) :
+        # change the background highlight to reflect whether this toolbar item is selected or not
+        if (focus) :
+            col = 'dark grey'; relief = GROOVE
+            if not(self.parameter_tool == None) :
+                current_option = self.proj_list[self.current_option]
+                name = str(current_option).split('.')[-1][:-2]
+                self.parameter_tool.set_focus(name, current_option, self.doc)
+        else :
+            col = 'light grey'; relief = RAISED
+        self.config(bg = col, relief = relief)
+        self.title_label.config(bg = col)
+        self.option_menu.config(bg = col)
 
+    ########### Util Methods ########################################################
+    def get_proj_list(self ) :
+        # find all subclasses of Projection defined in topo/projections
+        return find_classes_in_package(topo.projections, Projection)
+
+
+###############################################################################
+
+class ParametersTool(Frame) :
+
+    def __init__(self, parent = None) :
+        # super constructor call.
+        Frame.__init__(self, parent)
+        # label
+        self.title_label = Label(self)
+        self.title_label.pack(side = TOP)
+        self.doc_label = Label(self, font = ("Times", 12))
+        self.doc_label.pack(side = TOP)
+        # parameters frame, for showing modifiable class properties
+        self.parameter_frame = ParametersFrame(self, bd = 2)
+        self.button_panel = Frame(self)
+        update_button = Button(self.button_panel, text = 'Apply', command = self.update_parameters)
+        update_button.pack()
+
+
+    def update_parameters(self) :
+        self.parameter_frame.set_class_parameters()
+
+    def set_focus(self, name, focus_class, doc = '') :
+        self.parameter_frame.forget()
+        self.button_panel.forget()
+        self.title_label.config(text = name)
+        self.doc_label.config(text = doc)
+        try :
+            self.parameter_frame.create_class_widgets(focus_class)
+            if not(focus_class == None) :
+                self.button_panel.pack(side = TOP)
+        except AttributeError:
+             pass

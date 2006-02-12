@@ -24,51 +24,53 @@ class EditorObject :
 
     # constructor
     def __init__(self, name, canvas) :
-	self.canvas = canvas # retains a reference to the canvas
-	self.name = name # set the name of the sheet
-	self.focus = False # this does not have the focus
+        self.canvas = canvas # retains a reference to the canvas
+        self.name = name # set the name of the sheet
+        self.focus = False # this does not have the focus
 
     def draw(self) :
-	# draw the object at the current x, y position
-	pass
+        # draw the object at the current x, y position
+        pass
 
-    def showProperties(self) :
-	# show parameters frame for object
-	paramWindow = Toplevel()
-	Label(paramWindow, text = self.name).pack(side = TOP)
-	self.paramFrame = ParametersFrame(paramWindow)
-	self.buttonPanel = Frame(paramWindow)
-	self.buttonPanel.pack(side = BOTTOM)
-	updateButton = Button(self.buttonPanel, text = 'Apply', command = self.updateParameters)
-	okayButton = Button(self.buttonPanel, text = 'Ok', command = lambda : self.okParameters(paramWindow))
-	okayButton.pack(side = RIGHT)
-	updateButton.pack(side = RIGHT)
+    def show_properties(self) :
+        # show parameters frame for object
+        parameter_window = Toplevel()
+        Label(parameter_window, text = self.name).pack(side = TOP)
+        self.parameter_frame = ParametersFrame(parameter_window)
+        self.button_panel = Frame(parameter_window)
+        self.button_panel.pack(side = BOTTOM)
+        update_button = Button(self.button_panel, text = 'Apply', 
+            command = self.update_parameters)
+        okay_button = Button(self.button_panel, text = 'Ok', 
+            command = lambda : self.okay_parameters(parameter_window))
+        okay_button.pack(side = RIGHT)
+        update_button.pack(side = RIGHT)
 
-    def updateParameters(self) :
-	self.paramFrame.set_obj_params()
+    def update_parameters(self) :
+        self.parameter_frame.set_obj_params()
 
-    def okParameters(self, paramWindow) :
-	self.updateParameters()
-	paramWindow.destroy()
+    def okay_parameters(self, parameter_window) :
+        self.update_parameters()
+        parameter_window.destroy()
 
-    def setFocus(self, focus) : # set focus
-	self.focus = focus
+    def set_focus(self, focus) : # set focus
+        self.focus = focus
 
-    def showActivity(self) : # set whether activity should be displayed.
-	pass
+    def show_activity(self) : # set whether activity should be displayed.
+        pass
 
     def move(self) :
-	# update position of object and redraw
-	pass
+        # update position of object and redraw
+        pass
 
     def remove(self) :
-	# remove this object from the canvas and deal with relevant 
-	# Topographica objects.
-	pass    
+        # remove this object from the canvas and deal with relevant 
+        # Topographica objects.
+        pass    
 
-    def inBounds(self, x, y) : 
-	# return true, if x,y lies within this gui object's boundary
-	pass
+    def in_bounds(self, x, y) : 
+        # return true, if x,y lies within this gui object's boundary
+        pass
 
 ####################################################################
 
@@ -80,93 +82,92 @@ class EditorNode(EditorObject) :
     in a EditorCanvas. Extending classes will supply a draw method and other type specific 
     attributes. 
     """
-    def __init__(self, canvas, pos, name, colour = ('slate blue', 'lavender')) :
-	EditorObject.__init__(self, name, canvas)
-	self.colours = colour # colours for drawing this node on the canvas
-	self.fromCon = [] # connections from this node
-	self.toCon = [] # connections to this node
-	self.x = pos[0] # set the x and y coords of the centre of this node
-	self.y = pos[1]
-	self.loopCount = 0
+    def __init__(self, canvas, pos, name, colour = ('dark red','black')):#('slate blue', 'lavender')) :
+        EditorObject.__init__(self, name, canvas)
+        self.colours = colour # colours for drawing this node on the canvas
+        self.from_connections = [] # connections from this node
+        self.to_connections = [] # connections to this node
+        self.x = pos[0] # set the x and y coords of the centre of this node
+        self.y = pos[1]
 
     ############ Connection methods ########################
 
-    def attachCon(self, con, fromTo) :
-	if (fromTo == self.FROM) :
-		if (con.nodeFrom == con.nodeTo) :
-			self.fromCon = [con] + self.fromCon
-		else :
-			self.fromCon = self.fromCon + [con]
-	else :
-		if (con.nodeFrom == con.nodeTo) :
-			self.toCon = [con] + self.toCon
-		else :
-			self.toCon = self.toCon + [con]
-	self.canvas.redrawObjects()
+    def attach_connection(self, con, from_to) :
+        if (from_to == self.FROM) :
+            if (con.from_node == con.to_node) :
+                self.from_connections = [con] + self.from_connections
+            else :
+                self.from_connections = self.from_connections + [con]
+        else :
+            if (con.from_node == con.to_node) :
+                self.to_connections = [con] + self.to_connections
+            else :
+                self.to_connections = self.to_connections + [con]
 	
-    def removeCon(self, con, fromTo) : # remove a connection to or from this node
-	if (fromTo) :
-		l = len(self.toCon)
-		for i in range(l) :
-			if (con == self.toCon[i]) : break
-		else : return
-		del self.toCon[i]
-		node = con.nodeFrom
-	else :
-		l = len(self.fromCon)
-		for i in range(l) :
-			if (con == self.fromCon[i]) : break
-		else : return
-		del self.fromCon[i]
-		node = con.nodeTo
-	index = con.drawIndex
-	# Decrease the indexes of the connections between the same nodes and with a higher index.
-	for con in self.fromCon :
-		if (node == con.nodeTo and con.drawIndex > index) :
-			con.drawIndex -= 1
-			if (not(con.nodeTo == con.nodeFrom)) :
-				con.connectToCoord(self.width)
-	self.canvas.redrawObjects()
+    def remove_connection(self, con, from_to) : # remove a connection to or from this node
+        if (from_to) :
+            l = len(self.to_connections)
+            for i in range(l) :
+                if (con == self.to_connections[i]) : break
+            else : return
+            del self.to_connections[i]
+            node = con.from_node
+        else :
+            l = len(self.from_connections)
+            for i in range(l) :
+                if (con == self.from_connections[i]) : break
+            else : return
+            del self.from_connections[i]
+            node = con.to_node
+        index = con.draw_index
+        # Decrease the indexes of the connections between the same nodes and with a higher index.
+        for con in self.from_connections :
+            if (node == con.to_node and con.draw_index > index) :
+                con.draw_index -= 1
+                if con.to_node == con.from_node :
+                    con.get_factor()
+                else :
+                    con.connect_to_coord((self.width / 2) - 10)
 
-    def getConCount(self, node) :
-	count = 0
-	for con in self.fromCon :
-		if (con.nodeTo == node) :
-			count += 1
-	for con in self.toCon :
-		if (con.nodeFrom == node) :
-			count += 1
-	return count
+    def get_connection_count(self, node) :
+        count = 0
+        for con in self.from_connections :
+            if (con.to_node == node) :
+                count += 1
+        for con in self.to_connections :
+            if (con.from_node == node) :
+                count += 1
+        return count
 
     ############ Util methods ##############################
     
-    def getPos(self) :
-	return (self.x, self.y) # return center point of node
+    def get_pos(self) :
+        return (self.x, self.y) # return center point of node
 
-    def showProperties(self) :
-	EditorObject.showProperties(self)
-	self.paramFrame.create_widgets(self.sheet)
-	lateralButton = Button(self.buttonPanel, text = 'Lateral', command = self.showLatParams)
-	lateralButton.pack(side = RIGHT)
+    def show_properties(self) :
+        EditorObject.show_properties(self)
+        self.parameter_frame.create_widgets(self.sheet)
+        lateral_button = Button(self.button_panel, text = 'Lateral', command = self.show_lateral_parameters)
+        lateral_button.pack(side = RIGHT)
 
-    def showLatParams(self) :
-	latList = []
-	for con in self.fromCon :
-		if (con.nodeTo == con.nodeFrom) :
-			latList += [con]
-	paramWindow = Toplevel()
-	for con in latList :
-		frame = Frame(paramWindow)
-		frame.pack(side = LEFT)
-		Label(frame, text = con.name).pack(side = TOP)
-		con.paramFrame = ParametersFrame(frame)
-		con.paramFrame.create_widgets(con.connection)
-		buttonPanel = Frame(frame)
-		buttonPanel.pack(side = BOTTOM)
-		Button(buttonPanel, text = 'Apply', 
-				command = con.updateParameters).pack(side = LEFT)
-		Button(buttonPanel, text = 'Delete',
-				command = con.remove).pack(side = RIGHT)
+    def show_lateral_parameters(self) :
+        lateral_connection_list = []
+        for con in self.from_connections :
+            if (con.to_node == con.from_node) :
+                lateral_connection_list += [con]
+        parameter_window = Toplevel()
+        for con in lateral_connection_list :
+            frame = Frame(parameter_window)
+            frame.pack(side = LEFT)
+            Label(frame, text = con.name).pack(side = TOP)
+            con.parameter_frame = ParametersFrame(frame)
+            con.parameter_frame.create_widgets(con.connection)
+            button_panel = Frame(frame)
+            button_panel.pack(side = BOTTOM)
+            Button(button_panel, text = 'Apply', 
+                command = con.update_parameters).pack(side = LEFT)
+            Button(button_panel, text = 'Delete',
+                command = con.remove).pack(side = RIGHT)
 
 class EditorSheet(EditorNode) :
     """
@@ -175,152 +176,177 @@ class EditorSheet(EditorNode) :
     Canvas. The colours used for drawing can be set. Uses bounding box to
     determine if x, y coord is within its boundary.
     """
-    sheet_moving = False
 
     def __init__(self, canvas, sheet, pos, name) :
-	# super constructor call
-	EditorNode.__init__(self, canvas, pos, name)
-	self.sheet = sheet # the topo sheet that this object represents
-	sheet.guiX, sheet.guiY = self.x, self.y # store the ed coords in the topo sheet
-	self.width = 70.0 # set the width and height parameters for this object
-	self.height = 35.0
-	self.activity = False
-	col = self.colours[1]
-	self.initDraw(col, False) # create a new paralellogram
-	self.currentCol = col
-	self.gradient = 1
-	self.elCount = self.matrixElementCount()
-	self.canvas.redrawObjects()
+        # super constructor call
+        EditorNode.__init__(self, canvas, pos, name)
+        self.sheet = sheet # the topo sheet that this object represents
+        sheet.gui_x, sheet.gui_y = self.x, self.y # store the ed coords in the topo sheet
+        self.element_count = self.matrix_element_count()
+        self.set_bounds()
+        self.activity = False
+        col = self.colours[1]
+        self.init_draw(col, False) # create a new paralellogram
+        self.currentCol = col
+        self.gradient = 1
+        # ALALERT remove from here
+        self.canvas.redraw_objects()
 
     ############ Draw methods ############################
 
-    def setFocus(self, focus) :
-	EditorSheet.sheet_moving = focus
-	for id in self.id :
-			self.canvas.delete(id)
-	self.canvas.delete(self.label) # remove label	
-	EditorNode.setFocus(self, focus) # call to super's set focus
-	if (focus) : col = self.colours[0]
-	else : col = self.colours[1]
-	self.initDraw(col, focus) # create new one with correct colour
-	self.currentCol = col
-	self.draw()
-	# redraw the connections
-	#for con in self.toCon : 
-	#	con.move()
-	#for con in self.fromCon :
-	#	con.move()
+    def set_focus(self, focus) :
+        for id in self.id :
+            self.canvas.delete(id)
+        self.canvas.delete(self.label) # remove label	
+        EditorNode.set_focus(self, focus) # call to super's set focus
+        if (focus) : col = self.colours[0]
+        else : col = self.colours[1]
+        self.init_draw(col, focus) # create new one with correct colour
+        self.currentCol = col
+        self.draw()
 
-    def showActivity(self) :
-	if self.activity :
-		self.activity = False
-	else :
-		self.activity = True
+    def show_activity(self) :
+        if self.activity :
+            self.activity = False
+        else :
+            self.activity = True
 
-    def initDraw(self, colour, focus) :
-	self.id = []
-	if focus : labCol = colour
-	else : labCol = 'black'
-	h, w = self.height, self.width
-	if (not self.focus and (self.activity)) :
-		colour = ''
-		h, w = self.height, self.width
-		x, y = self.x - (1.5 * w), self.y + h
-		update_activity()
-		m = self.sheet.sheet_view_dict['Activity'].view()[0]
-		wM, hM = self.elCount
-		dX, dY = w*2 / wM, h*2 / hM
-		for j in range(int(hM)) :
-			for i in range(int(wM)) :
-				a = j * dY
-				x1, y1 = x + a + (i * dX), y - a
-				x2, y2 = x1 + dY, y1 - dY
-				x3, x4 = x2 + dX, x1 + dX
-				col = '#'+str(hex(int(m[j][i]*255))[2:])*3
-				self.id = self.id + [self.canvas.create_polygon
-					(x1, y1, x2, y2, x3, y2, x4, y1, fill = col, outline = col)]
-	x, y = self.x, self.y
-	x1,y1 = (x - (1.5 * w), y + h)
-	x2,y2 = (x - (0.5 * w), y - h)
-	x3,y3 = (x + (1.5 * w), y - h)
-	x4,y4 = (x + (0.5 * w), y + h)
-	self.id = self.id + [self.canvas.create_polygon(x1, y1, x2, y2, x3, y3, x4, y4, 
-						fill = colour , outline = "black")]
-	self.label = self.canvas.create_text(x - 75 , y, anchor = E, fill = labCol, text = self.name)
+    def init_draw(self, colour, focus) :
+        self.id = []
+        if focus : label_colour = colour
+        else : label_colour = 'black'
+        h, w = 0.5 * self.height, 0.5 * self.width
+        if (not self.focus and (self.activity)) :
+            colour = ''
+            x, y = self.x - w + h, self.y - h
+            # AL, the idea will be to allow any available plots to be shown on the sheet.
+            # eg m = self.sheet.sheet_view_dict['OrientationPreference'].view()[0]
+            update_activity()
+            m = self.sheet.sheet_view_dict['Activity'].view()[0]
+            m = self.normalize(m)
+            matrix_width, matrix_height = self.element_count
+            dX, dY = int((w * 2)/ matrix_width), int((h * 2) / matrix_height)
+            for i in range(matrix_height) :
+                for j in range(matrix_width) :
+                    a = i * dY
+                    x1, y1 = x - a + (j * dX), y + a
+                    x2, y2 = x1 - dY, y1 + dY
+                    x3, x4 = x2 + dX, x1 + dX
+                    col = '#' + (self.dec_to_hex_str(m[i][j], 3)) * 3
+                    self.id = self.id + [self.canvas.create_polygon
+                       (x1, y1, x2, y2, x3, y2, x4, y1, fill = col, outline = col)]
+        x, y = self.x, self.y
+        x1,y1 = (x - w - h, y + h)
+        x2,y2 = (x - w + h, y - h)
+        x3,y3 = x2 + self.width, y2
+        x4,y4 = x1 + self.width, y1
+        self.id = self.id + [self.canvas.create_polygon(x1, y1, x2, y2, x3, y3, x4, y4, 
+            fill = colour , outline = "black")]
+        dX = (self.width / 2) + 5
+        self.label = self.canvas.create_text(x - dX, y, anchor = E, fill = label_colour, text = self.name)
+    
+    def normalize(self,a):
+        """ 
+        Normalize an array s.
+        In case of a constant array, ones is returned for value greater than zero,
+        and zeros in case of value inferior or equal to zero.
+        """
+        # AL is it possible to use the normalize method in plot?
+        from Numeric import zeros, ones, Float, divide
+        a_offset = a-min(a.flat)
+        max_a_offset = max(a_offset.flat)
+        if max_a_offset>0:
+             a = divide(a_offset,float(max_a_offset))
+        else:
+             if min(a.flat)<=0:
+                  a=zeros(a.shape,Float)
+             else:
+                  a=ones(a.shape,Float)
+        return a
+
+    def dec_to_hex_str(self, val, length) :
+        # expects a normalised value and maps it to a hex value of the given length
+        max_val = pow(16, length) - 1
+        hex_string = str(hex(int(val * max_val)))
+        extend = length - len(hex_string) + 2
+        hex_string = (extend * '0') + hex_string[2:]
+        return hex_string
 
     def draw(self, x = 0, y = 0) :
-	# move the parallelogram and label by the given x, y coords (default redraw)
-	try :
-		if not(x == y == 0) :
-			for id in self.id :
-				self.canvas.move(id, x, y)
-			self.canvas.move(self.label, x, y)
-		for id in self.id :
-			self.canvas.tag_raise(id)
-			self.canvas.tag_raise(self.label)
-	except IndexError :
-		print("Out of Canvas")
-	# redraw the connections
-	for con in self.toCon : 
-		if (con.nodeFrom == con.nodeTo) :
-			con.move()
-	for con in self.toCon :
-		if (not(con.nodeFrom == con.nodeTo)) :
-			con.move()
-	for con in self.fromCon :
-		if (not(con.nodeFrom == con.nodeTo)) :
-			con.move()
+        # move the parallelogram and label by the given x, y coords (default redraw)
+        if not(x == y == 0) :
+            for id in self.id :
+                self.canvas.move(id, x, y)
+            self.canvas.move(self.label, x, y)
+        for id in self.id :
+            self.canvas.tag_raise(id)
+        self.canvas.tag_raise(self.label)
+        # redraw the connections
+        for con in self.to_connections : 
+            if (con.from_node == con.to_node) :
+                con.move()
+        for con in self.to_connections :
+            if (not(con.from_node == con.to_node)) :
+                con.move()
+        for con in self.from_connections :
+            if (not(con.from_node == con.to_node)) :
+                con.move()
 
     ############ Update methods ############################ 
 
     def remove(self) :
-	l = len(self.fromCon) # remove all the connections from and to this sheet
-	for index in range(l) :
-		self.fromCon[0].remove()
-	l = len(self.toCon)
-	for index in range(l) :
-		self.toCon[0].remove()
-	for id in self.id :
-		self.canvas.delete(self.id)
-	self.canvas.delete(self.label)
-	self.canvas.removeObject(self) # remove from canvas' object list
-	self.canvas.redrawObjects()
+        l = len(self.from_connections) # remove all the connections from and to this sheet
+        for index in range(l) :
+            self.from_connections[0].remove()
+        l = len(self.to_connections)
+        for index in range(l) :
+            self.to_connections[0].remove()
+        for id in self.id :
+            self.canvas.delete(id)
+        self.canvas.delete(self.label)
+        self.canvas.remove_object(self) # remove from canvas' object list
 
     def move(self, x, y) :
-	# the connections position is updated
-	old = self.x, self.y
-	self.x = x
-	self.y = y
-	self.sheet.guiX, self.sheet.guiY = x, y # update topo sheet position
-	self.draw(self.x - old[0], self.y - old[1])
+        # the connections position is updated
+        old = self.x, self.y
+        self.x = x
+        self.y = y
+        self.sheet.gui_x, self.sheet.gui_y = x, y # update topo sheet position
+        self.draw(self.x - old[0], self.y - old[1])
 
     ############ Util methods ##############################
 
-    def inBounds(self, posx, posy) : # returns true if point lies in a bounding box
-	# if the coord is pressed within the parallelogram representation this 
-	# returns true.
-	# Get the paralellogram points and centers them around the given point
-	x = self.x - posx; y = self.y - posy
-	A = (x - (1.5 * self.width), y + self.height)
-	B = (x - (0.5 * self.width), y - self.height)
-	C = (x + (1.5 * self.width), y - self.height)
-	D = (x + (0.5 * self.width), y + self.height)
-	# calculate the line constants 	
-	# As the gradient of the lines is 1 the calculation is simple.
-	aAB = A[1] + A[0]
-	aCD = C[1] + C[0]
-	# The points are centered around the given coord, finding the intersects with line y = 0
-	# and ensuring that the left line lies on the negative side of the point and the right line
-	# lies on the positive side of the point determines that the point is within the parallelogram.
-	if ((D[1] >= 0) and (B[1] <= 0) and (aAB <= 0) and (aCD >= 0)) :
-		return True
-	return False
+    def in_bounds(self, pos_x, pos_y) : # returns true if point lies in a bounding box
+        # if the coord is pressed within the parallelogram representation this 
+        # returns true.
+        # Get the paralellogram points and centers them around the given point
+        x = self.x - pos_x; y = self.y - pos_y
+        A = (x - (0.5 * self.width) - (0.5 * self.height), y + (0.5 * self.height))
+        B = (x - (0.5 * self.width) + (0.5 * self.height), y - (0.5 * self.height))
+        C = B[0] + self.width, B[1]
+        D = A[0] + self.width, A[1]
+        # calculate the line constants 	
+        # As the gradient of the lines is 1 the calculation is simple.
+        a_AB = A[1] + A[0]
+        a_CD = C[1] + C[0]
+        # The points are centered around the given coord, finding the intersects with line y = 0
+        # and ensuring that the left line lies on the negative side of the point and the right line
+        # lies on the positive side of the point determines that the point is within the parallelogram.
+        if ((D[1] >= 0) and (B[1] <= 0) and (a_AB <= 0) and (a_CD >= 0)) :
+            return True
+        return False
 
-    def matrixElementCount(self) :
-	# returns the length and width of the matrix that holds this sheet's plot values
-	lbrt = self.sheet.bounds.aarect().lbrt()
-	den = self.sheet.density
-	return den *(lbrt[2] - lbrt[0]), den *(lbrt[3] - lbrt[1])
+    def matrix_element_count(self) :
+        # returns the length and width of the matrix that holds this sheet's plot values
+        lbrt = self.sheet.bounds.aarect().lbrt()
+        density = self.sheet.density
+        return int(density *(lbrt[2] - lbrt[0])), int(density *(lbrt[3] - lbrt[1]))
+    
+    def set_bounds(self) :
+        width_fact = 120; height_fact = 60
+        lbrt = self.sheet.bounds.aarect().lbrt()
+        self.width = width_fact * (lbrt[2] - lbrt[0])
+        self.height = height_fact * (lbrt[3] - lbrt[1])
 
 ####################################################################
 
@@ -331,57 +357,55 @@ class EditorConnection(EditorObject) :
     to cover any topographica connection (connection / projection), and extending 
     classes will supply a draw method and other type specific attributes.
     """
-    def __init__(self, name, canvas, nodeFrom) :
-	EditorObject.__init__(self, name, canvas)
-	self.nodeFrom = nodeFrom # initial node selected
-	self.nodeTo = None # updated when the user selects the second node - self.connect(..)
-	# temporary point, for when the to connection node is undefined
-	self.posTo = nodeFrom.getPos()
+    def __init__(self, name, canvas, from_node) :
+        EditorObject.__init__(self, name, canvas)
+        self.from_node = from_node # initial node selected
+        self.to_node = None # updated when the user selects the second node - self.connect(..)
+        # temporary point, for when the to connection node is undefined
+        self.to_position = from_node.get_pos()
 	
-
-
     ############ Draw methods ############################
 
-    def setFocus(self, focus) : # give this connection the focus
-     	EditorObject.setFocus(self, focus)
-	self.draw()
+    def set_focus(self, focus) : # give this connection the focus
+        EditorObject.set_focus(self, focus)
+        self.draw()
 
     ############ Update methods ############################ 
     
     def move(self) :
-	# if one of the nodes connected by this connection move, then move by redrawing	
-	self.gradient = self.calcGradient()
-	self.draw() 
+        # if one of the nodes connected by this connection move, then move by redrawing	
+        self.gradient = self.calculate_gradient()
+        self.draw() 
 
-    def updtPos(self, pos) : # update the temporary point
-	self.posTo = pos
-	self.draw()
+    def update_position(self, pos) : # update the temporary point
+        self.to_position = pos
+        self.draw()
 
-    def connect(self, nodeTo, con) : # pass the node this connection is to
-	#from topo.base.projection import Projection
-	self.connection = con # store the topo connection this object represents
-	if (self.name == "") :
-		self.name = con.name
-	self.drawIndex = self.nodeFrom.getConCount(nodeTo)
-	if (self.nodeFrom == nodeTo) :
-		self.fact = self.getFact() 
-	else :
-		self.connectToCoord(self.nodeFrom.width - 10)
-	self.nodeTo = nodeTo # store a reference to the node this is connected to
-	self.nodeFrom.attachCon(self, self.FROM) # tell the sheets that they are connected.
-	self.nodeTo.attachCon(self, self.TO)
-	self.posTo = None
-	self.gradient = self.calcGradient()
+    def connect(self, to_node, con) : # pass the node this connection is to
+        self.connection = con # store the topo connection this object represents
+        if (self.name == "") :
+            self.name = con.name
+        self.draw_index = self.from_node.get_connection_count(to_node)
+        if (self.from_node == to_node) :
+            self.factor = self.get_factor() 
+        else :
+            self.connect_to_coord((self.from_node.width / 2) - 10)
+        self.to_node = to_node # store a reference to the node this is connected to
+        self.from_node.attach_connection(self, self.FROM) # tell the sheets that they are connected.
+        self.to_node.attach_connection(self, self.TO)
+        self.to_position = None
+        self.gradient = self.calculate_gradient()
 
     ############ Util methods ##############################
-    def showProperties(self) :
-	EditorObject.showProperties(self)
-	self.paramFrame.create_widgets(self.connection)
+    def show_properties(self) :
+        EditorObject.show_properties(self)
+        con = self.connection
+        self.parameter_frame.create_widgets(self.connection)
 
-    def connectToCoord(self, width) :
-	n = self.drawIndex
-	sign = math.pow(-1, n)
-	self.dev = sign * width + (-sign) * math.pow(0.5, math.ceil(0.5 * (n))) * width
+    def connect_to_coord(self, width) :
+        n = self.draw_index
+        sign = math.pow(-1, n)
+        self.deviation = sign * width + (-sign) * math.pow(0.5, math.ceil(0.5 * (n))) * width
 
 
 class EditorProjection(EditorConnection) :
@@ -395,175 +419,176 @@ class EditorProjection(EditorConnection) :
     area around the arrow head. The same can be determined for a lateral projection 
     ellipse
     """	
-    def __init__(self, name, canvas, nodeFrom) :
-	EditorConnection.__init__(self, name, canvas, nodeFrom)
-	# if more than one connection between nodes, 
-	# this will reflect how to draw this connection
-	self.drawIndex = 0
-	self.dev = 0
-	self.radius = 10
-	self.gradient = (1,1)
-	self.id = (None,None)
-	self.label = None
-	self.balloon = Pmw.Balloon(canvas)
-	self.fact = self.getFact() 
+    def __init__(self, name, canvas, from_node, receptive_field = True) :
+        EditorConnection.__init__(self, name, canvas, from_node)
+        # if more than one connection between nodes, 
+        # this will reflect how to draw this connection
+        self.draw_index = 0
+        self.deviation = 0
+        self.radius = 10
+        self.gradient = (1,1)
+        self.id = (None,None)
+        self.label = None
+        self.balloon = Pmw.Balloon(canvas)
+        self.factor = self.get_factor()
+        self.receptive_field = receptive_field
 
     ############ Draw methods ############################
-    def draw(self, receptiveFields = True) :
-	# determine if connected to a second node, and find the correct posFrom
-	for id in self.id : # remove the old connection
-		self.canvas.delete(id)
-	self.canvas.delete(self.label)
-	posFrom = self.nodeFrom.getPos() # get the centre points of the two nodes
-	if (self.nodeTo == None) :  # if not connected yet, use temporary point.
-		posTo = self.posTo
-	else :
-		posTo = self.nodeTo.getPos()
+    def draw(self) :
+        # determine if connected to a second node, and find the correct from_position
+        for id in self.id : # remove the old connection
+            self.canvas.delete(id)
+        self.canvas.delete(self.label)
+        from_position = self.from_node.get_pos() # get the centre points of the two nodes
+        if (self.to_node == None) :  # if not connected yet, use temporary point.
+            to_position = self.to_position
+        else :
+            to_position = self.to_node.get_pos()
+        # set the colour to be used depending on whether connection has the focus.
+        if (self.focus) : 
+            text_col = col = 'dark red'
+            lateral_colour = self.from_node.colours[0]
+        else :
+            text_col = 'black'
+            col = 'purple'#'dark green'
+            lateral_colour = '' #self.from_node.currentCol
+        # midpoint of line
+        middle = self.get_middle(from_position, to_position)
+        if (to_position == from_position) : # connection to and from the same node
+            """
+            AL - OLD: Shows lateral connections as loops (here to see if still useful)
+            # change the size of circle depending how many lateral connections there are.
+            deviation = self.draw_index * 15 
+            x1 = to_position[0] - (20 + deviation)
+            y2 = to_position[1]
+            x2 = x1 + 40 + (2 * deviation)
+            y1 = y2 - (30 + deviation) 
+            midX = self.get_middle((x1,0),(x2,0))[0]
+            # create oval and an arrow head.
+            self.id = (self.canvas.create_oval(x1, y1, x2, y2, outline = col), 
+            self.canvas.create_line(midX, y1, midX+1, y1, arrow = FIRST, fill = col))
+            # draw name label beside arrow head
+            self.label = self.canvas.create_text(middle[0] - 
+            (20 + len(self.name)*3), middle[1] - (30 + deviation) , text = self.name)
+            """
+            a, b = self.factor
+            x1 = to_position[0] - a
+            y1 = to_position[1] + b
+            x2 = to_position[0] + a
+            y2 = to_position[1] - b
+            self.id = (self.canvas.create_oval(x1, y1, x2, y2, fill = lateral_colour, 
+                dash = (2,2), outline = 'yellow', width = 2), None)
+            self.balloon.tagbind(self.canvas, self.id[0], self.name)
 
-	# set the colour to be used depending on whether connection has the focus.
-	if (self.focus) : 
-		col = 'slate blue'
-		latCol = self.nodeFrom.colours[0]
-	else : 
-		col = 'black'
-		latCol = self.nodeFrom.currentCol
-	# midpoint of line
-	mid = self.getMid(posFrom, posTo)
-	if (posTo == posFrom) : # connection to and from the same node
-		"""
-		AL - OLD: Shows lateral connections as loops (here to see if still useful)
-		# change the size of circle depending how many lateral connections there are.
-		dev = self.drawIndex * 15 
-	    	x1 = posTo[0] - (20 + dev)
-	    	y2 = posTo[1]
-	    	x2 = x1 + 40 + (2 * dev)
-	    	y1 = y2 - (30 + dev) 
-	    	midX = self.getMid((x1,0),(x2,0))[0]
-		# create oval and an arrow head.
-		self.id = (self.canvas.create_oval(x1, y1, x2, y2, outline = col), 
-	        self.canvas.create_line(midX, y1, midX+1, y1, arrow = FIRST, fill = col))
-		# draw name label beside arrow head
-		self.label = self.canvas.create_text(mid[0] - 
-			     (20 + len(self.name)*3), mid[1] - (30 + dev) , text = self.name)
-		"""
-		fact = self.fact
-		x1 = posTo[0] - (2 * fact)
-		y1 = posTo[1] + fact
-		x2 = posTo[0] + (2 * fact)
-		y2 = posTo[1] - fact
-		self.id = (self.canvas.create_oval(x1, y1, x2, y2, fill = latCol, 
-						dash = (2,2), outline = 'black'), None)
-		self.balloon.tagbind(self.canvas, self.id[0], self.name)
-
-	else :  # connection between distinct nodes
-		if (receptiveFields) : # if receptive fields are to be drawn
-			x1, y1 = posTo
-			x2, y2 = posFrom
-			#x1 += self.dev
-			x2 += self.dev
-			rad = self.radius
-			self.id = (self.canvas.create_line(x1,y1,x2-rad,y2, fill = col),
-				   self.canvas.create_line(x1,y1,x2+rad,y2, fill = col),
-				   self.canvas.create_oval(x2-rad,y2-(0.5*rad),x2+rad,y2+(0.5*rad)))
-		else :
-			# create a line between the nodes - use 2 to make arrow in centre.
-	    		self.id = (self.canvas.create_line(posFrom, mid , arrow = LAST, fill = col),
-	    			  self.canvas.create_line(mid, posTo, fill = col))
-		# draw name label
-		dX = 20
-		dY = self.drawIndex * 20
-		self.label = self.canvas.create_text(mid[0] - dX,
-			     mid[1] - dY, fill = col, text = self.name, anchor = E)
+        else :  # connection between distinct nodes
+            if (self.receptive_field) : # if receptive fields are to be drawn
+                x1, y1 = to_position
+                x2, y2 = from_position
+                x2 += self.deviation
+                radius = self.radius
+                self.id = (self.canvas.create_line(x1, y1, x2 - radius, y2, fill = col),
+                    self.canvas.create_line(x1, y1, x2 + radius, y2, fill = col),
+                    self.canvas.create_oval(x2 - radius, y2 - (0.5 * radius), 
+                    x2 + radius, y2 + (0.5 * radius), outline = col))
+            else :
+                # create a line between the nodes - use 2 to make arrow in centre.
+                self.id = (self.canvas.create_line(from_position, middle , arrow = LAST, fill = col),
+                    self.canvas.create_line(middle, to_position, fill = col))
+            # draw name label
+            dX = 20
+            dY = self.draw_index * 20
+            self.label = self.canvas.create_text(middle[0] - dX,
+                middle[1] - dY, fill = text_col, text = self.name, anchor = E)
 	
 	
     ############ Update methods ############################ 
     def remove(self) :
-	if (self.nodeTo != None) : # if a connection had been made then remove it from the 'to' node
-		self.nodeTo.removeCon(self, self.TO)
-		self.nodeFrom.removeCon(self, self.FROM) # and remove from 'from' node
-	for id in self.id : # remove the representation from the canvas
-		self.canvas.delete(id)
-	self.canvas.delete(self.label)
+        if (self.to_node != None) : # if a connection had been made then remove it from the 'to' node
+            self.to_node.remove_connection(self, self.TO)
+            self.from_node.remove_connection(self, self.FROM) # and remove from 'from' node
+        for id in self.id : # remove the representation from the canvas
+            self.canvas.delete(id)
+        self.canvas.delete(self.label)
 
 
     ############ Util methods ##############################
-    def getMid(self, pos1, pos2) : # returns the middle of two points
-	return (pos1[0] + (pos2[0] - pos1[0])*0.5, pos1[1] + (pos2[1] - pos1[1])*0.5)
+    def get_middle(self, pos1, pos2) : # returns the middle of two points
+        return (pos1[0] + (pos2[0] - pos1[0])*0.5, pos1[1] + (pos2[1] - pos1[1])*0.5)
 
-    # returns the size of the semiminor axis of the ellipse representing the drawIndex-th
-    # lateral projection. The ovals decrease in size as their drawIndex increases. The
-    # semimajor axis is calculated as 2 * semiminor axis.
-    def getFact(self) :
-	#n = 0.7 * self.drawIndex
-	#return (15 / (1 + n))
-	a = 8; n = (self.nodeFrom.width / 2) - 10; b = (n - a)
-	return a + (b * (1 - pow(0.8, self.drawIndex)))
-
+    # returns the size of the semimajor and semiminor axis of the ellipse representing 
+    # the draw_index-th lateral projection.
+    def get_factor(self) :
+        w = self.from_node.width; h = self.from_node.height
+        a = 20; n = (w / 2) - 10; b = (n - a)
+        major = a + (b * (1 - pow(0.8, self.draw_index)))
+        a = 20 * (h / w); n = (h / 2) - 10; b = (n - a)
+        minor = a + (b * (1 - pow(0.8, self.draw_index)))
+        return major, minor
     # returns the gradients of the two lines making the opening 'v' part of the receptive field. 
-    # this depends on the drawIndex, as it determines where the projection's representation begins.
-    def calcGradient(self) :
-	posTo = (self.nodeTo.x, self.nodeTo.y)
-	posFrom = (self.nodeFrom.x, self.nodeFrom.y)
-	A = (posTo[0] #+ self.dev 
-	,posTo[1])
-	T = (posFrom[0] + self.dev ,posFrom[1])
-	B = (T[0] - self.radius, T[1])
-	C = (T[0] + self.radius, T[1])
-	try :
-		MBA = (A[1] - B[1]) / (A[0] - B[0])
-		MCA = (A[1] - C[1]) / (A[0] - C[0])
-	except ZeroDivisionError :
-		return 99999 # AL - this should be a big number
-	return (MBA, MCA)
+    # this depends on the draw_index, as it determines where the projection's representation begins.
+    def calculate_gradient(self) :
+        to_position = (self.to_node.x, self.to_node.y)
+        from_position = (self.from_node.x, self.from_node.y)
+        A = (to_position[0], to_position[1])
+        T = (from_position[0] + self.deviation ,from_position[1])
+        B = (T[0] - self.radius, T[1])
+        C = (T[0] + self.radius, T[1])
+        den_BA = (A[0] - B[0])
+        if not(den_BA == 0) :
+            m_BA = (A[1] - B[1]) / den_BA
+        else : 
+            m_BA = 99999 # AL - this should be a big number
+        den_CA = (A[0] - C[0])
+        if not(den_CA == 0) :
+            m_CA = (A[1] - C[1]) / den_CA
+        else : 
+            m_CA = 99999 # AL - this should be a big number
+        return (m_BA, m_CA)
 
-    def inBounds(self, x, y, receptiveFields = True) : # returns true if point lies in a bounding box
+    def in_bounds(self, x, y) : # returns true if point lies in a bounding box
 
-	if (receptiveFields) :
-		# returns true if x, y lie inside the oval representing this lateral projection
-		if (self.nodeTo == None or self.nodeTo == self.nodeFrom) :
-			fact = self.getFact()
-			x, y = x - self.nodeTo.getPos()[0], y - self.nodeTo.getPos()[1]
-			a = 2 * fact; b = fact
-			if (x > a or x < -a) :
-				return False
-			import math
-			pY = math.sqrt(pow(b,2) * (1 - (pow(x,2)/pow(a,2))))
-			if (y > pY or y < -pY) :
-				return False
-			return True
-		# returns true if x, y lie inside the triangular receptive field representing this projection
-		# get the points of the triangular receptive field, centered around the x, y point given
-		posTo = (self.nodeTo.x, self.nodeTo.y)
-		posFrom = (self.nodeFrom.x, self.nodeFrom.y)
-		A = (posTo[0] #+ self.dev 
-			- x, posTo[1] - y)
-		T = (posFrom[0] + self.dev - x, posFrom[1] - y)
-		B = (T[0] - self.radius, T[1])
-		C = (T[0] + self.radius, T[1])
-		# if the y coords lie outwith the boundaries, return false
-		if (((A[1] < B[1]) and (B[1] < 0 or A[1] > 0)) or 
-		    ((A[1] >= B[1]) and (B[1] > 0 or A[1] < 0))) :
-			return False
-		# calculate the constant for the lines of the triangle
-		aBA = A[1] - (self.gradient[0] * A[0])
-		aCA = A[1] - (self.gradient[1] * A[0])
-		# The points are centered around the given coord, finding the intersects with line y = 0
-		# and ensuring that the left line lies on the negative side of the point and the right line
-		# lies on the positive side of the point determines that the point is within the triangle.
-		if (((0 - aCA) / self.gradient[1] >= 0) and ((0 - aBA) / self.gradient[0] <= 0)) :
-			return True
-		return False	
+        if (self.receptive_field) :
+            # returns true if x, y lie inside the oval representing this lateral projection
+            if (self.to_node == None or self.to_node == self.from_node) :
+                a, b = self.factor
+                x, y = x - self.to_node.get_pos()[0], y - self.to_node.get_pos()[1]
+                if (x > a or x < -a) :
+                    return False
+                pY = math.sqrt(pow(b,2) * (1 - (pow(x,2)/pow(a,2))))
+                if (y > pY or y < -pY) :
+                    return False
+                return True
+            # returns true if x, y lie inside the triangular receptive field representing this projection
+            # get the points of the triangular receptive field, centered around the x, y point given
+            to_position = (self.to_node.x, self.to_node.y)
+            from_position = (self.from_node.x, self.from_node.y)
+            A = (to_position[0] - x, to_position[1] - y)
+            T = (from_position[0] + self.deviation - x, from_position[1] - y)
+            B = (T[0] - self.radius, T[1])
+            C = (T[0] + self.radius, T[1])
+            # if the y coords lie outwith the boundaries, return false
+            if (((A[1] < B[1]) and (B[1] < 0 or A[1] > 0)) or 
+                ((A[1] >= B[1]) and (B[1] > 0 or A[1] < 0))) :
+                return False
+            # calculate the constant for the lines of the triangle
+            a_BA = A[1] - (self.gradient[0] * A[0])
+            a_CA = A[1] - (self.gradient[1] * A[0])
+            # The points are centered around the given coord, finding the intersects with line y = 0
+            # and ensuring that the left line lies on the negative side of the point and the right line
+            # lies on the positive side of the point determines that the point is within the triangle.
+            if (((0 - a_CA) / self.gradient[1] >= 0) and ((0 - a_BA) / self.gradient[0] <= 0)) :
+                return True
+            return False	
 
-	# If connections are represented as lines
-	# currently uses an extent around the arrow head.
-	posTo = self.nodeTo.getPos()
-	posFrom = self.nodeFrom.getPos()
-	if (self.nodeTo == self.nodeFrom) :
-		dev = self.drawIndex * 15
-		mid = (posTo[0], posTo[1] - (30 + dev))
-	else :
-		mid = self.getMid(posFrom, posTo)
-
-	if ((x < mid[0] + 10) & (x > mid[0] - 10) & (y < mid[1] + 10) & (y > mid[1] - 10)) :
-		return True
-	return False
+        # If connections are represented as lines
+        # currently uses an extent around the arrow head.
+        to_position = self.to_node.get_pos()
+        from_position = self.from_node.get_pos()
+        if (self.to_node == self.from_node) :
+            deviation = self.draw_index * 15
+            middle = (to_position[0], to_position[1] - (30 + deviation))
+        else :
+            middle = self.get_middle(from_position, to_position)
+        if ((x < middle[0] + 10) & (x > middle[0] - 10) & (y < middle[1] + 10) & (y > middle[1] - 10)) :
+            return True
+        return False
