@@ -357,8 +357,8 @@ class Sheet(EventProcessor):
     code.
     """
 
-    bounds  = Constant(default=BoundingBox(points=((-0.5,-0.5),(0.5,0.5))))
-    density = Constant(default=10)
+    bounds  = Constant(BoundingBox(points=((-0.5,-0.5),(0.5,0.5))))
+    density = Constant(10)
     # JABALERT: Should be set per-projection, not per-Sheet, right?
     learning = BooleanParameter(True)
     precedence = Number(default = 0.1, softbounds=(0.0,1.0),
