@@ -227,7 +227,7 @@ class EditorSheet(EditorNode) :
             m = self.sheet.sheet_view_dict['Activity'].view()[0]
             m = self.normalize(m)
             matrix_width, matrix_height = self.element_count
-            dX, dY = int((w * 2)/ matrix_width), int((h * 2) / matrix_height)
+            dX, dY = (w * 2)/ matrix_width, (h * 2) / matrix_height
             for i in range(matrix_height) :
                 for j in range(matrix_width) :
                     a = i * dY
