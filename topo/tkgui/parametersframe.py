@@ -6,9 +6,9 @@ $Id$
 __version__='$Revision$'
 
 from propertiesframe import PropertiesFrame
-from Tkinter import Frame, Button, RIGHT, TOP, BOTTOM, END, YES, N,S,E,W,X, Menu, Toplevel, Label
+from Tkinter import Frame, Button, RIGHT, TOP, BOTH, BOTTOM, END, YES, N,S,E,W,X, Menu, Toplevel, Label
 import topo.base.utils
-from topo.base.utils import keys_sorted_by_value, dict_translator
+from topo.base.utils import keys_sorted_by_value, dict_translator, string_int_translator, string_bb_translator
 import topo
 import topo.base.parameter
 import Pmw
@@ -40,7 +40,7 @@ class ParametersFrame(Frame):
         """
         Frame.__init__(self,parent,config)
         self.__properties_frame = PropertiesFrame(parent)
-        self.__properties_frame.pack(side=TOP,expand=YES,fill=X)
+        self.__properties_frame.pack(side=TOP,expand=YES,fill=BOTH)
 
         # CEBHACKALERT: these buttons should be stacked on the window or
         # something, but I don't know how to do that.
@@ -63,12 +63,17 @@ class ParametersFrame(Frame):
         self.option_add("*Menu.tearOff", "0") 
         self.menu = Menu(self)
         self.menu.insert_command(END, label = 'Properties', command = lambda: 
-            self.showParamProperties(self.show_my_parameters))
+            self.show_parameter_properties(self.parameters_properties))
 
         self.__help_balloon = Pmw.Balloon(parent)
         
         self.__widgets = {} # should it be none?
         self.__visible_parameters = {}
+
+        # The dictionary of class_type: property_to_add pairs.
+        self.__class_property = {
+            int:                                  self.__add_int_property,
+            topo.base.boundingregion.BoundingBox: self.__add_bounding_box_property}
 
         # The dictionary of parameter_type:property_to_add pairs.
         self.__parameter_property = {
@@ -104,6 +109,12 @@ class ParametersFrame(Frame):
 ##         """
 ##         pass
 
+    def set_class_parameters(self) :
+        assert self.topo_class != None, ("ParameterFrame must be associated with a Class, " + 
+            "to set its parameters")
+        for (name) in self.__visible_parameters :
+            w = self.__widgets[name][1]
+            setattr(self.topo_class, name, w.get_value())
 
     # CEBHACKALERT: rename to set_object_parameters, probably.
     def set_obj_params(self):
@@ -121,8 +132,57 @@ class ParametersFrame(Frame):
             w = self.__widgets[name][1]  # [0] is label (Message), [1] is widget
             setattr(self.topo_obj,name,w.get_value())
 
-    def create_widgets(self, topo_obj, translator_dictionary = {}):
+    def create_class_widgets(self, topo_class = None, translator_dictionary = {}, topo_object = None) :
         """
+        Allows the Constant parameters of a class to be changed.
+
+        ALALERT First attempt solution that will probably need strong revision. 
+        """
+        self.translator_dictionary = translator_dictionary
+
+        # wipe old labels and widgets from screen
+        for (label,widget) in self.__widgets.values():
+            label.grid_forget()
+            widget.grid_forget()
+
+        if not(topo_object == None) :
+            self.topo_obj = topo_object
+            self.topo_class = topo_object.__class__
+
+        elif not(topo_class == None) :
+            self.topo_obj = topo_class()
+            self.topo_class = topo_class
+
+        else : # No object or class to create widgets of.
+            return
+
+        # find constant fields from topo_obj, for topo_class
+        self.__visible_parameters = list(parameter_name
+                                    for (parameter_name,parameter)
+                                    in self.topo_obj.get_paramobj_dict().items()
+                                    if parameter.__class__ == topo.base.parameter.Constant
+                                    and not(parameter.hidden))    
+ 
+        # create the widgets
+        self.__widgets = {}
+        row = 0
+        for parameter_name in self.__visible_parameters :
+            self.__add_property_for_class(parameter_name)
+            (label,widget) = self.__widgets[parameter_name]
+            label.grid(row=row,
+                       column=0,
+                       padx=self.__properties_frame.padding,
+                       pady=self.__properties_frame.padding,
+                       sticky=E)
+            widget.grid(row=row,
+                        column=1,
+                        padx=self.__properties_frame.padding,
+                        pady=self.__properties_frame.padding,
+                        sticky=N+S+W+E)
+            row += 1
+
+    def create_widgets(self, topo_obj, translator_dictionary = {}):
+        """topo.base.parameter.Constant:
         Create widgets for all non-hidden Parameters of topo_obj and add them
         to the screen.
 
@@ -207,17 +267,16 @@ class ParametersFrame(Frame):
 
     # CEBHACKALERT: don't need to pass parameter. See HACKALERT below
     # about DynamicNumber
-    def __add_text_property(self,parameter_name,parameter):
+    def __add_text_property(self,parameter_name,parameter, translator = None):
         """
         Add a text property to the properties_frame.
         """
         attr = getattr(self.topo_obj,parameter_name)
         str_attr = str(attr)
-        if attr == str_attr :
-            translator = None
+        if not(translator == None) or (attr == str_attr) :
             value = attr
         else :
-            translator = lambda in_string: dict_translator(in_string, trdict = {str_attr:attr})
+            translator = lambda in_string: dict_translator(in_string, translator_dictionary = {str_attr:attr})
             value = str_attr
         self.__widgets[parameter_name] = self.__properties_frame.add_text_property(
             parameter_name,
@@ -289,72 +348,78 @@ class ParametersFrame(Frame):
         # get the current value of this field
         attr = getattr(self.topo_obj, parameter_name)
         translator_dictionary = {}
+        self.object_dictionary[parameter_name] = {}
         value = ''
         # for each of the classes that this selector can select between loop through
         # and find if there is a suitable object already instantiated in either the
         # current value or in the dictionary passed in.
         for key in parameter.range().keys() :
-            paramEntry = parameter.range()[key]
-            if paramEntry == attr.__class__ :
-                # if the class is the same as the class of the current value, use the
-                # this as the cover for this class; note that this is the current selection
+            parameter_entry = parameter.range()[key]
+            if parameter_entry == attr.__class__ :
                 translator_dictionary[key] = attr
+                self.object_dictionary[parameter_name][key] = attr
                 value = key
             else :
-                try :
-                    # loop through the passed in list for this field and if an entry is of the
-                    # correct class, use it as a cover for the class
-                    for entry in self.translator_dictionary[parameter_name] :
-                        try :
-                            if (self.translator_dictionary[entry].__class__ == paramEntry) :
-                                translator_dictionary[key] = self.translator_dictionary[entry]
-                        except Exception: pass # if entry does not have a class field
+                # look for an entry in the passed in dict
+                if self.translator_dictionary.has_key(parameter_name) :
+                    if self.translator_dictionary[parameter_name].has_key(key) :
+                        translator_dictionary[key] = self.translator_dictionary[parameter_name][key]
+                        self.object_dictionary[parameter_name][key] = translator_dictionary[key]
                     else :
-                        # if no suitable objects, make a new object of the class
-                        try : # ALALERT This means if an object of this class cannot be instantiated here
-                              # it can't be selected in this selector
-                            translator_dictionary[key] = parameter.range()[key]()
-                        except Exception : pass
-                except KeyError : # if there is no list entry for this field
-                        try :# ALALERT This needs to be dealt with properly; as above
-                            translator_dictionary[key] = parameter.range()[key]()
-                        except Exception : pass
+                        # if no suitable objects, use class
+                        translator_dictionary[key] = parameter.range()[key]
+                else :
+                    translator_dictionary[key] = parameter.range()[key]
+
         # if the current value lies outwith the recognised classes, then add the class to the list, with
         # the current value as the object.
         if (value == '') :
             translator_dictionary[attr.name] = attr
+            self.object_dictionary[parameter_name][attr.name] = attr
             value = attr.name
+        self.translator_dictionary[parameter_name] = translator_dictionary
         # maps the class key to the object found above. 
-        translator = lambda in_string: dict_translator(in_string, trdict = translator_dictionary)
+        translator = lambda in_string: dict_translator(in_string, parameter_name, 
+            translator_dictionary = self.translator_dictionary)
         self.__widgets[parameter_name] = self.__properties_frame.add_combobox_property(
                     parameter_name,
                     value = value,
                     scrolledlist_items = translator_dictionary.keys(),
                     translator = translator)
         w = self.__widgets[parameter_name][1]
-        # this could be retained and passed back, to retain the values of all object
-        self.translator_dictionary[parameter_name] = translator_dictionary.values()
         # bind right click to allow the selected classes properties to be changed.
         w._entryWidget.bind('<Button-3>', 
-            lambda event, w = w: self.rightClick(event, w))
+            lambda event: self.right_click(event, w, parameter_name))
 
-    def rightClick(self, event, widget) :
-        self.show_my_parameters = widget.get_value()
+    def right_click(self, event, widget, name) :
+        self.parameters_properties = widget, name
         self.menu.tk_popup(event.x_root, event.y_root)
 
-    def showParamProperties(self, obj) :
-        paramWindow = Toplevel()
-        Label(paramWindow, text = obj.name).pack(side = TOP)
-        paramFrame = ParametersFrame(paramWindow)
-        paramFrame.create_widgets(obj)
-        buttonPanel = Frame(paramWindow)
-        buttonPanel.pack(side = BOTTOM)
-        Button(buttonPanel, text = 'Apply', 
-            command = paramFrame.set_obj_params).pack(side = RIGHT)
-        Button(buttonPanel, text = 'Ok', command = lambda frame=paramFrame, win=paramWindow: 
-            self.paramPropertiesOk(frame, win)).pack(side = RIGHT)
+    def show_parameter_properties(self, param) :
+        w, name = param
+        obj = w.get_value()
+        # It is possible that the selected field is a Class. Check and if it is, 
+        # instantiate a new object of the class and enter it in the dictionary.
+        from topo.base.topoobject import TopoObject
+        if not isinstance(obj, TopoObject) :
+            try :
+                obj = obj()
+                obj_key = w.get()
+                self.translator_dictionary[name][obj_key] = obj
+                self.object_dictionary[name][obj_key] = obj
+            except : return
+        parameter_window = Toplevel()
+        Label(parameter_window, text = obj.name).pack(side = TOP)
+        parameter_frame = ParametersFrame(parameter_window)
+        parameter_frame.create_widgets(obj)
+        button_panel = Frame(parameter_window)
+        button_panel.pack(side = BOTTOM)
+        Button(button_panel, text = 'Ok', command = lambda frame=parameter_frame, win=parameter_window: 
+            self.parameter_properties_ok(frame, win)).pack(side = RIGHT)
+        Button(button_panel, text = 'Apply', 
+            command = parameter_frame.set_obj_params).pack(side = RIGHT)
 
-    def paramPropertiesOk(self,frame, win) :
+    def parameter_properties_ok(self,frame, win) :
         frame.set_obj_params()
         win.destroy()
 
@@ -367,15 +432,25 @@ class ParametersFrame(Frame):
                     parameter_name,
                     value = getattr(self.topo_obj,parameter_name))
 
+    def __add_bounding_box_property(self,parameter_name,parameter) :
+        attr = getattr(self.topo_obj,parameter_name)
+        points = attr.aarect().lbrt()
+        translator = lambda in_string: string_bb_translator(in_string, default = points)
+        self.__widgets[parameter_name] = self.__properties_frame.add_text_property(
+            parameter_name,
+            translator = translator,
+            value = points)
+        
+    def __add_int_property(self, parameter_name, parameter) :
+        attr = getattr(self.topo_obj, parameter_name)
+        translator = lambda num: string_int_translator(num, default = attr)
+        self.__add_text_property(parameter_name,parameter, translator = translator)
 
-
-
-
-
-
-
-
-
-
-
+    def __add_property_for_class(self, parameter_name) :
+        attr = getattr(self.topo_obj,parameter_name)
+        attr_class = attr.__class__
+        if self.__class_property.has_key(attr_class) :
+            self.__class_property[attr.__class__](parameter_name, None)
+        else :
+            self.__add_text_property(parameter_name,None)
 
