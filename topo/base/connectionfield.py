@@ -572,6 +572,7 @@ class CFSheet(ProjectionSheet):
     """
 
     measure_maps = BooleanParameter(True)
+    precedence = Number(0.5)
 
     def learn(self):
         for proj in chain(*self.in_projections.values()):
