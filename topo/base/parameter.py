@@ -617,40 +617,24 @@ class Constant(Parameter):
 
     The default value of the Parameter can, however, be set on a class.
     """
-    __slots__ = ['value']
+    __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default,**params):
         """
         This Constant gets a deepcopy of the value passed in when it is declared.
         """
-        self.value=copy.deepcopy(default)
-        Parameter.__init__(self,default=default,**params)
-             
+        Parameter.__init__(self,default=copy.deepcopy(default),**params)
+
     def __set__(self,obj,val):
         """
-        Does not allow set commands for an object, unless that object is
-        not yet initialized.
-
-        If called on e.g. a class or an uninitialized object, sets this Constant's value;
-        otherwise, raises an error.
+        Does not allow set commands except on the classobj or
+        on an uninitialized TopoObject.
         """
         if obj==None or obj.initialized==False:
-            self.value=val
+            super(Constant,self).__set__(obj,val)
         else:
-            raise TypeError("Constant parameter cannot be modified.")
-
-    def __get__(self,obj,objtype):
-        """
-        Return this Constant's value if called on an object; otherwise, return the
-        class' value.
-        """
-        if obj:
-            return self.value
-        else:
-            return self.default
-
-
+            raise TypeError("Constant parameter cannot be modified")
 
 def produce_value(value_obj):
     """
