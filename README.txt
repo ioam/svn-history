@@ -2,8 +2,10 @@ This version of the Topographica cortical map simulator is still under
 active development.  An updated version may be available from
 topographica.org.
 
-Copyright 2005 James A. Bednar, Yoonsuck Choe, Judah B.
-De Paula, Jefferson Provost, and Joseph Reisinger.
+The Topographica software code and documentation are copyright
+2005-2006 James A. Bednar, Christopher Ball, Christopher Palmer,
+Yoonsuck Choe, Julien Ciroux, Judah B. De Paula, Judith Law, Alan
+Lindsay, Louise Mathews, Jefferson Provost, and Yiu Fai Sit.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License version 2 as
@@ -13,9 +15,8 @@ even the implied warranty of merchantability or fitness for a
 particular purpose.  See the GNU General Public License for more
 details, in the file COPYING.txt.
 
-Before you start, make sure that you have a copy of Topographica in
-your home directory or some other directory in which you can write
-files, and that you have at least 500MB available.
+Before you start, make sure that you have a copy of Topographica in a
+directory where you have at least 500MB of disk space available.
 
 
 BUILDING DOCUMENTATION
@@ -28,7 +29,8 @@ topographica directory and type "make doc", then load doc/index.html
 into your web browser.  If there are any problems generating the local
 copy, you can instead use the web-based documentation at
 www.topographica.org.  (The doc/ directory is just a copy of the
-www.topographica.org site.)
+www.topographica.org site, although the web site will not necessarily
+match this particular copy of Topographica.)
 
 
 BUILDING TOPOGRAPHICA
@@ -40,40 +42,12 @@ source.  This approach makes the initial compilation time longer and
 the simulator directory larger, but it minimizes the changes necessary
 for specific platforms and operating system versions.
 
-Linux: 
-
-To build Topographica under Linux, just type "make" from within the
-topographica/ directory.  The build process will take a while to
-complete (e.g. about 5-10 minutes on a 1.5GHz Pentium IV
-machine).  If all goes well, a script named "topographica" will be
-created in the topographica/ directory; you can use this to start
-Topographica as described below.  If you run into problems, you can
-try "make -k", which skips any packages that have errors; many of 
-these are not required for normal usage, and can safely be omitted.
-
-UNIX:
-
-Topographica is developed under Linux, but should work on other
-versions of UNIX as well, as long as they have standard GNU tools like
-make and GCC installed.  Just follow the Linux instructions, replacing
-"make" with "gmake" if that's the name of GNU make on your system.
-
-Windows:
-
-See doc/Downloads/win32.html (or the source file
-doc/Downloads/win32_text.php).
-
-Mac:
-
-Topographica builds only under Mac OS X or later.  Topographica
-developers have only limited access to OS X machines, and so at any
-time there are likely to be some issues with the OS X version,
-although we do try to minimize them.  
-
-If you have an X server installed, you can just build Topographica as
-described for Linux.  It is also possible to build Topographica using
-a native (Aqua) version of Python, which looks a bit nicer, but we
-have not yet documented how to do that.
+For specific instructions on building Topographica on each platform,
+see doc/Downloads/index.html.  There may also be additional
+platform-specific information in doc/Downloads/<platform>.html.  If
+you haven't compiled the documentation, for each file.html you can
+simply read the corresponding source file file_text.php in a text
+editor.
 
 
 USING TOPOGRAPHICA
