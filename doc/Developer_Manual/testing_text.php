@@ -19,10 +19,9 @@ about.
 input or user examination of the output are also encouraged, but all
 these must be kept separate from the main automated regression tests.
 
-<P>Note that one cannot assume that any existing file has a
-corresponding test file already, because of an oversight when the file
-was created.  Moreover, existing test files should <i>not</i> be
-assumed to be exhaustive or even particularly useful; they vary a lot
-in how comprehensive they are.  So please always check the test file
-when coding, especially when debugging, because it probably needs work
-too.
+<P>Note that, due to previous oversights, one cannot assume that any
+existing file has a corresponding test file already.  Moreover,
+existing test files should <i>not</i> be assumed to be exhaustive or
+even particularly useful; they vary a lot in how comprehensive they
+are.  So please always check the test file when coding, especially
+when debugging, because it probably needs work too.
