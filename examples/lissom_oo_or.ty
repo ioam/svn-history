@@ -61,12 +61,13 @@ CFProjection.learning_fn=DivisiveHebbian()
 # build simulation
 
 s = topo.base.simulator.Simulator()
-Retina = GeneratorSheet(name='Retina',density=24.0,bounds=radial_bounds(0.7917),
+
+Retina = GeneratorSheet(name='Retina',density=24.0,bounds=radial_bounds(1.025),
                         input_generator=input_pattern)
-LGNOn = CFSheet(name='LGNOn',density=24.0,bounds=radial_bounds(0.7917),
+LGNOn = CFSheet(name='LGNOn',density=24.0,bounds=radial_bounds(0.750),   
                 output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                 measure_maps=False)
-LGNOff = CFSheet(name='LGNOff',density=24.0,bounds=radial_bounds(0.7917),
+LGNOff = CFSheet(name='LGNOff',density=24.0,bounds=radial_bounds(0.750),       
                  output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                  measure_maps=False)
 V1 = LISSOM(name='V1',density=48.0)
