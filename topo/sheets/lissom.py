@@ -20,9 +20,6 @@ from topo.outputfns.basic import PiecewiseLinear
 
 class LISSOM(CFSheet):
 
-    # Should be changed to a OutputFunctionParameter
-    output_fn = OutputFunctionParameter(default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
-    
     # modify weights after each activation?
     continuous_learning = BooleanParameter(default=False)
 
@@ -31,6 +28,11 @@ class LISSOM(CFSheet):
 
     precedence = Number(0.6)
     tsettle=8
+
+    def __init__(self,**params):
+        self.output_fn=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65)
+        super(LISSOM,self).__init__(**params)
+
 
     def input_event(self,src,src_port,dest_port,data):
         # On a new afferent input, clear the activity
