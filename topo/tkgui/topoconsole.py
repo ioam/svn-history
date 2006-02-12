@@ -527,7 +527,7 @@ class TopoConsole(Frame):
             remain = fmod(fcount, step)
             for i in xrange(iters):
                 s.run(step)
-                percent = 100.0*i/fcount
+                percent = 100.0*i/iters
                 message = 'Time ' + str(s.time()) + ': ' + str(int(percent)) + '% of '  + str(fcount) + ' completed.'
                 self.messageBar.message('state', message)
                 self.update_idletasks()
