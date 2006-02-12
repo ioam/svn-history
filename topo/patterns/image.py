@@ -12,7 +12,6 @@ from topo.base.topoobject import TopoObject
 from topo.base.sheet import bounds2slice
 from topo.outputfns.basic import DivisiveMaxNormalize
 from topo.base.patterngenerator import PatternGenerator
-from topo.patterns.basic import AR_PREC, SI_PREC
 from topo.base.parameter import Filename, Number, Parameter, Enumeration
 from topo.outputfns import OutputFunctionParameter
 from Numeric import array, transpose, ones, floor, Float, divide, where
@@ -226,8 +225,8 @@ class TopoImage(TopoObject):
 class Image(PatternGenerator):
     """2D image generator."""
 
-    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=AR_PREC)
-    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=SI_PREC)
+    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.31)
+    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.30)
     filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9)
 
     size_normalization = Enumeration(default='fit_shortest',
