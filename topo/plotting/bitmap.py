@@ -86,7 +86,7 @@ class Bitmap(TopoObject):
         is not changed.
         """
         x,y = self.image.size
-        zx, zy = x*factor, y*factor
+        zx, zy = int(x*factor), int(y*factor)
         return self.image.resize((zx,zy))
 
     def _arrayToImage(self, inArray):
@@ -168,31 +168,28 @@ class HSVBitmap(Bitmap):
     constructed by RGBBitmap, and can be used in the same way.
     """
 
-    def __init__(self,hMapArray,sMapArray,vMapArray):
+    def __init__(self,hue,sat,val):
         """Each matrix must be the same size, with values in the range 0.0 to 1.0."""
-        shape = hMapArray.shape
-        rmat = Numeric.array(hMapArray,Numeric.Float)
-        gmat = Numeric.array(sMapArray,Numeric.Float)
-        bmat = Numeric.array(vMapArray,Numeric.Float)
+        shape = hue.shape # Assumed same as sat.shape and val.shape
+        rmat = Numeric.zeros(shape,Numeric.Float)
+        gmat = Numeric.zeros(shape,Numeric.Float)
+        bmat = Numeric.zeros(shape,Numeric.Float)
 
-
-	### JCALERT! We sould do a cropping here, before requesting hsv_to_rgb
-        ### This function fail when the value are not in the range [0,1] for the hue
-        ### Which fails if it is not normalized....
-        ### For the moment there is an hack in featuremap, that does normalize the value to
-        ### 1 in case of a cyclic value and not for a non-cyclic.
-        ### Nevertheless, I think we should catch this case here....Or think a bit more about it...
-        # Note: should someday file a feature request for PIL
-        # for them to accept an image of type 'HSV', so that
-        # they will do this conversion themselves, without us
-        # needing an explicit loop here.
-        for j in range(shape[0]):
-            for i in range(shape[1]):
-                rgb = hsv_to_rgb(rmat[j,i],gmat[j,i],bmat[j,i])
-                rmat[j,i] = rgb[0]
-                gmat[j,i] = rgb[1]
-                bmat[j,i] = rgb[2]
-                   
+        # Note: should someday file a feature request for PIL for them
+        # to accept an image of type 'HSV', so that they will do this
+        # conversion themselves, without us needing an explicit loop
+        # here.  That should speed this up.
+        ch = Numeric.clip(hue,0.0,1.0)
+        cs = Numeric.clip(sat,0.0,1.0)
+        cv = Numeric.clip(val,0.0,1.0)
+        
+        for i in range(shape[0]):
+            for j in range(shape[1]):
+                r,g,b = hsv_to_rgb(ch[i,j],cs[i,j],cv[i,j])
+                rmat[i,j] = r
+                gmat[i,j] = g
+                bmat[i,j] = b
+        
         rImage = self._arrayToImage(rmat)
         gImage = self._arrayToImage(gmat)
         bImage = self._arrayToImage(bmat)
