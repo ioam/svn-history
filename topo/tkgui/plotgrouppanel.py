@@ -260,7 +260,7 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
 	    if not bitmap.resize:
 		tmp_list = tmp_list + [bitmap.zoom(self.zoom_factor*max_height/bitmap.height())]
 	    else:
-		tmp_list = tmp_list + [bitmap.zoom(self.zoom_factor*int(max_height/bitmap.height()+0.5))]
+		tmp_list = tmp_list + [bitmap.zoom(self.zoom_factor*int(max_height/bitmap.height()))]
 	    
 	self.zoomed_images = [ImageTk.PhotoImage(im) for im in tmp_list]
 
