@@ -74,6 +74,7 @@ class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
         sim = topoconsole.active_sim()
         self._sim_eps = [ep for ep in sim.objects(Sheet).values()
                   if isinstance(ep,topo.base.connectionfield.CFSheet)]
+	self._sim_eps.sort(lambda x, y: cmp(x.precedence,y.precedence))
         sim_ep_names = [ep.name for ep in self._sim_eps]
         if len(sim_ep_names) > 0:
             self.region.set(sim_ep_names[0])
