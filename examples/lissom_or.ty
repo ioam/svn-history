@@ -29,15 +29,12 @@ from topo.patterns import PatternGeneratorParameter
 
 # CEBHACKALERT: ##C lines to replace nearby equivalents
 # when code verified with circular connection fields.
-input_bounds = BoundingBox(points=((-0.6792,-0.6792),
-          			   ( 0.6792, 0.6792))) 
-
 ##C input_bounds = BoundingBox(points=((-0.7917,-0.7917),
 ##C   				       ( 0.7917, 0.7917))) 
 
 GeneratorSheet.density = 24.0 
 GeneratorSheet.period = 1
-GeneratorSheet.bounds = input_bounds
+GeneratorSheet.bounds = BoundingBox(radius=0.6792)
 
 random.seed(1234)
 topo.patterns.basic.Gaussian.scale = 1.0    
@@ -47,18 +44,10 @@ topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(
 
 topo.patterns.basic.Gaussian.size = 2*0.0468      
 topo.patterns.basic.Gaussian.aspect_ratio = 4.0      
-topo.patterns.basic.Gaussian.bounds = input_bounds
+topo.patterns.basic.Gaussian.bounds = BoundingBox(radius=0.6792)
 
 # LISSOM parameters
 LISSOM.density = 48.0    
-
-# Connection parameters
-
-afferent_weight_bounds   = BoundingBox(points=((-0.22,-0.22),(0.22,0.22)))
-##C afferent_weight_bounds   = BoundingBox(points=((-0.25,-0.25),(0.25,0.25)))
-excitatory_weight_bounds = BoundingBox(points=((-0.10,-0.10),(0.10,0.10)))
-inhibitory_weight_bounds = BoundingBox(points=((-0.23,-0.23),(0.23,0.23))) 
-
 
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)
@@ -77,15 +66,16 @@ V1 = LISSOM(name='V1')
 
 s.connect(Retina,V1, delay = FixedPoint("0.05"),
           connection_type=CFProjection,strength=1.0,name='Afferent0',
-          weights_bounds=afferent_weight_bounds,learning_rate=1.274)
+          weights_bounds=BoundingBox(radius=0.22),learning_rate=1.274)
+##C afferent_weight_bounds   = BoundingBox(points=((-0.25,-0.25),(0.25,0.25)))
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="exc",
           connection_type=CFProjection,strength = 0.9, name='LateralExcitatory',
-          weights_bounds = excitatory_weight_bounds,learning_rate=2.674)
+          weights_bounds=BoundingBox(radius=0.1),learning_rate=2.674)
             
 s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
           connection_type=CFProjection,strength = -0.9, name='LateralInhibitory',
-          weights_bounds = inhibitory_weight_bounds,learning_rate=2.466)         
+          weights_bounds=BoundingBox(radius=0.23),learning_rate=2.466)         
 
 
 # CEBHACKALERT: scheduled events are missing. e.g. change_bounds are ok for this density,
@@ -94,10 +84,10 @@ s.connect(V1,V1, delay = FixedPoint("0.05"), dest_port="inh",
 # Also applies to lissom_oo_or.ty.
 
 
-s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.06,-0.06),(0.06,0.06))))
-s.schedule_action(500, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.042,-0.042),(0.042,0.042))))
-s.schedule_action(1000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.0336,-0.0336),(0.0336,0.0336))))
-s.schedule_action(2000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-0.021,-0.021),(0.021,0.021))))
+s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(radius=0.06))
+s.schedule_action(500, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(radius=0.042))
+s.schedule_action(1000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(radius=0.0336))
+s.schedule_action(2000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(radius=0.021))
 
 
 # Schedule action requires a function, so we create a temporary one

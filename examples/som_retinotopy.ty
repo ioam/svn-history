@@ -82,7 +82,7 @@ RetinotopicSOM.alpha_0  = 0.42
 RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom() 
 
-CFProjection.weights_bounds=BoundingBox(points=((-1.0,-1.0),(1.0,1.0))) # fully connected network.
+CFProjection.weights_bounds=BoundingBox(radius=1.0) # fully connected network.
 CFProjection.response_fn = CFEuclideanDistance() 
 CFProjection.learning_fn = HebbianSOMLF()
 
