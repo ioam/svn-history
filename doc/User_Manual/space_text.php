@@ -125,11 +125,11 @@ often result in artifacts in the behavior of units near the border.
 To avoid such artifacts, lower-level Sheets should usually have areas
 larger than 1.0x1.0.
 
-<P>For instance, assume that Sheets have a 1.0x1.0 area.  If a a
+<P>For instance, assume that Sheets have a 1.0x1.0 area.  If a 
 higher level sheet U has a ConnectionField BoundingBox of size 0.4x0.4
 on lower-level Sheet L, neurons near the border of U will have up to
-0.2 in Sheet coordinate cut off of their ConnectionFields.  To prevent
-this, the BoundingBox of L can be extended by 0.2 units Sheet
+0.2 in Sheet coordinates cut off of their ConnectionFields.  To prevent
+this, the BoundingBox of L can be extended by 0.2 in Sheet
 coordinates in each direction:
 
 <P><CENTER><IMG BORDER="2" WIDTH="407" HEIGHT="404" SRC="images/retina_edge_buffer.png"></CENTER>
