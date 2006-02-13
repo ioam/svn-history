@@ -23,13 +23,20 @@ essentials for using CVS at SourceForge are described below; see the
 SourceForge documentation</A> for more details or if you have any
 difficulties.
 
-<P>To get started, first change to a directory to which you have write access with sufficient space available, i.e., about 400 megabytes as of 2/2006. There are two ways to get your own local copy of the CVS files, depending on whether or not you are an official Topographica developer. Non-developers can check out a read-only version of the repository, while developers have read/write access so that they can make changes that become a permanent part of the project repository. Please follow the appropriate set of instructions below.
+<P>To get started, first change to a directory to which you have write
+access with sufficient space available, i.e., about 400 megabytes as
+of 2/2006. There are two ways to get your own local copy of the CVS
+files, depending on whether or not you are an official Topographica
+developer. Non-developers can check out a read-only version of the
+repository, while developers have read/write access so that they can
+make changes that become a permanent part of the project
+repository. Please follow the appropriate set of instructions below.
 
 <H3>Read-only access</H3>
 
-<P>For read-only access from UNIX, Mac, or Windows with <A
-HREF="http://www.cygwin.com/">Cygwin</a> installed, log in to
-the CVS server using the command:
+<P>For read-only access from UNIX, Mac, or
+<A HREF="http://www.cygwin.com/">Cygwin</a> (Windows with Unix
+commands installed), log in to the CVS server using the command:
 
 <pre>
   cvs -d :pserver:anonymous@cvs.sf.net:/cvsroot/topographica login
@@ -44,8 +51,9 @@ wherever you want the files to be stored, and use the command:
 </pre>
 
 (where the entire command should be on a single line, even though it
-is broken into two lines above).  This process will likely take a few
-minutes, as there are some extremely large files involved.  The <code>-r
+is broken into two lines above).  This process will likely take
+several minutes (probably appearing to hang at certain points), as
+there are some extremely large files involved.  The <code>-r
 LATEST_STABLE</code> option selects the version that has most recently
 been declared to pass all tests.  That option can be omitted if you
 want the absolutely most up-to-date version, which may not always be
@@ -83,13 +91,18 @@ forgotten to do the CVS_RSH command.  The LATEST_STABLE option can
 also be provided as above, but developers will more likely want the
 most up-to-date version for editing.
 
-<P>GUI-based Windows users can use the read-only procedure described
+<P>Windows users can use the read-only procedure described
 for TortoiseCVS above, replacing CVSROOT with
 <code>:ext:<i>uname</i>@cvs.sourceforge.net:/cvsroot/topographica</code>.
 You will typically need to have an SSH client installed for this to
 work, such as
 <A HREF="http://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</A>.
 
+<P>Note that anyone interested in Topographica is welcome to join as a
+Topographica developer to get read/write access, so that your changes
+can become part of the main distribution.  Just email
+<A HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107?subject=Request%20to%20be%20a%20Topographica%20developer">Jim</a>
+and describe what you want to do, and he'll tell you what to do from there.
 
 <H3>Building Topographica</H3>
 
@@ -113,7 +126,7 @@ all" will also run the regression tests and example files, to ensure
 that everything is functioning properly on your system.  At the
 moment, be sure that you do this compilation on a machine with a
 functioning DISPLAY, i.e., not a remote text-only session, or there
-will be errors involving Tk.
+will be some warnings involving Tk.
 
 <P>If all goes well, a script named <code>topographica</code> will be
 created in the <code>topographica/</code> directory; you can use this
@@ -126,11 +139,11 @@ versions of UNIX as well, as long as they have standard GNU tools like
 make and GCC installed.  Just follow the Linux instructions, replacing
 <code>make</code> with <code>gmake</code> if that's the name of GNU make on your system.
 
-<P><B>Mac:</B>
+<P><B><A NAME="osx">Mac:</A></B>
 Topographica builds only under Mac OS X or later.  Topographica
 developers have only limited access to OS X machines, and so at any
-time there are likely to be some issues with the OS X version,
-although we do try to minimize them.
+time there may be some issues with the OS X version, although we do
+try to minimize them.
 
 <P>These instructions assume that you have an X server installed.  It
 is also possible to build Topographica using a native (Aqua) version
@@ -151,9 +164,12 @@ some people have reported that SciPy (weave) does not work with gcc 4.0.
 Also install the FinkCommander GUI, which makes finding and installing Unix software
 more convenient.
 <li> With Fink, find and install the following packages: <code>libpng</code> and 
-<code>freetype219</code> (they provide, repectively, the PNG format
+<code>freetype219</code> (they provide, respectively, the PNG format
 handling and the matplotlib library installation required to run
 Topographica).
+<li> If you want to compile the local copy of the documentation
+(e.g. for online help), use Fink to get imagemagick, transfig, and m4,
+plus php if it's not already installed.
 <li> If CVS is not already installed on your Mac, find and install <code>cvsup</code>
 (and the associated library and client) with Fink.
 <li> Get, unpack, and make Topographica using CVS as described above.
@@ -162,18 +178,27 @@ Topographica).
 <P> Other OS X versions may require small changes to this procedure,
 to make sure that compatible libraries are available.
 
-<P><B>Windows:</B> It should be possible to build Topographica under
-Windows just as is done under UNIX, if you first install <A
-HREF="http://www.cygwin.com/">Cygwin</a>, although as of 2/2006 the
-library versions available on Cygwin are a bit out of date and thus
-this process does not currently go smoothly. Most of the features of
-Topographica are available with a Win32-native Python, and if you
-choose this option then Cygwin is optional. However, there are likely
-to be a lot of small problems that we have not yet had the time to
-eliminate, so the native version on Windows is not yet suitable for
-most users.
 
-<P>In any case, the basic steps for building the native version are:
+<P><B>Windows:</B> The Topographica project is committed to supporting
+Windows in the long term, but in the current stage of very active
+development under Linux, the Windows version often lags behind and has
+various minor quirks and installation difficulties.  Thus Windows
+support should be considered experimental at this stage.
+
+<P>In any case, there are two ways to build Topographica under
+Windows: <A HREF="http://www.cygwin.com/">Cygwin</a> and Windows
+native.  Cygwin offers a set of UNIX-compatible tools that make it
+possible to compile UNIX-style programs under Windows, in which case
+you can follow the generic Linux instructions above.  However, as of
+1/2006 the library versions available on Cygwin are a bit out of date
+and thus this process does not currently go smoothly.
+
+<P>Instead of Cygwin, Topographica can also be configured to use
+Win32-native versions of various support tools like Python.
+However, there are again likely to be various problems related to
+library versions at any given time, so installing the native version
+is not necessarily straightforward.  <P>In any case, the basic steps
+for building the native version are:
 
 <ol>
 <li> Double click on setup.bat 
@@ -189,7 +214,7 @@ to D:\Topographica, the command would be: "setup D:"
 <P>
 After installation you should now have an icon on your desktop that
 opens the directory where Topographica is installed.  There will be a
-new file association called ".ty" which are scripts that the
+new file association called ".ty"; these are scripts that the
 Topographica program will execute when you double-click on them.
 
 <P>You can now test the installation by double-clicking on the
@@ -221,11 +246,18 @@ or
 or
 
 <pre>
+  ./topographica -g examples/som_retinotopy.ty
+</pre>
+
+or
+
+<pre>
   ./topographica -g examples/lissom_or.ty
 </pre>
 
-If you use the latter, a good way to get started is to work through
-the <A HREF="../Tutorials/lissom_or.html">LISSOM tutorial</A>.
+For the latter two examples, a good way to get started is to work through 
+the <A HREF="../Tutorials/som_retinotopy.html">SOM</A> or 
+the <A HREF="../Tutorials/lissom_or.html">LISSOM</A> tutorials.
 
 <H3>Updating Topographica</H3>
 
@@ -238,9 +270,12 @@ stable version at any time by doing:
   make all
 </pre>
 
-If you want the very most recent version, stable or not, replace
+<P>If you want the very most recent version, stable or not, replace
 <code>-r LATEST_STABLE</code> with <code>-A</code> to force a complete
-update.  Note that updating the examples/ subdirectory sometimes takes
+update. Under TortoiseCVS in Windows, you can right click in the
+topographica directory and select CVS Update to get the new files.
+
+<P>Note that updating the examples/ subdirectory sometimes takes
 a long time, if the sample saved snapshot has been updated.
 Similarly, updating the external/ subdirectory sometimes takes a long
 time, if some of the external packages have been upgraded, and in that
