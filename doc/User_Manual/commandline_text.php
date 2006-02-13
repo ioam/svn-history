@@ -31,17 +31,6 @@ array([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0
 ...
 </pre>
 
-If the GUI is running, you can also plot any vector or matrix in the
-program:
-
-<pre>
-$ ./topographica -g examples/cfsom_or.ty 
-Topographica&gt; from topo.commands.pylabplots import *
-Topographica&gt; matrixplot(V1.activity)
-Topographica&gt; vectorplot(V1.activity[0])
-Topographica&gt;
-</pre>
-
 To see what is available for inspection or manipulation for any
 object, you can use <code>dir()</code>:
 
@@ -85,21 +74,33 @@ class CFSOM(topo.base.connectionfield.CFSheet)
 Topographica&gt;
 </pre>
 
+<A NAME="pylab">If the GUI is running, you can also plot any vector or matrix in the
+program:</A>
+
+<pre>
+$ ./topographica -g examples/cfsom_or.ty 
+Topographica&gt; from topo.commands.pylabplots import *
+Topographica&gt; matrixplot(V1.activity)
+Topographica&gt; vectorplot(V1.activity[0])
+Topographica&gt;
+</pre>
+
 <P>The prompt can also be used for any mathematical calculation or
 plotting one might wish to do, a la Matlab:
 
+<!-- JABALERT! Should include screenshots of what the plotting looks like -->
 <pre>
 $ ./topographica -g examples/cfsom_or.ty 
 Topographica&gt; from Numeric import *
 Topographica&gt; 2*pi*exp(1.6)
 31.120820554943471
-Topographica&gt; from topo.commands.pylabplots import *
 Topographica&gt; t = arange(0.0, 1.0+0.01, 0.01)
 Topographica&gt; s = cos(2*2*pi*t)
 Topographica&gt; from pylab import *
 Topographica&gt; plot(s)
 [&lt;matplotlib.lines.Line2D instance at 0xb6b1aeac&gt;]
-Topographica&gt; 
+Topographica&gt; show._needmain = False
+Topographica&gt; show()
 </pre>
 
 See the <A href="http://numeric.scipy.org/numpydoc/numdoc.htm">Numeric</A>
