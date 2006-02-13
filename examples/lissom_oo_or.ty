@@ -20,7 +20,8 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFDotProduct
 from topo.base.parameter import DynamicNumber
-from topo.base.connectionfield import CFSheet, radial_bounds
+from topo.base.connectionfield import CFSheet
+from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import DivisiveHebbian
 from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
 from topo.patterns import PatternGeneratorParameter
@@ -61,29 +62,29 @@ CFProjection.learning_fn=DivisiveHebbian()
 # build simulation
 
 s = topo.base.simulator.Simulator()
-Retina = GeneratorSheet(name='Retina',density=24.0,bounds=radial_bounds(0.5+0.25+0.375),
+Retina = GeneratorSheet(name='Retina',density=24.0,bounds=BoundingBox(radius=0.5+0.25+0.375),
                         input_generator=input_pattern)
-LGNOn = CFSheet(name='LGNOn',density=24.0,bounds=radial_bounds(0.5+0.25),
+LGNOn = CFSheet(name='LGNOn',density=24.0,bounds=BoundingBox(radius=0.5+0.25),
                 output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                 measure_maps=False)
-LGNOff = CFSheet(name='LGNOff',density=24.0,bounds=radial_bounds(0.5+0.25),
+LGNOff = CFSheet(name='LGNOff',density=24.0,bounds=BoundingBox(radius=0.5+0.25),
                  output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                  measure_maps=False)
-V1 = LISSOM(name='V1',density=48.0,bounds=radial_bounds(0.5))
+V1 = LISSOM(name='V1',density=48.0,bounds=BoundingBox(radius=0.5))
 V1.output_fn.lower_bound=0.083
 V1.output_fn.upper_bound=0.633
 
 # LGN ON channel
 LGNOn_center = s.connect(Retina,LGNOn,dest_port="center",delay = FixedPoint("0.05"),
                          connection_type=SharedWeightCFProjection,strength=2.33,
-                         name='Center',weights_bounds=radial_bounds(0.375),
+                         name='Center',weights_bounds=BoundingBox(radius=0.375),
                          weights_generator=topo.patterns.basic.Gaussian(size=0.0417,aspect_ratio=1))
 
 LGNOn_center.learning_fn.output_fn = DivisiveSumNormalize()
 
 LGNOn_surround = s.connect(Retina,LGNOn,dest_port="surround",delay = FixedPoint("0.05"),
                            connection_type=SharedWeightCFProjection,strength=-2.33,
-                           name='Surround',weights_bounds=radial_bounds(0.375),
+                           name='Surround',weights_bounds=BoundingBox(radius=0.375),
                            weights_generator=topo.patterns.basic.Gaussian(size=0.1667,aspect_ratio=1))
 
 LGNOn_surround.learning_fn.output_fn = DivisiveSumNormalize()
@@ -92,37 +93,37 @@ LGNOn_surround.learning_fn.output_fn = DivisiveSumNormalize()
 # LGN OFF channel
 LGNOff_center = s.connect(Retina,LGNOff,dest_port="center",delay = FixedPoint("0.05"),
                           connection_type=SharedWeightCFProjection,strength=-2.33,
-                          name='Center',weights_bounds=radial_bounds(0.375),
+                          name='Center',weights_bounds=BoundingBox(radius=0.375),
                           weights_generator=topo.patterns.basic.Gaussian(size=0.0417,aspect_ratio=1))
 LGNOff_center.learning_fn.output_fn = DivisiveSumNormalize()
 
 LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoint("0.05"),
                             connection_type=SharedWeightCFProjection,strength=2.33,
-                            name='Surround',weights_bounds=radial_bounds(0.375),
+                            name='Surround',weights_bounds=BoundingBox(radius=0.375),
                             weights_generator=topo.patterns.basic.Gaussian(size=0.1667,aspect_ratio=1))
 LGNOff_surround.learning_fn.output_fn = DivisiveSumNormalize()
 
 s.connect(LGNOn,V1,delay=FixedPoint("0.05"),dest_port="on",
           connection_type=CFProjection,strength=0.5,name='LGNOnAfferent',
-          weights_bounds=radial_bounds(0.25),learning_rate=0.9590)
+          weights_bounds=BoundingBox(radius=0.25),learning_rate=0.9590)
 
 s.connect(LGNOff,V1,delay=FixedPoint("0.05"),dest_port="off",
           connection_type=CFProjection,strength=0.5,name='LGNOffAfferent',
-          weights_bounds=radial_bounds(0.25),learning_rate=0.9590)
+          weights_bounds=BoundingBox(radius=0.25),learning_rate=0.9590)
 
 
 s.connect(V1,V1,delay=FixedPoint("0.05"),dest_port="exc",
           connection_type=CFProjection,strength=0.9,name='LateralExcitatory',
-          weights_bounds=radial_bounds(0.10),learning_rate=3.2018) 
+          weights_bounds=BoundingBox(radius=0.10),learning_rate=3.2018) 
             
 s.connect(V1,V1,delay=FixedPoint("0.05"), dest_port="inh",
           connection_type=CFProjection,strength=-0.9,name='LateralInhibitory',
-          weights_bounds=radial_bounds(0.23),learning_rate=1.9626)         
+          weights_bounds=BoundingBox(radius=0.23),learning_rate=1.9626)         
 
 # CEBHACKALERT: add missing scheduled actions
 
-s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, radial_bounds(0.06))
-s.schedule_action(500, V1.projections()['LateralExcitatory'].change_bounds, radial_bounds(0.042))
+s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(radius=0.06))
+s.schedule_action(500, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(radius=0.042))
 
 
 # Schedule action requires a function, so we create a temporary one

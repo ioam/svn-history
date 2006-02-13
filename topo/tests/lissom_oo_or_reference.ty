@@ -29,7 +29,8 @@ from topo.responsefns.optimized import CFDotProduct
 import topo.patterns.basic
 from topo.base.sheet import BoundingBox
 from topo.base.parameter import DynamicNumber
-from topo.base.connectionfield import CFSheet, wt_bounds
+from topo.base.connectionfield import CFSheet
+from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import DivisiveHebbian
 from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
 from topo.patterns import PatternGeneratorParameter
@@ -153,7 +154,7 @@ gaussian_width = xsigma/BaseRN/sqrt(2.0)
 gaussian_height = ysigma/BaseRN/sqrt(2.0)
 topo.patterns.basic.Gaussian.size = 2*gaussian_height
 topo.patterns.basic.Gaussian.aspect_ratio = gaussian_width/gaussian_height
-input_bounds = wt_bounds( RN/(2.0*BaseRN*area_scale) )
+input_bounds = BoundingBox(radius= RN/(2.0*BaseRN*area_scale) )
 
 topo.patterns.basic.Gaussian.bounds = input_bounds
                                                
@@ -168,10 +169,10 @@ min_exc_radius = min_exc_rad/BaseN
 
 
 # Connection parameters
-lgn_weight_bounds = wt_bounds(r_L/BaseLN)
-afferent_weight_bounds   = wt_bounds(rf_radius/BaseRN)               # 137 units
-excitatory_weight_bounds = wt_bounds(exc_rad/BaseN, min_exc_radius)  # 97 units
-inhibitory_weight_bounds = wt_bounds(inh_rad/BaseN)                  # 421 units
+lgn_weight_bounds = BoundingBox(radius=r_L/BaseLN)
+afferent_weight_bounds   = BoundingBox(radius=rf_radius/BaseRN)               # 137 units
+excitatory_weight_bounds = BoundingBox(radius=exc_rad/BaseN, min_radius=min_exc_radius)  # 97 units
+inhibitory_weight_bounds = BoundingBox(radius=inh_rad/BaseN)                  # 421 units
 
 # Circular ConnectionFields
 CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
@@ -259,10 +260,10 @@ s.connect(V1,V1,delay=FixedPoint("0.05"), dest_port="inh",
 
 
 # this results in 37 units
-s.schedule_action(199, V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.6*exc_rad/BaseN,min_exc_radius))
+s.schedule_action(199, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(radius=0.6*exc_rad/BaseN,min_radius=min_exc_radius))
 
 # and this results in 21 units
-s.schedule_action(499, V1.projections()['LateralExcitatory'].change_bounds, wt_bounds(0.42*exc_rad/BaseN,min_exc_radius))
+s.schedule_action(499, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(radius=0.42*exc_rad/BaseN,min_radius=min_exc_radius))
 
 
 

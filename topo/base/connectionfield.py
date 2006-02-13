@@ -628,14 +628,3 @@ class CFSheet(ProjectionSheet):
 
 
 
-def radial_bounds(radius,min_radius=0.0):
-    """
-    Create a BoundingBox with the specified radius.
-
-    If min_radius is given, the BoundingBox will
-    use min_radius if it's larger than radius - so
-    by passing min_radius=1.25/density, a BoundingBox
-    of at least 3x3 matrix units can be guaranteed.
-    """
-    r = max(radius,min_radius)
-    return BoundingBox(points=((-r,-r),(r,r)))

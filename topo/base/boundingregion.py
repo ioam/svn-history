@@ -45,10 +45,36 @@ class BoundingBox(BoundingRegion):
 
     points = a sequence of two points that define an axis-aligned rectangle.
     """
+
     def __init__(self,**args):
-        self._aarect = AARectangle(*args['points'])
-        if 'points' in args:
+        """
+        Create a BoundingBox.
+
+        A radius or points can be specified for the AARectangle.
+        
+        If radius is passed in, the BoundingBox will use min_radius
+        (which defaults to 0.0) if it's larger than radius - so by
+        passing min_radius=1.25/density, a BoundingBox of at least 3x3
+        matrix units can be guaranteed.
+
+        If neither radius nor points is passed in, create a default
+        AARectangle defined by (-0.5,-0.5),(0.5,0.5).
+        """
+        if 'radius' in args:
+            radius = args['radius']
+            min_radius=args.get('min_radius',0.0)
+            r=max(radius,min_radius)
+            self._aarect=AARectangle((-r,-r),(r,r))
+            del args['radius']
+        elif 'points' in args:
+            self._aarect = AARectangle(*args['points'])
             del args['points']
+        else:
+            self._aarect = AARectangle((-0.5,-0.5),(0.5,0.5))
+
+        # CEBHACKALERT? Why are things in args deleted here before args are passed
+        # on (it's not done elsewhere...should it be?)?
+        
         super(BoundingBox,self).__init__(**args)        
 
     def contains(self,x,y):
