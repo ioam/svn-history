@@ -36,15 +36,37 @@
 <i>
 <b>News:</b>
 
+<p><b>14 February 06:</b> Version 0.8.2 released, including numerous
+bugfixes, 
+circular receptive fields,
+shared-weight projections,
+<A TARGET="_top" href="../Tutorials/lissom_oo_or.html">tutorial with ON/OFF LGN model</A>,
+<A TARGET="_top" href="../Tutorials/som_retinotopy.html">SOM retinotopy tutorial</A>,
+Euclidean-distance-based response and learning functions,
+density-independent SOM parameters,
+<A TARGET="_top" href="../Downloads/index.html#osx">Mac OS X instructions</A>,
+<A TARGET="_top" href="../Developer_Manual/index.html">developer manual</A>,
+<A TARGET="_top" href="../User_Manual/index.html">partial user manual</A>,
+much-improved model editor,
+<A TARGET="_top" href="../User_Manual/commandline.html#pylab">generic Matlab-style plotting</A>,
+topographic grid plotting,
+RGB plots,
+user-controllable plot sorting,
+plot color keys,
+<!-- Normally distributed random PatternGenerator, -->
+and progress reports during learning.
+
+
 <p><b>22 December 05:</b> Version 0.8.1 released, including numerous
 bugfixes, more flexible plotting (including weight colorization),
 user-controllable optimization, properties panels, more-useful
-reference manual, image input patterns, and a prototype graphical
+<A TARGET="_top" href="../Reference_Manual/index.html">reference manual</A>,
+image input patterns, and a prototype graphical
 model editor.  <!-- Plus SOMs with selectable Projections -->
 
 <p><b>8 November 05:</b> New site launched with Topographica version
 0.8.0, including a new
- <a target="_top" href="../Tutorials/index.html">Topographica tutorial</a>.
+ <a target="_top" href="../Tutorials/lissom_or.html">LISSOM tutorial</a>.
 (<a target="_top" href="../images/051107_topographica_screen_shot_white.png">Linux screenshot</a>).
 
 </i>
