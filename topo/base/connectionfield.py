@@ -74,10 +74,11 @@ class ConnectionField(TopoObject):
 
         weights_bounds_templates is assumed to have been initialized correctly
         already (see e.g. CFProjection.initialize_bounds() ).
-        CEBHACKALERT: maybe some external function is required? We need to
-        have correctly setup bounds here, in change_bounds(), and in other
-        places such as CFProjection (where the mask is made).
         """
+        # CEBHACKALERT: maybe an external function is required? We need to
+        # have correctly setup bounds here, in change_bounds(), and in other
+        # places such as CFProjection (where the mask is made). At the moment,
+        # the function is in CFProjection.
 
         super(ConnectionField,self).__init__(**params)
 
