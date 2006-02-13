@@ -171,7 +171,7 @@ different preferred orientation.  This suggests an explanation for why
 the response is patchy: neurons preferring orientations other than
 the one present on the retina do not respond.  You can also look at
 the <span class='t_item'>LateralInhibitory</span> weights instead of
-<span class='t_item'>Afferent0</span>; those are patchy as well because the typical
+<span class='t_item'>LGNOnAfferent</span>; those are patchy as well because the typical
 activity patterns are patchy.
 
 </p><p></p></li><li>To visualize all the neurons at once
