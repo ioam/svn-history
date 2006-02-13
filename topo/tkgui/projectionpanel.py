@@ -38,6 +38,18 @@ BORDERWIDTH = 1
 # not displayed.
 CANVASBUFFER = 1
 
+
+def cmp_projections(p1,p2):
+    """
+    Comparison function for Plots.
+    It compares the precedence number first and then the src_name and name attributes.
+    """
+    if p1[1].src.precedence != p2[1].src.precedence:
+	return cmp(p1[1].src.precedence,p2[1].src.precedence)
+    else:
+	return cmp(p1[0],p2[0])
+
+
 ### JABALERT: Maybe this should be called CFProjectionPanel instead,
 ### since it is only valid for CFProjections.
 class ProjectionPanel(CFSheetPlotPanel):
@@ -53,7 +65,7 @@ class ProjectionPanel(CFSheetPlotPanel):
 
         self.weight_name = StringVar()
         self.weight_name.set('None')
-        self.projections = {}
+        self.projections = KeyedList()
 
         self.params_frame1 = Frame(master=self)
         self.params_frame1.pack(side=RIGHT,expand=YES,fill=X)
@@ -92,6 +104,9 @@ class ProjectionPanel(CFSheetPlotPanel):
     ### have such a set of Projections.  Thus all comments like the
     ### PRE below should be deleted, once the behavior of the list of
     ### projections has been verified.
+
+    ### JC: this function has to be re-written anyway... 
+    ###	e.g I don't know why self.projections is a KeyedList...
     def _create_projection_dict(self,sheet_name):
         """
         PRE: Each Projection in the CFSheet should have a unique name.
@@ -112,13 +127,9 @@ class ProjectionPanel(CFSheetPlotPanel):
                             if ep.name == sheet_name][0]
             self.tmp_projections = dict([(i.name, i) for i in
                                      chain(*self._sim_ep.in_projections.values())])
-
-            ### JCHACKALERT! This has been done to solve the problem of the displaying order in
-            ### the projection panel: this way, we start to plot in the alphabetical order
-            ### which corresponds (luckily) to the order we want
-            self.projections = KeyedList()
+	    self.projections= KeyedList()
             sorted_list = self.tmp_projections.items()
-            sorted_list.sort()
+            sorted_list.sort(cmp_projections)
             for item in sorted_list:
                 self.projections.append((item[0],item[1]))
                 
