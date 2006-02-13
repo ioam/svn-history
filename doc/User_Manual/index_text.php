@@ -10,5 +10,6 @@ usable.  Sections that are ready so far include:
 <!-- <A HREF="background.html">Background</A><BR> -->
 <A HREF="time.html">Representing time in Topographica</A><BR>
 <A HREF="space.html">Representing space in Topographica (coordinate systems)</A><BR>
+<A HREF="commandline.html">Using the Topographica command line</A><BR>
 <!-- <A HREF="features.html">Topographica features</A><BR> -->
 <A HREF="about.html">About Topographica</A><BR>
