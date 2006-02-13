@@ -80,12 +80,11 @@ class PlotGroup(TopoObject):
         ### returning it.
 	self.normalize = normalize
 
-	self.plot_list = plot_list  
+	self.plot_list = plot_list	
         
 	# store the PlotGroup in plot_group_dict
 	plotgroup_dict[plot_group_key]=self
 
-        self.added_list = []
 	self.bitmaps = []
 
         # In the future, it might be good to be able to specify the
@@ -122,14 +121,6 @@ class PlotGroup(TopoObject):
             self.bitmaps.append(win)
         return self.bitmaps
     
-    
-    def add(self,new_plot):
-        """
-        new_plot can be a single Plot, or it can be a list of plots.
-        Either way, it will be properly added to the end of self.plot_list.
-        """     
-	self.added_list.extend(new_plot)
-      
 
     # Call from load_images() as a dynamic list to regenerate all_plots anytime (allowing refreshing)
     def plots(self):
@@ -137,7 +128,7 @@ class PlotGroup(TopoObject):
         Generate the bitmap lists.
         """
         bitmap_list = []
-	all_plots = flatten(self._plot_list()) + self.added_list
+	all_plots = flatten(self._plot_list()) 
         generated_bitmap_list = [each for each in all_plots if each != None]
 	# sorting the Plots.
 	self._ordering_plots(generated_bitmap_list)
@@ -184,7 +175,7 @@ class TemplatePlotGroup(PlotGroup):
         This function calls create_plots, that is implemented in each TemplatePlotGroup subclasses.
         """
 	sheet_list = [each for each in dict_sort(self.simulator.objects(Sheet)) if self.sheet_filter_lam(each)]      
-	plot_list=self.plot_list
+	plot_list = self.plot_list
         # Loop over all sheets that passed the filter.
         #     Loop over each individual plot template:
         #         Call the create_plots function to create the according plot
@@ -204,8 +195,6 @@ class TemplatePlotGroup(PlotGroup):
         p = make_template_plot(plot_channels,sheet.sheet_view_dict,sheet.density,sheet.bounds,self.normalize,False,name=plot_name)
 	return [p]
 
-    ### JCALERT! We have to decide what to do with the added_list concept in PlotGroup
-    ### (as well as the add function...which shouldn't take a list...)
     def _add_static_images(self):
         """
         Construct the static image Plot (e.g. color key for Orientation Preference map.
@@ -214,7 +203,7 @@ class TemplatePlotGroup(PlotGroup):
             image = Image.open(file_path)
 	    plot = Plot(image,name=image_name)
 	    plot.bitmap.resize=False
-            self.add([plot])
+            self.plot_list.append(plot)
             
 
 class ConnectionFieldsPlotGroup(TemplatePlotGroup):
