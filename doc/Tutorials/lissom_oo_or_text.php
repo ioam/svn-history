@@ -375,6 +375,9 @@ V1.projections()['LGNOffAfferent'].learning_rate=200
 
 Now each new pattern generated in a
 training iteration will nearly wipe out any existing weights.
+(It may also be possible to view and change the learning_rate in the
+<span class='w_title'>Model Editor</span> window, although that
+feature is currently under development.)
 
 <p></p></li><li>For more control over the training inputs, open the
 <span class='w_title'>Test Pattern</span> window, select an
