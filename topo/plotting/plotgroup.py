@@ -23,6 +23,8 @@ from topo.base.connectionfield import CFSheet
 from plot import make_template_plot, Plot
 import bitmap
 
+
+
 def cmp_plot(plot1,plot2):
     """
     Comparison function for Plots.
@@ -36,12 +38,13 @@ def cmp_plot(plot1,plot2):
 
 
 def sort_plots(plot_list):
-    """Sort a (static) plot list according to the src_names."""
+    """Sort a list of plots according to the src_names."""
     plot_list.sort(cmp_plot)
 
 
 # PlotGroup used by the simulation are stored in this dictionnary
 plotgroup_dict = {}
+
 
 
 
@@ -71,11 +74,16 @@ class PlotGroup(TopoObject):
         super(PlotGroup,self).__init__(**params)  
 
 	self.plot_group_key = plot_group_key
+
 	### JCALERT:Normalize is no really used by PlotGroup for the moment
         ### But it will be when sorted out what to do with TestPattern.
         ### the problem is that for a PlotGroup the plot_list is static...
         ### so it is hard to re-generate the plot if normalize change...
         ### (it is already used by sub-classes though)
+	### This should be fixed by having a normalize method in Plot that transform a plot
+        ### bitmap to normalize it. If self.normalize change in the PlotGroup,
+        ### the _plot_list function called the Plot.normalize method on the plot_list before
+        ### returning it.
 	self.normalize = normalize
 
 	self.plot_list = plot_list  
@@ -83,7 +91,6 @@ class PlotGroup(TopoObject):
 	# store the PlotGroup in plot_group_dict
 	plotgroup_dict[plot_group_key]=self
 
-        self.all_plots = []
         self.added_list = []
 	self.bitmaps = []
 
@@ -95,6 +102,7 @@ class PlotGroup(TopoObject):
         # would have the first row with 3, the second row with 2, the
         # third row with 4, etc.  The default left-to-right ordering
         # in one row could perhaps be represented as (None, Inf).
+
 
     def _plot_list(self):
 	"""
@@ -135,8 +143,8 @@ class PlotGroup(TopoObject):
         Generate the bitmap lists.
         """
         bitmap_list = []
-	self.all_plots = flatten(self._plot_list()) + self.added_list
-        generated_bitmap_list = [each for each in self.all_plots if each != None]
+	all_plots = flatten(self._plot_list()) + self.added_list
+        generated_bitmap_list = [each for each in all_plots if each != None]
         ### JCALERT! For each plotgroup, we want the plot to be displayed
         ### in the alphabetical order according to their view_info['src_name']
         ### The only PlotGroup that does not have to do that is the projectionplotgroup
@@ -165,6 +173,7 @@ class TemplatePlotGroup(PlotGroup):
         else:
             self.sheet_filter_lam = lambda s : True
 
+	# add static images to the added_plot_list, as specified by the template.
         self._add_static_images()
 
 	
@@ -173,7 +182,7 @@ class TemplatePlotGroup(PlotGroup):
         Procedure that is called when creating a PlotGroup, that return the plot_list attribute
         i.e. the list of plot that are specified by the PlotGroup template.
 
-        This function calls create_plots, that is implemented in each PlotGroup subclasses.
+        This function calls create_plots, that is implemented in each TemplatePlotGroup subclasses.
         """
 	sheet_list = [each for each in dict_sort(self.simulator.objects(Sheet)) if self.sheet_filter_lam(each)]      
 	plot_list=self.plot_list
@@ -268,6 +277,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
         
         super(ProjectionPlotGroup,self).__init__(plot_group_key,plot_list,normalize,
                                                   simulator,template,sheet_name,**params)
+
 	### JCALERT! It is a bit confusing, but in the case of the projection
         ### sheet_filter_lam filter to one single sheet...
 	for s in self.simulator.objects(Sheet).values():
@@ -337,10 +347,10 @@ class ProjectionPlotGroup(TemplatePlotGroup):
         bitmap_list = []
       
 	self.debug('Dynamic plotgroup')
-	self.all_plots = flatten(self._plot_list()) + self.added_list
-	self.debug('all_plots = ' + str(self.all_plots))
+	all_plots = flatten(self._plot_list()) + self.added_list
+	self.debug('all_plots = ' + str(all_plots))
         
-        generated_bitmap_list = [each for each in self.all_plots if each !=None]
+        generated_bitmap_list = [each for each in all_plots if each !=None]
         return generated_bitmap_list
 
 
