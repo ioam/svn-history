@@ -23,21 +23,26 @@ installing</a> Topographica.</p>
 <h2>Response of an orientation map</h2>
 
 In this example, we will load a saved network and test its behavior by
-presenting different visual input patterns.
+presenting different visual input patterns.  We will assume that
+Topographica is installed in /home/jbednar/public/topographica/.
 
 <ol> 
 <p></p>
 <li>First, change to your topographica directory, e.g.:
 
-<blockquote><code class='to_type'>cd ~/topographica/</code></blockquote>
+<blockquote><code class='to_type'>cd /home/jbednar/public/topographica/</code></blockquote>
 <p></p>
 </li>
 
-<li> Next, start the Topographica GUI, telling it to load the
+<li>Next, start the Topographica GUI, telling it to load the
 lissom simulation:
-<blockquote><code class='to_type'>./topographica -g examples/lissom_oo_or.ty</code></blockquote>
+<blockquote><code class='to_type'>
+  ./topographica -g examples/lissom_oo_or.ty
+  </code></blockquote>
 <p></p>
-You should see a new window for the GUI:
+  
+After a few tens of seconds while the network is initialized, you should
+see a new window for the GUI:
 <p class='center'>
 <img src="images/topographica_console.png" alt="Console Window"
 align="middle" width="496" height="215">
@@ -50,12 +55,17 @@ similar buttons should be provided.
 </li>
 <li> Next, load the saved network by selecting
 selecting <span class='t_item'>Load snapshot</span> from the
-<span class='t_item'>Simulation</span> menu and selecting <code>examples/lissom_oo_or_20000.typ</code>. This
-simulation is a small orientation map, with a 54x54
-retina, a 36x36 LGN (composed of one 36x36 OFF channel sheet, and one 36x36 ON channel sheet), and a 48x48 V1 with about two million
-synaptic weights. The architecture can be viewed in the <span class='w_title'>Model Editor</span> window (which can be selected from the <span class='t_item'>Simulation</span> menu), but is also shown below:
+<span class='t_item'>Simulation</span> menu and selecting
+<code>examples/lissom_oo_or_20000.typ</code>. This small orientation
+map simulation should load in a few seconds, with a 54x54
+retina, a 36x36 LGN (composed of one 36x36 OFF channel sheet, and one
+36x36 ON channel sheet), and a 48x48 V1 with about two million 
+synaptic weights. The architecture can be viewed in the <span
+class='w_title'>Model Editor</span> window (which can be selected from
+the <span class='t_item'>Simulation</span> menu), but is also shown
+below:
 <p class='center'>
-<img src="images/lissom_network_diagram_oo.png" alt="LISSOM network."
+<img src="images/lissom_network_diagram_oo.png" alt="LISSOM network"
 align="middle" width="570" height="412">
 </p>
 
@@ -86,13 +96,28 @@ the <span class='t_item'>Plots</span> menu on the <span class='w_title'>Topograp
 
 This window shows the response for each neural area.  
 
-</p><p>In the <span class='t_item'>Retina</span> plot, each photoreceptor is represented as
-a pixel whose shade of grey codes the response level, increasing from black to
-white.  This pattern is what was specified in
-the <span class='w_title'>Test Pattern</span> window. The <span class='t_item'>LGNOn</span> and <span class='t_item'>LGNOff</span> activity levels are also coded in shades of grey. <!--CEBHACKALERT:missing edge buffer--> At this stage the response
-level in <span class='t_item'>V1</span> is also coded in shades of grey. Note that the response is patchy, as
-explained below.
+</p><p>In the <span class='t_item'>Retina</span> plot, each
+photoreceptor is represented as a pixel whose shade of grey codes the
+response level, increasing from black to white.  This pattern is what
+was specified in the <span class='w_title'>Test Pattern</span> window.
+Similarly, locations in the LGN that have an OFF or ON cell response
+to this pattern are shown in the <span class='t_item'>LGNOff</span> and
+<span class='t_item'>LGNOn</span> plots.  The Retina appears larger
+than the LGN because the borders of the Retina have been
+<A HREF="../User_Manual/space.html#edge-buffers"> extended on all
+sides</A> so that no LGN has a ConnectionField cut off by the border.
+At this stage the response level in <span class='t_item'>V1</span> is
+also coded in shades of grey. Note that the V1 response is patchy, as
+explained below.  The borders of the LGN were also extended so that no
+neuron in V1 would have an afferent ConnectionField cut off by the LGN
+border, though this may not be evident because the V1 plot is at a
+different scale than the others.
 
+<P>From these plots, you can see that the single line presented on the
+retina is edge-detected in the LGN, with ON LGN cells responding to
+areas brighter than their surround, and OFF LGN cells responding to
+areas darker than their surround.  In V1, the response is patchy, as
+explained below.
 </p>
 
 <p></p>
@@ -115,15 +140,16 @@ to the neuron in the center of the cortex (by default):
 neuron" align="middle" WIDTH="566" HEIGHT="266">
 </p>
 
-<p>
-The plot shows the afferent weights to V1 (i.e., connections from the ON and OFF channels of the LGN
-, followed by the  lateral excitatory and lateral inhibitory
-weights to that neuron from nearby neurons in V1. The afferent
-weights represent the retinal pattern that would most excite the neuron.
-For this particular neuron, the optimal retinal stimulus would be a
-bright line oriented at about 45 degrees (10 o'clock) in the center of
-the retina, although this neuron is not particularly orientation selective.
-</p><p></p></li><li>If all neurons had the same weight pattern, the response
+<p> The plot shows the afferent weights to V1 (i.e., connections from
+the ON and OFF channels of the LGN, followed by the lateral excitatory
+and lateral inhibitory weights to that neuron from nearby neurons in
+V1. The afferent weights represent the retinal pattern that would most
+excite the neuron.  For this particular neuron, the optimal retinal
+stimulus would be a short, bright line oriented at about 40 degrees (2
+o'clock) in the center of the retina, although this neuron is not
+particularly orientation selective.  </p><p></p></li>
+
+<li>If all neurons had the same weight pattern, the response
 would not be patchy -- it would just be a blurred version of the
 input (for inputs matching the weight pattern), or blank (for other
 inputs). To see what the other neurons look like, select <span
@@ -131,6 +157,7 @@ class='t_item'>Projection</span> from the <span
 class='t_item'>Plots</span> menu, then select <span
 class='t_item'>LGNOnAfferent</span> from the drop-down <span
 class='t_item'>Projection</span> list:
+  
 
 <p class="center">
 <img src="images/projection_oo.png" alt="Afferent weights of many
@@ -147,8 +174,6 @@ the <span class='t_item'>LateralInhibitory</span> weights instead of
 <span class='t_item'>Afferent0</span>; those are patchy as well because the typical
 activity patterns are patchy.
 
-<!--CEBHACKALERT: ON/OFF explanation-->
-
 </p><p></p></li><li>To visualize all the neurons at once
 in experimental animals, optical imaging experiments measure responses
 to a variety of patterns and record the one most effective at stimulating each
@@ -163,20 +188,24 @@ refresh during this time.  Once it completes, you should see:
 </p><br>
 
 <P>
-The plot on the left is the orientation map for V1 in this network.
+The <span class='t_item'>Orientation Preference</span> plot
+is the orientation map for V1 in this model.
 Each neuron in the plot is color coded by its preferred orientation,
 according to the key shown to the left of the plot.
 (If viewing a monochrome printout, see web page for the colors).
 </p>
 
-<p>
-You can see that nearby neurons have similar orientation preferences,
-as found in primate visual cortex. The V1 plot on the right shows the
-relative selectivity of each neuron for orientation; you can see that
-in this simulation nearly all neurons became orientation selective.
-The V1 plot in the center shows the two previously mentioned plots
-combined -- each neuron is colored with its preferred orientation, and
-the stronger the selectivity, the brighter the color.
+<p> You can see that nearby neurons have similar orientation
+preferences, as found in primate visual cortex. The <span
+class='t_item'>Orientation Selectivity</span> plot shows the relative
+selectivity of each neuron for orientation on an arbitrary scale; you
+can see that in this simulation nearly all neurons became orientation
+selective.  The <span class='t_item'>Orientation
+Preference&Selectivity</span> plot shows the two other Orientation
+plots combined -- each neuron is colored with its preferred
+orientation, and the stronger the selectivity, the brighter the color.
+In this case, because the neurons are strongly selective, the
+Preference&Selectivity plot is nearly identical to the Preference plot.
 
 </p><p>
 </p></li>
@@ -212,19 +241,23 @@ it again -- the colors should be different, and match the orientation chosen.
 <li> If you now <span class='b_press'>Refresh</span> the
 <span class='w_title'>Connection Fields</span>
 window, you can see that the neuron whose weights we plotted is
-located in a patch of neurons responding to similar orientations:
+located in between two different patches of neurons responding to
+different orientations: 
 
 
 <p class="center">
 <img src="images/unit_weights_0_0_oo_or.png" alt="Colorized weights of
 one neuron" align="middle" width="566" height="266" ><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
-
-
 </p>
 <p>
-Look at the <span class='t_item'>LateralInhibitory</span> weights, which show that
-the neurons around the location to the right of the retina's center are primarily green <!--CEBHACKALERT: hmm...-->. 
+Look at the <span class='t_item'>LateralExcitatory</span> weights, which show that
+the neurons around the location to the right of the retina's center
+are primarily green, while those to the left are primarily red.  Thus
+this particular neuron happens to be located on a fracture between two
+orientations, which is why its orientation selectivity is low.
+Neurons just to the left or right can be selected by changing the
+(X,Y) coordinates; these should have higher selectivity.
 </p>
 <p></p></li>
 
@@ -242,10 +275,13 @@ control its size, location, etc.:
 </p><blockquote>
 <dl compact="compact">
 <dt><span class='t_item'>orientation</span>                          </dt><dd> controls the angle (try PI/4 or -PI/4)
-</dd><dt><span class='t_item'>x</span> and <span class='t_item'>y</span>         </dt><dd> control the position on the retina (try 0 or 0.5)
-</dd><dt><span class='t_item'>width</span> and
-<span class='t_item'>height</span> </dt><dd>
-control the width and height of e.g. Gaussians and rings
+</dd><dt><span class='t_item'>x</span> and <span class='t_item'>y</span>         </dt><dd> 
+control the position on the retina (try 0 or 0.5)
+</dd><dt><span class='t_item'>size</span></dt><dd>
+controls the overall size of e.g. Gaussians and rings
+</dd><dt><span class='t_item'>aspect_ratio</span> </dt><dd>
+controls the ratio between width and height; will be scaled by the
+  size in both directions
 </dd><dt><span class='t_item'>smoothing</span>
 </dt><dd> controls the amount of Gaussian falloff around the edges of patterns such as rings and lines
 </dd><dt><span class='t_item'>scale</span>
@@ -265,26 +301,27 @@ are less sensitive to the scale or contrast.
 
 <p> 
 To present photographs, select a <span class='t_item'>Pattern generator</span> of type
-<span class='t_item'>Image</span>. (You can type the path to a PGM file of your
-own in the <span class='t_item'>filename</span> box.) For most photographs you will
-need to change the <span class='t_item'>scale</span> to to see a reasonable
-response from this network.  A much larger (and slower) network would
+<span class='t_item'>Image</span>. (You can type the path to an image file of your
+own (in e.g. PNG, JPG, TIFF, or PGM format) in the <span
+class='t_item'>filename</span> box.) For most photographs you will 
+need to change the <span class='t_item'>scale</span> to something like
+0.6 to see a reasonable
+response from this model V1.  A much larger (and slower) map would
 be required to see detailed patterns in the response to most images,
-but even with this network you can see some orientation-specific
-responses to large contours in the image:  
+but even with this network you may be able to see some
+orientation-specific responses to large contours in the image:
 </p>
 
 <p class="center">
-<img src="images/natural_image_oo_or.png" alt="Ellen Arthur" align="middle" width="562" height="293" ><br />
+<img src="images/natural_image_oo_or.png" alt="Ellen Arthur" align="middle" width="424" height="256" ><br />
 </p>
 
-
-
-<!--CEBHACKALERT: update .... Be aware when comparing the
-Retina and V1 plots for a photograph that each processing stage
-eliminates some of the outer edges of the image, so that V1 is
-only looking at the center of the image on the Retina.-->
-</p></li></ol>
+<P>Be aware when comparing the Retina and V1 plots for a photograph
+that each processing stage eliminates some of the outer edges of the
+image, so that V1 is only looking at the center of the image on the
+LGN.
+</p></li>
+</ol>
 
 
 
@@ -298,18 +335,16 @@ studied using the LISSOM model in Topographica as follows.
 <p>
 </p><ol>
 
-<p></p><li>First, select <span class='t_item'>Load script</span>
-from the <span class='t_item'>Simulation</span> menu, change to the <code>examples</code> directory, and
-select <code>lissom_or.ty</code>. This reverts the 
-network to its initial, disorganized state.  You will probably also
-want to close any open plotting windows, to avoid confusion.
+<p></p><li>First, quit and restart as above, but without loading the
+  saved <code>.typ</code> network.
 
 <p></p></li><li>Next, open an <span class='w_title'>Activity</span> window 
 and make sure that it has <span class='t_item'>Auto-refresh</span> enabled.  Unless your machine is 
 very slow, also enable <span class='t_item'>Auto-refresh</span> in a
-<span class='w_title'>Projection</span> window.  On a very fast machine you could
+<span class='w_title'>Projection</span> window showing <span
+class='t_item'>LGNOnAfferent</span>.  On a very fast machine you could
 even <span class='t_item'>Auto-refresh</span> an <span class='w_title'>Orientation Preference</span> window
-(highly optional).
+(not really practical at present).
 
 <p></p></li><li>Now click the mouse into the <span class='t_item'>Learning iterations</span> field
 of the <span class='w_title'>Topographica Console</span> window, and press return a few
@@ -320,17 +355,23 @@ learning this input can be seen in the <span class='w_title'>Projection</span>
 window.
 
 <p></p></li><li>With each new input, you should be able to see small changes in the
-weights of a few neurons in the array (by peering closely).  If the changes are too subtle for your taste,
+weights of a few neurons in the <span
+class='t_item'>LGNOnAfferent</span> array (by peering closely).  If the changes are too subtle for your taste,
 you can make each input have a obvious effect by speeding up learning
 to a highly implausible level.  To do this, type: 
 
-<blockquote><code class='to_type'>V1.projections()['Afferent0'].learning_rate</code></blockquote>
+<blockquote><code class='to_type'>
+V1.projections()['LGNOnAfferent'].learning_rate
+</code></blockquote>
 
 in the <span class='t_item'>Command</span> box or at the Topographica
 terminal prompt. The current learning rate will be
 displayed in your terminal window. Next, type:
 
-<blockquote><code class='to_type'>V1.projections()['Afferent0'].learning_rate=0.1</code></blockquote>
+<blockquote><code class='to_type'>
+V1.projections()['LGNOnAfferent'].learning_rate=200
+V1.projections()['LGNOffAfferent'].learning_rate=200
+</code></blockquote>
 
 Now each new pattern generated in a
 training iteration will nearly wipe out any existing weights.
@@ -379,17 +420,17 @@ patient, try doing 1000 iterations at a time instead before looking at
 an Orientation Map</b></span>.<p></p></li>
 -->
 
-<p><li> If you are <em>really</em> patient, you can
-change the number of units to something closer to real primate cortex,
-by quitting, editing the Python code file
-<code>examples/lissom_or.ty</code> to contain
-the line <code>BaseN=150</code> rather than <code>BaseN=48</code>, and restarting.  You'll need at
-least 640MB of memory and a lot of time, but you can then step through
-the simulation as above.  The final result after 20000 iterations
-(i.e., several hours) should be a much smoother map and neurons that
-are more orientation selective.  Even so, the overall organization and
-function should be similar.
-</li></ol>
+<p><li> If you are <em>really</em> patient, you can change the number
+of units to something closer to real primate cortex, by quitting,
+editing the Python code file <code>examples/lissom_or.ty</code> to
+contain the line <code>BaseN=150</code> rather than
+<code>BaseN=48</code>, and restarting.  You'll need at least 640MB of
+memory and a lot of time, but you can then step through the simulation
+as above.  The final result after 20000 iterations (requiring several hours,
+if not days) should be a much smoother map and neurons that are more
+orientation selective.  Even so, the overall organization and function
+should be similar.  </li></ol>
+
 
 <h2>Exploring further</h2>
 
