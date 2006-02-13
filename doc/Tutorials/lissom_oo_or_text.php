@@ -51,12 +51,12 @@ similar buttons should be provided.
 <li> Next, load the saved network by selecting
 selecting <span class='t_item'>Load snapshot</span> from the
 <span class='t_item'>Simulation</span> menu and selecting <code>examples/lissom_oo_or_20000.typ</code>. This
-simulation is a small orientation map, with a 24x24
-retina, a 24x24 LGN (composed of one 24x24 OFF channel sheet, and one 24x24 ON channel sheet), and a 48x48 V1 with about two million
+simulation is a small orientation map, with a 54x54
+retina, a 36x36 LGN (composed of one 36x36 OFF channel sheet, and one 36x36 ON channel sheet), and a 48x48 V1 with about two million
 synaptic weights. The architecture can be viewed in the <span class='w_title'>Model Editor</span> window (which can be selected from the <span class='t_item'>Simulation</span> menu), but is also shown below:
 <p class='center'>
 <img src="images/lissom_network_diagram_oo.png" alt="LISSOM network."
-align="middle" width="512" height="354">
+align="middle" width="570" height="412">
 </p>
 
 <p></p>
@@ -68,7 +68,7 @@ select <span class='t_item'>Test pattern</span> from the <span class='t_item'>Si
 
 <p class='center'>
 <img src="images/test_pattern_oo.png" alt="Test Pattern window"
-align="middle" width="342" height="612">
+align="middle" WIDTH="324" HEIGHT="600">
 </p>
 
 <p>
@@ -81,18 +81,14 @@ This will present a horizontal line.
 <li>To see the result, select <span class='t_item'>Activity</span> from
 the <span class='t_item'>Plots</span> menu on the <span class='w_title'>Topographica Console</span> to get:
 <p class='center'>
-<img src="images/activity_line_oo.png" alt="Response to a line" align="middle" width="562" height="293">
+<img src="images/activity_line_oo.png" alt="Response to a line" align="middle" width="424" height="256">
 </p>
 
-
-
-This window shows the response for each neural area, <span
-class='t_item'>Retina</span> on the left
-and <span class='t_item'>V1</span> on the right.  
+This window shows the response for each neural area.  
 
 </p><p>In the <span class='t_item'>Retina</span> plot, each photoreceptor is represented as
 a pixel whose shade of grey codes the response level, increasing from black to
-white.  These patterns are what was specified in
+white.  This pattern is what was specified in
 the <span class='w_title'>Test Pattern</span> window. The <span class='t_item'>LGNOn</span> and <span class='t_item'>LGNOff</span> activity levels are also coded in shades of grey. <!--CEBHACKALERT:missing edge buffer--> At this stage the response
 level in <span class='t_item'>V1</span> is also coded in shades of grey. Note that the response is patchy, as
 explained below.
@@ -106,14 +102,17 @@ explained below.
 the weights to V1 neurons.  These weights were learned previously, by
 presenting 20000 oriented Gaussian patterns at random angles
 and positions.  To plot a single neuron, select 
-<span class='t_item'>Connection Fields</span> from the <span class='t_item'>Plots</span> menu, then select <span class='t_item'>V1</span> from the <span class='t_item'>Sheet</span> drop-down list. This will plot the synaptic strengths of
-the neuron in the center of the cortex by default:
+<span class='t_item'>Connection Fields</span> from the <span
+class='t_item'>Plots</span> menu, then select <span
+class='t_item'>V1</span> from the <span class='t_item'>Sheet</span>
+drop-down list. This will plot the synaptic strengths of connections
+to the neuron in the center of the cortex (by default):
 
 
 
 <p class="center">
 <img src="images/unit_weights_0_0_oo.png" alt="Weights of one
-neuron" align="middle" width="592" height="315">
+neuron" align="middle" WIDTH="566" HEIGHT="266">
 </p>
 
 <p>
@@ -122,15 +121,20 @@ The plot shows the afferent weights to V1 (i.e., connections from the ON and OFF
 weights to that neuron from nearby neurons in V1. The afferent
 weights represent the retinal pattern that would most excite the neuron.
 For this particular neuron, the optimal retinal stimulus would be a
-bright line oriented at about 45 degrees (10 o'clock) in the center of the retina.
+bright line oriented at about 45 degrees (10 o'clock) in the center of
+the retina, although this neuron is not particularly orientation selective.
 </p><p></p></li><li>If all neurons had the same weight pattern, the response
 would not be patchy -- it would just be a blurred version of the
 input (for inputs matching the weight pattern), or blank (for other
-							  inputs). To see what the other neurons look like, select <span class='t_item'>Projection</span> from the <span class='t_item'>Plots</span> menu, then select <span class='t_item'>LGNOnAfferent</span> from the drop-down <span class='t_item'>Projection</span> list:
+inputs). To see what the other neurons look like, select <span
+class='t_item'>Projection</span> from the <span
+class='t_item'>Plots</span> menu, then select <span
+class='t_item'>LGNOnAfferent</span> from the drop-down <span
+class='t_item'>Projection</span> list:
 
 <p class="center">
 <img src="images/projection_oo.png" alt="Afferent weights of many
-neurons" align="middle" width="653" height="452">
+neurons" align="middle" WIDTH="639" HEIGHT="449">
 </p>
 
 This plot shows the afferent weights from the LGN ON sheet for every fifth neuron in each
@@ -149,16 +153,16 @@ activity patterns are patchy.
 in experimental animals, optical imaging experiments measure responses
 to a variety of patterns and record the one most effective at stimulating each
 neuron.  A similar procedure can be performed in the model by selecting
-<span class='t_item'>Orientation Preference</span> from the <span class='t_item'>Plots</span> menu:
+<span class='t_item'>Orientation Preference</span> from the <span
+class='t_item'>Plots</span> menu.  This will usually take about 30
+seconds to complete; it is normal for the Topographica windows not to
+refresh during this time.  Once it completes, you should see:
 
 <p class="center">
-<img src="images/oo_or_map.png" alt="Orientation map" width="617" height="293">
+<img src="images/oo_or_map.png" alt="Orientation map" width="617" height="292">
 </p><br>
 
-
 <P>
-(This will usually take about 30 seconds to complete; it is normal
-for the Topographica windows not to refresh during this time.)
 The plot on the left is the orientation map for V1 in this network.
 Each neuron in the plot is color coded by its preferred orientation,
 according to the key shown to the left of the plot.
@@ -169,14 +173,10 @@ according to the key shown to the left of the plot.
 You can see that nearby neurons have similar orientation preferences,
 as found in primate visual cortex. The V1 plot on the right shows the
 relative selectivity of each neuron for orientation; you can see that
-there are patches of neurons near the borders that are not very
-orientation selective, and smaller patches in the center, but that
-most are selective.  The V1 plot in the center shows the two
-previously mentioned plots combined -- each neuron is colored with its
-preferred orientation, and the stronger the selectivity, the brighter
-the color.  From this plot it is clear that the unselective patches
-tend to lie between patches of different colors (i.e. different
-preferred orientations).
+in this simulation nearly all neurons became orientation selective.
+The V1 plot in the center shows the two previously mentioned plots
+combined -- each neuron is colored with its preferred orientation, and
+the stronger the selectivity, the brighter the color.
 
 </p><p>
 </p></li>
@@ -187,7 +187,7 @@ on the <span class='w_title'>Test pattern</span> window and then looking
 at the refreshed image in the <span class='w_title'>Activity</span> window:
 
 <p class="center">
-<img src="images/activity_line_oo_or.png" alt="Color-coded response to a line" width="562" height="293"><br />
+<img src="images/activity_line_oo_or.png" alt="Color-coded response to a line" width="424" height="256" ><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
 
@@ -217,7 +217,7 @@ located in a patch of neurons responding to similar orientations:
 
 <p class="center">
 <img src="images/unit_weights_0_0_oo_or.png" alt="Colorized weights of
-one neuron" align="middle" width="573" height="267" ><br />
+one neuron" align="middle" width="566" height="266" ><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 
 
