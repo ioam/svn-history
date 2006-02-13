@@ -170,10 +170,10 @@ class Parameter(object):
     # where it is defined. As a result, subclasses will have a
     # __dict__ unless they also define __slots__.
 
-    __slots__ = ['_name','default','doc','hidden','precedence']
+    __slots__ = ['_name','default','doc','hidden','precedence','value_semantics']
     count = 0
 
-    def __init__(self,default=None,doc=None,hidden=False,precedence=None):
+    def __init__(self,default=None,doc=None,hidden=False,precedence=None,value_semantics=False):
         """
         Initialize a new parameter.
 
@@ -205,6 +205,7 @@ class Parameter(object):
         Parameter.count += 1
         self.default = default
         self.doc = doc
+        self.value_semantics = value_semantics
 
     def __get__(self,obj,objtype):
         """

@@ -294,6 +294,17 @@ class TopoObject(object):
 
 
     def __setup_params(self,**config):
+        """
+        """
+        # CEBHACKALERT: testing code - here as an example
+        # of how we might do value semantics.
+        # deepcopy a Parameter if its 'value_semantics' attribute is True
+        for class_ in classlist(type(self)):
+            for (k,v) in class_.__dict__.items():
+                if isinstance(v,Parameter) and v.value_semantics==True:                 
+                    p_name = v.get_name(self) # the name that this TopoObject has for this Parameter
+                    self.__dict__[p_name] = copy.deepcopy(v.default)
+                    
         for name,val in config.items():
             desc,desctype = self.__class__.get_param_descriptor(name)
             if desc:
@@ -301,6 +312,7 @@ class TopoObject(object):
             else:
                 self.warning("CANNOT SET non-parameter %s ="%name, val)
             setattr(self,name,val)
+
 
     def get_param_values(self):
         """Return a list of name,value pairs for all Parameters of this object"""
