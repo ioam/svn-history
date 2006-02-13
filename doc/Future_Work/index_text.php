@@ -24,15 +24,16 @@ although it is not usually difficult for individual tech-savvy users
 to get Topographica working on those platforms before we have had a
 chance to look at them.
 
-<P><DT></DT><DD>
-The GUI and the simulation run should be asynchronous, either using
-threads or subprocesses.  Right now, the GUI is on hold (not even
-redrawing the screen) during processor-intensive computations such as
-learning or computing preference maps.  Without any progress report or
-status meter, users are likely to assume that the software has hung.
-Thus it is crucial to provide this sort of status display, as well as
-allowing interruption or other activities during long computations.
-<!-- 
+<P><DT>Progress updating and cancellation</DT><DD> 
+
+Progress reporting of the display has now been implemented during
+learning, so that users will be able to tell how much progress has
+been made.  However, during other processor-intensive computations
+like computing preference maps, the display will not yet be updated,
+and users are likely to assume that the software has hung.  Thus it is
+crucial to provide a status display in such cases, as well as allowing
+interruption or other activities during long computations.
+<!--
   Using an RPC (or XML-RPC) subprocess would be nice, because it will
   allow a "clean reload" of the simulation like what you get with F5
   in IDLE, and will allow the GUI to be local while the simulator runs
@@ -51,7 +52,7 @@ any variable holding a lambda function.  As a result, there can be
 cases when not all of the important properties of the network are
 restored, and we will be working to eliminate such cases.  In
 addition, pickling is not robust against changes to the class
-definitions for LISSOM, such as changes in names.  To reduce these
+definitions for LISSOM, such as changes in class names.  To reduce these
 problems, we are working on an alternative implementation of state
 saving using XML, which is designed to be an archival, readable
 format.  In the meantime, users should be aware that saved snapshot
@@ -62,35 +63,30 @@ Topographica, and should be considered temporary.
 Two-dimensional bitmap plots are already supported, but will be
 expanded significantly over the near term and longer term.  Immediate
 tasks include allowing the user to control plot brightness scaling if
-desired, and adding an "overload" or "cropped" indicator to show if
-some values are too large to be displayed in the selected range.  We
-will also be adding support for arbitrary user-defined colormaps, and
-for numerical indications of the plotting scales.
+desired, adding user-defined colormaps, and adding an "overload" or
+"cropped" indicator to show if some values are too large to be
+displayed in the selected range.  We will also be adding support for
+arbitrary user-defined colormaps, and for numerical indications of the
+plotting scales.
 
 <P><DT>Input patterns</DT><DD>
-The support for drawing input patterns is fairly mature, but to handle
-multiple patterns per presentation, it will be necessary to add a
-Composite pattern type, which combines multiple PatternGenerator
-outputs into a single pattern.  
+The support for drawing input patterns is fairly mature, but support
+for Composite patterns is not yet complete.  Composite patterns are
+necessary for such things as weights initialized with Gaussians plus
+random noise, multiple patterns per iteration, or selecting from a
+database of natural images.  
 <!-- Also need to respect bounding boxes for this to be practical. -->
 
-<P><DT>Sheet scaling</DT><DD>
-The size and density of Sheets can currently be specified and changed
-arbitrarily, but some parameters (such as the learning rates) are still
-defined in forms that are valid only for specific densities.  These
-parameters will be redefined to be expressed in density-independent terms.
-
 <P><DT>Circular CFs</DT><DD>
-Currently, only square ConnectionFields are implemented, but support
-for circular (or any arbitrary shape) ConnectionFields is currently 
-in development. 
+Preliminary support is now implemented for circular (or any other
+  shape) CFs, but this will be improved in upcoming releases.
 <!-- Also should consider sparse layers with patch distribution of units -->
 
 <P><DT>Convolution Projections</DT><DD>
-Typical LGN models use Difference of Gaussians (DoG) units, which are
+LGN models use Difference of Gaussians (DoG) units, which are
 effectively convolutions of a fixed weight vector with an input
-region.  Implementing these in Topographica will be straightforward,
-and should be done in the near future.
+region, are now supported, but these will be improved in upcoming
+releases.
 
 <P><DT>Command-line and batch interfaces</DT><DD>
 Although Topographica is written to be independent of the type of
@@ -129,19 +125,20 @@ literature.  These will act as starting points for developing models
 in Topographica.
 
 <P><DT>Plotting</DT><DD>
-We will be adding 1D (line) and 2D (contour or vector field) plots
-based on <A HREF="http://matplotlib.sourceforge.net/">MatPlotLib</A>
-in the near future.  MatPlotLib is already included in the
-distribution, and can be used to visualize any data in the simulation,
-but we do not yet provide examples or generate the plots
-automatically.  We plan to use MatPlotLib 2D plots to allow any
-SheetView(s) to be used as a <A
-HREF="http://matplotlib.sourceforge.net/screenshots/pcolor_demo_large.png">contour</A>
-or vector field overlay on top of a bitmap, e.g. for joint preference
-maps (such as direction arrows on topo of an orientation bitmap plot).
-<!-- Plan: Templates accept a Contours parameter, which can be a list of 
-(sheetview, threshold) pairs, which will be drawn in order. -->
-
+We have recently added 1D (line) and 2D (contour or vector field)
+plots based on
+<A HREF="http://matplotlib.sourceforge.net/">MatPlotLib</A> for any
+program object selected by the user.  We will also be making the
+general-purpose template-based plotting use the 2D plots, which will
+make it possible to do
+<A HREF="http://matplotlib.sourceforge.net/screenshots/pcolor_demo_large.png">contour</A>
+plots, as well as matrix plots showing axis ticks and labels.  We
+also plan to use MatPlotLib 2D plots to allow any SheetView(s) to be
+used as a or vector field overlay on top of a bitmap, e.g. for joint
+preference maps (such as direction arrows on topo of an orientation
+bitmap plot).
+<!-- Plan: Templates accept a Contours parameter, which can be a list
+of (sheetview, threshold) pairs, which will be drawn in order. -->
 
 <P>Other minor changes planned include adding outlining of
 ConnectionField extents, and plotting histograms for each bitmap.
@@ -167,7 +164,7 @@ and their output, either as a single shell-editor component (like IDLE
 or MatLab) or as a separate pane (not a drop-down).  
 <!--
   The PMW HistoryText
-  widget will probably work nicely for this, but you need to figureout
+  widget will probably work nicely for this, but you need to figure out
   how to get the output that normally goes to the shell window and put
   it in a gui pane.  Pyro Robotics does this, so you might be able to
   steal their code. (jprovost)
@@ -290,14 +287,14 @@ Topographica users with experience in these domains will be
 particularly helpful.
 
 
-<P><DT>Data import/export</DT><DD>
-It will be crucial to provide easy-to-use interfaces for exchanging
-data and calling code in other simulators, such as Matlab (see
-pymat.sourceforge.net).  These will
-be used both for analyzing Topographica data, and for allowing
-connection patterns and/or map organization to be specified from
-experimental data.  Meanwhile, the Python command-line interface can
-be used to display or save any element of the model.
+<P><DT>Data import/export</DT><DD> It will be crucial to provide
+easy-to-use interfaces for exchanging data and calling code in other
+simulators, such as Matlab (see
+<A HREF="http://pymat.sourceforge.net">pymat.sourceforge.net</A>).
+These will be used both for analyzing Topographica data, and for
+allowing connection patterns and/or map organization to be specified
+from experimental data.  Meanwhile, the Python command-line interface
+can be used to display or save any element of the model.
 
 <P><DT>Lesion support</DT><DD>
 Eventually, all components will be temporarily lesionable, i.e.,
@@ -462,7 +459,7 @@ network based on that data.
 
 More ambitiously, could start out with the above rough sketch of a
 network, then auto-optimize parameters to match a set of behavioral
-observations.  --> Longer-term project; will need ways to explore the
+observations. Longer-term project; will need ways to explore the
 space of possible models matching those observations.
 
 In general, it would be useful to start with a set of observations,
