@@ -6,7 +6,8 @@ $Id$
 """
 
 # CEBHACKALERT: I have to go over this file. It should be considered
-# untested.
+# untested. Needs to be updated following changes to Sheet and
+# pattern generator.
 
 from topo.base.topoobject import TopoObject
 from topo.base.sheet import bounds2slice
@@ -37,10 +38,13 @@ def sheet2matrixidx_array(x,y,bounds,density):
     boundary will be just outside the matrix, because the right and
     bottom boundaries are exclusive.
     """
-
-    left,bottom,right,top = bounds.aarect().lbrt()
-    xdensity = int(density*(right-left)) / float((right-left))
-    ydensity = int(density*(top-bottom)) / float((top-bottom))
+    # CEBHACKALERT: see Sheet.__init__
+    if type(density)!=tuple:
+        left,bottom,right,top = bounds.aarect().lbrt()
+        xdensity = int(density*(right-left)) / float((right-left))
+        ydensity = int(density*(top-bottom)) / float((top-bottom))
+    else:
+        xdensity,ydensity = density
 
     r,c = sheet2matrix(x,y,bounds,xdensity,ydensity)
     r = floor(r)
