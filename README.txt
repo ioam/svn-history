@@ -52,7 +52,7 @@ editor.
 
 USING TOPOGRAPHICA
 
-See doc/Tutorial/index.html for examples of getting started with
+See doc/Tutorials/index.html for examples of getting started with
 Topographica, and doc/index.html for all of the documentation.  You
 can also get online help from the Topographica command line using
 help(), or from the shell command line using "./bin/pydoc some-text".
