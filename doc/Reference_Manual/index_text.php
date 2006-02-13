@@ -2,7 +2,11 @@ This reference manual contains detailed documentation of each
 component making up Topographica, assuming that the user is already
 familiar with basic Topographica usage.  See the
 <A HREF="../User_Manual/index.html">User Manual</A> and
-<A HREF="../Tutorials/index.html">Tutorials</A> for such a introduction.
+<A HREF="../Tutorials/index.html">Tutorials</A> for such a
+introduction.  Note that the documentation of these components is
+gradually being improved; many components (especially Parameters) do
+not have suitable documentation yet.
+<!-- JABALERT: Needs updating once docstrings are more consistent -->
 
 <H2>Main packages</H2>
 
