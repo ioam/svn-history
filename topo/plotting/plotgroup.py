@@ -37,14 +37,8 @@ def cmp_plot(plot1,plot2):
 		   (plot2.plot_src_name+plot2.name))
 
 
-def sort_plots(plot_list):
-    """Sort a list of plots according to the src_names."""
-    plot_list.sort(cmp_plot)
-
-
 # PlotGroup used by the simulation are stored in this dictionnary
 plotgroup_dict = {}
-
 
 
 
@@ -145,15 +139,20 @@ class PlotGroup(TopoObject):
         bitmap_list = []
 	all_plots = flatten(self._plot_list()) + self.added_list
         generated_bitmap_list = [each for each in all_plots if each != None]
-        ### JCALERT! For each plotgroup, we want the plot to be displayed
-        ### in the alphabetical order according to their view_info['src_name']
-        ### The only PlotGroup that does not have to do that is the projectionplotgroup
-        ### and that is why this function is overwritten. 
-        ### (It has to be fixed, as well as the handling of plot label in general)
-        sort_plots(generated_bitmap_list)
+	# sorting the Plots.
+	self._ordering_plots(generated_bitmap_list)
         return generated_bitmap_list
-    
-  
+   
+
+    def _ordering_plots(self,plot_list):
+	"""
+	Function called to sort the Plots in order.
+	They are ordered according to their precedence number first, and then by alphabetical order.
+	"""
+	return plot_list.sort(cmp_plot)
+
+
+
 
 class TemplatePlotGroup(PlotGroup):
     """
@@ -334,23 +333,12 @@ class ProjectionPlotGroup(TemplatePlotGroup):
         return coords
 
     
-    ### JCALERT ! for the moment this function is re-implemented only for ProjectionGroup
-    ### because we do not want the plots to be sorted according to their src_name in this case
-    ### To avoid this problem, the sorting should be done from the panel according to the bitmap
-    ### src_name and name + a computation level number that sould be added to Sheet and then SheetView, indicating
-    ### a hierarchy (e.g Retina: level 0, V1: level 1, V2: level 2... this has obviously has to be defined by
-    ### the user.)
-    def plots(self):
-        """
-        Generate the bitmap lists.
-        """            
-        bitmap_list = []
-      
-	self.debug('Dynamic plotgroup')
-	all_plots = flatten(self._plot_list()) + self.added_list
-	self.debug('all_plots = ' + str(all_plots))
-        
-        generated_bitmap_list = [each for each in all_plots if each !=None]
-        return generated_bitmap_list
-
+    def _ordering_plots(self,plot_list):
+	"""
+	Function called to sort the Plots in order.
+	It is re-implmented for ProjectionPlotGroup, because we do not want to order the Connection Field
+        views composing the projection plot in any order (i.e. we want to preserve the same order).
+	"""
+	return plot_list
+    
 
