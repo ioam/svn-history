@@ -164,15 +164,25 @@ to make sure that compatible libraries are available.
 
 <P><B>Windows:</B> It should be possible to build Topographica under
 Windows just as is done under UNIX, if you first install <A
-HREF="http://www.cygwin.com/">Cygwin</a>, although as of 2/2006 the library versions available on Cygwin are a bit out of date and thus this process does not currently go smoothly. Alternatively, nearly all of the features of Topographica are available with a Win32-native Python, and if you choose this option then Cygwin is optional. The basic steps for building the native version are:<ol>
-<li> Double click on setup.bat
-<li> Follow the various installation prompts for the packages 
-     bundled with Topographica.
+HREF="http://www.cygwin.com/">Cygwin</a>, although as of 2/2006 the
+library versions available on Cygwin are a bit out of date and thus
+this process does not currently go smoothly. Most of the features of
+Topographica are available with a Win32-native Python, and if you
+choose this option then Cygwin is optional. However, there are likely
+to be a lot of small problems that we have not yet had the time to
+eliminate, so the native version on Windows is not yet suitable for
+most users.
+
+<P>In any case, the basic steps for building the native version are:
+
+<ol>
+<li> Double click on setup.bat 
+<li> Follow the various installation prompts for the packages bundled with Topographica.
 </ol>
 
 <P>
 If you do not wish to install to the default Windows program files
-directory, you will need to run setup.bat from the command-line, with
+directory, you will instead need to run setup.bat from the command-line, with
 the target base path as the first parameter.  For example, to install
 to D:\Topographica, the command would be: "setup D:"
 
