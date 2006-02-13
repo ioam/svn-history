@@ -168,6 +168,6 @@ s.schedule_action(20000, set_deltabeta,0.223 , 0.863)
 V1.gui_x=306.0;     V1.gui_y=225.0
 LGNOn.gui_x=432.0;  LGNOn.gui_y=345.0
 LGNOff.gui_x=150.0; LGNOff.gui_y=345.0
-Retina.gui_x=279.0; Retina.gui_y=486.0
+Retina.gui_x=279.0; Retina.gui_y=500.0
 
 s.run(0)
