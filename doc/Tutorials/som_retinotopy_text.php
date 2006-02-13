@@ -317,22 +317,27 @@ your terminal window. Then change this value as you see fit, e.g. to
 and go through learning again.  With such a small learning radius,
 global ordering is unlikely to happen, and one can expect the
 topographic grid not to flatten out (despite local order in patches).
+<br>
+<br>
 
-<P>Similarly, consider changing the
-learning rate from <code>V1.alpha_0=0.42</code> to e.g. 1.0.
-V1.density and Retina.density cannot be changed after the simulation
-has started; to change those edit the <code>som_retinotopy.ty</code>
-file as described in the initial steps above.
+<P>Similarly, consider changing the learning rate from
+<code>V1.alpha_0=0.42</code> to e.g. 1.0.  V1.density and
+Retina.density cannot be changed after the simulation has started; to
+change those edit the <code>som_retinotopy.ty</code> file as described
+in the initial steps above and start Topographica again.
 
 <P>You can also try changing the random.seed() value in the .ty file,
 to get a different stream of inputs, or RandomArray.seed(), to get a
 different set of initial weights.
 
-<P>Of course, the input pattern can also be changed.  E.g. if an
-oriented pattern is used, with random orientations, neurons will
-become selective for orientation and not just position.  See the
-<code>obermayer_pnas90.ty</code> file for more details.
+<P>Finally, you could change the input pattern to get a different type
+of map.  E.g. if an oriented pattern is used, with random
+orientations, neurons will become selective for orientation and not
+just position.  See the <code>examples/obermayer_pnas90.ty</code> file
+for more details, though that simulation is quite processor-intensive
+compared to this one.
 
+</ol>
 
 <h2>Exploring further</h2>
 
