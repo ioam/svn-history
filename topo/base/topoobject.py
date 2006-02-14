@@ -127,6 +127,11 @@ class TopoMetaclass(type):
         values for non-Parameter objects in TopoObjects, and have the
         values inherited through the TopoObject hierarchy as usual.
         """
+        # CEBHACKALERT: the problem with looking only for None is
+        # for things like bounds, which default to (None,None) in
+        # Number...that's not ==None. So unfortunately we don't
+        # inherit bounds, etc.
+        
         for slot in param.__slots__:
             base_classes = iter(bases)
 
