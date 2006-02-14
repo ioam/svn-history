@@ -60,22 +60,30 @@ class BoundingBox(BoundingRegion):
         If neither radius nor points is passed in, create a default
         AARectangle defined by (-0.5,-0.5),(0.5,0.5).
         """
+        # if present, 'radius', 'min_radius', and 'points' are deleted from
+        # args before they're passed to the superclass (because they
+        # aren't parameters to be set)
         if 'radius' in args:
             radius = args['radius']
-            min_radius=args.get('min_radius',0.0)
+            del args['radius']
+
+            if 'min_radius' in args:
+                min_radius = args['min_radius']
+                del args['min_radius']
+            else:
+                min_radius = 0.0
+
             r=max(radius,min_radius)
             self._aarect=AARectangle((-r,-r),(r,r))
-            del args['radius']
+                
         elif 'points' in args:
             self._aarect = AARectangle(*args['points'])
             del args['points']
         else:
             self._aarect = AARectangle((-0.5,-0.5),(0.5,0.5))
 
-        # CEBHACKALERT? Why are things in args deleted here before args are passed
-        # on (it's not done elsewhere...should it be?)?
-        
         super(BoundingBox,self).__init__(**args)        
+
 
     def contains(self,x,y):
         """
