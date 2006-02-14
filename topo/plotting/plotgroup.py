@@ -9,6 +9,7 @@ $Id$
 __version__='$Revision$'
 
 import types
+import copy
 
 from Numeric import transpose, array, ravel
 
@@ -68,7 +69,6 @@ class PlotGroup(TopoObject):
         super(PlotGroup,self).__init__(**params)  
 
 	self.plot_group_key = plot_group_key
-
 	### JCALERT:Normalize is no really used by PlotGroup for the moment
         ### But it will be when sorted out what to do with TestPattern.
         ### the problem is that for a PlotGroup the plot_list is static...
@@ -79,12 +79,10 @@ class PlotGroup(TopoObject):
         ### the _plot_list function called the Plot.normalize method on the plot_list before
         ### returning it.
 	self.normalize = normalize
-
 	self.plot_list = plot_list	
         
 	# store the PlotGroup in plot_group_dict
 	plotgroup_dict[plot_group_key]=self
-
 	self.bitmaps = []
 
         # In the future, it might be good to be able to specify the
@@ -181,19 +179,21 @@ class TemplatePlotGroup(PlotGroup):
         #         Call the create_plots function to create the according plot
         for each in sheet_list:
 	    for (pt_name,pt) in self.template.plot_templates:
-		plot_list = plot_list + self.create_plots(pt_name,pt,each)
+		plot_list = plot_list + self._create_plots(pt_name,pt,each)
     	return plot_list
 
 
-    def create_plots(self,pt_name,pt,sheet):
+    def _create_plots(self,pt_name,pt,sheet):
 	""" 
 	Sub-function of _plot_list().
 	Creates a plot corresponding to a plot_template and its name, and a sheet.
 	"""
 	plot_channels = pt
 	plot_name = pt_name
-        p = make_template_plot(plot_channels,sheet.sheet_view_dict,sheet.density,sheet.bounds,self.normalize,False,name=plot_name)
+        p = make_template_plot(plot_channels,sheet.sheet_view_dict,sheet.density,
+			       sheet.bounds,self.normalize,False,name=plot_name)
 	return [p]
+
 
     def _add_static_images(self):
         """
@@ -205,6 +205,7 @@ class TemplatePlotGroup(PlotGroup):
 	    plot.bitmap.resize=False
             self.plot_list.append(plot)
             
+
 
 class ConnectionFieldsPlotGroup(TemplatePlotGroup):
     """
@@ -219,31 +220,33 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
     def __init__(self,plot_group_key,plot_list,normalize,simulator,template,sheet_name,**params):
         self.x = float(plot_group_key[2])
         self.y = float(plot_group_key[3])
-      	self.situate = False
-        
+      	self.situate = False       
 	super(ConnectionFieldsPlotGroup,self).__init__(plot_group_key,plot_list,normalize,
-						  simulator,template,sheet_name,**params)
+						       simulator,template,sheet_name,**params)
   
-    def create_plots(self,pt_name,pt,sheet):
+    def _create_plots(self,pt_name,pt,sheet):
 
 	plot_list = []
         if not isinstance(sheet,CFSheet):
             self.warning('Requested weights view from other than CFSheet.')
         else:
-            for p in set(flatten(sheet.in_projections.values())):	
-		### JCALERT! This has to be clarified somewhere: the sheet_view for a 
-		### weight belongs to the src_sheet, and the name in the key
-                ### is the destination sheet.
-	        plot_channels = pt
-	        ### JCALERT! do the plot_channels['Strength'] == 'weights' test
-                ### here and in projectionplotgroup
-                key = ('Weights',sheet.name,p.name,self.x,self.y)
-		plot_name = p.src.name 
-		plot_channels['Strength'] = key			       
-		plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
-				      p.src.bounds,self.normalize,self.situate,name=plot_name))
-        self.debug('plot_list =' + str(plot_list))
+	    # If the Strength is set to Weights, we request UnitViews 
+	    # (i.e. by changing the Strength key in the plot_channels)
+	    # Otherwise, we consider Strength as a specifying a SheetView.
+	    if ( pt.get('Strength', None) == 'Weights'):
+		for p in set(flatten(sheet.in_projections.values())):			    
+		    plot_channels = copy.deepcopy(pt)
+		    # Note: the UnitView is in the src_sheet view_dict,
+		    # and the name in the key is the destination sheet.
+		    key = ('Weights',sheet.name,p.name,self.x,self.y)
+		    plot_channels['Strength'] = key
+		    plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
+							p.src.bounds,self.normalize,self.situate,name=p.src.name))
+	    else:
+		 plot_list.append(make_template_plot(pt,sheet.sheet_view_dict,sheet.density,
+						     sheet.bounds,self.normalize,self.situate,name=pt_name))
         return plot_list
+
 
 
 
@@ -275,7 +278,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
         self._sim_ep_src = self._sim_ep.get_in_projection_by_name(self.weight_name)[0].src
 
  
-    def create_plots(self,pt_name,pt,sheet):
+    def _create_plots(self,pt_name,pt,sheet):
 
 	### JCALERT This has to be solved: projection is a list here!
         ### for the moment the hack below deal with that.	
@@ -284,15 +287,13 @@ class ProjectionPlotGroup(TemplatePlotGroup):
         if projection:
 	    src_sheet=projection[0].src
 	    projection=projection[0]
-
 	    for x,y in self.generate_coords():
-		plot_channels = pt
+		plot_channels = copy.deepcopy(pt)
 		### JCALERT! Do the test pt['Strength']='Weights' here
 		key = ('Weights',sheet.name,projection.name,x,y)
 		plot_channels['Strength'] = key
 		plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,
-                                      src_sheet.density,src_sheet.bounds,self.normalize,self.situate))
-		
+                                      src_sheet.density,src_sheet.bounds,self.normalize,self.situate))		
         return plot_list
 
 
@@ -321,7 +322,8 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 
         return coords
 
-    
+  
+  
     def _ordering_plots(self,plot_list):
 	"""
 	Function called to sort the Plots in order.
