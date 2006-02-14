@@ -6,7 +6,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import Button, Label, Frame, Toplevel, TOP, LEFT, RIGHT, BOTTOM, E
+from Tkinter import Button, Label, Frame, Toplevel, TOP, LEFT, RIGHT, BOTTOM, E, LAST, FIRST
 import Pmw
 import math
 
@@ -27,6 +27,8 @@ class EditorObject :
         self.canvas = canvas # retains a reference to the canvas
         self.name = name # set the name of the sheet
         self.focus = False # this does not have the focus
+        self.viewing_choices = []
+        self.object_cover_dict = {}
 
     def draw(self) :
         # draw the object at the current x, y position
@@ -48,6 +50,7 @@ class EditorObject :
 
     def update_parameters(self) :
         self.parameter_frame.set_obj_params()
+        self.object_cover_dict = self.parameter_frame.object_dictionary
 
     def okay_parameters(self, parameter_window) :
         self.update_parameters()
@@ -148,7 +151,7 @@ class EditorNode(EditorObject) :
 
     def show_properties(self) :
         EditorObject.show_properties(self)
-        self.parameter_frame.create_widgets(self.sheet)
+        self.parameter_frame.create_widgets(self.sheet, self.object_cover_dict)
         lateral_button = Button(self.button_panel, text = 'Lateral', command = self.show_lateral_parameters)
         lateral_button.pack(side = RIGHT)
 
@@ -188,11 +191,12 @@ class EditorSheet(EditorNode) :
         self.set_bounds()
         self.activity = False
         col = self.colours[1]
+        self.view = 'normal'
         self.init_draw(col, False) # create a new paralellogram
         self.currentCol = col
         self.gradient = 1
-        # ALALERT remove from here
-        self.canvas.redraw_objects()
+        self.viewing_choices = [('Normal', lambda: self.select_view('normal')),
+                                ('Activity', lambda: self.select_view('activity'))]
 
     ############ Draw methods ############################
 
@@ -207,18 +211,17 @@ class EditorSheet(EditorNode) :
         self.currentCol = col
         self.draw()
 
-    def show_activity(self) :
-        if self.activity :
-            self.activity = False
-        else :
-            self.activity = True
+    def select_view(self, view_choice) :
+        self.view = view_choice
+        self.set_focus(False)
+        self.canvas.redraw_objects()
 
     def init_draw(self, colour, focus) :
         self.id = []
         if focus : label_colour = colour
         else : label_colour = 'black'
         h, w = 0.5 * self.height, 0.5 * self.width
-        if (not self.focus and (self.activity)) :
+        if (not self.focus and (self.view == 'activity')) :
             colour = ''
             x, y = self.x - w + h, self.y - h
             # AL, the idea will be to allow any available plots to be shown on the sheet.
@@ -387,6 +390,7 @@ class EditorConnection(EditorObject) :
         self.connection = con # store the topo connection this object represents
         if (self.name == "") :
             self.name = con.name
+        # ALALERT this shouldn't be here.
         self.draw_index = self.from_node.get_connection_count(to_node)
         if (self.from_node == to_node) :
             self.factor = self.get_factor() 
@@ -395,14 +399,11 @@ class EditorConnection(EditorObject) :
         self.to_node = to_node # store a reference to the node this is connected to
         self.from_node.attach_connection(self, self.FROM) # tell the sheets that they are connected.
         self.to_node.attach_connection(self, self.TO)
-        self.to_position = None
-        self.gradient = self.calculate_gradient()
 
     ############ Util methods ##############################
     def show_properties(self) :
         EditorObject.show_properties(self)
-        con = self.connection
-        self.parameter_frame.create_widgets(self.connection)
+        self.parameter_frame.create_widgets(self.connection, self.object_cover_dict)
 
     def connect_to_coord(self, width) :
         n = self.draw_index
@@ -427,15 +428,26 @@ class EditorProjection(EditorConnection) :
         # this will reflect how to draw this connection
         self.draw_index = 0
         self.deviation = 0
-        self.radius = 10
+        self.normal_radius = 15
+        self.radius = self.get_radius()
         self.gradient = (1,1)
         self.id = (None,None)
         self.label = None
         self.balloon = Pmw.Balloon(canvas)
         self.factor = self.get_factor()
         self.receptive_field = receptive_field
+        self.view = 'radius'
+        self.viewing_choices = [('Normal', lambda: self.select_view('normal')),
+                                ('Line', lambda: self.select_view('line')),
+                                ('Field Radius', lambda: self.select_view('radius'))]
 
     ############ Draw methods ############################
+    def select_view(self, view_choice) :
+        self.view = view_choice
+        self.move()
+        self.set_focus(False)  
+
+
     def draw(self) :
         # determine if connected to a second node, and find the correct from_position
         for id in self.id : # remove the old connection
@@ -446,6 +458,13 @@ class EditorProjection(EditorConnection) :
             to_position = self.to_position
         else :
             to_position = self.to_node.get_pos()
+
+        {'normal' : self.draw_normal,
+         'line' :   self.draw_line,
+         'radius' : self.draw_radius
+        }[self.view](from_position, to_position)
+
+    def draw_line(self,from_position, to_position) :
         # set the colour to be used depending on whether connection has the focus.
         if (self.focus) : 
             text_col = col = 'dark red'
@@ -454,12 +473,8 @@ class EditorProjection(EditorConnection) :
             text_col = 'black'
             col = 'purple'#'dark green'
             lateral_colour = '' #self.from_node.currentCol
-        # midpoint of line
         middle = self.get_middle(from_position, to_position)
         if (to_position == from_position) : # connection to and from the same node
-            """
-            AL - OLD: Shows lateral connections as loops (here to see if still useful)
-            # change the size of circle depending how many lateral connections there are.
             deviation = self.draw_index * 15 
             x1 = to_position[0] - (20 + deviation)
             y2 = to_position[1]
@@ -472,7 +487,70 @@ class EditorProjection(EditorConnection) :
             # draw name label beside arrow head
             self.label = self.canvas.create_text(middle[0] - 
             (20 + len(self.name)*3), middle[1] - (30 + deviation) , text = self.name)
-            """
+        else :    
+            # create a line between the nodes - use 2 to make arrow in centre.
+            dev = self.deviation
+            from_pos = from_position[0] + self.deviation, from_position[1]
+            mid = middle[0] + 0.5 * self.deviation, middle[1]
+            self.id = (self.canvas.create_line(from_pos, mid , arrow = LAST, fill = col),
+                    self.canvas.create_line(mid, to_position, fill = col))
+            # draw name label
+            dX = 20
+            dY = self.draw_index * 20
+            self.label = self.canvas.create_text(middle[0] - dX,
+                middle[1] - dY, fill = text_col, text = self.name, anchor = E)
+
+    def draw_radius(self, from_position, to_position) :
+        # 'not imp yet'
+        self.draw_normal
+         # set the colour to be used depending on whether connection has the focus.
+        if (self.focus) : 
+            text_col = col = 'dark red'
+            lateral_colour = self.from_node.colours[0]
+        else :
+            text_col = 'black'
+            col = 'purple'#'dark green'
+            lateral_colour = '' #self.from_node.currentCol
+        # midpoint of line
+        middle = self.get_middle(from_position, to_position)
+        if (to_position == from_position) : # connection to and from the same node
+            a, b = self.get_radius()
+            x1 = to_position[0] - a
+            y1 = to_position[1] + b
+            x2 = to_position[0] + a
+            y2 = to_position[1] - b
+            self.id = (self.canvas.create_oval(x1, y1, x2, y2, fill = lateral_colour, 
+                dash = (2,2), outline = 'yellow', width = 2), None)
+            self.balloon.tagbind(self.canvas, self.id[0], self.name)       
+        else :  # connection between distinct nodes
+            x1, y1 = to_position
+            x2, y2 = from_position
+            # this is for cases when the radius changes size.
+            radius_x, radius_y = self.get_radius()
+            self.id = (self.canvas.create_line(x1, y1, x2 - radius_x, y2, fill = col),
+                self.canvas.create_line(x1, y1, x2 + radius_x, y2, fill = col),
+                self.canvas.create_oval(x2 - radius_x, y2 - radius_y, 
+                x2 + radius_x, y2 + radius_y, outline = col))
+            # draw name label
+            dX = 20
+            dY = self.draw_index * 20
+            self.label = self.canvas.create_text(middle[0] - dX,
+                middle[1] - dY, fill = text_col, text = self.name, anchor = E)
+
+
+
+    def draw_normal(self, from_position, to_position) :
+        # set the colour to be used depending on whether connection has the focus.
+        if (self.focus) : 
+            text_col = col = 'dark red'
+            lateral_colour = self.from_node.colours[0]
+        else :
+            text_col = 'black'
+            col = 'purple'#'dark green'
+            lateral_colour = '' #self.from_node.currentCol
+        # midpoint of line
+        middle = self.get_middle(from_position, to_position)
+        if (to_position == from_position) : # connection to and from the same node
             a, b = self.factor
             x1 = to_position[0] - a
             y1 = to_position[1] + b
@@ -483,25 +561,19 @@ class EditorProjection(EditorConnection) :
             self.balloon.tagbind(self.canvas, self.id[0], self.name)
 
         else :  # connection between distinct nodes
-            if (self.receptive_field) : # if receptive fields are to be drawn
-                x1, y1 = to_position
-                x2, y2 = from_position
-                x2 += self.deviation
-                radius = self.radius
-                self.id = (self.canvas.create_line(x1, y1, x2 - radius, y2, fill = col),
-                    self.canvas.create_line(x1, y1, x2 + radius, y2, fill = col),
-                    self.canvas.create_oval(x2 - radius, y2 - (0.5 * radius), 
-                    x2 + radius, y2 + (0.5 * radius), outline = col))
-            else :
-                # create a line between the nodes - use 2 to make arrow in centre.
-                self.id = (self.canvas.create_line(from_position, middle , arrow = LAST, fill = col),
-                    self.canvas.create_line(middle, to_position, fill = col))
+            x1, y1 = to_position
+            x2, y2 = from_position
+            x2 += self.deviation
+            radius = self.normal_radius
+            self.id = (self.canvas.create_line(x1, y1, x2 - radius, y2, fill = col),
+                self.canvas.create_line(x1, y1, x2 + radius, y2, fill = col),
+                self.canvas.create_oval(x2 - radius, y2 - (0.5 * radius), 
+                x2 + radius, y2 + (0.5 * radius), outline = col))
             # draw name label
             dX = 20
             dY = self.draw_index * 20
             self.label = self.canvas.create_text(middle[0] - dX,
                 middle[1] - dY, fill = text_col, text = self.name, anchor = E)
-	
 	
     ############ Update methods ############################ 
     def remove(self) :
@@ -519,9 +591,32 @@ class EditorProjection(EditorConnection) :
         else: 
             self.connect_to_coord((self.width / 2) - 10)
 
+    def connect(self, to_node, con) :
+        EditorConnection.connect(self, to_node, con)
+        self.to_position = None
+        self.gradient = self.calculate_gradient()
+        self.radius = self.get_radius()
+
     ############ Util methods ##############################
     def get_middle(self, pos1, pos2) : # returns the middle of two points
         return (pos1[0] + (pos2[0] - pos1[0])*0.5, pos1[1] + (pos2[1] - pos1[1])*0.5)
+
+    def get_radius(self) :
+        if self.to_node == None :
+            return (self.normal_radius, self.normal_radius * 
+                self.from_node.height / self.from_node.width)
+        node = self.from_node
+        node_bounds = node.sheet.bounds.aarect().lbrt()
+        try :
+            bounds = self.connection.weights_bounds.aarect().lbrt()
+        except :
+            try :
+                bounds = self.connection._weights_bounds_param_value.aarect().lbrt()
+            except : return (self.normal_radius, self.normal_radius * 
+                self.from_node.height / self.from_node.width)
+        radius_x = (node.width / 2) * (bounds[2] - bounds[0]) / (node_bounds[2] - node_bounds[0])
+        radius_y = radius_x * node.height / node.width
+        return radius_x, radius_y
 
     # returns the size of the semimajor and semiminor axis of the ellipse representing 
     # the draw_index-th lateral projection.
@@ -529,7 +624,7 @@ class EditorProjection(EditorConnection) :
         w = self.from_node.width; h = self.from_node.height
         a = 20; n = (w / 2) - 10; b = (n - a)
         major = a + (b * (1 - pow(0.8, self.draw_index)))
-        a = 20 * (h / w); n = (h / 2) - 10; b = (n - a)
+        a = 20 * h / w; n = (h / 2) - 10; b = (n - a)
         minor = a + (b * (1 - pow(0.8, self.draw_index)))
         return major, minor
 
@@ -538,12 +633,16 @@ class EditorProjection(EditorConnection) :
     # returns the gradients of the two lines making the opening 'v' part of the receptive field. 
     # this depends on the draw_index, as it determines where the projection's representation begins.
     def calculate_gradient(self) :
-        to_position = (self.to_node.x, self.to_node.y)
-        from_position = (self.from_node.x, self.from_node.y)
-        A = (to_position[0], to_position[1])
-        T = (from_position[0] + self.deviation ,from_position[1])
-        B = (T[0] - self.radius, T[1])
-        C = (T[0] + self.radius, T[1])
+        if self.view == 'radius':
+            A = self.to_node.get_pos()
+            T = self.from_node.get_pos()
+            B = (T[0] - self.radius[0], T[1])
+            C = (T[0] + self.radius[0], T[1])
+        else :
+            A = self.to_node.get_pos()
+            T = (self.from_node.get_pos()[0] + self.deviation ,self.from_node.get_pos()[1])
+            B = (T[0] - self.normal_radius, T[1])
+            C = (T[0] + self.normal_radius, T[1])
         den_BA = (A[0] - B[0])
         if not(den_BA == 0) :
             m_BA = (A[1] - B[1]) / den_BA
@@ -557,11 +656,26 @@ class EditorProjection(EditorConnection) :
         return (m_BA, m_CA)
 
     def in_bounds(self, x, y) : # returns true if point lies in a bounding box
-
-        if (self.receptive_field) :
+        if self.view == 'line':
+            # If connections are represented as lines
+            # currently uses an extent around the arrow head.
+            to_position = self.to_node.get_pos()
+            from_position = self.from_node.get_pos()
+            if (self.to_node == self.from_node) :
+                deviation = self.draw_index * 15
+                middle = (to_position[0], to_position[1] - (30 + deviation))
+            else :
+                middle = self.get_middle(from_position, to_position)
+            if ((x < middle[0] + 10) & (x > middle[0] - 10) & (y < middle[1] + 10) & (y > middle[1] - 10)) :
+                return True
+            return False
+        else :
             # returns true if x, y lie inside the oval representing this lateral projection
             if (self.to_node == None or self.to_node == self.from_node) :
-                a, b = self.factor
+                if self.view == 'radius' :
+                    a, b = self.get_radius()
+                else :
+                    a, b = self.factor
                 x, y = x - self.to_node.get_pos()[0], y - self.to_node.get_pos()[1]
                 if (x > a or x < -a) :
                     return False
@@ -573,10 +687,16 @@ class EditorProjection(EditorConnection) :
             # get the points of the triangular receptive field, centered around the x, y point given
             to_position = (self.to_node.x, self.to_node.y)
             from_position = (self.from_node.x, self.from_node.y)
-            A = (to_position[0] - x, to_position[1] - y)
-            T = (from_position[0] + self.deviation - x, from_position[1] - y)
-            B = (T[0] - self.radius, T[1])
-            C = (T[0] + self.radius, T[1])
+            if self.view == 'radius' :
+                A = (to_position[0] - x, to_position[1] - y)
+                T = (from_position[0] + self.deviation - x, from_position[1] - y)
+                B = (T[0] - self.radius[0], T[1])
+                C = (T[0] + self.radius[0], T[1])
+            else :
+                A = (to_position[0] - x, to_position[1] - y)
+                T = (from_position[0] + self.deviation - x, from_position[1] - y)
+                B = (T[0] - self.normal_radius, T[1])
+                C = (T[0] + self.normal_radius, T[1])
             # if the y coords lie outwith the boundaries, return false
             if (((A[1] < B[1]) and (B[1] < 0 or A[1] > 0)) or 
                 ((A[1] >= B[1]) and (B[1] > 0 or A[1] < 0))) :
@@ -590,16 +710,3 @@ class EditorProjection(EditorConnection) :
             if (((0 - a_CA) / self.gradient[1] >= 0) and ((0 - a_BA) / self.gradient[0] <= 0)) :
                 return True
             return False	
-
-        # If connections are represented as lines
-        # currently uses an extent around the arrow head.
-        to_position = self.to_node.get_pos()
-        from_position = self.from_node.get_pos()
-        if (self.to_node == self.from_node) :
-            deviation = self.draw_index * 15
-            middle = (to_position[0], to_position[1] - (30 + deviation))
-        else :
-            middle = self.get_middle(from_position, to_position)
-        if ((x < middle[0] + 10) & (x > middle[0] - 10) & (y < middle[1] + 10) & (y > middle[1] - 10)) :
-            return True
-        return False

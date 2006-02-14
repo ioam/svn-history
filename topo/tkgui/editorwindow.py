@@ -38,6 +38,7 @@ class EditorCanvas(Canvas) :
         self.object_list = []
         # set the initial mode.
         self.mode = "ARROW"
+        self.MAX_VIEWS = 5
         # get the topo simulator
         self.simulator = self.get_sim()
         print self.simulator
@@ -45,11 +46,11 @@ class EditorCanvas(Canvas) :
         # create the menu widget used as a popup on objects and connections
         self.option_add("*Menu.tearOff", "0") 
         self.menu = Menu(self)
+        self.view = Menu(self.menu)
         # add property, toggle activity drawn on sheets, object draw ordering and delete entries to the menu.
         self.menu.insert_command(END, label = 'Properties', 
             command = lambda: self.show_properties(self.focus))
-        self.menu.insert_command(END, label = 'Show Activity',
-            command = lambda: self.show_activity(self.focus))
+        self.menu.add_cascade(label = 'Change View', menu = self.view, underline = 0)
         self.menu.insert_command(END, label = 'Move Forward', 
             command = lambda: self.move_forward(self.focus))
         self.menu.insert_command(END, label = 'Move to Front', 
@@ -59,7 +60,7 @@ class EditorCanvas(Canvas) :
         self.menu.insert_command(END, label = 'Delete', 
             command = lambda: self.delete_focus(self.focus))
         # the indexes of the menu items that are for objects only
-        self.object_indices = [1,2,3,4]
+        self.object_indices = [2,3,4]
 
         # bind key_press events in canvas.
         self.bind('<KeyPress>', self.key_press)
@@ -333,6 +334,8 @@ class EditorCanvas(Canvas) :
         x, y = self.canvasx(event.x), self.canvasy(event.y)
         # get connection at this point
         focus = self.get_connection_xy(x, y)
+        for i in range(self.MAX_VIEWS) : # max number of views
+            self.view.delete(END)
         if (focus == None) :
             # if no connection, checks bounds of objects
             focus = self.get_object_xy(x, y)
@@ -343,7 +346,10 @@ class EditorCanvas(Canvas) :
             # gray out menu items that are just for objects
             for i in self.object_indices :
                 self.menu.entryconfig(i,foreground = 'Gray', activeforeground = 'Gray')
+        # command = lambda: self.show_activity(self.focus))
         if (focus != None) :
+            for (label, function) in focus.viewing_choices :
+                self.view.add_command(label = label, command = function)
             # give the connection or object the focus
             focus.set_focus(True)
             self.focus = focus
