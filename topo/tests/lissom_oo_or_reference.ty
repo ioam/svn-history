@@ -203,19 +203,19 @@ LGNOff = CFSheet(bounds=input_bounds,name='LGNOff',output_fn=PiecewiseLinear(low
 V1 = LISSOM(name='V1')
 
 # LGN ON channel
+SharedWeightCFProjection.learning_fn.output_fn = DivisiveSumNormalize()
+
 LGNOn_center = s.connect(Retina,LGNOn,dest_port="center",delay = FixedPoint("0.05"),
                          connection_type=SharedWeightCFProjection,strength=2.33,
                          name='Center',weights_bounds=lgn_weight_bounds,
                          weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_c/BaseRN,aspect_ratio=1))
 
-LGNOn_center.learning_fn.output_fn = DivisiveSumNormalize()
 
 LGNOn_surround = s.connect(Retina,LGNOn,dest_port="surround",delay = FixedPoint("0.05"),
                            connection_type=SharedWeightCFProjection,strength=-2.33,
                            name='Surround',weights_bounds=lgn_weight_bounds,
                            weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_s/BaseRN,aspect_ratio=1))
 
-LGNOn_surround.learning_fn.output_fn = DivisiveSumNormalize()
 
 
 # LGN OFF channel
@@ -224,14 +224,11 @@ LGNOff_center = s.connect(Retina,LGNOff,dest_port="center",delay = FixedPoint("0
                           name='Center',weights_bounds=lgn_weight_bounds,
                           weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_c/BaseRN,aspect_ratio=1))
 
-LGNOff_center.learning_fn.output_fn = DivisiveSumNormalize()
 
 LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoint("0.05"),
                             connection_type=SharedWeightCFProjection,strength=2.33,
                             name='Surround',weights_bounds=lgn_weight_bounds,
                             weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_s/BaseRN,aspect_ratio=1))
-LGNOff_surround.learning_fn.output_fn = DivisiveSumNormalize()
-
 
 
 s.connect(LGNOn,V1,delay=FixedPoint("0.05"),dest_port="on",
