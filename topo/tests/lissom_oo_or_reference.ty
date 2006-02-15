@@ -168,9 +168,6 @@ input_pattern = topo.patterns.basic.Gaussian(scale=scale_input,
 retina_bounds = BoundingBox(radius= RN/(2.0*BaseRN*area_scale))
 lgn_bounds = BoundingBox(radius=LN/(2.0*BaseLN*area_scale))
                                                
-# LISSOM parameters
-LISSOM.output_fn = PiecewiseLinear(lower_bound=delta,upper_bound=beta)
-LISSOM.density = BaseN
 #LISSOM.tsettle=tsettle
 
 # division done here once for convenience
@@ -209,7 +206,8 @@ LGNOn = CFSheet(bounds=lgn_bounds,name='LGNOn',density=24.0,
 LGNOff = CFSheet(bounds=lgn_bounds,name='LGNOff',density=24.0,
                  output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
 
-V1 = LISSOM(name='V1')
+V1 = LISSOM(name='V1', density=48.0,
+            output_fn=PiecewiseLinear(lower_bound=delta,upper_bound=beta))
 
 # LGN ON channel
 SharedWeightCFProjection.learning_fn.output_fn = DivisiveSumNormalize()
