@@ -236,6 +236,7 @@ class CFResponseFunction(TopoObject):
         raise NotImplementedError
 
 
+
 class GenericCFResponseFn(CFResponseFunction):
     """
     Generic large-scale response function based on a simple single-CF function.
@@ -508,6 +509,8 @@ class CFProjection(Projection):
         return UnitView((matrix_data,new_box),sheet_x,sheet_y,self)
 
 
+    ### HACKALERT! Should we omit the input_activity parameter and use
+    ### the self.src.activity instead
     def activate(self,input_activity):
         """Activate using the specified response_fn and output_fn."""
         self.input_buffer = input_activity
@@ -515,7 +518,14 @@ class CFProjection(Projection):
         self.activity = self.output_fn(self.activity)
 
 
+    def learn(self):
+        """
+        For a CFProjection, learn consist in calling the learning_fn.
+        """
+        self.learning_fn(self.cfs,self.input_buffer,self.dest.activity,self.learning_rate)
 
+
+        
     def change_bounds(self, weights_bounds_template):
         """
         Change the bounding box for all of the ConnectionFields in this Projection.
@@ -575,17 +585,10 @@ class CFSheet(ProjectionSheet):
     measure_maps = BooleanParameter(True)
     precedence = Number(0.5)
 
-    def learn(self):
+        
+    def learn(self):       
         for proj in chain(*self.in_projections.values()):
-            if proj.input_buffer:
-                learning_rate = proj.learning_rate
-                ### JABHACKALERT: This code should be moved into a learn()
-                ### function in Projection, so that individual projections
-                ### can use different arguments to their learning functions.
-                inp = proj.input_buffer
-                cfs = proj.cfs
-                proj.learning_fn(cfs, inp, self.activity, learning_rate)
-
+            proj.learn()
 
                 
     def update_unit_view(self,x,y,projection_name=None):
@@ -629,3 +632,10 @@ class CFSheet(ProjectionSheet):
 
 
 
+
+
+
+   
+    
+
+        

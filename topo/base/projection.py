@@ -84,6 +84,13 @@ class Projection(EPConnection):
     def activate(self,input_activity):
         raise NotImplementedError
 
+    
+    def learn(self):
+        """
+        This function has to be re-implemented by sub-classes, if they wish
+        to support learning.
+        """
+        pass
 
 
 class ProjectionSheet(Sheet):
