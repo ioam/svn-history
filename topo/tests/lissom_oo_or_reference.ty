@@ -69,8 +69,23 @@ xsigma=6.0
 ysigma=1.5
 scale_input=1.0
 
-retina_edge_buffer=round((rf_radius+(randomness*BaseRN*area_scale/2.0)),0)
+
+# radius of LGN DoG center Gaussian
+sigma_c = 0.5 
+
+# radius of LGN DoG surround Gaussian
+sigma_s = 4*sigma_c 
+
+# radius of LGN afferent connections
+r_L = 4.7*sigma_s
+
+# buffers so sheet above has full rfs...
+lgn_edge_buffer = round(rf_radius,0)
+retina_edge_buffer=round(rf_radius+r_L,0)
+
+# ...and actual numbers of neurons with the buffers
 RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
+LN=round(BaseLN*area_scale+2*lgn_edge_buffer,0)
 
 
 ### (3)
@@ -83,14 +98,8 @@ alpha_inh=0.00025*ics
 
 tsettle=8
 
-
-sigma_c = 0.5 # radius of LGN DoG center Gaussian
-sigma_s = 4*sigma_c # radius of LGN DoG surround Gaussian
-
-r_L = 4.7*sigma_s
-
-assert RN == 38
-assert retina_edge_buffer == 7
+assert LN == 38
+assert lgn_edge_buffer == 7
 assert xsigma == 6
 assert ysigma == 1.5
 #assert inputs_pereye == 1
@@ -123,7 +132,7 @@ assert round(min_exc_rad,5) == 1.59091
 
 # c++ lissom first takes the integer part of rf_radius, I think?
 # So we do that here, although we want to keep it as a float
-# for the calculations in this file.
+# for the python calculations in this file.
 rf_radius = float(int(rf_radius))
 r_L = float(int(r_L))
 
@@ -144,21 +153,21 @@ n_inputs,input_x,input_y,input_orientation = topo.tests.lissom_log_parser.get_in
 n_inputs-=1;input_x.next();input_y.next();input_orientation.next() # c++ lissom's first iteration is just a test
 
 print "Number of patterns available for learning iterations:",n_inputs
-## CEBHACKALERT: gaussian parameters set at end of file because
-## gaussian weights otherwise steal the dynamic numbers. Should
-## set the parameters on the generator sheet's input_generator
-## instead.
-topo.patterns.basic.Gaussian.scale = scale_input
 
 gaussian_width = xsigma/BaseRN/sqrt(2.0)
 gaussian_height = ysigma/BaseRN/sqrt(2.0)
-topo.patterns.basic.Gaussian.size = 2*gaussian_height
-topo.patterns.basic.Gaussian.aspect_ratio = gaussian_width/gaussian_height
-input_bounds = BoundingBox(radius= RN/(2.0*BaseRN*area_scale) )
 
-topo.patterns.basic.Gaussian.bounds = input_bounds
+input_pattern = topo.patterns.basic.Gaussian(scale=scale_input,
+                                             size = 2*gaussian_height,
+                                             aspect_ratio= gaussian_width/gaussian_height,
+                                             x=DynamicNumber(lambda : input_x.next()/BaseLN - 0.5*LN/BaseLN),
+                                             y=DynamicNumber(lambda : input_y.next()/BaseLN - 0.5*LN/BaseLN),
+                                             orientation=DynamicNumber(lambda : round(2*pi*input_orientation.next()/360.0,1)))
+
+
+retina_bounds = BoundingBox(radius= RN/(2.0*BaseRN*area_scale))
+lgn_bounds = BoundingBox(radius=LN/(2.0*BaseLN*area_scale))
                                                
-
 # LISSOM parameters
 LISSOM.output_fn = PiecewiseLinear(lower_bound=delta,upper_bound=beta)
 LISSOM.density = BaseN
@@ -166,7 +175,6 @@ LISSOM.density = BaseN
 
 # division done here once for convenience
 min_exc_radius = min_exc_rad/BaseN
-
 
 # Connection parameters
 lgn_weight_bounds = BoundingBox(radius=r_L/BaseLN)
@@ -192,14 +200,15 @@ CFProjection.learning_fn=DivisiveHebbian()
 
 s = topo.base.simulator.Simulator()
 
-GeneratorSheet.bounds = input_bounds
-Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),
-                        name='Retina')
+Retina = GeneratorSheet(name='Retina',bounds=retina_bounds,
+                        input_generator=input_pattern)
 
-LGNOn = CFSheet(bounds=input_bounds,name='LGNOn',output_fn=PiecewiseLinear(lower_bound=0.0,
-                                                       upper_bound=1.0),density=24.0)
-LGNOff = CFSheet(bounds=input_bounds,name='LGNOff',output_fn=PiecewiseLinear(lower_bound=0.0,
-                                                         upper_bound=1.0),density=24.0)
+LGNOn = CFSheet(bounds=lgn_bounds,name='LGNOn',density=24.0,
+                output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
+
+LGNOff = CFSheet(bounds=lgn_bounds,name='LGNOff',density=24.0,
+                 output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
+
 V1 = LISSOM(name='V1')
 
 # LGN ON channel
@@ -215,7 +224,6 @@ LGNOn_surround = s.connect(Retina,LGNOn,dest_port="surround",delay = FixedPoint(
                            connection_type=SharedWeightCFProjection,strength=-2.33,
                            name='Surround',weights_bounds=lgn_weight_bounds,
                            weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_s/BaseRN,aspect_ratio=1))
-
 
 
 # LGN OFF channel
@@ -293,23 +301,17 @@ def set_deltabeta(x,y):
     V1.output_fn.lower_bound=x
     V1.output_fn.upper_bound=y
 
-s.schedule_action(  200, set_deltabeta,0.093 , 0.643)
-s.schedule_action(  500, set_deltabeta,0.103 , 0.653)
-s.schedule_action( 1000, set_deltabeta,0.133 , 0.663)
-s.schedule_action( 2000, set_deltabeta,0.163 , 0.683)
-s.schedule_action( 3000, set_deltabeta,0.183 , 0.713)
-s.schedule_action( 4000, set_deltabeta,0.183 , 0.743)
-s.schedule_action( 5000, set_deltabeta,0.193 , 0.773)
-s.schedule_action( 6500, set_deltabeta,0.203 , 0.803)
-s.schedule_action( 8000, set_deltabeta,0.213 , 0.833)
-s.schedule_action(20000, set_deltabeta,0.223 , 0.863)
+s.schedule_action(  199, set_deltabeta,0.093 , 0.643)
+s.schedule_action(  499, set_deltabeta,0.103 , 0.653)
+s.schedule_action(  999, set_deltabeta,0.133 , 0.663)
+s.schedule_action( 1999, set_deltabeta,0.163 , 0.683)
+s.schedule_action( 2999, set_deltabeta,0.183 , 0.713)
+s.schedule_action( 3999, set_deltabeta,0.183 , 0.743)
+s.schedule_action( 4999, set_deltabeta,0.193 , 0.773)
+s.schedule_action( 6499, set_deltabeta,0.203 , 0.803)
+s.schedule_action( 7999, set_deltabeta,0.213 , 0.833)
+s.schedule_action(19999, set_deltabeta,0.223 , 0.863)
 
-
-
-## see earlier CEBHACKALERT about setting these parameters.
-topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : input_x.next()/BaseRN - 0.5*RN/BaseRN)
-topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : input_y.next()/BaseRN - 0.5*RN/BaseRN)
-topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda : round(2*pi*input_orientation.next()/360.0,1))
 
 
 
