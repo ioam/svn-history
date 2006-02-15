@@ -58,13 +58,10 @@ class CFSOM(CFSheet):
         rows,cols = self.activity.shape
         radius = self.radius() * self.density
         
-        learning_rate = self.alpha()
         for proj in chain(*self.in_projections.values()):
-            if proj.input_buffer:
-                if isinstance(proj.learning_fn, SOMLF):
-                    proj.learning_fn.learning_radius = radius
-                inp = proj.input_buffer
-                cfs = proj.cfs
-                proj.learning_fn(cfs, inp, self.activity, learning_rate)
+            proj.learning_rate = self.alpha()
+            if isinstance(proj.learning_fn, SOMLF):
+               proj.learning_fn.learning_radius = radius
+            proj.learn()
 
 
