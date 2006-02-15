@@ -101,7 +101,7 @@ LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoin
 
 
 s.connect(LGNOn,V1,delay=FixedPoint("0.05"),dest_port="on",
-          connection_type=CFProjection,strength=0.5,name='LGNOnAfferent',
+          connection_type=CFProjection,strength=0.75,name='LGNOnAfferent',
           weights_bounds=BoundingBox(radius=0.25),learning_rate=0.9590)
 
 s.connect(LGNOff,V1,delay=FixedPoint("0.05"),dest_port="off",
