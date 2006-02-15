@@ -588,7 +588,10 @@ class CFSheet(ProjectionSheet):
         
     def learn(self):       
         for proj in chain(*self.in_projections.values()):
-            proj.learn()
+            ### JCALERT! Figure out why this test is needed (here and in CFSOM.learn())
+            ### solve the problem and delete it.
+            if proj.input_buffer:
+                proj.learn()
 
                 
     def update_unit_view(self,x,y,projection_name=None):
