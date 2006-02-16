@@ -301,12 +301,14 @@ class TopoObject(object):
     def __setup_params(self,**config):
         """
         """
-        # CEBHACKALERT: testing code - here as an example
-        # of how we might do value semantics.
-        # deepcopy a Parameter if its 'value_semantics' attribute is True
+        # CEBHACKALERT: copied objects share the same name
+
+        # deepcopy a Parameter if its 'instantiate' attribute is True,
+        # and put it in this TopoObject's dictionary - so it has its
+        # own copy, rather than sharing the class'.
         for class_ in classlist(type(self)):
             for (k,v) in class_.__dict__.items():
-                if isinstance(v,Parameter) and v.value_semantics==True:                 
+                if isinstance(v,Parameter) and v.instantiate==True:                 
                     p_name = v.get_name(self) # the name that this TopoObject has for this Parameter
                     self.__dict__[p_name] = copy.deepcopy(v.default)
                     

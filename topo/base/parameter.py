@@ -170,10 +170,11 @@ class Parameter(object):
     # where it is defined. As a result, subclasses will have a
     # __dict__ unless they also define __slots__.
 
-    __slots__ = ['_name','default','doc','hidden','precedence','value_semantics']
+    __slots__ = ['_name','default','doc','hidden','precedence','instantiate']
     count = 0
 
-    def __init__(self,default=None,doc=None,hidden=False,precedence=None,value_semantics=False):
+    # CEBHACKALERT: I think this can be made simpler
+    def __init__(self,default=None,doc=None,hidden=False,precedence=None,instantiate=False):
         """
         Initialize a new parameter.
 
@@ -205,7 +206,7 @@ class Parameter(object):
         Parameter.count += 1
         self.default = default
         self.doc = doc
-        self.value_semantics = value_semantics
+        self.instantiate = instantiate
 
     def __get__(self,obj,objtype):
         """
@@ -336,7 +337,8 @@ class Filename(Parameter):
         """
         super(Filename,self).__set__(obj,normpath(val))
 
-        
+
+# CEBHACKALERT: needs to be finished
 class Enumeration(Parameter):
     """
     Enumeration is a Parameter with a list of available values.
@@ -625,7 +627,7 @@ class Constant(Parameter):
         """
         This Constant gets a deepcopy of the value passed in when it is declared.
         """
-        Parameter.__init__(self,default=copy.deepcopy(value),**params)
+        Parameter.__init__(self,default=value,instantiate=True,**params)
 
     def __set__(self,obj,val):
         """
@@ -685,7 +687,7 @@ class ClassSelectorParameter(Parameter):
     def __init__(self,class_,default=None,doc="",**params):
         """
         """
-        Parameter.__init__(self,default=default,doc=doc,**params)
+        Parameter.__init__(self,default=default,doc=doc,instantiate=True,**params)
         self.class_ = class_
 
         # check it's in range
