@@ -11,7 +11,7 @@ __version__='$Revision$'
 ### translated, etc. easily.
 ###
 from parameter import Parameter
-from topoobject import ParameterizedObject
+from parameterizedobject import ParameterizedObject
 from arrayutils import inf
 
 class BoundingRegion(ParameterizedObject):

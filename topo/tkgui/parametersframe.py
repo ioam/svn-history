@@ -409,7 +409,7 @@ class ParametersFrame(Frame):
         obj = w.get_value()
         # It is possible that the selected field is a Class. Check and if it is, 
         # instantiate a new object of the class and enter it in the dictionary.
-        from topo.base.topoobject import ParameterizedObject
+        from topo.base.parameterizedobject import ParameterizedObject
         if not isinstance(obj, ParameterizedObject) :
             try :
                 obj = obj()

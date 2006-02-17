@@ -17,7 +17,7 @@ __version__='$Revision$'
 ### topo/tests/testcfsom.py might be of some help for inspiration.
 
 import topo
-import topo.base.topoobject
+import topo.base.parameterizedobject
 import topo.base.simulator
 from topo.base.utils import *
 
@@ -27,7 +27,7 @@ from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import plotgroup_dict, TemplatePlotGroup, ConnectionFieldsPlotGroup,ProjectionPlotGroup 
 
  
-class PlotFileSaver(topo.base.topoobject.ParameterizedObject):
+class PlotFileSaver(topo.base.parameterizedobject.ParameterizedObject):
     def __init__(self,**config):
         super(PlotFileSaver,self).__init__(**config)
         self.sim = topo.base.simulator.get_active_sim()

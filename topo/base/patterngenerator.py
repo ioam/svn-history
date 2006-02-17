@@ -8,7 +8,7 @@ $Id$
 
 __version__='$Revision$'
 
-from topoobject import ParameterizedObject
+from parameterizedobject import ParameterizedObject
 from boundingregion import BoundingBox
 from sheet import  matrixidx2sheet, bounds2slice
 from Numeric import add,subtract,cos,sin,array

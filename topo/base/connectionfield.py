@@ -23,7 +23,7 @@ __version__ = '$Revision$'
 import Numeric
 import copy
 
-from topoobject import ParameterizedObject
+from parameterizedobject import ParameterizedObject
 from projection import Projection,ProjectionSheet,Identity,OutputFunctionParameter
 from parameter import Parameter, Number, BooleanParameter,ClassSelectorParameter
 from arrayutils import Mdot,divisive_normalization

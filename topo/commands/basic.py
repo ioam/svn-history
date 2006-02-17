@@ -4,7 +4,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.topoobject import ParameterizedObject
+from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import Sheet
 from topo.base.projection import ProjectionSheet
 import topo.base.simulator

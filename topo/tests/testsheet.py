@@ -8,7 +8,7 @@ __version__='$Revision$'
 import unittest
 import topo
 from topo.base.sheet import *
-import topo.base.topoobject
+import topo.base.parameterizedobject
 import Numeric
 from topo.base import boundingregion
 from topo.base.sheetview import SheetView

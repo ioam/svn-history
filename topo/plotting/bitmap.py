@@ -26,7 +26,7 @@ from colorsys import hsv_to_rgb
 import Numeric, Image, math
 
 from topo.base.parameter import Parameter
-from topo.base.topoobject import ParameterizedObject
+from topo.base.parameterizedobject import ParameterizedObject
 
 ### JCALERT: To do:
 ###        - Update the test file.

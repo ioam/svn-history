@@ -10,7 +10,7 @@ __version__='$Revision$'
 import unittest
 from topo.tkgui import *
 from topo.base.simulator import Simulator
-import topo.base.topoobject
+import topo.base.parameterizedobject
 import topo.base.simulator
 
 class TestTopoConsole(unittest.TestCase):
@@ -19,8 +19,8 @@ class TestTopoConsole(unittest.TestCase):
         # topo.base.registry.set_active_sim(None)
         self.s = Simulator(register=False)
         self.console = start()
-        topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
-        self.s.print_level = topo.base.topoobject.WARNING
+        topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
+        self.s.print_level = topo.base.parameterizedobject.WARNING
 
     def test_do_learning(self):
         run_time = 15.5

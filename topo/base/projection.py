@@ -11,7 +11,7 @@ from itertools import chain
 from sheet import Sheet
 from parameter import Parameter, Number, BooleanParameter, ClassSelectorParameter
 from simulator import EPConnection
-from topoobject import ParameterizedObject
+from parameterizedobject import ParameterizedObject
 
 
 class OutputFunction(ParameterizedObject):

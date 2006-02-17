@@ -14,7 +14,7 @@ import Numeric, random, os
 from math import pi
 import topo.patterns.basic
 import topo.patterns.random
-import topo.base.topoobject
+import topo.base.parameterizedobject
 from topo.sheets.cfsom import CFSOM
 import topo.base.connectionfield
 from topo.plotting.plotfilesaver import *
@@ -37,17 +37,17 @@ class TestPlotFileSaver(unittest.TestCase):
         CFSOM.radius_0 = 0.1
         CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 	CFProjection.learning_fn=HebbianSOMLF()
-        topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
+        topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
         self.s = topo.base.simulator.Simulator()
         
         retina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina')
         retina2 = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina2')
         V1 = CFSOM(name='V1')
         V2 = CFSOM(name='V2')
-        retina.print_level = topo.base.topoobject.WARNING
-        retina2.print_level = topo.base.topoobject.WARNING
-        V1.print_level = topo.base.topoobject.WARNING
-        V2.print_level = topo.base.topoobject.WARNING
+        retina.print_level = topo.base.parameterizedobject.WARNING
+        retina2.print_level = topo.base.parameterizedobject.WARNING
+        V1.print_level = topo.base.parameterizedobject.WARNING
+        V2.print_level = topo.base.parameterizedobject.WARNING
         
         self.s.connect(retina,V1,delay=0.5,connection_type=CFProjection,name='R1toV1')
         self.s.connect(retina,V2,delay=0.5,connection_type=CFProjection,name='R1toV2')

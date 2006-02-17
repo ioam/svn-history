@@ -8,7 +8,7 @@ __version__='$Revision$'
 
 from Numeric import zeros, ones, Float, divide, ravel,clip,array
 
-from topo.base.topoobject import ParameterizedObject
+from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameter import Dynamic
 from topo.base.sheetview import SheetView
 from topo.base.sheet import submatrix, bounds2slice, crop_slice_to_sheet_bounds

@@ -34,8 +34,8 @@ class TestPlotGroupPanel(unittest.TestCase):
         """
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 30
-#        base.print_level = topo.base.topoobject.WARNING
-#        GeneratorSheet.print_level = topo.base.topoobject.WARNING
+#        base.print_level = topo.base.parameterizedobject.WARNING
+#        GeneratorSheet.print_level = topo.base.parameterizedobject.WARNING
         
         topo.patterns.basic.Gaussian.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         topo.patterns.basic.Gaussian.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -50,7 +50,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         ###########################################
         # build simulation
         
-#        topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
+#        topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
         
         self.s = Simulator()
         self.s.verbose("Creating simulation objects...")
@@ -74,7 +74,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         sheetG = Sheet()
         sheetB = Sheet()
         retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian())
-        retina.print_level = topo.base.topoobject.WARNING
+        retina.print_level = topo.base.parameterizedobject.WARNING
 
         # For a new sheet_group named Miata:
         sviewR = SheetView((self.ra,BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))))
@@ -104,8 +104,8 @@ class TestPlotGroupPanel(unittest.TestCase):
         Here, we're not interested in the Activity plots, but we are
         interested in the weights of the receptive fields.
         """
-        topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
-        topo.tkgui.plotgrouppanel.PlotGroupPanel.print_level = topo.base.topoobject.WARNING
+        topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
+        topo.tkgui.plotgrouppanel.PlotGroupPanel.print_level = topo.base.parameterizedobject.WARNING
         # input generation params
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 30
@@ -126,12 +126,12 @@ class TestPlotGroupPanel(unittest.TestCase):
         s = topo.base.simulator.Simulator()
         
         retina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina')
-        retina.print_level = topo.base.topoobject.WARNING
+        retina.print_level = topo.base.parameterizedobject.WARNING
         V1 = CFSOM(name='V1')
-        V1.print_level = topo.base.topoobject.WARNING
+        V1.print_level = topo.base.parameterizedobject.WARNING
         
         s.connect(retina,V1,delay=1)
-        s.print_level = topo.base.topoobject.WARNING
+        s.print_level = topo.base.parameterizedobject.WARNING
         
         s.run(1)
 

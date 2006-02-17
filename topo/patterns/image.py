@@ -9,7 +9,7 @@ $Id$
 # untested. Needs to be updated following changes to Sheet and
 # pattern generator.
 
-from topo.base.topoobject import ParameterizedObject
+from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import bounds2slice
 from topo.outputfns.basic import DivisiveMaxNormalize
 from topo.base.patterngenerator import PatternGenerator

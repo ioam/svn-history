@@ -9,7 +9,7 @@ __version__='$Revision$'
 
 from topo.base.connectionfield import CFResponseFunction
 from topo.base.parameter import Parameter
-from topo.base.topoobject import ParameterizedObject
+from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.inlinec import inline, optimized
 
 from topo.responsefns.basic import CFDotProduct_Py, CFEuclideanDistance_Py

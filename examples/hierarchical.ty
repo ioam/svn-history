@@ -68,7 +68,7 @@ CFProjection.learning_fn = HebbianSOMLF()
 CFProjection.response_fn = CFDotProduct()
 
 
-#topo.base.topoobject.min_print_level = topo.base.topoobject.MESSAGE
+#topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.MESSAGE
 
 
 ###########################################

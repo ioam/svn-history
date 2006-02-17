@@ -9,7 +9,7 @@ $Id$
 __version__='$Revision$'
 
 
-from topo.base.topoobject import ParameterizedObject
+from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.keyedlist import KeyedList
 from topo.base.parameter import Parameter
 

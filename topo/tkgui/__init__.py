@@ -11,7 +11,7 @@ $Id$
 __version__='$Revision$'
 
 import Pmw, sys, Tkinter
-import topo.base.topoobject
+import topo.base.parameterizedobject
 import topoconsole
 
 # CEBHACKALERT:
@@ -55,7 +55,7 @@ def show_cmd_prompt():
     so as to let the user know that the command-line is still
     active.
     """
-    if topo.base.topoobject.min_print_level >= topo.base.topoobject.MESSAGE:
+    if topo.base.parameterizedobject.min_print_level >= topo.base.parameterizedobject.MESSAGE:
         print "\n", sys.ps1,
         sys.stdout.flush()
     

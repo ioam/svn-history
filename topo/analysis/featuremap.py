@@ -25,7 +25,7 @@ from Numeric import array, zeros, Float
 from topo.base import sheetview
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
-from topo.base.topoobject import ParameterizedObject
+from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.utils import cross_product, frange
 from topo.commands.basic import pattern_present, restore_input_generators, save_input_generators
 from topo.misc.distribution import Distribution

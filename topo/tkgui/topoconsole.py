@@ -16,7 +16,7 @@ from projectionpanel import ProjectionPanel
 from testpattern import TestPattern
 from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
 import topo.base.simulator
-import topo.base.topoobject
+import topo.base.parameterizedobject
 from topo.tkgui.editorwindow import ModelEditor
 
 import topo.commands.basic
@@ -50,7 +50,7 @@ def active_sim():
 plotpanel_classes = {}
 
 
-class PlotsMenuEntry(topo.base.topoobject.ParameterizedObject):
+class PlotsMenuEntry(topo.base.parameterizedobject.ParameterizedObject):
     """
     Use these objects to populate the TopoConsole Plots pulldown.  The
     pulldown requires a name and a function to call when the item is

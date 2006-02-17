@@ -80,7 +80,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from topoobject import ParameterizedObject
+from parameterizedobject import ParameterizedObject
 from parameter import Parameter
 from copy import copy, deepcopy
 from fixedpoint import FixedPoint

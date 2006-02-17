@@ -17,7 +17,7 @@ import types
 import operator
 
 import sheet
-from topoobject import ParameterizedObject
+from parameterizedobject import ParameterizedObject
 
 ### JABHACKALERT!
 ###

@@ -10,7 +10,7 @@ import unittest
 from topo.sheets.cfsom import CFSOM
 from pprint import pprint
 from topo.plotting import plot
-from topo.base import topoobject
+from topo.base import parameterizedobject
 from topo.plotting.bitmap import *
 from topo.base.sheet import Sheet
 from topo.sheets.generatorsheet import *
@@ -20,7 +20,7 @@ import topo.patterns.basic
 from math import pi
 from topo.base.parameter import Dynamic
 import random
-import topo.base.topoobject
+import topo.base.parameterizedobject
 from topo.base.connectionfield import CFProjection
 from topo.learningfns.basic import HebbianSOMLF
 import pdb #debugger
@@ -139,7 +139,7 @@ class TestCFSom(unittest.TestCase):
         # input generation params
         GeneratorSheet.period = 1.0
         GeneratorSheet.density = 30
-        GeneratorSheet.print_level = topo.base.topoobject.WARNING
+        GeneratorSheet.print_level = topo.base.parameterizedobject.WARNING
         
         topo.patterns.basic.Gaussian.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         topo.patterns.basic.Gaussian.y = Dynamic(lambda : random.uniform(-0.5,0.5))        
@@ -159,7 +159,7 @@ class TestCFSom(unittest.TestCase):
         ###########################################
         # build simulation
         
-        topo.base.topoobject.min_print_level = topo.base.topoobject.WARNING
+        topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
       
         s = Simulator()
         s.verbose("Creating simulation objects...")
@@ -168,11 +168,11 @@ class TestCFSom(unittest.TestCase):
         # Old form
         #retina = GaussianSheet(name='Retina')
         V1 = CFSOM(name='V1')
-        V1.print_level = topo.base.topoobject.WARNING
+        V1.print_level = topo.base.parameterizedobject.WARNING
 
         s.connect(retina,V1,delay=1,connection_type=CFProjection,
                   name='RtoV1',learning_fn=HebbianSOMLF())
-        s.print_level = topo.base.topoobject.WARNING
+        s.print_level = topo.base.parameterizedobject.WARNING
 
         self.assertTrue(len(V1.get_in_projection_by_name('RtoV1')) == 1)
         self.assertTrue(len(V1.get_in_projection_by_name('R1toV1')) == 0)

@@ -13,7 +13,7 @@ from Numeric import zeros, Float, ravel
 from topo.base.arrayutils import L2norm
 from topo.base.connectionfield import CFResponseFunction
 from topo.base.parameter import Parameter
-from topo.base.topoobject import ParameterizedObject
+from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.inlinec import inline, optimized
 
 class CFDotProduct_Py(CFResponseFunction):

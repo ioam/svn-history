@@ -16,7 +16,7 @@ from Numeric import transpose, array, ravel
 import Image
 
 from topo.base.utils import flatten, dict_sort
-from topo.base.topoobject import ParameterizedObject
+from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
 from topo.base.connectionfield import CFSheet

@@ -22,7 +22,7 @@ from Tkinter import Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE
 
 import topo.tkgui
-import topo.base.topoobject
+import topo.base.parameterizedobject
 import topo.base.simulator 
 
 import topo.plotting.bitmap
@@ -40,7 +40,7 @@ BORDERWIDTH = 1
 CANVASBUFFER = 1
 
 
-class PlotGroupPanel(Frame,topo.base.topoobject.ParameterizedObject):
+class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
     """
     Abstract PlotGroupPanel class for displaying bitmapped images to a TK
     GUI window.  Must be subclassed to be usable.
