@@ -247,7 +247,7 @@ class TopoObject(object):
 
         # CEBHACKALERT: it's possible for TopoObjects to share the same name.
         # (E.g. two can be created with the same name passed in.)
-        self.__set_name()
+        self.__generate_name()
         
         self.__setup_params(**config)
         object_count += 1
@@ -257,7 +257,7 @@ class TopoObject(object):
 
         self.initialized=True
 
-    def __set_name(self):
+    def __generate_name(self):
         """
         Sets name to a gensym formed from the object's type name and a unique number.
         """
@@ -329,7 +329,7 @@ class TopoObject(object):
                     if isinstance(new_object,TopoObject):
                         global object_count
                         object_count+=1
-                        new_object.__set_name()
+                        new_object.__generate_name()
                         
                     
                     
