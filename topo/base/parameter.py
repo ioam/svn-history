@@ -223,16 +223,6 @@ class Parameter(object):
         else:
             result = obj.__dict__.get(self.get_name(obj),self.default)
 
-            # CEBHACKALERT: allows a DynamicNumber to have been set as the
-            # value of a Number parameter of a ParameterizedObject. If we will
-            # continue to do this, we probably want one DynamicValue parameter
-            # and not DynamicNumber etc.
-            # This code shouldn't have any effect on existing uses of
-            # DynamicNumber - they all overwrite the original Number
-            # parameter anyway.
-            # (See also Number.__set__().)
-            if type(result)==DynamicNumber:
-                result=result.__get__(obj,objtype)
         return result
 
 
@@ -420,6 +410,38 @@ class Number(Parameter):
         self.bounds = bounds
         self._softbounds = softbounds  
         self._check_bounds(default)  # only create this number if the default value and bounds are consistent
+
+
+    ### JCALERT! The __get__ method is momentarily re-implemented in Number so that to deal
+    ### with the DynamicNumber. It will probably be deleted again when DynamicNumber will be
+    ### removed from the Parameter class hierarchy.
+    def __get__(self,obj,objtype):
+        """
+        Get a parameter value.  If called on the class, produce the
+        default value.  If called on an instance, produce the instance's
+        value, if one has been set, otherwise produce the default value.
+        """
+        # For documentation on __get__() see 'Implementing Descriptors'
+        # in the Python reference manual
+        # (http://www.python.org/doc/2.4.2/ref/descriptors.html)
+
+        if not obj:
+            result = self.default
+        else:
+            result = obj.__dict__.get(self.get_name(obj),self.default)
+
+            # CEBHACKALERT: allows a DynamicNumber to have been set as the
+            # value of a Number parameter of a ParameterizedObject. If we will
+            # continue to do this, we probably want one DynamicValue parameter
+            # and not DynamicNumber etc.
+            # This code shouldn't have any effect on existing uses of
+            # DynamicNumber - they all overwrite the original Number
+            # parameter anyway.
+            # (See also Number.__set__().)
+            if type(result)==DynamicNumber:
+                result=result.__get__(obj,objtype)
+        return result
+
 
     def __set__(self,obj,val):
         """
