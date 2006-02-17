@@ -43,6 +43,17 @@ def hebbian(input_activity, unit_activity, weights, single_connection_learning_r
     """Simple Hebbian learning for the weights of one single unit."""
     weights += single_connection_learning_rate * unit_activity * input_activity
 
+# CEBHACKALERT: see docstring
+class Hebbian(object):
+    """
+    This is a temporary wrapper around the hebbian() function so that
+    deepcopy can work when a Parameter has this function as its
+    default value. (To be removed when TopoObject's support for
+    deepcopy is corrected. See connectionfield.py's GenericCFResponseFn
+    and projections/basic.py's SharedWeightCFResponseFn)
+    """
+    def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
+        weights += single_connection_learning_rate * unit_activity * input_activity
 
 
 class ConnectionField(TopoObject):
@@ -335,7 +346,7 @@ class LearningFunctionParameter(ClassSelectorParameter):
 
 class GenericCFLF(CFLearningFunction):
     """CFLearningFunction applying the specified single_cf_fn to each CF."""
-    single_cf_fn = Parameter(default=hebbian)
+    single_cf_fn = Parameter(default=Hebbian())
     output_fn = Parameter(default=Identity())
     
     def __init__(self,**params):
