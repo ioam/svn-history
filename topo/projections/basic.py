@@ -64,7 +64,6 @@ class SharedWeightCFProjection(CFProjection):
     response_fn = ResponseFunctionParameter(default=SharedWeightCFResponseFn())
     ### JABHACKALERT: Learning won't actually work yet.
     learning_fn = Constant(IdentityCFLF())
-    cf_slice_and_bounds = []
     output_fn  = PatternGeneratorParameter(default=Identity())
     strength = Number(default=1.0)
 
@@ -98,6 +97,9 @@ class SharedWeightCFProjection(CFProjection):
         # in cf.slice_and_bounds[2]. The bounds are also stored for
         # access by plotting routines in [1]. The slice of the sheet to
         # which these bounds correspond is stored in [0].
+
+        self.cf_slice_and_bounds = []
+        
         cf = self.sharedcf
         for y in self.dest.sheet_rows()[::-1]:
             row = []
