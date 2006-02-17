@@ -259,7 +259,6 @@ class Parameter(object):
         """
         if not hasattr(self,'_name') or not self._name:
              classes = classlist(type(obj))[::-1]
-             print classes
              for class_ in classes:
                  for attrib_name in dir(class_):
                      if hasattr(class_,'get_param_descriptor'):
