@@ -32,10 +32,7 @@ from topo.learningfns.basic import HebbianSOMLF
 from topo.outputfns.basic import DivisiveSumNormalize
 from topo.patterns import PatternGeneratorParameter
 
-### JCALERT! For the moment, I use a super-class of CFSOM in order to
-### override the decay (and alpha) function. It would be good to make
-### them Parameters in CFSOM, so that we can delete that here and in
-### obermayer, yet still override the decay and alpha function.
+
 class RetinotopicSOM(CFSOM):
     """A variant of CFSOM that uses exponential decay functions for alpha and radius."""
 
@@ -76,7 +73,7 @@ topo.patterns.basic.Gaussian.aspect_ratio = 1.0
 RetinotopicSOM.density = 40
 RetinotopicSOM.learning_length = 40000
 
-RetinotopicSOM.radius_0 = 13.3/40 # *1.5 works for RetinotopicSOM.density = 10
+RetinotopicSOM.radius_0 = 13.3/40
 RetinotopicSOM.alpha_0  = 0.42
 
 RandomArray.seed(500,500)
@@ -98,8 +95,3 @@ s.connect(Retina,V1,delay=0.5,connection_type=CFProjection,name='RtoV1')
 
 s.run(0)
 #s.run(10000)
-
-# import profile,pstats
-#
-# p = profile.Profile()
-# p.runctx('s.run(10)',locals(),globals())
