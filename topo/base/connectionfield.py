@@ -34,6 +34,7 @@ from patterngenerator import PatternGeneratorParameter
 import patterngenerator
 from boundingregion import BoundingBox
 
+
 # Specified explicitly when creating weights matrix - required
 # for optimized C functions.
 weight_type = Numeric.Float32
@@ -443,6 +444,8 @@ class CFProjection(Projection):
             ### be a class attribute; not sure.
             self.cfs = cflist
 
+        ### JCALERT! We might want to change the default value of the input value to self.src.activity;
+        ### but it fails, raising a type error. It probably has to be clarified why this is happenning
         self.input_buffer = None
         self.activity = Numeric.array(self.dest.activity)
 
@@ -532,10 +535,11 @@ class CFProjection(Projection):
         """
         For a CFProjection, learn consist in calling the learning_fn.
         """
+        # Learning is performed if the input_buffer has already been set,
+        # i.e. there is an input to the Projection.
         if self.input_buffer:
             self.learning_fn(self.cfs,self.input_buffer,self.dest.activity,self.learning_rate)
-
-
+      
         
     def change_bounds(self, weights_bounds_template):
         """
