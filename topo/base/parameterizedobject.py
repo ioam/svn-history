@@ -254,17 +254,20 @@ class Parameter(object):
         The parameter instance itself does not store its name, and cannot
         know what name the object that owns it might have for it.  However,
         it can discover this if the owning object is passed to this function,
-        which looks for itself in the owning object and returns the name
+        which looks for itself in the owning class hierarchy and returns the name
         assigned to it.    
         """
         if not hasattr(self,'_name') or not self._name:
-            class_ = obj.__class__
-            for attrib_name in dir(class_):
-                desc,desctype = class_.get_param_descriptor(attrib_name)
-                if desc is self:
-                    self._name = '_%s_param_value'%attrib_name
-                    break
-        return self._name
+             classes = classlist(type(obj))[::-1] 
+             for class_ in classes:
+                 for attrib_name in dir(class_):
+                     desc,desctype = class_.get_param_descriptor(attrib_name)
+                     if desc is self:
+                         self._name = '_%s_param_value'%attrib_name
+                         return self._name
+        else:
+            return self._name
+
 
     # When a Parameter is owned by a ParameterizedObject, we want the
     # documentation for that object to print the doc slot for this
