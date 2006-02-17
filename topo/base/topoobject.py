@@ -244,6 +244,10 @@ class TopoObject(object):
         # Flag that can be tested to see if e.g. Constant Parameters
         # can still be set
         self.initialized=False
+
+        # CEBHACKALERT: it's possible for TopoObjects to share the same name.
+        # (E.g. two can be created with the same name passed in.)
+
         self.name = '%s%05d' % (self.__class__.__name__ ,object_count)
         self.__setup_params(**config)
         object_count += 1
