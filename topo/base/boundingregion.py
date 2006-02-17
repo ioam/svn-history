@@ -10,7 +10,7 @@ __version__='$Revision$'
 ### matrix notation, not list notation, so that it can be scaled,
 ### translated, etc. easily.
 ###
-from parameter import Parameter
+from parameterclasses import Parameter
 from parameterizedobject import ParameterizedObject
 from arrayutils import inf
 

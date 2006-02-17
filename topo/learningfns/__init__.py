@@ -23,6 +23,6 @@ def make_classes_from_all_imported_modules_available():
     Add all LearningFunction classes from the currently imported modules in
     the topo.learningfns namespace to the list of available LearningFunctions.
 
-    See topo.base.parameter.ClassSelectorParameter.range().
+    See topo.base.parameterclasses.ClassSelectorParameter.range().
     """
     LearningFunctionParameter.packages.append(topo.learningfns)

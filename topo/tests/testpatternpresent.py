@@ -7,7 +7,7 @@ __version__='$Revision$'
 
 import unittest, random
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.parameter import Dynamic
+from topo.base.parameterclasses import Dynamic
 import topo.patterns.basic
 from topo.base.boundingregion import BoundingBox
 from topo.sheets.cfsom import CFSOM

@@ -13,7 +13,7 @@ __version__ = "$Revision$"
 import Numeric
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameter import Parameter,Number,Constant
+from topo.base.parameterclasses import Parameter,Number,Constant
 from topo.base.arrayutils import Mdot
 from topo.base.connectionfield import CFProjection,IdentityCFLF,ResponseFunctionParameter
 from topo.base.patterngenerator import PatternGeneratorParameter

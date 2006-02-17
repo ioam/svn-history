@@ -19,7 +19,7 @@ from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFDotProduct
-from topo.base.parameter import DynamicNumber
+from topo.base.parameterclasses import DynamicNumber
 from topo.base.connectionfield import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import DivisiveHebbian

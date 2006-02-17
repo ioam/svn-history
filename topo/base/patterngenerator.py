@@ -12,7 +12,7 @@ from parameterizedobject import ParameterizedObject
 from boundingregion import BoundingBox
 from sheet import  matrixidx2sheet, bounds2slice
 from Numeric import add,subtract,cos,sin,array
-from parameter import Parameter,Number,ClassSelectorParameter
+from parameterclasses import Parameter,Number,ClassSelectorParameter
 from math import pi
 
 

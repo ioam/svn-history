@@ -19,11 +19,10 @@ from math import exp, sqrt
 import topo.patterns.random
 import topo.patterns.basic
 
-from topo.base.parameter import Number
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.boundingregion import BoundingBox
 from topo.base.connectionfield import CFProjection
-from topo.base.parameter import DynamicNumber
+from topo.base.parameterclasses import DynamicNumber,Number
 from topo.sheets.cfsom import CFSOM
 from topo.responsefns.optimized import CFDotProduct, CFEuclideanDistance
 from topo.responsefns.basic import CFEuclideanDistance_Py, CFDotProduct_Py

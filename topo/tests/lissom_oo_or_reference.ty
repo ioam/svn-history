@@ -28,7 +28,7 @@ from topo.projections.basic import CFProjection,SharedWeightCFProjection
 from topo.responsefns.optimized import CFDotProduct
 import topo.patterns.basic
 from topo.base.sheet import BoundingBox
-from topo.base.parameter import DynamicNumber
+from topo.base.parameterclasses import DynamicNumber
 from topo.base.connectionfield import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import DivisiveHebbian

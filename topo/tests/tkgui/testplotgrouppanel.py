@@ -18,7 +18,7 @@ import topo.tkgui.plotgrouppanel
 import Tkinter
 from topo.sheets.cfsom import CFSOM
 from math import pi
-from topo.base.parameter import Dynamic
+from topo.base.parameterclasses import Dynamic
 import random
 import pdb #debugger
 import topo.patterns.basic

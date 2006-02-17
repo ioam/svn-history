@@ -9,7 +9,7 @@ import Numeric
 from itertools import chain
 
 from sheet import Sheet
-from parameter import Parameter, Number, BooleanParameter, ClassSelectorParameter
+from parameterclasses import Parameter, Number, BooleanParameter, ClassSelectorParameter
 from simulator import EPConnection
 from parameterizedobject import ParameterizedObject
 

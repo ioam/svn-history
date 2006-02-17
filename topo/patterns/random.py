@@ -8,7 +8,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.parameter import Number,Parameter
+from topo.base.parameterclasses import Number,Parameter
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheet import bounds2slice
 import RandomArray

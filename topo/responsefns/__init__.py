@@ -24,6 +24,6 @@ def make_classes_from_all_imported_modules_available():
     Add all ResponseFunction classes from the currently imported modules in
     the topo.learningfns namespace to the list of available ResponseFunctions.
 
-    See topo.base.parameter.ClassSelectorParameter.range().
+    See topo.base.parameterclasses.ClassSelectorParameter.range().
     """
     ResponseFunctionParameter.packages.append(topo.responsefns)

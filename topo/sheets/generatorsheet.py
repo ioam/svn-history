@@ -10,7 +10,7 @@ from topo.base.sheet import BoundingBox
 
 from topo.base.utils import NxN
 
-from topo.base.parameter import Parameter, Dynamic
+from topo.base.parameterclasses import Parameter, Dynamic
 
 import topo.base.patterngenerator
 

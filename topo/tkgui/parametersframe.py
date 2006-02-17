@@ -10,7 +10,7 @@ from Tkinter import Frame, Button, RIGHT, TOP, BOTH, BOTTOM, END, YES, N,S,E,W,X
 import topo.base.utils
 from topo.base.utils import keys_sorted_by_value, dict_translator, string_int_translator, string_bb_translator
 import topo
-import topo.base.parameter
+import topo.base.parameterclasses
 import Pmw
 
 
@@ -77,11 +77,11 @@ class ParametersFrame(Frame):
 
         # The dictionary of parameter_type:property_to_add pairs.
         self.__parameter_property = {
-            topo.base.parameter.Constant:         self.__add_readonly_text_property,
-            topo.base.parameter.Number:           self.__add_numeric_property,
-            topo.base.parameter.Enumeration:      self.__add_enumeration_property,
-            topo.base.parameter.BooleanParameter: self.__add_boolean_property,
-            topo.base.parameter.ClassSelectorParameter: self.__add_class_selector_property}
+            topo.base.parameterclasses.Constant:         self.__add_readonly_text_property,
+            topo.base.parameterclasses.Number:           self.__add_numeric_property,
+            topo.base.parameterclasses.Enumeration:      self.__add_enumeration_property,
+            topo.base.parameterclasses.BooleanParameter: self.__add_boolean_property,
+            topo.base.parameterclasses.ClassSelectorParameter: self.__add_class_selector_property}
 
 
 
@@ -131,7 +131,7 @@ class ParametersFrame(Frame):
         parameters_to_modify = [ (name,parameter)
                                  for (name,parameter)
                                  in self.__visible_parameters.items()
-                                 if not type(parameter)==topo.base.parameter.Constant]
+                                 if not type(parameter)==topo.base.parameterclasses.Constant]
 
         for (name,parameter) in parameters_to_modify:
             w = self.__widgets[name][1]  # [0] is label (Message), [1] is widget
@@ -168,7 +168,7 @@ class ParametersFrame(Frame):
         self.__visible_parameters = list(parameter_name
                                     for (parameter_name,parameter)
                                     in self.topo_obj.get_paramobj_dict().items()
-                                    if parameter.__class__ == topo.base.parameter.Constant
+                                    if parameter.__class__ == topo.base.parameterclasses.Constant
                                     and not(parameter.hidden))    
  
         # create the widgets
@@ -262,7 +262,7 @@ class ParametersFrame(Frame):
         a match is found. If no match is found, the Parameter just gets a
         textbox. 
         """
-        for c in topo.base.parameter.classlist(type(parameter))[::-1]:
+        for c in topo.base.parameterclasses.classlist(type(parameter))[::-1]:
             if self.__parameter_property.has_key(c):
                 # find the right method...
                 property_to_add = self.__parameter_property[c]
@@ -317,7 +317,7 @@ class ParametersFrame(Frame):
 
             # CEBHACKALERT: revert to previous behaviour for DynamicNumber
             # until we figure out how to do it properly.
-            if isinstance(parameter, topo.base.parameter.DynamicNumber):
+            if isinstance(parameter, topo.base.parameterclasses.DynamicNumber):
                 v = parameter.default
             else:
                 v = getattr(self.topo_obj,parameter_name)

@@ -13,7 +13,7 @@ from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import bounds2slice
 from topo.outputfns.basic import DivisiveMaxNormalize
 from topo.base.patterngenerator import PatternGenerator
-from topo.base.parameter import Filename, Number, Parameter, Enumeration
+from topo.base.parameterclasses import Filename, Number, Parameter, Enumeration
 from topo.outputfns import OutputFunctionParameter
 from Numeric import array, transpose, ones, floor, Float, divide, where
 

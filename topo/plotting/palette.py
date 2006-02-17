@@ -6,7 +6,7 @@ $Id$
 __version__='$Revision$'
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameter import Dynamic
+from topo.base.parameterclasses import Dynamic
 import plot
 
 ### JABALERT: Should be able to construct a Palette automatically by

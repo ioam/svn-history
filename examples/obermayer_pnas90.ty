@@ -26,7 +26,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.patterngenerator import BoundingBox
 from topo.base.connectionfield import CFProjection
 from topo.responsefns.optimized import CFDotProduct
-from topo.base.parameter import Number,DynamicNumber
+from topo.base.parameterclasses import Number,DynamicNumber
 from topo.sheets.cfsom import CFSOM
 import topo.patterns.random
 import topo.patterns.basic

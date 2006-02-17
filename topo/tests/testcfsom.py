@@ -18,7 +18,7 @@ from topo.base.simulator import *
 from topo.base import patterngenerator
 import topo.patterns.basic
 from math import pi
-from topo.base.parameter import Dynamic
+from topo.base.parameterclasses import Dynamic, Parameter
 import random
 import topo.base.parameterizedobject
 from topo.base.connectionfield import CFProjection
@@ -29,7 +29,6 @@ import pdb #debugger
 ### Only for ImageSaver
 from Numeric import resize,array,zeros
 from topo.base.simulator import EventProcessor
-from topo.base.parameter import Parameter
 from topo.base.utils import NxN
 from pprint import *
 import Image, ImageOps

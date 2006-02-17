@@ -16,7 +16,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.patterngenerator import BoundingBox
 #from topo.projections.kernelprojection import KernelProjection
 from topo.base.connectionfield import CFProjection
-from topo.base.parameter import DynamicNumber
+from topo.base.parameterclasses import DynamicNumber, Number
 from topo.sheets.cfsom import CFSOM
 import topo.patterns.random
 from topo.responsefns.optimized import CFDotProduct
@@ -26,7 +26,7 @@ from topo.learningfns.basic import HebbianSOMLF
 from topo.outputfns.basic import PiecewiseLinear
 from topo.patterns import PatternGeneratorParameter
 
-from topo.base.parameter import Number
+
 
 ###########################################
 # Set parameters

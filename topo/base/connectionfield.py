@@ -25,7 +25,7 @@ import copy
 
 from parameterizedobject import ParameterizedObject
 from projection import Projection,ProjectionSheet,Identity,OutputFunctionParameter
-from parameter import Parameter, Number, BooleanParameter,ClassSelectorParameter
+from parameterclasses import Parameter, Number, BooleanParameter,ClassSelectorParameter
 from arrayutils import Mdot,divisive_normalization
 from sheet import Sheet,bounds2slice,sheet2matrixidx,crop_slice_to_sheet_bounds,slice2bounds
 from sheetview import UnitView

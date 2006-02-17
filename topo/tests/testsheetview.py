@@ -93,7 +93,7 @@ from Numeric import resize,array
 from topo.base.sheet import Sheet
 from topo.base.simulator import EventProcessor
 from topo.base.utils import NxN
-from topo.base.parameter import Parameter
+from topo.base.parameterclasses import Parameter
 from pprint import *
 import Image, ImageOps
 

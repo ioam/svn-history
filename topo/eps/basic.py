@@ -10,7 +10,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.parameter import Parameter
+from topo.base.parameterclasses import Parameter
 from topo.base.simulator import EventProcessor
 
 class PulseGenerator(EventProcessor):

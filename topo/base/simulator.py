@@ -81,7 +81,7 @@ $Id$
 __version__='$Revision$'
 
 from parameterizedobject import ParameterizedObject
-from parameter import Parameter
+from parameterclasses import Parameter
 from copy import copy, deepcopy
 from fixedpoint import FixedPoint
 

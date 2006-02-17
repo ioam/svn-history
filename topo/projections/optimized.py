@@ -7,7 +7,7 @@ $Id$
 __version__='$Revision$'
 
 from topo.base.connectionfield import CFProjection
-from topo.base.parameter import Parameter
+from topo.base.parameterclasses import Parameter
 from topo.base.projection import Identity
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.responsefns.optimized import CFDotProduct_CPointer

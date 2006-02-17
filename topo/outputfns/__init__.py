@@ -26,7 +26,7 @@ def make_classes_from_all_imported_modules_available():
     Add all OutputFunction classes from the currently imported modules in
     the topo.outputfns namespace to the list of available OutputFunctions.
 
-    See topo.base.parameter.ClassSelectorParameter.range().
+    See topo.base.parameterclasses.ClassSelectorParameter.range().
     """
     OutputFunctionParameter.packages.append(topo.outputfns)
 

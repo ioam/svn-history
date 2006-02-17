@@ -7,12 +7,11 @@ $Id$
 __version__='$Revision$'
 
 from topo.base.arrayutils import L2norm
-from topo.base.parameter import Number
+from topo.base.parameterclasses import Number
 from Numeric import argmax,exp,floor
 from topo.base.connectionfield import CFSheet
 from itertools import chain
 from topo.learningfns.basic import SOMLF
-from topo.base.parameter import Number
 
 
 class CFSOM(CFSheet):
