@@ -46,6 +46,11 @@ class CFSOM(CFSheet):
         """Exponential decay."""
         return 0.5**(time/float(half_life))
 
+    ### JCALERT! For the moment, som_retinotopy uses a super-class of
+    ### CFSOM in order to override the decay (and alpha) functions. It
+    ### would be good to make them Parameters here, so that we can
+    ### delete that there and in obermayer, yet still override the
+    ### decay and alpha function.
     def alpha(self):
         """Return the learning rate at a specified simulator time, using exponential falloff."""
         return self.alpha_0 * self.decay(float(self.simulator.time()),self.half_life)
