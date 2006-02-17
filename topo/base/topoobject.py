@@ -236,7 +236,7 @@ class TopoObject(object):
     
     def __init__(self,**config):
         """
-        If **config doesn't contain a 'name' parameter, set self.name
+        If **config doesn't contain a 'name' parameter, self.name defaults
         to a gensym formed from the object's type name and a unique number.
         """        
         global object_count
@@ -247,8 +247,8 @@ class TopoObject(object):
 
         # CEBHACKALERT: it's possible for TopoObjects to share the same name.
         # (E.g. two can be created with the same name passed in.)
-
-        self.name = '%s%05d' % (self.__class__.__name__ ,object_count)
+        self.__set_name()
+        
         self.__setup_params(**config)
         object_count += 1
 
@@ -256,6 +256,12 @@ class TopoObject(object):
         self.verbose('Initialized',self)
 
         self.initialized=True
+
+    def __set_name(self):
+        """
+        Sets name to a gensym formed from the object's type name and a unique number.
+        """
+        self.name = '%s%05d' % (self.__class__.__name__ ,object_count)
 
     def __repr__(self):
         """
