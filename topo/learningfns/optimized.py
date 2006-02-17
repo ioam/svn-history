@@ -8,7 +8,7 @@ $Id$
 __version__ = "$Revision$"
 
 from topo.misc.inlinec import inline, optimized
-from topo.base.topoobject import TopoObject
+from topo.base.topoobject import ParameterizedObject
 from topo.base.parameter import Parameter,Constant,Number
 from topo.base.projection import Identity
 from topo.base.connectionfield import CFLearningFunction
@@ -110,7 +110,7 @@ class Hebbian_Py(GenericCFLF):
 
 if not optimized:
     Hebbian = Hebbian_Py
-    TopoObject().message('Inline-optimized components not available; using Hebbian_Py instead of Hebbian.')
+    ParameterizedObject().message('Inline-optimized components not available; using Hebbian_Py instead of Hebbian.')
 
 
 
@@ -225,7 +225,7 @@ class DivisiveHebbian_Py(GenericCFLF):
 
 if not optimized:
     DivisiveHebbian = DivisiveHebbian_Py
-    TopoObject().message('Inline-optimized components not available; using DivisiveHebbian_Py instead of DivisiveHebbian.')
+    ParameterizedObject().message('Inline-optimized components not available; using DivisiveHebbian_Py instead of DivisiveHebbian.')
 
 
 
@@ -332,6 +332,6 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
 
 if not optimized:
     DivisiveHebbian_CPointer = DivisiveHebbian_Py
-    TopoObject().message('Inline-optimized components not available; using DivisiveHebbian_Py instead of DivisiveHebbian_CPointer.')
+    ParameterizedObject().message('Inline-optimized components not available; using DivisiveHebbian_Py instead of DivisiveHebbian_CPointer.')
     
 

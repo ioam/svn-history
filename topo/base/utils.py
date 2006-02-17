@@ -161,8 +161,8 @@ def dict_translator(in_string, name = '', translator_dictionary = {}) :
     if translator_dictionary.has_key(name) :
         if translator_dictionary[name].has_key(in_string) :
             val = translator_dictionary[name][in_string]
-            from topo.base.topoobject import TopoObject
-            if isinstance(val, TopoObject) :
+            from topo.base.topoobject import ParameterizedObject
+            if isinstance(val, ParameterizedObject) :
                 return val
             else : 
                 try :

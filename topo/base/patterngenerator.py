@@ -8,7 +8,7 @@ $Id$
 
 __version__='$Revision$'
 
-from topoobject import TopoObject
+from topoobject import ParameterizedObject
 from boundingregion import BoundingBox
 from sheet import  matrixidx2sheet, bounds2slice
 from Numeric import add,subtract,cos,sin,array
@@ -16,7 +16,7 @@ from parameter import Parameter,Number,ClassSelectorParameter
 from math import pi
 
 
-class PatternGenerator(TopoObject):
+class PatternGenerator(ParameterizedObject):
     # CEBHACKALERT: update this documentation when finished reorganizing parametersframe.py
     """
     A class hierarchy for callable objects that can generate 2D patterns.

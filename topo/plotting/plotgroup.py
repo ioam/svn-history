@@ -16,7 +16,7 @@ from Numeric import transpose, array, ravel
 import Image
 
 from topo.base.utils import flatten, dict_sort
-from topo.base.topoobject import TopoObject
+from topo.base.topoobject import ParameterizedObject
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
 from topo.base.connectionfield import CFSheet
@@ -43,7 +43,7 @@ plotgroup_dict = {}
 
 
 
-class PlotGroup(TopoObject):
+class PlotGroup(ParameterizedObject):
     """
     Container that has one or more Plots and also knows how to arrange
     the plots and other special parameters.

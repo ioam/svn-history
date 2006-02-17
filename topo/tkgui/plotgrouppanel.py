@@ -40,7 +40,7 @@ BORDERWIDTH = 1
 CANVASBUFFER = 1
 
 
-class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
+class PlotGroupPanel(Frame,topo.base.topoobject.ParameterizedObject):
     """
     Abstract PlotGroupPanel class for displaying bitmapped images to a TK
     GUI window.  Must be subclassed to be usable.
@@ -66,9 +66,9 @@ class PlotGroupPanel(Frame,topo.base.topoobject.TopoObject):
         pgt_name: name of the PlotGroupTemplate associated with the panel
 	"""
 
-	### JCALERT! what is config and why is it passed to both TopoObject and Frame?
+	### JCALERT! what is config and why is it passed to both ParameterizedObject and Frame?
         Frame.__init__(self,parent,config)
-        topo.plotting.plot.TopoObject.__init__(self,**config)
+        topo.plotting.plot.ParameterizedObject.__init__(self,**config)
 
 	self.console = console
         self.parent = parent

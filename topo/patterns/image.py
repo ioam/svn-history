@@ -9,7 +9,7 @@ $Id$
 # untested. Needs to be updated following changes to Sheet and
 # pattern generator.
 
-from topo.base.topoobject import TopoObject
+from topo.base.topoobject import ParameterizedObject
 from topo.base.sheet import bounds2slice
 from topo.outputfns.basic import DivisiveMaxNormalize
 from topo.base.patterngenerator import PatternGenerator
@@ -99,7 +99,7 @@ def fit_longest(x,y,n_rows,n_cols,height,width):
     return x/sf, y/sf
 
 
-class TopoImage(TopoObject):
+class TopoImage(ParameterizedObject):
     """
 
     Stores a Numeric array representing a normalized Image. The Image

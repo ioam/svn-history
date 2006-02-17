@@ -43,7 +43,7 @@ class Mdot(object):
     """
     This is a temporary wrapper around the mdot() function so that
     deepcopy can work when a Parameter has this function as its
-    default value. (To be removed when TopoObject's support for
+    default value. (To be removed when ParameterizedObject's support for
     deepcopy is corrected. See connectionfield.py's GenericCFResponseFn
     and projections/basic.py's SharedWeightCFResponseFn)
     """

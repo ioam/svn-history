@@ -11,10 +11,10 @@ __version__='$Revision$'
 ### translated, etc. easily.
 ###
 from parameter import Parameter
-from topoobject import TopoObject
+from topoobject import ParameterizedObject
 from arrayutils import inf
 
-class BoundingRegion(TopoObject):
+class BoundingRegion(ParameterizedObject):
     """
     Abstract bounding region class, for any portion of a 2D plane.
 

@@ -5,7 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.topoobject import TopoObject
+from topo.base.topoobject import ParameterizedObject
 from topo.base.parameter import Dynamic
 import plot
 
@@ -163,7 +163,7 @@ WHITE_BACKGROUND = 1
 ########################  JC: starting new implementation #############
 from Numeric import zeros
 
-class StringBasedPalette(TopoObject):
+class StringBasedPalette(ParameterizedObject):
     
     ### JCALERT: What is the default scale?
     def __init__(spec="KRYW",num_colors=0,scale=1.0):
@@ -200,7 +200,7 @@ class StringBasedPalette(TopoObject):
 ### straightforward, taking some specification and immediately
 ### constructing a usable object (without e.g. requiring set() to be
 ### called).
-class Palette(TopoObject):
+class Palette(ParameterizedObject):
     """
     Each palette has 3*256 values that are keyed by an index.
     This base class takes in a list of 256 triples.

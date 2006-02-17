@@ -27,7 +27,7 @@ from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import plotgroup_dict, TemplatePlotGroup, ConnectionFieldsPlotGroup,ProjectionPlotGroup 
 
  
-class PlotFileSaver(topo.base.topoobject.TopoObject):
+class PlotFileSaver(topo.base.topoobject.ParameterizedObject):
     def __init__(self,**config):
         super(PlotFileSaver,self).__init__(**config)
         self.sim = topo.base.simulator.get_active_sim()

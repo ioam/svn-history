@@ -12,7 +12,7 @@ __version__ = "$Revision$"
 
 import Numeric
 
-from topo.base.topoobject import TopoObject
+from topo.base.topoobject import ParameterizedObject
 from topo.base.parameter import Parameter,Number,Constant
 from topo.base.arrayutils import Mdot
 from topo.base.connectionfield import CFProjection,IdentityCFLF,ResponseFunctionParameter
@@ -24,7 +24,7 @@ from topo.outputfns.basic import Identity
 
 # CEBHACKALERT: not yet tested
 
-class SharedWeightCFResponseFn(TopoObject):
+class SharedWeightCFResponseFn(ParameterizedObject):
     """
     Response function accepting a single CF applied to all units.
     Otherwise similar to GenericCFResponseFn.

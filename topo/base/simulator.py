@@ -80,7 +80,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from topoobject import TopoObject
+from topoobject import ParameterizedObject
 from parameter import Parameter
 from copy import copy, deepcopy
 from fixedpoint import FixedPoint
@@ -98,7 +98,7 @@ def get_active_sim():
     If there is no active simulator a warning is printed.
     """
     if __active_sim==None:
-        TopoObject().warning('No active Simulator.')
+        ParameterizedObject().warning('No active Simulator.')
     return __active_sim
 
 def set_active_sim(sim):
@@ -109,7 +109,7 @@ def set_active_sim(sim):
 objects_to_notify_of_active_sim=[]
 
 
-class EventProcessor(TopoObject):
+class EventProcessor(ParameterizedObject):
     """
     Base class for EventProcessors, i.e. objects that can accept and
     handle events.  This base class handles the basic mechanics of
@@ -195,7 +195,7 @@ class EventProcessor(TopoObject):
     
 
 
-class EPConnection(TopoObject):
+class EPConnection(ParameterizedObject):
     """
     EPConnection stores basic information for a connection between
     two EventProcessors.
@@ -231,7 +231,7 @@ class SimulatorEvent:
 # efficient one.  Jeff has an O(log N) minheap implementation, but
 # there are likely to be many others to select from.
 #
-class Simulator(TopoObject):
+class Simulator(ParameterizedObject):
     """
     A simulator class that uses a simple sorted event list (instead of
     e.g. a sched.scheduler object) to manage events and dispatching.

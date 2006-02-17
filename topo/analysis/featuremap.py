@@ -25,7 +25,7 @@ from Numeric import array, zeros, Float
 from topo.base import sheetview
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
-from topo.base.topoobject import TopoObject
+from topo.base.topoobject import ParameterizedObject
 from topo.base.utils import cross_product, frange
 from topo.commands.basic import pattern_present, restore_input_generators, save_input_generators
 from topo.misc.distribution import Distribution
@@ -34,7 +34,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 import topo.base.simulator
 
 
-class FeatureMap(TopoObject):
+class FeatureMap(ParameterizedObject):
     """
     A feature map for one stimulus dimension (e.g. Orientation) for one Sheet.
 
@@ -103,7 +103,7 @@ class FeatureMap(TopoObject):
 
          
 
-class MeasureFeatureMap(TopoObject):
+class MeasureFeatureMap(ParameterizedObject):
     """
     """
     def __init__(self, feature_param):

@@ -17,7 +17,7 @@ import types
 import operator
 
 import sheet
-from topoobject import TopoObject
+from topoobject import ParameterizedObject
 
 ### JABHACKALERT!
 ###
@@ -40,7 +40,7 @@ operations = {ADD : operator.add,
               DIVIDE : operator.truediv}
 
 
-class SheetView(TopoObject):
+class SheetView(ParameterizedObject):
     """
     A SheetView is constructed from a matrix of values, a bounding box
     for that matrix, and a name.  There are two major ways to create a

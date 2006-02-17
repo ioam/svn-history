@@ -9,12 +9,12 @@ $Id$
 __version__='$Revision$'
 
 
-from topo.base.topoobject import TopoObject
+from topo.base.topoobject import ParameterizedObject
 from topo.misc.keyedlist import KeyedList
 from topo.base.parameter import Parameter
 
 
-class PlotGroupTemplate(TopoObject):
+class PlotGroupTemplate(ParameterizedObject):
     """
     Class specifying how to construct a PlotGroup from the objects in a Simulator.
 

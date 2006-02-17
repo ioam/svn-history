@@ -13,7 +13,7 @@ from itertools import chain
 from topo.base.connectionfield import CFSheet
 from topo.base.parameter import BooleanParameter,Number
 from topo.base.projection import OutputFunctionParameter
-from topo.base.topoobject import TopoObject
+from topo.base.topoobject import ParameterizedObject
 from topo.misc.inlinec import optimized
 from topo.outputfns.basic import PiecewiseLinear
 
@@ -116,4 +116,4 @@ class LISSOM_CPointer(LISSOM):
 # code does not have optimized set.
 if not optimized:
     LISSOM_CPointer = LISSOM
-    TopoObject().message('Inline-optimized components not available; using LISSOM instead of LISSOM_CPointer.')
+    ParameterizedObject().message('Inline-optimized components not available; using LISSOM instead of LISSOM_CPointer.')

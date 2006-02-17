@@ -50,7 +50,7 @@ def matrix_hsv_to_rgb(hMapArray,sMapArray,vMapArray):
     ## This code should never be seen.  It means that calling code did
     ## not take the precaution of clipping the input matrices.
     if max(rmat.flat) > 1 or max(gmat.flat) > 1 or max(bmat.flat) > 1:
-	topo.base.topoobject.TopoObject().warning('HSVBitmap inputs exceed 1. Clipping to 1.0')
+	topo.base.topoobject.ParameterizedObject().warning('HSVBitmap inputs exceed 1. Clipping to 1.0')
 	if max(rmat.flat) > 0: rmat = clip(rmat,0.0,1.0)
 	if max(gmat.flat) > 0: gmat = clip(gmat,0.0,1.0)
 	if max(bmat.flat) > 0: bmat = clip(bmat,0.0,1.0)

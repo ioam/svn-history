@@ -1,7 +1,7 @@
 """
 Topographica Base
 
-Implements the Topographica generic base class TopoObject.  This class
+Implements the Topographica generic base class ParameterizedObject.  This class
 encapsulates generic functions of all Topographica classes, such as
 automatic parameter setting, message output, etc.
 
@@ -29,11 +29,11 @@ object_count = 0
 
 class TopoMetaclass(type):
     """
-    The metaclass of TopoObject (and all its descendents).
+    The metaclass of ParameterizedObject (and all its descendents).
 
     The metaclass overrides type.__setattr__ to allow us to set
     Parameter values on classes without overwriting the attribute
-    descriptor.  That is, for a TopoObject of type X with a Parameter
+    descriptor.  That is, for a ParameterizedObject of type X with a Parameter
     y, the user can type X.y=3, which sets the default value of
     Parameter y to be 3, rather than overwriting y with the constant
     value 3 (and thereby losing all other info about that Parameter,
@@ -45,11 +45,11 @@ class TopoMetaclass(type):
     having a specific object available.  Perhaps they do something
     else that requires them to be in the metaclass, though?
 
-    The __init__ method is used when defining a TopoObject class,
+    The __init__ method is used when defining a ParameterizedObject class,
     usually when the module where that class is located is imported
     for the first time.  That is, the __init__ in this metaclass
     initializes the *class* object, while the __init__ method defined
-    in each TopoObject class is called for each new instance of that
+    in each ParameterizedObject class is called for each new instance of that
     class.
     """   
     def __init__(self,name,bases,dict):
@@ -83,7 +83,7 @@ class TopoMetaclass(type):
         In all other cases set the attribute normally (i.e. overwrite
         the descriptor).  If the new value is a Parameter, once it has
         been set we make sure that the value is inherited from
-        TopoObject superclasses as described in __param_inheritance().
+        ParameterizedObject superclasses as described in __param_inheritance().
         """        
 
         # Find out if there's a Parameter called attribute_name as a
@@ -108,24 +108,24 @@ class TopoMetaclass(type):
                 
     def __param_inheritance(self,param_name,param,bases):
         """
-        Look for Parameter values in superclasses of this TopoObject.
+        Look for Parameter values in superclasses of this ParameterizedObject.
 
         Ordinarily, when a Python object is instantiated, attributes
         not given values in the constructor will inherit the value
         given in the object's class, or in its superclasses.  For
-        Parameters owned by TopoObjects, we have implemented an
+        Parameters owned by ParameterizedObjects, we have implemented an
         additional level of default lookup, should this ordinary
         lookup return only None.
 
         In such a case, i.e. when no non-None value was found for a
         Parameter by the usual inheritance mechanisms, we explicitly
         look for Parameters with the same name in superclasses of this
-        TopoObject, and use the first such value that we find.
+        ParameterizedObject, and use the first such value that we find.
 
         The goal is to be able to set the default value (or other
-        slots) of a Parameter within a TopoObject, just as we can set
-        values for non-Parameter objects in TopoObjects, and have the
-        values inherited through the TopoObject hierarchy as usual.
+        slots) of a Parameter within a ParameterizedObject, just as we can set
+        values for non-Parameter objects in ParameterizedObjects, and have the
+        values inherited through the ParameterizedObject hierarchy as usual.
         """
         for slot in param.__slots__:
             base_classes = iter(bases)
@@ -168,7 +168,7 @@ class TopoMetaclass(type):
                 print self.__name__+'.'+key, '=', val.default
 
 
-class TopoObject(object):
+class ParameterizedObject(object):
     """
     Base class for most Topographica objects, providing automatic
     object naming, automatic parameter setting, and message formatting
@@ -176,20 +176,20 @@ class TopoObject(object):
     
     - Automatic object naming -
     
-    Every TopoObject has a name parameter.  If the user doesn't designate
+    Every ParameterizedObject has a name parameter.  If the user doesn't designate
     a name=<str> argument when constructing the object, the object will be
     given a name consisting of its class name followed by a unique 5-digit
     number. 
     
     - Automatic parameter setting -
     
-    The TopoObject __init__ method will automatically read the list of
+    The ParameterizedObject __init__ method will automatically read the list of
     keyword parameters.  If any keyword matches the name of a Parameter
     (see parameter.py) defined in the object's class or any of its
     superclasses, that parameter in the instance will get the value given
     as a keyword argument.  For example:
     
-      class Foo(TopoObject):
+      class Foo(ParameterizedObject):
          xx = Parameter(default=1)
     
       foo = Foo(xx=20)
@@ -198,7 +198,7 @@ class TopoObject(object):
     
     - Message formatting -
     
-    Each TopoObject has several methods for optionally printing output
+    Each ParameterizedObject has several methods for optionally printing output
     according to the current 'print level'.  The print levels are SILENT,
     WARNING, MESSAGE, VERBOSE, and DEBUG.  Each successive level allows
     more messages to be printed.  For example, when the level is VERBOSE,
@@ -207,12 +207,12 @@ class TopoObject(object):
     will be printed.
     
     For each level (except SILENT) there's an associated print method:
-    TopoObject.warning(), .message(), .verbose(), and .debug().
+    ParameterizedObject.warning(), .message(), .verbose(), and .debug().
     
     Each line printed this way is prepended with the name of the object
-    that printed it.  The TopoObject parameter print_level, and the module
+    that printed it.  The ParameterizedObject parameter print_level, and the module
     global variable min_print_level combine to determine what gets
-    printed.  For example, if foo is a TopoObject:
+    printed.  For example, if foo is a ParameterizedObject:
     
        foo.message('The answer is',42)
     
@@ -240,7 +240,7 @@ class TopoObject(object):
         # can still be set
         self.initialized=False
 
-        # CEBHACKALERT: it's possible for TopoObjects to share the same name.
+        # CEBHACKALERT: it's possible for ParameterizedObjects to share the same name.
         # (E.g. two can be created with the same name passed in.)
         self.__generate_name()
         
@@ -307,7 +307,7 @@ class TopoObject(object):
         """
         """
         # deepcopy a Parameter if its 'instantiate' attribute is True,
-        # and put it in this TopoObject's dictionary - so it has its
+        # and put it in this ParameterizedObject's dictionary - so it has its
         # own copy, rather than sharing the class'.        
         for class_ in classlist(type(self)):
             for (k,v) in class_.__dict__.items():
@@ -316,12 +316,12 @@ class TopoObject(object):
                     new_object = copy.deepcopy(v.default)
                     self.__dict__[parameter_name]=new_object
 
-                    # a new TopoObject needs a new name
+                    # a new ParameterizedObject needs a new name
                     # CEBHACKALERT: this will write over any name given;
                     # instead, maybe the name function could accept
                     # a prefix? To do when HACKALERT about naming is
                     # fixed in __init__.
-                    if isinstance(new_object,TopoObject):
+                    if isinstance(new_object,ParameterizedObject):
                         global object_count
                         object_count+=1
                         new_object.__generate_name()
@@ -428,7 +428,7 @@ class TopoObject(object):
 
 def print_all_param_defaults():
     print "===== Topographica Parameter Default Values ====="
-    classes = descendents(TopoObject)
+    classes = descendents(ParameterizedObject)
     classes.sort(key=lambda x:x.__name__)
     for c in classes:
         c.print_param_defaults()
@@ -439,22 +439,22 @@ def print_all_param_defaults():
 
 def class_parameters(topo_class):
     """
-    Return the non-hidden Parameters of the specified TopoObject class as {parameter_name: parameter}.
+    Return the non-hidden Parameters of the specified ParameterizedObject class as {parameter_name: parameter}.
 
     E.g. for a class that has one Parameter
     x=Number()
     this function returns
     {'x':<topo.base.parameter.Number object at ...>}
 
-    The specified class must be of type TopoObject.
+    The specified class must be of type ParameterizedObject.
     """
     assert isinstance(topo_class, type)
 
     # Create the object so that Parameters of any superclasses are also present.
     topo_obj = topo_class()
     
-    if not isinstance(topo_obj,TopoObject):
-        raise TypeError("Can only get Parameters for a class derived from TopoObject.")
+    if not isinstance(topo_obj,ParameterizedObject):
+        raise TypeError("Can only get Parameters for a class derived from ParameterizedObject.")
     
     parameters = [(parameter_name,parameter)
                   for (parameter_name,parameter)

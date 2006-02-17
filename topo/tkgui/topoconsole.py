@@ -50,7 +50,7 @@ def active_sim():
 plotpanel_classes = {}
 
 
-class PlotsMenuEntry(topo.base.topoobject.TopoObject):
+class PlotsMenuEntry(topo.base.topoobject.ParameterizedObject):
     """
     Use these objects to populate the TopoConsole Plots pulldown.  The
     pulldown requires a name and a function to call when the item is

@@ -156,7 +156,7 @@ class Parameter(object):
 
 
     Note about pickling: Parameters are usually used inside
-    TopoObjects, and so are pickled even though Parameter has no
+    ParameterizedObjects, and so are pickled even though Parameter has no
     explicit support for pickling (usually if a class has __slots__ it
     can't be pickled without additional support: see the Pickle module
     documentation).
@@ -182,11 +182,11 @@ class Parameter(object):
         the default value.
 
         _name stores the Parameter's name. This is
-        created automatically by TopoObject, but can also be passed in
-        (see TopoObject).
+        created automatically by ParameterizedObject, but can also be passed in
+        (see ParameterizedObject).
 
         default is the value of Parameter p that is returned if
-        TopoObject_class.p is requested, or if TopoObject_object.p is
+        ParameterizedObject_class.p is requested, or if ParameterizedObject_object.p is
         requested but has not been set.
 
         hidden is a flag that allows objects using Parameters to know
@@ -224,7 +224,7 @@ class Parameter(object):
             result = obj.__dict__.get(self.get_name(obj),self.default)
 
             # CEBHACKALERT: allows a DynamicNumber to have been set as the
-            # value of a Number parameter of a TopoObject. If we will
+            # value of a Number parameter of a ParameterizedObject. If we will
             # continue to do this, we probably want one DynamicValue parameter
             # and not DynamicNumber etc.
             # This code shouldn't have any effect on existing uses of
@@ -275,10 +275,10 @@ class Parameter(object):
                     break
         return self._name
 
-    # When a Parameter is owned by a TopoObject, we want the
+    # When a Parameter is owned by a ParameterizedObject, we want the
     # documentation for that object to print the doc slot for this
     # parameter, not the __doc__ value for the Parameter class or
-    # subclass.  For instance, if we have a TopoObject class X with
+    # subclass.  For instance, if we have a ParameterizedObject class X with
     # parameters y(doc="All about y") and z(doc="More about z"),
     # help(X) should include "All about y" in the section describing
     # y, and "More about z" in the section about z.
@@ -297,7 +297,7 @@ class Parameter(object):
     # docstring defined in those classes.  We could save a copy of
     # that docstring in a class attribute, and it *may* be possible
     # somehow to return that for help(Parameter), without breaking the
-    # current support for help(X) (where X is a TopoObject and help(X)
+    # current support for help(X) (where X is a ParameterizedObject and help(X)
     # describes X's specific Parameters).  Seems difficult, though.
     __doc__ = property((lambda self: self.doc))
     
@@ -643,7 +643,7 @@ class Constant(Parameter):
     def __set__(self,obj,val):
         """
         Does not allow set commands except on the classobj or
-        on an uninitialized TopoObject.
+        on an uninitialized ParameterizedObject.
         """
         if obj==None or obj.initialized==False:
             super(Constant,self).__set__(obj,val)

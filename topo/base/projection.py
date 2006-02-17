@@ -11,10 +11,10 @@ from itertools import chain
 from sheet import Sheet
 from parameter import Parameter, Number, BooleanParameter, ClassSelectorParameter
 from simulator import EPConnection
-from topoobject import TopoObject
+from topoobject import ParameterizedObject
 
 
-class OutputFunction(TopoObject):
+class OutputFunction(ParameterizedObject):
     """
     Object to map a numeric item into another of the same size.
 

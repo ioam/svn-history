@@ -9,7 +9,7 @@ __version__='$Revision$'
 
 from topo.base.connectionfield import CFResponseFunction
 from topo.base.parameter import Parameter
-from topo.base.topoobject import TopoObject
+from topo.base.topoobject import ParameterizedObject
 from topo.misc.inlinec import inline, optimized
 
 from topo.responsefns.basic import CFDotProduct_Py, CFEuclideanDistance_Py
@@ -71,7 +71,7 @@ class CFDotProduct(CFResponseFunction):
 
 if not optimized:
     CFDotProduct = CFDotProduct_Py
-    TopoObject().message('Inline-optimized components not available; using CFDotProduct_Py instead of CFDotProduct.')
+    ParameterizedObject().message('Inline-optimized components not available; using CFDotProduct_Py instead of CFDotProduct.')
 
 
 
@@ -233,7 +233,7 @@ class CFDotProduct_CPointer(CFResponseFunction):
 
 if not optimized:
     CFDotProduct_CPointer = CFDotProduct_Py
-    TopoObject().message('Inline-optimized components not available; using CFDotProduct_Py instead of CFDotProduct_CPointer.')
+    ParameterizedObject().message('Inline-optimized components not available; using CFDotProduct_Py instead of CFDotProduct_CPointer.')
    
 
  
@@ -319,6 +319,6 @@ class CFEuclideanDistance(CFResponseFunction):
 
 if not optimized:
     CFEuclideanDistance = CFEuclideanDistance_Py
-    TopoObject().message('Inline-optimized components not available; using CFEuclideanDistance_Py instead of CFEuclideanDistance.')
+    ParameterizedObject().message('Inline-optimized components not available; using CFEuclideanDistance_Py instead of CFEuclideanDistance.')
 
 

@@ -17,7 +17,7 @@ import Pmw
 # CEBHACKALERT: this file is still being reorganized; there are still
 # temporary methods.
 
-# CEBHACKALERT: doesn't work for TopoObject class.
+# CEBHACKALERT: doesn't work for ParameterizedObject class.
 
 # CEBHACKALERT: there used to be a 'reset_to_defaults' method, which
 # didn't work. When Parameters can be set and then maintained between
@@ -29,7 +29,7 @@ import Pmw
 
 class ParametersFrame(Frame):
     """
-    Frame for all non-hidden Parameters of a TopoObject class.
+    Frame for all non-hidden Parameters of a ParameterizedObject class.
 
 
     When asked to create wigets, ... makes a PropertiesFrame containing all the specified class' Parameters.
@@ -119,12 +119,12 @@ class ParametersFrame(Frame):
     # CEBHACKALERT: rename to set_object_parameters, probably.
     def set_obj_params(self):
         """
-        For all non-Constant Parameters of the currently set TopoObject(),
+        For all non-Constant Parameters of the currently set ParameterizedObject(),
         set the values of the Parameters to those specified by the widgets.
 
         Only sets the value on the object if the value in the widget is
         different from the one in the object. This prevents a local copy
-        of a variable being made into a TopoObject just because the TopoObject
+        of a variable being made into a ParameterizedObject just because the ParameterizedObject
         is opened in the model editor.
         """
         assert self.topo_obj!=None, "ParametersFrame must be associated with a TopoObj()."
@@ -409,8 +409,8 @@ class ParametersFrame(Frame):
         obj = w.get_value()
         # It is possible that the selected field is a Class. Check and if it is, 
         # instantiate a new object of the class and enter it in the dictionary.
-        from topo.base.topoobject import TopoObject
-        if not isinstance(obj, TopoObject) :
+        from topo.base.topoobject import ParameterizedObject
+        if not isinstance(obj, ParameterizedObject) :
             try :
                 obj = obj()
                 obj_key = w.get()

@@ -65,7 +65,7 @@ class GeneratorSheet(Sheet):
         if len(self.input_generator_stack) >= 1:
             self.set_input_generator(self.input_generator_stack.pop())
         else:
-            TopoObject().warning('There is no previous input generator to restore.')
+            ParameterizedObject().warning('There is no previous input generator to restore.')
 
                
     def start(self):

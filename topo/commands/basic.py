@@ -4,7 +4,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.topoobject import TopoObject
+from topo.base.topoobject import ParameterizedObject
 from topo.base.sheet import Sheet
 from topo.base.projection import ProjectionSheet
 import topo.base.simulator
@@ -85,7 +85,7 @@ def pattern_present(inputs=None,duration=1.0,learning=False,overwrite_previous=F
             if gen_eps_list.has_key(each):
                 gen_eps_list[each].set_input_generator(inputs[each])
             else:
-                TopoObject().warning('%s not a valid Sheet Name.' % each)
+                ParameterizedObject().warning('%s not a valid Sheet Name.' % each)
 
         sim.state_push()
         sim.run(duration)

@@ -23,7 +23,7 @@ __version__ = '$Revision$'
 import Numeric
 import copy
 
-from topoobject import TopoObject
+from topoobject import ParameterizedObject
 from projection import Projection,ProjectionSheet,Identity,OutputFunctionParameter
 from parameter import Parameter, Number, BooleanParameter,ClassSelectorParameter
 from arrayutils import Mdot,divisive_normalization
@@ -49,7 +49,7 @@ class Hebbian(object):
     """
     This is a temporary wrapper around the hebbian() function so that
     deepcopy can work when a Parameter has this function as its
-    default value. (To be removed when TopoObject's support for
+    default value. (To be removed when ParameterizedObject's support for
     deepcopy is corrected. See connectionfield.py's GenericCFResponseFn
     and projections/basic.py's SharedWeightCFResponseFn)
     """
@@ -57,7 +57,7 @@ class Hebbian(object):
         weights += single_connection_learning_rate * unit_activity * input_activity
 
 
-class ConnectionField(TopoObject):
+class ConnectionField(ParameterizedObject):
     """
     A set of weights on one input Sheet.
 
@@ -231,7 +231,7 @@ class ConnectionField(TopoObject):
 
 
 
-class CFResponseFunction(TopoObject):
+class CFResponseFunction(ParameterizedObject):
     """
     Map an input activity matrix into an output matrix using CFs.
 
@@ -292,7 +292,7 @@ class ResponseFunctionParameter(ClassSelectorParameter):
         super(ResponseFunctionParameter,self).__init__(CFResponseFunction,default=default,doc=doc,**params)        
 
 
-class CFLearningFunction(TopoObject):
+class CFLearningFunction(ParameterizedObject):
     """
     Compute new CFs based on input and output activity values.
 

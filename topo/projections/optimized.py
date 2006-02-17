@@ -9,7 +9,7 @@ __version__='$Revision$'
 from topo.base.connectionfield import CFProjection
 from topo.base.parameter import Parameter
 from topo.base.projection import Identity
-from topo.base.topoobject import TopoObject
+from topo.base.topoobject import ParameterizedObject
 from topo.responsefns.optimized import CFDotProduct_CPointer
 from topo.learningfns.optimized import DivisiveHebbian_CPointer
 from topo.misc.inlinec import inline, optimized
@@ -69,7 +69,7 @@ class CFProjection_CPointer(CFProjection):
 # code does not have optimized set.
 if not optimized:
     CFProjection_CPointer = CFProjection
-    TopoObject().message('Inline-optimized components not available; using CFProjection instead of CFProjection_CPointer.')
+    ParameterizedObject().message('Inline-optimized components not available; using CFProjection instead of CFProjection_CPointer.')
         
 
 def setup_wp(cfs, wp, rows, cols):

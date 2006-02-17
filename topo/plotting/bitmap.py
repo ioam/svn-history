@@ -26,7 +26,7 @@ from colorsys import hsv_to_rgb
 import Numeric, Image, math
 
 from topo.base.parameter import Parameter
-from topo.base.topoobject import TopoObject
+from topo.base.topoobject import ParameterizedObject
 
 ### JCALERT: To do:
 ###        - Update the test file.
@@ -34,7 +34,7 @@ from topo.base.topoobject import TopoObject
 ###        - Get rid of view_info
 ###        - Get rid of accessing function (copy, show...), though it is not crucial.
 
-class Bitmap(TopoObject):
+class Bitmap(ParameterizedObject):
     """
     Wrapper class for the PIL Image class.
 

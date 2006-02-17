@@ -8,7 +8,7 @@ __version__='$Revision$'
 
 from Numeric import zeros, ones, Float, divide, ravel,clip,array
 
-from topo.base.topoobject import TopoObject
+from topo.base.topoobject import ParameterizedObject
 from topo.base.parameter import Dynamic
 from topo.base.sheetview import SheetView
 from topo.base.sheet import submatrix, bounds2slice, crop_slice_to_sheet_bounds
@@ -27,7 +27,7 @@ import palette
 ### - Get rid of release_sheetviews.
 
 
-class Plot(TopoObject):
+class Plot(ParameterizedObject):
      """
      Simple Plot object constructed from a specified image.
      """
@@ -57,7 +57,7 @@ def make_template_plot(channels,sheet_view_dict,density=None,
          if plot.bitmap != None:
 	     return plot
      
-     TopoObject(name="make_template_plot").verbose('No',name,'plot constructed for this Sheet')
+     ParameterizedObject(name="make_template_plot").verbose('No',name,'plot constructed for this Sheet')
      return None
 
 
@@ -104,7 +104,7 @@ class TemplatePlot(Plot):
         the plot_bounding_box), or only the smallest plot.  The
         situate parameter is usually useful only for a Weights plot.
         
-        name (which is inherited from TopoObject) specifies the name
+        name (which is inherited from ParameterizedObject) specifies the name
         to use for this plot.
         """
 

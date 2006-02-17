@@ -15,7 +15,7 @@ __version__='$Revision$'
 
 import Numeric
 
-from topo.base.topoobject import TopoObject
+from topo.base.topoobject import ParameterizedObject
 from topo.base.parameter import Number
 from topo.base.arrayutils import L2norm, norm
 from topo.base.projection import OutputFunction
