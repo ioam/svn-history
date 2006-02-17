@@ -311,6 +311,7 @@ class ParametersFrame(Frame):
         try:
             low_bound,high_bound = parameter.get_soft_bounds()
 
+            #CEBHACKALERT: but one is ok - change this
             if low_bound==None or high_bound==None or low_bound==high_bound:
                 raise AttributeError # i.e. there aren't really softbounds
 
