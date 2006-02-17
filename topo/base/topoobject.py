@@ -311,16 +311,27 @@ class TopoObject(object):
     def __setup_params(self,**config):
         """
         """
-        # CEBHACKALERT: copied objects share the same name
-
         # deepcopy a Parameter if its 'instantiate' attribute is True,
         # and put it in this TopoObject's dictionary - so it has its
-        # own copy, rather than sharing the class'.
+        # own copy, rather than sharing the class'.        
         for class_ in classlist(type(self)):
             for (k,v) in class_.__dict__.items():
                 if isinstance(v,Parameter) and v.instantiate==True:
                     parameter_name = v.get_name(self) 
-                    self.__dict__[parameter_name] = copy.deepcopy(v.default)
+                    new_object = copy.deepcopy(v.default)
+                    self.__dict__[parameter_name]=new_object
+
+                    # a new TopoObject needs a new name
+                    # CEBHACKALERT: this will write over any name given;
+                    # instead, maybe the name function could accept
+                    # a prefix? To do when HACKALERT about naming is
+                    # fixed in __init__.
+                    if isinstance(new_object,TopoObject):
+                        global object_count
+                        object_count+=1
+                        new_object.__set_name()
+                        
+                    
                     
         for name,val in config.items():
             desc,desctype = self.__class__.get_param_descriptor(name)
