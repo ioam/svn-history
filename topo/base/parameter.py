@@ -198,7 +198,7 @@ class Parameter(object):
 
         default, doc, and precedence default to None. This is to allow
         inheritance of Parameter slots (attributes) from the owning-class'
-        class hierarchy (see TopoMetaclass).
+        class hierarchy (see ParameterizedObjectMetaclass).
         """
         self._name = None
         self.hidden=hidden

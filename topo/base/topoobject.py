@@ -27,7 +27,7 @@ min_print_level = NORMAL
 object_count = 0
 
 
-class TopoMetaclass(type):
+class ParameterizedObjectMetaclass(type):
     """
     The metaclass of ParameterizedObject (and all its descendents).
 
@@ -222,7 +222,7 @@ class ParameterizedObject(object):
            print foo.name+':', 'The answer is', 42
     """
 
-    __metaclass__ = TopoMetaclass
+    __metaclass__ = ParameterizedObjectMetaclass
 
 
     ### It might make sense to make the name be visible (not hidden) by default.
