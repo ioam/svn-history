@@ -121,6 +121,11 @@ class ParametersFrame(Frame):
         """
         For all non-Constant Parameters of the currently set TopoObject(),
         set the values of the Parameters to those specified by the widgets.
+
+        Only sets the value on the object if the value in the widget is
+        different from the one in the object. This prevents a local copy
+        of a variable being made into a TopoObject just because the TopoObject
+        is opened in the model editor.
         """
         assert self.topo_obj!=None, "ParametersFrame must be associated with a TopoObj()."
         parameters_to_modify = [ (name,parameter)
@@ -130,7 +135,10 @@ class ParametersFrame(Frame):
 
         for (name,parameter) in parameters_to_modify:
             w = self.__widgets[name][1]  # [0] is label (Message), [1] is widget
-            setattr(self.topo_obj,name,w.get_value())
+
+            if w.get_value()!=getattr(self.topo_obj,name):
+                setattr(self.topo_obj,name,w.get_value())
+
 
     def create_class_widgets(self, topo_class = None, translator_dictionary = {}, topo_object = None) :
         """
