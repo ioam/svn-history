@@ -386,7 +386,7 @@ class Number(Parameter):
     __slots__ = ['bounds','_softbounds']
     __doc__ = property((lambda self: self.doc))
  
-    def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),**params):
+    def __init__(self,default=0.0,bounds=None,softbounds=None,**params):
         """
         Number is a numeric parameter. Numbers have a default value,
         and bounds.  There are two types of bounds: `bounds' and
@@ -457,6 +457,8 @@ class Number(Parameter):
         # be inside the bounds; it may be appropriate to add a warning
         # in such cases.
         if (is_number(val)):
+            if self.bounds==None:
+                return val
             min, max = self.bounds 
             if min != None: 
                 if val < min:
@@ -485,25 +487,34 @@ class Number(Parameter):
         if not (is_number(val)):
             raise ValueError("Parameter " + `self._name` + " (" + `self.__class__` + ") only takes a numeric value; " + `type(val)` + " is not numeric.")
 
-        min,max = self.bounds
-        if min != None and max != None:
-            if not (min <= val <= max):
-                raise ValueError("Parameter must be between " + `min` + ' and ' + `max` + ' (inclusive).')
-        elif min != None:
-            if not min <= val: 
-                raise ValueError("Parameter must be at least " + `min` + '.')
-        elif max != None:
-            if not val <= max:
-                raise ValueError("Parameter must be at most " + `min` + '.')
+        if self.bounds!=None:
+            min,max = self.bounds
+            if min != None and max != None:
+                if not (min <= val <= max):
+                    raise ValueError("Parameter must be between " + `min` + ' and ' + `max` + ' (inclusive).')
+            elif min != None:
+                if not min <= val: 
+                    raise ValueError("Parameter must be at least " + `min` + '.')
+            elif max != None:
+                if not val <= max:
+                    raise ValueError("Parameter must be at most " + `min` + '.')
 
     def get_soft_bounds(self):
         """
         For each soft bound (upper and lower), if there is a defined bound (not equal to None)
         then it is returned, otherwise it defaults to the hard bound. The hard bound could still be None.
         """
-        hl,hu = self.bounds
-        sl,su = self._softbounds
+        if self.bounds==None:
+            hl,hu=(None,None)
+        else:
+            hl,hu=self.bounds
 
+        if self._softbounds==None:
+            sl,su=(None,None)
+        else:
+            sl,su=self._softbounds
+
+                
         if (sl==None): l = hl
         else:          l = sl
 
@@ -527,7 +538,7 @@ class Magnitude(Number):
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
-    def __init__(self,default=1.0,softbounds=(None,None),**params):
+    def __init__(self,default=1.0,softbounds=None,**params):
         Number.__init__(self,default=default,bounds=(0.0,1.0),softbounds=softbounds,**params)
 
 
@@ -558,7 +569,7 @@ class DynamicNumber(Number):
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
-    def __init__(self,default=0.0,bounds=(None,None),softbounds=(None,None),**params):
+    def __init__(self,default=0.0,bounds=None,softbounds=None,**params):
         """
         Create Dynamic version of Number parameter.
 
