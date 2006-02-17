@@ -38,6 +38,19 @@ def msum(m):
     """
     return sum(sum(m))
 
+# CEBHACKALERT: see the docstring
+class Mdot(object):
+    """
+    This is a temporary wrapper around the mdot() function so that
+    deepcopy can work when a Parameter has this function as its
+    default value. (To be removed when TopoObject's support for
+    deepcopy is corrected. See connectionfield.py's GenericCFResponseFn
+    and projections/basic.py's SharedWeightCFResponseFn)
+    """
+    def __call__(self,m1,m2):
+        a = m1*m2
+        return sum(a.flat)
+
 ### JAB: Could be rewritten using weave.blitz to avoid creating a temporary
 def mdot(m1,m2):
     """
