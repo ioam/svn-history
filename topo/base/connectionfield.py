@@ -26,7 +26,7 @@ import copy
 from topoobject import TopoObject
 from projection import Projection,ProjectionSheet,Identity,OutputFunctionParameter
 from parameter import Parameter, Number, BooleanParameter,ClassSelectorParameter
-from arrayutils import mdot,divisive_normalization
+from arrayutils import Mdot,divisive_normalization
 from sheet import Sheet,bounds2slice,sheet2matrixidx,crop_slice_to_sheet_bounds,slice2bounds
 from sheetview import UnitView
 from itertools import chain
@@ -252,7 +252,7 @@ class GenericCFResponseFn(CFResponseFunction):
     ConnectionField weights) and computes a scalar activation value
     based on those weights.
     """
-    single_cf_fn = Parameter(default=mdot)
+    single_cf_fn = Parameter(default=Mdot())
     
     def __init__(self,**params):
         super(GenericCFResponseFn,self).__init__(**params)

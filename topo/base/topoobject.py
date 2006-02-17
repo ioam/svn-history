@@ -308,15 +308,9 @@ class TopoObject(object):
         # own copy, rather than sharing the class'.
         for class_ in classlist(type(self)):
             for (k,v) in class_.__dict__.items():
-                if isinstance(v,Parameter) and v.instantiate==True:                 
-                    p_name = v.get_name(self) # the name that this TopoObject has for this Parameter
-                    # CEBHACKALERT: seems some things can't be deepcopied e.g.
-                    # gaussian as used in lissom_oo_or.ty...this is just
-                    # a temporary solution while I work out what is wrong.
-                    try:
-                        self.__dict__[p_name] = copy.deepcopy(v.default)
-                    except TypeError:
-                        self.__dict__[p_name] = copy.copy(v.default)
+                if isinstance(v,Parameter) and v.instantiate==True:
+                    parameter_name = v.get_name(self) 
+                    self.__dict__[parameter_name] = copy.deepcopy(v.default)
                     
         for name,val in config.items():
             desc,desctype = self.__class__.get_param_descriptor(name)

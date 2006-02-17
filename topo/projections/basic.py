@@ -14,7 +14,7 @@ import Numeric
 
 from topo.base.topoobject import TopoObject
 from topo.base.parameter import Parameter,Number,Constant
-from topo.base.arrayutils import mdot
+from topo.base.arrayutils import Mdot
 from topo.base.connectionfield import CFProjection,IdentityCFLF,ResponseFunctionParameter
 from topo.base.patterngenerator import PatternGeneratorParameter
 from topo.base.sheetview import UnitView
@@ -33,7 +33,7 @@ class SharedWeightCFResponseFn(TopoObject):
     ### implemented a wrapper around the cfs argument of
     ### GenericCFResponseFn, so that GenericCFResponseFn will work
     ### whether there is an actual full set of cfs or not.
-    single_cf_fn = Parameter(default=mdot)
+    single_cf_fn = Parameter(default=Mdot())
     
     def __init__(self,**params):
         super(SharedWeightCFResponseFn,self).__init__(**params)
