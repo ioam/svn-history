@@ -447,6 +447,7 @@ class CFProjection(Projection):
         self.activity = Numeric.array(self.dest.activity)
 
 
+
     def create_mask_template(self):
         """
         """
@@ -520,8 +521,6 @@ class CFProjection(Projection):
         return UnitView((matrix_data,new_box),sheet_x,sheet_y,self)
 
 
-    ### HACKALERT! Should we omit the input_activity parameter and use
-    ### the self.src.activity instead
     def activate(self,input_activity):
         """Activate using the specified response_fn and output_fn."""
         self.input_buffer = input_activity
@@ -533,7 +532,8 @@ class CFProjection(Projection):
         """
         For a CFProjection, learn consist in calling the learning_fn.
         """
-        self.learning_fn(self.cfs,self.input_buffer,self.dest.activity,self.learning_rate)
+        if self.input_buffer:
+            self.learning_fn(self.cfs,self.input_buffer,self.dest.activity,self.learning_rate)
 
 
         
@@ -597,12 +597,12 @@ class CFSheet(ProjectionSheet):
     precedence = Number(0.5)
 
         
-    def learn(self):       
+    def learn(self):
+        """
+        Call the learn() method on every CFProjection to the Sheet.
+        """
         for proj in chain(*self.in_projections.values()):
-            ### JCALERT! Figure out why this test is needed (here and in CFSOM.learn())
-            ### solve the problem and delete it.
-            if proj.input_buffer:
-                proj.learn()
+            proj.learn()
 
                 
     def update_unit_view(self,x,y,projection_name=None):

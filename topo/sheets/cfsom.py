@@ -60,14 +60,15 @@ class CFSOM(CFSheet):
         return self.radius_0 * self.decay(float(self.simulator.time()),self.half_life)
 
     def learn(self):
+        """
+        Call the learn() method on every CFProjection to the Sheet.
+        """
         rows,cols = self.activity.shape
         radius = self.radius() * self.density
-        
         for proj in chain(*self.in_projections.values()):
-            if proj.input_buffer:
-                proj.learning_rate = self.alpha()
-                if isinstance(proj.learning_fn, SOMLF):
-                    proj.learning_fn.learning_radius = radius
-                proj.learn()
+            proj.learning_rate = self.alpha()
+            if isinstance(proj.learning_fn, SOMLF):
+                proj.learning_fn.learning_radius = radius
+            proj.learn()
 
 
