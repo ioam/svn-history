@@ -258,13 +258,15 @@ class Parameter(object):
         assigned to it.    
         """
         if not hasattr(self,'_name') or not self._name:
-             classes = classlist(type(obj))[::-1] 
+             classes = classlist(type(obj))[::-1]
+             print classes
              for class_ in classes:
                  for attrib_name in dir(class_):
-                     desc,desctype = class_.get_param_descriptor(attrib_name)
-                     if desc is self:
-                         self._name = '_%s_param_value'%attrib_name
-                         return self._name
+                     if hasattr(class_,'get_param_descriptor'):
+                         desc,desctype = class_.get_param_descriptor(attrib_name)
+                         if desc is self:
+                             self._name = '_%s_param_value'%attrib_name
+                             return self._name
         else:
             return self._name
 
