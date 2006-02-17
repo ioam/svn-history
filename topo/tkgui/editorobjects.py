@@ -196,7 +196,8 @@ class EditorSheet(EditorNode) :
         self.currentCol = col
         self.gradient = 1
         self.viewing_choices = [('Normal', lambda: self.select_view('normal')),
-                                ('Activity', lambda: self.select_view('activity'))]
+                                ('Activity', lambda: self.select_view('activity')),
+                                ('Density Grid', lambda: self.select_view('density'))]
 
     ############ Draw methods ############################
 
@@ -221,25 +222,26 @@ class EditorSheet(EditorNode) :
         if focus : label_colour = colour
         else : label_colour = 'black'
         h, w = 0.5 * self.height, 0.5 * self.width
-        if (not self.focus and (self.view == 'activity')) :
-            colour = ''
-            x, y = self.x - w + h, self.y - h
-            # AL, the idea will be to allow any available plots to be shown on the sheet.
-            # eg m = self.sheet.sheet_view_dict['OrientationPreference'].view()[0]
-            update_activity()
-            m = self.sheet.sheet_view_dict['Activity'].view()[0]
-            m = self.normalize(m)
-            matrix_width, matrix_height = self.element_count
-            dX, dY = (w * 2)/ matrix_width, (h * 2) / matrix_height
-            for i in range(matrix_height) :
-                for j in range(matrix_width) :
-                    a = i * dY
-                    x1, y1 = x - a + (j * dX), y + a
-                    x2, y2 = x1 - dY, y1 + dY
-                    x3, x4 = x2 + dX, x1 + dX
-                    col = '#' + (self.dec_to_hex_str(m[i][j], 3)) * 3
-                    self.id = self.id + [self.canvas.create_polygon
-                       (x1, y1, x2, y2, x3, y2, x4, y1, fill = col, outline = col)]
+        if not(self.focus) :
+            if self.view == 'activity' :
+                colour = ''
+                x, y = self.x - w + h, self.y - h
+                # AL, the idea will be to allow any available plots to be shown on the sheet.
+                # eg m = self.sheet.sheet_view_dict['OrientationPreference'].view()[0]
+                update_activity()
+                m = self.sheet.sheet_view_dict['Activity'].view()[0]
+                m = self.normalize(m)
+                matrix_width, matrix_height = self.element_count
+                dX, dY = (w * 2)/ matrix_width, (h * 2) / matrix_height
+                for i in range(matrix_height) :
+                    for j in range(matrix_width) :
+                        a = i * dY
+                        x1, y1 = x - a + (j * dX), y + a
+                        x2, y2 = x1 - dY, y1 + dY
+                        x3, x4 = x2 + dX, x1 + dX
+                        col = '#' + (self.dec_to_hex_str(m[i][j], 3)) * 3
+                        self.id = self.id + [self.canvas.create_polygon
+                           (x1, y1, x2, y2, x3, y2, x4, y1, fill = col, outline = col)]
         x, y = self.x, self.y
         x1,y1 = (x - w - h, y + h)
         x2,y2 = (x - w + h, y - h)
@@ -249,7 +251,23 @@ class EditorSheet(EditorNode) :
             fill = colour , outline = "black")]
         dX = (self.width / 2) + 5
         self.label = self.canvas.create_text(x - dX, y, anchor = E, fill = label_colour, text = self.name)
-    
+        # adds a density grid over the sheet
+        if self.view == 'density' :
+            x, y = self.x - w + h, self.y - h
+            matrix_width, matrix_height = self.element_count
+            dX, dY = (w * 2)/ matrix_width, (h * 2) / matrix_height
+            for i in range(matrix_height + 1) :
+                x1 = x - (i * dY)
+                x2 = x1 + (w * 2)
+                y1 = y + (i * dY)
+                self.id = self.id + [self.canvas.create_line(x1, y1, x2, y1, fill = 'slate blue')]
+            for j in range(matrix_width + 1) :
+                x1 = x + (j * dX)
+                x2 = x1 - (h * 2)
+                y1 = y
+                y2 = y1 + (h * 2)
+                self.id = self.id + [self.canvas.create_line(x1, y1, x2, y2, fill = 'slate blue')]
+
     def normalize(self,a):
         """ 
         Normalize an array s.
@@ -437,9 +455,9 @@ class EditorProjection(EditorConnection) :
         self.factor = self.get_factor()
         self.receptive_field = receptive_field
         self.view = 'radius'
-        self.viewing_choices = [('Normal', lambda: self.select_view('normal')),
+        self.viewing_choices = [('Field Radius', lambda: self.select_view('radius')),
                                 ('Line', lambda: self.select_view('line')),
-                                ('Field Radius', lambda: self.select_view('radius'))]
+                                ('Fixed Size', lambda: self.select_view('normal'))]
 
     ############ Draw methods ############################
     def select_view(self, view_choice) :
