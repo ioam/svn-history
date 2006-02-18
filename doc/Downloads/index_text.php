@@ -126,12 +126,17 @@ all" will also run the regression tests and example files, to ensure
 that everything is functioning properly on your system.  At the
 moment, be sure that you do this compilation on a machine with a
 functioning DISPLAY, i.e., not a remote text-only session, or there
-will be some warnings involving Tk.
+will be some warnings involving Tk.  
 
 <P>If all goes well, a script named <code>topographica</code> will be
 created in the <code>topographica/</code> directory; you can use this
-to start Topographica as described in the
-<A HREF="../Tutorials/index.html">Tutorials</A>.  
+to start Topographica as described in the <A
+HREF="../Tutorials/index.html">Tutorials</A>.  If you have problems,
+try adding <code>-k</code> to the <code>make</code> command, which
+will allow the make process to skip any components that do not build
+properly on your machine. Topographica is highly modular, and most
+functionality should be accessible even without some of those
+components.
 
 <P><B>UNIX:</B>
 Topographica is developed under Linux, but should work on other
