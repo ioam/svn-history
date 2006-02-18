@@ -1,9 +1,7 @@
 """
-Topographica Base
-
-Implements the Topographica generic base class ParameterizedObject.  This class
-encapsulates generic functions of all Topographica classes, such as
-automatic parameter setting, message output, etc.
+Generic support for objects with full-featured Parameters and
+messaging.  Potentially useful for any large Python program that needs
+user-modifiable object attributes.
 
 $Id$
 """
@@ -15,6 +13,7 @@ import copy
 
 from pprint import pprint
 
+# JABALERT: Could consider using Python's logging facilities instead.
 SILENT  = 0
 WARNING = 50
 NORMAL  = 100
@@ -25,104 +24,112 @@ DEBUG   = 300
 min_print_level = NORMAL
 object_count = 0
 
-
+### JABALERT: The documentation for Dynamic needs to be moved out of here,
+### with only a general mention that dynamic subclasses can be implemented,
+### unless support for Dynamic is moved into this file.
 class Parameter(object):
     """
-    An attribute descriptor for declaring Topographica parameters.
+    An attribute descriptor for declaring parameters.
 
-    Simulation parameters are represented in Topographica as a special
-    kind of class attribute.  Setting a class attribute to be an
-    instance of this class causes that attribute of the class and its
-    instances to be treated as a Topographica parameter.  This allows
-    special behavior, including dynamically generated parameter values
-    (using lambdas or generators), and type or range checking at
+    Parameters are a special kind of class attribute.  Setting a class
+    attribute to be an instance of this class causes that attribute of
+    the class and its instances to be treated as a Parameter.  This
+    allows special behavior, including dynamically generated parameter
+    values (using lambdas or generators), documentation strings,
+    read-only (constant) parameters, and type or range checking at
     assignment time.
 
-    For example, suppose someone has defined a new kind of sheet, that
-    has parameters alpha, sigma, and gamma.  He would begin his class
-    definition something like this:
+    For example, suppose someone wants to define two new kind of
+    objects Foo and Bar, such that Bar has a parameter delta, Foo is a
+    subclass of Bar, and Foo has parameters alpha, sigma, and gamma
+    (and delta inherited from Bar).  She would begin her class
+    definitions with something like this:
 
-    class FooSheet(Sheet):
-        alpha = Parameter(default=0.1)
-        sigma = Parameter(default=0.0)
-        gamma = Parameter(default=1.0)
+    class Bar(ParameterizedObject):
+        delta = Parameter(default=0.6, doc='The difference between steps.')
         ...
+        
+    class Foo(Bar):
+        alpha = Parameter(default=0.1, doc='The starting value.')
+        sigma = Parameter(default=0.5, doc='The standard deviation.', constant=True)
+        gamma = Parameter(default=1.0, doc='The ending value.')
+        ...
+
+    Class Foo would then have four parameters, with delta defaulting to 0.6.
 
     Parameters have several advantages over plain attributes:
 
-    1. They can be set automatically in an instance:  The FooSheet
-        __init__ method should call setup_params(self,FooSheet,**args),
-        where **args is the dictionary of keyword arguments passed to the
-        constructor.  This function will discover all the parameters in
-        FooSheet, and set them from the arguments passed in.  E.g., if a
-        script does this:
+    1. Parameters can be set automatically when an instance is
+       constructed: The default constructor for Foo (and Bar) will
+       accept arbitrary keyword arguments, each of which can be used
+       to specify the value of a Parameter of Foo (or any of Foo's
+       superclasses).  E.g., if a script does this:
 
-            myfoo = FooSheet(alpha=0.5)
+           myfoo = Foo(alpha=0.5)
 
-        myfoo.alpha will return 0.5, without the foosheet constructor
-        needing special code to set alpha.
+       myfoo.alpha will return 0.5, without the Foo constructor
+       needing special code to set alpha.
 
-    2. They can be dynamic.  If a Parameter is declared as Dynamic, it can
-        be set to be a callable object (e.g a function), and getting the
-        parameter's value will call that callable.  E.g.  To cause all
-        FooSheets to draw their gammas from a gaussian distribution you'd
-        write something like:
+       If Foo implements its own constructor, keyword arguments will
+       still be accepted if the constructor accepts a dictionary of
+       keyword arguments (as in'def __init__(self,**params):'), and
+       then each class calls its superclass (as in
+       'super(Foo,self).__init__(**params)') so that the
+       ParameterizedObject constructor will process the keywords.
 
-            from random import gauss
-            FooSheet.sigma = Dynamic(lambda:gauss(0.5,0.1))
+    2. A ParameterizedObject need specify only the attributes of a
+       Parameter whose values differ those declared in superclasses of
+       the ParameterizedObject; the other values will be inherited.
+       E.g. if Foo declares
 
-        If a Dynamic Parameter's value is set to a Python generator or iterator,
-        then when the Parameter is accessed, the iterator's .next() method
-        is called.  So to get a parameter that cycles through a sequence,
-        you could write:
-            from itertools import cycle
-            FooSheet.sigma = Dynamic(cycle([0.1,0.5,0.9]))
+        delta = Parameter(default=0.2) 
+
+       the default value of 0.2 will override the 0.6 inherited from
+       Bar, but the doc will be inherited from Bar.
 
     3. The Parameter descriptor class can be subclassed to provide more
-        complex behavior, allowing special types of parameters that, for
-        example, require their values to be numbers in certain ranges, or
-        read their values from a file or other external source.
+       complex behavior, allowing special types of parameters that, for
+       example, require their values to be numbers in certain ranges,
+       generate their values dynamically from a random distribution, or 
+       read their values from a file or other external source.
 
-
-    One of the key benefits of __slots__ is given in the reference manual
-    at http://www.python.org/doc/2.4/ref/slots.html:
-    
-        By default, instances of both old and new-style classes have a
-        dictionary for attribute storage. This wastes space for
-        objects having very few instance variables. The space
-        consumption can become acute when creating large numbers of
-        instances.
-
-        The default can be overridden by defining __slots__ in a
-        new-style class definition. The __slots__ declaration takes a
-        sequence of instance variables and reserves just enough space
-        in each instance to hold a value for each variable. Space is
-        saved because __dict__ is not created for each instance.
-
-    Note that the actual value of a Parameter is not stored in the
-    Parameter object itself, but in the owning object's __dict__.
-
-    See this HOW-TO document for a good intro to descriptors in
-    Python:
-        http://users.rcn.com/python/download/Descriptor.htm
-
-    (And the other items on http://www.python.org/doc/newstyle.html)
-
-
-    Note about pickling: Parameters are usually used inside
-    ParameterizedObjects, and so are pickled even though Parameter has no
-    explicit support for pickling (usually if a class has __slots__ it
-    can't be pickled without additional support: see the Pickle module
-    documentation).
+    4. The attributes associated with Parameters provide enough
+       information for automatically generating property sheets in
+       graphical user interfaces, to allow Parameters
+       ParameterizedObjects to be edited by users.
     """
 
+    # Because they implement __get__ and __set__, Parameters are
+    # known as 'descriptors' in Python.  See 
+    # http://users.rcn.com/python/download/Descriptor.htm
+    # (and the other items on http://www.python.org/doc/newstyle.html)
+    # for more information.
+    #
+    # So that the extra features of Parameters do not require a lot of
+    # overhead, Parameters are implemented using __slots__ (see
+    # http://www.python.org/doc/2.4/ref/slots.html).  Instead of having
+    # a full Python dictionary associated with each Parameter instance,
+    # Parameter instances have an enumerated list (named __slots__) of
+    # attributes, and reserve just enough space to store these
+    # attributes.  Using __slots__ requires special support for
+    # operations to copy and restore Parameters (e.g. for Python
+    # persistent storage pickling), and these are implemented for
+    # ParameterizedObjects.
+    # 
+    # Note that the actual value of a Parameter is not stored in the
+    # Parameter object itself, but in the owning
+    # ParameterizedObject'ss __dict__.
+    # 
+    # Note about pickling: Parameters are usually used inside
+    # ParameterizedObjects, and so can be pickled even though
+    # Parameter has no explicit support for pickling (usually if a
+    # class has __slots__ it can't be pickled without additional
+    # support: see the Pickle module documentation).
+    #                                                    
     # To get the benefit of slots, subclasses must themselves define
     # __slots__, whether or not they define attributes not present in
-    # the base Parameter class.
-    # See the reference manual:
-    # The action of a __slots__ declaration is limited to the class
-    # where it is defined. As a result, subclasses will have a
-    # __dict__ unless they also define __slots__.
+    # the base Parameter class.  That's because a subclass will have
+    # a __dict__ unless it also defines __slots__.
 
     __slots__ = ['_name','default','doc','hidden','precedence','instantiate','constant']
     count = 0
@@ -169,7 +176,6 @@ class Parameter(object):
         else:
             self.instantiate = instantiate
         
-
     def __get__(self,obj,objtype):
         """
         Get a parameter value.  If called on the class, produce the
@@ -196,8 +202,8 @@ class Parameter(object):
         instance's dictionary under the parameter's _name gensym.
 
         If the Parameter's constant attribute is True, does not allow
-        set commands except on the classobj or
-        on an uninitialized ParameterizedObject.
+        set commands except on the classobj or on an uninitialized
+        ParameterizedObject.
         """    
         if self.constant:
             if not obj:
@@ -279,25 +285,26 @@ class ParameterizedObjectMetaclass(type):
 
     The metaclass overrides type.__setattr__ to allow us to set
     Parameter values on classes without overwriting the attribute
-    descriptor.  That is, for a ParameterizedObject of type X with a Parameter
-    y, the user can type X.y=3, which sets the default value of
-    Parameter y to be 3, rather than overwriting y with the constant
-    value 3 (and thereby losing all other info about that Parameter,
-    such as the doc string, bounds, etc.)
+    descriptor.  That is, for a ParameterizedObject of type X with a
+    Parameter y, the user can type X.y=3, which sets the default value
+    of Parameter y to be 3, rather than overwriting y with the
+    constant value 3 (and thereby losing all other info about that
+    Parameter, such as the doc string, bounds, etc.).
 
-    The other methods get_param_descriptor and print_param_defaults
-    could perhaps be made into static functions, because all they
-    (appear to) do is to provide a way to call the functions without
-    having a specific object available.  Perhaps they do something
-    else that requires them to be in the metaclass, though?
+    The __init__ method is used when defining a ParameterizedObject
+    class, usually when the module where that class is located is
+    imported for the first time.  That is, the __init__ in this
+    metaclass initializes the *class* object, while the __init__
+    method defined in each ParameterizedObject class is called for
+    each new instance of that class.
+    """
 
-    The __init__ method is used when defining a ParameterizedObject class,
-    usually when the module where that class is located is imported
-    for the first time.  That is, the __init__ in this metaclass
-    initializes the *class* object, while the __init__ method defined
-    in each ParameterizedObject class is called for each new instance of that
-    class.
-    """   
+    # The other methods get_param_descriptor and print_param_defaults
+    # could perhaps be made into static functions, because all they
+    # (appear to) do is to provide a way to call the functions without
+    # having a specific object available.  Perhaps they do something
+    # else that requires them to be in the metaclass, though?
+    
     def __init__(self,name,bases,dict):
         """
         Initialize the class object (not an instance of the class, but the class itself).
@@ -416,24 +423,19 @@ class ParameterizedObjectMetaclass(type):
 
 class ParameterizedObject(object):
     """
-    Base class for most Topographica objects, providing automatic
-    object naming, automatic parameter setting, and message formatting
-    facilities:
+    Base class for named objects that support Parameters and message formatting.
     
-    - Automatic object naming -
+    Automatic object naming: Every ParameterizedObject has a name
+    parameter.  If the user doesn't designate a name=<str> argument
+    when constructing the object, the object will be given a name
+    consisting of its class name followed by a unique 5-digit number.
     
-    Every ParameterizedObject has a name parameter.  If the user doesn't designate
-    a name=<str> argument when constructing the object, the object will be
-    given a name consisting of its class name followed by a unique 5-digit
-    number. 
-    
-    - Automatic parameter setting -
-    
-    The ParameterizedObject __init__ method will automatically read the list of
-    keyword parameters.  If any keyword matches the name of a Parameter
-    (see parameter.py) defined in the object's class or any of its
-    superclasses, that parameter in the instance will get the value given
-    as a keyword argument.  For example:
+    Automatic parameter setting: The ParameterizedObject __init__
+    method will automatically read the list of keyword parameters.  If
+    any keyword matches the name of a Parameter (see parameter.py)
+    defined in the object's class or any of its superclasses, that
+    parameter in the instance will get the value given as a keyword
+    argument.  For example:
     
       class Foo(ParameterizedObject):
          xx = Parameter(default=1)
@@ -442,23 +444,22 @@ class ParameterizedObject(object):
     
     in this case foo.xx gets the value 20.
     
-    - Message formatting -
-    
-    Each ParameterizedObject has several methods for optionally printing output
-    according to the current 'print level'.  The print levels are SILENT,
-    WARNING, MESSAGE, VERBOSE, and DEBUG.  Each successive level allows
-    more messages to be printed.  For example, when the level is VERBOSE,
-    all warning, message, and verbose output will be printed.  When it is
-    WARNING, only warnings will be printed.  When it is SILENT, no output
-    will be printed.
+    Message formatting: Each ParameterizedObject has several methods
+    for optionally printing output according to the current 'print
+    level', such as SILENT, WARNING, MESSAGE, VERBOSE, or DEBUG.  Each
+    successive level allows more messages to be printed.  For example,
+    when the level is VERBOSE, all warning, message, and verbose
+    output will be printed.  When it is WARNING, only warnings will be
+    printed.  When it is SILENT, no output will be printed.
     
     For each level (except SILENT) there's an associated print method:
     ParameterizedObject.warning(), .message(), .verbose(), and .debug().
     
-    Each line printed this way is prepended with the name of the object
-    that printed it.  The ParameterizedObject parameter print_level, and the module
-    global variable min_print_level combine to determine what gets
-    printed.  For example, if foo is a ParameterizedObject:
+    Each line printed this way is prepended with the name of the
+    object that printed it.  The ParameterizedObject parameter
+    print_level, and the module global variable min_print_level
+    combine to determine what gets printed.  For example, if foo is a
+    ParameterizedObject:
     
        foo.message('The answer is',42)
     
@@ -471,7 +472,7 @@ class ParameterizedObject(object):
     __metaclass__ = ParameterizedObjectMetaclass
 
 
-    ### It might make sense to make the name be visible (not hidden) by default.
+    ### JABALERT: It might make sense to make the name be visible (not hidden) by default.
     name           = Parameter(default=None,hidden=True)
     print_level = Parameter(default=MESSAGE,hidden=True)
     
@@ -679,7 +680,7 @@ class ParameterizedObject(object):
 
 
 def print_all_param_defaults():
-    print "===== Topographica Parameter Default Values ====="
+    print "========= Parameter Default Values ========"
     classes = descendents(ParameterizedObject)
     classes.sort(key=lambda x:x.__name__)
     for c in classes:
@@ -689,28 +690,27 @@ def print_all_param_defaults():
     
 
 
-def class_parameters(topo_class):
+def class_parameters(parameterized_class):
     """
-    Return the non-hidden Parameters of the specified ParameterizedObject class as {parameter_name: parameter}.
+    Return the non-hidden Parameters of the specified ParameterizedObject class
+    as {parameter_name: parameter}.
 
-    E.g. for a class that has one Parameter
-    x=Number()
-    this function returns
+    E.g. for a class that has one Parameter x=Number(), this function returns
     {'x':<topo.base.parameter.Number object at ...>}
 
     The specified class must be of type ParameterizedObject.
     """
-    assert isinstance(topo_class, type)
+    assert isinstance(parameterized_class, type)
 
     # Create the object so that Parameters of any superclasses are also present.
-    topo_obj = topo_class()
+    parameterized_obj = parameterized_class()
     
-    if not isinstance(topo_obj,ParameterizedObject):
+    if not isinstance(parameterized_obj,ParameterizedObject):
         raise TypeError("Can only get Parameters for a class derived from ParameterizedObject.")
     
     parameters = [(parameter_name,parameter)
                   for (parameter_name,parameter)
-                  in topo_obj.get_paramobj_dict().items()
+                  in parameterized_obj.get_paramobj_dict().items()
                   if not parameter.hidden
                  ]
                  

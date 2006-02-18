@@ -1,10 +1,5 @@
 """
-Module for handling experiment parameters and defaults.
-
-This module defines an attribute descriptor for experiment parameters.
-An experiment parameter is represented in Topographica as a special
-kind of class attribute.  See the Parameter class documentation for
-more details.
+Subclasses of Parameter, implementing specific parameter types.
 
 $Id$
 """
@@ -382,6 +377,30 @@ class DynamicNumber(Number):
 
 
 class Dynamic(Parameter):
+    """
+    Parameter whose value is generated dynamically by a callable object.
+    
+    If a Parameter is declared as Dynamic, it can be set to be a
+    callable object (such as a function), and getting the parameter's
+    value will call that callable.  E.g., to cause all objects of type
+    Foo to draw the value of Parameter gammas from a Gaussian
+    distribution, you'd write something like:
+
+      from random import gauss
+      Foo.sigma = Dynamic(lambda:gauss(0.5,0.1))
+
+    If a Dynamic Parameter's value is set to a Python generator or iterator,
+    then when the Parameter is accessed, the iterator's .next() method
+    is called.  So to get a parameter that cycles through a sequence,
+    you could write:
+        
+      from itertools import cycle
+      Foo.sigma = Dynamic(cycle([0.1,0.5,0.9]))
+
+    Note that at present, the callable object must be an instance of a
+    callable class, rather than a named function or a lambda function,
+    or else this object will not be picklable.
+    """
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
     
