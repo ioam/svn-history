@@ -171,11 +171,11 @@ class Parameter(object):
     # where it is defined. As a result, subclasses will have a
     # __dict__ unless they also define __slots__.
 
-    __slots__ = ['_name','default','doc','hidden','precedence','instantiate']
+    __slots__ = ['_name','default','doc','hidden','precedence','instantiate','constant']
     count = 0
 
     # CEBHACKALERT: I think this can be made simpler
-    def __init__(self,default=None,doc=None,hidden=False,precedence=None,instantiate=False):
+    def __init__(self,default=None,doc=None,hidden=False,precedence=None,instantiate=False,constant=False):
         """
         Initialize a new parameter.
 
@@ -207,7 +207,15 @@ class Parameter(object):
         Parameter.count += 1
         self.default = default
         self.doc = doc
-        self.instantiate = instantiate
+        self.constant = constant
+
+        # CEBHACKALERT: constants must be instantiated: should this
+        # instead be a check and raise an error to inform the user?
+        if self.constant:
+            self.instantiate = True
+        else:
+            self.instantiate = instantiate
+        
 
     def __get__(self,obj,objtype):
         """
@@ -233,12 +241,25 @@ class Parameter(object):
         set the default value, if on an instance, set the value of the
         parameter in the object, where the value is stored in the
         instance's dictionary under the parameter's _name gensym.
-        """    
-        if not obj:
-            self.default = val
-        else:
-            obj.__dict__[self.get_name(obj)] = val
 
+        If the Parameter's constant attribute is True, does not allow
+        set commands except on the classobj or
+        on an uninitialized ParameterizedObject.
+        """    
+        if self.constant:
+            if not obj:
+                self.default = val
+            elif not obj.initialized:
+                obj.__dict__[self.get_name(obj)] = val
+            else:
+                raise TypeError("Constant parameter cannot be modified")
+
+        else:
+            if not obj:
+                self.default = val
+            else:
+                obj.__dict__[self.get_name(obj)] = val
+                
 
     def __delete__(self,obj):
         """
@@ -303,6 +324,10 @@ class Constant(Parameter):
     initialized object.
 
     The default value of the Parameter can, however, be set on a class.
+
+    Note that until Topographica supports some form of read-only object,
+    it is still possible to change the attributes of the object stored in
+    a Constant (e.g. the left bound of a BoundingBox).
     """
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
@@ -311,17 +336,7 @@ class Constant(Parameter):
         """
         This Constant gets a deepcopy of the value passed in when it is declared.
         """
-        Parameter.__init__(self,default=value,instantiate=True,**params)
-
-    def __set__(self,obj,val):
-        """
-        Does not allow set commands except on the classobj or
-        on an uninitialized ParameterizedObject.
-        """
-        if obj==None or obj.initialized==False:
-            super(Constant,self).__set__(obj,val)
-        else:
-            raise TypeError("Constant parameter cannot be modified")
+        Parameter.__init__(self,default=value,instantiate=True,constant=True,**params)
 
 
 class ParameterizedObjectMetaclass(type):
@@ -663,10 +678,10 @@ class ParameterizedObject(object):
         # The exclusion of Constant is because we currently load a script first, so Constants get set.
         
         # first get class-level attributes
-        c = self.__class__
 
+        c = self.__class__
         for entry in c.__dict__.keys():
-            if isinstance(c.__dict__[entry], Parameter) and not isinstance(c.__dict__[entry], Constant):
+            if isinstance(c.__dict__[entry], Parameter): 
                 state[entry] = getattr(self, entry)
 
         # end CEBHACKALERT
@@ -693,9 +708,20 @@ class ParameterizedObject(object):
 
 
     def __setstate__(self,state):
+        """
+        Restore objects from the state dictionary to this object.
+
+        During this process the object is considered uninitialized.
+        """
+        del state['initialized']  # (we restore this attribute ourselves)
+        self.initialized=False
+        
         for k,v in state.items():
             setattr(self,k,v)
+            
         self.unpickle()
+        self.initialized=True
+
 
     def unpickle(self):
         pass
