@@ -78,7 +78,6 @@ class ParametersFrame(Frame):
 
         # The dictionary of parameter_type:property_to_add pairs.
         self.__parameter_property = {
-            topo.base.parameterclasses.Constant:         self.__add_readonly_text_property,
             topo.base.parameterclasses.Number:           self.__add_numeric_property,
             topo.base.parameterclasses.Enumeration:      self.__add_enumeration_property,
             topo.base.parameterclasses.BooleanParameter: self.__add_boolean_property,
@@ -132,7 +131,7 @@ class ParametersFrame(Frame):
         parameters_to_modify = [ (name,parameter)
                                  for (name,parameter)
                                  in self.__visible_parameters.items()
-                                 if not type(parameter)==topo.base.parameterclasses.Constant]
+                                 if not parameter.constant==True]
 
         for (name,parameter) in parameters_to_modify:
             w = self.__widgets[name][1]  # [0] is label (Message), [1] is widget
@@ -169,7 +168,7 @@ class ParametersFrame(Frame):
         self.__visible_parameters = list(parameter_name
                                     for (parameter_name,parameter)
                                     in self.topo_obj.get_paramobj_dict().items()
-                                    if parameter.__class__ == topo.base.parameterclasses.Constant
+                                    if parameter.constant == True
                                     and not(parameter.hidden))    
  
         # create the widgets
@@ -263,15 +262,18 @@ class ParametersFrame(Frame):
         a match is found. If no match is found, the Parameter just gets a
         textbox. 
         """
-        for c in topo.base.parameterizedobject.classlist(type(parameter))[::-1]:
-            if self.__parameter_property.has_key(c):
-                # find the right method...
-                property_to_add = self.__parameter_property[c]
-                # ...then call it
-                property_to_add(parameter_name,parameter)
-                return
-        # no match: use text box
-        self.__add_text_property(parameter_name,parameter)
+        if parameter.constant==True:
+            self.__add_readonly_text_property(parameter_name,parameter)
+        else:
+            for c in topo.base.parameterizedobject.classlist(type(parameter))[::-1]:
+                if self.__parameter_property.has_key(c):
+                    # find the right method...
+                    property_to_add = self.__parameter_property[c]
+                    # ...then call it
+                    property_to_add(parameter_name,parameter)
+                    return
+            # no match: use text box
+            self.__add_text_property(parameter_name,parameter)
             
 
     # CEBHACKALERT: don't need to pass parameter. See HACKALERT below
