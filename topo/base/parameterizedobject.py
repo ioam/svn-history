@@ -318,25 +318,6 @@ class Parameter(object):
     __doc__ = property((lambda self: self.doc))
     
 
-class Constant(Parameter):
-    """
-    Constant Parameter that can be constructed and used but not set on an
-    initialized object.
-
-    The default value of the Parameter can, however, be set on a class.
-
-    Note that until Topographica supports some form of read-only object,
-    it is still possible to change the attributes of the object stored in
-    a Constant (e.g. the left bound of a BoundingBox).
-    """
-    __slots__ = []
-    __doc__ = property((lambda self: self.doc))
-
-    def __init__(self,value,**params):
-        """
-        This Constant gets a deepcopy of the value passed in when it is declared.
-        """
-        Parameter.__init__(self,default=value,instantiate=True,constant=True,**params)
 
 
 class ParameterizedObjectMetaclass(type):
