@@ -201,8 +201,8 @@ class EPConnection(ParameterizedObject):
     two EventProcessors.
     """
 
-    src = Parameter(default=None)
-    dest = Parameter(default=None)
+    src = Parameter(default=None,constant=True)
+    dest = Parameter(default=None,constant=True)
     src_port = Parameter(default=None)
     dest_port = Parameter(default=None)
     delay = Parameter(default=None)

@@ -382,9 +382,9 @@ class CFProjection(Projection):
     and stores it in the activity array.
     """
     response_fn = ResponseFunctionParameter(default=GenericCFResponseFn())
-    cf_type = Parameter(default=ConnectionField)
+    cf_type = Parameter(default=ConnectionField,constant=True)
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
-    weights_generator = PatternGeneratorParameter(default=patterngenerator.Constant())
+    weights_generator = PatternGeneratorParameter(default=patterngenerator.Constant(),constant=True)
     weights_shape = PatternGeneratorParameter(default=patterngenerator.Constant(),constant=True)
     learning_fn = LearningFunctionParameter(default=GenericCFLF())
     learning_rate = Parameter(default=0.0)
@@ -540,7 +540,9 @@ class CFProjection(Projection):
         if self.input_buffer:
             self.learning_fn(self.cfs,self.input_buffer,self.dest.activity,self.learning_rate)
       
-        
+
+    ### JABALERT: This should be changed into a special __set__ method for
+    ### weights_bounds, instead of being a separate function.
     def change_bounds(self, weights_bounds_template):
         """
         Change the bounding box for all of the ConnectionFields in this Projection.
