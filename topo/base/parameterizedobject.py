@@ -603,21 +603,18 @@ class ParameterizedObject(object):
         CEBHACKALERT: I will document this function.
         """
         state = {}
-        
-        # CEBHACKALERT: 
-        # what this ought to do is traverse the classes in order most general to specific to get the
-        # attributes, writing over more general ones with more specific.
-        # I have code that uses classlist() do that, but I know for certain that the current code does not affect
-        # the operation of LISSOM.
-        # The exclusion of Constant is because we currently load a script first, so Constants get set.
-        
+
         # first get class-level attributes
 
+        # CEBHACKALERT: I think this can be re-written properly
+        # now...traversing the class hierarchy ought to be possible when
+        # e.g. lambdas aren't hidden away in DynamicNumbers. Currently
+        # this code avoids the problem because unpicklable things
+        # are never reached.
         c = self.__class__
         for entry in c.__dict__.keys():
             if isinstance(c.__dict__[entry], Parameter): 
                 state[entry] = getattr(self, entry)
-
         # end CEBHACKALERT
 
         # now get the object's __dict__
@@ -660,8 +657,14 @@ class ParameterizedObject(object):
     def unpickle(self):
         pass
 
-    ### Need to decide whether this is redundant with get_param_dict, and if
+    # HACKALERT
+    ### Need to decide whether this is redundant with get_paramobj_dict, and if
     ### so which one to delete.
+    # CB: this isn't used, and could be deleted. When most external objects want
+    # a ParameterizedObject's Parameters, they don't want them all and usually
+    # take some subset. So using this function would be a little wasteful, because
+    # two loops would be required.
+    # get_param_obj_dict is used in one place, under a HACKALERT.
     def get_param_dict(self,**config):
         paramdict = {}
         for class_ in classlist(type(self)):
