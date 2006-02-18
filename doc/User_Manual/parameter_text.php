@@ -58,11 +58,13 @@ will contain the same string for <code>doc</doc> as
 
 
 <H2>Using Parameters</H2>
-<P>
+
+Something something.
+
+<H3>Class attributes are shared between instances</H3>
 In Python, attributes declared at the class level are shared by all
 instances of that class, unless an instance overwrites the attribute
 with its own copy of the variable. For example: 
-
 <pre> 
 class
 Example(object):
@@ -112,7 +114,7 @@ Topographica> example1.a
 Because instances share the object held in the class attribute, any changes to
 attributes of the object will show up in all the instances.
 
-<P>
+<H3>Parameters can behave like class attributes</H3>
 The same general rules apply to Parameters, which are declared at the class
 level:
 <pre>
@@ -136,6 +138,8 @@ Topographica> ExampleP.a = 40
 Topographica> example1.a
 40
 </pre>
+
+<H3>Parameters can behave like instance attributes</H3>
 However, Parameters offer a number of advantages for controlling
 behaviour. First, when creating an object, the value of a class
 Parameter can be passed in and results in the object having its own
@@ -148,6 +152,7 @@ Topographica> ExampleP.a = 12
 Topographica> e1.a
 8
 </pre>
+
 Second, the author of a class can make a particular Parameter 
 be instantiated for each new object - overriding the default
 behaviour. This is useful when the Parameter will hold a
@@ -180,7 +185,7 @@ output_fn = Parameter(default=PiecewiseLinear(),instantiate=True)
 </pre>
 In this case, each instance of CFSheet will have its own
 instance of PiecewiseLinear, independent of other
-CFSheets' PiecewiseLinear() instances.
+<code>CFSheet</code>s' <code>PiecewiseLinear()</code> instances.
 
 <br><br>
 
