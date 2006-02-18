@@ -657,22 +657,14 @@ class ParameterizedObject(object):
     def unpickle(self):
         pass
 
-    # HACKALERT
-    ### Need to decide whether this is redundant with get_paramobj_dict, and if
-    ### so which one to delete.
-    # CB: this isn't used, and could be deleted. When most external objects want
-    # a ParameterizedObject's Parameters, they don't want them all and usually
-    # take some subset. So using this function would be a little wasteful, because
-    # two loops would be required.
-    # get_param_obj_dict is used in one place, under a HACKALERT.
-    def get_param_dict(self,**config):
-        paramdict = {}
-        for class_ in classlist(type(self)):
-            for name,val in class_.__dict__.items():
-                if isinstance(val,Parameter):
-                    paramdict[name] = getattr(self,name)
-        return paramdict
-
+    # CEBHACKALERT: this is used once, under a HACKALERT. It could be
+    # deleted: when most external objects want a ParameterizedObject's
+    # Parameters, they don't want them all and usually take some
+    # subset. So using this function would be a little wasteful,
+    # because two loops would be required in those cases.  But, to a
+    # user of ParameterizedObject (who doesn't use the rest of
+    # Topographica) this would be a useful function - so I think it
+    # should be kept and this HACKALERT removed.
     def get_paramobj_dict(self,**config):
         """
         For getting the parameter objects directly, not just the
