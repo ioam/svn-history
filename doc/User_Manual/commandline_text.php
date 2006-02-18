@@ -82,15 +82,23 @@ $ ./topographica -g examples/cfsom_or.ty
 Topographica&gt; from topo.commands.pylabplots import *
 Topographica&gt; matrixplot(V1.activity)
 Topographica&gt; vectorplot(V1.activity[0])
+Topographica&gt; vectorplot(V1.activity[1])
+Topographica&gt; vectorplot(V1.activity[10])
 Topographica&gt;
 </pre>
+
+Result:
+
+<center>
+<IMG src="images/matrixvectorplot.png" WIDTH="420" HEIGHT="473">
+</center>
 
 <P>The prompt can also be used for any mathematical calculation or
 plotting one might wish to do, a la Matlab:
 
 <!-- JABALERT! Should include screenshots of what the plotting looks like -->
 <pre>
-$ ./topographica -g examples/cfsom_or.ty 
+$ ./topographica -g
 Topographica&gt; from Numeric import *
 Topographica&gt; 2*pi*exp(1.6)
 31.120820554943471
@@ -103,6 +111,17 @@ Topographica&gt; show._needmain = False
 Topographica&gt; show()
 </pre>
 
-See the <A href="http://numeric.scipy.org/numpydoc/numdoc.htm">Numeric</A>
-and <A href="http://matplotlib.sourceforge.net/">MatPlotLib</A>
-documentation for more details.
+Resulting plot:
+
+<center>
+<IMG src="images/sine_plot.png" WIDTH="658" HEIGHT="551">
+</center>
+
+<P>See the <A
+href="http://numeric.scipy.org/numpydoc/numdoc.htm">Numeric</A>
+documentation for more details on the mathematical expressions and
+functions supported, and the <A
+href="http://matplotlib.sourceforge.net/">MatPlotLib</A> documentation
+for how to make new plots and change their axes, labels, titles, line
+styles, etc.
+
