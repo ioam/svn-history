@@ -13,6 +13,7 @@ import topo
 import topo.base.parameterclasses
 import Pmw
 
+import topo.base.parameterizedobject
 
 # CEBHACKALERT: this file is still being reorganized; there are still
 # temporary methods.
@@ -262,7 +263,7 @@ class ParametersFrame(Frame):
         a match is found. If no match is found, the Parameter just gets a
         textbox. 
         """
-        for c in topo.base.parameterclasses.classlist(type(parameter))[::-1]:
+        for c in topo.base.parameterizedobject.classlist(type(parameter))[::-1]:
             if self.__parameter_property.has_key(c):
                 # find the right method...
                 property_to_add = self.__parameter_property[c]
