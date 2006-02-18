@@ -17,17 +17,6 @@ from utils import find_classes_in_package,classname_repr
 from parameterizedobject import Parameter
 
 
-# CEBHACKALERT: is there a problem with inheritance of default
-# values for Parameters?
-# For example, in CFProjection there is the class attribute
-# weights_shape = PatternGeneratorParameter(patterngenerator.Constant())
-# If at some point I later type 
-# PatternGeneratorParameter.default = topo.patterns.basic.Gaussian()
-# then weights_shape will become topo.patterns.basic.Gaussian()
-# (This is a reminder for me to look - I haven't investigated yet.)
-
-
-
 class Constant(Parameter):
     """
     Constant Parameter that can be constructed and used but not set on an
@@ -47,7 +36,6 @@ class Constant(Parameter):
         This Constant gets a deepcopy of the value passed in when it is declared.
         """
         Parameter.__init__(self,default=value,instantiate=True,constant=True,**params)
-
         
     
 # CEBHACKALERT: at the moment, the path must be relative to Topographica's path.
