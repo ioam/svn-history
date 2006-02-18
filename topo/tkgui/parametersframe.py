@@ -190,7 +190,8 @@ class ParametersFrame(Frame):
             row += 1
 
     def create_widgets(self, topo_obj, translator_dictionary = {}):
-        """topo.base.parameter.Constant:
+        """
+        topo.base.parameterclasses.Constant:
         Create widgets for all non-hidden Parameters of topo_obj and add them
         to the screen.
 
