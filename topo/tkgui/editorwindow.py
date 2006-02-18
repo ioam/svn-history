@@ -6,7 +6,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import Canvas, Frame, Toplevel, Tk, Menu, Scrollbar, SUNKEN, YES, BOTH, LEFT, END, RIGHT, TOP, BOTTOM, X, Y
+from Tkinter import Canvas, Frame, Button, Toplevel, Tk, Menu, Scrollbar, SUNKEN, YES, BOTH, LEFT, END, RIGHT, TOP, BOTTOM, X, Y
 from random import Random, random
 
 from topo.base.simulator import get_active_sim, set_active_sim, Simulator
@@ -28,9 +28,15 @@ class EditorCanvas(Canvas) :
 
     ############ Constructor ####################################
     def __init__(self, root = None, width = 600, height = 600) :
-        # Superclass call
         Canvas.__init__(self, root, width = width, height = height, bg = "white", bd = 2, relief = SUNKEN)
+        self.panel = Frame(root)
+        self.panel.pack(side = TOP, fill = X)
+        # Refresh, Reduce, and Enlarge Buttons.
+        Button(self.panel,text="Refresh", command=self.refresh).pack(side=LEFT)
+        Button(self.panel,text="Reduce", command=self.reduce_scale).pack(side=LEFT)
+        Button(self.panel,text="Enlarge", command=self.enlarge_scale).pack(side=LEFT)        
         # retain the current focus in the canvas
+        self.scaling_factor = 1.0
         self.current_object = None
         self.current_connection = None
         self.focus = None
@@ -165,6 +171,26 @@ class EditorCanvas(Canvas) :
         bar.set_focus(True)
         self.mode = mode
 
+    ########### Panel methods #########################################
+    def refresh(self) :
+        for obj in self.object_list :
+            obj.set_focus(True)
+            obj.set_focus(False)
+        for obj in self.object_list :
+            connection_list = obj.from_connections[:]
+            connection_list.reverse()
+            for con in connection_list :
+                con.move()
+
+    def enlarge_scale(self) :
+        self.scaling_factor += 0.2
+        self.refresh()
+ 
+    def reduce_scale(self) :
+        if self.scaling_factor <= 0.4 : return
+        self.scaling_factor -= 0.2
+        self.refresh()
+
     ########### Object moving methods #################################
     # if an object is left clicked in the canvas, these methods allow it to be repositioned in
     # the canvas.
@@ -211,7 +237,7 @@ class EditorCanvas(Canvas) :
         obj = self.get_object_xy(x, y)
         if (obj != None) : # if an object, connect the objects and remove focus
             if (self.current_connection != None) :
-                self.connection_tool.createConnection(self.current_connection, obj)
+                self.connection_tool.create_connection(self.current_connection, obj)
                 self.current_connection.set_focus(False)
         else : # if not an object, remove the connection
             if (self.current_connection != None) :

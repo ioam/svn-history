@@ -191,14 +191,19 @@ class ConnectionTool(Frame) :
         # connections/projections the returned object will depend on current selection.
         return EditorProjection("", self.canvas, from_node)
 
-    def createConnection(self, editor_connection, node) :
+    def create_connection(self, editor_connection, node) :
         # connects the ed connection. Will also form correct connection in the
         # topo simulator.
         sim = self.canvas.simulator
         from_node = editor_connection.from_node.sheet
         to_node = node.sheet
         con_type = self.proj_list[self.current_option]
-        con = sim.connect(from_node, to_node, connection_type = con_type)
+        try :
+            con = sim.connect(from_node, to_node, connection_type = con_type)
+        except ValueError:
+            print "These sheets could not be connected by a "+ self.current_option
+            editor_connection.remove()
+            return
         editor_connection.connect(node, con)
 
     def set_option(self, option) :
@@ -237,6 +242,7 @@ class ParametersTool(Frame) :
     def __init__(self, parent = None) :
         # super constructor call.
         Frame.__init__(self, parent)
+        self.focus = None
         # label
         self.title_label = Label(self)
         self.title_label.pack(side = TOP)
@@ -253,6 +259,7 @@ class ParametersTool(Frame) :
         self.parameter_frame.set_class_parameters()
 
     def set_focus(self, name, focus_class, doc = '') :
+        self.focus = name
         self.parameter_frame.forget()
         self.button_panel.forget()
         self.title_label.config(text = name)

@@ -221,7 +221,8 @@ class EditorSheet(EditorNode) :
         self.id = []
         if focus : label_colour = colour
         else : label_colour = 'black'
-        h, w = 0.5 * self.height, 0.5 * self.width
+        factor = self.canvas.scaling_factor
+        h, w = 0.5 * self.height * factor, 0.5 * self.width *factor
         if not(self.focus) :
             if self.view == 'activity' :
                 colour = ''
@@ -245,11 +246,11 @@ class EditorSheet(EditorNode) :
         x, y = self.x, self.y
         x1,y1 = (x - w - h, y + h)
         x2,y2 = (x - w + h, y - h)
-        x3,y3 = x2 + self.width, y2
-        x4,y4 = x1 + self.width, y1
+        x3,y3 = x2 + (w * 2), y2
+        x4,y4 = x1 + (w * 2), y1
         self.id = self.id + [self.canvas.create_polygon(x1, y1, x2, y2, x3, y3, x4, y4, 
             fill = colour , outline = "black")]
-        dX = (self.width / 2) + 5
+        dX = w + 5
         self.label = self.canvas.create_text(x - dX, y, anchor = E, fill = label_colour, text = self.name)
         # adds a density grid over the sheet
         if self.view == 'density' :
@@ -344,10 +345,12 @@ class EditorSheet(EditorNode) :
         # returns true.
         # Get the paralellogram points and centers them around the given point
         x = self.x - pos_x; y = self.y - pos_y
-        A = (x - (0.5 * self.width) - (0.5 * self.height), y + (0.5 * self.height))
-        B = (x - (0.5 * self.width) + (0.5 * self.height), y - (0.5 * self.height))
-        C = B[0] + self.width, B[1]
-        D = A[0] + self.width, A[1]
+        w = 0.5 * self.width * self.canvas.scaling_factor
+        h = 0.5 * self.height * self.canvas.scaling_factor
+        A = (x - w - h, y + h)
+        B = (x - w + h, y - h)
+        C = B[0] + (2 * w), B[1]
+        D = A[0] + (2 * w), A[1]
         # calculate the line constants 	
         # As the gradient of the lines is 1 the calculation is simple.
         a_AB = A[1] + A[0]
@@ -368,8 +371,8 @@ class EditorSheet(EditorNode) :
     def set_bounds(self) :
         width_fact = 120; height_fact = 60
         lbrt = self.sheet.bounds.aarect().lbrt()
-        self.width = width_fact * (lbrt[2] - lbrt[0])
-        self.height = height_fact * (lbrt[3] - lbrt[1])
+        self.width = width_fact * (lbrt[2] - lbrt[0]) * self.canvas.scaling_factor
+        self.height = height_fact * (lbrt[3] - lbrt[1]) * self.canvas.scaling_factor
 
 ####################################################################
 
@@ -398,6 +401,7 @@ class EditorConnection(EditorObject) :
     def move(self) :
         # if one of the nodes connected by this connection move, then move by redrawing	
         self.gradient = self.calculate_gradient()
+        self.update_factor()
         self.draw() 
 
     def update_position(self, pos) : # update the temporary point
@@ -492,12 +496,13 @@ class EditorProjection(EditorConnection) :
             col = 'purple'#'dark green'
             lateral_colour = '' #self.from_node.currentCol
         middle = self.get_middle(from_position, to_position)
+        factor = self.canvas.scaling_factor
         if (to_position == from_position) : # connection to and from the same node
-            deviation = self.draw_index * 15 
-            x1 = to_position[0] - (20 + deviation)
+            deviation = self.draw_index * 15 * factor
+            x1 = to_position[0] - ((20 * factor) + deviation)
             y2 = to_position[1]
-            x2 = x1 + 40 + (2 * deviation)
-            y1 = y2 - (30 + deviation) 
+            x2 = x1 + (40 * factor) + (2 * deviation)
+            y1 = y2 - ((30 * factor) + deviation) 
             midX = self.get_middle((x1,0),(x2,0))[0]
             # create oval and an arrow head.
             self.id = (self.canvas.create_oval(x1, y1, x2, y2, outline = col), 
@@ -513,14 +518,12 @@ class EditorProjection(EditorConnection) :
             self.id = (self.canvas.create_line(from_pos, mid , arrow = LAST, fill = col),
                     self.canvas.create_line(mid, to_position, fill = col))
             # draw name label
-            dX = 20
-            dY = self.draw_index * 20
+            dX = 20 * factor
+            dY = self.draw_index * 20 * factor
             self.label = self.canvas.create_text(middle[0] - dX,
                 middle[1] - dY, fill = text_col, text = self.name, anchor = E)
 
     def draw_radius(self, from_position, to_position) :
-        # 'not imp yet'
-        self.draw_normal
          # set the colour to be used depending on whether connection has the focus.
         if (self.focus) : 
             text_col = col = 'dark red'
@@ -531,6 +534,7 @@ class EditorProjection(EditorConnection) :
             lateral_colour = '' #self.from_node.currentCol
         # midpoint of line
         middle = self.get_middle(from_position, to_position)
+        factor = self.canvas.scaling_factor
         if (to_position == from_position) : # connection to and from the same node
             a, b = self.get_radius()
             x1 = to_position[0] - a
@@ -548,7 +552,7 @@ class EditorProjection(EditorConnection) :
             self.id = (self.canvas.create_line(x1, y1, x2 - radius_x, y2, fill = col),
                 self.canvas.create_line(x1, y1, x2 + radius_x, y2, fill = col),
                 self.canvas.create_oval(x2 - radius_x, y2 - radius_y, 
-                x2 + radius_x, y2 + radius_y, outline = col))
+                    x2 + radius_x, y2 + radius_y, outline = col))
             # draw name label
             dX = 20
             dY = self.draw_index * 20
@@ -600,6 +604,7 @@ class EditorProjection(EditorConnection) :
             self.from_node.remove_connection(self, self.FROM) # and remove from 'from' node
         for id in self.id : # remove the representation from the canvas
             self.canvas.delete(id)
+        print 'delete'
         self.canvas.delete(self.label)
 
     def decrement_draw_index(self) :
@@ -620,8 +625,9 @@ class EditorProjection(EditorConnection) :
         return (pos1[0] + (pos2[0] - pos1[0])*0.5, pos1[1] + (pos2[1] - pos1[1])*0.5)
 
     def get_radius(self) :
+        factor = self.canvas.scaling_factor
         if self.to_node == None :
-            return (self.normal_radius, self.normal_radius * 
+            return (factor * self.normal_radius, factor * self.normal_radius * 
                 self.from_node.height / self.from_node.width)
         node = self.from_node
         node_bounds = node.sheet.bounds.aarect().lbrt()
@@ -630,16 +636,17 @@ class EditorProjection(EditorConnection) :
         except :
             try :
                 bounds = self.connection._weights_bounds_param_value.aarect().lbrt()
-            except : return (self.normal_radius, self.normal_radius * 
+            except : return (factor * self.normal_radius, factor * self.normal_radius * 
                 self.from_node.height / self.from_node.width)
-        radius_x = (node.width / 2) * (bounds[2] - bounds[0]) / (node_bounds[2] - node_bounds[0])
+        radius_x = factor * (node.width / 2) * (bounds[2] - bounds[0]) / (node_bounds[2] - node_bounds[0])
         radius_y = radius_x * node.height / node.width
         return radius_x, radius_y
 
     # returns the size of the semimajor and semiminor axis of the ellipse representing 
     # the draw_index-th lateral projection.
     def get_factor(self) :
-        w = self.from_node.width; h = self.from_node.height
+        factor = self.canvas.scaling_factor
+        w = factor * self.from_node.width; h = factor * self.from_node.height
         a = 20; n = (w / 2) - 10; b = (n - a)
         major = a + (b * (1 - pow(0.8, self.draw_index)))
         a = 20 * h / w; n = (h / 2) - 10; b = (n - a)
@@ -651,6 +658,7 @@ class EditorProjection(EditorConnection) :
     # returns the gradients of the two lines making the opening 'v' part of the receptive field. 
     # this depends on the draw_index, as it determines where the projection's representation begins.
     def calculate_gradient(self) :
+        factor = self.canvas.scaling_factor
         if self.view == 'radius':
             A = self.to_node.get_pos()
             T = self.from_node.get_pos()
@@ -659,8 +667,8 @@ class EditorProjection(EditorConnection) :
         else :
             A = self.to_node.get_pos()
             T = (self.from_node.get_pos()[0] + self.deviation ,self.from_node.get_pos()[1])
-            B = (T[0] - self.normal_radius, T[1])
-            C = (T[0] + self.normal_radius, T[1])
+            B = (T[0] - (factor * self.normal_radius), T[1])
+            C = (T[0] + (factor * self.normal_radius), T[1])
         den_BA = (A[0] - B[0])
         if not(den_BA == 0) :
             m_BA = (A[1] - B[1]) / den_BA
@@ -674,14 +682,15 @@ class EditorProjection(EditorConnection) :
         return (m_BA, m_CA)
 
     def in_bounds(self, x, y) : # returns true if point lies in a bounding box
+        factor = self.canvas.scaling_factor
         if self.view == 'line':
             # If connections are represented as lines
             # currently uses an extent around the arrow head.
             to_position = self.to_node.get_pos()
             from_position = self.from_node.get_pos()
             if (self.to_node == self.from_node) :
-                deviation = self.draw_index * 15
-                middle = (to_position[0], to_position[1] - (30 + deviation))
+                deviation = self.draw_index * 15 * factor
+                middle = (to_position[0], to_position[1] - ((30 * factor) + deviation))
             else :
                 middle = self.get_middle(from_position, to_position)
             if ((x < middle[0] + 10) & (x > middle[0] - 10) & (y < middle[1] + 10) & (y > middle[1] - 10)) :
@@ -703,18 +712,18 @@ class EditorProjection(EditorConnection) :
                 return True
             # returns true if x, y lie inside the triangular receptive field representing this projection
             # get the points of the triangular receptive field, centered around the x, y point given
-            to_position = (self.to_node.x, self.to_node.y)
-            from_position = (self.from_node.x, self.from_node.y)
+            to_position = self.to_node.get_pos()
+            from_position = self.from_node.get_pos()
             if self.view == 'radius' :
                 A = (to_position[0] - x, to_position[1] - y)
-                T = (from_position[0] + self.deviation - x, from_position[1] - y)
+                T = (from_position[0] + (self.deviation * factor) - x, from_position[1] - y)
                 B = (T[0] - self.radius[0], T[1])
                 C = (T[0] + self.radius[0], T[1])
             else :
                 A = (to_position[0] - x, to_position[1] - y)
-                T = (from_position[0] + self.deviation - x, from_position[1] - y)
-                B = (T[0] - self.normal_radius, T[1])
-                C = (T[0] + self.normal_radius, T[1])
+                T = (from_position[0] + (self.deviation * factor) - x, from_position[1] - y)
+                B = (T[0] - (self.normal_radius * factor), T[1])
+                C = (T[0] + (self.normal_radius * factor), T[1])
             # if the y coords lie outwith the boundaries, return false
             if (((A[1] < B[1]) and (B[1] < 0 or A[1] > 0)) or 
                 ((A[1] >= B[1]) and (B[1] > 0 or A[1] < 0))) :
