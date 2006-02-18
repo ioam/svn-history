@@ -514,7 +514,7 @@ class EditorProjection(EditorConnection) :
             # create a line between the nodes - use 2 to make arrow in centre.
             dev = self.deviation
             from_pos = from_position[0] + self.deviation, from_position[1]
-            mid = middle[0] + 0.5 * self.deviation, middle[1]
+            mid = middle[0] + 0.5 * dev, middle[1]
             self.id = (self.canvas.create_line(from_pos, mid , arrow = LAST, fill = col),
                     self.canvas.create_line(mid, to_position, fill = col))
             # draw name label
@@ -604,7 +604,7 @@ class EditorProjection(EditorConnection) :
             self.from_node.remove_connection(self, self.FROM) # and remove from 'from' node
         for id in self.id : # remove the representation from the canvas
             self.canvas.delete(id)
-        print 'delete'
+            print 'delete'
         self.canvas.delete(self.label)
 
     def decrement_draw_index(self) :
@@ -692,8 +692,9 @@ class EditorProjection(EditorConnection) :
                 deviation = self.draw_index * 15 * factor
                 middle = (to_position[0], to_position[1] - ((30 * factor) + deviation))
             else :
+                dev = self.deviation * 0.5
                 middle = self.get_middle(from_position, to_position)
-            if ((x < middle[0] + 10) & (x > middle[0] - 10) & (y < middle[1] + 10) & (y > middle[1] - 10)) :
+            if ((x < middle[0] + 10 + dev) & (x > middle[0] - 10 + dev) & (y < middle[1] + 10) & (y > middle[1] - 10)) :
                 return True
             return False
         else :
