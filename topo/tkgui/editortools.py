@@ -128,6 +128,8 @@ class NodeTool(Frame) :
     ####### Node Methods ###################################################
 
     def create_node(self, x, y) :
+        if self.parameter_tool.focus :
+            self.parameter_tool.update_parameters()
         # get the current selection and create the new topo object
         sheet = self.sheet_list[self.current_option]()
         sim = self.canvas.simulator # get the current simulator
@@ -194,6 +196,8 @@ class ConnectionTool(Frame) :
     def create_connection(self, editor_connection, node) :
         # connects the ed connection. Will also form correct connection in the
         # topo simulator.
+        if self.parameter_tool.focus :
+            self.parameter_tool.update_parameters()
         sim = self.canvas.simulator
         from_node = editor_connection.from_node.sheet
         to_node = node.sheet
@@ -250,9 +254,6 @@ class ParametersTool(Frame) :
         self.doc_label.pack(side = TOP)
         # parameters frame, for showing modifiable class properties
         self.parameter_frame = ParametersFrame(self, bd = 2)
-        self.button_panel = Frame(self)
-        update_button = Button(self.button_panel, text = 'Apply', command = self.update_parameters)
-        update_button.pack()
 
 
     def update_parameters(self) :
@@ -261,12 +262,9 @@ class ParametersTool(Frame) :
     def set_focus(self, name, focus_class, doc = '') :
         self.focus = name
         self.parameter_frame.forget()
-        self.button_panel.forget()
         self.title_label.config(text = name)
         self.doc_label.config(text = doc)
         try :
             self.parameter_frame.create_class_widgets(focus_class)
-            if not(focus_class == None) :
-                self.button_panel.pack(side = TOP)
         except AttributeError:
              pass
