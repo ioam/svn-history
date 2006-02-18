@@ -432,7 +432,7 @@ class ParameterizedObject(object):
     
     Automatic parameter setting: The ParameterizedObject __init__
     method will automatically read the list of keyword parameters.  If
-    any keyword matches the name of a Parameter (see parameter.py)
+    any keyword matches the name of a Parameter (see Parameter class)
     defined in the object's class or any of its superclasses, that
     parameter in the instance will get the value given as a keyword
     argument.  For example:
@@ -696,7 +696,7 @@ def class_parameters(parameterized_class):
     as {parameter_name: parameter}.
 
     E.g. for a class that has one Parameter x=Number(), this function returns
-    {'x':<topo.base.parameter.Number object at ...>}
+    {'x':<topo.base.parameterclasses.Number object at ...>}
 
     The specified class must be of type ParameterizedObject.
     """
