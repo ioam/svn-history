@@ -17,6 +17,14 @@ from utils import find_classes_in_package,classname_repr
 from parameterizedobject import Parameter
 
 
+# CEBHACKALERT: much of the documentation for Parameter subclasses
+# that ought to be in the class docstring is in the __init__
+# docstring so that it shows up. In some cases there is
+# some repetition.
+# See JABHACKALERT by __doc__.
+
+
+
 class Constant(Parameter):
     """
     Constant Parameter that can be constructed and used but not set on an

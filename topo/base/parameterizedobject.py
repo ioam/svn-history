@@ -26,12 +26,6 @@ min_print_level = NORMAL
 object_count = 0
 
 
-# CEBHACKALERT: much of the documentation for Parameter subclasses
-# that ought to be in the class docstring is in the __init__
-# docstring so that it shows up. In some cases there is
-# some repetition.
-# See JABHACKALERT by __doc__.
-
 
 def classlist(class_):
     """
