@@ -6,7 +6,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.connectionfield import CFProjection, ResponseFunctionParameter
+from topo.base.connectionfield import CFProjection, ResponseFunctionParameter,LearningFunctionParameter
 from topo.base.parameterclasses import Parameter
 from topo.base.projection import Identity
 from topo.base.parameterizedobject import ParameterizedObject
@@ -31,7 +31,7 @@ class CFProjection_CPointer(CFProjection):
     slice_ptrs = []
     mask_ptrs = []
     response_fn = ResponseFunctionParameter(default=CFDotProduct_CPointer())
-    learning_fn = Parameter(default=DivisiveHebbian_CPointer())
+    learning_fn = LearningFunctionParameter(default=DivisiveHebbian_CPointer())
 
     def __init__(self,**params):
         super(CFProjection_CPointer,self).__init__(**params)
