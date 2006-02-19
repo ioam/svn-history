@@ -257,7 +257,8 @@ class Simulator(ParameterizedObject):
     other Topographica commands and classes might look for or want to
     be informed about.
     """
-            
+
+    ### JCALERT! Should be set to BooleanParameter, but does not work.
     step_mode = Parameter(default=False)
     register = Parameter(default=True)
 
