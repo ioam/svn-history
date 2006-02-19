@@ -332,3 +332,21 @@ class AARectangle(object):
         return (r <= l) or (t <= b)
 
 
+### JABALERT: Should classes like this inherit from something like
+### ClassInstanceParameter, which takes a class name and verifies that
+### the value is in that class?
+###
+### Do we also need a BoundingBoxParameter?
+class BoundingRegionParameter(Parameter):
+    """
+    Parameter whose value can be any BoundingRegion instance, enclosing a region in a 2D plane.
+    """
+    def __init__(self,default=BoundingBox(radius=0.5),**params):
+        super(BoundingRegionParameter,self).__init__(default=default,**params)
+        
+    def __set__(self,obj,val):
+        if not isinstance(val,BoundingRegion):
+            raise ValueError("Parameter must be a BoundingRegion.")
+        else:
+            super(BoundingRegionParameter,self).__set__(obj,val)
+            
