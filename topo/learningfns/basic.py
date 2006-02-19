@@ -12,6 +12,7 @@ from topo.base.connectionfield import CFLearningFunction,OutputFunctionParameter
 from topo.base.arrayutils import L2norm
 from Numeric import exp, argmax
 from topo.base.boundingregion import BoundingBox
+from topo.base.patterngenerator import PatternGeneratorParameter
 import topo.patterns.basic
 from math import ceil
 
@@ -52,9 +53,8 @@ class HebbianSOMLF(SOMLF):
 
     learning_radius = Number(default=0.0)
     crop_radius_multiplier = Number(default=3.0,doc="Factor by which the radius should be multiplied when deciding how far from the winner to keep updating the weights.")
-    # JABALERT: Should be a PatternGeneratorParameter eventually
-    neighborhood_kernel_generator = Parameter(default=topo.patterns.basic.Gaussian(),
-                                              doc="Neighborhood function")
+    neighborhood_kernel_generator = PatternGeneratorParameter(default=topo.patterns.basic.Gaussian(),
+                                                              doc="Neighborhood function")
     
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
 
