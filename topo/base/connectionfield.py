@@ -383,7 +383,8 @@ class CFProjection(Projection):
     activate(self,input_activity) that computes the response from the input 
     and stores it in the activity array.
     """
-    response_fn = ResponseFunctionParameter(default=GenericCFResponseFn())
+    response_fn = ResponseFunctionParameter(default=GenericCFResponseFn(),
+                                            doc='response function to compute the Projection activity.' )
     cf_type = Parameter(default=ConnectionField,constant=True)
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
     weights_generator = PatternGeneratorParameter(default=patterngenerator.Constant(),constant=True)
