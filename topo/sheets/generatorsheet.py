@@ -10,7 +10,7 @@ from topo.base.sheet import BoundingBox
 
 from topo.base.utils import NxN
 
-from topo.base.parameterclasses import Parameter, Dynamic
+from topo.base.parameterclasses import Number, Dynamic
 
 import topo.base.patterngenerator
 
@@ -22,8 +22,8 @@ class GeneratorSheet(Sheet):
     Typically generates the patterns by choosing parameters from a
     random distribution, but can use any mechanism.
     """
-    period = Parameter(default=1)
-    phase  = Parameter(default=0)
+    period = Number(default=1)
+    phase  = Number(default=0)
 
     input_generator = topo.base.patterngenerator.PatternGeneratorParameter()
     
