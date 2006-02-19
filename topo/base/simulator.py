@@ -81,7 +81,7 @@ $Id$
 __version__='$Revision$'
 
 from parameterizedobject import ParameterizedObject, Parameter
-from parameterclasses import Number
+from parameterclasses import Number, BooleanParameter, CallableParameter
 from copy import copy, deepcopy
 from fixedpoint import FixedPoint
 
@@ -227,7 +227,7 @@ class EPConnection(ParameterizedObject):
 
 class SimulatorEvent:
     """Simulator event"""
-    fn = Parameter(default=None,doc="Function to execute when the event is processed")
+    fn = CallableParameter(default=None,doc="Function to execute when the event is processed.")
 
     def __init__(self,time,src,dest,src_port,dest_port,data,fn=None):
         self.time = time
@@ -258,9 +258,9 @@ class Simulator(ParameterizedObject):
     be informed about.
     """
 
-    ### JCALERT! Should be set to BooleanParameter, but does not work.
-    step_mode = Parameter(default=False)
-    register = Parameter(default=True)
+    ### JABALERT! Is step_mode even implemented?
+    step_mode = BooleanParameter(default=False)
+    register = BooleanParameter(default=True)
 
     def __init__(self,**config):
         """
