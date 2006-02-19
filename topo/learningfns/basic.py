@@ -30,7 +30,8 @@ class SOMLF(CFLearningFunction):
     specifies the radius of the neighborhood function used during
     learning.
     """
-    learning_radius = Number(default=0.0)
+    learning_radius = Number(default=0.0,
+                             doc="Specify the radius of the Neighborhood function used for learning.")
 
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         raise NotImplementedError
@@ -49,13 +50,13 @@ class HebbianSOMLF(SOMLF):
     bounds, density, radius, and height to return a kernel matrix.
     """
 
-    learning_radius = Number(default=0.0,doc="Radius for the neighborhood function.")
+    learning_radius = Number(default=0.0)
     crop_radius_multiplier = Number(default=3.0,doc="Factor by which the radius should be multiplied when deciding how far from the winner to keep updating the weights.")
     # JABALERT: Should be a PatternGeneratorParameter eventually
     neighborhood_kernel_generator = Parameter(default=topo.patterns.basic.Gaussian(),
                                               doc="Neighborhood function")
     output_fn = OutputFunctionParameter(default=Identity(),
-                 doc='output function applied to the weights after learning')
+                 doc='Output function applied to the weights after learning.')
     
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
 
