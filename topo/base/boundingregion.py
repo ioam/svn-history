@@ -10,8 +10,8 @@ __version__='$Revision$'
 ### matrix notation, not list notation, so that it can be scaled,
 ### translated, etc. easily.
 ###
-from parameterclasses import Parameter
-from parameterizedobject import ParameterizedObject
+from parameterizedobject import ParameterizedObject, Parameter
+from parameterclasses import Number
 from arrayutils import inf
 
 class BoundingRegion(ParameterizedObject):
@@ -120,9 +120,25 @@ class BoundingBox(BoundingRegion):
 
 
 
+class Cartesian2DPoint(Parameter):
+    """
+    Parameter whose value represents a point in a 2D Cartesian plane.
+    """
+    ### JABALERT: Should accept and respect a BoundingBox bounds.
+    __slots__ = []
+    __doc__ = property((lambda self: self.doc))
+
+    def __set__(self,obj,val):
+        try: ## Test that it is a 2-tuple
+            (x,y) = val 
+            super(Cartesian2DPoint,self).__set__(obj,val)
+        except:
+            raise ValueError("Parameter must be a 2D point (an x,y tuple).")
+
+
 class BoundingEllipse(BoundingBox):
     """
-    Similar to BoundingBox, but it the region is the ellipse
+    Similar to BoundingBox, but the region is the ellipse
     inscribed within the rectangle.
     """
     def __init__(self,**args):
@@ -142,18 +158,16 @@ class BoundingEllipse(BoundingBox):
 
 class BoundingCircle(BoundingRegion):
     """
-    A bounding circle.
-    parameters:
+    A circular BoundingRegion.
 
-    center = a single point (x,y)
-    radius = a scalar radius
+    Takes parameters center (a single 2D point (x,y)) and radius (a
+    scalar radius).
     """
-    radius = Parameter(0.5)
-    center = Parameter((0.0,0.0))
+    radius = Number(0.5,bounds=(0.0,None))
+    center = Cartesian2DPoint((0.0,0.0))
 
     def __init__(self,**args):
         super(BoundingCircle,self).__init__(**args)
-
 
     def contains(self,x,y):
         xc,yc = self.center
@@ -310,4 +324,5 @@ class AARectangle(object):
     def empty(self):
         l,b,r,t = self.lbrt()
         return (r <= l) or (t <= b)
+
 
