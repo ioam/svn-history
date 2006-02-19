@@ -118,7 +118,8 @@ class ProjectionSheet(Sheet):
     A and produces and identically shaped output matrix. The default
     is the identity function.
     """
-    output_fn = OutputFunctionParameter()
+    output_fn = OutputFunctionParameter(default=Identity(),
+                                        doc='output function applied (optionally) to the ProjectionSheet activity.')
     apply_output_fn=BooleanParameter(default=True)
                              
     def __init__(self,**params):

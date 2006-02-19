@@ -11,7 +11,7 @@ from topo.misc.inlinec import inline, optimized
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Parameter,Constant,Number
 from topo.base.projection import Identity
-from topo.base.connectionfield import CFLearningFunction
+from topo.base.connectionfield import CFLearningFunction,OutputFunctionParameter
 from topo.outputfns.basic import DivisiveSumNormalize
 
 
@@ -27,7 +27,8 @@ class Hebbian(CFLearningFunction):
     GenericCFLF(single_cf_fn=hebbian), except faster.  Callers can set
     the output_fn to perform normalization if desired.
     """
-    output_fn = Parameter(default=Identity())
+    output_fn = OutputFunctionParameter(default=Identity(),
+                 doc='output function applied to the weights after learning')
     
     def __init__(self,**params):
         super(Hebbian,self).__init__(**params)

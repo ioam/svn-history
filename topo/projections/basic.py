@@ -15,7 +15,7 @@ import Numeric
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Parameter,Number,Constant
 from topo.base.arrayutils import Mdot
-from topo.base.connectionfield import CFProjection,IdentityCFLF,ResponseFunctionParameter
+from topo.base.connectionfield import CFProjection,IdentityCFLF,ResponseFunctionParameter,OutputFunctionParameter
 from topo.base.patterngenerator import PatternGeneratorParameter
 from topo.base.sheetview import UnitView
 
@@ -64,7 +64,7 @@ class SharedWeightCFProjection(CFProjection):
     response_fn = ResponseFunctionParameter(default=SharedWeightCFResponseFn())
     ### JABHACKALERT: Learning won't actually work yet.
     learning_fn = Constant(IdentityCFLF())
-    output_fn  = PatternGeneratorParameter(default=Identity())
+    output_fn  = OutputFunctionParameter(default=Identity())
     strength = Number(default=1.0)
 
     def __init__(self,**params):

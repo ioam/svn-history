@@ -330,7 +330,8 @@ class CFLearningFunction(ParameterizedObject):
 class IdentityCFLF(CFLearningFunction):
     """CFLearningFunction performing no learning."""
 
-    output_fn = Parameter(default=Identity())
+    output_fn = OutputFunctionParameter(default=Identity(),
+                 doc='output function applied to the weights after learning')
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         pass
 
@@ -348,7 +349,8 @@ class LearningFunctionParameter(ClassSelectorParameter):
 class GenericCFLF(CFLearningFunction):
     """CFLearningFunction applying the specified single_cf_fn to each CF."""
     single_cf_fn = Parameter(default=Hebbian())
-    output_fn = Parameter(default=Identity())
+    output_fn =  OutputFunctionParameter(default=Identity(),
+                 doc='output function applied to the weights after learning')
     
     def __init__(self,**params):
         super(GenericCFLF,self).__init__(**params)
@@ -388,7 +390,8 @@ class CFProjection(Projection):
     weights_shape = PatternGeneratorParameter(default=patterngenerator.Constant(),constant=True)
     learning_fn = LearningFunctionParameter(default=GenericCFLF())
     learning_rate = Parameter(default=0.0)
-    output_fn  = OutputFunctionParameter(default=Identity())
+    output_fn  = OutputFunctionParameter(default=Identity(),
+                                         doc='output function applied to the Projection activity.')
     strength = Number(default=1.0)
 
 
