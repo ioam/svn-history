@@ -1,28 +1,730 @@
-2006-02-12  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+2006-02-18 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
 
-	* examples/lissom_oo_or.ty 1.20: Updated gui attribute names to
-	match Alan's recent changes
+	* topo/base/connectionfield.py 1.122, topo/base/simulator.py
+	1.27: Made a few more parameters constant
 
-2006-02-12  alan_lindsay  <alan_lindsay@lodestar.inf.ed.ac.uk>
+2006-02-18 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
 
-	* topo/tkgui/parametersframe.py 1.48: Allows class constants to be
-	set, crudely. A dictionary of dictionaries, holding only the
-	objects changed by the user is used to allow values to be
-	maintained after closing the parametersframe.
+	* topo/base/parameterizedobject.py 1.14,
+	topo/tkgui/parametersframe.py 1.56: Corrected a doc referring
+	to topo.base.parameter.
 
-	* topo/tkgui/editorobjects.py 1.16, topo/tkgui/editortools.py 1.8,
-	topo/tkgui/editorwindow.py 1.16: Changed method and variable names
-	to coincide with the rest of Topographica. Activity plots are now
-	mapped correctly onto sheets and the shape and size of a sheet's
-	bounding box is represented by the editor sheet.
+2006-02-18 alan_lindsay <alan_lindsay@lodestar.inf.ed.ac.uk>
 
-	* topo/base/utils.py 1.55: Added extra translator functions for
-	features in ParameterFrame.
+	* topo/tkgui/editorobjects.py 1.22: Line view bounds check
+	sorted.
 
-	* examples/hierarchical.ty 1.27: ModelEditor uses gui_x instead of
-	guiX; same for y.
+	* topo/tkgui/editortools.py 1.10: Updates class parameters
+	without update button
 
-2006-02-12  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+2006-02-18 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/parameter_text.php 1.4: Tried to break text
+	up a little.
+
+	* doc/User_Manual/parameter_text.php 1.3: Continued writing...
+
+2006-02-18 alan_lindsay <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorobjects.py 1.21, topo/tkgui/editortools.py
+	1.9, topo/tkgui/editorwindow.py 1.18: Added Refresh, Enlarge,
+	Reduce buttons and an error message for when connections don't
+	happen.
+
+2006-02-18 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/parameter_text.php 1.2: Continued writing;
+	still incomplete.
+
+2006-02-18 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/commandline_text.php 1.3,
+	doc/User_Manual/images/matrixvectorplot.png 1.1,
+	doc/User_Manual/images/sine_plot.png 1.1: Added plot
+	screenshots
+
+	* topo/base/parameterclasses.py 1.6,
+	topo/base/parameterizedobject.py 1.13: Cleaned up and
+	generalized the documentation.  Renamed methods and variables
+	that referred to Topographica, since the classes are now fully
+	general
+
+	* doc/Downloads/index_text.php 1.20: Added note about make -k
+
+2006-02-18 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterizedobject.py 1.12: Removed
+	get_param_dict() because it simply returns attributes of the
+	TopoObject (and its superclasses) that are Parameters.
+
+	* topo/base/parameterizedobject.py 1.11: Tidied comments.
+
+	* topo/base/parameterizedobject.py 1.10: Moved two functions
+	to the end of the file.
+
+	* topo/base/parameterclasses.py 1.5,
+	topo/base/parameterizedobject.py 1.9: Moved a HACKALERT
+
+	* topo/tkgui/parametersframe.py 1.55: Parameters with
+	attribute constant==True are set non-editable for an object,
+	and editable for a class (i.e. no visible change, just updated
+	for constant attribute of Parameter).
+
+	* topo/base/connectionfield.py 1.121: weights_shape is set to
+	be a constant Parameter.
+
+	* topo/tkgui/parametersframe.py 1.54: Corrected import for
+	classlist. There might be other files with this mistake?
+
+	* topo/base/parameterclasses.py 1.4: Removed HACKALERT.
+
+	* topo/base/parameterclasses.py 1.3,
+	topo/base/parameterizedobject.py 1.8: Moved Constant to
+	parameterclasses.py
+
+	* topo/base/parameterizedobject.py 1.7: Parameters can have a
+	'constant' attribute. If this is True, they cannot be set on
+	an initialized TopoObject (and they are also
+	instantiated). The Constant Parameter is now simply a
+	Parameter with constant=True. Constant parameters are now no
+	longer excluded from pickling - they are pickled like
+	everything else. Such changes go together because deepcopy
+	uses __getstate__ and __setstate__, as does pickling.
+
+2006-02-17 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/projections/basic.py 1.14: All
+	SharedWeightCFProjections were sharing the same
+	cf_slice_and_bounds list because it was declared as a class
+	attribute.
+
+	* topo/base/parameterizedobject.py 1.6: Removed print
+	statement accidentally left behind.
+
+	* topo/base/parameterizedobject.py 1.5: Corrected mistake in
+	previous commit.
+
+	* topo/base/parameterizedobject.py 1.4: get_name() doesn't
+	just look in the immediate class for the parameter, but in the
+	whole class hierarchy. Before, None was being returned
+	sometimes. That had broken pickling.
+
+2006-02-17 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterclasses.py 1.2,
+	topo/base/parameterizedobject.py 1.3: Moved Parameter (and
+	associated functions class_list() and descendents()) in
+	parameterizedobject.py. I also momentarily moved Constant,
+	until the use of this class in Parameter is deleted (Chris
+	should fix that). Parameter and Constant are still imported
+	in parameterclasses.py, so that we can still import any
+	Parameter class from parameterclasses.py.
+
+	* topo/sheets/cfsom.py 1.25, topo/sheets/generatorsheet.py
+	1.23, topo/sheets/lissom.py 1.42,
+	topo/tests/lissom_oo_or_reference.ty 1.14,
+	topo/tests/lissom_or_reference.ty 1.26,
+	topo/tests/testcfsom.py 1.13, topo/tests/testlissom.ty 1.12,
+	topo/tests/testlissom_cpointer.ty 1.4,
+	topo/tests/testpatternpresent.py 1.7,
+	topo/tests/testsheetview.py 1.10,
+	topo/tests/tkgui/testplotgrouppanel.py 1.7,
+	topo/tkgui/parametersframe.py 1.53, topo/base/__init__.py 1.9,
+	topo/base/boundingregion.py 1.17, topo/base/connectionfield.py
+	1.120, topo/base/parameterizedobject.py 1.2,
+	topo/base/patterngenerator.py 1.62, topo/base/projection.py
+	1.45, topo/base/sheet.py 1.59, topo/base/simulator.py 1.26,
+	topo/eps/basic.py 1.4, topo/learningfns/__init__.py 1.4,
+	topo/learningfns/basic.py 1.42, topo/learningfns/optimized.py
+	1.26, topo/outputfns/__init__.py 1.6, topo/outputfns/basic.py
+	1.20, topo/patterns/__init__.py 1.10, topo/patterns/basic.py
+	1.55, topo/patterns/image.py 1.31, topo/patterns/random.py
+	1.19, topo/plotting/bitmap.py 1.29, topo/plotting/palette.py
+	1.10, topo/plotting/plot.py 1.84, topo/plotting/templates.py
+	1.31, topo/projections/basic.py 1.13,
+	topo/projections/optimized.py 1.16,
+	topo/responsefns/__init__.py 1.5, topo/responsefns/basic.py
+	1.25, topo/responsefns/optimized.py 1.13, examples/cfsom_or.ty
+	1.28, examples/hierarchical.ty 1.30, examples/lissom_oo_or.ty
+	1.27, examples/lissom_or.ty 1.65, examples/obermayer_pnas90.ty
+	1.23, examples/som_retinotopy.ty 1.19, topo/base/parameter.py
+	1.56, topo/base/parameterclasses.py 1.1: Renamed parameter.py
+	to parameterclasses.py.
+
+	* topo/base/parameter.py 1.55: Re-implemented the __get__
+	method for Number, so that not having to know about
+	DynamicNumber from the Parameter class (will eventually allow
+	to move the Parameter class to parameterizedobject.py.
+
+2006-02-17 alan_lindsay <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorobjects.py 1.20: Added density grid view
+	for sheets
+
+2006-02-17 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testpatternpresent.py 1.6, topo/tests/testplot.py
+	1.18, topo/tests/testplotfilesaver.py 1.10,
+	topo/tests/testsheet.py 1.23,
+	topo/tests/tkgui/testplotgrouppanel.py 1.6,
+	topo/tests/tkgui/testtemplateplotgrouppanel.py 1.4,
+	topo/tests/tkgui/testtopoconsole.py 1.7,
+	topo/tkgui/__init__.py 1.8, topo/tkgui/parametersframe.py
+	1.52, topo/tkgui/plotgrouppanel.py 1.37,
+	topo/tkgui/topoconsole.py 1.37, topo/learningfns/basic.py
+	1.41, topo/learningfns/optimized.py 1.25,
+	topo/outputfns/basic.py 1.19, topo/patterns/image.py 1.30,
+	topo/plotting/bitmap.py 1.28, topo/plotting/palette.py 1.9,
+	topo/plotting/plot.py 1.83, topo/plotting/plotfilesaver.py
+	1.25, topo/plotting/plotgroup.py 1.90,
+	topo/plotting/templates.py 1.30, topo/projections/basic.py
+	1.12, topo/projections/optimized.py 1.15,
+	topo/responsefns/basic.py 1.24, topo/responsefns/optimized.py
+	1.12, topo/sheets/lissom.py 1.41, topo/tests/testcfsom.py
+	1.12, topo/analysis/featuremap.py 1.39, topo/base/__init__.py
+	1.8, topo/base/boundingregion.py 1.16,
+	topo/base/connectionfield.py 1.119,
+	topo/base/patterngenerator.py 1.61, topo/base/projection.py
+	1.44, topo/base/sheetview.py 1.13, topo/base/simulator.py
+	1.25, topo/base/topoobject.py 1.31, topo/base/utils.py 1.57,
+	topo/commands/basic.py 1.21, examples/hierarchical.ty 1.29,
+	topo/base/parameterizedobject.py 1.1: Re-named topoobject.py
+	to parameterizedobject.py.
+
+	* topo/base/topoobject.py 1.30, topo/base/parameter.py 1.54:
+	Renamed TopoMetaclass to ParameterizedObjectMetaclass.
+
+	* topo/tests/testplot.py 1.17, topo/tkgui/parametersframe.py
+	1.51, topo/tkgui/plotgrouppanel.py 1.36,
+	topo/tkgui/topoconsole.py 1.36, topo/sheets/generatorsheet.py
+	1.22, topo/sheets/lissom.py 1.40, topo/responsefns/basic.py
+	1.23, topo/responsefns/optimized.py 1.11,
+	topo/projections/basic.py 1.11, topo/projections/optimized.py
+	1.14, topo/learningfns/basic.py 1.40,
+	topo/learningfns/optimized.py 1.24, topo/outputfns/basic.py
+	1.18, topo/patterns/image.py 1.29, topo/plotting/bitmap.py
+	1.27, topo/plotting/palette.py 1.8, topo/plotting/plot.py
+	1.82, topo/plotting/plotfilesaver.py 1.24,
+	topo/plotting/plotgroup.py 1.89, topo/plotting/templates.py
+	1.29, topo/analysis/featuremap.py 1.38,
+	topo/base/arrayutils.py 1.5, topo/base/boundingregion.py 1.15,
+	topo/base/connectionfield.py 1.118, topo/base/parameter.py
+	1.53, topo/base/patterngenerator.py 1.60,
+	topo/base/projection.py 1.43, topo/base/sheetview.py 1.12,
+	topo/base/simulator.py 1.24, topo/base/topoobject.py 1.29,
+	topo/base/utils.py 1.56, topo/commands/basic.py 1.20: Renamed
+	TopoObject to ParameterizedObject.
+
+2006-02-17 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/parametersframe.py 1.50: Added HACKALERT.
+
+2006-02-17 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.117: Added comment and ALERT.
+
+2006-02-17 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameter.py 1.52, topo/base/topoobject.py 1.28:
+	bounds and softbounds are None when not set so that parameter
+	inheritance works.
+
+2006-02-17 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.116, topo/sheets/cfsom.py
+	1.24: Moved the test on the input_buffer from CFSheet learn()
+	to CFProjection learn().
+
+2006-02-17 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/parametersframe.py 1.49: set_obj_params() only
+	sets the value on an object if the value is different from the
+	one already in the object.
+
+2006-02-17 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/sheets/cfsom.py 1.23: Moved alert here from
+	som_retinotopy.ty
+
+	* examples/som_retinotopy.ty 1.18: Simplified slightly
+
+2006-02-17 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.115: Added wrapper around
+	hebbian() so deepcopy works. TopoObject needs to have its
+	support for deepcopy corrected.
+
+	* topo/base/topoobject.py 1.27: Renamed __set_name() to
+	__generate_name().
+
+	* topo/base/topoobject.py 1.26: If a Parameter is a
+	TopoObject, and it's deepcopied for a new TopoObject, it's
+	renamed.
+
+	* topo/base/topoobject.py 1.25: No visible change: created a
+	simple __set_name() method from the original line of code in
+	topoobject. (Done because it will be used when Parameters are
+	deepcopied to new objects.)
+
+	* topo/base/topoobject.py 1.24: Added HACKALERT about the
+	possibility of TopoObjects sharing the same name.
+
+	* topo/base/connectionfield.py 1.114, topo/base/topoobject.py
+	1.23, topo/projections/basic.py 1.10: Added wrapper around
+	mdot so deepcopy works. TopoObject needs to have its support
+	for deepcopy corrected.
+
+	* topo/base/arrayutils.py 1.4: Added temporary wrapper class
+	around mdot.
+
+2006-02-16 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/topoobject.py 1.22: Had to add a HACK - some
+	things don't seem to deepcopy.
+
+	* topo/sheets/lissom.py 1.39: A Parameter has an 'instantiate'
+	attribute (previously 'value_semantics') that indicates
+	whether or not a TopoObject should copy the Parameter into its
+	own __dict__. instantiate defaults to False for Parameter, but
+	True for certain subclasses (e.g. ClassSelectorParameter,
+	Constant).
+
+	* topo/base/sheet.py 1.58, topo/base/parameter.py 1.51,
+	topo/base/topoobject.py 1.21: topo/sheets/lissom.py
+
+2006-02-15 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/laminar.ty 1.1: Initial version from Judith
+
+2006-02-15 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.113, topo/sheets/cfsom.py
+	1.22: Added a mysterious test (if proj.input_buffer), that I
+	previously deleted in CFSheet abd CFSOM learn() function, but
+	that happens to be needed. This will be solved tomorrow.
+
+	* topo/sheets/cfsom.py 1.21: Modified the CFSOM learning
+	function so that it calls the learn() function on the
+	projections, instead of re-implementing it.
+
+	* topo/base/connectionfield.py 1.112, topo/base/projection.py
+	1.42: Added a learn() function for Projections, which is
+	called from the CFSheet learn() function.
+
+2006-02-15 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or.ty 1.26,
+	examples/lissom_oo_or_20000.typ 1.7: Increased ON connection
+	strength to 0.75. C++ LISSOM normalizes all its afferent
+	weights to 1 so the ON and OFF channel can have different
+	effects; topographica doesn't so we compensate by increasing
+	the ON connection strength until we support joint
+	normalization.
+
+	* topo/tests/lissom_oo_or_reference.ty 1.13: density and
+	output_fn set on V1 rather than on LISSOM.
+
+	* topo/tests/lissom_oo_or_reference.ty 1.12: Various changes
+	to help match c++ lissom (adding edge buffers) and to make the
+	file clearer.
+
+2006-02-14 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/boundingregion.py 1.14: min_radius is deleted from
+	the args if it's passed in, so that it's not passed to the
+	superclass. Removed a hackalert.
+
+	* topo/tests/lissom_oo_or_reference.ty 1.11:
+	SharedWeightCFProjection.learning_fn.output_fn set to
+	DivisiveSumNormalize, rather than being set on the Projections
+	separately.
+
+2006-02-14 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/or_key_white_vert.png 1.2: Flipped to fix
+
+2006-02-14 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.88: Added the possibility of
+	passing SheetView plot_template to a ConnectionField
+	PlotGroupTemplate. If the plot_template uses the keyword
+	'Weights' for the Strength, we request a UnitView, otherwise
+	we create a normal plot with Strength specifying a
+	SheetView. This not at all effective so far, because no such
+	template are declared (also the displaying of labels is not
+	exactly consistent between a connection field plot, and a
+	normal SheetView plot, but still it looks alright).
+
+	* topo/tkgui/connectionfieldspanel.py 1.2: Corrected a typo
+	mistake in the label display.
+
+2006-02-14 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/parameter_text.php 1.1: Beginnings of
+	Parameter documentation. Committed while I change locations...
+
+	* topo/base/topoobject.py 1.20: Added HACKALERT about
+	parameter inheritance.
+
+	* examples/lissom_oo_or.ty 1.25:
+	SharedWeightCFProjection.learning_fn.output_fn set to
+	DivisiveSumNormalize, instead of setting the projections'
+	learning_fn.output_fns separately.
+
+2006-02-14 alan_lindsay <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorobjects.py 1.19, topo/tkgui/editorwindow.py
+	1.17: Changed the way you change the view of connectioons and
+	sheets. Radius' are represented, though, it seems like
+	connections might not be reporting the truth..
+
+2006-02-13 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/som_retinotopy_text.php 1.4: Minor cleanup
+
+2006-02-13 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.87: Deleted the added_list
+	attribute and the add() function in PlotGroup. It was an
+	unused concept, and we can still add Plots to a PlotGroup
+	since its plot_list attribute is public.
+
+	* topo/plotting/plotgroup.py 1.86: Added a function
+	_ordering_plots in PlotGroup. It is called by plots() before
+	returning the plot_list. It allows to only have to
+	re-implement this simple function in ProjectionPlotGroup,
+	instead of the whole plots() function.
+
+2006-02-13 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/space_text.php 1.4: Minor changes.
+
+2006-02-13 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.85: Deleted a unused attribute
+	self.all_plots.
+
+2006-02-13 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/lissom_oo_or_text.php 1.5: Changed Afferent0
+	that was left over to LGNOnAfferent.
+
+2006-02-13 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/projectionpanel.py 1.37: Modified the sorting of
+	the projections in the projection_menu: now they are first
+	sorted with the precedence number of there source Sheet and
+	then by alphabetical order. Also added a comment about
+	re-writing the function _create_projection_dict(), which is
+	quite messy.
+
+	* topo/base/sheetview.py 1.11: Made the UnitView precedence
+	parameter to be set to the value of the
+	projection.src.precedence parameter (the precedence number of
+	the source Sheet). That allows the plot in the
+	connectionfieldpanel to be sorted accordingly.
+
+2006-02-13 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or_20000.typ 1.6: Same map, but with
+	updates to code in the pickle.
+
+	* topo/base/parameter.py 1.50, topo/base/sheet.py 1.57,
+	topo/base/topoobject.py 1.19: Parameter has a
+	'value_semantics' attribute. TopoObject copies the Parameter
+	into its own dictionary if this is set True. This is just a
+	demonstration of how we could do explicit value semantics:
+	setting value_semantics=True on any parameter means a copy
+	of its default value is always given to a new TopoObject. So
+	for a Constant parameter, setting value_semantics=True makes
+	the Constant truly constant. There is one example of this for
+	demonstration: Sheet's bounds. Presumably the attribute
+	shouldn't actually be called value_semantics.
+
+2006-02-13 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/lissom_oo_or_text.php 1.4,
+	doc/Tutorials/images/natural_image_oo_or.png 1.2: Fixes and
+	cleanup
+
+2006-02-13 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/image.py 1.28: Updated to take account of
+	patterngenerator being passed the true xdensity and ydensity
+	rather than just the density. Added hackalert.
+
+2006-02-13 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/images/or_key_vert_transparent_topo.png 1.2:
+	Unused
+
+	* topo/commands/or_key_white_vert.png 1.1,
+	topo/plotting/templates.py 1.28: Updated color key
+
+	* doc/Tutorials/images/activity_line_oo.png 1.2,
+	doc/Tutorials/images/activity_line_oo_or.png 1.2,
+	doc/Tutorials/images/lissom_network_diagram_oo.png 1.2,
+	doc/Tutorials/images/oo_or_map.png 1.2,
+	doc/Tutorials/images/or_key_horiz_transparent.png 1.2,
+	doc/Tutorials/images/projection_oo.png 1.2,
+	doc/Tutorials/images/test_pattern_oo.png 1.2,
+	doc/Tutorials/images/unit_weights_0_0_oo.png 1.2,
+	doc/Tutorials/images/unit_weights_0_0_oo_or.png 1.2,
+	doc/Tutorials/lissom_oo_or_text.php 1.2: Updated lissom_oo_or
+	tutorial
+
+	* examples/lissom_oo_or.ty 1.24: Adjusted model editor
+	coordinates due to edge buffer change
+
+	* doc/Reference_Manual/index_text.php 1.6: Added caveat
+
+	* doc/Downloads/index_text.php 1.19: Updated Mac and Windows
+	instructions
+
+	* doc/Tutorials/index_text.php 1.2: Added link to lissom_oo_or
+	* tutorial
+
+	* doc/User_Manual/commandline_text.php 1.2: Reorganized
+
+	* doc/shared/index.php 1.9: Added news item
+
+	* README.txt 1.14: Minor bugfix
+
+	* doc/User_Manual/commandline_text.php 1.1,
+	doc/User_Manual/index_text.php 1.11: Added command line
+	examples
+
+	* doc/User_Manual/.cvsignore 1.4: More to ignore
+
+	* doc/Future_Work/index_text.php 1.9: Updates; some items
+	actually completed!
+
+	* Makefile 1.35: Bumped version number in anticipation of
+	release
+
+	* doc/Downloads/index_text.php 1.18: Added Windows disclaimer
+
+	* external/win32/Numeric-23.7.win32-py2.4.exe 1.2,
+	external/win32/Numeric-24.2.win32-py2.4.exe 1.1,
+	external/win32/setup.py 1.23: Upgraded to Numeric 24
+
+2006-02-13 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.111: Minor change to
+	hackalert.
+
+	* examples/cfsom_or.ty 1.27, examples/hierarchical.ty 1.28,
+	examples/lissom_or.ty 1.64, examples/obermayer_pnas90.ty 1.22,
+	examples/som_retinotopy.ty 1.17: BoundingBox can be created by
+	specifying a radius.
+
+2006-02-13 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Developer_Manual/.cvsignore 1.2,
+	doc/Developer_Manual/parameters_text.php 1.2,
+	doc/Developer_Manual/python_text.php 1.2: Reorganized
+	developer manual to be grouped more reasonably
+
+2006-02-13 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/lissom_oo_or_reference.ty 1.10: BoundingBox can
+	be created by passing a radius or points. This takes the place
+	of the previous radial_bounds() function.
+
+2006-02-13 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/.cvsignore 1.2: More to ignore
+
+2006-02-13 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or.ty 1.23, topo/base/boundingregion.py
+	1.13, topo/base/connectionfield.py 1.110: BoundingBox can be
+	created by passing a radius or points. This takes the place of
+	the previous radial_bounds() function.
+
+2006-02-12 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Developer_Manual/alerts_text.php 1.1,
+	doc/Developer_Manual/coding_text.php 1.1,
+	doc/Developer_Manual/communication_text.php 1.2,
+	doc/Developer_Manual/gui_text.php 1.2,
+	doc/Developer_Manual/imports_text.php 1.3,
+	doc/Developer_Manual/index_text.php 1.2,
+	doc/Developer_Manual/naming_text.php 1.2,
+	doc/Developer_Manual/ood_text.php 1.2,
+	doc/Developer_Manual/optimization_text.php 1.2,
+	doc/Developer_Manual/revisioncontrol_text.php 1.2: Reorganized
+	developer manual to be grouped more reasonably
+
+2006-02-12 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameter.py 1.49: Changed variable name in
+	Constant to make the code clearer. The previous version does
+	appear to work - I appear to have been confusing myself while
+	testing it.
+
+	* topo/base/parameter.py 1.48: Simple version of Constant that
+	ought to work, but appears not to.
+
+2006-02-12 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/responsefns/optimized.py 1.10: Simplified CFDotProduct
+	C++ code by moving declarations to where they are needed
+
+2006-02-12 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameter.py 1.47: Changed Constant's attepted set
+	error to a TypeError.
+
+	* topo/base/parameter.py 1.46: Removed a HACKALERT that should
+	have been removed a while back.
+
+	* topo/base/parameter.py 1.45: Constant parameter is now
+	constant (i.e. doesn't inherit changes once it's been
+	created).
+
+	* topo/base/sheet.py 1.56: Removed 'default=' from Constant
+	declarations.
+
+	* topo/sheets/lissom.py 1.38: The LISSOM sheet output_fn
+	Parameter is set in the constructor, rather than being
+	re-declared at the class level. This means that each LISSOM
+	sheet object has its own output_fn by default, rather than all
+	LISSOM sheets sharing one object.
+
+2006-02-12 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/cfsheetplotpanel.py 1.14: Changed the sorting of
+	the region_menu, so that to start by high area instead of low
+	area.
+
+	* topo/tkgui/cfsheetplotpanel.py 1.13: Sorted the region_menu
+	for a CFSheetPlotPanel, according to the precedence parameter
+	of the sheets.
+
+	* topo/plotting/plotgroup.py 1.84: Changed the sort_plots
+	function (and introduced a new cmp_plot function) to sort
+	according to bith the precedence and the alphabetical order.
+
+	* topo/base/connectionfield.py 1.109: Forgotten CFSheet
+	precedence default value in previous commit.
+
+	* topo/plotting/plot.py 1.81: Added an attribute precedence to
+	a Plot, that is 0.0 by default, and a copy of the SheetViews
+	used for making the plot (set at the same time as the
+	src_name).
+
+	* topo/analysis/featuremap.py 1.37, topo/commands/analysis.py
+	1.11, topo/base/sheetview.py 1.10: Added a precedence
+	attribute to the SheetView, which is a copy of the sheet
+	precedence parameter, passed when creating a SheetView.
+
+	* topo/base/sheet.py 1.55, topo/sheets/cfsom.py 1.20,
+	topo/sheets/lissom.py 1.37: Added a parameter precedence to
+	the Sheet objects. It gives a sorting information for plot
+	display.
+
+2006-02-12 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/bitmap.py 1.26: Fixed bug when plotting
+	selectivities higher than 1.0; now crops h,s,v before calling
+	hsv2rgb.  Silenced warning from PIL.
+
+	* doc/Downloads/index_text.php 1.17: Cleanup of Windows
+	instructions in progress
+
+	* doc/Developer_Manual/testing_text.php 1.2: Minor
+	clarification
+
+	* examples/lissom_oo_or_20000.typ 1.5: Retrained the map
+
+2006-02-12 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.54: Initializes activity matrix
+	correctly. Added HACKALERT: here and elsewhere there is
+	duplication of code.
+
+	* topo/sheets/generatorsheet.py 1.21: Now uses
+	PatternGenerator correctly.
+
+2006-02-12 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* README.txt 1.13: Simplified so that it will stay up to date;
+	just points to doc/
+
+2006-02-12 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/basic.py 1.54, topo/patterns/image.py 1.27:
+	Removed 'precedence constants' since we have decided on an
+	ordering for the parameters.
+
+2006-02-12 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.35: Corrected an error in
+	load_image.
+
+2006-02-12 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.108,
+	topo/projections/basic.py 1.9: Initialization of the cfs in
+	CFProjection.__init__() can be disabled. SharedWeightCFProjection
+	uses this to avoid initializing the cfs (since it only requires a
+	single, shared cf - that it was previously initializing all the
+	cfs was an error, causing its initialization time to be much
+	longer than necessary).
+
+2006-02-12 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* ChangeLog 1.5, ChangeLog.txt 1.1: Moved ChangeLog to
+	ChangeLog.txt to make it readable under Windows
+
+2006-02-12 alan_lindsay <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorobjects.py 1.18: Fixed a rounding error
+
+	* topo/tkgui/editorobjects.py 1.17: Fixed a delete update bug
+
+2006-02-12 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.35: Fixed error in percentage
+	calculation
+
+	* examples/lissom_oo_or.ty 1.22: Changed Retina's edge buffer
+	to match wt_bounds
+
+2006-02-12 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or.ty 1.21: Set the retina and LGN edge
+	buffer.
+
+2006-02-12 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* ChangeLog 1.4: Added recent changes
+
+	* examples/lissom_oo_or.ty 1.20: Updated gui attribute names
+	to match Alan's recent changes
+
+2006-02-12 alan_lindsay <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/parametersframe.py 1.48: Allows class constants
+	to be set, crudely. A dictionary of dictionaries, holding only
+	the objects changed by the user is used to allow values to be
+	mainained after closing the parameterframe.
+
+	* topo/tkgui/editorobjects.py 1.16, topo/tkgui/editortools.py
+	1.8, topo/tkgui/editorwindow.py 1.16: Changed method and
+	variable names to coincide with the rest of
+	Topographica. Activity plots are now mapped correctly onto
+	sheets and the shape and size of a sheets bounding box is
+	represented by the editor sheet.
+
+	* topo/base/utils.py 1.55: Added extra translator functions
+	for features in ParameterFrame.
+
+	* examples/hierarchical.ty 1.27: ModelEditor uses gui_x
+	instead of guiX, same for y.
+
+2006-02-12 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
 
 	* examples/lissom_oo_or_20000.typ 1.4: New version from Chris
 
