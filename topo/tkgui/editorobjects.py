@@ -85,6 +85,10 @@ class EditorNode(EditorObject) :
     in a EditorCanvas. Extending classes will supply a draw method and other type specific 
     attributes. 
     """
+    show_density = False
+    show_activity = False
+
+
     def __init__(self, canvas, pos, name, colour = ('dark red','black')):#('slate blue', 'lavender')) :
         EditorObject.__init__(self, name, canvas)
         self.colours = colour # colours for drawing this node on the canvas
@@ -181,8 +185,6 @@ class EditorSheet(EditorNode) :
     Canvas. The colours used for drawing can be set. Uses bounding box to
     determine if x, y coord is within its boundary.
     """
-
-    show_density = False
 
     def __init__(self, canvas, sheet, pos, name) :
         # super constructor call

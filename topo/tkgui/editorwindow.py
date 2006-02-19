@@ -14,7 +14,7 @@ from topo.base.simulator import get_active_sim, set_active_sim, Simulator
 from topo.base.sheet import Sheet
 from topo.base.projection import Projection
 
-from editorobjects import EditorSheet, EditorProjection
+from editorobjects import EditorNode, EditorSheet, EditorProjection
 from editortools import ArrowTool, NodeTool, ConnectionTool, ParametersTool
 
 class EditorCanvas(Canvas) :
@@ -74,6 +74,7 @@ class EditorCanvas(Canvas) :
         self.canvas_menu.add_command(label = 'Save Snapshot', command = self.save_snapshot)
         self.canvas_menu.add_cascade(label = 'Sheet options', menu = self.sheet_options, underline = 0)
         self.sheet_options.add_command(label = 'Toggle Density Grid', command = self.toggle_object_density)
+        self.sheet_options.add_command(label = 'Toggle Activity', command = self.toggle_object_activity)
 
         # bind key_press events in canvas.
         self.bind('<KeyPress>', self.key_press)
@@ -278,16 +279,22 @@ class EditorCanvas(Canvas) :
         return i
 
     def toggle_object_density(self) :
-        if EditorSheet.show_density :
-            EditorSheet.show_density = False
+        if EditorNode.show_density :
+            EditorNode.show_density = False
         else :
-            EditorSheet.show_density = True
+            EditorNode.show_density = True
         self.refresh() 
 
-    """def show_activity(self, focus) : 
-        # toggle whether the activity of an object is plotted
-        focus.show_activity()
-        focus.set_focus(False)"""
+    def toggle_object_activity(self) :
+        if EditorNode.show_activity :
+            EditorNode.show_activity = False
+            view = 'normal'
+        else :
+            EditorNode.show_activity = True
+            view = 'activity'
+        for obj in self.object_list :
+            obj.select_view(view)
+        self.refresh()
 
     def get_object_xy(self, x, y) : 
         # return object at given x, y (None if no object)
