@@ -80,8 +80,8 @@ $Id$
 """
 __version__='$Revision$'
 
-from parameterizedobject import ParameterizedObject
-from parameterclasses import Parameter
+from parameterizedobject import ParameterizedObject, Parameter
+from parameterclasses import Number
 from copy import copy, deepcopy
 from fixedpoint import FixedPoint
 
@@ -195,17 +195,31 @@ class EventProcessor(ParameterizedObject):
     
 
 
+class EventProcessorParameter(Parameter):
+    """
+    Parameter whose value can be any EventProcessor instance.
+    """
+    def __init__(self,default=EventProcessor(),**params):
+        super(EventProcessorParameter,self).__init__(default=default,**params)
+        
+    def __set__(self,obj,val):
+        if not isinstance(val,EventProcessor):
+            raise ValueError("Parameter must be an EventProcessor.")
+        else:
+            super(EventProcessorParameter,self).__set__(obj,val)
+
+
 class EPConnection(ParameterizedObject):
     """
     EPConnection stores basic information for a connection between
     two EventProcessors.
     """
 
-    src = Parameter(default=None,constant=True)
-    dest = Parameter(default=None,constant=True)
+    src = EventProcessorParameter(default=None,constant=True)
+    dest = EventProcessorParameter(default=None,constant=True)
     src_port = Parameter(default=None)
     dest_port = Parameter(default=None)
-    delay = Parameter(default=None)
+    delay = Parameter(default=0)
 
     def __init__(self,**params):
         super(EPConnection,self).__init__(**params)
