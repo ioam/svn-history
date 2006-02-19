@@ -306,8 +306,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
         """
         def rev(x): y = x; y.reverse(); return y
         
-        aarect = self._sim_ep.bounds.aarect()
-        (l,b,r,t) = aarect.lbrt()
+        (l,b,r,t) = self._sim_ep.bounds.lbrt()
         x = float(r - l) 
         y = float(t - b)
         x_step = x / (int(x * self.density) + 1)

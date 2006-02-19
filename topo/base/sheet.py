@@ -129,7 +129,7 @@ def sheet2matrix(x,y,bounds,xdensity,ydensity):
     and for that to work the density may need to be adjusted.
     """
 
-    left,bottom,right,top = bounds.aarect().lbrt()
+    left,bottom,right,top = bounds.lbrt()
 
     # Compute the true density along x and y. The true density does
     # not equal to the 'density' argument when density*(right-left) or
@@ -176,7 +176,7 @@ def matrix2sheet(float_row,float_col,bounds,xdensity,ydensity):
     Inverse of sheet2matrix().
     """
 
-    left,bottom,right,top = bounds.aarect().lbrt()
+    left,bottom,right,top = bounds.lbrt()
 
     # CEBHACKALERT: xdensity and/or ydensity could be zero (with a small
     # BoundingBox or low density). Either that should be dealt with here,
@@ -229,7 +229,7 @@ def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density):
     it is not an independent copy.
     """
 
-    left,bottom,right,top = sheet_bounds.aarect().lbrt()
+    left,bottom,right,top = sheet_bounds.lbrt()
     xdensity = int(sheet_density*(right-left)) / float((right-left))
     ydensity = int(sheet_density*(top-bottom)) / float((top-bottom))
 
@@ -251,7 +251,7 @@ def bounds2slice(slice_bounds, sheet_bounds, xdensity, ydensity):
     
     Returns (a,b,c,d) such that a matrix M can be sliced using M[a:b,c:d].
     """
-    l,b,r,t = slice_bounds.aarect().lbrt()
+    l,b,r,t = slice_bounds.lbrt()
     
     t_m,l_m = sheet2matrix(l,t,sheet_bounds,xdensity,ydensity)
     b_m,r_m = sheet2matrix(r,b,sheet_bounds,xdensity,ydensity)
@@ -372,7 +372,7 @@ class Sheet(EventProcessor):
         self.debug("density = ",self.density)
 
         # CEBHACKALERT: clean this up (see also plot.py,image.py)
-        left,bottom,right,top = self.bounds.aarect().lbrt()
+        left,bottom,right,top = self.bounds.lbrt()
         # The real densities along x and y of the sheet
         self.xdensity = int(self.density*(right-left)) / float((right-left))
         self.ydensity = int(self.density*(top-bottom)) / float((top-bottom))

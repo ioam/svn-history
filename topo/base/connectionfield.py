@@ -457,7 +457,7 @@ class CFProjection(Projection):
         # CEBHACKALERT: allow user to override this.
         # calculate the size & aspect_ratio of the mask if appropriate
         if hasattr(self.weights_shape, 'size'):
-            l,b,r,t = self.weights_bounds.aarect().lbrt()
+            l,b,r,t = self.weights_bounds.lbrt()
             self.weights_shape.size = t-b
             self.weights_shape.aspect_ratio = (r-l)/self.weights_shape.size
 

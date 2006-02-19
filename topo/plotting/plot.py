@@ -255,7 +255,7 @@ class TemplatePlot(Plot):
         """
         # CEBHACKALERT: like in other places, this needs to be
         # cleaned up.
-        left,bottom,right,top = outer_box.aarect().lbrt()
+        left,bottom,right,top = outer_box.lbrt()
         xdensity = int(density*(right-left)) / float((right-left))
         ydensity = int(density*(top-bottom)) / float((top-bottom))
 
