@@ -118,6 +118,12 @@ class BoundingBox(BoundingRegion):
     def aarect(self):
         return self._aarect
 
+    def lbrt(self):
+        """
+        return left,bottom,right,top values for the BoundingBox.
+        """
+        return self._aarect.lbrt()
+
 
 
 class Cartesian2DPoint(Parameter):
