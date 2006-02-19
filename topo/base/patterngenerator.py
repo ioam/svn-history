@@ -9,7 +9,7 @@ $Id$
 __version__='$Revision$'
 
 from parameterizedobject import ParameterizedObject
-from boundingregion import BoundingBox
+from boundingregion import BoundingBox, BoundingRegionParameter
 from sheet import  matrixidx2sheet, bounds2slice
 from Numeric import add,subtract,cos,sin,array
 from parameterclasses import Parameter,Number,ClassSelectorParameter
@@ -36,7 +36,8 @@ class PatternGenerator(ParameterizedObject):
     the Topographica coordinate system.
     """
 
-    bounds  = Parameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True)
+    bounds  = BoundingRegionParameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True,
+                                      doc = "BoundingBox of the area in which the pattern is generated")
     density = Parameter(default=10,hidden=True)
 
     x       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.20,
