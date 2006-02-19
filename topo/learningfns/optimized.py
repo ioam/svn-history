@@ -28,7 +28,7 @@ class Hebbian(CFLearningFunction):
     the output_fn to perform normalization if desired.
     """
     output_fn = OutputFunctionParameter(default=Identity(),
-                 doc='output function applied to the weights after learning')
+                 doc='Output function applied to the weights after learning.')
     
     def __init__(self,**params):
         super(Hebbian,self).__init__(**params)
@@ -128,7 +128,7 @@ class DivisiveHebbian(CFLearningFunction):
     modification; the output_fn is not actually called from within
     this function.
     """
-    output_fn = Constant(DivisiveSumNormalize())
+    output_fn = OutputFunctionParameter(DivisiveSumNormalize())
 
     def __init__(self,**params):
         super(DivisiveHebbian,self).__init__(**params)
@@ -242,7 +242,7 @@ class DivisiveHebbian_CPointer(CFLearningFunction):
     CFProjection_CPointer. This class should only be used by a sheet that
     only has CFProjection_CPointers connected to it. 
     """
-    output_fn = Constant(DivisiveSumNormalize())
+    output_fn = OutputFunctionParameter(DivisiveSumNormalize())
 
     def __init__(self,**params):
         super(DivisiveHebbian_CPointer,self).__init__(**params)
