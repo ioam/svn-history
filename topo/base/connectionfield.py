@@ -32,7 +32,7 @@ from sheetview import UnitView
 from itertools import chain
 from patterngenerator import PatternGeneratorParameter
 import patterngenerator
-from boundingregion import BoundingBox
+from boundingregion import BoundingBox, BoundingRegionParameter
 
 
 # Specified explicitly when creating weights matrix - required
@@ -66,8 +66,10 @@ class ConnectionField(ParameterizedObject):
     including many other ConnectionFields.
     """
     
-    x = Parameter(default=0,doc='The x coordinate of the location of the center of this ConnectionField\non the input Sheet, e.g. for use when determining where the weight matrix\nlines up with the input Sheet matrix.')
-    y = Parameter(default=0,doc='The y coordinate of the location of the center of this ConnectionField\non the input Sheet, e.g. for use when determining where the weight matrix\nlines up with the input Sheet matrix.')
+    x = Number(default=0.0,softbounds=(-1.0,1.0),
+               doc='The x coordinate of the location of the center of this ConnectionField\non the input Sheet, e.g. for use when determining where the weight matrix\nlines up with the input Sheet matrix.')
+    y = Number(default=0.0,softbounds=(-1.0,1.0),
+               doc='The y coordinate of the location of the center of this ConnectionField\non the input Sheet, e.g. for use when determining where the weight matrix\nlines up with the input Sheet matrix.')
 
     # Weights matrix; not yet initialized.
     weights = []
@@ -386,12 +388,15 @@ class CFProjection(Projection):
     response_fn = ResponseFunctionParameter(default=GenericCFResponseFn(),
                                             doc='Function for computing the Projection response to an input pattern.' )
     cf_type = Parameter(default=ConnectionField,constant=True)
-    weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
-    weights_generator = PatternGeneratorParameter(default=patterngenerator.Constant(),constant=True)
-    weights_shape = PatternGeneratorParameter(default=patterngenerator.Constant(),constant=True)
+    weights_bounds = BoundingRegionParameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))),
+                                             doc="Bounds defining the Sheet area covered by the connectionfields")
+    weights_generator = PatternGeneratorParameter(default=patterngenerator.Constant(),constant=True,
+                                                  doc="Generate initial weights values")
+    weights_shape = PatternGeneratorParameter(default=patterngenerator.Constant(),constant=True,
+                                              doc="Define the shape of the connection fields")
     learning_fn = LearningFunctionParameter(default=GenericCFLF(),
                                             doc='Function for computing changes to the weights based on one activation step.')
-    learning_rate = Parameter(default=0.0)
+    learning_rate = Number(default=0.0,softbounds=(0,100))
     output_fn  = OutputFunctionParameter(default=Identity(),
                                          doc='Function applied to the Projection activity after it is computed.')
     strength = Number(default=1.0)
