@@ -102,7 +102,7 @@ class ImageSaver(EventProcessor):
 class TestCFSom(unittest.TestCase):
 
     def setUp(self):
-        self.s = Simulator(step_mode = 1)
+        self.s = Simulator(step_mode = True)
         self.sheet1 = Sheet()
         self.sheet2 = Sheet()
 

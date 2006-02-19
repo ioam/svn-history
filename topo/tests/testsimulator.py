@@ -20,7 +20,7 @@ class TestSimulator(unittest.TestCase):
         Test to make sure that SimulatorEvent copies the underlying data
         on construction.
         """
-        s = Simulator(step_mode = 1)
+        s = Simulator(step_mode = True)
         data = array([4,3])
         se = SimulatorEvent(1,2,3,4,5,data)
         se.data[0] = 5
@@ -29,7 +29,7 @@ class TestSimulator(unittest.TestCase):
         assert se != se2, 'Objects are the same'
 
     def test_state_stack(self):
-        s = Simulator(step_mode = 1)
+        s = Simulator(step_mode = True)
         pulse1 = PulseGenerator(period = 1)
         pulse2 = PulseGenerator(period = 3)
         sum = SumUnit()
@@ -43,7 +43,7 @@ class TestSimulator(unittest.TestCase):
         
 
     def test_get_objects(self):
-        s = Simulator(step_mode = 1)
+        s = Simulator(step_mode = True)
 
         pulse1 = PulseGenerator(period = 1)
         pulse2 = PulseGenerator(period = 3)
