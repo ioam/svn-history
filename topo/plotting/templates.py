@@ -30,6 +30,7 @@ class PlotGroupTemplate(ParameterizedObject):
     """
     
     command = Parameter(None)
+    ### JABHACKALERT: Is this used?  Seems strange to be a string; also used as Boolean below.
     normalize = Parameter('False')
     
     def __init__(self, plot_templates=[], static_images = [],**params):
@@ -131,17 +132,17 @@ def new_plotgroup_template(name,command,normalize=False):
     return pgt
 
 pgt = new_plotgroup_template(name='Activity',command='update_activity()')
-pgt.add_plot('Activity',[('Strength','Activity'),('Hue','OrientationPreference')])
+pgt.add_plot('Activity',[('Strength','Activity'),('Hue','OrientationPreference'),('Confidence','OrientationSelectivity')])
 
 ### JCALERT! unitweightpanel could be re-named Connectionfields panel...?
 ### Also, the situate option could be specified in the template.
 ### Also implement the test for 'Weights' in PlotGroup.
 pgt = new_plotgroup_template(name='Connection Fields',command='update_connectionfields()',normalize='True')
-pgt.add_plot('Connection Fields',[('Strength','Weights'),('Hue','OrientationPreference')])
+pgt.add_plot('Connection Fields',[('Strength','Weights'),('Hue','OrientationPreference'),('Confidence','OrientationSelectivity')])
 
 
 pgt = new_plotgroup_template(name='Projection',command='update_projections()',normalize='True')
-pgt.add_plot('Projection',[('Strength','Weights'),('Hue','OrientationPreference')])
+pgt.add_plot('Projection',[('Strength','Weights'),('Hue','OrientationPreference'),('Confidence','OrientationSelectivity')])
 
 
 pgt = new_plotgroup_template(name='Orientation Preference',command='measure_or_pref()')
@@ -149,7 +150,6 @@ pgt.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pgt.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
 pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
-# This line is commented out while the re-sizing is being fixed in plotgrouppanel.py
 pgt.add_static_image('Color Key','topo/commands/or_key_white_vert.png')
 
 
