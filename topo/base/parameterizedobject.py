@@ -482,6 +482,7 @@ class ParameterizedObject(object):
 
     ### JABALERT: It might make sense to make the name be visible (not hidden) by default.
     name           = Parameter(default=None,hidden=True)
+    ### JABALERT: Should probably make this an Enumeration instead.
     print_level = Parameter(default=MESSAGE,hidden=True)
     
     def __init__(self,**config):
