@@ -34,7 +34,7 @@ from topo.patterns import PatternGeneratorParameter
 
 GeneratorSheet.density = 24.0 
 GeneratorSheet.period = 1
-GeneratorSheet.bounds = BoundingBox(radius=0.6792)
+GeneratorSheet.bounds = BoundingBox(radius=0.72)
 
 random.seed(1234)
 topo.patterns.basic.Gaussian.scale = 1.0    
@@ -44,7 +44,7 @@ topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(
 
 topo.patterns.basic.Gaussian.size = 2*0.0468      
 topo.patterns.basic.Gaussian.aspect_ratio = 4.0      
-topo.patterns.basic.Gaussian.bounds = BoundingBox(radius=0.6792)
+topo.patterns.basic.Gaussian.bounds = BoundingBox(radius=0.72)
 
 # LISSOM parameters
 LISSOM.density = 48.0    
