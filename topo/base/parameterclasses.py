@@ -308,6 +308,20 @@ class BooleanParameter(Parameter):
         super(BooleanParameter,self).__set__(obj,val)
 
 
+class CallableParameter(Parameter):
+    """Parameter holding a value that is a callable object, such as a function."""
+    __slots__ = []
+    __doc__ = property((lambda self: self.doc))
+
+    def __init__(self,default=None,**params):
+        Parameter.__init__(self,default=default,instantiate=True,**params)
+
+    def __set__(self,obj,val):
+        if not callable(val):
+            raise ValueError("CallableParameter only takes a callable object.")
+        super(CallableParameter,self).__set__(obj,val)
+
+
 
 # This could multiply inherit from Dynamic and Number, but it's
 # currently mixed together by hand for simplicity.
