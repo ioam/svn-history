@@ -352,7 +352,7 @@ class GenericCFLF(CFLearningFunction):
     """CFLearningFunction applying the specified single_cf_fn to each CF."""
     single_cf_fn = Parameter(default=Hebbian())
     output_fn =  OutputFunctionParameter(default=Identity(),
-                 doc='Function applied to the weights after each learning step')
+                 doc='Function applied to the weights after each learning step.')
     
     def __init__(self,**params):
         super(GenericCFLF,self).__init__(**params)
@@ -389,11 +389,11 @@ class CFProjection(Projection):
                                             doc='Function for computing the Projection response to an input pattern.' )
     cf_type = Parameter(default=ConnectionField,constant=True)
     weights_bounds = BoundingRegionParameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))),
-                                             doc="Bounds defining the Sheet area covered by the connectionfields")
+                                             doc="Bounds defining the Sheet area covered by the connectionfields.")
     weights_generator = PatternGeneratorParameter(default=patterngenerator.Constant(),constant=True,
-                                                  doc="Generate initial weights values")
+                                                  doc="Generate initial weights values.")
     weights_shape = PatternGeneratorParameter(default=patterngenerator.Constant(),constant=True,
-                                              doc="Define the shape of the connection fields")
+                                              doc="Define the shape of the connection fields.")
     learning_fn = LearningFunctionParameter(default=GenericCFLF(),
                                             doc='Function for computing changes to the weights based on one activation step.')
     learning_rate = Number(default=0.0,softbounds=(0,100))
