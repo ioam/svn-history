@@ -13,16 +13,15 @@ __version__ = "$Revision$"
 import Numeric
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Parameter,Number,Constant
+from topo.base.parameterclasses import Parameter,Number
 from topo.base.arrayutils import Mdot
 from topo.base.connectionfield import CFProjection,IdentityCFLF,ResponseFunctionParameter,OutputFunctionParameter
 from topo.base.patterngenerator import PatternGeneratorParameter
+from topo.base.connectionfield import LearningFunctionParameter
 from topo.base.sheetview import UnitView
 
 from topo.outputfns.basic import Identity
 
-
-# CEBHACKALERT: not yet tested
 
 class SharedWeightCFResponseFn(ParameterizedObject):
     """
@@ -62,8 +61,8 @@ class SharedWeightCFProjection(CFProjection):
     currently disabled.
     """
     response_fn = ResponseFunctionParameter(default=SharedWeightCFResponseFn())
-    ### JABHACKALERT: Learning won't actually work yet.
-    learning_fn = Constant(IdentityCFLF())
+    ### JABHACKALERT: Set to be constant as a clue that learning won't actually work yet.
+    learning_fn = LearningFunctionParameter(IdentityCFLF(),constant=True)
     output_fn  = OutputFunctionParameter(default=Identity())
     strength = Number(default=1.0)
 
