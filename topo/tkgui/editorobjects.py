@@ -182,6 +182,8 @@ class EditorSheet(EditorNode) :
     determine if x, y coord is within its boundary.
     """
 
+    show_density = False
+
     def __init__(self, canvas, sheet, pos, name) :
         # super constructor call
         EditorNode.__init__(self, canvas, pos, name)
@@ -196,8 +198,7 @@ class EditorSheet(EditorNode) :
         self.currentCol = col
         self.gradient = 1
         self.viewing_choices = [('Normal', lambda: self.select_view('normal')),
-                                ('Activity', lambda: self.select_view('activity')),
-                                ('Density Grid', lambda: self.select_view('density'))]
+                                ('Activity', lambda: self.select_view('activity'))]
 
     ############ Draw methods ############################
 
@@ -253,7 +254,7 @@ class EditorSheet(EditorNode) :
         dX = w + 5
         self.label = self.canvas.create_text(x - dX, y, anchor = E, fill = label_colour, text = self.name)
         # adds a density grid over the sheet
-        if self.view == 'density' :
+        if self.show_density :
             x, y = self.x - w + h, self.y - h
             matrix_width, matrix_height = self.element_count
             dX, dY = (w * 2)/ matrix_width, (h * 2) / matrix_height

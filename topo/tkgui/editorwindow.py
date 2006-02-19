@@ -7,6 +7,7 @@ $Id$
 __version__='$Revision$'
 
 from Tkinter import Canvas, Frame, Button, Toplevel, Tk, Menu, Scrollbar, SUNKEN, YES, BOTH, LEFT, END, RIGHT, TOP, BOTTOM, X, Y
+from tkFileDialog import asksaveasfilename
 from random import Random, random
 
 from topo.base.simulator import get_active_sim, set_active_sim, Simulator
@@ -51,22 +52,28 @@ class EditorCanvas(Canvas) :
 
         # create the menu widget used as a popup on objects and connections
         self.option_add("*Menu.tearOff", "0") 
-        self.menu = Menu(self)
-        self.view = Menu(self.menu)
+        self.item_menu = Menu(self)
+        self.view = Menu(self.item_menu)
         # add property, toggle activity drawn on sheets, object draw ordering and delete entries to the menu.
-        self.menu.insert_command(END, label = 'Properties', 
+        self.item_menu.insert_command(END, label = 'Properties', 
             command = lambda: self.show_properties(self.focus))
-        self.menu.add_cascade(label = 'Change View', menu = self.view, underline = 0)
-        self.menu.insert_command(END, label = 'Move Forward', 
+        self.item_menu.add_cascade(label = 'Change View', menu = self.view, underline = 0)
+        self.item_menu.insert_command(END, label = 'Move Forward', 
             command = lambda: self.move_forward(self.focus))
-        self.menu.insert_command(END, label = 'Move to Front', 
+        self.item_menu.insert_command(END, label = 'Move to Front', 
             command = lambda: self.move_to_front(self.focus))
-        self.menu.insert_command(END, label = 'Move to Back', 
+        self.item_menu.insert_command(END, label = 'Move to Back', 
             command = lambda: self.move_to_back(self.focus))
-        self.menu.insert_command(END, label = 'Delete', 
+        self.item_menu.insert_command(END, label = 'Delete', 
             command = lambda: self.delete_focus(self.focus))
         # the indexes of the menu items that are for objects only
         self.object_indices = [2,3,4]
+
+        self.canvas_menu = Menu(self)
+        self.sheet_options = Menu(self.canvas_menu)
+        self.canvas_menu.add_command(label = 'Save Snapshot', command = self.save_snapshot)
+        self.canvas_menu.add_cascade(label = 'Sheet options', menu = self.sheet_options, underline = 0)
+        self.sheet_options.add_command(label = 'Toggle Density Grid', command = self.toggle_object_density)
 
         # bind key_press events in canvas.
         self.bind('<KeyPress>', self.key_press)
@@ -78,7 +85,7 @@ class EditorCanvas(Canvas) :
         # bind the possible right button events to the canvas.
         self.bind('<Button-3>', self.right_click)
         # because right-click opens menu, a release event can only be flagged by the menu.
-        self.menu.bind('<ButtonRelease-3>', self.right_release)   
+        self.item_menu.bind('<ButtonRelease-3>', self.right_release)   
 
         # add scroll bar; horizontal and vertical
         self.config(scrollregion = (0, 0, 1200, 1200))
@@ -270,10 +277,17 @@ class EditorCanvas(Canvas) :
         del self.object_list[i]
         return i
 
-    def show_activity(self, focus) : 
+    def toggle_object_density(self) :
+        if EditorSheet.show_density :
+            EditorSheet.show_density = False
+        else :
+            EditorSheet.show_density = True
+        self.refresh() 
+
+    """def show_activity(self, focus) : 
         # toggle whether the activity of an object is plotted
         focus.show_activity()
-        focus.set_focus(False)
+        focus.set_focus(False)"""
 
     def get_object_xy(self, x, y) : 
         # return object at given x, y (None if no object)
@@ -367,11 +381,11 @@ class EditorCanvas(Canvas) :
             focus = self.get_object_xy(x, y)
             # fill in menu items that are just for objects
             for i in self.object_indices :
-                self.menu.entryconfig(i, foreground = 'Black', activeforeground = 'Black')
+                self.item_menu.entryconfig(i, foreground = 'Black', activeforeground = 'Black')
         else :
             # gray out menu items that are just for objects
             for i in self.object_indices :
-                self.menu.entryconfig(i,foreground = 'Gray', activeforeground = 'Gray')
+                self.item_menu.entryconfig(i,foreground = 'Gray', activeforeground = 'Gray')
         # command = lambda: self.show_activity(self.focus))
         if (focus != None) :
             for (label, function) in focus.viewing_choices :
@@ -380,9 +394,16 @@ class EditorCanvas(Canvas) :
             focus.set_focus(True)
             self.focus = focus
             # create the popup menu at current mouse coord
-            self.menu.tk_popup(event.x_root, event.y_root)
+            self.item_menu.tk_popup(event.x_root, event.y_root)
+        else :
+            self.canvas_menu.tk_popup(event.x_root, event.y_root)
         
     ############## Util ############################################
+
+    def save_snapshot(self) :
+        file = asksaveasfilename()
+        if file:
+            self.postscript(file=file)
 
     def set_tool_bars(self, arrow_tool, connection_tool, object_tool) :
         # reference to the toolbar items, a tool is notified when the canvas is changed
