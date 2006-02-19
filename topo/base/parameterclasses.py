@@ -300,7 +300,7 @@ class Integer(Number):
 
     def __set__(self,obj,val):
         if not isinstance(val,int):
-            raise "Parameter must be an integer."
+            raise ValueError("Parameter must be an integer.")
         super(Integer,self).__set__(obj,val)
 
 
@@ -322,10 +322,10 @@ class BooleanParameter(Parameter):
 
     def __set__(self,obj,val):
         if not isinstance(val,bool):
-            raise "BooleanParameter only takes a Boolean value."
+            raise ValueError("BooleanParameter only takes a Boolean value.")
 
         if val != True and val != False:
-            raise "BooleanParameter must be True or False"
+            raise ValueError("BooleanParameter must be True or False.")
 
         super(BooleanParameter,self).__set__(obj,val)
 
