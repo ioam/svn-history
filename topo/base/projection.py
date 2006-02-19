@@ -55,10 +55,10 @@ class Identity(OutputFunction):
 # CEBHACKALERT: don't need to pass through stuff like doc because of **params
 class OutputFunctionParameter(ClassSelectorParameter):
     """
+    Parameter whose value can be any OutputFunction, i.e., a function mapping a 2D array
+    to a 2D array.
     """
     def __init__(self,default=Identity(),doc='',**params):
-        """
-        """
         super(OutputFunctionParameter,self).__init__(OutputFunction,default=default,doc=doc,**params)        
 
 
