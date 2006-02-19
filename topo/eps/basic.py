@@ -10,7 +10,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.parameterclasses import Parameter
+from topo.base.parameterclasses import Number
 from topo.base.simulator import EventProcessor
 
 class PulseGenerator(EventProcessor):
@@ -19,22 +19,13 @@ class PulseGenerator(EventProcessor):
     A simple pulse generator node.  Produces pulses (scalars) of a
     fixed amplitude at a fixed frequency and phase.
 
-    Parameters:
-      amplitude = The size of the pulse to generate. (default 1.0)
-      period    = The period with which to repeat the pulse. (default 0.0)
-                  If zero, the pulse will be sent exactly once.
-      phase     = The time after starting the simulation to wait before
-                  sending the first pulse. (default 0.0)
-
     Period and phase are in units of simulation time.  If period is
     omitted or set to 0, a single pulse is sent, offset from the start
     of the simulation by the phase.
-
     """
-
-    amplitude = Parameter(1)
-    period    = Parameter(0)
-    phase     = Parameter(0)
+    amplitude = Number(1.0,doc="The size of the pulse to generate.")
+    period    = Number(0.0,doc="The period with which to repeat the pulse. If zero, the pulse will be sent exactly once.")
+    phase     = Number(0.0,doc="The time after starting the simulation to wait before sending the first pulse.")
 
     def input_event(self,src,src_port,dest_port,data):
         """
@@ -56,15 +47,10 @@ class ThresholdUnit(EventProcessor):
     pulses.  When the accumulated value rises above threshold, it
     generates a pulse of a given amplitude and resets the accumulator
     to zero.
-
-    Parameters:
-       threshold = (default 1.0) The threshold at which to fire.
-       amplitude = (default 1.0) The size of the pulse to generate.
-       accum     = (default 0.0) The initial accumulator value
     """
-    threshold     = Parameter(default=1.0)
-    initial_accum = Parameter(default=0.0)
-    amplitude     = Parameter(default=1.0)
+    threshold     = Number(default=1.0,doc="The threshold at which to fire.")
+    initial_accum = Number(default=0.0,doc="The initial accumulator value.")
+    amplitude     = Number(default=1.0,doc="The size of the pulse to generate.")
 
     def __init__(self,**config):
         EventProcessor.__init__(self,**config)
