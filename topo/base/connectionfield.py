@@ -389,7 +389,8 @@ class CFProjection(Projection):
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
     weights_generator = PatternGeneratorParameter(default=patterngenerator.Constant(),constant=True)
     weights_shape = PatternGeneratorParameter(default=patterngenerator.Constant(),constant=True)
-    learning_fn = LearningFunctionParameter(default=GenericCFLF())
+    learning_fn = LearningFunctionParameter(default=GenericCFLF(),
+                                            doc='learning function used for updating the connection fields.')
     learning_rate = Parameter(default=0.0)
     output_fn  = OutputFunctionParameter(default=Identity(),
                                          doc='output function applied to the Projection activity.')
