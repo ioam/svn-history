@@ -95,10 +95,10 @@ $Id$
 __version__ = '$Revision$'
 
 from simulator import EventProcessor
-from parameterclasses import Constant, BooleanParameter, Number
+from parameterclasses import Constant, BooleanParameter, Number, Parameter
 from Numeric import zeros,array,floor,ceil,Float
 
-from boundingregion import BoundingBox
+from boundingregion import BoundingBox, BoundingRegionParameter
 import sheetview 
 
 def sheet2matrix(x,y,bounds,xdensity,ydensity):
@@ -357,8 +357,12 @@ class Sheet(EventProcessor):
     code.
     """
 
-    bounds  = Constant(BoundingBox(points=((-0.5,-0.5),(0.5,0.5))))
-    density = Constant(10)
+    bounds  = BoundingRegionParameter(BoundingBox(radius=0.5),constant=True,
+                                      doc="BoundingBox of the Sheet coordinate area covered by this Sheet")
+    ### JABHACKALERT: Should be type Number, but that causes problems
+    ### when instantiating Sheets in the Model Editor.
+    density = Parameter(default=10,constant=True,
+                        doc="Number of processing units per 1.0 distance horizontally or vertically in Sheet coordinates")
     # JABALERT: Should be set per-projection, not per-Sheet, right?
     learning = BooleanParameter(True)
     precedence = Number(default = 0.1, softbounds=(0.0,1.0),
@@ -497,3 +501,5 @@ class Slice(object):
         c1=self.slice_array[2]
         c2=self.slice_array[3]
         return M[r1:r2,c1:c2]
+
+
