@@ -38,7 +38,7 @@ class PatternGenerator(ParameterizedObject):
 
     bounds  = BoundingRegionParameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True,
                                       doc = "BoundingBox of the area in which the pattern is generated")
-    density = Parameter(default=10,hidden=True)
+    density = Number(default=10,bounds=(0,None),hidden=True)
 
     x       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.20,
                      doc="x-coordinate location of pattern center")
