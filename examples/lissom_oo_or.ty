@@ -77,43 +77,43 @@ V1.output_fn.upper_bound=0.633
 # LGN ON channel
 SharedWeightCFProjection.learning_fn.output_fn=DivisiveSumNormalize()
 
-LGNOn_center = s.connect(Retina,LGNOn,dest_port="center",delay = FixedPoint("0.05"),
+LGNOn_center = s.connect(Retina,LGNOn,delay = FixedPoint("0.05"),
                          connection_type=SharedWeightCFProjection,strength=2.33,
                          name='Center',weights_bounds=BoundingBox(radius=0.375),
                          weights_generator=topo.patterns.basic.Gaussian(size=0.0417,aspect_ratio=1))
 
-LGNOn_surround = s.connect(Retina,LGNOn,dest_port="surround",delay = FixedPoint("0.05"),
+LGNOn_surround = s.connect(Retina,LGNOn,delay = FixedPoint("0.05"),
                            connection_type=SharedWeightCFProjection,strength=-2.33,
                            name='Surround',weights_bounds=BoundingBox(radius=0.375),
                            weights_generator=topo.patterns.basic.Gaussian(size=0.1667,aspect_ratio=1))
 
 
 # LGN OFF channel
-LGNOff_center = s.connect(Retina,LGNOff,dest_port="center",delay = FixedPoint("0.05"),
+LGNOff_center = s.connect(Retina,LGNOff,delay = FixedPoint("0.05"),
                           connection_type=SharedWeightCFProjection,strength=-2.33,
                           name='Center',weights_bounds=BoundingBox(radius=0.375),
                           weights_generator=topo.patterns.basic.Gaussian(size=0.0417,aspect_ratio=1))
 
-LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoint("0.05"),
+LGNOff_surround = s.connect(Retina,LGNOff,delay = FixedPoint("0.05"),
                             connection_type=SharedWeightCFProjection,strength=2.33,
                             name='Surround',weights_bounds=BoundingBox(radius=0.375),
                             weights_generator=topo.patterns.basic.Gaussian(size=0.1667,aspect_ratio=1))
 
 
-s.connect(LGNOn,V1,delay=FixedPoint("0.05"),dest_port="on",
+s.connect(LGNOn,V1,delay=FixedPoint("0.05"),
           connection_type=CFProjection,strength=0.75,name='LGNOnAfferent',
           weights_bounds=BoundingBox(radius=0.25),learning_rate=0.9590)
 
-s.connect(LGNOff,V1,delay=FixedPoint("0.05"),dest_port="off",
+s.connect(LGNOff,V1,delay=FixedPoint("0.05"),
           connection_type=CFProjection,strength=0.5,name='LGNOffAfferent',
           weights_bounds=BoundingBox(radius=0.25),learning_rate=0.9590)
 
 
-s.connect(V1,V1,delay=FixedPoint("0.05"),dest_port="exc",
+s.connect(V1,V1,delay=FixedPoint("0.05"),
           connection_type=CFProjection,strength=0.9,name='LateralExcitatory',
           weights_bounds=BoundingBox(radius=0.10),learning_rate=3.2018) 
             
-s.connect(V1,V1,delay=FixedPoint("0.05"), dest_port="inh",
+s.connect(V1,V1,delay=FixedPoint("0.05"), 
           connection_type=CFProjection,strength=-0.9,name='LateralInhibitory',
           weights_bounds=BoundingBox(radius=0.23),learning_rate=1.9626)         
 
