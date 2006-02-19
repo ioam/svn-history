@@ -131,6 +131,10 @@ class Parameter(object):
     # the base Parameter class.  That's because a subclass will have
     # a __dict__ unless it also defines __slots__.
 
+    ### JABALERT: hidden could perhaps be replaced with a very low
+    ### (e.g. negative) precedence value.  That way by default the
+    ### GUI could display those with precedence >0, but the user could
+    ### select a level.
     __slots__ = ['_name','default','doc','hidden','precedence','instantiate','constant']
     count = 0
 
@@ -483,7 +487,7 @@ class ParameterizedObject(object):
         """        
         global object_count
 
-        # Flag that can be tested to see if e.g. Constant Parameters
+        # Flag that can be tested to see if e.g. constant Parameters
         # can still be set
         self.initialized=False
 

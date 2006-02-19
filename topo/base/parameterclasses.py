@@ -117,7 +117,7 @@ class Enumeration(Parameter):
 
 
 
-
+### JABALERT: Needs to be extended to accept FixedPoint as a number.
 class Number(Parameter):
     """
     """
@@ -471,13 +471,6 @@ class ClassSelectorParameter(Parameter):
         self.class_ = class_
 
         # check it's in range
-
-##     def add_packages(self, packages):
-##         """
-##         """
-##         # assert they are packages?
-##         self.packages.append(packages)
-        
 
     def get_default_class_name(self):
         """
