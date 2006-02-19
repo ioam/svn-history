@@ -131,13 +131,20 @@ class ProjectionSheet(Sheet):
         """
         Accept a connection from src, on src_port, for dest_port.
         Contruct a dictionary of projections indexed by source name.
+        Ensure that Projections to this ProjectionSheet are named differently,
+        by raising an error if the user try to do so.
         """
         Sheet._connect_from(self, conn, **args)
 
+        ### JCALERT! This could be better re-implemented: the structure of in_projections obliged to
+        ### use the chain method in slef.projections. Maybe it would be possible to code it differently.        
         if isinstance(conn, Projection):
             if conn.src.name not in self.in_projections:
                 self.in_projections[conn.src.name] = []
-            self.in_projections[conn.src.name].append(conn)
+            if conn.name in self.projections():
+                raise ValueError('Two Projections to the same Sheet, have to be named differently')
+            else:
+                self.in_projections[conn.src.name].append(conn)
 
 
     def input_event(self,src,src_port,dest_port,data):
@@ -209,7 +216,6 @@ class ProjectionSheet(Sheet):
         for proj in self.in_projections[input_sheet.name]:
             if proj.dest_port == dest_port:
                 proj.activate(input_activity)
-		break
 
 
     def projections(self):
@@ -223,6 +229,7 @@ class ProjectionSheet(Sheet):
 # Calls to the function below can be changed to call the one above once simulator.py
 # has been altered so that it does not allow creation of e.g. projections sharing the
 # same name. Then the function below can be removed.
+# JC: I think it can be done now: if two Projections shared the same name an error is raised in _connect_from
 
     def get_in_projection_by_name(self,tname):
         """
