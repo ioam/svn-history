@@ -48,7 +48,6 @@ class Bitmap(ParameterizedObject):
     be counted before they are clipped; these are stored in the
     clipped_pixels attribute.
     """
-    normalize = Parameter(default=0)
     clipped_pixels = 0
     
     def __init__(self,image):
