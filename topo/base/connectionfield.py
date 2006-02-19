@@ -331,7 +331,7 @@ class IdentityCFLF(CFLearningFunction):
     """CFLearningFunction performing no learning."""
 
     output_fn = OutputFunctionParameter(default=Identity(),
-                 doc='output function applied to the weights after learning')
+                 doc='Function applied to the weights after each learning step.')
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         pass
 
@@ -350,7 +350,7 @@ class GenericCFLF(CFLearningFunction):
     """CFLearningFunction applying the specified single_cf_fn to each CF."""
     single_cf_fn = Parameter(default=Hebbian())
     output_fn =  OutputFunctionParameter(default=Identity(),
-                 doc='output function applied to the weights after learning')
+                 doc='Function applied to the weights after each learning step')
     
     def __init__(self,**params):
         super(GenericCFLF,self).__init__(**params)
@@ -384,16 +384,16 @@ class CFProjection(Projection):
     and stores it in the activity array.
     """
     response_fn = ResponseFunctionParameter(default=GenericCFResponseFn(),
-                                            doc='response function to compute the Projection activity.' )
+                                            doc='Function for computing the Projection response to an input pattern.' )
     cf_type = Parameter(default=ConnectionField,constant=True)
     weights_bounds = Parameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
     weights_generator = PatternGeneratorParameter(default=patterngenerator.Constant(),constant=True)
     weights_shape = PatternGeneratorParameter(default=patterngenerator.Constant(),constant=True)
     learning_fn = LearningFunctionParameter(default=GenericCFLF(),
-                                            doc='learning function used for updating the connection fields.')
+                                            doc='Function for computing changes to the weights based on one activation step.')
     learning_rate = Parameter(default=0.0)
     output_fn  = OutputFunctionParameter(default=Identity(),
-                                         doc='output function applied to the Projection activity.')
+                                         doc='Function applied to the Projection activity after it is computed.')
     strength = Number(default=1.0)
 
 
