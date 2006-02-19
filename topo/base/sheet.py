@@ -95,7 +95,7 @@ $Id$
 __version__ = '$Revision$'
 
 from simulator import EventProcessor
-from parameterclasses import Constant, BooleanParameter, Number, Parameter
+from parameterclasses import BooleanParameter, Number, Parameter
 from Numeric import zeros,array,floor,ceil,Float
 
 from boundingregion import BoundingBox, BoundingRegionParameter

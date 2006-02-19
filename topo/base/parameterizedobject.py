@@ -207,8 +207,12 @@ class Parameter(object):
 
         If the Parameter's constant attribute is True, does not allow
         set commands except on the classobj or on an uninitialized
-        ParameterizedObject.
-        """    
+        ParameterizedObject.  Note that until Topographica supports
+        some form of read-only object, it is still possible to change
+        the attributes of the object stored in a constant (e.g. the
+        left bound of a BoundingBox).
+        """
+        
         if self.constant:
             if not obj:
                 self.default = val

@@ -9,7 +9,7 @@ __version__ = "$Revision$"
 
 from topo.misc.inlinec import inline, optimized
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Parameter,Constant,Number
+from topo.base.parameterclasses import Parameter,Number
 from topo.base.projection import Identity
 from topo.base.connectionfield import CFLearningFunction,OutputFunctionParameter
 from topo.outputfns.basic import DivisiveSumNormalize
