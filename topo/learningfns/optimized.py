@@ -27,8 +27,6 @@ class Hebbian(CFLearningFunction):
     GenericCFLF(single_cf_fn=hebbian), except faster.  Callers can set
     the output_fn to perform normalization if desired.
     """
-    output_fn = OutputFunctionParameter(default=Identity(),
-                 doc='Output function applied to the weights after learning.')
     
     def __init__(self,**params):
         super(Hebbian,self).__init__(**params)

@@ -306,7 +306,9 @@ class CFLearningFunction(ParameterizedObject):
     Objects in this class must support being called as a function with
     the arguments specified below.
     """
- 
+    output_fn = OutputFunctionParameter(default=Identity(),
+                 doc="Function applied to the weights after each learning step.")
+    
     def constant_sum_connection_rate(self,cfs,learning_rate):
 	""" 
 	return the learning rate for a single connection according to the total learning_rate,
@@ -331,9 +333,7 @@ class CFLearningFunction(ParameterizedObject):
 
 class IdentityCFLF(CFLearningFunction):
     """CFLearningFunction performing no learning."""
-
-    output_fn = OutputFunctionParameter(default=Identity(),
-                 doc='Function applied to the weights after each learning step.')
+  
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         pass
 
@@ -351,8 +351,6 @@ class LearningFunctionParameter(ClassSelectorParameter):
 class GenericCFLF(CFLearningFunction):
     """CFLearningFunction applying the specified single_cf_fn to each CF."""
     single_cf_fn = Parameter(default=Hebbian())
-    output_fn =  OutputFunctionParameter(default=Identity(),
-                 doc='Function applied to the weights after each learning step.')
     
     def __init__(self,**params):
         super(GenericCFLF,self).__init__(**params)

@@ -55,8 +55,6 @@ class HebbianSOMLF(SOMLF):
     # JABALERT: Should be a PatternGeneratorParameter eventually
     neighborhood_kernel_generator = Parameter(default=topo.patterns.basic.Gaussian(),
                                               doc="Neighborhood function")
-    output_fn = OutputFunctionParameter(default=Identity(),
-                 doc='Output function applied to the weights after learning.')
     
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
 
