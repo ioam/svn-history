@@ -186,6 +186,8 @@ def find_classes_in_package(package,parentclass):
     the caller will first need to do 'from package import *'.
     Does not search packages contained within the specified
     package, only the top-level modules.
+
+    Does not return the parentclass itself.
     """
     result = {}
     for v1 in package.__dict__.itervalues():
