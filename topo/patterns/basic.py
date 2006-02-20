@@ -39,10 +39,10 @@ class Gaussian(PatternGenerator):
     
     aspect_ratio   = Number(default=0.3,bounds=(0.0,None),softbounds=(0.0,2.0),
                             precedence=0.31,
-                            doc="xsigma=ysigma*aspect_ratio (see size)")
+                            doc="Ratio of the width to the height.  Specifically, xsigma=ysigma*aspect_ratio (see size).")
     size  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),
                    precedence=0.30,
-                   doc="Gaussian is defined by:\n  exp(-x^2/(2*xsigma^2) - y^2/(2*ysigma^2)\nysigma=size/2")
+                   doc="Gaussian is defined by:\n  exp(-x^2/(2*xsigma^2) - y^2/(2*ysigma^2)\nwhere ysigma=size/2.")
 
     def function(self,**params):
         ysigma = params.get('size',self.size)/2.0
@@ -56,7 +56,7 @@ class SineGrating(PatternGenerator):
     
     frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),
                        precedence=0.50,
-                       doc="frequency of the sine grating")
+                       doc="Frequency of the sine grating.")
     phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),precedence=0.51,doc="phase of the sine grating")
 
     def function(self,**params):
@@ -75,16 +75,16 @@ class Gabor(PatternGenerator):
     
     frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),
                        precedence=0.50,
-                       doc="frequency of the sine grating component")
+                       doc="Frequency of the sine grating component.")
     phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),
                        precedence=0.51,
-                       doc="phase of the sine grating component")
+                       doc="Phase of the sine grating component.")
     aspect_ratio   = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
                             precedence=0.31,
-                            doc="ratio of width to height; size*aspect_ratio gives the width of Gaussian component (see Gaussian)")
+                            doc="Ratio of width to height; size*aspect_ratio gives the width of Gaussian component (see Gaussian)")
     size  = Number(default=0.25,bounds=(0.0,None),softbounds=(0.0,2.0),
                    precedence=0.30,
-                   doc="determines the height of the Gaussian component (see Gaussian)")
+                   doc="Determines the height of the Gaussian component (see Gaussian).")
 
     def function(self,**params):
         height = params.get('size',self.size)/2.0
@@ -110,10 +110,10 @@ class Line(PatternGenerator):
 
     thickness   = Number(default=0.006,bounds=(0.0,None),softbounds=(0.0,1.0),
                          precedence=0.60,
-                         doc="thickness of the solid central part")
+                         doc="Thickness (width) of the solid central part of the line.")
     smoothing = Number(default=0.05,bounds=(0.0,None),softbounds=(0.0,0.5),
                        precedence=0.61,
-                       doc="thickness of the Gaussian fall-off")
+                       doc="Width of the Gaussian fall-off.")
 
     # CEBHACKALERT:
     # scale does not need to be here. For the tutorial, having this scale
@@ -132,13 +132,13 @@ class Disk(PatternGenerator):
 
     aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
                            precedence=0.31,
-                           doc="ratio of width to height; size*aspect_ratio gives the width of the disk")
+                           doc="Ratio of width to height; size*aspect_ratio gives the width of the disk.")
     size  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),
                    precedence=0.30,
-                   doc="height of the disk")
+                   doc="Height of the disk")
     smoothing = Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
                        precedence=0.61,
-                       doc="width of the Gaussian fall-off")
+                       doc="Width of the Gaussian fall-off")
     
     def function(self,**params):
         height = params.get('size',self.size)
@@ -156,13 +156,13 @@ class Ring(PatternGenerator):
 
     thickness   = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5),
                          precedence=0.60,
-                         doc="thickness of the ring")
+                         doc="Thickness (line width) of the ring.")
     smoothing = Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
                        precedence=0.61,
-                       doc="width of the Gaussian fall-off in and outside the ring")
+                       doc="Width of the Gaussian fall-off inside and outside the ring.")
     aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
                            precedence=0.31,
-                           doc="ratio of width to height; size*aspect_ratio gives the overall width")
+                           doc="Ratio of width to height; size*aspect_ratio gives the overall width.")
     size  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.30)
 
     def function(self,**params):
@@ -182,10 +182,10 @@ class Rectangle(PatternGenerator):
     
     aspect_ratio   = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
                             precedence=0.31,
-                            doc="ratio of width to height; size*aspect_ratio gives the width of the rectangle")
+                            doc="Ratio of width to height; size*aspect_ratio gives the width of the rectangle.")
     size  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),
                    precedence=0.30,
-                   doc="height of the rectangle")
+                   doc="Height of the rectangle.")
 
     # We will probably want to add Fuzzy-style anti-aliasing to this.
 
@@ -200,8 +200,8 @@ class Rectangle(PatternGenerator):
 class SquareGrating(PatternGenerator):
     """2D squarewave grating pattern generator."""
     
-    frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),precedence=0.50,doc="frequency of the underlying sine grating")
-    phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),precedence=0.51,doc="phase of the underlying sine grating")
+    frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),precedence=0.50,doc="Frequency of the square grating.")
+    phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),precedence=0.51,doc="Phase of the square grating.")
 
     # We will probably want to add anti-aliasing to this,
     # and there might be an easier way to do it than by
