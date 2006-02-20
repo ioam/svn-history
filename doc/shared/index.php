@@ -36,7 +36,7 @@
 <i>
 <b>News:</b>
 
-<p><b>14 February 06:</b> Version 0.8.2 released, including numerous
+<p><b>20 February 06:</b> Version 0.8.2 released, including numerous
 bugfixes, 
 circular receptive fields,
 shared-weight projections,
