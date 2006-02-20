@@ -26,8 +26,7 @@ two-dimensional Gaussian pattern generator, which has the Parameters
 <code>y</code>, <code>size</code>, <code>aspect_ratio</code>, and
 <code>orientation</code>.  (To see this list, you can select Gaussian
 in a Test Pattern window, or type 
-<!-- Is there a nicer-sounding command than this we could use? -->
-<code>G.get_paramobj_dict().keys()</code> at a Topographica command
+<code>G.params().keys()</code> at a Topographica command
 prompt.)  From a Topographica command prompt, you can type
 <code>G.scale</code> to see its scale (e.g. 1.0), and e.g.
 <code>G.scale=0.8</code> to set it.  Alternatively, you can set the
