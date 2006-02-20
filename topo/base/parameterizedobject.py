@@ -667,7 +667,7 @@ class ParameterizedObject(object):
     def unpickle(self):
         pass
 
-    def params(self,**config):
+    def params(self):
         """
         Return the Parameters of this object as the
         dictionary {name: Parameter}, where Parameter
