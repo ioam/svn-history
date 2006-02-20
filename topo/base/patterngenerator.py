@@ -52,6 +52,13 @@ class PatternGenerator(ParameterizedObject):
                     doc="Additive offset to input pattern, defaulting to 0.0")
 
 
+    def __init__(self,**params):
+        """
+        PatternGenerator is an abstract class: prevent instantiation of
+        PatternGenerator itself.
+        """
+        super(PatternGenerator,self).__init__(abstract_class=PatternGenerator,**params)
+
     def __call__(self,**params):
         """
         # CEBHACKALERT: I still have documentation to write, including explaining

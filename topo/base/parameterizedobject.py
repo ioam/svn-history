@@ -537,11 +537,17 @@ class ParameterizedObject(object):
     ### JABALERT: Should probably make this an Enumeration instead.
     print_level = Parameter(default=MESSAGE,hidden=True)
     
-    def __init__(self,**config):
+    def __init__(self,abstract_class=None,**config):
         """
+        Initialize a ParameterizedObject instance, unless the instance's
+        type is abstract_class, in which case an error is raised.
+        
         If **config doesn't contain a 'name' parameter, self.name defaults
         to a gensym formed from the object's type name and a unique number.
-        """        
+        """
+        if abstract_class!=None and self.__class__ is abstract_class:
+            raise NotImplementedError(repr(self.__class__)+" is abstract.")
+
         global object_count
 
         # Flag that can be tested to see if e.g. constant Parameters
