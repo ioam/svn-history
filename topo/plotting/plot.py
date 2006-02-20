@@ -31,7 +31,7 @@ class Plot(ParameterizedObject):
      """
      Simple Plot object constructed from a specified image.
      """
-     def __init__(self,image,**params):
+     def __init__(self,image=None,**params):
           
           ### JCALERT! Should we leave super(Plot,self) in TemplatePlot
           ### Also sort out plot_src_name
@@ -108,7 +108,7 @@ class TemplatePlot(Plot):
         to use for this plot.
         """
 
-        super(Plot,self).__init__(**params) 
+        super(TemplatePlot,self).__init__(**params) 
        
         self.bitmap = None
         
