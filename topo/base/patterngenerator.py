@@ -166,14 +166,16 @@ class Constant(PatternGenerator):
         return self.scale*ones(shape, Float)+self.offset
 
 
-# CEBHACKALERT: don't need to pass through doc etc.
 class PatternGeneratorParameter(ClassSelectorParameter):
     """
     """
-    def __init__(self,default=Constant(),doc='',**params):
+    ## CEBHACKALERT: see ClassSelectorParameter. __slots__ = []
+    __doc__ = property((lambda self: self.doc))
+
+    def __init__(self,default=Constant(),**params):
         """
         """
-        super(PatternGeneratorParameter,self).__init__(PatternGenerator,default=default,doc=doc,**params)
+        super(PatternGeneratorParameter,self).__init__(PatternGenerator,default=default,**params)
 
 
 
