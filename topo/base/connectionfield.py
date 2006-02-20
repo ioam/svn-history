@@ -284,14 +284,16 @@ class GenericCFResponseFn(CFResponseFunction):
         activity *= strength
 
 
-# CEBHACKALERT: don't need to pass through stuff like doc because of **params
 class ResponseFunctionParameter(ClassSelectorParameter):
     """
     """
-    def __init__(self,default=GenericCFResponseFn(),doc='',**params):
+    #CEBHACKALERT: see ClassSelectorParameter. __slots__ = []
+    __doc__ = property((lambda self: self.doc))
+
+    def __init__(self,default=GenericCFResponseFn(),**params):
         """
         """
-        super(ResponseFunctionParameter,self).__init__(CFResponseFunction,default=default,doc=doc,**params)        
+        super(ResponseFunctionParameter,self).__init__(CFResponseFunction,default=default,**params)        
 
 
 class CFLearningFunction(ParameterizedObject):
@@ -338,14 +340,16 @@ class IdentityCFLF(CFLearningFunction):
         pass
 
 
-# CEBHACKALERT: don't need to pass through stuff like doc because of **params
 class LearningFunctionParameter(ClassSelectorParameter):
     """
     """
-    def __init__(self,default=IdentityCFLF(),doc='',**params):
+    # CEBHACKALERT: see ClassSelectorParameter. __slots__ = []
+    __doc__ = property((lambda self: self.doc))
+
+    def __init__(self,default=IdentityCFLF(),**params):
         """
         """
-        super(LearningFunctionParameter,self).__init__(CFLearningFunction,default=default,doc=doc,**params)        
+        super(LearningFunctionParameter,self).__init__(CFLearningFunction,default=default,**params)        
 
 
 class GenericCFLF(CFLearningFunction):
