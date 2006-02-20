@@ -243,9 +243,6 @@ class MeasureFeatureMap(ParameterizedObject):
 		else:
 		    norm_factor = 1.0
 
-		### JCALERT! There is an hack in the for the view_name (which is only the name of the sheet)
-                ### it enables the proper display in plot.py (see corresponding alert)
-                ### It might have to be changed when the name display is fixed in plot.py (ask Jim)
                 preference_map = SheetView(((self.__featuremaps[sheet][feature].preference())/norm_factor,
                                              bounding_box), sheet.name ,sheet.precedence)
                 sheet.sheet_view_dict[feature.capitalize()+'Preference']=preference_map
