@@ -167,7 +167,7 @@ class ParametersFrame(Frame):
         # find constant fields from topo_obj, for topo_class
         self.__visible_parameters = list(parameter_name
                                     for (parameter_name,parameter)
-                                    in self.topo_obj.get_paramobj_dict().items()
+                                    in self.topo_obj.params().items()
                                     if parameter.constant == True
                                     and not(parameter.hidden))    
  
@@ -219,7 +219,7 @@ class ParametersFrame(Frame):
         # find visible parameters for topo_obj
         self.__visible_parameters = dict([(parameter_name,parameter)
                                         for (parameter_name,parameter)
-                                        in self.topo_obj.get_paramobj_dict().items()
+                                        in self.topo_obj.params().items()
                                         if not parameter.hidden])
         # create the widgets
         self.__widgets = {}

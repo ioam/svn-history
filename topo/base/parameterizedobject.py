@@ -667,18 +667,15 @@ class ParameterizedObject(object):
     def unpickle(self):
         pass
 
-    # CEBHACKALERT: this is used once, under a HACKALERT. It could be
-    # deleted: when most external objects want a ParameterizedObject's
-    # Parameters, they don't want them all and usually take some
-    # subset. So using this function would be a little wasteful,
-    # because two loops would be required in those cases.  But, to a
-    # user of ParameterizedObject (who doesn't use the rest of
-    # Topographica) this would be a useful function - so I think it
-    # should be kept and this HACKALERT removed.
-    def get_paramobj_dict(self,**config):
+    def params(self,**config):
         """
-        For getting the parameter objects directly, not just the
-        values.
+        Return the Parameters of this object as the
+        dictionary {name: Parameter}, where Parameter
+        is the Parameter object rather than its value.
+
+        Includes both local Parameters and those
+        shared by instances of the classes from
+        which this object comes.
         """
         paramdict = {}
         for class_ in classlist(type(self)):
@@ -719,7 +716,7 @@ def class_parameters(parameterized_class):
     
     parameters = [(parameter_name,parameter)
                   for (parameter_name,parameter)
-                  in parameterized_obj.get_paramobj_dict().items()
+                  in parameterized_obj.params().items()
                   if not parameter.hidden
                  ]
                  

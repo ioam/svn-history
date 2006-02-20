@@ -100,7 +100,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         #
         # pattern_generators = {'Pattern': <PatternGenerator_obj>}
         for generator_sheet_name in self.generator_sheets_patterns.values():
-            generator_sheet_params = generator_sheet_name['generator_sheet'].get_paramobj_dict()
+            generator_sheet_params = generator_sheet_name['generator_sheet'].params()
             pattern_generators = generator_sheet_params['input_generator'].range()
             break
         pattern_generators.pop("Random Generator") # CEBHACKALERT! See that class
