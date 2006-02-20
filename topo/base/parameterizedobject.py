@@ -43,6 +43,7 @@ def classlist(class_):
         for b in x.__bases__:
             if b not in q and b not in out:
                 q.append(b)
+                
     return out[::-1]
 
 
@@ -372,7 +373,7 @@ class ParameterizedObjectMetaclass(type):
                       if isinstance(obj,Parameter)]
         
         for param_name,param in parameters:
-            self.__param_inheritance(param_name,param,bases)
+            self.__param_inheritance(param_name,param)
 
 
     def __setattr__(self,attribute_name,value):
@@ -403,14 +404,13 @@ class ParameterizedObjectMetaclass(type):
             type.__setattr__(self,attribute_name,value)
             
             if isinstance(value,Parameter):
-                bases = classlist(self)[::-1]
-                self.__param_inheritance(attribute_name,value,bases)
+                self.__param_inheritance(attribute_name,value)
             else:
                 print (" ##WARNING## Setting non-Parameter class attribute %s.%s = %s "
                        % (self.__name__,attribute_name,`value`))
 
                 
-    def __param_inheritance(self,param_name,param,bases):
+    def __param_inheritance(self,param_name,param):
         """
         Look for Parameter values in superclasses of this ParameterizedObject.
 
@@ -437,9 +437,9 @@ class ParameterizedObjectMetaclass(type):
         for p_class in classlist(type(param)):
             if hasattr(p_class,'__slots__'):
                 slots.update(dict.fromkeys(p_class.__slots__))
-        
+
         for slot in slots.keys():
-            base_classes = iter(bases)
+            superclasses = iter(classlist(self)[::-1])
 
             # Search up the hierarchy until param.slot (which
             # has to be obtained using getattr(param,slot))
@@ -449,11 +449,11 @@ class ParameterizedObjectMetaclass(type):
             # and an iterator, but it works.
             while getattr(param,slot)==None:
                 try:
-                    param_base_class = base_classes.next()
+                    param_super_class = superclasses.next()
                 except StopIteration:
                     break
 
-                new_param = param_base_class.__dict__.get(param_name)
+                new_param = param_super_class.__dict__.get(param_name)
                 if new_param != None and hasattr(new_param,slot):
                     # (slot might not be there because could be a more
                     # general type of Parameter)
