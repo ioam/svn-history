@@ -36,7 +36,7 @@
 <i>
 <b>News:</b>
 
-<p><b>20 February 06:</b> Version 0.8.2 released, including numerous
+<p><b>14 February 06:</b> Version 0.8.2 released, including numerous
 bugfixes, 
 circular receptive fields,
 shared-weight projections,
@@ -47,14 +47,19 @@ density-independent SOM parameters,
 <A TARGET="_top" href="../Downloads/index.html#osx">Mac OS X instructions</A>,
 <A TARGET="_top" href="../Developer_Manual/index.html">developer manual</A>,
 <A TARGET="_top" href="../User_Manual/index.html">partial user manual</A>,
-much-improved model editor,
+much-improved 
+<A target="_top" href="../images/060220_model_editor_screen_shot.png">model editor</A>,
 <A TARGET="_top" href="../User_Manual/commandline.html#pylab">generic Matlab-style plotting</A>,
 topographic grid plotting,
 RGB plots,
 user-controllable plot sorting,
 plot color keys,
 <!-- Normally distributed random PatternGenerator, -->
-and progress reports during learning.
+and progress reports during learning.  See the 
+<A target="_top" href="../images/060220_topographica_screen_shot.png">Linux screenshot</A>.
+
+
+
 
 
 <p><b>22 December 05:</b> Version 0.8.1 released, including numerous
