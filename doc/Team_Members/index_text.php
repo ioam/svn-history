@@ -23,7 +23,7 @@ include:
 
   <p><dt>Chris Ball, September 2005-</dt>
   <dd>Chris recently worked on 
-      <a href="http://homepages.inf.ed.ac.uk/s0454615/mae/lissom/">modeling
+      <a href="http://homepages.inf.ed.ac.uk/v1cball/mae/lissom/">modeling
       motion aftereffects in LISSOM</a>, and now works on many different 
       parts of Topographica.  
 
