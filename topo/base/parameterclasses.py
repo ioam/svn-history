@@ -451,16 +451,17 @@ def is_number(obj):
 class ClassSelectorParameter(Parameter):
     """
     """
-    #__slots__ = ['packages','class_']
+    # CEBHACKALERT: class_, packages should be slots
+    # __slots__ = ['class_','packages']
     __doc__ = property((lambda self: self.doc))
 
     packages = []
     
-    def __init__(self,class_,default=None,doc="",**params):
+    def __init__(self,class_,default=None,**params):
         """
         """
-        Parameter.__init__(self,default=default,doc=doc,instantiate=True,**params)
         self.class_ = class_
+        Parameter.__init__(self,default=default,instantiate=True,**params)
 
         # check it's in range
 
