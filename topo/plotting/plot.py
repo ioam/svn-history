@@ -33,8 +33,6 @@ class Plot(ParameterizedObject):
      """
      def __init__(self,image=None,**params):
           
-          ### JCALERT! Should we leave super(Plot,self) in TemplatePlot
-          ### Also sort out plot_src_name
           super(Plot,self).__init__(**params) 
           self.bitmap = Bitmap(image)
           self.plot_src_name = ''
@@ -65,11 +63,7 @@ def make_template_plot(channels,sheet_view_dict,density=None,
 
 class TemplatePlot(Plot):
     """
-    A bitmap-based plot of one Sheet.
-
-    Once constructed, the Plot contains a bitmap (which is None if no
-    plot could be built) that is ready to display, and a view_info
-    data structure that can be used to create labels and filenames.
+    A bitmap-based plot as specified by a plot template (or plot channels).
     """
     
     def __init__(self,channels,sheet_view_dict,density,
