@@ -441,18 +441,15 @@ def is_number(obj):
 
 
 
-# CEBHACKALERT: base class for ones in output_fn,learning_fn,response_fn,
-# patterngenerator. Only output_fn, patterngenerator done so far.
-
-# - slots
-# - make slots private?
-# - documentation
-
 class ClassSelectorParameter(Parameter):
     """
     """
     # CEBHACKALERT: class_, packages should be slots
     # __slots__ = ['class_','packages']
+    # Having packages a class attribute like this means
+    # the list is shared! It's not causing problems right
+    # now, but it's wrong. This class and its subclasses
+    # need updating!
     __doc__ = property((lambda self: self.doc))
 
     packages = []
