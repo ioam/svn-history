@@ -229,16 +229,19 @@ class TopoImage(ParameterizedObject):
 class Image(PatternGenerator):
     """2D image generator."""
 
-    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.31)
-    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.30)
-    filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9)
+    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.31,doc="ratio of width to height; size*aspect_ratio gives the width")
+    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.30,doc="height of the image")
+    filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9,
+                        doc="path (relative to the Topographica base path) to an image in e.g. PNG, JPG, TIFF, or PGM format")
 
     size_normalization = Enumeration(default='fit_shortest',
                                      available=['fit_shortest','fit_longest','stretch_to_fit','original'],
                                      precedence=0.95,
                                      doc='How to scale the initial image size relative to the default area of 1.0.')
 
-    output_fn = OutputFunctionParameter(default=DivisiveMaxNormalize(),precedence=0.96,doc='How to normalize the value of each image pixel.')
+    output_fn = OutputFunctionParameter(default=DivisiveMaxNormalize(),
+                                        precedence=0.96,
+                                        doc='How to normalize the value of each image pixel.')
     
     def function(self,**params):
         bounds  = params.get('bounds', self.bounds)
