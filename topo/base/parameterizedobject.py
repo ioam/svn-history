@@ -431,7 +431,14 @@ class ParameterizedObjectMetaclass(type):
         values for non-Parameter objects in ParameterizedObjects, and have the
         values inherited through the ParameterizedObject hierarchy as usual.
         """
-        for slot in param.__slots__:
+        # get all relevant slots (i.e. slots defined in all superclasses of
+        # this parameter)
+        slots = {}
+        for p_class in classlist(type(param)):
+            if hasattr(p_class,'__slots__'):
+                slots.update(dict.fromkeys(p_class.__slots__))
+        
+        for slot in slots.keys():
             base_classes = iter(bases)
 
             # Search up the hierarchy until param.slot (which
@@ -447,7 +454,9 @@ class ParameterizedObjectMetaclass(type):
                     break
 
                 new_param = param_base_class.__dict__.get(param_name)
-                if new_param != None:
+                if new_param != None and hasattr(new_param,slot):
+                    # (slot might not be there because could be a more
+                    # general type of Parameter)
                     new_value = getattr(new_param,slot)
                     setattr(param,slot,new_value)
 
