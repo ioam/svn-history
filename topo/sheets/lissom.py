@@ -11,7 +11,7 @@ import Numeric
 from itertools import chain
 
 from topo.base.connectionfield import CFSheet
-from topo.base.parameterclasses import BooleanParameter,Number
+from topo.base.parameterclasses import BooleanParameter, Number, Integer
 from topo.base.projection import OutputFunctionParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.inlinec import optimized
@@ -30,7 +30,16 @@ class LISSOM(CFSheet):
     new_iteration = True
 
     precedence = Number(0.6)
-    tsettle=8
+    tsettle=Integer(default=8,bounds=(0,None),doc=
+                    """
+                    Number of times to activate the LISSOM sheet for each external input event.
+                    
+                    A counter is incremented each time an input is received from any
+                    source, and once the counter reaches tsettle, the last activation
+                    step is skipped so that there will not be any further recurrent
+                    activation.  The next external (i.e., afferent or feedback)
+                    event will then start the counter over again.
+                    """)
 
 
     def input_event(self,src,src_port,dest_port,data):
