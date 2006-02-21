@@ -21,7 +21,6 @@ from topo.base.patterngenerator import Constant
 # aspect_ratio: gives ratio of pattern's width:height; i.e. width/height 
  
 
-
 class Gaussian(PatternGenerator):
     """
     2D Gaussian pattern generator.
@@ -218,6 +217,36 @@ class SquareGrating(PatternGenerator):
 
 
 
+
+# CEBHACKALERT: I just used methods in Image;
+# I'm going to clean up Image and Composite together.
+
+from topo.base.sheet import bounds2slice,sheet2matrix
+from Numeric import floor,zeros,Float,where
+def sheet2matrixidx_array(x,y,bounds,density):
+    """
+    Convert a point (x,y) in sheet coordinates to the integer row and
+    column index of the matrix cell in which that point falls, given a
+    bounds and density.  Returns (row,column).
+
+    Note that if coordinates along the right or bottom boundary are
+    passed into this function, the returned matrix coordinate of the
+    boundary will be just outside the matrix, because the right and
+    bottom boundaries are exclusive.
+    """
+    # CEBHACKALERT: see Sheet.__init__
+    if type(density)!=tuple:
+        left,bottom,right,top = bounds.aarect().lbrt()
+        xdensity = int(density*(right-left)) / float((right-left))
+        ydensity = int(density*(top-bottom)) / float((top-bottom))
+    else:
+        xdensity,ydensity = density
+
+    r,c = sheet2matrix(x,y,bounds,xdensity,ydensity)
+    r = floor(r)
+    c = floor(c)
+    return r, c
+
 class CompositePatternGenerator(PatternGenerator):
     """
     PatternGenerator that accepts a list of other PatternGenerators.
@@ -225,16 +254,114 @@ class CompositePatternGenerator(PatternGenerator):
     list to create a pattern, then it combines the patterns to create a 
     single pattern that it returns.
     """
-	# CPHACKALERT: these should be a Parameters
-    operator = add
-    generatorlist = []
+    operator = Parameter(default=add,doc="Numeric function to combine the individual patterns.")
+    generators = Parameter(default=[],doc="List of patterns composing the composite.")
 
-    def __init__(self,generatorlist=[Disk(x=-0.3),Disk(x=0.3)],**params):
+    aspect_ratio   = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+                            precedence=0.31,
+                            doc="Ratio of width to height; size*aspect_ratio gives the width of the rectangle.")
+    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+                   precedence=0.30,
+                   doc="Height of the rectangle.")
+
+
+    def __init__(self,generators=[Disk(x=-0.3,smoothing=0),Disk(x=0.3,smoothing=0)],**params):
         super(CompositePatternGenerator,self).__init__(**params)
-        self.generatorlist = generatorlist
+        self.generators = generators
 
-    # Or should it be: def __call__(self,**params): ?
+
+    def __sheet_to_image(self,x,y,bounds,density,width,height):
+        """
+        Transform the given topographica abscissae/ordinates (x) to fit
+        an image with num_pixels along that aspect.
+
+        - translate center (Image has (0,0) as top-left corner, whereas Sheet has
+        (0,0) in the center).
+
+        An Image consists of discrete pixels, whereas the x values are floating-
+        point numbers. The simplistic technique in this function uses floor() to
+        map a range to a single number.
+
+        Maybe it would be better to put image into Sheet and use BoundingBocol functions, etc.
+        """
+        
+        n_image_rows,n_image_cols=x.shape
+
+        # CEBHACKALERT: temporary, density will become one again soon...
+        if type(density)!=tuple:
+            left,bottom,right,top = bounds.lbrt()
+            xdensity = int(density*(right-left)) / float((right-left))
+            ydensity = int(density*(top-bottom)) / float((top-bottom))
+        else:
+            xdensity,ydensity = density
+
+
+        # CEBHACKALERT: just made it work - this needs to be changed now
+        # that sheet and patterngenerator are different.
+        #n_sheet_rows,n_sheet_cols = bounds2shape(bounds,xdensity,ydensity)
+        r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
+        n_sheet_rows,n_sheet_cols = r2-r1,c2-c1
+        
+        x = x/width
+        y = y/height
+
+        row, col = sheet2matrixidx_array(x,y,bounds,density)
+
+        # CEBALERT:
+        # Instead of doing this kind of thing, could make TopoImage a
+        # Sheet and then do this with BoundingBoxes.
+        col = col - n_sheet_cols/2.0 + n_image_cols/2.0
+        row = row - n_sheet_rows/2.0 + n_image_rows/2.0
+
+        # document what this is...
+        col = where(col>=n_image_cols, -col, col)
+        row = where(row>=n_image_rows, -row, row)
+
+        # ...and don't do this
+        return col.astype(int), row.astype(int)
+
+
     def function(self,**params):
-    	patterns = [pg(bounds=params.get('bounds',self.bounds),density=params.get('density',self.density))
-                    for pg in self.generatorlist]
-        return self.operator.reduce(patterns)
+        bounds = params.get('bounds',self.bounds)
+        density=params.get('density',self.density)
+        height = params.get('size',self.size)
+        width = (params.get('aspect_ratio',self.aspect_ratio))*height
+
+        
+    	patterns = [pg(bounds=bounds,
+                       density=density)
+                    for pg in self.generators]
+        
+        self.image_array = self.operator.reduce(patterns)
+
+        return self.resamp(self.pattern_x,self.pattern_y,bounds,density,width,height)
+
+
+    def resamp(self, x, y,bounds,density,width=1.0, height=1.0):
+        """
+        Return pixels from the image (size-normalized according to
+        scaling) at the given Sheet (x,y) coordinates, with
+        width/height multiplied as specified by the given width and
+        height factors.
+        """
+ 
+        x_scaled, y_scaled = self.__sheet_to_image(x, y, bounds, density, width, height)
+
+        image_sample = zeros(x_scaled.shape, Float) #*self.background_value
+
+        # CEBALERT: Sample image at the scaled (x,y)
+        # coordinates. You'd think there'd be a Numeric way to do
+        # this.
+        for i in xrange(len(image_sample)):
+            for j in xrange(len(image_sample[i,:])):
+                    if x_scaled[i,j] >= 0 and y_scaled[i,j] >= 0:
+                        image_sample[i,j] = self.image_array[ y_scaled[i,j],x_scaled[i,j] ]
+
+        return image_sample
+
+
+
+
+
+
+        
