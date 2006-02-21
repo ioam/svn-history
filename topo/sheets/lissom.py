@@ -26,7 +26,7 @@ class LISSOM(CFSheet):
     # modify weights after each activation?
     continuous_learning = BooleanParameter(default=False)
 
-    presleep_count = 0
+    activation_count = 0
     new_iteration = True
 
     precedence = Number(0.6)
@@ -56,28 +56,22 @@ class LISSOM(CFSheet):
         Pass the accumulated stimulation through self.output_fn and
         send it out on the default output port.
         """
-
-        iteration_done = False
-        self.presleep_count += 1
-
-	if self.presleep_count == self.tsettle+2: #end of an iteration
-            iteration_done = True
-            self.presleep_count = 0
-            self.new_iteration = True # used by input_event when it is called
-
-        if self.new_input: 
+        if self.new_input:
             self.new_input = False
-            # The last iteration is for learning and does not need to compute
-	    # the activity.
-	    if not iteration_done:
-                self.activate()
-
-            if self.learning:
-                if self.continuous_learning:
+    	    if self.activation_count == self.tsettle:
+                # Once we have been activated the required number of times
+                # (determined by tsettle), reset various counters, learn
+                # if appropriate, and avoid further activation until an
+                # external event arrives.
+                self.activation_count = 0
+                self.new_iteration = True # used by input_event when it is called
+                if (self.learning and not self.continuous_learning):
                     self.learn()
-                else:
-                    if iteration_done:
-                        self.learn()
+            else:
+                self.activate()
+                self.activation_count += 1
+                if (self.learning and self.continuous_learning):
+                   self.learn()
                    
 
     # print the weights of a unit
