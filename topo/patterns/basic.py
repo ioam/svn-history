@@ -254,18 +254,18 @@ class CompositePatternGenerator(PatternGenerator):
     list to create a pattern, then it combines the patterns to create a 
     single pattern that it returns.
     """
-    operator = Parameter(default=add,doc="Numeric function to combine the individual patterns.")
-    generators = Parameter(default=[],doc="List of patterns composing the composite.")
+    operator = Parameter(default=add,doc="Numeric function used to combine the individual patterns.")
+    generators = Parameter(default=[],doc="List of patterns to use in the composite pattern.")
 
     aspect_ratio   = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
                             precedence=0.31,
-                            doc="Ratio of width to height; size*aspect_ratio gives the width of the rectangle.")
+                            doc="Ratio of width to height of the composite pattern.")
     size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
                    precedence=0.30,
-                   doc="Height of the rectangle.")
+                   doc="Height of the composite pattern.")
 
 
-    def __init__(self,generators=[Disk(x=-0.3,smoothing=0),Disk(x=0.3,smoothing=0)],**params):
+    def __init__(self,generators=[Disk(x=-0.3),Disk(x=0.3)],**params):
         super(CompositePatternGenerator,self).__init__(**params)
         self.generators = generators
 
@@ -322,15 +322,18 @@ class CompositePatternGenerator(PatternGenerator):
 
 
     def function(self,**params):
+
+        assert hasattr(self.operator,'reduce'),repr(self.operator)+" does not support 'reduce'."
+        
         bounds = params.get('bounds',self.bounds)
         density=params.get('density',self.density)
         height = params.get('size',self.size)
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
 
-        
-    	patterns = [pg(bounds=bounds,
-                       density=density)
-                    for pg in self.generators]
+        patterns = []
+        for pg in self.generators:
+            assert isinstance(pg,PatternGenerator),repr(pg)+" is not a PatternGenerator."
+            patterns.append(pg(bounds=bounds,density=density))
         
         self.image_array = self.operator.reduce(patterns)
 
