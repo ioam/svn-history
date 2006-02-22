@@ -349,7 +349,16 @@ class ParameterizedObjectMetaclass(type):
     metaclass initializes the *class* object, while the __init__
     method defined in each ParameterizedObject class is called for
     each new instance of that class.
+
+    Additionally, a class can declare itself abstract by having an
+    attribute _abstract_class_name set equal to its class name
+    (e.g. PatternGenerator is abstract, and has
+    _abstract_class_name='PatternGenerator').
+
+    The 'abstract' attribute can be used to find out if a class
+    is abstract or not.
     """
+    abstract = property(lambda self: self.__is_abstract())
 
     # The other methods get_param_descriptor and print_param_defaults
     # could perhaps be made into static functions, because all they
@@ -374,6 +383,21 @@ class ParameterizedObjectMetaclass(type):
         
         for param_name,param in parameters:
             self.__param_inheritance(param_name,param)
+
+
+    def __is_abstract(self):
+        """
+        Return True if this class has an __abstract_class_name attribute,
+        and it's equal to this class' __name__. Otherwise, return False.
+
+        Allows detection of abstract classes, since a concrete subclass
+        of an abstract class will have a name not equal to the
+        __abstract_class_name.
+        """
+        if hasattr(self,'_abstract_class_name') and self.__name__==self._abstract_class_name:
+            return True
+        else:
+            return False
 
 
     def __setattr__(self,attribute_name,value):
@@ -536,18 +560,13 @@ class ParameterizedObject(object):
     name           = Parameter(default=None,hidden=True)
     ### JABALERT: Should probably make this an Enumeration instead.
     print_level = Parameter(default=MESSAGE,hidden=True)
+
     
     def __init__(self,abstract_class=None,**config):
-        """
-        Initialize a ParameterizedObject instance, unless the instance's
-        type is abstract_class, in which case an error is raised.
-        
+        """        
         If **config doesn't contain a 'name' parameter, self.name defaults
         to a gensym formed from the object's type name and a unique number.
         """
-        if abstract_class!=None and self.__class__ is abstract_class:
-            raise NotImplementedError(repr(self.__class__)+" is abstract.")
-
         global object_count
 
         # Flag that can be tested to see if e.g. constant Parameters

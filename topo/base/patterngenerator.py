@@ -36,6 +36,9 @@ class PatternGenerator(ParameterizedObject):
     the Topographica coordinate system.
     """
 
+    # PatternGenerator is abstract
+    _abstract_class_name = "PatternGenerator"
+    
     bounds  = BoundingRegionParameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True,
                                       doc = "BoundingBox of the area in which the pattern is generated")
     density = Number(default=10,bounds=(0,None),hidden=True)
@@ -51,13 +54,6 @@ class PatternGenerator(ParameterizedObject):
     offset = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.11,
                     doc="Additive offset to input pattern, defaulting to 0.0")
 
-
-    def __init__(self,**params):
-        """
-        PatternGenerator is an abstract class: prevent instantiation of
-        PatternGenerator itself.
-        """
-        super(PatternGenerator,self).__init__(abstract_class=PatternGenerator,**params)
 
     def __call__(self,**params):
         """
