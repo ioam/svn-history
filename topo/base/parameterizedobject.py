@@ -574,8 +574,6 @@ class ParameterizedObject(object):
         """
         Returns '<self.name>'.
         """
-        # CEBHACKALERT: maybe override this in some subclasses, to make
-        # it return more useful info.
         return "<%s>" % self.name
 
     def __str__(self):
