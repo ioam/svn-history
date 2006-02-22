@@ -29,7 +29,7 @@ import topo
 
 from topo.base.arrayutils import octave_output
 from topo.base.sheet import Sheet
-from topo.base.utils import frange
+from topo.misc.utils import frange
 
 
 def vectorplot(vec):

@@ -8,7 +8,7 @@ __version__='$Revision$'
 from topo.base.sheet import Sheet 
 from topo.base.sheet import BoundingBox
 
-from topo.base.utils import NxN
+from topo.misc.utils import NxN
 
 from topo.base.parameterclasses import Number, Dynamic
 

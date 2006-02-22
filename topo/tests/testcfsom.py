@@ -29,7 +29,7 @@ import pdb #debugger
 ### Only for ImageSaver
 from Numeric import resize,array,zeros
 from topo.base.simulator import EventProcessor
-from topo.base.utils import NxN
+from topo.misc.utils import NxN
 from pprint import *
 import Image, ImageOps
 

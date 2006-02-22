@@ -8,7 +8,7 @@ $Id$
 __version__='$Revision$'
 
 from topo.base.sheet import Sheet
-from topo.base.utils import Struct, NxN
+from topo.misc.utils import Struct, NxN
 from Numeric import zeros
 
 class Composer(Sheet):

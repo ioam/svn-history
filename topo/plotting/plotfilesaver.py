@@ -19,7 +19,7 @@ __version__='$Revision$'
 import topo
 import topo.base.parameterizedobject
 import topo.base.simulator
-from topo.base.utils import *
+from topo.misc.utils import *
 
 from topo.commands.analysis import *
 

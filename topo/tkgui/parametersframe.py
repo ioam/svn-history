@@ -8,7 +8,7 @@ __version__='$Revision$'
 from propertiesframe import PropertiesFrame
 from Tkinter import Frame, Button, RIGHT, TOP, BOTH, BOTTOM, END, YES, N,S,E,W,X, Menu, Toplevel, Label
 import topo.base.utils
-from topo.base.utils import keys_sorted_by_value, dict_translator, string_int_translator, string_bb_translator
+from topo.misc.utils import keys_sorted_by_value, dict_translator, string_int_translator, string_bb_translator
 import topo
 import topo.base.parameterclasses
 import Pmw
