@@ -24,8 +24,7 @@ apply_output_fn, to allow joint normalization.
 </li>
 
 <li>
-2006/02/21 (CB): Indication of whether or not a class is abstract, to prevent
-instantiation and to hide from various lists.
+2006/02/22 (CB): Clean up ClassSelectorParameter and subclasses.
 </li>
 
 </ul>
@@ -48,10 +47,6 @@ CFDotProduct_opt1, CFDotProduct_cpointer goes to CFDotProduct_opt2
 <li>
 2006/02/21: ReadOnlyParameter to allow declaration of something but not let it
 be set, including in a ParameterizedObject constructor.
-</li>
-
-<li>
-2006/02/21: Clean up ClassSelectorParameter and subclasses.
 </li>
 
 <li> 
