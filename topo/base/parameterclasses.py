@@ -456,12 +456,12 @@ class ClassSelectorParameter(Parameter):
 
     packages = []
     
-    def __init__(self,class_,default=None,suffix_to_lose=None,**params):
+    def __init__(self,class_,default=None,instantiate=True,suffix_to_lose=None,**params):
         """
         """
         self.class_ = class_
         self.suffix_to_lose = suffix_to_lose
-        Parameter.__init__(self,default=default,instantiate=True,**params)
+        Parameter.__init__(self,default=default,instantiate=instantiate,**params)
 
         # check it's in range
 
