@@ -19,7 +19,7 @@ from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
 from topo.base.arrayutils import L2norm, norm
 from topo.base.projection import OutputFunction
-from topo.base.utils import clip_in_place
+from topo.base.arrayutils import clip_in_place
 
 # Imported here so that all OutputFunctions will be in the same package
 from topo.base.projection import Identity

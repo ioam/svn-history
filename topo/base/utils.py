@@ -279,28 +279,4 @@ def keys_sorted_by_value(d):
     return [ backitems[i][1] for i in range(0,len(backitems))]
 
 
-### JABALERT!
-###
-### If at all possible should be rewritten to use matrix functions
-### that eliminate the explicit for loop.  The savespace() should
-### probably also be eliminated. 
-### JC: It has been tried to change the function so that to get rid of
-### the for loop, but no satisfying matrix function has been found to
-### perform it.
-###
-### Should move to arrayutils.
-def clip_in_place(mat,lower_bound,upper_bound):
-    """Version of Numeric.clip that changes the argument in place, with no intermediate."""
-    mat.savespace(1)
-    mflat = mat.flat
-    size = len(mflat)
-    for i in xrange(size):
-        element = mflat[i]
-        if element<lower_bound:
-            mflat[i] = lower_bound
-        elif element>upper_bound:
-            mflat[i] = upper_bound
-
-
-
 
