@@ -391,15 +391,6 @@ class Sheet(EventProcessor):
         self.sheet_view_dict = {}
 
 
-    def __repr__(self):
-        """
-        Return '<Sheet self.name>'.
-        """
-        rep = self.__class__.__name__ + " " + self.name 
-        return "<%s>" % rep
-
-
-
     ### JABALERT: This should be deleted now that sheet_view_dict is public
     ### JC: shouldn't we keep that, or at list write a function in utils that delete
     ### a value in a dictinnary without returning an error if the key is not in the dict?
