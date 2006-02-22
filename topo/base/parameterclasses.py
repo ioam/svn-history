@@ -456,7 +456,7 @@ class ClassSelectorParameter(Parameter):
 
     packages = []
     
-    def __init__(self,class_,default=None,instantiate=True,suffix_to_lose=None,**params):
+    def __init__(self,class_,default=None,instantiate=True,suffix_to_lose='',**params):
         """
         """
         self.class_ = class_
