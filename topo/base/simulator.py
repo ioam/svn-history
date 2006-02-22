@@ -224,6 +224,13 @@ class EPConnection(ParameterizedObject):
     def __init__(self,**params):
         super(EPConnection,self).__init__(**params)
 
+    def __repr__(self):
+        """
+        Return '<self.class.name self.name: src=self.source, dest=self.dest>'.
+        """
+        rep = self.__class__.__name__ + " " + self.name + ": src="+`self.src`+", dest="+`self.dest`
+        return "<%s>" % rep
+
 
 class SimulatorEvent:
     """Simulator event"""
