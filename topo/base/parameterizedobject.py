@@ -580,9 +580,9 @@ class ParameterizedObject(object):
 
     def __str__(self):
         """
-        Returns '<self.name>'.
+        See __repr__().
         """
-        return "<%s>" % self.name
+        return self.__repr__()
 
 
     def __db_print(self,level=NORMAL,*args):
