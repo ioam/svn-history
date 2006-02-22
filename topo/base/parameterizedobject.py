@@ -572,7 +572,10 @@ class ParameterizedObject(object):
 
     def __repr__(self):
         """
-        Returns '<self.name>'.
+        Return '<self.name>'.
+
+        Subclasses may wish to reimplement this method to print more
+        useful information.
         """
         return "<%s>" % self.name
 
@@ -629,10 +632,8 @@ class ParameterizedObject(object):
                     self.__dict__[parameter_name]=new_object
 
                     # a new ParameterizedObject needs a new name
-                    # CEBHACKALERT: this will write over any name given;
-                    # instead, maybe the name function could accept
-                    # a prefix? To do when HACKALERT about naming is
-                    # fixed in __init__.
+                    # CEBHACKALERT: this will write over any name given
+                    # to the original object.
                     if isinstance(new_object,ParameterizedObject):
                         global object_count
                         object_count+=1
