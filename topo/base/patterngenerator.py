@@ -182,7 +182,7 @@ class PatternGeneratorParameter(ClassSelectorParameter):
     def __init__(self,default=Constant(),**params):
         """
         """
-        super(PatternGeneratorParameter,self).__init__(PatternGenerator,default=default,**params)
+        super(PatternGeneratorParameter,self).__init__(PatternGenerator,default=default,suffix_to_lose='Generator',**params)
 
 
 

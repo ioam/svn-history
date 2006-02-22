@@ -454,10 +454,11 @@ class ClassSelectorParameter(Parameter):
 
     packages = []
     
-    def __init__(self,class_,default=None,**params):
+    def __init__(self,class_,default=None,suffix_to_lose=None,**params):
         """
         """
         self.class_ = class_
+        self.suffix_to_lose = suffix_to_lose
         Parameter.__init__(self,default=default,instantiate=True,**params)
 
         # check it's in range
@@ -465,7 +466,7 @@ class ClassSelectorParameter(Parameter):
     def get_default_class_name(self):
         """
         """
-        return classname_repr(self.default.__class__.__name__)
+        return classname_repr(self.default.__class__.__name__,self.suffix_to_lose)
 
     def range(self):
         """
@@ -487,7 +488,7 @@ class ClassSelectorParameter(Parameter):
         for package in self.packages:
             classes = find_classes_in_package(package, self.class_)
             for (name,class_) in classes.items():
-                k[classname_repr(name)] = class_
+                k[classname_repr(name,self.suffix_to_lose)] = class_
 
         if len(k)==0:
             return {self.get_default_class_name():self.default}
