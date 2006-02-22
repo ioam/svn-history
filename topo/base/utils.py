@@ -301,17 +301,6 @@ def clip_in_place(mat,lower_bound,upper_bound):
         elif element>upper_bound:
             mflat[i] = upper_bound
 
-import re
-def classname_repr(class_name, suffix_to_lose=''):
-    """
-    Return class_name stripped of suffix_to_lose.
-    """
-    # Cut off 'suffix_to_lose'
-    viewable_name = re.sub(suffix_to_lose+'$','',class_name)
-
-    # CEBHACKALERT: replace underscores with spaces
-
-    return viewable_name
 
 
 
