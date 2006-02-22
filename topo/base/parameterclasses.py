@@ -489,7 +489,12 @@ class ClassSelectorParameter(Parameter):
         k = {}
         for package in self.packages:
             classes = find_classes_in_package(package, self.class_)
-            for (name,class_) in classes.items():
+
+            concrete_classes = [(name,class_)
+                                for (name,class_) in classes.items()
+                                if class_.abstract==False]
+            
+            for (name,class_) in concrete_classes:
                 k[self.classname_repr(name)] = class_
 
         if len(k)==0:
