@@ -554,8 +554,6 @@ class ParameterizedObject(object):
         # can still be set
         self.initialized=False
 
-        # CEBHACKALERT: it's possible for ParameterizedObjects to share the same name.
-        # (E.g. two can be created with the same name passed in.)
         self.__generate_name()
         
         self.__setup_params(**config)
@@ -576,6 +574,8 @@ class ParameterizedObject(object):
         """
         Returns '<self.name>'.
         """
+        # CEBHACKALERT: maybe override this in some subclasses, to make
+        # it return more useful info.
         return "<%s>" % self.name
 
     def __str__(self):
