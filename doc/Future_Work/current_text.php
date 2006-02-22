@@ -16,6 +16,10 @@ apply_output_fn, to allow joint normalization.
 </li>
 
 <li>
+2006/02/22 (CB): avoid deepcopy of a Numeric ufunc when instantiating a Parameter.
+</li>
+
+<li>
 2006/02/21 (CB): Composite pattern generator
 </li>
 
