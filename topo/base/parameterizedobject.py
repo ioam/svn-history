@@ -591,18 +591,20 @@ class ParameterizedObject(object):
 
     def __repr__(self):
         """
-        Return '<self.name>'.
-
-        Subclasses may wish to reimplement this method to print more
-        useful information.
+        Return '<self.class.name self.name>', followed by a list of
+        all Parameters.
         """
-        return "<%s>" % self.name
+        k = []
+        for name,val in self.get_param_values():
+             k.append( '%s = %s' % (name,val) )
+
+        return "<" + self.__class__.__name__ + " " + self.name + ">\n" + `k`
 
     def __str__(self):
         """
-        See __repr__().
+        Return '<self.class.name self.name>'.
         """
-        return self.__repr__()
+        return "<%s %s>" % (self.__class__.__name__,self.name)
 
 
     def __db_print(self,level=NORMAL,*args):
