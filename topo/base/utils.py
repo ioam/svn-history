@@ -301,17 +301,10 @@ def clip_in_place(mat,lower_bound,upper_bound):
         elif element>upper_bound:
             mflat[i] = upper_bound
 
-
-
-# CEBHACKALERT: should it also take full path to classname?
-# e.g. topo.base.patterngenerator.Constant rather than Constant
-# then keep to first "." from the right, or something.
-# I also don't know how it works.
-import string, re
+import re
 def classname_repr(class_name, suffix_to_lose=''):
     """
-    Return class_name stripped of suffix_to_lose,
-    and with spaces before any capital letters.
+    Return class_name stripped of suffix_to_lose.
     """
     # Cut off 'suffix_to_lose'
     viewable_name = re.sub(suffix_to_lose+'$','',class_name)
