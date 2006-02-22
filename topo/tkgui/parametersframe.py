@@ -7,7 +7,7 @@ __version__='$Revision$'
 
 from propertiesframe import PropertiesFrame
 from Tkinter import Frame, Button, RIGHT, TOP, BOTH, BOTTOM, END, YES, N,S,E,W,X, Menu, Toplevel, Label
-import topo.base.utils
+import topo.misc.utils
 from topo.misc.utils import keys_sorted_by_value, dict_translator, string_int_translator, string_bb_translator
 import topo
 import topo.base.parameterclasses
@@ -332,13 +332,13 @@ class ParametersFrame(Frame):
                 max_value = str(high_bound),
                 width = 30,
                 string_format = '%.6f',
-                translator = topo.base.utils.eval_atof)
+                translator = topo.misc.utils.eval_atof)
 
         except AttributeError:
             self.__widgets[parameter_name] = self.__properties_frame.add_text_property(
                 parameter_name,
                 value = getattr(self.topo_obj,parameter_name),
-                translator = topo.base.utils.eval_atof)
+                translator = topo.misc.utils.eval_atof)
 
     def __add_enumeration_property(self,parameter_name,parameter):
         """
