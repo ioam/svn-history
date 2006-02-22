@@ -591,15 +591,25 @@ class ParameterizedObject(object):
 
     def __repr__(self):
         """
-        Return '<self.class.name self.name>', followed by a list of
-        all Parameters.
+        Return 'classname(parameter1=x,parameter2=y,...)',
+        where all parameter=value pairs are printed in the parentheses.
+
+        An almost-valid expression that could be used to
+        recreate the object in the correct environment.
         """
-        k = []
+        param_value_pairs = []
         for name,val in self.get_param_values():
-             k.append( '%s = %s' % (name,val) )
+             param_value_pairs.append( '%s=%s' % (name,val) )
 
-        return "<" + self.__class__.__name__ + " " + self.name + ">\n" + `k`
+        rep = self.__class__.__name__+"("
 
+        for item in param_value_pairs:
+            rep = rep + item + ", "
+
+        # remove trailing ", " and add final parenthesis
+        return rep[0:rep.rindex(", ")] + ")"
+
+        
     def __str__(self):
         """
         Return '<self.class.name self.name>'.
