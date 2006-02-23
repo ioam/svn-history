@@ -442,18 +442,16 @@ def is_number(obj):
 
 
 import re
-
 class ClassSelectorParameter(Parameter):
     """
     """
-    # CEBHACKALERT: class_, packages should be slots
-    # __slots__ = ['class_','packages','suffix_to_lose']
+    __slots__ = ['class_','packages','suffix_to_lose']
+    __doc__ = property((lambda self: self.doc))
+
     # Having packages a class attribute like this means
     # the list is shared! It's not causing problems right
     # now, but it's wrong. This class and its subclasses
     # need updating!
-    __doc__ = property((lambda self: self.doc))
-
     packages = []
     
     def __init__(self,class_,default=None,instantiate=True,

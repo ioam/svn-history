@@ -287,7 +287,7 @@ class GenericCFResponseFn(CFResponseFunction):
 class ResponseFunctionParameter(ClassSelectorParameter):
     """
     """
-    #CEBHACKALERT: see ClassSelectorParameter. __slots__ = []
+    __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=GenericCFResponseFn(),**params):
@@ -343,7 +343,7 @@ class IdentityCFLF(CFLearningFunction):
 class LearningFunctionParameter(ClassSelectorParameter):
     """
     """
-    # CEBHACKALERT: see ClassSelectorParameter. __slots__ = []
+    __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=IdentityCFLF(),**params):

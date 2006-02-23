@@ -172,7 +172,7 @@ class Constant(PatternGenerator):
 class PatternGeneratorParameter(ClassSelectorParameter):
     """
     """
-    ## CEBHACKALERT: see ClassSelectorParameter. __slots__ = []
+    __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=Constant(),**params):

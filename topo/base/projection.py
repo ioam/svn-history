@@ -57,7 +57,7 @@ class OutputFunctionParameter(ClassSelectorParameter):
     Parameter whose value can be any OutputFunction, i.e., a function mapping a 2D array
     to a 2D array.
     """
-    #CEBHACKALERT: should have __slots__ = [] (see ClassSelectorParameter)
+    __slots__ = []
     __doc__ = property((lambda self: self.doc))
     
     def __init__(self,default=Identity(),**params):
