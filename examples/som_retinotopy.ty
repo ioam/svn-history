@@ -58,18 +58,29 @@ class RetinotopicSOM(CFSOM):
 
 # input patterns
 GeneratorSheet.period = 1.0
-GeneratorSheet.density = 24
+GeneratorSheet.density = 10
+
+# CEBHACKALERT: will go to wherever DynamicValue is
+class UniformRandomValue(object):
+    """
+    When called, return the next value from random.uniform within the
+    designated bounds.
+    """
+    def __init__(self,bounds=(0.0,1.0)):
+        self.bounds=bounds
+                 
+    def __call__(self):
+        return random.uniform(self.bounds[0],self.bounds[1])
+
 
 random.seed(1234)
-topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
-
-topo.patterns.basic.Gaussian.size = 2*sqrt(2.0*0.1*24.0)/24.0
-topo.patterns.basic.Gaussian.aspect_ratio = 1.0
+input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size = 2*sqrt(2.0*0.1*24.0)/24.0,aspect_ratio=1.0,
+                                    x=DynamicNumber(UniformRandomValue((-0.5,0.5))),
+                                    y=DynamicNumber(UniformRandomValue((-0.5,0.5))),
+                                    orientation=DynamicNumber(UniformRandomValue((-pi,pi))))
 
 # cortical sheet
-RetinotopicSOM.density = 40
+RetinotopicSOM.density = 10
 RetinotopicSOM.learning_length = 40000
 
 RetinotopicSOM.radius_0 = 13.3/40
@@ -79,7 +90,7 @@ RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom() 
 
 CFProjection.weights_bounds=BoundingBox(radius=1.0) # fully connected network.
-CFProjection.response_fn = CFEuclideanDistance() 
+CFProjection.response_fn = CFEuclideanDistance()
 CFProjection.learning_fn = HebbianSOMLF()
 
 
@@ -88,9 +99,9 @@ CFProjection.learning_fn = HebbianSOMLF()
 
 s = Simulator()
 
-Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),name='Retina')
+Retina = GeneratorSheet(input_generator=input_pattern,name='Retina')
 V1 = RetinotopicSOM(name='V1')
-s.connect(Retina,V1,delay=0.5,connection_type=CFProjection,name='RtoV1')
+RtoV1=s.connect(Retina,V1,delay=0.5,connection_type=CFProjection,name='RtoV1')
 
 s.run(0)
 #s.run(10000)
