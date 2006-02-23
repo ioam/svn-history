@@ -356,6 +356,8 @@ class Sheet(EventProcessor):
     i.e. representations of the sheet for use by analysis or plotting
     code.
     """
+    _abstract_class_name = "Sheet"
+
 
     bounds  = BoundingRegionParameter(BoundingBox(radius=0.5),constant=True,
                                       doc="BoundingBox of the Sheet coordinate area covered by this Sheet")
