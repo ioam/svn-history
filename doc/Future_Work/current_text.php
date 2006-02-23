@@ -76,12 +76,13 @@ PatternGenerator so that subclasses can inherit doc, precedence
 attributes (etc), but have them not used unless a subclass does really
 use them.
 </li>
-</ul>
 
 <li>
 2006/02/23 (CB): module as well as package list for ClassSelectorParameter?
 E.g. Want BoundingBoxParameter to be a ClassSelectorParameter, but don't want to add all of topo.base, just topo.base.boundingregion.
 </li>
+
+</ul>
 
 <h3>Other work</h3>
 
