@@ -38,6 +38,15 @@ apply_output_fn, to allow joint normalization across CFs.
 2006/02/23 (all): Ensuring classes are declared abstract when they should be, and making sure base and simple classes are imported into packages (i.e. Sheet into topo/sheets/, Projection into topo/projections/, Constant into topo/patterns/, and so on).
 </li>
 
+<li>
+2006/02/23 (all): Making more things be Parameters, and writing doc strings at the same time. E.g. the x and y widgets in the Unit Weights window can be Numbers with bounds, etc.
+</li>
+
+<li>
+2006/02/23 (CB): module as well as package list for ClassSelectorParameter?
+E.g. Want BoundingBoxParameter to be a ClassSelectorParameter, but don't want to add all of topo.base, just topo.base.boundingregion.
+</li>
+
 
 </ul>
 
@@ -81,11 +90,6 @@ with C++ LISSOM when there are circular connection fields.
 PatternGenerator so that subclasses can inherit doc, precedence
 attributes (etc), but have them not used unless a subclass does really
 use them.
-</li>
-
-<li>
-2006/02/23 (CB): module as well as package list for ClassSelectorParameter?
-E.g. Want BoundingBoxParameter to be a ClassSelectorParameter, but don't want to add all of topo.base, just topo.base.boundingregion.
 </li>
 
 </ul>
