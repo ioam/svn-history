@@ -444,7 +444,7 @@ def is_number(obj):
 class ClassSelectorParameter(Parameter):
     """
     """
-    __slots__ = ['class_','packages','suffix_to_lose']
+    __slots__ = ['class_','suffix_to_lose']
     __doc__ = property((lambda self: self.doc))
 
     # CEBHACKALERT: Having packages a class attribute like this means
