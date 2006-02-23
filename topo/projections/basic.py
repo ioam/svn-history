@@ -12,6 +12,9 @@ __version__ = "$Revision$"
 
 import Numeric
 
+# So all Projections are present in this package
+from topo.base.projection import Projection
+
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Parameter,Number
 from topo.base.arrayutils import Mdot
