@@ -402,7 +402,13 @@ class Sheet(EventProcessor):
         """
 	if self.sheet_view_dict.has_key(view_name):   
 	    del self.sheet_view_dict[view_name]
-            
+
+    def sheet2matrix(self,x,y):
+        return sheet2matrix(x,y,self.bounds,self.xdensity,self.ydensity)
+
+    def matrix2sheet(self,r,c):
+        return matrix2sheet(r,c,self.bounds,self.xdensity,self.ydensity)
+
                 
     def sheet2matrixidx(self,x,y):
         """
@@ -420,6 +426,7 @@ class Sheet(EventProcessor):
         coordinates.
         """
         return matrixidx2sheet(row,col,self.bounds,self.xdensity,self.ydensity)
+
 
     def sheet_offset(self):
         """
@@ -475,31 +482,86 @@ class Slice(object):
     """
     def __init__(self,slice_bounds,sheet):
         """
-        Create the matrix slice that corresponds to the sheet coordinate slice_bounds.
+        Create the matrix slice that corresponds to the sheet
+        coordinate slice_bounds.
         """
-        self.slice_array = sheet.bounds2slice(slice_bounds)
         self.sheet = sheet
+        self.slice_array = self.__bounds2slice(slice_bounds)
+
 
     def sheet_coordinate_bounds(self):
         """
         Return the sheet coordinate bounding box of this Slice.
         """
-        return self.sheet.slice2bounds(self.slice_array)
+        r1,r2,c1,c2 = self.slice_array
+
+        left,bottom = self.sheet.matrix2sheet(r2,c1)
+        right, top  = self.sheet.matrix2sheet(r1,c2)
+
+        return BoundingBox(points=((left,bottom),
+                                   (right,top)))
+
 
     def lbrt(self):
         """
         Return the matrix idx coordinate slice as a tuple.
         """
-        return (self.slice_array[2],self.slice_array[1],self.slice_array[3],self.slice_array[0])
+        r1,r2,c1,c2 = self.slice_array
+        return (c1,r2,c2,r1)
+
 
     def submatrix(self,M):
         """
         Return the submatrix of M defined by this Slice.
         """
-        r1=self.slice_array[0]
-        r2=self.slice_array[1]
-        c1=self.slice_array[2]
-        c2=self.slice_array[3]
+        r1,r2,c1,c2 = self.slice_array
         return M[r1:r2,c1:c2]
+
+
+    def __bounds2slice(self,slice_bounds):
+        """
+        Convert a bounding box into an array slice suitable for computing
+        a submatrix.
+
+        Includes all units whose centers are within the specified sheet
+        coordinate bounding box slice_bounds.
+
+        The returned slice does not respect the sheet's bounds: use
+        crop_slice_to_sheet_bounds() to have the slice cropped to the
+        sheet.
+
+        Returns (a,b,c,d) such that a matrix M can be sliced using M[a:b,c:d].
+        """
+        l,b,r,t = slice_bounds.lbrt()
+
+        t_m,l_m = self.sheet.sheet2matrix(l,t)
+        b_m,r_m = self.sheet.sheet2matrix(r,b)
+
+        l_idx = int(ceil(l_m-0.5))
+        t_idx = int(ceil(t_m-0.5))
+        r_idx = int(floor(r_m+0.5))
+        b_idx = int(floor(b_m+0.5))
+
+        return array((t_idx,b_idx,l_idx,r_idx))
+
+
+    def cropped_to_sheet(self):
+        """
+        Return the slice cropped to the sheet's bounds.
+        """
+        sheet_right = self.sheet.bounds.aarect().right()
+        sheet_bottom = self.sheet.bounds.aarect().bottom()
+        maxrow,maxcol = self.sheet.sheet2matrixidx(sheet_right,sheet_bottom)
+
+        t_idx,b_idx,l_idx,r_idx = self.slice_array
+
+        rstart = max(0,t_idx)
+        rbound = min(maxrow,b_idx)
+        cstart = max(0,l_idx)
+        cbound = min(maxcol,r_idx)
+
+        return array((rstart,rbound,cstart,cbound))
+
+
 
 
