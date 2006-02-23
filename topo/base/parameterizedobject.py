@@ -599,7 +599,7 @@ class ParameterizedObject(object):
         """
         param_value_pairs = []
         for name,val in self.get_param_values():
-             param_value_pairs.append( '%s=%s' % (name,val) )
+             param_value_pairs.append( '%s=%s' % (name,repr(val)) )
 
         rep = self.__class__.__name__+"("
 
