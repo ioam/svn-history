@@ -2,25 +2,36 @@
 
 Tasks on which the developers are currently working. 
 <br />
-<small>(Although an item can have the initials of a developer, that doesn't mean others cannot be working on it too. Similarly, items with no initials are not being ignored. Dates indicate the item was first added to the list, or a change was made.)</small>
+
+<small>
+(Initials in parentheses typically indicate the main person working on
+an item, but others may also be involved.  Items with no initials are
+not (yet) assigned to a specific developer. Dates indicate the item
+was first added to the list, or a change was made.)
+</small>
 
 <ul>
 
 <li> 
-2006/02/21 (JC): Cleaning up ports
+2006/02/21 (JC): Reimplementing command-line option processing to provide
+ability to execute Python code in arbitrary combinations of strings and files.
+</li>
+
+<li> 
+2006/02/21 (JC): Cleaning up ports.
 </li>
 
 <li>
-2006/02/21: Split output functions from learning functions to learn and
-apply_output_fn, to allow joint normalization.
+2006/02/21: (JC) Splitting output functions from learning functions to learn and
+apply_output_fn, to allow joint normalization across CFs.
 </li>
 
 <li>
-2006/02/22 (CB): avoid deepcopy of a Numeric ufunc when instantiating a Parameter.
+2006/02/22 (CB): Avoiding deepcopy of a Numeric ufunc when instantiating a Parameter.
 </li>
 
 <li>
-2006/02/21 (CB): Composite pattern generator
+2006/02/21 (CB): Composite pattern generator.
 </li>
 
 <li>
@@ -46,7 +57,7 @@ CFDotProduct_opt1, CFDotProduct_cpointer goes to CFDotProduct_opt2
 
 <li>
 2006/02/21: ReadOnlyParameter to allow declaration of something but not let it
-be set, including in a ParameterizedObject constructor.
+be set anywhere else, even in a ParameterizedObject constructor.
 </li>
 
 <li> 
@@ -54,7 +65,8 @@ be set, including in a ParameterizedObject constructor.
 </li>
 
 <li>
-2006/02/21 (CB): HACKALERTs relating to connection fields; matching with c++ LISSOM when there are circular connection fields.
+2006/02/21 (CB): HACKALERTs relating to connection fields; matching
+with C++ LISSOM when there are circular connection fields.
 </li>
 
 <li>
@@ -62,7 +74,10 @@ be set, including in a ParameterizedObject constructor.
 </li>
 
 <li>
-2006/02/21: Have size, aspect_ratio (etc) Parameters in PatternGenerator so that subclasses can inherit doc, precedence attributes (etc), but have them not used unless a subclass does really use them.
+2006/02/21: Have size, aspect_ratio (etc) Parameters in
+PatternGenerator so that subclasses can inherit doc, precedence
+attributes (etc), but have them not used unless a subclass does really
+use them.
 </li>
 </ul>
 
@@ -78,5 +93,9 @@ Ongoing work with uncertain finishing times.
 
 <li>
 2006/02/21 (CB): pickling
+</li>
+
+<li>
+2006/02/21 (all): Improving documentation and test files; eliminating ALERTs.
 </li>
 </ul>
