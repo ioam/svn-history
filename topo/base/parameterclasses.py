@@ -447,7 +447,7 @@ class ClassSelectorParameter(Parameter):
     """
     """
     # CEBHACKALERT: class_, packages should be slots
-    # __slots__ = ['class_','packages']
+    # __slots__ = ['class_','packages','suffix_to_lose']
     # Having packages a class attribute like this means
     # the list is shared! It's not causing problems right
     # now, but it's wrong. This class and its subclasses
@@ -456,30 +456,24 @@ class ClassSelectorParameter(Parameter):
 
     packages = []
     
-    def __init__(self,class_,default=None,instantiate=True,suffix_to_lose='',**params):
+    def __init__(self,class_,default=None,instantiate=True,
+                 suffix_to_lose='',**params):
         """
         """
         self.class_ = class_
         self.suffix_to_lose = suffix_to_lose
-        Parameter.__init__(self,default=default,instantiate=instantiate,**params)
+        Parameter.__init__(self,default=default,instantiate=instantiate,
+                           **params)
 
-        # check it's in range
-
-    def get_default_class_name(self):
-        """
-        """
-        return self.classname_repr(self.default.__class__.__name__)
+        # CEBHACKALERT: check default's in range
 
     def range(self):
         """
+        Return {visible_name: <class>} for all classes in self.packages.
+        If self.packages is empty, return the default.
 
-            (If pgp is a PatternGeneratorParameter, ofp.range() gives this
-    list. Note that only classes from the currently imported modules are
-    added, so to make all OutputFunctions available, it would first be necessary
-    to do 'from topo.ouputfns import *'.)
+        Only classes from already-imported modules are added.
         
-        e.g. Return a dict of OutputFunctions {visible_name: <outputfn_class>}.
-
         If range is empty, returns the default
         """
         # CEBHACKALERT: e.g. PatternGenerators come out in GUI in the arbitrary
@@ -495,29 +489,21 @@ class ClassSelectorParameter(Parameter):
                                 if class_.abstract==False]
             
             for (name,class_) in concrete_classes:
-                k[self.classname_repr(name)] = class_
+                k[self.__classname_repr(name)] = class_
 
         if len(k)==0:
-            return {self.get_default_class_name():self.default}
+            return {self.__classname_repr(self.default.__class__.__name__):self.default}
         else:
             return k
 
-    # temporary
-    def get_from_key(self,key):
-        """
-        """
-        return self.range()[key]()
-
-    
-    def classname_repr(self, class_name):
+    # CEBHACKALERT: might want to replace underscores with spaces
+    def __classname_repr(self, class_name):
         """
         Return class_name stripped of self.suffix_to_lose.
         """
         # Cut off 'suffix_to_lose'
-        viewable_name = re.sub(self.suffix_to_lose+'$','',class_name)
+        return re.sub(self.suffix_to_lose+'$','',class_name)
         
-        # CEBHACKALERT: replace underscores with spaces
         
-        return viewable_name
 
 
