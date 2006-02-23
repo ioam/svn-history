@@ -30,18 +30,28 @@ apply_output_fn, to allow joint normalization across CFs.
 2006/02/22 (CB): Avoiding deepcopy of a Numeric ufunc when instantiating a Parameter.
 </li>
 
-<li>
-2006/02/21 (CB): Composite pattern generator.
+<li> 
+2006/02/23 (CB): Slice class; HACKALERTs relating to Sheet, xdensity, ydensity (etc).
+</li>
+
+<li> 
+2006/02/23 (all): Ensuring classes are declared abstract when they should be, and making sure base and simple classes are imported into packages (i.e. Sheet into topo/sheets/, Projection into topo/projections/, Constant into topo/patterns/, and so on).
 </li>
 
 
 </ul>
+
 
 <h3>Tasks to be carried out next</h3>
 
 Tasks which the developers are about to start.
 
 <ul>
+
+<li>
+2006/02/23 (CB): Cleaning Composite and Image pattern generators.
+</li>
+
 <li>
 2006/02/21: Renaming of *_py classes so that *_py ones have the original name
 (they are the reference versions), and c (or otherwise optimized
@@ -55,10 +65,6 @@ CFDotProduct_opt1, CFDotProduct_cpointer goes to CFDotProduct_opt2
 <li>
 2006/02/21: ReadOnlyParameter to allow declaration of something but not let it
 be set anywhere else, even in a ParameterizedObject constructor.
-</li>
-
-<li> 
-2006/02/21 (CB): HACKALERTs relating to Sheet, xdensity, ydensity (etc).
 </li>
 
 <li>
