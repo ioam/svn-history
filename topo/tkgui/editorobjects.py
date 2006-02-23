@@ -615,7 +615,7 @@ class EditorProjection(EditorConnection) :
         if self.to_node == self.from_node :
             self.update_factor()
         else: 
-            self.connect_to_coord((self.width / 2) - 10)
+            self.connect_to_coord((self.from_node.width / 2) - 10)
 
     def connect(self, to_node, con) :
         EditorConnection.connect(self, to_node, con)
