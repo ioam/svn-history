@@ -6,21 +6,21 @@ $Id$
 __version__='$Revision$'
 
 import copy
-
-from utils import find_classes_in_package
+import re
+import os.path
 
 from parameterizedobject import Parameter
+from utils import find_classes_in_package
 
 
 # CEBHACKALERT: much of the documentation for Parameter subclasses
 # that ought to be in the class docstring is in the __init__
 # docstring so that it shows up. In some cases there is
 # some repetition.
-# See JABHACKALERT by __doc__.
+# See JABHACKALERT by Parameter's __doc__.
 
 
 # CEBHACKALERT: at the moment, the path must be relative to Topographica's path.
-from os.path import normpath
 class Filename(Parameter):
     """
     Filename is a Parameter that takes a string specifying the
@@ -45,13 +45,13 @@ class Filename(Parameter):
 
         The path must be relative to Topographica's own path.
         """
-        Parameter.__init__(self,normpath(default),**params)
+        Parameter.__init__(self,os.path.normpath(default),**params)
 
     def __set__(self,obj,val):
         """
         Call Parameter's __set__ with the os-specific path.
         """
-        super(Filename,self).__set__(obj,normpath(val))
+        super(Filename,self).__set__(obj,os.path.normpath(val))
 
 
 # CEBHACKALERT: needs to be finished
@@ -441,17 +441,15 @@ def is_number(obj):
 
 
 
-import re
 class ClassSelectorParameter(Parameter):
     """
     """
     __slots__ = ['class_','packages','suffix_to_lose']
     __doc__ = property((lambda self: self.doc))
 
-    # Having packages a class attribute like this means
-    # the list is shared! It's not causing problems right
-    # now, but it's wrong. This class and its subclasses
-    # need updating!
+    # CEBHACKALERT: Having packages a class attribute like this means
+    # the list is shared! It's not causing problems right now, but
+    # it's wrong.
     packages = []
     
     def __init__(self,class_,default=None,instantiate=True,
@@ -470,9 +468,7 @@ class ClassSelectorParameter(Parameter):
         Return {visible_name: <class>} for all classes in self.packages.
         If self.packages is empty, return the default.
 
-        Only classes from already-imported modules are added.
-        
-        If range is empty, returns the default
+        Only classes from already-imported modules are added.        
         """
         # CEBHACKALERT: e.g. PatternGenerators come out in GUI in the arbitrary
         # order of the keys of this dict. They used to come out at least in the
