@@ -16,7 +16,6 @@ from topo.base.utils import find_classes_in_package
 from topo.base.sheet import Sheet
 import topo.projections
 from topo.projections import *
-from topo.base.utils import find_classes_in_package
 from topo.base.projection import Projection
 
 from editorobjects import EditorSheet, EditorProjection
