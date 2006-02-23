@@ -79,6 +79,8 @@ class Projection(EPConnection):
     ProjectionSheet, from an input matrix of activity from the source
     Sheet.  Other than that, a Projection may be of any type.
     """
+    _abstract_class_name = "Projection"
+    
     strength = Number(default=1.0)
 
     def __init__(self,**params):
