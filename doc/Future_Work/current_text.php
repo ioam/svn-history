@@ -34,9 +34,6 @@ apply_output_fn, to allow joint normalization across CFs.
 2006/02/21 (CB): Composite pattern generator.
 </li>
 
-<li>
-2006/02/22 (CB): Clean up ClassSelectorParameter and subclasses.
-</li>
 
 </ul>
 
@@ -81,6 +78,10 @@ use them.
 </li>
 </ul>
 
+<li>
+2006/02/23 (CB): module as well as package list for ClassSelectorParameter?
+E.g. Want BoundingBoxParameter to be a ClassSelectorParameter, but don't want to add all of topo.base, just topo.base.boundingregion.
+</li>
 
 <h3>Other work</h3>
 
