@@ -9,24 +9,21 @@ $Id$
 # untested. Needs to be updated following changes to Sheet and
 # pattern generator.
 
-from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.sheet import bounds2slice
-from topo.outputfns.basic import DivisiveMaxNormalize
-from topo.base.patterngenerator import PatternGenerator
-from topo.base.parameterclasses import Filename, Number, Parameter, Enumeration
-from topo.outputfns import OutputFunctionParameter
-from Numeric import array, transpose, ones, floor, Float, divide, where
-
-# CEBHACKALERT: this is a tragic hack. Who would have thought that the
-# word Image would already have been used by someone else? And in a
-# file about images, too.
+# CEBHACKALERT: We already have 'Image' for the image generator.
 import Image as pImage
 import ImageOps
+from Numeric import array, transpose, ones, floor, Float, divide, where
+
+from topo.base.parameterizedobject import ParameterizedObject
+from topo.base.sheet import bounds2slice, sheet2matrix
+from topo.base.patterngenerator import PatternGenerator
+from topo.base.parameterclasses import Filename, Number, Parameter, Enumeration
+from topo.base.projection import OutputFunctionParameter
+
+from topo.outputfns.basic import DivisiveMaxNormalize
 
 
 # CEBHACKALERT: this is sheet's, but for arrays
-from topo.base.sheet import sheet2matrix
-from Numeric import floor
 def sheet2matrixidx_array(x,y,bounds,density):
     """
     Convert a point (x,y) in sheet coordinates to the integer row and
