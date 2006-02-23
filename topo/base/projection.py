@@ -59,6 +59,8 @@ class OutputFunctionParameter(ClassSelectorParameter):
     """
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
+
+    packages = []
     
     def __init__(self,default=Identity(),**params):
         super(OutputFunctionParameter,self).__init__(OutputFunction,default=default,**params)        

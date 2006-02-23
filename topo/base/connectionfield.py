@@ -290,6 +290,8 @@ class ResponseFunctionParameter(ClassSelectorParameter):
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
+    packages = []
+
     def __init__(self,default=GenericCFResponseFn(),**params):
         """
         """
@@ -345,6 +347,8 @@ class LearningFunctionParameter(ClassSelectorParameter):
     """
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
+
+    packages = []
 
     def __init__(self,default=IdentityCFLF(),**params):
         """

@@ -447,15 +447,12 @@ class ClassSelectorParameter(Parameter):
     __slots__ = ['class_','suffix_to_lose']
     __doc__ = property((lambda self: self.doc))
 
-    # CEBHACKALERT: Having packages a class attribute like this means
-    # the list is shared! It's not causing problems right now, but
-    # it's wrong.
-    packages = []
-    
     def __init__(self,class_,default=None,instantiate=True,
                  suffix_to_lose='',**params):
         """
         """
+        assert (hasattr(self, 'packages') and isinstance(self.packages,list)), "ClassSelectorParameter subclasses must have the class attribute 'packages', and it must be a list."
+        
         self.class_ = class_
         self.suffix_to_lose = suffix_to_lose
         Parameter.__init__(self,default=default,instantiate=instantiate,

@@ -175,6 +175,8 @@ class PatternGeneratorParameter(ClassSelectorParameter):
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
+    packages = []
+
     def __init__(self,default=Constant(),**params):
         """
         """
