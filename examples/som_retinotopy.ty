@@ -58,7 +58,7 @@ class RetinotopicSOM(CFSOM):
 
 # input patterns
 GeneratorSheet.period = 1.0
-GeneratorSheet.density = 10
+GeneratorSheet.density = 24
 
 # CEBHACKALERT: will go to wherever DynamicValue is
 class UniformRandomValue(object):
@@ -80,7 +80,7 @@ input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size = 2*sqrt(2.0*0.1*24.
                                     orientation=DynamicNumber(UniformRandomValue((-pi,pi))))
 
 # cortical sheet
-RetinotopicSOM.density = 10
+RetinotopicSOM.density = 40
 RetinotopicSOM.learning_length = 40000
 
 RetinotopicSOM.radius_0 = 13.3/40
