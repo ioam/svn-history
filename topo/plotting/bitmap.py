@@ -24,15 +24,13 @@ __version__='$Revision$'
 from colorsys import hsv_to_rgb
 
 import Numeric, Image, math
-
 from topo.base.parameterclasses import Parameter
 from topo.base.parameterizedobject import ParameterizedObject
 
 ### JCALERT: To do:
 ###        - Update the test file.
 ###        - Write PaletteBitmap when the Palette class is fixed
-###        - Get rid of view_info
-###        - Get rid of accessing function (copy, show...), though it is not crucial.
+###        - Get rid of accessing function (copy, show...) (should we really?)
 
 class Bitmap(ParameterizedObject):
     """
@@ -55,8 +53,10 @@ class Bitmap(ParameterizedObject):
 
 	# copy of the plot plot_src_name, used for displaying label along with self.name
         self.plot_src_name = None
-	### JCALERT! maybe renamed self.view_info, the same for the plot...
 	self.name = None
+	# indicate if we should re-size as a topographica plot (using integer)
+	# or if it is a static image that we can re-size without having to worry 
+	# about what a pixel represents.
 	self.resize = True
 
 
@@ -141,7 +141,7 @@ class PaletteBitmap(Bitmap):
         ### structure, unless for some reason we want to get rid of
         ### the Palette classes and always use data structures
         ### instead.
-
+	### JC: not yet properly implemented anyway.
         max_pixel_value=255
 
         newImage = self._arrayToImage(inArray)
