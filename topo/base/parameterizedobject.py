@@ -785,6 +785,37 @@ class ParameterizedObject(object):
         self.initialized=True
 
 
+
+##     def __getstate__(self):
+##         """
+##         """
+##         state = {}
+
+##         # deepcopy Parameters in the object's __dict__;
+##         # shallow copy other items (i.e. we assume mutable objects are in Parameters)
+##         if hasattr(self, '__dict__'):
+
+##             # do the usual
+##             state.update(copy.copy(self.__dict__))
+
+##             # but parameters get deepcopied
+##             for (k,v) in self.__dict__.items():
+##                 if isinstance(v,Parameter):
+##                     state[k] = copy.deepcopy(v)
+## #                else:
+## #                    state[k] = copy.copy(v)  # why didn't that work?
+                
+##         ## and slots if it has slots: none has slots
+##         #if hasattr(self, '__slots__'):
+##         #    print "SLOTS"
+##         #    for k in c.__slots__:
+##         #        state[k] = getattr(self,k) # is copy enough? no mutable values in slots?
+
+##         # could look for lambdas and warn
+        
+##         return state
+
+
     def unpickle(self):
         pass
 
