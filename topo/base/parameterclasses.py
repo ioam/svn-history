@@ -490,6 +490,111 @@ class ClassSelectorParameter(Parameter):
         # Cut off 'suffix_to_lose'
         return re.sub(self.suffix_to_lose+'$','',class_name)
         
+
+
+## # For the moment, this takes the string name in the form
+## # module.function
+## # and does 'import module' itself.
+## # Ideally this would instead take the function itself,
+## # and work out the right string to re-generate it.
+## # random.uniform, for example, has __name__ and __module__:
+## # it would be easy for that. But Numeric.add has no useful
+## # attributes and would need to be taken from repr(Numeric.add),
+## # in a way that would work for random etc. too.
+## # I haven't tried that yet...
+## class Wrapper(object):
+##     """
+##     Why Wrapper has to exist...
+##     """
+##     __slots__ = ['function_','function_as_text','module_name','args','kw']
+
+##     def __repr__(self):
+##         # CEBHACKALERT: not quite right, need to format args and kw
+##         return "Wrapper('"+self.function_as_text+"', "+`self.args`+", "+`self.kw`+")"
+
+##     def __str__(self):
+##         return "Wrapper('"+self.function_as_text+"')"
+
+##     def __getattribute__(self,attribute):
+##         """
+##         If the Wrapper object has the attribute, return it; if the
+##         function_ object has the attribute, return it; otherwise,
+##         raise an AttributeError.
+##         """
+##         try:
+##             x= object.__getattribute__(self,attribute)
+##         except AttributeError:
+##             function_ = object.__getattribute__(self,'function_')
+##             if hasattr(function_,attribute):
+##                 x = getattr(function_,attribute)
+##             else:
+##                 raise AttributeError("Neither "+`self`+" nor "+`self.function_`+" has the attribute '"+ attribute+"'.")
+##         return x        
+        
+    
+##     def __init__(self,function_as_text,*args,**kw):
+##         """
+##         Create the function from the text.
+##         function_as_text must be in the form 'module.function'.
+##         """
+##         self.function_as_text = function_as_text
+
+##         breakdown = function_as_text.split('.')
+##         assert len(breakdown)==2, "Wrapper must be given function in the form 'module.function'."
+        
+##         self.module_name = breakdown[0]
+##         self.args=args
+##         self.kw=kw
+##         self.function_ = self.__get_real_function()
+        
+              
+##     def __call__(self,*args,**kw):
+##         """
+##         If args or kw passed, return self.function_(*args,**kw);
+##         otherwise, return self.function_(**self.args,**self.kw).
+
+##         Allows Wrapper to be used when functions take arguments
+##         at call-time (e.g. Numeric.add(1,2)) and when functions
+##         have arguments specified on creation (e.g. when they are
+##         in a DynamicNumber and will be called without arguments).
+##         """
+##         if len(args)==0 and len(kw)==0:
+##             return self.function_(*self.args,**self.kw)
+##         else:
+##             return self.function_(*args,**kw)
+
+##     def __get_real_function(self):
+##         exec('import '+self.module_name)
+##         return eval(self.function_as_text)
+
+##     def __getstate__(self):
+##         """
+##         Can't pickle self.function_, so don't return it
+##         as part of the state. Instead, we recreate it
+##         in __setstate__().
+##         """
+##         state = {}
+        
+##         for slot in self.__slots__:
+##             state[slot]=getattr(self,slot)
+
+##         del state['function_']
+
+##         return state
+
+##     def __setstate__(self,state):
+##         """
+##         Restore the state.
+##         """
+##         for (k,v) in state.items():
+##             setattr(self,k,v)
+##         self.function_ = self.__get_real_function()
         
 
+        
+
+
+        
+        
+        
 
