@@ -253,4 +253,27 @@ def keys_sorted_by_value(d):
     return [ backitems[i][1] for i in range(0,len(backitems))]
 
 
+## import inspect
+## from topo.base.parameterizedobject import Parameter, ParameterizedObject
+## def recurse_modules_get_class_state(dict_,name,class_state,classes,processed):
+##     print "process",name
+##     for (k,v) in dict_.items():
+##         if '__all__' in dict_:
+##             a = dict_['__all__']
+##             for (k,v) in dict_.items():
+##                 # exclude plotting: it's full of lambdas and not part of the simulator!
+##                 if inspect.ismodule(v) and processed.count(k)<1 and a.count(k)>0 and k!='plotting':
+##                     processed.append(k)
+##                     recurse_modules_get_class_state(v.__dict__,v.__name__,class_state,classes,processed)
 
+##         else:
+##             if isinstance(v,type) and issubclass(v,ParameterizedObject):
+##                 class_state[k] = {}
+##                 classes[k] = v.__module__
+
+##                 # class ALWAYS has __dict__, right?
+##                 # Also, PO doesn't have slots.
+##                 for (name,obj) in v.__dict__.items():
+##                     if isinstance(obj,Parameter):
+##                         class_state[k][name] = obj  # should it be copy?
+                
