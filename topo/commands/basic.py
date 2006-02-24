@@ -176,3 +176,57 @@ def save_snapshot(snapshot_name):
         pickle.dump(sim, open(snapshot_name,'wb'), 2)
 
 
+
+
+## import __main__
+## import pickle
+
+## from topo.base.parameterizedobject import ParameterizedObject,Parameter
+## from topo.misc.utils import recurse_modules_get_class_state
+                                 
+## def save_snapshot(snapshot_name):
+##     """
+##     Save a snapshot of the current network's state.
+
+##     snapshot_name is the file name string.
+
+##     Uses Python's 'pickle' module, so subject to the same limitations.
+##     ** update
+##     """
+##     sim = topo.base.simulator.get_active_sim()
+
+##     class_state = {}
+##     classes = {}
+
+##     # for now we just search topo, but it could be extended to all packages.
+##     topo_ = __main__.__dict__['topo']
+##     recurse_modules_get_class_state(topo_.__dict__,topo_.__name__,class_state,classes,[])
+    
+##     pickle.dump((sim,classes,class_state), open(snapshot_name,'wb'), 2)
+
+
+## def load_snapshot(snapshot_name):
+##     """
+##     Return the current network to the state of the specified snapshot.
+
+##     snapshot_name is the file name string.
+##     """
+    
+##     sim,classes,class_state = pickle.load(open(snapshot_name,'rb'))
+
+##     topo.base.simulator.set_active_sim(sim)
+
+##     # Import classes back to __main__.
+##     # i.e. "import path.to.module"
+##     for (class_,path) in classes.items():
+##         exec 'import '+path in __main__.__dict__
+    
+##     # Set class attributes
+##     # i.e. "path.to.module.Class.x=y"
+##     for class_name,state in class_state.items():
+##         for p_name,p in state.items():
+##             __main__.__dict__['val'] = p
+##             exec 'setattr('+classes[class_name]+'.'+class_name+',"'+p_name+'",val)' in __main__.__dict__
+##             print 'setattr('+classes[class_name]+'.'+class_name+',"'+p_name+'",val)'
+##     # (? assumes parameters weren't added dynamically to a class i.e. they're all
+##     # in the source code)
