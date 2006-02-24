@@ -27,7 +27,7 @@ apply_output_fn, to allow joint normalization across CFs.
 </li>
 
 <li>
-2006/02/22 (CB): Avoiding deepcopy of a Numeric ufunc when instantiating a Parameter.
+2006/02/24 (CB): Correct ParameterizedObject's __getstate__ and still allow pickling; allow deepcopy of a Numeric ufunc when instantiating a Parameter, and deepcopy lambdas etc. 
 </li>
 
 <li> 
@@ -92,6 +92,10 @@ attributes (etc), but have them not used unless a subclass does really
 use them.
 </li>
 
+<li>
+2006/02/24: Filename paths (for Filename Parameter and plot templates).
+</li>
+
 </ul>
 
 <h3>Other work</h3>
@@ -101,10 +105,6 @@ Ongoing work with uncertain finishing times.
 <ul>
 <li>
 2006/02/21 (CB): Read-only objects, aiming at copy-on-write semantics
-</li>
-
-<li>
-2006/02/21 (CB): pickling
 </li>
 
 <li>
