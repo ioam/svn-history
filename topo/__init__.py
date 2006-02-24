@@ -51,9 +51,11 @@ __all__ = ['analysis',
 # Enable automatic importing of .ty files, treating them just like .py
 import topo.misc.tyimputil
 
+import os
 
 ABOUT_TEXT = """
-Pre-release version of Topographica; an updated version may be
+Pre-release version """+os.getenv("TOPORELEASE","")+ \
+""" of Topographica; an updated version may be
 available from topographica.org.
 
 Copyright 2005 James A. Bednar, Christopher Ball, Yoonsuck Choe,
