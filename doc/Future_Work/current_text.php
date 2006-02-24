@@ -27,11 +27,7 @@ apply_output_fn, to allow joint normalization across CFs.
 </li>
 
 <li>
-2006/02/24 (CB): Correct ParameterizedObject's __getstate__ and still allow pickling; allow deepcopy of a Numeric ufunc when instantiating a Parameter, and deepcopy lambdas etc. 
-</li>
-
-<li> 
-2006/02/23 (CB): Slice class; HACKALERTs relating to Sheet, xdensity, ydensity (etc).
+2006/02/24 (CB): Correct ParameterizedObject's __getstate__ and still allow pickling; allow deepcopy of a Numeric ufunc when instantiating a Parameter. 
 </li>
 
 <li> 
@@ -43,8 +39,7 @@ apply_output_fn, to allow joint normalization across CFs.
 </li>
 
 <li>
-2006/02/23 (CB): module as well as package list for ClassSelectorParameter?
-E.g. Want BoundingBoxParameter to be a ClassSelectorParameter, but don't want to add all of topo.base, just topo.base.boundingregion.
+2006/02/24 (JC): Filename paths (for Filename Parameter and plot templates etc).
 </li>
 
 
@@ -56,6 +51,19 @@ E.g. Want BoundingBoxParameter to be a ClassSelectorParameter, but don't want to
 Tasks which the developers are about to start.
 
 <ul>
+
+<li>
+2006/02/24 (CB): SheetSelectorParameter etc (so that the GUI (model editor) can
+display list of sheets etc from a Parameter. find_classes_in_package() will
+become a method of ClassSelectorParameter. Then module as well as package list 
+for ClassSelectorParameter. E.g. Want BoundingBoxParameter to be a 
+ClassSelectorParameter, but don't want to add all of topo.base, just 
+topo.base.boundingregion.
+</li>
+
+<li> 
+2006/02/24 (CB): Slice class; HACKALERTs relating to Sheet, xdensity, ydensity (etc).
+</li>
 
 <li>
 2006/02/23 (CB): Cleaning Composite and Image pattern generators.
@@ -92,9 +100,6 @@ attributes (etc), but have them not used unless a subclass does really
 use them.
 </li>
 
-<li>
-2006/02/24: Filename paths (for Filename Parameter and plot templates).
-</li>
 
 </ul>
 
