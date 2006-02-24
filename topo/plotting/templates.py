@@ -11,7 +11,7 @@ __version__='$Revision$'
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.keyedlist import KeyedList
-from topo.base.parameterclasses import Parameter
+from topo.base.parameterclasses import Parameter, BooleanParameter
 
 
 class PlotGroupTemplate(ParameterizedObject):
@@ -29,9 +29,8 @@ class PlotGroupTemplate(ParameterizedObject):
     be modified.
     """
     
-    command = Parameter(None)
-    ### JABHACKALERT: Is this used?  Seems strange to be a string; also used as Boolean below.
-    normalize = Parameter('False')
+    command = Parameter('pass')
+    normalize = BooleanParameter(False)
     
     def __init__(self, plot_templates=[], static_images = [],**params):
         """
@@ -85,7 +84,7 @@ class PlotGroupTemplate(ParameterizedObject):
 	self.plot_templates = KeyedList(plot_templates)
 	self.static_images = KeyedList(static_images)
 
-    ### JCALERT! We might eventually write this function 'Python-like'
+    ### JCALERT! We might eventually write these two functions 'Python-like'
     ### by using keyword argument to specify each channel a,d then get the dictionnary 
     ### of all remaining argument....
     def add_plot(self,name,specification_tuple_list):
@@ -94,9 +93,6 @@ class PlotGroupTemplate(ParameterizedObject):
 	    dict[key]=value
 	self.plot_templates.append((name,dict))
 
-    ### JCALERT! We might eventually write this function 'Python-like'
-    ### by using keyword argument to specify each channel a,d then get the dictionnary 
-    ### of all remaining argument....
     def add_static_image(self,name,file_path):
 	self.static_images.append((name,file_path))
         
@@ -123,6 +119,7 @@ plotgroup_templates = KeyedList()
 # (currently ignored?) and a documentation string describing each plot
 # (for hovering help text) within each template.
 # JC: we should also maybe add the situate option (and auto-refresh?)
+# I think Normalize is alright now...
 ### we might want to pass a plotgroup_type to the template
 ### (see corresponding alert in PlotGroupPanel)
 
@@ -134,14 +131,11 @@ def new_plotgroup_template(name,command,normalize=False):
 pgt = new_plotgroup_template(name='Activity',command='update_activity()')
 pgt.add_plot('Activity',[('Strength','Activity'),('Hue','OrientationPreference'),('Confidence','OrientationSelectivity')])
 
-### JCALERT! unitweightpanel could be re-named Connectionfields panel...?
-### Also, the situate option could be specified in the template.
-### Also implement the test for 'Weights' in PlotGroup.
-pgt = new_plotgroup_template(name='Connection Fields',command='update_connectionfields()',normalize='True')
+pgt = new_plotgroup_template(name='Connection Fields',command='update_connectionfields()',normalize=True)
 pgt.add_plot('Connection Fields',[('Strength','Weights'),('Hue','OrientationPreference'),('Confidence','OrientationSelectivity')])
 
 
-pgt = new_plotgroup_template(name='Projection',command='update_projections()',normalize='True')
+pgt = new_plotgroup_template(name='Projection',command='update_projections()',normalize=True)
 pgt.add_plot('Projection',[('Strength','Weights'),('Hue','OrientationPreference'),('Confidence','OrientationSelectivity')])
 
 
