@@ -29,8 +29,10 @@ SAVED_FILETYPES = [('Topographica saved networks','*'+SAVED_FILE_EXTENSION),('Al
 
 # CEBHACKALERT: will there be "not found" errors if they
 # didn't build doc/ (for which they need php...)?
-tutorial_url         = 'doc/Tutorial/index.html'
+user_manual_url      = 'doc/User_Manual/index.html'
+tutorials_url         = 'doc/Tutorials/index.html'
 reference_manual_url = 'doc/Reference_Manual/index.html'
+
 
 python_doc_url       = 'http://www.python.org/doc/'
 topo_www_url         = 'http://www.topographica.org/'
@@ -228,23 +230,29 @@ class TopoConsole(Frame):
                                  'Licensing and release information',
                                  label="About",
                                  command=self.new_about_window)
-         
+
         self.menubar.addmenuitem('Help', 'command',
-                                 'Walk-through LISSOM example',
-                                 label="Tutorial",
-                                 command=(lambda url=tutorial_url: self.open_url(url,relative=True)))
+                                 'How to use Topographica',
+                                 label="User Manual",
+                                 command=(lambda url=user_manual_url: self.open_url(url,relative=True)))
+
         self.menubar.addmenuitem('Help', 'command',
-                                 'Detailed documentation',
+                                 'Walk-through examples',
+                                 label="Tutorials",
+                                 command=(lambda url=tutorials_url: self.open_url(url,relative=True)))
+        self.menubar.addmenuitem('Help', 'command',
+                                 'Detailed code documentation',
                                  label="Reference Manual",
                                  command=(lambda url=reference_manual_url: self.open_url(url,relative=True)))
-        self.menubar.addmenuitem('Help', 'command',
-                                 'Python reference',
-                                 label="Python documentation",
-                                 command=(lambda url=python_doc_url: self.open_url(url)))
         self.menubar.addmenuitem('Help', 'command',
                                  'Topographica on the web',
                                  label="Topographica.org",
                                  command=(lambda url=topo_www_url: self.open_url(url)))
+
+        self.menubar.addmenuitem('Help', 'command',
+                                 'Python reference',
+                                 label="Python documentation",
+                                 command=(lambda url=python_doc_url: self.open_url(url)))
 
         
         #
@@ -432,16 +440,18 @@ class TopoConsole(Frame):
             
     def open_url(self, location, relative=False):
         """
+        Try to open the specified location in a new window of the default
+        browser. See webbrowser module for more information.
         """
         
         if relative:
             location = os.path.join(os.getcwd(),location)
             
         try:
-            webbrowser.open(location,autoraise=True)
-            self.messageBar.message('state', 'Launched browser to '+location)
+            webbrowser.open(location,new=True,autoraise=True)
+            self.messageBar.message('state', 'Opened '+location+' in browser.')
         except Error:
-            self.messageBar.message('state', 'Unable to launch a browser')
+            self.messageBar.message('state', 'Unable to control any browser.')
 
 
     #
