@@ -302,6 +302,39 @@ class Parameter(object):
             return self._name
 
 
+##     def __getstate__(self):
+##         """
+##         All Parameters have slots, not a dict, so we have to support
+##         pickle and deepcopy ourselves.
+##         """
+##         # The only complication is that a subclass' __slots__ do
+##         # not contain superclass' __slots__ (the superclass' __slots__
+##         # end up as attributes of the subclass (though it has no
+##         # __dict__.
+##         classes = [klass for klass in classlist(type(self))
+##                    if hasattr(klass,'__slots__')]
+        
+##         all_slots = []
+##         for klass in classes:
+##             all_slots+=klass.__slots__
+        
+##         state = {}
+##         for slot in all_slots:
+##             state[slot] = getattr(self,slot)
+
+##         return state
+
+##     def __setstate__(self,state):
+##         """
+##         Parameter doesn't have a __dict__, just __slots__.
+##         So we support pickle and deepcopy ourselves.
+##         """
+##         for (k,v) in state.items():
+##             setattr(self,k,v)
+        
+            
+        
+
     # When a Parameter is owned by a ParameterizedObject, we want the
     # documentation for that object to print the doc slot for this
     # parameter, not the __doc__ value for the Parameter class or
