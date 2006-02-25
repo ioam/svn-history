@@ -184,7 +184,7 @@ in Neuron or Genesis instead.
   <P><DT>Random number streams</DT><DD>
   Need to provide finer control over the generation of separate
   streams of random numbers, allowing them to be selected independently
-  for different uses, and to allow the sterams to be played back reliably.
+  for different uses, and to allow the streams to be played back reliably.
 
   <P><DT>Map statistics</DT><DD>  
   Will implement general routines for measuring the statistical
@@ -451,7 +451,7 @@ self-organization' from 'Representing signals in topographic maps' and
 
 Should allow the user to specify the parameters and network setup
 themselves, instead of having a learned map.  (E.g. select tuning
-width, connection types, etc.)  
+width, connection types, etc.)
 
 It should also be possible to import a map measured in the lab into
 Topographica, then allow the user to try it out by synthesizing a
@@ -534,4 +534,49 @@ Minor points for the tutorial:
 Need to add color keys to the Preference Map panels, e.g. by having a
 slot for it in the template.
 
+-------------------------------------------------------------------------------
+
+More Eyal comments:
+
+Need to specify what each 'neuron' in the simulation represents.
+How many simulated 'neurons' per simulated 'column'?
+
+Good point.
+
+Why are the lateral excitatory connections so limited and fixed?
+
+It would be nice to include moving stimuli (drifting gratings, random dots etc.)
+
+Display issues;
+  
+  1) Model editor - not clear how to interpret; how to modify;
+
+  2) State that each little plot in the projection plot shows only the -->
+     connection field of the neuron, not the entire set of afferents from the retina.
+
+  3)      Suggestions for Test pattern window
+  a.       contrast (0-100%) instead of scale
+  b.      mean luminance (0-1) instead of offset
+  c.       Change units for orientation to deg
+
+  (Part of our general project of allowing
+   user-configurable units. I think that's is the only way to do things
+   like this, because the simulator is not limited to vision only, and so
+   the underlying units have to be very general.)
+
+Minor
+  
+3) Say in the tutorial that orientation maps look funny around the
+edges, because of the effects of having lateral connections 
+that are cut in half at that border.
+
+To figure out:
+
+4) There is no response in V1 to a small square despite a strong
+   response in the retina. Does the response get canceled by the
+   lateral inhibition?
+
+5) At point 9 in the tutorial, when I press the Normalize toggle I get
+   strange activity pattern in the retina and V1 and when I press the
+   Normalize toggle again it does not revert to the old response.
 -->
