@@ -315,6 +315,7 @@ class TopoConsole(Frame):
         Frame.destroy(self)     # Get rid of widgets
         self.parent.destroy()   # Get rid of window
         if topo.gui_cmdline_flag:
+            print "Quit selected; exiting"
             sys.exit()
 
 
