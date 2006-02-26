@@ -302,37 +302,32 @@ class Parameter(object):
             return self._name
 
 
-##     def __getstate__(self):
-##         """
-##         All Parameters have slots, not a dict, so we have to support
-##         pickle and deepcopy ourselves.
-##         """
-##         # The only complication is that a subclass' __slots__ do
-##         # not contain superclass' __slots__ (the superclass' __slots__
-##         # end up as attributes of the subclass (though it has no
-##         # __dict__.
-##         classes = [klass for klass in classlist(type(self))
-##                    if hasattr(klass,'__slots__')]
+    def __getstate__(self):
+        """
+        All Parameters have slots, not a dict, so we have to support
+        pickle and deepcopy ourselves.
+        """
+        # The only complication is that a subclass' __slots__ do
+        # not contain superclass' __slots__ (the superclass' __slots__
+        # end up as attributes of the subclass).
+        classes = [klass for klass in classlist(type(self))
+                   if hasattr(klass,'__slots__')]
         
-##         all_slots = []
-##         for klass in classes:
-##             all_slots+=klass.__slots__
+        all_slots = []
+        for klass in classes:
+            all_slots+=klass.__slots__
         
-##         state = {}
-##         for slot in all_slots:
-##             state[slot] = getattr(self,slot)
+        state = {}
+        for slot in all_slots:
+            state[slot] = getattr(self,slot)
 
-##         return state
+        return state
 
-##     def __setstate__(self,state):
-##         """
-##         Parameter doesn't have a __dict__, just __slots__.
-##         So we support pickle and deepcopy ourselves.
-##         """
-##         for (k,v) in state.items():
-##             setattr(self,k,v)
-        
-            
+
+    def __setstate__(self,state):
+        """See __getstate__()"""
+        for (k,v) in state.items():
+            setattr(self,k,v)
         
 
     # When a Parameter is owned by a ParameterizedObject, we want the
@@ -731,40 +726,21 @@ class ParameterizedObject(object):
 
     def __getstate__(self):
         """
-        CEBHACKALERT: I will document this function.
+        Save the object's state: return a dictionary that is a shallow
+        copy of the object's __dict__, except that entries in __dict__
+        which are Parameters get deep copied.
+
+        (i.e. we assume mutable objects are in Parameters.)
+
+        ParameterizedObjects always have a __dict__ and do not have __slots__.
         """
-        state = {}
+        # shallow copy the __dict__ because we change some entries
+        state = self.__dict__.copy()
 
-        # first get class-level attributes
-
-        # CEBHACKALERT: I think this can be re-written properly
-        # now...traversing the class hierarchy ought to be possible when
-        # e.g. lambdas aren't hidden away in DynamicNumbers. Currently
-        # this code avoids the problem because unpicklable things
-        # are never reached.
-        c = self.__class__
-        for entry in c.__dict__.keys():
-            if isinstance(c.__dict__[entry], Parameter): 
-                state[entry] = getattr(self, entry)
-        # end CEBHACKALERT
-
-        # now get the object's __dict__
-        try:
-            state.update(copy.copy(self.__dict__))
-            
-        except AttributeError,err:
-            # object doesn't have a __dict__
-            pass
-
-        # get slots for this object's classes
-        for c in classlist(type(self)):
-            try:
-                for k in c.__slots__:
-                    state[k] = getattr(self,k)
-                    
-            except AttributeError:
-                # class doesn't have __slots__
-                pass
+        # deep copy Parameters; overwrites their original shallow copies 
+        for (k,v) in self.__dict__.items():
+            if isinstance(v,Parameter):
+                state[k] = copy.deepcopy(v)
 
         return state
 
@@ -781,43 +757,8 @@ class ParameterizedObject(object):
         for k,v in state.items():
             setattr(self,k,v)
             
-        self.unpickle()
         self.initialized=True
 
-
-
-##     def __getstate__(self):
-##         """
-##         """
-##         state = {}
-
-##         # deepcopy Parameters in the object's __dict__;
-##         # shallow copy other items (i.e. we assume mutable objects are in Parameters)
-##         if hasattr(self, '__dict__'):
-
-##             # do the usual
-##             state.update(copy.copy(self.__dict__))
-
-##             # but parameters get deepcopied
-##             for (k,v) in self.__dict__.items():
-##                 if isinstance(v,Parameter):
-##                     state[k] = copy.deepcopy(v)
-## #                else:
-## #                    state[k] = copy.copy(v)  # why didn't that work?
-                
-##         ## and slots if it has slots: none has slots
-##         #if hasattr(self, '__slots__'):
-##         #    print "SLOTS"
-##         #    for k in c.__slots__:
-##         #        state[k] = getattr(self,k) # is copy enough? no mutable values in slots?
-
-##         # could look for lambdas and warn
-        
-##         return state
-
-
-    def unpickle(self):
-        pass
 
     def params(self):
         """
@@ -847,7 +788,8 @@ def print_all_param_defaults():
 
     
 
-
+# CEBHACKALERT: I think this function's not used. It was created to
+# allow the GUI to do something, but is no longer required.
 def class_parameters(parameterized_class):
     """
     Return the non-hidden Parameters of the specified ParameterizedObject class
