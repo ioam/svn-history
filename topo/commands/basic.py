@@ -4,13 +4,18 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.parameterizedobject import ParameterizedObject
+import __main__
+import pickle
+
+import topo.base.simulator
+from topo.base.parameterizedobject import ParameterizedObject, Parameter
 from topo.base.sheet import Sheet
 from topo.base.projection import ProjectionSheet
-import topo.base.simulator
 from topo.sheets.generatorsheet import GeneratorSheet
+from topo.misc.utils import get_states_of_classes_from_module
 
-import pickle
+
+
 
 def save_input_generators():
     """Save a copy of the active_sim's current input_generators for all GeneratorSheets."""
@@ -106,62 +111,6 @@ def pattern_present(inputs=None,duration=1.0,learning=False,overwrite_previous=F
             restore_input_generators()
 
 
-# CEBHACKALERT: see below
-import topo.patterns.basic
-import topo.patterns.random
-from topo.base.sheet import Sheet
-import __main__
-
-def load_snapshot(snapshot_name):
-    """
-    Return the current network to the state of the specified snapshot.
-
-    snapshot_name is the file name string.
-
-    The specified snapshot should correspond to the network
-    structure currently loaded, e.g. a snapshot saved from the
-    lissom_or.ty example should be loaded only if lissom_or.ty has
-    itself first been run. Otherwise, the loaded snapshot is likely
-    to have incorrect behaviour.
-    """
-    # CEBHACKALERT:
-    # Should there be a check that the right kind of network has
-    # been loaded? If so, add it and change docstring above.
-    
-    # CEBHACKALERT:
-    # Should this execute in __main__.__dict__?
-    # load_cmd = 'import pickle; saved_sim=pickle.load(open("'+snapshot_name+'","rb")); import topo.base.simulator; topo.base.simulator.set_active_sim(saved_sim)'
-    #  exec load_cmd in __main__.__dict__
-    #
-    # Also confusion that current simulator is left behind as e.g. s
-
-    saved_sim = pickle.load(open(snapshot_name,'rb'))         
-    topo.base.simulator.set_active_sim(saved_sim)
-
-    # CEBHACKALERT:
-    # Until I figure out how to pickle random properties of the topo.patterns.basic.Gaussian properly...
-    # There are two hacks here now, because there are two different ways that we use lambda functions to generate random numbers in scripts. lissom_oo_or.ty uses one way; the other scripts use a different way.
-
-    if snapshot_name.find("lissom_oo_or_20000.typ")>0:
-        hack = """
-from topo.base.simulator import get_active_sim
-from topo.base.sheet import Sheet
-r=get_active_sim().objects(Sheet)['Retina']
-r.input_generator=input_pattern
-"""
-    else:
-        hack = """
-from topo.base.simulator import get_active_sim
-from topo.sheets.generatorsheet import GeneratorSheet
-gs_list = get_active_sim().objects(GeneratorSheet).values()
-try:
-    [gs.set_input_generator(topo.patterns.basic.Gaussian()) for gs in gs_list]
-except NameError:
-    pass
-"""
-        
-    exec hack in __main__.__dict__
-
 def save_snapshot(snapshot_name):
     """
     Save a snapshot of the current network's state.
@@ -169,64 +118,46 @@ def save_snapshot(snapshot_name):
     snapshot_name is the file name string.
 
     Uses Python's 'pickle' module, so subject to the same limitations.
+    ** update
     """
     sim = topo.base.simulator.get_active_sim()
 
-    if sim != None:
-        pickle.dump(sim, open(snapshot_name,'wb'), 2)
+    states_of_classes = {}
+    classes = {}
 
-
-
-
-## import __main__
-## import pickle
-
-## from topo.base.parameterizedobject import ParameterizedObject,Parameter
-## from topo.misc.utils import recurse_modules_get_class_state
-                                 
-## def save_snapshot(snapshot_name):
-##     """
-##     Save a snapshot of the current network's state.
-
-##     snapshot_name is the file name string.
-
-##     Uses Python's 'pickle' module, so subject to the same limitations.
-##     ** update
-##     """
-##     sim = topo.base.simulator.get_active_sim()
-
-##     class_state = {}
-##     classes = {}
-
-##     # for now we just search topo, but it could be extended to all packages.
-##     topo_ = __main__.__dict__['topo']
-##     recurse_modules_get_class_state(topo_.__dict__,topo_.__name__,class_state,classes,[])
+    # for now we just search topo, but it could be extended to all packages.
+    topo_ = __main__.__dict__['topo']
+    get_states_of_classes_from_module(topo_,states_of_classes,[])
     
-##     pickle.dump((sim,classes,class_state), open(snapshot_name,'wb'), 2)
+    pickle.dump((sim,states_of_classes), open(snapshot_name,'wb'), 2)
 
 
-## def load_snapshot(snapshot_name):
-##     """
-##     Return the current network to the state of the specified snapshot.
+def load_snapshot(snapshot_name):
+    """
+    Return the current network to the state of the specified snapshot.
 
-##     snapshot_name is the file name string.
-##     """
+    snapshot_name is the file name string.
+    """
     
-##     sim,classes,class_state = pickle.load(open(snapshot_name,'rb'))
+    sim,states_of_classes = pickle.load(open(snapshot_name,'rb'))
 
-##     topo.base.simulator.set_active_sim(sim)
+    topo.base.simulator.set_active_sim(sim)
 
-##     # Import classes back to __main__.
-##     # i.e. "import path.to.module"
-##     for (class_,path) in classes.items():
-##         exec 'import '+path in __main__.__dict__
-    
-##     # Set class attributes
-##     # i.e. "path.to.module.Class.x=y"
-##     for class_name,state in class_state.items():
-##         for p_name,p in state.items():
-##             __main__.__dict__['val'] = p
-##             exec 'setattr('+classes[class_name]+'.'+class_name+',"'+p_name+'",val)' in __main__.__dict__
-##             print 'setattr('+classes[class_name]+'.'+class_name+',"'+p_name+'",val)'
-##     # (? assumes parameters weren't added dynamically to a class i.e. they're all
-##     # in the source code)
+    # Set class attributes
+    # i.e. "path.to.module.Class.x=y"
+    for class_name,state in states_of_classes.items():
+
+        # Import class back to __main__
+        # from "topo.base.parameter.Parameter", we want "topo.base.parameter"
+        module_path = class_name[0:class_name.rindex('.')] 
+        #print 'import '+module_path
+        exec 'import '+module_path in __main__.__dict__
+
+        # now restore class Parameter values
+        for p_name,p in state.items():
+            __main__.__dict__['val'] = p
+            #print 'setattr('+class_name+',"'+p_name+'",val)'
+            exec 'setattr('+class_name+',"'+p_name+'",val)' in __main__.__dict__
+
+    # (? assumes parameters weren't added dynamically to a class i.e. they're all
+    # in the source code)
