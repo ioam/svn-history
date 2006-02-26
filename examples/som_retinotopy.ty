@@ -22,7 +22,7 @@ import topo.patterns.basic
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.boundingregion import BoundingBox
 from topo.base.connectionfield import CFProjection
-from topo.base.parameterclasses import DynamicNumber,Number
+from topo.base.parameterclasses import DynamicNumber,Number, Wrapper
 from topo.sheets.cfsom import CFSOM
 from topo.responsefns.optimized import CFDotProduct, CFEuclideanDistance
 from topo.responsefns.basic import CFEuclideanDistance_Py, CFDotProduct_Py
@@ -60,24 +60,11 @@ class RetinotopicSOM(CFSOM):
 GeneratorSheet.period = 1.0
 GeneratorSheet.density = 24
 
-# CEBHACKALERT: will go to wherever DynamicValue is
-class UniformRandomValue(object):
-    """
-    When called, return the next value from random.uniform within the
-    designated bounds.
-    """
-    def __init__(self,bounds=(0.0,1.0)):
-        self.bounds=bounds
-                 
-    def __call__(self):
-        return random.uniform(self.bounds[0],self.bounds[1])
-
-
 random.seed(1234)
 input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size = 2*sqrt(2.0*0.1*24.0)/24.0,aspect_ratio=1.0,
-                                    x=DynamicNumber(UniformRandomValue((-0.5,0.5))),
-                                    y=DynamicNumber(UniformRandomValue((-0.5,0.5))),
-                                    orientation=DynamicNumber(UniformRandomValue((-pi,pi))))
+                                    x=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
+                                    y=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
+                                    orientation=DynamicNumber(Wrapper("random.uniform",-pi,pi)))
 
 # cortical sheet
 RetinotopicSOM.density = 40

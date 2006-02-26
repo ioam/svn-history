@@ -32,23 +32,13 @@ from topo.patterns import PatternGeneratorParameter
 random.seed(1234)
 
 
-# CEBHACKALERT: will go to wherever DynamicValue is
-class UniformRandomValue(object):
-    """
-    When called, return the next value from random.uniform within the
-    designated bounds.
-    """
-    def __init__(self,bounds=(0.0,1.0)):
-        self.bounds=bounds
-                 
-    def __call__(self):
-        return random.uniform(self.bounds[0],self.bounds[1])
-
+from topo.base.parameterclasses import Wrapper
 
 input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size = 2*0.0468,aspect_ratio=4.0,
-                                    x=DynamicNumber(UniformRandomValue((-0.5,0.5))),
-                                    y=DynamicNumber(UniformRandomValue((-0.5,0.5))),
-                                    orientation=DynamicNumber(UniformRandomValue((-pi,pi))))
+                                    x=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
+                                    y=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
+                                    orientation=DynamicNumber(Wrapper("random.uniform",-pi,pi)))
+
                                  
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)

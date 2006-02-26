@@ -37,14 +37,16 @@ GeneratorSheet.period = 1
 GeneratorSheet.bounds = BoundingBox(radius=0.72)
 
 random.seed(1234)
-topo.patterns.basic.Gaussian.scale = 1.0    
-topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
 
+from topo.base.parameterclasses import Wrapper
+
+topo.patterns.basic.Gaussian.x = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Gaussian.y = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Gaussian.orientation = DynamicNumber(Wrapper("random.uniform",-pi,pi),softbounds=(0,2*pi))
 topo.patterns.basic.Gaussian.size = 2*0.0468      
 topo.patterns.basic.Gaussian.aspect_ratio = 4.0      
 topo.patterns.basic.Gaussian.bounds = BoundingBox(radius=0.72)
+
 
 # LISSOM parameters
 LISSOM.density = 48.0    

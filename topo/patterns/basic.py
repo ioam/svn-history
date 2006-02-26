@@ -247,6 +247,9 @@ def sheet2matrixidx_array(x,y,bounds,density):
     c = floor(c)
     return r, c
 
+
+
+from topo.base.parameterclasses import Wrapper
 class CompositePatternGenerator(PatternGenerator):
     """
     PatternGenerator that accepts a list of other PatternGenerators.
@@ -254,7 +257,7 @@ class CompositePatternGenerator(PatternGenerator):
     list to create a pattern, then it combines the patterns to create a 
     single pattern that it returns.
     """
-    operator = Parameter(default=add,doc="Numeric function used to combine the individual patterns.")
+    operator = Parameter(default=Wrapper("Numeric.add"),doc="Numeric function used to combine the individual patterns.")
     generators = Parameter(default=[],doc="List of patterns to use in the composite pattern.")
 
     aspect_ratio   = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),

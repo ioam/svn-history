@@ -18,7 +18,7 @@ import RandomArray
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.boundingregion import BoundingBox
 from topo.base.connectionfield import CFProjection
-from topo.base.parameterclasses import DynamicNumber
+from topo.base.parameterclasses import DynamicNumber,Wrapper
 from topo.sheets.cfsom import CFSOM
 from topo.responsefns.optimized import CFDotProduct
 import topo.patterns.random
@@ -36,9 +36,9 @@ GeneratorSheet.period = 1.0
 GeneratorSheet.density = 30
 
 random.seed(1234)
-topo.patterns.basic.Gaussian.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Gaussian.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Gaussian.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
+topo.patterns.basic.Gaussian.x = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Gaussian.y = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Gaussian.orientation = DynamicNumber(Wrapper("random.uniform",-pi,pi),softbounds=(0,2*pi))
 topo.patterns.basic.Gaussian.size = 2*0.3*1.5/7.0
 topo.patterns.basic.Gaussian.aspect_ratio = 7.0/1.5
 topo.patterns.basic.Gaussian.bounds = BoundingBox(radius=0.8)

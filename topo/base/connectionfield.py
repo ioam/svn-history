@@ -44,13 +44,12 @@ def hebbian(input_activity, unit_activity, weights, single_connection_learning_r
     """Simple Hebbian learning for the weights of one single unit."""
     weights += single_connection_learning_rate * unit_activity * input_activity
 
-# CEBHACKALERT: see docstring
+# CEBHACKALERT: see docstring. But note that now we have Wrapper class, we can use that.
 class Hebbian(object):
     """
     This is a temporary wrapper around the hebbian() function so that
     deepcopy can work when a Parameter has this function as its
-    default value. (To be removed when ParameterizedObject's support for
-    deepcopy is corrected. See connectionfield.py's GenericCFResponseFn
+    default value. See connectionfield.py's GenericCFResponseFn
     and projections/basic.py's SharedWeightCFResponseFn)
     """
     def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):

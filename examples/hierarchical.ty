@@ -16,7 +16,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.patterngenerator import BoundingBox
 #from topo.projections.kernelprojection import KernelProjection
 from topo.base.connectionfield import CFProjection
-from topo.base.parameterclasses import DynamicNumber, Number
+from topo.base.parameterclasses import DynamicNumber, Number, Wrapper
 from topo.sheets.cfsom import CFSOM
 import topo.patterns.random
 from topo.responsefns.optimized import CFDotProduct
@@ -39,10 +39,11 @@ GeneratorSheet.density = 20
 
 
 random.seed(1234)
-topo.patterns.basic.Line.x = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Line.y = DynamicNumber(lambda : random.uniform(-0.5,0.5),softbounds=(-1.0,1.0))
 
-topo.patterns.basic.Line.orientation = DynamicNumber(lambda :random.uniform(-pi,pi),softbounds=(0,2*pi))
+
+topo.patterns.basic.Line.x = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Line.y = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0))
+topo.patterns.basic.Line.orientation = DynamicNumber(Wrapper("random.uniform",-pi,pi),softbounds=(0,2*pi))
 topo.patterns.basic.Line.thickness = 0.02
 topo.patterns.basic.Line.bounds = BoundingBox(points=((-1.05,-0.8),(1.05,0.8)))
 
