@@ -253,27 +253,38 @@ def keys_sorted_by_value(d):
     return [ backitems[i][1] for i in range(0,len(backitems))]
 
 
-## import inspect
-## from topo.base.parameterizedobject import Parameter, ParameterizedObject
-## def recurse_modules_get_class_state(dict_,name,class_state,classes,processed):
-##     print "process",name
-##     for (k,v) in dict_.items():
-##         if '__all__' in dict_:
-##             a = dict_['__all__']
-##             for (k,v) in dict_.items():
-##                 # exclude plotting: it's full of lambdas and not part of the simulator!
-##                 if inspect.ismodule(v) and processed.count(k)<1 and a.count(k)>0 and k!='plotting':
-##                     processed.append(k)
-##                     recurse_modules_get_class_state(v.__dict__,v.__name__,class_state,classes,processed)
+# CEBHACKALERT: this could be improved!
+import inspect
+from topo.base.parameterizedobject import Parameter, ParameterizedObject
+def get_states_of_classes_from_module(module,states_of_classes,processed_modules):
+    """
+    Recursively search module and get states of classes within it.
 
-##         else:
-##             if isinstance(v,type) and issubclass(v,ParameterizedObject):
-##                 class_state[k] = {}
-##                 classes[k] = v.__module__
+    states_of_classes is a dictionary {module.path.and.Classname: state}
 
-##                 # class ALWAYS has __dict__, right?
-##                 # Also, PO doesn't have slots.
-##                 for (name,obj) in v.__dict__.items():
-##                     if isinstance(obj,Parameter):
-##                         class_state[k][name] = obj  # should it be copy?
+    Something is considered a module for our purposes if inspect says it's a module,
+    and it defines __all__. We only search through modules listed in __all__.
+
+    Keeps a list of processed modules to avoid looking at the same one more than once
+    (since e.g. __main__ contains __main__ contains __main__...)
+
+    topo.plotting is specifically excluded because it's full of lambdas and isn't
+    something we need to save the state of.
+    """
+    #print "processing:",module.__name__
+    dict_ = module.__dict__
+    for (k,v) in dict_.items():
+        if '__all__' in dict_ and inspect.ismodule(v) and k!='plotting':  
+            if dict_['__all__'].count(k)>0 and processed_modules.count(v)<1:
+                get_states_of_classes_from_module(v,states_of_classes,processed_modules)
+            processed_modules.append(v)
+
+        else:
+            if isinstance(v,type) and issubclass(v,ParameterizedObject):
+                full_class_path = v.__module__+'.'+k
+                states_of_classes[full_class_path] = {}
+                # class ALWAYS has __dict__, right? And no P.O. has slots.
+                for (name,obj) in v.__dict__.items():
+                    if isinstance(obj,Parameter):
+                        states_of_classes[full_class_path][name] = obj
                 
