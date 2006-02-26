@@ -27,7 +27,7 @@ apply_output_fn, to allow joint normalization across CFs.
 </li>
 
 <li>
-2006/02/24 (CB): Correct ParameterizedObject's __getstate__ and still allow pickling; allow deepcopy of a Numeric ufunc when instantiating a Parameter. 
+2006/02/26 (CB): A better way to implement Wrapper class (and a better name for it); a way to implement scheduled actions so that they will pickle (e.g. execute strings in __main__.__dict__); provide easier access to objects in the simulator (something like topo.sim['V1']); document pickle and update documentation now it's changed (e.g. tutorials, don't need to load script first of all); change all examples so they set input parameters on an object rather than the class (using Wrapper); 
 </li>
 
 <li> 
