@@ -38,13 +38,12 @@ GeneratorSheet.bounds = input_bounds
 
 random.seed(1234)
 
-topo.patterns.basic.Gaussian.scale = 1.0
-topo.patterns.basic.Gaussian.x = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Gaussian.y = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Gaussian.orientation = DynamicNumber(Wrapper("random.uniform",-pi,pi),softbounds=(0,2*pi))
-topo.patterns.basic.Gaussian.size = 2*0.0468
-topo.patterns.basic.Gaussian.aspect_ratio = 4.0
-topo.patterns.basic.Gaussian.bounds = input_bounds
+input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size=2*0.0468,
+                                             aspect_ratio=4.0,
+                                             bounds=input_bounds,
+                         x=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
+                         y=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
+                         orientation=DynamicNumber(Wrapper("random.uniform",-pi,pi)))
 
 # LISSOM parameters
 LISSOM.density = 24.0
@@ -61,7 +60,7 @@ CFProjection.learning_fn=DivisiveHebbian()
 # build simulation
 
 s = topo.base.simulator.Simulator()
-Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(), name='Retina')
+Retina = GeneratorSheet(input_generator=input_pattern, name='Retina')
 V1Exc = LISSOM(name='V1Exc',bounds=BoundingBox(radius=0.5))
 V1Exc.tsettle=9
 V1Inhib = LISSOM(name='V1Inhib', bounds=BoundingBox(radius=0.5))

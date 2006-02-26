@@ -20,7 +20,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection
 from topo.responsefns.optimized import CFDotProduct
 from topo.base.sheet import BoundingBox
-from topo.base.parameterclasses import DynamicNumber
+from topo.base.parameterclasses import DynamicNumber,Wrapper
 from topo.learningfns.optimized import DivisiveHebbian
 from topo.patterns import PatternGeneratorParameter
 
@@ -38,15 +38,12 @@ GeneratorSheet.bounds = BoundingBox(radius=0.72)
 
 random.seed(1234)
 
-from topo.base.parameterclasses import Wrapper
-
-topo.patterns.basic.Gaussian.x = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Gaussian.y = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Gaussian.orientation = DynamicNumber(Wrapper("random.uniform",-pi,pi),softbounds=(0,2*pi))
-topo.patterns.basic.Gaussian.size = 2*0.0468      
-topo.patterns.basic.Gaussian.aspect_ratio = 4.0      
-topo.patterns.basic.Gaussian.bounds = BoundingBox(radius=0.72)
-
+input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size=2*0.0468,
+                                             aspect_ratio=4.0,
+                                             bounds=BoundingBox(radius=0.72),
+                         x=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
+                         y=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
+                         orientation=DynamicNumber(Wrapper("random.uniform",-pi,pi)))
 
 # LISSOM parameters
 LISSOM.density = 48.0    
@@ -63,7 +60,7 @@ CFProjection.learning_fn=DivisiveHebbian()
 # build simulation
 
 s = topo.base.simulator.Simulator()
-Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(), name='Retina')
+Retina = GeneratorSheet(input_generator=input_pattern, name='Retina')
 V1 = LISSOM(name='V1')
 
 s.connect(Retina,V1, delay = FixedPoint("0.05"),
