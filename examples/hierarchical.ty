@@ -41,16 +41,22 @@ GeneratorSheet.density = 20
 random.seed(1234)
 
 
-topo.patterns.basic.Line.x = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Line.y = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Line.orientation = DynamicNumber(Wrapper("random.uniform",-pi,pi),softbounds=(0,2*pi))
-topo.patterns.basic.Line.thickness = 0.02
-topo.patterns.basic.Line.bounds = BoundingBox(points=((-1.05,-0.8),(1.05,0.8)))
-
 # CEBHACKALERT: something isn't working about using e.g.
 # PatternGeneratorParameter(default=X) in various places in the code
 # so I've temporarily commented out this line.
 # PatternGeneratorParameter.default=topo.patterns.basic.Line()
+
+left_input_pattern = topo.patterns.basic.Line(thickness=0.02,
+                       bounds=BoundingBox(points=((-1.05,-0.8),(1.05,0.8))),
+                       x=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
+                       y=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
+                       orientation=DynamicNumber(Wrapper("random.uniform",-pi,pi)))
+
+right_input_pattern = topo.patterns.basic.Line(thickness=0.02,
+                       bounds=BoundingBox(points=((-1.05,-0.8),(1.05,0.8))),
+                       x=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
+                       y=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
+                       orientation=DynamicNumber(Wrapper("random.uniform",-pi,pi)))
 
 
 # cortical sheet
@@ -78,8 +84,8 @@ CFProjection.response_fn = CFDotProduct()
 s = Simulator()
 
 # Sheets
-LeftRetina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='LeftRetina')
-RightRetina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='RightRetina')
+LeftRetina = GeneratorSheet(input_generator=left_input_pattern,name='LeftRetina')
+RightRetina = GeneratorSheet(input_generator=right_input_pattern,name='RightRetina')
 
 V1 = CFSOM(name='V1',alpha_0 = 0.5)
 V2 = CFSOM(name='V2',alpha_0 = 0.5)
