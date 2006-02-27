@@ -296,6 +296,8 @@ class Simulator(ParameterizedObject):
         Return item_name if it exists as an EventProcessor in
         the Simulator. See objects().
         """
+        if not isinstance(item_name,str):
+            raise TypeError("Expected string (objects in the Simulator are indexed by name).")
         try:
             return self.objects()[item_name]
         except KeyError:
