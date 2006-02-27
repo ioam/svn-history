@@ -68,9 +68,6 @@ def descendents(class_):
 
 
 
-### JABALERT: The documentation for Dynamic needs to be moved out of here,
-### with only a general mention that dynamic subclasses can be implemented,
-### unless support for Dynamic is moved into this file.
 class Parameter(object):
     """
     An attribute descriptor for declaring parameters.
@@ -157,19 +154,12 @@ class Parameter(object):
     # attributes, and reserve just enough space to store these
     # attributes.  Using __slots__ requires special support for
     # operations to copy and restore Parameters (e.g. for Python
-    # persistent storage pickling), and these are implemented for
-    # ParameterizedObjects.
+    # persistent storage pickling); see __getstate__ and __setstate__.
     # 
     # Note that the actual value of a Parameter is not stored in the
     # Parameter object itself, but in the owning
-    # ParameterizedObject'ss __dict__.
+    # ParameterizedObject's __dict__.
     # 
-    # Note about pickling: Parameters are usually used inside
-    # ParameterizedObjects, and so can be pickled even though
-    # Parameter has no explicit support for pickling (usually if a
-    # class has __slots__ it can't be pickled without additional
-    # support: see the Pickle module documentation).
-    #                                                    
     # To get the benefit of slots, subclasses must themselves define
     # __slots__, whether or not they define attributes not present in
     # the base Parameter class.  That's because a subclass will have
