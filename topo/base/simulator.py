@@ -163,7 +163,7 @@ class EventProcessor(ParameterizedObject):
 
     def start(self):
         """        
-        Called by the simulator when the EventProcessor is add()ed to the simlulator.
+        Called by the simulator when the EventProcessor is add()ed to the simulator.
 
         If an EventProcessor needs to have any code run when it is added to the simulator,
         it should be in this method.
