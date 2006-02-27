@@ -35,17 +35,19 @@ clean-ext-packages:
 topographica: external Makefile
 	echo "#!${PREFIX}/bin/python" > topographica
 	echo "#  Wrapper for setting environment vars and exec-ing commands" >> topographica
-	echo "import os,sys,topographica_script" >> topographica
+	echo "import os,sys" >> topographica
+	echo "from topo.misc.commandline import generate_params" >> topographica
 	echo "" >> topographica
 	echo "TOPO = '${PREFIX}'" >> topographica
 	echo "os.putenv('LD_LIBRARY_PATH'," >> topographica
 	echo "          ':'.join((os.path.join(TOPO,'lib'),os.getenv('LD_LIBRARY_PATH',''))))" >> topographica
 	echo "os.putenv('PYTHONPATH',TOPO+':'+':'+os.getenv('PYTHONPATH',''))" >> topographica
 	echo "os.putenv('TOPORELEASE','${RELEASE}')" >> topographica
+	echo "os.putenv('TOPO',TOPO)" >> topographica
 	echo "" >> topographica
 	echo "# exec" >> topographica
 	echo "cmd = os.path.join(TOPO,'bin/python')" >> topographica
-	echo "args = topographica_script.generate_params(sys.argv[1:])" >> topographica
+	echo "args = generate_params(sys.argv[1:])" >> topographica
 	echo "os.execv(cmd,[cmd] + args)" >> topographica
 
 	chmod a+x ${PREFIX}topographica
