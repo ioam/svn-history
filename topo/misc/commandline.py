@@ -13,10 +13,9 @@ __version__='$Revision$'
 
 import sys, __main__, math
 
-from getopt import getopt,GetoptError
 import os
+from optparse import OptionParser
 from topo.misc.inlinec import import_weave
-
 
 BANNER         = """
 Welcome to Topographica!
@@ -54,31 +53,105 @@ def start(interactive=True):
 
 
 
-### JABHACKALERT!
-### 
-### This file will need to be rewritten nearly entirely, probably by
-### me (jbednar), to be simpler and have the necessary features.  It's
-### clear that there's no reason to keep it even partially compatible
-### with python's own command-line format, because that format is not
-### very useful.  In particular, it needs to be rewritten to allow
-### Topographica/Python commands to be passed to the interpreter, even
-### when a file is also being executed.  The current implementation
-### mirrors the Python standard: a file can be read, or a
-### command-string parsed, but not both.  We can probably continue to
-### pass such arguments, if we require '--' before them.
+# Create the parser.
+usage = "usage: topographica ([<option>]:[<filename>])*\n\
+where <option> can be one of the following:\n\
+-c \"<command>\"\n\
+-g\n\
+-i\n\
+-v\n\
+"
 
-# All valid Python 2.4 args, plus 'g' for topo.gui.start()
-VALID_OPTS     = 'ic:dEhOQ:StuvVW:xm:g'  
+topo_parser = OptionParser(usage=usage)
 
+# Defining the options 
 
-def generate_cmd_prefix(interactive=True,start_gui=False):
+def getting_filenames(parser):
     """
-    Since a function call is needed for startup, the parameter on if
-    the banner should be displayed must be embedded within the command
-    string.
+    Sub-function used to catch any filenames following any options.
     """
-#    if start_gui: interactive = True
+    list_command=getattr(parser.values,"commands")
+    rargs = parser.rargs
+    while rargs:
+	arg = rargs[0]
+	if ((arg[:2] == "--" and len(arg) > 2) or
+            (arg[:1] == "-" and len(arg) > 1 and arg[1] != "-")):
+            break
+	else:
+	    list_command = list_command +  'execfile(\'' + arg + '\');'
+	    del rargs[0]
+    setattr(parser.values,"commands",list_command) 
+
+
+def g_i_action(option,opt_str,value,parser):
+    """callback function for the -g and -i option.""" 
+    setattr(parser.values,option.dest,True) 
+    getting_filenames(parser)
+
+
+topo_parser.add_option("-g","--gui",action="callback",callback=g_i_action,dest="gui",default=False,help="enter GUI mode.")
+topo_parser.add_option( "-i",action="callback",callback=g_i_action,dest="interactive",default=False,
+			help="inspect interactively after running script, and force prompts,\
+even if stdin does not appear to be a terminal.")
+
+
+def c_action(option,opt_str,value,parser):
+    """callback function for the -c option.""" 
+    list_command=getattr(parser.values,option.dest)
+    list_command +=  value + ";"
+    setattr(parser.values,option.dest,list_command) 
+    getting_filenames(parser)
+
+topo_parser.add_option("-c",action = "callback",callback = c_action,type="string",default='',dest="commands",
+		       metavar="\"<command>\"",help="commands passed in as a string and followed by files to be executed.")
+
+
+def append_to_option_list(option,opt_str,value,parser):
+    """callback function for all option without argument."""
+    option_list=getattr(parser.values,option.dest)
+    option_list.append(opt_str)
+    getting_filenames(parser)
+
+topo_parser.add_option("-v","--verbose",action="callback",callback = append_to_option_list,
+		       nargs=0, dest="list_option", default = [],help="verbose.")
+
+
+def generate_params(argv):
+    """
+    Read in argv (minus argv[0]!), and rearrange for re-execution.
+    """
+
+    (option,args) = topo_parser.parse_args(argv)
+
+    # catch the first filenames arguments
+    filename_arg = topo_parser.largs
+    list_filename = ''
+    for filename in filename_arg:
+	list_filename +=  'execfile(\'' + filename + '\');'
+    
+    # generates the prefixes of cmd and option_list
+    cmd, option_list = generate_prefixes(option.gui,option.interactive) 
+    # add the lists of non-arg options (recognized by python)
+    option_list += option.list_option
+
+    # cmd is the command line executed by python
+    # option_list is the option without arguments that are recognized by Python
+  
+    cmd += list_filename
+    cmd += option.commands
     # To deal with a need to double-quote under Windows
+    if os.name == 'nt': cmd += '"'
+    option_list.append('-c')
+    return (option_list + [cmd])
+
+
+
+def generate_prefixes(gui,interactive):
+    """
+    Generate start-up command and options.
+    """
+    option_list = []
+     # To deal with a need to double-quote under Windows
     if os.name == 'nt': cmd = '"'
     else: cmd = ''
 
@@ -95,66 +168,16 @@ def generate_cmd_prefix(interactive=True,start_gui=False):
     
     cmd += 'import topo.misc.commandline; topo.misc.commandline.start(' \
            + str(interactive) + ');'
-    if start_gui:
-        cmd += ' topo.gui_cmdline_flag = True; import topo.tkgui; topo.tkgui.start();'
+    
+    # if -g is on
+    if gui:
+	cmd += ' topo.gui_cmdline_flag = True; import topo.tkgui; topo.tkgui.start();'
+	option_list += ['-i']
     else:
         cmd += ' topo.gui_cmdline_flag = False;'
+     
+    # if -i is on
+    if interactive:
+	option_list += ['-i']
 
-    if os.name == 'nt': cmd += '"'
-
-    return cmd
-
-
-def generate_params(argv):
-    """
-    Read in argv (minus argv[0]!), and rearrange for re-execution.
-    Pass along all existing flags as well as possible.  If no -c, peel
-    off an argument as the file to evaluate.  If no args, and no -c,
-    enter interactive mode by adding a possibly redundant '-i'.
-    """
-    c_flag = False
-    in_opts, in_args = getopt(argv,VALID_OPTS)  
-
-    #print 'in_opts:', in_opts, ' in_args:', in_args
-
-    opts = list()                      # Preserve order in a list.
-    flags = dict(in_opts)              # Quickly check opts for '-i'
-    for (key, val) in in_opts:
-        if key == '-c':                # Add prefix string to start of a '-c' 
-            c_flag = True
-            val = generate_cmd_prefix(flags.has_key('-i'),
-                                      flags.has_key('-g')) + val
-        # Python can't handle a '-g', cut it, but add in a -i, so that
-        # the GUI will stay.
-        if key != '-g':                
-            opts.append((key,val))
-        else:
-            opts.append(('-i',''))
-
-    if not c_flag:                     # Create the '-c' on arg 1 or go interactive.
-        if len(in_args) >= 1:
-            key = '-c'
-	    # Under Windows, assumes the last character from
-	    # generate_cmd_prefix is a double-quote that can be cut
-	    # off, and then extra commands added.
-            if os.name == 'nt':
-                val = generate_cmd_prefix(flags.has_key('-i'),
-                                          flags.has_key('-g'))[:-1] + 'execfile(\'' + in_args[0] + '\');"'
-            else:
-                val = generate_cmd_prefix(flags.has_key('-i'),
-                                          flags.has_key('-g')) + 'execfile(\'' + in_args[0] + '\');'
-            opts.append((key,val))
-            in_args = in_args[1:]
-        else:
-            opts.append(('-i',''))     # Add an '-i' since it's needed with -c.
-            opts.append(('-c',generate_cmd_prefix(start_gui=flags.has_key('-g'))))
-
-    args = []
-    for each in opts:
-        args.append(each[0])
-        if each[1] != '': args.append(each[1])
-    args = args + in_args
-    return args
-
-
-
+    return cmd, option_list
