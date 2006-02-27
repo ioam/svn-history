@@ -90,6 +90,7 @@ STOP = "Simulator Stopped"
 
 Forever = FixedPoint(-1)
 
+
 __active_sim = None
 def get_active_sim():
     """
@@ -290,6 +291,16 @@ class Simulator(ParameterizedObject):
         self.events = []
         self._events_stack = []
 
+    def __getitem__(self,item_name):
+        """
+        Return item_name if it exists as an EventProcessor in
+        the Simulator. See objects().
+        """
+        try:
+            return self.objects()[item_name]
+        except KeyError:
+            raise AttributeError("Simulator doesn't contain '"+item_name+"'.")
+        
 
     def time(self):
         """
