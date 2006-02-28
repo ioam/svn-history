@@ -60,7 +60,7 @@ where <option> can be one of the following:\n\
 -c \"<command>\"\n\
 -g\n\
 -i\n\
--v\n\
+(-v TEMPORARILY DISABLED)\
 "
 
 topo_parser = OptionParser(usage=usage)
@@ -84,16 +84,23 @@ def getting_filenames(parser):
     setattr(parser.values,"commands",list_command) 
 
 
-def g_i_action(option,opt_str,value,parser):
+def g_i_v_action(option,opt_str,value,parser):
     """callback function for the -g and -i option.""" 
     setattr(parser.values,option.dest,True) 
     getting_filenames(parser)
 
 
-topo_parser.add_option("-g","--gui",action="callback",callback=g_i_action,dest="gui",default=False,help="enter GUI mode.")
-topo_parser.add_option( "-i",action="callback",callback=g_i_action,dest="interactive",default=False,
+topo_parser.add_option("-g","--gui",action="callback",callback=g_i_v_action,dest="gui",
+		       default=False,help="enter GUI mode.")
+topo_parser.add_option( "-i","--interactive",action="callback",callback=g_i_v_action,
+			dest="interactive",default=False,
 			help="inspect interactively after running script, and force prompts,\
 even if stdin does not appear to be a terminal.")
+
+### JC: See JCALERT in generate_prefixes: we cannot set verbose for the moment.
+# topo_parser.add_option("-v","--verbose",action="callback",callback = g_i_v_action,
+# 		       nargs=0, dest="verbose",default = False,help="verbose.")
+
 
 
 def c_action(option,opt_str,value,parser):
@@ -103,19 +110,9 @@ def c_action(option,opt_str,value,parser):
     setattr(parser.values,option.dest,list_command) 
     getting_filenames(parser)
 
-topo_parser.add_option("-c",action = "callback",callback = c_action,type="string",default='',dest="commands",
-		       metavar="\"<command>\"",help="commands passed in as a string and followed by files to be executed.")
-
-
-def append_to_option_list(option,opt_str,value,parser):
-    """callback function for all option without argument."""
-    option_list=getattr(parser.values,option.dest)
-    option_list.append(opt_str)
-    getting_filenames(parser)
-
-topo_parser.add_option("-v","--verbose",action="callback",callback = append_to_option_list,
-		       nargs=0, dest="list_option", default = [],help="verbose.")
-
+topo_parser.add_option("-c","--command",action = "callback",callback = c_action,type="string",
+		       default='',dest="commands",metavar="\"<command>\"",
+		       help="commands passed in as a string and followed by files to be executed.")
 
 def generate_params(argv):
     """
@@ -131,9 +128,7 @@ def generate_params(argv):
 	list_filename +=  'execfile(\'' + filename + '\');'
     
     # generates the prefixes of cmd and option_list
-    cmd, option_list = generate_prefixes(option.gui,option.interactive) 
-    # add the lists of non-arg options (recognized by python)
-    option_list += option.list_option
+    cmd = generate_prefixes(option) 
 
     # cmd is the command line executed by python
     # option_list is the option without arguments that are recognized by Python
@@ -142,16 +137,13 @@ def generate_params(argv):
     cmd += option.commands
     # To deal with a need to double-quote under Windows
     if os.name == 'nt': cmd += '"'
-    option_list.append('-c')
-    return (option_list + [cmd])
+    return cmd
 
 
-
-def generate_prefixes(gui,interactive):
+def generate_prefixes(option):
     """
     Generate start-up command and options.
     """
-    option_list = []
      # To deal with a need to double-quote under Windows
     if os.name == 'nt': cmd = '"'
     else: cmd = ''
@@ -168,17 +160,27 @@ def generate_prefixes(gui,interactive):
         pass
     
     cmd += 'import topo.misc.commandline; topo.misc.commandline.start(' \
-           + str(interactive) + ');'
+           + str(option.interactive) + ');'
     
     # if -g is on
-    if gui:
+    if option.gui:
 	cmd += ' topo.gui_cmdline_flag = True; import topo.tkgui; topo.tkgui.start();'
-	option_list += ['-i']
+	os.environ["PYTHONINSPECT"] = "1"
     else:
         cmd += ' topo.gui_cmdline_flag = False;'
      
     # if -i is on
-    if interactive:
-	option_list += ['-i']
+    if option.interactive:
+	os.environ["PYTHONINSPECT"] = "1"
 
-    return cmd, option_list
+    ### JCALERT! it is not possible to set PYTHONVERBOSE outside the startup file.
+    ### Is it why we previously had to open a new python? For the moment, we cannot set the 
+    ### verbose option... That will have to be solved or we will have to come back to the previous
+    ### version if we really want to support verbose.
+ #    if option.verbose:
+#  	os.environ["PYTHONVERBOSE"] = "1"
+    
+    return cmd
+
+
+	

@@ -48,7 +48,7 @@ topographica: external Makefile
 	echo "# exec" >> topographica
 	echo "cmd = os.path.join(TOPO,'bin/python')" >> topographica
 	echo "args = generate_params(sys.argv[1:])" >> topographica
-	echo "os.execv(cmd,[cmd] + args)" >> topographica
+	echo "exec(args)" >> topographica
 
 	chmod a+x ${PREFIX}topographica
 
