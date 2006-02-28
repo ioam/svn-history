@@ -27,15 +27,18 @@ class Filename(Parameter):
     Filename is a Parameter that takes a string specifying the
     path of a file and stores it in the format of the user's operating system.
 
-    The path must be relative to Topographica's own path.
+    The path to the file can be absolute or relative to Topographica's
+    path, or relative to any paths specified in search_paths or
+    common_search_paths.
 
-    To make your code work on all platforms, you should specify paths in UNIX format
-    (e.g. examples/ellen_arthur.pgm). You can specify paths in your operating
-    system's format, but only code that uses UNIX-style paths will run on all operating
-    systems.
+    To make your code work on all platforms, you should specify paths
+    in UNIX format (e.g. examples/ellen_arthur.pgm). You can specify
+    paths in your operating system's format, but only code that uses
+    UNIX-style paths will run on all operating systems.
     """
-    __slots__ = ['search_paths']
-    common_search_paths = [sys.exec_prefix]
+    __slots__ = ['search_paths','topographica_path']
+    common_search_paths = []
+    topographica_path = sys.exec_prefix
     
     __doc__ = property((lambda self: self.doc))
     
@@ -46,45 +49,76 @@ class Filename(Parameter):
         The string is stored in the path format of the user's
         operating system.
 
-        If the path is a relative one, it is appended to all prefixes
-        in Filename.common_search_paths and self.search_paths until
-        the file is found. If the file is not found, an error is raised. 
+        See __construct_path() for details on path resolution
+        order.
         """
         self.search_paths=search_paths
-        Parameter.__init__(self,self.__construct_path(default),**params)
+        
+        if default!=None:
+            k = self.__construct_path(default)
+        else:
+            k = None
+
+        Parameter.__init__(self,k,**params)
+
 
     def __set__(self,obj,val):
         """
-        Call Parameter's __set__ with the os-specific path.
+        Call Parameter's __set__, but constructing the path first
+        (see __construct_path()).
         """
         super(Filename,self).__set__(obj,self.__construct_path(val))
+
 
     def __construct_path(self,path):
         """
         Create an absolute path to the file if the path is not
         already absolute.
 
-        Looks in Filename's common_search_paths and any ones
-        added specifically to this parameter in search_paths.
+        Absolute paths are not changed.  A relative path is first
+        appended to Topographica's path. If no file is found, the path
+        is appended to the prefix paths held in common_search_paths,
+        followed by those in search_paths; at each point the presence
+        of the file is tested for and if there, its path is returned.
+        If a prefix path is absolute, the path is just appended to the
+        prefix; if a prefix path is relative, it's first tried
+        relative to the current directory, then it is itself appended
+        to Topographica's path.
 
-        (No lookup is done with an absolute path.)
+        An IOError is raised if the file is not found in any of these places.
         """
         # first convert to right type for os:
         path = os.path.normpath(path)
         
         if os.path.isabs(path): return path
 
-        # Append the given relative path to the prefixes until
-        # the file is found. An IOError is raised if the file
-        # isn't found in any of these.
-        try_path = ''
         paths_tried = []
+        
+        # first try "topographica_path/path"
+        try_path = os.path.join(self.topographica_path,path)
+        if os.path.isfile(try_path): return try_path
+        paths_tried.append(try_path)
+
+        # Now try appending the given relative path to the prefixes
+        # until the file is found.  If the prefix is absolute, just
+        # append path.  If the prefix is relative, first try using it
+        # (so relative to current directory), then try appending the
+        # prefix itself to the topographica_path to see if the file is
+        # found.
+        # An IOError is raised if the file isn't found in any of these.
+
         for prefix in self.common_search_paths+self.search_paths:
+
+            
             try_path = os.path.join(prefix,path)
             if os.path.isfile(try_path): return try_path
             paths_tried.append(try_path)
+
+            if not os.path.isabs(prefix):
+                try_path = os.path.join(self.topographica_path,prefix,path)
+                paths_tried.append(try_path)
             
-        raise IOError('File '+os.path.split(path)[1]+' was not found in the following places: '+str(paths_tried)+'.')
+        raise IOError('File "'+os.path.split(path)[1]+'" was not found in the following places: '+str(paths_tried)+'.')
 
 
 # CEBHACKALERT: needs to be finished
