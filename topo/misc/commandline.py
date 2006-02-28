@@ -54,7 +54,8 @@ def start(interactive=True):
 
 
 
-# Create the parser.
+
+# Create the topographica parser.
 usage = "usage: topographica ([<option>]:[<filename>])*\n\
 where <option> can be one of the following:\n\
 -c \"<command>\"\n\
@@ -62,12 +63,11 @@ where <option> can be one of the following:\n\
 -i\n\
 (-v TEMPORARILY DISABLED)\
 "
-
 topo_parser = OptionParser(usage=usage)
 
 # Defining the options 
 
-def getting_filenames(parser):
+def get_filenames(parser):
     """
     Sub-function used to catch any filenames following any options.
     """
@@ -79,7 +79,7 @@ def getting_filenames(parser):
             (arg[:1] == "-" and len(arg) > 1 and arg[1] != "-")):
             break
 	else:
-	    list_command = list_command +  'execfile(\'' + arg + '\');'
+	    list_command = list_command +  ["execfile(\'" + arg + "\')"]
 	    del rargs[0]
     setattr(parser.values,"commands",list_command) 
 
@@ -87,7 +87,7 @@ def getting_filenames(parser):
 def g_i_v_action(option,opt_str,value,parser):
     """callback function for the -g and -i option.""" 
     setattr(parser.values,option.dest,True) 
-    getting_filenames(parser)
+    get_filenames(parser)
 
 
 topo_parser.add_option("-g","--gui",action="callback",callback=g_i_v_action,dest="gui",
@@ -106,68 +106,58 @@ even if stdin does not appear to be a terminal.")
 def c_action(option,opt_str,value,parser):
     """callback function for the -c option.""" 
     list_command=getattr(parser.values,option.dest)
-    list_command +=  value + ";"
+    list_command +=  [value]
     setattr(parser.values,option.dest,list_command) 
-    getting_filenames(parser)
+    get_filenames(parser)
 
 topo_parser.add_option("-c","--command",action = "callback",callback = c_action,type="string",
-		       default='',dest="commands",metavar="\"<command>\"",
+		       default=[],dest="commands",metavar="\"<command>\"",
 		       help="commands passed in as a string and followed by files to be executed.")
 
-def generate_params(argv):
-    """
-    Read in argv (minus argv[0]!), and rearrange for re-execution.
-    """
 
+def exec_argv(argv):
+    """
+    Read in argv (minus argv[0]!), rearrange and execute.
+    """
     (option,args) = topo_parser.parse_args(argv)
-
-    # catch the first filenames arguments
-    filename_arg = topo_parser.largs
-    list_filename = ''
-    for filename in filename_arg:
-	list_filename +=  'execfile(\'' + filename + '\');'
     
-    # generates the prefixes of cmd and option_list
-    cmd = generate_prefixes(option) 
+    # execute prefix commands and set Python options.
+    exec_prefixes(option) 
 
-    # cmd is the command line executed by python
-    # option_list is the option without arguments that are recognized by Python
-  
-    cmd += list_filename
-    cmd += option.commands
-    # To deal with a need to double-quote under Windows
-    if os.name == 'nt': cmd += '"'
-    return cmd
+     # catch the first filenames arguments (before any options) and execute them.
+    filename_arg = topo_parser.largs
+    for filename in filename_arg:
+	execfile(filename) in __main__.__dict__
+
+    # execute remaining commands.
+    for cmd in option.commands:
+	exec cmd in __main__.__dict__
 
 
-def generate_prefixes(option):
+
+def exec_prefixes(option):
     """
-    Generate start-up command and options.
+    Execute start-up commands and set Python options.
     """
-     # To deal with a need to double-quote under Windows
-    if os.name == 'nt': cmd = '"'
-    else: cmd = ''
-
     # (As of 12/2005) With Python 2.4 compiled and run on Windows XP,
     # trying to import Weave after starting the topo command-line will
     # generate a serious system error.  However, importing weave first
     # does not cause problems.  
     try:
         if import_weave:
-            import weave    
-            cmd += 'import weave; '
+            exec "import weave" in __main__.__dict__    
     except:
         pass
-    
-    cmd += 'import topo.misc.commandline; topo.misc.commandline.start(' \
-           + str(option.interactive) + ');'
+
+    exec "import topo.misc.commandline; topo.misc.commandline.start(" \
+	   + str(option.interactive) + ");" in __main__.__dict__
     
     # if -g is on
     if option.gui:
-	cmd += ' topo.gui_cmdline_flag = True; import topo.tkgui; topo.tkgui.start();'
+	exec "topo.gui_cmdline_flag = True; import topo.tkgui; topo.tkgui.start();" in __main__.__dict__
 	os.environ["PYTHONINSPECT"] = "1"
     else:
-        cmd += ' topo.gui_cmdline_flag = False;'
+	exec "topo.gui_cmdline_flag = False;" in __main__.__dict__
      
     # if -i is on
     if option.interactive:
@@ -180,7 +170,6 @@ def generate_prefixes(option):
  #    if option.verbose:
 #  	os.environ["PYTHONVERBOSE"] = "1"
     
-    return cmd
 
 
 	
