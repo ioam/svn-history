@@ -12,7 +12,6 @@ $Id$
 """
 __version__='$Revision$'
 
-import random
 import RandomArray
 from math import exp, sqrt
 
@@ -22,7 +21,7 @@ import topo.patterns.basic
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.boundingregion import BoundingBox
 from topo.base.connectionfield import CFProjection
-from topo.base.parameterclasses import DynamicNumber,Number, Wrapper
+from topo.base.parameterclasses import DynamicNumber,Number,RandomWrapper
 from topo.sheets.cfsom import CFSOM
 from topo.responsefns.optimized import CFDotProduct, CFEuclideanDistance
 from topo.responsefns.basic import CFEuclideanDistance_Py, CFDotProduct_Py
@@ -60,11 +59,12 @@ class RetinotopicSOM(CFSOM):
 GeneratorSheet.period = 1.0
 GeneratorSheet.density = 24
 
-random.seed(1234)
-input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size = 2*sqrt(2.0*0.1*24.0)/24.0,aspect_ratio=1.0,
-                                    x=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
-                                    y=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
-                                    orientation=DynamicNumber(Wrapper("random.uniform",-pi,pi)))
+input_pattern = topo.patterns.basic.Gaussian(scale=1.0,
+                                             size=2*sqrt(2.0*0.1*24.0)/24.0,
+                                             aspect_ratio=1.0,
+                         x=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=7)),
+                         y=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=8)),
+               orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=9)))
 
 # cortical sheet
 RetinotopicSOM.density = 40
