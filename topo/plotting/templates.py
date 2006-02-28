@@ -11,7 +11,7 @@ __version__='$Revision$'
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.keyedlist import KeyedList
-from topo.base.parameterclasses import Parameter, BooleanParameter
+from topo.base.parameterclasses import Parameter, BooleanParameter, Filename
 
 
 class PlotGroupTemplate(ParameterizedObject):
@@ -31,6 +31,8 @@ class PlotGroupTemplate(ParameterizedObject):
     
     command = Parameter('pass')
     normalize = BooleanParameter(False)
+    image_location = Filename(search_paths=['topo/commands/'],
+                              doc='Use to ensure correct paths for any images used.')
     
     def __init__(self, plot_templates=[], static_images = [],**params):
         """
@@ -94,7 +96,8 @@ class PlotGroupTemplate(ParameterizedObject):
 	self.plot_templates.append((name,dict))
 
     def add_static_image(self,name,file_path):
-	self.static_images.append((name,file_path))
+        self.image_location = file_path
+	self.static_images.append((name,self.image_location))
         
 
 
@@ -144,7 +147,7 @@ pgt.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pgt.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
 pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
-pgt.add_static_image('Color Key','topo/commands/or_key_white_vert.png')
+pgt.add_static_image('Color Key','or_key_white_vert.png')
 
 
 pgt = new_plotgroup_template(name='Position Preference',command='measure_position_pref() ; topographic_grid()',normalize=True)
