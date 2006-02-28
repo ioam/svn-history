@@ -42,11 +42,15 @@ if '-v' in opts:
 else:
     verbosity = 1
 
-if args:
-    suite = unittest.TestSuite()
-    suite.addTests([getattr(tests,module).suite for module in args])
-else:
-    suite = topo.tests.suite
+# CEBHACKALERT: I commented this out so I could run tests,
+# but a specific test can't be run with 'runtests'.
+# That doesn't seem like a serious loss since individual
+# tests can be run in alternative way.
+## if args:
+##     suite = unittest.TestSuite()
+##     suite.addTests([getattr(tests,module).suite for module in args])
+## else:
+suite = topo.tests.suite
 
 unittest.TextTestRunner(verbosity=verbosity).run(suite)
 
