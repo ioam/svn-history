@@ -13,8 +13,7 @@ was first added to the list, or a change was made.)
 <ul>
 
 <li> 
-2006/02/21 (JC): Reimplementing command-line option processing to provide
-ability to execute Python code in arbitrary combinations of strings and files.
+2006/02/28 (CB): Fix problem (matching previous work) with som_retinotopy.
 </li>
 
 <li> 
@@ -27,8 +26,13 @@ apply_output_fn, to allow joint normalization across CFs.
 </li>
 
 <li>
-2006/02/26 (CB): A better way to implement Wrapper class (and a better name for it); a way to implement scheduled actions so that they will pickle (e.g. execute strings in __main__.__dict__); provide easier access to objects in the simulator (something like topo.sim['V1']); document pickle and update documentation now it's changed (e.g. tutorials, don't need to load script first of all); change all examples so they set input parameters on an object rather than the class (using Wrapper); 
+2006/02/28 (CB): A better way to implement Wrapper class (and a better name for it); independent random streams (finalize RandomWrapper); a way to implement scheduled actions so that they will pickle (e.g. execute strings in __main__.__dict__) [not committed, but working - just needs cleaning]; document pickle and update documentation now it's changed (e.g. tutorials, don't need to load script first of all); change all examples so they set input parameters on an object rather than the class (using Wrapper); why RetinotopicSOM can't be found on unpickling. 
 </li>
+
+<li>
+2006/02/28 (CB): SimSingleton class, allowing access to the simulator via topo.sim; provide easier access to objects in the simulator (something like topo.sim['V1']) [working, but not committed].
+</li>
+
 
 <li> 
 2006/02/23 (all): Ensuring classes are declared abstract when they should be, and making sure base and simple classes are imported into packages (i.e. Sheet into topo/sheets/, Projection into topo/projections/, Constant into topo/patterns/, and so on).
@@ -38,11 +42,6 @@ apply_output_fn, to allow joint normalization across CFs.
 2006/02/23 (all): Making more things be Parameters, and writing doc strings at the same time. E.g. the x and y widgets in the Unit Weights window can be Numbers with bounds, etc.
 </li>
 
-<li>
-2006/02/24 (JC): Filename paths (for Filename Parameter and plot templates etc).
-</li>
-
-
 </ul>
 
 
@@ -51,6 +50,10 @@ apply_output_fn, to allow joint normalization across CFs.
 Tasks which the developers are about to start.
 
 <ul>
+
+<li>
+2006/02/28 (CB): Filename paths (for Filename Parameter and plot templates etc). Check on Windows.
+</li>
 
 <li>
 2006/02/24 (CB): SheetSelectorParameter etc (so that the GUI (model editor) can
@@ -98,6 +101,11 @@ with C++ LISSOM when there are circular connection fields.
 PatternGenerator so that subclasses can inherit doc, precedence
 attributes (etc), but have them not used unless a subclass does really
 use them.
+</li>
+
+
+<li> 
+2006/02/28: Verbose command line option. Check new command line things on Windows.
 </li>
 
 
