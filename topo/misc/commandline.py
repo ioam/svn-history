@@ -26,6 +26,7 @@ specific command, or topo.about() for info on this release, including
 licensing information.
 """
 
+### JABALERT: Should pick just one of these, presumably pi
 global_constants = {'PI':math.pi, 'pi':math.pi, 'Pi':math.pi}
 
 def start(interactive=True):
