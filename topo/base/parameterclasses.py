@@ -5,6 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
+import sys
 import copy
 import re
 import os.path
@@ -33,25 +34,57 @@ class Filename(Parameter):
     system's format, but only code that uses UNIX-style paths will run on all operating
     systems.
     """
-    __slots__ = []
+    __slots__ = ['search_paths']
+    common_search_paths = [sys.exec_prefix]
+    
     __doc__ = property((lambda self: self.doc))
     
-    def __init__(self,default=None,**params):
+    def __init__(self,default=None,search_paths=[],**params):
         """
         Create a Filename Parameter with the specified string.
         
         The string is stored in the path format of the user's
         operating system.
 
-        The path must be relative to Topographica's own path.
+        If the path is a relative one, it is appended to all prefixes
+        in Filename.common_search_paths and self.search_paths until
+        the file is found. If the file is not found, an error is raised. 
         """
-        Parameter.__init__(self,os.path.normpath(default),**params)
+        self.search_paths=search_paths
+        Parameter.__init__(self,self.__construct_path(default),**params)
 
     def __set__(self,obj,val):
         """
         Call Parameter's __set__ with the os-specific path.
         """
-        super(Filename,self).__set__(obj,os.path.normpath(val))
+        super(Filename,self).__set__(obj,self.__construct_path(val))
+
+    def __construct_path(self,path):
+        """
+        Create an absolute path to the file if the path is not
+        already absolute.
+
+        Looks in Filename's common_search_paths and any ones
+        added specifically to this parameter in search_paths.
+
+        (No lookup is done with an absolute path.)
+        """
+        # first convert to right type for os:
+        path = os.path.normpath(path)
+        
+        if os.path.isabs(path): return path
+
+        # Append the given relative path to the prefixes until
+        # the file is found. An IOError is raised if the file
+        # isn't found in any of these.
+        try_path = ''
+        paths_tried = []
+        for prefix in self.common_search_paths+self.search_paths:
+            try_path = os.path.join(prefix,path)
+            if os.path.isfile(try_path): return try_path
+            paths_tried.append(try_path)
+            
+        raise IOError('File '+os.path.split(path)[1]+' was not found in the following places: '+str(paths_tried)+'.')
 
 
 # CEBHACKALERT: needs to be finished

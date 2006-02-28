@@ -228,8 +228,7 @@ class Image(PatternGenerator):
 
     aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.31,doc="Ratio of width to height; size*aspect_ratio gives the width.")
     size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.30,doc="Height of the image.")
-    filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9,
-                        doc="Path (relative to the Topographica base path) to an image in e.g. PNG, JPG, TIFF, or PGM format.")
+    filename = Filename(default='examples/ellen_arthur.pgm',search_paths=['/home/chris'],precedence=0.9,doc="Path (relative to the Topographica base path) to an image in e.g. PNG, JPG, TIFF, or PGM format.")
 
     size_normalization = Enumeration(default='fit_shortest',
                                      available=['fit_shortest','fit_longest','stretch_to_fit','original'],
