@@ -37,7 +37,7 @@ class Filename(Parameter):
     UNIX-style paths will run on all operating systems.
     """
     __slots__ = ['search_paths','topographica_path']
-    common_search_paths = []
+    common_search_paths = []  # could add something like a home directory?
     topographica_path = sys.exec_prefix
     
     __doc__ = property((lambda self: self.doc))
@@ -52,7 +52,7 @@ class Filename(Parameter):
         See __construct_path() for details on path resolution
         order.
         """
-        self.search_paths=search_paths
+        self.search_paths=search_paths  # e.g. an images directory
         
         if default!=None:
             k = self.__construct_path(default)
@@ -77,8 +77,8 @@ class Filename(Parameter):
 
         Absolute paths are not changed.  A relative path is first
         appended to Topographica's path. If no file is found, the path
-        is appended to the prefix paths held in common_search_paths,
-        followed by those in search_paths; at each point the presence
+        is appended to the prefix paths held in search_paths,
+        followed by those in common_search_paths; at each point the presence
         of the file is tested for and if there, its path is returned.
         If a prefix path is absolute, the path is just appended to the
         prefix; if a prefix path is relative, it's first tried
@@ -107,7 +107,7 @@ class Filename(Parameter):
         # found.
         # An IOError is raised if the file isn't found in any of these.
 
-        for prefix in self.common_search_paths+self.search_paths:
+        for prefix in self.search_paths+self.common_search_paths:
 
             
             try_path = os.path.join(prefix,path)
