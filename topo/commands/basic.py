@@ -8,7 +8,6 @@ import __main__
 import pickle
 
 import topo
-import topo.base.simulator
 from topo.base.parameterizedobject import ParameterizedObject, Parameter
 from topo.base.sheet import Sheet
 from topo.base.projection import ProjectionSheet
@@ -20,22 +19,16 @@ from topo.misc.utils import get_states_of_classes_from_module
 
 def save_input_generators():
     """Save a copy of the active_sim's current input_generators for all GeneratorSheets."""
-    sim = topo.base.simulator.get_active_sim()
-
-    if sim:
-        generator_sheets = sim.objects(GeneratorSheet).values()
-        for sheet in generator_sheets:
-            sheet.push_input_generator()
+    generator_sheets = topo.sim.objects(GeneratorSheet).values()
+    for sheet in generator_sheets:
+        sheet.push_input_generator()
 
 
 def restore_input_generators():
-    """Restore previously saved input_generators for all of active_sim's GeneratorSheets."""
-    sim = topo.base.simulator.get_active_sim()
-
-    if sim:
-        generator_sheets = sim.objects(GeneratorSheet).values()
-        for sheet in generator_sheets:
-            sheet.pop_input_generator()
+    """Restore previously saved input_generators for all of topo.sim's GeneratorSheets."""
+    generator_sheets = topo.sim.objects(GeneratorSheet).values()
+    for sheet in generator_sheets:
+        sheet.pop_input_generator()
 
 
 ### JABHACKALERT!  Should leave the state of all learning flags
@@ -63,8 +56,9 @@ def pattern_present(inputs=None,duration=1.0,learning=False,overwrite_previous=F
     If learning is False, overwrites the existing values of Sheet.learning
     to disable learning, then reenables learning.
     """
-    sim = topo.base.simulator.get_active_sim()
+    sim = topo.sim
 
+    # CEBHACKALERT: don't need this if-test?
     if sim:
 
         if not overwrite_previous:
