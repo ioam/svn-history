@@ -485,6 +485,10 @@ class ModelEditor :
         for node in node_list :
             # if the sheet has x,y coords, use them
             dictionary_entries = node.__dict__.keys()
+            ### JABALERT: Should probably change these to layout_x and layout_y, 
+            ### because they are about how the sheets are laid out in a visualization,
+            ### even if that layout is just generated as an image and saved to disk
+            ### rather than in a gui.
             if (('gui_x' in dictionary_entries) and ('gui_y' in dictionary_entries)) :
                 x, y = node.gui_x, node.gui_y
             # if not generate random coords
