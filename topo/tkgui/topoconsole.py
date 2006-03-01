@@ -141,7 +141,9 @@ class TopoConsole(Frame):
         self.num_weights_windows = 0
         self.num_weights_array_windows = 0
 
-        self.simulator = None
+        # CEBHACKALERT: don't need self.simulator, could just use
+        # topo.sim?
+        self.simulator = topo.sim
         # Ask simulator to tell this console if the active_sim changes
         topo.sim.objects_to_notify_of_active_sim.append(self)
         # CEBHACKALERT: this adds itself to the list above, but unless
