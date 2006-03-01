@@ -43,7 +43,7 @@ topo_www_url         = 'http://www.topographica.org/'
 
 # CEBHACKALERT: lose this and get TopoConsole.simulator instead
 def active_sim():
-    return topo.base.simulator.get_active_sim()
+    return topo.sim
 
 
 # If a particular plotgroup_template needs (or works better with) a
@@ -304,7 +304,7 @@ class TopoConsole(Frame):
     def notify_of_active_sim(self):
         """        
         """
-        self.simulator = topo.base.simulator.get_active_sim()
+        self.simulator = topo.sim
     
 
 
