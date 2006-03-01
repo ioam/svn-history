@@ -103,7 +103,15 @@ def measure_cog():
     """Calculate center of gravity for each CF of each unit in each CFSheet."""
 
     sim = topo.base.simulator.get_active_sim()
-    for sheet in sim.objects(CFSheet).values():
+
+    # JABHACKALERT: This does not seem to work for SharedWeightProjections,
+    # which give a blank CoG plot as of 1 Mar 2006, instead of a perfect grid.
+
+    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
+    measured_sheets = filter(f,sim.objects(Sheet).values())
+    
+    for sheet in measured_sheets:
+      if hasattr(sheet,'in_projections'):
         for projlist in sheet.in_projections.values():
             for proj in projlist:
                 rows,cols=sheet.activity.shape
@@ -111,10 +119,10 @@ def measure_cog():
                 ypref=zeros((rows,cols),Float)
                 for r in xrange(rows):
                     for c in xrange(cols):
-                        cf=proj.cfs[r][c]
+                        cf=proj.cf(r,c)
                         r1,r2,c1,c2 = cf.slice_tuple()
                         row_centroid,col_centroid = centroid(cf.weights)
-                        xcentroid ,ycentroid = matrix2sheet(r1+row_centroid+0.5,
+                        xcentroid, ycentroid = matrix2sheet(r1+row_centroid+0.5,
                                                             c1+col_centroid+0.5,
                                                             proj.src.bounds,
                                                             proj.src.xdensity,
