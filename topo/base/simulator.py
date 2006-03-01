@@ -92,7 +92,10 @@ Forever = FixedPoint(-1)
 
 
 # CEBHACKALERT: these are to be removed; calls
-# to them can be replaced by 'topo.sim'
+# to them can be replaced by 'topo.sim' and
+# 'topo.sim.change_sim(sim)' (if there is
+# anywhere other than load_snapshot that
+# really needs it.
 def get_active_sim():
     """
     Return the active simulator.
@@ -189,6 +192,12 @@ class SimSingleton(Singleton):
         Allow dictionary-style access to the simulator.
         """
         return self.actual_sim[item_name]
+
+    def __setitem__(self,item_name,item_value):
+        """
+        Allow dictionary-style access to the simulator.
+        """
+        self.actual_sim[item_name]=item_value
 
 
 class EventProcessor(ParameterizedObject):
@@ -321,6 +330,9 @@ class SimulatorEvent:
         self.fn = fn
 
 
+
+# CEBHACKALERT: need to rename to simulation, etc.
+
 # Simulator stores its events in a linear-time priority queue (i.e a
 # sorted list.) For efficiency, e.g. for spiking neuron simulations,
 # we'll probably need to replace the linear priority queue with a more
@@ -378,7 +390,21 @@ class Simulator(ParameterizedObject):
             return self.objects()[item_name]
         except KeyError:
             raise AttributeError("Simulator doesn't contain '"+item_name+"'.")
-        
+
+    # CB: for demonstration
+    def __setitem__(self,item_name,item_value):
+        """
+        Add item_value to the simulator, setting its name to item_name.
+        item_value must be an EP.
+        """
+        if not isinstance(item_name,str):
+           raise TypeError("Expected string for item name (objects in the Simulator are indexed by name).")
+
+        if not isinstance(item_value,EventProcessor):
+           raise TypeError("Expected EventProcessor: objects in the Simulator must be eps.")
+
+        item_value.name=item_name
+        self.add(item_value)
 
     def time(self):
         """
@@ -547,6 +573,26 @@ class Simulator(ParameterizedObject):
                 self._event_processors.append(ep)
                 ep.simulator = self
                 ep.start()
+
+
+    # CB: for demonstration only
+    def connect2(self,
+                src,
+                dest,
+                src_port=None,
+                dest_port=None,
+                delay=0,connection_type=EPConnection,**connection_params):
+        """
+        Connect the source to the destination, at the appropriate ports,
+        if any are given.  Returns the connection that
+        was created.
+        """
+        #self.add(src,dest)
+        conn = connection_type(src=self[src],dest=self[dest],src_port=src_port,dest_port=dest_port,delay=delay,**connection_params)
+        self[src]._connect_to(conn)
+        self[dest]._connect_from(conn)
+        return conn
+
 
 
     def connect(self,
