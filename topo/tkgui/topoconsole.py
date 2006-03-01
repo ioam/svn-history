@@ -19,6 +19,8 @@ import topo.base.simulator
 import topo.base.parameterizedobject
 from topo.tkgui.editorwindow import ModelEditor
 
+import topo
+
 import topo.commands.basic
 import webbrowser
 
@@ -141,7 +143,7 @@ class TopoConsole(Frame):
 
         self.simulator = None
         # Ask simulator to tell this console if the active_sim changes
-        topo.base.simulator.objects_to_notify_of_active_sim.append(self)
+        topo.sim.objects_to_notify_of_active_sim.append(self)
         # CEBHACKALERT: this adds itself to the list above, but unless
         # 'quit' is selected from the menu, it leaves itself behind in
         # the list (e.g. if X is clicked to shut the window).
@@ -310,7 +312,7 @@ class TopoConsole(Frame):
 
         Exits the Topographica interpreter.
         """
-        topo.base.simulator.objects_to_notify_of_active_sim.remove(self)
+        topo.sim.objects_to_notify_of_active_sim.remove(self)
         Frame.quit(self)
         Frame.destroy(self)     # Get rid of widgets
         self.parent.destroy()   # Get rid of window

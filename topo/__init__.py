@@ -75,3 +75,6 @@ def about():
     """Print release and licensing information."""
     print ABOUT_TEXT
 
+
+from topo.base.simulator import SimSingleton
+sim = SimSingleton()

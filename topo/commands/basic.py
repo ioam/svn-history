@@ -7,6 +7,7 @@ __version__='$Revision$'
 import __main__
 import pickle
 
+import topo
 import topo.base.simulator
 from topo.base.parameterizedobject import ParameterizedObject, Parameter
 from topo.base.sheet import Sheet
@@ -118,10 +119,9 @@ def save_snapshot(snapshot_name):
     snapshot_name is the file name string.
 
     Uses Python's 'pickle' module, so subject to the same limitations.
-    ** update
-    """
-    sim = topo.base.simulator.get_active_sim()
 
+    CEBHACKALERT: update both save_snapshot doc and load_snapshot doc
+    """
     states_of_classes = {}
     classes = {}
 
@@ -129,7 +129,7 @@ def save_snapshot(snapshot_name):
     topo_ = __main__.__dict__['topo']
     get_states_of_classes_from_module(topo_,states_of_classes,[])
     
-    pickle.dump((sim,states_of_classes), open(snapshot_name,'wb'), 2)
+    pickle.dump((topo.sim.actual_sim,states_of_classes), open(snapshot_name,'wb'), 2)
 
 
 def load_snapshot(snapshot_name):
@@ -140,8 +140,7 @@ def load_snapshot(snapshot_name):
     """
     
     sim,states_of_classes = pickle.load(open(snapshot_name,'rb'))
-
-    topo.base.simulator.set_active_sim(sim)
+    topo.sim.change_sim(sim)
 
     # Set class attributes
     # i.e. "path.to.module.Class.x=y"

@@ -91,23 +91,104 @@ STOP = "Simulator Stopped"
 Forever = FixedPoint(-1)
 
 
-__active_sim = None
+# CEBHACKALERT: these are to be removed; calls
+# to them can be replaced by 'topo.sim'
 def get_active_sim():
     """
-    Return the active simulator, which could be None.
-    
-    If there is no active simulator a warning is printed.
+    Return the active simulator.
     """
-    if __active_sim==None:
-        ParameterizedObject().warning('No active Simulator.')
-    return __active_sim
+    return SimSingleton()
 
 def set_active_sim(sim):
-    """Set the active simulator."""
-    global __active_sim
-    __active_sim = sim
+    """
+    """
+    SimSingleton().change_sim(sim)
 
-objects_to_notify_of_active_sim=[]
+
+class Singleton(object):
+    """
+    The singleton pattern.
+
+    To create a singleton class, you subclass from Singleton; each
+    subclass will have a single instance, no matter how many times its
+    constructor is called. To further initialize the subclass
+    instance, subclasses should override 'init' instead of __init__ -
+    the __init__ method is called each time the constructor is called.
+
+    From http://www.python.org/2.2.3/descrintro.html#__new__
+    """
+    def __new__(cls, *args, **kwds):
+        it = cls.__dict__.get("__it__")
+        if it is not None:
+            return it
+        cls.__it__ = it = object.__new__(cls)
+        it.init(*args, **kwds)
+        return it
+    def init(self, *args, **kwds):
+        pass
+
+
+
+class SimSingleton(Singleton):
+    """
+    A singleton class, the instance of which allows access to
+    the current simulator.
+
+    Any object added to the list objects_to_notify_of_active_sim is
+    assumed to have a notify_of_active_sim() method, which will be
+    called whenever a Simulator is created with register=True (the
+    default) so that such objects can take action if they wish.
+    """
+    actual_sim = None
+    objects_to_notify_of_active_sim = []
+        
+    def init(self):
+        """
+        Create a new simulator.
+        """
+        self.change_sim(Simulator())
+
+    def __getattribute__(self,attribute):
+        """
+        If the SimSingleton object has the attribute, return it; if the
+        actual_sim has the attribute, return it; otherwise, an AttributeError
+        relating to Simulator will be raised (as usual).
+        """
+        try:
+            return object.__getattribute__(self,attribute)
+        except AttributeError:
+            actual_sim = object.__getattribute__(self,'actual_sim')
+            return getattr(actual_sim,attribute)
+
+    def __setattr__(self,name,value):
+        """
+        If this object has the attribute name, set it to value.
+        Otherwise, set self.actual_sim.name=value.
+
+        Unless an attribute is inserted into this object's __dict__,
+        the only ones it has are 'actual_sim' and 'objects_to_notify_of_active_sim'.
+        So, this method really sets attributes on the actual_sim.
+        """
+        if hasattr(self,name):
+            object.__setattr__(self, name, value)
+        else:
+            object.__setattr__(self.actual_sim, name, value)
+
+    def change_sim(self,new_sim):
+        """
+        Set actual_sim to be new_sim, and notify objects in
+        objects_to_notify_of_active_sim that the simulator's changed.
+        """
+        assert isinstance(new_sim,Simulator), "Can only change to a Simulator instance."
+        self.actual_sim=new_sim
+        for obj in self.objects_to_notify_of_active_sim:
+            obj.notify_of_active_sim()
+            
+    def __getitem__(self,item_name):
+        """
+        Allow dictionary-style access to the simulator.
+        """
+        return self.actual_sim[item_name]
 
 
 class EventProcessor(ParameterizedObject):
@@ -281,12 +362,7 @@ class Simulator(ParameterizedObject):
         self._sleep_window_violation = False
 
         if self.register:
-            set_active_sim(self)
-            # CEBALERT: we might want to print a warning
-            # if obj doesn't exist any more rather than
-            # getting an error?
-            for obj in objects_to_notify_of_active_sim:
-                obj.notify_of_active_sim()
+            SimSingleton().change_sim(self)
 
         self.events = []
         self._events_stack = []
