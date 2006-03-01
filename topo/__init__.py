@@ -51,10 +51,10 @@ __all__ = ['analysis',
 # Enable automatic importing of .ty files, treating them just like .py
 import topo.misc.tyimputil
 
-import os
+from os import getenv
 
 ABOUT_TEXT = """
-Pre-release version """+os.getenv("TOPORELEASE","")+ \
+Pre-release version """+getenv("TOPORELEASE","")+ \
 """ of Topographica; an updated version may be
 available from topographica.org.
 
