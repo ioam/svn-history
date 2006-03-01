@@ -57,12 +57,8 @@ def start(interactive=True):
 
 # Create the topographica parser.
 usage = "usage: topographica ([<option>]:[<filename>])*\n\
-where <option> can be one of the following:\n\
--c \"<command>\"\n\
--g\n\
--i\n\
-(-v TEMPORARILY DISABLED)\
-"
+where any combination of options and Python script filenames will be\n\
+processed in order left to right."
 topo_parser = OptionParser(usage=usage)
 
 # Defining the options 
