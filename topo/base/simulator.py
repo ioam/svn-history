@@ -91,21 +91,14 @@ STOP = "Simulator Stopped"
 Forever = FixedPoint(-1)
 
 
-# CEBHACKALERT: these are to be removed; calls
-# to them can be replaced by 'topo.sim' and
-# 'topo.sim.change_sim(sim)' (if there is
-# anywhere other than load_snapshot that
-# really needs it.
+# CEBHACKALERT: this is to be removed; calls
+# can be replaced by 'topo.sim'
+
 def get_active_sim():
     """
     Return the active simulator.
     """
     return SimSingleton()
-
-def set_active_sim(sim):
-    """
-    """
-    SimSingleton().change_sim(sim)
 
 
 class Singleton(object):
