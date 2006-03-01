@@ -55,11 +55,11 @@ class Filename(Parameter):
         self.search_paths=search_paths  # e.g. an images directory
         
         if default!=None:
-            k = self.__construct_path(default)
+            path = self.__construct_path(default)
         else:
-            k = None
+            path = None
 
-        Parameter.__init__(self,k,**params)
+        Parameter.__init__(self,path,**params)
 
 
     def __set__(self,obj,val):
