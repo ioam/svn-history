@@ -10,7 +10,7 @@ from Tkinter import Canvas, Frame, Button, Toplevel, Tk, Menu, Scrollbar, SUNKEN
 from tkFileDialog import asksaveasfilename
 from random import Random, random
 
-from topo.base.simulator import get_active_sim, set_active_sim, Simulator
+import topo
 from topo.base.sheet import Sheet
 from topo.base.projection import Projection
 
@@ -47,8 +47,8 @@ class EditorCanvas(Canvas) :
         self.mode = "ARROW"
         self.MAX_VIEWS = 5
         # get the topo simulator
-        self.simulator = self.get_sim()
-        print self.simulator
+        self.simulator = topo.sim
+        print self.simulator.name # Do we need to print this? 
 
         # create the menu widget used as a popup on objects and connections
         self.option_add("*Menu.tearOff", "0") 
@@ -435,16 +435,6 @@ class EditorCanvas(Canvas) :
             # if no connection, check bounds of objects
             focus = self.get_object_xy(x, y)
         return focus # return the first found or None
-
-    def get_sim(self) :
-        # get the active Topographica simulator
-        sim = get_active_sim()
-        # if there is not one, create one and register it for other processes
-        if (sim == None) :
-            sim = Simulator()
-            set_active_sim(sim)
-        return sim
-
 
 
 ####################################################################
