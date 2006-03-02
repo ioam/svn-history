@@ -55,3 +55,6 @@ for key,val in locals().items():
             print err
 
 
+def run(verbosity=1):
+    unittest.TextTestRunner(verbosity=verbosity).run(suite)
+
