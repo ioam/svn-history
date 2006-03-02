@@ -63,17 +63,11 @@ events to itself than it sends out to other EPs.  In this case the
 self connections might have src_port = 'recurrent'.
 
 
-Active Simulator
+Current Simulator
 
-The active Simulator is the last Simulator to have been created
-with register=True (the default).
-
-Often, external objects will need to know when the active Simulator
-has changed, e.g. to update a GUI.  Any object added to the list
-objects_to_notify_of_active_sim is assumed to have a
-notify_of_active_sim() method, which will be called whenever a new
-Simulator is created with register=True (the default) so that such
-objects can take action if they wish.
+The current Simulator, which can be accessed through the instance
+of the Singleton class SimSingleton(), is the last Simulator to
+have been created with register=True (the default).
 
 
 $Id$
@@ -129,14 +123,8 @@ class SimSingleton(Singleton):
     """
     A singleton class, the instance of which allows access to
     the current simulator.
-
-    Any object added to the list objects_to_notify_of_active_sim is
-    assumed to have a notify_of_active_sim() method, which will be
-    called whenever a Simulator is created with register=True (the
-    default) so that such objects can take action if they wish.
     """
     actual_sim = None
-    objects_to_notify_of_active_sim = []
         
     def init(self):
         """
@@ -162,7 +150,7 @@ class SimSingleton(Singleton):
         Otherwise, set self.actual_sim.name=value.
 
         Unless an attribute is inserted into this object's __dict__,
-        the only ones it has are 'actual_sim' and 'objects_to_notify_of_active_sim'.
+        the only one it is are 'actual_sim'.
         So, this method really sets attributes on the actual_sim.
         """
         if hasattr(self,name):
@@ -170,15 +158,13 @@ class SimSingleton(Singleton):
         else:
             object.__setattr__(self.actual_sim, name, value)
 
+    # CEBHACKALERT: no longer need a method
     def change_sim(self,new_sim):
         """
-        Set actual_sim to be new_sim, and notify objects in
-        objects_to_notify_of_active_sim that the simulator's changed.
+        Set actual_sim to be new_sim.
         """
         assert isinstance(new_sim,Simulator), "Can only change to a Simulator instance."
         self.actual_sim=new_sim
-        for obj in self.objects_to_notify_of_active_sim:
-            obj.notify_of_active_sim()
             
     def __getitem__(self,item_name):
         """

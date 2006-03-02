@@ -92,26 +92,21 @@ class PlotsMenuEntry(topo.base.parameterizedobject.ParameterizedObject):
         self.title = '%s %d' % (self.label, self.num_windows)
         #if 'valid_context' in dir(self.class_name):
 
-        if self.console.simulator:
-	    if self.class_name.valid_context():
-		win = GUIToplevel(self.console)
-		win.withdraw()
-		win.title(self.title)
-		pn = self.class_name(parent=win,console=self.console,pgt_name=self.template.name)
-		pn.pack(expand=YES,fill=BOTH)
+        if self.class_name.valid_context():
+            win = GUIToplevel(self.console)
+            win.withdraw()
+            win.title(self.title)
+            pn = self.class_name(parent=win,console=self.console,pgt_name=self.template.name)
+            pn.pack(expand=YES,fill=BOTH)
 
-		pn.refresh_title()
-		win.deiconify()
-		self.console.messageBar.message('state', 'OK')
-		return pn
-	    else:
-		self.console.messageBar.message('state',
-						'Simulator does not have proper Sheet type.')
-		return None
-
-	else:
-	    self.console.messageBar.message('state', 'No active Simulator object.')
-	    return None
+            pn.refresh_title()
+            win.deiconify()
+            self.console.messageBar.message('state', 'OK')
+            return pn
+        else:
+            self.console.messageBar.message('state',
+                                            'Simulator does not have proper Sheet type.')
+            return None
 
 
 
@@ -135,21 +130,15 @@ class TopoConsole(Frame):
     def __init__(self, parent=None,**config):
         Frame.__init__(self,parent,config)
 
+        # CEBHACKALERT: for all the GUI/plotting things I don't know about yet
+        # that ask for a topoconsole's simulator.
+        self.simulator = topo.sim
+
         self.parent = parent
         self.num_activity_windows = 0
         self.num_orientation_windows = 0
         self.num_weights_windows = 0
         self.num_weights_array_windows = 0
-
-        # CEBHACKALERT: don't need self.simulator, could just use
-        # topo.sim?
-        self.simulator = topo.sim
-        # Ask simulator to tell this console if the active_sim changes
-        topo.sim.objects_to_notify_of_active_sim.append(self)
-        # CEBHACKALERT: this adds itself to the list above, but unless
-        # 'quit' is selected from the menu, it leaves itself behind in
-        # the list (e.g. if X is clicked to shut the window).
-        # I need to find an 'on close' or similar method.
 
         self.loaded_script = None
         self.input_params_window = None
@@ -301,20 +290,12 @@ class TopoConsole(Frame):
                                 obj.name,label=label,
                                 command=entry.command)
     
-    def notify_of_active_sim(self):
-        """        
-        """
-        self.simulator = topo.sim
-    
-
-
     def quit(self):
         """
         Close the main GUI window.
 
         Exits the Topographica interpreter.
         """
-        topo.sim.objects_to_notify_of_active_sim.remove(self)
         Frame.quit(self)
         Frame.destroy(self)     # Get rid of widgets
         self.parent.destroy()   # Get rid of window
@@ -417,20 +398,18 @@ class TopoConsole(Frame):
         """
         Test Pattern Window.  
         """
-        if self.simulator: 
-            if TestPattern.valid_context():
-                self.input_params_window = GUIToplevel(self)
-                self.input_params_window.withdraw()
-                self.input_params_window.title('Test Pattern')
-                ripp = TestPattern(self.input_params_window,self)
-                ripp.pack(side=TOP,expand=YES,fill=BOTH)
-                self.input_params_window.deiconify()
-                self.messageBar.message('state', 'OK')
-            else:
-                self.messageBar.message('state',
-                            'Simulator does not have proper Sheet type.')
-                return None
+        if TestPattern.valid_context():
+            self.input_params_window = GUIToplevel(self)
+            self.input_params_window.withdraw()
+            self.input_params_window.title('Test Pattern')
+            ripp = TestPattern(self.input_params_window,self)
+            ripp.pack(side=TOP,expand=YES,fill=BOTH)
+            self.input_params_window.deiconify()
+            self.messageBar.message('state', 'OK')
         else:
+            self.messageBar.message('state',
+                        'Simulator does not have proper Sheet type.')
+            return None
             self.messageBar.message('state', 'No active Simulator object.')
 
 
@@ -448,7 +427,7 @@ class TopoConsole(Frame):
         Try to open the specified location in a new window of the default
         browser. See webbrowser module for more information.
         """
-        
+        #CEBHACKALERT: change like Filename
         if relative:
             location = os.path.join(os.getcwd(),location)
             
@@ -526,31 +505,29 @@ class TopoConsole(Frame):
         A simulation object should be linked to the GUI before this
         learning command is issued on the Simulator object.
         """
-        s = active_sim()
+        # Could simply do s.run(float(count)), but instead breaks
+        # it up so that we can update the display after every 1.0
+        # time steps, then do any fractional part remaining.
+        # 
+        # Should replace with a progress bar; see
+        # http://tkinter.unpythonic.net/bwidget/
+        # http://tkinter.unpythonic.net/wiki/ProgressBar
+        s = topo.sim
         
-        if s:
-            # Could simply do s.run(float(count)), but instead breaks
-            # it up so that we can update the display after every 1.0
-            # time steps, then do any fractional part remaining.
-            # 
-            # Should replace with a progress bar; see
-            # http://tkinter.unpythonic.net/bwidget/
-            # http://tkinter.unpythonic.net/wiki/ProgressBar
-            fcount = float(count)
-            step   = 2.0
-            iters  = int(floor(fcount/step))
-            remain = fmod(fcount, step)
-            for i in xrange(iters):
-                s.run(step)
-                percent = 100.0*i/iters
-                message = 'Time ' + str(s.time()) + ': ' + str(int(percent)) + '% of '  + str(fcount) + ' completed.'
-                self.messageBar.message('state', message)
-                self.update_idletasks()
-            s.run(remain)
-            message = 'Ran ' + str(fcount) + ' to time ' + str(s.time())
-            self.auto_refresh()
-        else:
-            message = 'Error: No active simulator.'
+        fcount = float(count)
+        step   = 2.0
+        iters  = int(floor(fcount/step))
+        remain = fmod(fcount, step)
+        for i in xrange(iters):
+            s.run(step)
+            percent = 100.0*i/iters
+            message = 'Time ' + str(s.time()) + ': ' + str(int(percent)) + '% of '  + str(fcount) + ' completed.'
+            self.messageBar.message('state', message)
+            self.update_idletasks()
+        s.run(remain)
+        message = 'Ran ' + str(fcount) + ' to time ' + str(s.time())
+        self.auto_refresh()
+
 
         self.messageBar.message('state', message)
         topo.tkgui.show_cmd_prompt()
