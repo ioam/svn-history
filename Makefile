@@ -8,6 +8,9 @@ DOC    = doc/Reference_Manual
 RELEASE = 0.8.2
 RELEASE_TAG = release_0_8_2
 
+TEST_VERBOSITY = 1
+
+
 # Default does not include doc, in case user lacks PHP
 default: ext-packages topographica reference-manual
 
@@ -17,8 +20,10 @@ clean: cleandoc clean-ext-packages
 
 FORCE:
 
+# To get more information about which tests are being run, do:
+# make TEST_VERBOSITY=2 tests
 tests: FORCE
-	./topographica -c "import topo.tests; topo.tests.run()"
+	./topographica -c "import topo.tests; topo.tests.run(verbosity=${TEST_VERBOSITY})"
 
 examples: FORCE
 	make -C examples
