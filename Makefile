@@ -38,9 +38,7 @@ clean-ext-packages:
 
 # Startup Script, in Python
 topographica: external Makefile
-	rm topographica
-
-	echo "#!${PREFIX}bin/python" >> topographica
+	echo "#!${PREFIX}bin/python" > topographica
 	echo "" >> topographica
 	echo "# Wrapper for setting environment vars and exec-ing commands" >> topographica
 	echo "" >> topographica
