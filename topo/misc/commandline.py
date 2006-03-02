@@ -40,7 +40,7 @@ def start(interactive=True):
     
     for (k,v) in global_constants.items():
         exec '%s = %s' % (k,v) in __main__.__dict__
-        
+
     if interactive:
         print BANNER
         try:
@@ -122,8 +122,9 @@ def exec_argv(argv):
 
      # catch the first filenames arguments (before any options) and execute them.
     filename_arg = topo_parser.largs
+
     for filename in filename_arg:
-	execfile(filename) in __main__.__dict__
+	execfile(filename,__main__.__dict__)
 
     # execute remaining commands.
     for cmd in option.commands:
