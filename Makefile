@@ -47,10 +47,8 @@ topographica: external Makefile
 	echo "" >> topographica
 	echo "# Set os environment variables before importing anything else" >> topographica
 	echo "import os" >> topographica
-        # CEBHACKALERT: do we need this really?
-	echo "TOPO = '${PREFIX}'" >> topographica
-	echo "os.environ['LD_LIBRARY_PATH']=os.path.join(TOPO,'lib')+':'+os.getenv('LD_LIBRARY_PATH','')" >> topographica
-	echo "os.environ['PYTHONPATH']=TOPO+':'+os.getenv('PYTHONPATH','')" >> topographica
+	echo "os.environ['LD_LIBRARY_PATH']=os.path.join('${PREFIX}','lib')+':'+os.getenv('LD_LIBRARY_PATH','')" >> topographica
+	echo "os.environ['PYTHONPATH']='${PREFIX}'+':'+os.getenv('PYTHONPATH','')" >> topographica
 	echo "os.environ['TOPORELEASE']='${RELEASE}'" >> topographica
 	echo "" >> topographica
 	echo "# Now execute Topographica-specific things" >> topographica
