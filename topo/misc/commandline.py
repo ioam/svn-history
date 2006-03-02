@@ -116,9 +116,13 @@ def exec_argv(argv):
     Read in argv (minus argv[0]!), rearrange and execute.
     """
     (option,args) = topo_parser.parse_args(argv)
-    
+
+    # If no scripts and no commands were given, make it like -i was given.
+    if len(args)==0 and len(option.commands)==0:
+        option.interactive=True
+        
     # execute prefix commands and set Python options.
-    exec_prefixes(option) 
+    exec_prefixes(option)
 
      # catch the first filenames arguments (before any options) and execute them.
     filename_arg = topo_parser.largs
@@ -129,7 +133,6 @@ def exec_argv(argv):
     # execute remaining commands.
     for cmd in option.commands:
 	exec cmd in __main__.__dict__
-
 
 
 def exec_prefixes(option):
@@ -156,7 +159,7 @@ def exec_prefixes(option):
     else:
 	exec "topo.gui_cmdline_flag = False;" in __main__.__dict__
      
-    # if -i is on
+    # if -i is on, or no scripts were given and no commands were given
     if option.interactive:
 	os.environ["PYTHONINSPECT"] = "1"
 
