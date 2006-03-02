@@ -18,7 +18,7 @@ clean: cleandoc clean-ext-packages
 FORCE:
 
 tests: FORCE
-	./topographica runtests
+	./topographica -c "import topo.tests; topo.tests.run()"
 
 examples: FORCE
 	make -C examples
