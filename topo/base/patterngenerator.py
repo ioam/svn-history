@@ -55,6 +55,8 @@ class PatternGenerator(ParameterizedObject):
                     doc="Additive offset to input pattern, defaulting to 0.0")
 
 
+    # CEBHACKALERT: warnings should be printed if a non-parameter attribute
+    # is set this way (e.g. try topo.patterns.basic.Gaussian(height=4) ).
     def __call__(self,**params):
         """
         # CEBHACKALERT: I still have documentation to write, including explaining
