@@ -52,6 +52,9 @@ __all__ = ['analysis',
 import topo.misc.tyimputil
 
 from os import getenv
+from topo.base.simulator import SimSingleton
+
+sim = SimSingleton()
 
 ABOUT_TEXT = """
 Pre-release version """+getenv("TOPORELEASE","")+ \
@@ -76,5 +79,4 @@ def about():
     print ABOUT_TEXT
 
 
-from topo.base.simulator import SimSingleton
-sim = SimSingleton()
+
