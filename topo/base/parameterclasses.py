@@ -38,7 +38,6 @@ class Filename(Parameter):
     """
     __slots__ = ['search_paths','topographica_path']
     common_search_paths = []  # could add something like a home directory?
-    topographica_path = sys.exec_prefix
     
     __doc__ = property((lambda self: self.doc))
     
@@ -52,6 +51,9 @@ class Filename(Parameter):
         See __construct_path() for details on path resolution
         order.
         """
+        # CEBHACKALERT: have to think about pickling for these
+        # two attributes, and common_search_paths.
+        self.topographica_path = sys.exec_prefix
         self.search_paths=search_paths  # e.g. an images directory
         
         if default!=None:
