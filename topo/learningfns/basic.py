@@ -94,7 +94,7 @@ class HebbianSOMLF(SOMLF):
         bb = BoundingBox(points=((-rbound,-rbound), (rbound,rbound)))
 
         # Print parameters designed to match fm2d's output
-        #print "rad= %d std= %f alpha= %f" % (radius_int, radius, single_connection_learning_rate)
+        #print "%d rad= %d std= %f alpha= %f" % (topo.sim._time, radius_int, radius, single_connection_learning_rate)
 
         # CEBHACKALERT: specifying size here won't work for all patterns.
         # CEBHACKALERT: warnings should be printed if a non-parameter attribute
