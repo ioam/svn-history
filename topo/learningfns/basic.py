@@ -96,9 +96,6 @@ class HebbianSOMLF(SOMLF):
         # Print parameters designed to match fm2d's output
         #print "%d rad= %d std= %f alpha= %f" % (topo.sim._time, radius_int, radius, single_connection_learning_rate)
 
-        # CEBHACKALERT: specifying size here won't work for all patterns.
-        # CEBHACKALERT: warnings should be printed if a non-parameter attribute
-        # is set this way (e.g. try adding height=4).
         neighborhood_matrix = nk_generator(bounds=bb,density=1,size=2*radius)
         output_fn = self.output_fn
         for r in range(rmin,rmax):
