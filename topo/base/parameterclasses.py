@@ -27,21 +27,19 @@ class Filename(Parameter):
     Filename is a Parameter that takes a string specifying the
     path of a file and stores it in the format of the user's operating system.
 
-    The path to the file can be absolute or relative to Topographica's
-    path, or relative to any paths specified in search_paths or
-    common_search_paths.
+    The path to the file can be absolute or relative to any paths
+    specified in search_paths.
 
     To make your code work on all platforms, you should specify paths
     in UNIX format (e.g. examples/ellen_arthur.pgm). You can specify
     paths in your operating system's format, but only code that uses
     UNIX-style paths will run on all operating systems.
     """
-    __slots__ = ['search_paths','topographica_path']
-    common_search_paths = []  # could add something like a home directory?
-    
+    __slots__ = ['search_paths']
     __doc__ = property((lambda self: self.doc))
-    
-    def __init__(self,default=None,search_paths=[],**params):
+
+    # CEBHACKALERT: can we rely on TOPO being in __main__.__dict__?
+    def __init__(self,default=None,search_paths=[sys.exec_prefix],**params):
         """
         Create a Filename Parameter with the specified string.
         
@@ -51,15 +49,12 @@ class Filename(Parameter):
         See __construct_path() for details on path resolution
         order.
         """
-        # CEBHACKALERT: have to think about pickling for these
-        # two attributes, and common_search_paths.
-        self.topographica_path = sys.exec_prefix
-        self.search_paths=search_paths  # e.g. an images directory
+        self.search_paths = copy.copy(search_paths)
         
-        if default!=None:
-            path = self.__construct_path(default)
-        else:
+        if default==None:
             path = None
+        else:
+            path = self.__construct_path(default)
 
         Parameter.__init__(self,path,**params)
 
@@ -77,49 +72,22 @@ class Filename(Parameter):
         Create an absolute path to the file if the path is not
         already absolute.
 
-        Absolute paths are not changed.  A relative path is first
-        appended to Topographica's path. If no file is found, the path
-        is appended to the prefix paths held in search_paths,
-        followed by those in common_search_paths; at each point the presence
-        of the file is tested for and if there, its path is returned.
-        If a prefix path is absolute, the path is just appended to the
-        prefix; if a prefix path is relative, it's first tried
-        relative to the current directory, then it is itself appended
-        to Topographica's path.
+        A relative path is appended to the prefix paths held in
+        search_paths; at each point the presence of the file is tested
+        for and if there, its path is returned.
 
         An IOError is raised if the file is not found in any of these places.
         """
-        # first convert to right type for os:
         path = os.path.normpath(path)
         
         if os.path.isabs(path): return path
 
         paths_tried = []
-        
-        # first try "topographica_path/path"
-        try_path = os.path.join(self.topographica_path,path)
-        if os.path.isfile(try_path): return try_path
-        paths_tried.append(try_path)
-
-        # Now try appending the given relative path to the prefixes
-        # until the file is found.  If the prefix is absolute, just
-        # append path.  If the prefix is relative, first try using it
-        # (so relative to current directory), then try appending the
-        # prefix itself to the topographica_path to see if the file is
-        # found.
-        # An IOError is raised if the file isn't found in any of these.
-
-        for prefix in self.search_paths+self.common_search_paths:
-
-            
-            try_path = os.path.join(prefix,path)
+        for prefix in self.search_paths:            
+            try_path = os.path.join(os.path.normpath(prefix),path)
             if os.path.isfile(try_path): return try_path
             paths_tried.append(try_path)
 
-            if not os.path.isabs(prefix):
-                try_path = os.path.join(self.topographica_path,prefix,path)
-                paths_tried.append(try_path)
-            
         raise IOError('File "'+os.path.split(path)[1]+'" was not found in the following places: '+str(paths_tried)+'.')
 
 

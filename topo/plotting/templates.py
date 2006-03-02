@@ -31,8 +31,7 @@ class PlotGroupTemplate(ParameterizedObject):
     
     command = Parameter('pass')
     normalize = BooleanParameter(False)
-    image_location = Filename(search_paths=['topo/commands/'],
-                              doc='Use to ensure correct paths for any images used.')
+    image_location = Filename(doc='Use to ensure correct paths for any images used.')
     
     def __init__(self, plot_templates=[], static_images = [],**params):
         """
@@ -147,7 +146,7 @@ pgt.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pgt.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
 pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
-pgt.add_static_image('Color Key','or_key_white_vert.png')
+pgt.add_static_image('Color Key','topo/commands/or_key_white_vert.png')
 
 
 pgt = new_plotgroup_template(name='Position Preference',command='measure_position_pref() ; topographic_grid()',normalize=True)
