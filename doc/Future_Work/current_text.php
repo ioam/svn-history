@@ -12,6 +12,16 @@ was first added to the list, or a change was made.)
 
 <ul>
 
+<li>
+2006/03/03 (CB): topographica script, setting environment variables (problem finding tkinter libraries)
+</li>
+
+<li>
+2006/03/03 (CB): Windows version doesn't work (with automatic installation) now startup scripts have changed.
+</li>
+
+
+
 <li> 
 2006/02/28 (CB): Fix problem (matching previous work) with som_retinotopy.
 </li>
@@ -51,8 +61,12 @@ Tasks which the developers are about to start.
 
 <ul>
 
+<li>										    2006/03/03 (CB): modify test files to take less time to run (notably measurefeaturemap: reduce the density)
+</li>
+
+
 <li>
-2006/02/28 (CB): Filename paths (for Filename Parameter and plot templates etc). Check on Windows.
+2006/03/03 (CB): Filename paths (for Filename Parameter and plot templates etc):  Check on Windows.
 </li>
 
 <li>
@@ -103,9 +117,8 @@ attributes (etc), but have them not used unless a subclass does really
 use them.
 </li>
 
-
 <li> 
-2006/02/28: Verbose command line option. Check new command line things on Windows.
+2006/03/03: delete objects from simulator; setup GUI to use this.
 </li>
 
 
