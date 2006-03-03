@@ -18,6 +18,10 @@ all: default doc tests examples
 
 clean: cleandoc clean-ext-packages
 
+saved-examples: 
+	make -C examples lissom_oo_or_20000.typ
+
+
 FORCE:
 
 # To get more information about which tests are being run, do:

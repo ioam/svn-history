@@ -16,3 +16,14 @@ lissom_or:
 
 lissom_oo_or:
 	cd .. ; ./topographica examples/lissom_oo_or.ty -c "topo.sim.run(1)"
+
+
+# Generate saved examples
+
+lissom_oo_or_20000.typ: lissom_oo_or.ty
+	cd .. ; ./topographica examples/lissom_oo_or.ty -c "topo.sim.run(20000)" -c "from topo.commands.basic import save_snapshot ; save_snapshot('$@')"
+
+
+lissom_or_20000.typ: lissom_or.ty
+	cd .. ; ./topographica examples/lissom_or.ty -c "topo.sim.run(20000)" -c "from topo.commands.basic import save_snapshot ; save_snapshot('$@')"
+
