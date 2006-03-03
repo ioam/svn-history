@@ -312,7 +312,13 @@ contributions are very welcome!
 
 
 
-<!-- Could consider adding external packages or taking some code from them:
+<!--
+Should add filename of first script, or some other user-definable screen,
+to all window titles, so that different simulators can be kept straight.
+
+
+
+     Could consider adding external packages or taking some code from them:
      SciPy
      Pyro (Robotics)
      logger
