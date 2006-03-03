@@ -39,9 +39,7 @@ clean-ext-packages:
 # Startup Script, in Python
 topographica: external Makefile
 	echo "#!${PREFIX}bin/python" > topographica
-	echo "" >> topographica
-	echo "# Wrapper for setting environment vars and exec-ing commands" >> topographica
-	echo "" >> topographica
+	echo "# Startup script for Topographica" >> topographica
 	echo "" >> topographica
 	echo "# Set os environment variables before importing anything else" >> topographica
 	echo "import os" >> topographica
@@ -49,7 +47,7 @@ topographica: external Makefile
 	echo "os.environ['PYTHONPATH']='${PREFIX}'+':'+os.getenv('PYTHONPATH','')" >> topographica
 	echo "os.environ['TOPORELEASE']='${RELEASE}'" >> topographica
 	echo "" >> topographica
-	echo "# Now execute Topographica-specific things" >> topographica
+	echo "# Now process the command-line arguments and do Topographica-specific setup" >> topographica
 	echo "from sys import argv" >> topographica
 	echo "from topo.misc.commandline import exec_argv" >> topographica
 	echo "exec_argv(argv[1:])" >> topographica
