@@ -49,7 +49,7 @@ topographica: external Makefile
 	echo "" >> topographica
 	echo "# Now process the command-line arguments and do Topographica-specific setup" >> topographica
 	echo "from sys import argv" >> topographica
-	echo "from topo.misc.commandline import exec_argv" >> topographica
+	echo "from topo.misc.commandline import process_argv" >> topographica
 	echo "exec_argv(argv[1:])" >> topographica
 
 	chmod a+x ${PREFIX}topographica
