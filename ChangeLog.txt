@@ -1,3 +1,865 @@
+2006-03-03 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/Makefile 1.5: Added one iteration of execution
+
+	* Makefile 1.46: Changed exec_argv to process_argv to match
+	change in commandline.py
+
+	* topo/misc/commandline.py 1.10: Cleaned up and simplified
+
+	* Makefile 1.44: Minor cleanup to topographica script
+
+2006-03-02 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.43: Removed 'rm topographica' and put back '>
+	topographica' instead of '>> topographica' on first line. (I
+	didn't realize there was a difference...)
+
+	* Makefile 1.42: Removed TOPO variable from generated
+	topographica script code.
+
+	* Makefile 1.41: Changed generated code for topographica
+	script. (1) Environment variables are set before any imports
+	of Topographica things. (2) Environment variables are not set
+	with putenv() (see
+	http://www.python.org/doc/2.4.2/lib/os-procinfo.html). (3)
+	Removed extra slash in first line. (4) Sorted out ':' between
+	paths. (3) and (4) might be wrong and need to be checked.
+
+	* topo/__init__.py 1.53: No visible change - moved import
+	statemtements to the top.
+
+	* topo/misc/commandline.py 1.9: If topographica is started
+	with no scripts or commands to run, it opens interactively
+	(i.e. './topographica' is the same as './topographica -i').
+
+	* topo/base/parameterclasses.py 1.32,
+	topo/plotting/templates.py 1.35: Simplified Filename
+	Parameter, so it has just one search list.
+
+2006-03-02 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/patterngenerator.py 1.71: Moved an alert here from
+	learningfns/basic.py. (Chris)
+
+	* topo/learningfns/basic.py 1.51: Removed an irrelevant alert
+	and moved another to patterngenerator. (Chris)
+
+	* topo/learningfns/basic.py 1.50: Modified commented-out print
+	statement to include simulation time. (Chris)
+
+	* Makefile 1.40: Added control over test verbosity
+
+	* topo/misc/commandline.py 1.8: Fixed scripts to run in main
+	(e.g. to get the value of pi defined); not sure why the
+	previous syntax was not signalling an error
+
+2006-03-02 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* runtests 1.11: No longer required: tests can be run like
+	this:\n./topographica -c 'import topo.tests; topo.tests.run()'
+
+	* Makefile 1.39: Changed how tests are run (no longer uses
+	runtests script).
+
+	* topo/tests/__init__.py 1.7: Added run() function to allow
+	tests to be run like this:\n./topographica -c 'import
+	topo.tests; topo.tests.run()'
+
+	* topo/base/parameterclasses.py 1.31: Added HACKALERT: think
+	about Parameter class attributes, remembering they won't
+	pickle because Parameter isn't a TopoObject (in most cases
+	that's likely to be fine, but some class attributes are
+	designed to be set by the user). Moved Filename's
+	topographica_path to be an instance attribute for the moment,
+	because trying to set it on unpickling wasn't possible since
+	it's read-only. This will be investigated at the same time as
+	the alert.
+
+	* topo/tkgui/topoconsole.py 1.44: Removed a line that should
+	have been removed in the previous version.
+
+	* topo/base/simulator.py 1.39, topo/tkgui/topoconsole.py 1.43:
+	Got rid of some uses of 'active_sim', and got rid of
+	'objects_to_notify_of_active_sim' concept, since the current
+	simulator is always in topo.sim.
+
+2006-03-01 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/__init__.py 1.52: Reduced amount imported
+
+	* topo/learningfns/basic.py 1.49: Moved aspect_ratio into the
+	default Gaussian neighborhood, because it's conceivable to use
+	a non-unity aspect ratio
+
+	* topo/commands/analysis.py 1.12: Fixed bogus assumption that
+	all projections will have a cfs variable, and made it respect
+	the measure_maps declaration.  It should now work with
+	lissom_oo_or.ty, but it still needs work because it doesn't
+	seem to measure any useful map for a SharedWeightProjection
+
+	* topo/misc/commandline.py 1.7: Clarified help message
+
+	* runtests 1.10: Added ALERT
+
+	* topo/tkgui/editorwindow.py 1.22: Added alert
+
+2006-03-01 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.42: Removed uses of
+	get_active_sim().
+
+	* topo/commands/basic.py 1.25: Replaced get_active_sim() with
+	topo.sim
+
+	* topo/base/parameterclasses.py 1.30: No visible change -
+	changed a variable name.
+
+	* topo/base/simulator.py 1.38,
+	topo/tests/tkgui/testtopoconsole.py 1.8: Removed
+	topo.base.simulator.set_active_sim().
+
+	* topo/tkgui/editorwindow.py 1.21: Just uses topo.sim to get
+	the simulator.
+
+	* examples/hierarchical.ty 1.33: Added some temporary
+	demonstration lines for how access to the simulator might
+	work.
+
+	* topo/base/simulator.py 1.37: Simulator supports
+	dictionary-like assignment. Temporary method connect2() added
+	to work with this.
+
+	* topo/tkgui/topoconsole.py 1.41: On initialization, gets
+	self.simulator from topo.sim. There is always a simulator
+	now. Some plotting menu options need to be updated to check
+	there are sheets of the right type to do whatever it is
+	they're supposed to do.
+
+	* topo/__init__.py 1.51, topo/base/simulator.py 1.36,
+	topo/commands/basic.py 1.24, topo/tkgui/topoconsole.py 1.40:
+	Added SimSingleton class. Added variable
+	topo.sim=SimSingleton(), so there is simulator (empty) on
+	startup. SimSingleton() keeps one Simulator() object and
+	allows almost-transparent access to it, so topo.sim['V1'] etc
+	is possible. Begun changing calls to get_active_sim etc.
+
+2006-03-01 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/homeostatic.ty 1.1: Initial version for Veldri to
+	work with
+
+2006-02-28 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* runtests 1.9: Commented out argument-processing to allow
+	runtests (and 'make all') to work.
+
+	* examples/som_retinotopy.ty 1.23: Uses indepedent streams for
+	input pattern parameters.
+
+	* topo/plotting/templates.py 1.34: Made image_path be a
+	parameter; a path can be 'put through' this to ensure it's
+	valid for the OS and that the correct locations are searched.
+
+	* topo/base/parameterclasses.py 1.29: Filename searches
+	prefixes specified for this particular parameter first, then
+	common ones.
+
+	* topo/base/parameterclasses.py 1.28: Filename can be declared
+	with None as the path (i.e. no default path). Changed path
+	searching method, to allow relative and absolute prefix paths.
+
+	* topo/patterns/image.py 1.36: Removed path left in by
+	mistake, updated doc string.
+
+	* topo/base/parameterclasses.py 1.27, topo/patterns/image.py
+	1.35: For relative paths, Filename now searches both the
+	Filename.common_search_paths list and any specific list of
+	search_paths an instance is given. Currently
+	common_search_paths includes sys.exec_prefix (Topographica
+	base directory.
+
+	* doc/Future_Work/current_text.php 1.12: Updated with current
+	work.
+
+2006-02-28 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.38, topo/misc/commandline.py 1.6: Changed the
+	generate_params and generate_prefixes so that they execute
+	commands as they find them instead of creating a string. They
+	have been re-named exec_argv and exec_prefixes.
+
+2006-02-28 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_or.ty 1.71: Uses RandomWrapper, so x, y, and
+	orientation are independent random streams, and resume where
+	they left off on pickling.
+
+	* topo/base/parameterclasses.py 1.26: Added RandomWrapper, a
+	modified version of Wrapper, that creates a new Random()
+	instance. Gives independent random streams, and allows the
+	state of the stream to be saved when pickling.
+
+2006-02-28 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.37, topo/misc/commandline.py 1.5: Modified the
+	generate_params and generate_prefixes function in
+	commandline.py so that to work with the first copy of python,
+	instead of having to re-open a new one. Python options are now
+	directly set on the corresponding environment variable, and
+	the string of command is then executed with the exec
+	command. There is one problem for the verbose option: the
+	variable PYTHONVERBOSE is only read during startup, and cannot
+	be re-set afterwards. Therefore, the verbose option is
+	currently disabled.
+
+2006-02-28 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/commandline.py 1.4: Added alert
+
+2006-02-27 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/commandline.py 1.3: Replaced old
+	topographica_script code by the new version that uses
+	Optparse.
+
+	* topographica_script.py 1.21: Deleted the
+	topographica_script.py file; the code has been moved to
+	topo.misc.commandline.py.
+
+	* Makefile 1.36: Modified the Makefile to take into account
+	that the code of topographica_script has been moved to
+	topo/misc/commandline.py; also inserted the variable TOPO into
+	the environment. People will have to do a make after the
+	update to get a version that works.
+
+	* topo/misc/commandline.py 1.2: Moved the topographica_script
+	code to topo/misc/commandline.py.
+
+	* topo/learningfns/basic.py 1.48: Set the x and y to 0 when
+	creating the Gaussian instead of when calling it. That allows
+	more flexibility for the user.
+
+2006-02-27 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulator.py 1.35: Added more helpful error to
+	__getattribute__(), for if a string is not given.
+
+	* topo/base/simulator.py 1.34: Added dictionary-like object
+	access for Simulator: for a Simulator s, s['V1'] does
+	s.objects()['V1'].
+
+2006-02-27 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulator.py 1.33: Fixed typo
+
+	* topo/base/parameterizedobject.py 1.35: Minor comment cleanup
+
+	* doc/Future_Work/.cvsignore 1.2: Added current page
+
+2006-02-26 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/hierarchical.ty 1.32: Input pattern parameters set
+	on objects, rather than the class. I use two independent
+	objects here, though for the moment they aren't really
+	independent because everything shares one stream of random
+	numbers.
+
+	* doc/Future_Work/current_text.php 1.11: Updated my tasks.
+
+	* examples/laminar.ty 1.4, examples/lissom_or.ty 1.70: Input
+	pattern parameters set on a Gaussian object rather than the
+	Gaussian class.
+
+	* examples/laminar.ty 1.3: Some things will not deepcopy, such
+	as Numeric's ufuncs. Added a Wrapper class (which will be
+	renamed and will probably be changed to operate differently)
+	that allows these things to be
+	deepcopied. CompositePatternGenerator used a ufunc, so is
+	changed to use a Wrapper. Lambdas will also not deepcopy;
+	Wrapper does not support them, but does offer an
+	alternative. Examples files that used lambdas are changed
+	accordingly.
+
+	* topo/commands/basic.py 1.23: save_snapshot and load_snapshot
+	are changed to include pickling of class attributes.
+
+	* topo/misc/utils.py 1.3: Added a function (which could be
+	simplified) to search modules and retrieve class' states.
+
+	* topo/patterns/basic.py 1.60, examples/cfsom_or.ty 1.29,
+	examples/hierarchical.ty 1.31, examples/lissom_oo_or.ty 1.29,
+	examples/lissom_or.ty 1.69, examples/obermayer_pnas90.ty 1.24,
+	examples/som_retinotopy.ty 1.22, topo/base/connectionfield.py
+	1.134, topo/base/parameterclasses.py 1.25: Some things will
+	not deepcopy, such as Numeric's ufuncs. Added a Wrapper class
+	(which will be renamed and will probably be changed to operate
+	differently) that allows these things to be
+	deepcopied. CompositePatternGenerator used a ufunc, so is
+	changed to use a Wrapper. Lambdas will also not deepcopy;
+	Wrapper does not support them, but does offer an
+	alternative. Examples files that used lambdas are changed
+	accordingly.
+
+	* topo/base/parameterizedobject.py 1.34: ParameterizedObject
+	has __getstate__() that only returns instance data (before it
+	also returned class data). Also, it deep copies any instance
+	attribute that is a Parameter. Parameter has support for
+	deepcopy and pickle with its own __getstate__ and __setstate__
+	(required because Parameter uses __slots__, and does not have
+	a __dict__).
+
+2006-02-25 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/index_text.php 1.10: More to do
+
+	* topo/tkgui/topoconsole.py 1.39: Added indication of why the
+	GUI is exiting
+
+2006-02-24 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterizedobject.py 1.33: No visible change:
+	commented-out code for new __getstate__().
+
+	* topo/commands/basic.py 1.22: No visible change: new
+	commented-out code for replacement snapshot functions.
+
+	* topo/misc/utils.py 1.2: No visible change: new commented-out
+	code for a recursive module search. Might not belong here.
+
+	* topo/base/parameterclasses.py 1.24: No visible change: a
+	commented-out Wrapper class.
+
+	* topo/base/parameterizedobject.py 1.32: No visible change:
+	commented-out code for __getstate__() and __setstate__() of
+	Parameter.
+
+	* doc/Future_Work/current_text.php 1.10: Updated what I'm
+	working on.
+
+	* topo/__init__.py 1.50: ABOUT text includes the Topographica
+	release number.
+
+2006-02-24 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/templates.py 1.33: Made normalize be a
+	BooleanParameter, and corrected the templates where it was
+	passed in as a string. Cleaned up ALERTS.
+
+	* topo/plotting/bitmap.py 1.31: Cleaned up doc and ALERTS.
+
+2006-02-24 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.38: Updates to 'Help' menu
+	options.
+
+	* doc/Future_Work/current_text.php 1.9: Added a task.
+
+2006-02-23 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* examples/som_retinotopy.ty 1.21: Corrected to the right
+	density (which has been changed by mistake in the previous
+	commit.
+
+	* topo/learningfns/basic.py 1.47: Ensured that the
+	neighborhood matrix is defined with x=0 and y=0.
+
+	* examples/som_retinotopy.ty 1.20: Corrected the
+	som_retinotopy example such as not setting x,y and orientation
+	directly on the Gaussian class, but rather creating a Gaussian
+	object and assigning it to the GeneratorSheet.
+
+2006-02-23 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.8: Added task, moved
+	another to current work section.
+
+	* topo/projections/basic.py 1.17: Projection imported to
+	projections/basic.py so that it's part of the projections
+	package.
+
+	* topo/base/projection.py 1.52: Projection is an abstract
+	class.
+
+	* doc/Future_Work/current_text.php 1.7: Added a task, changed
+	some others round.
+
+2006-02-23 alan_lindsay <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorobjects.py 1.25: Fixed a wee typo (Ta
+	Chris).
+
+2006-02-23 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterclasses.py 1.23, topo/base/utils.py 1.64:
+	find_classes_in_package() returns the base class, but does not
+	return any abstract classes.
+
+	* topo/base/sheet.py 1.66: Sheet is declared to be an abstract
+	class.
+
+	* topo/base/sheet.py 1.65: Continued to write Slice
+	class. Added methods sheet2matrix() and matrix2sheet() to
+	Sheet. This is still a work in progress - there won't be so
+	many functions by the end.
+
+	* topo/patterns/image.py 1.34: Tidied up import statements.
+
+2006-02-23 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterizedobject.py 1.31: Changed
+	ParameterizedObject.__repr__ to use __repr__ for attribute
+	values also, to get closer to a valid Python expression
+
+2006-02-23 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.6: Corrected html tag
+	error.
+
+	* doc/Future_Work/current_text.php 1.5: Removed a task and
+	added another to the doing next section.
+
+	* topo/base/connectionfield.py 1.133,
+	topo/base/parameterclasses.py 1.22,
+	topo/base/patterngenerator.py 1.70, topo/base/projection.py
+	1.51: ClassSelectorParameter subclasses have packages
+	attribute that works properly.
+
+	* topo/base/parameterclasses.py 1.21: Corrected mistake
+	introduced in the previous-but-one version.
+
+	* topo/base/parameterclasses.py 1.20: Minor updates
+
+	* topo/base/connectionfield.py 1.132,
+	topo/base/parameterclasses.py 1.19,
+	topo/base/patterngenerator.py 1.69, topo/base/projection.py
+	1.50: ClassSelectorParameter and subclasses use __slots__.
+
+	* topo/tkgui/editortools.py 1.11: Removed duplicate import
+	statement.
+
+	* topo/base/parameterclasses.py 1.18: Tidying
+	ClassSelectorParameter; no visible change.
+
+2006-02-23 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/Makefile 1.4: Made default LISSOM test be oo_or
+	instead of or to test more code
+
+	* doc/Future_Work/current_text.php 1.4: Cleaned up and
+	reworded
+
+2006-02-22 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterizedobject.py 1.30: __repr__() returns
+	almost-runnable expression.
+
+	* doc/Future_Work/current_text.php 1.3: Removed a task; moved
+	another to currently-working-on section.
+
+	* topo/base/sheet.py 1.64, topo/base/simulator.py 1.32: No
+	longer overrides __repr__().
+
+	* topo/base/parameterizedobject.py 1.29: ParameterizedObject's
+	__repr__() returns <classname name> and a list of all
+	Parameters. __str__() returns <classname name>.
+
+	* topo/base/parameterclasses.py 1.17: ClassSelectorParameter's
+	suffix_to_lose defaults to empty string rather than None
+	(which it did before I accidentally changed it).
+
+	* topo/base/parameterclasses.py 1.16,
+	topo/tkgui/testpattern.py 1.23: ClassSelectorParameter doesn't
+	list abstract_classes.
+
+	* topo/patterns/random.py 1.20: RandomGenerator declared to be
+	an abstract class.
+
+	* topo/tkgui/parametersframe.py 1.60: Moved topo/base/utils.py
+	to topo/misc/utils.py
+
+	* topo/base/parameterizedobject.py 1.28,
+	topo/base/patterngenerator.py 1.68: Classes now have an
+	'abstract' attribute which is True if the class declares an
+	_abstract_class_name equal to its name and False otherwise
+	(i.e. if it doesn't declare _abstract_class_name, or it's set
+	to False. Abstract classes can be instantiated.
+
+2006-02-22 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterclasses.py 1.15: Added the possibility to
+	change the default value for instantiate when creating a
+	ClassSelectorParameter.
+
+2006-02-22 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/pylabplots.py 1.3, topo/misc/distribution.py
+	1.2, topo/plotting/plotfilesaver.py 1.26,
+	topo/plotting/plotgroup.py 1.92, topo/sheets/composer.py 1.9,
+	topo/sheets/generatorsheet.py 1.25, topo/tests/testcfsom.py
+	1.15, topo/tests/testfeaturemap.py 1.11,
+	topo/tests/testsheetview.py 1.11,
+	topo/tkgui/parametersframe.py 1.59,
+	topo/analysis/featuremap.py 1.41, topo/base/utils.py 1.63:
+	Moved contents of topo/base/utils.py to topo/misc/utils.py
+
+	* topo/misc/utils.py 1.1: Moved topo/base/utils.py to
+	topo/misc/utils.py.
+
+2006-02-22 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/laminar.ty 1.2: Made afferent learning match over
+	the first few iterations.  Fixed bug in tsettle.  Removed
+	cortical edge buffers.
+
+2006-02-22 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/arrayutils.py 1.6, topo/base/utils.py 1.62,
+	topo/outputfns/basic.py 1.21: Moved clip_in_place() from
+	utils.py to arrayutils.py
+
+	* topo/base/parameterizedobject.py 1.27: Minor edit of
+	comments.
+
+	* topo/base/parameterizedobject.py 1.26: Removed HACKALERT
+
+	* topo/base/parameterclasses.py 1.14, topo/base/utils.py 1.61:
+	classname_repr() moved to be a method of
+	ClassSelectorParameter.
+
+	* topo/base/parameterclasses.py 1.13,
+	topo/base/patterngenerator.py 1.67, topo/tkgui/testpattern.py
+	1.22: Added suffix_to_lose to ClassSelectorParameter, allowing
+	that siffix to be removed when the class name is
+	displayed. PatternGeneratorParameter removes 'Generator' by
+	default.
+
+	* topo/base/utils.py 1.60: Cleaned up documentation and
+	removed unused import for classname_repr().
+
+	* topo/base/sheet.py 1.63, topo/base/simulator.py 1.31:
+	__repr__() is overridden to print more useful information.
+
+	* topo/base/utils.py 1.59: classname_repr() no longer inserts
+	spaces before capital letters.
+
+	* topo/base/parameterizedobject.py 1.25: Made __str__() use
+	__repr__() (both previously contained the same code).
+
+	* topo/base/parameterizedobject.py 1.24: Removed HACKALERT
+	about name-sharing; added a HACKALERT about printing more
+	useful info at the commandline.
+
+	* doc/Future_Work/current_text.php 1.2: Added task (CB).
+
+	* doc/Future_Work/current_text.php 1.1: Initial version,
+	biased towards my work.
+
+2006-02-21 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/sheets/lissom.py 1.44: Changed tsettle into a positive
+	Integer parameter instead of a plain attribute
+
+	* topo/sheets/lissom.py 1.43: Fixed for cases where there are
+	multiple sheets in the model -- it had been counting the
+	number of times pre_sleep was called, which happens whenever
+	any input event occurs.  Now it counts the number of actual
+	activations for this sheet instead.  Should not change the
+	results for lissom_or.ty, but should change the results for
+	lissom_oo_or.ty (which should do one less settling step now)
+
+2006-02-21 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/basic.py 1.59: Minor alterations to
+	CompositePatternGenerator.
+
+	* topo/patterns/basic.py 1.58: Composite is now in a state
+	where it can be tried out usefully in the test pattern window
+	(to see better how it should finally work). But the
+	implementation is temporary.
+
+2006-02-20 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterizedobject.py 1.23,
+	topo/base/patterngenerator.py 1.66: Example of how we could
+	prevent instantiation of abstract classes, PatternGenerator in
+	this case. Since the super() call requires the class itself
+	inside the call anyway, putting it in there again is not too
+	much trouble...
+
+	* topo/base/parameterclasses.py 1.12: Change to a HACKALERT.
+
+	* topo/base/utils.py 1.58: Added to documentation.
+
+	* topo/base/parameterizedobject.py 1.22: Changed
+	__param_inheritance() to look up the classlist (superclasses)
+	itself, rather than having it passed in. Renamed uses of
+	'base_classes' to 'superclasses'; previously there was
+	confusion between 'bases' returned from classlist() and bases
+	as passed to the metaclass' __init__() method.
+
+	* topo/base/parameterizedobject.py 1.21: __param_inheritance()
+	changed to look at all slots, not just those in the immediate
+	class (so e.g. a Number parameter does inheritance for
+	bounds,softbounds and all the slots of its superclasses
+	(Parameter in this case)).
+
+	* topo/base/parameterizedobject.py 1.20: Moved classlist() and
+	descendents() to beginning of file.
+
+2006-02-20 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plot.py 1.87: Cleaned up the doc.
+
+	* topo/plotting/plot.py 1.86: Corrected mistake in Plot.
+
+	* topo/analysis/featuremap.py 1.40: Deleted old Alert in
+	FeatureMap.
+
+2006-02-20 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/shared/index.php 1.12: Updated release date
+
+	* topo/patterns/basic.py 1.57, topo/patterns/image.py 1.33:
+	Updated doc strings
+
+2006-02-20 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Team_Members/index_text.php 1.5: Updated link.
+
+	* topo/base/parameterclasses.py 1.11: Cleaned up
+	ClassSelectorParameter a little.
+
+	* topo/base/connectionfield.py 1.131: Cleaned up
+	ResponseFunctionParameter and LearningFunctionParameter.
+
+	* topo/base/patterngenerator.py 1.65: Cleaned up
+	PatternGeneratorParameter a little.
+
+	* topo/base/projection.py 1.49: Cleaned up
+	OutputFunctionParameter a little.
+
+	* topo/patterns/basic.py 1.56, topo/patterns/image.py 1.32:
+	Added some doc strings
+
+	* topo/tkgui/parametersframe.py 1.58: Removed out-of-date
+	hackalert.
+
+2006-02-20 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/parameters_text.php 1.2: Changed
+	get_paramobj_dict to params
+
+	* doc/images/060220_model_editor_screen_shot.png 1.1,
+	doc/images/060220_topographica_screen_shot.png 1.1,
+	doc/shared/index.php 1.11: Added screenshots
+
+2006-02-20 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterizedobject.py 1.19: Removed unused
+	argument from params().
+
+	* topo/base/parameterizedobject.py 1.18,
+	topo/tkgui/parametersframe.py 1.57, topo/tkgui/testpattern.py
+	1.21: Re-named get_paramobj_dict() to params().
+
+2006-02-20 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/shared/index.php 1.10: Updated release date
+
+	* examples/lissom_or_20000.typ 1.11,
+	examples/lissom_oo_or_20000.typ 1.8: Retrained map
+
+	* doc/User_Manual/.cvsignore 1.5,
+	doc/User_Manual/index_text.php 1.12,
+	doc/User_Manual/parameter_text.php 1.6,
+	doc/User_Manual/parameters_text.php 1.1: Added link to
+	Parameters documentation
+
+	* doc/User_Manual/parameter_text.php 1.5: Cleaned up
+
+2006-02-19 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulator.py 1.30: Changed schedule_action to
+	accept only callable values.  Changed step_mode and register
+	to be BooleanParameters, and added ALERT about step_mode.
+
+	* topo/tests/testcfsom.py 1.14, topo/tests/testsimulator.py
+	1.4: Fixed step_mode to be Boolean to allow that parameter to
+	be a BooleanParameter
+
+	* topo/base/parameterclasses.py 1.10: Added CallableParameter
+
+	* topo/plotting/templates.py 1.32: Added
+	OrientationSelectivity subplot to avoid confusion for Sheets
+	that are not orientation selective but still sometimes have a
+	map measured
+
+	* topo/plotting/bitmap.py 1.30: Removed unused normalize
+	parameter
+
+	* topo/learningfns/basic.py 1.46: Made SOM neighborhood
+	function into a PatternGeneratorParameter
+
+	* topo/eps/basic.py 1.5: Replaced Parameters with Numbers
+
+	* topo/base/patterngenerator.py 1.64: Changed density into a
+	Number with a lower bound
+
+	* topo/base/parameterizedobject.py 1.17: Added ALERT
+
+2006-02-19 alan_lindsay <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorobjects.py 1.24, topo/tkgui/editorwindow.py
+	1.20: Activity toggle for all now too.
+
+	* topo/tkgui/editorobjects.py 1.23, topo/tkgui/editorwindow.py
+	1.19: Right click in the canvas to bring up menu, allows save
+	snapshot of canvas (saved to postscript) and all sheet
+	densities to be toggled on/off.
+
+2006-02-19 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterclasses.py 1.9,
+	topo/base/parameterizedobject.py 1.16, topo/base/sheet.py
+	1.62, topo/learningfns/optimized.py 1.30: Removed Constant
+	Parameter, since it is the same as Parameter(constant=True).
+
+	* topo/projections/basic.py 1.16: Changed Constant to a
+	LearningFunctionParameter(constant=True)
+
+2006-02-19 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/sheets/generatorsheet.py 1.24: Made period and phase
+	parameter be Number instead of Parameter.
+
+	* topo/learningfns/basic.py 1.45,
+	topo/learningfns/optimized.py 1.29,
+	topo/base/connectionfield.py 1.130: Moved the declaration of
+	the ouput_fn parameter in the superclass CFLearningFunction,
+	instead of re-declaring it in all sub-classes.
+
+	* topo/learningfns/optimized.py 1.28: Cleaned up parameter doc
+	string, changed output_fn for for DivisiveHebbian and
+	DivisiveHebbian_Cpointer to be OutputFunctionParameter rather
+	than Constant.
+
+	* topo/learningfns/basic.py 1.44: Cleaned up parameters doc
+	string.
+
+	* topo/base/connectionfield.py 1.129: Added period to doc
+	strings.
+
+	* topo/base/simulator.py 1.29: Added alert about not being
+	able to decalrestep_mode and register Parameter as
+	BooleanParameter.
+
+	* topo/base/patterngenerator.py 1.63: Declared BoundingBox
+	parameters as BoundingRegionParameter rather than Parameter.
+
+	* topo/base/connectionfield.py 1.128: Declared BoundingBox
+	parameters as BoundingRegionParameter rather than
+	Parameter. Added some parameter doc string. Transformed
+	CFProjection learning_rate parameter to be a
+	Number. Transformed CF x and y parameters to be Numbers as
+	well.
+
+	* examples/lissom_or.ty 1.68: Deleted ommitted code added for
+	testing purpose.
+
+2006-02-19 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.127: Cleaned up doc strings
+
+2006-02-19 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.126: Added a doc string for
+	the learning_fn parameter of a CFProjection.
+
+	* topo/projections/optimized.py 1.18: Declared the
+	CFProjection_Cpointer learning_fn parameter as a
+	LearningFunctionParameter rather than a Parameter.
+
+	* topo/projections/optimized.py 1.17: Declared the
+	CFProjection_Cpointer response_fn parameter as a
+	ResponseFunctionParameter rather than a Parameter.
+
+	* topo/base/connectionfield.py 1.125: Added a doc string for
+	the response_fn parameter of a CFProjection.
+
+	* topo/projections/basic.py 1.15, topo/learningfns/basic.py
+	1.43, topo/learningfns/optimized.py 1.27,
+	topo/base/connectionfield.py 1.124, topo/base/projection.py
+	1.48: Changed the output_fn declared as Parameters to be
+	declared as OutputFunctionParameter. I added a doc string when
+	needed, that might need to be reviewed. I tried to see in
+	which case this doc string was already inherited, and not
+	added it in such case.
+
+2006-02-19 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/boundingregion.py 1.21: Made
+	BoundingRegionParameter instantiate by default
+
+2006-02-19 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_oo_or.ty 1.28, examples/lissom_or.ty 1.67:
+	Deleted the dest_port setting when creating a
+	CFProjection. Now, it is possible for different projections to
+	the same sheet to share the same dest_port (as soon as they
+	are named differently).
+
+	* topo/base/projection.py 1.47: Solved the problem of the port
+	for Projection: first, ensure that all the projection to the
+	same ProjectionSheet are named differently by raising an error
+	if intenting to do so; second, allow all the projection
+	sharing the same ports to be activated (by removing the
+	break in the activate method).
+
+	* topo/plotting/plot.py 1.85, topo/plotting/plotgroup.py 1.91:
+	Replaced the old bounds.aarect().lbrt() syntax by
+	bounds.lbrt().
+
+2006-02-19 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.61: Made bounds be a
+	BoundingRegionParameter, and density be a constant Parameter
+
+	* topo/base/boundingregion.py 1.20: Added
+	BoundingRegionParameter
+
+	* topo/base/simulator.py 1.28: Added EventProcessorParameter
+	for src and dest of an EPConnection
+
+	* topo/base/projection.py 1.46: Added docstring
+
+	* topo/base/parameterclasses.py 1.8,
+	topo/base/parameterizedobject.py 1.15: Added ALERT
+
+2006-02-19 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.60, topo/base/connectionfield.py 1.123:
+	Replaced the old bounds.aarect().lbrt() syntax by
+	bounds.lbrt().
+
+	* topo/base/boundingregion.py 1.19: Added a lbrt() method to
+	the BoundingBox. It should make Chris happy by allowing him to
+	to do bounds.lbrt().
+
+	* examples/lissom_or.ty 1.66: Corrected the Retina edge
+	buffer.
+
+2006-02-19 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterclasses.py 1.7: Fixed exceptions to be
+	classes
+
+	* topo/base/boundingregion.py 1.18: Added Cartesian2DPoint
+	parameter, and changed BoundingCircle to use it and Number
+	instead of Parameter
+
+	* ChangeLog.txt 1.2: Added new entries
+
 2006-02-18 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
 
 	* topo/base/connectionfield.py 1.122, topo/base/simulator.py
