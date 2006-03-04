@@ -19,8 +19,6 @@ from utils import find_classes_in_package
 # some repetition.
 # See JABHACKALERT by Parameter's __doc__.
 
-
-# CEBHACKALERT: at the moment, the path must be relative to Topographica's path.
 class Filename(Parameter):
     """
     Filename is a Parameter that takes a string specifying the
@@ -37,7 +35,8 @@ class Filename(Parameter):
     __slots__ = ['search_paths']
     __doc__ = property((lambda self: self.doc))
 
-    def __init__(self,default=None,search_paths=[os.environ.get('TOPOGRAPHICA_PATH','')],**params):
+    # CEBHACKALERT: should use sys.exec_prefix. At the moment, the value of this isn't consistent on Windows and linux.
+    def __init__(self,default=None,search_paths=[os.environ.get('TOPOGRAPHICAPATH','')],**params):
         """
         Create a Filename Parameter with the specified string.
         
