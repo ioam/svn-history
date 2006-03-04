@@ -49,6 +49,7 @@ topographica: external Makefile
 	echo "import os" >> topographica
 	echo "os.environ['LD_LIBRARY_PATH']=os.path.join('${PREFIX}','lib')+':'+os.environ.get('LD_LIBRARY_PATH','')" >> topographica
 	echo "os.environ['PYTHONPATH']='${PREFIX}'" >> topographica
+	echo "os.environ['TOPOGRAPHICAPATH']='${PREFIX}'" >> topographica
 	echo "os.environ['TOPORELEASE']='${RELEASE}'" >> topographica
 	echo "" >> topographica
 	echo "# Now process the command-line arguments and do Topographica-specific setup" >> topographica

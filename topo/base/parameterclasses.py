@@ -5,10 +5,9 @@ $Id$
 """
 __version__='$Revision$'
 
-import sys
 import copy
 import re
-import os.path
+import os
 
 from parameterizedobject import Parameter
 from utils import find_classes_in_package
@@ -39,7 +38,7 @@ class Filename(Parameter):
     __doc__ = property((lambda self: self.doc))
 
     # CEBHACKALERT: can we rely on TOPO being in __main__.__dict__?
-    def __init__(self,default=None,search_paths=[sys.exec_prefix],**params):
+    def __init__(self,default=None,search_paths=[os.environ.get('TOPOGRAPHICA_PATH','')],**params):
         """
         Create a Filename Parameter with the specified string.
         
