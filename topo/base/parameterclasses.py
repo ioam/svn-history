@@ -37,7 +37,6 @@ class Filename(Parameter):
     __slots__ = ['search_paths']
     __doc__ = property((lambda self: self.doc))
 
-    # CEBHACKALERT: can we rely on TOPO being in __main__.__dict__?
     def __init__(self,default=None,search_paths=[os.environ.get('TOPOGRAPHICA_PATH','')],**params):
         """
         Create a Filename Parameter with the specified string.
