@@ -71,7 +71,7 @@ class EditorCanvas(Canvas) :
 
         self.canvas_menu = Menu(self)
         self.sheet_options = Menu(self.canvas_menu)
-        self.canvas_menu.add_command(label = 'Save Snapshot', command = self.save_snapshot)
+        self.canvas_menu.add_command(label = 'Export as PostScript image', command = self.save_snapshot)
         self.canvas_menu.add_cascade(label = 'Sheet options', menu = self.sheet_options, underline = 0)
         self.sheet_options.add_command(label = 'Toggle Density Grid', command = self.toggle_object_density)
         self.sheet_options.add_command(label = 'Toggle Activity', command = self.toggle_object_activity)
@@ -408,6 +408,10 @@ class EditorCanvas(Canvas) :
     ############## Util ############################################
 
     def save_snapshot(self) :
+        POSTSCRIPT_FILETYPES = [('Encapsulated PostScript images','*.eps'),
+                                ('PostScript images','*.ps'),('All files','*')]
+        snapshot_name = asksaveasfilename(filetypes=POSTSCRIPT_FILETYPES)
+        
         file = asksaveasfilename()
         if file:
             self.postscript(file=file)
