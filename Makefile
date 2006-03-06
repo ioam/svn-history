@@ -46,8 +46,9 @@ topographica: external Makefile
 	echo "# Startup script for Topographica" >> topographica
 	echo "" >> topographica
 	echo "# Set os environment variables before importing anything else" >> topographica
+	# CEBHACKALERT: Do we need any of these except toporelease? Why are
+	# they environment variables in particular?
 	echo "import os" >> topographica
-	echo "os.environ['LD_LIBRARY_PATH']=os.path.join('${PREFIX}','lib')+':'+os.environ.get('LD_LIBRARY_PATH','')" >> topographica
 	echo "os.environ['PYTHONPATH']='${PREFIX}'" >> topographica
 	echo "os.environ['TOPOGRAPHICAPATH']='${PREFIX}'" >> topographica
 	echo "os.environ['TOPORELEASE']='${RELEASE}'" >> topographica

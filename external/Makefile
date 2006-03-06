@@ -22,8 +22,9 @@ PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.4
 
 python: ${PYTHON}.tgz tk
 	tar xzf ${PYTHON}.tgz
-	cd ${PYTHON}; ./configure --prefix=${PREFIX}
-	env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib make -C ${PYTHON} install
+	# LDFLAGS sets ${PREFIX}/lib as the LD_LIBRARY in the binary
+	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
+	env PREFIX=${PREFIX} make -C ${PYTHON} install
 	touch python
 
 python-clean:
@@ -34,6 +35,7 @@ python-uninstall:
 ##############################################################
 # Tcl
 #
+# CEBHACKALERT: we've done this now?
 # Jeff says that these flags, passed to the linker
 # should make the need to add the path to LD_LIBRARY_PATH
 # unnecessary   -Wl,-rpath -Wl,/home/jp/research/topographica/lib
@@ -58,9 +60,6 @@ tcl-uninstall:
 ##############################################################
 # Tk
 #
-# Jeff says that these flags, passed to the linker
-# should make the need to add the path to LD_LIBRARY_PATH
-# unnecessary   -Wl,-rpath -Wl,/home/jp/research/topographica/lib
 TK = tk8.4.9
 
 TK_UNINSTALL += lib/tk8.4 lib/libtk8.4.so lib/libtkstub8.4.a
