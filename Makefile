@@ -47,7 +47,8 @@ topographica: external Makefile
 	echo "" >> topographica
 	echo "# Set os environment variables before importing anything else" >> topographica
 	# CEBHACKALERT: Do we need any of these except toporelease? Why are
-	# they environment variables in particular?
+	# they environment variables in particular? I think we don't use
+	# TOPOGRAPHICAPATH.
 	echo "import os" >> topographica
 	echo "os.environ['PYTHONPATH']='${PREFIX}'" >> topographica
 	echo "os.environ['TOPOGRAPHICAPATH']='${PREFIX}'" >> topographica

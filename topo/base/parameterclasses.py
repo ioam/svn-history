@@ -7,7 +7,8 @@ __version__='$Revision$'
 
 import copy
 import re
-import os
+import os.path
+import sys
 
 from parameterizedobject import Parameter
 from utils import find_classes_in_package
@@ -35,8 +36,9 @@ class Filename(Parameter):
     __slots__ = ['search_paths']
     __doc__ = property((lambda self: self.doc))
 
-    # CEBHACKALERT: should use sys.exec_prefix. At the moment, the value of this isn't consistent on Windows and linux.
-    def __init__(self,default=None,search_paths=[os.environ.get('TOPOGRAPHICAPATH','')],**params):
+    # CEBHACKALERT: there's a better way, right? See the sys module documentation,
+    # and consider unix and windows.
+    def __init__(self,default=None,search_paths=[os.path.split(os.path.split(sys.executable)[0])[0]],**params):
         """
         Create a Filename Parameter with the specified string.
         
