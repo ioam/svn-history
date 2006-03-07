@@ -12,7 +12,7 @@ import sys, __main__, math
 
 import os
 from optparse import OptionParser
-from topo.misc.inlinec import import_weave
+from inlinec import import_weave
 
 BANNER         = """
 Welcome to Topographica!
