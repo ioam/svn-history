@@ -185,7 +185,7 @@ to make sure that compatible libraries are available.
 
 
 <P><B>Windows:</B> 
-<P> Double click on setup.bat in the Topographica directory.
+Double click on setup.bat in the Topographica directory.
 After installation, '.ty' files are associated with Topographica.
 Follow the instructions below for running Topographica (from a 
 command prompt), or double click on one of the networks in the 
