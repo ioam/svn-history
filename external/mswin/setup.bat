@@ -18,9 +18,9 @@ cd %startdir%
 
 REM check user wants to go ahead
  :start
-echo This will install Topographica to %instdir%.
-echo.
-echo (No other part of your system will be altered.)
+echo This script will: 
+echo - install Topographica to %instdir%,
+echo - associate '.ty' files with Topographica.
 echo.
 set choice=
 set /p choice=Enter '1' to proceeed or '2' to quit:
@@ -43,9 +43,9 @@ del /F python_topo.tar
 REM move the python stuff to the topographica directory
 move /Y python_topo ..\..\
 
-REM create startup scripts for topographica
+REM create startup scripts for Topographica
 echo.
-echo Creating startup scripts...
+echo Creating startup scripts and file association...
 ..\..\python_topo\python.exe setup.py "%instdir%"
 set installed="True"
 goto end
@@ -57,11 +57,11 @@ echo Topographica setup script finished.
 echo.
 if %installed%=="False" goto exit
 cd ..\..
-echo To start, type 
-echo    topographica
-echo at a command prompt (or
-echo    topographica -g 
-echo to get a graphical interface).
+echo To start, type 'topographica' at a command prompt,
+echo or 'topographica -g' to get a graphical interface.
+echo.
+echo Alternatively, double click on one of the 
+echo networks in the examples directory.
 echo.
 echo.
 

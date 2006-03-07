@@ -5,6 +5,8 @@
 import sys
 import os
 
+from _winreg import *
+
 # argument comes from setup.bat
 path = os.path.abspath(sys.argv[1])
 
@@ -36,3 +38,19 @@ f.write("""@echo off"""+'\n')
 f.write("""python_topo\python.exe topographica %*"""+'\n')
 f.write("""@echo on"""+'\n')
 f.close()
+
+
+
+# Link '.ty' file extension to  "topographica.bat -g"
+bat_path = os.path.join(path,'topographica.bat')
+ico_path = os.path.join(path,'topographica.ico')
+
+os.system('assoc .ty=Topographica.Script')
+os.system('ftype Topographica.Script="' + bat_path + '" -g "%1"')
+    
+# and add the Topographica icon to the registry.
+namepathkey = OpenKey(HKEY_CLASSES_ROOT,'Topographica.Script',0,KEY_SET_VALUE)
+SetValue(namepathkey,None,REG_SZ,'Topographica Script')
+SetValue(namepathkey,'DefaultIcon',REG_SZ, ico_path)
+
+
