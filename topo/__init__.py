@@ -48,16 +48,21 @@ __all__ = ['analysis',
            'responsefns',
            'sheets']
 
+# gets set by the topographica script
+release = ''
+
 # Enable automatic importing of .ty files, treating them just like .py
 import topo.misc.tyimputil
 
-from os import getenv
 from topo.base.simulator import SimSingleton
-
 sim = SimSingleton()
 
-ABOUT_TEXT = """
-Pre-release version """+getenv("TOPORELEASE","")+ \
+
+def about():
+    """Print release and licensing information."""
+
+    ABOUT_TEXT = """
+Pre-release version """+release+ \
 """ of Topographica; an updated version may be
 available from topographica.org.
 
@@ -72,10 +77,7 @@ in the hope that it will be useful, but without any warranty; without
 even the implied warranty of merchantability or fitness for a
 particular purpose.  See the GNU General Public License for more
 details.
-"""
-
-def about():
-    """Print release and licensing information."""
+"""    
     print ABOUT_TEXT
 
 
