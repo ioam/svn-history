@@ -184,59 +184,33 @@ plus php if it's not already installed.
 to make sure that compatible libraries are available.
 
 
-<P><B>Windows:</B> The Topographica project is committed to supporting
-Windows in the long term, but in the current stage of very active
-development under Linux, the Windows version often lags behind and has
-various minor quirks and installation difficulties.  Thus Windows
-support should be considered experimental at this stage.
+<P><B>Windows:</B> 
+<P> Double click on setup.bat in the Topographica directory.
+After installation, '.ty' files are associated with Topographica.
+Follow the instructions below for running Topographica (from a 
+command prompt), or double click on one of the networks in the 
+examples directory. 
 
-<P>In any case, there are two ways to build Topographica under
-Windows: <A HREF="http://www.cygwin.com/">Cygwin</a> and Windows
-native.  Cygwin offers a set of UNIX-compatible tools that make it
+<P>Instead of using the Windows versions of the various support tools
+for Topographica, it is also possible to use 
+<A HREF="http://www.cygwin.com/">Cygwin</a>. Cygwin offers a set of 
+UNIX-compatible tools that makes it
 possible to compile UNIX-style programs under Windows, in which case
 you can follow the generic Linux instructions above.  However, as of
 1/2006 the library versions available on Cygwin are a bit out of date
 and thus this process does not currently go smoothly.
 
-<P>Instead of Cygwin, Topographica can also be configured to use
-Win32-native versions of various support tools like Python.
-However, there are again likely to be various problems related to
-library versions at any given time, so installing the native version
-is not necessarily straightforward.  <P>In any case, the basic steps
-for building the native version are:
+<!--CEBHACKALERT: it might do ok, the problem was building tkinter - try
+disabling that from happening, and using cygwin's tkinter?-->
 
-<ol>
-<li> Double click on setup.bat 
-<li> Follow the various installation prompts for the packages bundled with Topographica.
-</ol>
 
-<P>
-If you do not wish to install to the default Windows program files
-directory, you will instead need to run setup.bat from the command-line, with
-the target base path as the first parameter.  For example, to install
-to D:\Topographica, the command would be: "setup D:"
-
-<P>
-After installation you should now have an icon on your desktop that
-opens the directory where Topographica is installed.  There will be a
-new file association called ".ty"; these are scripts that the
-Topographica program will execute when you double-click on them.
-
-<P>You can now test the installation by double-clicking on the
-topographica.bat file which will run the interactive Topographica
-shell and give you a &quot;Topographica&gt;&quot; prompt.  You can
-also double-click on some of the .ty files in the examples
-directory.<P>If you experience any problems, or wish to install Weave
-to enable the C-optimized functions, then please consult our detailed
-<a href="win32.html">Windows installation/troubleshooting
-instructions</a>.  Note that the performance of Topographica will be
-extremely poor (i.e., slow) unless you do successfully install Weave.
-
+<!--One day we might have instructions for building Topographica
+on Windows, compiling everything from source.-->
 
 <H3>Running Topographica</H3>
 
 Once you have the code installed and built, go to your
-topographica/ directory and type e.g.:
+topographica/ directory and type* e.g.:
 
 <pre>
   ./topographica -g examples/cfsom_or.ty
@@ -263,6 +237,9 @@ or
 For the latter two examples, a good way to get started is to work through 
 the <A HREF="../Tutorials/som_retinotopy.html">SOM</A> or 
 the <A HREF="../Tutorials/lissom_or.html">LISSOM</A> tutorials.
+
+<P>
+<small>* Windows users should omit the initial <code>./<code></small>
 
 <H3>Updating Topographica</H3>
 
