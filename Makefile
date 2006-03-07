@@ -45,13 +45,10 @@ topographica: external Makefile
 	echo "#!${PREFIX}bin/python" > topographica
 	echo "# Startup script for Topographica" >> topographica
 	echo "" >> topographica
-	echo "# Set os environment variables before importing anything else" >> topographica
-	# CEBHACKALERT: Do we need any of these except toporelease? Why are
-	# they environment variables in particular?
-	echo "import os" >> topographica
-	echo "os.environ['TOPORELEASE']='${RELEASE}'" >> topographica
+	echo "import topo" >> topographica
+	echo "topo.release='${RELEASE}'" >> topographica
 	echo "" >> topographica
-	echo "# Now process the command-line arguments and do Topographica-specific setup" >> topographica
+	echo "# Process the command-line arguments" >> topographica
 	echo "from sys import argv" >> topographica
 	echo "from topo.misc.commandline import process_argv" >> topographica
 	echo "process_argv(argv[1:])" >> topographica
