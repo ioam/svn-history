@@ -13,14 +13,13 @@ was first added to the list, or a change was made.)
 <ul>
 
 <li>
-2006/03/03 (CB): topographica script, setting environment variables (problem finding tkinter libraries)
+2006/03/07: (CB) Splitting output functions from learning functions to learn and
+apply_output_fn, to allow joint normalization across CFs.
 </li>
 
 <li>
-2006/03/03 (CB): Windows version doesn't work (with automatic installation) now startup scripts have changed.
+2006/03/07 (CB): (Windows version) association of .ty files - running topographica.bat from outside topographica directory; shortcut on desktop.
 </li>
-
-
 
 <li> 
 2006/02/28 (CB): Fix problem (matching previous work) with som_retinotopy.
@@ -30,19 +29,18 @@ was first added to the list, or a change was made.)
 2006/02/21 (JC): Cleaning up ports.
 </li>
 
+
 <li>
-2006/02/21: (JC) Splitting output functions from learning functions to learn and
-apply_output_fn, to allow joint normalization across CFs.
+2006/03/07: (CB) Implement scheduled actions as strings exec'd in main [not committed, but working - just needs cleaning]
 </li>
 
 <li>
-2006/02/28 (CB): A better way to implement Wrapper class (and a better name for it); independent random streams (finalize RandomWrapper); a way to implement scheduled actions so that they will pickle (e.g. execute strings in __main__.__dict__) [not committed, but working - just needs cleaning]; document pickle and update documentation now it's changed (e.g. tutorials, don't need to load script first of all); change all examples so they set input parameters on an object rather than the class (using Wrapper); why RetinotopicSOM can't be found on unpickling. 
+2006/03/07 (CB): A better way to implement the Wrapper class(es); change all examples so they set input parameters on an object rather than the class (using Wrapper) 
 </li>
 
 <li>
-2006/02/28 (CB): SimSingleton class, allowing access to the simulator via topo.sim; provide easier access to objects in the simulator (something like topo.sim['V1']) [working, but not committed].
+2006/03/07 (CB): Change current code over to use topo.sim['V1']-type access to simulator, and finalize connect2 etc; then remove old code.
 </li>
-
 
 <li> 
 2006/02/23 (all): Ensuring classes are declared abstract when they should be, and making sure base and simple classes are imported into packages (i.e. Sheet into topo/sheets/, Projection into topo/projections/, Constant into topo/patterns/, and so on).
@@ -61,12 +59,20 @@ Tasks which the developers are about to start.
 
 <ul>
 
-<li>										    2006/03/03 (CB): modify test files to take less time to run (notably measurefeaturemap: reduce the density)
+<li>
+2006/03/07 (CB): Document pickle and update documentation now it's changed (e.g. tutorials, don't need to load script first of all).
 </li>
 
+<li>
+2006/03/07 (CB): Why RetinotopicSOM can't be found on unpickling.
+</li>
 
 <li>
-2006/03/03 (CB): Filename paths (for Filename Parameter and plot templates etc):  Check on Windows.
+2006/03/07 (CB): Set simulator's release attribute on pickling.
+</li>
+
+<li>										    
+2006/03/03 (CB): modify test files to take less time to run (notably measurefeaturemap: reduce the density)
 </li>
 
 <li>
@@ -102,8 +108,7 @@ be set anywhere else, even in a ParameterizedObject constructor.
 </li>
 
 <li>
-2006/02/21 (CB): HACKALERTs relating to connection fields; matching
-with C++ LISSOM when there are circular connection fields.
+2006/03/07 (CB): HACKALERTs relating to connection fields; matching with C++ LISSOM when there are circular connection fields; implement change_bounds properly [made a first draft, JL is working with it]
 </li>
 
 <li>
@@ -121,6 +126,10 @@ use them.
 2006/03/03: delete objects from simulator; setup GUI to use this.
 </li>
 
+<li> 
+2006/03/07 (CB): (Windows) Script to generate the python_topo directory.
+</li>
+
 
 </ul>
 
@@ -136,4 +145,9 @@ Ongoing work with uncertain finishing times.
 <li>
 2006/02/21 (all): Improving documentation and test files; eliminating ALERTs.
 </li>
+
+<li>
+2006/03/07: (Windows) Build python on windows with free compiler ('free' as in 'free as a bird'). Maybe use pymingw?
+</li>
+
 </ul>
