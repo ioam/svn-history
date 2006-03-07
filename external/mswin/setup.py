@@ -11,7 +11,7 @@ compiler_path = "python_topo\\mingw\\bin"
 # topographica.ty
 f = open(os.path.join(path,"topographica.py"),'w')
 f.write('import os'+'\n')
-f.write("os.environ['PATH']='"+os.path.join(path,compiler_path)+";'\n")
+f.write("os.environ['PATH']='"+repr(os.path.join(path,compiler_path))+";'\n")
 ### should keep current path, too
 f.write("""os.environ['TOPORELEASE']='0.8.2'"""+'\n')
 f.write('from sys import argv\n')
