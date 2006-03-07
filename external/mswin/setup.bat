@@ -59,10 +59,13 @@ if %installed%=="False" goto exit
 cd ..\..
 echo To start, type 
 echo    topographica
-echo or
+echo at a command prompt (or
 echo    topographica -g 
-echo to get a graphical interface.
+echo to get a graphical interface).
 echo.
 echo.
 
 :exit
+echo.
+pause
+echo.
