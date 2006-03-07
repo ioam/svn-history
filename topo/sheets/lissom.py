@@ -91,32 +91,34 @@ class LISSOM(CFSheet):
 
 
 
-class LISSOM_CPointer(LISSOM):
-    """
-    LISSOMPointer implements the same algorithm as LISSOM, but it uses a
-    special learning function (DivisiveHebbian_CPointer) for faster execution 
-    time. This requires all the connections between the sheets are instances of 
-    CFProjection_CPointer (specified via connect()).
-    """
+# CEBHACKALERT: commented out because the cpointer learning functions
+# have fallen out of date.
+## class LISSOM_CPointer(LISSOM):
+##     """
+##     LISSOMPointer implements the same algorithm as LISSOM, but it uses a
+##     special learning function (DivisiveHebbian_CPointer) for faster execution 
+##     time. This requires all the connections between the sheets are instances of 
+##     CFProjection_CPointer (specified via connect()).
+##     """
 
-    def __init__(self,**params):
-        super(LISSOM_CPointer,self).__init__(**params)
-
-
-    def learn(self):
-        rows,cols = self.activity.shape
-        for proj in chain(*self.in_projections.values()):
-            if proj.input_buffer:
-                learning_rate = proj.learning_rate
-                inp = proj.input_buffer
-
-                cfs = proj.cfs
-                len, len2 = inp.shape
-                proj.learning_fn(cfs, inp, self.activity, learning_rate, weight_ptrs=proj.weight_ptrs, slice_ptrs=proj.slice_ptrs, mask_ptrs=proj.mask_ptrs)
+##     def __init__(self,**params):
+##         super(LISSOM_CPointer,self).__init__(**params)
 
 
-# Optimized version is overwritten by the unoptimized version if the
-# code does not have optimized set.
-if not optimized:
-    LISSOM_CPointer = LISSOM
-    ParameterizedObject().message('Inline-optimized components not available; using LISSOM instead of LISSOM_CPointer.')
+##     def learn(self):
+##         rows,cols = self.activity.shape
+##         for proj in chain(*self.in_projections.values()):
+##             if proj.input_buffer:
+##                 learning_rate = proj.learning_rate
+##                 inp = proj.input_buffer
+
+##                 cfs = proj.cfs
+##                 len, len2 = inp.shape
+##                 proj.learning_fn(cfs, inp, self.activity, learning_rate, weight_ptrs=proj.weight_ptrs, slice_ptrs=proj.slice_ptrs, mask_ptrs=proj.mask_ptrs)
+
+
+## # Optimized version is overwritten by the unoptimized version if the
+## # code does not have optimized set.
+## if not optimized:
+##     LISSOM_CPointer = LISSOM
+##     ParameterizedObject().message('Inline-optimized components not available; using LISSOM instead of LISSOM_CPointer.')
