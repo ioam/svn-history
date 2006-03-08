@@ -147,7 +147,7 @@ class DivisiveHebbian(CFLearningFunction):
             PyObject *weights = PyString_FromString("weights");
             PyObject *mask = PyString_FromString("mask");
             double load, delta;
-            double totald;
+            double total;
 
             x = output_activity;
             for (r=0; r<rows; ++r) {
@@ -166,9 +166,8 @@ class DivisiveHebbian(CFLearningFunction):
                         cc1 = *slice++;
                         cc2 = *slice;
                         m = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,mask))->data);
-
-                        totald = 0.0;
-
+                        total = 0.0;
+                        
                         // modify non-masked weights
                         inpj = input_activity+len*rr1+cc1;
                         for (i=rr1; i<rr2; ++i) {
@@ -178,9 +177,8 @@ class DivisiveHebbian(CFLearningFunction):
                                 // Numeric.Float32 values. 0 does not appear to transfer
                                 // as 0.
                                 if (*(m++) >= 0.000001) {
-                                    delta = load * *inpi;
-                                    *wi += delta;
-                                    totald += delta;
+                                    *wi += load * *inpi;
+                                    total += *wi;
                                 }
                                 ++wi;
                                 ++inpi;
@@ -188,19 +186,12 @@ class DivisiveHebbian(CFLearningFunction):
                             inpj += len;
                         }
 
-                        // CEBHACKALERT: it might be better just to sum the current weights
-                        // in the loop above and use this in the normalization. It would be
-                        // clearer and would probably behave better numerically (maybe
-                        // it's not currently summing to 1 exactly). But then it wouldn't
-                        // match C++ LISSOM so clearly.
-
                         // normalize the weights
-                        totald += 1.0;
-                        totald = 1.0/totald;
+                        total = 1.0/total;
                         rc = (rr2-rr1)*(cc2-cc1);
 
                         for (i=0; i<rc; ++i) {
-                            *(wj++) *= totald;
+                            *(wj++) *= total;
                         }
                     }
                 }
