@@ -35,7 +35,6 @@ f.close()
 # topographica.bat
 f = open(os.path.join(path,'topographica.bat'),'w')
 f.write("""@echo off"""+'\n')
-# nightmare: repr gives us the single quote, we need double for Windows
 f.write('cd "' path +'"\n')
 f.write("""python_topo\python.exe topographica %*"""+'\n')
 f.write("""@echo on"""+'\n')
