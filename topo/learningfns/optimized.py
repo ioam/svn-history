@@ -234,7 +234,7 @@ class DivisiveHebbian(CFLearningFunction):
         """
         inline(hebbian_div_norm_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
     
-        inline(hebbian_div_norm_code2, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
+        inline(hebbian_div_norm_code2, ['output_activity','rows','cols','cfs'], local_dict=locals())
        
 
 class DivisiveHebbian_Py(GenericCFLF):
