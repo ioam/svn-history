@@ -47,7 +47,8 @@ try:
     inline_named_params = {
         'extra_compile_args':['-O2','-fomit-frame-pointer','-funroll-loops'],
         'extra_link_args':['-lstdc++'],
-        'compiler':'gcc'
+        'compiler':'gcc',
+        'verbose':0
         }
 
     def inline_weave(*params,**nparams):
