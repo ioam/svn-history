@@ -115,12 +115,11 @@ def process_argv(argv):
     # (As of 12/2005) With Python 2.4 compiled and run on Windows XP,
     # trying to import Weave after starting the topo command-line will
     # generate a serious system error.  However, importing weave first
-    # does not cause problems.  
-    try:
-        if import_weave:
-            exec "import weave" in __main__.__dict__    
-    except:
-        pass
+    # does not cause problems.
+    # CEBHACKALERT: I can't check this out because I've never
+    # tried compiling Python on Windows. 
+
+    if import_weave: exec "import weave" in __main__.__dict__    
 
     exec "import topo.misc.commandline; topo.misc.commandline.start(" \
 	   + str(option.interactive) + ");" in __main__.__dict__
