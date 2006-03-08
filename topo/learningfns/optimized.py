@@ -186,10 +186,17 @@ class DivisiveHebbian(CFLearningFunction):
                             inpj += len;
                         }
 
+                        // Splitting learning from normalization:
+
+                        // store the sum of the cf's weights
+                        PyObject_SetAttrString(cf,"sum",PyFloat_FromDouble(total));
+
+                        // get the sum of the cf's weights
+                        total = PyFloat_AsDouble(PyObject_GetAttrString(cf,"sum"));
+
                         // normalize the weights
                         total = 1.0/total;
                         rc = (rr2-rr1)*(cc2-cc1);
-
                         for (i=0; i<rc; ++i) {
                             *(wj++) *= total;
                         }
