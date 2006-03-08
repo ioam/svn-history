@@ -137,41 +137,35 @@ class DivisiveHebbian(CFLearningFunction):
         len, len2 = input_activity.shape
 
         hebbian_div_norm_code = """
-            float *wi, *m;
-            double *x, *inpi, *inpj;
-            int *slice;
-            int rr1, rr2, cc1, cc2, rc;
-            int i, j, r, l;
+            double *inpi, *inpj;
             PyObject *cf, *cfsr;
             PyObject *sarray = PyString_FromString("slice_array");
             PyObject *weights = PyString_FromString("weights");
             PyObject *mask = PyString_FromString("mask");
-            double load, delta;
-            double total;
 
-            x = output_activity;
-            for (r=0; r<rows; ++r) {
+            double *x = output_activity;
+            for (int r=0; r<rows; ++r) {
                 cfsr = PyList_GetItem(cfs,r);
-                for (l=0; l<cols; ++l) {
-                    load = *x++;
+                for (int l=0; l<cols; ++l) {
+                    double load = *x++;
                     if (load != 0) {
                         load *= single_connection_learning_rate;
 
                         cf = PyList_GetItem(cfsr,l);
-                        wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
-                        slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
-                        rr1 = *slice++;
-                        rr2 = *slice++;
-                        cc1 = *slice++;
-                        cc2 = *slice;
-                        m = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,mask))->data);
-                        total = 0.0;
+                        float *wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
+                        int *slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
+                        int rr1 = *slice++;
+                        int rr2 = *slice++;
+                        int cc1 = *slice++;
+                        int cc2 = *slice;
+                        float *m = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,mask))->data);
+                        double total = 0.0;
                         
                         // modify non-masked weights
                         inpj = input_activity+len*rr1+cc1;
-                        for (i=rr1; i<rr2; ++i) {
+                        for (int i=rr1; i<rr2; ++i) {
                             inpi = inpj;
-                            for (j=cc1; j<cc2; ++j) {
+                            for (int j=cc1; j<cc2; ++j) {
                                 // CEBHACKALERT: the mask is an array of
                                 // Numeric.Float32 values. 0 does not appear to transfer
                                 // as 0.
