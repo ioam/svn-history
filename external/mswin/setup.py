@@ -35,7 +35,7 @@ f.close()
 # topographica.bat
 f = open(os.path.join(path,'topographica.bat'),'w')
 f.write("""@echo off"""+'\n')
-f.write('cd "' path +'"\n')
+f.write('cd "' + path + '"\n')
 f.write("""python_topo\python.exe topographica %*"""+'\n')
 f.write("""@echo on"""+'\n')
 f.close()
