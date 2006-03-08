@@ -181,39 +181,28 @@ class DivisiveHebbian(CFLearningFunction):
         """
 
         hebbian_div_norm_code2 = """
-            float *wi;
-            double *x;
-            int *slice;
-            int rr1, rr2, cc1, cc2, rc;
-            int i,r,l;
-            PyObject *cf, *cfsr;
-            PyObject *sarray = PyString_FromString("slice_array");
-            PyObject *weights = PyString_FromString("weights");
-            double load;
-            double total;
-
-            x = output_activity;
-            for (r=0; r<rows; ++r) {
-                cfsr = PyList_GetItem(cfs,r);
-                for (l=0; l<cols; ++l) {
-                    load = *x++;
+            double *x = output_activity;
+            for (int r=0; r<rows; ++r) {
+                PyObject *cfsr = PyList_GetItem(cfs,r);
+                for (int l=0; l<cols; ++l) {
+                    double load = *x++;
                     if (load != 0) {
 
-                        cf = PyList_GetItem(cfsr,l);
-                        wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
-                        slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
-                        rr1 = *slice++;
-                        rr2 = *slice++;
-                        cc1 = *slice++;
-                        cc2 = *slice;
+                        PyObject *cf = PyList_GetItem(cfsr,l);
+                        float *wi = (float *)(((PyArrayObject*)PyObject_GetAttrString(cf,"weights"))->data);
+                        int *slice = (int *)(((PyArrayObject*)PyObject_GetAttrString(cf,"slice_array"))->data);
+                        int rr1 = *slice++;
+                        int rr2 = *slice++;
+                        int cc1 = *slice++;
+                        int cc2 = *slice;
 
                         // get the sum of the cf's weights
-                        total = PyFloat_AsDouble(PyObject_GetAttrString(cf,"sum"));
+                        double total = PyFloat_AsDouble(PyObject_GetAttrString(cf,"sum"));
 
                         // normalize the weights
                         total = 1.0/total;
-                        rc = (rr2-rr1)*(cc2-cc1);
-                        for (i=0; i<rc; ++i) {
+                        int rc = (rr2-rr1)*(cc2-cc1);
+                        for (int i=0; i<rc; ++i) {
                             *(wi++) *= total;
                         }
                     }
