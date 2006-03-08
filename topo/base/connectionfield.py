@@ -95,6 +95,9 @@ class ConnectionField(ParameterizedObject):
 
         super(ConnectionField,self).__init__(**params)
 
+        # the sum of the weights
+        self.sum = 0.0 
+
         self.x = x; self.y = y
         self.input_sheet = input_sheet
         self.offset_bounds(weights_bounds_template)
