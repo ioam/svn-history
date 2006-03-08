@@ -137,34 +137,28 @@ class DivisiveHebbian(CFLearningFunction):
         len, len2 = input_activity.shape
 
         hebbian_div_norm_code = """
-            double *inpi, *inpj;
-            PyObject *cf, *cfsr;
-            PyObject *sarray = PyString_FromString("slice_array");
-            PyObject *weights = PyString_FromString("weights");
-            PyObject *mask = PyString_FromString("mask");
-
             double *x = output_activity;
             for (int r=0; r<rows; ++r) {
-                cfsr = PyList_GetItem(cfs,r);
+                PyObject *cfsr = PyList_GetItem(cfs,r);
                 for (int l=0; l<cols; ++l) {
                     double load = *x++;
                     if (load != 0) {
                         load *= single_connection_learning_rate;
 
-                        cf = PyList_GetItem(cfsr,l);
-                        float *wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
-                        int *slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
+                        PyObject *cf = PyList_GetItem(cfsr,l);
+                        float *wi = (float *)(((PyArrayObject*)PyObject_GetAttrString(cf,"weights"))->data);
+                        int *slice = (int *)(((PyArrayObject*)PyObject_GetAttrString(cf,"slice_array"))->data);
                         int rr1 = *slice++;
                         int rr2 = *slice++;
                         int cc1 = *slice++;
                         int cc2 = *slice;
-                        float *m = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,mask))->data);
+                        float *m = (float *)(((PyArrayObject*)PyObject_GetAttrString(cf,"mask"))->data);
                         double total = 0.0;
                         
                         // modify non-masked weights
-                        inpj = input_activity+len*rr1+cc1;
+                        double *inpj = input_activity+len*rr1+cc1;
                         for (int i=rr1; i<rr2; ++i) {
-                            inpi = inpj;
+                            double *inpi = inpj;
                             for (int j=cc1; j<cc2; ++j) {
                                 // CEBHACKALERT: the mask is an array of
                                 // Numeric.Float32 values. 0 does not appear to transfer
