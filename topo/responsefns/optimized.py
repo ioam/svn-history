@@ -33,20 +33,17 @@ class CFDotProduct(CFResponseFunction):
     
         code = """
             double *tact = temp_act;
-            PyObject *sarray = PyString_FromString("slice_array");
-            PyObject *weights = PyString_FromString("weights");
-    
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
 		for (int l=0; l<cols; ++l) {
                     PyObject *cf = PyList_GetItem(cfsr,l);
-                    int *slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
+                    int *slice = (int *)(((PyArrayObject*)PyObject_GetAttrString(cf,"slice_array"))->data);
                     int rr1 = *slice++;
                     int rr2 = *slice++;
                     int cc1 = *slice++;
                     int cc2 = *slice;
 		    double tot = 0.0;
-                    float *wj = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
+                    float *wj = (float *)(((PyArrayObject*)PyObject_GetAttrString(cf,"weights"))->data);
 		    double *xj = X+len*rr1+cc1;
 
                     // computes the dot product
