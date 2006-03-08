@@ -71,7 +71,7 @@ def get_filenames(parser):
             (arg[:1] == "-" and len(arg) > 1 and arg[1] != "-")):
             break
 	else:
-	    list_command = list_command +  ["execfile(\'" + arg + "\')"]
+	    list_command = list_command +  ['execfile(' + repr(os.path.abspath(arg)) + ')']
 	    del rargs[0]
     setattr(parser.values,"commands",list_command) 
 
@@ -139,6 +139,7 @@ def process_argv(argv):
     filename_arg = topo_parser.largs
 
     for filename in filename_arg:
+        # CB: this is going to need converting too, I don't know when it's used yet.
 	execfile(filename,__main__.__dict__)
 
     # execute remaining commands.
