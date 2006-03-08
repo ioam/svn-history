@@ -137,7 +137,7 @@ class DivisiveHebbian(CFLearningFunction):
         len, len2 = input_activity.shape
 
         hebbian_div_norm_code = """
-            float *wi, *wj, *m;
+            float *wi, *m;
             double *x, *inpi, *inpj;
             int *slice;
             int rr1, rr2, cc1, cc2, rc;
@@ -159,7 +159,6 @@ class DivisiveHebbian(CFLearningFunction):
 
                         cf = PyList_GetItem(cfsr,l);
                         wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
-                        wj = wi;
                         slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
                         rr1 = *slice++;
                         rr2 = *slice++;
@@ -186,10 +185,39 @@ class DivisiveHebbian(CFLearningFunction):
                             inpj += len;
                         }
 
-                        // Splitting learning from normalization:
-
                         // store the sum of the cf's weights
                         PyObject_SetAttrString(cf,"sum",PyFloat_FromDouble(total));
+                    }
+                }
+            }
+        """
+
+        hebbian_div_norm_code2 = """
+            float *wi;
+            double *x;
+            int *slice;
+            int rr1, rr2, cc1, cc2, rc;
+            int i,r,l;
+            PyObject *cf, *cfsr;
+            PyObject *sarray = PyString_FromString("slice_array");
+            PyObject *weights = PyString_FromString("weights");
+            double load;
+            double total;
+
+            x = output_activity;
+            for (r=0; r<rows; ++r) {
+                cfsr = PyList_GetItem(cfs,r);
+                for (l=0; l<cols; ++l) {
+                    load = *x++;
+                    if (load != 0) {
+
+                        cf = PyList_GetItem(cfsr,l);
+                        wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
+                        slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
+                        rr1 = *slice++;
+                        rr2 = *slice++;
+                        cc1 = *slice++;
+                        cc2 = *slice;
 
                         // get the sum of the cf's weights
                         total = PyFloat_AsDouble(PyObject_GetAttrString(cf,"sum"));
@@ -198,14 +226,15 @@ class DivisiveHebbian(CFLearningFunction):
                         total = 1.0/total;
                         rc = (rr2-rr1)*(cc2-cc1);
                         for (i=0; i<rc; ++i) {
-                            *(wj++) *= total;
+                            *(wi++) *= total;
                         }
                     }
                 }
             }
         """
-        
         inline(hebbian_div_norm_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
+    
+        inline(hebbian_div_norm_code2, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
        
 
 class DivisiveHebbian_Py(GenericCFLF):
