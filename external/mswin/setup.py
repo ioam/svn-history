@@ -54,4 +54,6 @@ namepathkey = OpenKey(HKEY_CLASSES_ROOT,'Topographica.Script',0,KEY_SET_VALUE)
 SetValue(namepathkey,None,REG_SZ,'Topographica Script')
 SetValue(namepathkey,'DefaultIcon',REG_SZ, ico_path)
 
-
+# and create a desktop shortcut
+# by calling a windows scripting file
+os.system('wscript create_shortcut.vbs "' + path + '"')
