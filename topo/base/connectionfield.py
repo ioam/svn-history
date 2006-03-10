@@ -35,6 +35,8 @@ import patterngenerator
 from boundingregion import BoundingBox, BoundingRegionParameter
 
 
+import topo
+
 # Specified explicitly when creating weights matrix - required
 # for optimized C functions.
 weight_type = Numeric.Float32
@@ -95,9 +97,6 @@ class ConnectionField(ParameterizedObject):
 
         super(ConnectionField,self).__init__(**params)
 
-        # the sum of the weights
-        self.sum = 0.0 
-
         self.x = x; self.y = y
         self.input_sheet = input_sheet
         self.offset_bounds(weights_bounds_template)
@@ -123,7 +122,11 @@ class ConnectionField(ParameterizedObject):
 
         # CEBHACKALERT: this works for now, while the output_fns are all multiplicative.
         self.weights *= self.mask   
+
         output_fn(self.weights)
+
+        # the initial sum of the weights
+        self.sum = sum(self.weights.flat)
         
         # CEBHACKALERT: incorporate such a test into testconnectionfield.
 #        assert self.weights.shape==(self.slice_array[1]-self.slice_array[0],self.slice_array[3]-self.slice_array[2]),str(self.weights.shape)+" "+str((self.slice_array[1]-self.slice_array[0],self.slice_array[3]-self.slice_array[2])) 
@@ -555,7 +558,7 @@ class CFProjection(Projection):
         """
         # Learning is performed if the input_buffer has already been set,
         # i.e. there is an input to the Projection.
-        if self.input_buffer:
+        if self.input_buffer: 
             self.learning_fn(self.cfs,self.input_buffer,self.dest.activity,self.learning_rate)
       
 
