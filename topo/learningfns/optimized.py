@@ -181,31 +181,30 @@ class DivisiveHebbian(CFLearningFunction):
         """
 
         hebbian_div_norm_code2 = """
-            double *x = output_activity;
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
                 for (int l=0; l<cols; ++l) {
-                    double load = *x++;
-                    if (load != 0) {
 
-                        PyObject *cf = PyList_GetItem(cfsr,l);
-                        float *wi = (float *)(((PyArrayObject*)PyObject_GetAttrString(cf,"weights"))->data);
-                        int *slice = (int *)(((PyArrayObject*)PyObject_GetAttrString(cf,"slice_array"))->data);
-                        int rr1 = *slice++;
-                        int rr2 = *slice++;
-                        int cc1 = *slice++;
-                        int cc2 = *slice;
+                    PyObject *cf = PyList_GetItem(cfsr,l);
+                    float *wi = (float *)(((PyArrayObject*)PyObject_GetAttrString(cf,"weights"))->data);
+                    int *slice = (int *)(((PyArrayObject*)PyObject_GetAttrString(cf,"slice_array"))->data);
+                    int rr1 = *slice++;
+                    int rr2 = *slice++;
+                    int cc1 = *slice++;
+                    int cc2 = *slice;
 
-                        // get the sum of the cf's weights
-                        double total = PyFloat_AsDouble(PyObject_GetAttrString(cf,"sum"));
+                    // get the sum of the cf's weights
+                    double total = PyFloat_AsDouble(PyObject_GetAttrString(cf,"sum"));
 
-                        // normalize the weights
-                        total = 1.0/total;
-                        int rc = (rr2-rr1)*(cc2-cc1);
-                        for (int i=0; i<rc; ++i) {
-                            *(wi++) *= total;
-                        }
+                    // normalize the weights
+                    total = 1.0/total;
+                    int rc = (rr2-rr1)*(cc2-cc1);
+                    for (int i=0; i<rc; ++i) {
+                        *(wi++) *= total;
                     }
+
+                    // set the sum to be 1 (eventually this value will be variable)
+                    PyObject_SetAttrString(cf,"sum",PyFloat_FromDouble(1.0));
                 }
             }
         """
