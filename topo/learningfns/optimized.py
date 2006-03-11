@@ -7,13 +7,11 @@ $Id$
 """
 __version__ = "$Revision$"
 
+import topo.base.connectionfield
 from topo.misc.inlinec import inline, optimized
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Parameter,Number
-from topo.base.projection import Identity
 from topo.base.connectionfield import CFLearningFunction,OutputFunctionParameter
-from topo.outputfns.basic import DivisiveSumNormalize
-
 
 # Imported here so that all CFLearningFunctions will be in the same package
 from topo.base.connectionfield import IdentityCFLF,GenericCFLF
@@ -24,10 +22,8 @@ class Hebbian(CFLearningFunction):
     CF-aware Hebbian learning rule.
 
     Implemented in C for speed.  Should be equivalent to
-    GenericCFLF(single_cf_fn=hebbian), except faster.  Callers can set
-    the output_fn to perform normalization if desired.
+    GenericCFLF(single_cf_fn=hebbian), except faster.  
     """
-    
     def __init__(self,**params):
         super(Hebbian,self).__init__(**params)
 
@@ -37,106 +33,6 @@ class Hebbian(CFLearningFunction):
         len, len2 = input_activity.shape
 
         hebbian_code = """
-            float *wi, *wj;
-            double *x, *inpi, *inpj;
-            int *slice;
-            int rr1, rr2, cc1, cc2, rc;
-            int i, j, r, l;
-            PyObject *cf, *cfsr;
-            PyObject *sarray = PyString_FromString("slice_array");
-            PyObject *weights = PyString_FromString("weights");
-            double load, delta;
-            double totald;
-    
-            x = output_activity;
-            for (r=0; r<rows; ++r) {
-                cfsr = PyList_GetItem(cfs,r);
-                for (l=0; l<cols; ++l) {
-                    load = *x++;
-                    if (load != 0) {
-                        load *= single_connection_learning_rate;
-    
-                        cf = PyList_GetItem(cfsr,l);
-                        wi = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
-                        wj = wi;
-                        slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
-                        rr1 = *slice++;
-                        rr2 = *slice++;
-                        cc1 = *slice++;
-                        cc2 = *slice;
-    
-                        totald = 0.0;
-    
-                        inpj = input_activity+len*rr1+cc1;
-                        for (i=rr1; i<rr2; ++i) {
-                            inpi = inpj;
-                            for (j=cc1; j<cc2; ++j) {
-                                delta = load * *inpi;
-                                *wi += delta;
-                                totald += delta;
-                                ++wi;
-                                ++inpi;
-                            }
-                            inpj += len;
-                        }
-                    }
-                }
-            }
-        """
-        
-        inline(hebbian_code, ['input_activity', 'output_activity', 'rows', 'cols', 'len', 'cfs', 'single_connection_learning_rate'],local_dict=locals())
-
-        # Apply output_fn to each CF, followed by mask
-        # (output_fn skipped for no-op case, as an optimization) 
-        output_fn = self.output_fn
-        for r in xrange(rows):
-            for c in xrange(cols):
-                cf = cfs[r][c]
-                # CEBHACKALERT: see ConnectionField.__init__()
-                cf.weights *= cf.mask
-                if type(output_fn) is not Identity:
-                    cf.weights = output_fn(cf.weights)
-
-class Hebbian_Py(GenericCFLF):
-    """
-    CF-aware Hebbian learning rule.
-
-    Wrapper written to allow transparent non-optimized fallback; 
-    equivalent to GenericCFLF(single_cf_fn=hebbian)
-    """
-    def __init__(self,**params):
-        super(Hebbian_Py,self).__init__(single_cf_fn=hebbian,**params)
-
-if not optimized:
-    Hebbian = Hebbian_Py
-    ParameterizedObject().message('Inline-optimized components not available; using Hebbian_Py instead of Hebbian.')
-
-
-
-# CEBHACKALERT: ought to be DivisiveL1Hebbian (assuming DivisiveSumNormalize
-# is changed to DivisiveL1Normalize). Same for similarly named functions.
-class DivisiveHebbian(CFLearningFunction):
-    """
-    CF-aware Hebbian learning rule with built-in divisive normalization.
-
-    Implemented in C for speed.  Should be equivalent to
-    GenericCFLF(single_cf_fn=hebbian,output_fn=DivisiveSumNormalize()),
-    except faster.  The output_fn cannot be modified, because the
-    divisive normalization is performed in C while doing the weight
-    modification; the output_fn is not actually called from within
-    this function.
-    """
-    output_fn = OutputFunctionParameter(DivisiveSumNormalize())
-
-    def __init__(self,**params):
-        super(DivisiveHebbian,self).__init__(**params)
-
-    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
-        rows,cols = output_activity.shape
-	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
-        len, len2 = input_activity.shape
-
-        hebbian_div_norm_code = """
             double *x = output_activity;
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
@@ -180,54 +76,30 @@ class DivisiveHebbian(CFLearningFunction):
             }
         """
 
-        hebbian_div_norm_code2 = """
-            for (int r=0; r<rows; ++r) {
-                PyObject *cfsr = PyList_GetItem(cfs,r);
-                for (int l=0; l<cols; ++l) {
-
-                    PyObject *cf = PyList_GetItem(cfsr,l);
-                    float *wi = (float *)(((PyArrayObject*)PyObject_GetAttrString(cf,"weights"))->data);
-                    int *slice = (int *)(((PyArrayObject*)PyObject_GetAttrString(cf,"slice_array"))->data);
-                    int rr1 = *slice++;
-                    int rr2 = *slice++;
-                    int cc1 = *slice++;
-                    int cc2 = *slice;
-
-                    // get the sum of the cf's weights
-                    double total = PyFloat_AsDouble(PyObject_GetAttrString(cf,"sum"));
-
-                    // normalize the weights
-                    total = 1.0/total;
-                    int rc = (rr2-rr1)*(cc2-cc1);
-                    for (int i=0; i<rc; ++i) {
-                        *(wi++) *= total;
-                    }
-
-                    // set the sum to be 1 (eventually this value will be variable)
-                    PyObject_SetAttrString(cf,"sum",PyFloat_FromDouble(1.0));
-                }
-            }
-        """
-        inline(hebbian_div_norm_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
+        inline(hebbian_code, ['input_activity', 'output_activity','rows', 'cols', 'len', 'cfs', 'single_connection_learning_rate'], local_dict=locals())
     
-        inline(hebbian_div_norm_code2, ['output_activity','rows','cols','cfs'], local_dict=locals())
        
 
-class DivisiveHebbian_Py(GenericCFLF):
+class Hebbian_Py(GenericCFLF):
     """
-    Same as GenericCFLF, but with a default output_fn of DivisiveSumNormalize.
+    Same as GenericCFLF single_cf_fn=hebbian
 
-    Acts as a an exact (but much, much slower) replacement for
-    DivisiveHebbian, to declare what DivisiveHebbian implements and to
-    allow fallback when inline-optimized components are not available.
+    Wrapper written to allow transparent non-optimized fallback; 
+    equivalent to GenericCFLF(single_cf_fn=topo.base.connectionfield.Hebbian())
     """
     def __init__(self,**params):
-        super(DivisiveHebbian_Py,self).__init__(**params)
-        self.output_fn = DivisiveSumNormalize()
+        super(Hebbian_Py,self).__init__(single_cf_fn=topo.base.connectionfield.Hebbian(),**params)
 
 if not optimized:
-    DivisiveHebbian = DivisiveHebbian_Py
+    Hebbian = Hebbian_Py
     ParameterizedObject().message('Inline-optimized components not available; using DivisiveHebbian_Py instead of DivisiveHebbian.')
+
+
+
+
+
+
+
 
 
 # CEBHACKALERT: this code has not been developed along with the other C code.
