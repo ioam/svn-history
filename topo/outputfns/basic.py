@@ -61,22 +61,32 @@ class DivisiveSumNormalize(OutputFunction):
     This operation ensures that an array has a sum equal to the specified 
     norm_value, rescaling each value to make this true.  The array is 
     unchanged if the sum is zero.
+
+    If the array's current norm_value is known (e.g. from some earlier
+    calculation), it can be passed in as an optimization.
     """
     norm_value = Number(default=1.0)
-
-    # re. HACKALERT above:
-    # In that case, should norm_value have bounds set so it's >=0 ?
-    # If this gets changed, change instances in lissom_or.ty where
-    # DivisiveSumNormalize is called with norm_value=-1.0.
 
     def __init__(self,**params):
         super(DivisiveSumNormalize,self).__init__(**params)
 
-    def __call__(self,x):
-        tot = 1.0*sum(x.flat)
-        if tot != 0:
-            factor = (self.norm_value/tot)
+    def __call__(self,x,current_norm_value=None):
+        """
+        Normalize the input array.
+
+        If the array's current norm_value is already equal to the required
+        norm_value, the operation is skipped.
+        """
+    
+        if current_norm_value==self.norm_value:
+            return x
+        elif current_norm_value==None:
+            current_norm_value = 1.0*sum(x.flat)
+            
+        if current_norm_value != 0:
+            factor = (self.norm_value/current_norm_value)
             x *= factor
+
         return x
 
 
