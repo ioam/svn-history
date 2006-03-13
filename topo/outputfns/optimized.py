@@ -35,12 +35,13 @@ class DivisiveSumNormalize(OutputFunction):
         If the array's current norm_value is already equal to the required
         norm_value, the operation is skipped.
         """
-        
         # Doesn't seem any faster to do this bit in C
         if current_norm_value==self.norm_value:
             return
         elif current_norm_value==None:
             current_norm_value=sum(x.flat)
+
+        target_norm_value = self.norm_value
 
         if current_norm_value != 0:
             rows,cols=x.shape
@@ -48,13 +49,13 @@ class DivisiveSumNormalize(OutputFunction):
             div_sum_norm_code = """
             float *xi = x;
 
-            double factor = 1.0/current_norm_value;
+            double factor = target_norm_value/current_norm_value;
 
             for (int i=0; i<rows*cols; ++i) {
                 *(xi++) *= factor;
             }
             """
-            inline(div_sum_norm_code, ['x','current_norm_value','rows','cols'], local_dict=locals())
+            inline(div_sum_norm_code, ['x','current_norm_value','target_norm_value','rows','cols'], local_dict=locals())
 
 
 if not optimized:
