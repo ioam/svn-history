@@ -29,7 +29,7 @@ import testpatternpresent
 import testdistribution
 import testfeaturemap
 import testoutputfnsbasic
-
+import testoutputfnsoptimized
 
 # CEBHACKALERT: no test for patterns/image.py
 
