@@ -37,7 +37,7 @@ class DivisiveSumNormalize(OutputFunction):
         """
         # Doesn't seem any faster to do this bit in C
         if current_norm_value==self.norm_value:
-            return
+            return x
         elif current_norm_value==None:
             current_norm_value=sum(x.flat)
 
@@ -56,6 +56,8 @@ class DivisiveSumNormalize(OutputFunction):
             }
             """
             inline(div_sum_norm_code, ['x','current_norm_value','target_norm_value','rows','cols'], local_dict=locals())
+
+        return x
 
 
 if not optimized:
