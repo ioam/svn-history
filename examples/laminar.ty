@@ -56,7 +56,6 @@ CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 CFProjection.response_fn=CFDotProduct()
 CFProjection.learning_fn=Hebbian()
 CFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
-CFProjection.cache_weights_sums = True
 
 ###########################################
 # build simulation

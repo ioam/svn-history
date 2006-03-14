@@ -48,7 +48,6 @@ CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFDotProduct()
 CFProjection.learning_fn=Hebbian()
 CFProjection.weights_output_fn.single_cf_fn = DivisiveSumNormalize_opt()
-CFProjection.cache_weights_sums=True
 
 ###########################################
 # build simulation
