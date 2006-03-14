@@ -71,7 +71,7 @@ class Hebbian(CFLearningFunction):
                         }
 
                         // store the sum of the cf's weights
-                        PyObject_SetAttrString(cf,"sum",PyFloat_FromDouble(total));
+                        PyObject_SetAttrString(cf,"_sum",PyFloat_FromDouble(total));
                     }
                 }
             }
