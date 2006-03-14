@@ -35,7 +35,7 @@ class DivisiveSumNormalize(OutputFunction):
         If the array's current norm_value is already equal to the required
         norm_value, the operation is skipped.
         """
-        # Doesn't seem any faster to do this bit in C
+        # Doesn't seem like it would be much faster to do this bit in C
         if current_norm_value==self.norm_value:
             return x
         elif current_norm_value==None:
@@ -63,3 +63,90 @@ class DivisiveSumNormalize(OutputFunction):
 if not optimized:
     DivisiveSumNormalize = DivisiveSumNormalize_Py
     ParameterizedObject().message('Inline-optimized components not available; using DivisiveSumNormalize_Py instead of DivisiveSumNormalize.')
+
+
+
+## class PiecewiseLinear(OutputFunction):
+##     """ 
+##     Piecewise-linear output function with lower and upper thresholds
+##     as constructor parameters.
+##     """
+##     lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
+##     upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
+    
+##     def __init__(self,**params):
+##         super(PiecewiseLinear,self).__init__(**params)
+
+##     def __call__(self,x):
+        
+##         fact = 1.0/(self.upper_bound-self.lower_bound)        
+##         rows,cols = x.shape
+##         lower_bound = self.lower_bound
+        
+##         clip_code = """
+##         double *xi = x;
+        
+##         for (int i=0; i<rows*cols; ++i) {
+##             *xi -= lower_bound;
+##             *xi *= fact;
+        
+##             if (*xi < 0.0) {
+##                 *xi = 0.0;
+##             }
+##             else {
+##                 if (*xi > 1.0) {
+##                    *xi = 1.0;
+##                 }
+##             }
+##             xi++;
+##         }
+##         """
+##         inline(clip_code, ['x','lower_bound','fact','rows','cols'], local_dict=locals())
+
+##         return x
+
+
+
+## from topo.base.connectionfield import CFOutputFunction
+## from topo.base.projection import OutputFunctionParameter
+## class CFDivisiveSumNormalize(CFOutputFunction):
+##     """
+##     """
+##     single_cf_fn = OutputFunctionParameter(DivisiveSumNormalize(),constant=True)
+
+##     def __init__(self,**params):
+##         super(CFDivisiveSumNormalize,self).__init__(**params)
+
+##     def __call__(self, cfs, output_activity, **params):
+##         rows,cols = output_activity.shape
+
+##         code = """
+##             double *x = output_activity;
+##             for (int r=0; r<rows; ++r) {
+##                 PyObject *cfsr = PyList_GetItem(cfs,r);
+##                 for (int l=0; l<cols; ++l) {
+##                     double load = *x++;
+##                     if (load != 0) {
+
+##                         PyObject *cf = PyList_GetItem(cfsr,l);
+##                         float *wi = (float *)(((PyArrayObject*)PyObject_GetAttrString(cf,"weights"))->data);
+##                         int *slice = (int *)(((PyArrayObject*)PyObject_GetAttrString(cf,"slice_array"))->data);
+##                         int rr1 = *slice++;
+##                         int rr2 = *slice++;
+##                         int cc1 = *slice++;
+##                         int cc2 = *slice;
+
+##                         // get the sum of the cf's weights
+##                         double total = PyFloat_AsDouble(PyObject_GetAttrString(cf,"sum"));
+
+##                         // normalize the weights
+##                         total = 1.0/total;
+##                         int rc = (rr2-rr1)*(cc2-cc1);
+##                         for (int i=0; i<rc; ++i) {
+##                             *(wi++) *= total;
+##                         }
+##                     }
+##                 }
+##             }
+##         """    
+##         inline(code, ['output_activity','rows','cols','cfs'], local_dict=locals())
