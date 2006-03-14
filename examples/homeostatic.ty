@@ -18,14 +18,11 @@ from fixedpoint import FixedPoint
 import topo.patterns.basic
 import topo.patterns.random
 
-from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
-from topo.responsefns.optimized import CFDotProduct
 from topo.base.parameterclasses import DynamicNumber,Number
 from topo.base.connectionfield import CFSheet
 from topo.base.boundingregion import BoundingBox
-from topo.learningfns.optimized import DivisiveHebbian
 from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
 from topo.patterns import PatternGeneratorParameter
 from topo.base.projection import OutputFunction
@@ -49,8 +46,6 @@ input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size = 2*0.0468,aspect_ra
 RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
-CFProjection.response_fn=CFDotProduct()
-CFProjection.learning_fn=DivisiveHebbian()
 
 
 class HomeostaticPiecewiseLinear(OutputFunction):
