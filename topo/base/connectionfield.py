@@ -72,11 +72,6 @@ class ConnectionField(ParameterizedObject):
     y = Number(default=0.0,softbounds=(-1.0,1.0),
                doc='The y coordinate of the location of the center of this ConnectionField\non the input Sheet, e.g. for use when determining where the weight matrix\nlines up with the input Sheet matrix.')
 
-    cache_sum = BooleanParameter(False,
-                                 doc="""If False, when the sum of the weights\n
-                                        is requested it will be calculated;\n
-                                        otherwise, the value in _sum will be\n
-                                        returned.""")
 
     # Weights matrix; not yet initialized.
     weights = []
@@ -99,19 +94,20 @@ class ConnectionField(ParameterizedObject):
         This also allows e.g. joint normalization, because the cf's
         _sum attribute can be set to the joint sum.
         """
-        if self.cache_sum:
+        if hasattr(self,'_sum'):
             return self._sum
         else:
             return sum(self.weights.flat)
             
     def set_sum(self,new_sum):
         """
-        Only if the cf's cache_sum attribute is True does
-        setting the cf's sum have any effect. If cache_sum is not True,
-        the set command is ignored because the value
-        would not necessarily be current at a later stage.
+        Only if the cf has a _sum attribute does setting the cf's sum
+        have any effect. If the cf has no _sum then the set command is
+        ignored because the value would not necessarily be current at
+        a later stage.
         """
-        if self.cache_sum: self._sum = new_sum
+        
+        if hasattr(self,'_sum'): self._sum = new_sum
 
     # CEBHACKALERT: this slows things down.
     sum = property(get_sum,set_sum,None,doc="Please see get_sum() and set_sum().")
@@ -161,7 +157,7 @@ class ConnectionField(ParameterizedObject):
         output_fn(self.weights)
 
         # Set the initial sum
-        if self.cache_sum: self.sum = output_fn.norm_value
+        self.sum = output_fn.norm_value
 
 
         # CEBHACKALERT: incorporate such a test into testconnectionfield.
@@ -266,7 +262,7 @@ class ConnectionField(ParameterizedObject):
             # CEBHACKALERT: see __init__
             self.weights *= self.mask
             output_fn(self.weights)
-            if self.cache_sum: self.sum=output_fn.norm_value
+            self.sum=output_fn.norm_value
 
     def slice_tuple(self):
         return self.slice_array[0],self.slice_array[1],self.slice_array[2],self.slice_array[3]
@@ -496,12 +492,6 @@ class CFProjection(Projection):
     weights_output_fn = OutputFunctionParameter(default=GenericCFOF(),
                           doc='Function applied to the weights after learning.')
 
-    cache_weights_sums = BooleanParameter(default=False,
-                          doc="""Set True if e.g. learning functions\n
-                                  operating on the connection fields store the\n
-                                  sums, or if the weights will be normalized\n
-                                  jointly with those of other CFProjections.""")
-
     strength = Number(default=1.0)
 
 
@@ -547,8 +537,7 @@ class CFProjection(Projection):
                                             copy.copy(self.weights_bounds),
                                             self.weights_generator,
                                             copy.copy(self.mask_template), 
-                                            self.weights_output_fn.single_cf_fn,
-                                            cache_sum=self.cache_weights_sums))
+                                            self.weights_output_fn.single_cf_fn))
                 cflist.append(row)
 
 
