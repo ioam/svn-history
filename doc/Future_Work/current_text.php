@@ -13,12 +13,8 @@ was first added to the list, or a change was made.)
 <ul>
 
 <li>
-2006/03/07: (CB) Splitting output functions from learning functions to learn and
-apply_output_fn, to allow joint normalization across CFs.
-</li>
-
-<li>
-2006/03/07 (CB): (Windows version) association of .ty files - running topographica.bat from outside topographica directory; shortcut on desktop.
+2006/03/14: (CB) Splitting output functions from learning functions to learn and
+apply_output_fn, to allow joint normalization across CFs. [With current CVS code, SharedWeightCFProjection does something wrong to begin with.]
 </li>
 
 <li> 
