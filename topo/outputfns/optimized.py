@@ -9,12 +9,12 @@ from topo.base.parameterclasses import Number
 
 from topo.misc.inlinec import inline, optimized
 
-from basic import DivisiveSumNormalize as DivisiveSumNormalize_Py
+from basic import DivisiveSumNormalize
 
 
 # CB: will be DivisiveL1Normalize (i.e. will use the
 # absolute values - see basic.py).
-class DivisiveSumNormalize(OutputFunction):
+class DivisiveSumNormalize_opt1(OutputFunction):
     """
     OutputFunction that divides an array by its sum.
 
@@ -26,7 +26,7 @@ class DivisiveSumNormalize(OutputFunction):
     norm_value = Number(default=1.0)    
 
     def __init__(self,**params):
-        super(DivisiveSumNormalize,self).__init__(**params)
+        super(DivisiveSumNormalize_opt1,self).__init__(**params)
 
     def __call__(self, x, current_norm_value=None):
         """
@@ -61,8 +61,8 @@ class DivisiveSumNormalize(OutputFunction):
 
 
 if not optimized:
-    DivisiveSumNormalize = DivisiveSumNormalize_Py
-    ParameterizedObject().message('Inline-optimized components not available; using DivisiveSumNormalize_Py instead of DivisiveSumNormalize.')
+    DivisiveSumNormalize_opt1 = DivisiveSumNormalize
+    ParameterizedObject().message('Inline-optimized components not available; using DivisiveSumNormalize instead of DivisiveSumNormalize_opt1.')
 
 
 
