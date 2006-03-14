@@ -31,6 +31,11 @@ class OutputFunction(ParameterizedObject):
     and is not currently guaranteed to have the same value as the one
     returned by this function.
     """
+
+    # CEBHACKALERT: can we have this here - is there a more appropriate
+    # term for it, general to output functions?
+    norm_value = Parameter(default=None)
+    
     def __call__(self,x):
         raise NotImplementedError
 
