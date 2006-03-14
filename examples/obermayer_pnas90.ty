@@ -97,7 +97,7 @@ CFProjection.response_fn = CFDotProduct()
 CFProjection.learning_fn=HebbianSOMLF()
 
 # Weights should be initialized to sum to unity: (Will this work?)
-CFProjection.learning_fn.output_fn=DivisiveSumNormalize()
+CFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
 
 ###########################################
 # build simulation

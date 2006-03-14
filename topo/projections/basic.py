@@ -16,14 +16,27 @@ import Numeric
 from topo.base.projection import Projection
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Parameter,Number
+from topo.base.parameterclasses import Parameter,Number,BooleanParameter
 from topo.base.arrayutils import Mdot
-from topo.base.connectionfield import CFProjection,IdentityCFLF,ResponseFunctionParameter,OutputFunctionParameter
+from topo.base.connectionfield import CFProjection,IdentityCFLF,ResponseFunctionParameter,OutputFunctionParameter,CFOutputFunction
 from topo.base.patterngenerator import PatternGeneratorParameter
 from topo.base.connectionfield import LearningFunctionParameter
 from topo.base.sheetview import UnitView
 
 from topo.outputfns.basic import Identity
+
+
+class SharedCFOF(CFOutputFunction):
+    single_cf_fn = Parameter(default=Identity())
+    
+    def __init__(self,**params):
+        super(SharedCFOF,self).__init__(**params)
+
+    def __call__(self, cfs, output_activity, norm_values=None, **params):
+        """Apply the specified single_cf_fn to every CF."""
+        if type(self.single_cf_fn) is not Identity:
+            cf = cfs[0]
+            self.single_cf_fn(cf.weights)
 
 
 class SharedWeightCFResponseFn(ParameterizedObject):
@@ -69,6 +82,11 @@ class SharedWeightCFProjection(CFProjection):
     output_fn  = OutputFunctionParameter(default=Identity())
     strength = Number(default=1.0)
 
+    cache_weights_sums = BooleanParameter(False)
+    weights_output_fn = OutputFunctionParameter(default=SharedCFOF())
+
+
+
     def __init__(self,**params):
         """
         Initialize the Projection with a single cf_type object
@@ -112,6 +130,8 @@ class SharedWeightCFProjection(CFProjection):
                 sheet_slice = cf.slice_tuple()
                 row.append((sheet_slice,cf.bounds,weights_slice))
             self.cf_slice_and_bounds.append(row)
+
+        self.cfs = [self.sharedcf]
 
 
     def cf(self,r,c):

@@ -22,7 +22,8 @@ from topo.responsefns.optimized import CFDotProduct
 from topo.base.parameterclasses import DynamicNumber
 from topo.base.connectionfield import CFSheet
 from topo.base.boundingregion import BoundingBox
-from topo.learningfns.optimized import DivisiveHebbian
+from topo.learningfns.optimized import Hebbian
+from topo.outputfns.optimized import DivisiveSumNormalize as DivisiveSumNormalize_opt
 from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
 from topo.patterns import PatternGeneratorParameter
 
@@ -45,8 +46,9 @@ RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFDotProduct()
-CFProjection.learning_fn=DivisiveHebbian()
-
+CFProjection.learning_fn=Hebbian()
+CFProjection.weights_output_fn.single_cf_fn = DivisiveSumNormalize_opt()
+CFProjection.cache_weights_sums=True
 
 ###########################################
 # build simulation
@@ -65,7 +67,7 @@ V1.output_fn.lower_bound=0.083
 V1.output_fn.upper_bound=0.633
 
 # LGN ON channel
-SharedWeightCFProjection.learning_fn.output_fn=DivisiveSumNormalize()
+SharedWeightCFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
 
 LGNOn_center = s.connect(Retina,LGNOn,delay = FixedPoint("0.05"),
                          connection_type=SharedWeightCFProjection,strength=2.33,

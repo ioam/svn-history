@@ -24,7 +24,8 @@ from topo.projections.basic import CFProjection
 from topo.responsefns.optimized import CFDotProduct
 from topo.base.sheet import BoundingBox
 from topo.base.parameterclasses import DynamicNumber,Wrapper
-from topo.learningfns.optimized import DivisiveHebbian
+from topo.learningfns.optimized import Hebbian
+from topo.outputfns.optimized import DivisiveSumNormalize
 from topo.patterns import PatternGeneratorParameter
 
 ###########################################
@@ -53,8 +54,9 @@ LISSOM.density = 24.0
 RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 CFProjection.response_fn=CFDotProduct()
-CFProjection.learning_fn=DivisiveHebbian()
-
+CFProjection.learning_fn=Hebbian()
+CFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
+CFProjection.cache_weights_sums = True
 
 ###########################################
 # build simulation

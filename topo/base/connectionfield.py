@@ -72,6 +72,12 @@ class ConnectionField(ParameterizedObject):
     y = Number(default=0.0,softbounds=(-1.0,1.0),
                doc='The y coordinate of the location of the center of this ConnectionField\non the input Sheet, e.g. for use when determining where the weight matrix\nlines up with the input Sheet matrix.')
 
+    cache_sum = BooleanParameter(False,
+                                 doc="""If False, when the sum of the weights\n
+                                        is requested it will be calculated;\n
+                                        otherwise, the value in _sum will be\n
+                                        returned.""")
+
     # Weights matrix; not yet initialized.
     weights = []
 
@@ -80,6 +86,36 @@ class ConnectionField(ParameterizedObject):
     # array for speed of access from optimized C components; use
     # self.slice_tuple() for a nicer Python access method.
     slice_array = []
+
+    def get_sum(self):
+        """
+        As an optimization, a learning function (or other function
+        that alters the cf's weights) may compute the sum
+        of the cf's weights and store it in _sum.
+
+        If this has been done, the stored value is returned. Otherwise,
+        the value is calculated when requested.
+
+        This also allows e.g. joint normalization, because the cf's
+        _sum attribute can be set to the joint sum.
+        """
+        if self.cache_sum:
+            return self._sum
+        else:
+            return sum(self.weights.flat)
+            
+    def set_sum(self,new_sum):
+        """
+        Only if the cf's cache_sum attribute is True does
+        setting the cf's sum have any effect. If cache_sum is not True,
+        the set command is ignored because the value
+        would not necessarily be current at a later stage.
+        """
+        if self.cache_sum: self._sum = new_sum
+
+    # CEBHACKALERT: this slows things down.
+    sum = property(get_sum,set_sum,None,doc="Please see get_sum() and set_sum().")
+
 
     # CEBHACKALERT: add some default values
     def __init__(self,x,y,input_sheet,weights_bounds_template,
@@ -122,14 +158,16 @@ class ConnectionField(ParameterizedObject):
 
         # CEBHACKALERT: this works for now, while the output_fns are all multiplicative.
         self.weights *= self.mask   
-
         output_fn(self.weights)
 
-        # the initial sum of the weights
-        self.sum = sum(self.weights.flat)
-        
+        # Set the initial sum
+        if self.cache_sum: self.sum = output_fn.norm_value
+
+
         # CEBHACKALERT: incorporate such a test into testconnectionfield.
 #        assert self.weights.shape==(self.slice_array[1]-self.slice_array[0],self.slice_array[3]-self.slice_array[2]),str(self.weights.shape)+" "+str((self.slice_array[1]-self.slice_array[0],self.slice_array[3]-self.slice_array[2])) 
+
+
 
 
     ### CEBHACKALERT: there is presumably a better way than this.
@@ -228,6 +266,7 @@ class ConnectionField(ParameterizedObject):
             # CEBHACKALERT: see __init__
             self.weights *= self.mask
             output_fn(self.weights)
+            if self.cache_sum: self.sum=output_fn.norm_value
 
     def slice_tuple(self):
         return self.slice_array[0],self.slice_array[1],self.slice_array[2],self.slice_array[3]
@@ -374,7 +413,6 @@ class GenericCFLF(CFLearningFunction):
         rows,cols = output_activity.shape
 	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
         # avoid evaluating these references each time in the loop
-        output_fn = self.output_fn
         single_cf_fn = self.single_cf_fn
 	for r in xrange(rows):
             for c in xrange(cols):
@@ -383,8 +421,52 @@ class GenericCFLF(CFLearningFunction):
                              output_activity[r,c], cf.weights, single_connection_learning_rate)
                 # CEBHACKALERT: see ConnectionField.__init__()
                 cf.weights *= cf.mask
-                output_fn(cf.weights)
                 
+
+class CFOutputFunction(ParameterizedObject):
+    """Map the weight matrix of each CF into a new one of the same shape."""
+    def __call__(self, cfs, output_activity,**params):
+        raise NotImplementedError
+
+
+class GenericCFOF(CFOutputFunction):
+    """Applies the specified single_cf_fn to each CF."""
+    single_cf_fn = Parameter(default=Identity())
+    
+    def __init__(self,**params):
+        """
+        The single_cf_fn must have the Parameter 'norm_value'  
+        (the target norm of the array it's given).
+        """
+        super(GenericCFOF,self).__init__(**params)
+
+    def __call__(self, cfs, output_activity, **params):
+        """
+        Apply the single_cf_fn to each CF.
+
+        For each CF, the sum of the weights is passed
+        as the current value of the norm. Following
+        application of the output function, the cf's
+        sum is then set equal to the single_cf_fn's
+        norm_value. 
+        """
+        if type(self.single_cf_fn) is not Identity:
+            rows,cols = output_activity.shape
+            single_cf_fn = self.single_cf_fn
+            norm_value = self.single_cf_fn.norm_value                
+
+            for r in xrange(rows):
+                for c in xrange(cols):
+                    # CB: this if-test assumes the last activity
+                    # pattern is relevant, which it might not be. OK
+                    # if this is called straight after learning.  This
+                    # should probably be removed, but it significantly
+                    # increases the speed.
+                    if output_activity[r,c]!=0:
+                        cf = cfs[r][c]                    
+                        single_cf_fn(cf.weights,cf.sum) 
+                        cf.sum=norm_value
+                    
 
 class CFProjection(Projection):
     """
@@ -410,6 +492,16 @@ class CFProjection(Projection):
     learning_rate = Number(default=0.0,softbounds=(0,100))
     output_fn  = OutputFunctionParameter(default=Identity(),
                                          doc='Function applied to the Projection activity after it is computed.')
+
+    weights_output_fn = OutputFunctionParameter(default=GenericCFOF(),
+                          doc='Function applied to the weights after learning.')
+
+    cache_weights_sums = BooleanParameter(default=False,
+                          doc="""Set True if e.g. learning functions\n
+                                  operating on the connection fields store the\n
+                                  sums, or if the weights will be normalized\n
+                                  jointly with those of other CFProjections.""")
+
     strength = Number(default=1.0)
 
 
@@ -455,7 +547,8 @@ class CFProjection(Projection):
                                             copy.copy(self.weights_bounds),
                                             self.weights_generator,
                                             copy.copy(self.mask_template), 
-                                            self.learning_fn.output_fn))
+                                            self.weights_output_fn.single_cf_fn,
+                                            cache_sum=self.cache_weights_sums))
                 cflist.append(row)
 
 
@@ -560,6 +653,7 @@ class CFProjection(Projection):
         # i.e. there is an input to the Projection.
         if self.input_buffer: 
             self.learning_fn(self.cfs,self.input_buffer,self.dest.activity,self.learning_rate)
+            self.weights_output_fn(self.cfs,self.dest.activity)
       
 
     ### JABALERT: This should be changed into a special __set__ method for
@@ -587,7 +681,7 @@ class CFProjection(Projection):
         
         rows,cols = self.get_shape()
         cfs = self.cfs
-        output_fn = self.learning_fn.output_fn
+        output_fn = self.weights_output_fn.single_cf_fn
         for r in xrange(rows):
             for c in xrange(cols):
                 cfs[r][c].change_bounds(copy.copy(weights_bounds),copy.copy(mask_template),output_fn=output_fn)

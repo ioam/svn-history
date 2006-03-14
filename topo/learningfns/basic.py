@@ -116,8 +116,6 @@ class HebbianSOMLF(SOMLF):
 
                     # CEBHACKALERT: see ConnectionField.__init__()
                     cf.weights *= cf.mask
-                    if type(output_fn) is not Identity:
-                        output_fn(cf.weights)
 
 
 

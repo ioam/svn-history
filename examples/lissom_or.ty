@@ -20,7 +20,8 @@ from topo.projections.basic import CFProjection
 from topo.responsefns.optimized import CFDotProduct
 from topo.base.sheet import BoundingBox
 from topo.base.parameterclasses import DynamicNumber,RandomWrapper
-from topo.learningfns.optimized import DivisiveHebbian
+from topo.learningfns.optimized import Hebbian
+from topo.outputfns.optimized import DivisiveSumNormalize
 from topo.patterns import PatternGeneratorParameter
 
 ###########################################
@@ -51,7 +52,13 @@ RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 ##C CFProjection.weights_shape = topo.patterns.basic.Disk()
 CFProjection.response_fn=CFDotProduct()
-CFProjection.learning_fn=DivisiveHebbian()
+CFProjection.learning_fn=Hebbian()
+
+CFProjection.cache_weights_sums = True
+CFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
+#from topo.outputfns.optimized import CFDivisiveSumNormalize
+#CFProjection.weights_output_fn=CFDivisiveSumNormalize()
+
 
 
 ###########################################
@@ -121,3 +128,14 @@ s.schedule_action( 8000, set_deltabeta, 0.23, 0.85)
 s.schedule_action(20000, set_deltabeta, 0.24, 0.88)
 
 s.run(0)
+#s.run(1)
+
+## # Set up performance profiling
+## import hotshot,hotshot.stats
+## prof = hotshot.Profile("abc")
+## prof.runctx('s.run(198)',globals(),locals())
+## prof.close()
+
+## p = hotshot.stats.load("abc")
+## p.strip_dirs().sort_stats('cumulative','time').print_stats()
+
