@@ -18,7 +18,7 @@ from topo.base.connectionfield import CFLearningFunction
 from topo.base.connectionfield import IdentityCFLF,GenericCFLF
 
 
-class Hebbian(CFLearningFunction):
+class Hebbian_opt1(CFLearningFunction):
     """
     CF-aware Hebbian learning rule.
 
@@ -26,7 +26,7 @@ class Hebbian(CFLearningFunction):
     GenericCFLF(single_cf_fn=hebbian), except faster.  
     """
     def __init__(self,**params):
-        super(Hebbian,self).__init__(**params)
+        super(Hebbian_opt1,self).__init__(**params)
 
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
@@ -81,17 +81,17 @@ class Hebbian(CFLearningFunction):
     
        
 
-class Hebbian_Py(GenericCFLF):
+class Hebbian(GenericCFLF):
     """
     Wrapper written to allow transparent non-optimized fallback; 
     equivalent to GenericCFLF(single_cf_fn=topo.base.connectionfield.Hebbian())
     """
     def __init__(self,**params):
-        super(Hebbian_Py,self).__init__(single_cf_fn=topo.base.connectionfield.Hebbian(),**params)
+        super(Hebbian,self).__init__(single_cf_fn=topo.base.connectionfield.Hebbian(),**params)
 
 if not optimized:
-    Hebbian = Hebbian_Py
-    ParameterizedObject().message('Inline-optimized components not available; using Hebbian_Py instead of Hebbian.')
+    Hebbian_opt1 = Hebbian
+    ParameterizedObject().message('Inline-optimized components not available; using Hebbian instead of Hebbian_opt1.')
 
 
 
