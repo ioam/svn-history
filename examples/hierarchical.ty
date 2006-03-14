@@ -19,7 +19,7 @@ from topo.base.connectionfield import CFProjection
 from topo.base.parameterclasses import DynamicNumber, Number, Wrapper
 from topo.sheets.cfsom import CFSOM
 import topo.patterns.random
-from topo.responsefns.optimized import CFDotProduct
+from topo.responsefns.optimized import CFDotProduct_opt1
 import topo.patterns.basic
 from topo.base.simulator import Simulator
 from topo.learningfns.basic import HebbianSOMLF
@@ -72,7 +72,7 @@ CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 CFProjection.weights_bounds=BoundingBox(radius=0.1)
 # CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0)
 CFProjection.learning_fn = HebbianSOMLF()
-CFProjection.response_fn = CFDotProduct()
+CFProjection.response_fn = CFDotProduct_opt1()
 
 
 #topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.MESSAGE

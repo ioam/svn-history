@@ -20,7 +20,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.connectionfield import CFProjection
 from topo.base.parameterclasses import DynamicNumber,Wrapper
 from topo.sheets.cfsom import CFSOM
-from topo.responsefns.optimized import CFDotProduct
+from topo.responsefns.optimized import CFDotProduct_opt1
 import topo.patterns.random
 import topo.patterns.basic
 from topo.base.simulator import Simulator
@@ -59,7 +59,7 @@ CFSOM.alpha_0 = 0.5
 RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom() #basic.Disk(size=0.22,aspect_ratio=1.0,smoothing=0.0) 
 CFProjection.weights_bounds=BoundingBox(radius=0.1)
-CFProjection.response_fn = CFDotProduct()
+CFProjection.response_fn = CFDotProduct_opt1()
 CFProjection.learning_fn=HebbianSOMLF()
 ###########################################
 # build simulation

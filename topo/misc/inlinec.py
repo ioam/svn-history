@@ -30,7 +30,7 @@ from copy import copy
 
 # Attempt to import weave.  This can be forced off for special
 # circumstances, such as incomplete or broken weave installs.
-import_weave = True
+import_weave = False
 
 # In case an outside package wants to know.  Try block will turn true
 # if it happens.

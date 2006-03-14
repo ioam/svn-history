@@ -12,9 +12,9 @@ from topo.base.parameterclasses import Parameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.inlinec import inline, optimized
 
-from topo.responsefns.basic import CFDotProduct_Py, CFEuclideanDistance_Py
+from topo.responsefns.basic import CFDotProduct, CFEuclideanDistance_Py
 
-class CFDotProduct(CFResponseFunction):
+class CFDotProduct_opt1(CFResponseFunction):
     """
     Dot-product response function.
 
@@ -23,7 +23,7 @@ class CFDotProduct(CFResponseFunction):
     version in Python.
     """
     def __init__(self,**params):
-        super(CFDotProduct,self).__init__(**params)
+        super(CFDotProduct_opt1,self).__init__(**params)
 
     def __call__(self, cfs, input_activity, activity, strength, **params):
         temp_act = activity
@@ -67,8 +67,8 @@ class CFDotProduct(CFResponseFunction):
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
 if not optimized:
-    CFDotProduct = CFDotProduct_Py
-    ParameterizedObject().message('Inline-optimized components not available; using CFDotProduct_Py instead of CFDotProduct.')
+    CFDotProduct_opt1 = CFDotProduct
+    ParameterizedObject().message('Inline-optimized components not available; using CFDotProduct instead of CFDotProduct_opt1.')
 
 
 

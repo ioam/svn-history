@@ -23,8 +23,8 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.connectionfield import CFProjection
 from topo.base.parameterclasses import DynamicNumber,Number,RandomWrapper
 from topo.sheets.cfsom import CFSOM
-from topo.responsefns.optimized import CFDotProduct, CFEuclideanDistance
-from topo.responsefns.basic import CFEuclideanDistance_Py, CFDotProduct_Py
+from topo.responsefns.optimized import CFDotProduct_opt1, CFEuclideanDistance
+from topo.responsefns.basic import CFEuclideanDistance_Py, CFDotProduct_opt1_Py
 from topo.base.simulator import Simulator
 from topo.learningfns.basic import HebbianSOMLF
 from topo.outputfns.basic import DivisiveSumNormalize

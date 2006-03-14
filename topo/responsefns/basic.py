@@ -16,7 +16,7 @@ from topo.base.parameterclasses import Parameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.inlinec import inline, optimized
 
-class CFDotProduct_Py(CFResponseFunction):
+class CFDotProduct(CFResponseFunction):
     """
     Dot-product response function.
 

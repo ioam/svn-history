@@ -25,7 +25,7 @@ from math import sqrt
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.patterngenerator import BoundingBox
 from topo.base.connectionfield import CFProjection
-from topo.responsefns.optimized import CFDotProduct
+from topo.responsefns.optimized import CFDotProduct_opt1
 from topo.base.parameterclasses import Number,DynamicNumber,Wrapper
 from topo.sheets.cfsom import CFSOM
 import topo.patterns.random
@@ -93,7 +93,7 @@ ObermayerSOM.learning_length = 30000
 RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 CFProjection.weights_bounds = BoundingBox(radius=1.0)
-CFProjection.response_fn = CFDotProduct()
+CFProjection.response_fn = CFDotProduct_opt1()
 CFProjection.learning_fn=HebbianSOMLF()
 
 # Weights should be initialized to sum to unity: (Will this work?)
