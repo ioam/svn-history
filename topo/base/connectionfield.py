@@ -642,8 +642,12 @@ class CFProjection(Projection):
         # i.e. there is an input to the Projection.
         if self.input_buffer: 
             self.learning_fn(self.cfs,self.input_buffer,self.dest.activity,self.learning_rate)
-            self.weights_output_fn(self.cfs,self.dest.activity)
-      
+
+
+    def apply_output_fn(self):
+        """Apply the weights_output_fn to the weights."""
+        self.weights_output_fn(self.cfs,self.dest.activity)
+
 
     ### JABALERT: This should be changed into a special __set__ method for
     ### weights_bounds, instead of being a separate function.
@@ -713,6 +717,50 @@ class CFSheet(ProjectionSheet):
         """
         for proj in chain(*self.in_projections.values()):
             proj.learn()
+            proj.apply_output_fn()
+
+##         # parameter or whatever
+##         self.joint_n = []
+
+##         # hack to get list!
+##         prjns2 = chain(*self.in_projections.values())
+##         prjns = []
+##         for i in prjns2:
+##             prjns.append(i)
+            
+
+##         all_prjns = self.projections()
+
+
+##         # assume one set of joints for the moment,
+##         # extend to list of tuples
+##         jns = []
+##         for proj_name in self.joint_n:
+##             p = all_prjns[proj_name]
+##             jns.append(p)
+##             prjns.remove(p)
+##             p.learn()
+            
+##         # should check they all have same no of cfs
+##         if len(jns)>0:
+##             proj  = jns[0]
+##             rows,cols = len(proj.cfs),len(proj.cfs[0])
+
+##             for r in range(rows):
+##                 for c in range(cols):
+##                     js = 0
+##                     for proj in jns:
+##                         js += proj.cfs[r][c].sum
+##                     for proj in jns:
+##                         proj.cfs[r][c].sum = js
+##                         proj.apply_output_fn()
+        
+##         # remaining, ungrouped projections
+##         for proj in prjns:   
+##             proj.learn()
+##             proj.apply_output_fn()
+
+
 
                 
     def update_unit_view(self,x,y,projection_name=None):
