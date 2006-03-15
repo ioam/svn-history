@@ -70,24 +70,24 @@ V1.output_fn.upper_bound=0.633
 # LGN ON channel
 LGNOn_center = s.connect(Retina,LGNOn,delay = FixedPoint("0.05"),
                          connection_type=SharedWeightCFProjection,strength=2.33,
-                         name='OnCenter',weights_bounds=BoundingBox(radius=0.375),
+                         name='Center',weights_bounds=BoundingBox(radius=0.375),
                          weights_generator=topo.patterns.basic.Gaussian(size=0.0417,aspect_ratio=1))
 
 LGNOn_surround = s.connect(Retina,LGNOn,delay = FixedPoint("0.05"),
                            connection_type=SharedWeightCFProjection,strength=-2.33,
-                           name='OnSurround',weights_bounds=BoundingBox(radius=0.375),
+                           name='Surround',weights_bounds=BoundingBox(radius=0.375),
                            weights_generator=topo.patterns.basic.Gaussian(size=0.1667,aspect_ratio=1))
 
 
 # LGN OFF channel
 LGNOff_center = s.connect(Retina,LGNOff,delay = FixedPoint("0.05"),
                           connection_type=SharedWeightCFProjection,strength=-2.33,
-                          name='OffCenter',weights_bounds=BoundingBox(radius=0.375),
+                          name='Center',weights_bounds=BoundingBox(radius=0.375),
                           weights_generator=topo.patterns.basic.Gaussian(size=0.0417,aspect_ratio=1))
 
 LGNOff_surround = s.connect(Retina,LGNOff,delay = FixedPoint("0.05"),
                             connection_type=SharedWeightCFProjection,strength=2.33,
-                            name='OffSurround',weights_bounds=BoundingBox(radius=0.375),
+                            name='Surround',weights_bounds=BoundingBox(radius=0.375),
                             weights_generator=topo.patterns.basic.Gaussian(size=0.1667,aspect_ratio=1))
 
 
