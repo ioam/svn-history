@@ -767,7 +767,6 @@ class CFSheet(ProjectionSheet):
         ### could be deleted after re-organizing the way projections are stored
         ### in self.in_projections. I think there is no need to store a list at all.
         ### (see ProjectionSheet in projection.py)
-        from itertools import chain
         in_projections = [p for p in chain(*self.in_projections.values())]
 
         # We check that all the projections are CFProjection
