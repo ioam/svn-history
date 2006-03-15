@@ -450,15 +450,10 @@ class GenericCFOF(CFOutputFunction):
 
             for r in xrange(rows):
                 for c in xrange(cols):
-                    # CB: this if-test assumes the last activity
-                    # pattern is relevant, which it might not be. OK
-                    # if this is called straight after learning.  This
-                    # should probably be removed, but it significantly
-                    # increases the speed.
-                    if output_activity[r,c]!=0:
-                        cf = cfs[r][c]                    
-                        single_cf_fn(cf.weights,cf.sum) 
-                        cf.sum=norm_value
+                    cf = cfs[r][c]                    
+                    single_cf_fn(cf.weights,cf.sum) 
+                    cf.sum=norm_value # (unless the CFLearningFunction
+                                      # sets _sum, this is redundant).
                     
 
 class CFProjection(Projection):
