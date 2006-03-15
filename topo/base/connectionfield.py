@@ -349,10 +349,7 @@ class CFLearningFunction(ParameterizedObject):
 
     Objects in this class must support being called as a function with
     the arguments specified below.
-    """
-    output_fn = OutputFunctionParameter(default=Identity(),
-                 doc="Function applied to the weights after each learning step.")
-    
+    """    
     def constant_sum_connection_rate(self,cfs,learning_rate):
 	""" 
 	return the learning rate for a single connection according to the total learning_rate,
