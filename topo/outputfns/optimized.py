@@ -149,6 +149,10 @@ class DivisiveSumNormalizeCFOF_opt1(CFOutputFunction):
                         for (int i=0; i<rc; ++i) {
                             *(wi++) *= total;
                         }
+
+                        // store the new sum (unlikely to be accessed before
+                        // learning, but makes things consistent)
+                        PyObject_SetAttrString(cf,"_sum",PyFloat_FromDouble(1.0));
                     }
                 }
             }
