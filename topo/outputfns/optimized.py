@@ -3,9 +3,10 @@ Output functions (see basic.py) written in C to optimize performance.
 
 Requires the weave package; without it unoptimized versions are used.
 """
-from topo.base.projection import OutputFunction
+from topo.base.projection import OutputFunction, OutputFunctionParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
+from topo.base.connectionfield import CFOutputFunction,GenericCFOF
 
 from topo.misc.inlinec import inline, optimized
 
@@ -106,47 +107,60 @@ if not optimized:
 ##         return x
 
 
+class DivisiveSumNormalizeCFOF_opt1(CFOutputFunction):
+    """
+    Performs divisive normalization of the weights of all cfs.
 
-## from topo.base.connectionfield import CFOutputFunction
-## from topo.base.projection import OutputFunctionParameter
-## class CFDivisiveSumNormalize(CFOutputFunction):
-##     """
-##     """
-##     single_cf_fn = OutputFunctionParameter(DivisiveSumNormalize(),constant=True)
+    Equivalent to GenericCFOF(single_cf_fn=DivisiveSumNormalize(norm_value=1.0))
+    """
+    single_cf_fn = OutputFunctionParameter(DivisiveSumNormalize_opt1(norm_value=1.0),constant=True)
 
-##     def __init__(self,**params):
-##         super(CFDivisiveSumNormalize,self).__init__(**params)
+    def __init__(self,**params):
+        super(DivisiveSumNormalizeCFOF_opt1,self).__init__(**params)
 
-##     def __call__(self, cfs, output_activity, **params):
-##         rows,cols = output_activity.shape
+    def __call__(self, cfs, output_activity, **params):
+        rows,cols = output_activity.shape
 
-##         code = """
-##             double *x = output_activity;
-##             for (int r=0; r<rows; ++r) {
-##                 PyObject *cfsr = PyList_GetItem(cfs,r);
-##                 for (int l=0; l<cols; ++l) {
-##                     double load = *x++;
-##                     if (load != 0) {
+        code = """
+            double *x = output_activity;
+            for (int r=0; r<rows; ++r) {
+                PyObject *cfsr = PyList_GetItem(cfs,r);
+                for (int l=0; l<cols; ++l) {
+                    double load = *x++;
+                    if (load != 0) {
 
-##                         PyObject *cf = PyList_GetItem(cfsr,l);
-##                         float *wi = (float *)(((PyArrayObject*)PyObject_GetAttrString(cf,"weights"))->data);
-##                         int *slice = (int *)(((PyArrayObject*)PyObject_GetAttrString(cf,"slice_array"))->data);
-##                         int rr1 = *slice++;
-##                         int rr2 = *slice++;
-##                         int cc1 = *slice++;
-##                         int cc2 = *slice;
+                        PyObject *cf = PyList_GetItem(cfsr,l);
+                        float *wi = (float *)(((PyArrayObject*)PyObject_GetAttrString(cf,"weights"))->data);
+                        int *slice = (int *)(((PyArrayObject*)PyObject_GetAttrString(cf,"slice_array"))->data);
+                        int rr1 = *slice++;
+                        int rr2 = *slice++;
+                        int cc1 = *slice++;
+                        int cc2 = *slice;
 
-##                         // get the sum of the cf's weights
-##                         double total = PyFloat_AsDouble(PyObject_GetAttrString(cf,"sum"));
+                        // get the sum of the cf's weights
+                        double total = PyFloat_AsDouble(PyObject_GetAttrString(cf,"_sum"));
 
-##                         // normalize the weights
-##                         total = 1.0/total;
-##                         int rc = (rr2-rr1)*(cc2-cc1);
-##                         for (int i=0; i<rc; ++i) {
-##                             *(wi++) *= total;
-##                         }
-##                     }
-##                 }
-##             }
-##         """    
-##         inline(code, ['output_activity','rows','cols','cfs'], local_dict=locals())
+                        // normalize the weights
+                        total = 1.0/total;
+                        int rc = (rr2-rr1)*(cc2-cc1);
+                        for (int i=0; i<rc; ++i) {
+                            *(wi++) *= total;
+                        }
+                    }
+                }
+            }
+        """    
+        inline(code, ['output_activity','rows','cols','cfs'], local_dict=locals())
+
+
+class DivisiveSumNormalizeCFOF(GenericCFOF):
+    """
+    Wraps GenericCFOF(single_cf_fn=DivisiveSumNormalize), the non-optimized
+    equivalent of DivisiveSumNormalizeCFOF_opt1.
+    """
+    def __init__(self,**params):
+        super(DivisiveSumNormalizeCFOF,self).__init__(single_cf_fn=DivisiveSumNormlize,**params)
+
+if not optimized:
+    DivisiveSumNormalizeCFOF_opt1 = DivisiveSumNormalizeCFOF
+    ParameterizedObject().message('Inline-optimized components not available; using DivisiveSumNormalize instead of DivisiveSumNormalize_opt1.')
