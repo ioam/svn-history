@@ -111,7 +111,10 @@ class DivisiveSumNormalizeCFOF_opt1(CFOutputFunction):
     """
     Performs divisive normalization of the weights of all cfs.
 
-    Equivalent to GenericCFOF(single_cf_fn=DivisiveSumNormalize(norm_value=1.0))
+    Equivalent to
+    GenericCFOF(single_cf_fn=DivisiveSumNormalize(norm_value=1.0)),
+    except this assumes the presence of the _sum attribute on any
+    activated unit's CFs.
     """
     single_cf_fn = OutputFunctionParameter(DivisiveSumNormalize_opt1(norm_value=1.0),constant=True)
 

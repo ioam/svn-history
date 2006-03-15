@@ -24,6 +24,9 @@ class Hebbian_opt1(CFLearningFunction):
 
     Implemented in C for speed.  Should be equivalent to
     GenericCFLF(single_cf_fn=hebbian), except faster.  
+
+    Sets the _sum attribute on any cf whose weights are
+    updated during learning.
     """
     def __init__(self,**params):
         super(Hebbian_opt1,self).__init__(**params)
