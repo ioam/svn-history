@@ -100,12 +100,13 @@ class SharedWeightCFProjection(CFProjection):
         ### JABHACKALERT: cfs is a dummy, here only so that learning will
         ### run without an exception
         self.cfs = []
+
         self.sharedcf=self.cf_type(0,0,
                                    self.src,
                                    self.weights_bounds,
                                    self.weights_generator,
                                    self.mask_template,
-                                   self.learning_fn.output_fn)
+                                   self.weights_output_fn.single_cf_fn)
 
         # CEBHACKALERT: Calculate and store the the slice of the
         # sheet, the bounds, and the slice of the weights matrix for
