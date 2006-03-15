@@ -438,6 +438,7 @@ class TopoConsole(Frame):
             try:
                 webbrowser.open(location,new=True,autoraise=True)
                 self.messageBar.message('state', 'Opened '+location+' in browser.')
+                return
             # Since one of the possible exception appears to be a 'WindowsError' (at least
             # on the Windows platform), just catch all exceptions.
             except Exception:
