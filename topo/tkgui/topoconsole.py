@@ -9,6 +9,7 @@ from math import fmod,floor
 from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, \
      LEFT, RIGHT, YES, BOTH, Label
 import Pmw, re, os, sys, code, traceback, __main__
+
 import tkFileDialog
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from connectionfieldspanel import ConnectionFieldsPanel
@@ -29,16 +30,15 @@ SCRIPT_FILETYPES = [('Topographica scripts','*.ty'),('Python scripts','*.py'),('
 SAVED_FILE_EXTENSION = '.typ'
 SAVED_FILETYPES = [('Topographica saved networks','*'+SAVED_FILE_EXTENSION),('All files','*')]
 
-# CEBHACKALERT: will there be "not found" errors if they
-# didn't build doc/ (for which they need php...)?
-user_manual_url      = 'doc/User_Manual/index.html'
-tutorials_url         = 'doc/Tutorials/index.html'
-reference_manual_url = 'doc/Reference_Manual/index.html'
 
-
-python_doc_url       = 'http://www.python.org/doc/'
-topo_www_url         = 'http://www.topographica.org/'
-
+# Documentation locations: locally built and web urls.
+# CEBHACKALERT: is it appropriate to use Filename parameter here in some way?
+topo_dir = os.path.split(os.path.split(sys.executable)[0])[0]
+user_manual_locations      = (os.path.join(topo_dir,'doc/User_Manual/index.html'),'http://topographica.org/User_Manual/')
+tutorials_locations        = (os.path.join(topo_dir,'doc/Tutorials/index.html'),'http://topographica.org/Tutorials/')
+reference_manual_locations = (os.path.join(topo_dir,'doc/Reference_Manual/index.html'),'http://topographica.org/Reference_Manual/')
+python_doc_locations = ('http://www.python.org/doc/')
+topo_www_locations = ('http://www.topographica.org/')
 
 
 # CEBHACKALERT: lose this and get TopoConsole.simulator instead
@@ -227,25 +227,27 @@ class TopoConsole(Frame):
         self.menubar.addmenuitem('Help', 'command',
                                  'How to use Topographica',
                                  label="User Manual",
-                                 command=(lambda url=user_manual_url: self.open_url(url,relative=True)))
+                                 command=(lambda x=user_manual_locations: self.open_location(x)))
 
         self.menubar.addmenuitem('Help', 'command',
                                  'Walk-through examples',
                                  label="Tutorials",
-                                 command=(lambda url=tutorials_url: self.open_url(url,relative=True)))
+                                 command=(lambda x=tutorials_locations: self.open_location(x)))
+        
         self.menubar.addmenuitem('Help', 'command',
                                  'Detailed code documentation',
                                  label="Reference Manual",
-                                 command=(lambda url=reference_manual_url: self.open_url(url,relative=True)))
+                                 command=(lambda x=reference_manual_locations: self.open_location(x)))
+        
         self.menubar.addmenuitem('Help', 'command',
                                  'Topographica on the web',
                                  label="Topographica.org",
-                                 command=(lambda url=topo_www_url: self.open_url(url)))
+                                 command=(lambda x=topo_www_locations: self.open_location(x)))
 
         self.menubar.addmenuitem('Help', 'command',
                                  'Python reference',
                                  label="Python documentation",
-                                 command=(lambda url=python_doc_url: self.open_url(url)))
+                                 command=(lambda x=python_doc_locations: self.open_location(x)))
 
         
         #
@@ -416,27 +418,32 @@ class TopoConsole(Frame):
         win = GUIToplevel(self)
         win.withdraw()
         win.title("About Topographica")
-        text = Label(win,text=topo.ABOUT_TEXT,justify=LEFT)
+        text = Label(win,text=topo.about(display=False),justify=LEFT)
         text.pack(side=LEFT)
         win.deiconify()
         self.messageBar.message('state', 'OK')
             
-    def open_url(self, location, relative=False):
+    def open_location(self, locations):
         """
-        Try to open the specified location in a new window of the default
+        Try to open one of the specified locations in a new window of the default
         browser. See webbrowser module for more information.
+
+        locations should be a tuple.
         """
-        #CEBHACKALERT: change like Filename
-        if relative:
-            location = os.path.join(os.getcwd(),location)
-            
-        try:
-            webbrowser.open(location,new=True,autoraise=True)
-            self.messageBar.message('state', 'Opened '+location+' in browser.')
-        except Error:
-            self.messageBar.message('state', 'Unable to control any browser.')
+        # CB: could have been a list. This is only here because if locations is set
+        # to a string, it will loop over the characters of the string.
+        assert isinstance(locations,tuple),"locations must be a tuple."
+        
+        for location in locations:
+            try:
+                webbrowser.open(location,new=True,autoraise=True)
+                self.messageBar.message('state', 'Opened '+location+' in browser.')
+            # Since one of the possible exception appears to be a 'WindowsError' (at least
+            # on the Windows platform), just catch all exceptions.
+            except Exception:
+                self.messageBar.message('state', "Couldn't open "+location+" in browser.")
 
-
+                
     #
     # Command buttons.
     #
