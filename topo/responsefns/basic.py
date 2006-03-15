@@ -24,7 +24,7 @@ class CFDotProduct(CFResponseFunction):
     (but otherwise equivalent) version.
     """
     def __init__(self,**params):
-        super(CFDotProduct_Py,self).__init__(**params)
+        super(CFDotProduct,self).__init__(**params)
 
     def __call__(self, cfs, input_activity, activity, strength, **params):
         rows,cols = activity.shape
