@@ -159,7 +159,7 @@ class DivisiveSumNormalizeCFOF(GenericCFOF):
     equivalent of DivisiveSumNormalizeCFOF_opt1.
     """
     def __init__(self,**params):
-        super(DivisiveSumNormalizeCFOF,self).__init__(single_cf_fn=DivisiveSumNormlize,**params)
+        super(DivisiveSumNormalizeCFOF,self).__init__(single_cf_fn=DivisiveSumNormalize,**params)
 
 if not optimized:
     DivisiveSumNormalizeCFOF_opt1 = DivisiveSumNormalizeCFOF
