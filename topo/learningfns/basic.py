@@ -65,7 +65,6 @@ class HebbianSOMLF(SOMLF):
 	single_connection_learning_rate = learning_rate
         radius = self.learning_radius
         crop_radius = max(1.25,radius*self.crop_radius_multiplier)
-        output_fn = self.output_fn
 
         # find out the matrix coordinates of the winner
         #
@@ -97,7 +96,6 @@ class HebbianSOMLF(SOMLF):
         #print "%d rad= %d std= %f alpha= %f" % (topo.sim._time, radius_int, radius, single_connection_learning_rate)
 
         neighborhood_matrix = nk_generator(bounds=bb,density=1,size=2*radius)
-        output_fn = self.output_fn
         for r in range(rmin,rmax):
             for c in range(cmin,cmax):
                 cwc = c - wc 
