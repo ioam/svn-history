@@ -58,7 +58,7 @@ from topo.base.simulator import SimSingleton
 sim = SimSingleton()
 
 
-def about():
+def about(display=True):
     """Print release and licensing information."""
 
     ABOUT_TEXT = """
@@ -77,8 +77,10 @@ in the hope that it will be useful, but without any warranty; without
 even the implied warranty of merchantability or fitness for a
 particular purpose.  See the GNU General Public License for more
 details.
-"""    
-    print ABOUT_TEXT
-
+"""
+    if display:
+        print ABOUT_TEXT
+    else:        
+        return ABOUT_TEXT
 
 
