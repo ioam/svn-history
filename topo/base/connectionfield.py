@@ -702,12 +702,11 @@ class CFSheet(ProjectionSheet):
     measure_maps = BooleanParameter(True)
     precedence = Number(0.5)
 
-
     ## make a joint_normalize method, which when called sets this
     ## parameter but also does a normalization there and then
     ## (for initialization)
     ## joint_normalize = Parameter(default=[])
-        
+                
     def learn(self):
         """
         Call the learn() method on every CFProjection to the Sheet.
@@ -716,45 +715,38 @@ class CFSheet(ProjectionSheet):
             proj.learn()
             proj.apply_output_fn()
 
-            
-##         # hack
-##         # (to get list)
-##         prjns2 = chain(*self.in_projections.values())
-##         prjns = []
-##         for i in prjns2:
-##             prjns.append(i)
-            
-##         all_prjns = self.projections()
-        
+##         in_proj = {}
+##         for proj in self.in_connections:
+##             in_proj[proj.name] = proj
+
 ##         # assume one set of joints for the moment,
-##         # extend to list of tuples (why there are 2 lists)
-##         jns = []
+##         # extend to list of tuples
+##         joints = []        
 ##         for proj_name in self.joint_normalize:
-##             p = all_prjns[proj_name]
-##             jns.append(p)
-##             prjns.remove(p)
-##             p.learn()
+##             proj = in_proj.pop(proj_name)
+##             proj.learn()
+##             joints.append(proj)
             
-##         # should check they all have same no of cfs
-##         if len(jns)>0:
-##             proj  = jns[0]
+##         # should check they all have same no of cfs, etc
+##         if len(joints)>0:
+##             proj  = joints[0]
 ##             rows,cols = len(proj.cfs),len(proj.cfs[0])
 
 ##             for r in range(rows):
 ##                 for c in range(cols):
 ##                     js = 0
-##                     for proj in jns:
+##                     for proj in joints:
 ##                         js += proj.cfs[r][c].sum
                         
-##                     for proj in jns:
+##                     for proj in joints:
 ##                         # set _sum so it knows not to re-calc
 ##                         proj.cfs[r][c]._sum = js
 
-##             for proj in jns:
+##             for proj in joints:
 ##                 proj.apply_output_fn()
-        
+
 ##         # remaining, ungrouped projections
-##         for proj in prjns:
+##         for proj in in_proj.values():
 ##             proj.learn()
 ##             proj.apply_output_fn()
 
