@@ -105,12 +105,12 @@ class ConnectionField(ParameterizedObject):
         have any effect. If the cf has no _sum then the set command is
         ignored because the value would not necessarily be current at
         a later stage.
-        """
-        
+        """        
         if hasattr(self,'_sum'): self._sum = new_sum
 
+
     # CEBHACKALERT: this slows things down.
-    sum = property(get_sum,set_sum,None,doc="Please see get_sum() and set_sum().")
+    sum = property(get_sum,set_sum,None,"Please see get_sum() and set_sum().")
 
 
     # CEBHACKALERT: add some default values
@@ -333,8 +333,8 @@ class ResponseFunctionParameter(ClassSelectorParameter):
     packages = []
 
     def __init__(self,default=GenericCFResponseFn(),**params):
-        """
-        """
+        """ 
+       """
         super(ResponseFunctionParameter,self).__init__(CFResponseFunction,default=default,**params)        
 
 
@@ -632,7 +632,7 @@ class CFProjection(Projection):
         """
         # Learning is performed if the input_buffer has already been set,
         # i.e. there is an input to the Projection.
-        if self.input_buffer: 
+        if self.input_buffer:
             self.learning_fn(self.cfs,self.input_buffer,self.dest.activity,self.learning_rate)
 
 
@@ -702,6 +702,11 @@ class CFSheet(ProjectionSheet):
     measure_maps = BooleanParameter(True)
     precedence = Number(0.5)
 
+
+    ## make a joint_normalize method, which when called sets this
+    ## parameter but also does a normalization there and then
+    ## (for initialization)
+    ## joint_normalize = Parameter(default=[])
         
     def learn(self):
         """
@@ -711,23 +716,20 @@ class CFSheet(ProjectionSheet):
             proj.learn()
             proj.apply_output_fn()
 
-##         # parameter or whatever
-##         self.joint_n = []
-
-##         # hack to get list!
+            
+##         # hack
+##         # (to get list)
 ##         prjns2 = chain(*self.in_projections.values())
 ##         prjns = []
 ##         for i in prjns2:
 ##             prjns.append(i)
             
-
 ##         all_prjns = self.projections()
-
-
+        
 ##         # assume one set of joints for the moment,
-##         # extend to list of tuples
+##         # extend to list of tuples (why there are 2 lists)
 ##         jns = []
-##         for proj_name in self.joint_n:
+##         for proj_name in self.joint_normalize:
 ##             p = all_prjns[proj_name]
 ##             jns.append(p)
 ##             prjns.remove(p)
@@ -743,16 +745,18 @@ class CFSheet(ProjectionSheet):
 ##                     js = 0
 ##                     for proj in jns:
 ##                         js += proj.cfs[r][c].sum
+                        
 ##                     for proj in jns:
-##                         proj.cfs[r][c].sum = js
-##                         proj.apply_output_fn()
+##                         # set _sum so it knows not to re-calc
+##                         proj.cfs[r][c]._sum = js
+
+##             for proj in jns:
+##                 proj.apply_output_fn()
         
 ##         # remaining, ungrouped projections
-##         for proj in prjns:   
+##         for proj in prjns:
 ##             proj.learn()
 ##             proj.apply_output_fn()
-
-
 
                 
     def update_unit_view(self,x,y,projection_name=None):
