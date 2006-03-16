@@ -39,12 +39,12 @@ class CFDotProduct(CFResponseFunction):
         activity *= strength
 
 
-class CFEuclideanDistance_Py(CFResponseFunction):
+class CFEuclideanDistance(CFResponseFunction):
     """
     Euclidean-distance--based response function.
     """
     def __init__(self,**params):
-        super(CFEuclideanDistance_Py,self).__init__(**params)
+        super(CFEuclideanDistance,self).__init__(**params)
 
     def __call__(self, cfs, input_activity, activity, strength, **params):
         rows,cols = activity.shape

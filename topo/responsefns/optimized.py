@@ -12,7 +12,7 @@ from topo.base.parameterclasses import Parameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.inlinec import inline, optimized
 
-from topo.responsefns.basic import CFDotProduct, CFEuclideanDistance_Py
+from topo.responsefns.basic import CFDotProduct, CFEuclideanDistance
 
 class CFDotProduct_opt1(CFResponseFunction):
     """
@@ -236,7 +236,7 @@ if not optimized:
  
 
     
-class CFEuclideanDistance(CFResponseFunction):
+class CFEuclideanDistance_opt1(CFResponseFunction):
     """
     Euclidean-distance response function.
 
@@ -245,7 +245,7 @@ class CFEuclideanDistance(CFResponseFunction):
     version in Python.
     """
     def __init__(self,**params):
-        super(CFEuclideanDistance,self).__init__(**params)
+        super(CFEuclideanDistance_opt1,self).__init__(**params)
 
     def __call__(self, cfs, input_activity, activity, strength, **params):
         temp_act = activity
@@ -315,7 +315,7 @@ class CFEuclideanDistance(CFResponseFunction):
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
 if not optimized:
-    CFEuclideanDistance = CFEuclideanDistance_Py
-    ParameterizedObject().message('Inline-optimized components not available; using CFEuclideanDistance_Py instead of CFEuclideanDistance.')
+    CFEuclideanDistance_opt1 = CFEuclideanDistance
+    ParameterizedObject().message('Inline-optimized components not available; using CFEuclideanDistance instead of CFEuclideanDistance_opt1.')
 
 

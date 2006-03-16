@@ -23,7 +23,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.connectionfield import CFProjection
 from topo.base.parameterclasses import DynamicNumber,Number,RandomWrapper
 from topo.sheets.cfsom import CFSOM
-from topo.responsefns.optimized import CFDotProduct_opt1, CFEuclideanDistance
+from topo.responsefns.optimized import CFDotProduct_opt1, CFEuclideanDistance_opt1
 from topo.base.simulator import Simulator
 from topo.learningfns.basic import HebbianSOMLF
 from topo.outputfns.basic import DivisiveSumNormalize
@@ -76,7 +76,7 @@ RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom() 
 
 CFProjection.weights_bounds=BoundingBox(radius=1.0) # fully connected network.
-CFProjection.response_fn = CFEuclideanDistance()
+CFProjection.response_fn = CFEuclideanDistance_opt1()
 CFProjection.learning_fn = HebbianSOMLF()
 
 
