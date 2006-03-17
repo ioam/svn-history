@@ -61,15 +61,16 @@ GeneratorSheet.density = 24
 input_pattern = topo.patterns.basic.Gaussian(scale=1.0,
                                              size=2*sqrt(2.0*0.1*24.0)/24.0,
                                              aspect_ratio=1.0,
-                         x=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=7)),
-                         y=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=8)),
-               orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=9)))
+                         x=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=9999)),
+                         y=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=2)),
+               orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=10)))
 
 # cortical sheet
 RetinotopicSOM.density = 40
 RetinotopicSOM.learning_length = 40000
 
-RetinotopicSOM.radius_0 = 13.3/40
+# CEBHACKALERT: should be 13.3? See doc/Future_Work/current.html.
+RetinotopicSOM.radius_0 = 13.2/40
 RetinotopicSOM.alpha_0  = 0.42
 
 RandomArray.seed(500,500)
