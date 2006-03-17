@@ -144,7 +144,8 @@ class SimSingleton(Singleton):
         """
         Create a new simulator.
         """
-        self.change_sim(Simulator())
+        # Simulator will call this object's change_sim()
+        Simulator()
 
     def __getattribute__(self,attribute):
         """
