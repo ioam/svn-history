@@ -173,7 +173,6 @@ class SimSingleton(Singleton):
         else:
             object.__setattr__(self.actual_sim, name, value)
 
-    # CEBHACKALERT: no longer need a method
     def change_sim(self,new_sim):
         """
         Set actual_sim to be new_sim.
