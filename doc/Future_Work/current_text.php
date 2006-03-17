@@ -36,7 +36,6 @@ was first added to the list, or a change was made.)
 2006/02/21 (JC): Cleaning up ports.
 </li>
 
-
 <li>
 2006/03/07: (CB) Implement scheduled actions as strings exec'd in main [not committed, but working - just needs cleaning]
 </li>
@@ -46,7 +45,9 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/03/07 (CB): Change current code over to use topo.sim['V1']-type access to simulator, and finalize connect2 etc; then remove old code.
+2006/03/17 (CB): Change current code over to use topo.sim['V1']-type
+access to simulator, and finalize connect2 etc; then remove old
+code. [hierarchical.ty example shows how the new way works.]
 </li>
 
 <li> 
@@ -89,16 +90,6 @@ become a method of ClassSelectorParameter. Then module as well as package list
 for ClassSelectorParameter. E.g. Want BoundingBoxParameter to be a 
 ClassSelectorParameter, but don't want to add all of topo.base, just 
 topo.base.boundingregion.
-</li>
-
-<li>
-2006/02/21: Renaming of *_py classes so that *_py ones have the original name
-(they are the reference versions), and c (or otherwise optimized
-versions) are suffixed _opt1, _opt2, etc., rather than with nothing or
-_cpointer.
-<br />
-e.g. CFDotProduct_Py goes to CFDotProduct, CFDotProduct goes to 
-CFDotProduct_opt1, CFDotProduct_cpointer goes to CFDotProduct_opt2
 </li>
 
 <li>
