@@ -13,12 +13,23 @@ was first added to the list, or a change was made.)
 <ul>
 
 <li>
-2006/03/14: (CB) Splitting output functions from learning functions to learn and
-apply_output_fn, to allow joint normalization across CFs. [With current CVS code, SharedWeightCFProjection does something wrong to begin with.]
+2006/03/17: (CB) Allowing joint normalization of projections for a CFSheet
 </li>
 
 <li> 
-2006/02/28 (CB): Fix problem (matching previous work) with som_retinotopy.
+2006/03/17 (CB): Fix problem (matching previous work) with som_retinotopy.
+</li>
+
+<li> 
+2006/03/17 (CB): Slice class; HACKALERTs relating to Sheet, xdensity, ydensity (etc).
+</li>
+
+<li>
+2006/03/17 (CB): HACKALERTs relating to connection fields; matching with C++ LISSOM when there are circular connection fields
+</li>
+
+<li>
+2006/03/17 (CB): Cleaning Composite and Image pattern generators.
 </li>
 
 <li> 
@@ -80,14 +91,6 @@ ClassSelectorParameter, but don't want to add all of topo.base, just
 topo.base.boundingregion.
 </li>
 
-<li> 
-2006/02/24 (CB): Slice class; HACKALERTs relating to Sheet, xdensity, ydensity (etc).
-</li>
-
-<li>
-2006/02/23 (CB): Cleaning Composite and Image pattern generators.
-</li>
-
 <li>
 2006/02/21: Renaming of *_py classes so that *_py ones have the original name
 (they are the reference versions), and c (or otherwise optimized
@@ -101,10 +104,6 @@ CFDotProduct_opt1, CFDotProduct_cpointer goes to CFDotProduct_opt2
 <li>
 2006/02/21: ReadOnlyParameter to allow declaration of something but not let it
 be set anywhere else, even in a ParameterizedObject constructor.
-</li>
-
-<li>
-2006/03/07 (CB): HACKALERTs relating to connection fields; matching with C++ LISSOM when there are circular connection fields; implement change_bounds properly [made a first draft, JL is working with it]
 </li>
 
 <li>
@@ -126,8 +125,12 @@ use them.
 2006/03/07 (CB): (Windows) Script to generate the python_topo directory.
 </li>
 
+<li>
+2006/03/07: make change_bounds() able to enlarge as well as shrink [made a first draft, JL is working with it]
+</li>
 
 </ul>
+
 
 <h3>Other work</h3>
 
