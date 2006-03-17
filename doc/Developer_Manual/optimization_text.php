@@ -34,3 +34,39 @@ if it will have any effect, but don't check it in to CVS.  If it looks
 like the optimization is worthwhile, brainstorm with other team
 members to figure out a way to do it cleanly and check in the clean
 version instead.
+
+
+<!--
+<H2>Providing optimized versions of objects</H2>
+<P>Numeric calculations are generally fast enough when using the 
+Numeric module. However, there are certain cases where this is not
+true, or where Numeric is unsuitable (for example, many Numeric
+operations do not act in-place on arrays). In addition to such Numeric
+cases, some routines might be optimizable by making particular 
+assumptions...
+
+<P>In the cases mentioned above, it is worthwhile to have a reference
+version of the object that is simple to understand and does not make
+any special assumptions. Then, an optimized version can be offered as
+an alternative. The convention we use is to add the suffix
+<code>_optN</code> to the optimized version, where <code>N</code> is a
+number that allows to distinguish between differently optimized
+versions. This is helpful both for understanding and for ensuring
+correctness.
+
+<P>For example, consider <code>CFDotProduct</code>, from 
+<code>topo.responsefns.basic</code>. If users wish to use
+a version optimized by having been written in C, they can
+instead import <code>CFDotProduct_opt1</code> from 
+<code>topo.responsefns.optimized</code>. We use
+<code>CFDotProduct_opt1</code> as standard in our code
+because it's much faster than - but otherwise identical to -
+the unoptimized version. However, because it relies on a
+more complex setup (having the weave module 
+installed, as well as a correctly configured C++ compiler),
+we cannot assume all users will have access to it. Therefore,
+we provide an automatic fall-back to the unoptimized version
+(see <code>topo/responsefns/optimized.py</code> for an example
+of how to do this). 
+-->
+

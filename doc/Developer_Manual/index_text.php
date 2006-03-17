@@ -27,7 +27,7 @@ parameters, units, and external imports.
 <DD>How to add functionality to the GUI</DD>
 
 <P><DT><A href="optimization.html"><strong>Optimization</strong></A></DT>
-<DD>When (and when not!) to optimize for performance</DD>
+<DD>When (and when not!) to optimize for performance<!--,and how to do it--></DD>
 
 <P><DT><A href="revisioncontrol.html"><strong>Revision control</strong></A></DT>
 <DD>How we keep track of changes to the code and other files</DD>
