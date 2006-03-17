@@ -36,14 +36,21 @@ members to figure out a way to do it cleanly and check in the clean
 version instead.
 
 
-<!--
-<H2>Providing optimized versions of objects</H2>
-<P>Numeric calculations are generally fast enough when using the 
-Numeric module. However, there are certain cases where this is not
-true, or where Numeric is unsuitable (for example, many Numeric
-operations do not act in-place on arrays). In addition to such Numeric
-cases, some routines might be optimizable by making particular 
-assumptions...
+<H2>Providing optimized versions of Topographica objects</H2>
+
+<P>Where possible, Python components can be implemented with high
+performance using
+<A href="http://numeric.scipy.org/numpydoc/numdoc.htm">Numeric</A>
+matrix operations.  This should be the first approach when optimizing
+any component, and indeed when writing the component for the first
+time (because the Numeric primitives are much easier to use and
+maintain than e.g. explicitly writing <code>for</code> loops.
+However, there are certain cases where the performance of Numeric is
+not sufficient, or where Numeric is unsuitable (for example, many
+Numeric operations do not act in-place on arrays).  Other components
+may be able to be implemented much more quickly if certain assumptions
+are made about the nature of their arguments, or the types of
+computations that can be performed.
 
 <P>In the cases mentioned above, it is worthwhile to have a reference
 version of the object that is simple to understand and does not make
@@ -54,19 +61,25 @@ number that allows to distinguish between differently optimized
 versions. This is helpful both for understanding and for ensuring
 correctness.
 
-<P>For example, consider <code>CFDotProduct</code>, from 
-<code>topo.responsefns.basic</code>. If users wish to use
-a version optimized by having been written in C, they can
-instead import <code>CFDotProduct_opt1</code> from 
+<P>For example, consider <code>CFDotProduct</code>, from
+<code>topo.responsefns.basic</code>. If users wish to use a version
+optimized by having been written in C, they can instead import
+<code>CFDotProduct_opt1</code> from
 <code>topo.responsefns.optimized</code>. We use
-<code>CFDotProduct_opt1</code> as standard in our code
-because it's much faster than - but otherwise identical to -
-the unoptimized version. However, because it relies on a
-more complex setup (having the weave module 
-installed, as well as a correctly configured C++ compiler),
-we cannot assume all users will have access to it. Therefore,
-we provide an automatic fall-back to the unoptimized version
-(see <code>topo/responsefns/optimized.py</code> for an example
-of how to do this). 
--->
+<code>CFDotProduct_opt1</code> as standard in our code because it's
+much faster than --- but otherwise identical to --- the unoptimized
+version. However, because <code>CFDotProduct_opt1</code> relies on a
+more complex setup (having the weave module installed, as well as a
+correctly configured C++ compiler), we cannot assume all users will
+have access to it. It is also extremely difficult to read and
+understand. Therefore, we provide an automatic fall-back to the
+unoptimized version (see <code>topo/responsefns/optimized.py</code>
+for an example of how to do this).
 
+<P>The non-optimized version also acts as a simple specification of
+exactly what the optimized version is supposed to do, apart from any
+optimizations.  The optimized versions are often nearly unreadable, so
+having the simple version available is very helpful for understanding
+and debugging.  The expectation is that the simple (slow) versions
+will rarely change, but the optimized ones will get faster and faster
+over time, while preserving the same user-visible behavior.
