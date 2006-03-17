@@ -168,9 +168,15 @@ class SimSingleton(Singleton):
         the only one it is are 'actual_sim'.
         So, this method really sets attributes on the actual_sim.
         """
-        if hasattr(self,name):
+        # read like:
+        #  if hasattr(self,name):
+        #      setattr(self,name,value)
+        #  else:
+        #      setattr(self.actual_sim,name,value)
+        try:
+            object.__getattribute__(self, name) 
             object.__setattr__(self, name, value)
-        else:
+        except AttributeError:
             object.__setattr__(self.actual_sim, name, value)
 
     def change_sim(self,new_sim):
