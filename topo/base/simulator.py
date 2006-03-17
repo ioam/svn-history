@@ -362,7 +362,7 @@ class Simulator(ParameterizedObject):
         # JABHACKALERT! Shouldn't this be at least 4 decimal places by default?
         # (Either using ,4 or setting the FixedPoint default precision to 4?)
         self._time = FixedPoint("0.0")
-        self._event_processors = []
+        self._event_processors = {}
         self._sleep_window = 0.0
         self._sleep_window_violation = False
 
@@ -384,20 +384,41 @@ class Simulator(ParameterizedObject):
         except KeyError:
             raise AttributeError("Simulator doesn't contain '"+item_name+"'.")
 
-    # CB: for demonstration
-    def __setitem__(self,item_name,item_value):
-        """
-        Add item_value to the simulator, setting its name to item_name.
-        item_value must be an EP.
-        """
-        if not isinstance(item_name,str):
-           raise TypeError("Expected string for item name (objects in the Simulator are indexed by name).")
 
-        if not isinstance(item_value,EventProcessor):
-           raise TypeError("Expected EventProcessor: objects in the Simulator must be eps.")
+    def __setitem__(self,ep_name,ep):
+        """
+        Add ep to the simulator, setting its name to ep_name.
+        ep must be an EventProcessor.
 
-        item_value.name=item_name
-        self.add(item_value)
+        If ep_name already exists in the simulator, ep overwrites
+        the original object (as for a dictionary).
+
+        If the ep itself already exists in the simulator, a
+        warning is printed and the ep is not added.
+
+        Note, EventProcessors do not necessarily have to be added to
+        the simulator to be used in a simulation, but they will not
+        receive the start() message.  Adding a node to the simulator
+        also sets the backlink node.simulator, so that the node can
+        enqueue events and read the simulator clock.
+        """
+        if not isinstance(ep_name,str):
+           raise TypeError("Expected string for item name (EPs in the Simulator are indexed by name).")
+
+        if not isinstance(ep,EventProcessor):
+           raise TypeError("Expected EventProcessor: objects in the Simulator must be EPs.")
+
+        if ep in self._event_processors.values():
+            self.warning("EventProcessor "+str(ep)+" () already exists in the simulator and will not be added.")
+        else:
+            ep.name=ep_name
+            # CEBHACKALERT: if this is overwriting an existing EP,
+            # it ought to delete it properly (i.e. remove connections
+            # etc). We need a delete() method already anyway.
+            self._event_processors[ep_name] = ep
+            ep.simulator = self
+            ep.start()
+
 
     def time(self):
         """
@@ -452,7 +473,7 @@ class Simulator(ParameterizedObject):
                     did_event = False
                     self.debug("Time to sleep. Current time =",self._time,
                                ".  Next event time =",self.events[0].time)
-                    for ep in self._event_processors:
+                    for ep in self._event_processors.values():
     #                    self.debug("Doing pre_sleep for",e)
                         ep.pre_sleep()
                     
@@ -552,6 +573,8 @@ class Simulator(ParameterizedObject):
         return len(self._events_stack)
 
 
+    # CEBHACKALERT: This method can be deleted when the
+    # connect() method is removed and replaced by connect2().
     def add(self,*EPs):
         """
         Add one or more EventProcessors to the simulator.
@@ -562,13 +585,11 @@ class Simulator(ParameterizedObject):
         that the node can enqueue events and read the simulator clock.
         """
         for ep in EPs:
-            if not ep in self._event_processors:
-                self._event_processors.append(ep)
+            if not ep in self._event_processors.values():
+                self._event_processors[ep.name] = ep
                 ep.simulator = self
                 ep.start()
 
-
-    # CB: for demonstration only
     def connect2(self,
                 src,
                 dest,
@@ -577,16 +598,16 @@ class Simulator(ParameterizedObject):
                 delay=0,connection_type=EPConnection,**connection_params):
         """
         Connect the source to the destination, at the appropriate ports,
-        if any are given.  Returns the connection that
-        was created.
+        if any are given.
+
+        src and dest should already be part of the simulator.
+
+        Returns the connection that was created.
         """
-        #self.add(src,dest)
         conn = connection_type(src=self[src],dest=self[dest],src_port=src_port,dest_port=dest_port,delay=delay,**connection_params)
         self[src]._connect_to(conn)
         self[dest]._connect_from(conn)
         return conn
-
-
 
     def connect(self,
                 src=None,
@@ -607,6 +628,7 @@ class Simulator(ParameterizedObject):
         return conn
     
 
+    # CEBHACKALERT: why not just event_processors()?
     ### It might be possible to come up with a more expressive name
     ### for this function.  It should mean 'anything that exists in
     ### the simulator universe, i.e. all EventProcessors'.
@@ -618,6 +640,7 @@ class Simulator(ParameterizedObject):
         EventProcessor, and so the baseclass must be either
         EventProcessor or one of its subclasses.
         """
-        return dict([(i.name,i) for i in self._event_processors \
-                     if isinstance(i,baseclass)])
-
+        return dict([(ep_name,ep)
+                     for (ep_name,ep) in self._event_processors.items()
+                     if isinstance(ep,baseclass)])
+        
