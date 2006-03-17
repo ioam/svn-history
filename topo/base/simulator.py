@@ -125,7 +125,21 @@ class SimSingleton(Singleton):
     the current simulator.
     """
     actual_sim = None
-        
+
+    # CEBHACKALERT: should both these completely hide that this is
+    # SimSingleton, as they do at the moment?
+    def __repr__(self):
+        """
+        Return the simulator's __repr__().
+        """
+        return self.actual_sim.__repr__()
+
+    def __str__(self):
+        """
+        Return the simulator's __str__().
+        """
+        return self.actual_sum.__str__()
+    
     def init(self):
         """
         Create a new simulator.
