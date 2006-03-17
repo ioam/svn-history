@@ -81,43 +81,39 @@ CFProjection.response_fn = CFDotProduct_opt1()
 ###########################################
 # build simulation
 
-# CB: topo.sim[''] are for demo
-
-s = topo.sim # (there'd be no need for this)
-
 # Sheets
-
 topo.sim['LeftRetina'] = GeneratorSheet(input_generator=left_input_pattern)
-RightRetina = GeneratorSheet(input_generator=right_input_pattern,name='RightRetina')
+topo.sim['RightRetina'] = GeneratorSheet(input_generator=right_input_pattern)
 
-topo.sim['V1']=CFSOM(alpha_0=0.5)
-
-V2 = CFSOM(name='V2',alpha_0 = 0.5)
-V3 = CFSOM(name='V3',alpha_0 = 0.5)
+topo.sim['V1'] = CFSOM(alpha_0 = 0.5)
+topo.sim['V2'] = CFSOM(alpha_0 = 0.5)
+topo.sim['V3'] = CFSOM(alpha_0 = 0.5)
 
 # Projections to V1
 topo.sim.connect2('LeftRetina','V1',delay=0.5,connection_type=CFProjection,name='AfferentLeft')
-
-V1 = topo.sim['V1'] # (or this)
-s.connect(RightRetina,V1,delay=0.5,connection_type=CFProjection,name='AfferentRight')
-#s.connect(V2,V1,delay=0.5,connection_type=CFProjection,name='FeedbackFromV2')
+topo.sim.connect2('RightRetina','V1',delay=0.5,connection_type=CFProjection,name='AfferentRight')
+#topo.sim.connect2('V2','V1',delay=0.5,connection_type=CFProjection,name='FeedbackFromV2')
 
 
 # Projections to V2
-LeftRetina = topo.sim['LeftRetina'] # (or this)
-s.connect(LeftRetina,V2,delay=0.5,connection_type=CFProjection,name='AfferentLeft')
-s.connect(RightRetina,V2,delay=0.5,connection_type=CFProjection,name='AfferentRight')
-s.connect(V1,V2,delay=0.5,connection_type=CFProjection,name='AfferentV1')
-s.connect(V3,V2,delay=0.5,connection_type=CFProjection,name='FeedbackFromV3')
+topo.sim.connect2('LeftRetina','V2',delay=0.5,connection_type=CFProjection,
+                  name='AfferentLeft')
+topo.sim.connect2('RightRetina','V2',delay=0.5,connection_type=CFProjection,
+                  name='AfferentRight')
+topo.sim.connect2('V1','V2',delay=0.5,connection_type=CFProjection,
+                  name='AfferentV1')
+topo.sim.connect2('V3','V2',delay=0.5,connection_type=CFProjection,
+                  name='FeedbackFromV3')
 
 # Projections to V3
-s.connect(V2,V3,delay=0.5,connection_type=CFProjection,name='Afferent')
+topo.sim.connect2('V2','V3',delay=0.5,connection_type=CFProjection,
+                  name='Afferent')
 
 # Set default locations for the Model Editor
-V1.gui_x=135          ; V1.gui_y=320
-V2.gui_x=500          ; V2.gui_y=230
-V3.gui_x=500          ; V3.gui_y=90
-LeftRetina.gui_x=151  ; LeftRetina.gui_y=520
-RightRetina.gui_x=369 ; RightRetina.gui_y=520
+topo.sim['V1'].gui_x=135          ; topo.sim['V1'].gui_y=320
+topo.sim['V2'].gui_x=500          ; topo.sim['V2'].gui_y=230
+topo.sim['V3'].gui_x=500          ; topo.sim['V3'].gui_y=90
+topo.sim['LeftRetina'].gui_x=151  ; topo.sim['LeftRetina'].gui_y=520
+topo.sim['RightRetina'].gui_x=369 ; topo.sim['RightRetina'].gui_y=520
 
-s.run(0)
+topo.sim.run(0)
