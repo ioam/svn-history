@@ -27,6 +27,8 @@ from topo.outputfns.basic import PiecewiseLinear
 from topo.patterns import PatternGeneratorParameter
 
 
+topo.sim.name = "Hierarchical example"
+
 
 ###########################################
 # Set parameters
