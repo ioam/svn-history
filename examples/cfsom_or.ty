@@ -28,44 +28,33 @@ from topo.responsefns.optimized import CFDotProduct_opt1
 from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 
-
-###########################################
-# Set parameters
-
+# Input pattern seed
 random.seed(1234)
-topo.patterns.basic.Gaussian.x = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Gaussian.y = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0))
-topo.patterns.basic.Gaussian.orientation = DynamicNumber(Wrapper("random.uniform",-pi,pi),softbounds=(0,2*pi))
-topo.patterns.basic.Gaussian.size = 2*0.3*1.5/7.0
-topo.patterns.basic.Gaussian.aspect_ratio = 7.0/1.5
-topo.patterns.basic.Gaussian.bounds = BoundingBox(radius=0.8)
 
-# CEBHACKALERT: something isn't working about using e.g.
-# PatternGeneratorParameter(default=X) in various places in the code
-# so I've temporarily commented out this line.
-# PatternGeneratorParameter.default=topo.patterns.basic.Gaussian()
-
-
-# cortical sheet
-CFSOM.density = 50
-CFSOM.learning_length = 10000
-CFSOM.radius_0 = 0.1
-
-CFSOM.alpha_0 = 0.5
-
+# Weight seed
 RandomArray.seed(500,500)
-CFProjection.weights_generator = topo.patterns.random.UniformRandom() #basic.Disk(size=0.22,aspect_ratio=1.0,smoothing=0.0) 
-CFProjection.weights_bounds=BoundingBox(radius=0.1)
-CFProjection.response_fn = CFDotProduct_opt1()
-CFProjection.learning_fn=HebbianSOMLF()
 
+# Input pattern
+gaussian_generator = topo.patterns.basic.Gaussian( \
+  x = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0)),
+  y = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0)),
+  orientation = DynamicNumber(Wrapper("random.uniform",-pi,pi),softbounds=(0,2*pi)),
+  size = 2*0.3*1.5/7.0,
+  aspect_ratio = 7.0/1.5,
+  bounds = BoundingBox(radius=0.8))
 
-###########################################
-# build simulation
+# Sheets, connections, and their parameters
+topo.sim['Retina'] = GeneratorSheet(input_generator=gaussian_generator,
+                                    name='Retina',
+                                    period=1.0,density=30)
 
-topo.sim['Retina'] = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),name='Retina',period=1.0,density=30)
-topo.sim['V1'] = CFSOM()
-topo.sim.connect2('Retina','V1',delay=0.5,connection_type=CFProjection, name='RtoV1')
+topo.sim['V1'] = CFSOM(density=50,learning_length=10000,radius_0=0.1,alpha_0=0.5)
+
+topo.sim.connect2('Retina','V1',delay=0.5,connection_type=CFProjection, name='RtoV1',
+                  weights_generator = topo.patterns.random.UniformRandom(),
+                  weights_bounds=BoundingBox(radius=0.1),
+                  response_fn = CFDotProduct_opt1(),
+                  learning_fn=HebbianSOMLF())
 
 topo.sim.run(0)
 
