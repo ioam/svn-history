@@ -13,7 +13,7 @@ import random
 import RandomArray
 
 import topo.patterns.random
-import topo.patterns.basicf
+import topo.patterns.basic
 
 from topo.base.connectionfield import CFProjection
 from topo.base.parameterclasses import DynamicNumber, Number, Wrapper
