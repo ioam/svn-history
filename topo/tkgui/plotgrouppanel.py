@@ -93,34 +93,15 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
 
         #self.plotgroup_type = plotgroup_type # type of the PlotGroup 
 
-        ### JABHACKALERT!
-        ###
-        ### When the GeneratorSheet.density is changed to a relatively
-        ### large but not unreasonable number, e.g. 512*512, the plot
-        ### window is many times larger than the screen, and there's
-        ### no way to reach the Reduce button.  In general, there need
-        ### to be scrollbars for viewing plots too large for the
-        ### screen.
-        ###
-        ### In this particular case, there appears to be a bug in how
-        ### INITIAL_PLOT_WIDTH is handled, because with a size of 512
-        ### a fixed INITIAL_PLOT_WIDTH of 60 shouldn't have any effect
-        ### at all.  Yet changing INITIAL_PLOT_WIDTH to 1 fixes the
-        ### size problem, and makes the images fit on screen with no
-        ### problem.  Very strange.  My guess for the culprit is the line:
-        ###
-        ###   self.zoom_factor = int(self.INITIAL_PLOT_WIDTH/min_width) + 1
-        ###
-        ### (below), which doesn't seem at all a correct way to
-        ### enforce a minimum width and an initial width.
-        
+        ### JABALERT! Need to implement scrollbars for viewing plots
+        ### too large for the screen.
         
         # Each plot can have a different minimum size.  If INITIAL_PLOT_WIDTH
         # is set to None, then no initial zooming is performed.  However,
         # MIN_PLOT_WIDTH may cause a zoom if the raw bitmap is still too
         # tiny.
         self.MIN_PLOT_WIDTH = 1
-        self.INITIAL_PLOT_WIDTH = 60
+        self.INITIAL_PLOT_WIDTH = 150
 
 
         self.pe_group = None
@@ -246,14 +227,21 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
 
 	self.bitmaps = self.pe_group.load_images()
 
-	min_width = reduce(min,[im.width() for im in self.bitmaps if im.resize])
+	max_width = reduce(max,[im.width() for im in self.bitmaps if im.resize])
 	max_height = float(reduce(max,[im.height() for im in self.bitmaps if im.resize]))
 	tmp_list = []
 
-	### JCALERT! We should work on this part in order to find a way to ensure a correct minimum size...
-        ### it should be in a sub-function in order to override it from projectionpanel.py
-	if ((self.initial_plot == True) and (min_width != 0)):
-	    self.zoom_factor = int(self.INITIAL_PLOT_WIDTH/min_width) + 1
+	### JCALERT/JABALERT! The calculation of the initial and minimum sizes
+        ### might need to be in a sub-function so that it can be overridden
+        ### for ProjectionPanel.  It also might be necessary to move the
+        ### calculation into PlotGroup, because similar things will be needed
+        ### even when saving plots directly to disk.
+	if ((self.initial_plot == True) and (max_width != 0)):
+            if (max_width >= self.INITIAL_PLOT_WIDTH):
+	       self.zoom_factor = 1
+            else:
+	       self.zoom_factor = int(self.INITIAL_PLOT_WIDTH/max_width)
+               self.reduce_button.config(state=NORMAL)
 	    self.initial_plot=False
 	    
 	for bitmap in self.bitmaps:
