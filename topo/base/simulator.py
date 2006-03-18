@@ -332,7 +332,7 @@ class SimulatorEvent:
 
 # CEBHACKALERT: need to rename to simulation, etc.
 
-# Simulator stores its events in a linear-time priority queue (i.e a
+# Simulator stores its events in a linear-time priority queue (i.e., a
 # sorted list.) For efficiency, e.g. for spiking neuron simulations,
 # we'll probably need to replace the linear priority queue with a more
 # efficient one.  Jeff has an O(log N) minheap implementation, but
@@ -492,6 +492,7 @@ class Simulator(ParameterizedObject):
                 # it's just right!  So pop the event and dispatch it to
                 # its destination.
                 e = self.events.pop(0)
+                self.verbose("Delivering event from", e.src.name,"to",e.dest.name,"at",self._time)
                 if e.fn == None:
                     e.dest.input_event(e.src,e.src_port,e.dest_port,e.data)
                     did_event = True
