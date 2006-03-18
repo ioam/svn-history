@@ -37,10 +37,11 @@ class DivisiveSumNormalize_opt1(OutputFunction):
         norm_value, the operation is skipped.
         """
         # Doesn't seem like it would be much faster to do this bit in C
+        if current_norm_value==None:
+            current_norm_value = sum(x.flat)
+        
         if current_norm_value==self.norm_value:
             return x
-        elif current_norm_value==None:
-            current_norm_value=sum(x.flat)
 
         target_norm_value = self.norm_value
 
