@@ -126,7 +126,7 @@ class SimSingleton(Singleton):
     """
     actual_sim = None
 
-    # CEBHACKALERT: should both these completely hide that this is
+    # should both these completely hide that this is
     # SimSingleton, as they do at the moment?
     def __repr__(self):
         """
