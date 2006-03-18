@@ -20,7 +20,7 @@ class CFDotProduct(CFResponseFunction):
     """
     Dot-product response function.
 
-    Written entirely in Python; see CFDotProduct for a much faster
+    Written entirely in Python; see CFDotProduct_opt1 for a much faster
     (but otherwise equivalent) version.
     """
     def __init__(self,**params):
@@ -61,4 +61,3 @@ class CFEuclideanDistance(CFResponseFunction):
         activity *= 0.0
         activity += (max_dist - euclidean_dist_mat)
         activity *= strength
-        #print max_dist,min(activity.flat)

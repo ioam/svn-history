@@ -19,7 +19,7 @@ class CFDotProduct_opt1(CFResponseFunction):
     Dot-product response function.
 
     Written in C for a several-hundred-times speedup; see
-    CFDotProduct_Py for an easier-to read (but otherwise equivalent)
+    CFDotProduct for an easier-to read (but otherwise equivalent)
     version in Python.
     """
     def __init__(self,**params):
@@ -77,8 +77,8 @@ class CFEuclideanDistance_opt1(CFResponseFunction):
     Euclidean-distance response function.
 
     Written in C for a several-hundred-times speedup; see
-    CFDotProduct_Py for an easier-to read (but otherwise equivalent)
-    version in Python.
+    CFEuclideanDistance for an easier-to read (but otherwise
+    equivalent) version in Python.
     """
     def __init__(self,**params):
         super(CFEuclideanDistance_opt1,self).__init__(**params)
