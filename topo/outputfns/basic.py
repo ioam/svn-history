@@ -18,6 +18,9 @@ import Numeric
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
 from topo.base.arrayutils import L2norm, norm
+# JABALERT: should move OutputFunction to some other file so that we
+# don't have to import projection here, or anything else
+# Topographica-specific
 from topo.base.projection import OutputFunction
 from topo.base.arrayutils import clip_in_place
 
