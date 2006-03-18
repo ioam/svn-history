@@ -18,7 +18,6 @@ __version__='$Revision$'
 
 import topo
 import topo.base.parameterizedobject
-import topo.base.simulator
 from topo.misc.utils import *
 
 from topo.commands.analysis import *
@@ -30,10 +29,9 @@ from topo.plotting.plotgroup import plotgroup_dict, TemplatePlotGroup, Connectio
 class PlotFileSaver(topo.base.parameterizedobject.ParameterizedObject):
     def __init__(self,**config):
         super(PlotFileSaver,self).__init__(**config)
-        self.sim = topo.base.simulator.get_active_sim()
         self.bitmaps = []
         self.files = []
-        self.name = {'base':self.sim.name, 'iteration':self.sim.time(), \
+        self.name = {'base':topo.sim.name, 'iteration':topo.sim.time(), \
                     'presentation':'0', 'region':'', 'type':''}
 
     def create_bitmaps(self):
@@ -74,7 +72,7 @@ class TemplateFile(PlotFileSaver):
 	exec(self.pgt.command)
 	if pg == None:
 	    pg = TemplatePlotGroup(self.pgt.name,[],self.pgt.normalize,
-				self.sim,self.pgt,None)
+				   self.pgt,None)
         self.bitmaps = pg.load_images()
         
 
@@ -97,7 +95,7 @@ class ActivityFile(PlotFileSaver):
 	if pg == None:
 	    pgt = plotgroup_templates['Activity']
 	    pg = TemplatePlotGroup('Activity',[],pgt.normalize,
-				self.sim,pgt,None)
+				   pgt,None)
 	    
         self.bitmaps = pg.load_images()
 	
@@ -121,7 +119,7 @@ class UnitWeightsFile(PlotFileSaver):
 	if pg == None:
 	    pgt = plotgroup_templates['Connection Fields']
 	    pg = ConnectionFieldsPlotGroup(self.plot_group_key,[],pgt.normalize,
-					   self.sim,pgt,self.region)
+					   pgt,self.region)
 			
 	
         self.bitmaps = pg.load_images()
@@ -146,7 +144,7 @@ class ProjectionFile(PlotFileSaver):
 	if pg == None:
 	    pgt = plotgroup_templates['Projection']
 	    pg = ProjectionPlotGroup(self.plot_group_key,[],pgt.normalize,
-				self.sim,pgt,self.region)
+				     pgt,self.region)
 
         self.bitmaps = pg.load_images()
         
