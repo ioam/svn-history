@@ -11,7 +11,7 @@ from topo.base.parameterclasses import Number
 from Numeric import argmax,exp,floor
 from topo.base.connectionfield import CFSheet
 from itertools import chain
-from topo.learningfns.basic import SOMLF
+from topo.learningfns.som import SOMLF
 
 
 class CFSOM(CFSheet):

@@ -25,7 +25,7 @@ from topo.base.parameterclasses import DynamicNumber,Number,RandomWrapper
 from topo.sheets.cfsom import CFSOM
 from topo.responsefns.optimized import CFDotProduct_opt1, CFEuclideanDistance_opt1
 from topo.base.simulator import Simulator
-from topo.learningfns.basic import HebbianSOMLF
+from topo.learningfns.som import HebbianSOMLF
 from topo.outputfns.basic import DivisiveSumNormalize
 from topo.patterns import PatternGeneratorParameter
 

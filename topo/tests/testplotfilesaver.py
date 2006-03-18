@@ -20,7 +20,7 @@ import topo.base.connectionfield
 from topo.plotting.plotfilesaver import *
 from PIL import *
 from topo.base.connectionfield import CFProjection
-from topo.learningfns.basic import HebbianSOMLF
+from topo.learningfns.som import HebbianSOMLF
 
 class TestPlotFileSaver(unittest.TestCase):
 

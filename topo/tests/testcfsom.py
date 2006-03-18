@@ -22,7 +22,7 @@ from topo.base.parameterclasses import Dynamic, Parameter
 import random
 import topo.base.parameterizedobject
 from topo.base.connectionfield import CFProjection
-from topo.learningfns.basic import HebbianSOMLF
+from topo.learningfns.som import HebbianSOMLF
 import pdb #debugger
 
 

@@ -25,7 +25,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.connectionfield import CFProjection
 from topo.sheets.cfsom import CFSOM
 from topo.base.simulator import Simulator
-from topo.learningfns.basic import HebbianSOMLF
+from topo.learningfns.som import HebbianSOMLF
 
 from topo.patterns import basic
 from topo.analysis.featuremap import FeatureMap, MeasureFeatureMap

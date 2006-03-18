@@ -22,7 +22,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.connectionfield import CFProjection
 from topo.base.parameterclasses import DynamicNumber,Wrapper
 from topo.base.simulator import Simulator
-from topo.learningfns.basic import HebbianSOMLF
+from topo.learningfns.som import HebbianSOMLF
 from topo.patterns import PatternGeneratorParameter
 from topo.responsefns.optimized import CFDotProduct_opt1
 from topo.sheets.cfsom import CFSOM

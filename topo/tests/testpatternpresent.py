@@ -16,7 +16,7 @@ from topo.base.connectionfield import CFProjection
 import topo.base.parameterizedobject
 from math import pi
 from topo.commands.basic import pattern_present
-from topo.learningfns.basic import HebbianSOMLF
+from topo.learningfns.som import HebbianSOMLF
 
 class TestPatternPresent(unittest.TestCase):
 
