@@ -39,9 +39,6 @@ class PiecewiseLinear(OutputFunction):
     lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
     upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
     
-    def __init__(self,**params):
-        super(PiecewiseLinear,self).__init__(**params)
-
     def __call__(self,x):
         fact = 1.0/(self.upper_bound-self.lower_bound)        
         x -= self.lower_bound
@@ -67,9 +64,6 @@ class DivisiveSumNormalize(OutputFunction):
     """
     norm_value = Number(default=1.0)
 
-    def __init__(self,**params):
-        super(DivisiveSumNormalize,self).__init__(**params)
-
     def __call__(self,x,current_norm_value=None):
         """
         Normalize the input array.
@@ -77,7 +71,17 @@ class DivisiveSumNormalize(OutputFunction):
         If the array's current norm_value is already equal to the required
         norm_value, the operation is skipped.
         """
-    
+
+        # JABALERT: Shouldn't this test be:
+        #
+        #if current_norm_value==None:
+        #    current_norm_value = 1.0*sum(x.flat)
+        #
+        #if current_norm_value==self.norm_value:
+        #    return x
+        #
+        # so that it just returns x in all cases where
+        # current_norm_value==self.norm_value?
         if current_norm_value==self.norm_value:
             return x
         elif current_norm_value==None:
@@ -99,9 +103,6 @@ class DivisiveLengthNormalize(OutputFunction):
     """
     norm_value = Number(default=1.0)
     
-    def __init__(self,**params):
-        super(DivisiveLengthNormalize,self).__init__(**params)
-
     def __call__(self,x):
         tot = 1.0*L2norm(x.flat)
         if tot != 0:
@@ -121,9 +122,6 @@ class DivisiveMaxNormalize(OutputFunction):
     """
     norm_value = Number(default=1.0)
     
-    def __init__(self,**params):
-        super(DivisiveMaxNormalize,self).__init__(**params)
-
     def __call__(self,x):
         tot = 1.0*max(abs(x.flat))
         if tot != 0:
@@ -145,12 +143,10 @@ class DivisiveLpNormalize(OutputFunction):
     p = Number(default=2)
     norm_value = Number(default=1.0)
     
-    def __init__(self,**params):
-        super(DivisiveLpNormalize,self).__init__(**params)
-
     def __call__(self,x):
         tot = 1.0*norm(x.flat,self.p)
         if tot != 0:
             factor = (self.norm_value/tot)
             x *=factor 
 	return x
+
