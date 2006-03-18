@@ -74,22 +74,12 @@ class DivisiveSumNormalize(OutputFunction):
         If the array's current norm_value is already equal to the required
         norm_value, the operation is skipped.
         """
-
-        # JABALERT: Shouldn't this test be:
-        #
-        #if current_norm_value==None:
-        #    current_norm_value = 1.0*sum(x.flat)
-        #
-        #if current_norm_value==self.norm_value:
-        #    return x
-        #
-        # so that it just returns x in all cases where
-        # current_norm_value==self.norm_value?
+        if current_norm_value==None:
+            current_norm_value = 1.0*sum(x.flat)
+        
         if current_norm_value==self.norm_value:
             return x
-        elif current_norm_value==None:
-            current_norm_value = 1.0*sum(x.flat)
-            
+        
         if current_norm_value != 0:
             factor = (self.norm_value/current_norm_value)
             x *= factor
