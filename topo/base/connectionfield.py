@@ -42,18 +42,31 @@ import topo
 weight_type = Numeric.Float32
 
 
-def hebbian(input_activity, unit_activity, weights, single_connection_learning_rate):
-    """Simple Hebbian learning for the weights of one single unit."""
-    weights += single_connection_learning_rate * unit_activity * input_activity
+# JABALERT: Also need a LearningFunctionParameter, for GenericCFLF to use.
+class LearningFunction(ParameterizedObject):
+    """Abstract base class for learning functions that plug into GenericCFLF."""
 
-# CEBHACKALERT: see docstring. But note that now we have Wrapper class, we can use that.
-class Hebbian(object):
+    # JABALERT: Shouldn't the single_connection_learning_rate be omitted from the call
+    # and instead made into a class parameter?
+    def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
+        """
+        Apply this learning function given the input and output activities and current weights.
+        
+        Must be implemented by subclasses.
+        """
+        raise NotImplementedError
+
+
+class Hebbian(LearningFunction):
     """
-    This is a temporary wrapper around the hebbian() function so that
-    deepcopy can work when a Parameter has this function as its
-    default value. See connectionfield.py's GenericCFResponseFn
-    and projections/basic.py's SharedWeightCFResponseFn)
+    Basic Hebbian rule; Dayan and Abbott, 2001, equation 8.3.
+
+    Increases each weight in proportion to the product of this
+    neuron's activity and the input activity.
+    
+    Requires some form of output_fn normalization for stability.
     """
+    
     def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
         weights += single_connection_learning_rate * unit_activity * input_activity
 
