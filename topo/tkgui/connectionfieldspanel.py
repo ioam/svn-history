@@ -25,7 +25,6 @@ import topo.commands.analysis
 
 ### JABALERT!  Why isn't there a Normalize button on this and
 ### ProjectionPanel like there is on ActivityPanel?
-### JCALERT! It could also be re-named ConnectionFieldsPanel?
 class ConnectionFieldsPanel(CFSheetPlotPanel):
     def __init__(self,parent,console=None,pgt_name=None,**config):
         super(ConnectionFieldsPanel,self).__init__(parent,console,pgt_name,**config)
