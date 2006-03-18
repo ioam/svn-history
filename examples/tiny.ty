@@ -25,7 +25,7 @@ from topo.outputfns.basic import PiecewiseLinear
 from topo.patterns import PatternGeneratorParameter
 from topo.responsefns.optimized import CFDotProduct_opt1
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.outputfns.basic import DivisiveSumNormalize
+from topo.outputfns.basic import DivisiveL1Normalize
 
 
 # Same as topo.base.connectionfield.Hebbian; copied here as a template
@@ -81,7 +81,7 @@ topo.sim.connect2('Retina','V1',name='RtoV1',delay=FixedPoint("0.5"),
                   weights_bounds=BoundingBox(radius=0.2),
                   response_fn=CFDotProduct_opt1(),
                   learning_fn=GenericCFLF(single_cf_fn=SampleHebbian(sample_param=0.5)),
-                  weights_output_fn=GenericCFOF(single_cf_fn=DivisiveSumNormalize()),
+                  weights_output_fn=GenericCFOF(single_cf_fn=DivisiveL1Normalize()),
                   learning_rate=200)
 
 

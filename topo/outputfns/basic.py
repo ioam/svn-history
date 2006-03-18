@@ -97,6 +97,40 @@ class DivisiveSumNormalize(OutputFunction):
         return x
 
 
+class DivisiveL1Normalize(OutputFunction):
+    """
+    OutputFunction that divides an array by its L1 norm.
+
+    This operation ensures that an array has a sum equal to the specified 
+    norm_value, rescaling each value to make this true.  The array is 
+    unchanged if the sum is zero.
+
+    If the array's current norm_value is known (e.g. from some earlier
+    calculation), it can be passed in as an optimization.
+    """
+    norm_value = Number(default=1.0)
+
+    def __call__(self,x,current_norm_value=None):
+        """
+        Normalize the input array.
+
+        If the array's current norm_value is already equal to the required
+        norm_value, the operation is skipped.
+        """
+
+        if current_norm_value==None:
+            current_norm_value = 1.0*sum(abs(x.flat))
+        
+        if current_norm_value==self.norm_value:
+            return x
+            
+        if current_norm_value != 0:
+            factor = (self.norm_value/current_norm_value)
+            x *= factor
+
+        return x
+
+
 class DivisiveLengthNormalize(OutputFunction):
     """
     OutputFunction to divide an array by its Euclidean length (aka its L2 norm).
