@@ -80,7 +80,7 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
             ### Otherwise, we could assume that each panel is associated with a PlotGroup
             ### and then specify a panel for each template. (as it is done from topoconsole)
 	    self.pe_group = TemplatePlotGroup(self.plot_group_key,[],self.normalize,
-					   self.console.simulator,self.pgt,None)
+					      self.pgt,None)
 
             
     def display_labels(self):
@@ -94,4 +94,4 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
 
 
     def refresh_title(self):
-        self.parent.title(self.mapname.get() + " time:%s" % (self.console.simulator.time()))
+        self.parent.title(self.mapname.get() + " time:%s" % (topo.sim.time()))

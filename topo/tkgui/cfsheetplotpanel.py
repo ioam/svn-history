@@ -11,6 +11,7 @@ $Id$
 __version__='$Revision$'
 
 from Tkinter import StringVar, Frame, LEFT, RIGHT, TOP, BOTTOM, YES, X, Checkbutton, DISABLED, Message
+import topo
 from topo.base.sheet import Sheet
 import Pmw
 import plotgrouppanel

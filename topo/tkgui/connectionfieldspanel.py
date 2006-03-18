@@ -139,7 +139,7 @@ class ConnectionFieldsPanel(CFSheetPlotPanel):
 	self.pe_group = plotgroup_dict.get(self.plot_group_key,None)
 	if self.pe_group == None:
 	    self.pe_group = ConnectionFieldsPlotGroup(self.plot_group_key,[],self.normalize,
-						 self.console.simulator,self.pgt,self.region.get())
+						      self.pgt,self.region.get())
 
         # self.situate is defined in the super class CFSheetPlotPanel
         self.pe_group.situate = self.situate
@@ -152,7 +152,7 @@ class ConnectionFieldsPanel(CFSheetPlotPanel):
         """
         new_title = 'Connection Fields of ' + self.region.get() + \
                     ' unit (' + str(self.x) + ',' + str(self.y) + ') at time '\
-                    + str(self.console.simulator.time())
+                    + str(topo.sim.time())
         self.plot_group_title.configure(tag_text = new_title)
 
 	if self._num_labels != len(self.canvases):
@@ -172,4 +172,4 @@ class ConnectionFieldsPanel(CFSheetPlotPanel):
         
     def refresh_title(self):
         self.parent.title(self.pgt.name + " %s (%0.3f,%0.3f) time:%s" %
-                          (self.region.get(),self.displayed_x,self.displayed_y,self.console.simulator.time()))
+                          (self.region.get(),self.displayed_x,self.displayed_y,topo.sim.time()))

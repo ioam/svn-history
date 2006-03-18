@@ -15,6 +15,7 @@ from math import ceil
 ### JCALERT! Try not to have to use chain and delete this import.
 from itertools import chain
 
+import topo
 from topo.misc.keyedlist import KeyedList
 from topo.base.projection import ProjectionSheet
 from topo.plotting.templates import plotgroup_templates
@@ -222,7 +223,7 @@ class ProjectionPanel(CFSheetPlotPanel):
 	self.pe_group = plotgroup_dict.get(self.plot_group_key,None)
 	if self.pe_group == None:
 	    self.pe_group = ProjectionPlotGroup(self.plot_group_key,[],self.normalize,
-						 self.console.simulator,self.pgt,self.region.get())
+						self.pgt,self.region.get())
         coords = self.pe_group.generate_coords()
         topo.commands.analysis.proj_coords = coords
 	topo.commands.analysis.sheet_name = self.region.get()
@@ -282,7 +283,7 @@ class ProjectionPanel(CFSheetPlotPanel):
             src_name = self.projections[self.weight_name.get()].src.name
 
             new_title = 'Projection ' + self.weight_name.get() + ' from ' + src_name + ' to ' \
-                        + self.region.get() + ' at time ' + str(self.console.simulator.time())
+                        + self.region.get() + ' at time ' + str(topo.sim.time())
             self.plot_group_title.configure(tag_text = new_title)
         else:
             self.plot_group_title.configure(tag_text = 'No Projections')

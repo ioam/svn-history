@@ -15,6 +15,7 @@ from Numeric import transpose, array, ravel
 
 import Image
 
+import topo
 from topo.misc.utils import flatten, dict_sort
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import Sheet
@@ -148,12 +149,11 @@ class TemplatePlotGroup(PlotGroup):
     PlotGroup that is built as specified by a PlotGroupTemplate.
     """
 
-    def __init__(self,plot_group_key,plot_list,normalize,simulator,template,sheet_name,**params):
+    def __init__(self,plot_group_key,plot_list,normalize,template,sheet_name,**params):
 
         super(TemplatePlotGroup,self).__init__(plot_group_key,plot_list,normalize,**params)
 	
 	self.template = template
-	self.simulator=simulator
 	# If no sheet_name is defined, the sheet_filter_lam accepts all sheets
         # (i.e the PlotGroup will try to build a Plot object for each Sheet in the simulation)
         if sheet_name:
@@ -172,7 +172,7 @@ class TemplatePlotGroup(PlotGroup):
 
         This function calls create_plots, that is implemented in each TemplatePlotGroup subclasses.
         """
-	sheet_list = [each for each in dict_sort(self.simulator.objects(Sheet)) if self.sheet_filter_lam(each)]      
+	sheet_list = [each for each in dict_sort(topo.sim.objects(Sheet)) if self.sheet_filter_lam(each)]      
 	plot_list = self.plot_list
         # Loop over all sheets that passed the filter.
         #     Loop over each individual plot template:
@@ -217,12 +217,12 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
       situate: Whether to situate the plot on the full source sheet, or just show the weights.
     """
 
-    def __init__(self,plot_group_key,plot_list,normalize,simulator,template,sheet_name,**params):
+    def __init__(self,plot_group_key,plot_list,normalize,template,sheet_name,**params):
         self.x = float(plot_group_key[2])
         self.y = float(plot_group_key[3])
       	self.situate = False       
 	super(ConnectionFieldsPlotGroup,self).__init__(plot_group_key,plot_list,normalize,
-						       simulator,template,sheet_name,**params)
+						       template,sheet_name,**params)
   
     def _create_plots(self,pt_name,pt,sheet):
 
@@ -255,7 +255,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
     PlotGroup for Projection Plots
     """
 
-    def __init__(self,plot_group_key,plot_list,normalize,simulator,template,sheet_name,**params):
+    def __init__(self,plot_group_key,plot_list,normalize,template,sheet_name,**params):
        
         self.weight_name = plot_group_key[1]
         self.density = float(plot_group_key[2])
@@ -267,11 +267,11 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 	self.situate = False
         
         super(ProjectionPlotGroup,self).__init__(plot_group_key,plot_list,normalize,
-                                                  simulator,template,sheet_name,**params)
+                                                 template,sheet_name,**params)
 
 	### JCALERT! It is a bit confusing, but in the case of the projection
         ### sheet_filter_lam filter to one single sheet...
-	for s in self.simulator.objects(Sheet).values():
+	for s in topo.sim.objects(Sheet).values():
 	    if self.sheet_filter_lam(s):
 		self._sim_ep = s
 
