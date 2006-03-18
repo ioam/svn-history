@@ -477,6 +477,8 @@ class CFProjection(Projection):
                                               doc="Define the shape of the connection fields.")
     learning_fn = LearningFunctionParameter(default=GenericCFLF(),
                                             doc='Function for computing changes to the weights based on one activation step.')
+
+    # JABALERT: Shouldn't learning_rate be owned by the learning_fn?
     learning_rate = Number(default=0.0,softbounds=(0,100))
     output_fn  = OutputFunctionParameter(default=Identity(),
                                          doc='Function applied to the Projection activity after it is computed.')
