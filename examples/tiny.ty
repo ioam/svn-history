@@ -39,11 +39,17 @@ class SampleHebbian(LearningFunction):
     
     Requires some form of output_fn normalization for stability.
     """
-    sample_param=Number(default=0.1,bounds=(0,None),doc="Positive-valued numeric parameter")
+    sample_param=Number(default=0.1,bounds=(0,None),doc="Example positive-valued numeric parameter")
+    value_0=Number(default=0.8,bounds=(0,None),doc="Example initial value parameter.")
+
+    def __init__(self,**params):
+        super(SampleHebbian,self).__init__(**params)
+        self.value=self.value_0
     
     def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
         weights += single_connection_learning_rate * unit_activity * input_activity
-        dummy_value = self.sample_param*unit_activity
+        dummy_value = self.sample_param*self.value*unit_activity
+        self.value = self.value*0.9
 
 
 # Input pattern seed
