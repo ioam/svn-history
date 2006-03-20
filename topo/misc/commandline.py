@@ -26,30 +26,6 @@ licensing information.
 ### JABALERT: Should pick just one of these, presumably pi
 global_constants = {'PI':math.pi, 'pi':math.pi, 'Pi':math.pi}
 
-
-def start(interactive=True):
-    """
-    Function that will display a banner and change the prompt display.
-    Since this is part of the topo package, the topo.__init__ will
-    already be evaluated when this file is imported.
-    """
-    sys.ps1 = 'Topographica> '
-    
-    for (k,v) in global_constants.items():
-        exec '%s = %s' % (k,v) in __main__.__dict__
-
-    if interactive:
-        print BANNER
-        try:
-            import readline
-        except ImportError:
-            print "Module readline not available.\nHistory and completion support disabled."
-        else:
-        #set up command completion
-            import rlcompleter
-            readline.parse_and_bind("tab: complete")
-
-
 # Create the topographica parser.
 usage = "usage: topographica ([<option>]:[<filename>])*\n\
 where any combination of options and Python script filenames will be\n\
@@ -102,6 +78,9 @@ topo_parser.add_option("-c","--command",action = "callback",callback = c_action,
 		       help="commands passed in as a string and followed by files to be executed.")
 
 
+
+### Execute what is specified by the options.
+
 def process_argv(argv):
     """
     Process command-line arguments (minus argv[0]!), rearrange and execute.
@@ -120,9 +99,23 @@ def process_argv(argv):
     # tried compiling Python on Windows. 
 
     if import_weave: exec "import weave" in __main__.__dict__    
+    
+    sys.ps1 = 'Topographica> '    
+    for (k,v) in global_constants.items():
+        exec '%s = %s' % (k,v) in __main__.__dict__
 
-    exec "import topo.misc.commandline; topo.misc.commandline.start(" \
-	   + str(option.interactive) + ");" in __main__.__dict__
+    # if -i is on, or no scripts were given and no commands were given
+    if option.interactive:
+	os.environ["PYTHONINSPECT"] = "1"
+	print BANNER
+        try:
+            import readline
+        except ImportError:
+            print "Module readline not available.\nHistory and completion support disabled."
+        else:
+        #set up command completion
+            import rlcompleter
+            readline.parse_and_bind("tab: complete")
     
     # if -g is on
     if option.gui:
@@ -130,10 +123,6 @@ def process_argv(argv):
 	os.environ["PYTHONINSPECT"] = "1"
     else:
 	exec "topo.gui_cmdline_flag = False;" in __main__.__dict__
-     
-    # if -i is on, or no scripts were given and no commands were given
-    if option.interactive:
-	os.environ["PYTHONINSPECT"] = "1"
 
      # catch the first filenames arguments (before any options) and execute them.
     filename_arg = topo_parser.largs
