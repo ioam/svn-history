@@ -11,6 +11,7 @@ __version__='$Revision$'
 import sys, __main__, math
 
 import os
+import topo
 from optparse import OptionParser
 from inlinec import import_weave
 
@@ -97,9 +98,8 @@ def process_argv(argv):
     # does not cause problems.
     # CEBHACKALERT: I can't check this out because I've never
     # tried compiling Python on Windows. 
-
     if import_weave: exec "import weave" in __main__.__dict__    
-    
+
     sys.ps1 = 'Topographica> '    
     for (k,v) in global_constants.items():
         exec '%s = %s' % (k,v) in __main__.__dict__
@@ -119,10 +119,10 @@ def process_argv(argv):
     
     # if -g is on
     if option.gui:
-	exec "topo.gui_cmdline_flag = True; import topo.tkgui; topo.tkgui.start();" in __main__.__dict__
+	exec "topo.gui_cmdline_flag = True; import topo.tkgui; topo.tkgui.start();" 
 	os.environ["PYTHONINSPECT"] = "1"
     else:
-	exec "topo.gui_cmdline_flag = False;" in __main__.__dict__
+	exec "topo.gui_cmdline_flag = False;" 
 
      # catch the first filenames arguments (before any options) and execute them.
     filename_arg = topo_parser.largs
