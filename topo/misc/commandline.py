@@ -11,7 +11,6 @@ __version__='$Revision$'
 import sys, __main__, math
 
 import os
-import topo
 from optparse import OptionParser
 from inlinec import import_weave
 
@@ -118,11 +117,15 @@ def process_argv(argv):
             readline.parse_and_bind("tab: complete")
     
     # if -g is on
+    # Not sure why we need that here, but it doesn't work when it is at the top of the file.
+    import topo
     if option.gui:
-	exec "topo.gui_cmdline_flag = True; import topo.tkgui; topo.tkgui.start();" 
+	import topo.tkgui
+	topo.gui_cmdline_flag = True
+	topo.tkgui.start() 
 	os.environ["PYTHONINSPECT"] = "1"
     else:
-	exec "topo.gui_cmdline_flag = False;" 
+	topo.gui_cmdline_flag = False 
 
      # catch the first filenames arguments (before any options) and execute them.
     filename_arg = topo_parser.largs
