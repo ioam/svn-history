@@ -23,8 +23,8 @@ specific command, or topo.about() for info on this release, including
 licensing information.
 """
 
-### JABALERT: Should pick just one of these, presumably pi
-global_constants = {'PI':math.pi, 'pi':math.pi, 'Pi':math.pi}
+# Use to define global constants
+global_constants = {'pi':math.pi}
 
 # Create the topographica parser.
 usage = "usage: topographica ([<option>]:[<filename>])*\n\
