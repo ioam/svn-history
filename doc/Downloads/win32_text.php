@@ -146,6 +146,7 @@
 
 <p>If Weave is installed but your C compiler is not installed or
    configured properly then Topographica will abort with an error
+   (typically "CompileError: error: command 'g++' failed")
    when you try to run it. If you are unable to fix the C compiler,
    but still want to run Topographica, you can set the
    <tt>import_weave</tt> variable in topo/misc/inlinec.py to False to
