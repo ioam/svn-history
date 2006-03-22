@@ -59,11 +59,11 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         is clear there is no appropriate data to plot."""
         return True
 
-    def __init__(self,parent,console,pgt_name,**config):
+    def __init__(self,parent,console,name,**config):
         """
         parent:  it is the window (GUIToplevel()) that contains the panel.
         console: is the associated console, (i.e. the TopoConsole that has this panel)
-        pgt_name: name of the PlotGroupTemplate associated with the panel
+        name: name associated with the panel
 	"""
 
         Frame.__init__(self,parent,config)
@@ -74,10 +74,11 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         self.balloon = Pmw.Balloon(parent)
         self.canvases = []
 
-	# By default, the plot_group_key is the pgt_name.
-	# for testpattern it is 'Preview' that does not corresponds to any template.
-        # for connectionfield and projection panel, the plotgroup_key is re-generated
-	self.plot_group_key = pgt_name
+	# For a PlotGroupPanel, the plot_group_key is the name passed at creation.
+	# (e.g for testpattern it is 'Preview')
+        # For a TemplatePlotGroupPanel, name is the name of the associated template 
+        # for ConnectionField and Projection Panel, the plotgroup_key is re-generated
+	self.plot_group_key = name
          
 	### JCALERT! This is not used for the moment, but it could:
         ### if the template specified an associated PlotGroup, we could do
