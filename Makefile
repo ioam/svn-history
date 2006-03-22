@@ -11,6 +11,29 @@ RELEASE_TAG = release_0_8_2
 TEST_VERBOSITY = 1
 
 
+# Commands needed to build a public distribution
+
+COMPRESS_ARCHIVE           = gzip
+MAKE_ARCHIVE               = tar -cf -
+MAKE_ZIP                   = zip -r -q
+MKDIR                      = mkdir -p
+SED			   = sed
+RM                         = rm -f
+CD                         = cd
+CP                         = cp
+MV                         = mv
+MAKE                       = make
+
+# Definitions for public distributions
+PROGRAM                    = topographica
+DIST_TMPDIR                = ../distributions
+DIST_DIRNAME               = ${PROGRAM}.${RELEASE}
+DIST_DIR                   = ${DIST_TMPDIR}/${DIST_DIRNAME}
+DIST_ARCHIVE               = ${DIST_DIRNAME}.tar.gz
+DIST_ZIP                   = ${DIST_DIRNAME}.zip
+
+
+
 # Default does not include doc, in case user lacks PHP
 default: ext-packages topographica reference-manual
 
@@ -77,6 +100,9 @@ doc: FORCE
 
 
 
+#############################################################################
+# For maintainer only; be careful with these commands
+
 ## Code releases, currently handled via CVS.
 ## Run these from a relatively clean copy of the topographica directory 
 ## (without stray files, especially in doc/).
@@ -92,4 +118,40 @@ LATEST_STABLE:
 # Update Topographica.org web site
 sf-web-site: reference-manual doc
 	rsync -v -arHz -e ssh doc/. topographica.sf.net:/home/groups/t/to/topographica/htdocs/.
+
+
+# Clear out everything not intended for the public distribution
+#
+# This is ordinarily commented out in the CVS version for safety, 
+# but it is enabled when the distribution directory is created.
+#
+#@@distclean: FORCE clean
+#@@	   ${RM} .#* */.#* */*/.#* */*~ .cvsignore ChangeLog */.cvsignore */*/.cvsignore
+#@@	   ${RM} ImageSaver*.ppm
+#@@	   ${RM} -r CVS */CVS */*/CVS
+
+
+# Make public distribution in subdirectory
+distdirprep: FORCE distclean 
+
+# Make public distribution archive
+distarc: FORCE distdirprep
+	${CD} .. ; ${MAKE_ARCHIVE} ${DIST_DIRNAME} | ${COMPRESS_ARCHIVE} > ${DIST_ARCHIVE}
+	${CD} .. ; ${RM} -f ${DIST_ZIP} ; ${MAKE_ZIP} ${DIST_ZIP} ${DIST_DIRNAME} 
+
+# Create public distribution subdirectory
+distdir: FORCE
+	${RM} -r ${DIST_DIR}
+	${MKDIR} ${DIST_DIR}
+	${CP} -r -d . ${DIST_DIR}
+	${RM} ${DIST_DIR}/Makefile 
+	${SED} \
+	-e 's|^#@@||' \
+	Makefile > ${DIST_DIR}/Makefile 
+
+# Create public distribution subdirectory and archive
+dist: doc distdir FORCE
+	${CD} ${DIST_DIR}; ${MAKE} distarc
+
+
 
