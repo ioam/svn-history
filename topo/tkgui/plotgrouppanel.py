@@ -100,12 +100,13 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         self.MIN_PLOT_WIDTH = 1
         self.INITIAL_PLOT_WIDTH = 150
 
-        self.pe_group = None
-        self.plots = []
+        self.pe_group = None        
         self.bitmaps = []
         self.labels = []
+        ### JCALERT! What is that use for?
         self._num_labels = 0
 
+        # Create and fill the control Frame
 	self.shared_control_frame = Frame(self)
         self.shared_control_frame.pack(side=TOP,expand=YES,fill=X)
 
@@ -127,6 +128,7 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         Button(self.shared_control_frame,text="Enlarge",
                command=self.enlarge).pack(side=LEFT)        
 
+        # Auto_refresh check button.
         # Default is to not have the window Auto-refresh, because some
         # plots are very slow to generate (e.g. some preference map
         # plots).  Call self.auto_refresh_checkbutton.invoke() to
@@ -139,8 +141,6 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         self.auto_refresh_checkbutton.invoke()
 
         # Normalization check button.
-	### JCALERT! Do we want to always pass a template (for the moment, the exception is testpattern?)
-        ### there is no normalize button for the testpattern... is this right?
 	self.normalize_checkbutton = Checkbutton(self.shared_control_frame,
                                                      text="Normalize",
                                                      command=self.toggle_normalize)
@@ -206,9 +206,7 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
     ### JCALERT! Re-write the doc for this function
     def load_images(self):
 	"""
-	Pre:  self.pe_group contains a PlotGroup
-              self.plots contains a list of plots following the
-	      format provided by PlotGroup.plots()
+	Pre:  self.pe_group contains a PlotGroup.
         Post: self.bitmaps contains a list of Bitmap Images ready for display.
 
         No geometry or Sheet information is necessary to perform the
