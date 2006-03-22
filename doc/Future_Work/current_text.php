@@ -32,10 +32,6 @@ was first added to the list, or a change was made.)
 2006/03/17 (CB): Cleaning Composite and Image pattern generators.
 </li>
 
-<li> 
-2006/02/21 (JC): Cleaning up ports.
-</li>
-
 <li>
 2006/03/07: (CB) Implement scheduled actions as strings exec'd in main [not committed, but working - just needs cleaning]
 </li>
