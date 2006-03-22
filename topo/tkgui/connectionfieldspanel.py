@@ -171,5 +171,6 @@ class ConnectionFieldsPanel(CFSheetPlotPanel):
     
         
     def refresh_title(self):
-        self.parent.title(self.pgt.name + " %s (%0.3f,%0.3f) time:%s" %
+        self.parent.title(topo.sim.name+': '+self.pgt.name + " %s (%0.3f,%0.3f) time:%s" %
                           (self.region.get(),self.displayed_x,self.displayed_y,topo.sim.time()))
+

@@ -10,6 +10,7 @@ __version__='$Revision$'
 import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas
+
 import plotgrouppanel
 from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import plotgroup_dict, TemplatePlotGroup
@@ -94,4 +95,4 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
 
 
     def refresh_title(self):
-        self.parent.title(self.mapname.get() + " time:%s" % (topo.sim.time()))
+        self.parent.title(topo.sim.name+': '+self.mapname.get() + " time:%s" % (topo.sim.time()))
