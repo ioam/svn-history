@@ -9,7 +9,7 @@ __version__='$Revision$'
 
 import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
-     Entry, Canvas
+     Entry, Canvas, Checkbutton
 
 import plotgrouppanel
 from topo.plotting.templates import plotgroup_templates
@@ -42,6 +42,11 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
 	### JCALERT! We might get rid of that, as it is redundant with plotgroup_key
         self.mapname = StringVar()       
         self.mapname.set(self.pgt.name)
+
+        self.actualsize_checkbutton = Checkbutton(self.shared_control_frame,
+                                                    text="Actualsize",
+                                                    command=self.toggle_actualsize)
+        self.actualsize_checkbutton.pack(side=LEFT)
 
 	# For a BasicPlotGroup, the plot_group_key is the name of the template
 	self.plot_group_key=self.pgt.name

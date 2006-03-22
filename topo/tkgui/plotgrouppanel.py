@@ -24,6 +24,7 @@ from Tkinter import Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
 import topo.tkgui
 import topo.base.parameterizedobject
 import topo.base.simulator 
+from topo.base.sheet import Sheet
 
 import topo.plotting.bitmap
 import topo.plotting.plotgroup
@@ -39,13 +40,12 @@ BORDERWIDTH = 1
 # not displayed.  
 CANVASBUFFER = 1
 
-
 class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
     """
     Abstract PlotGroupPanel class for displaying bitmapped images to a TK
     GUI window.  Must be subclassed to be usable.
     """
-
+	
     @staticmethod
     def valid_context():
         """
@@ -121,10 +121,12 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         # Refresh, Reduce, and Enlarge Buttons.
         Button(self.shared_control_frame,text="Refresh",
                command=self.refresh).pack(side=LEFT)
+               
         self.reduce_button = Button(self.shared_control_frame,text="Reduce",
                                    state=DISABLED,
                                    command=self.reduce)
         self.reduce_button.pack(side=LEFT)
+        
         Button(self.shared_control_frame,text="Enlarge",
                command=self.enlarge).pack(side=LEFT)        
 
@@ -139,7 +141,11 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
                                                     command=self.toggle_auto_refresh)
         self.auto_refresh_checkbutton.pack(side=LEFT)
         self.auto_refresh_checkbutton.invoke()
-
+        
+        
+        
+        self.actualsize = 0
+        
         # Normalization check button.
 	self.normalize_checkbutton = Checkbutton(self.shared_control_frame,
                                                      text="Normalize",
@@ -218,11 +224,11 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
 
 	self.bitmaps = self.pe_group.load_images()
 
-	max_width = reduce(max,[im.width() for im in self.bitmaps if im.resize])
+        max_width = reduce(max,[im.width() for im in self.bitmaps if im.resize])
 	max_height = float(reduce(max,[im.height() for im in self.bitmaps if im.resize]))
 	tmp_list = []
 
-	### JCALERT/JABALERT! The calculation of the initial and minimum sizes
+ 	### JCALERT/JABALERT! The calculation of the initial and minimum sizes
         ### might need to be in a sub-function so that it can be overridden
         ### for ProjectionPanel.  It also might be necessary to move the
         ### calculation into PlotGroup, because similar things will be needed
@@ -234,13 +240,20 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
 	       self.zoom_factor = int(self.INITIAL_PLOT_WIDTH/max_width)
                self.reduce_button.config(state=NORMAL)
 	    self.initial_plot=False
-	    
+            
 	for bitmap in self.bitmaps:
-	    if not bitmap.resize:
-		tmp_list = tmp_list + [bitmap.zoom(self.zoom_factor*max_height/bitmap.height())]
-	    else:
-		tmp_list = tmp_list + [bitmap.zoom(self.zoom_factor*int(max_height/bitmap.height()))]
-	    
+
+            if bitmap.resize:
+                if self.actualsize==1:
+                    s = topo.sim.objects(Sheet).get(bitmap.plot_src_name,None)
+                    adjust=float(10*self.zoom_factor)/float(s.density)
+                else:
+                    adjust=self.zoom_factor*int(max_height/bitmap.height())
+            else:
+                adjust=self.zoom_factor*max_height/bitmap.height()
+                              
+            tmp_list = tmp_list + [bitmap.zoom(adjust)]
+	
 	self.zoomed_images = [ImageTk.PhotoImage(im) for im in tmp_list]
 
         
@@ -328,7 +341,7 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         Change the window title.  TopoConsole will call this on
         startup of window.  
         """
-        self.parent.title("%s time:%s" % (self.plot_group_key,self.console.simulator.time()))
+        self.parent.title(topo.sim.name+': '+"%s time:%s" % (self.plot_group_key,topo.sim.time()))
           
 
     def reduce(self):
@@ -350,7 +363,7 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
 
 	self.load_images()
         self.display_plots()
-
+        
 
     def toggle_auto_refresh(self):
         """Function called by Widget when check-box clicked"""
@@ -366,6 +379,12 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         # unexpected behavior for a preference map calculation
         # (where it would do unnecessary, and potentially lengthy,
         # recalculation).
+        
+    def toggle_actualsize(self):
+        """Function called by Widget when check-box clicked"""
+        self.actualsize = not self.actualsize
+        self.load_images()
+        self.display_plots()
 
 
     def destroy(self):
