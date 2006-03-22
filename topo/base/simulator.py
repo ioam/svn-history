@@ -492,7 +492,13 @@ class Simulator(ParameterizedObject):
                 # it's just right!  So pop the event and dispatch it to
                 # its destination.
                 e = self.events.pop(0)
-                self.verbose("Delivering event from", e.src.name,"to",e.dest.name,"at",self._time)
+
+                # Report as much info as we can
+                try:
+                    self.verbose("Delivering event from", e.src.name,"to",e.dest.name,"at",self._time)
+                except AttributeError:
+                    self.verbose("Delivering event at",self._time)
+
                 if e.fn == None:
                     e.dest.input_event(e.src,e.src_port,e.dest_port,e.data)
                     did_event = True
