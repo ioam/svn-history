@@ -225,14 +225,18 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
 						       template,sheet_name,**params)
   
     def _create_plots(self,pt_name,pt,sheet):
-
+	""" 
+	Sub-function of _plot_list().
+	Creates a plot as specified by a Connection Field plot_template:
+	allows creating a connection field plot or a normal plot.
+	"""
 	plot_list = []
         if not isinstance(sheet,CFSheet):
             self.warning('Requested weights view from other than CFSheet.')
         else:
 	    # If the Strength is set to Weights, we request UnitViews 
 	    # (i.e. by changing the Strength key in the plot_channels)
-	    # Otherwise, we consider Strength as a specifying a SheetView.
+	    # Otherwise, we consider Strength as specifying a SheetView.
 	    if ( pt.get('Strength', None) == 'Weights'):
 		for p in set(flatten(sheet.in_projections.values())):			    
 		    plot_channels = copy.deepcopy(pt)
@@ -279,17 +283,19 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 
  
     def _create_plots(self,pt_name,pt,sheet):
-
-	### JCALERT This has to be solved: projection is a list here!
-        ### for the moment the hack below deal with that.	
-        projection = sheet.get_in_projection_by_name(self.weight_name)
+	""" 
+	Sub-function of _plot_list().
+	Creates a plot as specified by a Projection plot_template:
+	Built a projection Plot from corresponding UnitViews.
+	"""
+	projection = sheet.projections().get(self.weight_name,None)
         plot_list=[]
         if projection:
-	    src_sheet=projection[0].src
-	    projection=projection[0]
+	    src_sheet=projection.src
 	    for x,y in self.generate_coords():
 		plot_channels = copy.deepcopy(pt)
-		### JCALERT! Do the test pt['Strength']='Weights' here
+		# JC: we might consider allowing the construction of 'projection type' plots
+		# with other things than UnitViews.
 		key = ('Weights',sheet.name,projection.name,x,y)
 		plot_channels['Strength'] = key
 		plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,
