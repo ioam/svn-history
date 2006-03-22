@@ -20,6 +20,8 @@ import topo.base.simulator
 import topo.base.parameterizedobject
 from topo.tkgui.editorwindow import ModelEditor
 
+import time
+
 import topo
 
 import topo.commands.basic
@@ -146,10 +148,10 @@ class TopoConsole(Frame):
         self._init_widgets()
         # Doesn't work for providing icon for the window:
         #parent.wm_iconbitmap('@/home/jbednar/research/topographica/topo.xpm')
-
         title = "Topographica Console"
         self.parent.title(title)
         dict_console['console']=self
+        
 
     def _init_widgets(self):
         
@@ -525,12 +527,34 @@ class TopoConsole(Frame):
         step   = 2.0
         iters  = int(floor(fcount/step))
         remain = fmod(fcount, step)
+        starttime=time.time()
+        recenttimes=[]
+
+        # Temporary:
+        #self.parent.title(self.simulator.name) ## this changes the title bar to more usefull
+
+        ## Duration of most recent times from which to estimate remaining time
+        estimate_interval=50.0
         for i in xrange(iters):
+            recenttimes.append(time.time())
+            length = len(recenttimes)
+            if (length>50):
+                recenttimes.pop(0)
+                length-=1
+                
             s.run(step)
             percent = 100.0*i/iters
-            message = 'Time ' + str(s.time()) + ': ' + str(int(percent)) + '% of '  + str(fcount) + ' completed.'
+
+            estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
+            
+            minutes=int(estimate/60)
+            seconds=estimate%60
+            
+            message = 'Time ' + str(s.time()) + ': ' + str(int(percent)) + '% of '  + str(fcount) + ' completed.' + '     ' + str(minutes)+':' + ('%02d' % int(seconds))+ ' approx mins:secs remaining'
+
             self.messageBar.message('state', message)
             self.update_idletasks()
+                                                                                                                                                  
         s.run(remain)
         message = 'Ran ' + str(fcount) + ' to time ' + str(s.time())
         self.auto_refresh()
