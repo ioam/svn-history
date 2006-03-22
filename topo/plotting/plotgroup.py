@@ -275,12 +275,12 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 
 	### JCALERT! It is a bit confusing, but in the case of the projection
         ### sheet_filter_lam filter to one single sheet...
+	### this has to be made simpler...
 	for s in topo.sim.objects(Sheet).values():
 	    if self.sheet_filter_lam(s):
 		self._sim_ep = s
 
-        self._sim_ep_src = self._sim_ep.get_in_projection_by_name(self.weight_name)[0].src
-
+        self._sim_ep_src = self._sim_ep.projections().get(self.weight_name,None)
  
     def _create_plots(self,pt_name,pt,sheet):
 	""" 

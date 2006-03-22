@@ -237,26 +237,6 @@ class ProjectionSheet(Sheet):
         """
         return dict([(p.name,p) for p in chain(*self.in_projections.values())])
 
-# CEBHACKALERT:
-# Calls to the function below can be changed to call the one above once simulator.py
-# has been altered so that it does not allow creation of e.g. projections sharing the
-# same name. Then the function below can be removed.
-# JC: I think it can be done now: if two Projections shared the same name an error is raised in _connect_from
 
-    def get_in_projection_by_name(self,tname):
-        """
-        More often than not, a Projection is requested by name from a
-        sheet, rather than by the location in the connections list.
-        This code hides the complex reverse addressing necessary.
-        Always returns a list in case of multiple name hits, but the
-        list may be empty if no Projections have a name matching the
-        one passed in as t(arget)name.
-        """
-        
-        prjns = [p for name in self.in_projections
-                       for p in self.in_projections[name]
-                           if p.name == tname]
-
-        return prjns
 
 

@@ -173,8 +173,8 @@ class TestCFSom(unittest.TestCase):
                   name='RtoV1',learning_fn=HebbianSOMLF())
         s.print_level = topo.base.parameterizedobject.WARNING
 
-        self.assertTrue(len(V1.get_in_projection_by_name('RtoV1')) == 1)
-        self.assertTrue(len(V1.get_in_projection_by_name('R1toV1')) == 0)
+        self.assertTrue(V1.projections().get('RtoV1',None) != None)
+        self.assertTrue(V1.projections().get('RtoV1',None) != None)
         s.run(10)
 
 
