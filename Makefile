@@ -126,8 +126,10 @@ sf-web-site: reference-manual doc
 # but it is enabled when the distribution directory is created.
 #
 #@@distclean: FORCE clean
-#@@	   ${RM} .#* */.#* */*/.#* */*~ .cvsignore ChangeLog */.cvsignore */*/.cvsignore
-#@@	   ${RM} ImageSaver*.ppm
+#@@	   ${RM} .#* */.#* */*/.#* */*~ .cvsignore ChangeLog.txt */.cvsignore */*/.cvsignore
+#@@	   ${RM} ImageSaver*.ppm countalerts* annotate.out
+#@@	   ${RM} -r external/mswin external/win32
+#@@	   ${RM} -r tmp/
 #@@	   ${RM} -r CVS */CVS */*/CVS
 
 
