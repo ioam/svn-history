@@ -48,7 +48,7 @@ bib2html:
 	${MAKE} -C shared/bib2html/
 
 clean:
-	${RM} Reference_Manual/topo*.html
+	${RM} .??*~ *~ */*~ */.??*~ Reference_Manual/topo*.html
 
 # Not removed by default, for people who do not have PHP locally
 clean_php:

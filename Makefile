@@ -27,7 +27,7 @@ MAKE                       = make
 # Definitions for public distributions
 PROGRAM                    = topographica
 DIST_TMPDIR                = ../distributions
-DIST_DIRNAME               = ${PROGRAM}.${RELEASE}
+DIST_DIRNAME               = ${PROGRAM}-${RELEASE}
 DIST_DIR                   = ${DIST_TMPDIR}/${DIST_DIRNAME}
 DIST_ARCHIVE               = ${DIST_DIRNAME}.tar.gz
 DIST_ZIP                   = ${DIST_DIRNAME}.zip
@@ -39,7 +39,10 @@ default: ext-packages topographica reference-manual
 
 all: default doc tests examples
 
-clean: cleandoc clean-ext-packages
+clean: clean-doc clean-ext-packages clean-pyc
+	${RM} .??*~ *~ */*~ */.??*~ */*/*~ */*/.??*~ */*/*/*~ */*/*/.??*~ *.bak
+	${RM} .#??*.* */.#??*.* */*/.#??*.* */*/*/.#??*.*
+	${RM} -r bin include share lib man topographica ImageSaver*.jpeg python_topo
 
 saved-examples: 
 	make -C examples lissom_oo_or_20000.typ
@@ -86,7 +89,10 @@ lint:
 	${PYLINT} topo/*.py topo/*/*.py
 
 
-cleandoc:
+clean-pyc:
+	rm -f topo/*.pyc topo/*/*.pyc topo/*/*/*.pyc
+
+clean-doc:
 	make -C doc clean
 
 # Auto-generated source code documentation
@@ -127,17 +133,14 @@ sf-web-site: reference-manual doc
 #
 #@@distclean: FORCE clean
 #@@	   ${RM} .#* */.#* */*/.#* */*~ .cvsignore ChangeLog.txt */.cvsignore */*/.cvsignore
-#@@	   ${RM} ImageSaver*.ppm countalerts* annotate.out
-#@@	   ${RM} -r external/mswin external/win32
+#@@	   ${RM} etc/topographica.elc ImageSaver*.ppm countalerts* annotate.out
+#@@	   ${RM} -r external/mswin external/win32 setup.bat topographica.ico
 #@@	   ${RM} -r tmp/
-#@@	   ${RM} -r CVS */CVS */*/CVS
+#@@	   ${RM} -r CVS */CVS */*/CVS */*/*/CVS
 
-
-# Make public distribution in subdirectory
-distdirprep: FORCE distclean 
 
 # Make public distribution archive
-distarc: FORCE distdirprep
+distarc: FORCE distclean 
 	${CD} .. ; ${MAKE_ARCHIVE} ${DIST_DIRNAME} | ${COMPRESS_ARCHIVE} > ${DIST_ARCHIVE}
 	${CD} .. ; ${RM} -f ${DIST_ZIP} ; ${MAKE_ZIP} ${DIST_ZIP} ${DIST_DIRNAME} 
 
