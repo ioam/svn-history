@@ -66,7 +66,6 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         pgt_name: name of the PlotGroupTemplate associated with the panel
 	"""
 
-	### JCALERT! what is config and why is it passed to both ParameterizedObject and Frame?
         Frame.__init__(self,parent,config)
         topo.plotting.plot.ParameterizedObject.__init__(self,**config)
 
@@ -74,8 +73,6 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         self.parent = parent
         self.balloon = Pmw.Balloon(parent)
         self.canvases = []
-
-	self.pgt = plotgroup_templates.get(pgt_name,None)
 
 	# By default, the plot_group_key is the pgt_name.
 	# for testpattern it is 'Preview' that does not corresponds to any template.
@@ -90,7 +87,6 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         ### could all be done from the template.
         ### Also, do we want to associate panel and plotgroup: in which case, we could only specified a panel
         ### for a template and then creating a single type of PlotGroup for any panel (as it is now)
-
         #self.plotgroup_type = plotgroup_type # type of the PlotGroup 
 
         ### JABALERT! Need to implement scrollbars for viewing plots
@@ -102,7 +98,6 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         # tiny.
         self.MIN_PLOT_WIDTH = 1
         self.INITIAL_PLOT_WIDTH = 150
-
 
         self.pe_group = None
         self.plots = []
@@ -145,14 +140,11 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         # Normalization check button.
 	### JCALERT! Do we want to always pass a template (for the moment, the exception is testpattern?)
         ### there is no normalize button for the testpattern... is this right?
-        if self.pgt:        
-            self.normalize_checkbutton = Checkbutton(self.shared_control_frame,
+	self.normalize_checkbutton = Checkbutton(self.shared_control_frame,
                                                      text="Normalize",
                                                      command=self.toggle_normalize)
-	    self.normalize_checkbutton.pack(side=LEFT)
-	    self.normalize = self.pgt.normalize    
-            if self.normalize:
-                self.normalize_checkbutton.select()
+	self.normalize_checkbutton.pack(side=LEFT)
+	self.normalize = False    
             
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
