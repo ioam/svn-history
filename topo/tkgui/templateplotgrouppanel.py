@@ -47,7 +47,7 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
                                                     text="Sheet coordinates",
                                                     command=self.toggle_sheetcoords)
         self.sheetcoords_checkbutton.pack(side=LEFT)
-        self.sheetcoords_checkbutton.select()
+        #self.sheetcoords_checkbutton.select()
         
 	# For a BasicPlotGroup, the plot_group_key is the name of the template
 	self.plot_group_key=self.pgt.name
