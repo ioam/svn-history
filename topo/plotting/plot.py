@@ -29,7 +29,7 @@ import palette
 
 class Plot(ParameterizedObject):
      """
-     Simple Plot object constructed from a specified image.
+     Simple Plot object constructed from a specified PIL image.
      """
      def __init__(self,image=None,**params):
           
@@ -38,6 +38,7 @@ class Plot(ParameterizedObject):
           self.plot_src_name = ''
           self.precedence = 0.0
           
+
 
 def make_template_plot(channels,sheet_view_dict,density=None,
               plot_bounding_box=None,normalize=False,situate=False,name=None):
@@ -57,7 +58,6 @@ def make_template_plot(channels,sheet_view_dict,density=None,
      
      ParameterizedObject(name="make_template_plot").verbose('No',name,'plot constructed for this Sheet')
      return None
-
 
 
 
