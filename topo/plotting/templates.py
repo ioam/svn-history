@@ -146,7 +146,7 @@ pgt.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pgt.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
 pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
-pgt.add_static_image('Color Key','topo/commands/or_key_white_vert.png')
+pgt.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
 
 
 pgt = new_plotgroup_template(name='Position Preference',command='measure_position_pref() ; topographic_grid()',normalize=True)
