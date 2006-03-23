@@ -245,6 +245,10 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
             if bitmap.resize:
                 if self.sheetcoords==1:
                     s = topo.sim.objects(Sheet).get(bitmap.plot_src_name,None)
+                    # JABALERT: Instead of arbitrary factor 10, should
+                    # scale largest bitmap to INITIAL_PLOT_WIDTH in every case
+                    # Also need integer/float option, called 'Integer scaling',
+                    # and will need to make it apply to both cases.
                     adjust=float(10*self.zoom_factor)/float(s.density)
                 else:
                     adjust=self.zoom_factor*int(max_height/bitmap.height())
