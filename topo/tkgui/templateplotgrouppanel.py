@@ -43,11 +43,12 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         self.mapname = StringVar()       
         self.mapname.set(self.pgt.name)
 
-        self.actualsize_checkbutton = Checkbutton(self.shared_control_frame,
-                                                    text="Actualsize",
-                                                    command=self.toggle_actualsize)
-        self.actualsize_checkbutton.pack(side=LEFT)
-
+        self.sheetcoords_checkbutton = Checkbutton(self.shared_control_frame,
+                                                    text="Sheet coordinates",
+                                                    command=self.toggle_sheetcoords)
+        self.sheetcoords_checkbutton.pack(side=LEFT)
+        self.sheetcoords_checkbutton.select()
+        
 	# For a BasicPlotGroup, the plot_group_key is the name of the template
 	self.plot_group_key=self.pgt.name
         

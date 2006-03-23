@@ -135,7 +135,7 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         # plots are very slow to generate (e.g. some preference map
         # plots).  Call self.auto_refresh_checkbutton.invoke() to
         # enable autorefresh in a subclassed constructor function.
-        self.auto_refresh = 0
+        self.auto_refresh = False
         self.auto_refresh_checkbutton = Checkbutton(self.shared_control_frame,
                                                     text="Auto-refresh",
                                                     command=self.toggle_auto_refresh)
@@ -144,9 +144,8 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         
         
         
-        self.actualsize = 0
+        self.sheetcoords = True
         
-        # Normalization check button.
 	self.normalize_checkbutton = Checkbutton(self.shared_control_frame,
                                                      text="Normalize",
                                                      command=self.toggle_normalize)
@@ -244,7 +243,7 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
 	for bitmap in self.bitmaps:
 
             if bitmap.resize:
-                if self.actualsize==1:
+                if self.sheetcoords==1:
                     s = topo.sim.objects(Sheet).get(bitmap.plot_src_name,None)
                     adjust=float(10*self.zoom_factor)/float(s.density)
                 else:
@@ -380,9 +379,9 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         # (where it would do unnecessary, and potentially lengthy,
         # recalculation).
         
-    def toggle_actualsize(self):
+    def toggle_sheetcoords(self):
         """Function called by Widget when check-box clicked"""
-        self.actualsize = not self.actualsize
+        self.sheetcoords = not self.sheetcoords
         self.load_images()
         self.display_plots()
 
