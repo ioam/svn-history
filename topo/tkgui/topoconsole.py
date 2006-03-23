@@ -266,7 +266,7 @@ class TopoConsole(Frame):
         #
         # Learning
         #
-        learning_group = Pmw.Group(self,tag_text='Learning iterations')
+        learning_group = Pmw.Group(self,tag_text='Run simulator for:')
         learning_frame = learning_group.interior()
         learning_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
 
@@ -509,24 +509,24 @@ class TopoConsole(Frame):
             return True
 
 
-    def do_learning(self,count):
+    def do_learning(self,duration):
         """
-        A simulation object should be linked to the GUI before this
-        learning command is issued on the Simulator object.
+        Run the simulator for the specified simulator time duration.
+        
+        All this routine truly needs to do is
+        topo.sim.run(float(duration)), but it adds other useful
+        features like periodically displaying the simulated and real
+        time remaining.
         """
-        # Could simply do s.run(float(count)), but instead breaks
-        # it up so that we can update the display after every 1.0
-        # time steps, then do any fractional part remaining.
-        # 
+        
         # Should replace with a progress bar; see
         # http://tkinter.unpythonic.net/bwidget/
         # http://tkinter.unpythonic.net/wiki/ProgressBar
-        s = topo.sim
         
-        fcount = float(count)
+        fduration = float(duration)
         step   = 2.0
-        iters  = int(floor(fcount/step))
-        remain = fmod(fcount, step)
+        iters  = int(floor(fduration/step))
+        remain = fmod(fduration, step)
         starttime=time.time()
         recenttimes=[]
 
@@ -542,30 +542,27 @@ class TopoConsole(Frame):
                 recenttimes.pop(0)
                 length-=1
                 
-            s.run(step)
+            topo.sim.run(step)
             percent = 100.0*i/iters
 
             estimate = (iters-i)*(recenttimes[-1]-recenttimes[0])/length
             
-            minutes=int(estimate/60)
-            seconds=estimate%60
-            
-            message = 'Time ' + str(s.time()) + ': ' + str(int(percent)) + '% of '  + str(fcount) + ' completed.' + '     ' + str(minutes)+':' + ('%02d' % int(seconds))+ ' approx mins:secs remaining'
+            message = 'Time ' + str(topo.sim.time()) + ': ' + \
+                      str(int(percent)) + '% of '  + str(fduration) + ' completed ' + \
+                      ('(%02d' % int(estimate/60))+':' + \
+                      ('%02d' % int(estimate%60))+ ' remaining at current rate).'
 
             self.messageBar.message('state', message)
             self.update_idletasks()
                                                                                                                                                   
-        s.run(remain)
-        message = 'Ran ' + str(fcount) + ' to time ' + str(s.time())
+        topo.sim.run(remain)
+        message = 'Ran ' + str(fduration) + ' to time ' + str(topo.sim.time())
         self.auto_refresh()
 
 
         self.messageBar.message('state', message)
         topo.tkgui.show_cmd_prompt()
 
-        
-    def dummy(self):
-        print "Button pressed in ", self
         
         
 class GUIToplevel(Toplevel):
