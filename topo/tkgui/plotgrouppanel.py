@@ -19,7 +19,8 @@ import ImageTk
 import Pmw, re, os, sys
 from Tkinter import Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, \
-     StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE
+     StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE, \
+     Scrollbar, Y, VERTICAL, HORIZONTAL
 
 import topo.tkgui
 import topo.base.parameterizedobject
@@ -28,8 +29,6 @@ from topo.base.sheet import Sheet
 
 import topo.plotting.bitmap
 import topo.plotting.plotgroup
-from topo.plotting.templates import plotgroup_templates
-
 
 BORDERWIDTH = 1
 
@@ -39,6 +38,7 @@ BORDERWIDTH = 1
 # the border will not be close, too small, and some of the image is
 # not displayed.  
 CANVASBUFFER = 1
+
 
 class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
     """
@@ -59,40 +59,28 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         is clear there is no appropriate data to plot."""
         return True
 
-    def __init__(self,parent,console,name,**config):
+    def __init__(self,parent,console,name,**params):
         """
         parent:  it is the window (GUIToplevel()) that contains the panel.
         console: is the associated console, (i.e. the TopoConsole that has this panel)
         name: name associated with the panel
 	"""
 
-        Frame.__init__(self,parent,config)
-        topo.plotting.plot.ParameterizedObject.__init__(self,**config)
+        Frame.__init__(self,parent)
+        topo.plotting.plot.ParameterizedObject.__init__(self,**params)
 
 	self.console = console
         self.parent = parent
+	# ballon help component
         self.balloon = Pmw.Balloon(parent)
         self.canvases = []
 
 	# For a PlotGroupPanel, the plot_group_key is the name passed at creation.
 	# (e.g for testpattern it is 'Preview')
         # For a TemplatePlotGroupPanel, name is the name of the associated template 
-        # for ConnectionField and Projection Panel, the plotgroup_key is re-generated
+        # For a ConnectionField or a Projection Panel, the plotgroup_key is re-generated
 	self.plot_group_key = name
-         
-	### JCALERT! This is not used for the moment, but it could:
-        ### if the template specified an associated PlotGroup, we could do
-	### self.plotgroup_type = self.pgt.plotgroup_type
-        ### and then used that in the do_plot_cmd to create the PlotGroup.
-        ### this has to be discussed, as well as the topoconsole line that associate template with panel:
-        ### could all be done from the template.
-        ### Also, do we want to associate panel and plotgroup: in which case, we could only specified a panel
-        ### for a template and then creating a single type of PlotGroup for any panel (as it is now)
-        #self.plotgroup_type = plotgroup_type # type of the PlotGroup 
 
-        ### JABALERT! Need to implement scrollbars for viewing plots
-        ### too large for the screen.
-        
         # Each plot can have a different minimum size.  If INITIAL_PLOT_WIDTH
         # is set to None, then no initial zooming is performed.  However,
         # MIN_PLOT_WIDTH may cause a zoom if the raw bitmap is still too
@@ -103,7 +91,7 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         self.pe_group = None        
         self.bitmaps = []
         self.labels = []
-        ### JCALERT! What is that use for?
+        ### JCALERT! Figure out why we need that!
         self._num_labels = 0
 
         # Create and fill the control Frame
@@ -154,9 +142,20 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
             
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
-        self.plot_group_title = Pmw.Group(self,tag_text=str(self.plot_group_key))
+
+	self.plot_group_title = Pmw.Group(self,tag_text=str(self.plot_group_key))
         self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH,padx=5,pady=5)
-        self.plot_frame = self.plot_group_title.interior()
+	self.plot_frame = self.plot_group_title.interior()
+
+        ### JABALERT! Need to implement scrollbars for viewing plots
+        ### too large for the screen.
+	# JC: A way of implementing it. Needs more work: for the moment,
+        # the window expands without the scrollbar, but does not when the scrollbar is on.
+# 	self.scrollbar = Pmw.ScrolledFrame(self,borderframe=0,
+# 					   horizflex = 'elastic', vertflex='elastic',
+# 					   hscrollmode = 'dynamic', vscrollmode = 'dynamic')
+# 	self.scrollbar.pack(side=TOP,expand=YES,fill=X)
+#       self.plot_frame = self.scrollbar.interior()
 
         # For the first plot, use the INITIAL_PLOT_WIDTH to calculate zoom.
         self.initial_plot = True
@@ -208,7 +207,6 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         self.pe_group.do_plot_cmd()
   
   
-    ### JCALERT! Re-write the doc for this function
     def load_images(self):
 	"""
 	Pre:  self.pe_group contains a PlotGroup.
@@ -270,7 +268,7 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
               the last display, the grid size is increased, or decreased
               accordingly.
 
-        This function shuld be redefined in subclasses for interesting
+        This function should be redefined in subclasses for interesting
         things such as 2D grids.
         """
       
