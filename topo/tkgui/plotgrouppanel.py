@@ -30,6 +30,10 @@ from topo.base.sheet import Sheet
 import topo.plotting.bitmap
 import topo.plotting.plotgroup
 
+def identity(x):
+    """No-op function for use as a default."""
+    return x
+
 BORDERWIDTH = 1
 
 # Unfortunately, the canvas creation, border placement, and image
@@ -85,8 +89,8 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         # is set to None, then no initial zooming is performed.  However,
         # MIN_PLOT_WIDTH may cause a zoom if the raw bitmap is still too
         # tiny.
-        self.MIN_PLOT_WIDTH = 1
-        self.INITIAL_PLOT_WIDTH = 150
+        self.MIN_PLOT_HEIGHT = 1
+        self.INITIAL_PLOT_HEIGHT = 150
 
         self.pe_group = None        
         self.bitmaps = []
@@ -132,13 +136,20 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         
         
         
-        self.sheetcoords = True
+        self.sheetcoords = False
         
 	self.normalize_checkbutton = Checkbutton(self.shared_control_frame,
                                                      text="Normalize",
                                                      command=self.toggle_normalize)
 	self.normalize_checkbutton.pack(side=LEFT)
 	self.normalize = False    
+        
+	self.integerscaling_checkbutton = Checkbutton(self.shared_control_frame,
+                                                    text="Integer scaling",
+                                                    command=self.toggle_integerscaling)
+	self.integerscaling_checkbutton.pack(side=LEFT)
+	self.integerscaling = False
+        self.sizeconvertfn = identity
             
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
@@ -157,7 +168,7 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
 # 	self.scrollbar.pack(side=TOP,expand=YES,fill=X)
 #       self.plot_frame = self.scrollbar.interior()
 
-        # For the first plot, use the INITIAL_PLOT_WIDTH to calculate zoom.
+        # For the first plot, use the INITIAL_PLOT_HEIGHT to calculate zoom.
         self.initial_plot = True
         self.zoom_factor = 1
 	self.min_zoom_factor = 1
@@ -173,6 +184,18 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         self.load_images()
         self.display_plots()
 
+    def toggle_integerscaling(self):
+        """Function called by Widget when check-box clicked"""
+        self.integerscaling = not self.integerscaling
+        
+        if self.integerscaling:
+            self.sizeconvertfn = int
+        else:
+            self.sizeconvertfn = identity
+
+        identity
+        self.load_images()
+        self.display_plots()
 
     def refresh(self,extra=None):
         """
@@ -221,8 +244,18 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
 
 	self.bitmaps = self.pe_group.load_images()
 
-        max_width = reduce(max,[im.width() for im in self.bitmaps if im.resize])
-	max_height = float(reduce(max,[im.height() for im in self.bitmaps if im.resize]))
+        ### Should probably compute an initial master_zoom for both 
+        ### sheetcoords=1 and sheetcoords=0, and then we can switch back
+        ### and forth between them at will.
+        #if self.sheetcoords==1:
+            #sheet_heights = [i.get(bitmap.plot_src_name,None).bounds().lbrt().top()- ... for i in topo.sim.objects(Sheet)]
+            #max_density = float(reduce(max,[im.height() for im in self.bitmaps if im.resize]))
+
+            #[i.get(bitmap.plot_src_name,None).density()- ... for i in topo.sim.objects(Sheet)]
+            #max_height = density*max_sheet_height....
+        #else:
+        max_height = float(reduce(max,[im.height() for im in self.bitmaps if im.resize]))
+
 	tmp_list = []
 
  	### JCALERT/JABALERT! The calculation of the initial and minimum sizes
@@ -230,28 +263,27 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         ### for ProjectionPanel.  It also might be necessary to move the
         ### calculation into PlotGroup, because similar things will be needed
         ### even when saving plots directly to disk.
-	if ((self.initial_plot == True) and (max_width != 0)):
-            if (max_width >= self.INITIAL_PLOT_WIDTH):
+	if (self.initial_plot == True):
+            if (max_height == 0 or max_height >= self.INITIAL_PLOT_HEIGHT):
 	       self.zoom_factor = 1
             else:
-	       self.zoom_factor = int(self.INITIAL_PLOT_WIDTH/max_width)
+	       self.zoom_factor = int(self.INITIAL_PLOT_HEIGHT/max_height)
                self.reduce_button.config(state=NORMAL)
 	    self.initial_plot=False
             
 	for bitmap in self.bitmaps:
 
-            if bitmap.resize:
+            if not bitmap.resize:
+                adjust=1
+            else:
                 if self.sheetcoords==1:
                     s = topo.sim.objects(Sheet).get(bitmap.plot_src_name,None)
                     # JABALERT: Instead of arbitrary factor 10, should
-                    # scale largest bitmap to INITIAL_PLOT_WIDTH in every case
-                    # Also need integer/float option, called 'Integer scaling',
-                    # and will need to make it apply to both cases.
-                    adjust=float(10*self.zoom_factor)/float(s.density)
+                    # scale largest bitmap to INITIAL_PLOT_HEIGHT in every case
+                    # Maybe: rename zoom_factor to master_zoom, and adjust to zoom_factor
+                    adjust=self.zoom_factor*self.sizeconvertfn(10/float(s.density))
                 else:
-                    adjust=self.zoom_factor*int(max_height/bitmap.height())
-            else:
-                adjust=self.zoom_factor*max_height/bitmap.height()
+                    adjust=self.zoom_factor*self.sizeconvertfn(max_height/bitmap.height())
                               
             tmp_list = tmp_list + [bitmap.zoom(adjust)]
 	
