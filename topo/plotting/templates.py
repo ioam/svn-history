@@ -86,7 +86,7 @@ class PlotGroupTemplate(ParameterizedObject):
 	self.static_images = KeyedList(static_images)
 
     ### JCALERT! We might eventually write these two functions 'Python-like'
-    ### by using keyword argument to specify each channel a,d then get the dictionnary 
+    ### by using keyword argument to specify each channel and then get the dictionnary 
     ### of all remaining argument....
     def add_plot(self,name,specification_tuple_list):
 	dict={}
