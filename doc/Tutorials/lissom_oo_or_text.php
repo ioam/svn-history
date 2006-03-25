@@ -20,8 +20,8 @@ installing</a> Topographica.  Also, you will need to generate a saved
 orientation map network, which can be done by changing to the
 <code>examples/</code> directory and running "make
 lissom_oo_or_20000.typ".  Depending on the speed of your machine, you
-may want to go out for coffee at this point, and perhaps a full meal
-(up to a couple of hours).
+may want to come back and check on it the next day; on a 3GHz machine
+this training process currently takes about 5 hours.
 </p>
 
 
