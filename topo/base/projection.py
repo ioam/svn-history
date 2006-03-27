@@ -149,7 +149,7 @@ class ProjectionSheet(Sheet):
         Sheet._connect_from(self, conn, **args)
 
         ### JCALERT! This could be better re-implemented: the structure of in_projections obliged to
-        ### use the chain method in slef.projections. Maybe it would be possible to code it differently.        
+        ### use the chain method in slef.projections. Maybe it would be possible to code it differently.
         if isinstance(conn, Projection):
             if conn.src.name not in self.in_projections:
                 self.in_projections[conn.src.name] = []
@@ -157,6 +157,8 @@ class ProjectionSheet(Sheet):
                 raise ValueError('Two Projections to the same Sheet, have to be named differently')
             else:
                 self.in_projections[conn.src.name].append(conn)
+        else:
+            raise TypeError('ProjectionSheets only accept Projections, not other types of connection.')
 
 
     def input_event(self,src,src_port,dest_port,data):
