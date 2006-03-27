@@ -88,7 +88,7 @@ topo.sim.connect2('Retina','V1',name='RtoV1',delay=FixedPoint("0.5"),
                   response_fn=CFDotProduct_opt1(),
                   learning_fn=GenericCFLF(single_cf_fn=SampleHebbian(sample_param=0.5)),
                   weights_output_fn=GenericCFOF(single_cf_fn=DivisiveL1Normalize()),
-                  learning_rate=200)
+                  learning_rate=200.0)
 
 
     
