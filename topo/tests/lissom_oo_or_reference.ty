@@ -243,11 +243,11 @@ LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoin
 
 
 s.connect(LGNOn,V1,delay=FixedPoint("0.05"),dest_port="on",
-          connection_type=CFProjection,strength=1.0/2.0,name='LGNOnAfferent',
+          connection_type=CFProjection,strength=1.0,name='LGNOnAfferent',
           weights_bounds=afferent_weight_bounds,learning_rate=alpha_input*137)
 
 s.connect(LGNOff,V1,delay=FixedPoint("0.05"),dest_port="off",
-          connection_type=CFProjection,strength=1.0/2.0,name='LGNOffAfferent',
+          connection_type=CFProjection,strength=1.0,name='LGNOffAfferent',
           weights_bounds=afferent_weight_bounds,learning_rate=alpha_input*137)
 
 
@@ -259,6 +259,8 @@ s.connect(V1,V1,delay=FixedPoint("0.05"), dest_port="inh",
           connection_type=CFProjection,strength=-0.9,name='LateralInhibitory',
           weights_bounds=inhibitory_weight_bounds,learning_rate=alpha_inh*421)         
 
+
+V1.set_projections_to_jointly_normalize(['LGNOnAfferent','LGNOffAfferent'])
 
 # Times are 1 less than the or_map_topo.param c++ lissom simulation because that one uses
 # "hook before_input" to schedule events. So, an event at t=200 is executed before t=200's
