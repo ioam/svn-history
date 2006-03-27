@@ -16,6 +16,12 @@ was first added to the list, or a change was made.)
 2006/03/17: (CB) Allowing joint normalization of projections for a CFSheet
 </li>
 
+<li>
+2006/03/27: (CB) Clean up names of CFOutputFunctions, OutputFunctions, etc. and put
+in the correct locations.
+</li>
+
+
 <li> 
 2006/03/17 (CB): Fix problem (matching previous work) with som_retinotopy.
 </li>
