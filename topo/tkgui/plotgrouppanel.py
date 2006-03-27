@@ -55,13 +55,20 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         """
         Return true if there appears to be data available for this type of plot.
 
-        Some PlotGroupPanel classes plot only certain types of Sheets,
-        such as GeneratorSheets or ProjectionSheets.  To avoid
-        confusion and avoid errors later, callers can check this
-        static method before instantiating a plot of this type.
-        Subclasses should define this method to return false when it
-        is clear there is no appropriate data to plot."""
-        return True
+        To avoid confusing error messages, this method should be
+        defined to return False in the case where there is no
+        appropriate data to plot.  This information can be used to,
+        e.g., gray out the appropriate menu item.
+
+        By default, PlotGroupPanels are assumed to be valid only for
+        simulations that contain at least one Sheet.  Subclasses with
+        more specific requirements should override this method with
+        something more appropriate.
+        """
+        if topo.sim.objects(Sheet).items():
+            return True
+        else:
+            return False
 
     def __init__(self,parent,console,name,**params):
         """

@@ -166,12 +166,15 @@ class ProjectionPanel(CFSheetPlotPanel):
     @staticmethod
     def valid_context():
         """
-        Only open if ProjectionSheets are in the Simulator.
+        Only open if there are Projections defined.
         """
-        if topoconsole.active_sim().objects(ProjectionSheet).items():
-            return True
-        else:
+        projectionsheets=topo.sim.objects(ProjectionSheet).values()
+        if not projectionsheets:
             return False
+
+        projectionlists=[i.projections().values() for i in projectionsheets]
+        projections=[i for i in chain(*projectionlists)]
+        return (not projections == [])
 
 
     def projection_refresh(self,projection_name):
