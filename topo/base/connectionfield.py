@@ -121,9 +121,16 @@ class ConnectionField(ParameterizedObject):
         """        
         if hasattr(self,'_sum'): self._sum = new_sum
 
+    def del_sum(self):
+        """
+        Delete the _sum attribute if it exists.
+        """
+        if hasattr(self,'_sum'): delattr(self,'_sum')
+
+
 
     # CEBHACKALERT: this slows things down.
-    sum = property(get_sum,set_sum,None,"Please see get_sum() and set_sum().")
+    sum = property(get_sum,set_sum,del_sum,"Please see get_sum() and set_sum().")
 
 
     # CEBHACKALERT: add some default values
@@ -170,7 +177,7 @@ class ConnectionField(ParameterizedObject):
         output_fn(self.weights)
 
         # Set the initial sum
-        self.sum = output_fn.norm_value
+        #self.sum = output_fn.norm_value
 
         # CEBHACKALERT: incorporate such a test into testconnectionfield.
 #        assert self.weights.shape==(self.slice_array[1]-self.slice_array[0],self.slice_array[3]-self.slice_array[2]),str(self.weights.shape)+" "+str((self.slice_array[1]-self.slice_array[0],self.slice_array[3]-self.slice_array[2])) 
@@ -463,9 +470,8 @@ class GenericCFOF(CFOutputFunction):
             for r in xrange(rows):
                 for c in xrange(cols):
                     cf = cfs[r][c]                    
-                    single_cf_fn(cf.weights,cf.sum) 
-                    cf.sum=norm_value # (unless the CFLearningFunction
-                                      # sets _sum, this is redundant).
+                    single_cf_fn(cf.weights,cf.sum)
+                    ## del cf.sum 
                     
 
 class CFProjection(Projection):
@@ -756,17 +762,12 @@ class CFSheet(ProjectionSheet):
 ##                 for proj in self.joint_normalized_projections:
 ##                     sums.append(proj.cfs[r][c].sum)
 
-##                 if sums.count(sums[0])==len(sums):
-##                     # all the same
-##                     for proj in self.joint_normalized_projections:
-##                         proj.cfs[r][c]._sum=1.0
-##                 else:
-##                     joint_sum = add.reduce(sums)
-##                     for proj in self.joint_normalized_projections:
-##                         proj.cfs[r][c]._sum=joint_sum
+##                 joint_sum = add.reduce(sums)
+##                 for proj in self.joint_normalized_projections:
+##                     proj.cfs[r][c]._sum=joint_sum
+
                     
 ##         for proj in self.joint_normalized_projections:
-##             print "of for",proj
 ##             proj.apply_output_fn()
         
                         
@@ -781,7 +782,6 @@ class CFSheet(ProjectionSheet):
 ##         in_proj = []
 ##         for proj in self.in_connections:
 ##             in_proj.append(proj)
-##             print "learn for",proj
 ##             proj.learn()
 
 ##         # apply output_fn to grouped projections
