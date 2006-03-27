@@ -313,6 +313,10 @@ contributions are very welcome!
 
 
 <!--
+
+Should add links to CNV course and its exercises as something that can
+be done with Topographica.
+
 Should add filename of first script, or some other user-definable screen,
 to all window titles, so that different simulators can be kept straight.
 
