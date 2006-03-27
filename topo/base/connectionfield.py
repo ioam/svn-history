@@ -384,7 +384,7 @@ class CFLearningFunction(ParameterizedObject):
 	cf = cfs[cols/2][rows/2]
         # The number of units in the mask 
 	nb_unit = len(Numeric.nonzero(Numeric.ravel(cf.mask)))
-	constant_sum_connection_rate=learning_rate/(nb_unit)
+	constant_sum_connection_rate=learning_rate/float(nb_unit)
 	return constant_sum_connection_rate
 
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
