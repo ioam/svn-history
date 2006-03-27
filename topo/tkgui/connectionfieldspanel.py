@@ -157,7 +157,7 @@ class ConnectionFieldsPanel(CFSheetPlotPanel):
         """
         new_title = 'Connection Fields of ' + self.region.get() + \
                     ' unit (' + str(self.x) + ',' + str(self.y) + ') at time '\
-                    + str(topo.sim.time())
+                    + str(self.plot_time)
         self.plot_group_title.configure(tag_text = new_title)
 
 	if self._num_labels != len(self.canvases):
@@ -177,5 +177,5 @@ class ConnectionFieldsPanel(CFSheetPlotPanel):
         
     def refresh_title(self):
         self.parent.title(topo.sim.name+': '+self.pgt.name + " %s (%0.3f,%0.3f) time:%s" %
-                          (self.region.get(),self.displayed_x,self.displayed_y,topo.sim.time()))
+                          (self.region.get(),self.displayed_x,self.displayed_y,self.plot_time))
 

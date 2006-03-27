@@ -199,7 +199,7 @@ class ProjectionPanel(CFSheetPlotPanel):
 
     def refresh_title(self):
         self.parent.title(topo.sim.name+': '+"Projection %s %s time:%s" % (self.region.get(),
-            self.weight_name.get(),topo.sim.time()))
+            self.weight_name.get(),self.plot_time))
         
 
     def generate_plot_group_key(self):
@@ -286,7 +286,7 @@ class ProjectionPanel(CFSheetPlotPanel):
             src_name = self.projections[self.weight_name.get()].src.name
 
             new_title = 'Projection ' + self.weight_name.get() + ' from ' + src_name + ' to ' \
-                        + self.region.get() + ' at time ' + str(topo.sim.time())
+                        + self.region.get() + ' at time ' + str(self.plot_time)
             self.plot_group_title.configure(tag_text = new_title)
         else:
             self.plot_group_title.configure(tag_text = 'No Projections')

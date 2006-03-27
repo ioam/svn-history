@@ -23,14 +23,15 @@ from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE, \
      Scrollbar, Y, VERTICAL, HORIZONTAL
 
-import topo.tkgui
-import topo.base.parameterizedobject
-import topo.base.simulator 
+from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import Sheet
+import topo.base.simulator 
 
 import topo.plotting.bitmap
 import topo.plotting.plotgroup
 from topo.plotting.templates import plotgroup_templates
+
+import topo.tkgui
 
 def identity(x):
     """No-op function for use as a default."""
@@ -46,7 +47,7 @@ BORDERWIDTH = 1
 CANVASBUFFER = 1
 
 
-class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
+class PlotGroupPanel(Frame,ParameterizedObject):
     """
     Abstract PlotGroupPanel class for displaying bitmapped images to a TK
     GUI window.  Must be subclassed to be usable.
@@ -106,6 +107,7 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         self.bitmaps_history=[]
         self.time_history=[]
         self.history_index = -1
+        self.plot_time = 0 # JABALERT: Should probably be in the plotgroup, not here.
         self.labels = []
         ### JCALERT! Figure out why we need that!
         self._num_labels = 0
@@ -209,7 +211,6 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         self.normalize = not self.normalize
 	self.pe_group.normalize = self.normalize
         self.load_images()
-        self.history_index = self.history_index -1 #ensure index is changed only by an iteration 
         self.display_plots()
 
     def toggle_integerscaling(self):
@@ -221,9 +222,7 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         else:
             self.sizeconvertfn = identity
 
-        identity
         self.load_images()
-        self.history_index = self.history_index -1 
         self.display_plots()
 
     def refresh(self,extra=None):
@@ -264,20 +263,24 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
 	"""
 	Pre:  self.pe_group contains a PlotGroup.
         Post: self.bitmaps contains a list of Bitmap Images ready for display.
+
+        If new_iteration is True, advances the plot history counter; otherwise
+        just overwrites the current one.
 	"""
-        self.history_index = self.history_index +1
-        if (self.history_index > 0):
-           self.back_button.config(state=NORMAL)
-        else:
-            self.back_button.config(state=DISABLED)
-        
 	self.bitmaps = self.pe_group.load_images()
+
+        # Repeated plots at the same time overwrite the top plot history item;
+        # new ones are added to the list only when the simulator time changes.
+        if self.time_history and (self.time_history[-1] ==
+                                  self.console.simulator.time()):
+            self.bitmaps_history.pop()
+            self.time_history.pop()
+        
         self.bitmaps_history.append(copy.copy(self.bitmaps))
         self.time_history.append(copy.copy(self.console.simulator.time()))
-        
+        self.history_index = len(self.bitmaps_history)-1
+        self.plot_time=copy.copy(self.console.simulator.time())
 
-
-        
     def scale_images(self):
         """
         It is assumed that the PlotGroup code has not scaled the bitmap to the size currently
@@ -329,11 +332,16 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
 	
 	self.zoomed_images = [ImageTk.PhotoImage(im) for im in tmp_list]
 
-        if (self.history_index ==0):
+            
+        if (self.history_index > 0):
+            self.back_button.config(state=NORMAL)
+        else:
             self.back_button.config(state=DISABLED)
 
-        if (self.history_index >= self.console.simulator.time()):
+        if self.history_index >= len(self.bitmaps_history)-1:
             self.forward_button.config(state=DISABLED)
+        else:
+            self.forward_button.config(state=NORMAL)
         
     def display_plots(self):
         """
@@ -419,7 +427,7 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         Change the window title.  TopoConsole will call this on
         startup of window.  
         """
-        self.parent.title(topo.sim.name+': '+"%s time:%s" % (self.plot_group_key,topo.sim.time()))
+        self.parent.title(topo.sim.name+': '+"%s time:%s" % (self.plot_group_key,self.plot_time))
           
 
     def reduce(self):
@@ -430,8 +438,7 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         if self.zoom_factor == self.min_zoom_factor:
             self.reduce_button.config(state=DISABLED)
          
-	self.load_images()
-        self.history_index = self.history_index -1
+        self.load_images()
         self.scale_images()
         self.display_plots()
 
@@ -441,43 +448,38 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         self.reduce_button.config(state=NORMAL)
         self.zoom_factor = self.zoom_factor + 1
 
-	self.load_images()
-        self.history_index = self.history_index -1 
+        self.load_images()
         self.scale_images()
         self.display_plots()
 
-# JLHACKALERT Back and forward buttons - There is no need for back and forward buttons on the connection field window,
-# also currently will only scroll through bitmaps that have been explicity loaded - can it display any bitmap by loading the image for that iteration?
-# I also think this will need to be implemented seperately for each window type to get the correct plot_group_title and parent.title
-# It would also be nice to be able to scroll back through many iterations - put in a box for entering either the iteration number
-# you want to view or how many you want to jump maybe?
-
+    # JLALERT: It would be nice to be able to scroll back through many
+    # iterations.  Could put in a box for entering either the iteration
+    # number you want to view, or perhaps how many you want to jump...
     def back(self):
         """Function called by Widget to scroll back through the previous bitmaps"""
-        self.history_index = self.history_index - 1
-        self.forward_button.config(state=NORMAL)
-
+        self.history_index -= 1
+        
         self.bitmaps=self.bitmaps_history[self.history_index]
-        current_time=self.time_history[self.history_index]
-
-        self.plot_group_title.configure(tag_text = self.mapname.get() + ' at time ' + str(current_time))
-        self.parent.title(topo.sim.name+': '+"%s time:%s" % (self.plot_group_key,current_time))
-
+        self.plot_time=self.time_history[self.history_index]        
+        self.display_labels()
+        self.refresh_title()
         self.scale_images()
         self.display_plots()
 
 
 
     def forward(self):
-        """Function called by Widget to scroll forward through the bitmaps if previously you have scrolled back"""
-        self.history_index = self.history_index + 1
-        self.back_button.config(state=NORMAL)
+        """
+        Function called by Widget to scroll forward through the bitmaps.
+
+        Only useful if previously you have scrolled back.
+        """
+        self.history_index += 1
+        
 	self.bitmaps=self.bitmaps_history[self.history_index]
-        current_time=self.time_history[self.history_index]
-
-        self.plot_group_title.configure(tag_text = self.mapname.get() + ' at time ' + str(current_time))
-        self.parent.title((topo.sim.name+': '+"%s time:%s" %(self.plot_group_key, current_time)))
-
+        self.plot_time=self.time_history[self.history_index]
+        self.display_labels()
+        self.refresh_title()
         self.scale_images()
         self.display_plots()
         
@@ -501,7 +503,6 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         """Function called by Widget when check-box clicked"""
         self.sheetcoords = not self.sheetcoords
         self.load_images()
-        self.history_index = self.history_index -1 
         self.scale_images()
         self.display_plots()
 
