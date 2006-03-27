@@ -396,7 +396,7 @@ class TopoConsole(Frame):
 
     #
     # New plot windows
-    #
+    # JABALERT: Shouldn't this be named open_test_pattern_window?
     def open_plot_params_window(self):
         """
         Test Pattern Window.  
