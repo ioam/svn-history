@@ -107,7 +107,7 @@ class PlotsMenuEntry(topo.base.parameterizedobject.ParameterizedObject):
             return pn
         else:
             self.console.messageBar.message('state',
-                                            'Simulator does not have proper Sheet type.')
+                                            'No suitable objects in this simulation for this operation.')
             return None
 
 
@@ -522,7 +522,11 @@ class TopoConsole(Frame):
         # Should replace with a progress bar; see
         # http://tkinter.unpythonic.net/bwidget/
         # http://tkinter.unpythonic.net/wiki/ProgressBar
-        
+
+        ### JABALERT: Most of this code should move to the
+        ### Simulator class, because it is not specific to the GUI
+        ### E.g. we'll also want time remaining estimates from the
+        ### command line and the batch interface.
         fduration = float(duration)
         step   = 2.0
         iters  = int(floor(fduration/step))
