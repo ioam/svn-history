@@ -411,9 +411,7 @@ class TopoConsole(Frame):
             self.messageBar.message('state', 'OK')
         else:
             self.messageBar.message('state',
-                        'Simulator does not have proper Sheet type.')
-            return None
-            self.messageBar.message('state', 'No active Simulator object.')
+                                    'No suitable objects in this simulation for this operation.')
 
 
     def new_about_window(self):
