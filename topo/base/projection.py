@@ -154,7 +154,7 @@ class ProjectionSheet(Sheet):
             if conn.src.name not in self.in_projections:
                 self.in_projections[conn.src.name] = []
             if conn.name in self.projections():
-                raise ValueError('Two Projections to the same Sheet, have to be named differently')
+                raise ValueError('A Projection into a Sheet must have a unique name.')
             else:
                 self.in_projections[conn.src.name].append(conn)
         else:
@@ -215,6 +215,8 @@ class ProjectionSheet(Sheet):
         The sheet's own activity is not calculated until activite()
         is called.
         """
+        print "activate port",port
+        print "present_input",self,input_sheet,port
         for proj in self.in_projections[input_sheet.name]:
             if proj.dest_port == port:
                 proj.activate(input_activity)
