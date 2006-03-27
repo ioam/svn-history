@@ -215,8 +215,6 @@ class ProjectionSheet(Sheet):
         The sheet's own activity is not calculated until activite()
         is called.
         """
-        print "activate port",port
-        print "present_input",self,input_sheet,port
         for proj in self.in_projections[input_sheet.name]:
             if proj.dest_port == port:
                 proj.activate(input_activity)
