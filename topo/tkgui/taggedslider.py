@@ -14,7 +14,7 @@ import string
 # CEBHACKALERT: This file needs to be renamed.
 
 # CEBHACKALERT: somewhere there has to be better handling of bad input.
-# e.g. "cat" gives orientation zero, as does "pi/4".
+# e.g. "cat" gives orientation zero, as does "pI/4".
 
 
 # CEBHACKALERT: this should be an abstract class.
