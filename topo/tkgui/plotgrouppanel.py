@@ -12,12 +12,13 @@ __version__='$Revision$'
 
 import Numeric
 import MLab
+import copy
 
 import PIL
 import Image
 import ImageTk
 import Pmw, re, os, sys
-from Tkinter import Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
+from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, \
      StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE, \
      Scrollbar, Y, VERTICAL, HORIZONTAL
@@ -29,6 +30,7 @@ from topo.base.sheet import Sheet
 
 import topo.plotting.bitmap
 import topo.plotting.plotgroup
+from topo.plotting.templates import plotgroup_templates
 
 def identity(x):
     """No-op function for use as a default."""
@@ -101,6 +103,9 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
 
         self.pe_group = None        
         self.bitmaps = []
+        self.bitmaps_history=[]
+        self.time_history=[]
+        self.history_index = -1
         self.labels = []
         ### JCALERT! Figure out why we need that!
         self._num_labels = 0
@@ -119,15 +124,28 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         # 
         # Refresh, Reduce, and Enlarge Buttons.
         Button(self.shared_control_frame,text="Refresh",
-               command=self.refresh).pack(side=LEFT)
+                                     command=self.refresh).pack(side=LEFT)
                
         self.reduce_button = Button(self.shared_control_frame,text="Reduce",
-                                   state=DISABLED,
-                                   command=self.reduce)
+                                    state=DISABLED,
+                                    command=self.reduce)
         self.reduce_button.pack(side=LEFT)
         
         Button(self.shared_control_frame,text="Enlarge",
-               command=self.enlarge).pack(side=LEFT)        
+                                     command=self.enlarge).pack(side=LEFT)
+
+        self.back_button = Button(self.shared_control_frame,text="Back",
+                                  state = DISABLED,
+                                  command=self.back)
+        self.back_button.pack(side=LEFT)
+
+
+        self.forward_button = Button(self.shared_control_frame,text="Forward",
+                                     state = DISABLED,
+                                     command=self.forward)
+        self.forward_button.pack(side=LEFT)
+
+
 
         # Auto_refresh check button.
         # Default is to not have the window Auto-refresh, because some
@@ -184,11 +202,14 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         self.control_frame.pack(side=TOP,expand=YES,fill=X)
 
 
+        
+
     def toggle_normalize(self):
         """Function called by Widget when check-box clicked"""
         self.normalize = not self.normalize
 	self.pe_group.normalize = self.normalize
         self.load_images()
+        self.history_index = self.history_index -1 #ensure index is changed only by an iteration 
         self.display_plots()
 
     def toggle_integerscaling(self):
@@ -202,6 +223,7 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
 
         identity
         self.load_images()
+        self.history_index = self.history_index -1 
         self.display_plots()
 
     def refresh(self,extra=None):
@@ -211,7 +233,8 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         """
         Pmw.showbusycursor()
         self.do_plot_cmd()                # Create plot tuples
-        self.load_images()                # Scale bitmap images
+        self.load_images()                #  load bitmap images
+        self.scale_images()               #scale bitmap images
         self.display_plots()              # Put images in GUI canvas
         self.display_labels()             # Match labels to grid
         self.refresh_title()              # Update Frame title.
@@ -241,16 +264,27 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
 	"""
 	Pre:  self.pe_group contains a PlotGroup.
         Post: self.bitmaps contains a list of Bitmap Images ready for display.
-
-        No geometry or Sheet information is necessary to perform the
-        operations in this function, so it is unlikely that load_images()
-        will need to be redefined from a subclass.  It is assumed that
-        the PlotGroup code has not scaled the bitmap to the size currently
-        desired by the GUI.
 	"""
-
+        self.history_index = self.history_index +1
+        if (self.history_index > 0):
+           self.back_button.config(state=NORMAL)
+        else:
+            self.back_button.config(state=DISABLED)
+        
 	self.bitmaps = self.pe_group.load_images()
+        self.bitmaps_history.append(copy.copy(self.bitmaps))
+        self.time_history.append(copy.copy(self.console.simulator.time()))
+        
 
+
+        
+    def scale_images(self):
+        """
+        It is assumed that the PlotGroup code has not scaled the bitmap to the size currently
+        desired by the GUI.
+        """
+        
+        
         ### Should probably compute an initial master_zoom for both 
         ### sheetcoords=1 and sheetcoords=0, and then we can switch back
         ### and forth between them at will.
@@ -277,7 +311,6 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
 	       self.zoom_factor = int(self.INITIAL_PLOT_HEIGHT/max_height)
                self.reduce_button.config(state=NORMAL)
 	    self.initial_plot=False
-            
 	for bitmap in self.bitmaps:
 
             if not bitmap.resize:
@@ -296,6 +329,11 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
 	
 	self.zoomed_images = [ImageTk.PhotoImage(im) for im in tmp_list]
 
+        if (self.history_index ==0):
+            self.back_button.config(state=DISABLED)
+
+        if (self.history_index >= self.console.simulator.time()):
+            self.forward_button.config(state=DISABLED)
         
     def display_plots(self):
         """
@@ -393,6 +431,8 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
             self.reduce_button.config(state=DISABLED)
          
 	self.load_images()
+        self.history_index = self.history_index -1
+        self.scale_images()
         self.display_plots()
 
     
@@ -402,6 +442,43 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         self.zoom_factor = self.zoom_factor + 1
 
 	self.load_images()
+        self.history_index = self.history_index -1 
+        self.scale_images()
+        self.display_plots()
+
+# JLHACKALERT Back and forward buttons - There is no need for back and forward buttons on the connection field window,
+# also currently will only scroll through bitmaps that have been explicity loaded - can it display any bitmap by loading the image for that iteration?
+# I also think this will need to be implemented seperately for each window type to get the correct plot_group_title and parent.title
+# It would also be nice to be able to scroll back through many iterations - put in a box for entering either the iteration number
+# you want to view or how many you want to jump maybe?
+
+    def back(self):
+        """Function called by Widget to scroll back through the previous bitmaps"""
+        self.history_index = self.history_index - 1
+        self.forward_button.config(state=NORMAL)
+
+        self.bitmaps=self.bitmaps_history[self.history_index]
+        current_time=self.time_history[self.history_index]
+
+        self.plot_group_title.configure(tag_text = self.mapname.get() + ' at time ' + str(current_time))
+        self.parent.title(topo.sim.name+': '+"%s time:%s" % (self.plot_group_key,current_time))
+
+        self.scale_images()
+        self.display_plots()
+
+
+
+    def forward(self):
+        """Function called by Widget to scroll forward through the bitmaps if previously you have scrolled back"""
+        self.history_index = self.history_index + 1
+        self.back_button.config(state=NORMAL)
+	self.bitmaps=self.bitmaps_history[self.history_index]
+        current_time=self.time_history[self.history_index]
+
+        self.plot_group_title.configure(tag_text = self.mapname.get() + ' at time ' + str(current_time))
+        self.parent.title((topo.sim.name+': '+"%s time:%s" %(self.plot_group_key, current_time)))
+
+        self.scale_images()
         self.display_plots()
         
 
@@ -424,6 +501,8 @@ class PlotGroupPanel(Frame,topo.base.parameterizedobject.ParameterizedObject):
         """Function called by Widget when check-box clicked"""
         self.sheetcoords = not self.sheetcoords
         self.load_images()
+        self.history_index = self.history_index -1 
+        self.scale_images()
         self.display_plots()
 
 
