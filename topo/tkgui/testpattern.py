@@ -279,13 +279,15 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         for each in self.generator_sheets_patterns.keys():
             view_dict = {}
             k = self.generator_sheets_patterns[each]['pattern_generator']
+	    density = k.density
 	    view_dict[each] = topo.base.sheetview.SheetView((k(),k.bounds),src_name=each)
             channels = {'Strength':each,'Hue':None,'Confidence':None}
 	    ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
-            plist.append(make_template_plot(channels,view_dict,name='',normalize=self.normalize))
+            plist.append(make_template_plot(channels,view_dict,density,None,self.normalize,name=''))
         self.pe_group = topo.plotting.plotgroup.PlotGroup(plot_group_key='Preview',plot_list=plist,normalize=self.normalize)
 
 
+    ### JCALERT! will go when we will have cut do_plot_cmd in two...
     # re-implemented for the testpattern so that we re-create a new PlotGroup anytime
     # i.e. calling do_plot_cmd
     def toggle_normalize(self):
@@ -294,6 +296,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 	self.pe_group.normalize = self.normalize
 	self.do_plot_cmd()
         self.load_images()
+	self.scale_images()
         self.display_plots()
 
 
