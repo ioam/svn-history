@@ -32,8 +32,12 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,pgt_name,**config)
 
         # Plotgroup Template associated
-        self.pgt = plotgroup_templates[pgt_name]
-     
+        self.pgt = plotgroup_templates.get(pgt_name,None)
+
+	self.normalize = self.pgt.normalize
+        if self.normalize:
+	    self.normalize_checkbutton.select()
+
         # Command used to refresh the plot, if any
         self.cmdname = StringVar()
         
@@ -61,9 +65,8 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
                      scrolledlist_items=([self.pgt.command])
                      ).pack(side=LEFT,expand=YES,fill=X)
 
-
         self.refresh()
-	
+
         # To make the auto-refresh button not on by default when opening the panel
         # but it is not the case for the Activity PlotGroup
 	if self.mapname.get() != 'Activity':
