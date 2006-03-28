@@ -627,16 +627,22 @@ class CFProjection(Projection):
         Return a single connection field UnitView, for the unit
         located at sheet coordinate (sheet_x,sheet_y).
         """
-        (r,c) = (self.dest).sheet2matrixidx(sheet_x,sheet_y)
+	(r,c) = (self.dest).sheet2matrixidx(sheet_x,sheet_y)
 
-        # CEBHACKALERT: why is this necessary? Isn't cf[r][c].weights
+	slice_ = bounds2slice(self.cf(r,c).bounds,self.src.bounds,
+			      self.src.xdensity,self.src.ydensity)
+        r1,r2,c1,c2 = crop_slice_to_sheet_bounds(slice_,self.src.bounds,
+						 self.src.xdensity,self.src.ydensity)
+
+	matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float)
+
+	assert self.cf(r,c) != None, "Projection Matrix is None"
+	# CEBHACKALERT: why is this necessary? Isn't cf[r][c].weights
         # already a Numeric array? (Same in SharedWeightProjection.)
-        matrix_data = Numeric.array(self.cf(r,c).weights)
-
-        new_box = self.cf(r,c).bounds
+	matrix_data[r1:r2,c1:c2] = Numeric.array(self.cf(r,c).weights)
 	
-        assert matrix_data != None, "Projection Matrix is None"
-        return UnitView((matrix_data,new_box),sheet_x,sheet_y,self)
+        return UnitView((matrix_data,self.src.bounds),sheet_x,sheet_y,self)
+
 
 
     def activate(self,input_activity):
