@@ -41,7 +41,7 @@ class Plot(ParameterizedObject):
 
 
 def make_template_plot(channels,sheet_view_dict,density=None,
-              plot_bounding_box=None,normalize=False,situate=False,name=None):
+              plot_bounding_box=None,normalize=False,name=None):
      """
      Factory function for constructing a Plot object whose type is not yet known.
 
@@ -52,7 +52,7 @@ def make_template_plot(channels,sheet_view_dict,density=None,
      """
      plot_types=[SHCPlot,RGBPlot,PalettePlot]
      for pt in plot_types:
-         plot = pt(channels,sheet_view_dict,density,plot_bounding_box,normalize,situate,name=name)
+         plot = pt(channels,sheet_view_dict,density,plot_bounding_box,normalize,name=name)
          if plot.bitmap != None:
 	     return plot
      
@@ -67,7 +67,7 @@ class TemplatePlot(Plot):
     """
     
     def __init__(self,channels,sheet_view_dict,density,
-                 plot_bounding_box,normalize,situate,**params):
+                 plot_bounding_box,normalize,**params):
 	"""
         Build a plot out of a set of SheetViews as determined by a plot_template.
         
@@ -92,11 +92,7 @@ class TemplatePlot(Plot):
 	normalize specifies whether the Plot should be normalized to
 	fill the maximum dynamic range, i.e. 0.0 to 1.0.  If not
         normalized, values are clipped at 1.0.
-        
-	situate specifies if we want to situate the plot, i.e.,
-        whether to plot the entire Sheet (or other area specified by
-        the plot_bounding_box), or only the smallest plot.  The
-        situate parameter is usually useful only for a Weights plot.
+    
         
         name (which is inherited from ParameterizedObject) specifies the name
         to use for this plot.
@@ -224,9 +220,9 @@ class SHCPlot(TemplatePlot):
     """
 
     def __init__(self,channels,sheet_view_dict,density,
-                 plot_bounding_box,normalize,situate,**params):
+                 plot_bounding_box,normalize,**params):
 	super(SHCPlot,self).__init__(channels,sheet_view_dict,density, 
-				   plot_bounding_box,normalize,situate,**params)
+				   plot_bounding_box,normalize,**params)
         
 	# catching the empty plot exception
 	s_mat = self._get_matrix('Strength')
@@ -297,10 +293,10 @@ class RGBPlot(TemplatePlot):
   and Blue channels.
   """
   def __init__(self,channels,sheet_view_dict,density,
-                 plot_bounding_box,normalize,situate,**params):
+                 plot_bounding_box,normalize,**params):
 
        super(RGBPlot,self).__init__(channels,sheet_view_dict,density, 
-				   plot_bounding_box,normalize,situate,**params)
+				   plot_bounding_box,normalize,**params)
 
 
        # catching the empty plot exception
@@ -317,7 +313,7 @@ class RGBPlot(TemplatePlot):
 
             shape,box = self._get_shape_and_box()                                 
 
-            red,green,blue = self.__make_rgb_matrices((s_mat,h_mat,c_mat),shape,normalize)
+            red,green,blue = self.__make_rgb_matrices((r_mat,g_mat,b_mat),shape,normalize)
 
             if self.plot_bounding_box == None:
                self.plot_bounding_box = box
@@ -370,10 +366,10 @@ class PalettePlot(TemplatePlot):
      """
   
      def __init__(self,channels,sheet_view_dict,density,
-                  plot_bounding_box,normalize,situate,**params):
+                  plot_bounding_box,normalize,**params):
 
           super(PalettePlot,self).__init__(channels,sheet_view_dict,density, 
-                                           plot_bounding_box,normalize,situate,**params)
+                                           plot_bounding_box,normalize,**params)
 
           ### JABHACKALERT: To implement the class: If Strength is present,
           ### ask for Palette if it's there, and make a PaletteBitmap.

@@ -191,7 +191,7 @@ class TemplatePlotGroup(PlotGroup):
 	plot_channels = pt
 	plot_name = pt_name
         p = make_template_plot(plot_channels,sheet.sheet_view_dict,sheet.density,
- 			       sheet.bounds,self.normalize,False,name=plot_name)
+ 			       sheet.bounds,self.normalize,name=plot_name)
 	return [p]
 
 
@@ -246,15 +246,15 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
 		    plot_channels['Strength'] = key
 		    if self.situate:
 			plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
-							    None,self.normalize,self.situate,name=p.src.name))
+							    None,self.normalize,name=p.src.name))
 		    else:
 			(r,c) = p.dest.sheet2matrixidx(self.x,self.y)
 			plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
-							    p.cf(r,c).bounds,self.normalize,self.situate,name=p.src.name))
+							    p.cf(r,c).bounds,self.normalize,name=p.src.name))
 			
 	    else:
 		 plot_list.append(make_template_plot(pt,sheet.sheet_view_dict,sheet.density,
-						     sheet.bounds,self.normalize,self.situate,name=pt_name))
+						     sheet.bounds,self.normalize,name=pt_name))
         return plot_list
 
 
@@ -306,11 +306,11 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 		plot_channels['Strength'] = key
 		if self.situate:
 		    plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,src_sheet.density,
-							src_sheet.bounds,self.normalize,self.situate))
+							src_sheet.bounds,self.normalize))
 		else:
 		    (r,c) = projection.dest.sheet2matrixidx(x,y)
 		    plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,src_sheet.density,
-							projection.cf(r,c).bounds,self.normalize,self.situate))
+							projection.cf(r,c).bounds,self.normalize))
         return plot_list
 
 
