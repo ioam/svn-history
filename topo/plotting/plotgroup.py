@@ -191,7 +191,7 @@ class TemplatePlotGroup(PlotGroup):
 	plot_channels = pt
 	plot_name = pt_name
         p = make_template_plot(plot_channels,sheet.sheet_view_dict,sheet.density,
-			       sheet.bounds,self.normalize,False,name=plot_name)
+ 			       sheet.bounds,self.normalize,False,name=plot_name)
 	return [p]
 
 
@@ -244,8 +244,14 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
 		    # and the name in the key is the destination sheet.
 		    key = ('Weights',sheet.name,p.name,self.x,self.y)
 		    plot_channels['Strength'] = key
-		    plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
-							p.src.bounds,self.normalize,self.situate,name=p.src.name))
+		    if self.situate:
+			plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
+							    None,self.normalize,self.situate,name=p.src.name))
+		    else:
+			(r,c) = p.dest.sheet2matrixidx(self.x,self.y)
+			plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
+							    p.cf(r,c).bounds,self.normalize,self.situate,name=p.src.name))
+			
 	    else:
 		 plot_list.append(make_template_plot(pt,sheet.sheet_view_dict,sheet.density,
 						     sheet.bounds,self.normalize,self.situate,name=pt_name))
@@ -298,8 +304,13 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 		# with other things than UnitViews.
 		key = ('Weights',sheet.name,projection.name,x,y)
 		plot_channels['Strength'] = key
-		plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,
-                                      src_sheet.density,src_sheet.bounds,self.normalize,self.situate))		
+		if self.situate:
+		    plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,src_sheet.density,
+							src_sheet.bounds,self.normalize,self.situate))
+		else:
+		    (r,c) = projection.dest.sheet2matrixidx(x,y)
+		    plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,src_sheet.density,
+							projection.cf(r,c).bounds,self.normalize,self.situate))
         return plot_list
 
 

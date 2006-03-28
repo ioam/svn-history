@@ -125,35 +125,35 @@ class TestPlot(unittest.TestCase):
 
 	plot_channels1 = {'Strength':None,'Hue':None,'Confidence':None}
 	# plot1: empty plot 
-	self.plot1 = make_template_plot(plot_channels1,self.view_dict,name='plot1')
+	self.plot1 = make_template_plot(plot_channels1,self.view_dict,density=10.0,name='plot1')
 	
 	plot_channels2 = {'Strength':self.key1,'Hue':None,'Confidence':None}			   
         # plot2: sheetView 1, no normalize, no clipping
-	self.plot2 = make_template_plot(plot_channels2,self.view_dict,name='plot2')
+	self.plot2 = make_template_plot(plot_channels2,self.view_dict,density=10.0,name='plot2')
  
 	plot_channels3 = {'Strength':self.key1,'Hue':self.key2,'Confidence':None}
 	# plot3: sheetView 1+2, no normalize, no clipping
-	self.plot3 = make_template_plot(plot_channels3,self.view_dict,name='plot3')
+	self.plot3 = make_template_plot(plot_channels3,self.view_dict,density=10.0,name='plot3')
 
 	plot_channels4 = {'Strength':self.key1,'Hue':self.key2,'Confidence':self.key3}
 	# plot4: sheetView 1+2+3, no normalize , no clipping 
-	self.plot4 = make_template_plot(plot_channels4,self.view_dict,name='plot4')
+	self.plot4 = make_template_plot(plot_channels4,self.view_dict,density=10.0,name='plot4')
 
 	plot_channels5 = {'Strength':self.key1,'Hue':None,'Confidence':self.key3}
 	# plot5: sheetView 1+3, no normalize, no clipping
-	self.plot5 = make_template_plot(plot_channels5,self.view_dict,name='plot5')
+	self.plot5 = make_template_plot(plot_channels5,self.view_dict,density=10.0,name='plot5')
 
 	plot_channels6 = {'Strength':None,'Hue':self.key2,'Confidence':self.key3}
 	# plot6: sheetView 2+3, no normalize , no clipping 
-	self.plot6 = make_template_plot(plot_channels6,self.view_dict,name='plot6')
+	self.plot6 = make_template_plot(plot_channels6,self.view_dict,density=10.0,name='plot6')
 
 	plot_channels7 = {'Strength':self.key4,'Hue':self.key2,'Confidence':self.key3}
 	# plot7: sheetView 1+2+3, no normalize , clipping 
-	self.plot7 = make_template_plot(plot_channels7,self.view_dict,name='plot7')
+	self.plot7 = make_template_plot(plot_channels7,self.view_dict,density=10.0,name='plot7')
 
         plot_channels8 = {'Strength':self.key1,'Hue':self.key2,'Confidence':self.key3}
 	# plot8: sheetView 1+2+3, normalize , no clipping 
-	self.plot8 = make_template_plot(plot_channels8,self.view_dict,normalize=True,name='plot8')
+	self.plot8 = make_template_plot(plot_channels8,self.view_dict,density=10.0,normalize=True,name='plot8')
 
 	### JCALERT! FOR THE MOMENT I TAKE THE DEFAULT FOR NORMALIZE.
         ### WE WILL SEE IF IT REMAINS IN PLOT FIRST.
@@ -167,7 +167,7 @@ class TestPlot(unittest.TestCase):
 	self.sheet.sheet_view_dict[self.key4]=self.sheet_view4
 
 	plot_channels9 = {'Strength':self.key1,'Hue':self.key2,'Confidence':self.key3}
-	self.plot9 = make_template_plot(plot_channels9,self.sheet.sheet_view_dict,name='plot9')
+	self.plot9 = make_template_plot(plot_channels9,self.sheet.sheet_view_dict,density=10.0,name='plot9')
 
 	
 	
