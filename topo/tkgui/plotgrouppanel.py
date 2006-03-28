@@ -204,13 +204,12 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         self.control_frame.pack(side=TOP,expand=YES,fill=X)
 
 
-        
-
     def toggle_normalize(self):
         """Function called by Widget when check-box clicked"""
         self.normalize = not self.normalize
 	self.pe_group.normalize = self.normalize
         self.load_images()
+	self.scale_images()
         self.display_plots()
 
     def toggle_integerscaling(self):
@@ -280,6 +279,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         self.time_history.append(copy.copy(self.console.simulator.time()))
         self.history_index = len(self.bitmaps_history)-1
         self.plot_time=copy.copy(self.console.simulator.time())
+
 
     def scale_images(self):
         """
