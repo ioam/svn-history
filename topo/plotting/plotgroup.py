@@ -197,7 +197,7 @@ class TemplatePlotGroup(PlotGroup):
 
     def _add_static_images(self):
         """
-        Construct the static image Plot (e.g. color key for Orientation Preference map.
+        Construct a static image Plot (e.g. a color key for an Orientation Preference map).
         """        
         for image_name,file_path in self.template.static_images :
             image = Image.open(file_path)
