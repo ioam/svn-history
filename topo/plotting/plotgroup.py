@@ -246,11 +246,11 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
 		    plot_channels['Strength'] = key
 		    if self.situate:
 			plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
-							    None,self.normalize,name=p.src.name))
+							    None,self.normalize,name=p.name))
 		    else:
 			(r,c) = p.dest.sheet2matrixidx(self.x,self.y)
 			plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
-							    p.cf(r,c).bounds,self.normalize,name=p.src.name))
+							    p.cf(r,c).bounds,self.normalize,name=p.name))
 			
 	    else:
 		 plot_list.append(make_template_plot(pt,sheet.sheet_view_dict,sheet.density,

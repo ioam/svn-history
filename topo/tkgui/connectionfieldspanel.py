@@ -162,7 +162,7 @@ class ConnectionFieldsPanel(CFSheetPlotPanel):
 
 	if self._num_labels != len(self.canvases):
 	    old_labels = self.labels
-            self.labels = [Label(self.plot_frame,text=(each.plot_src_name + '\n(from ' + each.name+')') )
+            self.labels = [Label(self.plot_frame,text=(each.name + '\n(from ' + each.plot_src_name+')') )
 				 for each in self.bitmaps]
             for i in range(len(self.labels)):
                 self.labels[i].grid(row=1,column=i,sticky=NSEW)
@@ -171,7 +171,7 @@ class ConnectionFieldsPanel(CFSheetPlotPanel):
             self._num_labels = len(self.canvases)
         else:  # Same number of labels; reuse to avoid flickering.
             for i in range(len(self.labels)):
-                self.labels[i].configure(text=self.bitmaps[i].plot_src_name +'\n(from ' + self.bitmaps[i].name+')') 
+                self.labels[i].configure(text=self.bitmaps[i].name +'\n(from ' + self.bitmaps[i].plot_src_name+')') 
 
     
         
