@@ -166,7 +166,7 @@ class UnitView(SheetView):
         """
         Subclass of SheetView.  Contains additional x,y member data.
         """
-        super(UnitView,self).__init__(term_tuple, projection.name, projection.src.precedence,**params)
+        super(UnitView,self).__init__(term_tuple, projection.src.name, projection.src.precedence,**params)
         self.x = x
         self.y = y
         self.projection = projection
