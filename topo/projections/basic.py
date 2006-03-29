@@ -82,7 +82,6 @@ class SharedWeightCFProjection(CFProjection):
     output_fn  = OutputFunctionParameter(default=Identity())
     strength = Number(default=1.0)
 
-    cache_weights_sums = BooleanParameter(False)
     weights_output_fn = OutputFunctionParameter(default=SharedCFOF())
 
 
