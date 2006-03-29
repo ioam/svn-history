@@ -62,7 +62,6 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         defined to return False in the case where there is no
         appropriate data to plot.  This information can be used to,
         e.g., gray out the appropriate menu item.
-
         By default, PlotGroupPanels are assumed to be valid only for
         simulations that contain at least one Sheet.  Subclasses with
         more specific requirements should override this method with
@@ -286,20 +285,20 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         """
         It is assumed that the PlotGroup code has not scaled the bitmap to the size currently
         desired by the GUI.
-        """
-        
-        
+        """     
         ### Should probably compute an initial master_zoom for both 
         ### sheetcoords=1 and sheetcoords=0, and then we can switch back
         ### and forth between them at will.
-        #if self.sheetcoords==1:
-            #sheet_heights = [i.get(bitmap.plot_src_name,None).bounds().lbrt().top()- ... for i in topo.sim.objects(Sheet)]
-            #max_density = float(reduce(max,[im.height() for im in self.bitmaps if im.resize]))
-
-            #[i.get(bitmap.plot_src_name,None).density()- ... for i in topo.sim.objects(Sheet)]
-            #max_height = density*max_sheet_height....
-        #else:
-        max_height = float(reduce(max,[im.height() for im in self.bitmaps if im.resize]))
+        if self.sheetcoords==1:
+	    sheet_heights = [(topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[3]
+			      -topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[1])
+			     for b in self.bitmaps if b.resize]
+	    max_sheet_height = float(reduce(max,sheet_heights))
+            max_density = float(reduce(max,[topo.sim.objects(Sheet)[b.plot_src_name].density
+					    for b in self.bitmaps if b.resize]))
+            max_height = max_density*max_sheet_height
+        else:
+	    max_height = float(reduce(max,[b.height() for b in self.bitmaps if b.resize]))
 
 	tmp_list = []
 
@@ -315,24 +314,22 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 	       self.zoom_factor = int(self.INITIAL_PLOT_HEIGHT/max_height)
                self.reduce_button.config(state=NORMAL)
 	    self.initial_plot=False
+
 	for bitmap in self.bitmaps:
 
             if not bitmap.resize:
                 adjust=1
             else:
-                if self.sheetcoords==1:
+		if self.sheetcoords==1:
                     s = topo.sim.objects(Sheet).get(bitmap.plot_src_name,None)
-                    # JABALERT: Instead of arbitrary factor 10, should
-                    # scale largest bitmap to INITIAL_PLOT_HEIGHT in every case
-                    # Maybe: rename zoom_factor to master_zoom, and adjust to zoom_factor
-                    adjust=self.zoom_factor*self.sizeconvertfn(10/float(s.density))
-                else:
-                    adjust=self.zoom_factor*self.sizeconvertfn(max_height/bitmap.height())
+                     # Maybe: rename zoom_factor to master_zoom, and adjust to zoom_factor
+		    adjust=self.zoom_factor*self.sizeconvertfn(max_height/float(s.density))
+		else:
+		    adjust=self.zoom_factor*self.sizeconvertfn(max_height/bitmap.height())
                               
             tmp_list = tmp_list + [bitmap.zoom(adjust)]
 	
 	self.zoomed_images = [ImageTk.PhotoImage(im) for im in tmp_list]
-
             
         if (self.history_index > 0):
             self.back_button.config(state=NORMAL)
@@ -344,6 +341,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         else:
             self.forward_button.config(state=NORMAL)
         
+
     def display_plots(self):
         """
         Pre:  self.bitmaps contains a list of topo.bitmap objects.
