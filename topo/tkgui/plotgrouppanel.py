@@ -222,6 +222,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
             self.sizeconvertfn = identity
 
         self.load_images()
+	self.scale_images()        
         self.display_plots()
 
     def refresh(self,extra=None):
