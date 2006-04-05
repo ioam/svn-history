@@ -30,6 +30,7 @@ import testdistribution
 import testfeaturemap
 import testoutputfnsbasic
 import testoutputfnsoptimized
+import testimage
 
 # CEBHACKALERT: no test for patterns/image.py
 
