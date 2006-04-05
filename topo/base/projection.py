@@ -53,7 +53,7 @@ class Identity(OutputFunction):
     behavior, add side effects, or anything of that nature.
     """
 
-    def __call__(self,x):
+    def __call__(self,x,sum=None):
         return x
 
 
