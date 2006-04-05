@@ -8,12 +8,14 @@ $Id$
 
 __version__='$Revision$'
 
+from math import pi
+from Numeric import add,subtract,cos,sin,array
+
 from parameterizedobject import ParameterizedObject
 from boundingregion import BoundingBox, BoundingRegionParameter
-from sheet import  matrixidx2sheet, bounds2slice
-from Numeric import add,subtract,cos,sin,array
+from sheet import matrixidx2sheet, bounds2slice
 from parameterclasses import Parameter,Number,ClassSelectorParameter
-from math import pi
+
 
 
 class PatternGenerator(ParameterizedObject):
