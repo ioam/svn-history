@@ -13,6 +13,7 @@ from topo.base.simulator import *
 from PIL import Image
 from topo.base.sheetview import *
 from topo.plotting.bitmap import *
+from topo.projections.basic import CFProjection
 import topo.tkgui.topoconsole 
 import topo.tkgui.plotgrouppanel
 import Tkinter
@@ -130,7 +131,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         V1 = CFSOM(name='V1')
         V1.print_level = topo.base.parameterizedobject.WARNING
         
-        s.connect(retina,V1,delay=1)
+        s.connect(retina,V1,delay=1,connection_type=CFProjection)
         s.print_level = topo.base.parameterizedobject.WARNING
         
         s.run(1)
