@@ -174,7 +174,8 @@ class Constant(PatternGenerator):
         density = params.get('density',self.density)
         scale = params.get('scale',self.scale)
         offset = params.get('offset',self.offset)
-
+        output_fn = params.get('output_fn',self.output_fn)
+        
         # CEBHACKALERT: temporary, density will become one again soon...
         if type(density)!=tuple:
             xdensity=density
@@ -185,7 +186,11 @@ class Constant(PatternGenerator):
         r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
         shape = (r2-r1,c2-c1)
 
-        return scale*ones(shape, Float)+offset
+        if output_fn is Identity:
+            return scale*ones(shape, Float)+offset
+        else:
+            return output_fn(scale*ones(shape, Float)+offset)
+
 
 
 class PatternGeneratorParameter(ClassSelectorParameter):
