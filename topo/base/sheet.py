@@ -167,6 +167,17 @@ def sheet2matrixidx(x,y,bounds,xdensity,ydensity):
     return int(r), int(c)
 
 
+def sheet2matrixidx_array(x,y,bounds,xdensity,ydensity):
+    """
+    sheet2matrixidx but for arrays of x and y.
+    """
+    r,c = sheet2matrix(x,y,bounds,xdensity,ydensity)
+    r = floor(r)
+    c = floor(c)
+    return r.astype(int), c.astype(int)
+
+
+
 def matrix2sheet(float_row,float_col,bounds,xdensity,ydensity):
     """
     Convert a floating-point location (float_row,float_col) in matrix
@@ -419,6 +430,13 @@ class Sheet(EventProcessor):
         cooresponds to.
         """
         return sheet2matrixidx(x,y,self.bounds,self.xdensity,self.ydensity)
+
+
+    def sheet2matrixidx_array(self,x,y):
+        """
+        sheet2matrixidx but for arrays of x and y.
+        """
+        return sheet2matrixidx_array(x,y,self.bounds,self.xdensity,self.ydensity)
 
 
     def matrixidx2sheet(self,row,col):
