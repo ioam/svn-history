@@ -14,11 +14,6 @@ from topo.base.patterngenerator import PatternGenerator
 
 # Imported here so that all PatternGenerators will be in the same package
 from topo.base.patterngenerator import Constant
-
-# To go into documentation for the Parameters:
-#
-# size: (really this is height) 
-# aspect_ratio: gives ratio of pattern's width:height; i.e. width/height 
  
 
 class Gaussian(PatternGenerator):
