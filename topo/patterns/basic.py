@@ -218,8 +218,8 @@ class SquareGrating(PatternGenerator):
 
 
 
-# CEBHACKALERT: I just used methods in Image;
-# I'm going to clean up Image and Composite together.
+# CEBHACKALERT: this will be re-done; it is basically just the old
+# Image class.
 
 from topo.base.sheet import bounds2slice,sheet2matrix
 from Numeric import floor,zeros,Float,where
