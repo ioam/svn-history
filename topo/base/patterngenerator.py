@@ -19,7 +19,6 @@ from parameterclasses import Parameter,Number,ClassSelectorParameter
 
 
 class PatternGenerator(ParameterizedObject):
-    # CEBHACKALERT: update this documentation when finished reorganizing parametersframe.py
     """
     A class hierarchy for callable objects that can generate 2D patterns.
 
@@ -57,8 +56,6 @@ class PatternGenerator(ParameterizedObject):
                     doc="Additive offset to input pattern, defaulting to 0.0")
 
 
-    # CEBHACKALERT: warnings should be printed if a non-parameter attribute
-    # is set this way (e.g. try topo.patterns.basic.Gaussian(height=4) ).
     def __call__(self,**params):
         """
         # CEBHACKALERT: I still have documentation to write, including explaining
@@ -68,6 +65,11 @@ class PatternGenerator(ParameterizedObject):
 	is called, so we can just provide this information without
 	having the slice recomputed from the bounds.
         """
+        # CEBHACKALERT: does anyone else think this necessary? If not, let's
+        # remove it. If it stays, it should be added to the other __call__ methods.
+        for item in params:
+            if not isinstance(item,Parameter):
+                self.warning("'%s' was ignored (not a Parameter)."%item)                
         self.verbose("params = ",params)
         self.__setup_xy(params.get('bounds',self.bounds),
                         params.get('density',self.density),
