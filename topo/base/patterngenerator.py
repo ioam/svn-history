@@ -58,12 +58,11 @@ class PatternGenerator(ParameterizedObject):
 
     def __call__(self,**params):
         """
-        # CEBHACKALERT: I still have documentation to write, including explaining
-        params.get().
-
-        Sometimes the slice is already known before PatternGenerator
-	is called, so we can just provide this information without
-	having the slice recomputed from the bounds.
+        Create the pattern array.
+        
+        If called without any params, uses the values for the Parameters as
+        currently set on the object. Otherwise, any params specified override
+        those currently set on the object.
         """
         # CEBHACKALERT: does anyone else think this necessary? If not, let's
         # remove it. If it stays, it should be added to the other __call__ methods.
