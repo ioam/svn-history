@@ -7,7 +7,7 @@ __version__='$Revision$'
 # CEBHACKALERT: incomplete - being written.
 
 import unittest
-from utils import assert_array_equal
+from utils import assert_array_equal,assert_array_almost_equal
 
 from Numeric import array,Float,pi
 from MLab import rot90
@@ -15,106 +15,159 @@ from MLab import rot90
 from topo.patterns.image import Image
 from topo.outputfns.basic import Identity
 
-debugging = False
-
-if debugging: from topo.commands.pylabplots import *
+## from topo.commands.pylabplots import *
 
 
 class TestImage(unittest.TestCase):
 
-    def test_loading(self):
+    def test_vertical_oddimage_evensheet__horizontal_evenimage_evensheet(self):
         """
-        Check an Image matches the expected image_array.
+        Test vertical positioning for even sheet, odd image and horizontal
+        positioning for even image, even sheet.
         """
-        image_array = array([[  0, 34, 68,102,136],
-                             [  0, 34, 68,102,136],
-                             [  0, 34, 68,102,136],
-                             [255,  0,255,  0,255],
-                             [  0,255,  0,255,  0]],Float)
+        # CEBHACKALERT: (I never actually checked the edge_average in this
+        # case.)
+        image_array = array(
+[[  96.59090909,  96.59090909,  96.59090909,  96.59090909,  96.59090909,
+         96.59090909,  96.59090909,  96.59090909,],
+ [   0.        ,  34.        ,  68.        , 102.        , 136.        ,
+        255.   ,   0.        ,   0.             ,],
+ [   0.        ,  34.        ,  68.        , 102.        , 136.        ,
+        255.        , 255.        ,   0.        ,],
+ [   0.        ,  34.        ,  68.        , 102.        , 136.        ,
+        255.        , 255.        , 255.        ,],
+ [ 255.        ,   0.        , 255.        ,   0.        , 255.        ,
+          0.        , 255.        ,   0.        ,],
+ [   0.        , 255.        ,   0.        , 255.        ,   0.        ,
+        255.        ,   0.        , 255.        ,],
+ [  96.59090909,  96.59090909,  96.59090909,  96.59090909,  96.59090909,
+         96.59090909,  96.59090909,  96.59090909,],
+ [  96.59090909,  96.59090909,  96.59090909,  96.59090909,  96.59090909,
+         96.59090909,  96.59090909,  96.59090909,]],Float)
+
         
         image = Image(filename = 'topo/tests/testimage.pgm',
-                      density=5,
+                      density=8,
                       output_fn=Identity(),
+                      whole_image_output_fn=Identity(),
                       size_normalization='original')
 
-        assert_array_equal(image_array,image())
+        assert_array_almost_equal(image_array,image())
 
 
-
-    def test_centering(self):
+    # CB: this test is failing because Image is not right
+    def test_vertical_oddimage_oddsheet__horizontal_evenimage_oddsheet(self):
         """
-        Check that an Image loaded at its original size on a sheet
-        larger than the Image is correctly centered, for odd and
-        even sheets, and odd and even Images.
+        Test vertical centering for odd sheet, odd image, and horizontal
+        centering for odd sheet, even image
         """
-        # Odd-sized sheet, odd-sized Image:
-        image_array = array([[102,102,102,102,102,102,102,102,102,102,102],
-                             [102,102,102,102,102,102,102,102,102,102,102],
-                             [102,102,102,102,102,102,102,102,102,102,102],
-                             [102,102,102,  0, 34, 68,102,136,102,102,102],
-                             [102,102,102,  0, 34, 68,102,136,102,102,102],
-                             [102,102,102,  0, 34, 68,102,136,102,102,102],
-                             [102,102,102,255,  0,255,  0,255,102,102,102],
-                             [102,102,102,  0,255,  0,255,  0,102,102,102],
-                             [102,102,102,102,102,102,102,102,102,102,102],
-                             [102,102,102,102,102,102,102,102,102,102,102],
-                             [102,102,102,102,102,102,102,102,102,102,102]], 
-                            Float)
+        image_array = array(
+[[  96.59090909,  96.59090909,  96.59090909,  96.59090909,  96.59090909,
+         96.59090909,  96.59090909,  96.59090909,  96.59090909,],
+ [  96.59090909,  96.59090909,  96.59090909,  96.59090909,  96.59090909,
+         96.59090909,  96.59090909,  96.59090909,  96.59090909,],
+ [   0.        ,  34.        ,  68.        , 102.        , 136.        ,
+        255.   ,   0.        ,   0.             ,  96.59090909,],
+ [   0.        ,  34.        ,  68.        , 102.        , 136.        ,
+        255.        , 255.        ,   0.        ,  96.59090909,],
+ [   0.        ,  34.        ,  68.        , 102.        , 136.        ,
+        255.        , 255.        , 255.        ,  96.59090909,],
+ [ 255.        ,   0.        , 255.        ,   0.        , 255.        ,
+          0.        , 255.        ,   0.        ,  96.59090909,],
+ [   0.        , 255.        ,   0.        , 255.        ,   0.        ,
+        255.        ,   0.        , 255.        ,  96.59090909,],
+ [  96.59090909,  96.59090909,  96.59090909,  96.59090909,  96.59090909,
+         96.59090909,  96.59090909,  96.59090909,  96.59090909,],
+ [  96.59090909,  96.59090909,  96.59090909,  96.59090909,  96.59090909,
+         96.59090909,  96.59090909,  96.59090909,  96.59090909,]],Float)
+
         
         image = Image(filename = 'topo/tests/testimage.pgm',
-                      density=11,
+                      density=9,
                       output_fn=Identity(),
+                      whole_image_output_fn=Identity(),
                       size_normalization='original')
 
-        assert_array_equal(image_array,image())
+##         matrixplot(image())
+##         matrixplot(image_array)
+
+        assert_array_almost_equal(image_array,image())
 
 
-        # Even-sized sheet, odd-sized Image:
-        image_array = array([[102,102,102,102,102,102,102,102,102,102],
-                             [102,102,102,102,102,102,102,102,102,102],
-                             [102,102,102,102,102,102,102,102,102,102],
-                             [102,102,102,  0, 34, 68,102,136,102,102],
-                             [102,102,102,  0, 34, 68,102,136,102,102],
-                             [102,102,102,  0, 34, 68,102,136,102,102],
-                             [102,102,102,255,  0,255,  0,255,102,102],
-                             [102,102,102,  0,255,  0,255,  0,102,102],
-                             [102,102,102,102,102,102,102,102,102,102],
-                             [102,102,102,102,102,102,102,102,102,102]], 
-                            Float)
+
+
+
+
+##     def test_centering(self):
+##         """
+##         Check that an Image loaded at its original size on a sheet
+##         larger than the Image is correctly centered, for odd and
+##         even sheets, and odd and even Images.
+##         """
+##         # Odd-sized sheet, odd-sized Image:
+##         image_array = array([[102,102,102,102,102,102,102,102,102,102,102],
+##                              [102,102,102,102,102,102,102,102,102,102,102],
+##                              [102,102,102,102,102,102,102,102,102,102,102],
+##                              [102,102,102,  0, 34, 68,102,136,102,102,102],
+##                              [102,102,102,  0, 34, 68,102,136,102,102,102],
+##                              [102,102,102,  0, 34, 68,102,136,102,102,102],
+##                              [102,102,102,255,  0,255,  0,255,102,102,102],
+##                              [102,102,102,  0,255,  0,255,  0,102,102,102],
+##                              [102,102,102,102,102,102,102,102,102,102,102],
+##                              [102,102,102,102,102,102,102,102,102,102,102],
+##                              [102,102,102,102,102,102,102,102,102,102,102]], 
+##                             Float)
         
-        image = Image(filename = 'topo/tests/testimage.pgm',
-                      density=10,
-                      output_fn=Identity(),
-                      size_normalization='original')
+##         image = Image(filename = 'topo/tests/testimage.pgm',
+##                       density=11,
+##                       output_fn=Identity(),
+##                       size_normalization='original')
 
-        assert_array_equal(image_array,image())
+##         assert_array_equal(image_array,image())
+
+
+##         # Even-sized sheet, odd-sized Image:
+##         image_array = array([[102,102,102,102,102,102,102,102,102,102],
+##                              [102,102,102,102,102,102,102,102,102,102],
+##                              [102,102,102,102,102,102,102,102,102,102],
+##                              [102,102,102,  0, 34, 68,102,136,102,102],
+##                              [102,102,102,  0, 34, 68,102,136,102,102],
+##                              [102,102,102,  0, 34, 68,102,136,102,102],
+##                              [102,102,102,255,  0,255,  0,255,102,102],
+##                              [102,102,102,  0,255,  0,255,  0,102,102],
+##                              [102,102,102,102,102,102,102,102,102,102],
+##                              [102,102,102,102,102,102,102,102,102,102]], 
+##                             Float)
+        
+##         image = Image(filename = 'topo/tests/testimage.pgm',
+##                       density=10,
+##                       output_fn=Identity(),
+##                       size_normalization='original')
+
+##         assert_array_equal(image_array,image())
 
         
-    def test_resize(self):
-        """
-        Check various densities and ...
-        """
-        image_array = array([[  0,  0, 34, 34, 68, 68,102,102,136,136],
-                             [  0,  0, 34, 34, 68, 68,102,102,136,136],
-                             [  0,  0, 34, 34, 68, 68,102,102,136,136],
-                             [  0,  0, 34, 34, 68, 68,102,102,136,136],
-                             [  0,  0, 34, 34, 68, 68,102,102,136,136],
-                             [  0,  0, 34, 34, 68, 68,102,102,136,136],
-                             [255,255,  0,  0,255,255,  0,  0,255,255],
-                             [255,255,  0,  0,255,255,  0,  0,255,255],
-                             [  0,  0,255,255,  0,  0,255,255,  0,  0],
-                             [  0,  0,255,255,  0,  0,255,255,  0,  0]])
+##     def test_resize(self):
+##         """
+##         Check various densities and ...
+##         """
+##         image_array = array([[  0,  0, 34, 34, 68, 68,102,102,136,136],
+##                              [  0,  0, 34, 34, 68, 68,102,102,136,136],
+##                              [  0,  0, 34, 34, 68, 68,102,102,136,136],
+##                              [  0,  0, 34, 34, 68, 68,102,102,136,136],
+##                              [  0,  0, 34, 34, 68, 68,102,102,136,136],
+##                              [  0,  0, 34, 34, 68, 68,102,102,136,136],
+##                              [255,255,  0,  0,255,255,  0,  0,255,255],
+##                              [255,255,  0,  0,255,255,  0,  0,255,255],
+##                              [  0,  0,255,255,  0,  0,255,255,  0,  0],
+##                              [  0,  0,255,255,  0,  0,255,255,  0,  0]])
         
-        image = Image(filename = 'topo/tests/testimage.pgm',
-                      density=10,
-                      output_fn=Identity(),
-                      size_normalization='fit_shortest')
+##         image = Image(filename = 'topo/tests/testimage.pgm',
+##                       density=10,
+##                       output_fn=Identity(),
+##                       size_normalization='fit_shortest')
 
-        if debugging:
-            matrixplot(image())
-            matrixplot(image_array)
-
-        assert_array_equal(image_array,image())
+##         assert_array_equal(image_array,image())
 
 
 
