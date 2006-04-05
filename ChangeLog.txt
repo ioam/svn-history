@@ -1,9 +1,864 @@
-2006-03-03 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+2006-04-05  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/tkgui/testplotgrouppanel.py 1.8: Fixed broken test
+	uncovered by better error messages
+
+2006-04-05  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/projection.py 1.60: Added 'sum' argument to Identity.
+
+	* topo/tests/testimage.py 1.1, topo/tests/utils.py 1.1: Initial
+	version.
+
+	* topo/tests/testimage.pgm 1.1: An image to use for testing the
+	image generator in image.py.
+
+2006-03-29  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.52: Started to re-write
+	scale_images: got rid of the arbitrary factor 10 in the case of
+	sheet coordinate scaling; now the largest bitmap is scaled to
+	INITIAL_PLOT_HEIGHT in any cases. It remains to implement a master
+	zoom for each case.
+
+	* topo/plotting/plotgroup.py 1.99,
+	topo/tkgui/connectionfieldspanel.py 1.8: Corrected label display
+	for connection field panel accordingly to the new changes in the
+	UnitView plot_src_name attribute.
+
+	* topo/base/sheetview.py 1.14: Made the plot_src_name attribute
+	be set to the src sheet name for a UnitView as well, (it is a
+	necessary step in order to implement the sheet coordinates button
+	for the connection field panel).
+
+2006-03-29  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/projections/basic.py 1.20: Removed a line (unused) that I
+	left in by accident one time.
+
+2006-03-29  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.51: Made Integer scaling button
+	refresh automatically
+
+	* topo/plotting/plotgroup.py 1.98: Fixed typo in comment
+
+2006-03-28  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.50: Corrected mistake in
+	toogle_normalize (without a call to scale_images, the Plots are not
+	regenerated.)
+
+	* topo/tkgui/templateplotgrouppanel.py 1.9: Set the attribute
+	normalize according to the value for the template (for a
+	TemplatePlotGroupPanel).
+
+	* topo/tkgui/testpattern.py 1.26: Corrected Plot creation in the
+	TestPattern, according to the new changes in Plot.
+
+	* topo/plotting/plotgroup.py 1.97, topo/plotting/plot.py 1.90: Got
+	rid of the situate argument for plot: now it is all determined by
+	the plot_bounding_box.
+
+	* topo/plotting/plot.py 1.89, topo/plotting/plotgroup.py 1.96,
+	topo/tests/testplot.py 1.19: Changed Plot: now that UnitViews
+	shared the same bounds as the SheetViews, there is no need to
+	slice anymore when combining SheetViews with UnitViews. Now, a
+	plot_bounding_box is specified, in which the plot is drawn, or the
+	bounds of the Sheet are taken if no plot_bounding_box are
+	specified. There is still some problems for some plot_bounding_box
+	and density values combinations that will have to be adressed, but
+	no current used feature is broken.
+
+	* topo/base/connectionfield.py 1.150: Made UnitView bounds the
+	same as the source Sheet bounds of the connectionfield; therefore,
+	all SheetViews from a Sheet have the same bounds.
+
+2006-03-27  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/connectionfieldspanel.py 1.7,
+	topo/tkgui/plotgrouppanel.py 1.49, topo/tkgui/projectionpanel.py
+	1.41, topo/tkgui/templateplotgrouppanel.py 1.8: Changed
+	PlotGroupPanel to keep track of the plot_time of the current plot,
+	which may differ from the current simulator time; this makes the
+	back and forward buttons work with all PlotGroupPanels.  Cleaned
+	up implementation of back and forward in general.
+
+	* examples/tiny.ty 1.5: Made it more obvious that the
+	learning_rate is a float
+
+2006-03-27  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.48: Added back and forward
+	buttons - only really currently working well for activity window
+
+2006-03-27  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.149: Fixed bug -- if users
+	specified the learning rate as an integer, it was being truncated
+	to an even multiple of the size of the CF, with surprising
+	results.  Now effectively promotes the rate to a float.
+
+2006-03-27  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/projection.py 1.59: Removed print statements
+	accidentally left in the previous version.
+
+	* topo/base/projection.py 1.58: Altered wording of an error
+	message.
+
+	* topo/base/projection.py 1.57: Updated documentation for
+	present_input(). Also renamed uses of the 'dest_port' variable
+	name to just 'port' within the ProjectionSheet code; before it was
+	confusing. The Projection has the dest_port and src_port concept
+	(referring to src and dest EPs), but for a ProjectionSheet should
+	it be more like 'in_port' and 'out_port'?
+
+2006-03-27  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.51: Added ALERT
+
+	* topo/tkgui/topoconsole.py 1.50: Improved error message and
+	removed stray unused code
+
+2006-03-27  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/projection.py 1.56: Removed an outdated HACKALERT.
+
+	* topo/base/projection.py 1.55: ProjectionSheet raises a TypeError
+	if an attempt is made to connect anything other than a Projection.
+
+2006-03-27  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/taggedslider.py 1.22: Corrected error in previous
+	commit.
+
+2006-03-27  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.49: Better error message; added
+	ALERT
+
+	* topo/tkgui/connectionfieldspanel.py 1.6,
+	topo/tkgui/plotgrouppanel.py 1.47, topo/tkgui/projectionpanel.py
+	1.40: Added better checks for whether various plots will be
+	successful for the current simulation
+
+	* doc/Future_Work/index_text.php 1.12: More work
+
+2006-03-27  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.19: Updated my tasks
+
+2006-03-27  chrispalmer  <chrispalmer@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_or_sf.ty 1.1: initial spatial frequency work
+
+2006-03-27  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/lissom_oo_or_reference.ty 1.16: Set V1 afferents to
+	normalize together. Set afferent connection strengths to have
+	strength 1.
+
+	* topo/base/connectionfield.py 1.148: Added delattr for _sum
+	attribute. Altered commented-out code.
+
+2006-03-25  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Tutorials/lissom_oo_or_text.php 1.7,
+	doc/Tutorials/lissom_or_text.php 1.3: Updated estimates of
+	training times based on an actual run!
+
+	* examples/Makefile 1.7: Changed to put .typ files in this
+	directory
+
+2006-03-23  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.46: Intermediate checkin; still
+	messy.  Added integer scaling option, and sketched eventual
+	cleaned up code for resizing.  Turned off sheetcoords by default
+	so that ConnectionField would work
+
+	* topo/plotting/templates.py 1.37,
+	topo/commands/or_key_white_vert_small.png 1.1: Changed default
+	size of OR key to be a smaller image
+
+	* topo/tkgui/templateplotgrouppanel.py 1.7: Turned off sheetcoords
+	by default so that ConnectionField would work
+
+2006-03-23  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/templates.py 1.36: Corrected mistype.
+
+	* topo/plotting/plot.py 1.88: Corrected the doc.
+
+	* topo/tkgui/plotgrouppanel.py 1.45: Started an implementation of
+	the scrollbar that is commented out. Deleted unused import
+	statement. Cleaned up doc and comments. Corrected the use of
+	**config by the use of **param in the __init__ method.
+
+2006-03-23  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.44: Added alert
+
+	* topo/tkgui/plotgrouppanel.py 1.43,
+	topo/tkgui/templateplotgrouppanel.py 1.6: Changed actualsize to
+	sheetcoords for clarity; made on by default
+
+	* topo/tkgui/topoconsole.py 1.48: Renamed Learning iterations to
+	indicate that it's not necessarily learning anything and it's not
+	in terms of iterations (!).  Cleaned up time remaining text.
+
+2006-03-22  chrispalmer  <chrispalmer@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.42,
+	topo/tkgui/templateplotgrouppanel.py 1.5: Added actualsize button;
+	name not yet decided
+
+	* topo/tkgui/connectionfieldspanel.py 1.5,
+	topo/tkgui/projectionpanel.py 1.39,
+	topo/tkgui/templateplotgrouppanel.py 1.4: Added the simulator name
+	to window titles to help users keep multiple simulations straight
+
+2006-03-22  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.41: Deleted unused attribute
+	self.plots in PlotGroupPanel.Added doc and comment.
+
+2006-03-22  chrispalmer  <chrispalmer@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.47: Added estimate of time remaining
+
+2006-03-22  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.40, topo/tkgui/testpattern.py
+	1.25: Changed the argument pgt_name to name for a
+	PlotGroupPanel. There is no references to template in the
+	PlotGroup class.
+
+	* topo/tkgui/plotgrouppanel.py 1.39, topo/tkgui/testpattern.py
+	1.24: Cleaned up reference to a template from PlotGroupPanel. At
+	the same time, enabled the normalize button for the
+	testpattern. It recquired to re-implement the toggle_normalize in
+	the testpattern, but it is only a temporary solution while
+	re-organizing the panel hierarchy.
+
+2006-03-22  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulator.py 1.47: Fixed bug in recent checking;
+	scheduled events were failing due to lack of a src or dest for
+	which to print information
+
+	* Makefile 1.58, doc/Makefile 1.9: Cleaned up dist package
+	generation
+
+2006-03-22  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/base/projection.py 1.54, topo/plotting/plotgroup.py 1.95,
+	topo/tests/testcfsom.py 1.18: Deleted the
+	get_in_projection_by_name in ProjectionSheet. Replaced by using
+	the projections() method now that we ensure a unique name for
+	projections to the same ProjectionSheet.
+
+	* topo/plotting/plotgroup.py 1.94: Replaced the use of
+	get_in_projection_by_name() by the use of projections(). Now that
+	the problem of having a unique name is solved, we do not need to
+	return a list of projections for a given name. Deeleted
+	correponding Aletrt. Cleaned up the doc.
+
+2006-03-22  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.57: More files to clean up for distribution
+
+	* doc/Future_Work/current_text.php 1.18: Removed completed item
+
+	* doc/Downloads/win32_text.php 1.12: Added note
+
+	* Makefile 1.56: First pass at creating dist archive
+
+2006-03-21  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/commandline.py 1.17, topo/tkgui/taggedslider.py 1.21:
+	Removed global constants Pi and PI. The only syntax is now pi.
+
+	* topo/misc/commandline.py 1.16: Removed unnecessary exec
+	statements.
+
+	* topo/misc/commandline.py 1.15: Removed unnecessary in
+	__main__.__dict__ statements.
+
+2006-03-20  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/commandline.py 1.14: Removed the start function and
+	moved the corresponding code within process_argv.
+
+2006-03-18  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/outputfns/optimized.py 1.11, topo/outputfns/basic.py 1.26:
+	Corrected DivisiveSumNormalize's test of the current_norm_value.
+
+	* .cvsignore 1.6: Added python_topo directory (which exists on
+	Windows).
+
+	* topo/plotting/plotfilesaver.py 1.27: Started changing to get
+	simulator from topo.sim.
+
+2006-03-18  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.38: Hopefully fixed longstanding
+	issues about minimum and initial plot widths. Plots should now
+	default properly to around 150 pixels wide, or larger if the Sheet
+	has more pixels than that.  The Reduce button will now allow plots
+	to be reduced down to one pixel per unit, but no further (at the
+	moment)
+
+2006-03-18  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.93, topo/tkgui/cfsheetplotpanel.py
+	1.15, topo/tkgui/connectionfieldspanel.py 1.4,
+	topo/tkgui/projectionpanel.py 1.38,
+	topo/tkgui/templateplotgrouppanel.py 1.3: Started changing to get
+	simulator from topo.sim.
+
+2006-03-18  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/tiny.ty 1.4: Added explanatory note
+
+2006-03-18  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/connectionfieldspanel.py 1.3: Removed outdated alert.
+
+	* topo/base/simulator.py 1.46: Altered a comment - no visible
+	change.
+
+	* topo/base/connectionfield.py 1.147: Altered commented-out code:
+	no visible change.
+
+2006-03-18  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/tiny.ty 1.3, topo/outputfns/basic.py 1.25: Added
+	abs()-using DivisiveL1Normalize
+
+	* examples/tiny.ty 1.2: Added more example parameters
+
+	* examples/tiny.ty 1.1: Initial version
+
+	* topo/learningfns/som.py 1.1: Moved from basic.py
+
+	* examples/cfsom_or.ty 1.33, examples/hierarchical.ty 1.39,
+	examples/obermayer_pnas90.ty 1.27, examples/som_retinotopy.ty
+	1.28, topo/tests/testcfsom.py 1.17, topo/tests/testfeaturemap.py
+	1.12, topo/tests/testpatternpresent.py 1.8,
+	topo/tests/testplotfilesaver.py 1.11, topo/tests/testplotgroup.py
+	1.17, topo/learningfns/basic.py 1.54, topo/sheets/cfsom.py 1.26:
+	Moved SOM learning functions to topo/learningfns/som
+
+	* topo/base/connectionfield.py 1.146: Added LearningFunction
+	abstract class to establish a family of objects for use with
+	GenericCFLF
+
+	* topo/responsefns/basic.py 1.29, topo/responsefns/optimized.py
+	1.19: Fixed docstrings
+
+	* topo/outputfns/basic.py 1.24: Added alert
+
+	* topo/outputfns/basic.py 1.23: Added alert.  Removed redundant
+	constructors
+
+	* topo/base/simulator.py 1.45: Added debugging messages
+
+	* topo/base/connectionfield.py 1.145: Added alert
+
+	* topo/projections/optimized.py 1.20,
+	topo/responsefns/optimized.py 1.18, topo/learningfns/optimized.py
+	1.46, topo/sheets/lissom.py 1.46: Removed out-of-date
+	LISSOM_CPointer, CFDotProduct_CPointer, CFProjection_CPointer, and
+	DivisiveHebbian_CPointer; may eventually be resurrected
+
+2006-03-17  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/cfsom_or.ty 1.32: Cleaned up and simplified
+
+	* examples/cfsom_or.ty 1.31: Changed to Chris's new topo.sim
+	format
+
+	* examples/hierarchical.ty 1.38: Fixed typo
+
+	* examples/hierarchical.ty 1.37: Sorted imports
+
+2006-03-17  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.17: Updates to my tasks.
+
+	* examples/hierarchical.ty 1.36: Set the simulator name.
+
+	* topo/base/simulator.py 1.44: Corrected an error in
+	SimSingleton's __setattribute__() method.
+
+	* topo/base/simulator.py 1.43: Removed a HACKALERT from
+	SimSingleton.
+
+	* topo/base/simulator.py 1.42: Corrected logic error in
+	SimSingleton.init() that was creating two Simulators (though it
+	left only one behind).
+
+2006-03-17  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/main.ppm 1.2, topo/tests/testcfsom.py 1.16: Removed
+	unnecessary image
+
+2006-03-17  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulator.py 1.41: Cleaned up code for
+	dictionary-style access to simulator objects. Doing
+	topo.sim['V1']=EP where EP already exists in the simulator results
+	in a warning and the object not being added. Doing
+	topo.sim['V1']=EP2 where topo.sim['V1'] already exists results in
+	the EP already in topo.sim['V1'] being overwritten with EP2 (as
+	for dictionaries). Simulator's _event_processors is now a dict
+	rather than a list to make things simpler.
+
+2006-03-17  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/time_text.php 1.3: Fixed image sizes
+
+2006-03-17  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/hierarchical.ty 1.35: Changed to use newer simulator
+	syntax: topo.sim['V1'], etc.
+
+	* topo/base/simulator.py 1.40: SimSingleton uses the simulator's
+	repr and str methods.
+
+2006-03-17  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Developer_Manual/optimization_text.php 1.4: Edited Chris's
+	text slightly
+
+2006-03-17  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.16: Updated my tasks.
+
+	* examples/som_retinotopy.ty 1.27: Reduced SOM radius slightly
+	(and random seeds are different).
+
+	* doc/Developer_Manual/index_text.php 1.3,
+	doc/Developer_Manual/optimization_text.php 1.3: Added some
+	information about how we provide optimized components. It's
+	commented out for the moment so JAB can review it.
+
+2006-03-16  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/som_retinotopy.ty 1.26, topo/responsefns/basic.py 1.28,
+	topo/responsefns/optimized.py 1.17: CFEuclideanDistance is the
+	basic Python version, CFEuclideanDistance_opt1 is the optimized C
+	version.
+
+	* examples/som_retinotopy.ty 1.25: Removed unused line of imports.
+
+	* topo/base/connectionfield.py 1.144: No visible change. Changed
+	commented-out code so it's simpler (still behaves the same).
+
+	* topo/base/connectionfield.py 1.143: Changed sum property's
+	documentation. Apart from that, no visible change - altered
+	commented-out code.
+
+2006-03-15  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/lissom_oo_or_reference.ty 1.15: Update after recent
+	class changes.
+
+	* topo/base/connectionfield.py 1.142: Removed duplicate import
+	statement.
+
+	* topo/base/connectionfield.py 1.141: Removed optimization from
+	GenericCFOF.
+
+	* topo/learningfns/basic.py 1.53: Removed unused references to
+	output_fn.
+
+	* topo/outputfns/optimized.py 1.10: DivisiveSumNormalizeCFOF sets
+	the cfs' sum attribute after normalizing. (Currently has no
+	visible effect.)
+
+	* topo/learningfns/optimized.py 1.45, topo/outputfns/optimized.py
+	1.9: Modified documentation.
+
+	* examples/lissom_oo_or.ty 1.36: Reverted names of projections -
+	changes which I accidentally left in.
+
+	* examples/laminar.ty 1.10, examples/lissom_oo_or.ty 1.35: Uses
+	DivisiveSumNormalizeCFOF_opt1 instead of GenericCFOF with
+	single_cf_fn=DivisiveSumNormalize_opt1.
+
+	* topo/projections/basic.py 1.19: Corrected location of
+	single_cf_fn for weight initialization.
+
+	* topo/base/connectionfield.py 1.140: Removed output_fn Parameter
+	accidentally left behind in CFLearningFunction.
+
+	* examples/lissom_or.ty 1.77: Uses DivisiveSumNormalizeCFOF_opt1
+	instead of GenericCFOF with
+	single_cf_fn=DivisiveSumNormalize_opt1.
+
+	* topo/outputfns/optimized.py 1.8: Corrected mistake in
+	non-optimized wrapper for DivisiveSumNormalizeCFOF.
+
+	* topo/responsefns/basic.py 1.27: Corrected call to super(), must
+	have been missed from a previous set of commits.
+
+	* topo/outputfns/optimized.py 1.7: Corrected typo (in the code).
+
+	* topo/outputfns/optimized.py 1.6: Uncommented code for
+	DivisiveSumNormalizeCFOF and added non-optimized fallback to
+	GenericCFOF(single_cf_fn=DivisiveSumNormalize).
+
+	* topo/tkgui/topoconsole.py 1.46: Added return statement so all
+	the possible locations aren't opened in open_location().
+
+	* topo/tkgui/topoconsole.py 1.45: Windows users are unlikely to
+	have the locally built documentation. Therefore, locations on the
+	web are tried if the local copies fail. Also, fixed 'about' text,
+	since the ABOUT_TEXT variable in topo/__init__ had been moved into
+	a function.
+
+	* topo/__init__.py 1.55: 'About' text can be returned or
+	printed. Default is to print, as before.
+
+2006-03-14  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.15: Update to a task.
+
+	* topo/base/connectionfield.py 1.139: learn() split tp learn() and
+	apply_output_fn(). No visible change. Also committed commented-out
+	code in CFSheet's learn().
+
+	* topo/misc/inlinec.py 1.7: Reverted to previous version
+	(mistakenly committed).
+
+	* topo/responsefns/basic.py 1.26, topo/responsefns/optimized.py
+	1.16, topo/tests/testplotgroup.py 1.16, examples/cfsom_or.ty 1.30,
+	examples/hierarchical.ty 1.34, examples/laminar.ty 1.9,
+	examples/lissom_oo_or.ty 1.34, examples/lissom_or.ty 1.76,
+	examples/obermayer_pnas90.ty 1.26, examples/som_retinotopy.ty
+	1.24, topo/misc/inlinec.py 1.6: Changed
+	response_fns.optimized.CFDotProduct to CFDotProduct_opt1. If
+	inline-optimized components aren't available, falls back to
+	basic's CFDotProduct.
+
+	* examples/laminar.ty 1.8, examples/lissom_oo_or.ty 1.33,
+	examples/lissom_or.ty 1.75, topo/learningfns/optimized.py 1.44:
+	Changed learningfns.optimized.Hebbian to Hebbian_opt1. If
+	inline-optimized components aren't available, falls back to
+	Hebbian.
+
+	* topo/base/projection.py 1.53: Added 'norm_value' Parameter to
+	OutputFunction(). This is a hack while ConnectionField assumes all
+	OutputFunctions have a norm_value.
+
+	* topo/tests/testoutputfnsoptimized.py 1.2, examples/laminar.ty
+	1.7, examples/lissom_oo_or.ty 1.32, examples/lissom_or.ty 1.74,
+	topo/outputfns/optimized.py 1.5: Changed
+	ouputfns.optimized.DivisiveSumNormalize to
+	DivisiveSumNormalize_opt1. If inline-optimized components aren't
+	available, falls back to DivisiveSumNormalize.
+
+	* examples/laminar.ty 1.6, examples/lissom_oo_or.ty 1.31,
+	examples/lissom_or.ty 1.73: Removed cache_sum attribute from
+	CFProjection.
+
+	* topo/learningfns/optimized.py 1.43: Hebbian sets cf._sum,
+	allowing the sum of the weights to be cached without using the
+	slower Python property.
+
+	* topo/base/connectionfield.py 1.138: Removed cache_sum; if _sum
+	attribute exists, it is assumed that the value is always current.
+
+	* topo/learningfns/basic.py 1.52, topo/learningfns/optimized.py
+	1.42, topo/projections/basic.py 1.18, examples/laminar.ty 1.5,
+	examples/lissom_oo_or.ty 1.30, examples/lissom_or.ty 1.72,
+	examples/obermayer_pnas90.ty 1.25, topo/base/connectionfield.py
+	1.137: Split output_fns from learning_fns. Introduced
+	CFOuputFunction class to apply the output_fn to all CFs. Some ways
+	things have been done are a little confusing and could be
+	simplified (notably caching the sum of a CF's weights), but at the
+	moment the example networks should all behave the same.
+
+	* topo/outputfns/optimized.py 1.4: Committed some commented-out
+	classes (the CF output function doesn't belong here).
+
+	* examples/homeostatic.ty 1.2: Removed apparently unused code.
+
+2006-03-13  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/__init__.py 1.8: Test of optimized output functions
+	runs automatically.
+
+	* topo/outputfns/optimized.py 1.3: Added return statements to
+	match other output functions.
+
+	* topo/outputfns/optimized.py 1.2: Corrected DivisiveSumNormalize
+	for when the desired norm_value is not 1.
+
+2006-03-12  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/outputfns/basic.py 1.22: Changed DivisiveSumNormalize so
+	that it can accept a pre-calculated norm_value for the array, if
+	one is known. If the pre-calculated value is equal to the current
+	value, no normalization operation need occur.
+
+2006-03-11  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/outputfns/optimized.py 1.1: Initial
+	version. DivisiveSumNormalize intended to be equivalent but faster
+	version of that in outputfns/basic.py
+
+	* topo/learningfns/optimized.py 1.41: The previous commit was a
+	mistake (it was supposed to be outputfns/optimized that I
+	committed, not learningfns/optimized). This is the code from
+	version 1.39.
+
+	* topo/learningfns/optimized.py 1.40,
+	topo/tests/testoutputfnsoptimized.py 1.1: Initial
+	version. DivisiveSumNormalize intended to be equivalent but faster
+	version of that in outputfns/basic.py
+
+2006-03-10  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/learningfns/optimized.py 1.39: DivisiveHebbian's
+	normalization happens every time, whether or not the output
+	activity is zero.
+
+	* topo/base/connectionfield.py 1.136: Added sum of cf's initial
+	weights.
+
+2006-03-09  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* external/mswin/setup.bat 1.7, external/mswin/setup.py 1.12:
+	Installation creates a desktop shortcut with the Topographica
+	icon.
+
+	* external/mswin/create_shortcut.vbs 1.1: Creates a desktop
+	shortcut.
+
+2006-03-08  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* external/mswin/setup.py 1.11: Fixed typo.
+
+	* external/mswin/setup.py 1.10: Removed comment left in by
+	accident.
+
+	* topo/misc/commandline.py 1.13: Filename arguments are enclosed
+	in repr() so that bits of Windows paths that look like control
+	characters don't turn into control characters. (Note: I don't know
+	that the slashes around the string were for originally.)
+
+	* external/mswin/setup.py 1.9: Batch file: changes to Topographica
+	path before running, so that the current path variable is correct.
+
+	* topo/responsefns/optimized.py 1.15: Changed syntax in
+	CFDotProduct: no visible change.
+
+	* topo/learningfns/optimized.py 1.38: Moving to c++ syntax for
+	clarity...no visible change.
+
+	* topo/misc/inlinec.py 1.5: Added verbose=0 to the inline()
+	arguments. I'm not sure it actually makes any
+	difference. Developers can set it to 2 to see more output for
+	debugging; 0 should result in less garbage output for users. See
+	the weave documentation (but good luck finding it...try
+	old.scipy.org).
+
+	* topo/misc/commandline.py 1.12: Removed apparently redundant
+	try/catch block (there is already one in inlinec.py; in any case,
+	if something other than an ImportError occurs I think a user
+	should see it).
+
+	* topo/learningfns/optimized.py 1.35: Cleanup in DivisiveHebbian -
+	no visible change.
+
+	* topo/learningfns/optimized.py 1.34: Intermediate checkin:
+	DivisiveHebbian has learning in one chunk of C, and normalization
+	in another. No visible change.
+
+	* topo/learningfns/optimized.py 1.33: Intermediate checkin: store
+	sum of cf's weights in cf.sum, and retrieve. No visible change.
+
+	* topo/base/connectionfield.py 1.135: Intermediate checkin: added
+	sum attribute to connectionfield.
+
+	* topo/learningfns/optimized.py 1.32: Normalization factor is
+	calculated as the sum of the weights each time, rather than
+	accumulating the differences and assuming they summed to 1 in the
+	previous iteration. This has a very small effect; after 20000
+	iterations, the weights are different in about the 6th decimal
+	place, and a sum over the activity in V1 differs in about the
+	fifth decimal place.
+
+2006-03-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/commandline.py 1.11: No visible change: minor change
+	to import statement.
+
+	* doc/Downloads/index_text.php 1.22: Minor correction to text.
+
+	* doc/Future_Work/current_text.php 1.14: Updated with my current
+	tasks.
+
+	* doc/Downloads/index_text.php 1.21: Changed Windows installation
+	instructions.
+
+	* setup.bat 1.11: Just calls external\mswin\setup.bat
+
+	* external/mswin/setup.bat 1.6, external/mswin/setup.py 1.8: Minor
+	changes, plus associates '.ty' files with Topographica.
+
+	* external/mswin/setup.bat 1.5: Minor change - pauses at the end
+	in case launched by double clicking.
+
+	* external/mswin/setup.py 1.7: Now generates a script that looks
+	more like the one on unix. Fixed a problem with quotation marks.
+
+	* topo/__init__.py 1.54: Added 'release' attribute, which is set
+	by the topographica script. Moved ABOUT_TEXT into the about()
+	function so that the release value is filled in once it's been
+	set, rather than before.
+
+	* Makefile 1.55: Removed setting of TOPORELEASE environment
+	variable, and replaced it by setting topo.release.
+
+	* Makefile 1.54: Removed PYTHONPATH.
+
+	* Makefile 1.53: Removed TOPOGRAPHICAPATH.
+
+2006-03-07  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* external/mswin/setup.py 1.6: Hopefully fixes the backslash
+	problem for the generated topographica.py script
+
+2006-03-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/projections/optimized.py 1.19, topo/sheets/lissom.py 1.45,
+	topo/learningfns/optimized.py 1.31, topo/responsefns/optimized.py
+	1.14: Commented out cpointer code.
+
+2006-03-06  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* external/mswin/setup.py 1.5: Corrected another mistake.
+
+	* external/mswin/setup.py 1.4: Corrected an error with quotation
+	marks.
+
+	* external/mswin/setup.bat 1.4, external/mswin/setup.py 1.3,
+	external/mswin/topographica.bat 1.3: Various changes to the
+	scripts.
+
+	* Makefile 1.52, topo/base/parameterclasses.py 1.36: Filename
+	parameter gets the path by going up a level from the directory of
+	the binary, which works on Windows and unix. There might be a
+	better way.
+
+2006-03-06  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorwindow.py 1.23: Clarified what the snapshot is,
+	to distinguish it from the network snapshot
+
+2006-03-06  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* external/mswin/python242_topo_weave.tar.gz 1.2,
+	external/mswin/python242_topo.tar.gz 1.2,
+	external/mswin/python_topo.tar.gz 1.1: Removed previous versions
+	of Python directories and added one back. The new one has weave
+	and the mingw c compiler, and is configured to use this c compiler
+	by default so it will work on windows without any extra work.
+
+	* external/mswin/setup.bat 1.3, external/mswin/setup.py 1.2,
+	external/mswin/topographica.bat 1.2: Updated to work with new
+	python_topo.tar.gz
+
+	* Makefile 1.51, external/Makefile 1.31: Instead of setting the
+	LD_LIBRARY_PATH environment variable after python has started, we
+	hard-code the lib/ as the path when we make the python binary.
+
+2006-03-04  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterclasses.py 1.35: Added a HACKALERT and
+	corrected a typo in the code.
+
+	* external/mswin/python242_topo_weave.tar.gz 1.1: Python with
+	weave from scipy. Unfortunately includes other things for the
+	moment that take up space and could be removed.
+
+	* external/mswin/setup.bat 1.2: Added note on how to get weave.
+
+	* topo/base/parameterclasses.py 1.34: Removed a HACKALERT.
+
+	* external/mswin/python242_topo.tar.gz 1.1: Python 2.4.2 with
+	Numeric, PIL, matplotlib, Pmw, Fixedpoint
+
+	* external/mswin/topographica.bat 1.1: Starts python with the
+	topographica.py script. INitial version.
+
+	* external/mswin/setup.py 1.1: Creates topographica.py
+	script. Initial version.
+
+	* external/mswin/setup.bat 1.1: Simple windows batch file to
+	install ready-made python. Initial version.
+
+	* external/mswin/util/gunzip.exe 1.1, external/mswin/util/tar.exe
+	1.1: Utilities for extracting archives.
+
+	* topo/base/parameterclasses.py 1.33, Makefile 1.50: Added
+	TOPOGRAPHICAPATH to environment variables.
+
+2006-03-03  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* external/win32/Numeric-24.2.win32-py2.4.exe 1.3: New version
+	(added binary)
+
+	* external/win32/Numeric-24.2.win32-py2.4.exe 1.2: Removed
+	apparently-corrupt file. It wasn't added as binary and isn;t the
+	same size as the original.
+
+	* doc/Future_Work/current_text.php 1.13: Updated my tasks.
+
+	* external/win32/python-2.4.2.msi 1.3: Added as a binary file.
+
+	* external/win32/python-2.4.2.msi 1.2: Not in binary format. Two
+	Windows machines I tried it on said it is invalid; it worked on
+	another.
+
+	* external/win32/python-2.4.msi 1.2: Removed Python 2.4 since it's
+	not used any more (we have 2.4.2).
+
+	* Makefile 1.49: Topograpgica script: no longer uses os.getenv() -
+	instead accesses the os.environ dictionary itself.
+
+	* Makefile 1.48: For topographica script: ignore PYTHONPATH
+	environment variable and just use our own Python's path.
+
+2006-03-03  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_or_20000.typ 1.12,
+	examples/lissom_oo_or_20000.typ 1.9: Removed saved .typ files, to
+	speed up CVS downloads
+
+	* doc/Tutorials/lissom_oo_or_text.php 1.6,
+	doc/Tutorials/lissom_or_text.php 1.2: Changed tututorial
+	instructions to ask users to build a map rather than assuming it
+	is in CVS
+
+	* Makefile 1.47, examples/Makefile 1.6: Added code to generate
+	saved example files
+
+	* doc/Future_Work/index_text.php 1.11: Added note about filenames
+	as window titles
+
+	* ChangeLog.txt 1.3: Updated with recent changes
 
 	* examples/Makefile 1.5: Added one iteration of execution
 
-	* Makefile 1.46: Changed exec_argv to process_argv to match
-	change in commandline.py
+	* Makefile 1.46: Changed exec_argv to process_argv to match change
+	in commandline.py
 
 	* topo/misc/commandline.py 1.10: Cleaned up and simplified
 
@@ -11059,3 +11914,7 @@
 	1.1, topo/image.py 1.1, topo/image_example.py 1.1, .cvsignore 1.1,
 	runtests 1.1, topographica 1.1: Start
 
+# For Emacs:
+# Local Variables: ***
+# mode:Change-Log ***
+# End: ***
