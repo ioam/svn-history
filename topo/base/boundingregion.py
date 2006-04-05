@@ -94,6 +94,17 @@ class BoundingBox(BoundingRegion):
         left,bottom,right,top = self.aarect().lbrt()
         return (left <= x <= right) and (bottom <= y <= top)
 
+    def contains_exclusive(self,x,y):
+        """
+        Return True if the given point is contained within the
+        bounding box, where the bottom and right boundaries are
+        considered exclusive.
+        """
+        left,bottom,right,top = self.aarect().lbrt()
+        return (left <= x < right) and (bottom < y <= top)
+
+
+
     def containsbb_exclusive(self,x):
         """
         Returns true if the given BoundingBox x is contained within the
