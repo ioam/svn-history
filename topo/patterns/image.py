@@ -13,7 +13,7 @@ import ImageOps
 from Numeric import array, ones, Float
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.sheet import Sheet, bounds2slice
+from topo.base.sheet import Sheet
 from topo.base.boundingregion import BoundingBox
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.parameterclasses import Filename, Number, Parameter, Enumeration
@@ -58,7 +58,7 @@ class TopoImage(ParameterizedObject):
     (Black-bordered images therefore have a black background, and
     white-bordered images have a white background. Images with no
     border have a background that is less of a contrast than a white
-    or black one).
+    or black one.)
     """    
     def __init__(self, filename, whole_image_output_fn=Identity()):
         """
@@ -70,7 +70,7 @@ class TopoImage(ParameterizedObject):
         image_array.shape = (image.size[::-1]) # getdata() returns transposed image?
         
         rows,cols=image_array.shape
-        self.image_sheet = Sheet(density=1,
+        self.image_sheet = Sheet(density=1.0,
                                  bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
                                                             ( cols/2.0, rows/2.0))))
 
@@ -78,14 +78,34 @@ class TopoImage(ParameterizedObject):
         self.background_value = edge_average(image_array)
 
 
-    def __call__(self, x, y, sheet_bounds, sheet_density, scaling, width=1.0, height=1.0):
+    def __call__(self, x, y, sheet_density, scaling, width=1.0, height=1.0):
         """
         Return pixels from the Image at the given Sheet (x,y) coordinates.
 
-        sheet_bounds, sheet_density, and scaling determine how the image is scaled
-        initially (see __apply_size_normalization).
+        scaling determines how the image is scaled initially; it can be:
+          'stretch_to_fit'
+        scale both dimensions of the image so they would fill a Sheet
+        with bounds=BoundingBox(radius=0.5)
+        (disregards the original's aspect ratio)
 
-        The image is also scaled according to the supplied width and height.
+          'fit_shortest'
+        scale the image so that its shortest dimension is made to fill
+        the corresponding dimension on a Sheet with
+        bounds=BoundingBox(radius=0.5)
+        (maintains the original's aspect ratio)
+
+          'fit_longest'
+        scale the image so that its longest dimension is made to fill
+        the corresponding dimension on a Sheet with
+        bounds=BoundingBox(radius=0.5)
+        (maintains the original's aspect ratio)
+
+          'original'
+        no scaling is applied; one pixel of the image is put in one
+        unit of the sheet on which the image being displayed
+
+
+        The image is further scaled according to the supplied width and height.
         """
         # create new image sample, filled initially with the background value
         image_sample = ones(x.shape, Float)*self.background_value
@@ -94,13 +114,13 @@ class TopoImage(ParameterizedObject):
         if width==0 or height==0:
             return image_sample
 
-        # scale the supplied coordinates to match the image
+        # scale the supplied coordinates to match the image being at density=1
         x*=sheet_density 
         y*=sheet_density
       
         # scale according to initial image scaling selected (size_normalization)
         if not scaling=='original':
-            self.__apply_size_normalization(x,y,sheet_bounds,sheet_density,scaling)
+            self.__apply_size_normalization(x,y,sheet_density,scaling)
 
         # scale according to user-specified width and height
         x/=width
@@ -125,64 +145,33 @@ class TopoImage(ParameterizedObject):
         return image_sample
 
 
-    def __apply_size_normalization(self,x,y,sheet_bounds,sheet_density,scaling):
+    def __apply_size_normalization(self,x,y,sheet_density,scaling):
         """
-        Initial image scaling (size_normalization).
+        Initial image scaling (size_normalization), relative to the
+        default retinal dimension of 1.0 in sheet coordinates.
 
-        scaling can be:
-          'stretch_to_fit'
-        scale both dimensions of the image so they fill the sheet
-        on which the image is being displayed
-        (disregards the original's aspect ratio)
-
-          'fit_shortest'
-        scale the image so that its shortest dimension is made to fit
-        the longest dimension of the sheet on which it is being displayed
-        (maintains the original's aspect ratio)
-
-          'fit_longest'
-        scale the image so that its longest dimension is made to fit
-        the shortest dimension of the sheet on which it is being displayed
-        (maintains the original's aspect ratio)
-
-          'original'
-        no scaling is applied; one pixel of the image is put in one unit
-        of the sheet on which the image being displayed
+        See __call__ for a description of the various scaling options.
         """
-        # CEBHACKALERT: temporary, sheet_density will become one again soon...
-        if type(sheet_density)!=tuple:
-            xdensity=sheet_density
-            ydensity=sheet_density
-        else:
-            xdensity,ydensity = sheet_density
-
-
-        r1,r2,c1,c2 = bounds2slice(sheet_bounds,sheet_bounds,xdensity,ydensity)        
-        sheet_rows,sheet_cols = float(r2-r1),float(c2-c1)  # (float for later divisions)
         image_rows,image_cols = self.image_sheet.activity.shape
 
         # CEBALERT: instead of an if-test, could have a class of this
         # type of function (c.f. OutputFunctions, etc).
-
-
-        # CEBHACKALERT: scaling should be done relative to the default
-        # retinal area (i.e. 1.0) rather than to the current sheet.
         if scaling=='stretch_to_fit':
-            x_sf,y_sf = image_cols/sheet_cols, image_rows/sheet_rows
+            x_sf,y_sf = image_cols/sheet_density, image_rows/sheet_density
             x*=x_sf; y*=y_sf
 
         elif scaling=='fit_shortest':
             if image_rows<image_cols:
-                sf = image_rows/sheet_rows
+                sf = image_rows/sheet_density
             else:
-                sf = image_cols/sheet_cols
+                sf = image_cols/sheet_density
             x*=sf;y*=sf
             
         elif scaling=='fit_longest':
             if image_rows<image_cols:
-                sf = image_cols/sheet_cols
+                sf = image_cols/sheet_density
             else:
-                sf = image_rows/sheet_rows
+                sf = image_rows/sheet_density
             x*=sf;y*=sf
 
         else:
@@ -211,7 +200,6 @@ class Image(PatternGenerator):
 
     
     def function(self,**params):
-        bounds  = params.get('bounds', self.bounds)
         density = params.get('density', self.density)
         x       = params.get('pattern_x',self.pattern_x)
         y       = params.get('pattern_y',self.pattern_y)
@@ -223,6 +211,6 @@ class Image(PatternGenerator):
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
 
         image = TopoImage(filename, whole_image_output_fn)
-        return image(x,y,bounds,density, size_normalization,width, height)
+        return image(x,y,density, size_normalization,width, height)
 
 
