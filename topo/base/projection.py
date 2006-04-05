@@ -32,6 +32,9 @@ class OutputFunction(ParameterizedObject):
     returned by this function.
     """
 
+    # OutputFunction is abstract
+    _abstract_class_name = "OutputFunction"
+    
     # CEBHACKALERT: can we have this here - is there a more appropriate
     # term for it, general to output functions?
     norm_value = Parameter(default=None)
