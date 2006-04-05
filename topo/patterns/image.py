@@ -58,7 +58,7 @@ class TopoImage(ParameterizedObject):
     (Black-bordered images therefore have a black background, and
     white-bordered images have a white background. Images with no
     border have a background that is less of a contrast than a white
-    or black one.
+    or black one).
     """    
     def __init__(self, filename, whole_image_output_fn=Identity()):
         """
