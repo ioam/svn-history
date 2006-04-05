@@ -60,13 +60,13 @@ class TopoImage(ParameterizedObject):
     border have a background that is less of a contrast than a white
     or black one.
     """    
-    def __init__(self, filename, output_fn=Identity()):
+    def __init__(self, filename, whole_image_output_fn=Identity()):
         """
         Create a Sheet whose activity represents the original image,
-        after having output_fn applied.
+        after having whole_image_output_fn applied.
         """
         image = ImageOps.grayscale(pImage.open(filename))
-        image_array = output_fn(array(image.getdata(),Float))
+        image_array = whole_image_output_fn(array(image.getdata(),Float))
         image_array.shape = (image.size[::-1]) # getdata() returns transposed image?
         
         rows,cols=image_array.shape
@@ -121,9 +121,6 @@ class TopoImage(ParameterizedObject):
                     # indexes outside the image are left with the background color
                     if self.image_sheet.bounds.contains_exclusive(x[i,j],y[i,j]):
                         image_sample[i,j] = self.image_sheet.activity[r[i,j],c[i,j]]
-
-        # CEBALERT: could be useful to allow local normalization over the displayed
-        # part of the image, instead of the earlier global normalization.
 
         return image_sample
 
@@ -197,6 +194,8 @@ class TopoImage(ParameterizedObject):
 class Image(PatternGenerator):
     """2D image generator."""
 
+    output_fn = OutputFunctionParameter(default=Identity())
+    
     aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.31,doc="Ratio of width to height; size*aspect_ratio gives the width.")
     size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.30,doc="Height of the image.")
     filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9,doc="Path (can be relative to Topographica's base path) to an image in e.g. PNG, JPG, TIFF, or PGM format.")
@@ -206,9 +205,10 @@ class Image(PatternGenerator):
                                      precedence=0.95,
                                      doc='How to scale the initial image size relative to the default area of 1.0.')
 
-    output_fn = OutputFunctionParameter(default=DivisiveMaxNormalize(),
-                                        precedence=0.96,
-                                        doc='How to normalize the value of each image pixel.')
+    whole_image_output_fn = OutputFunctionParameter(default=DivisiveMaxNormalize(),
+                              precedence=0.96,
+                              doc='Function applied to the whole, original image array (before any cropping).')
+
     
     def function(self,**params):
         bounds  = params.get('bounds', self.bounds)
@@ -217,12 +217,12 @@ class Image(PatternGenerator):
         y       = params.get('pattern_y',self.pattern_y)
         filename = params.get('filename',self.filename)
         size_normalization = params.get('scaling',self.size_normalization)
-        output_fn = params.get('output_fn',self.output_fn)
+        whole_image_output_fn = params.get('whole_image_output_fn',self.whole_image_output_fn)
 
         height = params.get('size',self.size)
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
 
-        image = TopoImage(filename, output_fn)
+        image = TopoImage(filename, whole_image_output_fn)
         return image(x,y,bounds,density, size_normalization,width, height)
 
 
