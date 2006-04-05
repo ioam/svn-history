@@ -1,52 +1,25 @@
 """
-Contains two classes: TopoImage and Image.
-
+Image is a PatternGenerator that displays grayscale images.
 
 $Id$
 """
 
-# CEBHACKALERT: I have to go over this file. It should be considered
-# untested. Needs to be updated following changes to Sheet and
+# CEBHACKALERT: Needs to be updated following changes to Sheet and
 # pattern generator.
 
-# CEBHACKALERT: We already have 'Image' for the image generator.
+# CEBALERT: We already have 'Image' for the image generator.
 import Image as pImage
 import ImageOps
-from Numeric import array, transpose, ones, floor, Float, divide, where
+from Numeric import array, ones, Float
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.sheet import bounds2slice, sheet2matrix
+from topo.base.sheet import Sheet, bounds2slice
+from topo.base.boundingregion import BoundingBox
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.parameterclasses import Filename, Number, Parameter, Enumeration
 from topo.base.projection import OutputFunctionParameter
 
-from topo.outputfns.basic import DivisiveMaxNormalize
-
-
-# CEBHACKALERT: this is sheet's, but for arrays
-def sheet2matrixidx_array(x,y,bounds,density):
-    """
-    Convert a point (x,y) in sheet coordinates to the integer row and
-    column index of the matrix cell in which that point falls, given a
-    bounds and density.  Returns (row,column).
-
-    Note that if coordinates along the right or bottom boundary are
-    passed into this function, the returned matrix coordinate of the
-    boundary will be just outside the matrix, because the right and
-    bottom boundaries are exclusive.
-    """
-    # CEBHACKALERT: see Sheet.__init__
-    if type(density)!=tuple:
-        left,bottom,right,top = bounds.aarect().lbrt()
-        xdensity = int(density*(right-left)) / float((right-left))
-        ydensity = int(density*(top-bottom)) / float((top-bottom))
-    else:
-        xdensity,ydensity = density
-
-    r,c = sheet2matrix(x,y,bounds,xdensity,ydensity)
-    r = floor(r)
-    c = floor(c)
-    return r, c
+from topo.outputfns.basic import DivisiveMaxNormalize,Identity
 
 
 from Numeric import sum,ravel
@@ -68,161 +41,159 @@ def edge_average(a):
         return float(edge_sum)/num_values
 
 
-def stretch_to_fit(x,y,n_rows,n_cols,height,width):
-    """
-    """
-    y_sf = divide(float(n_rows),height)
-    x_sf = divide(float(n_cols),width)
-    return x/x_sf, y/y_sf        
-
-
-# CEBHACKALERT:
-# instead of fitting to this particular retina,
-# should fit to 1.0 ?
-def fit_shortest(x,y,n_rows,n_cols,height,width):
-    """
-    """
-    longest_r_dim = max(n_rows,n_cols)
-    shortest_i_dim = min(height,width)
-    sf = divide(float(longest_r_dim),shortest_i_dim)
-    return x/sf, y/sf
-
-def fit_longest(x,y,n_rows,n_cols,height,width):
-    """
-    """
-    shortest_r_dim = min(n_rows,n_cols)
-    longest_i_dim = max(height,width)
-    sf = divide(float(shortest_r_dim),longest_i_dim)
-    return x/sf, y/sf
-
-
 class TopoImage(ParameterizedObject):
     """
+    Stores a Sheet whose activity represents the image found at
+    filename.
 
-    Stores a Numeric array representing a normalized Image. The Image
-    is converted to and stored in grayscale. It is stored at its
-    original size.
+    The image is converted to grayscale if it is not already a
+    grayscale image. See PIL's Image class for details of supported
+    image file formats.
 
-    There is also a background value, displayed at any point on the
-    retina not covered by the image. This background value is
-    calculated by calculating the mean of the pixels around the edge
-    of the image. Black-bordered images therefore have a black
-    background, and white- bordered images have a white background,
-    for example. Images with no border have a background that is less
-    of a contrast than a white or black one.
+    When called, returns an array which is a sampling of this image at
+    the given array of (x,y) coordinates. (x,y) coordinates outside
+    the image are returned as the background value (calculated as an
+    edge average: see edge_average()).
 
+    (Black-bordered images therefore have a black background, and
+    white-bordered images have a white background. Images with no
+    border have a background that is less of a contrast than a white
+    or black one.
     """    
-    def __init__(self, filename, output_fn):
+    def __init__(self, filename, output_fn=Identity()):
         """
+        Create a Sheet whose activity represents the original image,
+        after having output_fn applied.
         """
         image = ImageOps.grayscale(pImage.open(filename))
-        self.n_image_cols, self.n_image_rows = image.size
-
-        image_array = array(image.getdata(),Float)
-        image_array = output_fn(image_array)
+        image_array = output_fn(array(image.getdata(),Float))
+        image_array.shape = (image.size[::-1]) # getdata() returns transposed image?
         
-        image_array.shape = (self.n_image_rows, self.n_image_cols) # ** getdata() returns transposed image?
-        self.image_array = transpose(image_array)
-        
-        self.background_value = edge_average(self.image_array)
+        rows,cols=image_array.shape
+        self.image_sheet = Sheet(density=1,
+                                 bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
+                                                            ( cols/2.0, rows/2.0))))
+
+        self.image_sheet.activity = image_array
+        self.background_value = edge_average(image_array)
 
 
-    # CEBHACKALERT: the name and documentation have to be changed.
-    def __sheet_to_image(self,x,y,bounds,density,width,height,scaling):
+    def __call__(self, x, y, sheet_bounds, sheet_density, scaling, width=1.0, height=1.0):
         """
-        Transform the given topographica abscissae/ordinates (x) to fit
-        an image with num_pixels along that aspect.
+        Return pixels from the Image at the given Sheet (x,y) coordinates.
 
-        - translate center (Image has (0,0) as top-left corner, whereas Sheet has
-        (0,0) in the center).
+        sheet_bounds, sheet_density, and scaling determine how the image is scaled
+        initially (see __apply_size_normalization).
 
-        An Image consists of discrete pixels, whereas the x values are floating-
-        point numbers. The simplistic technique in this function uses floor() to
-        map a range to a single number.
-
-        Maybe it would be better to put image into Sheet and use BoundingBocol functions, etc.
+        The image is also scaled according to the supplied width and height.
         """
+        # create new image sample, filled initially with the background value
+        image_sample = ones(x.shape, Float)*self.background_value
 
-        # CEBHACKALERT: temporary, density will become one again soon...
-        if type(density)!=tuple:
-            xdensity=density
-            ydensity=density
-        else:
-            xdensity,ydensity = density
+        # if the height or width is zero, there's no image to display...
+        if width==0 or height==0:
+            return image_sample
 
+        # scale the supplied coordinates to match the image
+        x*=sheet_density 
+        y*=sheet_density
+      
+        # scale according to initial image scaling selected (size_normalization)
+        if not scaling=='original':
+            self.__apply_size_normalization(x,y,sheet_bounds,sheet_density,scaling)
 
-        # CEBHACKALERT: just made it work - this needs to be changed now
-        # that sheet and patterngenerator are different.
-        #n_sheet_rows,n_sheet_cols = bounds2shape(bounds,xdensity,ydensity)
-        r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
-        n_sheet_rows,n_sheet_cols = r2-r1,c2-c1
+        # scale according to user-specified width and height
+        x/=width
+        y/=height
 
-        
-        # Initial image scaling (size_normalization)
-        
-        # CEBALERT: instead of an if-test, could have a class of this
-        # type of function and generate the list from that
-        # (c.f. PatternGeneratorParameter).
-        if scaling=='fit_shortest':
-            x,y = fit_shortest(x,y,n_sheet_rows,n_sheet_cols,self.n_image_rows,self.n_image_cols)
-        elif scaling=='fit_longest':
-            x,y = fit_longest(x,y,n_sheet_rows,n_sheet_cols,self.n_image_rows,self.n_image_cols)
-        elif scaling=='stretch_to_fit':
-            x,y = stretch_to_fit(x,y,n_sheet_rows,n_sheet_cols,self.n_image_rows,self.n_image_cols)
-        elif scaling=='original':
-            pass
-        
-        x = x/width
-        y = y/height
+        # convert the sheet (x,y) coordinates to matrixidx (r,c) ones
+        r,c = self.image_sheet.sheet2matrixidx_array(x,y)
 
-        row, col = sheet2matrixidx_array(x,y,bounds,density)
-
-        # CEBALERT:
-        # Instead of doing this kind of thing, could make TopoImage a
-        # Sheet and then do this with BoundingBoxes.
-        col = col - n_sheet_cols/2.0 + self.n_image_cols/2.0
-        row = row - n_sheet_rows/2.0 + self.n_image_rows/2.0
-
-        # document what this is...
-        col = where(col>=self.n_image_cols, -col, col)
-        row = where(row>=self.n_image_rows, -row, row)
-
-        # ...and don't do this
-        return col.astype(int), row.astype(int)
-
-
-    def __call__(self, x, y, bounds, density, scaling, width=1.0, height=1.0):
-        """
-        Return pixels from the image (size-normalized according to scaling) at the given Sheet (x,y) coordinates, with width/height multiplied as specified
-        by the given width and height factors.
-
-        
-        """
- 
-        x_scaled, y_scaled = self.__sheet_to_image(x, y, bounds, density, width, height, scaling)
-        
-        image_sample = ones(x_scaled.shape, Float)*self.background_value
-
-        if self.n_image_rows==0 or self.n_image_cols==0 or width==0 or height==0:
+        # now sample image at the (r,c) corresponding to the supplied (x,y)
+        image_rows,image_cols = self.image_sheet.activity.shape
+        if image_rows==0 or image_cols==0:
             return image_sample
         else:
-            # CEBALERT: Sample image at the scaled (x,y)
-            # coordinates. You'd think there'd be a Numeric way to do
-            # this.
-            for i in xrange(len(image_sample)):
-                for j in xrange(len(image_sample[i,:])):
-                    if x_scaled[i,j] >= 0 and y_scaled[i,j] >= 0:
-                        image_sample[i,j] = self.image_array[ x_scaled[i,j], y_scaled[i,j] ]
+            # CEBALERT: is there a more Numeric way to do this?
+            rows,cols = image_sample.shape
+            for i in xrange(rows):
+                for j in xrange(cols):
+                    # indexes outside the image are left with the background color
+                    if self.image_sheet.bounds.contains_exclusive(x[i,j],y[i,j]):
+                        image_sample[i,j] = self.image_sheet.activity[r[i,j],c[i,j]]
 
-        # CEBALERT:
-        # Could be useful to allow local normalization here instead of global.             
+        # CEBALERT: could be useful to allow local normalization over the displayed
+        # part of the image, instead of the earlier global normalization.
+
         return image_sample
 
 
+    def __apply_size_normalization(self,x,y,sheet_bounds,sheet_density,scaling):
+        """
+        Initial image scaling (size_normalization).
 
-# xsee PIL for documentation
-# color to grayscale, etc
-# rotation, resize just resample no interpolation
+        scaling can be:
+          'stretch_to_fit'
+        scale both dimensions of the image so they fill the sheet
+        on which the image is being displayed
+        (disregards the original's aspect ratio)
+
+          'fit_shortest'
+        scale the image so that its shortest dimension is made to fit
+        the longest dimension of the sheet on which it is being displayed
+        (maintains the original's aspect ratio)
+
+          'fit_longest'
+        scale the image so that its longest dimension is made to fit
+        the shortest dimension of the sheet on which it is being displayed
+        (maintains the original's aspect ratio)
+
+          'original'
+        no scaling is applied; one pixel of the image is put in one unit
+        of the sheet on which the image being displayed
+        """
+        # CEBHACKALERT: temporary, sheet_density will become one again soon...
+        if type(sheet_density)!=tuple:
+            xdensity=sheet_density
+            ydensity=sheet_density
+        else:
+            xdensity,ydensity = sheet_density
+
+
+        r1,r2,c1,c2 = bounds2slice(sheet_bounds,sheet_bounds,xdensity,ydensity)        
+        sheet_rows,sheet_cols = float(r2-r1),float(c2-c1)  # (float for later divisions)
+        image_rows,image_cols = self.image_sheet.activity.shape
+
+        # CEBALERT: instead of an if-test, could have a class of this
+        # type of function (c.f. OutputFunctions, etc).
+
+
+        # CEBHACKALERT: scaling should be done relative to the default
+        # retinal area (i.e. 1.0) rather than to the current sheet.
+        if scaling=='stretch_to_fit':
+            x_sf,y_sf = image_cols/sheet_cols, image_rows/sheet_rows
+            x*=x_sf; y*=y_sf
+
+        elif scaling=='fit_shortest':
+            if image_rows<image_cols:
+                sf = image_rows/sheet_rows
+            else:
+                sf = image_cols/sheet_cols
+            x*=sf;y*=sf
+            
+        elif scaling=='fit_longest':
+            if image_rows<image_cols:
+                sf = image_cols/sheet_cols
+            else:
+                sf = image_rows/sheet_rows
+            x*=sf;y*=sf
+
+        else:
+            raise ValueError("Unknown scaling option",scaling)
+
+
+
+# CEBHACKALERT: rotation,scaling etc. just resample - there's no interpolation.
 class Image(PatternGenerator):
     """2D image generator."""
 
