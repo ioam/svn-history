@@ -72,7 +72,11 @@ class PatternGenerator(ParameterizedObject):
                         params.get('x', self.x),
                         params.get('y',self.y),
                         params.get('orientation',self.orientation))
-        return self.scale*self.function(**params)+self.offset
+
+        scale = params.get('scale',self.scale)
+        offset = params.get('offset',self.offset)
+
+        return scale*self.function(**params)+offset
 
     def __setup_xy(self,bounds,density,x,y,orientation):
         """
@@ -157,6 +161,8 @@ class Constant(PatternGenerator):
     def __call__(self,**params):
         bounds = params.get('bounds',self.bounds)
         density = params.get('density',self.density)
+        scale = params.get('scale',self.scale)
+        offset = params.get('offset',self.offset)
 
         # CEBHACKALERT: temporary, density will become one again soon...
         if type(density)!=tuple:
@@ -168,7 +174,7 @@ class Constant(PatternGenerator):
         r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
         shape = (r2-r1,c2-c1)
 
-        return self.scale*ones(shape, Float)+self.offset
+        return scale*ones(shape, Float)+offset
 
 
 class PatternGeneratorParameter(ClassSelectorParameter):
