@@ -8,10 +8,12 @@ $Id$
 """
 __version__='$Revision$'
 
+import RandomArray
+
 from topo.base.parameterclasses import Number,Parameter
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheet import bounds2slice
-import RandomArray
+from topo.base.projection import Identity
 
 
 class RandomGenerator(PatternGenerator):
@@ -25,7 +27,6 @@ class RandomGenerator(PatternGenerator):
     y       = Number(hidden = True)
     orientation   = Number(hidden = True)
 
-
     def _distrib(self,shape,**params):
         """Method for subclasses to override with a particular random distribution."""
         raise NotImplementedError
@@ -35,6 +36,7 @@ class RandomGenerator(PatternGenerator):
     def __call__(self,**params):
         bounds = params.get('bounds',self.bounds)
         density = params.get('density',self.density)
+        output_fn = params.get('output_fn',self.output_fn)
 
         # CEBHACKALERT: temporary, density will become one again soon...
         if type(density)!=tuple:
@@ -46,7 +48,10 @@ class RandomGenerator(PatternGenerator):
         r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
         shape = (r2-r1,c2-c1)
 
-        return self._distrib(shape)
+        if output_fn is Identity:
+            return self._distrib(shape)
+        else:
+            return output_fn(self._distrib(shape))
 
 
 class UniformRandom(RandomGenerator):
