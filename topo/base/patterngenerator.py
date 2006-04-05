@@ -15,7 +15,7 @@ from parameterizedobject import ParameterizedObject
 from boundingregion import BoundingBox, BoundingRegionParameter
 from sheet import matrixidx2sheet, bounds2slice
 from parameterclasses import Parameter,Number,ClassSelectorParameter
-
+## from projection import OutputFunctionParameter, Identity
 
 
 class PatternGenerator(ParameterizedObject):
@@ -55,6 +55,10 @@ class PatternGenerator(ParameterizedObject):
     offset = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.11,
                     doc="Additive offset to input pattern, defaulting to 0.0")
 
+##     output_fn  = OutputFunctionParameter(default=Identity(),
+##                                          precedence=0.08,
+##                                          doc='Function applied to the pattern array after it has been created.')
+
 
     def __call__(self,**params):
         """
@@ -67,7 +71,7 @@ class PatternGenerator(ParameterizedObject):
         # CEBHACKALERT: does anyone else think this necessary? If not, let's
         # remove it. If it stays, it should be added to the other __call__ methods.
         for item in params:
-            if not isinstance(item,Parameter):
+            if item not in self.params():
                 self.warning("'%s' was ignored (not a Parameter)."%item)                
         self.verbose("params = ",params)
         self.__setup_xy(params.get('bounds',self.bounds),
@@ -78,8 +82,14 @@ class PatternGenerator(ParameterizedObject):
 
         scale = params.get('scale',self.scale)
         offset = params.get('offset',self.offset)
+##         output_fn = params.get('output_fn',self.output_fn)
 
         return scale*self.function(**params)+offset
+
+##         if output_fn is not Identity:
+##             return scale*self.function(**params)+offset
+##         else:
+##             return output_fn(scale*self.function(**params)+offset)
 
     def __setup_xy(self,bounds,density,x,y,orientation):
         """
