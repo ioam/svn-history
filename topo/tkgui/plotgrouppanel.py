@@ -195,8 +195,9 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 #       self.plot_frame = self.scrollbar.interior()
 
         # For the first plot, use the INITIAL_PLOT_HEIGHT to calculate zoom.
-        self.initial_plot = True
-        self.zoom_factor = 1
+	self.initial_plot=True
+	self.master_zoom=[1,1]
+	### JCALERT! renamed to min_master_zoom
 	self.min_zoom_factor = 1
         
         self.control_frame = Frame(self)
@@ -281,51 +282,53 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         self.plot_time=copy.copy(self.console.simulator.time())
 
 
-    def scale_images(self):
-        """
-        It is assumed that the PlotGroup code has not scaled the bitmap to the size currently
-        desired by the GUI.
-        """     
+    def _compute_max_height(self,sheetcoords):
+	"""
+	Subfunction that computes the maximum height for the PlotGroup,
+	specifying if sheetcoords is 0 or one, the calcul beeing 
+	different according to this parameter.
+	"""
         ### Should probably compute an initial master_zoom for both 
         ### sheetcoords=1 and sheetcoords=0, and then we can switch back
         ### and forth between them at will.
-        if self.sheetcoords==1:
+        if sheetcoords==1:
 	    sheet_heights = [(topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[3]
 			      -topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[1])
 			     for b in self.bitmaps if b.resize]
-	    max_sheet_height = float(reduce(max,sheet_heights))
+	    max_sheet_height = max(sheet_heights)
             max_density = float(reduce(max,[topo.sim.objects(Sheet)[b.plot_src_name].density
 					    for b in self.bitmaps if b.resize]))
             max_height = max_density*max_sheet_height
         else:
 	    max_height = float(reduce(max,[b.height() for b in self.bitmaps if b.resize]))
 
+	return max_height
+
+	
+    def scale_images(self):
+        """
+        It is assumed that the PlotGroup code has not scaled the bitmap to the size currently
+        desired by the GUI.
+        """          
+	max_height = self._compute_max_height(self.sheetcoords)
+	### JCALERT: that cannot be in the constructor for the moment, because when creating the 
+	### panel, there is no PlotGroup assigned to it... It will change when all will be inserted 
+	### in the PlotGroup (i.e scale_image, set_initial_master_zoom, compute_max_height...)
+	if self.initial_plot:
+	    self._set_initial_master_zoom()
+
 	tmp_list = []
 
- 	### JCALERT/JABALERT! The calculation of the initial and minimum sizes
-        ### might need to be in a sub-function so that it can be overridden
-        ### for ProjectionPanel.  It also might be necessary to move the
-        ### calculation into PlotGroup, because similar things will be needed
-        ### even when saving plots directly to disk.
-	if (self.initial_plot == True):
-            if (max_height == 0 or max_height >= self.INITIAL_PLOT_HEIGHT):
-	       self.zoom_factor = 1
-            else:
-	       self.zoom_factor = int(self.INITIAL_PLOT_HEIGHT/max_height)
-               self.reduce_button.config(state=NORMAL)
-	    self.initial_plot=False
-
 	for bitmap in self.bitmaps:
-
             if not bitmap.resize:
                 adjust=1
             else:
 		if self.sheetcoords==1:
                     s = topo.sim.objects(Sheet).get(bitmap.plot_src_name,None)
                      # Maybe: rename zoom_factor to master_zoom, and adjust to zoom_factor
-		    adjust=self.zoom_factor*self.sizeconvertfn(max_height/float(s.density))
+		    adjust=self.master_zoom[1]*self.sizeconvertfn(max_height/float(s.density))
 		else:
-		    adjust=self.zoom_factor*self.sizeconvertfn(max_height/bitmap.height())
+		    adjust=self.master_zoom[0]*self.sizeconvertfn(max_height/bitmap.height())
                               
             tmp_list = tmp_list + [bitmap.zoom(adjust)]
 	
@@ -341,6 +344,30 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         else:
             self.forward_button.config(state=NORMAL)
         
+
+    def _set_initial_master_zoom(self):
+	""" 
+	Subfunction that set the initial master zooms for both the sheet
+	coordinates and the matrix coordinates case. 
+	"""
+        ### JCALERT/JABALERT! The calculation of the initial and minimum sizes
+        ### might need to be in a sub-function so that it can be overridden
+        ### for ProjectionPanel.  It also might be necessary to move the
+        ### calculation into PlotGroup, because similar things will be needed
+        ### even when saving plots directly to disk.
+	max_height = self._compute_max_height(0)
+	if (max_height == 0 or max_height >= self.INITIAL_PLOT_HEIGHT):
+	    self.master_zoom[0] = 1
+	else:
+	    self.master_zoom[0]= int(self.INITIAL_PLOT_HEIGHT/max_height)
+	max_height = self._compute_max_height(1)
+	if (max_height == 0 or max_height >= self.INITIAL_PLOT_HEIGHT):
+	    self.master_zoom[1] = 1
+	else:
+	    self.master_zoom[1]= int(self.INITIAL_PLOT_HEIGHT/max_height)
+	    self.reduce_button.config(state=NORMAL)
+	self.initial_plot=False
+	    
 
     def display_plots(self):
         """
@@ -431,10 +458,11 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 
     def reduce(self):
         """Function called by Widget to reduce the zoom factor"""
-        if self.zoom_factor > self.min_zoom_factor:
-            self.zoom_factor = self.zoom_factor - 1
+        if min(self.master_zoom) > self.min_zoom_factor:	
+	    self.master_zoom[0] = self.master_zoom[0] - 1
+	    self.master_zoom[1] = self.master_zoom[1] - 1    
 
-        if self.zoom_factor == self.min_zoom_factor:
+        if min(self.master_zoom) == self.min_zoom_factor:
             self.reduce_button.config(state=DISABLED)
          
         self.load_images()
@@ -445,8 +473,8 @@ class PlotGroupPanel(Frame,ParameterizedObject):
     def enlarge(self):
         """Function called by Widget to increase the zoom factor"""
         self.reduce_button.config(state=NORMAL)
-        self.zoom_factor = self.zoom_factor + 1
-
+        self.master_zoom[0] = self.master_zoom[0] + 1
+	self.master_zoom[1] = self.master_zoom[1] + 1
         self.load_images()
         self.scale_images()
         self.display_plots()
