@@ -55,7 +55,8 @@ class TestImage(unittest.TestCase):
         assert_array_almost_equal(image_array,image())
 
 
-    # CB: this test is failing because Image is not right
+    # CB: this test is failing because of sheet2matrix()/sheet2matrixidx();
+    # it might not be possible to stop it failing.
     def test_vertical_oddimage_oddsheet__horizontal_evenimage_oddsheet(self):
         """
         Test vertical centering for odd sheet, odd image, and horizontal
