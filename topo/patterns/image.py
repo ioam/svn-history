@@ -211,6 +211,6 @@ class Image(PatternGenerator):
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
 
         image = TopoImage(filename, whole_image_output_fn)
-        return image(x,y,density, size_normalization,width, height)
+        return image(x,y,float(density),size_normalization,float(width),float(height))
 
 
