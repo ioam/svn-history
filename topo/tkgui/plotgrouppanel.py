@@ -197,8 +197,8 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         # For the first plot, use the INITIAL_PLOT_HEIGHT to calculate zoom.
 	self.initial_plot=True
 	self.master_zoom=[1,1]
-	### JCALERT! renamed to min_master_zoom
-	self.min_zoom_factor = 1
+	self.min_master_zoom = 1
+	self.zoom_factor=1.2
         
         self.control_frame = Frame(self)
         self.control_frame.pack(side=TOP,expand=YES,fill=X)
@@ -288,16 +288,13 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 	specifying if sheetcoords is 0 or one, the calcul beeing 
 	different according to this parameter.
 	"""
-        ### Should probably compute an initial master_zoom for both 
-        ### sheetcoords=1 and sheetcoords=0, and then we can switch back
-        ### and forth between them at will.
         if sheetcoords==1:
 	    sheet_heights = [(topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[3]
-			      -topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[1])
-			     for b in self.bitmaps if b.resize]
-	    max_sheet_height = max(sheet_heights)
-            max_density = float(reduce(max,[topo.sim.objects(Sheet)[b.plot_src_name].density
-					    for b in self.bitmaps if b.resize]))
+ 			      -topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[1])
+ 			     for b in self.bitmaps if b.resize]
+ 	    max_sheet_height = max(sheet_heights)
+	    max_density = float(reduce(max,[topo.sim.objects(Sheet)[b.plot_src_name].density
+						    for b in self.bitmaps if b.resize]))
             max_height = max_density*max_sheet_height
         else:
 	    max_height = float(reduce(max,[b.height() for b in self.bitmaps if b.resize]))
@@ -310,7 +307,6 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         It is assumed that the PlotGroup code has not scaled the bitmap to the size currently
         desired by the GUI.
         """          
-	max_height = self._compute_max_height(self.sheetcoords)
 	### JCALERT: that cannot be in the constructor for the moment, because when creating the 
 	### panel, there is no PlotGroup assigned to it... It will change when all will be inserted 
 	### in the PlotGroup (i.e scale_image, set_initial_master_zoom, compute_max_height...)
@@ -319,18 +315,22 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 
 	tmp_list = []
 
+	sheet_heights = [(topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[3]
+ 			      -topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[1])
+ 			     for b in self.bitmaps if b.resize]
+	max_sheet_height = max(sheet_heights)
+
 	for bitmap in self.bitmaps:
             if not bitmap.resize:
-                adjust=1
+                scaling_factor = 1
             else:
-		if self.sheetcoords==1:
+		if self.sheetcoords==1:		   
                     s = topo.sim.objects(Sheet).get(bitmap.plot_src_name,None)
-                     # Maybe: rename zoom_factor to master_zoom, and adjust to zoom_factor
-		    adjust=self.master_zoom[1]*self.sizeconvertfn(max_height/float(s.density))
+		    scaling_factor=self.sizeconvertfn(self.master_zoom[1]/float(s.density)/max_sheet_height)
 		else:
-		    adjust=self.master_zoom[0]*self.sizeconvertfn(max_height/bitmap.height())
+		    scaling_factor=self.sizeconvertfn(self.master_zoom[0]/float(bitmap.height()))
                               
-            tmp_list = tmp_list + [bitmap.zoom(adjust)]
+            tmp_list = tmp_list + [bitmap.zoom(scaling_factor)]
 	
 	self.zoomed_images = [ImageTk.PhotoImage(im) for im in tmp_list]
             
@@ -356,15 +356,16 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         ### calculation into PlotGroup, because similar things will be needed
         ### even when saving plots directly to disk.
 	max_height = self._compute_max_height(0)
-	if (max_height == 0 or max_height >= self.INITIAL_PLOT_HEIGHT):
-	    self.master_zoom[0] = 1
+	if (max_height >= self.INITIAL_PLOT_HEIGHT):
+	    ### rename to matrix_max_plot_height
+	    self.master_zoom[0] = max_height
 	else:
-	    self.master_zoom[0]= int(self.INITIAL_PLOT_HEIGHT/max_height)
+	    self.master_zoom[0]= self.INITIAL_PLOT_HEIGHT
 	max_height = self._compute_max_height(1)
-	if (max_height == 0 or max_height >= self.INITIAL_PLOT_HEIGHT):
-	    self.master_zoom[1] = 1
+	if (max_height >= self.INITIAL_PLOT_HEIGHT):
+	    self.master_zoom[1] = max_height
 	else:
-	    self.master_zoom[1]= int(self.INITIAL_PLOT_HEIGHT/max_height)
+	    self.master_zoom[1]= self.INITIAL_PLOT_HEIGHT
 	    self.reduce_button.config(state=NORMAL)
 	self.initial_plot=False
 	    
@@ -458,11 +459,11 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 
     def reduce(self):
         """Function called by Widget to reduce the zoom factor"""
-        if min(self.master_zoom) > self.min_zoom_factor:	
-	    self.master_zoom[0] = self.master_zoom[0] - 1
-	    self.master_zoom[1] = self.master_zoom[1] - 1    
+        if min(self.master_zoom) > self.min_master_zoom:	
+	    self.master_zoom[0] = self.master_zoom[0]/self.zoom_factor
+	    self.master_zoom[1] = self.master_zoom[1]/self.zoom_factor    
 
-        if min(self.master_zoom) == self.min_zoom_factor:
+        if min(self.master_zoom) <= self.min_master_zoom:
             self.reduce_button.config(state=DISABLED)
          
         self.load_images()
@@ -473,8 +474,8 @@ class PlotGroupPanel(Frame,ParameterizedObject):
     def enlarge(self):
         """Function called by Widget to increase the zoom factor"""
         self.reduce_button.config(state=NORMAL)
-        self.master_zoom[0] = self.master_zoom[0] + 1
-	self.master_zoom[1] = self.master_zoom[1] + 1
+        self.master_zoom[0] = self.master_zoom[0]*self.zoom_factor
+	self.master_zoom[1] = self.master_zoom[1]*self.zoom_factor
         self.load_images()
         self.scale_images()
         self.display_plots()
