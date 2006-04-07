@@ -57,8 +57,9 @@ class ProjectionPanel(CFSheetPlotPanel):
     def __init__(self,parent,console=None,pgt_name=None,**config):
         super(ProjectionPanel,self).__init__(parent,console,pgt_name,**config)
 
-        self.MIN_PLOT_WIDTH = 1
-        self.INITIAL_PLOT_WIDTH = 13
+        self.MIN_PLOT_HEIGHT = 1
+        self.INITIAL_PLOT_HEIGHT = 6
+        self.min_master_zoom=1
 
         self.density_str = StringVar()
         self.density_str.set('10.0')
@@ -234,7 +235,17 @@ class ProjectionPanel(CFSheetPlotPanel):
         exec self.cmdname.get()      
         # self.situate is defined in the super class CFSheetPlotPanel
         self.pe_group.situate= self.situate
- 
+
+    ### JCALERT It has to be re-implemented for the projectionpanel,
+    ### but this is only a momentary version that requires more work.
+    def _set_initial_master_zoom(self):
+	""" 
+	Subfunction that set the initial master zooms for both the sheet
+	coordinates and the matrix coordinates case. 
+	"""
+        self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
+        self.initial_plot=False
+
 
     def display_plots(self):
         """
@@ -243,7 +254,7 @@ class ProjectionPanel(CFSheetPlotPanel):
         """
         if self.pe_group:
             # Generate the zoomed images.
-            self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.zoom_factor))
+            self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.height_of_tallest_plot))
                                   for im in self.pe_group.bitmaps]
             old_canvases = self.canvases
             self.canvases = [Canvas(self.plot_frame,
