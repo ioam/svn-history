@@ -213,6 +213,147 @@ class SquareGrating(PatternGenerator):
 
 
 
+
+
+# CEBHACKALERT: not sure where this class should go.  Maybe it could
+# be generalized further and moved elsewhere.
+# Also, will need updating when Sheet is cleaned up.
+from Numeric import ones
+
+from topo.base.parameterizedobject import ParameterizedObject
+from topo.base.sheet import Sheet
+from topo.base.boundingregion import BoundingBox
+from topo.base.projection import Identity
+class PatternSampler(ParameterizedObject):
+    """
+    Stores a Sheet whose activity represents the supplied pattern_array,
+    and when called will resample that array at the supplied Sheet coordinates
+    according to the supplied scaling parameters.
+
+    (x,y) coordinates outside the pattern_array are returned as the
+    background value.
+    """
+
+    def __init__(self, pattern_array, whole_pattern_output_fn=Identity(), background_value=0.0):
+        """
+        Create a Sheet whose activity is pattern_array (where pattern_array
+        is a Numeric array) after application of whole_pattern_output_fn.
+        """
+        super(PatternSampler,self).__init__()
+        
+        rows,cols=pattern_array.shape
+        self.pattern_sheet = Sheet(density=1.0,
+                                 bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
+                                                            ( cols/2.0, rows/2.0))))
+        self.pattern_sheet.activity = whole_pattern_output_fn(pattern_array)
+        self.background_value = background_value
+        
+
+    def __call__(self, x, y, sheet_density, scaling, width=1.0, height=1.0):
+        """
+        Return pixels from the pattern at the given Sheet (x,y) coordinates.
+
+        sheet_density should be the density of the sheet on which the pattern
+        is to be drawn.
+
+        scaling determines how the pattern is scaled initially; it can be:
+          'stretch_to_fit'
+        scale both dimensions of the pattern so they would fill a Sheet
+        with bounds=BoundingBox(radius=0.5)
+        (disregards the original's aspect ratio)
+
+          'fit_shortest'
+        scale the pattern so that its shortest dimension is made to fill
+        the corresponding dimension on a Sheet with
+        bounds=BoundingBox(radius=0.5)
+        (maintains the original's aspect ratio)
+
+          'fit_longest'
+        scale the pattern so that its longest dimension is made to fill
+        the corresponding dimension on a Sheet with
+        bounds=BoundingBox(radius=0.5)
+        (maintains the original's aspect ratio)
+
+          'original'
+        no scaling is applied; one pixel of the pattern is put in one
+        unit of the sheet on which the pattern being displayed
+
+
+        The pattern is further scaled according to the supplied width and height.
+        """
+        # create new pattern sample, filled initially with the background value
+        pattern_sample = ones(x.shape, Float)*self.background_value
+
+        # if the height or width is zero, there's no pattern to display...
+        if width==0 or height==0:
+            return pattern_sample
+
+        # scale the supplied coordinates to match the pattern being at density=1
+        x*=sheet_density 
+        y*=sheet_density
+      
+        # scale according to initial pattern scaling selected (size_normalization)
+        if not scaling=='original':
+            self.__apply_size_normalization(x,y,sheet_density,scaling)
+
+        # scale according to user-specified width and height
+        x/=width
+        y/=height
+
+        # convert the sheet (x,y) coordinates to matrixidx (r,c) ones
+        r,c = self.pattern_sheet.sheet2matrixidx_array(x,y)
+
+        # now sample pattern at the (r,c) corresponding to the supplied (x,y)
+        pattern_rows,pattern_cols = self.pattern_sheet.activity.shape
+        if pattern_rows==0 or pattern_cols==0:
+            return pattern_sample
+        else:
+            # CEBALERT: is there a more Numeric way to do this?
+            rows,cols = pattern_sample.shape
+            for i in xrange(rows):
+                for j in xrange(cols):
+                    # indexes outside the pattern are left with the background color
+                    if self.pattern_sheet.bounds.contains_exclusive(x[i,j],y[i,j]):
+                        pattern_sample[i,j] = self.pattern_sheet.activity[r[i,j],c[i,j]]
+
+        return pattern_sample
+
+
+    def __apply_size_normalization(self,x,y,sheet_density,scaling):
+        """
+        Initial pattern scaling (size_normalization), relative to the
+        default retinal dimension of 1.0 in sheet coordinates.
+
+        See __call__ for a description of the various scaling options.
+        """
+        pattern_rows,pattern_cols = self.pattern_sheet.activity.shape
+
+        # CEBALERT: instead of an if-test, could have a class of this
+        # type of function (c.f. OutputFunctions, etc).
+        if scaling=='stretch_to_fit':
+            x_sf,y_sf = pattern_cols/sheet_density, pattern_rows/sheet_density
+            x*=x_sf; y*=y_sf
+
+        elif scaling=='fit_shortest':
+            if pattern_rows<pattern_cols:
+                sf = pattern_rows/sheet_density
+            else:
+                sf = pattern_cols/sheet_density
+            x*=sf;y*=sf
+            
+        elif scaling=='fit_longest':
+            if pattern_rows<pattern_cols:
+                sf = pattern_cols/sheet_density
+            else:
+                sf = pattern_rows/sheet_density
+            x*=sf;y*=sf
+
+        else:
+            raise ValueError("Unknown scaling option",scaling)
+
+
+
+
 # CEBHACKALERT: this will be re-done; it is basically just the old
 # Image class.
 
