@@ -8,7 +8,7 @@ __version__='$Revision$'
 
 import __main__
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
-     Entry, Canvas, FLAT
+     Entry, Canvas, FLAT, Checkbutton
 import Pmw
 import ImageTk
 from math import ceil
@@ -18,11 +18,12 @@ from itertools import chain
 import topo
 from topo.misc.keyedlist import KeyedList
 from topo.base.projection import ProjectionSheet
+from topo.base.sheet import Sheet
+import topo.base.connectionfield
 from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import plotgroup_dict, ProjectionPlotGroup
 
-from cfsheetplotpanel import CFSheetPlotPanel
-from plotgrouppanel import PlotGroupPanel
+from templateplotgrouppanel import TemplatePlotGroupPanel
 import topoconsole
 
 ### JCALERT! See if we could delete this import * and replace it...
@@ -53,10 +54,19 @@ def cmp_projections(p1,p2):
 
 ### JABALERT: Maybe this should be called CFProjectionPanel instead,
 ### since it is only valid for CFProjections.
-class ProjectionPanel(CFSheetPlotPanel):
+class ProjectionPanel(TemplatePlotGroupPanel):
     def __init__(self,parent,console=None,pgt_name=None,**config):
         super(ProjectionPanel,self).__init__(parent,console,pgt_name,**config)
 
+        self.region = StringVar()
+        self.region.set('None')
+
+        self.__params_frame = Frame(master=self)
+        self.__params_frame.pack(side=LEFT,expand=YES,fill=X)
+
+        self._add_situate_button()
+        self._add_region_menu()
+        
         self.MIN_PLOT_HEIGHT = 1
         self.INITIAL_PLOT_HEIGHT = 6
         self.min_master_zoom=1
@@ -84,7 +94,52 @@ class ProjectionPanel(CFSheetPlotPanel):
         self.auto_refresh_checkbutton.invoke()
         self.refresh()
 
+    def _add_region_menu(self):
+        """
+        This function adds a Sheet: menu that queries the active
+        simulation for the list of options.  When an update is made,
+        _region_refresh() is called.  It can either call the refresh()
+        funcion, or update another menu, and so on.
+        """
 
+        # Create the item list for CFSheet 'Sheet'  This will not change
+        # since this window will only examine one Simulator.
+        sim = topoconsole.active_sim()
+        self._sim_eps = [ep for ep in sim.objects(Sheet).values()
+                  if isinstance(ep,topo.base.connectionfield.CFSheet)]
+	self._sim_eps.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
+        sim_ep_names = [ep.name for ep in self._sim_eps]
+        if len(sim_ep_names) > 0:
+            self.region.set(sim_ep_names[0])
+
+        # The GUI label says Sheet, not CFSheet, because users probably 
+        # don't need to worry about the distinction.
+        self.opt_menu = Pmw.OptionMenu(self.__params_frame,
+                       command = self.region_refresh,
+                       labelpos = 'w',
+                       label_text = 'Sheet:',
+                       menubutton_textvariable = self.region,
+                       items = sim_ep_names)
+        self.opt_menu.pack(side=LEFT)
+
+    def _add_situate_button(self):
+        
+        self.situate = 0
+        self.situate_checkbutton = Checkbutton(self.__params_frame,
+                                                    text="Situate",
+                                                    command=self.toggle_situate)
+        self.situate_checkbutton.pack(side=LEFT)
+
+    def toggle_situate(self):
+        """Set the attribute situate"""
+        self.situate = not self.situate
+        if self.pe_group != None:
+            self.pe_group.situate = self.situate
+        self.initial_plot = True
+        self.height_of_tallest_plot = self.min_master_zoom = 1
+        self.refresh()
+
+        
     ### JABHACKALERT!
     ###
     ### This function should test the projections list from a Sheet to
@@ -153,8 +208,7 @@ class ProjectionPanel(CFSheetPlotPanel):
         self.params_frame2.pack(side=LEFT,expand=YES,fill=X)
 
         self._create_projection_dict(self.region.get())
-
-        
+       
         self.projection_menu = Pmw.OptionMenu(self.params_frame2,
                        command = self.projection_refresh,
                        labelpos = 'w',
