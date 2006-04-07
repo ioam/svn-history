@@ -41,84 +41,75 @@ def edge_average(a):
         return float(edge_sum)/num_values
 
 
-class TopoImage(ParameterizedObject):
+class PatternSampler(ParameterizedObject):
     """
-    Stores a Sheet whose activity represents the image found at
-    filename.
+    Stores a Sheet whose activity represents the supplied pattern_array,
+    and when called will resample that array at the supplied Sheet coordinates
+    according to the supplied scaling parameters.
 
-    The image is converted to grayscale if it is not already a
-    grayscale image. See PIL's Image class for details of supported
-    image file formats.
+    (x,y) coordinates outside the pattern_array are returned as the
+    background value.
+    """
 
-    When called, returns an array which is a sampling of this image at
-    the given array of (x,y) coordinates. (x,y) coordinates outside
-    the image are returned as the background value (calculated as an
-    edge average: see edge_average()).
-
-    (Black-bordered images therefore have a black background, and
-    white-bordered images have a white background. Images with no
-    border have a background that is less of a contrast than a white
-    or black one.)
-    """    
-    def __init__(self, filename, whole_image_output_fn=Identity()):
+    def __init__(self, pattern_array, whole_pattern_output_fn=Identity(), background_value=0.0):
         """
-        Create a Sheet whose activity represents the original image,
-        after having whole_image_output_fn applied.
+        Create a Sheet whose activity is pattern_array (where pattern_array
+        is a Numeric array) after application of whole_pattern_output_fn.
         """
-        image = ImageOps.grayscale(pImage.open(filename))
-        image_array = whole_image_output_fn(array(image.getdata(),Float))
-        image_array.shape = (image.size[::-1]) # getdata() returns transposed image?
+        super(PatternSampler,self).__init__()
         
-        rows,cols=image_array.shape
-        self.image_sheet = Sheet(density=1.0,
+        rows,cols=pattern_array.shape
+        self.pattern_sheet = Sheet(density=1.0,
                                  bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
                                                             ( cols/2.0, rows/2.0))))
-
-        self.image_sheet.activity = image_array
-        self.background_value = edge_average(image_array)
-
+        self.pattern_sheet.activity = whole_pattern_output_fn(pattern_array)
+        self.background_value = background_value
+        
 
     def __call__(self, x, y, sheet_density, scaling, width=1.0, height=1.0):
         """
-        Return pixels from the Image at the given Sheet (x,y) coordinates.
+        Return pixels from the pattern at the given Sheet (x,y) coordinates.
 
-        scaling determines how the image is scaled initially; it can be:
+        sheet_density should be the density of the sheet on which the pattern
+        is to be drawn.
+
+        scaling determines how the pattern is scaled initially; it can be:
           'stretch_to_fit'
-        scale both dimensions of the image so they would fill a Sheet
+        scale both dimensions of the pattern so they would fill a Sheet
         with bounds=BoundingBox(radius=0.5)
         (disregards the original's aspect ratio)
 
           'fit_shortest'
-        scale the image so that its shortest dimension is made to fill
+        scale the pattern so that its shortest dimension is made to fill
         the corresponding dimension on a Sheet with
         bounds=BoundingBox(radius=0.5)
         (maintains the original's aspect ratio)
 
           'fit_longest'
-        scale the image so that its longest dimension is made to fill
+        scale the pattern so that its longest dimension is made to fill
         the corresponding dimension on a Sheet with
         bounds=BoundingBox(radius=0.5)
         (maintains the original's aspect ratio)
 
           'original'
-        no scaling is applied; one pixel of the image is put in one
-        unit of the sheet on which the image being displayed
+        no scaling is applied; one pixel of the pattern is put in one
+        unit of the sheet on which the pattern being displayed
 
 
-        The image is further scaled according to the supplied width and height.
+        The pattern is further scaled according to the supplied width and height.
         """
-        # create new image sample, filled initially with the background value
-        image_sample = ones(x.shape, Float)*self.background_value
+        # create new pattern sample, filled initially with the background value
+        pattern_sample = ones(x.shape, Float)*self.background_value
 
-        # if the height or width is zero, there's no image to display...
+        # if the height or width is zero, there's no pattern to display...
         if width==0 or height==0:
-            return image_sample
+            return pattern_sample
 
-        # scale the supplied coordinates to match the image being at density=1
+        # scale the supplied coordinates to match the pattern being at density=1
         x*=sheet_density 
         y*=sheet_density
       
-        # scale according to initial image scaling selected (size_normalization)
+        # scale according to initial pattern scaling selected (size_normalization)
         if not scaling=='original':
             self.__apply_size_normalization(x,y,sheet_density,scaling)
 
@@ -127,55 +118,82 @@ class TopoImage(ParameterizedObject):
         y/=height
 
         # convert the sheet (x,y) coordinates to matrixidx (r,c) ones
-        r,c = self.image_sheet.sheet2matrixidx_array(x,y)
+        r,c = self.pattern_sheet.sheet2matrixidx_array(x,y)
 
-        # now sample image at the (r,c) corresponding to the supplied (x,y)
-        image_rows,image_cols = self.image_sheet.activity.shape
-        if image_rows==0 or image_cols==0:
-            return image_sample
+        # now sample pattern at the (r,c) corresponding to the supplied (x,y)
+        pattern_rows,pattern_cols = self.pattern_sheet.activity.shape
+        if pattern_rows==0 or pattern_cols==0:
+            return pattern_sample
         else:
             # CEBALERT: is there a more Numeric way to do this?
-            rows,cols = image_sample.shape
+            rows,cols = pattern_sample.shape
             for i in xrange(rows):
                 for j in xrange(cols):
-                    # indexes outside the image are left with the background color
-                    if self.image_sheet.bounds.contains_exclusive(x[i,j],y[i,j]):
-                        image_sample[i,j] = self.image_sheet.activity[r[i,j],c[i,j]]
+                    # indexes outside the pattern are left with the background color
+                    if self.pattern_sheet.bounds.contains_exclusive(x[i,j],y[i,j]):
+                        pattern_sample[i,j] = self.pattern_sheet.activity[r[i,j],c[i,j]]
 
-        return image_sample
+        return pattern_sample
 
 
     def __apply_size_normalization(self,x,y,sheet_density,scaling):
         """
-        Initial image scaling (size_normalization), relative to the
+        Initial pattern scaling (size_normalization), relative to the
         default retinal dimension of 1.0 in sheet coordinates.
 
         See __call__ for a description of the various scaling options.
         """
-        image_rows,image_cols = self.image_sheet.activity.shape
+        pattern_rows,pattern_cols = self.pattern_sheet.activity.shape
 
         # CEBALERT: instead of an if-test, could have a class of this
         # type of function (c.f. OutputFunctions, etc).
         if scaling=='stretch_to_fit':
-            x_sf,y_sf = image_cols/sheet_density, image_rows/sheet_density
+            x_sf,y_sf = pattern_cols/sheet_density, pattern_rows/sheet_density
             x*=x_sf; y*=y_sf
 
         elif scaling=='fit_shortest':
-            if image_rows<image_cols:
-                sf = image_rows/sheet_density
+            if pattern_rows<pattern_cols:
+                sf = pattern_rows/sheet_density
             else:
-                sf = image_cols/sheet_density
+                sf = pattern_cols/sheet_density
             x*=sf;y*=sf
             
         elif scaling=='fit_longest':
-            if image_rows<image_cols:
-                sf = image_cols/sheet_density
+            if pattern_rows<pattern_cols:
+                sf = pattern_cols/sheet_density
             else:
-                sf = image_rows/sheet_density
+                sf = pattern_rows/sheet_density
             x*=sf;y*=sf
 
         else:
             raise ValueError("Unknown scaling option",scaling)
+    
+
+
+
+class TopoImage(PatternSampler):
+    """
+    A PatternSampler based on the image found at filename.
+
+    The image is converted to grayscale if it is not already a
+    grayscale image. See PIL's Image class for details of supported
+    image file formats.
+
+    The background value is calculated as an edge average: see edge_average().
+    Black-bordered images therefore have a black background, and
+    white-bordered images have a white background. Images with no
+    border have a background that is less of a contrast than a white
+    or black one.
+    """    
+    def __init__(self, filename, whole_image_output_fn=Identity()):
+        """
+        Create a Sheet whose activity represents the original image,
+        after having whole_image_output_fn applied.
+        """
+        image = ImageOps.grayscale(pImage.open(filename))
+        image_array = array(image.getdata(),Float)
+        image_array.shape = (image.size[::-1]) # getdata() returns transposed image?
+        super(TopoImage,self).__init__(image_array,whole_image_output_fn,edge_average(image_array))
 
 
 
@@ -188,7 +206,6 @@ class Image(PatternGenerator):
     aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.31,doc="Ratio of width to height; size*aspect_ratio gives the width.")
     size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.30,doc="Height of the image.")
     filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9,doc="Path (can be relative to Topographica's base path) to an image in e.g. PNG, JPG, TIFF, or PGM format.")
-
     size_normalization = Enumeration(default='fit_shortest',
                                      available=['fit_shortest','fit_longest','stretch_to_fit','original'],
                                      precedence=0.95,
