@@ -195,7 +195,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 
         # For the first plot, use the INITIAL_PLOT_HEIGHT to calculate zoom.
 	self.initial_plot=True
-	self.master_zoom=1.0
+	self.height_of_tallest_plot=1.0
 	self.min_master_zoom=3.0
 	self.zoom_factor=1.2
         
@@ -303,9 +303,9 @@ class PlotGroupPanel(Frame,ParameterizedObject):
             else:
 		if self.sheetcoords==1:		   
                     s = topo.sim.objects(Sheet).get(bitmap.plot_src_name,None)
-		    scaling_factor=self.sizeconvertfn(self.master_zoom/float(s.density)/max_sheet_height)
+		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(s.density)/max_sheet_height)
 		else:
-		    scaling_factor=self.sizeconvertfn(self.master_zoom/float(bitmap.height()))
+		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(bitmap.height()))
                               
             tmp_list = tmp_list + [bitmap.zoom(scaling_factor)]
 	
@@ -341,10 +341,10 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 	matrix_max_height = max([b.height() for b in self.bitmaps if b.resize])
 	max_height = max(sheet_max_height,matrix_max_height)
 	if (max_height >= self.INITIAL_PLOT_HEIGHT):
-	    self.master_zoom = max_height
+	    self.height_of_tallest_plot = max_height
 	else:	
-	    self.master_zoom = self.INITIAL_PLOT_HEIGHT
-	if self.master_zoom == self.min_master_zoom:
+	    self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
+	if self.height_of_tallest_plot == self.min_master_zoom:
 	    self.reduce_button.config(state=DISABLED)
 	self.initial_plot=False
 
@@ -439,10 +439,10 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 
     def reduce(self):
         """Function called by Widget to reduce the zoom factor"""
-        if self.master_zoom > self.min_master_zoom:	
-	    self.master_zoom = self.master_zoom/self.zoom_factor
+        if self.height_of_tallest_plot > self.min_master_zoom:	
+	    self.height_of_tallest_plot = self.height_of_tallest_plot/self.zoom_factor
 
-        if self.master_zoom <= self.min_master_zoom:
+        if self.height_of_tallest_plot <= self.min_master_zoom:
             self.reduce_button.config(state=DISABLED)
          
         self.load_images()
@@ -453,7 +453,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
     def enlarge(self):
         """Function called by Widget to increase the zoom factor"""
         self.reduce_button.config(state=NORMAL)
-        self.master_zoom = self.master_zoom*self.zoom_factor
+        self.height_of_tallest_plot = self.height_of_tallest_plot*self.zoom_factor
         self.load_images()
         self.scale_images()
         self.display_plots()
