@@ -14,23 +14,30 @@ import Pmw
 import __main__
 from itertools import chain
 
-from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry,Label,NSEW
-from plotgrouppanel import PlotGroupPanel
-from cfsheetplotpanel import CFSheetPlotPanel
+from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry,Label,NSEW, Checkbutton
+from templateplotgrouppanel import TemplatePlotGroupPanel
 from topo.base.projection import ProjectionSheet
 from topo.plotting.plotgroup import plotgroup_dict, ConnectionFieldsPlotGroup
 from topo.base.sheet import Sheet
 import topoconsole
+import topo.base.connectionfield
 
 from topo.commands.analysis import *
 import topo.commands.analysis
 
 ### JABALERT!  Why isn't there a Normalize button on this and
 ### ProjectionPanel like there is on ActivityPanel?
-class ConnectionFieldsPanel(CFSheetPlotPanel):
-    def __init__(self,parent,console=None,pgt_name=None,**config):
-        super(ConnectionFieldsPanel,self).__init__(parent,console,pgt_name,**config)
+class ConnectionFieldsPanel(TemplatePlotGroupPanel):
+    def __init__(self,parent,console=None,pgt_name=None,**config):       
+        TemplatePlotGroupPanel.__init__(self,parent,console,pgt_name,**config)
+        self.region = StringVar()
+        self.region.set('None')
+        self.__params_frame = Frame(master=self)
+        self.__params_frame.pack(side=LEFT,expand=YES,fill=X)
 
+        self._add_situate_button()
+        self._add_region_menu()
+        
         # Receptive Fields are generally tiny.  Boost it up to make it visible.
         self.WEIGHT_PLOT_INITIAL_SIZE = 30
 
@@ -41,7 +48,7 @@ class ConnectionFieldsPanel(CFSheetPlotPanel):
         self.y_str = StringVar()
         self.y_str.set(0.0)
         self.displayed_x, self.displayed_y = 0, 0
-
+        
         self._add_xy_boxes()
         self.auto_refresh_checkbutton.invoke()
 	
@@ -50,6 +57,54 @@ class ConnectionFieldsPanel(CFSheetPlotPanel):
         self.toggle_situate()
 	self.situate_checkbutton.select()
 
+        self.refresh()
+
+
+    def _add_region_menu(self):
+        """
+        This function adds a Sheet: menu that queries the active
+        simulation for the list of options.  When an update is made,
+        _region_refresh() is called.  It can either call the refresh()
+        funcion, or update another menu, and so on.
+        """
+
+        # Create the item list for CFSheet 'Sheet'  This will not change
+        # since this window will only examine one Simulator.
+        sim = topoconsole.active_sim()
+        self._sim_eps = [ep for ep in sim.objects(Sheet).values()
+                  if isinstance(ep,topo.base.connectionfield.CFSheet)]
+	self._sim_eps.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
+        sim_ep_names = [ep.name for ep in self._sim_eps]
+        if len(sim_ep_names) > 0:
+            self.region.set(sim_ep_names[0])
+
+        # The GUI label says Sheet, not CFSheet, because users probably 
+        # don't need to worry about the distinction.
+        self.opt_menu = Pmw.OptionMenu(self.__params_frame,
+                       command = self.refresh,
+                       labelpos = 'w',
+                       label_text = 'Sheet:',
+                       menubutton_textvariable = self.region,
+                       items = sim_ep_names)
+        self.opt_menu.pack(side=LEFT)
+
+
+    def _add_situate_button(self):
+        
+        self.situate = 0
+        self.situate_checkbutton = Checkbutton(self.__params_frame,
+                                                    text="Situate",
+                                                    command=self.toggle_situate)
+        self.situate_checkbutton.pack(side=LEFT)
+
+
+    def toggle_situate(self):
+        """Set the attribute situate"""
+        self.situate = not self.situate
+        if self.pe_group != None:
+            self.pe_group.situate = self.situate
+        self.initial_plot = True
+        self.height_of_tallest_plot = self.min_master_zoom = 1
         self.refresh()
 
 
