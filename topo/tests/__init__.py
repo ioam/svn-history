@@ -1,60 +1,52 @@
 """
-Unit tests for Topographica
+Unit tests for Topographica.
+
+Runs all tests in every file in this directory and the tkgui/
+subdirectory whose name begins with 'test' and ends '.py',
+if they define the 'suite' attribute.
 
 $Id$
 """
 __version__='$Revision$'
 
-### JABALERT!
-###
-### Should change this to be like topo/patterns/__init__.py, i.e.
-### to automatically discover the test files.  That way new tests
-### can be just dropped in.
+import unittest,re,os
 
-import unittest, os
-import testboundingregion
-import testdummy
-import testbitmap
-import testsheet
-import testsheetview
-import testplot
-import testplotgroup
-import testplotfilesaver
-import testsimulator
-import testpalette
-import testcfsom
-import testpatterngenerator
-import testmatplotlib
-import testpatternpresent
-import testdistribution
-import testfeaturemap
-import testoutputfnsbasic
-import testoutputfnsoptimized
-import testimage
+# CEBHACKALERT: maybe the tkgui tests should be separate? There could
+# be name clashes by doing the import like this. Instead, maybe run()
+# in this file could all call GUI tests, which would be run separately in
+# tkgui/__init__.py?
+from tkgui import *
 
-# CEBHACKALERT: no test for patterns/image.py
+# Automatically discover all test*.py files in this directory
+# and import them. 
+__all__ = [re.sub('\.py$','',f)
+           for f in os.listdir(__path__[0])
+           if re.match('^test.*\.py$',f)]
+
+for test_name in __all__:
+    exec 'import '+test_name
 
 
-# tkgui import calls tkgui/__init__.py, which should contain other test
-# imports for that directory.
-import tkgui
-
+# For each test module that defines a 'suite' attribute, add its
+# tests.
+# Only adds tests requiring a display if the DISPLAY environment
+# variable is set.
 suite = unittest.TestSuite()
-
 display_loc = os.getenv('DISPLAY')
-for key,val in locals().items():
-    if type(val) == type(unittest) and not val in (unittest, os):
-        try:
-            print 'Checking module %s for test suite...' % key,
-            new_test = getattr(val,'suite')
-            if hasattr(new_test,'requires_display') and not display_loc:
-                print 'skipped: No $DISPLAY.'
-            else:
-                print 'found.'
-                suite.addTest(new_test)
-        except AttributeError,err:
-            print err
-
+for test_name in __all__+tkgui.__all__:    
+    test_module = locals()[test_name]
+    try:        
+        print 'Checking module %s for test suite...' % test_name,
+        new_test = getattr(test_module,'suite')
+        
+        if hasattr(new_test,'requires_display') and not display_loc:
+            print 'skipped: No $DISPLAY.'
+        else:
+            print 'found.'
+            suite.addTest(new_test)
+    except AttributeError,err:
+        print err
+    
 
 def run(verbosity=1):
     unittest.TextTestRunner(verbosity=verbosity).run(suite)
