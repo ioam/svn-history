@@ -104,7 +104,7 @@ class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
         if self.pe_group != None:
             self.pe_group.situate = self.situate
         self.initial_plot = True
-        self.zoom_factor = self.min_zoom_factor = 1
+        self.height_of_tallest_plot = self.min_master_zoom = 1
         self.refresh()
 
     def region_refresh(self, sheet_name):
