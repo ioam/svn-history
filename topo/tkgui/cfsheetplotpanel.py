@@ -42,6 +42,10 @@ class CFSheetPlotPanel(plotgrouppanel.PlotGroupPanel):
 	### JCALERT! Eventually all this code should go only in PlotGroupPanel
 
 	self.pgt = plotgroup_templates.get(pgt_name,None)
+        self.normalize = self.pgt.normalize
+        if self.normalize:
+	    self.normalize_checkbutton.select()
+
 	# Command used to refresh the plot, if any
         self.cmdname = StringVar()
         
