@@ -64,13 +64,17 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
                      entry_textvariable=self.cmdname,
                      scrolledlist_items=([self.pgt.command])
                      ).pack(side=LEFT,expand=YES,fill=X)
-
-        self.refresh()
-
+       
         # To make the auto-refresh button not on by default when opening the panel
         # but it is not the case for the Activity PlotGroup
 	if self.mapname.get() != 'Activity':
 	    self.auto_refresh_checkbutton.invoke()
+
+        # we do not want to refresh for subclasses, when calling the superclass constructor:
+        # refresh will need to be explicitly called from subclasses
+        if self.__class__ == TemplatePlotGroupPanel:
+            self.refresh()
+
 
     def do_plot_cmd(self):
         """
