@@ -37,6 +37,14 @@ def edge_average(a):
         return float(edge_sum)/num_values
 
 
+# CEBHACKALERT: this was originally a separate class with the
+# intention that an image file would only need to be loaded once. As
+# it is, a new image file is loaded every time Image's function() is
+# called. If Image had a Parameter 'topo_image' (or similar) rather
+# than 'filename', the idea of loading the image file only once would
+# work. But then how would the topo_image be specified in the GUI? If
+# it could be clicked on, and properties of the TopoImage edited
+# (specifically the filename), then it would work...
 class TopoImage(PatternSampler):
     """
     A PatternSampler based on the image found at filename.
