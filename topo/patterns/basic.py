@@ -234,10 +234,12 @@ class PatternSampler(ParameterizedObject):
     background value.
     """
 
-    def __init__(self, pattern_array, whole_pattern_output_fn=Identity(), background_value=0.0):
+    def __init__(self, pattern_array, whole_pattern_output_fn=Identity(), background_value_fn=None):
         """
         Create a Sheet whose activity is pattern_array (where pattern_array
         is a Numeric array) after application of whole_pattern_output_fn.
+
+        If supplied, background_value_fn must accept an array and return a scalar.
         """
         super(PatternSampler,self).__init__()
         
@@ -246,7 +248,11 @@ class PatternSampler(ParameterizedObject):
                                  bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
                                                             ( cols/2.0, rows/2.0))))
         self.pattern_sheet.activity = whole_pattern_output_fn(pattern_array)
-        self.background_value = background_value
+
+        if not background_value_fn:
+            self.background_value = 0.0
+        else:
+            self.background_value = background_value_fn(self.pattern_sheet.activity)
         
 
     def __call__(self, x, y, sheet_density, scaling, width=1.0, height=1.0):

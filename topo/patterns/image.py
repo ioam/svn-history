@@ -59,7 +59,7 @@ class TopoImage(PatternSampler):
         image = ImageOps.grayscale(pImage.open(filename))
         image_array = array(image.getdata(),Float)
         image_array.shape = (image.size[::-1]) # getdata() returns transposed image?
-        super(TopoImage,self).__init__(image_array,whole_image_output_fn,edge_average(image_array))
+        super(TopoImage,self).__init__(image_array,whole_image_output_fn,edge_average)
 
 
 
