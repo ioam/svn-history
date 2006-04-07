@@ -13,14 +13,17 @@ was first added to the list, or a change was made.)
 <ul>
 
 <li>
-2006/03/17: (CB) Allowing joint normalization of projections for a CFSheet
+2006/04/07: (CB) Allowing joint normalization of projections for a CFSheet. [This appears to work, but results from LISSOM simulations do not yet match those of C++ LISSOM.].
+</li>
+
+<li>
+2006/04/07: (CB) Implement joint normalization via ports - check ports work as expected.
 </li>
 
 <li>
 2006/03/27: (CB) Clean up names of CFOutputFunctions, OutputFunctions, etc. and put
 in the correct locations.
 </li>
-
 
 <li> 
 2006/03/17 (CB): Fix problem (matching previous work) with som_retinotopy.
@@ -31,11 +34,11 @@ in the correct locations.
 </li>
 
 <li>
-2006/03/17 (CB): HACKALERTs relating to connection fields; matching with C++ LISSOM when there are circular connection fields
+2006/04/07 (CB): HACKALERTs relating to connection fields; matching with C++ LISSOM when there are circular connection fields; test file for connectionfield.
 </li>
 
 <li>
-2006/03/17 (CB): Cleaning Composite and Image pattern generators.
+2006/04/07 (CB): Cleaning Composite and Image pattern generators, and write test files.
 </li>
 
 <li>
