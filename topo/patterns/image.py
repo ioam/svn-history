@@ -37,28 +37,6 @@ def edge_average(a):
         return float(edge_sum)/num_values
 
 
-# CEBHACKALERT: this was originally a separate class with the
-# intention that an image file would only need to be loaded once. As
-# it is, a new image file is loaded every time Image's function() is
-# called. If Image had a Parameter 'topo_image' (or similar) rather
-# than 'filename', the idea of loading the image file only once would
-# work. But then how would the topo_image be specified in the GUI? If
-# it could be clicked on, and properties of the TopoImage edited
-# (specifically the filename), then it would work...
-class TopoImage(PatternSampler):
-    """
-
-
-    """    
-    def __init__(self, filename, whole_image_output_fn=Identity()):
-        """
-        """
-        image = ImageOps.grayscale(pImage.open(filename))
-        image_array = array(image.getdata(),Float)
-        image_array.shape = (image.size[::-1]) # getdata() returns transposed image?
-        super(TopoImage,self).__init__(image_array,whole_image_output_fn,edge_average)
-
-
 
 # CEBHACKALERT: rotation,scaling etc. just resample - there's no interpolation.
 class Image(PatternGenerator):
