@@ -238,7 +238,7 @@ class ProjectionPanel(CFSheetPlotPanel):
 
     ### JCALERT It has to be re-implemented for the projectionpanel,
     ### but this is only a momentary version that requires more work.
-    def _set_initial_master_zoom(self):
+    def _set_height_of_tallest_plot(self):
 	""" 
 	Subfunction that set the initial master zooms for both the sheet
 	coordinates and the matrix coordinates case. 

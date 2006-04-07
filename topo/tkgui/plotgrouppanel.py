@@ -290,7 +290,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 	### panel, there is no PlotGroup assigned to it... It will change when all will be inserted 
 	### in the PlotGroup (i.e scale_image, set_initial_master_zoom, compute_max_height...)
 	if self.initial_plot:
-	    self._set_initial_master_zoom()
+	    self._set_height_of_tallest_plot()
 
 	tmp_list = []
 
@@ -322,7 +322,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
             self.forward_button.config(state=NORMAL)
         
 
-    def _set_initial_master_zoom(self):
+    def _set_height_of_tallest_plot(self):
 	""" 
 	Subfunction that set the initial master zooms for both the sheet
 	coordinates and the matrix coordinates case. 
