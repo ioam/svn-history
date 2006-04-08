@@ -6,7 +6,7 @@ $Id$
 __version__='$Revision$'
 
 
-import unittest
+import unittest,random
 
 import topo
 import Numeric
