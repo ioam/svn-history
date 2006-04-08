@@ -108,13 +108,12 @@ def pattern_present(inputs=None,duration=1.0,learning=False,overwrite_previous=F
 
 def save_snapshot(snapshot_name):
     """
-    Save a snapshot of the current network's state.
+    Save a snapshot of the network's current state.
 
-    snapshot_name is the file name string.
-
-    Uses Python's 'pickle' module, so subject to the same limitations.
-
-    CEBHACKALERT: update both save_snapshot doc and load_snapshot doc
+    Uses Python's 'pickle' module, so subject to the same limitations (see
+    the pickle module's documentation) - except that class attributes
+    of ParameterizedObjects declared within the topo package (including
+    all subpackages) are pickled.
     """
     states_of_classes = {}
     classes = {}
@@ -131,9 +130,7 @@ def save_snapshot(snapshot_name):
 
 def load_snapshot(snapshot_name):
     """
-    Return the current network to the state of the specified snapshot.
-
-    snapshot_name is the file name string.
+    Load the simulation stored in snapshot_name.
     """
     
     sim,states_of_classes = pickle.load(open(snapshot_name,'rb'))
