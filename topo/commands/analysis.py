@@ -8,7 +8,7 @@ $Id$
 from Numeric import array, zeros, Float
 from math import pi
 
-import topo.base.simulator
+import topo
 
 from topo.analysis.featuremap import MeasureFeatureMap
 from topo.base.arrayutils import octave_output, centroid
@@ -33,7 +33,7 @@ class PatternPresenter(object):
         self.duration=duration
         self.gen = patterngenerator
 
-    def __call__(self,sim,features_values,param_dict):
+    def __call__(self,features_values,param_dict):
     
         for param,value in param_dict.iteritems():
            self.gen.__setattr__(param,value)
@@ -41,7 +41,7 @@ class PatternPresenter(object):
         for feature,value in features_values.iteritems():
            self.gen.__setattr__(feature,value)
 
-        inputs = dict().fromkeys(sim.objects(GeneratorSheet),self.gen)
+        inputs = dict().fromkeys(topo.sim.objects(GeneratorSheet),self.gen)
 
         pattern_present(inputs, self.duration, learning=False,
                         apply_output_fn=self.apply_output_fn)
@@ -102,13 +102,11 @@ def measure_position_pref(divisions=6,size=0.2,scale=0.3,offset=0.0,display=Fals
 def measure_cog():
     """Calculate center of gravity for each CF of each unit in each CFSheet."""
 
-    sim = topo.base.simulator.get_active_sim()
-
     # JABHACKALERT: This does not seem to work for SharedWeightProjections,
     # which give a blank CoG plot as of 1 Mar 2006, instead of a perfect grid.
 
     f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-    measured_sheets = filter(f,sim.objects(Sheet).values())
+    measured_sheets = filter(f,topo.sim.objects(Sheet).values())
     
     for sheet in measured_sheets:
       if hasattr(sheet,'in_projections'):
@@ -144,8 +142,7 @@ def update_activity():
     """Measure an activity map. Command called when opening an activity plot group panel.
     To be exact, just add the activity sheet_view for Sheets objects of the simulator
     """
-    sim = topo.base.simulator.get_active_sim()
-    for sheet in sim.objects(Sheet).values():
+    for sheet in topo.sim.objects(Sheet).values():
         activity_copy = array(sheet.activity)
         new_view = SheetView((activity_copy,sheet.bounds),
                               sheet.name,sheet.precedence)
@@ -164,8 +161,7 @@ def update_connectionfields():
     Lambda function passed in, that will filter out all sheets
     except the one with the name being looked for.
     """
-    simulator=topo.base.simulator.get_active_sim()
-    sheets = simulator.objects(Sheet).values()
+    sheets = topo.sim.objects(Sheet).values()
     x = coordinate[0]
     y = coordinate[1]
     for each in sheets:
@@ -180,8 +176,7 @@ def update_connectionfields():
 proj_coords=[(0,0)]
 proj_name =''
 def update_projections():
-    simulator=topo.base.simulator.get_active_sim()
-    sheets = simulator.objects(Sheet).values()
+    sheets = topo.sim.objects(Sheet).values()
     for each in sheets:
 	if (each.name == sheet_name):
 	    for x,y in proj_coords:

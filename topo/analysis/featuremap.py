@@ -197,7 +197,7 @@ class MeasureFeatureMap(ParameterizedObject):
                 feature_points[feature] = value
 
             # DRAW THE PATTERN: call to the user_function
-            user_function(topo.sim,feature_points,param_dict)
+            user_function(feature_points,param_dict)
 
 
             # CEBHACKALERT: I've temporarily removed this feature,
