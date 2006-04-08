@@ -122,6 +122,9 @@ def save_snapshot(snapshot_name):
     # for now we just search topo, but it could be extended to all packages.
     topo_ = __main__.__dict__['topo']
     get_states_of_classes_from_module(topo_,states_of_classes,[])
+
+    # Store the release version for this simulator.
+    topo.sim.RELEASE = topo.release
     
     pickle.dump((topo.sim.actual_sim,states_of_classes), open(snapshot_name,'wb'), 2)
 
