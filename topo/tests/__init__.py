@@ -1,16 +1,21 @@
 """
 Unit tests for Topographica.
 
-Runs all tests in every file in this directory and the tkgui/
-subdirectory whose name begins with 'test' and ends '.py',
-if they define the 'suite' attribute.
+Runs all tests in any file in this directory whose name begins with
+'test' and ends '.py', if it define the 'suite' attribute.
 
 $Id$
 """
 __version__='$Revision$'
 
-import unittest,re,os
+# CEBALERT: It might be good if tests/ were a directory at the top
+# level, with a subdirectory structure mirroring that of topo/. Then
+# it is more likely we'd have a separate test file for each module,
+# and we could also simply name the files the same as what they are
+# testing, which could make it simpler to find the right test file.
 
+
+import unittest,re,os
 
 # Automatically discover all test*.py files in this directory
 # and import them. 
