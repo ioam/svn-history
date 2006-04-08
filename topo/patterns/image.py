@@ -11,7 +11,7 @@ from Numeric import array, Float, sum, ravel
 
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.parameterclasses import Filename, Number, Parameter, Enumeration
-from topo.base.projection import OutputFunctionParameter
+from topo.base.projection import OutputFnParameter
 
 from topo.outputfns.basic import DivisiveMaxNormalize,Identity
 
@@ -54,7 +54,7 @@ class Image(PatternGenerator):
     or black one.
     """
 
-    output_fn = OutputFunctionParameter(default=Identity())
+    output_fn = OutputFnParameter(default=Identity())
     
     aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.31,doc="Ratio of width to height; size*aspect_ratio gives the width.")
     size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.30,doc="Height of the image.")
@@ -64,7 +64,7 @@ class Image(PatternGenerator):
                                      precedence=0.95,
                                      doc='How to scale the initial image size relative to the default area of 1.0.')
 
-    whole_image_output_fn = OutputFunctionParameter(default=DivisiveMaxNormalize(),
+    whole_image_output_fn = OutputFnParameter(default=DivisiveMaxNormalize(),
                               precedence=0.96,
                               doc='Function applied to the whole, original image array (before any cropping).')
 

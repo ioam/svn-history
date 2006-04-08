@@ -11,20 +11,20 @@ __version__='$Revision$'
 from Numeric import zeros, Float, ravel
 
 from topo.base.arrayutils import L2norm
-from topo.base.connectionfield import CFResponseFunction
+from topo.base.connectionfield import CFProjectionResponseFn
 from topo.base.parameterclasses import Parameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.inlinec import inline, optimized
 
-class CFDotProduct(CFResponseFunction):
+class CFProjectionDotProduct(CFProjectionResponseFn):
     """
     Dot-product response function.
 
-    Written entirely in Python; see CFDotProduct_opt1 for a much faster
+    Written entirely in Python; see CFProjectionDotProduct_opt1 for a much faster
     (but otherwise equivalent) version.
     """
     def __init__(self,**params):
-        super(CFDotProduct,self).__init__(**params)
+        super(CFProjectionDotProduct,self).__init__(**params)
 
     def __call__(self, cfs, input_activity, activity, strength, **params):
         rows,cols = activity.shape
@@ -39,12 +39,12 @@ class CFDotProduct(CFResponseFunction):
         activity *= strength
 
 
-class CFEuclideanDistance(CFResponseFunction):
+class CFProjectionEuclideanDistance(CFProjectionResponseFn):
     """
     Euclidean-distance--based response function.
     """
     def __init__(self,**params):
-        super(CFEuclideanDistance,self).__init__(**params)
+        super(CFProjectionEuclideanDistance,self).__init__(**params)
 
     def __call__(self, cfs, input_activity, activity, strength, **params):
         rows,cols = activity.shape

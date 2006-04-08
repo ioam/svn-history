@@ -12,7 +12,7 @@ from itertools import chain
 
 from topo.base.connectionfield import CFSheet
 from topo.base.parameterclasses import BooleanParameter, Number, Integer
-from topo.base.projection import OutputFunctionParameter
+from topo.base.projection import OutputFnParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.inlinec import optimized
 from topo.outputfns.basic import PiecewiseLinear
@@ -21,8 +21,8 @@ from topo.outputfns.basic import PiecewiseLinear
 class LISSOM(CFSheet):
 
 
-    output_fn = OutputFunctionParameter(default=PiecewiseLinear(lower_bound=0.1,
-                                                                upper_bound=0.65))
+    output_fn = OutputFnParameter(default=PiecewiseLinear(lower_bound=0.1,
+                                                          upper_bound=0.65))
     # modify weights after each activation?
     continuous_learning = BooleanParameter(default=False)
 

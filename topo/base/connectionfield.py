@@ -20,44 +20,56 @@ $Id$
 __version__ = '$Revision$'
 
 
+# CEBHACKALERT: regarding the naming of things such as 'CFProjectionLearningFn'...
+# Maybe these functions won't always operate on *all* the CFs of a CFProjection?
+# But for the moment they do, which is what the documentation and naming implies.
+
+
+
 import Numeric
 import copy
+from itertools import chain
 
+import topo
+
+import patterngenerator
+from patterngenerator import PatternGeneratorParameter
 from parameterizedobject import ParameterizedObject
-from projection import Projection,ProjectionSheet,Identity,OutputFunctionParameter
-from parameterclasses import Parameter, Number, BooleanParameter,ClassSelectorParameter
+from projection import Projection,ProjectionSheet,Identity,OutputFnParameter
+from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter
 from arrayutils import Mdot,divisive_normalization
 from sheet import Sheet,bounds2slice,sheet2matrixidx,crop_slice_to_sheet_bounds,slice2bounds
 from sheetview import UnitView
-from itertools import chain
-from patterngenerator import PatternGeneratorParameter
-import patterngenerator
-from boundingregion import BoundingBox, BoundingRegionParameter
+from boundingregion import BoundingBox,BoundingRegionParameter
 
 
-import topo
 
 # Specified explicitly when creating weights matrix - required
 # for optimized C functions.
 weight_type = Numeric.Float32
 
 
-# JABALERT: Also need a LearningFunctionParameter, for GenericCFLF to use.
-class LearningFunction(ParameterizedObject):
+# CEBHACKALERT: do all these LearningFn* classes belong in this file?
+# Move to learningfns/basic.py?
+
+class LearningFn(ParameterizedObject):
     """Abstract base class for learning functions that plug into GenericCFLF."""
+
+    _abstract_class_name = "LearningFn"
 
     # JABALERT: Shouldn't the single_connection_learning_rate be omitted from the call
     # and instead made into a class parameter?
     def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
         """
-        Apply this learning function given the input and output activities and current weights.
+        Apply this learning function given the input and output
+        activities and current weights.
         
         Must be implemented by subclasses.
         """
         raise NotImplementedError
 
 
-class Hebbian(LearningFunction):
+class Hebbian(LearningFn):
     """
     Basic Hebbian rule; Dayan and Abbott, 2001, equation 8.3.
 
@@ -69,6 +81,20 @@ class Hebbian(LearningFunction):
     
     def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
         weights += single_connection_learning_rate * unit_activity * input_activity
+
+
+class LearningFnParameter(ClassSelectorParameter):
+    """
+    Parameter whose value can be any LearningFunction.
+    """
+    __slots__ = []
+    __doc__ = property((lambda self: self.doc))
+
+    packages = []
+
+    def __init__(self,default=Hebbian(),**params):
+        super(LearningFnParameter,self).__init__(LearningFn,default=default,**params)        
+
 
 
 class ConnectionField(ParameterizedObject):
@@ -292,9 +318,10 @@ class ConnectionField(ParameterizedObject):
 
 
 
-class CFResponseFunction(ParameterizedObject):
+class CFProjectionResponseFn(ParameterizedObject):
     """
-    Map an input activity matrix into an output matrix using CFs.
+    Map an input activity matrix into an output matrix using the CFs
+    in a CFProjection.
 
     Objects in this hierarchy of callable function objects compute a
     response matrix when given an input pattern and a set of
@@ -310,7 +337,7 @@ class CFResponseFunction(ParameterizedObject):
 
 
 
-class GenericCFResponseFn(CFResponseFunction):
+class CFProjectionGenericResponseFn(CFProjectionResponseFn):
     """
     Generic large-scale response function based on a simple single-CF function.
 
@@ -327,9 +354,6 @@ class GenericCFResponseFn(CFResponseFunction):
     """
     single_cf_fn = Parameter(default=Mdot())
     
-    def __init__(self,**params):
-        super(GenericCFResponseFn,self).__init__(**params)
-
     def __call__(self, cfs, input_activity, activity, strength):
         rows,cols = activity.shape
 
@@ -343,39 +367,45 @@ class GenericCFResponseFn(CFResponseFunction):
         activity *= strength
 
 
-class ResponseFunctionParameter(ClassSelectorParameter):
+class CFProjectionResponseFnParameter(ClassSelectorParameter):
     """
+    Parameter whose value can be any CFProjectionResponseFunction; i.e., a function
+    that uses all the CFs of a CFProjection to transform the input activity
+    into an output activity.
     """
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
     packages = []
 
-    def __init__(self,default=GenericCFResponseFn(),**params):
-        """ 
-       """
-        super(ResponseFunctionParameter,self).__init__(CFResponseFunction,default=default,**params)        
+    def __init__(self,default=CFProjectionGenericResponseFn(),**params):
+        super(CFProjectionResponseFnParameter,self).__init__(CFProjectionResponseFn,default=default,**params)        
 
 
-class CFLearningFunction(ParameterizedObject):
+
+class CFProjectionLearningFn(ParameterizedObject):
     """
-    Compute new CFs based on input and output activity values.
+    Compute new CFs for a CFProjection based on input and output activity values.
 
     Objects in this hierarchy of callable function objects compute a
     new set of CFs when given input and output patterns and a set of
-    ConnectionField objects.  Typically used for updating the weights
-    of one CFProjection.
+    ConnectionField objects.  Used for updating the weights of one
+    CFProjection.
 
     Objects in this class must support being called as a function with
     the arguments specified below.
     """    
     def constant_sum_connection_rate(self,cfs,learning_rate):
-	""" 
-	return the learning rate for a single connection according to the total learning_rate,
-        the number of rows and cols of the output_activity matrix and the connection fields
-	matrix cfs. Keep the sum of the single connection learning rate constant.
-	"""      
-        ### JCALERT! To check with Jim: we take the number of unit at the center of the matrix
+	"""
+	return the learning rate for a single connection according to
+        the total learning_rate, the number of rows and cols of the
+        output_activity matrix and the connection fields matrix
+        cfs. Keep the sum of the single connection learning rate
+        constant.
+	"""
+        
+        ### JCALERT! To check with Jim: we take the number of unit at
+        ### the center of the matrix
         ### That would be the best way to go, but it is not possible to acces the 
         ### sheet_density and bounds from here without more important changes
         #center_r,center_c = sheet2matrixidx(0,0,bounds,xdensity,ydensity)
@@ -391,35 +421,32 @@ class CFLearningFunction(ParameterizedObject):
         raise NotImplementedError
 
 
-class IdentityCFLF(CFLearningFunction):
+class CFProjectionIdentityLearningFn(CFProjectionLearningFn):
     """CFLearningFunction performing no learning."""
   
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         pass
 
 
-class LearningFunctionParameter(ClassSelectorParameter):
+class CFProjectionLearningFnParameter(ClassSelectorParameter):
     """
+    Parameter whose value can be any CFProjectionLearningFn; i.e., a function
+    that uses all the CFs of a CFProjection to transform the input activity
+    into an output activity.
     """
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
     packages = []
 
-    def __init__(self,default=IdentityCFLF(),**params):
-        """
-        """
-        super(LearningFunctionParameter,self).__init__(CFLearningFunction,default=default,**params)        
+    def __init__(self,default=CFProjectionIdentityLearningFn(),**params):
+        super(CFProjectionLearningFnParameter,self).__init__(CFProjectionLearningFn,default=default,**params)        
 
 
-class GenericCFLF(CFLearningFunction):
+class CFProjectionGenericLearningFn(CFProjectionLearningFn):
     """CFLearningFunction applying the specified single_cf_fn to each CF."""
-    single_cf_fn = Parameter(default=Hebbian())
+    single_cf_fn = LearningFnParameter(default=Hebbian())
     
-    def __init__(self,**params):
-        super(GenericCFLF,self).__init__(**params)
-
-   
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
         rows,cols = output_activity.shape
@@ -435,17 +462,20 @@ class GenericCFLF(CFLearningFunction):
                 cf.weights *= cf.mask
                 
 
-class CFOutputFunction(ParameterizedObject):
-    """Map the weight matrix of each CF into a new one of the same shape."""
+class CFProjectionOutputFn(ParameterizedObject):
+    """
+    Map the weight matrix of each CF in a CFProjection into a new one
+    of the same shape.
+    """
     _abstract_class_name = "CFOutputFunction"
     
     def __call__(self, cfs, output_activity,**params):
         raise NotImplementedError
 
 
-class GenericCFOF(CFOutputFunction):
-    """Applies the specified single_cf_fn to each CF."""
-    single_cf_fn = OutputFunctionParameter(default=Identity())
+class CFProjectionGenericOutputFn(CFProjectionOutputFn):
+    """Applies the specified single_cf_fn to each CF in the CFProjection."""
+    single_cf_fn = OutputFnParameter(default=Identity())
     
     def __call__(self, cfs, output_activity, **params):
         """
@@ -469,11 +499,23 @@ class GenericCFOF(CFOutputFunction):
                     ## del cf.sum 
 
 
-# CB: are we missing ProjectionFunctionParameter?
-
-class CFOutputFunctionParameter(ClassSelectorParameter):
+class CFProjectionIdentityOutputFn(CFProjectionOutputFn):
     """
-    Parameter whose value can be any CFOutputFunction; i.e., a function
+    CFProjectionOutputFn that leaves the CFs unchanged.
+
+    Cannot be changed or subclassed, since it might never
+    be called (it could simply be tested for and skipped).
+    """
+    single_cf_fn = OutputFnParameter(default=Identity(),constant=True)
+    
+    def __call__(self, cfs, output_activity, **params):
+        pass
+
+
+
+class CFProjectionOutputFnParameter(ClassSelectorParameter):
+    """
+    Parameter whose value can be any CFOutputFn; i.e., a function
     that iterates through all the CFs of a CFProjection and applies
     an output_fn to each.
     """
@@ -482,44 +524,55 @@ class CFOutputFunctionParameter(ClassSelectorParameter):
 
     packages = []
 
-    def __init__(self,default=GenericCFOF(),**params):
-        super(CFOutputFunctionParameter,self).__init__(CFOutputFunction,default=default,**params)        
+    def __init__(self,default=CFProjectionGenericOutputFn(),**params):
+        super(CFProjectionOutputFnParameter,self).__init__(CFProjectionOutputFn,default=default,**params)        
 
 
                     
-
 class CFProjection(Projection):
     """
     A projection composed of ConnectionFields from a Sheet into a ProjectionSheet.
 
     CFProjection computes its activity using a response_fn of type
-    CFResponseFunction (typically a CF-aware version of mdot) and output_fn 
+    CFProjectionResponseFn (typically a CF-aware version of mdot) and output_fn 
     (which is typically Identity). Any subclass has to implement the interface
     activate(self,input_activity) that computes the response from the input 
     and stores it in the activity array.
     """
-    response_fn = ResponseFunctionParameter(default=GenericCFResponseFn(),
-                                            doc='Function for computing the Projection response to an input pattern.' )
+    response_fn = CFProjectionResponseFnParameter(
+        default=CFProjectionGenericResponseFn(),
+        doc='Function for computing the Projection response to an input pattern.')
+    
     cf_type = Parameter(default=ConnectionField,constant=True)
-    weights_bounds = BoundingRegionParameter(default=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))),
-                                             doc="Bounds defining the Sheet area covered by the connectionfields.")
-    weights_generator = PatternGeneratorParameter(default=patterngenerator.Constant(),constant=True,
-                                                  doc="Generate initial weights values.")
-    weights_shape = PatternGeneratorParameter(default=patterngenerator.Constant(),constant=True,
-                                              doc="Define the shape of the connection fields.")
-    learning_fn = LearningFunctionParameter(default=GenericCFLF(),
-                                            doc='Function for computing changes to the weights based on one activation step.')
+    
+    weights_bounds = BoundingRegionParameter(
+        default=BoundingBox(radius=0.1),
+        doc="Bounds defining the Sheet area covered by the connectionfields.")
+    
+    weights_generator = PatternGeneratorParameter(
+        default=patterngenerator.Constant(),constant=True,
+        doc="Generate initial weights values.")
+    
+    weights_shape = PatternGeneratorParameter(
+        default=patterngenerator.Constant(),constant=True,
+        doc="Define the shape of the connection fields.")
+    
+    learning_fn = CFProjectionLearningFnParameter(
+        default=CFProjectionGenericLearningFn(),
+        doc='Function for computing changes to the weights based on one activation step.')
 
     # JABALERT: Shouldn't learning_rate be owned by the learning_fn?
     learning_rate = Number(default=0.0,softbounds=(0,100))
-    output_fn  = OutputFunctionParameter(default=Identity(),
-                                         doc='Function applied to the Projection activity after it is computed.')
+    
+    output_fn  = OutputFnParameter(
+        default=Identity(),
+        doc='Function applied to the Projection activity after it is computed.')
 
-    weights_output_fn = CFOutputFunctionParameter(default=GenericCFOF(),
-                          doc='Function applied to each CF after learning.')
+    weights_output_fn = CFProjectionOutputFnParameter(
+        default=CFProjectionGenericOutputFn(),
+        doc='Function applied to each CF after learning.')
 
     strength = Number(default=1.0)
-
 
 
     def __init__(self,initialize_cfs=True,**params):
@@ -573,8 +626,10 @@ class CFProjection(Projection):
             ### be a class attribute; not sure.
             self.cfs = cflist
 
-        ### JCALERT! We might want to change the default value of the input value to self.src.activity;
-        ### but it fails, raising a type error. It probably has to be clarified why this is happenning
+        ### JCALERT! We might want to change the default value of the
+        ### input value to self.src.activity; but it fails, raising a
+        ### type error. It probably has to be clarified why this is
+        ### happenning
         self.input_buffer = None
         self.activity = Numeric.array(self.dest.activity)
 
@@ -854,12 +909,3 @@ class CFSheet(ProjectionSheet):
     def release_unit_view(self,x,y):
         self.release_sheet_view(('Weights',x,y))
 
-
-
-
-
-
-   
-    
-
-        

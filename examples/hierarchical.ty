@@ -22,7 +22,7 @@ from topo.base.simulator import Simulator
 from topo.learningfns.som import HebbianSOMLF
 from topo.outputfns.basic import PiecewiseLinear
 from topo.patterns import PatternGeneratorParameter
-from topo.responsefns.optimized import CFDotProduct_opt1
+from topo.responsefns.optimized import CFProjectionDotProduct_opt1
 from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 
@@ -74,7 +74,7 @@ CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 CFProjection.weights_bounds=BoundingBox(radius=0.1)
 # CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0)
 CFProjection.learning_fn = HebbianSOMLF()
-CFProjection.response_fn = CFDotProduct_opt1()
+CFProjection.response_fn = CFProjectionDotProduct_opt1()
 
 
 #topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.MESSAGE

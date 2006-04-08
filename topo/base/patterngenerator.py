@@ -15,7 +15,7 @@ from parameterizedobject import ParameterizedObject
 from boundingregion import BoundingBox, BoundingRegionParameter
 from sheet import matrixidx2sheet, bounds2slice
 from parameterclasses import Parameter,Number,ClassSelectorParameter
-from projection import OutputFunctionParameter, Identity
+from projection import OutputFnParameter, Identity
 
 
 class PatternGenerator(ParameterizedObject):
@@ -54,9 +54,9 @@ class PatternGenerator(ParameterizedObject):
                    doc="Multiplicative strength of input pattern, defaulting to 1.0")
     offset = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.11,
                     doc="Additive offset to input pattern, defaulting to 0.0")
-    output_fn  = OutputFunctionParameter(default=Identity(),
-                                         precedence=0.08,
-                                         doc='Function applied to the pattern array after it has been created.')
+    output_fn  = OutputFnParameter(default=Identity(),
+                                   precedence=0.08,
+                                   doc='Function applied to the pattern array after it has been created.')
 
 
     def __call__(self,**params):

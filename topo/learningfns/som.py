@@ -8,7 +8,7 @@ __version__ = "$Revision$"
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Parameter,Number
 from topo.base.projection import Identity
-from topo.base.connectionfield import CFLearningFunction,OutputFunctionParameter
+from topo.base.connectionfield import CFProjectionLearningFn
 from topo.base.arrayutils import L2norm
 from Numeric import exp, argmax
 from topo.base.boundingregion import BoundingBox
@@ -17,7 +17,10 @@ import topo.patterns.basic
 from math import ceil
 
 
-class SOMLF(CFLearningFunction):
+# CEBHACKALERT: these are projfns.
+
+
+class SOMLF(CFProjectionLearningFn):
     """
     An abstract base class of learning functions for Self-Organizing Maps.
     

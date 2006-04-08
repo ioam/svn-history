@@ -1,5 +1,5 @@
 """
-Learning functions written in C to optimize performance. 
+Learning functions (see basic.py) and projection-level learning functions (see projfns.py) written in C to optimize performance. 
 
 Requires the weave package; without it unoptimized versions are used.
 
@@ -7,30 +7,26 @@ $Id$
 """
 __version__ = "$Revision$"
 
-import topo.base.connectionfield
-from topo.misc.inlinec import inline, optimized
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Parameter
-from topo.base.connectionfield import CFLearningFunction
+from topo.base.connectionfield import CFProjectionLearningFn, Hebbian
+
+from topo.misc.inlinec import inline, optimized
+
+# Imported here so that all CFProjectionLearningFns will be in the same package
+from topo.base.connectionfield import CFProjectionIdentityLearningFn,CFProjectionGenericLearningFn
 
 
-# Imported here so that all CFLearningFunctions will be in the same package
-from topo.base.connectionfield import IdentityCFLF,GenericCFLF
-
-
-class Hebbian_opt1(CFLearningFunction):
+class CFProjectionHebbian_opt1(CFProjectionLearningFn):
     """
     CF-aware Hebbian learning rule.
 
     Implemented in C for speed.  Should be equivalent to
-    GenericCFLF(single_cf_fn=hebbian), except faster.  
+    GenericCFProjectionLearningFn(single_cf_fn=Hebbian), except faster.  
 
     Sets the _sum attribute on any cf whose weights are
     updated during learning.
     """
-    def __init__(self,**params):
-        super(Hebbian_opt1,self).__init__(**params)
-
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
 	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
@@ -84,14 +80,15 @@ class Hebbian_opt1(CFLearningFunction):
     
        
 
-class Hebbian(GenericCFLF):
+class CFProjectionHebbian(CFProjectionGenericLearningFn):
     """
     Wrapper written to allow transparent non-optimized fallback; 
-    equivalent to GenericCFLF(single_cf_fn=topo.base.connectionfield.Hebbian())
+    equivalent to
+    GenericCFProjectionLearningFn(single_cf_fn=Hebbian())
     """
     def __init__(self,**params):
-        super(Hebbian,self).__init__(single_cf_fn=topo.base.connectionfield.Hebbian(),**params)
+        super(CFProjectionHebbian,self).__init__(single_cf_fn=Hebbian(),**params)
 
 if not optimized:
-    Hebbian_opt1 = Hebbian
-    ParameterizedObject().message('Inline-optimized components not available; using Hebbian instead of Hebbian_opt1.')
+    CFProjectionHebbian_opt1 = CFProjectionHebbian
+    ParameterizedObject().message('Inline-optimized components not available; using CFProjectionHebbian instead of CFProjectionHebbian_opt1.')

@@ -2,20 +2,25 @@
 Basic learning functions for CFProjections.
 
 Learning functions come in two varieties: LearningFunction, and
-CFLearningFunction.  A LearningFunction (e.g. Hebbian) applies to one
-ConnectionField, and is used with GenericCFLF to apply learning to an
-entire CFProjection.  GenericCFLF is one example of a
-CFLearningFunction; these work with the entire Projection at once.
-Some optimizations can only be applied at the CFLearningFunction
-level, so there are other CFLearningFunctions beyond GenericCFLF.
+CFProjectionLearningFunction.  A LearningFunction (e.g. Hebbian)
+applies to one ConnectionField, and is used with
+GenericCFProjectionLearningFn to apply learning to an entire
+CFProjection.  GenericCFProjectionLearningFn is one example of a
+CFProjectionLearningFunction; these work with the entire Projection at
+once.  Some optimizations can only be applied at the
+CFProjectionLearningFn level, so there are other
+CFProjectionLearningFns beyond GenericCFProjectionLearningFn.
 
 $Id$
 """
 __version__ = "$Revision$"
 
-from topo.base.parameterclasses import Number
-from topo.base.connectionfield import LearningFunction
+# CEBHACKALERT: file to be renamed projfns.py; basic.py will contain
+# the single-cf learning functions.
 
-# Imported here so that all CFLearningFunctions will be in the same package
-from topo.base.connectionfield import Hebbian,IdentityCFLF,GenericCFLF
+from topo.base.parameterclasses import Number
+from topo.base.connectionfield import LearningFn
+
+# Imported here so that all CFProjectionLearningFns will be in the same package
+from topo.base.connectionfield import Hebbian,CFProjectionIdentityLearningFn,CFProjectionGenericLearningFn
 

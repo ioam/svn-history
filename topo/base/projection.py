@@ -14,7 +14,7 @@ from simulator import EPConnection
 from parameterizedobject import ParameterizedObject
 
 
-class OutputFunction(ParameterizedObject):
+class OutputFn(ParameterizedObject):
     """
     Object to map a numeric item into another of the same size.
 
@@ -31,7 +31,7 @@ class OutputFunction(ParameterizedObject):
     and is not currently guaranteed to have the same value as the one
     returned by this function.
     """
-    _abstract_class_name = "OutputFunction"
+    _abstract_class_name = "OutputFn"
     
     # CEBHACKALERT: can we have this here - is there a more appropriate
     # term for it, general to output functions?
@@ -41,10 +41,10 @@ class OutputFunction(ParameterizedObject):
         raise NotImplementedError
 
 
-# Trivial example of an OutputFunction, provided for when a default
+# Trivial example of an OutputFn, provided for when a default
 # is needed.  The other concrete OutputFunction classes are stored
 # in outputfns/, to be imported as needed.
-class Identity(OutputFunction):
+class Identity(OutputFn):
     """
     Identity function, returning its argument as-is.
 
@@ -58,9 +58,9 @@ class Identity(OutputFunction):
         return x
 
 
-class OutputFunctionParameter(ClassSelectorParameter):
+class OutputFnParameter(ClassSelectorParameter):
     """
-    Parameter whose value can be any OutputFunction, i.e., a function
+    Parameter whose value can be any OutputFn, i.e., a function
     mapping a 2D array to a 2D array.
     """
     __slots__ = []
@@ -69,7 +69,7 @@ class OutputFunctionParameter(ClassSelectorParameter):
     packages = []
     
     def __init__(self,default=Identity(),**params):
-        super(OutputFunctionParameter,self).__init__(OutputFunction,default=default,**params)        
+        super(OutputFnParameter,self).__init__(OutputFn,default=default,**params)
 
 
 ### JABALERT
@@ -130,9 +130,12 @@ class ProjectionSheet(Sheet):
     A and produces and identically shaped output matrix. The default
     is the identity function.
     """
-    output_fn = OutputFunctionParameter(default=Identity(),
-                                        doc='output function applied (optionally) to the ProjectionSheet activity.')
+    output_fn = OutputFnParameter(
+        default=Identity(),
+        doc='output function applied (optionally) to the ProjectionSheet activity.')
+    
     apply_output_fn=BooleanParameter(default=True)
+
                              
     def __init__(self,**params):
         super(ProjectionSheet,self).__init__(**params)
@@ -149,8 +152,10 @@ class ProjectionSheet(Sheet):
         """
         Sheet._connect_from(self, conn, **args)
 
-        ### JCALERT! This could be better re-implemented: the structure of in_projections obliged to
-        ### use the chain method in slef.projections. Maybe it would be possible to code it differently.
+        ### JCALERT! This could be better re-implemented: the
+        ### structure of in_projections obliged to use the chain
+        ### method in slef.projections. Maybe it would be possible to
+        ### code it differently.
         if isinstance(conn, Projection):
             if conn.src.name not in self.in_projections:
                 self.in_projections[conn.src.name] = []
@@ -227,7 +232,4 @@ class ProjectionSheet(Sheet):
         for this Sheet.
         """
         return dict([(p.name,p) for p in chain(*self.in_projections.values())])
-
-
-
 

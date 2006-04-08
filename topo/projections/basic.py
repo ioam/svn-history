@@ -1,5 +1,4 @@
 """
-
 Repository for the basic Projection types.
 
 Mainly provides a place where additional Projections can be added in
@@ -15,23 +14,21 @@ import Numeric
 # So all Projections are present in this package
 from topo.base.projection import Projection
 
+from topo.base.projection import OutputFnParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Parameter,Number,BooleanParameter
 from topo.base.arrayutils import Mdot
-from topo.base.connectionfield import CFProjection,IdentityCFLF,ResponseFunctionParameter,OutputFunctionParameter,CFOutputFunction
+from topo.base.connectionfield import CFProjection,CFProjectionLearningFnParameter,CFProjectionIdentityLearningFn,CFProjectionResponseFnParameter,CFProjectionOutputFnParameter,CFProjectionIdentityOutputFn,CFProjectionOutputFn
 from topo.base.patterngenerator import PatternGeneratorParameter
-from topo.base.connectionfield import LearningFunctionParameter
 from topo.base.sheetview import UnitView
 
 from topo.outputfns.basic import Identity
 
 
-class SharedCFOF(CFOutputFunction):
-    single_cf_fn = Parameter(default=Identity())
-    
-    def __init__(self,**params):
-        super(SharedCFOF,self).__init__(**params)
 
+class SharedCFProjectionOutputFn(CFProjectionOutputFn):
+    single_cf_fn = OutputFnParameter(default=Identity())
+    
     def __call__(self, cfs, output_activity, norm_values=None, **params):
         """Apply the specified single_cf_fn to every CF."""
         if type(self.single_cf_fn) is not Identity:
@@ -39,7 +36,8 @@ class SharedCFOF(CFOutputFunction):
             self.single_cf_fn(cf.weights)
 
 
-class SharedWeightCFResponseFn(ParameterizedObject):
+
+class SharedCFProjectionResponseFn(ParameterizedObject):
     """
     Response function accepting a single CF applied to all units.
     Otherwise similar to GenericCFResponseFn.
@@ -50,9 +48,6 @@ class SharedWeightCFResponseFn(ParameterizedObject):
     ### whether there is an actual full set of cfs or not.
     single_cf_fn = Parameter(default=Mdot())
     
-    def __init__(self,**params):
-        super(SharedWeightCFResponseFn,self).__init__(**params)
-
     def __call__(self, cf, cf_slice_and_bounds, input_activity, activity, strength):
         rows,cols = activity.shape
         single_cf_fn = self.single_cf_fn
@@ -69,21 +64,27 @@ class SharedWeightCFResponseFn(ParameterizedObject):
         activity *= strength
         
 
-class SharedWeightCFProjection(CFProjection):
+class SharedCFProjection(CFProjection):
     """
     A Projection with a single ConnectionField shared by all units.
 
     Otherwise similar to CFProjection, except that learning is
     currently disabled.
     """
-    response_fn = ResponseFunctionParameter(default=SharedWeightCFResponseFn())
-    ### JABHACKALERT: Set to be constant as a clue that learning won't actually work yet.
-    learning_fn = LearningFunctionParameter(IdentityCFLF(),constant=True)
-    output_fn  = OutputFunctionParameter(default=Identity())
+    response_fn = CFProjectionResponseFnParameter(
+        default=SharedCFProjectionResponseFn())
+    
+    ### JABHACKALERT: Set to be constant as a clue that learning won't
+    ### actually work yet.
+    learning_fn = CFProjectionLearningFnParameter(
+        CFProjectionIdentityLearningFn(),constant=True)
+
+    output_fn  = OutputFnParameter(default=Identity())
+    
     strength = Number(default=1.0)
 
-    weights_output_fn = OutputFunctionParameter(default=SharedCFOF())
-
+    weights_output_fn = CFProjectionOutputFnParameter(
+        default=SharedCFProjectionOutputFn())
 
 
     def __init__(self,**params):
@@ -93,12 +94,7 @@ class SharedWeightCFProjection(CFProjection):
         """
         # we don't want the whole set of cfs initialized, but we
         # do want anything that Projection defines.
-        super(SharedWeightCFProjection,self).__init__(initialize_cfs=False,**params)
-
-
-        ### JABHACKALERT: cfs is a dummy, here only so that learning will
-        ### run without an exception
-        self.cfs = []
+        super(SharedCFProjection,self).__init__(initialize_cfs=False,**params)
 
         self.sharedcf=self.cf_type(0,0,
                                    self.src,
@@ -131,6 +127,8 @@ class SharedWeightCFProjection(CFProjection):
                 row.append((sheet_slice,cf.bounds,weights_slice))
             self.cf_slice_and_bounds.append(row)
 
+        ### JABHACKALERT: cfs is a dummy, here only so that learning will
+        ### run without an exception
         self.cfs = [self.sharedcf]
 
 

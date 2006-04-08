@@ -7,24 +7,21 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.connectionfield import CFResponseFunction
+from topo.base.connectionfield import CFProjectionResponseFn
 from topo.base.parameterclasses import Parameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.inlinec import inline, optimized
 
-from topo.responsefns.basic import CFDotProduct, CFEuclideanDistance
+from topo.responsefns.basic import CFProjectionDotProduct, CFProjectionEuclideanDistance
 
-class CFDotProduct_opt1(CFResponseFunction):
+class CFProjectionDotProduct_opt1(CFProjectionResponseFn):
     """
     Dot-product response function.
 
     Written in C for a several-hundred-times speedup; see
-    CFDotProduct for an easier-to read (but otherwise equivalent)
+    CFProjectionDotProduct for an easier-to read (but otherwise equivalent)
     version in Python.
     """
-    def __init__(self,**params):
-        super(CFDotProduct_opt1,self).__init__(**params)
-
     def __call__(self, cfs, input_activity, activity, strength, **params):
         temp_act = activity
         rows,cols = activity.shape
@@ -67,21 +64,21 @@ class CFDotProduct_opt1(CFResponseFunction):
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
 if not optimized:
-    CFDotProduct_opt1 = CFDotProduct
-    ParameterizedObject().message('Inline-optimized components not available; using CFDotProduct instead of CFDotProduct_opt1.')
+    CFprojectionDotProduct_opt1 = CFProjectionDotProduct
+    ParameterizedObject().message('Inline-optimized components not available; using CFProjectionDotProduct instead of CFProjectionDotProduct_opt1.')
 
 
 
-class CFEuclideanDistance_opt1(CFResponseFunction):
+class CFProjectionEuclideanDistance_opt1(CFProjectionResponseFn):
     """
     Euclidean-distance response function.
 
     Written in C for a several-hundred-times speedup; see
-    CFEuclideanDistance for an easier-to read (but otherwise
+    CFProjectionEuclideanDistance for an easier-to read (but otherwise
     equivalent) version in Python.
     """
     def __init__(self,**params):
-        super(CFEuclideanDistance_opt1,self).__init__(**params)
+        super(CFProjectionEuclideanDistance_opt1,self).__init__(**params)
 
     def __call__(self, cfs, input_activity, activity, strength, **params):
         temp_act = activity
@@ -151,7 +148,7 @@ class CFEuclideanDistance_opt1(CFResponseFunction):
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
 if not optimized:
-    CFEuclideanDistance_opt1 = CFEuclideanDistance
-    ParameterizedObject().message('Inline-optimized components not available; using CFEuclideanDistance instead of CFEuclideanDistance_opt1.')
+    CFProjectionEuclideanDistance_opt1 = CFProjectionEuclideanDistance
+    ParameterizedObject().message('Inline-optimized components not available; using CFProjectionEuclideanDistance instead of CFProjectionEuclideanDistance_opt1.')
 
 

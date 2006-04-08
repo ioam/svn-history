@@ -17,7 +17,7 @@ __all__ = [re.sub('\.py$','',f) for f in os.listdir(__path__[0])
 
 
 import topo
-from topo.base.connectionfield import LearningFunctionParameter
+from topo.base.connectionfield import LearningFnParameter
 def make_classes_from_all_imported_modules_available():
     """
     Add all LearningFunction classes from the currently imported modules in
@@ -25,4 +25,4 @@ def make_classes_from_all_imported_modules_available():
 
     See topo.base.parameterclasses.ClassSelectorParameter.range().
     """
-    LearningFunctionParameter.packages.append(topo.learningfns)
+    LearningFnParameter.packages.append(topo.learningfns)

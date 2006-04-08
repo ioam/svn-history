@@ -4,10 +4,10 @@ Output functions (see basic.py) and projection-level output functions
 
 Requires the weave package; without it unoptimized versions are used.
 """
-from topo.base.projection import OutputFunction, OutputFunctionParameter
+from topo.base.projection import OutputFn, OutputFnParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
-from topo.base.connectionfield import CFOutputFunction,GenericCFOF
+from topo.base.connectionfield import CFProjectionOutputFn,CFProjectionGenericOutputFn
 
 from topo.misc.inlinec import inline, optimized
 
@@ -16,9 +16,9 @@ from basic import DivisiveSumNormalize
 
 # CB: will be DivisiveL1Normalize (i.e. will use the
 # absolute values - see basic.py).
-class DivisiveSumNormalize_opt1(OutputFunction):
+class DivisiveSumNormalize_opt1(OutputFn):
     """
-    OutputFunction that divides an array by its sum.
+    OutputFn that divides an array by its sum.
 
     See the equivalent version in outputfns.basic for a
     description.
@@ -69,7 +69,7 @@ if not optimized:
 
 
 
-## class PiecewiseLinear(OutputFunction):
+## class PiecewiseLinear(OutputFn):
 ##     """ 
 ##     Piecewise-linear output function with lower and upper thresholds
 ##     as constructor parameters.
@@ -77,9 +77,6 @@ if not optimized:
 ##     lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
 ##     upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
     
-##     def __init__(self,**params):
-##         super(PiecewiseLinear,self).__init__(**params)
-
 ##     def __call__(self,x):
         
 ##         fact = 1.0/(self.upper_bound-self.lower_bound)        
@@ -109,19 +106,20 @@ if not optimized:
 ##         return x
 
 
-class DivisiveSumNormalizeCFOF_opt1(CFOutputFunction):
+class CFProjectionDivisiveSumNormalize_opt1(CFProjectionOutputFn):
     """
     Performs divisive normalization of the weights of all cfs.
 
     Equivalent to
-    GenericCFOF(single_cf_fn=DivisiveSumNormalize(norm_value=1.0)),
+    GenericCFProjectionOutputFn(single_cf_fn=DivisiveSumNormalize(norm_value=1.0)),
     except this assumes the presence of the _sum attribute on any
     activated unit's CFs.
     """
-    single_cf_fn = OutputFunctionParameter(DivisiveSumNormalize_opt1(norm_value=1.0),constant=True)
+    single_cf_fn = OutputFnParameter(DivisiveSumNormalize_opt1(norm_value=1.0),
+                                     constant=True)
 
     def __init__(self,**params):
-        super(DivisiveSumNormalizeCFOF_opt1,self).__init__(**params)
+        super(CFProjectionDivisiveSumNormalize_opt1,self).__init__(**params)
 
     def __call__(self, cfs, output_activity, **params):
         rows,cols = output_activity.shape
@@ -162,14 +160,16 @@ class DivisiveSumNormalizeCFOF_opt1(CFOutputFunction):
         inline(code, ['output_activity','rows','cols','cfs'], local_dict=locals())
 
 
-class DivisiveSumNormalizeCFOF(GenericCFOF):
+class CFProjectionDivisiveSumNormalize(CFProjectionGenericOutputFn):
     """
-    Wraps GenericCFOF(single_cf_fn=DivisiveSumNormalize), the non-optimized
-    equivalent of DivisiveSumNormalizeCFOF_opt1.
+    Wraps
+    CFProjectionGenericOutputFn(single_cf_fn=DivisiveSumNormalize),
+    the non-optimized equivalent of DivisiveSumNormalizeCFOF_opt1.
     """
     def __init__(self,**params):
-        super(DivisiveSumNormalizeCFOF,self).__init__(single_cf_fn=DivisiveSumNormalize(norm_value=1.0),**params)
+        super(CFProjectionDivisiveSumNormalize,self).__init__(single_cf_fn=DivisiveSumNormalize(norm_value=1.0),**params)
+
 
 if not optimized:
-    DivisiveSumNormalizeCFOF_opt1 = DivisiveSumNormalizeCFOF
-    ParameterizedObject().message('Inline-optimized components not available; using DivisiveSumNormalizeCFOF instead of DivisiveSumNormalizeCFOF_opt1.')
+    CFProjectionDivisiveSumNormalize_opt1 = CFProjectionDivisiveSumNormalize
+    ParameterizedObject().message('Inline-optimized components not available; using CFProjectionDivisiveSumNormalize instead of CFProjectionDivisiveSumNormalize_opt1.')

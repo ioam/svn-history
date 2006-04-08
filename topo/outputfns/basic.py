@@ -18,23 +18,25 @@ import Numeric
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
 from topo.base.arrayutils import L2norm, norm
-# JABALERT: should move OutputFunction to some other file so that we
+# JABALERT: should move OutputFn to some other file so that we
 # don't have to import projection here, or anything else
 # Topographica-specific
-from topo.base.projection import OutputFunction
+from topo.base.projection import OutputFn
 from topo.base.arrayutils import clip_in_place
 
-# Imported here so that all OutputFunctions will be in the same package
+# Imported here so that all OutputFns will be in the same package
 from topo.base.projection import Identity
 
-### JCALERT! The functions below have been re-written to work as procedure;
-### Nonetheless, I kept the return x statement in order to not be worry about
-### changing the call anywhere else in the code. That might have to be done later.
-### Also note that the test file still test the method for both procedure and function calls
+### JCALERT! The functions below have been re-written to work as
+### procedure; Nonetheless, I kept the return x statement in order to
+### not be worry about changing the call anywhere else in the
+### code. That might have to be done later.  Also note that the test
+### file still test the method for both procedure and function calls
 
 # CEBHACKALERT: these need to respect the mask - which will be passed in.
 
-class PiecewiseLinear(OutputFunction):
+
+class PiecewiseLinear(OutputFn):
     """ 
     Piecewise-linear output function with lower and upper thresholds
     as constructor parameters.
@@ -50,9 +52,9 @@ class PiecewiseLinear(OutputFunction):
         return x
 
 
-class DivisiveSumNormalize(OutputFunction):
+class DivisiveSumNormalize(OutputFn):
     """
-    OutputFunction that divides an array by its sum (aka its L1 norm).
+    OutputFn that divides an array by its sum (aka its L1 norm).
 
     # CEBHACKALERT: I think the L1 norm is the sum of the absolute
     # values. Is this supposed to be DivisiveSumNormalize or
@@ -87,9 +89,9 @@ class DivisiveSumNormalize(OutputFunction):
         return x
 
 
-class DivisiveL1Normalize(OutputFunction):
+class DivisiveL1Normalize(OutputFn):
     """
-    OutputFunction that divides an array by its L1 norm.
+    OutputFn that divides an array by its L1 norm.
 
     This operation ensures that an array has a sum equal to the specified 
     norm_value, rescaling each value to make this true.  The array is 
@@ -121,9 +123,9 @@ class DivisiveL1Normalize(OutputFunction):
         return x
 
 
-class DivisiveLengthNormalize(OutputFunction):
+class DivisiveLengthNormalize(OutputFn):
     """
-    OutputFunction to divide an array by its Euclidean length (aka its L2 norm).
+    OutputFn to divide an array by its Euclidean length (aka its L2 norm).
 
     For a given array interpreted as a flattened vector, keeps the
     Euclidean length of the vector at a specified norm_value.
@@ -138,9 +140,9 @@ class DivisiveLengthNormalize(OutputFunction):
         return x
 
 
-class DivisiveMaxNormalize(OutputFunction):
+class DivisiveMaxNormalize(OutputFn):
     """
-    OutputFunction to divide an array by the absolute value of its maximum.
+    OutputFn to divide an array by the absolute value of its maximum.
 
     For a given array interpreted as a flattened vector, scales the
     elements divisively so that the maximum absolute value is the
@@ -157,9 +159,9 @@ class DivisiveMaxNormalize(OutputFunction):
         return x
 
     
-class DivisiveLpNormalize(OutputFunction):
+class DivisiveLpNormalize(OutputFn):
     """
-    OutputFunction to divide an array by its Lp-Norm, where p is specified.
+    OutputFn to divide an array by its Lp-Norm, where p is specified.
 
     For a parameter p and a given array interpreted as a flattened
     vector, keeps the Lp-norm of the vector at a specified norm_value.

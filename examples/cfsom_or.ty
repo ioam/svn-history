@@ -24,7 +24,7 @@ from topo.base.parameterclasses import DynamicNumber,Wrapper
 from topo.base.simulator import Simulator
 from topo.learningfns.som import HebbianSOMLF
 from topo.patterns import PatternGeneratorParameter
-from topo.responsefns.optimized import CFDotProduct_opt1
+from topo.responsefns.optimized import CFProjectionDotProduct_opt1
 from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 
@@ -53,7 +53,7 @@ topo.sim['V1'] = CFSOM(density=50,learning_length=10000,radius_0=0.1,alpha_0=0.5
 topo.sim.connect2('Retina','V1',delay=0.5,connection_type=CFProjection, name='RtoV1',
                   weights_generator = topo.patterns.random.UniformRandom(),
                   weights_bounds=BoundingBox(radius=0.1),
-                  response_fn = CFDotProduct_opt1(),
+                  response_fn = CFProjectionDotProduct_opt1(),
                   learning_fn=HebbianSOMLF())
 
 topo.sim.run(0)
