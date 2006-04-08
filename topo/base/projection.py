@@ -31,8 +31,6 @@ class OutputFunction(ParameterizedObject):
     and is not currently guaranteed to have the same value as the one
     returned by this function.
     """
-
-    # OutputFunction is abstract
     _abstract_class_name = "OutputFunction"
     
     # CEBHACKALERT: can we have this here - is there a more appropriate
@@ -62,8 +60,8 @@ class Identity(OutputFunction):
 
 class OutputFunctionParameter(ClassSelectorParameter):
     """
-    Parameter whose value can be any OutputFunction, i.e., a function mapping a 2D array
-    to a 2D array.
+    Parameter whose value can be any OutputFunction, i.e., a function
+    mapping a 2D array to a 2D array.
     """
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
