@@ -49,9 +49,6 @@ from boundingregion import BoundingBox,BoundingRegionParameter
 weight_type = Numeric.Float32
 
 
-# CEBHACKALERT: do all these LearningFn* classes belong in this file?
-# Move to learningfns/basic.py?
-
 class LearningFn(ParameterizedObject):
     """Abstract base class for learning functions that plug into GenericCFLF."""
 
