@@ -21,8 +21,7 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/03/27: (CB) Clean up names of CFOutputFunctions, OutputFunctions, etc. and put
-in the correct locations.
+2006/04/08: (CB) Check that the name changes made to OutputFns and the rest make sense; finish that reorganization; make sure the corresponding Parameters are ok and that their lists are populated for the GUI.
 </li>
 
 <li> 
@@ -42,11 +41,11 @@ in the correct locations.
 </li>
 
 <li>
-2006/03/07: (CB) Implement scheduled actions as strings exec'd in main [not committed, but working - just needs cleaning]
+2006/04/08: (CB) Implement scheduled actions as strings exec'd in main [it worked a long time ago, it just needs to be implemented on a current copy!]
 </li>
 
 <li>
-2006/03/07 (CB): A better way to implement the Wrapper class(es); change all examples so they set input parameters on an object rather than the class (using Wrapper) 
+2006/04/08 (CB): A better way to implement the Wrapper class(es); change all examplesand tests so they set input parameters on an object rather than the class (using Wrapper) 
 </li>
 
 <li>
@@ -73,15 +72,11 @@ Tasks which the developers are about to start.
 <ul>
 
 <li>
-2006/03/07 (CB): Document pickle and update documentation now it's changed (e.g. tutorials, don't need to load script first of all).
+2006/04/08 (CB): Update tutorials now that scripts don't need to be run before loading a snapshot.
 </li>
 
 <li>
 2006/03/07 (CB): Why RetinotopicSOM can't be found on unpickling.
-</li>
-
-<li>
-2006/03/07 (CB): Set simulator's release attribute on pickling.
 </li>
 
 <li>
@@ -138,7 +133,7 @@ Ongoing work with uncertain finishing times.
 </li>
 
 <li>
-2006/03/07: (Windows) Build python on windows with free compiler ('free' as in 'free as a bird'). Maybe use pymingw?
+2006/03/07: (Windows) Build python on windows with free compiler. Maybe use pymingw?
 </li>
 
 </ul>
