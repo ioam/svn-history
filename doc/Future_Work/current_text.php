@@ -30,7 +30,7 @@ in the correct locations.
 </li>
 
 <li> 
-2006/03/17 (CB): Slice class; HACKALERTs relating to Sheet, xdensity, ydensity (etc).
+2006/04/08 (CB): Slice class; HACKALERTs relating to Sheet, xdensity, ydensity (etc); investigate failing test in testimage.py (that uses sheet functions).
 </li>
 
 <li>
@@ -82,10 +82,6 @@ Tasks which the developers are about to start.
 
 <li>
 2006/03/07 (CB): Set simulator's release attribute on pickling.
-</li>
-
-<li>										    
-2006/03/03 (CB): modify test files to take less time to run (notably measurefeaturemap: reduce the density)
 </li>
 
 <li>
