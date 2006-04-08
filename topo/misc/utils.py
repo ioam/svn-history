@@ -277,7 +277,7 @@ def get_states_of_classes_from_module(module,states_of_classes,processed_modules
     dict_ = module.__dict__
     for (k,v) in dict_.items():
         if '__all__' in dict_ and inspect.ismodule(v) and k not in exclude:
-            if dict_['__all__'].count(k)>0 and processed_modules.count(v)<1:
+            if k in dict_['__all__'] and v not in processed_modules:
                 #print "pickling classes in",k
                 get_states_of_classes_from_module(v,states_of_classes,processed_modules,exclude)
             processed_modules.append(v)
