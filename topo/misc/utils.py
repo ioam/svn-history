@@ -256,7 +256,7 @@ def keys_sorted_by_value(d):
 # CEBHACKALERT: this could be improved!
 import inspect
 from topo.base.parameterizedobject import Parameter, ParameterizedObject
-def get_states_of_classes_from_module(module,states_of_classes,processed_modules):
+def get_states_of_classes_from_module(module,states_of_classes,processed_modules,exclude=None):
     """
     Recursively search module and get states of classes within it.
 
@@ -265,18 +265,21 @@ def get_states_of_classes_from_module(module,states_of_classes,processed_modules
     Something is considered a module for our purposes if inspect says it's a module,
     and it defines __all__. We only search through modules listed in __all__.
 
-    Keeps a list of processed modules to avoid looking at the same one more than once
-    (since e.g. __main__ contains __main__ contains __main__...)
+    Keeps a list of processed modules to avoid looking at the same one
+    more than once (since e.g. __main__ contains __main__ contains
+    __main__...)
 
-    topo.plotting is specifically excluded because it's full of lambdas and isn't
-    something we need to save the state of.
+    Packages can be specifically excluded if listed in exclude.
     """
-    #print "processing:",module.__name__
+    if not exclude:
+        exclude = []
+    
     dict_ = module.__dict__
     for (k,v) in dict_.items():
-        if '__all__' in dict_ and inspect.ismodule(v) and k!='plotting':  
+        if '__all__' in dict_ and inspect.ismodule(v) and k not in exclude:
             if dict_['__all__'].count(k)>0 and processed_modules.count(v)<1:
-                get_states_of_classes_from_module(v,states_of_classes,processed_modules)
+                #print "pickling classes in",k
+                get_states_of_classes_from_module(v,states_of_classes,processed_modules,exclude)
             processed_modules.append(v)
 
         else:

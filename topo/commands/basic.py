@@ -118,9 +118,11 @@ def save_snapshot(snapshot_name):
     states_of_classes = {}
     classes = {}
 
-    # for now we just search topo, but it could be extended to all packages.
-    topo_ = __main__.__dict__['topo']
-    get_states_of_classes_from_module(topo_,states_of_classes,[])
+    # For now we just search topo, but it could be extended to all packages.
+    # We exclude certain subpackages that contain classes that aren't part
+    # of the simulation.
+    exclude = ('plotting','tkgui','tests') 
+    get_states_of_classes_from_module(topo,states_of_classes,[],exclude)
 
     # Store the release version for this simulator.
     topo.sim.RELEASE = topo.release
