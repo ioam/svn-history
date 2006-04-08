@@ -22,6 +22,8 @@ from math import pi
 
 from Numeric import array, zeros, Float 
 
+import topo
+
 from topo.base import sheetview
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
@@ -31,7 +33,7 @@ from topo.commands.basic import pattern_present, restore_input_generators, save_
 from topo.misc.distribution import Distribution
 from topo.sheets.generatorsheet import GeneratorSheet
 
-import topo.base.simulator
+
 
 
 class FeatureMap(ParameterizedObject):
@@ -127,9 +129,6 @@ class MeasureFeatureMap(ParameterizedObject):
                        {'x': (0.0,2.0), [0.0, 0.5, 0.6, 0.7, 1.0], False}
                        for the non-cyclic x values specified, which may only fall in the range [0.0,1.0].
         """
-        # CEBHACKALERT: see alert in topo/commands/basic.py about testing there is an active_sim
-        self.simulator=topo.base.simulator.get_active_sim()
-        
         # This dictionary will contain (for each sheet) a dictionary to hold the FeatureMap for each feature
         # {sheet: {feature: FeatureMap()}}
         self.__featuremaps = {}
@@ -156,7 +155,7 @@ class MeasureFeatureMap(ParameterizedObject):
         # (see alert in sheet.py), and we will have a per projection plastic
         # attribure, too.
         f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-        self.__measured_sheets = filter(f,self.simulator.objects(Sheet).values())
+        self.__measured_sheets = filter(f,topo.sim.objects(Sheet).values())
         
         # now create the featuremaps for each sheet    
         for sheet in self.__measured_sheets:
@@ -198,7 +197,7 @@ class MeasureFeatureMap(ParameterizedObject):
                 feature_points[feature] = value
 
             # DRAW THE PATTERN: call to the user_function
-            user_function(self.simulator,feature_points,param_dict)
+            user_function(topo.sim,feature_points,param_dict)
 
 
             # CEBHACKALERT: I've temporarily removed this feature,
