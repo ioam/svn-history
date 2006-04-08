@@ -479,6 +479,13 @@ def is_number(obj):
 
 class ClassSelectorParameter(Parameter):
     """
+    Parameter whose value is an instance of the specified class.
+
+    Offers a range() method to return possible types that the
+    value could be an instance of.
+
+    Subclasses must define the class attribute 'packages', which must
+    be a list.
     """
     __slots__ = ['class_','suffix_to_lose']
     __doc__ = property((lambda self: self.doc))
@@ -486,16 +493,22 @@ class ClassSelectorParameter(Parameter):
     def __init__(self,class_,default=None,instantiate=True,
                  suffix_to_lose='',**params):
         """
+
         """
         assert (hasattr(self, 'packages') and isinstance(self.packages,list)), "ClassSelectorParameter subclasses must have the class attribute 'packages', and it must be a list."
         
         self.class_ = class_
+
+        # CEBALERT: Currently offers the possibility to cut off the
+        # end of a class name (suffix_to_lose), but this could be
+        # extended to any processing of the class name.
         self.suffix_to_lose = suffix_to_lose
+
+        # CEBHACKALERT: check default's in range!
         Parameter.__init__(self,default=default,instantiate=instantiate,
                            **params)
 
-        # CEBHACKALERT: check default's in range
-
+        
     def range(self):
         """
         Return {visible_name: <class>} for all classes in self.packages.
@@ -518,12 +531,10 @@ class ClassSelectorParameter(Parameter):
         else:
             return k
 
-    # CEBHACKALERT: might want to replace underscores with spaces
     def __classname_repr(self, class_name):
         """
         Return class_name stripped of self.suffix_to_lose.
         """
-        # Cut off 'suffix_to_lose'
         return re.sub(self.suffix_to_lose+'$','',class_name)
         
 
