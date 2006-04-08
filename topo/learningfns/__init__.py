@@ -1,8 +1,13 @@
 """
-A family of learning functions for CFProjections.
-
-These function objects compute a new set of ConnectionFields when given an input
-and output pattern and a set of ConnectionField objects.
+Learning functions come in two varieties: LearningFunction, and
+CFProjectionLearningFunction.  A LearningFunction (e.g. Hebbian)
+applies to one ConnectionField, and is used with
+GenericCFProjectionLearningFn to apply learning to an entire
+CFProjection.  GenericCFProjectionLearningFn is one example of a
+CFProjectionLearningFunction; these work with the entire Projection at
+once.  Some optimizations can only be applied at the
+CFProjectionLearningFn level, so there are other
+CFProjectionLearningFns beyond GenericCFProjectionLearningFn.
 
 Any new learning functions added to this directory will automatically
 become available for any model.

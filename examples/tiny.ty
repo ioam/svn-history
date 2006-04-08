@@ -20,7 +20,8 @@ from topo.base.connectionfield import CFSheet,CFProjection,CFProjectionGenericOu
 from topo.base.connectionfield import LearningFn
 from topo.base.parameterclasses import DynamicNumber,Wrapper
 from topo.base.simulator import Simulator
-from topo.learningfns.basic import CFProjectionGenericLearningFn, Hebbian
+from topo.learningfns.projfns import CFProjectionGenericLearningFn
+from topo.learningfns.basic import Hebbian
 from topo.outputfns.basic import PiecewiseLinear
 from topo.patterns import PatternGeneratorParameter
 from topo.responsefns.optimized import CFProjectionDotProduct_opt1
