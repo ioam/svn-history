@@ -126,7 +126,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         # build simulation
         s = topo.base.simulator.Simulator()
         
-        retina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina',desnity=5)
+        retina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina',density=5)
         retina.print_level = topo.base.parameterizedobject.WARNING
         V1 = CFSOM(name='V1',density=5)
         V1.print_level = topo.base.parameterizedobject.WARNING
