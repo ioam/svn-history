@@ -22,13 +22,13 @@ class TestPatternPresent(unittest.TestCase):
 
     def test_pattern_present(self):
         GeneratorSheet.period = 1.0
-        GeneratorSheet.density = 20
+        GeneratorSheet.density = 4
         topo.patterns.basic.Line.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         topo.patterns.basic.Line.y = Dynamic(lambda : random.uniform(-0.5,0.5))
         topo.patterns.basic.Line.orientation = Dynamic(lambda :random.uniform(-pi,pi))
         topo.patterns.basic.Line.thickness = 0.02
         topo.patterns.basic.Line.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
-        CFSOM.density = 10
+        CFSOM.density = 4
         CFSOM.learning_length = 10000
         CFSOM.radius_0 = 0.1
         CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))

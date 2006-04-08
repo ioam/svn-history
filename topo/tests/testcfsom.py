@@ -133,11 +133,10 @@ class TestCFSom(unittest.TestCase):
 
     def test_cfsom(self):
         """
-        Cut and paste of current topographica/examples/cfsom_example.py
         """
         # input generation params
         GeneratorSheet.period = 1.0
-        GeneratorSheet.density = 30
+        GeneratorSheet.density = 5
         GeneratorSheet.print_level = topo.base.parameterizedobject.WARNING
         
         topo.patterns.basic.Gaussian.x = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -151,7 +150,7 @@ class TestCFSom(unittest.TestCase):
         topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
 
         # cf som parameters
-        CFSOM.density = 30
+        CFSOM.density = 5
         CFSOM.learning_length = 10000
         CFSOM.radius_0 = 0.1
 
