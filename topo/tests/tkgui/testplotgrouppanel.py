@@ -34,7 +34,7 @@ class TestPlotGroupPanel(unittest.TestCase):
             self.s   Sample simulation with a couple of sheets
         """
         GeneratorSheet.period = 1.0
-        GeneratorSheet.density = 30
+        GeneratorSheet.density = 5
 #        base.print_level = topo.base.parameterizedobject.WARNING
 #        GeneratorSheet.print_level = topo.base.parameterizedobject.WARNING
         
@@ -109,7 +109,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         topo.tkgui.plotgrouppanel.PlotGroupPanel.print_level = topo.base.parameterizedobject.WARNING
         # input generation params
         GeneratorSheet.period = 1.0
-        GeneratorSheet.density = 30
+        GeneratorSheet.density = 5
         
         topo.patterns.basic.Line.x = Dynamic(lambda : random.uniform(-0.5,0.5))
         topo.patterns.basic.Line.y = Dynamic(lambda : random.uniform(-0.5,0.5))
@@ -118,7 +118,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         topo.patterns.basic.Line.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
         
         # rf som parameters
-        CFSOM.density = 50
+        CFSOM.density = 5
         CFSOM.learning_length = 10000
         CFSOM.radius_0 = 0.1
         
@@ -126,9 +126,9 @@ class TestPlotGroupPanel(unittest.TestCase):
         # build simulation
         s = topo.base.simulator.Simulator()
         
-        retina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina')
+        retina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina',desnity=5)
         retina.print_level = topo.base.parameterizedobject.WARNING
-        V1 = CFSOM(name='V1')
+        V1 = CFSOM(name='V1',density=5)
         V1.print_level = topo.base.parameterizedobject.WARNING
         
         s.connect(retina,V1,delay=1,connection_type=CFProjection)
