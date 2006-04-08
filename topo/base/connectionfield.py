@@ -467,6 +467,25 @@ class GenericCFOF(CFOutputFunction):
                     cf = cfs[r][c]                    
                     single_cf_fn(cf.weights,cf.sum)
                     ## del cf.sum 
+
+
+# CB: are we missing ProjectionFunctionParameter?
+
+class CFOutputFunctionParameter(ClassSelectorParameter):
+    """
+    Parameter whose value can be any CFOutputFunction; i.e., a function
+    that iterates through all the CFs of a CFProjection and applies
+    an output_fn to each.
+    """
+    __slots__ = []
+    __doc__ = property((lambda self: self.doc))
+
+    packages = []
+
+    def __init__(self,default=GenericCFOF(),**params):
+        super(CFOutputFunctionParameter,self).__init__(CFOutputFunction,default=default,**params)        
+
+
                     
 
 class CFProjection(Projection):
@@ -496,8 +515,8 @@ class CFProjection(Projection):
     output_fn  = OutputFunctionParameter(default=Identity(),
                                          doc='Function applied to the Projection activity after it is computed.')
 
-    weights_output_fn = OutputFunctionParameter(default=GenericCFOF(),
-                          doc='Function applied to the weights after learning.')
+    weights_output_fn = CFOutputFunctionParameter(default=GenericCFOF(),
+                          doc='Function applied to each CF after learning.')
 
     strength = Number(default=1.0)
 
