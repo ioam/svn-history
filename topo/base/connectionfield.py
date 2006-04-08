@@ -445,15 +445,8 @@ class CFOutputFunction(ParameterizedObject):
 
 class GenericCFOF(CFOutputFunction):
     """Applies the specified single_cf_fn to each CF."""
-    single_cf_fn = Parameter(default=Identity())
+    single_cf_fn = OutputFunctionParameter(default=Identity())
     
-    def __init__(self,**params):
-        """
-        The single_cf_fn must have the Parameter 'norm_value'  
-        (the target norm of the array it's given).
-        """
-        super(GenericCFOF,self).__init__(**params)
-
     def __call__(self, cfs, output_activity, **params):
         """
         Apply the single_cf_fn to each CF.
