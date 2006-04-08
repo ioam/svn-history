@@ -1,8 +1,11 @@
 """
 Unit tests for Topographica.
 
-Runs all tests in any file in this directory whose name begins with
+Sets up all tests in any file in this directory whose name begins with
 'test' and ends '.py', if it define the 'suite' attribute.
+
+Use the 'run' function to run the tests.
+
 
 $Id$
 """
@@ -48,6 +51,30 @@ for test_name in __all__:
         print err
     
 
-def run(verbosity=1):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite)
+def run(verbosity=1,test_modules=None):
+    """
+    By default, run all tests in any file in this directory whose name
+    begins with 'test' and ends '.py', if it define the 'suite'
+    attribute.
+
+    Example usage:
+      ./topographica -c 'import topo.tests; topo.tests.run()'
+
+    
+    verbosity specifies the level of information printed during the
+    tests (see unittest.TextTestRunner).
+
+    To run only a subset of the tests, specify the module names in
+    test_modules. For example:
+    
+      ./topographica -c 'import topo.tests.testimage; topo.tests.run(test_modules=[topo.tests.testimage])'    
+    """
+
+    if not test_modules:
+        unittest.TextTestRunner(verbosity=verbosity).run(suite)
+    else:
+        new_suite = unittest.TestSuite()
+        for test_module in test_modules:
+            new_suite.addTest(getattr(test_module,'suite'))
+        unittest.TextTestRunner(verbosity=verbosity).run(new_suite)
 
