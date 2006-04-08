@@ -21,13 +21,13 @@ __version__='$Revision$'
 import unittest,re,os
 
 # Automatically discover all test*.py files in this directory
-# and import them. 
 __all__ = [re.sub('\.py$','',f)
            for f in os.listdir(__path__[0])
            if re.match('^test.*\.py$',f)]
 
-for test_name in __all__:
-    exec 'import '+test_name
+
+# Remove any test that for now we don't want to run with the others
+__all__.remove('testsnapshots') # (see the note in that file)
 
 
 # For each test module that defines a 'suite' attribute, add its
@@ -36,7 +36,11 @@ for test_name in __all__:
 # variable is set.
 suite = unittest.TestSuite()
 display_loc = os.getenv('DISPLAY')
-for test_name in __all__:    
+
+for test_name in __all__:
+    # import the module
+    exec 'import '+test_name
+    
     test_module = locals()[test_name]
     try:        
         print 'Checking module %s for test suite...' % test_name,
