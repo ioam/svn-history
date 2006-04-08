@@ -11,11 +11,6 @@ __version__='$Revision$'
 
 import unittest,re,os
 
-# CEBHACKALERT: maybe the tkgui tests should be separate? There could
-# be name clashes by doing the import like this. Instead, maybe run()
-# in this file could all call GUI tests, which would be run separately in
-# tkgui/__init__.py?
-from tkgui import *
 
 # Automatically discover all test*.py files in this directory
 # and import them. 
@@ -33,7 +28,7 @@ for test_name in __all__:
 # variable is set.
 suite = unittest.TestSuite()
 display_loc = os.getenv('DISPLAY')
-for test_name in __all__+tkgui.__all__:    
+for test_name in __all__:    
     test_module = locals()[test_name]
     try:        
         print 'Checking module %s for test suite...' % test_name,
