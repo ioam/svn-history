@@ -437,6 +437,8 @@ class GenericCFLF(CFLearningFunction):
 
 class CFOutputFunction(ParameterizedObject):
     """Map the weight matrix of each CF into a new one of the same shape."""
+    _abstract_class_name = "CFOutputFunction"
+    
     def __call__(self, cfs, output_activity,**params):
         raise NotImplementedError
 
