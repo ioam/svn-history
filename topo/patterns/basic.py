@@ -6,9 +6,10 @@ $Id$
 __version__='$Revision$'
 
 from math import pi
-from Numeric import around,bitwise_and,sin,add
+from Numeric import around,bitwise_and,sin,add,Float
 
-from topo.base.parameterclasses import Number, Parameter, ClassSelectorParameter
+from topo.base.parameterclasses import Number, Parameter, Enumeration
+from topo.base.projection import OutputFnParameter
 from topo.misc.patternfns import gaussian,gabor,line,disk,ring
 from topo.base.patterngenerator import PatternGenerator
 
@@ -359,6 +360,99 @@ class PatternSampler(ParameterizedObject):
 
 
 
+## from topo.base.parameterclasses import Wrapper
+## class CompositePatternGenerator(PatternGenerator):
+##     """
+##     PatternGenerator that accepts a list of other PatternGenerators.
+##     To create a new pattern, asks each of the PatternGenerators in the
+##     list to create a pattern, then it combines the patterns to create a 
+##     single pattern that it returns.
+##     """
+
+##     # CEBHACKALERT: size_normalization and whole_image_output_fn are
+##     # hidden temporarily.
+
+##     output_fn = OutputFnParameter(default=Identity())
+
+##     operator = Parameter(
+##         default=Wrapper("Numeric.add"),
+##         doc="Numeric function used to combine the individual patterns.",
+##         precedence=0.98)
+    
+##     generators = Parameter(
+##         default=[],
+##         doc="List of patterns to use in the composite pattern.",
+##         precedence=0.97)
+
+##     aspect_ratio   = Number(
+##         default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+##         precedence=0.31,
+##         doc="Ratio of width to height of the composite pattern.")
+    
+##     size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+##                    precedence=0.30,
+##                    doc="Height of the composite pattern.")
+
+##     size_normalization = Enumeration(
+##         hidden='True',
+##         default='original',
+##         available=['fit_shortest','fit_longest','stretch_to_fit','original'],
+##         precedence=0.95,
+##         doc='How to scale the initial image size relative to the default area of 1.0.')
+
+##     whole_image_output_fn = OutputFnParameter(
+##         hidden='True',
+##         default=Identity(),
+##         precedence=0.96,
+##         doc='Function applied to the whole composite array (before any cropping).')
+
+
+##     def __init__(self,generators=[Disk(x=-0.3),Disk(x=0.3)],**params):
+##         super(CompositePatternGenerator,self).__init__(**params)
+##         self.generators = generators
+##         self.image_array = None
+
+
+##     def function(self,**params):
+##         size_normalization = params.get('scaling',self.size_normalization)
+##         whole_image_output_fn = params.get('whole_image_output_fn',
+##                                            self.whole_image_output_fn)
+##         bounds = params.get('bounds',self.bounds)
+##         density=params.get('density',self.density)
+##         height = params.get('size',self.size)
+##         width = (params.get('aspect_ratio',self.aspect_ratio))*height
+
+
+##         assert hasattr(self.operator,'reduce'),repr(self.operator)+" does not support 'reduce'."
+
+
+##         # CEBHACKALERT: could skip re-generation if nothing has
+##         # changed.  But that involves checking the component
+##         # PatternGenerators haven't also changed (e.g. had a parameter
+##         # altered), which I'm not sure how to do in a reasonable
+##         # way. Alternatively, we could just say that if the list
+##         # doesn't change, we don't change the Composite - even though
+##         # a component PatternGenerator might have changed.
+
+
+##         patterns = []
+        
+##         for pg in self.generators:
+##             assert isinstance(pg,PatternGenerator),repr(pg)+" is not a PatternGenerator."
+##             patterns.append(pg(bounds=bounds,density=density))
+        
+##         image_array = self.operator.reduce(patterns)
+
+##         ps = PatternSampler(image_array,whole_image_output_fn)
+
+
+##         return ps(self.pattern_x,self.pattern_y,
+##                   float(density),
+##                   size_normalization,
+##                   float(width),float(height))
+
+
+
 
 # CEBHACKALERT: this will be re-done; it is basically just the old
 # Image class.
@@ -506,6 +600,11 @@ class CompositePatternGenerator(PatternGenerator):
                         image_sample[i,j] = self.image_array[ y_scaled[i,j],x_scaled[i,j] ]
 
         return image_sample
+
+
+
+
+
 
 
 
