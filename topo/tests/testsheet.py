@@ -414,27 +414,25 @@ class TestCoordinateTransforms(unittest.TestCase):
     # CEBHACKALERT: this test should probably be somewhere else and
     # called something different
     def test_connection_field_like(self):
-        pass
+        # test a ConnectionField-like example
+        sheet = Sheet()
+        cf_bounds = boundingregion.BoundingBox(points=((0.3,0.3),(0.6,0.6)))
 
-##         # test a ConnectionField-like example
-##         sheet = Sheet()
-##         cf_bounds = boundingregion.BoundingBox(points=((0.3,0.3),(0.6,0.6)))
+        slice_ = bounds2slice(cf_bounds,sheet.bounds,sheet.xdensity,sheet.ydensity)
+        slice_ = crop_slice_to_sheet_bounds(slice_,sheet.bounds,sheet.xdensity,sheet.ydensity)
 
-##         slice_ = bounds2slice(cf_bounds,sheet.bounds,sheet.xdensity,sheet.ydensity)
-##         slice_ = crop_slice_to_sheet_bounds(slice_,sheet.bounds,sheet.xdensity,sheet.ydensity)
+        # check it's been cropped to fit onto sheet...
+        self.assertEqual(slice_,(0,2,8,10))
 
-##         # check it's been cropped to fit onto sheet...
-##         self.assertEqual(slice_,(0,2,8,10))
+        # now check that it gives the correct bounds...
+        cropped_bounds = slice2bounds(slice_,sheet.bounds,sheet.xdensity,sheet.ydensity)
+        true_cropped_bounds = boundingregion.BoundingBox(points=((0.3,0.3),(0.5,0.5)))
+        for a,b in zip(cropped_bounds.aarect().lbrt(),true_cropped_bounds.aarect().lbrt()):
+            self.assertAlmostEqual(a,b)
 
-##         # now check that it gives the correct bounds...
-##         cropped_bounds = slice2bounds(slice_,sheet.bounds,sheet.xdensity,sheet.ydensity)
-##         true_cropped_bounds = boundingregion.BoundingBox(points=((0.3,0.3),(0.5,0.5)))
-##         for a,b in zip(cropped_bounds.aarect().lbrt(),true_cropped_bounds.aarect().lbrt()):
-##             self.assertAlmostEqual(a,b)
-
-##         # and that bounds2shape() gets the correct size
-## #        rows,cols = bounds2shape(cropped_bounds,sheet.xdensity,sheet.ydensity)
-## #        self.assertEqual((rows,cols),(2,2))
+        # and that bounds2shape() gets the correct size
+#        rows,cols = bounds2shape(cropped_bounds,sheet.xdensity,sheet.ydensity)
+#        self.assertEqual((rows,cols),(2,2))
 
         
 
