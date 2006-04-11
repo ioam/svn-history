@@ -415,7 +415,7 @@ class TestCoordinateTransforms(unittest.TestCase):
     # called something different
     def test_connection_field_like(self):
         # test a ConnectionField-like example
-        sheet = Sheet()
+        sheet = Sheet(density=10,bounds=BoundingBox(radius=0.5))
         cf_bounds = boundingregion.BoundingBox(points=((0.3,0.3),(0.6,0.6)))
 
         slice_ = bounds2slice(cf_bounds,sheet.bounds,sheet.xdensity,sheet.ydensity)
