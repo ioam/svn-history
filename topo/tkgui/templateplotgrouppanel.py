@@ -76,7 +76,7 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
             self.refresh()
 
 
-    def do_plot_cmd(self):
+    def plotgroup(self):
         """
         Function that generates the plot for the panel.
 
@@ -87,14 +87,15 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
  
         exec self.cmdname.get()
 
-	self.pe_group = plotgroup_dict.get(self.plot_group_key,None)
-	if self.pe_group == None:
+	plotgroup = plotgroup_dict.get(self.plot_group_key,None)
+	if plotgroup == None:
 	    ### JCALERT! Maybe if the template specified a PlotGroup, we could
             ### take the one that is specified.
             ### Otherwise, we could assume that each panel is associated with a PlotGroup
             ### and then specify a panel for each template. (as it is done from topoconsole)
-	    self.pe_group = TemplatePlotGroup(self.plot_group_key,[],self.normalize,
+	    plotgroup = TemplatePlotGroup(self.plot_group_key,[],self.normalize,
 					      self.pgt,None)
+	return plotgroup
 
             
     def display_labels(self):

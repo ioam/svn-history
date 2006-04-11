@@ -101,8 +101,8 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
     def toggle_situate(self):
         """Set the attribute situate"""
         self.situate = not self.situate
-        if self.pe_group != None:
-            self.pe_group.situate = self.situate
+        if self.plotgroup() != None:
+            self.plotgroup().situate = self.situate
         self.initial_plot = True
         self.height_of_tallest_plot = self.min_master_zoom = 1
         self.refresh()
@@ -180,7 +180,7 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         
 
 
-    def do_plot_cmd(self):
+    def plotgroup(self):
         """
         Create the right Plot Key that will define the needed
         information for a WeightsPlotGroup.  This is the key-word
@@ -196,13 +196,13 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
 
         exec self.cmdname.get()
 		
-	self.pe_group = plotgroup_dict.get(self.plot_group_key,None)
-	if self.pe_group == None:
-	    self.pe_group = ConnectionFieldsPlotGroup(self.plot_group_key,[],self.normalize,
+	plotgroup = plotgroup_dict.get(self.plot_group_key,None)
+	if plotgroup == None:
+	    plotgroup = ConnectionFieldsPlotGroup(self.plot_group_key,[],self.normalize,
 						      self.pgt,self.region.get())
 
-        # self.situate is defined in the super class CFSheetPlotPanel
-        self.pe_group.situate = self.situate
+        plotgroup.situate = self.situate
+	return plotgroup
 
 
     def display_labels(self):

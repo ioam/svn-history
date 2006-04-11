@@ -265,7 +265,8 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         if self.auto_refresh: self.refresh()
 
 
-    def do_plot_cmd(self):
+    ### JCALERT! That will have to be re-written properly, but works for the moment.
+    def plotgroup(self):
         """
         Replace the superclass do_plot_cmd.
         Create a PlotGroup that has a list of Plots that have been
@@ -284,20 +285,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
             channels = {'Strength':each,'Hue':None,'Confidence':None}
 	    ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
             plist.append(make_template_plot(channels,view_dict,density,None,self.normalize,name=''))
-        self.pe_group = topo.plotting.plotgroup.PlotGroup(plot_group_key='Preview',plot_list=plist,normalize=self.normalize)
-
-
-    ### JCALERT! will go when we will have cut do_plot_cmd in two...
-    # re-implemented for the testpattern so that we re-create a new PlotGroup anytime
-    # i.e. calling do_plot_cmd
-    def toggle_normalize(self):
-        """Function called by Widget when check-box clicked"""
-        self.normalize = not self.normalize
-	self.pe_group.normalize = self.normalize
-	self.do_plot_cmd()
-        self.load_images()
-	self.scale_images()
-        self.display_plots()
+        return topo.plotting.plotgroup.PlotGroup(plot_group_key='Preview',plot_list=plist,normalize=self.normalize)
 
 
 

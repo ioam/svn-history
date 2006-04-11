@@ -67,9 +67,9 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         self._add_situate_button()
         self._add_region_menu()
         
-        self.MIN_PLOT_HEIGHT = 1
-        self.INITIAL_PLOT_HEIGHT = 6
-        self.min_master_zoom=1
+     #    self.MIN_PLOT_HEIGHT = 1
+#         self.INITIAL_PLOT_HEIGHT = 6
+#         self.min_master_zoom=1
 
         self.density_str = StringVar()
         self.density_str.set('10.0')
@@ -133,10 +133,10 @@ class ProjectionPanel(TemplatePlotGroupPanel):
     def toggle_situate(self):
         """Set the attribute situate"""
         self.situate = not self.situate
-        if self.pe_group != None:
-            self.pe_group.situate = self.situate
-        self.initial_plot = True
-        self.height_of_tallest_plot = self.min_master_zoom = 1
+        if self.plotgroup() != None:
+            self.plotgroup().situate = self.situate
+        self.plotgroup().initial_plot = True
+        self.plotgroup().height_of_tallest_plot = self.min_master_zoom = 1
         self.refresh()
 
         
@@ -270,7 +270,7 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         self.plot_group_key = ('Projection',self.weight_name.get(),self.density,self.region.get())
 
 
-    def do_plot_cmd(self):
+    def plotgroup(self):
         """
         self.generate_plot_group_key() creates the density information needed for
         a ProjectionPlotGroup to create necessary Plots.
@@ -278,27 +278,18 @@ class ProjectionPanel(TemplatePlotGroupPanel):
   
 	self.generate_plot_group_key()
 
-	self.pe_group = plotgroup_dict.get(self.plot_group_key,None)
-	if self.pe_group == None:
-	    self.pe_group = ProjectionPlotGroup(self.plot_group_key,[],self.normalize,
+	plotgroup = plotgroup_dict.get(self.plot_group_key,None)
+	if plotgroup == None:
+	    plotgroup = ProjectionPlotGroup(self.plot_group_key,[],self.normalize,
 						self.pgt,self.region.get())
-        coords = self.pe_group.generate_coords()
+        coords = plotgroup.generate_coords()
         topo.commands.analysis.proj_coords = coords
 	topo.commands.analysis.sheet_name = self.region.get()
         topo.commands.analysis.proj_name = self.weight_name.get()
         exec self.cmdname.get()      
         # self.situate is defined in the super class CFSheetPlotPanel
-        self.pe_group.situate= self.situate
-
-    ### JCALERT It has to be re-implemented for the projectionpanel,
-    ### but this is only a momentary version that requires more work.
-    def _set_height_of_tallest_plot(self):
-	""" 
-	Subfunction that set the initial master zooms for both the sheet
-	coordinates and the matrix coordinates case. 
-	"""
-        self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
-        self.initial_plot=False
+        plotgroup.situate= self.situate
+	return plotgroup
 
 
     def display_plots(self):
@@ -306,10 +297,11 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         This must be changed from PlotGroupPanels version since
         ProjectionPanel requires a 2D grid of plots.
         """
-        if self.pe_group:
+	plotgroup = self.plotgroup()
+        if plotgroup:
             # Generate the zoomed images.
-            self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.height_of_tallest_plot))
-                                  for im in self.pe_group.bitmaps]
+            self.zoomed_images = [ImageTk.PhotoImage(im.zoom(plotgroup.height_of_tallest_plot))
+                                  for im in plotgroup.bitmaps]
             old_canvases = self.canvases
             self.canvases = [Canvas(self.plot_frame,
                                width=image.width()+BORDERWIDTH*2+CANVASBUFFER,
@@ -320,8 +312,8 @@ class ProjectionPanel(TemplatePlotGroupPanel):
             # Lay out images
             for i,image,canvas in zip(range(len(self.zoomed_images)),
                                       self.zoomed_images,self.canvases):
-                canvas.grid(row=i//self.pe_group.proj_plotting_shape[0],
-                            column=i%self.pe_group.proj_plotting_shape[1],
+                canvas.grid(row=i//plotgroup.proj_plotting_shape[0],
+                            column=i%plotgroup.proj_plotting_shape[1],
                             padx=UNIT_PADDING,pady=UNIT_PADDING)
                 # BORDERWIDTH is added because the border is drawn on the
                 # canvas, overwriting anything underneath it.

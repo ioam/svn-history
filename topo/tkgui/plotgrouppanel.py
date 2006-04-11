@@ -30,12 +30,13 @@ import topo.base.simulator
 import topo.plotting.bitmap
 import topo.plotting.plotgroup
 from topo.plotting.templates import plotgroup_templates
+from topo.plotting.plotgroup import plotgroup_dict,identity
 
 import topo.tkgui
 
-def identity(x):
-    """No-op function for use as a default."""
-    return x
+# def identity(x):
+#     """No-op function for use as a default."""
+#     return x
 
 BORDERWIDTH = 1
 
@@ -94,14 +95,14 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         # For a ConnectionField or a Projection Panel, the plotgroup_key is re-generated
 	self.plot_group_key = name
 
-        # Each plot can have a different minimum size.  If INITIAL_PLOT_WIDTH
-        # is set to None, then no initial zooming is performed.  However,
+        # Each plot can have a different minimum size. However,
         # MIN_PLOT_WIDTH may cause a zoom if the raw bitmap is still too
         # tiny.
-        self.MIN_PLOT_HEIGHT = 1
-        self.INITIAL_PLOT_HEIGHT = 150
+        #self.MIN_PLOT_HEIGHT = 1
+        #self.INITIAL_PLOT_HEIGHT = 150
 
-        self.pe_group = None        
+	### JCALERT: do a create_plot_group function instead of so_plot_cmd
+        #self.pe_group = self.create_plot_group()
         self.bitmaps = []
         self.bitmaps_history=[]
         self.time_history=[]
@@ -161,7 +162,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         
         
         
-        self.sheetcoords = False
+        #self.sheetcoords = False
         
 	self.normalize_checkbutton = Checkbutton(self.shared_control_frame,
                                                      text="Normalize",
@@ -174,7 +175,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
                                                     command=self.toggle_integerscaling)
 	self.integerscaling_checkbutton.pack(side=LEFT)
 	self.integerscaling = False
-        self.sizeconvertfn = identity
+        #self.sizeconvertfn = identity
             
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
@@ -194,9 +195,9 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 #       self.plot_frame = self.scrollbar.interior()
 
         # For the first plot, use the INITIAL_PLOT_HEIGHT to calculate zoom.
-	self.initial_plot=True
-	self.height_of_tallest_plot=1.0
-	self.min_master_zoom=3.0
+# 	self.initial_plot=True
+# 	self.height_of_tallest_plot=1.0
+# 	self.min_master_zoom=3.0
 	self.zoom_factor=1.2
         
         self.control_frame = Frame(self)
@@ -206,19 +207,20 @@ class PlotGroupPanel(Frame,ParameterizedObject):
     def toggle_normalize(self):
         """Function called by Widget when check-box clicked"""
         self.normalize = not self.normalize
-	self.pe_group.normalize = self.normalize
+	self.plotgroup().normalize = self.normalize
         self.load_images()
 	self.scale_images()
         self.display_plots()
+
 
     def toggle_integerscaling(self):
         """Function called by Widget when check-box clicked"""
         self.integerscaling = not self.integerscaling
         
         if self.integerscaling:
-            self.sizeconvertfn = int
+            self.plotgroup().sizeconvertfn = int
         else:
-            self.sizeconvertfn = identity
+            self.plotgroup().sizeconvertfn = identity
 
         self.load_images()
 	self.scale_images()        
@@ -230,7 +232,6 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         must either be implemented, or overwritten.
         """
         Pmw.showbusycursor()
-        self.do_plot_cmd()                # Create plot tuples
         self.load_images()                #  load bitmap images
         self.scale_images()               #scale bitmap images
         self.display_plots()              # Put images in GUI canvas
@@ -241,21 +242,15 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 
 
     ### JCALERT! 
-    ### This function is actually always re-implemented....
-    ### It can also be made so that we spared the templateplotgrouppanel re-implementation...
-    def do_plot_cmd(self):
+    ### This function is called to re-generate the PlotGroup anytime if needed.
+    def plotgroup(self):
         """
-        Subclasses of PlotGroupPanel will need to create this function to
-        generate the plots.
-
-        See ConnectionFieldsPanel and ProjectionPanel for
-        examples.
+	Function that re-generate the PlotGroup anytime.
         """
-        self.pe_group = self.PlotGroup(self.plot_group_key,[],self.normalize)
-	### JCALERT! That should be make uniform with the templateplotgrouppanel and then eventually maybe
-        ### get rid of the basicplotgrouppanel. (i.E. merged plotgrouppanel and basicplotgrouppanel)
-	self.pe_group.initialize_plot_list(plot_list=[])
-        self.pe_group.do_plot_cmd()
+	plotgroup = plotgroup_dict.get(self.plot_group_key,None)
+	if plotgroup == None:
+	    plotgroup = self.PlotGroup(self.plot_group_key,[],self.normalize)
+	return plotgroup
   
   
     def load_images(self):
@@ -266,7 +261,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         If new_iteration is True, advances the plot history counter; otherwise
         just overwrites the current one.
 	"""
-	self.bitmaps = self.pe_group.load_images()
+	self.bitmaps = self.plotgroup().load_images()
 
         # Repeated plots at the same time overwrite the top plot history item;
         # new ones are added to the list only when the simulator time changes.
@@ -289,27 +284,27 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 	### JCALERT: that cannot be in the constructor for the moment, because when creating the 
 	### panel, there is no PlotGroup assigned to it... It will change when all will be inserted 
 	### in the PlotGroup (i.e scale_image, set_initial_master_zoom, compute_max_height...)
-	if self.initial_plot:
-	    self._set_height_of_tallest_plot()
+# 	if self.initial_plot:
+# 	    self._set_height_of_tallest_plot()
 
-	tmp_list = []
+# 	tmp_list = []
 
-	max_sheet_height = max([(topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[3]
- 			      -topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[1])
- 			     for b in self.bitmaps if b.resize])
-	for bitmap in self.bitmaps:
-            if not bitmap.resize:
-                scaling_factor = 1
-            else:
-		if self.sheetcoords==1:		   
-                    s = topo.sim.objects(Sheet).get(bitmap.plot_src_name,None)
-		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(s.density)/max_sheet_height)
-		else:
-		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(bitmap.height()))
+# 	max_sheet_height = max([(topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[3]
+#  			      -topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[1])
+#  			     for b in self.bitmaps if b.resize])
+# 	for bitmap in self.bitmaps:
+#             if not bitmap.resize:
+#                 scaling_factor = 1
+#             else:
+# 		if self.sheetcoords==1:		   
+#                     s = topo.sim.objects(Sheet).get(bitmap.plot_src_name,None)
+# 		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(s.density)/max_sheet_height)
+# 		else:
+# 		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(bitmap.height()))
                               
-            tmp_list = tmp_list + [bitmap.zoom(scaling_factor)]
+#             tmp_list = tmp_list + [bitmap.zoom(scaling_factor)]
 	
-	self.zoomed_images = [ImageTk.PhotoImage(im) for im in tmp_list]
+# 	self.zoomed_images = [ImageTk.PhotoImage(im) for im in tmp_list]
             
         if (self.history_index > 0):
             self.back_button.config(state=NORMAL)
@@ -322,31 +317,31 @@ class PlotGroupPanel(Frame,ParameterizedObject):
             self.forward_button.config(state=NORMAL)
         
 
-    def _set_height_of_tallest_plot(self):
-	""" 
-	Subfunction that set the initial master zooms for both the sheet
-	coordinates and the matrix coordinates case. 
-	"""
-        ### JCALERT/JABALERT! The calculation of the initial and minimum sizes
-        ### might need to be in a sub-function so that it can be overridden
-        ### for ProjectionPanel.  It also might be necessary to move the
-        ### calculation into PlotGroup, because similar things will be needed
-        ### even when saving plots directly to disk.
-	max_sheet_height = max([(topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[3]
- 			  -topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[1])
- 			  for b in self.bitmaps if b.resize])
-	max_density = max([topo.sim.objects(Sheet)[b.plot_src_name].density
-			   for b in self.bitmaps if b.resize])
-	sheet_max_height = max_density*max_sheet_height
-	matrix_max_height = max([b.height() for b in self.bitmaps if b.resize])
-	max_height = max(sheet_max_height,matrix_max_height)
-	if (max_height >= self.INITIAL_PLOT_HEIGHT):
-	    self.height_of_tallest_plot = max_height
-	else:	
-	    self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
-	if self.height_of_tallest_plot == self.min_master_zoom:
-	    self.reduce_button.config(state=DISABLED)
-	self.initial_plot=False
+ #    def _set_height_of_tallest_plot(self):
+# 	""" 
+# 	Subfunction that set the initial master zooms for both the sheet
+# 	coordinates and the matrix coordinates case. 
+# 	"""
+#         ### JCALERT/JABALERT! The calculation of the initial and minimum sizes
+#         ### might need to be in a sub-function so that it can be overridden
+#         ### for ProjectionPanel.  It also might be necessary to move the
+#         ### calculation into PlotGroup, because similar things will be needed
+#         ### even when saving plots directly to disk.
+# 	max_sheet_height = max([(topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[3]
+#  			  -topo.sim.objects(Sheet)[b.plot_src_name].bounds.lbrt()[1])
+#  			  for b in self.bitmaps if b.resize])
+# 	max_density = max([topo.sim.objects(Sheet)[b.plot_src_name].density
+# 			   for b in self.bitmaps if b.resize])
+# 	sheet_max_height = max_density*max_sheet_height
+# 	matrix_max_height = max([b.height() for b in self.bitmaps if b.resize])
+# 	max_height = max(sheet_max_height,matrix_max_height)
+# 	if (max_height >= self.INITIAL_PLOT_HEIGHT):
+# 	    self.height_of_tallest_plot = max_height
+# 	else:	
+# 	    self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
+# 	if self.height_of_tallest_plot == self.min_master_zoom:
+# 	    self.reduce_button.config(state=DISABLED)
+# 	self.initial_plot=False
 
 
 
@@ -363,7 +358,9 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         This function should be redefined in subclasses for interesting
         things such as 2D grids.
         """
-      
+ 
+	### JCALERT: This has to be changed.
+	self.zoomed_images = [ImageTk.PhotoImage(b.image) for b in self.bitmaps]
         # If the number of canvases or their sizes has changed, then
         # create a new set of canvases.  If the old canvases still can
         # work, then reuse them to prevent flicker.
@@ -428,7 +425,8 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         else:  # Same number of labels; reuse to avoid flickering.
             for i in range(len(self.labels)):
                 self.labels[i].configure(text=self.bitmaps[i].plot_src_name +'\n' + self.bitmaps[i].name) 
-       
+ 
+      
     def refresh_title(self):
         """
         Change the window title.  TopoConsole will call this on
@@ -439,10 +437,10 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 
     def reduce(self):
         """Function called by Widget to reduce the zoom factor"""
-        if self.height_of_tallest_plot > self.min_master_zoom:	
-	    self.height_of_tallest_plot = self.height_of_tallest_plot/self.zoom_factor
+        if self.plotgroup().height_of_tallest_plot > self.plotgroup().min_master_zoom:	
+	    self.plotgroup().height_of_tallest_plot = self.plotgroup().height_of_tallest_plot/self.zoom_factor
 
-        if self.height_of_tallest_plot <= self.min_master_zoom:
+        if self.plotgroup().height_of_tallest_plot <= self.plotgroup().min_master_zoom:
             self.reduce_button.config(state=DISABLED)
          
         self.load_images()
@@ -453,7 +451,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
     def enlarge(self):
         """Function called by Widget to increase the zoom factor"""
         self.reduce_button.config(state=NORMAL)
-        self.height_of_tallest_plot = self.height_of_tallest_plot*self.zoom_factor
+        self.plotgroup().height_of_tallest_plot = self.plotgroup().height_of_tallest_plot*self.zoom_factor
         self.load_images()
         self.scale_images()
         self.display_plots()
@@ -507,7 +505,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         
     def toggle_sheetcoords(self):
         """Function called by Widget when check-box clicked"""
-        self.sheetcoords = not self.sheetcoords
+        self.plotgroup().sheetcoords = not self.plotgroup().sheetcoords
         self.load_images()
         self.scale_images()
         self.display_plots()
