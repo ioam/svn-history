@@ -6,16 +6,16 @@
 all: hierarchical cfsom_or lissom_oo_or
 
 cfsom_or:
-	cd .. ; ./topographica examples/cfsom_or.ty -c "topo.sim.run(1)"
+	cd .. ; ./topographica -c "default_density=4" examples/cfsom_or.ty -c "topo.sim.run(1)"
 
 hierarchical:
-	cd .. ; ./topographica examples/hierarchical.ty -c "topo.sim.run(1)"
+	cd .. ; ./topographica -c "default_density=4" examples/hierarchical.ty -c "topo.sim.run(1)"
 
 lissom_or:
-	cd .. ; ./topographica examples/lissom_or.ty -c "topo.sim.run(1)"
+	cd .. ; ./topographica -c "default_density=4" examples/lissom_or.ty -c "topo.sim.run(1)"
 
 lissom_oo_or:
-	cd .. ; ./topographica examples/lissom_oo_or.ty -c "topo.sim.run(1)"
+	cd .. ; ./topographica -c "default_density=4" examples/lissom_oo_or.ty -c "topo.sim.run(1)"
 
 
 # Generate saved examples
