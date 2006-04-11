@@ -6,7 +6,7 @@ $Id$
 __version__='$Revision$'
 
 
-from Numeric import zeros, ones, Float, divide, ravel,clip,array
+from Numeric import zeros, ones, Float, divide,ravel,clip,array
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Dynamic
@@ -37,6 +37,10 @@ class Plot(ParameterizedObject):
           self.bitmap = Bitmap(image)
           self.plot_src_name = ''
           self.precedence = 0.0
+          # indicate if we should re-size as a topographica plot (using integer)
+          # or if it is a static image that we can re-size without having to worry 
+          # about what a pixel represents.
+          self.resize=False
           
 
 
@@ -99,7 +103,8 @@ class TemplatePlot(Plot):
         """
 
         super(TemplatePlot,self).__init__(**params) 
-       
+        # for a template plot, resize is True by default
+        self.resize=True
         self.bitmap = None
         
 
@@ -373,6 +378,7 @@ class PalettePlot(TemplatePlot):
 
           ### JABHACKALERT: To implement the class: If Strength is present,
           ### ask for Palette if it's there, and make a PaletteBitmap.
+
 
 
 

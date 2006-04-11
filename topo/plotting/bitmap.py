@@ -54,10 +54,6 @@ class Bitmap(ParameterizedObject):
 	# copy of the plot plot_src_name, used for displaying label along with self.name
         self.plot_src_name = None
 	self.name = None
-	# indicate if we should re-size as a topographica plot (using integer)
-	# or if it is a static image that we can re-size without having to worry 
-	# about what a pixel represents.
-	self.resize = True
 
 
     def copy(self):
