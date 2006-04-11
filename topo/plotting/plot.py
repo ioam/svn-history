@@ -195,8 +195,8 @@ class TemplatePlot(Plot):
     ### JC: maybe density can become an attribute of the TemplatePlot?
     def _re_bound(self,plot_bounding_box,mat,box,density):
 
-        # CEBHACKALERT: like in other places, this needs to be
-        # cleaned up.
+        # CEBHACKALERT: this needs to be done like the ydensity
+        # is adjusted in Sheet.__init__()
         left,bottom,right,top = plot_bounding_box.lbrt()
         xdensity = int(density*(right-left)) / float((right-left))
         ydensity = int(density*(top-bottom)) / float((top-bottom))
