@@ -240,9 +240,13 @@ def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density):
     it is not an independent copy.
     """
 
+    # CEBHACKALERT: xdensity and ydensity will be removed...but they
+    # should be the same.
     left,bottom,right,top = sheet_bounds.lbrt()
     xdensity = int(sheet_density*(right-left)) / float((right-left))
     ydensity = int(sheet_density*(top-bottom)) / float((top-bottom))
+
+    assert xdensity==ydensity
 
     r1,r2,c1,c2 = bounds2slice(bounds,sheet_bounds,xdensity,ydensity)
     return sheet_matrix[r1:r2,c1:c2]
@@ -388,11 +392,40 @@ class Sheet(EventProcessor):
 
         self.debug("density = ",self.density)
 
-        # CEBHACKALERT: clean this up (see also plot.py,image.py)
+
+        # Calculate the true density along x (from the left and right bounds and
+        # the nominal density), then adjust the top and bottom bounds so that
+        # the density along y is the same.
+        # The top and bottom bounds are adjusted such that the center
+        # y point remains the same, and each bound is as close as possible
+        # to its specified value.
+        # (move to docstring, etc)
+        
         left,bottom,right,top = self.bounds.lbrt()
-        # The real densities along x and y of the sheet
-        self.xdensity = int(self.density*(right-left)) / float((right-left))
-        self.ydensity = int(self.density*(top-bottom)) / float((top-bottom))
+        width = right-left; height = top-bottom
+
+        center_y = bottom + height/2.0
+
+        # CEBHACKALERT: temporary - avoid the constant issue while we
+        # calculate the bounds and the density
+        self.initialized = False
+
+
+        self.density = int(self.density*(width))/float((width))
+
+        n_units = round(height*self.density,0)
+        
+        adjusted_half_height = n_units/self.density/2.0
+        
+        adjusted_bottom = center_y - adjusted_half_height
+        adjusted_top = center_y + adjusted_half_height
+
+        self.bounds=BoundingBox(points=((left,adjusted_bottom),(right,adjusted_top)))
+        self.initialized=True
+
+        # CEBHACKALERT: these will be removed
+        self.xdensity = self.density
+        self.ydensity = self.density
 
         # setup the activity matrix
         r1,r2,c1,c2 = bounds2slice(self.bounds,self.bounds,self.xdensity,self.ydensity)
