@@ -6,7 +6,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import Canvas, Frame, Button, Toplevel, Tk, Menu, Scrollbar, SUNKEN, YES, BOTH, LEFT, END, RIGHT, TOP, BOTTOM, X, Y
+from Tkinter import Canvas, Frame, Checkbutton, Button, Toplevel, Tk, Menu, Scrollbar, SUNKEN, YES, BOTH, LEFT, END, RIGHT, TOP, BOTTOM, X, Y
 from tkFileDialog import asksaveasfilename
 from random import Random, random
 
@@ -32,10 +32,24 @@ class EditorCanvas(Canvas) :
         Canvas.__init__(self, root, width = width, height = height, bg = "white", bd = 2, relief = SUNKEN)
         self.panel = Frame(root)
         self.panel.pack(side = TOP, fill = X)
-        # Refresh, Reduce, and Enlarge Buttons.
+        # Top bar of the canvas, allowing changes in size, display and to force refresh.
         Button(self.panel,text="Refresh", command=self.refresh).pack(side=LEFT)
         Button(self.panel,text="Reduce", command=self.reduce_scale).pack(side=LEFT)
         Button(self.panel,text="Enlarge", command=self.enlarge_scale).pack(side=LEFT)        
+        self.auto_refresh = False
+        from topo.tkgui.topoconsole import dict_console
+        self.console = dict_console['console']
+        self.auto_refresh_checkbutton = Checkbutton(self.panel,text="Auto-refresh",
+                                                    command=self.toggle_auto_refresh)
+        self.auto_refresh_checkbutton.pack(side=LEFT)
+
+        self.normalize_checkbutton = Checkbutton(self.panel, text="Normalize",
+                                                    command=self.toggle_normalize)
+
+        self.normalize_checkbutton.pack(side=LEFT)
+        if EditorNode.normalize == True :
+            self.normalize_checkbutton.select()
+
         # retain the current focus in the canvas
         self.scaling_factor = 1.0
         self.current_object = None
@@ -44,6 +58,7 @@ class EditorCanvas(Canvas) :
         # list holding references to all the objects in the canvas	
         self.object_list = []
         # set the initial mode.
+        self.display_mode = 'video'
         self.mode = "ARROW"
         self.MAX_VIEWS = 5
         # get the topo simulator
@@ -71,9 +86,16 @@ class EditorCanvas(Canvas) :
 
         self.canvas_menu = Menu(self)
         self.sheet_options = Menu(self.canvas_menu)
+        mode_options = Menu(self.canvas_menu)
         self.canvas_menu.add_command(label = 'Export as PostScript image', command = self.save_snapshot)
+        self.canvas_menu.add_cascade(label = 'Select Mode', menu = mode_options)
+        mode_options.add_command(label = 'Video', command = lambda: self.set_display_mode('video'))
+        mode_options.add_command(label = 'Normal', command = lambda: self.set_display_mode('normal'))
+        mode_options.add_command(label = 'Printing', command = lambda: 
+            self.set_display_mode('printing'))
         self.canvas_menu.add_cascade(label = 'Sheet options', menu = self.sheet_options, underline = 0)
-        self.sheet_options.add_command(label = 'Toggle Density Grid', command = self.toggle_object_density)
+        self.sheet_options.add_command(label = 'Toggle Density Grid', command = 
+            self.toggle_object_density)
         self.sheet_options.add_command(label = 'Toggle Activity', command = self.toggle_object_activity)
 
         # bind key_press events in canvas.
@@ -199,6 +221,19 @@ class EditorCanvas(Canvas) :
         self.scaling_factor -= 0.2
         self.refresh()
 
+    def toggle_auto_refresh(self):
+        self.auto_refresh = not self.auto_refresh
+        if self.auto_refresh:
+            self.console.auto_refresh_panels.append(self)
+        else:
+            self.console.auto_refresh_panels.remove(self)
+
+    def toggle_normalize(self) :
+        EditorNode.normalize = not EditorNode.normalize
+        self.refresh()
+
+
+
     ########### Object moving methods #################################
     # if an object is left clicked in the canvas, these methods allow it to be repositioned in
     # the canvas.
@@ -245,14 +280,26 @@ class EditorCanvas(Canvas) :
         obj = self.get_object_xy(x, y)
         if (obj != None) : # if an object, connect the objects and remove focus
             if (self.current_connection != None) :
-                self.connection_tool.create_connection(self.current_connection, obj)
-                self.current_connection.set_focus(False)
+                connected = self.connection_tool.create_connection(self.current_connection, obj)
+                if connected :
+                    self.current_connection.set_focus(False)
         else : # if not an object, remove the connection
             if (self.current_connection != None) :
                 self.current_connection.remove()
-        self.redraw_objects()
+        if connected :
+            self.redraw_objects()
         # dereference
         self.current_connection = None
+
+    def get_connection_xy(self, x, y) :
+        # return connection at given x, y (None if no connection)
+        for obj in self.object_list :
+            connection_list = obj.from_connections[:]
+            connection_list.reverse()
+            for con in connection_list :
+                if (con.in_bounds(x, y)) :
+                    return con
+        return None
 
     ########### Object Methods ######################################
 
@@ -264,7 +311,7 @@ class EditorCanvas(Canvas) :
         # add a new object to the Canvas
         self.object_list = [obj] + self.object_list
 
-    def add_objectToBack(self, obj) : 
+    def add_object_to_back(self, obj) : 
         # add a new object to the Canvas at back of the list
         self.object_list =  self.object_list + [obj]
 
@@ -305,18 +352,6 @@ class EditorCanvas(Canvas) :
                 break
         else : return None
         return obj
-
-    ########### Connection Methods #################################
-
-    def get_connection_xy(self, x, y) :
-        # return connection at given x, y (None if no connection)
-        for obj in self.object_list :
-            connection_list = obj.from_connections[:]
-            connection_list.reverse()
-            for con in connection_list :
-                if (con.in_bounds(x, y)) :
-                    return con
-        return None
 
     ########### Properties Method ##################################
 
@@ -368,7 +403,7 @@ class EditorCanvas(Canvas) :
         # remove the object from the canvas list
         self.remove_object(obj)
         # add it to the back and redraw all
-        self.add_objectToBack(obj)
+        self.add_object_to_back(obj)
         self.redraw_objects()
 
     ########### Hang List Methods ##################################
@@ -393,9 +428,8 @@ class EditorCanvas(Canvas) :
             # gray out menu items that are just for objects
             for i in self.object_indices :
                 self.item_menu.entryconfig(i,foreground = 'Gray', activeforeground = 'Gray')
-        # command = lambda: self.show_activity(self.focus))
         if (focus != None) :
-            for (label, function) in focus.viewing_choices :
+            for (label, function) in focus.get_viewing_choices() :
                 self.view.add_command(label = label, command = function)
             # give the connection or object the focus
             focus.set_focus(True)
@@ -411,10 +445,13 @@ class EditorCanvas(Canvas) :
         POSTSCRIPT_FILETYPES = [('Encapsulated PostScript images','*.eps'),
                                 ('PostScript images','*.ps'),('All files','*')]
         snapshot_name = asksaveasfilename(filetypes=POSTSCRIPT_FILETYPES)
-        
-        file = asksaveasfilename()
-        if file:
-            self.postscript(file=file)
+        if snapshot_name:
+            self.postscript(file=snapshot_name)
+
+    def set_display_mode(self, mode) :
+        self.display_mode = mode
+        for obj in self.object_list :
+            obj.set_mode(mode)
 
     def set_tool_bars(self, arrow_tool, connection_tool, object_tool) :
         # reference to the toolbar items, a tool is notified when the canvas is changed

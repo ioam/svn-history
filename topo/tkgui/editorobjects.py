@@ -47,6 +47,7 @@ class EditorObject :
             command = lambda : self.okay_parameters(parameter_window))
         okay_button.pack(side = RIGHT)
         update_button.pack(side = RIGHT)
+        self.parameter_window = parameter_window
 
     def update_parameters(self) :
         self.parameter_frame.set_obj_params()
@@ -87,15 +88,15 @@ class EditorNode(EditorObject) :
     """
     show_density = False
     show_activity = False
+    normalize = False
 
-
-    def __init__(self, canvas, pos, name, colour = ('dark red','black')):#('slate blue', 'lavender')) :
+    def __init__(self, canvas, pos, name):
         EditorObject.__init__(self, name, canvas)
-        self.colours = colour # colours for drawing this node on the canvas
         self.from_connections = [] # connections from this node
         self.to_connections = [] # connections to this node
         self.x = pos[0] # set the x and y coords of the centre of this node
         self.y = pos[1]
+        self.mode = canvas.display_mode
 
     ############ Connection methods ########################
 
@@ -118,35 +119,12 @@ class EditorNode(EditorObject) :
                 if (con == self.to_connections[i]) : break
             else : return
             del self.to_connections[i]
-            node = con.from_node
         else :
             l = len(self.from_connections)
             for i in range(l) :
                 if (con == self.from_connections[i]) : break
             else : return
             del self.from_connections[i]
-            node = con.to_node
-        index = con.draw_index
-        # Decrease the indexes of the connections between the same nodes and with a higher index.
-        for connection in self.from_connections :
-            if (node == connection.to_node and connection.draw_index > index) :
-                connection.decrement_draw_index()
-            if connection.to_node == connection.from_node : return
-        for connection in self.to_connections :       
-            if (node == connection.from_node and connection.draw_index > index) :
-                connection.decrement_draw_index()
-
-
-    def get_connection_count(self, node) :
-        count = 0
-        for con in self.from_connections :
-            if (con.to_node == node) :
-                count += 1
-        for con in self.to_connections :
-            if (con.from_node == node) :
-                count += 1
-        if node == self : count /= 2
-        return count
 
     ############ Util methods ##############################
     
@@ -156,27 +134,21 @@ class EditorNode(EditorObject) :
     def show_properties(self) :
         EditorObject.show_properties(self)
         self.parameter_frame.create_widgets(self.sheet, self.object_cover_dict)
-        lateral_button = Button(self.button_panel, text = 'Lateral', command = self.show_lateral_parameters)
-        lateral_button.pack(side = RIGHT)
-
-    def show_lateral_parameters(self) :
-        lateral_connection_list = []
-        for con in self.from_connections :
-            if (con.to_node == con.from_node) :
-                lateral_connection_list += [con]
-        parameter_window = Toplevel()
-        for con in lateral_connection_list :
-            frame = Frame(parameter_window)
-            frame.pack(side = LEFT)
-            Label(frame, text = con.name).pack(side = TOP)
-            con.parameter_frame = ParametersFrame(frame)
-            con.parameter_frame.create_widgets(con.connection)
-            button_panel = Frame(frame)
-            button_panel.pack(side = BOTTOM)
-            Button(button_panel, text = 'Apply', 
-                command = con.update_parameters).pack(side = LEFT)
-            Button(button_panel, text = 'Delete',
-                command = con.remove).pack(side = RIGHT)
+        Label(self.parameter_window, text = '\n\nConnections').pack(side = TOP)
+        connection_list = [con.name for con in self.to_connections + self.from_connections]
+        connection_menu = Pmw.ComboBox(self.parameter_window, selectioncommand = 
+            self.view_connection_parameters, scrolledlist_items = 
+            connection_list)
+        connection_menu.pack(side = TOP)
+        
+    def view_connection_parameters(self, selection) :
+        for con in self.to_connections + self.from_connections :
+            if con.name == selection :
+                break
+        else : 
+            return
+        con.show_properties()
+        
 
 class EditorSheet(EditorNode) :
     """
@@ -194,8 +166,12 @@ class EditorSheet(EditorNode) :
         self.element_count = self.matrix_element_count()
         self.set_bounds()
         self.activity = False
-        col = self.colours[1]
-        self.view = 'normal'
+        self.set_colours()
+        col = self.colour[1]
+        if (self.activity) :
+            self.view = 'activity'
+        else : 
+            self.view = 'normal'
         self.init_draw(col, False) # create a new paralellogram
         self.currentCol = col
         self.gradient = 1
@@ -204,13 +180,15 @@ class EditorSheet(EditorNode) :
 
     ############ Draw methods ############################
 
+    def get_viewing_choices(self) :
+        return self.viewing_choices
+
     def set_focus(self, focus) :
         for id in self.id :
             self.canvas.delete(id)
         self.canvas.delete(self.label) # remove label	
         EditorNode.set_focus(self, focus) # call to super's set focus
-        if (focus) : col = self.colours[0]
-        else : col = self.colours[1]
+        col = self.colour[not focus]
         self.init_draw(col, focus) # create new one with correct colour
         self.currentCol = col
         self.draw()
@@ -219,6 +197,12 @@ class EditorSheet(EditorNode) :
         self.view = view_choice
         self.set_focus(False)
         self.canvas.redraw_objects()
+
+    def set_colours(self) :
+        colour = {'video':('dark red','black'),
+                  'normal':('slate blue', 'lavender'),
+                  'printing':('grey','white')}
+        self.colour = colour[self.mode] # colours for drawing this node on the canvas
 
     def init_draw(self, colour, focus) :
         self.id = []
@@ -234,7 +218,8 @@ class EditorSheet(EditorNode) :
                 # eg m = self.sheet.sheet_view_dict['OrientationPreference'].view()[0]
                 update_activity()
                 m = self.sheet.sheet_view_dict['Activity'].view()[0]
-                m = self.normalize(m)
+                if self.normalize == True :
+                    m = self.normalize_plot(m)
                 matrix_width, matrix_height = self.element_count
                 dX, dY = (w * 2)/ matrix_width, (h * 2) / matrix_height
                 for i in range(matrix_height) :
@@ -243,6 +228,9 @@ class EditorSheet(EditorNode) :
                         x1, y1 = x - a + (j * dX), y + a
                         x2, y2 = x1 - dY, y1 + dY
                         x3, x4 = x2 + dX, x1 + dX
+                        point = m[i][j]
+                        if point < 0 : point = 0.0
+                        if point > 1 : point = 1.0
                         col = '#' + (self.dec_to_hex_str(m[i][j], 3)) * 3
                         self.id = self.id + [self.canvas.create_polygon
                            (x1, y1, x2, y2, x3, y2, x4, y1, fill = col, outline = col)]
@@ -272,7 +260,7 @@ class EditorSheet(EditorNode) :
                 y2 = y1 + (h * 2)
                 self.id = self.id + [self.canvas.create_line(x1, y1, x2, y2, fill = 'slate blue')]
 
-    def normalize(self,a):
+    def normalize_plot(self,a):
         """ 
         Normalize an array s.
         In case of a constant array, ones is returned for value greater than zero,
@@ -341,6 +329,35 @@ class EditorSheet(EditorNode) :
         self.sheet.gui_x, self.sheet.gui_y = x, y # update topo sheet position
         self.draw(self.x - old[0], self.y - old[1])
 
+    ############ Connection methods ########################
+
+    def remove_connection(self, con, from_to) :
+        EditorNode.remove_connection(self, con, from_to)
+        if from_to :
+            node = con.from_node
+        else :
+            node = con.to_node
+        index = con.draw_index
+        # Decrease the indexes of the connections between the same nodes and with a higher index.
+        for connection in self.from_connections :
+            if (node == connection.to_node and connection.draw_index >= index) :
+                connection.decrement_draw_index()
+            if connection.to_node == connection.from_node : return
+        for connection in self.to_connections :       
+            if (node == connection.from_node and connection.draw_index >= index) :
+                connection.decrement_draw_index()
+
+    def get_connection_count(self, node) :
+        count = 0
+        for con in self.from_connections :
+            if (con.to_node == node) :
+                count += 1
+        for con in self.to_connections :
+            if (con.from_node == node) :
+                count += 1
+        if node == self : count /= 2
+        return count
+
     ############ Util methods ##############################
 
     def in_bounds(self, pos_x, pos_y) : # returns true if point lies in a bounding box
@@ -377,6 +394,19 @@ class EditorSheet(EditorNode) :
         self.width = width_fact * (lbrt[2] - lbrt[0]) * self.canvas.scaling_factor
         self.height = height_fact * (lbrt[3] - lbrt[1]) * self.canvas.scaling_factor
 
+    def set_mode(self, mode) :
+        self.mode = mode
+        self.set_colours()
+
+        for id in self.id :
+            self.canvas.delete(id)
+        self.canvas.delete(self.label) # remove label
+        self.init_draw(self.colour[not self.focus], self.focus)
+        for con in self.to_connections :
+            con.set_mode(mode)
+        for con in self.from_connections :
+            con.draw()
+
 ####################################################################
 
 class EditorConnection(EditorObject) :
@@ -392,7 +422,8 @@ class EditorConnection(EditorObject) :
         self.to_node = None # updated when the user selects the second node - self.connect(..)
         # temporary point, for when the to connection node is undefined
         self.to_position = from_node.get_pos()
-	
+        self.mode = canvas.display_mode
+
     ############ Draw methods ############################
 
     def set_focus(self, focus) : # give this connection the focus
@@ -415,13 +446,8 @@ class EditorConnection(EditorObject) :
         self.connection = con # store the topo connection this object represents
         if (self.name == "") :
             self.name = con.name
-        # ALALERT this shouldn't be here.
-        self.draw_index = self.from_node.get_connection_count(to_node)
-        if (self.from_node == to_node) :
-            self.factor = self.get_factor() 
-        else :
-            self.connect_to_coord((self.from_node.width / 2) - 10)
         self.to_node = to_node # store a reference to the node this is connected to
+        self.to_position = None
         self.from_node.attach_connection(self, self.FROM) # tell the sheets that they are connected.
         self.to_node.attach_connection(self, self.TO)
 
@@ -429,12 +455,6 @@ class EditorConnection(EditorObject) :
     def show_properties(self) :
         EditorObject.show_properties(self)
         self.parameter_frame.create_widgets(self.connection, self.object_cover_dict)
-
-    def connect_to_coord(self, width) :
-        n = self.draw_index
-        sign = math.pow(-1, n)
-        self.deviation = sign * width + (-sign) * math.pow(0.5, math.ceil(0.5 * (n))) * width
-
 
 class EditorProjection(EditorConnection) :
 
@@ -461,17 +481,26 @@ class EditorProjection(EditorConnection) :
         self.balloon = Pmw.Balloon(canvas)
         self.factor = self.get_factor()
         self.receptive_field = receptive_field
-        self.view = 'radius'
+        self.set_colours()
+        self.view = 'normal'
         self.viewing_choices = [('Field Radius', lambda: self.select_view('radius')),
                                 ('Line', lambda: self.select_view('line')),
                                 ('Fixed Size', lambda: self.select_view('normal'))]
 
     ############ Draw methods ############################
+    def get_viewing_choices(self) :
+        return self.viewing_choices
+
     def select_view(self, view_choice) :
         self.view = view_choice
         self.move()
         self.set_focus(False)  
 
+    def set_colours(self) :
+        colours = {'video' : ('dark red', 'purple', 'yellow'),
+                   'normal': ('dark red', 'purple', 'yellow'),
+                   'printing': ('grey', 'black', 'black')}
+        self.colour = colours[self.mode]
 
     def draw(self) :
         # determine if connected to a second node, and find the correct from_position
@@ -492,12 +521,12 @@ class EditorProjection(EditorConnection) :
     def draw_line(self,from_position, to_position) :
         # set the colour to be used depending on whether connection has the focus.
         if (self.focus) : 
-            text_col = col = 'dark red'
-            lateral_colour = self.from_node.colours[0]
+            text_col = col = self.colour[0]
+            lateral_colour = self.from_node.colour[0]
         else :
             text_col = 'black'
-            col = 'purple'#'dark green'
-            lateral_colour = '' #self.from_node.currentCol
+            col = self.colour[1]
+            lateral_colour = ''
         middle = self.get_middle(from_position, to_position)
         factor = self.canvas.scaling_factor
         if (to_position == from_position) : # connection to and from the same node
@@ -529,12 +558,12 @@ class EditorProjection(EditorConnection) :
     def draw_radius(self, from_position, to_position) :
          # set the colour to be used depending on whether connection has the focus.
         if (self.focus) : 
-            text_col = col = 'dark red'
-            lateral_colour = self.from_node.colours[0]
+            text_col = col = self.colour[0]
+            lateral_colour = self.from_node.colour[0]
         else :
             text_col = 'black'
-            col = 'purple'#'dark green'
-            lateral_colour = '' #self.from_node.currentCol
+            col = self.colour[1]
+            lateral_colour = ''
         # midpoint of line
         middle = self.get_middle(from_position, to_position)
         factor = self.canvas.scaling_factor
@@ -545,7 +574,7 @@ class EditorProjection(EditorConnection) :
             x2 = to_position[0] + a
             y2 = to_position[1] - b
             self.id = (self.canvas.create_oval(x1, y1, x2, y2, fill = lateral_colour, 
-                dash = (2,2), outline = 'yellow', width = 2), None)
+                dash = (2,2), outline = self.colour[2], width = 2), None)
             self.balloon.tagbind(self.canvas, self.id[0], self.name)       
         else :  # connection between distinct nodes
             x1, y1 = to_position
@@ -562,17 +591,15 @@ class EditorProjection(EditorConnection) :
             self.label = self.canvas.create_text(middle[0] - dX,
                 middle[1] - dY, fill = text_col, text = self.name, anchor = E)
 
-
-
     def draw_normal(self, from_position, to_position) :
         # set the colour to be used depending on whether connection has the focus.
         if (self.focus) : 
-            text_col = col = 'dark red'
-            lateral_colour = self.from_node.colours[0]
+            text_col = col = self.colour[0]
+            lateral_colour = self.from_node.colour[0]
         else :
             text_col = 'black'
-            col = 'purple'#'dark green'
-            lateral_colour = '' #self.from_node.currentCol
+            col = self.colour[1]
+            lateral_colour = ''
         # midpoint of line
         middle = self.get_middle(from_position, to_position)
         if (to_position == from_position) : # connection to and from the same node
@@ -582,7 +609,7 @@ class EditorProjection(EditorConnection) :
             x2 = to_position[0] + a
             y2 = to_position[1] - b
             self.id = (self.canvas.create_oval(x1, y1, x2, y2, fill = lateral_colour, 
-                dash = (2,2), outline = 'yellow', width = 2), None)
+                dash = (2,2), outline = self.colour[2], width = 2), None)
             self.balloon.tagbind(self.canvas, self.id[0], self.name)
 
         else :  # connection between distinct nodes
@@ -607,7 +634,6 @@ class EditorProjection(EditorConnection) :
             self.from_node.remove_connection(self, self.FROM) # and remove from 'from' node
         for id in self.id : # remove the representation from the canvas
             self.canvas.delete(id)
-            print 'delete'
         self.canvas.delete(self.label)
 
     def decrement_draw_index(self) :
@@ -619,7 +645,11 @@ class EditorProjection(EditorConnection) :
 
     def connect(self, to_node, con) :
         EditorConnection.connect(self, to_node, con)
-        self.to_position = None
+        self.draw_index = self.from_node.get_connection_count(to_node)-1
+        if (self.from_node == to_node) :
+            self.factor = self.get_factor() 
+        else :
+            self.connect_to_coord((self.from_node.width / 2) - 10)
         self.gradient = self.calculate_gradient()
         self.radius = self.get_radius()
 
@@ -658,6 +688,12 @@ class EditorProjection(EditorConnection) :
 
     def update_factor(self) :
         self.factor = self.get_factor()
+
+    def connect_to_coord(self, width) :
+        n = self.draw_index
+        sign = math.pow(-1, n)
+        self.deviation = sign * width + (-sign) * math.pow(0.5, math.ceil(0.5 * (n))) * width
+
     # returns the gradients of the two lines making the opening 'v' part of the receptive field. 
     # this depends on the draw_index, as it determines where the projection's representation begins.
     def calculate_gradient(self) :
@@ -692,8 +728,8 @@ class EditorProjection(EditorConnection) :
             to_position = self.to_node.get_pos()
             from_position = self.from_node.get_pos()
             if (self.to_node == self.from_node) :
-                deviation = self.draw_index * 15 * factor
-                middle = (to_position[0], to_position[1] - ((30 * factor) + deviation))
+                dev = self.draw_index * 15 * factor
+                middle = (to_position[0], to_position[1] - ((30 * factor) + dev))
             else :
                 dev = self.deviation * 0.5
                 middle = self.get_middle(from_position, to_position)
@@ -740,4 +776,9 @@ class EditorProjection(EditorConnection) :
             # lies on the positive side of the point determines that the point is within the triangle.
             if (((0 - a_CA) / self.gradient[1] >= 0) and ((0 - a_BA) / self.gradient[0] <= 0)) :
                 return True
-            return False	
+            return False
+
+    def set_mode(self, mode) :
+        self.mode = mode
+        self.set_colours()
+        self.draw()

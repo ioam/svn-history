@@ -203,11 +203,12 @@ class ConnectionTool(Frame) :
         con_type = self.proj_list[self.current_option]
         try :
             con = sim.connect(from_node, to_node, connection_type = con_type)
-        except ValueError:
+        except :
             print "These sheets could not be connected by a "+ self.current_option
             editor_connection.remove()
-            return
+            return False
         editor_connection.connect(node, con)
+        return True
 
     def set_option(self, option) :
         self.current_option = option
