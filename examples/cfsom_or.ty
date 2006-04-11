@@ -48,7 +48,8 @@ topo.sim['Retina'] = GeneratorSheet(input_generator=gaussian_generator,
                                     name='Retina',
                                     period=1.0,density=30)
 
-topo.sim['V1'] = CFSOM(density=50,learning_length=10000,radius_0=0.1,alpha_0=0.5)
+topo.sim['V1'] = CFSOM(density=locals().get('default_density',50.0),
+                       learning_length=10000,radius_0=0.1,alpha_0=0.5)
 
 topo.sim.connect2('Retina','V1',delay=0.5,connection_type=CFProjection, name='RtoV1',
                   weights_generator = topo.patterns.random.UniformRandom(),

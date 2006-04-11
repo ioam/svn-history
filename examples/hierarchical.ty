@@ -62,7 +62,7 @@ right_input_pattern = topo.patterns.basic.Line(thickness=0.02,
 
 
 # cortical sheet
-CFSOM.density = 10
+CFSOM.density = locals().get('default_density',10.0)
 CFSOM.learning_length = 10000
 CFSOM.radius_0 = 0.1
 

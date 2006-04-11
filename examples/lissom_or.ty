@@ -45,7 +45,7 @@ input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size=2*0.0468,
                  orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=56)))
 
 # LISSOM parameters
-LISSOM.density = 48.0    
+LISSOM.density = locals().get('default_density',48.0)    
 
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)

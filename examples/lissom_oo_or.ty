@@ -53,7 +53,6 @@ SharedCFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
 
 ###########################################
 # build simulation
-
 s = topo.base.simulator.Simulator()
 Retina = GeneratorSheet(name='Retina',density=24.0,bounds=BoundingBox(radius=0.5+0.25+0.375),
                         input_generator=input_pattern)
@@ -63,9 +62,11 @@ LGNOn = CFSheet(name='LGNOn',density=24.0,bounds=BoundingBox(radius=0.5+0.25),
 LGNOff = CFSheet(name='LGNOff',density=24.0,bounds=BoundingBox(radius=0.5+0.25),
                  output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                  measure_maps=False)
-V1 = LISSOM(name='V1',density=48.0,bounds=BoundingBox(radius=0.5))
+V1 = LISSOM(name='V1',density=locals().get('default_density',48.0),
+            bounds=BoundingBox(radius=0.5))
 V1.output_fn.lower_bound=0.083
 V1.output_fn.upper_bound=0.633
+
 
 # LGN ON channel
 LGNOn_center = s.connect(Retina,LGNOn,delay = FixedPoint("0.05"),
