@@ -270,7 +270,7 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         self.plot_group_key = ('Projection',self.weight_name.get(),self.density,self.region.get())
 
 
-    def plotgroup(self):
+    def refresh_plotgroup(self):
         """
         self.generate_plot_group_key() creates the density information needed for
         a ProjectionPlotGroup to create necessary Plots.
@@ -281,7 +281,7 @@ class ProjectionPanel(TemplatePlotGroupPanel):
 	plotgroup = plotgroup_dict.get(self.plot_group_key,None)
 	if plotgroup == None:
 	    plotgroup = ProjectionPlotGroup(self.plot_group_key,[],self.normalize,
-						self.pgt,self.region.get())
+					    self.sheetcoords,self.integerscaling,self.pgt,self.region.get())
         coords = plotgroup.generate_coords()
         topo.commands.analysis.proj_coords = coords
 	topo.commands.analysis.sheet_name = self.region.get()
@@ -297,11 +297,10 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         This must be changed from PlotGroupPanels version since
         ProjectionPanel requires a 2D grid of plots.
         """
-	plotgroup = self.plotgroup()
-        if plotgroup:
+        if self.plotgroup:
             # Generate the zoomed images.
-            self.zoomed_images = [ImageTk.PhotoImage(im.zoom(plotgroup.height_of_tallest_plot))
-                                  for im in plotgroup.bitmaps]
+            self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.plotgroup.height_of_tallest_plot))
+                                  for im in self.plotgroup.bitmaps]
             old_canvases = self.canvases
             self.canvases = [Canvas(self.plot_frame,
                                width=image.width()+BORDERWIDTH*2+CANVASBUFFER,
@@ -312,8 +311,8 @@ class ProjectionPanel(TemplatePlotGroupPanel):
             # Lay out images
             for i,image,canvas in zip(range(len(self.zoomed_images)),
                                       self.zoomed_images,self.canvases):
-                canvas.grid(row=i//plotgroup.proj_plotting_shape[0],
-                            column=i%plotgroup.proj_plotting_shape[1],
+                canvas.grid(row=i//self.plotgroup.proj_plotting_shape[0],
+                            column=i%self.plotgroup.proj_plotting_shape[1],
                             padx=UNIT_PADDING,pady=UNIT_PADDING)
                 # BORDERWIDTH is added because the border is drawn on the
                 # canvas, overwriting anything underneath it.

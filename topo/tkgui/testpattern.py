@@ -266,7 +266,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 
 
     ### JCALERT! That will have to be re-written properly, but works for the moment.
-    def plotgroup(self):
+    def refresh_plotgroup(self):
         """
         Replace the superclass do_plot_cmd.
         Create a PlotGroup that has a list of Plots that have been
@@ -276,7 +276,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 
         Return self.pe_group which contains a PlotGroup.
         """
-        plist = []       
+        plot_list = []       
         for each in self.generator_sheets_patterns.keys():
             view_dict = {}
             k = self.generator_sheets_patterns[each]['pattern_generator']
@@ -284,8 +284,9 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 	    view_dict[each] = topo.base.sheetview.SheetView((k(),k.bounds),src_name=each)
             channels = {'Strength':each,'Hue':None,'Confidence':None}
 	    ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
-            plist.append(make_template_plot(channels,view_dict,density,None,self.normalize,name=''))
-        return topo.plotting.plotgroup.PlotGroup(plot_group_key='Preview',plot_list=plist,normalize=self.normalize)
+            plot_list.append(make_template_plot(channels,view_dict,density,None,self.normalize,name=''))
+        return topo.plotting.plotgroup.PlotGroup('Preview',plot_list,self.normalize,
+						 self.sheetcoords,self.integerscaling)
 
 
 

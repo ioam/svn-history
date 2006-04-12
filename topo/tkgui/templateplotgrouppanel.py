@@ -76,7 +76,7 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
             self.refresh()
 
 
-    def plotgroup(self):
+    def refresh_plotgroup(self):
         """
         Function that generates the plot for the panel.
 
@@ -94,7 +94,7 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
             ### Otherwise, we could assume that each panel is associated with a PlotGroup
             ### and then specify a panel for each template. (as it is done from topoconsole)
 	    plotgroup = TemplatePlotGroup(self.plot_group_key,[],self.normalize,
-					      self.pgt,None)
+					  self.sheetcoords,self.integerscaling,self.pgt,None)
 	return plotgroup
 
             
