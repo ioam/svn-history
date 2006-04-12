@@ -17,8 +17,7 @@ from topo.base.projection import Projection
 from topo.base.projection import OutputFnParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Parameter,Number,BooleanParameter
-from topo.base.arrayutils import Mdot
-from topo.base.connectionfield import CFProjection,CFProjectionLearningFnParameter,CFProjectionIdentityLearningFn,CFProjectionResponseFnParameter,CFProjectionOutputFnParameter,CFProjectionIdentityOutputFn,CFProjectionOutputFn
+from topo.base.connectionfield import CFProjection,CFProjectionLearningFnParameter,CFProjectionIdentityLearningFn,CFProjectionResponseFnParameter,CFProjectionOutputFnParameter,CFProjectionIdentityOutputFn,CFProjectionOutputFn, Mdot, ResponseFnParameter
 from topo.base.patterngenerator import PatternGeneratorParameter
 from topo.base.sheetview import UnitView
 
@@ -46,7 +45,7 @@ class SharedCFProjectionResponseFn(ParameterizedObject):
     ### implemented a wrapper around the cfs argument of
     ### GenericCFResponseFn, so that GenericCFResponseFn will work
     ### whether there is an actual full set of cfs or not.
-    single_cf_fn = Parameter(default=Mdot())
+    single_cf_fn = ResponseFnParameter(default=Mdot())
     
     def __call__(self, cf, cf_slice_and_bounds, input_activity, activity, strength):
         rows,cols = activity.shape
