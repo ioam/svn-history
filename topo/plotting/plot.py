@@ -195,17 +195,21 @@ class TemplatePlot(Plot):
     ### JC: maybe density can become an attribute of the TemplatePlot?
     def _re_bound(self,plot_bounding_box,mat,box,density):
 
-        # CEBHACKALERT: this needs to be done like the ydensity
-        # is adjusted in Sheet.__init__()
-        left,bottom,right,top = plot_bounding_box.lbrt()
-        xdensity = int(density*(right-left)) / float((right-left))
-        ydensity = int(density*(top-bottom)) / float((top-bottom))
+        # CEBHACKALERT: for Julien...
+        # If plot_bounding_box is that of a Sheet, it will already have been
+        # setup so that the density in the x direction and the density in the
+        # y direction are equal.
+        # If plot_bounding_box comes from elsewhere (i.e. you create it from
+        # arbitrary bounds), it might need to be adjusted to ensure the density
+        # in both directions is the same (see Sheet.__init__()). I don't know where
+        # you want to do that; presumably the code should be common to Sheet and
+        # where it's used in the plotting?
 
         if plot_bounding_box.containsbb_exclusive(box):
-             r1,r2,c1,c2 = bounds2slice(plot_bounding_box,plot_bounding_box, xdensity, ydensity)
+             r1,r2,c1,c2 = bounds2slice(plot_bounding_box,plot_bounding_box,density)
              shape = (r2-r1,c2-c1)
              new_mat = zeros(shape,Float)
-             r1,r2,c1,c2 = bounds2slice(box,plot_bounding_box,xdensity,ydensity)
+             r1,r2,c1,c2 = bounds2slice(box,plot_bounding_box,density)
              new_mat[r1:r2,c1:c2] = mat
         else:
              new_mat = submatrix(plot_bounding_box,mat,box,density)
