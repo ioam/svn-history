@@ -25,7 +25,8 @@ from topo.learningfns.som import HebbianSOMLF
 class TestPlotFileSaver(unittest.TestCase):
 
     def test_file_saving(self):
-	GeneratorSheet.period = 1.0
+        pass
+# 	  GeneratorSheet.period = 1.0
 #         GeneratorSheet.density = 4
 #         topo.patterns.basic.Line.x = Dynamic(lambda : random.uniform(-0.5,0.5))
 #         topo.patterns.basic.Line.y = Dynamic(lambda : random.uniform(-0.5,0.5))
