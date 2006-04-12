@@ -240,7 +240,7 @@ def matrixidx2sheet(row,col,bounds,density,ydensity=None):
     return round(x,10),round(y,10)
 
 
-def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density,ydensity=None):
+def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density):
     """
     Return the submatrix of a sheet_matrix specified by a bounds.
 
@@ -249,10 +249,6 @@ def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density,ydensity=None):
     sheet_matrix.  The submatrix is just a view into the sheet_matrix;
     it is not an independent copy.
     """
-    # CEBHACKALERT: to delete
-    if ydensity:
-        assert sheet_density==ydensity
-        
     r1,r2,c1,c2 = bounds2slice(bounds,sheet_bounds,sheet_density)
     return sheet_matrix[r1:r2,c1:c2]
 
