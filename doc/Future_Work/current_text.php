@@ -21,7 +21,7 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/04/08: (CB) Check that the name changes made to OutputFns and the rest make sense; finish that reorganization; make sure the corresponding Parameters are ok and that their lists are populated for the GUI.
+2006/04/12: (CB) Finish reorganizing response functions and CFProjection response functions; rename CFProjectionGenericOutputFn to GenericCFPOutputFn, etc.; rename connectionfield.py to cf.py; rename Identity to IdentityOutputFn; create Identity learning function; create topo/base/functionfamilies.py and move LearningFns etc into it; rename SharedCFProjection SharedWeightCFProjection  
 </li>
 
 <li> 
@@ -29,7 +29,7 @@ was first added to the list, or a change was made.)
 </li>
 
 <li> 
-2006/04/08 (CB): Slice class; HACKALERTs relating to Sheet, xdensity, ydensity (etc); investigate failing test in testimage.py (that uses sheet functions).
+2006/04/12 (CB): Remove xdensity and ydensity now density in each dimension is equal for a sheet; slice class; investigate failing test in testimage.py (that uses sheet functions).
 </li>
 
 <li>
@@ -37,7 +37,7 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/04/07 (CB): Cleaning Composite and Image pattern generators, and write test files.
+2006/04/12 (CB): Uncomment new Composite class and remove the old one; write test file for Composite and complete Image's test file.
 </li>
 
 <li>
