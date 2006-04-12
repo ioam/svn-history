@@ -118,21 +118,14 @@ class PatternGenerator(ParameterizedObject):
         x is a 1d-array of x-axis values at which to sample the pattern;
         y contains the y-axis values.
         """
-        # CEBHACKALERT: temporary, density will become one again soon...
-        if type(density)!=tuple:
-            xdensity=density
-            ydensity=density
-        else:
-            xdensity,ydensity = density
-
         # CEBHACKALERT: doesn't evaluate pattern at correct location on the sheet.
         # But this is a start (it's simpler than before) - and matches previous
         # topographica behavior for lissom_or_reference.
-        r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
+        r1,r2,c1,c2 = bounds2slice(bounds,bounds,density)
         n_rows=r2-r1; n_cols=c2-c1
         
-        y = array([matrixidx2sheet(r,0,bounds,xdensity,ydensity) for r in range(n_rows)])
-        x = array([matrixidx2sheet(0,c,bounds,xdensity,ydensity) for c in range(n_cols)])
+        y = array([matrixidx2sheet(r,0,bounds,density) for r in range(n_rows)])
+        x = array([matrixidx2sheet(0,c,bounds,density) for c in range(n_cols)])
 
         # x increases from left to right; y decreases from left to right.
         # For this function to make sense on its own, y should probably be
@@ -176,14 +169,7 @@ class Constant(PatternGenerator):
         offset = params.get('offset',self.offset)
         output_fn = params.get('output_fn',self.output_fn)
         
-        # CEBHACKALERT: temporary, density will become one again soon...
-        if type(density)!=tuple:
-            xdensity=density
-            ydensity=density
-        else:
-            xdensity,ydensity = density
-
-        r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
+        r1,r2,c1,c2 = bounds2slice(bounds,bounds,density)
         shape = (r2-r1,c2-c1)
 
         if output_fn is Identity:

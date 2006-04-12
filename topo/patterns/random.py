@@ -38,14 +38,7 @@ class RandomGenerator(PatternGenerator):
         density = params.get('density',self.density)
         output_fn = params.get('output_fn',self.output_fn)
 
-        # CEBHACKALERT: temporary, density will become one again soon...
-        if type(density)!=tuple:
-            xdensity=density
-            ydensity=density
-        else:
-            xdensity,ydensity = density
-
-        r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
+        r1,r2,c1,c2 = bounds2slice(bounds,bounds,density)
         shape = (r2-r1,c2-c1)
 
         if output_fn is Identity:
