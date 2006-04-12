@@ -280,14 +280,10 @@ def bounds2slice(slice_bounds, sheet_bounds, sheet_density):
     return t_idx,b_idx,l_idx,r_idx
 
 
-def crop_slice_to_sheet_bounds(slice_,sheet_bounds,density,ydensity=None):
+def crop_slice_to_sheet_bounds(slice_,sheet_bounds,density):
     """
     Crop the given slice to the specified sheet_bounds.
     """
-    if ydensity:
-        assert ydensity==density
-
-    
     maxrow,maxcol = sheet2matrixidx(sheet_bounds.aarect().right(),
                                     sheet_bounds.aarect().bottom(),
                                     sheet_bounds,density)
