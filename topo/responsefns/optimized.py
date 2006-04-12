@@ -8,9 +8,9 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.connectionfield import CFProjectionResponseFn
-from topo.base.parameterclasses import Parameter
+from topo.base.connectionfield import CFProjectionResponseFn,ResponseFnParameter,Mdot
 from topo.base.parameterizedobject import ParameterizedObject
+
 from topo.misc.inlinec import inline, optimized
 
 from topo.responsefns.projfns import CFProjectionDotProduct, CFProjectionEuclideanDistance
@@ -23,6 +23,9 @@ class CFProjectionDotProduct_opt1(CFProjectionResponseFn):
     CFProjectionDotProduct for an easier-to read (but otherwise equivalent)
     version in Python.
     """
+
+    single_cf_fn = ResponseFnParameter(Mdot(),constant=True)    
+
     def __call__(self, cfs, input_activity, activity, strength, **params):
         temp_act = activity
         rows,cols = activity.shape
@@ -78,9 +81,6 @@ class CFProjectionEuclideanDistance_opt1(CFProjectionResponseFn):
     CFProjectionEuclideanDistance for an easier-to read (but otherwise
     equivalent) version in Python.
     """
-    def __init__(self,**params):
-        super(CFProjectionEuclideanDistance_opt1,self).__init__(**params)
-
     def __call__(self, cfs, input_activity, activity, strength, **params):
         temp_act = activity
         rows,cols = activity.shape
