@@ -21,7 +21,7 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/04/12: (CB) Finish reorganizing response functions and CFProjection response functions; rename CFProjectionGenericOutputFn to GenericCFPOutputFn, etc.; rename connectionfield.py to cf.py; rename Identity to IdentityOutputFn; create Identity learning function; create topo/base/functionfamilies.py and move LearningFns etc into it; rename SharedCFProjection SharedWeightCFProjection  
+2006/04/12: (CB) Finish reorganizing response functions and CFProjection response functions; rename CFProjectionGenericOutputFn to GenericCFPOutputFn, etc.; rename connectionfield.py to cf.py; rename Identity to IdentityOutputFn; create Identity learning function; create topo/base/functionfamilies.py and move LearningFns etc into it; rename SharedCFProjection SharedWeightCFProjection; make sure GUI lists are populated (and try to make that simpler).
 </li>
 
 <li> 
