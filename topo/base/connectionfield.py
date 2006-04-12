@@ -133,7 +133,7 @@ class ConnectionField(ParameterizedObject):
         if hasattr(self,'_sum'):
             return self._sum
         else:
-            return sum(self.weights.flat)
+            return Numeric.sum(self.weights.flat)
             
     def set_sum(self,new_sum):
         """
