@@ -25,7 +25,7 @@ from Numeric import array,Float,pi
 
 from topo.base.boundingregion import BoundingBox
 from topo.patterns.image import Image
-from topo.outputfns.basic import Identity
+from topo.outputfns.basic import IdentityOF
 
 
 
@@ -58,8 +58,8 @@ class TestImage(unittest.TestCase):
         image = Image(filename = 'topo/tests/testimage.pgm',
                       density=8,
                       bounds=BoundingBox(radius=0.5),
-                      output_fn=Identity(),
-                      whole_image_output_fn=Identity(),
+                      output_fn=IdentityOF(),
+                      whole_image_output_fn=IdentityOF(),
                       size_normalization='original')
 
         assert_array_almost_equal(image_array,image())
@@ -98,8 +98,8 @@ class TestImage(unittest.TestCase):
         
         image = Image(filename = 'topo/tests/testimage.pgm',
                       density=9,
-                      output_fn=Identity(),
-                      whole_image_output_fn=Identity(),
+                      output_fn=IdentityOF(),
+                      whole_image_output_fn=IdentityOF(),
                       size_normalization='original')
 
         assert_array_almost_equal(image_array,image())
@@ -183,8 +183,8 @@ class TestImage(unittest.TestCase):
         image = Image(filename = 'topo/tests/testimage.pgm',
                       density=8,
                       size=2.0,
-                      output_fn=Identity(),
-                      whole_image_output_fn=Identity(),
+                      output_fn=IdentityOF(),
+                      whole_image_output_fn=IdentityOF(),
                       size_normalization='fit_longest',
                       bounds=BoundingBox(radius=1.0))
 
@@ -267,8 +267,8 @@ class TestImage(unittest.TestCase):
 
         image = Image(filename = 'topo/tests/testimage.pgm',
                       density=8,
-                      output_fn=Identity(),
-                      whole_image_output_fn=Identity(),
+                      output_fn=IdentityOF(),
+                      whole_image_output_fn=IdentityOF(),
                       size_normalization='stretch_to_fit',
                       bounds=BoundingBox(radius=1.0))
 
@@ -317,8 +317,8 @@ class TestImage(unittest.TestCase):
 
         image = Image(filename = 'topo/tests/testimage.pgm',
                       density=15,
-                      output_fn=Identity(),
-                      whole_image_output_fn=Identity(),
+                      output_fn=IdentityOF(),
+                      whole_image_output_fn=IdentityOF(),
                       size_normalization='fit_shortest',
                       bounds=BoundingBox(radius=0.5))
 
@@ -349,8 +349,8 @@ class TestImage(unittest.TestCase):
 ##         image = Image(filename = 'topo/tests/testimage.pgm',
 ##                       density=8,
 ##                       bounds=BoundingBox(radius=0.5),
-##                       output_fn=Identity(),
-##                       whole_image_output_fn=Identity(),
+##                       output_fn=IdentityOF(),
+##                       whole_image_output_fn=IdentityOF(),
 ##                       size_normalization='original')
 
 ##         assert_array_almost_equal(rot90(image_array,1),image(orientation=pi/2))

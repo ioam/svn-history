@@ -5,19 +5,19 @@ $Id$
 """
 __version__ = "$Revision$"
 
-from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Parameter,Number
-from topo.base.projection import Identity
-from topo.base.connectionfield import CFProjectionLearningFn
-from topo.base.arrayutils import L2norm
 from Numeric import exp, argmax
-from topo.base.boundingregion import BoundingBox
-from topo.base.patterngenerator import PatternGeneratorParameter
-import topo.patterns.basic
 from math import ceil
 
+from topo.base.parameterizedobject import ParameterizedObject
+from topo.base.parameterclasses import Number
+from topo.base.connectionfield import CFProjectionLearningFn
+from topo.base.arrayutils import L2norm
+from topo.base.boundingregion import BoundingBox
+from topo.base.patterngenerator import PatternGeneratorParameter
 
-# CEBHACKALERT: these are projfns.
+import topo.patterns.basic
+
+from topo.outputfns.basic import IdentityOF
 
 
 class SOMLF(CFProjectionLearningFn):

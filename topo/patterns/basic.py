@@ -9,12 +9,12 @@ from math import pi
 from Numeric import around,bitwise_and,sin,add,Float
 
 from topo.base.parameterclasses import Number, Parameter, Enumeration
-from topo.base.projection import OutputFnParameter
-from topo.misc.patternfns import gaussian,gabor,line,disk,ring
+from topo.base.functionfamilies import OutputFnParameter
 from topo.base.patterngenerator import PatternGenerator
-
 # Imported here so that all PatternGenerators will be in the same package
 from topo.base.patterngenerator import Constant
+
+from topo.misc.patternfns import gaussian,gabor,line,disk,ring
  
 
 class Gaussian(PatternGenerator):
@@ -224,7 +224,7 @@ from Numeric import ones
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import Sheet
 from topo.base.boundingregion import BoundingBox
-from topo.base.projection import Identity
+from topo.outputfns.basic import IdentityOF
 class PatternSampler(ParameterizedObject):
     """
     Stores a Sheet whose activity represents the supplied pattern_array,
@@ -235,7 +235,7 @@ class PatternSampler(ParameterizedObject):
     background value.
     """
 
-    def __init__(self, pattern_array, whole_pattern_output_fn=Identity(), background_value_fn=None):
+    def __init__(self, pattern_array, whole_pattern_output_fn=IdentityOF(), background_value_fn=None):
         """
         Create a Sheet whose activity is pattern_array (where pattern_array
         is a Numeric array) after application of whole_pattern_output_fn.
@@ -372,7 +372,7 @@ class PatternSampler(ParameterizedObject):
 ##     # CEBHACKALERT: size_normalization and whole_image_output_fn are
 ##     # hidden temporarily.
 
-##     output_fn = OutputFnParameter(default=Identity())
+##     output_fn = OutputFnParameter(default=IdentityOF())
 
 ##     operator = Parameter(
 ##         default=Wrapper("Numeric.add"),
@@ -402,7 +402,7 @@ class PatternSampler(ParameterizedObject):
 
 ##     whole_image_output_fn = OutputFnParameter(
 ##         hidden='True',
-##         default=Identity(),
+##         default=IdentityOF(),
 ##         precedence=0.96,
 ##         doc='Function applied to the whole composite array (before any cropping).')
 

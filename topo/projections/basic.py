@@ -14,23 +14,23 @@ import Numeric
 # So all Projections are present in this package
 from topo.base.projection import Projection
 
-from topo.base.projection import OutputFnParameter
+from topo.base.functionfamilies import OutputFnParameter
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Parameter,Number,BooleanParameter
+from topo.base.parameterclasses import Number,BooleanParameter
 from topo.base.connectionfield import CFProjection,CFProjectionLearningFnParameter,CFProjectionIdentityLearningFn,CFProjectionResponseFnParameter,CFProjectionOutputFnParameter,CFProjectionIdentityOutputFn,CFProjectionOutputFn, Mdot, ResponseFnParameter
 from topo.base.patterngenerator import PatternGeneratorParameter
 from topo.base.sheetview import UnitView
 
-from topo.outputfns.basic import Identity
+from topo.outputfns.basic import IdentityOF
 
 
 
 class SharedCFProjectionOutputFn(CFProjectionOutputFn):
-    single_cf_fn = OutputFnParameter(default=Identity())
+    single_cf_fn = OutputFnParameter(default=IdentityOF())
     
     def __call__(self, cfs, output_activity, norm_values=None, **params):
         """Apply the specified single_cf_fn to every CF."""
-        if type(self.single_cf_fn) is not Identity:
+        if type(self.single_cf_fn) is not IdentityOF:
             cf = cfs[0]
             self.single_cf_fn(cf.weights)
 
@@ -78,7 +78,7 @@ class SharedCFProjection(CFProjection):
     learning_fn = CFProjectionLearningFnParameter(
         CFProjectionIdentityLearningFn(),constant=True)
 
-    output_fn  = OutputFnParameter(default=Identity())
+    output_fn  = OutputFnParameter(default=IdentityOF())
     
     strength = Number(default=1.0)
 

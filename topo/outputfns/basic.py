@@ -18,14 +18,11 @@ import Numeric
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
 from topo.base.arrayutils import L2norm, norm
-# JABALERT: should move OutputFn to some other file so that we
-# don't have to import projection here, or anything else
-# Topographica-specific
-from topo.base.projection import OutputFn
+from topo.base.functionfamilies import OutputFn
 from topo.base.arrayutils import clip_in_place
 
 # Imported here so that all OutputFns will be in the same package
-from topo.base.projection import Identity
+from topo.base.functionfamilies import IdentityOF
 
 ### JCALERT! The functions below have been re-written to work as
 ### procedure; Nonetheless, I kept the return x statement in order to

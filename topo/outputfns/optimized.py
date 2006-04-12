@@ -4,10 +4,10 @@ Output functions (see basic.py) and projection-level output functions
 
 Requires the weave package; without it unoptimized versions are used.
 """
-from topo.base.projection import OutputFn, OutputFnParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
 from topo.base.connectionfield import CFProjectionOutputFn,CFProjectionGenericOutputFn
+from topo.base.functionfamilies import OutputFn, OutputFnParameter
 
 from topo.misc.inlinec import inline, optimized
 

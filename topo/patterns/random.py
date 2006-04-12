@@ -13,7 +13,8 @@ import RandomArray
 from topo.base.parameterclasses import Number,Parameter
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheet import bounds2slice
-from topo.base.projection import Identity
+
+from topo.outputfns.basic import IdentityOF
 
 
 class RandomGenerator(PatternGenerator):
@@ -41,7 +42,7 @@ class RandomGenerator(PatternGenerator):
         r1,r2,c1,c2 = bounds2slice(bounds,bounds,density)
         shape = (r2-r1,c2-c1)
 
-        if output_fn is Identity:
+        if output_fn is IdentityOF:
             return self._distrib(shape)
         else:
             return output_fn(self._distrib(shape))

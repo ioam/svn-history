@@ -33,7 +33,8 @@ import topo
 import patterngenerator
 from patterngenerator import PatternGeneratorParameter
 from parameterizedobject import ParameterizedObject
-from projection import Projection,ProjectionSheet,Identity,OutputFnParameter
+from functionfamilies import OutputFnParameter, IdentityOF
+from projection import Projection,ProjectionSheet
 from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter
 from sheet import Sheet,bounds2slice,sheet2matrixidx,crop_slice_to_sheet_bounds,slice2bounds
 from sheetview import UnitView
@@ -197,7 +198,7 @@ class ConnectionField(ParameterizedObject):
     # CEBHACKALERT: add some default values
     def __init__(self,x,y,input_sheet,weights_bounds_template,
                  weights_generator,mask_template,
-                 output_fn=Identity(),**params):
+                 output_fn=IdentityOF(),**params):
         """
 
         weights_bounds_templates is assumed to have been initialized correctly
@@ -310,7 +311,7 @@ class ConnectionField(ParameterizedObject):
         return activity[r1:r2,c1:c2]
 
 
-    def change_bounds(self, weights_bounds, mask_template, output_fn=Identity()):
+    def change_bounds(self, weights_bounds, mask_template, output_fn=IdentityOF()):
         """
         Change the bounding box for this ConnectionField.
 
@@ -508,7 +509,7 @@ class CFProjectionOutputFn(ParameterizedObject):
 
 class CFProjectionGenericOutputFn(CFProjectionOutputFn):
     """Applies the specified single_cf_fn to each CF in the CFProjection."""
-    single_cf_fn = OutputFnParameter(default=Identity())
+    single_cf_fn = OutputFnParameter(default=IdentityOF())
     
     def __call__(self, cfs, output_activity, **params):
         """
@@ -520,7 +521,7 @@ class CFProjectionGenericOutputFn(CFProjectionOutputFn):
         sum is then set equal to the single_cf_fn's
         norm_value. 
         """
-        if type(self.single_cf_fn) is not Identity:
+        if type(self.single_cf_fn) is not IdentityOF:
             rows,cols = output_activity.shape
             single_cf_fn = self.single_cf_fn
             norm_value = self.single_cf_fn.norm_value                
@@ -539,7 +540,7 @@ class CFProjectionIdentityOutputFn(CFProjectionOutputFn):
     Cannot be changed or subclassed, since it might never
     be called (it could simply be tested for and skipped).
     """
-    single_cf_fn = OutputFnParameter(default=Identity(),constant=True)
+    single_cf_fn = OutputFnParameter(default=IdentityOF(),constant=True)
     
     def __call__(self, cfs, output_activity, **params):
         pass
@@ -568,7 +569,7 @@ class CFProjection(Projection):
 
     CFProjection computes its activity using a response_fn of type
     CFProjectionResponseFn (typically a CF-aware version of mdot) and output_fn 
-    (which is typically Identity). Any subclass has to implement the interface
+    (which is typically IdentityOF). Any subclass has to implement the interface
     activate(self,input_activity) that computes the response from the input 
     and stores it in the activity array.
     """
@@ -598,7 +599,7 @@ class CFProjection(Projection):
     learning_rate = Number(default=0.0,softbounds=(0,100))
     
     output_fn  = OutputFnParameter(
-        default=Identity(),
+        default=IdentityOF(),
         doc='Function applied to the Projection activity after it is computed.')
 
     weights_output_fn = CFProjectionOutputFnParameter(
