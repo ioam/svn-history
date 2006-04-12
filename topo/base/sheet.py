@@ -101,7 +101,7 @@ from Numeric import zeros,array,floor,ceil,Float
 from boundingregion import BoundingBox, BoundingRegionParameter
 import sheetview 
 
-def sheet2matrix(x,y,bounds,xdensity,ydensity):
+def sheet2matrix(x,y,bounds,density,ydensity=None):
     """
     Convert a point (x,y) in Sheet coordinates to continuous matrix
     coordinates.
@@ -128,6 +128,12 @@ def sheet2matrix(x,y,bounds,xdensity,ydensity):
     the matrix. The matrix needs to tile the plane exactly,
     and for that to work the density may need to be adjusted.
     """
+    # CEBHACKALERT
+    if ydensity:
+        assert ydensity==density
+    else:
+        ydensity=density
+
 
     left,bottom,right,top = bounds.lbrt()
 
@@ -143,12 +149,12 @@ def sheet2matrix(x,y,bounds,xdensity,ydensity):
     # then scale to the size of the matrix. The y coordinate needs to
     # flipped, because the points are moving down in the sheet as the
     # y index increases in the matrix.
-    float_col = (x-left) * xdensity
-    float_row = (top-y)  * ydensity
+    float_col = (x-left) * density
+    float_row = (top-y)  * density
     return float_row, float_col
   
 
-def sheet2matrixidx(x,y,bounds,xdensity,ydensity):
+def sheet2matrixidx(x,y,bounds,density,ydensity=None):
     """
     Convert a point (x,y) in sheet coordinates to the integer row and
     column index of the matrix cell in which that point falls, given a
@@ -161,7 +167,7 @@ def sheet2matrixidx(x,y,bounds,xdensity,ydensity):
 
     Valid only for scalar x and y.
     """
-    r,c = sheet2matrix(x,y,bounds,xdensity,ydensity)
+    r,c = sheet2matrix(x,y,bounds,density,ydensity)
     r = floor(r)
     c = floor(c)
     return int(r), int(c)
@@ -178,7 +184,7 @@ def sheet2matrixidx_array(x,y,bounds,xdensity,ydensity):
 
 
 
-def matrix2sheet(float_row,float_col,bounds,xdensity,ydensity):
+def matrix2sheet(float_row,float_col,bounds,density,ydensity=None):
     """
     Convert a floating-point location (float_row,float_col) in matrix
     coordinates to its corresponding location (x,y) in sheet
@@ -186,6 +192,8 @@ def matrix2sheet(float_row,float_col,bounds,xdensity,ydensity):
     
     Inverse of sheet2matrix().
     """
+    if ydensity:
+        assert ydensity==density
 
     left,bottom,right,top = bounds.lbrt()
 
@@ -194,14 +202,14 @@ def matrix2sheet(float_row,float_col,bounds,xdensity,ydensity):
     # or it should be disallowed earlier.
     # This problem arises in several places (e.g. see PatternGenerator).
 
-    xstep = 1.0 / xdensity
-    ystep = 1.0 / ydensity
+    xstep = 1.0 / density
+    ystep = 1.0 / density
     x = float_col*xstep + left
     y = top - float_row*ystep
     return x, y
 
 
-def matrixidx2sheet(row,col,bounds,xdensity,ydensity):
+def matrixidx2sheet(row,col,bounds,density,ydensity=None):
     """
     Return (x,y) where x and y are the floating point coordinates of
     the *center* of the given matrix cell (row,col). If the matrix cell
@@ -217,8 +225,10 @@ def matrixidx2sheet(row,col,bounds,xdensity,ydensity):
 
     Valid only for scalar x and y.
     """
+    if ydensity:
+        assert ydensity==density
 
-    x,y = matrix2sheet((row+0.5), (col+0.5), bounds, xdensity, ydensity)
+    x,y = matrix2sheet((row+0.5), (col+0.5), bounds, density)
 
     # Rounding is useful for comparing the result with a floating point number
     # that we specify by typing the number out (e.g. fp = 0.5).
@@ -252,7 +262,7 @@ def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density):
     return sheet_matrix[r1:r2,c1:c2]
 
 
-def bounds2slice(slice_bounds, sheet_bounds, xdensity, ydensity):
+def bounds2slice(slice_bounds, sheet_bounds, density, ydensity=None):
     """
     Convert a bounding box into an array slice suitable for computing
     a submatrix.
@@ -266,10 +276,13 @@ def bounds2slice(slice_bounds, sheet_bounds, xdensity, ydensity):
     
     Returns (a,b,c,d) such that a matrix M can be sliced using M[a:b,c:d].
     """
+    if ydensity:
+        assert ydensity==density
+    
     l,b,r,t = slice_bounds.lbrt()
     
-    t_m,l_m = sheet2matrix(l,t,sheet_bounds,xdensity,ydensity)
-    b_m,r_m = sheet2matrix(r,b,sheet_bounds,xdensity,ydensity)
+    t_m,l_m = sheet2matrix(l,t,sheet_bounds,density)
+    b_m,r_m = sheet2matrix(r,b,sheet_bounds,density)
 
     l_idx = int(ceil(l_m-0.5))
     t_idx = int(ceil(t_m-0.5))
@@ -279,13 +292,17 @@ def bounds2slice(slice_bounds, sheet_bounds, xdensity, ydensity):
     return t_idx,b_idx,l_idx,r_idx
 
 
-def crop_slice_to_sheet_bounds(slice_,sheet_bounds,xdensity,ydensity):
+def crop_slice_to_sheet_bounds(slice_,sheet_bounds,density,ydensity=None):
     """
     Crop the given slice to the specified sheet_bounds.
     """
+    if ydensity:
+        assert ydensity==density
+
+    
     maxrow,maxcol = sheet2matrixidx(sheet_bounds.aarect().right(),
                                     sheet_bounds.aarect().bottom(),
-                                    sheet_bounds,xdensity,ydensity)
+                                    sheet_bounds,density)
     t_idx,b_idx,l_idx,r_idx = slice_
     
     rstart = max(0,t_idx)
@@ -296,25 +313,31 @@ def crop_slice_to_sheet_bounds(slice_,sheet_bounds,xdensity,ydensity):
     return rstart,rbound,cstart,cbound
 
 
-def bounds2slicearray(slice_bounds, input_bounds, input_xdensity, input_ydensity):
+def bounds2slicearray(slice_bounds, input_bounds, input_density, input_ydensity=None):
     """
     Same as bounds2slice(), but return a Numeric array instead of a tuple.
     """
-    r1,r2,c1,c2 = bounds2slice(slice_bounds,input_bounds,input_xdensity,input_ydensity)
+    if input_ydensity:
+        assert input_ydensity==input_density
+    
+    r1,r2,c1,c2 = bounds2slice(slice_bounds,input_bounds,input_density)
     return array([r1,r2,c1,c2])
 
 
 # CEBHACKALERT: slice is a Python type.
-def slice2bounds(slice,sheet_bounds,sheet_xdensity,sheet_ydensity):
+def slice2bounds(slice,sheet_bounds,sheet_density,sheet_ydensity=None):
     """
     Construct the bounds that corresponds to the given slice.
     This way, this function is an exact transform of bounds2slice. 
     That enables to retrieve the slice information from the bounding box.
     """
+    if sheet_ydensity:
+        assert sheet_ydensity==sheet_density
+
     r1,r2,c1,c2 = slice
 
-    left,bottom = matrix2sheet(r2,c1,sheet_bounds,sheet_xdensity,sheet_ydensity)
-    right, top   = matrix2sheet(r1,c2,sheet_bounds,sheet_xdensity,sheet_ydensity)
+    left,bottom = matrix2sheet(r2,c1,sheet_bounds,sheet_density)
+    right, top   = matrix2sheet(r1,c2,sheet_bounds,sheet_density)
 
     bounds = BoundingBox(points=((left,bottom),
                                   (right,top)))
@@ -333,10 +356,13 @@ def slice2bounds(slice,sheet_bounds,sheet_xdensity,sheet_ydensity):
     return bounds
 
 
-def slicearray2bounds(slicearray,sheet_bounds,sheet_xdensity,sheet_ydensity):
+def slicearray2bounds(slicearray,sheet_bounds,sheet_density,sheet_ydensity=None):
     """
     Same as slice2bounds, but the slice is an array instead of a tuple.
     """
+    if sheet_ydensity:
+        assert sheet_ydensity==sheet_density
+
     return slice2bounds((slicearray[0],slicearray[1],slicearray[2],slicearray[3]), sheet_bounds, sheet_xdensity,sheet_ydensity)
 
 
