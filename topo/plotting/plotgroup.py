@@ -38,13 +38,13 @@ def cmp_plot(plot1,plot2):
 	return cmp((plot1.plot_src_name+plot1.name),
 		   (plot2.plot_src_name+plot2.name))
 
+
 def identity(x):
     """No-op function for use as a default."""
     return x
 
 # PlotGroup used by the simulation are stored in this dictionnary
 plotgroup_dict = {}
-
 
 
 class PlotGroup(ParameterizedObject):
@@ -73,20 +73,12 @@ class PlotGroup(ParameterizedObject):
         super(PlotGroup,self).__init__(**params)  
 
 	self.plot_group_key = plot_group_key
-	### JCALERT:Normalize is no really used by PlotGroup for the moment
-        ### But it will be when sorted out what to do with TestPattern.
-        ### the problem is that for a PlotGroup the plot_list is static...
-        ### so it is hard to re-generate the plot if normalize change...
-        ### (it is already used by sub-classes though)
-	### This should be fixed by having a normalize method in Plot that transform a plot
-        ### bitmap to normalize it. If self.normalize change in the PlotGroup,
-        ### the _plot_list function called the Plot.normalize method on the plot_list before
-        ### returning it.
 	self.normalize = normalize
 	self.plot_list = plot_list	
         
 	# store the PlotGroup in plot_group_dict
 	plotgroup_dict[plot_group_key]=self
+
 	self.bitmaps = []
 
         # In the future, it might be good to be able to specify the
@@ -105,6 +97,7 @@ class PlotGroup(ParameterizedObject):
 	self.height_of_tallest_plot=1.0
 	self.min_master_zoom=3.0
 
+	### JCALERT: sort out the handling of these two parameters...
 	self.sizeconvertfn = identity
 	self.sheetcoords = False
 
@@ -123,7 +116,7 @@ class PlotGroup(ParameterizedObject):
 	"""
 	return self.plot_list
 
-
+    ### JCALERT: gte rid of this function and only keep plots
     def load_images(self):
         """
         Pre: the update command that load the SheetView corresponding to the PlotGroup
@@ -151,15 +144,14 @@ class PlotGroup(ParameterizedObject):
 	### JCALERT: here we should generate the sheet_views
 	### Need more work to see how to do it.
 	self._generate_sheet_views()
-	all_plots = flatten(self._plot_list()) 
-        all_plots = [each for each in all_plots if each != None]
+        all_plots = [each for each in flatten(self._plot_list()) if each != None]
+	# scaling the Plots
 	self.scale_images(all_plots)
 	# sorting the Plots.
 	self._ordering_plots(all_plots)
         return all_plots
  
 
-    ### When committed I will have to change the resize handling
     def scale_images(self,plots):
         """
         It is assumed that the PlotGroup code has not scaled the bitmap to the size currently
@@ -179,7 +171,7 @@ class PlotGroup(ParameterizedObject):
             if not plot.resize:
                 scaling_factor = 1
             else:
-		if self.sheetcoords==1:		   
+		if self.sheetcoords:		   
                     s = topo.sim.objects(Sheet).get(plot.plot_src_name,None)
 		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(s.density)/max_sheet_height)
 		else:
@@ -197,11 +189,6 @@ class PlotGroup(ParameterizedObject):
 	Subfunction that set the initial master zooms for both the sheet
 	coordinates and the matrix coordinates case. 
 	"""
-        ### JCALERT/JABALERT! The calculation of the initial and minimum sizes
-        ### might need to be in a sub-function so that it can be overridden
-        ### for ProjectionPanel.  It also might be necessary to move the
-        ### calculation into PlotGroup, because similar things will be needed
-        ### even when saving plots directly to disk.
 	max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
  			  -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
  			  for p in plots if p.resize])
@@ -214,7 +201,7 @@ class PlotGroup(ParameterizedObject):
 	    self.height_of_tallest_plot = max_height
 	else:	
 	    self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
-### JCALERT: That functionnality will have to be added again to the PlotGroupPanel
+        ### JCALERT: That functionnality will have to be added again to the PlotGroupPanel
 # 	if self.height_of_tallest_plot == self.min_master_zoom:
 # 	    self.reduce_button.config(state=DISABLED)
 	self.initial_plot=False
@@ -365,20 +352,21 @@ class ProjectionPlotGroup(TemplatePlotGroup):
         ### This is set by self.generate_coords()
         self.proj_plotting_shape = (0,0)
 
-	self.situate = False
-        
+	self.situate = False        
         super(ProjectionPlotGroup,self).__init__(plot_group_key,plot_list,normalize,
                                                  template,sheet_name,**params)
 
         self.INITIAL_PLOT_HEIGHT = 6
         self.min_master_zoom=1
+
 	### JCALERT! It is a bit confusing, but in the case of the projection
         ### sheet_filter_lam filter to one single sheet...
 	### this has to be made simpler...
 	for s in topo.sim.objects(Sheet).values():
 	    if self.sheet_filter_lam(s):
 		self._sim_ep = s
-
+	
+	### JCALERT! change this name 
         self._sim_ep_src = self._sim_ep.projections().get(self.weight_name,None)
  
     def _create_plots(self,pt_name,pt,sheet):
@@ -438,7 +426,6 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 	Subfunction that set the initial master zooms for both the sheet
 	coordinates and the matrix coordinates case. 
 	"""
-	print "passed_iun"
         self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
         self.initial_plot=False
   
