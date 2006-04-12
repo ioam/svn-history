@@ -60,7 +60,7 @@ class PlotGroup(ParameterizedObject):
     ### - rewrite the test file.
 
 
-    def __init__(self, plotgroup_key, plot_list, normalize, sheetcoords, integerscaling,**params):
+    def __init__(self, plotgroup_key, plot_list, normalize, sheetcoords, integerscaling, **params):
     
         """
 	plotgroup_key is a key for storing the PlotGroup in the plotgroup_dict.
@@ -73,9 +73,15 @@ class PlotGroup(ParameterizedObject):
         super(PlotGroup,self).__init__(**params)  
 
 	self.plotgroup_key = plotgroup_key
-	self.normalize = normalize
 	self.plot_list = plot_list	
-        
+	self.normalize = normalize
+	self.sheetcoords = sheetcoords
+
+	if integerscaling:
+            self.sizeconvertfn = int
+        else:
+            self.sizeconvertfn = identity
+
 	# store the PlotGroup in plot_group_dict
 	plotgroup_dict[plotgroup_key]=self
 
@@ -93,18 +99,9 @@ class PlotGroup(ParameterizedObject):
 	# Enforce a minimum plot height for the tallest plot of the PlotGroup.
 	self.INITIAL_PLOT_HEIGHT = 150
 
-	self.initial_plot=True
-	self.height_of_tallest_plot=1.0
 	self.min_master_zoom=3.0
-
-
-	if integerscaling:
-            self.sizeconvertfn = int
-        else:
-            self.sizeconvertfn = identity
-
-	self.sizeconvertfn = identity
-	self.sheetcoords = sheetcoords
+	self.height_of_tallest_plot = 1.0
+	self.initial_plot=True
 
 
     def _generate_sheet_views(self):
@@ -120,6 +117,7 @@ class PlotGroup(ParameterizedObject):
 	function that returns the plot_list.
 	"""
 	return self.plot_list
+
 
     ### JCALERT: gte rid of this function and only keep plots
     def load_images(self):
@@ -161,14 +159,13 @@ class PlotGroup(ParameterizedObject):
         """
         It is assumed that the PlotGroup code has not scaled the bitmap to the size currently
         desired by the GUI.
-        """          
-	### JCALERT: that cannot be in the constructor for the moment, because when creating the 
-	### panel, there is no PlotGroup assigned to it... It will change when all will be inserted 
-	### in the PlotGroup (i.e scale_image, set_initial_master_zoom, compute_max_height...)
-	if self.initial_plot:
-	    self._set_height_of_tallest_plot(plots)
+        """ 
+        ### JCALERT: that cannot be in the constructor for the moment, because when creating the 
+ 	### panel, there is no PlotGroup assigned to it... It will change when all will be inserted 
+ 	### in the PlotGroup (i.e scale_image, set_initial_master_zoom, compute_max_height...)
+ 	if self.initial_plot:
+ 	    self._set_height_of_tallest_plot(plots)
 
-	tmp_list = []
 	### JCALERT: here we should take the plot bounds instead of the sheet one (id in set_height_of..)?
 	max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
  			      -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
@@ -212,7 +209,6 @@ class PlotGroup(ParameterizedObject):
 # 	    self.reduce_button.config(state=DISABLED)
 	self.initial_plot=False
 
-
     def _ordering_plots(self,plot_list):
 	"""
 	Function called to sort the Plots in order.
@@ -230,8 +226,7 @@ class TemplatePlotGroup(PlotGroup):
 
     def __init__(self,plotgroup_key,plot_list,normalize,sheetcoords,integerscaling,template,sheet_name,**params):
 
-        super(TemplatePlotGroup,self).__init__(plotgroup_key,plot_list,normalize,sheetcoords,integerscaling,**params)
-	
+	super(TemplatePlotGroup,self).__init__(plotgroup_key,plot_list,normalize,sheetcoords,integerscaling,**params)
 	self.template = template
 	# If no sheet_name is defined, the sheet_filter_lam accepts all sheets
         # (i.e the PlotGroup will try to build a Plot object for each Sheet in the simulation)
@@ -239,9 +234,9 @@ class TemplatePlotGroup(PlotGroup):
 	    self.sheet_filter_lam = lambda s: s.name == sheet_name
         else:
             self.sheet_filter_lam = lambda s : True
-
 	# add static images to the added_plot_list, as specified by the template.
         self._add_static_images()
+	
 
 	
     def _plot_list(self):
@@ -434,7 +429,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 	coordinates and the matrix coordinates case. 
 	"""
         self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
-        self.initial_plot=False
+	self.initial_plot=False
   
 
     def _ordering_plots(self,plot_list):
