@@ -24,8 +24,6 @@ __version__ = '$Revision$'
 # Maybe these functions won't always operate on *all* the CFs of a CFProjection?
 # But for the moment they do, which is what the documentation and naming implies.
 
-
-
 import Numeric
 import copy
 from itertools import chain
@@ -37,7 +35,6 @@ from patterngenerator import PatternGeneratorParameter
 from parameterizedobject import ParameterizedObject
 from projection import Projection,ProjectionSheet,Identity,OutputFnParameter
 from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter
-from arrayutils import Mdot,divisive_normalization
 from sheet import Sheet,bounds2slice,sheet2matrixidx,crop_slice_to_sheet_bounds,slice2bounds
 from sheetview import UnitView
 from boundingregion import BoundingBox,BoundingRegionParameter
@@ -50,7 +47,7 @@ weight_type = Numeric.Float32
 
 
 class LearningFn(ParameterizedObject):
-    """Abstract base class for learning functions that plug into GenericCFLF."""
+    """Abstract base class for learning functions that plug into CFProjectionGenericLearningFn."""
 
     _abstract_class_name = "LearningFn"
 
@@ -91,6 +88,47 @@ class LearningFnParameter(ClassSelectorParameter):
 
     def __init__(self,default=Hebbian(),**params):
         super(LearningFnParameter,self).__init__(LearningFn,default=default,**params)        
+
+
+
+class ResponseFn(ParameterizedObject):
+    """Abstract base class for response functions that plug into CFProjectionGenericResponseFn."""
+
+    _abstract_class_name = "ResponseFn"
+
+    def __call__(self,m1,m2):
+        """
+        Apply the response function; must be implemented by subclasses.
+        """
+        raise NotImplementedError
+
+
+class Mdot(ResponseFn):
+    """
+    Return the sum of the element-by-element product of two 2D
+    arrays.  
+    """
+    def __call__(self,m1,m2):
+        # Works in cases where dot(a.flat,b.flat) fails, e.g, with
+        # matrix slices or submatrices.
+        # CB: presumably that is to do with whether or not the arrays
+        # are each contiguous.        
+        a = m1*m2
+        return Numeric.sum(a.flat)
+
+
+class ResponseFnParameter(ClassSelectorParameter):
+    """
+    Parameter whose value can be any ResponseFunction.
+    """
+    __slots__ = []
+    __doc__ = property((lambda self: self.doc))
+
+    packages = []
+
+    def __init__(self,default=Hebbian(),**params):
+        super(ResponseFnParameter,self).__init__(ResponseFn,default=default,**params)        
+
 
 
 
@@ -337,7 +375,7 @@ class CFProjectionGenericResponseFn(CFProjectionResponseFn):
     Generic large-scale response function based on a simple single-CF function.
 
     Applies the single_cf_fn to each CF in turn.  For the default
-    single_cf_fn of mdot, does a basic dot product of each CF with the
+    single_cf_fn of Mdot(), does a basic dot product of each CF with the
     corresponding slice of the input array.  This function is likely
     to be slow to run, but it is easy to extend with any arbitrary
     single-CF response function.
@@ -347,7 +385,7 @@ class CFProjectionGenericResponseFn(CFProjectionResponseFn):
     ConnectionField weights) and computes a scalar activation value
     based on those weights.
     """
-    single_cf_fn = Parameter(default=Mdot())
+    single_cf_fn = ResponseFnParameter(default=Mdot())
     
     def __call__(self, cfs, input_activity, activity, strength):
         rows,cols = activity.shape
