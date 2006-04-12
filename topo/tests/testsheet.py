@@ -345,28 +345,28 @@ class TestCoordinateTransforms(unittest.TestCase):
 
 	slice =(0,3,7,8)
 	bounds = slice2bounds(slice,bb,10,10)
-        test_slice = bounds2slice(bounds,bb,10,10)
+        test_slice = bounds2slice(bounds,bb,10)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(4,7,8,10)
 	bounds = slice2bounds(slice,bb,10,10)
-        test_slice = bounds2slice(bounds,bb,10,10)
+        test_slice = bounds2slice(bounds,bb,10)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(2,3,4,8)
 	bounds = slice2bounds(slice,bb,10,10)
-        test_slice = bounds2slice(bounds,bb,10,10)
+        test_slice = bounds2slice(bounds,bb,10)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(0,3,9,10)
 	bounds = slice2bounds(slice,bb,10,10)
-        test_slice = bounds2slice(bounds,bb,10,10)
+        test_slice = bounds2slice(bounds,bb,10)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
@@ -375,21 +375,21 @@ class TestCoordinateTransforms(unittest.TestCase):
 
 	slice =(9,14,27,29)
 	bounds = slice2bounds(slice,bb,20,20)
-        test_slice = bounds2slice(bounds,bb,20,20)
+        test_slice = bounds2slice(bounds,bb,20)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(0,6,0,7)
 	bounds = slice2bounds(slice,bb,20,20)
-        test_slice = bounds2slice(bounds,bb,20,20)
+        test_slice = bounds2slice(bounds,bb,20)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(6,10,11,29)
 	bounds = slice2bounds(slice,bb,20,20)
-        test_slice = bounds2slice(bounds,bb,20,20)
+        test_slice = bounds2slice(bounds,bb,20)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
@@ -398,14 +398,14 @@ class TestCoordinateTransforms(unittest.TestCase):
 
 	slice =(4,7,2,3)
 	bounds = slice2bounds(slice,bb,7,7)
-        test_slice = bounds2slice(bounds,bb,7,7)
+        test_slice = bounds2slice(bounds,bb,7)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(0,7,0,7)
 	bounds = slice2bounds(slice,bb,7,7)
-        test_slice = bounds2slice(bounds,bb,7,7)
+        test_slice = bounds2slice(bounds,bb,7)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
@@ -442,14 +442,14 @@ class TestCoordinateTransforms(unittest.TestCase):
         sheet = Sheet(density=10,bounds=BoundingBox(radius=0.5))
         cf_bounds = boundingregion.BoundingBox(points=((0.3,0.3),(0.6,0.6)))
 
-        slice_ = bounds2slice(cf_bounds,sheet.bounds,sheet.xdensity,sheet.ydensity)
-        slice_ = crop_slice_to_sheet_bounds(slice_,sheet.bounds,sheet.xdensity,sheet.ydensity)
+        slice_ = bounds2slice(cf_bounds,sheet.bounds,sheet.density)
+        slice_ = crop_slice_to_sheet_bounds(slice_,sheet.bounds,sheet.density)
 
         # check it's been cropped to fit onto sheet...
         self.assertEqual(slice_,(0,2,8,10))
 
         # now check that it gives the correct bounds...
-        cropped_bounds = slice2bounds(slice_,sheet.bounds,sheet.xdensity,sheet.ydensity)
+        cropped_bounds = slice2bounds(slice_,sheet.bounds,sheet.density)
         true_cropped_bounds = boundingregion.BoundingBox(points=((0.3,0.3),(0.5,0.5)))
         for a,b in zip(cropped_bounds.aarect().lbrt(),true_cropped_bounds.aarect().lbrt()):
             self.assertAlmostEqual(a,b)
@@ -465,7 +465,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         # test that if you ask to slice the matrix with the sheet's BoundingBox, you
         # get back the whole matrix
         sheet_bb = boundingregion.BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
-        slice = bounds2slice(sheet_bb,sheet_bb,10,10)
+        slice = bounds2slice(sheet_bb,sheet_bb,10)
         true_slice = (0,10,0,10) # inclusive left boundary, exclusive right boundary
         self.assertEqual(slice,true_slice) 
 
@@ -476,29 +476,29 @@ class TestCoordinateTransforms(unittest.TestCase):
 	# Test with 20 density. 
 
         bb = boundingregion.BoundingBox(points=((-0.05,-0.20),(0.20,0.05)))
-        slice = bounds2slice(bb,sheet_bb,20,20)
+        slice = bounds2slice(bb,sheet_bb,20)
         true_slice = (9,14,9,14) 
         self.assertEqual(slice,true_slice)
 
 	bb = boundingregion.BoundingBox(points=((-0.40,0),(-0.30,0.30)))
-        slice = bounds2slice(bb,sheet_bb,20,20)
+        slice = bounds2slice(bb,sheet_bb,20)
         true_slice = (4,10,2,4) 
         self.assertEqual(slice,true_slice)
 
 	bb = boundingregion.BoundingBox(points=((0.15,0.10),(0.30,0.30)))
-        slice = bounds2slice(bb,sheet_bb,20,20)
+        slice = bounds2slice(bb,sheet_bb,20)
         true_slice = (4,8,13,16) 
         self.assertEqual(slice,true_slice)
 
 	bb = boundingregion.BoundingBox(points=((-0.05,-0.45),(0.10,-0.25)))
-        slice = bounds2slice(bb,sheet_bb,20,20)
+        slice = bounds2slice(bb,sheet_bb,20)
         true_slice = (15,19,9,12) 
         self.assertEqual(slice,true_slice)
 	
 	# test with 7 density sheet.
 	
 	bb = boundingregion.BoundingBox(points=((-0.5+2.0/7.0,0.5-2.0/7.0),(-0.5+4.0/7.0,0.5)))
-        slice = bounds2slice(bb,sheet_bb,7,7)
+        slice = bounds2slice(bb,sheet_bb,7)
         true_slice = (0,2,2,4) 
         self.assertEqual(slice,true_slice)
 

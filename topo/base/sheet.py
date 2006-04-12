@@ -240,7 +240,7 @@ def matrixidx2sheet(row,col,bounds,density,ydensity=None):
     return round(x,10),round(y,10)
 
 
-def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density):
+def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density,ydensity=None):
     """
     Return the submatrix of a sheet_matrix specified by a bounds.
 
@@ -249,20 +249,15 @@ def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density):
     sheet_matrix.  The submatrix is just a view into the sheet_matrix;
     it is not an independent copy.
     """
-
-    # CEBHACKALERT: xdensity and ydensity will be removed...but they
-    # should be the same.
-    left,bottom,right,top = sheet_bounds.lbrt()
-    xdensity = int(sheet_density*(right-left)) / float((right-left))
-    ydensity = int(sheet_density*(top-bottom)) / float((top-bottom))
-
-    assert xdensity==ydensity
-
-    r1,r2,c1,c2 = bounds2slice(bounds,sheet_bounds,xdensity,ydensity)
+    # CEBHACKALERT: to delete
+    if ydensity:
+        assert sheet_density==ydensity
+        
+    r1,r2,c1,c2 = bounds2slice(bounds,sheet_bounds,sheet_density)
     return sheet_matrix[r1:r2,c1:c2]
 
 
-def bounds2slice(slice_bounds, sheet_bounds, density, ydensity=None):
+def bounds2slice(slice_bounds, sheet_bounds, sheet_density):
     """
     Convert a bounding box into an array slice suitable for computing
     a submatrix.
@@ -276,13 +271,10 @@ def bounds2slice(slice_bounds, sheet_bounds, density, ydensity=None):
     
     Returns (a,b,c,d) such that a matrix M can be sliced using M[a:b,c:d].
     """
-    if ydensity:
-        assert ydensity==density
-    
     l,b,r,t = slice_bounds.lbrt()
     
-    t_m,l_m = sheet2matrix(l,t,sheet_bounds,density)
-    b_m,r_m = sheet2matrix(r,b,sheet_bounds,density)
+    t_m,l_m = sheet2matrix(l,t,sheet_bounds,sheet_density)
+    b_m,r_m = sheet2matrix(r,b,sheet_bounds,sheet_density)
 
     l_idx = int(ceil(l_m-0.5))
     t_idx = int(ceil(t_m-0.5))
@@ -313,13 +305,10 @@ def crop_slice_to_sheet_bounds(slice_,sheet_bounds,density,ydensity=None):
     return rstart,rbound,cstart,cbound
 
 
-def bounds2slicearray(slice_bounds, input_bounds, input_density, input_ydensity=None):
+def bounds2slicearray(slice_bounds, input_bounds, input_density):
     """
     Same as bounds2slice(), but return a Numeric array instead of a tuple.
     """
-    if input_ydensity:
-        assert input_ydensity==input_density
-    
     r1,r2,c1,c2 = bounds2slice(slice_bounds,input_bounds,input_density)
     return array([r1,r2,c1,c2])
 
@@ -454,7 +443,7 @@ class Sheet(EventProcessor):
         self.ydensity = self.density
 
         # setup the activity matrix
-        r1,r2,c1,c2 = bounds2slice(self.bounds,self.bounds,self.xdensity,self.ydensity)
+        r1,r2,c1,c2 = bounds2slice(self.bounds,self.bounds,self.density)
         self.activity = zeros((r2-r1,c2-c1),Float)
 
         self.__saved_activity = []          # For non-learning inputs
