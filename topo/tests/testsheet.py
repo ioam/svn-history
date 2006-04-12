@@ -411,6 +411,30 @@ class TestCoordinateTransforms(unittest.TestCase):
 	    self.assertEqual(a,b)
 
 
+    def test_Sheet_creation(self):
+
+        # Example where the nominal x and y densities would not be equal.
+        # density along x =10
+        # density along y <10
+        # The density along y should become 10, by adjusting the height to be 2.0
+        # in this case.
+        # The y center of the bounds should remain -0.0025. Hence we should get
+        # a bottom bound of -1.0025 and a top one of 0.9975.
+        sheet = Sheet(density=10,
+                      bounds=BoundingBox(points=((-0.5,-1.005),(0.5,1.0))))
+
+        self.assertEqual(sheet.density,10)
+        self.assertEqual(sheet.xdensity,10)
+        self.assertEqual(sheet.ydensity,10)
+        
+        l,b,r,t = sheet.bounds.lbrt()
+        self.assertEqual(l,-0.5)
+        self.assertEqual(r,0.5)                      
+        self.assertAlmostEqual(t,0.9975)
+        self.assertAlmostEqual(b,-1.0025)
+
+
+
     # CEBHACKALERT: this test should probably be somewhere else and
     # called something different
     def test_connection_field_like(self):
@@ -701,8 +725,9 @@ class TestBox3Coordinates(TestCoordinateTransforms):
 
 
 # CEB: still making tests for TestBox3Coordinates...
-cases = [TestBox1Coordinates,
-         TestBox2Coordinates]
+cases = [TestBox1Coordinates]
+
+#         TestBox2Coordinates]
 #         TestBox3Coordinates]
          
 
