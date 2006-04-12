@@ -502,12 +502,6 @@ class TestCoordinateTransforms(unittest.TestCase):
         true_slice = (0,2,2,4) 
         self.assertEqual(slice,true_slice)
 
-	# test with xdensity=7 and ydensity=10
-	
-	bb = boundingregion.BoundingBox(points=((-0.5+2.0/7.0,0.30),(-0.5+4.0/7.0,0.5)))
-        slice = bounds2slice(bb,sheet_bb,7,10)
-        true_slice = (0,2,2,4) 
-        self.assertEqual(slice,true_slice)
 	
     def test_slice2bounds(self):
 
