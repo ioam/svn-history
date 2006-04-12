@@ -108,17 +108,17 @@ class UnitWeightsFile(PlotFileSaver):
         self.region = region
         self.name['region'] = '%s_%01.03f_%01.03f' % (region, x, y)
         self.name['type'] = 'Weights'
-        self.plot_group_key = ('Weights',self.region,x,y)
+        self.plotgroup_key = ('Weights',self.region,x,y)
 
         self.create_bitmaps()
         self.save_to_disk()
 
     def create_bitmaps(self):
 
-	pg = plotgroup_dict.get(self.plot_group_key,None)	
+	pg = plotgroup_dict.get(self.plotgroup_key,None)	
 	if pg == None:
 	    pgt = plotgroup_templates['Connection Fields']
-	    pg = ConnectionFieldsPlotGroup(self.plot_group_key,[],pgt.normalize,
+	    pg = ConnectionFieldsPlotGroup(self.plotgroup_key,[],pgt.normalize,
 					   pgt,self.region)
 			
 	
@@ -132,7 +132,7 @@ class ProjectionFile(PlotFileSaver):
         self.region = region
         self.name['region'] = '%s_%s' % (region, projection)
         self.name['type'] = 'Projection'
-        self.plot_group_key = ('Projection',projection,density,self.region)
+        self.plotgroup_key = ('Projection',projection,density,self.region)
 
         self.create_bitmaps()
         self.save_to_disk()
@@ -140,10 +140,10 @@ class ProjectionFile(PlotFileSaver):
 
     def create_bitmaps(self):
 
-	pg = plotgroup_dict.get(self.plot_group_key,None)	
+	pg = plotgroup_dict.get(self.plotgroup_key,None)	
 	if pg == None:
 	    pgt = plotgroup_templates['Projection']
-	    pg = ProjectionPlotGroup(self.plot_group_key,[],pgt.normalize,
+	    pg = ProjectionPlotGroup(self.plotgroup_key,[],pgt.normalize,
 				     pgt,self.region)
 
         self.bitmaps = pg.load_images()

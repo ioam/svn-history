@@ -89,11 +89,11 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         self.balloon = Pmw.Balloon(parent)
         self.canvases = []
 
-	# For a PlotGroupPanel, the plot_group_key is the name passed at creation.
+	# For a PlotGroupPanel, the plotgroup_key is the name passed at creation.
 	# (e.g for testpattern it is 'Preview')
         # For a TemplatePlotGroupPanel, name is the name of the associated template 
         # For a ConnectionField or a Projection Panel, the plotgroup_key is re-generated
-	self.plot_group_key = plotgroup_key
+	self.plotgroup_key = plotgroup_key
 
 	### JCALERT: do a create_plot_group function instead of so_plot_cmd
         #self.pe_group = self.create_plot_group()
@@ -174,7 +174,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
 
-	self.plot_group_title = Pmw.Group(self,tag_text=str(self.plot_group_key))
+	self.plot_group_title = Pmw.Group(self,tag_text=str(self.plotgroup_key))
         self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH,padx=5,pady=5)
 	self.plot_frame = self.plot_group_title.interior()
 
@@ -250,9 +250,9 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         """
 	Function that re-generate the PlotGroup anytime.
         """
-	plotgroup = plotgroup_dict.get(self.plot_group_key,None)
+	plotgroup = plotgroup_dict.get(self.plotgroup_key,None)
 	if plotgroup == None:
-	    plotgroup = self.PlotGroup(self.plot_group_key,[],self.normalize,
+	    plotgroup = self.PlotGroup(self.plotgroup_key,[],self.normalize,
 				       self.sheetcoords,self.integerscaling)
 	return plotgroup
   
@@ -385,7 +385,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         Change the window title.  TopoConsole will call this on
         startup of window.  
         """
-        self.parent.title(topo.sim.name+': '+"%s time:%s" % (self.plot_group_key,self.plot_time))
+        self.parent.title(topo.sim.name+': '+"%s time:%s" % (self.plotgroup_key,self.plot_time))
           
 
     def reduce(self):

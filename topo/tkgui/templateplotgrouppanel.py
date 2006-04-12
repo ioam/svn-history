@@ -53,8 +53,8 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         self.sheetcoords_checkbutton.pack(side=LEFT)
         #self.sheetcoords_checkbutton.select()
         
-	# For a BasicPlotGroup, the plot_group_key is the name of the template
-	self.plot_group_key=self.pgt.name
+	# For a BasicPlotGroup, the plotgroup_key is the name of the template
+	self.plotgroup_key=self.pgt.name
         
         params_frame = Frame(master=self)
         params_frame.pack(side=TOP,expand=YES,fill=X)
@@ -87,13 +87,13 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
  
         exec self.cmdname.get()
 
-	plotgroup = plotgroup_dict.get(self.plot_group_key,None)
+	plotgroup = plotgroup_dict.get(self.plotgroup_key,None)
 	if plotgroup == None:
 	    ### JCALERT! Maybe if the template specified a PlotGroup, we could
             ### take the one that is specified.
             ### Otherwise, we could assume that each panel is associated with a PlotGroup
             ### and then specify a panel for each template. (as it is done from topoconsole)
-	    plotgroup = TemplatePlotGroup(self.plot_group_key,[],self.normalize,
+	    plotgroup = TemplatePlotGroup(self.plotgroup_key,[],self.normalize,
 					  self.sheetcoords,self.integerscaling,self.pgt,None)
 	return plotgroup
 

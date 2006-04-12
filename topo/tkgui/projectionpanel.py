@@ -257,30 +257,30 @@ class ProjectionPanel(TemplatePlotGroupPanel):
             self.weight_name.get(),self.plot_time))
         
 
-    def generate_plot_group_key(self):
+    def generate_plotgroup_key(self):
         """
         Generate the key used to look up the PlotGroup for this Projection.
 
-        The plot_group_key for retrieving the PlotGroup depends on the
+        The plotgroup_key for retrieving the PlotGroup depends on the
         values entered in the window widgets.  This method generates
         the appropriate key based on those values, using a tuple like:
         ('Projection', self.weight_name, self.density, self.region).
         """
         self.density = float(eval(self.density_str.get(),__main__.__dict__))
-        self.plot_group_key = ('Projection',self.weight_name.get(),self.density,self.region.get())
+        self.plotgroup_key = ('Projection',self.weight_name.get(),self.density,self.region.get())
 
 
     def refresh_plotgroup(self):
         """
-        self.generate_plot_group_key() creates the density information needed for
+        self.generate_plotgroup_key() creates the density information needed for
         a ProjectionPlotGroup to create necessary Plots.
         """
   
-	self.generate_plot_group_key()
+	self.generate_plotgroup_key()
 
-	plotgroup = plotgroup_dict.get(self.plot_group_key,None)
+	plotgroup = plotgroup_dict.get(self.plotgroup_key,None)
 	if plotgroup == None:
-	    plotgroup = ProjectionPlotGroup(self.plot_group_key,[],self.normalize,
+	    plotgroup = ProjectionPlotGroup(self.plotgroup_key,[],self.normalize,
 					    self.sheetcoords,self.integerscaling,self.pgt,self.region.get())
         coords = plotgroup.generate_coords()
         topo.commands.analysis.proj_coords = coords

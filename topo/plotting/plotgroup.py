@@ -43,6 +43,7 @@ def identity(x):
     """No-op function for use as a default."""
     return x
 
+
 # PlotGroup used by the simulation are stored in this dictionnary
 plotgroup_dict = {}
 
@@ -54,16 +55,15 @@ class PlotGroup(ParameterizedObject):
     """
 
     ###JCALERT:
-    ### - renamed plot_group_key to plotgroup_key.
     ### - fix the sorting of the plot for display.
     ### - clean up the doc.
     ### - rewrite the test file.
 
 
-    def __init__(self, plot_group_key, plot_list, normalize, sheetcoords, integerscaling,**params):
+    def __init__(self, plotgroup_key, plot_list, normalize, sheetcoords, integerscaling,**params):
     
         """
-	plot_group_key is a key for storing the PlotGroup in the plotgroup_dict.
+	plotgroup_key is a key for storing the PlotGroup in the plotgroup_dict.
 	It is then stored and identified under this key.
 
 	plot_list is a static list specifying the Plot objects belonging to the PlotGroup.
@@ -72,12 +72,12 @@ class PlotGroup(ParameterizedObject):
         """
         super(PlotGroup,self).__init__(**params)  
 
-	self.plot_group_key = plot_group_key
+	self.plotgroup_key = plotgroup_key
 	self.normalize = normalize
 	self.plot_list = plot_list	
         
 	# store the PlotGroup in plot_group_dict
-	plotgroup_dict[plot_group_key]=self
+	plotgroup_dict[plotgroup_key]=self
 
 	self.bitmaps = []
 
@@ -169,6 +169,7 @@ class PlotGroup(ParameterizedObject):
 	    self._set_height_of_tallest_plot(plots)
 
 	tmp_list = []
+	### JCALERT: here we should take the plot bounds instead of the sheet one (id in set_height_of..)?
 	max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
  			      -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
  			     for p in plots if p.resize])
@@ -227,9 +228,9 @@ class TemplatePlotGroup(PlotGroup):
     PlotGroup that is built as specified by a PlotGroupTemplate.
     """
 
-    def __init__(self,plot_group_key,plot_list,normalize,sheetcoords,integerscaling,template,sheet_name,**params):
+    def __init__(self,plotgroup_key,plot_list,normalize,sheetcoords,integerscaling,template,sheet_name,**params):
 
-        super(TemplatePlotGroup,self).__init__(plot_group_key,plot_list,normalize,sheetcoords,integerscaling,**params)
+        super(TemplatePlotGroup,self).__init__(plotgroup_key,plot_list,normalize,sheetcoords,integerscaling,**params)
 	
 	self.template = template
 	# If no sheet_name is defined, the sheet_filter_lam accepts all sheets
@@ -300,11 +301,11 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
       situate: Whether to situate the plot on the full source sheet, or just show the weights.
     """
 
-    def __init__(self,plot_group_key,plot_list,normalize,sheetcoords,integerscaling,template,sheet_name,**params):
-        self.x = float(plot_group_key[2])
-        self.y = float(plot_group_key[3])
+    def __init__(self,plotgroup_key,plot_list,normalize,sheetcoords,integerscaling,template,sheet_name,**params):
+        self.x = float(plotgroup_key[2])
+        self.y = float(plotgroup_key[3])
       	self.situate = False       
-	super(ConnectionFieldsPlotGroup,self).__init__(plot_group_key,plot_list,normalize,
+	super(ConnectionFieldsPlotGroup,self).__init__(plotgroup_key,plot_list,normalize,
 						       sheetcoords,integerscaling,template,sheet_name,**params)
   
     def _create_plots(self,pt_name,pt,sheet):
@@ -348,18 +349,18 @@ class ProjectionPlotGroup(TemplatePlotGroup):
     PlotGroup for Projection Plots
     """
 
-    def __init__(self,plot_group_key,plot_list,normalize,sheetcoords,integerscaling,
+    def __init__(self,plotgroup_key,plot_list,normalize,sheetcoords,integerscaling,
 		 template,sheet_name,**params):
 
-        self.weight_name = plot_group_key[1]
-        self.density = float(plot_group_key[2])
+        self.weight_name = plotgroup_key[1]
+        self.density = float(plotgroup_key[2])
 
         ### JCALERT! shape determined by the plotting density
         ### This is set by self.generate_coords()
         self.proj_plotting_shape = (0,0)
 
 	self.situate = False        
-        super(ProjectionPlotGroup,self).__init__(plot_group_key,plot_list,normalize,
+        super(ProjectionPlotGroup,self).__init__(plotgroup_key,plot_list,normalize,
                                                  sheetcoords,integerscaling,template,sheet_name,**params)
 
         self.INITIAL_PLOT_HEIGHT = 6

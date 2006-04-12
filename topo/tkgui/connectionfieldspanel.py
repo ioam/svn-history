@@ -144,9 +144,9 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
     ### the GUI code; this function should probably just be calling a
     ### PlotGroup (or subclass) function to generate the key.  This
     ### file should have only GUI-specific stuff.
-    def generate_plot_group_key(self):
+    def generate_plotgroup_key(self):
         """
-        The plot_group_key for the ConnectionFieldsPanel will change depending on the
+        The plotgroup_key for the ConnectionFieldsPanel will change depending on the
         input within the window widgets.  This means that the key
         needs to be regenerated at the appropriate times.
 
@@ -164,7 +164,7 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         l,b,r,t = ep.bounds.aarect().lbrt()
 
         if ep.bounds.contains(self.x,self.y):
-            self.plot_group_key = ('Weights',self.region.get(),self.x,self.y)
+            self.plotgroup_key = ('Weights',self.region.get(),self.x,self.y)
             self.displayed_x, self.displayed_y = self.x, self.y
         else:
             self.dialog = Pmw.Dialog(self.parent,title = 'Error')
@@ -189,16 +189,16 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         the Plot objects.
         """
 	 
-        self.generate_plot_group_key()
+        self.generate_plotgroup_key()
 	
 	topo.commands.analysis.coordinate = (self.x,self.y)
 	topo.commands.analysis.sheet_name = self.region.get()
 
         exec self.cmdname.get()
 		
-	plotgroup = plotgroup_dict.get(self.plot_group_key,None)
+	plotgroup = plotgroup_dict.get(self.plotgroup_key,None)
 	if plotgroup == None:
-	    plotgroup = ConnectionFieldsPlotGroup(self.plot_group_key,[],self.normalize,
+	    plotgroup = ConnectionFieldsPlotGroup(self.plotgroup_key,[],self.normalize,
 						  self.sheetcoords,self.integerscaling,self.pgt,self.region.get())
 
         plotgroup.situate = self.situate
