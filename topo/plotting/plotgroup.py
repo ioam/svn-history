@@ -17,12 +17,10 @@ import topo
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import Sheet
-from topo.base.sheetview import SheetView
 from topo.base.connectionfield import CFSheet
 
-
 from plot import make_template_plot, Plot
-import bitmap
+
 
 
 
