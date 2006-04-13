@@ -292,15 +292,12 @@ def bounds2slicearray(slice_bounds, input_bounds, input_density):
 
 
 # CEBHACKALERT: slice is a Python type.
-def slice2bounds(slice,sheet_bounds,sheet_density,sheet_ydensity=None):
+def slice2bounds(slice,sheet_bounds,sheet_density):
     """
     Construct the bounds that corresponds to the given slice.
     This way, this function is an exact transform of bounds2slice. 
     That enables to retrieve the slice information from the bounding box.
     """
-    if sheet_ydensity:
-        assert sheet_ydensity==sheet_density
-
     r1,r2,c1,c2 = slice
 
     left,bottom = matrix2sheet(r2,c1,sheet_bounds,sheet_density)
@@ -323,13 +320,10 @@ def slice2bounds(slice,sheet_bounds,sheet_density,sheet_ydensity=None):
     return bounds
 
 
-def slicearray2bounds(slicearray,sheet_bounds,sheet_density,sheet_ydensity=None):
+def slicearray2bounds(slicearray,sheet_bounds,sheet_density):
     """
     Same as slice2bounds, but the slice is an array instead of a tuple.
     """
-    if sheet_ydensity:
-        assert sheet_ydensity==sheet_density
-
     return slice2bounds((slicearray[0],slicearray[1],slicearray[2],slicearray[3]), sheet_bounds, sheet_xdensity,sheet_ydensity)
 
 

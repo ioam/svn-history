@@ -344,28 +344,28 @@ class TestCoordinateTransforms(unittest.TestCase):
 	bb = boundingregion.BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 
 	slice =(0,3,7,8)
-	bounds = slice2bounds(slice,bb,10,10)
+	bounds = slice2bounds(slice,bb,10)
         test_slice = bounds2slice(bounds,bb,10)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(4,7,8,10)
-	bounds = slice2bounds(slice,bb,10,10)
+	bounds = slice2bounds(slice,bb,10)
         test_slice = bounds2slice(bounds,bb,10)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(2,3,4,8)
-	bounds = slice2bounds(slice,bb,10,10)
+	bounds = slice2bounds(slice,bb,10)
         test_slice = bounds2slice(bounds,bb,10)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(0,3,9,10)
-	bounds = slice2bounds(slice,bb,10,10)
+	bounds = slice2bounds(slice,bb,10)
         test_slice = bounds2slice(bounds,bb,10)
 
 	for a,b in zip(slice,test_slice):
@@ -374,21 +374,21 @@ class TestCoordinateTransforms(unittest.TestCase):
 	bb = boundingregion.BoundingBox(points=((-0.75,-0.5),(0.75,0.5)))
 
 	slice =(9,14,27,29)
-	bounds = slice2bounds(slice,bb,20,20)
+	bounds = slice2bounds(slice,bb,20)
         test_slice = bounds2slice(bounds,bb,20)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(0,6,0,7)
-	bounds = slice2bounds(slice,bb,20,20)
+	bounds = slice2bounds(slice,bb,20)
         test_slice = bounds2slice(bounds,bb,20)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(6,10,11,29)
-	bounds = slice2bounds(slice,bb,20,20)
+	bounds = slice2bounds(slice,bb,20)
         test_slice = bounds2slice(bounds,bb,20)
 
 	for a,b in zip(slice,test_slice):
@@ -397,14 +397,14 @@ class TestCoordinateTransforms(unittest.TestCase):
 	bb = boundingregion.BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 
 	slice =(4,7,2,3)
-	bounds = slice2bounds(slice,bb,7,7)
+	bounds = slice2bounds(slice,bb,7)
         test_slice = bounds2slice(bounds,bb,7)
 
 	for a,b in zip(slice,test_slice):
 	    self.assertEqual(a,b)
 
 	slice =(0,7,0,7)
-	bounds = slice2bounds(slice,bb,7,7)
+	bounds = slice2bounds(slice,bb,7)
         test_slice = bounds2slice(bounds,bb,7)
 
 	for a,b in zip(slice,test_slice):
@@ -511,7 +511,7 @@ class TestCoordinateTransforms(unittest.TestCase):
 	
 	sheet_bb = boundingregion.BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 	slice = (0,7,0,7)
-	bounds = slice2bounds(slice,sheet_bb,7,7)
+	bounds = slice2bounds(slice,sheet_bb,7)
 	true_bounds_lbrt = (-0.5,-0.5,0.5,0.5)
 	for a,b in zip(bounds.aarect().lbrt(),true_bounds_lbrt):
 	    self.assertAlmostEqual(a,b)
@@ -523,13 +523,13 @@ class TestCoordinateTransforms(unittest.TestCase):
 	# Test for 10 density
 
 	slice = (0,9,1,5)
-	bounds = slice2bounds(slice,sheet_bb,10,10)
+	bounds = slice2bounds(slice,sheet_bb,10)
 	true_bounds_lbrt = (-0.4,-0.4,0,0.5)
 	for a,b in zip(bounds.aarect().lbrt(),true_bounds_lbrt):
 	    self.assertAlmostEqual(a,b)
 
 	slice = (2,3,7,10)
-	bounds = slice2bounds(slice,sheet_bb,10,10)
+	bounds = slice2bounds(slice,sheet_bb,10)
 	true_bounds_lbrt = (0.2,0.2,0.5,0.3)
 	for a,b in zip(bounds.aarect().lbrt(),true_bounds_lbrt):
 	    self.assertAlmostEqual(a,b)
@@ -537,13 +537,13 @@ class TestCoordinateTransforms(unittest.TestCase):
        	# Test for 7 density
 
 	slice = (3,7,2,5)
-	bounds = slice2bounds(slice,sheet_bb,7,7)
+	bounds = slice2bounds(slice,sheet_bb,7)
 	true_bounds_lbrt = (-0.5+2.0/7.0,-0.5,-0.5+5.0/7.0,0.5-3.0/7.0)
 	for a,b in zip(bounds.aarect().lbrt(),true_bounds_lbrt):
 	    self.assertAlmostEqual(a,b)
 
 	slice = (2,6,0,1)
-	bounds = slice2bounds(slice,sheet_bb,7,7)
+	bounds = slice2bounds(slice,sheet_bb,7)
 	true_bounds_lbrt = (-0.5,0.5-6.0/7.0,-0.5+1.0/7.0,0.5-2.0/7.0)
 	for a,b in zip(bounds.aarect().lbrt(),true_bounds_lbrt):
 	    self.assertAlmostEqual(a,b)
@@ -551,14 +551,14 @@ class TestCoordinateTransforms(unittest.TestCase):
 	# Test for 25 density
 
 	slice = (0,25,4,10)
-	bounds = slice2bounds(slice,sheet_bb,25,25)
+	bounds = slice2bounds(slice,sheet_bb,25)
 	true_bounds_lbrt = (-0.5+4.0/25.0,-0.5,-0.5+10.0/25.0,0.5)
 	for a,b in zip(bounds.aarect().lbrt(),true_bounds_lbrt):
 	    self.assertAlmostEqual(a,b)
 	
 
 	slice = (7,18,3,11)
-	bounds = slice2bounds(slice,sheet_bb,25,25)
+	bounds = slice2bounds(slice,sheet_bb,25)
 	true_bounds_lbrt = (-0.5+3.0/25.0,0.5-18.0/25.0,-0.5+11.0/25.0,0.5-7.0/25.0)
 	for a,b in zip(bounds.aarect().lbrt(),true_bounds_lbrt):
 	    self.assertAlmostEqual(a,b)
