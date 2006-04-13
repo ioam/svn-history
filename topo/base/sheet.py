@@ -327,55 +327,59 @@ class Sheet(EventProcessor):
     _Matrix_coordinates_ are the (row,col) specification for an
     element in the activity matrix.  The usual matrix coordinate
     specs apply.
-
-    Parameters:
-
-    bounds:   A BoundingBox object indicating the bounds of the sheet.
-              [default  (-0.5,-0.5) to (0.5,0.5)]
-              
-    density:  The linear density of the sheet [default 10]
-
-    learning: Setting this to False tells the Sheet not to change its
-              permanent state (e.g. any connection weights) based on
-              incoming events.
-
+          
     sheet_view_dict is a dictionary that stores SheetViews,
     i.e. representations of the sheet for use by analysis or plotting
-    code.
+    code.    
     """
     _abstract_class_name = "Sheet"
 
-
-    bounds  = BoundingRegionParameter(BoundingBox(radius=0.5),constant=True,
-                                      doc="BoundingBox of the Sheet coordinate area covered by this Sheet")
+    bounds  = BoundingRegionParameter(
+        BoundingBox(radius=0.5),constant=True,
+        doc="""
+            BoundingBox of the Sheet coordinate area covered by this Sheet.
+            The left and right bounds--if specified--will always be observed,
+            but the top and bottom bounds may be adjusted to ensure the density
+            in the y direction is the same as the density in the x direction.
+            In such a case, the top and bottom bounds are adjusted such that the
+            center y point remains the same, and each bound is as close as possible
+            to its specified value.
+            """)
+    
     ### JABHACKALERT: Should be type Number, but that causes problems
     ### when instantiating Sheets in the Model Editor.
-    density = Parameter(default=10,constant=True,
-                        doc="Number of processing units per 1.0 distance horizontally or vertically in Sheet coordinates")
+    density = Parameter(
+        default=10,constant=True,
+        doc="""
+        Number of processing units per 1.0 distance horizontally or vertically
+        in Sheet coordinates
+        """)
+    
     # JABALERT: Should be set per-projection, not per-Sheet, right?
-    learning = BooleanParameter(True)
-    precedence = Number(default = 0.1, softbounds=(0.0,1.0),
-			doc='Allows defining a sorting order on Sheet objects.')
+    learning = BooleanParameter(
+        True,
+        doc="""
+        Setting this to False tells the Sheet not to change its
+        permanent state (e.g. any connection weights) based on
+        incoming events.
+        """)
+
+    precedence = Number(
+        default = 0.1, softbounds=(0.0,1.0),
+        doc='Allows a sorting order for Sheets, e.g. in the GUI.')
 
 
     def __init__(self,**params):
 
         super(Sheet,self).__init__(**params)
-
         self.debug("density = ",self.density)
 
-
-        # Calculate the true density along x (from the left and right bounds and
-        # the nominal density), then adjust the top and bottom bounds so that
-        # the density along y is the same.
-        # The top and bottom bounds are adjusted such that the center
-        # y point remains the same, and each bound is as close as possible
-        # to its specified value.
+        # Calculate the true density along x (from the left and right
+        # bounds and the nominal density), then adjust the top and
+        # bottom bounds so that the density along y is the same.
         # (move to docstring, etc)
-        
         left,bottom,right,top = self.bounds.lbrt()
         width = right-left; height = top-bottom
-
         center_y = bottom + height/2.0
 
         # CEBHACKALERT: temporary - avoid the constant issue while we
