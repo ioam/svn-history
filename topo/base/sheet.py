@@ -130,13 +130,6 @@ def sheet2matrix(x,y,bounds,density):
     """
     left,bottom,right,top = bounds.lbrt()
 
-    # Compute the true density along x and y. The true density does
-    # not equal to the 'density' argument when density*(right-left) or
-    # density*(top-bottom) is not an integer.
-    # (These true densities could be cached by a Sheet if that would
-    # speed things up.)
-    #xdensity = int(density*(right-left)) / float((right-left))
-    #ydensity = int(density*(top-bottom)) / float((top-bottom))
 
     # First translate to (left,top), which is [0,0] in the matrix,
     # then scale to the size of the matrix. The y coordinate needs to
@@ -312,7 +305,12 @@ def slice2bounds(slice,sheet_bounds,sheet_density):
     return bounds
 
 
-
+# CEBHACKALERT:
+# - have user_bounds, user_density as the parameters and bounds,density
+#   (not Parameters) as the true values. In the Parameter documentation,
+#   point out where the true value can be found. (This is a similar
+#   issue to the one in CFProjection - seems like weights_bounds should
+#   be user_weights_bounds, or something like that.
 class Sheet(EventProcessor):
     """
     The generic base class for neural sheets.
@@ -334,7 +332,7 @@ class Sheet(EventProcessor):
     """
     _abstract_class_name = "Sheet"
 
-    bounds  = BoundingRegionParameter(
+    bounds = BoundingRegionParameter(
         BoundingBox(radius=0.5),constant=True,
         doc="""
             BoundingBox of the Sheet coordinate area covered by this Sheet.
@@ -342,8 +340,8 @@ class Sheet(EventProcessor):
             but the top and bottom bounds may be adjusted to ensure the density
             in the y direction is the same as the density in the x direction.
             In such a case, the top and bottom bounds are adjusted such that the
-            center y point remains the same, and each bound is as close as possible
-            to its specified value.
+            center y point remains the same, and each bound is as close as
+            possible to its specified value.
             """)
     
     ### JABHACKALERT: Should be type Number, but that causes problems
@@ -351,8 +349,10 @@ class Sheet(EventProcessor):
     density = Parameter(
         default=10,constant=True,
         doc="""
-        Number of processing units per 1.0 distance horizontally or vertically
-        in Sheet coordinates
+        User-specified number of processing units per 1.0 distance
+        horizontally or vertically in Sheet coordinates. The actual
+        number may be different because of discretization. For instance,
+        an area of 3x2 cannot have a density of 2 in each direction.
         """)
     
     # JABALERT: Should be set per-projection, not per-Sheet, right?
@@ -373,26 +373,20 @@ class Sheet(EventProcessor):
 
         super(Sheet,self).__init__(**params)
         self.debug("density = ",self.density)
+        self.initialized = False # (temporary - because we modify some constant parameters
 
         # Calculate the true density along x (from the left and right
         # bounds and the nominal density), then adjust the top and
         # bottom bounds so that the density along y is the same.
-        # (move to docstring, etc)
+        # (The true density is not equal to the 'density' argument
+        # when density*(right-left) is not an integer.)
         left,bottom,right,top = self.bounds.lbrt()
         width = right-left; height = top-bottom
         center_y = bottom + height/2.0
-
-        # CEBHACKALERT: temporary - avoid the constant issue while we
-        # calculate the bounds and the density
-        self.initialized = False
-
-
         self.density = int(self.density*(width))/float((width))
+        n_units = round(height*self.density,0)        
 
-        n_units = round(height*self.density,0)
-        
         adjusted_half_height = n_units/self.density/2.0
-        
         adjusted_bottom = center_y - adjusted_half_height
         adjusted_top = center_y + adjusted_half_height
 
