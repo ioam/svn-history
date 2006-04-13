@@ -283,14 +283,6 @@ def crop_slice_to_sheet_bounds(slice_,sheet_bounds,density):
     return rstart,rbound,cstart,cbound
 
 
-def bounds2slicearray(slice_bounds, input_bounds, input_density):
-    """
-    Same as bounds2slice(), but return a Numeric array instead of a tuple.
-    """
-    r1,r2,c1,c2 = bounds2slice(slice_bounds,input_bounds,input_density)
-    return array([r1,r2,c1,c2])
-
-
 # CEBHACKALERT: slice is a Python type.
 def slice2bounds(slice,sheet_bounds,sheet_density):
     """
@@ -318,13 +310,6 @@ def slice2bounds(slice,sheet_bounds,sheet_density):
     #   ystep = float((top-bottom)) / int(sheet_density*(top-bottom))
 
     return bounds
-
-
-def slicearray2bounds(slicearray,sheet_bounds,sheet_density):
-    """
-    Same as slice2bounds, but the slice is an array instead of a tuple.
-    """
-    return slice2bounds((slicearray[0],slicearray[1],slicearray[2],slicearray[3]), sheet_bounds, sheet_density)
 
 
 
