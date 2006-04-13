@@ -101,7 +101,7 @@ from Numeric import zeros,array,floor,ceil,Float
 from boundingregion import BoundingBox, BoundingRegionParameter
 import sheetview 
 
-def sheet2matrix(x,y,bounds,density,ydensity=None):
+def sheet2matrix(x,y,bounds,density):
     """
     Convert a point (x,y) in Sheet coordinates to continuous matrix
     coordinates.
@@ -128,13 +128,6 @@ def sheet2matrix(x,y,bounds,density,ydensity=None):
     the matrix. The matrix needs to tile the plane exactly,
     and for that to work the density may need to be adjusted.
     """
-    # CEBHACKALERT
-    if ydensity:
-        assert ydensity==density
-    else:
-        ydensity=density
-
-
     left,bottom,right,top = bounds.lbrt()
 
     # Compute the true density along x and y. The true density does
@@ -154,7 +147,7 @@ def sheet2matrix(x,y,bounds,density,ydensity=None):
     return float_row, float_col
   
 
-def sheet2matrixidx(x,y,bounds,density,ydensity=None):
+def sheet2matrixidx(x,y,bounds,density):
     """
     Convert a point (x,y) in sheet coordinates to the integer row and
     column index of the matrix cell in which that point falls, given a
@@ -167,17 +160,17 @@ def sheet2matrixidx(x,y,bounds,density,ydensity=None):
 
     Valid only for scalar x and y.
     """
-    r,c = sheet2matrix(x,y,bounds,density,ydensity)
+    r,c = sheet2matrix(x,y,bounds,density)
     r = floor(r)
     c = floor(c)
     return int(r), int(c)
 
 
-def sheet2matrixidx_array(x,y,bounds,xdensity,ydensity):
+def sheet2matrixidx_array(x,y,bounds,density):
     """
     sheet2matrixidx but for arrays of x and y.
     """
-    r,c = sheet2matrix(x,y,bounds,xdensity,ydensity)
+    r,c = sheet2matrix(x,y,bounds,density)
     r = floor(r)
     c = floor(c)
     return r.astype(int), c.astype(int)
@@ -457,7 +450,7 @@ class Sheet(EventProcessor):
 	    del self.sheet_view_dict[view_name]
 
     def sheet2matrix(self,x,y):
-        return sheet2matrix(x,y,self.bounds,self.xdensity,self.ydensity)
+        return sheet2matrix(x,y,self.bounds,self.density)
 
     def matrix2sheet(self,r,c):
         return matrix2sheet(r,c,self.bounds,self.xdensity,self.ydensity)
@@ -469,14 +462,14 @@ class Sheet(EventProcessor):
         coordinates and returns the (row,col) of the matrix cell it
         cooresponds to.
         """
-        return sheet2matrixidx(x,y,self.bounds,self.xdensity,self.ydensity)
+        return sheet2matrixidx(x,y,self.bounds,self.density)
 
 
     def sheet2matrixidx_array(self,x,y):
         """
         sheet2matrixidx but for arrays of x and y.
         """
-        return sheet2matrixidx_array(x,y,self.bounds,self.xdensity,self.ydensity)
+        return sheet2matrixidx_array(x,y,self.bounds,self.density)
 
 
     def matrixidx2sheet(self,row,col):
