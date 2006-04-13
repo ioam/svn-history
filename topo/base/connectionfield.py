@@ -251,9 +251,7 @@ class ConnectionField(ParameterizedObject):
         the correct submatrix of the weights or mask in case the
         unit is near the edge of the sheet).
         """
-        # get size of sheet (=self.input_sheet.activity.shape)
-        sr1,sr2,sc1,sc2 = self.input_sheet.bounds2slice(self.input_sheet.bounds)
-        sheet_rows = sr2-sr1; sheet_cols = sc2-sc1
+        sheet_rows,sheet_cols = self.input_sheet.activity.shape
 
         # get size of weights matrix
         r1,r2,c1,c2 = self.input_sheet.bounds2slice(weights_bounds_template)
