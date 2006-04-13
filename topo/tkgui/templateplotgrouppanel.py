@@ -21,6 +21,13 @@ from topo.plotting.plotgroup import TemplatePlotGroup
 import matplotlib
 matplotlib.use('TkAgg')
 
+### JABALERT: Should change this to discover and import all the
+### commands/*.py files automatically
+import __main__
+exec "from topo.commands.analysis import *" in __main__.__dict__
+exec "from topo.commands.basic import *"  in __main__.__dict__
+exec "from topo.commands.pylabplots import *" in __main__.__dict__
+
 
 class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
     def __init__(self,parent,console,pgt_name,**config):

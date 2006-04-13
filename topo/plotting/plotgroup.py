@@ -11,6 +11,8 @@ __version__='$Revision$'
 import copy
 import Image
 
+import __main__
+
 import topo
 from topo.misc.utils import flatten, dict_sort
 from topo.base.parameterizedobject import ParameterizedObject
@@ -21,11 +23,7 @@ from topo.base.connectionfield import CFSheet
 from plot import make_template_plot, Plot
 import bitmap
 
-### JABALERT: Should change this to discover and import all the
-### commands/*.py files automatically
-from topo.commands.analysis import *
-from topo.commands.basic import *
-#from topo.commands.pylabplots import *
+
 
 
 def cmp_plot(plot1,plot2):
@@ -246,7 +244,7 @@ class TemplatePlotGroup(PlotGroup):
 	Only implemented for TemplatePlotGroup. 
 	Execute the command associated with the template.
 	"""
-	exec self.cmdname
+	exec self.cmdname in __main__.__dict__
 
 	
     def _plot_list(self):
@@ -326,7 +324,7 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
 	topo.commands.analysis.coordinate = (self.x,self.y)
 	topo.commands.analysis.sheet_name = self.sheet_name
 
-        exec self.cmdname
+        exec self.cmdname  in __main__.__dict__
 		
 
     def _create_plots(self,pt_name,pt,sheet):
@@ -406,7 +404,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
         topo.commands.analysis.proj_coords = coords
 	topo.commands.analysis.sheet_name = self.sheet_name
         topo.commands.analysis.proj_name = self.weight_name
-        exec self.cmdname
+        exec self.cmdname  in __main__.__dict__
 		
     def _create_plots(self,pt_name,pt,sheet):
 	""" 
