@@ -398,33 +398,33 @@ class Sheet(EventProcessor):
 	    del self.sheet_view_dict[view_name]
 
     def sheet2matrix(self,x,y):
+        """
+        See sheet's sheet2matrix() function.
+        """
         return sheet2matrix(x,y,self.bounds,self.density)
 
     def matrix2sheet(self,r,c):
+        """
+        See sheet's matrix2sheet() function.
+        """
         return matrix2sheet(r,c,self.bounds,self.density)
-
                 
     def sheet2matrixidx(self,x,y):
         """
-        Coordinate transformation: takes a point (x,y) in sheet
-        coordinates and returns the (row,col) of the matrix cell it
-        cooresponds to.
+        See sheet's sheet2matrixidx() function.
         """
         return sheet2matrixidx(x,y,self.bounds,self.density)
 
-
     def sheet2matrixidx_array(self,x,y):
         """
-        sheet2matrixidx but for arrays of x and y.
+        sheet2matrixidx() but for arrays of x and y.
         """
         return sheet2matrixidx_array(x,y,self.bounds,self.density)
 
 
     def matrixidx2sheet(self,row,col):
         """
-        Coordinate transformation: Takes the (row,col) of an element
-        in the activity matrix and gives its (x,y) in sheet
-        coordinates.
+        See sheet's matrixidx2sheet() function.
         """
         return matrixidx2sheet(row,col,self.bounds,self.density)
 
