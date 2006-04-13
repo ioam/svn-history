@@ -131,10 +131,7 @@ class PatternGenerator(ParameterizedObject):
         # For this function to make sense on its own, y should probably be
         # reversed, but y would then have to be reversed again in
         # __create_and_rotate_coordinates().
-        y = y[:,1]
-        x = x[:,0]
-
-        return x, y
+        return x[:,0], y[:,1] 
 
 
     def __create_and_rotate_coordinates(self, x, y, orientation):
