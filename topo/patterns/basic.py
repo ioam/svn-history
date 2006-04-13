@@ -470,15 +470,7 @@ def sheet2matrixidx_array(x,y,bounds,density):
     boundary will be just outside the matrix, because the right and
     bottom boundaries are exclusive.
     """
-    # CEBHACKALERT: see Sheet.__init__
-    if type(density)!=tuple:
-        left,bottom,right,top = bounds.aarect().lbrt()
-        xdensity = int(density*(right-left)) / float((right-left))
-        ydensity = int(density*(top-bottom)) / float((top-bottom))
-    else:
-        xdensity,ydensity = density
-
-    r,c = sheet2matrix(x,y,bounds,xdensity,ydensity)
+    r,c = sheet2matrix(x,y,bounds,density)
     r = floor(r)
     c = floor(c)
     return r, c
@@ -526,19 +518,10 @@ class CompositePatternGenerator(PatternGenerator):
         
         n_image_rows,n_image_cols=x.shape
 
-        # CEBHACKALERT: temporary, density will become one again soon...
-        if type(density)!=tuple:
-            left,bottom,right,top = bounds.lbrt()
-            xdensity = int(density*(right-left)) / float((right-left))
-            ydensity = int(density*(top-bottom)) / float((top-bottom))
-        else:
-            xdensity,ydensity = density
-
-
         # CEBHACKALERT: just made it work - this needs to be changed now
         # that sheet and patterngenerator are different.
         #n_sheet_rows,n_sheet_cols = bounds2shape(bounds,xdensity,ydensity)
-        r1,r2,c1,c2 = bounds2slice(bounds,bounds,xdensity,ydensity)
+        r1,r2,c1,c2 = bounds2slice(bounds,bounds,density)
         n_sheet_rows,n_sheet_cols = r2-r1,c2-c1
         
         x = x/width
