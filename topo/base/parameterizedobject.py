@@ -172,6 +172,33 @@ class Parameter(object):
     __slots__ = ['_name','default','doc','hidden','precedence','instantiate','constant']
     count = 0
 
+    __doc__ = property((lambda self: self.doc))
+    # When a Parameter is owned by a ParameterizedObject, we want the
+    # documentation for that object to print the doc slot for this
+    # parameter, not the __doc__ value for the Parameter class or
+    # subclass.  For instance, if we have a ParameterizedObject class X with
+    # parameters y(doc="All about y") and z(doc="More about z"),
+    # help(X) should include "All about y" in the section describing
+    # y, and "More about z" in the section about z.
+    #
+    # We currently achieve this by making __doc__ return the value of
+    # self.doc, using the code below.
+    #
+    # NOTE: This code must also be copied to any subclass of
+    # Parameter, or else the documentation for y and z above will
+    # be the documentation for their Parameter class, not those
+    # specific parameters.
+    #
+    # JABHACKALERT: Unfortunately, this trick makes the documentation
+    # for Parameter and its subclasses invisible, so that e.g.
+    # help(Parameter) and help(Number) do not include the usual
+    # docstring defined in those classes.  We could save a copy of
+    # that docstring in a class attribute, and it *may* be possible
+    # somehow to return that for help(Parameter), without breaking the
+    # current support for help(X) (where X is a ParameterizedObject and help(X)
+    # describes X's specific Parameters).  Seems difficult, though.
+
+
     # CEBHACKALERT: I think this can be made simpler
     def __init__(self,default=None,doc=None,hidden=False,precedence=None,instantiate=False,constant=False):
         """
@@ -199,6 +226,14 @@ class Parameter(object):
         inheritance of Parameter slots (attributes) from the owning-class'
         class hierarchy (see ParameterizedObjectMetaclass).
         """
+        # Make sure subclass authors read all the documentation...
+        assert hasattr(self,'__dict__')==False, \
+               "Subclasses of Parameter should define __slots__; " \
+               + `type(self)` + " does not."
+
+        # CEBHACKALERT: not sure how to check that a subclass has
+        # __doc__ as a class attribute.
+
         self._name = None
         self.hidden=hidden
         self.precedence = precedence
@@ -317,35 +352,7 @@ class Parameter(object):
     def __setstate__(self,state):
         """See __getstate__()"""
         for (k,v) in state.items():
-            setattr(self,k,v)
-        
-
-    # When a Parameter is owned by a ParameterizedObject, we want the
-    # documentation for that object to print the doc slot for this
-    # parameter, not the __doc__ value for the Parameter class or
-    # subclass.  For instance, if we have a ParameterizedObject class X with
-    # parameters y(doc="All about y") and z(doc="More about z"),
-    # help(X) should include "All about y" in the section describing
-    # y, and "More about z" in the section about z.
-    #
-    # We currently achieve this by making __doc__ return the value of
-    # self.doc, using the code below.
-    #
-    # NOTE: This code must also be copied to any subclass of
-    # Parameter, or else the documentation for y and z above will
-    # be the documentation for their Parameter class, not those
-    # specific parameters.
-    #
-    # JABHACKALERT: Unfortunately, this trick makes the documentation
-    # for Parameter and its subclasses invisible, so that e.g.
-    # help(Parameter) and help(Number) do not include the usual
-    # docstring defined in those classes.  We could save a copy of
-    # that docstring in a class attribute, and it *may* be possible
-    # somehow to return that for help(Parameter), without breaking the
-    # current support for help(X) (where X is a ParameterizedObject and help(X)
-    # describes X's specific Parameters).  Seems difficult, though.
-    __doc__ = property((lambda self: self.doc))
-    
+            setattr(self,k,v)    
 
 
 
