@@ -14,7 +14,7 @@ import Image
 import __main__
 
 import topo
-from topo.misc.utils import flatten, dict_sort
+from topo.misc.utils import dict_sort
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
@@ -139,7 +139,7 @@ class PlotGroup(ParameterizedObject):
 	### JCALERT: here we should generate the sheet_views
 	### Need more work to see how to do it.
 	self._generate_sheet_views()
-        all_plots = [each for each in flatten(self._plot_list()) if each != None]
+        all_plots = [each for each in self._plot_list() if each != None]
 	# scaling the Plots
 	### JCALERT: momentary hack
 	if all_plots!=[]:
@@ -341,7 +341,7 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
 	    # (i.e. by changing the Strength key in the plot_channels)
 	    # Otherwise, we consider Strength as specifying a SheetView.
 	    if ( pt.get('Strength', None) == 'Weights'):
-		for p in set(flatten(sheet.in_projections.values())):			    
+		for p in sheet.projections().values():			    
 		    plot_channels = copy.deepcopy(pt)
 		    # Note: the UnitView is in the src_sheet view_dict,
 		    # and the name in the key is the destination sheet.
