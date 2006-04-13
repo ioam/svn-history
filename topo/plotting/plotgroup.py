@@ -22,9 +22,6 @@ from topo.base.connectionfield import CFSheet
 from plot import make_template_plot, Plot
 
 
-
-
-
 def cmp_plot(plot1,plot2):
     """
     Comparison function for Plots.
@@ -35,7 +32,6 @@ def cmp_plot(plot1,plot2):
     else:
 	return cmp((plot1.plot_src_name+plot1.name),
 		   (plot2.plot_src_name+plot2.name))
-
 
 def identity(x):
     """No-op function for use as a default."""
@@ -53,19 +49,20 @@ class PlotGroup(ParameterizedObject):
     ### - rewrite the test file.
 
 
-    def __init__(self, plotgroup_key, plot_list, normalize, sheetcoords, integerscaling, **params):
+    def __init__(self, plot_list, normalize, sheetcoords, integerscaling, **params):
     
         """
-	plotgroup_key is a key for storing the PlotGroup in the plotgroup_dict.
-	It is then stored and identified under this key.
-
 	plot_list is a static list specifying the Plot objects belonging to the PlotGroup.
 
-	normalize specified if the Plot in the PlotGroup should be normalized by default.       
+	normalize specified if the Plot in the PlotGroup should be normalized by default.
+
+	sheetcoords is a boolean specifying if the Plots are in sheet coordinates 
+	(as opposed to matrix coordinates)
+
+	intergerscaling is a boolean indicating that the Plots are scaled with integer.
         """
         super(PlotGroup,self).__init__(**params)  
 
-	self.plotgroup_key = plotgroup_key
 	self.plot_list = plot_list	
 	self.normalize = normalize
 	self.sheetcoords = sheetcoords
@@ -219,9 +216,9 @@ class TemplatePlotGroup(PlotGroup):
     PlotGroup that is built as specified by a PlotGroupTemplate.
     """
 
-    def __init__(self,plotgroup_key,plot_list,normalize,sheetcoords,integerscaling,template,sheet_name,**params):
+    def __init__(self,plot_list,normalize,sheetcoords,integerscaling,template,sheet_name,**params):
 
-	super(TemplatePlotGroup,self).__init__(plotgroup_key,plot_list,normalize,sheetcoords,integerscaling,**params)
+	super(TemplatePlotGroup,self).__init__(plot_list,normalize,sheetcoords,integerscaling,**params)
 	self.template = template
 	# If no sheet_name is defined, the sheet_filter_lam accepts all sheets
         # (i.e the PlotGroup will try to build a Plot object for each Sheet in the simulation)
@@ -304,13 +301,12 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
       situate: Whether to situate the plot on the full source sheet, or just show the weights.
     """
 
-    ### JCALERT! Figure out what to do with the plotgroup_key.
-    def __init__(self,plotgroup_key,plot_list,normalize,sheetcoords,integerscaling,
+    def __init__(self,plot_list,normalize,sheetcoords,integerscaling,
 		 template,sheet_name,x,y,**params):
         self.x = x
         self.y = y
       	self.situate = False       
-	super(ConnectionFieldsPlotGroup,self).__init__(plotgroup_key,plot_list,normalize,
+	super(ConnectionFieldsPlotGroup,self).__init__(plot_list,normalize,
 						       sheetcoords,integerscaling,template,sheet_name,**params)
   
     def _generate_sheet_views(self):
@@ -367,7 +363,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
     PlotGroup for Projection Plots
     """
 
-    def __init__(self,plotgroup_key,plot_list,normalize,sheetcoords,integerscaling,
+    def __init__(self,plot_list,normalize,sheetcoords,integerscaling,
 		 template,sheet_name,proj_name,density,**params):
 
 	### JCALERT! rename to proj_name
@@ -381,8 +377,8 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 	### JCALERT! should become an argument of the constructor (id:for connectionPlotGroup) 
 	self.situate = False 
        
-        super(ProjectionPlotGroup,self).__init__(plotgroup_key,plot_list,normalize,
-                                                 sheetcoords,integerscaling,template,sheet_name,**params)
+        super(ProjectionPlotGroup,self).__init__(plot_list,normalize,sheetcoords,integerscaling,
+						 template,sheet_name,**params)
 
         self.INITIAL_PLOT_HEIGHT = 6
         self.min_master_zoom=1

@@ -45,12 +45,9 @@ DEFAULT_PRESENTATION = '1.0'
 class TestPattern(plotgrouppanel.PlotGroupPanel):
     def __init__(self,parent,console=None,padding=2,**config):
 
-
-        self.INITIAL_PLOT_WIDTH = 100
+	super(TestPattern,self).__init__(parent,console,'Preview',**config)
+        self.INITIAL_PLOT_HEIGHT = 100
         self.padding = padding
-        self.parent = parent
-        self.console = console
-
 
         ### Find the GeneratorSheets in the simulator, set up generator_sheet_patterns dictionary
         #
@@ -64,8 +61,6 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
             self.generator_sheets_patterns[gen_sheet_name] = {'generator_sheet': gen_sheet,
                                                               'editing': True,
                                                               'pattern_generator': None} 
-	
-	super(TestPattern,self).__init__(parent,console,'Preview',**config)
 
         ### learning buttons
         #
@@ -293,7 +288,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 	    channels = {'Strength':each,'Hue':None,'Confidence':None}
 	    ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
 	    plot_list.append(make_template_plot(channels,view_dict,density,None,self.normalize,name=''))
-        return topo.plotting.plotgroup.PlotGroup('Preview',plot_list,self.normalize,
+        return topo.plotting.plotgroup.PlotGroup(plot_list,self.normalize,
 						 self.sheetcoords,self.integerscaling)
     
     ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.

@@ -194,7 +194,7 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         PlotGroup is created, call its do_plot_cmd() to prepare
         the Plot objects.
         """
-	plotgroup = ConnectionFieldsPlotGroup(self.plotgroup_key,[],self.normalize,
+	plotgroup = ConnectionFieldsPlotGroup([],self.normalize,
 					      self.sheetcoords,self.integerscaling,self.pgt,
 					      self.region.get(),self.x,self.y)
 	return plotgroup

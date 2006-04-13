@@ -277,8 +277,8 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         self.generate_plotgroup_key() creates the density information needed for
         a ProjectionPlotGroup to create necessary Plots.
         """
- 	plotgroup = ProjectionPlotGroup(self.plotgroup_key,[],self.normalize,
-					self.sheetcoords,self.integerscaling,self.pgt,self.region.get(),
+ 	plotgroup = ProjectionPlotGroup([],self.normalize,self.sheetcoords,
+					self.integerscaling,self.pgt,self.region.get(),
 					self.weight_name.get(),self.density)
   	return plotgroup
 

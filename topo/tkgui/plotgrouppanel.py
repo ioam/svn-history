@@ -254,8 +254,8 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 	Function that re-generate the PlotGroup anytime.
 	Needs to be re-implemented anytime.
         """
-        plotgroup = PlotGroup(self.plotgroup_key,[],self.normalize,
-				   self.sheetcoords,self.integerscaling)
+        plotgroup = PlotGroup([],self.normalize,
+			      self.sheetcoords,self.integerscaling)
 	return plotgroup
   
   

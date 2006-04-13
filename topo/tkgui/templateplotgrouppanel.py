@@ -90,7 +90,7 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         ### take the one that is specified.
         ### Otherwise, we could assume that each panel is associated with a PlotGroup
         ### and then specify a panel for each template. (as it is done from topoconsole)
-	plotgroup = TemplatePlotGroup(self.plotgroup_key,[],self.normalize,
+	plotgroup = TemplatePlotGroup([],self.normalize,
 				      self.sheetcoords,self.integerscaling,self.pgt,None)
 	return plotgroup
 
