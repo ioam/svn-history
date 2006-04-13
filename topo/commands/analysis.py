@@ -123,8 +123,7 @@ def measure_cog():
                         xcentroid, ycentroid = matrix2sheet(r1+row_centroid+0.5,
                                                             c1+col_centroid+0.5,
                                                             proj.src.bounds,
-                                                            proj.src.xdensity,
-                                                            proj.src.ydensity)
+                                                            proj.src.density)
                         xpref[r][c]= xcentroid
                         ypref[r][c]= ycentroid
 

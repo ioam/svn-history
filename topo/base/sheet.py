@@ -177,7 +177,7 @@ def sheet2matrixidx_array(x,y,bounds,density):
 
 
 
-def matrix2sheet(float_row,float_col,bounds,density,ydensity=None):
+def matrix2sheet(float_row,float_col,bounds,density):
     """
     Convert a floating-point location (float_row,float_col) in matrix
     coordinates to its corresponding location (x,y) in sheet
@@ -185,9 +185,6 @@ def matrix2sheet(float_row,float_col,bounds,density,ydensity=None):
     
     Inverse of sheet2matrix().
     """
-    if ydensity:
-        assert ydensity==density
-
     left,bottom,right,top = bounds.lbrt()
 
     # CEBHACKALERT: xdensity and/or ydensity could be zero (with a small
@@ -195,14 +192,13 @@ def matrix2sheet(float_row,float_col,bounds,density,ydensity=None):
     # or it should be disallowed earlier.
     # This problem arises in several places (e.g. see PatternGenerator).
 
-    xstep = 1.0 / density
-    ystep = 1.0 / density
-    x = float_col*xstep + left
-    y = top - float_row*ystep
+    step = 1.0 / density
+    x = float_col*step + left
+    y = top - float_row*step
     return x, y
 
 
-def matrixidx2sheet(row,col,bounds,density,ydensity=None):
+def matrixidx2sheet(row,col,bounds,density):
     """
     Return (x,y) where x and y are the floating point coordinates of
     the *center* of the given matrix cell (row,col). If the matrix cell
@@ -218,9 +214,6 @@ def matrixidx2sheet(row,col,bounds,density,ydensity=None):
 
     Valid only for scalar x and y.
     """
-    if ydensity:
-        assert ydensity==density
-
     x,y = matrix2sheet((row+0.5), (col+0.5), bounds, density)
 
     # Rounding is useful for comparing the result with a floating point number
@@ -453,7 +446,7 @@ class Sheet(EventProcessor):
         return sheet2matrix(x,y,self.bounds,self.density)
 
     def matrix2sheet(self,r,c):
-        return matrix2sheet(r,c,self.bounds,self.xdensity,self.ydensity)
+        return matrix2sheet(r,c,self.bounds,self.density)
 
                 
     def sheet2matrixidx(self,x,y):
@@ -478,7 +471,7 @@ class Sheet(EventProcessor):
         in the activity matrix and gives its (x,y) in sheet
         coordinates.
         """
-        return matrixidx2sheet(row,col,self.bounds,self.xdensity,self.ydensity)
+        return matrixidx2sheet(row,col,self.bounds,self.density)
 
 
     def sheet_offset(self):
