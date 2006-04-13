@@ -36,7 +36,7 @@ from parameterizedobject import ParameterizedObject
 from functionfamilies import OutputFnParameter, IdentityOF
 from projection import Projection,ProjectionSheet
 from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter
-from sheet import Sheet,bounds2slice,sheet2matrixidx,crop_slice_to_sheet_bounds,slice2bounds
+from sheet import Sheet,crop_slice_to_sheet_bounds
 from sheetview import UnitView
 from boundingregion import BoundingBox,BoundingRegionParameter
 
@@ -252,12 +252,11 @@ class ConnectionField(ParameterizedObject):
         unit is near the edge of the sheet).
         """
         # get size of sheet (=self.input_sheet.activity.shape)
-        sr1,sr2,sc1,sc2 = bounds2slice(self.input_sheet.bounds,self.input_sheet.bounds,self.input_sheet.density)
+        sr1,sr2,sc1,sc2 = self.input_sheet.bounds2slice(self.input_sheet.bounds)
         sheet_rows = sr2-sr1; sheet_cols = sc2-sc1
 
         # get size of weights matrix
-        r1,r2,c1,c2 = bounds2slice(weights_bounds_template,self.input_sheet.bounds,
-                                   self.input_sheet.density)
+        r1,r2,c1,c2 = self.input_sheet.bounds2slice(weights_bounds_template)
         n_rows=r2-r1; n_cols=c2-c1
 
         # get slice for the submatrix
@@ -277,8 +276,7 @@ class ConnectionField(ParameterizedObject):
 
         Also stores the slice_array for access by C.
 	"""
-        r1,r2,c1,c2 = bounds2slice(bounds,self.input_sheet.bounds,
-                                   self.input_sheet.density)
+        r1,r2,c1,c2 = self.input_sheet.bounds2slice(bounds)
 
         # translate to this cf's location
         center_row,center_col = self.input_sheet.sheet2matrixidx(self.x,self.y)
@@ -294,9 +292,7 @@ class ConnectionField(ParameterizedObject):
                                                  self.input_sheet.bounds,
                                                  self.input_sheet.density)
 
-        self.bounds = slice2bounds((r1,r2,c1,c2), self.input_sheet.bounds,
-                                   self.input_sheet.density)
-
+        self.bounds = self.input_sheet.slice2bounds((r1,r2,c1,c2))
 
         # Also, store the array for direct access by C.
         # Numeric.Int32 is specified explicitly here to avoid having it
@@ -702,7 +698,7 @@ class CFProjection(Projection):
         an odd number of rows and an odd number of columns. Then converts this
         slice back to sheet-coordinate bounds.    
         """
-        slice_ = bounds2slice(bounds,self.src.bounds,self.src.density)
+        slice_ = self.src.bounds2slice(bounds)
         n_rows=slice_[1]-slice_[0]; n_cols=slice_[3]-slice_[2]
 
         sheet_center_row,sheet_center_col = self.src.sheet2matrixidx(0.0,0.0)
@@ -712,7 +708,7 @@ class CFProjection(Projection):
         r2 = sheet_center_row + n_rows/2 +1
         c2 = sheet_center_col + n_cols/2 +1
 
-        return slice2bounds((r1,r2,c1,c2),self.src.bounds,self.src.density)
+        return self.src.slice2bounds((r1,r2,c1,c2))
 
 
     def cf(self,r,c):
@@ -731,8 +727,7 @@ class CFProjection(Projection):
         """
 	(r,c) = (self.dest).sheet2matrixidx(sheet_x,sheet_y)
 
-	slice_ = bounds2slice(self.cf(r,c).bounds,self.src.bounds,
-			      self.src.density)
+	slice_ = self.src.bounds2slice(self.cf(r,c).bounds)
         r1,r2,c1,c2 = crop_slice_to_sheet_bounds(slice_,self.src.bounds,
 						 self.src.density)
 
