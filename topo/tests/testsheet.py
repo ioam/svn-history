@@ -719,9 +719,8 @@ class TestBox3Coordinates(TestCoordinateTransforms):
 
 
 # CEB: still making tests for TestBox3Coordinates...
-cases = [TestBox1Coordinates]
-
-#         TestBox2Coordinates]
+cases = [TestBox1Coordinates,
+         TestBox2Coordinates]
 #         TestBox3Coordinates]
          
 
