@@ -25,6 +25,11 @@ from topo.base.connectionfield import CFSheet
 from plot import make_template_plot, Plot
 import bitmap
 
+### JABALERT: Should change this to discover and import all the
+### commands/*.py files automatically
+from topo.commands.analysis import *
+from topo.commands.basic import *
+#from topo.commands.pylabplots import *
 
 
 def cmp_plot(plot1,plot2):
@@ -44,10 +49,6 @@ def identity(x):
     return x
 
 
-# PlotGroup used by the simulation are stored in this dictionnary
-plotgroup_dict = {}
-
-
 class PlotGroup(ParameterizedObject):
     """
     Container that has one or more Plots and also knows how to arrange
@@ -55,7 +56,6 @@ class PlotGroup(ParameterizedObject):
     """
 
     ###JCALERT:
-    ### - fix the sorting of the plot for display.
     ### - clean up the doc.
     ### - rewrite the test file.
 
@@ -81,9 +81,6 @@ class PlotGroup(ParameterizedObject):
             self.sizeconvertfn = int
         else:
             self.sizeconvertfn = identity
-
-	# store the PlotGroup in plot_group_dict
-	plotgroup_dict[plotgroup_key]=self
 
 	self.bitmaps = []
 
@@ -115,6 +112,7 @@ class PlotGroup(ParameterizedObject):
     def _plot_list(self):
 	"""
 	function that returns the plot_list.
+	Re-implemented by TemplatePlotGroup to construct the plot list as specified by the template.
 	"""
 	return self.plot_list
 
@@ -149,7 +147,9 @@ class PlotGroup(ParameterizedObject):
 	self._generate_sheet_views()
         all_plots = [each for each in flatten(self._plot_list()) if each != None]
 	# scaling the Plots
-	self.scale_images(all_plots)
+	### JCALERT: momentary hack
+	if all_plots!=[]:
+	    self.scale_images(all_plots)
 	# sorting the Plots.
 	self._ordering_plots(all_plots)
         return all_plots
@@ -192,6 +192,7 @@ class PlotGroup(ParameterizedObject):
 	Subfunction that set the initial master zooms for both the sheet
 	coordinates and the matrix coordinates case. 
 	"""
+	### JCALERT! Momentary hack
 	max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
  			  -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
  			  for p in plots if p.resize])
@@ -208,6 +209,7 @@ class PlotGroup(ParameterizedObject):
 # 	if self.height_of_tallest_plot == self.min_master_zoom:
 # 	    self.reduce_button.config(state=DISABLED)
 	self.initial_plot=False
+
 
     def _ordering_plots(self,plot_list):
 	"""
@@ -230,13 +232,25 @@ class TemplatePlotGroup(PlotGroup):
 	self.template = template
 	# If no sheet_name is defined, the sheet_filter_lam accepts all sheets
         # (i.e the PlotGroup will try to build a Plot object for each Sheet in the simulation)
+	self.sheet_name=sheet_name
         if sheet_name:
 	    self.sheet_filter_lam = lambda s: s.name == sheet_name
         else:
             self.sheet_filter_lam = lambda s : True
+
+	# Command used to refresh the plot, if any
+        self.cmdname = self.template.command
+
 	# add static images to the added_plot_list, as specified by the template.
         self._add_static_images()
 	
+
+    def _generate_sheet_views(self):
+	""" 
+	Only implemented for TemplatePlotGroup. 
+	Execute the command associated with the template.
+	"""
+	exec self.cmdname
 
 	
     def _plot_list(self):
@@ -264,6 +278,7 @@ class TemplatePlotGroup(PlotGroup):
 	"""
 	plot_channels = pt
 	plot_name = pt_name
+### temporary: will have to be deleted when implementing the Plot BB in the right way.
 #	from topo.base.boundingregion import BoundingBox
 #       bb=BoundingBox(points=((-1.0,-1.0),(1.0,1.0)))
 # 	bb1=BoundingBox(points=((-0.25,-0.25),(0.25,0.25)))
@@ -296,13 +311,28 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
       situate: Whether to situate the plot on the full source sheet, or just show the weights.
     """
 
-    def __init__(self,plotgroup_key,plot_list,normalize,sheetcoords,integerscaling,template,sheet_name,**params):
-        self.x = float(plotgroup_key[2])
-        self.y = float(plotgroup_key[3])
+    ### JCALERT! Figure out what to do with the plotgroup_key.
+    def __init__(self,plotgroup_key,plot_list,normalize,sheetcoords,integerscaling,
+		 template,sheet_name,x,y,**params):
+        self.x = x
+        self.y = y
       	self.situate = False       
 	super(ConnectionFieldsPlotGroup,self).__init__(plotgroup_key,plot_list,normalize,
 						       sheetcoords,integerscaling,template,sheet_name,**params)
   
+    def _generate_sheet_views(self):
+	""" 
+	Only implemented for TemplatePlotGroup. 
+	Execute the command associated with the template.
+	"""
+	### JCALERT: commands in analysis have to be re-written so that to avoid
+	### setting all these global parameters.
+	topo.commands.analysis.coordinate = (self.x,self.y)
+	topo.commands.analysis.sheet_name = self.sheet_name
+
+        exec self.cmdname
+		
+
     def _create_plots(self,pt_name,pt,sheet):
 	""" 
 	Sub-function of _plot_list().
@@ -345,32 +375,43 @@ class ProjectionPlotGroup(TemplatePlotGroup):
     """
 
     def __init__(self,plotgroup_key,plot_list,normalize,sheetcoords,integerscaling,
-		 template,sheet_name,**params):
+		 template,sheet_name,proj_name,density,**params):
 
-        self.weight_name = plotgroup_key[1]
-        self.density = float(plotgroup_key[2])
+	### JCALERT! rename to proj_name
+        self.weight_name = proj_name
+        self.density = density
 
         ### JCALERT! shape determined by the plotting density
         ### This is set by self.generate_coords()
         self.proj_plotting_shape = (0,0)
-
-	self.situate = False        
+	
+	### JCALERT! should become an argument of the constructor (id:for connectionPlotGroup) 
+	self.situate = False 
+       
         super(ProjectionPlotGroup,self).__init__(plotgroup_key,plot_list,normalize,
                                                  sheetcoords,integerscaling,template,sheet_name,**params)
 
         self.INITIAL_PLOT_HEIGHT = 6
         self.min_master_zoom=1
 
-	### JCALERT! It is a bit confusing, but in the case of the projection
-        ### sheet_filter_lam filter to one single sheet...
-	### this has to be made simpler...
-	for s in topo.sim.objects(Sheet).values():
-	    if self.sheet_filter_lam(s):
-		self._sim_ep = s
-	
+
 	### JCALERT! change this name 
-        self._sim_ep_src = self._sim_ep.projections().get(self.weight_name,None)
+        #self._sim_ep_src = self._sim_ep.projections().get(self.weight_name,None)
  
+
+    def _generate_sheet_views(self):
+	""" 
+	Only implemented for TemplatePlotGroup. 
+	Execute the command associated with the template.
+	"""
+	### JCALERT: commands in analysis have to be re-written so that to avoid
+	### setting all these global parameters.
+	coords = self.generate_coords()
+        topo.commands.analysis.proj_coords = coords
+	topo.commands.analysis.sheet_name = self.sheet_name
+        topo.commands.analysis.proj_name = self.weight_name
+        exec self.cmdname
+		
     def _create_plots(self,pt_name,pt,sheet):
 	""" 
 	Sub-function of _plot_list().
@@ -405,7 +446,12 @@ class ProjectionPlotGroup(TemplatePlotGroup):
         from top-to-bottom.
         """
         def rev(x): y = x; y.reverse(); return y
-        
+        ### JCALERT! It is a bit confusing, but in the case of the projection
+        ### sheet_filter_lam filter to one single sheet...
+	### this has to be made simpler...
+	for s in topo.sim.objects(Sheet).values():
+	    if (self.sheet_filter_lam(s) and isinstance(s,CFSheet)):
+		self._sim_ep = s
         (l,b,r,t) = self._sim_ep.bounds.lbrt()
         x = float(r - l) 
         y = float(t - b)
@@ -430,7 +476,9 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 	"""
         self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
 	self.initial_plot=False
-  
+
+    def scale_images(self,plots):
+	pass
 
     def _ordering_plots(self,plot_list):
 	"""

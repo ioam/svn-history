@@ -11,37 +11,32 @@ import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas, Checkbutton
 
+import topo
 import plotgrouppanel
 from topo.plotting.templates import plotgroup_templates
-from topo.plotting.plotgroup import plotgroup_dict, TemplatePlotGroup
+from topo.plotting.plotgroup import TemplatePlotGroup
 
 ### We want to support any featuremap type defined in that file, and
 ### so import all of them here.
 import matplotlib
 matplotlib.use('TkAgg')
 
-### JABALERT: Should change this to discover and import all the
-### commands/*.py files automatically
-from topo.commands.analysis import *
-from topo.commands.basic import *
-from topo.commands.pylabplots import *
-
 
 class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
     def __init__(self,parent,console,pgt_name,**config):
-        plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,pgt_name,**config)
-
         # Plotgroup Template associated
         self.pgt = plotgroup_templates.get(pgt_name,None)
+
+	plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,pgt_name,**config)
 
 	self.normalize = self.pgt.normalize
         if self.normalize:
 	    self.normalize_checkbutton.select()
 
-        # Command used to refresh the plot, if any
+	 # Command used to refresh the plot, if any
         self.cmdname = StringVar()
-        
-        self.cmdname.set(self.pgt.command)
+         
+	self.cmdname.set(self.plotgroup.cmdname)
 
 	### JCALERT! We might get rid of that, as it is redundant with plotgroup_key
         self.mapname = StringVar()       
@@ -62,7 +57,7 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
 
         Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
                      entry_textvariable=self.cmdname,
-                     scrolledlist_items=([self.pgt.command])
+                     scrolledlist_items=([self.cmdname])
                      ).pack(side=LEFT,expand=YES,fill=X)
        
         # To make the auto-refresh button not on by default when opening the panel
@@ -76,7 +71,7 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
             self.refresh()
 
 
-    def refresh_plotgroup(self):
+    def generate_plotgroup(self):
         """
         Function that generates the plot for the panel.
 
@@ -84,20 +79,17 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         command is executed, then the plot is generated using the
         specified PlotGroupTemplate.
         """
- 
-        exec self.cmdname.get()
-
-	plotgroup = plotgroup_dict.get(self.plotgroup_key,None)
-	if plotgroup == None:
-	    ### JCALERT! Maybe if the template specified a PlotGroup, we could
-            ### take the one that is specified.
-            ### Otherwise, we could assume that each panel is associated with a PlotGroup
-            ### and then specify a panel for each template. (as it is done from topoconsole)
-	    plotgroup = TemplatePlotGroup(self.plotgroup_key,[],self.normalize,
-					  self.sheetcoords,self.integerscaling,self.pgt,None)
+        ### JCALERT! Maybe if the template specified a PlotGroup, we could
+        ### take the one that is specified.
+        ### Otherwise, we could assume that each panel is associated with a PlotGroup
+        ### and then specify a panel for each template. (as it is done from topoconsole)
+	plotgroup = TemplatePlotGroup(self.plotgroup_key,[],self.normalize,
+				      self.sheetcoords,self.integerscaling,self.pgt,None)
 	return plotgroup
 
-            
+    def update_plotgroup_variables(self):
+        self.plotgroup.cmdname = self.cmdname.get()
+ 
     def display_labels(self):
         """
         Change the title of the grid group by refreshing the time simulator,

@@ -44,7 +44,7 @@ DEFAULT_PRESENTATION = '1.0'
 
 class TestPattern(plotgrouppanel.PlotGroupPanel):
     def __init__(self,parent,console=None,padding=2,**config):
-        super(TestPattern,self).__init__(parent,console,'Preview',**config)
+
 
         self.INITIAL_PLOT_WIDTH = 100
         self.padding = padding
@@ -64,6 +64,8 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
             self.generator_sheets_patterns[gen_sheet_name] = {'generator_sheet': gen_sheet,
                                                               'editing': True,
                                                               'pattern_generator': None} 
+	
+	super(TestPattern,self).__init__(parent,console,'Preview',**config)
 
         ### learning buttons
         #
@@ -157,6 +159,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         
 
         self.__change_pattern_generator(self.__current_pattern_generator_name.get())
+	self.refresh()
 
 
     @staticmethod
@@ -178,6 +181,8 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         Also call the parent class refresh.
         """
         self.__setup_pattern_generators()
+        ### JCALERT : temporary hack to be changed, as well as the function special_generate_plotgroup
+	self.plotgroup = self.special_generate_plotgroup()
         super(TestPattern,self).refresh()
 
 
@@ -210,7 +215,9 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         self.__current_pattern_generator = self.pattern_generators[pattern_generator_name]()
         self.__params_frame.create_widgets(self.__current_pattern_generator)
 
-        if self.auto_refresh: self.refresh()
+        if self.auto_refresh: 
+	    self.plotgroup=self.special_generate_plotgroup()
+	    self.refresh()
 
 
     def present(self):
@@ -266,7 +273,8 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 
 
     ### JCALERT! That will have to be re-written properly, but works for the moment.
-    def refresh_plotgroup(self):
+    ### it is an hack to bypass the generate_plotgroup in the plotgrouppanel superclass...
+    def special_generate_plotgroup(self):
         """
         Replace the superclass do_plot_cmd.
         Create a PlotGroup that has a list of Plots that have been
@@ -282,12 +290,18 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
             k = self.generator_sheets_patterns[each]['pattern_generator']
 	    density = k.density
 	    view_dict[each] = topo.base.sheetview.SheetView((k(),k.bounds),src_name=each)
-            channels = {'Strength':each,'Hue':None,'Confidence':None}
+	    channels = {'Strength':each,'Hue':None,'Confidence':None}
 	    ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
-            plot_list.append(make_template_plot(channels,view_dict,density,None,self.normalize,name=''))
+	    plot_list.append(make_template_plot(channels,view_dict,density,None,self.normalize,name=''))
         return topo.plotting.plotgroup.PlotGroup('Preview',plot_list,self.normalize,
 						 self.sheetcoords,self.integerscaling)
-
+    
+    ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
+    def toggle_normalize(self):
+        """Function called by Widget when check-box clicked"""
+        self.normalize = not self.normalize
+	self.plotgroup.normalize = self.normalize
+	self.refresh()
 
 
     ### JABHACKALERT! Ideally this would move out of tkgui/ altogether.

@@ -21,7 +21,7 @@ from topo.base.projection import ProjectionSheet
 from topo.base.sheet import Sheet
 import topo.base.connectionfield
 from topo.plotting.templates import plotgroup_templates
-from topo.plotting.plotgroup import plotgroup_dict, ProjectionPlotGroup
+from topo.plotting.plotgroup import ProjectionPlotGroup
 
 from templateplotgrouppanel import TemplatePlotGroupPanel
 import topoconsole
@@ -56,10 +56,16 @@ def cmp_projections(p1,p2):
 ### since it is only valid for CFProjections.
 class ProjectionPanel(TemplatePlotGroupPanel):
     def __init__(self,parent,console=None,pgt_name=None,**config):
-        super(ProjectionPanel,self).__init__(parent,console,pgt_name,**config)
+        
 
         self.region = StringVar()
-        self.region.set('None')
+	self.density_str = StringVar()
+        self.density_str.set('10.0')
+        self.density = float(eval(self.density_str.get(),__main__.__dict__))
+	self.weight_name = StringVar()
+        self.projections = KeyedList()
+
+	super(ProjectionPanel,self).__init__(parent,console,pgt_name,**config)
 
         self.__params_frame = Frame(master=self)
         self.__params_frame.pack(side=LEFT,expand=YES,fill=X)
@@ -70,14 +76,6 @@ class ProjectionPanel(TemplatePlotGroupPanel):
      #    self.MIN_PLOT_HEIGHT = 1
 #         self.INITIAL_PLOT_HEIGHT = 6
 #         self.min_master_zoom=1
-
-        self.density_str = StringVar()
-        self.density_str.set('10.0')
-        self.density = float(eval(self.density_str.get(),__main__.__dict__))
-
-        self.weight_name = StringVar()
-        self.weight_name.set('None')
-        self.projections = KeyedList()
 
         self.params_frame1 = Frame(master=self)
         self.params_frame1.pack(side=RIGHT,expand=YES,fill=X)
@@ -257,7 +255,7 @@ class ProjectionPanel(TemplatePlotGroupPanel):
             self.weight_name.get(),self.plot_time))
         
 
-    def generate_plotgroup_key(self):
+    def update_plotgroup_variables(self):
         """
         Generate the key used to look up the PlotGroup for this Projection.
 
@@ -267,29 +265,22 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         ('Projection', self.weight_name, self.density, self.region).
         """
         self.density = float(eval(self.density_str.get(),__main__.__dict__))
-        self.plotgroup_key = ('Projection',self.weight_name.get(),self.density,self.region.get())
+	self.plotgroup.situate= self.situate
+	self.plotgroup.density = self.density
+	self.plotgroup.sheet_name=self.region.get()
+	self.plotgroup.weight_name = self.weight_name.get()
+	self.plotgroup.sheet_filter_lam = self.sheet_filter_lam = lambda s: s.name == self.region.get()
 
 
-    def refresh_plotgroup(self):
+    def generate_plotgroup(self):
         """
         self.generate_plotgroup_key() creates the density information needed for
         a ProjectionPlotGroup to create necessary Plots.
         """
-  
-	self.generate_plotgroup_key()
-
-	plotgroup = plotgroup_dict.get(self.plotgroup_key,None)
-	if plotgroup == None:
-	    plotgroup = ProjectionPlotGroup(self.plotgroup_key,[],self.normalize,
-					    self.sheetcoords,self.integerscaling,self.pgt,self.region.get())
-        coords = plotgroup.generate_coords()
-        topo.commands.analysis.proj_coords = coords
-	topo.commands.analysis.sheet_name = self.region.get()
-        topo.commands.analysis.proj_name = self.weight_name.get()
-        exec self.cmdname.get()      
-        # self.situate is defined in the super class CFSheetPlotPanel
-        plotgroup.situate= self.situate
-	return plotgroup
+ 	plotgroup = ProjectionPlotGroup(self.plotgroup_key,[],self.normalize,
+					self.sheetcoords,self.integerscaling,self.pgt,self.region.get(),
+					self.weight_name.get(),self.density)
+  	return plotgroup
 
 
     def display_plots(self):
@@ -300,7 +291,7 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         if self.plotgroup:
             # Generate the zoomed images.
             self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.plotgroup.height_of_tallest_plot))
-                                  for im in self.plotgroup.bitmaps]
+                                  for im in self.bitmaps]
             old_canvases = self.canvases
             self.canvases = [Canvas(self.plot_frame,
                                width=image.width()+BORDERWIDTH*2+CANVASBUFFER,

@@ -30,7 +30,7 @@ import topo.base.simulator
 import topo.plotting.bitmap
 import topo.plotting.plotgroup
 from topo.plotting.templates import plotgroup_templates
-from topo.plotting.plotgroup import plotgroup_dict,identity
+from topo.plotting.plotgroup import PlotGroup,identity
 
 import topo.tkgui
 
@@ -89,6 +89,8 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         self.balloon = Pmw.Balloon(parent)
         self.canvases = []
 
+	### JCALERT: we will have to rename plotgroup_key to something like 
+	### plotgroup_label.
 	# For a PlotGroupPanel, the plotgroup_key is the name passed at creation.
 	# (e.g for testpattern it is 'Preview')
         # For a TemplatePlotGroupPanel, name is the name of the associated template 
@@ -199,8 +201,12 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 	### JCALERT: Put the button in here instead of in TemplatePanels
 	self.sizeconvertfn = identity
 	self.sheetcoords=False
-	self.plotgroup=None
 
+	self.plotgroup = self.generate_plotgroup()
+
+    ### This function aims at replacing generate_plotgroup_key in connectionfields and all.
+    def update_plotgroup_variables(self):
+	pass
 
     def toggle_normalize(self):
         """Function called by Widget when check-box clicked"""
@@ -230,10 +236,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         must either be implemented, or overwritten.
         """
         Pmw.showbusycursor()
-	### JCALERT! temporary hack.
-	self.plotgroup=self.refresh_plotgroup()
-	self.plotgroup.sheetcoords=self.sheetcoords
-	self.plotgroup.sizeconvertfn=self.sizeconvertfn	
+	self.update_plotgroup_variables()
         self.load_images()                #  load bitmap images
         self.scale_images()               #scale bitmap images
         self.display_plots()              # Put images in GUI canvas
@@ -246,14 +249,13 @@ class PlotGroupPanel(Frame,ParameterizedObject):
     ### JCALERT! 
     ### This function is called to re-generate the PlotGroup anytime if needed.
     ### It shouldn't be re-implmented by subclasses, only generate_sheet_views should be
-    def refresh_plotgroup(self):
+    def generate_plotgroup(self):
         """
 	Function that re-generate the PlotGroup anytime.
+	Needs to be re-implemented anytime.
         """
-	plotgroup = plotgroup_dict.get(self.plotgroup_key,None)
-	if plotgroup == None:
-	    plotgroup = self.PlotGroup(self.plotgroup_key,[],self.normalize,
-				       self.sheetcoords,self.integerscaling)
+        plotgroup = PlotGroup(self.plotgroup_key,[],self.normalize,
+				   self.sheetcoords,self.integerscaling)
 	return plotgroup
   
   
@@ -278,6 +280,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         self.time_history.append(copy.copy(self.console.simulator.time()))
         self.history_index = len(self.bitmaps_history)-1
         self.plot_time=copy.copy(self.console.simulator.time())
+
 
     ### JCALERT! will have to disapear.
     def scale_images(self):

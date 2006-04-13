@@ -17,7 +17,7 @@ from itertools import chain
 from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry,Label,NSEW, Checkbutton
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from topo.base.projection import ProjectionSheet
-from topo.plotting.plotgroup import plotgroup_dict, ConnectionFieldsPlotGroup
+from topo.plotting.plotgroup import ConnectionFieldsPlotGroup
 from topo.base.sheet import Sheet
 import topoconsole
 import topo.base.connectionfield
@@ -29,30 +29,30 @@ import topo.commands.analysis
 ### ProjectionPanel like there is on ActivityPanel?
 class ConnectionFieldsPanel(TemplatePlotGroupPanel):
     def __init__(self,parent,console=None,pgt_name=None,**config):       
-        TemplatePlotGroupPanel.__init__(self,parent,console,pgt_name,**config)
+
         self.region = StringVar()
-        self.region.set('None')
+	self.x = 0
+	self.y = 0
+	TemplatePlotGroupPanel.__init__(self,parent,console,pgt_name,**config)
+
+
         self.__params_frame = Frame(master=self)
         self.__params_frame.pack(side=LEFT,expand=YES,fill=X)
-
         self._add_situate_button()
-        self._add_region_menu()
+
         
         # Receptive Fields are generally tiny.  Boost it up to make it visible.
         self.WEIGHT_PLOT_INITIAL_SIZE = 30
 
-        self.x = 0
         self.x_str = StringVar()
         self.x_str.set(0.0)
-        self.y = 0
         self.y_str = StringVar()
         self.y_str.set(0.0)
         self.displayed_x, self.displayed_y = 0, 0
-        
+	self._add_region_menu()
         self._add_xy_boxes()
         self.auto_refresh_checkbutton.invoke()
 	
-
 	# By default, the UnitWeight Plots are situated.
         self.toggle_situate()
 	self.situate_checkbutton.select()
@@ -144,7 +144,7 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
     ### the GUI code; this function should probably just be calling a
     ### PlotGroup (or subclass) function to generate the key.  This
     ### file should have only GUI-specific stuff.
-    def generate_plotgroup_key(self):
+    def update_plotgroup_variables(self):
         """
         The plotgroup_key for the ConnectionFieldsPanel will change depending on the
         input within the window widgets.  This means that the key
@@ -164,7 +164,10 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         l,b,r,t = ep.bounds.aarect().lbrt()
 
         if ep.bounds.contains(self.x,self.y):
-            self.plotgroup_key = ('Weights',self.region.get(),self.x,self.y)
+	    self.plotgroup.sheet_name = self.region.get()
+	    self.plotgroup.x = self.x
+	    self.plotgroup.y = self.y
+            #self.plotgroup_key = ('Weights',self.region.get(),self.x,self.y)
             self.displayed_x, self.displayed_y = self.x, self.y
         else:
             self.dialog = Pmw.Dialog(self.parent,title = 'Error')
@@ -177,10 +180,13 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
                               foreground = 'white',
                               pady = 20)
             w.pack(expand = 1, fill = 'both', padx = 4, pady = 4)
+	self.plotgroup.situate=self.situate
+	self.plotgroup.sheet_name = self.region.get()
+	self.plotgroup.sheet_filter_lam = self.sheet_filter_lam = lambda s: s.name == self.region.get()
         
 
 
-    def refresh_plotgroup(self):
+    def generate_plotgroup(self):
         """
         Create the right Plot Key that will define the needed
         information for a WeightsPlotGroup.  This is the key-word
@@ -188,20 +194,9 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         PlotGroup is created, call its do_plot_cmd() to prepare
         the Plot objects.
         """
-	 
-        self.generate_plotgroup_key()
-	
-	topo.commands.analysis.coordinate = (self.x,self.y)
-	topo.commands.analysis.sheet_name = self.region.get()
-
-        exec self.cmdname.get()
-		
-	plotgroup = plotgroup_dict.get(self.plotgroup_key,None)
-	if plotgroup == None:
-	    plotgroup = ConnectionFieldsPlotGroup(self.plotgroup_key,[],self.normalize,
-						  self.sheetcoords,self.integerscaling,self.pgt,self.region.get())
-
-        plotgroup.situate = self.situate
+	plotgroup = ConnectionFieldsPlotGroup(self.plotgroup_key,[],self.normalize,
+					      self.sheetcoords,self.integerscaling,self.pgt,
+					      self.region.get(),self.x,self.y)
 	return plotgroup
 
 

@@ -23,7 +23,7 @@ from topo.misc.utils import *
 from topo.commands.analysis import *
 
 from topo.plotting.templates import plotgroup_templates
-from topo.plotting.plotgroup import plotgroup_dict, TemplatePlotGroup, ConnectionFieldsPlotGroup,ProjectionPlotGroup 
+from topo.plotting.plotgroup import TemplatePlotGroup, ConnectionFieldsPlotGroup,ProjectionPlotGroup 
 
  
 class PlotFileSaver(topo.base.parameterizedobject.ParameterizedObject):
