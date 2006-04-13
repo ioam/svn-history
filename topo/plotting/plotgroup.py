@@ -72,6 +72,7 @@ class PlotGroup(ParameterizedObject):
         else:
             self.sizeconvertfn = identity
 
+	### JCALERT: later delete this attribute and only using plots.
 	self.bitmaps = []
 
         # In the future, it might be good to be able to specify the
@@ -86,11 +87,13 @@ class PlotGroup(ParameterizedObject):
 	# Enforce a minimum plot height for the tallest plot of the PlotGroup.
 	self.INITIAL_PLOT_HEIGHT = 150
 
-	self.min_master_zoom=3.0
 	self.height_of_tallest_plot = 1.0
 	self.initial_plot=True
+	### JCALERT:later rename this attribute
+	self.min_master_zoom=3.0
 
 
+    ### JCALERT: ASK JIM if we should rename that.
     def _generate_sheet_views(self):
 	""" 
 	Only implemented for TemplatePlotGroup. 
