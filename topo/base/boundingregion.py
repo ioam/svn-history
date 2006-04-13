@@ -352,6 +352,9 @@ class BoundingRegionParameter(Parameter):
     """
     Parameter whose value can be any BoundingRegion instance, enclosing a region in a 2D plane.
     """
+    __slots__ = []
+    __doc__ = property((lambda self: self.doc))
+
     def __init__(self,default=BoundingBox(radius=0.5),**params):
         super(BoundingRegionParameter,self).__init__(default=default,instantiate=True,**params)
         
