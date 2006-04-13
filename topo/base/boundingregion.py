@@ -38,20 +38,17 @@ class BoundingRegion(ParameterizedObject):
 
 class BoundingBox(BoundingRegion):
     """
-    A rectangular bounding box defined by two points forming
-    an axis-aligned rectangle.
-
-    parameters:
-
-    points = a sequence of two points that define an axis-aligned rectangle.
+    A rectangular bounding box defined either by two points forming
+    an axis-aligned rectangle (or simply a radius for a square).
     """
 
     def __init__(self,**args):
         """
         Create a BoundingBox.
 
-        A radius or points can be specified for the AARectangle.
-        
+        Either 'radius' or 'points' can be specified for the
+        AARectangle.
+
         If radius is passed in, the BoundingBox will use min_radius
         (which defaults to 0.0) if it's larger than radius - so by
         passing min_radius=1.25/density, a BoundingBox of at least 3x3
