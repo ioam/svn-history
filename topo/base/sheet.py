@@ -123,10 +123,6 @@ def sheet2matrix(x,y,bounds,density):
     matrix row index increases as y decreases).
 
     Density
-    When density*(left-right) or density*(top-bottom) is not an integer,
-    the supplied density argument is not used as the exact density for
-    the matrix. The matrix needs to tile the plane exactly,
-    and for that to work the density may need to be adjusted.
     """
     left,bottom,right,top = bounds.lbrt()
 
@@ -349,10 +345,14 @@ class Sheet(EventProcessor):
     density = Parameter(
         default=10,constant=True,
         doc="""
+
         User-specified number of processing units per 1.0 distance
         horizontally or vertically in Sheet coordinates. The actual
-        number may be different because of discretization. For instance,
-        an area of 3x2 cannot have a density of 2 in each direction.
+        number may be different because of discretization; the matrix
+        needs to tile the plane exactly, and for that to work the
+        density may need to be adjusted.
+        For instance, an area of 3x2 cannot have a density of 2 in
+        each direction.
         """)
     
     # JABALERT: Should be set per-projection, not per-Sheet, right?
