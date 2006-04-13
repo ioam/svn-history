@@ -121,11 +121,8 @@ def sheet2matrix(x,y,bounds,density):
     outside. Similarly, y=0.5 is inside (at row 0) but y=-0.5 is
     outside (at row 3) (it's the other way round for y because the
     matrix row index increases as y decreases).
-
-    Density
     """
     left,bottom,right,top = bounds.lbrt()
-
 
     # First translate to (left,top), which is [0,0] in the matrix,
     # then scale to the size of the matrix. The y coordinate needs to
@@ -175,12 +172,6 @@ def matrix2sheet(float_row,float_col,bounds,density):
     Inverse of sheet2matrix().
     """
     left,bottom,right,top = bounds.lbrt()
-
-    # CEBHACKALERT: xdensity and/or ydensity could be zero (with a small
-    # BoundingBox or low density). Either that should be dealt with here,
-    # or it should be disallowed earlier.
-    # This problem arises in several places (e.g. see PatternGenerator).
-
     step = 1.0 / density
     x = float_col*step + left
     y = top - float_row*step
@@ -273,32 +264,19 @@ def crop_slice_to_sheet_bounds(slice_,sheet_bounds,density):
 
 
 # CEBHACKALERT: slice is a Python type.
-def slice2bounds(slice,sheet_bounds,sheet_density):
+def slice2bounds(slice_,sheet_bounds,sheet_density):
     """
     Construct the bounds that corresponds to the given slice.
     This way, this function is an exact transform of bounds2slice. 
     That enables to retrieve the slice information from the bounding box.
     """
-    r1,r2,c1,c2 = slice
+    r1,r2,c1,c2 = slice_
 
     left,bottom = matrix2sheet(r2,c1,sheet_bounds,sheet_density)
     right, top   = matrix2sheet(r1,c2,sheet_bounds,sheet_density)
 
-    bounds = BoundingBox(points=((left,bottom),
-                                  (right,top)))
-
-    # yfsit: why do we need to check for <= 0?
-    #if (int(sheet_density*(right-left)) <= 0):
-    #   xstep = float((right-left)) / int(sheet_density)
-    #else:
-    #   xstep = float((right-left)) / int(sheet_density*(right-left))
-    #
-    #if (int(sheet_density*(top-bottom)) <= 0):
-    #   ystep = float((top-bottom)) / int(sheet_density)
-    #else:
-    #   ystep = float((top-bottom)) / int(sheet_density*(top-bottom))
-
-    return bounds
+    return BoundingBox(points=((left,bottom),
+                               (right,top)))
 
 
 # CEBHACKALERT:
@@ -345,7 +323,6 @@ class Sheet(EventProcessor):
     density = Parameter(
         default=10,constant=True,
         doc="""
-
         User-specified number of processing units per 1.0 distance
         horizontally or vertically in Sheet coordinates. The actual
         number may be different because of discretization; the matrix
@@ -384,7 +361,12 @@ class Sheet(EventProcessor):
         width = right-left; height = top-bottom
         center_y = bottom + height/2.0
         self.density = int(self.density*(width))/float((width))
-        n_units = round(height*self.density,0)        
+        n_units = round(height*self.density,0)
+
+        if n_units<1: raise ValueError(
+           "Sheet bounds and density must be specified such that the "+ \
+           "sheet has at least one unit in each direction; " \
+           +self.name+ " does not.")
 
         adjusted_half_height = n_units/self.density/2.0
         adjusted_bottom = center_y - adjusted_half_height
