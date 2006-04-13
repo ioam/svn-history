@@ -610,6 +610,9 @@ class TestCoordinateTransforms(unittest.TestCase):
         xdensity = int(density*(r-l)) / float(r-l)
         ydensity = int(density*(t-b)) / float(t-b)
 
+        # CB: temporary (mimics that a sheet recalculates its density)
+        density = xdensity
+
         bounds = BoundingBox(points=((l,b),(r,t)))
         
         self.assertEqual(sheet2matrixidx(0.8,0.8,bounds,xdensity,ydensity),(0,24+1))
