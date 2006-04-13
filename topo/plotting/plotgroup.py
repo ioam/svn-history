@@ -8,11 +8,7 @@ $Id$
 """
 __version__='$Revision$'
 
-import types
 import copy
-
-from Numeric import transpose, array, ravel
-
 import Image
 
 import topo
@@ -477,8 +473,10 @@ class ProjectionPlotGroup(TemplatePlotGroup):
         self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
 	self.initial_plot=False
 
+
     def scale_images(self,plots):
 	pass
+
 
     def _ordering_plots(self,plot_list):
 	"""
