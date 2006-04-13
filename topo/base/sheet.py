@@ -324,7 +324,7 @@ def slicearray2bounds(slicearray,sheet_bounds,sheet_density):
     """
     Same as slice2bounds, but the slice is an array instead of a tuple.
     """
-    return slice2bounds((slicearray[0],slicearray[1],slicearray[2],slicearray[3]), sheet_bounds, sheet_xdensity,sheet_ydensity)
+    return slice2bounds((slicearray[0],slicearray[1],slicearray[2],slicearray[3]), sheet_bounds, sheet_density)
 
 
 
@@ -409,10 +409,6 @@ class Sheet(EventProcessor):
 
         self.bounds=BoundingBox(points=((left,adjusted_bottom),(right,adjusted_top)))
         self.initialized=True
-
-        # CEBHACKALERT: these will be removed
-        self.xdensity = self.density
-        self.ydensity = self.density
 
         # setup the activity matrix
         r1,r2,c1,c2 = bounds2slice(self.bounds,self.bounds,self.density)

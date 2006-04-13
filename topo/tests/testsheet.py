@@ -424,8 +424,6 @@ class TestCoordinateTransforms(unittest.TestCase):
                       bounds=BoundingBox(points=((-0.5,-1.005),(0.5,1.0))))
 
         self.assertEqual(sheet.density,10)
-        self.assertEqual(sheet.density,10)
-        self.assertEqual(sheet.ydensity,10)
         
         l,b,r,t = sheet.bounds.lbrt()
         self.assertEqual(l,-0.5)
