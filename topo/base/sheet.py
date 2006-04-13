@@ -376,7 +376,7 @@ class Sheet(EventProcessor):
         self.initialized=True
 
         # setup the activity matrix
-        r1,r2,c1,c2 = bounds2slice(self.bounds,self.bounds,self.density)
+        r1,r2,c1,c2 = self.bounds2slice(self.bounds)
         self.activity = zeros((r2-r1,c2-c1),Float)
 
         self.__saved_activity = []          # For non-learning inputs
@@ -421,12 +421,23 @@ class Sheet(EventProcessor):
         """
         return sheet2matrixidx_array(x,y,self.bounds,self.density)
 
-
     def matrixidx2sheet(self,row,col):
         """
         See sheet's matrixidx2sheet() function.
         """
         return matrixidx2sheet(row,col,self.bounds,self.density)
+
+    def bounds2slice(self,bounds):
+        """
+        See sheet's bounds2slice() function.
+        """
+        return bounds2slice(bounds,self.bounds,self.density)
+
+    def slice2bounds(self,slice_):
+        """
+        See sheet's bounds2slice() function.
+        """
+        return slice2bounds(slice_,self.bounds,self.density)
 
 
     def sheet_offset(self):
