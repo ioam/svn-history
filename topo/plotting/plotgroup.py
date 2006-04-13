@@ -14,11 +14,12 @@ import Image
 import __main__
 
 import topo
-from topo.misc.utils import dict_sort
+
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
 from topo.base.connectionfield import CFSheet
+
 
 from plot import make_template_plot, Plot
 import bitmap
@@ -254,7 +255,7 @@ class TemplatePlotGroup(PlotGroup):
 
         This function calls create_plots, that is implemented in each TemplatePlotGroup subclasses.
         """
-	sheet_list = [each for each in dict_sort(topo.sim.objects(Sheet)) if self.sheet_filter_lam(each)]      
+	sheet_list = [each for each in topo.sim.objects(Sheet).values() if self.sheet_filter_lam(each)]      
 	plot_list = self.plot_list
         # Loop over all sheets that passed the filter.
         #     Loop over each individual plot template:
