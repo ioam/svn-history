@@ -72,8 +72,8 @@ class PlotGroup(ParameterizedObject):
         else:
             self.sizeconvertfn = identity
 
-	### JCALERT: later delete this attribute and only using plots.
-	self.bitmaps = []
+	# plot labels
+	self.labels = []
 
         # In the future, it might be good to be able to specify the
         # plot rows and columns using tuples.  For instance, if three
@@ -88,11 +88,9 @@ class PlotGroup(ParameterizedObject):
 	self.INITIAL_PLOT_HEIGHT = 150
 
 	self.height_of_tallest_plot = 1.0
-	self.initial_plot=True
+	self.initial_plot = True
 	### JCALERT:later rename this attribute
 	self.min_master_zoom=3.0
-
-	self.labels = []
 
 
     ### JCALERT: ASK JIM if we should rename that.
@@ -116,9 +114,8 @@ class PlotGroup(ParameterizedObject):
     # Call from load_images() as a dynamic list to regenerate all_plots anytime (allowing refreshing)
     def plots(self,update=True):
         """
-        Generate the bitmap lists.
+        Generate the sorted and scaled list of plots constituting the PlotGroup.
         """
-        bitmap_list = []
 	### JCALERT! See if we keep this test
 	if update:
 	    self.update_environment()
@@ -166,11 +163,6 @@ class PlotGroup(ParameterizedObject):
 		else:
 		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(plot.bitmap.height()))
 	    plot.bitmap.image = plot.bitmap.zoom(scaling_factor)
-
-                              
-   #          tmp_list = tmp_list + [bitmap.zoom(scaling_factor)]
-	
-# 	self.zoomed_images = [ImageTk.PhotoImage(im) for im in tmp_list]
 
 
     def _set_height_of_tallest_plot(self,plots):
