@@ -31,7 +31,7 @@ class CFProjectionDotProduct(CFProjectionResponseFn):
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = cfs[r][c]
-                r1,r2,c1,c2 = cf.slice_tuple()
+                r1,r2,c1,c2 = cf.slice_array
                 X = input_activity[r1:r2,c1:c2]
 
                 # "Mdot()"
@@ -50,7 +50,7 @@ class CFProjectionEuclideanDistance(CFProjectionResponseFn):
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = cfs[r][c]
-                r1,r2,c1,c2 = cf.slice_tuple()
+                r1,r2,c1,c2 = cf.slice_array
                 X = input_activity[r1:r2,c1:c2]
 		diff = ravel(X) - ravel(cf.weights)
 		euclidean_dist_mat[r,c] = L2norm(diff)

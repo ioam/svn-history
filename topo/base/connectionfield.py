@@ -153,8 +153,8 @@ class ConnectionField(ParameterizedObject):
 
     # Specifies how to get a submatrix from the source sheet that is aligned
     # properly with this weight matrix.  The information is stored as an
-    # array for speed of access from optimized C components; use
-    # self.slice_tuple() for a nicer Python access method.
+    # array for speed of access from optimized C components.
+    # CEBHACKALERT: can rename this to 'slice_' now.
     slice_array = []
 
     def get_sum(self):
@@ -301,7 +301,7 @@ class ConnectionField(ParameterizedObject):
 
 
     def get_input_matrix(self, activity):
-        r1,r2,c1,c2 = self.slice_tuple()
+        r1,r2,c1,c2 = self.slice_array
         return activity[r1:r2,c1:c2]
 
 
@@ -319,10 +319,10 @@ class ConnectionField(ParameterizedObject):
         should be extended to support increasing as well.
         """
         # CEBHACKALERT: re-write to allow arbitrary resizing
-        or1,or2,oc1,oc2 = self.slice_tuple()
+        or1,or2,oc1,oc2 = self.slice_array
 
         self.offset_bounds(weights_bounds)
-        r1,r2,c1,c2 = self.slice_tuple()
+        r1,r2,c1,c2 = self.slice_array
 
         if not (r1 == or1 and r2 == or2 and c1 == oc1 and c2 == oc2):
             self.weights = Numeric.array(self.weights[r1-or1:r2-or1,c1-oc1:c2-oc1],copy=1)
@@ -337,8 +337,6 @@ class ConnectionField(ParameterizedObject):
             output_fn(self.weights)
             self.sum=output_fn.norm_value
 
-    def slice_tuple(self):
-        return self.slice_array[0],self.slice_array[1],self.slice_array[2],self.slice_array[3]
 
     def change_density(self, new_wt_density):
         """Rescale the weight matrix in place, interpolating or decimating as necessary."""
@@ -389,7 +387,7 @@ class CFProjectionGenericResponseFn(CFProjectionResponseFn):
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = cfs[r][c]
-                r1,r2,c1,c2 = cf.slice_tuple()
+                r1,r2,c1,c2 = cf.slice_array
                 X = input_activity[r1:r2,c1:c2]
                 activity[r,c] = single_cf_fn(X,cf.weights)
         activity *= strength

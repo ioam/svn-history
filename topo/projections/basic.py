@@ -122,8 +122,7 @@ class SharedCFProjection(CFProjection):
                 cf.x,cf.y = x,y
                 cf.offset_bounds(self.weights_bounds)
                 weights_slice = cf.get_slice(self.weights_bounds)
-                sheet_slice = cf.slice_tuple()
-                row.append((sheet_slice,cf.bounds,weights_slice))
+                row.append((cf.slice_array,cf.bounds,weights_slice))
             self.cf_slice_and_bounds.append(row)
 
         ### JABHACKALERT: cfs is a dummy, here only so that learning will
