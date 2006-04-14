@@ -51,10 +51,6 @@ class Bitmap(ParameterizedObject):
     def __init__(self,image):
         self.image = image
 
-	# copy of the plot plot_src_name, used for displaying label along with self.name
-        self.plot_src_name = None
-	self.name = None
-
 
     def copy(self):
         """

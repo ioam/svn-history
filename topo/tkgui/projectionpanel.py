@@ -289,9 +289,12 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         ProjectionPanel requires a 2D grid of plots.
         """
         if self.plotgroup:
+	    plots = self.plotgroup.plots()
+	    ### Momentary: delete when sorting the bitmap history
+	    self.bitmaps = [p.bitmap for p in plots]
             # Generate the zoomed images.
-            self.zoomed_images = [ImageTk.PhotoImage(im.zoom(self.plotgroup.height_of_tallest_plot))
-                                  for im in self.bitmaps]
+            self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.zoom(self.plotgroup.height_of_tallest_plot))
+                                  for p in plots]
             old_canvases = self.canvases
             self.canvases = [Canvas(self.plot_frame,
                                width=image.width()+BORDERWIDTH*2+CANVASBUFFER,

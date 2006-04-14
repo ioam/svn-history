@@ -89,7 +89,6 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         # For a ConnectionField or a Projection Panel, the plotgroup_key is re-generated
 	self.plotgroup_key = plotgroup_key
 
-        self.bitmaps = []
         self.bitmaps_history=[]
         self.time_history=[]
         self.history_index = -1
@@ -214,8 +213,8 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 	### self.update_plotgroup_variables()
 	### self.refresh_plotgroup()
 	### self.display_plots()
-        self.load_images()                #  load bitmap images
 	self.display_plots()              # Put images in GUI canvas
+	self.load_images()                #  load bitmap images
         self.display_labels()             # Match labels to grid
         self.refresh_title()              # Update Frame title.
         Pmw.hidebusycursor()
@@ -238,7 +237,6 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         If new_iteration is True, advances the plot history counter; otherwise
         just overwrites the current one.
 	"""
-	self.bitmaps = self.plotgroup.load_images()
 
         # Repeated plots at the same time overwrite the top plot history item;
         # new ones are added to the list only when the simulator time changes.
@@ -310,9 +308,12 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         This function should be redefined in subclasses for interesting
         things such as 2D grids.
         """
- 
+	
 	### JCALERT: This has to be changed.
-	self.zoomed_images = [ImageTk.PhotoImage(b.image) for b in self.bitmaps]
+	plots=self.plotgroup.plots()
+	### Momentary: delete when sorting the bitmap history
+	self.bitmaps = [p.bitmap for p in plots]
+	self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image) for p in plots]
         # If the number of canvases or their sizes has changed, then
         # create a new set of canvases.  If the old canvases still can
         # work, then reuse them to prevent flicker.

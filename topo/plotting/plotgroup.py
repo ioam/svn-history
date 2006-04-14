@@ -111,24 +111,6 @@ class PlotGroup(ParameterizedObject):
 	"""
 	return self.plot_list
 
-
-    ### JCALERT: gte rid of this function and only keep plots
-    def load_images(self):
-        """
-        Pre: the update command that load the SheetView corresponding to the PlotGroup
-             has to be called.
-        Post: self.bitmaps contains a list of topo.bitmap objects or None if
-              no valid maps were available.
-
-        Returns: List of bitmaps.  self.bitmaps also has been updated.
-        """
-        self.bitmaps = []
-        for each in self.plots():
-            win = each.bitmap                      
-            win.plot_src_name = each.plot_src_name   
-	    win.name = each.name
-            self.bitmaps.append(win)
-        return self.bitmaps
     
 
     # Call from load_images() as a dynamic list to regenerate all_plots anytime (allowing refreshing)
