@@ -367,8 +367,8 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         """
         if self._num_labels != len(self.canvases):
             old_labels = self.labels
-            self.labels = [Label(self.plot_frame,text=each.plot_src_name + '\n' + each.name)
-				 for each in self.bitmaps]
+            self.labels = [Label(self.plot_frame,text=each)
+				 for each in self.plotgroup.labels]
             for i in range(len(self.labels)):
                 self.labels[i].grid(row=1,column=i,sticky=NSEW)
             for l in old_labels:
@@ -376,7 +376,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
             self._num_labels = len(self.canvases)
         else:  # Same number of labels; reuse to avoid flickering.
             for i in range(len(self.labels)):
-                self.labels[i].configure(text=self.bitmaps[i].plot_src_name +'\n' + self.bitmaps[i].name) 
+                self.labels[i].configure(text=self.plotgroup.labels[i]) 
  
       
     def refresh_title(self):

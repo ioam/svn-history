@@ -45,7 +45,7 @@ class Plot(ParameterizedObject):
 
 
 def make_template_plot(channels,sheet_view_dict,density=None,
-              plot_bounding_box=None,normalize=False,name=None):
+              plot_bounding_box=None,normalize=False,name='None'):
      """
      Factory function for constructing a Plot object whose type is not yet known.
 
@@ -159,6 +159,7 @@ class TemplatePlot(Plot):
 	    if sv != None:
                  self.plot_src_name = sv.src_name
                  self.precedence = sv.precedence
+        
 
     ### JCALERT: This could be inserted in teh code of get_matrix
     def _get_shape_and_box(self):

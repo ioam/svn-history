@@ -92,9 +92,11 @@ class PlotGroup(ParameterizedObject):
 	### JCALERT:later rename this attribute
 	self.min_master_zoom=3.0
 
+	self.labels = []
+
 
     ### JCALERT: ASK JIM if we should rename that.
-    def _generate_sheet_views(self):
+    def update_environment(self):
 	""" 
 	Only implemented for TemplatePlotGroup. 
 	Execute the command associated with the template.
@@ -130,23 +132,32 @@ class PlotGroup(ParameterizedObject):
     
 
     # Call from load_images() as a dynamic list to regenerate all_plots anytime (allowing refreshing)
-    def plots(self):
+    def plots(self,update=True):
         """
         Generate the bitmap lists.
         """
         bitmap_list = []
-	### JCALERT: here we should generate the sheet_views
-	### Need more work to see how to do it.
-	self._generate_sheet_views()
-        all_plots = [each for each in self._plot_list() if each != None]
+	### JCALERT! See if we keep this test
+	if update:
+	    self.update_environment()
+	all_plots = [plot for plot in self._plot_list() if plot != None]
 	# scaling the Plots
 	### JCALERT: momentary hack
 	if all_plots!=[]:
 	    self.scale_images(all_plots)
 	# sorting the Plots.
-	self._ordering_plots(all_plots)
+	self._ordering_plots(all_plots)	
+	self.generate_labels(all_plots)
         return all_plots
- 
+
+
+     ### Need to be re-implemented for connectionfieldplotgroup.
+    def generate_labels(self,plots):
+	""" Function used for generating the labels."""
+	self.labels = []
+	for plot in plots:
+	    self.labels.append(plot.plot_src_name + '\n' + plot.name)
+
 
     def scale_images(self,plots):
         """
@@ -238,7 +249,7 @@ class TemplatePlotGroup(PlotGroup):
         self._add_static_images()
 	
 
-    def _generate_sheet_views(self):
+    def update_environment(self):
 	""" 
 	Only implemented for TemplatePlotGroup. 
 	Execute the command associated with the template.
@@ -312,7 +323,7 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
 	super(ConnectionFieldsPlotGroup,self).__init__(plot_list,normalize,
 						       sheetcoords,integerscaling,template,sheet_name,**params)
   
-    def _generate_sheet_views(self):
+    def update_environment(self):
 	""" 
 	Only implemented for TemplatePlotGroup. 
 	Execute the command associated with the template.
@@ -359,7 +370,12 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
         return plot_list
 
 
-
+    ### Need to be re-implemented for connectionfieldplotgroup.
+    def generate_labels(self,plots):
+	""" Function used for generating the labels."""
+	self.labels = []
+	for plot in plots:
+	    self.labels.append(plot.name + '\n(from ' + plot.plot_src_name+')')
 
 class ProjectionPlotGroup(TemplatePlotGroup):
     """
@@ -391,7 +407,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
         #self._sim_ep_src = self._sim_ep.projections().get(self.weight_name,None)
  
 
-    def _generate_sheet_views(self):
+    def update_environment(self):
 	""" 
 	Only implemented for TemplatePlotGroup. 
 	Execute the command associated with the template.
