@@ -92,8 +92,6 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         # For a ConnectionField or a Projection Panel, the plotgroup_key is re-generated
 	self.plotgroup_key = plotgroup_key
 
-	### JCALERT: do a create_plot_group function instead of so_plot_cmd
-        #self.pe_group = self.create_plot_group()
         self.bitmaps = []
         self.bitmaps_history=[]
         self.time_history=[]
@@ -103,9 +101,11 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         ### JCALERT! Figure out why we need that!
         self._num_labels = 0
 
-        # Create and fill the control Frame
-	self.shared_control_frame = Frame(self)
-        self.shared_control_frame.pack(side=TOP,expand=YES,fill=X)
+        # Create and fill the 2 control Frames
+	self.control_frame_1 = Frame(self)
+        self.control_frame_1.pack(side=TOP,expand=YES,fill=X)
+	self.control_frame_2 = Frame(self)
+        self.control_frame_2.pack(side=TOP,expand=YES,fill=X)
 
         # JAB: Because these three buttons are present in nearly every
         # window, and aren't particularly important, we should
@@ -115,24 +115,23 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         # names as help text if the mouse lingers over them, so that
         # the user can figure them out the first time.
         # 
-        # Refresh, Reduce, and Enlarge Buttons.
-        Button(self.shared_control_frame,text="Refresh",
+        # Refresh, Reduce, Enlarge, Back and Forward Buttons.
+        Button(self.control_frame_1,text="Refresh",
                                      command=self.refresh).pack(side=LEFT)
                
-        self.reduce_button = Button(self.shared_control_frame,text="Reduce",
+        self.reduce_button = Button(self.control_frame_1,text="Reduce",
                                     command=self.reduce)
         self.reduce_button.pack(side=LEFT)
         
-        Button(self.shared_control_frame,text="Enlarge",
+        Button(self.control_frame_1,text="Enlarge",
                                      command=self.enlarge).pack(side=LEFT)
 
-        self.back_button = Button(self.shared_control_frame,text="Back",
+        self.back_button = Button(self.control_frame_2,text="Back",
                                   state = DISABLED,
                                   command=self.back)
         self.back_button.pack(side=LEFT)
 
-
-        self.forward_button = Button(self.shared_control_frame,text="Forward",
+        self.forward_button = Button(self.control_frame_2,text="Forward",
                                      state = DISABLED,
                                      command=self.forward)
         self.forward_button.pack(side=LEFT)
@@ -145,28 +144,32 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         # plots).  Call self.auto_refresh_checkbutton.invoke() to
         # enable autorefresh in a subclassed constructor function.
         self.auto_refresh = False
-        self.auto_refresh_checkbutton = Checkbutton(self.shared_control_frame,
+        self.auto_refresh_checkbutton = Checkbutton(self.control_frame_1,
                                                     text="Auto-refresh",
                                                     command=self.toggle_auto_refresh)
-        self.auto_refresh_checkbutton.pack(side=LEFT)
+        self.auto_refresh_checkbutton.pack(side=RIGHT)
         self.auto_refresh_checkbutton.invoke()
         
-        
-        
-        #self.sheetcoords = False
-        
-	self.normalize_checkbutton = Checkbutton(self.shared_control_frame,
+	self.normalize_checkbutton = Checkbutton(self.control_frame_1,
                                                      text="Normalize",
                                                      command=self.toggle_normalize)
-	self.normalize_checkbutton.pack(side=LEFT)
+	self.normalize_checkbutton.pack(side=RIGHT)
 	self.normalize = False    
         
-	self.integerscaling_checkbutton = Checkbutton(self.shared_control_frame,
+	self.integerscaling_checkbutton = Checkbutton(self.control_frame_2,
                                                     text="Integer scaling",
                                                     command=self.toggle_integerscaling)
-	self.integerscaling_checkbutton.pack(side=LEFT)
+	self.integerscaling_checkbutton.pack(side=RIGHT)
 	self.integerscaling = False
-        #self.sizeconvertfn = identity
+        self.sizeconvertfn = identity
+
+	self.sheetcoords_checkbutton = Checkbutton(self.control_frame_2,
+                                                    text="Sheet coordinates",
+                                                    command=self.toggle_sheetcoords)
+        self.sheetcoords_checkbutton.pack(side=RIGHT)
+	### JCALERT: see what to do with that.
+        #self.sheetcoords_checkbutton.select()
+	self.sheetcoords = False
             
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
@@ -193,9 +196,6 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         
         self.control_frame = Frame(self)
         self.control_frame.pack(side=TOP,expand=YES,fill=X)
-	### JCALERT: Put the button in here instead of in TemplatePanels
-	self.sizeconvertfn = identity
-	self.sheetcoords=False
 
 	self.plotgroup = self.generate_plotgroup()
 

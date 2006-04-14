@@ -48,12 +48,6 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
 	### JCALERT! We might get rid of that, as it is redundant with plotgroup_key
         self.mapname = StringVar()       
         self.mapname.set(self.pgt.name)
-
-        self.sheetcoords_checkbutton = Checkbutton(self.shared_control_frame,
-                                                    text="Sheet coordinates",
-                                                    command=self.toggle_sheetcoords)
-        self.sheetcoords_checkbutton.pack(side=LEFT)
-        #self.sheetcoords_checkbutton.select()
         
 	# For a BasicPlotGroup, the plotgroup_key is the name of the template
 	self.plotgroup_key=self.pgt.name
