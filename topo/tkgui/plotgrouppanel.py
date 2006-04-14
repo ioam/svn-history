@@ -25,7 +25,6 @@ from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import Sheet
-import topo.base.simulator 
 
 import topo.plotting.bitmap
 import topo.plotting.plotgroup
@@ -33,10 +32,6 @@ from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import PlotGroup,identity
 
 import topo.tkgui
-
-# def identity(x):
-#     """No-op function for use as a default."""
-#     return x
 
 BORDERWIDTH = 1
 
@@ -204,16 +199,21 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 
 	self.plotgroup = self.generate_plotgroup()
 
-    ### This function aims at replacing generate_plotgroup_key in connectionfields and all.
+
     def update_plotgroup_variables(self):
+	"""
+	Update the variables of the plotgroup according to the panel's variables.
+	Re-implemented for sub-classes.
+	"""
 	pass
+
 
     def toggle_normalize(self):
         """Function called by Widget when check-box clicked"""
         self.normalize = not self.normalize
 	self.plotgroup.normalize = self.normalize
         self.load_images()
-	self.scale_images()
+	
         self.display_plots()
 
 
@@ -227,7 +227,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
             self.plotgroup.sizeconvertfn = identity
 
         self.load_images()
-	self.scale_images()        
+	        
         self.display_plots()
 
     def refresh(self,extra=None):
@@ -238,7 +238,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         Pmw.showbusycursor()
 	self.update_plotgroup_variables()
         self.load_images()                #  load bitmap images
-        self.scale_images()               #scale bitmap images
+                       #scale bitmap images
         self.display_plots()              # Put images in GUI canvas
         self.display_labels()             # Match labels to grid
         self.refresh_title()              # Update Frame title.
@@ -281,15 +281,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         self.history_index = len(self.bitmaps_history)-1
         self.plot_time=copy.copy(self.console.simulator.time())
 
-
-    ### JCALERT! will have to disapear.
-    def scale_images(self):
-        """
-        It is assumed that the PlotGroup code has not scaled the bitmap to the size currently
-        desired by the GUI.
-	"""
-            
-        if (self.history_index > 0):
+	if (self.history_index > 0):
             self.back_button.config(state=NORMAL)
         else:
             self.back_button.config(state=DISABLED)
@@ -399,8 +391,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         if self.plotgroup.height_of_tallest_plot <= self.plotgroup.min_master_zoom:
             self.reduce_button.config(state=DISABLED)
          
-        self.load_images()
-        self.scale_images()
+        self.load_images()      
         self.display_plots()
 
     
@@ -408,8 +399,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         """Function called by Widget to increase the zoom factor"""
         self.reduce_button.config(state=NORMAL)
         self.plotgroup.height_of_tallest_plot = self.plotgroup.height_of_tallest_plot*self.zoom_factor
-        self.load_images()
-        self.scale_images()
+        self.load_images()        
         self.display_plots()
 
     # JLALERT: It would be nice to be able to scroll back through many
@@ -422,8 +412,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         self.bitmaps=self.bitmaps_history[self.history_index]
         self.plot_time=self.time_history[self.history_index]        
         self.display_labels()
-        self.refresh_title()
-        self.scale_images()
+        self.refresh_title()        
         self.display_plots()
 
 
@@ -440,8 +429,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         self.plot_time=self.time_history[self.history_index]
         self.display_labels()
         self.refresh_title()
-        self.scale_images()
-        self.display_plots()
+	self.display_plots()
         
 
     def toggle_auto_refresh(self):
@@ -464,8 +452,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         self.sheetcoords = not self.sheetcoords
 	self.plotgroup.sheetcoords = self.sheetcoords
         self.load_images()
-        self.scale_images()
-        self.display_plots()
+	self.display_plots()
 
 
     def destroy(self):
