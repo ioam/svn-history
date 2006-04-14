@@ -136,8 +136,6 @@ class PlotGroupPanel(Frame,ParameterizedObject):
                                      command=self.forward)
         self.forward_button.pack(side=LEFT)
 
-
-
         # Auto_refresh check button.
         # Default is to not have the window Auto-refresh, because some
         # plots are very slow to generate (e.g. some preference map
@@ -149,31 +147,31 @@ class PlotGroupPanel(Frame,ParameterizedObject):
                                                     command=self.toggle_auto_refresh)
         self.auto_refresh_checkbutton.pack(side=RIGHT)
         self.auto_refresh_checkbutton.invoke()
-        
+
+	# Normalize check button
+	self.normalize = False    
 	self.normalize_checkbutton = Checkbutton(self.control_frame_1,
                                                      text="Normalize",
                                                      command=self.toggle_normalize)
 	self.normalize_checkbutton.pack(side=RIGHT)
-	self.normalize = False    
-        
+
+        # Integerscaling check button
+	self.integerscaling = False
 	self.integerscaling_checkbutton = Checkbutton(self.control_frame_2,
                                                     text="Integer scaling",
                                                     command=self.toggle_integerscaling)
 	self.integerscaling_checkbutton.pack(side=RIGHT)
-	self.integerscaling = False
         self.sizeconvertfn = identity
 
+	# Sheet coordinates check button
+	self.sheetcoords = False
 	self.sheetcoords_checkbutton = Checkbutton(self.control_frame_2,
                                                     text="Sheet coordinates",
                                                     command=self.toggle_sheetcoords)
         self.sheetcoords_checkbutton.pack(side=RIGHT)
-	### JCALERT: see what to do with that.
-        #self.sheetcoords_checkbutton.select()
-	self.sheetcoords = False
             
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
-
 	self.plot_group_title = Pmw.Group(self,tag_text=str(self.plotgroup_key))
         self.plot_group_title.pack(side=TOP,expand=YES,fill=BOTH,padx=5,pady=5)
 	self.plot_frame = self.plot_group_title.interior()
@@ -188,10 +186,6 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 # 	self.scrollbar.pack(side=TOP,expand=YES,fill=X)
 #       self.plot_frame = self.scrollbar.interior()
 
-        # For the first plot, use the INITIAL_PLOT_HEIGHT to calculate zoom.
-# 	self.initial_plot=True
-# 	self.height_of_tallest_plot=1.0
-# 	self.min_master_zoom=3.0
 	self.zoom_factor=1.2
         
         self.control_frame = Frame(self)
@@ -212,23 +206,20 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         """Function called by Widget when check-box clicked"""
         self.normalize = not self.normalize
 	self.plotgroup.normalize = self.normalize
-        self.load_images()
-	
+        self.load_images()	
         self.display_plots()
 
 
     def toggle_integerscaling(self):
         """Function called by Widget when check-box clicked"""
-        self.integerscaling = not self.integerscaling
-        
+        self.integerscaling = not self.integerscaling        
         if self.integerscaling:
             self.plotgroup.sizeconvertfn = int
         else:
             self.plotgroup.sizeconvertfn = identity
-
         self.load_images()
-	        
         self.display_plots()
+
 
     def refresh(self,extra=None):
         """
@@ -238,8 +229,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         Pmw.showbusycursor()
 	self.update_plotgroup_variables()
         self.load_images()                #  load bitmap images
-                       #scale bitmap images
-        self.display_plots()              # Put images in GUI canvas
+	self.display_plots()              # Put images in GUI canvas
         self.display_labels()             # Match labels to grid
         self.refresh_title()              # Update Frame title.
         Pmw.hidebusycursor()
@@ -408,7 +398,6 @@ class PlotGroupPanel(Frame,ParameterizedObject):
     def back(self):
         """Function called by Widget to scroll back through the previous bitmaps"""
         self.history_index -= 1
-        
         self.bitmaps=self.bitmaps_history[self.history_index]
         self.plot_time=self.time_history[self.history_index]        
         self.display_labels()
@@ -424,7 +413,6 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         Only useful if previously you have scrolled back.
         """
         self.history_index += 1
-        
 	self.bitmaps=self.bitmaps_history[self.history_index]
         self.plot_time=self.time_history[self.history_index]
         self.display_labels()
