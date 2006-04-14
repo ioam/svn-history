@@ -64,6 +64,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         else:
             return False
 
+
     def __init__(self,parent,console,plotgroup_key,**params):
         """
         parent:  it is the window (GUIToplevel()) that contains the panel.
@@ -182,12 +183,42 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 # 	self.scrollbar.pack(side=TOP,expand=YES,fill=X)
 #       self.plot_frame = self.scrollbar.interior()
 
-	self.zoom_factor=1.2
+	# Factor for reducing or enlarging the Plots (20% anytime)
+	self.zoom_factor = 1.2
         
+	### JCALERT That has to be renamed.
         self.control_frame = Frame(self)
         self.control_frame.pack(side=TOP,expand=YES,fill=X)
 
 	self.plotgroup = self.generate_plotgroup()
+
+
+    def generate_plotgroup(self):
+        """
+	Function that creates the PlotGroupPanel's PlotGroup.
+	Needs to be re-implemented for subclasses.
+        """
+        plotgroup = PlotGroup([],self.normalize,
+			      self.sheetcoords,self.integerscaling)
+	return plotgroup
+
+
+    def refresh(self,extra=None):
+        """
+        Main steps for generating plots in the Frame.
+        """
+        Pmw.showbusycursor()
+	self.update_plotgroup_variables() # update PlotGroup variables
+	### JCALERT: should be:
+	### self.save_history()
+	### self.update_plotgroup_variables()
+	### self.refresh_plotgroup()
+	### self.display_plots()
+        self.load_images()                #  load bitmap images
+	self.display_plots()              # Put images in GUI canvas
+        self.display_labels()             # Match labels to grid
+        self.refresh_title()              # Update Frame title.
+        Pmw.hidebusycursor()
 
 
     def update_plotgroup_variables(self):
@@ -198,53 +229,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 	pass
 
 
-    def toggle_normalize(self):
-        """Function called by Widget when check-box clicked"""
-        self.normalize = not self.normalize
-	self.plotgroup.normalize = self.normalize
-        self.load_images()	
-        self.display_plots()
 
-
-    def toggle_integerscaling(self):
-        """Function called by Widget when check-box clicked"""
-        self.integerscaling = not self.integerscaling        
-        if self.integerscaling:
-            self.plotgroup.sizeconvertfn = int
-        else:
-            self.plotgroup.sizeconvertfn = identity
-        self.load_images()
-        self.display_plots()
-
-
-    def refresh(self,extra=None):
-        """
-        Main steps for generating plots in the Frame.  These functions
-        must either be implemented, or overwritten.
-        """
-        Pmw.showbusycursor()
-	self.update_plotgroup_variables()
-        self.load_images()                #  load bitmap images
-	self.display_plots()              # Put images in GUI canvas
-        self.display_labels()             # Match labels to grid
-        self.refresh_title()              # Update Frame title.
-        Pmw.hidebusycursor()
-
-
-
-    ### JCALERT! 
-    ### This function is called to re-generate the PlotGroup anytime if needed.
-    ### It shouldn't be re-implmented by subclasses, only generate_sheet_views should be
-    def generate_plotgroup(self):
-        """
-	Function that re-generate the PlotGroup anytime.
-	Needs to be re-implemented anytime.
-        """
-        plotgroup = PlotGroup([],self.normalize,
-			      self.sheetcoords,self.integerscaling)
-	return plotgroup
-  
-  
     def load_images(self):
 	"""
 	Pre:  self.pe_group contains a PlotGroup.
@@ -267,6 +252,34 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         self.history_index = len(self.bitmaps_history)-1
         self.plot_time=copy.copy(self.console.simulator.time())
 	self.update_back_fwd_button()
+
+
+    def toggle_normalize(self):
+        """Function called by Widget when check-box clicked"""
+        self.normalize = not self.normalize
+	self.plotgroup.normalize = self.normalize
+        self.load_images()	
+        self.display_plots()
+
+
+    def toggle_integerscaling(self):
+        """Function called by Widget when check-box clicked"""
+        self.integerscaling = not self.integerscaling        
+        if self.integerscaling:
+            self.plotgroup.sizeconvertfn = int
+        else:
+            self.plotgroup.sizeconvertfn = identity
+        self.load_images()
+        self.display_plots()
+
+
+ 
+
+
+  
+  
+  
+  
 
 
     ### Momentary have to be re-moved:  
