@@ -11,13 +11,11 @@ __version__='$Revision$'
 
 
 import Numeric
-import MLab
 import copy
 
-import PIL
 import Image
 import ImageTk
-import Pmw, re, os, sys
+import Pmw
 from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, \
      StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE, \
@@ -26,8 +24,6 @@ from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import Sheet
 
-import topo.plotting.bitmap
-import topo.plotting.plotgroup
 from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import PlotGroup,identity
 
