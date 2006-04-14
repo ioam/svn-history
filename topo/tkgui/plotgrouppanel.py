@@ -270,7 +270,12 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         self.time_history.append(copy.copy(self.console.simulator.time()))
         self.history_index = len(self.bitmaps_history)-1
         self.plot_time=copy.copy(self.console.simulator.time())
+	self.update_back_fwd_button()
 
+
+    ### Momentary have to be re-moved:  
+    def update_back_fwd_button(self):
+	
 	if (self.history_index > 0):
             self.back_button.config(state=NORMAL)
         else:
@@ -398,6 +403,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
     def back(self):
         """Function called by Widget to scroll back through the previous bitmaps"""
         self.history_index -= 1
+	self.update_back_fwd_button()
         self.bitmaps=self.bitmaps_history[self.history_index]
         self.plot_time=self.time_history[self.history_index]        
         self.display_labels()
@@ -409,10 +415,10 @@ class PlotGroupPanel(Frame,ParameterizedObject):
     def forward(self):
         """
         Function called by Widget to scroll forward through the bitmaps.
-
         Only useful if previously you have scrolled back.
         """
         self.history_index += 1
+	self.update_back_fwd_button()
 	self.bitmaps=self.bitmaps_history[self.history_index]
         self.plot_time=self.time_history[self.history_index]
         self.display_labels()
