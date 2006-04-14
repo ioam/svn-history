@@ -263,7 +263,6 @@ def crop_slice_to_sheet_bounds(slice_,sheet_bounds,density):
     return rstart,rbound,cstart,cbound
 
 
-# CEBHACKALERT: slice is a Python type.
 def slice2bounds(slice_,sheet_bounds,sheet_density):
     """
     Construct the bounds that corresponds to the given slice.
