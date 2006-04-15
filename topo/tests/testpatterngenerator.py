@@ -8,12 +8,12 @@ __version__='$Revision$'
 import unittest
 
 from Numeric import array
+from MLab import rot90
 
 from topo.base.patterngenerator import *
 import topo.patterns.basic
 
 from utils import assert_array_equal
-
 
 # CEBHACKALERT: needs writing so that it tests PatternGenerator properly!
 
@@ -40,8 +40,16 @@ class TestPatternGenerator(unittest.TestCase):
                                              density=density,bounds=bounds)
 
         assert_array_equal(rect(),target)
+        assert_array_equal(rect(orientation=pi/2),rot90(target))
 
-        
+        rot_45 = array([[0, 0, 0, 0, 0, 0],
+                        [0, 0, 1, 0, 0, 0],
+                        [0, 1, 1, 1, 0, 0],
+                        [0, 0, 1, 1, 1, 0],
+                        [0, 0, 0, 1, 0, 0],
+                        [0, 0, 0, 0, 0, 0]])
+                       
+        assert_array_equal(rect(orientation=pi/4),rot_45)
 
 
 suite = unittest.TestSuite()
