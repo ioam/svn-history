@@ -6,9 +6,14 @@ $Id$
 __version__='$Revision$'
 
 import unittest
-from topo.base.patterngenerator import *
+
 from Numeric import array
+
+from topo.base.patterngenerator import *
 import topo.patterns.basic
+
+from utils import assert_array_equal
+
 
 # CEBHACKALERT: needs writing so that it tests PatternGenerator properly!
 
@@ -30,9 +35,10 @@ class TestPatternGenerator(unittest.TestCase):
 
         rect_width = 0.3
         rect_height = 0.9
-        rect = topo.patterns.basic.Rectangle(scale=0.9,aspect_ratio=(rect_width/rect_height),
-                                density=4,bounds=bounds)
-        self.assertEqual(rect(),target)
+        rect = topo.patterns.basic.Rectangle(scale=0.9,
+                                             aspect_ratio=(rect_width/rect_height),
+                                             density=4,bounds=bounds)
+        assert_array_equal(rect(),target)
 #        print rect()
         
 
