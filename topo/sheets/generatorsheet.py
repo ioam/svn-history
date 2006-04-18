@@ -81,9 +81,7 @@ class GeneratorSheet(Sheet):
         self.verbose("Received %s input from %s." % (NxN(data.shape),src))
         self.verbose("Generating a new pattern...")
 
-        # CEBHACKALERT: clean this up (see Sheet.__init__() )
-        self.activity = self.input_generator(bounds=self.bounds,
-                                             density=self.density)
+        self.activity = self.input_generator()
         
         self.send_output(data=self.activity)
         self.verbose("Sending %s output at time %d." % (NxN(self.activity.shape),self.simulator.time()))
