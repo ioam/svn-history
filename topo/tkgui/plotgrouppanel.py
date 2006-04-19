@@ -202,19 +202,15 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 	return plotgroup
 
 
-    def refresh(self,extra=None):
+    def refresh(self,update=True):
         """
         Main steps for generating plots in the Frame.
         """
         Pmw.showbusycursor()
 	self.update_plotgroup_variables() # update PlotGroup variables
-	### JCALERT: should be:
-	### self.save_history()
-	### self.update_plotgroup_variables()
-	### self.refresh_plotgroup()
-	### self.display_plots()
-	self.display_plots()              # Put images in GUI canvas
-	self.load_images()                #  load bitmap images
+	# if update is True, the SheetViews are re-generated
+	self.display_plots(update)        # Put images in GUI canvas
+	self.add_to_history()                #  load bitmap images
         self.display_labels()             # Match labels to grid
         self.refresh_title()              # Update Frame title.
         Pmw.hidebusycursor()
@@ -228,74 +224,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 	pass
 
 
-
-    def load_images(self):
-	"""
-	Pre:  self.pe_group contains a PlotGroup.
-        Post: self.bitmaps contains a list of Bitmap Images ready for display.
-
-        If new_iteration is True, advances the plot history counter; otherwise
-        just overwrites the current one.
-	"""
-
-        # Repeated plots at the same time overwrite the top plot history item;
-        # new ones are added to the list only when the simulator time changes.
-        if self.time_history and (self.time_history[-1] ==
-                                  self.console.simulator.time()):
-            self.bitmaps_history.pop()
-            self.time_history.pop()
-        
-        self.bitmaps_history.append(copy.copy(self.bitmaps))
-        self.time_history.append(copy.copy(self.console.simulator.time()))
-        self.history_index = len(self.bitmaps_history)-1
-        self.plot_time=copy.copy(self.console.simulator.time())
-	self.update_back_fwd_button()
-
-
-    def toggle_normalize(self):
-        """Function called by Widget when check-box clicked"""
-        self.normalize = not self.normalize
-	self.plotgroup.normalize = self.normalize
-        self.load_images()	
-        self.display_plots()
-
-
-    def toggle_integerscaling(self):
-        """Function called by Widget when check-box clicked"""
-        self.integerscaling = not self.integerscaling        
-        if self.integerscaling:
-            self.plotgroup.sizeconvertfn = int
-        else:
-            self.plotgroup.sizeconvertfn = identity
-        self.load_images()
-        self.display_plots()
-
-
- 
-
-
-  
-  
-  
-  
-
-
-    ### Momentary have to be re-moved:  
-    def update_back_fwd_button(self):
-	
-	if (self.history_index > 0):
-            self.back_button.config(state=NORMAL)
-        else:
-            self.back_button.config(state=DISABLED)
-
-        if self.history_index >= len(self.bitmaps_history)-1:
-            self.forward_button.config(state=DISABLED)
-        else:
-            self.forward_button.config(state=NORMAL)
-
-
-
-    def display_plots(self):
+    def display_plots(self,update=True):
         """
         Pre:  self.bitmaps contains a list of topo.bitmap objects.
 
@@ -308,9 +237,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         This function should be redefined in subclasses for interesting
         things such as 2D grids.
         """
-	
-	### JCALERT: This has to be changed.
-	plots=self.plotgroup.plots()
+	plots=self.plotgroup.plots(update)
 	### Momentary: delete when sorting the bitmap history
 	self.bitmaps = [p.bitmap for p in plots]
 	self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image) for p in plots]
@@ -358,6 +285,63 @@ class PlotGroupPanel(Frame,ParameterizedObject):
                 canvas.grid(row=0,column=i,padx=5)
             
 
+    def add_to_history(self):
+	"""
+	Pre:  self.pe_group contains a PlotGroup.
+        Post: self.bitmaps contains a list of Bitmap Images ready for display.
+
+        If new_iteration is True, advances the plot history counter; otherwise
+        just overwrites the current one.
+	"""
+
+        # Repeated plots at the same time overwrite the top plot history item;
+        # new ones are added to the list only when the simulator time changes.
+        if self.time_history and (self.time_history[-1] ==
+                                  self.console.simulator.time()):
+            self.bitmaps_history.pop()
+            self.time_history.pop()
+        
+        self.bitmaps_history.append(copy.copy(self.bitmaps))
+        self.time_history.append(copy.copy(self.console.simulator.time()))
+        self.history_index = len(self.bitmaps_history)-1
+        self.plot_time=copy.copy(self.console.simulator.time())
+	self.update_back_fwd_button()
+
+
+    def toggle_normalize(self):
+        """Function called by Widget when check-box clicked"""
+        self.normalize = not self.normalize
+	self.plotgroup.normalize = self.normalize
+        self.display_plots(False)
+
+
+    def toggle_integerscaling(self):
+        """Function called by Widget when check-box clicked"""
+        self.integerscaling = not self.integerscaling        
+        if self.integerscaling:
+            self.plotgroup.sizeconvertfn = int
+        else:
+            self.plotgroup.sizeconvertfn = identity
+        self.display_plots(False)
+
+
+    ### Momentary have to be re-moved:  
+    def update_back_fwd_button(self):
+	
+	if (self.history_index > 0):
+            self.back_button.config(state=NORMAL)
+        else:
+            self.back_button.config(state=DISABLED)
+
+        if self.history_index >= len(self.bitmaps_history)-1:
+            self.forward_button.config(state=DISABLED)
+        else:
+            self.forward_button.config(state=NORMAL)
+
+
+
+   
+
 
     def display_labels(self):
         """
@@ -396,16 +380,14 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         if self.plotgroup.height_of_tallest_plot <= self.plotgroup.min_master_zoom:
             self.reduce_button.config(state=DISABLED)
          
-        self.load_images()      
-        self.display_plots()
+        self.display_plots(False)
 
     
     def enlarge(self):
         """Function called by Widget to increase the zoom factor"""
         self.reduce_button.config(state=NORMAL)
         self.plotgroup.height_of_tallest_plot = self.plotgroup.height_of_tallest_plot*self.zoom_factor
-        self.load_images()        
-        self.display_plots()
+        self.display_plots(False)
 
     # JLALERT: It would be nice to be able to scroll back through many
     # iterations.  Could put in a box for entering either the iteration
@@ -455,8 +437,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         """Function called by Widget when check-box clicked"""
         self.sheetcoords = not self.sheetcoords
 	self.plotgroup.sheetcoords = self.sheetcoords
-        self.load_images()
-	self.display_plots()
+	self.display_plots(False)
 
 
     def destroy(self):

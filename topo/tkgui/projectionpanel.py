@@ -131,10 +131,10 @@ class ProjectionPanel(TemplatePlotGroupPanel):
     def toggle_situate(self):
         """Set the attribute situate"""
         self.situate = not self.situate
-        if self.plotgroup() != None:
-            self.plotgroup().situate = self.situate
-        self.plotgroup().initial_plot = True
-        self.plotgroup().height_of_tallest_plot = self.min_master_zoom = 1
+        if self.plotgroup != None:
+            self.plotgroup.situate = self.situate
+        self.plotgroup.initial_plot = True
+        self.plotgroup.height_of_tallest_plot = self.min_master_zoom = 1
         self.refresh()
 
         
@@ -283,7 +283,7 @@ class ProjectionPanel(TemplatePlotGroupPanel):
   	return plotgroup
 
 
-    def display_plots(self):
+    def display_plots(self,update=True):
         """
         This must be changed from PlotGroupPanels version since
         ProjectionPanel requires a 2D grid of plots.
