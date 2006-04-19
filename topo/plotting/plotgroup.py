@@ -206,18 +206,14 @@ class TemplatePlotGroup(PlotGroup):
 
 	super(TemplatePlotGroup,self).__init__(plot_list,normalize,sheetcoords,integerscaling,**params)
 	self.template = template
-	# If no sheet_name is defined, the sheet_filter_lam accepts all sheets
-        # (i.e the PlotGroup will try to build a Plot object for each Sheet in the simulation)
+
+	# Sheet_name can be none, in which case the PlotGroup build Plots for each Sheet.
 	self.sheet_name=sheet_name
-        if sheet_name:
-	    self.sheet_filter_lam = lambda s: s.name == sheet_name
-        else:
-            self.sheet_filter_lam = lambda s : True
 
 	# Command used to refresh the plot, if any
         self.cmdname = self.template.command
 
-	# add static images to the added_plot_list, as specified by the template.
+	# Add static images to the added_plot_list, as specified by the template.
         self._add_static_images()
 	
 
@@ -236,7 +232,13 @@ class TemplatePlotGroup(PlotGroup):
 
         This function calls create_plots, that is implemented in each TemplatePlotGroup subclasses.
         """
-	sheet_list = [each for each in topo.sim.objects(Sheet).values() if self.sheet_filter_lam(each)]      
+	# If no sheet_name is defined, the sheet_filter_lam accepts all sheets
+        # (i.e the PlotGroup will try to build a Plot object for each Sheet in the simulation)
+	if self.sheet_name:
+	    sheet_list = [each for each in topo.sim.objects(Sheet).values() if each.name == self.sheet_name]   
+	else:
+	    sheet_list = [each for each in topo.sim.objects(Sheet).values()]
+   
 	plot_list = self.plot_list
         # Loop over all sheets that passed the filter.
         #     Loop over each individual plot template:
@@ -430,7 +432,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
         ### sheet_filter_lam filter to one single sheet...
 	### this has to be made simpler...
 	for s in topo.sim.objects(Sheet).values():
-	    if (self.sheet_filter_lam(s) and isinstance(s,CFSheet)):
+	    if (s.name==self.sheet_name and isinstance(s,CFSheet)):
 		self._sim_ep = s
         (l,b,r,t) = self._sim_ep.bounds.lbrt()
         x = float(r - l) 
@@ -475,6 +477,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
             else:
 		scaling_factor = self.sizeconvertfn(self.height_of_tallest_plot)
 	    plot.bitmap.image = plot.bitmap.zoom(scaling_factor)
+
 
     def _ordering_plots(self):
 	"""

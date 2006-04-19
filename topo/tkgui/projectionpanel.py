@@ -269,7 +269,6 @@ class ProjectionPanel(TemplatePlotGroupPanel):
 	self.plotgroup.density = self.density
 	self.plotgroup.sheet_name=self.region.get()
 	self.plotgroup.weight_name = self.weight_name.get()
-	self.plotgroup.sheet_filter_lam = self.sheet_filter_lam = lambda s: s.name == self.region.get()
 
 
     def generate_plotgroup(self):

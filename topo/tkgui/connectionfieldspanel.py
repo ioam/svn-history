@@ -182,8 +182,6 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
             w.pack(expand = 1, fill = 'both', padx = 4, pady = 4)
 	self.plotgroup.situate=self.situate
 	self.plotgroup.sheet_name = self.region.get()
-	self.plotgroup.sheet_filter_lam = self.sheet_filter_lam = lambda s: s.name == self.region.get()
-        
 
 
     def generate_plotgroup(self):
