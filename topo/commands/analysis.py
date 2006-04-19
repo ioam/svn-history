@@ -118,7 +118,7 @@ def measure_cog():
                 for r in xrange(rows):
                     for c in xrange(cols):
                         cf=proj.cf(r,c)
-                        r1,r2,c1,c2 = cf.slice_tuple()
+                        r1,r2,c1,c2 = cf.slice_array
                         row_centroid,col_centroid = centroid(cf.weights)
                         xcentroid, ycentroid = matrix2sheet(r1+row_centroid+0.5,
                                                             c1+col_centroid+0.5,
