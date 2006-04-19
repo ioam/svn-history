@@ -72,7 +72,7 @@ class PlotGroup(ParameterizedObject):
         else:
             self.sizeconvertfn = identity
 
-	# plot labels
+	# List of plot labels
 	self.labels = []
 
         # In the future, it might be good to be able to specify the
@@ -97,7 +97,8 @@ class PlotGroup(ParameterizedObject):
     def update_environment(self):
 	""" 
 	Only implemented for TemplatePlotGroup. 
-	Execute the command associated with the template.
+	Execute the command associated with the template
+	(e.g. generating the Sheetviews necessary to create the PlotGroup's Plots).
 	"""
 	pass
 
@@ -110,8 +111,6 @@ class PlotGroup(ParameterizedObject):
 	return self.plot_list
 
     
-
-    # Call from load_images() as a dynamic list to regenerate all_plots anytime (allowing refreshing)
     def plots(self,update=True):
         """
         Generate the sorted and scaled list of plots constituting the PlotGroup.
