@@ -237,7 +237,8 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         This function should be redefined in subclasses for interesting
         things such as 2D grids.
         """
-	plots=self.plotgroup.plots(update)
+	self.plotgroup.update_plots(update)
+	plots = self.plotgroup.plots
 	### Momentary: delete when sorting the bitmap history
 	self.bitmaps = [p.bitmap for p in plots]
 	self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image) for p in plots]

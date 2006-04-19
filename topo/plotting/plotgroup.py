@@ -111,33 +111,32 @@ class PlotGroup(ParameterizedObject):
 	return self.plot_list
 
     
-    def plots(self,update=True):
+    def update_plots(self,update=True):
         """
         Generate the sorted and scaled list of plots constituting the PlotGroup.
         """
 	### JCALERT! See if we keep this test
 	if update:
 	    self.update_environment()
-	all_plots = [plot for plot in self._plot_list() if plot != None]
+	self.plots = [plot for plot in self._plot_list() if plot != None]
 	# scaling the Plots
 	### JCALERT: momentary hack
-	if all_plots!=[]:
-	    self.scale_images(all_plots)
+	if self.plots!=[]:
+	    self.scale_images()
 	# sorting the Plots.
-	self._ordering_plots(all_plots)	
-	self.generate_labels(all_plots)
-        return all_plots
+	self._ordering_plots()	
+	self.generate_labels()
 
 
      ### Need to be re-implemented for connectionfieldplotgroup.
-    def generate_labels(self,plots):
+    def generate_labels(self):
 	""" Function used for generating the labels."""
 	self.labels = []
-	for plot in plots:
+	for plot in self.plots:
 	    self.labels.append(plot.plot_src_name + '\n' + plot.name)
 
 
-    def scale_images(self,plots):
+    def scale_images(self):
         """
         It is assumed that the PlotGroup code has not scaled the bitmap to the size currently
         desired by the GUI.
@@ -146,13 +145,13 @@ class PlotGroup(ParameterizedObject):
  	### panel, there is no PlotGroup assigned to it... It will change when all will be inserted 
  	### in the PlotGroup (i.e scale_image, set_initial_master_zoom, compute_max_height...)
  	if self.initial_plot:
- 	    self._set_height_of_tallest_plot(plots)
+ 	    self._set_height_of_tallest_plot()
 
 	### JCALERT: here we should take the plot bounds instead of the sheet one (id in set_height_of..)?
 	max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
  			      -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
- 			     for p in plots if p.resize])
-	for plot in plots:
+ 			     for p in self.plots if p.resize])
+	for plot in self.plots:
             if not plot.resize:
                 scaling_factor = 1
             else:
@@ -164,7 +163,7 @@ class PlotGroup(ParameterizedObject):
 	    plot.bitmap.image = plot.bitmap.zoom(scaling_factor)
 
 
-    def _set_height_of_tallest_plot(self,plots):
+    def _set_height_of_tallest_plot(self):
 	""" 
 	Subfunction that set the initial master zooms for both the sheet
 	coordinates and the matrix coordinates case. 
@@ -172,11 +171,11 @@ class PlotGroup(ParameterizedObject):
 	### JCALERT! Momentary hack
 	max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
  			  -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
- 			  for p in plots if p.resize])
+ 			  for p in self.plots if p.resize])
 	max_density = max([topo.sim.objects(Sheet)[p.plot_src_name].density
-			   for p in plots if p.resize])
+			   for p in self.plots if p.resize])
 	sheet_max_height = max_density*max_sheet_height
-	matrix_max_height = max([p.bitmap.height() for p in plots if p.resize])
+	matrix_max_height = max([p.bitmap.height() for p in self.plots if p.resize])
 	max_height = max(sheet_max_height,matrix_max_height)
 	if (max_height >= self.INITIAL_PLOT_HEIGHT):
 	    self.height_of_tallest_plot = max_height
@@ -188,12 +187,12 @@ class PlotGroup(ParameterizedObject):
 	self.initial_plot=False
 
 
-    def _ordering_plots(self,plot_list):
+    def _ordering_plots(self):
 	"""
 	Function called to sort the Plots in order.
 	They are ordered according to their precedence number first, and then by alphabetical order.
 	"""
-	return plot_list.sort(cmp_plot)
+	self.plots.sort(cmp_plot)
 
 
 
@@ -344,10 +343,10 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
 
 
     ### Need to be re-implemented for connectionfieldplotgroup.
-    def generate_labels(self,plots):
+    def generate_labels(self):
 	""" Function used for generating the labels."""
 	self.labels = []
-	for plot in plots:
+	for plot in self.plots:
 	    self.labels.append(plot.name + '\n(from ' + plot.plot_src_name+')')
 
 class ProjectionPlotGroup(TemplatePlotGroup):
@@ -372,7 +371,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
         super(ProjectionPlotGroup,self).__init__(plot_list,normalize,sheetcoords,integerscaling,
 						 template,sheet_name,**params)
 
-        self.INITIAL_PLOT_HEIGHT = 6
+        self.INITIAL_PLOT_HEIGHT = 5
         self.min_master_zoom=1
 
 
@@ -450,25 +449,39 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 
     ### JCALERT It has to be re-implemented for the projectionpanel,
     ### but this is only a momentary version that requires more work.
-    def _set_height_of_tallest_plot(self,plots):
+    def _set_height_of_tallest_plot(self):
 	""" 
 	Subfunction that set the initial master zooms for both the sheet
 	coordinates and the matrix coordinates case. 
 	"""
-        self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
+	max_height = max([p.bitmap.height() for p in self.plots if p.resize])
+	if (max_height >= self.INITIAL_PLOT_HEIGHT):
+	    self.height_of_tallest_plot = max_height
+	else:	
+	    self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
+        ### JCALERT: That functionnality will have to be added again to the PlotGroupPanel
+# 	if self.height_of_tallest_plot == self.min_master_zoom:
+# 	    self.reduce_button.config(state=DISABLED)
 	self.initial_plot=False
 
 
-    def scale_images(self,plots):
-	pass
+    def scale_images(self):
+	if self.initial_plot:
+ 	    self._set_height_of_tallest_plot()
 
+	for plot in self.plots:
+            if not plot.resize:
+                scaling_factor = 1
+            else:
+		scaling_factor = self.sizeconvertfn(self.height_of_tallest_plot)
+	    plot.bitmap.image = plot.bitmap.zoom(scaling_factor)
 
-    def _ordering_plots(self,plot_list):
+    def _ordering_plots(self):
 	"""
 	Function called to sort the Plots in order.
 	It is re-implmented for ProjectionPlotGroup, because we do not want to order the Connection Field
         views composing the projection plot in any order (i.e. we want to preserve the same order).
 	"""
-	return plot_list
+	pass
     
 
