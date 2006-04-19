@@ -359,124 +359,7 @@ class PatternSampler(ParameterizedObject):
             raise ValueError("Unknown scaling option",scaling)
 
 
-
-## from topo.base.parameterclasses import Wrapper
-## class CompositePatternGenerator(PatternGenerator):
-##     """
-##     PatternGenerator that accepts a list of other PatternGenerators.
-##     To create a new pattern, asks each of the PatternGenerators in the
-##     list to create a pattern, then it combines the patterns to create a 
-##     single pattern that it returns.
-##     """
-
-##     # CEBHACKALERT: size_normalization and whole_image_output_fn are
-##     # hidden temporarily.
-
-##     output_fn = OutputFnParameter(default=IdentityOF())
-
-##     operator = Parameter(
-##         default=Wrapper("Numeric.add"),
-##         doc="Numeric function used to combine the individual patterns.",
-##         precedence=0.98)
-    
-##     generators = Parameter(
-##         default=[],
-##         doc="List of patterns to use in the composite pattern.",
-##         precedence=0.97)
-
-##     aspect_ratio   = Number(
-##         default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-##         precedence=0.31,
-##         doc="Ratio of width to height of the composite pattern.")
-    
-##     size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-##                    precedence=0.30,
-##                    doc="Height of the composite pattern.")
-
-##     size_normalization = Enumeration(
-##         hidden='True',
-##         default='original',
-##         available=['fit_shortest','fit_longest','stretch_to_fit','original'],
-##         precedence=0.95,
-##         doc='How to scale the initial image size relative to the default area of 1.0.')
-
-##     whole_image_output_fn = OutputFnParameter(
-##         hidden='True',
-##         default=IdentityOF(),
-##         precedence=0.96,
-##         doc='Function applied to the whole composite array (before any cropping).')
-
-
-##     def __init__(self,generators=[Disk(x=-0.3),Disk(x=0.3)],**params):
-##         super(CompositePatternGenerator,self).__init__(**params)
-##         self.generators = generators
-##         self.image_array = None
-
-
-##     def function(self,**params):
-##         size_normalization = params.get('scaling',self.size_normalization)
-##         whole_image_output_fn = params.get('whole_image_output_fn',
-##                                            self.whole_image_output_fn)
-##         bounds = params.get('bounds',self.bounds)
-##         density=params.get('density',self.density)
-##         height = params.get('size',self.size)
-##         width = (params.get('aspect_ratio',self.aspect_ratio))*height
-
-
-##         assert hasattr(self.operator,'reduce'),repr(self.operator)+" does not support 'reduce'."
-
-
-##         # CEBHACKALERT: could skip re-generation if nothing has
-##         # changed.  But that involves checking the component
-##         # PatternGenerators haven't also changed (e.g. had a parameter
-##         # altered), which I'm not sure how to do in a reasonable
-##         # way. Alternatively, we could just say that if the list
-##         # doesn't change, we don't change the Composite - even though
-##         # a component PatternGenerator might have changed.
-
-
-##         patterns = []
-        
-##         for pg in self.generators:
-##             assert isinstance(pg,PatternGenerator),repr(pg)+" is not a PatternGenerator."
-##             patterns.append(pg(bounds=bounds,density=density))
-        
-##         image_array = self.operator.reduce(patterns)
-
-##         ps = PatternSampler(image_array,whole_image_output_fn)
-
-
-##         return ps(self.pattern_x,self.pattern_y,
-##                   float(density),
-##                   size_normalization,
-##                   float(width),float(height))
-
-
-
-
-# CEBHACKALERT: this will be re-done; it is basically just the old
-# Image class.
-
-from topo.base.sheet import bounds2slice,sheet2matrix
-from Numeric import floor,zeros,Float,where
-def sheet2matrixidx_array(x,y,bounds,density):
-    """
-    Convert a point (x,y) in sheet coordinates to the integer row and
-    column index of the matrix cell in which that point falls, given a
-    bounds and density.  Returns (row,column).
-
-    Note that if coordinates along the right or bottom boundary are
-    passed into this function, the returned matrix coordinate of the
-    boundary will be just outside the matrix, because the right and
-    bottom boundaries are exclusive.
-    """
-    r,c = sheet2matrix(x,y,bounds,density)
-    r = floor(r)
-    c = floor(c)
-    return r, c
-
-
-
+# CEBHACKALERT: this new version is untested (as was the old one...)
 from topo.base.parameterclasses import Wrapper
 class CompositePatternGenerator(PatternGenerator):
     """
@@ -485,105 +368,88 @@ class CompositePatternGenerator(PatternGenerator):
     list to create a pattern, then it combines the patterns to create a 
     single pattern that it returns.
     """
-    operator = Parameter(default=Wrapper("Numeric.add"),doc="Numeric function used to combine the individual patterns.")
-    generators = Parameter(default=[],doc="List of patterns to use in the composite pattern.")
 
-    aspect_ratio   = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-                            precedence=0.31,
-                            doc="Ratio of width to height of the composite pattern.")
+    # CEBHACKALERT: size_normalization and whole_image_output_fn are
+    # hidden temporarily.
+
+    output_fn = OutputFnParameter(default=IdentityOF())
+
+    operator = Parameter(
+        default=Wrapper("Numeric.add"),
+        doc="Numeric function used to combine the individual patterns.",
+        precedence=0.98)
+    
+    generators = Parameter(
+        default=[],
+        doc="List of patterns to use in the composite pattern.",
+        precedence=0.97)
+
+    aspect_ratio   = Number(
+        default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+        precedence=0.31,
+        doc="Ratio of width to height of the composite pattern.")
+    
     size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
                    precedence=0.30,
                    doc="Height of the composite pattern.")
+
+    size_normalization = Enumeration(
+        hidden='True',
+        default='original',
+        available=['fit_shortest','fit_longest','stretch_to_fit','original'],
+        precedence=0.95,
+        doc='How to scale the initial image size relative to the default area of 1.0.')
+
+    whole_image_output_fn = OutputFnParameter(
+        hidden='True',
+        default=IdentityOF(),
+        precedence=0.96,
+        doc='Function applied to the whole composite array (before any cropping).')
 
 
     def __init__(self,generators=[Disk(x=-0.3),Disk(x=0.3)],**params):
         super(CompositePatternGenerator,self).__init__(**params)
         self.generators = generators
-
-
-    def __sheet_to_image(self,x,y,bounds,density,width,height):
-        """
-        Transform the given topographica abscissae/ordinates (x) to fit
-        an image with num_pixels along that aspect.
-
-        - translate center (Image has (0,0) as top-left corner, whereas Sheet has
-        (0,0) in the center).
-
-        An Image consists of discrete pixels, whereas the x values are floating-
-        point numbers. The simplistic technique in this function uses floor() to
-        map a range to a single number.
-
-        Maybe it would be better to put image into Sheet and use BoundingBocol functions, etc.
-        """
-        
-        n_image_rows,n_image_cols=x.shape
-
-        # CEBHACKALERT: just made it work - this needs to be changed now
-        # that sheet and patterngenerator are different.
-        #n_sheet_rows,n_sheet_cols = bounds2shape(bounds,xdensity,ydensity)
-        r1,r2,c1,c2 = bounds2slice(bounds,bounds,density)
-        n_sheet_rows,n_sheet_cols = r2-r1,c2-c1
-        
-        x = x/width
-        y = y/height
-
-        row, col = sheet2matrixidx_array(x,y,bounds,density)
-
-        # CEBALERT:
-        # Instead of doing this kind of thing, could make TopoImage a
-        # Sheet and then do this with BoundingBoxes.
-        col = col - n_sheet_cols/2.0 + n_image_cols/2.0
-        row = row - n_sheet_rows/2.0 + n_image_rows/2.0
-
-        # document what this is...
-        col = where(col>=n_image_cols, -col, col)
-        row = where(row>=n_image_rows, -row, row)
-
-        # ...and don't do this
-        return col.astype(int), row.astype(int)
+        self.image_array = None
 
 
     def function(self,**params):
-
-        assert hasattr(self.operator,'reduce'),repr(self.operator)+" does not support 'reduce'."
-        
+        size_normalization = params.get('scaling',self.size_normalization)
+        whole_image_output_fn = params.get('whole_image_output_fn',
+                                           self.whole_image_output_fn)
         bounds = params.get('bounds',self.bounds)
         density=params.get('density',self.density)
         height = params.get('size',self.size)
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
 
+
+        assert hasattr(self.operator,'reduce'),repr(self.operator)+" does not support 'reduce'."
+
+
+        # CEBHACKALERT: could skip re-generation if nothing has
+        # changed.  But that involves checking the component
+        # PatternGenerators haven't also changed (e.g. had a parameter
+        # altered), which I'm not sure how to do in a reasonable
+        # way. Alternatively, we could just say that if the list
+        # doesn't change, we don't change the Composite - even though
+        # a component PatternGenerator might have changed.
+
+
         patterns = []
+        
         for pg in self.generators:
             assert isinstance(pg,PatternGenerator),repr(pg)+" is not a PatternGenerator."
             patterns.append(pg(bounds=bounds,density=density))
         
-        self.image_array = self.operator.reduce(patterns)
+        image_array = self.operator.reduce(patterns)
 
-        return self.resamp(self.pattern_x,self.pattern_y,bounds,density,width,height)
+        ps = PatternSampler(image_array,whole_image_output_fn)
 
 
-    def resamp(self, x, y,bounds,density,width=1.0, height=1.0):
-        """
-        Return pixels from the image (size-normalized according to
-        scaling) at the given Sheet (x,y) coordinates, with
-        width/height multiplied as specified by the given width and
-        height factors.
-        """
- 
-        x_scaled, y_scaled = self.__sheet_to_image(x, y, bounds, density, width, height)
-
-        image_sample = zeros(x_scaled.shape, Float) #*self.background_value
-
-        # CEBALERT: Sample image at the scaled (x,y)
-        # coordinates. You'd think there'd be a Numeric way to do
-        # this.
-        for i in xrange(len(image_sample)):
-            for j in xrange(len(image_sample[i,:])):
-                    if x_scaled[i,j] >= 0 and y_scaled[i,j] >= 0:
-                        image_sample[i,j] = self.image_array[ y_scaled[i,j],x_scaled[i,j] ]
-
-        return image_sample
-
+        return ps(self.pattern_x,self.pattern_y,
+                  float(density),
+                  size_normalization,
+                  float(width),float(height))
 
 
 
