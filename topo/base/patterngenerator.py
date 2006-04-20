@@ -88,6 +88,15 @@ class PatternGenerator(ParameterizedObject):
         precedence=0.08,
         doc='Function applied to the pattern array after it has been created.')
 
+    def _check_params(self,params):
+        """
+        Print a warning if params contains something that is
+        not a Parameter of this object.
+        """
+        for item in params:
+            if item not in self.params():
+                self.warning("'%s' was ignored (not a Parameter)."%item)
+        
 
     def __call__(self,**params):
         """
@@ -97,10 +106,7 @@ class PatternGenerator(ParameterizedObject):
         currently set on the object. Otherwise, any params specified override
         those currently set on the object.
         """
-        # CEBHACKALERT: put in a method and add to the other __call__ methods.
-        for item in params:
-            if item not in self.params():
-                self.warning("'%s' was ignored (not a Parameter)."%item)
+        self._check_params(params)
                 
         self.verbose("params = ",params)
         self.__setup_xy(params.get('bounds',self.bounds),
@@ -178,6 +184,8 @@ class Constant(PatternGenerator):
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)
     def __call__(self,**params):
+        self._check_params(params)
+
         bounds = params.get('bounds',self.bounds)
         xdensity = params.get('xdensity',self.xdensity)
         ydensity = params.get('ydensity',self.ydensity)
