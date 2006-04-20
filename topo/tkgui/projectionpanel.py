@@ -8,7 +8,7 @@ __version__='$Revision$'
 
 import __main__
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
-     Entry, Canvas, FLAT, Checkbutton
+     Entry, Canvas, FLAT, Checkbutton, NORMAL, DISABLED
 import Pmw
 import ImageTk
 from math import ceil
@@ -135,7 +135,8 @@ class ProjectionPanel(TemplatePlotGroupPanel):
             self.plotgroup.situate = self.situate
         self.plotgroup.initial_plot = True
         self.plotgroup.height_of_tallest_plot = self.min_master_zoom = 1
-        self.refresh()
+	self.plotgroup.update_plots(False)
+	self.display_plots()
 
         
     ### JABHACKALERT!
@@ -251,8 +252,8 @@ class ProjectionPanel(TemplatePlotGroupPanel):
 
 
     def refresh_title(self):
-        self.parent.title(topo.sim.name+': '+"Projection %s %s time:%s" % (self.region.get(),
-            self.weight_name.get(),self.plot_time))
+        self.parent.title(topo.sim.name+': '+"Projection %s %s time:%s" % (self.plotgroup.sheet_name,
+            self.plotgroup.weight_name,self.plotgroup.time))
         
 
     def update_plotgroup_variables(self):
@@ -335,11 +336,33 @@ class ProjectionPanel(TemplatePlotGroupPanel):
             src_name = self.projections[self.weight_name.get()].src.name
 
             new_title = 'Projection ' + self.plotgroup.weight_name + ' from ' + src_name + ' to ' \
-                        + self.plotgroup.sheet_name + ' at time ' + str(self.plotgroup.plot_time)
+                        + self.plotgroup.sheet_name + ' at time ' + str(self.plotgroup.time)
             self.plot_group_title.configure(tag_text = new_title)
         else:
             self.plot_group_title.configure(tag_text = 'No Projections')
         
 
+    def restore_panel_environment(self):
+	super(ProjectionPanel,self).restore_panel_environment()
+	if self.plotgroup.situate != self.situate:
+	    self.situate_checkbutton.config(state=NORMAL)
+	    self.situate_checkbutton.invoke()
+	    self.situate_checkbutton.config(state=DISABLED)
+
+    def update_back_fwd_button(self):
+	super(ProjectionPanel,self).update_back_fwd_button()
+	if (self.history_index > 0):
+            self.situate_checkbutton.config(state=DISABLED)
+	    ### JCALERT: Should find a way to disable the region menu
+	    ### (What I tried below does not work)
+	    ### Also, disabled the text for the xy_boxes (i.e., X,Y)
+	    ## Also, when changing the menu while looking in history,
+            ### it will replaced the old current one by the new one instead of adding
+	    ### the new at the following.
+	    #self.opt_menu.config(state=DISABLED)
+
+        if self.history_index >= len(self.plotgroups_history)-1:
+	    self.situate_checkbutton.config(state=NORMAL)
+	    #self.opt_menu.config(state=NORMAL)
 
 

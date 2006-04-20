@@ -57,6 +57,8 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
 
         self.auto_refresh_checkbutton.invoke()
 
+	self.refresh()
+
 
     def _add_region_menu(self):
         """
@@ -65,7 +67,6 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         _region_refresh() is called.  It can either call the refresh()
         funcion, or update another menu, and so on.
         """
-
         # Create the item list for CFSheet 'Sheet'  This will not change
         # since this window will only examine one Simulator.
         sim = topoconsole.active_sim()
@@ -103,7 +104,8 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
             self.plotgroup.situate = self.situate
         self.initial_plot = True
         self.height_of_tallest_plot = self.min_master_zoom = 1
-        self.refresh()
+        self.plotgroup.update_plots(False)
+	self.display_plots()
 
 
     def _add_xy_boxes(self):
@@ -217,6 +219,12 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
             self.situate_checkbutton.config(state=DISABLED)
 	    self.xe.config(state=DISABLED)
 	    self.ye.config(state=DISABLED)
+	    ### JCALERT: Should find a way to disable the region menu
+	    ### (What I tried below does not work)
+	    ### Also, disabled the text for the xy_boxes (i.e., X,Y)
+	    ## Also, when changing the menu while looking in history,
+            ### it will replaced the old current one by the new one instead of adding
+	    ### the new at the following.
 	    #self.opt_menu.config(state=DISABLED)
 
         if self.history_index >= len(self.plotgroups_history)-1:
