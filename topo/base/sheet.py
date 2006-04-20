@@ -112,9 +112,9 @@ class CoordinateTransformer(object):
     """
     ### xdensity and ydensity are properties so that xstep is kept in
     ### sync with xdensity, and similarly for ystep and ydensity. We
-    ### use xstep so that the repeatedly performed calculations in
-    ### matrix2sheet() use multiplications rather than divisions, for
-    ### speed.    
+    ### use xstep and ystep so that the repeatedly performed
+    ### calculations in matrix2sheet() use multiplications rather than
+    ### divisions, for speed.
     def set_xdensity(self,density):
         self.__xdensity=density
         self.__xstep = 1.0/density
@@ -146,15 +146,20 @@ class CoordinateTransformer(object):
     shape = property(get_shape)
 
 
-    def __init__(self,bounds,xdensity,ydensity):
+    def __init__(self,bounds,xdensity,ydensity=None):
         """
         Store the bounds (as l,b,r,t in an array), xdensity,
         and ydensity.
+
+        If ydensity is not specified, it is assumed to be
+        equal to xdensity.
         """
-        # CEBALERT: could accept single number for density too,
-        # and then assume xdensity==ydensity
         self.lbrt = array(bounds.lbrt())
-        self.xdensity,self.ydensity = xdensity,ydensity
+
+        if ydensity==None:
+            self.xdensity,self.ydensity = xdensity,xdensity
+        else:
+            self.xdensity,self.ydensity = xdensity,ydensity
 
         # CEBHACKALERT: temporary
         self.bounds2=bounds
