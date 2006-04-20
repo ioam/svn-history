@@ -315,7 +315,8 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 
     def toggle_integerscaling(self):
         """Function called by Widget when check-box clicked"""
-        self.integerscaling = not self.integerscaling        
+        self.integerscaling = not self.integerscaling 
+	self.plotgroup.integerscaling = self.integerscaling
         if self.integerscaling:
             self.plotgroup.sizeconvertfn = int
         else:
