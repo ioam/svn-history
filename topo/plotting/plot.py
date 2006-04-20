@@ -11,7 +11,7 @@ from Numeric import zeros, ones, Float, divide,ravel,clip,array
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Dynamic
 from topo.base.sheetview import SheetView
-from topo.base.sheet import submatrix, bounds2slice
+from topo.base.sheet import Slice,CoordinateTransformer
 
 from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap, Bitmap
 import palette
@@ -205,15 +205,21 @@ class TemplatePlot(Plot):
         # in both directions is the same (see Sheet.__init__()). I don't know where
         # you want to do that; presumably the code should be common to Sheet and
         # where it's used in the plotting?
-
+        #
+        # It's possible we can move some of the functionality
+        # into CoordinateTransformer.
         if plot_bounding_box.containsbb_exclusive(box):
-             r1,r2,c1,c2 = bounds2slice(plot_bounding_box,plot_bounding_box,density)
-             shape = (r2-r1,c2-c1)
-             new_mat = zeros(shape,Float)
-             r1,r2,c1,c2 = bounds2slice(box,plot_bounding_box,density)
+
+             ct = CoordinateTransformer(plot_bounding_box,density,density)
+             new_mat = zeros(ct.shape,Float)
+
+             ct2 = CoordinateTransformer(plot_bounding_box,density,density)
+             r1,r2,c1,c2 = Slice(box,ct2)
              new_mat[r1:r2,c1:c2] = mat
         else:
-             new_mat = submatrix(plot_bounding_box,mat,box,density)
+             s=Slice(plot_bounding_box,CoordinateTransformer(box,density,density))
+             s.crop_to_sheet()
+             new_mat = s.submatrix(mat)
 
         return new_mat
   
