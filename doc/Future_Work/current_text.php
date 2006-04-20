@@ -12,6 +12,10 @@ was first added to the list, or a change was made.)
 
 <ul>
 
+<li> 
+2006/04/20 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler; investigate failing test in testimage.py (that uses sheet functions).
+</li>
+
 <li>
 2006/04/07: (CB) Allowing joint normalization of projections for a CFSheet. [This appears to work, but results from LISSOM simulations do not yet match those of C++ LISSOM.].
 </li>
@@ -28,16 +32,12 @@ was first added to the list, or a change was made.)
 2006/03/17 (CB): Fix problem (matching previous work) with som_retinotopy.
 </li>
 
-<li> 
-2006/04/12 (CB): Remove xdensity and ydensity now density in each dimension is equal for a sheet; slice class; investigate failing test in testimage.py (that uses sheet functions).
-</li>
-
 <li>
 2006/04/07 (CB): HACKALERTs relating to connection fields; matching with C++ LISSOM when there are circular connection fields; test file for connectionfield.
 </li>
 
 <li>
-2006/04/12 (CB): Uncomment new Composite class and remove the old one; write test file for Composite and complete Image's test file.
+2006/04/20 (CB): write test file for Composite and complete Image's test file.
 </li>
 
 <li>
