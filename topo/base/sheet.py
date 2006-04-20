@@ -103,7 +103,17 @@ from boundingregion import BoundingBox, BoundingRegionParameter
 import sheetview 
 
 
-
+# CEBHACKALERT: The user-specified input to a CT is 'bounds' and
+# 'density'. For a Sheet, this means the parameters are 'bounds' and
+# 'density'.  The true bounds are stored as 'true_bounds', and the
+# true densities as 'xdensity', and 'ydensity'. That's probably not so
+# good.  The main reason I haven't considered changing the parameters
+# to 'user_bounds' and 'user_density' (so that the true bounds can be
+# stored in 'bounds' is the search-and-replace effort that would be
+# required.
+# (This is a similar issue to the one in CFProjection - seems like
+# weights_bounds should be user_weights_bounds, or something like
+# that.)
 
 class CoordinateTransformer(object):
     """
@@ -140,29 +150,59 @@ class CoordinateTransformer(object):
 
     ### CEBHACKALERT: temporary implementation
     def get_shape(self):
-        r1,r2,c1,c2 = self.bounds2slice(self.bounds2)
+        r1,r2,c1,c2 = self.bounds2slice(self.true_bounds)
         return (r2-r1,c2-c1)
 
     ### shape is a property so that's it's like Numeric.array.shape
     shape = property(get_shape)
 
 
-    def __init__(self,bounds,xdensity,ydensity=None):
+    def __init__(self,bounds,xdensity,ydensity=None,equalize_densities=False):
         """
-        Store the bounds (as l,b,r,t in an array), xdensity,
-        and ydensity.
+        Store the bounds (as l,b,r,t in an array), xdensity, and
+        ydensity.
+    
+        If ydensity is not specified, it is assumed to be equal to
+        xdensity.
 
-        If ydensity is not specified, it is assumed to be
-        equal to xdensity.
+        If equalize_densities is True, then only one density can be
+        supplied, and this is not assumed to match the bounds (i.e. it
+        is nominal): it may be adjusted.
         """
+        if equalize_densities:
+            if ydensity!=None: raise TypeError(
+                "Can't specify xdensity and ydensity and request equal " \
+               +"densities in each dimension.")
+            bounds,xdensity = self.__equalize_densities(bounds,xdensity)
+
+        self.true_bounds = bounds
+        self.xdensity, self.ydensity = xdensity, ydensity or xdensity
         self.lbrt = array(bounds.lbrt())
 
-        if ydensity==None: ydensity=xdensity
 
-        self.xdensity,self.ydensity = xdensity,ydensity
+    def __equalize_densities(self,nominal_bounds,nominal_density):
+        """
+        Calculate the true density along x, and adjust the top and
+        bottom bounds so that the density along y will be equal.
 
-        # CEBHACKALERT: temporary
-        self.bounds2=bounds
+        Returns (adjusted_bounds,true_density)
+        """
+        left,bottom,right,top = nominal_bounds.lbrt()
+        width = right-left; height = top-bottom
+        center_y = bottom + height/2.0
+        # The true density is not equal to the nominal_density
+        # when nominal_density*(right-left) is not an integer.
+        true_density = int(nominal_density*(width))/float((width))
+
+        n_cells = round(height*true_density,0)
+        adjusted_half_height = n_cells/true_density/2.0
+        # (The above might be clearer as (step*n_units)/2.0, where
+        # step=1.0/density.)
+        
+        return (BoundingBox(points=((left,  center_y-adjusted_half_height),
+                                    (right, center_y+adjusted_half_height))),
+                true_density)
+    
 
     def sheet2matrix(self,x,y):
         """
@@ -310,14 +350,8 @@ class CoordinateTransformer(object):
         return BoundingBox(points=((left,bottom),
                                    (right,top)))
 
-    
-    
 
-# CEBHACKALERT:
-# - have user_bounds, user_density as the parameters?
-#   (This is a similar issue to the one in CFProjection - seems like
-#   weights_bounds should be user_weights_bounds, or something like
-#   that.)
+    
 class Sheet(EventProcessor,CoordinateTransformer):
     """
     The generic base class for neural sheets.
@@ -351,7 +385,7 @@ class Sheet(EventProcessor,CoordinateTransformer):
             such that the center y point remains the same, and each
             bound is as close as possible to its specified value. The
             actual value of this Parameter is not adjusted, but the
-            true bounds may be found from the 'lbrt' array attribute
+            true bounds may be found from the 'true_bounds' attribute
             of this object.
             """)
     
@@ -384,61 +418,44 @@ class Sheet(EventProcessor,CoordinateTransformer):
         doc='Allows a sorting order for Sheets, e.g. in the GUI.')
 
 
-    def __init__(self,**params):
+    def __init__(self,equalize_densities=True,**params):
         """
         Initialize this object as an EventProcessor, then also as
         a CoordinateTransformer with equal xdensity and ydensity.
-        """
+
+        If equalize_densities is False, xdensity and ydensity are
+        not guaranteed to be the same, which would likely violate
+        assumptions made about sheets in other places.        """
 
         EventProcessor.__init__(self,**params)
 
-        # CEBHACKALERT: will become a method of CoordinateTransformer
-        # Calculate the true density along x.
-        # (From the left and right bounds and the nominal density.
-        # The top and bottom bounds are then adjusted so that the
-        # density along y is the same.)
-        
-        # The true density is not equal to the 'density' parameter
-        # when density*(right-left) is not an integer.)
+        # Now initialize this object as a CoordinateTransformer, with
+        # the same density along y as along x (unless equalize_densities
+        # is False).
+        CoordinateTransformer.__init__(self,self.bounds,self.density,
+                                       equalize_densities=equalize_densities)
 
-        left,bottom,right,top = self.bounds.lbrt()
-        width = right-left; height = top-bottom
-        center_y = bottom + height/2.0
-        density = int(self.density*(width))/float((width))
-
-        n_units = round(height*self.density,0)
-
+        n_units = round((self.lbrt[2]-self.lbrt[0])*self.xdensity,0)
         if n_units<1: raise ValueError(
            "Sheet bounds and density must be specified such that the "+ \
            "sheet has at least one unit in each direction; " \
            +self.name+ " does not.")
 
-        adjusted_half_height = n_units/density/2.0
-        # (The above might be clearer as (step*n_units)/2.0, where
-        # step=1.0/density. If not, don't use xstep,ystep in
-        # CoordinateTransformer and just divide by xdensity,ydensity instead.)
-        
-        bounds=BoundingBox(points=((left, center_y-adjusted_half_height),
-                                   (right, center_y + adjusted_half_height)))
-
-        # Now initialize this object as a CoordinateTransformer, with
-        # the same density along y as along x.
-        CoordinateTransformer.__init__(self,bounds,density)
-
         # setup the activity matrix
         self.activity = zeros(self.shape,Float)
 
-        self.__saved_activity = []          # For non-learning inputs
-
+        # For non-learning inputs
+        self.__saved_activity = []          
 
         ### JABALERT: Should perhaps rename this to view_dict
         self.sheet_view_dict = {}
 
 
     ### JABALERT: This should be deleted now that sheet_view_dict is public
-    ### JC: shouldn't we keep that, or at list write a function in utils that delete
-    ### a value in a dictinnary without returning an error if the key is not in the dict?
-    ### I leave for the moment, and have to ask Jim advise.
+    ### JC: shouldn't we keep that, or at least write a function in
+    ### utils that deletes a value in a dictinnary without returning an
+    ### error if the key is not in the dict?  I leave for the moment,
+    ### and have to ask Jim to advise.
     def release_sheet_view(self,view_name):
         """
         Delete the dictionary entry with key entry 'view_name' to save
@@ -587,7 +604,7 @@ class Slice(object):
         """
         Crop the slice to the CoordinateTransformer's bounds.
         """
-        r1,r2,c1,c2 = self.__ct.bounds2slice(self.__ct.bounds2)
+        r1,r2,c1,c2 = self.__ct.bounds2slice(self.__ct.true_bounds)
         maxrow,maxcol = r2-r1,c2-c1
                         
         t_idx,b_idx,l_idx,r_idx = self.__slice
