@@ -282,13 +282,12 @@ class ProjectionPanel(TemplatePlotGroupPanel):
   	return plotgroup
 
 
-    def display_plots(self,update=True):
+    def display_plots(self):
         """
         This must be changed from PlotGroupPanels version since
         ProjectionPanel requires a 2D grid of plots.
         """
         if self.plotgroup:
-	    self.plotgroup.update_plots()
 	    plots=self.plotgroup.plots
 	    ### Momentary: delete when sorting the bitmap history
 	    self.bitmaps = [p.bitmap for p in plots]
@@ -335,8 +334,8 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         if len(self.projections) > 0:
             src_name = self.projections[self.weight_name.get()].src.name
 
-            new_title = 'Projection ' + self.weight_name.get() + ' from ' + src_name + ' to ' \
-                        + self.region.get() + ' at time ' + str(self.plot_time)
+            new_title = 'Projection ' + self.plotgroup.weight_name.get() + ' from ' + src_name + ' to ' \
+                        + self.plotgroup.sheet_name + ' at time ' + str(self.plotgroup.plot_time)
             self.plot_group_title.configure(tag_text = new_title)
         else:
             self.plot_group_title.configure(tag_text = 'No Projections')

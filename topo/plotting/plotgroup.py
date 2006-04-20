@@ -92,6 +92,9 @@ class PlotGroup(ParameterizedObject):
 	### JCALERT:later rename this attribute
 	self.min_master_zoom=3.0
 
+	# Time attribute.
+	self.time = topo.sim.time()
+
 
     ### JCALERT: ASK JIM if we should rename that.
     def update_environment(self):
@@ -126,6 +129,7 @@ class PlotGroup(ParameterizedObject):
 	# sorting the Plots.
 	self._ordering_plots()	
 	self.generate_labels()
+	self.time=topo.sim.time()
 
 
      ### Need to be re-implemented for connectionfieldplotgroup.
@@ -428,9 +432,8 @@ class ProjectionPlotGroup(TemplatePlotGroup):
         from top-to-bottom.
         """
         def rev(x): y = x; y.reverse(); return y
-        ### JCALERT! It is a bit confusing, but in the case of the projection
-        ### sheet_filter_lam filter to one single sheet...
-	### this has to be made simpler...
+        ### JCALERT! Here, we assume that for a ProjectionPlotGroup,
+	### sheet_name is not None.
 	for s in topo.sim.objects(Sheet).values():
 	    if (s.name==self.sheet_name and isinstance(s,CFSheet)):
 		self._sim_ep = s

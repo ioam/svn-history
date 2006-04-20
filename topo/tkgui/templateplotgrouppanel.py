@@ -89,6 +89,7 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
 	return plotgroup
 
     def update_plotgroup_variables(self):
+	
         self.plotgroup.cmdname = self.cmdname.get()
  
     def display_labels(self):
@@ -97,9 +98,9 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         then call PlotGroupPanel's display_labels().
         """
         self.plot_group_title.configure(tag_text = self.mapname.get() + \
-                                  ' at time ' + str(self.plot_time))
+                                  ' at time ' + str(self.plotgroup.time))
         super(TemplatePlotGroupPanel,self).display_labels()
 
 
     def refresh_title(self):
-        self.parent.title(topo.sim.name+': '+self.mapname.get() + " time:%s" % self.plot_time)
+        self.parent.title(topo.sim.name+': '+self.mapname.get() + " time:%s" % self.plotgroup.time)

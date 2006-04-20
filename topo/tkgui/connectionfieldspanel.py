@@ -203,9 +203,9 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         Change the title of the grid group, then call PlotGroupPanel's
         display_labels().
         """
-        new_title = 'Connection Fields of ' + self.region.get() + \
-                    ' unit (' + str(self.x) + ',' + str(self.y) + ') at time '\
-                    + str(self.plot_time)
+        new_title = 'Connection Fields of ' + self.plotgroup.sheet_name + \
+                    ' unit (' + str(self.plotgroup.x) + ',' + str(self.plotgroup.y) + ') at time '\
+                    + str(self.plotgroup.time)
         self.plot_group_title.configure(tag_text = new_title)
         super(ConnectionFieldsPanel,self).display_labels()
 
@@ -213,5 +213,5 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         
     def refresh_title(self):
         self.parent.title(topo.sim.name+': '+self.pgt.name + " %s (%0.3f,%0.3f) time:%s" %
-                          (self.region.get(),self.displayed_x,self.displayed_y,self.plot_time))
+                          (self.region.get(),self.displayed_x,self.displayed_y,self.plotgroup.time))
 
