@@ -147,26 +147,27 @@ class PatternGenerator(ParameterizedObject):
         Generate vectors representing coordinates at which the pattern
         will be sampled.
 
-        Returns x and y; x is a 1d-array of x-axis values at which to
-        sample the pattern; y contains the y-axis values.
+        Returns two vectors x and y, where x is a 1d-array of x-axis
+        values at which to sample the pattern and y contains the y-axis
+        values.
         """
-
         # CEBHACKALERT: this will become a method of the Slice object.
         pattern_sheet = CoordinateTransformer(bounds,xdensity,ydensity)
-        
-        pattern_slice = Slice(bounds,pattern_sheet)
-        n_rows,n_cols = pattern_slice.shape
-        
-        y = array([pattern_sheet.matrixidx2sheet(r,0) for r in range(n_rows)])
-        x = array([pattern_sheet.matrixidx2sheet(0,c) for c in range(n_cols)])
+        n_rows,n_cols = pattern_sheet.shape
 
-        # x increases from left to right; y decreases from left to right.
+        rows = array(range(n_rows)); cols = array(range(n_cols))
+
+
+        # returns x,y; x increases from left to right; y decreases
+        # from left to right (because the row index increases as y
+        # decreases).
+        #
         # For this function to make sense on its own, y should probably be
         # reversed, but y would then have to be reversed again in
         # __create_and_rotate_coordinates().
-        return x[:,0], y[:,1] 
+        return pattern_sheet.matrixidx2sheet_array(rows,cols)
 
-
+        
     def __create_and_rotate_coordinates(self, x, y, orientation):
         """
         Create pattern matrices from x and y vectors, and rotate
