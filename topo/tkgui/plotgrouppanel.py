@@ -315,7 +315,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
             self.plotgroup.sizeconvertfn = int
         else:
             self.plotgroup.sizeconvertfn = identity
-	self.plotgroup.scale_images()
+	self.plotgroup.update_plots(False)
         self.display_plots()
 
 
@@ -369,16 +369,16 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 
         if self.plotgroup.height_of_tallest_plot <= self.plotgroup.min_master_zoom:
             self.reduce_button.config(state=DISABLED)
-	self.plotgroup.scale_images()
-        self.display_plots(False)
+	self.plotgroup.update_plots(False)
+        self.display_plots()
 
     
     def enlarge(self):
         """Function called by Widget to increase the zoom factor"""
         self.reduce_button.config(state=NORMAL)
         self.plotgroup.height_of_tallest_plot = self.plotgroup.height_of_tallest_plot*self.zoom_factor
-	self.plotgroup.scale_images()
-        self.display_plots(False)
+	self.plotgroup.update_plots(False)
+        self.display_plots()
 
     # JLALERT: It would be nice to be able to scroll back through many
     # iterations.  Could put in a box for entering either the iteration
@@ -390,7 +390,8 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         self.plotgroup = self.plotgroups_history[self.history_index]
 	self.display_plots()
         self.display_labels()
-        self.refresh_title()   
+        self.refresh_title() 
+	self.restaure_panel_environment()
 
 
     def forward(self):
@@ -404,8 +405,16 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 	self.display_plots()
         self.display_labels()
         self.refresh_title()
-
-        
+	self.restaure_panel_environment()
+	
+    def restaure_panel_environment(self):
+	if self.plotgroup.normalize != self.normalize:
+	    self.normalize_checkbutton.invoke()
+	if self.plotgroup.sheetcoords != self.sheetcoords:
+	    self.sheetcoords_checkbutton.invoke()
+	if self.plotgroup.integerscaling != self.integerscaling:
+	    self.integerscaling_checkbutton.invoke()
+	
 
     def toggle_auto_refresh(self):
         """Function called by Widget when check-box clicked"""
@@ -429,7 +438,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         """Function called by Widget when check-box clicked"""
         self.sheetcoords = not self.sheetcoords
 	self.plotgroup.sheetcoords = self.sheetcoords
-	self.plotgroup.scale_images()
+	self.plotgroup.update_plots(False)
 	self.display_plots()
 
 

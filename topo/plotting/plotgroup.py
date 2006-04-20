@@ -66,7 +66,7 @@ class PlotGroup(ParameterizedObject):
 	self.plot_list = plot_list	
 	self.normalize = normalize
 	self.sheetcoords = sheetcoords
-
+        self.integerscaling = integerscaling
 	if integerscaling:
             self.sizeconvertfn = int
         else:
@@ -121,6 +121,7 @@ class PlotGroup(ParameterizedObject):
 	### JCALERT! See if we keep this test
 	if update:
 	    self.update_environment()
+	    self.time = topo.sim.time()
 	self.plots = [plot for plot in self._plot_list() if plot != None]
 	# scaling the Plots
 	### JCALERT: momentary hack
@@ -129,8 +130,6 @@ class PlotGroup(ParameterizedObject):
 	# sorting the Plots.
 	self._ordering_plots()	
 	self.generate_labels()
-	self.time=topo.sim.time()
-
 
      ### Need to be re-implemented for connectionfieldplotgroup.
     def generate_labels(self):
