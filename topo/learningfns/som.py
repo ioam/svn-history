@@ -94,7 +94,8 @@ class HebbianSOMLF(SOMLF):
         # Print parameters designed to match fm2d's output
         #print "%d rad= %d std= %f alpha= %f" % (topo.sim._time, radius_int, radius, single_connection_learning_rate)
 
-        neighborhood_matrix = nk_generator(bounds=bb,density=1,size=2*radius)
+        neighborhood_matrix = nk_generator(bounds=bb,xdensity=1,ydensity=1,
+                                           size=2*radius)
         for r in range(rmin,rmax):
             for c in range(cmin,cmax):
                 cwc = c - wc 
