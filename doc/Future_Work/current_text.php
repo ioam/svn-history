@@ -13,7 +13,7 @@ was first added to the list, or a change was made.)
 <ul>
 
 <li> 
-2006/04/20 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler; investigate failing test in testimage.py (that uses sheet functions)
+2006/04/20 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler; investigate failing test in testimage.py (that uses sheet functions); did the performance change (e.g. lissom_oo_or)?
 </li>
 
 <li> 
