@@ -435,7 +435,7 @@ class TestCoordinateTransforms(unittest.TestCase):
 
         self.assertEqual(sheet.density,10)
         
-        l,b,r,t = sheet.bounds2.lbrt()
+        l,b,r,t = sheet.lbrt
         self.assertEqual(l,-0.5)
         self.assertEqual(r,0.5)                      
         self.assertAlmostEqual(t,0.9975)
