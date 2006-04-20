@@ -13,14 +13,13 @@ import Numeric
 from topo.base.boundingregion import BoundingBox
 from topo.base.sheetview import SheetView
 
-
+# CEBHACKALERT: 
 # Changes that need to be made to this file:
 # - stop various tests running twice, identically (see HACKALERT later on)
 # - don't create a new ct every time, just change its density
+# - test array versions of coordinate transform functions
+# - ensure methods of Slice are tested
 
-
-
-# CEBHACKALERT: still to test bounds2slice(), submatrix()
 
 
 class TestCoordinateTransforms(unittest.TestCase):
