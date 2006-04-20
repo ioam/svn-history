@@ -35,6 +35,8 @@ class RandomGenerator(PatternGenerator):
     # Optimization: We use a simpler __call__ method here to skip the
     # coordinate transformations (which would have no effect anyway)
     def __call__(self,**params):
+        self._check_params(params)
+        
         bounds = params.get('bounds',self.bounds)
         xdensity = params.get('xdensity',self.xdensity)
         ydensity = params.get('ydensity',self.ydensity)
