@@ -13,7 +13,11 @@ was first added to the list, or a change was made.)
 <ul>
 
 <li> 
-2006/04/20 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler; investigate failing test in testimage.py (that uses sheet functions).
+2006/04/20 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler; investigate failing test in testimage.py (that uses sheet functions)
+</li>
+
+<li> 
+2006/04/20 (CB): many of the tests in testsheet.py run twice - correct that.
 </li>
 
 <li>
