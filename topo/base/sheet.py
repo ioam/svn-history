@@ -102,6 +102,10 @@ from Numeric import zeros,array,floor,ceil,Float,ArrayType,around
 from boundingregion import BoundingBox, BoundingRegionParameter
 import sheetview 
 
+# CEBHACKALERT: seems likely that CoordinateTransformer should
+# go into its own file, so things such as PatternGenerator do
+# not depend on all the rest of Sheet.
+
 
 # CEBHACKALERT: The user-specified input to a CT is 'bounds' and
 # 'density'. For a Sheet, this means the parameters are 'bounds' and
