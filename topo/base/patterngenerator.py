@@ -127,8 +127,13 @@ class PatternGenerator(ParameterizedObject):
         orientation.
         """
         self.verbose("bounds = ",bounds,"xdensity =",xdensity,"x =",x,"y=",y)
-        x_points,y_points = self.__produce_sampling_vectors(bounds,xdensity,ydensity)
-        self.pattern_x, self.pattern_y = self.__create_and_rotate_coordinates(x_points-x,y_points-y,orientation)
+        # Generate vectors representing coordinates at which the pattern
+        # will be sampled.
+        x_points,y_points = CoordinateTransformer(bounds,xdensity,ydensity).sheetcoordinates_of_matrixidx()
+        # Generate matrices of x and y sheet coordinates at which to
+        # sample pattern, at the correct orientation
+        self.pattern_x, self.pattern_y = self.__create_and_rotate_coordinate_arrays(x_points-x,y_points-y,orientation)
+
 
     def function(self,**params):
         """
@@ -141,34 +146,8 @@ class PatternGenerator(ParameterizedObject):
         """
         raise NotImplementedError
 
-
-    def __produce_sampling_vectors(self, bounds, xdensity, ydensity):
-        """
-        Generate vectors representing coordinates at which the pattern
-        will be sampled.
-
-        Returns two vectors x and y, where x is a 1d-array of x-axis
-        values at which to sample the pattern and y contains the y-axis
-        values.
-        """
-        # CEBHACKALERT: this will become a method of the Slice object.
-        pattern_sheet = CoordinateTransformer(bounds,xdensity,ydensity)
-        n_rows,n_cols = pattern_sheet.shape
-
-        rows = array(range(n_rows)); cols = array(range(n_cols))
-
-
-        # returns x,y; x increases from left to right; y decreases
-        # from left to right (because the row index increases as y
-        # decreases).
-        #
-        # For this function to make sense on its own, y should probably be
-        # reversed, but y would then have to be reversed again in
-        # __create_and_rotate_coordinates().
-        return pattern_sheet.matrixidx2sheet_array(rows,cols)
-
         
-    def __create_and_rotate_coordinates(self, x, y, orientation):
+    def __create_and_rotate_coordinate_arrays(self, x, y, orientation):
         """
         Create pattern matrices from x and y vectors, and rotate
         them to the specified orientation.
