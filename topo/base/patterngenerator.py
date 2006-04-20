@@ -13,7 +13,7 @@ from Numeric import add,subtract,cos,sin,array
 
 from parameterizedobject import ParameterizedObject
 from boundingregion import BoundingBox, BoundingRegionParameter
-from sheet import matrixidx2sheet, bounds2slice
+from sheet import Slice,CoordinateTransformer
 from parameterclasses import Parameter,Number,ClassSelectorParameter
 from functionfamilies import OutputFnParameter, IdentityOF
 
@@ -35,28 +35,58 @@ class PatternGenerator(ParameterizedObject):
     The orientation of the pattern matrices have the same orientation
     maintained by the Sheet classes; see sheet.py for more details of
     the Topographica coordinate system.
+
+
+    CEBHACKALERT: might want to say something like, users of PG
+    might like to consider what xdensity and ydensity they want...
+    #width=self.right-self.left; height=self.top-self.bottom
+    #self.xdensity = int(density*(width))/float((width))
+    #self.ydensity = int(density*(height))/float((height))
+    # etc
+
     """
 
     # PatternGenerator is abstract
     _abstract_class_name = "PatternGenerator"
     
-    bounds  = BoundingRegionParameter(default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True,
-                                      doc = "BoundingBox of the area in which the pattern is generated")
-    density = Number(default=10,bounds=(0,None),hidden=True)
+    bounds  = BoundingRegionParameter(
+        default=BoundingBox(points=((-0.5,-0.5), (0.5,0.5))),hidden=True,
+        doc = "BoundingBox of the area in which the pattern is generated.")
+    
+    xdensity = Number(
+        default=10,bounds=(0,None),hidden=True,
+        doc="Density (number of samples per 1.0 length) in the x direction.")
 
-    x       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.20,
-                     doc="x-coordinate location of pattern center")
-    y       = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.21,
-                     doc="y-coordinate location of pattern center")
-    orientation = Number(default=0,softbounds=(0.0,2*pi),precedence=0.40,
-                         doc="Polar angle of pattern, i.e. the orientation in Cartesian coordinate\nsystem, with zero at 3 o'clock and increasing counterclockwise")
-    scale = Number(default=1.0,softbounds=(0.0,2.0),precedence=0.10,
-                   doc="Multiplicative strength of input pattern, defaulting to 1.0")
-    offset = Number(default=0.0,softbounds=(-1.0,1.0),precedence=0.11,
-                    doc="Additive offset to input pattern, defaulting to 0.0")
-    output_fn  = OutputFnParameter(default=IdentityOF(),
-                                   precedence=0.08,
-                                   doc='Function applied to the pattern array after it has been created.')
+    ydensity = Number(
+        default=10,bounds=(0,None),hidden=True,
+        doc="Density (number of samples per 1.0 length) in the y direction.")
+
+    x = Number(
+        default=0.0,softbounds=(-1.0,1.0),precedence=0.20,
+        doc="x-coordinate location of pattern center")
+
+    y = Number(
+        default=0.0,softbounds=(-1.0,1.0),precedence=0.21,
+        doc="y-coordinate location of pattern center")
+
+    orientation = Number(
+        default=0,softbounds=(0.0,2*pi),precedence=0.40,
+        doc="""
+        Polar angle of pattern, i.e. the orientation in Cartesian coordinate
+        system, with zero at 3 o'clock and increasing counterclockwise.""")
+    
+    scale = Number(
+        default=1.0,softbounds=(0.0,2.0),precedence=0.10,
+        doc="Multiplicative strength of input pattern, defaulting to 1.0")
+    
+    offset = Number(
+        default=0.0,softbounds=(-1.0,1.0),precedence=0.11,
+        doc="Additive offset to input pattern, defaulting to 0.0")
+    
+    output_fn = OutputFnParameter(
+        default=IdentityOF(),
+        precedence=0.08,
+        doc='Function applied to the pattern array after it has been created.')
 
 
     def __call__(self,**params):
@@ -67,15 +97,16 @@ class PatternGenerator(ParameterizedObject):
         currently set on the object. Otherwise, any params specified override
         those currently set on the object.
         """
-        # CEBHACKALERT: does anyone else think this necessary? If not, let's
-        # remove it. If it stays, it should be added to the other __call__ methods.
+        # CEBHACKALERT: put in a method and add to the other __call__ methods.
         for item in params:
             if item not in self.params():
-                self.warning("'%s' was ignored (not a Parameter)."%item)                
+                self.warning("'%s' was ignored (not a Parameter)."%item)
+                
         self.verbose("params = ",params)
         self.__setup_xy(params.get('bounds',self.bounds),
-                        params.get('density',self.density),
-                        params.get('x', self.x),
+                        params.get('xdensity',self.xdensity),
+                        params.get('ydensity',self.ydensity),                        
+                        params.get('x',self.x),
                         params.get('y',self.y),
                         params.get('orientation',self.orientation))
 
@@ -89,14 +120,14 @@ class PatternGenerator(ParameterizedObject):
             return output_fn(scale*self.function(**params)+offset)
 
 
-    def __setup_xy(self,bounds,density,x,y,orientation):
+    def __setup_xy(self,bounds,xdensity,ydensity,x,y,orientation):
         """
         Produce the pattern matrices from the bounds and density (or
         rows and cols), and transform according to x, y, and
         orientation.
         """
-        self.verbose("bounds = ",bounds,"density =",density,"x =",x,"y=",y)
-        x_points,y_points = self.__produce_sampling_vectors(bounds,density)
+        self.verbose("bounds = ",bounds,"xdensity =",xdensity,"x =",x,"y=",y)
+        x_points,y_points = self.__produce_sampling_vectors(bounds,xdensity,ydensity)
         self.pattern_x, self.pattern_y = self.__create_and_rotate_coordinates(x_points-x,y_points-y,orientation)
 
     def function(self,**params):
@@ -111,21 +142,23 @@ class PatternGenerator(ParameterizedObject):
         raise NotImplementedError
 
 
-    def __produce_sampling_vectors(self, bounds, density):
+    def __produce_sampling_vectors(self, bounds, xdensity, ydensity):
         """
-        Generate vectors representing coordinates at which the pattern will be sampled.
+        Generate vectors representing coordinates at which the pattern
+        will be sampled.
 
-        x is a 1d-array of x-axis values at which to sample the pattern;
-        y contains the y-axis values.
+        Returns x and y; x is a 1d-array of x-axis values at which to
+        sample the pattern; y contains the y-axis values.
         """
-        # CEBHACKALERT: doesn't evaluate pattern at correct location on the sheet.
-        # But this is a start (it's simpler than before) - and matches previous
-        # topographica behavior for lissom_or_reference.
-        r1,r2,c1,c2 = bounds2slice(bounds,bounds,density)
-        n_rows=r2-r1; n_cols=c2-c1
+
+        # CEBHACKALERT: this will become a method of the Slice object.
+        pattern_sheet = CoordinateTransformer(bounds,xdensity,ydensity)
         
-        y = array([matrixidx2sheet(r,0,bounds,density) for r in range(n_rows)])
-        x = array([matrixidx2sheet(0,c,bounds,density) for c in range(n_cols)])
+        pattern_slice = Slice(bounds,pattern_sheet)
+        n_rows,n_cols = pattern_slice.shape
+        
+        y = array([pattern_sheet.matrixidx2sheet(r,0) for r in range(n_rows)])
+        x = array([pattern_sheet.matrixidx2sheet(0,c) for c in range(n_cols)])
 
         # x increases from left to right; y decreases from left to right.
         # For this function to make sense on its own, y should probably be
@@ -136,8 +169,13 @@ class PatternGenerator(ParameterizedObject):
 
     def __create_and_rotate_coordinates(self, x, y, orientation):
         """
-        Creates pattern matrices from x and y vectors, and rotates them to the specified orientation.
+        Create pattern matrices from x and y vectors, and rotate
+        them to the specified orientation.
         """
+        # Using this two-liner requires that x increase from left to
+        # right and y decrease from left to right; I don't think it
+        # can be rewritten in so little code otherwise - but please
+        # prove me wrong.
         pattern_y = subtract.outer(cos(orientation)*y, sin(orientation)*x)
         pattern_x = add.outer(sin(orientation)*y, cos(orientation)*x)
         return pattern_x, pattern_y
@@ -161,13 +199,14 @@ class Constant(PatternGenerator):
     # coordinate transformations (which would have no effect anyway)
     def __call__(self,**params):
         bounds = params.get('bounds',self.bounds)
-        density = params.get('density',self.density)
+        xdensity = params.get('xdensity',self.xdensity)
+        ydensity = params.get('ydensity',self.ydensity)
         scale = params.get('scale',self.scale)
         offset = params.get('offset',self.offset)
         output_fn = params.get('output_fn',self.output_fn)
-        
-        r1,r2,c1,c2 = bounds2slice(bounds,bounds,density)
-        shape = (r2-r1,c2-c1)
+
+        slice_ = Slice(bounds,CoordinateTransformer(bounds,xdensity,ydensity))
+        shape = slice_.shape
 
         if output_fn is IdentityOF:
             return scale*ones(shape, Float)+offset
