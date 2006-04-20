@@ -206,11 +206,12 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         Main steps for generating plots in the Frame.
         """
         Pmw.showbusycursor()
+	self.plotgroup = copy.copy(self.plotgroup)
 	self.update_plotgroup_variables() # update PlotGroup variables
 	# if update is True, the SheetViews are re-generated
 	self.plotgroup.update_plots(update)
 	self.display_plots()              # Put images in GUI canvas
-	self.add_to_history()                #  load bitmap images
+	self.add_to_history()             # Add current Plotgroup to history
         self.display_labels()             # Match labels to grid
         self.refresh_title()              # Update Frame title.
         Pmw.hidebusycursor()
@@ -290,7 +291,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         If new_iteration is True, advances the plot history counter; otherwise
         just overwrites the current one.
 	"""
-	self.plotgroups_history.append(copy.copy(self.plotgroup))
+	self.plotgroups_history.append(self.plotgroup)
         self.history_index = len(self.plotgroups_history)-1
 	self.update_back_fwd_button()
 
