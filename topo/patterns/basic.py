@@ -245,6 +245,8 @@ class PatternSampler(ParameterizedObject):
         super(PatternSampler,self).__init__()
         
         rows,cols=pattern_array.shape
+        # CEBHACKALERT: needs to be based on a sheet that can have different
+        # xdensity and ydensity
         self.pattern_sheet = Sheet(density=1.0,
                                  bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
                                                             ( cols/2.0, rows/2.0))))
@@ -256,7 +258,7 @@ class PatternSampler(ParameterizedObject):
             self.background_value = background_value_fn(self.pattern_sheet.activity)
         
 
-    def __call__(self, x, y, sheet_density, scaling, width=1.0, height=1.0):
+    def __call__(self, x, y, sheet_xdensity, sheet_ydensity, scaling, width=1.0, height=1.0):
         """
         Return pixels from the pattern at the given Sheet (x,y) coordinates.
 
@@ -296,12 +298,12 @@ class PatternSampler(ParameterizedObject):
             return pattern_sample
 
         # scale the supplied coordinates to match the pattern being at density=1
-        x*=sheet_density 
-        y*=sheet_density
+        x*=sheet_xdensity 
+        y*=sheet_ydensity
       
         # scale according to initial pattern scaling selected (size_normalization)
         if not scaling=='original':
-            self.__apply_size_normalization(x,y,sheet_density,scaling)
+            self.__apply_size_normalization(x,y,sheet_xdensity,sheet_ydensity,scaling)
 
         # scale according to user-specified width and height
         x/=width
@@ -326,7 +328,7 @@ class PatternSampler(ParameterizedObject):
         return pattern_sample
 
 
-    def __apply_size_normalization(self,x,y,sheet_density,scaling):
+    def __apply_size_normalization(self,x,y,sheet_xdensity,sheet_ydensity,scaling):
         """
         Initial pattern scaling (size_normalization), relative to the
         default retinal dimension of 1.0 in sheet coordinates.
@@ -338,21 +340,21 @@ class PatternSampler(ParameterizedObject):
         # CEBALERT: instead of an if-test, could have a class of this
         # type of function (c.f. OutputFunctions, etc).
         if scaling=='stretch_to_fit':
-            x_sf,y_sf = pattern_cols/sheet_density, pattern_rows/sheet_density
+            x_sf,y_sf = pattern_cols/sheet_xdensity, pattern_rows/sheet_ydensity
             x*=x_sf; y*=y_sf
 
         elif scaling=='fit_shortest':
             if pattern_rows<pattern_cols:
-                sf = pattern_rows/sheet_density
+                sf = pattern_rows/sheet_ydensity
             else:
-                sf = pattern_cols/sheet_density
+                sf = pattern_cols/sheet_xdensity
             x*=sf;y*=sf
             
         elif scaling=='fit_longest':
             if pattern_rows<pattern_cols:
-                sf = pattern_cols/sheet_density
+                sf = pattern_cols/sheet_xdensity
             else:
-                sf = pattern_rows/sheet_density
+                sf = pattern_rows/sheet_ydensity
             x*=sf;y*=sf
 
         else:
@@ -418,7 +420,8 @@ class CompositePatternGenerator(PatternGenerator):
         whole_image_output_fn = params.get('whole_image_output_fn',
                                            self.whole_image_output_fn)
         bounds = params.get('bounds',self.bounds)
-        density=params.get('density',self.density)
+        xdensity=params.get('density',self.xdensity)
+        ydensity=params.get('density',self.ydensity)
         height = params.get('size',self.size)
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
 
@@ -439,7 +442,7 @@ class CompositePatternGenerator(PatternGenerator):
         
         for pg in self.generators:
             assert isinstance(pg,PatternGenerator),repr(pg)+" is not a PatternGenerator."
-            patterns.append(pg(bounds=bounds,density=density))
+            patterns.append(pg(bounds=bounds,xdensity=xdensity,ydensity=ydensity))
         
         image_array = self.operator.reduce(patterns)
 
@@ -447,7 +450,8 @@ class CompositePatternGenerator(PatternGenerator):
 
 
         return ps(self.pattern_x,self.pattern_y,
-                  float(density),
+                  float(xdensity),
+                  float(ydensity),
                   size_normalization,
                   float(width),float(height))
 
