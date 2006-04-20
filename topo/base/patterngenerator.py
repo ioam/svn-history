@@ -88,16 +88,7 @@ class PatternGenerator(ParameterizedObject):
         precedence=0.08,
         doc='Function applied to the pattern array after it has been created.')
 
-    def _check_params(self,params):
-        """
-        Print a warning if params contains something that is
-        not a Parameter of this object.
-        """
-        for item in params:
-            if item not in self.params():
-                self.warning("'%s' was ignored (not a Parameter)."%item)
         
-
     def __call__(self,**params):
         """
         Create the pattern array.

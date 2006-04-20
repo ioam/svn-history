@@ -706,6 +706,19 @@ class ParameterizedObject(object):
             setattr(self,name,val)
 
 
+    def _check_params(self,params):
+        """
+        Print a warning if params contains something that is
+        not a Parameter of this object.
+
+        Typically called by a __call__() method that accepts
+        **params in its arguments.
+        """
+        for item in params:
+            if item not in self.params():
+                self.warning("'%s' was ignored (not a Parameter)."%item)
+
+
     def get_param_values(self):
         """Return a list of name,value pairs for all Parameters of this object"""
         vals = []
