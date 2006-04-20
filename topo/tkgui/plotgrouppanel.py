@@ -206,6 +206,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         Main steps for generating plots in the Frame.
         """
         Pmw.showbusycursor()
+	# We copy the PlotGroup anytime we refresh, for saving in history
 	self.plotgroup = copy.copy(self.plotgroup)
 	self.update_plotgroup_variables() # update PlotGroup variables
 	# if update is True, the SheetViews are re-generated
@@ -291,8 +292,11 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         If new_iteration is True, advances the plot history counter; otherwise
         just overwrites the current one.
 	"""
-	self.plotgroups_history.append(self.plotgroup)
-        self.history_index = len(self.plotgroups_history)-1
+	# if we hit refresh during a Back research, we do not want to copy the 
+	# same PlotGroup two times in the history.
+	if self.history_index == len(self.plotgroups_history)-1:
+	    self.plotgroups_history.append(self.plotgroup)
+	self.history_index = len(self.plotgroups_history)-1        
 	self.update_back_fwd_button()
 
 
@@ -408,6 +412,9 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         self.auto_refresh = not self.auto_refresh
         self.debug("Auto-refresh = ", self.auto_refresh)
         topo.tkgui.show_cmd_prompt()
+	# when refreshing through auto-refresh, we know we want to
+	# save the new plotgroup, so we reset history_index
+	self.history_index = len(self.plotgroups_history)-1
         if self.auto_refresh:
             self.console.auto_refresh_panels.append(self)
         else:
