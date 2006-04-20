@@ -142,7 +142,8 @@ class CoordinateTransformer(object):
     def get_shape(self):
         r1,r2,c1,c2 = self.bounds2slice(self.bounds2)
         return (r2-r1,c2-c1)
-    
+
+    ### shape is a property so that's it's like Numeric.array.shape
     shape = property(get_shape)
 
 
@@ -422,11 +423,10 @@ class Sheet(EventProcessor,CoordinateTransformer):
 
         # Now initialize this object as a CoordinateTransformer, with
         # the same density along y as along x.
-        CoordinateTransformer.__init__(self,bounds,density,density)
+        CoordinateTransformer.__init__(self,bounds,density)
 
         # setup the activity matrix
-        r1,r2,c1,c2 = self.bounds2slice(self.bounds)
-        self.activity = zeros((r2-r1,c2-c1),Float)
+        self.activity = zeros(self.shape,Float)
 
         self.__saved_activity = []          # For non-learning inputs
 
@@ -462,6 +462,7 @@ class Sheet(EventProcessor,CoordinateTransformer):
         the activity matrix of the sheet.
         """
         rows,cols = self.activity.shape
+        # CEBHACKALERT: use matrixidx2sheet_array
         coords = [self.matrixidx2sheet(r,0) for r in range(rows-1,-1,-1)]
         return [y for (x,y) in coords]
 
@@ -471,6 +472,7 @@ class Sheet(EventProcessor,CoordinateTransformer):
         of the activity matrix of the sheet.
         """
         rows,cols = self.activity.shape
+        # CEBHACKALERT: use matrixidx2sheet_array
         coords = [self.matrixidx2sheet(0,c) for c in range(cols)]
         return [x for (x,y) in coords]
 
