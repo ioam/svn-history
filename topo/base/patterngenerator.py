@@ -13,7 +13,7 @@ from Numeric import add,subtract,cos,sin,array
 
 from parameterizedobject import ParameterizedObject
 from boundingregion import BoundingBox, BoundingRegionParameter
-from sheet import Slice,CoordinateTransformer
+from sheet import CoordinateTransformer
 from parameterclasses import Parameter,Number,ClassSelectorParameter
 from functionfamilies import OutputFnParameter, IdentityOF
 
@@ -206,8 +206,7 @@ class Constant(PatternGenerator):
         offset = params.get('offset',self.offset)
         output_fn = params.get('output_fn',self.output_fn)
 
-        slice_ = Slice(bounds,CoordinateTransformer(bounds,xdensity,ydensity))
-        shape = slice_.shape
+        shape = CoordinateTransformer(bounds,xdensity,ydensity).shape
 
         if output_fn is IdentityOF:
             return scale*ones(shape, Float)+offset
