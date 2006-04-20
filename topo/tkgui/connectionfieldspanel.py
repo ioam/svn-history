@@ -12,9 +12,9 @@ __version__='$Revision$'
 
 import Pmw
 import __main__
-from itertools import chain
 
-from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry,Label,NSEW, Checkbutton
+from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry,Label,NSEW, Checkbutton,NORMAL,DISABLED
+
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from topo.base.projection import ProjectionSheet
 from topo.plotting.plotgroup import ConnectionFieldsPlotGroup
@@ -48,7 +48,6 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         self.x_str.set(0.0)
         self.y_str = StringVar()
         self.y_str.set(0.0)
-        self.displayed_x, self.displayed_y = 0, 0
 	self._add_region_menu()
         self._add_xy_boxes()
         self.auto_refresh_checkbutton.invoke()
@@ -135,8 +134,7 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         if not projectionsheets:
             return False
 
-        projectionlists=[i.projections().values() for i in projectionsheets]
-        projections=[i for i in chain(*projectionlists)]
+        projections=[i.projections().values() for i in projectionsheets]
         return (not projections == [])
 
 
@@ -167,8 +165,6 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
 	    self.plotgroup.sheet_name = self.region.get()
 	    self.plotgroup.x = self.x
 	    self.plotgroup.y = self.y
-            #self.plotgroup_key = ('Weights',self.region.get(),self.x,self.y)
-            self.displayed_x, self.displayed_y = self.x, self.y
         else:
             self.dialog = Pmw.Dialog(self.parent,title = 'Error')
             message = 'The x/y coordinates are outside the bounding region.\n'\
@@ -213,5 +209,23 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         
     def refresh_title(self):
         self.parent.title(topo.sim.name+': '+self.pgt.name + " %s (%0.3f,%0.3f) time:%s" %
-                          (self.region.get(),self.displayed_x,self.displayed_y,self.plotgroup.time))
+                          (self.region.get(),self.plotgroup.x,self.plotgroup.y,self.plotgroup.time))
 
+
+    def update_back_fwd_button(self):
+	super(ConnectionFieldsPanel,self).update_back_fwd_button()
+	if (self.history_index > 0):
+            self.situate_checkbutton.config(state=DISABLED)
+	    self.xe.config(state=DISABLED)
+
+        if self.history_index >= len(self.plotgroups_history)-1:
+	    self.situate_checkbutton.config(state=NORMAL)
+	    self.xe.config(state=NORMAL)
+
+    def restore_panel_environment(self):
+	super(ConnectionFieldsPanel,self).restore_panel_environment()
+	if self.plotgroup.situate != self.situate:
+	    self.situate_checkbutton.config(state=NORMAL)
+	    self.situate_checkbutton.invoke()
+	    self.situate_checkbutton.config(state=DISABLED)
+	
