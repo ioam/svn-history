@@ -36,7 +36,7 @@ from parameterizedobject import ParameterizedObject
 from functionfamilies import OutputFnParameter, IdentityOF
 from projection import Projection,ProjectionSheet
 from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter
-from sheet import Sheet,crop_slice_to_sheet_bounds
+from sheet import Sheet,Slice
 from sheetview import UnitView
 from boundingregion import BoundingBox,BoundingRegionParameter
 
@@ -217,7 +217,8 @@ class ConnectionField(ParameterizedObject):
 
         # CEBHACKALERT: might want to do something about a size that's specified.
         w = weights_generator(x=self.x,y=self.y,bounds=self.bounds,
-                              density=self.input_sheet.density)
+                              xdensity=self.input_sheet.xdensity,
+                              ydensity=self.input_sheet.ydensity)
         self.weights = w.astype(weight_type)
         # Maintain the original type throughout operations, i.e. do not
         # promote to double.
@@ -232,7 +233,7 @@ class ConnectionField(ParameterizedObject):
 
         # CEBHACKALERT: this works for now, while the output_fns are all multiplicative.
         self.weights *= self.mask   
-        output_fn(self.weights)
+        output_fn(self.weights)        
 
         # Set the initial sum
         #self.sum = output_fn.norm_value
@@ -254,8 +255,8 @@ class ConnectionField(ParameterizedObject):
         sheet_rows,sheet_cols = self.input_sheet.activity.shape
 
         # get size of weights matrix
-        r1,r2,c1,c2 = self.input_sheet.bounds2slice(weights_bounds_template)
-        n_rows=r2-r1; n_cols=c2-c1
+        slice_ = Slice(weights_bounds_template,self.input_sheet)
+        n_rows,n_cols = slice_.shape
 
         # get slice for the submatrix
         center_row,center_col = self.input_sheet.sheet2matrixidx(self.x,self.y)
@@ -274,7 +275,8 @@ class ConnectionField(ParameterizedObject):
 
         Also stores the slice_array for access by C.
 	"""
-        r1,r2,c1,c2 = self.input_sheet.bounds2slice(bounds)
+        slice_ = Slice(bounds,self.input_sheet)
+        r1,r2,c1,c2 = slice_
 
         # translate to this cf's location
         center_row,center_col = self.input_sheet.sheet2matrixidx(self.x,self.y)
@@ -285,19 +287,17 @@ class ConnectionField(ParameterizedObject):
         r1+=row_offset; r2+=row_offset
         c1+=col_offset; c2+=col_offset
 
-        # crop to the sheet's bounds
-        r1,r2,c1,c2 = crop_slice_to_sheet_bounds((r1,r2,c1,c2),
-                                                 self.input_sheet.bounds,
-                                                 self.input_sheet.density)
+        slice_.set_slice((r1,r2,c1,c2))
+        slice_.crop_to_sheet()
 
-        self.bounds = self.input_sheet.slice2bounds((r1,r2,c1,c2))
+        self.bounds = slice_.bounds
 
         # Also, store the array for direct access by C.
         # Numeric.Int32 is specified explicitly here to avoid having it
         # default to Numeric.Int.  Numeric.Int works on 32-bit platforms,
         # but does not work properly with the optimized C activation and
         # learning functions on 64-bit machines.
-        self.slice_array = Numeric.array((r1,r2,c1,c2),typecode=Numeric.Int32) 
+        self.slice_array = Numeric.array(tuple(slice_),typecode=Numeric.Int32) 
 
 
     def get_input_matrix(self, activity):
@@ -677,7 +677,8 @@ class CFProjection(Projection):
         
         mask_template = self.weights_shape(x=center_x,y=center_y,
                                            bounds=self.weights_bounds,
-                                           density=self.src.density)
+                                           xdensity=self.src.xdensity,
+                                           ydensity=self.src.ydensity)
         # CEBHACKALERT: threshold should be settable by user
         mask_template = Numeric.where(mask_template>=0.5,mask_template,0.0)
 
@@ -694,8 +695,8 @@ class CFProjection(Projection):
         an odd number of rows and an odd number of columns. Then converts this
         slice back to sheet-coordinate bounds.    
         """
-        slice_ = self.src.bounds2slice(bounds)
-        n_rows=slice_[1]-slice_[0]; n_cols=slice_[3]-slice_[2]
+        slice_ = Slice(bounds,self.src)
+        n_rows,n_cols = slice_.shape
 
         sheet_center_row,sheet_center_col = self.src.sheet2matrixidx(0.0,0.0)
 
@@ -721,18 +722,22 @@ class CFProjection(Projection):
         Return a single connection field UnitView, for the unit
         located at sheet coordinate (sheet_x,sheet_y).
         """
-	(r,c) = (self.dest).sheet2matrixidx(sheet_x,sheet_y)
-
-	slice_ = self.src.bounds2slice(self.cf(r,c).bounds)
-        r1,r2,c1,c2 = crop_slice_to_sheet_bounds(slice_,self.src.bounds,
-						 self.src.density)
+	(r,c) = self.dest.sheet2matrixidx(sheet_x,sheet_y)
+        
+        slice_ = Slice(self.cf(r,c).bounds,self.src)
+        #print slice_.slice_
+        slice_.crop_to_sheet()
+        #print slice_.slice_
 
 	matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float)
 
 	assert self.cf(r,c) != None, "Projection Matrix is None"
 	# CEBHACKALERT: why is this necessary? Isn't cf[r][c].weights
         # already a Numeric array? (Same in SharedWeightProjection.)
+        r1,r2,c1,c2 = slice_
 	matrix_data[r1:r2,c1:c2] = Numeric.array(self.cf(r,c).weights)
+
+        #print matrix_data
 	
         return UnitView((matrix_data,self.src.bounds),sheet_x,sheet_y,self)
 
