@@ -94,197 +94,217 @@ $Id$
 
 __version__ = '$Revision$'
 
+
 from simulator import EventProcessor
 from parameterclasses import BooleanParameter, Number, Parameter
-from Numeric import zeros,array,floor,ceil,Float
+from Numeric import zeros,array,floor,ceil,Float,ArrayType
 
 from boundingregion import BoundingBox, BoundingRegionParameter
 import sheetview 
 
-def sheet2matrix(x,y,bounds,density):
+
+
+
+class CoordinateTransformer(object):
     """
-    Convert a point (x,y) in Sheet coordinates to continuous matrix
-    coordinates.
-
-    Returns (float_row,float_col), where float_row corresponds to y,
-    and float_col to x.
-
-    When computing this transformation for an existing sheet foo,
-    use the Sheet method foo.sheet2matrix(x,y).    
-
-    Bounds
-    For a Sheet with BoundingBox(points=((-0.5,-0.5),(0.5,0.5))) and
-    density=3, x=-0.5 corresponds to float_col=0.0 and x=0.5
-    corresponds to float_col=3.0.  float_col=3.0 is not inside the
-    matrix representing this Sheet, which has the three columns
-    (0,1,2). That is, x=-0.5 is inside the BoundingBox but x=0.5 is
-    outside. Similarly, y=0.5 is inside (at row 0) but y=-0.5 is
-    outside (at row 3) (it's the other way round for y because the
-    matrix row index increases as y decreases).
+    Provides methods to allow conversion between sheet and matrix
+    coordinates.    
     """
-    left,bottom,right,top = bounds.lbrt()
+    ### xdensity and ydensity are properties so that xstep is kept in
+    ### sync with xdensity, and similarly for ystep and ydensity. We
+    ### use xstep so that the repeatedly performed calculations in
+    ### matrix2sheet() use multiplications rather than divisions, for
+    ### speed.    
+    def set_xdensity(self,density):
+        self.__xdensity=density
+        self.__xstep = 1.0/density
+        
+    def set_ydensity(self,density):
+        self.__ydensity=density
+        self.__ystep = 1.0/density
 
-    # First translate to (left,top), which is [0,0] in the matrix,
-    # then scale to the size of the matrix. The y coordinate needs to
-    # flipped, because the points are moving down in the sheet as the
-    # y index increases in the matrix.
-    float_col = (x-left) * density
-    float_row = (top-y)  * density
-    return float_row, float_col
-  
-
-def sheet2matrixidx(x,y,bounds,density):
-    """
-    Convert a point (x,y) in sheet coordinates to the integer row and
-    column index of the matrix cell in which that point falls, given a
-    bounds and density.  Returns (row,column).
-
-    Note that if coordinates along the right or bottom boundary are
-    passed into this function, the returned matrix coordinate of the
-    boundary will be just outside the matrix, because the right and
-    bottom boundaries are exclusive.
-
-    Valid only for scalar x and y.
-    """
-    r,c = sheet2matrix(x,y,bounds,density)
-    r = floor(r)
-    c = floor(c)
-    return int(r), int(c)
-
-
-def sheet2matrixidx_array(x,y,bounds,density):
-    """
-    sheet2matrixidx but for arrays of x and y.
-    """
-    r,c = sheet2matrix(x,y,bounds,density)
-    r = floor(r)
-    c = floor(c)
-    return r.astype(int), c.astype(int)
-
-
-
-def matrix2sheet(float_row,float_col,bounds,density):
-    """
-    Convert a floating-point location (float_row,float_col) in matrix
-    coordinates to its corresponding location (x,y) in sheet
-    coordinates, given a bounds and density.
+    def get_xdensity(self): return self.__xdensity
+    def get_ydensity(self): return self.__ydensity
     
-    Inverse of sheet2matrix().
-    """
-    left,bottom,right,top = bounds.lbrt()
-    step = 1.0 / density
-    x = float_col*step + left
-    y = top - float_row*step
-    return x, y
+    xdensity = property(get_xdensity,
+                        set_xdensity,
+                        None,
+                        """The spacing between elements in an underlying
+                        matrix representation, in the x direction.""")
 
+    ydensity = property(get_ydensity,
+                        set_ydensity,
+                        None,
+                        """The spacing between elements in an underlying
+                        matrix representation, in the y direction.""")
 
-def matrixidx2sheet(row,col,bounds,density):
-    """
-    Return (x,y) where x and y are the floating point coordinates of
-    the *center* of the given matrix cell (row,col). If the matrix cell
-    represents a 0.2 by 0.2 region, then the center location returned
-    would be 0.1,0.1.
-
-    NOTE: This is NOT the strict mathematical inverse of
-    sheet2matrixidx(), because sheet2matrixidx() discards all but the integer
-    portion of the continuous matrix coordinate.
+    ### CEBHACKALERT: temporary implementation
+    def get_shape(self):
+        r1,r2,c1,c2 = self.bounds2slice(self.bounds2)
+        return (r2-r1,c2-c1)
     
-    When computing this transformation for an existing sheet foo, one
-    should use the Sheet method foo.matrixidx2sheet(r,c).
-
-    Valid only for scalar x and y.
-    """
-    x,y = matrix2sheet((row+0.5), (col+0.5), bounds, density)
-
-    # Rounding is useful for comparing the result with a floating point number
-    # that we specify by typing the number out (e.g. fp = 0.5).
-    # Round eliminates any precision errors that have been compounded
-    # via floating point operations so that the rounded number will better
-    # match the floating number that we type in.
-    # (CEB: if someone wishes to use array x and y, changing this to around()
-    # would work.)
-    return round(x,10),round(y,10)
+    shape = property(get_shape)
 
 
-def submatrix(bounds,sheet_matrix,sheet_bounds,sheet_density):
-    """
-    Return the submatrix of a sheet_matrix specified by a bounds.
+    def __init__(self,bounds,xdensity,ydensity):
+        """
+        Store the bounds (as l,b,r,t in an array), xdensity,
+        and ydensity.
+        """
+        # CEBALERT: could accept single number for density too,
+        # and then assume xdensity==ydensity
+        self.lbrt = array(bounds.lbrt())
+        self.xdensity,self.ydensity = xdensity,ydensity
 
-    Effectively computes the intersection between the sheet_bounds and
-    the new bounds, returning the corresponding submatrix of the given
-    sheet_matrix.  The submatrix is just a view into the sheet_matrix;
-    it is not an independent copy.
-    """
-    r1,r2,c1,c2 = bounds2slice(bounds,sheet_bounds,sheet_density)
-    return sheet_matrix[r1:r2,c1:c2]
+        # CEBHACKALERT: temporary
+        self.bounds2=bounds
+
+    def sheet2matrix(self,x,y):
+        """
+        Convert a point (x,y) in Sheet coordinates to continuous matrix
+        coordinates.
+
+        Returns (float_row,float_col), where float_row corresponds to y,
+        and float_col to x.
+
+        Note about Bounds
+        For a Sheet with BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
+        and density=3, x=-0.5 corresponds to float_col=0.0 and x=0.5
+        corresponds to float_col=3.0.  float_col=3.0 is not inside the
+        matrix representing this Sheet, which has the three columns
+        (0,1,2). That is, x=-0.5 is inside the BoundingBox but x=0.5
+        is outside. Similarly, y=0.5 is inside (at row 0) but y=-0.5
+        is outside (at row 3) (it's the other way round for y because
+        the matrix row index increases as y decreases).
+        """
+        # First translate to (left,top), which is [0,0] in the matrix,
+        # then scale to the size of the matrix. The y coordinate needs
+        # to be flipped, because the points are moving down in the
+        # sheet as the y index increases in the matrix.
+        float_col = (x-self.lbrt[0]) * self.__xdensity
+        float_row = (self.lbrt[3]-y) * self.__ydensity
+        return float_row, float_col
 
 
-def bounds2slice(slice_bounds, sheet_bounds, sheet_density):
-    """
-    Convert a bounding box into an array slice suitable for computing
-    a submatrix.
+    def sheet2matrixidx(self,x,y):
+        """
+        Convert a point (x,y) in sheet coordinates to the integer row and
+        column index of the matrix cell in which that point falls, given a
+        bounds and density.  Returns (row,column).
 
-    Includes all units whose centers are within the specified sheet
-    coordinate bounding box slice_bounds.
+        Note that if coordinates along the right or bottom boundary are
+        passed into this function, the returned matrix coordinate of the
+        boundary will be just outside the matrix, because the right and
+        bottom boundaries are exclusive.
 
-    The returned slice does not respect the sheet_bounds: use
-    crop_slice_to_sheet_bounds() to have the slice cropped to the
-    sheet.
+        Valid only for scalar x and y.
+        """
+        r,c = self.sheet2matrix(x,y)
+        r = floor(r)
+        c = floor(c)
+        return int(r), int(c)
+
+
+    def sheet2matrixidx_array(self,x,y):
+        """
+        sheet2matrixidx but for arrays of x and y.
+        """
+        r,c = self.sheet2matrix(x,y)
+        r = floor(r)
+        c = floor(c)
+        return r.astype(int), c.astype(int)
+
+
+    def matrix2sheet(self,float_row,float_col):
+        """
+        Convert a floating-point location (float_row,float_col) in matrix
+        coordinates to its corresponding location (x,y) in sheet
+        coordinates.
+
+        Inverse of sheet2matrix().
+        """
+        x = float_col*self.__xstep + self.lbrt[0]
+        y = self.lbrt[3] - float_row*self.__ystep
+        return x, y
+
+
+    def matrixidx2sheet(self,row,col):
+        """
+        Return (x,y) where x and y are the floating point coordinates of
+        the *center* of the given matrix cell (row,col). If the matrix cell
+        represents a 0.2 by 0.2 region, then the center location returned
+        would be 0.1,0.1.
+
+        NOTE: This is NOT the strict mathematical inverse of
+        sheet2matrixidx(), because sheet2matrixidx() discards all but the integer
+        portion of the continuous matrix coordinate.
+
+        Valid only for scalar x and y.
+        """
+        x,y = self.matrix2sheet((row+0.5), (col+0.5))
+
+        # Rounding is useful for comparing the result with a floating point number
+        # that we specify by typing the number out (e.g. fp = 0.5).
+        # Round eliminates any precision errors that have been compounded
+        # via floating point operations so that the rounded number will better
+        # match the floating number that we type in.
+        # (CEB: if someone wishes to use array x and y, changing this to around()
+        # would work.)
+        return round(x,10),round(y,10)
+
+    ### CEBHACKALERT: make some matrix2sheet_array methods.
+
+    ### CEBHACKALERT: move these two methods to Slice.
+    def bounds2slice(self,slice_bounds):
+        """
+        Convert a bounding box into an array slice suitable for computing
+        a submatrix.
+
+        Includes all units whose centers are within the specified sheet
+        coordinate bounding box slice_bounds.
+
+        The returned slice does not respect the sheet_bounds: use
+        crop_slice_to_sheet_bounds() to have the slice cropped to the
+        sheet.
+
+        Returns (a,b,c,d) such that a matrix M can be sliced using M[a:b,c:d].
+        """
+        l,b,r,t = slice_bounds.lbrt()
+
+        t_m,l_m = self.sheet2matrix(l,t)
+        b_m,r_m = self.sheet2matrix(r,b)
+
+        l_idx = int(ceil(l_m-0.5))
+        t_idx = int(ceil(t_m-0.5))
+        r_idx = int(floor(r_m+0.5))
+        b_idx = int(floor(b_m+0.5))
+
+        return t_idx,b_idx,l_idx,r_idx
+
+
+    def slice2bounds(self,slice_):
+        """
+        Construct the bounds that corresponds to the given slice.
+        This way, this function is an exact transform of bounds2slice. 
+        That enables to retrieve the slice information from the bounding box.
+        """
+        r1,r2,c1,c2 = slice_
+
+        left,bottom = self.matrix2sheet(r2,c1)
+        right, top  = self.matrix2sheet(r1,c2)
+
+        return BoundingBox(points=((left,bottom),
+                                   (right,top)))
+
     
-    Returns (a,b,c,d) such that a matrix M can be sliced using M[a:b,c:d].
-    """
-    l,b,r,t = slice_bounds.lbrt()
     
-    t_m,l_m = sheet2matrix(l,t,sheet_bounds,sheet_density)
-    b_m,r_m = sheet2matrix(r,b,sheet_bounds,sheet_density)
-
-    l_idx = int(ceil(l_m-0.5))
-    t_idx = int(ceil(t_m-0.5))
-    r_idx = int(floor(r_m+0.5))
-    b_idx = int(floor(b_m+0.5))
-
-    return t_idx,b_idx,l_idx,r_idx
-
-
-def crop_slice_to_sheet_bounds(slice_,sheet_bounds,density):
-    """
-    Crop the given slice to the specified sheet_bounds.
-    """
-    maxrow,maxcol = sheet2matrixidx(sheet_bounds.aarect().right(),
-                                    sheet_bounds.aarect().bottom(),
-                                    sheet_bounds,density)
-    t_idx,b_idx,l_idx,r_idx = slice_
-    
-    rstart = max(0,t_idx)
-    rbound = min(maxrow,b_idx)
-    cstart = max(0,l_idx)
-    cbound = min(maxcol,r_idx)
-
-    return rstart,rbound,cstart,cbound
-
-
-def slice2bounds(slice_,sheet_bounds,sheet_density):
-    """
-    Construct the bounds that corresponds to the given slice.
-    This way, this function is an exact transform of bounds2slice. 
-    That enables to retrieve the slice information from the bounding box.
-    """
-    r1,r2,c1,c2 = slice_
-
-    left,bottom = matrix2sheet(r2,c1,sheet_bounds,sheet_density)
-    right, top   = matrix2sheet(r1,c2,sheet_bounds,sheet_density)
-
-    return BoundingBox(points=((left,bottom),
-                               (right,top)))
-
 
 # CEBHACKALERT:
-# - have user_bounds, user_density as the parameters and bounds,density
-#   (not Parameters) as the true values. In the Parameter documentation,
-#   point out where the true value can be found. (This is a similar
-#   issue to the one in CFProjection - seems like weights_bounds should
-#   be user_weights_bounds, or something like that.
-class Sheet(EventProcessor):
+# - have user_bounds, user_density as the parameters?
+#   (This is a similar issue to the one in CFProjection - seems like
+#   weights_bounds should be user_weights_bounds, or something like
+#   that.)
+class Sheet(EventProcessor,CoordinateTransformer):
     """
     The generic base class for neural sheets.
 
@@ -308,13 +328,17 @@ class Sheet(EventProcessor):
     bounds = BoundingRegionParameter(
         BoundingBox(radius=0.5),constant=True,
         doc="""
-            BoundingBox of the Sheet coordinate area covered by this Sheet.
-            The left and right bounds--if specified--will always be observed,
-            but the top and bottom bounds may be adjusted to ensure the density
-            in the y direction is the same as the density in the x direction.
-            In such a case, the top and bottom bounds are adjusted such that the
-            center y point remains the same, and each bound is as close as
-            possible to its specified value.
+            User-specified BoundingBox of the Sheet coordinate area
+            covered by this Sheet.  The left and right bounds--if
+            specified--will always be observed, but the top and bottom
+            bounds may be adjusted to ensure the density in the y
+            direction is the same as the density in the x direction.
+            In such a case, the top and bottom bounds are adjusted
+            such that the center y point remains the same, and each
+            bound is as close as possible to its specified value. The
+            actual value of this Parameter is not adjusted, but the
+            true bounds may be found from the 'lbrt' array attribute
+            of this object.
             """)
     
     ### JABHACKALERT: Should be type Number, but that causes problems
@@ -322,23 +346,24 @@ class Sheet(EventProcessor):
     density = Parameter(
         default=10,constant=True,
         doc="""
-        User-specified number of processing units per 1.0 distance
-        horizontally or vertically in Sheet coordinates. The actual
-        number may be different because of discretization; the matrix
-        needs to tile the plane exactly, and for that to work the
-        density may need to be adjusted.
-        For instance, an area of 3x2 cannot have a density of 2 in
-        each direction.
-        """)
+            User-specified number of processing units per 1.0 distance
+            horizontally or vertically in Sheet coordinates. The actual
+            number may be different because of discretization; the matrix
+            needs to tile the plane exactly, and for that to work the
+            density may need to be adjusted.  For instance, an area of 3x2
+            cannot have a density of 2 in each direction. The true density
+            may be obtained from either the xdensity or ydensity attribute
+            (for a Sheet, these are identical).
+            """)
     
     # JABALERT: Should be set per-projection, not per-Sheet, right?
     learning = BooleanParameter(
         True,
         doc="""
-        Setting this to False tells the Sheet not to change its
-        permanent state (e.g. any connection weights) based on
-        incoming events.
-        """)
+            Setting this to False tells the Sheet not to change its
+            permanent state (e.g. any connection weights) based on
+            incoming events.
+            """)
 
     precedence = Number(
         default = 0.1, softbounds=(0.0,1.0),
@@ -346,20 +371,27 @@ class Sheet(EventProcessor):
 
 
     def __init__(self,**params):
+        """
+        Initialize this object as an EventProcessor, then also as
+        a CoordinateTransformer with equal xdensity and ydensity.
+        """
 
-        super(Sheet,self).__init__(**params)
-        self.debug("density = ",self.density)
-        self.initialized = False # (temporary - because we modify some constant parameters
+        EventProcessor.__init__(self,**params)
 
-        # Calculate the true density along x (from the left and right
-        # bounds and the nominal density), then adjust the top and
-        # bottom bounds so that the density along y is the same.
-        # (The true density is not equal to the 'density' argument
+        # CEBHACKALERT: will become a method of CoordinateTransformer
+        # Calculate the true density along x.
+        # (From the left and right bounds and the nominal density.
+        # The top and bottom bounds are then adjusted so that the
+        # density along y is the same.)
+        
+        # The true density is not equal to the 'density' parameter
         # when density*(right-left) is not an integer.)
+
         left,bottom,right,top = self.bounds.lbrt()
         width = right-left; height = top-bottom
         center_y = bottom + height/2.0
-        self.density = int(self.density*(width))/float((width))
+        density = int(self.density*(width))/float((width))
+
         n_units = round(height*self.density,0)
 
         if n_units<1: raise ValueError(
@@ -367,19 +399,25 @@ class Sheet(EventProcessor):
            "sheet has at least one unit in each direction; " \
            +self.name+ " does not.")
 
-        adjusted_half_height = n_units/self.density/2.0
-        adjusted_bottom = center_y - adjusted_half_height
-        adjusted_top = center_y + adjusted_half_height
+        adjusted_half_height = n_units/density/2.0
+        # (The above might be clearer as (step*n_units)/2.0, where
+        # step=1.0/density. If not, don't use xstep,ystep in
+        # CoordinateTransformer and just divide by xdensity,ydensity instead.)
+        
+        bounds=BoundingBox(points=((left, center_y-adjusted_half_height),
+                                   (right, center_y + adjusted_half_height)))
 
-        self.bounds=BoundingBox(points=((left,adjusted_bottom),(right,adjusted_top)))
-        self.initialized=True
+        # Now initialize this object as a CoordinateTransformer, with
+        # the same density along y as along x.
+        CoordinateTransformer.__init__(self,bounds,density,density)
 
         # setup the activity matrix
         r1,r2,c1,c2 = self.bounds2slice(self.bounds)
         self.activity = zeros((r2-r1,c2-c1),Float)
 
         self.__saved_activity = []          # For non-learning inputs
-        self.debug('activity.shape =',self.activity.shape)
+
+
         ### JABALERT: Should perhaps rename this to view_dict
         self.sheet_view_dict = {}
 
@@ -395,48 +433,6 @@ class Sheet(EventProcessor):
         """
 	if self.sheet_view_dict.has_key(view_name):   
 	    del self.sheet_view_dict[view_name]
-
-    def sheet2matrix(self,x,y):
-        """
-        See sheet's sheet2matrix() function.
-        """
-        return sheet2matrix(x,y,self.bounds,self.density)
-
-    def matrix2sheet(self,r,c):
-        """
-        See sheet's matrix2sheet() function.
-        """
-        return matrix2sheet(r,c,self.bounds,self.density)
-                
-    def sheet2matrixidx(self,x,y):
-        """
-        See sheet's sheet2matrixidx() function.
-        """
-        return sheet2matrixidx(x,y,self.bounds,self.density)
-
-    def sheet2matrixidx_array(self,x,y):
-        """
-        sheet2matrixidx() but for arrays of x and y.
-        """
-        return sheet2matrixidx_array(x,y,self.bounds,self.density)
-
-    def matrixidx2sheet(self,row,col):
-        """
-        See sheet's matrixidx2sheet() function.
-        """
-        return matrixidx2sheet(row,col,self.bounds,self.density)
-
-    def bounds2slice(self,bounds):
-        """
-        See sheet's bounds2slice() function.
-        """
-        return bounds2slice(bounds,self.bounds,self.density)
-
-    def slice2bounds(self,slice_):
-        """
-        See sheet's bounds2slice() function.
-        """
-        return slice2bounds(slice_,self.bounds,self.density)
 
 
     def sheet_offset(self):
@@ -487,92 +483,105 @@ class Sheet(EventProcessor):
         
 
 
-# CEBHACKALERT: unfinished, unused, untested.
 class Slice(object):
     """
+    Represents a slice of a CoordinateTransformer; i.e., an
+    array specifying the row and column start and end points
+    for a submatrix of the CoordinateTransformer.
+
+    A Slice() is created from the specified slice_bounds by
+    calculating the slice that corresponds to the bounds (see
+    CoordinateTransformer.bounds2slice).
+
+    The slice elements can be recovered by unpacking an instance
+    (e.g. k = Slice(); r1,r2,c1,c2 = k).
+
+    The exact bounds corresponding to the calculated slice are
+    available as the 'bounds' attribute.
     """
-    def __init__(self,slice_bounds,sheet):
+    ### Allows shape to work like Numeric.array's
+    # CEBHACKALERT: can this method be made private?
+    def get_shape(self):
+        """Return the shape of the slice."""
+        r1,r2,c1,c2 = self.__slice
+        return (r2-r1,c2-c1)
+    shape = property(get_shape)
+
+    def __init__(self,slice_bounds,coordinate_transformer):
         """
-        Create the matrix slice that corresponds to the sheet
-        coordinate slice_bounds.
+        Store the coordinate_transformer, calculate the
+        slice corresponding to the specified slice_bounds
+        (see CoordinateTransformer.bounds2slice()), and
+        store the bounds that exactly correspond to that
+        calculated slice.
+
+        The slice_bounds do not have to be within the
+        bounds of the coordinate_transformer. The method
+        crop_to_bounds() can be called to ensure this
+        is true.
         """
-        self.sheet = sheet
-        self.slice_array = self.__bounds2slice(slice_bounds)
+        self.__ct = coordinate_transformer
+        self.__slice = self.__ct.bounds2slice(slice_bounds)
+        self.bounds = self.__ct.slice2bounds(self.__slice)
+
+    def tuple(self):
+        r1,r2,c1,c2 = self.__slice
+        return (r1,r2,c1,c2)
 
 
-    def sheet_coordinate_bounds(self):
+    def __iter__(self):
         """
-        Return the sheet coordinate bounding box of this Slice.
+        Make this object behave like a sequence.
+
+        Specifically, allows unpacking:
+        slice_ = Slice()
+        r1,r2,c1,c2 = k
         """
-        r1,r2,c1,c2 = self.slice_array
-
-        left,bottom = self.sheet.matrix2sheet(r2,c1)
-        right, top  = self.sheet.matrix2sheet(r1,c2)
-
-        return BoundingBox(points=((left,bottom),
-                                   (right,top)))
+        return iter(self.__slice)
 
 
-    def lbrt(self):
+    # CEBHACKALERT: add a translate() method and remove this one.
+    def set_slice(self,slice_):
         """
-        Return the matrix idx coordinate slice as a tuple.
+        bypass creation of slice from bounds.
         """
-        r1,r2,c1,c2 = self.slice_array
-        return (c1,r2,c2,r1)
+        if not isinstance(slice_,ArrayType):
+            self.__slice = array(slice_)
+        else:
+            self.__slice = slice_
+        self.bounds = self.__ct.slice2bounds(self.__slice)
 
 
-    def submatrix(self,M):
+    def submatrix(self,matrix):
         """
-        Return the submatrix of M defined by this Slice.
+        Return the submatrix of the specified matrix specified by this
+        slice.
+
+        Equivalent to computing the intersection between the
+        CoordinateTransformer's bounds and the slice_bounds, and
+        returning the corresponding submatrix of the given matrix.
+
+        The submatrix is just a view into the sheet_matrix; it is not
+        an independent copy.
         """
-        r1,r2,c1,c2 = self.slice_array
-        return M[r1:r2,c1:c2]
+        r1,r2,c1,c2 = self.__slice
+        return matrix[r1:r2,c1:c2]
 
 
-    def __bounds2slice(self,slice_bounds):
+    def crop_to_sheet(self):
         """
-        Convert a bounding box into an array slice suitable for computing
-        a submatrix.
-
-        Includes all units whose centers are within the specified sheet
-        coordinate bounding box slice_bounds.
-
-        The returned slice does not respect the sheet's bounds: use
-        crop_slice_to_sheet_bounds() to have the slice cropped to the
-        sheet.
-
-        Returns (a,b,c,d) such that a matrix M can be sliced using M[a:b,c:d].
+        Crop the slice to the CoordinateTransformer's bounds.
         """
-        l,b,r,t = slice_bounds.lbrt()
-
-        t_m,l_m = self.sheet.sheet2matrix(l,t)
-        b_m,r_m = self.sheet.sheet2matrix(r,b)
-
-        l_idx = int(ceil(l_m-0.5))
-        t_idx = int(ceil(t_m-0.5))
-        r_idx = int(floor(r_m+0.5))
-        b_idx = int(floor(b_m+0.5))
-
-        return array((t_idx,b_idx,l_idx,r_idx))
-
-
-    def cropped_to_sheet(self):
-        """
-        Return the slice cropped to the sheet's bounds.
-        """
-        sheet_right = self.sheet.bounds.aarect().right()
-        sheet_bottom = self.sheet.bounds.aarect().bottom()
-        maxrow,maxcol = self.sheet.sheet2matrixidx(sheet_right,sheet_bottom)
-
-        t_idx,b_idx,l_idx,r_idx = self.slice_array
+        r1,r2,c1,c2 = self.__ct.bounds2slice(self.__ct.bounds2)
+        maxrow,maxcol = r2-r1,c2-c1
+                        
+        t_idx,b_idx,l_idx,r_idx = self.__slice
 
         rstart = max(0,t_idx)
         rbound = min(maxrow,b_idx)
         cstart = max(0,l_idx)
         cbound = min(maxcol,r_idx)
-
-        return array((rstart,rbound,cstart,cbound))
-
-
+        
+        self.set_slice((rstart,rbound,cstart,cbound))
 
 
