@@ -156,10 +156,9 @@ class CoordinateTransformer(object):
         """
         self.lbrt = array(bounds.lbrt())
 
-        if ydensity==None:
-            self.xdensity,self.ydensity = xdensity,xdensity
-        else:
-            self.xdensity,self.ydensity = xdensity,ydensity
+        if ydensity==None: ydensity=xdensity
+
+        self.xdensity,self.ydensity = xdensity,ydensity
 
         # CEBHACKALERT: temporary
         self.bounds2=bounds
