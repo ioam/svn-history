@@ -21,14 +21,14 @@ from utils import assert_array_equal
 class TestPatternGenerator(unittest.TestCase):
 
     def test_a_basic_patterngenerator(self):
-        density = 10
         pattern_bounds = BoundingBox(points=((0.3,0.2),(0.5,0.5)))
 
         pattern_target = array([[1,1],
                                 [1,1],
                                 [1,1]])
 
-        r = Rectangle(bounds=pattern_bounds,density=10.0,aspect_ratio=1,size=1)
+        r = Rectangle(bounds=pattern_bounds,xdensity=10,
+                      ydensity=10,aspect_ratio=1,size=1)
         assert_array_equal(r(),pattern_target)
         
 
@@ -36,14 +36,13 @@ class TestPatternGenerator(unittest.TestCase):
         """
         Constant overrides PatternGenerator's usual matrix creation.
         """
-        density = 10
         pattern_bounds = BoundingBox(points=((0.3,0.2),(0.5,0.5)))
 
         pattern_target = array([[1,1],
                                 [1,1],
                                 [1,1]])
 
-        c = Constant(bounds=pattern_bounds,density=10.0)
+        c = Constant(bounds=pattern_bounds,xdensity=10.0,ydensity=10)
         assert_array_equal(c(),pattern_target)
         
 
@@ -58,7 +57,8 @@ class TestPatternGenerator(unittest.TestCase):
                          [0,1,1,0],
                          [0,0,0,0]])
 
-        r = Rectangle(bounds=BoundingBox(radius=2),density=1,aspect_ratio=1,size=2)
+        r = Rectangle(bounds=BoundingBox(radius=2),xdensity=1,
+                      ydensity=1,aspect_ratio=1,size=2)
         assert_array_equal(r(),initial)
 
         ### x offset
@@ -89,7 +89,8 @@ class TestPatternGenerator(unittest.TestCase):
         height = 0.4
 
         r = Rectangle(bounds=BoundingBox(radius=0.5),
-                      density=10,aspect_ratio=width/height,size=height)
+                      xdensity=10,ydensity=10,
+                      aspect_ratio=width/height,size=height)
 
         assert_array_equal(r(x=-0.4,y=-0.3),target)
 
@@ -109,7 +110,7 @@ class TestPatternGenerator(unittest.TestCase):
         height = 0.4
 
         bounds = BoundingBox(points=((-0.9,-0.8),(0.1,0.2)))
-        r = Rectangle(bounds=bounds,density=10,
+        r = Rectangle(bounds=bounds,xdensity=10,ydensity=10,
                       aspect_ratio=width/height,size=height)
         
         assert_array_equal(r(x=-0.4,y=-0.3),target)
@@ -130,13 +131,14 @@ class TestPatternGenerator(unittest.TestCase):
                         [0, 0, 0, 0, 0, 0]])
 
         bounds = BoundingBox(radius=0.3)
-        density = 10
-        width = 2.0/density
-        height = 4.0/density
+        xdensity = 10
+        ydensity = 10
+        width = 2.0/xdensity
+        height = 4.0/ydensity
         
         rect = Rectangle(size=height,
                          aspect_ratio=width/height,
-                         density=density,bounds=bounds)
+                         xdensity=xdensity,ydensity=ydensity,bounds=bounds)
 
         assert_array_equal(rect(),target)
         assert_array_equal(rect(orientation=pi/2),rot90(target))
@@ -161,7 +163,7 @@ class TestPatternGenerator(unittest.TestCase):
                                [0, 0, 0, 0, 0, 0],
                                [0, 0, 0, 0, 0, 0]])
 
-        assert_array_equal(rect(x=-1.0/density,y=1.0/density,orientation=pi/4),
+        assert_array_equal(rect(x=-1.0/xdensity,y=1.0/ydensity,orientation=pi/4),
                            rot_45_offset)
 
 

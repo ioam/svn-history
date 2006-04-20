@@ -56,7 +56,8 @@ class TestImage(unittest.TestCase):
 
         
         image = Image(filename = 'topo/tests/testimage.pgm',
-                      density=8,
+                      xdensity=8,
+                      ydensity=8,
                       bounds=BoundingBox(radius=0.5),
                       output_fn=IdentityOF(),
                       whole_image_output_fn=IdentityOF(),
@@ -97,7 +98,8 @@ class TestImage(unittest.TestCase):
 
         
         image = Image(filename = 'topo/tests/testimage.pgm',
-                      density=9,
+                      xdensity=9,
+                      ydensity=9,
                       output_fn=IdentityOF(),
                       whole_image_output_fn=IdentityOF(),
                       size_normalization='original')
@@ -181,7 +183,8 @@ class TestImage(unittest.TestCase):
 
 
         image = Image(filename = 'topo/tests/testimage.pgm',
-                      density=8,
+                      xdensity=8,
+                      ydensity=8,
                       size=2.0,
                       output_fn=IdentityOF(),
                       whole_image_output_fn=IdentityOF(),
@@ -266,7 +269,8 @@ class TestImage(unittest.TestCase):
         
 
         image = Image(filename = 'topo/tests/testimage.pgm',
-                      density=8,
+                      xdensity=8,
+                      ydensity=8,
                       output_fn=IdentityOF(),
                       whole_image_output_fn=IdentityOF(),
                       size_normalization='stretch_to_fit',
@@ -316,7 +320,8 @@ class TestImage(unittest.TestCase):
 
 
         image = Image(filename = 'topo/tests/testimage.pgm',
-                      density=15,
+                      xdensity=15,
+                      ydensity=15,
                       output_fn=IdentityOF(),
                       whole_image_output_fn=IdentityOF(),
                       size_normalization='fit_shortest',
