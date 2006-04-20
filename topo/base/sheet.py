@@ -306,7 +306,18 @@ class CoordinateTransformer(object):
         """
         x,y = self.matrix2sheet((row+0.5), (col+0.5))
         return around(x,10),around(y,10)
-        
+
+
+    def sheetcoordinates_of_matrixidx(self):
+        """
+        Return x,y where x is a vector of sheet coordinates
+        representing the x-center of each matrix cell, and y
+        represents the corresponding y-center of the cell.
+        """
+        n_rows,n_cols = self.shape
+        rows = array(range(n_rows)); cols = array(range(n_cols))
+        return self.matrixidx2sheet_array(rows,cols)
+
 
     ### CEBHACKALERT: move these two methods to Slice.
     def bounds2slice(self,slice_bounds):
