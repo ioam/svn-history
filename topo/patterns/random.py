@@ -12,7 +12,7 @@ import RandomArray
 
 from topo.base.parameterclasses import Number,Parameter
 from topo.base.patterngenerator import PatternGenerator
-from topo.base.sheet import CoordinateTransformer,Slice
+from topo.base.sheet import CoordinateTransformer
 
 from topo.outputfns.basic import IdentityOF
 
@@ -40,9 +40,7 @@ class RandomGenerator(PatternGenerator):
         ydensity = params.get('ydensity',self.ydensity)
         output_fn = params.get('output_fn',self.output_fn)
 
-        slice_ = Slice(bounds,CoordinateTransformer(bounds,xdensity,ydensity))
-        shape = slice_.shape
-
+        shape = CoordinateTransformer(bounds,xdensity,ydensity).shape
         if output_fn is IdentityOF:
             return self._distrib(shape)
         else:
