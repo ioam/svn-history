@@ -334,7 +334,7 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         if len(self.projections) > 0:
             src_name = self.projections[self.weight_name.get()].src.name
 
-            new_title = 'Projection ' + self.plotgroup.weight_name.get() + ' from ' + src_name + ' to ' \
+            new_title = 'Projection ' + self.plotgroup.weight_name + ' from ' + src_name + ' to ' \
                         + self.plotgroup.sheet_name + ' at time ' + str(self.plotgroup.plot_time)
             self.plot_group_title.configure(tag_text = new_title)
         else:

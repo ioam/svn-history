@@ -91,6 +91,8 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 
         self.plotgroups_history=[]
         self.history_index = -1
+	# indicate if we are currently looking into the past
+	self.looking_in_history = False
 
         self.labels = []
         ### JCALERT! Figure out why we need that!
@@ -240,7 +242,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         things such as 2D grids.
         """
 	plots = self.plotgroup.plots
-	### Momentary: delete when sorting the bitmap history
+	### JCALERT:Momentary: delete when sorting the bitmap history
 	self.bitmaps = [p.bitmap for p in plots]
 	self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image) for p in plots]
         # If the number of canvases or their sizes has changed, then
@@ -294,9 +296,12 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 	"""
 	# if we hit refresh during a Back research, we do not want to copy the 
 	# same PlotGroup two times in the history.
-	if self.history_index == len(self.plotgroups_history)-1:
+	if self.looking_in_history == True:
+	    self.history_index = len(self.plotgroups_history)-1
+	    self.plotgroups_history[self.history_index]=self.plotgroup	
+	else:
 	    self.plotgroups_history.append(self.plotgroup)
-	self.history_index = len(self.plotgroups_history)-1        
+	    self.history_index = len(self.plotgroups_history)-1
 	self.update_back_fwd_button()
 
 
@@ -320,15 +325,21 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 
 
     ### Momentary have to be re-moved:  
-    def update_back_fwd_button(self):
-	
+    def update_back_fwd_button(self):	
 	if (self.history_index > 0):
             self.back_button.config(state=NORMAL)
+	    self.normalize_checkbutton.config(state=DISABLED)
+	    self.sheetcoords_checkbutton.config(state=DISABLED)
+	    self.integerscaling_checkbutton.config(state=DISABLED)
         else:
             self.back_button.config(state=DISABLED)
 
         if self.history_index >= len(self.plotgroups_history)-1:
             self.forward_button.config(state=DISABLED)
+	    self.normalize_checkbutton.config(state=NORMAL)
+	    self.sheetcoords_checkbutton.config(state=NORMAL)
+	    self.integerscaling_checkbutton.config(state=NORMAL)
+	    self.looking_in_history = False
         else:
             self.forward_button.config(state=NORMAL)
 
@@ -385,13 +396,15 @@ class PlotGroupPanel(Frame,ParameterizedObject):
     # number you want to view, or perhaps how many you want to jump...
     def back(self):
         """Function called by Widget to scroll back through the previous bitmaps"""
+	self.looking_in_history = True
         self.history_index -= 1
 	self.update_back_fwd_button()
         self.plotgroup = self.plotgroups_history[self.history_index]
 	self.display_plots()
         self.display_labels()
         self.refresh_title() 
-	self.restaure_panel_environment()
+	self.restore_panel_environment()
+	self.update_back_fwd_button()
 
 
     def forward(self):
@@ -400,20 +413,26 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         Only useful if previously you have scrolled back.
         """
         self.history_index += 1
-	self.update_back_fwd_button()
 	self.plotgroup=self.plotgroups_history[self.history_index]
 	self.display_plots()
         self.display_labels()
         self.refresh_title()
-	self.restaure_panel_environment()
+	self.restore_panel_environment()
+	self.update_back_fwd_button()
 	
-    def restaure_panel_environment(self):
+    def restore_panel_environment(self):
 	if self.plotgroup.normalize != self.normalize:
+	    self.normalize_checkbutton.config(state=NORMAL)
 	    self.normalize_checkbutton.invoke()
+	    self.normalize_checkbutton.config(state=DISABLED)
 	if self.plotgroup.sheetcoords != self.sheetcoords:
+	    self.sheetcoords_checkbutton.config(state=NORMAL)
 	    self.sheetcoords_checkbutton.invoke()
+	    self.sheetcoords_checkbutton.config(state=DISABLED)
 	if self.plotgroup.integerscaling != self.integerscaling:
+	    self.integerscaling_checkbutton.config(state=NORMAL)
 	    self.integerscaling_checkbutton.invoke()
+	    self.integerscaling_checkbutton.config(state=DISABLED)
 	
 
     def toggle_auto_refresh(self):
