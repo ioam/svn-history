@@ -50,13 +50,12 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         self.y_str.set(0.0)
 	self._add_region_menu()
         self._add_xy_boxes()
-        self.auto_refresh_checkbutton.invoke()
-	
+
 	# By default, the UnitWeight Plots are situated.
         self.toggle_situate()
 	self.situate_checkbutton.select()
 
-        self.refresh()
+        self.auto_refresh_checkbutton.invoke()
 
 
     def _add_region_menu(self):
@@ -113,16 +112,16 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
 
         Message(params_frame,text="Unit  X:",aspect=1000).pack(side=LEFT)
         self.xe = Entry(params_frame,textvariable=self.x_str)
-        self.xe.bind('<FocusOut>', self.refresh)
-        self.xe.bind('<Return>', self.refresh)
+        # JC: we would like to update when the user leaves the box,
+	# but we don't know yet how to do it.(id for ye)
+        self.xe.bind('<Return>',self.refresh)
         self.xe.pack(side=LEFT,expand=YES,fill=X)
 
         #self.tag.bind('<KeyRelease>', self.tag_keypress)
 
         Message(params_frame,text="Y:",aspect=1000).pack(side=LEFT)
         self.ye = Entry(params_frame,textvariable=self.y_str)
-        self.ye.bind('<FocusOut>', self.refresh)
-        self.ye.bind('<Return>', self.refresh)
+	self.ye.bind('<Return>', self.refresh)
         self.ye.pack(side=LEFT,expand=YES,fill=X,padx=5)
 
     @staticmethod
@@ -217,10 +216,14 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
 	if (self.history_index > 0):
             self.situate_checkbutton.config(state=DISABLED)
 	    self.xe.config(state=DISABLED)
+	    self.ye.config(state=DISABLED)
+	    #self.opt_menu.config(state=DISABLED)
 
         if self.history_index >= len(self.plotgroups_history)-1:
 	    self.situate_checkbutton.config(state=NORMAL)
 	    self.xe.config(state=NORMAL)
+	    self.ye.config(state=NORMAL)
+	    #self.opt_menu.config(state=NORMAL)
 
     def restore_panel_environment(self):
 	super(ConnectionFieldsPanel,self).restore_panel_environment()
