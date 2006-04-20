@@ -8,7 +8,6 @@ import unittest
 from pprint import pprint
 from topo.plotting import plot
 from topo.base.sheet import *
-from testsheetview import ImageGenerator
 from topo.sheets.generatorsheet import *
 import Numeric, random, os
 from math import pi
