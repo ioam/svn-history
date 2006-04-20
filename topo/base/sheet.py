@@ -97,7 +97,7 @@ __version__ = '$Revision$'
 
 from simulator import EventProcessor
 from parameterclasses import BooleanParameter, Number, Parameter
-from Numeric import zeros,array,floor,ceil,Float,ArrayType
+from Numeric import zeros,array,floor,ceil,Float,ArrayType,around
 
 from boundingregion import BoundingBox, BoundingRegionParameter
 import sheetview 
@@ -171,6 +171,8 @@ class CoordinateTransformer(object):
         Returns (float_row,float_col), where float_row corresponds to y,
         and float_col to x.
 
+        Valid for scalar or array x and y.
+
         Note about Bounds
         For a Sheet with BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
         and density=3, x=-0.5 corresponds to float_col=0.0 and x=0.5
@@ -225,6 +227,8 @@ class CoordinateTransformer(object):
         coordinates to its corresponding location (x,y) in sheet
         coordinates.
 
+        Valid for scalar or array float_row and float_col.
+
         Inverse of sheet2matrix().
         """
         x = float_col*self.__xstep + self.lbrt[0]
@@ -243,7 +247,7 @@ class CoordinateTransformer(object):
         sheet2matrixidx(), because sheet2matrixidx() discards all but the integer
         portion of the continuous matrix coordinate.
 
-        Valid only for scalar x and y.
+        Valid only for scalar row and col.
         """
         x,y = self.matrix2sheet((row+0.5), (col+0.5))
 
@@ -252,11 +256,16 @@ class CoordinateTransformer(object):
         # Round eliminates any precision errors that have been compounded
         # via floating point operations so that the rounded number will better
         # match the floating number that we type in.
-        # (CEB: if someone wishes to use array x and y, changing this to around()
-        # would work.)
         return round(x,10),round(y,10)
 
-    ### CEBHACKALERT: make some matrix2sheet_array methods.
+
+    def matrixidx2sheet_array(self,row,col):
+        """
+        matrixidx2sheet() but for arrays.
+        """
+        x,y = self.matrix2sheet((row+0.5), (col+0.5))
+        return around(x,10),around(y,10)
+        
 
     ### CEBHACKALERT: move these two methods to Slice.
     def bounds2slice(self,slice_bounds):
