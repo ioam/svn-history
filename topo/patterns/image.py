@@ -99,9 +99,10 @@ class Image(PatternGenerator):
 
 
     def function(self,**params):
-        density = params.get('density', self.density)
-        x       = params.get('pattern_x',self.pattern_x)
-        y       = params.get('pattern_y',self.pattern_y)
+        xdensity = params.get('xdensity', self.xdensity)
+        ydensity = params.get('ydensity', self.ydensity)
+        x        = params.get('pattern_x',self.pattern_x)
+        y        = params.get('pattern_y',self.pattern_y)
         filename = params.get('filename',self.filename)
         size_normalization = params.get('scaling',self.size_normalization)
         whole_image_output_fn = params.get('whole_image_output_fn',self.whole_image_output_fn)
@@ -110,6 +111,6 @@ class Image(PatternGenerator):
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
 
         self.__setup_pattern_sampler(filename,whole_image_output_fn)
-        return self.ps(x,y,float(density),size_normalization,float(width),float(height))
+        return self.ps(x,y,float(xdensity),float(ydensity),size_normalization,float(width),float(height))
 
 
