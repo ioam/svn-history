@@ -48,7 +48,8 @@ class GeneratorSheet(Sheet):
 
         self.input_generator = new_ig
         self.input_generator.bounds = self.bounds
-        self.input_generator.density = self.density
+        self.input_generator.xdensity = self.xdensity
+        self.input_generator.ydensity = self.ydensity
         
 
     def push_input_generator(self):
