@@ -13,7 +13,7 @@ import topo
 from topo.analysis.featuremap import MeasureFeatureMap
 from topo.base.arrayutils import octave_output, centroid
 from topo.base.connectionfield import CFSheet
-from topo.base.sheet import Sheet, matrix2sheet
+from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
 import topo.base.patterngenerator
 from topo.commands.basic import pattern_present
@@ -120,10 +120,10 @@ def measure_cog():
                         cf=proj.cf(r,c)
                         r1,r2,c1,c2 = cf.slice_array
                         row_centroid,col_centroid = centroid(cf.weights)
-                        xcentroid, ycentroid = matrix2sheet(r1+row_centroid+0.5,
-                                                            c1+col_centroid+0.5,
-                                                            proj.src.bounds,
-                                                            proj.src.density)
+                        xcentroid, ycentroid = proj.src.matrix2sheet(
+                            r1+row_centroid+0.5,
+                            c1+col_centroid+0.5)
+
                         xpref[r][c]= xcentroid
                         ypref[r][c]= ycentroid
 
