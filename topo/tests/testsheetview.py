@@ -61,17 +61,18 @@ class TestSheetView(unittest.TestCase):
             sv6.message(sv6.view())
 
 
-    def test_view(self):
-        ImageGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
-        ImageGenerator.density = 100
+# CEBHACKALERT: replace with test using Image
+##     def test_view(self):
+##         ImageGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+##         ImageGenerator.density = 100
         
-        input = ImageGenerator(filename='topo/tests/testsheetview.ppm')
-	sv = SheetView((input.activity,input.bounds),
-                          src_name=input.name)
-        input.sheet_view_dict['Activity']=sv
-        sv_tuple = sv.view()
-        map = PaletteBitmap(sv_tuple[0])
-        # map.show()
+##         input = ImageGenerator(filename='topo/tests/testsheetview.ppm')
+## 	sv = SheetView((input.activity,input.bounds),
+##                           src_name=input.name)
+##         input.sheet_view_dict['Activity']=sv
+##         sv_tuple = sv.view()
+##         map = PaletteBitmap(sv_tuple[0])
+##         # map.show()
 
 
 #     def test_generate_coords(self):
@@ -86,61 +87,62 @@ class TestSheetView(unittest.TestCase):
 
 
 
+# CB: I think this class can be removed now. We have topo/patterns/image.py, which uses a Sheet.
 
-# CEBHACKALERT: Used in a number of test files. Maybe one day topo/patterns/image.py
-# will be based on a Sheet, in which case this could be removed.
-from Numeric import resize,array
-from topo.base.sheet import Sheet
-from topo.base.simulator import EventProcessor
-from topo.misc.utils import NxN
-from topo.base.parameterclasses import Parameter
-from pprint import *
-import Image, ImageOps
+## # CEBHACKALERT: Used in a number of test files. Maybe one day topo/patterns/image.py
+## # will be based on a Sheet, in which case this could be removed.
+## from Numeric import resize,array
+## from topo.base.sheet import Sheet
+## from topo.base.simulator import EventProcessor
+## from topo.misc.utils import NxN
+## from topo.base.parameterclasses import Parameter
+## from pprint import *
+## import Image, ImageOps
 
-class ImageGenerator(Sheet):
-    """
+## class ImageGenerator(Sheet):
+##     """
 
-    parameters:
+##     parameters:
 
-      filename = The path to the image file.
+##       filename = The path to the image file.
 
-    A sheet that reads a pixel map and uses it to generate an activity
-    matrix.  The image is converted to grayscale and scaled to match
-    the bounds and density of the sheet.
+##     A sheet that reads a pixel map and uses it to generate an activity
+##     matrix.  The image is converted to grayscale and scaled to match
+##     the bounds and density of the sheet.
 
-    NOTE: A bare ImageGenerator only sends a single event, containing
-    its image when it gets the .start() call, to repeatedly generate
-    images, it must have a self-connection.  More elegant, however,
-    would be to convert the ImageGenerator from a sheet to a generator
-    function suitable for use with the GeneratorSheet class (see
-    topo/sheets/generatorsheet.py).
+##     NOTE: A bare ImageGenerator only sends a single event, containing
+##     its image when it gets the .start() call, to repeatedly generate
+##     images, it must have a self-connection.  More elegant, however,
+##     would be to convert the ImageGenerator from a sheet to a generator
+##     function suitable for use with the GeneratorSheet class (see
+##     topo/sheets/generatorsheet.py).
 
-    """
-    filename = Parameter(None)
+##     """
+##     filename = Parameter(None)
     
-    def __init__(self,**config):
+##     def __init__(self,**config):
 
-        super(ImageGenerator,self).__init__(**config)
+##         super(ImageGenerator,self).__init__(**config)
 
-        self.verbose("filename = " + self.filename)
+##         self.verbose("filename = " + self.filename)
 
-        image = Image.open(self.filename)
-        image = ImageOps.grayscale(image)
-        image = image.resize(self.activity.shape)
-        self.activity = resize(array([x for x in image.getdata()]),
-                                 (image.size[1],image.size[0]))
+##         image = Image.open(self.filename)
+##         image = ImageOps.grayscale(image)
+##         image = image.resize(self.activity.shape)
+##         self.activity = resize(array([x for x in image.getdata()]),
+##                                  (image.size[1],image.size[0]))
 
-	self.verbose("Initialized %s activity from %s" % (NxN(self.activity.shape),self.filename))
-        max_val = float(max(self.activity.flat))
-        self.activity = self.activity / max_val
+## 	self.verbose("Initialized %s activity from %s" % (NxN(self.activity.shape),self.filename))
+##         max_val = float(max(self.activity.flat))
+##         self.activity = self.activity / max_val
 
 
-    def start(self):
-	assert self.simulator
-	self.simulator.enqueue_event_rel(0,self,self,data=self.activity)
+##     def start(self):
+## 	assert self.simulator
+## 	self.simulator.enqueue_event_rel(0,self,self,data=self.activity)
 
-    def input_event(self,src,src_port,dest_port,data):
-        self.send_output(data=self.activity)
+##     def input_event(self,src,src_port,dest_port,data):
+##         self.send_output(data=self.activity)
 
 
 

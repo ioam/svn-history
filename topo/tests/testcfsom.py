@@ -107,27 +107,28 @@ class TestCFSom(unittest.TestCase):
         self.sheet2 = Sheet()
 
 
-    def test_imagegenerator(self):
-        """
-        Code moved from __main__ block of cfsom.py.  Gives a tight example
-        of running a cfsom simulation.
-        """
-        from testsheetview import ImageGenerator
+# CEBHACKALERT: replace with an equivalent example that uses Image
+##     def test_imagegenerator(self):
+##         """
+##         Code moved from __main__ block of cfsom.py.  Gives a tight example
+##         of running a cfsom simulation.
+##         """
+##         from testsheetview import ImageGenerator
         
-        s = Simulator(step_mode=True)
+##         s = Simulator(step_mode=True)
 
-        ImageGenerator.density = 100
-        ImageGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
-        input = ImageGenerator(filename='examples/ellen_arthur.pgm')
+##         ImageGenerator.density = 100
+##         ImageGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+##         input = ImageGenerator(filename='examples/ellen_arthur.pgm')
     
     
-        save = ImageSaver(pixel_scale=1.5)
-        som = CFSOM()
+##         save = ImageSaver(pixel_scale=1.5)
+##         som = CFSOM()
         
-        s.add(som,input,save)
-        s.connect(input,som,connection_type=CFProjection,learning_fn=HebbianSOMLF())
-        s.connect(som,save)
-        s.run(duration=10)
+##         s.add(som,input,save)
+##         s.connect(input,som,connection_type=CFProjection,learning_fn=HebbianSOMLF())
+##         s.connect(som,save)
+##         s.run(duration=10)
     
 
 
