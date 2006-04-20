@@ -208,7 +208,7 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         
     def refresh_title(self):
         self.parent.title(topo.sim.name+': '+self.pgt.name + " %s (%0.3f,%0.3f) time:%s" %
-                          (self.region.get(),self.plotgroup.x,self.plotgroup.y,self.plotgroup.time))
+                          (self.plotgroup.sheet_name,self.plotgroup.x,self.plotgroup.y,self.plotgroup.time))
 
 
     def update_back_fwd_button(self):
@@ -231,4 +231,3 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
 	    self.situate_checkbutton.config(state=NORMAL)
 	    self.situate_checkbutton.invoke()
 	    self.situate_checkbutton.config(state=DISABLED)
-	
