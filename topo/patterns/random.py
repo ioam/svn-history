@@ -12,7 +12,7 @@ import RandomArray
 
 from topo.base.parameterclasses import Number,Parameter
 from topo.base.patterngenerator import PatternGenerator
-from topo.base.sheet import bounds2slice
+from topo.base.sheet import CoordinateTransformer,Slice
 
 from topo.outputfns.basic import IdentityOF
 
@@ -36,11 +36,12 @@ class RandomGenerator(PatternGenerator):
     # coordinate transformations (which would have no effect anyway)
     def __call__(self,**params):
         bounds = params.get('bounds',self.bounds)
-        density = params.get('density',self.density)
+        xdensity = params.get('xdensity',self.xdensity)
+        ydensity = params.get('ydensity',self.ydensity)
         output_fn = params.get('output_fn',self.output_fn)
 
-        r1,r2,c1,c2 = bounds2slice(bounds,bounds,density)
-        shape = (r2-r1,c2-c1)
+        slice_ = Slice(bounds,CoordinateTransformer(bounds,xdensity,ydensity))
+        shape = slice_.shape
 
         if output_fn is IdentityOF:
             return self._distrib(shape)
