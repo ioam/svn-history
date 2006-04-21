@@ -12,12 +12,18 @@ was first added to the list, or a change was made.)
 
 <ul>
 
-<li> 
-2006/04/20 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler; investigate failing test in testimage.py (that uses sheet functions); did the performance change (e.g. lissom_oo_or)?
+<!-- CB: I put my tasks in the approximate order that I'm doing them -->
+
+<li>
+2006/04/21 (CB): unsituated plots of connection fields (in Connection Fields or Projection plots) are messed up for SharedWeight projections. I might have caused that...I'm looking at it.
+</li>
+
+<li>
+2006/04/21 (CB): matching with C++ LISSOM when there are circular connection fields; HACKALERTs relating to connection fields; test file for connectionfield.
 </li>
 
 <li> 
-2006/04/20 (CB): many of the tests in testsheet.py run twice - correct that.
+2006/04/21 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler; investigate failing test in testimage.py (that uses sheet functions); did the performance change (e.g. lissom_oo_or)?
 </li>
 
 <li>
@@ -25,27 +31,27 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
+2006/04/12: (CB) Finish reorganizing response functions and CFProjection response functions; rename CFProjectionGenericOutputFn to GenericCFPOutputFn, etc.; rename connectionfield.py to cf.py; rename Identity to IdentityOutputFn; create Identity learning function; create topo/base/functionfamilies.py and move LearningFns etc into it; rename SharedCFProjection SharedWeightCFProjection; make sure GUI lists are populated (and try to make that simpler).
+</li>
+
+<li>
 2006/04/07: (CB) Implement joint normalization via ports - check ports work as expected.
 </li>
 
 <li>
-2006/04/12: (CB) Finish reorganizing response functions and CFProjection response functions; rename CFProjectionGenericOutputFn to GenericCFPOutputFn, etc.; rename connectionfield.py to cf.py; rename Identity to IdentityOutputFn; create Identity learning function; create topo/base/functionfamilies.py and move LearningFns etc into it; rename SharedCFProjection SharedWeightCFProjection; make sure GUI lists are populated (and try to make that simpler).
+2006/04/08: (CB) Implement scheduled actions as strings exec'd in main [it worked a long time ago, it just needs to be implemented on a current copy!]
 </li>
 
 <li> 
 2006/03/17 (CB): Fix problem (matching previous work) with som_retinotopy.
 </li>
 
-<li>
-2006/04/07 (CB): HACKALERTs relating to connection fields; matching with C++ LISSOM when there are circular connection fields; test file for connectionfield.
+<li> 
+2006/04/20 (CB): many of the tests in testsheet.py run twice - correct that.
 </li>
 
 <li>
 2006/04/20 (CB): write test file for Composite and complete Image's test file.
-</li>
-
-<li>
-2006/04/08: (CB) Implement scheduled actions as strings exec'd in main [it worked a long time ago, it just needs to be implemented on a current copy!]
 </li>
 
 <li>
