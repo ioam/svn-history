@@ -15,10 +15,6 @@ was first added to the list, or a change was made.)
 <!-- CB: I put my tasks in the approximate order that I'm doing them -->
 
 <li>
-2006/04/21 (CB): unsituated plots of connection fields (in Connection Fields or Projection plots) are messed up for SharedWeight projections. I might have caused that...I'm looking at it.
-</li>
-
-<li>
 2006/04/21 (CB): matching with C++ LISSOM when there are circular connection fields; HACKALERTs relating to connection fields; test file for connectionfield.
 </li>
 
