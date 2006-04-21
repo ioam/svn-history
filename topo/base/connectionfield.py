@@ -725,9 +725,7 @@ class CFProjection(Projection):
 	(r,c) = self.dest.sheet2matrixidx(sheet_x,sheet_y)
         
         slice_ = Slice(self.cf(r,c).bounds,self.src)
-        #print slice_.slice_
         slice_.crop_to_sheet()
-        #print slice_.slice_
 
 	matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float)
 
