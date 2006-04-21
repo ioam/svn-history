@@ -68,7 +68,7 @@ class CFProjectionDotProduct_opt1(CFProjectionResponseFn):
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
 if not optimized:
-    CFprojectionDotProduct_opt1 = CFProjectionDotProduct
+    CFProjectionDotProduct_opt1 = CFProjectionDotProduct
     ParameterizedObject().message('Inline-optimized components not available; using CFProjectionDotProduct instead of CFProjectionDotProduct_opt1.')
 
 
