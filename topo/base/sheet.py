@@ -157,7 +157,7 @@ class CoordinateTransformer(object):
         r1,r2,c1,c2 = self.bounds2slice(self.true_bounds)
         return (r2-r1,c2-c1)
 
-    ### shape is a property so that's it's like Numeric.array.shape
+    ### shape is a property so that it's like Numeric.array.shape
     shape = property(get_shape)
 
 
