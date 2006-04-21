@@ -735,8 +735,6 @@ class CFProjection(Projection):
         r1,r2,c1,c2 = slice_
 	matrix_data[r1:r2,c1:c2] = Numeric.array(self.cf(r,c).weights)
 
-        #print matrix_data
-	
         return UnitView((matrix_data,self.src.bounds),sheet_x,sheet_y,self)
 
 
