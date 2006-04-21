@@ -726,8 +726,6 @@ class CFProjection(Projection):
 	matrix_data = Numeric.zeros(self.src.activity.shape,Numeric.Float)
         (r,c) = self.dest.sheet2matrixidx(sheet_x,sheet_y)
 
-	assert self.cf(r,c) != None, "Projection Matrix is None"
-
 	# CEBHACKALERT: why is this necessary? Isn't cf[r][c].weights
         # already a Numeric array? (Same in SharedWeightProjection.)
         r1,r2,c1,c2 = self.cf(r,c).slice_array
