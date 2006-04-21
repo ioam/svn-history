@@ -143,24 +143,6 @@ class SharedCFProjection(CFProjection):
         self.sharedcf.slice_array = slice_array
         return self.sharedcf
 
-
-    def get_view(self,sheet_x, sheet_y):
-        """
-        Return the shared ConnectionField as a UnitView, but with
-        the appropriate bounding box depending on the
-        sheet coordinate (sheet_x,sheet_y).
-        """
-        (r,c) = (self.dest).sheet2matrixidx(sheet_x,sheet_y)
-
-        # CEBHACKALERT: see get_view() in CFProjection
-        matrix_data = Numeric.array(self.sharedcf.weights)
-
-        # get weights bounds for each unit
-        new_box = (self.cf_slice_and_bounds[r][c])[1]
-
-        assert matrix_data != None, "Projection Matrix is None"
-        return UnitView((matrix_data,new_box),sheet_x,sheet_y,self)
-
     
     def activate(self,input_activity):
         """Activate using the specified response_fn and output_fn."""
