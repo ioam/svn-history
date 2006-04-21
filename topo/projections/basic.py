@@ -63,6 +63,9 @@ class SharedCFProjectionResponseFn(ParameterizedObject):
         activity *= strength
         
 
+# CEBHACKALERT: users should not access .sharedcf or .cfs directly,
+# but should use .cf(r,c). That all needs to be cleaned up, here and
+# in connectionfield.py.
 class SharedCFProjection(CFProjection):
     """
     A Projection with a single ConnectionField shared by all units.
@@ -129,9 +132,15 @@ class SharedCFProjection(CFProjection):
         ### run without an exception
         self.cfs = [self.sharedcf]
 
-
+    
     def cf(self,r,c):
         """Return the shared ConnectionField, for all coordinates."""
+        # CEBHACKALERT: there's probably a better way to do this than
+        # just replacing the sharedcf's bounds and slice_array. 
+        bounds = self.cf_slice_and_bounds[r][c][1]
+        slice_array = self.cf_slice_and_bounds[r][c][0]
+        self.sharedcf.bounds = bounds
+        self.sharedcf.slice_array = slice_array
         return self.sharedcf
 
 
