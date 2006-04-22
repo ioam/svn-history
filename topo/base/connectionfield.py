@@ -281,15 +281,11 @@ class ConnectionField(ParameterizedObject):
         # translate to this cf's location
         center_row,center_col = self.input_sheet.sheet2matrixidx(self.x,self.y)
         sheet_center_row,sheet_center_col = self.input_sheet.sheet2matrixidx(0.0,0.0)
-
         row_offset = center_row-sheet_center_row
         col_offset = center_col-sheet_center_col
-        r1+=row_offset; r2+=row_offset
-        c1+=col_offset; c2+=col_offset
+        slice_.translate(row_offset,col_offset)
 
-        slice_.set_slice((r1,r2,c1,c2))
         slice_.crop_to_sheet()
-
         self.bounds = slice_.bounds
 
         # Also, store the array for direct access by C.

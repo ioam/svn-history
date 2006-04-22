@@ -545,6 +545,10 @@ class Slice(object):
 
     The exact bounds corresponding to the calculated slice are
     available as the 'bounds' attribute.
+
+    Actions such as translate() do not respect the bounds of the
+    CoordinateTransformer; to have the slice cropped to the
+    CoordinateTransformer's bounds, use crop_to_sheet().
     """
     ### Allows shape to work like Numeric.array's
     # CEBHACKALERT: can this method be made private?
@@ -587,8 +591,18 @@ class Slice(object):
         return iter(self.__slice)
 
 
-    # CEBHACKALERT: add a translate() method and remove this one.
-    def set_slice(self,slice_):
+    def translate(self, r, c):
+        """
+        Translate the slice by the specified number of rows
+        and columns.
+        """
+        r1,r2,c1,c2 = self.__slice
+        r1+=r; r2+=r
+        c1+=c; c2+=c
+        self.__set_slice(array((r1,r2,c1,c2)))
+
+
+    def __set_slice(self,slice_):
         """
         bypass creation of slice from bounds.
         """
@@ -614,7 +628,7 @@ class Slice(object):
         r1,r2,c1,c2 = self.__slice
         return matrix[r1:r2,c1:c2]
 
-
+    ## CEBHACKALERT: should be crop_to_bounds
     def crop_to_sheet(self):
         """
         Crop the slice to the CoordinateTransformer's bounds.
@@ -629,6 +643,7 @@ class Slice(object):
         cstart = max(0,l_idx)
         cbound = min(maxcol,r_idx)
         
-        self.set_slice((rstart,rbound,cstart,cbound))
+        self.__set_slice((rstart,rbound,cstart,cbound))
+
 
 
