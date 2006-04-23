@@ -4,7 +4,7 @@ C++ simulation.
 
 This file is much more complex than necessary, because it is set up to
 match the C++ version of the LISSOM simulator as closely as possible.
-Most of the variables below are just temporary variables designed to
+Most of the variables below are just temporary ones designed to
 match those in the other simulator.
 
 $Id$
@@ -142,14 +142,15 @@ GeneratorSheet.period = 1
 
 # take the input pattern position parameters from the log file output
 # of the equivalent c++ simulation
-n_inputs,input_x,input_y,input_orientation = get_input_params(log_file="topo/tests/or_map_topo.log")
+n_inputs,input_x,input_y,input_orientation = get_input_params(
+    log_file="topo/tests/or_map_topo.log")
 
 # c++ lissom's first iteration is just a test...
 n_inputs-=1;input_x.next();input_y.next();input_orientation.next() 
 
 print "Number of patterns available for learning iterations:",n_inputs
 
-
+# c++ positions and angle need to be converted to match Topographica
 topo.patterns.basic.Gaussian.x = DynamicNumber(
     lambda : input_x.next()/BaseRN - 0.5*RN/BaseRN)
 topo.patterns.basic.Gaussian.y = DynamicNumber(
@@ -161,9 +162,7 @@ topo.patterns.basic.Gaussian.scale = scale_input
 
 gaussian_width = xsigma/BaseRN/sqrt(2.0)
 gaussian_height = ysigma/BaseRN/sqrt(2.0)
-input_bounds = BoundingBox(
-    points=((-RN/(BaseRN*area_scale)/2.0,-RN/(BaseRN*area_scale)/2.0),
-            ( RN/(BaseRN*area_scale)/2.0, RN/(BaseRN*area_scale)/2.0)))
+input_bounds = BoundingBox(radius=RN/(BaseRN*area_scale)/2.0)
 
 topo.patterns.basic.Gaussian.size = 2*gaussian_height
 topo.patterns.basic.Gaussian.aspect_ratio = gaussian_width/gaussian_height
@@ -176,17 +175,9 @@ LISSOM.density = BaseN
 #LISSOM.tsettle=tsettle
 
 # Connection parameters
-afferent_weight_bounds = BoundingBox(
-    points=((-rf_radius/BaseRN,-rf_radius/BaseRN),
-            (rf_radius/BaseRN,rf_radius/BaseRN)))
-
-excitatory_weight_bounds = BoundingBox(
-    points=((-exc_rad/BaseN,-exc_rad/BaseN),
-            (exc_rad/BaseN,exc_rad/BaseN)))
-
-inhibitory_weight_bounds = BoundingBox(
-    points=((-inh_rad/BaseN,-inh_rad/BaseN),
-            (inh_rad/BaseN,inh_rad/BaseN)))
+afferent_weight_bounds = BoundingBox(radius=rf_radius/BaseRN)
+excitatory_weight_bounds = BoundingBox(radius=exc_rad/BaseN)
+inhibitory_weight_bounds = BoundingBox(radius=inh_rad/BaseN)
 
 CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
