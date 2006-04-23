@@ -158,5 +158,11 @@ distdir: FORCE
 dist: doc distdir FORCE
 	${CD} ${DIST_DIR}; ${MAKE} distarc
 
+ChangeLog.txt: FORCE
+	mv ChangeLog.txt ChangeLog
+	`locate rcs2log | grep /emacs` -v > ChangeLog.new
+	cat ChangeLog.new ChangeLog > ChangeLog.txt
+	rm -f ChangeLog ChangeLog.new
+
 
 
