@@ -1,17 +1,1038 @@
-2006-04-05  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+2006-04-23 ceball <ceball@lodestar.inf.ed.ac.uk>
 
-	* topo/tests/tkgui/testplotgrouppanel.py 1.8: Fixed broken test
-	uncovered by better error messages
+	* topo/tests/lissom_or_reference.ty 1.28: Minor clean-up.
 
-2006-04-05  ceball  <ceball@lodestar.inf.ed.ac.uk>
+	* topo/tests/lissom_or_reference.ty 1.27: Updated to work with
+	current code, and made some minor simplifications.
 
-	* topo/base/projection.py 1.60: Added 'sum' argument to Identity.
+	* doc/Developer_Manual/imports_text.php 1.4: Fixed minor typo.
 
-	* topo/tests/testimage.py 1.1, topo/tests/utils.py 1.1: Initial
+2006-04-22 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.169, topo/base/sheet.py 1.94:
+	Added translate() method to Slice.
+
+2006-04-21 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/responsefns/optimized.py 1.23: Corrected typo in the
+	code that was stopping Topographica running without weave.
+
+	* doc/Future_Work/current_text.php 1.29: Removed a task!
+
+	* topo/base/connectionfield.py 1.168: Removed a HACKALERT and
+	the corresponding HACK.
+
+	* topo/base/connectionfield.py 1.167: Removed an assert
+	statement from get_view().
+
+	* topo/base/connectionfield.py 1.166: get_view() asks for cf's
+	slice directly, rather than getting bounds and calculating the
+	slice.
+
+	* topo/projections/basic.py 1.26: Removed get_view() because
+	there is no longer any need to override the superclass's
 	version.
 
-	* topo/tests/testimage.pgm 1.1: An image to use for testing the
-	image generator in image.py.
+	* topo/base/connectionfield.py 1.165: Removed another print
+	statement that I left in by mistake.
+
+	* topo/projections/basic.py 1.25: SharedWeight's cf(r,c)
+	method now returns the cf with the appropriate bounds.
+
+	* topo/base/connectionfield.py 1.164: Removed commented-out
+	print statements left in by mistake.
+
+	* topo/base/sheet.py 1.93: Corrected typo.
+
+	* doc/Future_Work/current_text.php 1.28: Updated my tasks;
+	started to put them in some kind of order (in which I'm doing
+	them).
+
+2006-04-20 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.92: Added HACKALERT about location of
+	CoordinateTransformer.
+
+	* topo/base/parameterizedobject.py 1.37,
+	topo/base/patterngenerator.py 1.88: Moved _check_params to
+	ParameterizedObject, where I meant to put it originally.
+
+	* topo/patterns/random.py 1.26: __call__() checks that its
+	arguments are Parameters.
+
+	* topo/base/patterngenerator.py 1.87: Moved code that checks
+	arguments of __call__() are Parameters to its own method;
+	added call to that method to Constant.
+
+	* topo/base/patterngenerator.py 1.86: PatternGenerator uses a
+	CoordinateTransformer method to get pattern sampling vectors.
+
+	* topo/base/sheet.py 1.91: Added method to return the sheet
+	coordinate x-centers and y-centers of the underlying matrix
+	cells of a CoordinateTransformer.
+
+2006-04-20 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/connectionfieldspanel.py 1.21,
+	topo/tkgui/projectionpanel.py 1.56: Fixed projectionpanel and
+	corrected errors in connectionfield panel. There is still a
+	warning when opening the connectionfield panel, it has to be
+	sorted.
+
+	* topo/tkgui/connectionfieldspanel.py 1.20: Corrected display
+	of the sheet_name while looking into history.
+
+2006-04-20 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testsheet.py 1.39: Minor update after change to
+	* Sheet.
+
+	* topo/base/sheet.py 1.90: Continued to update recent work
+	CoordinateTransformer. Equalizing the densities by adjusting
+	bounds is now an option on creating a CoordinateTransformer,
+	and is True by default for Sheets.
+
+2006-04-20 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/connectionfieldspanel.py 1.19: Corrected the
+	double call to refresh in the __init__, and got rid of the
+	FocusOut action for the xy boxes.
+
+	* topo/tkgui/connectionfieldspanel.py 1.18: Got rid of now
+	unuseful chain import.
+
+2006-04-20 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.89: Minor updates to use of Slice and
+	CoordinateTransformer.
+
+2006-04-20 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.78: Corrected handling of
+	integerscaling.
+
+	* topo/tkgui/plotgrouppanel.py 1.77,
+	topo/tkgui/projectionpanel.py 1.55: Added a parameter
+	looking_in_history that indicates if we are currently looking
+	back in time. Fixed the handling of the checkbuttons when
+	hitting back and forward.
+
+2006-04-20 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/random.py 1.25: Random generators get shape
+	from CoordinateTransformer, rather than from a Slice. Removed
+	Slice from imports.
+
+	* topo/base/patterngenerator.py 1.85: Constant gets shape from
+	CoordinateTransformer, rather than from a Slice. Removed Slice
+	from imports.
+
+	* doc/Future_Work/current_text.php 1.27: Updated my tasks.
+
+	* topo/base/patterngenerator.py 1.84: PatternGenerator uses
+	matrixidx2sheet_array()
+
+	* topo/tests/testsheet.py 1.38: Added some comments.
+
+	* topo/base/sheet.py 1.88: Added matrixidx2sheet_array() and
+	updated some comments.
+
+2006-04-20 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.120,
+	topo/tkgui/plotgrouppanel.py 1.76: Added a method
+	restore_environment in PlotGroup panel to re-instate the
+	state of the buttons when re-loading a Plotgroup from the
+	history.
+
+	* topo/tkgui/plotgrouppanel.py 1.75: Corrected the handling of
+	the history so that it act properly when hitting refresh or
+	auto-refresh.
+
+	* topo/tkgui/plotgrouppanel.py 1.74: Corrected the saving of
+	the history so that we do not update a PlotGroup in the past.
+
+	* topo/tkgui/plotgrouppanel.py 1.73,
+	topo/tkgui/projectionpanel.py 1.54,
+	topo/tkgui/templateplotgrouppanel.py 1.18,
+	topo/plotting/plotgroup.py 1.119,
+	topo/tkgui/connectionfieldspanel.py 1.17: Changed the handling
+	of the history: now a copy of the plotgroup is kept in history
+	instead of bitmaps. It still needs more work.
+
+2006-04-20 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.87: Simplified code committed in the
+	last version.
+
+	* topo/tests/testsheet.py 1.37: Where xdensity==ydensity,
+	CoordinateTransformers are created by passing just one
+	density.
+
+	* topo/base/sheet.py 1.86: Can create a CoordinateTransformer
+	by specifying only one density if xdensity==ydensity.
+
+	* doc/Future_Work/current_text.php 1.26: Updated my tasks.
+
+	* topo/tests/testimage.py 1.6,
+	topo/tests/testpatterngenerator.py 1.9: Uses xdensity and
+	ydensity in the tests, rather than just density. Only tests
+	cases where they're equal, though.
+
+	* topo/tests/testcfsom.py 1.20, topo/tests/testsheetview.py
+	1.12: Commented out the ImageGenerator class. Tests using it
+	will be resurrected in an equivalent form using the Image
+	class.
+
+	* topo/tests/testsheet.py 1.36: Updated after changes to
+	sheet.py (introduction of CoordinateTransformer). Some further
+	changes will be required when CoordinateTransformer is changed
+	some more...
+
+	* topo/tests/testplotgroup.py 1.19,
+	topo/tests/testplotfilesaver.py 1.15: Removed unused import
+	statement.
+
+	* topo/sheets/generatorsheet.py 1.28: The image generator is
+	passed xdensity and ydensity (both equal, since for a sheet
+	these are equal).
+
+	* topo/plotting/plot.py 1.96: Uses Slice and
+	* CoordinateTransformer.
+
+	* topo/patterns/random.py 1.24: Uses xdensity and ydensity,
+	and the Slice object.
+
+	* topo/patterns/image.py 1.50: Uses xdensity and ydensity.
+
+	* topo/patterns/basic.py 1.69: PatternSampler uses xdensity
+	and ydensity. This is an intermediate checkin - needs to be
+	cleaned up.
+
+	* topo/learningfns/som.py 1.4: Uses xdensity and ydensity in
+	call to pattern generator.
+
+	* topo/commands/analysis.py 1.16: Calls matrix2sheet() as a
+	method of the sheet being considered.
+
+	* topo/base/patterngenerator.py 1.83: Part-way checkin. Uses
+	the Slice object, but more of the calculations in
+	PatternGenerator will move to the Slice object.
+
+	* topo/base/connectionfield.py 1.163: Uses the Slice and
+	CoordinateTransformer classes. Some of the calculations in
+	here will move to the Slice object (e.g. translation of a
+	slice).
+
+	* topo/base/sheet.py 1.85: Part-way checkin. Created
+	CoordinateTransformer class, which contains methods that were
+	previously coordinate-transforming functions in this
+	file. Updated the Slice object. Still have to move some
+	methods from CoordinateTransformer to Slice, and finalize
+	other aspects.
+
+2006-04-19 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.118,
+	topo/tkgui/connectionfieldspanel.py 1.16,
+	topo/tkgui/projectionpanel.py 1.53: Deleted the attribute
+	sheet_filter_lam of a PlotGroup in order to be able to deep
+	copy a PlotGroup.
+
+	* topo/plotting/plotgroup.py 1.117,
+	topo/tkgui/plotgrouppanel.py 1.72,
+	topo/tkgui/projectionpanel.py 1.52: Corrected the
+	_set_height_of_tallest_plot and the scale_images method for a
+	ProjectionPlotGroup.
+
+2006-04-19 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/basic.py 1.68: Replaced the untested
+	CompositePatternGenerator with a new, untested
+	CompositePatternGenerator. This one is simpler.
+
+2006-04-19 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.71,
+	topo/tkgui/projectionpanel.py 1.51: Added a parameter update
+	when calling display_plots (decide wether re-generating the
+	Sheetviews or not.
+
+	* topo/plotting/plotgroup.py 1.116: Minor change in doc and
+	comment.
+
+2006-04-19 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/analysis.py 1.15: Get cf.slice_array rather
+	than calling cf.slice_tuple(). (This was part of an earlier
+	change, but does not seem to have been committed.)
+
+2006-04-18 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/sheets/generatorsheet.py 1.27: Removed unnecessary
+	setting of bounds and density. Removed out of date HACKALERT.
+
+2006-04-15 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testpatterngenerator.py 1.8: File is now a
+	reasonable test of PatternGenerator.
+
+	* topo/tests/testpatterngenerator.py 1.7: Added more tests.
+
+	* topo/tests/testpatterngenerator.py 1.6: Updated test.
+
+	* topo/tests/testpatterngenerator.py 1.5: Changed the test so
+	that it actually does what was intended (previously the
+	'assert' statement was not testing anything about the
+	arrays). Currently it fails but this might be because the test
+	itself is wrong.
+
+2006-04-14 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/projections/basic.py 1.24, topo/responsefns/projfns.py
+	1.3, topo/base/connectionfield.py 1.162: Removed cf's
+	slice_tuple() method. Going to rename slice_array to
+	slice_. slice_ being an array does not make it awkward to
+	access the elements since Python automatically unpacks array
+	values anyway.
+
+	* topo/base/sheet.py 1.84: Removed an outdated HACKALERT.
+
+2006-04-14 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.115: Minor re-organization;
+	deleted self.bitmaps.
+
+	* topo/plotting/bitmap.py 1.33, topo/plotting/plotgroup.py
+	1.114, topo/tkgui/plotgrouppanel.py 1.70,
+	topo/tkgui/projectionpanel.py 1.50: Delete the attribute
+	plot_src_name and name for a Bitmap (Not needed
+	anymore). Delete the PlotGroup load_images method, now we
+	explicitly built the bitmap list in PlotGroupPanel
+	display_plots().
+
+	* topo/plotting/plot.py 1.95, topo/plotting/plotgroup.py
+	1.113, topo/tkgui/connectionfieldspanel.py 1.15,
+	topo/tkgui/plotgrouppanel.py 1.69: Moved the generation of the
+	plot labels to PlotGroup; it will enable getting rid of the
+	copy of plot_src_name and name from Plot to Bitmap, and
+	eventually getting rid of the direct use of Bitmaps objects.
+
+	* topo/tkgui/plotgrouppanel.py 1.68: Re-organized order in the
+	file, added alert.
+
+	* topo/tkgui/plotgrouppanel.py 1.67: Deleted unused import
+	statements.
+
+	* topo/tkgui/plotgrouppanel.py 1.66: Temporary hack to fix
+	back and forward buttons.
+
+	* topo/tkgui/plotgrouppanel.py 1.65: Minor re-organization of
+	the __init__ method.
+
+	* topo/tkgui/plotgrouppanel.py 1.64,
+	topo/tkgui/templateplotgrouppanel.py 1.17: Added a second
+	control frame for Back, Forward, Sheetcoordinates and
+	Integerscaling Buttons. Moved the Sheetcoords button from
+	templateplotgrouppanel to plotgrouppanel. Deleted old
+	comments.
+
+	* topo/tkgui/plotgrouppanel.py 1.63: Deleted the
+	scale_images() method in PlotGroupPanel. Now the scaling is
+	done within PlotGroup. Also deleted unused import statements
+	and old alerts and update doc.
+
+2006-04-13 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.112: Added two ALERTS.
+
+2006-04-13 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/patterngenerator.py 1.82: No visible change -
+	minor alteration to the code.
+
+2006-04-13 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.111,
+	topo/tkgui/connectionfieldspanel.py 1.14,
+	topo/tkgui/plotgrouppanel.py 1.62,
+	topo/tkgui/projectionpanel.py 1.49,
+	topo/tkgui/templateplotgrouppanel.py 1.16,
+	topo/tkgui/testpattern.py 1.30: Deleted the attribute
+	plotgroup_key of a PlotGroup.
+
+2006-04-13 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/connectionfield.py 1.161: Get sheet's shape from
+	sheet's activity matrix shape.
+
+	* topo/base/connectionfield.py 1.160: Use sheet methods
+	bounds2slice() and slice2bounds().
+
+	* topo/base/sheet.py 1.83: Added sheet methods bounds2slice()
+	and slice2bounds().
+
+	* topo/base/sheet.py 1.82: Minor changes to documentation.
+
+	* topo/base/sheet.py 1.81: Enforce minimum number of units in
+	each direction to be 1; rename slice variable to slice_;
+	changes to documentation.
+
+2006-04-13 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.110: Deleted two unused import
+	statement.
+
+	* topo/plotting/plotgroup.py 1.109: Got rid of the use of
+	dict_sort. Now the ordering of the plot is performed
+	differently.
+
+	* topo/plotting/plotgroup.py 1.108: Deleted the import
+	statement for flatten and change the code that was using it.
+
+2006-04-13 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.80: Small change to documentation.
+
+	* topo/base/sheet.py 1.79: No visible change - small tidy up.
+
+	* topo/base/boundingregion.py 1.24: Minor change to
+	documentation.
+
+	* topo/base/parameterizedobject.py 1.36: Moved __doc__
+	definition higher up in the Parameter class so it is a bit
+	more obvious. Added check that subclasses of Parameter define
+	__slots__.
+
+	* topo/base/simulator.py 1.48: Added __slots__ and __doc__ to
+	EventProcessorParameter.
+
+	* topo/base/boundingregion.py 1.23: Added __slots__ and
+	__doc__ to BoundingRegionParameter.
+
+	* topo/base/sheet.py 1.78: Updated Sheet documentation a bit.
+
+2006-04-13 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.107,
+	topo/tkgui/templateplotgrouppanel.py 1.15: Replaced the import
+	statement for the commands within templateplotgrouppanel, and
+	import them in __main__.__dict__. They laso are executed in
+	__main__.__dict__ from the PlotGroups.
+
+2006-04-13 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.77: Removed unused functions
+	slicearray2bounds() and bounds2slicearray(). All slices will
+	be arrays eventually, but for now they are Python tuples.
+
+2006-04-13 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.106: Deleted unused import
+	statements.
+
+2006-04-13 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/basic.py 1.67: Removed xdensity and ydensity
+	from current Composite class (which will be replaced anyway).
+
+2006-04-13 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotfilesaver.py 1.29,
+	topo/plotting/plotgroup.py 1.105,
+	topo/tkgui/connectionfieldspanel.py 1.13,
+	topo/tkgui/plotgrouppanel.py 1.61,
+	topo/tkgui/projectionpanel.py 1.48,
+	topo/tkgui/templateplotgrouppanel.py 1.14,
+	topo/tkgui/testpattern.py 1.29: Deleted the plotgroup_dict
+	variable: now each panel create and store its own plotgroup
+	attribute and uses it accordingly. Added a method
+	generate_sheet_views to the PlotGroups: now the command to
+	update the sheet view is contained in PlotGroups (and still
+	can be modified from the panel). It is the first version
+	without plotgroup_dict, it needs some cleaning and improving
+	(in particular for the projectionpanel and testpattern).
+
+2006-04-13 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.76, topo/tests/testsheet.py 1.35:
+	Removed xdensity and ydensity. Except in the documentation.
+
+	* topo/base/sheet.py 1.75, topo/tests/testsheet.py 1.34:
+	slice2bounds() does not use xdensity and ydensity.
+
+	* topo/base/sheet.py 1.74, topo/commands/analysis.py 1.14,
+	topo/tests/testsheet.py 1.33: matrix2sheet() does not use
+	xdensity and ydensity.
+
+	* topo/base/sheet.py 1.73, topo/tests/testsheet.py 1.32:
+	sheet2matrix() and sheet2matrixidx() don't use xdensity and
+	ydensity.
+
+	* topo/tests/testsheet.py 1.31: Altered a test; no visible
+	change.
+
+	* topo/tests/testsheet.py 1.30: Uncommented a test case that
+	I'd previously left commented out by mistake.
+
+2006-04-12 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.72: crop_slice_to_sheet() doesn't use
+	xdensity and ydensity.
+
+	* topo/plotting/plot.py 1.94: Removed unused import.
+
+	* topo/base/sheet.py 1.71: submatrix() just takes density.
+
+	* topo/base/sheet.py 1.70, topo/tests/testsheet.py 1.29:
+	bounds2slice() just uses density, not xdensity and ydensity.
+
+	* topo/tests/testplotfilesaver.py 1.14: Only one line was in
+	the test, so I commented that one too.
+
+	* topo/plotting/plot.py 1.93: Removed xdensity and
+	ydensity. Adjusted the corresponding HACKALERT.
+
+	* topo/base/functionfamilies.py 1.1: Initial version.
+
+	* topo/learningfns/som.py 1.3, topo/outputfns/basic.py 1.28,
+	topo/outputfns/optimized.py 1.14, topo/patterns/basic.py 1.66,
+	topo/patterns/image.py 1.49, topo/patterns/random.py 1.23,
+	topo/projections/basic.py 1.23, topo/tests/testimage.py 1.5,
+	topo/base/connectionfield.py 1.159,
+	topo/base/patterngenerator.py 1.81, topo/base/projection.py
+	1.64: Moved OutputFn, OutputFnParameter, and Identity to
+	functionfamilies (from projection). Renamed Identity to
+	IdentityOF.
+
+	* topo/responsefns/basic.py 1.32: Import the basic response
+	functions.
+
+	* topo/responsefns/projfns.py 1.2: Removed unnecessary
+	__init__()s. Use ResponseFnParameter for single_cf_fn.
+
+	* topo/responsefns/optimized.py 1.22: Removed unnecessary
+	__init__(). Use ResponseFnParameter.
+
+	* topo/projections/basic.py 1.22: Use ResponseFnParameter.
+
+	* topo/base/arrayutils.py 1.7, topo/base/connectionfield.py
+	1.158: Moved Mdot() to connectionfield.py and made it a
+	LearningFn. Made ResponseFnParameter.
+
+	* topo/base/connectionfield.py 1.157: Changed a sum() of the
+	weights to Numeric.sum(). Numeric.sum() is faster. (Python's
+	sum() and Numeric's sum() appear to give slightly different
+	results in general, though this particular change makes no
+	difference at the moment.)
+
+2006-04-12 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.104: Minor re-organization of
+	the __init__.
+
+	* topo/tkgui/plotgrouppanel.py 1.60,
+	topo/plotting/plotfilesaver.py 1.28,
+	topo/plotting/plotgroup.py 1.103,
+	topo/tkgui/connectionfieldspanel.py 1.12,
+	topo/tkgui/projectionpanel.py 1.47,
+	topo/tkgui/templateplotgrouppanel.py 1.13: Renamed
+	plot_group_key to plotgroup_key for consistency.
+
+	* topo/plotting/plotgroup.py 1.102,
+	topo/tkgui/connectionfieldspanel.py 1.11,
+	topo/tkgui/plotgrouppanel.py 1.59,
+	topo/tkgui/projectionpanel.py 1.46,
+	topo/tkgui/templateplotgrouppanel.py 1.12,
+	topo/tkgui/testpattern.py 1.28: Added arguments sheetcoords
+	and integersaling to the PlotGroup constructor. Renamed
+	plotgroup() to refresh_plotgroup() in PlotGroupPanel and
+	subclasses. Now, refresh_plotgroup() is only called from the
+	refresh method, and I added an attribute self.plotgroup that
+	stores the current PlotGroup. Also deleted old code in
+	PlotGroupPanel.
+
+	* topo/plotting/plotgroup.py 1.101: Deleted old comments;
+	improved two lines of code.
+
+2006-04-12 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.24: Updated a task.
+
+	* doc/Future_Work/current_text.php 1.23: Updated my tasks.
+
+	* topo/base/connectionfield.py 1.156: Removed xdensity and
+	ydensity, just using density now.
+
+	* topo/base/sheet.py 1.69: Intermediate checkin. Removing
+	xdensity and ydensity gradually.
+
+	* topo/base/patterngenerator.py 1.80, topo/patterns/random.py
+	1.22: PatternGenerators only accept density as a single
+	number.
+
+	* topo/sheets/generatorsheet.py 1.26: Only passes density, not
+	xdensity and ydensity, to PatternGenerator for creating the
+	input pattern.
+
+	* topo/tests/testsheet.py 1.28: Removed test of bounds2slice()
+	that deliberately uses different x and y densities.
+
+	* topo/tests/testsheet.py 1.27: Added a test for Sheet
+	creation where the specified bounds and density would not give
+	a sheet with the same density along x as along y.
+
+2006-04-11 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plot.py 1.92: Changed a HACKALERT.
+
+2006-04-11 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/bitmap.py 1.32, topo/plotting/plot.py 1.91:
+	Got rid of the attribute resize for the bitmap, and added it
+	to Plot objects.
+
+	* topo/tests/testplotfilesaver.py 1.13,
+	topo/plotting/plotgroup.py 1.100,
+	topo/tkgui/projectionpanel.py 1.45,
+	topo/tkgui/connectionfieldspanel.py 1.10,
+	topo/tkgui/testpattern.py 1.27, topo/tkgui/plotgrouppanel.py
+	1.58, topo/tkgui/templateplotgrouppanel.py 1.11: Moved
+	everything not special to the GUI from PlotGroupPanel to
+	PlotGroup (e.g. sale_images,
+	_set_height_of_tallest_plot). Also deleted the old
+	do_plot_cmd, by a plotgroup() method that regenrates the
+	PlotGroup anytime from the panels. It is a first version that
+	have been committed in order to be further simplified. Note
+	also that there is a slight bug for the ProjectionPanel and
+	for the handling of the SheetCoordinates check_button, but
+	they will be fixed very soon.
+
+2006-04-11 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.68: Sheet has same density in x and y
+	directions (by adjusting height of BoundingBox if
+	necessary. Intermediate checkin: still have to removed
+	xdensity and ydensity from the code, and update the
+	documentation.
+
+	* examples/Makefile 1.8: Sets default_density to be smaller
+	before running each example.
+
+	* examples/lissom_or.ty 1.79, examples/cfsom_or.ty 1.35,
+	examples/hierarchical.ty 1.41, examples/lissom_oo_or.ty 1.38:
+	Allowed cortical density to be set externally via
+	default_density variable (otherwise uses the value set in the
+	file).
+
+2006-04-11 alan_lindsay <alan_lindsay@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorobjects.py 1.26, topo/tkgui/editortools.py
+	1.12, topo/tkgui/editorwindow.py 1.24: Colours of sheets
+	changed (together) by setting the canvas' mode. No lateral
+	button in sheet's property panel, just a list of connections
+	(opens their properties). Auto refresh and normalize options
+	in the canvas.
+
+	* doc/User_Manual/images/editorconnectiondrag.png 1.1,
+	doc/User_Manual/images/editorproperties.png 1.1,
+	doc/User_Manual/images/editorrepresentations.png 1.1,
+	doc/User_Manual/images/editortoolbaritems.png 1.1,
+	doc/User_Manual/model_editor.html 1.1: First draft user guide
+	for the model editor. Does not link to other sections and does
+	not conform to the style of the other pages.
+
+2006-04-11 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testsheet.py 1.26: Fix by Chris -- override
+	default Sheet bounds and density to be sure it's the ones we
+	expect
+
+	* .cvsignore 1.8: Added missing newline
+
+2006-04-11 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/responsefns/basic.py 1.31: Removed projection-level
+	response functions (they are in projfns.py.
+
+	* topo/responsefns/optimized.py 1.21: Updated
+	CFProjectionResponseFn imports to be from projfns.
+
+	* topo/responsefns/projfns.py 1.1: Renamed basic.py to
+	projfns.py since it contains only projection-level response
+	functions.
+
+2006-04-10 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testsheet.py 1.25: Re-enabled a test that I
+	disabled. This version, revision 1.25, is identical to
+	revision 1.23. I disabled the test when I changed how the
+	tests are run, because it began failing with no change other
+	than the test-running mechanism (and had not been failing
+	before). As far as I could tell, the test was running properly
+	and not failing before I changed the testing mechanism, so I
+	decided to comment out the test and investigate later on. I am
+	re-enabling the test because it is legitimately failing. I'm
+	not sure what is going on: was it not running before? How
+	could it not have been failing? The functions it is testing
+	have not changed throughout this process, so I am
+	confused. Maybe we all had *.pyc files left that were not
+	updated, though that seems unlikely.
+
+	* topo/patterns/basic.py 1.65: Added commented-out new version
+	of CompositePatternGenerator. Corrected import statements
+	(including for when new CompositePatternGenerator is
+	uncommented.
+
+2006-04-08 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.22: Updated my tasks.
+
+	* examples/tiny.ty 1.7, topo/learningfns/__init__.py 1.6,
+	topo/learningfns/basic.py 1.56: Sorted LearningFns into basic
+	and projfns.
+
+	* topo/learningfns/projfns.py 1.1: Initial version.
+
+	* topo/base/connectionfield.py 1.155: Removed HACKALERT.
+
+	* topo/projections/basic.py 1.21, topo/responsefns/__init__.py
+	1.6, topo/responsefns/basic.py 1.30,
+	topo/responsefns/optimized.py 1.20, topo/sheets/lissom.py
+	1.47, topo/tests/lissom_oo_or_reference.ty 1.17,
+	topo/tests/testplotgroup.py 1.18, topo/base/connectionfield.py
+	1.154, topo/base/patterngenerator.py 1.79,
+	topo/base/projection.py 1.63, topo/learningfns/__init__.py
+	1.5, topo/learningfns/basic.py 1.55,
+	topo/learningfns/optimized.py 1.47, topo/learningfns/som.py
+	1.2, topo/outputfns/__init__.py 1.7, topo/outputfns/basic.py
+	1.27, topo/outputfns/optimized.py 1.13,
+	topo/outputfns/projfns.py 1.2, topo/patterns/image.py 1.48,
+	examples/cfsom_or.ty 1.34, examples/hierarchical.ty 1.40,
+	examples/homeostatic.ty 1.3, examples/laminar.ty 1.11,
+	examples/lissom_oo_or.ty 1.37, examples/lissom_or.ty 1.78,
+	examples/lissom_or_sf.ty 1.2, examples/obermayer_pnas90.ty
+	1.28, examples/som_retinotopy.ty 1.29, examples/tiny.ty 1.6:
+	Attempting to organize functions that iterate over the CFs of
+	a CFProjection and those that act on a single array.
+
+	(As part of the more general idea that there are e.g. output
+	functions which apply to a Projection.)
+
+	For output functions, we have the single-array (normal
+	mathematical) output functions, e.g.: OutputFn Identity
+	DivisiveSumNormalize We also have the functions that iterate
+	through a CFProjection's CFs, applying an OutputFn to each:
+	CFProjectionOuputFn
+	CFProjectionIdentityOutputFn(single_cf_fn=Identity())
+	CFProjectionDivisiveSumNormalize(single_cf_fn=DivisiveSumNormalize())
+
+	OutputFns are in topo.outputfns.basic, and
+	CFProjectionOutputFns are in topo.outputfns.projfns. Other
+	Projection-level output functions would also go in the projfns
+	module.
+
+	The same applies to LearningFns and
+	CFProjectionLearningFns. ResponseFunctions have been renamed
+	CFProjectionResponseFunctions where they apply to a
+	CFProjection. The reorganization of LearningFns and
+	ResponseFns is not complete yet.
+
+	Along with this reorganization, CFProjectionOutputFnParameter
+	(as distinct from OutputFnParameter) has been introduced (and
+	similarly for LearningFns). Implementation of these is not
+	complete yet; notably the __init__.py files in the outputfns,
+	learningfns, and responsefns packages need to be cleaned up.
+
+	In addition to this, minor cleanups may also have occurred,
+	including: skipping calls to __init__() methods if all they do
+	is call the superclass' __init__()s; documentation strings.
+
+	* topo/base/parameterclasses.py 1.37: Updated documentation
+	for ClassSelectorParameter.
+
+	* topo/base/connectionfield.py 1.153: Added
+	CFOutputFunctionParameter class; made weights_output_fn be a
+	CFOutputFunctionParameter.
+
+	* topo/base/connectionfield.py 1.152: GenericCFOF: removed
+	__init__() method, since it does nothing but call the
+	superclass'. Made single_cf_fn parameter be an
+	OutputFunctionParameter.
+
+	* topo/base/projection.py 1.62: Minor clean-up of comments.
+
+	* topo/base/connectionfield.py 1.151: CFOutputFunction is
+	abstract.
+
+	* topo/outputfns/optimized.py 1.12: Updated docstring.
+
+	* topo/outputfns/projfns.py 1.1: Initial version.
+
+	* doc/Future_Work/current_text.php 1.21: Updated my tasks.
+
+	* topo/misc/utils.py 1.5: No visible change, altered syntax.
+
+	* topo/commands/basic.py 1.28, topo/misc/utils.py 1.4: Minor
+	changes to pickling - should be no visible change.
+
+	* topo/tests/__init__.py 1.14: Allowed a test to be ignored
+	easily. Removed testsnapshots from the automatic tests.
+
+	* topo/tests/testsnapshots.py 1.1: Initial version.
+
+	* topo/tests/__init__.py 1.13: Added ability to run a specific
+	list of test modules.
+
+	* topo/commands/basic.py 1.27: Updated docstrings for save_
+	and load_snapshot
+
+	* topo/commands/basic.py 1.26: When being pickled, the
+	simulator has its RELEASE attribute set to topo.release.
+
+	* topo/tests/testtemplateplotgrouppanel.py 1.2: Added missing
+	import statement.
+
+	* topo/tests/__init__.py 1.12: Updated doc string, added ALERT
+	about structure of tests/ directory that we might consider in
+	the future.
+
+	* topo/tests/__init__.py 1.11, topo/tests/testmatplotlibtk.py
+	1.1, topo/tests/testplotgrouppanel.py 1.1,
+	topo/tests/testpropertiesframe.py 1.1,
+	topo/tests/testtemplateplotgrouppanel.py 1.1,
+	topo/tests/testtopoconsole.py 1.1: Moved tkgui tests into main
+	test directory.
+
+	* topo/tests/testcfsom.py 1.19,
+	topo/tests/testpatternpresent.py 1.9,
+	topo/tests/testplotfilesaver.py 1.12: Reduced sheet densities.
+
+	* topo/analysis/featuremap.py 1.43, topo/commands/analysis.py
+	1.13: Removed calls to active_sim() and some passing round of
+	simulators.
+
+	* topo/analysis/featuremap.py 1.42: Removed a HACKALERT and
+	the corresponding call to active_sim().
+
+	* topo/tests/testfeaturemap.py 1.13: Reduced density of sheets
+	in test_measurefeaturemap(). It runs a lot faster now.
+
+2006-04-07 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/cfsheetplotpanel.py 1.18: Deleted
+	cfsheetplotpanel.py: the code is now in both connectionfield
+	and projection panels.
+
+	* topo/tkgui/projectionpanel.py 1.44: Added the code of
+	cfsheetplotpanel in projectionpanel and made it inherit from
+	TemplatePlotGroupPanel instead
+
+	* topo/tkgui/templateplotgrouppanel.py 1.10: Modified the
+	__init__ method: call refresh only if it is an instance of
+	TemplatePlotGroupPanel. Allow calling the constructor for
+	subclasses.
+
+	* topo/tkgui/connectionfieldspanel.py 1.9: Added the code of
+	cfsheetplotpanel in connectionfieldpanel and made it inherit
+	from TemplatePlotGroupPanel instead
+
+2006-04-07 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.20: Updated my tasks.
+
+	* topo/patterns/image.py 1.47: Removed TopoImage, which I
+	forgot to do on the previous commit.
+
+	* topo/patterns/image.py 1.46: Removed the TopoImage class and
+	a related HACKALERT. Images are now loaded only once, rather
+	than every time Image's function() is called.
+
+2006-04-07 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/cfsheetplotpanel.py 1.17: temporary hack to get
+	the normalize button set properly for a connectionfieldspanel
+	and a projectionpanel. It will be properly sorted when getting
+	rid of CFSheetPlotPanel and correcting the hierarchy of the
+	panels.
+
+2006-04-07 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/image.py 1.45: Added HACKALERT.
+
+	* topo/patterns/basic.py 1.64, topo/patterns/image.py 1.44:
+	Corrected mistake in PatternSampler where background value was
+	being calculated before array was normalized.
+
+2006-04-07 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.57,
+	topo/tkgui/projectionpanel.py 1.43: Renamed
+	_set_initial_master_zoom to _set_eight_of_tallest_plot.
+
+	* topo/tkgui/projectionpanel.py 1.42: Corrected
+	self.zoom_factor to be self.height_of_tallest_plot and
+	INITIAL_PLOT_WIDTH to INITIAL_PLOT_HEIGHT. Added a
+	re-implementation of the _set_initial_naster_zoom for the
+	projectionpanel (that needs more work).
+
+2006-04-07 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/basic.py 1.63, topo/patterns/image.py 1.43:
+	Moved PatternSampler class from topo/patterns/image.py to
+	topo/patterns/basic.py in anticipation of using it for
+	Composite. This might not be the correct final location for
+	PatternSampler.
+
+	* topo/patterns/image.py 1.42: Created a new class,
+	PatternSampler, which does the sampling of a pattern that
+	TopoImage did previously. TopoImage is now a subclass of
+	PatternSampler.
+
+2006-04-07 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/cfsheetplotpanel.py 1.16: Corrected error in
+	cfsheetplotpanel (forgot to change the name of
+	self.zoom_factor to self.height_of_tallest_plot and
+	self.min_zoom_factor to self.min_master_zoom); that should fix
+	the connectionfieldpanel.
+
+	* topo/tkgui/plotgrouppanel.py 1.56: Replaced self.master_zoom
+	by self.height_of_tallest_plot.
+
+2006-04-07 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/__init__.py 1.10: Any file named test*.py that
+	defines the 'suite' attribute will be included when the tests
+	are run.
+
+	* topo/tests/testsheet.py 1.24: Commented out a test which is
+	out of date. Will be updated when sheet.py and
+	connectionfield.py are reviewed.
+
+2006-04-06 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.55: simplified the function
+	_set_initial_plot_zoom; now there is only one
+	master_zoom. Deleted the function _compute_max_height.
+
+	* topo/tkgui/plotgrouppanel.py 1.54: Corrected the function
+	scale image; renamed self.min_zoom_factor to
+	self.min_master_zoom.
+
+2006-04-06 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* .cvsignore 1.7: Added 'topographica.bat' (which exists after
+	installation on Windows).
+
+	* topo/tests/testimage.py 1.4: Added more tests.
+
+2006-04-06 julienciroux <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/plotgrouppanel.py 1.53: Implement a master_zoom
+	for both sheet coordinates and matrix coordinates.
+
+2006-04-06 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/image.py 1.41: User-specified numbers involved
+	in divisions are first turned to floats in case integer values
+	are specified.
+
+	* topo/tests/testimage.py 1.3: Altered HACKALERT.
+
+2006-04-05 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/__init__.py 1.9: testimage.py added to the list
+	of tests. Currently one test is failing, because of a mistake
+	in image.py version 1.40; this will be corrected in the next
+	version of image.py.
+
+	* topo/tests/testimage.py 1.2: Continued writing.
+
+	* topo/patterns/basic.py 1.62: Removed an out-of-date
+	HACKALERT.
+
+	* topo/patterns/basic.py 1.61: Altered a HACKALERT.
+
+	* topo/patterns/image.py 1.40: Size scaling of each of the
+	image dimensions is done relative to the default retinal
+	dimension of 1.0, rather than the current sheet's dimension.
+
+	* topo/patterns/image.py 1.39: Corrected typo in
+	documentation.
+
+	* topo/patterns/image.py 1.38: Changed previous output_fn to
+	'whole_image_output_fn (needs a better name), so that there
+	can also be an output_fn to apply to the section of image that
+	is actually displayed (i.e. the meaning of output_fn for other
+	PatternGenerators).
+
+	* topo/patterns/random.py 1.21: Added output_fn to
+	PatternGenerators in random.py. Switched order of import
+	statements.
+
+	* topo/base/patterngenerator.py 1.78: Added output_fn to
+	Constant.
+
+	* topo/base/patterngenerator.py 1.77: PatternGenerators have
+	an OutputFunctionParameter.
+
+	* topo/base/projection.py 1.61: OutputFunction is an abstract
+	class.
+
+	* topo/base/patterngenerator.py 1.76: Corrected test for
+	whether or not an argument supplied to __call__() is a
+	Parameter. Added commented-out code for an output_fn on
+	PatternGenerator (so this change is separate from the first
+	one).
+
+	* topo/base/patterngenerator.py 1.75: Updated some
+	documentation.
+
+	* topo/base/patterngenerator.py 1.74: Added a warning to
+	__call__() of PatternGenerator if a value is passed for
+	something that does not exist as a Parameter.
+
+	* topo/base/patterngenerator.py 1.73: No visible change, just
+	switched order of import statements.
+
+	* topo/base/patterngenerator.py 1.72: Allowed to specifiy
+	scale and offset when calling PatternGenerator (altered
+	ConstantGenerator in the same way).
+
+	* topo/tests/testimage.pgm 1.2: Changed to have one even
+	dimension and one odd dimension.
+
+	* topo/patterns/image.py 1.37: Simplified the TopoImage class
+	by using a Sheet as the container for an image. That way,
+	coordinate transforms can work using the standard sheet.py
+	functions. Also, altered how the initial image scaling works
+	(it remains to make the initial scaling relative to the
+	default 1.0 retinal area, rather than the current retina).
+
+	* topo/base/sheet.py 1.67: Added a version of
+	sheet2matrixidx() that works for arrays. (All these functions
+	still have to be cleaned up into the Slice class.)
+
+	* topo/base/boundingregion.py 1.22: Added
+	contains_exclusive(), which is the same as contains() except
+	the right and bottom boundaries of the BoundingBox are
+	considered exclusive.
+
+2006-04-05 Jim Bednar <jbednar@lodestar.inf.ed.ac.uk>
+
+	* ChangeLog.txt 1.4: Updated with recent changes
+
+2006-04-05 ceball <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/projection.py 1.60: Added 'sum' argument to
+	Identity.
+
+	* topo/tests/testimage.py 1.1, topo/tests/utils.py 1.1:
+	Initial version.
+
+	* topo/tests/testimage.pgm 1.1: An image to use for testing
+	the image generator in image.py.
 
 2006-03-29  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
 
