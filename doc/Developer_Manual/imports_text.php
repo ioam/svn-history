@@ -73,7 +73,7 @@ order from most general to most specific:
 <LI>Topographica files not in the current package<BR>
       (with absolute paths like <CODE>topo.base.sheet</CODE>)
 <LI>Topographica files in the current package<BR>
-      (usually with relative pathslike <CODE>sheet</CODE>)
+      (usually with relative paths like <CODE>sheet</CODE>)
 </OL>
 
 <P>A blank line separates each of these sections, and items in the
