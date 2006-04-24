@@ -425,6 +425,16 @@ class Simulator(ParameterizedObject):
     step_mode = BooleanParameter(default=False)
     register = BooleanParameter(default=True)
 
+    # CEBHACKALERT: write the doc so a user knows what it means. And,
+    # should this be instantiated? I can't think right now.
+    startup_commands = Parameter(
+        default=[],
+        doc="""
+            List of string commands that will be exec'd in
+            __main__.__dict__ before this simulator is unpickled.
+            """)
+              
+
     def __init__(self,**config):
         """
         The simulator constructor takes one keyword parameter:
