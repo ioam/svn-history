@@ -111,6 +111,10 @@ topo.sim.connect2('V3','V2',delay=0.5,connection_type=CFProjection,
 topo.sim.connect2('V2','V3',delay=0.5,connection_type=CFProjection,
                   name='Afferent')
 
+
+# example scheduled action
+topo.sim.schedule_action(10, topo.sim['V1'].projections()['AfferentLeft'].change_bounds, BoundingBox(radius=0.05))
+
 # Set default locations for the Model Editor
 topo.sim['V1'].gui_x=135          ; topo.sim['V1'].gui_y=320
 topo.sim['V2'].gui_x=500          ; topo.sim['V2'].gui_y=230
