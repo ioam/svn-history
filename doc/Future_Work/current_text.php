@@ -15,7 +15,7 @@ was first added to the list, or a change was made.)
 <!-- CB: I put my tasks in the approximate order that I'm doing them -->
 
 <li>
-2006/04/24 (CB): At some point (before the changes to pickle that I'm about to commit), some things for pickling broke. (1) There's a savespace missing somewhere, because lissom_oo_or.ty compains about incorrect return type after unpickling, on activatation. (2) Without weave, there is an error during unpickling while reimporting modules.  [** before release]
+2006/04/24 (CB): At some point (before the changes to pickle that I'm about to commit), some things for pickling broke. (1) lissom_oo_or.ty compains about incorrect return type after unpickling, when learning. Only when using DivisiveSumNormalize from outputfns.basic - no problem when using DivisiveSumNormalize_opt1 from outputfns.optimized! (2) If weave could not be imported, there is an error during unpickling while setting class attributes for classes that don't exist in the basic modules.  [** before release]
 </li>
 
 <li> 
