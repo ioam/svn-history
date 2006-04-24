@@ -615,7 +615,11 @@ class CFProjection(Projection):
         """
         super(CFProjection,self).__init__(**params)
 
-        # adjust the weights to fit the sheet, and to be odd.
+        # CEBHACKALERT: see alert in Sheet about user_bounds.
+        self.original_bounds = copy.deepcopy(self.weights_bounds)
+        
+        # adjust the weights_bounds to be odd, and cropped to sheet if
+        # necessary
         self.weights_bounds = self.initialize_bounds(self.weights_bounds)
 
         self.mask_template = self.create_mask_template()
@@ -662,12 +666,13 @@ class CFProjection(Projection):
         """
         # CEBHACKALERT: allow user to override this.
         # calculate the size & aspect_ratio of the mask if appropriate
+        # (from the original user-specified bounds)
         if hasattr(self.weights_shape, 'size'):
-            l,b,r,t = self.weights_bounds.lbrt()
+            l,b,r,t = self.original_bounds.lbrt()
             self.weights_shape.size = t-b
             self.weights_shape.aspect_ratio = (r-l)/self.weights_shape.size
 
-        # CEBHACKALERT: mask centered to matrixidx center
+        # Center mask to matrixidx center
         center_r,center_c = self.src.sheet2matrixidx(0,0)
         center_x,center_y = self.src.matrixidx2sheet(center_r,center_c)
         
