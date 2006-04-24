@@ -1,7 +1,7 @@
 <HTML><HEAD>
 <META HTTP-EQUIV="content-type" CONTENT="text/html; charset=ISO-8859-1">
 <LINK rel="stylesheet" type="text/css" media="screen" href="../shared/topo.css">
-<TITLE>The Topographica Simulator</TITLE>
+<TITLE>The Topographica Neural Map Simulator</TITLE>
 </HEAD>
 <?php
 
