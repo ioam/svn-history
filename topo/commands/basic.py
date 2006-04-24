@@ -180,13 +180,25 @@ def load_snapshot(snapshot_name):
 
         # Import class back to __main__
         # from "topo.base.parameter.Parameter", we want "topo.base.parameter"
-        module_path = class_name[0:class_name.rindex('.')] 
+        module_path = class_name[0:class_name.rindex('.')]
         exec 'import '+module_path in __main__.__dict__
 
         # now restore class Parameter values
         for p_name,p in state.items():
             __main__.__dict__['val'] = p
-            exec 'setattr('+class_name+',"'+p_name+'",val)' in __main__.__dict__
+
+            # CEBHACKALERT: if Topographica falls back to non-optimized components,
+            # class attributes will be pickled for classes that don't exist
+            # in the basic modules.
+            try:
+                exec 'setattr('+class_name+',"'+p_name+'",val)' in __main__.__dict__
+            except AttributeError:
+                # trying to import class that doesn't exist in the module...
+                # was the class defined dynamically?
+                ParameterizedObject().warning('%s module does not contain the class %s; class attributes not restored.' % (module_path,class_name))
+                break
+
+
     # CEBHACKALERT? Assumes parameters weren't added dynamically to a class
     # i.e. they're all in the source code.
 
