@@ -318,6 +318,8 @@ class EPConnection(ParameterizedObject):
         super(EPConnection,self).__init__(**params)
 
 
+# CEBHACKALERT: how can this have a Parameter when it's not a
+# ParameterizedObject?
 class SimulatorEvent:
     """Simulator event"""
     fn = CallableParameter(default=None,doc="Function to execute when the event is processed.")
@@ -330,7 +332,6 @@ class SimulatorEvent:
         self.dest_port = dest_port
         self.data = deepcopy(data)
         self.fn = fn
-
 
 
 # CEBHACKALERT: need to rename to simulation, etc.
