@@ -318,23 +318,65 @@ class EPConnection(ParameterizedObject):
         super(EPConnection,self).__init__(**params)
 
 
-# CEBHACKALERT: how can this have a Parameter when it's not a
-# ParameterizedObject? To clarify, I mean that presumably
-# the parameter isn't operating as expected (it won't be checking
-# the type, for example).
-class SimulatorEvent:
-    """Simulator event"""
-    fn = CallableParameter(default=None,doc="Function to execute when the event is processed.")
+class Event(object):
+    """
+    Hierarchy of classes for storing events.
 
-    def __init__(self,time,src,dest,src_port,dest_port,data,fn=None):
+    When called, must make the event happen.
+    """
+    # CEBHACKALERT: subclasses must implement time attribute
+    
+    def __call__(self):
+        raise NotImplementedError
+
+class EPEvent(Event):
+    """An Event for delivery to an EventProcessor."""
+    def __init__(self,time,src,dest,src_port,dest_port,data):
         self.time = time
         self.src = src
         self.dest = dest
         self.src_port = src_port
         self.dest_port = dest_port
         self.data = deepcopy(data)
-        self.fn = fn
 
+    def __call__(self):
+        self.dest.input_event(self.src,self.src_port,self.dest_port,self.data)
+
+
+class CommandEvent(Event):
+    """An Event consisting of a command string to run."""
+
+    def __init__(self,time,command_string):
+        self.time = time
+        self.command_string = command_string
+        
+    def __call__(self):
+        """
+        exec's the command_string in __main__.__dict__.
+        
+        Be sure that any required items will be present in
+        __main__.__dict__; in particular, consider what will be present
+        after the network is saved and restored. For instance, results of
+        scripts you have run, or imports they make---all currently
+        available in __main__.__dict__---will not be saved with the
+        network.
+        """
+        import __main__
+        exec self.command_string in __main__.__dict__
+
+
+# CEBHACKALERT: class to be removed when all example files changed
+# to use schedule_command()!
+class SAEvent(Event):
+    def __init__(self,time,fn,args):
+        self.time = time
+        self.fn = fn
+        self.args = args
+
+    def __call__(self):
+        self.fn(*self.args)
+        
+    
 
 # CEBHACKALERT: do we need to allow a user to save arbitrary data
 # along with the network when pickling? Like specified imports and
@@ -352,24 +394,7 @@ class SimulatorEvent:
 # save_state({"__main__.__dict__": [BoundingBox, x]})
 # where save_state() also calls save_snapshot to get the simulator.
 
-class ScheduledCommand(object):
-    """
-    When called, exec's a command string in __main__.__dict__.
 
-    Be sure that any required items will be present in
-    __main__.__dict__; in particular, consider what will be present
-    after the network is saved and restored. For instance, results of
-    scripts you have run, or imports they make---all currently
-    available in __main__.__dict__---will not be saved with the
-    network.
-    """
-    def __init__(self,time,command_string):
-        self.time = time
-        self.command_string = command_string
-        
-    def __call__(self):
-        import __main__
-        exec self.command_string in __main__.__dict__
 
             
 # CEBHACKALERT: need to rename to simulation, etc.
@@ -531,38 +556,33 @@ class Simulator(ParameterizedObject):
             else:
 
                 # If it's not too late, and it's not too early, then
-                # it's just right!  So pop the event and dispatch it to
-                # its destination.
-                e = self.events.pop(0)
+                # it's just right!  So pop the event and call it.
+                event = self.events.pop(0)
 
-                # Report as much info as we can
+                # ####### INFORMATION PRINTING ONLY ########
+                # (I kept the try/catch for speed - will usually be EPEvent -
+                #  but I haven't checked the impact. Presumably it's tiny.
+                #  Could be simplified to:
+                #  if isinstance(event,EPEvent):
+                #      self.verbose...
+                #  elif isinstance(event,CommandEvent):
+                #      self.verbose...
+                #  else:
+                #      self.verbose...     )
                 try:
-                    self.verbose("Delivering event from", e.src.name,"to",e.dest.name,"at",self._time)
+                    self.verbose("Delivering event from",event.src.name,
+                                 "to",event.dest.name,"at",self._time)
                 except AttributeError:
-                    self.verbose("Delivering event at",self._time)
+                    if isinstance(event,CommandEvent):
+                        self.verbose(
+                            "Executing command '"+event.command_string+"' at "+`self._time`)
+                    else:
+                        self.verbose("Delivering event at",self._time)
+                # ##########################################
+                
+                event()
+                did_event=True
 
-                # CEBHACKALERT: this is overly complex. I assume we
-                # can lose 'fn' from SimulatorEvent since it's only
-                # used for scheduled actions, which we can now do via
-                # schedule_command()?  Then SimulatorEvent can be made
-                # into a new-style class (subclass of object), and its
-                # use restricted to being a genuine Event for
-                # EventProcessors (instead of also being hijacked to
-                # call any function).
-                #
-                # Or we could have one subclass of SimulatorEvent to
-                # do what ScheduledCommand does (and remove
-                # ScheduledCommand), and another to do what
-                # SimulatorEvent currently does. It doesn't seem right
-                # to have SimulatorEvents and ScheduledCommands in the
-                # simulator's events list. Or does it?
-                if isinstance(e,ScheduledCommand):
-                    e()
-                elif e.fn == None:
-                    e.dest.input_event(e.src,e.src_port,e.dest_port,e.data)
-                    did_event = True
-                else:
-                    e.fn(*(e.data))
 
         # The clock needs updating if the events have not done it.
         #if self.events and self.events[0].time >= stop_time:
@@ -583,7 +603,7 @@ class Simulator(ParameterizedObject):
         """
         self.debug("Enqueue absolute: from", (src,src_port),"to",(dest,dest_port),
                    "at time",self._time,"for time",time)
-        new_e = SimulatorEvent(time,src,dest,src_port,dest_port,data)
+        new_e = EPEvent(time,src,dest,src_port,dest_port,data)
 
         # The new event goes at the end of the event queue if there
         # isn't a queue right now, or if it's later than the last
@@ -608,7 +628,7 @@ class Simulator(ParameterizedObject):
     # CEBHACKALERT: can replace schedule_action() if all examples/ code is
     # changed over.
     def schedule_command(self,time,command_string):
-        new_event = ScheduledCommand(time=time,command_string=command_string)
+        new_event = CommandEvent(time=time,command_string=command_string)
 
         # CEBHACKALERT: doesn't this duplicate a lot of enqueue_event_abs()
         if not self.events or time >= self.events[-1].time:
@@ -630,7 +650,7 @@ class Simulator(ParameterizedObject):
         Usage: schedule_action(time, function name, param 1, param 2, ...)
         """
         self.debug("Enqueue absolute action: ", fn, "at time",self._time,"for time",time)
-        new_e = SimulatorEvent(time,None,None,None,None,p,fn=fn)
+        new_e = SAEvent(time,fn,p)
 
         # CEBHACKALERT: doesn't this duplicate a lot of enqueue_event_abs()
         if not self.events or time >= self.events[-1].time:
@@ -641,6 +661,7 @@ class Simulator(ParameterizedObject):
             if time < e.time:
                 self.events.insert(i,new_e)
                 break
+
 
     def state_push(self):
         """
