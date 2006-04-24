@@ -106,6 +106,11 @@ def pattern_present(inputs=None,duration=1.0,learning=False,overwrite_previous=F
             restore_input_generators()
 
 
+# CEBHACKALERT: Implement a Simulator Parameter that contains
+# startup commands, and pickle/unpickle it. This will allow
+# scheduled commands to be usable with pickle. (Currently
+# they pickle but won't run without the import statements etc
+# being executed first.)
 def save_snapshot(snapshot_name):
     """
     Save a snapshot of the network's current state.
