@@ -532,6 +532,10 @@ class Simulator(ParameterizedObject):
                    "at time",self._time,"for time",time)
         new_e = SimulatorEvent(time,src,dest,src_port,dest_port,data)
 
+        # The new event goes at the end of the event queue if there
+        # isn't a queue right now, or if it's later than the last
+        # event's time.  Otherwise, it's inserted at the appropriate
+        # position somewhere inside the event queue.
         if not self.events or time >= self.events[-1].time:
             self.events.append(new_e)
             return
@@ -561,6 +565,7 @@ class Simulator(ParameterizedObject):
         self.debug("Enqueue absolute action: ", fn, "at time",self._time,"for time",time)
         new_e = SimulatorEvent(time,None,None,None,None,p,fn=fn)
 
+        # CEBHACKALERT: doesn't this duplicate a lot of enqueue_event_abs()
         if not self.events or time >= self.events[-1].time:
             self.events.append(new_e)
             return
