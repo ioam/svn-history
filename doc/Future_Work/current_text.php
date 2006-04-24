@@ -23,19 +23,23 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
+2006/04/24: (CB) Switch all examples to use schedule_command(); delete schedule_action() and SAEvent. [** before release]
+</li>
+
+<li>
+2006/04/24 (CB): A better way to implement the Wrapper class(es); change all examples and tests so they set input parameters on an object rather than the class (using Wrapper or RandomWrapper) [** before release (but not the reimplementation part)] 
+</li>
+
+<li>
 2006/04/07: (CB) Allowing joint normalization of projections for a CFSheet. [This appears to work, but results from LISSOM simulations do not yet match those of C++ LISSOM.].
 </li>
 
 <li>
-2006/04/12: (CB) Finish reorganizing response functions and CFProjection response functions; rename CFProjectionGenericOutputFn to GenericCFPOutputFn, etc.; rename connectionfield.py to cf.py; rename Identity to IdentityOutputFn; create Identity learning function; create topo/base/functionfamilies.py and move LearningFns etc into it; rename SharedCFProjection SharedWeightCFProjection; make sure GUI lists are populated (and try to make that simpler).
+2006/04/12: (CB) Finish reorganizing response functions and CFProjection response functions; rename CFProjectionGenericOutputFn to GenericCFPOutputFn, etc.; rename connectionfield.py to cf.py; rename Identity to IdentityOutputFn; create Identity learning function; create topo/base/functionfamilies.py and move LearningFns etc into it; rename SharedCFProjection SharedWeightCFProjection; make sure GUI lists are populated (and try to make that simpler). [** before release]
 </li>
 
 <li>
 2006/04/07: (CB) Implement joint normalization via ports - check ports work as expected.
-</li>
-
-<li>
-2006/04/08: (CB) Implement scheduled actions as strings exec'd in main [it worked a long time ago, it just needs to be implemented on a current copy!]
 </li>
 
 <li> 
@@ -48,10 +52,6 @@ was first added to the list, or a change was made.)
 
 <li>
 2006/04/20 (CB): write test file for Composite and complete Image's test file.
-</li>
-
-<li>
-2006/04/08 (CB): A better way to implement the Wrapper class(es); change all examplesand tests so they set input parameters on an object rather than the class (using Wrapper) 
 </li>
 
 <li>
