@@ -12,5 +12,6 @@ usable.  Sections that are ready so far include:
 <A HREF="space.html">Representing space in Topographica (coordinate systems)</A><BR>
 <A HREF="commandline.html">Using the Topographica command line</A><BR>
 <A HREF="parameters.html">Controlling simulation parameters</A><BR>
+<A HREF="modeleditor.html">Graphical model editor</A><BR>
 <!-- <A HREF="features.html">Topographica features</A><BR> -->
 <A HREF="about.html">About Topographica</A><BR>
