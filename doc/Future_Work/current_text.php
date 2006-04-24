@@ -15,7 +15,7 @@ was first added to the list, or a change was made.)
 <!-- CB: I put my tasks in the approximate order that I'm doing them -->
 
 <li>
-2006/04/21 (CB): matching with C++ LISSOM when there are circular connection fields; HACKALERTs relating to connection fields; test file for connectionfield.
+2006/04/24 (CB): At some point (before the changes to pickle that I'm about to commit), some things for pickling broke. (1) There's a savespace missing somewhere, because lissom_oo_or.ty compains about incorrect return type after unpickling, on activatation. (2) Without weave, there is an error during unpickling while reimporting modules.  [** before release]
 </li>
 
 <li> 
@@ -81,6 +81,9 @@ Tasks which the developers are about to start.
 
 <ul>
 
+<li>
+2006/04/24 (CB): Allowing there to be a slower, more in-depth set of tests (that don't run with make tests, etc).
+</li>
 
 <li>
 2006/03/07 (CB): Why RetinotopicSOM can't be found on unpickling.
