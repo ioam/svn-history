@@ -15,14 +15,14 @@ working to correct all of these issues in the very near future.
 
 <P><DT>Windows and Mac versions</DT><DD> 
 Topographica is written in Python, which is available for many
-platforms.  We are committed to supporting the Windows version, and
-also plan to support the Mac OS X version.  Recent versions have so
-far been tested only on Linux, and due to the rapid pace of
-development, some changes are expected to be needed for non-Linux
-platforms.  We will announce when these changes have been made,
-although it is not usually difficult for individual tech-savvy users
-to get Topographica working on those platforms before we have had a
-chance to look at them.
+platforms.  We are committed to supporting the Windows version, but also
+currently support the Mac OS X version.  Recent versions have been
+tested successfully on Linux, Mac, and Windows. However, because of the 
+rapid pace of development and the developers' limited access to Mac and
+Windows machines, it is possible that some new features will not work
+on these platforms. However, it is not usually difficult for individual 
+tech-savvy users to get Topographica working on those platforms before 
+we have had a chance to look at them.
 
 <P><DT>Progress updating and cancellation</DT><DD> 
 
