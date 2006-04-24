@@ -125,13 +125,6 @@ assert round(alpha_exc/81,7)==0.0146701
 assert round(alpha_inh/529,8)==0.00195177
 assert tsettle == 8
 
-
-# c++ lissom first takes the integer part of rf_radius, I think?
-# So we do that here, although we want to keep it as a float
-# for the calculations in this file.
-rf_radius = float(int(rf_radius))
-
-
 # Number of decimal places for simulator time
 fixedpoint.DEFAULT_PRECISION=3
 random.seed(1234)
