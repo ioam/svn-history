@@ -22,6 +22,11 @@ was first added to the list, or a change was made.)
 2006/04/21 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler; investigate failing test in testimage.py (that uses sheet functions); did the performance change (e.g. lissom_oo_or)?
 </li>
 
+<li> 
+2006/04/24 (CB): Update user manuals regarding Sheet density [** before release]
+</li>
+
+
 <li>
 2006/04/24: (CB) Switch all examples to use schedule_command(); delete schedule_action() and SAEvent. [** before release]
 </li>
