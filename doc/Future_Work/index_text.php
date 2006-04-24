@@ -59,6 +59,23 @@ format.  In the meantime, users should be aware that saved snapshot
 files will not necessarily be readable by future versions of
 Topographica, and should be considered temporary.
 
+<!-- Suggested new state saving text, if I finish it for the release:
+Model state saving is currently implemented using Python "pickling"
+(persistent storage).  Some important classes of objects cannot yet be
+pickled, including any variable holding a lambda function.  As a
+result, there can be cases when not all of the important properties of
+a user's network are restored, and we will be working to prevent or
+support such cases.  In addition, pickling is not robust against
+changes to the class definitions, such as changes in class names.  To
+reduce these problems, we are working on an alternative implementation
+of state saving using XML, which is designed to be an archival,
+readable format.  In the meantime, users should be aware that saved
+snapshot files will not necessarily be readable by future versions of
+Topographica, and should be considered temporary.
+-->
+
+
+
 <P><DT>Plotting</DT><DD>
 Two-dimensional bitmap plots are already supported, but will be
 expanded significantly over the near term and longer term.  Immediate
