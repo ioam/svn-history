@@ -362,7 +362,10 @@ class CommandEvent(Event):
         network.
         """
         import __main__
-        exec self.command_string in __main__.__dict__
+        try:
+            exec self.command_string in __main__.__dict__
+        except SyntaxError:
+            raise SyntaxError("CommandEvent at "+`self.time`+" contained a syntax error:'"+self.command_string+"'")
 
 
 # CEBHACKALERT: class to be removed when all example files changed
