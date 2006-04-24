@@ -113,9 +113,10 @@ topo.sim.connect2('V2','V3',delay=0.5,connection_type=CFProjection,
 
 
 # example scheduled action
-topo.sim.schedule_command(10,"""from topo.base.boundingregion import BoundingBox; topo.sim['V1'].projections()['AfferentLeft'].change_bounds(BoundingBox(radius=0.05))""")
+topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
 
-#                          topo.sim['V1'].projections()['AfferentLeft'].change_bounds, BoundingBox(radius=0.05))
+topo.sim.schedule_command(10,"""topo.sim['V1'].projections()['AfferentLeft'].change_bounds(BoundingBox(radius=0.05))""")
+
 
 # Set default locations for the Model Editor
 topo.sim['V1'].gui_x=135          ; topo.sim['V1'].gui_y=320

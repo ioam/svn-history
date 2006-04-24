@@ -114,6 +114,8 @@ s.connect(V1,V1,delay=FixedPoint("0.05"),
 # (i.e. ones relevant to all bounds and densities, not just for
 #  the particular ones set in this file right now).
 
+s.startup_commands.append("from topo.base.boundingregion import BoundingBox")
+
 ### Lateral excitatory bounds changes
 s.schedule_command(200,'V1.projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.06))')
 s.schedule_command(500,'V1.projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.042))')
