@@ -453,7 +453,7 @@ _______________________________________________________________________________
 From Tue Sep  6 15:32:25 BST 2005 meeting with Eyal
 
 Major issues
-------------
+____________
 
 Overall, the documentation and software need to separate 'Learning and
 self-organization' from 'Representing signals in topographic maps' and
@@ -486,7 +486,7 @@ visual angle.  E.g. need to be able to map measured locations in the
 visual cortex into the model, or even map the measured retinotopic
 grid directly into the model.
 
-Color lookup tables for plotting -- user needs to pick them, and need
+Color lookup tables for plotting: user needs to pick them, and need
 to have keys shown as a color bar.  Also needs to control the
 baseline, clipping range, etc. and to have a clipping warning light.
 
@@ -510,7 +510,7 @@ spontaneous activity in darkness, etc.; will be worth studying.
 
 
 Less crucial points
--------------------
+___________________
 
 For the display, will be useful to have the units displayed on screen,
 etc.
@@ -544,7 +544,7 @@ Minor points for the tutorial:
 Need to add color keys to the Preference Map panels, e.g. by having a
 slot for it in the template.
 
--------------------------------------------------------------------------------
+_______________________________________________________________________________
 
 More Eyal comments:
 
@@ -561,7 +561,7 @@ Display issues;
   
   1) Model editor - not clear how to interpret; how to modify;
 
-  2) State that each little plot in the projection plot shows only the -->
+  2) State that each little plot in the projection plot shows only the
      connection field of the neuron, not the entire set of afferents from the retina.
 
   3)      Suggestions for Test pattern window
