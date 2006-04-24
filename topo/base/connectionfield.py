@@ -418,18 +418,15 @@ class CFProjectionLearningFn(ParameterizedObject):
     the arguments specified below.
     """    
     def constant_sum_connection_rate(self,cfs,learning_rate):
-	"""
-	return the learning rate for a single connection according to
-        the total learning_rate, the number of rows and cols of the
-        output_activity matrix and the connection fields matrix
-        cfs. Keep the sum of the single connection learning rate
-        constant.
-	"""
-        
-        ### JCALERT! To check with Jim: we take the number of unit at
-        ### the center of the matrix
-        ### That would be the best way to go, but it is not possible to acces the 
-        ### sheet_density and bounds from here without more important changes
+	""" 
+	Return the learning rate for a single connection assuming that
+        the total rate is to be divided evenly among all the units in
+        the connection field.
+	"""      
+        ### JCALERT! To check with Jim: right now, we take the number of units
+        ### at the center of the matrix.  It would be better to calculate it
+        ### directly from the sheet_density and bounds, but it is not currently
+        ### possible to access those from here.  Example:
         #center_r,center_c = sheet2matrixidx(0,0,bounds,xdensity,ydensity)
 	rows = len(cfs)
 	cols = len(cfs[0])
