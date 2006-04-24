@@ -336,6 +336,42 @@ class SimulatorEvent:
         self.fn = fn
 
 
+# CEBHACKALERT: do we need to allow a user to save arbitrary data
+# along with the network when pickling? Like specified imports and
+# results stored in variables in main?
+# 
+# For imports, maybe ScheduledAction could be a ParameterizedObject
+# (so class attributes get pickled), and it could have a class
+# attribute to store anything scheduled actions repeatedly depend on -
+# in many cases, scheduled actions require BoundingBox.
+#
+# Maybe it would be better to handle everything in something like
+# a general save functinon, which does save_snapshot() plus allows
+# things and their locations to be saved?
+# e.g.
+# save_state({"__main__.__dict__": [BoundingBox, x]})
+# where save_state() also calls save_snapshot to get the simulator.
+
+class ScheduledCommand(object):
+    """
+    When called, exec's a command string in __main__.__dict__.
+
+    Be sure that any required items will be present in
+    __main__.__dict__; in particular, consider what will be present
+    after the network is saved and restored. For instance, results of
+    scripts you have run, or imports they make---all currently
+    available in __main__.__dict__---will not be saved with the
+    network.
+    """
+    def __init__(self,time,command_string):
+        self.time = time
+        self.command_string = command_string
+        
+    def __call__(self):
+        import __main__
+        exec self.command_string in __main__.__dict__
+
+            
 # CEBHACKALERT: need to rename to simulation, etc.
 
 # Simulator stores its events in a linear-time priority queue (i.e., a
@@ -505,7 +541,24 @@ class Simulator(ParameterizedObject):
                 except AttributeError:
                     self.verbose("Delivering event at",self._time)
 
-                if e.fn == None:
+                # CEBHACKALERT: this is overly complex. I assume we
+                # can lose 'fn' from SimulatorEvent since it's only
+                # used for scheduled actions, which we can now do via
+                # schedule_command()?  Then SimulatorEvent can be made
+                # into a new-style class (subclass of object), and its
+                # use restricted to being a genuine Event for
+                # EventProcessors (instead of also being hijacked to
+                # call any function).
+                #
+                # Or we could have one subclass of SimulatorEvent to
+                # do what ScheduledCommand does (and remove
+                # ScheduledCommand), and another to do what
+                # SimulatorEvent currently does. It doesn't seem right
+                # to have SimulatorEvents and ScheduledCommands in the
+                # simulator's events list. Or does it?
+                if isinstance(e,ScheduledCommand):
+                    e()
+                elif e.fn == None:
                     e.dest.input_event(e.src,e.src_port,e.dest_port,e.data)
                     did_event = True
                 else:
@@ -552,6 +605,20 @@ class Simulator(ParameterizedObject):
         self.enqueue_event_abs(self._time+delay,
                                src,dest,src_port,dest_port,data)
 
+    # CEBHACKALERT: can replace schedule_action() if all examples/ code is
+    # changed over.
+    def schedule_command(self,time,command_string):
+        new_event = ScheduledCommand(time=time,command_string=command_string)
+
+        # CEBHACKALERT: doesn't this duplicate a lot of enqueue_event_abs()
+        if not self.events or time >= self.events[-1].time:
+            self.events.append(new_event)
+            return
+        for index,event in enumerate(self.events):
+            if time < event.time:
+                self.events.insert(index,new_event)
+                break
+        
 
     def schedule_action(self,time,fn,*p):
         """
