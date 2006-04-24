@@ -319,7 +319,9 @@ class EPConnection(ParameterizedObject):
 
 
 # CEBHACKALERT: how can this have a Parameter when it's not a
-# ParameterizedObject?
+# ParameterizedObject? To clarify, I mean that presumably
+# the parameter isn't operating as expected (it won't be checking
+# the type, for example).
 class SimulatorEvent:
     """Simulator event"""
     fn = CallableParameter(default=None,doc="Function to execute when the event is processed.")
