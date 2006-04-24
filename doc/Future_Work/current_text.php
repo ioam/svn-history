@@ -31,6 +31,10 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
+2006/04/24 (CB): Update tutorials now that scripts don't need to be run before loading a snapshot. [** before release]
+</li>
+
+<li>
 2006/04/07: (CB) Allowing joint normalization of projections for a CFSheet. [This appears to work, but results from LISSOM simulations do not yet match those of C++ LISSOM.].
 </li>
 
@@ -77,9 +81,6 @@ Tasks which the developers are about to start.
 
 <ul>
 
-<li>
-2006/04/08 (CB): Update tutorials now that scripts don't need to be run before loading a snapshot.
-</li>
 
 <li>
 2006/03/07 (CB): Why RetinotopicSOM can't be found on unpickling.
