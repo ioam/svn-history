@@ -284,7 +284,14 @@ def get_states_of_classes_from_module(module,states_of_classes,processed_modules
 
         else:
             if isinstance(v,type) and issubclass(v,ParameterizedObject):
-                full_class_path = v.__module__+'.'+k
+
+                # Note: we take the class name as v.__name__, not k, because
+                # k might be just a label for the true class. For example,
+                # if Topographica falls back to the unoptimized components,
+                # k could be "CFProjectionDotProduct_opt1", but v.__name__
+                # - and the actual class - is "CFProjectionDotProduct". It
+                # is correct to set the attributes on the true class.
+                full_class_path = v.__module__+'.'+v.__name__
                 states_of_classes[full_class_path] = {}
                 # class ALWAYS has __dict__, right? And no P.O. has slots.
                 for (name,obj) in v.__dict__.items():
