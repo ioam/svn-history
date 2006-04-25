@@ -44,7 +44,7 @@ performance using
 matrix operations.  This should be the first approach when optimizing
 any component, and indeed when writing the component for the first
 time (because the Numeric primitives are much easier to use and
-maintain than e.g. explicitly writing <code>for</code> loops.
+maintain than e.g. explicitly writing <code>for</code> loops).
 However, there are certain cases where the performance of Numeric is
 not sufficient, or where Numeric is unsuitable (for example, many
 Numeric operations do not act in-place on arrays).  Other components
@@ -57,7 +57,7 @@ version of the object that is simple to understand and does not make
 any special assumptions. Then, an optimized version can be offered as
 an alternative. The convention we use is to add the suffix
 <code>_optN</code> to the optimized version, where <code>N</code> is a
-number that allows to distinguish between differently optimized
+number that allows to distinguish between different optimized
 versions. This is helpful both for understanding and for ensuring
 correctness.
 

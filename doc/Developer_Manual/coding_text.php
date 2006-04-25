@@ -225,9 +225,11 @@ specifiers should be in Sheet coordinates, selecting the nearest
 appropriate unit, not row and column.
 
 <P>Appropriate units for most parameters can be determined by
-considering the continuous plane underlying the discrete units forming
-the model sheet, and the continuous logical timeline behind the
-discrete timesteps in the model. Some parameters should be expressed
+considering the <A HREF="../User_Manual/space.html">
+continuous plane underlying the discrete units forming
+the model sheet</A>, and the <A HREF="../User_Manual/time.html">
+continuous logical timeline behind the
+discrete timesteps in the model</A>. Some parameters should be expressed
 in terms of lengths in that plane, some in terms of areas, and some in
 terms of volumes, rather than numbers of units, etc.  Others are
 expressed in terms of lengths of time, rather than number of time
@@ -253,8 +255,9 @@ all or most of Topographica.)
 functions in <CODE>topo/</CODE>, i.e. they should respect the
 (as-yet-only-loosely-defined) Topographica API.
 
-<P>Typically, files will be named with the lowercase version of the
-main class which they contain.  E.g. sheet.py contains class Sheet and
-some associated functions.  Most files should contain one main class,
-though often subclasses are also included (in which case the file
-should be named after the parent class).
+<P>Typically, files organized around one main class will be named with
+the lowercase version of that main class.  E.g. sheet.py contains
+class Sheet and some associated functions.  Often files will include
+not just one class but a superclass and several subclasses; such files
+are named after the superclass.
+

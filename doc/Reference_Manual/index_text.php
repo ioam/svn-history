@@ -55,9 +55,9 @@ classes:
 <P><DT><A href="topo.outputfns.html"><strong>outputfns</strong></A></DT>
 <DD>Output functions: apply to matrices to do e.g. normalization or squashing</DD>
 <P><DT><A href="topo.responsefns.html"><strong>responsefns</strong></A></DT>
-<DD>Calculate the response of a Projection</DD>
+<DD>Calculate the response of a unit or a Projection</DD>
 <P><DT><A href="topo.learningfns.html"><strong>learningfns</strong></A></DT>
-<DD>Adjust weights for a Projection</DD>
+<DD>Adjust weights for a unit or a Projection</DD>
 <P><DT><A href="topo.commands.html"><strong>commands</strong></A></DT>
 <DD>High-level user commands</DD>
 </DL>
@@ -87,7 +87,7 @@ documentation:
 good basic introduction, check out the <A
 HREF="http://docs.python.org/tut/tut.html">Python tutorial</A>.  There
 are also books and many websites available with more information.
-Topographica is based on an unmodified copy of Python, so anything that
+Topographica is built on an unmodified copy of Python, so anything that
 Python can do is also valid for Topographica.
 </DD>
 
