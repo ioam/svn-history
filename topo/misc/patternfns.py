@@ -94,8 +94,8 @@ def __ellipse(x,y,a,b):
     """
     Return the ellipse specified by (x/a)^2 + (y/b)^2 = 1.
     """
-    x_a = divide(x,a)
-    y_b = divide(y,b)
+    x_a = divide(x,float(a))
+    y_b = divide(y,float(b))
     
     return 1.0 - (x_a*x_a + y_b*y_b)  
 
@@ -112,7 +112,7 @@ def __exp(x,denom):
     of denom.
     """
     # x/denom==nan if x==denom==0; 0 is returned in that case
-    return where(x!=0.0, exp(divide(x,denom)),0.0)
+    return where(x!=0.0, exp(divide(x,float(denom))),0.0)
 
 
                 
