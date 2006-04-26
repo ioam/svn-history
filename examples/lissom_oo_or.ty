@@ -24,7 +24,8 @@ from topo.base.connectionfield import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFProjectionHebbian_opt1
 from topo.outputfns.optimized import CFProjectionDivisiveSumNormalize_opt1
-from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
+from topo.outputfns.basic import PiecewiseLinear, DivisiveSumNormalize
+
 from topo.patterns import PatternGeneratorParameter
 
 ###########################################
@@ -114,7 +115,7 @@ s.connect(V1,V1,delay=FixedPoint("0.05"),
 # (i.e. ones relevant to all bounds and densities, not just for
 #  the particular ones set in this file right now).
 
-s.startup_commands.append("from topo.base.boundingregion import BoundingBox")
+s.startup_commands.append("from topo.base.boundingregion import BoundingBox; V1=topo.sim['V1']")
 
 ### Lateral excitatory bounds changes
 s.schedule_command(200,'V1.projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.06))')
