@@ -298,3 +298,81 @@ def get_states_of_classes_from_module(module,states_of_classes,processed_modules
                     if isinstance(obj,Parameter):
                         states_of_classes[full_class_path][name] = obj
                 
+
+
+# CEBHACKALERT: temporary solution for saving savespace state of arrays.
+### Python's pickle.Pickler and Numeric's Pickler do not save the
+### savespace attribute of arrays, so we implement our own Pickler and
+### Unpickler to do this.  These are subclasses of pickle.Pickler and
+### pickle.Unpickler, but we override the save_array and load_array
+### methods.
+###
+### These methods are modified ones taken from Numeric's Pickler and
+### Unpickler for the moment, but really they should just call
+### pickle.Pickler/pickle.Unpickler's own load_array and save_array
+### methods, but also save the savespace attribute.
+                        
+
+from Numeric import array,multiply,ArrayType,LittleEndian,fromstring,reshape
+import string
+
+### CB: code between marks is lifted from Numeric.py with modifications noted ###
+
+# These two functions are used in my modified pickle.py so that
+# matrices can be pickled.  Notice that matrices are written in
+# binary format for efficiency, but that they pay attention to
+# byte-order issues for  portability.
+
+def DumpArray(m, fp):
+    if m.typecode() == 'O':
+        raise TypeError, "Numeric Pickler can't pickle arrays of Objects"
+    s = m.shape
+    if LittleEndian: endian = "L"
+    else: endian = "B"
+    # CB: as well as writing typecode, write savespace
+    fp.write("A%s%s%d%d " % (m.typecode(), endian, m.spacesaver(), m.itemsize()))
+    for d in s:
+        fp.write("%d "% d)
+    fp.write('\n')
+    fp.write(m.tostring())
+
+def LoadArray(fp):
+    ln = string.split(fp.readline())
+    if ln[0][0] == 'A': ln[0] = ln[0][1:] # Nasty hack showing my ignorance of pickle
+    typecode = ln[0][0]
+    endian = ln[0][1]
+    # CB: read back savespace
+    savespace = int(ln[0][2])
+    
+    shape = map(lambda x: string.atoi(x), ln[1:])
+    itemsize = string.atoi(ln[0][3:])
+
+    sz = reduce(multiply, shape)*itemsize
+    data = fp.read(sz)
+
+    m = fromstring(data, typecode)
+    m = reshape(m, shape)
+    # CB: set savespace
+    m.savespace(savespace)
+
+    if (LittleEndian and endian == 'B') or (not LittleEndian and endian == 'L'):
+        return m.byteswapped()
+    else:
+        return m
+
+import pickle, copy
+class ExtraUnpickler(pickle.Unpickler):
+    def load_array(self):
+        self.stack.append(LoadArray(self))
+
+    dispatch = copy.copy(pickle.Unpickler.dispatch)
+    dispatch['A'] = load_array
+
+class ExtraPickler(pickle.Pickler):
+    def save_array(self, object):
+        DumpArray(object, self)
+
+    dispatch = copy.copy(pickle.Pickler.dispatch)
+    dispatch[ArrayType] = save_array
+
+### CB: end code from Numeric.py ###
