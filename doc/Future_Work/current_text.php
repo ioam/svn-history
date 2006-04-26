@@ -14,9 +14,6 @@ was first added to the list, or a change was made.)
 
 <!-- CB: I put my tasks in the approximate order that I'm doing them -->
 
-<li>
-2006/04/24 (CB): At some point (before the changes to pickle that I'm about to commit), some things for pickling broke. (1) lissom_oo_or.ty compains about incorrect return type after unpickling, when learning. Only when using DivisiveSumNormalize from outputfns.basic - no problem when using DivisiveSumNormalize_opt1 from outputfns.optimized! [** before release]
-</li>
 
 <li> 
 2006/04/21 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler; investigate failing test in testimage.py (that uses sheet functions); did the performance change (e.g. lissom_oo_or)? [** before release]
