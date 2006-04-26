@@ -52,6 +52,16 @@ import topo.patterns.basic
 from topo.tests.lissom_log_parser import get_input_params,get_matrix
 
 
+# Topographica learning rate is density-independent so to compare
+# with C++ lissom it's necessary to know the number of units.
+# Be aware that you'll need to change these later in the script
+# if the bounds are alterered. (Could be automated)
+n_aff_units=137
+n_exc_units=177
+n_inh_units=973
+
+
+
 ###########################################
 # Variables to match the C++ version of LISSOM
 
@@ -89,9 +99,9 @@ RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
 acs=6.5*6.5/rf_radius/rf_radius
 ecs=19.5*19.5/exc_rad/exc_rad
 ics=47.5*47.5/inh_rad/inh_rad
-alpha_input=0.007*121*acs
-alpha_exc=0.002*ecs*81
-alpha_inh=0.00025*ics*529
+alpha_input=0.007*n_aff_units*acs
+alpha_exc=0.002*ecs*n_exc_units
+alpha_inh=0.00025*ics*n_inh_units
 
 tsettle=8
 
@@ -121,9 +131,9 @@ assert scale_input==1.0
 assert acs==1
 assert round(ecs,5)==6.76000
 assert round(ics,5)==7.36735
-assert round(alpha_input/121,3)==0.007
-assert round(alpha_exc/81,7)==0.0135200
-assert round(alpha_inh/529,8)==0.00184184
+assert round(alpha_input/n_aff_units,3)==0.007
+assert round(alpha_exc/n_exc_units,7)==0.0135200
+assert round(alpha_inh/n_inh_units,8)==0.00184184
 assert tsettle == 8
 
 # Number of decimal places for simulator time
@@ -169,11 +179,9 @@ LISSOM.density = BaseN
 #LISSOM.tsettle=tsettle
 
 # Connection parameters
-
-# CEBHACKALERT: what's up with bounds2slice() here? 
-afferent_weight_bounds = BoundingBox(radius=rf_radius/BaseRN-0.00001)
-excitatory_weight_bounds = BoundingBox(radius=exc_rad/BaseN-0.00001)
-inhibitory_weight_bounds = BoundingBox(radius=inh_rad/BaseN-0.00001)
+afferent_weight_bounds = BoundingBox(radius=rf_radius/BaseRN)
+excitatory_weight_bounds = BoundingBox(radius=exc_rad/BaseN)
+inhibitory_weight_bounds = BoundingBox(radius=inh_rad/BaseN)
 
 CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
