@@ -689,25 +689,32 @@ class CFProjection(Projection):
 
     def initialize_bounds(self,bounds):
         """
-        Return sheet-coordinate bounds corresponding to the odd-dimensions
-        slice that best approximates the specified sheet-coordinate bounds.
+        Return sheet-coordinate bounds that correspond exactly to the slice
+        of the sheet which best approximates the specified sheet-coordinate
+        bounds.
 
 
-        Converts the bounds to a slice, but ensuring the slice specifies
-        an odd number of rows and an odd number of columns. Then converts this
-        slice back to sheet-coordinate bounds.    
+        The supplied bounds are translated to have a center at the center
+        of one of the sheet's units (we use the center unit), and then
+        these bounds are converted to a slice (see bounds2slice for details,
+        but results in a slice that exactly includes all units whose centers
+        are within the bounds). This slice is converted back to the exactly
+        corresponding bounds, and these are returned.
+
+        Note that this procedure guarantees bounds that yield a slice with
+        odd dimensions.
         """
-        slice_ = Slice(bounds,self.src)
-        n_rows,n_cols = slice_.shape
+        l,b,r,t = bounds.lbrt()
+        bounds_center_x = l+(r-l)/2.0
+        bounds_center_y = b+(t-b)/2.0
 
-        sheet_center_row,sheet_center_col = self.src.sheet2matrixidx(0.0,0.0)
+        center_unit_r,center_unit_c = self.src.sheet2matrixidx(0,0)
+        center_unit_xcenter,center_unit_ycenter = self.src.matrixidx2sheet(center_unit_r,center_unit_c)
 
-        r1 = sheet_center_row - n_rows/2
-        c1 = sheet_center_col - n_cols/2
-        r2 = sheet_center_row + n_rows/2 +1
-        c2 = sheet_center_col + n_cols/2 +1
+        bounds.translate(center_unit_xcenter-bounds_center_x,
+                         center_unit_ycenter-bounds_center_y)
 
-        return self.src.slice2bounds((r1,r2,c1,c2))
+        return Slice(bounds,self.src).bounds
 
 
     def cf(self,r,c):
