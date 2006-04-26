@@ -14,6 +14,9 @@ was first added to the list, or a change was made.)
 
 <!-- CB: I put my tasks in the approximate order that I'm doing them -->
 
+<li>
+2006/04/26 (CB): matching with C++ LISSOM when there are circular connection fields [seems to match, just have to check bounds changes etc and then after 20000 iterations]; HACKALERTs relating to connection fields; test file for connectionfield
+</li>
 
 <li> 
 2006/04/21 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler; investigate failing test in testimage.py (that uses sheet functions); did the performance change (e.g. lissom_oo_or)? [** before release]
@@ -22,7 +25,6 @@ was first added to the list, or a change was made.)
 <li> 
 2006/04/24 (CB): Update user manuals regarding Sheet density [** before release]
 </li>
-
 
 <li>
 2006/04/24: (CB) Switch all examples to use schedule_command(); delete schedule_action() and SAEvent. [** before release]
@@ -37,7 +39,7 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/04/07: (CB) Allowing joint normalization of projections for a CFSheet. [This appears to work, but results from LISSOM simulations do not yet match those of C++ LISSOM.].
+2006/04/07: (CB) Allowing joint normalization of projections for a CFSheet. [This appears to work, but results from LISSOM simulations do not yet match those of C++ LISSOM.]
 </li>
 
 <li>
