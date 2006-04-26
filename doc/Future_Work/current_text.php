@@ -29,7 +29,7 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/04/24 (CB): A better way to implement the Wrapper class(es); change all examples and tests so they set input parameters on an object rather than the class (using Wrapper or RandomWrapper) [** before release (but not the reimplementation part)] 
+2006/04/26 (CB): A better way to implement the Wrapper class(es); change all examples and tests so they set input parameters on an object rather than the class (using Wrapper or RandomWrapper); pickling of random streams  [** before release (but not the reimplementation part)] 
 </li>
 
 <li>
