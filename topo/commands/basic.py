@@ -6,6 +6,7 @@ __version__='$Revision$'
 
 import __main__
 import pickle
+import StringIO
 
 import topo
 from topo.base.parameterizedobject import ParameterizedObject, Parameter
@@ -147,13 +148,15 @@ def save_snapshot(snapshot_name):
     # that commands can be executed before it's unpickled.
     # CEBHACKALERT: someone should figure out if that is really
     # necessary
-    pickled_sim = pickle.dumps(topo.sim.actual_sim,2)
+    pickled_sim=StringIO.StringIO()
+    p = pickle.Pickler(pickled_sim,2)
+    p.dump(topo.sim.actual_sim)
 
-    
     ### Now pickle the lot to a file
     #
-    pickle.dump((startup_commands,states_of_classes,pickled_sim),
-                open(snapshot_name,'wb'), 2)
+    q = pickle.Pickler(open(snapshot_name,'wb'),2)
+    q.dump((startup_commands,states_of_classes,pickled_sim))
+    pickled_sim.close() # necessary?
 
 
 def load_snapshot(snapshot_name):
@@ -164,8 +167,8 @@ def load_snapshot(snapshot_name):
     topo.sim.startup_commands, then restores class attributes
     for ParameterizedObjects, then loads the simulator.
     """
-    
-    startup_commands,states_of_classes,pickled_sim = pickle.load(open(snapshot_name,'rb'))
+    u = pickle.Unpickler(open(snapshot_name,'rb'))
+    startup_commands,states_of_classes,pickled_sim = u.load()
 
     ### First execute the startup commands
     #
@@ -194,6 +197,7 @@ def load_snapshot(snapshot_name):
 
     ### Now unpickle the simulator and set it to be topo.sim
     #
-    sim = pickle.loads(pickled_sim)
-    topo.sim.change_sim(sim)
+    pickled_sim.seek(0)
+    v = pickle.Unpickler(pickled_sim)
+    topo.sim.change_sim(v.load())
 
