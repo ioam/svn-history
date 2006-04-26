@@ -664,6 +664,10 @@ class CFProjection(Projection):
         # CEBHACKALERT: allow user to override this.
         # calculate the size & aspect_ratio of the mask if appropriate
         # (from the original user-specified bounds)
+
+        # CEBHACKALERT: change this bit; adjust size so that it always
+        # ends '.0' in both x and y directions so that we get
+        # reasonable circles.
         if hasattr(self.weights_shape, 'size'):
             l,b,r,t = self.original_bounds.lbrt()
             self.weights_shape.size = t-b
