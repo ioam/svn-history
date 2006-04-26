@@ -641,6 +641,8 @@ class Wrapper(object):
 # CEBHACKALERT: Specifically for random; makes sure a new
 # instance is created every time. Probably temporary. Duplicates
 # a lot of the above.
+# CEBHACKALERT: investigate pickling of the random streams so that
+# they come back to where they left off, etc.
 import random
 class RandomWrapper(object):
     """
