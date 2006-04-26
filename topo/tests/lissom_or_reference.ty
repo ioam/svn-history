@@ -11,9 +11,10 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEBHACKALERT: learning rates need to be adjusted
+# To do:
+# - learning rates need to be adjusted
 # for 72x72 network.
-# Also, check all relevant scheduled events are
+# - also, check all relevant scheduled events are
 # here.
 
 
@@ -24,9 +25,9 @@ __version__='$Revision$'
 # 6 decimal places for activity values). Haven't checked
 # after more because learning rates not updated yet (used
 # correct learning rates for the 100-iterations test).
-# - With circular receptive fields, the disks are slightly
-# different shapes between c++ and topographica.
-
+# - With circular receptive fields, sum over activity
+# after 1 learning iteration matches to 5 dp. Haven't
+# checked any further yet.
 
 
 
@@ -60,8 +61,8 @@ BaseRN=24.0
 area_scale=1.0
 #num_eyes=1
 rf_radius=BaseRN/4.0+0.5
-inh_rad=max(2.5,BaseN/4.0-1.0)
-exc_rad=max(2.5,BaseN/10.0)
+inh_rad=max(2.5,BaseN/4.0-1.0)+0.5
+exc_rad=max(2.5,BaseN/10.0)+0.3
 #default_afferent_size_scale=BaseN/BaseRN
 gammaexc=0.9
 gammainh=0.9
@@ -106,8 +107,8 @@ assert delta == 0.1
 assert beta == 0.65
 #assert default_afferent_size_scale == 3
 assert rf_radius == 6.5
-assert inh_rad == 17
-assert exc_rad == 7.2
+assert inh_rad == 17.5
+assert exc_rad == 7.5
 assert area_scale == 1
 assert BaseRN == 24.
 assert BaseN == 72.
@@ -118,11 +119,11 @@ assert randomness == 0.0
 assert round(rf_radius_scale,6)==0.769231
 assert scale_input==1.0
 assert acs==1
-assert round(ecs,5)==7.33507
-assert round(ics,5)==7.80709
+assert round(ecs,5)==6.76000
+assert round(ics,5)==7.36735
 assert round(alpha_input/121,3)==0.007
-assert round(alpha_exc/81,7)==0.0146701
-assert round(alpha_inh/529,8)==0.00195177
+assert round(alpha_exc/81,7)==0.0135200
+assert round(alpha_inh/529,8)==0.00184184
 assert tsettle == 8
 
 # Number of decimal places for simulator time
@@ -168,9 +169,11 @@ LISSOM.density = BaseN
 #LISSOM.tsettle=tsettle
 
 # Connection parameters
-afferent_weight_bounds = BoundingBox(radius=rf_radius/BaseRN)
-excitatory_weight_bounds = BoundingBox(radius=exc_rad/BaseN)
-inhibitory_weight_bounds = BoundingBox(radius=inh_rad/BaseN)
+
+# CEBHACKALERT: what's up with bounds2slice() here? 
+afferent_weight_bounds = BoundingBox(radius=rf_radius/BaseRN-0.00001)
+excitatory_weight_bounds = BoundingBox(radius=exc_rad/BaseN-0.00001)
+inhibitory_weight_bounds = BoundingBox(radius=inh_rad/BaseN-0.00001)
 
 CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
