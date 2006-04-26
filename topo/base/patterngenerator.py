@@ -9,7 +9,7 @@ $Id$
 __version__='$Revision$'
 
 from math import pi
-from Numeric import add,subtract,cos,sin,array
+from Numeric import add,subtract,cos,sin
 
 from parameterizedobject import ParameterizedObject
 from boundingregion import BoundingBox, BoundingRegionParameter
