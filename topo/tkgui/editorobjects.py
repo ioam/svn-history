@@ -465,7 +465,7 @@ class EditorProjection(EditorConnection) :
     lateral projections are represented by a dotted ellipse around the centre.
     Can determine if x,y coord is within the triangular receptive field or within an
     area around the arrow head. The same can be determined for a lateral projection 
-    ellipse
+    ellipse.
     """	
     def __init__(self, name, canvas, from_node, receptive_field = True) :
         EditorConnection.__init__(self, name, canvas, from_node)
@@ -482,7 +482,7 @@ class EditorProjection(EditorConnection) :
         self.factor = self.get_factor()
         self.receptive_field = receptive_field
         self.set_colours()
-        self.view = 'normal'
+        self.view = 'radius'
         self.viewing_choices = [('Field Radius', lambda: self.select_view('radius')),
                                 ('Line', lambda: self.select_view('line')),
                                 ('Fixed Size', lambda: self.select_view('normal'))]
