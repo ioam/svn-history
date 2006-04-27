@@ -704,6 +704,22 @@ class CFProjection(Projection):
         Note that this procedure guarantees bounds that yield a slice with
         odd dimensions.
         """
+        
+        # CEBHACKALERT? Is the above statement really true? I think it
+        # might not be, but I don't have an example of it failing.
+        # Finding the center of a unit and translating the center of
+        # the bounds to that point would guarantee odd bounds if the
+        # same thing happened at each boundary. We say that the right
+        # and bottom bounds are exclusive, but that the left and top
+        # bounds are inclusive (and bounds2slice acts this way).  So
+        # if someone chooses weights_bounds whose borders - after the
+        # bounds have been translated to the center of a particular
+        # unit - go right through the center of surrounding units, we
+        # have the units along the right and bottom boundaries
+        # excluded, but the ones along left and top included.  So it
+        # seems like this ought to fail to produce odd weight matrices
+        # for some bounds and densities. Right?
+        
         l,b,r,t = bounds.lbrt()
         bounds_center_x = l+(r-l)/2.0
         bounds_center_y = b+(t-b)/2.0
