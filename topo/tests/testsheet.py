@@ -522,7 +522,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         self.assertEqual((r1,r2,c1,c2),(1,3,1,3))
 
         # CEBHACKALERT: this test fails; I'm not certain what the correct
-        # result should be.
+        # result should be. (1,4,1,4)?
         test_bounds.translate(0.05,-0.05)
         r1,r2,c1,c2 = ct.bounds2slice(test_bounds)
         self.assertEqual((r1,r2,c1,c2),(1,3,1,3))
