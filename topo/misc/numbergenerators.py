@@ -13,7 +13,7 @@ from topo.base.parameterclasses import Number
 
 
 # CEBHACKALERT: investigate pickling of the random streams to check
-# they come back where they left off.
+# they come back where they left off for these RandomDistributionWrappers.
 
 
 class RandomDistributionWrapper(ParameterizedObject):
@@ -153,6 +153,9 @@ class RandomWrapper(object):
             return self.function(*args,**kw)
 
 
+    # CB: I added a hack to allow state saving for the random generator,
+    # but it's possible we won't need any special code when we use the
+    # RandomDistributionClasses.
     def __getstate__(self):
         """
         Can't pickle self.function, so don't return it
@@ -166,12 +169,18 @@ class RandomWrapper(object):
 
         del state['function']
 
+        state['rg_state'] = self.random_generator.getstate()
+
         return state
 
     def __setstate__(self,state):
         """
         Restore the state.
         """
+        rg_state = state['rg_state']
+        del state['rg_state']
+        
         for (k,v) in state.items():
             setattr(self,k,v)
         self.function = getattr(self.random_generator,self.function_name)
+        self.random_generator.setstate(rg_state)
