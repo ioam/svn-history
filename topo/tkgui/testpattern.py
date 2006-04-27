@@ -283,7 +283,11 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         for each in self.generator_sheets_patterns.keys():
             view_dict = {}
             k = self.generator_sheets_patterns[each]['pattern_generator']
-	    density = k.density
+            # xdensity and ydensity are the same for the pattern_generator
+            # because they were set from a Sheet xdensity and ydensity,
+            # which are guaranteed to be the same
+	    density = k.xdensity
+            
 	    view_dict[each] = topo.base.sheetview.SheetView((k(),k.bounds),src_name=each)
 	    channels = {'Strength':each,'Hue':None,'Confidence':None}
 	    ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
@@ -321,4 +325,5 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
             if o_s_p['editing']==True:
                 o_s_p['pattern_generator'] = self.__params_frame.topo_obj
                 setattr(o_s_p['pattern_generator'],'bounds',copy.deepcopy(o_s_p['generator_sheet'].bounds))
-                setattr(o_s_p['pattern_generator'],'density', o_s_p['generator_sheet'].density)                
+                setattr(o_s_p['pattern_generator'],'xdensity', o_s_p['generator_sheet'].xdensity)
+                setattr(o_s_p['pattern_generator'],'ydensity', o_s_p['generator_sheet'].ydensity)                
