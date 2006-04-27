@@ -16,7 +16,7 @@ from topo.base.parameterclasses import Number
 # they come back where they left off for these RandomDistributionWrappers.
 
 
-class RandomDistributionWrapper(ParameterizedObject):
+class RandomDistribution(ParameterizedObject):
     """
     Python's random module provides the Random class, which can be
     instantiated to give an object that can be asked to generate
@@ -56,7 +56,7 @@ class RandomDistributionWrapper(ParameterizedObject):
         raise NotImplementedError
 
 
-class UniformRandom(RandomDistributionWrapper):
+class UniformRandom(RandomDistribution):
     """
     Specified with lbound and ubound; when called, return a random
     number in the range [lbound, ubound).
@@ -70,7 +70,7 @@ class UniformRandom(RandomDistributionWrapper):
         return self.random_generator.uniform(self.lbound,self.ubound)
 
 
-class NormalRandom(RandomDistributionWrapper):
+class NormalRandom(RandomDistribution):
     """
     Specified with mean mu and standard deviation sigma.
 
@@ -84,7 +84,6 @@ class NormalRandom(RandomDistributionWrapper):
 
 
 # CEBHACKALERT: Probably temporary. Duplicates a lot of Wrapper.
-# Does not save generator state (*add this*)
 class RandomWrapper(object):
     __slots__ = ['random_generator','function_name','function','args','kw']
 
