@@ -18,6 +18,11 @@ was first added to the list, or a change was made.)
 2006/04/26 (CB): matching with C++ LISSOM when there are circular connection fields [seems to match, just have to check bounds changes etc and then after 20000 iterations]; HACKALERTs relating to connection fields; test file for connectionfield
 </li>
 
+<li>
+2006/04/27 (CB): New CompositePatternGenerator does not work correctly (e.g. when used for weights) (this must affect Image too, since they both use the same code). [** before release - can always revert to previous version, which did work]
+</li>
+
+
 <li> 
 2006/04/21 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler; investigate failing test in testimage.py (that uses sheet functions); did the performance change (e.g. lissom_oo_or)? [** before release]
 </li>
@@ -86,7 +91,12 @@ Tasks which the developers are about to start.
 <ul>
 
 <li>
-2006/04/24 (CB): Allowing there to be a slower, more in-depth set of tests (that don't run with make tests, etc).
+2006/04/27 (CB): Number, DynamicNumber: allowing an attribute that has been declared as a Number to work with something that produces a number (i.e. do it properly - because it does work at the moment).
+</li>
+
+
+<li>
+2006/04/27 (CB): Allowing there to be a slower, more in-depth set of tests (that don't run with make tests, etc). Slower tests that are required: pickling, that example networks' results haven't changed,
 </li>
 
 <li>
