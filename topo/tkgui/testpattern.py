@@ -273,7 +273,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         """
         Replace the superclass do_plot_cmd.
         Create a PlotGroup that has a list of Plots that have been
-        created from a set of activitys defined by the user. We
+        created from a set of activities defined by the user. We
         don't need a completely new PlotGroup type for this temporary
         plot.
 
