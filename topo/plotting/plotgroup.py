@@ -90,7 +90,7 @@ class PlotGroup(ParameterizedObject):
 	self.height_of_tallest_plot = 1.0
 	self.initial_plot = True
 	### JCALERT:later rename this attribute
-	self.min_master_zoom=3.0
+	#self.min_master_zoom=3.0
 
 	# Time attribute.
 	self.time = topo.sim.time()
@@ -180,11 +180,12 @@ class PlotGroup(ParameterizedObject):
 	sheet_max_height = max_density*max_sheet_height
 	matrix_max_height = max([p.bitmap.height() for p in self.plots if p.resize])
 	max_height = max(sheet_max_height,matrix_max_height)
+        self.minimum_height_of_tallest_plot = max_height
 	if (max_height >= self.INITIAL_PLOT_HEIGHT):
 	    self.height_of_tallest_plot = max_height
 	else:	
 	    self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
-        ### JCALERT: That functionnality will have to be added again to the PlotGroupPanel
+        ### JCALERT: That functionality will have to be added again to the PlotGroupPanel
 # 	if self.height_of_tallest_plot == self.min_master_zoom:
 # 	    self.reduce_button.config(state=DISABLED)
 	self.initial_plot=False
@@ -377,7 +378,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 						 template,sheet_name,**params)
 
         self.INITIAL_PLOT_HEIGHT = 5
-        self.min_master_zoom=1
+        #self.min_master_zoom=1
 
 
 	### JCALERT! change this name 
@@ -459,6 +460,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 	coordinates and the matrix coordinates case. 
 	"""
 	max_height = max([p.bitmap.height() for p in self.plots if p.resize])
+        self.minimum_height_of_tallest_plot = max_height
 	if (max_height >= self.INITIAL_PLOT_HEIGHT):
 	    self.height_of_tallest_plot = max_height
 	else:	

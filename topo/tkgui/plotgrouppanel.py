@@ -375,20 +375,20 @@ class PlotGroupPanel(Frame,ParameterizedObject):
           
 
     def reduce(self):
-        """Function called by Widget to reduce the zoom factor"""
-        if self.plotgroup.height_of_tallest_plot > self.plotgroup.min_master_zoom:	
-	    self.plotgroup.height_of_tallest_plot = self.plotgroup.height_of_tallest_plot/self.zoom_factor
+        """Function called by Widget to reduce the plot size"""
+        new_height = self.plotgroup.height_of_tallest_plot / self.zoom_factor
 
-        if self.plotgroup.height_of_tallest_plot <= self.plotgroup.min_master_zoom:
+        if new_height < self.plotgroup.minimum_height_of_tallest_plot:
             self.reduce_button.config(state=DISABLED)
-	self.plotgroup.update_plots(False)
-        self.display_plots()
-
+        else:
+	    self.plotgroup.height_of_tallest_plot = new_height
+            self.plotgroup.update_plots(False)
+            self.display_plots()
     
     def enlarge(self):
-        """Function called by Widget to increase the zoom factor"""
+        """Function called by Widget to increase the plot size"""
         self.reduce_button.config(state=NORMAL)
-        self.plotgroup.height_of_tallest_plot = self.plotgroup.height_of_tallest_plot*self.zoom_factor
+        self.plotgroup.height_of_tallest_plot *= self.zoom_factor
 	self.plotgroup.update_plots(False)
         self.display_plots()
 
