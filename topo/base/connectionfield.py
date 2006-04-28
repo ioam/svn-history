@@ -714,8 +714,15 @@ class CFProjection(Projection):
         bounds.translate(center_unit_xcenter-bounds_center_x,
                          center_unit_ycenter-bounds_center_y)
 
-        return Slice(bounds,self.src).bounds
+        weights_template_slice =  Slice(bounds,self.src)
 
+        # method is faulty if weights_matrix isn't odd
+        rows,cols = weights_template_slice.shape
+        if rows%2!=1 or cols%2!=1:
+            raise AssertionError("weights_template yielded even-height or even-width weights matrix (%s rows, %s columns): weights matrix must have odd dimensions."%(rows,cols))
+
+        return weights_template_slice.bounds
+    
 
     def cf(self,r,c):
         """Return the specified ConnectionField"""
