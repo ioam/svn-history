@@ -37,6 +37,7 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
 	plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,pgt_name,**config)
 
 	self.normalize = self.pgt.normalize
+        self.plotgroup.normalize=self.normalize
         if self.normalize:
 	    self.normalize_checkbutton.select()
 
