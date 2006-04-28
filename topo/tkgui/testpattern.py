@@ -18,6 +18,9 @@ $Id$
 """
 __version__='$Revision$'
 
+### JABHACKALERT: Need to remove Back/Forward buttons, because they do not
+### do what the user would expect.  
+
 import copy
 import Pmw
 
@@ -269,6 +272,11 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 
     ### JCALERT! That will have to be re-written properly, but works for the moment.
     ### it is an hack to bypass the generate_plotgroup in the plotgrouppanel superclass...
+    ###
+    ### JABHACKALERT: This does *NOT* seem to be working even for the moment -- e.g.
+    ### the reduce button enlarges if pressed after one enlarge step and a switch
+    ### to Sheet coordinates.  Presumably the problem is that a new PlotGroup is
+    ### created each time, throwing away the state of important variables.
     def special_generate_plotgroup(self):
         """
         Replace the superclass do_plot_cmd.
