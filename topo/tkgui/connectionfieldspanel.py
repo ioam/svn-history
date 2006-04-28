@@ -25,8 +25,6 @@ import topo.base.connectionfield
 from topo.commands.analysis import *
 import topo.commands.analysis
 
-### JABALERT!  Why isn't there a Normalize button on this and
-### ProjectionPanel like there is on ActivityPanel?
 class ConnectionFieldsPanel(TemplatePlotGroupPanel):
     def __init__(self,parent,console=None,pgt_name=None,**config):       
 
