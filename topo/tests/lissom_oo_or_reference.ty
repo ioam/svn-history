@@ -131,13 +131,6 @@ assert tsettle == 8
 assert round(min_exc_rad,5) == 1.59091
 
 
-# c++ lissom first takes the integer part of rf_radius, I think?
-# So we do that here, although we want to keep it as a float
-# for the python calculations in this file.
-rf_radius = float(int(rf_radius))
-r_L = float(int(r_L))
-
-
 ###########################################
 # Set parameters
 
