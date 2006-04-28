@@ -10,6 +10,15 @@ $Id$
 __version__='$Revision$'
 
 
+### JABHACKALERT!!!!!!!!!!!!  Need to totally redo this class
+### hierarchy so that the panel does not store any extra copies of the
+### variables like normalize, sheetcoords, etc. --- it's impossible to
+### reason about it in its current form.  Each panel should simply
+### instantiate some PlotGroup type, and from then on query the
+### PlotGroup for the variables that it needs, and change them directly
+### in the PlotGroup rather than in shadow copies within the panel.
+
+
 import Numeric
 import copy
 
