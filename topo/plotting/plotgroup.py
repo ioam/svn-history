@@ -89,8 +89,6 @@ class PlotGroup(ParameterizedObject):
 
 	self.height_of_tallest_plot = 1.0
 	self.initial_plot = True
-	### JCALERT:later rename this attribute
-	#self.min_master_zoom=3.0
 
 	# Time attribute.
 	self.time = topo.sim.time()
@@ -141,14 +139,15 @@ class PlotGroup(ParameterizedObject):
 
     def scale_images(self):
         """
-        It is assumed that the PlotGroup code has not scaled the bitmap to the size currently
-        desired by the GUI.
-        """ 
+        Enlarge the bitmaps as needed for display.
+        """
+        ### JABALERT: Should this be done by the GUI instead, without changing the bitmaps?
+        
         ### JCALERT: that cannot be in the constructor for the moment, because when creating the 
  	### panel, there is no PlotGroup assigned to it... It will change when all will be inserted 
  	### in the PlotGroup (i.e scale_image, set_initial_master_zoom, compute_max_height...)
  	if self.initial_plot:
- 	    self._set_height_of_tallest_plot()
+ 	    self._calculate_minimum_height_of_tallest_plot()
 
 	### JCALERT: here we should take the plot bounds instead of the sheet one (id in set_height_of..)?
 	max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
@@ -166,12 +165,14 @@ class PlotGroup(ParameterizedObject):
 	    plot.bitmap.image = plot.bitmap.zoom(scaling_factor)
 
 
-    def _set_height_of_tallest_plot(self):
-	""" 
-	Subfunction that set the initial master zooms for both the sheet
-	coordinates and the matrix coordinates case. 
+    def _calculate_minimum_height_of_tallest_plot(self):
 	"""
-	### JCALERT! Momentary hack
+        Calculate the size of the plot that will generate the largest bitmap.
+
+        This value is used to set the initial plot heights, and the
+        minimum height to which the plot can be reduced.
+	"""
+        # JCALERT: Should be rewritten more cleanly.
 	max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
  			  -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
  			  for p in self.plots if p.resize])
@@ -185,9 +186,6 @@ class PlotGroup(ParameterizedObject):
 	    self.height_of_tallest_plot = max_height
 	else:	
 	    self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
-        ### JCALERT: That functionality will have to be added again to the PlotGroupPanel
-# 	if self.height_of_tallest_plot == self.min_master_zoom:
-# 	    self.reduce_button.config(state=DISABLED)
 	self.initial_plot=False
 
 
@@ -355,6 +353,8 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
 	for plot in self.plots:
 	    self.labels.append(plot.name + '\n(from ' + plot.plot_src_name+')')
 
+
+
 class ProjectionPlotGroup(TemplatePlotGroup):
     """
     PlotGroup for Projection Plots
@@ -378,7 +378,6 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 						 template,sheet_name,**params)
 
         self.INITIAL_PLOT_HEIGHT = 5
-        #self.min_master_zoom=1
 
 
 	### JCALERT! change this name 
@@ -452,43 +451,31 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 
         return coords
 
-    ### JCALERT It has to be re-implemented for the projectionpanel,
-    ### but this is only a momentary version that requires more work.
-    def _set_height_of_tallest_plot(self):
-	""" 
-	Subfunction that set the initial master zooms for both the sheet
-	coordinates and the matrix coordinates case. 
-	"""
-	max_height = max([p.bitmap.height() for p in self.plots if p.resize])
-        self.minimum_height_of_tallest_plot = max_height
-	if (max_height >= self.INITIAL_PLOT_HEIGHT):
-	    self.height_of_tallest_plot = max_height
-	else:	
-	    self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
-        ### JCALERT: That functionnality will have to be added again to the PlotGroupPanel
-# 	if self.height_of_tallest_plot == self.min_master_zoom:
-# 	    self.reduce_button.config(state=DISABLED)
-	self.initial_plot=False
-
 
     def scale_images(self):
 	if self.initial_plot:
- 	    self._set_height_of_tallest_plot()
+ 	    self._calculate_minimum_height_of_tallest_plot()
+
+	### JCALERT: here we should take the plot bounds instead of the sheet one (id in set_height_of..)?
+	max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
+ 			      -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
+ 			     for p in self.plots if p.resize])
+        matrix_max_height = max([p.bitmap.height() for p in self.plots if p.resize])
 
 	for plot in self.plots:
             if not plot.resize:
                 scaling_factor = 1
             else:
-		scaling_factor = self.sizeconvertfn(self.height_of_tallest_plot)
+		if self.sheetcoords:		   
+                    s = topo.sim.objects(Sheet).get(plot.plot_src_name,None)
+		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(s.density)/max_sheet_height)
+		else:
+		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(matrix_max_height))
 	    plot.bitmap.image = plot.bitmap.zoom(scaling_factor)
 
 
     def _ordering_plots(self):
-	"""
-	Function called to sort the Plots in order.
-	It is re-implmented for ProjectionPlotGroup, because we do not want to order the Connection Field
-        views composing the projection plot in any order (i.e. we want to preserve the same order).
-	"""
+	"""Skips plot sorting for Projections to keep the units in order."""
 	pass
     
 
