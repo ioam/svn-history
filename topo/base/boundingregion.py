@@ -42,6 +42,9 @@ class BoundingBox(BoundingRegion):
     an axis-aligned rectangle (or simply a radius for a square).
     """
 
+    # CEBHACKALERT: override __str__ and __repr__ to print the lbrt
+    # values?
+
     def __init__(self,**args):
         """
         Create a BoundingBox.
