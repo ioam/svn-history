@@ -214,10 +214,10 @@ V1 = LISSOM(name='V1', density=48.0,
 ## from topo.base.parameterclasses import Wrapper
 
 ## centerg = topo.patterns.basic.Gaussian(
-##     size=0.0417,aspect_ratio=1,output_fn=DivisiveSumNormalize())
+##     size=2*sigma_c/BaseRN,aspect_ratio=1,output_fn=DivisiveSumNormalize())
 
 ## surroundg = topo.patterns.basic.Gaussian(
-##     size=0.1667,aspect_ratio=1,output_fn=DivisiveSumNormalize())
+##     size=2*sigma_s/BaseRN,aspect_ratio=1,output_fn=DivisiveSumNormalize())
 
 ## ong = topo.patterns.basic.CompositePatternGenerator(
 ##     generators=[centerg,surroundg],operator=Wrapper("Numeric.subtract"))
@@ -226,16 +226,16 @@ V1 = LISSOM(name='V1', density=48.0,
 ##     generators=[surroundg,centerg],operator=Wrapper("Numeric.subtract"))
     
 ## # LGN ON channel
-## topo.sim.connect2('Retina','LGNOn',delay=FixedPoint("0.05"),
-##                   connection_type=SharedCFProjection,strength=2.33,
-##                   weights_bounds=BoundingBox(radius=0.375),name='ON',
-##                   weights_generator=ong)
+## s.connect(Retina,LGNOn,delay=FixedPoint("0.05"),
+##           connection_type=SharedCFProjection,strength=2.33,
+##           weights_bounds=BoundingBox(radius=0.375),name='ON',
+##           weights_generator=ong)
 
 ## # LGN OFF channel
-## topo.sim.connect2('Retina','LGNOff',delay = FixedPoint("0.05"),
-##                   connection_type=SharedCFProjection,strength=2.33,
-##                   name='Center',weights_bounds=BoundingBox(radius=0.375),
-##                   weights_generator=offg)
+## s.connect(Retina,LGNOff,delay = FixedPoint("0.05"),
+##           connection_type=SharedCFProjection,strength=2.33,
+##           name='Center',weights_bounds=BoundingBox(radius=0.375),
+##           weights_generator=offg)
 ##########################################################################
 
 
@@ -268,11 +268,11 @@ LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoin
 
 
 s.connect(LGNOn,V1,delay=FixedPoint("0.05"),dest_port="on",
-          connection_type=CFProjection,strength=1.0,name='LGNOnAfferent',
+          connection_type=CFProjection,strength=0.5,name='LGNOnAfferent',
           weights_bounds=afferent_weight_bounds,learning_rate=alpha_input*137)
 
 s.connect(LGNOff,V1,delay=FixedPoint("0.05"),dest_port="off",
-          connection_type=CFProjection,strength=1.0,name='LGNOffAfferent',
+          connection_type=CFProjection,strength=0.5,name='LGNOffAfferent',
           weights_bounds=afferent_weight_bounds,learning_rate=alpha_input*137)
 
 
