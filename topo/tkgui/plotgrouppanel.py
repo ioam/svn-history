@@ -17,7 +17,9 @@ __version__='$Revision$'
 ### instantiate some PlotGroup type, and from then on query the
 ### PlotGroup for the variables that it needs, and change them directly
 ### in the PlotGroup rather than in shadow copies within the panel.
-
+### This *may* require some changes in PlotGroup so that each PlotGroup
+### can be instantiated without any plots, and can then have plots
+### added. 
 
 import Numeric
 import copy
