@@ -132,6 +132,15 @@ class BoundingBox(BoundingRegion):
         """
         return self._aarect.lbrt()
 
+    def get_center(self):
+        """
+        Return the coordinates of the center of this BoundingBox
+        """
+        l,b,r,t = self._aarect.lbrt()
+        xcenter = l+(r-l)/2.0
+        ycenter = b+(t-b)/2.0
+        return xcenter,ycenter
+
 
 
 class Cartesian2DPoint(Parameter):
