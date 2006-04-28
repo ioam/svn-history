@@ -286,6 +286,13 @@ class ConnectionField(ParameterizedObject):
         slice_.translate(row_offset,col_offset)
 
         slice_.crop_to_sheet()
+
+        # weights matrix cannot have a zero-sized dimension
+        nrows,ncols = slice_.shape
+        if nrows<1 or ncols<1:
+            raise ValueError("ConnectionField at (%s,%s) has a zero-sized weights matrix; you may need to supply a larger weights_bounds_template or increase the density of the sheet."%(self.x,self.y))
+
+
         self.bounds = slice_.bounds
 
         # Also, store the array for direct access by C.
