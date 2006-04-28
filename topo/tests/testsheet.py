@@ -521,11 +521,13 @@ class TestCoordinateTransforms(unittest.TestCase):
         r1,r2,c1,c2 = ct.bounds2slice(test_bounds)
         self.assertEqual((r1,r2,c1,c2),(1,3,1,3))
 
-        # CEBHACKALERT: this test fails; I'm not certain what the correct
-        # result should be. (1,4,1,4)?
+        # CEBHACKALERT: this test fails because units that fall on the
+        # boundaries should all be included; bounds2slice does not
+        # include the ones on the left boundary because of floating point
+        # representation.
         test_bounds.translate(0.05,-0.05)
         r1,r2,c1,c2 = ct.bounds2slice(test_bounds)
-        self.assertEqual((r1,r2,c1,c2),(1,3,1,3))
+        self.assertEqual((r1,r2,c1,c2),(1,4,1,4))
         
 	
     def test_slice2bounds(self):
