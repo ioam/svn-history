@@ -19,7 +19,7 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/04/27 (CB): New CompositePatternGenerator does not work correctly (e.g. when used for weights) (this must affect Image too, since they both use the same code). [** before release - can always revert to previous version, which did work]
+2006/04/27 (CB): New CompositePatternGenerator does not work correctly (e.g. when used for weights) [** before release - can always revert to previous version, which did work]
 </li>
 
 
