@@ -599,10 +599,10 @@ class Slice(object):
         r1,r2,c1,c2 = self.__slice
         r1+=r; r2+=r
         c1+=c; c2+=c
-        self.__set_slice(array((r1,r2,c1,c2)))
+        self._set_slice(array((r1,r2,c1,c2)))
 
-
-    def __set_slice(self,slice_):
+    # CEBHACKALERT: temporarily available for outside use
+    def _set_slice(self,slice_):
         """
         bypass creation of slice from bounds.
         """
@@ -643,7 +643,7 @@ class Slice(object):
         cstart = max(0,l_idx)
         cbound = min(maxcol,r_idx)
         
-        self.__set_slice((rstart,rbound,cstart,cbound))
+        self._set_slice((rstart,rbound,cstart,cbound))
 
 
 
