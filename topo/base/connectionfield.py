@@ -224,14 +224,17 @@ class ConnectionField(ParameterizedObject):
         # promote to double.
         self.weights.savespace(1)
 
-        # Now we have to get the right submatrix of the mask (in case it is near an edge)
+        # Now we have to get the right submatrix of the mask (in case
+        # it is near an edge)
         r1,r2,c1,c2 =  self.get_slice(weights_bounds_template)
         m = mask_template[r1:r2,c1:c2]
         
         self.mask = m.astype(weight_type)
         self.mask.savespace(1)
 
-        # CEBHACKALERT: this works for now, while the output_fns are all multiplicative.
+        # CEBHACKALERT: this works for now, while the output_fns are
+        # all multiplicative.
+
         self.weights *= self.mask   
         output_fn(self.weights)        
 
@@ -268,10 +271,13 @@ class ConnectionField(ParameterizedObject):
         return (r1,r2,c1,c2)
         
 
+    # CEBHACKALERT: assumes the user wants the bounds to be centered
+    # about the unit, which might not be true. Same HACKALERT as for
+    # CFProjection.initialize_bounds()
     def offset_bounds(self,bounds):
         """
-        Given bounds centered on the sheet matrix, offset them to this
-        cf's location and store the result as self.bounds.
+        Offset the given bounds to this cf's location and store the
+        result in the 'bounds' attribute.
 
         Also stores the slice_array for access by C.
 	"""
@@ -279,18 +285,21 @@ class ConnectionField(ParameterizedObject):
         r1,r2,c1,c2 = slice_
 
         # translate to this cf's location
-        center_row,center_col = self.input_sheet.sheet2matrixidx(self.x,self.y)
-        sheet_center_row,sheet_center_col = self.input_sheet.sheet2matrixidx(0.0,0.0)
-        row_offset = center_row-sheet_center_row
-        col_offset = center_col-sheet_center_col
+        cf_row,cf_col = self.input_sheet.sheet2matrixidx(self.x,self.y)
+        bounds_x,bounds_y=bounds.get_center()
+        b_row,b_col=self.input_sheet.sheet2matrixidx(bounds_x,bounds_y)
+
+        row_offset = cf_row-b_row
+        col_offset = cf_col-b_col
         slice_.translate(row_offset,col_offset)
 
         slice_.crop_to_sheet()
 
-        # weights matrix cannot have a zero-sized dimension
+        # weights matrix cannot have a zero-sized dimension (could
+        # happen at this stage because of cropping)
         nrows,ncols = slice_.shape
         if nrows<1 or ncols<1:
-            raise ValueError("ConnectionField at (%s,%s) has a zero-sized weights matrix; you may need to supply a larger weights_bounds_template or increase the density of the sheet."%(self.x,self.y))
+            raise ValueError("ConnectionField at (%s,%s) (input_sheet=%s) has a zero-sized weights matrix (%s,%s); you may need to supply a larger weights_bounds_template or increase the density of the sheet."%(self.x,self.y,self.input_sheet,nrows,ncols))
 
 
         self.bounds = slice_.bounds
@@ -700,35 +709,58 @@ class CFProjection(Projection):
         of the sheet which best approximates the specified sheet-coordinate
         bounds.
 
+        The supplied bounds are translated to have a center at the
+        center of one of the sheet's units (we arbitrarily use the
+        center unit), and then these bounds are converted to a slice
+        in such a way that the slice exactly includes all units whose
+        centers are within the bounds (see
+        CoordinateTransformer.bounds2slice()). However, to ensure that
+        the bounds are treated symmetrically, we take the right and
+        bottom bounds and reflect these about the center of the
+        slice. Hence, if the bounds happen to go through units, if the
+        units are included on the right and bottom bounds, they will
+        be included on the left and top bounds. This ensures that the
+        slice has odd dimensions.
 
-        The supplied bounds are translated to have a center at the center
-        of one of the sheet's units (we use the center unit), and then
-        these bounds are converted to a slice (see bounds2slice for details,
-        but results in a slice that exactly includes all units whose centers
-        are within the bounds). This slice is converted back to the exactly
-        corresponding bounds, and these are returned.
-
-        Note that this procedure guarantees bounds that yield a slice with
-        odd dimensions.
+        This slice is converted back to the exactly corresponding
+        bounds, and these are returned.
         """        
-        l,b,r,t = bounds.lbrt()
-        bounds_center_x = l+(r-l)/2.0
-        bounds_center_y = b+(t-b)/2.0
+        bounds_xcenter,bounds_ycenter=bounds.get_center()
 
-        center_unit_r,center_unit_c = self.src.sheet2matrixidx(0,0)
-        center_unit_xcenter,center_unit_ycenter = self.src.matrixidx2sheet(center_unit_r,center_unit_c)
+        sheet_rows,sheet_cols=self.src.shape
+        # arbitrary (e.g. could use 0,0) 
+        center_row,center_col = sheet_rows/2,sheet_cols/2
+        unit_xcenter,unit_ycenter=self.src.matrixidx2sheet(center_row,
+                                                           center_col)
+        bounds.translate(unit_xcenter-bounds_xcenter,
+                         unit_ycenter-bounds_ycenter)
 
-        bounds.translate(center_unit_xcenter-bounds_center_x,
-                         center_unit_ycenter-bounds_center_y)
+        ### CEBHACKALERT: for now, assumes weights are to be centered
+        # about each unit, whatever the user specified. This will be
+        # changed. See also CF.offset_bounds().
+        #
+        # Slice will (optionally) perform a more general version
+        # of this, so it will not need to appear here.
+        weights_slice =  Slice(bounds,self.src)
+        r1,r2,c1,c2 = weights_slice
+        # r1 and c1 are reflection of r2 and c2 about center_u
+        r1=center_row-(r2-center_row-1)
+        c1=center_col-(c2-center_col-1)
+        weights_slice._set_slice((r1,r2,c1,c2))
+        ### end CEBHACKALERT
 
-        weights_template_slice =  Slice(bounds,self.src)
+        ### Checks:
+        # (1) user-supplied bounds must lead to a weights matrix of at
+        # least 1x1
+        # (2) weights matrix must be odd (otherwise this method has an error)
+        # (The second check should move to a test file.)
+        rows,cols = weights_slice.shape
+        if rows==0 or cols==0:
+            raise ValueError("weights_bounds_template results in a zero-sized weights matrix (%s,%s) for %s - you may need to supply a larger weights_bounds_template or increase the density of the sheet."%(rows,cols,self.name))
+        elif rows%2!=1 or cols%2!=1:
+            raise AssertionError("weights_template yielded even-height or even-width weights matrix (%s rows, %s columns) for %s - weights matrix must have odd dimensions."%(rows,cols,self.name))
 
-        # method is faulty if weights_matrix isn't odd
-        rows,cols = weights_template_slice.shape
-        if rows%2!=1 or cols%2!=1:
-            raise AssertionError("weights_template yielded even-height or even-width weights matrix (%s rows, %s columns): weights matrix must have odd dimensions."%(rows,cols))
-
-        return weights_template_slice.bounds
+        return weights_slice.bounds
     
 
     def cf(self,r,c):
