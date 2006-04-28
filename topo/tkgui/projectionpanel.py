@@ -33,8 +33,9 @@ from topo.commands.analysis import *
 
 UNIT_PADDING = 1
 BORDERWIDTH = 1
+
 # JDALERT: The canvas creation, border placement, and image
-# positioning, of Tkiner is very fragile.  This value boosts the size
+# positioning of Tkinter is very fragile.  This value boosts the size
 # of the canvas that the plot image is displayed on.  Too large and
 # the border will not be close, too small, and some of the image is
 # not displayed.
@@ -64,7 +65,7 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         self.density = float(eval(self.density_str.get(),__main__.__dict__))
 	self.weight_name = StringVar()
         self.projections = KeyedList()
-
+ 
 	super(ProjectionPanel,self).__init__(parent,console,pgt_name,**config)
 
         self.__params_frame = Frame(master=self)
