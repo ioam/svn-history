@@ -442,7 +442,9 @@ class CompositePatternGenerator(PatternGenerator):
         
         for pg in self.generators:
             assert isinstance(pg,PatternGenerator),repr(pg)+" is not a PatternGenerator."
-            patterns.append(pg(bounds=bounds,xdensity=xdensity,ydensity=ydensity))
+            # just call the PG because it should already have been
+            # setup as desired.
+            patterns.append(pg())
         
         image_array = self.operator.reduce(patterns)
 
