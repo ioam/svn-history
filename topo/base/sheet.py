@@ -433,7 +433,7 @@ class Sheet(EventProcessor,CoordinateTransformer):
         doc='Allows a sorting order for Sheets, e.g. in the GUI.')
 
 
-    def __init__(self,equalize_densities=True,**params):
+    def __init__(self,**params):
         """
         Initialize this object as an EventProcessor, then also as
         a CoordinateTransformer with equal xdensity and ydensity.
@@ -448,7 +448,7 @@ class Sheet(EventProcessor,CoordinateTransformer):
         # the same density along y as along x (unless equalize_densities
         # is False).
         CoordinateTransformer.__init__(self,self.bounds,self.density,
-                                       equalize_densities=equalize_densities)
+                                       equalize_densities=True)
 
         n_units = round((self.lbrt[2]-self.lbrt[0])*self.xdensity,0)
         if n_units<1: raise ValueError(
