@@ -9,7 +9,6 @@ $Id$
 """
 __version__='$Revision$'
 
-import random
 import RandomArray
 
 import topo.patterns.random
@@ -25,6 +24,7 @@ from topo.patterns import PatternGeneratorParameter
 from topo.responsefns.optimized import CFProjectionDotProduct_opt1
 from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
+from topo.misc.numbergenerators import RandomWrapper
 
 
 topo.sim.name = "Hierarchical example"
@@ -40,25 +40,24 @@ GeneratorSheet.period = 1.0
 GeneratorSheet.density = 20
 
 
-random.seed(1234)
-
-
 # CEBHACKALERT: something isn't working about using e.g.
 # PatternGeneratorParameter(default=X) in various places in the code
 # so I've temporarily commented out this line.
 # PatternGeneratorParameter.default=topo.patterns.basic.Line()
 
-left_input_pattern = topo.patterns.basic.Line(thickness=0.02,
-                       bounds=BoundingBox(points=((-1.05,-0.8),(1.05,0.8))),
-                       x=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
-                       y=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
-                       orientation=DynamicNumber(Wrapper("random.uniform",-pi,pi)))
+left_input_pattern = topo.patterns.basic.Line(
+    thickness=0.02,
+    bounds=BoundingBox(points=((-1.05,-0.8),(1.05,0.8))),
+    x=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=12)),
+    y=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=34)),
+    orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=56)))
 
-right_input_pattern = topo.patterns.basic.Line(thickness=0.02,
-                       bounds=BoundingBox(points=((-1.05,-0.8),(1.05,0.8))),
-                       x=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
-                       y=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
-                       orientation=DynamicNumber(Wrapper("random.uniform",-pi,pi)))
+right_input_pattern = topo.patterns.basic.Line(
+    thickness=0.02,
+    bounds=BoundingBox(points=((-1.05,-0.8),(1.05,0.8))),
+    x=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=100)),
+    y=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=200)),
+    orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=300)))
 
 
 # cortical sheet
