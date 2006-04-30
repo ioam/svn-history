@@ -12,7 +12,6 @@ $Id$
 """
 __version__='$Revision$'
 
-import random
 import RandomArray
 
 import topo.patterns.random
@@ -27,18 +26,16 @@ from topo.patterns import PatternGeneratorParameter
 from topo.responsefns.optimized import CFProjectionDotProduct_opt1
 from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
-
-# Input pattern seed
-random.seed(1234)
+from topo.misc.numbergenerators import RandomWrapper
 
 # Weight seed
 RandomArray.seed(500,500)
 
 # Input pattern
-gaussian_generator = topo.patterns.basic.Gaussian( \
-  x = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0)),
-  y = DynamicNumber(Wrapper("random.uniform",-0.5,0.5),softbounds=(-1.0,1.0)),
-  orientation = DynamicNumber(Wrapper("random.uniform",-pi,pi),softbounds=(0,2*pi)),
+gaussian_generator = topo.patterns.basic.Gaussian(
+  x = DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=12)),
+  y = DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=34)),
+  orientation = DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=56)),
   size = 2*0.3*1.5/7.0,
   aspect_ratio = 7.0/1.5,
   bounds = BoundingBox(radius=0.8))
