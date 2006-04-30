@@ -94,7 +94,7 @@ Tasks which the developers are about to start.
 </li>
 
 <li>
-2006/03/07 (CB): Why RetinotopicSOM can't be found on unpickling.
+2006/04/30 (CB): Do something about about pickling and unpickling RetinotopicSOM (and other classes declared in script filess) that can't be found on unpickling.
 </li>
 
 <li>
