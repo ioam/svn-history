@@ -25,6 +25,9 @@ from topo.outputfns.optimized import CFProjectionDivisiveSumNormalize_opt1
 from topo.patterns import PatternGeneratorParameter
 from topo.misc.numbergenerators import RandomWrapper
 
+# CEBHACKALERT: should be changed over to use circular connection fields.
+# (This requires that the learning rates be adjusted.)
+
 ###########################################
 # Set parameters
 
@@ -60,7 +63,6 @@ V1 = LISSOM(name='V1')
 s.connect(Retina,V1, delay = FixedPoint("0.05"),
           connection_type=CFProjection,strength=1.0,name='Afferent0',
           weights_bounds=BoundingBox(radius=0.22),learning_rate=1.274)
-##C afferent_weight_bounds   = BoundingBox(points=((-0.25,-0.25),(0.25,0.25)))
 
 s.connect(V1,V1, delay = FixedPoint("0.05"), 
           connection_type=CFProjection,strength = 0.9, name='LateralExcitatory',
@@ -71,10 +73,11 @@ s.connect(V1,V1, delay = FixedPoint("0.05"),
           weights_bounds=BoundingBox(radius=0.23),learning_rate=2.466)         
 
 
-# CEBHACKALERT: scheduled events are missing. e.g. change_bounds are ok for this density,
-# but for higher ones there are others that would make a difference. Now we can have
-# a minimum radius for the bounds, we can include those events. (From c++ lissom's or_defs.)
-# Also applies to lissom_oo_or.ty.
+# CEBHACKALERT: scheduled events are missing. e.g. change_bounds are
+# ok for this density, but for higher ones there are others that would
+# make a difference. Now we can have a minimum radius for the bounds,
+# we can include those events. (From c++ lissom's or_defs.)  Also
+# applies to lissom_oo_or.ty.
 
 
 s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(radius=0.06))
