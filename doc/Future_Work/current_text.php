@@ -117,6 +117,25 @@ be set anywhere else, even in a ParameterizedObject constructor.
 </li>
 
 <li>
+2006/02/30: What's this? 
+<pre>
+Topographica> p=PatternGeneratorParameter(default=Line())
+Topographica> PatternGeneratorParameter.default=Constant()
+Topographica> q=PatternGeneratorParameter(default=Line())
+Traceback (most recent call last):
+  File "<stdin>", line 1, in ?
+  File "/disk/data1/workspace/v1cball/t/topographica/topo/base/patterngenerator.py", line 207, in __init__
+    super(PatternGeneratorParameter,self).__init__(PatternGenerator,default=default,suffix_to_lose='Generator',**params)
+  File "/disk/data1/workspace/v1cball/t/topographica/topo/base/parameterclasses.py", line 508, in __init__
+    Parameter.__init__(self,default=default,instantiate=instantiate,
+  File "/disk/data1/workspace/v1cball/t/topographica/topo/base/parameterizedobject.py", line 241, in __init__
+    self.default = default
+AttributeError: 'PatternGeneratorParameter' object attribute 'default' is read-only
+Topographica> 
+</pre>
+</li>
+
+<li>
 2006/02/21: Remove Parameter's hidden attribute, and instead use (e.g. negative) precendence.
 </li>
 
