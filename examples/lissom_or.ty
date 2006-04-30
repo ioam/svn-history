@@ -28,9 +28,9 @@ from topo.misc.numbergenerators import RandomWrapper
 # CEBHACKALERT: should be changed over to use circular connection fields.
 # (This requires that the learning rates be adjusted.)
 
-###########################################
-# Set parameters
 
+### Setup input
+#
 GeneratorSheet.density = 24.0 
 GeneratorSheet.period = 1
 GeneratorSheet.bounds = BoundingBox(radius=0.72)
@@ -42,33 +42,36 @@ input_pattern = topo.patterns.basic.Gaussian(
     y=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=34)),
     orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=56)))
 
-# LISSOM parameters
-LISSOM.density = locals().get('default_density',48.0)    
 
-# Specify weight initialization, response function, and learning function
+### LISSOM parameters
+#
+LISSOM.density = locals().get('default_density',48.0)
+
+
+### Specify weight initialization, response function, and learning function
+#
 RandomArray.seed(500,500)
-CFProjection.weights_generator = topo.patterns.random.UniformRandom()
+CFProjection.weights_generator=topo.patterns.random.UniformRandom()
 CFProjection.response_fn=CFProjectionDotProduct_opt1()
 CFProjection.learning_fn=CFProjectionHebbian_opt1()
 CFProjection.weights_output_fn=CFProjectionDivisiveSumNormalize_opt1()
 
 
-###########################################
-# build simulation
 
-s = topo.base.simulator.Simulator()
-Retina = GeneratorSheet(input_generator=input_pattern, name='Retina')
-V1 = LISSOM(name='V1')
+### Build simulation
+#
+topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
+topo.sim['V1'] = LISSOM()
 
-s.connect(Retina,V1, delay = FixedPoint("0.05"),
+topo.sim.connect2('Retina','V1', delay = FixedPoint("0.05"),
           connection_type=CFProjection,strength=1.0,name='Afferent0',
           weights_bounds=BoundingBox(radius=0.22),learning_rate=1.274)
 
-s.connect(V1,V1, delay = FixedPoint("0.05"), 
+topo.sim.connect2('V1','V1', delay = FixedPoint("0.05"), 
           connection_type=CFProjection,strength = 0.9, name='LateralExcitatory',
           weights_bounds=BoundingBox(radius=0.1),learning_rate=2.674)
             
-s.connect(V1,V1, delay = FixedPoint("0.05"), 
+topo.sim.connect2('V1','V1', delay = FixedPoint("0.05"), 
           connection_type=CFProjection,strength = -0.9, name='LateralInhibitory',
           weights_bounds=BoundingBox(radius=0.23),learning_rate=2.466)         
 
@@ -80,54 +83,51 @@ s.connect(V1,V1, delay = FixedPoint("0.05"),
 # applies to lissom_oo_or.ty.
 
 
-s.schedule_action(200, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(radius=0.06))
-s.schedule_action(500, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(radius=0.042))
-s.schedule_action(1000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(radius=0.0336))
-s.schedule_action(2000,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(radius=0.021))
+### Schedule bounds changes
+#
+topo.sim.schedule_command( 200, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.06))')
+topo.sim.schedule_command( 500, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.042))')
+topo.sim.schedule_command(1000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.0336))')
+topo.sim.schedule_command(2000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.021))')
 
 
-# Schedule action requires a function, so we create a temporary one
-def set_learning_rate(projection_name, rate):
-    """Set the learning rate on the named projection of V1."""
-    V1.projections()[projection_name].learning_rate=rate
+### Schedule learning rate changes
+#
+topo.sim.schedule_command(  200,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=1.445')
+topo.sim.schedule_command(  500,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.205')
+topo.sim.schedule_command( 1000,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.149') 
+
+topo.sim.schedule_command(  500,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.911')
+topo.sim.schedule_command( 2000,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.729')
+topo.sim.schedule_command( 4000,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.545')
+topo.sim.schedule_command(20000,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.273')
 
 
-s.schedule_action(  200, set_learning_rate, "LateralExcitatory", 1.445)
-s.schedule_action(  500, set_learning_rate, "LateralExcitatory", 0.205)
-s.schedule_action( 1000, set_learning_rate, "LateralExcitatory", 0.149) 
+### Schedule LISSOM output function threshold changes
+#
+topo.sim.schedule_command(  200, 'topo.sim["V1"].output_fn.lower_bound=0.11; topo.sim["V1"].output_fn.upper_bound=0.66')
+topo.sim.schedule_command(  500, 'topo.sim["V1"].output_fn.lower_bound=0.12; topo.sim["V1"].output_fn.upper_bound=0.67')
+topo.sim.schedule_command( 1000, 'topo.sim["V1"].output_fn.lower_bound=0.15; topo.sim["V1"].output_fn.upper_bound=0.68')
+topo.sim.schedule_command( 2000, 'topo.sim["V1"].output_fn.lower_bound=0.18; topo.sim["V1"].output_fn.upper_bound=0.70')
+topo.sim.schedule_command( 3000, 'topo.sim["V1"].output_fn.lower_bound=0.20; topo.sim["V1"].output_fn.upper_bound=0.73')
+topo.sim.schedule_command( 4000, 'topo.sim["V1"].output_fn.lower_bound=0.20; topo.sim["V1"].output_fn.upper_bound=0.76')
+topo.sim.schedule_command( 5000, 'topo.sim["V1"].output_fn.lower_bound=0.21; topo.sim["V1"].output_fn.upper_bound=0.79')
+topo.sim.schedule_command( 6500, 'topo.sim["V1"].output_fn.lower_bound=0.22; topo.sim["V1"].output_fn.upper_bound=0.82')
+topo.sim.schedule_command( 8000, 'topo.sim["V1"].output_fn.lower_bound=0.23; topo.sim["V1"].output_fn.upper_bound=0.85')
+topo.sim.schedule_command(20000, 'topo.sim["V1"].output_fn.lower_bound=0.24; topo.sim["V1"].output_fn.upper_bound=0.88')
 
 
-s.schedule_action(  500, set_learning_rate, "Afferent0", 0.911)
-s.schedule_action( 2000, set_learning_rate, "Afferent0", 0.729)
-s.schedule_action( 4000, set_learning_rate, "Afferent0", 0.545)
-s.schedule_action(20000, set_learning_rate, "Afferent0", 0.273)
+
+topo.sim.run(0)
 
 
-def set_deltabeta(x,y):
-    """Set the threshold function limits on V1."""
-    V1.output_fn.lower_bound=x
-    V1.output_fn.upper_bound=y
 
-s.schedule_action(  200, set_deltabeta, 0.11, 0.66)
-s.schedule_action(  500, set_deltabeta, 0.12, 0.67)
-s.schedule_action( 1000, set_deltabeta, 0.15, 0.68)
-s.schedule_action( 2000, set_deltabeta, 0.18, 0.70)
-s.schedule_action( 3000, set_deltabeta, 0.20, 0.73)
-s.schedule_action( 4000, set_deltabeta, 0.20, 0.76)
-s.schedule_action( 5000, set_deltabeta, 0.21, 0.79)
-s.schedule_action( 6500, set_deltabeta, 0.22, 0.82)
-s.schedule_action( 8000, set_deltabeta, 0.23, 0.85)
-s.schedule_action(20000, set_deltabeta, 0.24, 0.88)
-
-s.run(0)
-#s.run(1)
-
-## # Set up performance profiling
+### Uncomment lines below to profile performance
+#
 ## import hotshot,hotshot.stats
 ## prof = hotshot.Profile("abc")
-## prof.runctx('s.run(198)',globals(),locals())
+## prof.runctx('top.sim.run(198)',globals(),locals())
 ## prof.close()
-
 ## p = hotshot.stats.load("abc")
 ## p.strip_dirs().sort_stats('cumulative','time').print_stats()
 
