@@ -117,7 +117,7 @@ be set anywhere else, even in a ParameterizedObject constructor.
 </li>
 
 <li>
-2006/02/30: What's this? 
+2006/04/30: What's this? 
 <pre>
 Topographica> p=PatternGeneratorParameter(default=Line())
 Topographica> PatternGeneratorParameter.default=Constant()
