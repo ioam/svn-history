@@ -96,20 +96,8 @@ CFProjection.learning_fn=HebbianSOMLF()
 CFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
 
 
-###########################################
-# build simulation
+topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
+topo.sim['V1'] = ObermayerSOM()
+topo.sim.connect2('Retina','V1',delay=0.5,connection_type=CFProjection)
 
-s = Simulator()
-Retina = GeneratorSheet(input_generator=input_pattern,name='Retina')
-V1 = ObermayerSOM(name='V1')
-s.connect(Retina,V1,delay=0.5,connection_type=CFProjection,name='RtoV1')
-
-s.run(0)
-
-
-#s.run(30000)
-
-# import profile,pstats
-#
-# p = profile.Profile()
-# p.runctx('s.run(10)',locals(),globals())
+topo.sim.run(0)
