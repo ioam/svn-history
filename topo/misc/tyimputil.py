@@ -22,6 +22,15 @@ $Id$
 
 __version__='$Revision$'
 
+# CEBHACKALERT: if I try to do e.g.
+#   import examples.obermayer_pnas90
+# I get an error that the module doesn't exist.
+# If I rename obermayer_pnas90.ty to obermayer_pnas90.py,
+# the import works fine. So does this file work? Do we
+# use it at all, given that someone could use exec_file
+# instead of importing a script once Topographica's
+# running?
+
 ### JABHACKALERT!
 ###
 ### What does "Replaced extension module with the full imputil once
