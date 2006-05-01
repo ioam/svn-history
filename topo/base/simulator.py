@@ -728,7 +728,13 @@ class Simulator(ParameterizedObject):
         src and dest should already be part of the simulator.
 
         Returns the connection that was created.
+
+        If the connection hasn't been given a name, it defaults to
+        'srcTodest'
         """
+        if 'name' not in connection_params:
+            connection_params['name'] = src+'To'+dest
+        
         conn = connection_type(src=self[src],dest=self[dest],src_port=src_port,dest_port=dest_port,delay=delay,**connection_params)
         self[src]._connect_to(conn)
         self[dest]._connect_from(conn)
