@@ -31,10 +31,6 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/05/01: (CB) replace Simulator.connect() with Simulator.connect2()  [** before release]
-</li>
-
-<li>
 2006/04/24 (CB): Update tutorials now that scripts don't need to be run before loading a snapshot. [** before release]
 </li>
 
