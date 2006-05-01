@@ -19,11 +19,11 @@ was first added to the list, or a change was made.)
 </li>
 
 <li> 
-2006/04/21 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler
+2006/04/21 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler [**before release]
 </li>
 
 <li> 
-2006/04/21 (CB): investigate failing test in testimage.py (that uses sheet functions)
+2006/04/21 (CB): investigate failing test in testimage.py (that uses sheet functions) [**before release]
 </li>
 
 <li>
