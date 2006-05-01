@@ -35,13 +35,13 @@ class TestPatternPresent(unittest.TestCase):
 	CFProjection.learning_fn=HebbianSOMLF()
         topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.MESSAGE
         s = topo.base.simulator.Simulator()
-        retina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina')
-        retina2 = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina2')
-        V1 = CFSOM(name='V1')
-        V2 = CFSOM(name='V2')
-        s.connect(retina,V1,delay=0.5,connection_type=CFProjection,name='R1toV1')
-        s.connect(retina,V2,delay=0.5,connection_type=CFProjection,name='R1toV2')
-        s.connect(retina2,V2,delay=0.5,connection_type=CFProjection,name='R2toV2')
+        s['Retina'] = GeneratorSheet(input_generator=topo.patterns.basic.Line())
+        s['Retina2'] = GeneratorSheet(input_generator=topo.patterns.basic.Line())
+        s['V1'] = CFSOM()
+        s['V2'] = CFSOM()
+        s.connect2('Retina','V1',delay=0.5,connection_type=CFProjection,name='R1toV1')
+        s.connect2('Retina','V2',delay=0.5,connection_type=CFProjection,name='R1toV2')
+        s.connect2('Retina2','V2',delay=0.5,connection_type=CFProjection,name='R2toV2')
         s.run(2)
 
         # Want to temporarily replace this:

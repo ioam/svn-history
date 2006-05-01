@@ -194,14 +194,14 @@ class TestMeasureFeatureMap(unittest.TestCase):
         Create a CFSOM sheet ('V1') connected to a GeneratorSheet ('Retina').
         """
         self.s = Simulator()
-        self.retina = GeneratorSheet(name='Retina',density=4.0)
-        self.V1 = CFSOM(name='V1',density=4.0)
-        self.V2 = CFSOM(name='V2',density=4.0)
+        self.s['Retina']=GeneratorSheet(density=4.0)
+        self.s['V1']= CFSOM(density=4.0)
+        self.s['V2'] = CFSOM(density=4.0)
 
-        self.s.connect(self.retina,self.V1,delay=0.5,connection_type=CFProjection,
+        self.s.connect2('Retina','V1',delay=0.5,connection_type=CFProjection,
                        name='RtoV1',learning_fn=HebbianSOMLF())
 
-        self.s.connect(self.retina,self.V2,delay=0.5,connection_type=CFProjection,
+        self.s.connect2('Retina','V2',delay=0.5,connection_type=CFProjection,
                        name='RtoV2',learning_fn=HebbianSOMLF())
 
 

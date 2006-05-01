@@ -667,23 +667,6 @@ class Simulator(ParameterizedObject):
         return len(self._events_stack)
 
 
-    # CEBHACKALERT: This method can be deleted when the
-    # connect() method is removed and replaced by connect2().
-    def add(self,*EPs):
-        """
-        Add one or more EventProcessors to the simulator.
-        Note, EventProcessors do not necessarily
-        have to be added to the simulator to be used in a simulation,
-        but they will not receive the start() message.  Adding a node
-        to the simulator also sets the backlink node.simulator, so
-        that the node can enqueue events and read the simulator clock.
-        """
-        for ep in EPs:
-            if not ep in self._event_processors.values():
-                self._event_processors[ep.name] = ep
-                ep.simulator = self
-                ep.start()
-
     def connect2(self,
                 src,
                 dest,
@@ -707,24 +690,6 @@ class Simulator(ParameterizedObject):
         conn = connection_type(src=self[src],dest=self[dest],src_port=src_port,dest_port=dest_port,delay=delay,**connection_params)
         self[src]._connect_to(conn)
         self[dest]._connect_from(conn)
-        return conn
-
-    def connect(self,
-                src=None,
-                dest=None,
-                src_port=None,
-                dest_port=None,
-                delay=0,connection_type=EPConnection,**connection_params):
-        """
-        Connect the source to the destination, at the appropriate ports,
-        if any are given.  If src and dest have not been added to the
-        simulator, they will be added.  Returns the connection that
-        was created.
-        """
-        self.add(src,dest)
-        conn = connection_type(src=src,dest=dest,src_port=src_port,dest_port=dest_port,delay=delay,**connection_params)
-        src._connect_to(conn)
-        dest._connect_from(conn)
         return conn
     
 

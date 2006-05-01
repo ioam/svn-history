@@ -91,10 +91,12 @@ class TestPlotGroupPanel(unittest.TestCase):
         sheetG.activity = self.ga
         sheetB.activity = self.ba
 
-        self.s.add(sheetR)
-        self.s.add(sheetG)
-        self.s.add(sheetB)
-        self.s.add(retina)
+        # CEBHACKALERT: I don't understand what this was supposed to
+        # test (i.e. how is it used by one of the tests?).
+##         self.s.add(sheetR)
+##         self.s.add(sheetG)
+##         self.s.add(sheetB)
+##         self.s.add(retina)
 
         # s.run(1)
 
@@ -126,12 +128,12 @@ class TestPlotGroupPanel(unittest.TestCase):
         # build simulation
         s = topo.base.simulator.Simulator()
         
-        retina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina',density=5)
-        retina.print_level = topo.base.parameterizedobject.WARNING
-        V1 = CFSOM(name='V1',density=5)
-        V1.print_level = topo.base.parameterizedobject.WARNING
+        s['retina'] = GeneratorSheet(input_generator=topo.patterns.basic.Line(),density=5)
+        s['retina'].print_level = topo.base.parameterizedobject.WARNING
+        s['V1'] = CFSOM(density=5)
+        s['V1'].print_level = topo.base.parameterizedobject.WARNING
         
-        s.connect(retina,V1,delay=1,connection_type=CFProjection)
+        s.connect2('retina','V1',delay=1,connection_type=CFProjection)
         s.print_level = topo.base.parameterizedobject.WARNING
         
         s.run(1)
