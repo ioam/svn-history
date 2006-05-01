@@ -118,6 +118,15 @@ def save_snapshot(snapshot_name):
     of ParameterizedObjects declared within the topo package (including
     all subpackages - except ones like 'plotting') are pickled.
     """
+    ### Classes etc defined in __main__ won't unpickle (so warn).
+    # The source code won't exist to recreate the class. 
+    import types
+    for k,v in __main__.__dict__.items():
+        # there's classes and functions...what else?
+        if isinstance(v,type) or isinstance(v,types.FunctionType):
+            if v.__module__ == "__main__":
+                ParameterizedObject().warning("%s (type %s) has source in __main__; it will not be found on unpickling."%(k,type(v)))
+
 
     ### Get ParameterizedObject class attributes
     #
