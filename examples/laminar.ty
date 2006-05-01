@@ -26,6 +26,7 @@ from topo.learningfns.optimized import CFProjectionHebbian_opt1
 from topo.outputfns.optimized import CFProjectionDivisiveSumNormalize_opt1
 from topo.misc.numbergenerators import RandomWrapper
 
+topo.sim.name = "laminar"
 
 ###########################################
 # Set parameters

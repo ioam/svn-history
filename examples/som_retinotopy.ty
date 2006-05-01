@@ -27,6 +27,7 @@ from topo.responsefns.optimized import CFProjectionEuclideanDistance_opt1
 from topo.learningfns.som import HebbianSOMLF
 from topo.misc.numbergenerators import RandomWrapper
 
+topo.sim.name = "som_retinotopy"
 
 class RetinotopicSOM(CFSOM):
     """A variant of CFSOM that uses exponential decay functions for alpha and radius."""

@@ -35,6 +35,8 @@ from topo.patterns import PatternGeneratorParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.outputfns.optimized import CFProjectionDivisiveSumNormalize_opt1
 
+# JABALERT: Shouldn't this script file be renamed lissom_oo_or_sf since it's ON/OFF?
+topo.sim.name = "lissom_oo_or_sf"
 
 
 ###########################################

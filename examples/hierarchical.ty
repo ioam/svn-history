@@ -27,7 +27,7 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.misc.numbergenerators import RandomWrapper
 
 
-topo.sim.name = "Hierarchical example"
+topo.sim.name = "hierarchical"
 
 
 ###########################################

@@ -35,6 +35,8 @@ from topo.patterns import PatternGeneratorParameter
 from topo.outputfns.basic import DivisiveSumNormalize
 from topo.misc.numbergenerators import RandomWrapper
 
+topo.sim.name = "obermayer_pnas90"
+
 
 class ObermayerSOM(CFSOM):
     """A variant of CFSOM that uses linear decay functions for alpha and radius."""

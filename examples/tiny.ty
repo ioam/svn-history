@@ -27,6 +27,8 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.outputfns.basic import DivisiveL1Normalize
 from topo.misc.numbergenerators import RandomWrapper
 
+topo.sim.name = "tiny"
+
 
 # Same as topo.base.connectionfield.Hebbian; copied here as a template
 # for writing other LearningFns

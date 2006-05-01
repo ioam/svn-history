@@ -27,6 +27,7 @@ from topo.outputfns.basic import PiecewiseLinear, DivisiveSumNormalize
 from topo.misc.numbergenerators import RandomWrapper
 from topo.patterns import PatternGeneratorParameter
 
+topo.sim.name = "lissom_oo_or"
 
 input_pattern = topo.patterns.basic.Gaussian(
           scale=1.0, size=2*0.0468, aspect_ratio=4.0,

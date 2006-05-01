@@ -25,6 +25,8 @@ from topo.outputfns.optimized import CFProjectionDivisiveSumNormalize_opt1
 from topo.patterns import PatternGeneratorParameter
 from topo.misc.numbergenerators import RandomWrapper
 
+topo.sim.name = "lissom_or"
+
 # CEBHACKALERT: should be changed over to use circular connection fields.
 # (This requires that the learning rates be adjusted.)
 
