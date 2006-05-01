@@ -444,7 +444,7 @@ class GenericCFPOutputFn(CFPOutputFn):
                     ## del cf.sum 
 
 
-class CFProjectionIdentityOutputFn(CFPOutputFn):
+class IdentityCFPOutputFn(CFPOutputFn):
     """
     CFPOutputFn that leaves the CFs unchanged.
 
