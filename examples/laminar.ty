@@ -7,10 +7,8 @@ but using different excitatory and inhibitory populations within V1.
 """
 __version__='$Revision$'
 
-import random
 import RandomArray
 import fixedpoint
-import Numeric
 
 from math import pi, sqrt
 from fixedpoint import FixedPoint
@@ -23,10 +21,11 @@ from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection
 from topo.responsefns.optimized import CFProjectionDotProduct_opt1
 from topo.base.sheet import BoundingBox
-from topo.base.parameterclasses import DynamicNumber,Wrapper
+from topo.base.parameterclasses import DynamicNumber
 from topo.learningfns.optimized import CFProjectionHebbian_opt1
 from topo.outputfns.optimized import CFProjectionDivisiveSumNormalize_opt1
-from topo.patterns import PatternGeneratorParameter
+from topo.misc.numbergenerators import RandomWrapper
+
 
 ###########################################
 # Set parameters
@@ -37,14 +36,14 @@ GeneratorSheet.density = 24.0
 GeneratorSheet.period = 1
 GeneratorSheet.bounds = input_bounds
 
-random.seed(1234)
 
-input_pattern = topo.patterns.basic.Gaussian(scale=1.0,size=2*0.0468,
-                                             aspect_ratio=4.0,
-                                             bounds=input_bounds,
-                         x=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
-                         y=DynamicNumber(Wrapper("random.uniform",-0.5,0.5)),
-                         orientation=DynamicNumber(Wrapper("random.uniform",-pi,pi)))
+input_pattern = topo.patterns.basic.Gaussian(
+    scale=1.0,size=2*0.0468,
+    aspect_ratio=4.0,
+    bounds=input_bounds,
+    x=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=99)),
+    y=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=88)),
+    orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=77)))
 
 # LISSOM parameters
 LISSOM.density = 24.0
@@ -60,94 +59,38 @@ CFProjection.weights_output_fn=CFProjectionDivisiveSumNormalize_opt1()
 ###########################################
 # build simulation
 
-s = topo.base.simulator.Simulator()
-Retina = GeneratorSheet(input_generator=input_pattern, name='Retina')
-V1Exc = LISSOM(name='V1Exc',bounds=BoundingBox(radius=0.5))
-V1Exc.tsettle=9
-V1Inhib = LISSOM(name='V1Inhib', bounds=BoundingBox(radius=0.5))
-V1Inhib.tsettle=8
+topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
+topo.sim['V1Exc'] = LISSOM(bounds=BoundingBox(radius=0.5),tsettle=9)
+topo.sim['V1Inhib'] = LISSOM(bounds=BoundingBox(radius=0.5),tsettle=8)
 
+topo.sim.connect2('Retina','V1Exc', delay = FixedPoint("0.05",4),
+                  connection_type=CFProjection,strength=1.0,name='Afferent',
+                  weights_bounds=BoundingBox(radius=0.22),learning_rate=1.274)
 
-Afferent=s.connect(Retina,V1Exc, delay = FixedPoint("0.05",4),
-          connection_type=CFProjection,strength=1.0,name='Afferent',
-          weights_bounds=BoundingBox(radius=0.22),learning_rate=1.274)
-
-LateralExcitatory_local=s.connect(V1Exc,V1Exc,dest_port="lat1", delay = FixedPoint("0.10",4),
-		   connection_type=CFProjection,strength = 0.95, name='LateralExcitatory_local',
-		   weights_bounds =BoundingBox(radius=0.10),learning_rate=0*0.4)	
+topo.sim.connect2('V1Exc','V1Exc',dest_port="lat1", delay = FixedPoint("0.10",4),
+                  connection_type=CFProjection,strength = 0.95,
+                  name='LateralExcitatory_local',
+                  weights_bounds =BoundingBox(radius=0.10),learning_rate=0*0.4)	
 		   
-LateralExcitatory=s.connect(V1Exc,V1Exc, dest_port="lat2", delay = FixedPoint("0.10",4),
-		   connection_type=CFProjection,strength = 0.15, name='LateralExcitatory',
-		   weights_bounds =BoundingBox(radius=0.25),learning_rate=0*1.6)	
+topo.sim.connect2('V1Exc','V1Exc', dest_port="lat2", delay = FixedPoint("0.10",4),
+                  connection_type=CFProjection,strength = 0.15,
+                  name='LateralExcitatory',
+                  weights_bounds =BoundingBox(radius=0.25),learning_rate=0*1.6)	
 		  
-V1Exc_to_V1Inhib=s.connect(V1Exc,V1Inhib, delay = FixedPoint("0.05",4),
-		   connection_type=CFProjection,strength = 1.65, name='V1Exc_to_V1Inhib',
-		   weights_bounds = BoundingBox(radius=0.25),learning_rate=0*0.4)
+topo.sim.connect2('V1Exc','V1Inhib', delay = FixedPoint("0.05",4),
+                  connection_type=CFProjection,strength = 1.65,
+                  name='V1Exc_to_V1Inhib',
+                  weights_bounds = BoundingBox(radius=0.25),learning_rate=0*0.4)
 
-V1Inhib_to_V1Exc=s.connect(V1Inhib,V1Exc, delay = FixedPoint("0.05",4),
-        	   connection_type=CFProjection,strength=-0.65, name='V1Inhib_to_V1Exc',
-	           weights_bounds = BoundingBox(radius=0.10),learning_rate=0*2.4)
+topo.sim.connect2('V1Inhib','V1Exc', delay = FixedPoint("0.05",4),
+                  connection_type=CFProjection,strength=-0.65,
+                  name='V1Inhib_to_V1Exc',
+                  weights_bounds = BoundingBox(radius=0.10),learning_rate=0*2.4)
 
-
-#s.schedule_action(400, V1Exc.projections()['LateralExcitatory_local'].change_bounds, BoundingBox(radius=0.06))
-#s.schedule_action(1000, V1Exc.projections()['LateralExcitatory_local'].change_bounds, BoundingBox(radius=0.042))
-#s.schedule_action(2000,V1Exc.projections()['LateralExcitatory_local'].change_bounds, BoundingBox(radius=0.0336))
-#s.schedule_action(4000,V1Exc.projections()['LateralExcitatory_local'].change_bounds, BoundingBox(radius=0.021))
-
-
-# Schedule action requires a function, so we create a temporary one
-#def set_learning_rate(projection_name, rate):
-#    """Set the learning rate on the named projection of V1."""
-#    V1Exc.projections()[projection_name].learning_rate=rate
-
-
-#s.schedule_action(  400, set_learning_rate, "LateralExcitatory_local", 1.445)
-#s.schedule_action(  1000, set_learning_rate, "LateralExcitatory_local", 0.205)
-#s.schedule_action( 2000, set_learning_rate, "LateralExcitatory_local", 0.149) 
-
-
-#s.schedule_action(  1000, set_learning_rate, "Afferent", 0.911)
-#s.schedule_action( 4000, set_learning_rate, "Afferent", 0.729)
-#s.schedule_action( 8000, set_learning_rate, "Afferent", 0.545)
-#s.schedule_action(40000, set_learning_rate, "Afferent", 0.273)
-
-
-#def set_deltabeta_Exc(x,y):
-#    """Set the threshold function limits on V1Exc."""
-#    V1Exc.output_fn.lower_bound=x
-#    V1Exc.output_fn.upper_bound=y
-
-#s.schedule_action(  400, set_deltabeta_Exc, 0.11, 0.66)
-#s.schedule_action(  1000, set_deltabeta_Exc, 0.12, 0.67)
-#s.schedule_action( 2000, set_deltabeta_Exc, 0.15, 0.68)
-#s.schedule_action( 4000, set_deltabeta_Exc, 0.18, 0.70)
-#s.schedule_action( 6000, set_deltabeta_Exc, 0.20, 0.73)
-#s.schedule_action( 8000, set_deltabeta_Exc, 0.20, 0.76)
-#s.schedule_action( 10000, set_deltabeta_Exc, 0.21, 0.79)
-#s.schedule_action( 13000, set_deltabeta_Exc, 0.22, 0.82)
-#s.schedule_action( 16000, set_deltabeta_Exc, 0.23, 0.85)
-#s.schedule_action(40000, set_deltabeta_Exc, 0.24, 0.88)
-
-#def set_deltabeta_Inhib(x,y):
-#    """Set the threshold function limits on V1Exc."""
-#    V1Inhib.output_fn.lower_bound=x
-#    V1Inhib.output_fn.upper_bound=y
-
-#s.schedule_action(  400, set_deltabeta_Inhib, 0.11, 0.66)
-#s.schedule_action(  1000, set_deltabeta_Inhib, 0.12, 0.67)
-#s.schedule_action( 2000, set_deltabeta_Inhib, 0.15, 0.68)
-#s.schedule_action( 4000, set_deltabeta_Inhib, 0.18, 0.70)
-#s.schedule_action( 6000, set_deltabeta_Inhib, 0.20, 0.73)
-#s.schedule_action( 8000, set_deltabeta_Inhib, 0.20, 0.76)
-#s.schedule_action( 10000, set_deltabeta_Inhib, 0.21, 0.79)
-#s.schedule_action( 13000, set_deltabeta_Inhib, 0.22, 0.82)
-#s.schedule_action( 16000, set_deltabeta_Inhib, 0.23, 0.85)
-#s.schedule_action(40000, set_deltabeta_Inhib, 0.24, 0.88)
-		   
 
 # Default coordinates for the model editor
-V1Exc.gui_x=230.0   ; V1Exc.gui_y=351.0
-V1Inhib.gui_x=218.0 ; V1Inhib.gui_y=90.0
-Retina.gui_x=232.0  ; Retina.gui_y=512.0
+topo.sim['V1Exc'].gui_x=230.0   ; topo.sim['V1Exc'].gui_y=351.0
+topo.sim['V1Inhib'].gui_x=218.0 ; topo.sim['V1Inhib'].gui_y=90.0
+topo.sim['Retina'].gui_x=232.0  ; topo.sim['Retina'].gui_y=512.0
 
-s.run(0)
+topo.sim.run(0)
