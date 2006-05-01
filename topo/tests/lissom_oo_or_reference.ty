@@ -4,6 +4,9 @@ $Id$
 """
 __version__='$Revision$'
 
+# (needs updating to use schedule_command)
+
+
 # CEBHACKALERT: parameters not all yet setup to match
 
 
@@ -242,45 +245,45 @@ V1 = LISSOM(name='V1', density=48.0,
 # LGN ON channel
 
 
-LGNOn_center = s.connect(Retina,LGNOn,dest_port="center",delay = FixedPoint("0.05"),
+LGNOn_center = s.connect2('Retina','LGNOn',dest_port="center",delay = FixedPoint("0.05"),
                          connection_type=SharedCFProjection,strength=2.33,
                          name='Center',weights_bounds=lgn_weight_bounds,
                          weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_c/BaseRN,aspect_ratio=1))
 
 
-LGNOn_surround = s.connect(Retina,LGNOn,dest_port="surround",delay = FixedPoint("0.05"),
+LGNOn_surround = s.connect2('Retina','LGNOn',dest_port="surround",delay = FixedPoint("0.05"),
                            connection_type=SharedCFProjection,strength=-2.33,
                            name='Surround',weights_bounds=lgn_weight_bounds,
                            weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_s/BaseRN,aspect_ratio=1))
 
 
 # LGN OFF channel
-LGNOff_center = s.connect(Retina,LGNOff,dest_port="center",delay = FixedPoint("0.05"),
+LGNOff_center = s.connect2('Retina','LGNOff',dest_port="center",delay = FixedPoint("0.05"),
                           connection_type=SharedCFProjection,strength=-2.33,
                           name='Center',weights_bounds=lgn_weight_bounds,
                           weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_c/BaseRN,aspect_ratio=1))
 
 
-LGNOff_surround = s.connect(Retina,LGNOff,dest_port="surround",delay = FixedPoint("0.05"),
+LGNOff_surround = s.connect2('Retina','LGNOff',dest_port="surround",delay = FixedPoint("0.05"),
                             connection_type=SharedCFProjection,strength=2.33,
                             name='Surround',weights_bounds=lgn_weight_bounds,
                             weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_s/BaseRN,aspect_ratio=1))
 
 
-s.connect(LGNOn,V1,delay=FixedPoint("0.05"),dest_port="on",
+s.connect2('LGNOn','V1',delay=FixedPoint("0.05"),dest_port="on",
           connection_type=CFProjection,strength=0.5,name='LGNOnAfferent',
           weights_bounds=afferent_weight_bounds,learning_rate=alpha_input*137)
 
-s.connect(LGNOff,V1,delay=FixedPoint("0.05"),dest_port="off",
+s.connect2('LGNOff','V1',delay=FixedPoint("0.05"),dest_port="off",
           connection_type=CFProjection,strength=0.5,name='LGNOffAfferent',
           weights_bounds=afferent_weight_bounds,learning_rate=alpha_input*137)
 
 
-s.connect(V1,V1,delay=FixedPoint("0.05"),dest_port="exc",
+s.connect2('V1','V1',delay=FixedPoint("0.05"),dest_port="exc",
           connection_type=CFProjection,strength=0.9,name='LateralExcitatory',
           weights_bounds=excitatory_weight_bounds,learning_rate=alpha_exc*97) 
             
-s.connect(V1,V1,delay=FixedPoint("0.05"), dest_port="inh",
+s.connect2('V1','V1',delay=FixedPoint("0.05"), dest_port="inh",
           connection_type=CFProjection,strength=-0.9,name='LateralInhibitory',
           weights_bounds=inhibitory_weight_bounds,learning_rate=alpha_inh*421)         
 

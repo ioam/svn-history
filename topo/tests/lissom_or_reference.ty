@@ -11,6 +11,9 @@ $Id$
 """
 __version__='$Revision$'
 
+
+# (needs updating to use schedule_command)
+
 # To do:
 # - learning rates need to be adjusted
 # for 72x72 network.
@@ -197,16 +200,16 @@ Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),
                         name='Retina')
 V1 = LISSOM(name='V1')
 
-s.connect(Retina,V1, delay = fixedpoint.FixedPoint("0.05"),
+s.connect2('Retina','V1', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength = 1.0, name='Afferent0',
           weights_bounds = afferent_weight_bounds, learning_rate=alpha_input)
 
-s.connect(V1,V1, delay = fixedpoint.FixedPoint("0.05"), dest_port="exc",
+s.connect2('V1','V1', delay = fixedpoint.FixedPoint("0.05"), dest_port="exc",
           connection_type=CFProjection,strength=gammaexc,
           name='LateralExcitatory',
           weights_bounds = excitatory_weight_bounds, learning_rate=alpha_exc)
 
-s.connect(V1,V1, delay = fixedpoint.FixedPoint("0.05"), dest_port="inh",
+s.connect2('V1','V1', delay = fixedpoint.FixedPoint("0.05"), dest_port="inh",
           connection_type=CFProjection,strength=-gammainh,
           name='LateralInhibitory',
           weights_bounds = inhibitory_weight_bounds, learning_rate=alpha_inh)
