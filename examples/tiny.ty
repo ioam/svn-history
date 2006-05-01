@@ -18,7 +18,7 @@ from topo.base.cf import CFSheet,CFProjection,CFProjectionGenericOutputFn
 from topo.base.functionfamilies import LearningFn
 from topo.base.parameterclasses import DynamicNumber
 from topo.base.simulator import Simulator
-from topo.learningfns.projfns import CFProjectionGenericLearningFn
+from topo.learningfns.projfns import GenericCFPLearningFn
 from topo.learningfns.basic import Hebbian
 from topo.outputfns.basic import PiecewiseLinear
 from topo.patterns import PatternGeneratorParameter
@@ -85,7 +85,7 @@ topo.sim.connect(
     weights_generator=topo.patterns.random.UniformRandom(),
     weights_bounds=BoundingBox(radius=0.2),
     response_fn=CFProjectionDotProduct_opt1(),
-    learning_fn=CFProjectionGenericLearningFn(single_cf_fn=SampleHebbian(sample_param=0.5)),
+    learning_fn=GenericCFPLearningFn(single_cf_fn=SampleHebbian(sample_param=0.5)),
     weights_output_fn=CFProjectionGenericOutputFn(single_cf_fn=DivisiveL1Normalize()),
     learning_rate=200.0)
 

@@ -388,8 +388,8 @@ class CFPLearningFnParameter(ClassSelectorParameter):
         super(CFPLearningFnParameter,self).__init__(CFPLearningFn,default=default,**params)        
 
 
-class CFProjectionGenericLearningFn(CFPLearningFn):
-    """CFLearningFunction applying the specified single_cf_fn to each CF."""
+class GenericCFPLearningFn(CFPLearningFn):
+    """CFPLearningFunction applying the specified single_cf_fn to each CF."""
     single_cf_fn = LearningFnParameter(default=Hebbian())
     
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
@@ -503,7 +503,7 @@ class CFProjection(Projection):
         doc="Define the shape of the connection fields.")
     
     learning_fn = CFPLearningFnParameter(
-        default=CFProjectionGenericLearningFn(),
+        default=GenericCFPLearningFn(),
         doc='Function for computing changes to the weights based on one activation step.')
 
     # JABALERT: Shouldn't learning_rate be owned by the learning_fn?

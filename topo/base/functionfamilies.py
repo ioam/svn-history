@@ -81,7 +81,7 @@ class OutputFnParameter(ClassSelectorParameter):
 class LearningFn(ParameterizedObject):
     """
     Abstract base class for learning functions that plug into
-    CFProjectionGenericLearningFn.
+    GenericCFPLearningFn.
     """
 
     _abstract_class_name = "LearningFn"

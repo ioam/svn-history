@@ -9,7 +9,7 @@ __version__ = "$Revision$"
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Parameter
-from topo.base.cf import CFPLearningFn,CFProjectionGenericLearningFn
+from topo.base.cf import CFPLearningFn,GenericCFPLearningFn
 from topo.base.functionfamilies import Hebbian
 
 from topo.misc.inlinec import inline, optimized
@@ -79,7 +79,7 @@ class CFProjectionHebbian_opt1(CFPLearningFn):
     
        
 
-class CFProjectionHebbian(CFProjectionGenericLearningFn):
+class CFProjectionHebbian(GenericCFPLearningFn):
     """
     Wrapper written to allow transparent non-optimized fallback; 
     equivalent to
