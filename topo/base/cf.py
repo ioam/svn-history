@@ -366,7 +366,7 @@ class CFPLearningFn(ParameterizedObject):
         raise NotImplementedError
 
 
-class CFProjectionIdentityLearningFn(CFPLearningFn):
+class IdentityCFPLearningFn(CFPLearningFn):
     """CFLearningFunction performing no learning."""
   
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
@@ -384,7 +384,7 @@ class CFPLearningFnParameter(ClassSelectorParameter):
 
     packages = []
 
-    def __init__(self,default=CFProjectionIdentityLearningFn(),**params):
+    def __init__(self,default=IdentityCFPLearningFn(),**params):
         super(CFPLearningFnParameter,self).__init__(CFPLearningFn,default=default,**params)        
 
 

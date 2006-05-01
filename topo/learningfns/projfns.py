@@ -11,5 +11,5 @@ $Id$
 __version__ = "$Revision$"
 
 # Imported here so that all ProjectionLearningFns will be in the same package
-from topo.base.cf import CFProjectionIdentityLearningFn,CFProjectionGenericLearningFn
+from topo.base.cf import IdentityCFPLearningFn,CFProjectionGenericLearningFn
 
