@@ -367,18 +367,6 @@ class CommandEvent(Event):
         except SyntaxError:
             raise SyntaxError("CommandEvent at "+`self.time`+" contained a syntax error:'"+self.command_string+"'")
 
-
-# CEBHACKALERT: class to be removed when all example files changed
-# to use schedule_command()!
-class SAEvent(Event):
-    def __init__(self,time,fn,args):
-        self.time = time
-        self.fn = fn
-        self.args = args
-
-    def __call__(self):
-        self.fn(*self.args)
-        
     
 
 # CEBHACKALERT: do we need to allow a user to save arbitrary data
@@ -638,9 +626,13 @@ class Simulator(ParameterizedObject):
         self.enqueue_event_abs(self._time+delay,
                                src,dest,src_port,dest_port,data)
 
-    # CEBHACKALERT: can replace schedule_action() if all examples/ code is
-    # changed over.
     def schedule_command(self,time,command_string):
+        """
+        Add a command to execute in __main__.__dict__ at the
+        specified time.
+
+        The command should be a string.
+        """
         new_event = CommandEvent(time=time,command_string=command_string)
 
         # CEBHACKALERT: doesn't this duplicate a lot of enqueue_event_abs()
@@ -652,29 +644,6 @@ class Simulator(ParameterizedObject):
                 self.events.insert(index,new_event)
                 break
         
-
-    def schedule_action(self,time,fn,*p):
-        """
-        Enqueue a function call event at an absolute simulator clock time.
-        (Same as enqueue_event_abs, except for scheduling a function call and
-        not a generic event.) This method should be used for arbitrary
-        functions to be called at specific times, e.g. for saving snapshots.
-
-        Usage: schedule_action(time, function name, param 1, param 2, ...)
-        """
-        self.debug("Enqueue absolute action: ", fn, "at time",self._time,"for time",time)
-        new_e = SAEvent(time,fn,p)
-
-        # CEBHACKALERT: doesn't this duplicate a lot of enqueue_event_abs()
-        if not self.events or time >= self.events[-1].time:
-            self.events.append(new_e)
-            return
-
-        for i,e in enumerate(self.events):
-            if time < e.time:
-                self.events.insert(i,new_e)
-                break
-
 
     def state_push(self):
         """
