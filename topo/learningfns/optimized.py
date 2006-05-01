@@ -9,11 +9,13 @@ __version__ = "$Revision$"
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Parameter
-from topo.base.connectionfield import CFProjectionLearningFn, Hebbian
+from topo.base.connectionfield import CFProjectionLearningFn
+from topo.base.functionfamilies import Hebbian
 
 from topo.misc.inlinec import inline, optimized
 
 # Imported here so that all CFProjectionLearningFns will be in the same package
+# CEBHACKALERT: why import these into optimized?
 from topo.base.connectionfield import CFProjectionIdentityLearningFn,CFProjectionGenericLearningFn
 
 

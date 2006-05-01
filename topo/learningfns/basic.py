@@ -1,17 +1,17 @@
 """
 Basic learning functions.
 
-A LearningFunction (e.g. Hebbian) applies to one ConnectionField.
+A LearningFn (e.g. Hebbian) applies to one ConnectionField.
 
 
 $Id$
 """
 __version__ = "$Revision$"
 
-from topo.base.connectionfield import LearningFn
+from topo.base.functionfamilies import LearningFn
 
-# Imported here so that all CFProjectionLearningFns will be in the same package
-from topo.base.connectionfield import Hebbian
+# Imported here so that all learning functions will be in the same package
+from topo.base.functionfamilies import Hebbian
 
 
 

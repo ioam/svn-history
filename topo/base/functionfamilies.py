@@ -72,3 +72,52 @@ class OutputFnParameter(ClassSelectorParameter):
     
     def __init__(self,default=IdentityOF(),**params):
         super(OutputFnParameter,self).__init__(OutputFn,default=default,**params)
+
+
+
+
+class LearningFn(ParameterizedObject):
+    """
+    Abstract base class for learning functions that plug into
+    CFProjectionGenericLearningFn.
+    """
+
+    _abstract_class_name = "LearningFn"
+
+    # JABALERT: Shouldn't the single_connection_learning_rate be
+    # omitted from the call and instead made into a class parameter?
+    def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
+        """
+        Apply this learning function given the input and output
+        activities and current weights.
+        
+        Must be implemented by subclasses.
+        """
+        raise NotImplementedError
+
+
+class Hebbian(LearningFn):
+    """
+    Basic Hebbian rule; Dayan and Abbott, 2001, equation 8.3.
+
+    Increases each weight in proportion to the product of this
+    neuron's activity and the input activity.
+    
+    Requires some form of output_fn normalization for stability.
+    """
+    
+    def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
+        weights += single_connection_learning_rate * unit_activity * input_activity
+
+
+class LearningFnParameter(ClassSelectorParameter):
+    """
+    Parameter whose value can be any LearningFunction.
+    """
+    __slots__ = []
+    __doc__ = property((lambda self: self.doc))
+
+    packages = []
+
+    def __init__(self,default=Hebbian(),**params):
+        super(LearningFnParameter,self).__init__(LearningFn,default=default,**params)        
