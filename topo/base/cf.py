@@ -407,7 +407,7 @@ class GenericCFPLearningFn(CFPLearningFn):
                 cf.weights *= cf.mask
                 
 
-class CFProjectionOutputFn(ParameterizedObject):
+class CFPOutputFn(ParameterizedObject):
     """
     Map the weight matrix of each CF in a CFProjection into a new one
     of the same shape.
@@ -418,7 +418,7 @@ class CFProjectionOutputFn(ParameterizedObject):
         raise NotImplementedError
 
 
-class CFProjectionGenericOutputFn(CFProjectionOutputFn):
+class CFProjectionGenericOutputFn(CFPOutputFn):
     """Applies the specified single_cf_fn to each CF in the CFProjection."""
     single_cf_fn = OutputFnParameter(default=IdentityOF())
     
@@ -444,9 +444,9 @@ class CFProjectionGenericOutputFn(CFProjectionOutputFn):
                     ## del cf.sum 
 
 
-class CFProjectionIdentityOutputFn(CFProjectionOutputFn):
+class CFProjectionIdentityOutputFn(CFPOutputFn):
     """
-    CFProjectionOutputFn that leaves the CFs unchanged.
+    CFPOutputFn that leaves the CFs unchanged.
 
     Cannot be changed or subclassed, since it might never
     be called (it could simply be tested for and skipped).
@@ -458,7 +458,7 @@ class CFProjectionIdentityOutputFn(CFProjectionOutputFn):
 
 
 
-class CFProjectionOutputFnParameter(ClassSelectorParameter):
+class CFPOutputFnParameter(ClassSelectorParameter):
     """
     Parameter whose value can be any CFOutputFn; i.e., a function
     that iterates through all the CFs of a CFProjection and applies
@@ -470,7 +470,7 @@ class CFProjectionOutputFnParameter(ClassSelectorParameter):
     packages = []
 
     def __init__(self,default=CFProjectionGenericOutputFn(),**params):
-        super(CFProjectionOutputFnParameter,self).__init__(CFProjectionOutputFn,default=default,**params)        
+        super(CFPOutputFnParameter,self).__init__(CFPOutputFn,default=default,**params)        
 
 
                     
@@ -513,7 +513,7 @@ class CFProjection(Projection):
         default=IdentityOF(),
         doc='Function applied to the Projection activity after it is computed.')
 
-    weights_output_fn = CFProjectionOutputFnParameter(
+    weights_output_fn = CFPOutputFnParameter(
         default=CFProjectionGenericOutputFn(),
         doc='Function applied to each CF after learning.')
 

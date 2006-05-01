@@ -17,7 +17,7 @@ from topo.base.projection import Projection
 from topo.base.functionfamilies import OutputFnParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number,BooleanParameter
-from topo.base.cf import CFProjection,CFPLearningFnParameter,IdentityCFPLearningFn,CFPResponseFnParameter,CFProjectionOutputFnParameter,CFProjectionIdentityOutputFn,CFProjectionOutputFn, Mdot, ResponseFnParameter
+from topo.base.cf import CFProjection,CFPLearningFnParameter,IdentityCFPLearningFn,CFPResponseFnParameter,CFPOutputFnParameter,CFProjectionIdentityOutputFn,CFPOutputFn, Mdot, ResponseFnParameter
 from topo.base.patterngenerator import PatternGeneratorParameter
 from topo.base.sheetview import UnitView
 
@@ -25,7 +25,7 @@ from topo.outputfns.basic import IdentityOF
 
 
 
-class SharedCFProjectionOutputFn(CFProjectionOutputFn):
+class SharedCFPOutputFn(CFPOutputFn):
     single_cf_fn = OutputFnParameter(default=IdentityOF())
     
     def __call__(self, cfs, output_activity, norm_values=None, **params):
@@ -85,8 +85,8 @@ class SharedCFProjection(CFProjection):
     
     strength = Number(default=1.0)
 
-    weights_output_fn = CFProjectionOutputFnParameter(
-        default=SharedCFProjectionOutputFn())
+    weights_output_fn = CFPOutputFnParameter(
+        default=SharedCFPOutputFn())
 
 
     def __init__(self,**params):

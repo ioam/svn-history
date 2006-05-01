@@ -6,7 +6,7 @@ Requires the weave package; without it unoptimized versions are used.
 """
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
-from topo.base.cf import CFProjectionOutputFn,CFProjectionGenericOutputFn
+from topo.base.cf import CFPOutputFn,CFProjectionGenericOutputFn
 from topo.base.functionfamilies import OutputFn, OutputFnParameter
 
 from topo.misc.inlinec import inline, optimized
@@ -106,12 +106,12 @@ if not optimized:
 ##         return x
 
 
-class CFProjectionDivisiveSumNormalize_opt1(CFProjectionOutputFn):
+class CFProjectionDivisiveSumNormalize_opt1(CFPOutputFn):
     """
     Performs divisive normalization of the weights of all cfs.
 
     Equivalent to
-    GenericCFProjectionOutputFn(single_cf_fn=DivisiveSumNormalize(norm_value=1.0)),
+    GenericCFPOutputFn(single_cf_fn=DivisiveSumNormalize(norm_value=1.0)),
     except this assumes the presence of the _sum attribute on any
     activated unit's CFs.
     """
