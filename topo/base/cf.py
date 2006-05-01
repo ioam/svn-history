@@ -285,7 +285,7 @@ class CFProjectionResponseFn(ParameterizedObject):
 
 
 
-class CFProjectionGenericResponseFn(CFProjectionResponseFn):
+class GenericCFPResponseFn(CFProjectionResponseFn):
     """
     Generic large-scale response function based on a simple single-CF function.
 
@@ -315,7 +315,7 @@ class CFProjectionGenericResponseFn(CFProjectionResponseFn):
         activity *= strength
 
 
-class CFProjectionResponseFnParameter(ClassSelectorParameter):
+class CFPResponseFnParameter(ClassSelectorParameter):
     """
     Parameter whose value can be any CFProjectionResponseFunction; i.e., a function
     that uses all the CFs of a CFProjection to transform the input activity
@@ -326,8 +326,8 @@ class CFProjectionResponseFnParameter(ClassSelectorParameter):
 
     packages = []
 
-    def __init__(self,default=CFProjectionGenericResponseFn(),**params):
-        super(CFProjectionResponseFnParameter,self).__init__(CFProjectionResponseFn,default=default,**params)        
+    def __init__(self,default=GenericCFPResponseFn(),**params):
+        super(CFPResponseFnParameter,self).__init__(CFProjectionResponseFn,default=default,**params)        
 
 
 
@@ -484,8 +484,8 @@ class CFProjection(Projection):
     activate(self,input_activity) that computes the response from the input 
     and stores it in the activity array.
     """
-    response_fn = CFProjectionResponseFnParameter(
-        default=CFProjectionGenericResponseFn(),
+    response_fn = CFPResponseFnParameter(
+        default=GenericCFPResponseFn(),
         doc='Function for computing the Projection response to an input pattern.')
     
     cf_type = Parameter(default=ConnectionField,constant=True)

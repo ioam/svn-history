@@ -17,7 +17,7 @@ from topo.base.projection import Projection
 from topo.base.functionfamilies import OutputFnParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number,BooleanParameter
-from topo.base.cf import CFProjection,CFProjectionLearningFnParameter,CFProjectionIdentityLearningFn,CFProjectionResponseFnParameter,CFProjectionOutputFnParameter,CFProjectionIdentityOutputFn,CFProjectionOutputFn, Mdot, ResponseFnParameter
+from topo.base.cf import CFProjection,CFProjectionLearningFnParameter,CFProjectionIdentityLearningFn,CFPResponseFnParameter,CFProjectionOutputFnParameter,CFProjectionIdentityOutputFn,CFProjectionOutputFn, Mdot, ResponseFnParameter
 from topo.base.patterngenerator import PatternGeneratorParameter
 from topo.base.sheetview import UnitView
 
@@ -73,7 +73,7 @@ class SharedCFProjection(CFProjection):
     Otherwise similar to CFProjection, except that learning is
     currently disabled.
     """
-    response_fn = CFProjectionResponseFnParameter(
+    response_fn = CFPResponseFnParameter(
         default=SharedCFProjectionResponseFn())
     
     ### JABHACKALERT: Set to be constant as a clue that learning won't

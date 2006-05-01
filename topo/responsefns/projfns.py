@@ -17,7 +17,7 @@ from topo.base.cf import CFProjectionResponseFn
 from topo.misc.inlinec import inline, optimized
 
 
-# CEBHACKALERT: This is CFProjectionGenericResponseFn(single_cf_fn=Mdot()).
+# CEBHACKALERT: This is GenericCFPResponseFn(single_cf_fn=Mdot()).
 class CFProjectionDotProduct(CFProjectionResponseFn):
     """
     Dot-product response function.
