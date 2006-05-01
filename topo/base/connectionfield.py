@@ -446,7 +446,7 @@ class CFProjectionLearningFn(ParameterizedObject):
         #center_r,center_c = sheet2matrixidx(0,0,bounds,xdensity,ydensity)
 	rows = len(cfs)
 	cols = len(cfs[0])
-	cf = cfs[cols/2][rows/2]
+	cf = cfs[rows/2][cols/2]
         # The number of units in the mask 
 	nb_unit = len(Numeric.nonzero(Numeric.ravel(cf.mask)))
 	constant_sum_connection_rate=learning_rate/float(nb_unit)
