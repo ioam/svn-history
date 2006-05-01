@@ -39,7 +39,7 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/04/12: (CB) rename CFProjectionGenericOutputFn to GenericCFPOutputFn, etc.; rename connectionfield.py to cf.py; create Identity learning and response functions; rename SharedCFProjection SharedWeightCFProjection; make sure GUI lists are populated (and try to make that simpler). [** before release]
+2006/05/01: (CB) rename CFProjectionGenericOutputFn to GenericCFPOutputFn, etc.; create Identity learning and response functions; rename SharedCFProjection SharedWeightCFProjection; make sure GUI lists are populated (and try to make that simpler). [** before release]
 </li>
 
 <li>
