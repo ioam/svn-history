@@ -6,7 +6,7 @@ Requires the weave package; without it unoptimized versions are used.
 """
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
-from topo.base.cf import CFPOutputFn,CFProjectionGenericOutputFn
+from topo.base.cf import CFPOutputFn,GenericCFPOutputFn
 from topo.base.functionfamilies import OutputFn, OutputFnParameter
 
 from topo.misc.inlinec import inline, optimized
@@ -160,10 +160,10 @@ class CFProjectionDivisiveSumNormalize_opt1(CFPOutputFn):
         inline(code, ['output_activity','rows','cols','cfs'], local_dict=locals())
 
 
-class CFProjectionDivisiveSumNormalize(CFProjectionGenericOutputFn):
+class CFProjectionDivisiveSumNormalize(GenericCFPOutputFn):
     """
     Wraps
-    CFProjectionGenericOutputFn(single_cf_fn=DivisiveSumNormalize),
+    GenericCFPOutputFn(single_cf_fn=DivisiveSumNormalize),
     the non-optimized equivalent of DivisiveSumNormalizeCFOF_opt1.
     """
     def __init__(self,**params):

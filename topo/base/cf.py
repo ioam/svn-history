@@ -418,7 +418,7 @@ class CFPOutputFn(ParameterizedObject):
         raise NotImplementedError
 
 
-class CFProjectionGenericOutputFn(CFPOutputFn):
+class GenericCFPOutputFn(CFPOutputFn):
     """Applies the specified single_cf_fn to each CF in the CFProjection."""
     single_cf_fn = OutputFnParameter(default=IdentityOF())
     
@@ -469,7 +469,7 @@ class CFPOutputFnParameter(ClassSelectorParameter):
 
     packages = []
 
-    def __init__(self,default=CFProjectionGenericOutputFn(),**params):
+    def __init__(self,default=GenericCFPOutputFn(),**params):
         super(CFPOutputFnParameter,self).__init__(CFPOutputFn,default=default,**params)        
 
 
@@ -514,7 +514,7 @@ class CFProjection(Projection):
         doc='Function applied to the Projection activity after it is computed.')
 
     weights_output_fn = CFPOutputFnParameter(
-        default=CFProjectionGenericOutputFn(),
+        default=GenericCFPOutputFn(),
         doc='Function applied to each CF after learning.')
 
     strength = Number(default=1.0)
