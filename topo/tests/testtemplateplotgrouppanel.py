@@ -94,10 +94,12 @@ class TestActivityPanel(unittest.TestCase):
         sheetG.activity = self.ga
         sheetB.activity = self.ba
 
-        self.s.add(sheetR)
-        self.s.add(sheetG)
-        self.s.add(sheetB)
-        self.s.add(retina)
+        # CEBHACKALERT: I don't understand what this is testing; it's not
+        # used later.
+##         self.s.add(sheetR)
+##         self.s.add(sheetG)
+##         self.s.add(sheetB)
+##         self.s.add(retina)
 	
         # s.run(1)
 
