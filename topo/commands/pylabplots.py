@@ -32,21 +32,45 @@ from topo.base.sheet import Sheet
 from topo.misc.utils import frange
 
 
-def vectorplot(vec):
+def windowtitle(title):
+    """
+    Helper function to set the title of this PyLab plot window to a string.
+
+    At the moment, PyLab does not offer a window-manager-independent
+    means for controlling the window title, so what we do is to try
+    what should work with Tkinter, and then suppress all errors.  That
+    way we should be ok when rendering to a file-based backend, but
+    will get nice titles in Tk windows.  If other toolkits are in use,
+    the title can be set here using a similar try/except mechanism, or
+    else there can be a switch based on the backend type.
+    """
+    try: 
+        manager = pylab.get_current_fig_manager()
+        manager.window.title(title)
+    except:
+        pass
+
+
+def vectorplot(vec,title=None):
     """
     Simple line plotting for any vector or list of numbers.
 
     Intended for interactive debugging or analyzing from the command
     prompt.  See MatPlotLib's pylab functions to create more elaborate
     or customized plots; this is just a simple example.
+
+    An optional string can be supplied as a title for the figure, if
+    desired.  At present, this is only used for the body of the figure,
+    not the 
     """
     pylab.plot(vec)
     pylab.grid(True)
+    if (title): windowtitle(title)
     pylab.show._needmain = False
     pylab.show()
 
 
-def matrixplot(mat):
+def matrixplot(mat,title=None):
     """
     Simple plotting for any matrix as a bitmap with axes.
 
@@ -58,6 +82,7 @@ def matrixplot(mat):
     pylab.gray()
     pylab.figure(figsize=(5,5))
     pylab.imshow(mat,interpolation='nearest')
+    if (title): windowtitle(title)
     pylab.show._needmain = False     
     pylab.show()
 
@@ -99,7 +124,7 @@ def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreferenc
             # what the actual possible range is for this simulation (which would presumably
             # be the maximum size of any GeneratorSheet?).
             pylab.axis([-0.5,0.5,-0.5,0.5])
-            pylab.title('Topographic mapping to '+sheet.name+' at time '+str(sim.time()))
+            windowtitle('Topographic mapping to '+sheet.name+' at time '+str(sim.time()))
 
             # Will need to provide a way to save this output
             # when there is no GUI
