@@ -15,10 +15,10 @@ import topo.patterns.basic
 import topo.patterns.random
 import topo.base.parameterizedobject
 from topo.sheets.cfsom import CFSOM
-import topo.base.connectionfield
+import topo.base.cf
 from topo.plotting.plotfilesaver import *
 from PIL import *
-from topo.base.connectionfield import CFProjection
+from topo.base.cf import CFProjection
 from topo.learningfns.som import HebbianSOMLF
 
 class TestPlotFileSaver(unittest.TestCase):

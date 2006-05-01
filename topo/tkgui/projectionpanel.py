@@ -19,7 +19,7 @@ import topo
 from topo.misc.keyedlist import KeyedList
 from topo.base.projection import ProjectionSheet
 from topo.base.sheet import Sheet
-import topo.base.connectionfield
+import topo.base.cf
 from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import ProjectionPlotGroup
 

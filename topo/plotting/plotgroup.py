@@ -17,7 +17,7 @@ import topo
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import Sheet
-from topo.base.connectionfield import CFSheet
+from topo.base.cf import CFSheet
 
 from plot import make_template_plot, Plot
 

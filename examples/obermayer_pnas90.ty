@@ -23,7 +23,7 @@ from math import sqrt, pi
 
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.patterngenerator import BoundingBox
-from topo.base.connectionfield import CFProjection
+from topo.base.cf import CFProjection
 from topo.responsefns.optimized import CFProjectionDotProduct_opt1
 from topo.base.parameterclasses import Number,DynamicNumber
 from topo.sheets.cfsom import CFSOM

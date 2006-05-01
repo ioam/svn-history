@@ -9,7 +9,7 @@ __version__ = "$Revision$"
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Parameter
-from topo.base.connectionfield import CFProjectionLearningFn,CFProjectionGenericLearningFn
+from topo.base.cf import CFProjectionLearningFn,CFProjectionGenericLearningFn
 from topo.base.functionfamilies import Hebbian
 
 from topo.misc.inlinec import inline, optimized

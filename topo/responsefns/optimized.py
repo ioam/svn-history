@@ -9,7 +9,7 @@ $Id$
 __version__='$Revision$'
 
 from topo.base.functionfamilies import ResponseFnParameter,Mdot
-from topo.base.connectionfield import CFProjectionResponseFn
+from topo.base.cf import CFProjectionResponseFn
 from topo.base.parameterizedobject import ParameterizedObject
 
 from topo.misc.inlinec import inline, optimized

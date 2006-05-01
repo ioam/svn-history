@@ -21,7 +21,7 @@ from math import pi
 from topo.base.parameterclasses import Dynamic, Parameter
 import random
 import topo.base.parameterizedobject
-from topo.base.connectionfield import CFProjection
+from topo.base.cf import CFProjection
 from topo.learningfns.som import HebbianSOMLF
 import pdb #debugger
 

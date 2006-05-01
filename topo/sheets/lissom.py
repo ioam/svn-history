@@ -10,7 +10,7 @@ import Numeric
 
 from itertools import chain
 
-from topo.base.connectionfield import CFSheet
+from topo.base.cf import CFSheet
 from topo.base.parameterclasses import BooleanParameter, Number, Integer
 from topo.base.projection import OutputFnParameter
 from topo.base.parameterizedobject import ParameterizedObject

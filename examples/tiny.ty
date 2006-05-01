@@ -14,8 +14,8 @@ import topo.patterns.basic
  
 from topo.base.parameterclasses import Number
 from topo.base.boundingregion import BoundingBox
-from topo.base.connectionfield import CFSheet,CFProjection,CFProjectionGenericOutputFn
-from topo.base.connectionfield import LearningFn
+from topo.base.cf import CFSheet,CFProjection,CFProjectionGenericOutputFn
+from topo.base.functionfamilies import LearningFn
 from topo.base.parameterclasses import DynamicNumber
 from topo.base.simulator import Simulator
 from topo.learningfns.projfns import CFProjectionGenericLearningFn

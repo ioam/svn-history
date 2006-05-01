@@ -20,7 +20,7 @@ import topo.patterns.random
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedCFProjection
 from topo.base.parameterclasses import DynamicNumber,Number
-from topo.base.connectionfield import CFSheet
+from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
 from topo.patterns import PatternGeneratorParameter

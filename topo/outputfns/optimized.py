@@ -6,7 +6,7 @@ Requires the weave package; without it unoptimized versions are used.
 """
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
-from topo.base.connectionfield import CFProjectionOutputFn,CFProjectionGenericOutputFn
+from topo.base.cf import CFProjectionOutputFn,CFProjectionGenericOutputFn
 from topo.base.functionfamilies import OutputFn, OutputFnParameter
 
 from topo.misc.inlinec import inline, optimized

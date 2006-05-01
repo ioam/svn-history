@@ -12,7 +12,7 @@ from Numeric import zeros, Float, ravel
 
 from topo.base.functionfamilies import ResponseFnParameter,Mdot
 from topo.base.arrayutils import L2norm
-from topo.base.connectionfield import CFProjectionResponseFn
+from topo.base.cf import CFProjectionResponseFn
 
 from topo.misc.inlinec import inline, optimized
 

@@ -22,7 +22,7 @@ from topo.base.boundingregion import BoundingBox
 
 # for making a simulator:
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.connectionfield import CFProjection
+from topo.base.cf import CFProjection
 from topo.sheets.cfsom import CFSOM
 from topo.base.simulator import Simulator
 from topo.learningfns.som import HebbianSOMLF

@@ -10,7 +10,7 @@ from math import ceil
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
-from topo.base.connectionfield import CFProjectionLearningFn
+from topo.base.cf import CFProjectionLearningFn
 from topo.base.arrayutils import L2norm
 from topo.base.boundingregion import BoundingBox
 from topo.base.patterngenerator import PatternGeneratorParameter

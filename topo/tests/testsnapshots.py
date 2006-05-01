@@ -22,7 +22,7 @@ import topo
 
 from topo.base.sheet import Sheet
 from topo.base.simulator import Simulator
-from topo.base.connectionfield import CFSheet,CFProjection
+from topo.base.cf import CFSheet,CFProjection
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.commands.basic import save_snapshot,load_snapshot
 

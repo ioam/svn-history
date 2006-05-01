@@ -18,7 +18,7 @@ import topo.patterns.random
 import topo.patterns.basic
  
 from topo.base.boundingregion import BoundingBox
-from topo.base.connectionfield import CFProjection
+from topo.base.cf import CFProjection
 from topo.base.parameterclasses import DynamicNumber,Wrapper
 from topo.base.simulator import Simulator
 from topo.learningfns.som import HebbianSOMLF

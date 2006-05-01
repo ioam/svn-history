@@ -12,7 +12,7 @@ import topo.patterns.basic
 from topo.base.boundingregion import BoundingBox
 from topo.sheets.cfsom import CFSOM
 import topo.patterns.random
-from topo.base.connectionfield import CFProjection
+from topo.base.cf import CFProjection
 import topo.base.parameterizedobject
 from math import pi
 from topo.commands.basic import pattern_present

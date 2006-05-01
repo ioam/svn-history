@@ -9,7 +9,7 @@ __version__='$Revision$'
 from topo.base.arrayutils import L2norm
 from topo.base.parameterclasses import Number
 from Numeric import argmax,exp,floor
-from topo.base.connectionfield import CFSheet
+from topo.base.cf import CFSheet
 from itertools import chain
 from topo.learningfns.som import SOMLF
 

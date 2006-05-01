@@ -20,7 +20,7 @@ import topo.patterns.basic
 
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.boundingregion import BoundingBox
-from topo.base.connectionfield import CFProjection
+from topo.base.cf import CFProjection
 from topo.base.parameterclasses import DynamicNumber,Number
 from topo.sheets.cfsom import CFSOM
 from topo.responsefns.optimized import CFProjectionEuclideanDistance_opt1

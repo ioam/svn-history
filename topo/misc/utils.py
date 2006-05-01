@@ -273,6 +273,8 @@ def get_states_of_classes_from_module(module,states_of_classes,processed_modules
     """
     if not exclude:
         exclude = []
+
+#    print "process",module
     
     dict_ = module.__dict__
     for (k,v) in dict_.items():

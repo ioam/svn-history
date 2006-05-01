@@ -12,7 +12,7 @@ import topo
 
 from topo.analysis.featuremap import MeasureFeatureMap
 from topo.base.arrayutils import octave_output, centroid
-from topo.base.connectionfield import CFSheet
+from topo.base.cf import CFSheet
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
 import topo.base.patterngenerator

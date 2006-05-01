@@ -18,7 +18,7 @@ __all__ = [re.sub('\.py$','',f) for f in os.listdir(__path__[0])
 
 
 import topo
-from topo.base.connectionfield import CFProjectionResponseFnParameter
+from topo.base.cf import CFProjectionResponseFnParameter
 def make_classes_from_all_imported_modules_available():
     """
     Add all ResponseFunction classes from the currently imported modules in
