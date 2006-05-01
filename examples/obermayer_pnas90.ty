@@ -19,7 +19,7 @@ $Id$
 __version__='$Revision$'
 
 import RandomArray
-from math import sqrt
+from math import sqrt, pi
 
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.patterngenerator import BoundingBox
@@ -39,8 +39,9 @@ from topo.misc.numbergenerators import RandomWrapper
 class ObermayerSOM(CFSOM):
     """A variant of CFSOM that uses linear decay functions for alpha and radius."""
 
-    # These values have been adjusted to convert from Obermayer's per-unit learning rates
-    # to Topographica's per-CF learning rates, assuming a 30x30 ConnectionField.
+    # These values have been adjusted to convert from Obermayer's
+    # per-unit learning rates to Topographica's per-CF learning rates,
+    # assuming a 30x30 ConnectionField.
     alpha_0 = Number(0.09)
     alpha_f = Number(0.02)
 
