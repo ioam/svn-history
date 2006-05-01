@@ -93,9 +93,6 @@ Tasks which the developers are about to start.
 2006/04/27 (CB): Allowing there to be a slower, more in-depth set of tests (that don't run with make tests, etc). Slower tests that are required: pickling, that example networks' results haven't changed, that performance doesn't get worse
 </li>
 
-<li>
-2006/04/30 (CB): Do something about about pickling and unpickling RetinotopicSOM (and other classes declared in script filess) that can't be found on unpickling.
-</li>
 
 <li>
 2006/02/24 (CB): SheetSelectorParameter etc (so that the GUI (model editor) can
@@ -168,6 +165,11 @@ Ongoing work with uncertain finishing times.
 <ul>
 <li>
 2006/02/21 (CB): Read-only objects, aiming at copy-on-write semantics
+</li>
+
+<li>
+2006/05/01: Pickle e.g. classes that were defined in scripts? At the moment
+a warning is printed for such classes and functions (including lambda functions).
 </li>
 
 <li>
