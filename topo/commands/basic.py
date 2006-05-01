@@ -119,7 +119,8 @@ def save_snapshot(snapshot_name):
     all subpackages - except ones like 'plotting') are pickled.
     """
     ### Classes etc defined in __main__ won't unpickle (so warn).
-    # The source code won't exist to recreate the class. 
+    # The source code won't exist to recreate the class. If e.g. a class
+    # is redefined in main before unpickling, it will be ok though.
     import types
     for k,v in __main__.__dict__.items():
         # there's classes and functions...what else?
