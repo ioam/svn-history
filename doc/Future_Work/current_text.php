@@ -18,12 +18,16 @@ was first added to the list, or a change was made.)
 2006/05/01: In the model editor, adding a projection between two sheets leads to an error. [**before release]
 </li>
 
-<li>
-2006/04/26 (CB): matching with C++ LISSOM when there are circular connection fields [seems to match, just have to check bounds changes etc and then after 20000 iterations]; HACKALERTs relating to connection fields; test file for connectionfield
+<li> 
+2006/04/21 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler
 </li>
 
 <li> 
-2006/04/21 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler; investigate failing test in testimage.py (that uses sheet functions); did the performance change (e.g. lissom_oo_or)? [** before release]
+2006/04/21 (CB): investigate failing test in testimage.py (that uses sheet functions)
+</li>
+
+<li>
+2006/05/02 (CB): Has the performance worsened (e.g. lissom_oo_or)? [** before release]
 </li>
 
 <li> 
@@ -35,27 +39,19 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
+2006/05/02: (CB) create Identity learning and response functions; rename SharedCFProjection SharedWeightCFProjection; make sure GUI lists are populated (and try to make that simpler). [** before release]
+</li>
+
+<li>
+2006/04/26 (CB): matching with C++ LISSOM when there are circular connection fields [seems to match, just have to check bounds changes etc and then after 20000 iterations]; HACKALERTs relating to connection fields; test file for connectionfield
+</li>
+
+<li>
 2006/04/07: (CB) Allowing joint normalization of projections for a CFSheet. [This appears to work, but results from LISSOM simulations do not yet match those of C++ LISSOM.]
 </li>
 
 <li>
-2006/05/01: (CB) create Identity learning and response functions; rename SharedCFProjection SharedWeightCFProjection; make sure GUI lists are populated (and try to make that simpler). [** before release]
-</li>
-
-<li>
 2006/04/07: (CB) Implement joint normalization via ports - check ports work as expected.
-</li>
-
-<li> 
-2006/03/17 (CB): Fix problem (matching previous work) with som_retinotopy.
-</li>
-
-<li> 
-2006/04/20 (CB): many of the tests in testsheet.py run twice - correct that.
-</li>
-
-<li>
-2006/04/20 (CB): write test file for Composite and complete Image's test file.
 </li>
 
 <li>
@@ -83,6 +79,18 @@ Tasks which the developers are about to start.
 2006/04/27 (CB): Number, DynamicNumber: allowing an attribute that has been declared as a Number to work with something that produces a number (i.e. do it properly - because it does work at the moment).
 </li>
 
+<li> 
+2006/03/17 (CB): Fix problem (matching previous work) with som_retinotopy.
+</li>
+
+<li> 
+2006/04/20 (CB): many of the tests in testsheet.py run twice - correct that.
+</li>
+
+<li>
+2006/04/20 (CB): write test file for Composite and complete Image's test file.
+</li>
+
 
 <li>
 2006/04/27 (CB): Allowing there to be a slower, more in-depth set of tests (that don't run with make tests, etc). Slower tests that are required: pickling, that example networks' results haven't changed, that performance doesn't get worse
@@ -101,7 +109,6 @@ topo.base.boundingregion.
 <li>
 2006/04/28 (CB): Create subdirectory of tests called 'reference' and move into it the reference simulations plus all their data and other support files.
 </li>
-
 
 <li>
 2006/02/21: ReadOnlyParameter to allow declaration of something but not let it
