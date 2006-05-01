@@ -162,19 +162,17 @@ class TestCFSom(unittest.TestCase):
       
         s = Simulator()
         s.verbose("Creating simulation objects...")
-        retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian())
+        s['retina']=GeneratorSheet(input_generator=topo.patterns.basic.Gaussian())
         
-        # Old form
-        #retina = GaussianSheet(name='Retina')
-        V1 = CFSOM(name='V1')
-        V1.print_level = topo.base.parameterizedobject.WARNING
+        s['V1'] = CFSOM()
+        s['V1'].print_level = topo.base.parameterizedobject.WARNING
 
-        s.connect(retina,V1,delay=1,connection_type=CFProjection,
-                  name='RtoV1',learning_fn=HebbianSOMLF())
+        s.connect2('retina','V1',delay=1,connection_type=CFProjection,
+                  learning_fn=HebbianSOMLF())
         s.print_level = topo.base.parameterizedobject.WARNING
 
-        self.assertTrue(V1.projections().get('RtoV1',None) != None)
-        self.assertTrue(V1.projections().get('RtoV1',None) != None)
+        self.assertTrue(topo.sim['V1'].projections().get('retinaToV1',None) != None)
+        self.assertTrue(topo.sim['V1'].projections().get('retinaToV1',None) != None)
         s.run(10)
 
 
