@@ -15,6 +15,10 @@ was first added to the list, or a change was made.)
 <!-- CB: I put my tasks in the approximate order that I'm doing them -->
 
 <li>
+2006/05/01: In the model editor, adding a projection between two sheets leads to an error. [**before release]
+</li>
+
+<li>
 2006/04/26 (CB): matching with C++ LISSOM when there are circular connection fields [seems to match, just have to check bounds changes etc and then after 20000 iterations]; HACKALERTs relating to connection fields; test file for connectionfield
 </li>
 
@@ -27,12 +31,7 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/04/30: (CB) Switch all examples to use schedule_command(); delete schedule_action() and SAEvent; Change current code over to use topo.sim['V1']-type
-access to simulator (necessary because otherwise you could say V1.activity before pickling, but after loading a saved network that would not work), and finalize connect2 etc (then remove old code). [** before release]
-</li>
-
-<li>
-2006/04/30 (CB): A better way to implement the Wrapper class; change all examples and tests so they set input parameters on an object rather than the class (using Wrapper or RandomWrapper) [** before release (but not the reimplementation part - that requires Number and DynamicNumber etc to have been fixed)] 
+2006/05/01: (CB) replace Simulator.connect() with Simulator.connect2()  [** before release]
 </li>
 
 <li>
