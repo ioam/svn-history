@@ -10,7 +10,7 @@ from math import ceil
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
-from topo.base.cf import CFProjectionLearningFn
+from topo.base.cf import CFPLearningFn
 from topo.base.arrayutils import L2norm
 from topo.base.boundingregion import BoundingBox
 from topo.base.patterngenerator import PatternGeneratorParameter
@@ -20,7 +20,7 @@ import topo.patterns.basic
 from topo.outputfns.basic import IdentityOF
 
 
-class SOMLF(CFProjectionLearningFn):
+class SOMLF(CFPLearningFn):
     """
     An abstract base class of learning functions for Self-Organizing Maps.
     

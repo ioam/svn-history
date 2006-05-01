@@ -331,7 +331,7 @@ class CFPResponseFnParameter(ClassSelectorParameter):
 
 
 
-class CFProjectionLearningFn(ParameterizedObject):
+class CFPLearningFn(ParameterizedObject):
     """
     Compute new CFs for a CFProjection based on input and output activity values.
 
@@ -366,16 +366,16 @@ class CFProjectionLearningFn(ParameterizedObject):
         raise NotImplementedError
 
 
-class CFProjectionIdentityLearningFn(CFProjectionLearningFn):
+class CFProjectionIdentityLearningFn(CFPLearningFn):
     """CFLearningFunction performing no learning."""
   
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         pass
 
 
-class CFProjectionLearningFnParameter(ClassSelectorParameter):
+class CFPLearningFnParameter(ClassSelectorParameter):
     """
-    Parameter whose value can be any CFProjectionLearningFn; i.e., a function
+    Parameter whose value can be any CFPLearningFn; i.e., a function
     that uses all the CFs of a CFProjection to transform the input activity
     into an output activity.
     """
@@ -385,10 +385,10 @@ class CFProjectionLearningFnParameter(ClassSelectorParameter):
     packages = []
 
     def __init__(self,default=CFProjectionIdentityLearningFn(),**params):
-        super(CFProjectionLearningFnParameter,self).__init__(CFProjectionLearningFn,default=default,**params)        
+        super(CFPLearningFnParameter,self).__init__(CFPLearningFn,default=default,**params)        
 
 
-class CFProjectionGenericLearningFn(CFProjectionLearningFn):
+class CFProjectionGenericLearningFn(CFPLearningFn):
     """CFLearningFunction applying the specified single_cf_fn to each CF."""
     single_cf_fn = LearningFnParameter(default=Hebbian())
     
@@ -502,7 +502,7 @@ class CFProjection(Projection):
         default=patterngenerator.Constant(),constant=True,
         doc="Define the shape of the connection fields.")
     
-    learning_fn = CFProjectionLearningFnParameter(
+    learning_fn = CFPLearningFnParameter(
         default=CFProjectionGenericLearningFn(),
         doc='Function for computing changes to the weights based on one activation step.')
 

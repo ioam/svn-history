@@ -9,19 +9,19 @@ __version__ = "$Revision$"
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Parameter
-from topo.base.cf import CFProjectionLearningFn,CFProjectionGenericLearningFn
+from topo.base.cf import CFPLearningFn,CFProjectionGenericLearningFn
 from topo.base.functionfamilies import Hebbian
 
 from topo.misc.inlinec import inline, optimized
 
 
 
-class CFProjectionHebbian_opt1(CFProjectionLearningFn):
+class CFProjectionHebbian_opt1(CFPLearningFn):
     """
     CF-aware Hebbian learning rule.
 
     Implemented in C for speed.  Should be equivalent to
-    GenericCFProjectionLearningFn(single_cf_fn=Hebbian), except faster.  
+    GenericCFPLearningFn(single_cf_fn=Hebbian), except faster.  
 
     Sets the _sum attribute on any cf whose weights are
     updated during learning.
@@ -83,7 +83,7 @@ class CFProjectionHebbian(CFProjectionGenericLearningFn):
     """
     Wrapper written to allow transparent non-optimized fallback; 
     equivalent to
-    GenericCFProjectionLearningFn(single_cf_fn=Hebbian())
+    GenericCFPLearningFn(single_cf_fn=Hebbian())
     """
     def __init__(self,**params):
         super(CFProjectionHebbian,self).__init__(single_cf_fn=Hebbian(),**params)
