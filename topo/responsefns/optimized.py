@@ -9,14 +9,14 @@ $Id$
 __version__='$Revision$'
 
 from topo.base.functionfamilies import ResponseFnParameter,Mdot
-from topo.base.cf import CFProjectionResponseFn
+from topo.base.cf import CFPResponseFn
 from topo.base.parameterizedobject import ParameterizedObject
 
 from topo.misc.inlinec import inline, optimized
 
 from topo.responsefns.projfns import CFProjectionDotProduct, CFProjectionEuclideanDistance
 
-class CFProjectionDotProduct_opt1(CFProjectionResponseFn):
+class CFProjectionDotProduct_opt1(CFPResponseFn):
     """
     Dot-product response function.
 
@@ -74,7 +74,7 @@ if not optimized:
 
 
 
-class CFProjectionEuclideanDistance_opt1(CFProjectionResponseFn):
+class CFProjectionEuclideanDistance_opt1(CFPResponseFn):
     """
     Euclidean-distance response function.
 

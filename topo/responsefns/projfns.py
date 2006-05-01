@@ -12,13 +12,13 @@ from Numeric import zeros, Float, ravel
 
 from topo.base.functionfamilies import ResponseFnParameter,Mdot
 from topo.base.arrayutils import L2norm
-from topo.base.cf import CFProjectionResponseFn
+from topo.base.cf import CFPResponseFn
 
 from topo.misc.inlinec import inline, optimized
 
 
 # CEBHACKALERT: This is GenericCFPResponseFn(single_cf_fn=Mdot()).
-class CFProjectionDotProduct(CFProjectionResponseFn):
+class CFProjectionDotProduct(CFPResponseFn):
     """
     Dot-product response function.
 
@@ -41,7 +41,7 @@ class CFProjectionDotProduct(CFProjectionResponseFn):
         activity *= strength
 
 
-class CFProjectionEuclideanDistance(CFProjectionResponseFn):
+class CFProjectionEuclideanDistance(CFPResponseFn):
     """
     Euclidean-distance--based response function.
     """

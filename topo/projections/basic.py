@@ -36,7 +36,7 @@ class SharedCFProjectionOutputFn(CFProjectionOutputFn):
 
 
 
-class SharedCFProjectionResponseFn(ParameterizedObject):
+class SharedCFPResponseFn(ParameterizedObject):
     """
     Response function accepting a single CF applied to all units.
     Otherwise similar to GenericCFResponseFn.
@@ -74,7 +74,7 @@ class SharedCFProjection(CFProjection):
     currently disabled.
     """
     response_fn = CFPResponseFnParameter(
-        default=SharedCFProjectionResponseFn())
+        default=SharedCFPResponseFn())
     
     ### JABHACKALERT: Set to be constant as a clue that learning won't
     ### actually work yet.

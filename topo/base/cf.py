@@ -266,7 +266,7 @@ class ConnectionField(ParameterizedObject):
 
 
 
-class CFProjectionResponseFn(ParameterizedObject):
+class CFPResponseFn(ParameterizedObject):
     """
     Map an input activity matrix into an output matrix using the CFs
     in a CFProjection.
@@ -285,7 +285,7 @@ class CFProjectionResponseFn(ParameterizedObject):
 
 
 
-class GenericCFPResponseFn(CFProjectionResponseFn):
+class GenericCFPResponseFn(CFPResponseFn):
     """
     Generic large-scale response function based on a simple single-CF function.
 
@@ -327,7 +327,7 @@ class CFPResponseFnParameter(ClassSelectorParameter):
     packages = []
 
     def __init__(self,default=GenericCFPResponseFn(),**params):
-        super(CFPResponseFnParameter,self).__init__(CFProjectionResponseFn,default=default,**params)        
+        super(CFPResponseFnParameter,self).__init__(CFPResponseFn,default=default,**params)        
 
 
 
@@ -479,7 +479,7 @@ class CFProjection(Projection):
     A projection composed of ConnectionFields from a Sheet into a ProjectionSheet.
 
     CFProjection computes its activity using a response_fn of type
-    CFProjectionResponseFn (typically a CF-aware version of mdot) and output_fn 
+    CFPResponseFn (typically a CF-aware version of mdot) and output_fn 
     (which is typically IdentityOF). Any subclass has to implement the interface
     activate(self,input_activity) that computes the response from the input 
     and stores it in the activity array.
