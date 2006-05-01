@@ -54,10 +54,6 @@ was first added to the list, or a change was made.)
 2006/04/07: (CB) Implement joint normalization via ports - check ports work as expected.
 </li>
 
-<li>
-2006/03/17 (CB): 
-</li>
-
 <li> 
 2006/02/23 (all): Ensuring classes are declared abstract when they should be, and making sure base and simple classes are imported into packages (i.e. Sheet into topo/sheets/, Projection into topo/projections/, Constant into topo/patterns/, and so on).
 </li>
