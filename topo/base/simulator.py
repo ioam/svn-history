@@ -667,7 +667,7 @@ class Simulator(ParameterizedObject):
         return len(self._events_stack)
 
 
-    def connect2(self,
+    def connect(self,
                 src,
                 dest,
                 src_port=None,

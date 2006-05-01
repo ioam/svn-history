@@ -100,6 +100,6 @@ CFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 topo.sim['V1'] = ObermayerSOM()
-topo.sim.connect2('Retina','V1',delay=0.5,connection_type=CFProjection)
+topo.sim.connect('Retina','V1',delay=0.5,connection_type=CFProjection)
 
 topo.sim.run(0)

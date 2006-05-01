@@ -133,7 +133,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         s['V1'] = CFSOM(density=5)
         s['V1'].print_level = topo.base.parameterizedobject.WARNING
         
-        s.connect2('retina','V1',delay=1,connection_type=CFProjection)
+        s.connect('retina','V1',delay=1,connection_type=CFProjection)
         s.print_level = topo.base.parameterizedobject.WARNING
         
         s.run(1)

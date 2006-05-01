@@ -198,10 +198,10 @@ class TestMeasureFeatureMap(unittest.TestCase):
         self.s['V1']= CFSOM(density=4.0)
         self.s['V2'] = CFSOM(density=4.0)
 
-        self.s.connect2('Retina','V1',delay=0.5,connection_type=CFProjection,
+        self.s.connect('Retina','V1',delay=0.5,connection_type=CFProjection,
                        name='RtoV1',learning_fn=HebbianSOMLF())
 
-        self.s.connect2('Retina','V2',delay=0.5,connection_type=CFProjection,
+        self.s.connect('Retina','V2',delay=0.5,connection_type=CFProjection,
                        name='RtoV2',learning_fn=HebbianSOMLF())
 
 

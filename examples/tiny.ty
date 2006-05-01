@@ -79,7 +79,7 @@ topo.sim['Retina'] = GeneratorSheet(input_generator=gaussian_generator,
 topo.sim['V1'] = CFSheet(density=5,bounds=BoundingBox(radius=0.5),
                          output_fn=PiecewiseLinear(lower_bound=0,upper_bound=1.0))
 
-topo.sim.connect2(
+topo.sim.connect(
     'Retina','V1',name='RtoV1',delay=FixedPoint("0.5"),
     connection_type=CFProjection, 
     weights_generator=topo.patterns.random.UniformRandom(),

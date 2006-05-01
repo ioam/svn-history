@@ -64,26 +64,26 @@ topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 topo.sim['V1Exc'] = LISSOM(bounds=BoundingBox(radius=0.5),tsettle=9)
 topo.sim['V1Inhib'] = LISSOM(bounds=BoundingBox(radius=0.5),tsettle=8)
 
-topo.sim.connect2('Retina','V1Exc', delay = FixedPoint("0.05",4),
+topo.sim.connect('Retina','V1Exc', delay = FixedPoint("0.05",4),
                   connection_type=CFProjection,strength=1.0,name='Afferent',
                   weights_bounds=BoundingBox(radius=0.22),learning_rate=1.274)
 
-topo.sim.connect2('V1Exc','V1Exc',dest_port="lat1", delay = FixedPoint("0.10",4),
+topo.sim.connect('V1Exc','V1Exc',dest_port="lat1", delay = FixedPoint("0.10",4),
                   connection_type=CFProjection,strength = 0.95,
                   name='LateralExcitatory_local',
                   weights_bounds =BoundingBox(radius=0.10),learning_rate=0*0.4)	
 		   
-topo.sim.connect2('V1Exc','V1Exc', dest_port="lat2", delay = FixedPoint("0.10",4),
+topo.sim.connect('V1Exc','V1Exc', dest_port="lat2", delay = FixedPoint("0.10",4),
                   connection_type=CFProjection,strength = 0.15,
                   name='LateralExcitatory',
                   weights_bounds =BoundingBox(radius=0.25),learning_rate=0*1.6)	
 		  
-topo.sim.connect2('V1Exc','V1Inhib', delay = FixedPoint("0.05",4),
+topo.sim.connect('V1Exc','V1Inhib', delay = FixedPoint("0.05",4),
                   connection_type=CFProjection,strength = 1.65,
                   name='V1Exc_to_V1Inhib',
                   weights_bounds = BoundingBox(radius=0.25),learning_rate=0*0.4)
 
-topo.sim.connect2('V1Inhib','V1Exc', delay = FixedPoint("0.05",4),
+topo.sim.connect('V1Inhib','V1Exc', delay = FixedPoint("0.05",4),
                   connection_type=CFProjection,strength=-0.65,
                   name='V1Inhib_to_V1Exc',
                   weights_bounds = BoundingBox(radius=0.10),learning_rate=0*2.4)

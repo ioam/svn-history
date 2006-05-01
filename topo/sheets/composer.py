@@ -19,7 +19,7 @@ class Composer(Sheet):
     mapped into the composer by adding the 'origin' argument to the
     connect() call e.g.:
 
-    sim.connect2(input_sheet.name,composer.name,delay=1, origin=(0.25,0.25))
+    sim.connect(input_sheet.name,composer.name,delay=1, origin=(0.25,0.25))
 
     will cause (0,0) on input sheet's activity to map to (0.25,0.25)
     on composer's activity.

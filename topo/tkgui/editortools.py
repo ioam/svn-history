@@ -202,7 +202,7 @@ class ConnectionTool(Frame) :
         to_node = node.sheet
         con_type = self.proj_list[self.current_option]
         try :
-            con = sim.connect2(from_node.name,to_node.name,connection_type=con_type)
+            con = sim.connect(from_node.name,to_node.name,connection_type=con_type)
         except :
             print "These sheets could not be connected by a "+ self.current_option
             editor_connection.remove()

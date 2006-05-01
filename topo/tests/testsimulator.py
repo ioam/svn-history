@@ -33,8 +33,8 @@ class TestSimulator(unittest.TestCase):
         s['pulse1'] = PulseGenerator(period = 1)
         s['pulse2'] = PulseGenerator(period = 3)
         s['sum_unit'] = SumUnit()
-        s.connect2('pulse1','sum_unit',delay=1)
-        s.connect2('pulse2','sum_unit',delay=1)
+        s.connect('pulse1','sum_unit',delay=1)
+        s.connect('pulse2','sum_unit',delay=1)
         s.run(1.0)
         s.state_push()
         self.assertEqual(s.state_len(),1)
@@ -51,8 +51,8 @@ class TestSimulator(unittest.TestCase):
         n1 = s['pulse1'].name
         n2 = s['pulse2'].name
 
-        s.connect2('pulse1','sum_unit',delay=1)
-        s.connect2('pulse2','sum_unit',delay=1)
+        s.connect('pulse1','sum_unit',delay=1)
+        s.connect('pulse2','sum_unit',delay=1)
         t1 = s.objects()
         e1 = [ep for ep in t1.values() if isinstance(ep,PulseGenerator) and ep.name == n1]
         t2 = s.objects()

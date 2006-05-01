@@ -167,7 +167,7 @@ class TestCFSom(unittest.TestCase):
         s['V1'] = CFSOM()
         s['V1'].print_level = topo.base.parameterizedobject.WARNING
 
-        s.connect2('retina','V1',delay=1,connection_type=CFProjection,
+        s.connect('retina','V1',delay=1,connection_type=CFProjection,
                   learning_fn=HebbianSOMLF())
         s.print_level = topo.base.parameterizedobject.WARNING
 

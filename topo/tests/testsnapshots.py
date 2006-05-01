@@ -41,7 +41,7 @@ class TestSnapshots(unittest.TestCase):
         topo.sim.name = test_sim_name
         topo.sim['Retina'] = GeneratorSheet()
         topo.sim['V1'] = CFSheet()
-        topo.sim.connect2('Retina','V1',delay=0.5,connection_type=CFProjection,name='Afferent')
+        topo.sim.connect('Retina','V1',delay=0.5,connection_type=CFProjection,name='Afferent')
         topo.sim.run(1)
         v1_activity = copy.deepcopy(topo.sim['V1'].activity)
     

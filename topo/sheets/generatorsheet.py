@@ -81,7 +81,7 @@ class GeneratorSheet(Sheet):
         assert self.simulator
 
         # connect self<->self (for repeating)
-        self.simulator.connect2(self.name,self.name,delay=self.period)
+        self.simulator.connect(self.name,self.name,delay=self.period)
 
         # first event is special
         self.simulator.enqueue_event_rel(self.phase,self,self,data=self.activity)

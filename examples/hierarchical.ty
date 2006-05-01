@@ -91,23 +91,23 @@ topo.sim['V2'] = CFSOM(alpha_0 = 0.5)
 topo.sim['V3'] = CFSOM(alpha_0 = 0.5)
 
 # Projections to V1
-topo.sim.connect2('LeftRetina','V1',delay=0.5,connection_type=CFProjection,name='AfferentLeft')
-topo.sim.connect2('RightRetina','V1',delay=0.5,connection_type=CFProjection,name='AfferentRight')
-#topo.sim.connect2('V2','V1',delay=0.5,connection_type=CFProjection,name='FeedbackFromV2')
+topo.sim.connect('LeftRetina','V1',delay=0.5,connection_type=CFProjection,name='AfferentLeft')
+topo.sim.connect('RightRetina','V1',delay=0.5,connection_type=CFProjection,name='AfferentRight')
+#topo.sim.connect('V2','V1',delay=0.5,connection_type=CFProjection,name='FeedbackFromV2')
 
 
 # Projections to V2
-topo.sim.connect2('LeftRetina','V2',delay=0.5,connection_type=CFProjection,
+topo.sim.connect('LeftRetina','V2',delay=0.5,connection_type=CFProjection,
                   name='AfferentLeft')
-topo.sim.connect2('RightRetina','V2',delay=0.5,connection_type=CFProjection,
+topo.sim.connect('RightRetina','V2',delay=0.5,connection_type=CFProjection,
                   name='AfferentRight')
-topo.sim.connect2('V1','V2',delay=0.5,connection_type=CFProjection,
+topo.sim.connect('V1','V2',delay=0.5,connection_type=CFProjection,
                   name='AfferentV1')
-topo.sim.connect2('V3','V2',delay=0.5,connection_type=CFProjection,
+topo.sim.connect('V3','V2',delay=0.5,connection_type=CFProjection,
                   name='FeedbackFromV3')
 
 # Projections to V3
-topo.sim.connect2('V2','V3',delay=0.5,connection_type=CFProjection,
+topo.sim.connect('V2','V3',delay=0.5,connection_type=CFProjection,
                   name='Afferent')
 
 

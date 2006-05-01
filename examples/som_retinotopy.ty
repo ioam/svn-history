@@ -79,6 +79,6 @@ CFProjection.learning_fn = HebbianSOMLF()
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 topo.sim['V1'] = RetinotopicSOM()
-topo.sim.connect2('Retina','V1',delay=0.5,connection_type=CFProjection)
+topo.sim.connect('Retina','V1',delay=0.5,connection_type=CFProjection)
 
 topo.sim.run(0)
