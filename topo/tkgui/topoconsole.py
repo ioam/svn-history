@@ -522,7 +522,7 @@ class TopoConsole(Frame):
         # http://tkinter.unpythonic.net/wiki/ProgressBar
 
         ### JABALERT: Most of this code should move to the
-        ### Simulator class, because it is not specific to the GUI
+        ### Simulation class, because it is not specific to the GUI.
         ### E.g. we'll also want time remaining estimates from the
         ### command line and the batch interface.
         fduration = float(duration)

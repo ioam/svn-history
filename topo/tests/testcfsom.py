@@ -102,7 +102,7 @@ class ImageSaver(EventProcessor):
 class TestCFSom(unittest.TestCase):
 
     def setUp(self):
-        self.s = Simulator(step_mode = True)
+        self.s = Simulation(step_mode = True)
         self.sheet1 = Sheet()
         self.sheet2 = Sheet()
 
@@ -115,7 +115,7 @@ class TestCFSom(unittest.TestCase):
 ##         """
 ##         from testsheetview import ImageGenerator
         
-##         s = Simulator(step_mode=True)
+##         s = Simulation(step_mode=True)
 
 ##         ImageGenerator.density = 100
 ##         ImageGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
@@ -160,7 +160,7 @@ class TestCFSom(unittest.TestCase):
         
         topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
       
-        s = Simulator()
+        s = Simulation()
         s.verbose("Creating simulation objects...")
         s['retina']=GeneratorSheet(input_generator=topo.patterns.basic.Gaussian())
         

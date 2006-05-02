@@ -16,11 +16,11 @@ from topo.base.parameterclasses import Parameter, BooleanParameter, Filename
 
 class PlotGroupTemplate(ParameterizedObject):
     """
-    Class specifying how to construct a PlotGroup from the objects in a Simulator.
+    Class specifying how to construct a PlotGroup from the objects in a Simulation.
 
     A PlotGroupTemplate is a data structure that specifies how to
     construct a set of related plots, when later given a set of Sheets
-    in a Simulator.  The template can be modified however the user
+    in a Simulation.  The template can be modified however the user
     wishes, allowing the user to control what information is shown in
     plots, how the data is displayed, and so on.  A single template is
     sufficient for any model, because the template does not include

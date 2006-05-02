@@ -9,14 +9,14 @@ __version__='$Revision$'
 # CEBHACKALERT: every time I have to change something in this file
 # it is very painful. There are always multiple copies of the same
 # thing! 
-# e.g. a Simulator was being passed around but then found
+# e.g. a Simulation was being passed around but then found
 # from somewhere else anyway. It was (and maybe still is?) possible
 # to pass feature parameters in at too many stages.
 # I have to clean it up!
 # - remove temporary testing code
 # - get rid of unused import statements
-# - a Simulator should be passed in; this code shouldn't look for
-#   active_sim
+# - a Simulation should be passed in; this code shouldn't look for
+#   topo.sim
 
 from math import pi
 

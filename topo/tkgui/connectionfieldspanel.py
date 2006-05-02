@@ -66,7 +66,7 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         funcion, or update another menu, and so on.
         """
         # Create the item list for CFSheet 'Sheet'  This will not change
-        # since this window will only examine one Simulator.
+        # since this window will only examine one Simulation.
         sim = topoconsole.active_sim()
         self._sim_eps = [ep for ep in sim.objects(Sheet).values()
                   if isinstance(ep,topo.base.cf.CFSheet)]

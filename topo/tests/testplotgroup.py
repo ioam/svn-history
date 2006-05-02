@@ -87,7 +87,7 @@ class TestPlotGroup(unittest.TestCase):
 #             if SHOW_PLOTS: map.show()
 
 #     def test_make_plot_group(self):
-#         sim = topo.base.simulator.Simulator()
+#         sim = topo.base.simulator.Simulation()
 #         pe = topo.plotting.plotengine.PlotEngine(sim)
 # 	filter = lambda s: True
 #         pg = pe.make_plot_group('Activity',
@@ -95,7 +95,7 @@ class TestPlotGroup(unittest.TestCase):
 # 				filter,'BasicPlotGroup')
 
 #     def test_get_plot_group(self):
-#         sim = topo.base.simulator.Simulator()
+#         sim = topo.base.simulator.Simulation()
 #         pe = topo.plotting.plotengine.PlotEngine(sim)
 #         pg = pe.get_plot_group('Activity',
 #                                plotgroup_templates['Activity'])
@@ -152,7 +152,7 @@ class TestPlotGroup(unittest.TestCase):
 
 ### JC: My new statements.
 import unittest
-from topo.base.simulator import Simulator
+from topo.base.simulator import Simulation
 from topo.plotting.plotgroup import TemplatePlotGroup, ConnectionFieldsPlotGroup
 from topo.plotting.templates import plotgroup_templates
 from topo.sheets.cfsom import CFSOM
@@ -170,7 +170,7 @@ from topo.base.patterngenerator import BoundingBox
 
 #       def setUp(self):
 
-#           self.sim = Simulator()
+#           self.sim = Simulation()
 
 #           CFSOM.density = 10
           

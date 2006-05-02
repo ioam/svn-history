@@ -163,7 +163,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
     @staticmethod
     def valid_context():
         """
-        Only open if GeneratorSheets are in the Simulator.
+        Only open if GeneratorSheets are in the Simulation.
         """
         sim = topoconsole.active_sim()
         if sim.objects(GeneratorSheet).items():
@@ -225,7 +225,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         patterns.  The system may become unstable if the user breaks
         this thread so that the original patterns are not properly
         restored, but then there are going to be other problems with
-        the Simulator state if a run is interrupted.
+        the Simulation state if a run is interrupted.
 
         This function is run no matter if learning is enabled or
         disabled since run() will detect sheet attributes.

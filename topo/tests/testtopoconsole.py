@@ -10,7 +10,7 @@ __version__='$Revision$'
 import topo
 import unittest
 from topo.tkgui import *
-from topo.base.simulator import Simulator
+from topo.base.simulator import Simulation
 import topo.base.parameterizedobject
 import topo.base.simulator
 
@@ -18,7 +18,7 @@ class TestTopoConsole(unittest.TestCase):
     def setUp(self):
         # CEBHACKALERT: do we need such a test now?
         # topo.base.registry.set_active_sim(None)
-        self.s = Simulator(register=False)
+        self.s = Simulation(register=False)
         self.console = start()
         topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
         self.s.print_level = topo.base.parameterizedobject.WARNING

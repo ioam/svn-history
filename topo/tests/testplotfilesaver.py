@@ -38,7 +38,7 @@ class TestPlotFileSaver(unittest.TestCase):
 #         CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 # 	CFProjection.learning_fn=HebbianSOMLF()
 #         topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
-#         self.s = topo.base.simulator.Simulator()
+#         self.s = topo.base.simulator.Simulation()
         
 #         retina = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina')
 #         retina2 = GeneratorSheet(input_generator=topo.patterns.basic.Line(),name='Retina2')

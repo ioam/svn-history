@@ -28,7 +28,7 @@ class TestPlotGroupPanel(unittest.TestCase):
 
     def setUp(self):
         """
-        Create a Simulator that has a couple of sheets within it that
+        Create a Simulation that has a couple of sheets within it that
         have data within them that can then be used by the GUI tests.
         Two objects created after completion:
             self.s   Sample simulation with a couple of sheets
@@ -53,7 +53,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         
 #        topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
         
-        self.s = Simulator()
+        self.s = Simulation()
         self.s.verbose("Creating simulation objects...")
 
         # Uses testbitmap.jpg.
@@ -126,7 +126,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         
         ###########################################
         # build simulation
-        s = topo.base.simulator.Simulator()
+        s = topo.base.simulator.Simulation()
         
         s['retina'] = GeneratorSheet(input_generator=topo.patterns.basic.Line(),density=5)
         s['retina'].print_level = topo.base.parameterizedobject.WARNING

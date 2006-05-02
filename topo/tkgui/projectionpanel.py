@@ -98,11 +98,11 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         This function adds a Sheet: menu that queries the active
         simulation for the list of options.  When an update is made,
         _region_refresh() is called.  It can either call the refresh()
-        funcion, or update another menu, and so on.
+        function, or update another menu, and so on.
         """
 
         # Create the item list for CFSheet 'Sheet'  This will not change
-        # since this window will only examine one Simulator.
+        # since this window will only examine one Simulation.
         sim = topoconsole.active_sim()
         self._sim_eps = [ep for ep in sim.objects(Sheet).values()
                   if isinstance(ep,topo.base.cf.CFSheet)]

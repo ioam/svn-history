@@ -21,7 +21,7 @@ import unittest, copy
 import topo
 
 from topo.base.sheet import Sheet
-from topo.base.simulator import Simulator
+from topo.base.simulator import Simulation
 from topo.base.cf import CFSheet,CFProjection
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.commands.basic import save_snapshot,load_snapshot
@@ -47,7 +47,7 @@ class TestSnapshots(unittest.TestCase):
     
         save_snapshot("temp_test")
 
-        Simulator()
+        Simulation()
         self.assertNotEqual(topo.sim.name,test_sim_name)
 
         load_snapshot("temp_test")
