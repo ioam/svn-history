@@ -30,7 +30,6 @@ from topo.sheets.cfsom import CFSOM
 import topo.patterns.random
 import topo.patterns.basic
 from topo.learningfns.som import HebbianSOMLF
-from topo.patterns import PatternGeneratorParameter
 from topo.outputfns.basic import DivisiveSumNormalize
 from topo.misc.numbergenerators import RandomWrapper
 

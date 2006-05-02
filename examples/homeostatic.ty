@@ -23,7 +23,6 @@ from topo.base.parameterclasses import DynamicNumber,Number
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
-from topo.patterns import PatternGeneratorParameter
 from topo.base.functionfamilies import OutputFn
 from topo.base.arrayutils import clip_in_place
 from topo.misc.numbergenerators import RandomWrapper

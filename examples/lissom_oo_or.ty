@@ -25,7 +25,6 @@ from topo.learningfns.optimized import CFProjectionHebbian_opt1
 from topo.outputfns.optimized import CFProjectionDivisiveSumNormalize_opt1
 from topo.outputfns.basic import PiecewiseLinear, DivisiveSumNormalize
 from topo.misc.numbergenerators import RandomWrapper
-from topo.patterns import PatternGeneratorParameter
 
 topo.sim.name = "lissom_oo_or"
 
