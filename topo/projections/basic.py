@@ -17,7 +17,7 @@ from topo.base.projection import Projection
 from topo.base.functionfamilies import OutputFnParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number,BooleanParameter
-from topo.base.cf import CFProjection,CFPLearningFnParameter,IdentityCFPLearningFn,CFPResponseFnParameter,CFPOutputFnParameter,IdentityCFPOutputFn,CFPOutputFn, Mdot, ResponseFnParameter
+from topo.base.cf import CFProjection,CFPLearningFnParameter,IdentityCFPLearningFn,CFPResponseFnParameter,CFPOutputFnParameter,IdentityCFPOutputFn,CFPOutputFn,CFPResponseFn, Mdot, ResponseFnParameter
 from topo.base.patterngenerator import PatternGeneratorParameter
 from topo.base.sheetview import UnitView
 
@@ -25,7 +25,7 @@ from topo.outputfns.basic import IdentityOF
 
 
 
-class SharedCFPOutputFn(CFPOutputFn):
+class SWPOutputFn(CFPOutputFn):
     single_cf_fn = OutputFnParameter(default=IdentityOF())
     
     def __call__(self, cfs, output_activity, norm_values=None, **params):
@@ -35,8 +35,7 @@ class SharedCFPOutputFn(CFPOutputFn):
             self.single_cf_fn(cf.weights)
 
 
-
-class SharedCFPResponseFn(ParameterizedObject):
+class SWPResponseFn(CFPResponseFn):
     """
     Response function accepting a single CF applied to all units.
     Otherwise similar to GenericCFResponseFn.
@@ -68,13 +67,13 @@ class SharedCFPResponseFn(ParameterizedObject):
 # in connectionfield.py.
 class SharedWeightProjection(CFProjection):
     """
-    A Projection with a single ConnectionField shared by all units.
+    A Projection with a single set of weights, shared by all units.
 
     Otherwise similar to CFProjection, except that learning is
     currently disabled.
     """
     response_fn = CFPResponseFnParameter(
-        default=SharedCFPResponseFn())
+        default=SWPResponseFn())
     
     ### JABHACKALERT: Set to be constant as a clue that learning won't
     ### actually work yet.
@@ -86,7 +85,7 @@ class SharedWeightProjection(CFProjection):
     strength = Number(default=1.0)
 
     weights_output_fn = CFPOutputFnParameter(
-        default=SharedCFPOutputFn())
+        default=SWPOutputFn())
 
 
     def __init__(self,**params):
