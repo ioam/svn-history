@@ -313,8 +313,9 @@ topo.sim.connect('V1s','V1s',delay=FixedPoint("0.05"),
 
 ### Scheduled actions
 #
-
 # CEBHACKALERT: add missing scheduled actions (see lissom_oo_or.ty)
+
+topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
 
 topo.sim.schedule_command(200,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.12))')
 topo.sim.schedule_command(500,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.084))')
