@@ -66,7 +66,7 @@ class SharedCFPResponseFn(ParameterizedObject):
 # CEBHACKALERT: users should not access .sharedcf or .cfs directly,
 # but should use .cf(r,c). That all needs to be cleaned up, here and
 # in connectionfield.py.
-class SharedCFProjection(CFProjection):
+class SharedWeightProjection(CFProjection):
     """
     A Projection with a single ConnectionField shared by all units.
 
@@ -96,7 +96,7 @@ class SharedCFProjection(CFProjection):
         """
         # we don't want the whole set of cfs initialized, but we
         # do want anything that Projection defines.
-        super(SharedCFProjection,self).__init__(initialize_cfs=False,**params)
+        super(SharedWeightProjection,self).__init__(initialize_cfs=False,**params)
 
         self.sharedcf=self.cf_type(0,0,
                                    self.src,

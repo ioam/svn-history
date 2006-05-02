@@ -18,7 +18,7 @@ import topo.patterns.basic
 import topo.patterns.random
 
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.projections.basic import CFProjection, SharedCFProjection
+from topo.projections.basic import CFProjection, SharedWeightProjection
 from topo.base.parameterclasses import DynamicNumber,Number
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
@@ -85,16 +85,16 @@ topo.sim['LGNOn'] = CFSheet(density=10.0,bounds=BoundingBox(radius=0.5+0.25),
 
 
 # LGN ON channel
-SharedCFProjection.learning_fn.output_fn=DivisiveSumNormalize()
+SharedWeightProjection.learning_fn.output_fn=DivisiveSumNormalize()
 
 topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),
-                  connection_type=SharedCFProjection,strength=2.33,
+                  connection_type=SharedWeightProjection,strength=2.33,
                   name='Center',weights_bounds=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),
-                  connection_type=SharedCFProjection,strength=-2.33,
+                  connection_type=SharedWeightProjection,strength=-2.33,
                   name='Surround',weights_bounds=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
