@@ -624,7 +624,7 @@ class CFProjection(Projection):
         center unit), and then these bounds are converted to a slice
         in such a way that the slice exactly includes all units whose
         centers are within the bounds (see
-        CoordinateTransformer.bounds2slice()). However, to ensure that
+        SheetCoordinateSystem.bounds2slice()). However, to ensure that
         the bounds are treated symmetrically, we take the right and
         bottom bounds and reflect these about the center of the
         slice. Hence, if the bounds happen to go through units, if the

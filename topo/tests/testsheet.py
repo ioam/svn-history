@@ -29,7 +29,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         self.box = BoundingBox(points=((self.left,self.bottom),
                                        (self.right,self.top)))
 
-        self.ct = CoordinateTransformer(self.box,self.density,self.density)
+        self.ct = SheetCoordinateSystem(self.box,self.density,self.density)
 
         # float bounds for matrix coordinates: these
         # values are actually outside the matrix
@@ -349,7 +349,7 @@ class TestCoordinateTransforms(unittest.TestCase):
     def test_slice2bounds_bounds2slice(self):
 
 	bb = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
-        ct = CoordinateTransformer(bb,10)
+        ct = SheetCoordinateSystem(bb,10)
 
 	slice =(0,3,7,8)
 	bounds = ct.slice2bounds(slice)
@@ -380,7 +380,7 @@ class TestCoordinateTransforms(unittest.TestCase):
 	    self.assertEqual(a,b)
 
 	bb = BoundingBox(points=((-0.75,-0.5),(0.75,0.5)))
-        ct = CoordinateTransformer(bb,20,20)
+        ct = SheetCoordinateSystem(bb,20,20)
 
 	slice =(9,14,27,29)
 	bounds = ct.slice2bounds(slice)
@@ -404,7 +404,7 @@ class TestCoordinateTransforms(unittest.TestCase):
 	    self.assertEqual(a,b)
 
 	bb = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
-        ct = CoordinateTransformer(bb,7)
+        ct = SheetCoordinateSystem(bb,7)
 
 	slice =(4,7,2,3)
 	bounds = ct.slice2bounds(slice)
@@ -473,7 +473,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         # test that if you ask to slice the matrix with the sheet's BoundingBox, you
         # get back the whole matrix
         sheet_bb = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
-        ct = CoordinateTransformer(sheet_bb,10)
+        ct = SheetCoordinateSystem(sheet_bb,10)
         
         slice_ = ct.bounds2slice(sheet_bb)
         true_slice = (0,10,0,10) # inclusive left boundary, exclusive right boundary
@@ -484,7 +484,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         # then drawn to get the slice from it.
        
 	# Test with 20 density. 
-        ct = CoordinateTransformer(sheet_bb,20,20)
+        ct = SheetCoordinateSystem(sheet_bb,20,20)
         bb = BoundingBox(points=((-0.05,-0.20),(0.20,0.05)))
         slice = ct.bounds2slice(bb)
 
@@ -509,14 +509,14 @@ class TestCoordinateTransforms(unittest.TestCase):
 	# test with 7 density sheet.
 	
 	bb = BoundingBox(points=((-0.5+2.0/7.0,0.5-2.0/7.0),(-0.5+4.0/7.0,0.5)))
-        ct = CoordinateTransformer(sheet_bb,7)
+        ct = SheetCoordinateSystem(sheet_bb,7)
         
         slice = ct.bounds2slice(bb)
         true_slice = (0,2,2,4) 
         self.assertEqual(slice,true_slice)
 
         #(4x4 matrix)
-        ct = CoordinateTransformer(BoundingBox(radius=0.2),xdensity=10,ydensity=10)
+        ct = SheetCoordinateSystem(BoundingBox(radius=0.2),xdensity=10,ydensity=10)
         test_bounds = BoundingBox(radius=0.1)
         r1,r2,c1,c2 = ct.bounds2slice(test_bounds)
         self.assertEqual((r1,r2,c1,c2),(1,3,1,3))
@@ -537,7 +537,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         # (I chose to use a 7 density, I don't know why I like 7 so much, it is kind of mystical)
 	
 	sheet_bb = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
-        ct = CoordinateTransformer(sheet_bb,7)
+        ct = SheetCoordinateSystem(sheet_bb,7)
 	slice = (0,7,0,7)
 	bounds = ct.slice2bounds(slice)
 	true_bounds_lbrt = (-0.5,-0.5,0.5,0.5)
@@ -550,7 +550,7 @@ class TestCoordinateTransforms(unittest.TestCase):
         # from it.
        	
 	# Test for 10 density
-        ct = CoordinateTransformer(sheet_bb,10)
+        ct = SheetCoordinateSystem(sheet_bb,10)
 	slice = (0,9,1,5)
 	bounds = ct.slice2bounds(slice)
 	true_bounds_lbrt = (-0.4,-0.4,0,0.5)
@@ -564,7 +564,7 @@ class TestCoordinateTransforms(unittest.TestCase):
 	    self.assertAlmostEqual(a,b)
 	
        	# Test for 7 density
-        ct = CoordinateTransformer(sheet_bb,7)
+        ct = SheetCoordinateSystem(sheet_bb,7)
 	slice = (3,7,2,5)
 	bounds = ct.slice2bounds(slice)
 	true_bounds_lbrt = (-0.5+2.0/7.0,-0.5,-0.5+5.0/7.0,0.5-3.0/7.0)
@@ -578,7 +578,7 @@ class TestCoordinateTransforms(unittest.TestCase):
 	    self.assertAlmostEqual(a,b)
 
 	# Test for 25 density
-        ct = CoordinateTransformer(sheet_bb,25)
+        ct = SheetCoordinateSystem(sheet_bb,25)
 	slice = (0,25,4,10)
 	bounds = ct.slice2bounds(slice)
 	true_bounds_lbrt = (-0.5+4.0/25.0,-0.5,-0.5+10.0/25.0,0.5)
@@ -640,7 +640,7 @@ class TestCoordinateTransforms(unittest.TestCase):
 
         bounds = BoundingBox(points=((l,b),(r,t)))
 
-        ct = CoordinateTransformer(bounds,density,density)
+        ct = SheetCoordinateSystem(bounds,density,density)
         
         self.assertEqual(ct.sheet2matrixidx(0.8,0.8),(0,24+1))
         self.assertEqual(ct.sheet2matrixidx(0.0,0.0),(12,12))

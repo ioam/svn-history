@@ -102,9 +102,6 @@ from Numeric import zeros,array,floor,ceil,Float,ArrayType,around
 from boundingregion import BoundingBox, BoundingRegionParameter
 import sheetview 
 
-# CEBHACKALERT: seems likely that CoordinateTransformer should
-# go into its own file, so things such as PatternGenerator do
-# not depend on all the rest of Sheet.
 
 
 # CEBHACKALERT: The user-specified input to a CT is 'bounds' and
@@ -119,7 +116,7 @@ import sheetview
 # weights_bounds should be user_weights_bounds, or something like
 # that.)
 
-class CoordinateTransformer(object):
+class SheetCoordinateSystem(object):
     """
     Provides methods to allow conversion between sheet and matrix
     coordinates.    
@@ -367,7 +364,7 @@ class CoordinateTransformer(object):
 
 
     
-class Sheet(EventProcessor,CoordinateTransformer):
+class Sheet(EventProcessor,SheetCoordinateSystem):
     """
     The generic base class for neural sheets.
 
@@ -436,7 +433,7 @@ class Sheet(EventProcessor,CoordinateTransformer):
     def __init__(self,**params):
         """
         Initialize this object as an EventProcessor, then also as
-        a CoordinateTransformer with equal xdensity and ydensity.
+        a SheetCoordinateSystem with equal xdensity and ydensity.
 
         If equalize_densities is False, xdensity and ydensity are
         not guaranteed to be the same, which would likely violate
@@ -444,10 +441,10 @@ class Sheet(EventProcessor,CoordinateTransformer):
 
         EventProcessor.__init__(self,**params)
 
-        # Now initialize this object as a CoordinateTransformer, with
+        # Now initialize this object as a SheetCoordinateSystem, with
         # the same density along y as along x (unless equalize_densities
         # is False).
-        CoordinateTransformer.__init__(self,self.bounds,self.density,
+        SheetCoordinateSystem.__init__(self,self.bounds,self.density,
                                        equalize_densities=True)
 
         n_units = round((self.lbrt[2]-self.lbrt[0])*self.xdensity,0)
@@ -532,13 +529,13 @@ class Sheet(EventProcessor,CoordinateTransformer):
 
 class Slice(object):
     """
-    Represents a slice of a CoordinateTransformer; i.e., an
+    Represents a slice of a SheetCoordinateSystem; i.e., an
     array specifying the row and column start and end points
-    for a submatrix of the CoordinateTransformer.
+    for a submatrix of the SheetCoordinateSystem.
 
     A Slice() is created from the specified slice_bounds by
     calculating the slice that corresponds to the bounds (see
-    CoordinateTransformer.bounds2slice).
+    SheetCoordinateSystem.bounds2slice).
 
     The slice elements can be recovered by unpacking an instance
     (e.g. k = Slice(); r1,r2,c1,c2 = k).
@@ -547,8 +544,8 @@ class Slice(object):
     available as the 'bounds' attribute.
 
     Actions such as translate() do not respect the bounds of the
-    CoordinateTransformer; to have the slice cropped to the
-    CoordinateTransformer's bounds, use crop_to_sheet().
+    SheetCoordinateSystem; to have the slice cropped to the
+    SheetCoordinateSystem's bounds, use crop_to_sheet().
     """
     ### Allows shape to work like Numeric.array's
     # CEBHACKALERT: can this method be made private?
@@ -562,7 +559,7 @@ class Slice(object):
         """
         Store the coordinate_transformer, calculate the
         slice corresponding to the specified slice_bounds
-        (see CoordinateTransformer.bounds2slice()), and
+        (see SheetCoordinateSystem.bounds2slice()), and
         store the bounds that exactly correspond to that
         calculated slice.
 
@@ -619,7 +616,7 @@ class Slice(object):
         slice.
 
         Equivalent to computing the intersection between the
-        CoordinateTransformer's bounds and the slice_bounds, and
+        SheetCoordinateSystem's bounds and the slice_bounds, and
         returning the corresponding submatrix of the given matrix.
 
         The submatrix is just a view into the sheet_matrix; it is not
@@ -631,7 +628,7 @@ class Slice(object):
     ## CEBHACKALERT: should be crop_to_bounds
     def crop_to_sheet(self):
         """
-        Crop the slice to the CoordinateTransformer's bounds.
+        Crop the slice to the SheetCoordinateSystem's bounds.
         """
         r1,r2,c1,c2 = self.__ct.bounds2slice(self.__ct.true_bounds)
         maxrow,maxcol = r2-r1,c2-c1

@@ -13,7 +13,7 @@ from Numeric import add,subtract,cos,sin
 
 from parameterizedobject import ParameterizedObject
 from boundingregion import BoundingBox, BoundingRegionParameter
-from sheet import CoordinateTransformer
+from sheet import SheetCoordinateSystem
 from parameterclasses import Parameter,Number,ClassSelectorParameter
 from functionfamilies import OutputFnParameter, IdentityOF
 
@@ -126,7 +126,7 @@ class PatternGenerator(ParameterizedObject):
         self.verbose("bounds = ",bounds,"xdensity =",xdensity,"x =",x,"y=",y)
         # Generate vectors representing coordinates at which the pattern
         # will be sampled.
-        x_points,y_points = CoordinateTransformer(bounds,xdensity,ydensity).sheetcoordinates_of_matrixidx()
+        x_points,y_points = SheetCoordinateSystem(bounds,xdensity,ydensity).sheetcoordinates_of_matrixidx()
         # Generate matrices of x and y sheet coordinates at which to
         # sample pattern, at the correct orientation
         self.pattern_x, self.pattern_y = self.__create_and_rotate_coordinate_arrays(x_points-x,y_points-y,orientation)
@@ -184,7 +184,7 @@ class Constant(PatternGenerator):
         offset = params.get('offset',self.offset)
         output_fn = params.get('output_fn',self.output_fn)
 
-        shape = CoordinateTransformer(bounds,xdensity,ydensity).shape
+        shape = SheetCoordinateSystem(bounds,xdensity,ydensity).shape
 
         if output_fn is IdentityOF:
             return scale*ones(shape, Float)+offset

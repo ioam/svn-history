@@ -11,7 +11,7 @@ from Numeric import zeros, ones, Float, divide,ravel,clip,array
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Dynamic
 from topo.base.sheetview import SheetView
-from topo.base.sheet import Slice,CoordinateTransformer
+from topo.base.sheet import Slice,SheetCoordinateSystem
 
 from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap, Bitmap
 import palette
@@ -207,17 +207,17 @@ class TemplatePlot(Plot):
         # where it's used in the plotting?
         #
         # It's possible we can move some of the functionality
-        # into CoordinateTransformer.
+        # into SheetCoordinateSystem.
         if plot_bounding_box.containsbb_exclusive(box):
 
-             ct = CoordinateTransformer(plot_bounding_box,density,density)
+             ct = SheetCoordinateSystem(plot_bounding_box,density,density)
              new_mat = zeros(ct.shape,Float)
 
-             ct2 = CoordinateTransformer(plot_bounding_box,density,density)
+             ct2 = SheetCoordinateSystem(plot_bounding_box,density,density)
              r1,r2,c1,c2 = Slice(box,ct2)
              new_mat[r1:r2,c1:c2] = mat
         else:
-             s=Slice(plot_bounding_box,CoordinateTransformer(box,density,density))
+             s=Slice(plot_bounding_box,SheetCoordinateSystem(box,density,density))
              s.crop_to_sheet()
              new_mat = s.submatrix(mat)
 
