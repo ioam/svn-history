@@ -41,9 +41,15 @@ class BoundingBox(BoundingRegion):
     A rectangular bounding box defined either by two points forming
     an axis-aligned rectangle (or simply a radius for a square).
     """
+    def __str__(self):
+        """
+        Return BoundingBox(points=((left,bottom),(right,top)))
 
-    # CEBHACKALERT: override __str__ and __repr__ to print the lbrt
-    # values?
+        Reimplemented here so that 'print' for a BoundingBox
+        will display the bounds.
+        """
+        l,b,r,t = self._aarect.lbrt()
+        return 'BoundingBox(points=((%s,%s),(%s,%s)))'%(l,b,r,t)
 
     def __init__(self,**args):
         """
