@@ -112,6 +112,23 @@ class Hebbian(LearningFn):
         weights += single_connection_learning_rate * unit_activity * input_activity
 
 
+class IdentityLF(LearningFn):
+    """
+    Identity function; does not modify the weights.
+
+    For speed, calling this function object is sometimes optimized
+    away entirely.  To make this feasible, it is not allowable to
+    derive other classes from this object, modify it to have different
+    behavior, add side effects, or anything of that nature.
+    """
+    
+    def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
+        pass
+
+
+
+
+
 class LearningFnParameter(ClassSelectorParameter):
     """
     Parameter whose value can be any LearningFunction.
