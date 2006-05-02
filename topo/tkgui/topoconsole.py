@@ -132,10 +132,6 @@ class TopoConsole(Frame):
     def __init__(self, parent=None,**config):
         Frame.__init__(self,parent,config)
 
-        # CEBHACKALERT: for all the GUI/plotting things I don't know about yet
-        # that ask for a topoconsole's simulation.
-        self.simulator = topo.sim
-
         self.parent = parent
         self.num_activity_windows = 0
         self.num_orientation_windows = 0
@@ -533,7 +529,7 @@ class TopoConsole(Frame):
         recenttimes=[]
 
         # Temporary:
-        #self.parent.title(self.simulator.name) ## this changes the title bar to more usefull
+        #self.parent.title(topo.sim.name) ## this changes the title bar to more useful
 
         ## Duration of most recent times from which to estimate remaining time
         estimate_interval=50.0
