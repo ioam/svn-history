@@ -158,7 +158,7 @@ class SheetCoordinateSystem(object):
         center_y = bottom + height/2.0
         # The true density is not equal to the nominal_density
         # when nominal_density*(right-left) is not an integer.
-        true_density = int(nominal_density*(width))/float((width))
+        true_density = int(nominal_density*(width))/float(width)
 
         n_cells = round(height*true_density,0)
         adjusted_half_height = n_cells/true_density/2.0
