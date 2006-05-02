@@ -221,7 +221,7 @@ class EventProcessor(ParameterizedObject):
         self.out_connections = {None:[]}
 
         # The simulation link is not set until the call to add()
-        self.simulator = None
+        self.simulation = None
 
 
     # if extra parameters are required for an EP subclass, a
@@ -265,7 +265,7 @@ class EventProcessor(ParameterizedObject):
         Send some data out to all connections on the given src_port.
         """
         for conn in self.out_connections[src_port]:
-            self.simulator.enqueue_event_rel(conn.delay,self,conn.dest,conn.src_port,conn.dest_port,data)
+            self.simulation.enqueue_event_rel(conn.delay,self,conn.dest,conn.src_port,conn.dest_port,data)
 
 
     def input_event(self,src,src_port,dest_port,data):
@@ -472,9 +472,9 @@ class Simulation(ParameterizedObject):
 
         Note, EventProcessors do not necessarily have to be added to
         the simulation to be used, but they will not receive the
-        start() message.  Adding a node to the simulator also sets the
-        backlink node.simulator, so that the node can enqueue events
-        and read the simulator clock.
+        start() message.  Adding a node to the simulation also sets the
+        backlink node.simulation, so that the node can enqueue events
+        and read the simulation clock.
         """
         if not isinstance(ep_name,str):
            raise TypeError("Expected string for item name (EPs in the Simulation are indexed by name).")
@@ -490,11 +490,7 @@ class Simulation(ParameterizedObject):
             # it ought to delete it properly (i.e. remove connections
             # etc). We need a delete() method already anyway.
             self._event_processors[ep_name] = ep
-            ep.simulator = self
-            # Temporary: simulation is an alias for simulator
             ep.simulation = self
-            ep.start()
-
 
     def time(self):
         """

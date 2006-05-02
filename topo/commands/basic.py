@@ -1,5 +1,5 @@
 """
-High-level user-level commands controlling the entire simulator.
+High-level user-level commands controlling the entire simulation.
 $Id$
 """
 __version__='$Revision$'
@@ -39,12 +39,12 @@ def pattern_present(inputs=None,duration=1.0,learning=False,overwrite_previous=F
 
     Given a set of input patterns (dictionary of
     GeneratorSheetName:PatternGenerator pairs), installs them into the
-    specified GeneratorSheets, runs the simulator for the specified
+    specified GeneratorSheets, runs the simulation for the specified
     length of time, then restores the original patterns and the
-    original simulator time.  Thus this input is not considered part
+    original simulation time.  Thus this input is not considered part
     of the regular simulation, and is usually for testing purposes.
 
-    If a simulator is not provided, the active simulator, if one
+    If a simulation is not provided, the active simulation, if one
     exists, is requested.
 
     If this process is interrupted by the user, the temporary patterns
@@ -111,7 +111,7 @@ def save_snapshot(snapshot_name):
     Save a snapshot of the network's current state.
 
     Commands listed in topo.sim.startup_commands are stored ready
-    to run before the simulator is unpickled in the future.
+    to run before the simulation is unpickled in the future.
 
     Uses Python's 'pickle' module, so subject to the same limitations (see
     the pickle module's documentation) - except that class attributes
@@ -146,14 +146,14 @@ def save_snapshot(snapshot_name):
     startup_commands = topo.sim.startup_commands
 
 
-    ### Set the release version for this simulator.
+    ### Set the release version for this simulation.
     #
     topo.sim.RELEASE = topo.release
 
 
-    ### Pickle the simulator itself
+    ### Pickle the simulation itself
     #
-    # Note that simulator is subjected to two levels of pickling so
+    # Note that simulation is subjected to two levels of pickling so
     # that commands can be executed before it's unpickled.
     # CEBHACKALERT: someone should figure out if that is really
     # necessary
@@ -174,7 +174,7 @@ def load_snapshot(snapshot_name):
 
     First executes any commands that were stored previously in
     topo.sim.startup_commands, then restores class attributes
-    for ParameterizedObjects, then loads the simulator.
+    for ParameterizedObjects, then loads the simulation.
     """
     u = ExtraUnpickler(open(snapshot_name,'rb'))
     startup_commands,states_of_classes,pickled_sim = u.load()
@@ -204,7 +204,7 @@ def load_snapshot(snapshot_name):
     # i.e. they're all in the source code.
 
 
-    ### Now unpickle the simulator and set it to be topo.sim
+    ### Now unpickle the simulation and set it to be topo.sim
     #
     pickled_sim.seek(0)
     v = ExtraUnpickler(pickled_sim)

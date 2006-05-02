@@ -194,7 +194,7 @@ class ConnectionTool(Frame) :
 
     def create_connection(self, editor_connection, node) :
         # connects the ed connection. Will also form correct connection in the
-        # topo simulator.
+        # topo simulation.
         if self.parameter_tool.focus :
             self.parameter_tool.update_parameters()
         sim = self.canvas.simulator

@@ -61,7 +61,7 @@ class EditorCanvas(Canvas) :
         self.display_mode = 'video'
         self.mode = "ARROW"
         self.MAX_VIEWS = 5
-        # get the topo simulator
+        # get the topo simulation
         self.simulator = topo.sim
         print self.simulator.name # Do we need to print this? 
 
@@ -508,7 +508,7 @@ class ModelEditor :
         # give the canvas a reference to the toolbars
         canvas.set_tool_bars(arrow_tool, connection_tool, object_tool) 
 
-        # give the canvas focus and import any objects and connections already in the simulator
+        # give the canvas focus and import any objects and connections already in the simulation
         canvas.focus_set()
         self.canvas = canvas
         self.import_model()
@@ -517,7 +517,7 @@ class ModelEditor :
         # random generator, and values used for randomly positioning sheets
         random_generator = Random() 
         padding = 75; spread_extent = 500
-        # get a list of all the sheets in the simulator
+        # get a list of all the sheets in the simulation
         sim = self.canvas.simulator
         node_dictionary = sim.objects(Sheet)
         node_list = node_dictionary.values()

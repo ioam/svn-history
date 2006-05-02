@@ -138,8 +138,10 @@ def measure_cog():
                 
 
 def update_activity():
-    """Measure an activity map. Command called when opening an activity plot group panel.
-    To be exact, just add the activity sheet_view for Sheets objects of the simulator
+    """
+    Measure an activity map. Command called when opening an activity plot group panel.
+
+    To be precise, just add the activity sheet_view for Sheets objects of the simulation.
     """
     for sheet in topo.sim.objects(Sheet).values():
         activity_copy = array(sheet.activity)

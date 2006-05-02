@@ -36,8 +36,8 @@ class PulseGenerator(EventProcessor):
 
     def start(self):
         if self.period:
-            self.simulator.connect(self.name,self.name,delay=self.period)
-        self.simulator.enqueue_event_rel(self.phase,self,self)
+            self.simulation.connect(self.name,self.name,delay=self.period)
+        self.simulation.enqueue_event_rel(self.phase,self,self)
         EventProcessor.start(self)
 
 
@@ -79,7 +79,7 @@ class SumUnit(EventProcessor):
         self.debug("received",data,"from",src,"value =",self.value)
 
     def pre_sleep(self):
-        self.debug("pre_sleep called, time =",self.simulator.time(),"value =",self.value)
+        self.debug("pre_sleep called, time =",self.simulation.time(),"value =",self.value)
         if self.value:
             self.debug("Sending output:",self.value)
             self.send_output(data=self.value)

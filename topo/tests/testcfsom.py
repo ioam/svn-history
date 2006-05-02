@@ -78,7 +78,7 @@ class ImageSaver(EventProcessor):
         filename = self.file_prefix + self.name
         if dest_port:
             filename += "_" + str(dest_port)
-        filename += "_" + (self.time_format % self.simulator.time())
+        filename += "_" + (self.time_format % self.simulation.time())
         filename += "." + self.file_format
 
         self.verbose("filename = '%s'" % filename)

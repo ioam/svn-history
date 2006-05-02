@@ -95,7 +95,7 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
  
     def display_labels(self):
         """
-        Change the title of the grid group by refreshing the time simulator,
+        Change the title of the grid group by refreshing the simulated time,
         then call PlotGroupPanel's display_labels().
         """
         self.plot_group_title.configure(tag_text = self.mapname.get() + \

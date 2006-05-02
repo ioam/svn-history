@@ -51,12 +51,12 @@ class CFSOM(CFSheet):
     ### delete that there and in obermayer, yet still override the
     ### decay and alpha function.
     def alpha(self):
-        """Return the learning rate at a specified simulator time, using exponential falloff."""
-        return self.alpha_0 * self.decay(float(self.simulator.time()),self.half_life)
+        """Return the learning rate at a specified simulation time, using exponential falloff."""
+        return self.alpha_0 * self.decay(float(self.simulation.time()),self.half_life)
 
     def radius(self):
-        """Return the radius at a specified simulator time, using exponential falloff."""
-        return self.radius_0 * self.decay(float(self.simulator.time()),self.half_life)
+        """Return the radius at a specified simulation time, using exponential falloff."""
+        return self.radius_0 * self.decay(float(self.simulation.time()),self.half_life)
 
     def learn(self):
         """

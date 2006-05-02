@@ -20,7 +20,7 @@ from Numeric import array, exp
 from topo.base.sheet import Sheet
 from topo.base.boundingregion import BoundingBox
 
-# for making a simulator:
+# for making a simulation:
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.cf import CFProjection
 from topo.sheets.cfsom import CFSOM

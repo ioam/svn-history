@@ -43,7 +43,7 @@ python_doc_locations = ('http://www.python.org/doc/')
 topo_www_locations = ('http://www.topographica.org/')
 
 
-# CEBHACKALERT: lose this and get TopoConsole.simulator instead
+# CEBHACKALERT: lose this and get TopoConsole.simulation instead
 def active_sim():
     return topo.sim
 
@@ -133,7 +133,7 @@ class TopoConsole(Frame):
         Frame.__init__(self,parent,config)
 
         # CEBHACKALERT: for all the GUI/plotting things I don't know about yet
-        # that ask for a topoconsole's simulator.
+        # that ask for a topoconsole's simulation.
         self.simulator = topo.sim
 
         self.parent = parent
@@ -172,7 +172,7 @@ class TopoConsole(Frame):
         self.menubar.addmenuitem('Simulation', 'command', 'Load script file',
                                  label = 'Load script',
                                  command = self.load_network)
-        self.menubar.addmenuitem('Simulation', 'command', "Save simulator's state to disk",
+        self.menubar.addmenuitem('Simulation', 'command', "Save simulation's state to disk",
                                  label = 'Save snapshot',
                                  command = self.save_snapshot)
         self.menubar.addmenuitem('Simulation', 'command', 'Load the previously saved state',
@@ -266,7 +266,7 @@ class TopoConsole(Frame):
         #
         # Learning
         #
-        learning_group = Pmw.Group(self,tag_text='Run simulator for:')
+        learning_group = Pmw.Group(self,tag_text='Run simulation for:')
         learning_frame = learning_group.interior()
         learning_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
 
@@ -450,9 +450,9 @@ class TopoConsole(Frame):
     #
     def do_command(self,cmd):
         """
-        Pass a Python command to a simulator object so that it can execute it
-        in the simulator namespace.  Print the result that comes back.  Assumes
-        that the simulator always returns and does not throw any exceptions
+        Pass a Python command to a simulation object so that it can execute it
+        in the simulation namespace.  Print the result that comes back.  Assumes
+        that the simulation always returns and does not throw any exceptions
         if the cmd contains an error.
         """
         result = self.exec_cmd(cmd)
@@ -466,7 +466,7 @@ class TopoConsole(Frame):
         command are caught, and the name of the exception is passed back to the
         calling function.  If the command goes through, an OK is sent, along with
         a copy of the command.
-        Collisions between simultaneously running simulators are possible.
+        Collisions between simultaneously running simulations are possible.
         """
         try:
             #g = globals()
@@ -509,7 +509,7 @@ class TopoConsole(Frame):
 
     def do_learning(self,duration):
         """
-        Run the simulator for the specified simulator time duration.
+        Run the simulation for the specified simulation time duration.
         
         All this routine truly needs to do is
         topo.sim.run(float(duration)), but it adds other useful

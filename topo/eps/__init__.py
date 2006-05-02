@@ -2,7 +2,7 @@
 EventProcessor classes.
 
 An EventProcessor is an object that the Simulation is aware of, and can
-accept simulator Events. EventProcessors can also generate Events, and
+accept simulation Events. EventProcessors can also generate Events, and
 will presumably do some computation as well.  Most EventProcessors
 will be in other more specific packages, such as topo.sheets; those
 here are the remaining uncategorized EventProcessors.  Any new

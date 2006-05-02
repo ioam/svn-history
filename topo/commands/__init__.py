@@ -1,5 +1,5 @@
 """
-A family of high-level user commands acting on the entire simulator.
+A family of high-level user commands acting on the entire simulation.
 
 Any new commands added to this directory will automatically become
 available for any program.

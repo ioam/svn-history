@@ -52,7 +52,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         self.INITIAL_PLOT_HEIGHT = 100
         self.padding = padding
 
-        ### Find the GeneratorSheets in the simulator, set up generator_sheet_patterns dictionary
+        ### Find the GeneratorSheets in the simulation, set up generator_sheet_patterns dictionary
         #
         # generator_sheets_patterns = 
         # {generator_sheet_name:  { 'generator_sheet': <gs_obj>,
@@ -249,7 +249,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         input to the input sheets.  This should work like a test stimuli,
         but the original input generator is not put back afterwards.
 
-        This function does run() the simulator but for 0.0 time.
+        This function does run() the simulation, but for 0.0 time.
         """
         #self.__setup_pattern_generators()
         #input_dict = dict([(name,d['pattern_generator'])
