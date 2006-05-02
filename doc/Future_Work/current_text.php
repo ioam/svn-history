@@ -15,15 +15,19 @@ was first added to the list, or a change was made.)
 <!-- CB: I put my tasks in the approximate order that I'm doing them -->
 
 <li> 
-2006/04/21 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler [**before release]
+2006/05/02 (CB): Finish Slice and CoordinateTransformer classes; rename CoordinateTransformer to SheetCoordinateSystem and move to sheetcoords.py; update PatternSampler [**before release]
 </li>
 
 <li>
-2006/05/02 (CB): Has the performance worsened (e.g. lissom_oo_or)? [** before release]
+2006/05/02 (CB): Matching with C++ lissom; has the performance worsened (e.g. lissom_oo_or)? [** before release]
 </li>
 
 <li> 
 2006/04/24 (CB): Update user manuals regarding Sheet density [** before release]
+</li>
+
+<li> 
+2006/05/02 (CB): Update documentation in general [** before release]
 </li>
 
 <li>
@@ -31,15 +35,19 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/05/02: (CB) create Identity learning and response functions; rename SharedCFProjection SharedWeightCFProjection; make sure GUI lists are populated (and try to make that simpler). [** before release]
+2006/05/02: (CB) create Identity learning and response functions; rename SharedCFProjection SharedWeightCFProjection; make sure GUI lists are populated for e.g. ResponseFns and CFPResponseFns (and try to make that simpler). [** before release]
 </li>
 
-<li>
-2006/04/26 (CB): matching with C++ LISSOM when there are circular connection fields [seems to match, just have to check bounds changes etc and then after 20000 iterations]; HACKALERTs relating to connection fields; test file for connectionfield
+<li> 
+2006/05/02 (CB): Procedure for making a Windows binary.
 </li>
 
 <li>
 2006/04/07: (CB) Allowing joint normalization of projections for a CFSheet. [This appears to work, but results from LISSOM simulations do not yet match those of C++ LISSOM.]
+</li>
+
+<li>
+2006/05/02 (CB): HACKALERTs relating to connection fields; test file for connectionfield.
 </li>
 
 <li>
