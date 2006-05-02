@@ -62,8 +62,8 @@ class EditorCanvas(Canvas) :
         self.mode = "ARROW"
         self.MAX_VIEWS = 5
         # get the topo simulation
-        self.simulator = topo.sim
-        print self.simulator.name # Do we need to print this? 
+        self.simulation = topo.sim
+        print self.simulation.name # Do we need to print this? 
 
         # create the menu widget used as a popup on objects and connections
         self.option_add("*Menu.tearOff", "0") 
@@ -518,7 +518,7 @@ class ModelEditor :
         random_generator = Random() 
         padding = 75; spread_extent = 500
         # get a list of all the sheets in the simulation
-        sim = self.canvas.simulator
+        sim = self.canvas.simulation
         node_dictionary = sim.objects(Sheet)
         node_list = node_dictionary.values()
 

@@ -131,7 +131,7 @@ class NodeTool(Frame) :
             self.parameter_tool.update_parameters()
         # get the current selection and create the new topo object
         sheet = self.sheet_list[self.current_option]()
-        sim = self.canvas.simulator # get the current simulator
+        sim = self.canvas.simulation # get the current simulation
         sim[sheet.name] = sheet
         # create the cover for the sheet and return it.
         return EditorSheet(self.canvas, sheet, (x, y), sheet.name)
@@ -197,7 +197,7 @@ class ConnectionTool(Frame) :
         # topo simulation.
         if self.parameter_tool.focus :
             self.parameter_tool.update_parameters()
-        sim = self.canvas.simulator
+        sim = self.canvas.simulation
         from_node = editor_connection.from_node.sheet
         to_node = node.sheet
         con_type = self.proj_list[self.current_option]
