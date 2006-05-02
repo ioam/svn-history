@@ -17,7 +17,6 @@ import topo.patterns.basic
 from topo.base.cf import CFProjection
 from topo.base.parameterclasses import DynamicNumber, Number, Wrapper
 from topo.base.patterngenerator import BoundingBox
-from topo.base.simulator import Simulator
 from topo.learningfns.som import HebbianSOMLF
 from topo.outputfns.basic import PiecewiseLinear
 from topo.patterns import PatternGeneratorParameter

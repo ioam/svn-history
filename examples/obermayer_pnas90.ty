@@ -29,7 +29,6 @@ from topo.base.parameterclasses import Number,DynamicNumber
 from topo.sheets.cfsom import CFSOM
 import topo.patterns.random
 import topo.patterns.basic
-from topo.base.simulator import Simulator
 from topo.learningfns.som import HebbianSOMLF
 from topo.patterns import PatternGeneratorParameter
 from topo.outputfns.basic import DivisiveSumNormalize
