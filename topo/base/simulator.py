@@ -709,3 +709,5 @@ class Simulator(ParameterizedObject):
                      for (ep_name,ep) in self._event_processors.items()
                      if isinstance(ep,baseclass)])
         
+### Temporary: Simulation is an alias for Simulator
+Simulation=Simulator
