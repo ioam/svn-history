@@ -13,7 +13,7 @@ from Numeric import add,subtract,cos,sin
 
 from parameterizedobject import ParameterizedObject
 from boundingregion import BoundingBox, BoundingRegionParameter
-from sheet import SheetCoordinateSystem
+from sheetcoords import SheetCoordinateSystem
 from parameterclasses import Parameter,Number,ClassSelectorParameter
 from functionfamilies import OutputFnParameter, IdentityOF
 

@@ -11,7 +11,8 @@ from Numeric import zeros, ones, Float, divide,ravel,clip,array
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Dynamic
 from topo.base.sheetview import SheetView
-from topo.base.sheet import Slice,SheetCoordinateSystem
+from topo.base.sheet import Slice
+from topo.base.sheetcoords import SheetCoordinateSystem
 
 from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap, Bitmap
 import palette

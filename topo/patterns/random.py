@@ -12,7 +12,7 @@ import RandomArray
 
 from topo.base.parameterclasses import Number,Parameter
 from topo.base.patterngenerator import PatternGenerator
-from topo.base.sheet import SheetCoordinateSystem
+from topo.base.sheetcoords import SheetCoordinateSystem
 
 from topo.outputfns.basic import IdentityOF
 

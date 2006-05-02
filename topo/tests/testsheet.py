@@ -7,6 +7,7 @@ __version__='$Revision$'
 
 import unittest
 import topo
+from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.base.sheet import *
 import topo.base.parameterizedobject
 import Numeric
