@@ -491,6 +491,8 @@ class Simulation(ParameterizedObject):
             # etc). We need a delete() method already anyway.
             self._event_processors[ep_name] = ep
             ep.simulator = self
+            # Temporary: simulation is an alias for simulator
+            ep.simulation = self
             ep.start()
 
 

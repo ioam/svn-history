@@ -114,7 +114,7 @@ class ProjectionSheet(Sheet):
         Accept input from some sheet.  Call .present_input() to
         compute the stimulation from that sheet.
         """
-        #self.message("Received input from",src,"at time",self.simulator.time())
+        #self.message("Received input from",src,"at time",self.simulation.time())
         self.present_input(data,src,port)
         self.new_input = True
 
@@ -135,7 +135,7 @@ class ProjectionSheet(Sheet):
 
     def pre_sleep(self):
         """
-        Called by the simulator after all the events are processed for the 
+        Called by the simulation after all the events are processed for the 
         current time but before time advances.  Allows the event processor
         to send any events that must be sent before time advances to drive
         the simulation. 

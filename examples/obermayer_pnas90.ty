@@ -52,14 +52,14 @@ class ObermayerSOM(CFSOM):
     midpoint = 15000
     
     def alpha(self):
-        return self.alpha_0 + (self.alpha_f-self.alpha_0)/self.learning_length*float(self.simulator.time())
+        return self.alpha_0 + (self.alpha_f-self.alpha_0)/self.learning_length*float(self.simulation.time())
     
     def radius(self):
        """Two-part piecewise-linear decay function."""
-       if self.simulator.time() < self.midpoint:
-         return self.radius_0 + (self.radius_m-self.radius_0)/self.midpoint*float(self.simulator.time())
+       if self.simulation.time() < self.midpoint:
+         return self.radius_0 + (self.radius_m-self.radius_0)/self.midpoint*float(self.simulation.time())
        else:
-         return self.radius_m + (self.radius_f-self.radius_m)/(self.learning_length-self.midpoint)*float(self.simulator.time()-self.midpoint)
+         return self.radius_m + (self.radius_f-self.radius_m)/(self.learning_length-self.midpoint)*float(self.simulation.time()-self.midpoint)
 
 
 

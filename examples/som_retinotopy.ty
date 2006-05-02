@@ -41,11 +41,11 @@ class RetinotopicSOM(CFSOM):
 
     def alpha(self):
        """Exponential decay."""
-       return self.alpha_0*exp(-6.0*(float(self.simulator.time())/self.learning_length))
+       return self.alpha_0*exp(-6.0*(float(self.simulation.time())/self.learning_length))
     
     def radius(self):
        """Exponential decay, but with a minimum value enforced."""
-       decayed_radius = self.radius_0*exp(-5.0*(float(self.simulator.time())/self.learning_length))
+       decayed_radius = self.radius_0*exp(-5.0*(float(self.simulation.time())/self.learning_length))
        return max(decayed_radius,self.radius_min)
 
 

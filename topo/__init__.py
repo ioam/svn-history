@@ -18,7 +18,7 @@ that can be used with the above functions and classes:
 sheets      - Sheet classes: 2D arrays of processing units
 projections - Projection classes: connections between Sheets
 patterns    - PatternGenerator classes: 2D input or weight patterns 
-eps         - EventProcessor classes: other simulator objects
+eps         - EventProcessor classes: other simulation objects
 outputfns   - Output functions, for e.g. normalization or squashing
 responsefns - Calculate the response of a Projection
 learningfns - Adjust weights for a Projection
