@@ -30,7 +30,7 @@ import topo
 import patterngenerator
 from patterngenerator import PatternGeneratorParameter
 from parameterizedobject import ParameterizedObject
-from functionfamilies import OutputFnParameter,IdentityOF,LearningFnParameter,Hebbian,ResponseFnParameter,Mdot
+from functionfamilies import OutputFnParameter,IdentityOF,LearningFnParameter,Hebbian,ResponseFnParameter,Mdot,IdentityLF
 from projection import Projection,ProjectionSheet
 from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter
 from sheet import Sheet,Slice
@@ -368,6 +368,7 @@ class CFPLearningFn(ParameterizedObject):
 
 class IdentityCFPLearningFn(CFPLearningFn):
     """CFLearningFunction performing no learning."""
+    single_cf_fn = LearningFnParameter(default=IdentityLF(),constant=True)
   
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         pass
