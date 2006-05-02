@@ -18,10 +18,6 @@ was first added to the list, or a change was made.)
 2006/04/21 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler [**before release]
 </li>
 
-<li> 
-2006/04/21 (CB): investigate failing test in testimage.py (that uses sheet functions) [**before release]
-</li>
-
 <li>
 2006/05/02 (CB): Has the performance worsened (e.g. lissom_oo_or)? [** before release]
 </li>
@@ -135,6 +131,10 @@ Topographica>
 PatternGenerator so that subclasses can inherit doc, precedence
 attributes (etc), but have them not used unless a subclass does really
 use them.
+</li>
+
+<li> 
+2006/05/02 (CB): investigate failing test in testimage.py (that uses sheet functions).
 </li>
 
 <li> 
