@@ -69,7 +69,7 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         # since this window will only examine one Simulator.
         sim = topoconsole.active_sim()
         self._sim_eps = [ep for ep in sim.objects(Sheet).values()
-                  if isinstance(ep,topo.base.connectionfield.CFSheet)]
+                  if isinstance(ep,topo.base.cf.CFSheet)]
 	self._sim_eps.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
         sim_ep_names = [ep.name for ep in self._sim_eps]
         if len(sim_ep_names) > 0:
