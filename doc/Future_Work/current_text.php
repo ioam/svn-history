@@ -112,6 +112,10 @@ be set anywhere else, even in a ParameterizedObject constructor.
 </li>
 
 <li>
+2006/05/02: Upgrade Numeric? Maybe some of the current problems will be solved? In particular, savespace has been removed from Numeric now. Perhaps trying to deepcopy a ufunc no longer leads to an error? Documentation for the new Numeric is not free, though. But we could document differences from the current Numeric documentation for our users, as we find these differences.
+</li>
+
+<li>
 2006/04/30: What's this? 
 <pre>
 Topographica> p=PatternGeneratorParameter(default=Line())
