@@ -68,9 +68,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
             of this object.
             """)
     
-    ### JABHACKALERT: Should be type Number, but that causes problems
-    ### when instantiating Sheets in the Model Editor.
-    density = Parameter(
+    density = Number(
         default=10,constant=True,
         doc="""
             User-specified number of processing units per 1.0 distance
