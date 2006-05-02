@@ -27,7 +27,3 @@ def make_classes_from_all_imported_modules_available():
     PatternGeneratorParameter.packages.append(topo.patterns)
 
 
-
-# CEBHACKALERT: Parameters such as density need to be set the same in the others that
-# could be chosen...or else the pattern_present stuff needs to do things like install
-# the right density and bounds...
