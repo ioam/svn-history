@@ -14,10 +14,6 @@ was first added to the list, or a change was made.)
 
 <!-- CB: I put my tasks in the approximate order that I'm doing them -->
 
-<li>
-2006/05/01: In the model editor, adding a projection between two sheets leads to an error. [**before release]
-</li>
-
 <li> 
 2006/04/21 (CB): Finish Slice and CoordinateTransformer classes; update PatternSampler [**before release]
 </li>
