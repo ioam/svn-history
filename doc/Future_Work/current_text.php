@@ -35,10 +35,6 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/05/02: (CB) create Identity learning and response functions. [** before release]
-</li>
-
-<li>
 2006/05/02: (CB) Make sure GUI lists are populated for e.g. ResponseFns and CFPResponseFns (and try to make that simpler). [** before release]
 </li>
 
