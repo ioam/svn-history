@@ -106,6 +106,7 @@ def flatten(l):
 
 # It might be good to handle some common exceptions specially,
 # generating warnings for them rather than suppressing them...
+### JABALERT! This will actually return any type, not just float; what's going on?
 def eval_atof(in_string,default_val = 0):
     """
     Create a float from a string by eval'ing it in the __main__
@@ -120,7 +121,7 @@ def eval_atof(in_string,default_val = 0):
 
 def string_int_translator(in_string, default = 0) :
     """
-    Attempt to parse the string into an int and return the in. If it
+    Attempt to parse the string into an int and return the int. If it
     fails, return a default value.
     """
     try :
