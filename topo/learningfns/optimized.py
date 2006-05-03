@@ -16,7 +16,7 @@ from topo.misc.inlinec import inline, optimized
 
 
 
-class CFProjectionHebbian_opt1(CFPLearningFn):
+class CFPHebbian_opt1(CFPLearningFn):
     """
     CF-aware Hebbian learning rule.
 
@@ -79,15 +79,15 @@ class CFProjectionHebbian_opt1(CFPLearningFn):
     
        
 
-class CFProjectionHebbian(GenericCFPLearningFn):
+class CFPHebbian(GenericCFPLearningFn):
     """
     Wrapper written to allow transparent non-optimized fallback; 
     equivalent to
     GenericCFPLearningFn(single_cf_fn=Hebbian())
     """
     def __init__(self,**params):
-        super(CFProjectionHebbian,self).__init__(single_cf_fn=Hebbian(),**params)
+        super(CFPHebbian,self).__init__(single_cf_fn=Hebbian(),**params)
 
 if not optimized:
-    CFProjectionHebbian_opt1 = CFProjectionHebbian
-    ParameterizedObject().message('Inline-optimized components not available; using CFProjectionHebbian instead of CFProjectionHebbian_opt1.')
+    CFPHebbian_opt1 = CFPHebbian
+    ParameterizedObject().message('Inline-optimized components not available; using CFPHebbian instead of CFPHebbian_opt1.')

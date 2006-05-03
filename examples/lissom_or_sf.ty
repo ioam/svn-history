@@ -26,7 +26,7 @@ from topo.responsefns.optimized import CFPDotProduct_opt1
 from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
-from topo.learningfns.optimized import CFProjectionHebbian_opt1
+from topo.learningfns.optimized import CFPHebbian_opt1
 from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
 from topo.outputfns.optimized import CFPDivisiveSumNormalize_opt1
 from topo.misc.numbergenerators import RandomWrapper
@@ -150,7 +150,7 @@ RandomArray.seed(500,500)
 CFProjection.weights_generator=topo.patterns.random.UniformRandom()
 CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPDotProduct_opt1()
-CFProjection.learning_fn=CFProjectionHebbian_opt1()
+CFProjection.learning_fn=CFPHebbian_opt1()
 CFProjection.weights_output_fn=CFPDivisiveSumNormalize_opt1()
 
 SharedWeightProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
