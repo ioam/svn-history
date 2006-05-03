@@ -179,8 +179,6 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         Also call the parent class refresh.
         """
         self.__setup_pattern_generators()
-        ### JCALERT : temporary hack to be changed, as well as the function special_generate_plotgroup
-	self.plotgroup = self.special_generate_plotgroup()
         super(TestPattern,self).refresh()
 
 
@@ -214,7 +212,6 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         self.__params_frame.create_widgets(self.__current_pattern_generator)
 
         if self.auto_refresh: 
-	    self.plotgroup=self.special_generate_plotgroup()
 	    self.refresh()
 
 
@@ -270,14 +267,9 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         if self.auto_refresh: self.refresh()
 
 
-    ### JCALERT! That will have to be re-written properly, but works for the moment.
-    ### it is an hack to bypass the generate_plotgroup in the plotgrouppanel superclass...
-    ###
-    ### JABHACKALERT: This does *NOT* seem to be working even for the moment -- e.g.
-    ### the reduce button enlarges if pressed after one enlarge step and a switch
-    ### to Sheet coordinates.  Presumably the problem is that a new PlotGroup is
-    ### created each time, throwing away the state of important variables.
-    def special_generate_plotgroup(self):
+    ### JCALERT! This has to be re-implemented for testpattern, it has to be done in a better way:
+    ### it does not work for integerscaling being on.
+    def update_plotgroup_variables(self):
         """
         Replace the superclass do_plot_cmd.
         Create a PlotGroup that has a list of Plots that have been
@@ -300,14 +292,38 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 	    channels = {'Strength':each,'Hue':None,'Confidence':None}
 	    ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
 	    plot_list.append(make_template_plot(channels,view_dict,density,None,self.normalize,name=''))
-        return topo.plotting.plotgroup.PlotGroup(plot_list,self.normalize,
+	new_plotgroup = topo.plotting.plotgroup.PlotGroup(plot_list,self.normalize,
 						 self.sheetcoords,self.integerscaling)
+	new_plotgroup.height_of_tallest_plot = self.plotgroup.height_of_tallest_plot
+	new_plotgroup.initial_plot = self.plotgroup.initial_plot
+	new_plotgroup.sheetcoords = self.plotgroup.sheetcoords
+	new_plotgroup.integerscaling = self.plotgroup.integerscaling
+	new_plotgroup.sizeconvertfn = self.plotgroup.sizeconvertfn
+	new_plotgroup.normalize = self.plotgroup.normalize
+	new_plotgroup.minimum_height_of_tallest_plot = self.plotgroup.minimum_height_of_tallest_plot
+	self.plotgroup = new_plotgroup
+ 				
     
     ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
     def toggle_normalize(self):
         """Function called by Widget when check-box clicked"""
         self.normalize = not self.normalize
-	self.plotgroup.normalize = self.normalize
+	self.refresh()
+
+    ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
+    def toggle_sheetcoords(self):
+        """Function called by Widget when check-box clicked"""
+        self.sheetcoords = not self.sheetcoords
+	self.refresh()
+
+    ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
+    def toggle_integerscaling(self):
+        """Function called by Widget when check-box clicked"""
+        self.integerscaling = not self.integerscaling 
+        if self.integerscaling:
+            self.plotgroup.sizeconvertfn = int
+        else:
+            self.plotgroup.sizeconvertfn = identity
 	self.refresh()
 
 

@@ -89,6 +89,7 @@ class PlotGroup(ParameterizedObject):
 
 	self.height_of_tallest_plot = 1.0
 	self.initial_plot = True
+	self.minimum_height_of_tallest_plot = 1.0
 
 	# Time attribute.
 	self.time = topo.sim.time()
@@ -153,6 +154,7 @@ class PlotGroup(ParameterizedObject):
 	max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
  			      -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
  			     for p in self.plots if p.resize])
+
 	for plot in self.plots:
             if not plot.resize:
                 scaling_factor = 1
