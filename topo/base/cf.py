@@ -572,7 +572,7 @@ class CFProjection(Projection):
 
             ### JABALERT: Should make cfs semi-private, since it has an
             ### accessor function and isn't always the same format
-            ### (e.g. for SharedWeightProjection).  Could also make it
+            ### (e.g. for SharedWeightCFProjection).  Could also make it
             ### be a class attribute; not sure.
             self.cfs = cflist
 

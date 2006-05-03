@@ -25,7 +25,7 @@ from topo.outputfns.basic import IdentityOF
 
 
 
-class SWPOutputFn(CFPOutputFn):
+class SharedWeightCFPOutputFn(CFPOutputFn):
     single_cf_fn = OutputFnParameter(default=IdentityOF())
     
     def __call__(self, cfs, output_activity, norm_values=None, **params):
@@ -35,7 +35,7 @@ class SWPOutputFn(CFPOutputFn):
             self.single_cf_fn(cf.weights)
 
 
-class SWPResponseFn(CFPResponseFn):
+class SharedWeightCFPResponseFn(CFPResponseFn):
     """
     Response function accepting a single CF applied to all units.
     Otherwise similar to GenericCFResponseFn.
@@ -65,7 +65,7 @@ class SWPResponseFn(CFPResponseFn):
 # CEBHACKALERT: users should not access .sharedcf or .cfs directly,
 # but should use .cf(r,c). That all needs to be cleaned up, here and
 # in connectionfield.py.
-class SharedWeightProjection(CFProjection):
+class SharedWeightCFProjection(CFProjection):
     """
     A Projection with a single set of weights, shared by all units.
 
@@ -73,7 +73,7 @@ class SharedWeightProjection(CFProjection):
     currently disabled.
     """
     response_fn = CFPResponseFnParameter(
-        default=SWPResponseFn())
+        default=SharedWeightCFPResponseFn())
     
     ### JABHACKALERT: Set to be constant as a clue that learning won't
     ### actually work yet.
@@ -85,7 +85,7 @@ class SharedWeightProjection(CFProjection):
     strength = Number(default=1.0)
 
     weights_output_fn = CFPOutputFnParameter(
-        default=SWPOutputFn())
+        default=SharedWeightCFPOutputFn())
 
 
     def __init__(self,**params):
@@ -95,7 +95,7 @@ class SharedWeightProjection(CFProjection):
         """
         # we don't want the whole set of cfs initialized, but we
         # do want anything that Projection defines.
-        super(SharedWeightProjection,self).__init__(initialize_cfs=False,**params)
+        super(SharedWeightCFProjection,self).__init__(initialize_cfs=False,**params)
 
         self.sharedcf=self.cf_type(0,0,
                                    self.src,
