@@ -1,9 +1,14 @@
 """
 ParametersFrame class.
 
+
 $Id$
 """
 __version__='$Revision$'
+
+# CEBHACKALERT: this file is being reorganized.
+
+
 
 from propertiesframe import PropertiesFrame
 from Tkinter import Frame, Button, RIGHT, TOP, BOTH, BOTTOM, END, YES, N,S,E,W,X, Menu, Toplevel, Label
@@ -17,10 +22,7 @@ import topo.base.parameterizedobject
 
 from topo.base.parameterizedobject import ParameterizedObject,ParameterizedObjectMetaclass
 
-# CEBHACKALERT: this file is still being reorganized; there are still
-# temporary methods.
 
-# CEBHACKALERT: doesn't work for ParameterizedObject class.
 
 # CEBHACKALERT: there used to be a 'reset_to_defaults' method, which
 # didn't work. When Parameters can be set and then maintained between
@@ -60,7 +62,7 @@ class ParametersFrame(Frame):
 
         self.__help_balloon = Pmw.Balloon(parent)
 
-        # CB: check these are consistent
+        # CB: check these are used consistently
         self.__widgets = {}
         self.__visible_parameters = {}
 
@@ -115,6 +117,11 @@ class ParametersFrame(Frame):
 
 
     def __new_widgets(self,class_=False):
+        """
+        Remove old labels and widgets from the screen (if there
+        are any), then create new ones, sort them by Parameter
+        precedence, and finally add them to the screen.
+        """
 
         # wipe old labels and widgets from screen
         for (label,widget) in self.__widgets.values():
@@ -131,6 +138,7 @@ class ParametersFrame(Frame):
         for name,parameter in self.__visible_parameters.items():
             parameter_precedences[name] = parameter.precedence
         sorted_parameter_names = keys_sorted_by_value(parameter_precedences)
+
         # add widgets to screen
         rows = range(len(sorted_parameter_names))
         for (row,parameter_name) in zip(rows,sorted_parameter_names): 
@@ -153,8 +161,6 @@ class ParametersFrame(Frame):
             self.__help_balloon.bind(label, help_text)
 
 
-
-        
 
     def create_class_widgets(self, topo_class, translator_dictionary = {}) :
         """
@@ -199,12 +205,10 @@ class ParametersFrame(Frame):
         self.topo_obj=topo_obj
 
 
-        # find visible parameters for topo_obj
         self.__visible_parameters = dict([(parameter_name,parameter)
                                         for (parameter_name,parameter)
                                         in self.topo_obj.params().items()
                                         if not parameter.hidden])
-
         self.__new_widgets()
 
 
@@ -220,28 +224,23 @@ class ParametersFrame(Frame):
         textbox. 
         """
         if class_:
-            v = getattr(self.topo_class,parameter_name) #or p.default?
+            v = getattr(self.topo_class,parameter_name)
             # or parameter.default for the class?
         else:
             v = getattr(self.topo_obj,parameter_name)
 
 
-#        print "add_p",parameter_name,parameter,class_
-        
         if parameter.constant==True and class_==False:
             self.__add_readonly_text_property(parameter_name,v,parameter)
         else:
             for c in topo.base.parameterizedobject.classlist(type(parameter))[::-1]:
                 if self.__parameter_property.has_key(c):
-#                    print "H"
                     # find the right method...
                     property_to_add = self.__parameter_property[c]
                     # ...then call it
-#                    print property_to_add
                     property_to_add(parameter_name,v,parameter)
                     return
             # no match: use text box
-#            print "I"
             self.__add_text_property(parameter_name,v,parameter)
             
 
@@ -312,6 +311,7 @@ class ParametersFrame(Frame):
                     value = v,
                     scrolledlist_items = parameter.available)
 
+    # CB: how does this work?
     def __add_class_selector_property(self,parameter_name,v,parameter):
         """
         Add a package property to the properties_frame by representing it
@@ -321,7 +321,7 @@ class ParametersFrame(Frame):
 
         # get the current value of this field
         translator_dictionary = {}
-#        self.object_dictionary[parameter_name] = {}
+        # self.object_dictionary[parameter_name] = {}  what?
         value = ''
         
         # for each of the classes that this selector can select
@@ -374,16 +374,16 @@ class ParametersFrame(Frame):
         Add a boolean property to the properties_frame by representing it with a
         Checkbutton.
         """        
-        self.__widgets[parameter_name] = self.__properties_frame.add_checkbutton_property(
-                    parameter_name,
-                    value = v)
+        self.__widgets[parameter_name] = self.__properties_frame.add_checkbutton_property(parameter_name,value=v)
 
 
-
+    # CB: I guess this does a new frame?
     def right_click(self, event, widget, name) :
         self.parameters_properties = widget, name
         self.menu.tk_popup(event.x_root, event.y_root)
 
+
+    # CB: there's no way this can work, but I don't know what it's for yet.
     def show_parameter_properties(self, param) :
         w, name = param
         obj = w.get_value()
@@ -408,12 +408,13 @@ class ParametersFrame(Frame):
         Button(button_panel, text = 'Apply', 
             command = parameter_frame.set_obj_params).pack(side = RIGHT)
 
+    # CB: where's this called from.
     def parameter_properties_ok(self,frame, win) :
         frame.set_obj_params()
         win.destroy()
 
 
-
+    # CB: how does this work? Think it needs to change.
     def __add_property_for_class(self, parameter_name) :
         attr = getattr(self.topo_obj,parameter_name)
         attr_class = attr.__class__
@@ -423,26 +424,3 @@ class ParametersFrame(Frame):
             self.__add_text_property(parameter_name,None)
                 
                 
-
-##     def __add_bounding_box_property(self,parameter_name,parameter) :
-##         attr = getattr(self.topo_obj,parameter_name)
-##         points = attr.aarect().lbrt()
-##         translator = None #lambda in_string: string_bb_translator(in_string, default = points)
-##         self.__widgets[parameter_name] = self.__properties_frame.add_text_property(
-##             parameter_name,
-##             translator = translator,
-##             value = points)
-        
-##     def __add_int_property(self, parameter_name, parameter) :
-##         attr = getattr(self.topo_obj, parameter_name)
-##         translator = lambda num: string_int_translator(num, default = attr)
-##         self.__add_text_property(parameter_name,parameter, translator = translator)
-
-##     def __add_property_for_class(self, parameter_name) :
-##         attr = getattr(self.topo_obj,parameter_name)
-##         attr_class = attr.__class__
-##         if self.__class_property.has_key(attr_class) :
-##             self.__class_property[attr.__class__](parameter_name, None)
-##         else :
-##             self.__add_text_property(parameter_name,None)
-
