@@ -530,6 +530,25 @@ class ParameterizedObjectMetaclass(type):
                 print self.__name__+'.'+key, '=', val.default
 
 
+    def classparams(self):
+        """
+        Return the Parameters of this class as the
+        dictionary {name: Parameter}, where Parameter
+        is the Parameter object rather than its value.
+
+        Includes Parameters from this class and its
+        superclasses.
+        """
+        paramdict = {}
+        for class_ in classlist(self):
+            for name,val in class_.__dict__.items():
+                if isinstance(val,Parameter):
+                    paramdict[name] = val
+        return paramdict
+
+
+
+
 class ParameterizedObject(object):
     """
     Base class for named objects that support Parameters and message formatting.
@@ -772,20 +791,10 @@ class ParameterizedObject(object):
 
     def params(self):
         """
-        Return the Parameters of this object as the
-        dictionary {name: Parameter}, where Parameter
-        is the Parameter object rather than its value.
-
-        Includes both local Parameters and those
-        shared by instances of the classes from
-        which this object comes.
+        See ParameterizedObjectMetaClass.classparams(),
+        which this method calls on the class of this object.
         """
-        paramdict = {}
-        for class_ in classlist(type(self)):
-            for name,val in class_.__dict__.items():
-                if isinstance(val,Parameter):
-                    paramdict[name] = val
-        return paramdict
+        return type(self).classparams()
 
 
 def print_all_param_defaults():
