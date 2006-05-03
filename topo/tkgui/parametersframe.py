@@ -238,6 +238,8 @@ class ParametersFrame(Frame):
             self.__add_text_property(parameter_name,v,parameter)
             
 
+    # CB: see alert in misc/utils; eval_atof doesn't do what it says! (which
+    # is why I can use it here...)
     def __add_text_property(self,parameter_name,v,parameter,translator=topo.misc.utils.eval_atof):
         """
         Add a text property to the properties_frame.
@@ -267,9 +269,11 @@ class ParametersFrame(Frame):
         try:
             low_bound,high_bound = parameter.get_soft_bounds()
 
-            #CEBHACKALERT: but one is ok - change this
+            # CEBHACKALERT: but one is ok - change this
+            # CB: This seems ok to me now, what's the problem?
             if low_bound==None or high_bound==None or low_bound==high_bound:
-                raise AttributeError # i.e. there aren't really softbounds
+                # i.e. there aren't really softbounds
+                raise AttributeError 
 
             self.__widgets[parameter_name] = self.__properties_frame.add_tagged_slider_property(
                 parameter_name,
@@ -282,7 +286,7 @@ class ParametersFrame(Frame):
 
         except AttributeError:
 
-            self.__widgets[parameter_name] = self.__properties_frame.add_text_property(parameter_name,value = v,translator = topo.misc.utils.eval_atof)
+            self.__widgets[parameter_name] = self.__properties_frame.add_text_property(parameter_name,value=v,translator=topo.misc.utils.eval_atof)
 
 
     def __add_enumeration_property(self,parameter_name,v,parameter):
