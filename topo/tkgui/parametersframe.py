@@ -8,21 +8,15 @@ __version__='$Revision$'
 
 # CEBHACKALERT: this file is being reorganized.
 
-
-
-from propertiesframe import PropertiesFrame
+import Pmw
 from Tkinter import Frame, Button, RIGHT, TOP, BOTH, BOTTOM, END, YES, N,S,E,W,X, Menu, Toplevel, Label
+
 import topo.misc.utils
 from topo.misc.utils import keys_sorted_by_value, dict_translator
-import topo
-import topo.base.parameterclasses
-import Pmw
+from topo.base.parameterizedobject import ParameterizedObject,ParameterizedObjectMetaclass,classlist
+from topo.base.parameterclasses import Number,Enumeration,ClassSelectorParameter,BooleanParameter
 
-import topo.base.parameterizedobject
-
-from topo.base.parameterizedobject import ParameterizedObject,ParameterizedObjectMetaclass
-
-
+from propertiesframe import PropertiesFrame
 
 # CEBHACKALERT: there used to be a 'reset_to_defaults' method, which
 # didn't work. When Parameters can be set and then maintained between
@@ -69,10 +63,10 @@ class ParametersFrame(Frame):
 
         # The dictionary of parameter_type:property_to_add pairs.
         self.__parameter_property = {
-            topo.base.parameterclasses.Number:self.__add_numeric_property,
-            topo.base.parameterclasses.Enumeration:self.__add_enumeration_property,
-            topo.base.parameterclasses.BooleanParameter:self.__add_boolean_property,
-            topo.base.parameterclasses.ClassSelectorParameter:self.__add_class_selector_property}
+            Number: self.__add_numeric_property,
+            Enumeration: self.__add_enumeration_property,
+            BooleanParameter: self.__add_boolean_property,
+            ClassSelectorParameter: self.__add_class_selector_property}
 
 
 
@@ -233,7 +227,7 @@ class ParametersFrame(Frame):
         if parameter.constant==True and class_==False:
             self.__add_readonly_text_property(parameter_name,v,parameter)
         else:
-            for c in topo.base.parameterizedobject.classlist(type(parameter))[::-1]:
+            for c in classlist(type(parameter))[::-1]:
                 if self.__parameter_property.has_key(c):
                     # find the right method...
                     property_to_add = self.__parameter_property[c]
@@ -389,7 +383,6 @@ class ParametersFrame(Frame):
         obj = w.get_value()
         # It is possible that the selected field is a Class. Check and if it is, 
         # instantiate a new object of the class and enter it in the dictionary.
-        from topo.base.parameterizedobject import ParameterizedObject
         if not isinstance(obj, ParameterizedObject) :
             try :
                 obj = obj()
