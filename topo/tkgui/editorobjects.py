@@ -28,7 +28,7 @@ class EditorObject :
         self.name = name # set the name of the sheet
         self.focus = False # this does not have the focus
         self.viewing_choices = []
-        self.object_cover_dict = {}
+#        self.object_cover_dict = {}
 
     def draw(self) :
         # draw the object at the current x, y position
@@ -51,7 +51,7 @@ class EditorObject :
 
     def update_parameters(self) :
         self.parameter_frame.set_obj_params()
-        self.object_cover_dict = self.parameter_frame.object_dictionary
+#        self.object_cover_dict = self.parameter_frame.object_dictionary
 
     def okay_parameters(self, parameter_window) :
         self.update_parameters()
@@ -133,7 +133,7 @@ class EditorNode(EditorObject) :
 
     def show_properties(self) :
         EditorObject.show_properties(self)
-        self.parameter_frame.create_widgets(self.sheet, self.object_cover_dict)
+        self.parameter_frame.create_widgets(self.sheet)
         Label(self.parameter_window, text = '\n\nConnections').pack(side = TOP)
         connection_list = [con.name for con in self.to_connections + self.from_connections]
         connection_menu = Pmw.ComboBox(self.parameter_window, selectioncommand = 
@@ -454,7 +454,7 @@ class EditorConnection(EditorObject) :
     ############ Util methods ##############################
     def show_properties(self) :
         EditorObject.show_properties(self)
-        self.parameter_frame.create_widgets(self.connection, self.object_cover_dict)
+        self.parameter_frame.create_widgets(self.connection)
 
 class EditorProjection(EditorConnection) :
 
