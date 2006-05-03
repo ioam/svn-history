@@ -98,7 +98,7 @@ class ParametersFrame(Frame):
         copy of a variable being made into a ParameterizedObject just
         because the ParameterizedObject is opened in the model editor.
         """
-        assert isinstance(self.topo_class,ParameterizedObject), "ParametersFrame must be associated with an ParameterizedObject to set object parameters."
+        assert isinstance(self.topo_obj,ParameterizedObject), "ParametersFrame must be associated with a ParameterizedObject to set object parameters."
         
         parameters_to_modify = [(name,parameter)
                                 for (name,parameter)
@@ -113,82 +113,18 @@ class ParametersFrame(Frame):
                 setattr(self.topo_obj,name,w.get_value())
 
 
-    def create_class_widgets(self, topo_class, translator_dictionary = {}) :
-        """
-        """
-        assert isinstance(self.topo_class,ParameterizedObjectMetaclass), "ParameterFrame must be passed a ParameterizedObjectMetaclass to create class parameters."
-        
-        self.translator_dictionary = translator_dictionary
+
+    def __new_widgets(self,class_=False):
 
         # wipe old labels and widgets from screen
         for (label,widget) in self.__widgets.values():
             label.grid_forget()
             widget.grid_forget()
 
-        self.topo_class = topo_class
-
-        self.__visible_parameters = dict([(parameter_name,parameter)
-                                      for (parameter_name,parameter)
-                                      in self.topo_class.classparams().items()
-                                      if not parameter.hidden])
- 
-        # create the widgets
-        self.__widgets = {}
-        row = 0
-        for parameter_name,parameter in self.__visible_parameters.items() :
-            self.__add_property_for_parameter(parameter_name,parameter,class_=True)
-
-            (label,widget) = self.__widgets[parameter_name]
-            label.grid(row=row,
-                       column=0,
-                       padx=self.__properties_frame.padding,
-                       pady=self.__properties_frame.padding,
-                       sticky=E)
-            widget.grid(row=row,
-                        column=1,
-                        padx=self.__properties_frame.padding,
-                        pady=self.__properties_frame.padding,
-                        sticky=N+S+W+E)
-            row += 1
-
-
-    def create_widgets(self, topo_obj, translator_dictionary = {}):
-        """
-        topo.base.parameterclasses.Constant:
-        Create widgets for all non-hidden Parameters of topo_obj and add them
-        to the screen.
-
-        Each Parameter gets a suitable widget (e.g. a slider for a Number with
-        soft_bounds). The default widget is a text box.
-
-        parameters must be Parameter objects.
-
-        Widgets are added in order of the Parameters' precedences.
-
-        If a dictionary is passed in when create_widgets is called
-        __add_class_selector_property will attempt to get
-        dictionary[parameter_name]. It expects these entries to be
-        lists of relevant objects to cover the selectable classes. It
-        updates the lists and it can be retrieved from
-        self.translator_dictionary when set_obj_params is called and
-        used on subsequent uses.
-        """
-        self.topo_obj=topo_obj
-
-        # wipe old labels and widgets from screen
-        for (label,widget) in self.__widgets.values():
-            label.grid_forget()
-            widget.grid_forget()
-
-        # find visible parameters for topo_obj
-        self.__visible_parameters = dict([(parameter_name,parameter)
-                                        for (parameter_name,parameter)
-                                        in self.topo_obj.params().items()
-                                        if not parameter.hidden])
         # create the widgets
         self.__widgets = {}
         for (parameter_name, parameter) in self.__visible_parameters.items():
-            self.__add_property_for_parameter(parameter_name,parameter)
+            self.__add_property_for_parameter(parameter_name,parameter,class_=class_)
 
         # sort Parameters by precedence (oops actually reverse of precedence!)
         parameter_precedences = {}
@@ -215,6 +151,63 @@ class ParametersFrame(Frame):
                         sticky=N+S+W+E)
             
             self.__help_balloon.bind(label, help_text)
+
+
+
+        
+
+    def create_class_widgets(self, topo_class, translator_dictionary = {}) :
+        """
+        """
+        assert isinstance(topo_class,ParameterizedObjectMetaclass), "ParameterFrame must be passed a ParameterizedObjectMetaclass to create widgets for class Parameters."
+        
+        self.translator_dictionary = translator_dictionary
+
+        self.topo_class = topo_class
+
+        self.__visible_parameters = dict([(parameter_name,parameter)
+                                      for (parameter_name,parameter)
+                                      in self.topo_class.classparams().items()
+                                      if not parameter.hidden])
+        self.__new_widgets(class_=True)
+ 
+
+
+    def create_widgets(self, topo_obj, translator_dictionary = {}):
+        """
+        topo.base.parameterclasses.Constant:
+        Create widgets for all non-hidden Parameters of topo_obj and add them
+        to the screen.
+
+        Each Parameter gets a suitable widget (e.g. a slider for a Number with
+        soft_bounds). The default widget is a text box.
+
+        parameters must be Parameter objects.
+
+        Widgets are added in order of the Parameters' precedences.
+
+        If a dictionary is passed in when create_widgets is called
+        __add_class_selector_property will attempt to get
+        dictionary[parameter_name]. It expects these entries to be
+        lists of relevant objects to cover the selectable classes. It
+        updates the lists and it can be retrieved from
+        self.translator_dictionary when set_obj_params is called and
+        used on subsequent uses.
+        """
+        assert isinstance(topo_obj,ParameterizedObject), "ParameterFrame must be passed a ParameterizedObject to create widgets for Parameters."
+
+        self.topo_obj=topo_obj
+
+
+        # find visible parameters for topo_obj
+        self.__visible_parameters = dict([(parameter_name,parameter)
+                                        for (parameter_name,parameter)
+                                        in self.topo_obj.params().items()
+                                        if not parameter.hidden])
+
+        self.__new_widgets()
+
+
 
 
     def __add_property_for_parameter(self,parameter_name,parameter,class_=False):
