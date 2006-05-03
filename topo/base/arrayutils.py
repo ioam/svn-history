@@ -157,8 +157,6 @@ def centroid(array_2D):
 ### JC: It has been tried to change the function so that to get rid of
 ### the for loop, but no satisfying matrix function has been found to
 ### perform it.
-###
-### Should move to arrayutils.
 def clip_in_place(mat,lower_bound,upper_bound):
     """Version of Numeric.clip that changes the argument in place, with no intermediate."""
     mat.savespace(1)
