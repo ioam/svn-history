@@ -9,7 +9,7 @@ import topo
 from topo.sheets.generatorsheet import *
 from topo.tkgui import *
 from topo.base.patterngenerator import *
-from topo.base.simulator import *
+from topo.base.simulation import *
 from PIL import Image
 from topo.base.sheetview import *
 from topo.plotting.bitmap import *
@@ -126,7 +126,7 @@ class TestPlotGroupPanel(unittest.TestCase):
         
         ###########################################
         # build simulation
-        s = topo.base.simulator.Simulation()
+        s = topo.base.simulation.Simulation()
         
         s['retina'] = GeneratorSheet(input_generator=topo.patterns.basic.Line(),density=5)
         s['retina'].print_level = topo.base.parameterizedobject.WARNING

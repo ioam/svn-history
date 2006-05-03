@@ -34,7 +34,7 @@ class TestPatternPresent(unittest.TestCase):
         CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 	CFProjection.learning_fn=HebbianSOMLF()
         topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.MESSAGE
-        s = topo.base.simulator.Simulation()
+        s = topo.base.simulation.Simulation()
         s['Retina'] = GeneratorSheet(input_generator=topo.patterns.basic.Line())
         s['Retina2'] = GeneratorSheet(input_generator=topo.patterns.basic.Line())
         s['V1'] = CFSOM()

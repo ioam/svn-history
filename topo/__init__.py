@@ -54,7 +54,7 @@ release = ''
 # Enable automatic importing of .ty files, treating them just like .py
 import topo.misc.tyimputil
 
-from topo.base.simulator import SimSingleton
+from topo.base.simulation import SimSingleton
 sim = SimSingleton()
 
 

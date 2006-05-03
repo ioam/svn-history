@@ -10,9 +10,9 @@ __version__='$Revision$'
 import topo
 import unittest
 from topo.tkgui import *
-from topo.base.simulator import Simulation
+from topo.base.simulation import Simulation
 import topo.base.parameterizedobject
-import topo.base.simulator
+import topo.base.simulation
 
 class TestTopoConsole(unittest.TestCase):
     def setUp(self):

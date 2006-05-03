@@ -93,7 +93,7 @@ class TestSheetView(unittest.TestCase):
 ## # will be based on a Sheet, in which case this could be removed.
 ## from Numeric import resize,array
 ## from topo.base.sheet import Sheet
-## from topo.base.simulator import EventProcessor
+## from topo.base.simulation import EventProcessor
 ## from topo.misc.utils import NxN
 ## from topo.base.parameterclasses import Parameter
 ## from pprint import *

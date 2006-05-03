@@ -11,7 +11,7 @@ $Id$
 __version__='$Revision$'
 
 from topo.base.parameterclasses import Number
-from topo.base.simulator import EventProcessor
+from topo.base.simulation import EventProcessor
 
 class PulseGenerator(EventProcessor):
 

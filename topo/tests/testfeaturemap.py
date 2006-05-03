@@ -24,7 +24,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.base.cf import CFProjection
 from topo.sheets.cfsom import CFSOM
-from topo.base.simulator import Simulation
+from topo.base.simulation import Simulation
 from topo.learningfns.som import HebbianSOMLF
 
 from topo.patterns import basic

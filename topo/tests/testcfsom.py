@@ -14,7 +14,7 @@ from topo.base import parameterizedobject
 from topo.plotting.bitmap import *
 from topo.base.sheet import Sheet
 from topo.sheets.generatorsheet import *
-from topo.base.simulator import *
+from topo.base.simulation import *
 from topo.base import patterngenerator
 import topo.patterns.basic
 from math import pi
@@ -28,7 +28,7 @@ import pdb #debugger
 
 ### Only for ImageSaver
 from Numeric import resize,array,zeros
-from topo.base.simulator import EventProcessor
+from topo.base.simulation import EventProcessor
 from topo.misc.utils import NxN
 from pprint import *
 import Image, ImageOps

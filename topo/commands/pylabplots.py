@@ -95,7 +95,7 @@ def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreferenc
     If sheet_views other than XPreference and YPreference are desired,
     the names of these can be passed in as arguments.
     """
-    sim = topo.base.simulator.get_active_sim()
+    sim = topo.base.simulation.get_active_sim()
     for sheet in sim.objects(Sheet).values():
         if ((xsheet_view_name in sheet.sheet_view_dict) and
             (ysheet_view_name in sheet.sheet_view_dict)):

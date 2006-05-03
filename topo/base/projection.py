@@ -11,7 +11,7 @@ from itertools import chain
 
 from sheet import Sheet
 from parameterclasses import Number, BooleanParameter
-from simulator import EPConnection
+from simulation import EPConnection
 from functionfamilies import OutputFnParameter,IdentityOF
 
 ### JABALERT

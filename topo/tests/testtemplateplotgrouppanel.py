@@ -15,7 +15,7 @@ import Pmw
 from PIL import Image
 from topo.sheets.generatorsheet import *
 from topo.base.patterngenerator import *
-from topo.base.simulator import *
+from topo.base.simulation import *
 from topo.base.sheetview import *
 from topo.tkgui.templateplotgrouppanel import *
 import topo.patterns.basic

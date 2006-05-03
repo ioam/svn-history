@@ -21,7 +21,7 @@ import unittest, copy
 import topo
 
 from topo.base.sheet import Sheet
-from topo.base.simulator import Simulation
+from topo.base.simulation import Simulation
 from topo.base.cf import CFSheet,CFProjection
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.commands.basic import save_snapshot,load_snapshot

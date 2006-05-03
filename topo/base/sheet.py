@@ -21,7 +21,7 @@ $Id$
 __version__ = '$Revision$'
 
 
-from simulator import EventProcessor
+from simulation import EventProcessor
 from sheetcoords import SheetCoordinateSystem
 from parameterclasses import BooleanParameter, Number, Parameter
 from Numeric import zeros,array,Float,ArrayType

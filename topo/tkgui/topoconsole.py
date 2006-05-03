@@ -16,7 +16,7 @@ from connectionfieldspanel import ConnectionFieldsPanel
 from projectionpanel import ProjectionPanel
 from testpattern import TestPattern
 from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
-import topo.base.simulator
+import topo.base.simulation
 import topo.base.parameterizedobject
 from topo.tkgui.editorwindow import ModelEditor
 
