@@ -1,9 +1,728 @@
-2006-04-23 ceball <ceball@lodestar.inf.ed.ac.uk>
+2006-05-03  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
+
+	* topo/plotting/plotgroup.py 1.124, topo/tkgui/testpattern.py
+	1.36: Improved TestPattern so that the reduce, enlarge and
+	sheetcoords button ar working. There is still a problem remaining
+	for integerscaling button: when it is on, and that we try to
+	reduce, we obtain a Division by Zero error.
+
+2006-05-03  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/parameterizedobject.py 1.39: Removed unused function
+	and the HACKALERT about it.
+
+	* topo/base/parameterizedobject.py 1.38: Added method to return
+	parameters of a ParameterizedObjectMetaClass. The object method
+	now just calls this method.
+
+2006-05-03  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/utils.py 1.9: Added alert
+
+2006-05-03  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/parametersframe.py 1.61: Added HACKALERT.
+
+2006-05-02  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheet.py 1.99: Set density back to being a Number; it
+	should only ever be a number.
+
+	* topo/base/sheetcoords.py 1.2: No visible change - removed
+	duplicate brackets.
+
+	* topo/base/simulator.py 1.64: Replaced a line that had been
+	accidentally removed.
+
+	* examples/obermayer_pnas90.ty 1.37, examples/tiny.ty 1.15,
+	examples/cfsom_or.ty 1.41, examples/homeostatic.ty 1.9,
+	examples/lissom_oo_or.ty 1.48, examples/lissom_or.ty 1.86: Removed
+	unused import statement.
+
+	* examples/hierarchical.ty 1.50: Removed an import statement
+	that's not currently used.
+
+	* topo/tkgui/__init__.py 1.9, topo/outputfns/__init__.py 1.8,
+	topo/patterns/__init__.py 1.12, topo/responsefns/__init__.py 1.9,
+	topo/learningfns/__init__.py 1.9: Now the GUI imports all
+	outputfns, patterns, and responsefns (rather than having a
+	function to allow this in all the separate packages). Also
+	populates the appropriate ClassSelectorParameter lists.
+
+2006-05-02  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.54: Removed unused variable
+
+	* topo/tkgui/editortools.py 1.17, topo/tkgui/editorwindow.py 1.26:
+	Renamed self.canvas.simulator to self.canvas.simulation
+
+	* topo/base/simulator.py 1.63,
+	topo/tkgui/templateplotgrouppanel.py 1.20,
+	topo/tkgui/testpattern.py 1.35, topo/tkgui/topoconsole.py 1.53,
+	topo/base/projection.py 1.65, topo/commands/__init__.py 1.5,
+	topo/commands/analysis.py 1.18, topo/commands/basic.py 1.37,
+	topo/eps/__init__.py 1.5, topo/eps/basic.py 1.8,
+	topo/sheets/cfsom.py 1.28, topo/sheets/generatorsheet.py 1.32,
+	topo/tests/testcfsom.py 1.25, topo/tests/testfeaturemap.py 1.18,
+	topo/tests/testsheetview.py 1.13, topo/tests/testsimulator.py 1.9,
+	topo/tkgui/editortools.py 1.16, topo/tkgui/editorwindow.py 1.25,
+	examples/obermayer_pnas90.ty 1.36, examples/som_retinotopy.ty
+	1.34, topo/__init__.py 1.56: Renamed self.simulator link for EPs
+	to self.simulation, plus other instances of the word simulator in
+	documentation and comments
+
+2006-05-02  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* examples/laminar.ty 1.15: Work in progress - Changed Lateral
+	Excitatory projection to be one single projection with initial
+	gaussian weights
+
+	* examples/laminar_nolearning.ty 1.1: Work in progress - contains
+	2 separate, initially random lateral excitatory projections - only
+	works for case with afferent learning or excitatory learning only
+
+	* examples/laminar_lissom.ty 1.1: Version of Lissom_or with
+	separate excitatory and inhibitory layers
+
+2006-05-02  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/__init__.py 1.11: Removed outdated HACKALERT.
+
+	* doc/Future_Work/current_text.php 1.62: Added long-term task of
+	upgrading Numeric.
+
+	* topo/base/boundingregion.py 1.27: Override __str__() so that the
+	bounds are displayed when printing a BoundingBox.
+
+2006-05-02  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulator.py 1.61, topo/analysis/featuremap.py 1.44,
+	topo/eps/__init__.py 1.4, topo/plotting/templates.py 1.38,
+	topo/tests/testcfsom.py 1.24, topo/tests/testfeaturemap.py 1.17,
+	topo/tests/testpatternpresent.py 1.13,
+	topo/tests/testplotfilesaver.py 1.17, topo/tests/testplotgroup.py
+	1.21, topo/tests/testplotgrouppanel.py 1.4,
+	topo/tests/testsimulator.py 1.8, topo/tests/testsnapshots.py 1.4,
+	topo/tests/testtemplateplotgrouppanel.py 1.4,
+	topo/tests/testtopoconsole.py 1.2,
+	topo/tkgui/connectionfieldspanel.py 1.25,
+	topo/tkgui/projectionpanel.py 1.60, topo/tkgui/testpattern.py
+	1.34, topo/tkgui/topoconsole.py 1.52, topo/commands/__init__.py
+	1.4: Renamed Simulator to Simulation
+
+	* topo/base/simulator.py 1.60: Temporary: Simulation is an alias
+	for Simulator
+
+2006-05-02  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/connectionfieldspanel.py 1.24,
+	topo/tkgui/projectionpanel.py 1.59: Renamed
+	topo/base/connectionfield.py to topo/base/cf.py.
+
+2006-05-02  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/cfsom_or.ty 1.40, examples/hierarchical.ty 1.49,
+	examples/obermayer_pnas90.ty 1.35, examples/tiny.ty 1.14: Removed
+	unused import
+
+2006-05-02  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.61: Removed a task.
+
+	* topo/base/cf.py 1.11: IdentityCFLearningFn has
+	single_cf_fn=IdentityLF.
+
+	* topo/base/functionfamilies.py 1.6: Added IdentityLF.
+
+	* doc/Future_Work/current_text.php 1.60: Removed a task, and split
+	up another.
+
+	* topo/projections/basic.py 1.35: Renamed SharedWeightOutputFn and
+	SharedWeightResponseFn to SWPOutputFn and SWPResponseFn. These
+	names might be a bit cryptic, but for now they are only used in
+	this file.
+
+	* examples/homeostatic.ty 1.8, examples/lissom_oo_or.ty 1.47,
+	examples/lissom_or_sf.ty 1.8, topo/projections/basic.py 1.34,
+	topo/tests/lissom_oo_or_reference.ty 1.24: Renamed
+	SharedCFProjection to SharedWeightProjection.
+
+	* topo/base/patterngenerator.py 1.91, topo/base/sheet.py 1.98,
+	topo/patterns/random.py 1.28, topo/plotting/plot.py 1.98,
+	topo/tests/testsheet.py 1.45: Moved SheetCoordinateSystem to
+	sheetcoords.py.
+
+	* topo/base/sheetcoords.py 1.1: Initial
+	version. SheetCoordinateSystem from sheet.py.
+
+	* topo/plotting/plot.py 1.97, topo/tests/testsheet.py 1.44,
+	topo/base/cf.py 1.10, topo/base/patterngenerator.py 1.90,
+	topo/base/sheet.py 1.97, topo/patterns/random.py 1.27: Renamed
+	CoordinateTransformer to SheetCoordinateSystem.
+
+	* topo/tests/testimage.py 1.7: Commented out a test (with an
+	explanation).
+
+	* doc/Future_Work/current_text.php 1.59: Update to tasks.
+
+	* doc/Future_Work/current_text.php 1.58: Moved a task.
+
+	* doc/Future_Work/current_text.php 1.57: Removed a task.
+
+	* topo/tkgui/editortools.py 1.15: Updated how sheet is added to
+	simulator.
+
+	* examples/lissom_or_sf.ty 1.7: Import BoundingBox as a Simulator
+	startup action.
+
+2006-05-01  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.56: Removed a stub. I hope it
+	wasn't about to become an important task because I've forgotten
+	what it was...
+
+	* doc/Future_Work/current_text.php 1.55: Restored some text I cut
+	by mistake.
+
+	* doc/Future_Work/current_text.php 1.54: Updated the task
+	orderings and split some of them up.
+
+	* doc/Future_Work/current_text.php 1.53: Updated a task.
+
+	* topo/projections/basic.py 1.33, topo/base/cf.py 1.9: Renamed
+	CFProjectionIdentityOutputFn to IdentityCFPOutputFn.
+
+	* topo/outputfns/optimized.py 1.17, topo/outputfns/projfns.py 1.4,
+	examples/tiny.ty 1.13, topo/base/cf.py 1.8: Renamed
+	CFProjectionGenericOutputFn to GenericCFPOutputFn.
+
+	* topo/base/cf.py 1.7, topo/outputfns/optimized.py 1.16,
+	topo/projections/basic.py 1.32: Renamed CFProjectionOutputFn to
+	CFPOutputFn.
+
+	* examples/tiny.ty 1.12, topo/base/cf.py 1.6,
+	topo/base/functionfamilies.py 1.5, topo/learningfns/optimized.py
+	1.52, topo/learningfns/projfns.py 1.4: Renamed
+	CFProjectionGenericLearningFn to GenericCFPLearningFn.
+
+	* topo/base/cf.py 1.5, topo/projections/basic.py 1.31,
+	topo/responsefns/optimized.py 1.26, topo/responsefns/projfns.py
+	1.7: Renamed CFProjectionResponseFn to CFPResponseFn.
+
+	* topo/base/cf.py 1.4, topo/learningfns/projfns.py 1.3,
+	topo/projections/basic.py 1.30: Renamed
+	CFProjectionIdentityLearningFn to IdentityCFPLearningFn.
+
+	* topo/projections/basic.py 1.29, topo/base/cf.py 1.3,
+	topo/learningfns/__init__.py 1.8, topo/learningfns/optimized.py
+	1.51, topo/learningfns/som.py 1.6: Renamed CFProjectionLearningFn
+	and CFProjectionLearningFnParameter to CFPLearningFn and
+	CFPLearningFnParameter, respectively.
+
+	* topo/base/cf.py 1.2, topo/base/functionfamilies.py 1.4,
+	topo/projections/basic.py 1.28, topo/responsefns/__init__.py 1.8,
+	topo/responsefns/projfns.py 1.6: Renamed
+	CFProjectionGenericResponseFn to GenericCFPResponseFn. Renamed
+	CFProjectionResponseFnParameter to CFPResponseFnParameter.
+
+	* doc/Future_Work/current_text.php 1.52: Updated a task.
+
+	* topo/base/connectionfield.py 1.183, topo/base/cf.py 1.1: Renamed
+	connectionfield.py to cf.py.
+
+	* topo/misc/utils.py 1.8, topo/outputfns/optimized.py 1.15,
+	topo/outputfns/projfns.py 1.3, topo/plotting/plotgroup.py 1.123,
+	topo/projections/basic.py 1.27, topo/responsefns/__init__.py 1.7,
+	topo/responsefns/optimized.py 1.25, topo/responsefns/projfns.py
+	1.5, topo/sheets/cfsom.py 1.27, topo/sheets/lissom.py 1.48,
+	topo/tests/lissom_oo_or_reference.ty 1.23, topo/tests/testcfsom.py
+	1.23, topo/tests/testfeaturemap.py 1.16,
+	topo/tests/testpatternpresent.py 1.12,
+	topo/tests/testplotfilesaver.py 1.16, topo/tests/testplotgroup.py
+	1.20, topo/tests/testsnapshots.py 1.3,
+	topo/tkgui/connectionfieldspanel.py 1.23,
+	topo/tkgui/projectionpanel.py 1.58, examples/cfsom_or.ty 1.39,
+	examples/hierarchical.ty 1.48, examples/homeostatic.ty 1.7,
+	examples/lissom_oo_or.ty 1.46, examples/lissom_or_sf.ty 1.6,
+	examples/obermayer_pnas90.ty 1.34, examples/som_retinotopy.ty
+	1.33, examples/tiny.ty 1.11, topo/commands/analysis.py 1.17,
+	topo/learningfns/__init__.py 1.7, topo/learningfns/optimized.py
+	1.50, topo/learningfns/projfns.py 1.2, topo/learningfns/som.py
+	1.5: Renamed connectionfield.py to cf.py
+
+	* doc/Future_Work/current_text.php 1.51: Updated a task.
+
+	* topo/base/connectionfield.py 1.182,
+	topo/base/functionfamilies.py 1.3, topo/responsefns/basic.py 1.33,
+	topo/responsefns/optimized.py 1.24, topo/responsefns/projfns.py
+	1.4: Moved ResponseFnParameter, Mdot, and ResponseFn to
+	functionfamilies.
+
+	* topo/learningfns/optimized.py 1.49: Removed imports of unused
+	classes - the optimized module just has the optimized classes, and
+	any it needs to use as fall-backs.
+
+	* topo/base/connectionfield.py 1.181: Corrected default
+	ResponseFnParameter; removed a HACKALERT.
+
+	* topo/base/connectionfield.py 1.180,
+	topo/base/functionfamilies.py 1.2, topo/learningfns/basic.py 1.57,
+	topo/learningfns/optimized.py 1.48: Moved LearningFn,
+	LearningFnParameter, and Hebbian to functionfamilies.py.
+
+	* doc/Future_Work/current_text.php 1.50: Removed a task.
+
+	* examples/cfsom_or.ty 1.38, examples/hierarchical.ty 1.47,
+	examples/homeostatic.ty 1.6, examples/laminar.ty 1.14,
+	examples/lissom_oo_or.ty 1.45, examples/lissom_or.ty 1.85,
+	examples/lissom_or_sf.ty 1.5, examples/obermayer_pnas90.ty 1.33,
+	examples/som_retinotopy.ty 1.32, examples/tiny.ty 1.10,
+	topo/base/simulator.py 1.59, topo/eps/basic.py 1.7,
+	topo/sheets/composer.py 1.11, topo/sheets/generatorsheet.py 1.31,
+	topo/tests/testcfsom.py 1.22, topo/tests/testfeaturemap.py 1.15,
+	topo/tests/testpatternpresent.py 1.11,
+	topo/tests/testplotgrouppanel.py 1.3, topo/tests/testsimulator.py
+	1.7, topo/tests/testsnapshots.py 1.2, topo/tkgui/editortools.py
+	1.14: Renamed Simulator's connect2() to connect().
+
+	* topo/tests/testtemplateplotgrouppanel.py 1.3: Added a HACKALERT
+	and commented some code.
+
+	* topo/tests/testfeaturemap.py 1.14,
+	topo/tests/testpatternpresent.py 1.10,
+	topo/tests/testplotgrouppanel.py 1.2, topo/tests/testsimulator.py
+	1.6, topo/base/simulator.py 1.58, topo/tests/testcfsom.py 1.21,
+	topo/tests/lissom_oo_or_reference.ty 1.22,
+	topo/tests/lissom_or_reference.ty 1.33: Uses Simulator's
+	connect2() instead of connect().
+
+	* topo/sheets/composer.py 1.10: Update to doc string.
+
+	* topo/eps/basic.py 1.6, topo/sheets/generatorsheet.py 1.30: Uses
+	Simulator's connect2() instead of connect().
+
+	* topo/tkgui/editortools.py 1.13: Uses Simulator.connect2() rather
+	than .connect(). Before this change there was an error when making
+	a connection.
+
+	* doc/Future_Work/current_text.php 1.49: Added task about model
+	editor. Removed schedule_action task.
+
+	* topo/tests/testlissom_cpointer.ty 1.5: Removed now we don't have
+	the _cpointer classes.
+
+	* topo/base/simulator.py 1.57: Removed schedule_action().
+
+	* examples/lissom_or_sf.ty 1.4: Updated with changes to code,
+	including topo.sim-style access, and using schedule_command().
+
+2006-05-01  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/obermayer_pnas90.ty 1.32, examples/som_retinotopy.ty
+	1.31, examples/tiny.ty 1.9, examples/hierarchical.ty 1.46,
+	examples/homeostatic.ty 1.5, examples/laminar.ty 1.13,
+	examples/lissom_oo_or.ty 1.44, examples/lissom_or.ty 1.84,
+	examples/lissom_or_sf.ty 1.3: Added names for the simulations
+
+	* topo/commands/pylabplots.py 1.4: Added control over window
+	titles
+
+2006-05-01  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/laminar.ty 1.12: Changed to use topo.sim-style access
+	to simulator. Tidied up.
+
+	* examples/homeostatic.ty 1.4: Minor updates, including to use
+	topo.sim rather than s.
+
+	* examples/som_retinotopy.ty 1.30: Minor tidy.
+
+	* examples/cfsom_or.ty 1.37: Minor clean up.
+
+	* examples/obermayer_pnas90.ty 1.31: Tidied up file; uses
+	'topo.sim' rather than 's'.
+
+	* topo/base/simulator.py 1.56: If a connection wasn't given a
+	name, it defaults to 'srcTodest' (e.g. 'RetinaToV1')
+
+	* doc/Future_Work/current_text.php 1.48: Removed a task; added one
+	to more long-term work.
+
+	* topo/base/connectionfield.py 1.179: Corrected index order for
+	accessing a list.
+
+	* topo/misc/tyimputil.py 1.2: Added HACKALERT.
+
+	* examples/obermayer_pnas90.ty 1.30: Added import of pi; minor
+	reformating of comments.
+
+	* topo/commands/basic.py 1.36: Minor update to comment.
+
+	* topo/commands/basic.py 1.35: Warns if there are classes or
+	functions around that were defined in __main__, since the source
+	won't be found on unpickling.
+
+2006-04-30  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.47: Updated a task.
+
+	* examples/obermayer_pnas90.ty 1.29: Input pattern parameters are
+	set on a Gaussian object rather than on the Gaussian class.
+
+	* topo/sheets/generatorsheet.py 1.29: Added a HACKALERT about the
+	input_generator bounds.
+
+	* examples/tiny.ty 1.8: Uses RandomWrapper with separate seed for
+	each stream of number. Minor tidy.
+
+	* examples/lissom_or.ty 1.83: Changed to use topo.sim['V1']-style
+	access to simulator. Scheduled actions changed to strings.
+
+	* examples/lissom_or.ty 1.82: Finished previous minor cleanup.
+
+	* examples/lissom_or.ty 1.81: Minor cleanup. Removed commented-out
+	code (it was confusing).
+
+	* doc/Future_Work/current_text.php 1.46: Corrected date.
+
+	* doc/Future_Work/current_text.php 1.45: Added task.
+
+	* examples/hierarchical.ty 1.45: Updated input pattern to use
+	RandomWrapper and have a separate seed for each stream of random
+	numbers.
+
+	* examples/cfsom_or.ty 1.36: Updated input pattern to use
+	RandomWrapper, have a separate seed for each stream of random
+	number, and not set softbounds.
+
+	* topo/base/sheet.py 1.96: Sheet cannot be created with unequal
+	densities.
+
+	* doc/Future_Work/current_text.php 1.44: Removed and updated some
+	tasks.
+
+2006-04-28  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/lissom_oo_or_reference.ty 1.21: Minor updates to
+	commented-out code. Also set afferent connections strengths to 0.5
+	each.
+
+	* topo/tests/lissom_oo_or_reference.ty 1.20: Removed some
+	commented-out code.
+
+	* topo/tests/lissom_oo_or_reference.ty 1.19: Added commented-out
+	code for using Composite for center/surround, rather than two
+	projections.
+
+	* topo/tests/lissom_oo_or_reference.ty 1.18: Updated to work with
+	current classes.
+
+	* topo/base/boundingregion.py 1.26: Added reminder that someone
+	should make BoundingRegion display something useful (like the
+	bounds...) when it's printed.
+
+	* doc/Future_Work/current_text.php 1.43: Added task.
+
+	* topo/patterns/basic.py 1.70: Corrected mistake in Composite; now
+	works again for weights generation.
+
+	* doc/Future_Work/current_text.php 1.42: Removed erroneous
+	statement in one of the tasks.
+
+	* topo/base/connectionfield.py 1.178: Changed
+	CFProjection.initialize_bounds() so that it avoids floating-point
+	representation difficulties. Specifically, it uses bounds2slice()
+	to get the right and bottom values of the slice, then mirrors
+	these about the center of the slice to get the left and top values
+	- ensuring the slice is odd. Updated CF.offset_bounds() so that it
+	does not assume the bounds it receives are centered at (0,0) on
+	the Sheet. These alterations could affect the behaviour of
+	existing networks; the reference simulations show no change.
+
+	* topo/base/sheet.py 1.95: Made set_slice be available outside the
+	Slice class, temporarily.
+
+	* topo/base/boundingregion.py 1.25: Added method to BoundingBox
+	that results the coordinates of the center of the bounds.
+
+	* topo/tests/testsheet.py 1.43: Commented out test of
+	bounds2slice() that fails because of the floating point
+	representation of these particular bounds.
+
+	* topo/base/connectionfield.py 1.177: Raises a ValueError if the
+	weights matrix ends up with a zero-sized dimension.
+
+	* topo/base/connectionfield.py 1.176: Added assert statement
+	(assert that the weights matrix is odd).
+
+2006-04-28  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/testpattern.py 1.33: Added ALERTs
+
+	* topo/tkgui/plotgrouppanel.py 1.81: Minor clarification
+
+	* topo/tkgui/plotgrouppanel.py 1.80: Added serious HACKALERT
+
+2006-04-28  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testsheet.py 1.42: Updated test.
+
+2006-04-28  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/templateplotgrouppanel.py 1.19: Fixed normalize
+	option for ConnectionFieldPanel and ProjectionPanel -- the button
+	was on, but the plots weren't normalized
+
+	* topo/tkgui/projectionpanel.py 1.57: Fixed typo
+
+	* topo/tkgui/connectionfieldspanel.py 1.22: Removed outdated ALERT
+
+	* topo/plotting/plotgroup.py 1.122: Improved plot size calculation
+	for projections; still needs work.  Cleaned up comments and
+	documentation.
+
+2006-04-27  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testsheet.py 1.41: Added comment.
+
+	* topo/tests/testsheet.py 1.40: Added another test of
+	bounds2slice(), currenly failing.
+
+	* topo/base/connectionfield.py 1.175: Removed the HACKALERT I just
+	added; I was confused.
+
+	* topo/base/connectionfield.py 1.174: Added HACKALERT about
+	initialize_bounds().
+
+	* doc/Future_Work/current_text.php 1.41: Updated a task.
+
+	* examples/lissom_oo_or.ty 1.43: Changed to use 'topo.sim'-style
+	access; tidied up a little.
+
+	* examples/lissom_oo_or.ty 1.42: Switced to using RandomWrapper.
+
+	* topo/misc/numbergenerators.py 1.4: Renamed
+	RandomDistributionWrapper to RandomDistribution. Removed a
+	HACKALERT.
+
+2006-04-27  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/testpattern.py 1.32: Minor typo fixed
+
+	* topo/tkgui/editorobjects.py 1.27: Made default CF representation
+	be more useful
+
+	* topo/tkgui/plotgrouppanel.py 1.79, topo/plotting/plotgroup.py
+	1.121: Enforced minimum size on plots, so that no pixels are lost
+
+2006-04-27  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/numbergenerators.py 1.3: Added hack to save state of
+	random generators in RandomWrapper.
+
+	* examples/lissom_or.ty 1.80: Moved RandomWrapper to
+	topo.misc.numbergenerators.
+
+	* topo/base/parameterclasses.py 1.39: Moved RandomWrapper to
+	topo/misc/numbergenerators.py
+
+	* topo/misc/numbergenerators.py 1.2: Renamed RandomWrapper to
+	RandomDistributionWrapper. Moved parameterclasses.py's
+	RandomWrapper into this file.
+
+	* topo/misc/numbergenerators.py 1.1: Initial version.
+
+	* topo/tkgui/testpattern.py 1.31: Updated with changes to xdensity
+	and ydensity for PatternGenerator and Sheet.
+
+	* doc/Future_Work/current_text.php 1.40: Added some tasks
+	(including one for before release).
+
+2006-04-26  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.39: Re-inserted a task that
+	got deleted some time back by accident while rearranging the file.
+
+	* topo/tests/lissom_or_reference.ty 1.32: Minor update to comment.
+
+	* topo/tests/lissom_or_reference.ty 1.31: Updated learning rates
+	(before bounds change).
+
+	* topo/base/connectionfield.py 1.173: Changed CFProjection's
+	initialize_bounds() to move the bounds to the center of a unit
+	before converting to a slice, thereby guaranteeing an odd size for
+	the slice.
+
+	* doc/Future_Work/current_text.php 1.38: Updated a task.
+
+	* topo/base/parameterclasses.py 1.38: Added note that random
+	streams don't appear to be pickled such that they resume where
+	they left off.
+
+	* topo/base/connectionfield.py 1.172: Added HACKALERT.
+
+	* topo/tests/lissom_or_reference.ty 1.30: Updates to match changes
+	to equivalen C++ lissom example.
+
+	* doc/Future_Work/current_text.php 1.37: Removed a task! About
+	pickling!
+
+	* examples/lissom_oo_or.ty 1.41: Added startup command to allow V1
+	still to be referred to.
+
+	* topo/commands/basic.py 1.34: Instead of pickle.Pickler and
+	pickle.Unpickler, use our custom Pickler and Unpickler.
+
+	* topo/misc/utils.py 1.7: Added new Pickler and Unpickler, used at
+	the moment to save array savespace setting.
+
+	* topo/commands/basic.py 1.33: No visible change: switched from
+	using pickle's load() and dump() functions to using pickle.Pickler
+	and pickle.Unpickler objects explicitly.
+
+	* topo/base/patterngenerator.py 1.89: Removed unused import.
+
+2006-04-25  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/patternfns.py 1.3: Added deliberate conversion of
+	input to float, in case user passes an int (for divisions)
+
+2006-04-25  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.36: Updated slightly
+
+2006-04-25  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.35: Finished part of a task.
+
+	* topo/commands/basic.py 1.32: Removed hack from load_snapshot().
+
+	* topo/misc/utils.py 1.6: Set class attributes on true class
+	rather than on the name we might be using for a class.
+
+2006-04-25  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Developer_Manual/coding_text.php 1.2,
+	doc/Developer_Manual/optimization_text.php 1.5,
+	doc/Reference_Manual/index_text.php 1.7: Minor fixes and
+	clarifications
+
+	* doc/User_Manual/images/.cvsignore 1.6: Minor fix
+
+2006-04-24  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.34: Updated a task.
+
+	* topo/commands/basic.py 1.31: Added a hack to avoid a problem
+	with unpickling when Topographica was pickled after falling back
+	to non-optimized components.
+
+	* doc/Future_Work/current_text.php 1.33: Added a task.
+
+	* topo/tests/testsimulator.py 1.5: Updated test with new class
+	name.
+
+	* examples/lissom_oo_or.ty 1.40, examples/hierarchical.ty 1.44:
+	Adds a command to the simulator's startup_commands.
+
+	* topo/base/simulator.py 1.55, topo/commands/basic.py 1.30: Added
+	startup_commands Parameter to Simulator. Altered
+	topo.commands.basic's save_snapshot() and load_snapshot() so that
+	these commands are executed before the simulator is unpickled. Now
+	scheduled actions can be pickled and unpickled without difficulty.
+
+	* doc/Future_Work/current_text.php 1.32: Added a task about
+	correcting things causing pickling to fail. Added task about
+	adding a set of more in-depth tests, distinct from the
+	quick-to-run tests.
+
+	* doc/Future_Work/current_text.php 1.31: Updated my tasks.
+
+	* doc/Future_Work/index_text.php 1.15: Added commented-out
+	optimistic update for pickling section.
+
+	* topo/commands/basic.py 1.29: Added note for improvement to
+	pickling.
+
+	* doc/Future_Work/index_text.php 1.14: Updated section about
+	different platforms.
+
+	* doc/Future_Work/current_text.php 1.30: Updated my tasks,
+	including marking those that need to be completed before the next
+	release.
+
+	* examples/lissom_oo_or.ty 1.39: Changed to use schedule_command()
+	instead of schedule_action().
+
+	* topo/base/simulator.py 1.54: Added more helpful printing in the
+	case of a SyntaxError for CommandEvent.
+
+	* topo/base/simulator.py 1.53: Added Event class, and EPEvent and
+	CommandEvent subclasses (as well as SAEVent class which will be
+	removed when all uses of schedule_action() in the examples are
+	removed). There is one change to the logic in Simulator.run(): now
+	did_event is set to True no matter what type of Event is called
+	(rather than just for SimulatorEvents without 'fn' attribute, as
+	before). I don't think this affects the behaviour.
+
+2006-04-24  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/.cvsignore 1.6, doc/User_Manual/index_text.php
+	1.13, doc/User_Manual/modeleditor_text.php 1.1: Moved
+	model_editor.html to modeleditor.php and added TOC link
+
+	* doc/User_Manual/model_editor.html 1.2: Moved to
+	model_editor_text.php
+
+	* doc/Future_Work/index_text.php 1.13: Fixed stray comment ender
+	that was giving garbage text at the end of the page
+
+	* topo/base/connectionfield.py 1.171: Clarified documentation
+
+	* doc/shared/index.php 1.13: Added more keywords to title
+
+2006-04-24  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* examples/hierarchical.ty 1.43: Changed scheduled action example
+	to use schedule_command(), which allows the network to be pickled
+	before all the scheduled actions have occurred.
+
+	* topo/base/simulator.py 1.52: Added ScheduledCommand class and
+	schedule_command() for exec'ing an arbitrary string in
+	__main__.__dict__ at a specified time. Added some HACKALERTs
+	(about scheduling commands).
+
+	* examples/hierarchical.ty 1.42: Added an example scheduled
+	action.
+
+	* topo/base/simulator.py 1.51: Added comment. Added HACKALERT.
+
+	* topo/base/simulator.py 1.50: Clarified a HACKALERT.
+
+	* topo/base/simulator.py 1.49: Added HACKALERT about
+	SimulatorEvent.
+
+	* topo/tests/lissom_or_reference.ty 1.29: Removed erroneous
+	cropping of rf_radius to an integer.
+
+	* topo/base/connectionfield.py 1.170: Mask size set from the
+	original, user-specified weights_bounds, rather than the
+	weights_bounds that may have been adjusted to be odd-sized. Still
+	need to change to have user-specified weights_bounds as the
+	Parameter user_weights_bounds.
+
+2006-04-23  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.59: Added automatic ChangeLog creation
+
+	* ChangeLog.txt 1.5: Updated with recent changes
+
+2006-04-23  ceball  <ceball@lodestar.inf.ed.ac.uk>
 
 	* topo/tests/lissom_or_reference.ty 1.28: Minor clean-up.
 
-	* topo/tests/lissom_or_reference.ty 1.27: Updated to work with
-	current code, and made some minor simplifications.
+	* topo/tests/lissom_or_reference.ty 1.27:
+	Updated to work with current code, and made some minor simplifications.
 
 	* doc/Developer_Manual/imports_text.php 1.4: Fixed minor typo.
 
