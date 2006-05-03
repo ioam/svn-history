@@ -158,6 +158,10 @@ class ParametersFrame(Frame):
             self.topo_class = topo_object.__class__
 
         elif not(topo_class == None) :
+            # CEBHACKALERT: it's not possible to instantiate all classes
+            # like this. E.g. for a CFProjection, doing so leads to an
+            # error. This stops the code after this line from ever
+            # being executed.
             self.topo_obj = topo_class()
             self.topo_class = topo_class
 
