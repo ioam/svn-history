@@ -805,35 +805,5 @@ def print_all_param_defaults():
         c.print_param_defaults()
     print "==========================================="
 
-    
-
-# CEBHACKALERT: I think this function's not used. It was created to
-# allow the GUI to do something, but is no longer required.
-def class_parameters(parameterized_class):
-    """
-    Return the non-hidden Parameters of the specified ParameterizedObject class
-    as {parameter_name: parameter}.
-
-    E.g. for a class that has one Parameter x=Number(), this function returns
-    {'x':<topo.base.parameterclasses.Number object at ...>}
-
-    The specified class must be of type ParameterizedObject.
-    """
-    assert isinstance(parameterized_class, type)
-
-    # Create the object so that Parameters of any superclasses are also present.
-    parameterized_obj = parameterized_class()
-    
-    if not isinstance(parameterized_obj,ParameterizedObject):
-        raise TypeError("Can only get Parameters for a class derived from ParameterizedObject.")
-    
-    parameters = [(parameter_name,parameter)
-                  for (parameter_name,parameter)
-                  in parameterized_obj.params().items()
-                  if not parameter.hidden
-                 ]
-                 
-    return dict(parameters)
-
 
 
