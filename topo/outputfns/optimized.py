@@ -106,7 +106,7 @@ if not optimized:
 ##         return x
 
 
-class CFProjectionDivisiveSumNormalize_opt1(CFPOutputFn):
+class CFPDivisiveSumNormalize_opt1(CFPOutputFn):
     """
     Performs divisive normalization of the weights of all cfs.
 
@@ -119,7 +119,7 @@ class CFProjectionDivisiveSumNormalize_opt1(CFPOutputFn):
                                      constant=True)
 
     def __init__(self,**params):
-        super(CFProjectionDivisiveSumNormalize_opt1,self).__init__(**params)
+        super(CFPDivisiveSumNormalize_opt1,self).__init__(**params)
 
     def __call__(self, cfs, output_activity, **params):
         rows,cols = output_activity.shape
@@ -160,16 +160,16 @@ class CFProjectionDivisiveSumNormalize_opt1(CFPOutputFn):
         inline(code, ['output_activity','rows','cols','cfs'], local_dict=locals())
 
 
-class CFProjectionDivisiveSumNormalize(GenericCFPOutputFn):
+class CFPDivisiveSumNormalize(GenericCFPOutputFn):
     """
     Wraps
     GenericCFPOutputFn(single_cf_fn=DivisiveSumNormalize),
     the non-optimized equivalent of DivisiveSumNormalizeCFOF_opt1.
     """
     def __init__(self,**params):
-        super(CFProjectionDivisiveSumNormalize,self).__init__(single_cf_fn=DivisiveSumNormalize(norm_value=1.0),**params)
+        super(CFPDivisiveSumNormalize,self).__init__(single_cf_fn=DivisiveSumNormalize(norm_value=1.0),**params)
 
 
 if not optimized:
-    CFProjectionDivisiveSumNormalize_opt1 = CFProjectionDivisiveSumNormalize
-    ParameterizedObject().message('Inline-optimized components not available; using CFProjectionDivisiveSumNormalize instead of CFProjectionDivisiveSumNormalize_opt1.')
+    CFPDivisiveSumNormalize_opt1 = CFPDivisiveSumNormalize
+    ParameterizedObject().message('Inline-optimized components not available; using CFPDivisiveSumNormalize instead of CFPDivisiveSumNormalize_opt1.')

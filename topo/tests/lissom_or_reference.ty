@@ -49,7 +49,7 @@ from topo.projections.basic import CFProjection
 from topo.outputfns.basic import PiecewiseLinear
 from topo.responsefns.optimized import CFPDotProduct_opt1
 from topo.learningfns.optimized import CFProjectionHebbian_opt1
-from topo.outputfns.optimized import CFProjectionDivisiveSumNormalize_opt1
+from topo.outputfns.optimized import CFPDivisiveSumNormalize_opt1
 import topo.patterns.basic
 
 from topo.tests.lissom_log_parser import get_input_params,get_matrix
@@ -190,7 +190,7 @@ CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPDotProduct_opt1()
 CFProjection.learning_fn=CFProjectionHebbian_opt1()
-CFProjection.weights_output_fn=CFProjectionDivisiveSumNormalize_opt1()
+CFProjection.weights_output_fn=CFPDivisiveSumNormalize_opt1()
 
 
 s = topo.base.simulator.Simulator()

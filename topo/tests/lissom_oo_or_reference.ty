@@ -35,7 +35,7 @@ from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFProjectionHebbian_opt1
-from topo.outputfns.optimized import CFProjectionDivisiveSumNormalize_opt1
+from topo.outputfns.optimized import CFPDivisiveSumNormalize_opt1
 from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
 from topo.patterns import PatternGeneratorParameter
 import topo.tests.lissom_log_parser
@@ -189,7 +189,7 @@ CFProjection.response_fn=CFPDotProduct_opt1()
 # Specify learning function
 CFProjection.learning_fn=CFProjectionHebbian_opt1()
 
-CFProjection.weights_output_fn=CFProjectionDivisiveSumNormalize_opt1()
+CFProjection.weights_output_fn=CFPDivisiveSumNormalize_opt1()
 
 SharedWeightProjection.weights_output_fn.single_cf_fn = DivisiveSumNormalize()
 
