@@ -41,7 +41,7 @@ class CFPDotProduct(CFPResponseFn):
         activity *= strength
 
 
-class CFProjectionEuclideanDistance(CFPResponseFn):
+class CFPEuclideanDistance(CFPResponseFn):
     """
     Euclidean-distance--based response function.
     """
