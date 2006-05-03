@@ -119,40 +119,7 @@ def eval_atof(in_string,default_val = 0):
         val = default_val
     return val
 
-def string_int_translator(in_string, default = 0) :
-    """
-    Attempt to parse the string into an int and return the int. If it
-    fails, return a default value.
-    """
-    try :
-        val = int(in_string)
-    except Exception :
-        val = default
-    return val
 
-def string_bb_translator(tuple_str, default = (0,0,0,0)) :
-    """
-    The string is split at spaces and if there is only one section
-    the string is evaluated in the main dict space, if there is 4
-    they are converted to numbers and used to define a BoundingBox
-    In other cases a default value is returned.
-    """
-    from topo.base.boundingregion import BoundingBox
-    default = BoundingBox(points = 
-               ((default[0], default[1]), (default[2], default[3])))
-    tup = tuple_str.split(' ')
-    if len(tup) == 1 :
-        return eval_atof(tup[0], default_val = default)
-    elif len(tup) == 4 :
-        num = {}
-        i = 0
-        for i in range(4) :
-            num[i] = eval_atof(tup[i], None)
-            if num[i] == None :
-                num[i] = default[i]
-    else :
-        return default
-    return BoundingBox(points = ((num[0], num[1]), (num[2], num[3])))
 
 def dict_translator(in_string, name = '', translator_dictionary = {}) :
     """
