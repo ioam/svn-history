@@ -9,7 +9,7 @@ __version__='$Revision$'
 
 from Tkinter import Frame, StringVar, Message, Label, IntVar, N,S,E,W,X, NORMAL
 import tkFont
-from taggedslider import TaggedSlider,EntryTranslator,ComboBoxTranslator,CheckbuttonTranslator
+from translatorwidgets import TaggedSlider,EntryTranslator,ComboBoxTranslator,CheckbuttonTranslator
 
 
 class PropertiesFrame(Frame):
