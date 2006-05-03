@@ -164,6 +164,12 @@ class PlotGroup(ParameterizedObject):
 		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(s.density)/max_sheet_height)
 		else:
 		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(plot.bitmap.height()))
+                    ### JABHACKALERT: Enforces a minimum scaling factor of 1,
+                    ### to avoid divide-by-zero errors.  The actual cause of these
+                    ### errors should instead be avoided elsewhere.
+                    if (scaling_factor <= 0):
+                        scaling_factor=1
+                    
 	    plot.bitmap.image = plot.bitmap.zoom(scaling_factor)
 
 
