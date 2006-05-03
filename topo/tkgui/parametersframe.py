@@ -15,6 +15,8 @@ import Pmw
 
 import topo.base.parameterizedobject
 
+from topo.base.parameterizedobject import ParameterizedObject,ParameterizedObjectMetaclass
+
 # CEBHACKALERT: this file is still being reorganized; there are still
 # temporary methods.
 
@@ -42,35 +44,26 @@ class ParametersFrame(Frame):
         Frame.__init__(self,parent,config)
         self.__properties_frame = PropertiesFrame(parent)
         self.__properties_frame.pack(side=TOP,expand=YES,fill=BOTH)
+
+        # CB: investigate
         self.translator_dictionary = {}
 
-        # CEBHACKALERT: these buttons should be stacked on the window or
-        # something, but I don't know how to do that.
-        
-        # buttons for setting/(restoring) class Parameter values.
-        #pattern_buttonBox = Pmw.ButtonBox(self,orient = 'horizontal',padx=0,pady=0)
-        #pattern_buttonBox.add('Install as class defaults',
-        #                      command=self.install_as_class_defaults)
-        #pattern_buttonBox.add('Revert to class defaults',
-        #                      command=self.revert_to_class_defaults)
-
-        # CEBHACKALERT: need this to revert to defaults in the file...
-        #pattern_buttonBox.add('Restore class defaults',
-        #                      command=self.restore_class_defaults)
-
-        #pattern_buttonBox.pack(side=TOP)
-
+        # CB: surely there's a better way?
         self.topo_obj = None
+        self.topo_class = None
 
+        # CB: what does all this do?
         self.option_add("*Menu.tearOff", "0") 
         self.menu = Menu(self)
         self.menu.insert_command(END, label = 'Properties', command = lambda: 
             self.show_parameter_properties(self.parameters_properties))
 
         self.__help_balloon = Pmw.Balloon(parent)
-        
-        self.__widgets = {} # should it be none?
+
+        # CB: check these are consistent
+        self.__widgets = {}
         self.__visible_parameters = {}
+
 
         # The dictionary of parameter_type:property_to_add pairs.
         self.__parameter_property = {
@@ -82,9 +75,11 @@ class ParametersFrame(Frame):
 
 
     def set_class_parameters(self) :
-        assert self.topo_class != None, "ParameterFrame must be associated with a class to set its class parameters"
+        """
+        """
+        assert isinstance(self.topo_class,ParameterizedObjectMetaclass), "ParameterFrame must be associated with a ParameterizedObjectMetaclass to set class parameters."
 
-        for name in self.__visible_parameters: #parameters_to_modify:
+        for name in self.__visible_parameters: 
             # [0] is label (Message), [1] is widget
             w = self.__widgets[name][1]
             
@@ -103,12 +98,12 @@ class ParametersFrame(Frame):
         copy of a variable being made into a ParameterizedObject just
         because the ParameterizedObject is opened in the model editor.
         """
-        assert self.topo_obj!=None, "ParametersFrame must be associated with an object to set its parameters."
+        assert isinstance(self.topo_class,ParameterizedObject), "ParametersFrame must be associated with an ParameterizedObject to set object parameters."
         
-        parameters_to_modify = [ (name,parameter)
-                                 for (name,parameter)
-                                 in self.__visible_parameters.items()
-                                 if not parameter.constant==True]
+        parameters_to_modify = [(name,parameter)
+                                for (name,parameter)
+                                in self.__visible_parameters.items()
+                                if not parameter.constant==True]
 
         for (name,parameter) in parameters_to_modify:
             # [0] is label (Message), [1] is widget
@@ -118,12 +113,11 @@ class ParametersFrame(Frame):
                 setattr(self.topo_obj,name,w.get_value())
 
 
-    def create_class_widgets(self, topo_class = None, translator_dictionary = {}, topo_object = None) :
+    def create_class_widgets(self, topo_class, translator_dictionary = {}) :
         """
-        Allows the Constant parameters of a class to be changed.
-
-        ALALERT First attempt solution that will probably need strong revision. 
         """
+        assert isinstance(self.topo_class,ParameterizedObjectMetaclass), "ParameterFrame must be passed a ParameterizedObjectMetaclass to create class parameters."
+        
         self.translator_dictionary = translator_dictionary
 
         # wipe old labels and widgets from screen
@@ -131,29 +125,19 @@ class ParametersFrame(Frame):
             label.grid_forget()
             widget.grid_forget()
 
-        if topo_class:
-            self.topo_class = topo_class
-        elif topo_object:
-            self.topo_class = type(topo_object)
-        else:
-            return
+        self.topo_class = topo_class
 
-        # find constant fields from topo_obj, for topo_class
         self.__visible_parameters = dict([(parameter_name,parameter)
                                       for (parameter_name,parameter)
                                       in self.topo_class.classparams().items()
                                       if not parameter.hidden])
-
-
-#                                    if parameter.constant == True
-#                                    and not(parameter.hidden))    
  
         # create the widgets
         self.__widgets = {}
         row = 0
         for parameter_name,parameter in self.__visible_parameters.items() :
             self.__add_property_for_parameter(parameter_name,parameter,class_=True)
-#            print "here"
+
             (label,widget) = self.__widgets[parameter_name]
             label.grid(row=row,
                        column=0,
@@ -166,6 +150,7 @@ class ParametersFrame(Frame):
                         pady=self.__properties_frame.padding,
                         sticky=N+S+W+E)
             row += 1
+
 
     def create_widgets(self, topo_obj, translator_dictionary = {}):
         """
