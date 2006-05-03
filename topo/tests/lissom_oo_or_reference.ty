@@ -28,7 +28,7 @@ from fixedpoint import FixedPoint
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection,SharedWeightProjection
-from topo.responsefns.optimized import CFProjectionDotProduct_opt1
+from topo.responsefns.optimized import CFPDotProduct_opt1
 import topo.patterns.basic
 from topo.base.sheet import BoundingBox
 from topo.base.parameterclasses import DynamicNumber
@@ -184,7 +184,7 @@ CFProjection.weights_generator = topo.patterns.basic.Constant()
 
 # Specify the response function
 # inlinec.optimized should make this unnecessary.
-CFProjection.response_fn=CFProjectionDotProduct_opt1()
+CFProjection.response_fn=CFPDotProduct_opt1()
 
 # Specify learning function
 CFProjection.learning_fn=CFProjectionHebbian_opt1()

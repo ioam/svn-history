@@ -159,7 +159,7 @@ from topo.sheets.cfsom import CFSOM
 import topo.patterns.random
 from topo.learningfns.som import HebbianSOMLF
 from topo.base.cf import CFProjection
-from topo.responsefns.optimized import CFProjectionDotProduct_opt1
+from topo.responsefns.optimized import CFPDotProduct_opt1
 from topo.base.patterngenerator import BoundingBox
 
 ### JCALERT! This file has to be re-written when the fundamental changes in plot.py
@@ -180,7 +180,7 @@ from topo.base.patterngenerator import BoundingBox
 
 #           CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 #           CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
-#           CFProjection.response_fn = CFProjectionDotProduct_opt1()
+#           CFProjection.response_fn = CFPDotProduct_opt1()
 #           CFProjection.learning_fn = HebbianSOMLF()
 
 #           self.sim.connect(V1,V2,delay=0.5,connection_type=CFProjection,name='V1toV2')

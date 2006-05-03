@@ -14,14 +14,14 @@ from topo.base.parameterizedobject import ParameterizedObject
 
 from topo.misc.inlinec import inline, optimized
 
-from topo.responsefns.projfns import CFProjectionDotProduct, CFProjectionEuclideanDistance
+from topo.responsefns.projfns import CFPDotProduct, CFProjectionEuclideanDistance
 
-class CFProjectionDotProduct_opt1(CFPResponseFn):
+class CFPDotProduct_opt1(CFPResponseFn):
     """
     Dot-product response function.
 
     Written in C for a several-hundred-times speedup; see
-    CFProjectionDotProduct for an easier-to read (but otherwise equivalent)
+    CFPDotProduct for an easier-to read (but otherwise equivalent)
     version in Python.
     """
 
@@ -69,8 +69,8 @@ class CFProjectionDotProduct_opt1(CFPResponseFn):
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
 if not optimized:
-    CFProjectionDotProduct_opt1 = CFProjectionDotProduct
-    ParameterizedObject().message('Inline-optimized components not available; using CFProjectionDotProduct instead of CFProjectionDotProduct_opt1.')
+    CFPDotProduct_opt1 = CFPDotProduct
+    ParameterizedObject().message('Inline-optimized components not available; using CFPDotProduct instead of CFPDotProduct_opt1.')
 
 
 

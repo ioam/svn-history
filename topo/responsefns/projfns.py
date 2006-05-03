@@ -18,11 +18,11 @@ from topo.misc.inlinec import inline, optimized
 
 
 # CEBHACKALERT: This is GenericCFPResponseFn(single_cf_fn=Mdot()).
-class CFProjectionDotProduct(CFPResponseFn):
+class CFPDotProduct(CFPResponseFn):
     """
     Dot-product response function.
 
-    Written entirely in Python; see CFProjectionDotProduct_opt1 for a much faster
+    Written entirely in Python; see CFPDotProduct_opt1 for a much faster
     (but otherwise equivalent) version.
     """
     single_cf_fn = ResponseFnParameter(Mdot(),constant=True)
