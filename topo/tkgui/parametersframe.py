@@ -238,8 +238,6 @@ class ParametersFrame(Frame):
             self.__add_text_property(parameter_name,v,parameter)
             
 
-    # CEBHACKALERT: don't need to pass parameter. See HACKALERT below
-    # about DynamicNumber
     def __add_text_property(self,parameter_name,v,parameter,translator=topo.misc.utils.eval_atof):
         """
         Add a text property to the properties_frame.
@@ -272,13 +270,6 @@ class ParametersFrame(Frame):
             #CEBHACKALERT: but one is ok - change this
             if low_bound==None or high_bound==None or low_bound==high_bound:
                 raise AttributeError # i.e. there aren't really softbounds
-
-##             # CEBHACKALERT: revert to previous behaviour for DynamicNumber
-##             # until we figure out how to do it properly.
-##             if isinstance(parameter, topo.base.parameterclasses.DynamicNumber):
-##                 v = parameter.default
-##             else:
-##                 v = getattr(self.topo_obj,parameter_name)
 
             self.__widgets[parameter_name] = self.__properties_frame.add_tagged_slider_property(
                 parameter_name,
