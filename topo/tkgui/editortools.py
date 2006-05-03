@@ -264,7 +264,6 @@ class ParametersTool(Frame) :
         self.parameter_frame.forget()
         self.title_label.config(text = name)
         self.doc_label.config(text = doc)
-        try :
+
+        if focus_class:
             self.parameter_frame.create_class_widgets(focus_class)
-        except AttributeError:
-             pass
