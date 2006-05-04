@@ -14,12 +14,15 @@ was first added to the list, or a change was made.)
 
 <!-- CB: I put my tasks in the approximate order that I'm doing them -->
 
+
+<!-- ### These tasks before the next release (i.e. 2006/05/08) ### -->
+
 <li>
 2006/05/04 (CB): Matching with C++ lissom; the performance has worsened (try lissom_oo_or). [** before release]
 </li>
 
 <li> 
-2006/05/02 (CB): Finish Slice and SheetCoordinateSystem classes; update PatternSampler. [**before release]
+2006/05/04 (CB): check PatternSampler [**before release]
 </li>
 
 <li> 
@@ -34,12 +37,20 @@ was first added to the list, or a change was made.)
 2006/04/24 (CB): Update tutorials now that scripts don't need to be run before loading a snapshot. [** before release]
 </li>
 
-<li>
-2006/05/02: (CB) Make sure GUI lists are populated for e.g. ResponseFns and CFPResponseFns (and try to make that simpler). [** before release]
+<li> 
+2006/05/02 (CB): Procedure for making a Windows binary. [** before release]
+</li>
+
+
+<!-- ### end of 'before release' ### -->
+
+
+<li> 
+2006/05/02 (CB): Finish Slice and SheetCoordinateSystem classes.
 </li>
 
 <li> 
-2006/05/02 (CB): Procedure for making a Windows binary. [** before release]
+2006/05/04: Tidy model editor's handling of sheet and projection class parameeters (why does the parametersframe have to be in a separate window for the widgets to work properly)?
 </li>
 
 <li>
