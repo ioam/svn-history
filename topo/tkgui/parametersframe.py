@@ -218,49 +218,49 @@ class ParametersFrame(Frame):
         textbox. 
         """
         if class_:
-            v = getattr(self.topo_class,parameter_name)
+            value = getattr(self.topo_class,parameter_name)
             # or parameter.default for the class?
         else:
-            v = getattr(self.topo_obj,parameter_name)
+            value = getattr(self.topo_obj,parameter_name)
 
         if parameter.constant==True and class_==False:
-            self.__add_readonly_text_property(parameter_name,v,parameter)
+            self.__add_readonly_text_property(parameter_name,value,parameter)
         else:
             for c in classlist(type(parameter))[::-1]:
                 if self.__parameter_property.has_key(c):
                     # find the right method...
                     property_to_add = self.__parameter_property[c]
                     # ...then call it
-                    property_to_add(parameter_name,v,parameter)
+                    property_to_add(parameter_name,value,parameter)
                     return
             # no match: use text box
-            self.__add_text_property(parameter_name,v,parameter)
+            self.__add_text_property(parameter_name,value,parameter)
             
 
-    def __add_text_property(self,parameter_name,v,parameter):
+    def __add_text_property(self,parameter_name,value,parameter):
         """
         Add a text property to the properties_frame.
         """
         # Used to keep track of the value and its string representation, or
         # to evaluate the string representation in __main__.__dict__
-        translator = lambda in_string: dict_translator(in_string,translator_dictionary={str(v):v})
+        translator = lambda in_string: dict_translator(in_string,translator_dictionary={str(value):value})
         
         self.__widgets[parameter_name]=self.__properties_frame.add_text_property(
             parameter_name,
             translator = translator,
-            value = v)
+            value = value)
 
 
-    def __add_readonly_text_property(self,parameter_name,v,parameter):
+    def __add_readonly_text_property(self,parameter_name,value,parameter):
         """
         Add a readonly text property to the properties_frame.
         """
         self.__widgets[parameter_name] = self.__properties_frame.add_text_property(
             parameter_name,
-            value = v,
+            value = value,
             readonly = True)
 
-    def __add_numeric_property(self,parameter_name,v,parameter):
+    def __add_numeric_property(self,parameter_name,value,parameter):
         """
         Add a numeric property to the properties_frame.
 
@@ -279,7 +279,7 @@ class ParametersFrame(Frame):
 
             self.__widgets[parameter_name] = self.__properties_frame.add_tagged_slider_property(
                 parameter_name,
-                v,
+                value,
                 min_value = str(low_bound),
                 max_value = str(high_bound),
                 width = 30,
@@ -288,10 +288,10 @@ class ParametersFrame(Frame):
 
         except AttributeError:
 
-            self.__widgets[parameter_name] = self.__properties_frame.add_text_property(parameter_name,value=v,translator=topo.misc.utils.eval_atof)
+            self.__widgets[parameter_name] = self.__properties_frame.add_text_property(parameter_name,value=value,translator=topo.misc.utils.eval_atof)
 
 
-    def __add_enumeration_property(self,parameter_name,v,parameter):
+    def __add_enumeration_property(self,parameter_name,value,parameter):
         """
         Add an enumeration property to the properties_frame by representing
         it with a ComboBox.
@@ -299,16 +299,16 @@ class ParametersFrame(Frame):
         # CEBHACKALERT: only string Enumerations work at the moment.
         self.__widgets[parameter_name] = self.__properties_frame.add_combobox_property(
                     parameter_name,
-                    value = v,
+                    value = value,
                     scrolledlist_items = parameter.available)
 
     # CB: how does this work?
-    def __add_class_selector_property(self,parameter_name,v,parameter):
+    def __add_class_selector_property(self,parameter_name,value,parameter):
         """
         Add a package property to the properties_frame by representing it
         with a ComboBox.
         """
-        attr = v
+        attr = value
 
         # get the current value of this field
         translator_dictionary = {}
@@ -360,12 +360,12 @@ class ParametersFrame(Frame):
 
 
 
-    def __add_boolean_property(self,parameter_name,v,parameter):
+    def __add_boolean_property(self,parameter_name,value,parameter):
         """
         Add a boolean property to the properties_frame by representing it with a
         Checkbutton.
         """        
-        self.__widgets[parameter_name] = self.__properties_frame.add_checkbutton_property(parameter_name,value=v)
+        self.__widgets[parameter_name] = self.__properties_frame.add_checkbutton_property(parameter_name,value=value)
 
 
     # CB: I guess this does a new frame?
