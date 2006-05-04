@@ -369,12 +369,15 @@ class ParametersFrame(Frame):
 
 
     # CB: I guess this does a new frame?
+    # JAB: Yes -- try it on something like an output_fn; it lets you
+    # edit the properties of that object.
     def right_click(self, event, widget, name) :
         self.parameters_properties = widget, name
         self.menu.tk_popup(event.x_root, event.y_root)
 
 
     # CB: there's no way this can work, but I don't know what it's for yet.
+    # JAB: See above.
     def show_parameter_properties(self, param) :
         w, name = param
         obj = w.get_value()
@@ -388,6 +391,7 @@ class ParametersFrame(Frame):
                 self.object_dictionary[name][obj_key] = obj
             except : return
         parameter_window = Toplevel()
+        parameter_window.title(obj.name+' parameters')
         Label(parameter_window, text = obj.name).pack(side = TOP)
         parameter_frame = ParametersFrame(parameter_window)
         parameter_frame.create_widgets(obj)
