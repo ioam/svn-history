@@ -118,9 +118,9 @@ def eval_atof(in_string,default_val = 0):
     except Exception:
         val = default_val
     return val
+    
 
-
-
+# CEBHACKALERT: I hope this can be simplified.
 def dict_translator(in_string, name = '', translator_dictionary = {}) :
     """
     Looks for an entry for the string in the dictionary. If it can't be
