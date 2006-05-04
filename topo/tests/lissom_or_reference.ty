@@ -224,21 +224,21 @@ topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"), dest_port="in
 # executed before t=200's input pattern is presented, and is therefore
 # equivalent to or_map_topo's event scheduled at t=200.
 
-topo.sim.schedule_command(199, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds, BoundingBox(radius=exc_rad*0.6/BaseN)')
+topo.sim.schedule_command(199, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.6/BaseN)); n_exc_units=81')
 
-topo.sim.schedule_command(499, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds, BoundingBox(radius=exc_rad*0.42/BaseN)')
+topo.sim.schedule_command(499, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.42/BaseN)); n_exc_units=49')
 
-topo.sim.schedule_command(999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds, BoundingBox(radius=(exc_rad*0.336/BaseN)')
+topo.sim.schedule_command(999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.336/BaseN)); n_exc_units=25')
 
-topo.sim.schedule_command(1999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds, BoundingBox(radius=2.0/BaseN)')
+topo.sim.schedule_command(1999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=2.0/BaseN)); n_exc_units=9')
 
 
 
-topo.sim.schedule_command(  499,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.001*ecs')
-topo.sim.schedule_command(  499,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.005*acs')
-topo.sim.schedule_command( 1999,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.004*acs')
-topo.sim.schedule_command( 3999,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.003*acs')
-topo.sim.schedule_command(19999,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.0015*acs')
+topo.sim.schedule_command(  499,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.001*ecs*n_exc_units')
+topo.sim.schedule_command(  499,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.005*acs*n_aff_units')
+topo.sim.schedule_command( 1999,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.004*acs*n_aff_units')
+topo.sim.schedule_command( 3999,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.003*acs*n_aff_units')
+topo.sim.schedule_command(19999,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.0015*acs*n_aff_units')
 
 
 topo.sim.schedule_command(  200, 'topo.sim["V1"].output_fn.lower_bound=0.11; topo.sim["V1"].output_fn.upper_bound=0.66')
