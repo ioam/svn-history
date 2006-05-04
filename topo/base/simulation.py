@@ -216,7 +216,8 @@ class EventProcessor(ParameterizedObject):
         # The in_connection is just a general list. Subclass can use other
         # data stuctures to optimize the operations specific to it
         # by overriding _connect_from().
-        
+
+        # JABHACKALERT: Why are these two not symmetric?  Surely there's no reason.        
         self.in_connections = []
         self.out_connections = {None:[]}
 
