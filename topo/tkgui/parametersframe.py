@@ -12,7 +12,7 @@ import Pmw
 from Tkinter import Frame, Button, RIGHT, TOP, BOTH, BOTTOM, END, YES, N,S,E,W,X, Menu, Toplevel, Label
 
 import topo.misc.utils
-from topo.misc.utils import keys_sorted_by_value, dict_translator
+from topo.misc.utils import keys_sorted_by_value, dict_translator, eval_atof
 from topo.base.parameterizedobject import ParameterizedObject,ParameterizedObjectMetaclass,classlist
 from topo.base.parameterclasses import Number,Enumeration,ClassSelectorParameter,BooleanParameter
 
@@ -223,7 +223,6 @@ class ParametersFrame(Frame):
         else:
             v = getattr(self.topo_obj,parameter_name)
 
-
         if parameter.constant==True and class_==False:
             self.__add_readonly_text_property(parameter_name,v,parameter)
         else:
@@ -238,16 +237,19 @@ class ParametersFrame(Frame):
             self.__add_text_property(parameter_name,v,parameter)
             
 
-    # CB: see alert in misc/utils; eval_atof doesn't do what it says! (which
-    # is why I can use it here...)
-    def __add_text_property(self,parameter_name,v,parameter,translator=topo.misc.utils.eval_atof):
+    def __add_text_property(self,parameter_name,v,parameter):
         """
         Add a text property to the properties_frame.
         """
+        # Used to keep track of the value and its string representation, or
+        # to evaluate the string representation in __main__.__dict__
+        translator = lambda in_string: dict_translator(in_string,translator_dictionary={str(v):v})
+        
         self.__widgets[parameter_name]=self.__properties_frame.add_text_property(
             parameter_name,
             translator = translator,
             value = v)
+
 
     def __add_readonly_text_property(self,parameter_name,v,parameter):
         """
