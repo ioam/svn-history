@@ -17,12 +17,10 @@ __version__='$Revision$'
 
 
 
-import random
 import fixedpoint
 #import pdb # debugger
 
 from math import pi, sqrt
-from itertools import chain
 from fixedpoint import FixedPoint
 
 from topo.sheets.lissom import LISSOM
@@ -37,11 +35,15 @@ from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPHebbian_opt1
 from topo.outputfns.optimized import CFPDivisiveSumNormalize_opt1
 from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
-from topo.patterns import PatternGeneratorParameter
+
 import topo.tests.lissom_log_parser
 
 ###########################################
 # Variables to match the C++ version of LISSOM
+
+n_aff_units = 137
+n_exc_units = 97
+n_inh_units = 421
 
 ### (1)
 BaseN=48.0
@@ -139,7 +141,6 @@ assert round(min_exc_rad,5) == 1.59091
 
 # Number of decimal places for simulator time
 fixedpoint.DEFAULT_PRECISION=3
-random.seed(1234)
 
 # input generation params
 GeneratorSheet.density = BaseRN*area_scale
@@ -178,36 +179,25 @@ inhibitory_weight_bounds = BoundingBox(radius=inh_rad/BaseN)                  # 
 
 # Circular ConnectionFields
 CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
-
-# Specify weight initialization
 CFProjection.weights_generator = topo.patterns.basic.Constant()
-
-# Specify the response function
-# inlinec.optimized should make this unnecessary.
 CFProjection.response_fn=CFPDotProduct_opt1()
-
-# Specify learning function
 CFProjection.learning_fn=CFPHebbian_opt1()
-
 CFProjection.weights_output_fn=CFPDivisiveSumNormalize_opt1()
-
 SharedWeightCFProjection.weights_output_fn.single_cf_fn = DivisiveSumNormalize()
 
-###########################################
-# build simulation
 
-s = topo.base.simulator.Simulator()
 
-Retina = GeneratorSheet(name='Retina',bounds=retina_bounds,
-                        input_generator=input_pattern)
 
-LGNOn = CFSheet(bounds=lgn_bounds,name='LGNOn',density=24.0,
-                output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
+topo.sim['Retina'] = GeneratorSheet(bounds=retina_bounds,
+                                    input_generator=input_pattern)
 
-LGNOff = CFSheet(bounds=lgn_bounds,name='LGNOff',density=24.0,
-                 output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
+topo.sim['LGNOn'] = CFSheet(bounds=lgn_bounds,density=24.0,
+                      output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
 
-V1 = LISSOM(name='V1', density=48.0,
+topo.sim['LGNOff'] = CFSheet(bounds=lgn_bounds,density=24.0,
+                      output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
+
+topo.sim['V1'] = LISSOM(density=48.0,
             output_fn=PiecewiseLinear(lower_bound=delta,upper_bound=beta))
 
 
@@ -243,49 +233,47 @@ V1 = LISSOM(name='V1', density=48.0,
 
 
 # LGN ON channel
+topo.sim.connect('Retina','LGNOn',dest_port="center",delay = FixedPoint("0.05"),
+                 connection_type=SharedWeightCFProjection,strength=2.33,
+                 name='Center',user_weights_bounds=lgn_weight_bounds,
+                 weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_c/BaseRN,aspect_ratio=1))
 
 
-LGNOn_center = s.connect2('Retina','LGNOn',dest_port="center",delay = FixedPoint("0.05"),
-                         connection_type=SharedWeightCFProjection,strength=2.33,
-                         name='Center',user_weights_bounds=lgn_weight_bounds,
-                         weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_c/BaseRN,aspect_ratio=1))
-
-
-LGNOn_surround = s.connect2('Retina','LGNOn',dest_port="surround",delay = FixedPoint("0.05"),
-                           connection_type=SharedWeightCFProjection,strength=-2.33,
-                           name='Surround',user_weights_bounds=lgn_weight_bounds,
-                           weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_s/BaseRN,aspect_ratio=1))
+topo.sim.connect('Retina','LGNOn',dest_port="surround",delay = FixedPoint("0.05"),
+                 connection_type=SharedWeightCFProjection,strength=-2.33,
+                 name='Surround',user_weights_bounds=lgn_weight_bounds,
+                 weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_s/BaseRN,aspect_ratio=1))
 
 
 # LGN OFF channel
-LGNOff_center = s.connect2('Retina','LGNOff',dest_port="center",delay = FixedPoint("0.05"),
-                          connection_type=SharedWeightCFProjection,strength=-2.33,
-                          name='Center',user_weights_bounds=lgn_weight_bounds,
-                          weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_c/BaseRN,aspect_ratio=1))
+topo.sim.connect('Retina','LGNOff',dest_port="center",delay = FixedPoint("0.05"),
+                 connection_type=SharedWeightCFProjection,strength=-2.33,
+                 name='Center',user_weights_bounds=lgn_weight_bounds,
+                 weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_c/BaseRN,aspect_ratio=1))
 
 
-LGNOff_surround = s.connect2('Retina','LGNOff',dest_port="surround",delay = FixedPoint("0.05"),
-                            connection_type=SharedWeightCFProjection,strength=2.33,
-                            name='Surround',user_weights_bounds=lgn_weight_bounds,
-                            weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_s/BaseRN,aspect_ratio=1))
+topo.sim.connect('Retina','LGNOff',dest_port="surround",delay = FixedPoint("0.05"),
+                 connection_type=SharedWeightCFProjection,strength=2.33,
+                 name='Surround',user_weights_bounds=lgn_weight_bounds,
+                 weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_s/BaseRN,aspect_ratio=1))
 
 
-s.connect2('LGNOn','V1',delay=FixedPoint("0.05"),dest_port="on",
-          connection_type=CFProjection,strength=0.5,name='LGNOnAfferent',
-          user_weights_bounds=afferent_weight_bounds,learning_rate=alpha_input*137)
+topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"),dest_port="on",
+          connection_type=CFProjection,strength=0.75,name='LGNOnAfferent',
+          user_weights_bounds=afferent_weight_bounds,learning_rate=alpha_input*n_aff_units)
 
-s.connect2('LGNOff','V1',delay=FixedPoint("0.05"),dest_port="off",
+topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"),dest_port="off",
           connection_type=CFProjection,strength=0.5,name='LGNOffAfferent',
-          user_weights_bounds=afferent_weight_bounds,learning_rate=alpha_input*137)
+          user_weights_bounds=afferent_weight_bounds,learning_rate=alpha_input*n_aff_units)
 
 
-s.connect2('V1','V1',delay=FixedPoint("0.05"),dest_port="exc",
+topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),dest_port="exc",
           connection_type=CFProjection,strength=0.9,name='LateralExcitatory',
-          user_weights_bounds=excitatory_weight_bounds,learning_rate=alpha_exc*97) 
+          user_weights_bounds=excitatory_weight_bounds,learning_rate=alpha_exc*n_exc_units) 
             
-s.connect2('V1','V1',delay=FixedPoint("0.05"), dest_port="inh",
+topo.sim.connect('V1','V1',delay=FixedPoint("0.05"), dest_port="inh",
           connection_type=CFProjection,strength=-0.9,name='LateralInhibitory',
-          user_weights_bounds=inhibitory_weight_bounds,learning_rate=alpha_inh*421)         
+          user_weights_bounds=inhibitory_weight_bounds,learning_rate=alpha_inh*n_inh_units)         
 
 
 #V1.set_projections_to_jointly_normalize(['LGNOnAfferent','LGNOffAfferent'])
@@ -303,53 +291,45 @@ s.connect2('V1','V1',delay=FixedPoint("0.05"), dest_port="inh",
 ### available again.
 
 
-# this results in 37 units
-s.schedule_action(199, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(radius=0.6*exc_rad/BaseN,min_radius=min_exc_radius))
+### EXCITATORY BOUNDS CHANGES
+#
+topo.sim.schedule_command(199, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.6*exc_rad/BaseN,min_radius=min_exc_radius)); n_exc_units=37')
 
-# and this results in 21 units
-s.schedule_action(499, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(radius=0.42*exc_rad/BaseN,min_radius=min_exc_radius))
-
-
-
-# Schedule action requires a function, so we create a temporary one
-def set_learning_rate(projection_name, rate):
-    """Set the learning rate on the named projection of V1."""
-    V1.projections()[projection_name].learning_rate=rate
+topo.sim.schedule_command(499, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.42*exc_rad/BaseN,min_radius=min_exc_radius));n_exc_units=21')
 
 
+### LEARNING RATE CHANGES
+#
 # number of units changes with the bounds change
-s.schedule_action(  199, set_learning_rate, "LateralExcitatory", alpha_exc*37)
+topo.sim.schedule_command(  199, 'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=alpha_exc*n_exc_units')
 
 # scheduled change AND number of units changes with bounds change
-s.schedule_action(  499, set_learning_rate, "LateralExcitatory", 0.001*ecs*21)
+topo.sim.schedule_command(  499, 'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.001*ecs*21*n_exc_units')
+
+# c++ scheduled changes only
+topo.sim.schedule_command(  499, 'topo.sim["V1"].projections()["LGNOnAfferent"].learning_rate=0.005*acs*n_aff_units')
+topo.sim.schedule_command( 1999, 'topo.sim["V1"].projections()["LGNOnAfferent"].learning_rate=0.004*acs*n_aff_units')
+topo.sim.schedule_command( 3999, 'topo.sim["V1"].projections()["LGNOnAfferent"].learning_rate=0.003*acs*n_aff_units')
+topo.sim.schedule_command(19999, 'topo.sim["V1"].projections()["LGNOnAfferent"].learning_rate=0.0015*acs*n_aff_units')
+
+topo.sim.schedule_command(  499, 'topo.sim["V1"].projections()["LGNOffAfferent"].learning_rate=0.005*acs*n_aff_units')
+topo.sim.schedule_command( 1999, 'topo.sim["V1"].projections()["LGNOffAfferent"].learning_rate=0.004*acs*n_aff_units')
+topo.sim.schedule_command( 3999, 'topo.sim["V1"].projections()["LGNOffAfferent"].learning_rate=0.003*acs*n_aff_units')
+topo.sim.schedule_command(19999, 'topo.sim["V1"].projections()["LGNOffAfferent"].learning_rate=0.0015*acs*n_aff_units')
 
 
-s.schedule_action(  499, set_learning_rate, "LGNOnAfferent", 0.005*acs*137)
-s.schedule_action( 1999, set_learning_rate, "LGNOnAfferent", 0.004*acs*137)
-s.schedule_action( 3999, set_learning_rate, "LGNOnAfferent", 0.003*acs*137)
-s.schedule_action(19999, set_learning_rate, "LGNOnAfferent", 0.0015*acs*137)
-
-s.schedule_action(  499, set_learning_rate, "LGNOffAfferent", 0.005*acs*137)
-s.schedule_action( 1999, set_learning_rate, "LGNOffAfferent", 0.004*acs*137)
-s.schedule_action( 3999, set_learning_rate, "LGNOffAfferent", 0.003*acs*137)
-s.schedule_action(19999, set_learning_rate, "LGNOffAfferent", 0.0015*acs*137)
-
-
-def set_deltabeta(x,y):
-    """Set the threshold function limits on V1."""
-    V1.output_fn.lower_bound=x
-    V1.output_fn.upper_bound=y
-
-s.schedule_action(  199, set_deltabeta,0.093 , 0.643)
-s.schedule_action(  499, set_deltabeta,0.103 , 0.653)
-s.schedule_action(  999, set_deltabeta,0.133 , 0.663)
-s.schedule_action( 1999, set_deltabeta,0.163 , 0.683)
-s.schedule_action( 2999, set_deltabeta,0.183 , 0.713)
-s.schedule_action( 3999, set_deltabeta,0.183 , 0.743)
-s.schedule_action( 4999, set_deltabeta,0.193 , 0.773)
-s.schedule_action( 6499, set_deltabeta,0.203 , 0.803)
-s.schedule_action( 7999, set_deltabeta,0.213 , 0.833)
-s.schedule_action(19999, set_deltabeta,0.223 , 0.863)
+### V1 output function bounds changes
+#
+topo.sim.schedule_command(  199, 'topo.sim["V1"].output_fn.lower_bound=0.093; topo.sim["V1"].output_fn.upper_bound=0.643')
+topo.sim.schedule_command(  499, 'topo.sim["V1"].output_fn.lower_bound=0.103; topo.sim["V1"].output_fn.upper_bound=0.653')
+topo.sim.schedule_command(  999, 'topo.sim["V1"].output_fn.lower_bound=0.133; topo.sim["V1"].output_fn.upper_bound=0.663')
+topo.sim.schedule_command( 1999, 'topo.sim["V1"].output_fn.lower_bound=0.163; topo.sim["V1"].output_fn.upper_bound=0.683')
+topo.sim.schedule_command( 2999, 'topo.sim["V1"].output_fn.lower_bound=0.183; topo.sim["V1"].output_fn.upper_bound=0.713')
+topo.sim.schedule_command( 3999, 'topo.sim["V1"].output_fn.lower_bound=0.183; topo.sim["V1"].output_fn.upper_bound=0.743')
+topo.sim.schedule_command( 4999, 'topo.sim["V1"].output_fn.lower_bound=0.193; topo.sim["V1"].output_fn.upper_bound=0.773')
+topo.sim.schedule_command( 6499, 'topo.sim["V1"].output_fn.lower_bound=0.203; topo.sim["V1"].output_fn.upper_bound=0.803')
+topo.sim.schedule_command( 7999, 'topo.sim["V1"].output_fn.lower_bound=0.213; topo.sim["V1"].output_fn.upper_bound=0.833')
+topo.sim.schedule_command(19999, 'topo.sim["V1"].output_fn.lower_bound=0.223; topo.sim["V1"].output_fn.upper_bound=0.863')
 
 
 
