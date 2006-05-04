@@ -402,15 +402,5 @@ class ParametersFrame(Frame):
     def parameter_properties_ok(self,frame, win) :
         frame.set_obj_params()
         win.destroy()
-
-
-    # CB: how does this work? Think it needs to change.
-    def __add_property_for_class(self, parameter_name) :
-        attr = getattr(self.topo_obj,parameter_name)
-        attr_class = attr.__class__
-        if self.__class_property.has_key(attr_class) :
-            self.__class_property[attr.__class__](parameter_name, None)
-        else :
-            self.__add_text_property(parameter_name,None)
                 
                 
