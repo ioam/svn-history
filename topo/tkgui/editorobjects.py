@@ -37,6 +37,7 @@ class EditorObject :
     def show_properties(self) :
         # show parameters frame for object
         parameter_window = Toplevel()
+        parameter_window.title(self.name+' parameters')
         Label(parameter_window, text = self.name).pack(side = TOP)
         self.parameter_frame = ParametersFrame(parameter_window)
         self.button_panel = Frame(parameter_window)

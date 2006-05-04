@@ -257,10 +257,10 @@ class ParametersTool(Frame) :
         # with nothing in it opens when the model editor is
         # started.
         parameter_window = Toplevel() #self
+        parameter_window.title('New object parameters')
         #Label(parameter_window, text = "Edit class p").pack(side = TOP)
         self.parameter_frame = ParametersFrame(parameter_window)
         self.parameter_window=parameter_window
-
 
     def update_parameters(self) :
         self.parameter_frame.set_class_parameters()
