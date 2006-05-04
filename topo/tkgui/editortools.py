@@ -6,7 +6,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import Frame, Button, Label, Canvas, TOP, X, GROOVE, RAISED, BOTTOM
+from Tkinter import Frame, Button, Label, Canvas, TOP, X, GROOVE, RAISED, BOTTOM, Toplevel
 import Pmw
 import tkFont
 
@@ -252,8 +252,14 @@ class ParametersTool(Frame) :
         self.title_label.pack(side = TOP)
         self.doc_label = Label(self, font = ("Times", 12))
         self.doc_label.pack(side = TOP)
-        # parameters frame, for showing modifiable class properties
-        self.parameter_frame = ParametersFrame(self, bd = 2)
+
+        # CEBHACKALERT: the problem is, a tiny little window
+        # with nothing in it opens when the model editor is
+        # started.
+        parameter_window = Toplevel() #self
+        #Label(parameter_window, text = "Edit class p").pack(side = TOP)
+        self.parameter_frame = ParametersFrame(parameter_window)
+        self.parameter_window=parameter_window
 
 
     def update_parameters(self) :
@@ -261,9 +267,12 @@ class ParametersTool(Frame) :
 
     def set_focus(self, name, focus_class, doc = '') :
         self.focus = name
-        self.parameter_frame.forget()
+            
         self.title_label.config(text = name)
         self.doc_label.config(text = doc)
 
         if focus_class:
             self.parameter_frame.create_class_widgets(focus_class)
+
+            
+            
