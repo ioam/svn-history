@@ -222,7 +222,7 @@ class SquareGrating(PatternGenerator):
 from Numeric import ones
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.sheet import Sheet
+from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.base.boundingregion import BoundingBox
 from topo.outputfns.basic import IdentityOF
 class PatternSampler(ParameterizedObject):
@@ -245,11 +245,13 @@ class PatternSampler(ParameterizedObject):
         super(PatternSampler,self).__init__()
         
         rows,cols=pattern_array.shape
-        # CEBHACKALERT: needs to be based on a sheet that can have different
-        # xdensity and ydensity
-        self.pattern_sheet = Sheet(density=1.0,
-                                 bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
-                                                            ( cols/2.0, rows/2.0))))
+
+        self.pattern_sheet = SheetCoordinateSystem(
+            xdensity=1.0,
+            ydensity=1.0,
+            bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
+                                       ( cols/2.0, rows/2.0))))
+        
         self.pattern_sheet.activity = whole_pattern_output_fn(pattern_array)
 
         if not background_value_fn:
@@ -322,7 +324,7 @@ class PatternSampler(ParameterizedObject):
             for i in xrange(rows):
                 for j in xrange(cols):
                     # indexes outside the pattern are left with the background color
-                    if self.pattern_sheet.bounds.contains_exclusive(x[i,j],y[i,j]):
+                    if self.pattern_sheet.true_bounds.contains_exclusive(x[i,j],y[i,j]):
                         pattern_sample[i,j] = self.pattern_sheet.activity[r[i,j],c[i,j]]
 
         return pattern_sample
