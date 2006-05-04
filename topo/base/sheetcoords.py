@@ -77,9 +77,6 @@ from boundingregion import BoundingBox
 # to 'user_bounds' and 'user_density' (so that the true bounds can be
 # stored in 'bounds' is the search-and-replace effort that would be
 # required.
-# (This is a similar issue to the one in CFProjection - seems like
-# weights_bounds should be user_weights_bounds, or something like
-# that.)
 
 class SheetCoordinateSystem(object):
     """
