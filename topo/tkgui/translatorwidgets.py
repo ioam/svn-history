@@ -23,6 +23,10 @@ class TranslatorWidget(object):
     Abstract superclass for a widget that represents its true value with a string.
     """
     def __init__(self, translator=None):
+        """
+        translator is a function accepting one string argument
+        and returning the result of the translation
+        """
         self.translator = translator
 
 
