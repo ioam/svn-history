@@ -15,7 +15,9 @@
       A. Bednar</a>
   (<A HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107">&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107</a>)</I><SMALL></TD>
   <TD ALIGN="RIGHT"><SMALL><I>Last update: 
-Thu Dec 22 13:05:31 GMT 2005
+<?php
+echo date("D M j G:i:s T Y");
+?>
 </I><SMALL><img src="http://www.cs.utexas.edu/users/jbednar/cgi-bin/logaccess.cgi?topographica.org" height=1 width=1>
 </TD>
   </TR>
