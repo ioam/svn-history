@@ -14,12 +14,12 @@ was first added to the list, or a change was made.)
 
 <!-- CB: I put my tasks in the approximate order that I'm doing them -->
 
-<li> 
-2006/05/02 (CB): Finish Slice and SheetCoordinateSystem classes; update PatternSampler. [**before release]
+<li>
+2006/05/04 (CB): Matching with C++ lissom; the performance has worsened (try lissom_oo_or). [** before release]
 </li>
 
-<li>
-2006/05/02 (CB): Matching with C++ lissom; has the performance worsened (e.g. lissom_oo_or)? [** before release]
+<li> 
+2006/05/02 (CB): Finish Slice and SheetCoordinateSystem classes; update PatternSampler. [**before release]
 </li>
 
 <li> 
@@ -147,6 +147,10 @@ use them.
 
 <li> 
 2006/05/02 (CB): investigate failing test in testimage.py (that uses sheet functions).
+</li>
+
+<li>
+2006/05/04 (CB): ParametersFrame needs to be tidied up!
 </li>
 
 <li> 
