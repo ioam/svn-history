@@ -228,17 +228,23 @@ topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"), dest_port="in
 # executed before t=200's input pattern is presented, and is therefore
 # equivalent to or_map_topo's event scheduled at t=200.
 
-topo.sim.schedule_command(199, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.6/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=81')
+topo.sim.schedule_command(199, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.6/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=69')
 
-topo.sim.schedule_command(499, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.42/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=49')
+topo.sim.schedule_command(499, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.42/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=29')
 
-topo.sim.schedule_command(999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.336/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=25')
+topo.sim.schedule_command(999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.336/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=21')
 
-topo.sim.schedule_command(1999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=2.0/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=9')
+#topo.sim.schedule_command(1999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=2.0/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=9')
 
+## CEBHACKALERT: investigate - last bounds change doesn't happen in Topographica
+## Topographica> topo.sim['V1'].in_connections[1].weights_bounds.lbrt()
+## (-0.02777777777777779, -0.04166666666666663, 0.04166666666666663, 0.02777777777777779)
+## Topographica> BoundingBox(radius=2.0/BaseN).lbrt()
+## (-0.027777777777777776, -0.027777777777777776, 0.027777777777777776, 0.027777777777777776)
 
-
+topo.sim.schedule_command(  199,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.002*ecs*n_exc_units')
 topo.sim.schedule_command(  499,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.001*ecs*n_exc_units')
+
 topo.sim.schedule_command(  499,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.005*acs*n_aff_units')
 topo.sim.schedule_command( 1999,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.004*acs*n_aff_units')
 topo.sim.schedule_command( 3999,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.003*acs*n_aff_units')
