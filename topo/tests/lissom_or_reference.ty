@@ -19,9 +19,7 @@ __version__='$Revision$'
 # (needs updating to use schedule_command)
 
 # To do:
-# - learning rates need to be adjusted
-# for 72x72 network.
-# - also, check all relevant scheduled events are
+# - check all relevant scheduled events are
 # here.
 
 
@@ -33,8 +31,10 @@ __version__='$Revision$'
 # after more because learning rates not updated yet (used
 # correct learning rates for the 100-iterations test).
 # - With circular receptive fields, sum over activity
-# after 55 learning iteration matches to 5-6 dp. Haven't
-# checked any further yet.
+# after 201 learning iteration matches to 5-6 dp. Haven't
+# checked any further yet, but unless the scheduled actions
+# contain a mistake, it should finish up matching to this
+# accuracy after 20000 iterations (waiting to see...).
 
 
 
@@ -218,7 +218,8 @@ topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"), dest_port="in
           name='LateralInhibitory',
           user_weights_bounds = inhibitory_weight_bounds, learning_rate=alpha_inh)
         
-
+# CEBHACKALERT: this isn't the right way to do it, but it
+# should be ok for our matching purposes...
 # Times are 1 less than the or_map_topo.param c++ lissom simulation
 # because that one uses "hook before_input" to schedule events. So, an
 # event at t=200 is executed before t=200's input pattern is
@@ -244,16 +245,16 @@ topo.sim.schedule_command( 3999,'topo.sim["V1"].projections()["Afferent0"].learn
 topo.sim.schedule_command(19999,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.0015*acs*n_aff_units')
 
 
-topo.sim.schedule_command(  200, 'topo.sim["V1"].output_fn.lower_bound=0.11; topo.sim["V1"].output_fn.upper_bound=0.66')
-topo.sim.schedule_command(  500, 'topo.sim["V1"].output_fn.lower_bound=0.12; topo.sim["V1"].output_fn.upper_bound=0.67')
-topo.sim.schedule_command( 1000, 'topo.sim["V1"].output_fn.lower_bound=0.15; topo.sim["V1"].output_fn.upper_bound=0.68')
-topo.sim.schedule_command( 2000, 'topo.sim["V1"].output_fn.lower_bound=0.18; topo.sim["V1"].output_fn.upper_bound=0.70')
-topo.sim.schedule_command( 3000, 'topo.sim["V1"].output_fn.lower_bound=0.20; topo.sim["V1"].output_fn.upper_bound=0.73')
-topo.sim.schedule_command( 4000, 'topo.sim["V1"].output_fn.lower_bound=0.20; topo.sim["V1"].output_fn.upper_bound=0.76')
-topo.sim.schedule_command( 5000, 'topo.sim["V1"].output_fn.lower_bound=0.21; topo.sim["V1"].output_fn.upper_bound=0.79')
-topo.sim.schedule_command( 6500, 'topo.sim["V1"].output_fn.lower_bound=0.22; topo.sim["V1"].output_fn.upper_bound=0.82')
-topo.sim.schedule_command( 8000, 'topo.sim["V1"].output_fn.lower_bound=0.23; topo.sim["V1"].output_fn.upper_bound=0.85')
-topo.sim.schedule_command(20000, 'topo.sim["V1"].output_fn.lower_bound=0.24; topo.sim["V1"].output_fn.upper_bound=0.88')
+topo.sim.schedule_command(  199, 'topo.sim["V1"].output_fn.lower_bound=0.11; topo.sim["V1"].output_fn.upper_bound=0.66')
+topo.sim.schedule_command(  499, 'topo.sim["V1"].output_fn.lower_bound=0.12; topo.sim["V1"].output_fn.upper_bound=0.67')
+topo.sim.schedule_command(  999, 'topo.sim["V1"].output_fn.lower_bound=0.15; topo.sim["V1"].output_fn.upper_bound=0.68')
+topo.sim.schedule_command( 1999, 'topo.sim["V1"].output_fn.lower_bound=0.18; topo.sim["V1"].output_fn.upper_bound=0.70')
+topo.sim.schedule_command( 2999, 'topo.sim["V1"].output_fn.lower_bound=0.20; topo.sim["V1"].output_fn.upper_bound=0.73')
+topo.sim.schedule_command( 3999, 'topo.sim["V1"].output_fn.lower_bound=0.20; topo.sim["V1"].output_fn.upper_bound=0.76')
+topo.sim.schedule_command( 4999, 'topo.sim["V1"].output_fn.lower_bound=0.21; topo.sim["V1"].output_fn.upper_bound=0.79')
+topo.sim.schedule_command( 6499, 'topo.sim["V1"].output_fn.lower_bound=0.22; topo.sim["V1"].output_fn.upper_bound=0.82')
+topo.sim.schedule_command( 7999, 'topo.sim["V1"].output_fn.lower_bound=0.23; topo.sim["V1"].output_fn.upper_bound=0.85')
+topo.sim.schedule_command(19999, 'topo.sim["V1"].output_fn.lower_bound=0.24; topo.sim["V1"].output_fn.upper_bound=0.88')
 
 
 
