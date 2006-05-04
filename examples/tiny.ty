@@ -81,7 +81,7 @@ topo.sim.connect(
     'Retina','V1',name='RtoV1',delay=FixedPoint("0.5"),
     connection_type=CFProjection, 
     weights_generator=topo.patterns.random.UniformRandom(),
-    weights_bounds=BoundingBox(radius=0.2),
+    user_weights_bounds=BoundingBox(radius=0.2),
     response_fn=CFPDotProduct_opt1(),
     learning_fn=GenericCFPLearningFn(single_cf_fn=SampleHebbian(sample_param=0.5)),
     weights_output_fn=GenericCFPOutputFn(single_cf_fn=DivisiveL1Normalize()),

@@ -207,13 +207,13 @@ SharedWeightCFProjection.learning_fn.output_fn=DivisiveSumNormalize()
 
 topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),name='Center',
 		  connection_type=SharedWeightCFProjection,strength=2.33,
-		  weights_bounds=BoundingBox(radius=retinalgnboxradius),
+		  user_weights_bounds=BoundingBox(radius=retinalgnboxradius),
                   weights_generator=topo.patterns.basic.Gaussian(size=centre,
 							       aspect_ratio=1))
 
 topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),name='Surround',
 		  connection_type=SharedWeightCFProjection,strength=-2.33,
-		  weights_bounds=BoundingBox(radius=retinalgnboxradius),
+		  user_weights_bounds=BoundingBox(radius=retinalgnboxradius),
 		  weights_generator=topo.patterns.basic.Gaussian(size=surround,
 							       aspect_ratio=1))
 
@@ -221,13 +221,13 @@ topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),name='Surround',
 # LGN OFF channel
 topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),name='Center',
 		  connection_type=SharedWeightCFProjection,strength=-2.33,
-		  weights_bounds=BoundingBox(radius=retinalgnboxradius),
+		  user_weights_bounds=BoundingBox(radius=retinalgnboxradius),
 		  weights_generator=topo.patterns.basic.Gaussian(size=centre,
 							       aspect_ratio=1))
 
 topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),name='Surround',
 		  connection_type=SharedWeightCFProjection,strength=2.33,
-		  weights_bounds=BoundingBox(radius=retinalgnboxradius),
+		  user_weights_bounds=BoundingBox(radius=retinalgnboxradius),
 		  weights_generator=topo.patterns.basic.Gaussian(size=surround,
 							       aspect_ratio=1))
                             
@@ -235,13 +235,13 @@ topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),name='Surround',
                             
 topo.sim.connect('Retina','LGNOns',delay = FixedPoint("0.05"),name='Center',
 		  connection_type=SharedWeightCFProjection,strength=2.33,
-		  weights_bounds=BoundingBox(radius=retinalgnboxradiuss),
+		  user_weights_bounds=BoundingBox(radius=retinalgnboxradiuss),
 		  weights_generator=topo.patterns.basic.Gaussian(size=centres,
 							       aspect_ratio=1))
 
 topo.sim.connect('Retina','LGNOns',delay = FixedPoint("0.05"),name='Surround',
 		  connection_type=SharedWeightCFProjection,strength=-2.33,
-		  weights_bounds=BoundingBox(radius=retinalgnboxradiuss),
+		  user_weights_bounds=BoundingBox(radius=retinalgnboxradiuss),
 		  weights_generator=topo.patterns.basic.Gaussian(size=surrounds,
 								 aspect_ratio=1))
 
@@ -249,13 +249,13 @@ topo.sim.connect('Retina','LGNOns',delay = FixedPoint("0.05"),name='Surround',
 # LGN OFF channel
 topo.sim.connect('Retina','LGNOffs',delay = FixedPoint("0.05"),
 		  connection_type=SharedWeightCFProjection,strength=-2.33,
-		  name='Center',weights_bounds=BoundingBox(radius=retinalgnboxradiuss),
+		  name='Center',user_weights_bounds=BoundingBox(radius=retinalgnboxradiuss),
 		  weights_generator=topo.patterns.basic.Gaussian(size=centres,
 								 aspect_ratio=1))
 
 topo.sim.connect('Retina','LGNOffs',delay=FixedPoint("0.05"),name='Surround',
 		  connection_type=SharedWeightCFProjection,strength=2.33,
-		  weights_bounds=BoundingBox(radius=retinalgnboxradiuss),
+		  user_weights_bounds=BoundingBox(radius=retinalgnboxradiuss),
 		  weights_generator=topo.patterns.basic.Gaussian(size=surrounds,
 								 aspect_ratio=1))
                             
@@ -263,23 +263,23 @@ topo.sim.connect('Retina','LGNOffs',delay=FixedPoint("0.05"),name='Surround',
 
 topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"),name='LGNOnAfferent',
 		  connection_type=CFProjection,strength=0.75,
-		  weights_bounds=BoundingBox(radius=lgnv1boxradius),
+		  user_weights_bounds=BoundingBox(radius=lgnv1boxradius),
 		  learning_rate=0.9590)
 
 topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"),name='LGNOffAfferent',
 		  connection_type=CFProjection,strength=0.5,
-		  weights_bounds=BoundingBox(radius=lgnv1boxradius),
+		  user_weights_bounds=BoundingBox(radius=lgnv1boxradius),
 		  learning_rate=0.9590)
 
 
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
 		  connection_type=CFProjection,strength=0.9,
-		  weights_bounds=BoundingBox(radius=latex),
+		  user_weights_bounds=BoundingBox(radius=latex),
 		  learning_rate=3.2018) 
             
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory', 
 		  connection_type=CFProjection,strength=-0.9,
-		  weights_bounds=BoundingBox(radius=latinh),
+		  user_weights_bounds=BoundingBox(radius=latinh),
 		  learning_rate=1.9626)         
 
 
@@ -287,26 +287,26 @@ RandomArray.seed(500,500) #sets V1s connectionfileds random initial weights seed
 
 topo.sim.connect('LGNOns','V1s',delay=FixedPoint("0.05"),name='LGNOnAfferents',
 		  connection_type=CFProjection,strength=0.75,
-		  weights_bounds=BoundingBox(radius=lgnv1boxradiuss),
+		  user_weights_bounds=BoundingBox(radius=lgnv1boxradiuss),
 		  learning_rate=0.9590)
 
 topo.sim.connect('LGNOffs','V1s',delay=FixedPoint("0.05"),
 		  connection_type=CFProjection,strength=0.5,
 		  name='LGNOffAfferents',
-		  weights_bounds=BoundingBox(radius=lgnv1boxradiuss),
+		  user_weights_bounds=BoundingBox(radius=lgnv1boxradiuss),
 		  learning_rate=0.9590)
 
 
 topo.sim.connect('V1s','V1s',delay=FixedPoint("0.05"),
 		  connection_type=CFProjection,strength=0.9,
 		  name='LateralExcitatorys',
-		  weights_bounds=BoundingBox(radius=latexs),
+		  user_weights_bounds=BoundingBox(radius=latexs),
 		  learning_rate=3.2018) 
             
 topo.sim.connect('V1s','V1s',delay=FixedPoint("0.05"), 
 		  connection_type=CFProjection,strength=-0.9,
 		  name='LateralInhibitorys',
-		  weights_bounds=BoundingBox(radius=latinhs),
+		  user_weights_bounds=BoundingBox(radius=latinhs),
 		  learning_rate=1.9626)   
 
 

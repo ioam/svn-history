@@ -88,13 +88,13 @@ SharedWeightCFProjection.learning_fn.output_fn=DivisiveSumNormalize()
 
 topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),
                   connection_type=SharedWeightCFProjection,strength=2.33,
-                  name='Center',weights_bounds=BoundingBox(radius=0.375),
+                  name='Center',user_weights_bounds=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),
                   connection_type=SharedWeightCFProjection,strength=-2.33,
-                  name='Surround',weights_bounds=BoundingBox(radius=0.375),
+                  name='Surround',user_weights_bounds=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
 

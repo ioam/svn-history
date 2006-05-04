@@ -491,7 +491,7 @@ class CFProjection(Projection):
     
     cf_type = Parameter(default=ConnectionField,constant=True)
     
-    weights_bounds = BoundingRegionParameter(
+    user_weights_bounds = BoundingRegionParameter(
         default=BoundingBox(radius=0.1),
         doc="Bounds defining the Sheet area covered by the connectionfields.")
     
@@ -528,7 +528,7 @@ class CFProjection(Projection):
         in the source sheet corresponding to the unit in the target
         sheet.
 
-        The weights_bounds specified may be altered. The bounds must
+        The user_weights_bounds specified may be altered. The bounds must
         be fit to the Sheet's matrix, and the weights matrix must
         have odd dimensions. These altered bounds are passed to the
         individual connection fields.
@@ -539,12 +539,10 @@ class CFProjection(Projection):
         """
         super(CFProjection,self).__init__(**params)
 
-        # CEBHACKALERT: see alert in Sheet about user_bounds.
-        self.original_bounds = copy.deepcopy(self.weights_bounds)
-        
-        # adjust the weights_bounds to be odd, and cropped to sheet if
+        # get the actual weight_bounds by adjusting a copy of the
+        # user_weights_bounds to be odd, and cropped to sheet if
         # necessary
-        self.weights_bounds = self.initialize_bounds(self.weights_bounds)
+        self.weights_bounds = self.initialize_bounds(self.user_weights_bounds)
 
         self.mask_template = self.create_mask_template()
         
@@ -596,7 +594,7 @@ class CFProjection(Projection):
         # ends '.0' in both x and y directions so that we get
         # reasonable circles.
         if hasattr(self.weights_shape, 'size'):
-            l,b,r,t = self.original_bounds.lbrt()
+            l,b,r,t = self.user_weights_bounds.lbrt()
             self.weights_shape.size = t-b
             self.weights_shape.aspect_ratio = (r-l)/self.weights_shape.size
 
@@ -614,7 +612,7 @@ class CFProjection(Projection):
         return mask_template
         
 
-    def initialize_bounds(self,bounds):
+    def initialize_bounds(self,original_bounds):
         """
         Return sheet-coordinate bounds that correspond exactly to the slice
         of the sheet which best approximates the specified sheet-coordinate
@@ -635,14 +633,17 @@ class CFProjection(Projection):
 
         This slice is converted back to the exactly corresponding
         bounds, and these are returned.
-        """        
+        """
+        # don't alter the user_weight_bounds
+        bounds = copy.deepcopy(original_bounds)
+        
         bounds_xcenter,bounds_ycenter=bounds.get_center()
-
         sheet_rows,sheet_cols=self.src.shape
         # arbitrary (e.g. could use 0,0) 
         center_row,center_col = sheet_rows/2,sheet_cols/2
         unit_xcenter,unit_ycenter=self.src.matrixidx2sheet(center_row,
                                                            center_col)
+
         bounds.translate(unit_xcenter-bounds_xcenter,
                          unit_ycenter-bounds_ycenter)
 
@@ -721,7 +722,7 @@ class CFProjection(Projection):
 
     ### JABALERT: This should be changed into a special __set__ method for
     ### weights_bounds, instead of being a separate function.
-    def change_bounds(self, weights_bounds_template):
+    def change_bounds(self, user_weights_bounds):
         """
         Change the bounding box for all of the ConnectionFields in this Projection.
 
@@ -730,7 +731,7 @@ class CFProjection(Projection):
 	Currently only allows reducing the size, but should be
         extended to allow increasing as well.
         """
-        weights_bounds = self.initialize_bounds(weights_bounds_template)
+        weights_bounds = self.initialize_bounds(user_weights_bounds)
 
         # CEBHACKALERT: should only warn if new bounds are actually larger - right
         # now it warns if bounds stay the same size.
@@ -738,6 +739,8 @@ class CFProjection(Projection):
             self.warning('Unable to change_bounds; currently allows reducing only.')
             return
 
+        # it's ok so we can store the bounds and resize the weights
+        self.user_weights_bounds = user_weights_bounds
         self.weights_bounds = weights_bounds
 
         mask_template = self.create_mask_template()

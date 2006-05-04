@@ -150,7 +150,7 @@ class SharedWeightCFProjection(CFProjection):
         self.activity = self.output_fn(self.activity)
 
 
-    def change_bounds(self, weights_bound_template):
+    def change_bounds(self, user_weights_bounds):
         """
         Change the bounding box for all of the ConnectionFields in this Projection.
 

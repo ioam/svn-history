@@ -231,13 +231,13 @@ V1 = LISSOM(name='V1', density=48.0,
 ## # LGN ON channel
 ## s.connect(Retina,LGNOn,delay=FixedPoint("0.05"),
 ##           connection_type=SharedWeightCFProjection,strength=2.33,
-##           weights_bounds=BoundingBox(radius=0.375),name='ON',
+##           user_weights_bounds=BoundingBox(radius=0.375),name='ON',
 ##           weights_generator=ong)
 
 ## # LGN OFF channel
 ## s.connect(Retina,LGNOff,delay = FixedPoint("0.05"),
 ##           connection_type=SharedWeightCFProjection,strength=2.33,
-##           name='Center',weights_bounds=BoundingBox(radius=0.375),
+##           name='Center',user_weights_bounds=BoundingBox(radius=0.375),
 ##           weights_generator=offg)
 ##########################################################################
 
@@ -247,45 +247,45 @@ V1 = LISSOM(name='V1', density=48.0,
 
 LGNOn_center = s.connect2('Retina','LGNOn',dest_port="center",delay = FixedPoint("0.05"),
                          connection_type=SharedWeightCFProjection,strength=2.33,
-                         name='Center',weights_bounds=lgn_weight_bounds,
+                         name='Center',user_weights_bounds=lgn_weight_bounds,
                          weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_c/BaseRN,aspect_ratio=1))
 
 
 LGNOn_surround = s.connect2('Retina','LGNOn',dest_port="surround",delay = FixedPoint("0.05"),
                            connection_type=SharedWeightCFProjection,strength=-2.33,
-                           name='Surround',weights_bounds=lgn_weight_bounds,
+                           name='Surround',user_weights_bounds=lgn_weight_bounds,
                            weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_s/BaseRN,aspect_ratio=1))
 
 
 # LGN OFF channel
 LGNOff_center = s.connect2('Retina','LGNOff',dest_port="center",delay = FixedPoint("0.05"),
                           connection_type=SharedWeightCFProjection,strength=-2.33,
-                          name='Center',weights_bounds=lgn_weight_bounds,
+                          name='Center',user_weights_bounds=lgn_weight_bounds,
                           weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_c/BaseRN,aspect_ratio=1))
 
 
 LGNOff_surround = s.connect2('Retina','LGNOff',dest_port="surround",delay = FixedPoint("0.05"),
                             connection_type=SharedWeightCFProjection,strength=2.33,
-                            name='Surround',weights_bounds=lgn_weight_bounds,
+                            name='Surround',user_weights_bounds=lgn_weight_bounds,
                             weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_s/BaseRN,aspect_ratio=1))
 
 
 s.connect2('LGNOn','V1',delay=FixedPoint("0.05"),dest_port="on",
           connection_type=CFProjection,strength=0.5,name='LGNOnAfferent',
-          weights_bounds=afferent_weight_bounds,learning_rate=alpha_input*137)
+          user_weights_bounds=afferent_weight_bounds,learning_rate=alpha_input*137)
 
 s.connect2('LGNOff','V1',delay=FixedPoint("0.05"),dest_port="off",
           connection_type=CFProjection,strength=0.5,name='LGNOffAfferent',
-          weights_bounds=afferent_weight_bounds,learning_rate=alpha_input*137)
+          user_weights_bounds=afferent_weight_bounds,learning_rate=alpha_input*137)
 
 
 s.connect2('V1','V1',delay=FixedPoint("0.05"),dest_port="exc",
           connection_type=CFProjection,strength=0.9,name='LateralExcitatory',
-          weights_bounds=excitatory_weight_bounds,learning_rate=alpha_exc*97) 
+          user_weights_bounds=excitatory_weight_bounds,learning_rate=alpha_exc*97) 
             
 s.connect2('V1','V1',delay=FixedPoint("0.05"), dest_port="inh",
           connection_type=CFProjection,strength=-0.9,name='LateralInhibitory',
-          weights_bounds=inhibitory_weight_bounds,learning_rate=alpha_inh*421)         
+          user_weights_bounds=inhibitory_weight_bounds,learning_rate=alpha_inh*421)         
 
 
 #V1.set_projections_to_jointly_normalize(['LGNOnAfferent','LGNOffAfferent'])

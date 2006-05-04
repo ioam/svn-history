@@ -69,20 +69,20 @@ topo.sim['V1Inh'] = LISSOM(bounds=BoundingBox(radius=0.5),tsettle=8)
 
 topo.sim.connect('Retina','V1Exc', delay = FixedPoint("0.05",4),
                  connection_type=CFProjection,strength=1.0,name='Afferent',
-                 weights_bounds=BoundingBox(radius=0.22),learning_rate=1.274)
+                 user_weights_bounds=BoundingBox(radius=0.22),learning_rate=1.274)
 
 topo.sim.connect('V1Exc','V1Exc', delay = FixedPoint("0.10",4),
 		   connection_type=CFProjection,strength = 0.9, name='LateralExcitatory',
-		   weights_bounds =BoundingBox(radius=0.10),
+		   user_weights_bounds =BoundingBox(radius=0.10),
                    learning_rate=2.674)
 
 topo.sim.connect('V1Exc','V1Inh', delay = FixedPoint("0.05",4),
                    connection_type=CFProjection,strength = 0.9, name='V1Exc_to_V1Inh',
-                   weights_bounds = BoundingBox(radius=0.10),learning_rate=2.674)
+                   user_weights_bounds = BoundingBox(radius=0.10),learning_rate=2.674)
 
 topo.sim.connect('V1Inh','V1Exc', delay = FixedPoint("0.05",4),
                          connection_type=CFProjection,strength=-0.9, name='V1Inh_to_V1Exc',
-                         weights_bounds = BoundingBox(radius=0.25),learning_rate=2.466)
+                         user_weights_bounds = BoundingBox(radius=0.25),learning_rate=2.466)
 
 
 ### Schedule bounds changes
