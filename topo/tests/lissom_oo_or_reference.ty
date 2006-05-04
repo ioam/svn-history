@@ -290,11 +290,17 @@ s.connect2('V1','V1',delay=FixedPoint("0.05"), dest_port="inh",
 
 #V1.set_projections_to_jointly_normalize(['LGNOnAfferent','LGNOffAfferent'])
 
-# Times are 1 less than the or_map_topo.param c++ lissom simulation because that one uses
-# "hook before_input" to schedule events. So, an event at t=200 is executed before t=200's
-# input pattern is presented. In Topographica, an event scheduled at t=0 is executed
-# after time=0's input pattern is presented. So one at t=199 is executed before t=200's
-# input pattern is presented, and is therefore  equivalent to or_map_topo's event scheduled at t=200.
+# Times are 1 less than the or_map_topo.param c++ lissom simulation
+# because that one uses "hook before_input" to schedule events. So, an
+# event at t=200 is executed before t=200's input pattern is
+# presented. In Topographica, an event scheduled at t=0 is executed
+# after time=0's input pattern is presented. So one at t=199 is
+# executed before t=200's input pattern is presented, and is therefore
+# equivalent to or_map_topo's event scheduled at t=200.
+
+
+### you can't pickle this simulation unless you make variables like exc_rad
+### available again.
 
 
 # this results in 37 units
