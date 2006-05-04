@@ -160,7 +160,7 @@ class ProjectionSheet(Sheet):
         Provide the given input_activity to each in_projection that has a dest_port
         equal to the specified port, asking each one to compute its activity.
         
-        The sheet's own activity is not calculated until activite()
+        The sheet's own activity is not calculated until activate()
         is called.
         """
         for proj in self.in_projections[input_sheet.name]:
