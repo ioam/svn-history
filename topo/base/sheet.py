@@ -30,6 +30,14 @@ from boundingregion import BoundingBox, BoundingRegionParameter
 import sheetview 
 
 
+# CEBHACKALERT: The user-specified input to an SCS is 'bounds' and
+# 'density'. For a Sheet, this means the parameters are 'bounds' and
+# 'density'.  The true bounds are stored as 'true_bounds', and the
+# true densities as 'xdensity', and 'ydensity' (see SCS).  That's
+# probably not so good.  The reason I haven't considered changing
+# the parameters to 'user_bounds' and 'user_density' (so that the true
+# bounds can be stored in 'bounds') is the search-and-replace effort
+# that would be required.
 
 class Sheet(EventProcessor,SheetCoordinateSystem):
     """
