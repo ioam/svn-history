@@ -4,8 +4,12 @@ C++ simulation.
 
 This file is much more complex than necessary, because it is set up to
 match the C++ version of the LISSOM simulator as closely as possible.
-Most of the variables below are just temporary ones designed to
-match those in the other simulator.
+Most of the variables below are just temporary ones designed to match
+those in the other simulator. In addition, some of the techniques for
+setting up the network are out of date. Please do not use this file as
+an example of how to use Topographica.
+
+
 
 $Id$
 """
@@ -193,28 +197,24 @@ CFProjection.learning_fn=CFPHebbian_opt1()
 CFProjection.weights_output_fn=CFPDivisiveSumNormalize_opt1()
 
 
-s = topo.base.simulator.Simulator()
+topo.sim['Retina'] = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),
+                                    bounds = input_bounds)
+topo.sim['V1'] = LISSOM()
 
-Retina = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),
-                        bounds = input_bounds,
-                        name='Retina')
-V1 = LISSOM(name='V1')
-
-s.connect2('Retina','V1', delay = fixedpoint.FixedPoint("0.05"),
+topo.sim.connect('Retina','V1', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength = 1.0, name='Afferent0',
           weights_bounds = afferent_weight_bounds, learning_rate=alpha_input)
 
-s.connect2('V1','V1', delay = fixedpoint.FixedPoint("0.05"), dest_port="exc",
+topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"), dest_port="exc",
           connection_type=CFProjection,strength=gammaexc,
           name='LateralExcitatory',
           weights_bounds = excitatory_weight_bounds, learning_rate=alpha_exc)
 
-s.connect2('V1','V1', delay = fixedpoint.FixedPoint("0.05"), dest_port="inh",
+topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"), dest_port="inh",
           connection_type=CFProjection,strength=-gammainh,
           name='LateralInhibitory',
           weights_bounds = inhibitory_weight_bounds, learning_rate=alpha_inh)
         
-
 
 # Times are 1 less than the or_map_topo.param c++ lissom simulation
 # because that one uses "hook before_input" to schedule events. So, an
@@ -224,43 +224,36 @@ s.connect2('V1','V1', delay = fixedpoint.FixedPoint("0.05"), dest_port="inh",
 # executed before t=200's input pattern is presented, and is therefore
 # equivalent to or_map_topo's event scheduled at t=200.
 
-s.schedule_action(199, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.6/BaseN,-exc_rad*0.6/BaseN),(exc_rad*0.6/BaseN,exc_rad*0.6/BaseN))))
+topo.sim.schedule_command(199, 'V1.projections()["LateralExcitatory"].change_bounds, BoundingBox(radius=exc_rad*0.6/BaseN)')
 
-s.schedule_action(499, V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.42/BaseN,-exc_rad*0.42/BaseN),(exc_rad*0.42/BaseN,exc_rad*0.42/BaseN))))
+topo.sim.schedule_command(499, 'V1.projections()["LateralExcitatory"].change_bounds, BoundingBox(radius=exc_rad*0.42/BaseN)')
 
-s.schedule_action(999,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-exc_rad*0.336/BaseN,-exc_rad*0.336/BaseN),(exc_rad*0.336/BaseN,exc_rad*0.336/BaseN))))
+topo.sim.schedule_command(999,'V1.projections()["LateralExcitatory"].change_bounds, BoundingBox(radius=(exc_rad*0.336/BaseN)')
 
-s.schedule_action(1999,V1.projections()['LateralExcitatory'].change_bounds, BoundingBox(points=((-2.0/BaseN,-2.0/BaseN),(2.0/BaseN,2.0/BaseN))))
-
-
-# Schedule action requires a function, so we create a temporary one
-def set_learning_rate(projection_name, rate):
-    """Set the learning rate on the named projection of V1."""
-    V1.projections()[projection_name].learning_rate=rate
+topo.sim.schedule_command(1999,'V1.projections()["LateralExcitatory"].change_bounds, BoundingBox(radius=2.0/BaseN)')
 
 
-s.schedule_action(  499, set_learning_rate, "LateralExcitatory", 0.001*ecs)
-s.schedule_action(  499, set_learning_rate, "Afferent0", 0.005*acs)
-s.schedule_action( 1999, set_learning_rate, "Afferent0", 0.004*acs)
-s.schedule_action( 3999, set_learning_rate, "Afferent0", 0.003*acs)
-s.schedule_action(19999, set_learning_rate, "Afferent0", 0.0015*acs)
+
+topo.sim.schedule_command(  499,'V1.projections()["LateralExcitatory"].learning_rate=0.001*ecs')
+topo.sim.schedule_command(  499,'V1.projections()["Afferent0"].learning_rate=0.005*acs')
+topo.sim.schedule_command( 1999,'V1.projections()["Afferent0"].learning_rate=0.004*acs')
+topo.sim.schedule_command( 3999,'V1.projections()["Afferent0"].learning_rate=0.003*acs')
+topo.sim.schedule_command(19999,'V1.projections()["Afferent0"].learning_rate=0.0015*acs')
 
 
-def set_deltabeta(x,y):
-    """Set the threshold function limits on V1."""
-    V1.output_fn.lower_bound=x
-    V1.output_fn.upper_bound=y
+topo.sim.schedule_command(  200, 'topo.sim["V1"].output_fn.lower_bound=0.11; topo.sim["V1"].output_fn.upper_bound=0.66')
+topo.sim.schedule_command(  500, 'topo.sim["V1"].output_fn.lower_bound=0.12; topo.sim["V1"].output_fn.upper_bound=0.67')
+topo.sim.schedule_command( 1000, 'topo.sim["V1"].output_fn.lower_bound=0.15; topo.sim["V1"].output_fn.upper_bound=0.68')
+topo.sim.schedule_command( 2000, 'topo.sim["V1"].output_fn.lower_bound=0.18; topo.sim["V1"].output_fn.upper_bound=0.70')
+topo.sim.schedule_command( 3000, 'topo.sim["V1"].output_fn.lower_bound=0.20; topo.sim["V1"].output_fn.upper_bound=0.73')
+topo.sim.schedule_command( 4000, 'topo.sim["V1"].output_fn.lower_bound=0.20; topo.sim["V1"].output_fn.upper_bound=0.76')
+topo.sim.schedule_command( 5000, 'topo.sim["V1"].output_fn.lower_bound=0.21; topo.sim["V1"].output_fn.upper_bound=0.79')
+topo.sim.schedule_command( 6500, 'topo.sim["V1"].output_fn.lower_bound=0.22; topo.sim["V1"].output_fn.upper_bound=0.82')
+topo.sim.schedule_command( 8000, 'topo.sim["V1"].output_fn.lower_bound=0.23; topo.sim["V1"].output_fn.upper_bound=0.85')
+topo.sim.schedule_command(20000, 'topo.sim["V1"].output_fn.lower_bound=0.24; topo.sim["V1"].output_fn.upper_bound=0.88')
 
-s.schedule_action(  199, set_deltabeta, 0.11, 0.66)
-s.schedule_action(  499, set_deltabeta, 0.12, 0.67)
-s.schedule_action(  999, set_deltabeta, 0.15, 0.68)
-s.schedule_action( 1999, set_deltabeta, 0.18, 0.70)
-s.schedule_action( 2999, set_deltabeta, 0.20, 0.73)
-s.schedule_action( 3999, set_deltabeta, 0.20, 0.76)
-s.schedule_action( 4999, set_deltabeta, 0.21, 0.79)
-s.schedule_action( 6499, set_deltabeta, 0.22, 0.82)
-s.schedule_action( 7999, set_deltabeta, 0.23, 0.85)
-s.schedule_action(19999, set_deltabeta, 0.24, 0.88)
+
+
 
 
 # CEBHACKALERT: actual tests commented out.
