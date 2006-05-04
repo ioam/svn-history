@@ -26,10 +26,19 @@ __version__='$Revision$'
 #   import examples.obermayer_pnas90
 # I get an error that the module doesn't exist.
 # If I rename obermayer_pnas90.ty to obermayer_pnas90.py,
-# the import works fine. So does this file work? Do we
-# use it at all, given that someone could use exec_file
-# instead of importing a script once Topographica's
-# running?
+# the import works fine.
+#
+# Maybe when we altered the way that Topographica starts up,
+# this file got forgotten? Because also .ty files used to get
+# compiled to .typ, but they don't anymore. So probably we
+# aren't even trying to use this file.
+#
+# Consider that exec_file can be used to run a script from the
+# command line, so maybe all we need to keep is the compilation
+# of ty files? Someone should investigate.
+
+
+
 
 ### JABHACKALERT!
 ###
