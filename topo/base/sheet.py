@@ -115,8 +115,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         EventProcessor.__init__(self,**params)
 
         # Now initialize this object as a SheetCoordinateSystem, with
-        # the same density along y as along x (unless equalize_densities
-        # is False).
+        # the same density along y as along x.
         SheetCoordinateSystem.__init__(self,self.bounds,self.density,
                                        equalize_densities=True)
 
