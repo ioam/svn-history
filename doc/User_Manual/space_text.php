@@ -80,6 +80,50 @@ to matrix coordinates appropriately, the user can use different
 densities at different times without changing any other parameters.
 
 
+<H3><A NAME="coord-details">More details about coordinates</A></H3>
+<P> The details of representing a Sheet with a matrix of a certain
+density can be more complex than described above because it is possible to 
+specify a bounds and density combination that cannot be realized.
+For instance, consider requesting that a Sheet have bounds of
+<code>BoundingBox(radius=0.3)</code>, and density of <code>7</code>.
+Such an area (a 0.6 x 0.6 square) cannot be tiled exactly by 7 units
+per 1.0 length. Therefore, when a sheet is created, we take a
+"bounds-master" approach and adjust the density so that the requested 
+bounds (i.e. area) is respected. In this example, the Sheet would 
+have an actual density of 6.67 (the closest value to tile
+the plane exactly; see 
+<?php classref('topo.base.sheetcoords','SheetCoordinateSystem')?>).
+This approach means that when the density is changed, the simulation
+remains the best approximation of the requested area.
+
+<P> However, because the bounds do not have to be square, there can be
+an additional complication (for certain bounds and densities).
+Consider the example above, but instead with rectangular bounds given
+by <code>BoundingBox(points=((-0.3,-0.5),(0.3,0.5)))</code>. This time,
+the y dimension would be tiled exactly by a density of 7, but the x
+dimension would not. This problem could be solved by allowing a Sheet
+to have different densities in each dimension (i.e. an xdensity and a
+ydensity); indeed, the 
+<?php classref('topo.base.sheetcoords','SheetCoordinateSystem')?> 
+underlying
+a Sheet does not assume that the xdensity and ydensity are
+equal. However, for a Sheet itself, it is simpler for the density to
+be equal in both dimensions. To solve the problem above, then, we take
+the bounds's x-width and calculate an xdensity from this (as described
+for the previous example), and make the ydensity equal to this by
+adjusting the top and bottom bounds. In our example, the top bound
+would be adjusted to 0.525, and the bottom to -0.525---the closest
+bounds allowing a density of 6.67 to tile the dimension exactly.
+
+<P>In summary, the bounds specified for a Sheet are respected, but the
+density may be adjusted so that the plane is tiled exactly. 
+In certain cases where it is not possible to have
+the same density in the y direction as in the x direction with the specified
+bounds, the top and bottom bounds are adjusted so that the densities can 
+remain equal. This is an
+"x-bounds-master" approach; futher discussion of this and alternatives
+is available in <?php classref('topo.base.sheetcoords','SheetCoordinateSystem')?>.
+
 <H2><A NAME="connection-fields">Connection fields</A></H2>
 
 Units in a Topographica Sheet can receive input from units in other
@@ -115,6 +159,7 @@ field is an area of the input sheet to which the unit responds.  Thus
 a ConnectionField is a lower-level concept than a receptive field, and
 RFs can be thought of as constructed from CFs.
 
+<!-- CEBHACKALERT: insert note about weights template, etc. -->
 
 <H2><A NAME="edge-buffers">Edge buffering</A></H2>
 
