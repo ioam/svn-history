@@ -32,17 +32,6 @@ def norm(v,p=2):
     return sum(abs(v)**p)**(1.0/p)
 
 
-# CEBHACKALERT: can remove some of these.
-### JAB: Could be rewritten using weave.blitz to avoid creating a temporary
-def mdot(m1,m2):
-    """
-    Returns the sum of the element-by-element product of two 2D
-    arrays.  Works in cases where dot(a.flat,b.flat) fails, e.g, with
-    matrix slices or submatrices.
-    """
-    a = m1*m2
-    return sum(a.flat)
-
 def divisive_normalization(weights):
     """Divisively normalize an array to sum to 1.0"""
     s = sum(weights.flat)

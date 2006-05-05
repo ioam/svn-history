@@ -155,6 +155,9 @@ class ResponseFn(ParameterizedObject):
         raise NotImplementedError
 
 
+### JAB: Could be rewritten using weave.blitz to avoid creating a temporary
+# CB: that comment applies also applies to all the functions in Numeric that
+# create an intermediate array, so don't operate in-place.
 class Mdot(ResponseFn):
     """
     Return the sum of the element-by-element product of two 2D
