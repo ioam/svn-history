@@ -11,5 +11,6 @@ $Id$
 """
 __version__='$Revision$'
 
-__all__ = ['boundingregion','connectionfield','parameterclasses','patterngenerator','sheet','sheetview','simulation','parameterizedobject','utils']
+__all__ = ['boundingregion','cf','parameterclasses','patterngenerator','sheet','sheetcoords','sheetview','simulation','parameterizedobject','arrayutils','projection','functionfamilies']
+
 
