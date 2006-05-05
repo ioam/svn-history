@@ -197,6 +197,15 @@ class EventProcessor(ParameterizedObject):
     connections. 
     """
     def __init__(self,**config):
+        """
+        Create an EventProcessor.
+
+        Note that just creating an EventProcessor does not mean it is
+        part of the simulation (i.e. it is not in the simulation's list
+        of EventProcessors, and it does not have its start() method called.
+        To add an EventProcessor e to a simulation s, simply do
+        s['name_of_e']=e. At this point, e's name becomes 'name_of_e'.
+        """
         super(EventProcessor,self).__init__(**config)
 
         # The out_connection db is a dictionary indexed by output port.  Each 
@@ -207,11 +216,10 @@ class EventProcessor(ParameterizedObject):
         # data stuctures to optimize the operations specific to it
         # by overriding _connect_from().
 
-        # JABHACKALERT: Why are these two not symmetric?  Surely there's no reason.        
+        # JABHACKALERT: Why are these two not symmetric?  Surely there's no reason.
         self.in_connections = []
         self.out_connections = {None:[]}
 
-        # The simulation link is not set until the call to add()
         self.simulation = None
 
 
@@ -244,10 +252,11 @@ class EventProcessor(ParameterizedObject):
 
     def start(self):
         """        
-        Called by the simulation when the EventProcessor is add()ed to the simulation.
+        Called by the simulation when the EventProcessor is added to
+        the simulation.
 
-        If an EventProcessor needs to have any code run when it is added to the simulation,
-        it should be in this method.
+        If an EventProcessor needs to have any code run when it is
+        added to the simulation, it should be in this method.
         """
         pass
 
@@ -298,15 +307,11 @@ class EPConnection(ParameterizedObject):
     EPConnection stores basic information for a connection between
     two EventProcessors.
     """
-
     src = EventProcessorParameter(default=None,constant=True)
     dest = EventProcessorParameter(default=None,constant=True)
     src_port = Parameter(default=None)
     dest_port = Parameter(default=None)
     delay = Parameter(default=0)
-
-    def __init__(self,**params):
-        super(EPConnection,self).__init__(**params)
 
 
 class Event(object):
@@ -319,6 +324,7 @@ class Event(object):
     
     def __call__(self):
         raise NotImplementedError
+
 
 class EPEvent(Event):
     """An Event for delivery to an EventProcessor."""
@@ -352,6 +358,7 @@ class CommandEvent(Event):
         available in __main__.__dict__---will not be saved with the
         network.
         """
+        # here to avoid importing __main__ into the rest of the file?
         import __main__
         try:
             exec self.command_string in __main__.__dict__
@@ -359,24 +366,6 @@ class CommandEvent(Event):
             raise SyntaxError("CommandEvent at "+`self.time`+" contained a syntax error:'"+self.command_string+"'")
 
     
-
-# CEBHACKALERT: do we need to allow a user to save arbitrary data
-# along with the network when pickling? Like specified imports and
-# results stored in variables in main?
-# 
-# For imports, maybe ScheduledAction could be a ParameterizedObject
-# (so class attributes get pickled), and it could have a class
-# attribute to store anything scheduled actions repeatedly depend on -
-# in many cases, scheduled actions require BoundingBox.
-#
-# Maybe it would be better to handle everything in something like
-# a general save functinon, which does save_snapshot() plus allows
-# things and their locations to be saved?
-# e.g.
-# save_state({"__main__.__dict__": [BoundingBox, x]})
-# where save_state() also calls save_snapshot to get the simulation.
-
-
 
             
 # Simulation stores its events in a linear-time priority queue (i.e., a
@@ -393,11 +382,9 @@ class Simulation(ParameterizedObject):
     The Parameter 'register' indicates whether or not to register the
     Simulation as being part of Topographica; that is, register would
     be false for use of the Simulation outside Topographica. With
-    register True, the Simulation is set to be the 'active_sim', which
-    other Topographica commands and classes might look for or want to
-    be informed about.
+    register True, the Simulation is set to be topo.sim, which
+    other Topographica commands and classes might look for.
     """
-
     ### JABALERT! Is step_mode even implemented?
     step_mode = BooleanParameter(default=False)
     register = BooleanParameter(default=True)
@@ -408,13 +395,17 @@ class Simulation(ParameterizedObject):
         default=[],
         doc="""
             List of string commands that will be exec'd in
-            __main__.__dict__ before this simulation is unpickled.
+            __main__.__dict__ (i.e. as if they were entered at the command prompt)
+            before this simulation is unpickled. Allows e.g. to make sure items
+            have been imported before scheduled_commands are run.
             """)
               
 
     def __init__(self,**config):
         """
-        The simulation constructor takes one keyword parameter:
+        Create the Simulation and register it as topo.sim unless
+        register==False.
+
         
            step_mode = debugging flag, causing the simulation to stop
                        before each tick.
@@ -459,7 +450,7 @@ class Simulation(ParameterizedObject):
         If the ep itself already exists in the simulation, a
         warning is printed and the ep is not added.
 
-        Note, EventProcessors do not necessarily have to be added to
+        Note: EventProcessors do not necessarily have to be added to
         the simulation to be used, but they will not receive the
         start() message.  Adding a node to the simulation also sets the
         backlink node.simulation, so that the node can enqueue events
@@ -490,6 +481,7 @@ class Simulation(ParameterizedObject):
         variable, it should be cast into a floating point number by float().
         """
         return self._time
+
     
     def run(self,duration=Forever,until=Forever):
         """
@@ -583,9 +575,11 @@ class Simulation(ParameterizedObject):
 
         # We don't need the sleep call in this class because the
         # continue_ loop updates the clock directly.
-
         self.warning("sleep not supported in class",self.__class__.__name__)
 
+
+    # CEBHACKALERT: should these two enqueue methods be private? They
+    # aren't called outside this class.
     def enqueue_event_abs(self,time,src,dest,src_port=None,dest_port=None,data=None):
         """
         Enqueue an event at an absolute simulation clock time.
@@ -606,6 +600,7 @@ class Simulation(ParameterizedObject):
             if time < e.time:
                 self.events.insert(i,new_e)
                 break
+
 
     def enqueue_event_rel(self,delay,src,dest,src_port=None,dest_port=None,data=None):
         """
@@ -663,7 +658,8 @@ class Simulation(ParameterizedObject):
                 delay=0,connection_type=EPConnection,**connection_params):
         """
         Connect the source to the destination, at the appropriate ports,
-        if any are given.
+        if any are given (src and dest are strings, naming the required
+        EPs).
 
         src and dest should already be part of the simulation.
 
@@ -692,6 +688,9 @@ class Simulation(ParameterizedObject):
         class.  All simulation objects have a base class of
         EventProcessor, and so the baseclass must be either
         EventProcessor or one of its subclasses.
+
+        To see what EPs are in the simulator, type e.g.
+         topo.sim.objects().keys()
         """
         return dict([(ep_name,ep)
                      for (ep_name,ep) in self._event_processors.items()
