@@ -265,7 +265,7 @@ class EventProcessor(ParameterizedObject):
         Send some data out to all connections on the given src_port.
         """
         for conn in self.out_connections[src_port]:
-            self.simulation.enqueue_event_rel(conn.delay,self,conn.dest,conn.src_port,conn.dest_port,data)
+            self.simulation.enqueue_epevent_rel(conn.delay,self,conn.dest,conn.src_port,conn.dest_port,data)
 
 
     def input_event(self,src,src_port,dest_port,data):
@@ -320,8 +320,9 @@ class Event(object):
 
     When called, must make the event happen.
     """
-    # CEBHACKALERT: subclasses must implement time attribute
-    
+    def __init__(self,time):
+        self.time = time
+        
     def __call__(self):
         raise NotImplementedError
 
@@ -329,7 +330,7 @@ class Event(object):
 class EPEvent(Event):
     """An Event for delivery to an EventProcessor."""
     def __init__(self,time,src,dest,src_port,dest_port,data):
-        self.time = time
+        super(EPEvent,self).__init__(time)
         self.src = src
         self.dest = dest
         self.src_port = src_port
@@ -344,7 +345,7 @@ class CommandEvent(Event):
     """An Event consisting of a command string to run."""
 
     def __init__(self,time,command_string):
-        self.time = time
+        super(CommandEvent,self).__init__(time)
         self.command_string = command_string
         
     def __call__(self):
@@ -389,8 +390,7 @@ class Simulation(ParameterizedObject):
     step_mode = BooleanParameter(default=False)
     register = BooleanParameter(default=True)
 
-    # CEBHACKALERT: write the doc so a user knows what it means. And,
-    # should this be instantiated? I can't think right now.
+    # CEBHACKALERT: should be instantiated.
     startup_commands = Parameter(
         default=[],
         doc="""
@@ -578,54 +578,63 @@ class Simulation(ParameterizedObject):
         self.warning("sleep not supported in class",self.__class__.__name__)
 
 
-    # CEBHACKALERT: should these two enqueue methods be private? They
-    # aren't called outside this class.
-    def enqueue_event_abs(self,time,src,dest,src_port=None,dest_port=None,data=None):
+    def enqueue_event_abs(self,new_event):
         """
-        Enqueue an event at an absolute simulation clock time.
+        Enqueue an Event at an absolute simulation clock time.
         """
-        self.debug("Enqueue absolute: from", (src,src_port),"to",(dest,dest_port),
-                   "at time",self._time,"for time",time)
-        new_e = EPEvent(time,src,dest,src_port,dest_port,data)
+        assert isinstance(new_event,Event)
 
         # The new event goes at the end of the event queue if there
         # isn't a queue right now, or if it's later than the last
         # event's time.  Otherwise, it's inserted at the appropriate
         # position somewhere inside the event queue.
-        if not self.events or time >= self.events[-1].time:
-            self.events.append(new_e)
+        if not self.events or new_event.time >= self.events[-1].time:
+            self.events.append(new_event)
             return
 
         for i,e in enumerate(self.events):
-            if time < e.time:
-                self.events.insert(i,new_e)
+            if new_event.time < e.time:
+                self.events.insert(i,new_event)
                 break
 
-
-    def enqueue_event_rel(self,delay,src,dest,src_port=None,dest_port=None,data=None):
+    def enqueue_event_rel(self,event):
         """
-        Enqueue an event at a time relative to the current simulation clock.
-        """
-        self.enqueue_event_abs(self._time+delay,
-                               src,dest,src_port,dest_port,data)
+        Enqueue an Event at a time relative to the current simulation clock.
 
-    def schedule_command(self,time,command_string):
+        The incoming event's time is treated as a delay and is added
+        to the simulation's current time.
+        """
+        event.time+=self._time
+        self.enqueue_event_abs(event)
+
+
+    def enqueue_epevent_rel(self,delay,src,dest,src_port=None,dest_port=None,data=None):
+        """
+        Enqueue the given constituents of an EPEvent at a time
+        relative to the current simulation clock.
+        """
+        epevent = EPEvent(delay,src,dest,src_port,dest_port,data)
+        self.enqueue_event_rel(epevent)
+
+        
+    # CEBALERT: could easily allow relative scheduling by calling
+    # enqueue_event_rel() if requested.
+    def schedule_command(self,time,command_string,absolute_time=True):
         """
         Add a command to execute in __main__.__dict__ at the
         specified time.
 
         The command should be a string.
-        """
-        new_event = CommandEvent(time=time,command_string=command_string)
 
-        # CEBHACKALERT: doesn't this duplicate a lot of enqueue_event_abs()
-        if not self.events or time >= self.events[-1].time:
-            self.events.append(new_event)
-            return
-        for index,event in enumerate(self.events):
-            if time < event.time:
-                self.events.insert(index,new_event)
-                break
+        If absolute_time is False, then time is treated as a delay,
+        and the command will be executed at the simulator's current time
+        plus this delay.
+        """
+        event = CommandEvent(time=time,command_string=command_string)
+        if absolute_time:
+            self.enqueue_event_abs(event)
+        else:
+            self.enqueue_event_rel(event)
         
 
     def state_push(self):

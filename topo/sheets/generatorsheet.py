@@ -84,7 +84,7 @@ class GeneratorSheet(Sheet):
         self.simulation.connect(self.name,self.name,delay=self.period)
 
         # first event is special
-        self.simulation.enqueue_event_rel(self.phase,self,self,data=self.activity)
+        self.simulation.enqueue_epevent_rel(self.phase,self,self,data=self.activity)
 
     def input_event(self,src,src_port,dest_port,data):
         self.verbose("Received %s input from %s." % (NxN(data.shape),src))
