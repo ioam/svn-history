@@ -4,7 +4,7 @@ ConnectionField and associated classes.
 This module defines some basic classes of objects used to create
 simulations of cortical sheets that take input through connection
 fields that project from other cortical sheets (or laterally from
-themselves):
+themselves).
 
 ConnectionField: Holds a single connection field within a CFProjection.
 
@@ -150,11 +150,6 @@ class ConnectionField(ParameterizedObject):
 
         # Set the initial sum
         #self.sum = output_fn.norm_value
-
-        # CEBHACKALERT: incorporate such a test into testconnectionfield.
-#        assert self.weights.shape==(self.slice_array[1]-self.slice_array[0],self.slice_array[3]-self.slice_array[2]),str(self.weights.shape)+" "+str((self.slice_array[1]-self.slice_array[0],self.slice_array[3]-self.slice_array[2])) 
-
-
 
 
     ### CEBHACKALERT: there is presumably a better way than this.
