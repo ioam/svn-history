@@ -12,7 +12,7 @@ import tkFont
 
 import topo.sheets
 from topo.sheets import *
-from topo.base.utils import find_classes_in_package
+from topo.base.parameterclasses import find_classes_in_package
 from topo.base.sheet import Sheet
 import topo.projections
 from topo.projections import *

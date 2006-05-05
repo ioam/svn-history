@@ -11,7 +11,6 @@ import os.path
 import sys
 
 from parameterizedobject import Parameter
-from utils import find_classes_in_package
 
 
 # CEBHACKALERT: much of the documentation for Parameter subclasses
@@ -477,6 +476,40 @@ def is_number(obj):
 
 
 
+
+# CEBHACKALERT: this should be a method of ClassSelectorParameter.
+# (CB: I have a note in my e-mail from JAB about something else related
+# to this change.)
+from inspect import ismodule
+def find_classes_in_package(package,parentclass):
+    """
+    Return a dictionary containing all items of the type
+    specified, owned by modules in the specified package.
+    
+    Only currently imported modules are searched, so
+    the caller will first need to do 'from package import *'.
+
+    If the class has an abstract attribute and it's True,
+    it will not be included.
+    
+    Does not search packages contained within the specified
+    package, only the top-level modules.
+
+    Note that the parentclass itself will be returned if, for
+    instance, it is imported by one of the modules in package.
+    """
+    result = {}
+    for v1 in package.__dict__.itervalues():
+        if ismodule(v1):
+            for v2 in v1.__dict__.itervalues():
+                if (isinstance(v2,type) and issubclass(v2,parentclass)):
+                    if hasattr(v2,'abstract') and v2.abstract==True:
+                        pass
+                    else:
+                        result[v2.__name__] = v2
+    return result
+
+
 class ClassSelectorParameter(Parameter):
     """
     Parameter whose value is an instance of the specified class.
@@ -536,7 +569,7 @@ class ClassSelectorParameter(Parameter):
         Return class_name stripped of self.suffix_to_lose.
         """
         return re.sub(self.suffix_to_lose+'$','',class_name)
-        
+
 
 
 # For the moment, this takes the string name in the form
