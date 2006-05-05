@@ -7,13 +7,14 @@ is an EventProcessor that maintains a rectangular array of activity
 values, and sends the contents of this array as the data element in
 events.
 
-
-In general sheets should be thought of as having arbitrary density and
-sheet coordinates should be used wherever possible, except when the
-code needs direct access to a specific unit.  By adhering to this
-convention, one should be able to write and debug a simulation at a
-low density, and then scale it up to run at higher densities (or down
-for lower densities) simply by changing e.g. Sheet.density.
+The Sheet itself is a SheetCoordinateSystem, so that units may be
+accessed by sheet or matrix coordinates. In general, however, sheets
+should be thought of as having arbitrary density and sheet coordinates
+should be used wherever possible, except when the code needs direct
+access to a specific unit.  By adhering to this convention, one should
+be able to write and debug a simulation at a low density, and then
+scale it up to run at higher densities (or down for lower densities)
+simply by changing e.g. Sheet.density.
 
 $Id$
 """
@@ -43,20 +44,8 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
     """
     The generic base class for neural sheets.
 
-    This class handles the sheet's activity matrix, and its
-    coordinate frame.  It manages two sets of coordinates:
-
-    _Sheet_coordinates_ are specified as (x,y) as on a normal
-    Cartesian graph; the positive y direction is upward, and the scale
-    and origin are arbitrary, and specified by parameters.
-
-    _Matrix_coordinates_ are the (row,col) specification for an
-    element in the activity matrix.  The usual matrix coordinate
-    specs apply.
-          
-    sheet_view_dict is a dictionary that stores SheetViews,
-    i.e. representations of the sheet for use by analysis or plotting
-    code.    
+    See SheetCoordinateSystem for how Sheet represents space, and
+    EventProcessor for how Sheet handles time.
     """
     _abstract_class_name = "Sheet"
 
@@ -108,13 +97,13 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         Initialize this object as an EventProcessor, then also as
         a SheetCoordinateSystem with equal xdensity and ydensity.
 
-        If equalize_densities is False, xdensity and ydensity are
-        not guaranteed to be the same, which would likely violate
-        assumptions made about sheets in other places.        """
-
+        sheet_view_dict is a dictionary that stores SheetViews,
+        i.e. representations of the sheet for use by analysis or plotting
+        code.    
+        """
         EventProcessor.__init__(self,**params)
 
-        # Now initialize this object as a SheetCoordinateSystem, with
+        # Initialize this object as a SheetCoordinateSystem, with
         # the same density along y as along x.
         SheetCoordinateSystem.__init__(self,self.bounds,self.density)
 
