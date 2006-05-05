@@ -390,8 +390,8 @@ class Simulation(ParameterizedObject):
     step_mode = BooleanParameter(default=False)
     register = BooleanParameter(default=True)
 
-    # CEBHACKALERT: should be instantiated.
     startup_commands = Parameter(
+        instantiate=True,
         default=[],
         doc="""
             List of string commands that will be exec'd in
@@ -617,8 +617,6 @@ class Simulation(ParameterizedObject):
         self.enqueue_event_rel(epevent)
 
         
-    # CEBALERT: could easily allow relative scheduling by calling
-    # enqueue_event_rel() if requested.
     def schedule_command(self,time,command_string,absolute_time=True):
         """
         Add a command to execute in __main__.__dict__ at the
