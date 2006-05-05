@@ -29,16 +29,10 @@ __version__='$Revision$'
 # the import works fine.
 #
 # Maybe when we altered the way that Topographica starts up,
-# this file got forgotten? Because also .ty files used to get
-# compiled to .typ, but they don't anymore. So probably we
-# aren't even trying to use this file.
+# this file got forgotten and is no longer used?
 #
 # Consider that exec_file can be used to run a script from the
-# command line, so maybe all we need to keep is the compilation
-# of ty files? Someone should investigate.
-
-
-
+# command line, so maybe we no longer need this file?
 
 ### JABHACKALERT!
 ###
