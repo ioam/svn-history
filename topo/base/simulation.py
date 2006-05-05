@@ -16,7 +16,7 @@ other EPs, as well as the mechanics of sending events to other EPs
 (through the simulation).  The EventProcessor class defines the basic
 EP programming interface.
 
-Formally, a simulation event is a tuple:
+Formally, a simulation event (EPEvent) is a tuple:
 (time,src,src_port,dest,dest_port,data), where
 
   time      = The time at which the event should be delivered, an arbitrary
@@ -83,16 +83,6 @@ SLEEP_EXCEPTION = "Sleep Exception"
 STOP = "Simulation Stopped"
 
 Forever = FixedPoint(-1)
-
-
-# CEBHACKALERT: this is to be removed; calls
-# can be replaced by 'topo.sim'
-
-def get_active_sim():
-    """
-    Return the active simulation.
-    """
-    return SimSingleton()
 
 
 class Singleton(object):
