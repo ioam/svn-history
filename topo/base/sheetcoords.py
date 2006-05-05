@@ -1,15 +1,31 @@
 """
-This scheme gives a Sheet two coordinate systems.  A pair of 'sheet
-coordinates' (x,y) are floating-point Cartesian coordinates indicating
-an arbitrary point on the sheet's plane.  A pair of 'matrix
-coordinates' (r,c), specify the row and column indices of a specific
-unit in the sheet.  This module provides facilities for converting
-between the two coordinate systems, and EVERYONE SHOULD USE THESE
-FACILITIES to guarantee that coordinate transformations are done
-consistently everywhere.
+Provides SheetCoordinateSystem, allowing conversion between the two
+coordinate systems used in Topographica.
+
+'Sheet coordinates' allow simulation parameters to be specified in
+units that are density-independent, whereas 'matrix coordinates'
+provide a means of realizing the continuous sheets.
+
+Hence we can have a pair of 'sheet coordinates' (x,y); floating-point
+Cartesian coordinates indicating an arbitrary point on the sheet's plane.
+We can also have a pair of 'matrix coordinates' (r,c), which are used
+to address an underlying matrix. These matrix coordinates are also
+floating-point numbers to allow precise conversion between the two
+schemes. Where it is necessary to address a specific element of the
+matrix (as is often the case in calculations), we also have the usual
+matrix index coordinates (r_idx, c_idx). We refer to these as
+matrixidx coordinates. SheetCoordinateSystem provies methods for converting
+between sheet and matrix coordinates, as well as sheet and matrixidx
+coordinates.
+
+Everyone should use these facilities for conversions between the two
+coordinate systems to guarantee consistency.
 
 
-Example of how the matrix stores the representation of the Sheet:
+
+
+Example of how the matrix stores the representation of the Sheet
+================================================================
 
 For the purposes of this example, assume the goal is a Sheet with
 density=3 that has a 1 at (-1/2,-1/2), a 5 at (0.0,0.0), and a 9 at
@@ -43,7 +59,7 @@ these Sheet coordinates is:
    [1 2 3]]
 
 If we have such a matrix, we can access it in one of two ways: Sheet
-or matrix coordinates.  In matrix coordinates, the matrix is indexed
+or matrix/matrixidx coordinates.  In matrixidx coordinates, the matrix is indexed
 by rows and columns, and it is possible to ask for the element at
 location [0,2] (which returns 9 as in any normal row-major matrix).
 But the values can additionally be accessed in Sheet coordinates,
@@ -53,7 +69,7 @@ Sheet coordinates, it is possible to ask for the element at location
 be cropped to give the nearest matrix element, namely the one with
 value 6.
 
-Of course, it would be an error to try to pass Matrix coordinates like
+Of course, it would be an error to try to pass matrix coordinates like
 [0,2] to the sheet2matrix calls; the result would be a value far
 outside of the actual matrix.
 
