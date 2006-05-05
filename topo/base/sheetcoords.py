@@ -84,6 +84,43 @@ from Numeric import zeros,array,floor,ceil,around
 from boundingregion import BoundingBox
 
 
+
+# Note about the 'bounds-master' approach we have adopted
+# =======================================================
+#
+# Our current approach is a "bounds-master" approach, where we trust
+# the user's specified x width, and choose the nearest density and y
+# height to make that possible.  The advantage of this is that when we
+# change the density (which is often), each such simulation is the
+# best possible approximation to the given area.  Generally, the area
+# is much more meaningful than the density, so this approach makes
+# sense.  Plus, the y height is usually the same as the x width, so
+# it's not usually a problem that the y height is not respected.  The
+# disadvantage is that the user's area can only be trusted in one
+# dimension, because of wanting to avoid the complication of separate
+# xdensity and ydensity, which makes this approach very difficult to
+# explain to the user.
+#
+# The other approach is density-master: trust the user's specified
+# density as-is, and simply choose the nearest area that fits that
+# density.  The advantages are that (a) it's very simple to describe
+# and reason about, and (b) if a user asks for a different area, they
+# get a true subsection of the same simulation they would have gotten
+# at the larger area.  The disadvantage is that the simulation isn't
+# the best approximation of the given area that it could be -- e.g. at
+# low densities, the sheet area could be quite significantly different
+# than the one the user requested.  Plus, if we took this approach
+# seriously, then we'd let the density specify the matrix coordinate
+# system entirely, including the origin, which would mean that the
+# actual area would often be offset from the intended one, which is
+# even worse.  Differences between the area and the offset could cause
+# severe problems in the alignment of projections between sheets with
+# different densities, which would make low-density versions of
+# hierarchical models behave very strangely.
+
+
+
+
 class SheetCoordinateSystem(object):
     """
     Provides methods to allow conversion between sheet and matrix
