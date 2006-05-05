@@ -31,13 +31,6 @@ def norm(v,p=2):
     """
     return sum(abs(v)**p)**(1.0/p)
 
-def msum(m):
-    """
-    Returns the sum of elements in a 2D matrix.  Works in cases where
-    sum(a.flat) fails, e.g, with matrix slices or submatrices.
-    """
-    return sum(sum(m))
-
 
 # CEBHACKALERT: can remove some of these.
 ### JAB: Could be rewritten using weave.blitz to avoid creating a temporary
