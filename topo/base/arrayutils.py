@@ -10,6 +10,30 @@ import re
 from Numeric import sqrt, ones, dot, sum, arctan2, array2string
 
 
+# CEBHACKALERT: there are some inconsistencies throughout as to
+# whether we should assume arrays are contiguous (i.e. using an
+# array's 'flat' attribute, or using the ravel() function).  It
+# appears that in the most recent Numeric, this problem is taken care
+# of, so when we change, these problems should go away.  In addition,
+# we won't have to deal with savespace.
+#
+# You can see the changes that are made to code when upgrading to the
+# most recent version by looking at Numeric's code converting utility:
+# http://projects.scipy.org/scipy/numpy/browser/trunk/numpy/lib/convertcode.py
+# Notably for this hackalert:
+#8	 * Makes search and replace changes to:	
+#9	   - .typecode()	
+#10	   - .iscontiguous()	
+#13	 * Converts .flat to .ravel() except for .flat = xxx or .flat[xxx]	
+#14	 * Change typecode= to dtype=	
+#15	 * Eliminates savespace=xxx	
+#16	 * Replace xxx.spacesaver() with True	
+#17	 * Convert xx.savespace(?) to pass + ## xx.savespace(?)	
+
+
+
+
+
 # One might think we could use float('inf') or array([float('inf')]) here,
 # but as of Python 2.4 only some platforms will support float('inf').
 # 
