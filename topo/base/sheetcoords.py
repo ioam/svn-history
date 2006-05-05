@@ -126,22 +126,20 @@ class SheetCoordinateSystem(object):
     shape = property(get_shape)
 
 
-    def __init__(self,bounds,xdensity,ydensity=None,equalize_densities=False):
+    def __init__(self,bounds,xdensity,ydensity=None):
         """
         Store the bounds (as l,b,r,t in an array), xdensity, and
         ydensity.
     
-        If ydensity is not specified, it is assumed to be equal to
-        xdensity.
-
-        If equalize_densities is True, then only one density can be
-        supplied, and this is not assumed to match the bounds (i.e. it
-        is nominal): it may be adjusted.
+        If ydensity is not specified, it is assumed that the specified
+        xdensity is nominal and that the true xdensity should be
+        calculated. The top and bottom bounds are adjusted so that
+        the ydensity is equal to the xdensity. 
+        
+        If both xdensity and ydensity are specified, these and the bounds
+        are taken to be exact and are not adjusted.
         """
-        if equalize_densities:
-            if ydensity!=None: raise TypeError(
-                "Can't specify xdensity and ydensity and request equal " \
-               +"densities in each dimension.")
+        if not ydensity:
             bounds,xdensity = self.__equalize_densities(bounds,xdensity)
 
         self.true_bounds = bounds

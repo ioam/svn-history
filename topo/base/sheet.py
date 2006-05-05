@@ -116,8 +116,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
 
         # Now initialize this object as a SheetCoordinateSystem, with
         # the same density along y as along x.
-        SheetCoordinateSystem.__init__(self,self.bounds,self.density,
-                                       equalize_densities=True)
+        SheetCoordinateSystem.__init__(self,self.bounds,self.density)
 
         n_units = round((self.lbrt[2]-self.lbrt[0])*self.xdensity,0)
         if n_units<1: raise ValueError(
