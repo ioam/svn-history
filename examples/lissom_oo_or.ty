@@ -17,7 +17,7 @@ import topo.patterns.random
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
-from topo.responsefns.optimized import CFPDotProduct_opt1
+from topo.responsefns.optimized import CFPDotProduct_opt1, SharedWeightCFPDotProduct_opt1
 from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
@@ -42,6 +42,8 @@ CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPDotProduct_opt1()
 CFProjection.learning_fn=CFPHebbian_opt1()
 CFProjection.weights_output_fn=CFPDivisiveSumNormalize_opt1()
+SharedWeightCFProjection.response_fn=SharedWeightCFPDotProduct_opt1()
+
 SharedWeightCFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
 
 ###########################################
@@ -152,3 +154,12 @@ topo.sim['LGNOff'].gui_x=150.0;  topo.sim['LGNOff'].gui_y=345.0
 topo.sim['Retina'].gui_x=279.0;  topo.sim['Retina'].gui_y=500.0
 
 topo.sim.run(0)
+
+
+# Uncomment to allow profiling
+## import hotshot,hotshot.stats
+## prof = hotshot.Profile("abc")
+## prof.runctx('topo.sim.run(199)',globals(),locals())
+## prof.close()
+## p = hotshot.stats.load("abc")
+## p.strip_dirs().sort_stats('cumulative','time').print_stats()
