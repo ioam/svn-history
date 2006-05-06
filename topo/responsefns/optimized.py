@@ -8,13 +8,16 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.functionfamilies import ResponseFnParameter,Mdot
+from topo.base.functionfamilies import ResponseFnParameter,Mdot,ResponseFn
 from topo.base.cf import CFPResponseFn
 from topo.base.parameterizedobject import ParameterizedObject
 
 from topo.misc.inlinec import inline, optimized
 
 from topo.responsefns.projfns import CFPDotProduct, CFPEuclideanDistance
+
+from topo.projections.basic import SharedWeightCFPResponseFn
+
 
 class CFPDotProduct_opt1(CFPResponseFn):
     """
@@ -154,3 +157,104 @@ if not optimized:
     ParameterizedObject().message('Inline-optimized components not available; using CFPEuclideanDistance instead of CFPEuclideanDistance_opt1.')
 
 
+
+# CEBHACKALERT: should be equivalent to Mdot(). It's definitely
+# faster but I haven't tested it properly. We don't use it.
+# Additionally, we should stick to calling these dot product
+# functions either DotProduct or Mdot.
+class DotProduct_opt1(ResponseFn):
+    """
+    Dot-product response function. Equivalent to Mdot.
+
+    Not tested.
+    """
+    def __call__(self, m1, m2):
+        rows,cols = m1.shape
+        tot = 0.0
+
+        code = """
+               for (int i=0; i<rows; ++i) {
+                   for (int j=0; j<cols; ++j) {
+                       tot += *m1 * *m2;
+                       ++m1;
+                       ++m2;
+                   }
+               }  
+               """    
+        inline(code, ['m1', 'm2', 'cols','rows','tot'], local_dict=locals())
+        return tot
+
+
+if not optimized:
+    DotProduct_opt1 = Mdot
+    ParameterizedObject().message('Inline-optimized components not available; using Mdot instead of DotProduct_opt1.')
+
+
+
+# See the hackalert in projections/basic.py; this wouldn't be
+# required if SharedWeightProjection wrapped the list of cfs
+# better.
+class SharedWeightCFPDotProduct_opt1(CFPResponseFn):
+    """
+    Dot-product response function for SharedWeightCFProjection.
+
+    The same as CFPDotProduct, but where there is only one set of weights.
+    """
+    single_cf_fn = ResponseFnParameter(Mdot(),constant=True)    
+
+    def __call__(self, cfs, input_activity, activity, strength, **params):
+        temp_act = activity
+        rows,cols = activity.shape
+        len, len2 = input_activity.shape
+        X = input_activity.flat
+        sw = cfs[0][0].weights
+
+        code = """
+            double *tact = temp_act;
+            for (int r=0; r<rows; ++r) {
+                PyObject *cfsr = PyList_GetItem(cfs,r);
+		for (int l=0; l<cols; ++l) {
+                    PyObject *cf = PyList_GetItem(cfsr,l);
+                    int *slice = (int *)(((PyArrayObject*)PyObject_GetAttrString(cf,"slice_array"))->data);
+                    int rr1 = *slice++;
+                    int rr2 = *slice++;
+                    int cc1 = *slice++;
+                    int cc2 = *slice;
+		    double tot = 0.0;
+                    float *wj = sw;
+		    double *xj = X+len*rr1+cc1;
+
+                    // computes the dot product
+		    for (int i=rr1; i<rr2; ++i) {
+                        double *xi = xj;
+			float *wi = wj;                       
+			for (int j=cc1; j<cc2; ++j) {
+                            tot += *wi * *xi;
+                            ++wi;
+                            ++xi;
+                        }
+                        xj += len;
+			wj += cc2-cc1;
+                    }  
+                    *tact = tot*strength;
+                    ++tact;
+                }
+            }
+        """
+    
+        inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows','sw'], local_dict=locals())
+
+
+class SharedWeightCFPDotProduct(SharedWeightCFPResponseFn):
+    """
+    Wrapper written to allow transparent non-optimized fallback; 
+    equivalent to
+    SharedWeightCFPResponseFn(single_cf_fn=Mdot())
+    """
+    def __init__(self,**params):
+        super(SharedWeightCFPDotProduct,self).__init__(single_cf_fn=Mdot(),**params)
+
+
+if not optimized:
+    SharedWeightCFPDotProduct_opt1 = SharedWeightCFPDotProduct
+    ParameterizedObject().message('Inline-optimized components not available; using SharedWeightCFPDotProduct instead of SharedWeightCFPDotProduct_opt1.')
