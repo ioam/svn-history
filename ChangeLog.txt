@@ -1,10 +1,283 @@
+2006-05-05  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/sheetcoords.py 1.7: Added comment (from JAB) about
+	'bounds-master' vs 'density-master' approaches.
+
+	* doc/User_Manual/space_text.php 1.5: Initial attempt at
+	describing 'bounds-master' approach to Sheet bounds/density.
+
+	* topo/base/simulation.py 1.6: Made the saved_commands Simulation
+	Parameter be instantiated (it's specific to one Simulation
+	object); this isn't very important since most users will not have
+	more than one Simulation. Removed two HACKALERTs.
+
+	* topo/base/simulation.py 1.5, topo/eps/basic.py 1.10,
+	topo/sheets/generatorsheet.py 1.33: Cleaned up enqueue_event*
+	methods. This could probably be simplified further. Events must
+	have a time.
+
+	* topo/base/simulation.py 1.4: Cleaned up a little.
+
+	* topo/commands/pylabplots.py 1.6, topo/base/simulation.py 1.3:
+	Removed get_active_sim().
+
+	* topo/base/sheet.py 1.104: Updates to docstrings and comments.
+
+	* topo/base/sheet.py 1.103, topo/base/sheetcoords.py 1.6:
+	Simplified creation of SheetCoordinateSystem.
+
+	* topo/base/sheetcoords.py 1.5: Updated file's docstring.
+
+	* topo/base/cf.py 1.14: Removed outdated HACKALERT.
+
+	* topo/base/utils.py 1.66: Removed empty file.
+
+	* topo/base/parameterclasses.py 1.40, topo/base/utils.py 1.65,
+	topo/tkgui/editortools.py 1.21: Moved find_classes_in_package() to
+	parameterclasses.py.
+
+	* topo/base/__init__.py 1.11: Updated __all__.
+
+	* topo/misc/tyimputil.py 1.4: Corrected HACKALERT.
+
+	* topo/base/arrayutils.py 1.11: Added HACKALERT about savespace
+	and .flat/ravel(), with a note about upgrading Numeric and a link
+	to Numeric's convertcode.py.
+
+	* topo/base/arrayutils.py 1.10, topo/base/functionfamilies.py 1.7:
+	Removed mdot() function - there is the Mdot ResponseFn in
+	topo.responsefns.basic. Moved comment about weave.blitz from mdot
+	to Mdot.
+
+	* topo/base/arrayutils.py 1.9: Removed unused and potentially
+	misleading msum() function.
+
+2006-05-04  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/basic.py 1.71: PatternSampler (and hence
+	CompositePatternGenerator and Image) is based on
+	SheetCoordinateSystem with an activity matrix, rather than on
+	Sheet.
+
+	* topo/tests/lissom_or_reference.ty 1.45: Corrected learning
+	rates, added missing scheduled action, and commented out final
+	weights bounds change.
+
+	* topo/tests/lissom_oo_or_reference.ty 1.31: Updated for recent
+	changes to code.
+
+	* doc/Downloads/index_text.php 1.23: Added commented-out section
+	(for JAB to decide whether or not it's worthwhile to include)
+	about problems with cvs, with a link to SourceForge's status page.
+
+	* topo/tests/lissom_or_reference.ty 1.44: Adjusted times which I'd
+	changed by mistake earlier. Altered some comments. Appears to
+	match c++ lissom after 201 iterations (i.e. after the first set of
+	scheduled actions).
+
+	* topo/tests/lissom_or_reference.ty 1.43: Corrected mistake left
+	in previous version by mistake.
+
+	* topo/tests/lissom_or_reference.ty 1.42: Forget to divide
+	min_exc_rad by BaseN.
+
+	* topo/base/sheet.py 1.102: Update to a comment.
+
+	* topo/base/sheet.py 1.101, topo/base/sheetcoords.py 1.4: Moved
+	HACKALERT from sheetcoords to sheet.
+
+	* topo/base/sheetcoords.py 1.3: Updated HACKALERT.
+
+	* topo/base/cf.py 1.13, topo/projections/basic.py 1.37,
+	topo/tests/lissom_oo_or_reference.ty 1.30,
+	topo/tests/lissom_or_reference.ty 1.41, topo/tests/testlissom.ty
+	1.13, examples/cfsom_or.ty 1.43, examples/hierarchical.ty 1.52,
+	examples/homeostatic.ty 1.11, examples/laminar.ty 1.19,
+	examples/laminar_lissom.ty 1.5, examples/laminar_nolearning.ty
+	1.5, examples/lissom_oo_or.ty 1.53, examples/lissom_or.ty 1.90,
+	examples/lissom_or_sf.ty 1.13, examples/obermayer_pnas90.ty 1.39,
+	examples/som_retinotopy.ty 1.36, examples/tiny.ty 1.17: For a
+	CFProjection, users specify the BoundingRegionParameter
+	user_weights_bounds. The actual weights_bounds are stored in the
+	attribute weights_bounds.
+
+	* topo/tests/lissom_or_reference.ty 1.40: Added min_exc_rad.
+
+	* topo/misc/tyimputil.py 1.3: Updated HACKALERT (ty files no
+	longer get compiled to typ).
+
+	* topo/tests/lissom_or_reference.ty 1.39: Updated learning rates.
+
+2006-05-04  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/simulation.py 1.2: Added alert
+
+	* topo/base/projection.py 1.67: Fixed trivial typo on doc
+
+	* doc/shared/trailer.php 1.3: Fixed web pages to show the date the
+	page was generated, not a fixed date from 2005
+
+2006-05-04  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/lissom_oo_or_reference.ty 1.29: Corrected mistake in
+	previous commit.
+
+2006-05-04  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/parametersframe.py 1.72: Added titles for
+	ParametersFrame windows
+
+2006-05-04  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/lissom_or_reference.ty 1.38: Finished previous
+	update.
+
+2006-05-04  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/editorobjects.py 1.29, topo/tkgui/editortools.py
+	1.20: Added titles for ParametersFrame windows
+
+2006-05-04  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/lissom_or_reference.ty 1.37: Updated for recent
+	changes to code.
+
+	* doc/Future_Work/current_text.php 1.64: Updated tasks.
+
+	* topo/tkgui/editortools.py 1.19: For editing sheet and projection
+	classes, a new window opens. This at least makes the model editor
+	ok for creating sheets and projections.
+
+	* doc/Future_Work/current_text.php 1.63: Updates to tasks.
+
+	* topo/tkgui/parametersframe.py 1.71: Removed unused method.
+
+	* topo/tkgui/parametersframe.py 1.70: Change to variable name.
+
+	* topo/tkgui/parametersframe.py 1.69: Added back a modified
+	version of dict_translator use for add_text_property().
+
+	* topo/misc/utils.py 1.12: Added comment.
+
+	* topo/tkgui/translatorwidgets.py 1.2: Minor change to comment.
+
+2006-05-03  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/parametersframe.py 1.68: Minor changes to notes.
+
+	* topo/tkgui/parametersframe.py 1.67: Removed some commented-out
+	code about DynamicNumber. If DynamicNumbers display strangely in
+	ParametersFrames, then it might be because I commented out this
+	code before - so it may be necessary to restore it. For now,
+	though, I don't remember what it was for.
+
+	* topo/tkgui/parametersframe.py 1.66: Tidied imports.
+
+	* topo/tkgui/parametersframe.py 1.65: Minor cleanup, with some
+	reminders for myself.
+
+	* topo/tkgui/parametersframe.py 1.64: Still cleaning: simplified
+	widget creation, corrected some mistakes.
+
+	* topo/tkgui/parametersframe.py 1.63: Continued cleaning...
+
+	* topo/tkgui/editortools.py 1.18: Only ask ParametersFrame to make
+	widgets if something has been selected.
+
+	* topo/tkgui/parametersframe.py 1.62, topo/tkgui/editorobjects.py
+	1.28: Intermediate checkin. Model editor can now set all
+	parameters on sheet and projection classes before they're
+	instantiated. Not fully tested, not finished, and might be a
+	regression in some areas.
+
+	* topo/misc/utils.py 1.11: Removed some string translation
+	functions.
+
+	* topo/tkgui/propertiesframe.py 1.18, topo/tkgui/taggedslider.py
+	1.23, topo/tkgui/translatorwidgets.py 1.1: Renamed taggedslider.py
+	to translatorwidgets.py.
+
+	* examples/homeostatic.ty 1.10, examples/lissom_oo_or.ty 1.52,
+	examples/lissom_or_sf.ty 1.12, topo/base/cf.py 1.12,
+	topo/commands/analysis.py 1.19, topo/projections/basic.py 1.36,
+	topo/tests/lissom_oo_or_reference.ty 1.28: Renamed
+	SharedWeightProjection to SharedWeightCFProjection, as well as the
+	corresponding response and output functions.
+
+	* examples/laminar.ty 1.18, examples/laminar_lissom.ty 1.4,
+	examples/laminar_nolearning.ty 1.4, examples/lissom_oo_or.ty 1.51,
+	examples/lissom_or.ty 1.89, examples/lissom_or_sf.ty 1.11,
+	topo/learningfns/optimized.py 1.53,
+	topo/tests/lissom_oo_or_reference.ty 1.27,
+	topo/tests/lissom_or_reference.ty 1.36: Renamed
+	CFProjectionHebbian to CFPHebbian (along with _opt1 version).
+
+	* examples/laminar.ty 1.17, examples/laminar_lissom.ty 1.3,
+	examples/laminar_nolearning.ty 1.3, examples/lissom_oo_or.ty 1.50,
+	examples/lissom_or.ty 1.88, examples/lissom_or_sf.ty 1.10,
+	topo/outputfns/optimized.py 1.18,
+	topo/tests/lissom_oo_or_reference.ty 1.26,
+	topo/tests/lissom_or_reference.ty 1.35: Renamed
+	CFProjectionDivisiveSumNormalize to CFPDivisiveSumNormalize (along
+	with _opt1 version).
+
+	* examples/som_retinotopy.ty 1.35, topo/responsefns/optimized.py
+	1.28, topo/responsefns/projfns.py 1.9: Renamed
+	CFProjectionEuclideanDistance to CFPEuclideanDistance (along with
+	_opt1 version).
+
+	* topo/misc/utils.py 1.10, topo/responsefns/optimized.py 1.27,
+	topo/responsefns/projfns.py 1.8,
+	topo/tests/lissom_oo_or_reference.ty 1.25,
+	topo/tests/lissom_or_reference.ty 1.34,
+	topo/tests/testplotgroup.py 1.23, examples/tiny.ty 1.16,
+	examples/hierarchical.ty 1.51, examples/laminar.ty 1.16,
+	examples/laminar_lissom.ty 1.2, examples/laminar_nolearning.ty
+	1.2, examples/lissom_oo_or.ty 1.49, examples/lissom_or.ty 1.87,
+	examples/lissom_or_sf.ty 1.9, examples/obermayer_pnas90.ty 1.38,
+	examples/cfsom_or.ty 1.42: Renamed CFProjectionDotProduct to
+	CFPDotProduct (and the _opt1 version).
+
+2006-05-03  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testsimulation.py 1.1, topo/tests/testsimulator.py
+	1.11: Moved testsimulator.py to testsimulation.py
+
+	* topo/base/simulator.py 1.66, topo/tests/testcfsom.py 1.26,
+	topo/tests/testfeaturemap.py 1.19,
+	topo/tests/testpatternpresent.py 1.14,
+	topo/tests/testplotfilesaver.py 1.18, topo/tests/testplotgroup.py
+	1.22, topo/tests/testplotgrouppanel.py 1.5,
+	topo/tests/testsheetview.py 1.14, topo/tests/testsimulator.py
+	1.10, topo/tests/testsnapshots.py 1.5,
+	topo/tests/testtemplateplotgrouppanel.py 1.5,
+	topo/tests/testtopoconsole.py 1.3, topo/tkgui/topoconsole.py 1.55,
+	topo/__init__.py 1.57, topo/base/__init__.py 1.10,
+	topo/base/projection.py 1.66, topo/base/sheet.py 1.100,
+	topo/commands/pylabplots.py 1.5, topo/eps/basic.py 1.9: Moved
+	topo.base.simulator to topo.base.simulation
+
+	* topo/base/simulation.py 1.1: Moved topo/base/simulator.py to
+	topo/base/simulation.py
+
+	* topo/tkgui/testpattern.py 1.37: Added missing import
+
+	* topo/plotting/plotgroup.py 1.125: Added hack to work around
+	problem with reducing integer coordinates in the Test Pattern
+	window
+
+	* topo/base/arrayutils.py 1.8, topo/base/simulator.py 1.65:
+	Removed apparently outdated comments
+
+	* ChangeLog.txt 1.6: Updated with recent changes
+
 2006-05-03  julienciroux  <julienciroux@lodestar.inf.ed.ac.uk>
 
 	* topo/plotting/plotgroup.py 1.124, topo/tkgui/testpattern.py
 	1.36: Improved TestPattern so that the reduce, enlarge and
-	sheetcoords button ar working. There is still a problem remaining
-	for integerscaling button: when it is on, and that we try to
-	reduce, we obtain a Division by Zero error.
+	sheetcoords buttons are working. There is still a problem
+	remaining for the integerscaling button: when it is on, and that
+	we try to reduce, we obtain a Division by Zero error.
 
 2006-05-03  ceball  <ceball@lodestar.inf.ed.ac.uk>
 
@@ -795,7 +1068,7 @@
 	* topo/tkgui/connectionfieldspanel.py 1.21,
 	topo/tkgui/projectionpanel.py 1.56: Fixed projectionpanel and
 	corrected errors in connectionfield panel. There is still a
-	warning when opening the connectionfield panel, it has to be
+	warning when opening the connectionfield panel; it has to be
 	sorted.
 
 	* topo/tkgui/connectionfieldspanel.py 1.20: Corrected display
@@ -860,8 +1133,8 @@
 
 	* topo/plotting/plotgroup.py 1.120,
 	topo/tkgui/plotgrouppanel.py 1.76: Added a method
-	restore_environment in PlotGroup panel to re-instate the
-	state of the buttons when re-loading a Plotgroup from the
+	restore_environment in PlotGroup panel to restore the
+	state of the buttons when reloading a Plotgroup from the
 	history.
 
 	* topo/tkgui/plotgrouppanel.py 1.75: Corrected the handling of
@@ -974,8 +1247,8 @@
 
 	* topo/tkgui/plotgrouppanel.py 1.71,
 	topo/tkgui/projectionpanel.py 1.51: Added a parameter update
-	when calling display_plots (decide wether re-generating the
-	Sheetviews or not.
+	when calling display_plots (determines whether to regenerate
+	the SheetViews).
 
 	* topo/plotting/plotgroup.py 1.116: Minor change in doc and
 	comment.
@@ -1026,7 +1299,7 @@
 	1.114, topo/tkgui/plotgrouppanel.py 1.70,
 	topo/tkgui/projectionpanel.py 1.50: Delete the attribute
 	plot_src_name and name for a Bitmap (Not needed
-	anymore). Delete the PlotGroup load_images method, now we
+	anymore). Delete the PlotGroup load_images method; now we
 	explicitly built the bitmap list in PlotGroupPanel
 	display_plots().
 
@@ -1164,12 +1437,12 @@
 	topo/tkgui/projectionpanel.py 1.48,
 	topo/tkgui/templateplotgrouppanel.py 1.14,
 	topo/tkgui/testpattern.py 1.29: Deleted the plotgroup_dict
-	variable: now each panel create and store its own plotgroup
+	variable: now each panel creates and stores its own plotgroup
 	attribute and uses it accordingly. Added a method
 	generate_sheet_views to the PlotGroups: now the command to
 	update the sheet view is contained in PlotGroups (and still
-	can be modified from the panel). It is the first version
-	without plotgroup_dict, it needs some cleaning and improving
+	can be modified from the panel). This is the first version
+	without plotgroup_dict; it needs some cleaning and improving
 	(in particular for the projectionpanel and testpattern).
 
 2006-04-13 ceball <ceball@lodestar.inf.ed.ac.uk>
@@ -1325,7 +1598,7 @@
 	have been committed in order to be further simplified. Note
 	also that there is a slight bug for the ProjectionPanel and
 	for the handling of the SheetCoordinates check_button, but
-	they will be fixed very soon.
+	this will be fixed very soon.
 
 2006-04-11 ceball <ceball@lodestar.inf.ed.ac.uk>
 
@@ -1587,13 +1860,13 @@
 
 	* topo/tkgui/plotgrouppanel.py 1.57,
 	topo/tkgui/projectionpanel.py 1.43: Renamed
-	_set_initial_master_zoom to _set_eight_of_tallest_plot.
+	_set_initial_master_zoom to _set_height_of_tallest_plot.
 
 	* topo/tkgui/projectionpanel.py 1.42: Corrected
 	self.zoom_factor to be self.height_of_tallest_plot and
 	INITIAL_PLOT_WIDTH to INITIAL_PLOT_HEIGHT. Added a
-	re-implementation of the _set_initial_naster_zoom for the
-	projectionpanel (that needs more work).
+	re-implementation of the _set_initial_master_zoom for the
+	projectionpanel (but it needs more work).
 
 2006-04-07 ceball <ceball@lodestar.inf.ed.ac.uk>
 
@@ -1978,9 +2251,9 @@
 	* topo/tkgui/plotgrouppanel.py 1.39, topo/tkgui/testpattern.py
 	1.24: Cleaned up reference to a template from PlotGroupPanel. At
 	the same time, enabled the normalize button for the
-	testpattern. It recquired to re-implement the toggle_normalize in
-	the testpattern, but it is only a temporary solution while
-	re-organizing the panel hierarchy.
+	testpattern. This required reimplementing toggle_normalize in
+	the testpattern, but that's only a temporary solution while
+	reorganizing the panel hierarchy.
 
 2006-03-22  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
