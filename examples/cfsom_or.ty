@@ -47,7 +47,7 @@ topo.sim['V1'] = CFSOM(density=locals().get('default_density',50.0),
 
 topo.sim.connect('Retina','V1',delay=0.5,connection_type=CFProjection,
                   weights_generator = topo.patterns.random.UniformRandom(),
-                  user_weights_bounds=BoundingBox(radius=0.1),
+                  nominal_bounds_template=BoundingBox(radius=0.1),
                   response_fn = CFPDotProduct_opt1(),
                   learning_fn=HebbianSOMLF())
 

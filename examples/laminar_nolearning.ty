@@ -74,25 +74,25 @@ topo.sim['V1Inh'] = LISSOM(bounds=BoundingBox(radius=0.5),tsettle=8)
 
 topo.sim.connect('Retina','V1Exc', delay = FixedPoint("0.05",4),
                  connection_type=CFProjection,strength=1.0,name='Afferent1',
-                 user_weights_bounds=BoundingBox(radius=0.22),learning_rate=1.274)
+                 nominal_bounds_template=BoundingBox(radius=0.22),learning_rate=1.274)
 
 topo.sim.connect('V1Exc','V1Exc', delay = FixedPoint("0.10",4),
 		   connection_type=CFProjection,strength = 0.86, name='LateralExcitatory_local',
-		   user_weights_bounds =BoundingBox(radius=0.10),
+		   nominal_bounds_template =BoundingBox(radius=0.10),
                    learning_rate=2.674)
 
 topo.sim.connect('V1Exc','V1Exc', delay = FixedPoint("0.10",4),
 		   connection_type=CFProjection,strength = 0.1, name='LateralExcitatory',
-		   user_weights_bounds =BoundingBox(radius=0.25),
+		   nominal_bounds_template =BoundingBox(radius=0.25),
                    learning_rate=0*2.674)
 
 topo.sim.connect('V1Exc','V1Inh', delay = FixedPoint("0.05",4),
                    connection_type=CFProjection,strength = 1.9, name='V1Exc_to_V1Inh',
-                   user_weights_bounds = BoundingBox(radius=0.25),learning_rate=0*2.674)
+                   nominal_bounds_template = BoundingBox(radius=0.25),learning_rate=0*2.674)
 
 topo.sim.connect('V1Inh','V1Exc', delay = FixedPoint("0.05",4),
                          connection_type=CFProjection,strength=-0.4, name='V1Inh_to_V1Exc',
-                         user_weights_bounds = BoundingBox(radius=0.10),learning_rate=0*2.466)
+                         nominal_bounds_template = BoundingBox(radius=0.10),learning_rate=0*2.466)
 
 #These do not really make any sense yet for this model
 ### Schedule bounds changes

@@ -66,15 +66,15 @@ topo.sim['V1'] = LISSOM()
 
 topo.sim.connect('Retina','V1', delay = FixedPoint("0.05"),
           connection_type=CFProjection,strength=1.0,name='Afferent0',
-          user_weights_bounds=BoundingBox(radius=0.22),learning_rate=1.274)
+          nominal_bounds_template=BoundingBox(radius=0.22),learning_rate=1.274)
 
 topo.sim.connect('V1','V1', delay = FixedPoint("0.05"), 
           connection_type=CFProjection,strength = 0.9, name='LateralExcitatory',
-          user_weights_bounds=BoundingBox(radius=0.1),learning_rate=2.674)
+          nominal_bounds_template=BoundingBox(radius=0.1),learning_rate=2.674)
             
 topo.sim.connect('V1','V1', delay = FixedPoint("0.05"), 
           connection_type=CFProjection,strength = -0.9, name='LateralInhibitory',
-          user_weights_bounds=BoundingBox(radius=0.23),learning_rate=2.466)         
+          nominal_bounds_template=BoundingBox(radius=0.23),learning_rate=2.466)         
 
 
 # CEBHACKALERT: scheduled events are missing. e.g. change_bounds are

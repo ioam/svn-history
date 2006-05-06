@@ -86,7 +86,7 @@ ObermayerSOM.learning_length = 30000
 
 RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()
-CFProjection.user_weights_bounds = BoundingBox(radius=1.0)
+CFProjection.nominal_bounds_template = BoundingBox(radius=1.0)
 CFProjection.response_fn = CFPDotProduct_opt1()
 CFProjection.learning_fn=HebbianSOMLF()
 

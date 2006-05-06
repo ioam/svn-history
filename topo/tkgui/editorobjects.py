@@ -665,11 +665,14 @@ class EditorProjection(EditorConnection) :
                 self.from_node.height / self.from_node.width)
         node = self.from_node
         node_bounds = node.sheet.bounds.aarect().lbrt()
+
+        # CEBHACKALERT: why do we try all these things, including accessing
+        # '_bounds_template_param_value'?
         try :
-            bounds = self.connection.weights_bounds.aarect().lbrt()
+            bounds = self.connection.bounds_template.aarect().lbrt()
         except :
             try :
-                bounds = self.connection._weights_bounds_param_value.aarect().lbrt()
+                bounds = self.connection._bounds_template_param_value.aarect().lbrt()
             except : return (factor * self.normal_radius, factor * self.normal_radius * 
                 self.from_node.height / self.from_node.width)
         radius_x = factor * (node.width / 2) * (bounds[2] - bounds[0]) / (node_bounds[2] - node_bounds[0])

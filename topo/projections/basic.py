@@ -99,7 +99,7 @@ class SharedWeightCFProjection(CFProjection):
 
         self.sharedcf=self.cf_type(0,0,
                                    self.src,
-                                   self.weights_bounds,
+                                   self.bounds_template,
                                    self.weights_generator,
                                    self.mask_template,
                                    self.weights_output_fn.single_cf_fn)
@@ -122,8 +122,8 @@ class SharedWeightCFProjection(CFProjection):
             row = []
             for x in self.dest.sheet_cols():
                 cf.x,cf.y = x,y
-                cf.offset_bounds(self.weights_bounds)
-                weights_slice = cf.get_slice(self.weights_bounds)
+                cf.offset_bounds(self.bounds_template)
+                weights_slice = cf.get_slice(self.bounds_template)
                 row.append((cf.slice_array,cf.bounds,weights_slice))
             self.cf_slice_and_bounds.append(row)
 
@@ -150,7 +150,7 @@ class SharedWeightCFProjection(CFProjection):
         self.activity = self.output_fn(self.activity)
 
 
-    def change_bounds(self, user_weights_bounds):
+    def change_bounds(self, nominal_bounds_template):
         """
         Change the bounding box for all of the ConnectionFields in this Projection.
 
