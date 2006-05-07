@@ -27,6 +27,11 @@ affect results, but halves performance. [** before release]
 </li>
 
 <li>
+2006/05/07 (CB): Unhide ParameterizedObject name attribute so names can be set in the GUI. Objects in the simulation are indexed by name, so name needs to be a constant Parameter. There is probably an easy way to allow renaming, though. [** before release]
+</li>
+
+
+<li>
 2006/05/06: Rename Sheet's bounds and density to nominal_bounds and nominal_density. Rename SheetCoordinateSystem's true_bounds attribute to bounds. [** before release]
 </li>
 
