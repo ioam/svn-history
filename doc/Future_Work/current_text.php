@@ -32,6 +32,10 @@ affect results, but halves performance. [** before release]
 
 
 <li>
+2006/05/07 (CB): DynamicNumbers in the model editor (ParametersFrame). [** before release]
+</li>
+
+<li>
 2006/05/06: Rename Sheet's bounds and density to nominal_bounds and nominal_density. Rename SheetCoordinateSystem's true_bounds attribute to bounds. [** before release]
 </li>
 
