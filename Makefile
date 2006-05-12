@@ -5,8 +5,8 @@ PYCHECKER = bin/pychecker
 
 DOC    = doc/Reference_Manual
 
-RELEASE = 0.8.2
-RELEASE_TAG = release_0_8_2
+RELEASE = 0.8.3alpha
+RELEASE_TAG = release_0_8_3alpha
 
 TEST_VERBOSITY = 1
 
@@ -155,7 +155,7 @@ distdir: FORCE
 	Makefile > ${DIST_DIR}/Makefile 
 
 # Create public distribution subdirectory and archive
-dist: doc distdir FORCE
+dist: doc distdir reference-manual FORCE
 	${CD} ${DIST_DIR}; ${MAKE} distarc
 
 ChangeLog.txt: FORCE
