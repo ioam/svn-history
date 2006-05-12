@@ -1,5 +1,5 @@
 Topographica comes with the following step-by-step guides to running
-simulations:
+simulations: 
 
 <P><DL>
 <DT><A href="lissom_oo_or.html"><strong>LISSOM Orientation Map</strong></A></DT>
