@@ -217,6 +217,8 @@ class ParametersFrame(Frame):
         a match is found. If no match is found, the Parameter just gets a
         textbox. 
         """
+        # CEBHACKALERT: results in DynamicNumber being called and producing
+        # a value, rather than displaying information about the dynamic number.
         if class_:
             value = getattr(self.topo_class,parameter_name)
             # or parameter.default for the class?
