@@ -42,7 +42,7 @@ class LISSOM(CFSheet):
                     """)
 
 
-    def input_event(self,src,src_port,dest_port,data):
+    def input_event(self,conn,src,src_port,dest_port,data):
         # On a new afferent input, clear the activity
         if self.new_iteration:
             self.new_iteration = False
@@ -51,7 +51,7 @@ class LISSOM(CFSheet):
                 for proj in self.in_projections[name]:
                     proj.activity *= 0.0
 
-        super(LISSOM,self).input_event(src,src_port,dest_port,data)
+        super(LISSOM,self).input_event(conn,src,src_port,dest_port,data)
 
 
     ### JABHACKALERT!  There should be some sort of warning when

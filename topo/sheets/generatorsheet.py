@@ -81,12 +81,12 @@ class GeneratorSheet(Sheet):
         assert self.simulation
 
         # connect self<->self (for repeating)
-        self.simulation.connect(self.name,self.name,delay=self.period)
+        c=self.simulation.connect(self.name,self.name,delay=self.period)
 
         # first event is special
-        self.simulation.enqueue_epevent_rel(self.phase,self,self,data=self.activity)
+        self.simulation.enqueue_epevent_rel(self.phase,c,self,self,data=self.activity)
 
-    def input_event(self,src,src_port,dest_port,data):
+    def input_event(self,conn,src,src_port,dest_port,data):
         self.verbose("Received %s input from %s." % (NxN(data.shape),src))
         self.verbose("Generating a new pattern...")
 

@@ -69,7 +69,7 @@ class ImageSaver(EventProcessor):
 
 
 
-    def input_event(self,src,src_port,dest_port,data):
+    def input_event(self,conn,src,src_port,dest_port,data):
 
         self.verbose("Received %s  input from %s" % (NxN(data.shape),src))
         self.verbose("input max value = %d" % max(data.flat))
