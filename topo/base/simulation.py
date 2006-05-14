@@ -255,10 +255,10 @@ class EventProcessor(ParameterizedObject):
         Send some data out to all connections on the given src_port.
         """
         for conn in self.out_connections[src_port]:
-            self.simulation.enqueue_epevent_rel(conn.delay,self,conn.dest,conn.src_port,conn.dest_port,data)
+            self.simulation.enqueue_epevent_rel(conn.delay,conn,self,conn.dest,conn.src_port,conn.dest_port,data)
 
 
-    def input_event(self,src,src_port,dest_port,data):
+    def input_event(self,conn,src,src_port,dest_port,data):
         """
         Called by the simulation to dispatch an event on the given port
         from src.  (By default, does nothing.)
@@ -320,16 +320,17 @@ class Event(object):
 
 class EPEvent(Event):
     """An Event for delivery to an EventProcessor."""
-    def __init__(self,time,src,dest,src_port,dest_port,data):
+    def __init__(self,time,conn,src,dest,src_port,dest_port,data):
         super(EPEvent,self).__init__(time)
         self.src = src
         self.dest = dest
         self.src_port = src_port
         self.dest_port = dest_port
         self.data = deepcopy(data)
+        self.conn = conn
 
     def __call__(self):
-        self.dest.input_event(self.src,self.src_port,self.dest_port,self.data)
+        self.dest.input_event(self.conn,self.src,self.src_port,self.dest_port,self.data)
 
 
 class CommandEvent(Event):
@@ -598,12 +599,12 @@ class Simulation(ParameterizedObject):
         self.enqueue_event_abs(event)
 
 
-    def enqueue_epevent_rel(self,delay,src,dest,src_port=None,dest_port=None,data=None):
+    def enqueue_epevent_rel(self,delay,conn,src,dest,src_port=None,dest_port=None,data=None):
         """
         Enqueue the given constituents of an EPEvent at a time
         relative to the current simulation clock.
         """
-        epevent = EPEvent(delay,src,dest,src_port,dest_port,data)
+        epevent = EPEvent(delay,conn,src,dest,src_port,dest_port,data)
         self.enqueue_event_rel(epevent)
 
         
