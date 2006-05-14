@@ -22,7 +22,7 @@ class TestSimulation(unittest.TestCase):
         """
         s = Simulation(step_mode = True)
         data = array([4,3])
-        se = EPEvent(1,6,2,3,4,5,data)
+        se = EPEvent(1,2,data)
         se.data[0] = 5
         assert data[0] != se.data[0], 'Matrices should be different'
         se2 = copy(se)

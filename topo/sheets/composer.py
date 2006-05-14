@@ -54,17 +54,17 @@ class Composer(Sheet):
             self.activity = zeros(self.activity.shape)+0.0
             self.__dirty=False
            
-    def input_event(self,conn,src,src_port,dest_port,data):
+    def input_event(self,conn,data):
 
-        self.verbose("Received %s input from %s." % (NxN(data.shape),src))
+        self.verbose("Received %s input from %s." % (NxN(data.shape),conn.src))
 
         self.__dirty = True
 
         in_rows, in_cols = data.shape
 
         # compute the correct position of the input in the buffer
-        start_row,start_col = self.sheet2matrixidx(*self.inputs[(src.name,src_port)].origin)
-        row_adj,col_adj = src.sheet2matrixidx(0,0)
+        start_row,start_col = self.sheet2matrixidx(*self.inputs[(conn.src.name,conn.src_port)].origin)
+        row_adj,col_adj = conn.src.sheet2matrixidx(0,0)
 
         self.debug("origin (row,col) = "+`(start_row,start_col)`)
         self.debug("adjust (row,col) = "+`(row_adj,col_adj)`)

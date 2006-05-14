@@ -84,10 +84,10 @@ class GeneratorSheet(Sheet):
         c=self.simulation.connect(self.name,self.name,delay=self.period)
 
         # first event is special
-        self.simulation.enqueue_epevent_rel(self.phase,c,self,self,data=self.activity)
+        self.simulation.enqueue_epevent_rel(self.phase,c,data=self.activity)
 
-    def input_event(self,conn,src,src_port,dest_port,data):
-        self.verbose("Received %s input from %s." % (NxN(data.shape),src))
+    def input_event(self,conn,data):
+        self.verbose("Received %s input from %s." % (NxN(data.shape),conn.src))
         self.verbose("Generating a new pattern...")
 
         self.activity = self.input_generator()

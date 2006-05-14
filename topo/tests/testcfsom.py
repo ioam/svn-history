@@ -69,15 +69,15 @@ class ImageSaver(EventProcessor):
 
 
 
-    def input_event(self,conn,src,src_port,dest_port,data):
+    def input_event(self,conn,data):
 
-        self.verbose("Received %s  input from %s" % (NxN(data.shape),src))
+        self.verbose("Received %s  input from %s" % (NxN(data.shape),conn.src))
         self.verbose("input max value = %d" % max(data.flat))
 
         # assemble the filename
         filename = self.file_prefix + self.name
-        if dest_port:
-            filename += "_" + str(dest_port)
+        if conn.dest_port:
+            filename += "_" + str(conn.dest_port)
         filename += "_" + (self.time_format % self.simulation.time())
         filename += "." + self.file_format
 
