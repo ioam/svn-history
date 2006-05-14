@@ -1,42 +1,26 @@
 """
-The Topographica Simulation class.  
+A general-purpose Simulation class for discrete events.  
 
-The Simulation object is the central object of a Topographica
-simulation.  It handles the simulation clock and maintains
-communication between the components of the simulation.
+The Simulation object is the central object of a simulation.  It
+handles the simulation clock time and maintains communication between
+the components of the simulation.
 
-A simulation is structured as a directed graph of event-processing nodes
-called EventProcessors (EPs).  EventProcessors generate data-carrying
-events, which are routed through the graph to other EventProcessors
-via delayed connections.
+A simulation is structured as a directed graph of event-processing
+nodes called EventProcessors (EPs).  EventProcessors generate
+data-carrying Events, which are routed through the graph to other
+EventProcessors via delayed connections.  Most objects in the
+simulation will be a subclass of EventProcessor, customized to provide
+some specific behavior.
 
-The simulation is modular: EventProcessors should inherit from the root
-EventProcessor class.  This class manages the EP's connections to
-other EPs, as well as the mechanics of sending events to other EPs
-(through the Simulation).  The EventProcessor class defines the basic
-EP programming interface.
+There are different subclasses of Event, each doing different types of
+computation, and each can contain any arbitrary Python data.  A
+simulation begins by giving each EventProcessor an opportunity to send
+any initial events.  It then proceeds by processing and delivering
+events to EventProcessors in time order.  After all events for the
+current time are processed, the simulation gives each EventProcessor a
+chance to do any final computation, after which simulation time skips
+to the time of the earliest event remaining in the queue.
 
-Formally, a simulation event (EPConnectionEvent) is a class with the following
-data:
-
-  time      = The time at which the event should be delivered, an arbitrary
-              floating point value.
-  src       = The EventProcessor from which the event originated.
-  src_port  = The output port from which the event originated
-              in the source EP. (see PORTS, below)
-  dest      = Destination EventProcessor of the event
-  dest_port = The input port to which the event is destined in dest.
-              (see PORTS) below.
-  data      = The event data to be delivered.  Can be anything.
-
-
-A simulation begins by giving each EventProcessor an opportunity to
-send any initial events.  It then proceeds by processing and
-delivering events to EventProcessors in time order.  After all events
-for the current time are processed, the simulation gives each
-EventProcessor a chance to do any final computation, after which
-simulation time skips to the time of the earliest event remaining in
-the queue.
 
 PORTS
 
@@ -46,27 +30,29 @@ distinguish between inputs and outputs.  A port specifier can be any
 hashable Python object.  If not specified, the input and output ports
 for a connection default to None.
 
-Output ports distinguish different types of output that an EP may
+src_ports distinguish different types of output that an EP may
 produce. When sending output, the EP must call self.send_output()
-separately for each port.  Input ports distinguish different types of
+separately for each port.  dest_ports distinguish different types of
 input an EP may receive and process.  The EP is free to interpret the
 input port designation on an incoming event in any way it chooses.
 
-An example of input port use might be an EP that receives 'ordinary'
+An example dest_port might be for an EP that receives 'ordinary'
 neural activity on the default port, and receives a separate
 modulatory signal that influences learning.  The originator of the
 modulatory signal might have a connection to the EP with dest_port =
-'modulation'.
+'modulation'.  Multiple ports can be grouped by a dest EP by assuming
+a convention that the keys are tuples,
+e.g. ('jointnormalize','Conn1'), ('jointnormalize','Conn2').
 
-An example of output port use might be an EP that sends different
+An example src_port use might be an EP that sends different
 events to itself than it sends out to other EPs.  In this case the
 self connections might have src_port = 'recurrent'.
 
 
-Current Simulation
+CURRENT SIMULATION
 
-The current Simulation, which can be accessed through the instance
-of the Singleton class SimSingleton(), is the last Simulation to
+The current Simulation, which can be accessed through the instance of
+the Singleton class SimSingleton(), is the most recent Simulation to
 have been created with register=True (the default).
 
 
@@ -105,15 +91,14 @@ class Singleton(object):
         it.init(*args, **kwds)
         return it
     def init(self, *args, **kwds):
+        """Method to be overridden if the subclass needs initialization."""
         pass
 
 
 
 class SimSingleton(Singleton):
-    """
-    A singleton class, the instance of which allows access to
-    the current simulation.
-    """
+    """Provides access to a single shared instance of Simulation."""
+    
     actual_sim = None
 
     # should both these completely hide that this is
@@ -127,8 +112,8 @@ class SimSingleton(Singleton):
         return self.actual_sim.__str__()
     
     def init(self):
-        """Create a new simulation."""
-        # Simulation will call this object's change_sim()
+        """Create a new simulation object when needed."""
+        # The Simulation constructor will call SimSingleton's change_sim()
         Simulation()
 
     def __getattribute__(self,attribute):
@@ -216,10 +201,10 @@ class EventProcessor(ParameterizedObject):
     # them, and passed on here
     def _connect_to(self,conn):
         """
-        Add a connection to dest/port.
-        
+        Add the specified connection to the list of outgoing connections.
         Should only be called from Simulation.connect().
         """
+        ### JABALERT: Should check name for uniqueness just as _connect_from does.
 
         if not conn.src_port in self.out_connections:
             self.out_connections[conn.src_port] = []
@@ -229,12 +214,8 @@ class EventProcessor(ParameterizedObject):
 
     def _connect_from(self,conn):
         """
-        Add a connection from src/port.
-        
-        Should only be called from Simulation.connect().  The extra
-        keyword arguments in **args contain arbitrary connection
-        parameters that can be interpreted by EP subclasses as
-        needed.  
+        Add the specified connection to the list of incoming connections.
+        Should only be called from Simulation.connect().
         """
         for existing_connection in self.in_connections:
             if existing_connection.name == conn.name:
@@ -249,7 +230,8 @@ class EventProcessor(ParameterizedObject):
         the simulation.
 
         If an EventProcessor needs to have any code run when it is
-        added to the simulation, it should be in this method.
+        added to the simulation, the code can be put into this method
+        in the subclass.
         """
         pass
 
@@ -262,26 +244,29 @@ class EventProcessor(ParameterizedObject):
 
     def input_event(self,conn,data):
         """
-        Called by the simulation to dispatch an event on the given port
-        from src.  (By default, does nothing.)
+        Called by the simulation when an EPConnectionEvent is delivered;
+        the EventProcessor should process the data somehow.
         """
-        pass
+        raise NotImplementedError
 
-    ### JABALERT: Should change the name somehow.
+
+    ### JABALERT: Should change the name to process_current_time
     def pre_sleep(self):
         """
-        Called by the simulation before sleeping.  Allows the event processor
-        to send any events that must be sent before time advances.
-        (By default, does nothing.)
+        Called by the simulation before advancing the simulation
+        time.  Allows the event processor to do any computation that
+        requires that all events for this time have been delivered.
+        Computations performed in this method should not generate any
+        events with a zero time delay, or else causality could be
+        violated. (By default, does nothing.)
         """
         pass
     
 
 
 class EventProcessorParameter(Parameter):
-    """
-    Parameter whose value can be any EventProcessor instance.
-    """
+    """Parameter whose value can be any EventProcessor instance."""
+    
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
     
@@ -300,30 +285,69 @@ class EPConnection(ParameterizedObject):
     EPConnection stores basic information for a connection between
     two EventProcessors.
     """
-    src = EventProcessorParameter(default=None,constant=True)
-    dest = EventProcessorParameter(default=None,constant=True)
-    src_port = Parameter(default=None)
-    dest_port = Parameter(default=None)
-    delay = Parameter(default=0)
+    src = EventProcessorParameter(default=None,constant=True,precedence=0.10,doc=
+       """The EventProcessor from which messages originate.""")
+    
+    dest = EventProcessorParameter(default=None,constant=True,precedence=0.11,doc=
+       """The EventProcessor to which messages are delivered.""")
+    
+    src_port = Parameter(default=None,precedence=0.20,doc=
+       """
+       Identifier that can be used to distinguish different types of outgoing connections.
+
+       EventProcessors that generate only a single type of
+       outgoing event will typically use a src_port of None.  However,
+       if multiple types of communication are meaningful, the
+       EventProcessor can accept other values for src_port.  It is up
+       to the src EventProcessor to deliver appropriate data to each
+       port, and to declare what will be sent over that port.
+       """)
+    
+    dest_port = Parameter(default=None,precedence=0.21,doc=
+       """
+       Identifier that can be used to distinguish different types of incoming connections.
+
+       EventProcessors that accept only a single type of incoming
+       event will typically use a src_port of None.  However, if
+       multiple types are of communication are meaningful, the
+       EventProcessor can accept other values for dest_port.  It is up
+       to the dest EventProcessor to process the data appropriately
+       for each port, and to define what is expected to be sent to
+       that port.
+       """)
+
+    delay = Parameter(default=0,doc=
+       """Simulation time between when each Event is generated by the src and when it is delivered to the dest.""")
 
 
 class Event(object):
-    """
-    Hierarchy of classes for storing events.
-
-    When called, must make the event happen.
-    """
+    """Hierarchy of classes for storing simulation events of various types."""
     def __init__(self,time):
         self.time = time
         
     def __call__(self):
+        """
+        Cause some computation to be performed, deliver a message, etc.,
+        as appropriate for each subtype of Event.
+        """
         raise NotImplementedError
 
 
 class EPConnectionEvent(Event):
-    """An Event for delivery to an EPConnection."""
+    """
+    An Event for delivery to an EPConnection.
+
+    Provides access to a data field, which can be used for anything
+    the src wants to provide, and a link to the connection over which
+    it has arrived, so that the dest can determine what to do with the
+    data.
+    """
     def __init__(self,time,conn,data=None):
         super(EPConnectionEvent,self).__init__(time)
+        assert isinstance(conn,EPConnection)
+        ### JABALERT: Do we always want to deepcopy here?
+        ### E.g. the same data sent to a dozen ports should probably have
+        ### only one copy.
         self.data = deepcopy(data)
         self.conn = conn
 
@@ -332,7 +356,7 @@ class EPConnectionEvent(Event):
 
 
 class CommandEvent(Event):
-    """An Event consisting of a command string to run."""
+    """An Event consisting of a command string to execute."""
 
     def __init__(self,time,command_string):
         super(CommandEvent,self).__init__(time)
@@ -349,7 +373,7 @@ class CommandEvent(Event):
         available in __main__.__dict__---will not be saved with the
         network.
         """
-        # here to avoid importing __main__ into the rest of the file?
+        # Presumably here to avoid importing __main__ into the rest of the file
         import __main__
         try:
             exec self.command_string in __main__.__dict__
@@ -371,10 +395,8 @@ class Simulation(ParameterizedObject):
     e.g. a sched.scheduler object) to manage events and dispatching.
 
     The Parameter 'register' indicates whether or not to register the
-    Simulation as being part of Topographica; that is, register would
-    be false for use of the Simulation outside Topographica. With
-    register True, the Simulation is set to be topo.sim, which
-    other Topographica commands and classes might look for.
+    Simulation with SimSingleton, which can be used to provide a
+    single point of contact for accessing the Simulation.
     """
     ### JABALERT! Is step_mode even implemented?
     step_mode = BooleanParameter(default=False)
@@ -393,19 +415,20 @@ class Simulation(ParameterizedObject):
 
     def __init__(self,**config):
         """
-        Create the Simulation and register it as topo.sim unless
-        register==False.
+        Create the Simulation and register it with SimSingleton unless
+        register==False.  Parameter values can be passed in as for any
+        ParameterizedObject, e.g.:
         
            step_mode = debugging flag, causing the simulation to stop
                        before each tick.
         """
         super(Simulation,self).__init__(**config)
 
-        # time is a fixed-point number
         # JABHACKALERT! Shouldn't this be at least 4 decimal places by default?
         # (Either using ,4 or setting the FixedPoint default precision to 4?)
         self._time = FixedPoint("0.0")
         self._event_processors = {}
+        # JABALERT: These and sleep() can be removed.
         self._sleep_window = 0.0
         self._sleep_window_violation = False
 
@@ -436,14 +459,11 @@ class Simulation(ParameterizedObject):
         If ep_name already exists in the simulation, ep overwrites
         the original object (as for a dictionary).
 
-        If the ep itself already exists in the simulation, a
-        warning is printed and the ep is not added.
-
         Note: EventProcessors do not necessarily have to be added to
         the simulation to be used, but otherwise they will not receive the
         start() message.  Adding a node to the simulation also sets the
         backlink node.simulation, so that the node can enqueue events
-        and read the simulation clock.
+        and read the simulation time.
         """
         if not isinstance(ep_name,str):
            raise TypeError("Expected string for item name (EPs in the Simulation are indexed by name).")
@@ -466,20 +486,22 @@ class Simulation(ParameterizedObject):
         """
         Return the current simulation time as a FixedPoint object.
         
-	If the time return is used in the computation of a floating point 
-        variable, it should be cast into a floating point number by float().
+	If the time returned will be used in the computation of a
+        floating point variable, it should be cast into a floating
+        point number by float().
         """
         return self._time
 
     
     def run(self,duration=Forever,until=Forever):
         """
-        Run the simulation by starting the event scheduler.
+        Process simulation events for the specified duration or until the specified time.
 
-        parameters:
-          duration = time to run in simulation time. Default: run indefinitely.
-          until    = time to stop in simulation time. Default: run indefinitely.
-          (note if both duration and until are used, they both will apply.)
+        Arguments:
+          duration = length of simulation time to run. Default: run indefinitely.
+          until    = maximum simulation time to simulate. Default: run indefinitely.
+
+        If both duration and until are used, the one that is reached first will apply.
         """
         # Complicated expression for min(time+duration,until)
         if duration == Forever:
@@ -491,44 +513,41 @@ class Simulation(ParameterizedObject):
             
         did_event = False
         while self.events and (stop_time == Forever or self._time < stop_time):
-
             # Loop while there are events and it's not time to stop.
             
             if self.events[0].time < self._time:
+                # Warn and then discard events scheduled *before* the current time
 
-                # if the first event's time is less than the current time
-                # then the event is stale, so print a warning and
-                # discard it.                
-
+                ### Replace this specific info with events[0].debugging_info (see below)
                 self.warning('Discarding stale event from',(self.events[0].conn.src,self.events[0].conn.src_port),
                              'to',(self.events[0].conn.dest,self.events[0].conn.dest_port),
                              'for time',self.events[0].time,
                              '. Current time =',self._time)
                 self.events.pop(0)
+                
             elif self.events[0].time > self._time:
-
-                # If the first event's time is greater than the
-                # current time then it's time to sleep (i.e. increment
-                # the clock).  Before doing that, give everyone a
-                # pre_sleep() call.
+                # Before moving on to the next time, do any processing
+                # necessary for the current time.  This is necessary only
+                # if some event has been delivered at the current time.
 
                 if did_event:
                     did_event = False
                     self.debug("Time to sleep. Current time =",self._time,
                                ".  Next event time =",self.events[0].time)
                     for ep in self._event_processors.values():
-    #                    self.debug("Doing pre_sleep for",e)
                         ep.pre_sleep()
                     
-                # set the time to the frontmost event (Note: the front
-                # event may have been changed by the .pre_sleep() calls).
+                # Set the time to the frontmost event.  Bear in mind
+                # that the front event may have been changed by the
+                # .pre_sleep() calls.
                 self._time = self.events[0].time
+                
             else:
-
-                # If it's not too late, and it's not too early, then
-                # it's just right!  So pop the event and call it.
+                # Pop and call the event at the head of the queue.
                 event = self.events.pop(0)
 
+                ### JABALERT: Replace all this with self.verbose(event.debugging_info),
+                ### and provide appropriate debugging_info in each Event class.
                 # ####### INFORMATION PRINTING ONLY ########
                 # (I kept the try/catch for speed - will usually be EPConnectionEvent -
                 #  but I haven't checked the impact. Presumably it's tiny.
@@ -554,7 +573,7 @@ class Simulation(ParameterizedObject):
                 did_event=True
 
 
-        # The clock needs updating if the events have not done it.
+        # The time needs updating if the events have not done it.
         #if self.events and self.events[0].time >= stop_time:
         if stop_time != Forever:
             self._time = stop_time
@@ -563,32 +582,33 @@ class Simulation(ParameterizedObject):
     def sleep(self,delay):
 
         # We don't need the sleep call in this class because the
-        # continue_ loop updates the clock directly.
+        # continue_ loop updates the time directly.
         self.warning("sleep not supported in class",self.__class__.__name__)
 
 
-    def enqueue_event_abs(self,new_event):
+    def enqueue_event_abs(self,event):
         """
         Enqueue an Event at an absolute simulation clock time.
         """
-        assert isinstance(new_event,Event)
+        assert isinstance(event,Event)
 
         # The new event goes at the end of the event queue if there
         # isn't a queue right now, or if it's later than the last
         # event's time.  Otherwise, it's inserted at the appropriate
         # position somewhere inside the event queue.
-        if not self.events or new_event.time >= self.events[-1].time:
-            self.events.append(new_event)
+        if not self.events or event.time >= self.events[-1].time:
+            self.events.append(event)
             return
 
         for i,e in enumerate(self.events):
-            if new_event.time < e.time:
-                self.events.insert(i,new_event)
+            if event.time < e.time:
+                self.events.insert(i,event)
                 break
 
+    ### JABALERT: Eliminate this, and have EPs set event.time as an absolute time.
     def enqueue_event_rel(self,event):
         """
-        Enqueue an Event at a time relative to the current simulation clock.
+        Enqueue an Event at a time relative to the current simulation time.
 
         The incoming event's time is treated as a delay and is added
         to the simulation's current time.
@@ -596,17 +616,13 @@ class Simulation(ParameterizedObject):
         event.time+=self._time
         self.enqueue_event_abs(event)
 
-        
+    ### JABALERT: Eliminate the absolute_time argument (and always do absolute)
     def schedule_command(self,time,command_string,absolute_time=True):
         """
         Add a command to execute in __main__.__dict__ at the
         specified time.
 
         The command should be a string.
-
-        If absolute_time is False, then time is treated as a delay,
-        and the command will be executed at the simulator's current time
-        plus this delay.
         """
         event = CommandEvent(time=time,command_string=command_string)
         if absolute_time:
@@ -634,37 +650,32 @@ class Simulation(ParameterizedObject):
         """Return number of event queues in _events_stack."""
         return len(self._events_stack)
 
-    # CEBHACKALERT: can we also have src and dest in conn_params?
+
+    # Could just process src and dest in conn_params.  
+    # Also could accept the connection already created, rather than
+    # creating one.
     def connect(self,src,dest,connection_type=EPConnection,**conn_params):
         """
-        Connect the source to the destination, at the appropriate ports,
-        if any are given (src and dest are strings, naming the required
-        EPs).
+        Connect the src EventProcessor to the dest EventProcessor.
 
-        src and dest should already be part of the simulation.
-
-        Returns the connection that was created.
-
-        If the connection hasn't been given a name, it defaults to
-        'srcTodest'
+        The src and dest should be string names of existing EPs.
+        Returns the connection that was created.  If the connection
+        hasn't been given a name, it defaults to 'srcTodest'.
         """
+        
         if 'name' not in conn_params:
             # Might want to have a way of altering the name if this one's
             # already in use. At the moment, an error is raised (correctly).
             conn_params['name'] = src+'To'+dest
-        
+
+        # Looks up src and dest in our dictionary of objects
         conn = connection_type(src=self[src],dest=self[dest],**conn_params)
         self[src]._connect_to(conn)
         self[dest]._connect_from(conn)
         return conn
     
 
-    ### CEBALERT: why not just event_processors()?
-    ###
-    ### It might be possible to come up with a more expressive name
-    ### for this function.  It should mean 'anything that exists in
-    ### the simulation universe, i.e. all EventProcessors'.
-    ###
+    ### Could change the name to event_processors().
     def objects(self,baseclass=EventProcessor):
         """
         Return a list of simulation objects having the specified base
@@ -672,8 +683,8 @@ class Simulation(ParameterizedObject):
         EventProcessor, and so the baseclass must be either
         EventProcessor or one of its subclasses.
 
-        To see what EPs are in the simulator, type e.g.
-         topo.sim.objects().keys()
+        If there is a simulator called s, you can type e.g.
+        s.objects().keys() to see a list of all objects.
         """
         return dict([(ep_name,ep)
                      for (ep_name,ep) in self._event_processors.items()
