@@ -16,7 +16,7 @@ other EPs, as well as the mechanics of sending events to other EPs
 (through the Simulation).  The EventProcessor class defines the basic
 EP programming interface.
 
-Formally, a simulation event (EPEvent) is a class with the following
+Formally, a simulation event (EPConnectionEvent) is a class with the following
 data:
 
   time      = The time at which the event should be delivered, an arbitrary
@@ -318,10 +318,10 @@ class Event(object):
         raise NotImplementedError
 
 
-class EPEvent(Event):
-    """An Event for delivery to an EventProcessor."""
+class EPConnectionEvent(Event):
+    """An Event for delivery to an EPConnection."""
     def __init__(self,time,conn,data):
-        super(EPEvent,self).__init__(time)
+        super(EPConnectionEvent,self).__init__(time)
         self.data = deepcopy(data)
         self.conn = conn
 
@@ -528,10 +528,10 @@ class Simulation(ParameterizedObject):
                 event = self.events.pop(0)
 
                 # ####### INFORMATION PRINTING ONLY ########
-                # (I kept the try/catch for speed - will usually be EPEvent -
+                # (I kept the try/catch for speed - will usually be EPConnectionEvent -
                 #  but I haven't checked the impact. Presumably it's tiny.
                 #  Could be simplified to:
-                #  if isinstance(event,EPEvent):
+                #  if isinstance(event,EPConnectionEvent):
                 #      self.verbose...
                 #  elif isinstance(event,CommandEvent):
                 #      self.verbose...
@@ -597,10 +597,10 @@ class Simulation(ParameterizedObject):
 
     def enqueue_epevent_rel(self,delay,conn,data=None):
         """
-        Enqueue the given constituents of an EPEvent at a time
+        Enqueue the given constituents of an EPConnectionEvent at a time
         relative to the current simulation clock.
         """
-        epevent = EPEvent(delay,conn,data)
+        epevent = EPConnectionEvent(delay,conn,data)
         self.enqueue_event_rel(epevent)
 
         
