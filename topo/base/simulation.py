@@ -236,9 +236,12 @@ class EventProcessor(ParameterizedObject):
         parameters that can be interpreted by EP subclasses as
         needed.  
         """
+        for existing_connection in self.in_connections:
+            if existing_connection.name == conn.name:
+                raise ValueError('A connection into an EventProcessor must have a unique name; "%s" into %s already exists'%(conn.name,self.name))
 
-	if conn not in self.in_connections:
-            self.in_connections.append(conn)
+        self.in_connections.append(conn)
+
 
     def start(self):
         """        
