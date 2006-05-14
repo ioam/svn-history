@@ -22,7 +22,8 @@ class TestSimulation(unittest.TestCase):
         """
         s = Simulation(step_mode = True)
         data = array([4,3])
-        se = EPConnectionEvent(1,2,data)
+        epc = EPConnection()
+        se = EPConnectionEvent(1,epc,data)
         se.data[0] = 5
         assert data[0] != se.data[0], 'Matrices should be different'
         se2 = copy(se)
