@@ -109,13 +109,13 @@ class ProjectionSheet(Sheet):
             raise TypeError('ProjectionSheets only accept Projections, not other types of connection.')
 
 
-    def input_event(self,conn,src,src_port,port,data):
+    def input_event(self,conn,data):
         """
         Accept input from some sheet.  Call .present_input() to
         compute the stimulation from that sheet.
         """
         #self.message("Received input from",src,"at time",self.simulation.time())
-        self.present_input(data,conn,src,port)
+        self.present_input(data,conn)
         self.new_input = True
 
 
@@ -155,7 +155,7 @@ class ProjectionSheet(Sheet):
         pass
 
 
-    def present_input(self,input_activity,conn,input_sheet,port):
+    def present_input(self,input_activity,conn):
         """
         Provide the given input_activity to each in_projection that has a dest_port
         equal to the specified port, asking each one to compute its activity.
