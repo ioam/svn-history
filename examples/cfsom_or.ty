@@ -26,6 +26,8 @@ from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.misc.numbergenerators import RandomWrapper
 
+topo.sim.name = "cfsom_or"
+
 # Weight seed
 RandomArray.seed(500,500)
 
