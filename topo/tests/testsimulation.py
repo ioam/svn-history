@@ -17,12 +17,12 @@ from topo.eps.basic import *
 class TestSimulation(unittest.TestCase):
     def test_event_copy(self):
         """
-        Test to make sure that EPEvent copies the underlying data
+        Test to make sure that EPConnectionEvent copies the underlying data
         on construction.
         """
         s = Simulation(step_mode = True)
         data = array([4,3])
-        se = EPEvent(1,2,data)
+        se = EPConnectionEvent(1,2,data)
         se.data[0] = 5
         assert data[0] != se.data[0], 'Matrices should be different'
         se2 = copy(se)
