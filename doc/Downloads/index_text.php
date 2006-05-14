@@ -105,13 +105,15 @@ can become part of the main distribution.  Just email
 and describe what you want to do, and he'll tell you what to do from there.
 
 
-<!-- 
 <H3>Problems with CVS?</H3>
 
-Sometimes the SourceForge.net cvs service experiences problems. If you receive
-messages such as "connection closed by remote host", or the cvs connection
-times out, you may wish to check the SourceForge.net <a href="https://sourceforge.net/docman/display_doc.php?docid=2352&group_id=1">status page</a>. Be aware that this page is not always updated as fast as problems appear.
--->
+Sometimes the SourceForge.net cvs service experiences problems. If you
+receive messages such as "connection closed by remote host", or the
+cvs connection times out, you may wish to check the SourceForge.net 
+<a href="https://sourceforge.net/docman/display_doc.php?docid=2352&group_id=1">status
+page</a>. Be aware that this page is not always updated as fast as
+problems appear.
+
 
 <H3>Building Topographica</H3>
 
