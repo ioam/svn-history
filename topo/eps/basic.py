@@ -19,25 +19,24 @@ class PulseGenerator(EventProcessor):
     A simple pulse generator node.  Produces pulses (scalars) of a
     fixed amplitude at a fixed frequency and phase.
 
-    Period and phase are in units of simulation time.  If period is
-    omitted or set to 0, a single pulse is sent, offset from the start
-    of the simulation by the phase.
+    Period and phase are in units of simulation time. Period must be
+    greater than zero.
     """
     amplitude = Number(1.0,doc="The size of the pulse to generate.")
-    period    = Number(0.0,doc="The period with which to repeat the pulse. If zero, the pulse will be sent exactly once.")
+    period    = Number(1.0,bounds=(0,None),doc="The period with which to repeat the pulse. Must be greater than zero.")
     phase     = Number(0.0,doc="The time after starting the simulation to wait before sending the first pulse.")
 
-    def input_event(self,conn,src,src_port,dest_port,data):
+    def input_event(self,conn,data):
         """
         On input from self, generate output. Ignore all other inputs.
         """
-        self.verbose('received event from',src,'on port',dest_port,'with data',data)
+        self.verbose('received event from',conn.src,'on port',conn.dest_port,'with data',data)
         self.send_output(data=self.amplitude)
 
     def start(self):
-        if self.period:
-            c=self.simulation.connect(self.name,self.name,delay=self.period)
-        self.simulation.enqueue_epevent_rel(self.phase,c,self,self)
+        assert self.period > 0
+        c=self.simulation.connect(self.name,self.name,delay=self.period)
+        self.simulation.enqueue_epevent_rel(self.phase,c)
         EventProcessor.start(self)
 
 
@@ -56,8 +55,8 @@ class ThresholdUnit(EventProcessor):
         EventProcessor.__init__(self,**config)
         self.accum = self.initial_accum
 
-    def input_event(self,conn,src,src_port,dest_port,data):
-        if dest_port == 'input':
+    def input_event(self,conn,data):
+        if conn.dest_port == 'input':
             self.accum += data
             self.verbose( 'received',data,'accumulator now',self.accum)
             if self.accum > self.threshold:
@@ -74,9 +73,9 @@ class SumUnit(EventProcessor):
         super(SumUnit,self).__init__(**params)
         self.value = 0.0
 
-    def input_event(self,src,src_port,dest_port,data):
+    def input_event(self,conn,data):
         self.value += data
-        self.debug("received",data,"from",src,"value =",self.value)
+        self.debug("received",data,"from",conn.src,"value =",self.value)
 
     def pre_sleep(self):
         self.debug("pre_sleep called, time =",self.simulation.time(),"value =",self.value)
