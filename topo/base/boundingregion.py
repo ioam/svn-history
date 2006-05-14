@@ -121,6 +121,15 @@ class BoundingBox(BoundingRegion):
         leftx,bottomx,rightx,topx = x.aarect().lbrt()
         return (left <= leftx) and (bottom <= bottomx) and (right >= rightx) and (top >= topx) and (not ((left == leftx) and (bottom == bottomx) and (right == rightx) and (top == topx)))
 
+    def containsbb_inclusive(self,x):
+        """
+        Returns true if the given BoundingBox x is contained within the
+        bounding box, including cases of exact match.
+        """
+        left,bottom,right,top = self.aarect().lbrt()
+        leftx,bottomx,rightx,topx = x.aarect().lbrt()
+        return (left <= leftx) and (bottom <= bottomx) and (right >= rightx) and (top >= topx)
+
     def upperexclusive_contains(self,x,y):
         """
         Returns true if the given point is contained within the

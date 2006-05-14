@@ -732,10 +732,11 @@ class CFProjection(Projection):
         """
         bounds_template = self.initialize_bounds(nominal_bounds_template)
 
-        # CEBHACKALERT: should only warn if new bounds are actually larger - right
-        # now it warns if bounds stay the same size.
         if not self.bounds_template.containsbb_exclusive(bounds_template):
-            self.warning('Unable to change_bounds; currently allows reducing only.')
+            if self.bounds_template.containsbb_inclusive(bounds_template):
+                self.debug('Initial and final bounds are the same.')
+            else:
+                self.warning('Unable to change_bounds; currently allows reducing only.')
             return
 
         # it's ok so we can store the bounds and resize the weights
