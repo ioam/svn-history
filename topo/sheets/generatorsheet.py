@@ -5,6 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
+from topo.base.simulation import EPConnectionEvent
 from topo.base.sheet import Sheet 
 from topo.base.sheet import BoundingBox
 
@@ -84,7 +85,7 @@ class GeneratorSheet(Sheet):
         c=self.simulation.connect(self.name,self.name,delay=self.period)
 
         # first event is special
-        self.simulation.enqueue_epevent_rel(self.phase,c,data=self.activity)
+        self.simulation.enqueue_event_rel(EPConnectionEvent(self.phase,c,data=self.activity))
 
     def input_event(self,conn,data):
         self.verbose("Received %s input from %s." % (NxN(data.shape),conn.src))
