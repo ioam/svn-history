@@ -101,7 +101,7 @@ class ProjectionSheet(Sheet):
 
         ### JCALERT! This could be better re-implemented: the
         ### structure of in_projections obliged to use the chain
-        ### method in slef.projections. Maybe it would be possible to
+        ### method in self.projections. Maybe it would be possible to
         ### code it differently.
         if isinstance(conn, Projection):
             if conn.src.name not in self.in_projections:
