@@ -255,8 +255,7 @@ class EventProcessor(ParameterizedObject):
         Send some data out to all connections on the given src_port.
         """
         for conn in self.out_connections[src_port]:
-            self.simulation.enqueue_epevent_rel(conn.delay,conn,data)
-
+            self.simulation.enqueue_event_rel(EPConnectionEvent(conn.delay,conn,data))
 
     def input_event(self,conn,data):
         """
@@ -320,7 +319,7 @@ class Event(object):
 
 class EPConnectionEvent(Event):
     """An Event for delivery to an EPConnection."""
-    def __init__(self,time,conn,data):
+    def __init__(self,time,conn,data=None):
         super(EPConnectionEvent,self).__init__(time)
         self.data = deepcopy(data)
         self.conn = conn
@@ -593,15 +592,6 @@ class Simulation(ParameterizedObject):
         """
         event.time+=self._time
         self.enqueue_event_abs(event)
-
-
-    def enqueue_epevent_rel(self,delay,conn,data=None):
-        """
-        Enqueue the given constituents of an EPConnectionEvent at a time
-        relative to the current simulation clock.
-        """
-        epevent = EPConnectionEvent(delay,conn,data)
-        self.enqueue_event_rel(epevent)
 
         
     def schedule_command(self,time,command_string,absolute_time=True):
