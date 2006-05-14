@@ -12,10 +12,6 @@ from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
 
 
-# CEBHACKALERT: investigate pickling of the random streams to check
-# they come back where they left off for these RandomDistributionWrappers.
-
-
 class RandomDistribution(ParameterizedObject):
     """
     Python's random module provides the Random class, which can be
@@ -50,7 +46,7 @@ class RandomDistribution(ParameterizedObject):
         else:
             self.random_generator.jumpahead(10)
 
-        super(RandomWrapper,self).__init__(**params)        
+        super(RandomDistribution,self).__init__(**params)        
         
     def __call__(self):
         raise NotImplementedError
