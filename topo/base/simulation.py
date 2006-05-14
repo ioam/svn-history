@@ -650,8 +650,9 @@ class Simulation(ParameterizedObject):
         If the connection hasn't been given a name, it defaults to
         'srcTodest'
         """
-        ### JABHACKALERT: What happens if this name is not unique?
         if 'name' not in connection_params:
+            # Might want to have a way of altering the name if this one's
+            # already in use. At the moment, an error is raised (correctly).
             connection_params['name'] = src+'To'+dest
         
         conn = connection_type(src=self[src],dest=self[dest],src_port=src_port,dest_port=dest_port,delay=delay,**connection_params)
