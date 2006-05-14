@@ -27,7 +27,7 @@ class PulseGenerator(EventProcessor):
     period    = Number(0.0,doc="The period with which to repeat the pulse. If zero, the pulse will be sent exactly once.")
     phase     = Number(0.0,doc="The time after starting the simulation to wait before sending the first pulse.")
 
-    def input_event(self,src,src_port,dest_port,data):
+    def input_event(self,conn,src,src_port,dest_port,data):
         """
         On input from self, generate output. Ignore all other inputs.
         """
@@ -36,8 +36,8 @@ class PulseGenerator(EventProcessor):
 
     def start(self):
         if self.period:
-            self.simulation.connect(self.name,self.name,delay=self.period)
-        self.simulation.enqueue_epevent_rel(self.phase,self,self)
+            c=self.simulation.connect(self.name,self.name,delay=self.period)
+        self.simulation.enqueue_epevent_rel(self.phase,c,self,self)
         EventProcessor.start(self)
 
 
@@ -56,7 +56,7 @@ class ThresholdUnit(EventProcessor):
         EventProcessor.__init__(self,**config)
         self.accum = self.initial_accum
 
-    def input_event(self,src,src_port,dest_port,data):
+    def input_event(self,conn,src,src_port,dest_port,data):
         if dest_port == 'input':
             self.accum += data
             self.verbose( 'received',data,'accumulator now',self.accum)
