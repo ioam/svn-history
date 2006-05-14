@@ -81,6 +81,11 @@ class ProjectionSheet(Sheet):
                              
     def __init__(self,**params):
         super(ProjectionSheet,self).__init__(**params)
+
+        # CEBHACKALERT: do we need a separate thing from in_connections?
+        # Can't we just use in_connections, and know that every item
+        # in it is a Projection (connect_from() in this class will only
+        # accept Projections).
 	self.in_projections = {}
         self.new_input = False
 
@@ -101,10 +106,7 @@ class ProjectionSheet(Sheet):
         if isinstance(conn, Projection):
             if conn.src.name not in self.in_projections:
                 self.in_projections[conn.src.name] = []
-            if conn.name in self.projections():
-                raise ValueError('A Projection into a Sheet must have a unique name.')
-            else:
-                self.in_projections[conn.src.name].append(conn)
+            self.in_projections[conn.src.name].append(conn)
         else:
             raise TypeError('ProjectionSheets only accept Projections, not other types of connection.')
 
