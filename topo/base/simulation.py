@@ -634,13 +634,8 @@ class Simulation(ParameterizedObject):
         """Return number of event queues in _events_stack."""
         return len(self._events_stack)
 
-
-    def connect(self,
-                src,
-                dest,
-                src_port=None,
-                dest_port=None,
-                delay=0,connection_type=EPConnection,**connection_params):
+    # CEBHACKALERT: can we also have src and dest in conn_params?
+    def connect(self,src,dest,connection_type=EPConnection,**conn_params):
         """
         Connect the source to the destination, at the appropriate ports,
         if any are given (src and dest are strings, naming the required
@@ -653,12 +648,12 @@ class Simulation(ParameterizedObject):
         If the connection hasn't been given a name, it defaults to
         'srcTodest'
         """
-        if 'name' not in connection_params:
+        if 'name' not in conn_params:
             # Might want to have a way of altering the name if this one's
             # already in use. At the moment, an error is raised (correctly).
-            connection_params['name'] = src+'To'+dest
+            conn_params['name'] = src+'To'+dest
         
-        conn = connection_type(src=self[src],dest=self[dest],src_port=src_port,dest_port=dest_port,delay=delay,**connection_params)
+        conn = connection_type(src=self[src],dest=self[dest],**conn_params)
         self[src]._connect_to(conn)
         self[dest]._connect_from(conn)
         return conn
