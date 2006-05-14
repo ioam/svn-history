@@ -56,54 +56,50 @@ def pattern_present(inputs=None,duration=1.0,learning=False,overwrite_previous=F
     If learning is False, overwrites the existing values of Sheet.learning
     to disable learning, then reenables learning.
     """
-    sim = topo.sim
 
-    # CEBHACKALERT: don't need this if-test?
-    if sim:
+    if not overwrite_previous:
+        save_input_generators()
 
-        if not overwrite_previous:
-            save_input_generators()
-
-        ### JABALERT!  Should clean up how these are set on each
-        ### sheet; it overwrites any old values.
-            
-        # turn off sheets' learning if learning=False
-        if not learning:
-            for each in sim.objects(Sheet).values():
-                 each.learning = False
-
-
-        if not apply_output_fn:
-            for each in sim.objects(Sheet).values():
-                 each.apply_output_fn = False
-
-
-        gen_eps_list = sim.objects(GeneratorSheet)
+    ### JABALERT!  Should clean up how these are set on each
+    ### sheet; it overwrites any old values.
         
-        # Register the inputs on each input sheet
-        for each in inputs.keys():
-            if gen_eps_list.has_key(each):
-                gen_eps_list[each].set_input_generator(inputs[each])
-            else:
-                ParameterizedObject().warning('%s not a valid Sheet Name.' % each)
+    # turn off sheets' learning if learning=False
+    if not learning:
+        for each in topo.sim.objects(Sheet).values():
+             each.learning = False
 
-        sim.state_push()
-        sim.run(duration)
-        sim.state_pop()
 
-        # turn sheets' learning back on if we turned it off before
-        if not learning:
-            for each in sim.objects(Sheet).values():
-                each.learning = True
+    if not apply_output_fn:
+        for each in topo.sim.objects(Sheet).values():
+             each.apply_output_fn = False
+
+
+    gen_eps_list = topo.sim.objects(GeneratorSheet)
+    
+    # Register the inputs on each input sheet
+    for each in inputs.keys():
+        if gen_eps_list.has_key(each):
+            gen_eps_list[each].set_input_generator(inputs[each])
+        else:
+            ParameterizedObject().warning('%s not a valid Sheet Name.' % each)
+
+    topo.sim.state_push()
+    topo.sim.run(duration)
+    topo.sim.state_pop()
+
+    # turn sheets' learning back on if we turned it off before
+    if not learning:
+        for each in topo.sim.objects(Sheet).values():
+            each.learning = True
   
 
-        if not apply_output_fn:
-            for each in sim.objects(Sheet).values():
-                each.apply_output_fn = True
+    if not apply_output_fn:
+        for each in topo.sim.objects(Sheet).values():
+            each.apply_output_fn = True
  
-            
-        if not overwrite_previous:
-            restore_input_generators()
+        
+    if not overwrite_previous:
+        restore_input_generators()
 
 
 def save_snapshot(snapshot_name):

@@ -123,7 +123,7 @@ def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreferenc
             # what the actual possible range is for this simulation (which would presumably
             # be the maximum size of any GeneratorSheet?).
             pylab.axis([-0.5,0.5,-0.5,0.5])
-            windowtitle('Topographic mapping to '+sheet.name+' at time '+str(sim.time()))
+            windowtitle('Topographic mapping to '+sheet.name+' at time '+str(topo.sim.time()))
 
             # Will need to provide a way to save this output
             # when there is no GUI
