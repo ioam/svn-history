@@ -11,7 +11,7 @@ $Id$
 __version__='$Revision$'
 
 from topo.base.parameterclasses import Number
-from topo.base.simulation import EventProcessor
+from topo.base.simulation import EventProcessor,EPConnectionEvent
 
 class PulseGenerator(EventProcessor):
 
@@ -36,7 +36,7 @@ class PulseGenerator(EventProcessor):
     def start(self):
         assert self.period > 0
         c=self.simulation.connect(self.name,self.name,delay=self.period)
-        self.simulation.enqueue_epevent_rel(self.phase,c)
+        self.simulation.enqueue_event_rel(EPConnectionEvent(self.phase,c))
         EventProcessor.start(self)
 
 
