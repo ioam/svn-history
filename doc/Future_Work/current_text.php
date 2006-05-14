@@ -18,6 +18,11 @@ was first added to the list, or a change was made.)
 <!-- ### These tasks before the next release (i.e. 2006/05/08) ### -->
 
 <li>
+2006/05/07 (CB): Remove RandomWrapper from examples, and use
+UniformRandom instead. [** before release]
+</li>
+
+<li>
 2006/05/07 (CB): Matching with C++ lissom. [** before release]
 </li>
 
