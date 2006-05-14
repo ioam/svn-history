@@ -30,6 +30,7 @@ from topo.learningfns.optimized import CFPHebbian_opt1
 from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
 from topo.outputfns.optimized import CFPDivisiveSumNormalize_opt1
 from topo.misc.numbergenerators import RandomWrapper
+from topo.responsefns.optimized import SharedWeightCFPDotProduct_opt1
 
 # JABALERT: Shouldn't this script file be renamed lissom_oo_or_sf since it's ON/OFF?
 topo.sim.name = "lissom_oo_or_sf"
@@ -154,7 +155,7 @@ CFProjection.learning_fn=CFPHebbian_opt1()
 CFProjection.weights_output_fn=CFPDivisiveSumNormalize_opt1()
 
 SharedWeightCFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
-
+SharedWeightCFProjection.response_fn = SharedWeightCFPDotProduct_opt1()
 
 ###########################################
 # build simulation
