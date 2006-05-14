@@ -780,7 +780,6 @@ class ParameterizedObject(object):
 
         During this process the object is considered uninitialized.
         """
-        del state['initialized']  # (we restore this attribute ourselves)
         self.initialized=False
         
         for k,v in state.items():
