@@ -13,11 +13,11 @@ via delayed connections.
 The simulation is modular: EventProcessors should inherit from the root
 EventProcessor class.  This class manages the EP's connections to
 other EPs, as well as the mechanics of sending events to other EPs
-(through the simulation).  The EventProcessor class defines the basic
+(through the Simulation).  The EventProcessor class defines the basic
 EP programming interface.
 
-Formally, a simulation event (EPEvent) is a tuple:
-(time,src,src_port,dest,dest_port,data), where
+Formally, a simulation event (EPEvent) is a class with the following
+data:
 
   time      = The time at which the event should be delivered, an arbitrary
               floating point value.
@@ -119,21 +119,15 @@ class SimSingleton(Singleton):
     # should both these completely hide that this is
     # SimSingleton, as they do at the moment?
     def __repr__(self):
-        """
-        Return the simulation's __repr__().
-        """
+        """Return the simulation's __repr__()."""
         return self.actual_sim.__repr__()
 
     def __str__(self):
-        """
-        Return the simulation's __str__().
-        """
-        return self.actual_sum.__str__()
+        """Return the simulation's __str__()."""
+        return self.actual_sim.__str__()
     
     def init(self):
-        """
-        Create a new simulation.
-        """
+        """Create a new simulation."""
         # Simulation will call this object's change_sim()
         Simulation()
 
@@ -170,22 +164,16 @@ class SimSingleton(Singleton):
             object.__setattr__(self.actual_sim, name, value)
 
     def change_sim(self,new_sim):
-        """
-        Set actual_sim to be new_sim.
-        """
+        """Set actual_sim to be new_sim."""
         assert isinstance(new_sim,Simulation), "Can only change to a Simulation instance."
         self.actual_sim=new_sim
             
     def __getitem__(self,item_name):
-        """
-        Allow dictionary-style access to the simulation.
-        """
+        """Allow dictionary-style access to the simulation."""
         return self.actual_sim[item_name]
 
     def __setitem__(self,item_name,item_value):
-        """
-        Allow dictionary-style access to the simulation.
-        """
+        """Allow dictionary-style access to the simulation."""
         self.actual_sim[item_name]=item_value
 
 
@@ -193,7 +181,7 @@ class EventProcessor(ParameterizedObject):
     """
     Base class for EventProcessors, i.e. objects that can accept and
     handle events.  This base class handles the basic mechanics of
-    connections and sending events, and store both incoming and outgoing
+    connections and sending events, and stores both incoming and outgoing
     connections. 
     """
     def __init__(self,**config):
@@ -202,7 +190,7 @@ class EventProcessor(ParameterizedObject):
 
         Note that just creating an EventProcessor does not mean it is
         part of the simulation (i.e. it is not in the simulation's list
-        of EventProcessors, and it does not have its start() method called.
+        of EventProcessors, and it does not have its start() method called).
         To add an EventProcessor e to a simulation s, simply do
         s['name_of_e']=e. At this point, e's name becomes 'name_of_e'.
         """
@@ -228,7 +216,8 @@ class EventProcessor(ParameterizedObject):
     # them, and passed on here
     def _connect_to(self,conn):
         """
-        Add a connection to dest/port with a delay (default=0).
+        Add a connection to dest/port.
+        
         Should only be called from Simulation.connect().
         """
 
@@ -240,7 +229,8 @@ class EventProcessor(ParameterizedObject):
 
     def _connect_from(self,conn):
         """
-        Add a connection from src/port with a delay (default=0).
+        Add a connection from src/port.
+        
         Should only be called from Simulation.connect().  The extra
         keyword arguments in **args contain arbitrary connection
         parameters that can be interpreted by EP subclasses as
@@ -274,7 +264,8 @@ class EventProcessor(ParameterizedObject):
         from src.  (By default, does nothing.)
         """
         pass
-    
+
+    ### JABALERT: Should change the name somehow.
     def pre_sleep(self):
         """
         Called by the simulation before sleeping.  Allows the event processor
@@ -405,7 +396,6 @@ class Simulation(ParameterizedObject):
         """
         Create the Simulation and register it as topo.sim unless
         register==False.
-
         
            step_mode = debugging flag, causing the simulation to stop
                        before each tick.
@@ -451,7 +441,7 @@ class Simulation(ParameterizedObject):
         warning is printed and the ep is not added.
 
         Note: EventProcessors do not necessarily have to be added to
-        the simulation to be used, but they will not receive the
+        the simulation to be used, but otherwise they will not receive the
         start() message.  Adding a node to the simulation also sets the
         backlink node.simulation, so that the node can enqueue events
         and read the simulation clock.
@@ -508,7 +498,7 @@ class Simulation(ParameterizedObject):
             if self.events[0].time < self._time:
 
                 # if the first event's time is less than the current time
-                # then the event is stale so print a warning and
+                # then the event is stale, so print a warning and
                 # discard it.                
 
                 self.warning('Discarding stale event from',(self.events[0].src,self.events[0].src_port),
@@ -646,9 +636,7 @@ class Simulation(ParameterizedObject):
         self._events_stack.append((self._time,[copy(event) for event in self.events]))
 
     def state_pop(self):
-        """
-        Pop a scheduler off the stack.  
-        """
+        """Pop a scheduler off the stack."""
         self._time, self.events = self._events_stack.pop()
 
 
@@ -675,6 +663,7 @@ class Simulation(ParameterizedObject):
         If the connection hasn't been given a name, it defaults to
         'srcTodest'
         """
+        ### JABHACKALERT: What happens if this name is not unique?
         if 'name' not in connection_params:
             connection_params['name'] = src+'To'+dest
         
@@ -684,7 +673,8 @@ class Simulation(ParameterizedObject):
         return conn
     
 
-    # CEBHACKALERT: why not just event_processors()?
+    ### CEBALERT: why not just event_processors()?
+    ###
     ### It might be possible to come up with a more expressive name
     ### for this function.  It should mean 'anything that exists in
     ### the simulation universe, i.e. all EventProcessors'.
