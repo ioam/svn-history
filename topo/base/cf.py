@@ -576,7 +576,7 @@ class CFProjection(Projection):
         ### JCALERT! We might want to change the default value of the
         ### input value to self.src.activity; but it fails, raising a
         ### type error. It probably has to be clarified why this is
-        ### happenning
+        ### happening
         self.input_buffer = None
         self.activity = Numeric.array(self.dest.activity)
 
