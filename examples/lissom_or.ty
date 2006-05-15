@@ -41,7 +41,7 @@ input_pattern = topo.patterns.basic.Gaussian(
     bounds=BoundingBox(radius=0.72),
     x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
     y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
-    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=12)))
+    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
 
 
