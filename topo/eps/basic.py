@@ -78,8 +78,8 @@ class SumUnit(EventProcessor):
         self.value += data
         self.debug("received",data,"from",conn.src,"value =",self.value)
 
-    def pre_sleep(self):
-        self.debug("pre_sleep called, time =",self.simulation.time(),"value =",self.value)
+    def process_current_time(self):
+        self.debug("process_current_time called, time =",self.simulation.time(),"value =",self.value)
         if self.value:
             self.debug("Sending output:",self.value)
             self.send_output(data=self.value)

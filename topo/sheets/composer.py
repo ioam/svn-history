@@ -48,7 +48,7 @@ class Composer(Sheet):
         Sheet._connect_from(self,proj)
         self.inputs[(proj.src.name,proj.src_port)] = Struct(origin=origin)
     
-    def pre_sleep(self):
+    def process_current_time(self):
         if self.__dirty:        
             self.send_output(data=self.activity) 
             self.activity = zeros(self.activity.shape)+0.0

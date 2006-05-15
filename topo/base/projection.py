@@ -135,7 +135,7 @@ class ProjectionSheet(Sheet):
         self.send_output(data=self.activity)
 
 
-    def pre_sleep(self):
+    def process_current_time(self):
         """
         Called by the simulation after all the events are processed for the 
         current time but before time advances.  Allows the event processor
@@ -152,7 +152,7 @@ class ProjectionSheet(Sheet):
     def learn(self):
         """
         Override this method to implement learning/adaptation.  Called
-        from self.pre_sleep() _after_ activity has been propagated.
+        from self.process_current_time() _after_ activity has been propagated.
         """
         pass
 

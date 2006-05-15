@@ -60,7 +60,7 @@ class LISSOM(CFSheet):
     ### at all after the first iteration?), but of course that is
     ### arguably an error condition anyway (and should thus be
     ### flagged).
-    def pre_sleep(self):
+    def process_current_time(self):
         """
         Pass the accumulated stimulation through self.output_fn and
         send it out on the default output port.

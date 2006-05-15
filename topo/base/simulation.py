@@ -252,8 +252,7 @@ class EventProcessor(ParameterizedObject):
         raise NotImplementedError
 
 
-    ### JABALERT: Should change the name to process_current_time
-    def pre_sleep(self):
+    def process_current_time(self):
         """
         Called by the simulation before advancing the simulation
         time.  Allows the event processor to do any computation that
@@ -528,11 +527,11 @@ class Simulation(ParameterizedObject):
                     self.debug("Time to sleep. Current time =",self._time,
                                ".  Next event time =",self.events[0].time)
                     for ep in self._event_processors.values():
-                        ep.pre_sleep()
+                        ep.process_current_time()
                     
                 # Set the time to the frontmost event.  Bear in mind
                 # that the front event may have been changed by the
-                # .pre_sleep() calls.
+                # .process_current_time() calls.
                 self._time = self.events[0].time
                 
             else:
