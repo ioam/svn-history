@@ -153,6 +153,7 @@ random.seed(1234)
 # input generation params
 GeneratorSheet.density = BaseRN*area_scale
 GeneratorSheet.period = 1
+GeneratorSheet.phase = 0.05
 
 # take the input pattern position parameters from the log file output
 # of the equivalent c++ simulation

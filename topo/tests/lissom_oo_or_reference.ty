@@ -147,6 +147,7 @@ fixedpoint.DEFAULT_PRECISION=3
 # input generation params
 GeneratorSheet.density = BaseRN*area_scale
 GeneratorSheet.period = 1
+GeneratorSheet.phase=0.05
 
 # take the input pattern position parameters from the log file output of the equivalent c++ simulation
 n_inputs,input_x,input_y,input_orientation = topo.tests.lissom_log_parser.get_input_params(log_file="topo/tests/oo_or_map_topo.log")
