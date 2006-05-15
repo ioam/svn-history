@@ -400,8 +400,6 @@ class Simulation(ParameterizedObject):
     Simulation with SimSingleton, which can be used to provide a
     single point of contact for accessing the Simulation.
     """
-    ### JABALERT! Removed unimplemented step_mode
-    step_mode = BooleanParameter(default=False)
     register = BooleanParameter(default=True)
 
     startup_commands = Parameter(
@@ -418,11 +416,7 @@ class Simulation(ParameterizedObject):
     def __init__(self,**config):
         """
         Create the Simulation and register it with SimSingleton unless
-        register==False.  Parameter values can be passed in as for any
-        ParameterizedObject, e.g.:
-        
-           step_mode = debugging flag, causing the simulation to stop
-                       before each tick.
+        register==False.        
         """
         super(Simulation,self).__init__(**config)
 

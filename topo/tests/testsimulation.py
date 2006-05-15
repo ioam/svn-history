@@ -20,7 +20,7 @@ class TestSimulation(unittest.TestCase):
         Test to make sure that EPConnectionEvent copies the underlying data
         on construction.
         """
-        s = Simulation(step_mode = True)
+        s = Simulation()
         data = array([4,3])
         epc = EPConnection()
         se = EPConnectionEvent(1,epc,data)
@@ -30,7 +30,7 @@ class TestSimulation(unittest.TestCase):
         assert se != se2, 'Objects are the same'
 
     def test_state_stack(self):
-        s = Simulation(step_mode = True)
+        s = Simulation()
         s['pulse1'] = PulseGenerator(period = 1)
         s['pulse2'] = PulseGenerator(period = 3)
         s['sum_unit'] = SumUnit()
@@ -44,7 +44,7 @@ class TestSimulation(unittest.TestCase):
         
 
     def test_get_objects(self):
-        s = Simulation(step_mode = True)
+        s = Simulation()
 
         s['pulse1'] = PulseGenerator(period = 1)
         s['pulse2'] = PulseGenerator(period = 3)
