@@ -156,9 +156,9 @@ class ResponseFn(ParameterizedObject):
 
 
 ### JAB: Could be rewritten using weave.blitz to avoid creating a temporary
-# CB: that comment applies also applies to all the functions in Numeric that
+# CB: that comment also applies to all the functions in Numeric that
 # create an intermediate array, so don't operate in-place.
-class Mdot(ResponseFn):
+class DotProduct(ResponseFn):
     """
     Return the sum of the element-by-element product of two 2D
     arrays.  
@@ -181,6 +181,6 @@ class ResponseFnParameter(ClassSelectorParameter):
 
     packages = []
 
-    def __init__(self,default=Mdot(),**params):
+    def __init__(self,default=DotProduct(),**params):
         super(ResponseFnParameter,self).__init__(ResponseFn,default=default,**params)        
 

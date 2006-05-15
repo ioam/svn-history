@@ -30,7 +30,7 @@ import topo
 import patterngenerator
 from patterngenerator import PatternGeneratorParameter
 from parameterizedobject import ParameterizedObject
-from functionfamilies import OutputFnParameter,IdentityOF,LearningFnParameter,Hebbian,ResponseFnParameter,Mdot,IdentityLF
+from functionfamilies import OutputFnParameter,IdentityOF,LearningFnParameter,Hebbian,ResponseFnParameter,DotProduct,IdentityLF
 from projection import Projection,ProjectionSheet
 from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter
 from sheet import Sheet,Slice
@@ -286,7 +286,7 @@ class GenericCFPResponseFn(CFPResponseFn):
     Generic large-scale response function based on a simple single-CF function.
 
     Applies the single_cf_fn to each CF in turn.  For the default
-    single_cf_fn of Mdot(), does a basic dot product of each CF with the
+    single_cf_fn of DotProduct(), does a basic dot product of each CF with the
     corresponding slice of the input array.  This function is likely
     to be slow to run, but it is easy to extend with any arbitrary
     single-CF response function.
@@ -296,7 +296,7 @@ class GenericCFPResponseFn(CFPResponseFn):
     ConnectionField weights) and computes a scalar activation value
     based on those weights.
     """
-    single_cf_fn = ResponseFnParameter(default=Mdot())
+    single_cf_fn = ResponseFnParameter(default=DotProduct())
     
     def __call__(self, cfs, input_activity, activity, strength):
         rows,cols = activity.shape

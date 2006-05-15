@@ -10,14 +10,14 @@ __version__='$Revision$'
 
 from Numeric import zeros, Float, ravel
 
-from topo.base.functionfamilies import ResponseFnParameter,Mdot
+from topo.base.functionfamilies import ResponseFnParameter,DotProduct
 from topo.base.arrayutils import L2norm
 from topo.base.cf import CFPResponseFn
 
 from topo.misc.inlinec import inline, optimized
 
 
-# CEBHACKALERT: This is GenericCFPResponseFn(single_cf_fn=Mdot()).
+# CEBHACKALERT: This is GenericCFPResponseFn(single_cf_fn=DotProduct()).
 class CFPDotProduct(CFPResponseFn):
     """
     Dot-product response function.
@@ -25,7 +25,7 @@ class CFPDotProduct(CFPResponseFn):
     Written entirely in Python; see CFPDotProduct_opt1 for a much faster
     (but otherwise equivalent) version.
     """
-    single_cf_fn = ResponseFnParameter(Mdot(),constant=True)
+    single_cf_fn = ResponseFnParameter(DotProduct(),constant=True)
     
     def __call__(self, cfs, input_activity, activity, strength, **params):
         rows,cols = activity.shape
@@ -35,7 +35,7 @@ class CFPDotProduct(CFPResponseFn):
                 r1,r2,c1,c2 = cf.slice_array
                 X = input_activity[r1:r2,c1:c2]
 
-                # "Mdot()"
+                # "DotProduct()"
                 a = X*cf.weights
                 activity[r,c] = sum(a.flat)
         activity *= strength

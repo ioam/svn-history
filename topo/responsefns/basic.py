@@ -5,4 +5,4 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.functionfamilies import Mdot,ResponseFn
+from topo.base.functionfamilies import DotProduct,ResponseFn

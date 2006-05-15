@@ -18,7 +18,7 @@ from topo.base.projection import Projection
 from topo.base.functionfamilies import OutputFnParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number,BooleanParameter
-from topo.base.cf import CFProjection,CFPLearningFnParameter,IdentityCFPLearningFn,CFPResponseFnParameter,CFPOutputFnParameter,IdentityCFPOutputFn,CFPOutputFn,CFPResponseFn, Mdot, ResponseFnParameter
+from topo.base.cf import CFProjection,CFPLearningFnParameter,IdentityCFPLearningFn,CFPResponseFnParameter,CFPOutputFnParameter,IdentityCFPOutputFn,CFPOutputFn,CFPResponseFn, DotProduct, ResponseFnParameter
 from topo.base.patterngenerator import PatternGeneratorParameter
 from topo.base.sheetview import UnitView
 
@@ -52,7 +52,7 @@ class SharedWeightCFPResponseFn(CFPResponseFn):
     Response function accepting a single CF applied to all units.
     Otherwise similar to GenericCFResponseFn.
     """
-    single_cf_fn = ResponseFnParameter(default=Mdot())
+    single_cf_fn = ResponseFnParameter(default=DotProduct())
     
     def __call__(self, cfs, input_activity, activity, strength):
         rows,cols = activity.shape

@@ -8,7 +8,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from topo.base.functionfamilies import ResponseFnParameter,Mdot,ResponseFn
+from topo.base.functionfamilies import ResponseFnParameter,DotProduct,ResponseFn
 from topo.base.cf import CFPResponseFn
 from topo.base.parameterizedobject import ParameterizedObject
 
@@ -28,7 +28,7 @@ class CFPDotProduct_opt1(CFPResponseFn):
     version in Python.
     """
 
-    single_cf_fn = ResponseFnParameter(Mdot(),constant=True)    
+    single_cf_fn = ResponseFnParameter(DotProduct(),constant=True)    
 
     def __call__(self, cfs, input_activity, activity, strength, **params):
         temp_act = activity
@@ -158,13 +158,11 @@ if not optimized:
 
 
 
-# CEBHACKALERT: should be equivalent to Mdot(). It's definitely
+# CEBHACKALERT: should be equivalent to DotProduct(). It's definitely
 # faster but I haven't tested it properly. We don't use it.
-# Additionally, we should stick to calling these dot product
-# functions either DotProduct or Mdot.
 class DotProduct_opt1(ResponseFn):
     """
-    Dot-product response function. Equivalent to Mdot.
+    Dot-product response function. Equivalent to DotProduct.
 
     Not tested.
     """
@@ -186,8 +184,8 @@ class DotProduct_opt1(ResponseFn):
 
 
 if not optimized:
-    DotProduct_opt1 = Mdot
-    ParameterizedObject().message('Inline-optimized components not available; using Mdot instead of DotProduct_opt1.')
+    DotProduct_opt1 = DotProduct
+    ParameterizedObject().message('Inline-optimized components not available; using DotProduct instead of DotProduct_opt1.')
 
 
 
@@ -200,7 +198,7 @@ class SharedWeightCFPDotProduct_opt1(CFPResponseFn):
 
     The same as CFPDotProduct, but where there is only one set of weights.
     """
-    single_cf_fn = ResponseFnParameter(Mdot(),constant=True)    
+    single_cf_fn = ResponseFnParameter(DotProduct(),constant=True)    
 
     def __call__(self, cfs, input_activity, activity, strength, **params):
         temp_act = activity
@@ -249,10 +247,10 @@ class SharedWeightCFPDotProduct(SharedWeightCFPResponseFn):
     """
     Wrapper written to allow transparent non-optimized fallback; 
     equivalent to
-    SharedWeightCFPResponseFn(single_cf_fn=Mdot())
+    SharedWeightCFPResponseFn(single_cf_fn=DotProduct())
     """
     def __init__(self,**params):
-        super(SharedWeightCFPDotProduct,self).__init__(single_cf_fn=Mdot(),**params)
+        super(SharedWeightCFPDotProduct,self).__init__(single_cf_fn=DotProduct(),**params)
 
 
 if not optimized:
