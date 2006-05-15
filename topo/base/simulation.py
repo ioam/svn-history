@@ -428,9 +428,6 @@ class Simulation(ParameterizedObject):
         # (Either using ,4 or setting the FixedPoint default precision to 4?)
         self._time = FixedPoint("0.0")
         self._event_processors = {}
-        # JABALERT: These and sleep() can be removed.
-        self._sleep_window = 0.0
-        self._sleep_window_violation = False
 
         if self.register:
             SimSingleton().change_sim(self)
@@ -577,13 +574,6 @@ class Simulation(ParameterizedObject):
         #if self.events and self.events[0].time >= stop_time:
         if stop_time != Forever:
             self._time = stop_time
-
-
-    def sleep(self,delay):
-
-        # We don't need the sleep call in this class because the
-        # continue_ loop updates the time directly.
-        self.warning("sleep not supported in class",self.__class__.__name__)
 
 
     def enqueue_event_abs(self,event):
