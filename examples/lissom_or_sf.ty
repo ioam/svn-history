@@ -29,7 +29,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPHebbian_opt1
 from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
 from topo.outputfns.optimized import CFPDivisiveSumNormalize_opt1
-from topo.misc.numbergenerators import RandomWrapper
+from topo.misc.numbergenerators import UniformRandom
 from topo.responsefns.optimized import SharedWeightCFPDotProduct_opt1
 
 # JABALERT: Shouldn't this script file be renamed lissom_oo_or_sf since it's ON/OFF?
@@ -93,10 +93,11 @@ from topo.patterns.basic import CompositePatternGenerator
 
 
 x=1
-x1=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=32))
-y1=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=12))
-x2=DynamicNumber(RandomWrapper("uniform",-1.0,1.0,seed=33))
-y2=DynamicNumber(RandomWrapper("uniform",-1.0,1.0,seed=13))
+
+x1=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=32))
+x2=DynamicNumber(UniformRandom(lbound=-1.0,ubound=1.0,seed=33))
+y1=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12))
+y2=DynamicNumber(UniformRandom(lbound=-1.0,ubound=1.0,seed=13))
 
 
 def swap():
@@ -121,7 +122,7 @@ input_pattern = topo.patterns.basic.Gaussian(
 	scale=1.0,
 	size=DynamicNumber(swap),
 	aspect_ratio=4.0,
-	orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=56)))
+	orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
 
 #########
