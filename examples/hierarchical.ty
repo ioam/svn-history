@@ -22,7 +22,7 @@ from topo.outputfns.basic import PiecewiseLinear
 from topo.responsefns.optimized import CFPDotProduct_opt1
 from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.misc.numbergenerators import RandomWrapper
+from topo.misc.numbergenerators import UniformRandom
 
 
 topo.sim.name = "hierarchical"
@@ -43,19 +43,22 @@ GeneratorSheet.density = 20
 # so I've temporarily commented out this line.
 # PatternGeneratorParameter.default=topo.patterns.basic.Line()
 
+
+
+
 left_input_pattern = topo.patterns.basic.Line(
     thickness=0.02,
     bounds=BoundingBox(points=((-1.05,-0.8),(1.05,0.8))),
-    x=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=12)),
-    y=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=34)),
-    orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=56)))
+    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
+    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
+    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=12)))
 
 right_input_pattern = topo.patterns.basic.Line(
     thickness=0.02,
     bounds=BoundingBox(points=((-1.05,-0.8),(1.05,0.8))),
-    x=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=100)),
-    y=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=200)),
-    orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=300)))
+    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=100)),
+    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
+    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=300)))
 
 
 # cortical sheet
