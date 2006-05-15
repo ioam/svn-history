@@ -355,6 +355,9 @@ class EPConnectionEvent(Event):
     def __call__(self):
         self.conn.dest.input_event(self.conn,self.data)
 
+    def __repr__(self):
+        return "EPConnectionEvent(time="+`self.time`+",conn="+`self.conn`+")"
+
 
 class CommandEvent(Event):
     """An Event consisting of a command string to execute."""
@@ -362,7 +365,10 @@ class CommandEvent(Event):
     def __init__(self,time,command_string):
         super(CommandEvent,self).__init__(time)
         self.command_string = command_string
-        
+
+    def __repr__(self):
+        return "CommandEvent(time="+`self.time`+" ,command_string='"+self.command_string+"')"
+    
     def __call__(self):
         """
         exec's the command_string in __main__.__dict__.
@@ -510,12 +516,7 @@ class Simulation(ParameterizedObject):
             
             if self.events[0].time < self._time:
                 # Warn and then discard events scheduled *before* the current time
-
-                ### Replace this specific info with events[0].debugging_info (see below)
-                self.warning('Discarding stale event from',(self.events[0].conn.src,self.events[0].conn.src_port),
-                             'to',(self.events[0].conn.dest,self.events[0].conn.dest_port),
-                             'for time',self.events[0].time,
-                             '. Current time =',self._time)
+                self.warning('Discarding event',repr(self.events[0]))
                 self.events.pop(0)
                 
             elif self.events[0].time > self._time:
@@ -538,30 +539,7 @@ class Simulation(ParameterizedObject):
             else:
                 # Pop and call the event at the head of the queue.
                 event = self.events.pop(0)
-
-                ### JABALERT: Replace all this with self.verbose(event.debugging_info),
-                ### and provide appropriate debugging_info in each Event class.
-                # ####### INFORMATION PRINTING ONLY ########
-                # (I kept the try/catch for speed - will usually be EPConnectionEvent -
-                #  but I haven't checked the impact. Presumably it's tiny.
-                #  Could be simplified to:
-                #  if isinstance(event,EPConnectionEvent):
-                #      self.verbose...
-                #  elif isinstance(event,CommandEvent):
-                #      self.verbose...
-                #  else:
-                #      self.verbose...     )
-                try:
-                    self.verbose("Delivering event from",event.conn.src.name,
-                                 "to",event.conn.dest.name,"at",self._time)
-                except AttributeError:
-                    if isinstance(event,CommandEvent):
-                        self.verbose(
-                            "Executing command '"+event.command_string+"' at "+`self._time`)
-                    else:
-                        self.verbose("Delivering event at",self._time)
-                # ##########################################
-                
+                self.verbose("Delivering "+ repr(event))
                 event()
                 did_event=True
 
