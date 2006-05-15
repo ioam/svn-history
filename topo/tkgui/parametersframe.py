@@ -95,11 +95,13 @@ class ParametersFrame(Frame):
         because the ParameterizedObject is opened in the model editor.
         """
         assert isinstance(self.topo_obj,ParameterizedObject), "ParametersFrame must be associated with a ParameterizedObject to set object parameters."
-        
+
+        # CEBHACKALERT: name should be a constant Parameter; the
+        # 'or name==...' can be removed when it is.
         parameters_to_modify = [(name,parameter)
                                 for (name,parameter)
                                 in self.__visible_parameters.items()
-                                if not parameter.constant==True]
+                                if not (parameter.constant==True or name=='name')]
 
         for (name,parameter) in parameters_to_modify:
             # [0] is label (Message), [1] is widget
@@ -225,7 +227,9 @@ class ParametersFrame(Frame):
         else:
             value = getattr(self.topo_obj,parameter_name)
 
-        if parameter.constant==True and class_==False:
+        # CEBHACKALERT: name should be a constant Parameter; the
+        # 'or parameter_name' can be removed when it is. (see earlier alert too)
+        if (parameter.constant==True or parameter_name=='name') and class_==False:
             self.__add_readonly_text_property(parameter_name,value,parameter)
         else:
             for c in classlist(type(parameter))[::-1]:

@@ -130,7 +130,12 @@ class NodeTool(Frame) :
         if self.parameter_tool.focus :
             self.parameter_tool.update_parameters()
         # get the current selection and create the new topo object
-        sheet = self.sheet_list[self.current_option]()
+
+        # CEBHACKALERT: because ParameterizedObject overwrites the name
+        # unless it's passed in params when the object is created, I
+        # pass the class name (set by ParametersFrame) here.
+        # Same goes for projections.
+        sheet = self.sheet_list[self.current_option](name=self.sheet_list[self.current_option].name)
         sim = self.canvas.simulation # get the current simulation
         sim[sheet.name] = sheet
         # create the cover for the sheet and return it.
@@ -201,6 +206,7 @@ class ConnectionTool(Frame) :
         from_node = editor_connection.from_node.sheet
         to_node = node.sheet
         con_type = self.proj_list[self.current_option]
+        # CEBHACKALERT: see alert about sheet name
         try :
             con = sim.connect(from_node.name,to_node.name,connection_type=con_type)
         except :
