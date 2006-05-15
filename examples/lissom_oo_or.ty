@@ -50,6 +50,7 @@ SharedWeightCFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
 # build simulation
 
 topo.sim['Retina'] = GeneratorSheet(density=24.0,input_generator=input_pattern,
+                                    period=1.0, phase=0.05,
                                     bounds=BoundingBox(radius=0.5+0.25+0.375))
 
 topo.sim['LGNOn'] = CFSheet(density=24.0,bounds=BoundingBox(radius=0.5+0.25),

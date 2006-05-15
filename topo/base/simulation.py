@@ -504,7 +504,8 @@ class Simulation(ParameterizedObject):
             stop_time = min(self._time+duration,until)
             
         did_event = False
-        while self.events and (stop_time == Forever or self._time < stop_time):
+
+        while self.events and (stop_time == Forever or self._time <= stop_time):
             # Loop while there are events and it's not time to stop.
             
             if self.events[0].time < self._time:

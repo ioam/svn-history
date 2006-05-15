@@ -76,7 +76,7 @@ class HomeostaticPiecewiseLinear(OutputFn):
 
 
 topo.sim['Retina'] = GeneratorSheet(density=24.0,input_generator=input_pattern,
-                                    bounds=BoundingBox(radius=0.5+0.25+0.375))
+                                    bounds=BoundingBox(radius=0.5+0.25+0.375),phase=0.05)
                         
 topo.sim['LGNOn'] = CFSheet(density=10.0,bounds=BoundingBox(radius=0.5+0.25),
                             output_fn=HomeostaticPiecewiseLinear(lower_bound=0.0,

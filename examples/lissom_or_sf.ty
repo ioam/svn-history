@@ -162,9 +162,9 @@ SharedWeightCFProjection.response_fn = SharedWeightCFPDotProduct_opt1()
 # build simulation
 topo.sim.name='big and small'
 
-topo.sim['Retina'] = GeneratorSheet(density=24.0,bounds=BoundingBox(radius=v1size+retinabuffer),input_generator=input_pattern)
+topo.sim['Retina'] = GeneratorSheet(density=24.0,bounds=BoundingBox(radius=v1size+retinabuffer),input_generator=input_pattern,phase=0.05)
                         
-#topo.sim['Retina'] = GeneratorSheet(density=12.0,bounds=BoundingBox(radius=v1size+retinabuffer),input_generator=CompositePatternGenerator([input_pattern,input_pattern,input_pattern,input_pattern]))                        
+#topo.sim['Retina'] = GeneratorSheet(density=12.0,bounds=BoundingBox(radius=v1size+retinabuffer),input_generator=CompositePatternGenerator([input_pattern,input_pattern,input_pattern,input_pattern]),phase=0.05)
                         
 topo.sim['LGNOn'] = CFSheet(
 	density=12.0,bounds=BoundingBox(radius=v1size+lgnbuffer),

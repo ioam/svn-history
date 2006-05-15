@@ -42,13 +42,13 @@ gaussian_generator = topo.patterns.basic.Gaussian(
 
 # Sheets, connections, and their parameters
 topo.sim['Retina'] = GeneratorSheet(input_generator=gaussian_generator,
-                                    period=1.0,density=30)
+                                    period=1.0,phase=0.25,density=30)
 
 topo.sim['V1'] = CFSOM(density=locals().get('default_density',50.0),
                        learning_length=10000,radius_0=0.1,alpha_0=0.5)
 
-topo.sim.connect('Retina','V1',delay=0.5,connection_type=CFProjection,
-                  weights_generator = topo.patterns.random.UniformRandom(),
+topo.sim.connect('Retina','V1',delay=0.25,connection_type=CFProjection,
+                  weights_generator = topo.patterns.basic.Gaussian(),
                   nominal_bounds_template=BoundingBox(radius=0.1),
                   response_fn = CFPDotProduct_opt1(),
                   learning_fn=HebbianSOMLF())

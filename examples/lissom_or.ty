@@ -34,6 +34,7 @@ topo.sim.name = "lissom_or"
 #
 GeneratorSheet.density = 24.0 
 GeneratorSheet.period = 1
+GeneratorSheet.phase = 0.05
 GeneratorSheet.bounds = BoundingBox(radius=0.72)
 
 input_pattern = topo.patterns.basic.Gaussian(
