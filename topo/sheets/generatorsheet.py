@@ -82,10 +82,11 @@ class GeneratorSheet(Sheet):
         assert self.simulation
 
         # connect self<->self (for repeating)
-        c=self.simulation.connect(self.name,self.name,delay=self.period)
+        conn=self.simulation.connect(self.name,self.name,delay=self.period)
 
         # first event is special
-        self.simulation.enqueue_event_rel(EPConnectionEvent(self.phase,c,data=self.activity))
+        e=EPConnectionEvent(self.phase+topo.sim.time(),conn,data=self.activity)
+        self.simulation.enqueue_event_abs(e)
 
     def input_event(self,conn,data):
         self.verbose("Received %s input from %s." % (NxN(data.shape),conn.src))

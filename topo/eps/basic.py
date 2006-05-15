@@ -35,8 +35,9 @@ class PulseGenerator(EventProcessor):
 
     def start(self):
         assert self.period > 0
-        c=self.simulation.connect(self.name,self.name,delay=self.period)
-        self.simulation.enqueue_event_rel(EPConnectionEvent(self.phase,c))
+        conn=self.simulation.connect(self.name,self.name,delay=self.period)
+        e=EPConnectionEvent(self.simulation.time()+self.phase, conn)
+        self.simulation.enqueue_event_abs(e)
         EventProcessor.start(self)
 
 

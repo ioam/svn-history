@@ -240,7 +240,8 @@ class EventProcessor(ParameterizedObject):
         Send some data out to all connections on the given src_port.
         """
         for conn in self.out_connections[src_port]:
-            self.simulation.enqueue_event_rel(EPConnectionEvent(conn.delay,conn,data))
+            e=EPConnectionEvent(conn.delay+self.simulation.time(),conn,data)
+            self.simulation.enqueue_event_abs(e)
 
     def input_event(self,conn,data):
         """
@@ -575,7 +576,7 @@ class Simulation(ParameterizedObject):
         if stop_time != Forever:
             self._time = stop_time
 
-
+    # ** rename to enqueue_event
     def enqueue_event_abs(self,event):
         """
         Enqueue an Event at an absolute simulation clock time.
@@ -595,18 +596,6 @@ class Simulation(ParameterizedObject):
                 self.events.insert(i,event)
                 break
 
-    ### JABALERT: Eliminate this, and have EPs set event.time as an absolute time.
-    def enqueue_event_rel(self,event):
-        """
-        Enqueue an Event at a time relative to the current simulation time.
-
-        The incoming event's time is treated as a delay and is added
-        to the simulation's current time.
-        """
-        event.time+=self._time
-        self.enqueue_event_abs(event)
-
-    ### JABALERT: Eliminate the absolute_time argument (and always do absolute)
     def schedule_command(self,time,command_string):
         """
         Add a command to execute in __main__.__dict__ at the
