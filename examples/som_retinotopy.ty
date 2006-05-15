@@ -25,7 +25,7 @@ from topo.base.parameterclasses import DynamicNumber,Number
 from topo.sheets.cfsom import CFSOM
 from topo.responsefns.optimized import CFPEuclideanDistance_opt1
 from topo.learningfns.som import HebbianSOMLF
-from topo.misc.numbergenerators import RandomWrapper
+from topo.misc.numbergenerators import UniformRandom
 
 topo.sim.name = "som_retinotopy"
 
@@ -57,9 +57,9 @@ input_pattern = topo.patterns.basic.Gaussian(
     scale=1.0,
     size=2*sqrt(2.0*0.1*24.0)/24.0,
     aspect_ratio=1.0,
-    x=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=9999)),
-    y=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=2)),
-    orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=10)))
+    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=9999)),
+    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=2)),
+    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=10)))
 
 # cortical sheet
 RetinotopicSOM.density = 40
