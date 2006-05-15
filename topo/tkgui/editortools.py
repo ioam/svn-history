@@ -135,7 +135,12 @@ class NodeTool(Frame) :
         # unless it's passed in params when the object is created, I
         # pass the class name (set by ParametersFrame) here.
         # Same goes for projections.
-        sheet = self.sheet_list[self.current_option](name=self.sheet_list[self.current_option].name)
+        sheet_name=self.sheet_list[self.current_option].name
+        if sheet_name is not None:
+            sheet = self.sheet_list[self.current_option](name=sheet_name)
+        else:
+            sheet = self.sheet_list[self.current_option]()
+            
         sim = self.canvas.simulation # get the current simulation
         sim[sheet.name] = sheet
         # create the cover for the sheet and return it.
@@ -206,9 +211,15 @@ class ConnectionTool(Frame) :
         from_node = editor_connection.from_node.sheet
         to_node = node.sheet
         con_type = self.proj_list[self.current_option]
+        con_name = con_type.name
         # CEBHACKALERT: see alert about sheet name
+
+        # CEBHACKALERT: should probably catch a specific error?
         try :
-            con = sim.connect(from_node.name,to_node.name,connection_type=con_type)
+            if con_name is not None:
+                con = sim.connect(from_node.name,to_node.name,connection_type=con_type,name=con_name)
+            else:
+                con = sim.connect(from_node.name,to_node.name,connection_type=con_type)
         except :
             print "These sheets could not be connected by a "+ self.current_option
             editor_connection.remove()
