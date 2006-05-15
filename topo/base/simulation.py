@@ -189,7 +189,8 @@ class EventProcessor(ParameterizedObject):
         # data stuctures to optimize the operations specific to it
         # by overriding _connect_from().
 
-        # JABHACKALERT: Why are these two not symmetric?  Surely there's no reason.
+        # JABHACKALERT: These should both be plain lists; the dictionary
+        # doesn't serve any useful purpose any more
         self.in_connections = []
         self.out_connections = {None:[]}
 
@@ -399,7 +400,7 @@ class Simulation(ParameterizedObject):
     Simulation with SimSingleton, which can be used to provide a
     single point of contact for accessing the Simulation.
     """
-    ### JABALERT! Is step_mode even implemented?
+    ### JABALERT! Removed unimplemented step_mode
     step_mode = BooleanParameter(default=False)
     register = BooleanParameter(default=True)
 
