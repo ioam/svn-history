@@ -90,6 +90,9 @@ class PropertiesFrame(Frame):
                                selectioncommand=(lambda value: self.properties[name].set(value)),**kw)
                 
         control.selectitem(value)
+
+        # CEBHACKALERT: this doesn't work for PMW. How do we bind the return
+        # key to a PMW combobox? I couldn't figure it out.
         control.bind('<Return>', self.optional_refresh)
         return self.add_property(name,var,control,value)
 
