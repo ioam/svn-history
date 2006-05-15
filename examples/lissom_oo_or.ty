@@ -24,15 +24,15 @@ from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPHebbian_opt1
 from topo.outputfns.optimized import CFPDivisiveSumNormalize_opt1
 from topo.outputfns.basic import PiecewiseLinear, DivisiveSumNormalize
-from topo.misc.numbergenerators import RandomWrapper
+from topo.misc.numbergenerators import UniformRandom
 
 topo.sim.name = "lissom_oo_or"
 
 input_pattern = topo.patterns.basic.Gaussian(
           scale=1.0, size=2*0.0468, aspect_ratio=4.0,
-          x=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=12)),
-          y=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=34)),
-          orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=56)))
+          x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
+          y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
+          orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=12)))
 
                                  
 # Specify weight initialization, response function, and learning function

@@ -24,7 +24,7 @@ from topo.learningfns.som import HebbianSOMLF
 from topo.responsefns.optimized import CFPDotProduct_opt1
 from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.misc.numbergenerators import RandomWrapper
+from topo.misc.numbergenerators import UniformRandom
 
 topo.sim.name = "cfsom_or"
 
@@ -33,12 +33,12 @@ RandomArray.seed(500,500)
 
 # Input pattern
 gaussian_generator = topo.patterns.basic.Gaussian(
-  x = DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=12)),
-  y = DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=34)),
-  orientation = DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=56)),
-  size = 2*0.3*1.5/7.0,
-  aspect_ratio = 7.0/1.5,
-  bounds = BoundingBox(radius=0.8))
+    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
+    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
+    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)),
+    size = 2*0.3*1.5/7.0,
+    aspect_ratio = 7.0/1.5,
+    bounds = BoundingBox(radius=0.8))
 
 # Sheets, connections, and their parameters
 topo.sim['Retina'] = GeneratorSheet(input_generator=gaussian_generator,
