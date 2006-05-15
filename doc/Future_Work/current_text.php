@@ -23,13 +23,26 @@ UniformRandom instead. [** before release]
 </li>
 
 <li>
-2006/05/07 (CB): Matching with C++ lissom. [** before release]
+2006/05/15 (CB): deal with trivial hackalerts in simulation.py [** before release]
 </li>
 
 <li>
-2006/05/07 (CB): Unhide ParameterizedObject name attribute so names can be set in the GUI. Objects in the simulation are indexed by name, so name needs to be a constant Parameter. There is probably an easy way to allow renaming, though. [** before release]
+2006/05/15 (CB): Rename Mdot to DotProduct [** before release]
 </li>
 
+<li>
+2006/05/15 (CB): Missing scheduled_actions in lissom examples [** before release]
+</li>
+
+
+<li>
+2006/05/15 (CB): min_exc_rad in lissom examples [** before release]
+</li>
+
+
+<li>
+2006/05/15 (CB): Comments about relative performance of c++ CFP functions vs python CFP with C++ single function vs all-python.  [** before release]
+</li>
 
 <li>
 2006/05/07 (CB): DynamicNumbers in the model editor (ParametersFrame). [** before release]
@@ -61,6 +74,22 @@ UniformRandom instead. [** before release]
 
 <li> 
 2006/05/02 (CB): Finish Slice and SheetCoordinateSystem classes.
+</li>
+
+<li>
+2006/05/15 (CB): Matching lissom_oo_or with C++ lissom. 
+</li>
+
+<li>
+2006/05/15: All arrays should be Numeric.Float32
+</li>
+
+<li>
+2006/04/27 (CB): Allowing there to be a slower, more in-depth set of tests (that don't run with make tests, etc). Slower tests that are required: pickling, that example networks' results haven't changed, that performance doesn't get worse
+</li>
+
+<li>
+2006/05/15: Objects in the simulation are indexed by name, so name needs to be a constant Parameter. There is probably an easy way to allow renaming, though. Hacks in ParametersFrame.
 </li>
 
 <li> 
@@ -110,11 +139,6 @@ Tasks which the developers are about to start.
 
 <li>
 2006/04/20 (CB): write test file for Composite and complete Image's test file.
-</li>
-
-
-<li>
-2006/04/27 (CB): Allowing there to be a slower, more in-depth set of tests (that don't run with make tests, etc). Slower tests that are required: pickling, that example networks' results haven't changed, that performance doesn't get worse
 </li>
 
 
