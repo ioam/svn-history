@@ -241,7 +241,7 @@ class EventProcessor(ParameterizedObject):
         """
         for conn in self.out_connections[src_port]:
             e=EPConnectionEvent(conn.delay+self.simulation.time(),conn,data)
-            self.simulation.enqueue_event_abs(e)
+            self.simulation.enqueue_event(e)
 
     def input_event(self,conn,data):
         """
@@ -576,8 +576,8 @@ class Simulation(ParameterizedObject):
         if stop_time != Forever:
             self._time = stop_time
 
-    # ** rename to enqueue_event
-    def enqueue_event_abs(self,event):
+
+    def enqueue_event(self,event):
         """
         Enqueue an Event at an absolute simulation clock time.
         """
@@ -604,7 +604,7 @@ class Simulation(ParameterizedObject):
         The command should be a string.
         """
         event = CommandEvent(time=time,command_string=command_string)
-        self.enqueue_event_abs(event)
+        self.enqueue_event(event)
         
 
     def state_push(self):

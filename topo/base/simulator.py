@@ -596,7 +596,7 @@ class Simulation(ParameterizedObject):
 
         self.warning("sleep not supported in class",self.__class__.__name__)
 
-    def enqueue_event_abs(self,time,src,dest,src_port=None,dest_port=None,data=None):
+    def enqueue_event(self,time,src,dest,src_port=None,dest_port=None,data=None):
         """
         Enqueue an event at an absolute simulation clock time.
         """
@@ -621,7 +621,7 @@ class Simulation(ParameterizedObject):
         """
         Enqueue an event at a time relative to the current simulation clock.
         """
-        self.enqueue_event_abs(self._time+delay,
+        self.enqueue_event(self._time+delay,
                                src,dest,src_port,dest_port,data)
 
     def schedule_command(self,time,command_string):
@@ -633,7 +633,7 @@ class Simulation(ParameterizedObject):
         """
         new_event = CommandEvent(time=time,command_string=command_string)
 
-        # CEBHACKALERT: doesn't this duplicate a lot of enqueue_event_abs()
+        # CEBHACKALERT: doesn't this duplicate a lot of enqueue_event()
         if not self.events or time >= self.events[-1].time:
             self.events.append(new_event)
             return

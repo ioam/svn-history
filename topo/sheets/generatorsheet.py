@@ -86,7 +86,7 @@ class GeneratorSheet(Sheet):
 
         # first event is special
         e=EPConnectionEvent(self.phase+topo.sim.time(),conn,data=self.activity)
-        self.simulation.enqueue_event_abs(e)
+        self.simulation.enqueue_event(e)
 
     def input_event(self,conn,data):
         self.verbose("Received %s input from %s." % (NxN(data.shape),conn.src))
