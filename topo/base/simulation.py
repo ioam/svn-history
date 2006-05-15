@@ -607,7 +607,7 @@ class Simulation(ParameterizedObject):
         self.enqueue_event_abs(event)
 
     ### JABALERT: Eliminate the absolute_time argument (and always do absolute)
-    def schedule_command(self,time,command_string,absolute_time=True):
+    def schedule_command(self,time,command_string):
         """
         Add a command to execute in __main__.__dict__ at the
         specified time.
@@ -615,10 +615,7 @@ class Simulation(ParameterizedObject):
         The command should be a string.
         """
         event = CommandEvent(time=time,command_string=command_string)
-        if absolute_time:
-            self.enqueue_event_abs(event)
-        else:
-            self.enqueue_event_rel(event)
+        self.enqueue_event_abs(event)
         
 
     def state_push(self):
