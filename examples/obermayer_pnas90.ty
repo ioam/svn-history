@@ -31,7 +31,7 @@ import topo.patterns.random
 import topo.patterns.basic
 from topo.learningfns.som import HebbianSOMLF
 from topo.outputfns.basic import DivisiveSumNormalize
-from topo.misc.numbergenerators import RandomWrapper
+from topo.misc.numbergenerators import UniformRandom
 
 topo.sim.name = "obermayer_pnas90"
 
@@ -74,9 +74,9 @@ gaussian_width = 0.23/sqrt(2)
 gaussian_height = 0.09/sqrt(2)
 
 input_pattern = topo.patterns.basic.Gaussian(
-    x=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=12)),
-    y=DynamicNumber(RandomWrapper("uniform",-0.5,0.5,seed=34)),
-    orientation=DynamicNumber(RandomWrapper("uniform",-pi,pi,seed=56)),
+    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
+    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
+    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)),
     size=2*gaussian_height,aspect_ratio=gaussian_width/gaussian_height,
     bounds=BoundingBox(radius=0.5))
 
