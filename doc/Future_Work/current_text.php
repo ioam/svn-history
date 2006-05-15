@@ -27,10 +27,6 @@ UniformRandom instead. [** before release]
 </li>
 
 <li>
-2006/05/15 (CB): Rename Mdot to DotProduct [** before release]
-</li>
-
-<li>
 2006/05/15 (CB): Missing scheduled_actions in lissom examples [** before release]
 </li>
 
