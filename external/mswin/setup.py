@@ -1,6 +1,8 @@
-# Create topographica.py script and topographica.bat batch file.
+# Create topographica.py script, topographica.bat batch file,
+# put shortcut on desktop, associate .ty files, put Topographica
+# icon in registry.
 
-# CEBHACKALERT: it's like the Makefile; can't it be the same?
+
 
 import sys
 import os
@@ -11,6 +13,9 @@ from _winreg import *
 path = os.path.abspath(sys.argv[1])
 
 compiler_path = "python_topo\\mingw\\bin"
+
+
+# CEBHACKALERT: it's like the Makefile; can't it be the same?
 
 # topographica script
 f = open(os.path.join(path,"topographica"),'w')
