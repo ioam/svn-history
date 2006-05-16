@@ -17,7 +17,7 @@ REM ** root directory
 
 cd ..\..\..
 rmdir /Q /S CVS\
-REM del /Q /F .cvsignore
+del /Q /F .cvsignore
 del /Q /F Makefile
 del /Q /F ChangeLog.txt
 del /Q /F topographica
