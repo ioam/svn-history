@@ -23,7 +23,7 @@ while (opt${1:q} =~ opt-*)
 	shift
         breaksw
     default:
-        echo 'Usage:  cvssetroot [-anonymous | -user <sf-username>]'
+        echo 'Usage:  toporoot [-anonymous | -user <sf-username>]'
         echo ' '
         echo 'Use -anonymous for read-only access.  If your local username does'
         echo 'not match your sourceforge.net username, you will need to specify'
