@@ -7,6 +7,8 @@ REM Put the setup scripts into {topographica}/setup/
 mkdir ..\..\..\setup
 copy setup.bat ..\..\..\setup\
 copy ..\setup.py ..\..\..\setup\
+copy ..\create_shortcut.vbs ..\..\..\setup\
+
 
 REM Clean this copy of Topographica...
 
