@@ -36,6 +36,12 @@ Source: "D:\Program Files\topographica\*"; DestDir: "{app}"; Flags: ignoreversio
 Filename: "{app}\setup\setup.bat"; WorkingDir: "{app}\setup"; Flags: runhidden
 Filename: "{app}\topographica.bat"; Description: "{cm:LaunchProgram,Topographica}"; Flags: shellexec postinstall skipifsilent
 
+[UninstallDelete]
+; we don't remove user-created files but CEBHACKALERT this includes leaving behind .pyc files.
+Type: filesandordirs; Name: "{app}\python_topo"
+Type: files; Name: "{app}\topographica"
+Type: files; Name: "{app}\topographica.bat"
+
 
 ; CEBHACKALERT: should have [UninstallRun] section to remove desktop shortcut and .ty association.
 
