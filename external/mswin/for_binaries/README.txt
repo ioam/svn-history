@@ -11,6 +11,11 @@ Making a Windows installation package
     - copies this directory's setup.bat to setup/ subdirectory
     - cleans files that aren't needed for the binary version
 
+(3) CEBHACKALERT: make sure release numbers are up to date in
+    ..\setup.py and topographica.iss (the second is only for user's 
+    information while installing).
+
 (3) I use 'Inno Setup 5', an open-source installation package creator.
     (See http://www.jrsoftware.org/isinfo.php)
-    The script topographica.iss will create a .exe installation file.
+    The script topographica.iss will create a .exe installation file;
+    just choose 'compile' from the menu.
