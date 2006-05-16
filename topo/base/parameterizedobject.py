@@ -665,7 +665,7 @@ class ParameterizedObject(object):
         """
         Iff print_level or self.db_print_level is greater than or
         equal to the given level, print str.
-        """
+        """            
         if level <= max(min_print_level,self.print_level):
             s = ' '.join([str(x) for x in args])
             print "%s: %s" % (self.name,s)
@@ -738,15 +738,19 @@ class ParameterizedObject(object):
                 self.warning("'%s' was ignored (not a Parameter)."%item)
 
 
+                
+            
+
     def get_param_values(self):
         """Return a list of name,value pairs for all Parameters of this object"""
         vals = []
-        for name in dir(self):
-            desc,desctype = self.__class__.get_param_descriptor(name)
-            if desc:
-                vals.append((name,getattr(self,name)))
+        for name in self.params().keys():
+            value = getattr(self,name)
+            vals.append((name,value))
+
         vals.sort(key=lambda x:x[0])
         return vals
+            
 
     def print_param_values(self):
         for name,val in self.get_param_values():
