@@ -15,7 +15,11 @@ Making a Windows installation package
     ..\setup.py and topographica.iss (the second is only for user's 
     information while installing).
 
-(3) I use 'Inno Setup 5', an open-source installation package creator.
+(4) Copy topographica.iss to wherever you want to create the .exe
+    file, then delete the external directory (which includes this file
+    so remember the next step!).
+
+(5) I use 'Inno Setup 5', an open-source installation package creator.
     (See http://www.jrsoftware.org/isinfo.php)
     The script topographica.iss will create a .exe installation file;
     just choose 'compile' from the menu.
