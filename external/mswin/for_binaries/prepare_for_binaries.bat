@@ -5,8 +5,8 @@ REM *** BE SURE YOU MEAN TO DO THIS TO YOUR COPY! ***
 
 REM Put the setup scripts into {topographica}/setup/ 
 mkdir ..\..\..\setup
-cp setup.bat ..\..\..\setup\
-cp ..\setup.py ..\..\..\setup\
+copy setup.bat ..\..\..\setup\
+copy ..\setup.py ..\..\..\setup\
 
 REM Clean this copy of Topographica...
 
@@ -15,7 +15,7 @@ REM ** root directory
 
 cd ..\..\..
 rmdir /Q /S CVS\
-del /Q /F .cvsignore
+REM del /Q /F .cvsignore
 del /Q /F Makefile
 del /Q /F ChangeLog.txt
 del /Q /F topographica
@@ -41,25 +41,23 @@ REM CEBHACKALERT: it would be good to get the built doc files in here!
 
 
 REM ** etc\
+cd etc\
 rmdir /Q /S CVS
 del /Q /F .cvsignore
+cd ..
 
 
 REM ** examples\
+cd examples\
 rmdir /Q /S CVS
 del /Q /F .cvsignore
-
+cd ..
 
 REM ** topo\
+cd topo\
 rmdir /Q /S CVS
 del /Q /F .cvsignore
+cd ..
 
 REM CEBHACKALERT: how on Windows does one recursively delete?
 REM We need to remove all pyc files plus the CVS files
-
-
-
-
-
-
-
