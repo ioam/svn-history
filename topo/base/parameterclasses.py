@@ -363,7 +363,7 @@ class CallableParameter(Parameter):
 class DynamicNumber(Number):
     """
     """
-    __slots__ = []
+    __slots__ = ['last_value']
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=0.0,bounds=None,softbounds=None,**params):
@@ -378,6 +378,10 @@ class DynamicNumber(Number):
         self._softbounds = softbounds  
         self._check_bounds(default)  # only create this number if the default value and bounds are consistent
 
+        # CEBHACKALERT: allows to avoid the problem of displaying the value without
+        # changing its value.
+        self.last_value = None
+
     def __get__(self,obj,objtype):
         """
         Get a parameter value.  If called on the class, produce the
@@ -389,6 +393,8 @@ class DynamicNumber(Number):
         else:
             result = produce_value(obj.__dict__.get(self.get_name(obj),self.default))
         self._check_bounds(result)
+
+        self.last_value = result
         return result
 
     def _check_bounds(self,val):
