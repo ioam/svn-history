@@ -37,5 +37,5 @@ Filename: "{app}\setup\setup.bat"; WorkingDir: "{app}\setup"; Flags: runhidden
 Filename: "{app}\topographica.bat"; Description: "{cm:LaunchProgram,Topographica}"; Flags: shellexec postinstall skipifsilent
 
 
-; should have [UninstallRun] section to remove desktop shortcut and .ty association.
+; CEBHACKALERT: should have [UninstallRun] section to remove desktop shortcut and .ty association.
 
