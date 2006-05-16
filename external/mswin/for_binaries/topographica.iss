@@ -25,13 +25,12 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "D:\Program Files\topographica\topographica.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\Program Files\topographica\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
-[Icons]
-Name: "{group}\Topographica"; Filename: "{app}\topographica.ico"
-;Name: "{userdesktop}\Topographica"; Filename: "{app}\topographica.bat"; Tasks: desktopicon
+; [Icons]
+; Name: "{group}\Topographica"; Filename: "{app}\topographica.bat"
+; Name: "{userdesktop}\Topographica"; Filename: "{app}\topographica.bat"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\setup\setup.bat"; WorkingDir: "{app}\setup"; Flags: runhidden
