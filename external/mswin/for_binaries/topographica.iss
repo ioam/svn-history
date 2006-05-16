@@ -14,7 +14,6 @@ DefaultDirName={pf}\Topographica
 DefaultGroupName=Topographica
 LicenseFile=D:\Program Files\topographica\COPYING.txt
 InfoBeforeFile=D:\Program Files\topographica\README.txt
-InfoAfterFile=D:\Program Files\topographica\ChangeLog.txt
 OutputBaseFilename=setup
 Compression=lzma
 SolidCompression=yes
@@ -37,4 +36,7 @@ Name: "{group}\Topographica"; Filename: "{app}\topographica.ico"
 [Run]
 Filename: "{app}\setup\setup.bat"; WorkingDir: "{app}\setup"; Flags: runhidden
 Filename: "{app}\topographica.bat"; Description: "{cm:LaunchProgram,Topographica}"; Flags: shellexec postinstall skipifsilent
+
+
+; should have [UninstallRun] section to remove desktop shortcut and .ty association.
 
