@@ -743,9 +743,22 @@ class ParameterizedObject(object):
 
     def get_param_values(self):
         """Return a list of name,value pairs for all Parameters of this object"""
+        from parameterclasses import DynamicNumber
         vals = []
         for name in self.params().keys():
-            value = getattr(self,name)
+
+            # CEBHACKALERT: avoids getting a new value for a DynamicNumber!
+            # (Otherwise, all that should be here is value=getattr(self,name).)
+            k = "_%s_param_value"%(name)
+            if k in self.__dict__:
+                if isinstance(self.__dict__[k],DynamicNumber):
+                    value = self.__dict__[k].last_value
+                else:
+                    value = getattr(self,name)
+            else:
+                value = getattr(self,name)                    
+            # end CEBHACKALERT 
+                    
             vals.append((name,value))
 
         vals.sort(key=lambda x:x[0])
