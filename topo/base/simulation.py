@@ -425,9 +425,7 @@ class Simulation(ParameterizedObject):
         """
         super(Simulation,self).__init__(**config)
 
-        # JABHACKALERT! Shouldn't this be at least 4 decimal places by default?
-        # (Either using ,4 or setting the FixedPoint default precision to 4?)
-        self._time = FixedPoint("0.0")
+        self._time = FixedPoint("0.0",4)
         self._event_processors = {}
 
         if self.register:
