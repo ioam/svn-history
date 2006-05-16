@@ -165,24 +165,20 @@ n_inputs-=1;input_x.next();input_y.next();input_orientation.next()
 
 print "Number of patterns available for learning iterations:",n_inputs
 
-# c++ positions and angle need to be converted to match Topographica
-topo.patterns.basic.Gaussian.x = DynamicNumber(
-    lambda : input_x.next()/BaseRN - 0.5*RN/BaseRN)
-topo.patterns.basic.Gaussian.y = DynamicNumber(
-    lambda : input_y.next()/BaseRN - 0.5*RN/BaseRN)
-topo.patterns.basic.Gaussian.orientation = DynamicNumber(
-    lambda : round(2*pi*input_orientation.next()/360.0,1))
-
-topo.patterns.basic.Gaussian.scale = scale_input
-
+input_bounds = BoundingBox(radius=RN/(BaseRN*area_scale)/2.0)
 gaussian_width = xsigma/BaseRN/sqrt(2.0)
 gaussian_height = ysigma/BaseRN/sqrt(2.0)
-input_bounds = BoundingBox(radius=RN/(BaseRN*area_scale)/2.0)
 
-topo.patterns.basic.Gaussian.size = 2*gaussian_height
-topo.patterns.basic.Gaussian.aspect_ratio = gaussian_width/gaussian_height
-topo.patterns.basic.Gaussian.bounds = input_bounds
-                                               
+# c++ positions and angle need to be converted to match Topographica
+input_pattern = topo.patterns.basic.Gaussian(
+    scale=scale_input,
+    bounds=input_bounds,
+    size = 2*gaussian_height,
+    aspect_ratio= gaussian_width/gaussian_height,
+    x=DynamicNumber(lambda : input_x.next()/BaseRN - 0.5*RN/BaseRN),
+    y=DynamicNumber(lambda : input_y.next()/BaseRN - 0.5*RN/BaseRN),
+    orientation=DynamicNumber(lambda : round(2*pi*input_orientation.next()/360.0,1)))
+
 
 # LISSOM parameters
 LISSOM.output_fn = PiecewiseLinear(lower_bound=delta,upper_bound=beta)
@@ -201,7 +197,7 @@ CFProjection.learning_fn=CFPHebbian_opt1()
 CFProjection.weights_output_fn=CFPDivisiveSumNormalize_opt1()
 
 
-topo.sim['Retina'] = GeneratorSheet(input_generator=topo.patterns.basic.Gaussian(),
+topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
                                     bounds = input_bounds)
 topo.sim['V1'] = LISSOM()
 
