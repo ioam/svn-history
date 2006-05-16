@@ -19,7 +19,12 @@ Making a Windows installation package
     file, then delete the external directory (which includes this file
     so remember the next step!).
 
-(5) I use 'Inno Setup 5', an open-source installation package creator.
+(5) Delete the doc/ subdirectory and replace it with one where the 
+    documentation has been compiled (I copy it over from a linux
+    version, but you could complile the php files on Windows, good
+    luck with that).
+
+(6) I use 'Inno Setup 5', an open-source installation package creator.
     (See http://www.jrsoftware.org/isinfo.php)
     The script topographica.iss will create a .exe installation file;
     just choose 'compile' from the menu.
