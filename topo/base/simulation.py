@@ -355,8 +355,10 @@ class EPConnectionEvent(Event):
     def __call__(self):
         self.conn.dest.input_event(self.conn,self.data)
 
-    def __repr__(self):
-        return "EPConnectionEvent(time="+`self.time`+",conn="+`self.conn`+")"
+# CEBHACKALERT: commented out because it prints the DynamicNumbers,
+# which results in new numbers being generated.
+##     def __repr__(self):
+##         return "EPConnectionEvent(time="+`self.time`+",conn="+`self.conn`+")"
 
 
 class CommandEvent(Event):
