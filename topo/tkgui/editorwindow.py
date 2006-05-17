@@ -543,19 +543,18 @@ class ModelEditor :
         
         for editor_node in self.canvas.object_list :
             node = editor_node.sheet
-            for connection_list in node.out_connections:
-                for con in connection_list :
-                    # create cover for a projection
-                    editor_connection = EditorProjection("", self.canvas, editor_node)
-                    # find the EditorNode that the proj connects to
-                    for dest_editor_node in self.canvas.object_list :
-                        if (dest_editor_node.sheet == con.dest) :
-                            dest = dest_editor_node
-                            break
-                    # CEBHACKALERT: looks like indentation is messed up?
-                    else :
-                        print "Incomplete connection : ", con
+            for con in node.out_connections:
+                # create cover for a projection
+                editor_connection = EditorProjection("", self.canvas, editor_node)
+                # find the EditorNode that the proj connects to
+                for dest_editor_node in self.canvas.object_list :
+                    if (dest_editor_node.sheet == con.dest) :
+                        dest = dest_editor_node
                         break
-                    # connect the connection to the destination node
-                    editor_connection.connect(dest, con)
+                # CEBHACKALERT: looks like indentation is messed up?
+                else :
+                    print "Incomplete connection : ", con
+                    break
+                # connect the connection to the destination node
+                editor_connection.connect(dest, con)
         self.canvas.redraw_objects()
