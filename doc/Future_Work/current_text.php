@@ -18,7 +18,11 @@ was first added to the list, or a change was made.)
 <!-- ### These tasks before the next release (i.e. 2006/05/08) ### -->
 
 <li>
-2006/05/16 (CB): Problem with SharedWeightCFProjection cvs CFProjection.
+2006/05/16 (CB): Problem with SharedWeightCFProjection vs CFProjection.
+</li>
+
+<li>
+2006/05/17 (CB): Windows binary installation - have the installation package install the desktop and start menu shortcuts, rather than using a .vbs script. [** before release]
 </li>
 
 <li>
@@ -38,7 +42,7 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/05/17 (CB): delete connection method, make model editor use it [** before release]
+2006/05/17 (CB): add a delete connection method, make model editor use it [** before release]
 </li>
 
 <li> 
@@ -93,6 +97,14 @@ to generate a new value.
 
 <li>
 2006/05/15: All arrays should be Numeric.Float32
+</li>
+
+<li>
+2006/05/17: Windows-specific files to new module in CVS.
+</li>
+
+<li>
+2006/05/17 (CB): Script to create Windows python/topographica installation, for generating python_topo directory.
 </li>
 
 <li>
