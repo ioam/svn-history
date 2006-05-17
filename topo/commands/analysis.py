@@ -102,9 +102,6 @@ def measure_position_pref(divisions=6,size=0.2,scale=0.3,offset=0.0,display=Fals
 def measure_cog():
     """Calculate center of gravity for each CF of each unit in each CFSheet."""
 
-    # JABHACKALERT: This does not seem to work for SharedWeightCFProjections,
-    # which give a blank CoG plot as of 1 Mar 2006, instead of a perfect grid.
-
     f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
     measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
 
