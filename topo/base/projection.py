@@ -82,18 +82,13 @@ class ProjectionSheet(Sheet):
         self.new_input = False
 
 
-    def _connect_from(self, conn, **args):
+    def _connect_from(self, conn):
         """
-        See Sheet's _connect_from(); raises an error if conn is not
+        See EventProcessor's _connect_from(); raises an error if conn is not
         a Projection.
         """
         if isinstance(conn, Projection):
-            # CEBHACKALERT: these args aren't going anywhere! Sheet has
-            # _connect_from inherited from EventProcessor, whose
-            # _connect_from does not accept args! And should be super
-            # call (see line below next)?
-            Sheet._connect_from(self, conn, **args)
-            #super(ProjectionSheet,self)._connect_from(self, conn)
+            super(ProjectionSheet,self)._connect_from(conn)
         else:
             raise TypeError('ProjectionSheets only accept Projections, not other types of connection.')
 
