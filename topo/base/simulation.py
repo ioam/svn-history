@@ -161,6 +161,10 @@ class SimSingleton(Singleton):
         """Allow dictionary-style access to the simulation."""
         self.actual_sim[item_name]=item_value
 
+    def __delitem__(self,item_name):
+        """Allow dictionary-style access to the simulation."""
+        del self.actual_sim[item_name]
+
 
 class EventProcessor(ParameterizedObject):
     """
@@ -473,6 +477,61 @@ class Simulation(ParameterizedObject):
             self._event_processors[ep_name] = ep
             ep.simulation = self
             ep.start()
+
+
+    def __delitem__(self,ep_name):
+        """
+        Dictionary-style deletion of EPs from the simulation; see __delete_ep().
+
+        Deletes EP from simulation, plus connections that come into it and
+        connections that go out of it.
+        """
+        if not isinstance(ep_name,str):
+           raise TypeError("Expected string for item name (EPs in the Simulation are indexed by name).")
+
+        self.__delete_ep(ep_name)
+
+
+    # CEBHACKALERT: should be reimplemented. Results in unnecessary looping,
+    # is difficult to understand, and contains the same code twice. But it
+    # does work.
+    def __delete_ep(self,ep_name):
+        """
+        Remove the specified EventProcessor from the simulation, plus
+        delete connections that come into it and connections that go from it.
+
+        (Used by 'del topo.sim[ep_name]' (as for a dictionary) to delete
+        event processors from the simulation.)
+        """
+        ep = self[ep_name]
+        
+        # remove from simulation list of eps
+        del self._event_processors[ep_name]
+
+        # remove out_conections that go to this ep
+        for conn in ep.in_connections:
+            i = 0
+            to_del = []
+            for out_conn in conn.src.out_connections:
+                if out_conn.dest is ep:
+                    to_del.append(i)
+                i+=1
+
+            for i in to_del:
+                del conn.src.out_connections[i]
+
+        # remove in_connections that come from this ep
+        for conn in ep.out_connections:
+            i = 0
+            to_del = []
+            for in_conn in conn.dest.in_connections:
+                if in_conn.src is ep:
+                    to_del.append(i)
+                i+=1
+
+            for i in to_del:
+                del conn.dest.in_connections[i]
+
 
     def time(self):
         """
