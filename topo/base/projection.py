@@ -7,8 +7,6 @@ __version__='$Revision$'
 
 import Numeric
 
-from itertools import chain
-
 from sheet import Sheet
 from parameterclasses import Number, BooleanParameter
 from simulation import EPConnection
@@ -81,32 +79,21 @@ class ProjectionSheet(Sheet):
                              
     def __init__(self,**params):
         super(ProjectionSheet,self).__init__(**params)
-
-        # CEBHACKALERT: do we need a separate thing from in_connections?
-        # Can't we just use in_connections, and know that every item
-        # in it is a Projection (connect_from() in this class will only
-        # accept Projections).
-	self.in_projections = {}
         self.new_input = False
 
 
     def _connect_from(self, conn, **args):
         """
-        Accept a connection from src, on src_port, for dest_port.
-        Contruct a dictionary of projections indexed by source name.
-        Ensure that Projections to this ProjectionSheet are named differently,
-        by raising an error if the user try to do so.
+        See Sheet's _connect_from(); raises an error if conn is not
+        a Projection.
         """
-        Sheet._connect_from(self, conn, **args)
-
-        ### JCALERT! This could be better re-implemented: the
-        ### structure of in_projections obliged to use the chain
-        ### method in self.projections. Maybe it would be possible to
-        ### code it differently.
         if isinstance(conn, Projection):
-            if conn.src.name not in self.in_projections:
-                self.in_projections[conn.src.name] = []
-            self.in_projections[conn.src.name].append(conn)
+            # CEBHACKALERT: these args aren't going anywhere! Sheet has
+            # _connect_from inherited from EventProcessor, whose
+            # _connect_from does not accept args! And should be super
+            # call (see line below next)?
+            Sheet._connect_from(self, conn, **args)
+            #super(ProjectionSheet,self)._connect_from(self, conn)
         else:
             raise TypeError('ProjectionSheets only accept Projections, not other types of connection.')
 
@@ -127,11 +114,13 @@ class ProjectionSheet(Sheet):
         the activity for this sheet, and send the result out.
         """
         self.activity *= 0.0
-        for name in self.in_projections:
-            for proj in self.in_projections[name]:
-                self.activity+= proj.activity
+
+        for proj in self.in_connections:
+            self.activity+= proj.activity
+
         if self.apply_output_fn:
             self.activity = self.output_fn(self.activity)
+
         self.send_output(data=self.activity)
 
 
@@ -165,14 +154,16 @@ class ProjectionSheet(Sheet):
         The sheet's own activity is not calculated until activate()
         is called.
         """
+        # CEBHACKALERT: can remove assert statement.
         assert isinstance(conn,Projection), type(conn)
         conn.activate(input_activity)
         
-
+    # CEBHACKALERT: check if we still need this now that in_connections
+    # is a list. We should be able to delete it.
     def projections(self):
         """
-        Return a dictionary {projection_name, projection} of all the in_projections
+        Return a dictionary {projection_name, projection} of all the in_connections
         for this Sheet.
         """
-        return dict([(p.name,p) for p in chain(*self.in_projections.values())])
+        return dict([(p.name,p) for p in self.in_connections])
 

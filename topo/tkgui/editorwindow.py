@@ -542,7 +542,7 @@ class ModelEditor :
         # create the editor covers for the connections
         for editor_node in self.canvas.object_list :
             node = editor_node.sheet
-            for connection_list in node.out_connections.values() :
+            for connection_list in node.out_connections:
                 for con in connection_list :
                     # create cover for a projection
                     editor_connection = EditorProjection("", self.canvas, editor_node)

@@ -6,11 +6,11 @@ $Id$
 """
 __version__='$Revision$'
 
+from Numeric import argmax,exp,floor
+
 from topo.base.arrayutils import L2norm
 from topo.base.parameterclasses import Number
-from Numeric import argmax,exp,floor
 from topo.base.cf import CFSheet
-from itertools import chain
 from topo.learningfns.som import SOMLF
 
 
@@ -64,7 +64,7 @@ class CFSOM(CFSheet):
         """
         rows,cols = self.activity.shape
         radius = self.radius() * self.density
-        for proj in chain(*self.in_projections.values()):
+        for proj in self.in_connections:
             proj.learning_rate = self.alpha()
             if isinstance(proj.learning_fn, SOMLF):
                 proj.learning_fn.learning_radius = radius

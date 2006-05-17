@@ -183,7 +183,7 @@ class ProjectionPanel(TemplatePlotGroupPanel):
             self._sim_ep = [ep for ep in self._sim_eps
                             if ep.name == sheet_name][0]
             self.tmp_projections = dict([(i.name, i) for i in
-                                     chain(*self._sim_ep.in_projections.values())])
+                                         self._sim_ep.in_connections])
 	    self.projections= KeyedList()
             sorted_list = self.tmp_projections.items()
             sorted_list.sort(cmp_projections)

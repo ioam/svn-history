@@ -8,8 +8,6 @@ __version__='$Revision$'
 
 import Numeric
 
-from itertools import chain
-
 from topo.base.cf import CFSheet
 from topo.base.parameterclasses import BooleanParameter, Number, Integer
 from topo.base.projection import OutputFnParameter
@@ -47,10 +45,9 @@ class LISSOM(CFSheet):
         if self.new_iteration:
             self.new_iteration = False
             self.activity *= 0.0
-            for name in self.in_projections:
-                for proj in self.in_projections[name]:
-                    proj.activity *= 0.0
-
+            for proj in self.in_connections:
+                proj.activity *= 0.0
+                    
         super(LISSOM,self).input_event(conn,data)
 
 
@@ -85,6 +82,6 @@ class LISSOM(CFSheet):
 
     # print the weights of a unit
     def printwts(self,x,y):
-        for proj in chain(*self.in_projections.values()):
+        for proj in self.in_connections:
             print proj.name, x, y
             print proj.cfs[x][y].weights

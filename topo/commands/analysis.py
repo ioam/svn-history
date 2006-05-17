@@ -107,33 +107,39 @@ def measure_cog():
 
     f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
     measured_sheets = filter(f,topo.sim.objects(Sheet).values())
-    
+
+    # CEBHACKALERT: indentation is different from elsewhere
+    # CEBHACKALERT: instead of detecting projectionsheets here, why not
+    # just get only projectionsheets above? And shouldn't it be specifically for
+    # a CFSheet, not just any projectionsheet?
+    from topo.base.projection import ProjectionSheet
     for sheet in measured_sheets:
-      if hasattr(sheet,'in_projections'):
-        for projlist in sheet.in_projections.values():
-            for proj in projlist:
-                rows,cols=sheet.activity.shape
-                xpref=zeros((rows,cols),Float)
-                ypref=zeros((rows,cols),Float)
-                for r in xrange(rows):
-                    for c in xrange(cols):
-                        cf=proj.cf(r,c)
-                        r1,r2,c1,c2 = cf.slice_array
-                        row_centroid,col_centroid = centroid(cf.weights)
-                        xcentroid, ycentroid = proj.src.matrix2sheet(
-                            r1+row_centroid+0.5,
-                            c1+col_centroid+0.5)
-
-                        xpref[r][c]= xcentroid
-                        ypref[r][c]= ycentroid
-
-                ### JCALERT: This will need to be extended to work when there are multiple
-                ### projections to this sheet; right now only the last one in the list
-                ### will show up.
-                new_view = SheetView((xpref,sheet.bounds), sheet.name,sheet.precedence)
-                sheet.sheet_view_dict['XCoG']=new_view
-                new_view = SheetView((ypref,sheet.bounds), sheet.name,sheet.precedence)
-                sheet.sheet_view_dict['YCoG']=new_view
+      if isinstance(sheet, ProjectionSheet):
+        for proj in sheet.in_connections:
+            rows,cols=sheet.activity.shape
+            xpref=zeros((rows,cols),Float)
+            ypref=zeros((rows,cols),Float)
+            for r in xrange(rows):
+                for c in xrange(cols):
+                    cf=proj.cf(r,c)
+                    r1,r2,c1,c2 = cf.slice_array
+                    row_centroid,col_centroid = centroid(cf.weights)
+                    xcentroid, ycentroid = proj.src.matrix2sheet(
+                        r1+row_centroid+0.5,
+                        c1+col_centroid+0.5)
+                    
+                    xpref[r][c]= xcentroid
+                    ypref[r][c]= ycentroid
+                    
+                    ### JCALERT: This will need to be extended to work
+                    ### when there are multiple projections to this sheet;
+                    ### right now only the last one in the list will show
+                    ### up.
+                    
+                    new_view = SheetView((xpref,sheet.bounds), sheet.name,sheet.precedence)
+                    sheet.sheet_view_dict['XCoG']=new_view
+                    new_view = SheetView((ypref,sheet.bounds), sheet.name,sheet.precedence)
+                    sheet.sheet_view_dict['YCoG']=new_view
     
                 
 

@@ -23,7 +23,6 @@ __version__ = '$Revision$'
 
 import Numeric
 import copy
-from itertools import chain
 
 import topo
 
@@ -838,7 +837,7 @@ class CFSheet(ProjectionSheet):
         """
         Call the learn() method on every CFProjection to the Sheet.
         """
-        for proj in chain(*self.in_projections.values()):
+        for proj in self.in_connections:
             proj.learn()
             proj.apply_output_fn()
 
@@ -867,14 +866,8 @@ class CFSheet(ProjectionSheet):
 	Each UnitView is then added to the sheet_view_dict of its source sheet.
 	It returns the list of all UnitView for the given unit.
 	"""     
-        ### JCALERT! The use of the chain function (here and in projection.py)
-        ### could be deleted after re-organizing the way projections are stored
-        ### in self.in_projections. I think there is no need to store a list at all.
-        ### (see ProjectionSheet in projection.py)
-        in_projections = [p for p in chain(*self.in_projections.values())]
-
         # We check that all the projections are CFProjection
-        for p in in_projections:
+        for p in self.in_connections:
             if not isinstance(p,CFProjection):
                 ### JCALERT! Choose if we raise an error or if we just delete the
                 ### Non-CFProjection from the in_projection list.
@@ -885,7 +878,7 @@ class CFSheet(ProjectionSheet):
         else:
             projection_filter = lambda p: p.name==projection_name
             
-        views = [p.get_view(x,y) for p in in_projections if projection_filter(p)]
+        views = [p.get_view(x,y) for p in self.in_connections if projection_filter(p)]
 
         for v in views:
             src = v.projection.src

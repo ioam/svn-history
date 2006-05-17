@@ -181,18 +181,10 @@ class EventProcessor(ParameterizedObject):
         """
         super(EventProcessor,self).__init__(**config)
 
-        # The out_connection db is a dictionary indexed by output port.  Each 
-        # output port refers to a list of EPConnection objects with that 
-        # output port. This optimizes the lookup of the set of outgoing
-        # connections from the same port.
-        # The in_connection is just a general list. Subclass can use other
-        # data stuctures to optimize the operations specific to it
-        # by overriding _connect_from().
-
-        # JABHACKALERT: These should both be plain lists; the dictionary
-        # doesn't serve any useful purpose any more
+        # A subclass could use another data stucture to optimize operations
+        # specific to itself, if it also overrides _connect_from().
         self.in_connections = []
-        self.out_connections = {None:[]}
+        self.out_connections = []
 
         self.simulation = None
 
@@ -205,12 +197,11 @@ class EventProcessor(ParameterizedObject):
         Add the specified connection to the list of outgoing connections.
         Should only be called from Simulation.connect().
         """
-        ### JABALERT: Should check name for uniqueness just as _connect_from does.
-
-        if not conn.src_port in self.out_connections:
-            self.out_connections[conn.src_port] = []
+        for existing_connection in self.out_connections:
+            if existing_connection.name==conn.name and existing_connection.dest==conn.dest:
+                raise ValueError('A connection out of an EventProcessor must have a unique name; "%s" out of %s already exists'%(conn.name,self.name))
   
-        self.out_connections[conn.src_port].append(conn)
+        self.out_connections.append(conn)
 
 
     def _connect_from(self,conn):
@@ -236,13 +227,18 @@ class EventProcessor(ParameterizedObject):
         """
         pass
 
+
     def send_output(self,src_port=None,data=None):
         """
         Send some data out to all connections on the given src_port.
         """
-        for conn in self.out_connections[src_port]:
+        out_conns_on_src_port = [conn for conn in self.out_connections
+                                 if conn.src_port==src_port]
+
+        for conn in out_conns_on_src_port:
             e=EPConnectionEvent(conn.delay+self.simulation.time(),conn,data)
             self.simulation.enqueue_event(e)
+            
 
     def input_event(self,conn,data):
         """
