@@ -10,6 +10,8 @@ from Tkinter import Button, Label, Frame, Toplevel, TOP, LEFT, RIGHT, BOTTOM, E,
 import Pmw
 import math
 
+import topo
+
 from topo.commands.analysis import update_activity
 from parametersframe import ParametersFrame
 
@@ -321,6 +323,7 @@ class EditorSheet(EditorNode) :
             self.canvas.delete(id)
         self.canvas.delete(self.label)
         self.canvas.remove_object(self) # remove from canvas' object list
+        del topo.sim[self.sheet.name] # actually delete the sheet
 
     def move(self, x, y) :
         # the connections position is updated
