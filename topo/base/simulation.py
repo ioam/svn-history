@@ -471,9 +471,10 @@ class Simulation(ParameterizedObject):
             self.warning("EventProcessor "+str(ep)+" () already exists in the simulation and will not be added.")
         else:
             ep.name=ep_name
-            # CEBHACKALERT: if this is overwriting an existing EP,
-            # it ought to delete it properly (i.e. remove connections
-            # etc). We need a delete() method already anyway.
+            # deletes and overwrites any existing EP with the same name,
+            # silently, as if a dictionary
+            if ep.name in self._event_processors: del self[ep.name]
+                
             self._event_processors[ep_name] = ep
             ep.simulation = self
             ep.start()
