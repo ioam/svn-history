@@ -13,7 +13,6 @@ import topo
 from topo.analysis.featuremap import MeasureFeatureMap
 from topo.base.arrayutils import octave_output, centroid
 from topo.base.cf import CFSheet
-from topo.base.projection import ProjectionSheet
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
 import topo.base.patterngenerator
@@ -107,9 +106,7 @@ def measure_cog():
     # which give a blank CoG plot as of 1 Mar 2006, instead of a perfect grid.
 
     f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-    # CEBHACKALERT: shouldn't it be specifically for a CFSheet,
-    # not just any projectionsheet?
-    measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
+    measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
 
     for sheet in measured_sheets:
         for proj in sheet.in_connections:
