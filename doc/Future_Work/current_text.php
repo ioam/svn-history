@@ -18,6 +18,10 @@ was first added to the list, or a change was made.)
 <!-- ### These tasks before the next release (i.e. 2006/05/08) ### -->
 
 <li>
+2006/05/16 (CB): Problem with SharedWeightCFProjection cvs CFProjection.
+</li>
+
+<li>
 2006/05/15 (CB): deal with trivial hackalerts in simulation.py [** before release]
 </li>
 
@@ -56,36 +60,12 @@ was first added to the list, or a change was made.)
 <!-- ### end of 'before release' ### -->
 
 
-<li> 
-2006/05/02 (CB): Finish Slice and SheetCoordinateSystem classes.
-</li>
-
 <li>
 2006/05/15 (CB): Matching lissom_oo_or with C++ lissom. 
 </li>
 
 <li>
-2006/05/15: All arrays should be Numeric.Float32
-</li>
-
-<li>
-2006/04/27 (CB): Allowing there to be a slower, more in-depth set of tests (that don't run with make tests, etc). Slower tests that are required: pickling, that example networks' results haven't changed, that performance doesn't get worse
-</li>
-
-<li>
-2006/05/15: Objects in the simulation are indexed by name, so name needs to be a constant Parameter. There is probably an easy way to allow renaming, though. Hacks in ParametersFrame.
-</li>
-
-<li> 
-2006/05/04: Tidy model editor's handling of sheet and projection class parameeters (why does the parametersframe have to be in a separate window for the widgets to work properly)?
-</li>
-
-<li>
 2006/04/07: (CB) Allowing joint normalization of projections for a CFSheet. [This appears to work, but results from LISSOM simulations do not yet match those of C++ LISSOM.]
-</li>
-
-<li>
-2006/05/02 (CB): HACKALERTs relating to connection fields; test file for connectionfield.
 </li>
 
 <li> 
@@ -115,7 +95,32 @@ to generate a new value.
 </li>
 
 <li>
+2006/05/15: All arrays should be Numeric.Float32
+</li>
+
+<li>
+2006/05/02 (CB): HACKALERTs relating to connection fields; test file for connectionfield.
+</li>
+
+<li>
+2006/04/27 (CB): Allowing there to be a slower, more in-depth set of tests (that don't run with make tests, etc). Slower tests that are required: pickling, that example networks' results haven't changed, that performance doesn't get worse
+</li>
+
+<li>
+2006/05/15: Objects in the simulation are indexed by name, so name needs to be a constant Parameter. There is probably an easy way to allow renaming, though. Hacks in ParametersFrame.
+</li>
+
+<li> 
+2006/05/04: Tidy model editor's handling of sheet and projection class parameeters (why does the parametersframe have to be in a separate window for the widgets to work properly)?
+</li>
+
+
+<li>
 2006/04/07: (CB) Implement joint normalization via ports - check ports work as expected.
+</li>
+
+<li> 
+2006/05/02 (CB): Finish Slice and SheetCoordinateSystem classes.
 </li>
 
 <li> 
