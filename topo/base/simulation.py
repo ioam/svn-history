@@ -201,9 +201,17 @@ class EventProcessor(ParameterizedObject):
         Add the specified connection to the list of outgoing connections.
         Should only be called from Simulation.connect().
         """
+
+        # CB: outgoing connection must have a unique name
+##         for existing_connection in self.out_connections:
+##             if existing_connection.name==conn.name:
+##                 raise ValueError('A connection out of an EventProcessor must have a unique name; "%s" out of %s already exists'%(conn.name,self.name))
+
+        # CB: outgoing connection must be uniquely named among others going
+        # to the same destination.
         for existing_connection in self.out_connections:
             if existing_connection.name==conn.name and existing_connection.dest==conn.dest:
-                raise ValueError('A connection out of an EventProcessor must have a unique name; "%s" out of %s already exists'%(conn.name,self.name))
+                raise ValueError('A connection out of an EventProcessor must have a unique name among connections to a particular destination; "%s" out of %s into %s already exists'%(conn.name,conn.dest,self.name))
   
         self.out_connections.append(conn)
 
