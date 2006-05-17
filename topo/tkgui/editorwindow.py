@@ -540,6 +540,7 @@ class ModelEditor :
             self.canvas.add_object(editor_node)
 
         # create the editor covers for the connections
+        
         for editor_node in self.canvas.object_list :
             node = editor_node.sheet
             for connection_list in node.out_connections:
@@ -551,6 +552,7 @@ class ModelEditor :
                         if (dest_editor_node.sheet == con.dest) :
                             dest = dest_editor_node
                             break
+                    # CEBHACKALERT: looks like indentation is messed up?
                     else :
                         print "Incomplete connection : ", con
                         break
