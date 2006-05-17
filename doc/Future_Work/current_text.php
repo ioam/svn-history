@@ -35,9 +35,6 @@ was first added to the list, or a change was made.)
 2006/05/15 (CB): Comments about relative performance of c++ CFP functions vs python CFP with C++ single function vs all-python.  [** before release]
 </li>
 
-<li>
-2006/05/07 (CB): DynamicNumbers in the model editor (ParametersFrame). [** before release]
-</li>
 
 <li>
 2006/05/06: Rename Sheet's bounds and density to nominal_bounds and nominal_density. Rename SheetCoordinateSystem's true_bounds attribute to bounds. [** before release]
@@ -53,10 +50,6 @@ was first added to the list, or a change was made.)
 
 <li>
 2006/04/24 (CB): Update tutorials now that scripts don't need to be run before loading a snapshot. [** before release]
-</li>
-
-<li> 
-2006/05/02 (CB): Procedure for making a Windows binary. [** before release]
 </li>
 
 
@@ -95,10 +88,6 @@ was first added to the list, or a change was made.)
 2006/05/02 (CB): HACKALERTs relating to connection fields; test file for connectionfield.
 </li>
 
-<li>
-2006/04/07: (CB) Implement joint normalization via ports - check ports work as expected.
-</li>
-
 <li> 
 2006/02/23 (all): Ensuring classes are declared abstract when they should be, and making sure base and simple classes are imported into packages (i.e. Sheet into topo/sheets/, Projection into topo/projections/, Constant into topo/patterns/, and so on).
 </li>
@@ -117,7 +106,16 @@ Tasks which the developers are about to start.
 <ul>
 
 <li>
-2006/04/27 (CB): Number, DynamicNumber: allowing an attribute that has been declared as a Number to work with something that produces a number (i.e. do it properly - because it does work at the moment).
+2006/05/17 (CB): Number, DynamicNumber: allowing an attribute that has
+been declared as a Number to work with something that produces a
+number (i.e. do it properly - because it does work at the
+moment). Includes making sure something sensible happens in model
+editor, and that printing dynamic parameters doesn't cause them
+to generate a new value.
+</li>
+
+<li>
+2006/04/07: (CB) Implement joint normalization via ports - check ports work as expected.
 </li>
 
 <li> 
@@ -131,7 +129,6 @@ Tasks which the developers are about to start.
 <li>
 2006/04/20 (CB): write test file for Composite and complete Image's test file.
 </li>
-
 
 <li>
 2006/02/24 (CB): SheetSelectorParameter etc (so that the GUI (model editor) can
