@@ -496,6 +496,8 @@ class Simulation(ParameterizedObject):
     # CEBHACKALERT: should be reimplemented. Results in unnecessary looping,
     # is difficult to understand, and contains the same code twice. But it
     # does work.
+    # Should at least be split so there's a 'delete_connection' method that
+    # can also separately be used to delete connections.
     def __delete_ep(self,ep_name):
         """
         Remove the specified EventProcessor from the simulation, plus
