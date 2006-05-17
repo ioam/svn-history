@@ -551,7 +551,6 @@ class ModelEditor :
                     if (dest_editor_node.sheet == con.dest) :
                         dest = dest_editor_node
                         break
-                # CEBHACKALERT: looks like indentation is messed up?
                 else :
                     print "Incomplete connection : ", con
                     break
