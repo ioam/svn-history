@@ -111,8 +111,6 @@ def measure_cog():
     # not just any projectionsheet?
     measured_sheets = filter(f,topo.sim.objects(ProjectionSheet).values())
 
-    # CEBHACKALERT: indentation is different from elsewhere
-
     for sheet in measured_sheets:
         for proj in sheet.in_connections:
             rows,cols=sheet.activity.shape
