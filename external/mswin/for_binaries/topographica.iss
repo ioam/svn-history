@@ -21,8 +21,8 @@ SolidCompression=yes
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
-[Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+;[Tasks]
+;Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
 Source: "D:\Program Files\topographica\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -34,7 +34,7 @@ Source: "D:\Program Files\topographica\*"; DestDir: "{app}"; Flags: ignoreversio
 
 [Run]
 Filename: "{app}\setup\setup.bat"; WorkingDir: "{app}\setup"; Flags: runhidden
-Filename: "{app}\topographica.bat"; Description: "{cm:LaunchProgram,Topographica}"; Flags: shellexec postinstall skipifsilent
+Filename: "{app}\topographica.bat"; Parameters: "-g"; Description: "{cm:LaunchProgram,Topographica}"; Flags: shellexec postinstall skipifsilent
 
 [UninstallDelete]
 ; we don't remove user-created files but CEBHACKALERT this includes leaving behind .pyc files.
