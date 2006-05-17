@@ -162,7 +162,7 @@ class SimSingleton(Singleton):
         self.actual_sim[item_name]=item_value
 
     def __delitem__(self,item_name):
-        """Allow dictionary-style access to the simulation."""
+        """Allow dictionary-style deletion of objects from the simulation."""
         del self.actual_sim[item_name]
 
 
