@@ -5,7 +5,7 @@
 
 [Setup]
 AppName=Topographica
-AppVerName=Topographica 0.8
+AppVerName=Topographica 0.8.2
 AppPublisher=Topographica development team
 AppPublisherURL=http://www.topographica.org
 AppSupportURL=http://www.topographica.org
@@ -23,8 +23,8 @@ SolidCompression=yes
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
-;[Tasks]
-;Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+[Tasks]
+Name: desktopicon; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
 Source: "D:\Program Files\topographica\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -62,7 +62,3 @@ Filename: "{app}\topographica.bat"; Parameters: "-g"; Description: "{cm:LaunchPr
 Type: filesandordirs; Name: "{app}\python_topo"
 Type: files; Name: "{app}\topographica"
 Type: files; Name: "{app}\topographica.bat"
-
-
-; CEBHACKALERT: should have [UninstallRun] section to remove desktop shortcut and .ty association.
-
