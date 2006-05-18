@@ -39,14 +39,14 @@ repository. Please follow the appropriate set of instructions below.
 commands installed), log in to the CVS server using the command:
 
 <pre>
-  cvs -d :pserver:anonymous@cvs.sf.net:/cvsroot/topographica login
+  cvs -d :pserver:anonymous@topographica.cvs.sf.net:/cvsroot/topographica login
 </pre>
 
 When a password is requested, just press return.  Then change to
 wherever you want the files to be stored, and use the command:
 
 <pre>
-  cvs -d :pserver:anonymous@cvs.sf.net:/cvsroot/topographica
+  cvs -d :pserver:anonymous@topographica.cvs.sf.net:/cvsroot/topographica
   checkout -P -r LATEST_STABLE topographica
 </pre>
 
@@ -64,7 +64,7 @@ usable due to work in progress.
 using TortoiseCVS 1.8.25).  After installing TortoiseCVS, open the
 Windows directory where you want the files to be located on your
 machine, right click, select "CVS Checkout", fill in CVSROOT as
-<code>:pserver:anonymous@cvs.sf.net:/cvsroot/topographica</code>, and
+<code>:pserver:anonymous@topographica.cvs.sf.net:/cvsroot/topographica</code>, and
 type in <code>topographica</code> for the module name.  Before
 clicking OK, select the "Revision" tab and select "Choose branch or
 tag", filling in "LATEST_STABLE" as the tag name (unless you want the
@@ -81,7 +81,7 @@ Just type <code>export CVS_RSH=ssh</code> for <code>sh/bash</code> or
 in your shell startup file.  The checkout command is then:
 
 <pre>
-  cvs -d ':ext:<i>uname</i>@cvs.sourceforge.net:/cvsroot/topographica' checkout topographica
+  cvs -d ':ext:<i>uname</i>@topographica.cvs.sf.net:/cvsroot/topographica' checkout topographica
 </pre>
 
 where <i>uname</i> should be replaced with your SourceForge.net
@@ -93,7 +93,7 @@ most up-to-date version for editing.
 
 <P>Windows users can use the read-only procedure described
 for TortoiseCVS above, replacing CVSROOT with
-<code>:ext:<i>uname</i>@cvs.sourceforge.net:/cvsroot/topographica</code>.
+<code>:ext:<i>uname</i>@topographica.cvs.sf.net:/cvsroot/topographica</code>.
 You will typically need to have an SSH client installed for this to
 work, such as
 <A HREF="http://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</A>.
