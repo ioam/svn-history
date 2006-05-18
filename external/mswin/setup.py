@@ -1,6 +1,7 @@
-# Create topographica.py script, topographica.bat batch file,
-# put shortcut on desktop, associate .ty files, put Topographica
-# icon in registry.
+# Create topographica.py script, topographica.bat batch file
+
+# first commandline argument is path
+# second commandline argument is whether or not to put shortcut on desktop, associate .ty files, put Topographica icon in registry ("cvs" for yes, anything else for no)
 
 
 
@@ -12,10 +13,13 @@ from _winreg import *
 # argument comes from setup.bat
 path = os.path.abspath(sys.argv[1])
 
+cvs_topo = sys.argv[2]
+
+
 compiler_path = "python_topo\\mingw\\bin"
 
 
-# CEBHACKALERT: it's like the Makefile; can't it be the same?
+# CEBHACKALERT: it's like the Makefile here; can't it be the same?
 
 # topographica script
 f = open(os.path.join(path,"topographica"),'w')
@@ -47,18 +51,19 @@ f.close()
 
 
 
-# Link '.ty' file extension to  "topographica.bat -g"
-bat_path = os.path.join(path,'topographica.bat')
-ico_path = os.path.join(path,'topographica.ico')
-
-os.system('assoc .ty=Topographica.Script')
-os.system('ftype Topographica.Script="' + bat_path + '" -g "%1"')
+if cvs_topo=="cvs":
+    # Link '.ty' file extension to  "topographica.bat -g"
+    bat_path = os.path.join(path,'topographica.bat')
+    ico_path = os.path.join(path,'topographica.ico')
     
-# and add the Topographica icon to the registry.
-namepathkey = OpenKey(HKEY_CLASSES_ROOT,'Topographica.Script',0,KEY_SET_VALUE)
-SetValue(namepathkey,None,REG_SZ,'Topographica Script')
-SetValue(namepathkey,'DefaultIcon',REG_SZ, ico_path)
-
-# and create a desktop shortcut
-# by calling a windows scripting file
-os.system('wscript create_shortcut.vbs "' + path + '"')
+    os.system('assoc .ty=Topographica.Script')
+    os.system('ftype Topographica.Script="' + bat_path + '" -g "%1"')
+    
+    # and add the Topographica icon to the registry.
+    namepathkey = OpenKey(HKEY_CLASSES_ROOT,'Topographica.Script',0,KEY_SET_VALUE)
+    SetValue(namepathkey,None,REG_SZ,'Topographica Script')
+    SetValue(namepathkey,'DefaultIcon',REG_SZ, ico_path)
+    
+    # and create a desktop shortcut
+    # by calling a windows scripting file
+    os.system('wscript create_shortcut.vbs "' + path + '"')

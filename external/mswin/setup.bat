@@ -47,7 +47,11 @@ move /Y python_topo ..\..\
 REM create startup scripts for Topographica
 echo.
 echo * Creating scripts and file association...
-..\..\python_topo\python.exe setup.py "%instdir%"
+
+REM pass "cvs" option so we get the shortcut and
+REM association, etc (could put an if here)
+..\..\python_topo\python.exe setup.py "%instdir%" "cvs"
+
 set installed="True"
 goto end
 
