@@ -49,20 +49,23 @@ SharedWeightCFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
 ###########################################
 # build simulation
 
-topo.sim['Retina'] = GeneratorSheet(density=24.0,input_generator=input_pattern,
-                                    period=1.0, phase=0.05,
-                                    bounds=BoundingBox(radius=0.5+0.25+0.375))
+topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
+                                  input_generator=input_pattern,
+                                  period=1.0, phase=0.05,
+                                  nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
 
-topo.sim['LGNOn'] = CFSheet(density=24.0,bounds=BoundingBox(radius=0.5+0.25),
-                  output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
-                  measure_maps=False)
+topo.sim['LGNOn']=CFSheet(nominal_density=24.0,
+                          nominal_bounds=BoundingBox(radius=0.5+0.25),
+                          output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                          measure_maps=False)
 
-topo.sim['LGNOff'] = CFSheet(density=24.0,bounds=BoundingBox(radius=0.5+0.25),
-                   output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
-                   measure_maps=False)
+topo.sim['LGNOff']=CFSheet(nominal_density=24.0,
+                           nominal_bounds=BoundingBox(radius=0.5+0.25),
+                           output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                           measure_maps=False)
 
-topo.sim['V1'] = LISSOM(density=locals().get('default_density',48.0),
-                        bounds=BoundingBox(radius=0.5))
+topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
+                        nominal_bounds=BoundingBox(radius=0.5))
 
 topo.sim['V1'].output_fn.lower_bound=0.083
 topo.sim['V1'].output_fn.upper_bound=0.633

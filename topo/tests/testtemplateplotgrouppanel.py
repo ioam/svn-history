@@ -37,7 +37,7 @@ class TestActivityPanel(unittest.TestCase):
     
         """
         GeneratorSheet.period = 1.0
-        GeneratorSheet.density = 30
+        GeneratorSheet.nominal_density = 30
 #        base.print_level = topo.base.parameterizedobject.WARNING
 #        GeneratorSheet.print_level = topo.base.parameterizedobject.WARNING
         

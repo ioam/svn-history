@@ -145,7 +145,7 @@ assert round(min_exc_rad,5) == 1.59091
 fixedpoint.DEFAULT_PRECISION=3
 
 # input generation params
-GeneratorSheet.density = BaseRN*area_scale
+GeneratorSheet.nominal_density = BaseRN*area_scale
 GeneratorSheet.period = 1
 GeneratorSheet.phase=0.05
 
@@ -191,16 +191,16 @@ SharedWeightCFProjection.response_fn=SharedWeightCFPDotProduct_opt1()
 
 
 
-topo.sim['Retina'] = GeneratorSheet(bounds=retina_bounds,
+topo.sim['Retina'] = GeneratorSheet(nominal_bounds=retina_bounds,
                                     input_generator=input_pattern)
 
-topo.sim['LGNOn'] = CFSheet(bounds=lgn_bounds,density=24.0,
+topo.sim['LGNOn'] = CFSheet(nominal_bounds=lgn_bounds,nominal_density=24.0,
                       output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
 
-topo.sim['LGNOff'] = CFSheet(bounds=lgn_bounds,density=24.0,
+topo.sim['LGNOff'] = CFSheet(nominal_bounds=lgn_bounds,nominal_density=24.0,
                       output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
 
-topo.sim['V1'] = LISSOM(density=48.0,
+topo.sim['V1'] = LISSOM(nominal_density=48.0,
             output_fn=PiecewiseLinear(lower_bound=delta,upper_bound=beta))
 
 

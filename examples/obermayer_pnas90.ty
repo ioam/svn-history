@@ -68,7 +68,7 @@ class ObermayerSOM(CFSOM):
 # input patterns
 GeneratorSheet.period = 1.0
 GeneratorSheet.phase = 0.25
-GeneratorSheet.density = 30
+GeneratorSheet.nominal_density = 30
 
 
 gaussian_width = 0.23/sqrt(2)
@@ -82,7 +82,7 @@ input_pattern = topo.patterns.basic.Gaussian(
     bounds=BoundingBox(radius=0.5))
 
 # cortical sheet
-ObermayerSOM.density = 25 #6
+ObermayerSOM.nominal_density = 25 #6
 ObermayerSOM.learning_length = 30000
 
 RandomArray.seed(500,500)

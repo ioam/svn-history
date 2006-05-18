@@ -36,8 +36,8 @@ class TestFeatureMap(unittest.TestCase):
     def setUp(self):
 
         # sheet to test. As it is, its activity matrix dimension is (3,2)
-        Sheet.density = 1
-        Sheet.bounds = BoundingBox(points=((-1,-2),(1,1)))
+        Sheet.nominal_density = 1
+        Sheet.nominal_bounds = BoundingBox(points=((-1,-2),(1,1)))
         test_sheet = Sheet()
         # simple activity arrays use to update the feature maps
         self.a1 = array([[1,1], [1,1], [1,1]])
@@ -194,9 +194,9 @@ class TestMeasureFeatureMap(unittest.TestCase):
         Create a CFSOM sheet ('V1') connected to a GeneratorSheet ('Retina').
         """
         self.s = Simulation()
-        self.s['Retina']=GeneratorSheet(density=4.0)
-        self.s['V1']= CFSOM(density=4.0)
-        self.s['V2'] = CFSOM(density=4.0)
+        self.s['Retina']=GeneratorSheet(nominal_density=4.0)
+        self.s['V1']= CFSOM(nominal_density=4.0)
+        self.s['V2'] = CFSOM(nominal_density=4.0)
 
         self.s.connect('Retina','V1',delay=0.5,connection_type=CFProjection,
                        name='RtoV1',learning_fn=HebbianSOMLF())

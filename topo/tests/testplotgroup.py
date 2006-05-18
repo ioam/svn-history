@@ -172,7 +172,7 @@ from topo.base.patterngenerator import BoundingBox
 
 #           self.sim = Simulation()
 
-#           CFSOM.density = 10
+#           CFSOM.nominal_density = 10
           
 #           V1 = CFSOM(name='V1')
 #           V2 = CFSOM(name='V2')

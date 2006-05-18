@@ -324,7 +324,7 @@ class PatternSampler(ParameterizedObject):
             for i in xrange(rows):
                 for j in xrange(cols):
                     # indexes outside the pattern are left with the background color
-                    if self.pattern_sheet.true_bounds.contains_exclusive(x[i,j],y[i,j]):
+                    if self.pattern_sheet.bounds.contains_exclusive(x[i,j],y[i,j]):
                         pattern_sample[i,j] = self.pattern_sheet.activity[r[i,j],c[i,j]]
 
         return pattern_sample

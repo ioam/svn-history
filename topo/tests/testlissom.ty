@@ -60,9 +60,9 @@ from topo.base.parameterclasses import DynamicNumber
 from topo.learningfns.optimized import DivisiveHebbian
 from topo.patterns import PatternGeneratorParameter
 
-GeneratorSheet.density = 5.0 
+GeneratorSheet.nominal_density = 5.0 
 GeneratorSheet.period = 1
-GeneratorSheet.bounds = BoundingBox(points=((-0.7,-0.7),(0.7,0.7)))
+GeneratorSheet.nominal_bounds = BoundingBox(points=((-0.7,-0.7),(0.7,0.7)))
 
 random.seed(1234)
 topo.patterns.basic.Gaussian.scale = 1.0    
@@ -73,7 +73,7 @@ topo.patterns.basic.Gaussian.size = 2*0.5
 topo.patterns.basic.Gaussian.aspect_ratio = 0.1/0.5   
 topo.patterns.basic.Gaussian.bounds = BoundingBox(points=((-0.5,-0.5),(0.5,0.5)))
 
-LISSOM.density = 10.0
+LISSOM.nominal_density = 10.0
 
 afferent_weight_bounds   = BoundingBox(points=((-0.2,-0.2),(0.2,0.2)))
 excitatory_weight_bounds = BoundingBox(points=((-0.1,-0.1),(0.1,0.1)))

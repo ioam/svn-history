@@ -389,7 +389,7 @@ class EditorSheet(EditorNode) :
     def matrix_element_count(self) :
         # returns the length and width of the matrix that holds this sheet's plot values
         lbrt = self.sheet.bounds.aarect().lbrt()
-        density = self.sheet.density
+        density = self.sheet.xdensity
         return int(density *(lbrt[2] - lbrt[0])), int(density *(lbrt[3] - lbrt[1]))
     
     def set_bounds(self) :

@@ -63,7 +63,7 @@ class CFSOM(CFSheet):
         Call the learn() method on every CFProjection to the Sheet.
         """
         rows,cols = self.activity.shape
-        radius = self.radius() * self.density
+        radius = self.radius() * self.xdensity
         for proj in self.in_connections:
             proj.learning_rate = self.alpha()
             if isinstance(proj.learning_fn, SOMLF):

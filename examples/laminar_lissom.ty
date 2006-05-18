@@ -33,10 +33,10 @@ topo.sim.name = "laminar_lissom"
 
 input_bounds = BoundingBox(radius=0.72)
 
-GeneratorSheet.density = 24.0
+GeneratorSheet.nominal_density = 24.0
 GeneratorSheet.period = 1
 GeneratorSheet.phase = 0.05
-GeneratorSheet.bounds = input_bounds
+GeneratorSheet.nominal_bounds = input_bounds
 
 
 input_pattern = topo.patterns.basic.Gaussian(
@@ -49,7 +49,7 @@ input_pattern = topo.patterns.basic.Gaussian(
 
 
 # LISSOM parameters
-LISSOM.density = 24.0
+LISSOM.nominal_density = 24.0
 
 
 # Specify weight initialization, response function, and learning function
@@ -74,17 +74,17 @@ topo.sim.connect('Retina','V1Exc', delay = FixedPoint("0.05",4),
                  nominal_bounds_template=BoundingBox(radius=0.22),learning_rate=1.274)
 
 topo.sim.connect('V1Exc','V1Exc', delay = FixedPoint("0.10",4),
-		   connection_type=CFProjection,strength = 0.9, name='LateralExcitatory',
-		   nominal_bounds_template =BoundingBox(radius=0.10),
-                   learning_rate=2.674)
+                 connection_type=CFProjection,strength = 0.9, name='LateralExcitatory',
+                 nominal_bounds_template =BoundingBox(radius=0.10),
+                 learning_rate=2.674)
 
 topo.sim.connect('V1Exc','V1Inh', delay = FixedPoint("0.05",4),
-                   connection_type=CFProjection,strength = 0.9, name='V1Exc_to_V1Inh',
-                   nominal_bounds_template = BoundingBox(radius=0.10),learning_rate=2.674)
+                 connection_type=CFProjection,strength = 0.9, name='V1Exc_to_V1Inh',
+                 nominal_bounds_template = BoundingBox(radius=0.10),learning_rate=2.674)
 
 topo.sim.connect('V1Inh','V1Exc', delay = FixedPoint("0.05",4),
-                         connection_type=CFProjection,strength=-0.9, name='V1Inh_to_V1Exc',
-                         nominal_bounds_template = BoundingBox(radius=0.25),learning_rate=2.466)
+                 connection_type=CFProjection,strength=-0.9, name='V1Inh_to_V1Exc',
+                 nominal_bounds_template = BoundingBox(radius=0.25),learning_rate=2.466)
 
 
 ### Schedule bounds changes

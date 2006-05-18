@@ -34,10 +34,10 @@ topo.sim.name = "laminar"
 
 input_bounds = BoundingBox(radius=0.72)
 
-GeneratorSheet.density = 24.0
+GeneratorSheet.nominal_density = 24.0
 GeneratorSheet.period = 1
 GeneratorSheet.phase = 0.05
-GeneratorSheet.bounds = input_bounds
+GeneratorSheet.nominal_bounds = input_bounds
 
 
 input_pattern = topo.patterns.basic.Gaussian(
@@ -63,8 +63,8 @@ CFProjection.weights_output_fn=CFPDivisiveSumNormalize_opt1()
 # build simulation
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
-topo.sim['V1Exc'] = LISSOM(bounds=BoundingBox(radius=0.5),tsettle=9)
-topo.sim['V1Inh'] = LISSOM(bounds=BoundingBox(radius=0.4),tsettle=8)
+topo.sim['V1Exc'] = LISSOM(nominal_bounds=BoundingBox(radius=0.5),tsettle=9)
+topo.sim['V1Inh'] = LISSOM(nominal_bounds=BoundingBox(radius=0.4),tsettle=8)
 
 topo.sim.connect('Retina','V1Exc', delay = FixedPoint("0.05",4),
                  connection_type=CFProjection,strength=1.0,name='Afferent',

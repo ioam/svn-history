@@ -14,7 +14,7 @@ should be used wherever possible, except when the code needs direct
 access to a specific unit.  By adhering to this convention, one should
 be able to write and debug a simulation at a low density, and then
 scale it up to run at higher densities (or down for lower densities)
-simply by changing e.g. Sheet.density.
+simply by changing e.g. Sheet.nominal_density.
 
 $Id$
 """
@@ -31,9 +31,6 @@ from boundingregion import BoundingBox, BoundingRegionParameter
 import sheetview 
 
 
-# CEBHACKALERT: bounds -> nominal_bounds, density -> nominal_density
-# SheetCoordinateSystem's true_bounds -> bounds.
-
 class Sheet(EventProcessor,SheetCoordinateSystem):
     """
     The generic base class for neural sheets.
@@ -43,7 +40,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
     """
     _abstract_class_name = "Sheet"
 
-    bounds = BoundingRegionParameter(
+    nominal_bounds = BoundingRegionParameter(
         BoundingBox(radius=0.5),constant=True,
         doc="""
             User-specified BoundingBox of the Sheet coordinate area
@@ -59,7 +56,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
             of this object.
             """)
     
-    density = Number(
+    nominal_density = Number(
         default=10,constant=True,
         doc="""
             User-specified number of processing units per 1.0 distance
@@ -99,7 +96,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
 
         # Initialize this object as a SheetCoordinateSystem, with
         # the same density along y as along x.
-        SheetCoordinateSystem.__init__(self,self.bounds,self.density)
+        SheetCoordinateSystem.__init__(self,self.nominal_bounds,self.nominal_density)
 
         n_units = round((self.lbrt[2]-self.lbrt[0])*self.xdensity,0)
         if n_units<1: raise ValueError(
@@ -284,7 +281,7 @@ class Slice(object):
         """
         Crop the slice to the SheetCoordinateSystem's bounds.
         """
-        r1,r2,c1,c2 = self.__ct.bounds2slice(self.__ct.true_bounds)
+        r1,r2,c1,c2 = self.__ct.bounds2slice(self.__ct.bounds)
         maxrow,maxcol = r2-r1,c2-c1
                         
         t_idx,b_idx,l_idx,r_idx = self.__slice

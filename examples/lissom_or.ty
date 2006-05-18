@@ -32,10 +32,10 @@ topo.sim.name = "lissom_or"
 
 ### Setup input
 #
-GeneratorSheet.density = 24.0 
+GeneratorSheet.nominal_density = 24.0 
 GeneratorSheet.period = 1
 GeneratorSheet.phase = 0.05
-GeneratorSheet.bounds = BoundingBox(radius=0.72)
+GeneratorSheet.nominal_bounds = BoundingBox(radius=0.72)
 
 input_pattern = topo.patterns.basic.Gaussian(
     scale=1.0,size=2*0.0468,aspect_ratio=4.0,
@@ -48,7 +48,7 @@ input_pattern = topo.patterns.basic.Gaussian(
 
 ### LISSOM parameters
 #
-LISSOM.density = locals().get('default_density',48.0)
+LISSOM.nominal_density = locals().get('default_density',48.0)
 
 
 ### Specify weight initialization, response function, and learning function

@@ -63,8 +63,8 @@ class TestSheetView(unittest.TestCase):
 
 # CEBHACKALERT: replace with test using Image
 ##     def test_view(self):
-##         ImageGenerator.bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
-##         ImageGenerator.density = 100
+##         ImageGenerator.nominal_bounds = BoundingBox(points=((-0.8,-0.8),(0.8,0.8)))
+##         ImageGenerator.nominal_density = 100
         
 ##         input = ImageGenerator(filename='topo/tests/testsheetview.ppm')
 ## 	sv = SheetView((input.activity,input.bounds),

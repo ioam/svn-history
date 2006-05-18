@@ -33,10 +33,10 @@ topo.sim.name = "hierarchical"
 
 # input patterns
 
-GeneratorSheet.bounds = BoundingBox(points=((-0.75,-0.5),(0.75,0.5)))
+GeneratorSheet.nominal_bounds = BoundingBox(points=((-0.75,-0.5),(0.75,0.5)))
 GeneratorSheet.period = 1.0
 GeneratorSheet.phase = 0.25
-GeneratorSheet.density = 20
+GeneratorSheet.nominal_density = 20
 
 
 # CEBHACKALERT: something isn't working about using e.g.
@@ -63,7 +63,7 @@ right_input_pattern = topo.patterns.basic.Line(
 
 
 # cortical sheet
-CFSOM.density = locals().get('default_density',10.0)
+CFSOM.nominal_density = locals().get('default_density',10.0)
 CFSOM.learning_length = 10000
 CFSOM.radius_0 = 0.1
 

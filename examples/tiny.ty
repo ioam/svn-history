@@ -71,10 +71,10 @@ gaussian_generator = topo.patterns.basic.Gaussian(
 
 # Sheets, connections, and their parameters
 topo.sim['Retina'] = GeneratorSheet(input_generator=gaussian_generator,
-                                    bounds=BoundingBox(radius=0.6),
-                                    period=1.0,phase=0.25,density=24)
+                                    nominal_bounds=BoundingBox(radius=0.6),
+                                    period=1.0,phase=0.25,nominal_density=24)
 
-topo.sim['V1'] = CFSheet(density=5,bounds=BoundingBox(radius=0.5),
+topo.sim['V1'] = CFSheet(nominal_density=5,nominal_bounds=BoundingBox(radius=0.5),
                          output_fn=PiecewiseLinear(lower_bound=0,upper_bound=1.0))
 
 topo.sim.connect(

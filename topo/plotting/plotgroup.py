@@ -161,7 +161,7 @@ class PlotGroup(ParameterizedObject):
             else:
 		if self.sheetcoords:		   
                     s = topo.sim.objects(Sheet).get(plot.plot_src_name,None)
-		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(s.density)/max_sheet_height)
+		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(s.xdensity)/max_sheet_height)
 		else:
 		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(plot.bitmap.height()))
                     ### JABHACKALERT: Enforces a minimum scaling factor of 1,
@@ -184,7 +184,7 @@ class PlotGroup(ParameterizedObject):
 	max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
  			  -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
  			  for p in self.plots if p.resize])
-	max_density = max([topo.sim.objects(Sheet)[p.plot_src_name].density
+	max_density = max([topo.sim.objects(Sheet)[p.plot_src_name].xdensity
 			   for p in self.plots if p.resize])
 	sheet_max_height = max_density*max_sheet_height
 	matrix_max_height = max([p.bitmap.height() for p in self.plots if p.resize])
@@ -271,9 +271,9 @@ class TemplatePlotGroup(PlotGroup):
 #       bb=BoundingBox(points=((-1.0,-1.0),(1.0,1.0)))
 # 	bb1=BoundingBox(points=((-0.25,-0.25),(0.25,0.25)))
 # 	bb2=BoundingBox(points=((-0.75,-0.5),(0.75,0.5)))
-# 	p = make_template_plot(plot_channels,sheet.sheet_view_dict,sheet.density,
+# 	p = make_template_plot(plot_channels,sheet.sheet_view_dict,sheet.xdensity,
 #  			       bb,self.normalize,name=plot_name)
-        p = make_template_plot(plot_channels,sheet.sheet_view_dict,sheet.density,
+        p = make_template_plot(plot_channels,sheet.sheet_view_dict,sheet.xdensity,
  			       sheet.bounds,self.normalize,name=plot_name)
 	return [p]
 
@@ -341,15 +341,15 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
 		    key = ('Weights',sheet.name,p.name,self.x,self.y)
 		    plot_channels['Strength'] = key
 		    if self.situate:
-			plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
+			plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.xdensity,
 							    None,self.normalize,name=p.name))
 		    else:
 			(r,c) = p.dest.sheet2matrixidx(self.x,self.y)
-			plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.density,
+			plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.xdensity,
 							    p.cf(r,c).bounds,self.normalize,name=p.name))
 			
 	    else:
-		 plot_list.append(make_template_plot(pt,sheet.sheet_view_dict,sheet.density,
+		 plot_list.append(make_template_plot(pt,sheet.sheet_view_dict,sheet.xdensity,
 						     sheet.bounds,self.normalize,name=pt_name))
         return plot_list
 
@@ -422,11 +422,11 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 		key = ('Weights',sheet.name,projection.name,x,y)
 		plot_channels['Strength'] = key
 		if self.situate:
-		    plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,src_sheet.density,
+		    plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,src_sheet.xdensity,
 							src_sheet.bounds,self.normalize))
 		else:
 		    (r,c) = projection.dest.sheet2matrixidx(x,y)
-		    plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,src_sheet.density,
+		    plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,src_sheet.xdensity,
 							projection.cf(r,c).bounds,self.normalize))
         return plot_list
 
@@ -476,7 +476,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
             else:
 		if self.sheetcoords:		   
                     s = topo.sim.objects(Sheet).get(plot.plot_src_name,None)
-		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(s.density)/max_sheet_height)
+		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(s.xdensity)/max_sheet_height)
 		else:
 		    scaling_factor=self.sizeconvertfn(self.height_of_tallest_plot/float(matrix_max_height))
 	    plot.bitmap.image = plot.bitmap.zoom(scaling_factor)

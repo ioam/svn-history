@@ -156,7 +156,7 @@ class SheetCoordinateSystem(object):
 
     ### CEBHACKALERT: temporary implementation
     def get_shape(self):
-        r1,r2,c1,c2 = self.bounds2slice(self.true_bounds)
+        r1,r2,c1,c2 = self.bounds2slice(self.bounds)
         return (r2-r1,c2-c1)
 
     ### shape is a property so that it's like Numeric.array.shape
@@ -179,7 +179,7 @@ class SheetCoordinateSystem(object):
         if not ydensity:
             bounds,xdensity = self.__equalize_densities(bounds,xdensity)
 
-        self.true_bounds = bounds
+        self.bounds = bounds
         self.xdensity, self.ydensity = xdensity, ydensity or xdensity
         self.lbrt = array(bounds.lbrt())
 

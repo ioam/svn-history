@@ -151,7 +151,7 @@ fixedpoint.DEFAULT_PRECISION=3
 random.seed(1234)
 
 # input generation params
-GeneratorSheet.density = BaseRN*area_scale
+GeneratorSheet.nominal_density = BaseRN*area_scale
 GeneratorSheet.period = 1
 GeneratorSheet.phase = 0.05
 
@@ -182,7 +182,7 @@ input_pattern = topo.patterns.basic.Gaussian(
 
 # LISSOM parameters
 LISSOM.output_fn = PiecewiseLinear(lower_bound=delta,upper_bound=beta)
-LISSOM.density = BaseN
+LISSOM.nominal_density = BaseN
 #LISSOM.tsettle=tsettle
 
 # Connection parameters
@@ -198,7 +198,7 @@ CFProjection.weights_output_fn=CFPDivisiveSumNormalize_opt1()
 
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
-                                    bounds = input_bounds)
+                                    nominal_bounds=input_bounds)
 topo.sim['V1'] = LISSOM()
 
 topo.sim.connect('Retina','V1', delay = fixedpoint.FixedPoint("0.05"),

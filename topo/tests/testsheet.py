@@ -431,11 +431,12 @@ class TestCoordinateTransforms(unittest.TestCase):
         # in this case.
         # The y center of the bounds should remain -0.0025. Hence we should get
         # a bottom bound of -1.0025 and a top one of 0.9975.
-        sheet = Sheet(density=10,
-                      bounds=BoundingBox(points=((-0.5,-1.005),(0.5,1.0))))
+        sheet = Sheet(nominal_density=10,
+                      nominal_bounds=BoundingBox(points=((-0.5,-1.005),(0.5,1.0))))
 
-        self.assertEqual(sheet.density,10)
-        
+        self.assertEqual(sheet.xdensity,10)
+        self.assertEqual(sheet.xdensity,sheet.ydensity)
+
         l,b,r,t = sheet.lbrt
         self.assertEqual(l,-0.5)
         self.assertEqual(r,0.5)                      
@@ -448,7 +449,7 @@ class TestCoordinateTransforms(unittest.TestCase):
     # called something different
     def test_connection_field_like(self):
         # test a ConnectionField-like example
-        sheet = Sheet(density=10,bounds=BoundingBox(radius=0.5))
+        sheet = Sheet(nominal_density=10,nominal_bounds=BoundingBox(radius=0.5))
         cf_bounds = BoundingBox(points=((0.3,0.3),(0.6,0.6)))
 
         slice_ = Slice(cf_bounds,sheet)

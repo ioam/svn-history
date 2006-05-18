@@ -162,43 +162,43 @@ SharedWeightCFProjection.response_fn = SharedWeightCFPDotProduct_opt1()
 # build simulation
 topo.sim.name='big and small'
 
-topo.sim['Retina'] = GeneratorSheet(density=24.0,bounds=BoundingBox(radius=v1size+retinabuffer),input_generator=input_pattern,phase=0.05)
+topo.sim['Retina'] = GeneratorSheet(nominal_density=24.0,nominal_bounds=BoundingBox(radius=v1size+retinabuffer),input_generator=input_pattern,phase=0.05)
                         
 #topo.sim['Retina'] = GeneratorSheet(density=12.0,bounds=BoundingBox(radius=v1size+retinabuffer),input_generator=CompositePatternGenerator([input_pattern,input_pattern,input_pattern,input_pattern]),phase=0.05)
                         
 topo.sim['LGNOn'] = CFSheet(
-	density=12.0,bounds=BoundingBox(radius=v1size+lgnbuffer),
+	nominal_density=12.0,nominal_bounds=BoundingBox(radius=v1size+lgnbuffer),
 	output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
 	measure_maps=False)
 
 topo.sim['LGNOff'] = CFSheet(
-	density=12.0,bounds=BoundingBox(radius=v1size+lgnbuffer),
+	nominal_density=12.0,nominal_bounds=BoundingBox(radius=v1size+lgnbuffer),
 	output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
 	measure_maps=False)
 
-topo.sim['V1'] = LISSOM(density=24.0,bounds=BoundingBox(radius=v1size))
+topo.sim['V1'] = LISSOM(nominal_density=24.0,nominal_bounds=BoundingBox(radius=v1size))
 
 topo.sim['V1'].output_fn.lower_bound=0.083
 topo.sim['V1'].output_fn.upper_bound=0.633
 
 
 topo.sim['LGNOns'] = CFSheet(
-	density=24.0,bounds=BoundingBox(radius=v1sizes+lgnbuffers),
+	nominal_density=24.0,nominal_bounds=BoundingBox(radius=v1sizes+lgnbuffers),
 	output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
 	measure_maps=False)
 	 
 topo.sim['LGNOffs'] = CFSheet(
-	density=24.0,bounds=BoundingBox(radius=v1sizes+lgnbuffers),
+	nominal_density=24.0,nominal_bounds=BoundingBox(radius=v1sizes+lgnbuffers),
 	output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
 	measure_maps=False)
 
-topo.sim['V1s'] = LISSOM(density=48.0,bounds=BoundingBox(radius=v1sizes))
+topo.sim['V1s'] = LISSOM(nominal_density=48.0,nominal_bounds=BoundingBox(radius=v1sizes))
 
 topo.sim['V1s'].output_fn.lower_bound=0.083
 topo.sim['V1s'].output_fn.upper_bound=0.633
 
 
-topo.sim.zapdensity=topo.sim['Retina'].density,topo.sim['LGNOff'].density,topo.sim['LGNOffs'].density,topo.sim['LGNOn'].density,topo.sim['LGNOns'].density,topo.sim['V1'].density,topo.sim['V1s'].density
+topo.sim.zapdensity=topo.sim['Retina'].xdensity,topo.sim['LGNOff'].xdensity,topo.sim['LGNOffs'].xdensity,topo.sim['LGNOn'].xdensity,topo.sim['LGNOns'].xdensity,topo.sim['V1'].xdensity,topo.sim['V1s'].xdensity
 
 
 

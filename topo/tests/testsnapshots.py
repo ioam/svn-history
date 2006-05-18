@@ -37,7 +37,7 @@ class TestSnapshots(unittest.TestCase):
         comes back ok.
         """
         test_sim_name = "testing_sim"
-        Sheet.density = 2.0
+        Sheet.nominal_density = 2.0
         topo.sim.name = test_sim_name
         topo.sim['Retina'] = GeneratorSheet()
         topo.sim['V1'] = CFSheet()
