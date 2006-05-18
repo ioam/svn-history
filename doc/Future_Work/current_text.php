@@ -37,10 +37,6 @@ was first added to the list, or a change was made.)
 2006/05/15 (CB): Comments about relative performance of c++ CFP functions vs python CFP with C++ single function vs all-python.  [** before release]
 </li>
 
-<li>
-2006/05/17 (CB): add a delete connection method, make model editor use it [** before release]
-</li>
-
 <li> 
 2006/04/24 (CB): Update user manuals regarding Sheet density [** before release]
 </li>
