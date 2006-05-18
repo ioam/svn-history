@@ -15,6 +15,8 @@ import topo
 from topo.commands.analysis import update_activity
 from parametersframe import ParametersFrame
 
+# CEBHACKALERT: any reason this isn't a new-style class
+# (i.e. why doesn't this inherit from object)?
 class EditorObject :
     """
     Anything that can be added and manipulated in an EditorCanvas. Every EditorCanvas
@@ -463,6 +465,11 @@ class EditorConnection(EditorObject) :
         self.from_node.attach_connection(self, self.FROM) # tell the sheets that they are connected.
         self.to_node.attach_connection(self, self.TO)
 
+    def remove(self):
+        # CEBHACKALERT: there's no code to handle GUI object removal
+        # (though it looks like the EditorProjection subclass implements it).
+        self.connection.remove()
+
     ############ Util methods ##############################
     def show_properties(self) :
         EditorObject.show_properties(self)
@@ -647,6 +654,11 @@ class EditorProjection(EditorConnection) :
         for id in self.id : # remove the representation from the canvas
             self.canvas.delete(id)
         self.canvas.delete(self.label)
+
+        # CEBHACKALERT: see alert about EditorObject not inheriting from object.
+        EditorConnection.remove(self)
+        #super(EditorProjection,self).remove()
+        
 
     def decrement_draw_index(self) :
         self.draw_index -= 1
