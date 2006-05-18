@@ -413,6 +413,14 @@ class EditorSheet(EditorNode) :
 
 ####################################################################
 
+
+### JABALERT: From the behavior in the Model Editor, this seems to be
+### treating all Connections as Projections.  Specifically, the self
+### Connection of a GeneratorSheet is rendered like a lateral
+### connection (with a dotted oval) rather than with (e.g.) a circular
+### arrow.  The Projection support should also acknowledge that it is
+### specific to CFProjection, because other representations would be
+### appropriate for other types of Projection.
 class EditorConnection(EditorObject) :
 
     """
@@ -501,8 +509,8 @@ class EditorProjection(EditorConnection) :
         self.set_focus(False)  
 
     def set_colours(self) :
-        colours = {'video' : ('dark red', 'purple', 'yellow'),
-                   'normal': ('dark red', 'purple', 'yellow'),
+        colours = {'video' : ('dark red', 'blue', 'yellow'),
+                   'normal': ('dark red', 'blue', 'yellow'),
                    'printing': ('grey', 'black', 'black')}
         self.colour = colours[self.mode]
 
