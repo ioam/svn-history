@@ -16,6 +16,7 @@ DefaultGroupName=Topographica
 LicenseFile=D:\Program Files\topographica\COPYING.txt
 InfoBeforeFile=D:\Program Files\topographica\README.txt
 OutputBaseFilename=setup
+;; set to none when testing or you will be here a long time
 Compression=lzma
 SolidCompression=yes
 
