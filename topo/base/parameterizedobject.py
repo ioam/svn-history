@@ -455,7 +455,7 @@ class ParameterizedObjectMetaclass(type):
             if isinstance(value,Parameter):
                 self.__param_inheritance(attribute_name,value)
             else:
-                print (" ##WARNING## Setting non-Parameter class attribute %s.%s = %s "
+                print ("Warning: Setting non-Parameter class attribute %s.%s = %s "
                        % (self.__name__,attribute_name,`value`))
 
                 
@@ -672,24 +672,19 @@ class ParameterizedObject(object):
         sys.stdout.flush()
 
     def warning(self,*args):
-        """
-        Print the arguments as a warning.
-        """
-        self.__db_print(WARNING,"##WARNING##",*args)
+        """Print the arguments as a warning."""
+        self.__db_print(WARNING,"Warning:",*args)
+        
     def message(self,*args):
-        """
-        Print the arguments as a message.
-        """
+        """Print the arguments as a message."""
         self.__db_print(MESSAGE,*args)
+        
     def verbose(self,*args):
-        """
-        Print the arguments as a verbose message.
-        """
+        """Print the arguments as a verbose message."""
         self.__db_print(VERBOSE,*args)
+        
     def debug(self,*args):
-        """
-        Print the arguments as a debugging statement.
-        """
+        """Print the arguments as a debugging statement."""
         self.__db_print(DEBUG,*args)
 
 
@@ -737,9 +732,6 @@ class ParameterizedObject(object):
             if item not in self.params():
                 self.warning("'%s' was ignored (not a Parameter)."%item)
 
-
-                
-            
 
     def get_param_values(self):
         """Return a list of name,value pairs for all Parameters of this object"""
@@ -814,12 +806,15 @@ class ParameterizedObject(object):
 
 
 def print_all_param_defaults():
-    print "========= Parameter Default Values ========"
+    print "_______________________________________________________________________________"
+    print ""
+    print "                           Parameter Default Values"
+    print ""
     classes = descendents(ParameterizedObject)
     classes.sort(key=lambda x:x.__name__)
     for c in classes:
         c.print_param_defaults()
-    print "==========================================="
+    print "_______________________________________________________________________________"
 
 
 
