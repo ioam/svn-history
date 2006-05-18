@@ -71,8 +71,7 @@ class PatternGenerator(ParameterizedObject):
 
     orientation = Number(
         default=0,softbounds=(0.0,2*pi),precedence=0.40,
-        doc="""
-        Polar angle of pattern, i.e. the orientation in Cartesian coordinate
+        doc="""Polar angle of pattern, i.e. the orientation in Cartesian coordinate
         system, with zero at 3 o'clock and increasing counterclockwise.""")
     
     scale = Number(
@@ -86,7 +85,7 @@ class PatternGenerator(ParameterizedObject):
     output_fn = OutputFnParameter(
         default=IdentityOF(),
         precedence=0.08,
-        doc='Function applied to the pattern array after it has been created.')
+        doc="Function to apply to the pattern array after it has been created.")
 
         
     def __call__(self,**params):
@@ -111,6 +110,7 @@ class PatternGenerator(ParameterizedObject):
         offset = params.get('offset',self.offset)
         output_fn = params.get('output_fn',self.output_fn)
 
+        # Optimization: Skip output_fn if IdentityOF.
         if output_fn is IdentityOF:
             return scale*self.function(**params)+offset
         else:
@@ -186,6 +186,7 @@ class Constant(PatternGenerator):
 
         shape = SheetCoordinateSystem(bounds,xdensity,ydensity).shape
 
+        # Optimization: Skip output_fn if IdentityOF.
         if output_fn is IdentityOF:
             return scale*ones(shape, Float)+offset
         else:
@@ -194,18 +195,11 @@ class Constant(PatternGenerator):
 
 
 class PatternGeneratorParameter(ClassSelectorParameter):
-    """
-    """
+    """Parameter whose value can be any instance of a PatternGenerator class."""
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
     packages = []
 
     def __init__(self,default=Constant(),**params):
-        """
-        """
         super(PatternGeneratorParameter,self).__init__(PatternGenerator,default=default,suffix_to_lose='Generator',**params)
-
-
-
-
