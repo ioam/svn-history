@@ -50,7 +50,7 @@ Root: HKCR; Subkey: "TopographicaScript\DefaultIcon"; ValueType: string; ValueNa
 
 ;"shell\open\command" is the registry key that specifies the program to execute when a file of the type is double-clicked in Explorer.
 ;The surrounding quotes are in the command line so it handles long filenames correctly.
-Root: HKCR; Subkey: "Topographica\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\topographica.bat"" -g ""%1"""
+Root: HKCR; Subkey: "TopographicaScript\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\topographica.bat"" -g ""%1"""
 
 
 [Run]
