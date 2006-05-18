@@ -38,10 +38,6 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/05/06: Rename Sheet's bounds and density to nominal_bounds and nominal_density. Rename SheetCoordinateSystem's true_bounds attribute to bounds. [** before release]
-</li>
-
-<li>
 2006/05/17 (CB): add a delete connection method, make model editor use it [** before release]
 </li>
 
