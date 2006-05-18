@@ -72,7 +72,7 @@ class ProjectionSheet(Sheet):
     """
     output_fn = OutputFnParameter(
         default=IdentityOF(),
-        doc='output function applied (optionally) to the ProjectionSheet activity.')
+        doc='Output function applied (optionally) to the ProjectionSheet activity.')
     
     apply_output_fn=BooleanParameter(default=True)
 
@@ -85,7 +85,8 @@ class ProjectionSheet(Sheet):
     def _connect_from(self, conn):
         """
         See EventProcessor's _connect_from(); raises an error if conn is not
-        a Projection.
+        a Projection.  Subclasses of ProjectionSheet that know how to handle
+        other types of Connections should override this method.
         """
         if isinstance(conn, Projection):
             super(ProjectionSheet,self)._connect_from(conn)
