@@ -15,10 +15,11 @@ DefaultDirName={pf}\Topographica
 DefaultGroupName=Topographica
 LicenseFile=D:\Program Files\topographica\COPYING.txt
 InfoBeforeFile=D:\Program Files\topographica\README.txt
-OutputBaseFilename=setup
+OutputBaseFilename=setup_topographica
 ;; set to none when testing or you will be here a long time
 Compression=lzma
 SolidCompression=yes
+SetupIconFile=D:\Program Files\topographica\topographica.ico
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -31,9 +32,9 @@ Source: "D:\Program Files\topographica\*"; DestDir: "{app}"; Flags: ignoreversio
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{group}\Topographica"; Filename: "{app}\topographica.bat"; WorkingDir: "{app}"; Parameters: "-g"
+Name: "{group}\Topographica"; Filename: "{app}\topographica.bat"; WorkingDir: "{app}"; Parameters: "-g"; IconFilename: "{app}\topographica.ico"
 Name: "{group}\Uninstall Topographica"; Filename: "{uninstallexe}"
-Name: "{userdesktop}\Topographica"; Filename: "{app}\topographica.bat"; Tasks: desktopicon
+Name: "{userdesktop}\Topographica"; Filename: "{app}\topographica.bat"; Tasks: desktopicon; IconFilename: "{app}\topographica.ico"
 
 
 [Registry]
