@@ -43,11 +43,6 @@ python_doc_locations = ('http://www.python.org/doc/')
 topo_www_locations = ('http://www.topographica.org/')
 
 
-# CEBHACKALERT: lose this and get TopoConsole.simulation instead
-def active_sim():
-    return topo.sim
-
-
 # If a particular plotgroup_template needs (or works better with) a
 # specific subclass of PlotPanel, the writer of the new subclass
 # or the plotgroup_template can declare here that that template

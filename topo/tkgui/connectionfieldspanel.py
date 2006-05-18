@@ -15,6 +15,8 @@ import __main__
 
 from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry,Label,NSEW, Checkbutton,NORMAL,DISABLED
 
+import topo
+
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from topo.base.projection import ProjectionSheet
 from topo.plotting.plotgroup import ConnectionFieldsPlotGroup
@@ -67,8 +69,7 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         """
         # Create the item list for CFSheet 'Sheet'  This will not change
         # since this window will only examine one Simulation.
-        sim = topoconsole.active_sim()
-        self._sim_eps = [ep for ep in sim.objects(Sheet).values()
+        self._sim_eps = [ep for ep in topo.sim.objects(Sheet).values()
                   if isinstance(ep,topo.base.cf.CFSheet)]
 	self._sim_eps.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
         sim_ep_names = [ep.name for ep in self._sim_eps]
@@ -155,7 +156,7 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         if isinstance(self.x,int): self.x = float(self.x)
         if isinstance(self.y,int): self.y = float(self.y)
 
-        ep = [ep for ep in topoconsole.active_sim().objects(Sheet).values()
+        ep = [ep for ep in topo.sim.objects(Sheet).values()
               if ep.name == self.region.get()][0]
         # This assumes that displaying the rectangle information is enough.
         l,b,r,t = ep.bounds.aarect().lbrt()

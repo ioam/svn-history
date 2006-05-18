@@ -24,6 +24,8 @@ __version__='$Revision$'
 import copy
 import Pmw
 
+import topo
+
 import topo.base.patterngenerator
 import topo.base.sheetview
 
@@ -61,7 +63,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         #                           'pattern_generator': <pg_obj> }
         #                         }    
         self.generator_sheets_patterns = {}
-        for (gen_sheet_name,gen_sheet) in topoconsole.active_sim().objects(GeneratorSheet).items():
+        for (gen_sheet_name,gen_sheet) in topo.sim.objects(GeneratorSheet).items():
             self.generator_sheets_patterns[gen_sheet_name] = {'generator_sheet': gen_sheet,
                                                               'editing': True,
                                                               'pattern_generator': None} 
@@ -166,7 +168,7 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         """
         Only open if GeneratorSheets are in the Simulation.
         """
-        sim = topoconsole.active_sim()
+        sim = topo.sim
         if sim.objects(GeneratorSheet).items():
             return True
         else:
