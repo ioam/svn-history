@@ -5,7 +5,6 @@ OutputFns: accept and modify a 2d array
 ResponseFns: accept two 2d arrays and return a scalar
 LearningFns: accept two 2d arrays and a scalar, return one of the arrays modified
 
-
 $Id$
 """
 __version__='$Revision$'
@@ -155,9 +154,9 @@ class ResponseFn(ParameterizedObject):
         raise NotImplementedError
 
 
-### JAB: Could be rewritten using weave.blitz to avoid creating a temporary
-# CB: that comment also applies to all the functions in Numeric that
-# create an intermediate array, so don't operate in-place.
+# This function (and any other Numeric functions that create an
+# intermediate array) might be better rewritten using weave.blitz to
+# avoid creating the temporary.
 class DotProduct(ResponseFn):
     """
     Return the sum of the element-by-element product of two 2D
