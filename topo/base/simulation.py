@@ -590,7 +590,7 @@ class Simulation(ParameterizedObject):
             
             if self.events[0].time < self._time:
                 # Warn and then discard events scheduled *before* the current time
-                self.warning('Discarding event',repr(self.events[0]))
+                self.warning('Discarding stale (unprocessed) event',repr(self.events[0]))
                 self.events.pop(0)
                 
             elif self.events[0].time > self._time:
