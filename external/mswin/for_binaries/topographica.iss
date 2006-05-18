@@ -15,11 +15,10 @@ DefaultDirName={pf}\Topographica
 DefaultGroupName=Topographica
 LicenseFile=D:\Program Files\topographica\COPYING.txt
 InfoBeforeFile=D:\Program Files\topographica\README.txt
-OutputBaseFilename=setup_topographica
+OutputBaseFilename=setup
 ;; set to none when testing or you will be here a long time
 Compression=lzma
 SolidCompression=yes
-SetupIconFile=D:\Program Files\topographica\topographica.ico
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
