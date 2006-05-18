@@ -10,6 +10,7 @@ AppPublisher=Topographica development team
 AppPublisherURL=http://www.topographica.org
 AppSupportURL=http://www.topographica.org
 AppUpdatesURL=http://www.topographica.org
+ChangesAssociations=Yes
 DefaultDirName={pf}\Topographica
 DefaultGroupName=Topographica
 LicenseFile=D:\Program Files\topographica\COPYING.txt
@@ -28,9 +29,28 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Source: "D:\Program Files\topographica\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
-; [Icons]
-; Name: "{group}\Topographica"; Filename: "{app}\topographica.bat"
-; Name: "{userdesktop}\Topographica"; Filename: "{app}\topographica.bat"; Tasks: desktopicon
+[Icons]
+Name: "{group}\Topographica"; Filename: "{app}\topographica.bat"; WorkingDir: "{app}"; Parameters: "-g"
+Name: "{group}\Uninstall Topographica"; Filename: "{uninstallexe}"
+Name: "{userdesktop}\Topographica"; Filename: "{app}\topographica.bat"; Tasks: desktopicon
+
+
+[Registry]
+; ".myp" is the extension we're associating. "MyProgramFile" is the internal name for the file type as stored
+; in the registry. Make sure you use a unique name for this so you don't inadvertently overwrite another
+; application's registry key.
+Root: HKCR; Subkey: ".ty"; ValueType: string; ValueName: ""; ValueData: "TopographicaScript"; Flags: uninsdeletevalue
+
+;"My Program File" is the name for the file type as shown in Explorer.
+Root: HKCR; Subkey: "TopographicaScript"; ValueType: string; ValueName: ""; ValueData: "Topographica Script"; Flags: uninsdeletekey
+
+;"DefaultIcon" is the registry key that specifies the filename containing the icon to associate with the file type.
+Root: HKCR; Subkey: "TopographicaScript\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\topographica.ico"
+
+;"shell\open\command" is the registry key that specifies the program to execute when a file of the type is double-clicked in Explorer.
+;The surrounding quotes are in the command line so it handles long filenames correctly.
+Root: HKCR; Subkey: "Topographica\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\topographica.bat"" -g ""%1"""
+
 
 [Run]
 Filename: "{app}\setup\setup.bat"; WorkingDir: "{app}\setup"; Flags: runhidden
