@@ -49,10 +49,10 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
             bounds may be adjusted to ensure the density in the y
             direction is the same as the density in the x direction.
             In such a case, the top and bottom bounds are adjusted
-            such that the center y point remains the same, and each
+            so that the center y point remains the same, and each
             bound is as close as possible to its specified value. The
             actual value of this Parameter is not adjusted, but the
-            true bounds may be found from the 'true_bounds' attribute
+            true bounds may be found from the 'bounds' attribute
             of this object.
             """)
     
@@ -63,10 +63,10 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
             horizontally or vertically in Sheet coordinates. The actual
             number may be different because of discretization; the matrix
             needs to tile the plane exactly, and for that to work the
-            density may need to be adjusted.  For instance, an area of 3x2
+            density might need to be adjusted.  For instance, an area of 3x2
             cannot have a density of 2 in each direction. The true density
             may be obtained from either the xdensity or ydensity attribute
-            (for a Sheet, these are identical).
+            (since these are identical for a Sheet).
             """)
     
     # JABALERT: Should be set per-projection, not per-Sheet, right?
