@@ -22,6 +22,7 @@ orientation map network, which can be done by changing to the
 lissom_oo_or_20000.typ".  Depending on the speed of your machine, you
 may want to come back and check on it the next day; on a 3GHz machine
 this training process currently takes about 5 hours.
+<!--CEBHACKALERT: surely not 5 hours any more? More like just over an hour?-->
 </p>
 
 
@@ -40,15 +41,12 @@ Topographica is installed in /home/jbednar/public/topographica/.
 <p></p>
 </li>
 
-<li>Next, start the Topographica GUI, telling it to load the
-lissom simulation:
+<li>Next, start the Topographica GUI:
 <blockquote><code class='to_type'>
-  ./topographica -g examples/lissom_oo_or.ty
+  ./topographica -g
   </code></blockquote>
 <p></p>
   
-After a few tens of seconds while the network is initialized, you should
-see a new window for the GUI:
 <p class='center'>
 <img src="images/topographica_console.png" alt="Console Window"
 align="middle" width="496" height="215">
