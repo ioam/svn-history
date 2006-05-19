@@ -54,9 +54,10 @@ Tasks which the developers are about to start.
 <ul>
 
 <li>
-2006/05/19: Topographica's memory usage grows and grows and grows:
-needs to be investigated. 
+2006/05/19: CFPHebbian_opt1 or CFPDivisiveSumNormalize_opt1 (or both) cause
+memory use to go up each call.
 </li>
+
 
 <li>
 2006/05/17 (CB): Number, DynamicNumber: allowing an attribute that has
