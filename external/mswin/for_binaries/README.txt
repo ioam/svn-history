@@ -5,8 +5,7 @@ Making a Windows installation package
     work under CVS. This means you have run setup.bat in the
     Topographica root directory and can use Topographica.
 
-(2) CEBHACKALERT: run 'make win' on unix to get the release
-    version correct.
+(2) Do a 'make new-version' on unix to update the release numbers
 
 (3) Run 'prepare_for_binaries.bat'
 
@@ -15,11 +14,12 @@ Making a Windows installation package
     version, but you could complile the php files on Windows, good
     luck with that).
 
-(5) Copy topographica.iss to wherever you want to create the .exe
-    file, then delete the external directory (which includes this file
-    so remember the next step!).
+(5) Copy topographica.iss to wherever you want to create the
+    setup.exe file, then delete the external/ directory 
+    (which includes this file, so remember the next step!).
 
 (6) I use 'Inno Setup 5', an open-source installation package creator.
     (See http://www.jrsoftware.org/isinfo.php)
-    The script topographica.iss will create a .exe installation file;
-    just choose 'compile' from the menu.
+    Adjust the paths marked *** to match those on your system, then
+    just choose 'compile' from the 'build' menu. You should get
+    setup.exe.
