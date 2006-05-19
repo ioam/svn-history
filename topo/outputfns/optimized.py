@@ -22,7 +22,10 @@ class DivisiveSumNormalize_opt1(OutputFn):
     OutputFn that divides an array by its sum.
 
     See the equivalent version in outputfns.basic for a
-    description.
+    description. When used as the single_cf_fn in CFP learning
+    functions, provides a performance improvement over the python
+    DivisiveSumNormalize output function.  The all-c++ CFP learning
+    function CFPDivisiveSumNormalize_opt1 is still much faster though.
 
     The given array must be of type Numeric.Float32.
     """
