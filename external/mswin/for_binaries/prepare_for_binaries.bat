@@ -3,23 +3,15 @@
 REM *** SETUP THIS COPY OF TOPOGRAPHICA FOR MAKING A BINARY INSTALLATION ***
 REM *** BE SURE YOU MEAN TO DO THIS TO YOUR COPY! ***
 
-REM    - deletes setup.bat from root topographica directory
-REM    - copies this directory's setup.bat to setup/ subdirectory
+REM    - copies setup.py to root directory
 REM    - cleans files that aren't needed for the binary version
 
 
-
-
-
-
-REM Put the setup scripts into {topographica}/setup/ 
-mkdir ..\..\..\setup
-copy setup.bat ..\..\..\setup\
-copy ..\setup.py ..\..\..\setup\
+REM Put the setup script into {topographica} 
+copy ..\setup.py ..\..\..\
 
 
 REM Clean this copy of Topographica...
-
 
 REM ** root directory
 
