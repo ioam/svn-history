@@ -1,22 +1,33 @@
-# Create topographica.py script, topographica.bat batch file
-
-# first commandline argument is path
-# second commandline argument is whether or not to put shortcut on desktop, associate .ty files, put Topographica icon in registry ("cvs" for yes, anything else for no)
-
-
+# Create topographica script and topographica.bat batch file.
+# (Note that on Windows the batch file is necessary for executing
+# commands at all.)
+#
+# The first argument (required) is the Topographica root directory.
+# A second optional argument "create_associations" may be passed to have
+# this script create file associations and shortcuts. 
+#
+#
+# Examples:
+#
+# To have this script simply make the script and batch file:
+#    setup.py "d:\program files\topographica"
+#
+# To have this script additionally create file associations and shortcuts,
+# it might be invoked as:
+#    setup.py "d:\program files\topographica" "create_associations"
 
 import sys
 import os
 
-from _winreg import *
+create_associations=False
+compiler_path = "python_topo\\mingw\\bin"
 
-# argument comes from setup.bat
+
+# CEBHACKALERT: should check it's valid, etc.
 path = os.path.abspath(sys.argv[1])
 
-cvs_topo = sys.argv[2]
-
-
-compiler_path = "python_topo\\mingw\\bin"
+if sys.argv[2]=="create_associations":
+    create_associations=True
 
 
 # CEBHACKALERT: it's like the Makefile here; can't it be the same?
@@ -50,8 +61,8 @@ f.write("""@echo on"""+'\n')
 f.close()
 
 
-
-if cvs_topo=="cvs":
+from _winreg import *
+if create_associations:
     # Link '.ty' file extension to  "topographica.bat -g"
     bat_path = os.path.join(path,'topographica.bat')
     ico_path = os.path.join(path,'topographica.ico')
