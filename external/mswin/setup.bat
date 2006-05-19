@@ -1,3 +1,5 @@
+REM Script to setup a CVS-controlled copy of Topographica.
+
 @echo off
 
 REM Note that this script assumes it's starting two levels 
@@ -20,6 +22,8 @@ REM check user wants to go ahead
  :start
 echo This script will: 
 echo - install Topographica to %instdir%;
+
+REM these could be optional!
 echo - associate '.ty' files with Topographica;
 echo - put a shortcut to Topographica on your desktop.
 echo.
@@ -48,9 +52,9 @@ REM create startup scripts for Topographica
 echo.
 echo * Creating scripts and file association...
 
-REM pass "cvs" option so we get the shortcut and
-REM association, etc (could put an if here)
-..\..\python_topo\python.exe setup.py "%instdir%" "cvs"
+REM pass "create_associations" option so we get the shortcut and
+REM file association.
+..\..\python_topo\python.exe setup.py "%instdir%" "create_associations"
 
 set installed="True"
 goto end
