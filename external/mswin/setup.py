@@ -29,8 +29,9 @@ compiler_path = "python_topo\\mingw\\bin"
 # CEBHACKALERT: should check it's valid, etc.
 path = os.path.abspath(sys.argv[1])
 
-if sys.argv[2]=="create_associations":
-    create_associations=True
+if len(sys.argv)>2:
+    if sys.argv[2]=="create_associations":
+        create_associations=True
 
 
 # CEBHACKALERT: it's like the Makefile here; can't it be the same?
