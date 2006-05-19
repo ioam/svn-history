@@ -69,6 +69,7 @@ Filename: "{app}\topographica.bat"; Parameters: "-g"; Description: "{cm:LaunchPr
 ;
 ; User-created files do not get removed.
 ; (CEBHACKALERT this includes leaving behind .pyc files.)
+; CEBHACKALERT: shouldn't delete any files modified by user.
 Type: filesandordirs; Name: "{app}\python_topo"
 Type: files; Name: "{app}\topographica"
 Type: files; Name: "{app}\topographica.bat"
