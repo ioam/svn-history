@@ -1,7 +1,10 @@
-; You will need to adjust the source paths (i.e. those currently beginning
-; 'd:\program files\topographica') to wherever is the copy of Topographica
-; that's being used to create the setup file.
-
+; Takes the topographica directory and makes a setup.exe out of it, as well
+; as setting up file associations etc.
+; Also adds uninstall information.
+;
+; See readme.txt for how to use.
+;
+; adjust items marked with *** to match your setup
 
 [Setup]
 AppName=Topographica
@@ -13,10 +16,12 @@ AppUpdatesURL=http://www.topographica.org
 ChangesAssociations=Yes
 DefaultDirName={pf}\Topographica
 DefaultGroupName=Topographica
+; ***
 LicenseFile=D:\Program Files\topographica\COPYING.txt
+; ***
 InfoBeforeFile=D:\Program Files\topographica\README.txt
 OutputBaseFilename=setup
-;; set to none when testing or you will be here a long time
+; set to none when testing or you will be here a long time
 Compression=lzma
 SolidCompression=yes
 
@@ -27,8 +32,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: desktopicon; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
+; ***
 Source: "D:\Program Files\topographica\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{group}\Topographica"; Filename: "{app}\topographica.bat"; WorkingDir: "{app}"; Parameters: "-g"; IconFilename: "{app}\topographica.ico"
@@ -37,21 +42,20 @@ Name: "{userdesktop}\Topographica"; Filename: "{app}\topographica.bat"; Paramete
 
 
 [Registry]
-; ".myp" is the extension we're associating. "MyProgramFile" is the internal name for the file type as stored
-; in the registry. Make sure you use a unique name for this so you don't inadvertently overwrite another
-; application's registry key.
+; add the .ty file type to the registry as TopographicaScript
 Root: HKCR; Subkey: ".ty"; ValueType: string; ValueName: ""; ValueData: "TopographicaScript"; Flags: uninsdeletevalue
 
-;"My Program File" is the name for the file type as shown in Explorer.
+; TopographicaScript will display as "Topographica Script" to users
 Root: HKCR; Subkey: "TopographicaScript"; ValueType: string; ValueName: ""; ValueData: "Topographica Script"; Flags: uninsdeletekey
 
-;"DefaultIcon" is the registry key that specifies the filename containing the icon to associate with the file type.
+; a TopographicaScript is associated with the topographica icon
 Root: HKCR; Subkey: "TopographicaScript\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\topographica.ico"
 
-;"shell\open\command" is the registry key that specifies the program to execute when a file of the type is double-clicked in Explorer.
-;The surrounding quotes are in the command line so it handles long filenames correctly.
+; when a TopographicaScript is double clicked etc, this is what gets run
 Root: HKCR; Subkey: "TopographicaScript\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\topographica.bat"" -g ""%1"""
 
+; CEBHACKALERT: it would be nice also to associate the icon topographica.ico with topographica.bat, but I don't know
+; how to do this.
 
 
 [Run]
