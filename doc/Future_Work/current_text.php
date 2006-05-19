@@ -22,10 +22,6 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/05/17 (CB): Windows binary installation - have the installation package install the desktop and start menu shortcuts, rather than using a .vbs script. [** before release]
-</li>
-
-<li>
 2006/05/15 (CB): Missing scheduled_actions in lissom examples [** before release]
 </li>
 
