@@ -26,10 +26,6 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
-2006/05/15 (CB): min_exc_rad in lissom examples [** before release]
-</li>
-
-<li>
 2006/05/15 (CB): Comments about relative performance of c++ CFP functions vs python CFP with C++ single function vs all-python.  [** before release]
 </li>
 
