@@ -18,7 +18,7 @@ was first added to the list, or a change was made.)
 <!-- ### These tasks before the next release (i.e. 2006/05/08) ### -->
 
 <li>
-2006/05/16 (CB): Problem with SharedWeightCFProjection vs CFProjection.
+2006/05/16 (CB): Problem with SharedWeightCFProjection vs CFProjection. [** before release]
 </li>
 
 <li>
@@ -56,6 +56,21 @@ Tasks which the developers are about to start.
 <li>
 2006/05/19: CFPHebbian_opt1 or CFPDivisiveSumNormalize_opt1 (or both) cause
 memory use to go up each call.
+</li>
+
+<li>
+2006/05/19: look at the output from:
+<code>bin/python lib/python2.4/site-packages/pychecker/checker.py topo/base/*.py</code>.
+Decide which ones of the messages are real problems.  Running it
+right now gives 86 warnings, which isn't too hard to imagine looking
+at.  Some of them look like things that could be genuinely confusing,
+and would be easy to fix (like having local variables named min or
+max), and at least one detected an existing hackalert.  Some others
+are clearly not problems, but then there is a huge category that I
+don't quite understand (like "Function (__init__) uses named
+arguments" or "__set__ is not a special method"); those would be worth
+understanding.  Once that's done for base/, the rest should be much
+easier.
 </li>
 
 
@@ -191,6 +206,11 @@ Ongoing work with uncertain finishing times.
 <ul>
 <li>
 2006/02/21 (CB): Read-only objects, aiming at copy-on-write semantics
+</li>
+
+<li>
+2006/05/19: This file grows each day, without bounds. One day it will be 
+too big to open.
 </li>
 
 <li>
