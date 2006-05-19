@@ -54,6 +54,11 @@ Tasks which the developers are about to start.
 <ul>
 
 <li>
+2006/05/19: Topographica's memory usage grows and grows and grows:
+needs to be investigated. 
+</li>
+
+<li>
 2006/05/17 (CB): Number, DynamicNumber: allowing an attribute that has
 been declared as a Number to work with something that produces a
 number (i.e. do it properly - because it does work at the
