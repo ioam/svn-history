@@ -26,10 +26,6 @@ was first added to the list, or a change was made.)
 </li>
 
 <li> 
-2006/04/24 (CB): Update user manuals regarding Sheet density [** before release]
-</li>
-
-<li> 
 2006/05/02 (CB): Update documentation in general [** before release]
 </li>
 
