@@ -29,10 +29,6 @@ was first added to the list, or a change was made.)
 2006/05/02 (CB): Update documentation in general [** before release]
 </li>
 
-<li>
-2006/04/24 (CB): Update tutorials now that scripts don't need to be run before loading a snapshot. [** before release]
-</li>
-
 
 <!-- ### end of 'before release' ### -->
 
