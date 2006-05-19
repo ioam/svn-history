@@ -632,7 +632,7 @@ class CFProjection(Projection):
         This slice is converted back to the exactly corresponding
         bounds, and these are returned.
         """
-        # don't alter the user_weight_bounds
+        # don't alter the original_bounds
         bounds = copy.deepcopy(original_bounds)
         
         bounds_xcenter,bounds_ycenter=bounds.get_center()
@@ -653,6 +653,9 @@ class CFProjection(Projection):
         # of this, so it will not need to appear here.
         weights_slice =  Slice(bounds,self.src)
         r1,r2,c1,c2 = weights_slice
+
+        
+        
         # r1 and c1 are reflection of r2 and c2 about center_u
         r1=center_row-(r2-center_row-1)
         c1=center_col-(c2-center_col-1)
