@@ -171,11 +171,6 @@ use them.
 2006/05/04 (CB): ParametersFrame needs to be tidied up!
 </li>
 
-<li> 
-2006/03/03: delete objects from simulator; setup GUI to use this.
-</li>
-
-
 <li>
 2006/03/07: make change_bounds() able to enlarge as well as shrink [made a first draft, JL is working with it]
 </li>
