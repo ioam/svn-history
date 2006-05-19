@@ -49,13 +49,12 @@ class PiecewiseLinear(OutputFn):
         return x
 
 
+# CEBHACKALERT: should be DivisiveL1Normalize (i.e. use the
+# absolute values). Delete this and replace its uses with
+# the DivisiveL1Normalize class below (see also optimized.py).
 class DivisiveSumNormalize(OutputFn):
     """
     OutputFn that divides an array by its sum (aka its L1 norm).
-
-    # CEBHACKALERT: I think the L1 norm is the sum of the absolute
-    # values. Is this supposed to be DivisiveSumNormalize or
-    # DivisiveL1Normalize?
 
     This operation ensures that an array has a sum equal to the specified 
     norm_value, rescaling each value to make this true.  The array is 

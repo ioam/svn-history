@@ -14,8 +14,9 @@ from topo.misc.inlinec import inline, optimized
 from basic import DivisiveSumNormalize
 
 
-# CB: will be DivisiveL1Normalize (i.e. will use the
-# absolute values - see basic.py).
+# CEBHACKALERT: the various DivisiveSumNormalize classes
+# should be DivisiveL1Normalize (i.e. use the absolute values - see basic.py).
+
 class DivisiveSumNormalize_opt1(OutputFn):
     """
     OutputFn that divides an array by its sum.
