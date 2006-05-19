@@ -158,13 +158,14 @@ if not optimized:
 
 
 
-# CEBHACKALERT: should be equivalent to DotProduct(). It's definitely
-# faster but I haven't tested it properly. We don't use it.
 class DotProduct_opt1(ResponseFn):
     """
     Dot-product response function. Equivalent to DotProduct.
 
-    Not tested.
+    When used as the single_cf_fn for GenericCFPResponseFn,
+    improves the performance (compared with using DotProduct).
+    However, the entirely C++ CFPDotProduct_opt1 is still
+    much faster.
     """
     def __call__(self, m1, m2):
         rows,cols = m1.shape
