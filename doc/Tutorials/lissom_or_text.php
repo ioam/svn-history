@@ -38,9 +38,8 @@ presenting different visual input patterns.
 <p></p>
 </li>
 
-<li> Next, start the Topographica GUI, telling it to load the
-lissom simulation:
-<blockquote><code class='to_type'>./topographica -g examples/lissom_or.ty</code></blockquote>
+<li> Next, start the Topographica GUI:
+<blockquote><code class='to_type'>./topographica -g</code></blockquote>
 <p></p>
 You should see a new window for the GUI:
 <p class='center'>
