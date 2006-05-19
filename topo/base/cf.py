@@ -518,6 +518,9 @@ class CFProjection(Projection):
 
     strength = Number(default=1.0)
 
+    enforce_min_rad = BooleanParameter(
+        default=True,
+        doc='If true, the bounds_template will be at least a 3x3 matrix.')
 
     def __init__(self,initialize_cfs=True,**params):
         """
@@ -623,11 +626,12 @@ class CFProjection(Projection):
         centers are within the bounds (see
         SheetCoordinateSystem.bounds2slice()). However, to ensure that
         the bounds are treated symmetrically, we take the right and
-        bottom bounds and reflect these about the center of the
-        slice. Hence, if the bounds happen to go through units, if the
-        units are included on the right and bottom bounds, they will
-        be included on the left and top bounds. This ensures that the
-        slice has odd dimensions.
+        bottom bounds and reflect these about the center of the slice
+        (i.e. we take the 'xradius' to be right_col-center_col and the
+        'yradius' to be bottom_col-center_row). Hence, if the bounds
+        happen to go through units, if the units are included on the
+        right and bottom bounds, they will be included on the left and
+        top bounds. This ensures that the slice has odd dimensions.
 
         This slice is converted back to the exactly corresponding
         bounds, and these are returned.
@@ -654,24 +658,34 @@ class CFProjection(Projection):
         weights_slice =  Slice(bounds,self.src)
         r1,r2,c1,c2 = weights_slice
 
-        
-        
-        # r1 and c1 are reflection of r2 and c2 about center_u
-        r1=center_row-(r2-center_row-1)
-        c1=center_col-(c2-center_col-1)
+        xrad = c2-center_col-1
+        yrad = r2-center_row-1
+
+        if self.enforce_min_rad:
+            # ensures at least 3x3 weights matrix
+            if xrad<1: xrad=1
+            if yrad<1: yrad=1
+
+        r2=center_row+yrad+1
+        c2=center_col+xrad+1
+        r1=center_row-yrad
+        c1=center_col-xrad
+
         weights_slice._set_slice((r1,r2,c1,c2))
         ### end CEBHACKALERT
 
         ### Checks:
         # (1) user-supplied bounds must lead to a weights matrix of at
         # least 1x1
-        # (2) weights matrix must be odd (otherwise this method has an error)
-        # (The second check should move to a test file.)
         rows,cols = weights_slice.shape
         if rows==0 or cols==0:
             raise ValueError("nominal_bounds_template results in a zero-sized weights matrix (%s,%s) for %s - you may need to supply a larger nominal_bounds_template or increase the density of the sheet."%(rows,cols,self.name))
-        elif rows%2!=1 or cols%2!=1:
+        # (2) weights matrix must be odd (otherwise this method has an error)
+        # (The second check should move to a test file.)
+        if rows%2!=1 or cols%2!=1:
             raise AssertionError("nominal_bounds_template yielded even-height or even-width weights matrix (%s rows, %s columns) for %s - weights matrix must have odd dimensions."%(rows,cols,self.name))
+
+
 
         return weights_slice.bounds
     
