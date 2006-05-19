@@ -21,8 +21,8 @@ tested successfully on Linux, Mac, and Windows. However, because of the
 rapid pace of development and the developers' limited access to Mac and
 Windows machines, it is possible that some new features will not work
 on these platforms. However, it is not usually difficult for individual 
-tech-savvy users to get Topographica working on those platforms before 
-we have had a chance to look at them.
+tech-savvy users to get these features working on those platforms before 
+we have had a chance to test them.
 
 <P><DT>Progress updating and cancellation</DT><DD> 
 
