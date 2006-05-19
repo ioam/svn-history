@@ -1,20 +1,23 @@
-# Create topographica script and topographica.bat batch file.
+# Create 'topographica' script and topographica.bat batch file.
 # (Note that on Windows the batch file is necessary for executing
 # commands at all.)
 #
 # The first argument (required) is the Topographica root directory.
 # A second optional argument "create_associations" may be passed to have
-# this script create file associations and shortcuts. 
+# this script create file associations and shortcuts (used when
+# setting up a cvs-controlled copy of topographica).
 #
 #
 # Examples:
 #
 # To have this script simply make the script and batch file:
 #    setup.py "d:\program files\topographica"
+# (This is what the binary installation procedure uses.)
 #
 # To have this script additionally create file associations and shortcuts,
 # it might be invoked as:
 #    setup.py "d:\program files\topographica" "create_associations"
+# (This is how a cvs-controlled copy is setup.)
 
 import sys
 import os
