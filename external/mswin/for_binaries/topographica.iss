@@ -53,12 +53,22 @@ Root: HKCR; Subkey: "TopographicaScript\DefaultIcon"; ValueType: string; ValueNa
 Root: HKCR; Subkey: "TopographicaScript\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\topographica.bat"" -g ""%1"""
 
 
+
 [Run]
-Filename: "{app}\setup\setup.bat"; WorkingDir: "{app}\setup"; Flags: runhidden
+; Run the python script to create 'topographica' python script and topographica.bat 
+Filename: "{app}\python_topo\python.exe"; Parameters: """{app}\setup.py"" ""{app}"""; WorkingDir: "{app}"; Flags: runhidden
+
+; User gets to choose to run Topographica after installation
 Filename: "{app}\topographica.bat"; Parameters: "-g"; Description: "{cm:LaunchProgram,Topographica}"; Flags: shellexec postinstall skipifsilent
 
+
+
 [UninstallDelete]
-; we don't remove user-created files but CEBHACKALERT this includes leaving behind .pyc files.
+; Files that get created outside this installation script (e.g. by setup.py)
+; that we don't want to leave around after uninstallation.
+;
+; User-created files do not get removed.
+; (CEBHACKALERT this includes leaving behind .pyc files.)
 Type: filesandordirs; Name: "{app}\python_topo"
 Type: files; Name: "{app}\topographica"
 Type: files; Name: "{app}\topographica.bat"
