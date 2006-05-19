@@ -175,9 +175,6 @@ use them.
 2006/03/03: delete objects from simulator; setup GUI to use this.
 </li>
 
-<li> 
-2006/03/07 (CB): (Windows) Script to generate the python_topo directory.
-</li>
 
 <li>
 2006/03/07: make change_bounds() able to enlarge as well as shrink [made a first draft, JL is working with it]
