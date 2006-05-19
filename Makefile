@@ -115,6 +115,14 @@ doc: FORCE
 
 cvs-release: LATEST_STABLE sf-web-site
 
+# Update any files that keep track of the version number
+new-version: FORCE
+	mv external/mswin/for_binaries/topographica.iss external/mswin/for_binaries/topographica.iss~
+	sed -e 's/AppVerName=Topographica.*/AppVerName=Topographica '"${RELEASE}"'/g' external/mswin/for_binaries/topographica.iss~ > external/mswin/for_binaries/topographica.iss
+	mv external/mswin/setup.py external/mswin/setup.py~
+	sed -e "s/topo.release='.*'/topo.release='${RELEASE}'"'/g' external/mswin/setup.py~ > external/mswin/setup.py
+
+
 # Make a new LATEST_STABLE on the web, using the currently checked-out version
 LATEST_STABLE:
 	cvs rtag -d LATEST_STABLE topographica
