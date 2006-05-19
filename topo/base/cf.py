@@ -31,7 +31,7 @@ from patterngenerator import PatternGeneratorParameter
 from parameterizedobject import ParameterizedObject
 from functionfamilies import OutputFnParameter,IdentityOF,LearningFnParameter,Hebbian,ResponseFnParameter,DotProduct,IdentityLF
 from projection import Projection,ProjectionSheet
-from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter
+from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter,Integer
 from sheet import Sheet,Slice
 from sheetview import UnitView
 from boundingregion import BoundingBox,BoundingRegionParameter
@@ -518,9 +518,13 @@ class CFProjection(Projection):
 
     strength = Number(default=1.0)
 
-    enforce_min_rad = BooleanParameter(
-        default=True,
-        doc='If true, the bounds_template will be at least a 3x3 matrix.')
+    min_matrix_radius = Integer(
+        default=1,bounds=(0,None),
+        doc="""
+        Enforced minimum for radius of weights matrix.
+        The default of 1 gives a minimum matrix of 3x3. 0 would
+        allow a 1x1 matrix.
+        """)
 
     def __init__(self,initialize_cfs=True,**params):
         """
@@ -658,13 +662,9 @@ class CFProjection(Projection):
         weights_slice =  Slice(bounds,self.src)
         r1,r2,c1,c2 = weights_slice
 
-        xrad = c2-center_col-1
-        yrad = r2-center_row-1
-
-        if self.enforce_min_rad:
-            # ensures at least 3x3 weights matrix
-            if xrad<1: xrad=1
-            if yrad<1: yrad=1
+        # use the calculated radius unless it's smaller than the min
+        xrad=max(c2-center_col-1,self.min_matrix_radius)
+        yrad=max(r2-center_row-1,self.min_matrix_radius)
 
         r2=center_row+yrad+1
         c2=center_col+xrad+1
