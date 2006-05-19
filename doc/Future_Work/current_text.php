@@ -25,11 +25,6 @@ was first added to the list, or a change was made.)
 2006/05/15 (CB): Missing scheduled_actions in lissom examples [** before release]
 </li>
 
-<li> 
-2006/05/02 (CB): Update documentation in general [** before release]
-</li>
-
-
 <!-- ### end of 'before release' ### -->
 
 
