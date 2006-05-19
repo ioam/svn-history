@@ -55,8 +55,8 @@ Root: HKCR; Subkey: "TopographicaScript\shell\open\command"; ValueType: string; 
 
 
 [Run]
-; Run the python script to create 'topographica' python script and topographica.bat 
-Filename: "{app}\python_topo\python.exe"; Parameters: """{app}\setup.py"" ""{app}"""; WorkingDir: "{app}"; Flags: runhidden
+; Run the python script to create 'topographica' python script and topographica.bat
+Filename: "{app}\python_topo\python.exe"; Parameters: "setup.py ""{app}"""; WorkingDir: "{app}"; Flags: runhidden
 
 ; User gets to choose to run Topographica after installation
 Filename: "{app}\topographica.bat"; Parameters: "-g"; Description: "{cm:LaunchProgram,Topographica}"; Flags: shellexec postinstall skipifsilent
