@@ -443,17 +443,14 @@ class TopoConsole(Frame):
                 self.messageBar.message('state', "Couldn't open "+location+" in browser.")
 
                 
-    #
-    # Command buttons.
-    #
     def exec_cmd(self,cmd):
         """
-        Use exec to evaluate the command.  This is a prototype that needs to be
-        tested to see what kind of issues develop.  Exceptions raised by the exec
-        command are caught, and the name of the exception is passed back to the
-        calling function.  If the command goes through, an OK is sent, along with
-        a copy of the command.
-        Collisions between simultaneously running simulations are possible.
+        exec the cmd in __main__.__dict__.
+
+        Redirects sys.stdout and sys.stderr to the output text window
+        for the duration of the command.
+
+        Updates the status bar to indicate success or not.
         """
         capture_stdout = StringIO.StringIO()
         capture_stderr = StringIO.StringIO()
