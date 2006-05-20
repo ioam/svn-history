@@ -5,6 +5,8 @@ $Id$
 """
 __version__ = "$Revision$"
 
+from Numeric import ones,Float32
+
 from topo.base.functionfamilies import LearningFn,LearningFnParameter
 from topo.base.parameterclasses import Number
 from topo.base.cf import CFPLearningFn
@@ -97,49 +99,53 @@ class BCMFixed(LearningFn):
     def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
         weights += single_connection_learning_rate * unit_activity * input_activity * (unit_activity-self.unit_threshold)
 
-## JABHACKALERT: Untested
-class CFPBCM(CFPLearningFn):
-    """
-    Bienenstock, Cooper, and Munro (1982) learning rule with sliding threshold.
-    
-    (See Dayan and Abbott, 2001, equation 8.12, 8.13).
-
-    Activities change only when there is both pre- and post-synaptic activity.
-    Threshold is adjusted based on recent firing rates.
-    """
-    single_cf_fn = LearningFnParameter(default=Hebbian())
-    
-    unit_threshold_0=Number(default=0.5,bounds=(0,None),
-        doc="Initial value of threshold between LTD and LTP; actual value computed based on recent history.")
-    unit_threshold_learning_rate=Number(default=0.1,bounds=(0,None),
-        doc="Amount by which the unit_threshold is adjusted for each activity calculation.")
-
-    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
-        rows,cols = output_activity.shape
-
-        # Initialize thresholds the first time we learn the size of the output_activity.
-        if not hasattr(self,unit_thresholds):
-            self.unit_thresholds=ones(x.shape,Float32)*unit_threshold_0
-
-        # JABALERT: Is this correct?
-	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
-
-        # avoid evaluating these references each time in the loop
-        single_cf_fn = self.single_cf_fn
-	for r in xrange(rows):
-            for c in xrange(cols):
-                cf = cfs[r][c]
-                input_activity = cf.get_input_matrix(input_activity)
-                unit_activity = output_activity[r,c]
-                threshold=self.unit_thresholds[r,c]
-                cf.weights += single_connection_learning_rate * unit_activity * input_activity * (unit_activity-threshold)
-                self.unit_thresholds[r,c] += self.unit_threshold_learning_rate*(unit_activity*unit_activity-threshold)
-
-                # CEBHACKALERT: see ConnectionField.__init__()
-                cf.weights *= cf.mask
-    
-
-
+##  ## JABHACKALERT: Untested
+##  class CFPBCM(CFPLearningFn):
+##      """
+##      Bienenstock, Cooper, and Munro (1982) learning rule with sliding threshold.
+##      
+##      (See Dayan and Abbott, 2001, equation 8.12, 8.13).
+##  
+##      Activities change only when there is both pre- and post-synaptic activity.
+##      Threshold is adjusted based on recent firing rates.
+##      """
+##      single_cf_fn = LearningFnParameter(default=Hebbian())
+##      
+##      unit_threshold_0=Number(default=0.5,bounds=(0,None),
+##          doc="Initial value of threshold between LTD and LTP; actual value computed based on recent history.")
+##      unit_threshold_learning_rate=Number(default=0.1,bounds=(0,None),
+##          doc="Amount by which the unit_threshold is adjusted for each activity calculation.")
+##  
+##      def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+##          # Initialize thresholds the first time we learn the size of the output_activity.
+##          if not hasattr(self,'unit_thresholds'):
+##              self.unit_thresholds=ones(output_activity.shape,Float32)*self.unit_threshold_0
+##              self.unit_thresholds.savespace(1)
+##  
+##          rows,cols = output_activity.shape
+##  
+##          # JABALERT: Is this correct?
+##  	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
+##  
+##          # avoid evaluating these references each time in the loop
+##          single_cf_fn = self.single_cf_fn
+##  	for r in xrange(rows):
+##              for c in xrange(cols):
+##                  cf = cfs[r][c]
+##                  input_activity = cf.get_input_matrix(input_activity)
+##                  unit_activity = output_activity[r,c]
+##                  threshold=self.unit_thresholds[r,c]
+##                  print cf.weights, type(cf.weights)
+##                  print input_activity, type(input_activity)
+##                  print single_connection_learning_rate,unit_activity,threshold, (unit_activity-threshold)
+##                  cf.weights += (single_connection_learning_rate * unit_activity * (unit_activity-threshold)) * input_activity 
+##                  self.unit_thresholds[r,c] += self.unit_threshold_learning_rate*(unit_activity*unit_activity-threshold)
+##  
+##                  # CEBHACKALERT: see ConnectionField.__init__()
+##                  cf.weights *= cf.mask
+##      
+##  
+##  
 ##  # Inappropriately shares the history between units; needs to be modified to be a CFPTrace learning rule
 ##  class Trace(LearningFn):
 ##      """
