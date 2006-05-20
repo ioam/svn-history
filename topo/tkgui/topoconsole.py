@@ -310,7 +310,7 @@ class TopoConsole(Frame):
 
         self.cmd_box = Pmw.ComboBox(command_frame, autoclear=1,history=1,dropdown=1,
                                     selectioncommand=Pmw.busycallback(self.exec_cmd))
-        self.cmd_box.pack(side=LEFT,expand=YES,fill=X)
+        self.cmd_box.pack(side=TOP,expand=YES,fill=X)
 
         #
         # Command Response
@@ -320,11 +320,11 @@ class TopoConsole(Frame):
         # (2) should have scroll bars (though you can scroll with mouse or keys)
         # The 'Text' manual is about 8000 pages...someone needs to
         # read it.
-        scrollbar = Scrollbar(self)
+        scrollbar = Scrollbar(command_frame)
         scrollbar.pack(side=RIGHT, fill=Y)
-        self.cmd_output = OutputText(self,state=DISABLED,height=10,
+        self.cmd_output = OutputText(command_frame,state=DISABLED,height=10,
                                      yscrollcommand=scrollbar.set)
-        self.cmd_output.pack()
+        self.cmd_output.pack(side=BOTTOM,expand=YES,fill=X)
         scrollbar.config(command=self.cmd_output.yview)
 
 
