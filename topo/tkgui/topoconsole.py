@@ -7,7 +7,7 @@ __version__='$Revision$'
 
 from math import fmod,floor
 from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, \
-     LEFT, RIGHT, YES, BOTH, Label, Text, END, DISABLED, NORMAL
+     LEFT, RIGHT, YES, BOTH, Label, Text, END, DISABLED, NORMAL, Scrollbar, Y
 import Pmw, os, sys, traceback, __main__
 import StringIO
 import tkFileDialog
@@ -320,8 +320,12 @@ class TopoConsole(Frame):
         # (2) should have scroll bars (though you can scroll with mouse or keys)
         # The 'Text' manual is about 8000 pages...someone needs to
         # read it.
-        self.cmd_output = OutputText(self,state=DISABLED,height=10)
+        scrollbar = Scrollbar(self)
+        scrollbar.pack(side=RIGHT, fill=Y)
+        self.cmd_output = OutputText(self,state=DISABLED,height=10,
+                                     yscrollcommand=scrollbar.set)
         self.cmd_output.pack()
+        scrollbar.config(command=self.cmd_output.yview)
 
 
     def populate_plots_menu(self, menubar):
