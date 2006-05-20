@@ -7,7 +7,7 @@ __version__='$Revision$'
 
 from math import fmod,floor
 from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, \
-     LEFT, RIGHT, YES, BOTH, Label, Text, END
+     LEFT, RIGHT, YES, BOTH, Label, Text, END, DISABLED, NORMAL
 import Pmw, os, sys, traceback, __main__
 import StringIO
 import tkFileDialog
@@ -50,6 +50,45 @@ topo_www_locations = ('http://www.topographica.org/')
 #   plotpanel_classes['Hue Pref Map'] = HuePreferencePanel
 plotpanel_classes = {}
 
+
+
+
+class OutputText(Text):
+    """
+    A Tkinter Text widget but with some convenience methods.
+
+    (Notably the Text stays DISABLED (i.e. not editable)
+    except when we need to display new text).
+    """
+
+    def append_cmd(self,cmd,output):
+        """
+        Print out:
+        >>> cmd
+        output
+
+        And scroll to the end.
+        """
+        self.config(state=NORMAL)
+        self.insert(END,">>> "+cmd+"\n"+output)
+        self.insert("\n")
+        self.config(state=DISABLED)        
+        self.see(END)
+
+    def append_text(self,text):
+        """
+        Print out:
+        text
+
+        And scroll to the end.
+        """
+        self.config(state=NORMAL)
+        self.insert(END,text)
+        self.insert("\n")
+        self.config(state=DISABLED)
+        self.see(END)
+
+        
 
 class PlotsMenuEntry(topo.base.parameterizedobject.ParameterizedObject):
     """
@@ -260,10 +299,9 @@ class TopoConsole(Frame):
         # CEBHACKALERT:
         # (1) what length history is this going to keep?
         # (2) should have scroll bars (though you can scroll with mouse or keys)
-        # (3) shouldn't be able to type in it
         # The 'Text' manual is about 8000 pages...someone needs to
         # read it.
-        self.cmd_output = Text(self)
+        self.cmd_output = OutputText(self,state=DISABLED)
         self.cmd_output.pack()
 
 
@@ -476,14 +514,10 @@ class TopoConsole(Frame):
         output = capture_stdout.getvalue()
         error = capture_stderr.getvalue()
 
-        self.cmd_output.insert(END,">>> "+cmd+"\n"+output)
-
+        self.cmd_output.append_cmd(cmd,output)
+        
         if error:
-            self.cmd_output.insert(END,"*** Error:\n"+error)
-
-        # add a blank line, scroll text box
-        self.cmd_output.insert(END,"\n")
-        self.cmd_output.see(END)
+            self.cmd_output.append_text("*** Error:\n"+error)
             
         # stop capturing
         sys.stdout = sys.__stdout__
