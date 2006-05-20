@@ -97,6 +97,8 @@ more complex commands than necessary.  These items will be simplified
 and made more appropriate for command-line and batch use, to make
 using larger networks more practical.
 
+<!-- CEBHACKALERT: can we remove this? It's missing little things
+like handling dynamic numbers, etc. -->
 <P><DT>GUI model editor</DT><DD>
 
 The Topographica GUI supports plotting and analysis of existing
@@ -106,8 +108,7 @@ network.  Parameters and options can then be set on these components,
 thus defining a simulation without requiring coding (except to add new
 primitives if desired).  This facility is still under development, and
 is still missing some crucial functionality required for the graphical
-approach to be useful, such as the ability to set object parameters
-before they are constructed.  These limitations will be removed very
+approach to be useful. These limitations will be removed very
 soon, allowing the editor to be used to construct useful models.
 </DL>
 
@@ -181,6 +182,7 @@ compartmental models based on the cable equation can be simulated
 in Neuron or Genesis instead.
 
 <!--
+  CEBHACKALERT: this one can be removed, right?
   <P><DT>Random number streams</DT><DD>
   Need to provide finer control over the generation of separate
   streams of random numbers, allowing them to be selected independently
@@ -208,6 +210,7 @@ things, and disabling the remaining warnings.  That way, new code
 could be automatically checked with those programs and the warnings
 would be likely to be meaningful.
 
+<!-- CEBHACKALERT: partly done? -->
 <P><DT>Plot histories</DT><DD>
 It would be nice if GUI plot windows could save a user-selectable
 amount of history, so that one could scroll back and forth over time
@@ -317,6 +320,7 @@ contributions are very welcome!
 Should add links to CNV course and its exercises as something that can
 be done with Topographica.
 
+CEBHACKALERT: this is done?
 Should add filename of first script, or some other user-definable screen,
 to all window titles, so that different simulators can be kept straight.
 
