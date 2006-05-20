@@ -291,6 +291,9 @@ class TopoConsole(Frame):
 
         self.learning_str = StringVar()
         self.learning_str.set('1')
+
+        # CEBHACKALERT: does the busycallback actually work? I don't
+        # see a busy cursor.
         Pmw.ComboBox(learning_frame,autoclear=1,history=1,dropdown=1,
                      entry_textvariable=self.learning_str,
                      selectioncommand=Pmw.busycallback(self.do_learning)
@@ -317,7 +320,7 @@ class TopoConsole(Frame):
         # (2) should have scroll bars (though you can scroll with mouse or keys)
         # The 'Text' manual is about 8000 pages...someone needs to
         # read it.
-        self.cmd_output = OutputText(self,state=DISABLED)
+        self.cmd_output = OutputText(self,state=DISABLED,height=10)
         self.cmd_output.pack()
 
 
