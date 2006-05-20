@@ -154,6 +154,13 @@ individual units are not labeled or individually selectable.  We plan
 to make all such plots "live", so that individual units or
 ConnectionFields can be selected and analyzed.
 
+
+<!-- CEBHACKALERT: I think this item can be removed. 
+It might be better to have one pane (like IDLE), but the two-pane
+approach we have gives some advantages. For example, I can press the
+"up" arrow in the 'Command:' box to find previous commands. It was
+also very simple to implement. -->
+
 <P><DT>Command console</DT><DD>
 At the moment, the Topographica console GUI window provides a single 
 command-line widget, allowing arbitrary Python commands to be executed.
