@@ -251,7 +251,7 @@ class TopoConsole(Frame):
         command_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
 
         self.cmd_box = Pmw.ComboBox(command_frame, autoclear=1,history=1,dropdown=1,
-                                    selectioncommand=Pmw.busycallback(self.do_command))
+                                    selectioncommand=Pmw.busycallback(self.exec_cmd))
         self.cmd_box.pack(side=LEFT,expand=YES,fill=X)
 
         #
@@ -446,16 +446,6 @@ class TopoConsole(Frame):
     #
     # Command buttons.
     #
-    def do_command(self,cmd):
-        """
-        Pass a Python command to a simulation object so that it can execute it
-        in the simulation namespace.  Print the result that comes back.  Assumes
-        that the simulation always returns and does not throw any exceptions
-        if the cmd contains an error.
-        """
-        result = self.exec_cmd(cmd)
-
-
     def exec_cmd(self,cmd):
         """
         Use exec to evaluate the command.  This is a prototype that needs to be
@@ -483,7 +473,7 @@ class TopoConsole(Frame):
         output = capture_stdout.getvalue()
         error = capture_stderr.getvalue()
 
-        self.cmd_output.insert(END,"["+time.ctime()+"] >:\n"+output)
+        self.cmd_output.insert(END,"["+time.ctime()+"]:\n"+output)
 
         if error:
             self.cmd_output.insert(END,"*** Error:\n"+error)
