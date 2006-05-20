@@ -257,6 +257,12 @@ class TopoConsole(Frame):
         #
         # Command Response
         #
+        # CEBHACKALERT:
+        # (1) what length history is this going to keep?
+        # (2) should have scroll bars (though you can scroll with mouse or keys)
+        # (3) shouldn't be able to type in it
+        # The 'Text' manual is about 8000 pages...someone needs to
+        # read it.
         self.cmd_output = Text(self)
         self.cmd_output.pack()
 
@@ -475,8 +481,9 @@ class TopoConsole(Frame):
         if error:
             self.cmd_output.insert(END,"*** Error:\n"+error)
 
-        # add a blank line 
+        # add a blank line, scroll text box
         self.cmd_output.insert(END,"\n")
+        self.cmd_output.see(END)
             
         # stop capturing
         sys.stdout = sys.__stdout__
