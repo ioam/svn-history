@@ -281,6 +281,22 @@ class TopoConsole(Frame):
                                  label="Python documentation",
                                  command=(lambda x=python_doc_locations: self.open_location(x)))
 
+
+        #
+        # Learning
+        #
+        learning_group = Pmw.Group(self,tag_text='Run simulation for:')
+        learning_frame = learning_group.interior()
+        learning_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
+
+        self.learning_str = StringVar()
+        self.learning_str.set('1')
+        Pmw.ComboBox(learning_frame,autoclear=1,history=1,dropdown=1,
+                     entry_textvariable=self.learning_str,
+                     selectioncommand=Pmw.busycallback(self.do_learning)
+                     ).pack(side=LEFT,expand=YES,fill=X)
+
+
         
         #
         # Command entry
@@ -303,21 +319,6 @@ class TopoConsole(Frame):
         # read it.
         self.cmd_output = OutputText(self,state=DISABLED)
         self.cmd_output.pack()
-
-
-        #
-        # Learning
-        #
-        learning_group = Pmw.Group(self,tag_text='Run simulation for:')
-        learning_frame = learning_group.interior()
-        learning_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
-
-        self.learning_str = StringVar()
-        self.learning_str.set('1')
-        Pmw.ComboBox(learning_frame,autoclear=1,history=1,dropdown=1,
-                     entry_textvariable=self.learning_str,
-                     selectioncommand=Pmw.busycallback(self.do_learning)
-                     ).pack(side=LEFT,expand=YES,fill=X)
 
 
     def populate_plots_menu(self, menubar):
