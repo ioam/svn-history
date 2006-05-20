@@ -71,7 +71,7 @@ class OutputText(Text):
         """
         self.config(state=NORMAL)
         self.insert(END,">>> "+cmd+"\n"+output)
-        self.insert("\n")
+        self.insert(END,"\n")
         self.config(state=DISABLED)        
         self.see(END)
 
@@ -84,7 +84,7 @@ class OutputText(Text):
         """
         self.config(state=NORMAL)
         self.insert(END,text)
-        self.insert("\n")
+        self.insert(END,"\n")
         self.config(state=DISABLED)
         self.see(END)
 
