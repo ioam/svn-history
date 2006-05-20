@@ -7,25 +7,25 @@ __version__='$Revision$'
 
 from math import fmod,floor
 from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, \
-     LEFT, RIGHT, YES, BOTH, Label
-import Pmw, re, os, sys, code, traceback, __main__
-
+     LEFT, RIGHT, YES, BOTH, Label, Text, END
+import Pmw, os, sys, traceback, __main__
+import StringIO
 import tkFileDialog
+import time
+import webbrowser
+
+import topo
+import topo.commands.basic
+from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
+import topo.base.simulation
+import topo.base.parameterizedobject
+
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from connectionfieldspanel import ConnectionFieldsPanel
 from projectionpanel import ProjectionPanel
 from testpattern import TestPattern
-from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
-import topo.base.simulation
-import topo.base.parameterizedobject
-from topo.tkgui.editorwindow import ModelEditor
+from editorwindow import ModelEditor
 
-import time
-
-import topo
-
-import topo.commands.basic
-import webbrowser
 
 SCRIPT_FILETYPES = [('Topographica scripts','*.ty'),('Python scripts','*.py'),('All files','*')]
 
@@ -255,6 +255,13 @@ class TopoConsole(Frame):
         self.cmd_box.pack(side=LEFT,expand=YES,fill=X)
 
         #
+        # Command Response
+        #
+        self.cmd_output = Text(self)
+        self.cmd_output.pack()
+
+
+        #
         # Learning
         #
         learning_group = Pmw.Group(self,tag_text='Run simulation for:')
@@ -447,8 +454,7 @@ class TopoConsole(Frame):
         if the cmd contains an error.
         """
         result = self.exec_cmd(cmd)
-	self.messageBar.message('state', result)
-        topo.tkgui.show_cmd_prompt()
+
 
     def exec_cmd(self,cmd):
         """
@@ -459,17 +465,42 @@ class TopoConsole(Frame):
         a copy of the command.
         Collisions between simultaneously running simulations are possible.
         """
+        capture_stdout = StringIO.StringIO()
+        capture_stderr = StringIO.StringIO()
+
+        # capture output and errors
+        sys.stdout = capture_stdout
+        sys.stderr = capture_stderr
+
         try:
-            #g = globals()
-            g = __main__.__dict__
-            exec cmd in g
+            exec cmd in __main__.__dict__
             result = 'OK: ' + cmd
-            # print 'Ran in namespace: ' + __name__
+            
         except Exception, e:
-            result = 'Exception Raised: ' + e.__doc__
             traceback.print_exc()
-        return result
-    
+            result = 'Exception Raised: ' + e.__doc__
+
+        output = capture_stdout.getvalue()
+        error = capture_stderr.getvalue()
+
+        self.cmd_output.insert(END,"["+time.ctime()+"] >:\n"+output)
+
+        if error:
+            self.cmd_output.insert(END,"*** Error:\n"+error)
+
+        # add a blank line 
+        self.cmd_output.insert(END,"\n")
+            
+        # stop capturing
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+                
+        capture_stdout.close()
+        capture_stderr.close()
+
+	self.messageBar.message('state', result)
+        #topo.tkgui.show_cmd_prompt()
+
     
     def load_script_file(self,filename):
         """
