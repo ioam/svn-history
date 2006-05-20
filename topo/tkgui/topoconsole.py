@@ -476,7 +476,7 @@ class TopoConsole(Frame):
         output = capture_stdout.getvalue()
         error = capture_stderr.getvalue()
 
-        self.cmd_output.insert(END,"["+time.ctime()+"]:\n"+output)
+        self.cmd_output.insert(END,">>> "+cmd+"\n"+output)
 
         if error:
             self.cmd_output.insert(END,"*** Error:\n"+error)
