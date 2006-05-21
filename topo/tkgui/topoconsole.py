@@ -239,12 +239,12 @@ class TopoConsole(Frame):
                                  label = 'Quit',
                                  command = self.quit)
 
-	# Create and pack the MessageBar.  (Shows "Status:")
-	self.messageBar = Pmw.MessageBar(self,
+	# Create and pack the MessageBar.  (Shows "Status")
+        msg_group = Pmw.Group(self,tag_text='Status')
+        msg_group.pack(side=BOTTOM,expand=YES,fill=X,padx=4,pady=8)
+	self.messageBar = Pmw.MessageBar(msg_group.interior(),
                                          entry_width = 45,
-                                         entry_relief='groove',
-                                         labelpos = 'w',
-                                         label_text = 'Status:')
+                                         entry_relief='groove')
 	self.messageBar.pack(side = BOTTOM,fill=X,padx=4,pady=8)
 	self.messageBar.message('state', 'OK')
 	self.balloon.configure(statuscommand = self.messageBar.helpmessage)
@@ -293,7 +293,6 @@ class TopoConsole(Frame):
         #
         # Running the simulation
         #
-
         learning_group = Pmw.Group(self,tag_text='Simulation control')
         learning_frame = learning_group.interior()
         learning_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
