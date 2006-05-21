@@ -410,7 +410,7 @@ class CommandEvent(Event):
         self.command_string = command_string
 
     def __repr__(self):
-        return "CommandEvent(time="+`self.time`+" ,command_string='"+self.command_string+"')"
+        return "CommandEvent(time="+`self.time`+", command_string='"+self.command_string+"')"
     
     def __call__(self):
         """
