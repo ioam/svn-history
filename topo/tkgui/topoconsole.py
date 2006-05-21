@@ -559,10 +559,10 @@ class TopoConsole(Frame):
         output = capture_stdout.getvalue()
         error = capture_stderr.getvalue()
 
-        self.cmd_output.append_cmd(cmd,output)
+        self.command_output.append_cmd(cmd,output)
         
         if error:
-            self.cmd_output.append_text("*** Error:\n"+error)
+            self.command_output.append_text("*** Error:\n"+error)
             
         # stop capturing
         sys.stdout = sys.__stdout__
