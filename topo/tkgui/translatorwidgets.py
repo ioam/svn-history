@@ -117,6 +117,7 @@ class TaggedSlider(Frame,TranslatorWidget):
                  max_value="1.0",
                  string_format = '%f',
                  tag_width=10,
+                 slider_length=100,
                  translator=string.atof,
                  **config):
 
@@ -138,8 +139,11 @@ class TaggedSlider(Frame,TranslatorWidget):
         
         # Add the slider        
         self.__slider_val = IntVar(0)
-        self.__slider = Scale(self,showvalue=0,from_=0,to=10000,orient='horizontal',
-                           variable=self.__slider_val, command=self.__slider_command)
+        self.__slider = Scale(self,showvalue=0,from_=0,to=10000,
+                              orient='horizontal',
+                              length=slider_length,
+                              variable=self.__slider_val,
+                              command=self.__slider_command)
         self.__slider.pack(side=LEFT,expand=YES,fill=BOTH)
         self.__set_slider_from_tag()
         self.__first_slider_command = True          # see self.__slider_command below
