@@ -295,7 +295,7 @@ class TopoConsole(Frame):
         Label(learning_frame,text='Run for: ').pack(side=LEFT)
         
         learning_str=StringVar()
-        learning_str.set('1')
+        learning_str.set('1.0')
 
         # CEBHACKALERT: does the busycallback actually work? I don't
         # see a busy cursor.
@@ -320,7 +320,7 @@ class TopoConsole(Frame):
         ### toggle_command_widgets() and shrinks it) (i.e. it
         ### shows/hides command entry/output widgets).
         self.show_command_widgets = Tkinter.IntVar()
-        self.show_command_widgets.set(1)
+        self.show_command_widgets.set(0)
         command_frame = Frame(self)
         command_group = Pmw.Group(command_frame,
                               tag_pyclass = Tkinter.Checkbutton,
@@ -339,10 +339,9 @@ class TopoConsole(Frame):
         Tkinter.Frame(cw).pack()
 
 
-        ### Make a ComboBox (command_box) for entering commands.
-        self.command_box=Pmw.ComboBox(cw,autoclear=1,history=1,dropdown=1,
+        ### Make a ComboBox (command_entry) for entering commands.
+        self.command_entry=Pmw.ComboBox(cw,autoclear=1,history=1,dropdown=1,
                                selectioncommand=Pmw.busycallback(self.exec_cmd))
-        self.command_box.pack(side=TOP,expand=YES,fill=X)
 
 
         ### Now we make a Text (command_output, for output from commands)
@@ -358,15 +357,17 @@ class TopoConsole(Frame):
                                          yscrollcommand=scrollbar.set)
         self.command_output.pack(side=TOP,expand=YES,fill=X)
         scrollbar.config(command=self.command_output.yview)
-        self.command_output_frame.pack()
+
+        # note that pack() hasn't been called on command_output or on
+        # command_entry - get called by toggle_command_widgets
 
 
     def toggle_command_widgets(self):
         if self.show_command_widgets.get()==1:
-            self.command_box.pack(side=TOP,expand=YES,fill=X)
+            self.command_entry.pack(side=TOP,expand=YES,fill=X)
             self.command_output_frame.pack()
         else:
-            self.command_box.pack_forget()
+            self.command_entry.pack_forget()
             self.command_output_frame.pack_forget()
             
 
