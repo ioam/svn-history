@@ -63,7 +63,6 @@ class EditorCanvas(Canvas) :
         self.MAX_VIEWS = 5
         # get the topo simulation
         self.simulation = topo.sim
-        print self.simulation.name # Do we need to print this? 
 
         # create the menu widget used as a popup on objects and connections
         self.option_add("*Menu.tearOff", "0") 
