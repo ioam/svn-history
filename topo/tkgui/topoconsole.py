@@ -324,7 +324,7 @@ class TopoConsole(Frame):
         command_frame = Frame(self)
         command_group = Pmw.Group(command_frame,
                               tag_pyclass = Tkinter.Checkbutton,
-                              tag_text='Commands',
+                              tag_text='Command prompt',
                               tag_command = self.toggle_command_widgets,
                               tag_variable = self.show_command_widgets)
 
@@ -341,6 +341,7 @@ class TopoConsole(Frame):
 
         ### Make a ComboBox (command_entry) for entering commands.
         self.command_entry=Pmw.ComboBox(cw,autoclear=1,history=1,dropdown=1,
+                                        label_text='>>>',labelpos='w',
                                selectioncommand=Pmw.busycallback(self.exec_cmd))
 
 
