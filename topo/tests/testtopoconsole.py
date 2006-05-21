@@ -23,14 +23,6 @@ class TestTopoConsole(unittest.TestCase):
         topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
         self.s.print_level = topo.base.parameterizedobject.WARNING
 
-    def test_do_learning(self):
-        run_time = 15.5
-        topo.sim.change_sim(self.s)
-        start_time = self.s.time()
-        self.console.do_learning(str(run_time))
-        end_time = self.s.time()
-        self.assertEqual(start_time+run_time,end_time)
-
     def tearDown(self):
         self.console.quit()
 
