@@ -26,7 +26,7 @@ from connectionfieldspanel import ConnectionFieldsPanel
 from projectionpanel import ProjectionPanel
 from testpattern import TestPattern
 from editorwindow import ModelEditor
-
+from translatorwidgets import TaggedSlider
 
 SCRIPT_FILETYPES = [('Topographica scripts','*.ty'),('Python scripts','*.py'),('All files','*')]
 
@@ -286,23 +286,27 @@ class TopoConsole(Frame):
         #
         # Running the simulation
         #
+
         learning_group = Pmw.Group(self,tag_text='Simulation control')
         learning_frame = learning_group.interior()
         learning_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
 
-        self.learning_str = StringVar()
-        self.learning_str.set('1')
+
+        Label(learning_frame,text='Run for: ').pack(side=LEFT)
+        
+        learning_str=StringVar()
+        learning_str.set('1')
 
         # CEBHACKALERT: does the busycallback actually work? I don't
         # see a busy cursor.
-        Pmw.ComboBox(learning_frame,autoclear=1,history=1,dropdown=1,
-                     entry_textvariable=self.learning_str,
-                     entry_width=7,
-                     label_text = 'Run for: ',
-                     labelpos = 'w',
-                     selectioncommand=Pmw.busycallback(self.do_learning)
-                     ).pack(side=LEFT)
-        
+        self.run_for = TaggedSlider(learning_frame,
+                                    tagvariable=learning_str,
+                                    min_value=0,max_value=50)
+        self.run_for.pack(side=LEFT)
+
+        go = Button(learning_frame,text="Go",
+                    command=Pmw.busycallback(self.do_learning))
+        go.pack(side=LEFT)
 
 
         
@@ -348,9 +352,10 @@ class TopoConsole(Frame):
         scrollbar = Scrollbar(self.command_output_frame)
         scrollbar.pack(side=RIGHT, fill=Y)
         # CEBHACKALERT: what length history is this going to keep?
-        self.command_output = OutputText(self.command_output_frame,state=DISABLED,
-                                     height=10,
-                                     yscrollcommand=scrollbar.set)
+        self.command_output = OutputText(self.command_output_frame,
+                                         state=DISABLED,
+                                         height=10,
+                                         yscrollcommand=scrollbar.set)
         self.command_output.pack(side=TOP,expand=YES,fill=X)
         scrollbar.config(command=self.command_output.yview)
         self.command_output_frame.pack()
@@ -602,12 +607,13 @@ class TopoConsole(Frame):
             return True
 
 
-    def do_learning(self,duration):
+    def do_learning(self):
         """
-        Run the simulation for the specified simulation time duration.
+        Run the simulation for the duration specified in the
+        'run for' taggedslider.
         
         All this routine truly needs to do is
-        topo.sim.run(float(duration)), but it adds other useful
+        topo.sim.run(self.run_for.get_value()), but it adds other useful
         features like periodically displaying the simulated and real
         time remaining.
         """
@@ -620,7 +626,7 @@ class TopoConsole(Frame):
         ### Simulation class, because it is not specific to the GUI.
         ### E.g. we'll also want time remaining estimates from the
         ### command line and the batch interface.
-        fduration = float(duration)
+        fduration = self.run_for.get_value()
         step   = 2.0
         iters  = int(floor(fduration/step))
         remain = fmod(fduration, step)
