@@ -6,6 +6,7 @@ $Id$
 __version__='$Revision$'
 
 from math import fmod,floor
+import Tkinter
 from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, Button, \
      LEFT, RIGHT, YES, BOTH, Label, Text, END, DISABLED, NORMAL, Scrollbar, Y
 import Pmw, os, sys, traceback, __main__
@@ -283,9 +284,9 @@ class TopoConsole(Frame):
 
 
         #
-        # Learning
+        # Running the simulation
         #
-        learning_group = Pmw.Group(self,tag_text='Run simulation for:')
+        learning_group = Pmw.Group(self,tag_text='Simulation control')
         learning_frame = learning_group.interior()
         learning_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
 
@@ -296,51 +297,73 @@ class TopoConsole(Frame):
         # see a busy cursor.
         Pmw.ComboBox(learning_frame,autoclear=1,history=1,dropdown=1,
                      entry_textvariable=self.learning_str,
+                     entry_width=7,
+                     label_text = 'Run for: ',
+                     labelpos = 'w',
                      selectioncommand=Pmw.busycallback(self.do_learning)
-                     ).pack(side=LEFT,expand=YES,fill=X)
+                     ).pack(side=LEFT)
+        
 
 
         
         #
         # Command entry
         #
-        self.command_group = Pmw.Group(self,tag_text='Command')
-        command_frame = self.command_group.interior()
-        self.command_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
 
-        self.cmd_box = Pmw.ComboBox(command_frame, autoclear=1,history=1,dropdown=1,
-                                    selectioncommand=Pmw.busycallback(self.exec_cmd))
-        self.cmd_box.pack(side=TOP,expand=YES,fill=X)
+        ### Make a Frame inside of which is a Pmw.Group, with a tag
+        ### that incorporates a checkbutton. Deselecting the
+        ### checkbutton empties the frame of the widgets (see
+        ### toggle_command_widgets() and shrinks it) (i.e. it
+        ### shows/hides command entry/output widgets).
+        self.show_command_widgets = Tkinter.IntVar()
+        self.show_command_widgets.set(1)
+        command_frame = Frame(self)
+        command_group = Pmw.Group(command_frame,
+                              tag_pyclass = Tkinter.Checkbutton,
+                              tag_text='Commands',
+                              tag_command = self.toggle_command_widgets,
+                              tag_variable = self.show_command_widgets)
 
-        #
-        # Command Response
-        #
-        # CEBHACKALERT: what length history is this going to keep?
-        scrollbar = Scrollbar(command_frame)
+                
+        command_group.pack(fill = 'both', expand = 1, side='left')
+        cw = Tkinter.Frame(command_group.interior())
+        cw.pack(padx = 2, pady = 2, expand='yes', fill='both')
+        command_frame.pack(padx = 6, pady = 6, expand='yes', fill='both')
+
+        # empty frame to allow resizing to 0 (otherwise cw
+        # would stay at the size it was before all widgets were removed)
+        Tkinter.Frame(cw).pack()
+
+
+        ### Make a ComboBox (command_box) for entering commands.
+        self.command_box=Pmw.ComboBox(cw,autoclear=1,history=1,dropdown=1,
+                               selectioncommand=Pmw.busycallback(self.exec_cmd))
+        self.command_box.pack(side=TOP,expand=YES,fill=X)
+
+
+        ### Now we make a Text (command_output, for output from commands)
+        ### with a Scrollbar, both inside a Frame (command_output_frame,
+        ### for convenient access)
+        self.command_output_frame = Tkinter.Frame(cw)
+        scrollbar = Scrollbar(self.command_output_frame)
         scrollbar.pack(side=RIGHT, fill=Y)
-        self.cmd_output = OutputText(command_frame,state=DISABLED,height=10,
+        # CEBHACKALERT: what length history is this going to keep?
+        self.command_output = OutputText(self.command_output_frame,state=DISABLED,
+                                     height=10,
                                      yscrollcommand=scrollbar.set)
-        self.cmd_output.pack(side=TOP,expand=YES,fill=X)
-        scrollbar.config(command=self.cmd_output.yview)
+        self.command_output.pack(side=TOP,expand=YES,fill=X)
+        scrollbar.config(command=self.command_output.yview)
+        self.command_output_frame.pack()
 
 
-        self.cmd_hide = Button(command_frame,text="Hide",
-                               command=self.hide_command_widgets)
-        self.cmd_hide.pack(side=RIGHT)
-
-
-    def hide_command_widgets(self):
-        self.command_group.pack_forget()
-        self.cmd_unhide = Button(self,text="Commands",
-                                 command=self.show_command_widgets)
-        self.cmd_unhide.pack(side=RIGHT)
-
-
-
-    def show_command_widgets(self):
-        self.command_group.pack()
-        self.cmd_unhide.destroy()
-        
+    def toggle_command_widgets(self):
+        if self.show_command_widgets.get()==1:
+            self.command_box.pack(side=TOP,expand=YES,fill=X)
+            self.command_output_frame.pack()
+        else:
+            self.command_box.pack_forget()
+            self.command_output_frame.pack_forget()
+            
 
     def populate_plots_menu(self, menubar):
         """
