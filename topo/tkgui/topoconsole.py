@@ -5,6 +5,10 @@ $Id$
 """
 __version__='$Revision$'
 
+# CEBHACKALERT: widget and frame sizes (e.g. widths) are a mess
+# throughout topo.tkgui
+
+
 from math import fmod,floor
 import Tkinter
 from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, Button, \
@@ -301,7 +305,10 @@ class TopoConsole(Frame):
         # see a busy cursor.
         self.run_for = TaggedSlider(learning_frame,
                                     tagvariable=learning_str,
-                                    min_value=0,max_value=50)
+                                    tag_width=11,
+                                    slider_length=150,
+                                    min_value=0,max_value=50000,
+                                    string_format='%.4f')
         self.run_for.pack(side=LEFT)
 
         go = Button(learning_frame,text="Go",
