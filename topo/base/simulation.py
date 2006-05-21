@@ -173,6 +173,8 @@ class EventProcessor(ParameterizedObject):
     connections and sending events, and stores both incoming and outgoing
     connections. 
     """
+    _abstract_class_name = "EventProcessor"
+
     def __init__(self,**config):
         """
         Create an EventProcessor.
@@ -362,6 +364,8 @@ class EPConnection(ParameterizedObject):
 
 class Event(object):
     """Hierarchy of classes for storing simulation events of various types."""
+    _abstract_class_name = "Event"
+
     def __init__(self,time):
         self.time = time
         

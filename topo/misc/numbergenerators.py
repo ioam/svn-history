@@ -27,7 +27,7 @@ class RandomDistribution(ParameterizedObject):
     The underlying random.Random() instance and all its methods can be
     accessed from the 'random_generator' attribute.
     """
-    _abstract_class_name="RandomWrapper"
+    _abstract_class_name="RandomDistribution"
     
     def __init__(self,**params):
         """

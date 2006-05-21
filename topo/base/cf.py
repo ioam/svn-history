@@ -275,6 +275,8 @@ class CFPResponseFn(ParameterizedObject):
     the arguments specified below, and must return a matrix the same
     size as the activity matrix supplied.
     """
+    _abstract_class_name = "CFPResponseFn"
+
     def __call__(self, cfs, input_activity, activity, strength, **params):
         raise NotImplementedError
 
@@ -337,7 +339,9 @@ class CFPLearningFn(ParameterizedObject):
 
     Objects in this class must support being called as a function with
     the arguments specified below.
-    """    
+    """
+    _abstract_class_name = "CFPLearningFn"
+        
     def constant_sum_connection_rate(self,cfs,learning_rate):
 	""" 
 	Return the learning rate for a single connection assuming that
@@ -408,7 +412,7 @@ class CFPOutputFn(ParameterizedObject):
     Map the weight matrix of each CF in a CFProjection into a new one
     of the same shape.
     """
-    _abstract_class_name = "CFOutputFunction"
+    _abstract_class_name = "CFPOutputFn"
     
     def __call__(self, cfs, output_activity,**params):
         raise NotImplementedError

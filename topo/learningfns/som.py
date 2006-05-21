@@ -30,6 +30,8 @@ class SOMLF(CFPLearningFn):
     specifies the radius of the neighborhood function used during
     learning.
     """
+    _abstract_class_name = "SOMLF"
+
     learning_radius = Number(default=0.0,
                              doc="Specify the radius of the Neighborhood function used for learning.")
 
