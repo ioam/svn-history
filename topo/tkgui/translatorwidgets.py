@@ -151,7 +151,11 @@ class TaggedSlider(Frame,TranslatorWidget):
 
     def refresh(self,e=None):
         self.__set_slider_from_tag()
-        self.root.optional_refresh()
+        # CEBHACKALERT: what is this?
+        try:
+            self.root.optional_refresh()
+        except AttributeError:
+            pass
 
 
     # CEBALERT: the comment is true, this is required. But
@@ -164,7 +168,11 @@ class TaggedSlider(Frame,TranslatorWidget):
         """
         if not self.__first_slider_command:
             self.__set_tag_from_slider()
-            self.root.optional_refresh()
+            # CEBHACKALERT: see above but one alert
+            try:
+                self.root.optional_refresh()
+            except AttributeError:
+                pass
         else:
             self.__first_slider_command = False
 
