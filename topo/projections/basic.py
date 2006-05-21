@@ -17,7 +17,7 @@ from topo.base.projection import Projection
 
 from topo.base.functionfamilies import OutputFnParameter
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Number,BooleanParameter
+from topo.base.parameterclasses import Number,BooleanParameter,Parameter
 from topo.base.cf import CFProjection,CFPLearningFnParameter,IdentityCFPLearningFn,CFPResponseFnParameter,CFPOutputFnParameter,IdentityCFPOutputFn,CFPOutputFn,CFPResponseFn, DotProduct, ResponseFnParameter
 from topo.base.patterngenerator import PatternGeneratorParameter
 from topo.base.sheetview import UnitView
@@ -183,6 +183,16 @@ class SharedWeightCFProjection(CFProjection):
 	"""
         raise NotImplementedError
 
+class LeakyCFProjection(CFProjection):
+    """
+    A projection that has a decay_rate parameter so that incoming
+    input is decayed over time as x(t) = input + x(t-1)*exp(-decay_rate),
+    and then the weighted sum of x(t) is calculated.
+    """
 
+    decay_rate = Parameter(default=1.0,doc="input decay rate for leaky synapse")
 
+    def __init__(self,**params):
+        super(LeakyCFProjection,self).__init__(**params)
+        self.decay_rate = params.get('decay_rate',1.0)
 
