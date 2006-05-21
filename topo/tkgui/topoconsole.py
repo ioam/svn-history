@@ -180,6 +180,9 @@ class TopoConsole(Frame):
         self.num_weights_windows = 0
         self.num_weights_array_windows = 0
 
+	# Create the Balloon.
+	self.balloon = Pmw.Balloon(self)
+
         self.loaded_script = None
         self.input_params_window = None
         self.auto_refresh_panels = []
@@ -189,12 +192,11 @@ class TopoConsole(Frame):
         title = "Topographica Console"
         self.parent.title(title)
         dict_console['console']=self
+
         
 
     def _init_widgets(self):
         
-	# Create the Balloon.
-	self.balloon = Pmw.Balloon(self)
 
 	# Create and pack the MenuBar.
 	self.menubar = Pmw.MenuBar(self,
@@ -247,7 +249,8 @@ class TopoConsole(Frame):
                                          entry_relief='groove')
 	self.messageBar.pack(side = BOTTOM,fill=X,padx=4,pady=8)
 	self.messageBar.message('state', 'OK')
-	self.balloon.configure(statuscommand = self.messageBar.helpmessage)
+	self.balloon.configure(statuscommand = self.messageBar.helpmessage,
+                               state='status')
 
         #
         # Plot menu
@@ -298,7 +301,9 @@ class TopoConsole(Frame):
         learning_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
 
 
-        Label(learning_frame,text='Run for: ').pack(side=LEFT)
+        rf=Label(learning_frame,text='Run for: ')
+        rf.pack(side=LEFT)
+        self.balloon.bind(rf,"Duration for which to run the simulation.")
         
         learning_str=StringVar()
         learning_str.set('1.0')
@@ -313,6 +318,7 @@ class TopoConsole(Frame):
                                     string_format='%.4f')
         self.run_for.pack(side=LEFT)
 
+        self.balloon.bind(self.run_for,"Running duration is a 4 decimal place number.")
         go = Button(learning_frame,text="Go",
                     command=Pmw.busycallback(self.do_learning))
         go.pack(side=LEFT)
