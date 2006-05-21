@@ -7,7 +7,10 @@ __version__='$Revision$'
 
 # CEBHACKALERT: widget and frame sizes (e.g. widths) are a mess
 # throughout topo.tkgui
-
+# Also, notice what happens on resizing: space between widgets increases,
+# but the widgets themselves stay the same size. It would be better if
+# some were allowed to expand, like the Text box for command output
+# and in particular the status box.
 
 from math import fmod,floor
 import Tkinter
@@ -238,7 +241,7 @@ class TopoConsole(Frame):
 
 	# Create and pack the MessageBar.  (Shows "Status:")
 	self.messageBar = Pmw.MessageBar(self,
-                                         entry_width = 60,
+                                         entry_width = 45,
                                          entry_relief='groove',
                                          labelpos = 'w',
                                          label_text = 'Status:')
