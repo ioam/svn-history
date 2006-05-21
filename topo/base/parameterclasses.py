@@ -486,6 +486,9 @@ def is_number(obj):
 # CEBHACKALERT: this should be a method of ClassSelectorParameter.
 # (CB: I have a note in my e-mail from JAB about something else related
 # to this change.)
+# CEBALERT: see descendents() in parameterizedobject.py; that
+# function could probably be called in such a way as to reduce
+# what needs to be done by this function, or even eliminate it.
 from inspect import ismodule
 def find_classes_in_package(package,parentclass):
     """
