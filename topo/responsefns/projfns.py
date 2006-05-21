@@ -16,6 +16,8 @@ from topo.base.cf import CFPResponseFn
 
 from topo.misc.inlinec import inline, optimized
 
+# Imported here so that all ResponseFns will be in the same package
+from topo.base.cf import GenericCFPResponseFn
 
 # CEBHACKALERT: This is GenericCFPResponseFn(single_cf_fn=DotProduct()).
 class CFPDotProduct(CFPResponseFn):
