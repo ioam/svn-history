@@ -6,7 +6,7 @@ $Id$
 __version__='$Revision$'
 
 from math import fmod,floor
-from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, \
+from Tkinter import Frame, Toplevel, StringVar, X, BOTTOM, TOP, Button, \
      LEFT, RIGHT, YES, BOTH, Label, Text, END, DISABLED, NORMAL, Scrollbar, Y
 import Pmw, os, sys, traceback, __main__
 import StringIO
@@ -304,9 +304,9 @@ class TopoConsole(Frame):
         #
         # Command entry
         #
-        command_group = Pmw.Group(self,tag_text='Command')
-        command_frame = command_group.interior()
-        command_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
+        self.command_group = Pmw.Group(self,tag_text='Command')
+        command_frame = self.command_group.interior()
+        self.command_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
 
         self.cmd_box = Pmw.ComboBox(command_frame, autoclear=1,history=1,dropdown=1,
                                     selectioncommand=Pmw.busycallback(self.exec_cmd))
@@ -315,18 +315,32 @@ class TopoConsole(Frame):
         #
         # Command Response
         #
-        # CEBHACKALERT:
-        # (1) what length history is this going to keep?
-        # (2) should have scroll bars (though you can scroll with mouse or keys)
-        # The 'Text' manual is about 8000 pages...someone needs to
-        # read it.
+        # CEBHACKALERT: what length history is this going to keep?
         scrollbar = Scrollbar(command_frame)
         scrollbar.pack(side=RIGHT, fill=Y)
         self.cmd_output = OutputText(command_frame,state=DISABLED,height=10,
                                      yscrollcommand=scrollbar.set)
-        self.cmd_output.pack(side=BOTTOM,expand=YES,fill=X)
+        self.cmd_output.pack(side=TOP,expand=YES,fill=X)
         scrollbar.config(command=self.cmd_output.yview)
 
+
+        self.cmd_hide = Button(command_frame,text="Hide",
+                               command=self.hide_command_widgets)
+        self.cmd_hide.pack(side=RIGHT)
+
+
+    def hide_command_widgets(self):
+        self.command_group.pack_forget()
+        self.cmd_unhide = Button(self,text="Commands",
+                                 command=self.show_command_widgets)
+        self.cmd_unhide.pack(side=RIGHT)
+
+
+
+    def show_command_widgets(self):
+        self.command_group.pack()
+        self.cmd_unhide.destroy()
+        
 
     def populate_plots_menu(self, menubar):
         """
