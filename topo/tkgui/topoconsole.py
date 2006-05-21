@@ -666,7 +666,7 @@ class TopoConsole(Frame):
 
 
         self.messageBar.message('state', message)
-        topo.tkgui.show_cmd_prompt()
+        #topo.tkgui.show_cmd_prompt()
 
         
         
