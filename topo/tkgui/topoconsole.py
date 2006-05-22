@@ -594,7 +594,7 @@ class TopoConsole(Frame):
         capture_stderr.close()
 
 	self.messageBar.message('state', result)
-        #topo.tkgui.show_cmd_prompt()
+        topo.tkgui.show_cmd_prompt()
 
     
     def load_script_file(self,filename):
