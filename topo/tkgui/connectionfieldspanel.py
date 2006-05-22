@@ -183,7 +183,7 @@ It is an error to request a unit outside the area of the Sheet.""")
             message = 'The x/y coordinates are outside the bounding region.\n'\
                     + '  ' + str(l) + ' < X < ' + str(r) + '\n' \
                     + '  ' + str(b) + ' < Y < ' + str(t)
-	    w = Tkinter.Label(self.dialog.interior(),
+	    w = Label(self.dialog.interior(),
                               text = message,
                               background = 'black',
                               foreground = 'white',
