@@ -203,6 +203,8 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 
 	self.plotgroup = self.generate_plotgroup()
 
+	# Hotkey for killing the window
+	self.parent.bind('<Control-q>',self.parent_destroy)
 
     def generate_plotgroup(self):
         """
@@ -478,5 +480,8 @@ class PlotGroupPanel(Frame,ParameterizedObject):
             self.console.auto_refresh_panels.remove(self)
         Frame.destroy(self)
 
-
-
+    # YCHACKALERT: This is a hack to avoid number of argument mismatch
+    # when the Control-q hotkey binding is activated.
+    def parent_destroy(self,dummy):
+	self.destroy()
+	self.parent.destroy()
