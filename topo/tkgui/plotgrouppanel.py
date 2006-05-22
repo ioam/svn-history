@@ -362,7 +362,7 @@ original data is no longer available.""")
     def toggle_integerscaling(self):
         """Function called by Widget when check-box clicked"""
         self.integerscaling = not self.integerscaling 
-< 	self.plotgroup.integerscaling = self.integerscaling
+ 	self.plotgroup.integerscaling = self.integerscaling
         if self.integerscaling:
             self.plotgroup.sizeconvertfn = int
         else:
