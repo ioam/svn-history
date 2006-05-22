@@ -43,8 +43,7 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
 
 	 # Command used to refresh the plot, if any
         self.cmdname = StringVar()
-         
-	self.cmdname.set(self.plotgroup.cmdname)
+	self.cmdname.set(self.plotgroup.updatecommand)
 
 	### JCALERT! We might get rid of that, as it is redundant with plotgroup_key
         self.mapname = StringVar()       
@@ -55,12 +54,16 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         
         params_frame = Frame(master=self)
         params_frame.pack(side=TOP,expand=YES,fill=X)
-        Message(params_frame,text="Update command:",aspect=1000).pack(side=LEFT)
+        cmdlabel = Message(params_frame,text="Update command:",aspect=1000)
+        cmdlabel.pack(side=LEFT)
+        self.balloon.bind(cmdlabel,self.plotgroup.params()['updatecommand'].__doc__)
+        
+        cmdbox = Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
+                              entry_textvariable=self.cmdname,
+                              scrolledlist_items=([self.cmdname]))
+        cmdbox.pack(side=LEFT,expand=YES,fill=X)
+        self.balloon.bind(cmdbox,self.plotgroup.params()['updatecommand'].__doc__)
 
-        Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
-                     entry_textvariable=self.cmdname,
-                     scrolledlist_items=([self.cmdname])
-                     ).pack(side=LEFT,expand=YES,fill=X)
        
         # To make the auto-refresh button not on by default when opening the panel
         # but it is not the case for the Activity PlotGroup
@@ -85,13 +88,14 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         ### take the one that is specified.
         ### Otherwise, we could assume that each panel is associated with a PlotGroup
         ### and then specify a panel for each template. (as it is done from topoconsole)
-	plotgroup = TemplatePlotGroup([],self.normalize,
-				      self.sheetcoords,self.integerscaling,self.pgt,None)
+	plotgroup = TemplatePlotGroup([],self.pgt,None,
+                                      normalize=self.normalize,
+				      sheetcoords=self.sheetcoords,
+                                      integerscaling=self.integerscaling)
 	return plotgroup
 
     def update_plotgroup_variables(self):
-	
-        self.plotgroup.cmdname = self.cmdname.get()
+        self.plotgroup.updatecommand = self.cmdname.get()
  
     def display_labels(self):
         """

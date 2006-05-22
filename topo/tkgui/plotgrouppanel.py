@@ -17,6 +17,9 @@ __version__='$Revision$'
 ### instantiate some PlotGroup type, and from then on query the
 ### PlotGroup for the variables that it needs, and change them directly
 ### in the PlotGroup rather than in shadow copies within the panel.
+### It should be possible to do this in a very general way based on
+### Parameters in the PlotGroup, so that the Tk-specific stuff is as
+### simple as possible.
 ### This *may* require some changes in PlotGroup so that each PlotGroup
 ### can be instantiated without any plots, and can then have plots
 ### added. 
@@ -88,7 +91,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 
 	self.console = console
         self.parent = parent
-	# ballon help component
+	# balloon help component
         self.balloon = Pmw.Balloon(parent)
         self.canvases = []
 
@@ -124,25 +127,40 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         # the user can figure them out the first time.
         # 
         # Refresh, Reduce, Enlarge, Back and Forward Buttons.
-        Button(self.control_frame_1,text="Refresh",
-                                     command=self.refresh).pack(side=LEFT)
+        self.refresh_button = Button(self.control_frame_1,text="Refresh",
+                                          command=self.refresh)
+        self.refresh_button.pack(side=LEFT)
+        self.balloon.bind(self.refresh_button,"Force the current plot to be regenerated.")
                
         self.reduce_button = Button(self.control_frame_1,text="Reduce",
                                     command=self.reduce)
         self.reduce_button.pack(side=LEFT)
+        self.balloon.bind(self.reduce_button,
+"""Reduce the displayed size of the current plots by about 20%.  A minimum size that
+preserves at least one pixel per unit is enforced, to ensure that
+no data is lost when displaying.""")
+
         
-        Button(self.control_frame_1,text="Enlarge",
-                                     command=self.enlarge).pack(side=LEFT)
+        enlarge_button=Button(self.control_frame_1,text="Enlarge",
+                              command=self.enlarge)
+        enlarge_button.pack(side=LEFT)
+        self.balloon.bind(enlarge_button,
+"""Increase the displayed size of the current plots by about 20%.""")
 
         self.back_button = Button(self.control_frame_2,text="Back",
-                                  state = DISABLED,
-                                  command=self.back)
+                                  state = DISABLED,command=self.back)
         self.back_button.pack(side=LEFT)
+        self.balloon.bind(self.back_button,
+"""Move backward through the history of all the plots shown in this window.
+When showing a historical plot, some functions will be disabled, because the
+original data is no longer available.""")
 
         self.forward_button = Button(self.control_frame_2,text="Forward",
                                      state = DISABLED,
                                      command=self.forward)
         self.forward_button.pack(side=LEFT)
+        self.balloon.bind(self.forward_button,
+"Move forward through the history of all the plots shown in this window.")
 
         # Auto_refresh check button.
         # Default is to not have the window Auto-refresh, because some
@@ -150,32 +168,33 @@ class PlotGroupPanel(Frame,ParameterizedObject):
         # plots).  Call self.auto_refresh_checkbutton.invoke() to
         # enable autorefresh in a subclassed constructor function.
         self.auto_refresh = False
-        self.auto_refresh_checkbutton = Checkbutton(self.control_frame_1,
-                                                    text="Auto-refresh",
-                                                    command=self.toggle_auto_refresh)
+        self.auto_refresh_checkbutton = \
+            Checkbutton(self.control_frame_1, text="Auto-refresh",
+                        command=self.toggle_auto_refresh)
         self.auto_refresh_checkbutton.pack(side=RIGHT)
         self.auto_refresh_checkbutton.invoke()
+        self.balloon.bind(self.auto_refresh_checkbutton,
+"Whether to regenerate this plot whenever the simulation time advances.")
 
 	# Normalize check button
-	self.normalize = False    
-	self.normalize_checkbutton = Checkbutton(self.control_frame_1,
-                                                     text="Normalize",
-                                                     command=self.toggle_normalize)
+	self.normalize = False 
+	self.normalize_checkbutton = \
+            Checkbutton(self.control_frame_1,text="Normalize",command=self.toggle_normalize)
 	self.normalize_checkbutton.pack(side=RIGHT)
 
         # Integerscaling check button
 	self.integerscaling = False
-	self.integerscaling_checkbutton = Checkbutton(self.control_frame_2,
-                                                    text="Integer scaling",
-                                                    command=self.toggle_integerscaling)
-	self.integerscaling_checkbutton.pack(side=RIGHT)
+	self.integerscaling_checkbutton = \
+           Checkbutton(self.control_frame_2,text="Integer scaling",
+                       command=self.toggle_integerscaling)
+        self.integerscaling_checkbutton.pack(side=RIGHT)
         self.sizeconvertfn = identity
-
+        
 	# Sheet coordinates check button
 	self.sheetcoords = False
-	self.sheetcoords_checkbutton = Checkbutton(self.control_frame_2,
-                                                    text="Sheet coordinates",
-                                                    command=self.toggle_sheetcoords)
+	self.sheetcoords_checkbutton = \
+            Checkbutton(self.control_frame_2,text="Sheet coordinates",
+                        command=self.toggle_sheetcoords)
         self.sheetcoords_checkbutton.pack(side=RIGHT)
             
         # Main Plot group title can be changed from a subclass with the
@@ -203,16 +222,30 @@ class PlotGroupPanel(Frame,ParameterizedObject):
 
 	self.plotgroup = self.generate_plotgroup()
 
+        # For now, the balloon help needs to be separate from the buttons
+        # above, because it depends on the plotgroup and they are needed
+        # for creating the plotgroup.  All of this needs to be cleaned up
+        # drastically.
+        self.balloon.bind(self.normalize_checkbutton,
+                          self.plotgroup.params()['normalize'].__doc__)
+        self.balloon.bind(self.sheetcoords_checkbutton,
+                          self.plotgroup.params()['sheetcoords'].__doc__)
+        self.balloon.bind(self.integerscaling_checkbutton,
+                          self.plotgroup.params()['integerscaling'].__doc__)
+
 	# Hotkey for killing the window
 	self.parent.bind('<Control-q>',self.parent_destroy)
+
 
     def generate_plotgroup(self):
         """
 	Function that creates the PlotGroupPanel's PlotGroup.
 	Needs to be re-implemented for subclasses.
         """
-        plotgroup = PlotGroup([],self.normalize,
-			      self.sheetcoords,self.integerscaling)
+        plotgroup = PlotGroup([],
+                              normalize=self.normalize,
+			      sheetcoords=self.sheetcoords,
+                              integerscaling=self.integerscaling)
 	return plotgroup
 
 
@@ -329,7 +362,7 @@ class PlotGroupPanel(Frame,ParameterizedObject):
     def toggle_integerscaling(self):
         """Function called by Widget when check-box clicked"""
         self.integerscaling = not self.integerscaling 
-	self.plotgroup.integerscaling = self.integerscaling
+< 	self.plotgroup.integerscaling = self.integerscaling
         if self.integerscaling:
             self.plotgroup.sizeconvertfn = int
         else:

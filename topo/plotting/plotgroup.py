@@ -16,6 +16,7 @@ import __main__
 import topo
 
 from topo.base.parameterizedobject import ParameterizedObject
+from topo.base.parameterclasses import Parameter,BooleanParameter
 from topo.base.sheet import Sheet
 from topo.base.cf import CFSheet
 
@@ -48,26 +49,31 @@ class PlotGroup(ParameterizedObject):
     ### - clean up the doc.
     ### - rewrite the test file.
 
+    normalize = BooleanParameter(default=False,doc=
+"""Whether to scale plots so that the peak value will be white
+and the minimum value black.""")
 
-    def __init__(self, plot_list, normalize, sheetcoords, integerscaling, **params):
+    sheetcoords = BooleanParameter(default=False,doc=
+"""Whether to scale plots based on their relative sizes in sheet
+coordinates.  If True, plots are scaled so that their sizes are
+proportional to their area in sheet coordinates, so that one can
+compare corresponding areas.  If False, plots are scaled to have
+similar sizes on screen, regardless of their corresponding
+sheet areas.""")
+
+    integerscaling = BooleanParameter(default=False,doc=
+"""When scaling bitmaps, whether to ensure that the scaled bitmap is an even
+multiple of the original.  If true, every unit will be represented by a
+square of the same size.""")
     
+    def __init__(self, plot_list, **params):
         """
 	plot_list is a static list specifying the Plot objects belonging to the PlotGroup.
-
-	normalize specified if the Plot in the PlotGroup should be normalized by default.
-
-	sheetcoords is a boolean specifying if the Plots are in sheet coordinates 
-	(as opposed to matrix coordinates)
-
-	intergerscaling is a boolean indicating that the Plots are scaled with integer.
         """
         super(PlotGroup,self).__init__(**params)  
 
 	self.plot_list = plot_list	
-	self.normalize = normalize
-	self.sheetcoords = sheetcoords
-        self.integerscaling = integerscaling
-	if integerscaling:
+	if self.integerscaling:
             self.sizeconvertfn = int
         else:
             self.sizeconvertfn = identity
@@ -212,16 +218,24 @@ class TemplatePlotGroup(PlotGroup):
     PlotGroup that is built as specified by a PlotGroupTemplate.
     """
 
-    def __init__(self,plot_list,normalize,sheetcoords,integerscaling,template,sheet_name,**params):
+    # JABALERT: Should be a StringParameter
+    updatecommand = Parameter(default="",doc=
+"""Command to execute before updating this plot, e.g. to calculate sheet views.
 
-	super(TemplatePlotGroup,self).__init__(plot_list,normalize,sheetcoords,integerscaling,**params)
+The command can be any Python code, and will be evaluated in the main namespace
+(as if it were typed into a .ty script).""")
+
+
+    def __init__(self,plot_list,template,sheet_name,**params):
+
+	super(TemplatePlotGroup,self).__init__(plot_list,**params)
 	self.template = template
 
 	# Sheet_name can be none, in which case the PlotGroup build Plots for each Sheet.
 	self.sheet_name=sheet_name
 
-	# Command used to refresh the plot, if any
-        self.cmdname = self.template.command
+	# Command used to refresh the plot, if any.  Overwrites any keyword parameter above.
+        self.updatecommand = self.template.command
 
 	# Add static images to the added_plot_list, as specified by the template.
         self._add_static_images()
@@ -232,7 +246,7 @@ class TemplatePlotGroup(PlotGroup):
 	Only implemented for TemplatePlotGroup. 
 	Execute the command associated with the template.
 	"""
-	exec self.cmdname in __main__.__dict__
+	exec self.updatecommand in __main__.__dict__
 
 	
     def _plot_list(self):
@@ -299,13 +313,11 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
       situate: Whether to situate the plot on the full source sheet, or just show the weights.
     """
 
-    def __init__(self,plot_list,normalize,sheetcoords,integerscaling,
-		 template,sheet_name,x,y,**params):
+    def __init__(self,plot_list,template,sheet_name,x,y,**params):
         self.x = x
         self.y = y
       	self.situate = False       
-	super(ConnectionFieldsPlotGroup,self).__init__(plot_list,normalize,
-						       sheetcoords,integerscaling,template,sheet_name,**params)
+	super(ConnectionFieldsPlotGroup,self).__init__(plot_list,template,sheet_name,**params)
   
     def update_environment(self):
 	""" 
@@ -317,7 +329,7 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
 	topo.commands.analysis.coordinate = (self.x,self.y)
 	topo.commands.analysis.sheet_name = self.sheet_name
 
-        exec self.cmdname  in __main__.__dict__
+        exec self.updatecommand  in __main__.__dict__
 		
 
     def _create_plots(self,pt_name,pt,sheet):
@@ -368,8 +380,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
     PlotGroup for Projection Plots
     """
 
-    def __init__(self,plot_list,normalize,sheetcoords,integerscaling,
-		 template,sheet_name,proj_name,density,**params):
+    def __init__(self,plot_list,template,sheet_name,proj_name,density,**params):
 
 	### JCALERT! rename to proj_name
         self.weight_name = proj_name
@@ -382,8 +393,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 	### JCALERT! should become an argument of the constructor (id:for connectionPlotGroup) 
 	self.situate = False 
        
-        super(ProjectionPlotGroup,self).__init__(plot_list,normalize,sheetcoords,integerscaling,
-						 template,sheet_name,**params)
+        super(ProjectionPlotGroup,self).__init__(plot_list,template,sheet_name,**params)
 
         self.INITIAL_PLOT_HEIGHT = 5
 
@@ -403,7 +413,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
         topo.commands.analysis.proj_coords = coords
 	topo.commands.analysis.sheet_name = self.sheet_name
         topo.commands.analysis.proj_name = self.weight_name
-        exec self.cmdname  in __main__.__dict__
+        exec self.updatecommand  in __main__.__dict__
 		
     def _create_plots(self,pt_name,pt,sheet):
 	""" 

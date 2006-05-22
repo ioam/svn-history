@@ -85,15 +85,21 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
                        menubutton_textvariable = self.region,
                        items = sim_ep_names)
         self.opt_menu.pack(side=LEFT)
+        # Should be shared with projectionpanel
+        self.balloon.bind(self.opt_menu,"""CFSheet whose unit(s) will be plotted.""")
 
 
     def _add_situate_button(self):
-        
         self.situate = 0
         self.situate_checkbutton = Checkbutton(self.__params_frame,
                                                     text="Situate",
                                                     command=self.toggle_situate)
         self.situate_checkbutton.pack(side=LEFT)
+        # Should move into the documentation for a situate parameter shared with projectionpanel
+        self.balloon.bind(self.situate_checkbutton,
+"""If True, plots the weights on the entire source sheet, using zeros for all
+weights outside the ConnectionField.  If False, plots only the actual weights that
+are stored.""")
 
 
     def toggle_situate(self):
@@ -117,13 +123,18 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
 	# but we don't know yet how to do it.(id for ye)
         self.xe.bind('<Return>',self.refresh)
         self.xe.pack(side=LEFT,expand=YES,fill=X)
-
+        self.balloon.bind(self.xe,
+"""Sheet coordinate location desired.  The unit nearest this location will be returned.
+It is an error to request a unit outside the area of the Sheet.""")
         #self.tag.bind('<KeyRelease>', self.tag_keypress)
 
         Message(params_frame,text="Y:",aspect=1000).pack(side=LEFT)
         self.ye = Entry(params_frame,textvariable=self.y_str)
 	self.ye.bind('<Return>', self.refresh)
         self.ye.pack(side=LEFT,expand=YES,fill=X,padx=5)
+        self.balloon.bind(self.ye,
+"""Sheet coordinate location desired.  The unit nearest this location will be returned.
+It is an error to request a unit outside the area of the Sheet.""")
 
     @staticmethod
     def valid_context():
@@ -155,6 +166,8 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         self.y = eval(self.y_str.get(),g)
         if isinstance(self.x,int): self.x = float(self.x)
         if isinstance(self.y,int): self.y = float(self.y)
+        # JABALERT: Need to display the actual x,y coordintes of the
+        # nearest unit somehow, since that differs from the value requested.
 
         ep = [ep for ep in topo.sim.objects(Sheet).values()
               if ep.name == self.region.get()][0]
@@ -188,9 +201,10 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         PlotGroup is created, call its do_plot_cmd() to prepare
         the Plot objects.
         """
-	plotgroup = ConnectionFieldsPlotGroup([],self.normalize,
-					      self.sheetcoords,self.integerscaling,self.pgt,
-					      self.region.get(),self.x,self.y)
+	plotgroup = ConnectionFieldsPlotGroup([],self.pgt,self.region.get(),self.x,self.y,
+                                              normalize=self.normalize,
+                                              sheetcoords=self.sheetcoords,
+                                              integerscaling=self.integerscaling)
 	return plotgroup
 
 

@@ -120,6 +120,9 @@ class ProjectionPanel(TemplatePlotGroupPanel):
                        menubutton_textvariable = self.region,
                        items = sim_ep_names)
         self.opt_menu.pack(side=LEFT)
+        # Should be shared with projectionpanel
+        self.balloon.bind(self.opt_menu,
+"""CFSheet whose unit(s) will be plotted.""")
 
     def _add_situate_button(self):
         
@@ -128,6 +131,11 @@ class ProjectionPanel(TemplatePlotGroupPanel):
                                                     text="Situate",
                                                     command=self.toggle_situate)
         self.situate_checkbutton.pack(side=LEFT)
+        # Should move into the documentation for a situate parameter shared with connectionfieldspanel
+        self.balloon.bind(self.situate_checkbutton,
+"""If True, plots the weights on the entire source sheet, using zeros for all
+weights outside the ConnectionField.  If False, plots only the actual weights that
+are stored.""")
 
     def toggle_situate(self):
         """Set the attribute situate"""
@@ -216,6 +224,9 @@ class ProjectionPanel(TemplatePlotGroupPanel):
                        menubutton_textvariable = self.weight_name,
                        items = self.projections.keys())
         self.projection_menu.pack(side=LEFT)
+        # Should be shared with projectionpanel
+        self.balloon.bind(self.projection_menu,
+"""Projection to plot.""")
 
 
     @staticmethod
@@ -278,9 +289,11 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         self.generate_plotgroup_key() creates the density information needed for
         a ProjectionPlotGroup to create necessary Plots.
         """
- 	plotgroup = ProjectionPlotGroup([],self.normalize,self.sheetcoords,
-					self.integerscaling,self.pgt,self.region.get(),
-					self.weight_name.get(),self.density)
+ 	plotgroup = ProjectionPlotGroup([],self.pgt,self.region.get(),
+					self.weight_name.get(),self.density,
+                                        normalize=self.normalize,
+                                        sheetcoords=self.sheetcoords,
+                                        integerscaling=self.integerscaling)
   	return plotgroup
 
 

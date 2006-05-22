@@ -76,6 +76,8 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
         self.learning_button = Checkbutton(self,text='Network Learning',
                                       variable=self.learning)
         self.learning_button.pack(side=TOP)
+        self.balloon.bind(self.learning_button,
+"""Whether to enable learning during presentation.""")
         # buttonBox.add('Use for future learning',command = self.use_for_learning)
 
 
@@ -85,14 +87,22 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
                 labelpos = 'w',label_text = 'Duration to Present:',
                 value = DEFAULT_PRESENTATION,validate = {'validator' : 'real'})
         self.present_length.pack(fill='x', expand=1, padx=10, pady=5)
+        self.balloon.bind(self.present_length,
+"""How long to run the simulator when presenting.""")
 
 
         ### 'Present'/'reset to defaults' buttons  (i.e. re: patterns themselves)
         #
         buttonBox = Pmw.ButtonBox(self,orient = 'horizontal',padx=0,pady=0)
         buttonBox.pack(side=TOP)
-        buttonBox.add('Present', command=self.present)
-        buttonBox.add('Reset to defaults', command=self.reset_to_defaults)
+        
+        present_button = buttonBox.add('Present', command=self.present)
+        self.balloon.bind(present_button,
+"""Present this pattern to the simulation.""")
+
+        reset_button = buttonBox.add('Reset to defaults', command=self.reset_to_defaults)
+        self.balloon.bind(reset_button,
+"""Reset the parameters for this pattern back to their defaults.""")
 
 
         ### Menu of PatternGenerator types
@@ -133,6 +143,9 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
                                             menubutton_textvariable = self.__current_pattern_generator_name,
                                             items = self.pattern_generators.keys())
         self.pg_choice_box.pack(side=TOP)
+        self.balloon.bind(self.pg_choice_box,
+"""Type of pattern to present.
+Each type will have various parameters that can be changed.""")
 
 
         ### The ParametersFrame
@@ -295,8 +308,10 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 	    channels = {'Strength':each,'Hue':None,'Confidence':None}
 	    ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
 	    plot_list.append(make_template_plot(channels,view_dict,density,None,self.normalize,name=''))
-	new_plotgroup = topo.plotting.plotgroup.PlotGroup(plot_list,self.normalize,
-						 self.sheetcoords,self.integerscaling)
+	new_plotgroup = topo.plotting.plotgroup.PlotGroup(plot_list,
+                                                          normalize=self.normalize,
+                                                          sheetcoords=self.sheetcoords,
+                                                          integerscaling=self.integerscaling)
 	new_plotgroup.height_of_tallest_plot = self.plotgroup.height_of_tallest_plot
 	new_plotgroup.initial_plot = self.plotgroup.initial_plot
 	new_plotgroup.sheetcoords = self.plotgroup.sheetcoords
