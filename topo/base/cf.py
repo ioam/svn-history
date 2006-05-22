@@ -20,6 +20,18 @@ $Id$
 __version__ = '$Revision$'
 
 
+# CEBHACKALERT: some things that need to be cleaned up...
+#
+# - CFProjection sometimes passes copies of objects to the CFs its
+# creating, sometimes it doesn't. Some of ConnectionField's methods
+# change their arguments, some don't.  Could lead to confusion and
+# some hard-to-track bugs. (Same applies to SharedWeightCFProjection.)
+#
+# - The Slice object, then what a CF stores as a slice can finally be
+# cleaned up.
+
+
+
 
 import Numeric
 import copy
@@ -107,7 +119,7 @@ class ConnectionField(ParameterizedObject):
     # CEBHACKALERT: add some default values
     def __init__(self,x,y,input_sheet,bounds_template,
                  weights_generator,mask_template,
-                 output_fn=IdentityOF(),**params):
+                 output_fn=IdentityOF(),slice_=None,**params):
         """
 
         bounds_template is assumed to have been initialized correctly
@@ -122,7 +134,7 @@ class ConnectionField(ParameterizedObject):
 
         self.x = x; self.y = y
         self.input_sheet = input_sheet
-        self.offset_bounds(bounds_template)
+        self.offset_bounds(bounds_template,slice_)
 
         # CEBHACKALERT: might want to do something about a size that's specified.
         w = weights_generator(x=self.x,y=self.y,bounds=self.bounds,
@@ -135,7 +147,7 @@ class ConnectionField(ParameterizedObject):
 
         # Now we have to get the right submatrix of the mask (in case
         # it is near an edge)
-        r1,r2,c1,c2 =  self.get_slice(bounds_template)
+        r1,r2,c1,c2 =  self.get_slice(bounds_template,slice_)
         m = mask_template[r1:r2,c1:c2]
         
         self.mask = m.astype(weight_type)
@@ -152,17 +164,19 @@ class ConnectionField(ParameterizedObject):
 
 
     ### CEBHACKALERT: there is presumably a better way than this.
-    def get_slice(self,bounds_template):
+    def get_slice(self,bounds_template,slice_=None):
         """
         Return the correct slice for a weights/mask matrix at this
         ConnectionField's location on the sheet (i.e. for getting
         the correct submatrix of the weights or mask in case the
         unit is near the edge of the sheet).
         """
+        if not slice_:
+            slice_ = Slice(bounds_template,self.input_sheet)
+            
         sheet_rows,sheet_cols = self.input_sheet.activity.shape
 
         # get size of weights matrix
-        slice_ = Slice(bounds_template,self.input_sheet)
         n_rows,n_cols = slice_.shape
 
         # get slice for the submatrix
@@ -178,16 +192,18 @@ class ConnectionField(ParameterizedObject):
     # CEBHACKALERT: assumes the user wants the bounds to be centered
     # about the unit, which might not be true. Same HACKALERT as for
     # CFProjection.initialize_bounds()
-    def offset_bounds(self,bounds):
+    def offset_bounds(self,bounds,slice_=None):
         """
         Offset the given bounds to this cf's location and store the
         result in the 'bounds' attribute.
 
         Also stores the slice_array for access by C.
 	"""
-        slice_ = Slice(bounds,self.input_sheet)
-        r1,r2,c1,c2 = slice_
-
+        if not slice_:
+            slice_ = Slice(bounds,self.input_sheet)
+        else:
+            slice_ = copy.copy(slice_)
+               
         # translate to this cf's location
         cf_row,cf_col = self.input_sheet.sheet2matrixidx(self.x,self.y)
         bounds_x,bounds_y=bounds.get_center()
@@ -553,6 +569,8 @@ class CFProjection(Projection):
         # cropped to sheet if necessary
         self.bounds_template = self.initialize_bounds(self.nominal_bounds_template)
 
+        slice_ = Slice(self.bounds_template,self.src)
+
         self.mask_template = self.create_mask_template()
         
 
@@ -573,7 +591,8 @@ class CFProjection(Projection):
                                             copy.copy(self.bounds_template),
                                             self.weights_generator,
                                             copy.copy(self.mask_template), 
-                                            self.weights_output_fn.single_cf_fn))
+                                            output_fn=self.weights_output_fn.single_cf_fn,
+                                            slice_=slice_))
                 cflist.append(row)
 
 
