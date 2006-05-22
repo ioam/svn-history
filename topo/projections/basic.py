@@ -200,17 +200,15 @@ class LeakyCFProjection(CFProjection):
     and then the weighted sum of x(t) is calculated.
     """
 
-    decay_rate = Number(default=1.0,
-		        bounds=(0,None),
-                        doc="input decay rate for each leaky synapse")
-
-    leaky_input_buffer = None
+    decay_rate = Number(default=1.0,bounds=(0,None),
+                        doc="Input decay rate for each leaky synapse")
 
     def __init__(self,**params):
         super(LeakyCFProjection,self).__init__(**params)
-	# YC hack alert
+	# YCHACKALERT:
 	# This is a crude hack to initialize the leaky_input_buffer
 	# to a zero matrix that has the same size as the src sheet.
+        # JAB - try:   self.leaky_input_buffer = Numeric.zeros(self.src.activity.shape)
 	self.leaky_input_buffer = self.src.activity * 0.0
 
     def activate(self,input_activity):
@@ -219,6 +217,6 @@ class LeakyCFProjection(CFProjection):
 	and add a leaked version of it to the current input_activity. This 
 	function needs to deal with a finer time-scale.
 	"""
-	self.leaky_input_buffer = input_activity +self.leaky_input_buffer*exp(-self.decay_rate) 
+	self.leaky_input_buffer = input_activity + self.leaky_input_buffer*exp(-self.decay_rate) 
         super(LeakyCFProjection,self).activate(self.leaky_input_buffer)
 
