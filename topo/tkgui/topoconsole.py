@@ -249,6 +249,9 @@ class TopoConsole(Frame):
                                          entry_relief='groove')
 	self.messageBar.pack(side = BOTTOM,fill=X,padx=4,pady=8)
 	self.messageBar.message('state', 'OK')
+        # JABALERT: Commenting this out restores the balloons for the
+        # widgets in this window, but not for the menus.  Any idea how
+        # to make balloons appear for both?
 	self.balloon.configure(statuscommand = self.messageBar.helpmessage,
                                state='status')
 
@@ -303,7 +306,7 @@ class TopoConsole(Frame):
 
         rf=Label(learning_frame,text='Run for: ')
         rf.pack(side=LEFT)
-        self.balloon.bind(rf,"Duration for which to run the simulation.")
+        self.balloon.bind(rf,"Duration to run the simulation when Go is pressed.")
         
         learning_str=StringVar()
         learning_str.set('1.0')
@@ -314,14 +317,15 @@ class TopoConsole(Frame):
                                     tagvariable=learning_str,
                                     tag_width=11,
                                     slider_length=150,
-                                    min_value=0,max_value=50000,
+                                    min_value=0,max_value=20000,
                                     string_format='%.4f')
         self.run_for.pack(side=LEFT)
 
-        self.balloon.bind(self.run_for,"Running duration is a 4 decimal place number.")
+        self.balloon.bind(self.run_for,"Duration to run the simulation, e.g. 0.0500, 1.0, or 20000.")
         go = Button(learning_frame,text="Go",
                     command=Pmw.busycallback(self.do_learning))
         go.pack(side=LEFT)
+        self.balloon.bind(go,"Run the simulation for the specified duration.")
 
 
         
@@ -358,7 +362,8 @@ class TopoConsole(Frame):
         self.command_entry=Pmw.ComboBox(cw,autoclear=1,history=1,dropdown=1,
                                         label_text='>>>',labelpos='w',
                                selectioncommand=Pmw.busycallback(self.exec_cmd))
-
+        self.balloon.bind(self.command_entry,
+"""Accepts any valid Python command and executes it in main as if typed at a terminal window.""")
 
         ### Now we make a Text (command_output, for output from commands)
         ### with a Scrollbar, both inside a Frame (command_output_frame,

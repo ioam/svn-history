@@ -55,16 +55,18 @@ and the minimum value black.""")
 
     sheetcoords = BooleanParameter(default=False,doc=
 """Whether to scale plots based on their relative sizes in sheet
-coordinates.  If True, plots are scaled so that their sizes are
+coordinates.  If true, plots are scaled so that their sizes are
 proportional to their area in sheet coordinates, so that one can
-compare corresponding areas.  If False, plots are scaled to have
+compare corresponding areas.  If false, plots are scaled to have
 similar sizes on screen, regardless of their corresponding
 sheet areas.""")
 
     integerscaling = BooleanParameter(default=False,doc=
 """When scaling bitmaps, whether to ensure that the scaled bitmap is an even
 multiple of the original.  If true, every unit will be represented by a
-square of the same size.""")
+square of the same size.  Typically false so that the overall area will
+be correct, e.g. when using Sheet coordinates, which is often more
+important.""")
     
     def __init__(self, plot_list, **params):
         """
@@ -223,7 +225,9 @@ class TemplatePlotGroup(PlotGroup):
 """Command to execute before updating this plot, e.g. to calculate sheet views.
 
 The command can be any Python code, and will be evaluated in the main namespace
-(as if it were typed into a .ty script).""")
+(as if it were typed into a .ty script).  The initial value is determined by
+the template for this plot, but various arguments can be passed, a modified
+version substituted, etc.""")
 
 
     def __init__(self,plot_list,template,sheet_name,**params):
