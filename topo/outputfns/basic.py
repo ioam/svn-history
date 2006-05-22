@@ -73,7 +73,7 @@ class DivisiveSumNormalize(OutputFn):
         norm_value, the operation is skipped.
         """
         if current_norm_value==None:
-            current_norm_value = 1.0*sum(x.flat)
+            current_norm_value = 1.0*Numeric.sum(x.flat)
         
         if current_norm_value==self.norm_value:
             return x
@@ -107,7 +107,7 @@ class DivisiveL1Normalize(OutputFn):
         """
 
         if current_norm_value==None:
-            current_norm_value = 1.0*sum(abs(x.flat))
+            current_norm_value = 1.0*Numeric.sum(abs(x.flat))
         
         if current_norm_value==self.norm_value:
             return x
