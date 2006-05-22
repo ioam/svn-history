@@ -13,6 +13,7 @@ from topo.misc.inlinec import inline, optimized
 
 from basic import DivisiveSumNormalize
 
+from Numeric import sum
 
 # CEBHACKALERT: the various DivisiveSumNormalize classes
 # should be DivisiveL1Normalize (i.e. use the absolute values - see basic.py).
@@ -49,20 +50,20 @@ class DivisiveSumNormalize_opt1(OutputFn):
             return x
 
         target_norm_value = self.norm_value
+        
 
         if current_norm_value != 0:
+            factor = target_norm_value/current_norm_value
             rows,cols=x.shape
             
             div_sum_norm_code = """
             float *xi = x;
 
-            double factor = target_norm_value/current_norm_value;
-
             for (int i=0; i<rows*cols; ++i) {
                 *(xi++) *= factor;
             }
             """
-            inline(div_sum_norm_code, ['x','current_norm_value','target_norm_value','rows','cols'], local_dict=locals())
+            inline(div_sum_norm_code, ['x','current_norm_value','target_norm_value','rows','cols','factor'], local_dict=locals())
 
         return x
 
