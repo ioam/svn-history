@@ -11,6 +11,7 @@ __version__ = "$Revision$"
 
 import copy
 import Numeric
+from math import exp
 
 # So all Projections are present in this package
 from topo.base.projection import Projection
@@ -190,9 +191,23 @@ class LeakyCFProjection(CFProjection):
     and then the weighted sum of x(t) is calculated.
     """
 
-    decay_rate = Parameter(default=1.0,doc="input decay rate for leaky synapse")
+    decay_rate = Number(default=1.0,
+		        bounds=(0,None),
+                        doc="input decay rate for each leaky synapse")
+
+    leaky_input_buffer = None
 
     def __init__(self,**params):
         super(LeakyCFProjection,self).__init__(**params)
-        self.decay_rate = params.get('decay_rate',1.0)
+	self.leaky_input_buffer = self.src.activity
+
+    def activate(self,input_activity):
+	"""
+	Retain input_activity from the previous step in leaky_input_buffer
+	and add a leaked version of it to the current input_activity. This 
+	function needs to deal with a finer time-scale.
+	"""
+	self.leaky_input_buffer = input_activity
+				+ self.leaky_input_buffer*exp(-self.decay_rate) 
+        super(LeakyCFProjection,self).activate(self.leaky_input_buffer)
 
