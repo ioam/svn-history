@@ -205,11 +205,7 @@ class LeakyCFProjection(CFProjection):
 
     def __init__(self,**params):
         super(LeakyCFProjection,self).__init__(**params)
-	# YCHACKALERT:
-	# This is a crude hack to initialize the leaky_input_buffer
-	# to a zero matrix that has the same size as the src sheet.
-        # JAB - try:   self.leaky_input_buffer = Numeric.zeros(self.src.activity.shape)
-	self.leaky_input_buffer = self.src.activity * 0.0
+	self.leaky_input_buffer = Numeric.zeros(self.src.activity.shape)
 
     def activate(self,input_activity):
 	"""
