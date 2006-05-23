@@ -313,7 +313,8 @@ class GenericCFPResponseFn(CFPResponseFn):
     ConnectionField weights) and computes a scalar activation value
     based on those weights.
     """
-    single_cf_fn = ResponseFnParameter(default=DotProduct())
+    single_cf_fn = ResponseFnParameter(default=DotProduct(),
+        doc="Accepts a ResponseFn that will be applied to each CF individually.")
     
     def __call__(self, cfs, input_activity, activity, strength):
         rows,cols = activity.shape
@@ -406,8 +407,9 @@ class CFPLearningFnParameter(ClassSelectorParameter):
 
 class GenericCFPLearningFn(CFPLearningFn):
     """CFPLearningFunction applying the specified single_cf_fn to each CF."""
-    single_cf_fn = LearningFnParameter(default=Hebbian())
-    
+    single_cf_fn = LearningFnParameter(default=Hebbian(),
+        doc="Accepts a LearningFn that will be applied to each CF individually.")
+       
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         """Apply the specified single_cf_fn to every CF."""
         rows,cols = output_activity.shape
@@ -436,7 +438,8 @@ class CFPOutputFn(ParameterizedObject):
 
 class GenericCFPOutputFn(CFPOutputFn):
     """Applies the specified single_cf_fn to each CF in the CFProjection."""
-    single_cf_fn = OutputFnParameter(default=IdentityOF())
+    single_cf_fn = OutputFnParameter(default=IdentityOF(),
+        doc="Accepts an OutputFn that will be applied to each CF individually.")
     
     def __call__(self, cfs, output_activity, **params):
         """
@@ -504,14 +507,13 @@ class CFProjection(Projection):
         default=GenericCFPResponseFn(),
         doc='Function for computing the Projection response to an input pattern.')
     
-    cf_type = Parameter(default=ConnectionField,constant=True)
+    cf_type = Parameter(default=ConnectionField,constant=True,
+        doc="Type of ConnectionField to use when creating individual CFs.")
     
     nominal_bounds_template = BoundingRegionParameter(
         default=BoundingBox(radius=0.1),
-        doc="""
-            Bounds defining the Sheet area covered by the connectionfields;
-            may be adjusted slightly (see initialize_bounds())
-            """)
+        doc="""Bounds defining the Sheet area covered by a prototypical ConnectionField.
+The true bounds will differ depending on the density (see initialize_bounds()).""")
     
     weights_generator = PatternGeneratorParameter(
         default=patterngenerator.Constant(),constant=True,
@@ -526,7 +528,8 @@ class CFProjection(Projection):
         doc='Function for computing changes to the weights based on one activation step.')
 
     # JABALERT: Shouldn't learning_rate be owned by the learning_fn?
-    learning_rate = Number(default=0.0,softbounds=(0,100))
+    learning_rate = Number(default=0.0,softbounds=(0,100),
+        doc="Amount of learning at each step for this projection, specified in units that are independent of the density of each Sheet.")
     
     output_fn  = OutputFnParameter(
         default=IdentityOF(),
@@ -536,7 +539,7 @@ class CFProjection(Projection):
         default=GenericCFPOutputFn(),
         doc='Function applied to each CF after learning.')
 
-    strength = Number(default=1.0)
+    strength = Number(default=1.0,doc="Global multiplicative scaling applied to the Activity of this Sheet.")
 
     min_matrix_radius = Integer(
         default=1,bounds=(0,None),
