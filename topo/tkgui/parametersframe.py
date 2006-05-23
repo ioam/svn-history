@@ -11,7 +11,7 @@ __version__='$Revision$'
 from inspect import getdoc
 
 import Pmw
-from Tkinter import Frame, Button, RIGHT, TOP, BOTH, BOTTOM, END, YES, N,S,E,W,X, Menu, Toplevel, Label
+from Tkinter import Frame, Button, RIGHT, TOP, BOTH, BOTTOM, END, YES, N,S,E,W,X, Menu, Toplevel, Label, LEFT
 
 import topo.misc.utils
 from topo.misc.utils import keys_sorted_by_value, dict_translator, eval_atof
@@ -19,6 +19,7 @@ from topo.base.parameterizedobject import ParameterizedObject,ParameterizedObjec
 from topo.base.parameterclasses import Number,Enumeration,ClassSelectorParameter,BooleanParameter
 
 from propertiesframe import PropertiesFrame
+from translatorwidgets import CheckbuttonTranslator
 
 # CEBHACKALERT: there used to be a 'reset_to_defaults' method, which
 # didn't work. When Parameters can be set and then maintained between
@@ -150,12 +151,18 @@ class ParametersFrame(Frame):
                        pady=self.__properties_frame.padding,
                        sticky=E)
 
+            # We want widgets to stretch to both sides...
+            posn=E+W
+            # ...except Checkbuttons, which should be left-aligned.
+            if isinstance(widget,CheckbuttonTranslator):
+                posn=W
+                
             widget.grid(row=row,
                         column=1,
                         padx=self.__properties_frame.padding,
                         pady=self.__properties_frame.padding,
-                        sticky=N+S+W+E)
-            
+                        sticky=posn)
+
             self.__help_balloon.bind(label, help_text)
 
 
@@ -290,7 +297,6 @@ class ParametersFrame(Frame):
                 value,
                 min_value = str(low_bound),
                 max_value = str(high_bound),
-                width = 30,
                 string_format = '%.6f',
                 translator = topo.misc.utils.eval_atof)
 
@@ -372,7 +378,7 @@ class ParametersFrame(Frame):
         """
         Add a boolean property to the properties_frame by representing it with a
         Checkbutton.
-        """        
+        """
         self.__widgets[parameter_name] = self.__properties_frame.add_checkbutton_property(parameter_name,value=value)
 
 
