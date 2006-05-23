@@ -67,14 +67,15 @@ class ProjectionSheet(Sheet):
     to model modulatory or other more complicated types of connections.
 
     The output_fn is a function s(A) that takes an activity matrix
-    A and produces and identically shaped output matrix. The default
+    A and produces an identically shaped output matrix. The default
     is the identity function.
     """
     output_fn = OutputFnParameter(
         default=IdentityOF(),
-        doc='Output function applied (optionally) to the ProjectionSheet activity.')
+        doc="Output function to apply (if apply_output_fn is true) to this Sheet's activity.")
     
-    apply_output_fn=BooleanParameter(default=True)
+    apply_output_fn=BooleanParameter(default=True,
+        doc="Whether to apply the output_fn after computing an Activity matrix.")
 
                              
     def __init__(self,**params):

@@ -17,12 +17,11 @@ from topo.outputfns.basic import PiecewiseLinear
 
 
 class LISSOM(CFSheet):
-
-
     output_fn = OutputFnParameter(default=PiecewiseLinear(lower_bound=0.1,
                                                           upper_bound=0.65))
-    # modify weights after each activation?
-    continuous_learning = BooleanParameter(default=False)
+    continuous_learning = BooleanParameter(default=False, doc=
+       """Whether to modify the weights after every settling step.
+If false, waits until settling is completed before doing learning.""")
 
     activation_count = 0
     new_iteration = True

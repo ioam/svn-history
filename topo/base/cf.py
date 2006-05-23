@@ -824,7 +824,7 @@ class CFSheet(ProjectionSheet):
     routines.
     """
 
-    measure_maps = BooleanParameter(True)
+    measure_maps = BooleanParameter(True,doc="Whether to include this Sheet when measuring various maps to create SheetViews")
     precedence = Number(0.5)
 
 ##     # should refer to applying output_fn together, not just normalization
