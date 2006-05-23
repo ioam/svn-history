@@ -272,7 +272,8 @@ class ParametersTool(Frame) :
 
         # CEBHACKALERT: the problem is, a tiny little window
         # with nothing in it opens when the model editor is
-        # started.
+        # started. If it's shut, there'll be an error if someone
+        # tries to add a new object.
         parameter_window = Toplevel() #self
         parameter_window.title('New object parameters')
         #Label(parameter_window, text = "Edit class p").pack(side = TOP)
