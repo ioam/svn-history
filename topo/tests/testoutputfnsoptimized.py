@@ -53,8 +53,11 @@ class TestDivisiveSumNormalize_opt1(unittest.TestCase):
                         [4.0,3.0,11.0]]).astype(Float32)
             
         self.fn2(self.a1)
+        # Numeric does the sum with Float32s; the comparison
+        # value comes from Python doing the sum (in Float64s)
+        # so we round to 6 d.p.
         for item1,item2 in zip(self.a1.flat,fn2_a1.flat):
-            self.assertAlmostEqual(item1, item2)
+            self.assertAlmostEqual(item1, item2, 6)
 
         self.fn2(self.a2)
         for item1,item2 in zip(self.a2.flat,fn2_a2.flat):
