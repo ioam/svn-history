@@ -18,10 +18,6 @@ was first added to the list, or a change was made.)
 <!-- ### These tasks before the next release (i.e. 2006/05/08) ### -->
 
 <li>
-2006/05/16 (CB): Problem with SharedWeightCFProjection vs CFProjection. [** before release]
-</li>
-
-<li>
 2006/05/15 (CB): Missing scheduled_actions in lissom examples [** before release]
 </li>
 
