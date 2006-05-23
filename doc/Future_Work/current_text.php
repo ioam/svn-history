@@ -33,6 +33,20 @@ was first added to the list, or a change was made.)
 </li>
 
 <li>
+2006/05/23: tkgui cleanup - what widgets should expand (expand=YES ?), which should fill the space (fill=X ?) (e.g. the command output box should expand when topoconsole does, and in parameters frames sliders etc should expand).
+</li>
+
+<li>
+2006/05/23: tkgui making shell command prompt skip a line. If it doesn't prompt won't come back if information is printed.
+</li>
+
+
+<li>
+2006/05/23: binding help balloon to the widget (already bound to the label) in parametersframe so that help can be seen for objects that are e.g. being selected.
+</li>
+
+
+<li>
 2006/04/07: (CB) Allowing joint normalization of projections for a CFSheet. [This appears to work, but results from LISSOM simulations do not yet match those of C++ LISSOM.]
 </li>
 
