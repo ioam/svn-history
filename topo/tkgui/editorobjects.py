@@ -6,6 +6,7 @@ $Id$
 """
 __version__='$Revision$'
 
+from inspect import getdoc
 from Tkinter import Button, Label, Frame, Toplevel, TOP, LEFT, RIGHT, BOTTOM, E, LAST, FIRST
 import Pmw
 import math
@@ -41,9 +42,14 @@ class EditorObject :
     def show_properties(self) :
         # show parameters frame for object
         parameter_window = Toplevel()
-        parameter_window.title(self.name+' parameters')
-        Label(parameter_window, text = self.name).pack(side = TOP)
+        parameter_window.title(self.name)
+        help_balloon = Pmw.Balloon(parameter_window)
+
+        title = Label(parameter_window, text = self.name)
+        title.pack(side = TOP)
         self.parameter_frame = ParametersFrame(parameter_window)
+        help_balloon.bind(title,getdoc(self.parameterized_obj))
+        
         self.button_panel = Frame(parameter_window)
         self.button_panel.pack(side = BOTTOM)
         update_button = Button(self.button_panel, text = 'Apply', 
@@ -166,7 +172,13 @@ class EditorSheet(EditorNode) :
     def __init__(self, canvas, sheet, pos, name) :
         # super constructor call
         EditorNode.__init__(self, canvas, pos, name)
+        # CEBHACKALERT: couldn't the object be stored in something like
+        # self.parameterized_object rather than specifically self.sheet
+        # or self.connection? I've added a copy but 'sheet' needs to be
+        # replaced (here and in other classes).
         self.sheet = sheet # the topo sheet that this object represents
+        self.parameterized_obj = self.sheet
+        
         sheet.gui_x, sheet.gui_y = self.x, self.y # store the ed coords in the topo sheet
         self.element_count = self.matrix_element_count()
         self.set_bounds()
@@ -458,6 +470,8 @@ class EditorConnection(EditorObject) :
 
     def connect(self, to_node, con) : # pass the node this connection is to
         self.connection = con # store the topo connection this object represents
+        # CEBHACKALERT: see earlier alert about sheet attribute name
+        self.parameterized_obj = self.connection
         if (self.name == "") :
             self.name = con.name
         self.to_node = to_node # store a reference to the node this is connected to

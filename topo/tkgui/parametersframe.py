@@ -391,6 +391,8 @@ class ParametersFrame(Frame):
 
 
     # CB: there's no way this can work, but I don't know what it's for yet.
+    ## CEBHACKALERT: this method must be fixed, as the others were, not to
+    ## instantiate ParameterizedObjects just to find their Parameters.
     # JAB: See above.
     def show_parameter_properties(self, param) :
         w, name = param
@@ -406,7 +408,9 @@ class ParametersFrame(Frame):
             except : return
         parameter_window = Toplevel()
         parameter_window.title(obj.name+' parameters')
-        Label(parameter_window, text = obj.name).pack(side = TOP)
+        title = Label(parameter_window, text = obj.name)
+        title.pack(side = TOP)
+        self.__help_balloon.bind(title,getdoc(obj))
         parameter_frame = ParametersFrame(parameter_window)
         parameter_frame.create_widgets(obj)
         button_panel = Frame(parameter_window)
