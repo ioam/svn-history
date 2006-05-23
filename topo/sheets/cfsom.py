@@ -29,13 +29,10 @@ class CFSOM(CFSheet):
     and modify weights according to a neighborhood function around the
     winner.  Other Projection types can also be used.
     """
-    rmin = Number(0.0)
-    rmax = Number(1.0)
-    
-    alpha_0 = Number(0.5)
-    radius_0 = Number(1.0)
+    alpha_0 = Number(0.5, doc="Initial value of the learning rate.")
+    radius_0 = Number(1.0, doc="Initial value of the neighborhood radius.")
     precedence = Number(0.6)
-    learning_length = Number(1000)
+    learning_length = Number(1000, doc="Number of input presentations to use, by default.")
     
     def __init__(self,**params):
         super(CFSOM,self).__init__(**params)
