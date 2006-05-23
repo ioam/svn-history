@@ -133,6 +133,7 @@ class ConnectionField(ParameterizedObject):
         super(ConnectionField,self).__init__(**params)
 
         self.x = x; self.y = y
+
         self.input_sheet = input_sheet
         self.offset_bounds(bounds_template,slice_)
 
@@ -213,6 +214,7 @@ class ConnectionField(ParameterizedObject):
         col_offset = cf_col-b_col
         slice_.translate(row_offset,col_offset)
 
+
         slice_.crop_to_sheet()
 
         # weights matrix cannot have a zero-sized dimension (could
@@ -223,6 +225,7 @@ class ConnectionField(ParameterizedObject):
 
 
         self.bounds = slice_.bounds
+
 
         # Also, store the array for direct access by C.
         # Numeric.Int32 is specified explicitly here to avoid having it
@@ -675,6 +678,9 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         center_row,center_col = sheet_rows/2,sheet_cols/2
         unit_xcenter,unit_ycenter=self.src.matrixidx2sheet(center_row,
                                                            center_col)
+
+        #CEBHACKALERT: to be cleaned up...
+        self.center_unitxcenter,self.center_unitycenter = unit_xcenter,unit_ycenter
 
         bounds.translate(unit_xcenter-bounds_xcenter,
                          unit_ycenter-bounds_ycenter)
