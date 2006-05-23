@@ -8,7 +8,6 @@ $Id$
 __version__='$Revision$'
 
 from Tkinter import Frame, StringVar, Message, Label, IntVar, N,S,E,W,X, NORMAL
-import tkFont
 from translatorwidgets import TaggedSlider,EntryTranslator,ComboBoxTranslator,CheckbuttonTranslator
 
 
@@ -58,7 +57,6 @@ class PropertiesFrame(Frame):
         if readonly:
             control = Label(self,
                             textvariable = var,
-                            font=tkFont.Font(weight=tkFont.NORMAL),
                             **kw)
         else:
             control = EntryTranslator(self,
