@@ -600,8 +600,7 @@ class ParameterizedObject(object):
     __metaclass__ = ParameterizedObjectMetaclass
 
 
-    ### JABALERT: It might make sense to make the name be visible (not hidden) by default.
-    name           = Parameter(default=None)
+    name           = Parameter(default=None,doc="String identifier for this object.")
     ### JABALERT: Should probably make this an Enumeration instead.
     print_level = Parameter(default=MESSAGE,hidden=True)
 
