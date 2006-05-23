@@ -128,28 +128,22 @@ class SharedWeightCFProjection(CFProjection):
         # do want anything that Projection defines.
         super(SharedWeightCFProjection,self).__init__(initialize_cfs=False,**params)
 
-        dest_sheetrows = self.dest.sheet_rows()[::-1]
-        dest_sheetcols = self.dest.sheet_cols()
-
         # want the sharedcf to be located on the grid, so
         # pick a central unit and use its center
-        center_unit_x = dest_sheetcols[len(dest_sheetcols)/2]
-        center_unit_y = dest_sheetrows[len(dest_sheetrows)/2]        
-
-        self.__sharedcf=self.cf_type(center_unit_x,center_unit_y,
+        self.__sharedcf=self.cf_type(self.center_unitxcenter,
+                                     self.center_unitycenter,
                                      self.src,
                                      self.bounds_template,
                                      self.weights_generator,
                                      self.mask_template,
                                      self.weights_output_fn.single_cf_fn)
-        
 
         cflist = []
         scf = self.__sharedcf
         bounds_template = self.bounds_template
-        for y in dest_sheetrows:
+        for y in self.dest.sheet_rows()[::-1]:
             row = []
-            for x in dest_sheetcols:
+            for x in self.dest.sheet_cols():
                 cf = DummyCF(scf,x,y,bounds_template)
                 row.append(cf)
             cflist.append(row)
