@@ -70,8 +70,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
             """)
     
     # JABALERT: Should be set per-projection, not per-Sheet, right?
-    learning = BooleanParameter(
-        True,
+    learning = BooleanParameter(True,
         doc="""
             Setting this to False tells the Sheet not to change its
             permanent state (e.g. any connection weights) based on
