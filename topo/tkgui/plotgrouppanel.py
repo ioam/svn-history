@@ -27,6 +27,8 @@ __version__='$Revision$'
 import Numeric
 import copy
 
+from inspect import getdoc
+
 import Image
 import ImageTk
 import Pmw
@@ -227,11 +229,11 @@ original data is no longer available.""")
         # for creating the plotgroup.  All of this needs to be cleaned up
         # drastically.
         self.balloon.bind(self.normalize_checkbutton,
-                          self.plotgroup.params()['normalize'].__doc__)
+                          getdoc(self.plotgroup.params()['normalize']))
         self.balloon.bind(self.sheetcoords_checkbutton,
-                          self.plotgroup.params()['sheetcoords'].__doc__)
+                          getdoc(self.plotgroup.params()['sheetcoords']))
         self.balloon.bind(self.integerscaling_checkbutton,
-                          self.plotgroup.params()['integerscaling'].__doc__)
+                          getdoc(self.plotgroup.params()['integerscaling']))
 
 	# Hotkey for killing the window
 	self.parent.bind('<Control-q>',self.parent_destroy)

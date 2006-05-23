@@ -6,6 +6,7 @@ $Id$
 """
 __version__='$Revision$'
 
+from inspect import getdoc
 
 import Pmw
 from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
@@ -56,13 +57,13 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         params_frame.pack(side=TOP,expand=YES,fill=X)
         cmdlabel = Message(params_frame,text="Update command:",aspect=1000)
         cmdlabel.pack(side=LEFT)
-        self.balloon.bind(cmdlabel,self.plotgroup.params()['updatecommand'].__doc__)
+        self.balloon.bind(cmdlabel,getdoc(self.plotgroup.params()['updatecommand']))
         
         cmdbox = Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
                               entry_textvariable=self.cmdname,
                               scrolledlist_items=([self.cmdname]))
         cmdbox.pack(side=LEFT,expand=YES,fill=X)
-        self.balloon.bind(cmdbox,self.plotgroup.params()['updatecommand'].__doc__)
+        self.balloon.bind(cmdbox,getdoc(self.plotgroup.params()['updatecommand']))
 
        
         # To make the auto-refresh button not on by default when opening the panel

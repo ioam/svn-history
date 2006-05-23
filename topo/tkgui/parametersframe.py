@@ -8,6 +8,8 @@ __version__='$Revision$'
 
 # CEBHACKALERT: this file is being reorganized.
 
+from inspect import getdoc
+
 import Pmw
 from Tkinter import Frame, Button, RIGHT, TOP, BOTH, BOTTOM, END, YES, N,S,E,W,X, Menu, Toplevel, Label
 
@@ -140,7 +142,7 @@ class ParametersFrame(Frame):
         for (row,parameter_name) in zip(rows,sorted_parameter_names): 
             (label,widget) = self.__widgets[parameter_name]
 
-            help_text = self.__visible_parameters[parameter_name].__doc__
+            help_text = getdoc(self.__visible_parameters[parameter_name])
 
             label.grid(row=row,
                        column=0,

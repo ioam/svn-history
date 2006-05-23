@@ -21,6 +21,7 @@ import StringIO
 import tkFileDialog
 import time
 import webbrowser
+from inspect import getdoc
 
 import topo
 import topo.commands.basic
@@ -581,7 +582,7 @@ class TopoConsole(Frame):
             
         except Exception, e:
             traceback.print_exc()
-            result = 'Exception Raised: ' + e.__doc__
+            result = 'Exception Raised: ' + getdoc(e)
 
         output = capture_stdout.getvalue()
         error = capture_stderr.getvalue()
