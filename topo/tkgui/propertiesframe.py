@@ -7,7 +7,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import Frame, StringVar, Message, Label, IntVar, N,S,E,W,X, NORMAL
+from Tkinter import Frame, StringVar, Message, Label, IntVar, N,S,E,W,X, NORMAL, Entry
 from translatorwidgets import TaggedSlider,EntryTranslator,ComboBoxTranslator,CheckbuttonTranslator
 
 
@@ -49,13 +49,16 @@ class PropertiesFrame(Frame):
 
     def add_text_property(self,name,value="",readonly=False,**kw):
         """
-        Create a TKInter.Entry box and add it to self.properties, unless readonly is
-        True - in which case create a Tkinter.Label.
+        Create a TKInter.Entry box and add it to self.properties,
+        unless readonly is True - in which case create a readonly
+        Entry.
         """
         var = StringVar()
 
         if readonly:
-            control = Label(self,
+            control = Entry(self,
+                            state="readonly",
+                            fg="gray45",
                             textvariable = var,
                             **kw)
         else:
