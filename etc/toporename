@@ -60,7 +60,7 @@ if not (cont[0] == 'y' or cont[0] == 'Y'):
 
 
 print separator
-system("replaceall '" + fromregexp + "' '" + toregexp + "' " + files)
+system("etc/replaceall '" + fromregexp + "' '" + toregexp + "' " + files)
 
 
 print separator
