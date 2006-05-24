@@ -46,7 +46,7 @@ if checkcvs:
     differences=system("cvs diff --brief")
     if differences:
         cont = raw_input("CVS error or differences already present; continue with toporename (Y/N)?")
-        if not (cont[0] == 'y') or (cont[0] == 'Y'):
+        if not (cont[0] == 'y' or cont[0] == 'Y'):
             exit(-1)
 
 print separator
@@ -54,11 +54,11 @@ print "Existing instances of " + toregexp + ":"
 system("grep -n -H '" + toregexp + "' " + files)
 print
 cont=raw_input("Anything listed above might represent a clash; continue with toporename (Y/N)?")
-if not (cont[0] == 'y') or (cont[0] == 'Y'):
+
+if not (cont[0] == 'y' or cont[0] == 'Y'):
     exit(-1)
 
-    
-            
+
 print separator
 system("replaceall '" + fromregexp + "' '" + toregexp + "' " + files)
 
