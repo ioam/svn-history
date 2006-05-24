@@ -14,6 +14,7 @@ import math
 import topo
 
 from topo.commands.analysis import update_activity
+from topo.misc.utils import shortclassname
 from parametersframe import ParametersFrame
 
 # CEBHACKALERT: any reason this isn't a new-style class
@@ -39,6 +40,14 @@ class EditorObject :
         # draw the object at the current x, y position
         pass
 
+    def objdoc(self) :
+        """Documentation string for this object."""
+        ### JABALERT Should be expanded to allow a per-object description
+        ### JABALERT Should be bound to the actual editor object as well.
+        return self.name + " is of type " + \
+               shortclassname(self.parameterized_obj) + \
+               ":\n\n" + getdoc(self.parameterized_obj)
+
     def show_properties(self) :
         # show parameters frame for object
         parameter_window = Toplevel()
@@ -48,7 +57,7 @@ class EditorObject :
         title = Label(parameter_window, text = self.name)
         title.pack(side = TOP)
         self.parameter_frame = ParametersFrame(parameter_window)
-        help_balloon.bind(title,getdoc(self.parameterized_obj))
+        self.balloon.bind(title,self.objdoc())
         
         self.button_panel = Frame(parameter_window)
         self.button_panel.pack(side = BOTTOM)
