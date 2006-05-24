@@ -25,6 +25,12 @@ was first added to the list, or a change was made.)
 
 
 <li>
+2006/05/24 (JB): Problems with examples/joublin_bc96.ty: strange Projection
+plots, errors for small radii (problem with the min_radius code)?
+</li>
+
+
+<li>
 2006/05/15 (CB): Matching lissom_oo_or with C++ lissom. 
 </li>
 
