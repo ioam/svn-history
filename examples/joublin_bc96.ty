@@ -1,0 +1,114 @@
+"""
+SOM-based rat somatosensory map based on Joublin et al., Biological
+Cybernetics 74, pp. 275-286, 1996.
+
+Contains a hindpaw representation, a sheet of pre-cortical relay
+cells, and two cortical sheets (with excitatory and inhibitory
+neurons).
+
+Known differences from the reference simulation:
+
+  - No explicit representation of the hindpaw (just a rectangular array)
+
+  - Connection from R to E should be offset from the center
+
+  - Other misc differences as listed below
+
+  - Not tested. :-)
+
+$Id$
+"""
+__version__='$Revision$'
+
+import RandomArray
+
+import topo.patterns.random
+import topo.patterns.basic
+
+from topo.base.cf import CFProjection
+from topo.base.parameterclasses import DynamicNumber, Number, Wrapper
+from topo.base.patterngenerator import BoundingBox
+from topo.learningfns.som import HebbianSOMLF
+from topo.outputfns.basic import PiecewiseLinear
+from topo.responsefns.optimized import CFPDotProduct_opt1
+from topo.sheets.cfsom import CFSOM
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.misc.numbergenerators import UniformRandom
+
+
+topo.sim.name = "joublin_bc96"
+
+
+###########################################
+# Set parameters
+
+input_pattern = topo.patterns.basic.Gaussian(
+    scale=1.0,size=2*0.0468,aspect_ratio=4.0,
+    bounds=BoundingBox(radius=0.72),
+    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
+    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
+    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+
+RandomArray.seed(500,500)
+CFSOM.learning_length = 10000
+CFSOM.radius_0 = 15/25.0
+CFProjection.learning_fn = HebbianSOMLF()
+CFProjection.response_fn = CFPDotProduct_opt1()
+
+# sheet activation saturates at 1
+#CFSOM.output_fn = PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
+
+
+###########################################
+# build simulation
+
+# Sheets
+topo.sim['Hindpaw'] = GeneratorSheet(
+    input_generator=input_pattern, nominal_density = 25,
+    nominal_bounds=BoundingBox(points=((0,0),(15/25.0,25/25.0))),
+    period = 1.0,phase = 0.05)
+
+topo.sim['R-cells'] = CFSOM(alpha_0 = 0.5, nominal_density=25,
+                            nominal_bounds=BoundingBox(points=((      0,0),(15/25.0,25/25.0))))
+
+topo.sim['E-cells'] = CFSOM(alpha_0 = 0.5, nominal_density=25,
+                            nominal_bounds=BoundingBox(points=((-6/25.0,0),(15/25.0,29/25.0))))
+
+topo.sim['I-cells'] = CFSOM(alpha_0 = 0.5, nominal_density=25,
+                            nominal_bounds=BoundingBox(points=((-6/25.0,0),(15/25.0,29/25.0))))
+
+# Need to figure out learning_rate and add to each connection,
+# plus delays and strengths
+topo.sim.connect('Hindpaw','R-cells',delay=0.05,connection_type=CFProjection,name='Afferent',
+                 strength=1.0,nominal_bounds_template=BoundingBox(radius=11/25.0/2.0),
+                 weights_generator=topo.patterns.random.UniformRandom())
+
+topo.sim.connect('R-cells','R-cells',delay=0.05,connection_type=CFProjection,name='Lateral',
+                 strength=1.0,nominal_bounds_template=BoundingBox(radius=15/25.0/2.0),
+                 weights_generator=topo.patterns.random.UniformRandom())
+
+# Needs BoundingBox(radius=1/25.0/2.0), but that causes an error right now
+topo.sim.connect('R-cells','E-cells',delay=0.05,connection_type=CFProjection,name='Afferent',
+                 strength=1.0,nominal_bounds_template=BoundingBox(radius=15/25.0/2.0),min_matrix_radius=1,
+                 weights_generator=topo.patterns.basic.Constant())
+
+topo.sim.connect('E-cells','E-cells',delay=0.05,connection_type=CFProjection,name='Lateral',
+                 strength=1.0,nominal_bounds_template=BoundingBox(radius=15/25.0/2.0),
+                 weights_generator=topo.patterns.random.UniformRandom())
+
+topo.sim.connect('E-cells','I-cells',delay=0.05,connection_type=CFProjection,name='Afferent',
+                 strength=1.0,nominal_bounds_template=BoundingBox(radius=21/25.0/2.0),
+                 weights_generator=topo.patterns.random.UniformRandom())
+
+topo.sim.connect('I-cells','E-cells',delay=0.05,connection_type=CFProjection,name='Inhibitory',
+                 strength=-1.0,nominal_bounds_template=BoundingBox(radius=21/25.0/2.0),
+                 weights_generator=topo.patterns.random.UniformRandom())
+
+
+# Set default locations for the Model Editor
+topo.sim['I-cells'].gui_x=200  ; topo.sim['I-cells'].gui_y=50
+topo.sim['E-cells'].gui_x=200  ; topo.sim['E-cells'].gui_y=200
+topo.sim['R-cells'].gui_x=200  ; topo.sim['R-cells'].gui_y=350
+topo.sim['Hindpaw'].gui_x=200  ; topo.sim['Hindpaw'].gui_y=500
+
+topo.sim.run(0)
