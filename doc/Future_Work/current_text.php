@@ -215,6 +215,12 @@ Ongoing work with uncertain finishing times.
 
 <ul>
 <li>
+2006/05/24 (JB): Add a facility for reporting the approximate time spent
+in methods of each EventProcessor, to allow simple debugging without having
+to use the profiler.
+</li>
+
+<li>
 2006/02/21 (CB): Read-only objects, aiming at copy-on-write semantics
 </li>
 
