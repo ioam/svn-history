@@ -8,7 +8,7 @@ __version__='$Revision$'
 
 import __main__
 import math
-
+import re
 
 
 def wrap(lower, upper, x):
@@ -267,7 +267,15 @@ def get_states_of_classes_from_module(module,states_of_classes,processed_modules
                 for (name,obj) in v.__dict__.items():
                     if isinstance(obj,Parameter):
                         states_of_classes[full_class_path][name] = obj
-                
+
+def shortclassname(x):
+    """
+    Returns the class name of x as a string with the leading package information removed.
+
+    E.g. if x is of type "<class 'topo.base.sheet.Sheet'>", returns
+    "Sheet"
+    """
+    return re.sub("'>","",re.sub(".*[.]","",repr(type(x))))
 
 
 # CEBHACKALERT: temporary solution for saving savespace state of arrays.
