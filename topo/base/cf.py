@@ -818,19 +818,18 @@ class CFSheet(ProjectionSheet):
     """
     A ProjectionSheet providing access to the ConnectionFields in its CFProjections.
 
-    ProjectionSheet classes do not assume that the Projections can
-    provide a set of weights for individual units, or indeed that
-    there are units or weights at all.  In contrast, CFSheet is built
-    around the assumption that there are units in this Sheet, indexed
-    by Sheet coordinates (x,y), and that these units have one or more
-    ConnectionField connections on another Sheet (via CFProjections).
-    It then provides an interface for visualizing or analyzing these
-    ConnectionFields for each unit.  A ProjectionSheet should work
-    just the same as this sheet, except that it will not provide those
-    routines.
+    CFSheet is a Sheet built from units indexed by Sheet coordinates
+    (x,y).  Each unit can have one or more ConnectionFields on another
+    Sheet (via this sheet's CFProjections).  Thus CFSheet is a more
+    concrete version of a ProjectionSheet; a ProjectionSheet does not
+    require that there be units or weights of any kind.  Unless you
+    need access to the underlying ConnectionFields for visualization
+    or analysis, CFSheet and ProjectionSheet are interchangeable.
     """
 
-    measure_maps = BooleanParameter(True,doc="Whether to include this Sheet when measuring various maps to create SheetViews")
+    measure_maps = BooleanParameter(True,doc="""
+        Whether to include this Sheet when measuring various maps to create SheetViews.""")
+
     precedence = Number(0.5)
 
 ##     # should refer to applying output_fn together, not just normalization

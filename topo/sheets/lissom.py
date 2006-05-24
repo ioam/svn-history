@@ -1,6 +1,5 @@
 """
-A Sheet class implementing the LISSOM algorithm
-(Sirosh and Miikkulainen, Biological Cybernetics 71:66-78, 1994).
+The LISSOM class.
 
 $Id$
 """
@@ -17,27 +16,34 @@ from topo.outputfns.basic import PiecewiseLinear
 
 
 class LISSOM(CFSheet):
-    output_fn = OutputFnParameter(default=PiecewiseLinear(lower_bound=0.1,
-                                                          upper_bound=0.65))
-    continuous_learning = BooleanParameter(default=False, doc=
-       """Whether to modify the weights after every settling step.
-If false, waits until settling is completed before doing learning.""")
+    """
+    A Sheet class implementing the LISSOM algorithm
+    (Sirosh and Miikkulainen, Biological Cybernetics 71:66-78, 1994).
 
+    A LISSOM sheet is a CFSheet slightly modified to enforce a fixed
+    number of settling steps.  Settling is controlled by the tsettle
+    parameter; once that number of settling steps has been reached, an
+    external input is required before the sheet will activate again.
+    """
+
+    tsettle=Integer(default=8,bounds=(0,None),doc="""
+       Number of times to activate the LISSOM sheet for each external input event.
+       
+       A counter is incremented each time an input is received from any
+       source, and once the counter reaches tsettle, the last activation
+       step is skipped so that there will not be any further recurrent
+       activation.  The next external (i.e., afferent or feedback)
+       event will then start the counter over again.""")
+
+    continuous_learning = BooleanParameter(default=False, doc="""
+       Whether to modify the weights after every settling step.
+       If false, waits until settling is completed before doing learning.""")
+
+    output_fn = OutputFnParameter(default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
+    precedence = Number(0.6)
+    
     activation_count = 0
     new_iteration = True
-
-    precedence = Number(0.6)
-    tsettle=Integer(default=8,bounds=(0,None),doc=
-                    """
-                    Number of times to activate the LISSOM sheet for each external input event.
-                    
-                    A counter is incremented each time an input is received from any
-                    source, and once the counter reaches tsettle, the last activation
-                    step is skipped so that there will not be any further recurrent
-                    activation.  The next external (i.e., afferent or feedback)
-                    event will then start the counter over again.
-                    """)
-
 
     def input_event(self,conn,data):
         # On a new afferent input, clear the activity
