@@ -19,7 +19,7 @@ from topo.responsefns.projfns import CFPRF_DotProduct, CFPEuclideanDistance
 from topo.projections.basic import SharedWeightCFPResponseFn
 
 
-class CFPDotProduct_opt1(CFPResponseFn):
+class CFPRF_DotProduct_opt(CFPResponseFn):
     """
     Dot-product response function.
 
@@ -72,8 +72,8 @@ class CFPDotProduct_opt1(CFPResponseFn):
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
 if not optimized:
-    CFPDotProduct_opt1 = CFPRF_DotProduct
-    ParameterizedObject().message('Inline-optimized components not available; using CFPRF_DotProduct instead of CFPDotProduct_opt1.')
+    CFPRF_DotProduct_opt = CFPRF_DotProduct
+    ParameterizedObject().message('Inline-optimized components not available; using CFPRF_DotProduct instead of CFPRF_DotProduct_opt.')
 
 
 
@@ -164,7 +164,7 @@ class DotProduct_opt1(ResponseFn):
 
     When used as the single_cf_fn for GenericCFPResponseFn,
     improves the performance (compared with using DotProduct).
-    However, the entirely C++ CFPDotProduct_opt1 is still
+    However, the entirely C++ CFPRF_DotProduct_opt is still
     much faster.
     """
     def __call__(self, m1, m2):

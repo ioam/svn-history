@@ -19,7 +19,7 @@ from topo.base.parameterclasses import DynamicNumber, Number, Wrapper
 from topo.base.patterngenerator import BoundingBox
 from topo.learningfns.som import CFPLF_HebbianSOM
 from topo.outputfns.basic import PiecewiseLinear
-from topo.responsefns.optimized import CFPDotProduct_opt1
+from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.misc.numbergenerators import UniformRandom
@@ -75,7 +75,7 @@ CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 CFProjection.nominal_bounds_template=BoundingBox(radius=0.1)
 # CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0)
 CFProjection.learning_fn = CFPLF_HebbianSOM()
-CFProjection.response_fn = CFPDotProduct_opt1()
+CFProjection.response_fn = CFPRF_DotProduct_opt()
 
 
 #topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.MESSAGE

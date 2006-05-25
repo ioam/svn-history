@@ -20,7 +20,7 @@ from topo.base.parameterclasses import DynamicNumber
 from topo.learningfns.projfns import CFPLF_Plugin
 from topo.learningfns.basic import Hebbian
 from topo.outputfns.basic import PiecewiseLinear
-from topo.responsefns.optimized import CFPDotProduct_opt1
+from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.outputfns.basic import DivisiveL1Normalize
 from topo.misc.numbergenerators import UniformRandom
@@ -82,7 +82,7 @@ topo.sim.connect(
     connection_type=CFProjection, 
     weights_generator=topo.patterns.random.UniformRandom(),
     nominal_bounds_template=BoundingBox(radius=0.2),
-    response_fn=CFPDotProduct_opt1(),
+    response_fn=CFPRF_DotProduct_opt(),
     learning_fn=CFPLF_Plugin(single_cf_fn=SampleHebbian(sample_param=0.5)),
     weights_output_fn=GenericCFPOutputFn(single_cf_fn=DivisiveL1Normalize()),
     learning_rate=200.0)

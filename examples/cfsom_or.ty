@@ -21,7 +21,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFProjection
 from topo.base.parameterclasses import DynamicNumber,Wrapper
 from topo.learningfns.som import CFPLF_HebbianSOM
-from topo.responsefns.optimized import CFPDotProduct_opt1
+from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.misc.numbergenerators import UniformRandom
@@ -50,7 +50,7 @@ topo.sim['V1'] = CFSOM(nominal_density=locals().get('default_density',50.0),
 topo.sim.connect('Retina','V1',delay=0.25,connection_type=CFProjection,
                   weights_generator = topo.patterns.basic.Gaussian(),
                   nominal_bounds_template=BoundingBox(radius=0.1),
-                  response_fn = CFPDotProduct_opt1(),
+                  response_fn = CFPRF_DotProduct_opt(),
                   learning_fn=CFPLF_HebbianSOM())
 
 topo.sim.run(0)

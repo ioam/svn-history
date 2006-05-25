@@ -24,7 +24,7 @@ class CFPRF_DotProduct(CFPResponseFn):
     """
     Dot-product response function.
 
-    Written entirely in Python; see CFPDotProduct_opt1 for a much faster
+    Written entirely in Python; see CFPRF_DotProduct_opt for a much faster
     (but otherwise equivalent) version.
     """
     single_cf_fn = ResponseFnParameter(DotProduct(),constant=True)
