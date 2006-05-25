@@ -120,7 +120,8 @@ def eval_atof(in_string,default_val = 0):
     return val
     
 
-# CEBHACKALERT: I hope this can be simplified.
+# CEBHACKALERT: I hope this can be simplified; I don't know how it works
+# yet.
 def dict_translator(in_string, name = '', translator_dictionary = {}) :
     """
     Looks for an entry for the string in the dictionary. If it can't be
@@ -198,11 +199,17 @@ def frange(start, end=None, inc=1.0, inclusive=False):
 
 
 
-# CEBHACKALERT: I think this function should be renamed to values_sorted_by_key() or something
-# like that. The name's misleading: it doesn't sort the actual dictionary, it just returns the values sorted by key - right?
-
+# CEBHACKALERT: I think this function should be renamed to
+# values_sorted_by_key() or something like that. The name's
+# misleading: it doesn't sort the actual dictionary, it just returns
+# the values sorted by key - right?
 def dict_sort(d):
-    """ Simple and fast routine to sort a dictonary on key """
+    """
+    Sort a dictionary by key.
+
+    By Alex Martelli, 2001/04/08
+    http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52306
+    """
     keys = d.keys()
     keys.sort()
     return map(d.get, keys)
