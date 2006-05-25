@@ -125,7 +125,7 @@ class SharedWeightCFProjection(CFProjection):
         (typically a ConnectionField),
         """
         # we don't want the whole set of cfs initialized, but we
-        # do want anything that Projection defines.
+        # do want anything that CFProjection defines.
         super(SharedWeightCFProjection,self).__init__(initialize_cfs=False,**params)
 
         # want the sharedcf to be located on the grid, so
@@ -156,8 +156,9 @@ class SharedWeightCFProjection(CFProjection):
     
     def cf(self,r,c):
         """Return the shared ConnectionField, for all coordinates."""
-        # CEBHACKALERT: there's probably a better way to do this than
-        # just replacing the sharedcf's bounds and slice_array. 
+        # CEBHACKALERT: there's a better way to do this than
+        # just replacing the sharedcf's bounds and slice_array;
+        # see HACKALERT by DummyCF.
         self.__sharedcf.bounds = self.cfs[r][c].bounds
         self.__sharedcf.slice_array = self.cfs[r][c].slice_array
         return self.__sharedcf
