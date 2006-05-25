@@ -24,7 +24,7 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
     Dot-product response function.
 
     Written in C for a several-hundred-times speedup; see
-    CFPRF_DotProduct for an easier-to read (but otherwise equivalent)
+    CFPRF_DotProduct for an easier-to-read (but otherwise equivalent)
     version in Python.
     """
 
@@ -82,7 +82,7 @@ class CFPEuclideanDistance_opt1(CFPResponseFn):
     Euclidean-distance response function.
 
     Written in C for a several-hundred-times speedup; see
-    CFPRF_EuclideanDistance for an easier-to read (but otherwise
+    CFPRF_EuclideanDistance for an easier-to-read (but otherwise
     equivalent) version in Python.
     """
     def __call__(self, cfs, input_activity, activity, strength, **params):
@@ -90,7 +90,7 @@ class CFPEuclideanDistance_opt1(CFPResponseFn):
         rows,cols = activity.shape
         len, len2 = input_activity.shape
         X = input_activity.flat
-    
+
         code = """
 	    #include <math.h>
             float  *wi, *wj; 
