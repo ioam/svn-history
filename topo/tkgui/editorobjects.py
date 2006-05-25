@@ -52,12 +52,12 @@ class EditorObject :
         # show parameters frame for object
         parameter_window = Toplevel()
         parameter_window.title(self.name)
-        help_balloon = Pmw.Balloon(parameter_window)
+        balloon = Pmw.Balloon(parameter_window)
 
         title = Label(parameter_window, text = self.name)
         title.pack(side = TOP)
         self.parameter_frame = ParametersFrame(parameter_window)
-        self.balloon.bind(title,self.objdoc())
+        balloon.bind(title,self.objdoc())
         
         self.button_panel = Frame(parameter_window)
         self.button_panel.pack(side = BOTTOM)
