@@ -79,15 +79,15 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
     
        
 
-class CFPHebbian(GenericCFPLearningFn):
+class CFPLF_Hebbian(GenericCFPLearningFn):
     """
     Wrapper written to allow transparent non-optimized fallback; 
     equivalent to
     GenericCFPLearningFn(single_cf_fn=Hebbian())
     """
     def __init__(self,**params):
-        super(CFPHebbian,self).__init__(single_cf_fn=Hebbian(),**params)
+        super(CFPLF_Hebbian,self).__init__(single_cf_fn=Hebbian(),**params)
 
 if not optimized:
-    CFPLF_Hebbian_opt = CFPHebbian
-    ParameterizedObject().message('Inline-optimized components not available; using CFPHebbian instead of CFPLF_Hebbian_opt.')
+    CFPLF_Hebbian_opt = CFPLF_Hebbian
+    ParameterizedObject().message('Inline-optimized components not available; using CFPLF_Hebbian instead of CFPLF_Hebbian_opt.')
