@@ -158,7 +158,7 @@ if not optimized:
 
 
 
-class DotProduct_opt1(ResponseFn):
+class DotProduct_opt(ResponseFn):
     """
     Dot-product response function. Equivalent to DotProduct.
 
@@ -185,8 +185,8 @@ class DotProduct_opt1(ResponseFn):
 
 
 if not optimized:
-    DotProduct_opt1 = DotProduct
-    ParameterizedObject().message('Inline-optimized components not available; using DotProduct instead of DotProduct_opt1.')
+    DotProduct_opt = DotProduct
+    ParameterizedObject().message('Inline-optimized components not available; using DotProduct instead of DotProduct_opt.')
 
 
 
