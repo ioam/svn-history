@@ -24,7 +24,7 @@ from topo.base.cf import CFProjection
 from topo.base.parameterclasses import DynamicNumber,Number
 from topo.sheets.cfsom import CFSOM
 from topo.responsefns.optimized import CFPEuclideanDistance_opt1
-from topo.learningfns.som import HebbianSOMLF
+from topo.learningfns.som import CFPLF_HebbianSOM
 from topo.misc.numbergenerators import UniformRandom
 
 topo.sim.name = "som_retinotopy"
@@ -75,7 +75,7 @@ CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 
 CFProjection.nominal_bounds_template=BoundingBox(radius=1.0) # fully connected network.
 CFProjection.response_fn = CFPEuclideanDistance_opt1()
-CFProjection.learning_fn = HebbianSOMLF()
+CFProjection.learning_fn = CFPLF_HebbianSOM()
 
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)

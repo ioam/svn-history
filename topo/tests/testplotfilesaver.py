@@ -19,7 +19,7 @@ import topo.base.cf
 from topo.plotting.plotfilesaver import *
 from PIL import *
 from topo.base.cf import CFProjection
-from topo.learningfns.som import HebbianSOMLF
+from topo.learningfns.som import CFPLF_HebbianSOM
 
 class TestPlotFileSaver(unittest.TestCase):
 
@@ -36,7 +36,7 @@ class TestPlotFileSaver(unittest.TestCase):
 #         CFSOM.learning_length = 10000
 #         CFSOM.radius_0 = 0.1
 #         CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
-# 	CFProjection.learning_fn=HebbianSOMLF()
+# 	CFProjection.learning_fn=CFPLF_HebbianSOM()
 #         topo.base.parameterizedobject.min_print_level = topo.base.parameterizedobject.WARNING
 #         self.s = topo.base.simulation.Simulation()
         

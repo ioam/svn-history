@@ -28,7 +28,7 @@ import topo.patterns.basic
 from topo.base.cf import CFProjection
 from topo.base.parameterclasses import DynamicNumber, Number, Wrapper
 from topo.base.patterngenerator import BoundingBox
-from topo.learningfns.som import HebbianSOMLF
+from topo.learningfns.som import CFPLF_HebbianSOM
 from topo.outputfns.basic import PiecewiseLinear
 from topo.responsefns.optimized import CFPDotProduct_opt1
 from topo.sheets.cfsom import CFSOM
@@ -52,7 +52,7 @@ input_pattern = topo.patterns.basic.Gaussian(
 RandomArray.seed(500,500)
 CFSOM.learning_length = 10000
 CFSOM.radius_0 = 15/25.0
-CFProjection.learning_fn = HebbianSOMLF()
+CFProjection.learning_fn = CFPLF_HebbianSOM()
 CFProjection.response_fn = CFPDotProduct_opt1()
 
 # sheet activation saturates at 1

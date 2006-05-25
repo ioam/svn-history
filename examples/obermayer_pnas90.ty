@@ -29,7 +29,7 @@ from topo.base.parameterclasses import Number,DynamicNumber
 from topo.sheets.cfsom import CFSOM
 import topo.patterns.random
 import topo.patterns.basic
-from topo.learningfns.som import HebbianSOMLF
+from topo.learningfns.som import CFPLF_HebbianSOM
 from topo.outputfns.basic import DivisiveSumNormalize
 from topo.misc.numbergenerators import UniformRandom
 
@@ -89,7 +89,7 @@ RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom()
 CFProjection.nominal_bounds_template = BoundingBox(radius=1.0)
 CFProjection.response_fn = CFPDotProduct_opt1()
-CFProjection.learning_fn=HebbianSOMLF()
+CFProjection.learning_fn=CFPLF_HebbianSOM()
 
 # Weights should be initialized to sum to unity: (Will this work?)
 # CEBHACKALERT: they will be made to sum to 1 after every learning iteration.

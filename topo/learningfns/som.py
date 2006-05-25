@@ -40,7 +40,7 @@ class SOMLF(CFPLearningFn):
 
 
 
-class HebbianSOMLF(SOMLF):
+class CFPLF_HebbianSOM(SOMLF):
     """
     Hebbian learning rule for CFProjections to Self-Organizing Maps.
 

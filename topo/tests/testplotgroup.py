@@ -157,7 +157,7 @@ from topo.plotting.plotgroup import TemplatePlotGroup, ConnectionFieldsPlotGroup
 from topo.plotting.templates import plotgroup_templates
 from topo.sheets.cfsom import CFSOM
 import topo.patterns.random
-from topo.learningfns.som import HebbianSOMLF
+from topo.learningfns.som import CFPLF_HebbianSOM
 from topo.base.cf import CFProjection
 from topo.responsefns.optimized import CFPDotProduct_opt1
 from topo.base.patterngenerator import BoundingBox
@@ -181,7 +181,7 @@ from topo.base.patterngenerator import BoundingBox
 #           CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 #           CFProjection.weights_generator = topo.patterns.random.UniformRandom(bounds=BoundingBox(points=((-0.1,-0.1),(0.1,0.1))))
 #           CFProjection.response_fn = CFPDotProduct_opt1()
-#           CFProjection.learning_fn = HebbianSOMLF()
+#           CFProjection.learning_fn = CFPLF_HebbianSOM()
 
 #           self.sim.connect(V1,V2,delay=0.5,connection_type=CFProjection,name='V1toV2')
 #           self.sim.connect(V3,V2,delay=0.5,connection_type=CFProjection,name='V2toV3')

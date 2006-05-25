@@ -22,7 +22,7 @@ from topo.base.parameterclasses import Dynamic, Parameter
 import random
 import topo.base.parameterizedobject
 from topo.base.cf import CFProjection
-from topo.learningfns.som import HebbianSOMLF
+from topo.learningfns.som import CFPLF_HebbianSOM
 import pdb #debugger
 
 
@@ -126,7 +126,7 @@ class TestCFSom(unittest.TestCase):
 ##         som = CFSOM()
         
 ##         s.add(som,input,save)
-##         s.connect(input,som,connection_type=CFProjection,learning_fn=HebbianSOMLF())
+##         s.connect(input,som,connection_type=CFProjection,learning_fn=CFPLF_HebbianSOM())
 ##         s.connect(som,save)
 ##         s.run(duration=10)
     
@@ -168,7 +168,7 @@ class TestCFSom(unittest.TestCase):
         s['V1'].print_level = topo.base.parameterizedobject.WARNING
 
         s.connect('retina','V1',delay=1,connection_type=CFProjection,
-                  learning_fn=HebbianSOMLF())
+                  learning_fn=CFPLF_HebbianSOM())
         s.print_level = topo.base.parameterizedobject.WARNING
 
         self.assertTrue(topo.sim['V1'].projections().get('retinaToV1',None) != None)
