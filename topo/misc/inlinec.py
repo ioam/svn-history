@@ -25,6 +25,10 @@ the function is a stub.
 
 $Id$
 """
+
+# Guide to using weave: 
+# http://old.scipy.org/documentation/weave/weaveusersguide.html
+
 import os
 from copy import copy
 
