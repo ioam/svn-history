@@ -23,7 +23,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFProjection
 from topo.base.parameterclasses import DynamicNumber,Number
 from topo.sheets.cfsom import CFSOM
-from topo.responsefns.optimized import CFPEuclideanDistance_opt1
+from topo.responsefns.optimized import CFPRF_EuclideanDistance_opt
 from topo.learningfns.som import CFPLF_HebbianSOM
 from topo.misc.numbergenerators import UniformRandom
 
@@ -74,7 +74,7 @@ RandomArray.seed(500,500)
 CFProjection.weights_generator = topo.patterns.random.UniformRandom() 
 
 CFProjection.nominal_bounds_template=BoundingBox(radius=1.0) # fully connected network.
-CFProjection.response_fn = CFPEuclideanDistance_opt1()
+CFProjection.response_fn = CFPRF_EuclideanDistance_opt()
 CFProjection.learning_fn = CFPLF_HebbianSOM()
 
 

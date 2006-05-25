@@ -77,7 +77,7 @@ if not optimized:
 
 
 
-class CFPEuclideanDistance_opt1(CFPResponseFn):
+class CFPRF_EuclideanDistance_opt(CFPResponseFn):
     """
     Euclidean-distance response function.
 
@@ -153,8 +153,8 @@ class CFPEuclideanDistance_opt1(CFPResponseFn):
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
 if not optimized:
-    CFPEuclideanDistance_opt1 = CFPRF_EuclideanDistance
-    ParameterizedObject().message('Inline-optimized components not available; using CFPRF_EuclideanDistance instead of CFPEuclideanDistance_opt1.')
+    CFPRF_EuclideanDistance_opt = CFPRF_EuclideanDistance
+    ParameterizedObject().message('Inline-optimized components not available; using CFPRF_EuclideanDistance instead of CFPRF_EuclideanDistance_opt.')
 
 
 
