@@ -143,7 +143,7 @@ class LearningFnParameter(ClassSelectorParameter):
 
 
 class ResponseFn(ParameterizedObject):
-    """Abstract base class for response functions that plug into GenericCFPResponseFn."""
+    """Abstract base class for response functions that plug into CFPRF_Plugin."""
 
     _abstract_class_name = "ResponseFn"
 

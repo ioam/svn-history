@@ -162,7 +162,7 @@ class DotProduct_opt1(ResponseFn):
     """
     Dot-product response function. Equivalent to DotProduct.
 
-    When used as the single_cf_fn for GenericCFPResponseFn,
+    When used as the single_cf_fn for CFPRF_Plugin,
     improves the performance (compared with using DotProduct).
     However, the entirely C++ CFPRF_DotProduct_opt is still
     much faster.

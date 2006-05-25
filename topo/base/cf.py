@@ -301,7 +301,7 @@ class CFPResponseFn(ParameterizedObject):
 
 
 
-class GenericCFPResponseFn(CFPResponseFn):
+class CFPRF_Plugin(CFPResponseFn):
     """
     Generic large-scale response function based on a simple single-CF function.
 
@@ -343,7 +343,7 @@ class CFPResponseFnParameter(ClassSelectorParameter):
 
     packages = []
 
-    def __init__(self,default=GenericCFPResponseFn(),**params):
+    def __init__(self,default=CFPRF_Plugin(),**params):
         super(CFPResponseFnParameter,self).__init__(CFPResponseFn,default=default,**params)        
 
 
@@ -507,7 +507,7 @@ class CFProjection(Projection):
     and stores it in the activity array.
     """
     response_fn = CFPResponseFnParameter(
-        default=GenericCFPResponseFn(),
+        default=CFPRF_Plugin(),
         doc='Function for computing the Projection response to an input pattern.')
     
     cf_type = Parameter(default=ConnectionField,constant=True,
