@@ -141,12 +141,15 @@ class DivisiveNormalizeL2(OutputFn):
 
 class DivisiveNormalizeLinf(OutputFn):
     """
-    OutputFn to divide an array by the absolute value of its maximum.
+    OutputFn to divide an array by its L-infinity norm
+    (i.e. the absolute value of its maximum).
 
     For a given array interpreted as a flattened vector, scales the
     elements divisively so that the maximum absolute value is the
-    specified norm_value.  This is also called the divisive
-    L-infinity, infinity, or Chebyshev norm.
+    specified norm_value.
+
+    The L-infinity norm is also known as the divisive infinity norm
+    and Chebyshev norm.
     """
     norm_value = Number(default=1.0)
     
