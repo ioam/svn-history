@@ -6,7 +6,7 @@ Requires the weave package; without it unoptimized versions are used.
 """
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
-from topo.base.cf import CFPOutputFn,GenericCFPOutputFn
+from topo.base.cf import CFPOutputFn,CFPOF_Plugin
 from topo.base.functionfamilies import OutputFn, OutputFnParameter
 
 from topo.misc.inlinec import inline, optimized
@@ -116,7 +116,7 @@ class CFPDivisiveSumNormalize_opt1(CFPOutputFn):
     Performs divisive normalization of the weights of all cfs.
 
     Equivalent to
-    GenericCFPOutputFn(single_cf_fn=DivisiveSumNormalize(norm_value=1.0)),
+    CFPOF_Plugin(single_cf_fn=DivisiveSumNormalize(norm_value=1.0)),
     except this assumes the presence of the _sum attribute on any
     activated unit's CFs.
     """
@@ -165,10 +165,10 @@ class CFPDivisiveSumNormalize_opt1(CFPOutputFn):
         inline(code, ['output_activity','rows','cols','cfs'], local_dict=locals())
 
 
-class CFPOF_DivisiveSumNormalize(GenericCFPOutputFn):
+class CFPOF_DivisiveSumNormalize(CFPOF_Plugin):
     """
     Wraps
-    GenericCFPOutputFn(single_cf_fn=DivisiveSumNormalize),
+    CFPOF_Plugin(single_cf_fn=DivisiveSumNormalize),
     the non-optimized equivalent of DivisiveSumNormalizeCFOF_opt1.
     """
     def __init__(self,**params):

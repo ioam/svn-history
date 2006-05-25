@@ -14,7 +14,7 @@ import topo.patterns.basic
  
 from topo.base.parameterclasses import Number
 from topo.base.boundingregion import BoundingBox
-from topo.base.cf import CFSheet,CFProjection,GenericCFPOutputFn
+from topo.base.cf import CFSheet,CFProjection,CFPOF_Plugin
 from topo.base.functionfamilies import LearningFn
 from topo.base.parameterclasses import DynamicNumber
 from topo.learningfns.projfns import CFPLF_Plugin
@@ -84,7 +84,7 @@ topo.sim.connect(
     nominal_bounds_template=BoundingBox(radius=0.2),
     response_fn=CFPRF_DotProduct_opt(),
     learning_fn=CFPLF_Plugin(single_cf_fn=SampleHebbian(sample_param=0.5)),
-    weights_output_fn=GenericCFPOutputFn(single_cf_fn=DivisiveL1Normalize()),
+    weights_output_fn=CFPOF_Plugin(single_cf_fn=DivisiveL1Normalize()),
     learning_rate=200.0)
 
 

@@ -439,7 +439,7 @@ class CFPOutputFn(ParameterizedObject):
         raise NotImplementedError
 
 
-class GenericCFPOutputFn(CFPOutputFn):
+class CFPOF_Plugin(CFPOutputFn):
     """Applies the specified single_cf_fn to each CF in the CFProjection."""
     single_cf_fn = OutputFnParameter(default=IdentityOF(),
         doc="Accepts an OutputFn that will be applied to each CF individually.")
@@ -491,7 +491,7 @@ class CFPOutputFnParameter(ClassSelectorParameter):
 
     packages = []
 
-    def __init__(self,default=GenericCFPOutputFn(),**params):
+    def __init__(self,default=CFPOF_Plugin(),**params):
         super(CFPOutputFnParameter,self).__init__(CFPOutputFn,default=default,**params)        
 
 
@@ -539,7 +539,7 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         doc='Function applied to the Projection activity after it is computed.')
 
     weights_output_fn = CFPOutputFnParameter(
-        default=GenericCFPOutputFn(),
+        default=CFPOF_Plugin(),
         doc='Function applied to each CF after learning.')
 
     strength = Number(default=1.0,doc="Global multiplicative scaling applied to the Activity of this Sheet.")
