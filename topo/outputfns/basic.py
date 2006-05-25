@@ -122,7 +122,7 @@ class DivisiveNormalizeL1(OutputFn):
         return x
 
 
-class DivisiveLengthNormalize(OutputFn):
+class DivisiveNormalizeL2(OutputFn):
     """
     OutputFn to divide an array by its Euclidean length (aka its L2 norm).
 
@@ -166,7 +166,7 @@ class DivisiveLpNormalize(OutputFn):
     vector, keeps the Lp-norm of the vector at a specified norm_value.
     Faster versions are provided separately for the typical L1-norm
     and L2-norm cases.  Defaults to be the same as an L2-norm, i.e.,
-    DivisiveLengthNormalize.
+    DivisiveNormalizeL2.
     """
     p = Number(default=2)
     norm_value = Number(default=1.0)

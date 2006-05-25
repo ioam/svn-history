@@ -17,7 +17,7 @@ import unittest
 
 
 from topo.outputfns.basic import PiecewiseLinear, DivisiveSumNormalize
-from topo.outputfns.basic import DivisiveLengthNormalize, DivisiveMaxNormalize
+from topo.outputfns.basic import DivisiveNormalizeL2, DivisiveMaxNormalize
 from topo.outputfns.basic import DivisiveLpNormalize
 
 from Numeric import array
@@ -166,8 +166,8 @@ class TestDivisiveLengthNormalize(unittest.TestCase):
                          [4.0,3.0,11.0],
                          [2.0,5.0,9.0]])
 
-        self.fn1 = DivisiveLengthNormalize()        
-        self.fn2 = DivisiveLengthNormalize(norm_value=4.0)
+        self.fn1 = DivisiveNormalizeL2()        
+        self.fn2 = DivisiveNormalizeL2(norm_value=4.0)
                
     def test_divisive_length_normalize(self):
         # Test as a procedure
