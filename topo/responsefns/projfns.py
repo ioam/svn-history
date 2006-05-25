@@ -43,7 +43,7 @@ class CFPRF_DotProduct(CFPResponseFn):
         activity *= strength
 
 
-class CFPEuclideanDistance(CFPResponseFn):
+class CFPRF_EuclideanDistance(CFPResponseFn):
     """
     Euclidean-distance--based response function.
     """

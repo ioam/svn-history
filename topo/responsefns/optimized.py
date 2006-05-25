@@ -14,7 +14,7 @@ from topo.base.parameterizedobject import ParameterizedObject
 
 from topo.misc.inlinec import inline, optimized
 
-from topo.responsefns.projfns import CFPRF_DotProduct, CFPEuclideanDistance
+from topo.responsefns.projfns import CFPRF_DotProduct, CFPRF_EuclideanDistance
 
 from topo.projections.basic import SharedWeightCFPResponseFn
 
@@ -82,7 +82,7 @@ class CFPEuclideanDistance_opt1(CFPResponseFn):
     Euclidean-distance response function.
 
     Written in C for a several-hundred-times speedup; see
-    CFPEuclideanDistance for an easier-to read (but otherwise
+    CFPRF_EuclideanDistance for an easier-to read (but otherwise
     equivalent) version in Python.
     """
     def __call__(self, cfs, input_activity, activity, strength, **params):
@@ -153,8 +153,8 @@ class CFPEuclideanDistance_opt1(CFPResponseFn):
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
 if not optimized:
-    CFPEuclideanDistance_opt1 = CFPEuclideanDistance
-    ParameterizedObject().message('Inline-optimized components not available; using CFPEuclideanDistance instead of CFPEuclideanDistance_opt1.')
+    CFPEuclideanDistance_opt1 = CFPRF_EuclideanDistance
+    ParameterizedObject().message('Inline-optimized components not available; using CFPRF_EuclideanDistance instead of CFPEuclideanDistance_opt1.')
 
 
 
