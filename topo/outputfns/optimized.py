@@ -26,7 +26,7 @@ class DivisiveSumNormalize_opt1(OutputFn):
     description. When used as the single_cf_fn in CFP learning
     functions, provides a performance improvement over the python
     DivisiveSumNormalize output function.  The all-c++ CFP learning
-    function CFPDivisiveSumNormalize_opt1 is still much faster though.
+    function CFPOF_DivisiveSumNormalize_opt is still much faster though.
 
     The given array must be of type Numeric.Float32.
     """
@@ -111,7 +111,7 @@ if not optimized:
 ##         return x
 
 
-class CFPDivisiveSumNormalize_opt1(CFPOutputFn):
+class CFPOF_DivisiveSumNormalize_opt(CFPOutputFn):
     """
     Performs divisive normalization of the weights of all cfs.
 
@@ -124,7 +124,7 @@ class CFPDivisiveSumNormalize_opt1(CFPOutputFn):
                                      constant=True)
 
     def __init__(self,**params):
-        super(CFPDivisiveSumNormalize_opt1,self).__init__(**params)
+        super(CFPOF_DivisiveSumNormalize_opt,self).__init__(**params)
 
     def __call__(self, cfs, output_activity, **params):
         rows,cols = output_activity.shape
@@ -176,5 +176,5 @@ class CFPOF_DivisiveSumNormalize(CFPOF_Plugin):
 
 
 if not optimized:
-    CFPDivisiveSumNormalize_opt1 = CFPOF_DivisiveSumNormalize
-    ParameterizedObject().message('Inline-optimized components not available; using CFPOF_DivisiveSumNormalize instead of CFPDivisiveSumNormalize_opt1.')
+    CFPOF_DivisiveSumNormalize_opt = CFPOF_DivisiveSumNormalize
+    ParameterizedObject().message('Inline-optimized components not available; using CFPOF_DivisiveSumNormalize instead of CFPOF_DivisiveSumNormalize_opt.')

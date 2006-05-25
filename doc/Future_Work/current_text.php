@@ -70,7 +70,7 @@ Tasks which the developers are about to start.
 <ul>
 
 <li>
-2006/05/19: CFPLF_Hebbian_opt or CFPDivisiveSumNormalize_opt1 (or both) cause
+2006/05/19: CFPLF_Hebbian_opt or CFPOF_DivisiveSumNormalize_opt (or both) cause
 memory use to go up each call.
 </li>
 
