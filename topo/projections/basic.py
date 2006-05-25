@@ -19,7 +19,7 @@ from topo.base.projection import Projection
 from topo.base.functionfamilies import OutputFnParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number,BooleanParameter,Parameter
-from topo.base.cf import CFProjection,CFPLearningFnParameter,CFPLF_Identity,CFPResponseFnParameter,CFPOutputFnParameter,IdentityCFPOutputFn,CFPOutputFn,CFPResponseFn, DotProduct, ResponseFnParameter
+from topo.base.cf import CFProjection,CFPLearningFnParameter,CFPLF_Identity,CFPResponseFnParameter,CFPOutputFnParameter,CFPOF_Identity,CFPOutputFn,CFPResponseFn, DotProduct, ResponseFnParameter
 from topo.base.patterngenerator import PatternGeneratorParameter
 from topo.base.sheetview import UnitView
 

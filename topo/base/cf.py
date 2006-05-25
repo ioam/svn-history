@@ -466,7 +466,7 @@ class CFPOF_Plugin(CFPOutputFn):
                     ## del cf.sum 
 
 
-class IdentityCFPOutputFn(CFPOutputFn):
+class CFPOF_Identity(CFPOutputFn):
     """
     CFPOutputFn that leaves the CFs unchanged.
 
