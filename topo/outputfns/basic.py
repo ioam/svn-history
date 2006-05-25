@@ -139,7 +139,7 @@ class DivisiveNormalizeL2(OutputFn):
         return x
 
 
-class DivisiveMaxNormalize(OutputFn):
+class DivisiveNormalizeLinf(OutputFn):
     """
     OutputFn to divide an array by the absolute value of its maximum.
 
