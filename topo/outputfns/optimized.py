@@ -16,7 +16,7 @@ from basic import DivisiveSumNormalize
 from Numeric import sum
 
 # CEBHACKALERT: see HACKALERT in basic.by
-class DivisiveSumNormalize_opt1(OutputFn):
+class DivisiveSumNormalize_opt(OutputFn):
     """
     OutputFn that divides an array by its sum.
 
@@ -31,7 +31,7 @@ class DivisiveSumNormalize_opt1(OutputFn):
     norm_value = Number(default=1.0)    
 
     def __init__(self,**params):
-        super(DivisiveSumNormalize_opt1,self).__init__(**params)
+        super(DivisiveSumNormalize_opt,self).__init__(**params)
 
     def __call__(self, x, current_norm_value=None):
         """
@@ -67,8 +67,8 @@ class DivisiveSumNormalize_opt1(OutputFn):
 
 
 if not optimized:
-    DivisiveSumNormalize_opt1 = DivisiveSumNormalize
-    ParameterizedObject().message('Inline-optimized components not available; using DivisiveSumNormalize instead of DivisiveSumNormalize_opt1.')
+    DivisiveSumNormalize_opt = DivisiveSumNormalize
+    ParameterizedObject().message('Inline-optimized components not available; using DivisiveSumNormalize instead of DivisiveSumNormalize_opt.')
 
 
 
@@ -118,7 +118,7 @@ class CFPOF_DivisiveSumNormalize_opt(CFPOutputFn):
     except this assumes the presence of the _sum attribute on any
     activated unit's CFs.
     """
-    single_cf_fn = OutputFnParameter(DivisiveSumNormalize_opt1(norm_value=1.0),
+    single_cf_fn = OutputFnParameter(DivisiveSumNormalize_opt(norm_value=1.0),
                                      constant=True)
 
     def __init__(self,**params):
