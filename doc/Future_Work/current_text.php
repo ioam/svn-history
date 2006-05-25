@@ -112,7 +112,7 @@ to generate a new value.
 </li>
 
 <li>
-2006/05/02 (CB): HACKALERTs relating to connection fields; test file for connectionfield.
+2006/05/22 (CB): HACKALERTs relating to connection fields; test file for connectionfield; cleaning up cf.py and projections/basic.py along with the Slice class (there are several simplifications that can be made).
 </li>
 
 <li>
