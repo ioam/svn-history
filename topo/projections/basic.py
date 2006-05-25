@@ -38,7 +38,7 @@ from topo.outputfns.basic import IdentityOF
 # a shared ConnectionField is in a list of 'DummyCF' wrappers.
 
 
-class SharedWeightCFPOutputFn(CFPOutputFn):
+class CFPOF_SharedWeight(CFPOutputFn):
     single_cf_fn = OutputFnParameter(default=IdentityOF())
     
     def __call__(self, cfs, output_activity, norm_values=None, **params):
@@ -116,7 +116,7 @@ class SharedWeightCFProjection(CFProjection):
     strength = Number(default=1.0)
 
     weights_output_fn = CFPOutputFnParameter(
-        default=SharedWeightCFPOutputFn())
+        default=CFPOF_SharedWeight())
 
 
     def __init__(self,**params):
