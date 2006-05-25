@@ -20,7 +20,7 @@ from topo.misc.inlinec import inline, optimized
 from topo.base.cf import GenericCFPResponseFn
 
 # CEBHACKALERT: This is GenericCFPResponseFn(single_cf_fn=DotProduct()).
-class CFPDotProduct(CFPResponseFn):
+class CFPRF_DotProduct(CFPResponseFn):
     """
     Dot-product response function.
 

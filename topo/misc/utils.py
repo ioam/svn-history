@@ -259,7 +259,7 @@ def get_states_of_classes_from_module(module,states_of_classes,processed_modules
                 # k might be just a label for the true class. For example,
                 # if Topographica falls back to the unoptimized components,
                 # k could be "CFPDotProduct_opt1", but v.__name__
-                # - and the actual class - is "CFPDotProduct". It
+                # - and the actual class - is "CFPRF_DotProduct". It
                 # is correct to set the attributes on the true class.
                 full_class_path = v.__module__+'.'+v.__name__
                 states_of_classes[full_class_path] = {}

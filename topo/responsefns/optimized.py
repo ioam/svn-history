@@ -14,7 +14,7 @@ from topo.base.parameterizedobject import ParameterizedObject
 
 from topo.misc.inlinec import inline, optimized
 
-from topo.responsefns.projfns import CFPDotProduct, CFPEuclideanDistance
+from topo.responsefns.projfns import CFPRF_DotProduct, CFPEuclideanDistance
 
 from topo.projections.basic import SharedWeightCFPResponseFn
 
@@ -24,7 +24,7 @@ class CFPDotProduct_opt1(CFPResponseFn):
     Dot-product response function.
 
     Written in C for a several-hundred-times speedup; see
-    CFPDotProduct for an easier-to read (but otherwise equivalent)
+    CFPRF_DotProduct for an easier-to read (but otherwise equivalent)
     version in Python.
     """
 
@@ -72,8 +72,8 @@ class CFPDotProduct_opt1(CFPResponseFn):
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
 
 if not optimized:
-    CFPDotProduct_opt1 = CFPDotProduct
-    ParameterizedObject().message('Inline-optimized components not available; using CFPDotProduct instead of CFPDotProduct_opt1.')
+    CFPDotProduct_opt1 = CFPRF_DotProduct
+    ParameterizedObject().message('Inline-optimized components not available; using CFPRF_DotProduct instead of CFPDotProduct_opt1.')
 
 
 
@@ -197,7 +197,7 @@ class SharedWeightCFPDotProduct_opt1(CFPResponseFn):
     """
     Dot-product response function for SharedWeightCFProjection.
 
-    The same as CFPDotProduct, but where there is only one set of weights.
+    The same as CFPRF_DotProduct, but where there is only one set of weights.
     """
     single_cf_fn = ResponseFnParameter(DotProduct(),constant=True)    
 
