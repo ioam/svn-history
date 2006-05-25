@@ -18,7 +18,7 @@ import unittest
 
 from topo.outputfns.basic import PiecewiseLinear, DivisiveSumNormalize
 from topo.outputfns.basic import DivisiveNormalizeL2, DivisiveMaxNormalize
-from topo.outputfns.basic import DivisiveLpNormalize
+from topo.outputfns.basic import DivisiveNormalizeLp
 
 from Numeric import array
 from math import sqrt
@@ -27,7 +27,7 @@ from math import sqrt
 ### to avoid changing all the call to outputfns in others topographica module
 ### This is why in the test, both way of calling the outputfns has been tested:
 ### as a procedure and as a function
-### Note: that it does not work for the DivisiveLpNormalize for reasons not yet clarified;
+### Note: that it does not work for the DivisiveNormalizeLp for reasons not yet clarified;
 ### (cf outputfns/basic.py, corresponding  JCALERT!)
 ### Therefore the test for this function has to be eventually re-written when the problem is solved
 
@@ -302,9 +302,9 @@ class TestDivisiveLpNormalize(unittest.TestCase):
                          [2.0,5.0,9.0]])
 
         # The default value of p is 2, so in this case, same as L2
-        self.fn1 = DivisiveLpNormalize()        
-        self.fn2 = DivisiveLpNormalize(p=3.0)
-        self.fn3 = DivisiveLpNormalize(p=4.0,norm_value=2.0)
+        self.fn1 = DivisiveNormalizeLp()        
+        self.fn2 = DivisiveNormalizeLp(p=3.0)
+        self.fn3 = DivisiveNormalizeLp(p=4.0,norm_value=2.0)
         
     def test_divisive_lp_normalize(self):
 

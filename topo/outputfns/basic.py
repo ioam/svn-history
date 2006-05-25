@@ -158,7 +158,7 @@ class DivisiveMaxNormalize(OutputFn):
         return x
 
     
-class DivisiveLpNormalize(OutputFn):
+class DivisiveNormalizeLp(OutputFn):
     """
     OutputFn to divide an array by its Lp-Norm, where p is specified.
 
