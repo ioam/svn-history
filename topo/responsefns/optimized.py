@@ -193,7 +193,7 @@ if not optimized:
 # See the hackalert in projections/basic.py; this wouldn't be
 # required if SharedWeightProjection wrapped the list of cfs
 # better.
-class SharedWeightCFPDotProduct_opt1(CFPResponseFn):
+class CFPRF_SharedWeightDotProduct_opt(CFPResponseFn):
     """
     Dot-product response function for SharedWeightCFProjection.
 
@@ -255,5 +255,5 @@ class CFPRF_SharedWeightDotProduct(CFPRF_SharedWeight):
 
 
 if not optimized:
-    SharedWeightCFPDotProduct_opt1 = CFPRF_SharedWeightDotProduct
-    ParameterizedObject().message('Inline-optimized components not available; using CFPRF_SharedWeightDotProduct instead of SharedWeightCFPDotProduct_opt1.')
+    CFPRF_SharedWeightDotProduct_opt = CFPRF_SharedWeightDotProduct
+    ParameterizedObject().message('Inline-optimized components not available; using CFPRF_SharedWeightDotProduct instead of CFPRF_SharedWeightDotProduct_opt.')

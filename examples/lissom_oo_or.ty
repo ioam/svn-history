@@ -17,7 +17,7 @@ import topo.patterns.random
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
-from topo.responsefns.optimized import CFPRF_DotProduct_opt, SharedWeightCFPDotProduct_opt1
+from topo.responsefns.optimized import CFPRF_DotProduct_opt, CFPRF_SharedWeightDotProduct_opt
 from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
@@ -42,7 +42,7 @@ CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPDivisiveSumNormalize_opt1()
-SharedWeightCFProjection.response_fn=SharedWeightCFPDotProduct_opt1()
+SharedWeightCFProjection.response_fn=CFPRF_SharedWeightDotProduct_opt()
 
 SharedWeightCFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
 
