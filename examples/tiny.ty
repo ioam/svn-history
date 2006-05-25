@@ -22,7 +22,7 @@ from topo.learningfns.basic import Hebbian
 from topo.outputfns.basic import PiecewiseLinear
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.outputfns.basic import DivisiveL1Normalize
+from topo.outputfns.basic import DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
 topo.sim.name = "tiny"
@@ -84,7 +84,7 @@ topo.sim.connect(
     nominal_bounds_template=BoundingBox(radius=0.2),
     response_fn=CFPRF_DotProduct_opt(),
     learning_fn=CFPLF_Plugin(single_cf_fn=SampleHebbian(sample_param=0.5)),
-    weights_output_fn=CFPOF_Plugin(single_cf_fn=DivisiveL1Normalize()),
+    weights_output_fn=CFPOF_Plugin(single_cf_fn=DivisiveNormalizeL1()),
     learning_rate=200.0)
 
 
