@@ -20,7 +20,7 @@ import topo.patterns.basic
 from topo.outputfns.basic import IdentityOF
 
 
-class SOMLF(CFPLearningFn):
+class CFPLF_SOM(CFPLearningFn):
     """
     An abstract base class of learning functions for Self-Organizing Maps.
     
@@ -30,7 +30,7 @@ class SOMLF(CFPLearningFn):
     specifies the radius of the neighborhood function used during
     learning.
     """
-    _abstract_class_name = "SOMLF"
+    _abstract_class_name = "CFPLF_SOM"
 
     learning_radius = Number(default=0.0,
                              doc="Specify the radius of the Neighborhood function used for learning.")
@@ -40,7 +40,7 @@ class SOMLF(CFPLearningFn):
 
 
 
-class CFPLF_HebbianSOM(SOMLF):
+class CFPLF_HebbianSOM(CFPLF_SOM):
     """
     Hebbian learning rule for CFProjections to Self-Organizing Maps.
 

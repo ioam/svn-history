@@ -11,7 +11,7 @@ from Numeric import argmax,exp,floor
 from topo.base.arrayutils import L2norm
 from topo.base.parameterclasses import Number
 from topo.base.cf import CFSheet
-from topo.learningfns.som import SOMLF
+from topo.learningfns.som import CFPLF_SOM
 
 
 class CFSOM(CFSheet):
@@ -25,7 +25,7 @@ class CFSOM(CFSheet):
 
     Most of the real work is done by the Projection, and specifically
     by the Projection's learning_fn.  The learning_fn will typically
-    be a subclass of SOMLF, and will typically select a winning unit
+    be a subclass of CFPLF_SOM, and will typically select a winning unit
     and modify weights according to a neighborhood function around the
     winner.  Other Projection types can also be used.
     """
@@ -63,7 +63,7 @@ class CFSOM(CFSheet):
         radius = self.radius() * self.xdensity
         for proj in self.in_connections:
             proj.learning_rate = self.alpha()
-            if isinstance(proj.learning_fn, SOMLF):
+            if isinstance(proj.learning_fn, CFPLF_SOM):
                 proj.learning_fn.learning_radius = radius
             proj.learn()
 
