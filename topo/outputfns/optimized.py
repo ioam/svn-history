@@ -165,16 +165,16 @@ class CFPDivisiveSumNormalize_opt1(CFPOutputFn):
         inline(code, ['output_activity','rows','cols','cfs'], local_dict=locals())
 
 
-class CFPDivisiveSumNormalize(GenericCFPOutputFn):
+class CFPOF_DivisiveSumNormalize(GenericCFPOutputFn):
     """
     Wraps
     GenericCFPOutputFn(single_cf_fn=DivisiveSumNormalize),
     the non-optimized equivalent of DivisiveSumNormalizeCFOF_opt1.
     """
     def __init__(self,**params):
-        super(CFPDivisiveSumNormalize,self).__init__(single_cf_fn=DivisiveSumNormalize(norm_value=1.0),**params)
+        super(CFPOF_DivisiveSumNormalize,self).__init__(single_cf_fn=DivisiveSumNormalize(norm_value=1.0),**params)
 
 
 if not optimized:
-    CFPDivisiveSumNormalize_opt1 = CFPDivisiveSumNormalize
-    ParameterizedObject().message('Inline-optimized components not available; using CFPDivisiveSumNormalize instead of CFPDivisiveSumNormalize_opt1.')
+    CFPDivisiveSumNormalize_opt1 = CFPOF_DivisiveSumNormalize
+    ParameterizedObject().message('Inline-optimized components not available; using CFPOF_DivisiveSumNormalize instead of CFPDivisiveSumNormalize_opt1.')
