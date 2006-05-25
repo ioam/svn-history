@@ -16,7 +16,7 @@ from topo.misc.inlinec import inline, optimized
 
 from topo.responsefns.projfns import CFPRF_DotProduct, CFPRF_EuclideanDistance
 
-from topo.projections.basic import SharedWeightCFPResponseFn
+from topo.projections.basic import CFPRF_SharedWeight
 
 
 class CFPRF_DotProduct_opt(CFPResponseFn):
@@ -244,11 +244,11 @@ class SharedWeightCFPDotProduct_opt1(CFPResponseFn):
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows','sw'], local_dict=locals())
 
 
-class SharedWeightCFPDotProduct(SharedWeightCFPResponseFn):
+class SharedWeightCFPDotProduct(CFPRF_SharedWeight):
     """
     Wrapper written to allow transparent non-optimized fallback; 
     equivalent to
-    SharedWeightCFPResponseFn(single_cf_fn=DotProduct())
+    CFPRF_SharedWeight(single_cf_fn=DotProduct())
     """
     def __init__(self,**params):
         super(SharedWeightCFPDotProduct,self).__init__(single_cf_fn=DotProduct(),**params)

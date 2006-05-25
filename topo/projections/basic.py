@@ -48,7 +48,7 @@ class SharedWeightCFPOutputFn(CFPOutputFn):
             self.single_cf_fn(cf.weights)
 
 
-class SharedWeightCFPResponseFn(CFPResponseFn):
+class CFPRF_SharedWeight(CFPResponseFn):
     """
     Response function accepting a single CF applied to all units.
     Otherwise similar to GenericCFResponseFn.
@@ -104,7 +104,7 @@ class SharedWeightCFProjection(CFProjection):
     currently disabled.
     """
     response_fn = CFPResponseFnParameter(
-        default=SharedWeightCFPResponseFn())
+        default=CFPRF_SharedWeight())
     
     ### JABHACKALERT: Set to be constant as a clue that learning won't
     ### actually work yet.
