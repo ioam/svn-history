@@ -11,7 +11,7 @@ $Id$
 __version__ = "$Revision$"
 
 # Imported here so that all ProjectionLearningFns will be in the same package
-from topo.base.cf import CFPLF_Identity,GenericCFPLearningFn
+from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
 
 ##  ## JABHACKALERT: Untested
 ##  class CFPBCM(CFPLearningFn):

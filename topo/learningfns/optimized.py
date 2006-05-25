@@ -9,7 +9,7 @@ __version__ = "$Revision$"
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Parameter
-from topo.base.cf import CFPLearningFn,GenericCFPLearningFn
+from topo.base.cf import CFPLearningFn,CFPLF_Plugin
 from topo.base.functionfamilies import Hebbian
 
 from topo.misc.inlinec import inline, optimized
@@ -21,7 +21,7 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
     CF-aware Hebbian learning rule.
 
     Implemented in C for speed.  Should be equivalent to
-    GenericCFPLearningFn(single_cf_fn=Hebbian), except faster.  
+    CFPLF_Plugin(single_cf_fn=Hebbian), except faster.  
 
     Sets the _sum attribute on any cf whose weights are
     updated during learning.
@@ -79,11 +79,11 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
     
        
 
-class CFPLF_Hebbian(GenericCFPLearningFn):
+class CFPLF_Hebbian(CFPLF_Plugin):
     """
     Wrapper written to allow transparent non-optimized fallback; 
     equivalent to
-    GenericCFPLearningFn(single_cf_fn=Hebbian())
+    CFPLF_Plugin(single_cf_fn=Hebbian())
     """
     def __init__(self,**params):
         super(CFPLF_Hebbian,self).__init__(single_cf_fn=Hebbian(),**params)

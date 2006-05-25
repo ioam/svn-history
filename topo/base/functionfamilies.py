@@ -80,7 +80,7 @@ class OutputFnParameter(ClassSelectorParameter):
 class LearningFn(ParameterizedObject):
     """
     Abstract base class for learning functions that plug into
-    GenericCFPLearningFn.
+    CFPLF_Plugin.
     """
 
     _abstract_class_name = "LearningFn"

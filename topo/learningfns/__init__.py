@@ -2,12 +2,12 @@
 Learning functions come in two varieties: LearningFunction, and
 CFProjectionLearningFunction.  A LearningFunction (e.g. Hebbian)
 applies to one ConnectionField, and is used with
-GenericCFPLearningFn to apply learning to an entire
-CFProjection.  GenericCFPLearningFn is one example of a
+CFPLF_Plugin to apply learning to an entire
+CFProjection.  CFPLF_Plugin is one example of a
 CFProjectionLearningFunction; these work with the entire Projection at
 once.  Some optimizations can only be applied at the
 CFPLearningFn level, so there are other
-CFPLearningFns beyond GenericCFPLearningFn.
+CFPLearningFns beyond CFPLF_Plugin.
 
 Any new learning functions added to this directory will automatically
 become available for any model.

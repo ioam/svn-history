@@ -408,7 +408,7 @@ class CFPLearningFnParameter(ClassSelectorParameter):
         super(CFPLearningFnParameter,self).__init__(CFPLearningFn,default=default,**params)        
 
 
-class GenericCFPLearningFn(CFPLearningFn):
+class CFPLF_Plugin(CFPLearningFn):
     """CFPLearningFunction applying the specified single_cf_fn to each CF."""
     single_cf_fn = LearningFnParameter(default=Hebbian(),
         doc="Accepts a LearningFn that will be applied to each CF individually.")
@@ -527,7 +527,7 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         doc="Define the shape of the connection fields.")
     
     learning_fn = CFPLearningFnParameter(
-        default=GenericCFPLearningFn(),
+        default=CFPLF_Plugin(),
         doc='Function for computing changes to the weights based on one activation step.')
 
     # JABALERT: Shouldn't learning_rate be owned by the learning_fn?
