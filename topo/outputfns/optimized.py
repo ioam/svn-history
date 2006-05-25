@@ -15,9 +15,7 @@ from basic import DivisiveSumNormalize
 
 from Numeric import sum
 
-# CEBHACKALERT: the various DivisiveSumNormalize classes
-# should be DivisiveL1Normalize (i.e. use the absolute values - see basic.py).
-
+# CEBHACKALERT: see HACKALERT in basic.by
 class DivisiveSumNormalize_opt1(OutputFn):
     """
     OutputFn that divides an array by its sum.
