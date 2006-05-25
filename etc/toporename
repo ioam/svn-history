@@ -4,7 +4,11 @@
 # First shows the existing uses, then changes it, then prompts for CVS checkin.
 #
 # Examples: cd .. ; etc/toporename CFPHebbian CFPLF_Hebbian
-#           cd .. ; etc/toporename '[[:<:]]CFPHebbian[[:>:]]' 'CFPLF_Hebbian'
+#           cd .. ; etc/toporename '\bCFPHebbian\b' 'CFPLF_Hebbian'
+
+# (Note: because \b is printed as a backspace, the print-out will be incorrect:
+# 'Replacing CFPHebbia> with <CFPLF_Hebbian> in file examples/cfsom_or.ty.'
+# but the operation itself will be unaffected.)
 
 from os import system
 from sys import argv,exit
