@@ -70,6 +70,8 @@ class CPCA(LearningFn):
     Has built-in normalization, and so does not require output_fn
     normalization for stability.  Intended to be a more biologically
     plausible version of the Oja rule.
+
+    Submitted by Veldri Kurniawan and Lewis Ng.
     """
    
     def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
