@@ -15,11 +15,13 @@ __version__='$Revision$'
 
 import Numeric
 
+from Numeric import dot
+
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
 from topo.base.arrayutils import L2norm, norm
 from topo.base.functionfamilies import OutputFn
-from topo.base.arrayutils import clip_in_place
+from topo.base.arrayutils import clip_in_place,clip_lower
 
 # Imported here so that all OutputFns will be in the same package
 from topo.base.functionfamilies import IdentityOF
@@ -181,3 +183,16 @@ class DivisiveNormalizeLp(OutputFn):
             x *=factor 
 	return x
 
+
+
+class HalfRectifyAndSquare(OutputFn):
+    """
+    Output function that applies a half-wave rectification (clips at zero)
+    and then squares the values.
+    """
+    lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
+    
+    def __call__(self,x):
+        clip_lower(x,self.lower_bound)
+        x *= x
+        return x
