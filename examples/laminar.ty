@@ -121,5 +121,3 @@ topo.sim.schedule_command(20000, 'topo.sim["V1Exc"].output_fn.lower_bound=0.24; 
 topo.sim['V1Exc'].gui_x=230.0   ; topo.sim['V1Exc'].gui_y=351.0
 topo.sim['V1Inh'].gui_x=218.0 ; topo.sim['V1Inh'].gui_y=90.0
 topo.sim['Retina'].gui_x=232.0  ; topo.sim['Retina'].gui_y=512.0
-
-topo.sim.run(0)

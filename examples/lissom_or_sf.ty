@@ -381,9 +381,6 @@ topo.sim['LGNOffs'].gui_x=700.0; topo.sim['LGNOffs'].gui_y=345.0
 
 
 
-topo.sim.run(0)
-
-
 
 from os import system
 

@@ -121,10 +121,6 @@ topo.sim.schedule_command(20000, 'topo.sim["V1"].output_fn.lower_bound=0.24; top
 
 
 
-topo.sim.run(0)
-
-
-
 ### Uncomment lines below to profile performance
 #
 ## import hotshot,hotshot.stats

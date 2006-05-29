@@ -104,5 +104,3 @@ topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),
 # default locations for model editor
 topo.sim['LGNOn'].gui_x=432.0;  topo.sim['LGNOn'].gui_y=345.0
 topo.sim['Retina'].gui_x=279.0; topo.sim['Retina'].gui_y=500.0
-
-topo.sim.run(0)

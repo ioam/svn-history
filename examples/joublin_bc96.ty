@@ -110,5 +110,3 @@ topo.sim['I-cells'].gui_x=200  ; topo.sim['I-cells'].gui_y=50
 topo.sim['E-cells'].gui_x=200  ; topo.sim['E-cells'].gui_y=200
 topo.sim['R-cells'].gui_x=200  ; topo.sim['R-cells'].gui_y=350
 topo.sim['Hindpaw'].gui_x=200  ; topo.sim['Hindpaw'].gui_y=500
-
-topo.sim.run(0)

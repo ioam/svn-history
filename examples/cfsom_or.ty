@@ -52,5 +52,3 @@ topo.sim.connect('Retina','V1',delay=0.05,connection_type=CFProjection,
                   nominal_bounds_template=BoundingBox(radius=0.1),
                   response_fn = CFPRF_DotProduct_opt(),
                   learning_fn=CFPLF_HebbianSOM())
-
-topo.sim.run(0)

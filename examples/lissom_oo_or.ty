@@ -157,7 +157,6 @@ topo.sim['LGNOn'].gui_x=432.0;   topo.sim['LGNOn'].gui_y=345.0
 topo.sim['LGNOff'].gui_x=150.0;  topo.sim['LGNOff'].gui_y=345.0
 topo.sim['Retina'].gui_x=279.0;  topo.sim['Retina'].gui_y=500.0
 
-topo.sim.run(0)
 
 
 # Uncomment to allow profiling

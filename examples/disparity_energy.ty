@@ -162,5 +162,3 @@ topo.sim['TroughFirst'].gui_x=658.0
 topo.sim['TroughFirst'].gui_y=230.0
 topo.sim['PeakFirst'].gui_x=902.0
 topo.sim['PeakFirst'].gui_y=230.0
-
-topo.sim.run(0)

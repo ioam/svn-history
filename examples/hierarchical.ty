@@ -125,5 +125,3 @@ topo.sim['V2'].gui_x=500          ; topo.sim['V2'].gui_y=230
 topo.sim['V3'].gui_x=500          ; topo.sim['V3'].gui_y=90
 topo.sim['LeftRetina'].gui_x=151  ; topo.sim['LeftRetina'].gui_y=520
 topo.sim['RightRetina'].gui_x=369 ; topo.sim['RightRetina'].gui_y=520
-
-topo.sim.run(0)
