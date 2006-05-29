@@ -77,14 +77,15 @@ scaling equations that underlie Sheet coordinates
     The licensing terms are also somewhat restrictive, in part because of 
     its nature as a joint commercial/academic project.<BR><BR>
   <dt><A TARGET="_top" HREF="http://ilab.usc.edu/toolkit/documentation.shtml">iNVT</A></dt>
-  <dd>iLab Neuromorphic Vision C++ toolkit is a high-performance
-    computer-vision oriented toolkit from Koch and Itti with support
+  <dd>iLab Neuromorphic Vision Toolkit is a high-performance
+    computer-vision oriented C++ toolkit from Koch and Itti with support
     for saliency maps for modeling attention.  It has a strong focus
     on topographically organized regions, but at a high level of
     abstraction, and without specific support for learning and
     development.<BR><BR>
   <dt><A TARGET="_top" HREF="http://www.cs.cmu.edu/~dr/Lens">LENS</A></dt>
   <dd>Simple, basic artificial neural-network simulator (primarily
-    backpropagation networks, but also has support for Kohonen SOMs).<BR><BR>
+    abstract backpropagation networks, but also has support for
+    Kohonen SOM models of topographic maps).<BR><BR>
 </dl>
 
