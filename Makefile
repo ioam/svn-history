@@ -142,6 +142,15 @@ sf-web-site: reference-manual doc
 #@@distclean: FORCE clean
 #@@	   ${RM} .#* */.#* */*/.#* */*~ .cvsignore ChangeLog.txt */.cvsignore */*/.cvsignore
 #@@	   ${RM} etc/topographica.elc ImageSaver*.ppm countalerts* annotate.out
+#@@	   ${RM} examples/disparity_energy.ty
+#@@	   ${RM} examples/homeostatic.ty
+#@@	   ${RM} examples/joublin_bc96.ty
+#@@	   ${RM} examples/laminar.ty*
+#@@	   ${RM} examples/laminar_lissom.ty
+#@@	   ${RM} examples/laminar_nolearning.ty
+#@@	   ${RM} examples/leaky_lissom_or.ty
+#@@	   ${RM} examples/lissom_or_sf.ty
+#@@	   ${RM} examples/tiny.ty
 #@@	   ${RM} -r external/mswin external/win32 setup.bat topographica.ico
 #@@	   ${RM} -r tmp/
 #@@	   ${RM} -r CVS */CVS */*/CVS */*/*/CVS
