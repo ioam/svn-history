@@ -69,7 +69,7 @@ topo.sim['V1Inh'] = LISSOM(bounds=BoundingBox(radius=0.5),tsettle=8)
 #V1Inh should possibly be a CFSheet to avoid having to set tsettle -
 #I will need to overwrite some of the default CFSheet parameters (e.g. Output function) first
 
-topo.sim.connect('Retina','V1Exc', delay = FixedPoint("0.05",4),
+topo.sim.connect('Retina','V1Exc', delay = FixedPoint("0.10",4),
                  connection_type=CFProjection,strength=1.0,name='Afferent',
                  nominal_bounds_template=BoundingBox(radius=0.22),learning_rate=1.274)
 

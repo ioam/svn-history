@@ -47,7 +47,7 @@ input_pattern = topo.patterns.basic.Gaussian(
     orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
 # LISSOM parameters
-LISSOM.density = 24.0
+LISSOM.nominal_density = 24.0
 
 
 # Specify weight initialization, response function, and learning function
@@ -64,7 +64,7 @@ topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)
 topo.sim['V1Exc'] = LISSOM(nominal_bounds=BoundingBox(radius=0.5),tsettle=9)
 topo.sim['V1Inh'] = LISSOM(nominal_bounds=BoundingBox(radius=0.4),tsettle=8)
 
-topo.sim.connect('Retina','V1Exc', delay = FixedPoint("0.05",4),
+topo.sim.connect('Retina','V1Exc', delay = FixedPoint("0.10",4),
                  connection_type=CFProjection,strength=1.0,name='Afferent',
                  nominal_bounds_template=BoundingBox(radius=0.22),learning_rate=1.274)
 
