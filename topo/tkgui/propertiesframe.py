@@ -59,13 +59,13 @@ class PropertiesFrame(Frame):
             control = Entry(self,
                             state="readonly",
                             fg="gray45",
-                            width=40,
+                            width=35,
                             textvariable = var,
                             **kw)
         else:
             control = EntryTranslator(self,
                                 textvariable = var,
-                                width=40,
+                                width=35,
                                 **kw)
             control.bind('<Return>', self.optional_refresh)
             
