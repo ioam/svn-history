@@ -60,7 +60,7 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
                                 // as 0.
                                 if (*(m++) >= 0.000001) {
                                     *wi += load * *inpi;
-                                    total += *wi;
+                                    total += fabs(*wi);
                                 }
                                 ++wi;
                                 ++inpi;

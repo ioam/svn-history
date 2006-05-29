@@ -22,8 +22,8 @@ from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
-from topo.outputfns.optimized import CFPOF_DivisiveSumNormalize_opt
-from topo.outputfns.basic import PiecewiseLinear, DivisiveSumNormalize
+from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
 topo.sim.name = "lissom_oo_or"
@@ -41,10 +41,10 @@ CFProjection.weights_generator=topo.patterns.random.UniformRandom()
 CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
-CFProjection.weights_output_fn=CFPOF_DivisiveSumNormalize_opt()
+CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 SharedWeightCFProjection.response_fn=CFPRF_SharedWeightDotProduct_opt()
 
-SharedWeightCFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
+SharedWeightCFProjection.weights_output_fn.single_cf_fn=DivisiveNormalizeL1()
 
 ###########################################
 # build simulation

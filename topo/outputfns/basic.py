@@ -51,45 +51,6 @@ class PiecewiseLinear(OutputFn):
         return x
 
 
-# CEBHACKALERT: should be DivisiveNormalizeL1 (i.e. use the
-# absolute values). Delete this and replace its uses with
-# the DivisiveNormalizeL1 class below (see also optimized.py).
-# This hasn't been done because it would require altering the C++
-# functions to use the L1 norm rather than the sum.
-# We keep these basic ones around as the unoptimized alternatives.
-class DivisiveSumNormalize(OutputFn):
-    """
-    OutputFn that divides an array by its sum.
-
-    This operation ensures that an array has a sum equal to the specified 
-    norm_value, rescaling each value to make this true.  The array is 
-    unchanged if the sum is zero.
-
-    If the array's current norm_value is known (e.g. from some earlier
-    calculation), it can be passed in as an optimization.
-    """
-    norm_value = Number(default=1.0)
-
-    def __call__(self,x,current_norm_value=None):
-        """
-        Normalize the input array.
-
-        If the array's current norm_value is already equal to the required
-        norm_value, the operation is skipped.
-        """
-        if current_norm_value==None:
-            current_norm_value = 1.0*Numeric.sum(x.flat)
-        
-        if current_norm_value==self.norm_value:
-            return x
-        
-        if current_norm_value != 0:
-            factor = (self.norm_value/current_norm_value)
-            x *= factor
-
-        return x
-
-
 class DivisiveNormalizeL1(OutputFn):
     """
     OutputFn that divides an array by its L1 norm.

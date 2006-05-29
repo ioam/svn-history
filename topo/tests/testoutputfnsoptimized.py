@@ -9,11 +9,11 @@ import unittest
 
 from Numeric import array, Float32
 
-from topo.outputfns.optimized import DivisiveSumNormalize_opt
+from topo.outputfns.optimized import DivisiveNormalizeL1_opt
 
 
 
-class TestDivisiveSumNormalize_opt1(unittest.TestCase):
+class TestDivisiveNormalizeL1_opt1(unittest.TestCase):
     
     def setUp(self):
 
@@ -23,19 +23,19 @@ class TestDivisiveSumNormalize_opt1(unittest.TestCase):
         self.a2 = array([[1.0,-1.0,7.0],
                         [4.0,3.0,11.0]]).astype(Float32)
 
-        self.fn1 = DivisiveSumNormalize_opt()
-        self.fn2 = DivisiveSumNormalize_opt(norm_value=4.0)
+        self.fn1 = DivisiveNormalizeL1_opt()
+        self.fn2 = DivisiveNormalizeL1_opt(norm_value=4.0)
                
     def test_divisive_sum_normalize(self):
         # Test as a procedure
 
         fn1_a1 = self.a1/3.0
 
-        fn1_a2 = self.a2/25.0
+        fn1_a2 = self.a2/27.0
 
         fn2_a1 = (self.a1/3.0)*4.0
 
-        fn2_a2 = (self.a2/25.0)*4.0
+        fn2_a2 = (self.a2/27.0)*4.0
 
 
         self.fn1(self.a1)
@@ -84,7 +84,7 @@ class TestDivisiveSumNormalize_opt1(unittest.TestCase):
 
 
 
-cases = [TestDivisiveSumNormalize_opt1]
+cases = [TestDivisiveNormalizeL1_opt1]
 
 suite = unittest.TestSuite()
 suite.addTests(unittest.makeSuite(case) for case in cases)

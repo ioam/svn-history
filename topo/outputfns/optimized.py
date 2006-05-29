@@ -11,27 +11,27 @@ from topo.base.functionfamilies import OutputFn, OutputFnParameter
 
 from topo.misc.inlinec import inline, optimized
 
-from basic import DivisiveSumNormalize
+from basic import DivisiveNormalizeL1
 
 from Numeric import sum
 
 # CEBHACKALERT: see HACKALERT in basic.by
-class DivisiveSumNormalize_opt(OutputFn):
+class DivisiveNormalizeL1_opt(OutputFn):
     """
-    OutputFn that divides an array by its sum.
+    OutputFn that divides an array by the sum of the absolute value of each element.
 
     See the equivalent version in outputfns.basic for a
     description. When used as the single_cf_fn in CFP learning
     functions, provides a performance improvement over the python
-    DivisiveSumNormalize output function.  The all-c++ CFP learning
-    function CFPOF_DivisiveSumNormalize_opt is still much faster though.
+    DivisiveNormalizeL1 output function.  The all-C++ CFP learning
+    function CFPOF_DivisiveNormalizeL1_opt is still much faster though.
 
     The given array must be of type Numeric.Float32.
     """
     norm_value = Number(default=1.0)    
 
     def __init__(self,**params):
-        super(DivisiveSumNormalize_opt,self).__init__(**params)
+        super(DivisiveNormalizeL1_opt,self).__init__(**params)
 
     def __call__(self, x, current_norm_value=None):
         """
@@ -42,7 +42,7 @@ class DivisiveSumNormalize_opt(OutputFn):
         """
         # Doesn't seem like it would be much faster to do this bit in C
         if current_norm_value==None:
-            current_norm_value = sum(x.flat)
+            current_norm_value = sum(abs(x.flat))
         
         if current_norm_value==self.norm_value:
             return x
@@ -67,8 +67,8 @@ class DivisiveSumNormalize_opt(OutputFn):
 
 
 if not optimized:
-    DivisiveSumNormalize_opt = DivisiveSumNormalize
-    ParameterizedObject().message('Inline-optimized components not available; using DivisiveSumNormalize instead of DivisiveSumNormalize_opt.')
+    DivisiveNormalizeL1_opt = DivisiveNormalizeL1
+    ParameterizedObject().message('Inline-optimized components not available; using DivisiveNormalizeL1 instead of DivisiveNormalizeL1_opt.')
 
 
 
@@ -109,20 +109,20 @@ if not optimized:
 ##         return x
 
 
-class CFPOF_DivisiveSumNormalize_opt(CFPOutputFn):
+class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     """
     Performs divisive normalization of the weights of all cfs.
 
     Equivalent to
-    CFPOF_Plugin(single_cf_fn=DivisiveSumNormalize(norm_value=1.0)),
+    CFPOF_Plugin(single_cf_fn=DivisiveNormalizeL1(norm_value=1.0)),
     except this assumes the presence of the _sum attribute on any
-    activated unit's CFs.
+    activated unit's CFs, to be set by (e.g.) the learning_fn.
     """
-    single_cf_fn = OutputFnParameter(DivisiveSumNormalize_opt(norm_value=1.0),
+    single_cf_fn = OutputFnParameter(DivisiveNormalizeL1_opt(norm_value=1.0),
                                      constant=True)
 
     def __init__(self,**params):
-        super(CFPOF_DivisiveSumNormalize_opt,self).__init__(**params)
+        super(CFPOF_DivisiveNormalizeL1_opt,self).__init__(**params)
 
     def __call__(self, cfs, output_activity, **params):
         rows,cols = output_activity.shape
@@ -163,16 +163,16 @@ class CFPOF_DivisiveSumNormalize_opt(CFPOutputFn):
         inline(code, ['output_activity','rows','cols','cfs'], local_dict=locals())
 
 
-class CFPOF_DivisiveSumNormalize(CFPOF_Plugin):
+class CFPOF_DivisiveNormalizeL1(CFPOF_Plugin):
     """
     Wraps
-    CFPOF_Plugin(single_cf_fn=DivisiveSumNormalize),
-    the non-optimized equivalent of DivisiveSumNormalizeCFOF_opt1.
+    CFPOF_Plugin(single_cf_fn=DivisiveNormalizeL1),
+    the non-optimized equivalent of CFOF_DivisiveNormalizeL1_opt1.
     """
     def __init__(self,**params):
-        super(CFPOF_DivisiveSumNormalize,self).__init__(single_cf_fn=DivisiveSumNormalize(norm_value=1.0),**params)
+        super(CFPOF_DivisiveNormalizeL1,self).__init__(single_cf_fn=DivisiveNormalizeL1(norm_value=1.0),**params)
 
 
 if not optimized:
-    CFPOF_DivisiveSumNormalize_opt = CFPOF_DivisiveSumNormalize
-    ParameterizedObject().message('Inline-optimized components not available; using CFPOF_DivisiveSumNormalize instead of CFPOF_DivisiveSumNormalize_opt.')
+    CFPOF_DivisiveNormalizeL1_opt = CFPOF_DivisiveNormalizeL1
+    ParameterizedObject().message('Inline-optimized components not available; using CFPOF_DivisiveNormalizeL1 instead of CFPOF_DivisiveNormalizeL1_opt.')

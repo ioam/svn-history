@@ -30,7 +30,7 @@ from topo.sheets.cfsom import CFSOM
 import topo.patterns.random
 import topo.patterns.basic
 from topo.learningfns.som import CFPLF_HebbianSOM
-from topo.outputfns.basic import DivisiveSumNormalize
+from topo.outputfns.basic import DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
 topo.sim.name = "obermayer_pnas90"
@@ -94,7 +94,7 @@ CFProjection.learning_fn=CFPLF_HebbianSOM()
 # Weights should be initialized to sum to unity: (Will this work?)
 # CEBHACKALERT: they will be made to sum to 1 after every learning iteration.
 # I guess that isn't what was intended?
-CFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
+CFProjection.weights_output_fn.single_cf_fn=DivisiveNormalizeL1()
 
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern)

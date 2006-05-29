@@ -16,7 +16,7 @@ __version__='$Revision$'
 import unittest
 
 
-from topo.outputfns.basic import PiecewiseLinear, DivisiveSumNormalize
+from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.outputfns.basic import DivisiveNormalizeL2, DivisiveNormalizeLinf
 from topo.outputfns.basic import DivisiveNormalizeLp
 
@@ -90,7 +90,7 @@ class TestPiecewiseLinear(unittest.TestCase):
            self.assertAlmostEqual(item1, item2)
  
             
-class TestDivisiveSumNormalize(unittest.TestCase):
+class TestDivisiveNormalizeL1(unittest.TestCase):
     
     def setUp(self):
 
@@ -100,19 +100,19 @@ class TestDivisiveSumNormalize(unittest.TestCase):
         self.a2 = array([[1.0,-1.0,7.0],
                         [4.0,3.0,11.0]])
 
-        self.fn1 = DivisiveSumNormalize()
-        self.fn2 = DivisiveSumNormalize(norm_value=4.0)
+        self.fn1 = DivisiveNormalizeL1()
+        self.fn2 = DivisiveNormalizeL1(norm_value=4.0)
                
     def test_divisive_sum_normalize(self):
         # Test as a procedure
 
         fn1_a1 = self.a1/3.0
 
-        fn1_a2 = self.a2/25.0
+        fn1_a2 = self.a2/27.0
 
         fn2_a1 = (self.a1/3.0)*4.0
 
-        fn2_a2 = (self.a2/25.0)*4.0
+        fn2_a2 = (self.a2/27.0)*4.0
 
 
         self.fn1(self.a1)
@@ -409,7 +409,7 @@ class TestDivisiveLpNormalize(unittest.TestCase):
 
 
 cases = [TestPiecewiseLinear,
-         TestDivisiveSumNormalize,
+         TestDivisiveNormalizeL1,
          TestDivisiveLengthNormalize,
          TestDivisiveMaxNormalize,
          TestDivisiveLpNormalize]

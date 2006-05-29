@@ -22,7 +22,7 @@ from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.base.parameterclasses import DynamicNumber,Number
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
-from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
+from topo.outputfns.basic import DivisiveNormalizeL1,PiecewiseLinear
 from topo.base.functionfamilies import OutputFn
 from topo.base.arrayutils import clip_in_place
 from topo.misc.numbergenerators import UniformRandom
@@ -86,7 +86,7 @@ topo.sim['LGNOn'] = CFSheet(nominal_density=10.0,measure_maps=False,
 
 
 # LGN ON channel
-SharedWeightCFProjection.learning_fn.output_fn=DivisiveSumNormalize()
+SharedWeightCFProjection.learning_fn.output_fn=DivisiveNormalizeL1()
 
 topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),
                   connection_type=SharedWeightCFProjection,strength=2.33,

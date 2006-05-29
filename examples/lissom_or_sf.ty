@@ -27,8 +27,8 @@ from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
-from topo.outputfns.basic import DivisiveSumNormalize,PiecewiseLinear
-from topo.outputfns.optimized import CFPOF_DivisiveSumNormalize_opt
+from topo.outputfns.basic import DivisiveNormalizeL1,PiecewiseLinear
+from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.misc.numbergenerators import UniformRandom
 from topo.responsefns.optimized import CFPRF_SharedWeightDotProduct_opt
 
@@ -153,9 +153,9 @@ CFProjection.weights_generator=topo.patterns.random.UniformRandom()
 CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
-CFProjection.weights_output_fn=CFPOF_DivisiveSumNormalize_opt()
+CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
-SharedWeightCFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
+SharedWeightCFProjection.weights_output_fn.single_cf_fn=DivisiveNormalizeL1()
 SharedWeightCFProjection.response_fn = CFPRF_SharedWeightDotProduct_opt()
 
 ###########################################
@@ -203,9 +203,9 @@ topo.sim.zapdensity=topo.sim['Retina'].xdensity,topo.sim['LGNOff'].xdensity,topo
 
 
 # LGN ON channel
-#SharedWeightCFProjection.weights_output_fn.single_cf_fn=DivisiveSumNormalize()
+#SharedWeightCFProjection.weights_output_fn.single_cf_fn=DivisiveNormalizeL1()
 
-SharedWeightCFProjection.learning_fn.output_fn=DivisiveSumNormalize()
+SharedWeightCFProjection.learning_fn.output_fn=DivisiveNormalizeL1()
 
 topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),name='Center',
 		  connection_type=SharedWeightCFProjection,strength=2.33,
