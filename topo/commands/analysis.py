@@ -28,10 +28,10 @@ class PatternPresenter(object):
     for use with map measurement commands like measure_or_pref.
     """
     
-    def __init__(self,patterngenerator,apply_output_fn=True,duration=1.0):
+    def __init__(self,pattern_generator,apply_output_fn=True,duration=1.0):
         self.apply_output_fn=apply_output_fn
         self.duration=duration
-        self.gen = patterngenerator
+        self.gen = pattern_generator
 
     def __call__(self,features_values,param_dict):
     
@@ -51,8 +51,23 @@ class PatternPresenter(object):
 
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,
-                    user_function=PatternPresenter(SineGrating(),False,1.0)):
-    """Measure orientation maps, using a sine grating by default."""
+                    user_function=PatternPresenter(pattern_generator=SineGrating(),
+                                                   apply_output_fn=False,duration=0.175)):
+
+    """
+    Measure orientation maps, using a sine grating by default.
+
+    Measures maps by collating the responses to a set of input
+    patterns controlled by some parameters.  The parameter ranges and
+    number of input patterns in each range are determined by the
+    num_phase, num_orientation, and frequencies parameters.  The
+    particular pattern used is determined by the user_function
+    argument, which defaults to a sine grating presented for a short
+    duration.  By convention, the Topographica example files
+    are designed to have a suitable activity pattern computed by
+    that time, but the duration will need to be changed for other
+    models that do not follow that convention.
+    """
 
     # CEBHACKALERT:
     # Is there some way that lissom_or.ty could set the value of a variable
