@@ -244,16 +244,6 @@ class CFPRF_SharedWeightDotProduct_opt(CFPResponseFn):
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows','sw'], local_dict=locals())
 
 
-class CFPRF_SharedWeightDotProduct(CFPRF_SharedWeight):
-    """
-    Wrapper written to allow transparent non-optimized fallback; 
-    equivalent to
-    CFPRF_SharedWeight(single_cf_fn=DotProduct())
-    """
-    def __init__(self,**params):
-        super(CFPRF_SharedWeightDotProduct,self).__init__(single_cf_fn=DotProduct(),**params)
-
-
 if not optimized:
-    CFPRF_SharedWeightDotProduct_opt = CFPRF_SharedWeightDotProduct
-    ParameterizedObject().message('Inline-optimized components not available; using CFPRF_SharedWeightDotProduct instead of CFPRF_SharedWeightDotProduct_opt.')
+    CFPRF_SharedWeightDotProduct_opt = CFPRF_SharedWeight
+    ParameterizedObject().message('Inline-optimized components not available; using CFPRF_SharedWeight instead of CFPRF_SharedWeightDotProduct_opt.')
