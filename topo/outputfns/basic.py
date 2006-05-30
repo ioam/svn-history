@@ -144,8 +144,6 @@ class DivisiveNormalizeLp(OutputFn):
             x *=factor 
 	return x
 
-
-
 class HalfRectifyAndSquare(OutputFn):
     """
     Output function that applies a half-wave rectification (clips at zero)
@@ -157,3 +155,20 @@ class HalfRectifyAndSquare(OutputFn):
         clip_lower(x,self.lower_bound)
         x *= x
         return x
+
+class Spike(OutputFn):
+    """ 
+    A spike generation function with a fixed threshold, and 
+    an optional absolute refractory period.
+    """
+    threshold = Number(default=0.0, doc="spike threshold")
+    abs_refracory_period = Number(default=0.0, doc="absolute refractory period")
+
+    sleep_count = Number(default=0.0, doc="internal variable, to enforce absolute refractory period")
+    
+    def __call__(self,x):
+	if x>threshold:
+	    return 1.0
+	else:
+            return 0.0
+
