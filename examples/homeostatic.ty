@@ -17,15 +17,20 @@ from fixedpoint import FixedPoint
 import topo.patterns.basic
 import topo.patterns.random
 
+from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
-from topo.base.parameterclasses import DynamicNumber,Number
+from topo.responsefns.optimized import CFPRF_DotProduct_opt, CFPRF_SharedWeightDotProduct_opt
+from topo.base.parameterclasses import DynamicNumber, Number
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
-from topo.outputfns.basic import DivisiveNormalizeL1,PiecewiseLinear
+from topo.learningfns.optimized import CFPLF_Hebbian_opt
+from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
+from topo.misc.numbergenerators import UniformRandom
 from topo.base.functionfamilies import OutputFn
 from topo.base.arrayutils import clip_in_place
-from topo.misc.numbergenerators import UniformRandom
+import Numeric
 
 topo.sim.name = "homeostatic"
 
@@ -38,9 +43,9 @@ input_pattern = topo.patterns.basic.Gaussian(
                                  
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)
-CFProjection.weights_generator = topo.patterns.random.UniformRandom()
-CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
 
+SharedWeightCFProjection.response_fn=CFPRF_SharedWeightDotProduct_opt()
+SharedWeightCFProjection.weights_output_fn.single_cf_fn=DivisiveNormalizeL1()
 
 class HomeostaticPiecewiseLinear(OutputFn):
     """ 
@@ -52,14 +57,16 @@ class HomeostaticPiecewiseLinear(OutputFn):
     lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
     upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
 
+
     # How much history to store
-    history_length=10
+    history_length=20
 
     def __init__(self,**params):
         super(HomeostaticPiecewiseLinear,self).__init__(**params)
 
 	# History of activations
 	self.recent_history=[]
+	self.first_call = True
 
     def __call__(self,x):
 	self.recent_history.append(copy.deepcopy(x))
@@ -68,29 +75,60 @@ class HomeostaticPiecewiseLinear(OutputFn):
 	if len(self.recent_history) > self.history_length:
             self.recent_history.pop(0)
 
-        fact = 1.0/(self.upper_bound-self.lower_bound)        
-        x -= self.lower_bound
+	if self.first_call:
+	    self.first_call = False
+	    self.lower_b = Numeric.ones(x.shape, x.typecode()) * 0.2
+	    self.upper_b = Numeric.ones(x.shape, x.typecode()) * 0.7
+	else:
+            # Compute average of activities during history_length
+            xshape = x.shape
+            self.average = Numeric.zeros(xshape, x.typecode())
+            
+            for c in range(0,len(self.recent_history)):
+                self.average = self.average + self.recent_history[c]
+
+            self.average /= len(self.recent_history)
+
+            rho1 = (self.average < 0.25) * (-4*self.average + 1)
+            rho2 = (self.average > 0.75) * (-4*self.average + 3)
+            rho = -(rho1 + rho2)
+
+            self.lower_b += rho*0.1
+            clip_in_place(self.lower_b,0.0,1.0)
+            #self.upper_b += rho*0.1;
+            #clip_in_place(self.upper_b,0.0,1.0)
+            self.upper_b = self.lower_b + 0.5
+	
+
+        #fact = 1.0/(self.upper_bound-self.lower_bound)        
+        #x -= self.lower_bound
+        #x *= fact
+            
+        fact = 1.0/(self.upper_b - self.lower_b)
+        x -= self.lower_b
         x *= fact
         clip_in_place(x,0.0,1.0)
+	#print x
+	#print self.upper_b
         return x
 
 
-topo.sim['Retina'] = GeneratorSheet(nominal_density=24.0,
-                                    nominal_bounds=BoundingBox(radius=0.5+0.25+0.375),
-                                    input_generator=input_pattern,phase=0.05)
+topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
+                                  input_generator=input_pattern,
+                                  period=1.0, phase=0.05,
+                                  nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
                         
-topo.sim['LGNOn'] = CFSheet(nominal_density=10.0,measure_maps=False,
+topo.sim['LGNOn'] = CFSheet(nominal_density=5.0,measure_maps=False,
                             nominal_bounds=BoundingBox(radius=0.5+0.25),
                             output_fn=HomeostaticPiecewiseLinear(lower_bound=0.0,
-                                                                 upper_bound=1.0))
+                                                      upper_bound=1.0))
 
 
 # LGN ON channel
-SharedWeightCFProjection.learning_fn.output_fn=DivisiveNormalizeL1()
 
-topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),
+topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
                   connection_type=SharedWeightCFProjection,strength=2.33,
-                  name='Center',nominal_bounds_template=BoundingBox(radius=0.375),
+                  nominal_bounds_template=BoundingBox(radius=0.375),name='Center',
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
@@ -99,7 +137,6 @@ topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),
                   name='Surround',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
-
 
 # default locations for model editor
 topo.sim['LGNOn'].gui_x=432.0;  topo.sim['LGNOn'].gui_y=345.0
