@@ -158,11 +158,8 @@ def centroid(array_2D):
 ### JABALERT!
 ###
 ### If at all possible should be rewritten to use matrix functions
-### that eliminate the explicit for loop.  The savespace() should
-### probably also be eliminated. 
-### JC: It has been tried to change the function so that to get rid of
-### the for loop, but no satisfying matrix function has been found to
-### perform it.
+### that eliminate the explicit for loop, because this is very slow.  
+### The savespace() should probably also be eliminated.  
 def clip_in_place(mat,lower_bound,upper_bound):
     """Version of Numeric.clip that changes the argument in place, with no intermediate."""
     mat.savespace(1)
@@ -178,8 +175,8 @@ def clip_in_place(mat,lower_bound,upper_bound):
 ### JABALERT!
 ###
 ### If at all possible should be rewritten to use matrix functions
-### that eliminate the explicit for loop.  The savespace() should
-### probably also be eliminated. 
+### that eliminate the explicit for loop, because this is very slow.  
+### The savespace() should probably also be eliminated.  
 def clip_lower(mat,lower_bound):
     """Version of Numeric.clip that changes the argument in place, with no intermediate."""
     mat.savespace(1)
