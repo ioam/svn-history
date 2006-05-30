@@ -158,6 +158,28 @@ class HalfRectifyAndSquare(OutputFn):
         return x
 
 
+class BinaryThreshold(OutputFn):
+    """
+    Forces all values below a threshold to zero, and above it to 1.0.
+    """
+    threshold = Number(default=0.25, doc="Decision point for determining binary value.")
+
+    def __call__(self,x):
+        ### If at all possible should be rewritten to use matrix functions
+        ### that eliminate the explicit for loop, because this is very slow.  
+        ### The savespace() should probably also be eliminated.  
+        x.savespace(1)
+        mflat = x.flat
+        size = len(mflat)
+        for i in xrange(size):
+            element = mflat[i]
+            if element<self.threshold:
+                mflat[i] = 0.0
+            else:
+                mflat[i] = 1.0
+        return x
+
+
 class Spike(OutputFn):
     """ 
     A spike generation function with a fixed threshold, and 
