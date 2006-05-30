@@ -63,7 +63,7 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 LeakyCFProjection.weights_generator=topo.patterns.random.UniformRandom()
 LeakyCFProjection.response_fn=DynamicThreshold_CFPRF_DotProduct_opt()
 LeakyCFProjection.learning_fn=CFPLF_Hebbian_opt()
-LeakyCFProjection.weights_output_fn=CFPOF_DivisiveSumNormalize_opt()
+LeakyCFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
 
 ### Build simulation
