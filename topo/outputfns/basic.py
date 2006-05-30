@@ -144,6 +144,7 @@ class DivisiveNormalizeLp(OutputFn):
             x *=factor 
 	return x
 
+
 class HalfRectifyAndSquare(OutputFn):
     """
     Output function that applies a half-wave rectification (clips at zero)
@@ -155,6 +156,7 @@ class HalfRectifyAndSquare(OutputFn):
         clip_lower(x,self.lower_bound)
         x *= x
         return x
+
 
 class Spike(OutputFn):
     """ 
