@@ -11,6 +11,9 @@ import RandomArray
 import fixedpoint
 import copy
 
+from Numeric import sum,ones
+import Numeric
+
 from math import pi, sqrt
 from fixedpoint import FixedPoint
 
@@ -30,7 +33,6 @@ from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 from topo.base.functionfamilies import OutputFn
 from topo.base.arrayutils import clip_in_place
-import Numeric
 
 topo.sim.name = "homeostatic"
 
@@ -54,8 +56,9 @@ class HomeostaticPiecewiseLinear(OutputFn):
     activation.  Currently identical to PiecewiseLinear, but will
     need to be changed.
     """
-    lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
-    upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
+    lower_bound = Number(default=0.2,softbounds=(0.0,1.0),doc="")
+    upper_bound = Number(default=0.7,softbounds=(0.0,1.0),doc="")
+    decay = Number(default=0.1,softbounds=(0.0,1.0),doc="")
 
 
     # How much history to store
@@ -77,33 +80,25 @@ class HomeostaticPiecewiseLinear(OutputFn):
 
 	if self.first_call:
 	    self.first_call = False
-	    self.lower_b = Numeric.ones(x.shape, x.typecode()) * 0.2
-	    self.upper_b = Numeric.ones(x.shape, x.typecode()) * 0.7
-	else:
-            # Compute average of activities during history_length
-            xshape = x.shape
-            self.average = Numeric.zeros(xshape, x.typecode())
-            
-            for c in range(0,len(self.recent_history)):
-                self.average = self.average + self.recent_history[c]
-
-            self.average /= len(self.recent_history)
-
-            rho1 = (self.average < 0.25) * (-4*self.average + 1)
-            rho2 = (self.average > 0.75) * (-4*self.average + 3)
-            rho = -(rho1 + rho2)
-
-            self.lower_b += rho*0.1
-            clip_in_place(self.lower_b,0.0,1.0)
-            #self.upper_b += rho*0.1;
-            #clip_in_place(self.upper_b,0.0,1.0)
-            self.upper_b = self.lower_b + 0.5
+	    self.lower_b = Numeric.ones(x.shape, x.typecode()) * self.lower_bound
+	    self.upper_b = Numeric.ones(x.shape, x.typecode()) * self.upper_bound
 	
+	# Adjust bounds based on recent history
+        
+        self.averages = sum(self.recent_history)/(1.0*len(self.recent_history))
 
-        #fact = 1.0/(self.upper_bound-self.lower_bound)        
-        #x -= self.lower_bound
-        #x *= fact
-            
+        rho1 = (self.averages < 0.25) * (-4.0*self.averages + 1.0)
+        rho2 = (self.averages > 0.75) * (-4.0*self.averages + 3.0)
+        rho = -(rho1 + rho2)
+
+        self.lower_b += rho*self.decay
+        clip_in_place(self.lower_b,0.0,1.0)
+        #self.upper_b += rho*self.decay;
+        #clip_in_place(self.upper_b,0.0,1.0)
+        self.upper_b = self.lower_b + 0.5
+
+	# Apply upper and lower bounds
+        
         fact = 1.0/(self.upper_b - self.lower_b)
         x -= self.lower_b
         x *= fact
