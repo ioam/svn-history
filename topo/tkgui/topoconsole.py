@@ -155,16 +155,6 @@ class PlotsMenuEntry(topo.base.parameterizedobject.ParameterizedObject):
 
 
 
-### JABHACKALERT/JCHACKALERT:
-### This variable is used for displaying patterns presented in
-### MeasureFeatureMap, but should be eliminated (here and later in
-### this file) when MeasureFeatureMap is updated to save plots
-### directly to disk without the GUI.
-###
-### In any case, it's not clear why it needed to be a dictionary and
-### not an ordinary variable.
-dict_console={}
-
 class TopoConsole(Frame):
     """
     TopoConsole class file.
@@ -192,9 +182,10 @@ class TopoConsole(Frame):
         #parent.wm_iconbitmap('@/home/jbednar/research/topographica/topo.xpm')
         title = "Topographica Console"
         self.parent.title(title)
-        dict_console['console']=self
 
-        
+        # Provide a way for other code to access the GUI when necessary
+        topo.guimain=self
+
 
     def _init_widgets(self):
         

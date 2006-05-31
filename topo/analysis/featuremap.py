@@ -169,11 +169,17 @@ class MeasureFeatureMap(ParameterizedObject):
     def measure_maps(self,user_function,param_dict,display=False):
 
         """
-        Create a list of all permutations of the feature values, then, for each permutation, set the
-        feature values in the namespace __main__ and execute the user's code (input_command) there too, updating
-        the feature maps.
+        Create a list of all permutations of the feature values, then,
+        for each permutation, set the feature values in the namespace
+        __main__ and execute the user's code (input_command) there
+        too, updating the feature maps.
 
-        Note: allows execution of arbitrary code.
+        To make debugging easier, if display is true and there is a
+        GUI open and registered in topo.guimain, asks the GUI to
+        update its windows; e.g. any activity window with Auto-Refresh
+        enabled will then be updated to show the activity pattern
+        being tested.  This might cause problems if a preference map
+        window has auto-refresh enabled. :-/
         """
         save_input_generators()
         
@@ -199,24 +205,11 @@ class MeasureFeatureMap(ParameterizedObject):
             # DRAW THE PATTERN: call to the user_function
             user_function(feature_points,param_dict)
 
-
-            # CEBHACKALERT: I've temporarily removed this feature,
-            # i.e. plotting each pattern. There must be a better way
-            # than this!
-            #
-            # JC: For it to work, uncomment this and pass in display=True
-            # (or change display to 1 below)
-            #### Debugging     ####
-           #  import topo.tkgui.topoconsole 
-#             from topo.plotting.templates import plotgroup_templates
-#             if display:
-#                temp=plotgroup_templates['Activity']
-#                console = topo.tkgui.topoconsole.dict_console['console']
-#                x = topo.tkgui.topoconsole.PlotsMenuEntry(console,temp)
-#                panel = x.command()
-#                panel.toggle_auto_refresh()
-            #### Debugging end ####
-
+            if display:
+                if hasattr(topo,'guimain'):
+                    topo.guimain.auto_refresh()
+                else:
+                    self.warning("No GUI available for display.")
             
             # NOW UPDATE EACH FEATUREMAP WITH (ACTIVITY,FEATURE_VALUE)
             for sheet in self.__measured_sheets:
