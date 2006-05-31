@@ -69,13 +69,9 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
     models that do not follow that convention.
     """
 
-    # CEBHACKALERT:
-    # Is there some way that lissom_or.ty could set the value of a variable
-    # that measure_or_pref reads, so that measure_or_pref could default to
-    # duration=1.0, but when LISSOM is loaded switches to 0.06?  Otherwise
-    # people playing around with CFSOM will think it doesn't work for
-    # orientation maps...
-
+    # Could consider having scripts set a variable for the duration,
+    # based on their own particular model setup, and to have it read
+    # from here.  Instead, assumes a fixed default duration right now...
     
     if num_phase <= 0 or num_orientation <= 0:
         raise ValueError("num_phase and num_orientation must be greater than 0")
@@ -96,7 +92,7 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
 
 
-def measure_position_pref(divisions=6,size=0.2,scale=0.3,offset=0.0,display=False,
+def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=False,
                           user_function=PatternPresenter(Gaussian(aspect_ratio=1.0),False,1.0),
                           x_range=(-0.5,0.5),y_range=(-0.5,0.5)):
     """Measure position preference map, using Gaussian patterns by default."""
