@@ -440,7 +440,8 @@ class TopoConsole(Frame):
 
     # CEBHACKALERT:
     # save_ and load_snapshot() and load_network() ought to close open windows such
-    # as Activity.
+    # as Activity.  Currently it just refreshes the windows, but that could get
+    # confusing.
     
     def load_snapshot(self):
         """
@@ -456,6 +457,7 @@ class TopoConsole(Frame):
             topo.commands.basic.load_snapshot(snapshot_name)
             self.messageBar.message('state', 'Loaded snapshot ' + snapshot_name)
 
+        self.auto_refresh()
         topo.tkgui.show_cmd_prompt()
 
 
@@ -495,7 +497,8 @@ class TopoConsole(Frame):
         """
         for win in self.auto_refresh_panels:
             win.refresh()
-
+        self.update_idletasks()
+                    
     # open the model editor window
     def open_model_editor(self) :
 	ModelEditor()
