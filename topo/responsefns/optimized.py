@@ -247,3 +247,4 @@ class CFPRF_SharedWeightDotProduct_opt(CFPResponseFn):
 if not optimized:
     CFPRF_SharedWeightDotProduct_opt = CFPRF_SharedWeight
     ParameterizedObject().message('Inline-optimized components not available; using CFPRF_SharedWeight instead of CFPRF_SharedWeightDotProduct_opt.')
+
