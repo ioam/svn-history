@@ -9,6 +9,11 @@ from topo.base.functionfamilies import DotProduct,ResponseFn
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.base.parameterclasses import Number
 
+# YCHACKALERT
+# The functionality of this class needs to be moved to an appropriate
+# sheet class: see sheets.slissom. 
+# This class uses optimized code, so it should be moved to optimized.py
+# or gotten rid of entirely.
 class DynamicThreshold_CFPRF_DotProduct_opt(CFPRF_DotProduct_opt):
     """CFPRF_DotProduct_opt with dynamic thresholding"""
 
