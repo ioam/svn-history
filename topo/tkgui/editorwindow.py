@@ -37,8 +37,7 @@ class EditorCanvas(Canvas) :
         Button(self.panel,text="Reduce", command=self.reduce_scale).pack(side=LEFT)
         Button(self.panel,text="Enlarge", command=self.enlarge_scale).pack(side=LEFT)        
         self.auto_refresh = False
-        from topo.tkgui.topoconsole import dict_console
-        self.console = dict_console['console']
+        self.console = topo.guimain
         self.auto_refresh_checkbutton = Checkbutton(self.panel,text="Auto-refresh",
                                                     command=self.toggle_auto_refresh)
         self.auto_refresh_checkbutton.pack(side=LEFT)
