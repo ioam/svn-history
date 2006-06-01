@@ -275,7 +275,12 @@ class Slice(object):
         r1,r2,c1,c2 = self.__slice
         return matrix[r1:r2,c1:c2]
 
-    ## CEBHACKALERT: should be crop_to_bounds
+    ## CEBALERT: should be renamed to crop_to_bounds Because
+    ## crop_to_sheet and translate are both called many, many times
+    ## during CFProjection initialization, it might be worth making
+    ## the bounds be accessed as a property so that it wouldn't be
+    ## updated twice as it is now, and would instead be cached and
+    ## reused.
     def crop_to_sheet(self):
         """
         Crop the slice to the SheetCoordinateSystem's bounds.
