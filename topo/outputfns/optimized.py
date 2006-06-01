@@ -15,7 +15,7 @@ from basic import DivisiveNormalizeL1
 
 from Numeric import sum
 
-# CEBHACKALERT: see HACKALERT in basic.by
+
 class DivisiveNormalizeL1_opt(OutputFn):
     """
     OutputFn that divides an array by the sum of the absolute value of each element.
@@ -68,41 +68,6 @@ if not optimized:
     DivisiveNormalizeL1_opt = DivisiveNormalizeL1
     ParameterizedObject().message('Inline-optimized components not available; using DivisiveNormalizeL1 instead of DivisiveNormalizeL1_opt.')
 
-
-
-## class PiecewiseLinear(OutputFn):
-##     """ 
-##     Piecewise-linear output function with lower and upper thresholds
-##     as constructor parameters.
-##     """
-##     lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
-##     upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
-    
-##     def __call__(self,x):
-        
-##         fact = 1.0/(self.upper_bound-self.lower_bound)        
-##         rows,cols = x.shape
-##         lower_bound = self.lower_bound
-        
-##         clip_code = """
-##         double *xi = x;
-        
-##         for (int i=0; i<rows*cols; ++i) {
-##             *xi -= lower_bound;
-##             *xi *= fact;
-        
-##             if (*xi < 0.0) {
-##                 *xi = 0.0;
-##             }
-##             else {
-##                 if (*xi > 1.0) {
-##                    *xi = 1.0;
-##                 }
-##             }
-##             xi++;
-##         }
-##         """
-##         inline(clip_code, ['x','lower_bound','fact','rows','cols'], local_dict=locals())
 
 
 class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
