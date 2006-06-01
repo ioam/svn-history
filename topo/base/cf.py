@@ -470,8 +470,8 @@ class CFPOF_Identity(CFPOutputFn):
     """
     CFPOutputFn that leaves the CFs unchanged.
 
-    Cannot be changed or subclassed, since it might never
-    be called (it could simply be tested for and skipped).
+    Must never be changed or subclassed, because it might never
+    be called. (I.e., it could simply be tested for and skipped.)
     """
     single_cf_fn = OutputFnParameter(default=IdentityOF(),constant=True)
     
@@ -749,7 +749,7 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         """Activate using the specified response_fn and output_fn."""
         self.input_buffer = input_activity
         self.response_fn(self.cfs, input_activity, self.activity, self.strength)
-        self.activity = self.output_fn(self.activity)
+        self.output_fn(self.activity)
 
 
     def learn(self):
@@ -762,6 +762,7 @@ The true bounds will differ depending on the density (see initialize_bounds())."
             self.learning_fn(self.cfs,self.input_buffer,self.dest.activity,self.learning_rate)
 
 
+    ### JABALERT: Is this necessary?
     def apply_output_fn(self):
         """Apply the weights_output_fn to the weights."""
         self.weights_output_fn(self.cfs,self.dest.activity)

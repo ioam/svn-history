@@ -101,7 +101,7 @@ class PatternGenerator(ParameterizedObject):
         self.verbose("params = ",params)
         self.__setup_xy(params.get('bounds',self.bounds),
                         params.get('xdensity',self.xdensity),
-                        params.get('ydensity',self.ydensity),                        
+                        params.get('ydensity',self.ydensity),
                         params.get('x',self.x),
                         params.get('y',self.y),
                         params.get('orientation',self.orientation))
@@ -110,12 +110,12 @@ class PatternGenerator(ParameterizedObject):
         offset = params.get('offset',self.offset)
         output_fn = params.get('output_fn',self.output_fn)
 
-        # Optimization: Skip output_fn if IdentityOF.
-        if output_fn is IdentityOF:
-            return scale*self.function(**params)+offset
-        else:
-            return output_fn(scale*self.function(**params)+offset)
-
+        result = scale*self.function(**params)+offset
+        
+        if output_fn is not IdentityOF: # Optimization (but may not actually help)
+            output_fn(result)
+        
+        return result
 
     def __setup_xy(self,bounds,xdensity,ydensity,x,y,orientation):
         """
@@ -186,12 +186,12 @@ class Constant(PatternGenerator):
 
         shape = SheetCoordinateSystem(bounds,xdensity,ydensity).shape
 
-        # Optimization: Skip output_fn if IdentityOF.
-        if output_fn is IdentityOF:
-            return scale*ones(shape, Float)+offset
-        else:
-            return output_fn(scale*ones(shape, Float)+offset)
+        result = scale*ones(shape, Float)+offset
+        
+        if output_fn is not IdentityOF: # Optimization (but may not actually help)
+            output_fn(result)
 
+        return result
 
 
 class PatternGeneratorParameter(ClassSelectorParameter):

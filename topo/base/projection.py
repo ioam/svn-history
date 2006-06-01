@@ -113,10 +113,10 @@ class ProjectionSheet(Sheet):
         self.activity *= 0.0
 
         for proj in self.in_connections:
-            self.activity+= proj.activity
+            self.activity += proj.activity
 
         if self.apply_output_fn:
-            self.activity = self.output_fn(self.activity)
+            self.output_fn(self.activity)
 
         self.send_output(data=self.activity)
 

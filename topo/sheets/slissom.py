@@ -53,7 +53,7 @@ class SLISSOM(LISSOM):
             self.activity+= proj.activity
 
         if self.apply_output_fn:
-            self.activity = self.output_fn(self.activity)
+            self.output_fn(self.activity)
 
 	# Thresholding: right now, only fixed threshold is supported.
         rows,cols = self.activity.shape

@@ -115,8 +115,7 @@ class SharedWeightCFProjection(CFProjection):
     
     strength = Number(default=1.0)
 
-    weights_output_fn = CFPOutputFnParameter(
-        default=CFPOF_SharedWeight())
+    weights_output_fn = CFPOutputFnParameter(default=CFPOF_SharedWeight())
 
 
     def __init__(self,**params):
@@ -168,7 +167,7 @@ class SharedWeightCFProjection(CFProjection):
         """Activate using the specified response_fn and output_fn."""
         self.input_buffer = input_activity
         self.response_fn(self.cfs, input_activity, self.activity, self.strength)
-        self.activity = self.output_fn(self.activity)
+        self.output_fn(self.activity)
 
 
     def change_bounds(self, nominal_bounds_template):

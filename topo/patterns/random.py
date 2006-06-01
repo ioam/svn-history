@@ -43,10 +43,14 @@ class RandomGenerator(PatternGenerator):
         output_fn = params.get('output_fn',self.output_fn)
 
         shape = SheetCoordinateSystem(bounds,xdensity,ydensity).shape
-        if output_fn is IdentityOF:
-            return self._distrib(shape)
-        else:
-            return output_fn(self._distrib(shape))
+
+        result = self._distrib(shape)
+        
+        if output_fn is not IdentityOF: # Optimization (but may not actually help)
+            output_fn(result)
+        
+        return result
+
 
 
 class UniformRandom(RandomGenerator):
