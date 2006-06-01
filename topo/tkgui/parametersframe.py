@@ -382,9 +382,6 @@ class ParametersFrame(Frame):
         self.__widgets[parameter_name] = self.__properties_frame.add_checkbutton_property(parameter_name,value=value)
 
 
-    # CB: I guess this does a new frame?
-    # JAB: Yes -- try it on something like an output_fn; it lets you
-    # edit the properties of that object.
     def right_click(self, event, widget, name) :
         self.parameters_properties = widget, name
         self.menu.tk_popup(event.x_root, event.y_root)
@@ -393,7 +390,6 @@ class ParametersFrame(Frame):
     # CB: there's no way this can work, but I don't know what it's for yet.
     ## CEBHACKALERT: this method must be fixed, as the others were, not to
     ## instantiate ParameterizedObjects just to find their Parameters.
-    # JAB: See above.
     def show_parameter_properties(self, param) :
         w, name = param
         obj = w.get_value()
