@@ -48,7 +48,6 @@ class PiecewiseLinear(OutputFn):
         x -= self.lower_bound
         x *= fact
         clip_in_place(x,0.0,1.0)
-        return x
 
 
 class DivisiveNormalizeL1(OutputFn):
@@ -82,8 +81,6 @@ class DivisiveNormalizeL1(OutputFn):
             factor = (self.norm_value/current_norm_value)
             x *= factor
 
-        return x
-
 
 class DivisiveNormalizeL2(OutputFn):
     """
@@ -99,7 +96,6 @@ class DivisiveNormalizeL2(OutputFn):
         if tot != 0:
             factor = (self.norm_value/tot)
             x *= factor
-        return x
 
 
 class DivisiveNormalizeLinf(OutputFn):
@@ -121,7 +117,6 @@ class DivisiveNormalizeLinf(OutputFn):
         if tot != 0:
             factor = (self.norm_value/tot)
             x *= factor
-        return x
 
     
 class DivisiveNormalizeLp(OutputFn):
@@ -142,7 +137,6 @@ class DivisiveNormalizeLp(OutputFn):
         if tot != 0:
             factor = (self.norm_value/tot)
             x *=factor 
-	return x
 
 
 class HalfRectifyAndSquare(OutputFn):
@@ -155,7 +149,6 @@ class HalfRectifyAndSquare(OutputFn):
     def __call__(self,x):
         clip_lower(x,self.lower_bound)
         x *= x
-        return x
 
 
 class BinaryThreshold(OutputFn):
@@ -168,5 +161,4 @@ class BinaryThreshold(OutputFn):
         above_threshold = x>=self.threshold
         x *= 0.0
         x += above_threshold
-        return x
 

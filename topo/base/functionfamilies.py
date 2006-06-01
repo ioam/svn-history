@@ -19,24 +19,17 @@ from topo.base.parameterclasses import ClassSelectorParameter
 
 class OutputFn(ParameterizedObject):
     """
-    Object to map a numeric item into another of the same size.
+    Function object to modify a matrix in place, e.g. for normalization.
 
-    Typically used for transforming an array of intermediate results
-    into a final version.  For instance, when computing the output of
-    a Sheet, one will often first compute a linear sum, then use a
-    sigmoidal OutputFunction to transform that into the final result.
-
+    Used for transforming an array of intermediate results into a
+    final version, by cropping it, normalizing it, squaring it, etc.
+    
     Objects in this class must support being called as a function with
-    one argument, typically a matrix, and return a matrix of the same
-    size.  If implemented using Numeric functions, subclasses of this
-    class should also work for scalars.  For matrix or other mutable
-    objects, the argument x may be modified by the call to this function,
-    and is not currently guaranteed to have the same value as the one
-    returned by this function.
+    one matrix argument, and are expected to change that matrix in place.
     """
     _abstract_class_name = "OutputFn"
     
-    # CEBHACKALERT: can we have this here - is there a more appropriate
+    # CEBALERT: can we have this here - is there a more appropriate
     # term for it, general to output functions?
     norm_value = Parameter(default=None)
     
@@ -58,7 +51,7 @@ class IdentityOF(OutputFn):
     """
 
     def __call__(self,x,sum=None):
-        return x
+        pass
 
 
 class OutputFnParameter(ClassSelectorParameter):

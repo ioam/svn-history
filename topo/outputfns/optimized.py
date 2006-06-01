@@ -63,8 +63,6 @@ class DivisiveNormalizeL1_opt(OutputFn):
             """
             inline(div_sum_norm_code, ['x','current_norm_value','target_norm_value','rows','cols','factor'], local_dict=locals())
 
-        return x
-
 
 if not optimized:
     DivisiveNormalizeL1_opt = DivisiveNormalizeL1
@@ -105,8 +103,6 @@ if not optimized:
 ##         }
 ##         """
 ##         inline(clip_code, ['x','lower_bound','fact','rows','cols'], local_dict=locals())
-
-##         return x
 
 
 class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
@@ -165,9 +161,8 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
 
 class CFPOF_DivisiveNormalizeL1(CFPOF_Plugin):
     """
-    Wraps
-    CFPOF_Plugin(single_cf_fn=DivisiveNormalizeL1),
-    the non-optimized equivalent of CFOF_DivisiveNormalizeL1_opt1.
+    Non-optimized version of CFOF_DivisiveNormalizeL1_opt1
+    (which is just CFPOF_Plugin(single_cf_fn=DivisiveNormalizeL1)).
     """
     def __init__(self,**params):
         super(CFPOF_DivisiveNormalizeL1,self).__init__(single_cf_fn=DivisiveNormalizeL1(norm_value=1.0),**params)
