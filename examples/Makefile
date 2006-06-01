@@ -3,7 +3,7 @@
 # Performs simple tests that the examples at least run; should be
 # replaced by more extensive tests.
 
-all: hierarchical cfsom_or lissom_oo_or
+all: hierarchical cfsom_or som_retinotopy lissom_oo_or
 
 cfsom_or:
 	cd .. ; ./topographica -c "default_density=4" examples/cfsom_or.ty -c "topo.sim.run(1)"
@@ -16,6 +16,9 @@ lissom_or:
 
 lissom_oo_or:
 	cd .. ; ./topographica -c "default_density=4" examples/lissom_oo_or.ty -c "topo.sim.run(1)"
+
+som_retinotopy:
+	cd .. ; ./topographica -c "default_density=4" examples/som_retinotopy.ty -c "topo.sim.run(1)"
 
 
 # Generate saved examples
