@@ -15,14 +15,9 @@ was first added to the list, or a change was made.)
 <!-- CB: I put my tasks in the approximate order that I'm doing them -->
 
 
-<!-- ### These tasks before the next release (i.e. 2006/05/08) ### -->
-
 <li>
-2006/05/15 (CB): Missing scheduled_actions in lissom examples [** before release]
+2006/05/15: Missing scheduled_actions in lissom examples
 </li>
-
-<!-- ### end of 'before release' ### -->
-
 
 <li>
 2006/05/24 (JB): Problems with examples/joublin_bc96.ty: strange Projection
@@ -35,16 +30,12 @@ plots, errors for small radii (problem with the min_radius code)?
 </li>
 
 <li>
-2006/05/23: tkgui cleanup - what widgets should expand (expand=YES ?), which should fill the space (fill=X ?) (e.g. the command output box should expand when topoconsole does, and in parameters frames sliders etc should expand).
-</li>
-
-<li>
-2006/05/23: tkgui making shell command prompt skip a line. If it doesn't prompt won't come back if information is printed.
+2006/05/23 (JB): tkgui making shell command prompt skip a line. If it doesn't prompt won't come back if information is printed.
 </li>
 
 
 <li>
-2006/05/23: binding help balloon to the widget (already bound to the label) in parametersframe so that help can be seen for objects that are e.g. being selected.
+2006/05/23 (JB): binding help balloon to the widget (already bound to the label) in parametersframe so that help can be seen for objects that are e.g. being selected.
 </li>
 
 
@@ -52,12 +43,11 @@ plots, errors for small radii (problem with the min_radius code)?
 2006/04/07: (CB) Allowing joint normalization of projections for a CFSheet. [This appears to work, but results from LISSOM simulations do not yet match those of C++ LISSOM.]
 </li>
 
-<li> 
-2006/02/23 (all): Ensuring classes are declared abstract when they should be, and making sure base and simple classes are imported into packages (i.e. Sheet into topo/sheets/, Projection into topo/projections/, Constant into topo/patterns/, and so on).
-</li>
-
 <li>
-2006/02/23 (all): Making more things be Parameters, and writing doc strings at the same time. E.g. the x and y widgets in the Unit Weights window can be Numbers with bounds, etc.
+2006/05/19: CFPLF_Hebbian_opt or CFPOF_DivisiveNormalizeL1_opt (or both) cause
+memory use to go up each call.  Also, CFPLF_Hebbian_opt does not seem to work
+properly when used with CFPOF_DivisiveNormalizeL1.
+
 </li>
 
 </ul>
@@ -70,8 +60,7 @@ Tasks which the developers are about to start.
 <ul>
 
 <li>
-2006/05/19: CFPLF_Hebbian_opt or CFPOF_DivisiveSumNormalize_opt (or both) cause
-memory use to go up each call.
+2006/05/23: tkgui cleanup - what widgets should expand (expand=YES ?), which should fill the space (fill=X ?) (e.g. the command output box should expand when topoconsole does, and in parameters frames sliders etc should expand).
 </li>
 
 <li>
@@ -91,12 +80,12 @@ easier.
 
 
 <li>
-2006/05/17 (CB): Number, DynamicNumber: allowing an attribute that has
-been declared as a Number to work with something that produces a
-number (i.e. do it properly - because it does work at the
-moment). Includes making sure something sensible happens in model
-editor, and that printing dynamic parameters doesn't cause them
-to generate a new value.
+2006/05/17 (JB): Number, DynamicNumber: Need to replace the current
+implementation with one where Number has a 'dynamic' slot that
+can be turned on or off, so that any Number could be dynamic.
+Includes making sure something sensible happens in model editor,
+and (eventually) making it possible to set their values and
+(hopefully) change any Number to be dynamic.
 </li>
 
 <li>
@@ -104,7 +93,7 @@ to generate a new value.
 </li>
 
 <li>
-2006/05/17: Windows-specific files to new module in CVS.
+2006/05/17 (JB): Windows-specific files to new module in CVS.
 </li>
 
 <li>
@@ -112,45 +101,52 @@ to generate a new value.
 </li>
 
 <li>
-2006/05/22 (CB): HACKALERTs relating to connection fields; test file for connectionfield; cleaning up cf.py and projections/basic.py along with the Slice class (there are several simplifications that can be made).
+2006/05/22 (CB): Test file for connectionfield.
 </li>
 
 <li>
-2006/04/27 (CB): Allowing there to be a slower, more in-depth set of tests (that don't run with make tests, etc). Slower tests that are required: pickling, that example networks' results haven't changed, that performance doesn't get worse
+2006/05/22: HACKALERTs relating to connection fields; test file for connectionfield; cleaning up cf.py and projections/basic.py along with the Slice class (there are several simplifications that can be made).
 </li>
 
 <li>
-2006/05/15: Objects in the simulation are indexed by name, so name needs to be a constant Parameter. There is probably an easy way to allow renaming, though. Hacks in ParametersFrame.
+2006/04/27 (JB): Allowing there to be a slower, more in-depth set of tests (that don't run with make tests, etc). Slower tests that are required: pickling, that example networks' results haven't changed, that performance doesn't get worse
+</li>
+
+<li>
+2006/05/15: Objects in the simulation are indexed by name, so name needs to be a constant Parameter (which <i>might</i> cause some other problems).  There are some related hacks in ParametersFrame that would also need to be cleaned up.
 </li>
 
 <li> 
 2006/05/04: Tidy model editor's handling of sheet and projection class parameeters (why does the parametersframe have to be in a separate window for the widgets to work properly)?
 </li>
 
-
 <li>
-2006/04/07: (CB) Implement joint normalization via ports - check ports work as expected.
+2006/04/07: (JB) Implement joint normalization via ports - check ports work as expected.
 </li>
 
 <li> 
-2006/05/02 (CB): Finish Slice and SheetCoordinateSystem classes.
+2006/05/02: Finish Slice and SheetCoordinateSystem classes (see ALERTs).
 </li>
 
 <li> 
-2006/03/17 (CB): Fix problem (matching previous work) with som_retinotopy.
+2006/03/17 (JB): Fix problem (matching previous work) with som_retinotopy, at least for small densities.
 </li>
 
 <li> 
-2006/04/20 (CB): many of the tests in testsheet.py run twice - correct that.
+2006/04/20: many of the tests in testsheet.py run twice - correct that.  See CEBHACKALERT in topo/tests/testsheet.py.
 </li>
 
 <li>
-2006/04/20 (CB): write test file for Composite and complete Image's test file.
+2006/04/20 (JB): write test file for Composite and complete Image's test file.
 </li>
 
 <li>
-2006/02/24 (CB): SheetSelectorParameter etc (so that the GUI (model editor) can
-display list of sheets etc from a Parameter. find_classes_in_package() will
+2006/02/24: SheetSelectorParameter etc (so that the GUI (model editor) can
+display list of sheet classes etc from a Parameter).
+</li>
+
+<li>
+2006/02/24 (JB): find_classes_in_package() will
 become a method of ClassSelectorParameter. Then module as well as package list 
 for ClassSelectorParameter. E.g. Want BoundingBoxParameter to be a 
 ClassSelectorParameter, but don't want to add all of topo.base, just 
@@ -171,7 +167,7 @@ be set anywhere else, even in a ParameterizedObject constructor.
 </li>
 
 <li>
-2006/04/30: What's this? 
+2006/04/30: What does this error mean? 
 <pre>
 Topographica> p=PatternGeneratorParameter(default=Line())
 Topographica> PatternGeneratorParameter.default=Constant()
@@ -190,18 +186,20 @@ Topographica>
 </li>
 
 <li>
-2006/02/21: Remove Parameter's hidden attribute, and instead use (e.g. negative) precendence.
+2006/02/21 (JB): Remove Parameter's hidden attribute, and instead use (e.g. negative) precendence.
 </li>
 
 <li>
-2006/02/21: Have size, aspect_ratio (etc) Parameters in
+2006/02/21 (JB): Have size and aspect_ratio Parameters in
 PatternGenerator so that subclasses can inherit doc, precedence
 attributes (etc), but have them not used unless a subclass does really
-use them.
+use them.  It might be better just to create an abstract PatternGenerator
+class for grouping together all patterns using those parameters, which shouldn't be too hard. 
 </li>
 
 <li> 
-2006/05/02 (CB): investigate failing test in testimage.py (that uses sheet functions).
+2006/05/02: investigate failing test in testimage.py (that uses sheet functions).
+Currently commented out; may not be a problem.
 </li>
 
 <li>
@@ -209,7 +207,7 @@ use them.
 </li>
 
 <li>
-2006/03/07: make change_bounds() able to enlarge as well as shrink [made a first draft, JL is working with it]
+2006/03/07 (JL): make change_bounds() able to enlarge as well as shrink [made a first draft, JL is working with it]
 </li>
 
 </ul>
@@ -221,23 +219,24 @@ Ongoing work with uncertain finishing times.
 
 <ul>
 <li>
+2006/02/23 (all): Making more things be Parameters, and writing doc strings at the same time. E.g. the x and y widgets in the Unit Weights window can be Numbers with bounds, etc.
+</li>
+
+<li> 
+2006/02/23 (all): Ensuring classes are declared abstract when they should be, and making sure base and simple classes are imported into packages (i.e. Sheet into topo/sheets/, Projection into topo/projections/, Constant into topo/patterns/, and so on).
+</li>
+
+<li>
 2006/05/24 (JB): Add a facility for reporting the approximate time spent
 in methods of each EventProcessor, to allow simple debugging without having
-to use the profiler.
+to use the profiler.  Or at least add the hotshot commands from lissom_or.ty
+to a function that can be called easily, which wouldn't be very difficult.
 </li>
 
 <li>
-2006/02/21 (CB): Read-only objects, aiming at copy-on-write semantics
-</li>
-
-<li>
-2006/05/19: This file grows each day, without bounds. One day it will be 
-too big to open.
-</li>
-
-<li>
-2006/05/01: Pickle e.g. classes that were defined in scripts? At the moment
-a warning is printed for such classes and functions (including lambda functions).
+2006/02/21: Might someday be interesting to have read-only objects,
+aiming at copy-on-write semantics, but this seems quite difficult to
+achieve in Python.
 </li>
 
 <li>
@@ -245,7 +244,7 @@ a warning is printed for such classes and functions (including lambda functions)
 </li>
 
 <li>
-2006/03/07: (Windows) Build python on windows with free compiler. Maybe use pymingw?
+2006/03/07: Build python on windows with free compiler. Maybe use pymingw?
 </li>
 
 </ul>
