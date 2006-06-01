@@ -163,7 +163,6 @@ def clip_in_place(mat,lower_bound,upper_bound):
     mat *= to_keep
     mat += lower_cropping*lower_bound
     mat += upper_cropping*upper_bound
-    return mat
 
 
 def clip_lower(mat,lower_bound):
@@ -173,4 +172,3 @@ def clip_lower(mat,lower_bound):
 
     mat *= to_keep
     mat += lower_cropping*lower_bound
-    return mat
