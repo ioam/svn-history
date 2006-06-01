@@ -125,7 +125,7 @@ topo.sim.schedule_command(20000, 'topo.sim["V1"].output_fn.lower_bound=0.24; top
 #
 ## import hotshot,hotshot.stats
 ## prof = hotshot.Profile("abc")
-## prof.runctx('top.sim.run(198)',globals(),locals())
+## prof.runctx('topo.sim.run(198)',globals(),locals())
 ## prof.close()
 ## p = hotshot.stats.load("abc")
 ## p.strip_dirs().sort_stats('cumulative','time').print_stats()
