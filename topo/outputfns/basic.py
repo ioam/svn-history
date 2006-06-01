@@ -26,12 +26,6 @@ from topo.base.arrayutils import clip_in_place,clip_lower
 # Imported here so that all OutputFns will be in the same package
 from topo.base.functionfamilies import IdentityOF
 
-### JCALERT! The functions below have been re-written to work as
-### procedure; Nonetheless, I kept the return x statement in order to
-### not be worry about changing the call anywhere else in the
-### code. That might have to be done later.  Also note that the test
-### file still test the method for both procedure and function calls
-
 # CEBHACKALERT: these need to respect the mask - which will be passed in.
 
 
