@@ -7,8 +7,7 @@ __version__ = "$Revision$"
 
 import re
 
-from Numeric import sqrt, ones, dot, sum, arctan2, array2string
-
+from Numeric import sqrt, ones, dot, sum, arctan2, array2string, logical_not, bitwise_or
 
 # CEBHACKALERT: there are some inconsistencies throughout as to
 # whether we should assume arrays are contiguous (i.e. using an
@@ -155,34 +154,23 @@ def centroid(array_2D):
     return row_centroid, col_centroid
 
 
-### JABALERT!
-###
-### If at all possible should be rewritten to use matrix functions
-### that eliminate the explicit for loop, because this is very slow.  
-### The savespace() should probably also be eliminated.  
 def clip_in_place(mat,lower_bound,upper_bound):
     """Version of Numeric.clip that changes the argument in place, with no intermediate."""
-    mat.savespace(1)
-    mflat = mat.flat
-    size = len(mflat)
-    for i in xrange(size):
-        element = mflat[i]
-        if element<lower_bound:
-            mflat[i] = lower_bound
-        elif element>upper_bound:
-            mflat[i] = upper_bound
+    lower_cropping = mat<lower_bound
+    upper_cropping = mat>upper_bound
+    to_keep = logical_not(bitwise_or(lower_cropping,upper_cropping))
 
-### JABALERT!
-###
-### If at all possible should be rewritten to use matrix functions
-### that eliminate the explicit for loop, because this is very slow.  
-### The savespace() should probably also be eliminated.  
+    mat *= to_keep
+    mat += lower_cropping*lower_bound
+    mat += upper_cropping*upper_bound
+    return mat
+
+
 def clip_lower(mat,lower_bound):
-    """Version of Numeric.clip that changes the argument in place, with no intermediate."""
-    mat.savespace(1)
-    mflat = mat.flat
-    size = len(mflat)
-    for i in xrange(size):
-        element = mflat[i]
-        if element<lower_bound:
-            mflat[i] = lower_bound
+    """One-sided version of clip_in_place."""
+    lower_cropping = mat<lower_bound
+    to_keep = logical_not(lower_cropping)
+
+    mat *= to_keep
+    mat += lower_cropping*lower_bound
+    return mat

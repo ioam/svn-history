@@ -165,18 +165,9 @@ class BinaryThreshold(OutputFn):
     threshold = Number(default=0.25, doc="Decision point for determining binary value.")
 
     def __call__(self,x):
-        ### If at all possible should be rewritten to use matrix functions
-        ### that eliminate the explicit for loop, because this is very slow.  
-        ### The savespace() should probably also be eliminated.  
-        x.savespace(1)
-        mflat = x.flat
-        size = len(mflat)
-        for i in xrange(size):
-            element = mflat[i]
-            if element<self.threshold:
-                mflat[i] = 0.0
-            else:
-                mflat[i] = 1.0
+        above_threshold = x>=self.threshold
+        x *= 0.0
+        x += above_threshold
         return x
 
 
