@@ -33,8 +33,8 @@ develops a mapping of the input space.
 
 <P><li>Next, you will usually want to edit the <code>som_retinotopy.ty</code> file to make it
   faster to run, by reducing the number of units simulated in the
-  retina and V1.  On most machines, a GeneratorSheet.density of 10
-  (used for the Retina) and a RetinotopicSOM.density of 10 (used for
+  retina and V1.  On most machines, a GeneratorSheet.nominal_density of 10
+  (used for the Retina) and a RetinotopicSOM.nominal_density of 10 (used for
   V1) should be reasonably fast to run.  The default Retina density of
   24 and V1 density of 40 are set to match the simulation presented in
   Chapter 3 of the CMVC book, but much smaller densities should also
@@ -44,13 +44,13 @@ develops a mapping of the input space.
   $ emacs som_retinotopy.ty
   $ diff som_retinotopy.ty~ som_retinotopy.ty
   65c65
-  < GeneratorSheet.density = 24
+  < GeneratorSheet.nominal_density = 24
   ---
-  > GeneratorSheet.density = 10
+  > GeneratorSheet.nominal_density = 10
   76c76
-  < RetinotopicSOM.density = 40
+  < RetinotopicSOM.nominal_density = locals().get('default_density',40.0)
   ---
-  > RetinotopicSOM.density = 10
+  > RetinotopicSOM.nominal_density = locals().get('default_density',10.0)
 </pre>
 
 
