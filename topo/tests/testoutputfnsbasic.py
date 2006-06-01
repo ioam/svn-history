@@ -23,15 +23,6 @@ from topo.outputfns.basic import DivisiveNormalizeLp
 from Numeric import array
 from math import sqrt
 
-### JCALERT! In the original outputfns/basic.py files, the return x line at the end has been kept
-### to avoid changing all the call to outputfns in others topographica module
-### This is why in the test, both way of calling the outputfns has been tested:
-### as a procedure and as a function
-### Note: that it does not work for the DivisiveNormalizeLp for reasons not yet clarified;
-### (cf outputfns/basic.py, corresponding  JCALERT!)
-### Therefore the test for this function has to be eventually re-written when the problem is solved
-
-
 class TestPiecewiseLinear(unittest.TestCase):
 
     def setUp(self):
@@ -73,21 +64,6 @@ class TestPiecewiseLinear(unittest.TestCase):
         self.fn3(self.a2)
         for item1,item2 in zip(self.a2.flat,fn3_a2.flat):
             self.assertAlmostEqual(item1, item2)
-        
-        # Test as a function:
-
-        self.a1 = array([[0.5,-1.0,0.99],
-                        [1.001,-0.001,0.6]])
-
-        self.a2 = array([[1.0,-1.0,7.0],
-                        [4.0,3.0,11.0]])
-
-        for item1,item2 in zip(self.fn1(self.a1).flat,fn1_a1.flat):
-           self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2(self.a1).flat,fn2_a1.flat):
-           self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn3(self.a2).flat,fn3_a2.flat):
-           self.assertAlmostEqual(item1, item2)
  
             
 class TestDivisiveNormalizeL1(unittest.TestCase):
@@ -138,23 +114,6 @@ class TestDivisiveNormalizeL1(unittest.TestCase):
             self.assertAlmostEqual(item1, item2)
 
 
-        # Test as a function:
-        
-        self.a1 = array([[0.3,0.6,0.7],
-                        [0.8,0.4,0.2]])
-
-        self.a2 = array([[1.0,-1.0,7.0],
-                        [4.0,3.0,11.0]])
-
-        for item1,item2 in zip(self.fn1(self.a1).flat,fn1_a1.flat):
-           self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn1(self.a2).flat,fn1_a2.flat):
-           self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2(self.a1).flat,fn2_a1.flat):
-           self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2(self.a2).flat,fn2_a2.flat):
-           self.assertAlmostEqual(item1, item2)    
-
 class TestDivisiveLengthNormalize(unittest.TestCase):
     
     def setUp(self):
@@ -204,26 +163,7 @@ class TestDivisiveLengthNormalize(unittest.TestCase):
         self.fn2(self.a2)
         for item1,item2 in zip(self.a2.flat,fn2_a2.flat):
             self.assertAlmostEqual(item1, item2)
-            
 
-        # Test as a function:
-
-        self.a1 = array([[0.3,0.6,0.7],
-                        [0.8,0.4,0.2]])
-
-        self.a2 = array([[1.0,-1.0,7.0],
-                         [4.0,3.0,11.0],
-                         [2.0,5.0,9.0]])
-
-
-        for item1,item2 in zip(self.fn1(self.a1).flat,fn1_a1.flat):
-           self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn1(self.a2).flat,fn1_a2.flat):
-           self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2(self.a1).flat,fn2_a1.flat):
-           self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2(self.a2).flat,fn2_a2.flat):
-           self.assertAlmostEqual(item1, item2)
             
 class TestDivisiveMaxNormalize(unittest.TestCase):
     
@@ -272,24 +212,6 @@ class TestDivisiveMaxNormalize(unittest.TestCase):
             self.assertAlmostEqual(item1, item2)
 
 
-        # Test as a function:
-        
-        self.a1 = array([[0.3,0.6,0.7],
-                        [0.8,0.4,0.2]])
-
-        self.a2 = array([[1.0,-1.0,7.0],
-                         [4.0,3.0,-11.0],
-                         [2.0,5.0,9.0]])
-            
-        for item1,item2 in zip(self.fn1(self.a1).flat,fn1_a1.flat):
-           self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn1(self.a2).flat,fn1_a2.flat):
-           self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2(self.a1).flat,fn2_a1.flat):
-           self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2(self.a2).flat,fn2_a2.flat):
-           self.assertAlmostEqual(item1, item2)
-
 class TestDivisiveLpNormalize(unittest.TestCase):
     
     def setUp(self):
@@ -325,9 +247,11 @@ class TestDivisiveLpNormalize(unittest.TestCase):
         fn2_a1 = self.a1/l3norm_a1
         fn2_a2 = self.a2/l3norm_a2
 
-        for item1,item2 in zip(self.fn1(self.a1).flat,fn1_a1.flat):
+        self.fn1(self.a1)
+        self.fn1(self.a2)
+        for item1,item2 in zip(self.a1.flat,fn1_a1.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn1(self.a2).flat,fn1_a2.flat):
+        for item1,item2 in zip(self.a2.flat,fn1_a2.flat):
             self.assertAlmostEqual(item1, item2)
 
 	self.a1 = array([[0.3,0.6,0.7],
@@ -337,9 +261,11 @@ class TestDivisiveLpNormalize(unittest.TestCase):
                          [4.0,3.0,-11.0],
                          [2.0,5.0,9.0]])
 
-        for item1,item2 in zip(self.fn2(self.a1).flat,fn2_a1.flat):
+        self.fn2(self.a1)
+        self.fn2(self.a2)
+        for item1,item2 in zip(self.a1.flat,fn2_a1.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2(self.a2).flat,fn2_a2.flat):
+        for item1,item2 in zip(self.a2.flat,fn2_a2.flat):
             self.assertAlmostEqual(item1, item2)
 
 	self.a1 = array([[0.3,0.6,0.7],
@@ -355,12 +281,14 @@ class TestDivisiveLpNormalize(unittest.TestCase):
         fn3_a2 = (self.a2/l4norm_a2)*2.0
 
 
-        for item1,item2 in zip(self.fn3(self.a1).flat,fn3_a1.flat):
+        self.fn3(self.a1)
+        self.fn3(self.a2)
+        for item1,item2 in zip(self.a1.flat,fn3_a1.flat):
             self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn3(self.a2).flat,fn3_a2.flat):
+        for item1,item2 in zip(self.a2.flat,fn3_a2.flat):
             self.assertAlmostEqual(item1, item2)
 
-        # Test as a procedure to be fixed!
+        # The rest of this procedure might be redundant (already covered above)
 
 	self.a1 = array([[0.3,0.6,0.7],
                         [0.8,0.4,0.2]])

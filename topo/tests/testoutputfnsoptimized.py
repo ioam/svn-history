@@ -64,25 +64,6 @@ class TestDivisiveNormalizeL1_opt1(unittest.TestCase):
             self.assertAlmostEqual(item1, item2)
 
 
-        # Test as a function:
-        
-        self.a1 = array([[0.3,0.6,0.7],
-                        [0.8,0.4,0.2]]).astype(Float32)
-
-        self.a2 = array([[1.0,-1.0,7.0],
-                        [4.0,3.0,11.0]]).astype(Float32)
-
-        for item1,item2 in zip(self.fn1(self.a1).flat,fn1_a1.flat):
-           self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn1(self.a2).flat,fn1_a2.flat):
-           self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2(self.a1).flat,fn2_a1.flat):
-           self.assertAlmostEqual(item1, item2)
-        for item1,item2 in zip(self.fn2(self.a2).flat,fn2_a2.flat):
-           self.assertAlmostEqual(item1, item2)    
-
-
-
 
 cases = [TestDivisiveNormalizeL1_opt1]
 
