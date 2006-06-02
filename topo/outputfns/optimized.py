@@ -30,9 +30,6 @@ class DivisiveNormalizeL1_opt(OutputFn):
     """
     norm_value = Number(default=1.0)    
 
-    def __init__(self,**params):
-        super(DivisiveNormalizeL1_opt,self).__init__(**params)
-
     def __call__(self, x, current_norm_value=None):
         """
         Normalize the input array.
@@ -47,11 +44,8 @@ class DivisiveNormalizeL1_opt(OutputFn):
         if current_norm_value==self.norm_value:
             return x
 
-        target_norm_value = self.norm_value
-        
-
         if current_norm_value != 0:
-            factor = target_norm_value/current_norm_value
+            factor = self.norm_value/current_norm_value
             rows,cols=x.shape
             
             div_sum_norm_code = """
@@ -61,7 +55,7 @@ class DivisiveNormalizeL1_opt(OutputFn):
                 *(xi++) *= factor;
             }
             """
-            inline(div_sum_norm_code, ['x','current_norm_value','target_norm_value','rows','cols','factor'], local_dict=locals())
+            inline(div_sum_norm_code, ['x','rows','cols','factor'], local_dict=locals())
 
 
 if not optimized:
