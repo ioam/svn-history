@@ -45,7 +45,7 @@ clean: clean-doc clean-ext-packages clean-pyc
 	${RM} -r bin include share lib man topographica ImageSaver*.jpeg python_topo
 
 saved-examples: 
-	make -C examples lissom_oo_or_20000.typ
+	make -C examples saved-examples
 
 
 FORCE:
