@@ -99,14 +99,9 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
         len, len2 = input_activity.shape
         X = input_activity.flat
 
-        # JABALERT: Should move the declarations down to the first use
         code = """
 	    #include <math.h>
-            float  *wi; 
-            double *xi, *xj;
             double *tact = temp_act;
-            int rr1, rr2, cc1, cc2;
-	    double euclidean_distance, tot;
  	    double max_dist=0.0;
     
             for (int r=0; r<rows; ++r) {
@@ -119,17 +114,17 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
 		    float *wj = (float *)(((PyArrayObject*)weights_obj)->data);
                     int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);
                     
-                    rr1 = *slice++;
-                    rr2 = *slice++;
-                    cc1 = *slice++;
-                    cc2 = *slice;
+                    int rr1 = *slice++;
+                    int rr2 = *slice++;
+                    int cc1 = *slice++;
+                    int cc2 = *slice;
 
-                    xj = X+len*rr1+cc1;
+                    double *xj = X+len*rr1+cc1;
     
                     // computes the dot product
-		    tot = 0.0;
+		    double tot = 0.0;
                     for (int i=rr1; i<rr2; ++i) {
-                        xi = xj;                        
+                        double *xi = xj;                        
                         float *wi = wj;
                         for (int j=cc1; j<cc2; ++j) {
 			    // JCALERT! find power notation in C.
@@ -140,10 +135,11 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
                         xj += len;
 			wj += cc2-cc1;
                     }
-		    euclidean_distance = sqrt(tot); 
-		    if (euclidean_distance>max_dist) {
+		    
+		    double euclidean_distance = sqrt(tot); 
+		    if (euclidean_distance>max_dist)
 		        max_dist = euclidean_distance;
-                    }	    
+		    
                     *tact = euclidean_distance;
                     ++tact;
                     
