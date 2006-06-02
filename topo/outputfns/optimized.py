@@ -97,15 +97,18 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                     if (load != 0) {
 
                         PyObject *cf = PyList_GetItem(cfsr,l);
-                        float *wi = (float *)(((PyArrayObject*)PyObject_GetAttrString(cf,"weights"))->data);
-                        int *slice = (int *)(((PyArrayObject*)PyObject_GetAttrString(cf,"slice_array"))->data);
+                        PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
+                        PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
+                        PyObject *sum_obj     = PyObject_GetAttrString(cf,"_sum");
+                        
+                        float *wi = (float *)(((PyArrayObject*)weights_obj)->data);
+                        int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);
+                        double total = PyFloat_AsDouble(sum_obj); // sum of the cf's weights
+
                         int rr1 = *slice++;
                         int rr2 = *slice++;
                         int cc1 = *slice++;
                         int cc2 = *slice;
-
-                        // get the sum of the cf's weights
-                        double total = PyFloat_AsDouble(PyObject_GetAttrString(cf,"_sum"));
 
                         // normalize the weights
                         total = 1.0/total;
@@ -113,6 +116,11 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                         for (int i=0; i<rc; ++i) {
                             *(wi++) *= total;
                         }
+
+                        // Anything obtained with PyObject_GetAttrString must be explicitly freed
+                        Py_DECREF(weights_obj);
+                        Py_DECREF(slice_obj);
+                        Py_DECREF(sum_obj);
 
                         // store the new sum (unlikely to be accessed before
                         // learning, but makes things consistent)

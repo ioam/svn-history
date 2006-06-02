@@ -41,13 +41,19 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
                         load *= single_connection_learning_rate;
 
                         PyObject *cf = PyList_GetItem(cfsr,l);
-                        float *wi = (float *)(((PyArrayObject*)PyObject_GetAttrString(cf,"weights"))->data);
-                        int *slice = (int *)(((PyArrayObject*)PyObject_GetAttrString(cf,"slice_array"))->data);
+                        PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
+                        PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
+                        PyObject *mask_obj    = PyObject_GetAttrString(cf,"mask");
+
+                        float *wi = (float *)(((PyArrayObject*)weights_obj)->data);
+                        int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);
+                        float *m  = (float *)(((PyArrayObject*)mask_obj)->data);
+                        
                         int rr1 = *slice++;
                         int rr2 = *slice++;
                         int cc1 = *slice++;
                         int cc2 = *slice;
-                        float *m = (float *)(((PyArrayObject*)PyObject_GetAttrString(cf,"mask"))->data);
+                        
                         double total = 0.0;
                         
                         // modify non-masked weights
@@ -68,6 +74,11 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
                             inpj += len;
                         }
 
+                        // Anything obtained with PyObject_GetAttrString must be explicitly freed
+                        Py_DECREF(weights_obj);
+                        Py_DECREF(slice_obj);
+                        Py_DECREF(mask_obj);
+                        
                         // store the sum of the cf's weights
                         PyObject_SetAttrString(cf,"_sum",PyFloat_FromDouble(total));
                     }

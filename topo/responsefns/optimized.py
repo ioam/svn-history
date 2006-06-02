@@ -42,13 +42,17 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                 PyObject *cfsr = PyList_GetItem(cfs,r);
 		for (int l=0; l<cols; ++l) {
                     PyObject *cf = PyList_GetItem(cfsr,l);
-                    int *slice = (int *)(((PyArrayObject*)PyObject_GetAttrString(cf,"slice_array"))->data);
+                    PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
+                    PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
+
+                    float *wj = (float *)(((PyArrayObject*)weights_obj)->data);
+                    int *slice = (int *)(((PyArrayObject*)slice_obj)->data);
+                    
                     int rr1 = *slice++;
                     int rr2 = *slice++;
                     int cc1 = *slice++;
                     int cc2 = *slice;
 		    double tot = 0.0;
-                    float *wj = (float *)(((PyArrayObject*)PyObject_GetAttrString(cf,"weights"))->data);
 		    double *xj = X+len*rr1+cc1;
 
                     // computes the dot product
@@ -65,6 +69,10 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
                     }  
                     *tact = tot*strength;
                     ++tact;
+
+                    // Anything obtained with PyObject_GetAttrString must be explicitly freed
+                    Py_DECREF(weights_obj);
+                    Py_DECREF(slice_obj);
                 }
             }
         """
@@ -91,37 +99,38 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
         len, len2 = input_activity.shape
         X = input_activity.flat
 
+        # JABALERT: Should move the declarations down to the first use
         code = """
 	    #include <math.h>
-            float  *wi, *wj; 
+            float  *wi; 
             double *xi, *xj;
             double *tact = temp_act;
-            int *slice;
             int rr1, rr2, cc1, cc2;
-	    PyObject *cf, *cfsr;
-            PyObject *sarray = PyString_FromString("slice_array");
-            PyObject *weights = PyString_FromString("weights");
 	    double euclidean_distance, tot;
  	    double max_dist=0.0;
     
             for (int r=0; r<rows; ++r) {
-                cfsr = PyList_GetItem(cfs,r);
+                PyObject* cfsr = PyList_GetItem(cfs,r);
                 for (int l=0; l<cols; ++l) {
-                    cf = PyList_GetItem(cfsr,l);
-                    slice = (int *)(((PyArrayObject*)PyObject_GetAttr(cf,sarray))->data);
+                    PyObject *cf = PyList_GetItem(cfsr,l);
+                    PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
+                    PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
+                    
+		    float *wj = (float *)(((PyArrayObject*)weights_obj)->data);
+                    int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);
+                    
                     rr1 = *slice++;
                     rr2 = *slice++;
                     cc1 = *slice++;
                     cc2 = *slice;
 
                     xj = X+len*rr1+cc1;
-		    wj = (float *)(((PyArrayObject*)PyObject_GetAttr(cf,weights))->data);
     
                     // computes the dot product
 		    tot = 0.0;
                     for (int i=rr1; i<rr2; ++i) {
                         xi = xj;                        
-                        wi = wj;
+                        float *wi = wj;
                         for (int j=cc1; j<cc2; ++j) {
 			    // JCALERT! find power notation in C.
                             tot += (*wi - *xi) * (*wi - *xi);
@@ -137,6 +146,10 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
                     }	    
                     *tact = euclidean_distance;
                     ++tact;
+                    
+                    // Anything obtained with PyObject_GetAttrString must be explicitly freed
+                    Py_DECREF(weights_obj);
+                    Py_DECREF(slice_obj);
                 }
             }
 	    tact = temp_act;
@@ -214,7 +227,10 @@ class CFPRF_SharedWeightDotProduct_opt(CFPResponseFn):
                 PyObject *cfsr = PyList_GetItem(cfs,r);
 		for (int l=0; l<cols; ++l) {
                     PyObject *cf = PyList_GetItem(cfsr,l);
-                    int *slice = (int *)(((PyArrayObject*)PyObject_GetAttrString(cf,"slice_array"))->data);
+                    PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
+                    
+                    int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);
+
                     int rr1 = *slice++;
                     int rr2 = *slice++;
                     int cc1 = *slice++;
@@ -237,6 +253,9 @@ class CFPRF_SharedWeightDotProduct_opt(CFPResponseFn):
                     }  
                     *tact = tot*strength;
                     ++tact;
+                    
+                    // Anything obtained with PyObject_GetAttrString must be explicitly freed
+                    Py_DECREF(slice_obj);
                 }
             }
         """
