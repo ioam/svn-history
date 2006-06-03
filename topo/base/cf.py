@@ -463,7 +463,7 @@ class CFPOF_Plugin(CFPOutputFn):
                 for c in xrange(cols):
                     cf = cfs[r][c]                    
                     single_cf_fn(cf.weights,cf.sum)
-                    ## del cf.sum 
+                    cf.sum=norm_value
 
 
 class CFPOF_Identity(CFPOutputFn):
