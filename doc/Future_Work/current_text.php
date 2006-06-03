@@ -43,13 +43,6 @@ plots, errors for small radii (problem with the min_radius code)?
 2006/04/07: (CB) Allowing joint normalization of projections for a CFSheet. [This appears to work, but results from LISSOM simulations do not yet match those of C++ LISSOM.]
 </li>
 
-<li>
-2006/05/19: CFPLF_Hebbian_opt or CFPOF_DivisiveNormalizeL1_opt (or both) cause
-memory use to go up each call.  Also, CFPLF_Hebbian_opt does not seem to work
-properly when used with CFPOF_DivisiveNormalizeL1.
-
-</li>
-
 </ul>
 
 
