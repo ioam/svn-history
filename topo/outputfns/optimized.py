@@ -115,7 +115,9 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
 
                         // store the new sum (unlikely to be accessed before
                         // learning, but makes things consistent)
-                        PyObject_SetAttrString(cf,"_sum",PyFloat_FromDouble(1.0));
+                        PyObject *total_obj = PyFloat_FromDouble(1.0);  //(new ref)
+                        PyObject_SetAttrString(cf,"_sum",total_obj);
+                        Py_DECREF(total_obj);
                     }
                 }
             }
