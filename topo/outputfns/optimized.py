@@ -76,9 +76,6 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     single_cf_fn = OutputFnParameter(DivisiveNormalizeL1_opt(norm_value=1.0),
                                      constant=True)
 
-    def __init__(self,**params):
-        super(CFPOF_DivisiveNormalizeL1_opt,self).__init__(**params)
-
     def __call__(self, cfs, output_activity, **params):
         rows,cols = output_activity.shape
 
