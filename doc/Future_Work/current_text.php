@@ -21,7 +21,7 @@ was first added to the list, or a change was made.)
 
 <li>
 2006/05/24 (JB): Problems with examples/joublin_bc96.ty: strange Projection
-plots, errors for small radii (problem with the min_radius code)?
+plots.
 </li>
 
 
@@ -51,6 +51,15 @@ plots, errors for small radii (problem with the min_radius code)?
 Tasks which the developers are about to start.
 
 <ul>
+
+<li>
+2006/06/03: Allow min_matrix_radius to be set to zero, and then say
+that if no unit ends up in the CF, then there will be no CF for that
+unit.  But that's going to make the rest of the code hard to write,
+because we'll either have to deal with CFs with empty matrices, or
+deal with CFs missing altogether.
+(As an example, the problem of zero-sized CFs arises in examples/joublin_bc96.ty.)
+</li>
 
 <li>
 2006/05/23: tkgui cleanup - what widgets should expand (expand=YES ?), which should fill the space (fill=X ?) (e.g. the command output box should expand when topoconsole does, and in parameters frames sliders etc should expand).
