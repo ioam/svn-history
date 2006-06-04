@@ -32,7 +32,7 @@ topo.sim.name = "slissom_or"
 
 ### Setup input
 #
-GeneratorSheet.nominal_density = 24.0 
+GeneratorSheet.nominal_density = 36.0 
 GeneratorSheet.period = 1
 GeneratorSheet.phase = 0.05
 GeneratorSheet.nominal_bounds = BoundingBox(radius=0.72)
@@ -44,11 +44,14 @@ input_pattern = topo.patterns.basic.Gaussian(
     y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
     orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
+# YC use test pattern
+input_pattern = topo.patterns.basic.TwoRectangles(scale=1.0)
+
 
 
 ### LISSOM parameters
 #
-SLISSOM.nominal_density = locals().get('default_density',48.0)
+SLISSOM.nominal_density = locals().get('default_density',24.0)
 
 
 ### Specify weight initialization, response function, and learning function
@@ -77,11 +80,13 @@ topo.sim.connect('Retina','V1', delay = FixedPoint("0.10"),
 
 topo.sim.connect('V1','V1', delay = FixedPoint("0.05"), 
           connection_type=LeakyCFProjection,strength = 0.9, name='LateralExcitatory',
-          nominal_bounds_template=BoundingBox(radius=0.1),learning_rate=2.674)
+          nominal_bounds_template=BoundingBox(radius=0.1),learning_rate=22.674,
+	  decay_rate=0.5)
             
 topo.sim.connect('V1','V1', delay = FixedPoint("0.05"), 
           connection_type=LeakyCFProjection,strength = -0.9, name='LateralInhibitory',
-          nominal_bounds_template=BoundingBox(radius=0.23),learning_rate=2.466)         
+          nominal_bounds_template=BoundingBox(radius=0.9),learning_rate=22.466,
+	  decay_rate=0.001)
 
 
 # CEBHACKALERT: scheduled events are missing. e.g. change_bounds are
