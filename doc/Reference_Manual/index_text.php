@@ -1,12 +1,17 @@
 This reference manual contains detailed documentation of each
 component making up Topographica, assuming that the user is already
-familiar with basic Topographica usage.  See the
-<A HREF="../User_Manual/index.html">User Manual</A> and
-<A HREF="../Tutorials/index.html">Tutorials</A> for such a
-introduction.  Note that the documentation of these components is
-gradually being improved; many components (especially Parameters) do
-not have suitable documentation yet.
-<!-- JABALERT: Needs updating once docstrings are more consistent -->
+familiar with basic Topographica usage.  See the <A
+HREF="../User_Manual/index.html">User Manual</A> and <A
+HREF="../Tutorials/index.html">Tutorials</A> for such a introduction.
+Note that the documentation of these components is gradually being
+improved, and not every component is properly documented yet.
+Moreover, the documentation is often much more verbose than necessary,
+because many little-used yet often duplicated methods are included for
+each class.  Still, the reference for a given component does
+provide a comprehensive listing of all attributes and methods,
+inherited or otherwise, which is difficult to obtain from the
+source code.
+
 
 <H2>Main packages</H2>
 
@@ -32,10 +37,11 @@ Topographica classes, implementing basic functionality such as
 Parameters (user-controllable attributes), Sheets (arrays of units),
 Projections (large groups of connections between Sheets),
 ConnectionFields (spatially localized groups of connections to one
-unit), and the event-driven Simulator.  All of these files are
+unit), and the event-driven Simulation.  All of these files are
 independent of the rest of the files in topo/, and act as the primary
-programming interface on which Topographica is built.
-
+programming interface on which Topographica is built.  The rest of the
+directories add components used in specific models, and implement the
+GUI.
 
 <H2>Library</H2>
 
@@ -51,7 +57,7 @@ classes:
 <P><DT><A href="topo.projections.html"><strong>projections</strong></A></DT>
 <DD>Projection classes: connections between Sheets</DD>
 <P><DT><A href="topo.eps.html"><strong>eps</strong></A></DT>
-<DD>EventProcessor classes: other simulator objects</DD>
+<DD>EventProcessor classes: other simulation objects</DD>
 <P><DT><A href="topo.outputfns.html"><strong>outputfns</strong></A></DT>
 <DD>Output functions: apply to matrices to do e.g. normalization or squashing</DD>
 <P><DT><A href="topo.responsefns.html"><strong>responsefns</strong></A></DT>
@@ -64,13 +70,30 @@ classes:
 
 <P>All of the library components are optional, in the sense that they
 can be deleted or ignored or replaced with custom versions without
-affecting the code in any of the main packages.
+affecting the code in any of the main packages.  (Of course, any
+specific model that depends on the component would not be able to
+function without it.)
 
-<P> Each of the library directories can be extended with new classes
+<P>Each of the library directories can be extended with new classes
 of the appropriate type, just by adding a new .py file to that
 directory.  E.g. a file of new PatternGenerator classes can be copied
 into patterns/, and will then show up in the GUI menus as potential
 input patterns.
+
+<P>Many of the components come in multiple varieties, to be used at
+different levels in a model.  For instance, there are learningfns that
+operate on a single unit (type LearningFn), and ones that operate on
+an entire CFProjection (type CFPLearningFn).  The lower level
+components can be used by providing them to a "Plugin" version of the
+higher level component, which will apply the lower level version to
+each unit.  For instance, a LearningFn can be used with a
+CFPLearningFn of type CFPLF_Plugin, and will be applied the same to
+each unit individually.
+
+<P>Many components also come with an optimized version, usually
+written in C for speed.  The fastest, but least flexible, components
+will be high-level components written in C, such as CFPLF_Hebbian_opt.
+
 
 <!-- JABALERT! This should probably move to its own page. -->
 <H2>External Packages</H2>
@@ -93,8 +116,11 @@ Python can do is also valid for Topographica.
 
 <P><DT><A href="http://numeric.scipy.org/numpydoc/numdoc.htm">Numeric</A></DT>
 <DD>Topographica makes heavy use of Numeric arrays and math functions; these
-provide high-level operations for dealing with matrix data.  The interface and 
-options are similar to Matlab and other high-level array languages.
+provide high-level operations for dealing with matrix data.  The
+interface and options are similar to Matlab and other high-level array
+languages.  These operations are generally much higher performance
+than explicitly manipulating each matrix element, as well as being
+simpler, and so they should be used whenever possible.
 </DD>
 
 <P><DT><A href="http://matplotlib.sourceforge.net/">MatPlotLib</A></DT>
@@ -108,7 +134,7 @@ one might wish to visualize, including any array or vector in the program.
 <DD>Topographica uses the Python Imaging Library for reading and
 writing bitmap images of various types.  PIL also provides a variety
 of image processing and graphics routines, which are available for use
-in Topographica modules and scripts.</DD>
+in Topographica components and scripts.</DD>
 
 <P><DT><A href="http://pmw.sourceforge.net/">Pmw</A></DT>
 <DD>Topographica uses Pmw for its graphical user interface (GUI)

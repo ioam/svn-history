@@ -134,10 +134,10 @@ Pentium IV machine with a local disk).  If you have PHP installed, you
 can also make local copies of the HTML documentation from the web
 site; to do so, type "make all" instead of (or after) "make".  "make
 all" will also run the regression tests and example files, to ensure
-that everything is functioning properly on your system.  At the
-moment, be sure that you do this compilation on a machine with a
-functioning DISPLAY, i.e., not a remote text-only session, or there
-will be some warnings involving Tk.  
+that everything is functioning properly on your system.  (Note that if
+you do the tests on a machine without a functioning DISPLAY, such as a
+remote text-only session, there will be some warnings about GUI tests
+being skipped.)
 
 <P>If all goes well, a script named <code>topographica</code> will be
 created in the <code>topographica/</code> directory; you can use this
@@ -156,15 +156,10 @@ make and GCC installed.  Just follow the Linux instructions, replacing
 <code>make</code> with <code>gmake</code> if that's the name of GNU make on your system.
 
 <P><B><A NAME="osx">Mac:</A></B>
-Topographica builds only under Mac OS X or later.  Topographica
-developers have only limited access to OS X machines, and so at any
-time there may be some issues with the OS X version, although we do
-try to minimize them.
-
-<P>These instructions assume that you have an X server installed.  It
-is also possible to build Topographica using a native (Aqua) version
-of Python, which looks a bit nicer, but we have not yet documented how
-to do that.
+Topographica builds only under Mac OS X or later.  These instructions
+assume that you have an X server installed.  It is also possible to
+build Topographica using a native (Aqua) version of Python, which
+looks a bit nicer, but we have not yet documented how to do that.
 
 <P>To install under Mac OS X 10.4 (Tiger):
 
@@ -199,18 +194,13 @@ to make sure that compatible libraries are available.
 Double click on setup.bat in the Topographica directory.
 After installation, '.ty' files are associated with Topographica.
 Follow the instructions below for running Topographica (from a 
-command prompt), or double click on one of the networks in the 
+command prompt), or double click on one of the .ty scripts in the 
 examples directory. 
 
 <P>Instead of using the Windows versions of the various support tools
-for Topographica, it is also possible to use 
-<A HREF="http://www.cygwin.com/">Cygwin</a>. Cygwin offers a set of 
-UNIX-compatible tools that makes it
-possible to compile UNIX-style programs under Windows, in which case
-you can follow the generic Linux instructions above.  However, as of
-1/2006 the library versions available on Cygwin are a bit out of date
-and thus this process does not currently go smoothly.
-
+for Topographica, it should be possible to build Topographica on <A
+HREF="http://www.cygwin.com/">Cygwin</a>, but it may be necessary to 
+modify some of the makefiles.
 <!--CEBHACKALERT: it might do ok, the problem was building tkinter - try
 disabling that from happening, and using cygwin's tkinter?-->
 
@@ -221,7 +211,7 @@ on Windows, compiling everything from source.-->
 <H3>Running Topographica</H3>
 
 Once you have the code installed and built, go to your
-topographica/ directory and type* e.g.:
+topographica/ directory and type e.g.:
 
 <pre>
   ./topographica -g examples/cfsom_or.ty
@@ -245,12 +235,11 @@ or
   ./topographica -g examples/lissom_or.ty
 </pre>
 
+(Windows users should omit the initial <code>./</code>).
 For the latter two examples, a good way to get started is to work through 
 the <A HREF="../Tutorials/som_retinotopy.html">SOM</A> or 
-the <A HREF="../Tutorials/lissom_or.html">LISSOM</A> tutorials.
+<A HREF="../Tutorials/lissom_or.html">LISSOM</A> tutorials.
 
-<P>
-<small>* Windows users should omit the initial <code>./<code></small>
 
 <H3>Updating Topographica</H3>
 
@@ -268,10 +257,8 @@ stable version at any time by doing:
 update. Under TortoiseCVS in Windows, you can right click in the
 topographica directory and select CVS Update to get the new files.
 
-<P>Note that updating the examples/ subdirectory sometimes takes
-a long time, if the sample saved snapshot has been updated.
-Similarly, updating the external/ subdirectory sometimes takes a long
-time, if some of the external packages have been upgraded, and in that
-case the "make all" can also take some time to build.
+<P>Note that updating the external/ subdirectory sometimes takes a
+long time, if some of the external packages have been upgraded, and in
+that case "make all" can also take some time to build.
 
 

@@ -1,16 +1,16 @@
 <H1>LISSOM Orientation Map</H1>
 
-<!-- TO DO: fix indentation; make standards-compliant so it will -->
+<!-- CEBALERT: Should fix indentation; make standards-compliant so it will -->
 <!-- display properly on different browsers (I'll fix spacing at the -->
 <!-- same time); sort blockquotes -->
 
 <p>
 This tutorial shows how to use the
 <a href="http://topographica.org/">Topographica</a> software to explore a
-simple orientation map simulation using weight plots and test pattern
-images.  This particular example uses a <a
+simple orientation map simulation using test patterns and weight
+plots.  This particular example uses a <a
 href="http://nn.cs.utexas.edu/lookup?rflissom">LISSOM model</a>
-cortex, although Topographica supports other models and is easily
+cortex, although Topographica supports many other models and is easily
 extensible for models not yet supported.
 </p>
 
@@ -20,9 +20,8 @@ installing</a> Topographica.  Also, you will need to generate a saved
 orientation map network, which can be done by changing to the
 <code>examples/</code> directory and running "make
 lissom_oo_or_20000.typ".  Depending on the speed of your machine, you
-may want to come back and check on it the next day; on a 3GHz machine
-this training process currently takes about 5 hours.
-<!--CEBHACKALERT: surely not 5 hours any more? More like just over an hour?-->
+may want to go out for coffee at this point; on a 3GHz 512MB machine
+this training process currently takes an hour or so.
 </p>
 
 

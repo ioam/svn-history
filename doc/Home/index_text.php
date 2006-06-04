@@ -51,12 +51,18 @@ motor areas.
 
 <P>Topographica is freely available for downloading, and is an open
 source project whose capabilities can be extended and modified by any
-user.  The project is under active development, but as shown in the
-Tutorials it is already suitable for running visual cortex simulations.
+user.  We welcome contributions from users, and invite interested
+people to join our globally distributed development team.  Although
+the code is still under very active development, it is in daily use in
+numerous research projects and academic classes.  Given the fast pace
+of current development, being a developer is probably the best way to
+keep up with all of the changes.  We anticipate making a solid 1.0
+release later this year (2006) that will be ready for widespread
+deployment.
 
-Also see our 
-<A target="_top" HREF="http://nn.cs.utexas.edu/area-view.php?RECORD_KEY%28Areas%29=AreaID&AreaID(Areas)=11">
+<P>Also see our <A target="_top"
+HREF="http://nn.cs.utexas.edu/area-view.php?RECORD_KEY%28Areas%29=AreaID&AreaID(Areas)=11">
 research pages</a> for results from simulations run with Topographica
-and related tools, and our 
-<A target="_top" HREF="http://computationalmaps.org">new book</A> for more details.
+and related tools, and our <A target="_top"
+HREF="http://computationalmaps.org">new book</A> for more details.
 

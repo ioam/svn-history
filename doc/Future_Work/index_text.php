@@ -1,8 +1,9 @@
 <P>Topographica is still under very active development.  As described
 below, a large number of changes and new features are scheduled over
-the next few months, as well as over the next few years.
+the next few months, as well as over the next few years.  Our current
+<a href="current.html">lower-level list of tasks</a> is kept separately.
 
-<H2>Most urgent (First quarter 2006):</H2>
+<H2>Most urgent (Summer 2006):</H2>
 <DL COMPACT>
 <DT>ALERTs</DT><DD>
 There are a large number of relatively small problems noted in the
@@ -13,16 +14,62 @@ They also help prevent poor programming style from being propagated to
 other parts of the code before we have a chance to correct it.  We are
 working to correct all of these issues in the very near future.
 
-<P><DT>Windows and Mac versions</DT><DD> 
-Topographica is written in Python, which is available for many
-platforms.  We are committed to supporting the Windows version, but also
-currently support the Mac OS X version.  Recent versions have been
-tested successfully on Linux, Mac, and Windows. However, because of the 
-rapid pace of development and the developers' limited access to Mac and
-Windows machines, it is possible that some new features will not work
-on these platforms. However, it is not usually difficult for individual 
-tech-savvy users to get these features working on those platforms before 
-we have had a chance to test them.
+<P><DT>Stable APIs</DT><DD>
+The Topographica API (determined by the classes in base/) is gradually
+becoming more stable, and by the time of the 1.0 release it should be
+possible to build add-in components and model scripts and expect them
+to be usable in future versions (or to have a conversion program
+available for them).
+
+<P><DT>Command-line and batch interfaces</DT><DD>
+Although Topographica is written to be independent of the type of
+interface, and does not require a GUI or other interactive console,
+some functions are currently implemented only in the GUI.  Others are
+currently more difficult to use in batch mode, requiring longer and
+more complex commands than necessary.  These items will be simplified
+and made more appropriate for command-line and batch use, to make
+using larger networks more practical.
+
+<P><DT>Spiking support</DT><DD>
+Topographica primarily supports firing-rate (scalar) units, but
+spiking models are currently under development, and preliminary
+versions are included already.  We will be developing interfaces
+between spiking and non-spiking Sheets and analysis tools for spiking
+neurons.  We primarily expect to support integrate-and-fire and
+related computationally tractable spiking unit models; more detailed
+compartmental models based on the cable equation can be simulated in
+Neuron or Genesis instead.
+
+<P><DT>Polishing the GUI model editor</DT><DD>
+
+The Topographica model editor allows a model to be constructed,
+modified, visualized, and edited.  However, there are a few operations
+not currently supported, such as setting a parameter to a random
+stream of numbers.  These limitations (combined with the ongoing
+changes to the saved file formats) mean that most models are best
+constructed using .ty script files rather than the editor.  These
+remaining limitations will be addressed soon, but in the meantime
+the editor is still quite useful for exploring and modifying 
+models created using .ty scripts.
+</DL>
+
+
+<H2>Near future:</H2>
+<DL COMPACT>
+
+<P><DT>Archival state saving</DT><DD>
+
+Model state saving is currently implemented using Python "pickling"
+(persistent storage).  As the Topographica classes change, these files
+quickly become out of date, and cannot be loaded into more recent
+versions.  By the 1.0 release we plan to provide an upgrade path, so
+that old saved files can be used with new versions.  To make this
+simpler, we are working on an alternative implementation of state
+saving using XML, which is designed to be an archival, readable
+format.  In the meantime, users should be aware that saved snapshot
+files will not necessarily be readable by future versions of
+Topographica, and should be considered temporary.
+
 
 <P><DT>Progress updating and cancellation</DT><DD> 
 
@@ -43,89 +90,27 @@ In addition to the progress bars, it would be nice to have an estimate
 for the memory requirements of a large network, so that the user can
 verify that it is a reasonable simulation to run on his or her machine.
 
-<P><DT>State saving</DT><DD>
-Model state saving is currently implemented using Python "pickling"
-(persistent storage).  Some important classes of objects cannot yet be
-pickled, including any variable holding a lambda function.  As a
-result, there can be cases when not all of the important properties of
-a user's network are restored, and we will be working to prevent or
-support such cases (at the moment, we only warn the user).  In
-addition, pickling is not robust against changes to the class
-definitions, such as changes in class names.  To reduce these
-problems, we are working on an alternative implementation of state
-saving using XML, which is designed to be an archival, readable
-format.  In the meantime, users should be aware that saved snapshot
-files will not necessarily be readable by future versions of
-Topographica, and should be considered temporary.
+<!-- Should consider sparse layers with patch distribution of units -->
 
+<P><DT>More example models</DT><DD>
+Topographica currently includes a small sampling of example models,
+primarily from the visual system.  Additional models being implemented
+in Topographica, including somatosensory models and additional visual
+models from our labs and elsewhere (including motion direction, eye
+preference, and color map simulations) as well as other sample visual
+system models from the literature.  These will act as starting points
+for developing models in Topographica.
 
-<P><DT>Plotting</DT><DD>
-Two-dimensional bitmap plots are already supported, but will be
-expanded significantly over the near term and longer term.  Immediate
-tasks include allowing the user to control plot brightness scaling if
-desired, adding user-defined colormaps, and adding an "overload" or
-"cropped" indicator to show if some values are too large to be
-displayed in the selected range.  We will also be adding support for
-arbitrary user-defined colormaps, and for numerical indications of the
-plotting scales.
+<P><DT>Bitmap plotting enhancements</DT><DD>
 
-<P><DT>Input patterns</DT><DD>
-The support for drawing input patterns is fairly mature, but support
-for Composite patterns is not yet complete.  Composite patterns are
-necessary for such things as weights initialized with Gaussians plus
-random noise, multiple patterns per iteration, or selecting from a
-database of natural images.  
-<!-- Also need to respect bounding boxes for this to be practical. -->
+The current basic support for two-dimensional bitmap plotting will
+eventually need to be expanded to allow the user to control plot
+brightness scaling, provide numerical indications of the plotting
+scales, allow custom colormaps, and add an "overload" or "cropped"
+indicator to show if some values are too large to be displayed in the
+selected range.
 
-<P><DT>Circular CFs</DT><DD>
-Preliminary support is now implemented for circular (or any other
-  shape) CFs, but this will be improved in upcoming releases.
-<!-- Also should consider sparse layers with patch distribution of units -->
-
-<P><DT>Convolution Projections</DT><DD>
-LGN models use Difference of Gaussians (DoG) units, which are
-effectively convolutions of a fixed weight vector with an input
-region, are now supported, but these will be improved in upcoming
-releases.
-
-<P><DT>Command-line and batch interfaces</DT><DD>
-Although Topographica is written to be independent of the type of
-interface, and does not require a GUI or other interactive console,
-some functions are currently implemented only in the GUI.  Others are
-currently more difficult to use in batch mode, requiring longer and
-more complex commands than necessary.  These items will be simplified
-and made more appropriate for command-line and batch use, to make
-using larger networks more practical.
-
-<!-- CEBHACKALERT: can we remove this? It's missing little things
-like handling dynamic numbers, etc. -->
-<P><DT>GUI model editor</DT><DD>
-
-The Topographica GUI supports plotting and analysis of existing
-networks, and now includes a network construction GUI that allows
-primitives to be selected from the library and connected into a model
-network.  Parameters and options can then be set on these components,
-thus defining a simulation without requiring coding (except to add new
-primitives if desired).  This facility is still under development, and
-is still missing some crucial functionality required for the graphical
-approach to be useful. These limitations will be removed very
-soon, allowing the editor to be used to construct useful models.
-</DL>
-
-
-<H2>Near future (first half 2006):</H2>
-<DL COMPACT>
-
-<P><DT>Example models</DT><DD>
-Topographica currently includes a small sampling of example models
-drawn from the work of the authors.  However, over the next few months
-we will be adding a large number of other example models from our labs
-(including motion direction, eye preference, and color map
-simulations) as well as other sample visual system models from the
-literature.  These will act as starting points for developing models
-in Topographica.
-
-<P><DT>Plotting</DT><DD>
+<P><DT>Automatic Line-based plotting</DT><DD>
 We have recently added 1D (line) and 2D (contour or vector field)
 plots based on
 <A HREF="http://matplotlib.sourceforge.net/">MatPlotLib</A> for any
@@ -155,55 +140,20 @@ to make all such plots "live", so that individual units or
 ConnectionFields can be selected and analyzed.
 
 
-<!-- CEBHACKALERT: I think this item can be removed. 
-It might be better to have one pane (like IDLE), but the two-pane
-approach we have gives some advantages. For example, I can press the
-"up" arrow in the 'Command:' box to find previous commands. It was
-also very simple to implement. -->
-
-<P><DT>Command console</DT><DD>
-At the moment, the Topographica console GUI window provides a single 
-command-line widget, allowing arbitrary Python commands to be executed.
-However, the output from those commands goes into the shell window
-from which Topographica was launched, which can be confusing, because
-the commands themselves do not appear there.  It would be good to add
-a visible command I/O history that shows both the commands executed
-and their output, either as a single shell-editor component (like IDLE
-or MatLab) or as a separate pane (not a drop-down).  
-<!--
-  The PMW HistoryText
-  widget will probably work nicely for this, but you need to figure out
-  how to get the output that normally goes to the shell window and put
-  it in a gui pane.  Pyro Robotics does this, so you might be able to
-  steal their code. (jprovost)
--->
-
-<P><DT>Spiking support</DT><DD>
-Topographica currently supports only firing-rate (scalar) units, but
-we have prototyped integrate-and-fire spiking unit support separately.
-We are currently working on adding spiking Sheets, interfaces between
-spiking and non-spiking Sheets, and analysis tools for spiking
-neurons.  We expect to support integrate-and-fire and related
-computationally tractable spiking unit models; more detailed
-compartmental models based on the cable equation can be simulated
-in Neuron or Genesis instead.
-
-<!--
-  CEBHACKALERT: this one can be removed, right?
-  <P><DT>Random number streams</DT><DD>
-  Need to provide finer control over the generation of separate
-  streams of random numbers, allowing them to be selected independently
-  for different uses, and to allow the streams to be played back reliably.
-
-  <P><DT>Map statistics</DT><DD>  
+<P><DT>Map statistics</DT><DD>  
   Will implement general routines for measuring the statistical
   properties of Sheets, such as for computing a perceived orientation.
--->
 </DL>
 
 
 <H2>Eventually:</H2>
 <DL COMPACT>
+
+<P><DT>Improve documentation</DT><DD>
+The reference manual is generated automatically from the source code,
+and needs significant attention to ensure that it is readable and
+consistent.  For instance, not all parameters are documented yet, but
+all will need to be.
 
 <P><DT>More testing code</DT><DD>
 Topographica has a fairly complete test library, but there are still
@@ -217,11 +167,8 @@ things, and disabling the remaining warnings.  That way, new code
 could be automatically checked with those programs and the warnings
 would be likely to be meaningful.
 
-<!-- CEBHACKALERT: partly done? -->
-<P><DT>Plot histories</DT><DD>
-It would be nice if GUI plot windows could save a user-selectable
-amount of history, so that one could scroll back and forth over time
-to compare the time-stamped plots.  Once this is done, it should be
+<P><DT>Animating plot histories</DT><DD>
+GUI plot windows save a history of each plot, and it should be
 feasible to add animations of these plots over time, as a helpful
 visualization.
 
@@ -244,13 +191,6 @@ desirable to calibrate the system for specific scales, such as degrees
 of visual angle, millimeters in cortex, etc.  We plan to add
 user-defined scales on top of the arbitrary scales, mapping from
 values in the simulator to user-defined quantities for display.
-
-<P><DT>Improve documentation</DT><DD>
-
-The reference manual is generated automatically from the source code,
-and needs significant attention to ensure that it is readable and
-consistent.  For instance, not all parameters are documented yet, but
-all will need to be.
 
 <P><DT>Parallelization</DT><DD>
 Due to their weakly interconnected graph structure, Topographica
@@ -286,7 +226,7 @@ release if it can be made more general.  Such fine-grained parallelism
 will be restricted to specific Sheet and/or Projection types, because
 it requires access to the inner workings of the Sheet.
 
-<P><DT>Non-visual modalities</DT><DD>
+<P><DT>More non-visual modalities</DT><DD>
 Most of the specific support in Topographica is designed with visual
 areas in mind, but is written generally so that it applies to any
 topographically organized region.  We plan to implement specific
@@ -295,7 +235,6 @@ subcortical processing, and appropriate visualizations.  We also plan
 to add similar support for motor areas.  Contributions from
 Topographica users with experience in these domains will be
 particularly helpful.
-
 
 <P><DT>Data import/export</DT><DD> It will be crucial to provide
 easy-to-use interfaces for exchanging data and calling code in other
@@ -344,9 +283,6 @@ What components are taking a long time to run?  Guide the user for
 optimization, focusing on the components we expect to be the
 bottlenecks.
 
-Should add ability to add arbitrary image to a PlotGroupTemplate (see
-plot.py).
-
 Consider adding a main Documentation page, which describes each of the
 manuals and who should read which one.
 
@@ -369,21 +305,9 @@ From Geisler meeting 7/1/2005:
 
   - Add black and white background options.
 
-  - Add state (weight) saving. (done)
-
-  - Verify/fix .ty file importing; it should work just like .py file
-    importing.  May need to send some changes to the Python maintainers.
-
-  - Verify that everything works on Windows and Mac.  
-
-  - Support composite objects (for multiple training inputs, face
-    patterns).
-
   - Add linking objects between eyes (for e.g. ocular dominance).
 
   - Add user-defined arbitrary colormaps ("KRYW", "BbKrR", etc.).
-
-  - Add sheet edge buffers.
 
   - Implement binary file saving, using CDF, HDF, or something like it.
 
@@ -393,10 +317,6 @@ From Geisler meeting 7/1/2005:
     and kernel factory routines.
 
   - Configure GUI to pop up a requestor for urgent-enough messages.
-  
-  - Consider supporting 1D and 3D line-based plotting, using
-    e.g. Matplotlib or Pyx, though this can possibly be postponed to
-    the next milestone.
   
   - Add bounding intersections and unions, which are needed when RFs
     extend past the edge of a sheet. (intersections done)
@@ -419,9 +339,6 @@ From Geisler meeting 7/1/2005:
     later milestones, but is listed here in case it is required for ON/OFF
     plots.
   
-  - Unify random number generation, so that users can manipulate seeds
-    appropriately to play back a particular simulation.
-  
   - Consider using the Python logger module as a back end for logging
     messages.
   
@@ -443,17 +360,6 @@ into something that will work with each new release.
 Once milestone 4 is released, we can make a full 1.0 public release,
 and we can stop using LISSOM for anything but retrieving historical
 results.
-
-
-Milestone 5: Advancing. Implement a large percentage of the features
-promised in the Topographica grant proposal, enough to clearly
-demonstrate that the software is a big advance over LISSOM
-5.0.
-
-Once milestone 5 has been reached, we can make another public
-release and start heavily marketing the software to all potential
-users, trying to convince them to switch from whatever they are
-currently using to Topographica.  
 
 Also see the Topographica grant proposal.  This milestone will include
 things like GUI-based network building, algorithms other than LISSOM

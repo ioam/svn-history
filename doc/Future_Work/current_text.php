@@ -30,7 +30,7 @@ plots.
 </li>
 
 <li>
-2006/05/23 (JB): tkgui making shell command prompt skip a line. If it doesn't prompt won't come back if information is printed.
+2006/05/23 (JB): tkgui making shell command prompt skip a line. If it doesn't prompt, it won't come back if information is printed.
 </li>
 
 
@@ -139,7 +139,8 @@ and (eventually) making it possible to set their values and
 </li>
 
 <li>
-2006/04/20 (JB): write test file for Composite and complete Image's test file.
+2006/04/20 (JB): write test file for Composite and complete Image's test file.  Clean 
+up the Composite pattern.
 </li>
 
 <li>
