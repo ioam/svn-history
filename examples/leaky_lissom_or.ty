@@ -80,13 +80,13 @@ topo.sim.connect('Retina','V1', delay = FixedPoint("0.10"),
 
 topo.sim.connect('V1','V1', delay = FixedPoint("0.05"), 
           connection_type=LeakyCFProjection,strength = 0.9, name='LateralExcitatory',
-          nominal_bounds_template=BoundingBox(radius=0.1),learning_rate=22.674,
+          nominal_bounds_template=BoundingBox(radius=0.1),learning_rate=2.674,
 	  decay_rate=0.5)
             
 topo.sim.connect('V1','V1', delay = FixedPoint("0.05"), 
           connection_type=LeakyCFProjection,strength = -0.9, name='LateralInhibitory',
-          nominal_bounds_template=BoundingBox(radius=0.9),learning_rate=22.466,
-	  decay_rate=0.001)
+          nominal_bounds_template=BoundingBox(radius=0.9),learning_rate=2.466,
+	  decay_rate=0.01)
 
 
 # CEBHACKALERT: scheduled events are missing. e.g. change_bounds are
