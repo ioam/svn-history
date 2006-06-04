@@ -6,7 +6,7 @@ $Id$
 __version__='$Revision$'
 
 from math import pi
-from Numeric import around,bitwise_and,sin,add,Float
+from Numeric import around,bitwise_and,sin,add,Float,bitwise_or
 
 from topo.base.parameterclasses import Number, Parameter, Enumeration
 from topo.base.functionfamilies import OutputFnParameter
@@ -191,6 +191,39 @@ class Rectangle(PatternGenerator):
         return bitwise_and(abs(self.pattern_x)<=width/2.0,
                            abs(self.pattern_y)<=height/2.0)
 
+class TwoRectangles(Rectangle):
+    """Two 2D rectangle pattern generator."""
+
+    x1 = Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
+                   doc="x center of square 1.")
+    y1 = Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
+                   doc="y center of square 1.")
+    x2 = Number(default=0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
+                   doc="x center of square 2.")
+    y2 = Number(default=0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
+                   doc="y center of square 2.")
+
+    # YCHACKALERT
+    # Maybe this can be implemented much more cleanly by calling
+    # the parent's function() twice, but it's hard to see how to 
+    # set the (x,y) offset for the parent.
+    def function(self,**params):
+        height = params.get('size',self.size)
+        width = (params.get('aspect_ratio',self.aspect_ratio))*height
+
+        return bitwise_or(
+	       bitwise_and(bitwise_and(
+			(self.pattern_x-self.x1)<=self.x1+width/4.0,
+			(self.pattern_x-self.x1)>=self.x1-width/4.0),
+		      bitwise_and(
+			(self.pattern_y-self.y1)<=self.y1+width/4.0,
+			(self.pattern_y-self.y1)>=self.y1-width/4.0)),
+	       bitwise_and(bitwise_and(
+			(self.pattern_x-self.x2)<=self.x2+width/4.0,
+			(self.pattern_x-self.x2)>=self.x2-width/4.0),
+		      bitwise_and(
+			(self.pattern_y-self.y2)<=self.y2+width/4.0,
+			(self.pattern_y-self.y2)>=self.y2-width/4.0)))
 
 class SquareGrating(PatternGenerator):
     """2D squarewave grating pattern generator."""
