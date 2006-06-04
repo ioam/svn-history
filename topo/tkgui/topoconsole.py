@@ -62,6 +62,17 @@ plotpanel_classes = {}
 
 
 
+# jprovost: The command output window could be implemented using the
+# PMW HistoryText widget, but we need to figure out how to get the
+# output that normally goes to the shell window and put it in a gui
+# pane.  Pyro Robotics does this, so we might be able to steal their
+# code.
+# 
+# CEB: It might be better to have one pane (like IDLE), but the
+# two-pane approach we have gives some advantages. For example, I can
+# press the "up" arrow in the 'Command:' box to find previous
+# commands. It was also very simple to implement.
+
 class OutputText(Text):
     """
     A Tkinter Text widget but with some convenience methods.
