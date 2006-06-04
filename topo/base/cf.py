@@ -78,6 +78,10 @@ class ConnectionField(ParameterizedObject):
     # CEBHACKALERT: can rename this to 'slice_' now.
     slice_array = []
 
+    # JABHACKALERT: The handling of _sum needs to be revisited, because
+    # it is unlikely to work for arbitrary combinations of output and
+    # learning functions.  E.g. the norm_value is sometimes treated as if
+    # it is always the sum, when it may be the length instead.
     def get_sum(self):
         """
         As an optimization, a learning function (or other function
