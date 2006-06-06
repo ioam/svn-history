@@ -754,7 +754,30 @@ class ParameterizedObject(object):
 
         vals.sort(key=lambda x:x[0])
         return vals
-            
+
+
+    def inspect_value(self,name):
+        """
+        Return the value of the specified parameter without modifying it.
+
+        Same as getattr() except for DynamicNumbers
+        """
+        from parameterclasses import DynamicNumber
+        
+        # CEBHACKALERT: avoids getting a new value for a DynamicNumber!
+        # (Otherwise, all that should be here is value=getattr(self,name).)
+        k = "_%s_param_value"%(name)
+        if k in self.__dict__:
+            if isinstance(self.__dict__[k],DynamicNumber):
+                value = self.__dict__[k].last_value
+            else:
+                value = getattr(self,name)
+        else:
+            value = getattr(self,name)                    
+        # end CEBHACKALERT 
+
+        return value
+
 
     def print_param_values(self):
         for name,val in self.get_param_values():
