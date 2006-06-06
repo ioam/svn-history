@@ -14,62 +14,27 @@ import Pmw, sys, Tkinter
 import topo.base.parameterizedobject
 import topoconsole
 
-# We'll make all the classes from the following packages available:
-from topo.patterns import *
-from topo.outputfns import *
+
+# When not using the GUI, Topographica does not ordinary import any of
+# the classes in the separate Topographica packages. For example, none
+# of the pattern types in topo.patterns is imported in Topographica by
+# default.  But for the GUI, we want all such things to be available
+# as lists from which the user can select.  To do this, we import all
+# pattern types and other such classes here. User-defined classes will
+# also appear in the GUI menus if they are derived from any class
+# derived from the one specified in each widget, and imported before
+# the relevant GUI window starts.
+from topo.eps import *
 from topo.learningfns import *
+from topo.outputfns import *
+from topo.patterns import *
+from topo.projections import *
 from topo.responsefns import *
-# CEBHACKALERT: Still to add others: sheets, projections
+from topo.sheets import *
 
-
-### Populating GUI lists
-#   --------------------
-# 
-# By default, none of the classes in the separate Topographica
-# packages is imported. For example, none of the pattern types in
-# topo.patterns is imported in Topographica by default.  But for the
-# GUI, we want all such things to be available as lists from which the
-# user can select.  To do this, we import all pattern types here
-# and add the topo.patterns package to PatternGeneratorParameter's
-# package list. We do the same for other classes like this - see the
-# imports list at the top of the file.
-#
-# User-defined classes will appear in these lists if they are in the
-# namespace of the appropriate package.  e.g. if I define the class
-# StarPatternGenerator, so long as it is added to topo.patterns
-# somewhere
-# (e.g. 'topo.patterns.basic.StarPatternGenerator=StarPatternGenerator')
-# it will appear in GUI lists.
-#
-
-def add_package(class_selector,package):
-    class_selector.packages.append(package)
-
-
-# PatternGenerators
+from topo.base.cf import CFPLearningFnParameter,CFPOutputFnParameter,CFPResponseFnParameter
+from topo.base.functionfamilies import LearningFnParameter,OutputFnParameter,ResponseFnParameter
 from topo.base.patterngenerator import PatternGeneratorParameter
-add_package(PatternGeneratorParameter,topo.patterns)
-
-# OutputFns
-from topo.base.functionfamilies import OutputFnParameter
-from topo.base.cf import CFPOutputFnParameter
-add_package(OutputFnParameter,topo.outputfns)
-add_package(CFPOutputFnParameter,topo.outputfns)
-
-# LearningFns
-from topo.base.functionfamilies import LearningFnParameter
-from topo.base.cf import CFPLearningFnParameter
-add_package(LearningFnParameter,topo.learningfns)
-add_package(CFPLearningFnParameter,topo.learningfns)
-
-# ResponseFns
-from topo.base.functionfamilies import ResponseFnParameter
-from topo.base.cf import CFPResponseFnParameter
-add_package(ResponseFnParameter,topo.responsefns)
-add_package(CFPResponseFnParameter,topo.responsefns)
-
-### End 'Populating GUI lists'
-
 
 
 def show_cmd_prompt():

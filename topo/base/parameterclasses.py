@@ -492,11 +492,8 @@ def concrete_descendents(parentclass):
     imported are included, so the caller will usually first do 'from
     package import *'.
 
-    If the class has an abstract attribute and it's True, it will not
-    be included.    
-    Note that the parentclass itself will be returned if, for
-    instance, it is imported by one of the modules in package.
-
+    If the class has an attribute 'abstract', and it's True, the class
+    will not be included.
     """
     return dict([(c.__name__,c) for c in descendents(parentclass)
                  if not (hasattr(c,'abstract') and c.abstract==True)])
@@ -508,19 +505,12 @@ class ClassSelectorParameter(Parameter):
 
     Offers a range() method to return possible types that the
     value could be an instance of.
-
-    Subclasses must define the class attribute 'packages', which must
-    be a list.
     """
     __slots__ = ['class_','suffix_to_lose']
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,class_,default=None,instantiate=True,
                  suffix_to_lose='',**params):
-        """
-
-        """
-        assert (hasattr(self, 'packages') and isinstance(self.packages,list)), "ClassSelectorParameter subclasses must have the class attribute 'packages', and it must be a list."
         
         self.class_ = class_
 
@@ -546,22 +536,14 @@ class ClassSelectorParameter(Parameter):
         # same order every time because it was a keyedlist. Don't forget to fix
         # that.
         k = {}
-        for package in self.packages:
-            classes = concrete_descendents(self.class_)
-            for (name,class_) in classes.items():
-                k[self.__classname_repr(name)] = class_
+        classes = concrete_descendents(self.class_)
+        for (name,class_) in classes.items():
+            k[self.__classname_repr(name)] = class_
 
         if len(k)==0:
             return {self.__classname_repr(self.default.__class__.__name__):self.default}
         else:
             return k
-cvs diff: Diffing topo/commands
-cvs diff: Diffing topo/eps
-cvs diff: Diffing topo/learningfns
-cvs diff: Diffing topo/misc
-cvs diff: Diffing topo/outputfns
-cvs diff: Diffing topo/patterns
-cvs diff: Diffing topo/plotting
 
     def __classname_repr(self, class_name):
         """
