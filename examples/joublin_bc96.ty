@@ -20,6 +20,9 @@ $Id$
 """
 __version__='$Revision$'
 
+## To measure the position preference:
+## measure_position_pref(divisions=6,size=0.3,scale=1.0,offset=0.0,display=True,user_function=PatternPresenter(HindpawGaussian(aspect_ratio=1.0),False,1.0), x_range=(0.0,0.6),y_range=(0.0,1.0)) ; topographic_grid()
+
 import RandomArray
 
 import topo.patterns.random
@@ -34,24 +37,53 @@ from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.misc.numbergenerators import UniformRandom
-
+from topo.misc.patternfns import gaussian
 
 topo.sim.name = "joublin_bc96"
+
+
+class HindpawGaussian(Gaussian):
+    """
+    2D Gaussian pattern generator whose size depends on the Y position.
+
+    Used for modeling inputs to the hind paw of a rat in Joublin et
+    al., Biological Cybernetics 74, pp. 275-286, 1996.
+
+    See the Gaussian PatternGenerator for more details.
+    """
+    
+    size_factor = Number(default=-0.8,softbounds=(-2.0,2.0),precedence=0.80,
+                         doc="Factor by which the size is decreased as Y increases.")
+
+    def function(self,**params):
+        y=self.inspect_value('y') # JABALERT: Retrieve value without incrementing it
+        specified_ysigma = params.get('size',self.size)/2.0
+        ysigma = specified_ysigma*(self.size_factor*y+1.0)
+        xsigma = params.get('aspect_ratio',self.aspect_ratio)*ysigma
+        print specified_ysigma,self.size_factor,y,ysigma
+
+        return gaussian(self.pattern_x,self.pattern_y,xsigma,ysigma)
+
+# Sketch of ICMS training:
+#def train_ICMS():
+#    for x ...
+#        for y ...
+#            pattern_present(inputs={'Hindpaw',HindpawGaussian(aspect_ratio=1.0)},duration=1.0,learning=True,apply_output_fn=True):
 
 
 ###########################################
 # Set parameters
 
-input_pattern = topo.patterns.basic.Gaussian(
-    scale=1.0,size=2*0.0468,aspect_ratio=4.0,
-    bounds=BoundingBox(radius=0.72),
-    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
-    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
+input_pattern = HindpawGaussian(
+    scale=1.0,size=0.3,aspect_ratio=1.0,
+#    bounds=BoundingBox(points=((0.0,0.0),(15.0/25.0,25.0/25.0))),
+    x=DynamicNumber(UniformRandom(lbound=0.0,ubound=0.6,seed=12)),
+    y=DynamicNumber(UniformRandom(lbound=0.0,ubound=1.0,seed=34)),
     orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
 RandomArray.seed(500,500)
 CFSOM.learning_length = 10000
-CFSOM.radius_0 = 15/25.0
+CFSOM.radius_0 = 15.0/25.0
 CFProjection.learning_fn = CFPLF_HebbianSOM()
 CFProjection.response_fn = CFPRF_DotProduct_opt()
 
@@ -65,43 +97,45 @@ CFProjection.response_fn = CFPRF_DotProduct_opt()
 # Sheets
 topo.sim['Hindpaw'] = GeneratorSheet(
     input_generator=input_pattern, nominal_density = 25,
-    nominal_bounds=BoundingBox(points=((0,0),(15/25.0,25/25.0))),
+    nominal_bounds=BoundingBox(points=((0.0,0.0),(15.0/25.0,25.0/25.0))),
     period = 1.0,phase = 0.05)
 
 topo.sim['R-cells'] = CFSOM(alpha_0 = 0.5, nominal_density=25,
-                            nominal_bounds=BoundingBox(points=((      0,0),(15/25.0,25/25.0))))
+                            nominal_bounds=BoundingBox(points=((      0,0),(15.0/25.0,25.0/25.0))))
 
 topo.sim['E-cells'] = CFSOM(alpha_0 = 0.5, nominal_density=25,
-                            nominal_bounds=BoundingBox(points=((-6/25.0,0),(15/25.0,29/25.0))))
+                            nominal_bounds=BoundingBox(points=((-6/25.0,0),(15.0/25.0,29.0/25.0))))
 
 topo.sim['I-cells'] = CFSOM(alpha_0 = 0.5, nominal_density=25,
-                            nominal_bounds=BoundingBox(points=((-6/25.0,0),(15/25.0,29/25.0))))
+                            nominal_bounds=BoundingBox(points=((-6/25.0,0),(15.0/25.0,29.0/25.0))))
 
 # Need to figure out learning_rate and add to each connection,
 # plus delays and strengths
 topo.sim.connect('Hindpaw','R-cells',delay=0.05,connection_type=CFProjection,name='Afferent',
-                 strength=1.0,nominal_bounds_template=BoundingBox(radius=11/25.0/2.0),
+                 strength=1.0,nominal_bounds_template=BoundingBox(radius=11.0/25.0/2.0),
                  weights_generator=topo.patterns.random.UniformRandom())
 
 topo.sim.connect('R-cells','R-cells',delay=0.05,connection_type=CFProjection,name='Lateral',
-                 strength=1.0,nominal_bounds_template=BoundingBox(radius=15/25.0/2.0),
+                 strength=1.0,nominal_bounds_template=BoundingBox(radius=15.0/25.0/2.0),
                  weights_generator=topo.patterns.random.UniformRandom())
 
 # Needs BoundingBox(radius=1/25.0/2.0), but that causes an error right now
 topo.sim.connect('R-cells','E-cells',delay=0.05,connection_type=CFProjection,name='Afferent',
-                 strength=1.0,nominal_bounds_template=BoundingBox(radius=15/25.0/2.0),min_matrix_radius=1,
+                 strength=1.0,nominal_bounds_template=BoundingBox(radius=15.0/25.0/2.0),min_matrix_radius=1,
                  weights_generator=topo.patterns.basic.Constant())
 
 topo.sim.connect('E-cells','E-cells',delay=0.05,connection_type=CFProjection,name='Lateral',
-                 strength=1.0,nominal_bounds_template=BoundingBox(radius=15/25.0/2.0),
+                 strength=1.0,nominal_bounds_template=BoundingBox(radius=15.0/25.0/2.0),
                  weights_generator=topo.patterns.random.UniformRandom())
 
 topo.sim.connect('E-cells','I-cells',delay=0.05,connection_type=CFProjection,name='Afferent',
-                 strength=1.0,nominal_bounds_template=BoundingBox(radius=21/25.0/2.0),
+                 learning_fn = CFPLF_HebbianSOM(),
+                 strength=1.0,nominal_bounds_template=BoundingBox(radius=21.0/25.0/2.0),
                  weights_generator=topo.patterns.random.UniformRandom())
 
 topo.sim.connect('I-cells','E-cells',delay=0.05,connection_type=CFProjection,name='Inhibitory',
-                 strength=-1.0,nominal_bounds_template=BoundingBox(radius=21/25.0/2.0),
+                 learning_fn = CFPLF_HebbianSOM(),
+                 strength=-1.0,nominal_bounds_template=BoundingBox(radius=21.0/25.0/2.0),
                  weights_generator=topo.patterns.random.UniformRandom())
 
 
