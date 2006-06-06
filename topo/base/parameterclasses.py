@@ -10,7 +10,7 @@ import re
 import os.path
 import sys
 
-from parameterizedobject import Parameter
+from parameterizedobject import Parameter, descendents
 
 
 # CEBHACKALERT: much of the documentation for Parameter subclasses
@@ -483,40 +483,23 @@ def is_number(obj):
 
 
 
-# CEBHACKALERT: this should be a method of ClassSelectorParameter.
-# (CB: I have a note in my e-mail from JAB about something else related
-# to this change.)
-# CEBALERT: see descendents() in parameterizedobject.py; that
-# function could probably be called in such a way as to reduce
-# what needs to be done by this function, or even eliminate it.
-from inspect import ismodule
-def find_classes_in_package(package,parentclass):
+# CEBALERT: this should be a method of ClassSelectorParameter.
+def concrete_descendents(parentclass):
     """
-    Return a dictionary containing all items of the type
-    specified, owned by modules in the specified package.
-    
-    Only currently imported modules are searched, so
-    the caller will first need to do 'from package import *'.
+    Return a dictionary containing all subclasses of the specified
+    parentclass, including the parentclass.  Only classes that are
+    defined in scripts that have been run or modules that have been
+    imported are included, so the caller will usually first do 'from
+    package import *'.
 
-    If the class has an abstract attribute and it's True,
-    it will not be included.
-    
-    Does not search packages contained within the specified
-    package, only the top-level modules.
-
+    If the class has an abstract attribute and it's True, it will not
+    be included.    
     Note that the parentclass itself will be returned if, for
     instance, it is imported by one of the modules in package.
+
     """
-    result = {}
-    for v1 in package.__dict__.itervalues():
-        if ismodule(v1):
-            for v2 in v1.__dict__.itervalues():
-                if (isinstance(v2,type) and issubclass(v2,parentclass)):
-                    if hasattr(v2,'abstract') and v2.abstract==True:
-                        pass
-                    else:
-                        result[v2.__name__] = v2
-    return result
+    return dict([(c.__name__,c) for c in descendents(parentclass)
+                 if not (hasattr(c,'abstract') and c.abstract==True)])
 
 
 class ClassSelectorParameter(Parameter):
@@ -564,7 +547,7 @@ class ClassSelectorParameter(Parameter):
         # that.
         k = {}
         for package in self.packages:
-            classes = find_classes_in_package(package, self.class_)
+            classes = concrete_descendents(self.class_)
             for (name,class_) in classes.items():
                 k[self.__classname_repr(name)] = class_
 
@@ -572,6 +555,13 @@ class ClassSelectorParameter(Parameter):
             return {self.__classname_repr(self.default.__class__.__name__):self.default}
         else:
             return k
+cvs diff: Diffing topo/commands
+cvs diff: Diffing topo/eps
+cvs diff: Diffing topo/learningfns
+cvs diff: Diffing topo/misc
+cvs diff: Diffing topo/outputfns
+cvs diff: Diffing topo/patterns
+cvs diff: Diffing topo/plotting
 
     def __classname_repr(self, class_name):
         """

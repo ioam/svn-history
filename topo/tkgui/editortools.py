@@ -12,7 +12,7 @@ import tkFont
 
 import topo.sheets
 from topo.sheets import *
-from topo.base.parameterclasses import find_classes_in_package
+from topo.base.parameterclasses import concrete_descendents
 from topo.base.sheet import Sheet
 import topo.projections
 from topo.projections import *
@@ -93,7 +93,7 @@ class NodeTool(Frame) :
         self.title_label.pack()
         self.doc = 'Use the sheet tool to click a\nsheet object into the canvas.'
         # gets list of all the available sheets.
-        self.sheet_list = self.get_sheet_list()
+        self.sheet_list = concrete_descendents(Sheet)
         sheet_list = self.sheet_list.keys()
         # populate the menu with the available sheet list.
         self.option_menu = Pmw.ComboBox(self, selectioncommand = 
@@ -147,13 +147,11 @@ class NodeTool(Frame) :
         return EditorSheet(self.canvas, sheet, (x, y), sheet.name)
 
     ####### Util Methods #####################################################
-    def get_sheet_list(self) :	
-        # find all subclasses of Sheet defined in topo/sheets
-        return find_classes_in_package(topo.sheets, Sheet)
-
     def set_option(self, option) :
         self.current_option = option
         self.change_mode(None)
+
+
 
 ###############################################################################
 
@@ -184,7 +182,7 @@ class ConnectionTool(Frame) :
         self.title_label.pack()
         self.doc = 'Use the connection tool to\ndrag connections between objects'
         # gets list of all the available projections.
-        self.proj_list = self.get_proj_list()
+        self.proj_list = concrete_descendents(Projection)
         proj_list = self.proj_list.keys() # gets the class names.
         # populate the menu with the available projection list.
         self.option_menu = Pmw.ComboBox(self, selectioncommand = 
@@ -250,10 +248,6 @@ class ConnectionTool(Frame) :
         self.title_label.config(bg = col)
         self.option_menu.config(bg = col)
 
-    ########### Util Methods ########################################################
-    def get_proj_list(self ) :
-        # find all subclasses of Projection defined in topo/projections
-        return find_classes_in_package(topo.projections, Projection)
 
 
 ###############################################################################

@@ -78,7 +78,10 @@ function without it.)
 of the appropriate type, just by adding a new .py file to that
 directory.  E.g. a file of new PatternGenerator classes can be copied
 into patterns/, and will then show up in the GUI menus as potential
-input patterns.
+input patterns.  The GUI will also show any class derived from those
+in the library directories, even if it is defined in your own files,
+as long as that file has been run or imported before the GUI window 
+is opened.
 
 <P>Many of the components come in multiple varieties, to be used at
 different levels in a model.  For instance, there are learningfns that
