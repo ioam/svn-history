@@ -297,11 +297,12 @@ studied using the LISSOM model in Topographica as follows.
 <p>
 </p><ol>
 
-<p></p><li>First, select <span class='t_item'>Load script</span>
-from the <span class='t_item'>Simulation</span> menu, change to the <code>examples</code> directory, and
-select <code>lissom_or.ty</code>. This reverts the 
-network to its initial, disorganized state.  You will probably also
-want to close any open plotting windows, to avoid confusion.
+<p></p><li>First, quit from any existing simulation, and start with a fresh copy:
+
+<blockquote><code class='to_type'>
+  ./topographica -g examples/lissom_or.ty
+  </code></blockquote>
+<p></p>
 
 <p></p></li><li>Next, open an <span class='w_title'>Activity</span> window 
 and make sure that it has <span class='t_item'>Auto-refresh</span> enabled.  Unless your machine is 
@@ -378,17 +379,24 @@ patient, try doing 1000 iterations at a time instead before looking at
 an Orientation Map</b></span>.<p></p></li>
 -->
 
-<p><li> If you are <em>really</em> patient, you can
-change the number of units to something closer to real primate cortex,
-by quitting, editing the Python code file
-<code>examples/lissom_or.ty</code> to contain
-the line <code>BaseN=150</code> rather than <code>BaseN=48</code>, and restarting.  You'll need at
-least 640MB of memory and a lot of time, but you can then step through
-the simulation as above.  The final result after 20000 iterations
-(i.e., several hours) should be a much smoother map and neurons that
-are more orientation selective.  Even so, the overall organization and
-function should be similar.
+<p><li> If you are <em>really</em> patient, you can change the number
+of units to something closer to real primate cortex, by quitting,
+editing the Python code file <code>examples/lissom_or.ty</code> to
+change the <code>nominal_density</code> of V1 from 48 to 150,
+and doing:
+<blockquote><code class='to_type'>
+  ./topographica -g examples/lissom_or.ty
+  </code></blockquote>
+<p></p>
+  
+You'll need a lot of memory and a lot of time, but you can then step
+through the simulation as above.  The final result after 20000
+iterations (requiring several hours, if not days) should be a much
+smoother map and neurons that are more orientation selective.  Even
+so, the overall organization and function should be similar.
 </li></ol>
+
+
 
 <h2>Exploring further</h2>
 

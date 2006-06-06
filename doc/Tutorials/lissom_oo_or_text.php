@@ -21,7 +21,7 @@ orientation map network, which can be done by changing to the
 <code>examples/</code> directory and running "make
 lissom_oo_or_20000.typ".  Depending on the speed of your machine, you
 may want to go out for coffee at this point; on a 3GHz 512MB machine
-this training process currently takes an hour or so.
+this training process currently takes a little over an hour.
 </p>
 
 
@@ -324,6 +324,34 @@ that each processing stage eliminates some of the outer edges of the
 image, so that V1 is only looking at the center of the image on the
 LGN.
 </p></li>
+
+<li>The procedure above allows you to explore the relationship between
+the input and the final response after the cortex has settled due to
+the lateral connections.  If you want to understand the settling
+process itself, you can also visualize how the activity propagates
+from the retina to the LGN, from the LGN to V1, and then within V1.
+To do this, go to the console window and change the "Run for" value
+from 1.0 to 0.05.  Also make sure that there is an <span
+class='t_item'>Activity</span> window open, with Auto-refresh enabled.
+Now if you hit "Go" repeatedly, you will see the activity arrive first
+in the LGN, then in V1, and then gradually change within V1.
+
+<P>As explained in the
+<A HREF="../User_Manual/time.html">User Manual</A>,
+this process is controlled by the network structure and the delays
+between nodes.  For simplicity, let's consider time starting at zero.
+The first scheduled event is that the Retina will be asked to draw an
+input pattern at time 0.05 (the phase of the
+<?php classref('topo.sheets.generatorsheet','GeneratorSheet') ?>).  Thus
+the first visible activity occurs in the Retina, at 0.05.  The
+Retina is connected to the LGN with a delay of 0.05, and so the LGN
+responds at 0.10.  Again, the delay from the LGN to V1 is 0.05, so V1
+is first activated at time 0.15.  V1 also has self-connections with a
+delay of 0.05, and so V1 is then repeatedly activated every 0.05 timesteps.
+Eventually, the number of V1 activations reaches a fixed limit for LISSOM
+(usually about 10 timesteps), and no further events are generated or consumed
+until the next input is generated at time 1.05.  
+</li>
 </ol>
 
 
@@ -338,8 +366,13 @@ studied using the LISSOM model in Topographica as follows.
 <p>
 </p><ol>
 
-<p></p><li>First, quit and restart as above, but without loading the
-  saved <code>.typ</code> network.
+<p></p><li>First, quit from any existing simulation, and start with a fresh copy:
+
+<blockquote><code class='to_type'>
+  ./topographica -g examples/lissom_oo_or.ty
+  </code></blockquote>
+<p></p>
+
 
 <p></p></li><li>Next, open an <span class='w_title'>Activity</span> window 
 and make sure that it has <span class='t_item'>Auto-refresh</span> enabled.  Unless your machine is 
@@ -428,14 +461,20 @@ an Orientation Map</b></span>.<p></p></li>
 
 <p><li> If you are <em>really</em> patient, you can change the number
 of units to something closer to real primate cortex, by quitting,
-editing the Python code file <code>examples/lissom_or.ty</code> to
-contain the line <code>BaseN=150</code> rather than
-<code>BaseN=48</code>, and restarting.  You'll need at least 640MB of
-memory and a lot of time, but you can then step through the simulation
-as above.  The final result after 20000 iterations (requiring several hours,
-if not days) should be a much smoother map and neurons that are more
-orientation selective.  Even so, the overall organization and function
-should be similar.  </li></ol>
+editing the Python code file <code>examples/lissom_oo_or.ty</code> to
+change the <code>nominal_density</code> of V1 from 48 to 150,
+and doing:
+<blockquote><code class='to_type'>
+  ./topographica -g examples/lissom_oo_or.ty
+  </code></blockquote>
+<p></p>
+  
+You'll need a lot of memory and a lot of time, but you can then step
+through the simulation as above.  The final result after 20000
+iterations (requiring several hours, if not days) should be a much
+smoother map and neurons that are more orientation selective.  Even
+so, the overall organization and function should be similar.
+</li></ol>
 
 
 <h2>Exploring further</h2>
