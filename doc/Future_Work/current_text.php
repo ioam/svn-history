@@ -16,6 +16,11 @@ was first added to the list, or a change was made.)
 
 
 <li>
+2006/06/06: Fix TopoConsole "Run for" TaggedSlider so that pressing Return
+is the same as hitting Go.
+</li>
+
+<li>
 2006/05/15: Missing scheduled_actions in lissom examples
 </li>
 
