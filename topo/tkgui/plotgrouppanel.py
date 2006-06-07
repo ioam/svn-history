@@ -34,7 +34,7 @@ import ImageTk
 import Pmw
 from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, \
-     StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE, \
+     BooleanVar, StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE, \
      Scrollbar, Y, VERTICAL, HORIZONTAL
 
 from topo.base.parameterizedobject import ParameterizedObject
@@ -167,37 +167,42 @@ original data is no longer available.""")
         # Auto_refresh check button.
         # Default is to not have the window Auto-refresh, because some
         # plots are very slow to generate (e.g. some preference map
-        # plots).  Call self.auto_refresh_checkbutton.invoke() to
-        # enable autorefresh in a subclassed constructor function.
-        self.auto_refresh = False
+        # plots).  Call self.auto_refresh.set(True) to enable
+        # autorefresh in a subclassed constructor function.
+	self.auto_refresh = BooleanVar()
+	self.auto_refresh.set(False)
+        if self.auto_refresh.get():
+            self.console.auto_refresh_panels.append(self)
         self.auto_refresh_checkbutton = \
             Checkbutton(self.control_frame_1, text="Auto-refresh",
-                        command=self.toggle_auto_refresh)
+                        variable=self.auto_refresh,command=self.set_auto_refresh)
         self.auto_refresh_checkbutton.pack(side=RIGHT)
-        self.auto_refresh_checkbutton.invoke()
         self.balloon.bind(self.auto_refresh_checkbutton,
-"Whether to regenerate this plot whenever the simulation time advances.")
+            "Whether to regenerate this plot whenever the simulation time advances.")
 
 	# Normalize check button
-	self.normalize = False 
-	self.normalize_checkbutton = \
-            Checkbutton(self.control_frame_1,text="Normalize",command=self.toggle_normalize)
+	self.normalize = BooleanVar()
+	self.normalize.set(False)
+	self.normalize_checkbutton = Checkbutton(self.control_frame_1,
+             text="Normalize",variable=self.normalize,command=self.set_normalize)
 	self.normalize_checkbutton.pack(side=RIGHT)
 
         # Integerscaling check button
-	self.integerscaling = False
-	self.integerscaling_checkbutton = \
-           Checkbutton(self.control_frame_2,text="Integer scaling",
-                       command=self.toggle_integerscaling)
+	self.integerscaling = BooleanVar()
+	self.integerscaling.set(False)
+	self.integerscaling_checkbutton = Checkbutton(self.control_frame_2,
+             text="Integer scaling", variable=self.integerscaling,
+             command=self.set_integerscaling)
         self.integerscaling_checkbutton.pack(side=RIGHT)
         self.sizeconvertfn = identity
         
 	# Sheet coordinates check button
-	self.sheetcoords = False
-	self.sheetcoords_checkbutton = \
-            Checkbutton(self.control_frame_2,text="Sheet coordinates",
-                        command=self.toggle_sheetcoords)
+	self.sheetcoords = BooleanVar()
+	self.sheetcoords.set(False)
+	self.sheetcoords_checkbutton = Checkbutton(self.control_frame_2,
+             text="Sheet coordinates",variable=self.sheetcoords,command=self.set_sheetcoords)
         self.sheetcoords_checkbutton.pack(side=RIGHT)
+        self.sheetcoords_checkbutton.var=False
             
         # Main Plot group title can be changed from a subclass with the
         # command: self.plot_group.configure(tag_text='NewName')
@@ -245,9 +250,9 @@ original data is no longer available.""")
 	Needs to be re-implemented for subclasses.
         """
         plotgroup = PlotGroup([],
-                              normalize=self.normalize,
-			      sheetcoords=self.sheetcoords,
-                              integerscaling=self.integerscaling)
+                              normalize=self.normalize.get(),
+			      sheetcoords=self.sheetcoords.get(),
+                              integerscaling=self.integerscaling.get())
 	return plotgroup
 
 
@@ -353,19 +358,17 @@ original data is no longer available.""")
 	self.update_back_fwd_button()
 
 
-    def toggle_normalize(self):
+    def set_normalize(self):
         """Function called by Widget when check-box clicked"""
-        self.normalize = not self.normalize
-	self.plotgroup.normalize = self.normalize
+	self.plotgroup.normalize = self.normalize.get()
 	self.plotgroup.update_plots(False)
         self.display_plots()
 
 
-    def toggle_integerscaling(self):
+    def set_integerscaling(self):
         """Function called by Widget when check-box clicked"""
-        self.integerscaling = not self.integerscaling 
- 	self.plotgroup.integerscaling = self.integerscaling
-        if self.integerscaling:
+ 	self.plotgroup.integerscaling = self.integerscaling.get()
+        if self.integerscaling.get():
             self.plotgroup.sizeconvertfn = int
         else:
             self.plotgroup.sizeconvertfn = identity
@@ -470,49 +473,50 @@ original data is no longer available.""")
 	self.update_back_fwd_button()
 	
     def restore_panel_environment(self):
-	if self.plotgroup.normalize != self.normalize:
+	if self.plotgroup.normalize != self.normalize.get():
 	    self.normalize_checkbutton.config(state=NORMAL)
 	    self.normalize_checkbutton.invoke()
 	    self.normalize_checkbutton.config(state=DISABLED)
-	if self.plotgroup.sheetcoords != self.sheetcoords:
+	if self.plotgroup.sheetcoords != self.sheetcoords.get():
 	    self.sheetcoords_checkbutton.config(state=NORMAL)
 	    self.sheetcoords_checkbutton.invoke()
 	    self.sheetcoords_checkbutton.config(state=DISABLED)
-	if self.plotgroup.integerscaling != self.integerscaling:
+	if self.plotgroup.integerscaling != self.integerscaling.get():
 	    self.integerscaling_checkbutton.config(state=NORMAL)
 	    self.integerscaling_checkbutton.invoke()
 	    self.integerscaling_checkbutton.config(state=DISABLED)
 	
 
-    def toggle_auto_refresh(self):
+    def set_auto_refresh(self):
         """Function called by Widget when check-box clicked"""
-        self.auto_refresh = not self.auto_refresh
-        self.debug("Auto-refresh = ", self.auto_refresh)
         topo.tkgui.show_cmd_prompt()
 	# when refreshing through auto-refresh, we know we want to
 	# save the new plotgroup, so we reset history_index
 	self.history_index = len(self.plotgroups_history)-1
-        if self.auto_refresh:
-            self.console.auto_refresh_panels.append(self)
+        if self.auto_refresh.get():
+            if not (self in self.console.auto_refresh_panels):
+                self.console.auto_refresh_panels.append(self)
         else:
-            self.console.auto_refresh_panels.remove(self)
+            if self in self.console.auto_refresh_panels:
+                self.console.auto_refresh_panels.remove(self)
+            
         # JAB: it might make sense for turning on auto-refresh
         # to do a refresh automatically, though that might have
         # unexpected behavior for a preference map calculation
         # (where it would do unnecessary, and potentially lengthy,
         # recalculation).
         
-    def toggle_sheetcoords(self):
+    def set_sheetcoords(self):
         """Function called by Widget when check-box clicked"""
-        self.sheetcoords = not self.sheetcoords
-	self.plotgroup.sheetcoords = self.sheetcoords
+	self.plotgroup.sheetcoords = self.sheetcoords.get()
 	self.plotgroup.update_plots(False)
 	self.display_plots()
 
 
     def destroy(self):
-        if self.auto_refresh:
-            self.console.auto_refresh_panels.remove(self)
+        if self.auto_refresh.get():
+            if self in self.console.auto_refresh_panels:
+                self.console.auto_refresh_panels.remove(self)
         Frame.destroy(self)
 
     # YCHACKALERT: This is a hack to avoid number of argument mismatch

@@ -37,10 +37,8 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
 
 	plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,pgt_name,**config)
 
-	self.normalize = self.pgt.normalize
-        self.plotgroup.normalize=self.normalize
-        if self.normalize:
-	    self.normalize_checkbutton.select()
+	self.normalize.set(self.pgt.normalize)
+        self.plotgroup.normalize=self.normalize.get()
 
 	 # Command used to refresh the plot, if any
         self.cmdname = StringVar()
@@ -66,10 +64,11 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         self.balloon.bind(cmdbox,getdoc(self.plotgroup.params()['updatecommand']))
 
        
-        # To make the auto-refresh button not on by default when opening the panel
-        # but it is not the case for the Activity PlotGroup
-	if self.mapname.get() != 'Activity':
-	    self.auto_refresh_checkbutton.invoke()
+        # To make the auto-refresh button off by default except for
+        # the Activity PlotGroup
+	if self.mapname.get() == 'Activity':
+	    self.auto_refresh.set(True)
+            self.set_auto_refresh()
 
         # we do not want to refresh for subclasses, when calling the superclass constructor:
         # refresh will need to be explicitly called from subclasses
@@ -90,9 +89,9 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
         ### Otherwise, we could assume that each panel is associated with a PlotGroup
         ### and then specify a panel for each template. (as it is done from topoconsole)
 	plotgroup = TemplatePlotGroup([],self.pgt,None,
-                                      normalize=self.normalize,
-				      sheetcoords=self.sheetcoords,
-                                      integerscaling=self.integerscaling)
+                                      normalize=self.normalize.get(),
+				      sheetcoords=self.sheetcoords.get(),
+                                      integerscaling=self.integerscaling.get())
 	return plotgroup
 
     def update_plotgroup_variables(self):

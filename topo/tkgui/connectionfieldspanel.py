@@ -13,7 +13,8 @@ __version__='$Revision$'
 import Pmw
 import __main__
 
-from Tkinter import StringVar, Frame, TOP, LEFT, YES, X, Message, Entry,Label,NSEW, Checkbutton,NORMAL,DISABLED
+from Tkinter import StringVar, BooleanVar, Frame, TOP, LEFT, YES, X, Message
+from Tkinter import Entry, Label, NSEW, Checkbutton, NORMAL, DISABLED
 
 import topo
 
@@ -51,11 +52,8 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
 	self._add_region_menu()
         self._add_xy_boxes()
 
-	# By default, the UnitWeight Plots are situated.
-        self.toggle_situate()
-	self.situate_checkbutton.select()
-
-        self.auto_refresh_checkbutton.invoke()
+        self.auto_refresh.set(False)
+        self.set_auto_refresh()
 
 	self.refresh()
 
@@ -90,10 +88,10 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
 
 
     def _add_situate_button(self):
-        self.situate = 0
+	self.situate = BooleanVar()
+	self.situate.set(True)
         self.situate_checkbutton = Checkbutton(self.__params_frame,
-                                                    text="Situate",
-                                                    command=self.toggle_situate)
+             text="Situate",variable=self.situate,command=self.set_situate)
         self.situate_checkbutton.pack(side=LEFT)
         # Should move into the documentation for a situate parameter shared with projectionpanel
         self.balloon.bind(self.situate_checkbutton,
@@ -102,11 +100,10 @@ weights outside the ConnectionField.  If False, plots only the actual weights th
 are stored.""")
 
 
-    def toggle_situate(self):
+    def set_situate(self):
         """Set the attribute situate"""
-        self.situate = not self.situate
         if self.plotgroup != None:
-            self.plotgroup.situate = self.situate
+            self.plotgroup.situate = self.situate.get()
         self.initial_plot = True
         self.height_of_tallest_plot = self.min_master_zoom = 1
         self.plotgroup.update_plots(False)
@@ -189,7 +186,7 @@ It is an error to request a unit outside the area of the Sheet.""")
                               foreground = 'white',
                               pady = 20)
             w.pack(expand = 1, fill = 'both', padx = 4, pady = 4)
-	self.plotgroup.situate=self.situate
+	self.plotgroup.situate=self.situate.get()
 	self.plotgroup.sheet_name = self.region.get()
 
 
@@ -202,9 +199,9 @@ It is an error to request a unit outside the area of the Sheet.""")
         the Plot objects.
         """
 	plotgroup = ConnectionFieldsPlotGroup([],self.pgt,self.region.get(),self.x,self.y,
-                                              normalize=self.normalize,
-                                              sheetcoords=self.sheetcoords,
-                                              integerscaling=self.integerscaling)
+                                              normalize=self.normalize.get(),
+                                              sheetcoords=self.sheetcoords.get(),
+                                              integerscaling=self.integerscaling.get())
 	return plotgroup
 
 
@@ -248,7 +245,7 @@ It is an error to request a unit outside the area of the Sheet.""")
 
     def restore_panel_environment(self):
 	super(ConnectionFieldsPanel,self).restore_panel_environment()
-	if self.plotgroup.situate != self.situate:
+	if self.plotgroup.situate != self.situate.get():
 	    self.situate_checkbutton.config(state=NORMAL)
 	    self.situate_checkbutton.invoke()
 	    self.situate_checkbutton.config(state=DISABLED)

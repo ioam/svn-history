@@ -7,8 +7,10 @@ __version__='$Revision$'
 
 
 import __main__
-from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
-     Entry, Canvas, FLAT, Checkbutton, NORMAL, DISABLED
+
+from Tkinter import StringVar, BooleanVar, Frame, YES, LEFT, TOP, RIGHT
+from Tkinter import X, Message, Entry, Canvas, FLAT, Checkbutton, NORMAL, DISABLED
+
 import Pmw
 import ImageTk
 from math import ceil
@@ -58,7 +60,6 @@ def cmp_projections(p1,p2):
 class ProjectionPanel(TemplatePlotGroupPanel):
     def __init__(self,parent,console=None,pgt_name=None,**config):
         
-
         self.region = StringVar()
 	self.density_str = StringVar()
         self.density_str.set('10.0')
@@ -72,6 +73,7 @@ class ProjectionPanel(TemplatePlotGroupPanel):
         self.__params_frame.pack(side=LEFT,expand=YES,fill=X)
 
         self._add_situate_button()
+	self.situate.set(False)
         self._add_region_menu()
         
      #    self.MIN_PLOT_HEIGHT = 1
@@ -90,7 +92,9 @@ class ProjectionPanel(TemplatePlotGroupPanel):
 
         self._add_projection_menu()
 
-        self.auto_refresh_checkbutton.invoke()
+        self.auto_refresh.set(False)
+        self.set_auto_refresh()
+        
         self.refresh()
 
     def _add_region_menu(self):
@@ -126,10 +130,10 @@ class ProjectionPanel(TemplatePlotGroupPanel):
 
     def _add_situate_button(self):
         
-        self.situate = 0
+	self.situate = BooleanVar()
+	self.situate.set(True)
         self.situate_checkbutton = Checkbutton(self.__params_frame,
-                                                    text="Situate",
-                                                    command=self.toggle_situate)
+             text="Situate",variable=self.situate,command=self.set_situate)
         self.situate_checkbutton.pack(side=LEFT)
         # Should move into the documentation for a situate parameter shared with connectionfieldspanel
         self.balloon.bind(self.situate_checkbutton,
@@ -137,11 +141,10 @@ class ProjectionPanel(TemplatePlotGroupPanel):
 weights outside the ConnectionField.  If False, plots only the actual weights that
 are stored.""")
 
-    def toggle_situate(self):
-        """Set the attribute situate"""
-        self.situate = not self.situate
+    def set_situate(self):
+        """Set the attribute situate."""
         if self.plotgroup != None:
-            self.plotgroup.situate = self.situate
+            self.plotgroup.situate = self.situate.get()
         self.plotgroup.initial_plot = True
         self.plotgroup.height_of_tallest_plot = self.min_master_zoom = 1
 	self.plotgroup.update_plots(False)
@@ -278,7 +281,7 @@ are stored.""")
         ('Projection', self.weight_name, self.density, self.region).
         """
         self.density = float(eval(self.density_str.get(),__main__.__dict__))
-	self.plotgroup.situate= self.situate
+	self.plotgroup.situate= self.situate.get()
 	self.plotgroup.density = self.density
 	self.plotgroup.sheet_name=self.region.get()
 	self.plotgroup.weight_name = self.weight_name.get()
@@ -291,9 +294,9 @@ are stored.""")
         """
  	plotgroup = ProjectionPlotGroup([],self.pgt,self.region.get(),
 					self.weight_name.get(),self.density,
-                                        normalize=self.normalize,
-                                        sheetcoords=self.sheetcoords,
-                                        integerscaling=self.integerscaling)
+                                        normalize=self.normalize.get(),
+                                        sheetcoords=self.sheetcoords.get(),
+                                        integerscaling=self.integerscaling.get())
   	return plotgroup
 
 
@@ -358,7 +361,7 @@ are stored.""")
 
     def restore_panel_environment(self):
 	super(ProjectionPanel,self).restore_panel_environment()
-	if self.plotgroup.situate != self.situate:
+	if self.plotgroup.situate != self.situate.get():
 	    self.situate_checkbutton.config(state=NORMAL)
 	    self.situate_checkbutton.invoke()
 	    self.situate_checkbutton.config(state=DISABLED)

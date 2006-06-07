@@ -212,7 +212,7 @@ Each type will have various parameters that can be changed.""")
         if not self.generator_sheets_patterns[button_name]['editing']:
             self.generator_sheets_patterns[button_name]['pattern_generator'] = copy.copy(self.__current_pattern_generator)
         else:
-            if self.auto_refresh:
+            if self.auto_refresh.get():
                 self.__setup_pattern_generators()
                 self.refresh()
         
@@ -227,7 +227,7 @@ Each type will have various parameters that can be changed.""")
         self.__current_pattern_generator = self.pattern_generators[pattern_generator_name]()
         self.__params_frame.create_widgets(self.__current_pattern_generator)
 
-        if self.auto_refresh: 
+        if self.auto_refresh.get(): 
 	    self.refresh()
 
 
@@ -280,7 +280,7 @@ Each type will have various parameters that can be changed.""")
         self.present_length.setvalue(DEFAULT_PRESENTATION)
         self.learning_button.deselect()
         self.pg_choice_box.invoke(self.__default_pattern_generator_name)
-        if self.auto_refresh: self.refresh()
+        if self.auto_refresh.get(): self.refresh()
 
 
     ### JCALERT! This has to be re-implemented for testpattern, it has to be done in a better way:
@@ -307,11 +307,11 @@ Each type will have various parameters that can be changed.""")
 	    view_dict[each] = topo.base.sheetview.SheetView((k(),k.bounds),src_name=each)
 	    channels = {'Strength':each,'Hue':None,'Confidence':None}
 	    ### JCALERT! it is not good to have to pass '' here... maybe a test in plot would be better
-	    plot_list.append(make_template_plot(channels,view_dict,density,None,self.normalize,name=''))
+	    plot_list.append(make_template_plot(channels,view_dict,density,None,self.normalize.get(),name=''))
 	new_plotgroup = topo.plotting.plotgroup.PlotGroup(plot_list,
-                                                          normalize=self.normalize,
-                                                          sheetcoords=self.sheetcoords,
-                                                          integerscaling=self.integerscaling)
+                                                          normalize=self.normalize.get(),
+                                                          sheetcoords=self.sheetcoords.get(),
+                                                          integerscaling=self.integerscaling.get())
 	new_plotgroup.height_of_tallest_plot = self.plotgroup.height_of_tallest_plot
 	new_plotgroup.initial_plot = self.plotgroup.initial_plot
 	new_plotgroup.sheetcoords = self.plotgroup.sheetcoords
@@ -323,22 +323,19 @@ Each type will have various parameters that can be changed.""")
  				
     
     ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
-    def toggle_normalize(self):
+    def set_normalize(self):
         """Function called by Widget when check-box clicked"""
-        self.normalize = not self.normalize
 	self.refresh()
 
     ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
-    def toggle_sheetcoords(self):
+    def set_sheetcoords(self):
         """Function called by Widget when check-box clicked"""
-        self.sheetcoords = not self.sheetcoords
 	self.refresh()
 
     ### JCALERT: have to re-implement it to regenerate the PlotGroup anytime.
-    def toggle_integerscaling(self):
+    def set_integerscaling(self):
         """Function called by Widget when check-box clicked"""
-        self.integerscaling = not self.integerscaling 
-        if self.integerscaling:
+        if self.integerscaling.get():
             self.plotgroup.sizeconvertfn = int
         else:
             self.plotgroup.sizeconvertfn = identity
