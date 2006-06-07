@@ -62,8 +62,6 @@ class OutputFnParameter(ClassSelectorParameter):
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
-    packages = []
-    
     def __init__(self,default=IdentityOF(),**params):
         super(OutputFnParameter,self).__init__(OutputFn,default=default,**params)
 
@@ -128,8 +126,6 @@ class LearningFnParameter(ClassSelectorParameter):
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
-    packages = []
-
     def __init__(self,default=Hebbian(),**params):
         super(LearningFnParameter,self).__init__(LearningFn,default=default,**params)        
 
@@ -170,8 +166,6 @@ class ResponseFnParameter(ClassSelectorParameter):
     """
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
-
-    packages = []
 
     def __init__(self,default=DotProduct(),**params):
         super(ResponseFnParameter,self).__init__(ResponseFn,default=default,**params)        

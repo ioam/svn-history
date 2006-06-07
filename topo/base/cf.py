@@ -345,8 +345,6 @@ class CFPResponseFnParameter(ClassSelectorParameter):
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 
-    packages = []
-
     def __init__(self,default=CFPRF_Plugin(),**params):
         super(CFPResponseFnParameter,self).__init__(CFPResponseFn,default=default,**params)        
 
@@ -405,8 +403,6 @@ class CFPLearningFnParameter(ClassSelectorParameter):
     """
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
-
-    packages = []
 
     def __init__(self,default=CFPLF_Identity(),**params):
         super(CFPLearningFnParameter,self).__init__(CFPLearningFn,default=default,**params)        
@@ -492,8 +488,6 @@ class CFPOutputFnParameter(ClassSelectorParameter):
     """
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
-
-    packages = []
 
     def __init__(self,default=CFPOF_Plugin(),**params):
         super(CFPOutputFnParameter,self).__init__(CFPOutputFn,default=default,**params)        
