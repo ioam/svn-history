@@ -61,14 +61,14 @@ number that allows to distinguish between different optimized
 versions. This is helpful both for understanding and for ensuring
 correctness.
 
-<P>For example, consider <code>CFDotProduct</code>, from
-<code>topo.responsefns.basic</code>. If users wish to use a version
+<P>For example, consider <code>CFPRF_DotProduct</code>, from
+<code>topo.responsefns.projfns</code>. If users wish to use a version
 optimized by having been written in C, they can instead import
-<code>CFDotProduct_opt1</code> from
+<code>CFPRF_DotProduct_opt</code> from
 <code>topo.responsefns.optimized</code>. We use
-<code>CFDotProduct_opt1</code> as standard in our code because it's
+<code>CFPRF_DotProduct_opt</code> as standard in our code because it's
 much faster than --- but otherwise identical to --- the unoptimized
-version. However, because <code>CFDotProduct_opt1</code> relies on a
+version. However, because <code>CFPRF_DotProduct_opt</code> relies on a
 more complex setup (having the weave module installed, as well as a
 correctly configured C++ compiler), we cannot assume all users will
 have access to it. It is also extremely difficult to read and
