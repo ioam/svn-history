@@ -479,8 +479,10 @@ so, the overall organization and function should be similar.
 
 <h2>Exploring further</h2>
 
-<p> Topographica comes with
-additional examples, and more are currently being added. Any valid Python code can
+<p> Topographica comes with additional examples, and more are
+currently being added.  In particular, the above examples work
+in nearly the same way with the simpler <code>lissom_or.ty</code>
+model.  Any valid Python code can
 be used to control and extend Topographica; documentation for Python and existing Topographica commands
 can be accessed from the <span class='t_item'>Help</span> menu of the
 <span class='w_title'>Topographica Console</span> window.

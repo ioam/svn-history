@@ -9,9 +9,11 @@ objects to a saved orientation map network, and to visualize and
 analyze the responses.  It also shows how to develop a new simulation
 using different input patterns.</DD><BR>
 
+<!--
 <DT><A href="lissom_or.html"><strong>LISSOM Orientation Map without ON/OFF</strong></A></DT>
 <DD>Simpler version of the above tutorial, consisting of one input region (Retina)
 and one cortical region (V1)</DD><BR>
+-->
 
 <DT><A href="som_retinotopy.html"><strong>SOM Retinotopic Map</strong></A></DT>
 <DD>How to run a model that develops selectivity for position, mapping
