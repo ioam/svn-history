@@ -141,7 +141,7 @@ ConnectionFields can be selected and analyzed.
 
 
 <P><DT>Map statistics</DT><DD>  
-  Will implement general routines for measuring the statistical
+ We will implement general routines for measuring the statistical
   properties of Sheets, such as for computing a perceived orientation.
 </DL>
 
