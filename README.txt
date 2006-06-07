@@ -1,6 +1,10 @@
-This version of the Topographica cortical map simulator is still under
-active development.  An updated version may be available from
-topographica.org.
+Topographica is a general-purpose neural simulator focusing on
+topographic maps.  This version of the simulator is still under active
+development; an updated version may be available from
+topographica.org.  Subsequent versions are not guaranteed to be able
+to load files saved from this version, and scripts developed using
+this version are likely to need modification when subsequent versions
+are released.
 
 The Topographica software code and documentation are copyright
 2005-2006 James A. Bednar, Christopher Ball, Christopher Palmer,
