@@ -33,7 +33,6 @@ topo.sim.name = "hierarchical"
 
 # input patterns
 
-GeneratorSheet.nominal_bounds = BoundingBox(points=((-0.75,-0.5),(0.75,0.5)))
 GeneratorSheet.period = 1.0
 GeneratorSheet.phase = 0.25
 GeneratorSheet.nominal_density = 20
@@ -56,7 +55,7 @@ left_input_pattern = topo.patterns.basic.Line(
 
 right_input_pattern = topo.patterns.basic.Line(
     thickness=0.02,
-    bounds=BoundingBox(points=((-1.05,-0.8),(1.05,0.8))),
+    bounds=BoundingBox(points=((-0.8,-1.05),(0.8,1.05))),
     x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=100)),
     y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
     orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=300)))
@@ -85,12 +84,15 @@ CFProjection.response_fn = CFPRF_DotProduct_opt()
 # build simulation
 
 # Sheets
-topo.sim['LeftRetina'] = GeneratorSheet(input_generator=left_input_pattern)
-topo.sim['RightRetina'] = GeneratorSheet(input_generator=right_input_pattern)
+topo.sim['LeftRetina'] = GeneratorSheet(input_generator=left_input_pattern,
+	nominal_bounds = BoundingBox(points=((-0.75,-0.5),(0.75,0.5))))
+topo.sim['RightRetina'] = GeneratorSheet(input_generator=right_input_pattern,
+	nominal_bounds = BoundingBox(points=((-0.5,-0.75),(0.5,0.75))))
 
 topo.sim['V1'] = CFSOM(alpha_0 = 0.5)
-topo.sim['V2'] = CFSOM(alpha_0 = 0.5)
-topo.sim['V3'] = CFSOM(alpha_0 = 0.5)
+topo.sim['V2'] = CFSOM(alpha_0 = 0.5,
+	nominal_bounds = BoundingBox(points=((-0.4,-0.4),(0.4,0.6))))
+topo.sim['V3'] = CFSOM(alpha_0 = 0.5,nominal_density=5)
 
 # Projections to V1
 topo.sim.connect('LeftRetina','V1',delay=0.5,connection_type=CFProjection,name='AfferentLeft')
