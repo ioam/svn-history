@@ -48,7 +48,7 @@ Topographica is installed in /home/jbednar/public/topographica/.
   
 <p class='center'>
 <img src="images/topographica_console.png" alt="Console Window"
-align="middle" width="496" height="215">
+align="middle" width="370" height="239">
 </p>
 <p>
 The window and button style will differ on different platforms, but
@@ -69,7 +69,7 @@ the <span class='t_item'>Simulation</span> menu), but is also shown
 below:
 <p class='center'>
 <img src="images/lissom_network_diagram_oo.png" alt="LISSOM network"
-align="middle" width="570" height="412">
+align="middle" width="569" height="413">
 </p>
 
 <p></p>
@@ -81,7 +81,7 @@ select <span class='t_item'>Test pattern</span> from the <span class='t_item'>Si
 
 <p class='center'>
 <img src="images/test_pattern_oo.png" alt="Test Pattern window"
-align="middle" WIDTH="324" HEIGHT="600">
+align="middle" WIDTH="426" HEIGHT="730">
 </p>
 
 <p>
@@ -94,7 +94,7 @@ This will present a horizontal line.
 <li>To see the result, select <span class='t_item'>Activity</span> from
 the <span class='t_item'>Plots</span> menu on the <span class='w_title'>Topographica Console</span> to get:
 <p class='center'>
-<img src="images/activity_line_oo.png" alt="Response to a line" align="middle" width="424" height="256">
+<img src="images/activity_line_oo.png" alt="Response to a line" align="middle" width="676" height="328">
 </p>
 
 This window shows the response for each neural area.  
@@ -140,7 +140,7 @@ to the neuron in the center of the cortex (by default):
 
 <p class="center">
 <img src="images/unit_weights_0_0_oo.png" alt="Weights of one
-neuron" align="middle" WIDTH="566" HEIGHT="266">
+neuron" align="middle" WIDTH="676" HEIGHT="358">
 </p>
 
 <p> The plot shows the afferent weights to V1 (i.e., connections from
@@ -164,7 +164,7 @@ class='t_item'>Projection</span> list:
 
 <p class="center">
 <img src="images/projection_oo.png" alt="Afferent weights of many
-neurons" align="middle" WIDTH="639" HEIGHT="449">
+neurons" align="middle" WIDTH="659" HEIGHT="491">
 </p>
 
 This plot shows the afferent weights from the LGN ON sheet for every fifth neuron in each
@@ -187,7 +187,7 @@ seconds to complete; it is normal for the Topographica windows not to
 refresh during this time.  Once it completes, you should see:
 
 <p class="center">
-<img src="images/oo_or_map.png" alt="Orientation map" width="617" height="292">
+<img src="images/oo_or_map.png" alt="Orientation map" width="629" height="369">
 </p><br>
 
 <P>
@@ -219,10 +219,9 @@ on the <span class='w_title'>Test pattern</span> window and then looking
 at the refreshed image in the <span class='w_title'>Activity</span> window:
 
 <p class="center">
-<img src="images/activity_line_oo_or.png" alt="Color-coded response to a line" width="424" height="256" ><br />
+<img src="images/activity_line_oo_or.png" alt="Color-coded response to a line" width="676" height="328" ><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
 </p><br>
-
 
 (Alternatively, if you want to keep the old plot for comparison, you
 can make sure that <span class='t_item'>Auto-refresh</span> is not enabled in it, then
@@ -250,9 +249,10 @@ different orientations:
 
 <p class="center">
 <img src="images/unit_weights_0_0_oo_or.png" alt="Colorized weights of
-one neuron" align="middle" width="566" height="266" ><br />
+one neuron" align="middle" width="676" height="358" ><br />
 <img src="images/or_key_horiz_transparent.png" alt="Orientation key" height="23" width="288">
-</p>
+</p><br>
+
 <p>
 Look at the <span class='t_item'>LateralExcitatory</span> weights, which show that
 the neurons around the location to the right of the retina's center
@@ -316,7 +316,7 @@ orientation-specific responses to large contours in the image:
 </p>
 
 <p class="center">
-<img src="images/natural_image_oo_or.png" alt="Ellen Arthur" align="middle" width="424" height="256" ><br />
+<img src="images/natural_image_oo_or.png" alt="Ellen Arthur" align="middle" width="676" height="328" ><br />
 </p>
 
 <P>Be aware when comparing the Retina and V1 plots for a photograph
