@@ -12,7 +12,7 @@ is inherited from parent classes if not specified in a subclass.
 <A HREF="../Reference_Manual/topo.base.parameterizedobject.html#ParameterizedObject">
 ParameterizedObject</A>s.  For instance, Sheets, Projections, and
 PatternGenerators are all ParameterizedObjects.  The Parameters of a
-Sheet include its <code>density</code> and <code>bounds</code>, and
+Sheet include its <code>nominal_density</code> and <code>nominal_bounds</code>, and
 the Parameters of a PatternGenerator include its <code>scale</code> and
 <code>offset</code>.
 

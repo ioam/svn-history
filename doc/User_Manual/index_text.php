@@ -2,7 +2,7 @@
 manual, with the tutorial as a guide, it can be difficult to figure
 out the underlying principles and appropriate way to use Topographica.
 To clarify these issues, a detailed user manual is currently under
-development (as of 2/2006), and will be posted here when it is
+development (as of 6/2006), and will be posted here when it is
 usable.  Sections that are ready so far include:
 
 <P>

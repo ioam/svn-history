@@ -29,10 +29,6 @@ plots.
 2006/05/15 (CB): Matching lissom_oo_or with C++ lissom. 
 </li>
 
-<li>
-2006/05/23 (JB): tkgui making shell command prompt skip a line. If it doesn't prompt, it won't come back if information is printed.
-</li>
-
 
 <li>
 2006/05/23 (JB): binding help balloon to the widget (already bound to the label) in parametersframe so that help can be seen for objects that are e.g. being selected.
@@ -149,11 +145,7 @@ display list of sheet classes etc from a Parameter).
 </li>
 
 <li>
-2006/02/24 (JB): find_classes_in_package() will
-become a method of ClassSelectorParameter. Then module as well as package list 
-for ClassSelectorParameter. E.g. Want BoundingBoxParameter to be a 
-ClassSelectorParameter, but don't want to add all of topo.base, just 
-topo.base.boundingregion.
+2006/02/24 (JB): find_classes_in_package() will become a method of ClassSelectorParameter. 
 </li>
 
 <li>
