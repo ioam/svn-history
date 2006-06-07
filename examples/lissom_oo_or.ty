@@ -99,7 +99,7 @@ topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
 
 
 topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"),
-                  connection_type=CFProjection,strength=0.75,name='LGNOnAfferent',
+                  connection_type=CFProjection,strength=0.5,name='LGNOnAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590)
 
 topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"),
