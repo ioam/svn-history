@@ -651,7 +651,7 @@
 	gives a the startup time 65% of the previous time.
 
 	* topo/tkgui/topoconsole.py 1.79: Shell prints new prompt
-	everytime there simulation is run, as it did before. Otherwise the
+	everytime the simulation is run, as it did before. Otherwise the
 	prompt does not appear again after messages are printed.
 
 2006-05-21  ceball  <ceball@lodestar.inf.ed.ac.uk>
@@ -2304,7 +2304,7 @@
 	* topo/base/connectionfield.py 1.172: Added HACKALERT.
 
 	* topo/tests/lissom_or_reference.ty 1.30: Updates to match changes
-	to equivalen C++ lissom example.
+	to equivalent C++ lissom example.
 
 	* doc/Future_Work/current_text.php 1.37: Removed a task! About
 	pickling!
@@ -2878,7 +2878,7 @@
 	* topo/plotting/plotgroup.py 1.107,
 	topo/tkgui/templateplotgrouppanel.py 1.15: Replaced the import
 	statement for the commands within templateplotgrouppanel, and
-	import them in __main__.__dict__. They laso are executed in
+	import them in __main__.__dict__. They also are executed in
 	__main__.__dict__ from the PlotGroups.
 
 2006-04-13 ceball <ceball@lodestar.inf.ed.ac.uk>
@@ -3726,7 +3726,7 @@
 
 2006-03-22  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
-	* topo/base/simulator.py 1.47: Fixed bug in recent checking;
+	* topo/base/simulator.py 1.47: Fixed bug in recent checkin;
 	scheduled events were failing due to lack of a src or dest for
 	which to print information
 
@@ -3744,8 +3744,8 @@
 	* topo/plotting/plotgroup.py 1.94: Replaced the use of
 	get_in_projection_by_name() by the use of projections(). Now that
 	the problem of having a unique name is solved, we do not need to
-	return a list of projections for a given name. Deeleted
-	correponding Aletrt. Cleaned up the doc.
+	return a list of projections for a given name. Deleted
+	correponding Alert. Cleaned up the doc.
 
 2006-03-22  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
@@ -4325,7 +4325,7 @@
 	speed up CVS downloads
 
 	* doc/Tutorials/lissom_oo_or_text.php 1.6,
-	doc/Tutorials/lissom_or_text.php 1.2: Changed tututorial
+	doc/Tutorials/lissom_or_text.php 1.2: Changed tutorial
 	instructions to ask users to build a map rather than assuming it
 	is in CVS
 
@@ -4491,7 +4491,7 @@
 	* runtests 1.9: Commented out argument-processing to allow
 	runtests (and 'make all') to work.
 
-	* examples/som_retinotopy.ty 1.23: Uses indepedent streams for
+	* examples/som_retinotopy.ty 1.23: Uses independent streams for
 	input pattern parameters.
 
 	* topo/plotting/templates.py 1.34: Made image_path be a
@@ -4867,7 +4867,7 @@
 	* topo/base/parameterclasses.py 1.13,
 	topo/base/patterngenerator.py 1.67, topo/tkgui/testpattern.py
 	1.22: Added suffix_to_lose to ClassSelectorParameter, allowing
-	that siffix to be removed when the class name is
+	that suffix to be removed when the class name is
 	displayed. PatternGeneratorParameter removes 'Generator' by
 	default.
 
