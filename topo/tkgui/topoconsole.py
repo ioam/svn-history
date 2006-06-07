@@ -27,8 +27,8 @@ import topo
 import topo.commands.basic
 from topo.plotting.templates import PlotGroupTemplate, plotgroup_templates
 import topo.base.simulation
-import topo.base.parameterizedobject
 
+from topo.base.parameterizedobject import ParameterizedObject
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from connectionfieldspanel import ConnectionFieldsPanel
 from projectionpanel import ProjectionPanel
@@ -110,7 +110,7 @@ class OutputText(Text):
 
         
 
-class PlotsMenuEntry(topo.base.parameterizedobject.ParameterizedObject):
+class PlotsMenuEntry(ParameterizedObject):
     """
     Use these objects to populate the TopoConsole Plots pulldown.  The
     pulldown requires a name and a function to call when the item is
@@ -168,10 +168,7 @@ class PlotsMenuEntry(topo.base.parameterizedobject.ParameterizedObject):
 
 class TopoConsole(Frame):
     """
-    TopoConsole class file.
-    
-    Primary window for the Tk-based GUI.  Loads, saves, calls other window
-    frames in plotframe.py.
+    Main window for the Tk-based GUI.
     """
     def __init__(self, parent=None,**config):
         Frame.__init__(self,parent,config)
@@ -322,9 +319,10 @@ class TopoConsole(Frame):
                                     slider_length=150,
                                     min_value=0,max_value=20000,
                                     string_format='%.4f')
+        self.balloon.bind(self.run_for,"Duration to run the simulation, e.g. 0.0500, 1.0, or 20000.")
+        #self.run_for.bind('<Return>',self.exec_cmd) # Doesn't seem to work
         self.run_for.pack(side=LEFT)
 
-        self.balloon.bind(self.run_for,"Duration to run the simulation, e.g. 0.0500, 1.0, or 20000.")
         go = Button(learning_frame,text="Go",
                     command=Pmw.busycallback(self.do_learning))
         go.pack(side=LEFT)
@@ -362,15 +360,14 @@ class TopoConsole(Frame):
         # would stay at the size it was before all widgets were removed)
         Tkinter.Frame(cw).pack()
 
-
         ### Make a ComboBox (command_entry) for entering commands.
         self.command_entry=Pmw.ComboBox(cw,autoclear=1,history=1,dropdown=1,
-                                        label_text='>>>',labelpos='w',
+                                        label_text='>>> ',labelpos='w',
                                selectioncommand=Pmw.busycallback(self.exec_cmd))
         self.balloon.bind(self.command_entry,
-"""Accepts any valid Python command and executes it in main as if typed at a terminal window.""")
+             """Accepts any valid Python command and executes it in main as if typed at a terminal window.""")
 
-        ### Now we make a Text (command_output, for output from commands)
+        ### Make a Text (command_output, for output from commands)
         ### with a Scrollbar, both inside a Frame (command_output_frame,
         ### for convenient access)
         self.command_output_frame = Tkinter.Frame(cw)
@@ -390,7 +387,7 @@ class TopoConsole(Frame):
 
     def toggle_command_widgets(self):
         if self.show_command_widgets.get()==1:
-            self.command_entry.pack(side=TOP,expand=YES,fill=X)
+            self.command_entry.pack(side=BOTTOM,expand=YES,fill=X)
             self.command_output_frame.pack()
         else:
             self.command_entry.pack_forget()
@@ -446,8 +443,7 @@ class TopoConsole(Frame):
                 self.messageBar.message('state', 'Loaded ' + self.loaded_script)
             else:
                 self.messageBar.message('state', 'Failed to load ' + self.loaded_script)
-        topo.tkgui.show_cmd_prompt()
-
+        
 
     # CEBHACKALERT:
     # save_ and load_snapshot() and load_network() ought to close open windows such
@@ -469,7 +465,6 @@ class TopoConsole(Frame):
             self.messageBar.message('state', 'Loaded snapshot ' + snapshot_name)
 
         self.auto_refresh()
-        topo.tkgui.show_cmd_prompt()
 
 
     def save_snapshot(self):
@@ -489,8 +484,6 @@ class TopoConsole(Frame):
                 
             topo.commands.basic.save_snapshot(snapshot_name)
             self.messageBar.message('state', 'Snapshot saved to ' + snapshot_name)
-
-        topo.tkgui.show_cmd_prompt()
     
                 
     def reset_network(self):
@@ -607,7 +600,6 @@ class TopoConsole(Frame):
         capture_stderr.close()
 
 	self.messageBar.message('state', result)
-        topo.tkgui.show_cmd_prompt()
 
     
     def load_script_file(self,filename):
@@ -671,6 +663,7 @@ class TopoConsole(Frame):
         for i in xrange(iters):
             recenttimes.append(time.time())
             length = len(recenttimes)
+
             if (length>50):
                 recenttimes.pop(0)
                 length-=1
@@ -694,7 +687,6 @@ class TopoConsole(Frame):
 
 
         self.messageBar.message('state', message)
-        #topo.tkgui.show_cmd_prompt()
 
         
         
