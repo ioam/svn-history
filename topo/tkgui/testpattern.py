@@ -54,7 +54,8 @@ class TestPattern(plotgrouppanel.PlotGroupPanel):
 	super(TestPattern,self).__init__(parent,console,'Preview',**config)
         self.INITIAL_PLOT_HEIGHT = 100
         self.padding = padding
-
+	self.auto_refresh.set(True)
+        
         ### Find the GeneratorSheets in the simulation, set up generator_sheet_patterns dictionary
         #
         # generator_sheets_patterns = 
