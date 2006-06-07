@@ -620,13 +620,9 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         """
         # CEBHACKALERT: allow user to override this.
         # calculate the size & aspect_ratio of the mask if appropriate
-        # (from the original user-specified bounds)
-
-        # CEBHACKALERT: change this bit; adjust size so that it always
-        # ends '.0' in both x and y directions so that we get
-        # reasonable circles.
+        # mask size set to be that of the weights matrix
         if hasattr(self.weights_shape, 'size'):
-            l,b,r,t = self.nominal_bounds_template.lbrt()
+            l,b,r,t = self.bounds_template.lbrt()
             self.weights_shape.size = t-b
             self.weights_shape.aspect_ratio = (r-l)/self.weights_shape.size
 
