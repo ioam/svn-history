@@ -198,7 +198,7 @@ original data is no longer available.""")
         
 	# Sheet coordinates check button
 	self.sheetcoords = BooleanVar()
-	self.sheetcoords.set(False)
+	self.sheetcoords.set(True)
 	self.sheetcoords_checkbutton = Checkbutton(self.control_frame_2,
              text="Sheet coordinates",variable=self.sheetcoords,command=self.set_sheetcoords)
         self.sheetcoords_checkbutton.pack(side=RIGHT)
@@ -489,9 +489,9 @@ original data is no longer available.""")
 
     def set_auto_refresh(self):
         """Function called by Widget when check-box clicked"""
-        topo.tkgui.show_cmd_prompt()
 	# when refreshing through auto-refresh, we know we want to
 	# save the new plotgroup, so we reset history_index
+        ### JABALERT: Really?  This is just the auto-refresh button.
 	self.history_index = len(self.plotgroups_history)-1
         if self.auto_refresh.get():
             if not (self in self.console.auto_refresh_panels):
