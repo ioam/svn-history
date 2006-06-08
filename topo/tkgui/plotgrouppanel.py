@@ -198,7 +198,7 @@ original data is no longer available.""")
         
 	# Sheet coordinates check button
 	self.sheetcoords = BooleanVar()
-	self.sheetcoords.set(True)
+	self.sheetcoords.set(False)
 	self.sheetcoords_checkbutton = Checkbutton(self.control_frame_2,
              text="Sheet coordinates",variable=self.sheetcoords,command=self.set_sheetcoords)
         self.sheetcoords_checkbutton.pack(side=RIGHT)
