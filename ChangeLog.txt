@@ -1,4 +1,90 @@
+2006-06-08  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/shared/index.php 1.14: Added news item for 0.9.0
+
+	* doc/Tutorials/lissom_oo_or_text.php 1.13: Fixed the text to
+	match the new simulation
+
+	* doc/User_Manual/commandline_text.php 1.4: Updated to current
+	syntax
+
+	* doc/Tutorials/images/som_activity_000000.png 1.2,
+	doc/Tutorials/images/som_activity_000001.png 1.2,
+	doc/Tutorials/images/som_activity_000006.png 1.2,
+	doc/Tutorials/images/som_cog_000000.png 1.2,
+	doc/Tutorials/images/som_cog_000100.png 1.2,
+	doc/Tutorials/images/som_grid_000000.png 1.2,
+	doc/Tutorials/images/som_grid_000100.png 1.2,
+	doc/Tutorials/images/som_grid_010000.png 1.2,
+	doc/Tutorials/images/som_grid_040000.png 1.2,
+	doc/Tutorials/images/som_network_diagram.png 1.2,
+	doc/Tutorials/images/som_projection_000000.png 1.2,
+	doc/Tutorials/images/som_projection_000001.png 1.2,
+	doc/Tutorials/images/som_projection_000006.png 1.2,
+	doc/Tutorials/images/som_projection_040000.png 1.2,
+	doc/Tutorials/som_retinotopy_text.php 1.6: Reverted to
+	full-density simulation; reduced-density version needs work
+
+	* topo/tkgui/plotgrouppanel.py 1.88: Disabled sheet coordinates by
+	default, because it makes V1 be too tiny to see with any
+	reasonable plot size
+
+2006-06-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/responsefns/optimized.py 1.46: Added comment to an ALERT.
+
+	* doc/Future_Work/index_text.php 1.21: Really minor change to
+	wording.
+
+	* topo/patterns/basic.py 1.75: Changed default scale of Line, for
+	the tutorial.
+
+	* doc/Tutorials/lissom_oo_or_text.php 1.12: Resized images.
+
+	* doc/Tutorials/images/activity_line_oo.png 1.3,
+	doc/Tutorials/images/activity_line_oo_or.png 1.3,
+	doc/Tutorials/images/lissom_network_diagram_oo.png 1.3,
+	doc/Tutorials/images/natural_image_oo_or.png 1.3,
+	doc/Tutorials/images/oo_or_map.png 1.3,
+	doc/Tutorials/images/projection_oo.png 1.3,
+	doc/Tutorials/images/test_pattern_oo.png 1.3,
+	doc/Tutorials/images/topographica_console.png 1.2,
+	doc/Tutorials/images/unit_weights_0_0_oo.png 1.3,
+	doc/Tutorials/images/unit_weights_0_0_oo_or.png 1.3: Updated to
+	match current simulation.
+
 2006-06-07  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/testsheetview.ppm 1.2: Removed unused image
+
+	* doc/Home/.cvsignore 1.2, doc/Home/oldnews_text.php 1.1: Added
+	oldnews page
+
+	* Makefile 1.64, external/mswin/for_binaries/topographica.iss
+	1.19, external/mswin/setup.py 1.19: Updated to 0.9.0 release
+
+	* doc/Developer_Manual/index_text.php 1.4: Uncommented Chris's
+	addition
+
+	* ChangeLog.txt 1.9: Fixed typos
+
+2006-06-07  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/base/cf.py 1.38: Mask size set to be that of the weights
+	matrix, rather than the nominal (user-specified) bounds.
+
+	* examples/lissom_oo_or.ty 1.67: LGNOnAfferent strength reverted
+	to 0.5 (i.e. removed a hack).
+
+2006-06-07  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/testpattern.py 1.41: Restored auto-refresh=True in
+	the Test Pattern window, to make sure that the preview updates
+	when the PatternGenerator is changed
+
+	* README.txt 1.15: Added stronger warnings
+
+	* ChangeLog.txt 1.8: Updated with recent changes
 
 	* doc/Future_Work/current_text.php 1.104: Added task
 
