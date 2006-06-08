@@ -53,7 +53,7 @@ cd ..\..
 
 del /Q /F setup.bat
 REM don't delete topographica.ico
-rm dir /Q /S tmp\
+rmdir /Q /S tmp\
 REM CEBHACKALERT: need to delete CVS/ dirs automatically
 
 rmdir /Q /S CVS\
@@ -70,7 +70,7 @@ REM **** end things the Makefile deletes
 
 
 REM ** delete .pyc files
-del /S /Q /F .pyc
+del /S /Q /F *.pyc
 
 
 
