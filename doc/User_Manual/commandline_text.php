@@ -80,6 +80,7 @@ program:</A>
 <pre>
 $ ./topographica -g examples/cfsom_or.ty 
 Topographica&gt; from topo.commands.pylabplots import *
+Topographica&gt; V1 = topo.sim['V1']
 Topographica&gt; matrixplot(V1.activity)
 Topographica&gt; vectorplot(V1.activity[0])
 Topographica&gt; vectorplot(V1.activity[1])
