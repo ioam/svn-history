@@ -1,17 +1,21 @@
 <P>Topographica is currently under very active development, with many
-changes made daily.  To simplify the process of frequent file
-releases, it is currently distributed using
-<A HREF="http://www.nongnu.org/cvs/">CVS</A>, the version control
-system used for managing Topographica development.  Over the next few
-months, installation packages will be built for Linux, Windows, and
-Macintosh, which will speed up and simplify the process of
-installation (at the cost of making it slightly more difficult to
-upgrade to new versions).  If you prefer to wait for these packages,
-just sign up for the
-<A HREF="https://lists.sourceforge.net/lists/listinfo/topographica-announce">topographica-announce</A>
-mailing list, where they will be announced when available.
+changes made daily. Developers, users who plan to modify any of the source 
+files, and users who wish to receive frequent updates, should obtain
+Topographica using <A HREF="http://www.nongnu.org/cvs/">CVS</A> (the version 
+control system used for managing Topographica development), as detailed
+below.
 
-<!-- They will be listed at http://sourceforge.net/project/showfiles.php?group_id=53602 -->
+<P>Alternatively, installation packages are available for Linux, Windows, and
+Macintosh at our Sourceforge 
+<A HREF="http://sourceforge.net/project/showfiles.php?group_id=53602">downloads</A> 
+page. These packages simplify the process of installation (at the cost of making
+it slightly more difficult to upgrade to new versions). Linux and Mac users should 
+download the desired archive package and then follow the 'Building Topographica' 
+instructions below; Windows users can download and run an .exe file, which will 
+perform all the necessary steps. Updated packages are announced on the
+<A HREF="https://lists.sourceforge.net/lists/listinfo/topographica-announce">topographica-announce</A>
+mailing list.
+
 
 <H2>Installing using CVS</H2>
 
