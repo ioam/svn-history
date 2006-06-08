@@ -41,13 +41,11 @@ del examples\tiny.ty
 
 REM ** remove external\
 cd external\
-rmdir /Q /S CVS\
 del /Q /F *
 rmdir /Q /S win32
 
 REM don't delete all of external\mswin yet!
 cd mswin\
-rmdir /Q /S CVS\
 rmdir /Q /S util\
 del /Q /F *
 
@@ -57,6 +55,17 @@ del /Q /F setup.bat
 REM don't delete topographica.ico
 rm dir /Q /S tmp\
 REM CEBHACKALERT: need to delete CVS/ dirs automatically
+
+rmdir /Q /S CVS\
+cd examples\
+rmdir /Q /S CVS\
+cd ..
+cd etc\
+rmdir /Q /S CVS\
+cd ..
+cd topo\
+rmdir /Q /S CVS\
+cd ..
 REM **** end things the Makefile deletes
 
 
