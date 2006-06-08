@@ -247,7 +247,7 @@ the <A HREF="../Tutorials/som_retinotopy.html">SOM</A> or
 
 <H3>Updating Topographica</H3>
 
-Once you have Topographica checked out, you can update to the latest
+CVS users who have Topographica checked out can update to the latest
 stable version at any time by doing:
 
 <pre>
@@ -264,5 +264,9 @@ topographica directory and select CVS Update to get the new files.
 <P>Note that updating the external/ subdirectory sometimes takes a
 long time, if some of the external packages have been upgraded, and in
 that case "make all" can also take some time to build.
+
+<P>Users of Topographica who don't use CVS (having downloaded one of the 
+archive or binary packages) can subscribe to the 
+<A HREF="https://lists.sourceforge.net/lists/listinfo/topographica-announce">topographica-announce</A> mailing list to hear about updates.
 
 
