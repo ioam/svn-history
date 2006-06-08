@@ -12,9 +12,7 @@ page. These packages simplify the process of installation (at the cost of making
 it slightly more difficult to upgrade to new versions). Linux and Mac users should 
 download the desired archive package and then follow the 'Building Topographica' 
 instructions below; Windows users can download and run an .exe file, which will 
-perform all the necessary steps. Updated packages are announced on the
-<A HREF="https://lists.sourceforge.net/lists/listinfo/topographica-announce">topographica-announce</A>
-mailing list.
+perform all the necessary steps.
 
 
 <H2>Installing using CVS</H2>
