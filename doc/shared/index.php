@@ -28,13 +28,34 @@
 	banner($fname);
 
 	# 4. news box (need to replace with something clean)
-	if ($fname == "/Home") {
+	if ($fname == "/Home" && $textfile == "index_text.php") {
 		print '
 <table width="100%" cellpadding="5"><tr><td bgcolor="'.$banner_bg_color.'">
 <blockquote>
 <blockquote>
 <i>
 <b>News:</b>
+
+<p><b>07 June 06:</b> Version 0.9.0 released, including numerous
+bugfixes, 
+context-sensitive (balloon) help for nearly every parameter and control,
+full Windows support, 
+full Mac OS X support,
+significant performance increases (7X faster on the main example scripts, with more
+speedups to come),
+faster startup,
+better memory management,
+simpler programming interface,
+improved state saving (e.g. no longer requiring the original script),
+independently controllable random number streams,
+plot window histories,
+more library components (e.g. Oja rule, CPCA, covariance),
+<!-- plotting in Sheet coordinates, -->
+<!-- better plot size handling, -->
+<!-- command history buffer, -->
+prototype spiking neuron support, and
+much-improved <A target="_top" href="../User_Manual/modeleditor.html">model editor</A>.
+
 
 <p><b>20 February 06:</b> Version 0.8.2 released, including numerous
 bugfixes, 
@@ -59,21 +80,7 @@ and progress reports during learning.  See the
 <A target="_top" href="../images/060220_topographica_screen_shot.png">Linux screenshot</A>.
 
 
-
-
-
-<p><b>22 December 05:</b> Version 0.8.1 released, including numerous
-bugfixes, more flexible plotting (including weight colorization),
-user-controllable optimization, properties panels, more-useful
-<A TARGET="_top" href="../Reference_Manual/index.html">reference manual</A>,
-image input patterns, and a prototype graphical
-model editor.  <!-- Plus SOMs with selectable Projections -->
-
-<p><b>8 November 05:</b> New site launched with Topographica version
-0.8.0, including a new
- <a target="_top" href="../Tutorials/lissom_or.html">LISSOM tutorial</a>.
-(<a target="_top" href="../images/051107_topographica_screen_shot_white.png">Linux screenshot</a>).
-
+<p><A target="_top" href="../Home/oldnews.html"><i>Older news</i></A>
 </i>
 </blockquote>
 </blockquote>
