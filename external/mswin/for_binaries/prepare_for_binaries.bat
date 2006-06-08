@@ -25,7 +25,7 @@ del /Q /F topographica.bat
 
 REM **** Things the Makefile deletes
 del /S /Q /F .#* *~ .cvsignore ChangeLog.txt
-del etc/topographica.elc
+del etc\topographica.elc
 del ImageSaver*.ppm
 del countalerts*
 del annotate.out
