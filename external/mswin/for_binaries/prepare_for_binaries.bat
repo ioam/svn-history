@@ -54,17 +54,17 @@ cd ..\..
 del /Q /F setup.bat
 REM don't delete topographica.ico
 rmdir /Q /S tmp\
-REM CEBHACKALERT: need to delete CVS/ dirs automatically
+REM CEBHACKALERT: need to delete CVS/ dirs recursively
 
-rmdir /Q /S CVS\
+rmdir /Q /S CVS
 cd examples\
-rmdir /Q /S CVS\
+rmdir /Q /S CVS
 cd ..
 cd etc\
-rmdir /Q /S CVS\
+rmdir /Q /S CVS
 cd ..
 cd topo\
-rmdir /Q /S CVS\
+rmdir /Q /S CVS
 cd ..
 REM **** end things the Makefile deletes
 
