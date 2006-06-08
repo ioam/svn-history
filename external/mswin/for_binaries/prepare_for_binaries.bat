@@ -13,53 +13,55 @@ copy ..\setup.py ..\..\..\
 
 REM Clean this copy of Topographica...
 
-REM ** root directory
-
 cd ..\..\..
-rmdir /Q /S CVS\
-del /Q /F .cvsignore
+
+REM not using the makefile...
 del /Q /F Makefile
-del /Q /F ChangeLog.txt
+
+REM delete files created by setup
 del /Q /F topographica
 del /Q /F topographica.bat
-del /Q /F setup.bat
 
-REM ** external\
 
+REM **** Things the Makefile deletes
+del /S /Q /F .#* *~ .cvsignore ChangeLog.txt
+del etc/topographica.elc
+del ImageSaver*.ppm
+del countalerts*
+del annotate.out
+del examples\disparity_energy.ty
+del examples\homeostatic.ty
+del examples\joublin_bc96.ty
+del examples\laminar.ty*
+del examples\laminar_lissom.ty
+del examples\laminar_nolearning.ty
+del examples\leaky_lissom_or.ty
+del examples\lissom_or_sf.ty
+del examples\tiny.ty
+
+REM ** remove external\
 cd external\
 rmdir /Q /S CVS\
 del /Q /F *
 rmdir /Q /S win32
 
+REM don't delete all of external\mswin yet!
 cd mswin\
 rmdir /Q /S CVS\
 rmdir /Q /S util\
 del /Q /F *
 
+cd ..\..
 
-REM ** doc\
-cd ..\..\
-REM CEBHACKALERT: it would be good to get the built doc files in here!
-
-
-REM ** etc\
-cd etc\
-rmdir /Q /S CVS
-del /Q /F .cvsignore
-cd ..
+del /Q /F setup.bat
+REM don't delete topographica.ico
+rm dir /Q /S tmp\
+REM CEBHACKALERT: need to delete CVS/ dirs automatically
+REM **** end things the Makefile deletes
 
 
-REM ** examples\
-cd examples\
-rmdir /Q /S CVS
-del /Q /F .cvsignore
-cd ..
+REM ** delete .pyc files
+del /S /Q /F .pyc
 
-REM ** topo\
-cd topo\
-rmdir /Q /S CVS
-del /Q /F .cvsignore
-cd ..
 
-REM CEBHACKALERT: how on Windows does one recursively delete?
-REM We need to remove all pyc files plus the CVS files
+
