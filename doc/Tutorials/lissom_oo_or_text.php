@@ -105,16 +105,9 @@ response level, increasing from black to white.  This pattern is what
 was specified in the <span class='w_title'>Test Pattern</span> window.
 Similarly, locations in the LGN that have an OFF or ON cell response
 to this pattern are shown in the <span class='t_item'>LGNOff</span> and
-<span class='t_item'>LGNOn</span> plots.  The Retina appears larger
-than the LGN because the borders of the Retina have been
-<A HREF="../User_Manual/space.html#edge-buffers"> extended on all
-sides</A> so that no LGN has a ConnectionField cut off by the border.
+<span class='t_item'>LGNOn</span> plots.  
 At this stage the response level in <span class='t_item'>V1</span> is
-also coded in shades of grey. Note that the V1 response is patchy, as
-explained below.  The borders of the LGN were also extended so that no
-neuron in V1 would have an afferent ConnectionField cut off by the LGN
-border, though this may not be evident because the V1 plot is at a
-different scale than the others.
+also coded in shades of grey.
 
 <P>From these plots, you can see that the single line presented on the
 retina is edge-detected in the LGN, with ON LGN cells responding to
@@ -149,8 +142,7 @@ and lateral inhibitory weights to that neuron from nearby neurons in
 V1. The afferent weights represent the retinal pattern that would most
 excite the neuron.  For this particular neuron, the optimal retinal
 stimulus would be a short, bright line oriented at about 40 degrees (2
-o'clock) in the center of the retina, although this neuron is not
-particularly orientation selective.  </p><p></p></li>
+o'clock) in the center of the retina.  </p><p></p></li>
 
 <li>If all neurons had the same weight pattern, the response
 would not be patchy -- it would just be a blurred version of the
@@ -168,7 +160,7 @@ neurons" align="middle" WIDTH="659" HEIGHT="491">
 </p>
 
 This plot shows the afferent weights from the LGN ON sheet for every fifth neuron in each
-direction.  You can see that most of the other neurons are selective
+direction.  You can see that most of the neurons are selective
 for orientation (not just a circular spot), and each has a slightly
 different preferred orientation.  This suggests an explanation for why
 the response is patchy: neurons preferring orientations other than
@@ -243,8 +235,7 @@ it again -- the colors should be different, and match the orientation chosen.
 <li> If you now <span class='b_press'>Refresh</span> the
 <span class='w_title'>Connection Fields</span>
 window, you can see that the neuron whose weights we plotted is
-located in between two different patches of neurons responding to
-different orientations: 
+located in a patch of neurons with similar orientation preferences: 
 
 
 <p class="center">
@@ -255,10 +246,7 @@ one neuron" align="middle" width="676" height="358" ><br />
 
 <p>
 Look at the <span class='t_item'>LateralExcitatory</span> weights, which show that
-the neurons around the location to the right of the retina's center
-are primarily green, while those to the left are primarily red.  Thus
-this particular neuron happens to be located on a fracture between two
-orientations, which is why its orientation selectivity is low.
+the neurons near this neuron are primarily green and blue.
 Neurons just to the left or right can be selected by changing the
 (X,Y) coordinates; these should have higher selectivity.
 </p>
@@ -277,7 +265,7 @@ control its size, location, etc.:
 
 </p><blockquote>
 <dl compact="compact">
-<dt><span class='t_item'>orientation</span>                          </dt><dd> controls the angle (try PI/4 or -PI/4)
+<dt><span class='t_item'>orientation</span>                          </dt><dd> controls the angle (try pi/4 or -pi/4)
 </dd><dt><span class='t_item'>x</span> and <span class='t_item'>y</span>         </dt><dd> 
 control the position on the retina (try 0 or 0.5)
 </dd><dt><span class='t_item'>size</span></dt><dd>
@@ -289,10 +277,11 @@ controls the ratio between width and height; will be scaled by the
 </dt><dd> controls the amount of Gaussian falloff around the edges of patterns such as rings and lines
 </dd><dt><span class='t_item'>scale</span>
 
-</dt><dd> controls the brightness (try 0.5 for a sine grating).  Note
+</dt><dd> controls the brightness (try 1.0 for a sine grating).  Note
 that this relatively simple model is very sensitive to the scale, and
-scales higher than about 0.5 will result in a broad,
-orientation-unselective response.  More complex models (and actual brains!)
+scales higher than about 1.2 will result in a broad,
+orientation-unselective response, while low scales will give no
+response.  More complex models (and actual brains!)
 are less sensitive to the scale or contrast.
 </dd><dt><span class='t_item'>offset</span>                         </dt><dd> is added to every pixel
 </dd><dt><span class='t_item'>frequency</span>
@@ -308,7 +297,7 @@ To present photographs, select a <span class='t_item'>Pattern generator</span> o
 own (in e.g. PNG, JPG, TIFF, or PGM format) in the <span
 class='t_item'>filename</span> box.) For most photographs you will 
 need to change the <span class='t_item'>scale</span> to something like
-0.6 to see a reasonable
+2.0 to see a reasonable
 response from this model V1.  A much larger (and slower) map would
 be required to see detailed patterns in the response to most images,
 but even with this network you may be able to see some
@@ -322,7 +311,9 @@ orientation-specific responses to large contours in the image:
 <P>Be aware when comparing the Retina and V1 plots for a photograph
 that each processing stage eliminates some of the outer edges of the
 image, so that V1 is only looking at the center of the image on the
-LGN.
+LGN.  You can see the relative sizes by enabling "Sheet coordinates",
+which will plot V1 at its true size relative to the LGN, and likewise
+for the LGN with respect to the Retina.
 </p></li>
 
 <li>The procedure above allows you to explore the relationship between
@@ -383,7 +374,7 @@ even <span class='t_item'>Auto-refresh</span> an <span class='w_title'>Orientati
 (not really practical at present).
 
 <p></p></li><li>Now click the mouse into the <span class='t_item'>Learning iterations</span> field
-of the <span class='w_title'>Topographica Console</span> window, and press return a few
+of the <span class='w_title'>Topographica Console</span> window, and hit Go a few
 times, each time looking at
 the random input(s) and the response to them in the
 <span class='w_title'>Activity</span> window.  The effect on the network weights of
@@ -397,16 +388,17 @@ you can make each input have a obvious effect by speeding up learning
 to a highly implausible level.  To do this, type: 
 
 <blockquote><code class='to_type'>
-V1.projections()['LGNOnAfferent'].learning_rate
+topo.sim['V1'].projections()['LGNOnAfferent'].learning_rate
 </code></blockquote>
 
 in the <span class='t_item'>Command</span> box or at the Topographica
-terminal prompt. The current learning rate will be
-displayed in your terminal window. Next, type:
+terminal prompt. (You may need to activate the "Command Prompt" by
+clicking on it first).  The current learning rate will be displayed in
+your terminal window. Next, type:
 
 <blockquote><code class='to_type'>
-V1.projections()['LGNOnAfferent'].learning_rate=200
-V1.projections()['LGNOffAfferent'].learning_rate=200
+topo.sim['V1'].projections()['LGNOnAfferent'].learning_rate=200
+topo.sim['V1'].projections()['LGNOffAfferent'].learning_rate=200
 </code></blockquote>
 
 Now each new pattern generated in a
