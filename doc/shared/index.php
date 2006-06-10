@@ -36,8 +36,9 @@
 <i>
 <b>News:</b>
 
-<p><b>07 June 06:</b> Version 0.9.0 released, including numerous
-bugfixes, 
+<p><b>07 June 06:</b> Version 0.9.0
+<A target="_top" href="../Downloads/index.html">released</A>, including 
+numerous bugfixes, 
 context-sensitive (balloon) help for nearly every parameter and control,
 full Windows support, 
 full Mac OS X support,
