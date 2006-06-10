@@ -42,6 +42,7 @@ numerous bugfixes,
 context-sensitive (balloon) help for nearly every parameter and control,
 full Windows support, 
 full Mac OS X support,
+downloadable installation files,
 significant performance increases (7X faster on the main example scripts, with more
 speedups to come),
 faster startup,
