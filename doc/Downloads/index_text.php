@@ -237,7 +237,8 @@ or
   ./topographica -g examples/lissom_oo_or.ty
 </pre>
 
-(Windows users should omit the initial <code>./</code>).
+<small>(Windows users should omit the initial <code>./</code>, and replace the
+second <code>/</code> with a backslash <code>\</code>)</small><BR><BR>
 For the latter two examples, a good way to get started is to work through 
 the <A HREF="../Tutorials/som_retinotopy.html">SOM</A> or 
 <A HREF="../Tutorials/lissom_oo_or.html">LISSOM</A> tutorials.
