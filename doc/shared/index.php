@@ -40,7 +40,7 @@
 <A target="_top" href="../Downloads/index.html">released</A>, including 
 numerous bugfixes, 
 context-sensitive (balloon) help for nearly every parameter and control,
-full Windows support, 
+full Windows support (<A target="_top" href="../images/060607_topographica_win_screenshot.png">screenshot</A>),
 full Mac OS X support,
 downloadable installation files,
 significant performance increases (7X faster on the main example scripts, with more
