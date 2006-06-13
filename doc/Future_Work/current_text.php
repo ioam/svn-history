@@ -12,8 +12,6 @@ was first added to the list, or a change was made.)
 
 <ul>
 
-<!-- CB: I put my tasks in the approximate order that I'm doing them -->
-
 
 <li>
 2006/06/06: Fix TopoConsole "Run for" TaggedSlider so that pressing Return
@@ -209,6 +207,20 @@ Currently commented out; may not be a problem.
 <li>
 2006/03/07 (JL): make change_bounds() able to enlarge as well as shrink [made a first draft, JL is working with it]
 </li>
+
+<li>
+2006/06/13: Make command prompt more informative. Could be done by making a 
+variable in topo.misc.commandline that contains something that can be evaluated 
+to provide a string, which will then be used for the prompt.  That way the user 
+can change that to be anything he likes, just as in C++ LISSOM (in which there 
+is a variable called command_prompt_format whose default value is
+<code>lissom.t${iteration}.p${presentation}.c${command_num_called}${current_param_set_path}></code>.<br />
+In Python, there aren't any such string macros, but we could still
+have a variable topo.misc.commandline.prompt that is expected to be
+set to something callable in __main__, and whose value is evaluated
+before each time the prompt is executed.
+</li>
+
 
 </ul>
 
