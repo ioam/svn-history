@@ -67,7 +67,7 @@ shared-weight projections,
 <A TARGET="_top" href="../Tutorials/som_retinotopy.html">SOM retinotopy tutorial</A>,
 Euclidean-distance-based response and learning functions,
 density-independent SOM parameters,
-<A TARGET="_top" href="../Downloads/index.html#osx">Mac OS X instructions</A>,
+<A TARGET="_top" href="../Downloads/cvs.html#osx">Mac OS X instructions</A>,
 <A TARGET="_top" href="../Developer_Manual/index.html">developer manual</A>,
 <A TARGET="_top" href="../User_Manual/index.html">partial user manual</A>,
 much-improved 
