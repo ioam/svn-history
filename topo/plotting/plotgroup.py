@@ -293,6 +293,7 @@ version substituted, etc.""")
 #  			       bb,self.normalize,name=plot_name)
         p = make_template_plot(plot_channels,sheet.sheet_view_dict,sheet.xdensity,
  			       sheet.bounds,self.normalize,name=plot_name)
+
 	return [p]
 
 
@@ -367,10 +368,59 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
 	    else:
 		 plot_list.append(make_template_plot(pt,sheet.sheet_view_dict,sheet.xdensity,
 						     sheet.bounds,self.normalize,name=pt_name))
+    
         return plot_list
 
 
     ### Need to be re-implemented for connectionfieldplotgroup.
+    def generate_labels(self):
+	""" Function used for generating the labels."""
+	self.labels = []
+	for plot in self.plots:
+	    self.labels.append(plot.name + '\n(from ' + plot.plot_src_name+')')
+
+
+class ProjectionActivityPlotGroup(TemplatePlotGroup):
+    """
+    PlotGroup for Projection Activity views.  
+    """
+
+    def __init__(self,plot_list,template,sheet_name,**params):     
+	super(ProjectionActivityPlotGroup,self).__init__(plot_list,template,sheet_name,**params)
+  
+    def update_environment(self):
+	""" 
+	Only implemented for TemplatePlotGroup. 
+	Execute the command associated with the template.
+	"""
+	### JCALERT: commands in analysis have to be re-written so that to avoid
+	### setting all these global parameters.
+	topo.commands.analysis.sheet_name = self.sheet_name
+
+        exec self.updatecommand  in __main__.__dict__
+		
+    def _create_plots(self,pt_name,pt,sheet):
+	""" 
+	Sub-function of _plot_list().
+	Creates a plot as specified by a Projection Activity plot_template:
+    
+	"""
+	plot_list = []
+        if not isinstance(sheet,CFSheet):
+            self.warning('Requested Projection Activity view from other than CFSheet.')
+        else:
+	    for p in sheet.projections().values():			    
+		plot_channels = copy.deepcopy(pt)
+		key = ('ProjectionActivity',sheet.name,p.name)
+		plot_channels['Strength'] = key
+		plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.xdensity,
+							    p.src.bounds,self.normalize,name=p.name))
+
+        
+	return plot_list
+
+
+ 
     def generate_labels(self):
 	""" Function used for generating the labels."""
 	self.labels = []

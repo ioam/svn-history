@@ -31,6 +31,7 @@ import topo.base.simulation
 from topo.base.parameterizedobject import ParameterizedObject
 from templateplotgrouppanel import TemplatePlotGroupPanel
 from connectionfieldspanel import ConnectionFieldsPanel
+from projectionactivitypanel import ProjectionActivityPanel
 from projectionpanel import ProjectionPanel
 from testpattern import TestPattern
 from editorwindow import ModelEditor
@@ -713,5 +714,5 @@ class GUIToplevel(Toplevel):
 
 if __name__ != '__main__':
     plotpanel_classes['Connection Fields'] = ConnectionFieldsPanel
-    plotpanel_classes['Projection'] = ProjectionPanel
- 
+    plotpanel_classes['Projection'] = ProjectionPanel 
+    plotpanel_classes['Projection Activity'] = ProjectionActivityPanel 

@@ -1,3 +1,4 @@
+
 """
 Topographica SheetView objects and its subclasses.
 
@@ -170,6 +171,19 @@ class UnitView(SheetView):
         self.x = x
         self.y = y
         self.projection = projection
+
+class ProjectionView(SheetView):
+    """
+    ProjectionViews should be stored in Sheets via a tuple
+    ('Weights',Sheet,Projection). 
+    """
+
+    def __init__(self, term_tuple,projection,**params):
+        """
+        Subclass of SheetView. 
+        """
+	super(ProjectionView,self).__init__(term_tuple, projection.src.name, projection.src.precedence,**params)
+	self.projection = projection
 
 
 

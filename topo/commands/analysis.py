@@ -12,13 +12,14 @@ import topo
 
 from topo.analysis.featuremap import MeasureFeatureMap
 from topo.base.arrayutils import octave_output, centroid
-from topo.base.cf import CFSheet
+from topo.base.cf import CFSheet, CFProjection
 from topo.base.sheet import Sheet
-from topo.base.sheetview import SheetView
+from topo.base.sheetview import SheetView, ProjectionView
 import topo.base.patterngenerator
 from topo.commands.basic import pattern_present
 from topo.patterns.basic import SineGrating, Gaussian
 from topo.sheets.generatorsheet import GeneratorSheet
+from topo.base.projection import ProjectionSheet
 
 
 
@@ -51,8 +52,9 @@ class PatternPresenter(object):
 
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,
-                    user_function=PatternPresenter(pattern_generator=SineGrating(),
+		    user_function=PatternPresenter(pattern_generator=SineGrating(),
                                                    apply_output_fn=False,duration=0.175)):
+
 
     """
     Measure orientation maps, using a sine grating by default.
@@ -184,9 +186,31 @@ def update_connectionfields():
 
 proj_coords=[(0,0)]
 proj_name =''
+
+
 def update_projections():
     sheets = topo.sim.objects(Sheet).values()
     for each in sheets:
 	if (each.name == sheet_name):
 	    for x,y in proj_coords:
 		each.update_unit_view(x,y,proj_name,)
+
+def update_projectionactivity():
+
+    sheets = topo.sim.objects(Sheet).values()
+    for each in sheets:
+	if (each.name == sheet_name):
+	    each.update_projection_view()
+
+
+proj_name=''
+
+
+
+
+       
+    
+
+
+
+

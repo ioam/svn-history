@@ -45,7 +45,7 @@ from functionfamilies import OutputFnParameter,IdentityOF,LearningFnParameter,He
 from projection import Projection,ProjectionSheet
 from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter,Integer
 from sheet import Sheet,Slice
-from sheetview import UnitView
+from sheetview import UnitView, ProjectionView
 from boundingregion import BoundingBox,BoundingRegionParameter
 
 
@@ -714,7 +714,6 @@ The true bounds will differ depending on the density (see initialize_bounds())."
 
 
         return weights_slice.bounds
-    
 
     def cf(self,r,c):
         """Return the specified ConnectionField"""
@@ -737,6 +736,15 @@ The true bounds will differ depending on the density (see initialize_bounds())."
 
         return UnitView((matrix_data,self.src.bounds),sheet_x,sheet_y,self)
 
+
+    def get_projection_view(self):
+	"""
+	Returns the activity in a single projection
+	"""
+	matrix_data = Numeric.array(self.activity)
+	 
+	
+	return ProjectionView((matrix_data,self.src.bounds),self)
 
 
     def activate(self,input_activity):
@@ -927,8 +935,39 @@ class CFSheet(ProjectionSheet):
             src = v.projection.src
             key = ('Weights',v.projection.dest.name,v.projection.name,x,y)
             src.sheet_view_dict[key] = v
-       
-        
+    
+
+    def update_projection_view(self,projection_name=None):
+        """
+	Creates the list of ProjectionView objects 
+
+	Each ProjectionView is then added to the sheet_view_dict of its source sheet.
+
+	"""     
+        # We check that all the projections are CFProjection
+        for p in self.in_connections:
+            if not isinstance(p,CFProjection):
+                ### JCALERT! Choose if we raise an error or if we just delete the
+                ### Non-CFProjection from the in_projection list.
+                raise ValueError("projection has to be a CFProjection in order to build ProjectionView")
+            
+        if projection_name == None:
+            projection_filter = lambda p: True
+        else:
+            projection_filter = lambda p: p.name==projection_name
+            
+        views = [p.get_projection_view() for p in self.in_connections if projection_filter(p)]
+
+        for v in views:
+            src = v.projection.src
+            key = ('ProjectionActivity',v.projection.dest.name,v.projection.name)
+            src.sheet_view_dict[key] = v
+
+
+    
+
+
+ 
     ### JCALERT! This should probably be deleted...
     def release_unit_view(self,x,y):
         self.release_sheet_view(('Weights',x,y))
