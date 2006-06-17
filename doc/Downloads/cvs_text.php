@@ -155,7 +155,7 @@ located on your machine, right click, select "CVS Checkout", fill in
 CVSROOT with the appropriate <code>$TOPOROOT</code>, and type in
 <code>topographica</code> for the module name.  Before clicking OK,
 select the <code>Revision</code> tab and select <code>Choose branch or
-tag</code>, filling in <code>LATEST_STABLE<code> as the tag name
+tag</code>, filling in <code>LATEST_STABLE</code> as the tag name
 (unless you want the bleeding-edge version).  When you click OK, the
 files should be downloaded for you (though it may take some time).
 
