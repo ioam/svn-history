@@ -280,19 +280,10 @@ version substituted, etc.""")
     def _create_plots(self,pt_name,pt,sheet):
 	""" 
 	Sub-function of _plot_list().
-	Creates a plot corresponding to a plot_template and its name, and a sheet.
+	Creates a plot corresponding to a plot_template, its name, and a sheet.
 	"""
-	plot_channels = pt
-	plot_name = pt_name
-### temporary: will have to be deleted when implementing the Plot BB in the right way.
-#	from topo.base.boundingregion import BoundingBox
-#       bb=BoundingBox(points=((-1.0,-1.0),(1.0,1.0)))
-# 	bb1=BoundingBox(points=((-0.25,-0.25),(0.25,0.25)))
-# 	bb2=BoundingBox(points=((-0.75,-0.5),(0.75,0.5)))
-# 	p = make_template_plot(plot_channels,sheet.sheet_view_dict,sheet.xdensity,
-#  			       bb,self.normalize,name=plot_name)
-        p = make_template_plot(plot_channels,sheet.sheet_view_dict,sheet.xdensity,
- 			       sheet.bounds,self.normalize,name=plot_name)
+        p = make_template_plot(pt,sheet.sheet_view_dict,sheet.xdensity,
+ 			       sheet.bounds,self.normalize,name=pt_name)
 
 	return [p]
 
@@ -326,19 +317,30 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
 		
     def _create_plots(self,pt_name,pt,sheet):
 	"""Creates plots as specified by the plot_template."""
-	plot_list = []
         if not isinstance(sheet,CFSheet):
             self.warning('Requested Projection view from a Sheet that is not a CFSheet.')
+            return []
         else:
-	    for p in sheet.projections().values():			    
-		plot_channels = copy.deepcopy(pt)
-		key = (self.keyname,sheet.name,p.name)
-		plot_channels['Strength'] = key
-		plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.xdensity,
-                                                    p.src.bounds,self.normalize,name=p.name))
-
-        
-	return plot_list
+	    # Special case: if the Strength is set to self.keyname, we
+	    # request UnitViews (i.e. by changing the Strength key in
+	    # the plot_channels) Otherwise, we consider Strength as
+	    # specifying an arbitrary SheetView.
+	    if ( pt.get('Strength', None) == self.keyname):
+                plot_list = []
+		for p in sheet.projections().values():
+		    plot_channels = copy.deepcopy(pt)
+		    # Note: the UnitView is in the src_sheet view_dict,
+		    # and the name in the key is the destination sheet.
+		    key = (self.keyname,sheet.name,p.name)
+		    plot_channels['Strength'] = key
+                    plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,
+                                                        p.src.xdensity,
+                                                        None,self.normalize,name=p.name))
+                return plot_list
+                
+	    else: # Fall back to normal case
+                return super(ProjectionSheetPlotGroup,self)._create_plots(pt_name,pt,sheet)
+    
 
 
  
@@ -390,19 +392,14 @@ class ConnectionFieldsPlotGroup(ProjectionSheetPlotGroup):
 	Creates a plot as specified by a Connection Field plot_template:
 	allows creating a connection field plot or a normal plot.
 	"""
-	plot_list = []
         if not isinstance(sheet,CFSheet):
-            self.warning('Requested weights view from other than CFSheet.')
+            self.warning('Requested Projection view from a Sheet that is not a CFSheet.')
+            return []
         else:
-	    # Special case: if the Strength is set to Weights, we
-	    # request UnitViews (i.e. by changing the Strength key in
-	    # the plot_channels) Otherwise, we consider Strength as
-	    # specifying an arbitrary SheetView.
 	    if ( pt.get('Strength', None) == self.keyname):
+                plot_list = []
 		for p in sheet.projections().values():			    
 		    plot_channels = copy.deepcopy(pt)
-		    # Note: the UnitView is in the src_sheet view_dict,
-		    # and the name in the key is the destination sheet.
 		    key = (self.keyname,sheet.name,p.name,self.x,self.y)
 		    plot_channels['Strength'] = key
 		    if self.situate:
@@ -412,12 +409,10 @@ class ConnectionFieldsPlotGroup(ProjectionSheetPlotGroup):
 			(r,c) = p.dest.sheet2matrixidx(self.x,self.y)
 			plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.xdensity,
 							    p.cf(r,c).bounds,self.normalize,name=p.name))
+                return plot_list
 			
-	    else:
-		 plot_list.append(make_template_plot(pt,sheet.sheet_view_dict,sheet.xdensity,
-						     sheet.bounds,self.normalize,name=pt_name))
-    
-        return plot_list
+	    else: # Fall back to normal case
+                return super(ConnectionFieldsPlotGroup,self)._create_plots(pt_name,pt,sheet)
 
 
 
