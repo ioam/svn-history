@@ -25,6 +25,9 @@ import topo.base.cf
 from topo.commands.analysis import *
 import topo.commands.analysis
 
+### JABALERT: Should pull out common code from ProjectionActivityPanel,
+### ProjectionPanel, and ConnectionFieldsPanel into a shared parent
+### class.  Then those classes should probably all be in one file.
 class ProjectionActivityPanel(TemplatePlotGroupPanel):
     def __init__(self,parent,console=None,pgt_name=None,**config):       
 
