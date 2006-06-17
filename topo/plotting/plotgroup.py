@@ -305,8 +305,65 @@ version substituted, etc.""")
             image = Image.open(file_path)
 	    plot = Plot(image,name=image_name)
             self.plot_list.append(plot)
-            
 
+
+            
+class ProjectionSheetPlotGroup(TemplatePlotGroup):
+    """
+    Abstract PlotGroup for visualizations of the Projections of one Sheet.
+
+    Requires self.keyname to be set to the name of a placeholder
+    SheetView that will be replaced with a key that is unique to a
+    particular Projection of the current Sheet.
+    """
+
+    def __init__(self,plot_list,template,sheet_name,**params):
+	super(ProjectionSheetPlotGroup,self).__init__(plot_list,template,sheet_name,**params)
+        
+    def update_environment(self):
+	"""Execute the command associated with the template."""
+	### JCALERT: commands in analysis.py should be re-written to
+	### avoid setting these global parameters.
+	topo.commands.analysis.sheet_name = self.sheet_name
+        exec self.updatecommand  in __main__.__dict__
+		
+    def _create_plots(self,pt_name,pt,sheet):
+	"""Creates plots as specified by the plot_template."""
+	plot_list = []
+        if not isinstance(sheet,CFSheet):
+            self.warning('Requested Projection view from a Sheet that is not a CFSheet.')
+        else:
+	    for p in sheet.projections().values():			    
+		plot_channels = copy.deepcopy(pt)
+		key = (self.keyname,sheet.name,p.name)
+		plot_channels['Strength'] = key
+		plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.xdensity,
+                                                    p.src.bounds,self.normalize,name=p.name))
+
+        
+	return plot_list
+
+
+ 
+    def generate_labels(self):
+	""" Function used for generating the labels."""
+	self.labels = []
+	for plot in self.plots:
+	    self.labels.append(plot.name + '\n(from ' + plot.plot_src_name+')')
+
+
+
+class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
+    """PlotGroup for ProjectionActivity views."""
+
+    keyname='ProjectionActivity'
+
+
+
+### JABALERT: Should pull out common code from
+### ConnectionFieldsPlotGroup, ProjectionActivityPlotGroup, and
+### ProjectionPlotGroup into a shared parent class; then those
+### three classes should be much shorter.
 
 class ConnectionFieldsPlotGroup(TemplatePlotGroup):
     """
@@ -347,9 +404,10 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
         if not isinstance(sheet,CFSheet):
             self.warning('Requested weights view from other than CFSheet.')
         else:
-	    # If the Strength is set to Weights, we request UnitViews 
-	    # (i.e. by changing the Strength key in the plot_channels)
-	    # Otherwise, we consider Strength as specifying a SheetView.
+	    # Special case: if the Strength is set to Weights, we
+	    # request UnitViews (i.e. by changing the Strength key in
+	    # the plot_channels) Otherwise, we consider Strength as
+	    # specifying an arbitrary SheetView.
 	    if ( pt.get('Strength', None) == 'Weights'):
 		for p in sheet.projections().values():			    
 		    plot_channels = copy.deepcopy(pt)
@@ -380,55 +438,7 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
 	    self.labels.append(plot.name + '\n(from ' + plot.plot_src_name+')')
 
 
-class ProjectionActivityPlotGroup(TemplatePlotGroup):
-    """
-    PlotGroup for Projection Activity views.  
-    """
-
-    def __init__(self,plot_list,template,sheet_name,**params):     
-	super(ProjectionActivityPlotGroup,self).__init__(plot_list,template,sheet_name,**params)
-  
-    def update_environment(self):
-	""" 
-	Only implemented for TemplatePlotGroup. 
-	Execute the command associated with the template.
-	"""
-	### JCALERT: commands in analysis have to be re-written so that to avoid
-	### setting all these global parameters.
-	topo.commands.analysis.sheet_name = self.sheet_name
-
-        exec self.updatecommand  in __main__.__dict__
-		
-    def _create_plots(self,pt_name,pt,sheet):
-	""" 
-	Sub-function of _plot_list().
-	Creates a plot as specified by a Projection Activity plot_template:
-    
-	"""
-	plot_list = []
-        if not isinstance(sheet,CFSheet):
-            self.warning('Requested Projection Activity view from other than CFSheet.')
-        else:
-	    for p in sheet.projections().values():			    
-		plot_channels = copy.deepcopy(pt)
-		key = ('ProjectionActivity',sheet.name,p.name)
-		plot_channels['Strength'] = key
-		plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.xdensity,
-							    p.src.bounds,self.normalize,name=p.name))
-
-        
-	return plot_list
-
-
- 
-    def generate_labels(self):
-	""" Function used for generating the labels."""
-	self.labels = []
-	for plot in self.plots:
-	    self.labels.append(plot.name + '\n(from ' + plot.plot_src_name+')')
-
-
-
+### JABALERT: Should change ProjectionPlotGroup to CFProjectionPlotGroup.
 class ProjectionPlotGroup(TemplatePlotGroup):
     """
     PlotGroup for Projection Plots
