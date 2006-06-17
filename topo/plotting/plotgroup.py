@@ -317,9 +317,6 @@ class ProjectionSheetPlotGroup(TemplatePlotGroup):
     particular Projection of the current Sheet.
     """
 
-    def __init__(self,plot_list,template,sheet_name,**params):
-	super(ProjectionSheetPlotGroup,self).__init__(plot_list,template,sheet_name,**params)
-        
     def update_environment(self):
 	"""Execute the command associated with the template."""
 	### JCALERT: commands in analysis.py should be re-written to
@@ -365,7 +362,7 @@ class ProjectionActivityPlotGroup(ProjectionSheetPlotGroup):
 ### ProjectionPlotGroup into a shared parent class; then those
 ### three classes should be much shorter.
 
-class ConnectionFieldsPlotGroup(TemplatePlotGroup):
+class ConnectionFieldsPlotGroup(ProjectionSheetPlotGroup):
     """
     PlotGroup for Connection Fields UnitViews.  
 
@@ -375,6 +372,8 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
       situate: Whether to situate the plot on the full source sheet, or just show the weights.
     """
 
+    keyname='Weights'
+
     def __init__(self,plot_list,template,sheet_name,x,y,**params):
         self.x = x
         self.y = y
@@ -382,17 +381,8 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
 	super(ConnectionFieldsPlotGroup,self).__init__(plot_list,template,sheet_name,**params)
   
     def update_environment(self):
-	""" 
-	Only implemented for TemplatePlotGroup. 
-	Execute the command associated with the template.
-	"""
-	### JCALERT: commands in analysis have to be re-written so that to avoid
-	### setting all these global parameters.
 	topo.commands.analysis.coordinate = (self.x,self.y)
-	topo.commands.analysis.sheet_name = self.sheet_name
-
-        exec self.updatecommand  in __main__.__dict__
-		
+	super(ConnectionFieldsPlotGroup,self).update_environment()
 
     def _create_plots(self,pt_name,pt,sheet):
 	""" 
@@ -408,12 +398,12 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
 	    # request UnitViews (i.e. by changing the Strength key in
 	    # the plot_channels) Otherwise, we consider Strength as
 	    # specifying an arbitrary SheetView.
-	    if ( pt.get('Strength', None) == 'Weights'):
+	    if ( pt.get('Strength', None) == self.keyname):
 		for p in sheet.projections().values():			    
 		    plot_channels = copy.deepcopy(pt)
 		    # Note: the UnitView is in the src_sheet view_dict,
 		    # and the name in the key is the destination sheet.
-		    key = ('Weights',sheet.name,p.name,self.x,self.y)
+		    key = (self.keyname,sheet.name,p.name,self.x,self.y)
 		    plot_channels['Strength'] = key
 		    if self.situate:
 			plot_list.append(make_template_plot(plot_channels,p.src.sheet_view_dict,p.src.xdensity,
@@ -430,19 +420,12 @@ class ConnectionFieldsPlotGroup(TemplatePlotGroup):
         return plot_list
 
 
-    ### Need to be re-implemented for connectionfieldplotgroup.
-    def generate_labels(self):
-	""" Function used for generating the labels."""
-	self.labels = []
-	for plot in self.plots:
-	    self.labels.append(plot.name + '\n(from ' + plot.plot_src_name+')')
-
 
 ### JABALERT: Should change ProjectionPlotGroup to CFProjectionPlotGroup.
-class ProjectionPlotGroup(TemplatePlotGroup):
-    """
-    PlotGroup for Projection Plots
-    """
+class ProjectionPlotGroup(ProjectionSheetPlotGroup):
+    """PlotGroup for Projection Plots."""
+
+    keyname='Weights'
 
     def __init__(self,plot_list,template,sheet_name,proj_name,density,**params):
 
@@ -461,11 +444,6 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 
         self.INITIAL_PLOT_HEIGHT = 5
 
-
-	### JCALERT! change this name 
-        #self._sim_ep_src = self._sim_ep.projections().get(self.weight_name,None)
- 
-
     def update_environment(self):
 	""" 
 	Only implemented for TemplatePlotGroup. 
@@ -475,9 +453,8 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 	### setting all these global parameters.
 	coords = self.generate_coords()
         topo.commands.analysis.proj_coords = coords
-	topo.commands.analysis.sheet_name = self.sheet_name
         topo.commands.analysis.proj_name = self.weight_name
-        exec self.updatecommand  in __main__.__dict__
+	super(ProjectionPlotGroup,self).update_environment()
 		
     def _create_plots(self,pt_name,pt,sheet):
 	""" 
@@ -493,7 +470,7 @@ class ProjectionPlotGroup(TemplatePlotGroup):
 		plot_channels = copy.deepcopy(pt)
 		# JC: we might consider allowing the construction of 'projection type' plots
 		# with other things than UnitViews.
-		key = ('Weights',sheet.name,projection.name,x,y)
+		key = (self.keyname,sheet.name,projection.name,x,y)
 		plot_channels['Strength'] = key
 		if self.situate:
 		    plot_list.append(make_template_plot(plot_channels,src_sheet.sheet_view_dict,src_sheet.xdensity,
@@ -559,5 +536,3 @@ class ProjectionPlotGroup(TemplatePlotGroup):
     def _ordering_plots(self):
 	"""Skips plot sorting for Projections to keep the units in order."""
 	pass
-    
-
