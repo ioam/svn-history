@@ -12,7 +12,7 @@ import topo
 
 from topo.analysis.featuremap import MeasureFeatureMap
 from topo.base.arrayutils import octave_output, centroid
-from topo.base.cf import CFSheet, CFProjection
+from topo.base.cf import CFSheet, CFProjection, Projection
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView, ProjectionView
 import topo.base.patterngenerator
@@ -135,7 +135,7 @@ def measure_cog():
                     xpref[r][c]= xcentroid
                     ypref[r][c]= ycentroid
                     
-                    ### JCALERT: This will need to be extended to work
+                    ### JCHACKALERT: This will need to be extended to work
                     ### when there are multiple projections to this sheet;
                     ### right now only the last one in the list will show
                     ### up.
@@ -160,52 +160,58 @@ def update_activity():
         sheet.sheet_view_dict['Activity']=new_view
     
 
-
+# JABALERT: Module variables for passing values to the commands; should be
+# changed to a cleaner mechanism.
 coordinate = (0,0)
 sheet_name = ''
+proj_coords=[(0,0)]
+proj_name =''
+
+
 ### JACALERT! This function, as well as update_projections have to be simplified.
 ### Particularly, having to retrieve the Sheet object from the sheet_name is an issue:
 ### It might be better to have access to the Sheet object directly rather then the name 
 ### in the CFSheetPlotpanels.
 def update_connectionfields():
     """
-    Lambda function passed in, that will filter out all sheets
-    except the one with the name being looked for.
+    Add SheetViews for the weights of one unit in a CFSheet, 
+    for use in template-based plots.
     """
     sheets = topo.sim.objects(Sheet).values()
     x = coordinate[0]
     y = coordinate[1]
-    for each in sheets:
-	if (each.name == sheet_name):
-            ### JCALERT! It is confusing that the method unit_view is only defined in the 
-            ### CFSheet class, and that we are supposed to manipulate sheets here.
-            ### also, it is supposed to return a view, but here it is used as a procedure.
-	    each.update_unit_view(x,y)
-
-
-
-proj_coords=[(0,0)]
-proj_name =''
+    for s in sheets:
+	if (s.name == sheet_name and isinstance(s,CFSheet)):
+	    s.update_unit_view(x,y)
 
 
 def update_projections():
+    """
+    Add SheetViews for the weights in one CFProjection,
+    for use in template-based plots.
+    """
     sheets = topo.sim.objects(Sheet).values()
-    for each in sheets:
-	if (each.name == sheet_name):
+    for s in sheets:
+	if (s.name == sheet_name and isinstance(s,CFSheet)):
 	    for x,y in proj_coords:
-		each.update_unit_view(x,y,proj_name,)
+		s.update_unit_view(x,y,proj_name,)
+
 
 def update_projectionactivity():
-
-    sheets = topo.sim.objects(Sheet).values()
-    for each in sheets:
-	if (each.name == sheet_name):
-	    each.update_projection_view()
-
-
-proj_name=''
-
-
+    """
+    Add SheetViews for all of the Projections of the ProjectionSheet
+    specified by sheet_name, for use in template-based plots.
+    """
+    
+    for s in topo.sim.objects(Sheet).values():
+	if (s.name == sheet_name and isinstance(s,ProjectionSheet)):
+            for p in s.in_connections:
+                if not isinstance(p,Projection):
+                    topo.sim.debug("Skipping non-Projection "+p.name)
+                elif proj_name == '' or p.name==proj_name:
+                    v = p.get_projection_view()
+                    key = ('ProjectionActivity',v.projection.dest.name,v.projection.name)
+                    v.projection.src.sheet_view_dict[key] = v
 
 
        
