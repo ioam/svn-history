@@ -937,36 +937,6 @@ class CFSheet(ProjectionSheet):
             src.sheet_view_dict[key] = v
     
 
-    def update_projection_view(self,projection_name=None):
-        """
-	Creates the list of ProjectionView objects 
-
-	Each ProjectionView is then added to the sheet_view_dict of its source sheet.
-
-	"""     
-        # We check that all the projections are CFProjection
-        for p in self.in_connections:
-            if not isinstance(p,CFProjection):
-                ### JCALERT! Choose if we raise an error or if we just delete the
-                ### Non-CFProjection from the in_projection list.
-                raise ValueError("projection has to be a CFProjection in order to build ProjectionView")
-            
-        if projection_name == None:
-            projection_filter = lambda p: True
-        else:
-            projection_filter = lambda p: p.name==projection_name
-            
-        views = [p.get_projection_view() for p in self.in_connections if projection_filter(p)]
-
-        for v in views:
-            src = v.projection.src
-            key = ('ProjectionActivity',v.projection.dest.name,v.projection.name)
-            src.sheet_view_dict[key] = v
-
-
-    
-
-
  
     ### JCALERT! This should probably be deleted...
     def release_unit_view(self,x,y):
