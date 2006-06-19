@@ -223,6 +223,13 @@ set to something callable in __main__, and whose value is evaluated
 before each time the prompt is executed.
 </li>
 
+<li>
+2006/06/19: e.g. Filename's search_paths attribute shouldn't be pickled.
+Presumably there will be other such items, so should objects have a standard 
+attribute/parameter that lists attributes not to pickle? Or something like that.
+Otherwise, save_snapshot and load_snapshot could specifically avoid specific
+items.
+</li>
 
 </ul>
 
