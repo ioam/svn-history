@@ -81,12 +81,14 @@ easier.
 
 
 <li>
-2006/05/17 (JB): Number, DynamicNumber: Need to replace the current
+2006/06/19 (JB): Number, DynamicNumber: Need to replace the current
 implementation with one where Number has a 'dynamic' slot that
 can be turned on or off, so that any Number could be dynamic.
 Includes making sure something sensible happens in model editor,
 and (eventually) making it possible to set their values and
 (hopefully) change any Number to be dynamic.
+<br />
+Need to make sure DynamicNumbers are advanced only once per simulation time.
 </li>
 
 <li>
