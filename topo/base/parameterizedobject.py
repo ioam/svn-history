@@ -622,7 +622,7 @@ class ParameterizedObject(object):
         object_count += 1
 
         self.nopickle = []
-        self.verbose('Initialized',self)
+        self.debug('Initialized',self)
 
         self.initialized=True
 

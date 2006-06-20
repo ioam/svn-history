@@ -98,7 +98,7 @@ class PatternGenerator(ParameterizedObject):
         """
         self._check_params(params)
                 
-        self.verbose("params = ",params)
+        self.debug("params = ",params)
         self.__setup_xy(params.get('bounds',self.bounds),
                         params.get('xdensity',self.xdensity),
                         params.get('ydensity',self.ydensity),
@@ -123,7 +123,7 @@ class PatternGenerator(ParameterizedObject):
         rows and cols), and transform according to x, y, and
         orientation.
         """
-        self.verbose("bounds = ",bounds,"xdensity =",xdensity,"x =",x,"y=",y)
+        self.debug("bounds = ",bounds,"xdensity =",xdensity,"x =",x,"y=",y)
         # Generate vectors representing coordinates at which the pattern
         # will be sampled.
         x_points,y_points = SheetCoordinateSystem(bounds,xdensity,ydensity).sheetcoordinates_of_matrixidx()

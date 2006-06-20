@@ -181,9 +181,10 @@ class EventProcessor(ParameterizedObject):
 
         Note that just creating an EventProcessor does not mean it is
         part of the simulation (i.e. it is not in the simulation's list
-        of EventProcessors, and it does not have its start() method called).
+        of EventProcessors, and it will not have its start() method called).
         To add an EventProcessor e to a simulation s, simply do
-        s['name_of_e']=e. At this point, e's name becomes 'name_of_e'.
+        s['name_of_e']=e. At this point, e's 'name' attribute will be set
+        to 'name_of_e'.
         """
         super(EventProcessor,self).__init__(**config)
 
@@ -243,13 +244,15 @@ class EventProcessor(ParameterizedObject):
 
 
     def send_output(self,src_port=None,data=None):
-        """
-        Send some data out to all connections on the given src_port.
-        """
+        """Send some data out to all connections on the given src_port."""
         out_conns_on_src_port = [conn for conn in self.out_connections
                                  if conn.src_port==src_port]
 
         for conn in out_conns_on_src_port:
+            self.verbose("Time " + str(self.simulation.time()) + ":" +
+                         " Sending output on src_port " + str(src_port) +
+                         " via connection " + conn.name +
+                         " to " + conn.dest.name + ".")
             e=EPConnectionEvent(conn.delay+self.simulation.time(),conn,data)
             self.simulation.enqueue_event(e)
             
@@ -617,7 +620,7 @@ class Simulation(ParameterizedObject):
             else:
                 # Pop and call the event at the head of the queue.
                 event = self.events.pop(0)
-                self.verbose("Delivering "+ repr(event))
+                self.debug("Delivering "+ repr(event))
                 event()
                 did_event=True
 

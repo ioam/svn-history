@@ -95,10 +95,10 @@ generated and processed before this step is complete.""")
         self.simulation.enqueue_event(e)
 
     def input_event(self,conn,data):
-        self.verbose("Received %s input from %s." % (NxN(data.shape),conn.src))
-        self.verbose("Generating a new pattern...")
-
+        self.verbose("Time " + str(self.simulation.time()) + ":" +
+                     " Receiving input from " + str(conn.src.name) +
+                     " on dest_port " + str(conn.dest_port) +
+                     " via connection " + conn.name + ".")
+        self.verbose("Time %0.4f: Generating a new pattern" % (self.simulation.time()))
         self.activity = self.input_generator()
-        
         self.send_output(data=self.activity)
-        self.verbose("Sending %s output at time %d." % (NxN(self.activity.shape),self.simulation.time()))
