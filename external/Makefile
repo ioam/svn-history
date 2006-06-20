@@ -35,10 +35,6 @@ python-uninstall:
 ##############################################################
 # Tcl
 #
-# CEBHACKALERT: we've done this now?
-# Jeff says that these flags, passed to the linker
-# should make the need to add the path to LD_LIBRARY_PATH
-# unnecessary   -Wl,-rpath -Wl,/home/jp/research/topographica/lib
 TCL = tcl8.4.9
 TCL_UNINSTALL += bin/tclsh8.4 bin/wish8.4 lib/tclConfig.sh
 TCL_UNINSTALL += lib/tcl8.4 lib.tclConfig.sh lib/libtcl8.4.so lib/libtclstub8.4.a
