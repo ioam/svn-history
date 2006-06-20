@@ -27,7 +27,6 @@ class EditorCanvas(Canvas) :
     canvas in a Topographica model-editing GUI. 
     """
 
-    ############ Constructor ####################################
     def __init__(self, root = None, width = 600, height = 600) :
         Canvas.__init__(self, root, width = width, height = height, bg = "white", bd = 2, relief = SUNKEN)
         self.panel = Frame(root)
@@ -119,16 +118,16 @@ class EditorCanvas(Canvas) :
         vertical_scrollbar.pack(side = RIGHT, fill = Y)
         horizontal_scrollbar.pack(side = BOTTOM, fill = X)
     
-    ############ Keypress event handlers ############################
-
     def key_press(self, event) :
-        # what happens when a key is pressed.
+        "What happens when a key is pressed."
         self.change_mode(event.char)
 
-    ############ Left mouse button event handlers ###################
+
+    #   Left mouse button event handlers
         
     def left_click(self, event) :
-        # what is to happen if the left button is pressed.
+        "What is to happen if the left button is pressed."
+        
         x,y = self.canvasx(event.x), self.canvasy(event.y)
         {"ARROW" : self.init_move,	     # case Arrow mode
          "MAKE" : self.none,		     # case Make mode
@@ -136,8 +135,8 @@ class EditorCanvas(Canvas) :
         }[self.mode](x,y)                    # select function depending on mode
     
     def left_click_drag(self, event) :
-        # what is to happen if the mouse is dragged while the left button
-        # is pressed.
+        "What is to happen if the mouse is dragged while the left button is pressed."
+        
         x,y = self.canvasx(event.x), self.canvasy(event.y)
         {"ARROW" : self.update_move,              # case Arrow mode
          "MAKE" : self.none,		       # case Make mode
@@ -145,7 +144,8 @@ class EditorCanvas(Canvas) :
         }[self.mode](x,y)                      # select function depending on mode
         
     def left_release(self, event) :
-        # what is to happen when the left mouse button is released.
+        "What is to happen when the left mouse button is released."
+        
         x,y = self.canvasx(event.x), self.canvasy(event.y)
         {"ARROW" : self.end_move,            # case Arrow mode
          "MAKE" : self.create_object,	     # case Make mode
@@ -153,31 +153,35 @@ class EditorCanvas(Canvas) :
         }[self.mode](x,y)                    # select function depending on mode
 
     def left_double_click(self, event) :
-        # what is to happen if the left button is double clicked.
-	# the same for all modes - show the properties for the clicked item
-        # gets object or connection at this point and give it the focus
+        """
+        What is to happen if the left button is double clicked.
+	The same for all modes - show the properties for the clicked item.
+        Gets object or connection at this point and gives it the focus.
+        """
         focus = self.get_xy(event.x, event.y) 
         if (focus != None) :
             focus.set_focus(True)
         # show the object or connection's properties.
         self.show_properties(focus)         
+
     
-    ############ Right mouse button event handlers #################
+    #   Right mouse button event handlers
 
     def right_click(self, event) :
-        # what is to happen if the right button is pressed.
+        "What is to happen if the right button is pressed."
         self.show_hang_list(event)
 
     def right_release(self, event) :
-        # what is to happen when the right mouse button is released (bound to the menu).
+        "What is to happen when the right mouse button is released (bound to the menu)."
         if (self.focus != None) : # remove focus.
             self.focus.set_focus(False)
 
-    ########### Mode Methods #######################################
+
+    #   Mode Methods
     
     def change_mode(self, char) :
-        # changes the mode of the canvas. This will change the effect of mouse events in 
-        # the canvas.
+        "Changes the mode of the canvas, i.e., what mouse events will do."
+        
         if not char in ('c', 'm', 'a') : return
         # remove the focus from the previous toolbar item
         {"ARROW" : self.arrow_tool.set_focus,     # arrow toolbar item
@@ -199,7 +203,9 @@ class EditorCanvas(Canvas) :
         bar.set_focus(True)
         self.mode = mode
 
-    ########### Panel methods #########################################
+
+    #   Panel methods
+    
     def refresh(self) :
         for obj in self.object_list :
             obj.set_focus(True)
@@ -232,24 +238,28 @@ class EditorCanvas(Canvas) :
 
 
 
-    ########### Object moving methods #################################
-    # if an object is left clicked in the canvas, these methods allow it to be repositioned in
-    # the canvas.
+    #   Object moving methods
+    #
+    # If an object is left clicked in the canvas, these methods allow
+    # it to be repositioned in the canvas.
 
     def init_move(self, x, y) :
-        # determine if click was on an object.
+        "Determine if click was on an object."
+        
         self.current_object = self.get_object_xy(x, y)
         if (self.current_object != None) : 
             # if it was, give it the focus
             self.current_object.set_focus(True)
 
     def update_move(self, x, y) :
-        # if dragging an object, refresh it's position
+        "If dragging an object, refresh its position"
+        
         if (self.current_object != None) :
             self.current_object.move(x, y)
 
     def end_move(self, x, y) :
-        # if dropping an object, remove focus and refresh.
+        "If dropping an object, remove focus and refresh."
+        
         if (self.current_object != None) :
             self.current_object.set_focus(False)
             self.current_object.move(x, y)
@@ -257,11 +267,13 @@ class EditorCanvas(Canvas) :
         self.redraw_objects()
         self.current_object = None
 
-    ############ Connection methods ########################
+    #   Connection methods
+    #
     # these methods allow a connection to be made between two objects in the canvas
 
     def init_connection(self, x, y) :
-        # determine if click was on an object and retain
+        "Determine if click was on an object, and retain if so."
+        
         current_object = self.get_object_xy(x, y)
         if (current_object == None) : # if not change to ARROW mode
             self.change_mode('a')
@@ -270,11 +282,12 @@ class EditorCanvas(Canvas) :
             self.current_connection.set_focus(True)
 
     def update_connection(self, x, y) :
-        # update connection's pos 
+        "Update connection's position."
        	self.current_connection.update_position((x, y))
         
     def end_connection(self, x, y) :
-        # determine if the connection has been dropped on an object
+        "Determine if the connection has been dropped on an object."
+        
         obj = self.get_object_xy(x, y)
         if (obj != None) : # if an object, connect the objects and remove focus
             if (self.current_connection != None) :
@@ -291,7 +304,8 @@ class EditorCanvas(Canvas) :
         self.current_connection = None
 
     def get_connection_xy(self, x, y) :
-        # return connection at given x, y (None if no connection)
+        "Return connection at given x, y (None if no connection)."
+        
         for obj in self.object_list :
             connection_list = obj.from_connections[:]
             connection_list.reverse()
@@ -300,27 +314,28 @@ class EditorCanvas(Canvas) :
                     return con
         return None
 
-    ########### Object Methods ######################################
+    #   Object Methods
 
     def create_object(self, x, y) : 
-        # create a new object
+        "Create a new object."
         self.add_object(self.object_tool.create_node(x, y))
 
     def add_object(self, obj) : 
-        # add a new object to the Canvas
+        "Add a new object to the Canvas."
+        
         self.object_list = [obj] + self.object_list
 
     def add_object_to_back(self, obj) : 
-        # add a new object to the Canvas at back of the list
+        "Add a new object to the Canvas at back of the list."
+        
         self.object_list =  self.object_list + [obj]
 
     def remove_object(self, obj) : 
-        # remove an object from the canvas
-        # find object index in list
+        "Remove an object from the canvas."
+        
         for i in range(len(self.object_list)) : 
             if (obj == self.object_list[i]) : break
         else : return # object was not found
-        # delete index from list
         del self.object_list[i]
         return i
 
@@ -343,48 +358,52 @@ class EditorCanvas(Canvas) :
         self.refresh()
 
     def get_object_xy(self, x, y) : 
-        # return object at given x, y (None if no object)
-        # search through the bounds of each object in the canvas returns the first
-        # (nearest to front) object, None if no object at x,y
+        "Return object at given x, y (or None if no object)."
+        
+        # search through the bounds of each object in the canvas. 
+        # returns the first (nearest to front) object, None if no object at x,y
         for obj in self.object_list :
             if (obj.in_bounds(x, y)) :
                 break
         else : return None
         return obj
 
-    ########### Properties Method ##################################
 
     def show_properties(self, focus) :
-        # show properties of an object or connection and remove the focus
+        "Show properties of an object or connection, and remove the focus."
+        
         if (focus != None) :
             focus.show_properties()
             focus.set_focus(False)
         
-    ########### Delete GUI Object Method ###########################
-
     def delete_focus(self, focus) :
-        # tell a connection or object to delete itself
+        "Tell a connection or object to delete itself."
+        
         if (focus == None) : 
             pass
         else :
             focus.remove()
             self.redraw_objects()
 
-    ########### Object Order Methods ###############################
-    # these methods ensure the ordering in the canvas window is held and 
-    # allows manipulation of the order.    
+    #   Object Order Methods
+    #
+    # These methods ensure the ordering in the canvas window is held
+    # and allows manipulation of the order.
 
     def redraw_objects(self, index = None) :
-        # redraw all the objects in the canvas, index specifies that only
-        # the objects below a certain index need drawn
+        """
+        Redraw all the objects in the canvas.
+
+        If non-None, the index specifies that only the objects below
+        that index need drawing.
+        """
+
         if (index == None or index < 0) : index = len(self.object_list)
         for i in range(index ,0, -1) :
             self.object_list[i-1].draw()
     
     def move_to_front(self, obj) :
-        # remove the object from the canvas list
         index = self.remove_object(obj)
-        # add it to the front and redraw the necessary objects
         self.add_object(obj)
         self.redraw_objects(index)
 
@@ -399,17 +418,18 @@ class EditorCanvas(Canvas) :
         self.redraw_objects(i+1)
 
     def move_to_back(self, obj) :
-        # remove the object from the canvas list
         self.remove_object(obj)
-        # add it to the back and redraw all
         self.add_object_to_back(obj)
         self.redraw_objects()
 
-    ########### Hang List Methods ##################################
-    # if there is an object or connection at the right clicked point, a popup menu
-    # is displayed, allowing for modificaitions to the particular obj/con
+    #   Hang List Methods
+    #
+    # If there is an object or connection at the right clicked point,
+    # a popup menu is displayed, allowing for modifications to the
+    # particular obj/con.
 
     def show_hang_list(self, event) :
+
         # change to ARROW mode and get x, y mouse coords
         self.change_mode('a')
         x, y = self.canvasx(event.x), self.canvasy(event.y)
@@ -438,7 +458,7 @@ class EditorCanvas(Canvas) :
         else :
             self.canvas_menu.tk_popup(event.x_root, event.y_root)
         
-    ############## Util ############################################
+    #   Utility methods
 
     def save_snapshot(self) :
         POSTSCRIPT_FILETYPES = [('Encapsulated PostScript images','*.eps'),
@@ -467,8 +487,8 @@ class EditorCanvas(Canvas) :
     def none(self, x, y) : pass
 
     def get_xy(self, x, y) :
-        # returns the connection or object at this x, y position or None if there
-        # is not one.
+        "Returns the connection or object at this x, y position or None if there is not one."
+        
         # check for a connection
         focus = self.get_connection_xy(x, y)
         if (focus == None) :
@@ -477,16 +497,18 @@ class EditorCanvas(Canvas) :
         return focus # return the first found or None
 
 
-####################################################################
+
+
 
 class ModelEditor :
     """
-    This class constructs the main editor window. It uses a instance of GUICanvas as the main
-    editing canvas and inserts the three-option toolbar in a Frame along the left side of the
-    window. 
+    This class constructs the main editor window. It uses a instance
+    of GUICanvas as the main editing canvas and inserts the
+    three-option toolbar in a Frame along the left side of the window.
     """
 
     def __init__(self):
+        
         # create editor window and set title
         root = Tk()
         root.title("Model Editor")
@@ -513,6 +535,7 @@ class ModelEditor :
         self.import_model()
 
     def import_model(self) :
+        
         # random generator, and values used for randomly positioning sheets
         random_generator = Random() 
         padding = 75; spread_extent = 500
