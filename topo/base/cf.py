@@ -886,11 +886,14 @@ class CFSheet(ProjectionSheet):
                         
     def learn(self):
         """
-        Call the learn() method on every CFProjection to the Sheet.
+        Call the learn() method on every Projection to the Sheet.
         """
         for proj in self.in_connections:
-            proj.learn()
-            proj.apply_output_fn()
+            if not isinstance(proj,Projection):
+                topo.sim.debug("Skipping non-Projection "+proj.name)
+            else:
+                proj.learn()
+                proj.apply_output_fn()
 
 ##         in_proj = []
 ##         for proj in self.in_connections:
@@ -909,32 +912,22 @@ class CFSheet(ProjectionSheet):
 ##             proj.apply_output_fn()
 
                 
-    def update_unit_view(self,x,y,projection_name=None):
+    def update_unit_view(self,x,y,proj_name=''):
         """
-	Creates the list of UnitView objects for a particular unit in this CFSheet,
-	(There is one UnitView for each projection to this CFSheet).
+	Creates the list of UnitView objects for a particular unit in this CFSheet.
+	(There is one UnitView for each Projection to this CFSheet).
 
 	Each UnitView is then added to the sheet_view_dict of its source sheet.
 	It returns the list of all UnitView for the given unit.
 	"""     
-        # We check that all the projections are CFProjection
         for p in self.in_connections:
             if not isinstance(p,CFProjection):
-                ### JCALERT! Choose if we raise an error or if we just delete the
-                ### Non-CFProjection from the in_projection list.
-                raise ValueError("projection has to be a CFProjection in order to build UnitView.")
-            
-        if projection_name == None:
-            projection_filter = lambda p: True
-        else:
-            projection_filter = lambda p: p.name==projection_name
-            
-        views = [p.get_view(x,y) for p in self.in_connections if projection_filter(p)]
-
-        for v in views:
-            src = v.projection.src
-            key = ('Weights',v.projection.dest.name,v.projection.name,x,y)
-            src.sheet_view_dict[key] = v
+                topo.sim.debug("Skipping non-CFProjection "+p.name)
+            elif proj_name == '' or p.name==proj_name:
+                v = p.get_view(x,y)
+                src = v.projection.src
+                key = ('Weights',v.projection.dest.name,v.projection.name,x,y)
+                src.sheet_view_dict[key] = v
     
 
  
