@@ -10,9 +10,10 @@ PaletteBitmap  - 1 2D Matrix, 1 1D Color Map
 HSVBitmap    - 3 2D Matrices, Color (H), Confidence (S), Strength (V)
 RGBBitmap    - 3 2D Matrices, Red, Green, Blue Channels.
 
-All maps are assumed to be normalized to 1.  Matrices are passed in as
-part of the constructor and the image is generaed.  For more information,
-see the documentation for each of the Bitmap classes.
+All maps are assumed to be on a nominal range of 0.0 to 1.0.  Matrices
+are passed in as part of the constructor and the image is generaed.
+For more information, see the documentation for each of the Bitmap
+classes.
 
 The encapsulated PIL Image is accessible through the .bitmap attribute.
 
