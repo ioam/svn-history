@@ -137,7 +137,7 @@ pgt = new_plotgroup_template(name='Connection Fields',command='update_connection
 pgt.add_plot('Connection Fields',[('Strength','Weights'),('Hue','OrientationPreference'),('Confidence','OrientationSelectivity')])
 
 pgt = new_plotgroup_template(name='Projection Activity',command='update_projectionactivity()',normalize=True)
-pgt.add_plot('ProjectionActivity',[('Strength','ProjectionActivity'),('Hue','OrientationPreference'),('Confidence','OrientationSelectivity')])
+pgt.add_plot('ProjectionActivity',[('Strength','ProjectionActivity')])
 
 pgt = new_plotgroup_template(name='Projection',command='update_projections()',normalize=True)
 pgt.add_plot('Projection',[('Strength','Weights'),('Hue','OrientationPreference'),('Confidence','OrientationSelectivity')])
