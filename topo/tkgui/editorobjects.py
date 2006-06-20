@@ -17,8 +17,11 @@ from topo.commands.analysis import update_activity
 from topo.misc.utils import shortclassname
 from parametersframe import ParametersFrame
 
+
 # CEBHACKALERT: any reason this isn't a new-style class
 # (i.e. why doesn't this inherit from object)?
+# JAB: Probably no reason; should be changed to inherit from object.
+#
 class EditorObject :
     """
     Anything that can be added and manipulated in an EditorCanvas. Every EditorCanvas
@@ -28,28 +31,27 @@ class EditorObject :
     FROM = 0
     TO = 1
 
-    # constructor
     def __init__(self, name, canvas) :
         self.canvas = canvas # retains a reference to the canvas
         self.name = name # set the name of the sheet
         self.focus = False # this does not have the focus
         self.viewing_choices = []
-#        self.object_cover_dict = {}
 
     def draw(self) :
-        # draw the object at the current x, y position
+        "Draw the object at the current x, y position."
         pass
 
     def objdoc(self) :
         """Documentation string for this object."""
-        ### JABALERT Should be expanded to allow a per-object description
-        ### JABALERT Should be bound to the actual editor object as well.
+        ### JABALERT: Should be expanded to allow a per-object description,
+        ### and should be bound to the actual editor object as well.
         return self.name + " is of type " + \
                shortclassname(self.parameterized_obj) + \
                ":\n\n" + getdoc(self.parameterized_obj)
 
     def show_properties(self) :
-        # show parameters frame for object
+        "Show parameters frame for object."
+        
         parameter_window = Toplevel()
         parameter_window.title(self.name)
         balloon = Pmw.Balloon(parameter_window)
@@ -71,7 +73,6 @@ class EditorObject :
 
     def update_parameters(self) :
         self.parameter_frame.set_obj_params()
-#        self.object_cover_dict = self.parameter_frame.object_dictionary
 
     def okay_parameters(self, parameter_window) :
         self.update_parameters()
@@ -84,19 +85,17 @@ class EditorObject :
         pass
 
     def move(self) :
-        # update position of object and redraw
+        "Update position of object and redraw."
         pass
 
     def remove(self) :
-        # remove this object from the canvas and deal with relevant 
-        # Topographica objects.
+        "Remove this object from the canvas and from the Topographica simulation."
         pass    
 
     def in_bounds(self, x, y) : 
-        # return true, if x,y lies within this gui object's boundary
+        "Return true if x,y lies within this gui object's boundary."
         pass
 
-####################################################################
 
 
 class EditorNode(EditorObject) :
@@ -118,7 +117,8 @@ class EditorNode(EditorObject) :
         self.y = pos[1]
         self.mode = canvas.display_mode
 
-    ############ Connection methods ########################
+
+    #   Connection methods
 
     def attach_connection(self, con, from_to) :
         if (from_to == self.FROM) :
@@ -146,7 +146,8 @@ class EditorNode(EditorObject) :
             else : return
             del self.from_connections[i]
 
-    ############ Util methods ##############################
+
+    #   Util methods
     
     def get_pos(self) :
         return (self.x, self.y) # return center point of node
@@ -179,7 +180,6 @@ class EditorSheet(EditorNode) :
     """
 
     def __init__(self, canvas, sheet, pos, name) :
-        # super constructor call
         EditorNode.__init__(self, canvas, pos, name)
         # CEBHACKALERT: couldn't the object be stored in something like
         # self.parameterized_object rather than specifically self.sheet
@@ -204,7 +204,8 @@ class EditorSheet(EditorNode) :
         self.viewing_choices = [('Normal', lambda: self.select_view('normal')),
                                 ('Activity', lambda: self.select_view('activity'))]
 
-    ############ Draw methods ############################
+
+    #   Draw methods
 
     def get_viewing_choices(self) :
         return self.viewing_choices
@@ -333,7 +334,8 @@ class EditorSheet(EditorNode) :
             if (not(con.from_node == con.to_node)) :
                 con.move()
 
-    ############ Update methods ############################ 
+
+    #   Update methods
 
     def remove(self) :
         l = len(self.from_connections) # remove all the connections from and to this sheet
@@ -356,7 +358,8 @@ class EditorSheet(EditorNode) :
         self.sheet.gui_x, self.sheet.gui_y = x, y # update topo sheet position
         self.draw(self.x - old[0], self.y - old[1])
 
-    ############ Connection methods ########################
+
+    #   Connection methods
 
     def remove_connection(self, con, from_to) :
         EditorNode.remove_connection(self, con, from_to)
@@ -385,7 +388,8 @@ class EditorSheet(EditorNode) :
         if node == self : count /= 2
         return count
 
-    ############ Util methods ##############################
+
+    #   Util methods
 
     def in_bounds(self, pos_x, pos_y) : # returns true if point lies in a bounding box
         # if the coord is pressed within the parallelogram representation this 
@@ -402,9 +406,11 @@ class EditorSheet(EditorNode) :
         # As the gradient of the lines is 1 the calculation is simple.
         a_AB = A[1] + A[0]
         a_CD = C[1] + C[0]
-        # The points are centered around the given coord, finding the intersects with line y = 0
-        # and ensuring that the left line lies on the negative side of the point and the right line
-        # lies on the positive side of the point determines that the point is within the parallelogram.
+        # The points are centered around the given coord, finding the
+        # intersects with line y = 0 and ensuring that the left line
+        # lies on the negative side of the point and the right line
+        # lies on the positive side of the point determines that the
+        # point is within the parallelogram.
         if ((D[1] >= 0) and (B[1] <= 0) and (a_AB <= 0) and (a_CD >= 0)) :
             return True
         return False
@@ -434,7 +440,7 @@ class EditorSheet(EditorNode) :
         for con in self.from_connections :
             con.draw()
 
-####################################################################
+
 
 
 ### JABALERT: From the behavior in the Model Editor, this seems to be
@@ -444,6 +450,7 @@ class EditorSheet(EditorNode) :
 ### arrow.  The Projection support should also acknowledge that it is
 ### specific to CFProjection, because other representations would be
 ### appropriate for other types of Projection.
+###
 class EditorConnection(EditorObject) :
 
     """
@@ -459,13 +466,15 @@ class EditorConnection(EditorObject) :
         self.to_position = from_node.get_pos()
         self.mode = canvas.display_mode
 
-    ############ Draw methods ############################
+
+    #   Draw methods
 
     def set_focus(self, focus) : # give this connection the focus
         EditorObject.set_focus(self, focus)
         self.draw()
 
-    ############ Update methods ############################ 
+
+    #   Update methods
     
     def move(self) :
         # if one of the nodes connected by this connection move, then move by redrawing	
@@ -494,7 +503,9 @@ class EditorConnection(EditorObject) :
         if hasattr(self,'connection'):
             self.connection.remove()
 
-    ############ Util methods ##############################
+
+    #   Util methods
+    
     def show_properties(self) :
         EditorObject.show_properties(self)
         self.parameter_frame.create_widgets(self.connection)
@@ -530,7 +541,9 @@ class EditorProjection(EditorConnection) :
                                 ('Line', lambda: self.select_view('line')),
                                 ('Fixed Size', lambda: self.select_view('normal'))]
 
-    ############ Draw methods ############################
+
+    #   Draw methods
+    
     def get_viewing_choices(self) :
         return self.viewing_choices
 
@@ -670,7 +683,9 @@ class EditorProjection(EditorConnection) :
             self.label = self.canvas.create_text(middle[0] - dX,
                 middle[1] - dY, fill = text_col, text = self.name, anchor = E)
 	
-    ############ Update methods ############################ 
+
+    #   Update methods
+    
     def remove(self) :
         if (self.to_node != None) : # if a connection had been made then remove it from the 'to' node
             self.to_node.remove_connection(self, self.TO)
@@ -701,7 +716,9 @@ class EditorProjection(EditorConnection) :
         self.gradient = self.calculate_gradient()
         self.radius = self.get_radius()
 
-    ############ Util methods ##############################
+
+    #   Util methods
+    
     def get_middle(self, pos1, pos2) : # returns the middle of two points
         return (pos1[0] + (pos2[0] - pos1[0])*0.5, pos1[1] + (pos2[1] - pos1[1])*0.5)
 
@@ -797,8 +814,10 @@ class EditorProjection(EditorConnection) :
                 if (y > pY or y < -pY) :
                     return False
                 return True
-            # returns true if x, y lie inside the triangular receptive field representing this projection
-            # get the points of the triangular receptive field, centered around the x, y point given
+            # returns true if x, y lie inside the triangular receptive
+            # field representing this projection get the points of the
+            # triangular receptive field, centered around the x, y
+            # point given
             to_position = self.to_node.get_pos()
             from_position = self.from_node.get_pos()
             if self.view == 'radius' :
@@ -818,9 +837,11 @@ class EditorProjection(EditorConnection) :
             # calculate the constant for the lines of the triangle
             a_BA = A[1] - (self.gradient[0] * A[0])
             a_CA = A[1] - (self.gradient[1] * A[0])
-            # The points are centered around the given coord, finding the intersects with line y = 0
-            # and ensuring that the left line lies on the negative side of the point and the right line
-            # lies on the positive side of the point determines that the point is within the triangle.
+            # The points are centered around the given coord, finding
+            # the intersects with line y = 0 and ensuring that the
+            # left line lies on the negative side of the point and the
+            # right line lies on the positive side of the point
+            # determines that the point is within the triangle.
             if (((0 - a_CA) / self.gradient[1] >= 0) and ((0 - a_BA) / self.gradient[0] <= 0)) :
                 return True
             return False
