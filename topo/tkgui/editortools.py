@@ -21,14 +21,14 @@ from topo.base.projection import Projection
 from editorobjects import EditorSheet, EditorProjection
 from parametersframe import ParametersFrame
 
-class ArrowTool(Frame) :
+class ArrowTool(Frame):
     """
     ArrowTool is a selectable frame containing an arrow icon and a label. It is a
     toolbar item in a ModelEditor that allows the user to change the GUICanvas to 
     'ARROW' mode. 
     """
 
-    def __init__(self, canvas,  parent = None, parambar = None) :
+    def __init__(self, canvas,  parent = None, parambar = None):
         Frame.__init__(self, parent, bg = 'light grey', bd = 4, relief = RAISED)
         self.canvas = canvas # hold canvas reference
         self.parameter_tool = parambar # To display class properties and name
@@ -48,17 +48,17 @@ class ArrowTool(Frame) :
         self.bind('<Button-1>', self.change_mode)
 	
 	
-    def change_mode(self, event) :
+    def change_mode(self, event):
         self.canvas.change_mode('a') # (ARROW)
 
-    def set_focus(self, focus) :
+    def set_focus(self, focus):
         "Change the background highlight to reflect whether this toolbar item is selected."
         
-        if (focus) :
+        if (focus):
              col = 'dark grey'; relief = GROOVE
-             if not(self.parameter_tool == None) :
+             if not(self.parameter_tool == None):
                  self.parameter_tool.set_focus('Arrow', None, self.doc)
-        else :
+        else:
             col = 'light grey'; relief = RAISED
 
         self.config(bg = col, relief = relief)
@@ -69,7 +69,7 @@ class ArrowTool(Frame) :
 
 
 
-class NodeTool(Frame) :
+class NodeTool(Frame):
     """
     NodeTool extends Frame. It is expected to be included in a topographica
     model development GUI and functions as a self populating Node tool.
@@ -77,7 +77,7 @@ class NodeTool(Frame) :
     a suitable Editor cover for a node and creates the corresponding topo object.
     """
 
-    def __init__(self, canvas,  parent = None, parambar = None) :
+    def __init__(self, canvas,  parent = None, parambar = None):
         
         Frame.__init__(self, parent, bg = 'light grey', bd = 4, relief = RAISED)
         self.canvas = canvas # hold canvas reference.
@@ -105,19 +105,19 @@ class NodeTool(Frame) :
 
     #   Focus Methods
 	
-    def change_mode(self, option) :
+    def change_mode(self, option):
         self.canvas.change_mode('m') # ('MAKE')
 
-    def set_focus(self, focus) :
+    def set_focus(self, focus):
         "Change the background highlight to reflect whether this toolbar item is selected."
         
-        if (focus) :
+        if (focus):
             col = 'dark grey'; relief = GROOVE
-            if not(self.parameter_tool == None) :
+            if not(self.parameter_tool == None):
                 current_option = self.sheet_list[self.current_option]
                 name = str(current_option).split('.')[-1][:-2]
                 self.parameter_tool.set_focus(name, current_option, self.doc)
-        else :
+        else:
             col = 'light grey'; relief = RAISED
         self.config(bg = col, relief = relief)
         self.title_label.config(bg = col)
@@ -126,8 +126,8 @@ class NodeTool(Frame) :
 
     #   Node Methods
 
-    def create_node(self, x, y) :
-        if self.parameter_tool.focus :
+    def create_node(self, x, y):
+        if self.parameter_tool.focus:
             self.parameter_tool.update_parameters()
         # get the current selection and create the new topo object
 
@@ -149,7 +149,7 @@ class NodeTool(Frame) :
 
     #   Util Methods
     
-    def set_option(self, option) :
+    def set_option(self, option):
         self.current_option = option
         self.change_mode(None)
 
@@ -157,7 +157,7 @@ class NodeTool(Frame) :
 
 
 # JABHACKALERT: Currently only searches for topo.projections (connections have not been implemented yet).
-class ConnectionTool(Frame) :
+class ConnectionTool(Frame):
     """ 
     ConnectionTool extends Frame. It is expected to be included in a topographica
     model development GUI and functions as a self populating Connection toolbar.
@@ -167,7 +167,7 @@ class ConnectionTool(Frame) :
     cover. Allows user to change the EditorCanvas mode to 'CONNECTION' mode.
     """
 
-    def __init__(self, canvas, parent = None, parambar = None) :
+    def __init__(self, canvas, parent = None, parambar = None):
         # super constructor call.
         Frame.__init__(self, parent, bg = 'light grey', bd = 4, relief = RAISED)
         self.canvas = canvas # hold canvas reference.
@@ -195,7 +195,7 @@ class ConnectionTool(Frame) :
 
     #   Canvas Topo Linking Methods
 
-    def new_cover(self, from_node) :
+    def new_cover(self, from_node):
         """
         Create an EditorProjection and return it.
 
@@ -205,10 +205,10 @@ class ConnectionTool(Frame) :
         """
         return EditorProjection("", self.canvas, from_node)
 
-    def create_connection(self, editor_connection, node) :
+    def create_connection(self, editor_connection, node):
         "Connects the editor connection and the topo simulation connection."
 
-        if self.parameter_tool.focus :
+        if self.parameter_tool.focus:
             self.parameter_tool.update_parameters()
         sim = self.canvas.simulation
         from_node = editor_connection.from_node.sheet
@@ -218,38 +218,38 @@ class ConnectionTool(Frame) :
         # CEBHACKALERT: see alert about sheet name
 
         # CEBHACKALERT: should probably catch a specific error?
-        try :
+        try:
             if con_name is not None:
                 con = sim.connect(from_node.name,to_node.name,connection_type=con_type,name=con_name)
             else:
                 con = sim.connect(from_node.name,to_node.name,connection_type=con_type)
-        except :
+        except:
             print "These sheets could not be connected by a "+ self.current_option
             editor_connection.remove()
             return False
         editor_connection.connect(node, con)
         return True
 
-    def set_option(self, option) :
+    def set_option(self, option):
         self.current_option = option
         self.change_mode(None)
 
 
     #   Focus Methods
     
-    def change_mode(self, option) :
+    def change_mode(self, option):
         self.canvas.change_mode('c') # ('CONNECTION')
 
-    def set_focus(self, focus) :
+    def set_focus(self, focus):
         "Change the background highlight to reflect whether this toolbar item is selected."
         
-        if (focus) :
+        if (focus):
             col = 'dark grey'; relief = GROOVE
-            if not(self.parameter_tool == None) :
+            if not(self.parameter_tool == None):
                 current_option = self.proj_list[self.current_option]
                 name = str(current_option).split('.')[-1][:-2]
                 self.parameter_tool.set_focus(name, current_option, self.doc)
-        else :
+        else:
             col = 'light grey'; relief = RAISED
         self.config(bg = col, relief = relief)
         self.title_label.config(bg = col)
@@ -258,9 +258,9 @@ class ConnectionTool(Frame) :
 
 
 
-class ParametersTool(Frame) :
+class ParametersTool(Frame):
 
-    def __init__(self, parent = None) :
+    def __init__(self, parent = None):
         Frame.__init__(self, parent)
         self.focus = None
         # label
@@ -279,10 +279,10 @@ class ParametersTool(Frame) :
         self.parameter_frame = ParametersFrame(parameter_window)
         self.parameter_window=parameter_window
 
-    def update_parameters(self) :
+    def update_parameters(self):
         self.parameter_frame.set_class_parameters()
 
-    def set_focus(self, name, focus_class, doc = '') :
+    def set_focus(self, name, focus_class, doc = ''):
         self.focus = name
             
         self.title_label.config(text = name)
