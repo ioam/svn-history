@@ -194,7 +194,7 @@ def update_projections():
     for s in sheets:
 	if (s.name == sheet_name and isinstance(s,CFSheet)):
 	    for x,y in proj_coords:
-		s.update_unit_view(x,y,proj_name,)
+		s.update_unit_view(x,y,proj_name)
 
 
 def update_projectionactivity():
