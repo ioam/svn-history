@@ -282,6 +282,7 @@ class EditorCanvas(Canvas) :
                 if connected :
                     self.current_connection.set_focus(False)
         else : # if not an object, remove the connection
+            connected=False
             if (self.current_connection != None) :
                 self.current_connection.remove()
         if connected :

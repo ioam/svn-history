@@ -491,7 +491,8 @@ class EditorConnection(EditorObject) :
     def remove(self):
         # CEBHACKALERT: there's no code to handle GUI object removal
         # (though it looks like the EditorProjection subclass implements it).
-        self.connection.remove()
+        if hasattr(self,'connection'):
+            self.connection.remove()
 
     ############ Util methods ##############################
     def show_properties(self) :
