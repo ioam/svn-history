@@ -23,13 +23,18 @@ class GeneratorSheet(Sheet):
     Typically generates the patterns by choosing parameters from a
     random distribution, but can use any mechanism.
     """
-    period = Number(default=1,doc="Delay (in Simulation time) between generating new input patterns.")
+    
+    period = Number(default=1,doc=
+        "Delay (in Simulation time) between generating new input patterns.")
+    
     phase  = Number(default=0,doc=
-"""Delay after the start of the Simulation (at time zero) before
-generating an input pattern.  For a clocked, feedforward simulation, 
-one would typically want to use a small nonzero phase and use delays less
-than the user-visible step size (typically 1.0), so that inputs are
-generated and processed before this step is complete.""")
+        """
+        Delay after the start of the Simulation (at time zero) before
+        generating an input pattern.  For a clocked, feedforward simulation, 
+        one would typically want to use a small nonzero phase and use delays less
+        than the user-visible step size (typically 1.0), so that inputs are
+        generated and processed before this step is complete.
+        """)
 
     input_generator = topo.base.patterngenerator.PatternGeneratorParameter(doc=
 "Specifies a particular PatternGenerator type to use when creating patterns.")

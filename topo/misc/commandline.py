@@ -8,13 +8,14 @@ $Id$
 """
 __version__='$Revision$'
 
-import sys, __main__, math
 
-import os
+import sys, __main__, math, os
+
 from optparse import OptionParser
 from inlinec import import_weave
 
-BANNER         = """
+
+BANNER = """
 Welcome to Topographica!
 
 Type help() for interactive help with python, help(topo) for general
@@ -35,6 +36,8 @@ topo_parser = OptionParser(usage=usage)
 
 ### Define option processing
 
+
+### JABALERT: It might be possible to eliminate this; how it is used seems clunky.
 def get_filenames(parser):
     """
     Sub-function used to catch any filenames following any options.
@@ -87,16 +90,14 @@ def process_argv(argv):
     """
     (option,args) = topo_parser.parse_args(argv)
 
-    # If no scripts and no commands were given, make it like -i was given.
+    # If no scripts and no commands were given, pretend -i was given.
     if len(args)==0 and len(option.commands)==0:
         option.interactive=True
         
-    # (As of 12/2005) With Python 2.4 compiled and run on Windows XP,
-    # trying to import Weave after starting the topo command-line will
-    # generate a serious system error.  However, importing weave first
-    # does not cause problems.
-    # CEBHACKALERT: I can't check this out because I've never
-    # tried compiling Python on Windows. 
+    # JBDALERT: (As of 12/2005) With Python 2.4 compiled and run on
+    # Windows XP, trying to import Weave after starting the topo
+    # command-line will generate a serious system error.  However,
+    # importing weave first does not cause problems.
     if import_weave: exec "import weave" in __main__.__dict__    
 
     sys.ps1 = 'Topographica> '    
@@ -112,7 +113,7 @@ def process_argv(argv):
         except ImportError:
             print "Module readline not available.\nHistory and completion support disabled."
         else:
-        #set up command completion
+            #set up command completion
             import rlcompleter
             readline.parse_and_bind("tab: complete")
     
@@ -132,6 +133,7 @@ def process_argv(argv):
 
     for filename in filename_arg:
         # CB: this is going to need converting too, I don't know when it's used yet.
+        # JABALERT: What do you mean?  It looks fine to me.
 	execfile(filename,__main__.__dict__)
 
     # execute remaining commands.

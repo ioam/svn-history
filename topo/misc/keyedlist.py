@@ -5,6 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
+
 class KeyedList(list):
     """
     Extends the built-in type 'list' to support dictionary-like
@@ -18,7 +19,7 @@ class KeyedList(list):
     Redefined functions:
         __getitem__ ([,])
         __setitem__ ([,])
-        append  --  Now takes a tuple, (key, value) so that value
+        append  --  Now takes a tuple (key,value) so that value
                     can be later accessed by [key].
                     
     New functions modeled from dictionaries:
@@ -31,8 +32,9 @@ class KeyedList(list):
     """
 
     def __getitem__(self,k):
-        """ The bracket [] accessor. """
+        """The bracket [] accessor."""
         return self.get(k)
+
 
     def __setitem__(self,k,v):
         """
@@ -40,6 +42,7 @@ class KeyedList(list):
         Overwrite value if key already exists, otherwise append.
         """
         return self.set(k,v)
+
 
     def append(self, (key, value)):
         """
@@ -53,9 +56,11 @@ class KeyedList(list):
         """
         super(KeyedList,self).append(tuple((key,value)))
 
+
     def get(self, key, default=None):
         """
-        Get the value with the specified <key>.
+        Get the value with the specified key.
+        
         Returns None if no value with that key exists.
         """
         for (name,value) in self:
@@ -71,10 +76,11 @@ class KeyedList(list):
             
         return default
 
+
     def set(self, key, value):
         """
-        If the key already exists in the list, change the entry,
-        otherwise append the new key, value to the end of the list.
+        If the key already exists in the list, change the entry.
+        Otherwise append the new (key,value) to the end of the list.
         """
         for (k,v) in self:
             if k == key:
@@ -85,33 +91,31 @@ class KeyedList(list):
         self.append((key, value))
         return True
 
+
     def has_key(self,key):
-        """
-        Return True iff key is found in the ordered list.
-        """
+        """Return True iff key is found in the ordered list."""
         for (name,value) in self:
             if name == key:
                 return True
         return False
 
+
     def items(self):
         """
-        Provide function supported by dictionaries.  
+        Provide the item function supported by dictionaries.  
         A keyed list already is stored in this format, so just returns
         the actual underlying list.
         """
         return list(self)
 
+
     def keys(self):
-        """
-        A copy of the list of keys.
-        """
+        """A copy of the list of keys."""
         l = [k for (k,v) in self.items()]
         return l
 
+
     def update(self,b):
-        """
-        updates (and overwrites) key/value pairs from b
-        """
+        """Updates (and overwrites) key/value pairs from b."""
         for (k,v) in b.items():
             self.set(k,v)

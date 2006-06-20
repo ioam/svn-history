@@ -1,21 +1,20 @@
 """
-PatternGenerator abstract class and sample Constant(PatternGenerator)
-concrete class.
+PatternGenerator abstract class and basic example concrete class.
 
 $Id$
 """
-
-
 __version__='$Revision$'
 
+
 from math import pi
+
 from Numeric import add,subtract,cos,sin
 
-from parameterizedobject import ParameterizedObject
 from boundingregion import BoundingBox, BoundingRegionParameter
-from sheetcoords import SheetCoordinateSystem
-from parameterclasses import Parameter,Number,ClassSelectorParameter
 from functionfamilies import OutputFnParameter, IdentityOF
+from parameterclasses import Parameter,Number,ClassSelectorParameter
+from parameterizedobject import ParameterizedObject
+from sheetcoords import SheetCoordinateSystem
 
 
 class PatternGenerator(ParameterizedObject):
@@ -28,25 +27,15 @@ class PatternGenerator(ParameterizedObject):
     
     A PatternGenerator's Parameters can make use of Parameter's
     precedence attribute to specify the order in which they should
-    appear e.g. on a GUI. The precedence attribute is based on the
-    range 0.0 to 1.0, with ordering going from 0.0 (first) to 1.0
-    (last).
+    appear, e.g. in a GUI. The precedence attribute has a nominal
+    range of 0.0 to 1.0, with ordering going from 0.0 (first) to 1.0
+    (last), but any value is allowed.
 
-    The orientation of the pattern matrices have the same orientation
-    maintained by the Sheet classes; see sheet.py for more details of
-    the Topographica coordinate system.
-
-
-    CEBHACKALERT: might want to say something like, users of PG
-    might like to consider what xdensity and ydensity they want...
-    #width=self.right-self.left; height=self.top-self.bottom
-    #self.xdensity = int(density*(width))/float((width))
-    #self.ydensity = int(density*(height))/float((height))
-    # etc
-
+    The orientation and layout of the pattern matrices is defined by
+    the SheetCoordinateSystem class, which see.
     """
 
-    # PatternGenerator is abstract
+    # Declare that this class is abstract
     _abstract_class_name = "PatternGenerator"
     
     bounds  = BoundingRegionParameter(
@@ -58,20 +47,21 @@ class PatternGenerator(ParameterizedObject):
         doc="Density (number of samples per 1.0 length) in the x direction.")
 
     ydensity = Number(
-        default=10,bounds=(0,None),hidden=True,
-        doc="Density (number of samples per 1.0 length) in the y direction.")
+        default=10,bounds=(0,None),hidden=True,doc="""
+           Density (number of samples per 1.0 length) in the y direction.
+           Typically the same as the xdensity.""")
 
     x = Number(
         default=0.0,softbounds=(-1.0,1.0),precedence=0.20,
-        doc="x-coordinate location of pattern center")
+        doc="X-coordinate location of pattern center.")
 
     y = Number(
         default=0.0,softbounds=(-1.0,1.0),precedence=0.21,
-        doc="y-coordinate location of pattern center")
+        doc="Y-coordinate location of pattern center.")
 
     orientation = Number(
         default=0,softbounds=(0.0,2*pi),precedence=0.40,
-        doc="""Polar angle of pattern, i.e. the orientation in Cartesian coordinate
+        doc="""Polar angle of pattern, i.e. the orientation in the Cartesian coordinate
         system, with zero at 3 o'clock and increasing counterclockwise.""")
     
     scale = Number(
@@ -85,12 +75,12 @@ class PatternGenerator(ParameterizedObject):
     output_fn = OutputFnParameter(
         default=IdentityOF(),
         precedence=0.08,
-        doc="Function to apply to the pattern array after it has been created.")
+        doc="Optional function to apply to the pattern array after it has been created.")
 
         
     def __call__(self,**params):
         """
-        Create the pattern array.
+        Create and fill an array with the requested pattern.
         
         If called without any params, uses the values for the Parameters as
         currently set on the object. Otherwise, any params specified override
@@ -117,11 +107,12 @@ class PatternGenerator(ParameterizedObject):
         
         return result
 
+
     def __setup_xy(self,bounds,xdensity,ydensity,x,y,orientation):
         """
-        Produce the pattern matrices from the bounds and density (or
-        rows and cols), and transform according to x, y, and
-        orientation.
+        Produce pattern coordinate matrices from the bounds and
+        density (or rows and cols), and transforms them according to
+        x, y, and orientation.
         """
         self.debug("bounds = ",bounds,"xdensity =",xdensity,"x =",x,"y=",y)
         # Generate vectors representing coordinates at which the pattern
@@ -166,8 +157,8 @@ from Numeric import ones, Float
 class Constant(PatternGenerator):
     """Constant pattern generator, i.e. a solid, uniform field of the same value."""
 
-    # The standard x, y, and orientation variables are currently ignored,
-    # so they aren't shown in auto-generated lists of parameters (e.g. in the GUI)
+    # The standard x, y, and orientation variables ignored for this special case,
+    # so we hide them from auto-generated lists of parameters (e.g. in the GUI)
     x       = Number(hidden = True)
     y       = Number(hidden = True)
     orientation   = Number(hidden = True)
@@ -196,6 +187,7 @@ class Constant(PatternGenerator):
 
 class PatternGeneratorParameter(ClassSelectorParameter):
     """Parameter whose value can be any instance of a PatternGenerator class."""
+    
     __slots__ = []
     __doc__ = property((lambda self: self.doc))
 

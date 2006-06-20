@@ -1,5 +1,5 @@
 """
-Analysis tools for Topographica.
+Analysis tools for Topographica, other than plotting tools.
 
 $Id$
 """

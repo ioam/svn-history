@@ -1,15 +1,17 @@
 """
-Some Topographica specific changes to the standard pydoc command.
-Moves generated pydoc HTML files to the docs directory after they are
-created by pydoc.  To be used with MAKE, and only from the base
-Topographica directory.
+Topographica-specific changes to the standard pydoc command.
 
-The generated index.html file is for the topo/__init__.py file which
+Moves generated pydoc HTML files to the docs directory after they are
+created by pydoc.  Intended for use with MAKE, from within the base
+topographica/ directory.
+
+The generated index.html file is for the topo/__init__.py file, which
 does not necessarily catalog topo/*.py.  To see all files, select
 the 'index' link at the top of one of the html docs.
 
-To generate Documentation, enter 'make docs' from the base Topographica
-directory which will call this file on the Topographica sources.
+To generate documentation, enter 'make docs' from the base
+topographica/ directory, which will call this file on the Topographica
+sources.
 
 From the Makefile (Tabs have been stripped):
     cleandocs:
@@ -24,10 +26,12 @@ $Id$
 """
 __version__='$Revision$'
 
+
 import pydoc, glob, os
 from os.path import isdir
 from re import search, sub
 from copy import copy
+
 
 TOPO = 'topo'   # Subdirectory with Topographica source
 DOCS = 'doc/Reference_Manual'   # Subdirectory to place Docs
@@ -48,6 +52,7 @@ def _file_list(base_name):
         if isdir(f):
             filelist = filelist + _file_list(f)
     return filelist
+
 
 def filename_to_docname(f):
     """
@@ -82,14 +87,13 @@ def generate_docs():
     """
     Generate all pydoc documentation files within a docs directory under
     ./topographica according to the constant DOCS.  After generation,
-    there is an index.html that displays all the modules.  Note, if the
-    documentation is being changed, it may be necessary to call
-    'make cleandocs' to force a regeneration of documentation since we
+    there is an index.html that displays all the modules.  Note that
+    if the documentation is being changed, it may be necessary to call
+    'make cleandocs' to force a regeneration of documentation.  (We
     don't want to regenerate all the documentation each time a source
-    file is changed.
+    file is changed.)
     """
-    # Generate the files once.  Skip if already generated.
-    # os.system('rm -rf ' + DOCS + '/*')
+    # os.system('rm -rf ' + DOCS + '/*') # Force regeneration
     filelist =  _file_list(TOPO) + [TOPO]
     for i in filelist:
         f = filename_to_docname(i)
