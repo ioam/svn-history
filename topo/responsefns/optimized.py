@@ -127,10 +127,8 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
                         double *xi = xj;                        
                         float *wi = wj;
                         for (int j=cc1; j<cc2; ++j) {
-			    // JCALERT! find power notation in C.
-                            // CB: weave doesn't support power notation
-                            // (according to weave's manual).
-                            tot += (*wi - *xi) * (*wi - *xi);
+                            double diff = *wi - *xi;
+			    tot += diff*diff;
                             ++wi;
                             ++xi;
                         }
