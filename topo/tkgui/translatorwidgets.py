@@ -1,5 +1,5 @@
 """
-Class file for a TaggedSlider widget.
+Tk widgets that support evaluation (translation) of a string to set their value.
 
 $Id$
 """
@@ -15,19 +15,23 @@ import string
 # e.g. "cat" gives orientation zero, as does "pI/4".
 
 
-# CEBHACKALERT: this should be an abstract class.
-# Something isn't quite right because this isn't actually a widget,
-# it just assumes that when instantiated the object will also be a widget.
-class TranslatorWidget(object):
+class WidgetTranslator(object):
     """
-    Abstract superclass for a widget that represents its true value with a string.
+    Abstract superclass for objects (typically Widgets) that accept a string
+    value and compute a true value from that.  Subclasses must provide 
+    a get() operation (as do Tk Widgets)
     """
     def __init__(self, translator=None):
         """
-        translator is a function accepting one string argument
-        and returning the result of the translation
+        The translator should be a function accepting one string argument
+        and returning the result of the translation.
         """
         self.translator = translator
+
+
+    def get(self):
+        "Must be implemented by subclasses."
+        raise NotImplementedError
 
 
     def get_value(self):
@@ -39,28 +43,23 @@ class TranslatorWidget(object):
         a string, the underlying variable could be any type. Clients
         can call this method to get that variable's value.
         """
-        # the get() method should come with being a widget...
-        assert hasattr(self,'get'),\
-               'Subclasses of TranslatorWidget must have a get() method. '+repr(self)
-
         if self.translator != None:
             return self.translator(self.get())
         else:
             return self.get()
+    
 
-
-
-class EntryTranslator(Entry,TranslatorWidget):
+class EntryTranslator(Entry,WidgetTranslator):
     """
     Tkinter Entry widget with a translator.
     """
     def __init__(self, master, textvariable="", translator=None, **kw):
         Entry.__init__(self, master=master, textvariable=textvariable, **kw)
-        TranslatorWidget.__init__(self, translator=translator)
+        WidgetTranslator.__init__(self, translator=translator)
 
 
 
-class ComboBoxTranslator(Pmw.ComboBox,TranslatorWidget):
+class ComboBoxTranslator(Pmw.ComboBox,WidgetTranslator):
     """
     A Pmw ComboBox with a translator.
     """
@@ -69,20 +68,20 @@ class ComboBoxTranslator(Pmw.ComboBox,TranslatorWidget):
         Pmw.ComboBox.__init__(self, parent,
                               selectioncommand=selectioncommand,
                               scrolledlist_items=scrolledlist_items, **kw)
-        TranslatorWidget.__init__(self,translator=translator)
+        WidgetTranslator.__init__(self,translator=translator)
 
 
 
-class CheckbuttonTranslator(Checkbutton,TranslatorWidget):
+class CheckbuttonTranslator(Checkbutton,WidgetTranslator):
     """
-    A Tkinter Checkbutton...
+    A Tkinter Checkbutton with a translator.
     """
-    # CEBHACKALERT: surely I don't have to do self.var=variable and get()?
-    # Look at Checkbutton documentation
+    # CEB: It should be possible to eliminate self.var=variable and get();
+    # should check out the Checkbutton documentation.
     def __init__(self, master, variable, **kw):
         self.var = variable
         Checkbutton.__init__(self,master=master,variable=variable,**kw)        
-        TranslatorWidget.__init__(self,translator=None)
+        WidgetTranslator.__init__(self,translator=None)
 
     def get(self):
         if self.var.get()==1:
@@ -91,14 +90,14 @@ class CheckbuttonTranslator(Checkbutton,TranslatorWidget):
             return False
     
 
-# CEBHACKALERT: make TaggedSlider accept either numeric or string
+# CEBALERT: Should make TaggedSlider accept either numeric or string
 # values (including for max_value and min_value).
 
-# CEBHACKALERT: make slider:tag space ratio about 2:1 (if it's
-# possible to have relative sizes like that - then we don't have
-# widths specified everywhere).
+# CEBALERT: If we can make slider:tag space ratio about 2:1 (if it's
+# possible to have relative sizes like that), then we won't have to have
+# widths specified everywhere.
 
-class TaggedSlider(Frame,TranslatorWidget):
+class TaggedSlider(Frame,WidgetTranslator):
     """
     Widget for manipulating a numeric value using either a slider or a
     text-entry box, keeping the two values in sync.
@@ -122,7 +121,7 @@ class TaggedSlider(Frame,TranslatorWidget):
                  **config):
 
         Frame.__init__(self,root,**config)
-        TranslatorWidget.__init__(self,translator=translator)
+        WidgetTranslator.__init__(self,translator=translator)
 
         self.root = root
         self.__string_format = string_format
@@ -155,8 +154,8 @@ class TaggedSlider(Frame,TranslatorWidget):
 
     def refresh(self,e=None):
         self.__set_slider_from_tag()
-        # CEBHACKALERT: what is this?
         try:
+            # Refresh the PropertiesFrame (if embedded in one)
             self.root.optional_refresh()
         except AttributeError:
             pass
@@ -172,8 +171,8 @@ class TaggedSlider(Frame,TranslatorWidget):
         """
         if not self.__first_slider_command:
             self.__set_tag_from_slider()
-            # CEBHACKALERT: see above but one alert
             try:
+                # Refresh the PropertiesFrame (if embedded in one)
                 self.root.optional_refresh()
             except AttributeError:
                 pass
