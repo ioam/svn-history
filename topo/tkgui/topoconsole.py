@@ -5,7 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEBHACKALERT: widget and frame sizes (e.g. widths) are a mess
+# CEBALERT: widget and frame sizes (e.g. widths) are a mess
 # throughout topo.tkgui
 # Also, notice what happens on resizing: space between widgets increases,
 # but the widgets themselves stay the same size. It would be better if
@@ -44,7 +44,7 @@ SAVED_FILETYPES = [('Topographica saved networks','*'+SAVED_FILE_EXTENSION),('Al
 
 
 # Documentation locations: locally built and web urls.
-# CEBHACKALERT: is it appropriate to use Filename parameter here in some way?
+# CEBALERT: is it appropriate to use Filename parameter here in some way?
 topo_dir = os.path.split(os.path.split(sys.executable)[0])[0]
 user_manual_locations      = (os.path.join(topo_dir,'doc/User_Manual/index.html'),'http://topographica.org/User_Manual/')
 tutorials_locations        = (os.path.join(topo_dir,'doc/Tutorials/index.html'),'http://topographica.org/Tutorials/')
@@ -374,7 +374,7 @@ class TopoConsole(Frame):
         self.command_output_frame = Tkinter.Frame(cw)
         scrollbar = Scrollbar(self.command_output_frame)
         scrollbar.pack(side=RIGHT, fill=Y)
-        # CEBHACKALERT: what length history is this going to keep?
+        # CEBALERT: what length history is this going to keep?
         self.command_output = OutputText(self.command_output_frame,
                                          state=DISABLED,
                                          height=10,
@@ -425,7 +425,7 @@ class TopoConsole(Frame):
             sys.exit()
 
 
-    # CEBHACKALERT: the way this works might be a surprise, because previously
+    # CEBALERT: the way this works might be a surprise, because previously
     # defined things stay around. E.g. load hierarchical.ty, then lissom_or.ty.
     # Because the BoundingBox is set for GeneratorSheet in hierarchical.ty but
     # not lissom_or.ty, LISSOM is loaded with a rectangular retina.
@@ -446,7 +446,7 @@ class TopoConsole(Frame):
                 self.messageBar.message('state', 'Failed to load ' + self.loaded_script)
         
 
-    # CEBHACKALERT:
+    # CEBALERT:
     # save_ and load_snapshot() and load_network() ought to close open windows such
     # as Activity.  Currently it just refreshes the windows, but that could get
     # confusing.

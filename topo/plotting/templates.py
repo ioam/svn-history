@@ -31,7 +31,7 @@ class PlotGroupTemplate(ParameterizedObject):
     
     command = Parameter('pass')
     normalize = BooleanParameter(False)
-    image_location = Filename(doc='Use to ensure correct paths for any images used.')
+    image_location = Filename(doc='Paths to search for images to be loaded.')
     
     def __init__(self, plot_templates=[], static_images = [],**params):
         """

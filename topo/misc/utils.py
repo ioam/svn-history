@@ -120,8 +120,7 @@ def eval_atof(in_string,default_val = 0):
     return val
     
 
-# CEBHACKALERT: I hope this can be simplified; I don't know how it works
-# yet.
+# CEBALERT: I think this can probably be simplified.
 def dict_translator(in_string, name = '', translator_dictionary = {}) :
     """
     Looks for an entry for the string in the dictionary. If it can't be
