@@ -1,5 +1,6 @@
 """
-Learning functions (see basic.py) and projection-level learning functions (see projfns.py) written in C to optimize performance. 
+Learning functions (see basic.py) and projection-level learning
+functions (see projfns.py) written in C to optimize performance.
 
 Requires the weave package; without it unoptimized versions are used.
 
@@ -61,9 +62,9 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
                         for (int i=rr1; i<rr2; ++i) {
                             double *inpi = inpj;
                             for (int j=cc1; j<cc2; ++j) {
-                                // CEBHACKALERT: the mask is an array of
-                                // Numeric.Float32 values. 0 does not appear to transfer
-                                // as 0.
+                                // The mask is floating point, so we have to 
+                                // use a robust comparison instead of testing 
+                                // against exactly 0.0.
                                 if (*(m++) >= 0.000001) {
                                     *wi += load * *inpi;
                                     total += fabs(*wi);
@@ -95,8 +96,7 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
 class CFPLF_Hebbian(CFPLF_Plugin):
     """
     Wrapper written to allow transparent non-optimized fallback; 
-    equivalent to
-    CFPLF_Plugin(single_cf_fn=Hebbian())
+    equivalent to CFPLF_Plugin(single_cf_fn=Hebbian()).
     """
     def __init__(self,**params):
         super(CFPLF_Hebbian,self).__init__(single_cf_fn=Hebbian(),**params)

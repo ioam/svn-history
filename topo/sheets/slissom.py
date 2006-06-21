@@ -17,20 +17,24 @@ class SLISSOM(LISSOM):
     A Sheet class implementing the SLISSOM algorithm
     (Choe and Miikkulainen, Neurocomputing 21:139-157, 1998).
 
-    A SLISSOM sheet is a LISSOM sheet to include spiking neurons
-    using dynamic synapses.
+    A SLISSOM sheet is a LISSOM sheet extended to include spiking
+    neurons using dynamic synapses.
     """
 
     # configurable parameters
     threshold = Number(default=0.3,bounds=(0,None), doc="Baseline threshold")
-    decay_rate = Number(default=0.01,bounds=(0,None), \
-		doc="Dynamic threshold decay rate")
-    absolute_refractory = Number(default=1.0,bounds=(0,None), \
-		doc="Absolute refractory period")
-    dynamic_threshold_init = Number(default=2.0,bounds=(0,None), \
-		doc="Initial value for dynamic threshold when spike occurs")
-    spike_amplitude = Number(default=1.0,bounds=(0,None), \
-		doc="Amplitude of spike at the moment of spiking")
+
+    decay_rate = Number(default=0.01,bounds=(0,None), 
+        doc="Dynamic threshold decay rate")
+    
+    absolute_refractory = Number(default=1.0,bounds=(0,None),
+        doc="Absolute refractory period")
+    
+    dynamic_threshold_init = Number(default=2.0,bounds=(0,None),
+	doc="Initial value for dynamic threshold when spike occurs")
+    
+    spike_amplitude = Number(default=1.0,bounds=(0,None),
+	doc="Amplitude of spike at the moment of spiking")
 
     # matrices for internal use
     dynamic_threshold = None
@@ -54,7 +58,6 @@ class SLISSOM(LISSOM):
 	avoid self.send_output() being invoked before thresholding.
 	"""
 	
-	# copy from grandparent
         self.activity *= 0.0
 
         for proj in self.in_connections:

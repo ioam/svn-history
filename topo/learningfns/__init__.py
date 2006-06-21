@@ -1,11 +1,15 @@
 """
+A family of function objects for changing a set of weights over time.
+
 Learning functions come in two varieties: LearningFunction, and
 CFPLearningFunction.  A LearningFunction (e.g. Hebbian) applies to one
-ConnectionField, and is used with CFPLF_Plugin to apply learning to an
-entire CFProjection.  CFPLF_Plugin is one example of a
-CFPLearningFunction; these work with the entire Projection at once.
-Some optimizations can only be applied at the CFPLearningFn level, so
-there are other CFPLearningFns beyond CFPLF_Plugin.
+set of weights, typically from one ConnectionField.  To apply learning
+to an entire CFProjection, a LearningFunction can be plugged in to
+CFPLF_Plugin.  CFPLF_Plugin is one example of a CFPLearningFunction,
+which is a function that works with the entire Projection at once.
+Some optimizations and algorithms can only be applied at the full
+CFPLearningFn level, so there are other CFPLearningFns beyond
+CFPLF_Plugin.
 
 Any new learning functions added to this directory will automatically
 become available for any model.

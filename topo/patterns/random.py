@@ -1,9 +1,6 @@
 """
 Two-dimensional pattern generators drawing from various random distributions.
 
-At present, supports uniform random distributions, but could support
-normal distributions or 1/f noise.
-
 $Id$
 """
 __version__='$Revision$'

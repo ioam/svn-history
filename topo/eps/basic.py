@@ -10,32 +10,35 @@ $Id$
 """
 __version__='$Revision$'
 
+
 from topo.base.parameterclasses import Number
 from topo.base.simulation import EventProcessor,EPConnectionEvent
 
+
 class PulseGenerator(EventProcessor):
-
     """
-    A simple pulse generator node.  Produces pulses (scalars) of a
-    fixed amplitude at a fixed frequency and phase.
+    A simple pulse generator node.
 
-    Period and phase are in units of simulation time. Period must be
-    greater than zero.
+    Produces pulses (scalars) of a fixed amplitude at a fixed
+    frequency and phase.  Period and phase are in units of simulation
+    time.
     """
+    
     amplitude = Number(1.0,doc="The size of the pulse to generate.")
-    period    = Number(1.0,bounds=(0,None),doc="The period with which to repeat the pulse. Must be greater than zero.")
-    phase     = Number(0.0,doc="The time after starting the simulation to wait before sending the first pulse.")
+    
+    period    = Number(1.0,bounds=(0.0,None),doc=
+        "The period with which to repeat the pulse. Must be greater than zero.")
+    
+    phase     = Number(0.0,doc=
+        "The time after starting the simulation to wait before sending the first pulse.")
 
     def input_event(self,conn,data):
-        """
-        On input from self, generate output. Ignore all other inputs.
-        """
+        """On input from self, generate output. Ignore all other inputs."""
         self.verbose("Time " + str(self.simulation.time()) + ":" +
                      " Received event from ",conn.src,'on port',conn.dest_port,'with data',data)
         self.send_output(data=self.amplitude)
 
     def start(self):
-        assert self.period > 0
         conn=self.simulation.connect(self.name,self.name,delay=self.period)
         e=EPConnectionEvent(self.simulation.time()+self.phase, conn)
         self.simulation.enqueue_event(e)
@@ -49,6 +52,7 @@ class ThresholdUnit(EventProcessor):
     generates a pulse of a given amplitude and resets the accumulator
     to zero.
     """
+    
     threshold     = Number(default=1.0,doc="The threshold at which to fire.")
     initial_accum = Number(default=0.0,doc="The initial accumulator value.")
     amplitude     = Number(default=1.0,doc="The size of the pulse to generate.")
@@ -61,17 +65,16 @@ class ThresholdUnit(EventProcessor):
         if conn.dest_port == 'input':
             self.accum += data
             self.verbose("Time " + str(self.simulation.time()) + ":" +
-                         " Receiving ",data,"; accumulator now",self.accum)
+                         " Received ",data,"; accumulator now",self.accum)
             if self.accum > self.threshold:
                 self.send_output(data=self.amplitude)
                 self.accum = 0
-                print `self` + ' firing, amplitude = ' + `self.amplitude`
+                self.verbose(`self` + ' firing, amplitude = ' + `self.amplitude`)
 
 
 class SumUnit(EventProcessor):
-    """
-    A simple unit that outputs the running sum of input received thus far.
-    """
+    """A simple unit that outputs the running sum of input received thus far."""
+    
     def __init__(self,**params):
         super(SumUnit,self).__init__(**params)
         self.value = 0.0

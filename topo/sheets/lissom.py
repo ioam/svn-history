@@ -56,7 +56,7 @@ class LISSOM(CFSheet):
         super(LISSOM,self).input_event(conn,data)
 
 
-    ### JABHACKALERT!  There should be some sort of warning when
+    ### JABALERT!  There should be some sort of warning when
     ### tsettle times the input delay is larger than the input period.
     ### Right now it seems to do strange things in that case (settle
     ### at all after the first iteration?), but of course that is

@@ -159,7 +159,9 @@ class ConnectionField(ParameterizedObject):
         self.mask.savespace(1)
 
         # CEBHACKALERT: this works for now, while the output_fns are
-        # all multiplicative.
+        # all multiplicative.  But in the long run we need a better
+        # way to apply the mask.  The same applies anywhere the mask
+        # is used, including in learningfns/.
 
         self.weights *= self.mask   
         output_fn(self.weights)        

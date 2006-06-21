@@ -4,10 +4,11 @@ Output functions (see basic.py) and projection-level output functions
 
 Requires the weave package; without it unoptimized versions are used.
 """
-from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Number
+
 from topo.base.cf import CFPOutputFn,CFPOF_Plugin
 from topo.base.functionfamilies import OutputFn, OutputFnParameter
+from topo.base.parameterclasses import Number
+from topo.base.parameterizedobject import ParameterizedObject
 
 from topo.misc.inlinec import inline, optimized
 
@@ -20,11 +21,12 @@ class DivisiveNormalizeL1_opt(OutputFn):
     """
     OutputFn that divides an array by the sum of the absolute value of each element.
 
-    See the equivalent version in outputfns.basic for a
-    description. When used as the single_cf_fn in CFP learning
+    See the equivalent version outputfns.basic.DivisiveNormalizeL1 for
+    a description. When used as the single_cf_fn in CFP learning
     functions, provides a performance improvement over the python
     DivisiveNormalizeL1 output function.  The all-C++ CFP learning
-    function CFPOF_DivisiveNormalizeL1_opt is still much faster though.
+    function CFPOF_DivisiveNormalizeL1_opt is still much faster
+    though.
 
     The given array must be of type Numeric.Float32.
     """

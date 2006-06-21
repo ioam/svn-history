@@ -4,9 +4,10 @@ Image is a PatternGenerator that displays grayscale images.
 $Id$
 """
 
-# CEBALERT: We already have 'Image' for the image generator.
+# PIL Image is imported as pImage because we have our own Image PatternGenerator
 import Image as pImage
 import ImageOps
+
 from Numeric import array, Float, sum, ravel
 
 from topo.base.patterngenerator import PatternGenerator
@@ -20,9 +21,8 @@ from basic import PatternSampler
 
 from Numeric import sum,ravel
 def edge_average(a):
-    """
-    Return the mean value around the edge of an array.
-    """
+    "Return the mean value around the edge of an array."
+    
     if len(ravel(a)) < 2:
         return float(a[0])
     else:
@@ -38,7 +38,6 @@ def edge_average(a):
 
 
 
-# CEBHACKALERT: rotation,scaling etc. just resample - there's no interpolation.
 class Image(PatternGenerator):
     """
     2D image generator.
@@ -52,21 +51,34 @@ class Image(PatternGenerator):
     white-bordered images have a white background. Images with no
     border have a background that is less of a contrast than a white
     or black one.
+
+    At present, rotation, scaling, etc. just resample; it would be nice
+    to support some interpolation options as well.
     """
 
     output_fn = OutputFnParameter(default=IdentityOF())
     
-    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.31,doc="Ratio of width to height; size*aspect_ratio gives the width.")
-    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.30,doc="Height of the image.")
-    filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9,doc="Path (can be relative to Topographica's base path) to an image in e.g. PNG, JPG, TIFF, or PGM format.")
+    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),
+        softbounds=(0.0,2.0),precedence=0.31,doc=
+        "Ratio of width to height; size*aspect_ratio gives the width.")
+
+    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+                   precedence=0.30,doc="Height of the image.")
+    
+    filename = Filename(default='examples/ellen_arthur.pgm',precedence=0.9,doc=
+        """
+        File path (can be relative to Topographica's base path) to a bitmap image.
+        The image can be in any format accepted by PIL, e.g. PNG, JPG, TIFF, or PGM.
+        """)
+    
     size_normalization = Enumeration(default='fit_shortest',
-                                     available=['fit_shortest','fit_longest','stretch_to_fit','original'],
-                                     precedence=0.95,
-                                     doc='How to scale the initial image size relative to the default area of 1.0.')
+        available=['fit_shortest','fit_longest','stretch_to_fit','original'],
+        precedence=0.95,doc=
+        "How to scale the initial image size relative to the default area of 1.0.")
 
     whole_image_output_fn = OutputFnParameter(default=DivisiveNormalizeLinf(),
-                              precedence=0.96,
-                              doc='Function applied to the whole, original image array (before any cropping).')
+        precedence=0.96,doc=
+        "Function applied to the whole, original image array (before any cropping).")
 
 
     def __init__(self, **params):

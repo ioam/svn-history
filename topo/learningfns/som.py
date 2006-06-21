@@ -5,36 +5,34 @@ $Id$
 """
 __version__ = "$Revision$"
 
-from Numeric import exp, argmax
+
 from math import ceil
 
-from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Number
-from topo.base.cf import CFPLearningFn
+from Numeric import exp, argmax
+
 from topo.base.arrayutils import L2norm
 from topo.base.boundingregion import BoundingBox
+from topo.base.cf import CFPLearningFn
+from topo.base.parameterclasses import Number
+from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGeneratorParameter
 
-import topo.patterns.basic
-
+from topo.patterns.basic import Gaussian
 from topo.outputfns.basic import IdentityOF
 
 
 class CFPLF_SOM(CFPLearningFn):
-    """
-    An abstract base class of learning functions for Self-Organizing Maps.
-    
-    These objects have a parameter learning_radius that is expected to
-    be kept up to date, either by the Sheet to which they are
-    connected or explicitly by the user.  The learning_radius
-    specifies the radius of the neighborhood function used during
-    learning.
-    """
+    """An abstract base class of learning functions for Self-Organizing Maps."""
     _abstract_class_name = "CFPLF_SOM"
 
-    learning_radius = Number(default=0.0,
-                             doc="Specify the radius of the Neighborhood function used for learning.")
-
+    learning_radius = Number(default=0.0,doc=
+        """
+        The radius of the neighborhood function to be used for
+        learning.  Typically, this value will be set by the Sheet or
+        Projection owning this CFPLearningFn, but it can also be set
+        explicitly by the user.
+        """)
+    
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         raise NotImplementedError
 
@@ -53,10 +51,27 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
     """
 
     learning_radius = Number(default=0.0)
-    crop_radius_multiplier = Number(default=3.0,doc="Factor by which the radius should be multiplied when deciding how far from the winner to keep updating the weights.")
-    neighborhood_kernel_generator = PatternGeneratorParameter(default=topo.patterns.basic.Gaussian(x=0.0,y=0.0,aspect_ratio=1.0),
-                                                              doc="Neighborhood function")
     
+    crop_radius_multiplier = Number(default=3.0,doc=
+        """
+        Factor by which the radius should be multiplied,
+        when deciding how far from the winner to keep updating the weights.
+        """)
+    
+    neighborhood_kernel_generator = PatternGeneratorParameter(
+        default=Gaussian(x=0.0,y=0.0,aspect_ratio=1.0),
+        doc="Neighborhood function")
+    
+
+    def winner_coords(self, activity, cols):
+        "Returns the coordinates of the most-active unit."
+        
+        pos = argmax(activity.flat)
+        r = pos/cols
+        c = pos%cols
+        return r,c
+
+
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
 
         rows,cols = output_activity.shape
@@ -108,7 +123,7 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
                     rate = single_connection_learning_rate * neighborhood_matrix[rwr+radius_int,cwc+radius_int]
 		    X = cf.get_input_matrix(input_activity)
 
-                    # CEBHACKALERT:
+                    # CEBALERT:
                     # This is for pickling - the savespace for cf.weights does
                     # not appear to be pickled.
                     cf.weights.savespace(1)
@@ -116,12 +131,4 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
 
                     # CEBHACKALERT: see ConnectionField.__init__()
                     cf.weights *= cf.mask
-
-
-
-    def winner_coords(self, activity, cols):
-        pos = argmax(activity.flat)
-        r = pos/cols
-        c = pos%cols
-        return r,c
 

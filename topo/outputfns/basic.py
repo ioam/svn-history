@@ -1,38 +1,42 @@
 """
-Simple functions mapping from a value into another of the same shape.
+Simple functions operating on a matrix, potentially modifying it.
 
-A set of endomorphic functions, i.e., functions mapping from an object
-into another of the same matrix shape.  These are useful for neuron
-output functions, normalization of matrices, etc.
+These are useful for neuron output functions, normalization of
+matrices, etc.
 
 All of these function objects (callable objects) should work for
-Numeric array arguments of arbitrary shape.  Some will also work for
+Numeric array arguments of arbitrary shape.  Some may also work for
 scalars.
 
 $Id$
 """
 __version__='$Revision$'
 
+
 import Numeric
 
 from Numeric import dot
 
-from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Number
+from topo.base.arrayutils import clip_in_place,clip_lower
 from topo.base.arrayutils import L2norm, norm
 from topo.base.functionfamilies import OutputFn
-from topo.base.arrayutils import clip_in_place,clip_lower
+from topo.base.parameterclasses import Number
+from topo.base.parameterizedobject import ParameterizedObject
 
 # Imported here so that all OutputFns will be in the same package
 from topo.base.functionfamilies import IdentityOF
+
 
 # CEBHACKALERT: these need to respect the mask - which will be passed in.
 
 
 class PiecewiseLinear(OutputFn):
     """ 
-    Piecewise-linear output function with lower and upper thresholds
-    as constructor parameters.
+    Piecewise-linear OutputFn with lower and upper thresholds.
+    
+    Values below the lower_threshold are set to zero, those above
+    the upper threshold are set to 1.0, and those in between are
+    scaled linearly.
     """
     lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
     upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
@@ -95,7 +99,7 @@ class DivisiveNormalizeL2(OutputFn):
 class DivisiveNormalizeLinf(OutputFn):
     """
     OutputFn to divide an array by its L-infinity norm
-    (i.e. the absolute value of its maximum).
+    (i.e. the maximum absolute value of its elements).
 
     For a given array interpreted as a flattened vector, scales the
     elements divisively so that the maximum absolute value is the

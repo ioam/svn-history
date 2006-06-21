@@ -1,5 +1,7 @@
 """
-Output functions (see basic.py) that apply to a whole Projection. For example, for a CFProjection this involves iterating through all the CFs and applying an output function to each.
+Output functions (see basic.py) that apply to a whole Projection. For
+example, for a CFProjection this involves iterating through all the
+CFs and applying an output function to each set of weights in turn.
 
 $Id$
 """

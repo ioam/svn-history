@@ -33,11 +33,19 @@ class Gaussian(PatternGenerator):
     """
     
     aspect_ratio   = Number(default=0.3,bounds=(0.0,None),softbounds=(0.0,2.0),
-                            precedence=0.31,
-                            doc="Ratio of the width to the height.  Specifically, xsigma=ysigma*aspect_ratio (see size).")
+        precedence=0.31,doc=
+        """
+        Ratio of the width to the height.
+        Specifically, xsigma=ysigma*aspect_ratio (see size).
+        """)
+    
     size  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),
-                   precedence=0.30,
-                   doc="Gaussian is defined by:\n  exp(-x^2/(2*xsigma^2) - y^2/(2*ysigma^2)\nwhere ysigma=size/2.")
+        precedence=0.30,doc=
+        """
+        Overall size of the Gaussian, defined by:
+        exp(-x^2/(2*xsigma^2) - y^2/(2*ysigma^2)
+        where ysigma=size/2.
+        """)
 
     def function(self,**params):
         ysigma = params.get('size',self.size)/2.0
@@ -50,14 +58,13 @@ class SineGrating(PatternGenerator):
     """2D sine grating pattern generator."""
     
     frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),
-                       precedence=0.50,
-                       doc="Frequency of the sine grating.")
-    phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),precedence=0.51,doc="phase of the sine grating")
+                       precedence=0.50, doc="Frequency of the sine grating.")
+    
+    phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),
+                       precedence=0.51,doc="Phase of the sine grating.")
 
     def function(self,**params):
-        """
-        Return a sine grating pattern (two-dimensional sine wave).
-        """
+        """Return a sine grating pattern (two-dimensional sine wave)."""
         frequency  = params.get('frequency',self.frequency)
         phase      = params.get('phase',self.phase)
         
@@ -69,39 +76,32 @@ class Gabor(PatternGenerator):
     """2D Gabor pattern generator."""
     
     frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),
-                       precedence=0.50,
-                       doc="Frequency of the sine grating component.")
-    phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),
-                       precedence=0.51,
-                       doc="Phase of the sine grating component.")
-    aspect_ratio   = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-                            precedence=0.31,
-                            doc="Ratio of width to height; size*aspect_ratio gives the width of Gaussian component (see Gaussian)")
-    size  = Number(default=0.25,bounds=(0.0,None),softbounds=(0.0,2.0),
-                   precedence=0.30,
-                   doc="Determines the height of the Gaussian component (see Gaussian).")
+        precedence=0.50,doc="Frequency of the sine grating component.")
+    
+    phase = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),
+        precedence=0.51,doc="Phase of the sine grating component.")
+    
+    aspect_ratio = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+        precedence=0.31,doc=
+        """
+        Ratio of pattern width to height.
+        The width of the Gaussian component is size*aspect_ratio (see Gaussian).
+        """)
+    
+    size = Number(default=0.25,bounds=(0.0,None),softbounds=(0.0,2.0),
+        precedence=0.30,doc="Determines the height of the Gaussian component (see Gaussian).")
 
     def function(self,**params):
         height = params.get('size',self.size)/2.0
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
         
-        return gabor( self.pattern_x,
-                      self.pattern_y,
-                      width,
-                      height,
+        return gabor( self.pattern_x,self.pattern_y,width,height,
                       params.get('frequency',self.frequency),
                       params.get('phase',self.phase))  
 
 
 class Line(PatternGenerator):
     """2D line pattern generator."""
-
-    # CEBHACKALERT:
-    # Set smoothing to zero for the cfsom_example and you can
-    # see a problem with lines. The problem is either in
-    # the line() function, the generation of the matrices
-    # used to draw it, or just in the display; I have to look to
-    # see which.
 
     thickness   = Number(default=0.006,bounds=(0.0,None),softbounds=(0.0,1.0),
                          precedence=0.60,
@@ -126,48 +126,43 @@ class Disk(PatternGenerator):
     """2D disk pattern generator."""
 
     aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-                           precedence=0.31,
-                           doc="Ratio of width to height; size*aspect_ratio gives the width of the disk.")
+        precedence=0.31,doc=
+        "Ratio of width to height; size*aspect_ratio gives the width of the disk.")
+
     size  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),
-                   precedence=0.30,
-                   doc="Height of the disk")
+                   precedence=0.30,doc="Height of the disk")
+    
     smoothing = Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
-                       precedence=0.61,
-                       doc="Width of the Gaussian fall-off")
+                       precedence=0.61,doc="Width of the Gaussian fall-off")
     
     def function(self,**params):
         height = params.get('size',self.size)
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
 
-        return disk( self.pattern_x, 
-                     self.pattern_y, 
-                     width,
-                     height,
+        return disk( self.pattern_x,self.pattern_y,width,height,
                      params.get('smoothing',self.smoothing))  
 
 
 class Ring(PatternGenerator):
     """2D ring pattern generator."""
 
-    thickness   = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5),
-                         precedence=0.60,
-                         doc="Thickness (line width) of the ring.")
+    thickness = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5),
+        precedence=0.60,doc="Thickness (line width) of the ring.")
+    
     smoothing = Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
-                       precedence=0.61,
-                       doc="Width of the Gaussian fall-off inside and outside the ring.")
-    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-                           precedence=0.31,
-                           doc="Ratio of width to height; size*aspect_ratio gives the overall width.")
-    size  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.30)
+        precedence=0.61,doc="Width of the Gaussian fall-off inside and outside the ring.")
+    
+    aspect_ratio = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+        precedence=0.31,doc=
+        "Ratio of width to height; size*aspect_ratio gives the overall width.")
+    
+    size = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.30)
 
     def function(self,**params):
         height = params.get('size',self.size)
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
         
-        return ring(self.pattern_x, 
-                    self.pattern_y,
-                    width,
-                    height,
+        return ring(self.pattern_x,self.pattern_y,width,height,
                     params.get('thickness',self.thickness),
                     params.get('smoothing',self.smoothing))  
     
@@ -176,11 +171,11 @@ class Rectangle(PatternGenerator):
     """2D rectangle pattern generator."""
     
     aspect_ratio   = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-                            precedence=0.31,
-                            doc="Ratio of width to height; size*aspect_ratio gives the width of the rectangle.")
+        precedence=0.31,doc=
+        "Ratio of width to height; size*aspect_ratio gives the width of the rectangle.")
+    
     size  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),
-                   precedence=0.30,
-                   doc="Height of the rectangle.")
+        precedence=0.30,doc="Height of the rectangle.")
 
     # We will probably want to add Fuzzy-style anti-aliasing to this.
 
@@ -191,20 +186,23 @@ class Rectangle(PatternGenerator):
         return bitwise_and(abs(self.pattern_x)<=width/2.0,
                            abs(self.pattern_y)<=height/2.0)
 
+
 class TwoRectangles(Rectangle):
     """Two 2D rectangle pattern generator."""
 
     x1 = Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
-                   doc="x center of square 1.")
+                doc="X center of rectangle 1.")
+    
     y1 = Number(default=-0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
-                   doc="y center of square 1.")
+                doc="Y center of rectangle 1.")
+    
     x2 = Number(default=0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
-                   doc="x center of square 2.")
+                doc="X center of rectangle 2.")
+    
     y2 = Number(default=0.15,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
-                   doc="y center of square 2.")
+                doc="Y center of rectangle 2.")
 
-    # YCHACKALERT
-    # Maybe this can be implemented much more cleanly by calling
+    # YC: Maybe this can be implemented much more cleanly by calling
     # the parent's function() twice, but it's hard to see how to 
     # set the (x,y) offset for the parent.
     def function(self,**params):
@@ -225,11 +223,15 @@ class TwoRectangles(Rectangle):
 			(self.pattern_y-self.y2)<=self.y2+width/4.0,
 			(self.pattern_y-self.y2)>=self.y2-width/4.0)))
 
+
 class SquareGrating(PatternGenerator):
     """2D squarewave grating pattern generator."""
     
-    frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),precedence=0.50,doc="Frequency of the square grating.")
-    phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),precedence=0.51,doc="Phase of the square grating.")
+    frequency = Number(default=2.4,bounds=(0.0,None),softbounds=(0.0,10.0),
+        precedence=0.50,doc="Frequency of the square grating.")
+    
+    phase     = Number(default=0.0,bounds=(0.0,None),softbounds=(0.0,2*pi),
+        precedence=0.51,doc="Phase of the square grating.")
 
     # We will probably want to add anti-aliasing to this,
     # and there might be an easier way to do it than by
@@ -249,7 +251,7 @@ class SquareGrating(PatternGenerator):
 
 
 
-# CEBHACKALERT: not sure where this class should go.  Maybe it could
+# CEBALERT: not sure where this class should go.  Maybe it could
 # be generalized further and moved elsewhere.
 # Also, will need updating when Sheet is cleaned up.
 from Numeric import ones
@@ -260,9 +262,10 @@ from topo.base.boundingregion import BoundingBox
 from topo.outputfns.basic import IdentityOF
 class PatternSampler(ParameterizedObject):
     """
-    Stores a Sheet whose activity represents the supplied pattern_array,
-    and when called will resample that array at the supplied Sheet coordinates
-    according to the supplied scaling parameters.
+    Stores a SheetCoordinateSystem whose activity represents the
+    supplied pattern_array, and when called will resample that array
+    at the supplied Sheet coordinates according to the supplied
+    scaling parameters.
 
     (x,y) coordinates outside the pattern_array are returned as the
     background value.
@@ -280,9 +283,7 @@ class PatternSampler(ParameterizedObject):
         
         rows,cols=pattern_array.shape
 
-        self.pattern_sheet = SheetCoordinateSystem(
-            xdensity=1.0,
-            ydensity=1.0,
+        self.pattern_sheet = SheetCoordinateSystem(xdensity=1.0,ydensity=1.0,
             bounds=BoundingBox(points=((-cols/2.0,-rows/2.0),
                                        ( cols/2.0, rows/2.0))))
         
@@ -374,8 +375,8 @@ class PatternSampler(ParameterizedObject):
         """
         pattern_rows,pattern_cols = self.pattern_sheet.activity.shape
 
-        # CEBALERT: instead of an if-test, could have a class of this
-        # type of function (c.f. OutputFunctions, etc).
+        # Instead of an if-test, could have a class of this type of
+        # function (c.f. OutputFunctions, etc)...
         if scaling=='stretch_to_fit':
             x_sf,y_sf = pattern_cols/sheet_xdensity, pattern_rows/sheet_ydensity
             x*=x_sf; y*=y_sf
@@ -408,41 +409,31 @@ class CompositePatternGenerator(PatternGenerator):
     single pattern that it returns.
     """
 
-    # CEBHACKALERT: size_normalization and whole_image_output_fn are
-    # hidden temporarily.
+    # The size_normalization and whole_image_output_fn are hidden,
+    # because they don't (yet) have an obvious meaning for a
+    # CompositePatternGenerator.
 
     output_fn = OutputFnParameter(default=IdentityOF())
 
-    operator = Parameter(
-        default=Wrapper("Numeric.add"),
-        doc="Numeric function used to combine the individual patterns.",
-        precedence=0.98)
+    operator = Parameter(default=Wrapper("Numeric.add"),precedence=0.98,
+        doc="Numeric function used to combine the individual patterns.")
     
-    generators = Parameter(
-        default=[],
-        doc="List of patterns to use in the composite pattern.",
-        precedence=0.97)
+    generators = Parameter(default=[],precedence=0.97,
+        doc="List of patterns to use in the composite pattern.")
 
-    aspect_ratio   = Number(
-        default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+    aspect_ratio = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.31,
         doc="Ratio of width to height of the composite pattern.")
     
-    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-                   precedence=0.30,
-                   doc="Height of the composite pattern.")
+    size = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+        precedence=0.30,doc="Height of the composite pattern.")
 
-    size_normalization = Enumeration(
-        hidden='True',
-        default='original',
+    size_normalization = Enumeration(hidden='True',default='original',precedence=0.95,
         available=['fit_shortest','fit_longest','stretch_to_fit','original'],
-        precedence=0.95,
         doc='How to scale the initial image size relative to the default area of 1.0.')
 
     whole_image_output_fn = OutputFnParameter(
-        hidden='True',
-        default=IdentityOF(),
-        precedence=0.96,
+        hidden='True',default=IdentityOF(),precedence=0.96,
         doc='Function applied to the whole composite array (before any cropping).')
 
 
@@ -466,7 +457,7 @@ class CompositePatternGenerator(PatternGenerator):
         assert hasattr(self.operator,'reduce'),repr(self.operator)+" does not support 'reduce'."
 
 
-        # CEBHACKALERT: could skip re-generation if nothing has
+        # CEB: Could skip re-generation if nothing has
         # changed.  But that involves checking the component
         # PatternGenerators haven't also changed (e.g. had a parameter
         # altered), which I'm not sure how to do in a reasonable
@@ -479,8 +470,7 @@ class CompositePatternGenerator(PatternGenerator):
         
         for pg in self.generators:
             assert isinstance(pg,PatternGenerator),repr(pg)+" is not a PatternGenerator."
-            # just call the PG because it should already have been
-            # setup as desired.
+            # Assumes each PG already has appropriate params set on it
             patterns.append(pg())
         
         image_array = self.operator.reduce(patterns)

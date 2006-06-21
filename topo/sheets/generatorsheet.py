@@ -37,7 +37,7 @@ class GeneratorSheet(Sheet):
         """)
 
     input_generator = topo.base.patterngenerator.PatternGeneratorParameter(doc=
-"Specifies a particular PatternGenerator type to use when creating patterns.")
+        "Specifies a particular PatternGenerator type to use when creating patterns.")
     
     def __init__(self,**params):
         super(GeneratorSheet,self).__init__(**params)

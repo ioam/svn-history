@@ -1,13 +1,15 @@
 """
-CEBHACKALERT: documentation here and in the other dirs needs to point out
-projfns and basic.
+A family of function objects for transforming a matrix generated from some other function.
 
-
-A family of functions mapping from a value into another of the same shape.
-
-A set of endomorphic functions, i.e., functions mapping from an object
-into another of the same matrix shape.  These are useful for neuron
-output functions, normalization of matrices, etc.
+Output functions are useful for neuron activation functions,
+normalization of matrices, etc.  They come in two varieties:
+OutputFunction, and CFPOutputFunction.  An OutputFunction
+(e.g. PiecewiseLinear) applies to one matrix of any type, such as an
+activity matrix or a set of weights.  To apply an OutputFunction to
+all of the weight matrices in an entire CFProjection, an
+OutputFunction can be plugged in to CFPOF_Plugin.  CFPOF_Plugin is one
+example of a CFPOutputFunction, which is a function that works with
+the entire Projection at once.
 
 Any new output functions added to this directory will automatically
 become available for any model.
