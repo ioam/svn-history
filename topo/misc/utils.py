@@ -197,18 +197,12 @@ def frange(start, end=None, inc=1.0, inclusive=False):
     return L
 
 
-
-# CEBHACKALERT: I think this function should be renamed to
-# values_sorted_by_key() or something like that. The name's
-# misleading: it doesn't sort the actual dictionary, it just returns
-# the values sorted by key - right?
-def dict_sort(d):
+def values_sorted_by_key(d):
     """
-    Sort a dictionary by key.
-
-    By Alex Martelli, 2001/04/08
-    http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52306
+    Return the values of dictionary d sorted by key.
     """
+    # By Alex Martelli, 2001/04/08
+    # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52306
     keys = d.keys()
     keys.sort()
     return map(d.get, keys)
@@ -216,11 +210,10 @@ def dict_sort(d):
 
 def keys_sorted_by_value(d):
     """
-    Return the keys of dictionary d sorted by their values.
-
-    By Daniel Schult, 2004/01/23
-    Posted at http://aspn.activestate.com/ASPN/Python/Cookbook/Recipe/52306
+    Return the keys of dictionary d sorted by value.
     """
+    # By Daniel Schult, 2004/01/23
+    # http://aspn.activestate.com/ASPN/Python/Cookbook/Recipe/52306
     items=d.items()
     backitems=[ [v[1],v[0]] for v in items]
     backitems.sort()
