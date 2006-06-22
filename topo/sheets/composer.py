@@ -46,8 +46,8 @@ class Composer(Sheet):
         for k,v in config.items():
             self.ports[port][k] = v
 
-    def _connect_from(self,proj,origin=(0,0)):
-        super(Composer,self)._connect_from(proj)
+    def _dest_connect(self,proj,origin=(0,0)):
+        super(Composer,self)._dest_connect(proj)
         self.inputs[(proj.src.name,proj.src_port)] = Struct(origin=origin)
     
     def process_current_time(self):

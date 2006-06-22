@@ -83,14 +83,14 @@ class ProjectionSheet(Sheet):
         self.new_input = False
 
 
-    def _connect_from(self, conn):
+    def _dest_connect(self, conn):
         """
-        See EventProcessor's _connect_from(); raises an error if conn is not
+        See EventProcessor's _dest_connect(); raises an error if conn is not
         a Projection.  Subclasses of ProjectionSheet that know how to handle
         other types of Connections should override this method.
         """
         if isinstance(conn, Projection):
-            super(ProjectionSheet,self)._connect_from(conn)
+            super(ProjectionSheet,self)._dest_connect(conn)
         else:
             raise TypeError('ProjectionSheets only accept Projections, not other types of connection.')
 

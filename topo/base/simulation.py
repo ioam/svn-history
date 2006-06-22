@@ -198,7 +198,7 @@ class EventProcessor(ParameterizedObject):
         super(EventProcessor,self).__init__(**config)
 
         # A subclass could use another data stucture to optimize operations
-        # specific to itself, if it also overrides _connect_from().
+        # specific to itself, if it also overrides _dest_connect().
         self.in_connections = []
         self.out_connections = []
 
@@ -208,8 +208,7 @@ class EventProcessor(ParameterizedObject):
     # if extra parameters are required for an EP subclass, a
     # dictionary could be added to Simulation.connect() to hold
     # them, and passed on here
-    # JABALERT: Rename to _outgoing_connect
-    def _connect_to(self,conn):
+    def _src_connect(self,conn):
         """
         Add the specified connection to the list of outgoing connections.
         Should only be called from Simulation.connect().
@@ -229,8 +228,7 @@ class EventProcessor(ParameterizedObject):
         self.out_connections.append(conn)
 
 
-    # JABALERT: Rename to _incoming_connect
-    def _connect_from(self,conn):
+    def _dest_connect(self,conn):
         """
         Add the specified connection to the list of incoming connections.
         Should only be called from Simulation.connect().
@@ -716,8 +714,8 @@ class Simulation(ParameterizedObject):
 
         # Looks up src and dest in our dictionary of objects
         conn = connection_type(src=self[src],dest=self[dest],**conn_params)
-        self[src]._connect_to(conn)
-        self[dest]._connect_from(conn)
+        self[src]._src_connect(conn)
+        self[dest]._dest_connect(conn)
         return conn
     
 
