@@ -24,6 +24,8 @@ class GeneratorSheet(Sheet):
     random distribution, but can use any mechanism.
     """
     
+    dest_ports=['Trigger']
+
     period = Number(default=1,doc=
         "Delay (in Simulation time) between generating new input patterns.")
     
@@ -93,10 +95,10 @@ class GeneratorSheet(Sheet):
         assert self.simulation
 
         # connect self<->self (for repeating)
-        conn=self.simulation.connect(self.name,self.name,delay=self.period)
+        conn=self.simulation.connect(self.name,self.name,delay=self.period,dest_port='Trigger',name='Trigger')
 
         # first event is special
-        e=EPConnectionEvent(self.phase+topo.sim.time(),conn,data=self.activity)
+        e=EPConnectionEvent(self.phase+topo.sim.time(),conn)
         self.simulation.enqueue_event(e)
 
     def input_event(self,conn,data):
