@@ -27,7 +27,7 @@ class GeneratorSheet(Sheet):
     period = Number(default=1,doc=
         "Delay (in Simulation time) between generating new input patterns.")
     
-    phase  = Number(default=0,doc=
+    phase  = Number(default=0.05,doc=
         """
         Delay after the start of the Simulation (at time zero) before
         generating an input pattern.  For a clocked, feedforward simulation, 
