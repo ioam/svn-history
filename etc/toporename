@@ -20,7 +20,7 @@ separator = "___________________________________________________________________
 def usage():
     print """
 Usage: toporename <from-regexp> <to-regexp> [file]*
-E.g.:   replaceall '\\cite\(.*\){\(.*\)}' '\\makecitation\1{\2}' file1 file2
+E.g.:   toporename '\\cite\(.*\){\(.*\)}' '\\makecitation\1{\2}' file1 file2
 """
 
 def quotedlist(l):
