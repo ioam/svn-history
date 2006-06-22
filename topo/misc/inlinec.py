@@ -36,11 +36,12 @@ $Id$
 import os
 from copy import copy
 
-# Attempt to import weave.  This can be forced off manually for
-# special circumstances, such as incomplete or broken weave installs.
+# If true, will attempt to import weave.  Set this to False if you want
+# to avoid weave altogether, e.g. if your installation is broken.
 import_weave = True
 
-# Variable reporting whether weave was successfully imported (below).
+# Variable that will be used to report whether weave was successfully
+# imported (below).
 weave_imported = False
 
 
