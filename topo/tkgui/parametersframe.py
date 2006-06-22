@@ -286,8 +286,6 @@ class ParametersFrame(Frame):
         try:
             low_bound,high_bound = parameter.get_soft_bounds()
 
-            # CEBHACKALERT: but one is ok - change this
-            # CB: This seems ok to me now, what's the problem?
             if low_bound==None or high_bound==None or low_bound==high_bound:
                 # i.e. there aren't really softbounds
                 raise AttributeError 
@@ -301,7 +299,6 @@ class ParametersFrame(Frame):
                 translator = topo.misc.utils.eval_atof)
 
         except AttributeError:
-
             self.__widgets[parameter_name] = self.__properties_frame.add_text_property(parameter_name,value=value,translator=topo.misc.utils.eval_atof)
 
 
@@ -326,7 +323,6 @@ class ParametersFrame(Frame):
 
         # get the current value of this field
         translator_dictionary = {}
-        # self.object_dictionary[parameter_name] = {}  what?
         value = ''
         
         # for each of the classes that this selector can select
@@ -338,14 +334,12 @@ class ParametersFrame(Frame):
             parameter_entry = parameter.range()[key]
             if parameter_entry == attr.__class__ :
                 translator_dictionary[key] = attr
-                #self.object_dictionary[parameter_name][key] = attr
                 value = key
             else :
                 # look for an entry in the passed in dict
                 #if self.translator_dictionary.has_key(parameter_name) :
                 #    if self.translator_dictionary[parameter_name].has_key(key) :
                 #        translator_dictionary[key] = self.translator_dictionary[parameter_name][key]
-                #        self.object_dictionary[parameter_name][key] = translator_dictionary[key]
                     #else :
                         # if no suitable objects, use class
                     #    translator_dictionary[key] = parameter.range()[key]
@@ -356,7 +350,6 @@ class ParametersFrame(Frame):
         # the current value as the object.
         if (value == '') :
             translator_dictionary[attr.name] = attr
-            #self.object_dictionary[parameter_name][attr.name] = attr
             value = attr.name
         self.translator_dictionary[parameter_name] = translator_dictionary
         # maps the class key to the object found above. 
@@ -400,7 +393,6 @@ class ParametersFrame(Frame):
                 obj = obj()
                 obj_key = w.get()
                 self.translator_dictionary[name][obj_key] = obj
-                self.object_dictionary[name][obj_key] = obj
             except : return
         parameter_window = Toplevel()
         parameter_window.title(obj.name+' parameters')
