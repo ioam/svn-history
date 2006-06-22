@@ -194,11 +194,13 @@ def load_snapshot(snapshot_name):
         # now restore class Parameter values
         for p_name,p in state.items():
             __main__.__dict__['val'] = p
-            exec 'setattr('+class_name+',"'+p_name+'",val)' in __main__.__dict__
+            try:
+                exec 'setattr('+class_name+',"'+p_name+'",val)' in __main__.__dict__
+            except:
+                ParameterizedObject().warning('Problem restoring parameter %s=%s for class %s; name may have changed since the snapshot was created.' % (p_name,repr(p),class_name))
 
     # CEBHACKALERT? Assumes parameters weren't added dynamically to a class
     # i.e. they're all in the source code.
-
 
     ### Now unpickle the simulation and set it to be topo.sim
     #
