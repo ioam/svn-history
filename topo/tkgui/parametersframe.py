@@ -366,7 +366,6 @@ class ParametersFrame(Frame):
             lambda event: self.right_click(event, w, parameter_name))
 
 
-
     def __add_boolean_property(self,parameter_name,value,parameter):
         """
         Add a boolean property to the properties_frame by representing it with a
@@ -380,20 +379,16 @@ class ParametersFrame(Frame):
         self.menu.tk_popup(event.x_root, event.y_root)
 
 
-    # CB: there's no way this can work, but I don't know what it's for yet.
-    ## CEBHACKALERT: this method must be fixed, as the others were, not to
-    ## instantiate ParameterizedObjects just to find their Parameters.
     def show_parameter_properties(self, param) :
         w, name = param
         obj = w.get_value()
-        # It is possible that the selected field is a Class. Check and if it is, 
-        # instantiate a new object of the class and enter it in the dictionary.
-        if not isinstance(obj, ParameterizedObject) :
-            try :
-                obj = obj()
-                obj_key = w.get()
-                self.translator_dictionary[name][obj_key] = obj
-            except : return
+
+        # CEBALERT: If the selected field is a class rather than an
+        # object, then we can't handle it yet.
+        if not isinstance(obj, ParameterizedObject):
+            raise NotImplementedError("Right-click editing for a class is not yet supported.") # ...because we have to clean the class vs object editing first.
+        
+
         parameter_window = Toplevel()
         parameter_window.title(obj.name+' parameters')
         title = Label(parameter_window, text = obj.name)
@@ -408,7 +403,7 @@ class ParametersFrame(Frame):
         Button(button_panel, text = 'Apply', 
             command = parameter_frame.set_obj_params).pack(side = RIGHT)
 
-    # CB: where's this called from.
+    # CB: where's this called from?
     def parameter_properties_ok(self,frame, win) :
         frame.set_obj_params()
         win.destroy()
