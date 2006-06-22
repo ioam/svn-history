@@ -171,10 +171,19 @@ class EventProcessor(ParameterizedObject):
     Base class for EventProcessors, i.e. objects that can accept and
     handle events.  This base class handles the basic mechanics of
     connections and sending events, and stores both incoming and outgoing
-    connections. 
+    connections.
+
+    The dest_ports attribute specifies which dest_ports are supported
+    by this class; subclasses can augment or change this list if they
+    wish.  The special value dest_ports=None means to accept
+    connections to any dest_port, while dest_ports=[None,'Trigger']
+    means that only connections to port None or port 'Trigger' are
+    accepted.
     """
     _abstract_class_name = "EventProcessor"
 
+    dest_ports=[None]
+    
     def __init__(self,**config):
         """
         Create an EventProcessor.
@@ -199,6 +208,7 @@ class EventProcessor(ParameterizedObject):
     # if extra parameters are required for an EP subclass, a
     # dictionary could be added to Simulation.connect() to hold
     # them, and passed on here
+    # JABALERT: Rename to _outgoing_connect
     def _connect_to(self,conn):
         """
         Add the specified connection to the list of outgoing connections.
@@ -219,11 +229,17 @@ class EventProcessor(ParameterizedObject):
         self.out_connections.append(conn)
 
 
+    # JABALERT: Rename to _incoming_connect
     def _connect_from(self,conn):
         """
         Add the specified connection to the list of incoming connections.
         Should only be called from Simulation.connect().
         """
+
+        if self.dest_ports and not conn.dest_port in self.dest_ports:
+            raise ValueError("%s is not on the list of ports allowed for incoming connections for %s: %s." %
+                             (str(conn.dest_port), self.__class__, str(self.dest_ports)))
+
         for existing_connection in self.in_connections:
             if existing_connection.name == conn.name:
                 raise ValueError('A connection into an EventProcessor must have a unique name; "%s" into %s already exists'%(conn.name,self.name))
