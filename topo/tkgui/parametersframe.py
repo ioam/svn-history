@@ -363,7 +363,7 @@ class ParametersFrame(Frame):
         w = self.__widgets[parameter_name][1]
         # bind right click to allow the selected classes properties to be changed.
         w._entryWidget.bind('<Button-3>', 
-            lambda event: self.right_click(event, w, parameter_name))
+            lambda event: self.right_click(event, w))
 
 
     def __add_boolean_property(self,parameter_name,value,parameter):
@@ -374,14 +374,17 @@ class ParametersFrame(Frame):
         self.__widgets[parameter_name] = self.__properties_frame.add_checkbutton_property(parameter_name,value=value)
 
 
-    def right_click(self, event, widget, name) :
-        self.parameters_properties = widget, name
+    def right_click(self, event, widget) :
+        self.parameters_properties = widget
         self.menu.tk_popup(event.x_root, event.y_root)
 
 
-    def show_parameter_properties(self, param) :
-        w, name = param
-        obj = w.get_value()
+    def show_parameter_properties(self, widget):
+        """
+        Open a new window containing a ParametersFrame for the
+        current object in the supplied widget.
+        """
+        obj = widget.get_value()
 
         # CEBALERT: If the selected field is a class rather than an
         # object, then we can't handle it yet.
