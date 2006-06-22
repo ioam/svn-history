@@ -11,11 +11,9 @@ __version__='$Revision$'
 from topo.base.functionfamilies import ResponseFnParameter,DotProduct,ResponseFn
 from topo.base.cf import CFPResponseFn
 from topo.base.parameterizedobject import ParameterizedObject
-
 from topo.misc.inlinec import inline, optimized
 
-from topo.responsefns.projfns import CFPRF_DotProduct, CFPRF_EuclideanDistance
-
+from topo.responsefns.projfns import CFPRF_Plugin, CFPRF_EuclideanDistance
 from topo.projections.basic import CFPRF_SharedWeight
 
 
@@ -78,6 +76,14 @@ class CFPRF_DotProduct_opt(CFPResponseFn):
         """
     
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
+
+class CFPRF_DotProduct(CFPRF_Plugin):
+    """
+    Wrapper written to allow transparent non-optimized fallback; 
+    equivalent to CFPRF_Plugin(single_cf_fn=DotProduct()).
+    """
+    def __init__(self,**params):
+        super(CFPRF_DotProduct,self).__init__(single_cf_fn=DotProduct(),**params)
 
 if not optimized:
     CFPRF_DotProduct_opt = CFPRF_DotProduct

@@ -21,29 +21,6 @@ from topo.misc.inlinec import inline, optimized
 from topo.base.cf import CFPRF_Plugin
 
 
-# CEBALERT: This should probably be eliminated, becuase it doesn't
-# appear to offer any advantages over CFPRF_Plugin(single_cf_fn=DotProduct()).
-class CFPRF_DotProduct(CFPResponseFn):
-    """
-    Dot-product response function.
-
-    Written entirely in Python; see CFPRF_DotProduct_opt for a much faster
-    (but otherwise equivalent) version.
-    """
-    single_cf_fn = ResponseFnParameter(DotProduct(),constant=True)
-    
-    def __call__(self, cfs, input_activity, activity, strength, **params):
-        rows,cols = activity.shape
-        for r in xrange(rows):
-            for c in xrange(cols):
-                cf = cfs[r][c]
-                r1,r2,c1,c2 = cf.slice_array
-                X = input_activity[r1:r2,c1:c2]
-                a = X*cf.weights
-                activity[r,c] = sum(a.flat)
-        activity *= strength
-
-
 class CFPRF_EuclideanDistance(CFPResponseFn):
     """
     Euclidean-distance--based response function.
