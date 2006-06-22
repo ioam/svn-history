@@ -328,13 +328,20 @@ class ParametersFrame(Frame):
         # dictionary passed in.
 
         possible_classes = parameter.range()
+        self.translator_dictionary[parameter_name] = possible_classes
 
+        
         for (visible_name,class_) in possible_classes.items():
+
             if class_ == value.__class__:
                 value_text = visible_name
+                # add the object to the translator dictionary so it's
+                # returned again if its class is selected
+                self.translator_dictionary[parameter_name].update(
+                    {visible_name:value})
 
-        translator_dictionary = possible_classes
-        self.translator_dictionary[parameter_name] = translator_dictionary
+
+
 
         # maps the class key to the object found above. 
         translator = lambda in_string: dict_translator(in_string, parameter_name, 
@@ -344,7 +351,7 @@ class ParametersFrame(Frame):
         self.__widgets[parameter_name] = self.__properties_frame.add_combobox_property(
                     parameter_name,
                     value = value_text,
-                    scrolledlist_items = translator_dictionary.keys(),
+                    scrolledlist_items = possible_classes.keys(),
                     translator = translator)
         w = self.__widgets[parameter_name][1]
         # bind right click to allow the selected classes properties to be changed.
