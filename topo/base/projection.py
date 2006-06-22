@@ -8,7 +8,7 @@ __version__='$Revision$'
 import Numeric
 
 from sheet import Sheet
-from parameterclasses import Number, BooleanParameter
+from parameterclasses import Number, BooleanParameter, Parameter
 from simulation import EPConnection
 from functionfamilies import OutputFnParameter,IdentityOF
 
@@ -28,6 +28,11 @@ class Projection(EPConnection):
     _abstract_class_name = "Projection"
     
     strength = Number(default=1.0)
+
+    src_port = Parameter(default='Activity')
+    
+    dest_port = Parameter(default='Activity')
+
 
     def __init__(self,**params):
         super(Projection,self).__init__(**params)
@@ -70,6 +75,11 @@ class ProjectionSheet(Sheet):
     A and produces an identically shaped output matrix. The default
     is the identity function.
     """
+
+    src_ports=['Activity']
+    
+    dest_ports=['Activity']
+    
     output_fn = OutputFnParameter(
         default=IdentityOF(),
         doc="Output function to apply (if apply_output_fn is true) to this Sheet's activity.")
@@ -121,7 +131,7 @@ class ProjectionSheet(Sheet):
         if self.apply_output_fn:
             self.output_fn(self.activity)
 
-        self.send_output(data=self.activity)
+        self.send_output(src_port='Activity',data=self.activity)
 
 
     def process_current_time(self):

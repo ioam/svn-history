@@ -24,6 +24,8 @@ class GeneratorSheet(Sheet):
     random distribution, but can use any mechanism.
     """
     
+    src_ports=['Activity']
+    
     dest_ports=['Trigger']
 
     period = Number(default=1,doc=
@@ -95,7 +97,7 @@ class GeneratorSheet(Sheet):
         assert self.simulation
 
         # connect self<->self (for repeating)
-        conn=self.simulation.connect(self.name,self.name,delay=self.period,dest_port='Trigger',name='Trigger')
+        conn=self.simulation.connect(self.name,self.name,delay=self.period,src_port='Activity',dest_port='Trigger',name='Trigger')
 
         # first event is special
         e=EPConnectionEvent(self.phase+topo.sim.time(),conn)
@@ -108,4 +110,4 @@ class GeneratorSheet(Sheet):
                      " via connection " + conn.name + ".")
         self.verbose("Time %0.4f: Generating a new pattern" % (self.simulation.time()))
         self.activity = self.input_generator()
-        self.send_output(data=self.activity)
+        self.send_output(src_port='Activity',data=self.activity)

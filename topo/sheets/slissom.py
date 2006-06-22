@@ -87,5 +87,5 @@ class SLISSOM(LISSOM):
 			self.dynamic_threshold[r,c] * exp(-self.decay_rate)
 		    self.spike_history[r,c] -= 1
 
-        self.send_output(data=self.activity)
+        self.send_output(src_port='Activity',data=self.activity)
 
