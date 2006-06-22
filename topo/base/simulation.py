@@ -179,9 +179,14 @@ class EventProcessor(ParameterizedObject):
     connections to any dest_port, while dest_ports=[None,'Trigger']
     means that only connections to port None or port 'Trigger' are
     accepted.
+
+    Similarly, the src_ports attribute specifies which src_ports will
+    be given output by this class.
     """
     _abstract_class_name = "EventProcessor"
 
+    src_ports=[None]
+    
     dest_ports=[None]
     
     def __init__(self,**config):
@@ -213,6 +218,10 @@ class EventProcessor(ParameterizedObject):
         Add the specified connection to the list of outgoing connections.
         Should only be called from Simulation.connect().
         """
+
+        if self.src_ports and not conn.src_port in self.src_ports:
+            raise ValueError("%s is not on the list of ports provided for outgoing connections for %s: %s." %
+                             (str(conn.src_port), self.__class__, str(self.src_ports)))
 
         # CB: outgoing connection must have a unique name
 ##         for existing_connection in self.out_connections:
