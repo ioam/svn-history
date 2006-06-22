@@ -124,7 +124,7 @@ def eval_atof(in_string,default_val = 0):
 def dict_translator(in_string, name = '', translator_dictionary = {}) :
     """
     Looks for an entry for the string in the dictionary. If it can't be
-    found the string is evaluated in using the main dictionary.
+    found the string is evaluated in __main__.__dict__.
     """
     if translator_dictionary.has_key(name) :
         if translator_dictionary[name].has_key(in_string) :
@@ -139,7 +139,8 @@ def dict_translator(in_string, name = '', translator_dictionary = {}) :
                 except : pass
     elif translator_dictionary.has_key(in_string) :
         return translator_dictionary[in_string]
-    val = eval_atof(in_string, default_val = in_string)
+
+    val = eval(in_string, __main__.__dict__)
     return val
 
 
