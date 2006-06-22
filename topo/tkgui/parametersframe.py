@@ -319,45 +319,31 @@ class ParametersFrame(Frame):
         Add a package property to the properties_frame by representing it
         with a ComboBox.
         """
-        attr = value
-
-        # get the current value of this field
         translator_dictionary = {}
-        value = ''
+        value_text = ''
         
         # for each of the classes that this selector can select
         # between loop through and find if there is a suitable object
         # already instantiated in either the current value or in the
         # dictionary passed in.
-        
-        for key in parameter.range().keys() :
-            parameter_entry = parameter.range()[key]
-            if parameter_entry == attr.__class__ :
-                translator_dictionary[key] = attr
-                value = key
-            else :
-                # look for an entry in the passed in dict
-                #if self.translator_dictionary.has_key(parameter_name) :
-                #    if self.translator_dictionary[parameter_name].has_key(key) :
-                #        translator_dictionary[key] = self.translator_dictionary[parameter_name][key]
-                    #else :
-                        # if no suitable objects, use class
-                    #    translator_dictionary[key] = parameter.range()[key]
-                #else :
-                translator_dictionary[key] = parameter.range()[key]
 
-        # if the current value lies outwith the recognised classes, then add the class to the list, with
-        # the current value as the object.
-        if (value == '') :
-            translator_dictionary[attr.name] = attr
-            value = attr.name
+        possible_classes = parameter.range()
+
+        for (visible_name,class_) in possible_classes.items():
+            if class_ == value.__class__:
+                value_text = visible_name
+
+        translator_dictionary = possible_classes
         self.translator_dictionary[parameter_name] = translator_dictionary
+
         # maps the class key to the object found above. 
         translator = lambda in_string: dict_translator(in_string, parameter_name, 
             translator_dictionary = self.translator_dictionary)
+
+
         self.__widgets[parameter_name] = self.__properties_frame.add_combobox_property(
                     parameter_name,
-                    value = value,
+                    value = value_text,
                     scrolledlist_items = translator_dictionary.keys(),
                     translator = translator)
         w = self.__widgets[parameter_name][1]
