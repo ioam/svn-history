@@ -197,6 +197,7 @@ def frange(start, end=None, inc=1.0, inclusive=False):
     return L
 
 
+# CB: this function isn't used, as of 2006/06/22
 def values_sorted_by_key(d):
     """
     Return the values of dictionary d sorted by key.
