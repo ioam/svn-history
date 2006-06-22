@@ -156,7 +156,8 @@ class EditorNode(EditorObject):
         EditorObject.show_properties(self)
         self.parameter_frame.create_widgets(self.sheet)
         Label(self.parameter_window, text = '\n\nConnections').pack(side = TOP)
-        connection_list = [con.name for con in self.to_connections + self.from_connections]
+        connections = list(set(self.to_connections).union(set(self.from_connections)))
+        connection_list = [con.name for con in connections]
         connection_menu = Pmw.ComboBox(self.parameter_window, selectioncommand = 
             self.view_connection_parameters, scrolledlist_items = 
             connection_list)
