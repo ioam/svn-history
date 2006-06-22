@@ -330,17 +330,19 @@ class ParametersFrame(Frame):
         possible_classes = parameter.range()
         self.translator_dictionary[parameter_name] = possible_classes
 
-        
-        for (visible_name,class_) in possible_classes.items():
 
+        # CEBHACKALERT: since this method is only called on creation of
+        # the widgets, 'caching' the object like this only works for the
+        # default object!
+        for (visible_name,class_) in possible_classes.items():
             if class_ == value.__class__:
                 value_text = visible_name
-                # add the object to the translator dictionary so it's
-                # returned again if its class is selected
+                # overwrite the class in {visible_name:class} with
+                # the object, so it will be returned rather than a
+                # new object if this class is selected again 
                 self.translator_dictionary[parameter_name].update(
                     {visible_name:value})
-
-
+                break
 
 
         # maps the class key to the object found above. 
