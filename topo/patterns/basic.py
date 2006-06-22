@@ -110,12 +110,6 @@ class Line(PatternGenerator):
                        precedence=0.61,
                        doc="Width of the Gaussian fall-off.")
 
-    # CEBHACKALERT:
-    # scale does not need to be here. For the tutorial, having this scale
-    # allows users to see patchy responses to a line without needing to
-    # adjust it themselves.
-    scale = Number(default=0.9,softbounds=(0.0,2.0))
-    
     def function(self,**params):
         return line(self.pattern_y, 
                     params.get('thickness',self.thickness),

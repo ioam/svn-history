@@ -33,6 +33,8 @@ input_pattern = topo.patterns.basic.Gaussian(
           y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
           orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
+# Default for tutorial
+topo.patterns.basic.Line.scale=0.7
                                  
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)

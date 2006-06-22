@@ -35,6 +35,9 @@ input_pattern = topo.patterns.basic.Gaussian(
           orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
                                  
+# Default for tutorial
+topo.patterns.basic.Line.scale=0.9
+                                 
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)
 CFProjection.weights_generator=topo.patterns.random.UniformRandom()
