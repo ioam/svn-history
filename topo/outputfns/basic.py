@@ -148,6 +148,27 @@ class HalfRectifyAndSquare(OutputFn):
         clip_lower(x,self.lower_bound)
         x *= x
 
+class HalfRectify(OutputFn):
+    """
+    Output function that applies a half-wave rectification (clips at zero)
+    
+    """
+    lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
+    
+    def __call__(self,x):
+        clip_lower(x,self.lower_bound)
+
+
+class Square(OutputFn):
+    """
+    Output function that applies a squaring nonlinearity
+
+    """
+
+    def __call__(self,x):
+    
+        x *= x     
+        
 
 class BinaryThreshold(OutputFn):
     """
