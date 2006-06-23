@@ -33,6 +33,10 @@ lissom_oo_or_20000.typ: lissom_oo_or.ty ../topo/*/*.py
 lissom_or_20000.typ: lissom_or.ty ../topo/*/*.py
 	../topographica lissom_or.ty    -c "topo.sim.run(20000)" -c "from topo.commands.basic import save_snapshot ; save_snapshot('$@')"
 
+
+obermayer_pnas90_30000.typ: obermayer_pnas90.ty ../topo/*/*.py
+	../topographica obermayer_pnas90.ty   -c "topo.sim.run(40000)" -c "from topo.commands.basic import save_snapshot ; save_snapshot('$@')"
+
 som_retinotopy_40000.typ: som_retinotopy.ty ../topo/*/*.py
 	../topographica som_retinotopy.ty   -c "topo.sim.run(40000)" -c "from topo.commands.basic import save_snapshot ; save_snapshot('$@')"
 
