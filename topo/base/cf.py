@@ -837,6 +837,8 @@ class CFSheet(ProjectionSheet):
 
     precedence = Number(0.5)
 
+## Example: V1.set_projections_to_jointly_normalize(['LGNOnAfferent','LGNOffAfferent'])
+
 ##     # should refer to applying output_fn together, not just normalization
 ##     # (here and elsewhere)
 ##     joint_normalized_projections = Parameter(default=[],instantiate=True)

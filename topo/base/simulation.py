@@ -40,13 +40,14 @@ An example dest_port might be for an EP that receives 'ordinary'
 neural activity on the default port, and receives a separate
 modulatory signal that influences learning.  The originator of the
 modulatory signal might have a connection to the EP with dest_port =
-'modulation'.  Multiple ports can be grouped by a dest EP by assuming
+'Modulation'.  Multiple ports can be grouped by a dest EP by assuming
 a convention that the keys are tuples,
-e.g. ('jointnormalize','Conn1'), ('jointnormalize','Conn2').
+e.g. ('JointNormalize','Group1'), ('JointNormalize','Group2').
 
-An example src_port use might be an EP that sends different
-events to itself than it sends out to other EPs.  In this case the
-self connections might have src_port = 'recurrent'.
+An example src_port use might be an EP that sends different events to
+itself than it sends out to other EPs.  In this case the self
+connections might have src_port = 'Recurrent', and probably also a
+special dest_port.
 
 
 CURRENT SIMULATION
