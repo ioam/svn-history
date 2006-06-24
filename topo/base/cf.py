@@ -429,6 +429,35 @@ class CFPLF_Plugin(CFPLearningFn):
                 # CEBHACKALERT: see ConnectionField.__init__()
                 cf.weights *= cf.mask
                 
+class CFPLF_OutstarHebbian(CFPLearningFn):
+    """CFPLearningFunction applying the specified (default is Hebbian) 
+       single_cf_fn to each CF, where normalization is done in an outstar-manner."""
+    single_cf_fn = LearningFnParameter(default=Hebbian(),
+        doc="Accepts a LearningFn that will be applied to each CF individually.")
+
+    outstar_wsum = None
+
+    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+        """Apply the specified single_cf_fn to every CF."""
+        rows,cols = output_activity.shape
+	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
+        # avoid evaluating these references each time in the loop
+        single_cf_fn = self.single_cf_fn
+	outstar_wsum = Numeric.zeros(input_activity.shape)
+	for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+                single_cf_fn(cf.get_input_matrix(input_activity),
+                             output_activity[r,c], cf.weights, single_connection_learning_rate)
+
+		# Outstar normalization
+		wrows,wcols = cf.weights.shape
+		for wr in xrange(wrows):
+		   for wc in xrange(wcols):
+			outstar_wsum[wr][wc] += cf.weights[wr][wc]
+
+                # CEBHACKALERT: see ConnectionField.__init__()
+                cf.weights *= cf.mask
 
 class CFPOutputFn(ParameterizedObject):
     """
