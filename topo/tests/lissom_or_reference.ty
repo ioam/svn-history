@@ -205,12 +205,12 @@ topo.sim.connect('Retina','V1', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength = 1.0, name='Afferent0',
           nominal_bounds_template = afferent_weight_bounds, learning_rate=alpha_input)
 
-topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"), dest_port="exc",
+topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength=gammaexc,
           name='LateralExcitatory',
           nominal_bounds_template = excitatory_weight_bounds, learning_rate=alpha_exc)
 
-topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"), dest_port="inh",
+topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength=-gammainh,
           name='LateralInhibitory',
           nominal_bounds_template = inhibitory_weight_bounds, learning_rate=alpha_inh)
