@@ -3,7 +3,6 @@ TestPattern
 
 Sliders panel for inputs
 
-# CEBHACKALERT: I will update this.
 
 The list of valid Input Types is automatically generated from the
 PatternGenerator subclasses found in topo.base.patterngenerator (which
@@ -20,6 +19,14 @@ __version__='$Revision$'
 
 ### JABHACKALERT: Need to remove Back/Forward buttons, because they do not
 ### do what the user would expect.  
+
+# CB: when this file is cleaned up, the following bug should be
+# confirmed and sorted out if present.  The current hierarchical
+# example has rectangular retinas, one with its long axis horizontal,
+# and one with its long axis vertical. However, the test pattern
+# window shows two identical rectangles (whereas the model editor
+# shows the sheets correctly).
+
 
 import copy
 import Pmw
