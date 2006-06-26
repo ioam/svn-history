@@ -44,7 +44,6 @@ class ParametersFrame(Frame):
         self.__properties_frame = PropertiesFrame(parent)
         self.__properties_frame.pack(side=TOP,expand=YES,fill=BOTH)
 
-        # CB: investigate
         self.translator_dictionary = {}
 
         # CB: surely there's a better way?
@@ -59,7 +58,6 @@ class ParametersFrame(Frame):
 
         self.__help_balloon = Pmw.Balloon(parent)
 
-        # CB: check these are used consistently
         self.__widgets = {}
         self.__visible_parameters = {}
 
@@ -313,7 +311,7 @@ class ParametersFrame(Frame):
                     value = value,
                     scrolledlist_items = parameter.available)
 
-    # CB: how does this work?
+
     def __add_class_selector_property(self,parameter_name,value,parameter):
         """
         Add a package property to the properties_frame by representing it
@@ -322,11 +320,6 @@ class ParametersFrame(Frame):
         translator_dictionary = {}
         value_text = ''
         
-        # for each of the classes that this selector can select
-        # between loop through and find if there is a suitable object
-        # already instantiated in either the current value or in the
-        # dictionary passed in.
-
         possible_classes = parameter.range()
         self.translator_dictionary[parameter_name] = possible_classes
 
