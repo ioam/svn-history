@@ -52,6 +52,11 @@ Tasks which the developers are about to start.
 <ul>
 
 <li>
+2006/06/26: Test pattern window doesn't display retinas correctly (see note
+by CB in the testpattern.py file). The file needs to be cleaned up anyway.
+</li>
+
+<li>
 2006/06/03: Allow min_matrix_radius to be set to zero, and then say
 that if no unit ends up in the CF, then there will be no CF for that
 unit.  But that's going to make the rest of the code hard to write,
