@@ -52,6 +52,11 @@ Tasks which the developers are about to start.
 <ul>
 
 <li>
+2006/06/26 (CB): parameters frame doesn't properly set object properties when 
+right click is used (there's a clearer explanation in parametersframe.py).
+</li>
+
+<li>
 2006/06/26: Test pattern window doesn't display retinas correctly (see note
 by CB in the testpattern.py file). The file needs to be cleaned up anyway.
 </li>
