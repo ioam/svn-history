@@ -1,5 +1,6 @@
 """
-Tests PatternGenerator (position and orientation).
+Tests PatternGenerator (position and orientation), and some of the
+basic patterns.
 
 $Id$
 """
@@ -13,7 +14,7 @@ from MLab import rot90
 from topo.base.patterngenerator import Constant
 from topo.base.boundingregion import BoundingBox
 
-from topo.patterns.basic import Rectangle
+from topo.patterns.basic import Rectangle,Gaussian,CompositePatternGenerator
 
 from utils import assert_array_equal
 
@@ -166,6 +167,23 @@ class TestPatternGenerator(unittest.TestCase):
         assert_array_equal(rect(x=-1.0/xdensity,y=1.0/ydensity,orientation=pi/4),
                            rot_45_offset)
 
+
+
+    def test_basic_composite_patterns(self):
+        """
+        Test that a composite pattern consisting of just one Gaussian is the same
+        as that actual Gaussian pattern, and similarly for a composite pattern of
+        two rectangles.
+        """
+        g = Gaussian(size=0.2,aspect_ratio=0.5)
+        c = CompositePatternGenerator(generators=[g])
+        assert_array_equal(g(),c())
+
+        r1=Rectangle(size=0.2,aspect_ratio=1,xdensity=10,ydensity=10,x=0.3,y=0.3)
+        r2=Rectangle(size=0.2,aspect_ratio=1,xdensity=10,ydensity=10,x=-0.3,y=-0.3)
+        c_true = r1()+r2()        
+        c = CompositePatternGenerator(generators=[r1,r2])
+        assert_array_equal(c(),c_true)
 
 
 
