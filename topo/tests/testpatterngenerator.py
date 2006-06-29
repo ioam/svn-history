@@ -169,7 +169,7 @@ class TestPatternGenerator(unittest.TestCase):
 
 
 
-    def test_basic_composite_patterns(self):
+    def test_composite_pattern_basic(self):
         """
         Test that a composite pattern consisting of just one Gaussian is the same
         as that actual Gaussian pattern, and similarly for a composite pattern of
@@ -189,6 +189,23 @@ class TestPatternGenerator(unittest.TestCase):
 ##         c_true = r1()+r2()        
 ##         c = CompositePatternGenerator(generators=[r1,r2])
 ##         assert_array_equal(c(),c_true)
+               # test that moving is ok
+
+
+# CEBHACKALERT: this test genuinely fails, because the moved
+# composite is very slightly different from the moved gaussian -
+# almost like they are being normalized differently, though I doubt
+# that is the problem.
+##     def test_composite_pattern_moves(self):
+##         """
+##         Test that moving a composite pattern yields the correct pattern.
+##         """
+##         g = Gaussian(size=0.2,aspect_ratio=0.5,xdensity=7,ydensity=7)
+##         c = CompositePatternGenerator(xdensity=7,ydensity=7,generators=[g],
+##                                       x=-0.3,y=0.4)
+
+##         g_moved = g(x=-0.3,y=0.4)
+##         assert_array_equal(c(),g_moved)
 
 
 
