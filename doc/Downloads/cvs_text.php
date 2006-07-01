@@ -208,3 +208,14 @@ directory and select <code>CVS Update</code> to get the new files.
 <P>Note that updating the external/ subdirectory sometimes takes a
 long time, if some of the external packages have been upgraded, and in
 that case "make all" can also take some time to build.
+
+<H3>SSH Agent</H3>
+
+If you do a lot of CVS updates, especially if you are a Topographica
+developer, you may wish to set up CVS so that SourceForge.net does not
+have to keep asking for your password for every transaction.  This can
+be done using SSH, by <A
+HREF="https://sourceforge.net/docs/F02/">setting up SSH and uploading
+your public keys to sf.net</A>, then starting ssh-agent on your local
+machine.  Once the agent is running, you should be able to use CVS
+with no password.
