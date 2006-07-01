@@ -58,6 +58,13 @@ more library components (e.g. Oja rule, CPCA, covariance),
 prototype spiking neuron support, and
 much-improved <A target="_top" href="../User_Manual/modeleditor.html">model editor</A>.
 
+<p><b>15 May 06:</b> New book <A target="_top"
+HREF="http://computationalmaps.org"><i>Computational Maps in the
+Visual Cortex</i></A> available, including background on modeling
+computational maps, a review of visual cortex models, and <A
+target="_top" HREF="http://computationalmaps.org/docs/chapter5.pdf">an
+extended set of examples of the types of models supported by
+Topographica</a>.
 
 <p><b>20 February 06:</b> Version 0.8.2 released, including numerous
 bugfixes, 
