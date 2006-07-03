@@ -4,7 +4,7 @@
 ;;; To use this mode, add the following lines to your .emacs file:
 ;;;
 ;;; (add-to-list 'load-path "$TOPO/etc/")
-;;; (add-to-list 'auto-mode-alist '(".ty$" 'Topographica-mode))
+;;; (add-to-list 'auto-mode-alist (cons ".ty$" 'Topographica-mode))
 ;;; (autoload 'Topographica-mode "topographica.elc" "Topographica mode" t)
 ;;;
 ;;; where $TOPO is the path to your topographica/ directory.
