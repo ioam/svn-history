@@ -20,10 +20,11 @@ from topo.projections.basic import CFProjection,LeakyCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.base.sheet import BoundingBox
 from topo.base.parameterclasses import DynamicNumber
-from topo.base.cf import CFPLF_Plugin,CFPLF_OutstarHebbian
+from topo.base.cf import CFPLF_Plugin
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1
+from topo.learningfns.projfns import CFPLF_OutstarHebbian
 from topo.misc.numbergenerators import UniformRandom
 
 topo.sim.name = "slissom_or"

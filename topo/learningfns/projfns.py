@@ -10,11 +10,12 @@ $Id$
 """
 __version__ = "$Revision$"
 
-from Numeric import ones,Float32
+from Numeric import ones,Float32,zeros
 
 from topo.base.cf import CFPLearningFn,LearningFnParameter
 from topo.base.parameterclasses import Number
 from basic import BCMFixed
+from topo.base.functionfamilies import Hebbian
 
 # Imported here so that all ProjectionLearningFns will be in the same package
 from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
@@ -87,3 +88,34 @@ from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
 ##      def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
 ##          trace = (1-self.trace_strength)*unit_activity+self.trace_strength*self.trace
 ##          weights += single_connection_learning_rate * trace * input_activity
+
+class CFPLF_OutstarHebbian(CFPLearningFn):
+    """CFPLearningFunction applying the specified (default is Hebbian) 
+       single_cf_fn to each CF, where normalization is done in an outstar-manner."""
+    single_cf_fn = LearningFnParameter(default=Hebbian(),
+        doc="Accepts a LearningFn that will be applied to each CF individually.")
+
+    outstar_wsum = None
+
+    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+        """Apply the specified single_cf_fn to every CF."""
+        rows,cols = output_activity.shape
+	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
+        # avoid evaluating these references each time in the loop
+        single_cf_fn = self.single_cf_fn
+	outstar_wsum = zeros(input_activity.shape)
+	for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+                single_cf_fn(cf.get_input_matrix(input_activity),
+                             output_activity[r,c], cf.weights, single_connection_learning_rate)
+
+		# Outstar normalization
+		wrows,wcols = cf.weights.shape
+		for wr in xrange(wrows):
+		   for wc in xrange(wcols):
+			outstar_wsum[wr][wc] += cf.weights[wr][wc]
+
+                # CEBHACKALERT: see ConnectionField.__init__()
+                cf.weights *= cf.mask
+
