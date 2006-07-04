@@ -48,6 +48,8 @@ from sheet import Sheet,Slice
 from sheetview import UnitView, ProjectionView
 from boundingregion import BoundingBox,BoundingRegionParameter
 
+# JABALERT: Need to move KeyedList to base if we keep this
+from topo.misc.keyedlist import KeyedList
 
 # Specified explicitly when creating weights matrix - required
 # for optimized C functions.
@@ -836,83 +838,99 @@ class CFSheet(ProjectionSheet):
 
     precedence = Number(0.5)
 
-## Example: V1.set_projections_to_jointly_normalize(['LGNOnAfferent','LGNOffAfferent'])
+    def _port_match(self,key,portlist):
+        """
+        Returns True if the given key matches any port on the given list.
 
-##     # should refer to applying output_fn together, not just normalization
-##     # (here and elsewhere)
-##     joint_normalized_projections = Parameter(default=[],instantiate=True)
+        A port is considered a match if the port is == to the key,
+        or if the port is a tuple whose first element is == to the key,
+        or if both the key and the port are tuples whose first elements are ==.
+        """
+        port=portlist[0]
+        return [port for port in portlist
+                if (port == key or
+                    (isinstance(key,tuple)  and key[0] == port) or
+                    (isinstance(port,tuple) and port[0] == key) or
+                    (isinstance(key,tuple)  and isinstance(port,tuple) and port[0] == key[0]))]
 
-##     def set_projections_to_jointly_normalize(self, projection_names):
-##         """
-##         Set which projections to jointly normalize, and perform
-##         initial normalization.
-##         """
-##         # {projection_name:projection}
-##         in_proj = {}
-##         for proj in self.in_connections:
-##             in_proj[proj.name] = proj
+    # JABHACKALERT: Need to jointly normalize before the first iteration, somehow.
+    # Also, whenever a connection is added to a group, need to check
+    # that it has the same no of cfs as the existing connection.
 
-##         # extend to list of tuples for separate groups to jointly normalize
-##         for proj_name in projection_names:
-##             self.joint_normalized_projections.append(in_proj[proj_name])
+    def __grouped_in_projections(self):
+        """
+        Return a dictionary of lists of incoming Projections, grouped for normalization..
 
-##         self.__normalize_joint_projections()
-
-
-##     def __normalize_joint_projections(self):
-##         """
-##         Perform joint normalization.
-##         """
-##         from Numeric import add
+        The entry None will contain those to be normalized
+        independently, while the other entries will contain a list of
+        Projections, each of which should be normalized together.
+        """
+        in_proj = KeyedList()
+        in_proj[None]=[] # Independent (ungrouped) connections
         
-##         if len(self.joint_normalized_projections)<1:
-##             return
-        
-##         # should check they all have same no of cfs, etc
-##         proj  = self.joint_normalized_projections[0]
-##         rows,cols = len(proj.cfs),len(proj.cfs[0])
-
-##         for r in range(rows):
-##             for c in range(cols):
-##                 sums = []
-##                 for proj in self.joint_normalized_projections:
-##                     sums.append(proj.cfs[r][c].sum)
-
-##                 joint_sum = add.reduce(sums)
-##                 for proj in self.joint_normalized_projections:
-##                     proj.cfs[r][c]._sum=joint_sum
-
+        for c in self.in_connections:
+            d = c.dest_port
+            if not isinstance(c,Projection):
+                self.debug("Skipping non-Projection "+c.name)
+            elif isinstance(d,tuple) and len(d)>2 and d[1]=='JointNormalize':
+                if in_proj.get(d[2]):
+                    in_proj[d[2]].append(c)
+                else:
+                    in_proj[d[2]]=[c]
+            elif isinstance(d,tuple):
+                raise ValueError("Unable to determine appropriate action for dest_port: %s (connection %s)." % (d,c.name))
+            else:
+                in_proj[None].append(c)
                     
-##         for proj in self.joint_normalized_projections:
-##             proj.apply_output_fn()
-        
+        return in_proj
+
                         
+    # should refer to applying output_fn together, not just normalization
+    # (here and elsewhere)
+    def __normalize_joint_projections(self,projlist):
+        """Normalize the specified list of projections together."""
+
+        # Assumes that all Projections in the list have the same r,c size
+        assert len(projlist)>=1
+        proj  = projlist[0]
+        rows,cols = len(proj.cfs),len(proj.cfs[0])
+
+        for r in range(rows):
+            for c in range(cols):
+                sums = [p.cfs[r][c].sum for p in projlist]
+                joint_sum = Numeric.add.reduce(sums)
+                for p in projlist:
+                    p.cfs[r][c]._sum=joint_sum
+                 
+        for p in projlist:
+            p.apply_output_fn()
+
+
     def learn(self):
         """
         Call the learn() method on every Projection to the Sheet.
         """
+        # Ask all projections to learn independently
         for proj in self.in_connections:
             if not isinstance(proj,Projection):
-                topo.sim.debug("Skipping non-Projection "+proj.name)
+                self.debug("Skipping non-Projection "+proj.name)
             else:
                 proj.learn()
-                proj.apply_output_fn()
 
-##         in_proj = []
-##         for proj in self.in_connections:
-##             in_proj.append(proj)
-##             proj.learn()
-
-##         # apply output_fn to grouped projections
-##         self.__normalize_joint_projections()
-
-##         # remove jointly normalized ones from the dict
-##         for proj in self.joint_normalized_projections:
-##             in_proj.remove(proj)
-            
-##         # apply output_fn to remaining, ungrouped projections
-##         for proj in in_proj:
-##             proj.apply_output_fn()
+        # Apply output function in groups determined by dest_port
+        for key,projlist in self.__grouped_in_projections():
+            if key == None:
+                self.debug("Time " + str(self.simulation.time()) + ": " +
+                           "Independently normalizing:")
+                for p in projlist:
+                    p.apply_output_fn()
+                    self.debug('  ',p.name)
+            else:
+                self.debug("Time " + str(self.simulation.time()) + ": " +
+                           "Jointly normalizing %s:" % key)
+                for p in projlist: self.debug("  ",p.name)
+                self.__normalize_joint_projections(projlist)
+         
 
                 
     def update_unit_view(self,x,y,proj_name=''):
@@ -925,7 +943,7 @@ class CFSheet(ProjectionSheet):
 	"""     
         for p in self.in_connections:
             if not isinstance(p,CFProjection):
-                topo.sim.debug("Skipping non-CFProjection "+p.name)
+                self.debug("Skipping non-CFProjection "+p.name)
             elif proj_name == '' or p.name==proj_name:
                 v = p.get_view(x,y)
                 src = v.projection.src
