@@ -210,6 +210,15 @@ class EventProcessor(ParameterizedObject):
 
         self.simulation = None
 
+    def _port_match(self,key,portlist):
+        """
+        Returns True if the given key matches any port on the given list.
+
+        In the default implementation, a port is considered a match if
+        the port is == to the key, but subclasses of EventProcessor can
+        override this to provide weaker forms of matching.
+        """
+        return key in portlist
 
     # if extra parameters are required for an EP subclass, a
     # dictionary could be added to Simulation.connect() to hold
@@ -220,7 +229,7 @@ class EventProcessor(ParameterizedObject):
         Should only be called from Simulation.connect().
         """
 
-        if self.src_ports and not conn.src_port in self.src_ports:
+        if self.src_ports and not self._port_match(conn.src_port,self.src_ports):
             raise ValueError("%s is not on the list of ports provided for outgoing connections for %s: %s." %
                              (str(conn.src_port), self.__class__, str(self.src_ports)))
 
@@ -244,7 +253,7 @@ class EventProcessor(ParameterizedObject):
         Should only be called from Simulation.connect().
         """
 
-        if self.dest_ports and not conn.dest_port in self.dest_ports:
+        if self.dest_ports and not self._port_match(conn.dest_port,self.dest_ports):
             raise ValueError("%s is not on the list of ports allowed for incoming connections for %s: %s." %
                              (str(conn.dest_port), self.__class__, str(self.dest_ports)))
 
@@ -266,11 +275,11 @@ class EventProcessor(ParameterizedObject):
         """
         pass
 
-
+    ### JABALERT: Should change send_output to accept a list of src_ports, not a single src_port.
     def send_output(self,src_port=None,data=None):
         """Send some data out to all connections on the given src_port."""
         out_conns_on_src_port = [conn for conn in self.out_connections
-                                 if conn.src_port==src_port]
+                                 if self._port_match(conn.src_port,[src_port])]
 
         for conn in out_conns_on_src_port:
             self.verbose("Time " + str(self.simulation.time()) + ":" +
