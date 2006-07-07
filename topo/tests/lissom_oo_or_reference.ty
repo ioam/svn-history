@@ -222,13 +222,13 @@ topo.sim['V1'] = LISSOM(nominal_density=48.0,
 ##     generators=[surroundg,centerg],operator=Wrapper("Numeric.subtract"))
     
 ## # LGN ON channel
-## s.connect(Retina,LGNOn,delay=FixedPoint("0.05"),
+## topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
 ##           connection_type=SharedWeightCFProjection,strength=2.33,
 ##           nominal_bounds_template=BoundingBox(radius=0.375),name='ON',
 ##           weights_generator=ong)
 
 ## # LGN OFF channel
-## s.connect(Retina,LGNOff,delay = FixedPoint("0.05"),
+## topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
 ##           connection_type=SharedWeightCFProjection,strength=2.33,
 ##           name='Center',nominal_bounds_template=BoundingBox(radius=0.375),
 ##           weights_generator=offg)
