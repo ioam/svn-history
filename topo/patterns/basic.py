@@ -442,8 +442,8 @@ class CompositePatternGenerator(PatternGenerator):
         whole_image_output_fn = params.get('whole_image_output_fn',
                                            self.whole_image_output_fn)
         bounds = params.get('bounds',self.bounds)
-        xdensity=params.get('density',self.xdensity)
-        ydensity=params.get('density',self.ydensity)
+        xdensity=params.get('xdensity',self.xdensity)
+        ydensity=params.get('ydensity',self.ydensity)
         height = params.get('size',self.size)
         width = (params.get('aspect_ratio',self.aspect_ratio))*height
 
