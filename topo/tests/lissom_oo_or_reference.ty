@@ -221,12 +221,12 @@ off_weights = topo.patterns.basic.CompositePatternGenerator(
 
 topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
           connection_type=SharedWeightCFProjection,strength=2.33,
-          nominal_bounds_template=BoundingBox(radius=0.375),name='ON',
+          nominal_bounds_template=BoundingBox(radius=0.375),
           weights_generator=on_weights)
 
 topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
           connection_type=SharedWeightCFProjection,strength=2.33,
-          name='Center',nominal_bounds_template=BoundingBox(radius=0.375),
+          nominal_bounds_template=BoundingBox(radius=0.375),
           weights_generator=off_weights)
 
 
