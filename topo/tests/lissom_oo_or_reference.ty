@@ -32,10 +32,10 @@ from topo.base.sheet import BoundingBox
 from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
+from topo.base.parameterclasses import Wrapper
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import DivisiveNormalizeL1,PiecewiseLinear
-
 from topo.responsefns.optimized import CFPRF_SharedWeightDotProduct_opt
 
 import topo.tests.lissom_log_parser
@@ -186,7 +186,6 @@ CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
-SharedWeightCFProjection.weights_output_fn.single_cf_fn = DivisiveNormalizeL1()
 SharedWeightCFProjection.response_fn=CFPRF_SharedWeightDotProduct_opt()
 
 
@@ -204,61 +203,31 @@ topo.sim['V1'] = LISSOM(nominal_density=48.0,
             output_fn=PiecewiseLinear(lower_bound=delta,upper_bound=beta))
 
 
-# Use Composite for center/surround instead of two projections
-# (also remove SharedWeightCFProjection.weights_output_fn... line above
-##########################################################################
-## from topo.base.parameterclasses import Wrapper
 
-## centerg = topo.patterns.basic.Gaussian(
-##     size=2*sigma_c/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1())
 
-## surroundg = topo.patterns.basic.Gaussian(
-##     size=2*sigma_s/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1())
+centerg = topo.patterns.basic.Gaussian(
+    size=2*sigma_c/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1())
 
-## ong = topo.patterns.basic.CompositePatternGenerator(
-##     generators=[centerg,surroundg],operator=Wrapper("Numeric.subtract"))
+surroundg = topo.patterns.basic.Gaussian(
+    size=2*sigma_s/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1())
 
-## offg = topo.patterns.basic.CompositePatternGenerator(
-##     generators=[surroundg,centerg],operator=Wrapper("Numeric.subtract"))
+on_weights = topo.patterns.basic.CompositePatternGenerator(
+    generators=[centerg,surroundg],operator=Wrapper("Numeric.subtract"))
+
+off_weights = topo.patterns.basic.CompositePatternGenerator(
+    generators=[surroundg,centerg],operator=Wrapper("Numeric.subtract"))
     
-## # LGN ON channel
-## topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
-##           connection_type=SharedWeightCFProjection,strength=2.33,
-##           nominal_bounds_template=BoundingBox(radius=0.375),name='ON',
-##           weights_generator=ong)
-
-## # LGN OFF channel
-## topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
-##           connection_type=SharedWeightCFProjection,strength=2.33,
-##           name='Center',nominal_bounds_template=BoundingBox(radius=0.375),
-##           weights_generator=offg)
-##########################################################################
 
 
-# LGN ON channel
-topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),
-                 connection_type=SharedWeightCFProjection,strength=2.33,
-                 name='Center',nominal_bounds_template=lgn_weight_bounds,
-                 weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_c/BaseRN,aspect_ratio=1))
-
-
-topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),
-                 connection_type=SharedWeightCFProjection,strength=-2.33,
-                 name='Surround',nominal_bounds_template=lgn_weight_bounds,
-                 weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_s/BaseRN,aspect_ratio=1))
-
-
-# LGN OFF channel
-topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
-                 connection_type=SharedWeightCFProjection,strength=-2.33,
-                 name='Center',nominal_bounds_template=lgn_weight_bounds,
-                 weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_c/BaseRN,aspect_ratio=1))
-
+topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
+          connection_type=SharedWeightCFProjection,strength=2.33,
+          nominal_bounds_template=BoundingBox(radius=0.375),name='ON',
+          weights_generator=on_weights)
 
 topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
-                 connection_type=SharedWeightCFProjection,strength=2.33,
-                 name='Surround',nominal_bounds_template=lgn_weight_bounds,
-                 weights_generator=topo.patterns.basic.Gaussian(size=2*sigma_s/BaseRN,aspect_ratio=1))
+          connection_type=SharedWeightCFProjection,strength=2.33,
+          name='Center',nominal_bounds_template=BoundingBox(radius=0.375),
+          weights_generator=off_weights)
 
 
 topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"),
