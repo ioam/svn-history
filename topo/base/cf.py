@@ -522,7 +522,8 @@ The true bounds will differ depending on the density (see initialize_bounds())."
     weights_generator = PatternGeneratorParameter(
         default=patterngenerator.Constant(),constant=True,
         doc="Generate initial weights values.")
-    
+
+    # JABALERT: Confusing name; change to cf_shape or cf_boundary_shape
     weights_shape = PatternGeneratorParameter(
         default=patterngenerator.Constant(),constant=True,
         doc="Define the shape of the connection fields.")
