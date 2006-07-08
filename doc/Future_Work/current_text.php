@@ -42,6 +42,12 @@ plots.
 2006/04/07: (CB) Allowing joint normalization of projections for a CFSheet. [This appears to work, but results from LISSOM simulations do not yet match those of C++ LISSOM.]
 </li>
 
+<li>
+2006/07/07 (JB): Fix normalization to allow negative weights.  Also
+consider adding other normalization options, including joint
+normalization across all plots with the same name.
+</li>
+
 </ul>
 
 
@@ -131,10 +137,6 @@ Need to make sure DynamicNumbers are advanced only once per simulation time.
 
 <li> 
 2006/05/04: Tidy model editor's handling of sheet and projection class parameeters (why does the parametersframe have to be in a separate window for the widgets to work properly)?
-</li>
-
-<li>
-2006/04/07: (JB) Implement joint normalization via ports - check ports work as expected.
 </li>
 
 <li> 
