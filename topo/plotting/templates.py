@@ -157,11 +157,23 @@ pgt.add_plot('Y Preference',[('Strength','YPreference')])
 pgt.add_plot('Position Preference',[('Red','XPreference'),('Green','YPreference')])
 
 
-
 pgt = new_plotgroup_template(name='Center of Gravity',command='measure_cog() ; topographic_grid(xsheet_view_name="XCoG",ysheet_view_name="YCoG")',normalize=True)
 pgt.add_plot('X CoG',[('Strength','XCoG')])
 pgt.add_plot('Y CoG',[('Strength','YCoG')])
 pgt.add_plot('CoG',[('Red','XCoG'),('Green','YCoG')])
 
+pgt = new_plotgroup_template(name='Ocular Preference',command='measure_od_pref()')
+pgt.add_plot('Ocular Preference',[('Strength','OcularPreference')])
+pgt.add_plot('Ocular Selectivity',[('Strength','OcularSelectivity')])
+
+
+pgt = new_plotgroup_template(name='Positiondisparity Preference',command='measure_position_disparity()')
+pgt.add_plot('Positiondisparity Preference',[('Strength','PositiondisparityPreference')])
+pgt.add_plot('Positiondisparity Selectivity',[('Strength','PositiondisparitySelectivity')])
+
+
+pgt = new_plotgroup_template(name='Phasedisparity Preference',command='measure_phase_disparity()')
+pgt.add_plot('Phasedisparity Preference',[('Strength','PhasedisparityPreference')])
+pgt.add_plot('Phasedisparity Selectivity',[('Strength','PhasedisparitySelectivity')])
 
 
