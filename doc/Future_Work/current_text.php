@@ -48,6 +48,10 @@ consider adding other normalization options, including joint
 normalization across all plots with the same name.
 </li>
 
+<li>
+2006/07/21 (CB): Update scripts now windows-specific files have moved to topographica-win module. Make script to create python/topographica installation, including the mingw compiler. 
+</li>
+
 </ul>
 
 
@@ -112,14 +116,6 @@ Need to make sure DynamicNumbers are advanced only once per simulation time.
 </li>
 
 <li>
-2006/05/17 (JB): Windows-specific files to new module in CVS.
-</li>
-
-<li>
-2006/05/17 (CB): Script to create Windows python/topographica installation, for generating python_topo directory.
-</li>
-
-<li>
 2006/05/22 (CB): Test file for connectionfield.
 </li>
 
@@ -136,7 +132,7 @@ Need to make sure DynamicNumbers are advanced only once per simulation time.
 </li>
 
 <li> 
-2006/05/04: Tidy model editor's handling of sheet and projection class parameeters (why does the parametersframe have to be in a separate window for the widgets to work properly)?
+2006/05/04: Tidy model editor's handling of sheet and projection class parameters (why does the parametersframe have to be in a separate window for the widgets to work properly)?
 </li>
 
 <li> 
