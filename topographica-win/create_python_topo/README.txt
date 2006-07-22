@@ -1,27 +1,24 @@
-# CEBHACKALERT: this directory is going to contain 
-# a script to create a working Python installation suitable
-# for Topographica (i.e. the script run by a developer to
-# create the python_topo/ directory). 
-# ** The script already present will not work **
-
-
-Windows Installer Binary Files Directory
 $Id$
 
-This directory contains files that are used by the Windows Install.
-There are two other files in the root Topographica directory that 
-are also part of the Win32 system: topographica.ico, and setup.bat
+****************************************************
+Create Topographica's python directory (python_topo)
+****************************************************
 
-setup.bat changes to this directory and runs:
-python setup.py configure - Verifies Python 2.4 is installed
-python setup.py install   - Installs the required packs and does
-                            things to the Windows Registry.
+Because we can't build Python with a free compiler, we use the binary
+as distributed by python.org
 
-The .\util directory contains:
+This procedure sets up a copy of Python with all the external packages
+necessary for Topographica. This copy of python is then archived for
+distribution to Topographica users. Only if a package is upgraded or
+added does someone need to go through this procedure.
 
-tar.exe       - Windows does not have this.
-gunzip.exe    - Needed to unpack binaries.
-gzip.exe      - Just in case.
-Y_OR_N.COM    - Utility to verify installation is desired in setup.bat
-noinstall.txt - Used by setup.py and xcopy.exe to avoid copying the 
-		external directories into the installation directory.
+
+(1) Run setup.bat. Accept all defaults (they're set programmatically)
+    - changing any of the paths will break something.
+
+(2) As suggested by the script file, check that the new python_topo\
+    directory works.
+
+(3) If it does, turn it into a tar.gz file and commit to the repository
+    (topographica-win\common\python_topo.tar.gz
+
