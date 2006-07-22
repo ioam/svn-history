@@ -47,10 +47,7 @@ echo.
 echo * Unpacking and installing Python...
 ..\util\gunzip -c ..\common\python_topo.tar.gz > ..\common\python_topo.tar
 ..\util\tar xvf ..\common\python_topo.tar
-
-REM doesn't work?
 del /F ..\common\python_topo.tar
-pause
 
 REM move the python stuff to the topographica directory
 move /Y python_topo ..\..\
