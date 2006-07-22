@@ -6,7 +6,6 @@ set startdir=%CD%
 ..\util\gunzip -c ..\..\external\Pmw.tgz > ..\..\external\Pmw.tar
 ..\util\tar xvf ..\..\external\Pmw.tar
 copy ..\..\external\Pmw .
-pause
 
 cd ..
 xcopy /E /I create_python_topo c:\create_python_topo
