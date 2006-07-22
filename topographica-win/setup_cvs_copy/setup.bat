@@ -51,6 +51,10 @@ del /F ..\common\python_topo.tar
 
 REM move the python stuff to the topographica directory
 move /Y python_topo ..\..\
+REM CEBHACKALERT: somehow the line above seems to leave a copy
+REM of python_topo behind; i.e., it just copies it! Wastes 120Mb of
+REM a user's drive.
+
 
 REM copy the icon to the topographica directory
 copy ..\common\topographica.ico ..\..
