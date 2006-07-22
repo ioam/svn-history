@@ -24,4 +24,5 @@ Making a Windows installation package
     (see http://www.jrsoftware.org/isinfo.php).
     Open topographica.iss in the topographica directory, adjust the
     paths marked *** to match those on your system, then just choose
-    'compile' from the 'build' menu. You should get a setup.exe file.
+    'compile' from the 'build' menu. You should get a setup.exe file
+    in the newly created Output directory.
