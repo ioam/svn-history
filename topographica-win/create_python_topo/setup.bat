@@ -6,6 +6,7 @@ set startdir=%CD%
 ..\util\gunzip -c ..\..\external\Pmw.tgz > ..\..\external\Pmw.tar
 ..\util\tar xvf ..\..\external\Pmw.tar
 copy ..\..\external\Pmw .
+pause
 
 cd ..
 xcopy /E /I create_python_topo c:\create_python_topo
@@ -20,10 +21,10 @@ start /w Numeric-24.2.win32-py2.4.exe
 start /w matplotlib-0.81.win32-py2.4.exe
 start /w PIL-1.1.5.win32-py2.4.exe
 
-xcopy /E /I Pmw c:\python24\Lib\site-packages\
+move Pmw c:\python24\Lib\site-packages
 
 REM ** For fixedpoint, the patched version from unix is used.
-copy fixedpoint-0.1.2_patched.py c:\python24\Lib\site-packages\fixedpoint.py
+move fixedpoint-0.1.2_patched.py c:\python24\Lib\site-packages\fixedpoint.py
 
 cd ..
 rmdir /Q /S create_python_topo
