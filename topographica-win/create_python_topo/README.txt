@@ -2,6 +2,8 @@
 # a script to create a working Python installation suitable
 # for Topographica (i.e. the script run by a developer to
 # create the python_topo/ directory). 
+# ** The script already present will not work **
+
 
 Windows Installer Binary Files Directory
 $Id$
