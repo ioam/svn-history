@@ -17,12 +17,10 @@ set installed="False"
 
 REM get directories
 set startdir=%CD%
-echo %startdir%
 cd ..\..
 set instdir=%CD%
 cd %startdir%
-echo %instdir%
-pause 
+
 
 REM check user wants to go ahead
  :start
@@ -48,12 +46,14 @@ REM unzip and untar, leaving original gz file alone
 echo.
 echo * Unpacking and installing Python...
 ..\util\gunzip -c ..\common\python_topo.tar.gz > ..\common\python_topo.tar
-pause
 ..\util\tar xvf ..\common\python_topo.tar
+
+REM doesn't work?
 del /F ..\common\python_topo.tar
+pause
 
 REM move the python stuff to the topographica directory
-move /Y python_topo %instdir%
+move /Y python_topo ..\..\
 
 REM create startup scripts for Topographica
 echo.
