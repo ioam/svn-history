@@ -1,8 +1,8 @@
+@echo off
+
 REM *****************************************************
 REM Script to setup a CVS-controlled copy of Topographica
 REM *****************************************************
-
-@echo off
 
 REM Note: this script assumes it's starting two levels 
 REM above the topographica directory (currently
