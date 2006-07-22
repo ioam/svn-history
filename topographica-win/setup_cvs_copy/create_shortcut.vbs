@@ -4,16 +4,15 @@
 
 
 Function CreateShortcut(topo_dir)
-Set objShell = WScript.CreateObject("WScript.Shell")
-strDesktopFolder = objShell.SpecialFolders("Desktop")
-Set objShortCut = objShell.CreateShortcut(strDesktopFolder & "\Topographica.lnk")
-
-objShortCut.TargetPath = topo_dir & "\topographica.bat"
-objShortCut.Arguments = "-g"
-objShortCut.WorkingDirectory = topo_dir
-objShortCut.Description = "Run Topographica"
-objShortCut.IconLocation = topo_dir & "\topographica.ico"
-objShortCut.Save
+  Set objShell = WScript.CreateObject("WScript.Shell")
+  strDesktopFolder = objShell.SpecialFolders("Desktop")
+  Set objShortCut = objShell.CreateShortcut(strDesktopFolder & "\Topographica.lnk")
+  objShortCut.TargetPath = topo_dir & "\topographica.bat"
+  objShortCut.Arguments = "-g"
+  objShortCut.WorkingDirectory = topo_dir
+  objShortCut.Description = "Run Topographica"
+  objShortCut.IconLocation = topo_dir & "\topographica-win\common\topographica.ico"
+  objShortCut.Save
 End Function
 
 

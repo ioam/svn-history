@@ -1,12 +1,12 @@
-** update!
-
-
-REM Script to setup a CVS-controlled copy of Topographica.
+REM *****************************************************
+REM Script to setup a CVS-controlled copy of Topographica
+REM *****************************************************
 
 @echo off
 
-REM Note that this script assumes it's starting two levels 
-REM above the topographica directory.
+REM Note: this script assumes it's starting two levels 
+REM above the topographica directory (currently
+REM topographica/topographica-win/setup_cvs_copy/)
 
 echo.
 echo Topographica installation script
@@ -44,9 +44,9 @@ goto start
 REM unzip and untar, leaving original gz file alone
 echo.
 echo * Unpacking and installing Python...
-util\gunzip -c python_topo.tar.gz > python_topo.tar
-util\tar xvf python_topo.tar
-del /F python_topo.tar
+..\util\gunzip -c common\python_topo.tar.gz > common\python_topo.tar
+..\util\tar xvf common\python_topo.tar
+del /F common\python_topo.tar
 
 REM move the python stuff to the topographica directory
 move /Y python_topo ..\..\
@@ -54,10 +54,7 @@ move /Y python_topo ..\..\
 REM create startup scripts for Topographica
 echo.
 echo * Creating scripts and file association...
-
-REM pass "create_associations" option so we get the shortcut and
-REM file association.
-..\..\python_topo\python.exe setup.py "%instdir%" "create_associations"
+..\..\python_topo\python.exe common\setup.py "%instdir%" "create_associations"
 
 set installed="True"
 goto end
