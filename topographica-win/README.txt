@@ -16,8 +16,8 @@ Creating python_topo/
 ====================
 
 * This step need only be performed if we change Python version or
-* update an extra (e.g. Numeric), and it is only performed by one
-* developer: the result is committed to the repository.
+* update an external package (e.g. Numeric), and it is only performed
+* by one developer: the result is committed to the repository.
 
 A developer uses the script in create_python_topo/ to setup a copy of
 Python plus all the extras (e.g. Numeric) needed for Topographica. The

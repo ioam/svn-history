@@ -1,11 +1,9 @@
-** UPDATE!
-
-# Create 'topographica' script and topographica.bat batch file.
-# (Note that on Windows the batch file is necessary for executing
-# commands at all.)
+# Create 'topographica' script and topographica.bat batch file.  (Note
+# that on Windows the batch file is necessary for executing commands
+# at all.)
 #
-# The first argument (required) is the Topographica root directory.
-# A second optional argument "create_associations" may be passed to have
+# The first argument (required) is the Topographica root directory.  A
+# second optional argument "create_associations" may be passed to have
 # this script create file associations and shortcuts (used when
 # setting up a cvs-controlled copy of topographica).
 #
@@ -29,6 +27,7 @@ compiler_path = "python_topo\\mingw\\bin"
 
 
 # CEBHACKALERT: should check it's valid, etc.
+# Should check arguments, and so on.
 path = os.path.abspath(sys.argv[1])
 
 if len(sys.argv)>2:
@@ -37,6 +36,7 @@ if len(sys.argv)>2:
 
 
 # CEBHACKALERT: it's like the Makefile here; can't it be the same?
+
 
 # topographica script
 f = open(os.path.join(path,"topographica"),'w')
@@ -49,7 +49,7 @@ f.write("from os import environ\n")
 f.write("environ['PATH']="+repr(os.path.join(path,compiler_path))+"\n")
 f.write("\n")
 f.write('import topo'+'\n')
-# This is hard-coded twice: should be read from somewhere.
+# CEBHACKALERT: This is hard-coded twice: should be read from somewhere.
 f.write("topo.release='0.9.0'\n")
 f.write("\n")
 f.write("# Process the command-line arguments\n")
