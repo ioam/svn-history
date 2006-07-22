@@ -22,3 +22,9 @@ added does someone need to go through this procedure.
 (3) If it does, turn it into a tar.gz file and commit to the repository
     (topographica-win\common\python_topo.tar.gz
 
+
+CEBHACKALERT: does not install weave or a C compiler! 
+The necessary mingw packages for a C compiler are in 
+topographica-win\create_python_topo\mingw, but the
+script does not use them. Weave isn't present in the
+repository.
