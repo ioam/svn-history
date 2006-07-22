@@ -55,6 +55,9 @@ pause
 REM move the python stuff to the topographica directory
 move /Y python_topo ..\..\
 
+REM copy the icon to the topographica directory
+copy ..\common\topographica.ico ..\..
+
 REM create startup scripts for Topographica
 echo.
 echo * Creating scripts and file association...
