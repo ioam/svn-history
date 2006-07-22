@@ -76,13 +76,12 @@ rmdir /Q /S CVS
 cd ..
 REM **** end things the Makefile deletes
 
+print %cd%
+REM ** delete external/
+rmdir /Q /S external
 
 REM ** delete .pyc files
 del /S /Q /F *.pyc
-
-REM ** delete external/
-rmdir /Q /S external/
-
 
 REM ** Finally, remove topographica-win\
 REM (includes this file!)
