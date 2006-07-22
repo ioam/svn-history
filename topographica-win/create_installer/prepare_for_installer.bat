@@ -80,7 +80,8 @@ REM **** end things the Makefile deletes
 REM ** delete .pyc files
 del /S /Q /F *.pyc
 
-
+REM ** delete external/
+rmdir /Q /S external/
 
 
 REM ** Finally, remove topographica-win\
