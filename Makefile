@@ -151,7 +151,6 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} examples/leaky_lissom_or.ty
 #@@	   ${RM} examples/lissom_or_sf.ty
 #@@	   ${RM} examples/tiny.ty
-#@@	   ${RM} -r external/mswin external/win32 setup.bat topographica.ico
 #@@	   ${RM} -r tmp/
 #@@	   ${RM} -r CVS */CVS */*/CVS */*/*/CVS
 
