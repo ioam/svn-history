@@ -1,24 +1,45 @@
 @echo off
 
-REM *** SETUP THIS COPY OF TOPOGRAPHICA FOR MAKING A BINARY INSTALLATION ***
-REM *** BE SURE YOU MEAN TO DO THIS TO YOUR COPY! ***
 
-REM    - copies setup.py to root directory
-REM    - cleans files that aren't needed for the binary version
+REM check user wants to go ahead
+ :start
+echo This script will turn this copy of Topographica into one
+echo suitable for binary distribution.
+echo.
+echo ** BE SURE YOU WANT TO DO THIS TO YOUR COPY OF TOPOGRAPHICA **
+echo.
+echo.
+set choice=
+set /p choice=Enter '1' to proceeed or '2' to quit:
+if not '%choice%'=='' set choice=%choice:~0,1%
+if '%choice%'=='1' goto install
+if '%choice%'=='2' goto end
+echo "%choice%" is not valid; please enter '1' or '2'
+echo.
+goto start
 
 
-REM Put the setup script into {topographica} 
-copy ..\setup.py ..\..\..\
+:install
+
+REM - copies setup.py to root directory
+REM - cleans files that aren't needed for the binary version
+
+REM Put the setup script, Topographica icon, and installation
+REM script file into the topographica directory (for use while 
+REM creating setup.exe file)
+copy ..\common\setup.py ..\..
+copy ..\common\topographica.ico ..\..
+copy ..\create_installer\topographica.iss ..\..
 
 
 REM Clean this copy of Topographica...
 
-cd ..\..\..
+cd ..\..
 
 REM not using the makefile...
 del /Q /F Makefile
 
-REM delete files created by setup
+REM delete files created by setup_cvs_copy\setup.bat
 del /Q /F topographica
 del /Q /F topographica.bat
 
@@ -39,20 +60,7 @@ del examples\leaky_lissom_or.ty
 del examples\lissom_or_sf.ty
 del examples\tiny.ty
 
-REM ** remove external\
-cd external\
-del /Q /F *
-rmdir /Q /S win32
 
-REM don't delete all of external\mswin yet!
-cd mswin\
-rmdir /Q /S util\
-del /Q /F *
-
-cd ..\..
-
-del /Q /F setup.bat
-REM don't delete topographica.ico
 rmdir /Q /S tmp\
 REM CEBHACKALERT: need to delete CVS/ dirs recursively
 
@@ -74,3 +82,12 @@ del /S /Q /F *.pyc
 
 
 
+
+REM ** Finally, remove topographica-win\
+REM (includes this file!)
+rmdir /Q /S topographica-win
+
+
+
+
+:end

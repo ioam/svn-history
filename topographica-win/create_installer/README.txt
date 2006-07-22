@@ -17,9 +17,10 @@ Making a Windows installation package
     version, but you could complile the php files on Windows, good
     luck with that).
 
-(5) Copy topographica.iss to wherever you want to create the
-    setup.exe file, then delete the topographica-win/ directory 
-    (which includes this file, so remember the next step!).
+(5) Copy topographica.iss to wherever you want to create the setup.exe
+    file, then delete the topographica-win/ directory and all
+    subdirectories (which includes this file, so remember the next
+    step!).
 
 (6) I use 'Inno Setup 5', an open-source installation package creator.
     (See http://www.jrsoftware.org/isinfo.php)
