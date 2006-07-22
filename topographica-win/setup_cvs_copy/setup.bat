@@ -17,9 +17,12 @@ set installed="False"
 
 REM get directories
 set startdir=%CD%
+echo %startdir%
 cd ..\..
 set instdir=%CD%
 cd %startdir%
+echo %instdir%
+pause 
 
 REM check user wants to go ahead
  :start
@@ -44,17 +47,18 @@ goto start
 REM unzip and untar, leaving original gz file alone
 echo.
 echo * Unpacking and installing Python...
-..\util\gunzip -c common\python_topo.tar.gz > common\python_topo.tar
-..\util\tar xvf common\python_topo.tar
-del /F common\python_topo.tar
+..\util\gunzip -c ..\common\python_topo.tar.gz > ..\common\python_topo.tar
+pause
+..\util\tar xvf ..\common\python_topo.tar
+del /F ..\common\python_topo.tar
 
 REM move the python stuff to the topographica directory
-move /Y python_topo ..\..\
+move /Y python_topo %instdir%
 
 REM create startup scripts for Topographica
 echo.
 echo * Creating scripts and file association...
-..\..\python_topo\python.exe common\setup.py "%instdir%" "create_associations"
+..\..\python_topo\python.exe ..\common\setup.py "%instdir%" "create_associations"
 
 set installed="True"
 goto end
