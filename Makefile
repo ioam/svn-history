@@ -115,12 +115,13 @@ doc: FORCE
 
 cvs-release: LATEST_STABLE sf-web-site
 
-# Update any files that keep track of the version number
+# Update any topographica-win files that keep track of the version number
+# CEBALERT: maintainer must have checked out topographica-win
 new-version: FORCE
-	mv external/mswin/for_binaries/topographica.iss external/mswin/for_binaries/topographica.iss~
-	sed -e 's/AppVerName=Topographica.*/AppVerName=Topographica '"${RELEASE}"'/g' external/mswin/for_binaries/topographica.iss~ > external/mswin/for_binaries/topographica.iss
-	mv external/mswin/setup.py external/mswin/setup.py~
-	sed -e "s/topo.release='.*'/topo.release='${RELEASE}'"'/g' external/mswin/setup.py~ > external/mswin/setup.py
+	mv topographica-win/create_installer/topographica.iss topographica-win/create_installer/topographica.iss~
+	sed -e 's/AppVerName=Topographica.*/AppVerName=Topographica '"${RELEASE}"'/g' topographica-win/create_installer/topographica.iss~ > topographica-win/create_installer/topographica.iss
+	mv topographica-win/common/setup.py topographica-win/common/setup.py~
+	sed -e "s/topo.release='.*'/topo.release='${RELEASE}'"'/g' topographica-win/common/setup.py~ > topographica-win/common/setup.py
 
 
 # Make a new LATEST_STABLE on the web, using the currently checked-out version
@@ -151,7 +152,6 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} examples/leaky_lissom_or.ty
 #@@	   ${RM} examples/lissom_or_sf.ty
 #@@	   ${RM} examples/tiny.ty
-#@@	   ${RM} -r external/mswin external/win32 setup.bat topographica.ico
 #@@	   ${RM} -r tmp/
 #@@	   ${RM} -r CVS */CVS */*/CVS */*/*/CVS
 
