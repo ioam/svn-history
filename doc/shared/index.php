@@ -36,6 +36,14 @@
 <i>
 <b>News:</b>
 
+<p><b>23 July 06:</b> Version 0.9.1
+<A target="_top" href="../Downloads/index.html">released</A>.
+This is a bugfix release only, upgrading the included Tcl/Tk package
+to correct a syntax error in its configure script, which had
+been preventing compilation on platforms using bash 3.1 (such as
+Ubuntu 6.06).  There is no benefit to updating if 0.9.0 already runs
+on your platform.
+
 <p><b>07 June 06:</b> Version 0.9.0
 <A target="_top" href="../Downloads/index.html">released</A>, including 
 numerous bugfixes, 
