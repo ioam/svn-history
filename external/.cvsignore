@@ -14,11 +14,9 @@ pmw
 python
 startscript
 tcl
-tcl8.4.6
-tcl8.4.9
+tcl8.4.13
 tk
-tk8.4.6
-tk8.4.9
+tk8.4.13
 weave
 Scipy_core-0.3.0_108.1820
 fixedpoint

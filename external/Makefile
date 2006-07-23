@@ -20,9 +20,9 @@ PYTHON_UNINSTALL += bin/idle bin/python bin/pydoc bin/python2.4
 PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.4
 
 
+# LDFLAGS sets ${PREFIX}/lib as the LD_LIBRARY in the binary
 python: ${PYTHON}.tgz tk
 	tar xzf ${PYTHON}.tgz
-	# LDFLAGS sets ${PREFIX}/lib as the LD_LIBRARY in the binary
 	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
 	env PREFIX=${PREFIX} make -C ${PYTHON} install
 	touch python
@@ -35,13 +35,13 @@ python-uninstall:
 ##############################################################
 # Tcl
 #
-TCL = tcl8.4.9
+TCL = tcl8.4.13
 TCL_UNINSTALL += bin/tclsh8.4 bin/wish8.4 lib/tclConfig.sh
 TCL_UNINSTALL += lib/tcl8.4 lib.tclConfig.sh lib/libtcl8.4.so lib/libtclstub8.4.a
 TCL_UNINSTALL += include/tcl*.h man/man*
 
-tcl: ${TCL}.tgz 
-	tar xzf ${TCL}.tgz
+tcl: ${TCL}-src.tar.gz
+	tar xzf ${TCL}-src.tar.gz
 	cd ${TCL}/unix; ./configure --prefix=${PREFIX}
 	make -C ${TCL}/unix install
 	touch tcl
@@ -56,13 +56,13 @@ tcl-uninstall:
 ##############################################################
 # Tk
 #
-TK = tk8.4.9
+TK = tk8.4.13
 
 TK_UNINSTALL += lib/tk8.4 lib/libtk8.4.so lib/libtkstub8.4.a
 TK_UNINSTALL += include/tk*.h lib/tkConfig.sh
 
-tk: ${TK}.tgz tcl
-	tar xzf ${TK}.tgz
+tk: ${TK}-src.tar.gz tcl
+	tar xzf ${TK}-src.tar.gz
 	cd ${TK}/unix; ./configure --prefix=${PREFIX}
 	make -C ${TK}/unix install
 	touch tk
@@ -144,9 +144,10 @@ numeric-uninstall:
 MATPLOTLIB = matplotlib-0.81
 MATPLOTLIB_UNINSTALL =  ${PYTHON_LIB}/site-packages/matplotlib
 
+# The DISPLAY=:0 is apparently necessary for it to build in a remote ssh session
 matplotlib: ${MATPLOTLIB}.tgz python
 	tar xzf ${MATPLOTLIB}.tgz
-	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py build
+	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib DISPLAY=:0 ${PREFIX}/bin/python setup.py build
 	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch matplotlib
 
