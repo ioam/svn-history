@@ -5,8 +5,8 @@ PYCHECKER = bin/pychecker
 
 DOC = doc/Reference_Manual
 
-RELEASE = 0.9.0
-RELEASE_TAG = release_0_9_0
+RELEASE = 0.9.1
+RELEASE_TAG = release_0_9_1
 
 TEST_VERBOSITY = 1
 
