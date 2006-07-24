@@ -62,11 +62,6 @@ Tasks which the developers are about to start.
 <ul>
 
 <li>
-2006/07/22: Activity window won't open on Windows - get a Math domain
-error.
-</li>
-
-<li>
 2006/06/26 (CB): parameters frame doesn't properly set object properties when 
 right click is used (there's a clearer explanation in parametersframe.py).
 </li>
