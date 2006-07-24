@@ -36,8 +36,9 @@ requirements.
 
 <P>On Windows, no build step is necessary if you downloaded the
 self-installing .exe file.  Windows CVS users should just double click
-on setup.bat in the Topographica directory after checking out the
-code.
+on setup.bat in the 
+<code>topographica\topographica-win\setup_cvs_copy\</code>
+directory after checking out the code.
 
 <P>On other systems, just type <code>make</code> (which may be called
 <code>gmake</code> on some systems) from within the

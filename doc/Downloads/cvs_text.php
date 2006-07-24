@@ -158,7 +158,17 @@ CVSROOT with the appropriate <code>$TOPOROOT</code>, and type in
 select the <code>Revision</code> tab and select <code>Choose branch or
 tag</code>, filling in <code>LATEST_STABLE</code> as the tag name
 (unless you want the bleeding-edge version).  When you click OK, the
-files should be downloaded for you (though it may take some time).
+files should be downloaded for you (though it might take a little time). 
+
+<P>Following this step, it is necessary to obtain the Windows versions
+of Topographica's support tools. Change into the <code>topographica</code>
+directory that you just checked out, and again right click and select
+"CVS Checkout". Re-use the settings from before, but change the module name 
+from <code>topographica</code> to <code>topographica-win</code>.
+<!--CB: should we say to set the revision tag again this time, or does it 
+remain the same? I forgot to check.-->
+The wait to download will be longer this time, since the Windows support
+tools are distributed as binaries.
 
 
 <H4><A NAME="windows">Cygwin:</A></H4>
