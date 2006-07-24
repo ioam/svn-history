@@ -23,6 +23,8 @@ start /w PIL-1.1.5.win32-py2.4.exe
 move Pmw c:\python24\Lib\site-packages
 
 REM ** For fixedpoint, the patched version from unix is used.
+REM ** CEBHACKALERT: use the patch executable in utils to create the
+REM patch from the diff and fixedpoint.tgz file in external\
 move fixedpoint-0.1.2_patched.py c:\python24\Lib\site-packages\fixedpoint.py
 
 cd ..
