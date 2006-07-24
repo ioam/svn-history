@@ -145,10 +145,11 @@ and m4, if these are not already installed.
 <!--  Topographica on Windows, compiling everything from source...-->
 
 <P>Under Windows, we recommend installing
-<A HREF="http://www.tortoisecvs.org/">TortoiseCVS</A> (tested 2/2006
-using TortoiseCVS 1.8.25).  For read/write access, also install an SSH
-client such as
-<A HREF="http://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</A>.
+<A HREF="http://www.tortoisecvs.org/">TortoiseCVS</A> (tested 7/2006
+using TortoiseCVS 1.8.24).  For read/write access, you might
+also need to install an SSH client such as
+<A HREF="http://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</A>
+(though this is included with TortoiseCVS).
 
 <P>Then open the Windows directory where you want the files to be
 located on your machine, right click, select "CVS Checkout", fill in
