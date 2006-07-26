@@ -23,23 +23,545 @@ __version__='$Revision$'
 ## To measure the position preference:
 ## measure_position_pref(divisions=6,size=0.3,scale=1.0,offset=0.0,display=True,user_function=PatternPresenter(HindpawGaussian(aspect_ratio=1.0),False,1.0), x_range=(0.0,0.6),y_range=(0.0,1.0)) ; topographic_grid()
 
+import Numeric
 import RandomArray
+import copy
 
 import topo.patterns.random
 import topo.patterns.basic
 
-from topo.base.cf import CFProjection
+import topo.base.patterngenerator
+
+from Numeric import argmax, ones, Float, Float32
+
+from topo.base.arrayutils import exp, L2norm
+from topo.base.cf import ConnectionField, CFPLearningFn, CFPLF_Identity, CFProjection, CFPResponseFn, CFSheet
+from topo.base.functionfamilies import DotProduct, ResponseFnParameter, LearningFn
+from topo.base.functionfamilies import OutputFn, OutputFnParameter, IdentityOF
 from topo.base.parameterclasses import DynamicNumber, Number, Wrapper
-from topo.base.patterngenerator import BoundingBox
+from topo.base.parameterizedobject import ParameterizedObject
+#from topo.base.patterngenerator import BoundingBox, PatternGenerator
+from topo.base.patterngenerator import PatternGenerator, PatternGeneratorParameter
+from topo.base.sheetcoords import SheetCoordinateSystem
+from topo.base.sheet import Slice
+from topo.base.boundingregion import BoundingBox, BoundingRegionParameter
 from topo.learningfns.som import CFPLF_HebbianSOM
 from topo.outputfns.basic import PiecewiseLinear
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
+from topo.misc.inlinec import inline, optimized
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.patternfns import gaussian
 
-topo.sim.name = "joublin_bc96"
+topo.sim.name = "joublin_bc96_sim1"
+
+# Specified explicitly when creating weights matrix - required
+# for optimized C functions.
+# weight_type = Numeric.Float32
+weight_type = Float32
+
+
+
+class RCells_CFProjection(CFProjection):
+    """
+    A projection composed of ConnectionFields from Hindpaw to R-cells and ConnectionFields from R-cells 
+    to R-cells.
+    """
+    
+    neighborhood_nominal_bounds_template = BoundingRegionParameter(
+        default=BoundingBox(radius=0.1),
+        doc="""Bounds defining the neighborhood RF.""")
+
+    neighborhood_weights_shape = PatternGeneratorParameter(
+        default=topo.base.patterngenerator.Constant(),constant=True,
+        doc="Define the shape of the neighborhood connection fields.")
+ 
+    neighborhood_sigma = Number(default=4.0,doc="space constant of the weights of neighborhood ConnectionFields.")
+    neighborhood_sigma0 = Number(default=4.0)   
+
+    neighborhood_time_constant = Number(default=500.0, doc="time constant for neighborhood_sigma.")
+
+    learning_rate0 = Number(default=0.0)
+    learning_time_constant = Number(default=1000.0, doc="time constant for learning_rate.")
+
+    time_step = Number(default=0.01, doc="time step (ms) of the simulation.")
+    totalSimTime = 0.0
+
+    rcells_learn = Number(default=1)
+ 
+    def __init__(self,initialize_cfs=True,**params):
+        """
+        Initialize the two sets of ConnectionFields.
+        """
+        super(RCells_CFProjection,self).__init__(**params)
+        
+        self.neighborhood_bounds_template = self.initialize_neighborhood_bounds(self.neighborhood_nominal_bounds_template)
+
+        n_slice_ = Slice(self.neighborhood_bounds_template,self.src)
+
+        self.neighborhood_mask_template = self.create_neighborhood_mask_template()
+
+        if initialize_cfs:
+            n_cflist = []
+            for y in self.dest.sheet_rows()[::-1]:
+                row = []
+                for x in self.dest.sheet_cols():
+                    row.append(self.cf_type(x,y,
+                                            self.src,
+                                            copy.copy(self.neighborhood_bounds_template),
+                                            self.weights_generator,
+                                            copy.copy(self.neighborhood_mask_template), 
+                                            output_fn=self.weights_output_fn.single_cf_fn,
+                                            slice_=n_slice_))
+                n_cflist.append(row)
+            
+            self.n_cfs = n_cflist
+
+        self.neighborhood_sigma0 = self.neighborhood_sigma
+        self.learning_rate0 = self.learning_rate
+
+    
+    def create_neighborhood_mask_template(self):
+        """
+        """
+        if hasattr(self.neighborhood_weights_shape, 'size'):
+            l,b,r,t = self.neighborhood_bounds_template.lbrt()
+            self.neighborhood_weights_shape.size = t-b
+            self.neighborhood_weights_shape.aspect_ratio = (r-l)/self.neighborhood_weights_shape.size
+
+        # Center mask to matrixidx center
+        center_r,center_c = self.src.sheet2matrixidx(0,0)
+        center_x,center_y = self.src.matrixidx2sheet(center_r,center_c)
+        
+        mask_template = self.neighborhood_weights_shape(x=center_x,y=center_y,
+                                                        bounds=self.neighborhood_bounds_template,
+                                                        xdensity=self.src.xdensity,
+                                                        ydensity=self.src.ydensity)
+        
+        mask_template = Numeric.where(mask_template>=0.5,mask_template,0.0)
+
+        return mask_template
+
+
+    def initialize_neighborhood_bounds(self,original_bounds):
+        """
+        """
+        
+        bounds = copy.deepcopy(original_bounds)
+        
+        bounds_xcenter,bounds_ycenter=bounds.get_center()
+        sheet_rows,sheet_cols=self.src.shape
+        # arbitrary (e.g. could use 0,0) 
+        center_row,center_col = sheet_rows/2,sheet_cols/2
+        unit_xcenter,unit_ycenter=self.src.matrixidx2sheet(center_row,
+                                                           center_col)
+
+        bounds.translate(unit_xcenter-bounds_xcenter,
+                         unit_ycenter-bounds_ycenter)
+
+        weights_slice =  Slice(bounds,self.src)
+        r1,r2,c1,c2 = weights_slice
+
+        # use the calculated radius unless it's smaller than the min
+        xrad=max(c2-center_col-1,self.min_matrix_radius)
+        yrad=max(r2-center_row-1,self.min_matrix_radius)
+
+        r2=center_row+yrad+1
+        c2=center_col+xrad+1
+        r1=center_row-yrad
+        c1=center_col-xrad
+
+        weights_slice._set_slice((r1,r2,c1,c2))
+        
+        rows,cols = weights_slice.shape
+        if rows==0 or cols==0:
+            raise ValueError("neighborhood_nominal_bounds_template results in a zero-sized weights matrix (%s,%s) for %s - you may need to supply a larger neighborhood_nominal_bounds_template or increase the density of the sheet."%(rows,cols,self.name))
+        # (2) weights matrix must be odd (otherwise this method has an error)
+        # (The second check should move to a test file.)
+        if rows%2!=1 or cols%2!=1:
+            raise AssertionError("neighborhood_nominal_bounds_template yielded even-height or even-width weights matrix (%s rows, %s columns) for %s - weights matrix must have odd dimensions."%(rows,cols,self.name))
+
+        return weights_slice.bounds
+
+ 
+    def activate(self,input_activity):
+        """Activate using the specified response_fn and output_fn."""
+        self.input_buffer = input_activity
+        self.response_fn(self.cfs, input_activity, self.activity, self.strength)
+        
+        # Local competition
+        
+        rows,cols = self.activity.shape
+        new_activity = Numeric.array(self.activity)
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf = self.n_cfs[r][c]
+                r1,r2,c1,c2 = cf.slice_array
+                X = Numeric.array(self.activity[r1:r2,c1:c2])
+                # Find winner
+                rX,cX = X.shape
+                pos = argmax(X.flat)
+                rw = pos/cX
+                cw = pos%cX
+                ro = r-r1
+                co = c-c1
+                weight = ((ro-rw)*(ro-rw)+(co-cw)*(co-cw))/(self.neighborhood_sigma*self.neighborhood_sigma)
+                new_activity[r,c] = self.activity[r,c] * exp(-1*weight)
+        
+        self.activity = new_activity
+        self.output_fn(self.activity)
+
+
+    def learn(self):
+        """
+        For a CFProjection, learn consist in calling the learning_fn.
+        """
+        # Learning is performed if the input_buffer has already been set,
+        # i.e. there is an input to the Projection.
+        if self.input_buffer:
+            if self.rcells_learn == 1:
+                self.learning_fn(self.cfs,self.input_buffer,self.activity,self.learning_rate)
+                self.totalSimTime = self.totalSimTime + 1*self.time_step
+                self.neighborhood_sigma = self.neighborhood_sigma0 / (1 + self.totalSimTime/self.neighborhood_time_constant)
+                self.learning_rate = self.learning_rate0 / (1 + self.totalSimTime/self.learning_time_constant)
+                #print "R-Cells finish learning"
+
+
+class RCells_CFPL_Hebbian(CFPLearningFn):
+    """
+    """
+
+    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+        rows,cols = output_activity.shape
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+                cf_input_activity = cf.get_input_matrix(input_activity)
+                unit_activity = output_activity[r,c]
+                cf.weights = cf.weights + learning_rate * unit_activity * (cf_input_activity - cf.weights)
+
+
+class RCells_CFPRF_DotProduct_Norm(CFPResponseFn):
+    """
+    Dot-product response function for projection from Hindpaw to R-cells, with normalization
+    """
+    
+    single_cf_fn = ResponseFnParameter(DotProduct(),constant=True)
+    
+    def __call__(self, cfs, input_activity, activity, strength, **params):
+        rows,cols = activity.shape
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+                r1,r2,c1,c2 = cf.slice_array
+                X = input_activity[r1:r2,c1:c2]
+
+                # "DotProduct()"
+                a = X*cf.weights
+                b = X.flat
+                activity[r,c] = sum(a.flat)/L2norm(b)
+        activity *= strength
+
+
+class RCells_CFPRF_DotProduct_Norm_opt(CFPResponseFn):
+    """
+    Dot-product response function for projection from Hindpaw to R-cells, with normalization
+    """
+    
+    single_cf_fn = ResponseFnParameter(DotProduct(),constant=True)    
+
+    def __call__(self, cfs, input_activity, activity, strength, **params):
+        temp_act = activity
+        rows,cols = activity.shape
+        len, len2 = input_activity.shape
+        X = input_activity.flat
+    
+        code = """
+            #include <math.h>
+            double *tact = temp_act;
+            for (int r=0; r<rows; ++r) {
+                PyObject *cfsr = PyList_GetItem(cfs,r);
+		for (int l=0; l<cols; ++l) {
+                    PyObject *cf = PyList_GetItem(cfsr,l);
+                    PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
+                    PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
+
+                    float *wj = (float *)(((PyArrayObject*)weights_obj)->data);
+                    int *slice = (int *)(((PyArrayObject*)slice_obj)->data);
+                    
+                    int rr1 = *slice++;
+                    int rr2 = *slice++;
+                    int cc1 = *slice++;
+                    int cc2 = *slice;
+		    double tot = 0.0;
+                    double norm = 0.0;    // the normalization factor
+		    double *xj = X+len*rr1+cc1;
+
+                    // computes the dot product
+		    for (int i=rr1; i<rr2; ++i) {
+                        double *xi = xj;
+			float *wi = wj;                       
+			for (int j=cc1; j<cc2; ++j) {
+                            tot += *wi * *xi;
+                            norm += *xi * *xi;
+                            ++wi;
+                            ++xi;
+                        }
+                        xj += len;
+			wj += cc2-cc1;
+                    }
+                    tot = tot/sqrt(norm);    // normalize the total activity
+                    *tact = tot*strength;
+                    ++tact;
+
+                    // Anything obtained with PyObject_GetAttrString must be explicitly freed
+                    Py_DECREF(weights_obj);
+                    Py_DECREF(slice_obj);
+                }
+            }
+        """
+    
+        inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
+
+if not optimized:
+    RCells_CFPRF_DotProduct_Norm_opt = RCells_CFPRF_DotProduct_Norm
+    ParameterizedObject().message('Inline-optimized components not available; using RCells_CFPRF_DotProduct_Norm instead of RCells_CFPRF_DotProduct_Norm_opt.')
+    
+
+class Cortical_CFSheet(CFSheet):
+    """
+    CFSheet for E-cells and I-cells: previous activitiy is used to calculate the 
+    new activity.
+
+    """
+	
+    Cortical_RF_eta = Number(default=0.5,doc="The slope of the sigmoid in the activation rule")
+    Cortical_RF_gamma = Number(default=10.0,doc="The refractory period of the cells in the activation rule")
+    Cortical_RF_tau = Number(default=1.0,doc="The membrane time constant of the cells in the activation rule")
+    Cortical_RF_theta = Number(default=0.09,doc="The threshold of the cells (points of inflection of the sigmoid) in the activation rule")
+	
+	
+    def activate(self):
+        """
+        Collect activity from each projection, combine it with previous 
+        activity to calculate the activity for this sheet, and send the 
+        result out.
+        """
+        
+        new_activity = zeros(self.shape,Float)
+        eta = self.Cortical_RF_eta
+        gamma = self.Cortical_RF_gamma
+        tau = self.Cortical_RF_tau
+        theta = self.Cortical_RF_theta
+
+        for proj in self.in_connections:
+            new_activity += proj.activity
+
+        rows,cols = self.shape
+        for i in xrange(rows):
+            for j in xrange(cols):
+                dx1 = 1 - gamma*self.activity[i,j]
+                dx2 = sigmoid(theta,eta,tau*new_activity[i,j])
+                dx = dx1 * dx2  - self.activity[i,j]
+                dx = dx/tau
+                self.activity[i,j] = self.activity[i,j] + dx
+                
+        if self.apply_output_fn:
+            self.output_fn(self.activity)
+
+        self.send_output(data=self.activity)
+            		
+def sigmoid(theta,eta,y):
+    n = 1/(1+exp(-1*eta*theta))
+    f = (1/(1+exp(-1*eta*(y-theta)))-n)/(1-n)
+    if f < 0:
+        f = 0
+    return f
+
+class ECells_ConnectionField(ConnectionField):
+    """
+    Connection field for projection from E-cells to E-cells
+	
+    """
+    weights_max = []   # Upper boundaries of the weights
+    weights_min = []   # Lower boundaries of the weights
+    weights_max_amplitude = Number(default=1.5)
+    weights_max_sigma = Number(default=4.0/25.0)
+    weights_min_amplitude = Number(default=1.5)
+    weights_min_sigma = Number(default=1.0/25.0)
+    
+    weight_pos_row = Number(default=0)
+    weight_pos_col = Number(default=0)
+
+    cf_set_weight_max = Number(default=0)
+
+    def __init__(self,x,y,input_sheet,bounds_template,weights_generator,mask_template,
+                 output_fn=IdentityOF(),slice_=None,**params):
+        
+        #super(ECells_ConnectionField,self).__init__(x,y,input_sheet,bounds_template,
+        #                                            weights_generator,mask_template,
+        #                                            output_fn,slice_,**params)
+        
+        super(ConnectionField,self).__init__(**params)
+        
+        self.x = x; self.y = y
+
+        self.input_sheet = input_sheet
+        self.offset_bounds(bounds_template,slice_)
+
+        r1,r2,c1,c2 =  self.get_slice(bounds_template,slice_)
+        
+        centre_row, centre_col = input_sheet.sheet2matrixidx(x,y)
+        l,b,r,t = self.bounds.lbrt()
+        weight_r1, weight_c1 = input_sheet.sheet2matrixidx(l,t)
+        self.weight_pos_row = centre_row - weight_r1
+        self.weight_pos_col = centre_col - weight_c1
+        #print x,y, centre_row, centre_col
+        #print l,b,r,t, weight_r1, weight_c1
+        #print "---------"
+        #print self.weight_pos_row, self.weight_pos_col
+        #print self.cf_set_weight_max
+        
+        
+        w = weights_generator(x=self.x,y=self.y,bounds=self.bounds,
+                              xdensity=self.input_sheet.xdensity,
+                              ydensity=self.input_sheet.ydensity,
+                              cf_centre_row = self.weight_pos_row,
+                              cf_centre_col = self.weight_pos_col)
+        w[self.weight_pos_row, self.weight_pos_col] = 0.0
+        self.weights = w.astype(weight_type)
+        self.weights.savespace(1)
+
+        m = mask_template[r1:r2,c1:c2]
+        
+        self.mask = m.astype(weight_type)
+        self.mask.savespace(1)
+
+        self.weights *= self.mask   
+        output_fn(self.weights)
+
+        w_max = weights_generator(x=self.x,y=self.y,bounds=self.bounds,
+                                  xdensity=self.input_sheet.xdensity,
+                                  ydensity=self.input_sheet.ydensity,
+                                  amplitude=self.weights_max_amplitude,
+                                  sigma=self.weights_max_sigma,
+                                  cf_centre_row = self.weight_pos_row,
+                                  cf_centre_col = self.weight_pos_col)
+        self.weights_max = w_max.astype(weight_type)
+        self.weights_max.savespace(1)
+        self.weights_max *= self.mask   
+        output_fn(self.weights_max)
+        
+        w_min = weights_generator(x=self.x,y=self.y,bounds=self.bounds,
+                                  xdensity=self.input_sheet.xdensity,
+                                  ydensity=self.input_sheet.ydensity,
+                                  amplitude=self.weights_min_amplitude,
+                                  sigma=self.weights_min_sigma,
+                                  cf_centre_row = self.weight_pos_row,
+                                  cf_centre_col = self.weight_pos_col)
+        self.weights_min = w_min.astype(weight_type)
+        self.weights_min.savespace(1)
+        self.weights_min *= self.mask   
+        output_fn(self.weights_min) 
+
+
+class ECells_Learning(CFPLearningFn):
+    """
+    Learning rules for connections between E-cells of the model in 
+    Joublin et al., Biological Cybernetics 74, pp. 280-281, 1996.
+    
+    """
+    
+    gamma = Number(default=10.0,doc="Refractory period of the cell.")
+    epislon = Number(default=0.5,doc="Activity threshold.")
+    alpha_p = Number(default=1.0,doc="Learning rate.")
+    alpha_n = Number(default=0.01,doc="Unlearning rate.") 
+    
+    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+        rows,cols = output_activity.shape
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+                #single_cf_fn(cf.get_input_matrix(input_activity),
+                #             output_activity[r,c], cf.weights, single_connection_learning_rate)
+                cf_input_activity = cf.get_input_matrix(input_activity)
+                unit_activity = output_activity[r,c]
+               
+                wrows,wcols = cf.weights.shape
+                for i in range(wrows):
+                    for j in xrange(wcols):
+                        if wrows != cf.weight_pos_row and wcols != cf.weight_pos_col:
+                            if unit_activity > cf_input_activity[i,j]:
+                                v = unit_activity
+                            else:
+                                v = cf_input_activity[i,j]
+                            m = (1+self.gamma)*v - self.epislon
+                            if m < 0:
+                                cf.weights[i,j] = (self.alpha_n * m * (cf.weights_min[i,j] - cf.weights[i,j])) + cf.weights[i,j]
+                            else:
+                                cf.weights[i,j] = (self.alpha_p * m * (cf.weights_max[i,j] - cf.weights[i,j])) + cf.weights[i,j]
+                cf.weights *= cf.mask
+       
+
+class Cortical_WeightGenerator(PatternGenerator):
+    """
+    Weights generator for E-cells and I-cells
+    """
+    
+    amplitude = Number(default=1.5)
+    sigma = Number(default=1.0)	
+    cf_centre_row = Number(default=0)
+    cf_centre_col = Number(default=0)
+    x = Number(default=0.0)
+    y = Number(default=0.0)
+    
+
+    def __call__(self,**params):
+        self._check_params(params)
+        x = params.get('x',self.x)
+        y = params.get('y',self.y)
+        bounds = params.get('bounds',self.bounds)
+        xdensity = params.get('xdensity',self.xdensity)
+        ydensity = params.get('ydensity',self.ydensity)
+        output_fn = params.get('output_fn',self.output_fn)
+        amplitude = params.get('ampliude',self.amplitude)
+        sigma = params.get('sigma',self.sigma)
+        #rc = params.get('cf_centre_row',self.cf_centre_row)
+        #cc = params.get('cf_centre_col',self.cf_centre_col)
+
+        #shape = SheetCoordinateSystem(bounds,xdensity,ydensity).shape
+        sheetCd = SheetCoordinateSystem(bounds,xdensity,ydensity)
+        shape = sheetCd.shape
+
+        #cf_row, cf_col = SheetCoordinateSystem(bounds,xdensity,ydensity).sheet2matrixidx(x,y)
+        cf_row, cf_col = sheetCd.sheet2matrixidx(x,y)
+        l,b,r,t = bounds.lbrt()
+        #weight_r1, weight_c1 = SheetCoordinateSystem(bounds,xdensity,ydensity).sheet2matrixidx(l,t)
+        weight_r1, weight_c1 = sheetCd.sheet2matrixidx(l,t)
+        rc = cf_row - weight_r1
+        cc = cf_col - weight_c1
+        #if rc != rc1 or cc != cc1:
+            #print "-----"
+            #print rc,cc, rc1, cc1, x,y
+            
+        
+        result = ones(shape, Float)
+        rows,cols = shape
+        #rc = rows/2
+        #cc = cols/2
+        #rc = shape[0]/2
+        #cc = shape[1]/2
+
+        for i in xrange(rows):
+            for j in xrange(cols):
+                result[i,j] = amplitude * exp(-((i-rc)*(i-rc) + (j-cc)*(j-cc))/(sigma*sigma))
+
+        if output_fn is not IdentityOF: 
+            output_fn(result)
+
+        return result
+
 
 
 class HindpawGaussian(Gaussian):
@@ -64,27 +586,60 @@ class HindpawGaussian(Gaussian):
 
         return gaussian(self.pattern_x,self.pattern_y,xsigma,ysigma)
 
-# Sketch of ICMS training:
-#def train_ICMS():
-#    for x ...
-#        for y ...
-#            pattern_present(inputs={'Hindpaw',HindpawGaussian(aspect_ratio=1.0)},duration=1.0,learning=True,apply_output_fn=True):
+
+class HindpawGaussian2(Gaussian):
+    """
+    2D Gaussian pattern generator whose size depends on the Y position.
+
+    Used for modeling inputs to the hind paw of a rat in Joublin et
+    al., Biological Cybernetics 74, pp. 275-286, 1996.
+
+    See the Gaussian PatternGenerator for more details.
+    """
+
+    def function(self,**params):
+        y=self.inspect_value('y') # JABALERT: Retrieve value without incrementing it
+        ysigma = params.get('size',self.size)/2.0
+        
+        if y >= 0.55:
+            ysigma = ysigma/4
+        elif 0.38<=y<0.55:
+            ysigma = ysigma/2
+        elif 0.2<=y<0.38:
+            ysigma = ysigma * 3/4
+        else:
+            ysigma = ysigma * 1
+        
+        xsigma = params.get('aspect_ratio',self.aspect_ratio)*ysigma
+        print y,ysigma
+
+        return gaussian(self.pattern_x,self.pattern_y,xsigma,ysigma)
+
 
 
 ###########################################
 # Set parameters
 
-input_pattern = HindpawGaussian(
-    scale=1.0,size=0.3,aspect_ratio=1.0,
-#    bounds=BoundingBox(points=((0.0,0.0),(15.0/25.0,25.0/25.0))),
-    x=DynamicNumber(UniformRandom(lbound=0.0,ubound=0.6,seed=12)),
+input_pattern = HindpawGaussian2(
+    scale=1.0,size=0.24,aspect_ratio=1.0,
+    x=DynamicNumber(UniformRandom(lbound=0.0,ubound=1.0,seed=12)),
     y=DynamicNumber(UniformRandom(lbound=0.0,ubound=1.0,seed=34)),
     orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
+#input_pattern = topo.patterns.basic.Gaussian(
+#                x=0.5, y=0.5, orientation=0, size=0.24,aspect_ratio=1)
+
+#input_pattern = HindpawGaussian(
+#    scale=1.0,size=0.3,aspect_ratio=1.0,
+#    bounds=BoundingBox(points=((0.0,0.0),(15.0/25.0,25.0/25.0))),
+#    x=DynamicNumber(UniformRandom(lbound=0.0,ubound=1.0,seed=12)),
+#    y=DynamicNumber(UniformRandom(lbound=0.0,ubound=1.0,seed=34)),
+#    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+
 RandomArray.seed(500,500)
-CFSOM.learning_length = 10000
-CFSOM.radius_0 = 15.0/25.0
-CFProjection.learning_fn = CFPLF_HebbianSOM()
+#CFSOM.learning_length = 10000
+#CFSOM.radius_0 = 15.0/25.0/2.0
+#CFProjection.learning_fn = CFPLF_HebbianSOM()
 CFProjection.response_fn = CFPRF_DotProduct_opt()
 
 # sheet activation saturates at 1
@@ -97,48 +652,94 @@ CFProjection.response_fn = CFPRF_DotProduct_opt()
 # Sheets
 topo.sim['Hindpaw'] = GeneratorSheet(
     input_generator=input_pattern, nominal_density = 25,
-    nominal_bounds=BoundingBox(points=((0.0,0.0),(15.0/25.0,25.0/25.0))),
+    nominal_bounds=BoundingBox(points=((0.0,0.0),(25.0/25.0,25.0/25.0))),
     period = 1.0,phase = 0.05)
 
-topo.sim['R-cells'] = CFSOM(alpha_0 = 0.5, nominal_density=25,
-                            nominal_bounds=BoundingBox(points=((      0,0),(15.0/25.0,25.0/25.0))))
+topo.sim['R-cells'] = CFSheet(nominal_density=25,
+                              nominal_bounds=BoundingBox(points=((      0,0),(25.0/25.0,25.0/25.0))))
 
-topo.sim['E-cells'] = CFSOM(alpha_0 = 0.5, nominal_density=25,
-                            nominal_bounds=BoundingBox(points=((-6/25.0,0),(15.0/25.0,29.0/25.0))))
+#topo.sim['E-cells'] = CFSheet(nominal_density=25,
+#                              nominal_bounds=BoundingBox(points=((      0,0),(25.0/25.0,25.0/25.0))))
 
-topo.sim['I-cells'] = CFSOM(alpha_0 = 0.5, nominal_density=25,
-                            nominal_bounds=BoundingBox(points=((-6/25.0,0),(15.0/25.0,29.0/25.0))))
+topo.sim['E-cells'] = Cortical_CFSheet(Cortical_RF_eta=0.5,Cortical_RF_gamma=10.0,
+                                       Cortical_RF_tau=1.0,Cortical_RF_theta=0.09,
+                                       nominal_density=25,
+                                       nominal_bounds=BoundingBox(points=((      0,0),(25.0/25.0,25.0/25.0))))
+
+topo.sim['I-cells'] = Cortical_CFSheet(Cortical_RF_eta=0.3,Cortical_RF_gamma=10.0,
+                                       Cortical_RF_tau=1.0,Cortical_RF_theta=0.17,
+                                       nominal_density=25,
+                                       nominal_bounds=BoundingBox(points=((      0,0),(25.0/25.0,25.0/25.0))))
 
 # Need to figure out learning_rate and add to each connection,
-# plus delays and strengths
-topo.sim.connect('Hindpaw','R-cells',delay=0.05,connection_type=CFProjection,name='Afferent',
-                 strength=1.0,nominal_bounds_template=BoundingBox(radius=11.0/25.0/2.0),
+# plus delays and strengths                            
+                            
+topo.sim.connect('Hindpaw','R-cells',
+                 delay=0.05,
+                 connection_type=RCells_CFProjection,
+                 name='Afferent',
+                 learning_fn = RCells_CFPL_Hebbian(),
+                 response_fn = RCells_CFPRF_DotProduct_Norm_opt(),
+                 learning_rate = 0.2,
+                 strength=1.0,
+                 nominal_bounds_template=BoundingBox(radius=11.0/25.0/2.0),
+                 neighborhood_nominal_bounds_template=BoundingBox(radius=15.0/25.0/2.0),
                  weights_generator=topo.patterns.random.UniformRandom())
 
-topo.sim.connect('R-cells','R-cells',delay=0.05,connection_type=CFProjection,name='Lateral',
-                 strength=1.0,nominal_bounds_template=BoundingBox(radius=15.0/25.0/2.0),
-                 weights_generator=topo.patterns.random.UniformRandom())
+#topo.sim.connect('R-cells','R-cells',delay=0.05,connection_type=CFProjection,name='Lateral',
+#                 learning_fn = CFPLF_HebbianSOM(),
+#                 strength=1.0,nominal_bounds_template=BoundingBox(radius=15.0/25.0/2.0),
+#                 weights_generator=topo.patterns.random.UniformRandom())
 
-# Needs BoundingBox(radius=1/25.0/2.0), but that causes an error right now
-topo.sim.connect('R-cells','E-cells',delay=0.05,connection_type=CFProjection,name='Afferent',
-                 strength=1.0,nominal_bounds_template=BoundingBox(radius=15.0/25.0/2.0),min_matrix_radius=1,
-                 weights_generator=topo.patterns.basic.Constant())
+def connect_RE():
+    topo.sim.connect('R-cells','E-cells',
+                     delay=0.05,
+                     connection_type=CFProjection,
+                     name='Afferent',
+                     learning_fn = CFPLF_Identity(),
+                     strength=1.0,
+                     nominal_bounds_template=BoundingBox(radius=1.0/25.0/2.0),
+                     min_matrix_radius=0,
+                     weights_generator=topo.patterns.basic.Constant())
 
-topo.sim.connect('E-cells','E-cells',delay=0.05,connection_type=CFProjection,name='Lateral',
-                 strength=1.0,nominal_bounds_template=BoundingBox(radius=15.0/25.0/2.0),
-                 weights_generator=topo.patterns.random.UniformRandom())
+def connect_EE():
+    topo.sim.connect('E-cells','E-cells',
+                     delay=0.05,
+                     connection_type=CFProjection,
+                     name='Lateral',
+                     learning_fn = ECells_Learning(),
+                     cf_type = ECells_ConnectionField,
+                     strength=1.0,
+                     nominal_bounds_template=BoundingBox(radius=15.0/25.0/2.0),
+                     weights_generator=Cortical_WeightGenerator(amplitude=1.5,sigma=1.0/25.0))
 
-topo.sim.connect('E-cells','I-cells',delay=0.05,connection_type=CFProjection,name='Afferent',
-                 learning_fn = CFPLF_HebbianSOM(),
-                 strength=1.0,nominal_bounds_template=BoundingBox(radius=21.0/25.0/2.0),
-                 weights_generator=topo.patterns.random.UniformRandom())
+# No Learning for projections from E-cells to I-cells and I-cells to E-cells
+def connect_EI():
+    topo.sim.connect('E-cells','I-cells',
+                     delay=0.05,
+                     connection_type=CFProjection,
+                     name='Afferent',
+                     learning_fn = CFPLF_Identity(),
+                     strength=1.0,
+                     nominal_bounds_template=BoundingBox(radius=21.0/25.0/2.0),
+                     weights_generator=Cortical_WeightGenerator(amplitude=0.5,sigma=20.0/25.0))
 
-topo.sim.connect('I-cells','E-cells',delay=0.05,connection_type=CFProjection,name='Inhibitory',
-                 learning_fn = CFPLF_HebbianSOM(),
-                 strength=-1.0,nominal_bounds_template=BoundingBox(radius=21.0/25.0/2.0),
-                 weights_generator=topo.patterns.random.UniformRandom())
+def connect_IE():
+    topo.sim.connect('I-cells','E-cells',
+                     delay=0.05,
+                     connection_type=CFProjection,
+                     name='Inhibitory',
+                     learning_fn = CFPLF_Identity(),
+                     strength=-1.0,
+                     nominal_bounds_template=BoundingBox(radius=21.0/25.0/2.0),
+                     weights_generator=Cortical_WeightGenerator(amplitude=0.5,sigma=5.0/25.0))              
 
-
+def connect_all():
+    connect_RE()
+    connect_EE()
+    connect_EI()
+    connect_IE()
+              
 # Set default locations for the Model Editor
 topo.sim['I-cells'].gui_x=200  ; topo.sim['I-cells'].gui_y=50
 topo.sim['E-cells'].gui_x=200  ; topo.sim['E-cells'].gui_y=200
