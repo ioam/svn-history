@@ -54,7 +54,7 @@ from topo.misc.inlinec import inline, optimized
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.patternfns import gaussian
 
-topo.sim.name = "joublin_bc96_sim1"
+topo.sim.name = "joublin_bc96"
 
 # Specified explicitly when creating weights matrix - required
 # for optimized C functions.
@@ -86,7 +86,6 @@ class RCells_CFProjection(CFProjection):
     learning_time_constant = Number(default=1000.0, doc="time constant for learning_rate.")
 
     time_step = Number(default=0.01, doc="time step (ms) of the simulation.")
-    totalSimTime = 0.0
 
     rcells_learn = Number(default=1)
  
@@ -191,14 +190,14 @@ class RCells_CFProjection(CFProjection):
         self.response_fn(self.cfs, input_activity, self.activity, self.strength)
         
         # Local competition
-        
+        feedforward_influence = Numeric.array(self.activity)
         rows,cols = self.activity.shape
-        new_activity = Numeric.array(self.activity)
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = self.n_cfs[r][c]
                 r1,r2,c1,c2 = cf.slice_array
-                X = Numeric.array(self.activity[r1:r2,c1:c2])
+                # JABALERT: Could avoid the copying here by using ravel() instead of X.flat
+                X = Numeric.array(feedforward_influence[r1:r2,c1:c2])
                 # Find winner
                 rX,cX = X.shape
                 pos = argmax(X.flat)
@@ -206,30 +205,30 @@ class RCells_CFProjection(CFProjection):
                 cw = pos%cX
                 ro = r-r1
                 co = c-c1
-                weight = ((ro-rw)*(ro-rw)+(co-cw)*(co-cw))/(self.neighborhood_sigma*self.neighborhood_sigma)
-                new_activity[r,c] = self.activity[r,c] * exp(-1*weight)
-        
-        self.activity = new_activity
+                weight = exp(-1*((ro-rw)*(ro-rw)+(co-cw)*(co-cw))/(self.neighborhood_sigma*self.neighborhood_sigma))
+                self.activity[r,c] = feedforward_influence[r,c] * weight
+
         self.output_fn(self.activity)
 
 
     def learn(self):
         """
-        For a CFProjection, learn consist in calling the learning_fn.
+        For a CFProjection, learn() consists of calling the learning_fn.
         """
         # Learning is performed if the input_buffer has already been set,
         # i.e. there is an input to the Projection.
         if self.input_buffer:
             if self.rcells_learn == 1:
+                totalSimTime = float(self.dest.simulation.time())
+                self.neighborhood_sigma = self.neighborhood_sigma0 / (1.0 + totalSimTime/self.neighborhood_time_constant)
+                self.learning_rate = self.learning_rate0 / (1.0 + totalSimTime/self.learning_time_constant)
                 self.learning_fn(self.cfs,self.input_buffer,self.activity,self.learning_rate)
-                self.totalSimTime = self.totalSimTime + 1*self.time_step
-                self.neighborhood_sigma = self.neighborhood_sigma0 / (1 + self.totalSimTime/self.neighborhood_time_constant)
-                self.learning_rate = self.learning_rate0 / (1 + self.totalSimTime/self.learning_time_constant)
                 #print "R-Cells finish learning"
 
 
 class RCells_CFPL_Hebbian(CFPLearningFn):
     """
+    Feedforward learning rule for the R-cells.
     """
 
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
@@ -238,8 +237,8 @@ class RCells_CFPL_Hebbian(CFPLearningFn):
             for c in xrange(cols):
                 cf = cfs[r][c]
                 cf_input_activity = cf.get_input_matrix(input_activity)
-                unit_activity = output_activity[r,c]
-                cf.weights = cf.weights + learning_rate * unit_activity * (cf_input_activity - cf.weights)
+                cf.weights += (learning_rate * output_activity[r,c]) * (cf_input_activity - cf.weights)
+
 
 
 class RCells_CFPRF_DotProduct_Norm(CFPResponseFn):
@@ -573,29 +572,6 @@ class HindpawGaussian(Gaussian):
 
     See the Gaussian PatternGenerator for more details.
     """
-    
-    size_factor = Number(default=-0.8,softbounds=(-2.0,2.0),precedence=0.80,
-                         doc="Factor by which the size is decreased as Y increases.")
-
-    def function(self,**params):
-        y=self.inspect_value('y') # JABALERT: Retrieve value without incrementing it
-        specified_ysigma = params.get('size',self.size)/2.0
-        ysigma = specified_ysigma*(self.size_factor*y+1.0)
-        xsigma = params.get('aspect_ratio',self.aspect_ratio)*ysigma
-        print specified_ysigma,self.size_factor,y,ysigma
-
-        return gaussian(self.pattern_x,self.pattern_y,xsigma,ysigma)
-
-
-class HindpawGaussian2(Gaussian):
-    """
-    2D Gaussian pattern generator whose size depends on the Y position.
-
-    Used for modeling inputs to the hind paw of a rat in Joublin et
-    al., Biological Cybernetics 74, pp. 275-286, 1996.
-
-    See the Gaussian PatternGenerator for more details.
-    """
 
     def function(self,**params):
         y=self.inspect_value('y') # JABALERT: Retrieve value without incrementing it
@@ -620,7 +596,7 @@ class HindpawGaussian2(Gaussian):
 ###########################################
 # Set parameters
 
-input_pattern = HindpawGaussian2(
+input_pattern = HindpawGaussian(
     scale=1.0,size=0.24,aspect_ratio=1.0,
     x=DynamicNumber(UniformRandom(lbound=0.0,ubound=1.0,seed=12)),
     y=DynamicNumber(UniformRandom(lbound=0.0,ubound=1.0,seed=34)),
@@ -628,13 +604,6 @@ input_pattern = HindpawGaussian2(
 
 #input_pattern = topo.patterns.basic.Gaussian(
 #                x=0.5, y=0.5, orientation=0, size=0.24,aspect_ratio=1)
-
-#input_pattern = HindpawGaussian(
-#    scale=1.0,size=0.3,aspect_ratio=1.0,
-#    bounds=BoundingBox(points=((0.0,0.0),(15.0/25.0,25.0/25.0))),
-#    x=DynamicNumber(UniformRandom(lbound=0.0,ubound=1.0,seed=12)),
-#    y=DynamicNumber(UniformRandom(lbound=0.0,ubound=1.0,seed=34)),
-#    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
 RandomArray.seed(500,500)
 #CFSOM.learning_length = 10000
