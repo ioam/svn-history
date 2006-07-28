@@ -279,6 +279,37 @@ def shortclassname(x):
     return re.sub("'>","",re.sub(".*[.]","",repr(type(x))))
 
 
+def array_to_ascii(A,outfile):
+    """
+    Save the given array A to disk as outfile in an ascii format suitable for
+    use with Matlab or Octave.
+
+    After using this function to create 'outfile', the following Matlab code
+    would create a variable 'outfile' containing the array A:
+    load -ascii outfile
+    """
+    # CB: someone might be concerned with precision; I have taken no notice
+    # of it.
+    # CEBALERT: there should be a complementary function (for reading in
+    # arrays saved by matlab), but the plan is for a proper interface with
+    # Matlab...
+     
+    # Matlab:
+    # - columns separated by whitespace, rows by newline
+    # - same number of columns in each row
+    # - can't have comments
+    # (Octave's more flexible but most people use Matlab.)
+    f = open(outfile,'w')
+    for row in A:
+        for col in row:
+            #f.write("%f ")%(col)
+            f.write(str(col)+" ")
+        f.write("\n")
+
+    f.close()
+            
+
+
 # CEBHACKALERT: temporary solution for saving savespace state of arrays.
 ### Python's pickle.Pickler and Numeric's Pickler do not save the
 ### savespace attribute of arrays, so we implement our own Pickler and
