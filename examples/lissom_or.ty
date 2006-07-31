@@ -2,7 +2,7 @@
 Example of a LISSOM-based orientation map (without ON/OFF channels).
 
 """
-__version__='$Revision$'
+
 
 import RandomArray
 import fixedpoint
@@ -25,16 +25,14 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear
 from topo.misc.numbergenerators import UniformRandom
 
-topo.sim.name = "lissom_or"
+topo.sim.name = "lissom_or_310706"
 
 input_pattern = topo.patterns.basic.Gaussian(
-          scale=1.0, size=2*0.0468, aspect_ratio=4.0,
-          x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
-          y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
+          scale=1.0, size=0.08333, aspect_ratio=4.6666,
+          x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12)),
+          y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34)),
           orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
-# Default for tutorial
-topo.patterns.basic.Line.scale=0.7
                                  
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)
@@ -51,11 +49,11 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
                                   input_generator=input_pattern,
                                   period=1.0, phase=0.05,
-                                  nominal_bounds=BoundingBox(radius=0.5+0.275))
+                                  nominal_bounds=BoundingBox(radius=0.5+0.25))
 
 
 topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
-                        nominal_bounds=BoundingBox(radius=0.5))
+                        nominal_bounds=BoundingBox(radius=0.5), tsettle=9)
 
 topo.sim['V1'].output_fn.lower_bound=0.1
 topo.sim['V1'].output_fn.upper_bound=0.65
@@ -63,15 +61,17 @@ topo.sim['V1'].output_fn.upper_bound=0.65
 
 topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
                   connection_type=CFProjection,strength=1.0,name='Afferent',
-                  nominal_bounds_template=BoundingBox(radius=0.275),learning_rate=0.9590)
+                  nominal_bounds_template=BoundingBox(radius=0.271),learning_rate=0.9590)
 
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                   connection_type=CFProjection,strength=0.9,
-                  nominal_bounds_template=BoundingBox(radius=0.10),learning_rate=3.2018) 
+		  weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=2*0.079),
+                  nominal_bounds_template=BoundingBox(radius=0.1),learning_rate=2.278) 
             
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                   connection_type=CFProjection,strength=-0.9,
-                  nominal_bounds_template=BoundingBox(radius=0.23),learning_rate=1.9626)  
+		  weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=2*0.477),
+                  nominal_bounds_template=BoundingBox(radius=0.229),learning_rate=1.627)  
 
 
 
@@ -96,15 +96,15 @@ topo.sim.schedule_command(20000,'topo.sim["V1"].projections()["LateralExcitatory
 
 
 ### Lateral excitatory learning rate changes
-topo.sim.schedule_command(200,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=1.2213')
-topo.sim.schedule_command(500,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.3466')
-
+topo.sim.schedule_command(200,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.693')
+topo.sim.schedule_command(500,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.347')
+topo.sim.schedule_command(1000,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.149')
 
 ### Afferent learning rate changes
-topo.sim.schedule_command(  500,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.6850;topo.sim["V1"].projections()["Afferent"].learning_rate=0.6850')
-topo.sim.schedule_command( 2000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.5480;topo.sim["V1"].projections()["Afferent"].learning_rate=0.5480')
-topo.sim.schedule_command( 4000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.4110;topo.sim["V1"].projections()["Afferent"].learning_rate=0.4110')
-topo.sim.schedule_command(20000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.2055;topo.sim["V1"].projections()["Afferent"].learning_rate=0.2055')
+topo.sim.schedule_command(  500,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.6850')
+topo.sim.schedule_command( 2000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.5480')
+topo.sim.schedule_command( 4000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.4110')
+topo.sim.schedule_command(20000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.2055')
 
 ### Schedule LISSOM output function threshold changes
 #
