@@ -34,7 +34,7 @@ from topo.base.arrayutils import clip_in_place
 
 from topo.patterns.image import edge_average
 from os import listdir
-from random import randrange
+from random import randrange, uniform
 import Image as pImage
 import ImageOps
 from Numeric import array, Float, ravel
@@ -124,12 +124,15 @@ class ImageSeq(PatternGenerator):
 
         self.__setup_pattern_sampler(self.imagepath,whole_image_output_fn)
 	
+	self.x = uniform (-5.5,5.5)
+	self.y = uniform (-5.5,5.5)
 	index = randrange(0,self.number_of_patterns)
+	print index, ' - ', self.x, ' - ', self.y
 	return self.patterns[index](x,y,float(xdensity),float(ydensity),size_normalization,float(width),float(height))
 
 
 
-input_pattern = ImageSeq(scale=1.0, aspect_ratio=1.0, size_normalization='stretch_to_fit', size=2.0)
+input_pattern = ImageSeq(scale=1.1, aspect_ratio=1.0, size_normalization='original', size=2.5)
 
                                  
 # Specify weight initialization, response function, and learning function
@@ -149,10 +152,10 @@ class HomeostaticMaxEnt(OutputFn):
     Implementation of intrinsic excitability equations from Triesch, ICANN 2005, LNCS 3696 pp. 65-70.
     """
     lstep = Number(default=8,doc="")
-    a_init = Number(default=14,doc="Multiplicative parameter controlling the exponential.")
+    a_init = Number(default=13,doc="Multiplicative parameter controlling the exponential.")
     b_init = Number(default=-3,doc="Additive parameter controlling the exponential.")
     eta = Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
-    mu = Number(default=0.1,doc="Average firing rate target.")
+    mu = Number(default=0.05,doc="Average firing rate target.")
 
     def __init__(self,**params):
         super(HomeostaticMaxEnt,self).__init__(**params)
@@ -247,7 +250,7 @@ class TestFn(OutputFn):
 	if self.n_step == self.learn_step:
 
 	    self.n_step = 0
-	    self.x_hist.append (self.x_avg)
+	    #self.x_hist.append (self.x_avg)
 
 	    print self.x_avg[23][23], ' ', self.x_avg[11][11], ' ', self.x_avg[0][0], ' ', self.x_avg[47][47]
 
@@ -275,8 +278,9 @@ topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
 
 #output_fn=TestFn())
 
-#topo.sim['V1'].output_fn.lower_bound=0.083
-#topo.sim['V1'].output_fn.upper_bound=0.633
+#thr = 0.007
+#topo.sim['V1'].output_fn.lower_bound=0.083-thr
+#topo.sim['V1'].output_fn.upper_bound=0.633-thr
 
 
 # LGN ON channel
@@ -314,15 +318,27 @@ topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"),
                   connection_type=CFProjection,strength=0.5,name='LGNOffAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590)
 
+'''
+topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
+                  connection_type=CFProjection,strength=0.9,
+                  nominal_bounds_template=BoundingBox(radius=0.10),learning_rate=3.2018) 
+            
+topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
+                  connection_type=CFProjection,strength=-1.3,
+                  nominal_bounds_template=BoundingBox(radius=0.23),learning_rate=1.9626)  
+'''
 
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                   connection_type=CFProjection,strength=0.9,
                   nominal_bounds_template=BoundingBox(radius=0.10),learning_rate=3.2018) 
             
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
-                  connection_type=CFProjection,strength=-0.9,
-                  nominal_bounds_template=BoundingBox(radius=0.23),learning_rate=1.9626)  
+                  connection_type=CFProjection,strength=-1.75,
+                  nominal_bounds_template=BoundingBox(radius=0.23),learning_rate=0.0081)  
 
+topo.sim.schedule_command(500,'topo.sim["V1"].projections()["LateralInhibitory"].strength=-2.2; topo.sim["V1"].projections()["LateralInhibitory"].learning_rate=0.0162;')
+topo.sim.schedule_command(1000,'topo.sim["V1"].projections()["LateralInhibitory"].strength=-2.6; topo.sim["V1"].projections()["LateralInhibitory"].learning_rate=0.0243;')
+topo.sim.schedule_command(2500,'topo.sim["V1"].projections()["LateralInhibitory"].learning_rate=0.04054;')
 
 
 ### Actions scheduled to occur as the simulation proceeds.
@@ -349,16 +365,16 @@ topo.sim.schedule_command(20000,'topo.sim["V1"].projections()["LGNOnAfferent"].l
 
 ### LISSOM output function bounds changes
 '''
-topo.sim.schedule_command(  200,'topo.sim["V1"].output_fn.lower_bound=0.093;topo.sim["V1"].output_fn.upper_bound=0.643')
-topo.sim.schedule_command(  500,'topo.sim["V1"].output_fn.lower_bound=0.103;topo.sim["V1"].output_fn.upper_bound=0.643')
-topo.sim.schedule_command( 1000,'topo.sim["V1"].output_fn.lower_bound=0.133;topo.sim["V1"].output_fn.upper_bound=0.663')
-topo.sim.schedule_command( 2000,'topo.sim["V1"].output_fn.lower_bound=0.163;topo.sim["V1"].output_fn.upper_bound=0.683')
-topo.sim.schedule_command( 3000,'topo.sim["V1"].output_fn.lower_bound=0.183;topo.sim["V1"].output_fn.upper_bound=0.713')
-topo.sim.schedule_command( 4000,'topo.sim["V1"].output_fn.lower_bound=0.183;topo.sim["V1"].output_fn.upper_bound=0.743')
-topo.sim.schedule_command( 5000,'topo.sim["V1"].output_fn.lower_bound=0.193;topo.sim["V1"].output_fn.upper_bound=0.773')
-topo.sim.schedule_command( 6500,'topo.sim["V1"].output_fn.lower_bound=0.203;topo.sim["V1"].output_fn.upper_bound=0.803')
-topo.sim.schedule_command( 8000,'topo.sim["V1"].output_fn.lower_bound=0.213;topo.sim["V1"].output_fn.upper_bound=0.833')
-topo.sim.schedule_command(20000,'topo.sim["V1"].output_fn.lower_bound=0.223;topo.sim["V1"].output_fn.upper_bound=0.863')
+topo.sim.schedule_command(  200,'topo.sim["V1"].output_fn.lower_bound=0.093-thr;topo.sim["V1"].output_fn.upper_bound=0.643-thr')
+topo.sim.schedule_command(  500,'topo.sim["V1"].output_fn.lower_bound=0.103-thr;topo.sim["V1"].output_fn.upper_bound=0.643-thr')
+topo.sim.schedule_command( 1000,'topo.sim["V1"].output_fn.lower_bound=0.133-thr;topo.sim["V1"].output_fn.upper_bound=0.663-thr')
+topo.sim.schedule_command( 2000,'topo.sim["V1"].output_fn.lower_bound=0.163-thr;topo.sim["V1"].output_fn.upper_bound=0.683-thr')
+topo.sim.schedule_command( 3000,'topo.sim["V1"].output_fn.lower_bound=0.183-thr;topo.sim["V1"].output_fn.upper_bound=0.713-thr')
+topo.sim.schedule_command( 4000,'topo.sim["V1"].output_fn.lower_bound=0.183-thr;topo.sim["V1"].output_fn.upper_bound=0.743-thr')
+topo.sim.schedule_command( 5000,'topo.sim["V1"].output_fn.lower_bound=0.193-thr;topo.sim["V1"].output_fn.upper_bound=0.773-thr')
+topo.sim.schedule_command( 6500,'topo.sim["V1"].output_fn.lower_bound=0.203-thr;topo.sim["V1"].output_fn.upper_bound=0.803-thr')
+topo.sim.schedule_command( 8000,'topo.sim["V1"].output_fn.lower_bound=0.213-thr;topo.sim["V1"].output_fn.upper_bound=0.833-thr')
+topo.sim.schedule_command(20000,'topo.sim["V1"].output_fn.lower_bound=0.223-thr;topo.sim["V1"].output_fn.upper_bound=0.863-thr')
 '''
 
 # default locations for model editor
