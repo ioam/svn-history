@@ -206,13 +206,15 @@ topo.sim['V1'] = LISSOM(nominal_density=48.0,
             output_fn=PiecewiseLinear(lower_bound=delta,upper_bound=beta))
 
 
-
+# C++ LISSOM divides by pi in RadialFunction::Gaussian but not for
+# Gaussian in retinalobjs (and elsewhere)
+from math import pi,sqrt
 
 centerg = topo.patterns.basic.Gaussian(
-    size=2*sigma_c/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1())
+    size=2*sigma_c*sqrt(pi)/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1())
 
 surroundg = topo.patterns.basic.Gaussian(
-    size=2*sigma_s/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1())
+    size=2*sigma_s*sqrt(pi)/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1())
 
 # ** missing CFPOF_DivisiveNormalizeL1 on the weights
 
