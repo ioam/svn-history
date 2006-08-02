@@ -901,7 +901,9 @@ class CFSheet(ProjectionSheet):
         for r in range(rows):
             for c in range(cols):
                 sums = [p.cfs[r][c].sum for p in projlist]
-                joint_sum = Numeric.add.reduce(sums)
+                # CB: *to check, this could be the wrong way round*
+                # + document
+                joint_sum = Numeric.add.reduce(sums)/float(len(projlist))
                 for p in projlist:
                     p.cfs[r][c]._sum=joint_sum
                  
