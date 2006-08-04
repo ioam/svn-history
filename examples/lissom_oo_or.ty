@@ -29,9 +29,9 @@ from topo.misc.numbergenerators import UniformRandom
 topo.sim.name = "lissom_oo_or"
 
 input_pattern = topo.patterns.basic.Gaussian(
-          scale=1.0, size=2*0.0468, aspect_ratio=4.0,
-          x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
-          y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
+          scale=1.0, size=0.08333, aspect_ratio=4.6666,
+          x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12)),
+          y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34)),
           orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
                                  
@@ -78,26 +78,26 @@ topo.sim['V1'].output_fn.upper_bound=0.633
 topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
                   connection_type=SharedWeightCFProjection,strength=2.33,
                   nominal_bounds_template=BoundingBox(radius=0.375),name='Center',
-                  weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
+                  weights_generator=topo.patterns.basic.Gaussian(size=0.07385,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),
                   connection_type=SharedWeightCFProjection,strength=-2.33,
                   name='Surround',nominal_bounds_template=BoundingBox(radius=0.375),
-                  weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
+                  weights_generator=topo.patterns.basic.Gaussian(size=0.2954,
                                                                  aspect_ratio=1))
 
 # LGN OFF channel
 topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
                   connection_type=SharedWeightCFProjection,strength=-2.33,
                   name='Center',nominal_bounds_template=BoundingBox(radius=0.375),
-                  weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
+                  weights_generator=topo.patterns.basic.Gaussian(size=0.07385,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
                   connection_type=SharedWeightCFProjection,strength=2.33,
                   name='Surround',nominal_bounds_template=BoundingBox(radius=0.375),
-                  weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
+                  weights_generator=topo.patterns.basic.Gaussian(size=0.2954,
                                                                  aspect_ratio=1))
 
 
