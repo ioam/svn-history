@@ -6,7 +6,7 @@ Requires the weave package; without it unoptimized versions are used.
 """
 
 from topo.base.cf import CFPOutputFn,CFPOF_Plugin
-from topo.base.functionfamilies import OutputFn, OutputFnParameter
+from topo.base.functionfamilies import OutputFn, OutputFnParameter, IdentityOF
 from topo.base.parameterclasses import Number
 from topo.base.parameterizedobject import ParameterizedObject
 
@@ -78,7 +78,7 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
         inline(code, ['output_activity','rows','cols','cfs'], local_dict=locals())
 
 
-class CFPOF_DivisiveNormalizeL1(CFPOF_Plugin):
+class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
     """
     Non-optimized version of CFOF_DivisiveNormalizeL1_opt1.
 
@@ -91,13 +91,10 @@ class CFPOF_DivisiveNormalizeL1(CFPOF_Plugin):
 
     def __call__(self, cfs, output_activity, **params):
         """
-        Apply the single_cf_fn to each CF.
-
-        For each CF, the sum of the weights is passed
-        as the current value of the norm. Following
-        application of the output function, the cf's
-        sum is then set equal to the single_cf_fn's
-        norm_value. 
+        Uses the cf.sum attribute to allow optimization
+        by computing the sum separately, and to allow joint
+        normalization.  After use, cf.sum is deleted because
+        the value it would have has been changed.
         """
         if type(self.single_cf_fn) is not IdentityOF:
             rows,cols = output_activity.shape
@@ -107,10 +104,9 @@ class CFPOF_DivisiveNormalizeL1(CFPOF_Plugin):
             for r in xrange(rows):
                 for c in xrange(cols):
                     cf = cfs[r][c]
-                    single_cf_fn(cf.weights,cf.sum)
 		    current_sum=cf.sum
-	            factor = (self.norm_value/current_sum)
-	            x *= factor
+	            factor = norm_value/current_sum
+	            cf.weights *= factor
                     del cf.sum
 
 
