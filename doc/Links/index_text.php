@@ -71,7 +71,7 @@ scaling equations that underlie Sheet coordinates
     from ion channels to behavioral experiments.  Can be used for some
     of the same types of models supported by Topographica, but does
     not have an explicit focus on topographically organized areas.<BR><BR>
-  <dt><A TARGET="_top" HREF="http://www.bliss-project.org">NEST</A></dt>
+  <dt><A TARGET="_top" HREF="http://www.nest-initiative.org">NEST</A></dt>
   <dd>NEST (formerly called BLISS) is a general-purpose simulator for
     large networks of neurons, but without an explicit focus on topography.
     The licensing terms are also somewhat restrictive, in part because of 
