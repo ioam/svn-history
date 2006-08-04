@@ -55,9 +55,6 @@ class DivisiveNormalizeL1(OutputFn):
     This operation ensures that an array has a sum equal to the specified 
     norm_value, rescaling each value to make this true.  The array is 
     unchanged if the sum is zero.
-
-    If the array's current norm_value is known (e.g. from some earlier
-    calculation), it can be passed in as an optimization.
     """
     norm_value = Number(default=1.0)
 
