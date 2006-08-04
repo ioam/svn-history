@@ -16,6 +16,8 @@ from basic import DivisiveNormalizeL1
 
 from Numeric import sum
 
+# For backwards compatibility when loading pickled files; can be deleted
+DivisiveNormalizeL1_opt=DivisiveNormalizeL1
 
 class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     """
