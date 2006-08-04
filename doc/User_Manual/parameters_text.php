@@ -35,7 +35,7 @@ value via the <code>scale</code> widget in a Test Pattern window.
 <P>The biggest difference from a standard Python attribute is visible
 when one tries to set a Parameter to a value that is not allowed.  For
 instance, you can try to enter <code>-1</code> in the
-<code>aspect_ratio</code> box, or type <code>G.aspect_ratio=0.8</code>
+<code>aspect_ratio</code> box, or type <code>G.aspect_ratio=-0.5</code>
 at the command prompt, but in either case you should get a ValueError.
 Similarly, trying to set it to anything but a number
 (e.g. <code>G.aspect_ratio="big"</code>) should produce an error.
