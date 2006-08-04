@@ -24,8 +24,9 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
     Implemented in C for speed.  Should be equivalent to
     CFPLF_Plugin(single_cf_fn=Hebbian), except faster.  
 
-    Sets the _sum attribute on any cf whose weights are
-    updated during learning.
+    As a side effect, sets the sum attribute on any cf whose weights
+    are updated during learning, to speed up later operations that
+    might depend on it.
     """
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
@@ -82,7 +83,7 @@ class CFPLF_Hebbian_opt(CFPLearningFn):
                         
                         // store the sum of the cf's weights
                         PyObject *total_obj = PyFloat_FromDouble(total);  //(new ref)
-                        PyObject_SetAttrString(cf,"_sum",total_obj);
+                        PyObject_SetAttrString(cf,"sum",total_obj);
                         Py_DECREF(total_obj);
                     }
                 }

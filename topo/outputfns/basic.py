@@ -61,22 +61,11 @@ class DivisiveNormalizeL1(OutputFn):
     """
     norm_value = Number(default=1.0)
 
-    def __call__(self,x,current_norm_value=None):
-        """
-        Normalize the input array.
-
-        If the array's current norm_value is already equal to the required
-        norm_value, the operation is skipped.
-        """
-
-        if current_norm_value==None:
-            current_norm_value = 1.0*Numeric.sum(abs(x.flat))
-        
-        if current_norm_value==self.norm_value:
-            return x
-            
-        if current_norm_value != 0:
-            factor = (self.norm_value/current_norm_value)
+    def __call__(self,x):
+        """L1-normalize the input array, if it has a nonzero sum."""
+        current_sum = 1.0*Numeric.sum(abs(x.flat))
+        if current_sum != 0:
+            factor = (self.norm_value/current_sum)
             x *= factor
 
 

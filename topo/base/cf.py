@@ -88,37 +88,40 @@ class ConnectionField(ParameterizedObject):
         """
         As an optimization, a learning function (or other function
         that alters the cf's weights) may compute the sum
-        of the cf's weights and store it in _sum.
+        of the cf's weights and cache it in the sum attribute (which
+        really puts the value in _sum).
 
-        If this has been done, the stored value is returned. Otherwise,
+        If this has been done, the cached value is returned. Otherwise,
         the value is calculated when requested.
 
         This also allows e.g. joint normalization, because the cf's
-        _sum attribute can be set to the joint sum.
+        sum attribute can be set explicitly to the joint sum.
         """
-        if hasattr(self,'_sum'):
-            return self._sum
+        if hasattr(self,'__sum'):
+            return self.__sum
         else:
             return Numeric.sum(self.weights.flat)
             
     def set_sum(self,new_sum):
         """
-        Only if the cf has a _sum attribute does setting the cf's sum
-        have any effect. If the cf has no _sum then the set command is
-        ignored because the value would not necessarily be current at
-        a later stage.
+        Once set to a value, that cached value will be used until the
+        sum is deleted.  Thus if any object sets this value, any other
+        object that changes the value should either delete the cached
+        sum or update it to the correct value.  Otherwise, there is a
+        possibility that a stale cached value will be returned.
         """        
-        if hasattr(self,'_sum'): self._sum = new_sum
+        self.__sum = new_sum
 
     def del_sum(self):
         """
-        Delete the _sum attribute if it exists.
+        Delete any cached sum that may exist.
         """
-        if hasattr(self,'_sum'): delattr(self,'_sum')
+        if hasattr(self,'__sum'): delattr(self,'__sum')
 
 
 
-    # CEBHACKALERT: this slows things down.
+    # CEBHACKALERT: Accessing sum as a property from the C code will probably
+    # slow it down; this should be checked.
     sum = property(get_sum,set_sum,del_sum,"Please see get_sum() and set_sum().")
 
 
@@ -127,7 +130,6 @@ class ConnectionField(ParameterizedObject):
                  weights_generator,mask_template,
                  output_fn=IdentityOF(),slice_=None,**params):
         """
-
         bounds_template is assumed to have been initialized correctly
         already (see e.g. CFProjection.initialize_bounds() ).
         """
@@ -167,9 +169,6 @@ class ConnectionField(ParameterizedObject):
 
         self.weights *= self.mask   
         output_fn(self.weights)        
-
-        # Set the initial sum
-        #self.sum = output_fn.norm_value
 
 
     ### CEBHACKALERT: there is presumably a better way than this.
@@ -279,7 +278,7 @@ class ConnectionField(ParameterizedObject):
             # CEBHACKALERT: see __init__
             self.weights *= self.mask
             output_fn(self.weights)
-            self.sum=output_fn.norm_value
+            del self.sum
 
 
     def change_density(self, new_wt_density):
@@ -464,10 +463,8 @@ class CFPOF_Plugin(CFPOutputFn):
 
             for r in xrange(rows):
                 for c in xrange(cols):
-                    cf = cfs[r][c]                    
-                    single_cf_fn(cf.weights,cf.sum)
-                    # CB: cf.sum=norm_value ought to be ok
-                    # but it doesn't work
+                    cf = cfs[r][c]
+                    single_cf_fn(cf.weights)
                     del cf.sum
 
 
@@ -905,7 +902,7 @@ class CFSheet(ProjectionSheet):
                 # + document
                 joint_sum = Numeric.add.reduce(sums)/float(len(projlist))
                 for p in projlist:
-                    p.cfs[r][c]._sum=joint_sum
+                    p.cfs[r][c].sum=joint_sum
                  
         for p in projlist:
             p.apply_output_fn()
