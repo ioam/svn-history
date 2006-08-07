@@ -18,7 +18,7 @@ from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.base.parameterclasses import Wrapper
-from topo.outputfns.basic import PiecewiseLinear,IdentityOF
+from topo.outputfns.basic import PiecewiseLinear,IdentityOF,DivisiveNormalizeL1
 from topo.responsefns.optimized import CFPRF_SharedWeightDotProduct_opt
 
 import topo.tests.lissom_log_parser
@@ -95,8 +95,8 @@ topo.sim['Retina'] = GeneratorSheet(nominal_bounds=retina_bounds,
 topo.sim['LGNOn'] = CFSheet(nominal_bounds=lgn_bounds,nominal_density=BaseRN,
                       output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
 
-topo.sim['LGNOff'] = CFSheet(nominal_bounds=lgn_bounds,nominal_density=BaseRN,
-                      output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
+## topo.sim['LGNOff'] = CFSheet(nominal_bounds=lgn_bounds,nominal_density=BaseRN,
+##                       output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
 
 
 lgn_weight_pattern = topo.patterns.basic.Disk(smoothing=0.0,
@@ -109,8 +109,8 @@ topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
                   nominal_bounds_template=lgn_weight_bounds,
                   weights_generator=lgn_weight_pattern)
 
-# LGN OFF channel
-topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=1.0,
-                  nominal_bounds_template=lgn_weight_bounds,
-                  weights_generator=lgn_weight_pattern)
+## # LGN OFF channel
+## topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
+##                   connection_type=SharedWeightCFProjection,strength=1.0,
+##                   nominal_bounds_template=lgn_weight_bounds,
+##                   weights_generator=lgn_weight_pattern)
