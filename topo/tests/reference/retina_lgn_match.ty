@@ -1,0 +1,116 @@
+"""
+For matching with C++ lissom's retina_lgn_match.param.
+
+$Id$
+"""
+__version__='$Revision$'
+
+import fixedpoint
+
+from math import pi, sqrt
+from fixedpoint import FixedPoint
+
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.projections.basic import SharedWeightCFProjection
+import topo.patterns.basic
+from topo.base.sheet import BoundingBox
+from topo.base.parameterclasses import DynamicNumber
+from topo.base.cf import CFSheet
+from topo.base.boundingregion import BoundingBox
+from topo.base.parameterclasses import Wrapper
+from topo.outputfns.basic import PiecewiseLinear,IdentityOF
+from topo.responsefns.optimized import CFPRF_SharedWeightDotProduct_opt
+
+import topo.tests.lissom_log_parser
+
+BaseRN=24.0
+rf_radius=BaseRN/4.0+0.5
+
+area_scale=1.0
+#num_eyes=1
+
+randomness = 0.0
+#smooth_circular_radius_trim = -0.25
+
+
+xsigma=6.0
+ysigma=1.5
+scale_input=1.0
+
+# radius of LGN Gaussian
+sigma_c = 4.5 #0.5 
+
+# radius of LGN afferent connections
+r_L = 5.5 #4.7*sigma_s
+
+# buffers so sheet above has full rfs...
+lgn_edge_buffer = round(rf_radius,0)
+retina_edge_buffer=round(rf_radius+r_L,0)
+
+# ...and actual numbers of neurons with the buffers
+RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
+LN=round(BaseRN*area_scale+2*lgn_edge_buffer,0)
+
+
+fixedpoint.DEFAULT_PRECISION=3
+
+# input generation params
+GeneratorSheet.nominal_density = BaseRN*area_scale
+GeneratorSheet.period = 1
+GeneratorSheet.phase=0.05
+
+# take the input pattern position parameters from the log
+# file output of the equivalent c++ simulation
+n_inputs,input_x,input_y,input_orientation = topo.tests.lissom_log_parser.get_input_params(log_file="topo/tests/oo_or_map_topo.log")
+n_inputs-=1;input_x.next();input_y.next();input_orientation.next() # c++ lissom's first iteration is just a test
+print "Number of patterns available for learning iterations:",n_inputs
+
+
+gaussian_width = xsigma/BaseRN/sqrt(2.0)
+gaussian_height = ysigma/BaseRN/sqrt(2.0)
+
+input_pattern = topo.patterns.basic.Gaussian(scale=scale_input,
+                                             size = 2*gaussian_height,
+                                             aspect_ratio= gaussian_width/gaussian_height,
+                                             x=DynamicNumber(lambda : input_x.next()/BaseRN - 0.5*LN/BaseRN),
+                                             y=DynamicNumber(lambda : input_y.next()/BaseRN - 0.5*LN/BaseRN),
+                                             orientation=DynamicNumber(lambda : round(2*pi*input_orientation.next()/360.0,1)))
+
+
+retina_bounds = BoundingBox(radius= RN/(2.0*BaseRN*area_scale))
+lgn_bounds = BoundingBox(radius=LN/(2.0*BaseRN*area_scale))
+                                               
+# Connection parameters
+lgn_weight_bounds = BoundingBox(radius=r_L/BaseRN)
+
+# Circular ConnectionFields
+CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
+SharedWeightCFProjection.response_fn=CFPRF_SharedWeightDotProduct_opt()
+SharedWeightCFProjection.weights_output_fn.single_cf_fn=IdentityOF() #DivisiveNormalizeL1()
+
+
+topo.sim['Retina'] = GeneratorSheet(nominal_bounds=retina_bounds,
+                                    input_generator=input_pattern)
+
+topo.sim['LGNOn'] = CFSheet(nominal_bounds=lgn_bounds,nominal_density=BaseRN,
+                      output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
+
+topo.sim['LGNOff'] = CFSheet(nominal_bounds=lgn_bounds,nominal_density=BaseRN,
+                      output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0))
+
+
+lgn_weight_pattern = topo.patterns.basic.Disk(smoothing=0.0,
+    size=2*sigma_c/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1())
+
+
+# LGN ON channel
+topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
+                  connection_type=SharedWeightCFProjection,strength=1.0,
+                  nominal_bounds_template=lgn_weight_bounds,
+                  weights_generator=lgn_weight_pattern)
+
+# LGN OFF channel
+topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
+                  connection_type=SharedWeightCFProjection,strength=1.0,
+                  nominal_bounds_template=lgn_weight_bounds,
+                  weights_generator=lgn_weight_pattern)
