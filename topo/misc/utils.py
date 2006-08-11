@@ -357,7 +357,7 @@ def LoadArray(fp):
     shape = map(lambda x: string.atoi(x), ln[1:])
     itemsize = string.atoi(ln[0][3:])
 
-    sz = reduce(multiply, shape)*itemsize
+    sz = reduce(multiply, shape, 1)*itemsize
     data = fp.read(sz)
 
     m = fromstring(data, typecode)
