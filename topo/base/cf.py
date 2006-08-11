@@ -82,9 +82,9 @@ class ConnectionField(ParameterizedObject):
         Returns the stored norm_value, if any, or else the current sum of the weights.
         See the norm_total property for more details.
         """
-        # The actual value is cached in __norm_total.
-        if hasattr(self,'__norm_total'):
-            return self.__norm_total
+        # The actual value is cached in _norm_total.
+        if hasattr(self,'_norm_total'):
+            return self._norm_total
         else:
             return Numeric.sum(self.weights.flat)
             
@@ -93,14 +93,14 @@ class ConnectionField(ParameterizedObject):
         Set an explicit value to be returned by norm_total.
         See the norm_total property for more details.
         """        
-        self.__norm_total = new_norm_total
+        self._norm_total = new_norm_total
 
     def del_norm_total(self):
         """
         Delete any cached norm_total that may have been set.
         See the norm_total property for more details.
         """
-        if hasattr(self,'__norm_total'): delattr(self,'__norm_total')
+        if hasattr(self,'_norm_total'): delattr(self,'_norm_total')
 
 
 
