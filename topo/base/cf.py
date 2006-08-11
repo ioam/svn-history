@@ -80,49 +80,61 @@ class ConnectionField(ParameterizedObject):
     # CEBHACKALERT: can rename this to 'slice_' now.
     slice_array = []
 
-    # JABHACKALERT: The handling of _sum needs to be revisited, because
-    # it is unlikely to work for arbitrary combinations of output and
-    # learning functions.  E.g. the norm_value is sometimes treated as if
-    # it is always the sum, when it may be the length instead.
-    def get_sum(self):
+    def get_norm_total(self):
         """
-        As an optimization, a learning function (or other function
-        that alters the cf's weights) may compute the sum
-        of the cf's weights and cache it in the sum attribute (which
-        really puts the value in _sum).
-
-        If this has been done, the cached value is returned. Otherwise,
-        the value is calculated when requested.
-
-        This also allows e.g. joint normalization, because the cf's
-        sum attribute can be set explicitly to the joint sum.
+        Returns the stored norm_value, if any, or else the current sum of the weights.
+        See the norm_total property for more details.
         """
-        if hasattr(self,'__sum'):
-            return self.__sum
+        # The actual value is cached in __norm_total.
+        if hasattr(self,'__norm_total'):
+            return self.__norm_total
         else:
             return Numeric.sum(self.weights.flat)
             
-    def set_sum(self,new_sum):
+    def set_norm_total(self,new_norm_total):
         """
-        Once set to a value, that cached value will be used until the
-        sum is deleted.  Thus if any object sets this value, any other
-        object that changes the value should either delete the cached
-        sum or update it to the correct value.  Otherwise, there is a
-        possibility that a stale cached value will be returned.
+        Set an explicit value to be returned by norm_total.
+        See the norm_total property for more details.
         """        
-        self.__sum = new_sum
+        self.__norm_total = new_norm_total
 
-    def del_sum(self):
+    def del_norm_total(self):
         """
-        Delete any cached sum that may exist.
+        Delete any cached norm_total that may have been set.
+        See the norm_total property for more details.
         """
-        if hasattr(self,'__sum'): delattr(self,'__sum')
+        if hasattr(self,'__norm_total'): delattr(self,'__norm_total')
 
 
 
-    # CEBHACKALERT: Accessing sum as a property from the C code will probably
+    # CEBHACKALERT: Accessing norm_total as a property from the C code will probably
     # slow it down; this should be checked.
-    sum = property(get_sum,set_sum,del_sum,"Please see get_sum() and set_sum().")
+    norm_total = property(get_norm_total,set_norm_total,del_norm_total,
+        """
+        The norm_total property returns a value useful in computing
+        a sum-based weight normalization.
+
+        By default, the value returned is simply the current sum of
+        the connection weights.  However, another value can be
+        substituted by setting norm_total explicitly, and this cached
+        value will then be returned instead.
+
+        This mechanism has two main purposes.  First, it allows a
+        learning function to cache the sum value for an output
+        function to use later without computation, which can be a
+        significant time savings.  Second, the extra level of
+        indirection allows the sum value to be manipulated before it
+        is used, to implement operations like joint normalization
+        across corresponding CFs in multiple Projections.
+
+        Apart from such cases, norm_total can be ignored.
+        
+        Note that every person who uses a class that sets or gets
+        norm_total must be very careful to ensure that stale values
+        will never be accessed.  A good way to do this is to make sure
+        that the value is only set just before it will be used, and
+        deleted as soon as it has been accessed.
+        """)
 
 
     # CEBHACKALERT: add some default values
@@ -278,7 +290,7 @@ class ConnectionField(ParameterizedObject):
             # CEBHACKALERT: see __init__
             self.weights *= self.mask
             output_fn(self.weights)
-            del self.sum
+            del self.norm_total
 
 
     def change_density(self, new_wt_density):
@@ -298,8 +310,8 @@ class CFPResponseFn(ParameterizedObject):
     function for a neuron, computing activation for one Projection.
 
     Objects in this class must support being called as a function with
-    the arguments specified below, and must return a matrix the same
-    size as the activity matrix supplied.
+    the arguments specified below, and are assumed to modify the
+    activity matrix in place.
     """
     _abstract_class_name = "CFPResponseFn"
 
@@ -465,7 +477,7 @@ class CFPOF_Plugin(CFPOutputFn):
                 for c in xrange(cols):
                     cf = cfs[r][c]
                     single_cf_fn(cf.weights)
-                    del cf.sum
+                    del cf.norm_total
 
 
 class CFPOF_Identity(CFPOutputFn):
@@ -897,12 +909,12 @@ class CFSheet(ProjectionSheet):
 
         for r in range(rows):
             for c in range(cols):
-                sums = [p.cfs[r][c].sum for p in projlist]
+                sums = [p.cfs[r][c].norm_total for p in projlist]
                 # CB: *to check, this could be the wrong way round*
                 # + document
                 joint_sum = Numeric.add.reduce(sums)/float(len(projlist))
                 for p in projlist:
-                    p.cfs[r][c].sum=joint_sum
+                    p.cfs[r][c].norm_total=joint_sum
                  
         for p in projlist:
             p.apply_output_fn()

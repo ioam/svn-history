@@ -43,7 +43,7 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                         PyObject *cf = PyList_GetItem(cfsr,l);
                         PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
                         PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
-                        PyObject *sum_obj     = PyObject_GetAttrString(cf,"sum");
+                        PyObject *sum_obj     = PyObject_GetAttrString(cf,"norm_total");
                         
                         float *wi = (float *)(((PyArrayObject*)weights_obj)->data);
                         int *slice =  (int *)(((PyArrayObject*)slice_obj)->data);
@@ -66,11 +66,8 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                         Py_DECREF(slice_obj);
                         Py_DECREF(sum_obj);
 
-                        // store the new sum (unlikely to be accessed before
-                        // learning, but makes things consistent)
-                        PyObject *total_obj = PyFloat_FromDouble(1.0);  //(new ref)
-                        PyObject_SetAttrString(cf,"sum",total_obj);
-                        Py_DECREF(total_obj);
+                        // Delete the out-of-date norm_total
+                        PyObject_DelAttrString(cf,"norm_total");
                     }
                 }
             }
@@ -91,9 +88,9 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
 
     def __call__(self, cfs, output_activity, **params):
         """
-        Uses the cf.sum attribute to allow optimization
+        Uses the cf.norm_total attribute to allow optimization
         by computing the sum separately, and to allow joint
-        normalization.  After use, cf.sum is deleted because
+        normalization.  After use, cf.norm_total is deleted because
         the value it would have has been changed.
         """
         if type(self.single_cf_fn) is not IdentityOF:
@@ -104,10 +101,10 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
             for r in xrange(rows):
                 for c in xrange(cols):
                     cf = cfs[r][c]
-		    current_sum=cf.sum
+		    current_sum=cf.norm_total
 	            factor = norm_value/current_sum
 	            cf.weights *= factor
-                    del cf.sum
+                    del cf.norm_total
 
 
 if not optimized:
