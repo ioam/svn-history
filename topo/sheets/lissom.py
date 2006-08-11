@@ -7,6 +7,8 @@ __version__='$Revision$'
 
 import Numeric
 
+import topo
+
 from topo.base.cf import CFSheet
 from topo.base.parameterclasses import BooleanParameter, Number, Integer
 from topo.base.projection import OutputFnParameter, Projection
@@ -47,6 +49,18 @@ class JointNormalizingCFSheet(CFSheet):
     together, as long as an appropriate OutputFn is being used.
     """
 
+    # JABALERT: Should check that whenever a connection is added to a
+    # group, it has the same no of cfs as the existing connections.
+
+
+    def start(self):
+        # Force the weights to be normalized at the start of the simulation
+        # JABALERT: There may be some cleaner way to achieve this.
+        assert self.simulation
+        self.simulation.schedule_command(topo.sim.time(),
+                                         'topo.sim["' + self.name + '"]._normalize_weights()')
+
+
     def _port_match(self,key,portlist):
         """
         Returns True if the given key matches any port on the given list.
@@ -63,10 +77,6 @@ class JointNormalizingCFSheet(CFSheet):
                     (isinstance(key,tuple)  and key[0] == port) or
                     (isinstance(port,tuple) and port[0] == key) or
                     (isinstance(key,tuple)  and isinstance(port,tuple) and port[0] == key[0]))]
-
-    # JABHACKALERT: Need to jointly normalize before the first iteration, somehow.
-    # Also, whenever a connection is added to a group, need to check
-    # that it has the same no of cfs as the existing connection.
 
     def __grouped_in_projections(self):
         """
@@ -114,19 +124,9 @@ class JointNormalizingCFSheet(CFSheet):
                     p.cfs[r][c].norm_total=joint_sum
 
 
-    def learn(self):
-        """
-        Call the learn() method on every Projection to the Sheet, and
-        call the output functions (jointly if necessary).
-        """
-        # Ask all projections to learn independently
-        for proj in self.in_connections:
-            if not isinstance(proj,Projection):
-                self.debug("Skipping non-Projection "+proj.name)
-            else:
-                proj.learn()
-
-        # Apply output function in groups determined by dest_port
+    def _normalize_weights(self):
+        """Apply the weights output_fn for every group of Projections."""
+        
         for key,projlist in self.__grouped_in_projections():
             if key == None:
                 normtype='Independent'
@@ -142,6 +142,22 @@ class JointNormalizingCFSheet(CFSheet):
                 self.debug('  ',p.name)
 
 
+    def learn(self):
+        """
+        Call the learn() method on every Projection to the Sheet, and
+        call the output functions (jointly if necessary).
+        """
+        # Ask all projections to learn independently
+        for proj in self.in_connections:
+            if not isinstance(proj,Projection):
+                self.debug("Skipping non-Projection "+proj.name)
+            else:
+                proj.learn()
+
+        # Apply output function in groups determined by dest_port
+        self._normalize_weights()
+
+        
 
 class LISSOM(JointNormalizingCFSheet):
     """
