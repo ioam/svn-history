@@ -80,7 +80,8 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
     Non-optimized version of CFOF_DivisiveNormalizeL1_opt1.
 
     Same as CFPOF_Plugin(single_cf_fn=DivisiveNormalizeL1), except
-    that it supports joint normalization.
+    that it supports joint normalization using via the norm_total
+    property of ConnectionField.
     """
 
     single_cf_fn = OutputFnParameter(DivisiveNormalizeL1(norm_value=1.0),
