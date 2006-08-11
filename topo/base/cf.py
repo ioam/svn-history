@@ -48,9 +48,6 @@ from sheet import Sheet,Slice
 from sheetview import UnitView, ProjectionView
 from boundingregion import BoundingBox,BoundingRegionParameter
 
-# JABALERT: Need to move KeyedList to base if we keep this
-from topo.misc.keyedlist import KeyedList
-
 # Specified explicitly when creating weights matrix - required
 # for optimized C functions.
 weight_type = Numeric.Float32
@@ -832,6 +829,11 @@ The true bounds will differ depending on the density (see initialize_bounds())."
 
 
 
+
+### JABALERT: Should consider eliminating this class, moving its
+### methods up to ProjectionSheet, because they may in fact be valid
+### for all ProjectionSheets.
+###    
 class CFSheet(ProjectionSheet):
     """
     A ProjectionSheet providing access to the ConnectionFields in its CFProjections.
@@ -850,99 +852,6 @@ class CFSheet(ProjectionSheet):
 
     precedence = Number(0.5)
 
-    def _port_match(self,key,portlist):
-        """
-        Returns True if the given key matches any port on the given list.
-
-        A port is considered a match if the port is == to the key,
-        or if the port is a tuple whose first element is == to the key,
-        or if both the key and the port are tuples whose first elements are ==.
-        """
-        port=portlist[0]
-        return [port for port in portlist
-                if (port == key or
-                    (isinstance(key,tuple)  and key[0] == port) or
-                    (isinstance(port,tuple) and port[0] == key) or
-                    (isinstance(key,tuple)  and isinstance(port,tuple) and port[0] == key[0]))]
-
-    # JABHACKALERT: Need to jointly normalize before the first iteration, somehow.
-    # Also, whenever a connection is added to a group, need to check
-    # that it has the same no of cfs as the existing connection.
-
-    def __grouped_in_projections(self):
-        """
-        Return a dictionary of lists of incoming Projections, grouped for normalization.
-
-        The entry None will contain those to be normalized
-        independently, while the other entries will contain a list of
-        Projections, each of which should be normalized together.
-        """
-        in_proj = KeyedList()
-        in_proj[None]=[] # Independent (ungrouped) connections
-        
-        for c in self.in_connections:
-            d = c.dest_port
-            if not isinstance(c,Projection):
-                self.debug("Skipping non-Projection "+c.name)
-            elif isinstance(d,tuple) and len(d)>2 and d[1]=='JointNormalize':
-                if in_proj.get(d[2]):
-                    in_proj[d[2]].append(c)
-                else:
-                    in_proj[d[2]]=[c]
-            elif isinstance(d,tuple):
-                raise ValueError("Unable to determine appropriate action for dest_port: %s (connection %s)." % (d,c.name))
-            else:
-                in_proj[None].append(c)
-                    
-        return in_proj
-
-                        
-    def __compute_joint_norm_totals(self,projlist):
-        """Compute norm_total for each CF in each projections from a group to be normalized jointly."""
-
-        # Assumes that all Projections in the list have the same r,c size
-        assert len(projlist)>=1
-        proj  = projlist[0]
-        rows,cols = len(proj.cfs),len(proj.cfs[0])
-
-        for r in range(rows):
-            for c in range(cols):
-                sums = [p.cfs[r][c].norm_total for p in projlist]
-                # CB: *to check, this could be the wrong way round*
-                # + document
-                joint_sum = Numeric.add.reduce(sums)/float(len(projlist))
-                for p in projlist:
-                    p.cfs[r][c].norm_total=joint_sum
-
-
-    def learn(self):
-        """
-        Call the learn() method on every Projection to the Sheet, and
-        call the output functions (jointly if necessary).
-        """
-        # Ask all projections to learn independently
-        for proj in self.in_connections:
-            if not isinstance(proj,Projection):
-                self.debug("Skipping non-Projection "+proj.name)
-            else:
-                proj.learn()
-
-        # Apply output function in groups determined by dest_port
-        for key,projlist in self.__grouped_in_projections():
-            if key == None:
-                normtype='Independent'
-            else:
-                normtype='Joint'
-                self.__compute_joint_norm_totals(projlist)
-
-            self.debug("Time " + str(self.simulation.time()) + ": " + normtype +
-                       "ly normalizing:")
-         
-            for p in projlist:
-                p.apply_output_fn()
-                self.debug('  ',p.name)
-
-                
     def update_unit_view(self,x,y,proj_name=''):
         """
 	Creates the list of UnitView objects for a particular unit in this CFSheet.
