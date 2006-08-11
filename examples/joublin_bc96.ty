@@ -32,7 +32,7 @@ import topo.patterns.basic
 
 import topo.base.patterngenerator
 
-from Numeric import argmax, ones, Float, Float32
+from Numeric import argmax, ones, Float
 
 from topo.base.arrayutils import exp, L2norm
 from topo.base.cf import ConnectionField, CFPLearningFn, CFPLF_Identity, CFProjection, CFPResponseFn, CFSheet
