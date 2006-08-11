@@ -117,9 +117,7 @@ class JointNormalizingCFSheet(CFSheet):
         for r in range(rows):
             for c in range(cols):
                 sums = [p.cfs[r][c].norm_total for p in projlist]
-                # CB: *to check, this could be the wrong way round*
-                # + document
-                joint_sum = Numeric.add.reduce(sums)/float(len(projlist))
+                joint_sum = Numeric.add.reduce(sums)
                 for p in projlist:
                     p.cfs[r][c].norm_total=joint_sum
 
