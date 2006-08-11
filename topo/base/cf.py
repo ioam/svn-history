@@ -871,7 +871,7 @@ class CFSheet(ProjectionSheet):
 
     def __grouped_in_projections(self):
         """
-        Return a dictionary of lists of incoming Projections, grouped for normalization..
+        Return a dictionary of lists of incoming Projections, grouped for normalization.
 
         The entry None will contain those to be normalized
         independently, while the other entries will contain a list of
@@ -897,10 +897,8 @@ class CFSheet(ProjectionSheet):
         return in_proj
 
                         
-    # should refer to applying output_fn together, not just normalization
-    # (here and elsewhere)
-    def __normalize_joint_projections(self,projlist):
-        """Normalize the specified list of projections together."""
+    def __compute_joint_norm_totals(self,projlist):
+        """Compute norm_total for each CF in each projections from a group to be normalized jointly."""
 
         # Assumes that all Projections in the list have the same r,c size
         assert len(projlist)>=1
@@ -915,14 +913,12 @@ class CFSheet(ProjectionSheet):
                 joint_sum = Numeric.add.reduce(sums)/float(len(projlist))
                 for p in projlist:
                     p.cfs[r][c].norm_total=joint_sum
-                 
-        for p in projlist:
-            p.apply_output_fn()
 
 
     def learn(self):
         """
-        Call the learn() method on every Projection to the Sheet.
+        Call the learn() method on every Projection to the Sheet, and
+        call the output functions (jointly if necessary).
         """
         # Ask all projections to learn independently
         for proj in self.in_connections:
@@ -934,17 +930,17 @@ class CFSheet(ProjectionSheet):
         # Apply output function in groups determined by dest_port
         for key,projlist in self.__grouped_in_projections():
             if key == None:
-                self.debug("Time " + str(self.simulation.time()) + ": " +
-                           "Independently normalizing:")
-                for p in projlist:
-                    p.apply_output_fn()
-                    self.debug('  ',p.name)
+                normtype='Independent'
             else:
-                self.debug("Time " + str(self.simulation.time()) + ": " +
-                           "Jointly normalizing %s:" % key)
-                for p in projlist: self.debug("  ",p.name)
-                self.__normalize_joint_projections(projlist)
+                normtype='Joint'
+                self.__compute_joint_norm_totals(projlist)
+
+            self.debug("Time " + str(self.simulation.time()) + ": " + normtype +
+                       "ly normalizing:")
          
+            for p in projlist:
+                p.apply_output_fn()
+                self.debug('  ',p.name)
 
                 
     def update_unit_view(self,x,y,proj_name=''):
