@@ -58,9 +58,7 @@ topo.sim.name = "joublin_bc96"
 
 # Specified explicitly when creating weights matrix - required
 # for optimized C functions.
-# weight_type = Numeric.Float32
-weight_type = Float32
-
+from topo.base.cf import weight_type
 
 
 class RCells_CFProjection(CFProjection):
