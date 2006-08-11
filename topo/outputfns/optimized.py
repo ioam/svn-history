@@ -32,14 +32,17 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     def __call__(self, cfs, output_activity, **params):
         rows,cols = output_activity.shape
 
+        # The original code normalized only the CFs for units that were
+        # activated; it might be possible to restore that extra optimization
+        # if some way is found to override that for the first iteration.
         code = """
             double *x = output_activity;
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
                 for (int l=0; l<cols; ++l) {
                     double load = *x++;
-                    if (load != 0) {
-
+                    //if (load != 0)
+                    {
                         PyObject *cf = PyList_GetItem(cfsr,l);
                         PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
                         PyObject *slice_obj   = PyObject_GetAttrString(cf,"slice_array");
@@ -55,10 +58,10 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                         int cc2 = *slice;
 
                         // normalize the weights
-                        total = 1.0/total;
+                        double factor = 1.0/total;
                         int rc = (rr2-rr1)*(cc2-cc1);
                         for (int i=0; i<rc; ++i) {
-                            *(wi++) *= total;
+                            *(wi++) *= factor;
                         }
 
                         // Anything obtained with PyObject_GetAttrString must be explicitly freed
@@ -66,7 +69,7 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                         Py_DECREF(slice_obj);
                         Py_DECREF(sum_obj);
 
-                        // Delete the out-of-date norm_total
+                        // Delete the stale norm_total
                         PyObject_DelAttrString(cf,"norm_total");
                     }
                 }
