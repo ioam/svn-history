@@ -123,7 +123,7 @@ class JointNormalizingCFSheet(CFSheet):
 
 
     def _normalize_weights(self):
-        """Apply the weights output_fn for every group of Projections."""
+        """Apply the weights_output_fn for every group of Projections."""
         
         for key,projlist in self.__grouped_in_projections():
             if key == None:
