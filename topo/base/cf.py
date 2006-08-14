@@ -441,40 +441,46 @@ class CFPLF_Plugin(CFPLearningFn):
                 
 class CFPOutputFn(ParameterizedObject):
     """
-    Map the weight matrix of each CF in a CFProjection into a new one
-    of the same shape.
+    Type for an object that applies some operation (typically something
+    like normalization) to all CFs in a CFProjection for which the specified
+    mask (typically the activity at the destination of this projection)
+    is nonzero.
     """
     _abstract_class_name = "CFPOutputFn"
     
-    def __call__(self, cfs, output_activity,**params):
+    def __call__(self, cfs, mask, **params):
+        """Operate on each CF for which the mask is nonzero."""
         raise NotImplementedError
 
 
 class CFPOF_Plugin(CFPOutputFn):
-    """Applies the specified single_cf_fn to each CF in the CFProjection."""
+    """
+    Applies the specified single_cf_fn to each CF in the CFProjection
+    for which the mask is nonzero.
+    """
     single_cf_fn = OutputFnParameter(default=IdentityOF(),
         doc="Accepts an OutputFn that will be applied to each CF individually.")
     
-    def __call__(self, cfs, output_activity, **params):
+    def __call__(self, cfs, mask, **params):
         """
-        Apply the single_cf_fn to each CF.
+        Apply the single_cf_fn to each CF for which the mask is nonzero.
 
-        For each CF, the sum of the weights is passed
-        as the current value of the norm. Following
-        application of the output function, the cf's
-        sum is then set equal to the single_cf_fn's
-        norm_value. 
+        For each CF, the sum of the weights is passed as the current
+        value of the norm. Following application of the output
+        function, the cf's sum is then set equal to the single_cf_fn's
+        norm_value.
         """
         if type(self.single_cf_fn) is not IdentityOF:
-            rows,cols = output_activity.shape
+            rows,cols = mask.shape
             single_cf_fn = self.single_cf_fn
             norm_value = self.single_cf_fn.norm_value                
 
             for r in xrange(rows):
                 for c in xrange(cols):
-                    cf = cfs[r][c]
-                    single_cf_fn(cf.weights)
-                    del cf.norm_total
+                    if (mask[r][c] != 0):
+                        cf = cfs[r][c]
+                        single_cf_fn(cf.weights)
+                        del cf.norm_total
 
 
 class CFPOF_Identity(CFPOutputFn):
@@ -486,7 +492,7 @@ class CFPOF_Identity(CFPOutputFn):
     """
     single_cf_fn = OutputFnParameter(default=IdentityOF(),constant=True)
     
-    def __call__(self, cfs, output_activity, **params):
+    def __call__(self, cfs, mask, **params):
         pass
 
 

@@ -29,14 +29,14 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
     single_cf_fn = OutputFnParameter(DivisiveNormalizeL1(norm_value=1.0),
                                      constant=True)
 
-    def __call__(self, cfs, output_activity, **params):
-        rows,cols = output_activity.shape
+    def __call__(self, cfs, mask, **params):
+        rows,cols = mask.shape
 
         # The original code normalized only the CFs for units that were
         # activated; it might be possible to restore that extra optimization
         # if some way is found to override that for the first iteration.
         code = """
-            double *x = output_activity;
+            double *x = mask;
             for (int r=0; r<rows; ++r) {
                 PyObject *cfsr = PyList_GetItem(cfs,r);
                 for (int l=0; l<cols; ++l) {
@@ -75,7 +75,7 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                 }
             }
         """    
-        inline(code, ['output_activity','rows','cols','cfs'], local_dict=locals())
+        inline(code, ['mask','rows','cols','cfs'], local_dict=locals())
 
 
 class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
@@ -83,14 +83,14 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
     Non-optimized version of CFOF_DivisiveNormalizeL1_opt1.
 
     Same as CFPOF_Plugin(single_cf_fn=DivisiveNormalizeL1), except
-    that it supports joint normalization using via the norm_total
+    that it supports joint normalization using the norm_total
     property of ConnectionField.
     """
 
     single_cf_fn = OutputFnParameter(DivisiveNormalizeL1(norm_value=1.0),
                                      constant=True)
 
-    def __call__(self, cfs, output_activity, **params):
+    def __call__(self, cfs, mask, **params):
         """
         Uses the cf.norm_total attribute to allow optimization
         by computing the sum separately, and to allow joint
@@ -98,17 +98,18 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
         the value it would have has been changed.
         """
         if type(self.single_cf_fn) is not IdentityOF:
-            rows,cols = output_activity.shape
+            rows,cols = mask.shape
             single_cf_fn = self.single_cf_fn
             norm_value = self.single_cf_fn.norm_value                
 
             for r in xrange(rows):
                 for c in xrange(cols):
-                    cf = cfs[r][c]
-		    current_sum=cf.norm_total
-	            factor = norm_value/current_sum
-	            cf.weights *= factor
-                    del cf.norm_total
+                    if (mask[r][c] != 0):
+                        cf = cfs[r][c]
+    		        current_sum=cf.norm_total
+    	                factor = norm_value/current_sum
+    	                cf.weights *= factor
+                        del cf.norm_total
 
 
 if not optimized:
