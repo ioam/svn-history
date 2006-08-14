@@ -30,6 +30,7 @@ from Numeric import zeros,array,Float,ArrayType
 from boundingregion import BoundingBox, BoundingRegionParameter
 import sheetview 
 
+activity_type = Float
 
 class Sheet(EventProcessor,SheetCoordinateSystem):
     """
@@ -104,7 +105,7 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
            +self.name+ " does not.")
 
         # setup the activity matrix
-        self.activity = zeros(self.shape,Float)
+        self.activity = zeros(self.shape,activity_type)
 
         # For non-learning inputs
         self.__saved_activity = []          
