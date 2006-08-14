@@ -776,10 +776,8 @@ The true bounds will differ depending on the density (see initialize_bounds())."
             self.learning_fn(self.cfs,self.input_buffer,self.dest.activity,self.learning_rate)
 
 
-    ### JABALERT: Is this necessary?
-    def apply_output_fn(self):
-        """Apply the weights_output_fn to the weights."""
-        self.weights_output_fn(self.cfs,self.dest.activity)
+    def apply_learn_output_fn(self,mask):
+        self.weights_output_fn(self.cfs,mask)
 
 
     ### JABALERT: This should be changed into a special __set__ method for

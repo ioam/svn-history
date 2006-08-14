@@ -13,10 +13,10 @@ from topo.base.cf import CFSheet
 from topo.base.parameterclasses import BooleanParameter, Number, Integer
 from topo.base.projection import OutputFnParameter, Projection
 from topo.base.parameterizedobject import ParameterizedObject
+from topo.base.sheet import activity_type
 from topo.misc.inlinec import optimized
 from topo.misc.keyedlist import KeyedList
 from topo.outputfns.basic import PiecewiseLinear
-
 
 
 class JointNormalizingCFSheet(CFSheet):
@@ -134,9 +134,9 @@ class JointNormalizingCFSheet(CFSheet):
 
             self.debug("Time " + str(self.simulation.time()) + ": " + normtype +
                        "ly normalizing:")
-         
+
             for p in projlist:
-                p.apply_output_fn()
+                p.apply_learn_output_fn(Numeric.ones(self.shape,activity_type))
                 self.debug('  ',p.name)
 
 

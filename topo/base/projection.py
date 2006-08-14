@@ -49,6 +49,20 @@ class Projection(EPConnection):
         """
         pass
 
+    def apply_learn_output_fn(self,mask):
+        """
+        Sub-classes can implement this function if they wish to
+        perform an operation after learning has completed, such as
+        normalizing weight values across different projections.
+
+        The mask argument determines which units should have their
+        output_fn applied; units that are nonzero in the mask must
+        have the function applied, while those that are zero may or
+        may not have the function applied (depending on various
+        optimizations).
+        """
+        pass
+
 
 class ProjectionSheet(Sheet):
     """
@@ -150,8 +164,8 @@ class ProjectionSheet(Sheet):
 
     def learn(self):
         """
-        By default, call the learn() and apply_output_fn() methods on every Projection
-        to this Sheet.
+        By default, call the learn() and apply_learn_output_fn()
+        methods on every Projection to this Sheet.
         
         Any other type of learning can be implemented by overriding this method.
         Called from self.process_current_time() _after_ activity has
@@ -162,7 +176,7 @@ class ProjectionSheet(Sheet):
                 topo.sim.debug("Skipping non-Projection "+proj.name)
             else:
                 proj.learn()
-                proj.apply_output_fn()
+                proj.apply_learn_output_fn(self.activity)
 
 
     def present_input(self,input_activity,conn):
