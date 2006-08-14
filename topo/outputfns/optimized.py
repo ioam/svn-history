@@ -41,7 +41,7 @@ class CFPOF_DivisiveNormalizeL1_opt(CFPOutputFn):
                 PyObject *cfsr = PyList_GetItem(cfs,r);
                 for (int l=0; l<cols; ++l) {
                     double load = *x++;
-                    //if (load != 0)
+                    if (load != 0)
                     {
                         PyObject *cf = PyList_GetItem(cfsr,l);
                         PyObject *weights_obj = PyObject_GetAttrString(cf,"weights");
