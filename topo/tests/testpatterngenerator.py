@@ -171,41 +171,34 @@ class TestPatternGenerator(unittest.TestCase):
 
     def test_composite_pattern_basic(self):
         """
-        Test that a composite pattern consisting of just one Gaussian is the same
-        as that actual Gaussian pattern, and similarly for a composite pattern of
-        two rectangles.
+        Test that a composite pattern consisting of just one Gaussian
+        is the same as that actual Gaussian pattern, and that a
+        composite pattern of two rectangles is the same as adding the
+        two individual matrices.
         """
-# CEBHACKALERT: test commented out because although it passes if this
-# test is run by itself, if it is run as part of the suite it fails.
-# Presumably this is because a class default has been set elsewhere in the
-# tests, but is assumed to have some other value for this test.
-# Should be easy to fix.
-##         g = Gaussian(size=0.2,aspect_ratio=0.5)
-##         c = CompositePatternGenerator(generators=[g])
-##         assert_array_equal(g(),c())
+        bbox=BoundingBox(radius=0.5)
+        g = Gaussian(size=0.2,aspect_ratio=0.5,bounds=bbox,orientation=0,x=0.2,y=-0.03)
+        c = CompositePatternGenerator(generators=[g],bounds=bbox)
+        assert_array_equal(g(),c())
 
-##         r1=Rectangle(size=0.2,aspect_ratio=1,xdensity=10,ydensity=10,x=0.3,y=0.3)
-##         r2=Rectangle(size=0.2,aspect_ratio=1,xdensity=10,ydensity=10,x=-0.3,y=-0.3)
-##         c_true = r1()+r2()        
-##         c = CompositePatternGenerator(generators=[r1,r2])
-##         assert_array_equal(c(),c_true)
-               # test that moving is ok
+        r1=Rectangle(size=0.2,aspect_ratio=1,xdensity=10,ydensity=10,x=0.3,y=0.3,orientation=0)
+        r2=Rectangle(size=0.2,aspect_ratio=1,xdensity=10,ydensity=10,x=-0.3,y=-0.3,orientation=0)
+        c_true = r1()+r2()
+        c = CompositePatternGenerator(generators=[r1,r2])
+        assert_array_equal(c(),c_true)
 
+        
+    def test_composite_pattern_moves(self):
+        """
+        Test that moving a composite pattern yields the correct pattern.
+        """
+        bbox=BoundingBox(radius=0.5)
+        g = Gaussian(size=0.2,aspect_ratio=0.5,xdensity=7,ydensity=7,bounds=bbox,orientation=pi/3,x=0,y=0)
+        c = CompositePatternGenerator(xdensity=7,ydensity=7,generators=[g],x=-0.3,y=0.4,bounds=bbox)
+        g_moved = g(x=-0.3,y=0.4)
 
-# CEBHACKALERT: this test genuinely fails, because the moved
-# composite is very slightly different from the moved gaussian -
-# almost like they are being normalized differently, though I doubt
-# that is the problem.
-##     def test_composite_pattern_moves(self):
-##         """
-##         Test that moving a composite pattern yields the correct pattern.
-##         """
-##         g = Gaussian(size=0.2,aspect_ratio=0.5,xdensity=7,ydensity=7)
-##         c = CompositePatternGenerator(xdensity=7,ydensity=7,generators=[g],
-##                                       x=-0.3,y=0.4)
-
-##         g_moved = g(x=-0.3,y=0.4)
-##         assert_array_equal(c(),g_moved)
+        # JABHACKALERT: Fails; needs to be fixed.
+        #assert_array_equal(c(),g_moved)
 
 
 
