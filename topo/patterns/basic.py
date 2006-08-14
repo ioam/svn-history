@@ -247,7 +247,6 @@ class SquareGrating(PatternGenerator):
 
 # CEBALERT: not sure where this class should go.  Maybe it could
 # be generalized further and moved elsewhere.
-# Also, will need updating when Sheet is cleaned up.
 from Numeric import ones
 
 from topo.base.parameterizedobject import ParameterizedObject
@@ -267,8 +266,9 @@ class PatternSampler(ParameterizedObject):
 
     def __init__(self, pattern_array, whole_pattern_output_fn=IdentityOF(), background_value_fn=None):
         """
-        Create a Sheet whose activity is pattern_array (where pattern_array
-        is a Numeric array), modified in place by whole_pattern_output_fn.
+        Create a SheetCoordinateSystem whose activity is pattern_array
+        (where pattern_array is a Numeric array), modified in place by
+        whole_pattern_output_fn.
 
         If supplied, background_value_fn must accept an array and return a scalar.
 
@@ -450,16 +450,6 @@ class CompositePatternGenerator(PatternGenerator):
 
         assert hasattr(self.operator,'reduce'),repr(self.operator)+" does not support 'reduce'."
 
-
-        # CEB: Could skip re-generation if nothing has
-        # changed.  But that involves checking the component
-        # PatternGenerators haven't also changed (e.g. had a parameter
-        # altered), which I'm not sure how to do in a reasonable
-        # way. Alternatively, we could just say that if the list
-        # doesn't change, we don't change the Composite - even though
-        # a component PatternGenerator might have changed.
-
-
         patterns = []
         
         for pg in self.generators:
@@ -476,14 +466,3 @@ class CompositePatternGenerator(PatternGenerator):
                   float(ydensity),
                   size_normalization,
                   float(width),float(height))
-
-
-
-
-
-
-
-
-
-
-        
