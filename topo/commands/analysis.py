@@ -263,30 +263,30 @@ def measure_cog():
 
     for sheet in measured_sheets:
         for proj in sheet.in_connections:
-            rows,cols=sheet.activity.shape
-            xpref=zeros((rows,cols),Float)
-            ypref=zeros((rows,cols),Float)
-            for r in xrange(rows):
-                for c in xrange(cols):
-                    cf=proj.cf(r,c)
-                    r1,r2,c1,c2 = cf.slice_array
-                    row_centroid,col_centroid = centroid(cf.weights)
-                    xcentroid, ycentroid = proj.src.matrix2sheet(
+	    if proj.src.name == 'Retina':
+		rows,cols=sheet.activity.shape
+		xpref=zeros((rows,cols),Float)
+		ypref=zeros((rows,cols),Float)
+		for r in xrange(rows):
+		    for c in xrange(cols):
+			cf=proj.cf(r,c)
+			r1,r2,c1,c2 = cf.slice_array
+			row_centroid,col_centroid = centroid(cf.weights)
+			xcentroid, ycentroid = proj.src.matrix2sheet(
                         r1+row_centroid+0.5,
                         c1+col_centroid+0.5)
                     
-                    xpref[r][c]= xcentroid
-                    ypref[r][c]= ycentroid
+			xpref[r][c]= xcentroid
+			ypref[r][c]= ycentroid
                     
-                    ### JCHACKALERT: This will need to be extended to work
-                    ### when there are multiple projections to this sheet;
-                    ### right now only the last one in the list will show
-                    ### up.
+                    ### JLHACKALERT: This currently only works if there is a 
+                    ### projection from a sheet called 'Retina' (presumed to be the afferent) - will not work for a 
+                    ### more general case. There is probably a better way.
                     
-                    new_view = SheetView((xpref,sheet.bounds), sheet.name,sheet.precedence)
-                    sheet.sheet_view_dict['XCoG']=new_view
-                    new_view = SheetView((ypref,sheet.bounds), sheet.name,sheet.precedence)
-                    sheet.sheet_view_dict['YCoG']=new_view
+			new_view = SheetView((xpref,sheet.bounds), sheet.name,sheet.precedence)
+			sheet.sheet_view_dict['XCoG']=new_view
+			new_view = SheetView((ypref,sheet.bounds), sheet.name,sheet.precedence)
+			sheet.sheet_view_dict['YCoG']=new_view
     
                 
 
