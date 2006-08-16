@@ -255,15 +255,21 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
 
 
 
-def measure_cog():
+def measure_cog(display_proj_from ="Retina"):    
     """Calculate center of gravity for each CF of each unit in each CFSheet."""
-
+    
+    
     f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
     measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
-
+    
     for sheet in measured_sheets:
-        for proj in sheet.in_connections:
-	    if proj.src.name == 'Retina':
+	for proj in sheet.in_connections:
+	    sheet_name=proj.src.name
+	  #JLHACKALERT could use these lines to choose a projection instead of a sheet but then run 
+	  #into problems with diplaying more than one projection for each sheet in the gui.
+	  #	v = proj.get_projection_view()   
+          #     pname=v.projection.name
+	    if sheet_name == display_proj_from :
 		rows,cols=sheet.activity.shape
 		xpref=zeros((rows,cols),Float)
 		ypref=zeros((rows,cols),Float)
@@ -273,15 +279,16 @@ def measure_cog():
 			r1,r2,c1,c2 = cf.slice_array
 			row_centroid,col_centroid = centroid(cf.weights)
 			xcentroid, ycentroid = proj.src.matrix2sheet(
-                        r1+row_centroid+0.5,
-                        c1+col_centroid+0.5)
+			        r1+row_centroid+0.5,
+				c1+col_centroid+0.5)
                     
 			xpref[r][c]= xcentroid
 			ypref[r][c]= ycentroid
                     
-                    ### JLHACKALERT: This currently only works if there is a 
-                    ### projection from a sheet called 'Retina' (presumed to be the afferent) - will not work for a 
-                    ### more general case. There is probably a better way.
+                    ### JLHACKALERT: The default display works if there are projections 
+                    ### from a sheet called 'Retina' (presumed to be the afferent) 
+		    ##	if there is more than one projection from this sheet only the last one 
+		    ##	in the in_connections[] list will be plotted.
                     
 			new_view = SheetView((xpref,sheet.bounds), sheet.name,sheet.precedence)
 			sheet.sheet_view_dict['XCoG']=new_view
