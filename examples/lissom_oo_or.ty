@@ -84,10 +84,10 @@ centerg = topo.patterns.basic.Gaussian(
 surroundg = topo.patterns.basic.Gaussian(
     size=0.2954, aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
 
-on_weights = topo.patterns.basic.CompositePatternGenerator(
+on_weights = topo.patterns.basic.Composite(
     generators=[centerg,surroundg],operator=Wrapper("Numeric.subtract"))
 
-off_weights = topo.patterns.basic.CompositePatternGenerator(
+off_weights = topo.patterns.basic.Composite(
     generators=[surroundg,centerg],operator=Wrapper("Numeric.subtract"))
 
 

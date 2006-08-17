@@ -61,7 +61,7 @@ latexs=0.1
 latinhs=0.23
 
 from math import floor
-from topo.patterns.basic import CompositePatternGenerator
+from topo.patterns.basic import Composite
 
 
 #this one for small receptive fields
@@ -164,7 +164,7 @@ topo.sim.name='big and small'
 
 topo.sim['Retina'] = GeneratorSheet(nominal_density=24.0,nominal_bounds=BoundingBox(radius=v1size+retinabuffer),input_generator=input_pattern,phase=0.05)
                         
-#topo.sim['Retina'] = GeneratorSheet(density=12.0,bounds=BoundingBox(radius=v1size+retinabuffer),input_generator=CompositePatternGenerator([input_pattern,input_pattern,input_pattern,input_pattern]),phase=0.05)
+#topo.sim['Retina'] = GeneratorSheet(density=12.0,bounds=BoundingBox(radius=v1size+retinabuffer),input_generator=Composite([input_pattern,input_pattern,input_pattern,input_pattern]),phase=0.05)
                         
 topo.sim['LGNOn'] = CFSheet(
 	nominal_density=12.0,nominal_bounds=BoundingBox(radius=v1size+lgnbuffer),

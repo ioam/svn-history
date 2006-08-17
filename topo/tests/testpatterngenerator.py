@@ -14,7 +14,7 @@ from MLab import rot90
 from topo.base.patterngenerator import Constant
 from topo.base.boundingregion import BoundingBox
 
-from topo.patterns.basic import Rectangle,Gaussian,CompositePatternGenerator
+from topo.patterns.basic import Rectangle,Gaussian,Composite
 
 from utils import assert_array_equal
 
@@ -178,13 +178,13 @@ class TestPatternGenerator(unittest.TestCase):
         """
         bbox=BoundingBox(radius=0.5)
         g = Gaussian(size=0.2,aspect_ratio=0.5,bounds=bbox,orientation=0,x=0.2,y=-0.03)
-        c = CompositePatternGenerator(generators=[g],bounds=bbox)
+        c = Composite(generators=[g],bounds=bbox)
         assert_array_equal(g(),c())
 
         r1=Rectangle(size=0.2,aspect_ratio=1,xdensity=10,ydensity=10,x=0.3,y=0.3,orientation=0)
         r2=Rectangle(size=0.2,aspect_ratio=1,xdensity=10,ydensity=10,x=-0.3,y=-0.3,orientation=0)
         c_true = r1()+r2()
-        c = CompositePatternGenerator(generators=[r1,r2])
+        c = Composite(generators=[r1,r2])
         assert_array_equal(c(),c_true)
 
         
@@ -194,7 +194,7 @@ class TestPatternGenerator(unittest.TestCase):
         """
         bbox=BoundingBox(radius=0.5)
         g = Gaussian(size=0.2,aspect_ratio=0.5,xdensity=7,ydensity=7,bounds=bbox,orientation=pi/3,x=0,y=0)
-        c = CompositePatternGenerator(xdensity=7,ydensity=7,generators=[g],x=-0.3,y=0.4,bounds=bbox)
+        c = Composite(xdensity=7,ydensity=7,generators=[g],x=-0.3,y=0.4,bounds=bbox)
         g_moved = g(x=-0.3,y=0.4)
 
         assert_array_equal(c(),g_moved)

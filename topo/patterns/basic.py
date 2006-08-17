@@ -440,7 +440,3 @@ class Composite(PatternGenerator):
                     for pg in self.generators]
         image_array = self.operator.reduce(patterns)
         return image_array
-
-# Temporary
-CompositePatternGenerator=Composite
-
