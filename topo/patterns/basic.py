@@ -410,6 +410,9 @@ class Composite(PatternGenerator):
     generators = Parameter(default=[],precedence=0.97,
         doc="List of patterns to use in the composite pattern.")
 
+    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+        precedence=0.30,doc="Height of the composite pattern.")
+
     def __init__(self,generators=[Disk(x=-0.3,aspect_ratio=0.5),
                                   Disk(x= 0.3,aspect_ratio=0.5)],**params):
         super(Composite,self).__init__(**params)
@@ -428,11 +431,12 @@ class Composite(PatternGenerator):
         x=params.get('x',self.x)
         y=params.get('y',self.y)
         orientation=params.get('orientation',self.orientation)
-        
+        size=params.get('size',self.size)
+
         patterns = [pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
-                       x=x+pg.x*cos(orientation)+pg.y*sin(orientation),
-                       y=y+pg.x*sin(orientation)+pg.y*cos(orientation),
-                       orientation=pg.orientation+orientation)
+                       x=(x+pg.x*cos(orientation)+pg.y*sin(orientation))*size,
+                       y=(y+pg.x*sin(orientation)+pg.y*cos(orientation))*size,
+                       orientation=pg.orientation+orientation,size=pg.size*size)
                     for pg in self.generators]
         image_array = self.operator.reduce(patterns)
         return image_array
