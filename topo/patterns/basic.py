@@ -281,8 +281,8 @@ class Composite(PatternGenerator):
         size=params.get('size',self.size)
 
         patterns = [pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
-                       x=(x+pg.x*cos(orientation)+pg.y*sin(orientation))*size,
-                       y=(y+pg.x*sin(orientation)+pg.y*cos(orientation))*size,
+                       x=x+size*pg.x*cos(orientation)+pg.y*sin(orientation),
+                       y=y+size*pg.x*sin(orientation)+pg.y*cos(orientation),
                        orientation=pg.orientation+orientation,size=pg.size*size)
                     for pg in self.generators]
         image_array = self.operator.reduce(patterns)
