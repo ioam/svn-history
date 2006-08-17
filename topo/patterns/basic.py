@@ -404,10 +404,6 @@ class Composite(PatternGenerator):
     single pattern that it returns.
     """
 
-    # The size_normalization and whole_image_output_fn are hidden,
-    # because they don't (yet) have an obvious meaning for a
-    # CompositePatternGenerator.
-
     operator = Parameter(default=Wrapper("Numeric.add"),precedence=0.98,
         doc="Numeric function used to combine the individual patterns.")
     
