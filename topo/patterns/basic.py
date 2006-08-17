@@ -424,8 +424,11 @@ class Composite(PatternGenerator):
         bounds = params.get('bounds',self.bounds)
         xdensity=params.get('xdensity',self.xdensity)
         ydensity=params.get('ydensity',self.ydensity)
+        x=params.get('x',self.x)
+        y=params.get('y',self.y)
 
-        patterns = [pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds)
+        patterns = [pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
+                       x=pg.x+x,y=pg.y+y)
                     for pg in self.generators]
         image_array = self.operator.reduce(patterns)
         return image_array

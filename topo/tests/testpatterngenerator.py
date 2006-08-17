@@ -197,8 +197,7 @@ class TestPatternGenerator(unittest.TestCase):
         c = CompositePatternGenerator(xdensity=7,ydensity=7,generators=[g],x=-0.3,y=0.4,bounds=bbox)
         g_moved = g(x=-0.3,y=0.4)
 
-        # JABHACKALERT: Fails; needs to be fixed.
-        #assert_array_equal(c(),g_moved)
+        assert_array_equal(c(),g_moved)
 
 
 
