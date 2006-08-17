@@ -5,7 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from math import pi
+from math import pi, sin, cos
 from Numeric import around,bitwise_and,sin,add,Float,bitwise_or
 
 from topo.base.parameterclasses import Number, Parameter, Enumeration
@@ -410,7 +410,8 @@ class Composite(PatternGenerator):
     generators = Parameter(default=[],precedence=0.97,
         doc="List of patterns to use in the composite pattern.")
 
-    def __init__(self,generators=[Disk(x=-0.3),Disk(x=0.3)],**params):
+    def __init__(self,generators=[Disk(x=-0.3,aspect_ratio=0.5),
+                                  Disk(x= 0.3,aspect_ratio=0.5)],**params):
         super(Composite,self).__init__(**params)
         self.generators = generators
         
@@ -426,9 +427,12 @@ class Composite(PatternGenerator):
         ydensity=params.get('ydensity',self.ydensity)
         x=params.get('x',self.x)
         y=params.get('y',self.y)
-
+        orientation=params.get('orientation',self.orientation)
+        
         patterns = [pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
-                       x=pg.x+x,y=pg.y+y)
+                       x=x+pg.x*cos(orientation)+pg.y*sin(orientation),
+                       y=y+pg.x*sin(orientation)+pg.y*cos(orientation),
+                       orientation=pg.orientation+orientation)
                     for pg in self.generators]
         image_array = self.operator.reduce(patterns)
         return image_array
