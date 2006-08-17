@@ -255,7 +255,7 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
 
 
 
-def measure_cog(display_proj_from ="Retina"):    
+def measure_cog(display_projection ="Afferent"):    
     """Calculate center of gravity for each CF of each unit in each CFSheet."""
     
     
@@ -264,12 +264,7 @@ def measure_cog(display_proj_from ="Retina"):
     
     for sheet in measured_sheets:
 	for proj in sheet.in_connections:
-	    sheet_name=proj.src.name
-	  #JLHACKALERT could use these lines to choose a projection instead of a sheet but then run 
-	  #into problems with diplaying more than one projection for each sheet in the gui.
-	  #	v = proj.get_projection_view()   
-          #     pname=v.projection.name
-	    if sheet_name == display_proj_from :
+	    if proj.name == display_projection :
 		rows,cols=sheet.activity.shape
 		xpref=zeros((rows,cols),Float)
 		ypref=zeros((rows,cols),Float)
@@ -285,10 +280,9 @@ def measure_cog(display_proj_from ="Retina"):
 			xpref[r][c]= xcentroid
 			ypref[r][c]= ycentroid
                     
-                    ### JLHACKALERT: The default display works if there are projections 
-                    ### from a sheet called 'Retina' (presumed to be the afferent) 
-		    ##	if there is more than one projection from this sheet only the last one 
-		    ##	in the in_connections[] list will be plotted.
+		    ### JLHACKALERT: The default display works if there is a projection 
+                    ### called 'Afferent'otherwise each projection will need to be typed separately
+		    ##	only one projection from each sheet is displayed in the gui window at one time
                     
 			new_view = SheetView((xpref,sheet.bounds), sheet.name,sheet.precedence)
 			sheet.sheet_view_dict['XCoG']=new_view
