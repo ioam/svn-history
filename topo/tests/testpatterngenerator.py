@@ -177,14 +177,14 @@ class TestPatternGenerator(unittest.TestCase):
         two individual matrices.
         """
         bbox=BoundingBox(radius=0.5)
-        g = Gaussian(size=0.2,aspect_ratio=0.5,bounds=bbox,orientation=0,x=0.2,y=-0.03)
-        c = Composite(generators=[g],bounds=bbox)
-        assert_array_equal(g(),c())
+        g = Gaussian(size=0.2,aspect_ratio=0.5,orientation=0,x=0.2,y=-0.03)
+        c = Composite(generators=[g],bounds=bbox,xdensity=7,ydensity=7)
+        assert_array_equal(g(bounds=bbox,xdensity=7,ydensity=7),c())
 
-        r1=Rectangle(size=0.2,aspect_ratio=1,xdensity=10,ydensity=10,x=0.3,y=0.3,orientation=0)
-        r2=Rectangle(size=0.2,aspect_ratio=1,xdensity=10,ydensity=10,x=-0.3,y=-0.3,orientation=0)
-        c_true = r1()+r2()
-        c = Composite(generators=[r1,r2])
+        r1=Rectangle(size=0.2,aspect_ratio=1,x=0.3,y=0.3,orientation=0)
+        r2=Rectangle(size=0.2,aspect_ratio=1,x=-0.3,y=-0.3,orientation=0,bounds=BoundingBox(radius=0.8),xdensity=2)
+        c_true = r1(bounds=bbox,xdensity=7,ydensity=7)+r2(bounds=bbox,xdensity=7,ydensity=7)
+        c = Composite(generators=[r1,r2],bounds=bbox,xdensity=7,ydensity=7)
         assert_array_equal(c(),c_true)
 
         
@@ -193,13 +193,13 @@ class TestPatternGenerator(unittest.TestCase):
         Test that moving a composite pattern yields the correct pattern.
         """
         bbox=BoundingBox(radius=0.5)
-        g = Gaussian(size=0.2,aspect_ratio=0.5,xdensity=7,ydensity=7,bounds=bbox,orientation=pi/3,x=0,y=0)
-        c = Composite(xdensity=7,ydensity=7,generators=[g],x=-0.3,y=0.4,bounds=bbox)
-        g_moved = g(x=-0.3,y=0.4)
+        g = Gaussian(size=0.2,aspect_ratio=0.5,orientation=pi/3,x=0,y=0)
+        c = Composite(generators=[g],x=-0.3,y=0.4,xdensity=4,ydensity=4,bounds=bbox)
+        g_moved = g(x=-0.3,y=0.4,xdensity=4,ydensity=4,bounds=bbox)
 
         assert_array_equal(c(),g_moved)
 
-
+    # Should also test rotating, resizing...
 
 
 suite = unittest.TestSuite()
