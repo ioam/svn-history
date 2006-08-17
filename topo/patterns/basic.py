@@ -246,7 +246,8 @@ class SquareGrating(PatternGenerator):
 
 
 # CEBALERT: not sure where this class should go.  Maybe it could
-# be generalized further and moved elsewhere.
+# be generalized further and moved elsewhere.  JAB: Presumably
+# it can go into image.py, since it's not used here anymore.
 from Numeric import ones
 
 from topo.base.parameterizedobject import ParameterizedObject
@@ -393,9 +394,9 @@ class PatternSampler(ParameterizedObject):
             raise ValueError("Unknown scaling option",scaling)
 
 
-# CEBHACKALERT: this new version is untested (as was the old one...)
+
 from topo.base.parameterclasses import Wrapper
-class CompositePatternGenerator(PatternGenerator):
+class Composite(PatternGenerator):
     """
     PatternGenerator that accepts a list of other PatternGenerators.
     To create a new pattern, asks each of the PatternGenerators in the
@@ -407,62 +408,32 @@ class CompositePatternGenerator(PatternGenerator):
     # because they don't (yet) have an obvious meaning for a
     # CompositePatternGenerator.
 
-    output_fn = OutputFnParameter(default=IdentityOF())
-
     operator = Parameter(default=Wrapper("Numeric.add"),precedence=0.98,
         doc="Numeric function used to combine the individual patterns.")
     
     generators = Parameter(default=[],precedence=0.97,
         doc="List of patterns to use in the composite pattern.")
 
-    aspect_ratio = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-        precedence=0.31,
-        doc="Ratio of width to height of the composite pattern.")
-    
-    size = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-        precedence=0.30,doc="Height of the composite pattern.")
-
-    size_normalization = Enumeration(hidden='True',default='original',precedence=0.95,
-        available=['fit_shortest','fit_longest','stretch_to_fit','original'],
-        doc='How to scale the initial image size relative to the default area of 1.0.')
-
-    whole_image_output_fn = OutputFnParameter(
-        hidden='True',default=IdentityOF(),precedence=0.96,
-        doc='Function applied to the whole composite array (before any cropping).')
-
-
     def __init__(self,generators=[Disk(x=-0.3),Disk(x=0.3)],**params):
-        super(CompositePatternGenerator,self).__init__(**params)
+        super(Composite,self).__init__(**params)
         self.generators = generators
-        self.image_array = None
+        
+        assert hasattr(self.operator,'reduce'),repr(self.operator)+" does not support 'reduce'."
 
+        for pg in self.generators:
+            assert isinstance(pg,PatternGenerator),repr(pg)+" is not a PatternGenerator."
 
     def function(self,**params):
-        size_normalization = params.get('scaling',self.size_normalization)
-        whole_image_output_fn = params.get('whole_image_output_fn',
-                                           self.whole_image_output_fn)
+        """Constructs combined pattern out of the individual ones."""
         bounds = params.get('bounds',self.bounds)
         xdensity=params.get('xdensity',self.xdensity)
         ydensity=params.get('ydensity',self.ydensity)
-        height = params.get('size',self.size)
-        width = (params.get('aspect_ratio',self.aspect_ratio))*height
 
-
-        assert hasattr(self.operator,'reduce'),repr(self.operator)+" does not support 'reduce'."
-
-        patterns = []
-        
-        for pg in self.generators:
-            assert isinstance(pg,PatternGenerator),repr(pg)+" is not a PatternGenerator."
-            patterns.append(pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds))
-        
+        patterns = [pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds)
+                    for pg in self.generators]
         image_array = self.operator.reduce(patterns)
+        return image_array
 
-        ps = PatternSampler(image_array,whole_image_output_fn)
+# Temporary
+CompositePatternGenerator=Composite
 
-
-        return ps(self.pattern_x,self.pattern_y,
-                  float(xdensity),
-                  float(ydensity),
-                  size_normalization,
-                  float(width),float(height))
