@@ -242,7 +242,6 @@ class SquareGrating(PatternGenerator):
         return around(0.5 + 0.5*sin(frequency*2*pi*self.pattern_y + phase))
 
 
-
 class Composite(PatternGenerator):
     """
     PatternGenerator that accepts a list of other PatternGenerators.
@@ -251,8 +250,52 @@ class Composite(PatternGenerator):
     single pattern that it returns.
     """
 
-    operator = Parameter(default=Wrapper("Numeric.add"),precedence=0.98,
-        doc="Numeric function used to combine the individual patterns.")
+    # The Accum_Replace operator from LISSOM is not yet supported,
+    # but it should be added once PatternGenerator bounding boxes
+    # are respected and/or Image patterns support transparency.
+    operator = Parameter(default=Wrapper("Numeric.maximum"),precedence=0.98,doc="""
+        Binary Numeric function used to combine the individual patterns.
+
+        Any binary Numeric array "ufunc" returning the same
+        type of array as the operands and supporting the reduce
+        operator is allowed here.  Supported ufuncs include:
+
+          add
+          subtract
+          multiply
+          divide
+          maximum
+          minimum
+          remainder
+          power
+          logical_and
+          logical_or
+          logical_xor
+
+        The most useful ones are probably add and maximum, but there
+        are uses for at least some of the others as well (e.g. to
+        remove pieces of other patterns).
+
+        The function is specified as a string with the complete
+        pathname to the ufunc (e.g. "Numeric.add"); when that string
+        is evaluated in the main namespace an appropriate ufunc should
+        be returned.  (This approach is required to allow these
+        objects to be pickled; Numeric ufuncs themselves are not
+        picklable.
+
+        You can also write your own operators, by making a class that
+        has a static method named reduce that returns an array of the
+        same size and type as the objects in the list.  For example:
+        
+        class return_first(object):
+            @staticmethod
+            def reduce(x):
+                return x[0]
+
+        At the moment, this must be put into a top-level module, such as
+        topo.return_first=return_first, for the Wrapper class to be able
+        to locate it.
+        """)
     
     generators = Parameter(default=[],precedence=0.97,
         doc="List of patterns to use in the composite pattern.")
@@ -270,6 +313,9 @@ class Composite(PatternGenerator):
         for pg in self.generators:
             assert isinstance(pg,PatternGenerator),repr(pg)+" is not a PatternGenerator."
 
+    # JABALERT: To support large numbers of patterns on a large input region,
+    # should be changed to evaluate each pattern in a small box, and then
+    # combine them at the full Composite Bounding box size.
     def function(self,**params):
         """Constructs combined pattern out of the individual ones."""
         bounds = params.get('bounds',self.bounds)
