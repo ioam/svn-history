@@ -276,25 +276,25 @@ class Composite(PatternGenerator):
         are uses for at least some of the others as well (e.g. to
         remove pieces of other patterns).
 
-        The function is specified as a string with the complete
-        pathname to the ufunc (e.g. "Numeric.add"); when that string
-        is evaluated in the main namespace an appropriate ufunc should
-        be returned.  (This approach is required to allow these
-        objects to be pickled; Numeric ufuncs themselves are not
-        picklable.
+        The function is specified using the Wrapper class as a string
+        with the complete pathname to the ufunc
+        (e.g. Wrapper("Numeric.add")); when that string is evaluated
+        in the main namespace an appropriate ufunc should be returned.
+        (This approach is required to allow these objects to be
+        pickled; Numeric ufuncs themselves are not picklable.
 
         You can also write your own operators, by making a class that
-        has a static method named reduce that returns an array of the
-        same size and type as the objects in the list.  For example:
+        has a static method named "reduce" that returns an array of the
+        same size and type as the arrays in the list.  For example:
         
         class return_first(object):
             @staticmethod
             def reduce(x):
                 return x[0]
 
-        At the moment, this must be put into a top-level module, such as
-        topo.return_first=return_first, for the Wrapper class to be able
-        to locate it.
+        At the moment, this must be put into a top-level module,
+        perhaps by setting topo.return_first=return_first, for the
+        Wrapper class to be able to locate it.
         """)
     
     generators = Parameter(default=[],precedence=0.97,
