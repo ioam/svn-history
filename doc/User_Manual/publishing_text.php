@@ -1,7 +1,7 @@
 <H1>Publishing Topographica results</H1>
 
 <P>While many people will want to use Topographica for demonstrations,
-class tutorials, small projects, etc., many projects are expected to
+class tutorials, small projects, etc., other projects are expected to
 lead to a publication eventually.  There is still substantial work to
 be done to make Topographica output more useful for publications
 (volunteers welcome!); many of the visualizations, etc. are currently
