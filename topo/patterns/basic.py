@@ -8,7 +8,8 @@ __version__='$Revision$'
 from math import pi, sin, cos
 from Numeric import around,bitwise_and,sin,add,Float,bitwise_or
 
-from topo.base.parameterclasses import Number, Parameter, Enumeration, Wrapper
+from topo.base.parameterclasses import Number, Parameter, Enumeration
+from topo.base.parameterclasses import Wrapper, DynamicNumber
 from topo.base.functionfamilies import OutputFnParameter
 from topo.base.patterngenerator import PatternGenerator
 
@@ -16,7 +17,8 @@ from topo.base.patterngenerator import PatternGenerator
 from topo.base.patterngenerator import Constant
 
 from topo.misc.patternfns import gaussian,gabor,line,disk,ring
- 
+from topo.misc.utils import wrap
+from topo.misc.numbergenerators import UniformRandom
 
 class Gaussian(PatternGenerator):
     """
@@ -301,8 +303,8 @@ class Composite(PatternGenerator):
         doc="List of patterns to use in the composite pattern.")
 
     size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-        precedence=0.30,doc="Height of the composite pattern.")
-
+        precedence=0.30,doc="Scaling factor applied to all patterns.")
+        
     def __init__(self,generators=[Disk(x=-0.3,aspect_ratio=0.5),
                                   Disk(x= 0.3,aspect_ratio=0.5)],**params):
         super(Composite,self).__init__(**params)
@@ -332,4 +334,52 @@ class Composite(PatternGenerator):
                        orientation=pg.orientation+orientation,size=pg.size*size)
                     for pg in self.generators]
         image_array = self.operator.reduce(patterns)
+        return image_array
+
+
+
+class Selector(PatternGenerator):
+    """
+    PatternGenerator that selects from a list of other PatternGenerators.
+    """
+
+    generators = Parameter(default=[],precedence=0.97,
+        doc="List of patterns to choose from.")
+
+    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+        precedence=0.30,doc="Scaling factor applied to all patterns.")
+
+    index = DynamicNumber(default=UniformRandom(lbound=0,ubound=1.0,seed=76),
+        bounds=(-1.0,1.0),precedence=0.20,doc="""
+        Index into the list of generators, on a scale from 0 (start of the list)
+        to 1.0 (end of the list).  Typically a random value or other DynamicNumber,
+        to allow a different item to be selected each time.""")
+
+    def __init__(self,generators=[Disk(x=-0.3,aspect_ratio=0.5),
+                                  Rectangle(x=0.3,aspect_ratio=0.5)],**params):
+        super(Selector,self).__init__(**params)
+        self.generators = generators
+        assert len(generators)>0
+        for pg in self.generators:
+            assert isinstance(pg,PatternGenerator),repr(pg)+" is not a PatternGenerator."
+
+    def function(self,**params):
+        """Selects and returns one of the patterns in the list."""
+        bounds = params.get('bounds',self.bounds)
+        xdensity=params.get('xdensity',self.xdensity)
+        ydensity=params.get('ydensity',self.ydensity)
+        x=params.get('x',self.x)
+        y=params.get('y',self.y)
+        orientation=params.get('orientation',self.orientation)
+        size=params.get('size',self.size)
+        index=params.get('index',self.index)
+        int_index=int(len(self.generators)*wrap(0,1.0,index))
+
+        pg = self.generators[int_index]
+        
+        image_array = pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
+                         x=x+size*pg.x*cos(orientation)+pg.y*sin(orientation),
+                         y=y+size*pg.x*sin(orientation)+pg.y*cos(orientation),
+                         orientation=pg.orientation+orientation,size=pg.size*size)
+        
         return image_array
