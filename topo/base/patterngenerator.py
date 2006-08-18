@@ -192,4 +192,4 @@ class PatternGeneratorParameter(ClassSelectorParameter):
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,default=Constant(),**params):
-        super(PatternGeneratorParameter,self).__init__(PatternGenerator,default=default,suffix_to_lose='Generator',**params)
+        super(PatternGeneratorParameter,self).__init__(PatternGenerator,default=default,suffix_to_suppress='Generator',**params)
