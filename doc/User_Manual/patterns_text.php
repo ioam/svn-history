@@ -7,7 +7,13 @@ weight patterns, neighborhood kernels, or any similar application.
 
 <H2>Simple patterns</H2>
 
-<P>Topographica patterns are created using objects of type
+<P>The basic types of patterns supported by Topographica include:
+
+<center>
+<img src="images/patterntypes_small.png" width="598" height="209">
+</center>
+
+These patterns are created using objects of type
 <A HREF="../Reference_Manual/topo.base.patterngenerator.html">
 PatternGenerator</A>, which is an object that will return a 2D pattern
 when it is called as a function.  For instance, the Gaussian
@@ -66,9 +72,11 @@ in scripts the same way.
 <H2>Composite patterns</H2>
 
 <P>Often, rather than writing a new PatternGenerator class, you can
-combine existing PatternGenerators to make a new pattern.  For
-instance, you can make connection weights be random but with a
-Gaussian falloff in strength by setting:
+combine existing PatternGenerators to make a new pattern.  To do this,
+Topographica provides the special Composite PatternGenerator, which
+accepts a list of other PatternGenerators and an operator for
+combining them.  For instance, you can make connection weights be
+random but with a Gaussian falloff in strength by setting:
 
 <pre>
 CFProjection.weights_generator=topo.patterns.basic.Composite(
@@ -81,31 +89,54 @@ CFProjection.weights_generator=topo.patterns.basic.Composite(
 <img src="images/gaussianrandomweights.png" width=640 height=432>
 </center>
 
-<P>Similarly, you can construct patterns with different objects in
-fixed or variable positions relative to each other, adding or
-subtracting from each other (see the
+<P>Similarly, you can build up arbitrarily complex patterns by
+combining multiple PatternGenerators at different locations:
+
+<pre>
+$ ./topographica  -g
+Topographica&gt; from topo.patterns.basic import Gaussian, Disk, Composite
+Topographica&gt; from topo.base.parameterclasses import Wrapper
+Topographica&gt; lefteye    = Disk(    aspect_ratio=0.7, x=0.04, y=0.10, size=0.08, scale=1.00)
+Topographica&gt; leftpupil  = Disk(    aspect_ratio=1.0, x=0.03, y=0.08, size=0.04, scale=-1.6)
+Topographica&gt; righteye   = Disk(    aspect_ratio=0.7, x=0.04, y=-0.1, size=0.08, scale=1.00)
+Topographica&gt; rightpupil = Disk(    aspect_ratio=1.0, x=0.03, y=-0.08,size=0.04, scale=-1.6)
+Topographica&gt; nose       = Gaussian(aspect_ratio=0.8, x=-0.1, y=0.00, size=0.04, scale=-0.5)
+Topographica&gt; mouth      = Gaussian(aspect_ratio=0.8, x=-0.2, y=0.00, size=0.06, scale=-0.8)
+Topographica&gt; head       = Disk(    aspect_ratio=1.5, x=-0.02,y=0.00, size=0.40, scale=0.70)
+Topographica&gt; pg = Composite(generators=[lefteye,leftpupil,righteye,rightpupil,nose,mouth,head],
+Topographica&gt;                operator=Wrapper("Numeric.add"),xdensity=160,ydensity=160)
+Topographica&gt; matrixplot(pg(orientation=pi/1.8, x=0.2, y=0.1, offset=0.5, size=0.75))
+</pre>
+
+<center>
+<img src="images/face.png" width="310" height="299">
+</center>
+
+<P>Apart from adding the patterns, there are many other possible
+operators; see the
 <A HREF="../Reference_Manual/topo.patterns.basic.html#Composite">
-Composite parameter <code>operator</code></A>), etc.  In principle, any
-pattern can be constructed using Composite, but some will still be
-easier to do by coding a new PatternGenerator class.
+Composite parameter <code>operator</code></A>) for more details.
 
 
 <H2>Selector patterns</H2>
 
-<P>It is also often useful to choose from a set of different patterns,
-randomly or in order, such as from a set of natural images.  This can
-be done with the Selector PatternGenerator.  As a contrived example,
-weights can be choosen at random from a set of four different
-patterns:
+<P>Instead of combining the patterns, it can also be useful to choose
+one from a set of different patterns, such as choosing randomly from a
+database of natural images.  This can be done with the Selector
+PatternGenerator.  As a contrived example, weights can be choosen at
+random from a set of four different patterns:
 
 <pre>
 CFProjection.weights_generator=topo.patterns.basic.Selector(generators=[
-    topo.patterns.basic.Gaussian(orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=99))),
+    topo.patterns.basic.Gaussian(orientation=DynamicNumber(
+        UniformRandom(lbound=-pi,ubound=pi,seed=99))),
     topo.patterns.basic.Gaussian(aspect_ratio=1.0),
-    topo.patterns.basic.Rectangle(size=0.2,orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=99))),
+    topo.patterns.basic.Rectangle(size=0.2,orientation=DynamicNumber(
+        UniformRandom(lbound=-pi,ubound=pi,seed=99))),
     topo.patterns.basic.Disk(size=0.25)])
 </pre>
 
 <center>
 <img src="images/fourclassweights.png" width=640 height=436>
 </center>
+
