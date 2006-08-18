@@ -506,18 +506,18 @@ class ClassSelectorParameter(Parameter):
     Offers a range() method to return possible types that the
     value could be an instance of.
     """
-    __slots__ = ['class_','suffix_to_suppress']
+    __slots__ = ['class_','suffix_to_lose']
     __doc__ = property((lambda self: self.doc))
 
     def __init__(self,class_,default=None,instantiate=True,
-                 suffix_to_suppress='',**params):
+                 suffix_to_lose='',**params):
         
         self.class_ = class_
 
         # CEBALERT: Currently offers the possibility to cut off the
-        # end of a class name (suffix_to_suppress), but this could be
+        # end of a class name (suffix_to_lose), but this could be
         # extended to any processing of the class name.
-        self.suffix_to_suppress = suffix_to_suppress
+        self.suffix_to_lose = suffix_to_lose
 
         # CEBHACKALERT: check default's in range!
         Parameter.__init__(self,default=default,instantiate=instantiate,
@@ -547,9 +547,9 @@ class ClassSelectorParameter(Parameter):
 
     def __classname_repr(self, class_name):
         """
-        Return class_name stripped of self.suffix_to_suppress.
+        Return class_name stripped of self.suffix_to_lose.
         """
-        return re.sub(self.suffix_to_suppress+'$','',class_name)
+        return re.sub(self.suffix_to_lose+'$','',class_name)
 
 
 
