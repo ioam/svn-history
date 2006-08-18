@@ -42,9 +42,7 @@ class Gaussian(PatternGenerator):
         Specifically, xsigma=ysigma*aspect_ratio (see size).
         """)
     
-    size  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),
-        precedence=0.30,doc=
-        """
+    size  = Number(default=0.5,doc="""
         Overall size of the Gaussian, defined by:
         exp(-x^2/(2*xsigma^2) - y^2/(2*ysigma^2)
         where ysigma=size/2.
@@ -91,8 +89,8 @@ class Gabor(PatternGenerator):
         The width of the Gaussian component is size*aspect_ratio (see Gaussian).
         """)
     
-    size = Number(default=0.25,bounds=(0.0,None),softbounds=(0.0,2.0),
-        precedence=0.30,doc="Determines the height of the Gaussian component (see Gaussian).")
+    size = Number(default=0.25,doc="""
+        Determines the height of the Gaussian component (see Gaussian).""")
 
     def function(self,**params):
         height = params.get('size',self.size)/2.0
@@ -126,8 +124,7 @@ class Disk(PatternGenerator):
         precedence=0.31,doc=
         "Ratio of width to height; size*aspect_ratio gives the width of the disk.")
 
-    size  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),
-                   precedence=0.30,doc="Height of the disk")
+    size  = Number(default=0.5,doc="Top to bottom height of the disk")
     
     smoothing = Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
                        precedence=0.61,doc="Width of the Gaussian fall-off")
@@ -153,7 +150,7 @@ class Ring(PatternGenerator):
         precedence=0.31,doc=
         "Ratio of width to height; size*aspect_ratio gives the overall width.")
     
-    size = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),precedence=0.30)
+    size = Number(default=0.5)
 
     def function(self,**params):
         height = params.get('size',self.size)
@@ -171,8 +168,7 @@ class Rectangle(PatternGenerator):
         precedence=0.31,doc=
         "Ratio of width to height; size*aspect_ratio gives the width of the rectangle.")
     
-    size  = Number(default=0.5,bounds=(0.0,None),softbounds=(0.0,2.0),
-        precedence=0.30,doc="Height of the rectangle.")
+    size  = Number(default=0.5,doc="Height of the rectangle.")
 
     # We will probably want to add Fuzzy-style anti-aliasing to this.
 
@@ -302,8 +298,7 @@ class Composite(PatternGenerator):
     generators = ListParameter(default=[],precedence=0.97,class_=PatternGenerator,
         doc="List of patterns to use in the composite pattern.")
 
-    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-        precedence=0.30,doc="Scaling factor applied to all patterns.")
+    size  = Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
         
     def __init__(self,generators=[Disk(x=-0.3,aspect_ratio=0.5),
                                   Disk(x= 0.3,aspect_ratio=0.5)],**params):
@@ -341,16 +336,16 @@ class Selector(PatternGenerator):
     """
 
     generators = ListParameter(default=[Constant()],precedence=0.97,class_=PatternGenerator,bounds=(1,None),
-        doc="List of patterns to use in the composite pattern.")
+        doc="List of patterns from which to select.")
 
-    size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
-        precedence=0.30,doc="Scaling factor applied to all patterns.")
+    size  = Number(default=1.0,doc="Scaling factor applied to all sub-patterns.")
 
     index = DynamicNumber(default=UniformRandom(lbound=0,ubound=1.0,seed=76),
         bounds=(-1.0,1.0),precedence=0.20,doc="""
-        Index into the list of generators, on a scale from 0 (start of the list)
-        to 1.0 (end of the list).  Typically a random value or other DynamicNumber,
-        to allow a different item to be selected each time.""")
+        Index into the list of pattern generators, on a scale from 0
+        (start of the list) to 1.0 (end of the list).  Typically a
+        random value or other DynamicNumber, to allow a different item
+        to be selected each time.""")
 
     def __init__(self,generators=[Disk(x=-0.3,aspect_ratio=0.5),
                                   Rectangle(x=0.3,aspect_ratio=0.5)],**params):

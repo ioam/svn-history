@@ -33,6 +33,14 @@ class PatternGenerator(ParameterizedObject):
 
     The orientation and layout of the pattern matrices is defined by
     the SheetCoordinateSystem class, which see.
+
+    Note that not every parameter defined for a PatternGenerator will
+    be used by every subclass.  For instance, a Constant pattern will
+    ignore the x, y, orientation, and size parameters, because the
+    pattern does not vary with any of those parameters.  However,
+    those parameters are still defined for all PatternGenerators, even
+    Constant patterns, to allow PatternGenerators to be scaled, rotated,
+    translated, etc. uniformly.
     """
 
     # Declare that this class is abstract
@@ -64,6 +72,9 @@ class PatternGenerator(ParameterizedObject):
         doc="""Polar angle of pattern, i.e. the orientation in the Cartesian coordinate
         system, with zero at 3 o'clock and increasing counterclockwise.""")
     
+    size = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+        precedence=0.30,doc="""Determines the overall size of the pattern.""")
+
     scale = Number(
         default=1.0,softbounds=(0.0,2.0),precedence=0.10,
         doc="Multiplicative strength of input pattern, defaulting to 1.0")
