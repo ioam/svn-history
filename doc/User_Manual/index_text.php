@@ -13,6 +13,7 @@ usable.  Sections that are ready so far include:
 <A HREF="commandline.html">Using the Topographica command line</A><BR>
 <A HREF="parameters.html">Controlling simulation parameters</A><BR>
 <A HREF="modeleditor.html">Graphical model editor</A><BR>
+<A HREF="patterns.html">Generating patterns</A><BR>
 <!-- <A HREF="features.html">Topographica features</A><BR> -->
 <A HREF="publishing.html">Publishing results from Topographica</A><BR>
 <A HREF="about.html">About Topographica</A><BR>
