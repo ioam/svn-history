@@ -29,7 +29,8 @@ plots.
 
 
 <li>
-2006/05/15 (CB): Matching lissom_oo_or with C++ lissom. 
+2006/05/15 (CB): Matching lissom_oo_or with C++ lissom, and setting up tests
+to check that automatically.
 </li>
 
 
@@ -37,10 +38,6 @@ plots.
 2006/05/23 (JB): binding help balloon to the widget (already bound to the label) in parametersframe so that help can be seen for objects that are e.g. being selected.
 </li>
 
-
-<li>
-2006/04/07: (CB) Allowing joint normalization of projections for a CFSheet. [This appears to work, but results from LISSOM simulations do not yet match those of C++ LISSOM.]
-</li>
 
 <li>
 2006/07/07 (JB): Fix normalization to allow negative weights.  Also
@@ -148,8 +145,7 @@ Need to make sure DynamicNumbers are advanced only once per simulation time.
 </li>
 
 <li>
-2006/04/20 (JB): write test file for Composite and complete Image's test file.  Clean 
-up the Composite pattern.
+2006/04/20 (JB): Complete test file for Composite and Image.
 </li>
 
 <li>
