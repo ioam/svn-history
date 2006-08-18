@@ -9,7 +9,7 @@ from math import pi, sin, cos
 from Numeric import around,bitwise_and,sin,add,Float,bitwise_or
 
 from topo.base.parameterclasses import Number, Parameter, Enumeration
-from topo.base.parameterclasses import Wrapper, DynamicNumber
+from topo.base.parameterclasses import Wrapper, DynamicNumber, ListParameter
 from topo.base.functionfamilies import OutputFnParameter
 from topo.base.patterngenerator import PatternGenerator
 
@@ -299,7 +299,7 @@ class Composite(PatternGenerator):
         Wrapper class to be able to locate it.
         """)
     
-    generators = Parameter(default=[],precedence=0.97,
+    generators = ListParameter(default=[],precedence=0.97,class_=PatternGenerator,
         doc="List of patterns to use in the composite pattern.")
 
     size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
@@ -309,11 +309,8 @@ class Composite(PatternGenerator):
                                   Disk(x= 0.3,aspect_ratio=0.5)],**params):
         super(Composite,self).__init__(**params)
         self.generators = generators
-        
         assert hasattr(self.operator,'reduce'),repr(self.operator)+" does not support 'reduce'."
 
-        for pg in self.generators:
-            assert isinstance(pg,PatternGenerator),repr(pg)+" is not a PatternGenerator."
 
     # JABALERT: To support large numbers of patterns on a large input region,
     # should be changed to evaluate each pattern in a small box, and then
@@ -343,8 +340,8 @@ class Selector(PatternGenerator):
     PatternGenerator that selects from a list of other PatternGenerators.
     """
 
-    generators = Parameter(default=[],precedence=0.97,
-        doc="List of patterns to choose from.")
+    generators = ListParameter(default=[Constant()],precedence=0.97,class_=PatternGenerator,bounds=(1,None),
+        doc="List of patterns to use in the composite pattern.")
 
     size  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.30,doc="Scaling factor applied to all patterns.")
@@ -359,9 +356,6 @@ class Selector(PatternGenerator):
                                   Rectangle(x=0.3,aspect_ratio=0.5)],**params):
         super(Selector,self).__init__(**params)
         self.generators = generators
-        assert len(generators)>0
-        for pg in self.generators:
-            assert isinstance(pg,PatternGenerator),repr(pg)+" is not a PatternGenerator."
 
     def function(self,**params):
         """Selects and returns one of the patterns in the list."""
