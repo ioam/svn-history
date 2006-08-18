@@ -317,13 +317,16 @@ class Composite(PatternGenerator):
         ydensity=params.get('ydensity',self.ydensity)
         x=params.get('x',self.x)
         y=params.get('y',self.y)
+        scale=params.get('scale',self.scale)
+        offset=params.get('offset',self.offset)
         orientation=params.get('orientation',self.orientation)
         size=params.get('size',self.size)
 
         patterns = [pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
-                       x=x+size*pg.x*cos(orientation)+pg.y*sin(orientation),
-                       y=y+size*pg.x*sin(orientation)+pg.y*cos(orientation),
-                       orientation=pg.orientation+orientation,size=pg.size*size)
+                       x=x+size*(pg.x*cos(orientation)-pg.y*sin(orientation)),
+                       y=y+size*(pg.x*sin(orientation)+pg.y*cos(orientation)),
+                       orientation=pg.orientation+orientation,size=pg.size*size,
+                       scale=pg.scale*scale,offset=pg.offset+offset)
                     for pg in self.generators]
         image_array = self.operator.reduce(patterns)
         return image_array
@@ -359,6 +362,8 @@ class Selector(PatternGenerator):
         ydensity=params.get('ydensity',self.ydensity)
         x=params.get('x',self.x)
         y=params.get('y',self.y)
+        scale=params.get('scale',self.scale)
+        offset=params.get('offset',self.offset)
         orientation=params.get('orientation',self.orientation)
         size=params.get('size',self.size)
         index=params.get('index',self.index)
@@ -367,8 +372,9 @@ class Selector(PatternGenerator):
         pg = self.generators[int_index]
         
         image_array = pg(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
-                         x=x+size*pg.x*cos(orientation)+pg.y*sin(orientation),
-                         y=y+size*pg.x*sin(orientation)+pg.y*cos(orientation),
-                         orientation=pg.orientation+orientation,size=pg.size*size)
-        
+                         x=x+size*(pg.x*cos(orientation)-pg.y*sin(orientation)),
+                         y=y+size*(pg.x*sin(orientation)+pg.y*cos(orientation)),
+                         orientation=pg.orientation+orientation,size=pg.size*size,
+                         scale=pg.scale*scale,offset=pg.offset+offset)
+                       
         return image_array
