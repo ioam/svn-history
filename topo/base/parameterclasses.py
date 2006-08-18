@@ -280,7 +280,7 @@ class Number(Parameter):
                     raise ValueError("Parameter must be at least " + `min` + '.')
             elif max != None:
                 if not val <= max:
-                    raise ValueError("Parameter must be at most " + `min` + '.')
+                    raise ValueError("Parameter must be at most " + `max` + '.')
 
     def get_soft_bounds(self):
         """
@@ -550,6 +550,64 @@ class ClassSelectorParameter(Parameter):
         Return class_name stripped of self.suffix_to_lose.
         """
         return re.sub(self.suffix_to_lose+'$','',class_name)
+
+
+
+class ListParameter(Parameter):
+    """
+    Parameter whose value is a list of objects, usually of a specified type.
+
+    The bounds allows a minimum and/or maximum length of
+    list to be enforced.  If the class is non-None, all
+    items in the list are checked to be of that type.
+    """
+    __slots__ = ['class_','bounds']
+    __doc__ = property((lambda self: self.doc))
+
+    def __init__(self,default=[],class_=None,instantiate=True,
+                 bounds=(0,None),**params):
+        self.class_ = class_
+        self.bounds = bounds
+        self._check_bounds(default)
+        Parameter.__init__(self,default=default,instantiate=instantiate,
+                           **params)
+
+    # Could add range() method from ClassSelectorParameter, to allow
+    # list to be populated in the GUI
+
+    def __set__(self,obj,val):
+        """Set to the given value, raising an exception if out of bounds."""
+        if type(val)!=DynamicNumber:
+            self._check_bounds(val)
+        super(ListParameter,self).__set__(obj,val)
+
+    def _check_bounds(self,val):
+        """
+        Checks that the list is of the right length and has the right contents.
+        Otherwise, an exception is raised.
+        """
+
+        # CEB: all the following error messages should probably print out the parameter's name
+        # ('x', 'theta', or whatever)
+        if not (isinstance(val,list)):
+            raise ValueError("Parameter " + `self._name` + " (" + `self.__class__` + ") must be a list.")
+
+        if self.bounds!=None:
+            min,max = self.bounds
+            l=len(val)
+            if min != None and max != None:
+                if not (min <= l <= max):
+                    raise ValueError("List length must be between " + `min` + ' and ' + `max` + ' (inclusive).')
+            elif min != None:
+                if not min <= l: 
+                    raise ValueError("List length must be at least " + `min` + '.')
+            elif max != None:
+                if not l <= max:
+                    raise ValueError("List length must be at most " + `max` + '.')
+
+        if self.class_!=None:
+            for v in val:
+                assert isinstance(v,self.class_),repr(v)+" is not an instance of " + repr(self.class_) + "."
 
 
 
