@@ -279,7 +279,7 @@ class Composite(PatternGenerator):
         (e.g. Wrapper("Numeric.add")); when that string is evaluated
         in the main namespace an appropriate ufunc should be returned.
         (This approach is required to allow these objects to be
-        pickled; Numeric ufuncs themselves are not picklable.
+        pickled; Numeric ufuncs themselves are not picklable.)
 
         You can also write your own operators, by making a class that
         has a static method named "reduce" that returns an array of the
@@ -290,9 +290,7 @@ class Composite(PatternGenerator):
             def reduce(x):
                 return x[0]
 
-        At the moment, this must be put into a top-level module,
-        perhaps by setting topo.return_first=return_first, for the
-        Wrapper class to be able to locate it.
+        In this case the Wrapper class should not be necessary.    
         """)
     
     generators = ListParameter(default=[],precedence=0.97,class_=PatternGenerator,
