@@ -46,12 +46,12 @@ class TestBitmap(unittest.TestCase):
 
 
     def test_HSVBitmap(self):
-        a = [j for i in range(256) for j in range(256)]
-        b = [i for i in range(256) for j in range(256)]
-        c = [max(i,j) for i in range(256) for j in range(256)]
-        a = Numeric.reshape(a,(256,256)) / 255.0
-        b = Numeric.reshape(b,(256,256)) / 255.0
-        c = Numeric.reshape(c,(256,256)) / 255.0
+        a = [j for i in range(16) for j in range(16)]
+        b = [i for i in range(16) for j in range(16)]
+        c = [max(i,j) for i in range(16) for j in range(16)]
+        a = Numeric.reshape(a,(16,16)) / 255.0
+        b = Numeric.reshape(b,(16,16)) / 255.0
+        c = Numeric.reshape(c,(16,16)) / 255.0
         hsv = HSVBitmap(a,b,c)
         # hsv.show()
 
