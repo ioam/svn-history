@@ -13,7 +13,7 @@ weight patterns, neighborhood kernels, or any similar application.
 <img src="images/patterntypes_small.png" width="598" height="209">
 </center>
 
-These patterns are created using objects of type
+<P>These patterns are created using objects of type
 <A HREF="../Reference_Manual/topo.base.patterngenerator.html">
 PatternGenerator</A>, which is an object that will return a 2D pattern
 when it is called as a function.  For instance, the Gaussian
@@ -22,7 +22,7 @@ PatternGenerator will return Gaussian-shaped patterns:
 <pre>
 $ ./topographica -g
 Topographica&gt; from topo.patterns.basic import Gaussian
-Topographica&gt; pg=Gaussian(xdensity=10,ydensity=10,size=0.3,aspect_ratio=1.0)
+Topographica&gt; pg=Gaussian(xdensity=60,ydensity=60,size=0.3,aspect_ratio=1.0)
 Topographica&gt; 
 Topographica&gt; from topo.commands.pylabplots import *
 Topographica&gt; matrixplot(pg())
@@ -30,25 +30,27 @@ Topographica&gt; matrixplot(pg(size=0.5))
 </pre>
 
 <center>
-<img src="images/gaussian_0.3.png" width=279 height=279><img src="images/gaussian_0.5.png" width=279 height=279>
+<img src="images/gaussian_0.3.png" width="174" height="165"><img src="images/gaussian_0.5.png" width="174" height="165">
 </center>
 
 <P>As you can see, the parameters of a PatternGenerator can be set up
 when you create the object, or they can be supplied when you generate
-the pattern.
+the pattern.  Any parameter not supplied in either location inherits
+the default value set for it in that PatternGenerator class.
 
 <P>The reason for the name PatternGenerator is that the objects can
-each actually return an infinite number of patterns, if any of the
-parameters are set to Dynamic values.  For instance, a Gaussian input
-pattern can be specified to have a random orientation and (x,y)
+each actually return an infinite number of different patterns, if any
+of the parameters are set to Dynamic values.  For instance, a Gaussian
+input pattern can be specified to have a random orientation and (x,y)
 location:
 
 <pre>
-$ ./topographica  -g
+$ ./topographica -g
 Topographica&gt; from topo.patterns.basic import Gaussian
 Topographica&gt; from topo.base.parameterclasses import DynamicNumber
 Topographica&gt; from topo.misc.numbergenerators import UniformRandom
 Topographica&gt; input_pattern = Gaussian(size=0.08, aspect_ratio=4,
+                 xdensity=60,ydensity=60,
                  x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
                  y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
                  orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
@@ -57,7 +59,7 @@ Topographica&gt; matrixplot(input_pattern())
 </pre>
 
 <center>
-<img src="images/or_gaussian_1.png" width=279 height=279><img src="images/or_gaussian_2.png" width=279 height=279>
+<img src="images/or_gaussian_1.png" width="169" height="159"><img src="images/or_gaussian_2.png" width="169" height="159">
 </center>
 
 <P>There are many other types of patterns available already defined in
@@ -86,14 +88,16 @@ CFProjection.weights_generator=topo.patterns.basic.Composite(
 </pre>
 
 <center>
-<img src="images/gaussianrandomweights.png" width=640 height=432>
+<!-- <img src="images/gaussianrandomweights.png" width=640 height=432> -->
+<img src="images/gaussianrandomweights_dense.png" width="396" height="368">
 </center>
 
 <P>Similarly, you can build up arbitrarily complex patterns by
-combining multiple PatternGenerators at different locations:
+combining multiple PatternGenerators at different locations, and then
+scaling them, rotating them, and/or placing them together as a unit:
 
 <pre>
-$ ./topographica  -g
+$ ./topographica -g
 Topographica&gt; from topo.patterns.basic import Gaussian, Disk, Composite
 Topographica&gt; from topo.base.parameterclasses import Wrapper
 Topographica&gt; lefteye    = Disk(    aspect_ratio=0.7, x=0.04, y=0.10, size=0.08, scale=1.00)
@@ -114,7 +118,7 @@ Topographica&gt; matrixplot(pg(orientation=pi/1.8, x=0.2, y=0.1, offset=0.5, siz
 
 <P>Apart from adding the patterns, there are many other possible
 operators; see the
-<A HREF="../Reference_Manual/topo.patterns.basic.html#Composite">
+<A HREF="../Reference_Manual/topo.patterns.basic.html#Composite-function">
 Composite parameter <code>operator</code></A>) for more details.
 
 
@@ -124,19 +128,21 @@ Composite parameter <code>operator</code></A>) for more details.
 one from a set of different patterns, such as choosing randomly from a
 database of natural images.  This can be done with the Selector
 PatternGenerator.  As a contrived example, weights can be choosen at
-random from a set of four different patterns:
+random from a set of four different pattern generators:
 
 <pre>
 CFProjection.weights_generator=topo.patterns.basic.Selector(generators=[
     topo.patterns.basic.Gaussian(orientation=DynamicNumber(
         UniformRandom(lbound=-pi,ubound=pi,seed=99))),
-    topo.patterns.basic.Gaussian(aspect_ratio=1.0),
-    topo.patterns.basic.Rectangle(size=0.2,orientation=DynamicNumber(
+    topo.patterns.basic.Gaussian(aspect_ratio=1.0,
+        x=DynamicNumber(UniformRandom(lbound=-0.2,ubound=0.2,seed=12)),
+        y=DynamicNumber(UniformRandom(lbound=-0.2,ubound=0.2,seed=34))),
+    topo.patterns.basic.Rectangle(size=0.3,orientation=DynamicNumber(
         UniformRandom(lbound=-pi,ubound=pi,seed=99))),
-    topo.patterns.basic.Disk(size=0.25)])
+    topo.patterns.basic.Disk(size=0.2)])
 </pre>
 
 <center>
-<img src="images/fourclassweights.png" width=640 height=436>
+<img src="images/fourclassweights.png" width="390" height="371">
 </center>
 
