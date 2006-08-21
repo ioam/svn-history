@@ -13,7 +13,7 @@ inherited or otherwise, which is difficult to obtain from the
 source code.
 
 
-<H2>Main packages</H2>
+<H2><A NAME="core">Core packages</A></H2>
 
 <P>Topographica is designed as a collection of packages from which
 elements can be selected to model specific neural systems.  For more
@@ -43,7 +43,7 @@ programming interface on which Topographica is built.  The rest of the
 directories add components used in specific models, and implement the
 GUI.
 
-<H2>Library</H2>
+<H2><A NAME="library">Library</A></H2>
 
 <P>The Topographica primitives library consists of an extensible
 family of classes that can be used with the above functions and
