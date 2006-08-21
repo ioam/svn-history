@@ -2,7 +2,7 @@ m4_dnl Must be preprocessed by m4 to handle the citations
 m4_include(shared/bib2html.m4)m4_bib2html_init[[]]m4_dnl
 m4_bib2html_cite_named(deangelis:jnp93,[[DeAngelis et al 1993]],deangelis:tins95,[[1995]]).
 
-<p>Abstract: The biological function of cortical neurons can often be
+<p>The biological function of cortical neurons can often be
 understood only in the context of large, highly interconnected
 networks.  These networks typically form two-dimensional topographic
 maps, such as the retinotopic maps in the visual system.  This poster
@@ -99,8 +99,8 @@ Individual unit models:
   Compartmental models (rare)
 
 Synapses typically represented by a single number
-Also: Continuous analytical approximations (rare)\\
- m4_bib2html_cite_named(amari:topographic,[[Amari]],roquedasilvafilho:phd92,[[(Roquedasilvafilho et al. 1992]])
+Also: Continuous analytical approximations (rare)
+m4_bib2html_cite_named(amari:topographic,[[Amari]],roquedasilvafilho:phd92,[[(Roquedasilvafilho et al. 1992]])
     
 See m4_bib2html_cite_named(swindale:network96,[[(Swindale et al. 1996]],erwin:models,[[Erwin et al.]]) for review
 
