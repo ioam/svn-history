@@ -6,6 +6,7 @@ development (as of 6/2006), and will be posted here when it is
 usable.  Sections that are ready so far include:
 
 <P>
+<A HREF="introduction.html">Introduction</A><BR>
 <!-- <A HREF="basics.html">Topographica basics</A><BR> -->
 <!-- <A HREF="background.html">Background</A><BR> -->
 <A HREF="time.html">Representing time in Topographica</A><BR>
