@@ -48,6 +48,99 @@ of visual images, audio recordings, and test patterns.
 <br>      - Produce figures, tables, etc. for publication
 
 
+<H2>What Topographica supports</H2>
+
+<P>Because Topographica is based on a general-purpose interpreted
+programming language (Python), in a trivial sense one could argue that
+Topographica supports any possible model, and indeed, any possible
+software program.  A more relevant question to ask is 'how much
+support does Topographica provide for the types of tasks I want to
+do?'.  The answer to this second question depends on the task, of
+course, but it can be broken down into the following main levels,
+depending on how much of Topographica's code you can make use of for
+your own purposes.  The list is ordered so that the most general
+support, suitable for everyone but requiring the most effort, is at
+the top, and the most specific support is at the bottom.  Each
+successive level is designed to be completely independent of all levels
+below it, in the sense that everything in topo/ besides those listed
+can be deleted with no ill effects.  The useful levels include:
+
+<pre>
+<ol>
+<p><li>Python with C interface (ignoring <i>everything</i> in topo/): 
+<dl><dt>Supports:</dt><dd>Anything is possible, with no performance or programming limitations
+	(since anything can be written efficiently in C, and the rest can be written in Python)
+    <dt>Limitations:</dt><dd>Need to do all programming yourself.  Can't mix and match
+        code with other researchers very easily, because they are unlikely to choose
+	similar interfaces.
+    
+<p><li>1., plus event-driven simulator with parameterizable objects, debugging 
+        output, etc. from topo/base/ (ignoring Sheets, CFs, and Projections): 
+<dl><dt>Supports:</dt><dd>Running simulations of any physical system, with good semantics
+    	for parameter specification and inheritance.  
+    <dt>Limitations:</dt><dd>Basic event structure is in Python, which is
+	good for generality but means that performance will be good
+        only if the computation in the individual events is big
+        compared to the number of events.  This assumption is true for
+        existing Topographica simulations, but may not always apply).
+
+<p><li>1.-2., plus Sheets (just adding topo/base/sheet.py)
+<dl><dt>Supports:</dt><dd>Uniform interface for a wide variety of brain 
+        models of topographically organized 2D regions.  E.g. can measure
+	preference maps for anything supporting the Sheet interface.
+    <dt>Limitations:</dt><dd>Not useful if the assumptions of what 
+        constitutes a Sheet do not apply to your model -- e.g. ignores
+        curvature, sulci, gyrii; has hard boundaries between regions,
+        uses Cartesian, not hexagonal grid.  For instance, Sheets are
+        not a good way to model how the entire brain is parcellated
+        into brain areas during development, because that happens in
+        3D and does not start out with very strict boundaries between
+        regions.
+
+<p><li>1.-3., plus ConnectionFields and Projections (the rest of topo/base/)
+<dl><dt>Supports:</dt><dd>Anything with topographically organized 
+	projections between areas, each of which contains an array
+	of units, each with input from a spatially restricted region
+	on another (or the same) sheet.  Any such sheet can be plotted
+	and analyzed uniformly.
+    <dt>Limitations:</dt><dd>Much more specific limitations on what 
+	types of models can be used -- e.g. broad, sparse connectivity
+	between regions is less well supported (so far),
+	non-topographic mappings are currently left out.
+
+<p><li>1.-4., plus the Topographica primitives library (the rest of topo/)
+<dl><dt>Supports:</dt><dd>Can implement a large range of map models without
+        coding any new objects -- just setting parameters and calling
+        methods on existing objects.  Easy to mix and match components
+        between models, and to add just a few new components for a new
+	similar model.  Easy to compare different models from this
+        class under identical conditions.
+    <dt>Limitations:</dt><dd>Only a relatively small set of components
+	has actually been implemented so far, and so in practice the
+	primitives library will need to be expanded to cover most new
+	models, even from the class of models described in 4.
+</ol>
+
+<P>As one moves down this list, the amount of programming required to
+implement a basic model decreases (down to zero in any case we've
+already solved), but the limitations governing what can be done
+increase.  To the extent that these limitations are appropriate for
+what you want to model, Topographica will be an appropriate tool.  If
+what you want to do does not fit into these limitations, you will have
+to go up this list, doing more of the implementation work yourself and
+gaining less from what the Topographica developers have done.  If
+everything you are doing ends up being implemented at level 1 above,
+then there is no reason to use Topographica at all, except as an
+example of how to use Python and C together.
+
+<P>Note different parts of any particular model may be at different
+positions in this list.  For instance, even for a model that is fully
+supported by the Topographica primitives, you may want to add an
+interface to an external sensor such as a camera, which would have to
+be implemented at level 1 because no such interface currently exists.
+
+
+
 <pre>
 Sheet
   ProjectionSheet
