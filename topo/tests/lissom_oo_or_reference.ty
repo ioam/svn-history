@@ -216,10 +216,10 @@ centerg = topo.patterns.basic.Gaussian(
 surroundg = topo.patterns.basic.Gaussian(
     size=2*sigma_s*sqrt(pi)/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1())
 
-on_weights = topo.patterns.basic.CompositePatternGenerator(
+on_weights = topo.patterns.basic.Composite(
     generators=[centerg,surroundg],operator=Wrapper("Numeric.subtract"))
 
-off_weights = topo.patterns.basic.CompositePatternGenerator(
+off_weights = topo.patterns.basic.Composite(
     generators=[surroundg,centerg],operator=Wrapper("Numeric.subtract"))
     
 topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
