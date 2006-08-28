@@ -27,19 +27,20 @@ m4_bib2html_npcite_named(swindale:network96,[[Swindale et al. 1996]]).)
 However, the models to date have been limited in size and scope
 because existing simulation tools do not provide specific support for
 biologically realistic, densely interconnected topographic maps.
-Existing biological neural simulators, such as NEURON
+Existing biological neural simulators, such as 
+<A target="_top" HREF="http://kacy.neuro.duke.edu/">Neuron</A>
 m4_bib2html_cite_named(hines:nc97,[[Hines et al. 1997]]) and 
-GENESIS m4_bib2html_cite_named(bower:genesisbook98,[[Bower et al. 1998]]), 
+<A target="_top" HREF="http://www.genesis-sim.org/GENESIS/">GENESIS</A>
+m4_bib2html_cite_named(bower:genesisbook98,[[Bower et al. 1998]]), 
 primarily focus on detailed studies of individual neurons or very
 small networks of them.  Tools for simulating large populations of
 abstract units, such as PDP++
 m4_bib2html_cite_named(oreilly:book00,[[O'Reilly et al, 2000]]) and
-Matlab (www.mathworks.com),
-focus on engineering or cognitive science applications, rather than
-detailed models of neurons and connections in cortical and subcortical
-areas.  As a result, current simulators also lack specific support for
-measuring topographic map structure or generating input patterns at
-the topographic map level.
+<A target="_top" HREF="http://www.mathworks.com/">Matlab</A>
+focus primarily on engineering or cognitive science rather than
+neurobiological applications.  Other simulators also
+lack specific support for measuring topographic map structure or
+generating input patterns at the topographic map level.
 
 <P>The Topographica map-level simulator is designed to make it
 practical to simulate large-scale, detailed models of topographic
@@ -48,10 +49,10 @@ simulators, focusing on biologically realistic networks of tens or
 hundreds of thousands of neurons, forming topographic maps containing
 tens or hundreds of millions of connections.  
 
-<P>Topographica was developed as a collaboration between the
+<P>Topographica was developed through a collaboration between the
 <a href="http://www.cs.utexas.edu/">University of Texas at Austin</a>
 and the <a href="http://www.anc.ed.ac.uk/">University of
-Edinburgh</a>, as part of the
+Edinburgh</a>, funded by the
 <a href="http://www.nimh.nih.gov/neuroinformatics/">Human Brain
 Project</a> of the <a href="http://www.nimh.nih.gov">National
 Institutes of Mental Health</a>.  Now that the simulator has been
@@ -80,7 +81,7 @@ the organization and function of each map to be studied.
 
 <P>To make it practical to model topographic maps at this large scale,
 the fundamental neural unit in the simulator is a two-dimensional
-<I>sheet</I> of neurons, rather than a neuron or a part of a neuron.
+<i>sheet</i> of neurons, rather than a neuron or a part of a neuron.
 Conceptually, a sheet is a continuous, two-dimensional area (as in
 m4_bib2html_npcite_named(amari:topographic,[[Amari]],roquedasilvafilho:phd92,[[Roque
 da Silva Filho et al. 1992]]), which is typically approximated by a
@@ -107,10 +108,12 @@ complex, as needed for a particular study.
 <P>Sheets can be connected to other sheets in any combination,
 including lateral connections from the same sheet to itself, and
 recurrent feedback between sheets.  Sheet-to-sheet connections are
-called projections; these typically consist of a large set of
+called <i>projections</i>; these typically consist of a large set of
 individual connections between sheets.  For one cell in each sheet in
 the figure, example connections are shown for each projection,
-including lateral projections in V1 and higher areas.
+including lateral projections in V1 and higher areas.  Each circular
+patch of connections is called a <i>connection field</i>, consisting of 
+input connections from a spatially restricted region of a sheet.
 
 <P>Similar models can be used for topographic maps in somatosensory,
 auditory, and motor cortex.  Current biologically realistic models
@@ -144,9 +147,9 @@ implemented using interfaces to existing low-level simulators such as
 NEURON and GENESIS.
 
 
-<H2>Software design and architecture</H2>
+<H2>Software architecture and implementation</H2>
 
-<P>Topographica is implemented as a set of Python-language
+<P>Topographica is implemented as a set of 
 <A HREF="../Reference_Manual/index.html#core">packages providing
 the core functionality</A>, including the graphical user interface (GUI),
 plus an <A HREF="../Reference_Manual/index.html#library">extensible
