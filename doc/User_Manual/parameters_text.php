@@ -1,16 +1,18 @@
+<!-- -*-html-helper-*- mode -- (Hint for Emacs)-->
+
 <H1>Parameters</H1>
 
 <P>The behavior of most of the objects making up a Topographica
 simulation can be controlled by variables called Parameters. A
-<A HREF="../Reference_Manual/topo.base.parameterizedobject.html#Parameter">
-Parameter</A> is a special type of Python attribute extended to have
+<?php classref('topo.base.parameterizedobject','Parameter')?>
+is a special type of Python attribute extended to have
 features such as type and range checking, dynamically generated
 values, documentation strings, default values, etc., each of which
 is inherited from parent classes if not specified in a subclass.
 
 <P>Objects that can contain Parameters are called
-<A HREF="../Reference_Manual/topo.base.parameterizedobject.html#ParameterizedObject">
-ParameterizedObject</A>s.  For instance, Sheets, Projections, and
+<?php classref('topo.base.parameterizedobject','ParameterizedObject')?>.
+For instance, Sheets, Projections, and
 PatternGenerators are all ParameterizedObjects.  The Parameters of a
 Sheet include its <code>nominal_density</code> and <code>nominal_bounds</code>, and
 the Parameters of a PatternGenerator include its <code>scale</code> and
@@ -44,19 +46,19 @@ been declared as a <code>Number</code> Parameter with bounds
 '(0,None)' (i.e. a minimum value of 0.0, and no maximum value). 
 
 <P>To provide reasonable checking for parameters of different types, a large number of
-<A HREF="../Reference_Manual/topo.base.parameterclasses.html"> other
+<A HREF="../Reference_Manual/topo.base.parameterclasses.html">other
 Parameter types</A> are provided besides
-<A HREF="../Reference_Manual/topo.base.parameterclasses.html#Number">Number</A>,
+<?php classref('topo.base.parameterclasses','Number')?>,
 such as
-<A HREF="../Reference_Manual/topo.base.parameterclasses.html#Integer">Integer</A>,
-<A HREF="../Reference_Manual/topo.base.parameterclasses.html#Filename">Filename</A>,
-<A HREF="../Reference_Manual/topo.base.parameterclasses.html#Enumeration">Enumeration</A>,
+<?php classref('topo.base.parameterclasses','Integer')?>,
+<?php classref('topo.base.parameterclasses','Filename')?>,
+<?php classref('topo.base.parameterclasses','Enumeration')?>,
 and
-<A HREF="../Reference_Manual/topo.base.parameterclasses.html#BooleanParameter">BooleanParameter</A>.
+<?php classref('topo.base.parameterclasses','BooleanParameter')?>.
 Each of these types can be declared to be constant, in which case the
 value cannot be changed after the ParameterizedObject that owns the
 Parameter has been created.  Some classes like
-<A HREF="../Reference_Manual/topo.base.parameterclasses.html#DynamicNumber">DynamicNumber</A>
+<?php classref('topo.base.parameterclasses','DynamicNumber')?> 
 allow the parameter values to be generated from a sequence or random
 distribution, such as for generating random input patterns.
 
