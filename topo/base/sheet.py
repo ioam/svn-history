@@ -1,7 +1,7 @@
 """
 Neural sheet objects and associated functions.
 
-The Sheet class is the base class for EPs that simulate
+The Sheet class is the base class for EventProcessors that simulate
 topographically mapped sheets of units (neurons or columns).  A Sheet
 is an EventProcessor that maintains a rectangular array of activity
 values, and sends the contents of this array as the data element in
