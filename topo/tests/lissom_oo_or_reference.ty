@@ -235,12 +235,12 @@ topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
 
 topo.sim.connect('LGNOn','V1',delay=FixedPoint("0.05"),
                  dest_port=('Activity','JointNormalize', 'Afferent'),
-          connection_type=CFProjection,strength=0.5,name='LGNOnAfferent',
+          connection_type=CFProjection,strength=1.0,name='LGNOnAfferent',
           nominal_bounds_template=afferent_weight_bounds,learning_rate=alpha_input*n_aff_units)
 
 topo.sim.connect('LGNOff','V1',delay=FixedPoint("0.05"),
                  dest_port=('Activity','JointNormalize', 'Afferent'),
-          connection_type=CFProjection,strength=0.5,name='LGNOffAfferent',
+          connection_type=CFProjection,strength=1.0,name='LGNOffAfferent',
           nominal_bounds_template=afferent_weight_bounds,learning_rate=alpha_input*n_aff_units)
 
 
