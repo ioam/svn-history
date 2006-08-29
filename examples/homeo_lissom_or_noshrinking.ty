@@ -4,7 +4,7 @@ No shrinking of lateral excitatory radius - should more closely resemble biology
 Still a work in progress - the map still jumps around a lot at the start of learning
 Changes need to be made to the scheduled changes to improve organisation
 
-15/8/2006: Added intrinsic plasticity mechanism for individual neuron. 
+15/8/2006: Addition of intrinsic plasticity mechanism improves the resulting map. 
 """
 
 import RandomArray
@@ -31,8 +31,9 @@ from topo.outputfns.basic import PiecewiseLinear
 from topo.misc.numbergenerators import UniformRandom
 from topo.base.functionfamilies import OutputFn
 from topo.base.arrayutils import clip_in_place
+from topo.outputfns.homeostatic import HomeostaticMaxEnt
 
-topo.sim.name = "homeo_lissom_noshrinking"
+topo.sim.name = "homeo_lissom_or_noshrinking"
 
 
 input_pattern = topo.patterns.basic.Gaussian(
@@ -40,38 +41,6 @@ input_pattern = topo.patterns.basic.Gaussian(
           x=DynamicNumber(UniformRandom(lbound=-0.775,ubound=0.775,seed=12)),
           y=DynamicNumber(UniformRandom(lbound=-0.775,ubound=0.775,seed=34)),
           orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
-
-class HomeostaticMaxEnt(OutputFn):
-    """
-    Implementation of homeostatic intrinsic excitability from Triesch, ICANN 2005, LNCS 3696 pp. 65-70.
-    """
-    lstep = Number(default=8,doc="Number of steps to wait durring settling")
-    a_init = Number(default=13,doc="Multiplicative parameter controlling the exponential.")
-    b_init = Number(default=-4,doc="Additive parameter controlling the exponential.")
-    eta = Number(default=0.002,doc="Learning rate for homeostatic plasticity.")
-    mu = Number(default=0.01,doc="Average firing rate target.")
-
-    def __init__(self,**params):
-        super(HomeostaticMaxEnt,self).__init__(**params)
-
-	self.first_call = True
-
-    def __call__(self,x):
-	
-	if self.first_call:
-	    self.first_call = False
-	    self.a = Numeric.ones(x.shape, x.typecode()) * self.a_init
-	    self.b = Numeric.ones(x.shape, x.typecode()) * self.b_init
-
-	# Apply sigmoid function to x, resulting in what Triesch calls y
-        x_orig = copy.copy(x)
-        x *= 0.0
-	x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
-
-	# Update a and b
-	self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
-	self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
-
 
                                  
 # Specify weight initialization, response function, and learning function
@@ -93,9 +62,10 @@ topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
 
 
 topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',84.0),
-                        nominal_bounds=BoundingBox(radius=0.5),tsettle=9, output_fn=HomeostaticMaxEnt())
+                        nominal_bounds=BoundingBox(radius=0.5),tsettle=9, 
+			output_fn=HomeostaticMaxEnt(a_init=13, b_init=-4, eta=0.002, mu=0.01))
 
-#output_fn=TestFn())
+
 #topo.sim['V1'].output_fn.lower_bound=0.1
 #topo.sim['V1'].output_fn.upper_bound=0.65
 
@@ -124,10 +94,12 @@ topo.sim.schedule_command( 100,'topo.sim["V1"].projections()["Afferent"].learnin
 topo.sim.schedule_command( 1000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.274')
 topo.sim.schedule_command( 3000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.137')
 
+
+'''
 topo.sim.schedule_command( 1000,'topo.sim["V1"].tsettle=11')
 topo.sim.schedule_command( 3000,'topo.sim["V1"].tsettle=12')
 topo.sim.schedule_command( 5000,'topo.sim["V1"].tsettle=13')
-
+'''
 
 ### Schedule LISSOM output function threshold changes
 #
