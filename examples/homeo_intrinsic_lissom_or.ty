@@ -1,5 +1,6 @@
 """
-LISSOM-based orientation map (without ON/OFF channels) with Homeostatic Intrinsic Plasticity
+LISSOM-based orientation map (without ON/OFF channels) 
+with Homeostatic Intrinsic Plasticity Mechanism
 
 """
 __version__='$Revision$'
@@ -29,6 +30,8 @@ from topo.outputfns.basic import PiecewiseLinear
 from topo.misc.numbergenerators import UniformRandom
 from topo.base.functionfamilies import OutputFn
 from topo.base.arrayutils import clip_in_place
+from topo.commands.pylabplots import *
+from matplotlib.pylab import *
 
 topo.sim.name = "homeo_intrinsic_lissom_or"
 
@@ -58,15 +61,19 @@ class HomeostaticMaxEnt(OutputFn):
     eta = Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
     mu = Number(default=0.01,doc="Average firing rate target.")
 
+
     def __init__(self,**params):
         super(HomeostaticMaxEnt,self).__init__(**params)
 
-	# DEBUG only: Not required for the algorithm, but useful for debugging
 	self.first_call = True
+
+	# DEBUG only: Not required for the algorithm, but useful for debugging
+	"""
 	self.y_avg_count = 0 
 	self.n_step = 0
 	self.beta = 0.0003
 	self.ncall = 0
+	"""
 
     def __call__(self,x):
 	
@@ -76,9 +83,13 @@ class HomeostaticMaxEnt(OutputFn):
 	    self.b = Numeric.ones(x.shape, x.typecode()) * self.b_init
 
 	    # DEBUG only (for computing average activity of each neuron over time) 
-	    self.y_avg = Numeric.zeros(x.shape, x.typecode())
-	    self.x_avg = zeros(x.shape,x.typecode())
-	    self.x_hist = []
+	    """
+	    self.y_avg = zeros(x.shape,x.typecode())
+	    self.y_hist = zeros([5,30000],Float)  # average firing rate
+	    self.y_rate = zeros([5,30000],Float)  # firing rate over time
+	    self.x_rate = zeros([5,30000],Float)  # input to postsynaptic neurons, before thresholding
+	    self.ab_hist = zeros([2,5,30000],Float) # History of a and b
+	    """
 
 	# Apply sigmoid function to x, resulting in what Triesch calls y
         x_orig = copy.copy(x)
@@ -86,28 +97,59 @@ class HomeostaticMaxEnt(OutputFn):
 	x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
 
 	# DEBUG only (computing average activity of each neuron over time) 
+	"""
 	self.n_step += 1	
 	if self.n_step == self.lstep:
 	    self.n_step = 0
 	
-	    # Compute average of all previous y (firing rate), for debugging
-	    self.y_avg = (self.y_avg * self.y_avg_count + x) / (self.y_avg_count+1)
-	    self.y_avg_count += 1
-
+	    self.ncall += 1
 	    if self.ncall <= 500:
-	        self.x_avg = ((self.x_avg*self.ncall) + x) / (self.ncall+1)
-	        self.ncall += 1
+	        self.y_avg = ((self.y_avg*self.ncall) + x) / (self.ncall+1)
 	    else:
-	        self.x_avg = self.beta*x + (1.0-self.beta)*self.x_avg	        
+	        self.y_avg = self.beta*x + (1.0-self.beta)*self.y_avg
 
-	    #self.x_hist.append (self.x_avg)
-	    
-	    print self.x_avg[23][23], ' - ', self.x_avg[12][12], ' - ', self.x_avg[0][0], ' - ', self.x_avg[5][5]
+	    # Average firing rate
+	    self.y_hist[0][self.ncall] = self.y_avg[0][0]
+	    self.y_hist[1][self.ncall] = self.y_avg[11][11]
+	    self.y_hist[2][self.ncall] = self.y_avg[23][23]
+	    self.y_hist[3][self.ncall] = self.y_avg[35][35]
+	    self.y_hist[4][self.ncall] = self.y_avg[47][47]
 
+	    # firing rate over time
+	    self.y_rate[0][self.ncall] = x[0][0]
+	    self.y_rate[1][self.ncall] = x[11][11]
+	    self.y_rate[2][self.ncall] = x[23][23]
+	    self.y_rate[3][self.ncall] = x[35][35]
+	    self.y_rate[4][self.ncall] = x[47][47]
+
+	    # input to postsynaptic neurons, before thresholding
+	    self.x_rate[0][self.ncall] = x_orig[0][0]
+	    self.x_rate[1][self.ncall] = x_orig[11][11]
+	    self.x_rate[2][self.ncall] = x_orig[23][23]
+	    self.x_rate[3][self.ncall] = x_orig[35][35]
+	    self.x_rate[4][self.ncall] = x_orig[47][47]
+
+	    # a & b
+	    self.ab_hist[0][0][self.ncall] = self.a[0][0]
+	    self.ab_hist[0][1][self.ncall] = self.a[11][11]
+	    self.ab_hist[0][2][self.ncall] = self.a[23][23]
+	    self.ab_hist[0][3][self.ncall] = self.a[35][35]
+	    self.ab_hist[0][4][self.ncall] = self.a[47][47]
+
+	    self.ab_hist[1][0][self.ncall] = self.b[0][0]
+	    self.ab_hist[1][1][self.ncall] = self.b[11][11]
+	    self.ab_hist[1][2][self.ncall] = self.b[23][23]
+	    self.ab_hist[1][3][self.ncall] = self.b[35][35]
+	    self.ab_hist[1][4][self.ncall] = self.b[47][47]
+   
+	    print self.y_avg[23][23], ' - ', self.y_avg[11][11], ' - ', self.y_avg[0][0], ' - ', self.y_avg[47][47]
+	    print self.a[23][23], ',', self.b[23][23] , ' : ', self.a[11][11], ',', self.b[11][11]
+	"""
 
 	# Update a and b
 	self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
 	self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
+
 
 
 # DEBUG Only: OutputFn for computing average activity of each neuron
@@ -130,33 +172,83 @@ class TestFn(OutputFn):
 
     def __call__(self,x):
 
-        fact = 1.0/(self.upper_bound-self.lower_bound)        
+        x_orig = copy.copy(x)
+        fact = 1.0/(self.upper_bound-self.lower_bound)
         x -= self.lower_bound
         x *= fact
         clip_in_place(x,0.0,1.0)
 
 	if self.first_call:
 	    self.first_call = False
-	    #self.x_avg = self.beta * copy.copy(x)
-	    #self.x_avg[12][12] = 0.01
-	    self.x_avg = zeros(x.shape,x.typecode())
-	    self.x_hist = []
-
-	if self.ncall <= 500:
-	    self.x_avg = ((self.x_avg*self.ncall) + x) / (self.ncall+1)
-	    self.ncall += 1
-	else:	    
-	    self.x_avg = self.beta*x + (1.0-self.beta)*self.x_avg
-
+	    self.y_avg = zeros(x.shape,x.typecode())
+	    self.y_hist = zeros([5,30000],Float)  # average firing rate
+	    self.y_rate = zeros([5,30000],Float)  # firing rate over time
+	    self.y_rate = zeros([5,30000],Float)  # firing rate over time
+	    self.x_rate = zeros([5,30000],Float)  # input to postsynaptic neurons, before thresholding
 
 	self.n_step += 1
 	if self.n_step == self.learn_step:
 
 	    self.n_step = 0
-	    self.x_hist.append (self.x_avg)
+	    	
+	    self.ncall += 1
+	    if self.ncall <= 500:
+	    	self.y_avg = ((self.y_avg*self.ncall) + x) / (self.ncall+1)
+	    else:	    
+	    	self.y_avg = self.beta*x + (1.0-self.beta)*self.y_avg
 
-	    print self.x_avg[23][23], ' ', self.x_avg[11][11], ' ', self.x_avg[0][0], ' ', self.x_avg[47][47]
+	    # Average firing rate
+	    self.y_hist[0][self.ncall] = self.y_avg[0][0]
+	    self.y_hist[1][self.ncall] = self.y_avg[11][11]
+	    self.y_hist[2][self.ncall] = self.y_avg[23][23]
+	    self.y_hist[3][self.ncall] = self.y_avg[35][35]
+	    self.y_hist[4][self.ncall] = self.y_avg[47][47]
+
+	    # firing rate over time
+	    self.y_rate[0][self.ncall] = x[0][0]
+	    self.y_rate[1][self.ncall] = x[11][11]
+	    self.y_rate[2][self.ncall] = x[23][23]
+	    self.y_rate[3][self.ncall] = x[35][35]
+	    self.y_rate[4][self.ncall] = x[47][47]
+
+	    # input to postsynaptic neurons, before thresholding
+	    self.x_rate[0][self.ncall] = x_orig[0][0]
+	    self.x_rate[1][self.ncall] = x_orig[11][11]
+	    self.x_rate[2][self.ncall] = x_orig[23][23]
+	    self.x_rate[3][self.ncall] = x_orig[35][35]
+	    self.x_rate[4][self.ncall] = x_orig[47][47]
+
+	    print self.y_avg[23][23], ' ', self.y_avg[11][11], ' ', self.y_avg[0][0], ' ', self.y_avg[47][47]
 	
+
+
+# DEBUG Only: Function for plotting graph
+def plot_graph(which, ix, rng1=0, rng2=0, nbins=100, norm=0):
+	if which == 'y_hist':
+	    figure(1)
+	    vectorplot (topo.sim['V1'].output_fn.y_hist[ix][rng1:rng2])
+	elif which == 'y_rate':
+	    figure(2)
+	    vectorplot (topo.sim['V1'].output_fn.y_rate[ix][rng1:rng2])
+	elif which == 'x_rate':
+	    figure(3)
+	    vectorplot (topo.sim['V1'].output_fn.x_rate[ix][rng1:rng2])
+	elif which == 'y_bins':
+	    figure(4)
+	    print hist(topo.sim['V1'].output_fn.y_rate[ix][rng1:rng2],nbins,norm)
+	    #vectorplot (topo.sim['V1'].output_fn.y_bins[time][ix][rng1:rng2])
+	elif which == 'x_bins':
+	    figure(5)
+	    print hist(topo.sim['V1'].output_fn.x_rate[ix][rng1:rng2],nbins,norm)
+	    #vectorplot (topo.sim['V1'].output_fn.x_bins[time][ix][rng1:rng2])
+	elif which == 'a':
+	    figure(6)
+	    vectorplot (topo.sim['V1'].output_fn.ab_hist[0][ix][rng1:rng2])
+	elif which == 'b':
+	    figure(7)
+	    vectorplot (topo.sim['V1'].output_fn.ab_hist[1][ix][rng1:rng2])
+	    
+
 
 ###########################################
 # build simulation
@@ -168,9 +260,7 @@ topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
 
 
 topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
-                        nominal_bounds=BoundingBox(radius=0.5), output_fn=HomeostaticMaxEnt())
-
-#output_fn=TestFn())
+                        nominal_bounds=BoundingBox(radius=0.5),output_fn=HomeostaticMaxEnt())
 
 #topo.sim['V1'].output_fn.lower_bound=0.1
 #topo.sim['V1'].output_fn.upper_bound=0.65
@@ -217,6 +307,8 @@ topo.sim.schedule_command(  500,'topo.sim["V1"].projections()["Afferent"].learni
 topo.sim.schedule_command( 2000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.5480;topo.sim["V1"].projections()["Afferent"].learning_rate=0.5480')
 topo.sim.schedule_command( 4000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.4110;topo.sim["V1"].projections()["Afferent"].learning_rate=0.4110')
 topo.sim.schedule_command(20000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.2055;topo.sim["V1"].projections()["Afferent"].learning_rate=0.2055')
+
+
 
 ### Schedule LISSOM output function threshold changes
 #
