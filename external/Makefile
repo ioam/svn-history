@@ -144,11 +144,21 @@ numeric-uninstall:
 MATPLOTLIB = matplotlib-0.81
 MATPLOTLIB_UNINSTALL =  ${PYTHON_LIB}/site-packages/matplotlib
 
-# The DISPLAY=:0 is apparently necessary for it to build in a remote ssh session
+# Workaround to allow MATPLOTLIB to compile on a remote session.
+#
+# Forces the DISPLAY variable to be set, if only to a guess at the
+# correct value.  If DISPLAY is set incorrectly, matplotlib may not be
+# able to find the right Tcl/Tk libraries.
+ifeq ($(strip $(DISPLAY)),)
+  MATPLOTLIB_DISPLAY="DISPLAY=:0"
+else
+  MATPLOTLIB_DISPLAY=
+endif
+
 matplotlib: ${MATPLOTLIB}.tgz python
 	tar xzf ${MATPLOTLIB}.tgz
-	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib DISPLAY=:0 ${PREFIX}/bin/python setup.py build
-	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
+	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py build
+	cd ${MATPLOTLIB}; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${MATPLOTLIB_DISPLAY} ${PREFIX}/bin/python setup.py install
 	touch matplotlib
 
 matplotlib-clean:
