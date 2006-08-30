@@ -14,7 +14,8 @@ them for use in any particular model.
 used by Topographica.  All of these are available to the user when
 designing a model, but as the <a href="#implementation-levels">
 next section</a> indicates, not all of them need to be used for any
-particular model.  These lists are only representative of the object
+particular model, and anything not used can be ignored.  These lists
+are only representative of the object 
 types available in each general class; see the
 <A HREF="../Reference_Manual/">reference manual</A>, the menus in the
 GUI <A HREF="modeleditor.html">model editor</A>, or the files in
@@ -129,10 +130,12 @@ in no way limited to):
 	  (below).  This Sheet type supports a large class of
 	  topographic map models as-is, but others need specific
 	  extensions.
-        <li><?php classref('topo.sheets.cfsom','CFSOM')?>: 
-	  CFSheet with extensions to support the Kohonen SOM algorithm.
-        <li><?php classref('topo.sheets.lissom','LISSOM')?>: 
-	  CFSheet with extensions to support the LISSOM algorithm.
+            <ul>
+            <li><?php classref('topo.sheets.cfsom','CFSOM')?>: 
+	      CFSheet with extensions to support the Kohonen SOM algorithm.
+            <li><?php classref('topo.sheets.lissom','LISSOM')?>: 
+	      CFSheet with extensions to support the LISSOM algorithm.
+            </ul>
         </ul>
     </ul>
 </ul>
