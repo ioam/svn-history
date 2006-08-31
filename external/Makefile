@@ -1,14 +1,14 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-all: python jpeg pil numeric pmw matplotlib weave fixedpoint pychecker common pylint
+all: python jpeg pil numeric pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils
 
-clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean
+clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall
 
 ##############################################################
-# Python
+# Python (interpreted language)
 #
 PYTHON = Python-2.4.2
 
@@ -33,7 +33,7 @@ python-uninstall:
 	rm -rf python ${foreach f,${PYTHON_UNINSTALL}, ${PREFIX}/${f}}
 
 ##############################################################
-# Tcl
+# Tcl (required by Tk GUI toolkit)
 #
 TCL = tcl8.4.13
 TCL_UNINSTALL += bin/tclsh8.4 bin/wish8.4 lib/tclConfig.sh
@@ -54,7 +54,7 @@ tcl-uninstall:
 
 
 ##############################################################
-# Tk
+# Tk (GUI toolkit)
 #
 TK = tk8.4.13
 
@@ -75,7 +75,7 @@ tk-uninstall:
 
 
 #############################################################
-# jpeg
+# jpeg (JPEG image library)
 
 JPEG = jpeg-6b
 
@@ -101,7 +101,7 @@ jpeg-uninstall:
 
 
 ##############################################################
-# PIL
+# PIL (bitmap image library)
 #
 PIL = Imaging-1.1.5
 PIL_UNINSTALL = ${PYTHON_LIB}/site-packages/PIL
@@ -122,7 +122,7 @@ pil-uninstall:
 
 
 ##############################################################
-# Numeric
+# Numeric (matrix library)
 #
 NUMERIC = Numeric-24.0
 NUMERIC_UNINSTALL =  ${PYTHON_LIB}/site-packages/Numeric
@@ -139,7 +139,7 @@ numeric-uninstall:
 
 
 ##############################################################
-# MatPlotLib
+# MatPlotLib (plotting library)
 #
 MATPLOTLIB = matplotlib-0.81
 MATPLOTLIB_UNINSTALL =  ${PYTHON_LIB}/site-packages/matplotlib
@@ -168,7 +168,7 @@ matplotlib-uninstall:
 
 
 ##############################################################
-# PMW
+# PMW (graphical toolkit)
 #
 PMW = Pmw
 PMW_UNINSTALL = ${PYTHON_LIB}/site-packages/Pmw
@@ -185,7 +185,7 @@ pmw-uninstall:
 
 
 ##############################################################
-# Scipy (weave)
+# Scipy (for weave)
 #
 WEAVE = Scipy_core-0.3.0_108.1820
 WEAVE_UNINSTALL = ${PYTHON_LIB}/site-packages/weave
@@ -225,7 +225,7 @@ fixedpoint-uninstall:
 
 
 ##############################################################
-# pychecker
+# pychecker (optional source code checker)
 #
 PYCHECKER = pychecker-0.8.16
 PYCHECKER_UNINSTALL = ${PYTHON_LIB}/site-packages/pychecker
@@ -262,7 +262,7 @@ common-uninstall:
 
 
 ##############################################################
-# pylint
+# pylint (optional source-code checker)
 #
 PYLINT = pylint-0.7.0
 PYLINT_UNINSTALL = ${PYTHON_LIB}/site-packages/pylint
@@ -276,6 +276,42 @@ pylint-clean:
 	rm -rf ${PYLINT} 
 pylint-uninstall:
 	rm -rf pylint ${PYLINT} $(foreach f, ${PYLINT_UNINSTALL}, ${PREFIX}/${f})
+
+
+
+##############################################################
+# epydoc (Automatic Reference_Manual generator)
+#
+EPYDOC = epydoc-3.0alpha3
+EPYDOC_UNINSTALL = ${PYTHON_LIB}/site-packages/epydoc
+
+epydoc: ${EPYDOC}.tar.gz python common
+	tar xzf ${EPYDOC}.tar.gz
+	cd ${EPYDOC}; cd epydoc ; patch < ../../epydoc.diff; cd .. ; ${PREFIX}/bin/python setup.py install
+	touch epydoc
+
+epydoc-clean:
+	rm -rf ${EPYDOC} 
+epydoc-uninstall:
+	rm -rf epydoc ${EPYDOC} $(foreach f, ${EPYDOC_UNINSTALL}, ${PREFIX}/${f})
+
+
+
+##############################################################
+# docutils (used by epydoc)
+#
+DOCUTILS = docutils-0.4
+DOCUTILS_UNINSTALL = ${PYTHON_LIB}/site-packages/docutils
+
+docutils: ${DOCUTILS}.tar.gz python common
+	tar xzf ${DOCUTILS}.tar.gz
+	cd ${DOCUTILS}; ${PREFIX}/bin/python setup.py install
+	touch docutils
+
+docutils-clean:
+	rm -rf ${DOCUTILS} 
+docutils-uninstall:
+	rm -rf docutils ${DOCUTILS} $(foreach f, ${DOCUTILS_UNINSTALL}, ${PREFIX}/${f})
 
 
 
