@@ -37,7 +37,8 @@ def fix(x):
     towards zero.
     For negative numbers is equivalent to ceil and for positive to floor.
     """
-    
+    from matplotlib import numerix
+    from Numeric import floor,ceil,reshape
     dim = numerix.shape(x)
     if numerix.mlab.rank(x)==2:
         y = reshape(x,(1,dim[0]*dim[1]))[0]
