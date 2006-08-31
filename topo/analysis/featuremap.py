@@ -14,26 +14,20 @@ __version__='$Revision$'
 # to pass feature parameters in at too many stages.
 # I have to clean it up!
 # - remove temporary testing code
-# - get rid of unused import statements
 # - a Simulation should be passed in; this code shouldn't look for
 #   topo.sim
 
-from math import pi
-
-from Numeric import array, zeros, Float 
+from Numeric import zeros, Float
+from Numeric import array
 
 import topo
 
-from topo.base import sheetview
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.utils import cross_product, frange
-from topo.commands.basic import pattern_present, restore_input_generators, save_input_generators
+from topo.commands.basic import restore_input_generators, save_input_generators
 from topo.misc.distribution import Distribution
-from topo.sheets.generatorsheet import GeneratorSheet
-
-
 
 
 class FeatureMap(ParameterizedObject):
@@ -108,43 +102,7 @@ class FeatureMap(ParameterizedObject):
 class MeasureFeatureMap(ParameterizedObject):
     """
     """
-    def __init__(self, feature_param):
-        ### JABALERT: The feature_param structure is pretty
-        ### complicated; surely it should be an object or something
-        ### less fragile than a list assumed to have three elements as
-        ### it is here.
-        """
-        feature_param: a dictionary with sheets as keys and a dictionary: 
-                       {feature_name: (range, values, cyclic)} as values
-                       
-                       range: the tuple (lower_bound, upper_bound)
-                       values: either a list of the values to use for the feature (list), or
-                                      a step size (float) to generate the list
-                                      (i.e. frange(lower_bound,upper_bound,values))
-                       cyclic: whether or not the feature is cyclic (see topo.misc.distribution)
-
-                       e.g.    
-                       {'theta': (0.0,1.0), 0.10, True}
-                       for cyclic theta in steps of 0.10 from 0.0 to 1.0
-                       {'x': (0.0,2.0), [0.0, 0.5, 0.6, 0.7, 1.0], False}
-                       for the non-cyclic x values specified, which may only fall in the range [0.0,1.0].
-        """
-        # This dictionary will contain (for each sheet) a dictionary to hold the FeatureMap for each feature
-        # {sheet: {feature: FeatureMap()}}
-        self.__featuremaps = {}
-
-        # the list of (list of) values to be presented for each feature
-        self.__featurevalues = []
-        
-        for param in feature_param.values():
-            # param can be either list or float (a step size)
-            if isinstance(param[1],type([])):               
-                self.__featurevalues.append(param[1])
-            else:
-                low_bound,up_bound = param[0]
-                step=param[1]
-                cyclic=param[2]
-                self.__featurevalues.append(frange(low_bound,up_bound,step,not cyclic))
+    def __init__(self, features):
 
         # Sheets that have the attribure measure_maps and have it set True
         # get their maps measured.
@@ -152,21 +110,20 @@ class MeasureFeatureMap(ParameterizedObject):
         # to a specific projection, rather than measure the map due
         # to all projections.
         # The Sheet 'learning' parameter should be per projection
-        # (see alert in sheet.py), and we will have a per projection plastic
+        # see alert in sheet.py), and we will have a per projection plastic
         # attribure, too.
         f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-        self.__measured_sheets = filter(f,topo.sim.objects(Sheet).values())
-        
-        # now create the featuremaps for each sheet    
-        for sheet in self.__measured_sheets:
+        self.__sheets_to_measure_maps_for = filter(f,topo.sim.objects(Sheet).values())
+        # Add a (blank) FeatureMap for each Feature for each Sheet 
+        self.__featuremaps = {}                                          
+        for sheet in self.__sheets_to_measure_maps_for:
             self.__featuremaps[sheet] = {}
-            for feature, value in feature_param.items():
-                self.__featuremaps[sheet].update({feature: FeatureMap(sheet,
-                                                                          axis_range=value[0],
-                                                                          cyclic=value[2])})
+            for f in features:
+                self.__featuremaps[sheet][f.name]=FeatureMap(sheet,axis_range=f.range,cyclic=f.cyclic)
 
-                
-    def measure_maps(self,user_function,param_dict,display=False):
+                                                                                                                                
+        
+    def measure_maps(self,user_function,param_dict,features,display=False):
 
         """
         Create a list of all permutations of the feature values, then,
@@ -183,27 +140,23 @@ class MeasureFeatureMap(ParameterizedObject):
         """
         save_input_generators()
         
-        self.__present_input_patterns(user_function,param_dict,display)
+        self.__present_input_patterns(user_function,param_dict,display,features)
         self.__construct_sheet_views()
 
         restore_input_generators()
 
 
-    def __present_input_patterns(self,user_function,param_dict,display=False):
-        input_permutations = cross_product(self.__featurevalues)
-
+    def __present_input_patterns(self,user_function,param_dict,features,display=False):
+        feature_names=[f.name for f in features]
+        values_lists=[f.values for f in features]
+        permutations = cross_product(values_lists)
         # Present the input pattern with various parameter settings,
         # keeping track of the responses
-        for permutation in input_permutations:
-            sheet=self.__measured_sheets[0] # Assumes that there is at least one sheet; needs fixing
-            feature_points={}
-
-            # set each feature's value
-            for feature,value in zip(self.__featuremaps[sheet].keys(), permutation):
-                feature_points[feature] = value
+        for p in permutations:
+            settings = dict(zip(feature_names, p))
 
             # DRAW THE PATTERN: call to the user_function
-            user_function(feature_points,param_dict)
+            user_function(settings,param_dict)
 
             if display:
                 if hasattr(topo,'guimain'):
@@ -212,13 +165,13 @@ class MeasureFeatureMap(ParameterizedObject):
                     self.warning("No GUI available for display.")
             
             # NOW UPDATE EACH FEATUREMAP WITH (ACTIVITY,FEATURE_VALUE)
-            for sheet in self.__measured_sheets:
-                for feature,value in zip(self.__featuremaps[sheet].keys(), permutation):
+            for sheet in self.__sheets_to_measure_maps_for:
+                for feature,value in zip(feature_names, p):
                     self.__featuremaps[sheet][feature].update(sheet.activity, value)
         
 
     def __construct_sheet_views(self):
-        for sheet in self.__measured_sheets:
+        for sheet in self.__sheets_to_measure_maps_for:
             bounding_box = sheet.bounds
             
             for feature in self.__featuremaps[sheet].keys():
@@ -308,19 +261,3 @@ class MeasureFeatureMap(ParameterizedObject):
         return disp_sel,orient_sel 
 
     '''
-
-
-
-
-
-        
-
-    
-
-
-
-        
-
-
-
-    
