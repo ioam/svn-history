@@ -69,7 +69,7 @@ class PatternGenerator(ParameterizedObject):
 
     orientation = Number(
         default=0,softbounds=(0.0,2*pi),precedence=0.40,
-        doc="""Polar angle of pattern, i.e. the orientation in the Cartesian coordinate
+        doc="""Polar angle of pattern, i.e., the orientation in the Cartesian coordinate
         system, with zero at 3 o'clock and increasing counterclockwise.""")
     
     size = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
@@ -91,11 +91,12 @@ class PatternGenerator(ParameterizedObject):
         
     def __call__(self,**params):
         """
-        Create and fill an array with the requested pattern.
-        
-        If called without any params, uses the values for the Parameters as
-        currently set on the object. Otherwise, any params specified override
-        those currently set on the object.
+        Call the subclasses 'function' method on a rotated and scaled coordinate system.
+
+        Creates and fills an array with the requested pattern.  If
+        called without any params, uses the values for the Parameters
+        as currently set on the object. Otherwise, any params
+        specified override those currently set on the object.
         """
         self._check_params(params)
                 
@@ -136,12 +137,15 @@ class PatternGenerator(ParameterizedObject):
 
     def function(self,**params):
         """
-        Subclasses will typically implement this function to draw a pattern.
+        Function to draw a pattern that will then be scaled and rotated.
 
-        The pattern will then be scaled and rotated automatically by
-        __call__.  Alternatively, this function may be omitted and
-        __call__ reimplemented, e.g. if the automatic scaling and
-        rotating is not appropriate.
+        Instead of implementing __call__ directly, PatternGenerator
+        subclasses will typically implement this helper function used
+        by __call__, because that way they can let __call__ handle the
+        scaling and rotation for them.  Alternatively, __call__ itself
+        can be reimplemented entirely by a subclass (e.g. if it does
+        not need to do any scaling or rotation), in which case this
+        function will be ignored.
         """
         raise NotImplementedError
 
@@ -166,7 +170,7 @@ class PatternGenerator(ParameterizedObject):
 from Numeric import ones, Float
 
 class Constant(PatternGenerator):
-    """Constant pattern generator, i.e. a solid, uniform field of the same value."""
+    """Constant pattern generator, i.e., a solid, uniform field of the same value."""
 
     # The standard x, y, and orientation variables ignored for this special case,
     # so we hide them from auto-generated lists of parameters (e.g. in the GUI)
