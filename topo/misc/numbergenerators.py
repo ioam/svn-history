@@ -65,6 +65,15 @@ class UniformRandom(RandomDistribution):
     def __call__(self):
         return self.random_generator.uniform(self.lbound,self.ubound)
 
+###TRALERT:temporary implementation for selecting +ve or -ve gaussians in Plus/Minus disparity expt
+class Choice(RandomDistribution):
+    lower = Number(default=-0.5)
+    upper = Number(default=0.5)
+    
+    def __call__(self):
+
+        return self.random_generator.choice([self.lower,self.upper])
+
 
 class NormalRandom(RandomDistribution):
     """

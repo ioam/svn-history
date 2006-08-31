@@ -10,9 +10,14 @@ $Id$
 __version__='$Revision$'
 
 
+
 from math import pi
 
 from Numeric import where,maximum,cos,sin,sqrt,less_equal,divide,greater_equal,bitwise_xor
+
+from Numeric import zeros,ones
+from pylab import fix
+from RandomArray import random,seed
 
 from topo.base.arrayutils import exp
 
@@ -85,6 +90,85 @@ def ring(x, y, width, height, thickness, gaussian_width):
     outer_falloff = __exp(-outer_perimeter*outer_perimeter, 2.0*sigmasq)
 
     return maximum(inner_falloff,maximum(outer_falloff,ring))
+
+
+def rds(xsize,ysize,xdisparity,ydisparity,dotdensity,dotsize,gen_seed):
+
+
+    xsize=int(round(xsize))
+    ysize=int(round(ysize))
+    xdisparity=int(round(xdisparity))
+    ydisparity=int(round(ydisparity))
+    dotsize=int(round(dotsize))
+    gen_seed=int(round(gen_seed))
+    
+    bigxsize = 2*xsize
+    bigysize = 2*ysize
+    ndots=int(round(dotdensity * (bigxsize+2*dotsize) * (bigysize+2*dotsize) / min(dotsize,xsize) / min(dotsize,ysize)))
+    halfdot = fix(dotsize/2)
+
+    ###TRALERT:
+    
+    ###TRALERT:For Test Pattern Window
+    bigimage = 0.5*ones((bigysize,bigxsize))
+
+    ###TRALERT:For Energy models
+    '''
+    bigimage = zeros((bigysize,bigxsize))
+    '''
+    
+    xpos=zeros((1,ndots))
+    ypos=zeros((1,ndots))
+    x1=zeros((1,ndots))
+    y1=zeros((1,ndots))
+    x2=zeros((1,ndots))
+    y2=zeros((1,ndots))
+    col=zeros((1,ndots))
+
+    
+    seed(gen_seed*12,gen_seed*99)
+    col=random((1,ndots))
+
+    seed(gen_seed*122,gen_seed*799)
+    xpos=fix(random((1,ndots))*(bigxsize+2*dotsize)) - halfdot
+
+    seed(gen_seed*1243,gen_seed*9349)
+    ypos=fix(random((1,ndots))*(bigysize+2*dotsize)) - halfdot
+  
+    
+    for i in range(ndots):
+
+        ###TRALERT:For Test Pattern Window,white is represented as 1 and black as 0. background is 0.5
+        ###alternatively, offset parameter can be set properly
+        
+        if col[0][i] >= 0.5:
+            col[0][i]= 1
+        else:
+            col[0][i]= 0
+        
+        
+        ###TRALERT:For testing energy models, white==1, black==-1,background=0 (similar to Read's code)
+        '''
+        if col[0][i] >= 0.5:
+            col[0][i]= 1
+        else:
+            col[0][i]= -1
+        '''
+        
+        x1[0][i]= max(xpos[0][i],0)
+        x2[0][i]= min(xpos[0][i] + dotsize-1,bigxsize)
+        y1[0][i] = max(ypos[0][i],0)
+        y2[0][i] = min(ypos[0][i] + dotsize-1,bigysize)
+        bigimage[y1[0][i]:y2[0][i]+1,x1[0][i]:x2[0][i]+1] = col[0][i]
+        
+    image = bigimage[ (ysize/2)+ydisparity:(3*ysize/2)+ydisparity , (xsize/2)+xdisparity:(3*xsize/2)+xdisparity ]
+    
+    return image
+
+    
+
+
+
 
 
 # JABHACKALERT:  The __ellipse_dist function needs to be reimplemented
