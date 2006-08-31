@@ -394,9 +394,6 @@ class PatternSampler(ParameterizedObject):
             raise ValueError("Unknown scaling option",scaling)
 
 
-# CEBHACKALERT: this new version is untested (as was the old one...)
-from topo.base.parameterclasses import Wrapper
-class CompositePatternGenerator(PatternGenerator):
 
 class Composite(PatternGenerator):
 
