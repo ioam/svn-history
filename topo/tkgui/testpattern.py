@@ -355,6 +355,8 @@ Each type will have various parameters that can be changed.""")
     ### JAB: It is not clear how this will need to be extended to support
     ### objects with different parameters in the different eyes, e.g. to
     ### test ocular dominance.
+
+    ###TRALERT: Supports two-eye disparity model for RandomDotStereogram only
     def __setup_pattern_generators(self):
         """
         Make an instantiation of the current user patterns.
@@ -368,9 +370,22 @@ Each type will have various parameters that can be changed.""")
 
         self.__params_frame.set_obj_params()
 
+        disparity_flip=1
+        
         for (gs_name,o_s_p) in self.generator_sheets_patterns.items():
+            
+          
             if o_s_p['editing']==True:
-                o_s_p['pattern_generator'] = self.__params_frame.topo_obj
+                o_s_p['pattern_generator'] = self.__params_frame.topo_obj 
+                
+                if type(o_s_p['pattern_generator']) == topo.patterns.rds.RandomDotStereogram:
+
+                    pg_copy=copy.deepcopy(o_s_p['pattern_generator'])
+                    pg_copy.xdisparity=disparity_flip*pg_copy.xdisparity/2
+                    pg_copy.ydisparity=disparity_flip*pg_copy.ydisparity/2
+                    o_s_p['pattern_generator']=pg_copy
+                    disparity_flip=-1
+
                 setattr(o_s_p['pattern_generator'],'bounds',copy.deepcopy(o_s_p['generator_sheet'].bounds))
                 setattr(o_s_p['pattern_generator'],'xdensity', o_s_p['generator_sheet'].xdensity)
-                setattr(o_s_p['pattern_generator'],'ydensity', o_s_p['generator_sheet'].ydensity)                
+                setattr(o_s_p['pattern_generator'],'ydensity', o_s_p['generator_sheet'].ydensity)

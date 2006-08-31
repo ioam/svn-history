@@ -1,8 +1,11 @@
 """
-Example of a LISSOM-based Phase Disparity map with ON/OFF channels.
+DISP : Max  disp of 2 pixel (In fact 2 pixel)
 
+54 == 2.25
+2 = (2.25*2)/54 = 0.08333
+Since left_x = input_x - disp and right_x = input_x + disp,
+To get disp of 2 pixel, we need disp to be between -0.08333/2 <--> 0.08333/2
 """
-
 import RandomArray
 import fixedpoint
 
@@ -13,7 +16,6 @@ from fixedpoint import FixedPoint
 import topo.patterns.basic
 import topo.patterns.random
 import copy
-import random
 
 from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
@@ -27,49 +29,46 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
-topo.sim.name = "lissom_oo_phase_disparity"
 
-####################NOt required#######################
-###NOt yet implemented#############
-#left_phase=UniformRandom(lbound=0,ubound=2*pi,seed=12)
-#left_phase_copy=copy.deepcopy(left_phase)
-#phase_list=[0,pi/2,pi,3*pi/2]
-#random_phase=random.choice(phase_list)
-#random_phase_copy=copy.deepcopy(random_phase)
-#temp=lambda:left_phase_copy() + random_phase_copy()
-#right_phase=DynamicNumber(lambda:left_phase_copy() + random_phase_copy())
-#disparity=UniformRandom(lbound=0,ubound=2*pi,seed=12)
-#disparity_copy=copy.deepcopy(disparity)
-#right_phase=lambda:left_phase_copy() + disparity_copy()
-#############################################################
 
-left_phase=UniformRandom(lbound=0,ubound=2*pi,seed=100)
-left_phase_copy=copy.deepcopy(left_phase)
-right_phase=UniformRandom(lbound=0,ubound=2*pi,seed=200)
-right_phase_copy=copy.deepcopy(right_phase)
+
+#TR
+from topo.base.pickle import PickleDisparity1,PickleDisparity2
+
+topo.sim.name = "lissom_oo_disparity_gauss_2_pixel"
+
+### Present input patterns that are at non-corresponding locations on each retina
+left_x=PickleDisparity1()
+left_x.input_param = DynamicNumber(UniformRandom(lbound=-0.70833,ubound=0.70833,seed=12))
+left_x.disp = DynamicNumber(UniformRandom(lbound=-0.08333/2.0,ubound=0.08333/2.0,seed=150))
+
+right_x=PickleDisparity2()
+
+right_x.input_param = DynamicNumber(UniformRandom(lbound=-0.70833,ubound=0.70833,seed=12))
+right_x.disp = DynamicNumber(UniformRandom(lbound=-0.08333/2.0,ubound=0.08333/2.0,seed=150))
+
 
 
 left_input_pattern = topo.patterns.basic.Gaussian(
           size=2*0.0468, aspect_ratio=4.0,
-          scale=DynamicNumber(UniformRandom(lbound=0,ubound=2,seed=200)), 
-          x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
-          y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
+          #scale=DynamicNumber(UniformRandom(lbound=0,ubound=2,seed=200)), 
+          x=DynamicNumber(left_x),
+          y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34)),
           orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
 
 right_input_pattern = topo.patterns.basic.Gaussian(
           size=2*0.0468, aspect_ratio=4.0,
-          scale=DynamicNumber(UniformRandom(lbound=0,ubound=2,seed=200)), 
-          x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
-          y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
+          #scale=DynamicNumber(UniformRandom(lbound=0,ubound=2,seed=200)), 
+          x=DynamicNumber(right_x),
+          y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34)),
           orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
-
 
 
                           
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)
-CFProjection.weights_generator=topo.patterns.random.UniformRandom()
+CFProjection.weights_generator=topo.patterns.basic.Constant()
 CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
@@ -120,9 +119,7 @@ topo.sim['V1'].output_fn.upper_bound=0.633
 
 
 
-
 # LGN ON channel
-
 topo.sim.connect('LeftRetina','LGNOnLeft',delay=FixedPoint("0.05"),
                   connection_type=SharedWeightCFProjection,strength=2.33,
                   nominal_bounds_template=BoundingBox(radius=0.375),name='LCenterOn',
@@ -146,6 +143,7 @@ topo.sim.connect('RightRetina','LGNOnRight',delay = FixedPoint("0.05"),
                   name='RSurroundOn',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
+
 
 # LGN OFF channel
 topo.sim.connect('LeftRetina','LGNOffLeft',delay = FixedPoint("0.05"),
@@ -172,35 +170,24 @@ topo.sim.connect('RightRetina','LGNOffRight',delay = FixedPoint("0.05"),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
 
-
-###Setting the phase settings of the connection fields
-topo.patterns.basic.Gabor.orientation=pi/2
-topo.patterns.basic.Gabor.size=0.70
-topo.patterns.basic.Gabor.frequency=2.4
-topo.patterns.basic.Gabor.aspect_ratio=1
-
 # Connections from LGNs to V1
-# Phase of the Afferent Connections different
 
-topo.sim.connect('LGNOnLeft','V1',delay=FixedPoint("0.05"),
-                  connection_type=CFProjection,strength=0.75,name='LGNOnLeftAfferent',
-                  nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590,
-                  weights_generator=topo.patterns.basic.Gabor(phase=DynamicNumber(left_phase)))
+topo.sim.connect('LGNOnLeft','V1',delay=FixedPoint("0.05"),#dest_port=('Activity','JointNormalize', 'Afferent'),
+                  connection_type=CFProjection,strength=0.25,name='LGNOnLeftAfferent',
+                  nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590)
 
-topo.sim.connect('LGNOffLeft','V1',delay=FixedPoint("0.05"),
-                  connection_type=CFProjection,strength=0.5,name='LGNOffLeftAfferent',
-                  nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590,
-                  weights_generator=topo.patterns.basic.Gabor(phase=DynamicNumber(left_phase_copy)))
+topo.sim.connect('LGNOffLeft','V1',delay=FixedPoint("0.05"),#dest_port=('Activity','JointNormalize', 'Afferent'),
+                  connection_type=CFProjection,strength=0.25,name='LGNOffLeftAfferent',
+                  nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590)
 
-topo.sim.connect('LGNOnRight','V1',delay=FixedPoint("0.05"),
-                  connection_type=CFProjection,strength=0.75,name='LGNOnRightAfferent',
-                  nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590,
-                  weights_generator=topo.patterns.basic.Gabor(phase=DynamicNumber(right_phase)))
+topo.sim.connect('LGNOnRight','V1',delay=FixedPoint("0.05"),#dest_port=('Activity','JointNormalize', 'Afferent'),
+                  connection_type=CFProjection,strength=0.25,name='LGNOnRightAfferent',
+                  nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590)
 
-topo.sim.connect('LGNOffRight','V1',delay=FixedPoint("0.05"),
-                  connection_type=CFProjection,strength=0.5,name='LGNOffRightAfferent',
-                  nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590,
-                  weights_generator=topo.patterns.basic.Gabor(phase=DynamicNumber(right_phase_copy)))
+topo.sim.connect('LGNOffRight','V1',delay=FixedPoint("0.05"),#dest_port=('Activity','JointNormalize', 'Afferent'),
+                  connection_type=CFProjection,strength=0.25,name='LGNOffRightAfferent',
+                  nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590)
+
 
 # Lateral Connections
 
@@ -214,21 +201,27 @@ topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
 
 
 
-
 ### Actions scheduled to occur as the simulation proceeds.
-### copied from lissom_oo_or
-
-
 
 topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
 
 ### Lateral excitatory bounds changes
 topo.sim.schedule_command(200,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.06))')
 topo.sim.schedule_command(500,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.042))')
+topo.sim.schedule_command(1000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.0336))')
+topo.sim.schedule_command(2000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.02688))')
+topo.sim.schedule_command(3000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.02150))')
+topo.sim.schedule_command(4000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.01290))')
+topo.sim.schedule_command(5000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00774))')
+topo.sim.schedule_command(6500,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00464))')
+topo.sim.schedule_command(8000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00279))')
+topo.sim.schedule_command(20000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00167))')
+
 
 ### Lateral excitatory learning rate changes
 topo.sim.schedule_command(200,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=1.2213')
 topo.sim.schedule_command(500,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.3466')
+
 
 ### Afferent learning rate changes
 topo.sim.schedule_command(  500,'topo.sim["V1"].projections()["LGNOnLeftAfferent"].learning_rate=0.6850;topo.sim["V1"].projections()["LGNOffLeftAfferent"].learning_rate=0.6850')
@@ -244,7 +237,7 @@ topo.sim.schedule_command(20000,'topo.sim["V1"].projections()["LGNOnRightAfferen
 
 ### LISSOM output function bounds changes
 topo.sim.schedule_command(  200,'topo.sim["V1"].output_fn.lower_bound=0.093;topo.sim["V1"].output_fn.upper_bound=0.643')
-topo.sim.schedule_command(  500,'topo.sim["V1"].output_fn.lower_bound=0.103;topo.sim["V1"].output_fn.upper_bound=0.643')
+topo.sim.schedule_command(  500,'topo.sim["V1"].output_fn.lower_bound=0.103;topo.sim["V1"].output_fn.upper_bound=0.653')
 topo.sim.schedule_command( 1000,'topo.sim["V1"].output_fn.lower_bound=0.133;topo.sim["V1"].output_fn.upper_bound=0.663')
 topo.sim.schedule_command( 2000,'topo.sim["V1"].output_fn.lower_bound=0.163;topo.sim["V1"].output_fn.upper_bound=0.683')
 topo.sim.schedule_command( 3000,'topo.sim["V1"].output_fn.lower_bound=0.183;topo.sim["V1"].output_fn.upper_bound=0.713')
@@ -254,6 +247,8 @@ topo.sim.schedule_command( 6500,'topo.sim["V1"].output_fn.lower_bound=0.203;topo
 topo.sim.schedule_command( 8000,'topo.sim["V1"].output_fn.lower_bound=0.213;topo.sim["V1"].output_fn.upper_bound=0.833')
 topo.sim.schedule_command(20000,'topo.sim["V1"].output_fn.lower_bound=0.223;topo.sim["V1"].output_fn.upper_bound=0.863')
 
+
+
 # default locations for model editor
 
 topo.sim['V1'].gui_x=600.0;      topo.sim['V1'].gui_y=225.0
@@ -262,7 +257,7 @@ topo.sim['LGNOffLeft'].gui_x=482.0;  topo.sim['LGNOffLeft'].gui_y=445.0
 topo.sim['LeftRetina'].gui_x=279.0;  topo.sim['LeftRetina'].gui_y=700.0
 
 topo.sim['LGNOnRight'].gui_x=750.0;   topo.sim['LGNOnRight'].gui_y=445.0
-topo.sim['LGNOffRight'].gui_x=1032.0;  topo.sim['LGNOffRight'].gui_y=445.0
+topo.sim['LGNOffRight'].gui_x=1030.0;  topo.sim['LGNOffRight'].gui_y=445.0
 topo.sim['RightRetina'].gui_x=879.0;  topo.sim['RightRetina'].gui_y=700.0
 
 

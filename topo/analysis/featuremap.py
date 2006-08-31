@@ -246,8 +246,68 @@ class MeasureFeatureMap(ParameterizedObject):
                 sheet.sheet_view_dict[feature.capitalize()+'Selectivity']=selectivity_map
 
 
+    ##TRALERT: The following methods were used for analysis purposes in the disparity project
+    '''
+    def measure_maps_modified(self,user_function,param_dict,display=False):
 
+        save_input_generators()
+        
+        self.__present_input_patterns(user_function,param_dict,display)
+        disp_pref,orient_pref=self.get_disp_preference()
+        disp_select,orient_select=self.get_disp_selectivity()
 
+        restore_input_generators()
+        
+        return disp_pref,orient_pref,disp_select,orient_select
+    
+    def get_disp_preference(self):
+
+        disp=zeros([48,48],Float)
+        orient=zeros([48,48],Float)
+        
+        for sheet in self.__measured_sheets:
+
+            for feature in self.__featuremaps[sheet].keys():
+                if feature=='disparity':
+
+                    if self.__featuremaps[sheet][feature].distribution_matrix[0,0].cyclic == True:
+                        norm_factor = self.__featuremaps[sheet][feature].distribution_matrix[0,0].axis_range
+                        print 'norm_factor : ',norm_factor
+                    else:
+                        norm_factor = 1.0
+               
+                    disp=self.__featuremaps[sheet][feature].preference()*180/pi
+
+                if feature=='orientation':
+
+                    if self.__featuremaps[sheet][feature].distribution_matrix[0,0].cyclic == True:
+                        norm_factor = self.__featuremaps[sheet][feature].distribution_matrix[0,0].axis_range
+                        print 'norm_factor : ',norm_factor
+                    else:
+                        norm_factor = 1.0
+               
+                    orient=self.__featuremaps[sheet][feature].preference()*180/pi
+
+        return disp,orient           
+
+    def get_disp_selectivity(self):
+        disp_sel=zeros([48,48],Float)
+        orient_sel=zeros([48,48],Float)
+        
+        for sheet in self.__measured_sheets:
+            for feature in self.__featuremaps[sheet].keys():
+            
+                if feature=='disparity':
+               
+                    disp_sel = self.__featuremaps[sheet][feature].selectivity()
+
+                if feature=='orientation':
+               
+                    orient_sel = self.__featuremaps[sheet][feature].selectivity()
+                
+        return disp_sel,orient_sel 
+
+    '''
 
 
 

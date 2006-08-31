@@ -166,14 +166,7 @@ pgt = new_plotgroup_template(name='Ocular Preference',command='measure_od_pref()
 pgt.add_plot('Ocular Preference',[('Strength','OcularPreference')])
 pgt.add_plot('Ocular Selectivity',[('Strength','OcularSelectivity')])
 
-
-pgt = new_plotgroup_template(name='Positiondisparity Preference',command='measure_position_disparity()')
-pgt.add_plot('Positiondisparity Preference',[('Strength','PositiondisparityPreference')])
-pgt.add_plot('Positiondisparity Selectivity',[('Strength','PositiondisparitySelectivity')])
-
-
-pgt = new_plotgroup_template(name='Phasedisparity Preference',command='measure_phase_disparity()')
-pgt.add_plot('Phasedisparity Preference',[('Strength','PhasedisparityPreference')])
-pgt.add_plot('Phasedisparity Selectivity',[('Strength','PhasedisparitySelectivity')])
-
-
+pgt = new_plotgroup_template(name='Disparity Preference',command='measure_disparity()')
+pgt.add_plot('Disparity Preference',[('Hue','DisparityPreference')])
+pgt.add_plot('Disparity Selectivity',[('Strength','DisparitySelectivity')])
+pgt.add_static_image('Color Key','topo/commands/disp_key_white_vert_small.png')

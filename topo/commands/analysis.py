@@ -43,20 +43,6 @@ class PatternPresenter(object):
 
     def __call__(self,features_values,param_dict):
 
-        #Original call method
-        """
-        for param,value in param_dict.iteritems():
-           self.gen.__setattr__(param,value)
-        
-        for feature,value in features_values.iteritems():
-           self.gen.__setattr__(feature,value)
- 
-        inputs = dict().fromkeys(topo.sim.objects(GeneratorSheet),self.gen)
- 
-        pattern_present(inputs, self.duration, learning=False,
-                        apply_output_fn=self.apply_output_fn)
-
-        """
         
         for param,value in param_dict.iteritems():
            self.gen.__setattr__(param,value)
@@ -65,51 +51,43 @@ class PatternPresenter(object):
            self.gen.__setattr__(feature,value)
 
         gen_list=topo.sim.objects(GeneratorSheet)
-        eye=gen_list.keys()
+        input_pattern=gen_list.keys()
 
-        ###TRHACKALERT: This is not a generic implementation for presenting patterns. Certain
-        ###validations should be done(on GUI level as well).
+        inputs = dict().fromkeys(topo.sim.objects(GeneratorSheet),self.gen)
+        gen_copy1=copy.deepcopy(self.gen)
+        gen_copy2=copy.deepcopy(self.gen)
 
-        if len(eye)==2:
-            gen_copy1=copy.deepcopy(self.gen)
-            gen_copy2=copy.deepcopy(self.gen)
+        ###TRALERT: for disparity maps 
+        if features_values.has_key("disparity") and len(input_pattern)==2:
             inputs={}
-            
-            if features_values.has_key("positiondisparity"):
-                inputs[eye[0]]=gen_copy1
-                gen_copy2.x=gen_copy2.x + gen_copy2.positiondisparity
-                inputs[eye[1]]=gen_copy2
 
-            elif features_values.has_key("phasedisparity"):
-                
-                phase_first=random.uniform(0,2*pi)
-                phase_first_copy=copy.deepcopy(phase_first)
-                phase_second=phase_first_copy + features_values['phasedisparity']
-                proj_sheets=topo.sim.objects(CFSheet)
-                sheets_name=proj_sheets.keys()
-                lissom=topo.sim.objects(LISSOM).keys()
+            temp_phase1=gen_copy1.phase - gen_copy1.disparity/2.0
+            temp_phase2=gen_copy2.phase + gen_copy2.disparity/2.0
+            gen_copy1.phase=wrap(0,2*pi,temp_phase1)
+            gen_copy2.phase=wrap(0,2*pi,temp_phase2)
 
-                for sheet in sheets_name:
-                    if sheet != lissom[0]:
-                        conn_field=proj_sheets[sheet].out_connections
-                        if proj_sheets[sheet].in_connections[0].src.name == eye[0]:
-                            conn_field[0].weights_generator.__setattr__('phase',phase_first)
-                        else:
-                            conn_field[0].weights_generator.__setattr__('phase',phase_second)
-                            
-                inputs = dict().fromkeys(topo.sim.objects(GeneratorSheet),self.gen)
+            inputs[input_pattern[0]]=gen_copy1
+            inputs[input_pattern[1]]=gen_copy2
 
-            elif features_values.has_key("ocular"):
-                gen_copy1.scale=2*gen_copy1.ocular
-                inputs[eye[0]]=gen_copy1
-                gen_copy2.scale=2.0-2*gen_copy2.ocular
-                inputs[eye[1]]=gen_copy2
+        ###TRALERT: Need to implement 'else' part properly              
         else:
-            inputs = dict().fromkeys(topo.sim.objects(GeneratorSheet),self.gen)
+            print "Error Message"
+
+        ###TRALERT: for OD maps    
+        
+        if features_values.has_key("ocular")and len(input_pattern)==2:
+            gen_copy1.scale=2*gen_copy1.ocular
+            gen_copy2.scale=2.0-2*gen_copy2.ocular
+            
+            inputs[input_pattern[0]]=gen_copy1
+            inputs[input_pattern[1]]=gen_copy2
+
+        ###TRALERT: Need to implement 'else' part properly    
+        else:
+            print "Error Message"
 
         pattern_present(inputs, self.duration, learning=False,
                         apply_output_fn=self.apply_output_fn)
-
                     
 
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
@@ -155,6 +133,7 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         x.measure_maps(user_function, param_dict, display)
 
 
+###TRALERT: Function for OD map measurement
 def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=True,
 		    user_function=PatternPresenter(pattern_generator=SineGrating(),
@@ -178,40 +157,8 @@ def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
         x.measure_maps(user_function, param_dict, display)
 
-
-###TRHACKALERT :Might be preferable to present multiple oriented Gaussians as input
-### instead of Sine Grating. Any change in the x and y parameters would cause a change in
-### phase, as Jim mentioned.
-
-def measure_position_disparity(num_phase=18,num_orientation=4,frequencies=[2.4],
-                    scale=0.3,offset=0.0,display=True,
-		    user_function=PatternPresenter(pattern_generator=SineGrating(),
-                                                   apply_output_fn=False,duration=0.175)):
-
-    
-    if num_phase <= 0 or num_orientation <= 0:
-        raise ValueError("num_phase and num_orientation must be greater than 0")
-
-    else:
-        step_phase=2*pi/num_phase
-        step_orientation=pi/num_orientation
-
-        ###HACKALERT: If I name the feature_value position_disparity and do the necessary chnages in
-        ###topo.plotting.templates, I don't get any plot. Same applies for phase_disparity
-
-        feature_values = {"orientation": ( (0.0,pi), step_orientation, True),
-                          "phase": ( (0.0,2*pi),step_phase,True),
-                          "frequency": ((min(frequencies),max(frequencies)),frequencies,False),
-                          "positiondisparity":((-0.2,0.2),[-0.2,0.0,0.2],False)}
-
-        x=MeasureFeatureMap(feature_values)
-
-        param_dict = {"scale":scale,"offset":offset}
-
-        x.measure_maps(user_function, param_dict, display)
-
-
-def measure_phase_disparity(num_phase=18,num_orientation=4,num_disparity=4,frequencies=[2.4],
+###TRALERT: Function for disparity map measurement
+def measure_disparity(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=True,
 		    user_function=PatternPresenter(pattern_generator=SineGrating(),
                                                    apply_output_fn=False,duration=0.175)):
@@ -228,14 +175,45 @@ def measure_phase_disparity(num_phase=18,num_orientation=4,num_disparity=4,frequ
         feature_values = {"orientation": ( (0.0,pi), step_orientation, True),
                           "phase": ( (0.0,2*pi),step_phase,True),
                           "frequency": ((min(frequencies),max(frequencies)),frequencies,False),
-                          "phasedisparity":((0.0,2*pi),step_disparity,True)}
+                          "disparity":((0.0,2*pi),step_disparity,True)}
 
         x=MeasureFeatureMap(feature_values)
 
         param_dict = {"scale":scale,"offset":offset}
 
         x.measure_maps(user_function, param_dict, display)
-    
+
+###TRALERT: Function for disparity map analysis purposes. Used in conjunction with measure_maps_modified() in topo.analysis.featuremap
+'''
+def measure_disparity_modified(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
+                    scale=0.3,offset=0.0,display=True,
+		    user_function=PatternPresenter(pattern_generator=SineGrating(),
+                                                   apply_output_fn=False,duration=0.175)):
+
+
+    if num_phase <= 0 or num_orientation <= 0 or num_disparity <= 0:
+        raise ValueError("num_phase, num_disparity and num_orientation must be greater than 0")
+
+    else:
+        step_phase=2*pi/num_phase
+        step_orientation=pi/num_orientation
+        step_disparity=2*pi/num_disparity
+
+        print 'freq :',frequencies
+
+        feature_values = {"orientation": ( (0.0,pi), step_orientation, True),
+                          "phase": ( (0.0,2*pi),step_phase,True),
+                          "frequency": ((min(frequencies),max(frequencies)),frequencies,False),
+                          "disparity":((0.0,2*pi),step_disparity,True)}
+
+        x=MeasureFeatureMap(feature_values)
+
+        param_dict = {"scale":scale,"offset":offset}
+
+        disp_pref,orient_pref,disp_sel,orient_sel=x.measure_maps_modified(user_function, param_dict, display)
+
+        return disp_pref,orient_pref,disp_sel,orient_sel
+'''
 
 def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=False,
                           user_function=PatternPresenter(Gaussian(aspect_ratio=1.0),False,1.0),

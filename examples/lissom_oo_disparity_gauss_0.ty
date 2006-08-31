@@ -1,5 +1,5 @@
 """
-Example of a LISSOM-based Position Disparity map with ON/OFF channels.
+ZERO DISPARITY
 
 """
 
@@ -26,37 +26,42 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
-topo.sim.name = "lissom_oo_position_disparity"
 
+#TRALERT: to bypass lambda functions in script
+from topo.base.pickle import PickleDisparity1,PickleDisparity2
+
+topo.sim.name = "lissom_oo_disparity_gauss_0"
 
 ### Present input patterns that are at non-corresponding locations on each retina
-left_x=UniformRandom(lbound=-0.5,ubound=0.5,seed=12)
-left_x_copy=copy.deepcopy(left_x)
-disparity=UniformRandom(lbound=-0.1,ubound=0.1,seed=12)
-disparity_copy=copy.deepcopy(disparity)
-right_x=lambda:left_x_copy() + disparity_copy()
+left_x=PickleDisparity1()
+left_x.input_param = DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12))
+left_x.disp = DynamicNumber(UniformRandom(lbound=0.0,ubound=0.0,seed=150))
+
+right_x=PickleDisparity2()
+
+right_x.input_param = DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12))
+right_x.disp = DynamicNumber(UniformRandom(lbound=0.0,ubound=0.0,seed=150))
+
 
 
 left_input_pattern = topo.patterns.basic.Gaussian(
           size=2*0.0468, aspect_ratio=4.0,
-          scale=DynamicNumber(UniformRandom(lbound=0,ubound=2,seed=200)), 
           x=DynamicNumber(left_x),
-          y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
+          y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34)),
           orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
 
 right_input_pattern = topo.patterns.basic.Gaussian(
           size=2*0.0468, aspect_ratio=4.0,
-          scale=DynamicNumber(UniformRandom(lbound=0,ubound=2,seed=200)), 
           x=DynamicNumber(right_x),
-          y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=34)),
+          y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34)),
           orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
 
                           
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)
-CFProjection.weights_generator=topo.patterns.random.UniformRandom()
+CFProjection.weights_generator=topo.patterns.basic.Constant()
 CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
@@ -159,21 +164,22 @@ topo.sim.connect('RightRetina','LGNOffRight',delay = FixedPoint("0.05"),
                                                                  aspect_ratio=1))
 
 # Connections from LGNs to V1
+#Halving strength of afferent connection for 2 eye-model
 
-topo.sim.connect('LGNOnLeft','V1',delay=FixedPoint("0.05"),
-                  connection_type=CFProjection,strength=0.75,name='LGNOnLeftAfferent',
+topo.sim.connect('LGNOnLeft','V1',delay=FixedPoint("0.05"),#dest_port=('Activity','JointNormalize', 'Afferent'),
+                  connection_type=CFProjection,strength=0.25,name='LGNOnLeftAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590)
 
-topo.sim.connect('LGNOffLeft','V1',delay=FixedPoint("0.05"),
-                  connection_type=CFProjection,strength=0.5,name='LGNOffLeftAfferent',
+topo.sim.connect('LGNOffLeft','V1',delay=FixedPoint("0.05"),#dest_port=('Activity','JointNormalize', 'Afferent'),
+                  connection_type=CFProjection,strength=0.25,name='LGNOffLeftAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590)
 
-topo.sim.connect('LGNOnRight','V1',delay=FixedPoint("0.05"),
-                  connection_type=CFProjection,strength=0.75,name='LGNOnRightAfferent',
+topo.sim.connect('LGNOnRight','V1',delay=FixedPoint("0.05"),#dest_port=('Activity','JointNormalize', 'Afferent'),
+                  connection_type=CFProjection,strength=0.25,name='LGNOnRightAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590)
 
-topo.sim.connect('LGNOffRight','V1',delay=FixedPoint("0.05"),
-                  connection_type=CFProjection,strength=0.5,name='LGNOffRightAfferent',
+topo.sim.connect('LGNOffRight','V1',delay=FixedPoint("0.05"),#dest_port=('Activity','JointNormalize', 'Afferent'),
+                  connection_type=CFProjection,strength=0.25,name='LGNOffRightAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590)
 
 
@@ -198,10 +204,20 @@ topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingB
 ### Lateral excitatory bounds changes
 topo.sim.schedule_command(200,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.06))')
 topo.sim.schedule_command(500,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.042))')
+topo.sim.schedule_command(1000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.0336))')
+topo.sim.schedule_command(2000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.02688))')
+topo.sim.schedule_command(3000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.02150))')
+topo.sim.schedule_command(4000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.01290))')
+topo.sim.schedule_command(5000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00774))')
+topo.sim.schedule_command(6500,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00464))')
+topo.sim.schedule_command(8000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00279))')
+topo.sim.schedule_command(20000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.00167))')
+
 
 ### Lateral excitatory learning rate changes
 topo.sim.schedule_command(200,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=1.2213')
 topo.sim.schedule_command(500,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.3466')
+
 
 ### Afferent learning rate changes
 topo.sim.schedule_command(  500,'topo.sim["V1"].projections()["LGNOnLeftAfferent"].learning_rate=0.6850;topo.sim["V1"].projections()["LGNOffLeftAfferent"].learning_rate=0.6850')
@@ -217,7 +233,7 @@ topo.sim.schedule_command(20000,'topo.sim["V1"].projections()["LGNOnRightAfferen
 
 ### LISSOM output function bounds changes
 topo.sim.schedule_command(  200,'topo.sim["V1"].output_fn.lower_bound=0.093;topo.sim["V1"].output_fn.upper_bound=0.643')
-topo.sim.schedule_command(  500,'topo.sim["V1"].output_fn.lower_bound=0.103;topo.sim["V1"].output_fn.upper_bound=0.643')
+topo.sim.schedule_command(  500,'topo.sim["V1"].output_fn.lower_bound=0.103;topo.sim["V1"].output_fn.upper_bound=0.653')
 topo.sim.schedule_command( 1000,'topo.sim["V1"].output_fn.lower_bound=0.133;topo.sim["V1"].output_fn.upper_bound=0.663')
 topo.sim.schedule_command( 2000,'topo.sim["V1"].output_fn.lower_bound=0.163;topo.sim["V1"].output_fn.upper_bound=0.683')
 topo.sim.schedule_command( 3000,'topo.sim["V1"].output_fn.lower_bound=0.183;topo.sim["V1"].output_fn.upper_bound=0.713')

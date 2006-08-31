@@ -1,0 +1,162 @@
+"""
+Partial implementation of the Ohzawa et al. (Science 1990, 249:1037-1041) models
+for disparity neurons based on spatiotemporal energy.
+
+
+$Id$
+"""
+__version__='$Revision$'
+
+import RandomArray
+import fixedpoint
+import copy
+
+from math import pi, sqrt
+from fixedpoint import FixedPoint
+
+import topo.patterns.basic
+import topo.patterns.random
+
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.projections.basic import CFProjection, SharedWeightCFProjection
+from topo.base.parameterclasses import DynamicNumber,Number
+from topo.base.cf import CFSheet
+from topo.base.boundingregion import BoundingBox
+from topo.outputfns.basic import PiecewiseLinear,HalfRectifyAndSquare
+from topo.base.functionfamilies import OutputFn
+from topo.base.arrayutils import clip_in_place
+from topo.misc.numbergenerators import UniformRandom
+from topo.commands.pylabplots import *
+
+topo.sim.name = "ohzawa_science90"
+
+
+input_pattern = topo.patterns.rds.RandomDotStereogram(dotsize=DynamicNumber(UniformRandom(lbound=0.05,ubound=0.15,seed=100)),
+                                        xdisparity=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
+                                        dotdensity=DynamicNumber(UniformRandom(lbound=0.2,ubound=0.8,seed=300)),
+                                        random=DynamicNumber(UniformRandom(lbound=0.0,ubound=1000.0,seed=400)))
+
+input_pattern_copy=copy.deepcopy(input_pattern)
+
+
+# Input regions
+topo.sim['LeftRetina']  = GeneratorSheet(nominal_density=100.0,
+                                         nominal_bounds=BoundingBox(radius=0.5),
+                                         input_generator=input_pattern)
+                        
+topo.sim['RightRetina'] = GeneratorSheet(nominal_density=100.0,
+                                         nominal_bounds=BoundingBox(radius=0.5),
+                                         input_generator=input_pattern_copy)
+
+                        
+# Binocular simple cells
+topo.sim['S1'] = CFSheet(nominal_density=1.0,measure_maps=False,
+                            output_fn=HalfRectifyAndSquare(),learning=False,
+                            nominal_bounds=BoundingBox(radius=0.5))
+
+topo.sim['S2'] = CFSheet(nominal_density=1.0,measure_maps=False,
+                              output_fn=HalfRectifyAndSquare(),learning=False,
+                              nominal_bounds=BoundingBox(radius=0.5))
+
+topo.sim['S3'] = CFSheet(nominal_density=1.0,measure_maps=False,
+                                  output_fn=HalfRectifyAndSquare(),learning=False,
+                                  nominal_bounds=BoundingBox(radius=0.5))
+
+topo.sim['S4'] = CFSheet(nominal_density=1.0,measure_maps=False,
+                                output_fn=HalfRectifyAndSquare(),learning=False,
+                                nominal_bounds=BoundingBox(radius=0.5))
+
+
+# Complex cells
+topo.sim['C'] = CFSheet(nominal_density=1.0,measure_maps=True,learning=False,
+                         nominal_bounds=BoundingBox(radius=0.5))
+
+
+##Parameters defining the connection field of each unit in S1,S2,S3 and S4
+
+# Specify weight initialization, response function, and learning function
+RandomArray.seed(500,500)
+
+CFProjection.strength=1.0
+CFProjection.nominal_bounds_template=BoundingBox(radius=0.5)
+
+topo.patterns.basic.Gabor.orientation=pi/2
+topo.patterns.basic.Gabor.size=0.70
+topo.patterns.basic.Gabor.frequency=2.4
+topo.patterns.basic.Gabor.aspect_ratio=1
+
+###TRALERT: Tuned Excitatory complex cell model
+
+topo.sim.connect('LeftRetina','S1',delay = FixedPoint("0.05"),name='LS1',
+                 connection_type=CFProjection,
+                 weights_generator=topo.patterns.basic.Gabor(phase=0))
+
+topo.sim.connect('RightRetina','S1',delay = FixedPoint("0.05"),name='RS1',
+                 connection_type=CFProjection,
+                 weights_generator=topo.patterns.basic.Gabor(phase=0))
+
+
+topo.sim.connect('LeftRetina','S2',delay = FixedPoint("0.05"),name='LS2',
+                 connection_type=CFProjection,
+                 weights_generator=topo.patterns.basic.Gabor(phase=pi))
+
+topo.sim.connect('RightRetina','S2',delay = FixedPoint("0.05"),name='RS2',
+                 connection_type=CFProjection,
+                 weights_generator=topo.patterns.basic.Gabor(phase=pi))
+
+
+
+topo.sim.connect('LeftRetina','S3',delay = FixedPoint("0.05"),name='LS3',
+                 connection_type=CFProjection,
+                 weights_generator=topo.patterns.basic.Gabor(phase=pi/2))
+
+topo.sim.connect('RightRetina','S3',delay = FixedPoint("0.05"),name='RS3',
+                 connection_type=CFProjection,
+                 weights_generator=topo.patterns.basic.Gabor(phase=pi/2))
+
+
+topo.sim.connect('LeftRetina','S4',delay = FixedPoint("0.05"),name='LS4',
+                 connection_type=CFProjection,
+                 weights_generator=topo.patterns.basic.Gabor(phase=3*pi/2))
+
+topo.sim.connect('RightRetina','S4',delay = FixedPoint("0.05"),name='RS4',
+                 connection_type=CFProjection,
+                 weights_generator=topo.patterns.basic.Gabor(phase=3*pi/2))
+
+topo.sim.connect('S1','C',delay = FixedPoint("0.05"),name='S1ToC',
+                 connection_type=CFProjection,
+                 min_matrix_radius=0,nominal_bounds_template=BoundingBox(radius=0.01))
+                 
+
+topo.sim.connect('S2','C',delay = FixedPoint("0.05"),name='S2ToC',
+                 connection_type=CFProjection,
+                 min_matrix_radius=0,nominal_bounds_template=BoundingBox(radius=0.01))
+                 
+
+topo.sim.connect('S3','C',delay = FixedPoint("0.05"),name='S3ToC',
+                 connection_type=CFProjection,
+                 min_matrix_radius=0,nominal_bounds_template=BoundingBox(radius=0.01))
+                
+
+topo.sim.connect('S4','C',delay = FixedPoint("0.05"),name='S4ToC',
+                 connection_type=CFProjection,
+                 min_matrix_radius=0,nominal_bounds_template=BoundingBox(radius=0.01))
+                 
+
+
+
+# default locations for model editor
+topo.sim['C'].gui_x=437.0
+topo.sim['C'].gui_y=54.0
+topo.sim['LeftRetina'].gui_x=284.0
+topo.sim['LeftRetina'].gui_y=532.0
+topo.sim['RightRetina'].gui_x=745.0
+topo.sim['RightRetina'].gui_y=532.0
+topo.sim['S1'].gui_x=142.0
+topo.sim['S1'].gui_y=230.0
+topo.sim['S2'].gui_x=396.0
+topo.sim['S2'].gui_y=230.0
+topo.sim['S3'].gui_x=658.0
+topo.sim['S3'].gui_y=230.0
+topo.sim['S4'].gui_x=902.0
+topo.sim['S4'].gui_y=230.0
