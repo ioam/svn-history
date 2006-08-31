@@ -40,6 +40,15 @@ PHPHTML = ${subst _text.php,.html,${PHPBASE}}
 default: bib2html imagedirs all
 all: ${PHPHTML}
 
+
+# The --parse-only could be removed later if epydoc were patch to used the 
+# __repr___ for Parameter values, instead of a meaningless object identifier
+reference-manual: ../topo/*.py ../topo/*/*.py
+	mv ../topo/tests ../topo-tests-tmp
+	cd .. ; bin/epydoc  --parse-only --inheritance=listed --docformat=ReStructuredText --show-sourcecode --html -o doc/Reference_Manual --name=Topographica --url=http://topographica.org topo
+	mv ../topo-tests-tmp ../topo/tests 
+# 	--graph=all
+
 imagedirs:
 	${MAKE} -C User_Manual/images/
 

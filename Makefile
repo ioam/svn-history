@@ -3,8 +3,6 @@ PREFIX =  ${CURDIR}/
 PYLINT = bin/pylint --parseable=yes --required-attributes=__version__ --min-name-length=1 --notes=FIXME,XXX,TODO,ALERT --max-line-length=200 --disable-msg=C0324
 PYCHECKER = bin/pychecker
 
-DOC = doc/Reference_Manual
-
 RELEASE = 0.9.1
 RELEASE_TAG = release_0_9_1
 
@@ -95,11 +93,8 @@ clean-pyc:
 clean-doc:
 	make -C doc clean
 
-# Auto-generated source code documentation
-# Uses an integrated python script named gendocs.py
-reference-manual: topo/*.py topo/*/*.py doc/Reference_Manual
-	mkdir -p ${DOC}
-	./topographica topo/misc/gendocs.py
+reference-manual: 
+	make -C doc reference-manual
 
 doc: FORCE
 	make -C doc/
