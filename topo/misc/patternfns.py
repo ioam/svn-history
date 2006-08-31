@@ -16,7 +16,6 @@ from math import pi
 from Numeric import where,maximum,cos,sin,sqrt,less_equal,divide,greater_equal,bitwise_xor
 
 from Numeric import zeros,ones
-from pylab import fix
 from RandomArray import random,seed
 
 from topo.base.arrayutils import exp
@@ -27,6 +26,37 @@ from topo.base.arrayutils import exp
 # correctly. Unfortunately this makes such expressions more difficult
 # to read. How can Numeric's / operator be made to override Python's /
 # operator for scalars?
+
+
+# Taken from matplotlib.mlab; may be temporary
+def fix(x):
+
+    """
+    Rounds towards zero.
+    x_rounded = fix(x) rounds the elements of x to the nearest integers
+    towards zero.
+    For negative numbers is equivalent to ceil and for positive to floor.
+    """
+    
+    dim = numerix.shape(x)
+    if numerix.mlab.rank(x)==2:
+        y = reshape(x,(1,dim[0]*dim[1]))[0]
+        y = y.tolist()
+    elif numerix.mlab.rank(x)==1:
+        y = x
+    else:
+        y = [x]
+    for i in range(len(y)):
+	if y[i]>0:
+		y[i] = floor(y[i])
+	else:
+		y[i] = ceil(y[i])
+    if numerix.mlab.rank(x)==2:
+        x = reshape(y,dim)
+    elif numerix.mlab.rank(x)==0:
+        x = y[0]
+    return x
+
 
 
 def gaussian(x, y, xsigma, ysigma):
