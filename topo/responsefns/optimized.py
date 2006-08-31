@@ -9,11 +9,11 @@ $Id$
 __version__='$Revision$'
 
 from topo.base.functionfamilies import ResponseFnParameter,DotProduct,ResponseFn
-from topo.base.cf import CFPResponseFn
+from topo.base.cf import CFPResponseFn, CFPRF_Plugin
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.inlinec import inline, optimized
 
-from topo.responsefns.projfns import CFPRF_Plugin, CFPRF_EuclideanDistance
+from topo.responsefns.projfns import CFPRF_EuclideanDistance
 from topo.projections.basic import CFPRF_SharedWeight
 
 
