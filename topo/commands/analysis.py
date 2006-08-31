@@ -29,6 +29,36 @@ from topo.base.parameterclasses import DynamicNumber
 from topo.base.sheet import Sheet
 from topo.base.sheetview import SheetView
 
+from topo.misc.utils import frange
+
+class Feature(object):
+    """
+    Stores the feature parameters required for generating one map.
+    """
+
+    def __init__(self, name, range=None, step=0.0, values=None, cyclic=False):
+         """
+         Users can provide either a range and a step size, or a list of values.
+         If a list of values is supplied a range is optional, it defaults to
+         the min and max in the list of values.
+         """ 
+         self.name=name
+         self.step=step
+         self.cyclic=cyclic
+                     
+         if range:  
+             self.range=range
+         elif values:
+             self.range=(min(values),max(values))
+         else:
+             raise ValueError('The range or values must be specified')
+             
+         if values:  
+             self.values=values
+         else:
+             low_bound,up_bound = self.range
+             self.values=(frange(low_bound,up_bound,step,not cyclic))
+
 
 class PatternPresenter(object):
     """
@@ -42,11 +72,10 @@ class PatternPresenter(object):
         self.gen = pattern_generator
 
     def __call__(self,features_values,param_dict):
-
         
         for param,value in param_dict.iteritems():
            self.gen.__setattr__(param,value)
-        
+               
         for feature,value in features_values.iteritems():
            self.gen.__setattr__(feature,value)
 
@@ -59,6 +88,7 @@ class PatternPresenter(object):
 
         ###TRALERT: for disparity maps 
         if features_values.has_key("disparity") and len(input_pattern)==2:
+
             inputs={}
 
             temp_phase1=gen_copy1.phase - gen_copy1.disparity/2.0
@@ -70,8 +100,8 @@ class PatternPresenter(object):
             inputs[input_pattern[1]]=gen_copy2
 
         ###TRALERT: Need to implement 'else' part properly              
-        else:
-            print "Error Message"
+#        else:
+#            print "Error Message1"
 
         ###TRALERT: for OD maps    
         
@@ -83,18 +113,15 @@ class PatternPresenter(object):
             inputs[input_pattern[1]]=gen_copy2
 
         ###TRALERT: Need to implement 'else' part properly    
-        else:
-            print "Error Message"
+#        else:
+#            print "Error Message2"
 
         pattern_present(inputs, self.duration, learning=False,
                         apply_output_fn=self.apply_output_fn)
-                    
 
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,
-		    user_function=PatternPresenter(pattern_generator=SineGrating(),
-                                                   apply_output_fn=False,duration=0.175)):
-
+                    user_function=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
 
     """
     Measure orientation maps, using a sine grating by default.
@@ -114,7 +141,6 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
     # Could consider having scripts set a variable for the duration,
     # based on their own particular model setup, and to have it read
     # from here.  Instead, assumes a fixed default duration right now...
-    
     if num_phase <= 0 or num_orientation <= 0:
         raise ValueError("num_phase and num_orientation must be greater than 0")
 
@@ -122,15 +148,15 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         step_phase=2*pi/num_phase
         step_orientation=pi/num_orientation
 
-        feature_values = {"orientation": ( (0.0,pi), step_orientation, True),
-                          "phase": ( (0.0,2*pi),step_phase,True),
-                          "frequency": ((min(frequencies),max(frequencies)),frequencies,False)}
-
+        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                          Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
+                          Feature(name="frequency",values=frequencies)]     
+   
         x=MeasureFeatureMap(feature_values)
 
         param_dict = {"scale":scale,"offset":offset}
 
-        x.measure_maps(user_function, param_dict, display)
+        x.measure_maps(user_function, param_dict, display, feature_values)
 
 
 ###TRALERT: Function for OD map measurement
@@ -146,16 +172,16 @@ def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         step_phase=2*pi/num_phase
         step_orientation=pi/num_orientation
 
-        feature_values = {"orientation": ( (0.0,pi), step_orientation, True),
-                          "phase": ( (0.0,2*pi),step_phase,True),
+        feature_values = {"phase": ( (0.0,2*pi),step_phase,True),
+                          "orientation": ( (0.0,pi), step_orientation, True),
                           "frequency": ((min(frequencies),max(frequencies)),frequencies,False),
                           "ocular":((0.0,1.0),[0.0,1.0],False)}
 
         x=MeasureFeatureMap(feature_values)
-
+        
         param_dict = {"scale":scale,"offset":offset}
 
-        x.measure_maps(user_function, param_dict, display)
+        x.measure_maps(user_function, param_dict, display, feature_values)
 
 ###TRALERT: Function for disparity map measurement
 def measure_disparity(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
@@ -172,8 +198,8 @@ def measure_disparity(num_phase=12,num_orientation=4,num_disparity=12,frequencie
         step_orientation=pi/num_orientation
         step_disparity=2*pi/num_disparity
 
-        feature_values = {"orientation": ( (0.0,pi), step_orientation, True),
-                          "phase": ( (0.0,2*pi),step_phase,True),
+        feature_values = {"phase": ( (0.0,2*pi),step_phase,True),
+                          "orientation": ( (0.0,pi), step_orientation, True),
                           "frequency": ((min(frequencies),max(frequencies)),frequencies,False),
                           "disparity":((0.0,2*pi),step_disparity,True)}
 
@@ -181,7 +207,7 @@ def measure_disparity(num_phase=12,num_orientation=4,num_disparity=12,frequencie
 
         param_dict = {"scale":scale,"offset":offset}
 
-        x.measure_maps(user_function, param_dict, display)
+        x.measure_maps(user_function, param_dict, display, feature_values)
 
 ###TRALERT: Function for disparity map analysis purposes. Used in conjunction with measure_maps_modified() in topo.analysis.featuremap
 '''
@@ -200,9 +226,8 @@ def measure_disparity_modified(num_phase=12,num_orientation=4,num_disparity=12,f
         step_disparity=2*pi/num_disparity
 
         print 'freq :',frequencies
-
-        feature_values = {"orientation": ( (0.0,pi), step_orientation, True),
-                          "phase": ( (0.0,2*pi),step_phase,True),
+        feature_values = {"phase": ( (0.0,2*pi),step_phase,True),
+                          "orientation": ( (0.0,pi), step_orientation, True),
                           "frequency": ((min(frequencies),max(frequencies)),frequencies,False),
                           "disparity":((0.0,2*pi),step_disparity,True)}
 
@@ -210,7 +235,7 @@ def measure_disparity_modified(num_phase=12,num_orientation=4,num_disparity=12,f
 
         param_dict = {"scale":scale,"offset":offset}
 
-        disp_pref,orient_pref,disp_sel,orient_sel=x.measure_maps_modified(user_function, param_dict, display)
+        disp_pref,orient_pref,disp_sel,orient_sel=x.measure_maps_modified(user_function, param_dict, display, feature_values)
 
         return disp_pref,orient_pref,disp_sel,orient_sel
 '''
@@ -228,8 +253,8 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
         feature_values = {"x": ( x_range, 1.0*(x_range[1]-x_range[0])/divisions, False),
                           "y": ( y_range, 1.0*(y_range[1]-y_range[0])/divisions, False)}
         x=MeasureFeatureMap(feature_values)
-        param_dict = {"size":size,"scale":scale,"offset":offset}
-        x.measure_maps(user_function, param_dict, display)
+        param_dict = {"size":size,"scale":scale,"offset":offset}        
+        x.measure_maps(user_function, param_dict, display, feature_values)
 
 
 
