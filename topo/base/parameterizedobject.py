@@ -113,7 +113,7 @@ class Parameter(object):
 
        If Foo implements its own constructor, keyword arguments will
        still be accepted if the constructor accepts a dictionary of
-       keyword arguments (as in'def __init__(self,**params):'), and
+       keyword arguments (as in 'def __init__(self,**params):'), and
        then each class calls its superclass (as in
        'super(Foo,self).__init__(**params)') so that the
        ParameterizedObject constructor will process the keywords.
@@ -607,7 +607,7 @@ class ParameterizedObject(object):
     
     def __init__(self,abstract_class=None,**config):
         """        
-        If **config doesn't contain a 'name' parameter, self.name defaults
+        If **config does not contain a 'name' parameter, self.name defaults
         to a gensym formed from the object's type name and a unique number.
         """
         global object_count
@@ -724,8 +724,8 @@ class ParameterizedObject(object):
         Print a warning if params contains something that is
         not a Parameter of this object.
 
-        Typically called by a __call__() method that accepts
-        **params in its arguments.
+        Typically called by a __call__() method that accepts **params
+        in its arguments.
         """
         for item in params:
             if item not in self.params():

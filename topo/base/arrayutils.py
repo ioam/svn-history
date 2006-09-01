@@ -88,7 +88,7 @@ def arg(z):
 import Numeric
 def exp(x):
     """
-    Avoid overflow of Numeric.exp() for large-magnitude arguments (|x|>MAX_MAG).
+    Avoid overflow of Numeric.exp() for large-magnitude arguments (abs(x)>MAX_MAG).
 
     Return  Numeric.exp( inf)==inf  if x > MAX_MAG
             Numeric.exp(-inf)==0.0  if x < -MAX_MAG

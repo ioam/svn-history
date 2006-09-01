@@ -21,7 +21,7 @@ class KeyedList(list):
         __setitem__ ([,])
         append  --  Now takes a tuple (key,value) so that value
                     can be later accessed by [key].
-                    
+    
     New functions modeled from dictionaries:
         get
         set

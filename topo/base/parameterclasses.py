@@ -164,8 +164,7 @@ class Number(Parameter):
         sliders for the Number.
 
         Example of creating a Number:
-        AB = Number(default=0.5, bounds=(None,10),
-                    softbounds=(0,1), doc='Distance from A to B.')
+        AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
         """
         Parameter.__init__(self,default=default,**params)
         self.bounds = bounds

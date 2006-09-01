@@ -36,9 +36,9 @@ class Composer(Sheet):
     def port_configure(self,port,**config):
         """
         Configure a specific input port.
-        Port parameters:
-           origin = (default (0,0)) The offset in the output matrix
-                    where this port's input should be placed.
+        
+        origin = (default (0,0)) The offset in the output matrix where
+        this port's input should be placed.
         """
         if not port in self.ports:
             self.ports[port] = {}

@@ -65,27 +65,24 @@ class PatternSampler(ParameterizedObject):
         is to be drawn.
 
         scaling determines how the pattern is scaled initially; it can be:
-          'stretch_to_fit'
-        scale both dimensions of the pattern so they would fill a Sheet
-        with bounds=BoundingBox(radius=0.5)
+        
+        'stretch_to_fit': scale both dimensions of the pattern so they
+        would fill a Sheet with bounds=BoundingBox(radius=0.5)
         (disregards the original's aspect ratio)
 
-          'fit_shortest'
-        scale the pattern so that its shortest dimension is made to fill
-        the corresponding dimension on a Sheet with
-        bounds=BoundingBox(radius=0.5)
-        (maintains the original's aspect ratio)
+        'fit_shortest': scale the pattern so that its shortest
+        dimension is made to fill the corresponding dimension on a
+        Sheet with bounds=BoundingBox(radius=0.5) (maintains the
+        original's aspect ratio)
 
-          'fit_longest'
-        scale the pattern so that its longest dimension is made to fill
-        the corresponding dimension on a Sheet with
-        bounds=BoundingBox(radius=0.5)
-        (maintains the original's aspect ratio)
+        'fit_longest': scale the pattern so that its longest dimension
+        is made to fill the corresponding dimension on a Sheet with
+        bounds=BoundingBox(radius=0.5) (maintains the original's
+        aspect ratio)
 
-          'original'
-        no scaling is applied; one pixel of the pattern is put in one
-        unit of the sheet on which the pattern being displayed
-
+        'original': no scaling is applied; one pixel of the pattern is
+        put in one unit of the sheet on which the pattern being
+        displayed
 
         The pattern is further scaled according to the supplied width and height.
         """
