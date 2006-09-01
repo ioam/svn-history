@@ -17,9 +17,10 @@ next section</a> indicates, not all of them need to be used for any
 particular model, and anything not used can be ignored.  These lists
 are only representative of the object 
 types available in each general class; see the
-<A HREF="../Reference_Manual/">reference manual</A>, the menus in the
-GUI <A HREF="modeleditor.html">model editor</A>, or the files in
-topo/*/ to see the full list of the ones available.
+<A HREF="../Reference_Manual/index.html">reference manual</A> entry
+for each base class (which is typically hyperlinked below), the menus
+in the GUI <A HREF="modeleditor.html">model editor</A>, or the files
+in topo/*/ to see the full list of the ones available.
 
 <P>In each section, the relationships between the different classes
 are shown as an inheritance diagram, in outline format.  As an
@@ -47,17 +48,17 @@ Collie or a Terrier as well, plus any user-defined object of type Dog.
 <H3>ParameterizedObjects and Parameters</H3>
 
 <ul>
-<li><?php classref('topo.base.parameterizedobject','ParameterizedObject')?>:
-<li><?php classref('topo.base.parameterizedobject','Parameter')?>:
+<li><?php classref('topo.base.parameterizedobject','ParameterizedObject')?>
+<li><?php classref('topo.base.parameterizedobject','Parameter')?>
     <ul>
-    <li><?php classref('topo.base.parameterclasses','Number')?>:
+    <li><?php classref('topo.base.parameterclasses','Number')?>
         <ul>
-	<li><?php classref('topo.base.parameterclasses','Integer')?>:
+	<li><?php classref('topo.base.parameterclasses','Integer')?>
         </ul>
-    <li><?php classref('topo.base.parameterclasses','BooleanParameter')?>:
-    <li><?php classref('topo.base.parameterclasses','CallableParameter')?>:
-    <li><?php classref('topo.base.parameterclasses','ClassSelectorParameter')?>:
-    <li><?php classref('topo.base.parameterclasses','CallableParameter')?>:
+    <li><?php classref('topo.base.parameterclasses','BooleanParameter')?>
+    <li><?php classref('topo.base.parameterclasses','CallableParameter')?>
+    <li><?php classref('topo.base.parameterclasses','ClassSelectorParameter')?>
+    <li><?php classref('topo.base.parameterclasses','CallableParameter')?>
     </ul>
 </ul>
 
@@ -80,9 +81,9 @@ the object.  Most Topographica objects are
 <H3>Simulation and Events</H3>
 
 <ul>
-<li><?php classref('topo.base.simulation','Simulation')?>:
-<li><?php classref('topo.base.simulation','Event')?>:
-<li><?php classref('topo.base.simulation','EventProcessor')?>:
+<li><?php classref('topo.base.simulation','Simulation')?>
+<li><?php classref('topo.base.simulation','Event')?>
+<li><?php classref('topo.base.simulation','EventProcessor')?>
     <ul>
     <li><?php classref('topo.base.sheet','Sheet')?>: (see below)
     </ul>
@@ -103,26 +104,15 @@ that could be relevant for a model.
 
 <H3>Sheets</H3>
 
-<P>The actual EventProcessors in most Topographica simulations are
-typically of type <?php classref('topo.base.sheet','Sheet')?>.  A
-Sheet is a specific type of EventProcessor that occupies a finite 2D
-region of the continuous plane, allows indexing of this region using
-floating point coordinates, and maintains a rectangular array of
-activity values covering this region.
-
-<P>A hierarchy of different Sheet types is available, including (but
-in no way limited to):
-
 <P>
 <ul>
-<li><?php classref('topo.base.sheet','Sheet')?>: Abstract object type
-  (of which specific subtypes such as those below can be instantiated).
+<li><?php classref('topo.base.sheet','Sheet')?>
     <ul>
-    <li><?php classref('topo.base.projection','ProjectionSheet')?>:
+    <li><?php classref('topo.base.projection','ProjectionSheet')?>
       Sheet that can calculate activity based on a set of
       <?php classref('topo.base.projection','Projection')?>s.
         <ul>
-        <li><?php classref('topo.base.cf','CFSheet')?>:
+        <li><?php classref('topo.base.cf','CFSheet')?>
 	  ProjectionSheet whose Projections are of type
 	  <?php classref('topo.base.cf','CFProjection')?>,
 	  which means that they are made up of
@@ -140,17 +130,40 @@ in no way limited to):
     </ul>
 </ul>
 
+<P>The actual EventProcessors in most Topographica simulations are
+typically of type <?php classref('topo.base.sheet','Sheet')?>.  A
+Sheet is a specific type of EventProcessor that occupies a finite 2D
+region of the continuous plane, allows indexing of this region using
+floating point coordinates, and maintains a rectangular array of
+activity values covering this region.
+
 
 <H3>Connections and Projections</H3>
 
+<!-- ALERT: Does it work better to have the list first or second?  With -->
+<!-- explanations or without? -->
+
+<ul>
+<li><?php classref('topo.base.simulation','EPConnection')?>
+    <ul>
+    <li><?php classref('topo.base.projection','Projection')?>
+        <ul>
+        <li><?php classref('topo.base.cf','CFProjection')?>
+            <ul>
+            <li><?php classref('topo.projections.basic','SharedWeightCFProjection')?>
+            </ul>
+        </ul>
+    </ul>
+</ul>
+
 <P>EventProcessors can be connected together with unidirectional links
-called <?php classref('topo.base.simulation','Connection')?>s.  These
+called <?php classref('topo.base.simulation','EPConnection')?>s.  These
 connections provide a persistent mechanism for data generated by one
 EventProcessor to be delivered to another one after some nonzero delay
 in simulation time.
 
-<P>Most connections between Sheets are of type <?php
-classref('topo.base.projection','Projection')?>, which can be thought
+<P>Most connections between Sheets are of type 
+<?php classref('topo.base.projection','Projection')?>, which can be thought
 of as a bulk set of connections that includes many individual
 connections between neural units.  More specifically, a Projection is
 a Connection that can produce an Activity matrix when given an input
@@ -172,105 +185,132 @@ is used to perform the mathematical operation of convolution, i.e.,
 applying a set of weights to all points in a plane, and is equivalent
 to having one ConnectionField shared by every destination neuron.
 
-<ul>
-<li><?php classref('topo.base.simulation','Connection')?>:
-    <ul>
-    <li><?php classref('topo.base.projection','Projection')?>:
-        <ul>
-        <li><?php classref('topo.base.cf','CFProjection')?>:
-            <ul>
-            <li><?php classref('topo.projections.basic','SharedWeightCFProjection')?>:
-            </ul>
-        </ul>
-    </ul>
-</ul>
-
-<!-- ALERT: Does it work better to have the list first or second?  With -->
-<!-- explanations or without? -->
 
 <H3>PatternGenerators</H3>
 <ul>
-<li><?php classref('topo.base.patterngenerator','PatternGenerator')?>:
+<li><?php classref('topo.base.patterngenerator','PatternGenerator')?>
     <ul>
-    <li><?php classref('topo.patterns.basic','Gaussian')?>:
-    <li><?php classref('topo.patterns.basic','Constant')?>:
-    <li><?php classref('topo.patterns.basic','UniformRandom')?>:
+    <li><?php classref('topo.patterns.basic','Gaussian')?>
+    <li><?php classref('topo.base.patterngenerator','Constant')?>
+    <li><?php classref('topo.patterns.random','UniformRandom')?>
     </ul>
 </ul>
+
+<P>A large family of flexible, general-purpose function objects for
+producing 2D patterns is provided, as described on
+<A HREF="patterns.html">a separate page</A>.
 
 
 <H3>Output functions</H3>
 
 <ul>
-<li><?php classref('topo.base.functionfamilies','OutputFn')?>:
+<li><?php classref('topo.base.functionfamilies','OutputFn')?>
     <ul>
-    <li><?php classref('topo.outputfns.basic','DivisiveNormalizeL1')?>:
-    <li><?php classref('topo.outputfns.basic','DivisiveNormalizeL2')?>:
-    <li><?php classref('topo.outputfns.basic','PiecewiseLinear')?>:
-    <li><?php classref('topo.outputfns.basic','Identity')?>:
+    <li><?php classref('topo.outputfns.basic','DivisiveNormalizeL1')?>
+    <li><?php classref('topo.outputfns.basic','DivisiveNormalizeL2')?>
+    <li><?php classref('topo.outputfns.basic','PiecewiseLinear')?>
+    <li><?php classref('topo.base.functionfamilies','IdentityOF')?>
     </ul>
 </ul>
 
 <ul>
-<li><?php classref('topo.base.cf','CFPOutputFn')?>:
+<li><?php classref('topo.base.cf','CFPOutputFn')?>
     <ul>
-    <li><?php classref('topo.outputfns.basic','CFPOF_Plugin')?>:
-    <li><?php classref('topo.outputfns.basic','CFPOF_DivisiveNormalizeL1')?>:
+    <li><?php classref('topo.base.cf','CFPOF_Plugin')?>
+    <li><?php classref('topo.outputfns.optimized','CFPOF_DivisiveNormalizeL1')?>
     </ul>
 </ul>
 
+<P>An OutputFn is a function object that will accept a matrix argument
+and (typically) modify it in some way.  This is a very simple concept,
+but it is used many times throughout the Topographica code, and
+provides a lot of flexibility.  For instance, any function to
+normalize a set of weights or an input pattern is an OutputFn, as is
+any Sheet activity transfer function.
+
+<P>A family of output functions that works on an entire CFProjection at
+once is also available (CFPOutputFn).  These functions are more
+limited in applicability, but can be optimized heavily, and can do
+such things as normalizing across an entire projection.
 
 
 
 <H3>Response functions</H3>
 
 <ul>
-<li><?php classref('topo.base.functionfamilies','ResponseFn')?>:
+<li><?php classref('topo.base.functionfamilies','ResponseFn')?>
     <ul>
-    <li><?php classref('topo.responsefns.basic','DotProduct')?>:
+    <li><?php classref('topo.base.functionfamilies','DotProduct')?>
     </ul>
 </ul>
 
 
 <ul>
-<li><?php classref('topo.base.cf','CFPResponseFn')?>:
+<li><?php classref('topo.base.cf','CFPResponseFn')?>
     <ul>
-    <li><?php classref('topo.responsefns.basic','CFPRF_Plugin')?>:
-    <li><?php classref('topo.responsefns.basic','CFPRF_DotProduct')?>:
-    <li><?php classref('topo.responsefns.optimized','CFPRF_DotProduct_opt')?>:
+    <li><?php classref('topo.base.cf','CFPRF_Plugin')?>
+    <li><?php classref('topo.responsefns.optimized','CFPRF_DotProduct')?>
+    <li><?php classref('topo.responsefns.projfns','CFPRF_EuclideanDistance')?>
     </ul>
 </ul>
+
+
+<P>A ResponseFn is a function object that will compute a matrix of
+activity values from a matrix of weights and an input matrix of the
+same shape.  This is typically used for a neural response function.
+
+<P>A family of response functions that works on an entire CFProjection
+at once is also available (CFPResponseFn).  These functions can be
+optimized heavily, and can do such things as normalizing across an
+entire Sheet.
 
 
 <H3>Learning functions</H3>
+
 <ul>
-
-<li><?php classref('topo.base.functionfamilies','LearningFn')?>:
+<li><?php classref('topo.base.functionfamilies','LearningFn')?>
     <ul>
-    <li><?php classref('topo.learningfns.basic','Hebbian')?>:
+    <li><?php classref('topo.base.functionfamilies','Hebbian')?>
+    <li><?php classref('topo.learningfns.basic','Oja')?>
+    <li><?php classref('topo.learningfns.basic','Covariance')?>
     </ul>
 </ul>
 
-<li><?php classref('topo.base.cf','CFPLearningFn')?>:
+<ul>
+<li><?php classref('topo.base.cf','CFPLearningFn')?>
     <ul>
-    <li><?php classref('topo.learningfns.basic','CFPLF_Plugin')?>:
-    <li><?php classref('topo.learningfns.basic','')?>:
-    <li><?php classref('topo.learningfns.optimized','CFPLF_DivisiveHebbian')?>:
-    <li><?php classref('topo.learningfns.som','CFPLF_HebbianSOMLF')?>:
+    <li><?php classref('topo.base.cf','CFPLF_Plugin')?>
+    <li><?php classref('topo.learningfns.optimized','CFPLF_Hebbian')?>
+    <li><?php classref('topo.learningfns.som','CFPLF_HebbianSOM')?>
     </ul>
 </ul>
+
+
+
+<P>A LearningFn is a function object that will modify a matrix of
+weight values given an input activity pattern and an output activity
+value.  Most such rules are Hebbian-based, i.e., driven by the product
+of the input and output activity values, but there are many variants.
+
+<P>A family of learning functions that works on an entire CFProjection
+at once is also available (CFPLearningFn).  These functions can be
+optimized heavily, and can do such things as basing the activity
+on the single best-responding unit in a Sheet (as in a SOM).
+
+
+
 
 <H2><a name="implementation-levels">How much of Topographica to use</a></H2>
 
 <P>Topographica is designed as an extensible framework or toolkit,
 rather than as a monolithic application with a fixed list of features.
-Users can extend its functionality by writing objects in Python, a
-fully general-purpose interpreted programming language.  As a result,
+Users can extend its functionality by writing objects in Python, which
+is a fully general-purpose interpreted programming language.  As a result,
 Topographica supports any possible model (and indeed, any possible
-software program), but it provides much more specific support for
-specific types of models of topographic maps.  This approach allows
-some models to be built without any programming, while not limiting
-the future directions of research.
+software program), but as the above lists suggest, it provides much
+more specific support for specific types of models of topographic
+maps.  This approach allows some models to be built without any
+programming, while not limiting the future directions of research.
 
 <P>The following list explains the different levels of support
 provided by Topographica for different types of models, depending on
@@ -279,7 +319,12 @@ so that the most general support, suitable for everyone but requiring
 the most user effort, is at the top, and the most specific support is
 at the bottom.  Note that everything in the levels below where your
 model fits in can be ignored, because those files can be deleted with no ill 
-effects unless some part of your model uses objects from those levels.
+effects unless some part of your model uses objects from those
+levels.  You can also add items to any level, i.e., to any class
+hierarchy listed above; please 
+<A HREF="mailto:&#106&#98&#101&#100&#110&#97&#114&#64&#105&#110&#102&#46&#101&#100&#46&#97&#99&#46&#117&#107">contact
+us</a> to contribute any of these to the project or to join as a
+developer.
 
 <P>Topographica levels:
 
