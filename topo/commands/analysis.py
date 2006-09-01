@@ -172,10 +172,17 @@ def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         step_phase=2*pi/num_phase
         step_orientation=pi/num_orientation
 
-        feature_values = {"phase": ( (0.0,2*pi),step_phase,True),
-                          "orientation": ( (0.0,pi), step_orientation, True),
-                          "frequency": ((min(frequencies),max(frequencies)),frequencies,False),
-                          "ocular":((0.0,1.0),[0.0,1.0],False)}
+
+        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                          Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
+                          Feature(name="frequency",values=frequencies),
+                          Feature(name="ocular",range=(0.0,1.0),values=[0.0,1.0])]  
+                          
+
+#        feature_values = {"phase": ( (0.0,2*pi),step_phase,True),
+#                          "orientation": ( (0.0,pi), step_orientation, True),
+#                          "frequency": ((min(frequencies),max(frequencies)),frequencies,False),
+#                          "ocular":((0.0,1.0),[0.0,1.0],False)}
 
         x=MeasureFeatureMap(feature_values)
         
@@ -198,10 +205,10 @@ def measure_disparity(num_phase=12,num_orientation=4,num_disparity=12,frequencie
         step_orientation=pi/num_orientation
         step_disparity=2*pi/num_disparity
 
-        feature_values = {"phase": ( (0.0,2*pi),step_phase,True),
-                          "orientation": ( (0.0,pi), step_orientation, True),
-                          "frequency": ((min(frequencies),max(frequencies)),frequencies,False),
-                          "disparity":((0.0,2*pi),step_disparity,True)}
+        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                          Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
+                          Feature(name="frequency",values=frequencies),
+                          Feature(name="disparity",range=(0.0,2*pi),step=step_disparity,cyclic=True)]    
 
         x=MeasureFeatureMap(feature_values)
 
@@ -226,10 +233,17 @@ def measure_disparity_modified(num_phase=12,num_orientation=4,num_disparity=12,f
         step_disparity=2*pi/num_disparity
 
         print 'freq :',frequencies
-        feature_values = {"phase": ( (0.0,2*pi),step_phase,True),
-                          "orientation": ( (0.0,pi), step_orientation, True),
-                          "frequency": ((min(frequencies),max(frequencies)),frequencies,False),
-                          "disparity":((0.0,2*pi),step_disparity,True)}
+        
+        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                          Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
+                          Feature(name="frequency",values=frequencies),
+                          Feature(name="disparity",range=(0.0,2*pi),step=step_disparity,True)]          
+        
+        
+#        feature_values = {"phase": ( (0.0,2*pi),step_phase,True),
+#                          "orientation": ( (0.0,pi), step_orientation, True),
+#                          "frequency": ((min(frequencies),max(frequencies)),frequencies,False),
+#                          "disparity":((0.0,2*pi),step_disparity,True)}
 
         x=MeasureFeatureMap(feature_values)
 
@@ -250,8 +264,13 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
 
     else:
         # JABALERT: Will probably need some work to support multiple input regions
-        feature_values = {"x": ( x_range, 1.0*(x_range[1]-x_range[0])/divisions, False),
-                          "y": ( y_range, 1.0*(y_range[1]-y_range[0])/divisions, False)}
+        
+        feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
+                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]          
+        
+#        feature_values = {"x": ( x_range, 1.0*(x_range[1]-x_range[0])/divisions, False),
+#                          "y": ( y_range, 1.0*(y_range[1]-y_range[0])/divisions, False)}
+                          
         x=MeasureFeatureMap(feature_values)
         param_dict = {"size":size,"scale":scale,"offset":offset}        
         x.measure_maps(user_function, param_dict, display, feature_values)
