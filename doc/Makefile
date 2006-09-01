@@ -47,6 +47,8 @@ reference-manual: ../topo/*.py ../topo/*/*.py
 	mv ../topo/tests ../topo-tests-tmp
 	cd .. ; bin/epydoc  --parse-only --inheritance=listed --docformat=ReStructuredText --show-sourcecode --html -o doc/Reference_Manual --name=Topographica --url=http://topographica.org topo
 	mv ../topo-tests-tmp ../topo/tests 
+        # Force PHP to overwrite the auto-generated index.html file (at least for now)
+	touch Reference_Manual/index_text.php
 # 	--graph=all
 
 imagedirs:

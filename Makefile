@@ -35,7 +35,7 @@ DIST_ZIP                   = ${DIST_DIRNAME}.zip
 # Default does not include doc, in case user lacks PHP
 default: ext-packages topographica
 
-all: default doc tests examples reference-manual
+all: default reference-manual doc tests examples 
 
 clean: clean-doc clean-ext-packages clean-pyc
 	${RM} .??*~ *~ */*~ */.??*~ */*/*~ */*/.??*~ */*/*/*~ */*/*/.??*~ *.bak
