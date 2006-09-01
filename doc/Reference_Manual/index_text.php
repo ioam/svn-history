@@ -20,15 +20,15 @@ elements can be selected to model specific neural systems.  For more
 information, see the individual subpackages:
 
 <P><DL COMPACT>
-<DT><A href="topo.base.html"><strong>base</strong></A></DT>
+<DT><A href="topo.base-module.html"><strong>base</strong></A></DT>
 <DD>Core Topographica functions and classes</DD>
-<P><DT><A href="topo.plotting.html"><strong>plotting</strong></A></DT>
+<P><DT><A href="topo.plotting-module.html"><strong>plotting</strong></A></DT>
 <DD>Visualization functions and classes</DD>
-<P><DT><A href="topo.analysis.html"><strong>analysis</strong></A></DT>
+<P><DT><A href="topo.analysis-module.html"><strong>analysis</strong></A></DT>
 <DD>Analysis functions and classes (besides plotting)</DD>
-<P><DT><A href="topo.misc.html"><strong>misc</strong></A></DT>
+<P><DT><A href="topo.misc-module.html"><strong>misc</strong></A></DT>
 <DD>Miscellaneous independent utility functions and classes</DD>
-<P><DT><A href="topo.tkgui.html"><strong>tkgui</strong></A></DT>
+<P><DT><A href="topo.tkgui-module.html"><strong>tkgui</strong></A></DT>
 <DD>Tk-based graphical user interface (GUI)</DD>
 </dl>
 
@@ -50,21 +50,21 @@ family of classes that can be used with the above functions and
 classes:
 
 <P><DL COMPACT>
-<P><DT><A href="topo.patterns.html"><strong>patterns</strong></A></DT>
+<P><DT><A href="topo.patterns-module.html"><strong>patterns</strong></A></DT>
 <DD>PatternGenerator classes: 2D input or weight patterns</DD>
-<P><DT><A href="topo.sheets.html"><strong>sheets</strong></A></DT>
+<P><DT><A href="topo.sheets-module.html"><strong>sheets</strong></A></DT>
 <DD>Sheet classes: 2D arrays of processing units</DD>
-<P><DT><A href="topo.projections.html"><strong>projections</strong></A></DT>
+<P><DT><A href="topo.projections-module.html"><strong>projections</strong></A></DT>
 <DD>Projection classes: connections between Sheets</DD>
-<P><DT><A href="topo.eps.html"><strong>eps</strong></A></DT>
+<P><DT><A href="topo.eps-module.html"><strong>eps</strong></A></DT>
 <DD>EventProcessor classes: other simulation objects</DD>
-<P><DT><A href="topo.outputfns.html"><strong>outputfns</strong></A></DT>
+<P><DT><A href="topo.outputfns-module.html"><strong>outputfns</strong></A></DT>
 <DD>Output functions: apply to matrices to do e.g. normalization or squashing</DD>
-<P><DT><A href="topo.responsefns.html"><strong>responsefns</strong></A></DT>
+<P><DT><A href="topo.responsefns-module.html"><strong>responsefns</strong></A></DT>
 <DD>Calculate the response of a unit or a Projection</DD>
-<P><DT><A href="topo.learningfns.html"><strong>learningfns</strong></A></DT>
+<P><DT><A href="topo.learningfns-module.html"><strong>learningfns</strong></A></DT>
 <DD>Adjust weights for a unit or a Projection</DD>
-<P><DT><A href="topo.commands.html"><strong>commands</strong></A></DT>
+<P><DT><A href="topo.commands-module.html"><strong>commands</strong></A></DT>
 <DD>High-level user commands</DD>
 </DL>
 
