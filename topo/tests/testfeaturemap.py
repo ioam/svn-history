@@ -29,7 +29,7 @@ from topo.learningfns.som import CFPLF_HebbianSOM
 
 from topo.patterns import basic
 from topo.analysis.featuremap import FeatureMap, MeasureFeatureMap
-
+from topo.commands.analysis import Feature
 
 class TestFeatureMap(unittest.TestCase):
 
@@ -210,8 +210,9 @@ class TestMeasureFeatureMap(unittest.TestCase):
         """
         
         """
-        self.feature_param = {"orientation": ( (0.0,1.0), 0.5, True),
-                              "phase": ( (0.0,1.0), [0.2,0.4,0.6], False)}
+        
+        self.feature_param = [Feature(name="phase",range=(0.0,1.0),values=[0.2,0.4,0.6],cyclic=False),
+                          Feature(name="orientation",range=(0.0,1.0),step=0.5,cyclic=True)]
         
         self.x = MeasureFeatureMap(self.feature_param)
         #print self.V1.activity
