@@ -6,17 +6,6 @@ $Id$
 __version__='$Revision$'
 
 
-# CEBHACKALERT: every time I have to change something in this file
-# it is very painful. There are always multiple copies of the same
-# thing! 
-# e.g. a Simulation was being passed around but then found
-# from somewhere else anyway. It was (and maybe still is?) possible
-# to pass feature parameters in at too many stages.
-# I have to clean it up!
-# - remove temporary testing code
-# - a Simulation should be passed in; this code shouldn't look for
-#   topo.sim
-
 from Numeric import zeros, Float
 from Numeric import array
 
@@ -104,7 +93,7 @@ class MeasureFeatureMap(ParameterizedObject):
     """
     def __init__(self, features):
 
-        # Sheets that have the attribure measure_maps and have it set True
+        # Sheets that have the attribute measure_maps and have it set True
         # get their maps measured.
         # CEBHACKALERT: we might want to measure the map on a sheet due
         # to a specific projection, rather than measure the map due
