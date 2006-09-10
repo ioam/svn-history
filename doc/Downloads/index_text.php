@@ -44,15 +44,22 @@ directory after checking out the code.
 <code>gmake</code> on some systems) from within the
 <code>topographica/</code> directory.  The build process will take a
 while to complete (e.g. about 5-10 minutes on a 1.5GHz Pentium IV
-machine with a local disk).  If you have PHP installed, you can also
-make local copies of the HTML documentation from the web site; to do
-so, type <code>make all</code> instead of (or after)
-<code>make</code>.  <code>make all</code> will
+machine with a local disk).  If you have PHP, m4, and fig2dev
+installed, you can also make local copies of the HTML documentation
+from the web site; to do so, type <code>make all</code> instead of (or
+after) <code>make</code>.  <code>make all</code> will
 also run the regression tests and example files, to ensure that
 everything is functioning properly on your system.  (Note that if you
 do the tests on a machine without a functioning DISPLAY, such as a
 remote text-only session, there will be some warnings about GUI tests
 being skipped.)
+
+<P>On some Linux distributions that start with a minimal set of
+packages included, such as Ubuntu or the various "live CD" systems,
+you may need to specify explicitly that some standard libraries be
+installed in your system, such as <t>libfreetype</t>, <t>libpng</t>,
+<t>libx11-dev</t>, and <t>zlib</t>, before <code>make</code> will
+succeed.
 
 <P>If all goes well, a script named <code>topographica</code> or
 <code>topographica.bat</code> will be created in the

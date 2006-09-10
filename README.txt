@@ -26,10 +26,10 @@ directory where you have at least 500MB of disk space available.
 BUILDING DOCUMENTATION
 
 To read more about Topographica before trying to build it, you can
-build the documentation (apart from the Reference Manual) separately
-from compiling Topographica itself.  If PHP4 is installed on your
-system (as in most Linux distributions), just change to the
-topographica directory and type "make doc", then load doc/index.html
+build the documentation separately from compiling Topographica itself.
+If PHP4, m4, and fig2dev are installed on your system (as in most
+Linux distributions), just change to the topographica directory and
+type "make doc reference-manual", then load doc/index.html
 into your web browser.  If there are any problems generating the local
 copy, you can instead use the web-based documentation at
 www.topographica.org.  (The doc/ directory is just a copy of the
@@ -49,8 +49,8 @@ for specific platforms and operating system versions.
 For specific instructions on building Topographica on each platform,
 see doc/Downloads/index.html.  There may also be additional
 platform-specific information in doc/Downloads/<platform>.html.  If
-you haven't compiled the documentation, for each file.html you can
-simply read the corresponding source file file_text.php in a text
+you haven't compiled the documentation, for each <file>.html you can
+simply read the corresponding source file <file>_text.php in a text
 editor.
 
 
