@@ -57,9 +57,9 @@ being skipped.)
 <P>On some Linux distributions that start with a minimal set of
 packages included, such as Ubuntu or the various "live CD" systems,
 you may need to specify explicitly that some standard libraries be
-installed in your system, such as <t>libfreetype</t>, <t>libpng</t>,
-<t>libx11-dev</t>, and <t>zlib</t>, before <code>make</code> will
-succeed.
+installed in your system, such as <code>libfreetype</code>,
+<code>libpng</code>, <code>libx11-dev</code>, and <code>zlib</code>,
+before <code>make</code> will succeed.
 
 <P>If all goes well, a script named <code>topographica</code> or
 <code>topographica.bat</code> will be created in the
