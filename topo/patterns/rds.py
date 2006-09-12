@@ -48,7 +48,10 @@ def fix(x):
 
 class RandomDotStereogram(PatternGenerator):
     """
-    Random dot stereogram based on rectangular black and white patches.
+    Random dot stereogram using on rectangular black and white patches.
+
+    Based on Matlab code originally from Jenny Read, implemented in
+    Topographica by Tikesh Ramtohul (2006).
     """
 
     # Suppress unused parameters
@@ -95,14 +98,13 @@ class RandomDotStereogram(PatternGenerator):
 
         result=scale*self.rds(xsize,ysize,xdisparity,ydisparity,dotdensity,dotsize,random)+offset
         
-        if output_fn is not IdentityOF: 
+        if output_fn is not IdentityOF:
             output_fn(result)
 
         return result
         
         
     def rds(self,xsize,ysize,xdisparity,ydisparity,dotdensity,dotsize,gen_seed):
-    
     
         xsize=int(round(xsize))
         ysize=int(round(ysize))
@@ -116,12 +118,12 @@ class RandomDotStereogram(PatternGenerator):
         ndots=int(round(dotdensity * (bigxsize+2*dotsize) * (bigysize+2*dotsize) / min(dotsize,xsize) / min(dotsize,ysize)))
         halfdot = fix(dotsize/2)
     
-        ###TRALERT:
+        ### TRALERT:
         
-        ###TRALERT:For Test Pattern Window
+        ### TRALERT:For Test Pattern Window
         bigimage = 0.5*ones((bigysize,bigxsize))
     
-        ###TRALERT:For Energy models
+        ### TRALERT:For Energy models
         '''
         bigimage = zeros((bigysize,bigxsize))
         '''
@@ -147,8 +149,8 @@ class RandomDotStereogram(PatternGenerator):
         
         for i in range(ndots):
     
-            ###TRALERT:For Test Pattern Window,white is represented as 1 and black as 0. background is 0.5
-            ###alternatively, offset parameter can be set properly
+            ### TRALERT:For Test Pattern Window,white is represented as 1 and black as 0. background is 0.5
+            ### alternatively, offset parameter can be set properly
             
             if col[0][i] >= 0.5:
                 col[0][i]= 1
@@ -156,7 +158,7 @@ class RandomDotStereogram(PatternGenerator):
                 col[0][i]= 0
             
             
-            ###TRALERT:For testing energy models, white==1, black==-1,background=0 (similar to Read's code)
+            ### TRALERT:For testing energy models, white==1, black==-1,background=0 (similar to Read's code)
             '''
             if col[0][i] >= 0.5:
                 col[0][i]= 1
