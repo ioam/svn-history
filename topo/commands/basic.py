@@ -56,7 +56,7 @@ def pattern_present(inputs=None,duration=1.0,learning=False,overwrite_previous=F
     If learning is False, overwrites the existing values of Sheet.learning
     to disable learning, then reenables learning.
     """
-
+    
     if not overwrite_previous:
         save_input_generators()
 
@@ -83,9 +83,9 @@ def pattern_present(inputs=None,duration=1.0,learning=False,overwrite_previous=F
         else:
             ParameterizedObject().warning('%s not a valid Sheet Name.' % each)
 
-    topo.sim.state_push()
-    topo.sim.run(duration)
-    topo.sim.state_pop()
+    topo.sim.event_push()
+    topo.sim.run(duration) 
+    topo.sim.event_pop()
 
     # turn sheets' learning back on if we turned it off before
     if not learning:
