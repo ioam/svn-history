@@ -309,6 +309,11 @@ class EventProcessor(ParameterizedObject):
         """
         pass
     
+    def state_push(self,**args):
+        pass
+
+    def state_pop(self,**args):
+        pass
 
 
 class EventProcessorParameter(Parameter):
@@ -703,10 +708,31 @@ class Simulation(ParameterizedObject):
         scheduled events.
         """
         self._events_stack.append((self._time,[copy(event) for event in self.events]))
+        for ep in self._event_processors.values():
+            ep.state_push()
+
 
     def state_pop(self):
         """Pop a scheduler off the stack."""
-        self._time, self.events = self._events_stack.pop()
+        self._time, self.events = self._events_stack.pop()        
+	for ep in self._event_processors.values():
+            ep.state_pop()
+
+    def event_push(self):
+        """
+        Save the current scheduler to an internal stack, and create a
+        copy to continue with.  Useful for testing something while
+        being able to roll back to the original state.  The copy
+        of the scheduler includes a copy of all of the currently
+        scheduled events.
+        """
+        self._events_stack.append((self._time,[copy(event) for event in self.events]))
+
+
+
+    def event_pop(self):
+        """Pop a scheduler off the stack."""
+        self._time, self.events = self._events_stack.pop()        
 
 
     def state_len(self):
