@@ -101,6 +101,7 @@ class MeasureFeatureMap(ParameterizedObject):
         # The Sheet 'learning' parameter should be per projection
         # see alert in sheet.py), and we will have a per projection plastic
         # attribure, too.
+	
         f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
         self.__sheets_to_measure_maps_for = filter(f,topo.sim.objects(Sheet).values())
         # Add a (blank) FeatureMap for each Feature for each Sheet 
@@ -127,15 +128,21 @@ class MeasureFeatureMap(ParameterizedObject):
         being tested.  This might cause problems if a preference map
         window has auto-refresh enabled. :-/
         """
+	
+ 	topo.sim.state_push()
+	
         save_input_generators()
-        
+
         self.__present_input_patterns(user_function,param_dict,display,features)
         self.__construct_sheet_views()
 
         restore_input_generators()
 
+ 	topo.sim.state_pop()
+	
 
     def __present_input_patterns(self,user_function,param_dict,features,display=False):
+	
         feature_names=[f.name for f in features]
         values_lists=[f.values for f in features]
         permutations = cross_product(values_lists)
@@ -160,6 +167,7 @@ class MeasureFeatureMap(ParameterizedObject):
         
 
     def __construct_sheet_views(self):
+	
         for sheet in self.__sheets_to_measure_maps_for:
             bounding_box = sheet.bounds
             
