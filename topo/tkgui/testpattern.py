@@ -243,13 +243,16 @@ Each type will have various parameters that can be changed.""")
         This function is run no matter if learning is enabled or
         disabled since run() will detect sheet attributes.
         """
+
+	topo.sim.state_push()
         self.__setup_pattern_generators()
         input_dict = dict([(name,d['pattern_generator'])
                            for (name,d) in self.generator_sheets_patterns.items()])
         pattern_present(input_dict,self.present_length.getvalue(),
                         learning=self.learning.get(),overwrite_previous=False)
-        self.console.auto_refresh()
 
+        self.console.auto_refresh()
+	topo.sim.state_pop()
 
     ### JAB: It is not clear how this will need to be extended to support
     ### objects with different parameters in the different eyes, e.g. to
