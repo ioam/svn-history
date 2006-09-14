@@ -185,8 +185,11 @@ class LISSOM(JointNormalizingCFSheet):
     output_fn = OutputFnParameter(default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
     precedence = Number(0.6)
     
-    activation_count = 0
-    new_iteration = True
+    def __init__(self,**params):
+        super(LISSOM,self).__init__(**params)
+        self.__counter_stack=[]
+        self.activation_count = 0
+        self.new_iteration = True
 
     def input_event(self,conn,data):
         # On a new afferent input, clear the activity
@@ -233,3 +236,16 @@ class LISSOM(JointNormalizingCFSheet):
         for proj in self.in_connections:
             print proj.name, x, y
             print proj.cfs[x][y].weights
+
+
+    def state_push(self,**args):
+	"""Saves the current state of the Lissom sheet and the current activation count"""
+        super(LISSOM,self).state_push(**args)
+        self.__counter_stack.append((self.activation_count,self.new_iteration))
+
+    def state_pop(self,**args):
+	"""pops the last state and activation count from the top of the stack"""
+        super(LISSOM,self).state_pop(**args)
+        self.activation_count,self.new_iteration=self.__counter_stack.pop()
+  
+
