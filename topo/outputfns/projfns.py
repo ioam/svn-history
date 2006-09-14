@@ -11,4 +11,4 @@ from topo.base.cf import CFPOutputFn
 
 # imported here so that all projection-level output functions are in the
 # same package
-from topo.base.cf import CFPOF_Plugin
+from topo.base.cf import CFPOF_Plugin,CFPOF_Identity
