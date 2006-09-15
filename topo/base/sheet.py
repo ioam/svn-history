@@ -157,11 +157,11 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         return [x for (x,y) in coords]
 
 
-    def activity_push(self):
+    def state_push(self):
         """Save the current sheet activity to an internal stack."""
         self.__saved_activity.append(array(self.activity))
 
-    def activity_pop(self,restore_activity=True):
+    def state_pop(self,restore_activity=True):
         """
         Pop an activity off the stack and return the values.  If
         restore_activity is True, then put the popped information
