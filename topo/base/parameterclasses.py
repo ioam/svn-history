@@ -556,7 +556,7 @@ class ListParameter(Parameter):
     """
     Parameter whose value is a list of objects, usually of a specified type.
 
-    The bounds allows a minimum and/or maximum length of
+    The bounds allow a minimum and/or maximum length of
     list to be enforced.  If the class is non-None, all
     items in the list are checked to be of that type.
     """
