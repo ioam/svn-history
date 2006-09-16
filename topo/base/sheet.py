@@ -158,22 +158,29 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
 
 
     def state_push(self):
-        """Save the current sheet activity to an internal stack."""
+        """
+        Save the current state of this sheet to an internal stack.
+
+        This method is used by operations that need to test the
+        response of the sheet without permanently altering its state,
+        e.g. for measuring maps or probing the current behavior
+        non-invasively.  By default, only the activity pattern of this
+        sheet is saved, but subclasses should add saving for any
+        additional state that they maintain, or strange bugs are
+        likely to occur.  The state can be restored using state_pop().
+        """
         self.__saved_activity.append(array(self.activity))
 
-    def state_pop(self,restore_activity=True):
+    def state_pop(self):
         """
-        Pop an activity off the stack and return the values.  If
-        restore_activity is True, then put the popped information
-        back into the Sheet activity variable.
+        Pop the most recently saved state off the stack.
+
+        See state_push() for more details.
         """
-        old_act = self.__saved_activity.pop()
-        if restore_activity:
-            self.activity = old_act
-        return old_act
+        self.activity = self.__saved_activity.pop()
 
     def activity_len(self):
-        """Return the number of items in pushed into the activity stack."""
+        """Return the number of items that have been saved by state_push()."""
         return len(self.__saved_activity)
         
 
