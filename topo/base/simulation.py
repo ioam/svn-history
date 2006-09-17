@@ -309,10 +309,23 @@ class EventProcessor(ParameterizedObject):
         """
         pass
     
-    def state_push(self,**args):
+    def state_push(self):
+        """
+        Save the current state of this EventProcessor to an internal stack.
+
+        This method is used by operations that need to test the
+        response of the EventProcessor without permanently altering
+        its state.  All EventProcessors that maintain short-term state
+        should save and restore it using these commands.
+        """
         pass
 
-    def state_pop(self,**args):
+    def state_pop(self):
+        """
+        Pop the most recently saved state off the stack.
+
+        See state_push() for more details.
+        """
         pass
 
 
@@ -701,43 +714,46 @@ class Simulation(ParameterizedObject):
 
     def state_push(self):
         """
-        Save the current scheduler to an internal stack, and create a
-        copy to continue with.  Useful for testing something while
-        being able to roll back to the original state.  The copy
-        of the scheduler includes a copy of all of the currently
-        scheduled events.
+        Save a copy of the current state of the simulation for later restoration.
+
+        The saved copy includes all the events on the simulator stack
+        (saved using event_push()).  Each EventProcessor is also asked
+        to save its own state.  This operation is useful for testing
+        something while being able to roll back to the original state.
         """
-        self._events_stack.append((self._time,[copy(event) for event in self.events]))
+        self.event_push()
         for ep in self._event_processors.values():
             ep.state_push()
 
 
     def state_pop(self):
-        """Pop a scheduler off the stack."""
-        self._time, self.events = self._events_stack.pop()        
+        """
+        Pop the most recently saved state off the stack.
+
+        See state_push() for more details.
+        """
+        self.event_pop()
 	for ep in self._event_processors.values():
             ep.state_pop()
 
+
     def event_push(self):
         """
-        Save the current scheduler to an internal stack, and create a
-        copy to continue with.  Useful for testing something while
-        being able to roll back to the original state.  The copy
-        of the scheduler includes a copy of all of the currently
-        scheduled events.
+        Save a copy of the events queue for later restoration.
+
+        Same as state_push(), but does not ask EventProcessors to save
+        their state.
         """
         self._events_stack.append((self._time,[copy(event) for event in self.events]))
 
 
-
     def event_pop(self):
-        """Pop a scheduler off the stack."""
+        """
+        Pop the most recently saved events queue off the stack.
+
+        Same as state_pop(), but does not restore EventProcessors' state.
+        """
         self._time, self.events = self._events_stack.pop()        
-
-
-    def state_len(self):
-        """Return number of event queues in _events_stack."""
-        return len(self._events_stack)
 
 
     # Could just process src and dest in conn_params.  
