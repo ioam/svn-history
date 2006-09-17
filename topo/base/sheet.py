@@ -168,6 +168,11 @@ class Sheet(EventProcessor,SheetCoordinateSystem):
         sheet is saved, but subclasses should add saving for any
         additional state that they maintain, or strange bugs are
         likely to occur.  The state can be restored using state_pop().
+
+        Note that Sheets that do learning need not save the
+        values of all connection weights, if any, because
+        learning can be turned off explicitly.  Thus this method
+        is intended only for shorter-term state.
         """
         self.__saved_activity.append(array(self.activity))
 

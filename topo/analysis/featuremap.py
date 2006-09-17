@@ -130,14 +130,12 @@ class MeasureFeatureMap(ParameterizedObject):
         """
 	
  	topo.sim.state_push()
-	
         save_input_generators()
 
         self.__present_input_patterns(user_function,param_dict,display,features)
         self.__construct_sheet_views()
 
         restore_input_generators()
-
  	topo.sim.state_pop()
 	
 
