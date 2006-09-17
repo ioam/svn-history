@@ -38,9 +38,9 @@ class TestSimulation(unittest.TestCase):
         s.connect('pulse2','sum_unit',delay=1)
         s.run(1.0)
         s.state_push()
-        self.assertEqual(s.state_len(),1)
+        self.assertEqual(len(s._events_stack),1)
         s.state_pop()
-        self.assertEqual(s.state_len(),0)
+        self.assertEqual(len(s._events_stack),0)
         
 
     def test_get_objects(self):
