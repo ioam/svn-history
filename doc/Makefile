@@ -49,6 +49,7 @@ reference-manual: ../topo/*.py ../topo/*/*.py
 	mv ../topo-tests-tmp ../topo/tests 
         # Force PHP to overwrite the auto-generated index.html file (at least for now)
 	touch Reference_Manual/index_text.php
+	touch reference-manual
 # 	--graph=all
 
 imagedirs:
