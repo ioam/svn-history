@@ -42,7 +42,7 @@ class Covariance(LearningFn):
 
     If you wish to use an input threshold as in Dayan and Abbott
     equation 8.9 instead, set unit_threshold to zero and change
-    input_thresold to some positive value instead.  When both
+    input_threshold to some positive value instead.  When both
     thresholds are zero this rule degenerates to the standard Hebbian
     rule.
     
@@ -59,7 +59,7 @@ class Covariance(LearningFn):
         
 class CPCA(LearningFn):
     """
-    CPCA (Conditional Principal Component Analysis rule.
+    CPCA (Conditional Principal Component Analysis) rule.
 
     (See O'Reilly and Munakata, Computational Explorations in 
     Cognitive Neuroscience, 2000, equation 4.12.)
@@ -79,7 +79,7 @@ class CPCA(LearningFn):
         Update the value of the given weights matrix based on the
         input_activity matrix (of the same size as the weights matrix),
         the response of this unit (the unit_activity), and the previous weights 
-   	matrix governed by a per-connection learning rate.
+        matrix governed by a per-connection learning rate.
 	"""
 
         weights += single_connection_learning_rate * unit_activity * (input_activity - weights);
