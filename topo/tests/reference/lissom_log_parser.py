@@ -36,6 +36,11 @@ def get_input_params(log_file='or_map_topo.log'):
 # already. In any case, needs to print out meaningful errors.
 def get_matrix(matrix_file,dim):
     """
+    Returns an array containing the data in the specified C++ LISSOM .matrix
+    file. The dimensions of the array must match those specified in
+    dim=(rows,cols)  (to ensure that the matrix is the size you expect).
+
+    Ignores lines that start with a hash (#).
     """
     f = open(matrix_file)
 
@@ -48,12 +53,12 @@ def get_matrix(matrix_file,dim):
         
         if not line.startswith('#'):
             values = line.split()
-            assert len(values)==dim[0]
+            assert len(values)==dim[1], "Number of cols doesn't match expected value."
             for v in values:
                 row.append(float(v))
             n_rows_read+=1
             matrix.append(row)
 
-    assert n_rows_read==dim[1]
+    assert n_rows_read==dim[0], "Number of rows doesn't match expected value."
 
     return matrix
