@@ -313,64 +313,6 @@ topo.sim.schedule_command(19999, 'topo.sim["V1"].output_fn.lower_bound=0.223; to
 
 
 
-# CEBHACKALERT: actual tests commented out.
-
-def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
-    """
-    Go through the two matrices element-by-element and check for match to the specified
-    number of decimal places (dp).
-    """
-    r,c = topo_matrix.shape
-    for i in range(r):
-        for j in range(c):
-            t_value = round(topo_matrix[i,j],dp)
-            l_value = round(lissom_matrix[i][j],dp)
-            # CEBHACKALERT: will become some kind of assert
-            if t_value != l_value:
-                print "\n" + topo_matrix_name + " element ("+str(i)+","+str(j)+") didn't match to " + str(dp) + " decimal places.\nTopographica value="+str(t_value)+", C++ LISSOM value="+str(l_value)
-
-    
-## # CEBHACKALERT: will check values at different iterations (including after change_bounds() etc).
-## # Also will be putting data files in a reference/ subdirectory
-## s.run(1)
-
-## # compare C++ LISSOM and Topogrpahica activity values in the Retina and V1
-## c_retina_act = topo.tests.lissom_log_parser.get_matrix("topo/tests/or_map_topo.000001p000.Eye0_Activity.matrix",(RN,RN))
-## c_v1_act = topo.tests.lissom_log_parser.get_matrix("topo/tests/or_map_topo.000001p000.Primary_Activity.matrix",(BaseN,BaseN))
-## compare_elements(Retina.activity,c_retina_act,6,Retina.name)
-## compare_elements(V1.activity,c_v1_act,5,V1.name)
-
-
-## # compare weights 
-## unit_i,unit_j = 24,70
-
-## topo_aff_weights = V1.in_connections[0].cfs[unit_i][unit_j].weights
-## topo_latexc_weights = V1.in_connections[1].cfs[unit_i][unit_j].weights
-## topo_latinh_weights = V1.in_connections[2].cfs[unit_i][unit_j].weights
-
-## # CEBHACKALERT: turning off situate in c++ lissom appears to make the weight plot unsituated but
-## # leaves the matrix output situated! So I take the right slice. I will automate this in the
-## # get_matrix() function (unless the C could be changed easily?). Then almost all these lines will go.
-## import Numeric
-## c_aff_weights = topo.tests.lissom_log_parser.get_matrix("topo/tests/or_map_topo.000001.wts.Primary.Afferent0.0"+str(unit_i)+"_0"+str(unit_j)+".matrix",(RN,RN)) 
-## c_aff_weights = Numeric.array(c_aff_weights)
-## c_aff_weights = c_aff_weights[7:18,22:32]
-## assert c_aff_weights.shape==topo_aff_weights.shape
-## c_aff_weights = c_aff_weights.tolist()
-
-## c_latexc_weights = topo.tests.lissom_log_parser.get_matrix("topo/tests/or_map_topo.000001.wts.Primary.LateralExcitatory.0"+str(unit_i)+"_0"+str(unit_j)+".matrix",(BaseN,BaseN)) 
-## c_latexc_weights = Numeric.array(c_latexc_weights)
-## c_latexc_weights = c_latexc_weights[17:31,63:71]
-## assert c_latexc_weights.shape==topo_latexc_weights.shape
-## c_latexc_weights = c_latexc_weights.tolist()
-## # end CEBHACKALERT
-
-## compare_elements(topo_aff_weights,c_aff_weights,7,"V1 afferent weights")
-## compare_elements(topo_latexc_weights,c_latexc_weights,7,"V1 lateral excitatory weights")
-
-
-
-
 # Performance profiling
 #
 # Example 1
