@@ -158,7 +158,7 @@ GeneratorSheet.phase = 0.05
 # take the input pattern position parameters from the log file output
 # of the equivalent c++ simulation
 n_inputs,input_x,input_y,input_orientation = get_input_params(
-    log_file="topo/tests/or_map_topo.log")
+    log_file="topo/tests/reference/or_map_topo.log")
 
 # c++ lissom's first iteration is just a test...
 n_inputs-=1;input_x.next();input_y.next();input_orientation.next() 

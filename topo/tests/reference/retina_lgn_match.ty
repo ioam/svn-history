@@ -62,7 +62,7 @@ GeneratorSheet.phase=0.05
 
 # take the input pattern position parameters from the log
 # file output of the equivalent c++ simulation
-n_inputs,input_x,input_y,input_orientation = topo.tests.lissom_log_parser.get_input_params(log_file="topo/tests/oo_or_map_topo.log")
+n_inputs,input_x,input_y,input_orientation = topo.tests.lissom_log_parser.get_input_params(log_file="topo/tests/reference/oo_or_map_topo.log")
 n_inputs-=1;input_x.next();input_y.next();input_orientation.next() # c++ lissom's first iteration is just a test
 print "Number of patterns available for learning iterations:",n_inputs
 gaussian_width = xsigma/BaseRN/sqrt(2.0)
