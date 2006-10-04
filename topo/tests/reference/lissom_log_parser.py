@@ -62,3 +62,20 @@ def get_matrix(matrix_file,dim):
     assert n_rows_read==dim[0], "Number of rows doesn't match expected value."
 
     return matrix
+
+
+
+
+def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
+    """
+    Go through the two matrices element-by-element and check for match
+    to the specified number of decimal places (dp).
+    """
+    r,c = topo_matrix.shape
+    for i in range(r):
+        for j in range(c):
+            t_value = round(topo_matrix[i,j],dp)
+            l_value = round(lissom_matrix[i][j],dp)
+            # CEBHACKALERT: should be an assert statement
+            if t_value != l_value:
+                print "\n" + topo_matrix_name + " element ("+str(i)+","+str(j)+") didn't match to " + str(dp) + " decimal places.\nTopographica value="+str(t_value)+", C++ LISSOM value="+str(l_value)

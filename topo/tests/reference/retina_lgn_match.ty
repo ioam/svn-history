@@ -36,7 +36,7 @@ from topo.base.parameterclasses import Wrapper
 from topo.outputfns.basic import PiecewiseLinear,IdentityOF,DivisiveNormalizeL1
 from topo.responsefns.optimized import CFPRF_SharedWeightDotProduct_opt
 
-from topo.tests.reference.lissom_log_parser import get_input_params, get_matrix
+from topo.tests.reference.lissom_log_parser import get_input_params, get_matrix, compare_elements
 
 fixedpoint.DEFAULT_PRECISION=3
 
@@ -114,25 +114,6 @@ topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
 ##                   nominal_bounds_template=lgn_weight_bounds,
 ##                   weights_generator=lgn_weight_pattern)
 
-
-
-
-
-
-
-def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
-    """
-    Go through the two matrices element-by-element and check for match
-    to the specified number of decimal places (dp).
-    """
-    r,c = topo_matrix.shape
-    for i in range(r):
-        for j in range(c):
-            t_value = round(topo_matrix[i,j],dp)
-            l_value = round(lissom_matrix[i][j],dp)
-            # CEBHACKALERT: should be an assert statement
-            if t_value != l_value:
-                print "\n" + topo_matrix_name + " element ("+str(i)+","+str(j)+") didn't match to " + str(dp) + " decimal places.\nTopographica value="+str(t_value)+", C++ LISSOM value="+str(l_value)
 
 
 
