@@ -5,6 +5,21 @@ $Id$
 """
 __version__='$Revision$'
 
+
+## With one GeneratorSheet connected to one CFSheet via Disk-shaped
+## weights, presenting a Gaussian input pattern:
+##
+## topo retinal activity sum (time 1):
+## 2.80077196557051e+01
+## c++ eye00 activity sum (time 1):
+## 2.80077222131501e+01
+##
+## topo 'LGN' activity sum (time 1):
+## 2.33881340462627e+01
+## c++ Ganglia00 activity sum (time 1):
+## 2.33881275592545e+01
+
+
 import fixedpoint
 
 from math import pi, sqrt
@@ -23,38 +38,24 @@ from topo.responsefns.optimized import CFPRF_SharedWeightDotProduct_opt
 
 import topo.tests.lissom_log_parser
 
+fixedpoint.DEFAULT_PRECISION=3
+
+
 BaseRN=24.0
 rf_radius=BaseRN/4.0+0.5
-
 area_scale=1.0
-#num_eyes=1
-
 randomness = 0.0
-#smooth_circular_radius_trim = -0.25
-
-
 xsigma=6.0
 ysigma=1.5
 scale_input=1.0
-
-# radius of LGN Gaussian
-sigma_c = 4.5 #0.5 
-
-# radius of LGN afferent connections
-r_L = 5.5 #4.7*sigma_s
-
-# buffers so sheet above has full rfs...
+sigma_c = 4.5 # for 'LGN' Disk of diameter 9 
+r_L = 5.5 # for 11x11 ConnectionField
 lgn_edge_buffer = round(rf_radius,0)
 retina_edge_buffer=round(rf_radius+r_L,0)
-
-# ...and actual numbers of neurons with the buffers
 RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
 LN=round(BaseRN*area_scale+2*lgn_edge_buffer,0)
 
 
-fixedpoint.DEFAULT_PRECISION=3
-
-# input generation params
 GeneratorSheet.nominal_density = BaseRN*area_scale
 GeneratorSheet.period = 1
 GeneratorSheet.phase=0.05
@@ -64,8 +65,6 @@ GeneratorSheet.phase=0.05
 n_inputs,input_x,input_y,input_orientation = topo.tests.lissom_log_parser.get_input_params(log_file="topo/tests/oo_or_map_topo.log")
 n_inputs-=1;input_x.next();input_y.next();input_orientation.next() # c++ lissom's first iteration is just a test
 print "Number of patterns available for learning iterations:",n_inputs
-
-
 gaussian_width = xsigma/BaseRN/sqrt(2.0)
 gaussian_height = ysigma/BaseRN/sqrt(2.0)
 
