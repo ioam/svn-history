@@ -149,10 +149,6 @@ display list of sheet classes etc from a Parameter).
 </li>
 
 <li>
-2006/04/28 (CB): Create subdirectory of tests called 'reference' and move into it the reference simulations plus all their data and other support files.
-</li>
-
-<li>
 2006/02/21: ReadOnlyParameter to allow declaration of something but not let it
 be set anywhere else, even in a ParameterizedObject constructor.
 </li>
