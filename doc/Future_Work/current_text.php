@@ -108,15 +108,11 @@ Need to make sure DynamicNumbers are advanced only once per simulation time.
 </li>
 
 <li>
-2006/05/22 (CB): Test file for connectionfield.
+2006/05/22: HACKALERTs relating to connection fields; test file for connectionfield; cleaning up cf.py and projections/basic.py (e.g. DummyCF) along with the Slice class (there are several simplifications that can be made).
 </li>
 
 <li>
-2006/05/22: HACKALERTs relating to connection fields; test file for connectionfield; cleaning up cf.py and projections/basic.py along with the Slice class (there are several simplifications that can be made).
-</li>
-
-<li>
-2006/04/27 (JB): Allowing there to be a slower, more in-depth set of tests (that don't run with make tests, etc). Slower tests that are required: pickling, that example networks' results haven't changed, that performance doesn't get worse
+2006/04/27 (JB): Allowing there to be a slower, more in-depth set of tests (that don't run with make tests, etc). Required slower tests: pickling, that example networks' results haven't changed, that performance doesn't get worse, ...
 </li>
 
 <li>
@@ -226,8 +222,7 @@ before each time the prompt is executed.
 2006/06/19: e.g. Filename's search_paths attribute shouldn't be pickled.
 Presumably there will be other such items, so should objects have a standard 
 attribute/parameter that lists attributes not to pickle? Or something like that.
-Otherwise, save_snapshot and load_snapshot could specifically avoid specific
-items.
+Otherwise, save_snapshot and load_snapshot could specifically avoid items.
 </li>
 
 </ul>
