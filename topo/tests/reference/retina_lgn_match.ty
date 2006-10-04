@@ -116,6 +116,10 @@ topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
 
 
 
+# CEBHACKALERT: I intend to have C++ LISSOM run at this point, and generate
+# data. Then, the various C++ LISSOM data matrices do not need to be stored 
+# here.
+
 
 topo.sim.run(1)
     
