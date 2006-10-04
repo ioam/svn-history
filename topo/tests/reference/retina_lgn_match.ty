@@ -36,7 +36,7 @@ from topo.base.parameterclasses import Wrapper
 from topo.outputfns.basic import PiecewiseLinear,IdentityOF,DivisiveNormalizeL1
 from topo.responsefns.optimized import CFPRF_SharedWeightDotProduct_opt
 
-import topo.tests.lissom_log_parser
+from topo.tests.reference.lissom_log_parser import get_input_params, get_matrix
 
 fixedpoint.DEFAULT_PRECISION=3
 
@@ -62,7 +62,7 @@ GeneratorSheet.phase=0.05
 
 # take the input pattern position parameters from the log
 # file output of the equivalent c++ simulation
-n_inputs,input_x,input_y,input_orientation = topo.tests.lissom_log_parser.get_input_params(log_file="topo/tests/reference/oo_or_map_topo.log")
+n_inputs,input_x,input_y,input_orientation = get_input_params(log_file="topo/tests/reference/oo_or_map_topo.log")
 n_inputs-=1;input_x.next();input_y.next();input_orientation.next() # c++ lissom's first iteration is just a test
 print "Number of patterns available for learning iterations:",n_inputs
 gaussian_width = xsigma/BaseRN/sqrt(2.0)
@@ -113,3 +113,38 @@ topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
 ##                   connection_type=SharedWeightCFProjection,strength=1.0,
 ##                   nominal_bounds_template=lgn_weight_bounds,
 ##                   weights_generator=lgn_weight_pattern)
+
+
+
+
+
+
+
+def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
+    """
+    Go through the two matrices element-by-element and check for match
+    to the specified number of decimal places (dp).
+    """
+    r,c = topo_matrix.shape
+    for i in range(r):
+        for j in range(c):
+            t_value = round(topo_matrix[i,j],dp)
+            l_value = round(lissom_matrix[i][j],dp)
+            # CEBHACKALERT: should be an assert statement
+            if t_value != l_value:
+                print "\n" + topo_matrix_name + " element ("+str(i)+","+str(j)+") didn't match to " + str(dp) + " decimal places.\nTopographica value="+str(t_value)+", C++ LISSOM value="+str(l_value)
+
+
+
+topo.sim.run(1)
+    
+
+# compare C++ LISSOM and Topograhica activity values in the Retina/Eye00:
+c_eye00_act = get_matrix("topo/tests/reference/retina_lgn_match.000001p000.Eye0_Activity.matrix",(RN,RN))
+compare_elements(topo.sim['Retina'].activity,c_eye00_act,6,"Retina")
+
+# compare C++ LISSOM and Topograhica activity values in the 'LGN':
+c_ganglia00_act = get_matrix("topo/tests/reference/retina_lgn_match.000001p000.Ganglia00_Activity.matrix",(LN,LN))
+compare_elements(topo.sim['LGNOn'].activity,c_ganglia00_act,6,"LGNOn")
+
+
