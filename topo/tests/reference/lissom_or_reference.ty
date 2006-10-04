@@ -56,7 +56,7 @@ from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 import topo.patterns.basic
 
-from topo.tests.lissom_log_parser import get_input_params,get_matrix
+from topo.tests.reference.lissom_log_parser import get_input_params
 
 
 # Topographica learning rate is density-independent so to compare
