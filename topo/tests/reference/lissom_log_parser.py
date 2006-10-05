@@ -32,9 +32,10 @@ def get_input_params(log_file='or_map_topo.log'):
     return n_inputs,iter(x),iter(y),iter(orientation)
 
 
+from Numeric import array
 # CEBHACKALERT: this kind of function probably exists somewhere
 # already. In any case, needs to print out meaningful errors.
-def get_matrix(matrix_file,dim):
+def get_matrix(matrix_file,dim,center=None):
     """
     Returns an array containing the data in the specified C++ LISSOM .matrix
     file. The dimensions of the array must match those specified in
@@ -61,9 +62,7 @@ def get_matrix(matrix_file,dim):
 
     assert n_rows_read==dim[0], "Number of rows doesn't match expected value."
 
-    return matrix
-
-
+    return array(matrix)
 
 
 def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
@@ -71,6 +70,8 @@ def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
     Go through the two matrices element-by-element and check for match
     to the specified number of decimal places (dp).
     """
+    assert topo_matrix.shape == lissom_matrix.shape
+    
     r,c = topo_matrix.shape
     for i in range(r):
         for j in range(c):
