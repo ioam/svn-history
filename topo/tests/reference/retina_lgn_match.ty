@@ -40,6 +40,7 @@ from topo.tests.reference.lissom_log_parser import get_input_params, get_matrix,
 
 fixedpoint.DEFAULT_PRECISION=3
 
+BaseN=48.0
 
 BaseRN=24.0
 rf_radius=BaseRN/4.0+0.5
@@ -119,6 +120,15 @@ topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
 # CEBHACKALERT: I intend to have C++ LISSOM run at this point, and generate
 # data. Then, the various C++ LISSOM data matrices do not need to be stored 
 # here.
+#../../../../lissom_old/samples/lissom.5.x_2 retina_lgn_match.param -c "call set_thresholds.command" -c "step" -c "plot filename_format=$${default_filename_format} save_matrices=True"
+
+# weight scaling
+#ppm_weight_scale_type=PPM_WtScale_Fixed
+#Region::ppm_weight_fixed_multiplier=1
+#PlotGroup::Weights::filename_format="$${filebase}.$${06iteration}.wts.$${current_region}.$${current_plot}.$${03current_ui}_$${03current_uj}"
+#cmd::plot_unit::weight_situate=False
+
+#plot_unit region=Ganglia00
 
 
 topo.sim.run(1)
@@ -132,34 +142,16 @@ compare_elements(topo.sim['Retina'].activity,c_eye00_act,6,"Retina")
 c_ganglia00_act = get_matrix("topo/tests/reference/retina_lgn_match.000001p000.Ganglia00_Activity.matrix",(LN,LN))
 compare_elements(topo.sim['LGNOn'].activity,c_ganglia00_act,6,"LGNOn")
 
+# compare C++ LISSOM and Topographica weights:
 
+# CEBHACKALERT: turning off situate in c++ lissom appears to make the
+# weight plot unsituated but leaves the matrix output situated. So it's
+# necessary to take the right slice from the BaseNxBaseN matrix.
 
+# Retina-LGN
+i,j=18,18
+topo_LGNOn_weights = topo.sim['LGNOn'].in_connections[0].cf(i,j).weights
+c_Ganglia00_afferent = get_matrix('topo/tests/reference/retina_lgn_match.000000.wts.Ganglia00.Afferent0.018_018.matrix',(BaseN,BaseN)) 
+c_Ganglia00_afferent = c_Ganglia00_afferent[18:29,18:29]
 
-## CEBHACKALERT: outdated code, but will be used to compare weight matrix elements.
-
-## # compare weights 
-## unit_i,unit_j = 24,70
-
-## topo_aff_weights = V1.in_connections[0].cfs[unit_i][unit_j].weights
-## topo_latexc_weights = V1.in_connections[1].cfs[unit_i][unit_j].weights
-## topo_latinh_weights = V1.in_connections[2].cfs[unit_i][unit_j].weights
-
-## # CEBHACKALERT: turning off situate in c++ lissom appears to make the weight plot unsituated but
-## # leaves the matrix output situated! So I take the right slice. I will automate this in the
-## # get_matrix() function (unless the C could be changed easily?). Then almost all these lines will go.
-## import Numeric
-## c_aff_weights = topo.tests.lissom_log_parser.get_matrix("topo/tests/or_map_topo.000001.wts.Primary.Afferent0.0"+str(unit_i)+"_0"+str(unit_j)+".matrix",(RN,RN)) 
-## c_aff_weights = Numeric.array(c_aff_weights)
-## c_aff_weights = c_aff_weights[7:18,22:32]
-## assert c_aff_weights.shape==topo_aff_weights.shape
-## c_aff_weights = c_aff_weights.tolist()
-
-## c_latexc_weights = topo.tests.lissom_log_parser.get_matrix("topo/tests/or_map_topo.000001.wts.Primary.LateralExcitatory.0"+str(unit_i)+"_0"+str(unit_j)+".matrix",(BaseN,BaseN)) 
-## c_latexc_weights = Numeric.array(c_latexc_weights)
-## c_latexc_weights = c_latexc_weights[17:31,63:71]
-## assert c_latexc_weights.shape==topo_latexc_weights.shape
-## c_latexc_weights = c_latexc_weights.tolist()
-## # end CEBHACKALERT
-
-## compare_elements(topo_aff_weights,c_aff_weights,7,"V1 afferent weights")
-## compare_elements(topo_latexc_weights,c_latexc_weights,7,"V1 lateral excitatory weights")
+compare_elements(topo_LGNOn_weights,c_Ganglia00_afferent,6,"LGNOn weights")
