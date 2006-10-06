@@ -19,18 +19,11 @@ $Id$
 
 __version__ = '$Revision$'
 
-
-# CEBHACKALERT: some things that need to be cleaned up...
-#
-# - CFProjection sometimes passes copies of objects to the CFs its
-# creating, sometimes it doesn't. Some of ConnectionField's methods
-# change their arguments, some don't.  Could lead to confusion and
-# some hard-to-track bugs. (Same applies to SharedWeightCFProjection.)
-#
-# - The Slice object, then what a CF stores as a slice can finally be
-# cleaned up.
-
-
+# CEBHACKALERT: some things that need to be cleaned up in this file:
+# CFProjection sometimes passes *copies* of objects to the CFs it's creating,
+# sometimes it doesn't. Some of ConnectionField's methods change their
+# arguments, some don't.  These could lead to confusion and some hard-to-track
+# bugs. (Same applies to SharedWeightCFProjection.)
 
 
 import Numeric
@@ -79,7 +72,7 @@ class ConnectionField(ParameterizedObject):
 
     def get_norm_total(self):
         """
-        Returns the stored norm_value, if any, or else the current sum of the weights.
+        Return the stored norm_value, if any, or else the current sum of the weights.
         See the norm_total property for more details.
         """
         # The actual value is cached in _norm_total.
@@ -103,7 +96,6 @@ class ConnectionField(ParameterizedObject):
         if hasattr(self,'_norm_total'): delattr(self,'_norm_total')
 
 
-
     # CEBHACKALERT: Accessing norm_total as a property from the C code will probably
     # slow it down; this should be checked.
     norm_total = property(get_norm_total,set_norm_total,del_norm_total,
@@ -118,7 +110,7 @@ class ConnectionField(ParameterizedObject):
 
         This mechanism has two main purposes.  First, it allows a
         learning function to cache the sum value for an output
-        function to use later without computation, which can be a
+        function to use later without computation, which can result in
         significant time savings.  Second, the extra level of
         indirection allows the sum value to be manipulated before it
         is used, to implement operations like joint normalization
@@ -139,22 +131,33 @@ class ConnectionField(ParameterizedObject):
                  weights_generator,mask_template,
                  output_fn=IdentityOF(),slice_=None,**params):
         """
-        bounds_template is assumed to have been initialized correctly
-        already (see e.g. CFProjection.initialize_bounds() ).
+        Create weights at the specified (x,y) location.
+
+        The supplied bounds_template is moved to the specified location,
+        then converted to an array, and finally the weights pattern is
+        drawn inside.
+   
+        Note that bounds_template is assumed to have been initialized correctly
+        already (i.e. represents the exact bounds) - see
+        CFProjection.initialize_bounds().
         """
-        # CEBHACKALERT: maybe an external function is required? We need to
-        # have correctly setup bounds here, in change_bounds(), and in other
-        # places such as CFProjection (where the mask is made). At the moment,
-        # the function is in CFProjection.
+        # CEBHACKALERT: maybe an external function is required for
+        # initializing the bounds? We need to have correctly setup bounds
+        # here, in change_bounds(), and in other places such as CFProjection
+        # (where the mask is made). At the moment, the function is in
+        # CFProjection.
 
         super(ConnectionField,self).__init__(**params)
 
         self.x = x; self.y = y
-
         self.input_sheet = input_sheet
+
+        # Move bounds to correct (x,y) location, and convert to an array
+        # CEBHACKALERT: make this clearer by splitting into two functions.
         self.offset_bounds(bounds_template,slice_)
 
-        # CEBHACKALERT: might want to do something about a size that's specified.
+        # CEBHACKALERT: might want to do something about a size that's specified
+        # (right now the size is assumed to be that of the bounds)
         w = weights_generator(x=self.x,y=self.y,bounds=self.bounds,
                               xdensity=self.input_sheet.xdensity,
                               ydensity=self.input_sheet.ydensity)
@@ -284,7 +287,7 @@ class ConnectionField(ParameterizedObject):
             self.mask = m.astype(weight_type)
             self.mask.savespace(1)
 
-            # CEBHACKALERT: see __init__
+            # CEBHACKALERT: see __init__() regarding mask & output fn.
             self.weights *= self.mask
             output_fn(self.weights)
             del self.norm_total
@@ -436,7 +439,7 @@ class CFPLF_Plugin(CFPLearningFn):
                 cf = cfs[r][c]
                 single_cf_fn(cf.get_input_matrix(input_activity),
                              output_activity[r,c], cf.weights, single_connection_learning_rate)
-                # CEBHACKALERT: see ConnectionField.__init__()
+                # CEBHACKALERT: see ConnectionField.__init__() re. mask & output fn
                 cf.weights *= cf.mask
                 
 class CFPOutputFn(ParameterizedObject):
@@ -637,7 +640,7 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         """
         """
         # CEBHACKALERT: allow user to override this.
-        # calculate the size & aspect_ratio of the mask if appropriate
+        # Calculate the size & aspect_ratio of the mask if appropriate;
         # mask size set to be that of the weights matrix
         if hasattr(self.weights_shape, 'size'):
             l,b,r,t = self.bounds_template.lbrt()
