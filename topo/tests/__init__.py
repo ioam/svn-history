@@ -28,7 +28,8 @@ __all__ = [re.sub('\.py$','',f)
 
 # Remove any test that for now we don't want to run with the others
 __all__.remove('testsnapshots') # (see the note in that file)
-
+__all__.remove('testlissom_oo_or') # this is a slower test & should have a different
+                                   # calling mechanism (see Future_Work/current)
 
 # For each test module that defines a 'suite' attribute, add its
 # tests.
