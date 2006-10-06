@@ -5,6 +5,9 @@ have not changed.
 The current simulation's results are checked against the results
 stored in testlissom_oo_or.data.
 
+You can run the test like this:
+  ./topographica -c 'import topo.tests.testlissom_oo_or; topo.tests.run(test_modules=[topo.tests.testlissom_oo_or])'
+
 You can generate a new testlissom_oo_or.data file with the following command:
   ./topographica -c "from topo.tests.testlissom_oo_or import GenerateData; GenerateData()"
 """
@@ -58,31 +61,15 @@ class Test_lissom_oo_or(unittest.TestCase):
         ####
 
         topo.sim.run(1)
-        # CEBHACKALERT: the single line below ought to work instead of
-        # the 4 beneath it!
-        #assert_array_equal(trueV1activities[0],topo.sim['V1'].activity)
-        self.assertEqual(topo.sim['V1'].activity.shape,trueV1activities[0].shape)
-        for i in range(topo.sim['V1'].activity.shape[0]):
-            for j in range(topo.sim['V1'].activity.shape[1]):
-                self.assertEqual(topo.sim['V1'].activity[i,j],trueV1activities[0][i,j])
+        assert_array_equal(trueV1activities[0],topo.sim['V1'].activity)
 
         topo.sim.run(99)
-        #assert_array_equal(trueV1activities[1],topo.sim['V1'].activity)
-        self.assertEqual(topo.sim['V1'].activity.shape,trueV1activities[1].shape)
-        for i in range(topo.sim['V1'].activity.shape[0]):
-            for j in range(topo.sim['V1'].activity.shape[1]):
-                self.assertEqual(topo.sim['V1'].activity[i,j],trueV1activities[1][i,j])
+        assert_array_equal(trueV1activities[1],topo.sim['V1'].activity)
 
-        
         topo.sim.run(110)
-        #assert_array_equal(trueV1activities[2],topo.sim['V1'].activity)
-        self.assertEqual(topo.sim['V1'].activity.shape,trueV1activities[2].shape)
-        for i in range(topo.sim['V1'].activity.shape[0]):
-            for j in range(topo.sim['V1'].activity.shape[1]):
-                self.assertEqual(topo.sim['V1'].activity[i,j],trueV1activities[2][i,j])
+        assert_array_equal(trueV1activities[2],topo.sim['V1'].activity)
 
         
-
 suite = unittest.TestSuite()
 suite.addTest(unittest.makeSuite(Test_lissom_oo_or))
 
