@@ -36,6 +36,16 @@
 <i>
 <b>News:</b>
 
+<p><b>02 November 06:</b> Some users have reported problems when using
+optimized code on systems with the most recent GCC 4.1.x C/C++
+compilers.  We have added a patch to the included weave
+inline-compilation package that should fix the problem, currently
+available only on the most recent CVS version of Topographica.
+Affected users may need to do a <A target="_top"                                                                  
+href="../Downloads/cvs.html">CVS</A> update, then "make -C external
+weave-uninstall ; make".  These changes will be included in the next
+official release.
+
 <p><b>23 July 06:</b> Version 0.9.1
 <A target="_top" href="../Downloads/index.html">released</A>.
 This is a bugfix release only, upgrading the included Tcl/Tk package
