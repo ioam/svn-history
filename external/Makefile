@@ -190,7 +190,7 @@ pmw-uninstall:
 WEAVE = Scipy_core-0.3.0_108.1820
 WEAVE_UNINSTALL = ${PYTHON_LIB}/site-packages/weave external/weave
 
-weave: ${WEAVE}.tar.gz python
+weave: ${WEAVE}.tar.gz python weave.diff
 	tar xzf ${WEAVE}.tar.gz
 	cd ${WEAVE}; patch -p0 < ../weave.diff; env PREFIX=${PREFIX} LD_LIBRARY_PATH=${PREFIX}/lib ${PREFIX}/bin/python setup.py install
 	touch weave
