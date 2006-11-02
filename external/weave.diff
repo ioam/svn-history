@@ -1,0 +1,210 @@
+diff -u -r ./weave/scxx/list.h ./weave/scxx/list.h
+--- ./weave/scxx/list.h	2004-04-14 22:15:53.000000000 +0100
++++ ./weave/scxx/list.h	2006-11-02 11:31:21.000000000 +0000
+@@ -162,23 +162,23 @@
+     };
+     return *this;
+   };
+-  list& list::insert(int ndx, int other) {
++  list& insert(int ndx, int other) {
+     object oth = other;
+     return insert(ndx, oth);
+   };
+-  list& list::insert(int ndx, double other) {
++  list& insert(int ndx, double other) {
+     object oth = other;
+     return insert(ndx, oth);
+   };
+-  list& list::insert(int ndx, std::complex<double>& other) {
++  list& insert(int ndx, std::complex<double>& other) {
+     object oth = other;
+     return insert(ndx, oth);
+   };  
+-  list& list::insert(int ndx, const char* other) {
++  list& insert(int ndx, const char* other) {
+     object oth = other;
+     return insert(ndx, oth);
+   };
+-  list& list::insert(int ndx, const std::string& other) {
++  list& insert(int ndx, const std::string& other) {
+     object oth = other;
+     return insert(ndx, oth);
+   };
+diff -u -r ./weave/scxx/object.h ./weave/scxx/object.h
+--- ./weave/scxx/object.h	2004-04-14 22:15:53.000000000 +0100
++++ ./weave/scxx/object.h	2006-11-02 11:31:57.000000000 +0000
+@@ -597,7 +597,7 @@
+   //       be inlined instead of implemented i weave_imp.cpp.  This 
+   //       provides less automatic type checking, but is potentially faster.
+   //-------------------------------------------------------------------------
+-  object object::mcall(const char* nm) {
++  object mcall(const char* nm) {
+     object method = attr(nm);
+     PyObject* result = PyEval_CallObjectWithKeywords(method,NULL,NULL);
+     if (!result)
+@@ -605,7 +605,7 @@
+     return object(lose_ref(result));
+   }
+   
+-  object object::mcall(const char* nm, object& args_tup) {
++  object mcall(const char* nm, object& args_tup) {
+     object method = attr(nm);
+     PyObject* result = PyEval_CallObjectWithKeywords(method,args_tup,NULL);
+     if (!result)
+@@ -613,7 +613,7 @@
+     return object(lose_ref(result));
+   }
+   
+-  object object::mcall(const char* nm, object& args_tup, object& kw_dict) {
++  object mcall(const char* nm, object& args_tup, object& kw_dict) {
+     object method = attr(nm);
+     PyObject* result = PyEval_CallObjectWithKeywords(method,args_tup,kw_dict);
+     if (!result)
+@@ -636,19 +636,19 @@
+   //
+   // Note: see not on mcall()
+   //-------------------------------------------------------------------------
+-  object object::call() const {
++  object call() const {
+     PyObject *rslt = PyEval_CallObjectWithKeywords(*this, NULL, NULL);
+     if (rslt == 0)
+       throw 1;
+     return object(lose_ref(rslt));
+   }
+-  object object::call(object& args_tup) const {
++  object call(object& args_tup) const {
+     PyObject *rslt = PyEval_CallObjectWithKeywords(*this, args_tup, NULL);
+     if (rslt == 0)
+       throw 1;
+     return object(lose_ref(rslt));
+   }
+-  object object::call(object& args_tup, object& kw_dict) const {
++  object call(object& args_tup, object& kw_dict) const {
+     PyObject *rslt = PyEval_CallObjectWithKeywords(*this, args_tup, kw_dict);
+     if (rslt == 0)
+       throw 1;
+diff -u -r ./weave/scxx/sequence.h ./weave/scxx/sequence.h
+--- ./weave/scxx/sequence.h	2004-04-14 22:15:53.000000000 +0100
++++ ./weave/scxx/sequence.h	2006-11-02 11:31:37.000000000 +0000
+@@ -148,23 +148,23 @@
+       fail(PyExc_RuntimeError, "problem in in");
+     return (rslt==1);
+   };  
+-  bool sequence::in(int value) const {
++  bool in(int value) const {
+     object val = value;
+     return in(val);
+   };
+-  bool sequence::in(double value) const {
++  bool in(double value) const {
+     object val = value;
+     return in(val);
+   };
+-  bool sequence::in(const std::complex<double>& value) const {
++  bool in(const std::complex<double>& value) const {
+     object val = value;
+     return in(val);
+   };
+-  bool sequence::in(const char* value) const {
++  bool in(const char* value) const {
+     object val = value;
+     return in(val);
+   };
+-  bool sequence::in(const std::string& value) const {
++  bool in(const std::string& value) const {
+     object val = value.c_str();
+     return in(val);
+   };
+@@ -179,23 +179,23 @@
+       fail(PyExc_IndexError, "value not found");
+     return rslt;
+   };
+-  int sequence::index(int value) const {
++  int index(int value) const {
+     object val = value;
+     return index(val);
+   };  
+-  int sequence::index(double value) const {
++  int index(double value) const {
+     object val = value;
+     return index(val);
+   };
+-  int sequence::index(const std::complex<double>& value) const {
++  int index(const std::complex<double>& value) const {
+     object val = value;
+     return index(val);
+   };
+-  int sequence::index(const char* value) const {
++  int index(const char* value) const {
+     object val = value;
+     return index(val);
+   };  
+-  int sequence::index(const std::string& value) const {
++  int index(const std::string& value) const {
+     object val = value;
+     return index(val);
+   };
+diff -u -r ./weave/scxx/tuple.h ./weave/scxx/tuple.h
+--- ./weave/scxx/tuple.h	2004-04-14 22:15:53.000000000 +0100
++++ ./weave/scxx/tuple.h	2006-11-02 11:31:07.000000000 +0000
+@@ -16,7 +16,7 @@
+   tuple(int sz=0) : sequence (PyTuple_New(sz))  { lose_ref(_obj); }
+   tuple(const tuple& other) : sequence(other) { }
+   tuple(PyObject* obj) : sequence(obj) { _violentTypeCheck(); }
+-  tuple::tuple(const list& lst)
++  tuple(const list& lst)
+     : sequence (PyList_AsTuple(lst)) { lose_ref(_obj); }
+     
+   //-------------------------------------------------------------------------
+@@ -65,7 +65,7 @@
+   //-------------------------------------------------------------------------
+   // operator[] -- const and non-const versions of element access.
+   //-------------------------------------------------------------------------    
+-  indexed_ref tuple::operator [] (int i) {   
++  indexed_ref operator [] (int i) {   
+     // get a "borrowed" refcount    
+     PyObject* o = PyTuple_GetItem(_obj, i);  
+     // don't throw error for when [] fails because it might be on left hand 
+diff -u -r ./weave/scxx/sequence.h ./weave/scxx/sequence.h
+--- ./weave/scxx/sequence.h	2006-11-02 11:51:29.000000000 +0000
++++ ./weave/scxx/sequence.h	2006-11-02 11:49:55.000000000 +0000
+@@ -228,32 +228,32 @@
+   sequence& _parent;
+   int _ndx;
+ public:
+-  indexed_ref::indexed_ref(PyObject* obj, sequence& parent, int ndx)
++  indexed_ref(PyObject* obj, sequence& parent, int ndx)
+     : object(obj), _parent(parent), _ndx(ndx) { };
+   virtual ~indexed_ref() {};
+   
+-  indexed_ref& indexed_ref::operator=(const object& other) {
++  indexed_ref& operator=(const object& other) {
+     grab_ref(other);
+     _parent.set_item(_ndx, *this);
+     return *this;
+   };
+-  indexed_ref& indexed_ref::operator=(int other) {
++  indexed_ref& operator=(int other) {
+     object oth = other;
+     return operator=(oth);
+   };  
+-  indexed_ref& indexed_ref::operator=(double other) {
++  indexed_ref& operator=(double other) {
+     object oth = other;
+     return operator=(oth);
+   };  
+-  indexed_ref& indexed_ref::operator=(const std::complex<double>& other) {
++  indexed_ref& operator=(const std::complex<double>& other) {
+     object oth = other;
+     return operator=(oth);
+   };    
+-  indexed_ref& indexed_ref::operator=(const char* other) {
++  indexed_ref& operator=(const char* other) {
+     object oth = other;
+     return operator=(oth);
+   };    
+-  indexed_ref& indexed_ref::operator=(const std::string& other) {
++  indexed_ref& operator=(const std::string& other) {
+     object oth = other;
+     return operator=(oth);
+   };
