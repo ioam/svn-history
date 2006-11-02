@@ -257,6 +257,11 @@ achieve in Python.
 </li>
 
 <li>
+2006/10/10: Add FFT plot using Jim's Octave code; shouldn't be difficult.
+Might not be that hard to port it to Python, either.
+</li>
+
+<li>
 2006/03/07: Build python on windows with free compiler. Maybe use pymingw?
 </li>
 
