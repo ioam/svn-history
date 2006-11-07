@@ -32,7 +32,7 @@ from topo.base.functionfamilies import OutputFn
 from topo.base.arrayutils import clip_in_place
 from topo.outputfns.homeostatic import HomeostaticMaxEnt
 
-topo.sim.name = "homeo_intrinsic_lissom_oo_or"
+topo.sim.name = "lissom_oo_or_homeomaxent"
 
 input_pattern = topo.patterns.basic.Gaussian(
           scale=1.0, size=2*0.0468, aspect_ratio=4.0,
