@@ -1,7 +1,7 @@
 """
 Two layer model with one inhibitory and one excitatory sheet.
 Recurrent short range connections between sheets, long range excitation and short range inhibition
-Based on lissom_or - still a work in progress - not organising yet
+Based on lissom_or - still a work in progress - not organising yet 
 """
 
 
