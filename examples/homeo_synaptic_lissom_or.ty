@@ -30,6 +30,7 @@ from topo.misc.numbergenerators import UniformRandom
 from topo.base.functionfamilies import OutputFn
 from topo.base.arrayutils import clip_in_place
 from topo.patterns.basic import Disk
+from topo.outputfns.homeostatic import PiecewiseLinear_debug
 
 from topo.base.cf import CFPLearningFn,LearningFnParameter
 from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
@@ -126,52 +127,6 @@ class HomeoSynaptic(CFPLearningFn):
 	self.temp_hist.append (Numeric.sum(abs(cfs[23][23].weights.flat)))
 
 
-# DEBUG Only: OutputFn for computing average activity of each neuron
-class TestFn(OutputFn):
-    """ 
-    Piecewise-linear output function with lower and upper thresholds
-    as constructor parameters.
-    """
-    lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
-    upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
-    learn_step = Number(default=8,doc="Number of step before learning take place")
-
-    def __init__(self,**params):
-        super(TestFn,self).__init__(**params)
-
-	self.first_call = True
-	self.n_step = 0
-	self.beta = 0.0003
-	self.ncall = 0
-
-    def __call__(self,x):
-
-        fact = 1.0/(self.upper_bound-self.lower_bound)        
-        x -= self.lower_bound
-        x *= fact
-        clip_in_place(x,0.0,1.0)
-
-	if self.first_call:
-	    self.first_call = False
-	    #self.x_avg = self.beta * copy.copy(x)
-	    #self.x_avg[12][12] = 0.01
-	    self.x_avg = zeros(x.shape,x.typecode())
-	    self.x_hist = []
-	else:
-	    if self.ncall <= 1000:
-	    	self.x_avg = ((self.x_avg*self.ncall) + x) / (self.ncall+1)
-	    	self.ncall += 1
-	    else:	    
-	    	self.x_avg = self.beta*x + (1.0-self.beta)*self.x_avg
-
-	self.n_step += 1
-	if self.n_step == self.learn_step:
-
-	    self.n_step = 0
-	    #self.x_hist.append (self.x_avg)
-
-	    print self.x_avg[23][23], ' ', self.x_avg[11][11], ' ', self.x_avg[0][0], ' ', self.x_avg[47][47]
-
 
 class InitFn(CFPLearningFn):
     
@@ -216,7 +171,7 @@ topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
 
 
 topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
-                        nominal_bounds=BoundingBox(radius=0.5), output_fn=TestFn())
+                        nominal_bounds=BoundingBox(radius=0.5), output_fn=PiecewiseLinear_debug())
 #, output_fn=HomeostaticMaxEnt())
 
 topo.sim['V1'].output_fn.lower_bound=0.1
