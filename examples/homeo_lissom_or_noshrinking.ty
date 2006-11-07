@@ -12,8 +12,6 @@ import fixedpoint
 
 from math import pi, sqrt
 from fixedpoint import FixedPoint
-from Numeric import sum,ones,exp
-import Numeric
 
 import topo.patterns.basic
 import topo.patterns.random
@@ -22,15 +20,13 @@ from topo.sheets.lissom import LISSOM
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.projections.basic import CFProjection, SharedWeightCFProjection
 from topo.responsefns.optimized import CFPRF_DotProduct_opt, CFPRF_SharedWeightDotProduct_opt
-from topo.base.parameterclasses import DynamicNumber, Number
+from topo.base.parameterclasses import DynamicNumber
 from topo.base.cf import CFSheet
 from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear
 from topo.misc.numbergenerators import UniformRandom
-from topo.base.functionfamilies import OutputFn
-from topo.base.arrayutils import clip_in_place
 from topo.outputfns.homeostatic import HomeostaticMaxEnt
 
 topo.sim.name = "homeo_lissom_or_noshrinking"
@@ -89,7 +85,7 @@ topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingB
 
 
 ### Schedule learning rate changes
-
+#
 topo.sim.schedule_command( 100,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.548')
 topo.sim.schedule_command( 1000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.274')
 topo.sim.schedule_command( 3000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.137')
