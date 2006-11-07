@@ -12,9 +12,12 @@ Known differences from the reference simulation:
 
   - Connection from R to E should be offset from the center
 
-  - Other misc differences as listed below
+  - Learning rates, delays, and strengths need double-checking
 
-  - Not tested. :-)
+None of the known differences *should* cause problems, but the results
+differ from those reported in that paper, suggesting that some
+parameters are incorrect or interpreted differently.  Thus this
+simulation is not usable at present.
 
 $Id$
 """
@@ -41,7 +44,6 @@ from topo.base.functionfamilies import DotProduct, ResponseFnParameter, Learning
 from topo.base.functionfamilies import OutputFn, OutputFnParameter, IdentityOF
 from topo.base.parameterclasses import DynamicNumber, Number, Wrapper
 from topo.base.parameterizedobject import ParameterizedObject
-#from topo.base.patterngenerator import BoundingBox, PatternGenerator
 from topo.base.patterngenerator import PatternGenerator, PatternGeneratorParameter
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.base.sheet import Slice
@@ -262,6 +264,7 @@ class RCells_CFPRF_DotProduct_Norm(CFPResponseFn):
         activity *= strength
 
 
+
 class RCells_CFPRF_DotProduct_Norm_opt(CFPResponseFn):
     """
     Dot-product response function for projection from Hindpaw to R-cells, with normalization
@@ -327,6 +330,7 @@ if not optimized:
     ParameterizedObject().message('Inline-optimized components not available; using RCells_CFPRF_DotProduct_Norm instead of RCells_CFPRF_DotProduct_Norm_opt.')
     
 
+
 class Cortical_CFSheet(CFSheet):
     """
     CFSheet for E-cells and I-cells: previous activitiy is used to calculate the 
@@ -369,6 +373,7 @@ class Cortical_CFSheet(CFSheet):
             self.output_fn(self.activity)
 
         self.send_output(data=self.activity)
+
             		
 def sigmoid(theta,eta,y):
     n = 1/(1+exp(-1*eta*theta))
@@ -376,6 +381,7 @@ def sigmoid(theta,eta,y):
     if f < 0:
         f = 0
     return f
+
 
 class ECells_ConnectionField(ConnectionField):
     """
@@ -464,6 +470,7 @@ class ECells_ConnectionField(ConnectionField):
         output_fn(self.weights_min) 
 
 
+
 class ECells_Learning(CFPLearningFn):
     """
     Learning rules for connections between E-cells of the model in 
@@ -501,6 +508,7 @@ class ECells_Learning(CFPLearningFn):
                                 cf.weights[i,j] = (self.alpha_p * m * (cf.weights_max[i,j] - cf.weights[i,j])) + cf.weights[i,j]
                 cf.weights *= cf.mask
        
+
 
 class Cortical_WeightGenerator(PatternGenerator):
     """
@@ -573,7 +581,7 @@ class HindpawGaussian(Gaussian):
     """
 
     def function(self,**params):
-        y=self.inspect_value('y') # JABALERT: Retrieve value without incrementing it
+        y=self.inspect_value('y') # Retrieve value without incrementing it
         ysigma = params.get('size',self.size)/2.0
         
         if y >= 0.55:
@@ -614,6 +622,7 @@ CFProjection.response_fn = CFPRF_DotProduct_opt()
 #CFSOM.output_fn = PiecewiseLinear(lower_bound=0.0,upper_bound=1.0)
 
 
+
 ###########################################
 # build simulation
 
@@ -626,9 +635,6 @@ topo.sim['Hindpaw'] = GeneratorSheet(
 topo.sim['R-cells'] = CFSheet(nominal_density=25,
                               nominal_bounds=BoundingBox(points=((      0,0),(25.0/25.0,25.0/25.0))))
 
-#topo.sim['E-cells'] = CFSheet(nominal_density=25,
-#                              nominal_bounds=BoundingBox(points=((      0,0),(25.0/25.0,25.0/25.0))))
-
 topo.sim['E-cells'] = Cortical_CFSheet(Cortical_RF_eta=0.5,Cortical_RF_gamma=10.0,
                                        Cortical_RF_tau=1.0,Cortical_RF_theta=0.09,
                                        nominal_density=25,
@@ -639,9 +645,6 @@ topo.sim['I-cells'] = Cortical_CFSheet(Cortical_RF_eta=0.3,Cortical_RF_gamma=10.
                                        nominal_density=25,
                                        nominal_bounds=BoundingBox(points=((      0,0),(25.0/25.0,25.0/25.0))))
 
-# Need to figure out learning_rate and add to each connection,
-# plus delays and strengths                            
-                            
 topo.sim.connect('Hindpaw','R-cells',
                  delay=0.05,
                  connection_type=RCells_CFProjection,
