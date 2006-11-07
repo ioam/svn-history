@@ -1,9 +1,12 @@
 """
-Example of a LISSOM-based orientation map.
-No shrinking of lateral excitatory radius - should more closely resemble biology
-Still a work in progress - the map still jumps around a lot at the start of learning
-Changes need to be made to the scheduled changes to improve organisation
+Example of a LISSOM-based orientation map that avoids shrinking the
+lateral excitatory radius.
 
+This simulation is intended to be similar to standard LISSOM, but
+without the dramatic reorganizations typical of the early iterations
+where the lateral excitatory radius is large.  Requires homeostatic
+plasticity -- otherwise the map still jumps around a lot at the
+start of learning, yet some neurons still fail to organize.
 """
 
 import RandomArray
@@ -26,9 +29,17 @@ from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear
 from topo.misc.numbergenerators import UniformRandom
+from topo.outputfns.homeostatic import HomeostaticMaxEnt
 
+# Normally uses homeostatic plasticity, but can be called as
+#   ./topographica -c "homeostatic=False" ...
+# to use scheduled threshold changes instead.
+homeostatic = locals().get('homeostatic',True)
 
-topo.sim.name = "lissom_noshrinking"
+if homeostatic:
+    topo.sim.name = "homeo_lissom_or_noshrinking"
+else:
+    topo.sim.name = "lissom_or_noshrinking"
 
 
 input_pattern = topo.patterns.basic.Gaussian(
@@ -56,11 +67,18 @@ topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
                                   nominal_bounds=BoundingBox(radius=0.5+0.275))
 
 
-topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',84.0),
-                        nominal_bounds=BoundingBox(radius=0.5),tsettle=9)
+if homeostatic:
+    topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',84.0),
+                            nominal_bounds=BoundingBox(radius=0.5),tsettle=9, 
+                            output_fn=HomeostaticMaxEnt(a_init=13, b_init=-4, eta=0.002, mu=0.01))
+else:
+    topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',84.0),
+                            nominal_bounds=BoundingBox(radius=0.5),tsettle=9)
 
-topo.sim['V1'].output_fn.lower_bound=0.1
-topo.sim['V1'].output_fn.upper_bound=0.65
+
+if not homeostatic:
+    topo.sim['V1'].output_fn.lower_bound=0.1
+    topo.sim['V1'].output_fn.upper_bound=0.65
 
 
 topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
@@ -87,17 +105,18 @@ topo.sim.schedule_command( 100,'topo.sim["V1"].projections()["Afferent"].learnin
 topo.sim.schedule_command( 1000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.274')
 topo.sim.schedule_command( 3000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.137')
 
-topo.sim.schedule_command( 1000,'topo.sim["V1"].tsettle=11')
-topo.sim.schedule_command( 3000,'topo.sim["V1"].tsettle=12')
-topo.sim.schedule_command( 5000,'topo.sim["V1"].tsettle=13')
 
-### Schedule LISSOM output function threshold changes
-#
-topo.sim.schedule_command( 100, 'topo.sim["V1"].output_fn.lower_bound=0.15; topo.sim["V1"].output_fn.upper_bound=0.68')
-topo.sim.schedule_command( 1000, 'topo.sim["V1"].output_fn.lower_bound=0.21; topo.sim["V1"].output_fn.upper_bound=0.79')
-topo.sim.schedule_command( 3000, 'topo.sim["V1"].output_fn.lower_bound=0.22; topo.sim["V1"].output_fn.upper_bound=0.82')
-topo.sim.schedule_command( 5000, 'topo.sim["V1"].output_fn.lower_bound=0.23; topo.sim["V1"].output_fn.upper_bound=0.85')
-topo.sim.schedule_command( 10000, 'topo.sim["V1"].output_fn.lower_bound=0.24; topo.sim["V1"].output_fn.upper_bound=0.88')
+if not homeostatic:
+    ### Schedule LISSOM settling and output function threshold changes
+    topo.sim.schedule_command( 1000,'topo.sim["V1"].tsettle=11')
+    topo.sim.schedule_command( 3000,'topo.sim["V1"].tsettle=12')
+    topo.sim.schedule_command( 5000,'topo.sim["V1"].tsettle=13')
+
+    topo.sim.schedule_command( 100, 'topo.sim["V1"].output_fn.lower_bound=0.15; topo.sim["V1"].output_fn.upper_bound=0.68')
+    topo.sim.schedule_command( 1000, 'topo.sim["V1"].output_fn.lower_bound=0.21; topo.sim["V1"].output_fn.upper_bound=0.79')
+    topo.sim.schedule_command( 3000, 'topo.sim["V1"].output_fn.lower_bound=0.22; topo.sim["V1"].output_fn.upper_bound=0.82')
+    topo.sim.schedule_command( 5000, 'topo.sim["V1"].output_fn.lower_bound=0.23; topo.sim["V1"].output_fn.upper_bound=0.85')
+    topo.sim.schedule_command( 10000, 'topo.sim["V1"].output_fn.lower_bound=0.24; topo.sim["V1"].output_fn.upper_bound=0.88')
 
 topo.sim.run(0)
 
