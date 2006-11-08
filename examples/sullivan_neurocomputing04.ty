@@ -1,6 +1,15 @@
 """
 Implementation of Sullivan & de Sa's model from “A temporal trace and SOM-based model of complex cell development”.  Neurocomputing, Volumes 58-60, June 2004, pages 827-833.
 
+NOT YET TESTED. 
+Complex cell layer needs subtractive normalisation instead of divisive.
+
+The following parameters aren't specified in the paper:
+Sheet sizes(estimated from diagrams),
+Learning rates for both Hebbian and Trace functions,
+Input line thickness.
+
+
 $Id$
 """
 _version__='$Revision$'
@@ -27,6 +36,7 @@ topo.sim.name = "sullivan_nc04"
 GeneratorSheet.period = 1.0
 GeneratorSheet.phase = 0
 
+##RPHACKALERT Needs altered to fit description in paper
 input_pattern = topo.patterns.basic.Line(
     thickness=0.02,
     orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=12)))
@@ -35,12 +45,12 @@ RandomArray.seed(500,500)
 
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
-                                    period=1.0,phase=0.05,nominal_density=10)
+                                    period=1.0,phase=0.05,nominal_density=160)
 
 topo.sim['V1'] = CFSOM(nominal_density=locals().get('default_density',10.0),
                        learning_length=10000,radius_0=0.1,alpha_0=0.5)
 
-topo.sim['Complex Cell Layer'] = CFSOM(nominal_density=10.0,
+topo.sim['Complex Cell Layer'] = CFSOM(nominal_density=locals().get('default_density',10.0),
                        learning_length=10000,radius_0=0.1,alpha_0=0.5)
 
 topo.sim.connect('Retina','V1',delay=0.05,connection_type=CFProjection,
@@ -49,6 +59,8 @@ topo.sim.connect('Retina','V1',delay=0.05,connection_type=CFProjection,
                   response_fn = CFPRF_DotProduct_opt(),
                   learning_fn=CFPLF_HebbianSOM())
 
+
+##RPALERT Add subtractive multiplication here once implemented
 topo.sim.connect('V1','Complex Cell Layer',delay=0.05,connection_type=CFProjection,
                   weights_generator = topo.patterns.basic.Gaussian(),
                   nominal_bounds_template=BoundingBox(radius=1),
