@@ -1,0 +1,57 @@
+"""
+Implementation of Sullivan & de Sa's model from “A temporal trace and SOM-based model of complex cell development”.  Neurocomputing, Volumes 58-60, June 2004, pages 827-833.
+
+$Id$
+"""
+_version__='$Revision$'
+import RandomArray
+from math import exp, sqrt
+
+import topo.patterns.random
+import topo.patterns.basic
+
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.base.boundingregion import BoundingBox
+from topo.base.cf import CFProjection,CFPOF_Plugin
+from topo.base.parameterclasses import DynamicNumber,Number
+from topo.sheets.cfsom import CFSOM
+from topo.responsefns.optimized import CFPRF_EuclideanDistance_opt,CFPRF_DotProduct_opt
+from topo.learningfns.projfns import CFPLF_Trace, CFPLF_Plugin
+from topo.learningfns.som import CFPLF_HebbianSOM
+from topo.misc.numbergenerators import UniformRandom
+from topo.outputfns.basic import DivisiveNormalizeL1
+
+topo.sim.name = "sullivan_nc04"
+
+# input pattern
+GeneratorSheet.period = 1.0
+GeneratorSheet.phase = 0
+
+input_pattern = topo.patterns.basic.Line(
+    thickness=0.02,
+    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=12)))
+
+RandomArray.seed(500,500)
+
+
+topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
+                                    period=1.0,phase=0.05,nominal_density=10)
+
+topo.sim['V1'] = CFSOM(nominal_density=locals().get('default_density',10.0),
+                       learning_length=10000,radius_0=0.1,alpha_0=0.5)
+
+topo.sim['Complex Cell Layer'] = CFSOM(nominal_density=10.0,
+                       learning_length=10000,radius_0=0.1,alpha_0=0.5)
+
+topo.sim.connect('Retina','V1',delay=0.05,connection_type=CFProjection,
+                  weights_generator = topo.patterns.basic.Gaussian(),
+                  nominal_bounds_template=BoundingBox(radius=0.1),
+                  response_fn = CFPRF_DotProduct_opt(),
+                  learning_fn=CFPLF_HebbianSOM())
+
+topo.sim.connect('V1','Complex Cell Layer',delay=0.05,connection_type=CFProjection,
+                  weights_generator = topo.patterns.basic.Gaussian(),
+                  nominal_bounds_template=BoundingBox(radius=1),
+                  response_fn = CFPRF_EuclideanDistance_opt(),
+                  weights_output_fn=CFPLF_Plugin(single_cf_fn=DivisiveNormalizeL1()),
+                  learning_fn=CFPLF_Trace())

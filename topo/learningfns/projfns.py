@@ -15,7 +15,7 @@ from Numeric import ones,Float32,zeros
 from topo.base.cf import CFPLearningFn,LearningFnParameter
 from topo.base.parameterclasses import Number
 from basic import BCMFixed
-from topo.base.functionfamilies import Hebbian
+from topo.base.functionfamilies import Hebbian,LearningFn,LearningFnParameter
 
 # Imported here so that all ProjectionLearningFns will be in the same package
 from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
@@ -68,9 +68,9 @@ from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
 ##  
 ##  
 ##  # Inappropriately shares the history between units; needs to be modified to be a CFPLF_Trace learning rule
-##  class Trace(LearningFn):
+##class Trace(LearningFn):
 ##      """
-##      Trace learning rule; Foldiak (1991), Sutton and Barto (1981), Wallis and Rolls (1997).
+##    Trace learning rule; Foldiak (1991), Sutton and Barto (1981), Wallis and Rolls (1997).
 ##  
 ##      Incorporates a trace of recent activity into the learning
 ##      function, instead of learning based only on the current activity
@@ -84,11 +84,45 @@ from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
 ##      def __init__(self,**params):
 ##          super(Trace,self).__init__(**params)
 ##          self.trace=0
-##      
+##     
 ##      def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
 ##          trace = (1-self.trace_strength)*unit_activity+self.trace_strength*self.trace
 ##          weights += single_connection_learning_rate * trace * input_activity
 
+class CFPLF_Trace(CFPLearningFn):
+    """Reimplementation of Trace LearningFN as CFPLF, NOT FULLY TESTED
+
+       Trace learning rule; Foldiak (1991), Sutton and Barto (1981), Wallis and Rolls (1997).
+       
+       Incorporates a trace of recent activity into the learning
+       function, instead of learning based only on the current activity
+       as in strict Hebbian learning.
+  
+       Requires some form of output_fn normalization for stability.       
+    """
+
+
+    trace_strength=Number(default=0.5,bounds=(0.0,1.0),doc="How much the learning is dominated by the activity trace, relative to the current value.")     
+    single_cf_fn = LearningFnParameter(default=BCMFixed())                
+    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+          rows,cols = output_activity.shape
+          single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
+          single_cf_fn = self.single_cf_fn
+
+          ##Initialise traces to zero if they don't already exist
+          if not hasattr(self,'traces'):
+                self.traces=zeros(output_activity.shape,Float32)
+                self.traces.savespace(1)
+
+          for r in xrange(rows):
+                for c in xrange(cols):
+                      cf = cfs[r][c]
+                      input_activity = cf.get_input_matrix(input_activity)
+                      unit_activity = output_activity[r,c]
+                      self.traces[r,c] =(1-self.trace_strength)*unit_activity+self.trace_strength*self.traces[r,c]
+                      cf.weights += single_connection_learning_rate * self.traces[r,c] * input_activity 
+                      cf.weights *= cf.mask       
+      
 class CFPLF_OutstarHebbian(CFPLearningFn):
     """CFPLearningFunction applying the specified (default is Hebbian) 
        single_cf_fn to each CF, where normalization is done in an outstar-manner."""
