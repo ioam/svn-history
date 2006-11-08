@@ -55,7 +55,7 @@ the various levels of modeling, and a detailed presentation of the
 scaling equations that underlie Sheet coordinates 
 (which are also described in
 <A TARGET="_top" HREF="http://nn.cs.utexas.edu/keyword?bednar:neuroinformatics04">Bednar et al.
-<CITE>Neuroinformatics</CITE>, 2:275-302, 2004</A>)
+<CITE>Neuroinformatics</CITE>, 2:275-302, 2004</A>).
 
 <P>Other useful simulators:
 
@@ -65,7 +65,7 @@ scaling equations that underlie Sheet coordinates
   <dd>Detailed low-level modeling of neurons and small networks.  It is possible
    to use these simulators for topographic maps, but the computational
    requirements are usually extremely high, and typical users simulate
-   much smaller networks.<BR><BR>
+   much smaller networks .<BR><BR>
   <dt><A TARGET="_top" HREF="http://askja.bu.edu/catacomb">Catacomb</A></dt>
   <dd>Highly graphical Java-based simulator covering numerous levels,
     from ion channels to behavioral experiments.  Can be used for some
@@ -74,15 +74,20 @@ scaling equations that underlie Sheet coordinates
   <dt><A TARGET="_top" HREF="http://www.nest-initiative.org">NEST</A></dt>
   <dd>NEST (formerly called BLISS) is a general-purpose simulator for
     large networks of neurons, but without an explicit focus on topography.
-    The licensing terms are also somewhat restrictive, in part because of 
-    its nature as a joint commercial/academic project.<BR><BR>
+    NEST is based on a custom stack-based scripting language (like RPN
+    calculators or PostScript) that is not nearly as friendly as
+    Python, and requires much more of the simulation code to be
+    written in C.  On the other hand, NEST does provide many useful,
+    high-performance primitives, and can be particularly useful for
+    models that do not fit Topographica's abstractions closely.<BR><BR>
   <dt><A TARGET="_top" HREF="http://ilab.usc.edu/toolkit/documentation.shtml">iNVT</A></dt>
   <dd>iLab Neuromorphic Vision Toolkit is a high-performance
     computer-vision oriented C++ toolkit from Koch and Itti with support
     for saliency maps for modeling attention.  It has a strong focus
     on topographically organized regions, but at a high level of
     abstraction, and without specific support for learning and
-    development.<BR><BR>
+    development.  It also requires more time-consuming and less
+    flexible development in C++.<BR><BR>
   <dt><A TARGET="_top" HREF="http://www.cs.cmu.edu/~dr/Lens">LENS</A></dt>
   <dd>Simple, basic artificial neural-network simulator (primarily
     abstract backpropagation networks, but also has support for
