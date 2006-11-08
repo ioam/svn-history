@@ -89,18 +89,20 @@ from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
 ##          trace = (1-self.trace_strength)*unit_activity+self.trace_strength*self.trace
 ##          weights += single_connection_learning_rate * trace * input_activity
 
+
+
 class CFPLF_Trace(CFPLearningFn):
-    """Reimplementation of Trace LearningFN as CFPLF, NOT FULLY TESTED
-
-       Trace learning rule; Foldiak (1991), Sutton and Barto (1981), Wallis and Rolls (1997).
-       
-       Incorporates a trace of recent activity into the learning
-       function, instead of learning based only on the current activity
-       as in strict Hebbian learning.
-  
-       Requires some form of output_fn normalization for stability.       
     """
+    Reimplementation of Trace LearningFN as CFPLF, NOT FULLY TESTED
 
+    Trace learning rule; Foldiak (1991), Sutton and Barto (1981), Wallis and Rolls (1997).
+       
+    Incorporates a trace of recent activity into the learning
+    function, instead of learning based only on the current activity
+    as in strict Hebbian learning.
+    
+    Requires some form of output_fn normalization for stability.       
+    """
 
     trace_strength=Number(default=0.5,bounds=(0.0,1.0),doc="How much the learning is dominated by the activity trace, relative to the current value.")     
     single_cf_fn = LearningFnParameter(default=BCMFixed())                
@@ -123,6 +125,8 @@ class CFPLF_Trace(CFPLearningFn):
                       cf.weights += single_connection_learning_rate * self.traces[r,c] * input_activity 
                       cf.weights *= cf.mask       
       
+
+
 class CFPLF_OutstarHebbian(CFPLearningFn):
     """CFPLearningFunction applying the specified (default is Hebbian) 
        single_cf_fn to each CF, where normalization is done in an outstar-manner."""
