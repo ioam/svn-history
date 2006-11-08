@@ -1,0 +1,217 @@
+import RandomArray
+import fixedpoint
+import copy
+import Numeric
+from math import pi, sqrt
+from fixedpoint import FixedPoint
+from Numeric import sum,ones,exp
+
+import topo.patterns.random
+import topo.patterns.basic
+from topo.base.boundingregion import BoundingBox
+from topo.base.cf import CFProjection
+from topo.base.parameterclasses import DynamicNumber,Wrapper
+from topo.learningfns.som import CFPLF_HebbianSOM
+from topo.sheets.cfsom import CFSOM
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.misc.numbergenerators import UniformRandom
+from topo.patterns.basic import Disk
+from topo.base.cf import CFPLearningFn,LearningFnParameter
+from topo.learningfns.basic import Hebbian
+from topo.base.functionfamilies import LearningFn
+from topo.base.parameterclasses import DynamicNumber, Number
+from topo.base.functionfamilies import OutputFn
+from topo.base.arrayutils import clip_in_place
+
+
+  
+# Homeostatic Synaptic Scaling - Sullivan & de sa
+# Homeostatic Synaptic Scaling - Sullivan & de sa
+class HomeoSynaptic(CFPLearningFn):
+    """
+    Implementation of Homeostatic Synaptic Scaling
+    Sullivan & de Sa, "Homeostatic Synaptic Scaling in Self-Organizing Maps"
+
+    Does not requires some form of output_fn normalization for stability.
+    """
+    single_cf_fn = LearningFnParameter(default=Hebbian(), doc="Learning Fn that will be applied to each CF individually")
+    beta_n = Number(default=0.01,bounds=(0,None),doc="homeostatic learning rate")
+    beta_c = Number(default=0.005,bounds=(0,None),doc="time window over which the neuron's firing rate is averaged")
+    activity_target = Number(default=0.03,bounds=(0,None),doc="Target average activity") 
+    
+    def __init__(self,**params):
+        super(HomeoSynaptic,self).__init__(**params)
+	self.temp_hist = []
+   
+    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+	"""
+        Update the value of the given weights matrix based on the
+        input_activity matrix (of the same size as the weights matrix)
+        and the response of this unit (the unit_activity), governed by
+        a per-connection learning rate.
+	"""
+        
+        if not hasattr(self,'averages'):
+            #self.averages = ones(output_activity.shape,Float) * 0.05
+	    self.averages = topo.sim['V1'].output_fn.x_avg
+	 #####   print self.averages[23][23], ' ', self.averages[11][11]
+
+	    #print cfs[23][23].weights
+
+	    # normalize initial weights to 1.0
+            rows,cols = output_activity.shape
+            for r in xrange(rows):
+                for c in xrange(cols):
+                    cf = cfs[r][c]
+
+	            current_norm_value = 1.0*Numeric.sum(abs(cf.weights.flat))
+		    if current_norm_value != 0:
+            	    	factor = (1.0/current_norm_value)
+            	    	cf.weights *= factor
+
+	    #print "--", cfs[23][23].weights
+
+
+        # compute recent average of output activity
+        self.averages = self.beta_c * output_activity + (1.0-self.beta_c) * self.averages
+        activity_norm = 1.0 + self.beta_n * ((self.averages - self.activity_target)/self.activity_target)
+
+        rows,cols = output_activity.shape
+	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
+	
+       
+        # avoid evaluating these references each time in the loop
+        single_cf_fn = self.single_cf_fn
+	for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+
+                single_cf_fn(cf.get_input_matrix(input_activity),
+                             output_activity[r,c], cf.weights, single_connection_learning_rate)
+
+		# homeostatic normalization
+                cf.weights /= activity_norm[r][c]
+
+                # CEBHACKALERT: see ConnectionField.__init__()
+                cf.weights *= cf.mask
+
+##	print self.averages[23][23], ':', activity_norm[23][23], '   ', self.averages[11][11], ':', activity_norm[11][11]
+##	print Numeric.sum(abs(cfs[23][23].weights.flat)), '  ', Numeric.sum(abs(cfs[11][11].weights.flat))
+	
+	# debug only
+#		self.temp_hist.append (Numeric.sum(abs(cfs[23][23].weights.flat)))
+
+##################################################################################################	# DEBUG Only: OutputFn for computing average activity of each neuron
+class TestFn(OutputFn):
+    """ 
+    Piecewise-linear output function with lower and upper thresholds
+    as constructor parameters.
+    """
+    lower_bound = Number(default=0.0,softbounds=(0.0,1.0))
+    upper_bound = Number(default=1.0,softbounds=(0.0,1.0))
+    learn_step = Number(default=8,doc="Number of step before learning take place")
+
+    def __init__(self,**params):
+        super(TestFn,self).__init__(**params)
+
+	self.first_call = True
+	self.n_step = 0
+	self.beta = 0.0003
+	self.ncall = 0
+
+    def __call__(self,x):
+
+        fact = 1.0/(self.upper_bound-self.lower_bound)        
+        x -= self.lower_bound
+        x *= fact
+        clip_in_place(x,0.0,1.0)
+
+	if self.first_call:
+	    self.first_call = False
+	    #self.x_avg = self.beta * copy.copy(x)
+	    #self.x_avg[12][12] = 0.01
+	    self.x_avg = zeros(x.shape,x.typecode())
+	    self.x_hist = []
+	else:
+	    if self.ncall <= 1000:
+	    	self.x_avg = ((self.x_avg*self.ncall) + x) / (self.ncall+1)
+	    	self.ncall += 1
+	    else:	    
+	    	self.x_avg = self.beta*x + (1.0-self.beta)*self.x_avg
+
+	self.n_step += 1
+	if self.n_step == self.learn_step:
+
+	    self.n_step = 0
+	    #self.x_hist.append (self.x_avg)
+
+	 ##   print self.x_avg[23][23], ' ', self.x_avg[11][11], ' ', self.x_avg[0][0], ' ', self.x_avg[47][47]
+	
+	
+	
+	
+##################################################################################################	
+class InitFn(CFPLearningFn):
+    
+    def __init__(self,**params):
+        super(InitFn,self).__init__(**params)
+	self.FirstCall = True
+   
+    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+        
+        if self.FirstCall:
+	    self.FirstCall = False
+	    # normalize initial weights to 1.0
+            rows,cols = output_activity.shape
+            for r in xrange(rows):
+                for c in xrange(cols):
+                    cf = cfs[r][c]
+
+	            current_norm_value = 1.0*Numeric.sum(abs(cf.weights.flat))
+		    if current_norm_value != 0:
+            	    	factor = (1.0/current_norm_value)
+            	    	cf.weights *= factor
+
+	
+#########################################################################
+
+
+topo.sim.name = "Sullivan_homeo_synaptic_SOM"
+
+
+#weight initialization, response 
+RandomArray.seed(500,500)
+CFProjection.weights_generator=topo.patterns.random.UniformRandom()
+CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
+
+
+# Input pattern
+input_pattern = topo.patterns.basic.Gaussian(
+			scale=1, size=2*0.0468, aspect_ratio=4.0,
+			x=DynamicNumber(UniformRandom(lbound=-0.6,ubound=0.6,seed=12)),
+			y=DynamicNumber(UniformRandom(lbound=-0.6,ubound=0.6,seed=34)),
+			orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+		
+	
+  	  
+# Sheets, connections, and their parameters
+
+topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
+                                    period=1.0,phase=0.05,nominal_density=150)
+
+topo.sim['V1'] = CFSOM(nominal_density=locals().get('default_density',15),
+                       learning_length=10000,radius_0=0.1,alpha_0=0.5,output_fn=TestFn())
+
+topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
+                  connection_type=CFProjection,strength=1.0,name='Afferent',
+                  nominal_bounds_template=BoundingBox(radius=0.275),learning_rate=0,
+                  learning_fn=InitFn())
+			  
+#topo.sim.connect('Retina','V1',delay=0.05,connection_type=CFProjection,
+#                  weights_generator = topo.patterns.basic.Gaussian(),name='Afferent',
+#                  nominal_bounds_template=BoundingBox(radius=0.275),
+#                  learning_fn=HomeoSynaptic())
+#CFPLF_HebbianSOM()
+
+wait = 100
+topo.sim.schedule_command(wait,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.9590; topo.sim["V1"].projections()["Afferent"].learning_fn=HomeoSynaptic()')
