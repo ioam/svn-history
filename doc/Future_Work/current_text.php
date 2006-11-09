@@ -142,6 +142,15 @@ installation, including the mingw compiler.
 <ul>
 
 <li>
+2006/11/09 (JA?): Need to do a general overhaul of the GUI; it needs to be clean 
+and well designed so that it can be flexible.
+</li>
+
+<li>
+2006/11/09 (JL?): Add better support for exploring and optimizing parameter spaces.
+</li>
+
+<li>
 2006/06/26 (CB): parameters frame doesn't properly set object properties when 
 right click is used (there's a clearer explanation in parametersframe.py).
 </li>
