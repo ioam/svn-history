@@ -1,25 +1,112 @@
 <h3>Current tasks</h3>
 
-Tasks on which the developers are currently working. 
-<br />
-
-<small>
-(Initials in parentheses typically indicate the main person working on
-an item, but others may also be involved.  Items with no initials are
-not (yet) assigned to a specific developer. Dates indicate the item
-was first added to the list, or a change was made.)
+<p><small>
+By each task, initials in parentheses typically indicate the main
+person working on an item, but others may also be involved.  Items
+with no initials are not (yet) assigned to a specific developer (so
+please feel free to volunteer!!!!). Dates indicate the item was first
+added to the list, or a change was made.
 </small>
+
+<h3>Tasks to be addressed for the upcoming 0.9.2 release:</h3>
+
+<ul>
+
+<li>
+2006/11/09 (JL/CP): Subtle bug in orientation map measurement for
+LISSOM maps -- the maps differ very slightly (but measurably)
+depending on the order in which the test patterns are presented.
+Appears to be due to the way settling iterations are counted and
+reset.
+</li>
+
+<li>
+2006/11/09 (FD): Under Windows, the model editor will sometimes report
+a problem when it is first opened, but if it is reopened the problem
+goes away.
+</li>
+
+<li>
+2006/11/09 (JL): In certain cases, the plot history of plot windows 
+is lost.
+</li>
+
+<li>
+2006/11/09 (CP): The simulation name should be displayed in the
+console window, not just the other windows.
+</li>
+
+<li>
+2006/06/06 (CP): Fix TopoConsole "Run for" TaggedSlider so that
+pressing Return is the same as hitting Go.
+</li>
+
+<li>
+2006/11/09 (JL): If a Projection plot window has been opened,
+subsequent Projection Activity windows show only that Projection,
+but should show all Projections.
+</li>
+
+</ul>
+
+
+
+<h3>Tasks to be addressed soon after 0.9.2:</h3>
 
 <ul>
 
 
 <li>
-2006/06/06: Fix TopoConsole "Run for" TaggedSlider so that pressing Return
-is the same as hitting Go.
+2006/07/07 (CP): Fix normalization to allow negative weights.  Also
+consider adding other normalization options, including joint
+normalization across all plots with the same name.
 </li>
 
 <li>
-2006/05/15: Missing scheduled_actions in lissom examples
+2006/10/10 (JL): Add FFT plot using Jim's Octave code; shouldn't be
+difficult.  Might not be that hard to port it to Python, either.
+</li>
+
+<li>
+2006/11/09 (JL): Add plotting of tuning curves and contrast response functions
+</li>
+
+<li>
+2006/11/09 (JL): Support better saving of results during long batch
+runs (e.g. orientation maps and other plots).
+</li>
+
+<li>
+2006/11/09 (CP/JL): Add support for measuring receptive fields,
+perhaps using STRFPAK or a similar approach.
+</li>
+
+<li>
+2006/11/09 (CP): Add numerical indication of size and brightness scales
+to plots, to allow different Projections, etc. to be compared properly.
+</li>
+
+<li>
+2006/11/09 (CP?): Add support for plotting outstar connections, i.e. outgoing
+ConnectionFields.
+</li>
+
+<li>
+2006/11/09 (RZ): Add support for automatic generation of reports with
+statistics about maps, e.g. for estimating perceived quantities.
+</li>
+
+<li>
+2006/11/09 (RZ): Add simple timing functions to suggest what components
+need optimizing.
+</li>
+
+<li>
+2006/11/09 (RZ): Need to implement more of the optimizations from the C++ LISSOM code.
+</li>
+
+<li>
+2006/05/15 (JB): Missing scheduled_actions in lissom examples
 </li>
 
 <li>
@@ -35,26 +122,22 @@ to check that automatically.
 
 
 <li>
-2006/05/23 (JB): binding help balloon to the widget (already bound to the label) in parametersframe so that help can be seen for objects that are e.g. being selected.
+2006/05/23 (JB): binding help balloon to the widget (already bound to
+the label) in parametersframe so that help can be seen for objects
+that are e.g. being selected.
 </li>
 
 
 <li>
-2006/07/07 (JB): Fix normalization to allow negative weights.  Also
-consider adding other normalization options, including joint
-normalization across all plots with the same name.
-</li>
-
-<li>
-2006/07/21 (CB): Update scripts now windows-specific files have moved to topographica-win module. Make script to create python/topographica installation, including the mingw compiler. 
+2006/07/21 (CB): Update scripts now windows-specific files have moved
+to topographica-win module. Make script to create python/topographica
+installation, including the mingw compiler.
 </li>
 
 </ul>
 
 
-<h3>Tasks to be carried out next</h3>
-
-Tasks which the developers are about to start.
+<h3>Things we hope to take care of eventually</h3>
 
 <ul>
 
@@ -167,13 +250,19 @@ Topographica> PatternGeneratorParameter.default=Constant()
 Topographica> q=PatternGeneratorParameter(default=Line())
 Traceback (most recent call last):
   File "<stdin>", line 1, in ?
-  File "/disk/data1/workspace/v1cball/t/topographica/topo/base/patterngenerator.py", line 207, in __init__
-    super(PatternGeneratorParameter,self).__init__(PatternGenerator,default=default,suffix_to_lose='Generator',**params)
-  File "/disk/data1/workspace/v1cball/t/topographica/topo/base/parameterclasses.py", line 508, in __init__
+  File "/home/v1cball/topographica/topo/base/patterngenerator.py", 
+    line 207, in __init__
+    super(PatternGeneratorParameter,self).__init__
+         (PatternGenerator,default=default, suffix_to_lose='Generator',
+	  **params)
+  File "/home/v1cball/topographica/topo/base/parameterclasses.py", 
+    line 508, in __init__
     Parameter.__init__(self,default=default,instantiate=instantiate,
-  File "/disk/data1/workspace/v1cball/t/topographica/topo/base/parameterizedobject.py", line 241, in __init__
+  File "/home/v1cball/topographica/topo/base/parameterizedobject.py", 
+    line 241, in __init__
     self.default = default
-AttributeError: 'PatternGeneratorParameter' object attribute 'default' is read-only
+AttributeError: 'PatternGeneratorParameter' object attribute 'default' 
+is read-only
 Topographica> 
 </pre>
 </li>
@@ -254,11 +343,6 @@ achieve in Python.
 
 <li>
 2006/02/21 (all): Improving documentation and test files; eliminating ALERTs.
-</li>
-
-<li>
-2006/10/10: Add FFT plot using Jim's Octave code; shouldn't be difficult.
-Might not be that hard to port it to Python, either.
 </li>
 
 <li>
