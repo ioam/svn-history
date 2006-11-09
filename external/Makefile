@@ -22,9 +22,11 @@ PYTHON_UNINSTALL += ${PYTHON_LIB} man/man1/python.1 include/python2.4
 
 # LDFLAGS sets ${PREFIX}/lib as the LD_LIBRARY in the binary
 python: ${PYTHON}.tgz tk
+	echo ${PREFIX}
 	tar xzf ${PYTHON}.tgz
 	cd ${PYTHON}; ./configure --prefix=${PREFIX} LDFLAGS=-Wl,-rpath,${PREFIX}/lib
-	env PREFIX=${PREFIX} make -C ${PYTHON} install
+	cd ${PYTHON}; env PREFIX=${PREFIX} make 
+	cd ${PYTHON}; env PREFIX=${PREFIX} make install
 	touch python
 
 python-clean:
