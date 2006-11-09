@@ -10,7 +10,7 @@ uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-u
 ##############################################################
 # Python (interpreted language)
 #
-PYTHON = Python-2.4.2
+PYTHON = Python-2.4.4
 
 PYTHON_LIB  = lib/python2.4
 PYTHON_INC  = include/python2.4
