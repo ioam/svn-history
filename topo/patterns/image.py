@@ -68,21 +68,21 @@ class PatternSampler(ParameterizedObject):
         
         'stretch_to_fit': scale both dimensions of the pattern so they
         would fill a Sheet with bounds=BoundingBox(radius=0.5)
-        (disregards the original's aspect ratio)
+        (disregards the original's aspect ratio).
 
         'fit_shortest': scale the pattern so that its shortest
         dimension is made to fill the corresponding dimension on a
         Sheet with bounds=BoundingBox(radius=0.5) (maintains the
-        original's aspect ratio)
+        original's aspect ratio).
 
         'fit_longest': scale the pattern so that its longest dimension
         is made to fill the corresponding dimension on a Sheet with
         bounds=BoundingBox(radius=0.5) (maintains the original's
-        aspect ratio)
+        aspect ratio).
 
         'original': no scaling is applied; one pixel of the pattern is
         put in one unit of the sheet on which the pattern being
-        displayed
+        displayed.
 
         The pattern is further scaled according to the supplied width and height.
         """
@@ -123,6 +123,10 @@ class PatternSampler(ParameterizedObject):
 
         return pattern_sample
 
+    # Added by Tikesh for presenting stereo images; may not be needed anymore
+    def get_image_size(self):
+        r,c=self.pattern_array.shape
+        return r,c
 
     def __apply_size_normalization(self,x,y,sheet_xdensity,sheet_ydensity,scaling):
         """
