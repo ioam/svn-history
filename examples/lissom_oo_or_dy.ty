@@ -79,10 +79,10 @@ max_disparity = locals().get('max_disparity',2.0)
 # This trivial difference is for historical reasons only, to match the MSc results
 if plusminus: 
    disparity_bound = max_disparity*0.0416665/2.0
-   topo.sim.name = "lissom_oo_or_disparity_plusminus_" + repr(max_disparity) + "_pixel"
+   topo.sim.name = "lissom_oo_or_dy_plusminus_" + repr(max_disparity) + "_pixel"
 else:
    disparity_bound = max_disparity*0.041665/2.0
-   topo.sim.name = "lissom_oo_or_disparity_" + repr(max_disparity) + "_pixel"
+   topo.sim.name = "lissom_oo_or_dy_" + repr(max_disparity) + "_pixel"
 
 
 # jbednar: not sure where these numbers came from, but presumably this
