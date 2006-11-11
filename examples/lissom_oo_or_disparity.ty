@@ -90,24 +90,25 @@ right_x.input_param = DynamicNumber(UniformRandom(lbound=-position_bound,ubound=
 right_x.disp = DynamicNumber(UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150))
 
 
+left_scale=1.0
+right_scale=1.0
+input_offset=0.0
 
 left_input_pattern = topo.patterns.basic.Gaussian(
-          size=2*0.0468, aspect_ratio=4.0,
-          #scale=DynamicNumber(UniformRandom(lbound=0,ubound=2,seed=200)), 
+          size=2*0.0468, aspect_ratio=4.0, offset=input_offset,
+          scale=left_scale,
           x=DynamicNumber(left_x),
           y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34)),
           orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
-
 right_input_pattern = topo.patterns.basic.Gaussian(
-          size=2*0.0468, aspect_ratio=4.0,
-          #scale=DynamicNumber(UniformRandom(lbound=0,ubound=2,seed=200)), 
+          size=2*0.0468, aspect_ratio=4.0,offset=input_offset,
+          scale=right_scale,
           x=DynamicNumber(right_x),
           y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34)),
           orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
 
-                          
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)
 CFProjection.weights_generator=topo.patterns.basic.Constant()
