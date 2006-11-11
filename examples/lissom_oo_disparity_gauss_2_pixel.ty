@@ -1,8 +1,18 @@
 """
-DISP : Max  disp of 2 pixel (In fact 2 pixel)
+LISSOM-based V1 map for orientation and disparity preferences.
 
-54 == 2.25
-2 = (2.25*2)/54 = 0.08333
+From Tikesh Ramtohul, "A self-organizing model of disparity maps in
+the primary visual cortex", MSc Thesis, School of Informatics,
+University of Edinburgh, 2006,
+(http://www.inf.ed.ac.uk/publications/thesis/online/IM060400.pdf).
+
+This script uses a maximum disparity of 2 retinal pixels, by default,
+based on the following calculation:
+
+  retina width in sheet coordinates: 2*(0.5+0.25+0.375) = 2.25
+  retina width in pixels: 54
+  sheet coordinate length of two pixels: 2*(2.25/54) = 0.08333
+  
 Since left_x = input_x - disp and right_x = input_x + disp,
 To get disp of 2 pixel, we need disp to be between -0.08333/2 <--> 0.08333/2
 """
@@ -30,9 +40,7 @@ from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
 
-
-
-#TR
+# Temporary
 from topo.base.pickle import PickleDisparity1,PickleDisparity2
 
 topo.sim.name = "lissom_oo_disparity_gauss_2_pixel"
