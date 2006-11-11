@@ -1,6 +1,6 @@
 """
 LISSOM-based V1 map for orientation and disparity preferences,
-driven by stereo image pairs
+driven by stereo image pairs.
 
 From Tikesh Ramtohul, "A self-organizing model of disparity maps in
 the primary visual cortex", MSc Thesis, School of Informatics,
@@ -32,18 +32,12 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
-
-
-topo.sim.name = "lissom_oo_or_dy_photo"
-
-
-
-
-from topo.patterns.image import edge_average
 from os import listdir
+from Numeric import array, Float, ravel
 import Image as pImage
 import ImageOps
-from Numeric import array, Float, ravel
+
+from topo.patterns.image import edge_average
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.parameterclasses import Filename, Number, Parameter, Enumeration
 from topo.base.projection import OutputFnParameter
@@ -52,6 +46,10 @@ from topo.patterns.image import PatternSampler
 from topo.misc.numbergenerators import UniformRandom
 from pylab import fix,ceil
 from RandomArray import randint,seed,uniform
+
+
+topo.sim.name = "lissom_oo_or_dy_photo"
+
 
 class ImageSeq(PatternGenerator):
     """
@@ -144,8 +142,8 @@ class ImageSeq(PatternGenerator):
         seed(137*int(random_num1),541*int(random_num1))
         index = randint(0,len(self.patterns))
 
-        
-        y_value,x_value=self.patterns[index].get_image_size() ###added get_image_size()method in PatternSampler class
+        ### Requires new get_image_size() method added to PatternSampler
+        y_value,x_value=self.patterns[index].get_image_size() 
         x_bound=fix(x_value/54.0)-2.0
         y_bound=fix(y_value/54.0)-2.0
 
@@ -158,7 +156,7 @@ class ImageSeq(PatternGenerator):
 	print index, ' - ', x_bound, ' - ', y_bound, ' - ', self.x, ' - ', self.y
 	return self.patterns[index](x,y,float(xdensity),float(ydensity),size_normalization,float(width),float(height))
 
-########################################################################################################################
+
 
 
 
@@ -246,29 +244,29 @@ topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
 topo.sim['V1'].output_fn.lower_bound=0.076
 topo.sim['V1'].output_fn.upper_bound=0.626
 
-
+lgn_strength=4.7
 
 # LGN ON channel
 topo.sim.connect('LeftRetina','LGNOnLeft',delay=FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=4.7,
+                  connection_type=SharedWeightCFProjection,strength=lgn_strength,
                   nominal_bounds_template=BoundingBox(radius=0.375),name='LCenterOn',
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('LeftRetina','LGNOnLeft',delay = FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=-4.7,
+                  connection_type=SharedWeightCFProjection,strength=-lgn_strength,
                   name='LSurroundOn',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('RightRetina','LGNOnRight',delay=FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=4.7,
+                  connection_type=SharedWeightCFProjection,strength=lgn_strength,
                   nominal_bounds_template=BoundingBox(radius=0.375),name='RCenterOn',
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('RightRetina','LGNOnRight',delay = FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=-4.7,
+                  connection_type=SharedWeightCFProjection,strength=-lgn_strength,
                   name='RSurroundOn',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
@@ -276,45 +274,45 @@ topo.sim.connect('RightRetina','LGNOnRight',delay = FixedPoint("0.05"),
 
 # LGN OFF channel
 topo.sim.connect('LeftRetina','LGNOffLeft',delay = FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=-4.7,
+                  connection_type=SharedWeightCFProjection,strength=-lgn_strength,
                   name='LCenterOff',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('LeftRetina','LGNOffLeft',delay = FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=4.7,
+                  connection_type=SharedWeightCFProjection,strength=lgn_strength,
                   name='LSurroundOff',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('RightRetina','LGNOffRight',delay = FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=-4.7,
+                  connection_type=SharedWeightCFProjection,strength=-lgn_strength,
                   name='RCenterOff',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('RightRetina','LGNOffRight',delay = FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=4.7,
+                  connection_type=SharedWeightCFProjection,strength=lgn_strength,
                   name='RSurroundOff',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
 
 # Connections from LGNs to V1
 
-topo.sim.connect('LGNOnLeft','V1',delay=FixedPoint("0.05"),
-                  connection_type=CFProjection,strength=0.5/2.0,name='LGNOnLeftAfferent',
+topo.sim.connect('LGNOnLeft','V1',delay=FixedPoint("0.05"),#dest_port=('Activity','JointNormalize', 'Afferent'),
+                  connection_type=CFProjection,strength=0.25,name='LGNOnLeftAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590/stsd)
 
-topo.sim.connect('LGNOffLeft','V1',delay=FixedPoint("0.05"),
-                  connection_type=CFProjection,strength=0.5/2.0,name='LGNOffLeftAfferent',
+topo.sim.connect('LGNOffLeft','V1',delay=FixedPoint("0.05"),#dest_port=('Activity','JointNormalize', 'Afferent'),
+                  connection_type=CFProjection,strength=0.25,name='LGNOffLeftAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590/stsd)
 
-topo.sim.connect('LGNOnRight','V1',delay=FixedPoint("0.05"),
-                  connection_type=CFProjection,strength=0.5/2.0,name='LGNOnRightAfferent',
+topo.sim.connect('LGNOnRight','V1',delay=FixedPoint("0.05"),#dest_port=('Activity','JointNormalize', 'Afferent'),
+                  connection_type=CFProjection,strength=0.25,name='LGNOnRightAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590/stsd)
 
-topo.sim.connect('LGNOffRight','V1',delay=FixedPoint("0.05"),
-                  connection_type=CFProjection,strength=0.5/2.0,name='LGNOffRightAfferent',
+topo.sim.connect('LGNOffRight','V1',delay=FixedPoint("0.05"),#dest_port=('Activity','JointNormalize', 'Afferent'),
+                  connection_type=CFProjection,strength=0.25,name='LGNOffRightAfferent',
                   nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590/stsd)
 
 
@@ -328,14 +326,13 @@ topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                   connection_type=CFProjection,strength=-1.25,
                   nominal_bounds_template=BoundingBox(radius=0.23),learning_rate=0.1963)  
 
+### Actions scheduled to occur as the simulation proceeds.
+
+topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
+
 topo.sim.schedule_command(1000*st,'topo.sim["V1"].projections()["LateralInhibitory"].strength=-1.7; topo.sim["V1"].projections()["LateralInhibitory"].learning_rate=0.3925;')
 topo.sim.schedule_command(2000*st,'topo.sim["V1"].projections()["LateralInhibitory"].strength=-2.1; topo.sim["V1"].projections()["LateralInhibitory"].learning_rate=0.5888;')
 topo.sim.schedule_command(5000*st,'topo.sim["V1"].projections()["LateralInhibitory"].learning_rate=0.9813;')
-
-
-
-
-topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
 
 ### Lateral excitatory bounds changes
 topo.sim.schedule_command(200,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=0.06))')
@@ -372,15 +369,17 @@ topo.sim.schedule_command( 6500*st,'topo.sim["V1"].output_fn.lower_bound=0.196;t
 topo.sim.schedule_command( 8000*st,'topo.sim["V1"].output_fn.lower_bound=0.206;topo.sim["V1"].output_fn.upper_bound=0.756')
 topo.sim.schedule_command(20000*st,'topo.sim["V1"].output_fn.lower_bound=0.216;topo.sim["V1"].output_fn.upper_bound=0.766')
 
+
+
 # default locations for model editor
 
-topo.sim['V1'].gui_x=600.0;      topo.sim['V1'].gui_y=225.0
-topo.sim['LGNOnLeft'].gui_x=200.0;   topo.sim['LGNOnLeft'].gui_y=445.0
-topo.sim['LGNOffLeft'].gui_x=482.0;  topo.sim['LGNOffLeft'].gui_y=445.0
-topo.sim['LeftRetina'].gui_x=279.0;  topo.sim['LeftRetina'].gui_y=700.0
+topo.sim['V1'].gui_x=600.0;           topo.sim['V1'].gui_y=225.0
+topo.sim['LGNOnLeft'].gui_x=200.0;    topo.sim['LGNOnLeft'].gui_y=445.0
+topo.sim['LGNOffLeft'].gui_x=482.0;   topo.sim['LGNOffLeft'].gui_y=445.0
+topo.sim['LeftRetina'].gui_x=279.0;   topo.sim['LeftRetina'].gui_y=700.0
 
 topo.sim['LGNOnRight'].gui_x=750.0;   topo.sim['LGNOnRight'].gui_y=445.0
-topo.sim['LGNOffRight'].gui_x=1030.0;  topo.sim['LGNOffRight'].gui_y=445.0
+topo.sim['LGNOffRight'].gui_x=1030.0; topo.sim['LGNOffRight'].gui_y=445.0
 topo.sim['RightRetina'].gui_x=879.0;  topo.sim['RightRetina'].gui_y=700.0
 
 
