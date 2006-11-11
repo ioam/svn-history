@@ -117,19 +117,9 @@ topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
 
 
 
-# CEBHACKALERT: I intend to have C++ LISSOM run at this point, and generate
-# data. Then, the various C++ LISSOM data matrices do not need to be stored 
-# here.
-#../../../../lissom_old/samples/lissom.5.x_2 retina_lgn_match.param -c "call set_thresholds.command" -c "step" -c "plot filename_format=$${default_filename_format} save_matrices=True"
-
-# weight scaling
-#ppm_weight_scale_type=PPM_WtScale_Fixed
-#Region::ppm_weight_fixed_multiplier=1
-#PlotGroup::Weights::filename_format="$${filebase}.$${06iteration}.wts.$${current_region}.$${current_plot}.$${03current_ui}_$${03current_uj}"
-#cmd::plot_unit::weight_situate=False
-
-#plot_unit region=Ganglia00
-
+# This is the command used to generate the C++ data 
+# (set commandpath to the location of your lissom command/ directory)
+# ./lissom5 commandpath="../../../../lissom_old/command/" display=0 retina_lgn_match.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c "plot_unit region=Ganglia00 save_matrices=True" -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'
 
 topo.sim.run(1)
     
