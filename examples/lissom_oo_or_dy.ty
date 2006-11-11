@@ -3,7 +3,7 @@ LISSOM-based V1 map for orientation and disparity preferences.
 
 From Tikesh Ramtohul, "A self-organizing model of disparity maps in
 the primary visual cortex", MSc Thesis, School of Informatics,
-University of Edinburgh, 2006,
+University of Edinburgh, 2006
 (http://www.inf.ed.ac.uk/publications/thesis/online/IM060400.pdf).
 
 The four Gaussian-based simulation scripts in that thesis can be
@@ -322,13 +322,13 @@ topo.sim.schedule_command(20000,'topo.sim["V1"].output_fn.lower_bound=0.223;topo
 
 # default locations for model editor
 
-topo.sim['V1'].gui_x=600.0;      topo.sim['V1'].gui_y=225.0
-topo.sim['LGNOnLeft'].gui_x=200.0;   topo.sim['LGNOnLeft'].gui_y=445.0
-topo.sim['LGNOffLeft'].gui_x=482.0;  topo.sim['LGNOffLeft'].gui_y=445.0
-topo.sim['LeftRetina'].gui_x=279.0;  topo.sim['LeftRetina'].gui_y=700.0
+topo.sim['V1'].gui_x=600.0;           topo.sim['V1'].gui_y=225.0
+topo.sim['LGNOnLeft'].gui_x=200.0;    topo.sim['LGNOnLeft'].gui_y=445.0
+topo.sim['LGNOffLeft'].gui_x=482.0;   topo.sim['LGNOffLeft'].gui_y=445.0
+topo.sim['LeftRetina'].gui_x=279.0;   topo.sim['LeftRetina'].gui_y=700.0
 
 topo.sim['LGNOnRight'].gui_x=750.0;   topo.sim['LGNOnRight'].gui_y=445.0
-topo.sim['LGNOffRight'].gui_x=1030.0;  topo.sim['LGNOffRight'].gui_y=445.0
+topo.sim['LGNOffRight'].gui_x=1030.0; topo.sim['LGNOffRight'].gui_y=445.0
 topo.sim['RightRetina'].gui_x=879.0;  topo.sim['RightRetina'].gui_y=700.0
 
 
