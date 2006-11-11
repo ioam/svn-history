@@ -5,16 +5,6 @@ From Tikesh Ramtohul, "A self-organizing model of disparity maps in
 the primary visual cortex", MSc Thesis, School of Informatics,
 University of Edinburgh, 2006,
 (http://www.inf.ed.ac.uk/publications/thesis/online/IM060400.pdf).
-
-This script uses a maximum disparity of 2 retinal pixels, by default,
-based on the following calculation:
-
-  retina width in sheet coordinates: 2*(0.5+0.25+0.375) = 2.25
-  retina width in pixels: 54
-  sheet coordinate length of two pixels: 2*(2.25/54) = 0.08333
-  
-Since left_x = input_x - disp and right_x = input_x + disp,
-To get disp of 2 pixel, we need disp to be between -0.08333/2 <--> 0.08333/2
 """
 import RandomArray
 import fixedpoint
@@ -40,20 +30,39 @@ from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
 
-# Temporary
+# TRALERT: to bypass lambda functions in script
 from topo.base.pickle import PickleDisparity1,PickleDisparity2
 
-topo.sim.name = "lissom_oo_disparity_gauss_2_pixel"
+# By default uses a maximum disparity of 2 pixels 
+# (assuming a retina of 54 units), but can be called as
+#   ./topographica -c "max_disparity=xxx" ...
+# to use a maximum disparity of xxx pixels instead.
+#
+# Calculation based on:
+# 
+#   retina width in sheet coordinates: 2*(0.5+0.25+0.375) = 2.25
+#   retina width in pixels: 54
+#   sheet coordinate length of one pixel: 2.25/54 = approximately .041665
+#   
+# Since left_x = input_x - disp and right_x = input_x + disp,
+# to get disp of 1 pixel, we need disp to be between -.041665/2 <--> .041665/2
+# 
+max_disparity = locals().get('max_disparity',2.0)
+disparity_range = max_disparity*0.041665
+
+topo.sim.name = "lissom_oo_disparity_gauss_" + repr(max_disparity) + "_pixel"
+
 
 ### Present input patterns that are at non-corresponding locations on each retina
 left_x=PickleDisparity1()
 left_x.input_param = DynamicNumber(UniformRandom(lbound=-0.70833,ubound=0.70833,seed=12))
-left_x.disp = DynamicNumber(UniformRandom(lbound=-0.08333/2.0,ubound=0.08333/2.0,seed=150))
+left_x.disp = DynamicNumber(UniformRandom(lbound=-disparity_range/2.0,ubound=disparity_range/2.0,seed=150))
 
 right_x=PickleDisparity2()
 
+
 right_x.input_param = DynamicNumber(UniformRandom(lbound=-0.70833,ubound=0.70833,seed=12))
-right_x.disp = DynamicNumber(UniformRandom(lbound=-0.08333/2.0,ubound=0.08333/2.0,seed=150))
+right_x.disp = DynamicNumber(UniformRandom(lbound=-disparity_range/2.0,ubound=disparity_range/2.0,seed=150))
 
 
 
