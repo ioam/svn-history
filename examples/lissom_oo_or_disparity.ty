@@ -5,6 +5,21 @@ From Tikesh Ramtohul, "A self-organizing model of disparity maps in
 the primary visual cortex", MSc Thesis, School of Informatics,
 University of Edinburgh, 2006,
 (http://www.inf.ed.ac.uk/publications/thesis/online/IM060400.pdf).
+
+The four Gaussian-based simulation scripts in that thesis can be
+reproduced using this one script as follows:
+
+lissom_oo_disparity_gauss_2_pixel.ty:
+  ../topographica lissom_oo_or_disparity.ty
+
+lissom_oo_disparity_gauss_0.ty:
+  ../topographica -c "max_disparity=0" lissom_oo_or_disparity.ty
+  
+lissom_oo_disparity_plus_minus_2_pixel.ty: (not yet implemented)
+  ../topographica -c "plusminus=True" lissom_oo_or_disparity.ty
+
+lissom_oo_disparity_plus_minus_0.ty: (not yet implemented)
+  ../topographica -c "plusminus=True" -c "max_disparity=0" lissom_oo_or_disparity.ty
 """
 import RandomArray
 import fixedpoint
@@ -48,21 +63,29 @@ from topo.base.pickle import PickleDisparity1,PickleDisparity2
 # to get disp of 1 pixel, we need disp to be between -.041665/2 <--> .041665/2
 # 
 max_disparity = locals().get('max_disparity',2.0)
-disparity_range = max_disparity*0.041665
+disparity_bound = max_disparity*0.041665/2.0
 
 topo.sim.name = "lissom_oo_or_disparity_" + repr(max_disparity) + "_pixel"
 
 
+# jbednar: not sure where these numbers came from, but presumably this
+# helps keep the patterns from being off the retina too often
+if max_disparity = 0:
+   position_bound = 0.75
+else:
+   position_bound = 0.70833
+
+
 ### Present input patterns that are at non-corresponding locations on each retina
 left_x=PickleDisparity1()
-left_x.input_param = DynamicNumber(UniformRandom(lbound=-0.70833,ubound=0.70833,seed=12))
-left_x.disp = DynamicNumber(UniformRandom(lbound=-disparity_range/2.0,ubound=disparity_range/2.0,seed=150))
+left_x.input_param = DynamicNumber(UniformRandom(lbound=-position_bound,ubound=position_bound,seed=12))
+left_x.disp = DynamicNumber(UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150))
 
 right_x=PickleDisparity2()
 
 
-right_x.input_param = DynamicNumber(UniformRandom(lbound=-0.70833,ubound=0.70833,seed=12))
-right_x.disp = DynamicNumber(UniformRandom(lbound=-disparity_range/2.0,ubound=disparity_range/2.0,seed=150))
+right_x.input_param = DynamicNumber(UniformRandom(lbound=-position_bound,ubound=position_bound,seed=12))
+right_x.disp = DynamicNumber(UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150))
 
 
 
