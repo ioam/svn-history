@@ -77,23 +77,25 @@ right_x.input_param = DynamicNumber(UniformRandom(lbound=-position_bound,ubound=
 right_x.disp = DynamicNumber(UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150))
 
 
-
+# For Plus/Minus inputs
 scale_value = Choice()
 scale_value_copy=copy.deepcopy(scale_value)                      
+left_scale=DynamicNumber(scale_value)
+right_scale=DynamicNumber(scale_value_copy)
+input_offset=0.5
 
 
-# Plus/Minus simulation, offset and scale important
 left_input_pattern = topo.patterns.basic.Gaussian(
-          size=2*0.0468, aspect_ratio=4.0, offset=0.5,
-          scale=DynamicNumber(scale_value),
+          size=2*0.0468, aspect_ratio=4.0, offset=input_offset,
+          scale=left_scale,
           x=DynamicNumber(left_x),
           y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34)),
           orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
 
 
 right_input_pattern = topo.patterns.basic.Gaussian(
-          size=2*0.0468, aspect_ratio=4.0,offset=0.5,
-          scale=DynamicNumber(scale_value_copy),
+          size=2*0.0468, aspect_ratio=4.0,offset=input_offset,
+          scale=right_scale,
           x=DynamicNumber(right_x),
           y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34)),
           orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
