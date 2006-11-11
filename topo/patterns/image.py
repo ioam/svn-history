@@ -41,7 +41,8 @@ class PatternSampler(ParameterizedObject):
 
         """
         super(PatternSampler,self).__init__()
-        
+
+        self.pattern_array=pattern_array
         rows,cols=pattern_array.shape
 
         self.pattern_sheet = SheetCoordinateSystem(xdensity=1.0,ydensity=1.0,
