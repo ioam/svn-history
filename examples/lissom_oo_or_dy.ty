@@ -15,10 +15,10 @@ lissom_oo_disparity_gauss_2_pixel.ty:
 lissom_oo_disparity_gauss_0.ty:
   ../topographica -c "max_disparity=0" lissom_oo_or_dy.ty
   
-lissom_oo_disparity_plus_minus_2_pixel.ty: (not yet implemented)
+lissom_oo_disparity_plus_minus_2_pixel.ty:
   ../topographica -c "plusminus=True" lissom_oo_or_dy.ty
 
-lissom_oo_disparity_plus_minus_0.ty: (not yet implemented)
+lissom_oo_disparity_plus_minus_0.ty:
   ../topographica -c "plusminus=True" -c "max_disparity=0" lissom_oo_or_dy.ty
 """
 import RandomArray
@@ -48,7 +48,12 @@ from topo.misc.numbergenerators import UniformRandom
 # TRALERT: to bypass lambda functions in script
 from topo.base.pickle import PickleDisparity1,PickleDisparity2
 
-lgn_strength=2.33
+plusminus = locals().get('plusminus',False)
+
+if plusminus:
+   lgn_strength=2.33*2.0
+else:
+   lgn_strength=2.33
 
 # By default uses a maximum disparity of 2 pixels 
 # (assuming a retina of 54 units), but can be called as
@@ -64,10 +69,16 @@ lgn_strength=2.33
 # Since left_x = input_x - disp and right_x = input_x + disp,
 # to get disp of 1 pixel, we need disp to be between -.041665/2 <--> .041665/2
 # 
+   
 max_disparity = locals().get('max_disparity',2.0)
-disparity_bound = max_disparity*0.041665/2.0
 
-topo.sim.name = "lissom_oo_or_disparity_" + repr(max_disparity) + "_pixel"
+# This trivial difference is for historical reasons only, to match the MSc results
+if plusminus: 
+   disparity_bound = max_disparity*0.0416665/2.0
+   topo.sim.name = "lissom_oo_or_disparity_plusminus_" + repr(max_disparity) + "_pixel"
+else:
+   disparity_bound = max_disparity*0.041665/2.0
+   topo.sim.name = "lissom_oo_or_disparity_" + repr(max_disparity) + "_pixel"
 
 
 # jbednar: not sure where these numbers came from, but presumably this
@@ -75,8 +86,11 @@ topo.sim.name = "lissom_oo_or_disparity_" + repr(max_disparity) + "_pixel"
 if max_disparity == 0:
    position_bound = 0.75
 else:
-   position_bound = 0.70833
-
+   # This trivial difference is for historical reasons only, to match the MSc results
+   if plusminus: 
+      position_bound = 0.7083333 
+   else:
+      position_bound = 0.70833
 
 ### Present input patterns that are at non-corresponding locations on each retina
 left_x=PickleDisparity1()
@@ -90,9 +104,19 @@ right_x.input_param = DynamicNumber(UniformRandom(lbound=-position_bound,ubound=
 right_x.disp = DynamicNumber(UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150))
 
 
-left_scale=1.0
-right_scale=1.0
-input_offset=0.0
+if plusminus:
+   ###TRALERT: temporary implementation of Choice method to randomize the
+   ###selection of +ve and -ve gaussians
+   from topo.misc.numbergenerators import Choice
+   scale_value = Choice()
+   scale_value_copy=copy.deepcopy(scale_value)                      
+   left_scale=DynamicNumber(scale_value)
+   right_scale=DynamicNumber(scale_value_copy)
+   input_offset=0.5
+else:
+   left_scale=1.0
+   right_scale=1.0
+   input_offset=0.0
 
 left_input_pattern = topo.patterns.basic.Gaussian(
           size=2*0.0468, aspect_ratio=4.0, offset=input_offset,
