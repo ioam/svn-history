@@ -1,7 +1,9 @@
 """
 Example of a LISSOM-based orientation map (without ON/OFF channels).
 
+$Id$
 """
+__version__='$Revision$'
 
 
 import RandomArray

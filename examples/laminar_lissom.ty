@@ -4,6 +4,7 @@ Basic two layer model with one inhibitory and one excitatory sheet.
 Works in a similar way to lissom_or.ty, but using different excitatory and inhibitory populations within V1.
 The model continues to have long-range inhibition and short range excitation.
 
+$Id$
 """
 __version__='$Revision$'
 

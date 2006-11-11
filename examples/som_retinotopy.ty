@@ -12,6 +12,7 @@ $Id$
 """
 __version__='$Revision$'
 
+
 import RandomArray
 from math import exp, sqrt
 

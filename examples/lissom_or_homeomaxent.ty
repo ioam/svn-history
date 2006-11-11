@@ -2,6 +2,7 @@
 LISSOM-based orientation map (without ON/OFF channels) 
 with Homeostatic Intrinsic Plasticity Mechanism
 
+$Id$
 """
 __version__='$Revision$'
 

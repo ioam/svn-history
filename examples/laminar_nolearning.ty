@@ -9,6 +9,8 @@ All projections start with random weights
 
 Currently matches Lissom_or.ty with no learning and lateralExcitatory_local learning - however V1Exc_to_V1Inh does not learn in the same way as LateralExcitatory
 so falls down at inhibitory learning. (first 200 iterations only)
+
+$Id$
 """
 __version__='$Revision$'
 

@@ -1,8 +1,10 @@
 """
  LISSOM-based orientation map (without ON/OFF channels) with homeostatic synaptic plasticity
 
+$Id$
 """
 __version__='$Revision$'
+
 
 import RandomArray
 import fixedpoint

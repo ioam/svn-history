@@ -11,10 +11,12 @@ $Id$
 """
 _version__='$Revision$'
 
+
 import RandomArray
 import fixedpoint
 import copy
 import Numeric
+
 from math import pi, sqrt
 from fixedpoint import FixedPoint
 from Numeric import sum,ones,exp

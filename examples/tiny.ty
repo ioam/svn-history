@@ -5,6 +5,7 @@ $Id$
 """
 __version__='$Revision$'
 
+
 import RandomArray
 
 from fixedpoint import FixedPoint

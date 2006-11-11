@@ -7,7 +7,11 @@ without the dramatic reorganizations typical of the early iterations
 where the lateral excitatory radius is large.  Requires homeostatic
 plasticity -- otherwise the map still jumps around a lot at the
 start of learning, yet some neurons still fail to organize.
+
+$Id$
 """
+__version__='$Revision$'
+
 
 import RandomArray
 import fixedpoint

@@ -2,7 +2,6 @@
 Partial implementation of the Ohzawa et al. (Science 1990, 249:1037-1041) models
 for disparity neurons based on spatiotemporal energy.
 
-
 $Id$
 """
 __version__='$Revision$'

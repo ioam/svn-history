@@ -20,10 +20,14 @@ lissom_oo_disparity_plus_minus_2_pixel.ty:
 
 lissom_oo_disparity_plus_minus_0.ty:
   ../topographica -c "plusminus=True" -c "max_disparity=0" lissom_oo_or_dy.ty
+
+$Id$
 """
+__version__='$Revision$'
+
+
 import RandomArray
 import fixedpoint
-
 
 from math import pi, sqrt
 from fixedpoint import FixedPoint

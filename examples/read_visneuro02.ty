@@ -4,7 +4,10 @@ models for disparity neurons based on spatiotemporal energy.
 
 Not yet tested.
 
+$Id$
 """
+__version__='$Revision$'
+
 
 import RandomArray
 import fixedpoint

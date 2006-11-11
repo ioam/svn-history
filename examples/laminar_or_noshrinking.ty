@@ -2,7 +2,10 @@
 Two layer model with one inhibitory and one excitatory sheet.
 Recurrent short range connections between sheets, long range excitation and short range inhibition
 Based on lissom_or_noshrinking - work in progress. 
+
+$Id$
 """
+__version__='$Revision$'
 
 
 import RandomArray
