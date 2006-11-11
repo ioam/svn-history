@@ -70,7 +70,7 @@ topo.sim.name = "lissom_oo_or_disparity_" + repr(max_disparity) + "_pixel"
 
 # jbednar: not sure where these numbers came from, but presumably this
 # helps keep the patterns from being off the retina too often
-if max_disparity = 0:
+if max_disparity == 0:
    position_bound = 0.75
 else:
    position_bound = 0.70833
