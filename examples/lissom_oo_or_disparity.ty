@@ -50,7 +50,7 @@ from topo.base.pickle import PickleDisparity1,PickleDisparity2
 max_disparity = locals().get('max_disparity',2.0)
 disparity_range = max_disparity*0.041665
 
-topo.sim.name = "lissom_oo_disparity_gauss_" + repr(max_disparity) + "_pixel"
+topo.sim.name = "lissom_oo_or_disparity_" + repr(max_disparity) + "_pixel"
 
 
 ### Present input patterns that are at non-corresponding locations on each retina
