@@ -35,6 +35,8 @@ from topo.base.pickle import PickleDisparity1,PickleDisparity2
 ###TRALERT: temporary implementation of Choice method to randomize the selection of +ve and -ve gaussians
 from topo.misc.numbergenerators import Choice
 
+lgn_strength=2.33*2.0
+
 # By default uses a maximum disparity of 2 pixels 
 # (assuming a retina of 54 units), but can be called as
 #   ./topographica -c "max_disparity=xxx" ...
@@ -50,7 +52,7 @@ from topo.misc.numbergenerators import Choice
 # to get disp of 1 pixel, we need disp to be between -.041665/2 <--> .041665/2
 # 
 max_disparity = locals().get('max_disparity',2.0)
-disparity_bound = max_disparity*.0416665/2.0
+disparity_bound = max_disparity*0.0416665/2.0
 
 topo.sim.name = "lissom_oo_or_disparity_plusminus_" + repr(max_disparity) + "_pixel"
 
@@ -153,27 +155,26 @@ topo.sim['V1'].output_fn.upper_bound=0.633
 
 
 # LGN ON channel
-# Plus/Minus simulation, Strength Doubled
 topo.sim.connect('LeftRetina','LGNOnLeft',delay=FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=2.33*2.0,
+                  connection_type=SharedWeightCFProjection,strength=lgn_strength,
                   nominal_bounds_template=BoundingBox(radius=0.375),name='LCenterOn',
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('LeftRetina','LGNOnLeft',delay = FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=-2.33*2.0,
+                  connection_type=SharedWeightCFProjection,strength=-lgn_strength,
                   name='LSurroundOn',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('RightRetina','LGNOnRight',delay=FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=2.33*2.0,
+                  connection_type=SharedWeightCFProjection,strength=lgn_strength,
                   nominal_bounds_template=BoundingBox(radius=0.375),name='RCenterOn',
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('RightRetina','LGNOnRight',delay = FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=-2.33*2.0,
+                  connection_type=SharedWeightCFProjection,strength=-lgn_strength,
                   name='RSurroundOn',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
@@ -182,25 +183,25 @@ topo.sim.connect('RightRetina','LGNOnRight',delay = FixedPoint("0.05"),
 # LGN OFF channel
 # Plus/Minus simulation, Strength Doubled
 topo.sim.connect('LeftRetina','LGNOffLeft',delay = FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=-2.33*2.0,
+                  connection_type=SharedWeightCFProjection,strength=-lgn_strength,
                   name='LCenterOff',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('LeftRetina','LGNOffLeft',delay = FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=2.33*2.0,
+                  connection_type=SharedWeightCFProjection,strength=lgn_strength,
                   name='LSurroundOff',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('RightRetina','LGNOffRight',delay = FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=-2.33*2.0,
+                  connection_type=SharedWeightCFProjection,strength=-lgn_strength,
                   name='RCenterOff',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
                                                                  aspect_ratio=1))
 
 topo.sim.connect('RightRetina','LGNOffRight',delay = FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=2.33*2.0,
+                  connection_type=SharedWeightCFProjection,strength=lgn_strength,
                   name='RSurroundOff',nominal_bounds_template=BoundingBox(radius=0.375),
                   weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
                                                                  aspect_ratio=1))
