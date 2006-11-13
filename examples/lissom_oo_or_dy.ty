@@ -96,7 +96,7 @@ else:
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
 
-# Not athat this script must be run before unpickling will work.
+# Note that this script must be run before unpickling will work.
 class NumericOffset(ParameterizedObject):
    """
    Returns a numeric value plus a specified offset, to facilitate
@@ -110,10 +110,9 @@ class NumericOffset(ParameterizedObject):
    pickled; otherwise it would be in a lambda function and not
    picklable.
    """
-   
-   base = Number(default=0,doc="Value to which to add an offset")
-   offset = Number(default=0,doc="Amount of offset, before scaling")
-   offset_scale = Number(default=1.0,doc="Scaling value for the offset")
+   base         = Number(default=0.0,doc="Value to which to add an offset.")
+   offset       = Number(default=0.0,doc="Amount of offset, before scaling.")
+   offset_scale = Number(default=1.0,doc="Scaling value for the offset.")
    
    def __call__(self,**params):
        base=params.get('base',self.base)
