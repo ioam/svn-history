@@ -14,35 +14,36 @@ from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.base.functionfamilies import OutputFnParameter, IdentityOF
 
+
 class RandomDotStereogram(PatternGenerator):
     """
-    Random dot stereogram using on rectangular black and white patches.
+    Random dot stereogram using rectangular black and white patches.
 
     Based on Matlab code originally from Jenny Read, implemented in
     Topographica by Tikesh Ramtohul (2006).
     """
 
     # Suppress unused parameters
-    x = Number(hidden = True)
-    y = Number(hidden = True)
-    orientation = Number(hidden = True)
+    x = Number(hidden=True)
+    y = Number(hidden=True)
+    orientation = Number(hidden=True)
     
 
     # New parameters for this pattern
     xdisparity = Number(default=0.0,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
-                precedence=0.50,doc="Horizontal Disparity.")
+                        precedence=0.50,doc="Disparity in the horizontal direction.")
     
     ydisparity = Number(default=0.0,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
-                precedence=0.51,doc="Vertical Disparity.")
+                        precedence=0.51,doc="Disparity in the vertical direction.")
+    
+    dotdensity = Number(default=0.5,bounds=(0.0,None),softbounds=(0.1,0.9),
+                        precedence=0.52,doc="Number of dots per unit area; 0.5=50% coverage.")
 
-    dotdensity = Number(default=0.5,bounds=(0.0,1.0),softbounds=(0.1,0.9),
-                precedence=0.52,doc="controls number of dots, 0.5=50% coverage.")
+    dotsize    = Number(default=0.1,bounds=(0.0,None),softbounds=(0.05,0.15),
+                        precedence=0.53,doc="Edge length of each square dot.")
 
-    dotsize = Number(default=0.1,bounds=(0.0,1.0),softbounds=(0.05,0.15),
-                precedence=0.53,doc="edgelength of square dots.")
-
-    random = Number(default=500,bounds=(0.0,1000.0),softbounds=(0.0,1000.0),
-                precedence=0.54,doc="controls the position of the dots")
+    seed       = Number(default=500,bounds=(0.0,1000),softbounds=(0.0,1000.0),
+                        precedence=0.54,doc="Seed value for the random position of the dots.")
 
 
     def __call__(self,**params):
@@ -62,9 +63,9 @@ class RandomDotStereogram(PatternGenerator):
         ydisparity  = params.get('ydisparity',self.ydisparity*ysize)
         dotdensity  = params.get('dotdensity',self.dotdensity)
         dotsize     = params.get('dotsize',self.dotsize*xsize)
-        random      = params.get('random',self.random)
+        seed        = params.get('seed',self.seed)
 
-        result=scale*self.rds(xsize,ysize,xdisparity,ydisparity,dotdensity,dotsize,random)+offset
+        result=scale*self.rds(xsize,ysize,xdisparity,ydisparity,dotdensity,dotsize,seed)+offset
         
         if output_fn is not IdentityOF:
             output_fn(result)
