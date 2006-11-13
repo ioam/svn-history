@@ -400,7 +400,35 @@ compare_elements(topo_LGNOnToV1_weights,c_Primary_Afferent00,wt_dp,"LGNOn weight
 matrixplot(topo_LGNOnToV1_weights,title="(B) Topo LGNOnToV1"); matrixplot(c_Primary_Afferent00,title="(B) c++ Primary Afferent00")
 
 
-
 #oo_or_map_topo.000000.wts.Primary.Afferent01.000_000.matrix
-#oo_or_map_topo.000000.wts.Primary.LateralExcitatory.000_000.matrix
-#oo_or_map_topo.000000.wts.Primary.LateralInhibitory.000_000.matrix
+
+
+print "...** V1-V1 excitatory..."
+i,j=0,0
+topo_LatExc_weights = topo.sim['V1'].in_connections[2].cf(i,j).weights
+c_Primary_LatExc = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralExcitatory.000_000.matrix',(BaseN,BaseN)) 
+c_Primary_LatExc = c_Primary_LatExc[0:5,0:5] # c++ lissom doesn't situate weights
+
+compare_elements(topo_LatExc_weights,c_Primary_LatExc,wt_dp,"LateralExcitatory")
+
+matrixplot(topo_LatExc_weights,title="(C) Topo V1 LatExc 0,0"); matrixplot(c_Primary_LatExc,title="(C) c++ Primary LatExc 0,0")
+
+
+
+# CEBHACKALERT:
+# (1) the c++ lissom simulation is setup to have an even inh connectionfield, but the radius
+#     should be picked so that the matrix is odd
+# (2) the topographica simulation shouldn't be able to have an even cf! (Means the code in
+#     ConnectionField is wrong.)
+
+print "...** V1-V1 inhibitory..."
+i,j=0,0
+topo_LatInh_weights = topo.sim['V1'].in_connections[3].cf(i,j).weights
+c_Primary_LatInh = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralInhibitory.000_000.matrix',(BaseN,BaseN)) 
+c_Primary_LatInh = c_Primary_LatInh[0:12,0:12] # c++ lissom doesn't situate weights
+
+compare_elements(topo_LatInh_weights,c_Primary_LatInh,wt_dp,"LateralInhibitory")
+
+matrixplot(topo_LatInh_weights,title="(D) Topo V1 LatInh 0,0"); matrixplot(c_Primary_LatInh,title="(D) c++ Primary LatInh 0,0")
+
+
