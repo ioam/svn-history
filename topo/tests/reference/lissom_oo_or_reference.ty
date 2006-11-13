@@ -376,8 +376,7 @@ compare_elements(topo.sim['LGNOff'].activity,c_ganglia00_act,act_dp,"LGNOff")
 
 print "** Compare C++ LISSOM and Topograhica weights:"
 
-print "...Retina-LGN..."
-# Retina-LGN
+print "...** Retina-LGN..."
 i,j=0,0
 topo_LGNOn_weights = topo.sim['LGNOn'].in_connections[0].cf(i,j).weights
 c_Ganglia00_afferent = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Ganglia00.Afferent0.000_000.matrix',(RN,RN)) 
@@ -385,6 +384,23 @@ c_Ganglia00_afferent = c_Ganglia00_afferent[0:19,0:19] # c++ lissom doesn't situ
 
 compare_elements(topo_LGNOn_weights,c_Ganglia00_afferent,wt_dp,"LGNOn weights")
 
-matrixplot(topo_LGNOn_weights,title="Topo LGNOn afferents"); matrixplot(c_Ganglia00_afferent,title="c++ Ganglia00 Afferents")
+matrixplot(topo_LGNOn_weights,title="(A) Topo LGNOn afferents"); matrixplot(c_Ganglia00_afferent,title="(A) c++ Ganglia00 Afferents")
 
 #matrixplot(topo_LGNOn_weights-c_Ganglia00_afferent,"difference between topo lgnon afferents and c++ ganglia00 afferents")
+
+
+print "...** LGNOn-V1..."
+i,j=0,0
+topo_LGNOnToV1_weights = topo.sim['V1'].in_connections[0].cf(i,j).weights
+c_Primary_Afferent00 = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Primary.Afferent00.000_000.matrix',(LN,LN)) 
+c_Primary_Afferent00 = c_Primary_Afferent00[1:14,1:14] # c++ lissom doesn't situate weights
+
+compare_elements(topo_LGNOnToV1_weights,c_Primary_Afferent00,wt_dp,"LGNOn weights")
+
+matrixplot(topo_LGNOnToV1_weights,title="(B) Topo LGNOnToV1"); matrixplot(c_Primary_Afferent00,title="(B) c++ Primary Afferent00")
+
+
+
+#oo_or_map_topo.000000.wts.Primary.Afferent01.000_000.matrix
+#oo_or_map_topo.000000.wts.Primary.LateralExcitatory.000_000.matrix
+#oo_or_map_topo.000000.wts.Primary.LateralInhibitory.000_000.matrix
