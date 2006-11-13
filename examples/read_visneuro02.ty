@@ -1,5 +1,5 @@
 """
-Partial implementation of and Read et al. (Vis. Neurosci 2002, 19:735-753) 
+Partial implementation of the Read et al. (Vis. Neurosci 2002, 19:735-753) 
 models for disparity neurons based on spatiotemporal energy.
 
 Not yet tested.
