@@ -52,9 +52,12 @@ class DivisiveNormalizeL1(OutputFn):
     """
     OutputFn that divides an array by its L1 norm.
 
-    This operation ensures that an array has a sum equal to the specified 
-    norm_value, rescaling each value to make this true.  The array is 
-    unchanged if the sum is zero.
+    This operation ensures that the sum of the absolute values of the
+    array is equal to the specified norm_value, rescaling each value
+    to make this true.  The array is unchanged if the sum of absolute
+    values is zero.  For arrays of non-negative values where at least
+    one is non-zero, this operation is equivalent to a divisive sum
+    normalization.
     """
     norm_value = Number(default=1.0)
 
