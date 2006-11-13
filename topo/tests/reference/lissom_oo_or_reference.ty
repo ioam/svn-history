@@ -218,10 +218,10 @@ surroundg = topo.patterns.basic.Gaussian(
 
 from topo.outputfns.basic import DivisiveNormalizeSum
 on_weights = topo.patterns.basic.Composite(
-    generators=[centerg],operator=Wrapper("Numeric.subtract"))
+    generators=[centerg,surroundg],operator=Wrapper("Numeric.subtract"))
 
 off_weights = topo.patterns.basic.Composite(
-    generators=[surroundg],operator=Wrapper("Numeric.subtract"))
+    generators=[surroundg,centerg],operator=Wrapper("Numeric.subtract"))
     
 topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
           connection_type=SharedWeightCFProjection,strength=1.0,
