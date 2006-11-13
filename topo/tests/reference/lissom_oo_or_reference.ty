@@ -11,21 +11,18 @@ $Id$
 """
 __version__='$Revision$'
 
-# (needs updating to use schedule_command)
 
+# This simulation is still being worked on:
+#
+# - all parameters do not yet match
+#
+# - learning rates need to be adjusted for all the times the bounds
+# change.
 
-# CEBHACKALERT: parameters not all yet setup to match
-
-
-# CEBHACKALERT: learning rates need to be adjusted
-# for all the times the bounds change.
-
-# Current matching status:
 
 
 ## from topo.base.parameterizedobject import ParameterizedObject
 ## ParameterizedObject.print_level=300
-
 
 import fixedpoint
 #import pdb # debugger
@@ -260,9 +257,7 @@ topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),
           connection_type=CFProjection,strength=-0.9,name='LateralInhibitory',
           nominal_bounds_template=inhibitory_weight_bounds,learning_rate=alpha_inh*n_inh_units)         
 
-
-#V1.set_projections_to_jointly_normalize(['LGNOnAfferent','LGNOffAfferent'])
-
+# CEBHACKALERT: this is out of date and the times should be corrected
 # Times are 1 less than the or_map_topo.param c++ lissom simulation
 # because that one uses "hook before_input" to schedule events. So, an
 # event at t=200 is executed before t=200's input pattern is
@@ -272,8 +267,8 @@ topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),
 # equivalent to or_map_topo's event scheduled at t=200.
 
 
-### you can't pickle this simulation unless you make variables like exc_rad
-### available again.
+# note: you can't pickle this simulation unless you make variables
+# like exc_rad available again.
 
 
 ### EXCITATORY BOUNDS CHANGES
@@ -317,11 +312,7 @@ topo.sim.schedule_command( 7999, 'topo.sim["V1"].output_fn.lower_bound=0.213; to
 topo.sim.schedule_command(19999, 'topo.sim["V1"].output_fn.lower_bound=0.223; topo.sim["V1"].output_fn.upper_bound=0.863')
 
 
-
-
-
-
-# Performance profiling
+### PERFORMANCE PROFILING
 #
 # Example 1
 #import hotshot,hotshot.stats
@@ -342,7 +333,7 @@ topo.sim.schedule_command(19999, 'topo.sim["V1"].output_fn.lower_bound=0.223; to
 
 
 ### COMPARISONS
-
+#
 # command used to generate c++ lissom data:
 # ./lissom5 commandpath="../../../../lissom_old/command/" display=0 retina_lgn_match.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False 0 0" -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'
 
