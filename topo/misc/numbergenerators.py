@@ -65,14 +65,15 @@ class UniformRandom(RandomDistribution):
     def __call__(self):
         return self.random_generator.uniform(self.lbound,self.ubound)
 
-###TRALERT:temporary implementation for selecting +ve or -ve gaussians in Plus/Minus disparity expt
+
 class Choice(RandomDistribution):
     """
     Return a random element from the specified list of choices.
 
+    Accepts items of any type, though they are typically numbers.
     See the choice() function in the random module for further details.
     """
-    choices = ListParameter(default=[-0.5,0.5],
+    choices = ListParameter(default=[0,1],
         doc="List of items from which to select.")
     
     def __call__(self):
