@@ -9,7 +9,7 @@ __version__='$Revision$'
 import random
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Number
+from topo.base.parameterclasses import Number, ListParameter
 
 
 class RandomDistribution(ParameterizedObject):
@@ -67,12 +67,16 @@ class UniformRandom(RandomDistribution):
 
 ###TRALERT:temporary implementation for selecting +ve or -ve gaussians in Plus/Minus disparity expt
 class Choice(RandomDistribution):
-    lower = Number(default=-0.5)
-    upper = Number(default=0.5)
+    """
+    Return a random element from the specified list of choices.
+
+    See the choice() function in the random module for further details.
+    """
+    choices = ListParameter(default=[-0.5,0.5],
+        doc="List of items from which to select.")
     
     def __call__(self):
-
-        return self.random_generator.choice([self.lower,self.upper])
+        return self.random_generator.choice(self.choices)
 
 
 class NormalRandom(RandomDistribution):
