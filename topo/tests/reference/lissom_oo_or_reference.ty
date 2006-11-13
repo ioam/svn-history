@@ -211,24 +211,25 @@ topo.sim['V1'] = LISSOM(nominal_density=48.0,
 from math import pi,sqrt
 
 centerg = topo.patterns.basic.Gaussian(
-    size=2*sigma_c*sqrt(pi)/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1())
+    size=2*sigma_c*sqrt(pi)/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1(norm_value=2.33))
 
 surroundg = topo.patterns.basic.Gaussian(
-    size=2*sigma_s*sqrt(pi)/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1())
+    size=2*sigma_s*sqrt(pi)/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1(norm_value=2.33))
 
+from topo.outputfns.basic import DivisiveNormalizeSum
 on_weights = topo.patterns.basic.Composite(
-    generators=[surroundg],operator=Wrapper("Numeric.subtract"))
+    generators=[centerg],operator=Wrapper("Numeric.subtract"))
 
 off_weights = topo.patterns.basic.Composite(
     generators=[surroundg],operator=Wrapper("Numeric.subtract"))
     
 topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
-          connection_type=SharedWeightCFProjection,strength=2.33,
+          connection_type=SharedWeightCFProjection,strength=1.0,
           nominal_bounds_template=lgn_weight_bounds,
           weights_generator=on_weights)
 
 topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
-          connection_type=SharedWeightCFProjection,strength=2.33,
+          connection_type=SharedWeightCFProjection,strength=1.0,
           nominal_bounds_template=lgn_weight_bounds,
           weights_generator=off_weights)
 
@@ -330,3 +331,40 @@ topo.sim.schedule_command(19999, 'topo.sim["V1"].output_fn.lower_bound=0.223; to
 #p = pstats.Stats('abc')
 #p.strip_dirs().sort_stats('cumulative').print_stats()
 
+
+
+
+### COMPARISONS
+
+
+topo.sim.run(1)
+
+from topo.tests.reference.lissom_log_parser import get_input_params, get_matrix, compare_elements
+
+# no. of decimal places for matching activity and weight values
+act_dp = 5
+wt_dp = 5
+
+print "** Compare C++ LISSOM and Topograhica activity values in the Retina/Eye00:"
+c_eye00_act = get_matrix("topo/tests/reference/oo_or_map_topo.000001p000.Eye0_Activity.matrix",(RN,RN))
+compare_elements(topo.sim['Retina'].activity,c_eye00_act,act_dp,"Retina")
+
+print "** Compare C++ LISSOM and Topograhica activity values in LGN ON:"
+c_ganglia00_act = get_matrix("topo/tests/reference/oo_or_map_topo.000001p000.Ganglia00_Activity.matrix",(LN,LN))
+compare_elements(topo.sim['LGNOn'].activity,c_ganglia00_act,act_dp,"LGNOn")
+
+print "** Compare C++ LISSOM and Topograhica activity values in LGN OFF:"
+c_ganglia01_act = get_matrix("topo/tests/reference/oo_or_map_topo.000001p000.Ganglia01_Activity.matrix",(LN,LN))
+compare_elements(topo.sim['LGNOff'].activity,c_ganglia00_act,act_dp,"LGNOff")
+
+
+print "** Compare C++ LISSOM and Topograhica weights:"
+
+print "...Retina-LGN..."
+# Retina-LGN
+i,j=0,0
+topo_LGNOn_weights = topo.sim['LGNOn'].in_connections[0].cf(i,j).weights
+c_Ganglia00_afferent = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Ganglia00.Afferent0.000_000.matrix',(RN,RN)) 
+c_Ganglia00_afferent = c_Ganglia00_afferent[0:19,0:19] # c++ lissom doesn't situate weights
+
+compare_elements(topo_LGNOn_weights,c_Ganglia00_afferent,wt_dp,"LGNOn weights")
