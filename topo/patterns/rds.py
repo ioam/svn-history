@@ -6,45 +6,13 @@ $Id$
 __version__='$Revision$'
 
 
-from Numeric import zeros,ones
+from Numeric import zeros,ones,floor
 from RandomArray import random,seed
 
 from topo.base.parameterclasses import Number
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.base.functionfamilies import OutputFnParameter, IdentityOF
-
-
-# Taken from matplotlib.mlab; can probably be replaced with floor() or ceil().
-def fix(x):
-
-    """
-    Rounds towards zero.
-    x_rounded = fix(x) rounds the elements of x to the nearest integers
-    towards zero.
-    For negative numbers is equivalent to ceil and for positive to floor.
-    """
-    from matplotlib import numerix
-    from Numeric import floor,ceil,reshape
-    dim = numerix.shape(x)
-    if numerix.mlab.rank(x)==2:
-        y = reshape(x,(1,dim[0]*dim[1]))[0]
-        y = y.tolist()
-    elif numerix.mlab.rank(x)==1:
-        y = x
-    else:
-        y = [x]
-    for i in range(len(y)):
-	if y[i]>0:
-		y[i] = floor(y[i])
-	else:
-		y[i] = ceil(y[i])
-    if numerix.mlab.rank(x)==2:
-        x = reshape(y,dim)
-    elif numerix.mlab.rank(x)==0:
-        x = y[0]
-    return x
-
 
 class RandomDotStereogram(PatternGenerator):
     """
@@ -116,7 +84,7 @@ class RandomDotStereogram(PatternGenerator):
         bigxsize = 2*xsize
         bigysize = 2*ysize
         ndots=int(round(dotdensity * (bigxsize+2*dotsize) * (bigysize+2*dotsize) / min(dotsize,xsize) / min(dotsize,ysize)))
-        halfdot = fix(dotsize/2)
+        halfdot = floor(dotsize/2)
     
         ### TRALERT:
         
@@ -141,10 +109,10 @@ class RandomDotStereogram(PatternGenerator):
         col=random((1,ndots))
     
         seed(gen_seed*122,gen_seed*799)
-        xpos=fix(random((1,ndots))*(bigxsize+2*dotsize)) - halfdot
+        xpos=floor(random((1,ndots))*(bigxsize+2*dotsize)) - halfdot
     
         seed(gen_seed*1243,gen_seed*9349)
-        ypos=fix(random((1,ndots))*(bigysize+2*dotsize)) - halfdot
+        ypos=floor(random((1,ndots))*(bigysize+2*dotsize)) - halfdot
       
         
         for i in range(ndots):
