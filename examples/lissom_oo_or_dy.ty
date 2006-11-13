@@ -96,31 +96,37 @@ else:
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import Number
 
-class LeftPosition(ParameterizedObject):
-    center = Number(default=0,bounds=(-1.0,1.0),hidden=True)
-    offset = Number(default=0,bounds=(-1.0,1.0),hidden=True)
+# Not athat this script must be run before unpickling will work.
+class NumericOffset(ParameterizedObject):
+   """
+   Returns a numeric value plus a specified offset, to facilitate
+   setting a group of parameters to values that are linked except
+   for an additive term.  
 
-    def __call__(self,**params):
-        center=params.get('center',self.center)
-        offset=params.get('offset',self.offset)
-        return center - offset
+   The offset can be scaled arbitrarily, e.g. to allow one value
+   to be lower than the base value, and another to be higher.
 
-class RightPosition(ParameterizedObject):
-    center = Number(default=0,bounds=(-1.0,1.0),hidden=True)
-    offset = Number(default=0,bounds=(-1.0,1.0),hidden=True)
+   This class exists primarily to allow this type of code to be
+   pickled; otherwise it would be in a lambda function and not
+   picklable.
+   """
+   
+   base = Number(default=0,doc="Value to which to add an offset")
+   offset = Number(default=0,doc="Amount of offset, before scaling")
+   offset_scale = Number(default=1.0,doc="Scaling value for the offset")
+   
+   def __call__(self,**params):
+       base=params.get('base',self.base)
+       offset=params.get('offset',self.offset)
+       offset_scale=params.get('offset_scale',self.offset_scale)
+       return base + offset_scale*offset
 
-    def __call__(self,**params):
-        center=params.get('center',self.center)
-        offset=params.get('offset',self.offset)
-        return center + offset
-
-
-left_x=LeftPosition(\
-   center=DynamicNumber(UniformRandom(lbound=-position_bound,ubound=position_bound,seed=12)),
+left_x=NumericOffset(offset_scale=-1.0,
+   base=DynamicNumber(UniformRandom(lbound=-position_bound,ubound=position_bound,seed=12)),
    offset=DynamicNumber(UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150)))
 
-right_x=RightPosition(\
-   center=DynamicNumber(UniformRandom(lbound=-position_bound,ubound=position_bound,seed=12)),
+right_x=NumericOffset(offset_scale=1.0,
+   base=DynamicNumber(UniformRandom(lbound=-position_bound,ubound=position_bound,seed=12)),
    offset=DynamicNumber(UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150)))
 
 
