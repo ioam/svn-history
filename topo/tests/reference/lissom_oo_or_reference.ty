@@ -367,6 +367,8 @@ print "** Compare C++ LISSOM and Topograhica activity values in LGN ON:"
 c_ganglia00_act = get_matrix("topo/tests/reference/oo_or_map_topo.000001p000.Ganglia00_Activity.matrix",(LN,LN))
 compare_elements(topo.sim['LGNOn'].activity,c_ganglia00_act,act_dp,"LGNOn")
 
+matrixplot(topo.sim['LGNOn'].activity,title="Topo LGNOn activity"); matrixplot(c_ganglia00_act,title="c++ Ganglia00 activity")
+
 print "** Compare C++ LISSOM and Topograhica activity values in LGN OFF:"
 c_ganglia01_act = get_matrix("topo/tests/reference/oo_or_map_topo.000001p000.Ganglia01_Activity.matrix",(LN,LN))
 compare_elements(topo.sim['LGNOff'].activity,c_ganglia00_act,act_dp,"LGNOff")
@@ -382,3 +384,7 @@ c_Ganglia00_afferent = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wt
 c_Ganglia00_afferent = c_Ganglia00_afferent[0:19,0:19] # c++ lissom doesn't situate weights
 
 compare_elements(topo_LGNOn_weights,c_Ganglia00_afferent,wt_dp,"LGNOn weights")
+
+matrixplot(topo_LGNOn_weights,title="Topo LGNOn afferents"); matrixplot(c_Ganglia00_afferent,title="c++ Ganglia00 Afferents")
+
+#matrixplot(topo_LGNOn_weights-c_Ganglia00_afferent,"difference between topo lgnon afferents and c++ ganglia00 afferents")
