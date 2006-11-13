@@ -109,11 +109,9 @@ right_x.disp = DynamicNumber(UniformRandom(lbound=-disparity_bound,ubound=dispar
 
 
 if plusminus:
-   ###TRALERT: temporary implementation of Choice method to randomize the
-   ###selection of +ve and -ve gaussians
    from topo.misc.numbergenerators import Choice
-   scale_value = Choice()
-   scale_value_copy=copy.deepcopy(scale_value)                      
+   scale_value = Choice(choices=[-0.5,0.5])
+   scale_value_copy=copy.deepcopy(scale_value)
    left_scale=DynamicNumber(scale_value)
    right_scale=DynamicNumber(scale_value_copy)
    input_offset=0.5
