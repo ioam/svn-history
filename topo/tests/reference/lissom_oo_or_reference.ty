@@ -348,7 +348,7 @@ topo.sim.schedule_command(19999, 'topo.sim["V1"].output_fn.lower_bound=0.223; to
 ### COMPARISONS
 #
 # command used to generate c++ lissom data:
-# ./lissom5 commandpath="../../../../lissom_old/command/" display=0 retina_lgn_match.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'
+# ./lissom5 commandpath="../../../../lissom_old/command/" display=0 oo_or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c 'plot_unit save_matrices=True 0 0' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'
 
 
 topo.sim.run(1)
