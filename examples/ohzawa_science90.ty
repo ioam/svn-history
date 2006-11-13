@@ -1,6 +1,13 @@
 """
-Partial implementation of the Ohzawa et al. (Science 1990, 249:1037-1041) models
-for disparity neurons based on spatiotemporal energy.
+Partial implementation of the Ohzawa et al. (Science 1990, 249:1037-1041) model
+for disparity neurons based on spatiotemporal energy.  Provides one
+complex cell, whose behavior can be selected as near, far, tuned excitatory,
+or tuned inhibitory, as described in:
+
+  Tikesh Ramtohul, "A self-organizing model of disparity maps in
+  the primary visual cortex", MSc Thesis, School of Informatics,
+  University of Edinburgh, 2006
+  (http://www.inf.ed.ac.uk/publications/thesis/online/IM060400.pdf).
 
 $Id$
 """
@@ -50,23 +57,23 @@ topo.sim['RightRetina'] = GeneratorSheet(nominal_density=100.0,
                         
 # Binocular simple cells
 topo.sim['S1'] = CFSheet(nominal_density=1.0,measure_maps=False,
-                            output_fn=HalfRectifyAndSquare(),learning=False,
-                            nominal_bounds=BoundingBox(radius=0.5))
+                         output_fn=HalfRectifyAndSquare(),learning=False,
+                         nominal_bounds=BoundingBox(radius=0.5))
 
 topo.sim['S2'] = CFSheet(nominal_density=1.0,measure_maps=False,
-                              output_fn=HalfRectifyAndSquare(),learning=False,
-                              nominal_bounds=BoundingBox(radius=0.5))
+                         output_fn=HalfRectifyAndSquare(),learning=False,
+                         nominal_bounds=BoundingBox(radius=0.5))
 
 topo.sim['S3'] = CFSheet(nominal_density=1.0,measure_maps=False,
-                                  output_fn=HalfRectifyAndSquare(),learning=False,
-                                  nominal_bounds=BoundingBox(radius=0.5))
+                         output_fn=HalfRectifyAndSquare(),learning=False,
+                         nominal_bounds=BoundingBox(radius=0.5))
 
 topo.sim['S4'] = CFSheet(nominal_density=1.0,measure_maps=False,
-                                output_fn=HalfRectifyAndSquare(),learning=False,
-                                nominal_bounds=BoundingBox(radius=0.5))
+                         output_fn=HalfRectifyAndSquare(),learning=False,
+                         nominal_bounds=BoundingBox(radius=0.5))
 
 
-# Complex cells
+# Complex cell (just one total)
 topo.sim['C'] = CFSheet(nominal_density=1.0,measure_maps=True,learning=False,
                          nominal_bounds=BoundingBox(radius=0.5))
 
