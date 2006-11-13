@@ -1,4 +1,11 @@
 """
+LISSOM simulation designed to match C++ LISSOM's oo_or_map_topo
+simulation.
+
+To view the results of comparisons, gunzip the
+oo_or_map_topo.*.matrix.gz files in this directory, or gunzip
+lissom5.gz and run lissom again according to the instructions (see
+COMPARISONS below) to generate the data.
 
 $Id$
 """
