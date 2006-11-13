@@ -13,9 +13,12 @@ in this directory.
 gunzip lissom5.gz and run lissom again according to the instructions
 (see COMPARISONS below).
 
-
 (When using gunzip, if you leave the original gz files in place cvs
 will not download those original gz files again.)
+
+
+Search for '**' in the output to see which results are being printed.
+
 
 $Id$
 """
