@@ -48,10 +48,6 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
 from topo.misc.numbergenerators import UniformRandom
 
-
-# TRALERT: to bypass lambda functions in script
-from topo.base.pickle import PickleDisparity1,PickleDisparity2
-
 plusminus = locals().get('plusminus',False)
 
 if plusminus:
@@ -97,13 +93,33 @@ else:
       position_bound = 0.70833
 
 ### Present input patterns that are at non-corresponding locations on each retina
+from topo.base.parameterizedobject import ParameterizedObject
+from topo.base.parameterclasses import Number
+
+class PickleDisparity1(ParameterizedObject):
+    input_param = Number(default=0,bounds=(-1.0,1.0),hidden=True)
+    disp = Number(default=0,bounds=(-1.0,1.0),hidden=True)
+
+    def __call__(self,**params):
+        input_param=params.get('input_param',self.input_param)
+        disparity=params.get('disp',self.disp)
+        return input_param - disparity
+
+class PickleDisparity2(ParameterizedObject):
+    input_param = Number(default=0,bounds=(-1.0,1.0),hidden=True)
+    disp = Number(default=0,bounds=(-1.0,1.0),hidden=True)
+
+    def __call__(self,**params):
+        input_param=params.get('input_param',self.input_param)
+        disparity=params.get('disp',self.disp)
+        return input_param + disparity
+
+
 left_x=PickleDisparity1()
 left_x.input_param = DynamicNumber(UniformRandom(lbound=-position_bound,ubound=position_bound,seed=12))
 left_x.disp = DynamicNumber(UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150))
 
 right_x=PickleDisparity2()
-
-
 right_x.input_param = DynamicNumber(UniformRandom(lbound=-position_bound,ubound=position_bound,seed=12))
 right_x.disp = DynamicNumber(UniformRandom(lbound=-disparity_bound,ubound=disparity_bound,seed=150))
 
