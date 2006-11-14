@@ -9,7 +9,7 @@ __version__='$Revision$'
 from Numeric import zeros,ones,floor
 from RandomArray import random,seed
 
-from topo.base.parameterclasses import Number
+from topo.base.parameterclasses import Number,Integer
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.base.functionfamilies import OutputFnParameter, IdentityOF
@@ -26,8 +26,8 @@ class RandomDotStereogram(PatternGenerator):
     # Suppress unused parameters
     x = Number(hidden=True)
     y = Number(hidden=True)
+    size = Number(hidden=True)
     orientation = Number(hidden=True)
-    
 
     # New parameters for this pattern
     xdisparity = Number(default=0.0,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
@@ -42,50 +42,40 @@ class RandomDotStereogram(PatternGenerator):
     dotsize    = Number(default=0.1,bounds=(0.0,None),softbounds=(0.05,0.15),
                         precedence=0.53,doc="Edge length of each square dot.")
 
-    random_seed = Number(default=500,bounds=(0.0,1000),softbounds=(0.0,1000.0),
+    random_seed=Integer(default=500,bounds=(0,1000),
                         precedence=0.54,doc="Seed value for the random position of the dots.")
 
 
     def __call__(self,**params):
-        
+
         self._check_params(params)
         
-        bounds = params.get('bounds',self.bounds)
-        xdensity = params.get('xdensity',self.xdensity)
-        ydensity = params.get('ydensity',self.ydensity)
-        scale = params.get('scale',self.scale)
-        offset = params.get('offset',self.offset)
-        output_fn = params.get('output_fn',self.output_fn)
-
-        xsize,ysize = SheetCoordinateSystem(bounds,xdensity,ydensity).shape
-        
-        xdisparity  = params.get('xdisparity',self.xdisparity)*xsize
-        ydisparity  = params.get('ydisparity',self.ydisparity)*ysize
+        bounds      = params.get('bounds',self.bounds)
+        xdensity    = params.get('xdensity',self.xdensity)
+        ydensity    = params.get('ydensity',self.ydensity)
+        scale       = params.get('scale',self.scale)
+        offset      = params.get('offset',self.offset)
+        output_fn   = params.get('output_fn',self.output_fn)
         dotdensity  = params.get('dotdensity',self.dotdensity)
-        dotsize     = params.get('dotsize',self.dotsize)*xsize
         random_seed = params.get('random_seed',self.random_seed)
 
+        xsize,ysize = SheetCoordinateSystem(bounds,xdensity,ydensity).shape
         xsize=int(round(xsize))
         ysize=int(round(ysize))
-        xdisparity=int(round(xdisparity))
-        ydisparity=int(round(ydisparity))
-        dotsize=int(round(dotsize))
-        random_seed=int(round(random_seed))
+        
+        xdisparity  = int(round(params.get('xdisparity',self.xdisparity)*xsize))
+        ydisparity  = int(round(params.get('ydisparity',self.ydisparity)*ysize))
+        dotsize     = int(round(params.get('dotsize',self.dotsize)*xsize))
         
         bigxsize = 2*xsize
         bigysize = 2*ysize
-        ndots=int(round(dotdensity * (bigxsize+2*dotsize) * (bigysize+2*dotsize) / min(dotsize,xsize) / min(dotsize,ysize)))
+        ndots=int(round(dotdensity * (bigxsize+2*dotsize) * (bigysize+2*dotsize) /
+                        min(dotsize,xsize) / min(dotsize,ysize)))
         halfdot = floor(dotsize/2)
     
-        ### TRALERT:
-        
-        ### TRALERT:For Test Pattern Window
-        bigimage = 0.5*ones((bigysize,bigxsize))
-    
-        ### TRALERT:For Energy models
-        '''
-        bigimage = zeros((bigysize,bigxsize))
-        '''
+
+        bigimage = 0.5*ones((bigysize,bigxsize)) # For Test Pattern Window
+       #bigimage = zeros((bigysize,bigxsize))    # For energy models
         
         xpos=zeros((1,ndots))
         ypos=zeros((1,ndots))
@@ -108,22 +98,17 @@ class RandomDotStereogram(PatternGenerator):
         
         for i in range(ndots):
     
-            ### TRALERT:For Test Pattern Window,white is represented as 1 and black as 0. background is 0.5
-            ### alternatively, offset parameter can be set properly
+            ### TRALERT:For Test Pattern Window,white is represented
+            ### as 1 and black as 0. background is 0.5.  However,
+            ### for testing energy models, white==1,
+            ### black==-1,background=0 (similar to Read's code).
+            ### Alternatively, offset parameter can be set properly
             
             if col[0][i] >= 0.5:
                 col[0][i]= 1
             else:
-                col[0][i]= 0
-            
-            
-            ### TRALERT:For testing energy models, white==1, black==-1,background=0 (similar to Read's code)
-            '''
-            if col[0][i] >= 0.5:
-                col[0][i]= 1
-            else:
-                col[0][i]= -1
-            '''
+                col[0][i]= 0  # For Test Pattern Window
+               #col[0][i]= -1 # For energy models
             
             x1[0][i]= max(xpos[0][i],0)
             x2[0][i]= min(xpos[0][i] + dotsize-1,bigxsize)
