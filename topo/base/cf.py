@@ -602,6 +602,26 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         if initialize_cfs:            
             # set up array of ConnectionFields translated to each x,y in the src sheet
             cflist = []
+
+
+            ##RPHACKALERT:Uncomment following lines for sullivan_neurocomputing04 model, can be removed once function is properly re-implemented
+            ##Values have been hardcoded at 8 cells per receptive field as per his implementation.
+            ##for ycount,y in enumerate(self.dest.sheet_rows()[::-1]):
+            ##    if ycount%8==0:
+            ##        yReceptive=y
+            ##      row = []
+            ##    for xcount,x in enumerate(self.dest.sheet_cols()):
+            ##        if xcount%8==0:
+            ##            xReceptive=x
+            ##        row.append(self.cf_type(xReceptive,yReceptive,
+            ##                              self.src,
+            ##                              copy.copy(self.bounds_template),
+            ##                              self.weights_generator,
+            ##                              copy.copy(self.mask_template), 
+            ##                              output_fn=self.weights_output_fn.single_cf_fn,
+            ##                              slice_=slice_))
+            ##    cflist.append(row) 
+
             for y in self.dest.sheet_rows()[::-1]:
                 row = []
                 for x in self.dest.sheet_cols():
@@ -612,12 +632,12 @@ The true bounds will differ depending on the density (see initialize_bounds())."
                     # use some other type of mapping, e.g. to add jitter
                     # in the initial mapping.
                     row.append(self.cf_type(x,y,
-                                            self.src,
-                                            copy.copy(self.bounds_template),
-                                            self.weights_generator,
-                                            copy.copy(self.mask_template), 
-                                            output_fn=self.weights_output_fn.single_cf_fn,
-                                            slice_=slice_))
+                                         self.src,
+                                         copy.copy(self.bounds_template),
+                                         self.weights_generator,
+                                         copy.copy(self.mask_template), 
+                                         output_fn=self.weights_output_fn.single_cf_fn,
+                                         slice_=slice_))
                 cflist.append(row)
 
 
