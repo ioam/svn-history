@@ -1,6 +1,8 @@
 """
 Example of a LISSOM-based ocular dominance map with ON/OFF channels. 
 
+Not yet tested in any way.
+
 $Id$
 """
 __version__='$Revision$'
