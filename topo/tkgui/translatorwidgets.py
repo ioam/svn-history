@@ -151,8 +151,15 @@ class TaggedSlider(Frame,WidgetTranslator):
 
         
 
-
+    # CEBALERT: I find the refresh() and optional_refresh() methods
+    # confusing. Is there a simpler way to implement this kind of
+    # functionality?
     def refresh(self,e=None):
+        """
+        Sets the slider's position according to the value in the tag.
+        Additionally, calls the parent widget's optional_refresh()
+        method. This allows an action to be 'passed up'.
+        """
         self.__set_slider_from_tag()
         try:
             # Refresh the PropertiesFrame (if embedded in one)
