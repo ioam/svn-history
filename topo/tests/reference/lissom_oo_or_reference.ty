@@ -13,11 +13,14 @@ in this directory.
 gunzip lissom5.gz and run lissom again according to the instructions
 (see COMPARISONS below).
 
+
 (When using gunzip, if you leave the original gz files in place cvs
 will not download those original gz files again.)
 
 
 Search for '**' in the output to see which results are being printed.
+(If nothing is printed under a heading, it means all elements of the
+array matched exactly.)
 
 
 $Id$
@@ -350,7 +353,7 @@ topo.sim.schedule_command(19999, 'topo.sim["V1"].output_fn.lower_bound=0.223; to
 ### COMPARISONS
 #
 # command used to generate c++ lissom data:
-# ./lissom5 commandpath="../../../../lissom_old/command/" display=0 oo_or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c 'plot_unit save_matrices=True 0 0' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'
+# ./lissom5 commandpath="../../../../lissom_old/command/" display=0 oo_or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'
 
 
 topo.sim.run(1)
@@ -395,21 +398,32 @@ matrixplot(topo_LGNOn_weights,title="(A) Topo LGNOn afferents"); matrixplot(c_Ga
 #matrixplot(topo_LGNOn_weights-c_Ganglia00_afferent,"difference between topo lgnon afferents and c++ ganglia00 afferents")
 
 
-print "...** LGNOn-V1..."
+print "...** LGNOn-V1 unit 0 0..."
 i,j=0,0
-topo_LGNOnToV1_weights = topo.sim['V1'].in_connections[0].cf(i,j).weights
-c_Primary_Afferent00 = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Primary.Afferent00.000_000.matrix',(LN,LN)) 
-c_Primary_Afferent00 = c_Primary_Afferent00[1:14,1:14] # c++ lissom doesn't situate weights
+topo_LGNOnToV1_0_0 = topo.sim['V1'].in_connections[0].cf(i,j).weights
+c_Primary_Afferent00_0_0 = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Primary.Afferent00.000_000.matrix',(LN,LN)) 
+c_Primary_Afferent00_0_0 = c_Primary_Afferent00_0_0[1:14,1:14] # c++ lissom doesn't situate weights
 
-compare_elements(topo_LGNOnToV1_weights,c_Primary_Afferent00,wt_dp,"LGNOn weights")
+compare_elements(topo_LGNOnToV1_0_0,c_Primary_Afferent00_0_0,wt_dp,"LGNOn weights")
 
-matrixplot(topo_LGNOnToV1_weights,title="(B) Topo LGNOnToV1"); matrixplot(c_Primary_Afferent00,title="(B) c++ Primary Afferent00")
+matrixplot(topo_LGNOnToV1_0_0,title="(B) Topo LGNOnToV1 0 0"); matrixplot(c_Primary_Afferent00_0_0,title="(B) c++ Primary Afferent00 0 0")
+
+print "...** LGNOn-V1 unit 23 23..."
+i,j=23,23
+topo_LGNOnToV1_23_23 = topo.sim['V1'].in_connections[0].cf(i,j).weights
+c_Primary_Afferent00_23_23 = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Primary.Afferent00.023_023.matrix',(LN,LN)) 
+c_Primary_Afferent00_23_23 = c_Primary_Afferent00_23_23[12:25,12:25] # c++ lissom doesn't situate weights
+
+compare_elements(topo_LGNOnToV1_23_23,c_Primary_Afferent00_23_23,wt_dp,"LGNOn weights")
+
+matrixplot(topo_LGNOnToV1_23_23,title="(C) Topo LGNOnToV1 23 23"); matrixplot(c_Primary_Afferent00_23_23,title="(C) c++ Primary Afferent00 23 23")
+
 
 
 #oo_or_map_topo.000000.wts.Primary.Afferent01.000_000.matrix
 
 
-print "...** V1-V1 excitatory..."
+print "...** V1-V1 excitatory unit 0 0... "
 i,j=0,0
 topo_LatExc_weights = topo.sim['V1'].in_connections[2].cf(i,j).weights
 c_Primary_LatExc = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralExcitatory.000_000.matrix',(BaseN,BaseN)) 
@@ -417,17 +431,10 @@ c_Primary_LatExc = c_Primary_LatExc[0:5,0:5] # c++ lissom doesn't situate weight
 
 compare_elements(topo_LatExc_weights,c_Primary_LatExc,wt_dp,"LateralExcitatory")
 
-matrixplot(topo_LatExc_weights,title="(C) Topo V1 LatExc 0,0"); matrixplot(c_Primary_LatExc,title="(C) c++ Primary LatExc 0,0")
+matrixplot(topo_LatExc_weights,title="(D) Topo V1 LatExc 0,0"); matrixplot(c_Primary_LatExc,title="(D) c++ Primary LatExc 0,0")
 
 
-
-# CEBHACKALERT:
-# (1) the c++ lissom simulation is setup to have an even inh connectionfield, but the radius
-#     should be picked so that the matrix is odd
-# (2) the topographica simulation shouldn't be able to have an even cf! (Means the code in
-#     ConnectionField is wrong.)
-
-print "...** V1-V1 inhibitory..."
+print "...** V1-V1 inhibitory unit 0 0..."
 i,j=0,0
 topo_LatInh_weights = topo.sim['V1'].in_connections[3].cf(i,j).weights
 c_Primary_LatInh = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralInhibitory.000_000.matrix',(BaseN,BaseN)) 
@@ -435,6 +442,6 @@ c_Primary_LatInh = c_Primary_LatInh[0:12,0:12] # c++ lissom doesn't situate weig
 
 compare_elements(topo_LatInh_weights,c_Primary_LatInh,wt_dp,"LateralInhibitory")
 
-matrixplot(topo_LatInh_weights,title="(D) Topo V1 LatInh 0,0"); matrixplot(c_Primary_LatInh,title="(D) c++ Primary LatInh 0,0")
+matrixplot(topo_LatInh_weights,title="(F) Topo V1 LatInh 0,0"); matrixplot(c_Primary_LatInh,title="(F) c++ Primary LatInh 0,0")
 
 
