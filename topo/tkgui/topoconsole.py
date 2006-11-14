@@ -328,7 +328,7 @@ class TopoConsole(Frame):
 
         # When return is pressed, the TaggedSlider updates itself...but we also want to run
         # the simulation in this case.
-        learning_frame.optional_refresh=Pmw.busycallback(self.do_learning)
+        learning_frame.optional_action=Pmw.busycallback(self.do_learning)
 
         go = Button(learning_frame,text="Go",
                     command=Pmw.busycallback(self.do_learning))
