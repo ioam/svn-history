@@ -306,9 +306,6 @@ class TopoConsole(Frame):
         learning_frame = learning_group.interior()
         learning_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
 
-
-        learning_frame.optional_refresh=Pmw.busycallback(self.do_learning)
-
         rf=Label(learning_frame,text='Run for: ')
         rf.pack(side=LEFT)
         self.balloon.bind(rf,"Duration to run the simulation when Go is pressed.")
@@ -329,12 +326,17 @@ class TopoConsole(Frame):
         self.balloon.bind(self.run_for,"Duration to run the simulation, e.g. 0.0500, 1.0, or 20000.")
         self.run_for.pack(side=LEFT)
 
+        # When return is pressed, the TaggedSlider updates itself...but we also want to run
+        # the simulation in this case.
+        learning_frame.optional_refresh=Pmw.busycallback(self.do_learning)
+
         go = Button(learning_frame,text="Go",
                     command=Pmw.busycallback(self.do_learning))
         go.pack(side=LEFT)
         # CEBHACKALERT: this prevents the simulation time from being updated
         # in the messagebar
         #self.balloon.bind(go,"Run the simulation for the specified duration.")
+
 
 
         
