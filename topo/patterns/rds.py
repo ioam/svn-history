@@ -76,24 +76,24 @@ class RandomDotStereogram(PatternGenerator):
 
         bigimage = 0.5*ones((bigysize,bigxsize)) # For Test Pattern Window
        #bigimage = zeros((bigysize,bigxsize))    # For energy models
-        
-        xpos=zeros((1,ndots))
-        ypos=zeros((1,ndots))
-        x1=zeros((1,ndots))
-        y1=zeros((1,ndots))
-        x2=zeros((1,ndots))
-        y2=zeros((1,ndots))
-        col=zeros((1,ndots))
+
+        xpos=zeros((ndots))
+        ypos=zeros((ndots))
+        x1=zeros((ndots))
+        y1=zeros((ndots))
+        x2=zeros((ndots))
+        y2=zeros((ndots))
+        col=zeros((ndots))
     
         
         seed(random_seed*12,random_seed*99)
-        col=random((1,ndots))
+        col=random((ndots))
     
         seed(random_seed*122,random_seed*799)
-        xpos=floor(random((1,ndots))*(bigxsize+2*dotsize)) - halfdot
+        xpos=floor(random((ndots))*(bigxsize+2*dotsize)) - halfdot
     
         seed(random_seed*1243,random_seed*9349)
-        ypos=floor(random((1,ndots))*(bigysize+2*dotsize)) - halfdot
+        ypos=floor(random((ndots))*(bigysize+2*dotsize)) - halfdot
       
         
         for i in range(ndots):
@@ -104,17 +104,17 @@ class RandomDotStereogram(PatternGenerator):
             ### black==-1,background=0 (similar to Read's code).
             ### Alternatively, offset parameter can be set properly
             
-            if col[0][i] >= 0.5:
-                col[0][i]= 1
+            if col[i] >= 0.5:
+                col[i]= 1
             else:
-                col[0][i]= 0  # For Test Pattern Window
-               #col[0][i]= -1 # For energy models
+                col[i]= 0  # For Test Pattern Window
+               #col[i]= -1 # For energy models
             
-            x1[0][i]= max(xpos[0][i],0)
-            x2[0][i]= min(xpos[0][i] + dotsize-1,bigxsize)
-            y1[0][i] = max(ypos[0][i],0)
-            y2[0][i] = min(ypos[0][i] + dotsize-1,bigysize)
-            bigimage[y1[0][i]:y2[0][i]+1,x1[0][i]:x2[0][i]+1] = col[0][i]
+            x1[i]= max(xpos[i],0)
+            x2[i]= min(xpos[i] + dotsize-1,bigxsize)
+            y1[i] = max(ypos[i],0)
+            y2[i] = min(ypos[i] + dotsize-1,bigysize)
+            bigimage[y1[i]:y2[i]+1,x1[i]:x2[i]+1] = col[i]
             
         result = offset + scale*bigimage[ (ysize/2)+ydisparity:(3*ysize/2)+ydisparity , (xsize/2)+xdisparity:(3*xsize/2)+xdisparity ]
 
