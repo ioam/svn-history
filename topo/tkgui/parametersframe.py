@@ -16,7 +16,7 @@ from Tkinter import Frame, Button, RIGHT, TOP, BOTH, BOTTOM, END, YES, N,S,E,W,X
 import topo.misc.utils
 from topo.misc.utils import keys_sorted_by_value, dict_translator, eval_atof
 from topo.base.parameterizedobject import ParameterizedObject,ParameterizedObjectMetaclass,classlist
-from topo.base.parameterclasses import Number,Enumeration,ClassSelectorParameter,BooleanParameter
+from topo.base.parameterclasses import Integer,Number,Enumeration,ClassSelectorParameter,BooleanParameter
 
 from propertiesframe import PropertiesFrame
 from translatorwidgets import CheckbuttonTranslator
@@ -64,6 +64,7 @@ class ParametersFrame(Frame):
 
         # The dictionary of parameter_type:property_to_add pairs.
         self.__parameter_property = {
+            Integer: self.__add_text_property, # To work around the fact that __add_numeric_property only works for floats, right now
             Number: self.__add_numeric_property,
             Enumeration: self.__add_enumeration_property,
             BooleanParameter: self.__add_boolean_property,
