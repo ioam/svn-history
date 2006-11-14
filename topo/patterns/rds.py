@@ -29,6 +29,10 @@ class RandomDotStereogram(PatternGenerator):
     size = Number(hidden=True)
     orientation = Number(hidden=True)
 
+    # Override defaults to make them appropriate
+    scale  = Number(default=0.5)
+    offset = Number(default=0.5)
+
     # New parameters for this pattern
     xdisparity = Number(default=0.0,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
                         precedence=0.50,doc="Disparity in the horizontal direction.")
@@ -73,8 +77,7 @@ class RandomDotStereogram(PatternGenerator):
         halfdot = floor(dotsize/2)
     
 
-        bigimage = 0.5*ones((bigysize,bigxsize)) # For Test Pattern Window
-       #bigimage = zeros((bigysize,bigxsize))    # For energy models
+        bigimage = zeros((bigysize,bigxsize))
 
         x1=zeros((ndots))
         y1=zeros((ndots))
@@ -92,18 +95,10 @@ class RandomDotStereogram(PatternGenerator):
       
         
         for i in range(ndots):
-    
-            ### TRALERT:For Test Pattern Window,white is represented
-            ### as 1 and black as 0. background is 0.5.  However,
-            ### for testing energy models, white==1,
-            ### black==-1,background=0 (similar to Read's code).
-            ### Alternatively, offset parameter can be set properly
-            
             if col[i] >= 0.5:
                 col[i]= 1
             else:
-                col[i]= 0  # For Test Pattern Window
-               #col[i]= -1 # For energy models
+                col[i]= -1
             
             x1[i]= max(xpos[i],0)
             x2[i]= min(xpos[i] + dotsize-1,bigxsize)
