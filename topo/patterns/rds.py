@@ -42,7 +42,7 @@ class RandomDotStereogram(PatternGenerator):
     dotsize    = Number(default=0.1,bounds=(0.0,None),softbounds=(0.05,0.15),
                         precedence=0.53,doc="Edge length of each square dot.")
 
-    seed       = Number(default=500,bounds=(0.0,1000),softbounds=(0.0,1000.0),
+    random_seed = Number(default=500,bounds=(0.0,1000),softbounds=(0.0,1000.0),
                         precedence=0.54,doc="Seed value for the random position of the dots.")
 
 
@@ -63,24 +63,14 @@ class RandomDotStereogram(PatternGenerator):
         ydisparity  = params.get('ydisparity',self.ydisparity*ysize)
         dotdensity  = params.get('dotdensity',self.dotdensity)
         dotsize     = params.get('dotsize',self.dotsize*xsize)
-        seed        = params.get('seed',self.seed)
+        random_seed = params.get('random_seed',self.random_seed)
 
-        result=scale*self.rds(xsize,ysize,xdisparity,ydisparity,dotdensity,dotsize,seed)+offset
-        
-        if output_fn is not IdentityOF:
-            output_fn(result)
-
-        return result
-        
-        
-    def rds(self,xsize,ysize,xdisparity,ydisparity,dotdensity,dotsize,gen_seed):
-    
         xsize=int(round(xsize))
         ysize=int(round(ysize))
         xdisparity=int(round(xdisparity))
         ydisparity=int(round(ydisparity))
         dotsize=int(round(dotsize))
-        gen_seed=int(round(gen_seed))
+        random_seed=int(round(random_seed))
         
         bigxsize = 2*xsize
         bigysize = 2*ysize
@@ -106,13 +96,13 @@ class RandomDotStereogram(PatternGenerator):
         col=zeros((1,ndots))
     
         
-        seed(gen_seed*12,gen_seed*99)
+        seed(random_seed*12,random_seed*99)
         col=random((1,ndots))
     
-        seed(gen_seed*122,gen_seed*799)
+        seed(random_seed*122,random_seed*799)
         xpos=floor(random((1,ndots))*(bigxsize+2*dotsize)) - halfdot
     
-        seed(gen_seed*1243,gen_seed*9349)
+        seed(random_seed*1243,random_seed*9349)
         ypos=floor(random((1,ndots))*(bigysize+2*dotsize)) - halfdot
       
         
@@ -141,6 +131,9 @@ class RandomDotStereogram(PatternGenerator):
             y2[0][i] = min(ypos[0][i] + dotsize-1,bigysize)
             bigimage[y1[0][i]:y2[0][i]+1,x1[0][i]:x2[0][i]+1] = col[0][i]
             
-        image = bigimage[ (ysize/2)+ydisparity:(3*ysize/2)+ydisparity , (xsize/2)+xdisparity:(3*xsize/2)+xdisparity ]
-        
-        return image
+        result = offset + scale*bigimage[ (ysize/2)+ydisparity:(3*ysize/2)+ydisparity , (xsize/2)+xdisparity:(3*xsize/2)+xdisparity ]
+
+        if output_fn is not IdentityOF:
+            output_fn(result)
+
+        return result
