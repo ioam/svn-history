@@ -233,7 +233,7 @@ centerg = topo.patterns.basic.Gaussian(
 surroundg = topo.patterns.basic.Gaussian(
     size=2*sigma_s*sqrt(pi)/BaseRN,aspect_ratio=1,output_fn=DivisiveNormalizeL1(norm_value=2.33))
 
-from topo.outputfns.basic import DivisiveNormalizeSum
+
 on_weights = topo.patterns.basic.Composite(
     generators=[centerg,surroundg],operator=Wrapper("Numeric.subtract"))
 
