@@ -37,6 +37,7 @@ __version__='$Revision$'
 
 
 
+
 ## from topo.base.parameterizedobject import ParameterizedObject
 ## ParameterizedObject.print_level=300
 
@@ -444,6 +445,10 @@ compare_elements(topo_LatExc_23_23,c_Primary_LatExc_23_23,wt_dp,"LateralExcitato
 matrixplot(topo_LatExc_23_23,title="(E) Topo V1 LatExc 23,23"); matrixplot(c_Primary_LatExc_23_23,title="(E) c++ Primary LatExc 23,23")
 
 
+# CB: note that the lateral inhibitory weights are different shapes. The C++ lissom simulation should be setup so that
+# the radius ends in .5 (a specification of all the c++ simulations used before, right?), thereby avoiding the
+# bad circle shape (where there is a 'nipple' on each edge). Topographica should ensure that automatically, but I can't remember
+# whether that code was ever added.
 
 print "...** V1-V1 inhibitory unit 0 0..."
 i,j=0,0
@@ -454,5 +459,15 @@ c_Primary_LatInh = c_Primary_LatInh[0:12,0:12] # c++ lissom doesn't situate weig
 compare_elements(topo_LatInh_weights,c_Primary_LatInh,wt_dp,"LateralInhibitory")
 
 matrixplot(topo_LatInh_weights,title="(F) Topo V1 LatInh 0,0"); matrixplot(c_Primary_LatInh,title="(F) c++ Primary LatInh 0,0")
+
+print "...** V1-V1 inhibitory unit 23 23..."
+i,j=23,23
+topo_LatInh_23_23 = topo.sim['V1'].in_connections[3].cf(i,j).weights
+c_Primary_LatInh_23_23 = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralInhibitory.023_023.matrix',(BaseN,BaseN)) 
+c_Primary_LatInh_23_23 = c_Primary_LatInh_23_23[12:35,12:35] # c++ lissom doesn't situate weights
+
+compare_elements(topo_LatInh_23_23,c_Primary_LatInh_23_23,wt_dp,"LateralInhibitory")
+
+matrixplot(topo_LatInh_23_23,title="(G) Topo V1 LatInh 23,23"); matrixplot(c_Primary_LatInh_23_23,title="(G) c++ Primary LatInh 23,23")
 
 
