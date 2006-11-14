@@ -12,7 +12,7 @@ from RandomArray import random,seed
 from topo.base.parameterclasses import Number,Integer
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
-from topo.base.functionfamilies import OutputFnParameter, IdentityOF
+from topo.base.functionfamilies import IdentityOF
 
 
 class RandomDotStereogram(PatternGenerator):
@@ -60,12 +60,11 @@ class RandomDotStereogram(PatternGenerator):
         random_seed = params.get('random_seed',self.random_seed)
 
         xsize,ysize = SheetCoordinateSystem(bounds,xdensity,ydensity).shape
-        xsize=int(round(xsize))
-        ysize=int(round(ysize))
+        xsize,ysize = int(round(xsize)),int(round(ysize))
         
-        xdisparity  = int(round(params.get('xdisparity',self.xdisparity)*xsize))
-        ydisparity  = int(round(params.get('ydisparity',self.ydisparity)*ysize))
-        dotsize     = int(round(params.get('dotsize',self.dotsize)*xsize))
+        xdisparity  = int(round(xsize*params.get('xdisparity',self.xdisparity)))
+        ydisparity  = int(round(xsize*params.get('ydisparity',self.ydisparity)))
+        dotsize     = int(round(xsize*params.get('dotsize',self.dotsize)))
         
         bigxsize = 2*xsize
         bigysize = 2*ysize
@@ -112,7 +111,8 @@ class RandomDotStereogram(PatternGenerator):
             y2[i] = min(ypos[i] + dotsize-1,bigysize)
             bigimage[y1[i]:y2[i]+1,x1[i]:x2[i]+1] = col[i]
             
-        result = offset + scale*bigimage[ (ysize/2)+ydisparity:(3*ysize/2)+ydisparity , (xsize/2)+xdisparity:(3*xsize/2)+xdisparity ]
+        result = offset + scale*bigimage[ (ysize/2)+ydisparity:(3*ysize/2)+ydisparity ,
+                                          (xsize/2)+xdisparity:(3*xsize/2)+xdisparity ]
 
         if output_fn is not IdentityOF:
             output_fn(result)
