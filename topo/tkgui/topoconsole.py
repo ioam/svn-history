@@ -43,6 +43,7 @@ SAVED_FILE_EXTENSION = '.typ'
 SAVED_FILETYPES = [('Topographica saved networks','*'+SAVED_FILE_EXTENSION),('All files','*')]
 
 
+
 # Documentation locations: locally built and web urls.
 # CEBALERT: is it appropriate to use Filename parameter here in some way?
 topo_dir = os.path.split(os.path.split(sys.executable)[0])[0]
@@ -196,6 +197,7 @@ class TopoConsole(Frame):
         topo.guimain=self
 
 
+
     def _init_widgets(self):
         
 
@@ -305,6 +307,8 @@ class TopoConsole(Frame):
         learning_group.pack(side=TOP,expand=YES,fill=X,padx=4,pady=8)
 
 
+        learning_frame.optional_refresh=Pmw.busycallback(self.do_learning)
+
         rf=Label(learning_frame,text='Run for: ')
         rf.pack(side=LEFT)
         self.balloon.bind(rf,"Duration to run the simulation when Go is pressed.")
@@ -323,7 +327,6 @@ class TopoConsole(Frame):
                                     min_value=0,max_value=20000,
                                     string_format='%.4f')
         self.balloon.bind(self.run_for,"Duration to run the simulation, e.g. 0.0500, 1.0, or 20000.")
-        #self.run_for.bind('<Return>',self.exec_cmd) # Doesn't seem to work
         self.run_for.pack(side=LEFT)
 
         go = Button(learning_frame,text="Go",
