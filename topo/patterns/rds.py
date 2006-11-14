@@ -59,10 +59,10 @@ class RandomDotStereogram(PatternGenerator):
 
         xsize,ysize = SheetCoordinateSystem(bounds,xdensity,ydensity).shape
         
-        xdisparity  = params.get('xdisparity',self.xdisparity*xsize)
-        ydisparity  = params.get('ydisparity',self.ydisparity*ysize)
+        xdisparity  = params.get('xdisparity',self.xdisparity)*xsize
+        ydisparity  = params.get('ydisparity',self.ydisparity)*ysize
         dotdensity  = params.get('dotdensity',self.dotdensity)
-        dotsize     = params.get('dotsize',self.dotsize*xsize)
+        dotsize     = params.get('dotsize',self.dotsize)*xsize
         random_seed = params.get('random_seed',self.random_seed)
 
         xsize=int(round(xsize))
