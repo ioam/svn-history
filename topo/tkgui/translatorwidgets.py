@@ -130,7 +130,7 @@ class TaggedSlider(Frame,WidgetTranslator):
         self.__tag_val = tagvariable
         self.__tag = Entry(self,textvariable=self.__tag_val,width=tag_width)
         self.__tag.bind('<FocusOut>', self.refresh) # slider is updated on tag return... 
-        self.__tag.bind('<Return>', self.refresh)   # ...and on tag losing focus
+        self.__tag.bind('<Return>', self.action)   # ...and on tag losing focus
         self.__tag.pack(side=LEFT)
 
         self.__min_value = self.translator(min_value)
@@ -146,19 +146,16 @@ class TaggedSlider(Frame,WidgetTranslator):
         self.__slider.pack(side=LEFT,expand=YES,fill=BOTH)
         self.__set_slider_from_tag()
         self.__first_slider_command = True          # see self.__slider_command below
-
-
-
         
 
     # CEBALERT: I find the refresh() and optional_refresh() methods
     # confusing. Is there a simpler way to implement this kind of
-    # functionality?
+    # functionality?    
     def refresh(self,e=None):
         """
         Sets the slider's position according to the value in the tag.
         Additionally, calls the parent widget's optional_refresh()
-        method. This allows an action to be 'passed up'.
+        method.
         """
         self.__set_slider_from_tag()
         try:
@@ -166,6 +163,17 @@ class TaggedSlider(Frame,WidgetTranslator):
             self.root.optional_refresh()
         except AttributeError:
             pass
+
+    # CB: having said the above, I compounded the problem by adding
+    # more of the same.
+    def action(self, e=None):
+        """
+        Pressing return in a TaggedSlider causes the slider itself to
+        be refresh()ed, but also (optionally) allows an action to be
+        'passed up' to its parent.
+        """
+        self.root.optional_action()
+        self.refresh()
 
 
     # CEBALERT: the comment is true, this is required. But
