@@ -77,14 +77,10 @@ class RandomDotStereogram(PatternGenerator):
         bigimage = 0.5*ones((bigysize,bigxsize)) # For Test Pattern Window
        #bigimage = zeros((bigysize,bigxsize))    # For energy models
 
-        xpos=zeros((ndots))
-        ypos=zeros((ndots))
         x1=zeros((ndots))
         y1=zeros((ndots))
         x2=zeros((ndots))
         y2=zeros((ndots))
-        col=zeros((ndots))
-    
         
         seed(random_seed*12,random_seed*99)
         col=random((ndots))
