@@ -433,6 +433,17 @@ compare_elements(topo_LatExc_weights,c_Primary_LatExc,wt_dp,"LateralExcitatory")
 
 matrixplot(topo_LatExc_weights,title="(D) Topo V1 LatExc 0,0"); matrixplot(c_Primary_LatExc,title="(D) c++ Primary LatExc 0,0")
 
+print "...** V1-V1 excitatory unit 23 23... "
+i,j=23,23
+topo_LatExc_23_23 = topo.sim['V1'].in_connections[2].cf(i,j).weights
+c_Primary_LatExc_23_23 = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralExcitatory.023_023.matrix',(BaseN,BaseN)) 
+c_Primary_LatExc_23_23 = c_Primary_LatExc_23_23[19:28,19:28] # c++ lissom doesn't situate weights
+
+compare_elements(topo_LatExc_23_23,c_Primary_LatExc_23_23,wt_dp,"LateralExcitatory")
+
+matrixplot(topo_LatExc_23_23,title="(E) Topo V1 LatExc 23,23"); matrixplot(c_Primary_LatExc_23_23,title="(E) c++ Primary LatExc 23,23")
+
+
 
 print "...** V1-V1 inhibitory unit 0 0..."
 i,j=0,0
