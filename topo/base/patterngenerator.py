@@ -68,7 +68,7 @@ class PatternGenerator(ParameterizedObject):
         doc="Y-coordinate location of pattern center.")
 
     orientation = Number(
-        default=0,softbounds=(0.0,2*pi),precedence=0.40,
+        default=0.0,softbounds=(0.0,2*pi),precedence=0.40,
         doc="""Polar angle of pattern, i.e., the orientation in the Cartesian coordinate
         system, with zero at 3 o'clock and increasing counterclockwise.""")
     
