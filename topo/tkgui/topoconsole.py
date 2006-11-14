@@ -313,7 +313,9 @@ class TopoConsole(Frame):
         learning_str.set('1.0')
 
         # CEBHACKALERT: does the busycallback actually work? I don't
-        # see a busy cursor.
+        # see a busy cursor under metacity (the default GNOME window
+        # manager), but I do see one under twm.
+        
         self.run_for = TaggedSlider(learning_frame,
                                     tagvariable=learning_str,
                                     tag_width=11,
