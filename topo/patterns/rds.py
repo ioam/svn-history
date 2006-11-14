@@ -5,14 +5,15 @@ $Id$
 """
 __version__='$Revision$'
 
-
-from Numeric import zeros,ones,floor
+from Numeric import zeros,ones,floor,where,choose,less,greater,Int
 from RandomArray import random,seed
 
 from topo.base.parameterclasses import Number,Integer
 from topo.base.patterngenerator import PatternGenerator
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.base.functionfamilies import IdentityOF
+
+from topo.base.arrayutils import clip_lower
 
 
 class RandomDotStereogram(PatternGenerator):
@@ -52,6 +53,7 @@ class RandomDotStereogram(PatternGenerator):
 
     def __call__(self,**params):
 
+        # Gather parameters
         self._check_params(params)
         
         bounds      = params.get('bounds',self.bounds)
@@ -76,34 +78,26 @@ class RandomDotStereogram(PatternGenerator):
                         min(dotsize,xsize) / min(dotsize,ysize)))
         halfdot = floor(dotsize/2)
     
-
-        bigimage = zeros((bigysize,bigxsize))
-
-        x1=zeros((ndots))
-        y1=zeros((ndots))
-        x2=zeros((ndots))
-        y2=zeros((ndots))
-        
+        # Choose random colors and locations of square dots
         seed(random_seed*12,random_seed*99)
-        col=random((ndots))
-    
+        col=where(random((ndots))>=0.5, 1.0, -1.0)
+
         seed(random_seed*122,random_seed*799)
         xpos=floor(random((ndots))*(bigxsize+2*dotsize)) - halfdot
     
         seed(random_seed*1243,random_seed*9349)
         ypos=floor(random((ndots))*(bigysize+2*dotsize)) - halfdot
       
-        
+        # Construct arrays of points specifying the boundaries of each
+        # dot, cropping them by the big image size (0,0) to (bigxsize,bigysize)
+        x1=xpos.astype(Int) ; x1=choose(less(x1,0),(x1,0))
+        y1=ypos.astype(Int) ; y1=choose(less(y1,0),(y1,0))
+        x2=(xpos+(dotsize-1)).astype(Int) ; x2=choose(greater(x2,bigxsize),(x2,bigxsize))
+        y2=(ypos+(dotsize-1)).astype(Int) ; y2=choose(greater(y2,bigysize),(y2,bigysize))
+
+        # Draw each dot in the big image, on a blank background
+        bigimage = zeros((bigysize,bigxsize))
         for i in range(ndots):
-            if col[i] >= 0.5:
-                col[i]= 1
-            else:
-                col[i]= -1
-            
-            x1[i]= max(xpos[i],0)
-            x2[i]= min(xpos[i] + dotsize-1,bigxsize)
-            y1[i] = max(ypos[i],0)
-            y2[i] = min(ypos[i] + dotsize-1,bigysize)
             bigimage[y1[i]:y2[i]+1,x1[i]:x2[i]+1] = col[i]
             
         result = offset + scale*bigimage[ (ysize/2)+ydisparity:(3*ysize/2)+ydisparity ,
