@@ -1,7 +1,10 @@
 """
-Implementation of Sullivan & de Sa's model from “A temporal trace and SOM-based model of complex cell development”.  Neurocomputing, Volumes 58-60, June 2004, pages 827-833.
+Implementation of Sullivan & de Sa's model from "A temporal trace and
+SOM-based model of complex cell development",  Neurocomputing, Volumes
+58-60, June 2004, pages 827-833.
 
-NOT YET TESTED. 
+NOT YET TESTED.
+
 Complex cell layer needs subtractive normalisation instead of divisive.
 
 The following parameters aren't specified in the paper:
@@ -15,7 +18,8 @@ _version__='$Revision$'
 
 
 import RandomArray
-from math import exp, sqrt
+from math import exp, sqrt, fmod
+
 
 import topo.patterns.random
 import topo.patterns.basic
@@ -30,8 +34,27 @@ from topo.learningfns.projfns import CFPLF_Trace, CFPLF_Plugin
 from topo.learningfns.som import CFPLF_HebbianSOM
 from topo.misc.numbergenerators import UniformRandom
 from topo.outputfns.basic import DivisiveNormalizeL1
+from topo.base.functionfamilies import CoordinateMapperFn
 
 topo.sim.name = "sullivan_nc04"
+
+class XModulo(CoordinateMapperFn):
+    """Return the x coordinate of the given coordinate, modulo the specified step distance."""
+
+    grid_element_width = Number(1.0/5.0, doc="Length in Sheet coordinates of one large grid element.")
+    
+    def __call__(self,x,y):
+        #return -0.5+x-fmod(x,self.grid_element_width)
+        return x
+
+
+class YModulo(CoordinateMapperFn):
+    """Return the y coordinate of the given coordinate, modulo the specified step distance."""
+
+    grid_element_width = Number(1.0/5.0, doc="Length in Sheet coordinates of one large grid element.")
+    def __call__(self,x,y):
+        #return -0.5+y-fmod(y,self.grid_element_width)
+        return y
 
 # input pattern
 GeneratorSheet.period = 1.0
@@ -58,7 +81,9 @@ topo.sim.connect('Retina','V1',delay=0.05,connection_type=CFProjection,
                   weights_generator = topo.patterns.basic.Gaussian(),
                   nominal_bounds_template=BoundingBox(radius=0.1),
                   response_fn = CFPRF_DotProduct_opt(),
-                  learning_fn=CFPLF_HebbianSOM())
+                  learning_fn=CFPLF_HebbianSOM(),
+                  x_coord_mapper=XModulo(),
+                  y_coord_mapper=YModulo())
 
 
 ##RPALERT Add subtractive multiplication here once implemented

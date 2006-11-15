@@ -116,9 +116,6 @@ class IdentityLF(LearningFn):
         pass
 
 
-
-
-
 class LearningFnParameter(ClassSelectorParameter):
     """
     Parameter whose value can be any LearningFunction.
@@ -169,4 +166,41 @@ class ResponseFnParameter(ClassSelectorParameter):
 
     def __init__(self,default=DotProduct(),**params):
         super(ResponseFnParameter,self).__init__(ResponseFn,default=default,**params)        
+
+
+
+
+class CoordinateMapperFn(ParameterizedObject):
+    """Abstract base class for functions mapping from a 2D coordinate into another one."""
+
+    _abstract_class_name = "CoordinateMapperFn"
+
+    def __call__(self,x,y):
+        """
+        Apply the coordinate mapping function; must be implemented by subclasses.
+        """
+        raise NotImplementedError
+
+
+class XIdentity(CoordinateMapperFn):
+    """Return the x coordinate of the given coordinate."""
+    def __call__(self,x,y):
+        return x
+
+
+class YIdentity(CoordinateMapperFn):
+    """Return the y coordinate of the given coordinate."""
+    def __call__(self,x,y):
+        return y
+
+
+class CoordinateMapperFnParameter(ClassSelectorParameter):
+    """
+    Parameter whose value can be any ResponseFunction.
+    """
+    __slots__ = []
+    __doc__ = property((lambda self: self.doc))
+
+    def __init__(self,default=XIdentity(),**params):
+        super(CoordinateMapperFnParameter,self).__init__(CoordinateMapperFn,default=default,**params)
 

@@ -34,7 +34,10 @@ import topo
 import patterngenerator
 from patterngenerator import PatternGeneratorParameter
 from parameterizedobject import ParameterizedObject
-from functionfamilies import OutputFnParameter,IdentityOF,LearningFnParameter,Hebbian,ResponseFnParameter,DotProduct,IdentityLF
+from functionfamilies import OutputFnParameter,IdentityOF
+from functionfamilies import LearningFnParameter,Hebbian,IdentityLF
+from functionfamilies import ResponseFnParameter,DotProduct
+from functionfamilies import CoordinateMapperFnParameter,XIdentity,YIdentity
 from projection import Projection,ProjectionSheet
 from parameterclasses import Parameter,Number,BooleanParameter,ClassSelectorParameter,Integer
 from sheet import Sheet,Slice
@@ -513,6 +516,7 @@ class CFPOutputFnParameter(ClassSelectorParameter):
         super(CFPOutputFnParameter,self).__init__(CFPOutputFn,default=default,**params)        
 
 
+
                     
 class CFProjection(Projection):
     """
@@ -571,6 +575,15 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         allow a 1x1 matrix.
         """)
 
+    x_coord_mapper = CoordinateMapperFnParameter(
+        default=XIdentity(),
+        doc='Function to map a projected x coordinate into the target sheet.')
+
+    y_coord_mapper = CoordinateMapperFnParameter(
+        default=YIdentity(),
+        doc='Function to map a projected y coordinate into the target sheet.')
+
+
     def __init__(self,initialize_cfs=True,**params):
         """
         Initialize the Projection with a set of cf_type objects
@@ -603,41 +616,17 @@ The true bounds will differ depending on the density (see initialize_bounds())."
             # set up array of ConnectionFields translated to each x,y in the src sheet
             cflist = []
 
-
-            ##RPHACKALERT:Uncomment following lines for sullivan_neurocomputing04 model, can be removed once function is properly re-implemented
-            ##Values have been hardcoded at 8 cells per receptive field as per his implementation.
-            ##for ycount,y in enumerate(self.dest.sheet_rows()[::-1]):
-            ##    if ycount%8==0:
-            ##        yReceptive=y
-            ##      row = []
-            ##    for xcount,x in enumerate(self.dest.sheet_cols()):
-            ##        if xcount%8==0:
-            ##            xReceptive=x
-            ##        row.append(self.cf_type(xReceptive,yReceptive,
-            ##                              self.src,
-            ##                              copy.copy(self.bounds_template),
-            ##                              self.weights_generator,
-            ##                              copy.copy(self.mask_template), 
-            ##                              output_fn=self.weights_output_fn.single_cf_fn,
-            ##                              slice_=slice_))
-            ##    cflist.append(row) 
-
             for y in self.dest.sheet_rows()[::-1]:
                 row = []
                 for x in self.dest.sheet_cols():
-                    # JABALERT: Currently computes the location of the
-                    # ConnectionField as the exact location in the input
-                    # sheet corresponding to the unit in the destination
-                    # sheet.  Instead, we will need to add the ability to
-                    # use some other type of mapping, e.g. to add jitter
-                    # in the initial mapping.
-                    row.append(self.cf_type(x,y,
-                                         self.src,
-                                         copy.copy(self.bounds_template),
-                                         self.weights_generator,
-                                         copy.copy(self.mask_template), 
-                                         output_fn=self.weights_output_fn.single_cf_fn,
-                                         slice_=slice_))
+                    row.append(self.cf_type(self.x_coord_mapper(x,y),
+                                            self.y_coord_mapper(x,y),
+                                            self.src,
+                                            copy.copy(self.bounds_template),
+                                            self.weights_generator,
+                                            copy.copy(self.mask_template), 
+                                            output_fn=self.weights_output_fn.single_cf_fn,
+                                            slice_=slice_))
                 cflist.append(row)
 
 
