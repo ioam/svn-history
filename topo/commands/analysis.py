@@ -434,7 +434,7 @@ def update_projections():
   
     sheets = topo.sim.objects(Sheet).values()
     for s in sheets:
-	if (s.name == sheet_name and isinstance(s,CFSheet)):
+    	if (s.name == sheet_name and isinstance(s,CFSheet)):
 	    for x,y in proj_coords:
 		s.update_unit_view(x,y,proj_name)
 
@@ -446,12 +446,15 @@ def update_projectionactivity():
     """
   
     for s in topo.sim.objects(Sheet).values():
-	if (s.name == sheet_name and isinstance(s,ProjectionSheet)):
+   	if (s.name == sheet_name and isinstance(s,ProjectionSheet)):
             for p in s.in_connections:
                 if not isinstance(p,Projection):
                     topo.sim.debug("Skipping non-Projection "+p.name)
-                elif proj_name == '' or p.name==proj_name:
+                else:                                                
                     v = p.get_projection_view()
                     key = ('ProjectionActivity',v.projection.dest.name,v.projection.name)
                     v.projection.src.sheet_view_dict[key] = v
+                  
+  
+
 
