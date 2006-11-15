@@ -28,7 +28,7 @@ __version__ = '$Revision$'
 
 import Numeric
 import copy
-
+from Numeric import sum,ones,exp
 import topo
 
 import patterngenerator
@@ -353,6 +353,37 @@ class CFPRF_Plugin(CFPResponseFn):
                 activity[r,c] = single_cf_fn(X,cf.weights)
         activity *= strength
 
+class Activity_dependent(CFPResponseFn):
+    """
+    Response function used in lissom_or_noshrinking_latswitch
+
+    Each new activity is calculated from a dot product of the weights and input activity and multiplied by the strength 
+    In this case the strength is calculated based on the input activity of each unit.
+
+    The strength function is a sigmoid which switches from positive to negative (excitatory to inhibitory)
+    and can be controlled by changing the parameters slope,switch_point, ex_strength,inh_strength.  
+    
+    """
+
+    slope = Number(default=100,doc="Multiplicative parameter controlling the exponential.")
+    switch_point = Number(default=20,doc="Additive parameter controlling the exponential.")
+    ex_strength = Number(default=1.2, doc="Parameter controlling the maximum strength of excitation")
+    inh_strength = Number(default=0.9, doc="Parameter controlling the maximum strength of inhibition")
+      
+    def switching_strength_fn(self,a,w,slope,switch_point, ex_strength, inh_strength):
+        s = a*w*((ex_strength/(1+exp(slope*a-switch_point)))-inh_strength)
+        return Numeric.sum(s.flat)
+
+    def __call__(self, cfs, input_activity, activity,strength):
+        rows,cols = activity.shape
+        
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+                r1,r2,c1,c2 = cf.slice_array
+                X = input_activity[r1:r2,c1:c2]
+                activity[r,c] = self.switching_strength_fn(X,cf.weights,self.slope,
+                                                           self.switch_point,self.ex_strength, self.inh_strength)
 
 class CFPResponseFnParameter(ClassSelectorParameter):
     """
