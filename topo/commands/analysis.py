@@ -13,6 +13,7 @@ import topo
 import random
 import copy
 
+from topo.base.parameterclasses import BooleanParameter, Number
 from topo.analysis.featuremap import MeasureFeatureMap
 from topo.base.arrayutils import octave_output, centroid
 from topo.base.cf import CFSheet, CFProjection, Projection
@@ -65,14 +66,15 @@ class PatternPresenter(object):
     Function object for presenting PatternGenerator-created patterns,
     for use with map measurement commands like measure_or_pref.
     """
-    
+ 
     def __init__(self,pattern_generator,apply_output_fn=True,duration=1.0):
         self.apply_output_fn=apply_output_fn
         self.duration=duration
         self.gen = pattern_generator
 
     def __call__(self,features_values,param_dict):
-        
+
+     
         for param,value in param_dict.iteritems():
            self.gen.__setattr__(param,value)
                
@@ -86,7 +88,8 @@ class PatternPresenter(object):
         gen_copy1=copy.deepcopy(self.gen)
         gen_copy2=copy.deepcopy(self.gen)
 
-        ###TRALERT: for disparity maps 
+     
+        ###for disparity maps 
         if features_values.has_key("disparity") and len(input_pattern)==2:
 
             inputs={}
@@ -103,7 +106,7 @@ class PatternPresenter(object):
 #        else:
 #            print "Error Message1"
 
-        ###TRALERT: for OD maps    
+        ###for OD maps    
         
         if features_values.has_key("ocular")and len(input_pattern)==2:
             gen_copy1.scale=2*gen_copy1.ocular
@@ -119,8 +122,9 @@ class PatternPresenter(object):
         pattern_present(inputs, self.duration, learning=False,
                         apply_output_fn=self.apply_output_fn)
 
+
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
-                    scale=0.3,offset=0.0,display=False,
+                    scale=0.3,offset=0.0,display=True,settling=False,
                     user_function=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
 
     """
@@ -136,11 +140,20 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
     are designed to have a suitable activity pattern computed by
     that time, but the duration will need to be changed for other
     models that do not follow that convention.
+    The settling flag must be set accoring to the duration -
+    for a duration of 1.0 it is likely that settling should be turned on however
+    settling should be off for durations less than this to avoid errors in map measurement
     """
 
     # Could consider having scripts set a variable for the duration,
     # based on their own particular model setup, and to have it read
     # from here.  Instead, assumes a fixed default duration right now...
+ 
+    if settling==False:
+        topo.sheets.lissom.LISSOM.settling=False
+    else:
+        topo.sheets.lissom.LISSOM.settling=True
+        
     if num_phase <= 0 or num_orientation <= 0:
         raise ValueError("num_phase and num_orientation must be greater than 0")
 
@@ -148,9 +161,10 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         step_phase=2*pi/num_phase
         step_orientation=pi/num_orientation
 
-        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+        feature_values = [Feature(name="frequency",values=frequencies,),
                           Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
-                          Feature(name="frequency",values=frequencies)]     
+                          Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
+                         
    
         x=MeasureFeatureMap(feature_values)
 
@@ -158,12 +172,38 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
         x.measure_maps(user_function, param_dict, display, feature_values)
 
+    topo.sheets.lissom.LISSOM.settling=True    # turn settling back on for normal LISSOM settling process    
 
-###TRALERT: Function for OD map measurement
+
+
+        
+
 def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
-                    scale=0.3,offset=0.0,display=True,
+                    scale=0.3,offset=0.0,display=True,settling=False,
 		    user_function=PatternPresenter(pattern_generator=SineGrating(),
                                                    apply_output_fn=False,duration=0.175)):
+    """
+    Measure ocular dominance maps, using a sine grating by default.
+
+    Measures maps by collating the responses to a set of input
+    patterns controlled by some parameters.  The parameter ranges and
+    number of input patterns in each range are determined by the
+    num_phase, num_orientation, and frequencies parameters.  The
+    particular pattern used is determined by the user_function
+    argument, which defaults to a sine grating presented for a short
+    duration.  By convention, the Topographica example files
+    are designed to have a suitable activity pattern computed by
+    that time, but the duration will need to be changed for other
+    models that do not follow that convention.
+    The settling flag must be set accoring to the duration -
+    for a duration of 1.0 it is likely that settling should be turned on however
+    settling should be off for durations less than this to avoid errors in map measurement
+    """
+    
+    if settling==False:
+        topo.sheets.lissom.LISSOM.settling=False
+    else:
+        topo.sheets.lissom.LISSOM.settling=True
     
     if num_phase <= 0 or num_orientation <= 0:
         raise ValueError("num_phase and num_orientation must be greater than 0")
@@ -189,12 +229,35 @@ def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         param_dict = {"scale":scale,"offset":offset}
 
         x.measure_maps(user_function, param_dict, display, feature_values)
+    topo.sheets.lissom.LISSOM.settling=True    # turn settling back on for normal LISSOM settling process
 
-###TRALERT: Function for disparity map measurement
+
 def measure_disparity(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
-                    scale=0.3,offset=0.0,display=True,
+                    scale=0.3,offset=0.0,display=True,settling=False,
 		    user_function=PatternPresenter(pattern_generator=SineGrating(),
                                                    apply_output_fn=False,duration=0.175)):
+    """
+    Measure disparity maps, using a sine grating by default.
+
+    Measures maps by collating the responses to a set of input
+    patterns controlled by some parameters.  The parameter ranges and
+    number of input patterns in each range are determined by the
+    num_phase, num_orientation,num_disparity and frequencies parameters.  The
+    particular pattern used is determined by the user_function
+    argument, which defaults to a sine grating presented for a short
+    duration.  By convention, the Topographica example files
+    are designed to have a suitable activity pattern computed by
+    that time, but the duration will need to be changed for other
+    models that do not follow that convention.
+    The settling flag must be set accoring to the duration -
+    for a duration of 1.0 it is likely that settling should be turned on however
+    settling should be off for durations less than this to avoid errors in map measurement
+    """
+    
+    if settling==False:
+        topo.sheets.lissom.LISSOM.settling=False
+    else:
+        topo.sheets.lissom.LISSOM.settling=True
 
 
     if num_phase <= 0 or num_orientation <= 0 or num_disparity <= 0:
@@ -215,6 +278,8 @@ def measure_disparity(num_phase=12,num_orientation=4,num_disparity=12,frequencie
         param_dict = {"scale":scale,"offset":offset}
 
         x.measure_maps(user_function, param_dict, display, feature_values)
+
+    topo.sheets.lissom.LISSOM.settling=True    # turn settling back on for normal LISSOM settling process
 
 ###TRALERT: Function for disparity map analysis purposes. Used in conjunction with measure_maps_modified() in topo.analysis.featuremap
 '''
@@ -254,10 +319,20 @@ def measure_disparity_modified(num_phase=12,num_orientation=4,num_disparity=12,f
         return disp_pref,orient_pref,disp_sel,orient_sel
 '''
 
-def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=False,
+def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=False,settling=True,
                           user_function=PatternPresenter(Gaussian(aspect_ratio=1.0),False,1.0),
                           x_range=(-0.5,0.5),y_range=(-0.5,0.5)):
-    """Measure position preference map, using Gaussian patterns by default."""
+    """
+    Measure position preference map, using Gaussian patterns by default.
+    The settling flag must be set accoring to the duration -
+    for a duration of 1.0 it is likely that settling should be turned on however
+    settling should be off for durations less than this to avoid errors in map measurement
+    """
+
+    if settling==False:
+        topo.sheets.lissom.LISSOM.settling=False
+    else:
+        topo.sheets.lissom.LISSOM.settling=True
 
     if divisions <= 0:
         raise ValueError("divisions must be greater than 0")
@@ -275,7 +350,7 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
         param_dict = {"size":size,"scale":scale,"offset":offset}        
         x.measure_maps(user_function, param_dict, display, feature_values)
 
-
+    topo.sheets.lissom.LISSOM.settling=True    # turn settling back on for normal LISSOM settling process
 
 def measure_cog(display_projection ="Afferent"):    
     """Calculate center of gravity for each CF of each unit in each CFSheet."""
@@ -356,6 +431,7 @@ def update_projections():
     Add SheetViews for the weights in one CFProjection,
     for use in template-based plots.
     """
+  
     sheets = topo.sim.objects(Sheet).values()
     for s in sheets:
 	if (s.name == sheet_name and isinstance(s,CFSheet)):
@@ -368,7 +444,7 @@ def update_projectionactivity():
     Add SheetViews for all of the Projections of the ProjectionSheet
     specified by sheet_name, for use in template-based plots.
     """
-    
+  
     for s in topo.sim.objects(Sheet).values():
 	if (s.name == sheet_name and isinstance(s,ProjectionSheet)):
             for p in s.in_connections:
