@@ -184,16 +184,12 @@ class LISSOM(JointNormalizingCFSheet):
 
     output_fn = OutputFnParameter(default=PiecewiseLinear(lower_bound=0.1,upper_bound=0.65))
     precedence = Number(0.6)
-    settling=BooleanParameter(default="True", doc="""
-       Flag set when measuring maps to determine wether or not settling occurs,
-       will depend on duration of PatternPresenter""")
     
     def __init__(self,**params):
         super(LISSOM,self).__init__(**params)
         self.__counter_stack=[]
         self.activation_count = 0
         self.new_iteration = True
-
 
     def input_event(self,conn,data):
         # On a new afferent input, clear the activity
@@ -217,11 +213,9 @@ class LISSOM(JointNormalizingCFSheet):
         Pass the accumulated stimulation through self.output_fn and
         send it out on the default output port.
         """
-    
-      
         if self.new_input:
             self.new_input = False
-            if self.activation_count == self.tsettle:
+    	    if self.activation_count == self.tsettle:
                 # Once we have been activated the required number of times
                 # (determined by tsettle), reset various counters, learn
                 # if appropriate, and avoid further activation until an
@@ -232,13 +226,9 @@ class LISSOM(JointNormalizingCFSheet):
                     self.learn()
             else:
                 self.activate()
-                if self.settling==False:   #This loop will be activated when measuring maps for low durations when settling is turned off 
-                    self.activation_count=0
-                else:
-                    self.activation_count += 1
-
+                self.activation_count += 1
                 if (self.learning and self.continuous_learning):
-                    self.learn()
+                   self.learn()
                    
 
     # print the weights of a unit
