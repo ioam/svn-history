@@ -14,8 +14,8 @@ __version__='$Revision$'
 
 
 import Numeric
-
-from Numeric import dot
+import copy
+from Numeric import dot, exp
 
 from topo.base.arrayutils import clip_in_place,clip_lower
 from topo.base.arrayutils import L2norm, norm
@@ -46,6 +46,22 @@ class PiecewiseLinear(OutputFn):
         x -= self.lower_bound
         x *= fact
         clip_in_place(x,0.0,1.0)
+
+class Sigmoid(OutputFn):
+    """ 
+    Sigmoidal output function - (From Mathworld A Wolfram Web Resource. http://mathworld.wolfram.com/SigmoidFunction.html) 
+    Parameters k and l control the gradient (k) and the x-position (l) of
+    the exponential in the sigmoid function ie. 1/1+exp-(k*x+l)
+    """
+    k = Number(default=13,doc="Multiplicative parameter controlling the exponential.")
+    l = Number(default=-4,doc="Additive parameter controlling the exponential.")
+    
+    def __call__(self,x):
+
+        x_orig = copy.copy(x)
+        x *= 0.0
+	x += 1.0 / (1.0 + exp(-(self.k*x_orig + self.l)))
+
 
 
 class DivisiveNormalizeL1(OutputFn):
