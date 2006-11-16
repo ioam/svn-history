@@ -428,26 +428,52 @@ original data is no longer available.""")
     def reduce(self):
         """Function called by Widget to reduce the plot size"""
         new_height = self.plotgroup.height_of_tallest_plot / self.zoom_factor
-
+                
         if new_height < self.plotgroup.minimum_height_of_tallest_plot:
             self.reduce_button.config(state=DISABLED)
         else:
-	    self.plotgroup.height_of_tallest_plot = new_height
-            self.plotgroup.update_plots(False)
-            self.display_plots()
+            if self.looking_in_history == True:
+                self.plotgroup = self.plotgroups_history[self.history_index]
+                self.plotgroup.height_of_tallest_plot = new_height
+                self.plotgroup.scale_images()
+                self.display_plots()
+            else:
+                self.plotgroup.height_of_tallest_plot = new_height
+                self.plotgroup.update_plots(False)
+                self.display_plots()
+    
+
+#    def reduce(self):
+#        """Function called by Widget to reduce the plot size"""
+#        new_height = self.plotgroup.height_of_tallest_plot / self.zoom_factor#
+
+#        if new_height < self.plotgroup.minimum_height_of_tallest_plot:
+#            self.reduce_button.config(state=DISABLED)
+#        else:
+#	    self.plotgroup.height_of_tallest_plot = new_height
+#            self.plotgroup.update_plots(False)
+#            self.display_plots()
     
     def enlarge(self):
         """Function called by Widget to increase the plot size"""
         self.reduce_button.config(state=NORMAL)
-        self.plotgroup.height_of_tallest_plot *= self.zoom_factor
-	self.plotgroup.update_plots(False)
-        self.display_plots()
+        if self.looking_in_history == True:
+            self.plotgroup = self.plotgroups_history[self.history_index]
+            self.plotgroup.height_of_tallest_plot *= self.zoom_factor
+            self.plotgroup.scale_images()
+            self.display_plots()
+        else:
+            self.plotgroup.height_of_tallest_plot *= self.zoom_factor
+            self.plotgroup.update_plots(False)
+            self.display_plots()
+   
 
     # JLALERT: It would be nice to be able to scroll back through many
     # iterations.  Could put in a box for entering either the iteration
     # number you want to view, or perhaps how many you want to jump...
     def back(self):
         """Function called by Widget to scroll back through the previous bitmaps"""
+  
 	self.looking_in_history = True
         self.history_index -= 1
 	self.update_back_fwd_button()
@@ -457,6 +483,7 @@ original data is no longer available.""")
         self.refresh_title() 
 	self.restore_panel_environment()
 	self.update_back_fwd_button()
+  
 
 
     def forward(self):
