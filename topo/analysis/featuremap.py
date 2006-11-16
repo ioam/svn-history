@@ -147,6 +147,8 @@ class MeasureFeatureMap(ParameterizedObject):
         # Present the input pattern with various parameter settings,
         # keeping track of the responses
         for p in permutations:
+            topo.sim.state_push() 
+
             settings = dict(zip(feature_names, p))
 
             # DRAW THE PATTERN: call to the user_function
@@ -162,7 +164,8 @@ class MeasureFeatureMap(ParameterizedObject):
             for sheet in self.__sheets_to_measure_maps_for:
                 for feature,value in zip(feature_names, p):
                     self.__featuremaps[sheet][feature].update(sheet.activity, value)
-        
+            
+            topo.sim.state_pop()
 
     def __construct_sheet_views(self):
 	
