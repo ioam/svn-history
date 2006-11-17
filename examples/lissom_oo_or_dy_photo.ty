@@ -11,7 +11,16 @@ $Id$
 """
 __version__='$Revision$'
 
-###TEMPORARY IMPLEMENTATION...cannot be used in Test Pattern Window
+### JABHACKALERT: This implementation uses a custom version of code to
+### present a sequence of natural image patches, which is no longer
+### necessary or useful now that Composite patterns are fully
+### supported.  Thus this script should be modified to use a Composite
+### pattern before being extended or modified; the result should be
+### much simpler and more flexible.
+###
+### Apparently there is also some problem using this script together
+### with the Test Pattern window, but the specific problem has not
+### been documented.
 
 
 import RandomArray
