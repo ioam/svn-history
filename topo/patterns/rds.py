@@ -16,6 +16,14 @@ from topo.base.functionfamilies import IdentityOF
 from topo.base.arrayutils import clip_lower
 
 
+### JABHACKALERT: This code seems to work fine when the input regions
+### are all the same size and shape, but for
+### e.g. examples/hierarchical.ty the resulting images in the Test
+### Pattern preview window are square (instead of the actual
+### rectangular shapes), matching between the eyes (instead of the
+### actual two different rectangles), and with dot sizes that don't
+### match between the eyes.  It's not clear why this happens.
+
 class RandomDotStereogram(PatternGenerator):
     """
     Random dot stereogram using rectangular black and white patches.
