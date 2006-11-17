@@ -118,10 +118,9 @@ class PatternPresenter(object):
                         apply_output_fn=self.apply_output_fn)
 
 
-### JABALERT: user_function needs a more informative name, such as patternpresenter
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,
-                    user_function=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
+                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
 
     """
     Measure orientation maps, using a sine grating by default.
@@ -130,7 +129,7 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
     patterns controlled by some parameters.  The parameter ranges and
     number of input patterns in each range are determined by the
     num_phase, num_orientation, and frequencies parameters.  The
-    particular pattern used is determined by the user_function
+    particular pattern used is determined by the pattern_presenter
     argument, which defaults to a sine grating presented for a short
     duration.  By convention, most Topographica example files
     are designed to have a suitable activity pattern computed by
@@ -154,7 +153,7 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
    
         x=MeasureFeatureMap(feature_values)
         param_dict = {"scale":scale,"offset":offset}
-        x.measure_maps(user_function, param_dict, display, feature_values)
+        x.measure_maps(pattern_presenter, param_dict, display, feature_values)
 
 
 
@@ -162,7 +161,7 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 ### present various combinations of left and right eye activity?        
 def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=True,
-		    user_function=PatternPresenter(pattern_generator=SineGrating(),
+		    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
                                                    apply_output_fn=False,duration=0.175)):
     """
     Measure ocular dominance maps, using a sine grating by default.
@@ -171,7 +170,7 @@ def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
     patterns controlled by some parameters.  The parameter ranges and
     number of input patterns in each range are determined by the
     num_phase, num_orientation, and frequencies parameters.  The
-    particular pattern used is determined by the user_function
+    particular pattern used is determined by the pattern_presenter
     argument, which defaults to a sine grating presented for a short
     duration.  By convention, most Topographica example files
     are designed to have a suitable activity pattern computed by
@@ -193,13 +192,13 @@ def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                           
         x=MeasureFeatureMap(feature_values)
         param_dict = {"scale":scale,"offset":offset}
-        x.measure_maps(user_function, param_dict, display, feature_values)
+        x.measure_maps(pattern_presenter, param_dict, display, feature_values)
 
 
 
 def measure_disparity(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
                       scale=0.3,offset=0.0,display=True,
-                      user_function=PatternPresenter(pattern_generator=SineGrating(),
+                      pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
                                                      apply_output_fn=False,duration=0.175)):
     """
     Measure disparity maps, using a sine grating by default.
@@ -209,7 +208,7 @@ def measure_disparity(num_phase=12,num_orientation=4,num_disparity=12,frequencie
     number of input patterns in each range are determined by the
     num_phase, num_orientation, num_disparity, and frequencies
     parameters.  The particular pattern used is determined by the
-    user_function argument, which defaults to a sine grating presented
+    pattern_presenter argument, which defaults to a sine grating presented
     for a short duration.  By convention, most Topographica example
     files are designed to have a suitable activity pattern computed by
     that time, but the duration will need to be changed for other
@@ -231,7 +230,7 @@ def measure_disparity(num_phase=12,num_orientation=4,num_disparity=12,frequencie
 
         x=MeasureFeatureMap(feature_values)
         param_dict = {"scale":scale,"offset":offset}
-        x.measure_maps(user_function, param_dict, display, feature_values)
+        x.measure_maps(pattern_presenter, param_dict, display, feature_values)
 
 
 
@@ -241,7 +240,7 @@ def measure_disparity(num_phase=12,num_orientation=4,num_disparity=12,frequencie
 '''
 def measure_disparity_modified(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=True,
-		    user_function=PatternPresenter(pattern_generator=SineGrating(),
+		    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
                                                    apply_output_fn=False,duration=0.175)):
 
     if num_phase <= 0 or num_orientation <= 0 or num_disparity <= 0:
@@ -261,13 +260,13 @@ def measure_disparity_modified(num_phase=12,num_orientation=4,num_disparity=12,f
 
         x=MeasureFeatureMap(feature_values)
         param_dict = {"scale":scale,"offset":offset}
-        disp_pref,orient_pref,disp_sel,orient_sel=x.measure_maps_modified(user_function, param_dict, display, feature_values)
+        disp_pref,orient_pref,disp_sel,orient_sel=x.measure_maps_modified(pattern_presenter, param_dict, display, feature_values)
         return disp_pref,orient_pref,disp_sel,orient_sel
 '''
 
 
 def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=False,
-                          user_function=PatternPresenter(Gaussian(aspect_ratio=1.0),False,1.0),
+                          pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),False,1.0),
                           x_range=(-0.5,0.5),y_range=(-0.5,0.5)):
     """
     Measure position preference map, using a circular Gaussian by default.
@@ -276,7 +275,7 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
     patterns controlled by some parameters.  The parameter ranges and
     number of input patterns in each range are determined by the
     divisions parameter.  The particular pattern used is determined by the
-    size, scale, offset, and user_function arguments.
+    size, scale, offset, and pattern_presenter arguments.
     """
 
     if divisions <= 0:
@@ -289,11 +288,10 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
                           
         x=MeasureFeatureMap(feature_values)
         param_dict = {"size":size,"scale":scale,"offset":offset}
-        x.measure_maps(user_function, param_dict, display, feature_values)
+        x.measure_maps(pattern_presenter, param_dict, display, feature_values)
 
 
-###JABALERT: The name display_projection should be changed to e.g. proj_name
-def measure_cog(display_projection ="Afferent"):    
+def measure_cog(proj_name ="Afferent"):    
     """
     Calculate center of gravity (CoG) for each CF of each unit in each CFSheet.
 
@@ -308,7 +306,7 @@ def measure_cog(display_projection ="Afferent"):
     in the argument to this function, and a model using any other
     name must specify that explicitly when this function is called.
     """
-    ### JLHACKALERT: Should be updated to support multiple projections
+    ### JABHACKALERT: Should be updated to support multiple projections
     ### to each sheet, not requiring the name to be specified.
     
     f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
@@ -316,7 +314,7 @@ def measure_cog(display_projection ="Afferent"):
     
     for sheet in measured_sheets:
 	for proj in sheet.in_connections:
-	    if proj.name == display_projection :
+	    if proj.name == proj_name:
 		rows,cols=sheet.activity.shape
 		xpref=zeros((rows,cols),Float)
 		ypref=zeros((rows,cols),Float)

@@ -24,7 +24,7 @@ $Id$
 __version__='$Revision$'
 
 ## To measure the position preference:
-## measure_position_pref(divisions=6,size=0.3,scale=1.0,offset=0.0,display=True,user_function=PatternPresenter(HindpawGaussian(aspect_ratio=1.0),False,1.0), x_range=(0.0,0.6),y_range=(0.0,1.0)) ; topographic_grid()
+## measure_position_pref(divisions=6,size=0.3,scale=1.0,offset=0.0,display=True,pattern_presenter=PatternPresenter(HindpawGaussian(aspect_ratio=1.0),False,1.0), x_range=(0.0,0.6),y_range=(0.0,1.0)) ; topographic_grid()
 
 import Numeric
 import RandomArray

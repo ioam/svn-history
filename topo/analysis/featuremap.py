@@ -113,7 +113,7 @@ class MeasureFeatureMap(ParameterizedObject):
 
                                                                                                                                 
         
-    def measure_maps(self,user_function,param_dict,features,display=False):
+    def measure_maps(self,pattern_presenter,param_dict,features,display=False):
 
         """
         Create a list of all permutations of the feature values, then,
@@ -132,14 +132,14 @@ class MeasureFeatureMap(ParameterizedObject):
  	topo.sim.state_push()
         save_input_generators()
 
-        self.__present_input_patterns(user_function,param_dict,display,features)
+        self.__present_input_patterns(pattern_presenter,param_dict,display,features)
         self.__construct_sheet_views()
 
         restore_input_generators()
  	topo.sim.state_pop()
 	
 
-    def __present_input_patterns(self,user_function,param_dict,features,display=False):
+    def __present_input_patterns(self,pattern_presenter,param_dict,features,display=False):
 	
         feature_names=[f.name for f in features]
         values_lists=[f.values for f in features]
@@ -151,8 +151,8 @@ class MeasureFeatureMap(ParameterizedObject):
 
             settings = dict(zip(feature_names, p))
 
-            # DRAW THE PATTERN: call to the user_function
-            user_function(settings,param_dict)
+            # DRAW THE PATTERN: call to the pattern_presenter
+            pattern_presenter(settings,param_dict)
 
             if display:
                 if hasattr(topo,'guimain'):
@@ -199,11 +199,11 @@ class MeasureFeatureMap(ParameterizedObject):
 
     ##TRALERT: The following methods were used for analysis purposes in the disparity project
     '''
-    def measure_maps_modified(self,user_function,param_dict,display=False):
+    def measure_maps_modified(self,pattern_presenter,param_dict,display=False):
 
         save_input_generators()
         
-        self.__present_input_patterns(user_function,param_dict,display)
+        self.__present_input_patterns(pattern_presenter,param_dict,display)
         disp_pref,orient_pref=self.get_disp_preference()
         disp_select,orient_select=self.get_disp_selectivity()
 
