@@ -37,11 +37,6 @@ console window, not just the other windows.
 </li>
 
 <li>
-2006/06/06 (CP): Fix TopoConsole "Run for" TaggedSlider so that
-pressing Return is the same as hitting Go.
-</li>
-
-<li>
 2006/11/09 (JL): If a Projection plot window has been opened,
 subsequent Projection Activity windows show only that Projection,
 but should show all Projections.
