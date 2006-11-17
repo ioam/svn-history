@@ -33,7 +33,9 @@ is lost.
 
 <li>
 2006/11/09 (CP): The simulation name should be displayed in the
-console window, not just the other windows.
+console window, not just the other windows.  Could also put in
+automatic assignment of topo.sim.name, by taking the base name of the
+first .ty file in sys.argv (if any).
 </li>
 
 <li>
