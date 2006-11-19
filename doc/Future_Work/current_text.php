@@ -126,9 +126,8 @@ that are e.g. being selected.
 
 
 <li>
-2006/07/21 (CB): Update scripts now windows-specific files have moved
-to topographica-win module. Make script to create python/topographica
-installation, including the mingw compiler.
+2006/11/19 (CB): Make script to create python/topographica
+installation for Windows, including the mingw compiler.
 </li>
 
 </ul>
