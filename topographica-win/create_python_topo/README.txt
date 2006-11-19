@@ -12,9 +12,15 @@ necessary for Topographica. This copy of python is then archived for
 distribution to Topographica users. Only if a package is upgraded or
 added does someone need to go through this procedure.
 
+Please note: it will trash any existing copy of python that you have
+installed before (so not a python associated with topographica, but a
+standalone one). It seems
+you can only have
+
 
 (1) Run setup.bat. Accept all defaults (they're set programmatically)
-    - changing any of the paths will break something.
+    - changing any of the paths will break something. You only have to 
+    click 'next' or 'finish' whenever prompted.
 
 (2) As suggested by the script file, check that the new python_topo\
     directory works.
@@ -23,8 +29,3 @@ added does someone need to go through this procedure.
     (topographica-win\common\python_topo.tar.gz
 
 
-CEBHACKALERT: does not install weave or a C compiler! 
-The necessary mingw packages for a C compiler are in 
-topographica-win\create_python_topo\mingw, but the
-script does not use them. Weave isn't present in the
-repository.
