@@ -33,12 +33,10 @@ from translatorwidgets import CheckbuttonTranslator
 
 class ParametersFrame(Frame):
     """
-    Frame for all non-hidden Parameters of a ParameterizedObject class.
-
-
-    When asked to create wigets, ... makes a PropertiesFrame containing all the specified class' Parameters.
+    Frame that displays (and allows alteration of) the Parameters of
+    an associated ParameterizedObject instance or class (via a
+    PropertiesFrame for that ParameterizedObject).
     """
-
     def __init__(self, parent=None, **config):
         """
         """
@@ -57,8 +55,8 @@ class ParametersFrame(Frame):
 
         self.translator_dictionary = {}
 
-        # The object for which this ParametersFrame displays and alters
-        # parameters. (This could be a 'class' or an 'object'.)
+        # The ParameterizedObject instance or class for which this
+        # ParametersFrame displays and alters parameters.
         self.parameterized_object = None
 
         self.__widgets = {}
@@ -86,7 +84,7 @@ class ParametersFrame(Frame):
                 setattr(self.parameterized_object,name,w.get_value())
 
 
-    def set_obj_params(self):
+    def set_instance_parameters(self):
         """
         For all non-Constant Parameters of the currently set
         ParameterizedObject(), set the values of the Parameters to
@@ -202,7 +200,7 @@ class ParametersFrame(Frame):
         dictionary[parameter_name]. It expects these entries to be
         lists of relevant objects to cover the selectable classes. It
         updates the lists and it can be retrieved from
-        self.translator_dictionary when set_obj_params is called and
+        self.translator_dictionary when set_instance_parameters is called and
         used on subsequent uses.
         """
         assert isinstance(parameterized_object,ParameterizedObject), "ParameterFrame must be passed a ParameterizedObject to create widgets for Parameters."
@@ -390,11 +388,11 @@ class ParametersFrame(Frame):
         Button(button_panel, text = 'Ok', command = lambda frame=parameter_frame, win=parameter_window: 
             self.parameter_properties_ok(frame, win)).pack(side = RIGHT)
         Button(button_panel, text = 'Apply', 
-            command = parameter_frame.set_obj_params).pack(side = RIGHT)
+            command = parameter_frame.set_instance_parameters).pack(side = RIGHT)
 
     # CB: where's this called from?
     def parameter_properties_ok(self,frame, win) :
-        frame.set_obj_params()
+        frame.set_instance_parameters()
         win.destroy()
                 
                 
