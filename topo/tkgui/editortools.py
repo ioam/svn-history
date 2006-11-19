@@ -282,7 +282,7 @@ class ParametersTool(Frame):
         self.parameter_window=parameter_window
 
     def update_parameters(self):
-        self.parameter_frame.set_class_parameters()
+        self.parameter_frame.set_parameters()
 
     def set_focus(self, name, focus_class, doc = ''):
         self.focus = name

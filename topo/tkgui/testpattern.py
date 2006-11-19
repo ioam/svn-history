@@ -367,7 +367,7 @@ Each type will have various parameters that can be changed.""")
         # every time the pattern's redrawn.
         # This method will change.
 
-        self.__params_frame.set_instance_parameters()
+        self.__params_frame.set_parameters()
 
         disparity_flip=1
         

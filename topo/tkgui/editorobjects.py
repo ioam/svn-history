@@ -72,7 +72,7 @@ class EditorObject:
         self.parameter_window = parameter_window
 
     def update_parameters(self):
-        self.parameter_frame.set_instance_parameters()
+        self.parameter_frame.set_parameters()
 
     def okay_parameters(self, parameter_window):
         self.update_parameters()
