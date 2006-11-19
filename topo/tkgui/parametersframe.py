@@ -71,46 +71,43 @@ class ParametersFrame(Frame):
             ClassSelectorParameter: self.__add_class_selector_property}
 
 
-    def set_class_parameters(self) :
+    def set_parameters(self) :
         """
+        Set the parameters on the associated ParameterizedObject class or
+        instance to the values specified by the widgets.
+        
+        For an instance, only sets the values of non-Constant Parameters,
+
+        Only sets a value if the value in the widget is different from the one
+        in the ParameterizedObject. This prevents a local copy of a variable
+        being made into a ParameterizedObject just because the
+        ParameterizedObject is opened in the model editor.
         """
-        assert isinstance(self.parameterized_object,ParameterizedObjectMetaclass), "ParameterFrame must be associated with a ParameterizedObjectMetaclass to set class parameters."
+        if isinstance(self.parameterized_object,ParameterizedObjectMetaclass):
+            for name in self.__visible_parameters: 
+                # [0] is label (Message), [1] is widget
+                w = self.__widgets[name][1]
 
-        for name in self.__visible_parameters: 
-            # [0] is label (Message), [1] is widget
-            w = self.__widgets[name][1]
-            
-            if w.get_value()!=getattr(self.parameterized_object,name):
-                setattr(self.parameterized_object,name,w.get_value())
+                if w.get_value()!=getattr(self.parameterized_object,name):
+                    setattr(self.parameterized_object,name,w.get_value())
 
+        elif isinstance(self.parameterized_object,ParameterizedObject):
+            # CEBHACKALERT: name should be a constant Parameter; the
+            # 'or name==...' can be removed when it is.
+            parameters_to_modify = [(name,parameter)
+                                    for (name,parameter)
+                                    in self.__visible_parameters.items()
+                                    if not (parameter.constant==True or name=='name')]
 
-    def set_instance_parameters(self):
-        """
-        For all non-Constant Parameters of the currently set
-        ParameterizedObject(), set the values of the Parameters to
-        those specified by the widgets.
+            for (name,parameter) in parameters_to_modify:
+                # [0] is label (Message), [1] is widget
+                w = self.__widgets[name][1]
 
-        Only sets the value on the object if the value in the widget
-        is different from the one in the object. This prevents a local
-        copy of a variable being made into a ParameterizedObject just
-        because the ParameterizedObject is opened in the model editor.
-        """
-        assert isinstance(self.parameterized_object,ParameterizedObject), "ParametersFrame must be associated with a ParameterizedObject to set object parameters."
+                if w.get_value()!=getattr(self.parameterized_object,name):
+                    setattr(self.parameterized_object,name,w.get_value())
 
-        # CEBHACKALERT: name should be a constant Parameter; the
-        # 'or name==...' can be removed when it is.
-        parameters_to_modify = [(name,parameter)
-                                for (name,parameter)
-                                in self.__visible_parameters.items()
-                                if not (parameter.constant==True or name=='name')]
-
-        for (name,parameter) in parameters_to_modify:
-            # [0] is label (Message), [1] is widget
-            w = self.__widgets[name][1]
-            
-            if w.get_value()!=getattr(self.parameterized_object,name):
-                setattr(self.parameterized_object,name,w.get_value())
-
+        else:
+            raise AnICannotRememberPythonError, "ParameterFrame must be associated with a ParameterizedObject class or instance to set parameters."
 
 
     def __new_widgets(self,class_=False):
@@ -200,7 +197,7 @@ class ParametersFrame(Frame):
         dictionary[parameter_name]. It expects these entries to be
         lists of relevant objects to cover the selectable classes. It
         updates the lists and it can be retrieved from
-        self.translator_dictionary when set_instance_parameters is called and
+        self.translator_dictionary when set_parameters is called and
         used on subsequent uses.
         """
         assert isinstance(parameterized_object,ParameterizedObject), "ParameterFrame must be passed a ParameterizedObject to create widgets for Parameters."
@@ -388,11 +385,11 @@ class ParametersFrame(Frame):
         Button(button_panel, text = 'Ok', command = lambda frame=parameter_frame, win=parameter_window: 
             self.parameter_properties_ok(frame, win)).pack(side = RIGHT)
         Button(button_panel, text = 'Apply', 
-            command = parameter_frame.set_instance_parameters).pack(side = RIGHT)
+            command = parameter_frame.set_parameters).pack(side = RIGHT)
 
     # CB: where's this called from?
     def parameter_properties_ok(self,frame, win) :
-        frame.set_instance_parameters()
+        frame.set_parameters()
         win.destroy()
                 
                 
