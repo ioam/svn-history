@@ -125,11 +125,6 @@ that are e.g. being selected.
 </li>
 
 
-<li>
-2006/11/19 (CB): Make script to create python/topographica
-installation for Windows, including the mingw compiler.
-</li>
-
 </ul>
 
 
