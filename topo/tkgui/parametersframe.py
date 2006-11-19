@@ -58,7 +58,7 @@ class ParametersFrame(Frame):
         self.translator_dictionary = {}
 
         # CB: surely there's a better way?
-        self.topo_obj = None
+        self.PO_object = None
         self.topo_class = None
 
         self.__widgets = {}
@@ -97,7 +97,7 @@ class ParametersFrame(Frame):
         copy of a variable being made into a ParameterizedObject just
         because the ParameterizedObject is opened in the model editor.
         """
-        assert isinstance(self.topo_obj,ParameterizedObject), "ParametersFrame must be associated with a ParameterizedObject to set object parameters."
+        assert isinstance(self.PO_object,ParameterizedObject), "ParametersFrame must be associated with a ParameterizedObject to set object parameters."
 
         # CEBHACKALERT: name should be a constant Parameter; the
         # 'or name==...' can be removed when it is.
@@ -110,8 +110,8 @@ class ParametersFrame(Frame):
             # [0] is label (Message), [1] is widget
             w = self.__widgets[name][1]
             
-            if w.get_value()!=getattr(self.topo_obj,name):
-                setattr(self.topo_obj,name,w.get_value())
+            if w.get_value()!=getattr(self.PO_object,name):
+                setattr(self.PO_object,name,w.get_value())
 
 
 
@@ -184,10 +184,10 @@ class ParametersFrame(Frame):
  
 
 
-    def create_widgets(self, topo_obj, translator_dictionary = {}):
+    def create_widgets(self, PO_object, translator_dictionary = {}):
         """
         topo.base.parameterclasses.Constant:
-        Create widgets for all non-hidden Parameters of topo_obj and add them
+        Create widgets for all non-hidden Parameters of PO_object and add them
         to the screen.
 
         Each Parameter gets a suitable widget (e.g. a slider for a Number with
@@ -205,14 +205,14 @@ class ParametersFrame(Frame):
         self.translator_dictionary when set_obj_params is called and
         used on subsequent uses.
         """
-        assert isinstance(topo_obj,ParameterizedObject), "ParameterFrame must be passed a ParameterizedObject to create widgets for Parameters."
+        assert isinstance(PO_object,ParameterizedObject), "ParameterFrame must be passed a ParameterizedObject to create widgets for Parameters."
 
-        self.topo_obj=topo_obj
+        self.PO_object=PO_object
 
 
         self.__visible_parameters = dict([(parameter_name,parameter)
                                         for (parameter_name,parameter)
-                                        in self.topo_obj.params().items()
+                                        in self.PO_object.params().items()
                                         if not parameter.hidden])
         self.__new_widgets()
 
@@ -234,7 +234,7 @@ class ParametersFrame(Frame):
             value = getattr(self.topo_class,parameter_name)
             # or parameter.default for the class?
         else:
-            value = getattr(self.topo_obj,parameter_name)
+            value = getattr(self.PO_object,parameter_name)
 
         # CEBHACKALERT: name should be a constant Parameter; the
         # 'or parameter_name' can be removed when it is. (see earlier alert too)
