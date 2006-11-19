@@ -27,6 +27,8 @@ from translatorwidgets import CheckbuttonTranslator
 # re-implemented so that Parameters can be returned to default values
 # for the current class.
 
+# CEBHACKALERT: when creating a new Projection, we offer a 'name' field and
+# allow it to be typed in, but then ignore any text that's been entered.
 
 
 class ParametersFrame(Frame):
