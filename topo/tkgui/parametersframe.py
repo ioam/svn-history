@@ -46,13 +46,7 @@ class ParametersFrame(Frame):
         self.__properties_frame = PropertiesFrame(parent)
         self.__properties_frame.pack(side=TOP,expand=YES,fill=BOTH)
 
-        self.translator_dictionary = {}
-
-        # CB: surely there's a better way?
-        self.topo_obj = None
-        self.topo_class = None
-
-        # CB: what does all this do?
+        # Add the right click properties menu
         self.option_add("*Menu.tearOff", "0") 
         self.menu = Menu(self)
         self.menu.insert_command(END, label = 'Properties', command = lambda: 
@@ -60,9 +54,15 @@ class ParametersFrame(Frame):
 
         self.__help_balloon = Pmw.Balloon(parent)
 
+
+        self.translator_dictionary = {}
+
+        # CB: surely there's a better way?
+        self.topo_obj = None
+        self.topo_class = None
+
         self.__widgets = {}
         self.__visible_parameters = {}
-
 
         # The dictionary of parameter_type:property_to_add pairs.
         self.__parameter_property = {
@@ -71,7 +71,6 @@ class ParametersFrame(Frame):
             Enumeration: self.__add_enumeration_property,
             BooleanParameter: self.__add_boolean_property,
             ClassSelectorParameter: self.__add_class_selector_property}
-
 
 
     def set_class_parameters(self) :
