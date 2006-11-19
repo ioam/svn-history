@@ -59,7 +59,7 @@ class ParametersFrame(Frame):
 
         # CB: surely there's a better way?
         self.PO_object = None
-        self.topo_class = None
+        self.PO_class = None
 
         self.__widgets = {}
         self.__visible_parameters = {}
@@ -76,14 +76,14 @@ class ParametersFrame(Frame):
     def set_class_parameters(self) :
         """
         """
-        assert isinstance(self.topo_class,ParameterizedObjectMetaclass), "ParameterFrame must be associated with a ParameterizedObjectMetaclass to set class parameters."
+        assert isinstance(self.PO_class,ParameterizedObjectMetaclass), "ParameterFrame must be associated with a ParameterizedObjectMetaclass to set class parameters."
 
         for name in self.__visible_parameters: 
             # [0] is label (Message), [1] is widget
             w = self.__widgets[name][1]
             
-            if w.get_value()!=getattr(self.topo_class,name):
-                setattr(self.topo_class,name,w.get_value())
+            if w.get_value()!=getattr(self.PO_class,name):
+                setattr(self.PO_class,name,w.get_value())
 
 
     def set_obj_params(self):
@@ -167,18 +167,18 @@ class ParametersFrame(Frame):
 
 
 
-    def create_class_widgets(self, topo_class, translator_dictionary = {}) :
+    def create_class_widgets(self, PO_class, translator_dictionary = {}) :
         """
         """
-        assert isinstance(topo_class,ParameterizedObjectMetaclass), "ParameterFrame must be passed a ParameterizedObjectMetaclass to create widgets for class Parameters."
+        assert isinstance(PO_class,ParameterizedObjectMetaclass), "ParameterFrame must be passed a ParameterizedObjectMetaclass to create widgets for class Parameters."
         
         self.translator_dictionary = translator_dictionary
 
-        self.topo_class = topo_class
+        self.PO_class = PO_class
 
         self.__visible_parameters = dict([(parameter_name,parameter)
                                       for (parameter_name,parameter)
-                                      in self.topo_class.classparams().items()
+                                      in self.PO_class.classparams().items()
                                       if not parameter.hidden])
         self.__new_widgets(class_=True)
  
@@ -231,7 +231,7 @@ class ParametersFrame(Frame):
         # CEBHACKALERT: results in DynamicNumber being called and producing
         # a value, rather than displaying information about the dynamic number.
         if class_:
-            value = getattr(self.topo_class,parameter_name)
+            value = getattr(self.PO_class,parameter_name)
             # or parameter.default for the class?
         else:
             value = getattr(self.PO_object,parameter_name)
