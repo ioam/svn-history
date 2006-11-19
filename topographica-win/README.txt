@@ -47,9 +47,3 @@ To make an installation program for distribution to users,
 follow the instructions in create_installer/.
 
 
-
-
-
-Files in the for_binaries/ subdirectory allow an installation package 
-to be created for Topographica.
-
