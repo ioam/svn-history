@@ -399,6 +399,8 @@ matrixplot(topo_LGNOn_weights,title="(A) Topo LGNOn afferents"); matrixplot(c_Ga
 #matrixplot(topo_LGNOn_weights-c_Ganglia00_afferent,"difference between topo lgnon afferents and c++ ganglia00 afferents")
 
 
+
+
 print "...** LGNOn-V1 unit 0 0..."
 i,j=0,0
 topo_LGNOnToV1_0_0 = topo.sim['V1'].in_connections[0].cf(i,j).weights
@@ -444,11 +446,6 @@ compare_elements(topo_LatExc_23_23,c_Primary_LatExc_23_23,wt_dp,"LateralExcitato
 
 matrixplot(topo_LatExc_23_23,title="(E) Topo V1 LatExc 23,23"); matrixplot(c_Primary_LatExc_23_23,title="(E) c++ Primary LatExc 23,23")
 
-
-# CB: note that the lateral inhibitory weights are different shapes. The C++ lissom simulation should be setup so that
-# the radius ends in .5 (a specification of all the c++ simulations used before, right?), thereby avoiding the
-# bad circle shape (where there is a 'nipple' on each edge). Topographica should ensure that automatically, but I can't remember
-# whether that code was ever added.
 
 print "...** V1-V1 inhibitory unit 0 0..."
 i,j=0,0
