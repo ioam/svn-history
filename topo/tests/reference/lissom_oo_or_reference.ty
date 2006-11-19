@@ -80,8 +80,8 @@ area_scale=1.0
 rf_radius=BaseRN/4.0+0.5
 
 
-inh_rad=max(2.5,BaseN/4.0-1.0)
-exc_rad=max(2.5,BaseN/10.0)
+inh_rad=max(2.5,BaseN/4.0-1.0+0.5)
+exc_rad=max(2.5,BaseN/10.0-0.3)
 min_exc_rad=max(1.0,BaseN/44+0.5)
 #default_afferent_size_scale=BaseN/BaseRN
 gammaexc=0.9
@@ -130,36 +130,36 @@ alpha_inh=0.00025*ics
 
 tsettle=8
 
-assert LN == 38
-assert lgn_edge_buffer == 7
-assert xsigma == 6
-assert ysigma == 1.5
-#assert inputs_pereye == 1
-#assert round(retina_area_scale,6) == 0.591716
-assert rf_radius == 6.5
-assert delta == 0.083
-assert beta == 0.633
-#assert default_afferent_size_scale == 3
-assert rf_radius == 6.5
-assert inh_rad == 11
-assert exc_rad == 4.8
-assert area_scale == 1
-assert BaseRN == 24
-assert BaseN == 48
-#assert num_eyes==1
-assert gammaexc==0.9
-assert gammainh==0.9
-assert randomness == 0.0
-assert round(rf_radius_scale,6)==0.769231
-assert scale_input==1.0
-assert acs==1
-assert round(ecs,4)==16.5039
-assert round(ics,4)==18.6467
-assert round(alpha_input,3)==0.007
-assert round(alpha_exc,7)==0.0330078
-assert round(alpha_inh,8)==0.00466167
-assert tsettle == 8
-assert round(min_exc_rad,5) == 1.59091
+## assert LN == 38
+## assert lgn_edge_buffer == 7
+## assert xsigma == 6
+## assert ysigma == 1.5
+## #assert inputs_pereye == 1
+## #assert round(retina_area_scale,6) == 0.591716
+## assert rf_radius == 6.5
+## assert delta == 0.083
+## assert beta == 0.633
+## #assert default_afferent_size_scale == 3
+## assert rf_radius == 6.5
+## assert inh_rad == 11
+## assert exc_rad == 4.8
+## assert area_scale == 1
+## assert BaseRN == 24
+## assert BaseN == 48
+## #assert num_eyes==1
+## assert gammaexc==0.9
+## assert gammainh==0.9
+## assert randomness == 0.0
+## assert round(rf_radius_scale,6)==0.769231
+## assert scale_input==1.0
+## assert acs==1
+## assert round(ecs,4)==16.5039
+## assert round(ics,4)==18.6467
+## assert round(alpha_input,3)==0.007
+## assert round(alpha_exc,7)==0.0330078
+## assert round(alpha_inh,8)==0.00466167
+## assert tsettle == 8
+## assert round(min_exc_rad,5) == 1.59091
 
 
 ###########################################
