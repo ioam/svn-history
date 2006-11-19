@@ -374,7 +374,7 @@ Each type will have various parameters that can be changed.""")
         for (gs_name,o_s_p) in self.generator_sheets_patterns.items():
             if o_s_p['editing']==True:
                 
-                newpattern = copy.deepcopy(self.__params_frame.PO_object)
+                newpattern = copy.deepcopy(self.__params_frame.parameterized_object)
 
                 ###TRHACKALERT: Supports two-eye disparity model for RandomDotStereogram only,
                 ###alternating direction for each eye
