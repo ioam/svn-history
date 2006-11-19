@@ -2,7 +2,7 @@
 # RF-LISSOM parameter file for an ON/OFF orientation-map simulation
 # designed to match what Topographica can do as of 2006/02
 #
-# $Header: /disk/cvs/jbcvsglobal/lissom/samples/oo_or_map_topo.param,v 1.3 2006/02/09 12:43:25 cball Exp $
+# $Header: /cvsroot/topographica/topographica/topo/tests/reference/oo_or_map_topo.param,v 1.1 2006/11/13 00:34:10 ceball Exp $
 
 ###############################################################################
 # Training
@@ -20,8 +20,13 @@ set area_scale=1
 set num_eyes=1
 set layers_pereye=2
 set rf_radius=BaseRN/4+0.5 
-set inh_rad=2.5>?(BaseN/4-1) 
-set exc_rad=2.5>?(BaseN/10)
+# CB: In the reference simulation (from the book), the radii all end in ".5". Because V1 
+# has been scaled down here, these calculated radii would not end in ".5". 
+# So, I've adjusted them to end in 0.5, allowing me at least to match the
+# behavior where I know how c++ lissom behaves.
+
+set inh_rad=2.5>?(BaseN/4-1)+0.5
+set exc_rad=2.5>?(BaseN/10)-0.3
 
 #set default_afferent_size_scale=BaseN/BaseRN
 set gammaexc=0.9 
