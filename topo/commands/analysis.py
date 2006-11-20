@@ -70,7 +70,7 @@ class PatternPresenter(ParameterizedObject):
     Subclasses can provide additional mechanisms for doing this in
     different ways.
     """
-    
+
     def __init__(self,pattern_generator,apply_output_fn=True,duration=1.0):
         self.apply_output_fn=apply_output_fn
         self.duration=duration
@@ -92,24 +92,54 @@ class PatternPresenter(ParameterizedObject):
         ### JABALERT: Should replace these special cases with general
         ### support for having meta-parameters controlling the
         ### generation of different patterns for each GeneratorSheet.
-        ### At the very least, it should be simple to control
-        ### differences in single parameters easily.
+        ### For instance, we will also need to support xdisparity and
+        ### ydisparity, plus movement of patterns between two eyes,
+        ### etc.  At the very least, it should be simple to control
+        ### differences in single parameters easily.  In addition,
+        ### these meta-parameters should show up as parameters for
+        ### this object, augmenting the parameters for each individual
+        ### pattern, e.g. in the Test Pattern window.  In this way we
+        ### should be able to provide general support for manipulating
+        ### both pattern parameters and parameters controlling
+        ### interaction between or differences between patterns.
         gen_copy1=deepcopy(self.gen)
         gen_copy2=deepcopy(self.gen)
 
-        if features_values.has_key("disparity"):
+        if features_values.has_key("phasedisparity"):
             if len(input_pattern)!=2:
                 self.warning('Disparity is defined only when there are exactly two patterns')
             else:
-                inputs={}
-    
-                temp_phase1=gen_copy1.phase - gen_copy1.disparity/2.0
-                temp_phase2=gen_copy2.phase + gen_copy2.disparity/2.0
+                temp_phase1=gen_copy1.phase - gen_copy1.phasedisparity/2.0
+                temp_phase2=gen_copy2.phase + gen_copy2.phasedisparity/2.0
                 gen_copy1.phase=wrap(0,2*pi,temp_phase1)
                 gen_copy2.phase=wrap(0,2*pi,temp_phase2)
     
+                inputs={}
                 inputs[input_pattern[0]]=gen_copy1
                 inputs[input_pattern[1]]=gen_copy2
+
+        ## Not yet used; example only
+        #if features_values.has_key("xdisparity"):
+        #    if len(input_pattern)!=2:
+        #        self.warning('Disparity is defined only when there are exactly two patterns')
+        #    else:
+        #        gen_copy1.x=gen_copy1.x - gen_copy1.xdisparity/2.0
+        #        gen_copy2.x=gen_copy2.x + gen_copy2.xdisparity/2.0
+        #
+        #        inputs={}
+        #        inputs[input_pattern[0]]=gen_copy1
+        #        inputs[input_pattern[1]]=gen_copy2
+        #
+        #if features_values.has_key("ydisparity"):
+        #    if len(input_pattern)!=2:
+        #        self.warning('Disparity is defined only when there are exactly two patterns')
+        #    else:
+        #        gen_copy1.y=gen_copy1.y - gen_copy1.ydisparity/2.0
+        #        gen_copy2.y=gen_copy2.y + gen_copy2.ydisparity/2.0
+        #
+        #        inputs={}
+        #        inputs[input_pattern[0]]=gen_copy1
+        #        inputs[input_pattern[1]]=gen_copy2
 
         if features_values.has_key("ocular"):
             if len(input_pattern)!=2:
@@ -203,12 +233,12 @@ def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
 
 
-def measure_disparity(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
-                      scale=0.3,offset=0.0,display=True,
-                      pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
-                                                     apply_output_fn=False,duration=0.175)):
+def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
+                           scale=0.3,offset=0.0,display=True,
+                           pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
+                                                              apply_output_fn=False,duration=0.175)):
     """
-    Measure disparity maps, using a sine grating by default.
+    Measure disparity maps, using sine gratings by default.
 
     Measures maps by collating the responses to a set of input
     patterns controlled by some parameters.  The parameter ranges and
@@ -233,7 +263,7 @@ def measure_disparity(num_phase=12,num_orientation=4,num_disparity=12,frequencie
         feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
                           Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
                           Feature(name="frequency",values=frequencies),
-                          Feature(name="disparity",range=(0.0,2*pi),step=step_disparity,cyclic=True)]    
+                          Feature(name="phasedisparity",range=(0.0,2*pi),step=step_disparity,cyclic=True)]    
 
         x=MeasureFeatureMap(feature_values)
         param_dict = {"scale":scale,"offset":offset}
@@ -263,7 +293,7 @@ def measure_disparity_modified(num_phase=12,num_orientation=4,num_disparity=12,f
         feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
                           Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
                           Feature(name="frequency",values=frequencies),
-                          Feature(name="disparity",range=(0.0,2*pi),step=step_disparity,True)]          
+                          Feature(name="phasedisparity",range=(0.0,2*pi),step=step_disparity,True)]          
 
         x=MeasureFeatureMap(feature_values)
         param_dict = {"scale":scale,"offset":offset}

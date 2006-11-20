@@ -219,7 +219,7 @@ class MeasureFeatureMap(ParameterizedObject):
         for sheet in self.__measured_sheets:
 
             for feature in self.__featuremaps[sheet].keys():
-                if feature=='disparity':
+                if feature=='phasedisparity':
 
                     if self.__featuremaps[sheet][feature].distribution_matrix[0,0].cyclic == True:
                         norm_factor = self.__featuremaps[sheet][feature].distribution_matrix[0,0].axis_range
@@ -248,7 +248,7 @@ class MeasureFeatureMap(ParameterizedObject):
         for sheet in self.__measured_sheets:
             for feature in self.__featuremaps[sheet].keys():
             
-                if feature=='disparity':
+                if feature=='phasedisparity':
                
                     disp_sel = self.__featuremaps[sheet][feature].selectivity()
 
