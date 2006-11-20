@@ -43,6 +43,9 @@ class RandomDotStereogram(PatternGenerator):
     offset = Number(default=0.5)
 
     # New parameters for this pattern
+
+    #JABALERT: Should rename xdisparity and ydisparity to x and y, and simply
+    #set them to different values for each pattern to get disparity
     xdisparity = Number(default=0.0,bounds=(-1.0,1.0),softbounds=(-0.5,0.5),
                         precedence=0.50,doc="Disparity in the horizontal direction.")
     
