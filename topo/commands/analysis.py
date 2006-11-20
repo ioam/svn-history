@@ -15,6 +15,7 @@ import topo
 from topo.analysis.featuremap import MeasureFeatureMap
 from topo.base.arrayutils import octave_output, centroid
 from topo.base.cf import CFSheet, CFProjection, Projection
+from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import DynamicNumber
 from topo.base.projection import ProjectionSheet
 from topo.base.sheet import Sheet
@@ -23,7 +24,7 @@ from topo.base.sheetview import SheetView
 from topo.base.sheetview import SheetView, ProjectionView
 from topo.commands.basic import pattern_present
 from topo.misc.numbergenerators import UniformRandom
-from topo.misc.utils import frange
+from topo.misc.utils import frange, wrap
 from topo.patterns.basic import SineGrating, Gaussian
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.sheets.lissom import LISSOM
@@ -58,7 +59,7 @@ class Feature(object):
              self.values=(frange(low_bound,up_bound,step,not cyclic))
 
 
-class PatternPresenter(object):
+class PatternPresenter(ParameterizedObject):
     """
     Function object for presenting PatternGenerator-created patterns,
     for use with map measurement commands like measure_or_pref.
@@ -81,38 +82,38 @@ class PatternPresenter(object):
         input_pattern=gen_list.keys()
 
         inputs = dict().fromkeys(topo.sim.objects(GeneratorSheet),self.gen)
+
+        ### JABALERT: Should replace these special cases with
+        ### general support for having meta-parameters controlling the
+        ### generation of different patterns for each GeneratorSheet,
+        ### at least making it possible to control differences in
+        ### parameters easily.
         gen_copy1=deepcopy(self.gen)
         gen_copy2=deepcopy(self.gen)
 
-        ###TRALERT: for disparity maps 
-        if features_values.has_key("disparity") and len(input_pattern)==2:
+        if features_values.has_key("disparity"):
+            if len(input_pattern)!=2:
+                self.warning('Disparity is defined only when there are exactly two patterns')
+            else:
+                inputs={}
+    
+                temp_phase1=gen_copy1.phase - gen_copy1.disparity/2.0
+                temp_phase2=gen_copy2.phase + gen_copy2.disparity/2.0
+                gen_copy1.phase=wrap(0,2*pi,temp_phase1)
+                gen_copy2.phase=wrap(0,2*pi,temp_phase2)
+    
+                inputs[input_pattern[0]]=gen_copy1
+                inputs[input_pattern[1]]=gen_copy2
 
-            inputs={}
-
-            temp_phase1=gen_copy1.phase - gen_copy1.disparity/2.0
-            temp_phase2=gen_copy2.phase + gen_copy2.disparity/2.0
-            gen_copy1.phase=wrap(0,2*pi,temp_phase1)
-            gen_copy2.phase=wrap(0,2*pi,temp_phase2)
-
-            inputs[input_pattern[0]]=gen_copy1
-            inputs[input_pattern[1]]=gen_copy2
-
-        ###TRALERT: Need to implement 'else' part properly              
-#        else:
-#            print "Error Message1"
-
-        ###TRALERT: for OD maps    
-        
-        if features_values.has_key("ocular")and len(input_pattern)==2:
-            gen_copy1.scale=2*gen_copy1.ocular
-            gen_copy2.scale=2.0-2*gen_copy2.ocular
-            
-            inputs[input_pattern[0]]=gen_copy1
-            inputs[input_pattern[1]]=gen_copy2
-
-        ###TRALERT: Need to implement 'else' part properly    
-#        else:
-#            print "Error Message2"
+        if features_values.has_key("ocular"):
+            if len(input_pattern)!=2:
+                self.warning('Ocularity is defined only when there are exactly two patterns')
+            else:
+                gen_copy1.scale=2*gen_copy1.ocular
+                gen_copy2.scale=2.0-2*gen_copy2.ocular
+                
+                inputs[input_pattern[0]]=gen_copy1
+                inputs[input_pattern[1]]=gen_copy2
 
         pattern_present(inputs, self.duration, learning=False,
                         apply_output_fn=self.apply_output_fn)
