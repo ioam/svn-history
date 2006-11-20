@@ -311,7 +311,8 @@ class Integer(Number):
     __doc__ = property((lambda self: self.doc))
 
     def __set__(self,obj,val):
-        if not isinstance(val,int):
+        ###JABALERT: Should make sure the DynamicNumber is an integer
+        if not isinstance(val,int) and not isinstance(val,DynamicNumber):
             raise ValueError("Parameter must be an integer.")
         super(Integer,self).__set__(obj,val)
 
