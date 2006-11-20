@@ -31,7 +31,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.outputfns.basic import PiecewiseLinear,HalfRectifyAndSquare
 from topo.base.functionfamilies import OutputFn
 from topo.base.arrayutils import clip_in_place
-from topo.misc.numbergenerators import UniformRandom
+from topo.misc.numbergenerators import UniformRandom,UniformRandomInt
 from topo.commands.pylabplots import *
 
 topo.sim.name = "ohzawa_science90"
@@ -40,7 +40,7 @@ topo.sim.name = "ohzawa_science90"
 input_pattern = topo.patterns.rds.RandomDotStereogram(dotsize=DynamicNumber(UniformRandom(lbound=0.05,ubound=0.15,seed=100)),
                                         xdisparity=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=200)),
                                         dotdensity=DynamicNumber(UniformRandom(lbound=0.2,ubound=0.8,seed=300)),
-                                        random=DynamicNumber(UniformRandom(lbound=0.0,ubound=1000.0,seed=400)))
+                                        random_seed=DynamicNumber(UniformRandomInt(lbound=0,ubound=1000,seed=400)))
 
 input_pattern_copy=copy.deepcopy(input_pattern)
 
@@ -166,3 +166,300 @@ topo.sim['S3'].gui_x=658.0
 topo.sim['S3'].gui_y=230.0
 topo.sim['S4'].gui_x=902.0
 topo.sim['S4'].gui_y=230.0
+
+
+###############################################################################
+
+# Testing code not required for the model itself
+
+import copy
+import matplotlib
+import pylab
+import random
+
+from math import pi
+from Numeric import array, zeros, Float,size, shape
+
+import topo
+import topo.base.patterngenerator
+
+from topo.base import sheetview
+from topo.base.arrayutils import octave_output, centroid
+from topo.base.cf import CFSheet, CFProjection, Projection
+from topo.base.parameterclasses import DynamicNumber
+from topo.base.parameterizedobject import ParameterizedObject
+from topo.base.projection import ProjectionSheet
+from topo.base.sheet import Sheet
+from topo.base.sheetview import SheetView, ProjectionView
+from topo.commands.basic import pattern_present, restore_input_generators, save_input_generators
+from topo.commands.pylabplots import *
+from topo.misc.distribution import Distribution
+from topo.misc.numbergenerators import UniformRandom
+from topo.misc.utils import cross_product, frange
+from topo.patterns.basic import SineGrating, Gaussian
+from topo.patterns.rds import RandomDotStereogram
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.sheets.lissom import LISSOM
+
+
+class TestFeatureMap(ParameterizedObject):
+    """
+    A feature map for one stimulus dimension (e.g. Orientation) for one Sheet.
+
+    Given a set of activity matrices and associated parameter values,
+    constructs a preference map and a selectivity map for that parameter.
+    """
+
+
+    def __init__(self, sheet, axis_range=(0.0,1.0), cyclic=False):
+        
+        # Initialize the internal data structure: a matrix of Distribution objects.
+        # It would be nice to do this using some sort of map() or apply() function...
+        rows, cols = sheet.activity.shape
+        self.distribution_matrix = zeros(sheet.activity.shape,'O')
+        for i in range(rows):
+            for j in range(cols):
+                self.distribution_matrix[i,j] = Distribution(axis_range,cyclic,keep_peak=False) ##Note difference from FeatureMap Class
+       
+
+    def update(self, activity_matrix, feature_value):
+        """Add a new matrix of activity values for a given stimulus value."""
+        
+        ### JABHACKALERT!  Need to override +=, not +, due to modifying argument,
+        ### or else use a different function name altogether (e.g. update(x,y)).
+        self.distribution_matrix + self.__make_pairs(activity_matrix,feature_value)
+
+
+    def __make_pairs(self,activity_matrix,feature_value):
+        """
+        Transform an activity matrix to a matrix of dictionaries {feature_value:element}.
+    
+        Private method for use with the __add__ method of the Distribution class.
+        """
+        
+        new_matrix=zeros(activity_matrix.shape,'O')
+        for i in range(len(activity_matrix)):
+            for j in range(len(activity_matrix[i])):
+                           new_matrix[i,j] = {feature_value:activity_matrix[i,j]}
+        return new_matrix
+
+
+
+class MeasureTestFeatureMap(ParameterizedObject):
+    """
+    """
+    def __init__(self, feature_param):
+        ### JABALERT: The feature_param structure is pretty
+        ### complicated; surely it should be an object or something
+        ### less fragile than a list assumed to have three elements as
+        ### it is here.
+        """
+        feature_param: a dictionary with sheets as keys and a dictionary: 
+                       {feature_name: (range, values, cyclic)} as values
+                       
+                       range: the tuple (lower_bound, upper_bound)
+                       values: either a list of the values to use for the feature (list), or
+                                      a step size (float) to generate the list
+                                      (i.e. frange(lower_bound,upper_bound,values))
+                       cyclic: whether or not the feature is cyclic (see topo.misc.distribution)
+
+                       e.g.    
+                       {'theta': (0.0,1.0), 0.10, True}
+                       for cyclic theta in steps of 0.10 from 0.0 to 1.0
+                       {'x': (0.0,2.0), [0.0, 0.5, 0.6, 0.7, 1.0], False}
+                       for the non-cyclic x values specified, which may only fall in the range [0.0,1.0].
+        """
+        # This dictionary will contain (for each sheet) a dictionary to hold the TestFeatureMap for each feature
+        # {sheet: {feature: TestFeatureMap()}}
+        self.__featuremaps = {}
+
+        # the list of (list of) values to be presented for each feature
+        self.__featurevalues = []
+        
+        for param in feature_param.values():
+            # param can be either list or float (a step size)
+            if isinstance(param[1],type([])):               
+                self.__featurevalues.append(param[1])
+            else:
+                low_bound,up_bound = param[0]
+                step=param[1]
+                cyclic=param[2]
+                self.__featurevalues.append(frange(low_bound,up_bound,step,not cyclic))
+
+        f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
+        self.__measured_sheets = filter(f,topo.sim.objects(Sheet).values())
+        
+        # now create the featuremaps for each sheet    
+        for sheet in self.__measured_sheets:
+            self.__featuremaps[sheet] = {}
+            for feature, value in feature_param.items():
+                self.__featuremaps[sheet].update({feature: TestFeatureMap(sheet,
+                                                                          axis_range=value[0],
+                                                                         cyclic=value[2])})
+   
+
+   
+    def measure_maps_disparity(self,user_function,param_dict,display=False):
+        
+
+  
+        save_input_generators()
+        self.__present_input_patterns(user_function,param_dict,display)
+        self.__construct_tuning_curve()
+        restore_input_generators()
+ 
+
+    def __present_input_patterns(self,user_function,param_dict,display=False):
+        
+        input_permutations = cross_product(self.__featurevalues)
+
+        # Present the input pattern with various parameter settings,
+        # keeping track of the responses
+        for permutation in input_permutations:
+            sheet=self.__measured_sheets[0] # Assumes that there is at least one sheet; needs fixing
+            feature_points={}
+
+            # set each feature's value
+            for feature,value in zip(self.__featuremaps[sheet].keys(), permutation):
+                feature_points[feature] = value
+
+            # DRAW THE PATTERN: call to the user_function
+            user_function(feature_points,param_dict)
+            
+            # NOW UPDATE EACH TestFeatureMap WITH (ACTIVITY,FEATURE_VALUE)
+            for sheet in self.__measured_sheets:
+                for feature,value in zip(self.__featuremaps[sheet].keys(), permutation):
+                    self.__featuremaps[sheet][feature].update(sheet.activity, value)
+
+
+
+    def __construct_tuning_curve(self):
+
+        for sheet in self.__measured_sheets:
+            
+            for feature in self.__featuremaps[sheet].keys():
+
+                if feature=='xdisparity':
+
+
+                    rows, cols = self.__featuremaps[sheet][feature].distribution_matrix.shape
+                    #disp_matrix=zeros((, len(self.__featurevalues[0])),Float)
+
+                    disp_matrix=[]
+                    for i in range(rows):
+                        for j in range(cols):
+                            temp_norm=[]
+                            #temp_sum=sum(self.__featuremaps[sheet][feature].distribution_matrix[i,j].values())
+                            
+                            for disp in self.__featurevalues[0]: ##self.__featurevalues as list??Not that robust
+                                
+                                temp_value=self.__featuremaps[sheet][feature].distribution_matrix[i,j].get_value(disp)
+                                #temp_norm.append(temp_value/temp_sum)
+                                temp_norm.append(temp_value)
+                            #disp_matrix[i]=temp_norm
+                            pylab.bar(left=self.__featurevalues[0],height=temp_norm,width=0.02)
+                            pylab.scatter(self.__featurevalues[0],temp_norm)
+                            pylab.plot(self.__featurevalues[0],temp_norm)
+                            
+                            disp_matrix.append(temp_norm)
+                    print disp_matrix
+                    pylab.show()
+
+
+
+class TestPatternPresenter(object):
+    """
+    Function object for presenting PatternGenerator-created patterns,
+    for use with map measurement commands like measure_or_pref.
+    """
+    
+    def __init__(self,pattern_generator,apply_output_fn=True,duration=1.0):
+        self.apply_output_fn=apply_output_fn
+        self.duration=duration
+        self.gen = pattern_generator
+
+    def __call__(self,features_values,param_dict):
+
+       
+        for param,value in param_dict.iteritems():
+           self.gen.__setattr__(param,value)
+        
+        for feature,value in features_values.iteritems():
+           self.gen.__setattr__(feature,value)
+
+
+        gen_list=topo.sim.objects(GeneratorSheet)
+        input_pattern=gen_list.keys()
+
+        inputs = dict().fromkeys(topo.sim.objects(GeneratorSheet),self.gen)
+        gen_copy1=copy.deepcopy(self.gen)
+        gen_copy2=copy.deepcopy(self.gen)
+        inputs={}
+        
+        if features_values.has_key("xdisparity") and len(input_pattern)==2:
+            
+  
+            gen_copy1.xdisparity=gen_copy1.xdisparity #right retina
+            gen_copy2.xdisparity=-gen_copy2.xdisparity #left retina
+ 
+
+            inputs[input_pattern[0]]=gen_copy1
+            inputs[input_pattern[1]]=gen_copy2
+ 
+
+        pattern_present(inputs, self.duration, learning=False,
+                        apply_output_fn=self.apply_output_fn)
+
+        '''
+        print "V1's activity"
+        print topo.sim['TunedExc'].activity
+        print topo.sim['TunedInh'].activity
+        print topo.sim['Near'].activity
+        print topo.sim['Far'].activity
+        print topo.sim['V1'].activity
+        '''
+
+def measure_ohzawa_disparity(scale=1.0,offset=0.0,display=True,
+		    user_function=TestPatternPresenter(pattern_generator=RandomDotStereogram(),
+                                                   apply_output_fn=True,duration=0.175)):
+    
+    #apply_output_function must be True
+    '''
+    feature_values = {"xdisparity": ( (-0.5,0.5),[-0.5,-0.45,-0.4,-0.35,-0.3,-0.25,-0.2,-0.15,-0.1,-0.05,0.0,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5], False),
+                          "dotdensity": ( (0.1,0.9),[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9],False),
+                          "dotsize": ((0.05,0.25),[0.05,0.07,0.09,0.11,0.13,0.15,0.17,0.19,0.21,0.23,0.25],False)}
+    '''
+    '''
+    feature_values = {"xdisparity": ( (-0.5,0.5),[-0.5,-0.45,-0.4,-0.35,-0.3,-0.25,-0.2,-0.15,-0.1,-0.05,0.0,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5], False),
+                          "random_seed": ( (1,1000),range(1,50),False),
+                          "dotsize":( (0.05,0.15),[0.05,0.07,0.09,0.11,0.13,0.15],False)}
+    '''                    
+    
+    '''
+    feature_values = {"xdisparity": ( (-1.0,1.0),[-1.0,-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0], False),
+                          "random_seed": ( (1,1000),range(1,50),False)}
+                          #"dotsize":( (0.05,0.15),[0.05,0.07,0.09,0.11,0.13,0.15],False)}
+    '''
+    '''
+    feature_values = {"xdisparity": ( (-1.0,1.0),[-0.24,-0.22,-0.2,-0.18,-0.16,-0.14,-0.12,-0.1,-0.08,-0.06,-0.04,-0.02,0.0,0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.2,0.22,0.24], False),
+                          "random_seed": ( (1,25),range(1,5),False),
+                          "dotsize":( (0.05,0.15),[0.05],False)}
+    '''
+
+    feature_values = {"xdisparity": ( (-1.0,1.0),[-0.14,-0.12,-0.1,-0.08,-0.06,-0.04,-0.02,0.0,0.02,0.04,0.06,0.08,0.1,0.12,0.14], False),
+                          "random_seed": ( (1,501),range(2,501),False),
+                          "dotsize":( (0.05,0.15),[0.05],False)}
+
+    
+    '''
+    feature_values = {"xdisparity": ( (-1.0,1.0),[-0.05,-0.03], False),
+                          #"random_seed": ( (1,25),range(1,5),False),
+                          "dotsize":( (0.05,0.15),[0.05],False)}
+    '''
+    x=MeasureTestFeatureMap(feature_values)
+    
+    param_dict = {"scale":scale,"offset":offset}
+
+    x.measure_maps_disparity(user_function, param_dict, display)
+
+
