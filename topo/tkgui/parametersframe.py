@@ -351,7 +351,6 @@ class ParametersFrame(Frame):
 
         # CEBALERT: If the selected field is a class rather than an
         # object, then we can't handle it yet.
-        # In fact this test should be asling if it is a class!
         if not isinstance(obj, ParameterizedObject):
             raise NotImplementedError("Right-click editing for a class is not yet supported.") # ...because we have to clean the class vs object editing first.
         
