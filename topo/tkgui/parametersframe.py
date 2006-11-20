@@ -205,17 +205,13 @@ class ParametersFrame(Frame):
         a match is found. If no match is found, the Parameter just gets a
         textbox. 
         """
-        class_=False
-        if isinstance(self.parameterized_object,ParameterizedObjectMetaclass):
-            class_=True
-        
         # CEBHACKALERT: results in DynamicNumber being called and producing
         # a value, rather than displaying information about the dynamic number.
         value = getattr(self.parameterized_object,parameter_name)
 
         # CEBHACKALERT: name should be a constant Parameter; the
         # 'or parameter_name' can be removed when it is. (see earlier alert too)
-        if (parameter.constant==True or parameter_name=='name') and class_==False:
+        if (parameter.constant==True or parameter_name=='name') and isinstance(self.parameterized_object,ParameterizedObject):
             self.__add_readonly_text_property(parameter_name,value,parameter)
         else:
             for c in classlist(type(parameter))[::-1]:
