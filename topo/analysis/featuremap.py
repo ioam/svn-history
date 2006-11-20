@@ -100,7 +100,7 @@ class MeasureFeatureMap(ParameterizedObject):
         # to all projections.
         # The Sheet 'learning' parameter should be per projection
         # see alert in sheet.py), and we will have a per projection plastic
-        # attribure, too.
+        # attribute, too.
 	
         f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
         self.__sheets_to_measure_maps_for = filter(f,topo.sim.objects(Sheet).values())
