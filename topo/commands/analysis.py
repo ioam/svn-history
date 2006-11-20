@@ -61,8 +61,14 @@ class Feature(object):
 
 class PatternPresenter(ParameterizedObject):
     """
-    Function object for presenting PatternGenerator-created patterns,
-    for use with map measurement commands like measure_or_pref.
+    Function object for presenting PatternGenerator-created patterns.
+
+    This class helps coordinate a set of patterns to be presented to a
+    set of GeneratorSheets.  It provides a standardized way of
+    generating a set of linked patterns for testing or analysis, such
+    as when measuring preference maps or presenting test patterns.
+    Subclasses can provide additional mechanisms for doing this in
+    different ways.
     """
     
     def __init__(self,pattern_generator,apply_output_fn=True,duration=1.0):
@@ -83,11 +89,11 @@ class PatternPresenter(ParameterizedObject):
 
         inputs = dict().fromkeys(topo.sim.objects(GeneratorSheet),self.gen)
 
-        ### JABALERT: Should replace these special cases with
-        ### general support for having meta-parameters controlling the
-        ### generation of different patterns for each GeneratorSheet,
-        ### at least making it possible to control differences in
-        ### parameters easily.
+        ### JABALERT: Should replace these special cases with general
+        ### support for having meta-parameters controlling the
+        ### generation of different patterns for each GeneratorSheet.
+        ### At the very least, it should be simple to control
+        ### differences in single parameters easily.
         gen_copy1=deepcopy(self.gen)
         gen_copy2=deepcopy(self.gen)
 
