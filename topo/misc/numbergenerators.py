@@ -66,6 +66,22 @@ class UniformRandom(RandomDistribution):
         return self.random_generator.uniform(self.lbound,self.ubound)
 
 
+class UniformRandomInt(RandomDistribution):
+    """
+    Specified with lbound and ubound; when called, return a random
+    number in the range [lbound, ubound).
+
+    See the random module for further details.    
+    """
+    lbound = Number(default=0,doc="inclusive lower bound")
+    ubound = Number(default=1000,doc="inclusive upper bound")
+    
+    def __call__(self):
+        x = self.random_generator.randint(self.lbound,self.ubound)
+        print x
+        return x
+
+
 class Choice(RandomDistribution):
     """
     Return a random element from the specified list of choices.
