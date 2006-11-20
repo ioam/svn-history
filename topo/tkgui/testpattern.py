@@ -254,11 +254,6 @@ Each type will have various parameters that can be changed.""")
         self.console.auto_refresh()
 	topo.sim.state_pop()
 
-    ### JAB: It is not clear how this will need to be extended to support
-    ### objects with different parameters in the different eyes, e.g. to
-    ### test ocular dominance.  It is also not clear which types of
-    ### randomness to add in, e.g. to provide random positions and
-    ### orientations, but not random sizes.
     def use_for_learning(self):
         """
         Lock in the existing PatternFactories as the new default stimulus
@@ -350,12 +345,10 @@ Each type will have various parameters that can be changed.""")
 	self.refresh()
 
 
-    ### JABHACKALERT! Ideally this would move out of tkgui/ altogether.
-    ###
-    ### JAB: It is not clear how this will need to be extended to support
-    ### objects with different parameters in the different eyes, e.g. to
-    ### test ocular dominance.
-
+    ### JABHACKALERT: This should be replaced with a PatternPresenter
+    ### (from topo.commands.analysis), which will allow flexible
+    ### support for making objects with different parameters in the
+    ### different eyes, e.g. to test ocular dominance or disparity.
     def __setup_pattern_generators(self):
         """
         Make an instantiation of the current user patterns.
