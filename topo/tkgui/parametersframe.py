@@ -107,16 +107,15 @@ class ParametersFrame(Frame):
                     setattr(self.parameterized_object,name,w.get_value())
 
         else:
-            raise AnICannotRememberPythonError, "ParameterFrame must be associated with a ParameterizedObject class or instance to set parameters."
+            raise TypeError, "ParameterFrame must be associated with a ParameterizedObject class or instance to set parameters."
 
 
-    def __new_widgets(self,class_=False):
+    def __new_widgets(self):
         """
         Remove old labels and widgets from the screen (if there
         are any), then create new ones, sort them by Parameter
         precedence, and finally add them to the screen.
         """
-
         # wipe old labels and widgets from screen
         for (label,widget) in self.__widgets.values():
             label.grid_forget()
@@ -125,7 +124,7 @@ class ParametersFrame(Frame):
         # create the widgets
         self.__widgets = {}
         for (parameter_name, parameter) in self.__visible_parameters.items():
-            self.__add_property_for_parameter(parameter_name,parameter,class_=class_)
+            self.__add_property_for_parameter(parameter_name,parameter)
 
         # sort Parameters by precedence (oops actually reverse of precedence!)
         parameter_precedences = {}
@@ -159,36 +158,15 @@ class ParametersFrame(Frame):
                         sticky=posn)
 
             self.__help_balloon.bind(label, help_text)
-
-
-
-    def create_class_widgets(self, parameterized_object, translator_dictionary = {}) :
-        """
-        """
-        assert isinstance(parameterized_object,ParameterizedObjectMetaclass), "ParameterFrame must be passed a ParameterizedObjectMetaclass to create widgets for class Parameters."
-        
-        self.translator_dictionary = translator_dictionary
-
-        self.parameterized_object = parameterized_object
-
-        self.__visible_parameters = dict([(parameter_name,parameter)
-                                      for (parameter_name,parameter)
-                                      in self.parameterized_object.classparams().items()
-                                      if not parameter.hidden])
-        self.__new_widgets(class_=True)
  
-
 
     def create_widgets(self, parameterized_object, translator_dictionary = {}):
         """
-        topo.base.parameterclasses.Constant:
         Create widgets for all non-hidden Parameters of parameterized_object and add them
         to the screen.
 
         Each Parameter gets a suitable widget (e.g. a slider for a Number with
         soft_bounds). The default widget is a text box.
-
-        parameters must be Parameter objects.
 
         Widgets are added in order of the Parameters' precedences.
 
@@ -200,21 +178,25 @@ class ParametersFrame(Frame):
         self.translator_dictionary when set_parameters is called and
         used on subsequent uses.
         """
-        assert isinstance(parameterized_object,ParameterizedObject), "ParameterFrame must be passed a ParameterizedObject to create widgets for Parameters."
+        self.parameterized_object = parameterized_object
+        params = None
 
-        self.parameterized_object=parameterized_object
-
+        if isinstance(parameterized_object,ParameterizedObjectMetaclass):
+            self.translator_dictionary = translator_dictionary
+            params = self.parameterized_object.classparams().items()
+        elif isinstance(parameterized_object,ParameterizedObject):
+            params = self.parameterized_object.params().items()
+        else:
+            raise TypeError, "ParameterFrame must be passed a ParameterizedObject class or instance to create widgets for Parameters."
 
         self.__visible_parameters = dict([(parameter_name,parameter)
-                                        for (parameter_name,parameter)
-                                        in self.parameterized_object.params().items()
-                                        if not parameter.hidden])
+                                      for (parameter_name,parameter)
+                                      in params
+                                      if not parameter.hidden])
         self.__new_widgets()
 
 
-
-
-    def __add_property_for_parameter(self,parameter_name,parameter,class_=False):
+    def __add_property_for_parameter(self,parameter_name,parameter):
         """
         Find the correct property type for the given parameter.
 
@@ -223,6 +205,10 @@ class ParametersFrame(Frame):
         a match is found. If no match is found, the Parameter just gets a
         textbox. 
         """
+        class_=False
+        if isinstance(self.parameterized_object,ParameterizedObjectMetaclass):
+            class_=True
+        
         # CEBHACKALERT: results in DynamicNumber being called and producing
         # a value, rather than displaying information about the dynamic number.
         value = getattr(self.parameterized_object,parameter_name)
@@ -369,6 +355,7 @@ class ParametersFrame(Frame):
 
         # CEBALERT: If the selected field is a class rather than an
         # object, then we can't handle it yet.
+        # In fact this test should be asling if it is a class!
         if not isinstance(obj, ParameterizedObject):
             raise NotImplementedError("Right-click editing for a class is not yet supported.") # ...because we have to clean the class vs object editing first.
         
