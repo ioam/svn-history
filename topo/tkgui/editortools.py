@@ -291,7 +291,7 @@ class ParametersTool(Frame):
         self.doc_label.config(text = doc)
 
         if focus_class:
-            self.parameter_frame.create_class_widgets(focus_class)
+            self.parameter_frame.create_widgets(focus_class)
 
             
             
