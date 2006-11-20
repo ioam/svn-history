@@ -1,0 +1,150 @@
+"""
+Based on lissom_or_noshrinking (homeostatic=True). Lateral connection strength is dependent on the activity of each unit.
+Model is based on models of surround modulation in which lateral connections can be either facilitatory or suppressive
+depending on the contrast of the input. This should be a simpler implementation of what happens in the laminar model.
+Local inhibition becomes active only when there is sufficient exciatory drive.
+
+Work in progress - form of Activity_dependent response function needs to be refined in order to match experimental data
+
+"""
+
+
+import Numeric
+import copy
+from Numeric import sum,ones,exp
+import RandomArray
+import fixedpoint
+
+from math import pi, sqrt
+from fixedpoint import FixedPoint
+
+import topo.patterns.basic
+import topo.patterns.random
+
+
+from topo.base.functionfamilies import ResponseFn, ResponseFnParameter
+from topo.sheets.lissom import LISSOM
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.projections.basic import CFProjection, SharedWeightCFProjection
+from topo.responsefns.optimized import CFPRF_DotProduct_opt, CFPRF_SharedWeightDotProduct_opt
+from topo.base.parameterclasses import DynamicNumber, Number
+from topo.base.cf import CFSheet, CFPResponseFn
+from topo.base.boundingregion import BoundingBox
+from topo.learningfns.optimized import CFPLF_Hebbian_opt
+from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.outputfns.basic import PiecewiseLinear
+from topo.misc.numbergenerators import UniformRandom
+from topo.outputfns.homeostatic import HomeostaticMaxEnt
+
+
+
+topo.sim.name = "homeo_lissom_or_noshrinking_latswitch"
+
+
+class Activity_based(CFPResponseFn):
+    """
+    Output function which calculates the activity of each unit individually based on the input activity, the weights and
+    strength which is a function of the input activity. This allows connections to have either an excitatory or inhibitory
+    strength which is dependent on the activity of the unit in question. 
+    The strength function is a generalized logistic curve (Richards' curve), a flexible function for specifying a nonlinear growth curve.
+    y = l + ( u /(1 + b exp(-r (x - 2m)) ^ (1 / b)) )
+
+    It has five parameters:
+
+    * l: the lower asymptote;
+    * u: the upper asymptote minus l;
+    * m: the time of maximum growth;
+    * r: the growth rate;
+    * b: affects near which asymptote maximum growth occurs.
+
+    Richards, F.J. 1959 A flexible growth function for empirical use. J. Experimental Botany 10: 290--300, 1959
+    http://en.wikipedia.org/wiki/Generalised_logistic_curve
+    
+    """
+
+    l = Number(default=-0.9,doc="Parameter controlling the lower asymptote")
+    u = Number(default=1.2,doc="Parameter controlling the upper asymptote (upper asymptote minus lower asymptote")
+    m = Number(default=0.1,doc="Parameter controlling the time of maximum growth.")
+    r = Number(default=-100,doc="Parameter controlling the growth rate.")
+    b = Number(default=1,doc="Parameter which affects near which asymptote maximum growth occurs")
+
+    def strength_fn(self,a,w,l,u,m,r,b):
+        s = a*w*(l + ( u /(1 + b*exp(-r *(a - 2*m))**(1 / b))))  
+        return Numeric.sum(s.flat)
+       
+  
+    def __call__(self, cfs, input_activity, activity, strength, **params): #The strength parameter is not used but is here to avoid errors
+        rows,cols = activity.shape
+        
+        strength_fn = self.strength_fn
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+                r1,r2,c1,c2 = cf.slice_array
+                X = input_activity[r1:r2,c1:c2]
+                activity[r,c] =  strength_fn(X,cf.weights,self.l, self.u, self.m, self.r, self.b)
+
+        
+
+
+input_pattern = topo.patterns.basic.Gaussian(
+          scale=1.0, size=2*0.0468, aspect_ratio=4.0,
+          x=DynamicNumber(UniformRandom(lbound=-0.775,ubound=0.775,seed=12)),
+          y=DynamicNumber(UniformRandom(lbound=-0.775,ubound=0.775,seed=34)),
+          orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+
+                                 
+# Specify weight initialization, response function, and learning function
+RandomArray.seed(500,500)
+CFProjection.weights_generator=topo.patterns.random.UniformRandom()
+CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
+CFProjection.response_fn=CFPRF_DotProduct_opt()
+CFProjection.learning_fn=CFPLF_Hebbian_opt()
+CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
+
+###########################################
+# build simulation
+
+topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
+                                  input_generator=input_pattern,
+                                  period=1.0, phase=0.05,
+                                  nominal_bounds=BoundingBox(radius=0.5+0.275))
+
+
+
+topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
+                        nominal_bounds=BoundingBox(radius=0.5),tsettle=9, 
+                        output_fn=HomeostaticMaxEnt(a_init=13, b_init=-4, eta=0.002, mu=0.01))
+
+
+
+
+topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
+                  connection_type=CFProjection,strength=1.0,name='Afferent',
+                  nominal_bounds_template=BoundingBox(radius=0.275),learning_rate=0.9590)
+
+topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
+                  connection_type=CFProjection,strength=0.9,
+                  nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0) 
+            
+topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='Lateral',
+                  connection_type=CFProjection, response_fn=Activity_based(),
+                  nominal_bounds_template=BoundingBox(radius=0.244),learning_rate=1.7871)
+
+### Actions scheduled to occur as the simulation proceeds.#
+
+
+topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
+
+
+### Schedule learning rate changes
+#
+topo.sim.schedule_command( 100,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.548')
+topo.sim.schedule_command( 1000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.274')
+topo.sim.schedule_command( 3000,'topo.sim["V1"].projections()["Afferent"].learning_rate=0.137')
+
+
+topo.sim.run(0)
+
+
+
