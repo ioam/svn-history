@@ -34,6 +34,7 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear
 from topo.misc.numbergenerators import UniformRandom
 from topo.outputfns.homeostatic import HomeostaticMaxEnt
+from topo.base.parameterclasses import Wrapper
 
 # Normally uses homeostatic plasticity, but can be called as
 #   ./topographica -c "homeostatic=False" ...
@@ -68,7 +69,7 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
                                   input_generator=input_pattern,
                                   period=1.0, phase=0.05,
-                                  nominal_bounds=BoundingBox(radius=0.5+0.275))
+                                  nominal_bounds=BoundingBox(radius=0.5+0.25))
 
 
 if homeostatic:
@@ -87,15 +88,22 @@ if not homeostatic:
 
 topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
                   connection_type=CFProjection,strength=1.0,name='Afferent',
-                  nominal_bounds_template=BoundingBox(radius=0.275),learning_rate=0.9590)
+                 weights_generator=topo.patterns.basic.Composite(operator=Wrapper("Numeric.multiply"),
+                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.271),
+                                                                             topo.patterns.random.UniformRandom()]),
+                  nominal_bounds_template=BoundingBox(radius=0.271),learning_rate=0.9590)
 
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                   connection_type=CFProjection,strength=0.9,
+                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=2*0.03),
                   nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0) 
             
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
                   connection_type=CFProjection,strength=-0.9,
-                  nominal_bounds_template=BoundingBox(radius=0.244),learning_rate=1.7871)
+                 weights_generator=topo.patterns.basic.Composite(operator=Wrapper("Numeric.multiply"),
+                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.229),
+                                                                             topo.patterns.random.UniformRandom()]),
+                  nominal_bounds_template=BoundingBox(radius=0.229),learning_rate=1.627)
 
 ### Actions scheduled to occur as the simulation proceeds.#
 
