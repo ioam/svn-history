@@ -69,9 +69,9 @@ class UniformRandom(RandomDistribution):
 class UniformRandomInt(RandomDistribution):
     """
     Specified with lbound and ubound; when called, return a random
-    number in the range [lbound, ubound).
+    number in the inclusive range [lbound, ubound].
 
-    See the random module for further details.    
+    See the randint function in the random module for further details.    
     """
     lbound = Number(default=0,doc="inclusive lower bound")
     ubound = Number(default=1000,doc="inclusive upper bound")
