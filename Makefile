@@ -3,8 +3,8 @@ PREFIX =  ${CURDIR}/
 PYLINT = bin/pylint --parseable=yes --required-attributes=__version__ --min-name-length=1 --notes=FIXME,XXX,TODO,ALERT --max-line-length=200 --disable-msg=C0324
 PYCHECKER = bin/pychecker
 
-RELEASE = 0.9.1
-RELEASE_TAG = release_0_9_1
+RELEASE = 0.9.2
+RELEASE_TAG = release_0_9_2
 
 TEST_VERBOSITY = 1
 
