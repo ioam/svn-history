@@ -51,22 +51,53 @@ class PiecewiseLinear(OutputFn):
 
 class Sigmoid(OutputFn):
     """ 
-    Sigmoidal (logistic) output function 1/(1+exp-(k*x+l)).
-
-    Definition taken from Mathworld, A Wolfram Web
-    Resource, http://mathworld.wolfram.com/SigmoidFunction.html.
-    Parameters k and l control the gradient (k) and the x-position (l)
-    of the exponential.
+    Sigmoidal (logistic) output function 1/(1+exp-(r*x+k)).
+    Parameters r and k control the growth rate (r) and the x-position (k)
+    of the exponential. As defined in Jochen Triesch,ICANN 2005, LNCS 3696 pp.65-70. 
+    
+    This function is also a special case of the Generalized Logistic function below with r=r l=0, u=1, m=-k/2r and b=1
+    Richards, F.J. 1959 A flexible growth function for empirical use. J. Experimental Botany 10: 290--300, 1959
+    http://en.wikipedia.org/wiki/Generalised_logistic_curve
+    
     """
-    k = Number(default=13,doc="Multiplicative parameter controlling the exponential.")
-    l = Number(default=-4,doc="Additive parameter controlling the exponential.")
+    r = Number(default=1,doc="Parameter controlling the growth rate")
+    k = Number(default=0,doc="Parameter controlling the x-postion")
     
     def __call__(self,x):
 
         x_orig = copy.copy(x)
         x *= 0.0
-	x += 1.0 / (1.0 + exp(-(self.k*x_orig + self.l)))
+	x += 1.0 / (1.0 + exp(-(self.r*x_orig+self.k)))
+                  
 
+class GeneralizedLogistic(OutputFn):
+    """ 
+    The generalized logistic curve (Richards' curve), flexible function for specifying a nonlinear growth curve.
+    y = l + ( u /(1 + b exp(-r (x - 2m)) ^ (1 / b)) )
+
+    It has five parameters:
+
+    * l: the lower asymptote;
+    * u: the upper asymptote minus l;
+    * m: the time of maximum growth;
+    * r: the growth rate;
+    * b: affects near which asymptote maximum growth occurs.
+
+    Richards, F.J. 1959 A flexible growth function for empirical use. J. Experimental Botany 10: 290--300, 1959
+    http://en.wikipedia.org/wiki/Generalised_logistic_curve
+
+    """
+    l = Number(default=1,doc="Parameter controlling the lower asymptote")
+    u = Number(default=1,doc="Parameter controlling the upper asymptote (upper asymptote minus lower asymptote")
+    m = Number(default=1,doc="Parameter controlling the time of maximum growth.")
+    r = Number(default=1,doc="Parameter controlling the growth rate.")
+    b = Number(default=1,doc="Parameter which affects near which asymptote maximum growth occurs")
+    
+    def __call__(self,x):
+        
+        x_orig = copy.copy(x)
+        x *= 0.0
+        x += self.l + ( self.u /(1 + self.b*exp(-self.r *(x_orig - 2*self.m))**(1 / self.b)) )    
 
 
 class DivisiveNormalizeL1(OutputFn):
@@ -190,4 +221,6 @@ class BinaryThreshold(OutputFn):
         above_threshold = x>=self.threshold
         x *= 0.0
         x += above_threshold
+
+
 
