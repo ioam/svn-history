@@ -36,23 +36,20 @@
 <i>
 <b>News:</b>
 
-<p><b>02 November 06:</b> Some users have reported problems when using
-optimized code on systems with the most recent GCC 4.1.x C/C++
-compilers.  We have added a patch to the included weave
-inline-compilation package that should fix the problem, currently
-available only on the most recent CVS version of Topographica.
-Affected users may need to do a <A target="_top"                                                                  
-href="../Downloads/cvs.html">CVS</A> update, then "make -C external
-weave-uninstall ; make".  These changes will be included in the next
-official release.
-
-<p><b>23 July 06:</b> Version 0.9.1
-<A target="_top" href="../Downloads/index.html">released</A>.
-This is a bugfix release only, upgrading the included Tcl/Tk package
-to correct a syntax error in its configure script, which had
-been preventing compilation on platforms using bash 3.1 (such as
-Ubuntu 6.06).  There is no benefit to updating if 0.9.0 already runs
-on your platform.
+<p><b>22 November 06:</b> Version 0.9.2
+<A target="_top" href="../Downloads/index.html">released</A>, including
+numerous bugfixes (including fixing weave to work with GCC 4.1.x),
+much more complete user manual,
+more usable reference manual,
+more sample models,
+flexible joint normalization across Projections,
+arbitrary control of mapping CF centers (see CoordinateMapperFn),
+Composite and Selector patterns to allow flexible combinations of input patterns,
+homeostatic learning and output functions,
+sigmoid and generalized logistic output functions,
+and a new disparity map example (including a 
+random dot stereogram input pattern).
+<!-- Choice class to select randomly from a list of choices -->
 
 <p><b>07 June 06:</b> Version 0.9.0
 <A target="_top" href="../Downloads/index.html">released</A>, including 
@@ -83,29 +80,6 @@ computational maps, a review of visual cortex models, and <A
 target="_top" HREF="http://computationalmaps.org/docs/chapter5.pdf">an
 extended set of examples of the types of models supported by
 Topographica</a>.
-
-<p><b>20 February 06:</b> Version 0.8.2 released, including numerous
-bugfixes, 
-circular receptive fields,
-shared-weight projections,
-<A TARGET="_top" href="../Tutorials/lissom_oo_or.html">tutorial with ON/OFF LGN model</A>,
-<A TARGET="_top" href="../Tutorials/som_retinotopy.html">SOM retinotopy tutorial</A>,
-Euclidean-distance-based response and learning functions,
-density-independent SOM parameters,
-<A TARGET="_top" href="../Downloads/cvs.html#osx">Mac OS X instructions</A>,
-<A TARGET="_top" href="../Developer_Manual/index.html">developer manual</A>,
-<A TARGET="_top" href="../User_Manual/index.html">partial user manual</A>,
-much-improved 
-<A target="_top" href="../images/060220_model_editor_screen_shot.png">model editor</A>,
-<A TARGET="_top" href="../User_Manual/commandline.html#pylab">generic Matlab-style plotting</A>,
-topographic grid plotting,
-RGB plots,
-user-controllable plot sorting,
-plot color keys,
-<!-- Normally distributed random PatternGenerator, -->
-and progress reports during learning.  See the 
-<A target="_top" href="../images/060220_topographica_screen_shot.png">Linux screenshot</A>.
-
 
 <p><A target="_top" href="../Home/oldnews.html"><i>Older news</i></A>
 </i>
