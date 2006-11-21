@@ -339,11 +339,10 @@ class TopoConsole(Frame):
 
 
 
-        
+
         #
         # Command entry
         #
-
         ### Make a Frame inside of which is a Pmw.Group, with a tag
         ### that incorporates a checkbutton. Deselecting the
         ### checkbutton empties the frame of the widgets (see
@@ -664,7 +663,7 @@ class TopoConsole(Frame):
         recenttimes=[]
 
         # Temporary:
-        #self.parent.title(topo.sim.name) ## this changes the title bar to more useful
+        self.parent.title(topo.sim.name) ## this changes the title bar to more useful
 
         ## Duration of most recent times from which to estimate remaining time
         estimate_interval=50.0
