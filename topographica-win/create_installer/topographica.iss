@@ -8,7 +8,7 @@
 
 [Setup]
 AppName=Topographica
-AppVerName=Topographica 0.9.1
+AppVerName=Topographica 0.9.2
 AppPublisher=Topographica development team
 AppPublisherURL=http://www.topographica.org
 AppSupportURL=http://www.topographica.org
