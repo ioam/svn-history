@@ -130,7 +130,7 @@ that could be relevant for a model.
     </ul>
 </ul>
 
-<P>The actual EventProcessors in most Topographica simulations are
+<P>The actual EventProcessors in most current Topographica simulations are
 typically of type <?php classref('topo.base.sheet','Sheet')?>.  A
 Sheet is a specific type of EventProcessor that occupies a finite 2D
 region of the continuous plane, allows indexing of this region using
@@ -295,7 +295,7 @@ of the input and output activity values, but there are many variants.
 <P>A family of learning functions that works on an entire CFProjection
 at once is also available (CFPLearningFn).  These functions can be
 optimized heavily, and can do such things as basing the activity
-on the single best-responding unit in a Sheet (as in a SOM).
+on the single best-responding unit in a Sheet (as in a Kohonen SOM).
 
 
 
