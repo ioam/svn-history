@@ -124,6 +124,54 @@ at the sheet level is crucial to the simulator design, because it
 allows user parameters, model specifications, and interfaces to be
 independent of the details of how each sheet is implemented.
 
+<!-- Should integrate this figure in:
+<pre>
+images/000516_or_map_16MB.020000.or.pdf  48x48
+images/000516_or_map_32MB.020000.or.pdf  64x64
+images/000516_or_map_128MB.020000.or.pdf 96x96
+images/000516_or_map_512MB.020000.or.pdf 144x144
+</pre>
+<P>Orientation map scaling:
+    Four LISSOM orientation maps from networks of different sizes
+    are shown; the parameters for each network were calculated using
+    the scaling equations from m4_bib2html_cite_named(bednar:neuroinformatics04,[[(Bednar et al. 2004]]).  The size
+    of the network in the number of connections ranged from $2\times
+    10^7$ to $1\times 10^9$ (7 megabytes to 480 megabytes of
+    simulation memory), and the simulation time ranged from ten
+    minutes to four hours on the same machine, a single-processor 
+    600MHz Pentium III with 1024 megabytes of RAM.  %3:54
+    (Much larger simulations on the massively parallel Cray T3E
+    supercomputer perform similarly.)  Despite this wide range of
+    simulation scales, the final map organizations are both
+    qualitatively and quantitatively similar, as long as the sheet size
+    is above a certain minimum for the map type.
+
+<P>After exploring the behavior of the small network, the larger one can
+then be simulated on a supercomputer, using the same software, and
+without requiring a parameter search.  All Topographica parameters
+are specified in units that are independent of the density of the
+modeled regions, and thus the density can be changed at any time.
+
+<P>This rapid scaleup capability means that Topographica can be
+used to obtain meaningful results in just a few minutes using a
+personal computer, yet those results can be translated easily to a
+large, densely sampled network on a larger machine.  In addition,
+unlike neuron-level simulators, which will require much technological
+progress before simulating a large brain area will be practical,
+Topographica can already simulate all of human V1 (one of the largest
+visual areas) at the single-column level on practical workstations
+m4_bib2html_cite_named(bednar:neuroinformatics04,[[(Bednar et al. 2004]]). 
+With increases in computing power, even multiple
+cortical areas should become practical at the single-column level in
+the near future.  The underlying scaling equations
+also provide an easy trade-off between resolution and total size or
+complexity, which makes it easy to focus on particular levels of
+analysis, such as long-term organization or short-time-scale behavior.
+They will also help calibrate the simulation parameters
+of small networks with experimental measurements in larger
+preparations. 
+-->
+
 <P>As a result, the user can easily trade off between simulation detail
 and computational requirements, depending on the specific phenomena
 under study in a given simulator run.  (See
@@ -146,6 +194,16 @@ simulate specific phenomena.  We plan for these models to be
 implemented using interfaces to existing low-level simulators such as
 NEURON and GENESIS.
 
+<!-- Could work this in:
+<P> Starting point:
+<P>  1) existing model, want to make a change, or
+<P>  2) biological system, want to model it
+<br>      - Need to choose sheets, projections, properties from existing list, then
+<br>      - Need to analyze how it behaves (plotting, statistics, etc.), then
+<br>      - Depending on how well it fills the needs, need to be able to add
+<br>          new primitives or edit existing ones
+<br>      - Produce figures, tables, etc. for publication
+-->
 
 <H2>Software architecture and implementation</H2>
 
