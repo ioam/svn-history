@@ -8,32 +8,14 @@ please feel free to volunteer!!!!). Dates indicate the item was first
 added to the list, or a change was made.
 </small>
 
-<h3>Tasks to be addressed for the upcoming 0.9.2 release:</h3>
+<h3>Tasks to be addressed soon after the upcoming 0.9.2 release:</h3>
 
 <ul>
 
-
 <li>
-2006/11/09 (FD): Under Windows, the model editor will sometimes report
-a problem when it is first opened, but if it is reopened the problem
-goes away.
+2006/11/09 (CP): Add automatic assignment of topo.sim.name, by taking
+the base name of the first .ty file in sys.argv (if any).
 </li>
-
-<li>
-2006/11/09 (CP): The simulation name should be displayed in the
-console window, not just the other windows.  Could also put in
-automatic assignment of topo.sim.name, by taking the base name of the
-first .ty file in sys.argv (if any).
-</li>
-
-
-</ul>
-
-
-<h3>Tasks to be addressed soon after 0.9.2:</h3>
-
-<ul>
-
 
 <li>
 2006/07/07 (CP): Fix normalization to allow negative weights.  Also
