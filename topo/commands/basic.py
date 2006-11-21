@@ -122,7 +122,7 @@ def save_snapshot(snapshot_name):
         # there's classes and functions...what else?
         if isinstance(v,type) or isinstance(v,types.FunctionType):
             if v.__module__ == "__main__":
-                ParameterizedObject().warning("%s (type %s) has source in __main__; it will not be found on unpickling."%(k,type(v)))
+                ParameterizedObject().warning("%s (type %s) has source in __main__; it will only be found on unpickling if the class is explicitly defined (e.g. by running the same script first) before unpickling."%(k,type(v)))
 
 
     ### Get ParameterizedObject class attributes
