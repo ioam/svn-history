@@ -35,6 +35,7 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear
 from topo.misc.numbergenerators import UniformRandom
 from topo.outputfns.homeostatic import HomeostaticMaxEnt
+from topo.base.parameterclasses import Wrapper
 
 
 
@@ -43,7 +44,7 @@ topo.sim.name = "homeo_lissom_or_noshrinking_latswitch"
 
 class Activity_based(CFPResponseFn):
     """
-    Output function which calculates the activity of each unit individually based on the input activity, the weights and
+    Response function which calculates the activity of each unit individually based on the input activity, the weights and
     strength which is a function of the input activity. This allows connections to have either an excitatory or inhibitory
     strength which is dependent on the activity of the unit in question. 
     The strength function is a generalized logistic curve (Richards' curve), a flexible function for specifying a nonlinear growth curve.
@@ -108,7 +109,7 @@ CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
                                   input_generator=input_pattern,
                                   period=1.0, phase=0.05,
-                                  nominal_bounds=BoundingBox(radius=0.5+0.275))
+                                  nominal_bounds=BoundingBox(radius=0.5+0.25))
 
 
 
@@ -116,20 +117,26 @@ topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
                         nominal_bounds=BoundingBox(radius=0.5),tsettle=9, 
                         output_fn=HomeostaticMaxEnt(a_init=13, b_init=-4, eta=0.002, mu=0.01))
 
-
-
-
 topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
                   connection_type=CFProjection,strength=1.0,name='Afferent',
-                  nominal_bounds_template=BoundingBox(radius=0.275),learning_rate=0.9590)
+                 weights_generator=topo.patterns.basic.Composite(operator=Wrapper("Numeric.multiply"),
+                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.271),
+                                                                             topo.patterns.random.UniformRandom()]),
+                  nominal_bounds_template=BoundingBox(radius=0.271),learning_rate=0.9590)
 
 topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralExcitatory',
                   connection_type=CFProjection,strength=0.9,
+                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=2*0.03),
                   nominal_bounds_template=BoundingBox(radius=0.03),learning_rate=0) 
             
-topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='Lateral',
-                  connection_type=CFProjection, response_fn=Activity_based(),
-                  nominal_bounds_template=BoundingBox(radius=0.244),learning_rate=1.7871)
+topo.sim.connect('V1','V1',delay=FixedPoint("0.05"),name='LateralInhibitory',
+                  connection_type=CFProjection,response_fn=Activity_based(),
+                 weights_generator=topo.patterns.basic.Composite(operator=Wrapper("Numeric.multiply"),
+                                                                 generators=[Gaussian(aspect_ratio=1.0, size=2*0.229),
+                                                                             topo.patterns.random.UniformRandom()]),
+                  nominal_bounds_template=BoundingBox(radius=0.229),learning_rate=1.627)
+
+
 
 ### Actions scheduled to occur as the simulation proceeds.#
 

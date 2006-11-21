@@ -1,9 +1,8 @@
 """
 Two layer model with one inhibitory and one excitatory sheet.
 Recurrent short range connections between sheets, long range excitation and short range inhibition
-Based on lissom_or_noshrinking with homeostatic plasticity  - work in progress.
+Based on lissom_or_noshrinking - work in progress.
 Has homeostatic plasticity of Excitatory units (updated at each settling step),a sigmoid output function for inhibitory units and no shrinking of excitatory connections.
-Also need to change name!!
 """
 
 import RandomArray
@@ -28,7 +27,7 @@ from topo.base.boundingregion import BoundingBox
 from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 from topo.outputfns.basic import PiecewiseLinear
-from topo.outputfns.basic import Sigmoid
+from topo.outputfns.basic import GeneralizedLogistic, Sigmoid
 from topo.outputfns.homeostatic import HomeostaticMaxEnt
 from topo.misc.numbergenerators import UniformRandom
 from topo.base.parameterclasses import Wrapper
@@ -48,7 +47,6 @@ input_pattern = topo.patterns.basic.Gaussian(
 # Specify weight initialization, response function, and learning function
 RandomArray.seed(500,500)
 CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
-CFProjection.weights_generator=topo.patterns.random.UniformRandom()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
 CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
@@ -67,45 +65,52 @@ topo.sim['V1Exc'] =  LISSOM(nominal_density=locals().get('default_density',48.0)
                             output_fn=HomeostaticMaxEnt(eta=0.0013, mu=0.01,a_init=13, b_init=-4))
 topo.sim['V1Inh'] =  LISSOM(nominal_density=locals().get('default_density',48.0),
                             nominal_bounds=BoundingBox(radius=0.5),tsettle=14,
-                            output_fn=Sigmoid(a_init=13, b_init=-4))
+                            output_fn=Sigmoid(r=13, k=-4))
 
 
 
 topo.sim.connect('Retina','V1Exc', delay = FixedPoint("0.10",4),
                  connection_type=CFProjection,strength=1.0,name='AfferentEx',
+                 weights_generator=topo.patterns.basic.Composite(operator=Wrapper("Numeric.multiply"),
+                                                             generators=[Gaussian(aspect_ratio=1.0, size=2*0.271),
+                                                                         topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template=BoundingBox(radius=0.271),learning_rate=0.959)
 
 
 topo.sim.connect('V1Exc','V1Exc', delay = FixedPoint("0.05",4),
-                 connection_type=CFProjection,strength = 0.9, name='LateralExcitatory_local',
-                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.04),
+                 connection_type=CFProjection,strength = 0.75, name='LateralExcitatory_local',
+                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=2*0.03),
                  nominal_bounds_template=BoundingBox(radius=0.03),
                  learning_rate=0)
 
 topo.sim.connect('V1Exc','V1Exc', delay = FixedPoint("0.05",4),
                  connection_type=CFProjection,strength = 0.1, name='LateralExcitatory',
-                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=2*0.477),
+                 weights_generator=topo.patterns.basic.Composite(operator=Wrapper("Numeric.multiply"),
+                                                             generators=[Gaussian(aspect_ratio=1.0, size=2*0.229),
+                                                                         topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template =BoundingBox(radius=0.229),
                  learning_rate=1.627)
 
 topo.sim.connect('V1Exc','V1Inh', delay = FixedPoint("0.05",4),
                  connection_type=CFProjection,strength = 0.5, name='V1Exc_to_V1Inh_local',
-                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.04),
+                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=2*0.03),
                  nominal_bounds_template = BoundingBox(radius=0.03),learning_rate=0)
 
 topo.sim.connect('V1Exc','V1Inh', delay = FixedPoint("0.05",4),
-                 connection_type=CFProjection,strength = 2.0, name='V1Exc_to_V1Inh',
-                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=2*0.477),
+                 connection_type=CFProjection,strength = 1.3, name='V1Exc_to_V1Inh',
+                 weights_generator=topo.patterns.basic.Composite(operator=Wrapper("Numeric.multiply"),
+                                                             generators=[Gaussian(aspect_ratio=1.0, size=2*0.229),
+                                                                         topo.patterns.random.UniformRandom()]),
                  nominal_bounds_template = BoundingBox(radius=0.229),learning_rate=1.627)
 
 topo.sim.connect('V1Inh','V1Exc', delay = FixedPoint("0.05",4),
                  connection_type=CFProjection,strength=-0.4, name='V1Inh_to_V1Exc',
-                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.04),
+                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=2*0.03),
                  nominal_bounds_template = BoundingBox(radius=0.03),learning_rate=0)
 
 topo.sim.connect('V1Inh','V1Inh', delay = FixedPoint("0.05",4),
                  connection_type=CFProjection,strength=-0.4, name='V1Inh_to_V1Inh',
-                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=0.04),
+                 weights_generator=topo.patterns.basic.Gaussian(aspect_ratio=1.0, size=2*0.03),
                  nominal_bounds_template = BoundingBox(radius=0.03),learning_rate=0)
 
 ### Actions scheduled to occur as the simulation proceeds.#
