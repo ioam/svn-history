@@ -12,23 +12,11 @@ added to the list, or a change was made.
 
 <ul>
 
-<li>
-2006/11/09 (JL/CP): Subtle bug in orientation map measurement for
-LISSOM maps -- the maps differ very slightly (but measurably)
-depending on the order in which the test patterns are presented.
-Appears to be due to the way settling iterations are counted and
-reset.
-</li>
 
 <li>
 2006/11/09 (FD): Under Windows, the model editor will sometimes report
 a problem when it is first opened, but if it is reopened the problem
 goes away.
-</li>
-
-<li>
-2006/11/09 (JL): In certain cases, the plot history of plot windows 
-is lost.
 </li>
 
 <li>
@@ -38,14 +26,8 @@ automatic assignment of topo.sim.name, by taking the base name of the
 first .ty file in sys.argv (if any).
 </li>
 
-<li>
-2006/11/09 (JL): If a Projection plot window has been opened,
-subsequent Projection Activity windows show only that Projection,
-but should show all Projections.
-</li>
 
 </ul>
-
 
 
 <h3>Tasks to be addressed soon after 0.9.2:</h3>
