@@ -279,6 +279,201 @@ Otherwise, save_snapshot and load_snapshot could specifically avoid items.
 </ul>
 
 
+<h3>Things to get to eventually</h3>
+<ul>
+
+<li>
+2005/01/01: Should add simple timing functions -- what was the total
+time to run?  What components are taking a long time to run?  Guide
+the user for optimization, focusing on the components we expect to be
+the bottlenecks.
+</li>
+
+<!--
+<li>
+2005/01/01: Could add a web site with results of unit tests, updated nightly
+</li>
+-->
+
+<li>
+2005/01/01: Could consider using or taking components from: SciPy,
+ScientificPython, Chaco, Pyro (the robotics package), g, logger
+(instead of our custom messaging functions).
+</li>
+
+<li>
+2005/01/01: Should add support for additive or multiplicative noise, with
+many possible places it could be added.
+<!-- Also suggested by Geisler, 7/1/2005:
+  Package as a Matlab toolbox to get the right people to use it?
+  Package it as an easy-to-use out-of-the-box optical imaging simulator
+    -- need to tell it what stimulus, what eccentricity, what cortical patch
+  Be able to look at the effects of attention
+  Add specific models for intrinsic or voltage-sensitive-dye imaging 
+-->
+</li>
+
+<li>
+2005/01/01: Add a mechanism to group Sheets into a logical unit for
+plotting, analysis, etc.  For instance, it should be possible to group
+three R,G,B sheets into one eye, two ON and OFF sheets into one LGN
+area, and several V1 layers into one stack.  Such grouping should
+support e.g. presenting a color bitmap to an Eye instead of to R, G,
+and B separately, plotting the resulting activation from the three
+areas in true color, combining ON and OFF plots into one bitmap (by
+subtraction), and measuring a vertically summed orientation map for a
+model using several layers.
+</li>
+
+<li>
+2005/01/01: Finish porting all categories of simulations from parts II
+and III of the LISSOM book (i.e. orientation maps, ocular dominance
+maps, direction maps, combined maps, face maps, and two-level maps) to
+Topographica.
+</li>
+
+<!-- From Tue Sep  6 15:32:25 BST 2005 meeting with Eyal
+
+Major issues
+____________
+
+Overall, the documentation and software need to separate 'Learning and
+self-organization' from 'Representing signals in topographic maps' and
+'Understanding topographic maps'.
+
+Should allow the user to specify the parameters and network setup
+themselves, instead of having a learned map.  (E.g. select tuning
+width, connection types, etc.)
+
+It should also be possible to import a map measured in the lab into
+Topographica, then allow the user to try it out by synthesizing a
+network based on that data.
+
+More ambitiously, could start out with the above rough sketch of a
+network, then auto-optimize parameters to match a set of behavioral
+observations. Longer-term project; will need ways to explore the
+space of possible models matching those observations.
+
+In general, it would be useful to start with a set of observations,
+and select parameters that match that. 
+
+Should be able to specify (parametrically?) the tuning properties, and
+of course measure and display those.
+
+Need to have some representation of receptive fields, mapped onto
+actual size units in the world.
+
+Need to be able to map things to millimeters of cortex, and degrees of
+visual angle.  E.g. need to be able to map measured locations in the
+visual cortex into the model, or even map the measured retinotopic
+grid directly into the model.
+
+Color lookup tables for plotting: user needs to pick them, and need
+to have keys shown as a color bar.  Also needs to control the
+baseline, clipping range, etc. and to have a clipping warning light.
+
+For Eyal's work, adding realistic dynamics is key, including being
+able to control the time course, e.g. with various delays.  E.g. it
+would be great to have a movie showing the time course of an
+activation.  Usually they look at an array of activation patterns, 10
+images per row, and then average groups of e.g. 10 frames or subsample
+them.  They would usually want to simulate to match the measurement
+interval, e.g. 100 Hz, then average for display...
+
+Should study how to add noise to the system.  Both neural noise and
+measurement noise are important, including e.g. spatial correlations
+(due to lateral connections or feedback?) in spontaneous or evoked
+activity, and e.g. how they vary with different assumptions about the
+connectivity.
+
+In general, it's an open issue how to have a network with a good
+dynamic range but still stable, given background levels of activity,
+spontaneous activity in darkness, etc.; will be worth studying.
+
+
+Less crucial points
+___________________
+
+For the display, will be useful to have the units displayed on screen,
+etc.
+
+For plotting styles, check Shmuel and Grinvald and Fitzpatrick lab
+(e.g. does anyone else have OR-colored activity patterns?).
+
+Array of curves plots:
+If they start with an image of 1000x1000 pixels, they bin the data to
+100x100 pixel blocks, then plot the average time course of the
+response, as a single curve for each condition (x is time, y is change
+in fluorescence).  Then each of 100 panels will show 5 or 6 different
+curves for different experimental conditions.  (Similar to EEG data --
+shows spatial location of small differences between conditions.)
+
+Need good plots of receptive fields -- with the location and size
+plotted on the retina.
+
+Minor points for the tutorial:
+
+   When we show the plots, we have white outlines around the lateral
+   connections, but don't ever explain them. (easily fixed)
+  
+   Should show a color bar, and allow user to modify the clipping
+   range, etc. (not likely to be fixed in LISSOM, but will be done in
+   Topographica).
+  
+   Explain some of the parameters better (should be easily fixed)
+
+
+Need to add color keys to the Preference Map panels, e.g. by having a
+slot for it in the template.
+
+_______________________________________________________________________________
+
+More Eyal comments:
+
+Need to specify what each 'neuron' in the simulation represents.
+How many simulated 'neurons' per simulated 'column'?
+
+Why are the lateral excitatory connections so limited and fixed?
+
+It would be nice to include moving stimuli (drifting gratings, random dots etc.)
+
+Display issues;
+  
+  1) Model editor - not clear how to interpret; how to modify;
+
+  2) State that each little plot in the projection plot shows only the
+     connection field of the neuron, not the entire set of afferents from the retina.
+
+  3)      Suggestions for Test pattern window
+  a. contrast (0-100%) instead of scale
+  b. mean luminance (0-1) instead of offset
+  c. Change units for orientation to deg
+
+  (Part of our general project of allowing
+   user-configurable units. I think that's is the only way to do things
+   like this, because the simulator is not limited to vision only, and so
+   the underlying units have to be very general.)
+
+Minor
+  
+3) Say in the tutorial that orientation maps look funny around the
+edges, because of the effects of having lateral connections 
+that are cut in half at that border.
+
+To figure out:
+
+4) There is no response in V1 to a small square despite a strong
+   response in the retina. Does the response get canceled by the
+   lateral inhibition?
+
+5) At point 9 in the tutorial, when I press the Normalize toggle I get
+   strange activity pattern in the retina and V1 and when I press the
+   Normalize toggle again it does not revert to the old response.
+-->
+
+</ul>
+
+
 <h3>Other work</h3>
 
 Ongoing work with uncertain finishing times.
