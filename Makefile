@@ -151,7 +151,17 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} examples/laminar_lissom.ty
 #@@	   ${RM} examples/laminar_nolearning.ty
 #@@	   ${RM} examples/leaky_lissom_or.ty
+#@@	   ${RM} examples/lissom_oo_od.ty
+#@@	   ${RM} examples/lissom_oo_or_dy_photo.ty
+#@@	   ${RM} examples/lissom_oo_or_homeomaxent.ty
+#@@	   ${RM} examples/lissom_or_homeomaxent.ty
+#@@	   ${RM} examples/lissom_or_homeoscale.ty
+#@@	   ${RM} examples/lissom_or_noshrinking.ty
+#@@	   ${RM} examples/lissom_or_noshrinking_latswitch.ty
 #@@	   ${RM} examples/lissom_or_sf.ty
+#@@	   ${RM} examples/ohzawa_science90.ty
+#@@	   ${RM} examples/sullivan_neurocomputing04.ty
+#@@	   ${RM} examples/sullivan_neurocomputing06.ty
 #@@	   ${RM} examples/tiny.ty
 #@@	   ${RM} -r tmp/
 #@@	   ${RM} -r CVS */CVS */*/CVS */*/*/CVS
