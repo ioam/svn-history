@@ -369,128 +369,92 @@ wt_dp = 5
 
 comparisons = locals().get('comparisons',False)
 plots = locals().get('plots',True)
+matching = {}
+
+def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_shape,unit,sheet,conn):
+
+    comparing_what = conn + " " + str(unit) + " t=" + str(topo.sim.time()) 
+
+    topo_weights = topo.sim[sheet].projections()[conn].cf(*unit).weights
+    c_weights = get_matrix(c_matrix_filename,c_sheet_shape)[c_row_slice,c_col_slice] # c++ lissom doesn't situate weights  
+
+    match = compare_elements(topo_weights,c_weights,wt_dp,comparing_what)
+
+    if plots and not match:
+        matrixplot(topo_weights,title="topo "+comparing_what)
+        matrixplot(c_Ganglia00_afferent,title="c++ "+comparing_what)
+
+    matching[comparing_what] = match
+
+
+
 
 if comparisons:
 
-    matching_results = {}
 
 
-    print "** Compare C++ LISSOM and Topograhica weights:"
+    ### INITIAL WEIGHTS COMPARISONS
+    #
+    
 
     # CEBHACKALERT: the shared weight is similar, but does not match exactly.
     # Using one gaussian (rather than DoG), it doesn't match exactly either.
     # Using a solid disk, though (e.g. see retina_lgn_match.ty), the match is very close.
 
-    print "...** LGNOn weights..."
-    i,j=0,0
-    topo_LGNOn_weights = topo.sim['LGNOn'].in_connections[0].cf(i,j).weights
-    c_Ganglia00_afferent = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Ganglia00.Afferent0.000_000.matrix',(RN,RN)) 
-    c_Ganglia00_afferent = c_Ganglia00_afferent[0:19,0:19] # c++ lissom doesn't situate weights
-
-    matching_results["RetinaToLGNOn weights"] = compare_elements(topo_LGNOn_weights,c_Ganglia00_afferent,wt_dp,"LGNOn weights")
-
-    if plots and not matching_results["RetinaToLGNOn weights"]:
-        matrixplot(topo_LGNOn_weights,title="topo LGNOn afferents")
-        matrixplot(c_Ganglia00_afferent,title="c++ Ganglia00 Afferents")
+    compare_weights(
+        'topo/tests/reference/oo_or_map_topo.000000.wts.Ganglia00.Afferent0.000_000.matrix',
+        slice(0,19),slice(0,19),(RN,RN),
+        (0,0),'LGNOn','RetinaToLGNOn')
 
 
+    compare_weights(
+        'topo/tests/reference/oo_or_map_topo.000000.wts.Primary.Afferent00.000_000.matrix', 
+        slice(1,14),slice(1,14),(LN,LN),
+        (0,0),'V1','LGNOnAfferent')
 
-    print "...** LGNOn-V1 unit 0 0..."
-    i,j=0,0
-    topo_LGNOnToV1_0_0 = topo.sim['V1'].in_connections[0].cf(i,j).weights
-    c_Primary_Afferent00_0_0 = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Primary.Afferent00.000_000.matrix',(LN,LN)) 
-    c_Primary_Afferent00_0_0 = c_Primary_Afferent00_0_0[1:14,1:14] # c++ lissom doesn't situate weights
-
-    matching_results["LGNOnToV1 weights 0,0 t=0"] = compare_elements(topo_LGNOnToV1_0_0,c_Primary_Afferent00_0_0,wt_dp,"LGNOnToV1_0_0 weights")
-
-    if plots and not matching_results["LGNOnToV1 weights 0,0 t=0"]:
-        matrixplot(topo_LGNOnToV1_0_0,title="topo LGNOnToV1 0 0");
-        matrixplot(c_Primary_Afferent00_0_0,title="c++ Primary Afferent00 0 0")
-
-
-
-    print "...** LGNOn-V1 unit 23 23..."
-    i,j=23,23
-    topo_LGNOnToV1_23_23 = topo.sim['V1'].in_connections[0].cf(i,j).weights
-    c_Primary_Afferent00_23_23 = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Primary.Afferent00.023_023.matrix',(LN,LN)) 
-    c_Primary_Afferent00_23_23 = c_Primary_Afferent00_23_23[12:25,12:25] # c++ lissom doesn't situate weights
-
-    matching_results["LGNOnToV1 weights 23,23 t=0"] = compare_elements(topo_LGNOnToV1_23_23,c_Primary_Afferent00_23_23,wt_dp,"LGNOnToV1_23_23 weights")
-
-    if plots and not matching_results["LGNOnToV1 weights 23,23 t=0"]:
-        matrixplot(topo_LGNOnToV1_23_23,title="Topo LGNOnToV1 23 23")
-        matrixplot(c_Primary_Afferent00_23_23,title="c++ Primary Afferent00 23 23")
-
+    compare_weights(
+        'topo/tests/reference/oo_or_map_topo.000000.wts.Primary.Afferent00.023_023.matrix', 
+        slice(12,25),slice(12,25),(LN,LN),
+        (23,23),'V1','LGNOnAfferent')
 
 
     #oo_or_map_topo.000000.wts.Primary.Afferent01.000_000.matrix
 
+    compare_weights(
+        'topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralExcitatory.000_000.matrix',
+        slice(0,5),slice(0,5),(BaseN,BaseN),
+        (0,0),'V1','LateralExcitatory')
 
-    print "...** V1-V1 excitatory unit 0 0... "
-    i,j=0,0
-    topo_LatExc_weights = topo.sim['V1'].in_connections[2].cf(i,j).weights
-    c_Primary_LatExc = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralExcitatory.000_000.matrix',(BaseN,BaseN)) 
-    c_Primary_LatExc = c_Primary_LatExc[0:5,0:5] # c++ lissom doesn't situate weights
-
-    matching_results["LateralExcitatory weights 0,0 t=0"] = compare_elements(topo_LatExc_weights,c_Primary_LatExc,wt_dp,"LateralExcitatory 0 0")
-
-    if plots and not matching_results["LateralExcitatory weights 0,0 t=0"]:
-        matrixplot(topo_LatExc_weights,title="topo V1 LatExc 0,0")
-        matrixplot(c_Primary_LatExc,title="c++ Primary LatExc 0,0")
+    compare_weights(
+        'topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralExcitatory.023_023.matrix',
+        slice(19,28),slice(19,28),(BaseN,BaseN),
+        (23,23),'V1','LateralExcitatory')
 
 
+    compare_weights(
+        'topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralInhibitory.000_000.matrix',
+        slice(0,12),slice(0,12),(BaseN,BaseN),
+        (0,0),'V1','LateralInhibitory')
 
-    print "...** V1-V1 excitatory unit 23 23... "
-    i,j=23,23
-    topo_LatExc_23_23 = topo.sim['V1'].in_connections[2].cf(i,j).weights
-    c_Primary_LatExc_23_23 = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralExcitatory.023_023.matrix',(BaseN,BaseN)) 
-    c_Primary_LatExc_23_23 = c_Primary_LatExc_23_23[19:28,19:28] # c++ lissom doesn't situate weights
-
-    matching_results["LateralExcitatory weights 23,23 t=0"] = compare_elements(topo_LatExc_23_23,c_Primary_LatExc_23_23,wt_dp,"LateralExcitatory 23 23 t=0")
-
-    if plots and not matching_results["LateralExcitatory weights 23,23 t=0"]:
-        matrixplot(topo_LatExc_23_23,title="topo V1 LatExc 23,23")
-        matrixplot(c_Primary_LatExc_23_23,title="c++ Primary LatExc 23,23")
-
-
-
-    print "...** V1-V1 inhibitory unit 0 0..."
-    i,j=0,0
-    topo_LatInh_weights = topo.sim['V1'].in_connections[3].cf(i,j).weights
-    c_Primary_LatInh = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralInhibitory.000_000.matrix',(BaseN,BaseN)) 
-    c_Primary_LatInh = c_Primary_LatInh[0:12,0:12] # c++ lissom doesn't situate weights
-
-    matching_results["LateralInhibitory weights 0,0 t=0"] = compare_elements(topo_LatInh_weights,c_Primary_LatInh,wt_dp,"LateralInhibitory 0 0")
-
-    if plots and not matching_results["LateralInhibitory weights 0,0 t=0"]:
-        matrixplot(topo_LatInh_weights,title="Topo V1 LatInh 0,0")
-        matrixplot(c_Primary_LatInh,title="c++ Primary LatInh 0,0")
-
-        
-
-    print "...** V1-V1 inhibitory unit 23 23..."
-    i,j=23,23
-    topo_LatInh_23_23 = topo.sim['V1'].in_connections[3].cf(i,j).weights
-    c_Primary_LatInh_23_23 = get_matrix('topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralInhibitory.023_023.matrix',(BaseN,BaseN)) 
-    c_Primary_LatInh_23_23 = c_Primary_LatInh_23_23[12:35,12:35] # c++ lissom doesn't situate weights
-
-    matching_results["LateralInhibitory weights 23,23 t=0"] = compare_elements(topo_LatInh_23_23,c_Primary_LatInh_23_23,wt_dp,"LateralInhibitory 23 23")
-
-    if plots and not matching_results["LateralInhibitory weights 23,23 t=0"]:
-        matrixplot(topo_LatInh_23_23,title="topo V1 LatInh 23,23")
-        matrixplot(c_Primary_LatInh_23_23,title="c++ Primary LatInh 23,23")
-
-
+    compare_weights(
+        'topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralInhibitory.023_023.matrix',
+        slice(12,35),slice(12,35),(BaseN,BaseN),
+        (23,23),'V1','LateralInhibitory')
 
 
 
     topo.sim.run(1)
 
+
+
+    ### FIRST ITERATION ACTIVITY COMPARISONS
+    #
+
     print "** Compare C++ LISSOM and Topograhica activity values in the Retina/Eye00 t1:"
     c_eye00_act = get_matrix("topo/tests/reference/oo_or_map_topo.000001p000.Eye0_Activity.matrix",(RN,RN))
-    matching_results["Retina activity t=1"] = compare_elements(topo.sim['Retina'].activity,c_eye00_act,act_dp,"Retina t1")
+    matching["Retina activity t=1"] = compare_elements(topo.sim['Retina'].activity,c_eye00_act,act_dp,"Retina t1")
 
-    if plots and not matching_results["Retina activity t=1"]:
+    if plots and not matching["Retina activity t=1"]:
         matrixplot(topo.sim['Retina'].activity,title="Topo Retina activity t1")
         matrixplot(c_eye00_act,title="c++ Eye00 activity t1")
 
@@ -498,9 +462,9 @@ if comparisons:
 
     print "** Compare C++ LISSOM and Topograhica activity values in LGN ON t1:"
     c_ganglia00_act = get_matrix("topo/tests/reference/oo_or_map_topo.000001p000.Ganglia00_Activity.matrix",(LN,LN))
-    matching_results["LGNOn activity t=1"] = compare_elements(topo.sim['LGNOn'].activity,c_ganglia00_act,act_dp,"LGNOn act t1")
+    matching["LGNOn activity t=1"] = compare_elements(topo.sim['LGNOn'].activity,c_ganglia00_act,act_dp,"LGNOn act t1")
 
-    if plots and not matching_results["LGNOn activity t=1"]:
+    if plots and not matching["LGNOn activity t=1"]:
         matrixplot(topo.sim['LGNOn'].activity,title="Topo LGNOn activity t1")
         matrixplot(c_ganglia00_act,title="c++ Ganglia00 activity t1")
 
@@ -508,48 +472,34 @@ if comparisons:
 
     print "** Compare C++ LISSOM and Topograhica activity values in LGN OFF t1:"
     c_ganglia01_act = get_matrix("topo/tests/reference/oo_or_map_topo.000001p000.Ganglia01_Activity.matrix",(LN,LN))
-    matching_results["LGNOff activity t=1"] = compare_elements(topo.sim['LGNOff'].activity,c_ganglia01_act,act_dp,"LGNOff act t1")
+    matching["LGNOff activity t=1"] = compare_elements(topo.sim['LGNOff'].activity,c_ganglia01_act,act_dp,"LGNOff act t1")
 
-    if plots and not matching_results["LGNOff activity t=1"]:
+    if plots and not matching["LGNOff activity t=1"]:
         matrixplot(topo.sim['LGNOff'].activity,title="Topo LGNOff activity t1")
         matrixplot(c_ganglia01_act,title="c++ Ganglia01 activity t1")
 
 
     print "** Compare C++ LISSOM and Topograhica activity values in V1 t1:"
     c_primary_act = get_matrix("topo/tests/reference/oo_or_map_topo.000001p000.Primary_Activity.matrix",(BaseN,BaseN))
-    matching_results["V1 activity t=1"] = compare_elements(topo.sim['V1'].activity,c_primary_act,act_dp,"V1 act t1")
+    matching["V1 activity t=1"] = compare_elements(topo.sim['V1'].activity,c_primary_act,act_dp,"V1 act t1")
     
-    if plots and not matching_results["V1 activity t=1"]:
+    if plots and not matching["V1 activity t=1"]:
         matrixplot(topo.sim['V1'].activity,title="Topo V1 activity t1")
         matrixplot(c_primary_act,title="c++ primary activity t1")
 
 
 
-##     topo.sim.run(49)
+    # topo.sim.run(49)
 
-##     print "** Compare C++ LISSOM and Topograhica activity values in the Retina/Eye00 t50:"
-##     c_eye00_act = get_matrix("topo/tests/reference/oo_or_map_topo.000050p000.Eye0_Activity.matrix",(RN,RN))
-##     compare_elements(topo.sim['Retina'].activity,c_eye00_act,act_dp,"Retina")
 
-##     if plots: matrixplot(topo.sim['Retina'].activity,title="Topo Retina activity t50"); if plots: matrixplot(c_eye00_act,title="c++ Eye00 activity t50")
+    ### 50th ITERATION WEIGHTS COMPARISONS
+    #
+    #
 
-##     print "** Compare C++ LISSOM and Topograhica activity values in LGN ON t50:"
-##     c_ganglia00_act = get_matrix("topo/tests/reference/oo_or_map_topo.000050p000.Ganglia00_Activity.matrix",(LN,LN))
-##     compare_elements(topo.sim['LGNOn'].activity,c_ganglia00_act,act_dp,"LGNOn")
-
-##     if plots: matrixplot(topo.sim['LGNOn'].activity,title="Topo LGNOn activity t50"); if plots: matrixplot(c_ganglia00_act,title="c++ Ganglia00 activity t50")
-
-##     print "** Compare C++ LISSOM and Topograhica activity values in LGN OFF t50:"
-##     c_ganglia01_act = get_matrix("topo/tests/reference/oo_or_map_topo.000050p000.Ganglia01_Activity.matrix",(LN,LN))
-##     compare_elements(topo.sim['LGNOff'].activity,c_ganglia01_act,act_dp,"LGNOff")
-
-##     if plots: matrixplot(topo.sim['LGNOff'].activity,title="Topo LGNOff activity t50"); if plots: matrixplot(c_ganglia01_act,title="c++ Ganglia01 activity t50")
-
-##     print "** Compare C++ LISSOM and Topograhica activity values in V1 t50:"
-##     c_primary_act = get_matrix("topo/tests/reference/oo_or_map_topo.000050p000.Primary_Activity.matrix",(BaseN,BaseN))
-##     compare_elements(topo.sim['V1'].activity,c_primary_act,act_dp,"V1")
-
-##     if plots: matrixplot(topo.sim['V1'].activity,title="Topo V1 activity t50"); if plots: matrixplot(c_primary_act,title="c++ primary activity t50")
+    ### 50th ITERATION ACTIVITY COMPARISONS
+    #
+    #
+    
 
 
 
@@ -558,12 +508,9 @@ if comparisons:
     print "\n"
     print "Checking weights to "+str(wt_dp)+" d.p. and activity values to "+str(act_dp)+ " d.p." 
     print "\n"
-    for what,result in matching_results.items():
+    for what,result in matching.items():
         if result:
             print what + " ... pass"
         else:
             print what + " ... FAIL"
 
-    print "\n"
-    print 'Search backwards for "**" to see the values compared for each of the above (nothing is printed if the values match to the specified number of d.p.).'
-        
