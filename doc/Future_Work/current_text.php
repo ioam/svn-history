@@ -14,7 +14,11 @@ added to the list, or a change was made.
 
 <li>
 2006/11/09 (CP): Add automatic assignment of topo.sim.name, by taking
-the base name of the first .ty file in sys.argv (if any).
+the base name of the first .ty file in sys.argv (if any).  Also should
+clean up how the window titles are initialized, so that it is done
+after a .ty script is loaded (whether on the initial command line or
+from the GUI).  (Right now the name is updated only when a window is
+first opened, or when learning is done in the topoconsole.
 </li>
 
 <li>
