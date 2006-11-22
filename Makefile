@@ -90,7 +90,7 @@ lint:
 # Compare topographica and C++ lissom output
 compare: 
 	make -C topo/tests/reference/
-	./topographica -g -c "comparisons=True" topo/tests/reference/lissom_oo_or_reference.ty 
+	./topographica -c "comparisons=True" -c "plots=False" topo/tests/reference/lissom_oo_or_reference.ty 
 
 
 clean-pyc:
