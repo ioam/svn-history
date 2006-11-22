@@ -6,8 +6,8 @@ simulation.
 If you want to run the automatic comparisons, run the script like this:
 ./topographica -g -c "comparisons=True" topo/tests/reference/lissom_oo_or_reference.ty
 
-(When a result doesn't match, the Topographica and c++ lissom results will
-be plotted. You can suppress this with 'plots=False'.)
+(When a result doesn't match, the Topographica and c++ lissom results can
+be plotted: pass 'plots=1' to enable this.)
 
 For the comparisons, you can either use the existing data or generate
 data yourself.
@@ -368,7 +368,13 @@ wt_dp = 5
 
 
 comparisons = locals().get('comparisons',False)
-plots = locals().get('plots',True)
+
+plots = locals().get('plots',0)
+if plots==1:
+    plots=True
+else:
+    plots=False
+
 matching = {}
 
 def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_shape,unit,sheet,conn):
