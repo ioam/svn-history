@@ -382,11 +382,26 @@ def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_shape,unit
 
     if plots and not match:
         matrixplot(topo_weights,title="topo "+comparing_what)
-        matrixplot(c_Ganglia00_afferent,title="c++ "+comparing_what)
+        matrixplot(c_weights,title="c++ "+comparing_what)
 
     matching[comparing_what] = match
 
 
+
+def compare_activities(c_matrix_filename,c_sheet_shape,sheet):
+
+    comparing_what = sheet + " activity, t=" + str(topo.sim.time()) 
+
+    topo_act = topo.sim[sheet].activity
+    c_act = get_matrix(c_matrix_filename,c_sheet_shape)
+
+    match = compare_elements(topo_act,c_act,act_dp,comparing_what)
+
+    if plots and not match:
+        matrixplot(topo_act,title="topo "+comparing_what)
+        matrixplot(c_act,title="c++ "+comparing_what)
+
+    matching[comparing_what] = match
 
 
 if comparisons:
@@ -443,49 +458,26 @@ if comparisons:
 
 
 
-    topo.sim.run(1)
+# CB: these and further tests can be added once the earlier ones pass...
+
+##     topo.sim.run(1)
 
 
 
-    ### FIRST ITERATION ACTIVITY COMPARISONS
-    #
+##     ### FIRST ITERATION ACTIVITY COMPARISONS
+##     #
+##     compare_activities("topo/tests/reference/oo_or_map_topo.000001p000.Eye0_Activity.matrix",(RN,RN),
+##                        "Retina")
 
-    print "** Compare C++ LISSOM and Topograhica activity values in the Retina/Eye00 t1:"
-    c_eye00_act = get_matrix("topo/tests/reference/oo_or_map_topo.000001p000.Eye0_Activity.matrix",(RN,RN))
-    matching["Retina activity t=1"] = compare_elements(topo.sim['Retina'].activity,c_eye00_act,act_dp,"Retina t1")
+##     compare_activities("topo/tests/reference/oo_or_map_topo.000001p000.Ganglia00_Activity.matrix",(LN,LN),
+##                        "LGNOn")
 
-    if plots and not matching["Retina activity t=1"]:
-        matrixplot(topo.sim['Retina'].activity,title="Topo Retina activity t1")
-        matrixplot(c_eye00_act,title="c++ Eye00 activity t1")
+##     compare_activities("topo/tests/reference/oo_or_map_topo.000001p000.Ganglia01_Activity.matrix",(LN,LN),
+##                        "LGNOff")
 
+##     compare_activities("topo/tests/reference/oo_or_map_topo.000001p000.Primary_Activity.matrix",(BaseN,BaseN),
+##                        "V1")
 
-
-    print "** Compare C++ LISSOM and Topograhica activity values in LGN ON t1:"
-    c_ganglia00_act = get_matrix("topo/tests/reference/oo_or_map_topo.000001p000.Ganglia00_Activity.matrix",(LN,LN))
-    matching["LGNOn activity t=1"] = compare_elements(topo.sim['LGNOn'].activity,c_ganglia00_act,act_dp,"LGNOn act t1")
-
-    if plots and not matching["LGNOn activity t=1"]:
-        matrixplot(topo.sim['LGNOn'].activity,title="Topo LGNOn activity t1")
-        matrixplot(c_ganglia00_act,title="c++ Ganglia00 activity t1")
-
-
-
-    print "** Compare C++ LISSOM and Topograhica activity values in LGN OFF t1:"
-    c_ganglia01_act = get_matrix("topo/tests/reference/oo_or_map_topo.000001p000.Ganglia01_Activity.matrix",(LN,LN))
-    matching["LGNOff activity t=1"] = compare_elements(topo.sim['LGNOff'].activity,c_ganglia01_act,act_dp,"LGNOff act t1")
-
-    if plots and not matching["LGNOff activity t=1"]:
-        matrixplot(topo.sim['LGNOff'].activity,title="Topo LGNOff activity t1")
-        matrixplot(c_ganglia01_act,title="c++ Ganglia01 activity t1")
-
-
-    print "** Compare C++ LISSOM and Topograhica activity values in V1 t1:"
-    c_primary_act = get_matrix("topo/tests/reference/oo_or_map_topo.000001p000.Primary_Activity.matrix",(BaseN,BaseN))
-    matching["V1 activity t=1"] = compare_elements(topo.sim['V1'].activity,c_primary_act,act_dp,"V1 act t1")
-    
-    if plots and not matching["V1 activity t=1"]:
-        matrixplot(topo.sim['V1'].activity,title="Topo V1 activity t1")
-        matrixplot(c_primary_act,title="c++ primary activity t1")
 
 
 
