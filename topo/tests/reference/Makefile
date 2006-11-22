@@ -1,6 +1,6 @@
 # $Id$
 
-GZCAT = gzip -c
+GZCAT = gzip -dc
 RM    = rm -f
 
 FILESTOUNZIP  = ${wildcard *.gz}
