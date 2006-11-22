@@ -73,10 +73,16 @@ def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
     assert topo_matrix.shape == lissom_matrix.shape
     
     r,c = topo_matrix.shape
+
+    matches=True
+    
     for i in range(r):
         for j in range(c):
             t_value = round(topo_matrix[i,j],dp)
             l_value = round(lissom_matrix[i][j],dp)
             # CEBHACKALERT: should be an assert statement
             if t_value != l_value:
+                matches=False
                 print "\n" + topo_matrix_name + " element ("+str(i)+","+str(j)+") didn't match to " + str(dp) + " decimal places.\nTopographica value="+str(t_value)+", C++ LISSOM value="+str(l_value)
+
+    return matches
