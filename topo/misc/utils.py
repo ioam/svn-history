@@ -104,23 +104,18 @@ def flatten(l):
         return result
 
 
-def eval_atof(in_string):
+def eval_atof(str):
     """
-    Create a float from in_string by using string.atof(), but first
-    check __main__.__dict__ for the presence of a variable named
-    in_string, and if present, use its contents as the argument of
-    string.atof() instead of in_string itself.
+    Evaluates the given string in __main__, and converts it to a float.
 
-    See string.atof() for more details about the conversion from string
-    to float.
+    The string can contain any expression that will evaluate to a
+    number.  The expression can use any variables or functions that
+    are defined in the main namespace.
+
+    See string.atof() for more details about the conversion from the
+    evaluated string into a float.
     """
-    # There are two cases to consider. The first is that in_string is
-    # simply a string representing a number (e.g. "4"). In this case,
-    # eval()ing in_string in __main__ has no effect. The second is
-    # that in_string is the name of a variable that's already defined
-    # in __main__. In this case, eval()ing in_string means we get the
-    # contents of that variable as input to string.atof().
-    return string.atof(eval(in_string,__main__.__dict__))
+    return string.atof(eval(str,__main__.__dict__))
     
 
 # CEBHACKALERT: see the problem in ParametersFrame with its translator_dictionary;
