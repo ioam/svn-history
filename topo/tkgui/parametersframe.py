@@ -110,6 +110,44 @@ class ParametersFrame(Frame):
             raise TypeError, "ParameterFrame must be associated with a ParameterizedObject class or instance to set parameters."
 
 
+ 
+
+    def create_widgets(self, parameterized_object, translator_dictionary = {}):
+        """
+        Create widgets for all non-hidden Parameters of parameterized_object and add them
+        to the screen.
+
+        Each Parameter gets a suitable widget (e.g. a slider for a Number with
+        soft_bounds). The default widget is a text box.
+
+        Widgets are added in order of the Parameters' precedences.
+
+        If a dictionary is passed in when create_widgets is called
+        __add_class_selector_property will attempt to get
+        dictionary[parameter_name]. It expects these entries to be
+        lists of relevant objects to cover the selectable classes. It
+        updates the lists and it can be retrieved from
+        self.translator_dictionary when set_parameters is called and
+        used on subsequent uses.
+        """
+        self.parameterized_object = parameterized_object
+        params = None
+
+        if isinstance(parameterized_object,ParameterizedObjectMetaclass):
+            self.translator_dictionary = translator_dictionary
+            params = self.parameterized_object.classparams().items()
+        elif isinstance(parameterized_object,ParameterizedObject):
+            params = self.parameterized_object.params().items()
+        else:
+            raise TypeError, "ParameterFrame must be passed a ParameterizedObject class or instance to create widgets for Parameters."
+
+        self.__visible_parameters = dict([(parameter_name,parameter)
+                                      for (parameter_name,parameter)
+                                      in params
+                                      if not parameter.hidden])
+        self.__new_widgets()
+
+
     def __new_widgets(self):
         """
         Remove old labels and widgets from the screen (if there
@@ -158,42 +196,7 @@ class ParametersFrame(Frame):
                         sticky=posn)
 
             self.__help_balloon.bind(label, help_text)
- 
 
-    def create_widgets(self, parameterized_object, translator_dictionary = {}):
-        """
-        Create widgets for all non-hidden Parameters of parameterized_object and add them
-        to the screen.
-
-        Each Parameter gets a suitable widget (e.g. a slider for a Number with
-        soft_bounds). The default widget is a text box.
-
-        Widgets are added in order of the Parameters' precedences.
-
-        If a dictionary is passed in when create_widgets is called
-        __add_class_selector_property will attempt to get
-        dictionary[parameter_name]. It expects these entries to be
-        lists of relevant objects to cover the selectable classes. It
-        updates the lists and it can be retrieved from
-        self.translator_dictionary when set_parameters is called and
-        used on subsequent uses.
-        """
-        self.parameterized_object = parameterized_object
-        params = None
-
-        if isinstance(parameterized_object,ParameterizedObjectMetaclass):
-            self.translator_dictionary = translator_dictionary
-            params = self.parameterized_object.classparams().items()
-        elif isinstance(parameterized_object,ParameterizedObject):
-            params = self.parameterized_object.params().items()
-        else:
-            raise TypeError, "ParameterFrame must be passed a ParameterizedObject class or instance to create widgets for Parameters."
-
-        self.__visible_parameters = dict([(parameter_name,parameter)
-                                      for (parameter_name,parameter)
-                                      in params
-                                      if not parameter.hidden])
-        self.__new_widgets()
 
 
     def __add_property_for_parameter(self,parameter_name,parameter):
@@ -329,7 +332,7 @@ class ParametersFrame(Frame):
         w = self.__widgets[parameter_name][1]
         # bind right click to allow the selected classes properties to be changed.
         w._entryWidget.bind('<Button-3>', 
-            lambda event: self.right_click(event, w))
+            lambda event: self.__right_click(event, w))
 
 
     def __add_boolean_property(self,parameter_name,value,parameter):
@@ -340,7 +343,7 @@ class ParametersFrame(Frame):
         self.__widgets[parameter_name] = self.__properties_frame.add_checkbutton_property(parameter_name,value=value)
 
 
-    def right_click(self, event, widget) :
+    def __right_click(self, event, widget) :
         self.parameters_properties = widget
         self.menu.tk_popup(event.x_root, event.y_root)
 
@@ -366,7 +369,7 @@ class ParametersFrame(Frame):
         Button(button_panel, text = 'Apply', 
             command = parameter_frame.set_parameters).pack(side = RIGHT)
 
-    # CB: where's this called from?
+
     def __parameter_properties_ok(self,frame, win) :
         frame.set_parameters()
         win.destroy()
