@@ -1,5 +1,6 @@
 """
- LISSOM-based orientation map (without ON/OFF channels) with homeostatic synaptic plasticity
+LISSOM-based orientation map using homeostatic synaptic plasticity
+(without ON/OFF channels).
 
 $Id$
 """
@@ -46,25 +47,28 @@ input_pattern = topo.patterns.basic.Gaussian(
           x=DynamicNumber(UniformRandom(lbound=-0.6,ubound=0.6,seed=12)),
           y=DynamicNumber(UniformRandom(lbound=-0.6,ubound=0.6,seed=34)),
           orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
-
-#input_pattern = Disk(scale=1.0,size = 1.0, aspect_ratio=1.0,
-#    x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=20)),
-#    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=54)),
-#    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
                                 
 
-# Homeostatic Synaptic Scaling - Sullivan & de sa
 class HomeoSynaptic(CFPLearningFn):
     """
-    Implementation of Homeostatic Synaptic Scaling
-    Sullivan & de Sa, "Homeostatic Synaptic Scaling in Self-Organizing Maps"
+    Learning function using homeostatic synaptic scaling from 
+    Sullivan & de Sa, "Homeostatic Synaptic Scaling in Self-Organizing Maps",
+    Neural Networks (2006), 19(6-7):734-43.
 
-    Does not requires some form of output_fn normalization for stability.
+    Does not necessarily require output_fn normalization for stability.
     """
-    single_cf_fn = LearningFnParameter(default=Hebbian(), doc="Learning Fn that will be applied to each CF individually")
-    beta_n = Number(default=0.01,bounds=(0,None),doc="homeostatic learning rate")
-    beta_c = Number(default=0.005,bounds=(0,None),doc="time window over which the neuron's firing rate is averaged")
-    activity_target = Number(default=0.03,bounds=(0,None),doc="Target average activity") 
+
+    single_cf_fn = LearningFnParameter(default=Hebbian(),
+       doc="Learning function that will be applied to each CF individually.")
+    
+    beta_n = Number(default=0.01,bounds=(0,None),
+       doc="Homeostatic learning rate.")
+    
+    beta_c = Number(default=0.005,bounds=(0,None),
+       doc="Time window over which the neuron's firing rate is averaged.")
+    
+    activity_target = Number(default=0.03,bounds=(0,None),
+       doc="Target average activity.") 
     
     def __init__(self,**params):
         super(HomeoSynaptic,self).__init__(**params)
@@ -81,7 +85,7 @@ class HomeoSynaptic(CFPLearningFn):
         if not hasattr(self,'averages'):
             #self.averages = ones(output_activity.shape,Float) * 0.05
 	    self.averages = topo.sim['V1'].output_fn.x_avg
-	    print self.averages[23][23], ' ', self.averages[11][11]
+	    #print self.averages[23][23], ' ', self.averages[11][11]
 
 	    #print cfs[23][23].weights
 
@@ -101,7 +105,8 @@ class HomeoSynaptic(CFPLearningFn):
 
         # compute recent average of output activity
         self.averages = self.beta_c * output_activity + (1.0-self.beta_c) * self.averages
-        activity_norm = 1.0 + self.beta_n * ((self.averages - self.activity_target)/self.activity_target)
+        activity_norm = 1.0 + self.beta_n * \
+          ((self.averages - self.activity_target)/self.activity_target)
 
         rows,cols = output_activity.shape
 	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
@@ -122,8 +127,8 @@ class HomeoSynaptic(CFPLearningFn):
                 # CEBHACKALERT: see ConnectionField.__init__()
                 cf.weights *= cf.mask
 
-	print self.averages[23][23], ':', activity_norm[23][23], '   ', self.averages[11][11], ':', activity_norm[11][11]
-	print Numeric.sum(abs(cfs[23][23].weights.flat)), '  ', Numeric.sum(abs(cfs[11][11].weights.flat))
+	##print self.averages[23][23], ':', activity_norm[23][23], '   ', self.averages[11][11], ':', activity_norm[11][11]
+	##print Numeric.sum(abs(cfs[23][23].weights.flat)), '  ', Numeric.sum(abs(cfs[11][11].weights.flat))
 	
 	# debug only
 	self.temp_hist.append (Numeric.sum(abs(cfs[23][23].weights.flat)))
@@ -131,6 +136,10 @@ class HomeoSynaptic(CFPLearningFn):
 
 
 class InitFn(CFPLearningFn):
+    """
+    Dummy learning function used for initial iterations to gather statistics,
+    before using homeostatic plasticity.
+    """
     
     def __init__(self,**params):
         super(InitFn,self).__init__(**params)
@@ -162,6 +171,7 @@ CFProjection.response_fn=CFPRF_DotProduct_opt()
 #CFProjection.learning_fn=CFPLF_Hebbian_opt()
 #CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 #CFProjection.learning_fn=HomeoSynaptic()
+
 
 ###########################################
 # build simulation
@@ -279,15 +289,3 @@ topo.sim.schedule_command( 5000+wait, 'topo.sim["V1"].output_fn.lower_bound=0.21
 topo.sim.schedule_command( 6500+wait, 'topo.sim["V1"].output_fn.lower_bound=0.22; topo.sim["V1"].output_fn.upper_bound=0.82')
 topo.sim.schedule_command( 8000+wait, 'topo.sim["V1"].output_fn.lower_bound=0.23; topo.sim["V1"].output_fn.upper_bound=0.85')
 topo.sim.schedule_command(20000+wait, 'topo.sim["V1"].output_fn.lower_bound=0.24; topo.sim["V1"].output_fn.upper_bound=0.88')
-
-
-topo.sim.run(0)
-
-
-# Uncomment to allow profiling
-## import hotshot,hotshot.stats
-## prof = hotshot.Profile("abc")
-## prof.runctx('topo.sim.run(199)',globals(),locals())
-## prof.close()
-## p = hotshot.stats.load("abc")
-## p.strip_dirs().sort_stats('cumulative','time').print_stats()
