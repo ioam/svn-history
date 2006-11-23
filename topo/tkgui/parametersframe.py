@@ -352,12 +352,6 @@ class ParametersFrame(Frame):
         """
         obj = widget.get_value()
 
-        # CEBALERT: If the selected field is a class rather than an
-        # object, then we can't handle it yet.
-        if not isinstance(obj, ParameterizedObject):
-            raise NotImplementedError("Right-click editing for a class is not yet supported.") # ...because we have to clean the class vs object editing first.
-        
-
         parameter_window = Toplevel()
         parameter_window.title(obj.name+' parameters')
         title = Label(parameter_window, text = obj.name)
@@ -368,12 +362,12 @@ class ParametersFrame(Frame):
         button_panel = Frame(parameter_window)
         button_panel.pack(side = BOTTOM)
         Button(button_panel, text = 'Ok', command = lambda frame=parameter_frame, win=parameter_window: 
-            self.parameter_properties_ok(frame, win)).pack(side = RIGHT)
+            self.__parameter_properties_ok(frame, win)).pack(side = RIGHT)
         Button(button_panel, text = 'Apply', 
             command = parameter_frame.set_parameters).pack(side = RIGHT)
 
     # CB: where's this called from?
-    def parameter_properties_ok(self,frame, win) :
+    def __parameter_properties_ok(self,frame, win) :
         frame.set_parameters()
         win.destroy()
                 
