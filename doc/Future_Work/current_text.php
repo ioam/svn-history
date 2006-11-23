@@ -110,9 +110,9 @@ and well designed so that it can be flexible.
 </li>
 
 <li>
-2006/11/23 (CB): ParametersFrame doesn't properly set object properties when 
-right click is used (there's a more detailed explanation in parametersframe.py);
-finish cleaning ParametersFrame.
+2006/11/23: ParametersFrame doesn't properly set object properties when 
+right click is used (there's a more detailed explanation in parametersframe.py: see
+comments by uses of 'translator_dictionary').
 </li>
 
 <li>
