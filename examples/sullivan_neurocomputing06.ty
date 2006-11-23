@@ -1,10 +1,10 @@
 """
-Implementation of Sullivan & de Sa's model from “A temporal trace and
-SOM-based model of complex cell development”.  Neurocomputing, Volumes
-58-60, June 2004, pages 827-833.
+Implementation of synaptic scaling model from 
+T.J. Sullivan & V.R. de Sa (2006),"A self-organizing map with
+homeostatic synaptic scaling".  Neurocomputing 69(10-12):1183-1186.
 
 NOT YET TESTED. 
-Original was one-dimensional; need to be sure that a thin
+Original was one-dimensional; need to verify that a thin
 2D map is ok.
 
 $Id$
@@ -23,6 +23,7 @@ from Numeric import sum,ones,exp
 
 import topo.patterns.random
 import topo.patterns.basic
+
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFProjection
 from topo.base.parameterclasses import DynamicNumber,Wrapper
@@ -40,20 +41,26 @@ from topo.base.arrayutils import clip_in_place
 
 
   
-# Homeostatic Synaptic Scaling - Sullivan & de sa
 class HomeoSynaptic(CFPLearningFn):
     """
-    Implementation of homeostatic synaptic scaling from
+    Learning function using homeostatic synaptic scaling from 
     Sullivan & de Sa, "Homeostatic Synaptic Scaling in Self-Organizing Maps",
-    Neurocomputing 2006 (in press).
+    Neural Networks (2006), 19(6-7):734-43.
 
-    Does not require output_fn normalization for stability.
+    Does not necessarily require output_fn normalization for stability.
     """
-    single_cf_fn = LearningFnParameter(default=Hebbian(), doc="Learning Fn that will be applied to each CF individually")
-    beta_n = Number(default=0.01,bounds=(0,None),doc="homeostatic learning rate")
-    beta_c = Number(default=0.005,bounds=(0,None),doc="time window over which the neuron's firing rate is averaged")
-    activity_target = Number(default=0.03,bounds=(0,None),doc="Target average activity") 
-    #debug = Boolean(default=False,doc="Print average activity values") 
+
+    single_cf_fn = LearningFnParameter(default=Hebbian(),
+       doc="Learning function that will be applied to each CF individually.")
+    
+    beta_n = Number(default=0.01,bounds=(0,None),
+       doc="Homeostatic learning rate.")
+    
+    beta_c = Number(default=0.005,bounds=(0,None),
+       doc="Time window over which the neuron's firing rate is averaged.")
+    
+    activity_target = Number(default=0.03,bounds=(0,None),
+       doc="Target average activity.") 
     
     def __init__(self,**params):
         super(HomeoSynaptic,self).__init__(**params)
@@ -70,7 +77,7 @@ class HomeoSynaptic(CFPLearningFn):
         if not hasattr(self,'averages'):
             #self.averages = ones(output_activity.shape,Float) * 0.05
 	    self.averages = topo.sim['V1'].output_fn.x_avg
-	 #####   print self.averages[23][23], ' ', self.averages[11][11]
+	    #print self.averages[23][23], ' ', self.averages[11][11]
 
 	    #print cfs[23][23].weights
 
@@ -90,7 +97,8 @@ class HomeoSynaptic(CFPLearningFn):
 
         # compute recent average of output activity
         self.averages = self.beta_c * output_activity + (1.0-self.beta_c) * self.averages
-        activity_norm = 1.0 + self.beta_n * ((self.averages - self.activity_target)/self.activity_target)
+        activity_norm = 1.0 + self.beta_n * \
+          ((self.averages - self.activity_target)/self.activity_target)
 
         rows,cols = output_activity.shape
 	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
@@ -111,11 +119,13 @@ class HomeoSynaptic(CFPLearningFn):
                 # CEBHACKALERT: see ConnectionField.__init__()
                 cf.weights *= cf.mask
 
-##	print self.averages[23][23], ':', activity_norm[23][23], '   ', self.averages[11][11], ':', activity_norm[11][11]
-##	print Numeric.sum(abs(cfs[23][23].weights.flat)), '  ', Numeric.sum(abs(cfs[11][11].weights.flat))
+	##print self.averages[23][23], ':', activity_norm[23][23], '   ', self.averages[11][11], ':', activity_norm[11][11]
+	##print Numeric.sum(abs(cfs[23][23].weights.flat)), '  ', Numeric.sum(abs(cfs[11][11].weights.flat))
 	
 	# debug only
-#		self.temp_hist.append (Numeric.sum(abs(cfs[23][23].weights.flat)))
+	#self.temp_hist.append (Numeric.sum(abs(cfs[23][23].weights.flat)))
+
+
 
 #########################################################################
 
