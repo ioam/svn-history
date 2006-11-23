@@ -172,7 +172,10 @@ class TaggedSlider(Frame,WidgetTranslator):
         be refresh()ed, but also (optionally) allows an action to be
         'passed up' to its parent.
         """
-        self.root.optional_action()
+        try:
+            self.root.optional_action()
+        except AttributeError:
+            pass
         self.refresh()
 
 
