@@ -93,7 +93,7 @@ lint:
 # make COMPARISON_PLOTS=True tests
 compare: 
 	make -C topo/tests/reference/
-	./topographica -g -c "comparisons=True" -c "plots=${COMPARISON_PLOTS}" topo/tests/reference/lissom_oo_or_reference.ty 
+	./topographica -c "comparisons=True" -c "plots=${COMPARISON_PLOTS}" topo/tests/reference/lissom_oo_or_reference.ty 
 
 
 clean-pyc:
