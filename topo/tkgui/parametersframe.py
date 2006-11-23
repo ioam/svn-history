@@ -301,7 +301,10 @@ class ParametersFrame(Frame):
 
         # CEBHACKALERT: since this method is only called on creation of
         # the widgets, 'caching' the object like this only works for the
-        # default object!
+        # default object! This means that when you right click on a Parameter
+        # and get a new ParameterizedObject, if you change the values of the
+        # PO's Paremeters, they won't be saved...unless you're editing the
+        # default (original) PO.
         for (visible_name,class_) in possible_classes.items():
             if class_ == value.__class__:
                 value_text = visible_name
