@@ -233,7 +233,7 @@ class PiecewiseLinear_debug2(OutputFn):
     learn_step = Number(default=8,doc="Number of step before learning take place")
 
     def __init__(self,**params):
-        super(TestFn,self).__init__(**params)
+        super(PiecewiseLinear_debug2,self).__init__(**params)
 
 	self.first_call = True
 	self.n_step = 0
