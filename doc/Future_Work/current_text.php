@@ -81,8 +81,8 @@ plots.
 
 
 <li>
-2006/05/15 (CB): Matching lissom_oo_or with C++ lissom, and setting up tests
-to check that automatically.
+2006/11/23 (JB,CP): Matching lissom_oo_or with C++ lissom (do a 'make compare'
+to see the current matching status).
 </li>
 
 
@@ -110,8 +110,9 @@ and well designed so that it can be flexible.
 </li>
 
 <li>
-2006/06/26 (CB): parameters frame doesn't properly set object properties when 
-right click is used (there's a clearer explanation in parametersframe.py).
+2006/11/23 (CB): ParametersFrame doesn't properly set object properties when 
+right click is used (there's a more detailed explanation in parametersframe.py);
+finish cleaning ParametersFrame.
 </li>
 
 <li>
@@ -250,10 +251,6 @@ class for grouping together all patterns using those parameters, which shouldn't
 <li> 
 2006/05/02: investigate failing test in testimage.py (that uses sheet functions).
 Currently commented out; may not be a problem.
-</li>
-
-<li>
-2006/05/04 (CB): ParametersFrame needs to be tidied up!
 </li>
 
 <li>
