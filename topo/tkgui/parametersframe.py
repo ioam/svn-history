@@ -8,6 +8,7 @@ __version__='$Revision$'
 
 from inspect import getdoc
 
+import __main__
 import Pmw
 from Tkinter import Frame, Button, RIGHT, TOP, BOTH, BOTTOM, END, YES, N,S,E,W,X, Menu, Toplevel, Label, LEFT
 
@@ -281,7 +282,7 @@ class ParametersFrame(Frame):
             except AttributeError:
                 self.__widgets[parameter_name] = self.__properties_frame.add_text_property(parameter_name,value=value,translator=topo.misc.utils.eval_atof)
         else:
-            self.__widgets[parameter_name] = self.__properties_frame.add_text_property(parameter_name,value=value,translator=topo.misc.utils.eval_atof)
+            self.__widgets[parameter_name] = self.__properties_frame.add_text_property(parameter_name,value=value,translator=lambda x: eval(x,__main__.__dict__))
 
 
     def __add_enumeration_property(self,parameter_name,value,parameter):
