@@ -64,7 +64,6 @@ class ParametersFrame(Frame):
 
         # The dictionary of parameter_type:property_to_add pairs.
         self.__parameter_property = {
-            Integer: self.__add_text_property, # To work around the fact that __add_numeric_property only works for floats, right now
             Number: self.__add_numeric_property,
             Enumeration: self.__add_enumeration_property,
             BooleanParameter: self.__add_boolean_property,
@@ -259,22 +258,28 @@ class ParametersFrame(Frame):
         property is added. Otherwise, just a textbox is added (with
         a translator for string to float).
         """
-        try:
-            low_bound,high_bound = parameter.get_soft_bounds()
+        # CEBHACKALERT: because TaggedSlider only works for floats, subclasses
+        # of Number (like Integer) are just represented with a text box
+        # (for the moment).
+        if type(parameter)==Number:
+            try:
+                low_bound,high_bound = parameter.get_soft_bounds()
 
-            if low_bound==None or high_bound==None or low_bound==high_bound:
-                # i.e. there aren't really softbounds
-                raise AttributeError 
+                if low_bound==None or high_bound==None or low_bound==high_bound:
+                    # i.e. there aren't really softbounds
+                    raise AttributeError 
 
-            self.__widgets[parameter_name] = self.__properties_frame.add_tagged_slider_property(
-                parameter_name,
-                value,
-                min_value = str(low_bound),
-                max_value = str(high_bound),
-                string_format = '%.6f',
-                translator = topo.misc.utils.eval_atof)
+                self.__widgets[parameter_name] = self.__properties_frame.add_tagged_slider_property(
+                    parameter_name,
+                    value,
+                    min_value = str(low_bound),
+                    max_value = str(high_bound),
+                    string_format = '%.6f',
+                    translator = topo.misc.utils.eval_atof)
 
-        except AttributeError:
+            except AttributeError:
+                self.__widgets[parameter_name] = self.__properties_frame.add_text_property(parameter_name,value=value,translator=topo.misc.utils.eval_atof)
+        else:
             self.__widgets[parameter_name] = self.__properties_frame.add_text_property(parameter_name,value=value,translator=topo.misc.utils.eval_atof)
 
 
