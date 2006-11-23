@@ -131,7 +131,7 @@ class HomeoSynaptic(CFPLearningFn):
 	##print Numeric.sum(abs(cfs[23][23].weights.flat)), '  ', Numeric.sum(abs(cfs[11][11].weights.flat))
 	
 	# debug only
-	self.temp_hist.append (Numeric.sum(abs(cfs[23][23].weights.flat)))
+	#self.temp_hist.append (Numeric.sum(abs(cfs[23][23].weights.flat)))
 
 
 
