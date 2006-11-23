@@ -107,6 +107,9 @@ def flatten(l):
 # It might be good to handle some common exceptions specially,
 # generating warnings for them rather than suppressing them...
 ### JABALERT! This will actually return any type, not just float; what's going on?
+# CB: the use of this in ParametersFrame results in strange behavior,
+# e.g. "cat" gives orientation zero, as does "pI/4". Surely an error should be
+# raised in those cases (or at least a warning).
 def eval_atof(in_string,default_val = 0):
     """
     Create a float from a string by eval'ing it in the __main__
