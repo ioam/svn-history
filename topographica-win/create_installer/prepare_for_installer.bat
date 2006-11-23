@@ -45,11 +45,8 @@ del /Q /F topographica.bat
 
 
 REM **** Things the Makefile deletes
-del /S /Q /F .#* *~ .cvsignore ChangeLog.txt
-del etc\topographica.elc
-del ImageSaver*.ppm
-del countalerts*
-del annotate.out
+del /S /Q /F .#* *~ .cvsignore ChangeLog.txt *\.cvsignore *\*\.cvsignore
+del etc\topographica.elc ImageSaver*.ppm countalerts* annotate.out
 del examples\disparity_energy.ty
 del examples\homeostatic.ty
 del examples\joublin_bc96.ty
@@ -57,9 +54,18 @@ del examples\laminar.ty*
 del examples\laminar_lissom.ty
 del examples\laminar_nolearning.ty
 del examples\leaky_lissom_or.ty
+del examples\lissom_oo_od.ty
+del examples\lissom_oo_or_dy_photo.ty
+del examples\lissom_oo_or_homeomaxent.ty
+del examples\lissom_or_homeomaxent.ty
+del examples\lissom_or_homeoscale.ty
+del examples\lissom_or_noshrinking.ty
+del examples\lissom_or_noshrinking_latswitch.ty
 del examples\lissom_or_sf.ty
+del examples\ohzawa_science90.ty
+del examples\sullivan_neurocomputing04.ty
+del examples\sullivan_neurocomputing06.ty
 del examples\tiny.ty
-
 
 rmdir /Q /S tmp\
 REM CEBHACKALERT: need to delete CVS/ dirs recursively
@@ -75,6 +81,7 @@ cd topo\
 rmdir /Q /S CVS
 cd ..
 REM **** end things the Makefile deletes
+
 
 print %cd%
 REM ** delete external/
