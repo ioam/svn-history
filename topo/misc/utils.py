@@ -123,7 +123,8 @@ def eval_atof(in_string):
     return string.atof(eval(in_string,__main__.__dict__))
     
 
-# CEBALERT: I think this can probably be simplified.
+# CEBHACKALERT: see the problem in ParametersFrame with its translator_dictionary;
+# I also think this function can probably be simplified.
 def dict_translator(in_string, name = '', translator_dictionary = {}) :
     """
     Looks for an entry for the string in the dictionary. If it can't be
@@ -329,7 +330,8 @@ def array_to_ascii(A,outfile):
 from Numeric import array,multiply,ArrayType,LittleEndian,fromstring,reshape
 import string
 
-### CB: code between marks is lifted from Numeric.py with modifications noted ###
+### CB: code from here until the end mark is almost completely lifted from Numeric.py;
+### all modifications are prefaced by 'CB' ###
 
 # These two functions are used in my modified pickle.py so that
 # matrices can be pickled.  Notice that matrices are written in
