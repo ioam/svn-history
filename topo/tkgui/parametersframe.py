@@ -6,8 +6,6 @@ $Id$
 """
 __version__='$Revision$'
 
-# CEBHACKALERT: this file is being reorganized.
-
 from inspect import getdoc
 
 import Pmw
@@ -21,14 +19,17 @@ from topo.base.parameterclasses import Integer,Number,Enumeration,ClassSelectorP
 from propertiesframe import PropertiesFrame
 from translatorwidgets import CheckbuttonTranslator
 
-# CEBHACKALERT: there used to be a 'reset_to_defaults' method, which
-# didn't work. When Parameters can be set and then maintained between
-# classes (e.g. for PatternGenerators), reset_to_defaults() should be
-# re-implemented so that Parameters can be returned to default values
-# for the current class.
+# Some things missing from/wrong with ParametersFrame (other than the HACKALERTs):
+#
+# - There used to be a 'reset_to_defaults' method, which
+#   didn't work. It would be good to be able to reset an object to have
+#   the class defaults.
+# - When creating a new Projection, we offer a 'name' field and
+#   allow it to be typed in, but then ignore any text that's been entered.
+# - Some kind of 'cancel' button, for window managers that don't have the
+#   'X' button to close a window.
 
-# CEBHACKALERT: when creating a new Projection, we offer a 'name' field and
-# allow it to be typed in, but then ignore any text that's been entered.
+
 
 
 class ParametersFrame(Frame):
