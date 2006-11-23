@@ -424,6 +424,10 @@ if comparisons:
         (0,0),'LGNOn','RetinaToLGNOn')
 
 
+    # CEBHACKALERT: Before the simulation has been run, the
+    # Topographica weights are not jointly normalized.
+    topo.sim.run(0.00001)
+    
     compare_weights(
         'topo/tests/reference/oo_or_map_topo.000000.wts.Primary.Afferent00.000_000.matrix', 
         slice(1,14),slice(1,14),(LN,LN),
