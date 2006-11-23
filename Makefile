@@ -7,7 +7,7 @@ RELEASE = 0.9.2
 RELEASE_TAG = release_0_9_2
 
 TEST_VERBOSITY = 1
-COMPARISON_PLOTS = 0
+COMPARISON_PLOTS = False
 
 
 # Commands needed to build a public distribution
@@ -90,7 +90,7 @@ lint:
 
 # Compare topographica and C++ lissom output
 # To see plots of results that fail to match, do:
-# make COMPARISON_PLOTS=1 tests
+# make COMPARISON_PLOTS=True tests
 compare: 
 	make -C topo/tests/reference/
 	./topographica -g -c "comparisons=True" -c "plots=${COMPARISON_PLOTS}" topo/tests/reference/lissom_oo_or_reference.ty 
