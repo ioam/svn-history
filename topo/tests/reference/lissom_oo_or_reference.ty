@@ -7,7 +7,7 @@ If you want to run the automatic comparisons, run the script like this:
 ./topographica -g -c "comparisons=True" topo/tests/reference/lissom_oo_or_reference.ty
 
 (When a result doesn't match, the Topographica and c++ lissom results can
-be plotted: pass 'plots=1' to enable this.)
+be plotted: pass 'plots=True' to enable this.)
 
 For the comparisons, you can either use the existing data or generate
 data yourself.
@@ -369,11 +369,7 @@ wt_dp = 5
 
 comparisons = locals().get('comparisons',False)
 
-plots = locals().get('plots',0)
-if plots==1:
-    plots=True
-else:
-    plots=False
+plots = locals().get('plots',False)
 
 matching = {}
 
