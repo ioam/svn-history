@@ -10,6 +10,8 @@ $Id$
 """
 __version__ = "$Revision$"
 
+import Numeric
+
 from Numeric import ones,Float32,zeros
 
 from topo.base.cf import CFPLearningFn,LearningFnParameter
@@ -157,3 +159,95 @@ class CFPLF_OutstarHebbian(CFPLearningFn):
                 # CEBHACKALERT: see ConnectionField.__init__()
                 cf.weights *= cf.mask
 
+
+
+
+class HomeoSynaptic(CFPLearningFn):
+    """
+    Learning function using homeostatic synaptic scaling from 
+    Sullivan & de Sa, "Homeostatic Synaptic Scaling in Self-Organizing Maps",
+    Neural Networks (2006), 19(6-7):734-43.
+
+    Does not necessarily require output_fn normalization for stability.
+    """
+
+    single_cf_fn = LearningFnParameter(default=Hebbian(),
+       doc="Learning function that will be applied to each CF individually.")
+    
+    beta_n = Number(default=0.01,bounds=(0,None),
+       doc="Homeostatic learning rate.")
+    
+    beta_c = Number(default=0.005,bounds=(0,None),
+       doc="Time window over which the neuron's firing rate is averaged.")
+    
+    activity_target = Number(default=0.03,bounds=(0,None),
+       doc="Target average activity.") 
+    
+    def __init__(self,**params):
+        super(HomeoSynaptic,self).__init__(**params)
+	self.temp_hist = []
+   
+    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
+	"""
+        Update the value of the given weights matrix based on the
+        input_activity matrix (of the same size as the weights matrix)
+        and the response of this unit (the unit_activity), governed by
+        a per-connection learning rate.
+	"""
+        
+        if not hasattr(self,'averages'):
+            #self.averages = ones(output_activity.shape,Float) * 0.05
+            ###
+            ### JABHACKALERT: This is not acceptable in any way; why
+            ### on earth would it be accessing the global 'V1'
+            ### simulation, even if there is one?  Must be rewritten
+            ### ASAP!
+            import topo
+	    self.averages = topo.sim['V1'].output_fn.x_avg
+	    #print self.averages[23][23], ' ', self.averages[11][11]
+
+	    #print cfs[23][23].weights
+
+	    # normalize initial weights to 1.0
+            rows,cols = output_activity.shape
+            for r in xrange(rows):
+                for c in xrange(cols):
+                    cf = cfs[r][c]
+
+	            current_norm_value = 1.0*Numeric.sum(abs(cf.weights.flat))
+		    if current_norm_value != 0:
+            	    	factor = (1.0/current_norm_value)
+            	    	cf.weights *= factor
+
+	    #print "--", cfs[23][23].weights
+
+
+        # compute recent average of output activity
+        self.averages = self.beta_c * output_activity + (1.0-self.beta_c) * self.averages
+        activity_norm = 1.0 + self.beta_n * \
+          ((self.averages - self.activity_target)/self.activity_target)
+
+        rows,cols = output_activity.shape
+	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
+	
+       
+        # avoid evaluating these references each time in the loop
+        single_cf_fn = self.single_cf_fn
+	for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+
+                single_cf_fn(cf.get_input_matrix(input_activity),
+                             output_activity[r,c], cf.weights, single_connection_learning_rate)
+
+		# homeostatic normalization
+                cf.weights /= activity_norm[r][c]
+
+                # CEBHACKALERT: see ConnectionField.__init__()
+                cf.weights *= cf.mask
+
+	##print self.averages[23][23], ':', activity_norm[23][23], '   ', self.averages[11][11], ':', activity_norm[11][11]
+	##print Numeric.sum(abs(cfs[23][23].weights.flat)), '  ', Numeric.sum(abs(cfs[11][11].weights.flat))
+	
+	# debug only
+	#self.temp_hist.append (Numeric.sum(abs(cfs[23][23].weights.flat)))

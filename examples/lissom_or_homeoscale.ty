@@ -19,26 +19,26 @@ import Numeric
 import topo.patterns.basic
 import topo.patterns.random
 
-from topo.sheets.lissom import LISSOM
-from topo.sheets.generatorsheet import GeneratorSheet
-from topo.projections.basic import CFProjection
-from topo.responsefns.optimized import CFPRF_DotProduct_opt
-from topo.base.parameterclasses import DynamicNumber, Number
-from topo.base.cf import CFSheet, CFPOF_Plugin
-from topo.base.boundingregion import BoundingBox
-from topo.learningfns.optimized import CFPLF_Hebbian_opt
-from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
-from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
-from topo.misc.numbergenerators import UniformRandom
-from topo.base.functionfamilies import OutputFn
 from topo.base.arrayutils import clip_in_place
-from topo.patterns.basic import Disk
-from topo.outputfns.homeostatic import PiecewiseLinear_debug
-
+from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFPLearningFn,LearningFnParameter
 from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
-from topo.learningfns.basic import Hebbian
+from topo.base.cf import CFSheet, CFPOF_Plugin
 from topo.base.functionfamilies import LearningFn
+from topo.base.functionfamilies import OutputFn
+from topo.base.parameterclasses import DynamicNumber, Number
+from topo.learningfns.basic import Hebbian
+from topo.learningfns.optimized import CFPLF_Hebbian_opt
+from topo.learningfns.projfns import HomeoSynaptic
+from topo.misc.numbergenerators import UniformRandom
+from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
+from topo.outputfns.homeostatic import PiecewiseLinear_debug
+from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.patterns.basic import Disk
+from topo.projections.basic import CFProjection
+from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.sheets.lissom import LISSOM
 
 topo.sim.name = "lissom_or_homeoscale"
 
@@ -48,92 +48,6 @@ input_pattern = topo.patterns.basic.Gaussian(
           y=DynamicNumber(UniformRandom(lbound=-0.6,ubound=0.6,seed=34)),
           orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
                                 
-
-class HomeoSynaptic(CFPLearningFn):
-    """
-    Learning function using homeostatic synaptic scaling from 
-    Sullivan & de Sa, "Homeostatic Synaptic Scaling in Self-Organizing Maps",
-    Neural Networks (2006), 19(6-7):734-43.
-
-    Does not necessarily require output_fn normalization for stability.
-    """
-
-    single_cf_fn = LearningFnParameter(default=Hebbian(),
-       doc="Learning function that will be applied to each CF individually.")
-    
-    beta_n = Number(default=0.01,bounds=(0,None),
-       doc="Homeostatic learning rate.")
-    
-    beta_c = Number(default=0.005,bounds=(0,None),
-       doc="Time window over which the neuron's firing rate is averaged.")
-    
-    activity_target = Number(default=0.03,bounds=(0,None),
-       doc="Target average activity.") 
-    
-    def __init__(self,**params):
-        super(HomeoSynaptic,self).__init__(**params)
-	self.temp_hist = []
-   
-    def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
-	"""
-        Update the value of the given weights matrix based on the
-        input_activity matrix (of the same size as the weights matrix)
-        and the response of this unit (the unit_activity), governed by
-        a per-connection learning rate.
-	"""
-        
-        if not hasattr(self,'averages'):
-            #self.averages = ones(output_activity.shape,Float) * 0.05
-	    self.averages = topo.sim['V1'].output_fn.x_avg
-	    #print self.averages[23][23], ' ', self.averages[11][11]
-
-	    #print cfs[23][23].weights
-
-	    # normalize initial weights to 1.0
-            rows,cols = output_activity.shape
-            for r in xrange(rows):
-                for c in xrange(cols):
-                    cf = cfs[r][c]
-
-	            current_norm_value = 1.0*Numeric.sum(abs(cf.weights.flat))
-		    if current_norm_value != 0:
-            	    	factor = (1.0/current_norm_value)
-            	    	cf.weights *= factor
-
-	    #print "--", cfs[23][23].weights
-
-
-        # compute recent average of output activity
-        self.averages = self.beta_c * output_activity + (1.0-self.beta_c) * self.averages
-        activity_norm = 1.0 + self.beta_n * \
-          ((self.averages - self.activity_target)/self.activity_target)
-
-        rows,cols = output_activity.shape
-	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
-	
-       
-        # avoid evaluating these references each time in the loop
-        single_cf_fn = self.single_cf_fn
-	for r in xrange(rows):
-            for c in xrange(cols):
-                cf = cfs[r][c]
-
-                single_cf_fn(cf.get_input_matrix(input_activity),
-                             output_activity[r,c], cf.weights, single_connection_learning_rate)
-
-		# homeostatic normalization
-                cf.weights /= activity_norm[r][c]
-
-                # CEBHACKALERT: see ConnectionField.__init__()
-                cf.weights *= cf.mask
-
-	##print self.averages[23][23], ':', activity_norm[23][23], '   ', self.averages[11][11], ':', activity_norm[11][11]
-	##print Numeric.sum(abs(cfs[23][23].weights.flat)), '  ', Numeric.sum(abs(cfs[11][11].weights.flat))
-	
-	# debug only
-	#self.temp_hist.append (Numeric.sum(abs(cfs[23][23].weights.flat)))
-
-
 
 class InitFn(CFPLearningFn):
     """
