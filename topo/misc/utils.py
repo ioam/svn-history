@@ -104,23 +104,23 @@ def flatten(l):
         return result
 
 
-# It might be good to handle some common exceptions specially,
-# generating warnings for them rather than suppressing them...
-### JABALERT! This will actually return any type, not just float; what's going on?
-# CB: the use of this in ParametersFrame results in strange behavior,
-# e.g. "cat" gives orientation zero, as does "pI/4". Surely an error should be
-# raised in those cases (or at least a warning).
-def eval_atof(in_string,default_val = 0):
+def eval_atof(in_string):
     """
-    Create a float from a string by eval'ing it in the __main__
-    namespace.  If the string raises an exception, 0 is returned.
-    Catch any exceptions and return 0 if this is the case.
+    Create a float from in_string by using string.atof(), but first
+    check __main__.__dict__ for the presence of a variable named
+    in_string, and if present, use its contents as the argument of
+    string.atof() instead of in_string itself.
+
+    See string.atof() for more details about the conversion from string
+    to float.
     """
-    try:
-        val = eval(in_string,__main__.__dict__)
-    except Exception:
-        val = default_val
-    return val
+    # There are two cases to consider. The first is that in_string is
+    # simply a string representing a number (e.g. "4"). In this case,
+    # eval()ing in_string in __main__ has no effect. The second is
+    # that in_string is the name of a variable that's already defined
+    # in __main__. In this case, eval()ing in_string means we get the
+    # contents of that variable as input to string.atof().
+    return string.atof(eval(in_string,__main__.__dict__))
     
 
 # CEBALERT: I think this can probably be simplified.
