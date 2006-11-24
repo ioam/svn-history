@@ -277,12 +277,6 @@ attribute/parameter that lists attributes not to pickle? Or something like that.
 Otherwise, save_snapshot and load_snapshot could specifically avoid items.
 </li>
 
-</ul>
-
-
-<h3>Things to get to eventually</h3>
-<ul>
-
 <li>
 2005/01/01: Should add simple timing functions -- what was the total
 time to run?  What components are taking a long time to run?  Guide
