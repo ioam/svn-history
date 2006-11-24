@@ -47,7 +47,14 @@ practical to simulate large-scale, detailed models of topographic
 maps.  Topographica complements the existing low-level and abstract
 simulators, focusing on biologically realistic networks of tens or
 hundreds of thousands of neurons, forming topographic maps containing
-tens or hundreds of millions of connections.  
+tens or hundreds of millions of connections.  The goals of models at
+this level include understanding how topographic maps develop, how
+much of this development is driven by the environment, what
+computations the adult maps perform, how high-level capabilities are
+implemented by these maps, and how to relate large-scale phenomena to
+the activity of single units in maps.  The overall goal is generally
+to understand the brain at a scale that is directly relevant to
+behavior.
 
 <P>Topographica was developed through a collaboration between the
 <a href="http://www.cs.utexas.edu/">University of Texas at Austin</a>
@@ -79,17 +86,35 @@ include multiple brain regions, such as a part of an auditory or
 visual processing pathway, and simulate a large enough area to allow
 the organization and function of each map to be studied.  
 
+<!--  Could work this in:
+
+Map models focus on patches of cortex several mm^2 in size (and above)
+Emphasis is on 2D structure
+Usually driven by optical imaging results
+
+Modeling Approach
+    
+Pick cortical area to model (e.g. 4 mm$^2$ of cat V1)
+Add detail as needed to study particular phenomena
+Amount of detail limited by:
+  Computation time
+  Experimental data available to constrain behavior and parameters
+  Conceptual complexity of model
+Validate model on existing data
+Make predictions for new experiments
+-->
+
 <P>To make it practical to model topographic maps at this large scale,
 the fundamental neural unit in the simulator is a two-dimensional
 <i>sheet</i> of neurons, rather than a neuron or a part of a neuron.
 Conceptually, a sheet is a continuous, two-dimensional area (as in
 m4_bib2html_npcite_named(amari:topographic,[[Amari]],roquedasilvafilho:phd92,[[Roque
-da Silva Filho et al. 1992]]), which is typically approximated by a
+da Silva Filho et al. 1992]])), which is typically approximated by a
 finite array of neurons.  Topographica models consist of an
 interconnected set of such sheets, where each brain region is
 represented by one or more sheets.
 
-<table border=0 width="320" height="346" ALIGN=RIGHT>
+<table cellpadding="10" border=0 width="320" height="346" ALIGN=RIGHT>
 <tr><td><IMG BORDER="2" WIDTH="320" HEIGHT="346" SRC="images/generic-cortical-hierarchy-model.png"></td></tr>
 <tr><td ALIGN="CENTER"><b><A NAME="generic-model">Sample Topographica model of the visual system</A></b></td></tr>
 </table>
@@ -227,7 +252,7 @@ experimental results, such as optical imaging recordings, for
 validating models and for generating predictions.
 
 <P>
-<table border=0 width="320" height="346" ALIGN=RIGHT>
+<table cellpadding="10" border="0" width="320" height="346" ALIGN=RIGHT>
 <tr><td><A HREF="../images/060220_topographica_screen_shot.png">
 <IMG WIDTH="525" HEIGHT="364" SRC="images/060220_topographica_screen_shot_small.png"></a></td></tr>
 <tr><td ALIGN="CENTER"><b>Screenshot of Topographica visualizations</b></td></tr>
