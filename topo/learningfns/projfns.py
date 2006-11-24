@@ -66,36 +66,12 @@ from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
 ##
 ##                # CEBHACKALERT: see ConnectionField.__init__()
 ##                cf.weights *= cf.mask
-##      
-##  
-##  
-##  # Inappropriately shares the history between units; needs to be modified to be a CFPLF_Trace learning rule
-##class Trace(LearningFn):
-##      """
-##    Trace learning rule; Foldiak (1991), Sutton and Barto (1981), Wallis and Rolls (1997).
-##  
-##      Incorporates a trace of recent activity into the learning
-##      function, instead of learning based only on the current activity
-##      as in strict Hebbian learning.
-##  
-##      Requires some form of output_fn normalization for stability.
-##      """
-##      
-##      trace_strength=Number(default=0.5,bounds=(0.0,1.0),doc="How much the learning is dominated by the activity trace, relative to the current value.")
-##      
-##      def __init__(self,**params):
-##          super(Trace,self).__init__(**params)
-##          self.trace=0
-##     
-##      def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
-##          trace = (1-self.trace_strength)*unit_activity+self.trace_strength*self.trace
-##          weights += single_connection_learning_rate * trace * input_activity
 
 
 
 class CFPLF_Trace(CFPLearningFn):
     """
-    Reimplementation of Trace LearningFN as CFPLF, NOT FULLY TESTED
+    Implementation of Trace LearningFn as CFPLF, NOT FULLY TESTED
 
     Trace learning rule; Foldiak (1991), Sutton and Barto (1981), Wallis and Rolls (1997).
        
@@ -103,35 +79,46 @@ class CFPLF_Trace(CFPLearningFn):
     function, instead of learning based only on the current activity
     as in strict Hebbian learning.
     
-    Requires some form of output_fn normalization for stability.       
+    Requires some form of output_fn normalization for stability.
+
+    NOT YET TESTED.
     """
 
-    trace_strength=Number(default=0.5,bounds=(0.0,1.0),doc="How much the learning is dominated by the activity trace, relative to the current value.")     
+    trace_strength=Number(default=0.5,bounds=(0.0,1.0),
+       doc="How much the learning is dominated by the activity trace, relative to the current value.")     
     single_cf_fn = LearningFnParameter(default=BCMFixed())                
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
-          rows,cols = output_activity.shape
-          single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
-          single_cf_fn = self.single_cf_fn
+        rows,cols = output_activity.shape
+        single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
+        single_cf_fn = self.single_cf_fn
+        
+        ##Initialise traces to zero if they don't already exist
+        if not hasattr(self,'traces'):
+            self.traces=zeros(output_activity.shape,Float32)
+            self.traces.savespace(1)
+            
+        for r in xrange(rows):
+            for c in xrange(cols):
+                cf = cfs[r][c]
+                input_activity = cf.get_input_matrix(input_activity)
+                unit_activity = output_activity[r,c]
+                self.traces[r,c] =(1-self.trace_strength)*unit_activity+self.trace_strength*self.traces[r,c]
+                cf.weights += single_connection_learning_rate * self.traces[r,c] * (input_activity - cf.weights)
 
-          ##Initialise traces to zero if they don't already exist
-          if not hasattr(self,'traces'):
-                self.traces=zeros(output_activity.shape,Float32)
-                self.traces.savespace(1)
-
-          for r in xrange(rows):
-                for c in xrange(cols):
-                      cf = cfs[r][c]
-                      input_activity = cf.get_input_matrix(input_activity)
-                      unit_activity = output_activity[r,c]
-                      self.traces[r,c] =(1-self.trace_strength)*unit_activity+self.trace_strength*self.traces[r,c]
-                      cf.weights += single_connection_learning_rate * self.traces[r,c] * input_activity 
-                      cf.weights *= cf.mask       
+                # CEBHACKALERT: see ConnectionField.__init__()
+                cf.weights *= cf.mask
       
 
 
 class CFPLF_OutstarHebbian(CFPLearningFn):
-    """CFPLearningFunction applying the specified (default is Hebbian) 
-       single_cf_fn to each CF, where normalization is done in an outstar-manner."""
+    """
+    CFPLearningFunction applying the specified (default is Hebbian) 
+    single_cf_fn to each CF, where normalization is done in an outstar-manner.
+
+    Presumably does not need a separate output_fn for normalization.
+    
+    NOT YET TESTED.
+    """
     single_cf_fn = LearningFnParameter(default=Hebbian(),
         doc="Accepts a LearningFn that will be applied to each CF individually.")
 
