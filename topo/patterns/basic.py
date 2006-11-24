@@ -118,7 +118,17 @@ class Line(PatternGenerator):
 
 
 class Disk(PatternGenerator):
-    """2D disk pattern generator."""
+    """
+    2D disk pattern generator.
+
+    An elliptical disk can be obtained by adjusting the aspect_ratio of a circular
+    disk; this transforms a circle into an ellipse by stretching the circle in the
+    y (vertical) direction.
+
+    The Gaussian fall-off at a point P is an approximation for non-circular disks,
+    since the point on the ellipse closest to P is taken to be the same point as
+    the point on the circle before stretching that was closest to P.
+    """
 
     aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
         precedence=0.31,doc=
@@ -131,14 +141,18 @@ class Disk(PatternGenerator):
     
     def function(self,**params):
         height = params.get('size',self.size)
-        width = (params.get('aspect_ratio',self.aspect_ratio))*height
-
-        return disk( self.pattern_x,self.pattern_y,width,height,
-                     params.get('smoothing',self.smoothing))  
+        aspect_ratio = params.get('aspect_ratio',self.aspect_ratio)
+        
+        return disk(self.pattern_x/aspect_ratio,self.pattern_y,height,
+                         params.get('smoothing',self.smoothing))
 
 
 class Ring(PatternGenerator):
-    """2D ring pattern generator."""
+    """
+    2D ring pattern generator.
+
+    See the Disk class for a note about the Gaussian fall-off.
+    """
 
     thickness = Number(default=0.015,bounds=(0.0,None),softbounds=(0.0,0.5),
         precedence=0.60,doc="Thickness (line width) of the ring.")
@@ -154,9 +168,9 @@ class Ring(PatternGenerator):
 
     def function(self,**params):
         height = params.get('size',self.size)
-        width = (params.get('aspect_ratio',self.aspect_ratio))*height
-        
-        return ring(self.pattern_x,self.pattern_y,width,height,
+        aspect_ratio = params.get('aspect_ratio',self.aspect_ratio)
+
+        return ring(self.pattern_x/aspect_ratio,self.pattern_y,height,
                     params.get('thickness',self.thickness),
                     params.get('smoothing',self.smoothing))  
     
