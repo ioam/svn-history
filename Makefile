@@ -150,7 +150,7 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} examples/disparity_energy.ty
 #@@	   ${RM} examples/homeostatic.ty
 #@@	   ${RM} examples/joublin_bc96.ty
-#@@	   ${RM} examples/laminar.ty*
+#@@	   ${RM} examples/laminar.ty
 #@@	   ${RM} examples/laminar_lissom.ty
 #@@	   ${RM} examples/laminar_nolearning.ty
 #@@	   ${RM} examples/leaky_lissom_or.ty
@@ -165,7 +165,6 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} examples/ohzawa_science90.ty
 #@@	   ${RM} examples/sullivan_neurocomputing04.ty
 #@@	   ${RM} examples/sullivan_neurocomputing06.ty
-#@@	   ${RM} examples/tiny.ty
 #@@	   ${RM} -r tmp/
 #@@	   ${RM} -r CVS */CVS */*/CVS */*/*/CVS
 
