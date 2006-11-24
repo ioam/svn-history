@@ -1,7 +1,7 @@
 """
-Implementation of synaptic scaling model from 
-T.J. Sullivan & V.R. de Sa (2006),"A self-organizing map with
-homeostatic synaptic scaling".  Neurocomputing 69(10-12):1183-1186.
+Implementation of synaptic scaling model from T.J. Sullivan & V.R. de Sa,
+"Homeostatic Synaptic Scaling in Self-Organizing Maps", Neural
+Networks (2006), 19(6-7):734-43.
 
 NOT YET TESTED.
 
