@@ -73,9 +73,11 @@ topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
 
 
 
-
+# Note that the learning rates from the original paper must be scaled
+# by the number of units in a typical ConnectionField, i.e. 150 in this case
 topo.sim['V1'] = CFSOM(nominal_density=locals().get('default_density',15),
-                       learning_length=10000,radius_0=0.1,alpha_0=0.5,nominal_bounds=BoundingBox(points=((-0.5,-0.1),(0.5,0.1))),output_fn=PiecewiseLinear_debug2())
+                       learning_length=10000,radius_0=0.1,alpha_0=0.00033*150,
+                       nominal_bounds=BoundingBox(points=((-0.5,-0.1),(0.5,0.1))),output_fn=PiecewiseLinear_debug2())
 
 
 
@@ -87,3 +89,14 @@ topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
 topo.sim.schedule_command(6000,'vectorplot (topo.sim["V1"].projections()["Afferent"].learning_fn.ave_hist[0:6000])')
 topo.sim.schedule_command(6000,'vectorplot (topo.sim["V1"].projections()["Afferent"].learning_fn.temp_hist[0:6000])')
 
+
+#from topo.commands.basic import pattern_present
+#def measure_topography():
+#    """Function for mapping the topographic organization"""
+#    winners = []
+#    for i in xrange(0,149): # Need to handle sheet coordinates...
+#        pattern_present(Rectangle(size=...,x=i*1/150.0,...))
+#        winners += topo.sim['V1'].winner_coords(topo.sim['V1'].activity)
+#    vectorplot(winners.rows())
+#
+#measure_topography()
