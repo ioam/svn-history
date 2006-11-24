@@ -13,7 +13,7 @@ include:
       last word on the design and features.
 
   <p><dt><a target="_top" href="http://www.cs.utexas.edu/users/risto">Risto 
-      Miikkulainen</a>, Principal investigator, 2002-</dt>
+      Miikkulainen</a>, Principal investigator, 2002-2005</dt>
   <dd>Risto is a Professor of Computer Science at the University of
       Texas at Austin.
   <br>
@@ -43,13 +43,13 @@ include:
       first complete plotting and related GUI code.
 
   <p><dt>Alan Lindsay, September 2005-</dt>
-  <dd>Alan will be finishing up his undergraduate degree at the
-      University of Edinburgh in summer 2006.  Alan developed the new
+  <dd>Alan finished his undergraduate degree at the
+      University of Edinburgh in summer 2006.  Alan developed the 
       Model Editor, a graphical interface for specifying Topographica
       models by selecting and connecting pre-defined components.
 
   <p><dt>Louise Mathews, September 2005-</dt>
-  <dd>Louise will also be finishing up her undergraduate degree at the
+  <dd>Louise finished her undergraduate degree at the
       University of Edinburgh in summer 2006.  She implemented sample
       models of visual cortex maps published by other research groups.
       This effort will help ensure that Topographica has
