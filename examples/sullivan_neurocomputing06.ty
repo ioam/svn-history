@@ -3,9 +3,15 @@ Implementation of synaptic scaling model from
 T.J. Sullivan & V.R. de Sa (2006),"A self-organizing map with
 homeostatic synaptic scaling".  Neurocomputing 69(10-12):1183-1186.
 
-NOT YET TESTED. 
-Original was one-dimensional; need to verify that a thin
-2D map is ok.
+NOT YET TESTED.
+
+Original version was a one-dimensional ring to eliminate edge effects.
+This one is implemented as a thin two-dimensional area that includes
+a row of units (which should be equivalent to a string topology).
+Topographica does not yet include support for torus configurations, so
+connecting the ends of the string is not yet possible.  In any case,
+this configuration is suitable for generalizing to 2D just by changing
+the bounding boxes to be square instead of a narrow rectangle.
 
 $Id$
 """
@@ -30,8 +36,7 @@ from topo.base.cf import CFPLearningFn,LearningFnParameter
 from topo.base.cf import CFProjection
 from topo.base.functionfamilies import LearningFn
 from topo.base.functionfamilies import OutputFn
-from topo.base.parameterclasses import DynamicNumber, Number
-from topo.base.parameterclasses import DynamicNumber,Wrapper
+from topo.base.parameterclasses import DynamicNumber, Number, Wrapper
 from topo.learningfns.basic import Hebbian
 from topo.learningfns.projfns import HomeoSynaptic
 from topo.learningfns.som import CFPLF_HebbianSOM
@@ -41,13 +46,14 @@ from topo.patterns.basic import Disk
 from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
   
+
+
 topo.sim.name = "sullivan_neurocomputing06.ty"
 
 
 #weight initialization, response 
 RandomArray.seed(500,500)
 CFProjection.weights_generator=topo.patterns.random.UniformRandom()
-CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
 
 
 # Input pattern
@@ -61,16 +67,23 @@ input_pattern = topo.patterns.basic.Gaussian(
   	  
 # Sheets, connections, and their parameters
 
+
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
-                                    period=1.0,phase=0.05,nominal_density=150)
-# nominal_bounds=BoundingBox((-0.5,-0.1),(0.5,0.1)))
+                                    period=1.0,phase=0.05,nominal_density=150,nominal_bounds=BoundingBox(points=((-0.5,-0.1),(0.5,0.1))))
+
+
 
 
 topo.sim['V1'] = CFSOM(nominal_density=locals().get('default_density',15),
-                       learning_length=10000,radius_0=0.1,alpha_0=0.5,output_fn=PiecewiseLinear_debug2())
-# nominal_bounds=BoundingBox((-0.5,-0.1),(0.5,0.1)))
+                       learning_length=10000,radius_0=0.1,alpha_0=0.5,nominal_bounds=BoundingBox(points=((-0.5,-0.1),(0.5,0.1))),output_fn=PiecewiseLinear_debug2())
+
+
 
 topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
                   connection_type=CFProjection,strength=1.0,name='Afferent',
                   nominal_bounds_template=BoundingBox(radius=0.275),
                   learning_fn=HomeoSynaptic())
+
+topo.sim.schedule_command(6000,'vectorplot (topo.sim["V1"].projections()["Afferent"].learning_fn.ave_hist[0:6000])')
+topo.sim.schedule_command(6000,'vectorplot (topo.sim["V1"].projections()["Afferent"].learning_fn.temp_hist[0:6000])')
+
