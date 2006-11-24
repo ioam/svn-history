@@ -11,16 +11,16 @@ $Id$
 __version__ = "$Revision$"
 
 import Numeric
-
-from Numeric import ones,Float32,zeros
+from Numeric import ones,Float,Float32,zeros
 
 from topo.base.cf import CFPLearningFn,LearningFnParameter
-from topo.base.parameterclasses import Number
+from topo.base.parameterclasses import Number,BooleanParameter
 from basic import BCMFixed
 from topo.base.functionfamilies import Hebbian,LearningFn,LearningFnParameter
 
 # Imported here so that all ProjectionLearningFns will be in the same package
 from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
+
 
 #### JABHACKALERT: Untested
 ##class CFPLF_BCM(CFPLearningFn):
@@ -120,7 +120,7 @@ class CFPLF_OutstarHebbian(CFPLearningFn):
     NOT YET TESTED.
     """
     single_cf_fn = LearningFnParameter(default=Hebbian(),
-        doc="Accepts a LearningFn that will be applied to each CF individually.")
+        doc="LearningFn that will be applied to each CF individually.")
 
     outstar_wsum = None
 
@@ -157,23 +157,27 @@ class HomeoSynaptic(CFPLearningFn):
 
     Does not necessarily require output_fn normalization for stability.
     """
-
     single_cf_fn = LearningFnParameter(default=Hebbian(),
-       doc="Learning function that will be applied to each CF individually.")
-    
+       doc="LearningFn that will be applied to each CF individually")
+
     beta_n = Number(default=0.01,bounds=(0,None),
-       doc="Homeostatic learning rate.")
-    
+       doc="homeostatic learning rate")
+
     beta_c = Number(default=0.005,bounds=(0,None),
-       doc="Time window over which the neuron's firing rate is averaged.")
-    
-    activity_target = Number(default=0.03,bounds=(0,None),
-       doc="Target average activity.") 
+       doc="time window over which the neuron's firing rate is averaged")
+
+    activity_target = Number(default=0.1,bounds=(0,None),
+         doc="Target average activity")
+
+    #debug = BooleanParameter(default=False,doc="Print average activity values")
+    #beta_n = Number(default=0.00033,bounds=(0,None),doc="Homeostatic learning rate") #Too small?
+    #beta_c = Number(default=0.000033,bounds=(0,None),doc="Time window over which the neuron's firing rate is averaged")
     
     def __init__(self,**params):
         super(HomeoSynaptic,self).__init__(**params)
 	self.temp_hist = []
-   
+        self.ave_hist = []
+        
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
 	"""
         Update the value of the given weights matrix based on the
@@ -183,18 +187,9 @@ class HomeoSynaptic(CFPLearningFn):
 	"""
         
         if not hasattr(self,'averages'):
-            #self.averages = ones(output_activity.shape,Float) * 0.05
-            ###
-            ### JABHACKALERT: This is not acceptable in any way; why
-            ### on earth would it be accessing the global 'V1'
-            ### simulation, even if there is one?  Must be rewritten
-            ### ASAP!
-            import topo
-	    self.averages = topo.sim['V1'].output_fn.x_avg
-	    #print self.averages[23][23], ' ', self.averages[11][11]
-
-	    #print cfs[23][23].weights
-
+            self.averages = ones(output_activity.shape,Float) * 0.1
+	    
+                       	    
 	    # normalize initial weights to 1.0
             rows,cols = output_activity.shape
             for r in xrange(rows):
@@ -205,25 +200,19 @@ class HomeoSynaptic(CFPLearningFn):
 		    if current_norm_value != 0:
             	    	factor = (1.0/current_norm_value)
             	    	cf.weights *= factor
-
-	    #print "--", cfs[23][23].weights
-
-
+    
         # compute recent average of output activity
         self.averages = self.beta_c * output_activity + (1.0-self.beta_c) * self.averages
         activity_norm = 1.0 + self.beta_n * \
-          ((self.averages - self.activity_target)/self.activity_target)
-
+           ((self.averages - self.activity_target)/self.activity_target)
         rows,cols = output_activity.shape
 	single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
-	
-       
+
         # avoid evaluating these references each time in the loop
         single_cf_fn = self.single_cf_fn
 	for r in xrange(rows):
             for c in xrange(cols):
                 cf = cfs[r][c]
-
                 single_cf_fn(cf.get_input_matrix(input_activity),
                              output_activity[r,c], cf.weights, single_connection_learning_rate)
 
@@ -232,9 +221,7 @@ class HomeoSynaptic(CFPLearningFn):
 
                 # CEBHACKALERT: see ConnectionField.__init__()
                 cf.weights *= cf.mask
-
-	##print self.averages[23][23], ':', activity_norm[23][23], '   ', self.averages[11][11], ':', activity_norm[11][11]
-	##print Numeric.sum(abs(cfs[23][23].weights.flat)), '  ', Numeric.sum(abs(cfs[11][11].weights.flat))
-	
-	# debug only
-	#self.temp_hist.append (Numeric.sum(abs(cfs[23][23].weights.flat)))
+         
+	# For analysis only; can be removed (in which case also remove the initializations above)
+        self.ave_hist.append(self.averages[0][7])
+        self.temp_hist.append (Numeric.sum(abs(cfs[0][7].weights.flat)))
