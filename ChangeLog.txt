@@ -1,4 +1,161 @@
+2006-11-24  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Home/oldnews_text.php 1.3, doc/shared/index.php 1.23:
+	Cleaned up news announcements
+
+	* doc/Makefile 1.13: Fixed regeneration of ref manual after
+	cleanup
+
+	* doc/Links/index_text.php 1.6: Minor clarification
+
+	* doc/Team_Members/index_text.php 1.7: Minor updates
+
+	* doc/User_Manual/index_text.php 1.20: Removed outdated links
+
+	* doc/User_Manual/background_text.php.m4 1.4,
+	doc/User_Manual/features_text.php.m4 1.4: Removed unneeded files
+
+	* doc/User_Manual/introduction_text.php.m4 1.4: Added a few bits
+	of text from the background and features files
+
+2006-11-23  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_or_homeoscale.ty 1.6,
+	examples/sullivan_neurocomputing06.ty 1.5,
+	topo/learningfns/projfns.py 1.12: Moved HomeoSynaptic into main
+	learningfns/projfns.py file
+
+	* topo/outputfns/homeostatic.py 1.4: Fixed name of superclass
+
+	* examples/sullivan_neurocomputing06.ty 1.4: Cleaned up formatting
+	to match lissom_or_homeoscale.ty for merging them.
+
+	* examples/lissom_or_homeoscale.ty 1.5: Commented out extra
+	debugging operations
+
+	* examples/lissom_or_homeoscale.ty 1.4: Cleaned up comments and
+	formatting, and removed debugging statements
+
+	* topographica-win/create_installer/prepare_for_installer.bat 1.5:
+	Added more to delete; not entirely sure of Windows syntax
+
+	* topo/misc/utils.py 1.26: Clarified comments
+
+2006-11-23  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/parametersframe.py 1.102: Having made
+	topo.misc.utils.atof() actually return only floats, it no longer
+	worked as a translator for non-float (Integer in this case)
+	quantities, so switched it for a different one.
+
+2006-11-23  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.79: Removed -g from compare target to avoid popping
+	up the GUI at the end
+
+	* doc/Future_Work/current_text.php 1.132: Fixed trivial typo
+
+2006-11-23  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/utils.py 1.25: Minor change to comments.
+
+	* topo/tkgui/parametersframe.py 1.101: Cleaned some comments.
+
+	* doc/Future_Work/current_text.php 1.131: Updated ParametersFrame
+	task; I cleaned it up as far as my current knowledge of topo.tkgui
+	goes...beyond the changes I made, I'm no better able to clean it
+	up than another developer.
+
+	* topo/tkgui/parametersframe.py 1.100: Changed the location of the
+	hack to avoid TaggedSlider being used to represent Numeric types
+	other than floats.
+
+	* topo/tkgui/parametersframe.py 1.99: Clean-up: re-ordered two
+	methods, made some methods be private.
+
+	* topo/tkgui/parametersframe.py 1.98: Removed a hackalert. Made a
+	method private.
+
+	* doc/Future_Work/current_text.php 1.130: Updated tasks.
+
+	* topo/tkgui/parametersframe.py 1.97: Added more information to a
+	comment.
+
+	* topo/misc/utils.py 1.24: Changed eval_atof() so that it produces
+	a float from the string it's given, unless that string is the name
+	of a variable in __main__, in which case it produces a float from
+	the contents of that variable. (I think that's what the original
+	aim of the method was.) If in_string, or the contents of the
+	variable it represents, does not contain something which can
+	legitimately be converted to a float, then string.atof() raises an
+	error as it would usually - before, illegitimate input resulted in
+	a value of 0 or a non-float.
+
+	* topo/misc/utils.py 1.23, topo/tkgui/translatorwidgets.py 1.9:
+	Moved an ALERT from topo/tkgui/translatorwidgets.py to
+	topo/misc/utils.py.
+
+	* topo/tkgui/translatorwidgets.py 1.8: The 'optional_action()'
+	method was not optional, but it is now. (Fixes a bug where
+	pressing return on e.g. test pattern window leads to an error.)
+
+	* topo/tests/reference/lissom_oo_or_reference.ty 1.32: Now
+	advances the simulation time very slightly before comparing
+	weights, so that joint normalization has occurred before the
+	tests.
+
+	* topo/tests/reference/lissom_oo_or_reference.ty 1.31: Changed
+	calling syntax.
+
+	* Makefile 1.78: Changed calling syntax of lissom_oo_or.ty.
+
+2006-11-22  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/reference/Makefile 1.2: Fixed typo in zcat
+	definition; should run make clean to re-run reference tests
+
+	* doc/Future_Work/current_text.php 1.129: Clarified window title
+	task
+
+2006-11-22  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/tests/reference/lissom_oo_or_reference.ty 1.30: Changed
+	calling syntax from plots=True/False to plots=1/0 to make it easy
+	to specify from Makefile (might not have been necessary).
+
+	* Makefile 1.77: make COMPARISON_PLOTS=1 compare shows plots for
+	results that don't match.
+
+	* topo/tests/reference/lissom_log_parser.py 1.5:
+	compare_elements() returns True or False depending on result of
+	comparisons.
+
+	* topo/tests/reference/lissom_oo_or_reference.ty 1.29: Continued
+	simplification.
+
+	* topo/tests/reference/lissom_oo_or_reference.ty 1.28: Simplified
+	setting up a test.
+
+	* Makefile 1.76: Disabled plotting for 'comparisons'.
+
+	* topo/tests/reference/lissom_oo_or_reference.ty 1.27: Prints
+	pass/fail information for tests. Plotting optional. Some previous
+	tests commented out (there for future use).
+
 2006-11-21  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.75: Added more files to strip from public release
+
+	* topographica-win/common/setup.py 1.4,
+	topographica-win/create_installer/topographica.iss 1.3: Updated
+	Windows version number
+
+	* Makefile 1.74: Updated release number in anticipation of release
+
+	* doc/Home/oldnews_text.php 1.2, doc/shared/index.php 1.22: Added
+	news of upcoming 0.9.2 release
+
+	* ChangeLog.txt 1.11: Added recent changes
 
 	* doc/User_Manual/basics_text.php.m4 1.8: No longer needed
 
@@ -15,6 +172,32 @@
 	current_text.php, plus other misc updates
 
 	* doc/Future_Work/current_text.php 1.127: Removed completed tasks
+
+2006-11-21  chrispalmer  <chrispalmer@lodestar.inf.ed.ac.uk>
+
+	* topo/tkgui/topoconsole.py 1.93: script name will appear in
+	console window title bar, after running for one or more iterations
+
+2006-11-21  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/commands/basic.py 1.41: Clarified warning message for
+	pickling
+
+	* topo/misc/numbergenerators.py 1.11: Minor fix to docs
+
+2006-11-21  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.126: removed fixed bugs
+
+	* examples/lissom_or_noshrinking_latswitch.ty 1.4,
+	examples/laminar.ty 1.35: added random Gaussian initial weights
+
+	* examples/lissom_or_noshrinking.ty 1.4: changed parameters to
+	previously calculated values that match C++ version, added random
+	Gaussian initial weights
+
+	* topo/outputfns/basic.py 1.53: Added sigmoid function and
+	GeneralizedLogistic output functions
 
 2006-11-21  chrispalmer  <chrispalmer@lodestar.inf.ed.ac.uk>
 
