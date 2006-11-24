@@ -7,7 +7,7 @@ __version__ = "$Revision$"
 
 import re
 
-from Numeric import sqrt, ones, dot, sum, arctan2, array2string, logical_not, bitwise_or
+from Numeric import sqrt, ones, dot, sum, arctan2, array2string, logical_not, bitwise_or, argmax
 
 # CEBHACKALERT: there are some inconsistencies throughout as to
 # whether we should assume arrays are contiguous (i.e. using an
@@ -175,7 +175,7 @@ def clip_lower(mat,lower_bound):
 
 
 # There might already be a function for this in Numeric...
-def array_argmax(self, mat):
+def array_argmax(mat):
     "Returns the coordinates of the maximum element in the given matrix."
     rows,cols = mat.shape
     pos = argmax(mat.flat)
