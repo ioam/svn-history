@@ -44,17 +44,16 @@ class XModulo(CoordinateMapperFn):
     grid_element_width = Number(1.0/5.0, doc="Length in Sheet coordinates of one large grid element.")
     
     def __call__(self,x,y):
-        #return -0.5+x-fmod(x,self.grid_element_width)
-        return x
-
+	xmod=fmod(x+0.4875,self.grid_element_width)
+	return x-xmod
 
 class YModulo(CoordinateMapperFn):
     """Return the y coordinate of the given coordinate, modulo the specified step distance."""
 
     grid_element_width = Number(1.0/5.0, doc="Length in Sheet coordinates of one large grid element.")
     def __call__(self,x,y):
-        #return -0.5+y-fmod(y,self.grid_element_width)
-        return y
+	ymod=fmod(y+0.4875,self.grid_element_width)
+	return y-ymod
 
 # input pattern
 GeneratorSheet.period = 1.0
@@ -69,12 +68,12 @@ RandomArray.seed(500,500)
 
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
-                                    period=1.0,phase=0.05,nominal_density=160)
+                                    period=1.0,phase=0.05,nominal_density=40)
 
-topo.sim['V1'] = CFSOM(nominal_density=locals().get('default_density',10.0),
+topo.sim['V1'] = CFSOM(nominal_density=locals().get('default_density',40.0),
                        learning_length=10000,radius_0=0.1,alpha_0=0.5)
 
-topo.sim['Complex Cell Layer'] = CFSOM(nominal_density=locals().get('default_density',10.0),
+topo.sim['Complex Cell Layer'] = CFSOM(nominal_density=locals().get('default_density',40.0),
                        learning_length=10000,radius_0=0.1,alpha_0=0.5)
 
 topo.sim.connect('Retina','V1',delay=0.05,connection_type=CFProjection,
