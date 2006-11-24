@@ -5,7 +5,7 @@ optimized code on systems with the most recent GCC 4.1.x C/C++
 compilers.  We have added a patch to the included weave
 inline-compilation package that should fix the problem, currently
 available only on the most recent CVS version of Topographica.
-Affected users may need to do a <A target="_top"                                                                  
+Affected users may need to do a <A target="_top"
 href="../Downloads/cvs.html">CVS</A> update, then "make -C external
 weave-uninstall ; make".  These changes will be included in the next
 official release.
@@ -17,6 +17,36 @@ to correct a syntax error in its configure script, which had
 been preventing compilation on platforms using bash 3.1 (such as
 Ubuntu 6.06).  There is no benefit to updating if 0.9.0 already runs
 on your platform.
+
+<p><b>07 June 06:</b> Version 0.9.0
+<A target="_top" href="../Downloads/index.html">released</A>, including 
+numerous bugfixes, 
+context-sensitive (balloon) help for nearly every parameter and control,
+full Windows support (<A target="_top" href="../images/060607_topographica_win_screenshot.png">screenshot</A>),
+full Mac OS X support,
+downloadable installation files,
+significant performance increases (7X faster on the main example scripts, with more
+speedups to come),
+faster startup,
+better memory management,
+simpler programming interface,
+improved state saving (e.g. no longer requiring the original script),
+independently controllable random number streams,
+plot window histories,
+more library components (e.g. Oja rule, CPCA, covariance),
+<!-- plotting in Sheet coordinates, -->
+<!-- better plot size handling, -->
+<!-- command history buffer, -->
+prototype spiking neuron support, and
+much-improved <A target="_top" href="../User_Manual/modeleditor.html">model editor</A>.
+
+<p><b>15 May 06:</b> New book <A target="_top"
+HREF="http://computationalmaps.org"><i>Computational Maps in the
+Visual Cortex</i></A> available, including background on modeling
+computational maps, a review of visual cortex models, and <A
+target="_top" HREF="http://computationalmaps.org/docs/chapter5.pdf">an
+extended set of examples of the types of models supported by
+Topographica</a>.
 
 <p><b>20 February 06:</b> Version 0.8.2 released, including numerous
 bugfixes, 

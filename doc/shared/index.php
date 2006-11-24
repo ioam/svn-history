@@ -38,9 +38,9 @@
 
 <p><b>22 November 06:</b> Version 0.9.2
 <A target="_top" href="../Downloads/index.html">released</A>, including
-numerous bugfixes (including fixing weave to work with GCC 4.1.x),
+numerous bugfixes (e.g. to support GCC 4.1.x compilers),
 much more complete user manual,
-more usable reference manual,
+more useful reference manual,
 more sample models,
 flexible joint normalization across Projections,
 arbitrary control of mapping CF centers (see CoordinateMapperFn),
@@ -50,36 +50,6 @@ sigmoid and generalized logistic output functions,
 and a new disparity map example (including a 
 random dot stereogram input pattern).
 <!-- Choice class to select randomly from a list of choices -->
-
-<p><b>07 June 06:</b> Version 0.9.0
-<A target="_top" href="../Downloads/index.html">released</A>, including 
-numerous bugfixes, 
-context-sensitive (balloon) help for nearly every parameter and control,
-full Windows support (<A target="_top" href="../images/060607_topographica_win_screenshot.png">screenshot</A>),
-full Mac OS X support,
-downloadable installation files,
-significant performance increases (7X faster on the main example scripts, with more
-speedups to come),
-faster startup,
-better memory management,
-simpler programming interface,
-improved state saving (e.g. no longer requiring the original script),
-independently controllable random number streams,
-plot window histories,
-more library components (e.g. Oja rule, CPCA, covariance),
-<!-- plotting in Sheet coordinates, -->
-<!-- better plot size handling, -->
-<!-- command history buffer, -->
-prototype spiking neuron support, and
-much-improved <A target="_top" href="../User_Manual/modeleditor.html">model editor</A>.
-
-<p><b>15 May 06:</b> New book <A target="_top"
-HREF="http://computationalmaps.org"><i>Computational Maps in the
-Visual Cortex</i></A> available, including background on modeling
-computational maps, a review of visual cortex models, and <A
-target="_top" HREF="http://computationalmaps.org/docs/chapter5.pdf">an
-extended set of examples of the types of models supported by
-Topographica</a>.
 
 <p><A target="_top" href="../Home/oldnews.html"><i>Older news</i></A>
 </i>
