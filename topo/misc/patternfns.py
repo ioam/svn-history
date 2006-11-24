@@ -23,6 +23,7 @@ from topo.base.arrayutils import exp
 # correctly. Unfortunately this makes such expressions more difficult
 # to read. How can Numeric's / operator be made to override Python's /
 # operator for scalars?
+# Also, we use x*x rather x**2 in exp argument because
 
 
 def gaussian(x, y, xsigma, ysigma):
@@ -57,58 +58,40 @@ def line(y, thickness, gaussian_width):
     return where(gaussian_y_coord<=0, 1.0, falloff)
 
 
-def disk(x, y, width, height, gaussian_width):
+def disk(x, y, height, gaussian_width):
     """
-    Elliptical disk with Gaussian fall-off after the solid central region.
+    Circular disk with Gaussian fall-off after the solid central region.
     """
-    disk_perimeter = __ellipse_dist(x,y,width/2.0,height/2.0)  
-    disk = greater_equal(disk_perimeter,0)
+    disk_radius = height/2.0
+    
+    distance_from_origin = sqrt(x**2+y**2)
+    distance_outside_disk = distance_from_origin - disk_radius
 
     sigmasq = gaussian_width*gaussian_width
-    falloff = __exp(-disk_perimeter*disk_perimeter, 2.0*sigmasq)
+    falloff = __exp(-distance_outside_disk*distance_outside_disk, 2*sigmasq)
 
-    return maximum(disk, falloff)
+    return where(distance_outside_disk<=0,1.0,falloff)
 
 
-def ring(x, y, width, height, thickness, gaussian_width):
+def ring(x, y, height, thickness, gaussian_width):
     """
-    Elliptical ring (annulus) with Gaussian fall-off after the solid ring-shaped region.
-    """    
-    ellipse_dist = __ellipse_dist(x,y,width/2.0,height/2.0)  
+    Circular ring (annulus) with Gaussian fall-off after the solid ring-shaped region.
+    """
+    radius = height/2.0
+    half_thickness = thickness/2.0
 
-    inner_perimeter = ellipse_dist - thickness
-    outer_perimeter = ellipse_dist + thickness
+    distance_from_origin = sqrt(x**2+y**2)
+    distance_outside_outer_disk = distance_from_origin - radius - half_thickness
+    distance_inside_inner_disk = radius - half_thickness - distance_from_origin
 
-    ring = bitwise_xor(greater_equal(inner_perimeter,0.0),greater_equal(outer_perimeter,0.0)) 
+    ring = 1.0-bitwise_xor(greater_equal(distance_inside_inner_disk,0.0),greater_equal(distance_outside_outer_disk,0.0))
 
-    sigmasq = gaussian_width*gaussian_width
-    inner_falloff = __exp(-inner_perimeter*inner_perimeter, 2.0*sigmasq)
-    outer_falloff = __exp(-outer_perimeter*outer_perimeter, 2.0*sigmasq)
+    sigmasq = gaussian_width*gaussian_width  
+    inner_falloff = __exp(-distance_inside_inner_disk*distance_inside_inner_disk, 2.0*sigmasq)
+    outer_falloff = __exp(-distance_outside_outer_disk*distance_outside_outer_disk, 2.0*sigmasq)
 
     return maximum(inner_falloff,maximum(outer_falloff,ring))
 
-
-
-# JABHACKALERT:  The __ellipse_dist function needs to be reimplemented
-# with a function that actually computes the distance from point (x,y)
-# to the nearest point on the ellipse; this one does not.  The result
-# is that the falloffs for ring() and disk() are not correct; try 
-# comparing them with those for line().
-
-def __ellipse_dist(x,y,a,b):
-    """
-    For an ellipse consisting of all points (x1,y1) where 
-    (x1/a)^2 + (y1/b)^2 = 1, should return the distance from (x,y) to the
-    nearest point on the ellipse.  Negative distance represents points
-    outside of the ellipse.
-    
-    Bug: the value returned is currently related to the distance, but is
-    not the same quantity; it needs to be corrected.
-    """
-    x_a = divide(x,float(a))
-    y_b = divide(y,float(b))
-    
-    return 1.0 - (x_a*x_a + y_b*y_b)  
 
 
 def __exp(x,denom):
