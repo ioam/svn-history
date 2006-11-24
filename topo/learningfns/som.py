@@ -10,13 +10,13 @@ from math import ceil
 
 from Numeric import exp, argmax
 
-from topo.base.arrayutils import L2norm
+from topo.base.arrayutils import L2norm, array_argmax
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFPLearningFn
 from topo.base.parameterclasses import Number
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.patterngenerator import PatternGeneratorParameter
-
+    
 from topo.patterns.basic import Gaussian
 from topo.outputfns.basic import IdentityOF
 
@@ -63,15 +63,6 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
         doc="Neighborhood function")
     
 
-    def winner_coords(self, activity, cols):
-        "Returns the coordinates of the most-active unit."
-        
-        pos = argmax(activity.flat)
-        r = pos/cols
-        c = pos%cols
-        return r,c
-
-
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
 
         rows,cols = output_activity.shape
@@ -91,7 +82,7 @@ class CFPLF_HebbianSOM(CFPLF_SOM):
         # coordinates does not take much time, and requiring the
         # winner to be passed in would make it harder to mix and match
         # Projections and learning rules with different Sheets.
-        wr,wc = self.winner_coords(output_activity,cols)
+        wr,wc = array_argmax(output_activity)
 
         # Optimization: Calculate the bounding box around the winner
         # in which weights will be changed, to avoid considering those

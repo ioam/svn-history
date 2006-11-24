@@ -172,3 +172,15 @@ def clip_lower(mat,lower_bound):
 
     mat *= to_keep
     mat += lower_cropping*lower_bound
+
+
+# There might already be a function for this in Numeric...
+def array_argmax(self, mat):
+    "Returns the coordinates of the maximum element in the given matrix."
+    rows,cols = mat.shape
+    pos = argmax(mat.flat)
+    r = pos/cols
+    c = pos%cols
+    return r,c
+
+
