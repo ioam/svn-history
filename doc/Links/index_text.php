@@ -78,7 +78,8 @@ scaling equations that underlie Sheet coordinates
     calculators or PostScript) that is not nearly as friendly as
     Python, and requires much more of the simulation code to be
     written in C.  On the other hand, NEST does provide many useful,
-    high-performance primitives, and can be particularly useful for
+    high-performance primitives, has good parallel computer support,
+    and can be particularly useful for
     models that do not fit Topographica's abstractions closely.<BR><BR>
   <dt><A TARGET="_top" HREF="http://ilab.usc.edu/toolkit/documentation.shtml">iNVT</A></dt>
   <dd>iLab Neuromorphic Vision Toolkit is a high-performance
