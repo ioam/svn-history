@@ -13,7 +13,7 @@ __version__='$Revision$'
 
 from math import pi
 
-from Numeric import where,maximum,cos,sin,sqrt,less_equal,divide,greater_equal,bitwise_xor
+from Numeric import where,maximum,cos,sin,sqrt,divide,greater_equal,bitwise_xor
 
 from topo.base.arrayutils import exp
 
