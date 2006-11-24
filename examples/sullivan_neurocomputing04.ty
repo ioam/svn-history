@@ -70,11 +70,13 @@ RandomArray.seed(500,500)
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
                                     period=1.0,phase=0.05,nominal_density=40)
 
+# Note that the learning rates from the original paper must be scaled
+# by the number of units in a typical ConnectionField, either 5x5 or 40x40
 topo.sim['V1'] = CFSOM(nominal_density=locals().get('default_density',40.0),
-                       learning_length=10000,radius_0=0.1,alpha_0=0.5)
+                       learning_length=10000,radius_0=0.1,alpha_0=0.5*5*5)
 
 topo.sim['Complex Cell Layer'] = CFSOM(nominal_density=locals().get('default_density',40.0),
-                       learning_length=10000,radius_0=0.1,alpha_0=0.5)
+                       learning_length=10000,radius_0=0.1,alpha_0=0.5*40*40)
 
 topo.sim.connect('Retina','V1',delay=0.05,connection_type=CFProjection,
                   weights_generator = topo.patterns.basic.Gaussian(),
