@@ -21,7 +21,8 @@ class Oja(LearningFn):
     Oja's rule (Oja, 1982; Dayan and Abbott, 2001, equation 8.16.)
 
     Hebbian rule with soft multiplicative normalization, tending the
-    weights toward a constant sum-squared value over time.
+    weights toward a constant sum-squared value over time.  Thus this
+    function does not normally need a separate output_fn for normalization.
     """
     
     alpha=Number(default=0.1,bounds=(0,None))
