@@ -65,7 +65,6 @@ del examples\lissom_or_sf.ty
 del examples\ohzawa_science90.ty
 del examples\sullivan_neurocomputing04.ty
 del examples\sullivan_neurocomputing06.ty
-del examples\tiny.ty
 
 rmdir /Q /S tmp\
 REM CEBHACKALERT: need to delete CVS/ dirs recursively
