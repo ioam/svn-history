@@ -18,7 +18,10 @@ Making a Windows installation package
 (4) Delete the doc/ subdirectory and replace it with one where the 
     documentation has been compiled (I copy it over from a linux
     version, but you could complile the php files on Windows, good
-    luck with that).
+    luck with that).  The doc directory should be cleaned up before it
+    is copied in, by removing any CVS files, including the CVS
+    subdirectory of each directory, plus .cvsignore and cvs temporary
+    files.
 
 (6) I use 'Inno Setup 5', an open-source installation package creator
     (see http://www.jrsoftware.org/isinfo.php).
