@@ -131,8 +131,11 @@ new-version: FORCE
 # Make a new LATEST_STABLE on the web, using the currently checked-out version
 LATEST_STABLE:
 	cvs rtag -d LATEST_STABLE topographica
+	cvs rtag -d LATEST_STABLE topographica-win
 	cvs tag -F -c LATEST_STABLE
 	cvs tag -F -c ${RELEASE_TAG}
+	cvs rtag LATEST_STABLE topographica-win
+	cvs rtag ${RELEASE_TAG} topographica-win
 
 # Update Topographica.org web site
 sf-web-site: reference-manual doc
