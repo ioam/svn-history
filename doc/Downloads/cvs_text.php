@@ -59,7 +59,15 @@ to stick to the LATEST_STABLE version except to fix specific problems.
 
 <H3>Downloading via CVS</H3>
 
-The CVS installation instructions differ on the various platforms:
+The CVS installation instructions differ on the various platforms, as
+outlined below.  Regardless of platform, please note that the
+Topographica repository contains some very large files, and the CVS
+download process may appear to hang or freeze at various times while
+these files are downloaded.  Unfortunately, CVS does not provide any
+sort of feedback that this is occurring, so please just be patient
+when downloading via CVS.  Such pauses should be rare after the first
+CVS download, unless one of the large files has been updated.
+
 
 <H4><A NAME="linux">Linux/UNIX:</A></H4>
 
