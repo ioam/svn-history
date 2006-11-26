@@ -119,9 +119,7 @@ that version of the system, you would do:
 <li> From the Apple developer web site, download 
 <A HREF="http://developer.apple.com/tools/xcode/index.html">XCode_Tool2.2</a>
 (among other development utilities, it provides the required GCC C/C++ compiler).
-<li> Specify gcc 3.3 using: <code>sudo gcc_select 3.3</code>.  The
-default 4.0 compiler is fine for most of the included packages, but
-some people have reported that SciPy (weave) does not work with gcc 4.0.
+Other versions should also work, but have not been tested.
 <li> Download and install the <A HREF="http://fink.sourceforge.net/download/">Fink</a> package.
 Also install the FinkCommander GUI, which makes finding and installing Unix software
 more convenient.
@@ -137,8 +135,11 @@ and m4, if these are not already installed.
 </ol>
 
 <P>Once these programs are installed, Mac users can simply follow the
-<A HREF="#linux">Linux</A> instructions above.
-
+<A HREF="#linux">Linux</A> instructions above.  If you have trouble,
+you might try specifying gcc 3.3 using <code>sudo gcc_select
+3.3</code>.  (The default GCC 4.0 compiler works fine with recent
+versions of Topographica under Linux, but has not yet been tested
+under OS X.)
 
 <H4><A NAME="windows">Windows:</A></H4>
 <!--  CEBALERT: One day we might have instructions for building -->
