@@ -148,7 +148,7 @@ sf-web-site: reference-manual doc
 # but it is enabled when the distribution directory is created.
 #
 #@@distclean: FORCE clean
-#@@	   ${RM} .#* */.#* */*/.#* */*~ .cvsignore ChangeLog.txt */.cvsignore */*/.cvsignore
+#@@	   ${RM} .#* */.#* */*/.#* */*~ .cvsignore ChangeLog.txt */.cvsignore */*/.cvsignore */*/*/.cvsignore
 #@@	   ${RM} etc/topographica.elc ImageSaver*.ppm countalerts* annotate.out
 #@@	   ${RM} examples/disparity_energy.ty
 #@@	   ${RM} examples/homeostatic.ty
