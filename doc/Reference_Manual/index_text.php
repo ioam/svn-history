@@ -42,8 +42,7 @@ ConnectionFields (spatially localized groups of connections to one
 unit), and the event-driven Simulation.  All of these files are
 independent of the rest of the files in topo/, and act as the primary
 programming interface on which Topographica is built.  The rest of the
-directories add components used in specific models, and implement the
-GUI.
+directories add components used in specific models.
 
 <H2><A NAME="library">Library</A></H2>
 
