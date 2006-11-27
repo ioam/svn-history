@@ -168,6 +168,7 @@ sf-web-site: reference-manual doc
 #@@	   ${RM} examples/ohzawa_science90.ty
 #@@	   ${RM} examples/sullivan_neurocomputing04.ty
 #@@	   ${RM} examples/sullivan_nn06.ty
+#@@	   ${RM} -r topographica-win
 #@@	   ${RM} -r tmp/
 #@@	   ${RM} -r CVS */CVS */*/CVS */*/*/CVS
 
