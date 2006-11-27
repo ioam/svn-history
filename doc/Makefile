@@ -41,15 +41,15 @@ default: bib2html imagedirs all
 all: ${PHPHTML}
 
 
-# The --parse-only could be removed later if epydoc were patch to used the 
+# The --parse-only could be removed later if epydoc were patched to used the 
 # __repr___ for Parameter values, instead of a meaningless object identifier
-reference-manual: ../topo/*.py ../topo/*/*.py
+reference-manual: Reference_Manual/toc.html
+Reference_Manual/toc.html: ../topo/*.py ../topo/*/*.py Reference_Manual/index_text.php
 	mv ../topo/tests ../topo-tests-tmp
 	cd .. ; bin/epydoc  --parse-only --inheritance=listed --docformat=ReStructuredText --show-sourcecode --html -o doc/Reference_Manual --name=Topographica --url=http://topographica.org topo
 	mv ../topo-tests-tmp ../topo/tests 
-        # Force PHP to overwrite the auto-generated index.html file (at least for now)
-	touch Reference_Manual/index_text.php
-	touch reference-manual
+	mv Reference_Manual/index.html Reference_Manual/topo.html
+	make Reference_Manual/index.html
 # 	--graph=all
 
 imagedirs:

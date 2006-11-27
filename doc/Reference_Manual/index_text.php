@@ -17,7 +17,9 @@ source code.
 
 <P>Topographica is designed as a collection of packages from which
 elements can be selected to model specific neural systems.  For more
-information, see the individual subpackages:
+information, see the individual subpackages of the <A
+href="topo.html"><strong>topo</strong></A> package.  The most 
+essential of these are:
 
 <P><DL COMPACT>
 <DT><A href="topo.base-module.html"><strong>base</strong></A></DT>
@@ -144,7 +146,7 @@ in Topographica components and scripts.</DD>
 classes, and those who want to add their own GUI windows can use any
 widgets from Pmw.</DD>
 
-<P><DT><A href="http://www.scipy.org/documentation/weave/">Weave</A></DT>
+<P><DT><A href="http://www.scipy.org/Weave">Weave</A></DT>
 <DD>Topographica uses weave to allow snippets of C or C++ code to be
 included within Python functions, usually for a specific speed optimization.
 This functionality is available for any user-defined library function, 
