@@ -58,10 +58,9 @@ CFProjection.weights_generator=topo.patterns.random.UniformRandom()
 
 # Input pattern
 input_pattern = topo.patterns.basic.Gaussian(
-			scale=1, size=2*0.0468, aspect_ratio=4.0,
-			x=DynamicNumber(UniformRandom(lbound=-0.6,ubound=0.6,seed=12)),
-			y=DynamicNumber(UniformRandom(lbound=-0.6,ubound=0.6,seed=34)),
-			orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+			scale=1, size=2*0.0468, aspect_ratio=1.0,
+			x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
+			y=0,orientation=0)
 		
 	
   	  
@@ -69,7 +68,8 @@ input_pattern = topo.patterns.basic.Gaussian(
 
 
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
-                                    period=1.0,phase=0.05,nominal_density=150,nominal_bounds=BoundingBox(points=((-0.5,-0.1),(0.5,0.1))))
+                                    period=1.0,phase=0.05,nominal_density=150,
+                                    nominal_bounds=BoundingBox(points=((-0.5,-0.5/150.0),(0.5,0.5/150.0))))
 
 
 
@@ -77,7 +77,8 @@ topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
 # by the number of units in a typical ConnectionField, i.e. 150 in this case
 topo.sim['V1'] = CFSOM(nominal_density=locals().get('default_density',15),
                        learning_length=10000,radius_0=0.1,alpha_0=0.00033*150,
-                       nominal_bounds=BoundingBox(points=((-0.5,-0.1),(0.5,0.1))),output_fn=PiecewiseLinear_debug2())
+                       nominal_bounds=BoundingBox(points=((-0.5,-0.5/15.0),(0.5,0.5/15.0))),
+                       output_fn=PiecewiseLinear_debug2())
 
 
 
@@ -91,7 +92,7 @@ topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
 ##uncomenting one of the first will print the firing rate of a central neuron
 ##topo.sim.schedule_command(6000,'vectorplot (topo.sim["V1"].projections()["Afferent"].learning_fn.ave_hist[0:6000])')
 
-##uncomenting one of the first will print the sum of absolute waights of this neuron, to see if the weights change stabilises to something useful
+##uncomenting one of the first will print the sum of absolute weights of this neuron, to see if the weights change stabilises to something useful
 ##topo.sim.schedule_command(6000,'vectorplot (topo.sim["V1"].projections()["Afferent"].learning_fn.temp_hist[0:6000])')
 
 
@@ -100,10 +101,9 @@ def measure_topography():
     """Function for mapping the topographic organization"""
     winners = []
     for i in xrange(0,149): # Need to handle sheet coordinates...
-        ##pattern_present(Rectangle(size=...,x=i*1/150.0,...))
-        ##winners += topo.sim['V1'].winner_coords(topo.sim['V1'].activity)
-        ##vectorplot(winners.rows())
-        pattern_present({'Retina':Rectangle(size=1.0,x=i*1/150.0)})
+        pattern_present({'Retina':Rectangle(size=1.0/150.0,x=i/150.0-0.5+0.5/150)})
+        #import topo ; topo.guimain.auto_refresh()        
         winners+=array_argmax(topo.sim['V1'].activity)
 
+    ##vectorplot(winners.rows())
     print winners
