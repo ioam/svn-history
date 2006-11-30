@@ -5,8 +5,6 @@ SOM-based model of complex cell development",  Neurocomputing, Volumes
 
 NOT YET TESTED.
 
-Complex cell layer needs subtractive normalisation instead of divisive.
-
 The following parameters aren't specified in the paper:
 Sheet sizes(estimated from diagrams),
 Learning rates for both Hebbian and Trace functions,
@@ -75,14 +73,13 @@ topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
 
 # Note that the learning rates from the original paper must be scaled
 # by the number of units in a typical ConnectionField, either 5x5 or 40x40
-topo.sim['V1'] = CFSOM(nominal_density=locals().get('default_density',40.0),
-                       learning_length=10000,radius_0=0.1,alpha_0=0.02*5*5)
+topo.sim['V1'] = CFSheet(nominal_density=locals().get('default_density',40.0),
+                         learning_length=10000,radius_0=0.1,alpha_0=0.02*5*5)
 
 topo.sim.connect('Retina','V1',delay=0.05,connection_type=CFProjection,
-	             weights_generator = topo.patterns.basic.Gaussian(),
+                     weights_generator = topo.patterns.random.Line(orientation=DynamicNumber(UniformRandom(lbound=0.0,ubound=2*pi,seed=30)),
                      nominal_bounds_template=BoundingBox(radius=0.1),
                      response_fn = CFPRF_DotProduct_opt(),
-                     learning_fn=CFPLF_HebbianSOM(),
                      x_coord_mapper=XModulo(),
                      y_coord_mapper=YModulo())
 
@@ -90,9 +87,9 @@ topo.sim['Complex Cell Layer'] = CFSOM(nominal_density=locals().get('default_den
                        learning_length=10000,radius_0=0.1,alpha_0=0.1)
 
 topo.sim.connect('V1','Complex Cell Layer',delay=0.05,connection_type=CFProjection,
-                  weights_generator = topo.patterns.basic.Gaussian(),
+                  weights_generator = topo.patterns.random.UniformRandom(),
                   nominal_bounds_template=BoundingBox(radius=1),
                   response_fn = CFPRF_DotProduct_opt(),
-                  weights_output_fn=CFPLF_Plugin(single_cf_fn=DivisiveNormalizeL1()),
-#		  learning_fn=CFPLF_HebbianSOM())
+                  # output_fn = ...,  # Need to add an output_fn that finds the max and replaces
+                  # the activity with a kernel centered on the max, based on CFPLF_HebbianSOM (without the learning)
                   learning_fn=CFPLF_Trace())
