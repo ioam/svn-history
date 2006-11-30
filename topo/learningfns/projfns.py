@@ -14,6 +14,7 @@ import Numeric
 from Numeric import ones,Float,Float32,zeros
 
 from topo.base.cf import CFPLearningFn,LearningFnParameter
+from topo.base.sheet import activity_type
 from topo.base.parameterclasses import Number,BooleanParameter
 from basic import BCMFixed
 from topo.base.functionfamilies import Hebbian,LearningFn,LearningFnParameter
@@ -55,13 +56,13 @@ from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
 ##	for r in xrange(rows):
 ##            for c in xrange(cols):
 ##                cf = cfs[r][c]
-##                input_activity = cf.get_input_matrix(input_activity)
+##                input_act = cf.get_input_matrix(input_activity)
 ##                unit_activity = output_activity[r,c]
 ##                threshold=self.unit_thresholds[r,c]
-##                print cf.weights, type(cf.weights)
-##                print input_activity, type(input_activity)
-##                print single_connection_learning_rate,unit_activity,threshold, (unit_activity-threshold)
-##                cf.weights += (single_connection_learning_rate * unit_activity * (unit_activity-threshold)) * input_activity 
+##                #print cf.weights, type(cf.weights)
+##                #print input_act, type(input_act)
+##                #print single_connection_learning_rate,unit_activity,threshold, (unit_activity-threshold)
+##                cf.weights += (single_connection_learning_rate * unit_activity * (unit_activity-threshold)) * input_act 
 ##                self.unit_thresholds[r,c] += self.unit_threshold_learning_rate*(unit_activity*unit_activity-threshold)
 ##
 ##                # CEBHACKALERT: see ConnectionField.__init__()
@@ -71,23 +72,26 @@ from topo.base.cf import CFPLF_Identity,CFPLF_Plugin
 
 class CFPLF_Trace(CFPLearningFn):
     """
-    Implementation of Trace LearningFn as CFPLF, NOT FULLY TESTED
+    LearningFn that incorporates a trace of recent activity,
+    not just the current activity.
 
-    Trace learning rule; Foldiak (1991), Sutton and Barto (1981), Wallis and Rolls (1997).
+    Based on P. Foldiak (1991), "Learning Invariance from
+    Transformation Sequences", Neural Computation 3:194-200.  Also see
+    Sutton and Barto (1981) and Wallis and Rolls (1997).
+
+    Incorporates a decay term to keep the weight vector bounded, and
+    so it does not normally require any output_fn normalization for
+    stability.
        
-    Incorporates a trace of recent activity into the learning
-    function, instead of learning based only on the current activity
-    as in strict Hebbian learning.
-    
-    Requires some form of output_fn normalization for stability.
-
     NOT YET TESTED.
     """
 
     trace_strength=Number(default=0.5,bounds=(0.0,1.0),
        doc="How much the learning is dominated by the activity trace, relative to the current value.")     
+
     single_cf_fn = LearningFnParameter(default=Hebbian(),
         doc="LearningFn that will be applied to each CF individually.")              
+
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
         single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
@@ -95,19 +99,21 @@ class CFPLF_Trace(CFPLearningFn):
         
         ##Initialise traces to zero if they don't already exist
         if not hasattr(self,'traces'):
-            self.traces=zeros(output_activity.shape,Float32)
+            self.traces=zeros(output_activity.shape,activity_type)
             self.traces.savespace(1)
+            
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = cfs[r][c]
-                #single_cf_fn(cf.get_input_matrix(input_activity),
-                 #            output_activity[r,c], cf.weights, single_connection_learning_rate)
                 unit_activity = output_activity[r,c]
-                #print "r is",r,"c is",c,","unit_activity is",unit_activity
-                self.traces[r,c] =((1-self.trace_strength)*unit_activity)+(self.trace_strength*self.traces[r,c])
+                #print "r is",r,"c is",c,"unit_activity is",unit_activity
+                new_trace = ((1-self.trace_strength)*unit_activity)+(self.trace_strength*self.traces[r,c])
+                self.traces[r,c] = new_trace
                 #print "input=",input_activity[10,10],"weights=",cf.weights[10,10]
-                #print "input_activity - cf.weights is",input_activity[10,10]-cf.weights[10,10]           
-                cf.weights += single_connection_learning_rate * self.traces[r,c] * (cf.get_input_matrix(input_activity) - cf.weights)
+                #print "cf.get_input_matrix(input_activity) - cf.weights is",cf.get_input_matrix(input_activity)[10,10]-cf.weights[10,10]           
+                cf.weights += single_connection_learning_rate * new_trace * \
+                              (cf.get_input_matrix(input_activity) - cf.weights)
+                
                 #CEBHACKALERT: see ConnectionField.__init__()
                 cf.weights *= cf.mask
       
