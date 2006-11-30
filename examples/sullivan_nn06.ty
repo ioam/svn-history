@@ -103,7 +103,7 @@ def measure_topography():
         ##pattern_present(Rectangle(size=...,x=i*1/150.0,...))
         ##winners += topo.sim['V1'].winner_coords(topo.sim['V1'].activity)
         ##vectorplot(winners.rows())
-        pattern_present({'Retina':Rectangle(size=0.5,x=i*1/150.0)})
+        pattern_present({'Retina':Rectangle(size=1.0,x=i*1/150.0)})
         winners+=array_argmax(topo.sim['V1'].activity)
 
     print winners
