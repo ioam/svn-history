@@ -30,7 +30,7 @@ from Numeric import sum,ones,exp
 import topo.patterns.random
 import topo.patterns.basic
 
-from topo.base.arrayutils import clip_in_place
+from topo.base.arrayutils import clip_in_place,array_argmax
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFPLearningFn,LearningFnParameter
 from topo.base.cf import CFProjection
@@ -42,13 +42,13 @@ from topo.learningfns.projfns import HomeoSynaptic
 from topo.learningfns.som import CFPLF_HebbianSOM
 from topo.misc.numbergenerators import UniformRandom
 from topo.outputfns.homeostatic import PiecewiseLinear_debug2
-from topo.patterns.basic import Disk
+from topo.patterns.basic import Rectangle
 from topo.sheets.cfsom import CFSOM
 from topo.sheets.generatorsheet import GeneratorSheet
-  
+from topo.commands.basic import pattern_present
 
 
-topo.sim.name = "sullivan_neurocomputing06.ty"
+topo.sim.name = "sullivan_nn06.ty"
 
 
 #weight initialization, response 
@@ -86,17 +86,24 @@ topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
                   nominal_bounds_template=BoundingBox(radius=0.275),
                   learning_fn=HomeoSynaptic())
 
-topo.sim.schedule_command(6000,'vectorplot (topo.sim["V1"].projections()["Afferent"].learning_fn.ave_hist[0:6000])')
-topo.sim.schedule_command(6000,'vectorplot (topo.sim["V1"].projections()["Afferent"].learning_fn.temp_hist[0:6000])')
 
 
-#from topo.commands.basic import pattern_present
-#def measure_topography():
-#    """Function for mapping the topographic organization"""
-#    winners = []
-#    for i in xrange(0,149): # Need to handle sheet coordinates...
-#        pattern_present(Rectangle(size=...,x=i*1/150.0,...))
-#        winners += topo.sim['V1'].winner_coords(topo.sim['V1'].activity)
-#    vectorplot(winners.rows())
-#
-#measure_topography()
+##uncomenting one of the first will print the firing rate of a central neuron
+##topo.sim.schedule_command(6000,'vectorplot (topo.sim["V1"].projections()["Afferent"].learning_fn.ave_hist[0:6000])')
+
+##uncomenting one of the first will print the sum of absolute waights of this neuron, to see if the weights change stabilises to something useful
+##topo.sim.schedule_command(6000,'vectorplot (topo.sim["V1"].projections()["Afferent"].learning_fn.temp_hist[0:6000])')
+
+
+##It produces the learned map, showing the winning outputs/ inputs.. ##not working properly...
+def measure_topography():
+    """Function for mapping the topographic organization"""
+    winners = []
+    for i in xrange(0,149): # Need to handle sheet coordinates...
+        ##pattern_present(Rectangle(size=...,x=i*1/150.0,...))
+        ##winners += topo.sim['V1'].winner_coords(topo.sim['V1'].activity)
+        ##vectorplot(winners.rows())
+        pattern_present({'Retina':Rectangle(size=0.5,x=i*1/150.0)})
+        winners+=array_argmax(topo.sim['V1'].activity)
+
+    print winners
