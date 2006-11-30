@@ -86,7 +86,8 @@ class CFPLF_Trace(CFPLearningFn):
 
     trace_strength=Number(default=0.5,bounds=(0.0,1.0),
        doc="How much the learning is dominated by the activity trace, relative to the current value.")     
-    single_cf_fn = LearningFnParameter(default=BCMFixed())                
+    single_cf_fn = LearningFnParameter(default=Hebbian(),
+        doc="LearningFn that will be applied to each CF individually.")              
     def __call__(self, cfs, input_activity, output_activity, learning_rate, **params):
         rows,cols = output_activity.shape
         single_connection_learning_rate = self.constant_sum_connection_rate(cfs,learning_rate)
@@ -96,16 +97,18 @@ class CFPLF_Trace(CFPLearningFn):
         if not hasattr(self,'traces'):
             self.traces=zeros(output_activity.shape,Float32)
             self.traces.savespace(1)
-            
         for r in xrange(rows):
             for c in xrange(cols):
                 cf = cfs[r][c]
-                input_activity = cf.get_input_matrix(input_activity)
+                #single_cf_fn(cf.get_input_matrix(input_activity),
+                 #            output_activity[r,c], cf.weights, single_connection_learning_rate)
                 unit_activity = output_activity[r,c]
-                self.traces[r,c] =(1-self.trace_strength)*unit_activity+self.trace_strength*self.traces[r,c]
-                cf.weights += single_connection_learning_rate * self.traces[r,c] * (input_activity - cf.weights)
-
-                # CEBHACKALERT: see ConnectionField.__init__()
+                #print "r is",r,"c is",c,","unit_activity is",unit_activity
+                self.traces[r,c] =((1-self.trace_strength)*unit_activity)+(self.trace_strength*self.traces[r,c])
+                #print "input=",input_activity[10,10],"weights=",cf.weights[10,10]
+                #print "input_activity - cf.weights is",input_activity[10,10]-cf.weights[10,10]           
+                cf.weights += single_connection_learning_rate * self.traces[r,c] * (cf.get_input_matrix(input_activity) - cf.weights)
+                #CEBHACKALERT: see ConnectionField.__init__()
                 cf.weights *= cf.mask
       
 
@@ -136,7 +139,6 @@ class CFPLF_OutstarHebbian(CFPLearningFn):
                 cf = cfs[r][c]
                 single_cf_fn(cf.get_input_matrix(input_activity),
                              output_activity[r,c], cf.weights, single_connection_learning_rate)
-
 		# Outstar normalization
 		wrows,wcols = cf.weights.shape
 		for wr in xrange(wrows):
