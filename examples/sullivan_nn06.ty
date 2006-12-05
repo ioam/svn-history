@@ -95,17 +95,20 @@ topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
 ##uncomenting one of the first will print the sum of absolute weights of this neuron, to see if the weights change stabilises to something useful
 ##topo.sim.schedule_command(6000,'vectorplot (topo.sim["V1"].projections()["Afferent"].learning_fn.temp_hist[0:6000])')
 
-##It produces the learned map, showing the winning outputs/ inputs.. 
+
 def measure_topography():
-    """Function for mapping the topographic organization"""
+    """
+    Map the topographic organization by presenting rectangular inputs.
+
+    Turns on each pixel one by one, keeping track of the maximally activated
+    output node, and then plots and prints the result.
+    """
     winners = []
-    col=[]
     for i in xrange(0,149): # Need to handle sheet coordinates...
         pattern_present({'Retina':Rectangle(size=1.0/150.0,x=i/150.0-0.5+0.5/150)})
-        #import topo ; topo.guimain.auto_refresh()
+        #import topo ; topo.guimain.auto_refresh() # To visualize each pattern as it is drawn
         winners.append(array_argmax(topo.sim['V1'].activity))
-    for i in xrange(0,149):
-        col.append(winners[i][1])
+    col = [c for r,c in winners]
     print col
     vectorplot(col[0:149])
 
