@@ -16,12 +16,16 @@ __version__='$Revision$'
 import Numeric
 import copy
 from Numeric import dot, exp
+from math import ceil
 
 from topo.base.arrayutils import clip_in_place,clip_lower
-from topo.base.arrayutils import L2norm, norm
+from topo.base.arrayutils import L2norm, norm, array_argmax
 from topo.base.functionfamilies import OutputFn
 from topo.base.parameterclasses import Number
 from topo.base.parameterizedobject import ParameterizedObject
+from topo.base.patterngenerator import PatternGeneratorParameter
+from topo.base.boundingregion import BoundingBox
+from topo.patterns.basic import Gaussian
 
 # Imported here so that all OutputFns will be in the same package
 from topo.base.functionfamilies import IdentityOF
@@ -222,5 +226,48 @@ class BinaryThreshold(OutputFn):
         x *= 0.0
         x += above_threshold
 
+class KernelMax(OutputFn):
+    """
+    Based upon CFPLF_HebbianSOM but without learning. Finds the maximum activity and
+    replaces the output with a kernel centered around the max
 
+    The radius of the surround is specified by the parameter
+    kernel_radius, which should be set before using __call__.  The
+    shape of the surround is determined by the neighborhood_kernel_generator, 
+    and can be any PatternGenerator instance, or any function accepting
+    bounds, density, radius, and height to return a kernel matrix.
+    """
+    kernel_radius = Number(default=0.0)  
+    crop_radius_multiplier = Number(default=3.0,doc=
+        """
+        Factor by which the radius should be multiplied,
+        when deciding how far from the winner to extend the kernel.
+        """)
+    
+    neighborhood_kernel_generator = PatternGeneratorParameter(
+        default=Gaussian(x=0.0,y=0.0,aspect_ratio=1.0),
+        doc="Neighborhood function")
+  
+    def __call__(self, x):
+      	output_activity=x
+        rows,cols = output_activity.shape
+        radius = self.kernel_radius
+        crop_radius = max(1.25,radius*self.crop_radius_multiplier)
+
+        # find out the matrix coordinates of the winner
+        wr,wc = array_argmax(output_activity)
+
+        # Calculate the bounding box around the winner
+        cmin = int(max(0,wc-crop_radius))
+        cmax = int(min(wc+crop_radius+1,cols)) # at least 1 between cmin and cmax
+        rmin = int(max(0,wr-crop_radius))
+        rmax = int(min(wr+crop_radius+1,rows))
+
+        # generate the kernel matrix and set output activity to it.
+        nk_generator = self.neighborhood_kernel_generator
+        radius_int = int(ceil(crop_radius))
+        rbound = radius_int + 0.5
+        bb = BoundingBox(points=((-rbound,-rbound), (rbound,rbound)))
+        x = nk_generator(bounds=bb,xdensity=1,ydensity=1,
+                                           size=2*radius)
 
