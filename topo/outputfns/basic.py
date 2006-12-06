@@ -226,6 +226,10 @@ class BinaryThreshold(OutputFn):
         x *= 0.0
         x += above_threshold
 
+
+### JABALERT: Is this the right location for this class?  It brings in
+### dependencies on PatternGeneratorParameter and Gaussian, which are
+### not things that many OutputFns will need.  Perhaps move to som.py?
 class KernelMax(OutputFn):
     """
     Based upon CFPLF_HebbianSOM but without learning. Finds the maximum activity and
@@ -238,11 +242,6 @@ class KernelMax(OutputFn):
     bounds, density, radius, and height to return a kernel matrix.
     """
     kernel_radius = Number(default=0.0)  
-    crop_radius_multiplier = Number(default=3.0,doc=
-        """
-        Factor by which the radius should be multiplied,
-        when deciding how far from the winner to extend the kernel.
-        """)
     
     neighborhood_kernel_generator = PatternGeneratorParameter(
         default=Gaussian(x=0.0,y=0.0,aspect_ratio=1.0),
@@ -252,22 +251,13 @@ class KernelMax(OutputFn):
       	output_activity=x
         rows,cols = output_activity.shape
         radius = self.kernel_radius
-        crop_radius = max(1.25,radius*self.crop_radius_multiplier)
 
         # find out the matrix coordinates of the winner
         wr,wc = array_argmax(output_activity)
 
-        # Calculate the bounding box around the winner
-        cmin = int(max(0,wc-crop_radius))
-        cmax = int(min(wc+crop_radius+1,cols)) # at least 1 between cmin and cmax
-        rmin = int(max(0,wr-crop_radius))
-        rmax = int(min(wr+crop_radius+1,rows))
-
         # generate the kernel matrix and set output activity to it.
         nk_generator = self.neighborhood_kernel_generator
-        radius_int = int(ceil(crop_radius))
-        rbound = radius_int + 0.5
-        bb = BoundingBox(points=((-rbound,-rbound), (rbound,rbound)))
-        x = nk_generator(bounds=bb,xdensity=1,ydensity=1,
-                                           size=2*radius)
-
+        bb = BoundingBox(points=((0,0), (rows,cols))) # Check if bb is upper exclusive
+        x *= 0.0
+        x += nk_generator(bounds=bb,xdensity=1,ydensity=1,size=2*radius,x=wc,y=wr)
+        
