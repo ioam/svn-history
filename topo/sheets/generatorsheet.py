@@ -109,5 +109,9 @@ class GeneratorSheet(Sheet):
                      " on dest_port " + str(conn.dest_port) +
                      " via connection " + conn.name + ".")
         self.verbose("Time %0.4f: Generating a new pattern" % (self.simulation.time()))
+        
+        ### JABALERT: Would it be more efficient to re-use the same
+        ### bit of memory each time?  This way allocates a new block
+        ### of memory each time a pattern is drawn...
         self.activity = self.input_generator()
         self.send_output(src_port='Activity',data=self.activity)
