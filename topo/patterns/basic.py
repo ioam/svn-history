@@ -45,7 +45,7 @@ class Gaussian(PatternGenerator):
     size  = Number(default=0.5,doc="""
         Overall size of the Gaussian, defined by:
         exp(-x^2/(2*xsigma^2) - y^2/(2*ysigma^2)
-        where ysigma=size/2.
+        where ysigma=size/2 and xsigma=size/2*aspect_ratio.
         """)
 
     def function(self,**params):
