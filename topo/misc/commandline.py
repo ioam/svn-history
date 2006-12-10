@@ -15,6 +15,7 @@ from optparse import OptionParser
 from inlinec import import_weave
 
 
+# Startup banner
 BANNER = """
 Welcome to Topographica!
 
@@ -24,24 +25,35 @@ specific command, or topo.about() for info on this release, including
 licensing information.
 """
 
-# CB: this one gives "topographica-t0.0000> "
-# prompt = '"topographica-t"+str(topo.sim.time())+"> "'   
-prompt = '"Topographica> "'
-
 class CommandPrompt(object):
     """
-    Object whose __str__ method returns str() of the 
-    topo.misc.commandline.prompt variable eval()'d in __main__.
+    Provides a dynamically updated command prompt.
 
-    Set topo.misc.commandline.prompt to something that can be
-    eval()'d in __main__ to have that expression appear as the
-    prompt. E.g.
-    topo.misc.commandline.prompt = '"Topographica> "'
-    sets the prompt to 'Topographica> '.
+    The variable sys.ps1 controls Python's command prompt.  If that
+    variable is set to a non-string object, then the object's
+    __str__() method is called before displaying the prompt.  This
+    class provides a __str__() method that evaluates this class's
+    'format' variable in __main__, and then returns the result.  To
+    use this, just set sys.ps1 to an instance of this class.
+
+    The prompt is then controlled by the class attribute 'format'.
+    Several predefined formats are provided, and any of these (or any
+    arbitrary string) can be used by setting the class attribute
+    'format' to their values.  For example, user code can turn on ANSI
+    colors using:
+    
+      CommandPrompt.format=CommandPrompt.ansi_format
     """
-    # If Python's sys.ps1 is set to a non-string object, then that object's
-    # str() method is called before displaying the prompt. 
-    def __str__(self): return str(eval(prompt,__main__.__dict__))
+
+    # Predefined alternatives
+    basic_format   = '"Topographica> "'
+    simtime_format = '"Topographica_t%g> " % topo.sim.time()'
+    ansi_format    = '"\x1b[32;40;1mTopographica\x1b[33;40;1m_t%g>\x1b[m " % topo.sim.time()'
+
+    # Select from one of the predefined alternatives (or any other format):
+    format = simtime_format
+    
+    def __str__(self): return str(eval(self.format,__main__.__dict__))
 
 
 # Use to define global constants
@@ -119,7 +131,8 @@ def process_argv(argv):
     # importing weave first does not cause problems.
     if import_weave: exec "import weave" in __main__.__dict__    
 
-    sys.ps1 = CommandPrompt() 
+    sys.ps1 = CommandPrompt()
+    
     for (k,v) in global_constants.items():
         exec '%s = %s' % (k,v) in __main__.__dict__
 
