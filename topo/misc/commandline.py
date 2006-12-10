@@ -24,6 +24,26 @@ specific command, or topo.about() for info on this release, including
 licensing information.
 """
 
+# CB: this one gives "topographica-t0.0000> "
+# prompt = '"topographica-t"+str(topo.sim.time())+"> "'   
+prompt = '"Topographica> "'
+
+class CommandPrompt(object):
+    """
+    Object whose __str__ method returns str() of the 
+    topo.misc.commandline.prompt variable eval()'d in __main__.
+
+    Set topo.misc.commandline.prompt to something that can be
+    eval()'d in __main__ to have that expression appear as the
+    prompt. E.g.
+    topo.misc.commandline.prompt = '"Topographica> "'
+    sets the prompt to 'Topographica> '.
+    """
+    # If Python's sys.ps1 is set to a non-string object, then that object's
+    # str() method is called before displaying the prompt. 
+    def __str__(self): return str(eval(prompt,__main__.__dict__))
+
+
 # Use to define global constants
 global_constants = {'pi':math.pi}
 
@@ -32,7 +52,6 @@ usage = "usage: topographica ([<option>]:[<filename>])*\n\
 where any combination of options and Python script filenames will be\n\
 processed in order left to right."
 topo_parser = OptionParser(usage=usage)
-
 
 ### Define option processing
 
@@ -100,7 +119,7 @@ def process_argv(argv):
     # importing weave first does not cause problems.
     if import_weave: exec "import weave" in __main__.__dict__    
 
-    sys.ps1 = 'Topographica> '    
+    sys.ps1 = CommandPrompt() 
     for (k,v) in global_constants.items():
         exec '%s = %s' % (k,v) in __main__.__dict__
 
