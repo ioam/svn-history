@@ -74,6 +74,8 @@ class CFSOM(topo.base.connectionfield.CFSheet)
 Topographica&gt;
 </pre>
 
+<H2>Plotting from the command line</H2>
+
 <A NAME="pylab">If the GUI is running, you can also plot any vector or matrix in the
 program:</A>
 
@@ -126,3 +128,41 @@ href="http://matplotlib.sourceforge.net/">MatPlotLib</A> documentation
 for how to make new plots and change their axes, labels, titles, line
 styles, etc.
 
+
+<H2>Customizing the command prompt</H2>
+
+<P>The contents of the command prompt itself are controlled by
+the class variable <code>CommandPrompt.format</code>, which can be set
+to any Python code that evaluates to a string.  As of 12/2006, the
+default prompt is <code>Topographica_t0></code>, where 0 is the
+current value of <code>topo.sim.time()</code> when the prompt is
+printed.  This can be changed by doing something like:
+
+<pre>
+  from topo.misc.commandline import CommandPrompt
+  CommandPrompt.format = '"Topographica_t%g> " % topo.sim.time()'
+</pre>
+
+Here any Python expression that returns a string when evaluated
+in __main__ can be used, to include information other than the
+current simulation time.  If your terminal supports ANSI colors, you
+can use those in your prompt if you wish:
+
+<pre>
+  CommandPrompt.format = '"\x1b[32;40;1mTopographica\x1b[33;40;1m_t%g>\x1b[m " % topo.sim.time()'
+</pre>
+
+We've provided a shortcut for the above format to make it easier:
+
+<pre>
+  CommandPrompt.format = CommandPrompt.ansi_format
+</pre>
+
+<P>The result should be something like:
+
+<P><IMG HEIGHT=66 WIDTH=283 SRC="../images/ansiprompt.png">
+
+<!-- Could use TerminalController from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/475116 for portable output... -->  
+<P>Note that ANSI colors are not used by default, because terminals
+that do not support them will display them as unrecognizable symbols.
+				    

@@ -262,19 +262,6 @@ Currently commented out; may not be a problem.
 </li>
 
 <li>
-2006/06/13: Make command prompt more informative. Could be done by making a 
-variable in topo.misc.commandline that contains something that can be evaluated 
-to provide a string, which will then be used for the prompt.  That way the user 
-can change that to be anything he likes, just as in C++ LISSOM (in which there 
-is a variable called command_prompt_format whose default value is
-<code>lissom.t${iteration}.p${presentation}.c${command_num_called}${current_param_set_path}></code>.<br />
-In Python, there aren't any such string macros, but we could still
-have a variable topo.misc.commandline.prompt that is expected to be
-set to something callable in __main__, and whose value is evaluated
-before each time the prompt is executed.
-</li>
-
-<li>
 2006/06/19: e.g. Filename's search_paths attribute shouldn't be pickled.
 Presumably there will be other such items, so should objects have a standard 
 attribute/parameter that lists attributes not to pickle? Or something like that.

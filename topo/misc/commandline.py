@@ -45,6 +45,9 @@ class CommandPrompt(object):
       CommandPrompt.format=CommandPrompt.ansi_format
     """
 
+    # For portable ANSI output, could use TerminalController from:
+    # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/475116
+    # (or other such solutions)
     # Predefined alternatives
     basic_format   = '"Topographica> "'
     simtime_format = '"Topographica_t%g> " % topo.sim.time()'
