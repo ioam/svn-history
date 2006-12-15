@@ -8,9 +8,13 @@ please feel free to volunteer!!!!). Dates indicate the item was first
 added to the list, or a change was made.
 </small>
 
-<h3>Tasks to be addressed soon after the upcoming 0.9.2 release:</h3>
+<h3>Tasks to be addressed for the 0.9.3 release:</h3>
 
 <ul>
+
+<li>
+2006/12/14 (JB): Replace Numeric with NumPy, and upgrade MatPlotLib.
+</li>
 
 <li>
 2006/11/09 (CP): Add automatic assignment of topo.sim.name, by taking
