@@ -14,6 +14,16 @@ added to the list, or a change was made.
 
 <li>
 2006/12/14 (JB): Replace Numeric with NumPy, and upgrade MatPlotLib.
+<br>
+'savespace' has been removed from Numeric now, so perhaps trying 
+to deepcopy a ufunc no longer leads to an error? Should be able
+to remove the hack in topo.misc.utils.
+<br>
+Documentation for the new Numeric is not free. But we could document 
+differences from the current Numeric documentation for our users, as 
+we find these differences.
+</li>
+
 </li>
 
 <li>
@@ -209,10 +219,6 @@ display list of sheet classes etc from a Parameter).
 <li>
 2006/02/21: ReadOnlyParameter to allow declaration of something but not let it
 be set anywhere else, even in a ParameterizedObject constructor.
-</li>
-
-<li>
-2006/05/02: Upgrade Numeric? Maybe some of the current problems will be solved? In particular, savespace has been removed from Numeric now. Perhaps trying to deepcopy a ufunc no longer leads to an error? Documentation for the new Numeric is not free, though. But we could document differences from the current Numeric documentation for our users, as we find these differences.
 </li>
 
 <li>
