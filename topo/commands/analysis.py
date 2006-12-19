@@ -11,23 +11,19 @@ from math import pi
 from copy import deepcopy
 
 import topo
-
-from topo.analysis.featuremap import MeasureFeatureMap
 from topo.base.arrayutils import octave_output, centroid
 from topo.base.cf import CFSheet, CFProjection, Projection
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import DynamicNumber
 from topo.base.projection import ProjectionSheet
 from topo.base.sheet import Sheet
-from topo.base.sheet import Sheet
-from topo.base.sheetview import SheetView
 from topo.base.sheetview import SheetView, ProjectionView
 from topo.commands.basic import pattern_present
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.utils import frange, wrap
-from topo.patterns.basic import SineGrating, Gaussian
+from topo.patterns.basic import SineGrating, Gaussian 
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.sheets.lissom import LISSOM
+from topo.analysis.featureresponses import FeatureMaps
 
 
 class Feature(object):
@@ -155,6 +151,17 @@ class PatternPresenter(ParameterizedObject):
                         apply_output_fn=self.apply_output_fn)
 
 
+# Module variables for passing values to the commands.
+coordinate = (0,0)
+sheet_name = ''
+proj_coords=[(0,0)]
+proj_name =''
+
+### JABALERT: This mechanism for passing values is a bit awkward, and
+### should be changed to something cleaner.  It might also be better
+### to access a Sheet instance directly, rather than searching by name.
+       
+
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,
                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
@@ -187,12 +194,11 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
                           Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
                           Feature(name="frequency",values=frequencies)]     
-   
-        x=MeasureFeatureMap(feature_values)
+
         param_dict = {"scale":scale,"offset":offset}
-        x.measure_maps(pattern_presenter, param_dict, display, feature_values)
-
-
+        x=FeatureMaps(feature_values)
+        x.collect_feature_responses(pattern_presenter,param_dict,display)
+    
 
 ### JABALERT: Shouldn't there be a num_ocularities argument as well, to
 ### present various combinations of left and right eye activity?        
@@ -226,11 +232,13 @@ def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                           Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
                           Feature(name="frequency",values=frequencies),
                           Feature(name="ocular",range=(0.0,1.0),values=[0.0,1.0])]  
-                          
-        x=MeasureFeatureMap(feature_values)
-        param_dict = {"scale":scale,"offset":offset}
-        x.measure_maps(pattern_presenter, param_dict, display, feature_values)
 
+        param_dict = {"scale":scale,"offset":offset}
+        x=FeatureMaps(feature_values)
+        x.collect_feature_responses(pattern_presenter,param_dict,display)
+  
+     
+        
 
 
 def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
@@ -265,42 +273,10 @@ def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequ
                           Feature(name="frequency",values=frequencies),
                           Feature(name="phasedisparity",range=(0.0,2*pi),step=step_disparity,cyclic=True)]    
 
-        x=MeasureFeatureMap(feature_values)
         param_dict = {"scale":scale,"offset":offset}
-        x.measure_maps(pattern_presenter, param_dict, display, feature_values)
-
-
-
-
-###JABALERT: Can this code be deleted?
-###TR: Function for disparity map analysis purposes. Used in conjunction with measure_maps_modified() in topo.analysis.featuremap
-'''
-def measure_disparity_modified(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
-                    scale=0.3,offset=0.0,display=True,
-		    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
-                                                   apply_output_fn=False,duration=0.175)):
-
-    if num_phase <= 0 or num_orientation <= 0 or num_disparity <= 0:
-        raise ValueError("num_phase, num_disparity and num_orientation must be greater than 0")
-
-    else:
-        step_phase=2*pi/num_phase
-        step_orientation=pi/num_orientation
-        step_disparity=2*pi/num_disparity
-
-        print 'freq :',frequencies
-        
-        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                          Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
-                          Feature(name="frequency",values=frequencies),
-                          Feature(name="phasedisparity",range=(0.0,2*pi),step=step_disparity,True)]          
-
-        x=MeasureFeatureMap(feature_values)
-        param_dict = {"scale":scale,"offset":offset}
-        disp_pref,orient_pref,disp_sel,orient_sel=x.measure_maps_modified(pattern_presenter, param_dict, display, feature_values)
-        return disp_pref,orient_pref,disp_sel,orient_sel
-'''
-
+        x=FeatureMaps(feature_values)
+        x.collect_feature_responses(pattern_presenter,param_dict,display)
+     
 
 def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=False,
                           pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),False,1.0),
@@ -323,10 +299,11 @@ def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=Fals
         feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
                           Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]          
                           
-        x=MeasureFeatureMap(feature_values)
         param_dict = {"size":size,"scale":scale,"offset":offset}
-        x.measure_maps(pattern_presenter, param_dict, display, feature_values)
+        x=FeatureMaps(feature_values)
+        x.collect_feature_responses(pattern_presenter,param_dict,display)
 
+        
 
 def measure_cog(proj_name ="Afferent"):    
     """
@@ -390,15 +367,6 @@ def update_activity():
         sheet.sheet_view_dict['Activity']=new_view
     
 
-
-# Module variables for passing values to the commands.
-coordinate = (0,0)
-sheet_name = ''
-proj_coords=[(0,0)]
-proj_name =''
-### JABALERT: This mechanism for passing values is a bit awkward, and
-### should be changed to something cleaner.  It might also be better
-### to access a Sheet instance directly, rather than searching by name.
 
 
 def update_connectionfields():
