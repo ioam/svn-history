@@ -43,7 +43,8 @@ normalization across all plots with the same name.
 
 <li>
 2006/10/10 (JL): Add FFT plot using Jim's Octave code; shouldn't be
-difficult.  Might not be that hard to port it to Python, either.
+difficult.  Should also be easy to port it to native Python, because
+Numeric already includes a 2D FFT (see FFT.fft2d).
 </li>
 
 <li>
@@ -127,6 +128,25 @@ and well designed so that it can be flexible.
 2006/11/23: ParametersFrame doesn't properly set object properties when 
 right click is used (there's a more detailed explanation in parametersframe.py: see
 comments by uses of 'translator_dictionary').
+</li>
+
+<li>
+2006/12/21: Could add an example of processing auditory data by
+writing a PatternGenerator that does an FFT incrementally on an audio
+file, delivering part of a spectrogram at each clock tick.  The
+Numeric FFT.fft function might come in handy for this.
+</li>
+
+<li>
+2006/12/21: Could add an option to lock Topographica to real time, so
+that once processing is done at a particular virtual time, it waits
+until the next real time before moving to the next event (which may be
+different due to real-time input arriving by then).  On the other
+hand, maybe this isn't necessary?  E.g. everything could be driven
+from a PatternGenerator that produces a new pattern whenever some
+real-world input arrives, and then the rest of the processing can be
+triggered from that, as fast as it can compute.  Worth thinking about,
+e.g. to handle simple webcam input.
 </li>
 
 <li>
