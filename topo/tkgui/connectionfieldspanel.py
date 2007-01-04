@@ -29,12 +29,12 @@ from topo.commands.analysis import *
 import topo.commands.analysis
 
 class ConnectionFieldsPanel(TemplatePlotGroupPanel):
-    def __init__(self,parent,console=None,pgt_name=None,**config):       
+    def __init__(self,parent,console=None,pgt_name=None,**params):       
 
         self.region = StringVar()
 	self.x = 0
 	self.y = 0
-	TemplatePlotGroupPanel.__init__(self,parent,console,pgt_name,**config)
+	TemplatePlotGroupPanel.__init__(self,parent,console,pgt_name,**params)
 
 
         self.__params_frame = Frame(master=self)

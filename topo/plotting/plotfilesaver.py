@@ -27,8 +27,8 @@ from topo.plotting.plotgroup import TemplatePlotGroup, ConnectionFieldsPlotGroup
 
  
 class PlotFileSaver(topo.base.parameterizedobject.ParameterizedObject):
-    def __init__(self,**config):
-        super(PlotFileSaver,self).__init__(**config)
+    def __init__(self,**params):
+        super(PlotFileSaver,self).__init__(**params)
         self.bitmaps = []
         self.files = []
         self.name = {'base':topo.sim.name, 'iteration':topo.sim.time(), \
@@ -57,9 +57,9 @@ class PlotFileSaver(topo.base.parameterizedobject.ParameterizedObject):
 
 
 class TemplateFile(PlotFileSaver):
-    def __init__(self,pgt_name,**config):
+    def __init__(self,pgt_name,**params):
 
-        super(TemplateFile,self).__init__(**config)
+        super(TemplateFile,self).__init__(**params)
         self.pgt = plotgroup_templates.get(pgt_name,None)
         self.name['region'] = 'All_region'
         self.name['type'] = self.pgt.name
@@ -79,8 +79,8 @@ class TemplateFile(PlotFileSaver):
 
 
 class ActivityFile(PlotFileSaver):
-    def __init__(self,region=None,**config):
-        super(ActivityFile,self).__init__(**config)
+    def __init__(self,region=None,**params):
+        super(ActivityFile,self).__init__(**params)
         self.region = region
         self.name['region'] = region
         self.name['type'] = 'Activity'
@@ -103,8 +103,8 @@ class ActivityFile(PlotFileSaver):
 
 
 class UnitWeightsFile(PlotFileSaver):
-    def __init__(self,region,x,y,**config):
-        super(UnitWeightsFile,self).__init__(**config)
+    def __init__(self,region,x,y,**params):
+        super(UnitWeightsFile,self).__init__(**params)
         self.region = region
         self.name['region'] = '%s_%01.03f_%01.03f' % (region, x, y)
         self.name['type'] = 'Weights'
@@ -127,8 +127,8 @@ class UnitWeightsFile(PlotFileSaver):
 
 
 class ProjectionFile(PlotFileSaver):
-    def __init__(self,region,projection,density,**config):
-        super(ProjectionFile,self).__init__(**config)
+    def __init__(self,region,projection,density,**params):
+        super(ProjectionFile,self).__init__(**params)
         self.region = region
         self.name['region'] = '%s_%s' % (region, projection)
         self.name['type'] = 'Projection'

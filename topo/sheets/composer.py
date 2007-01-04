@@ -28,8 +28,8 @@ class Composer(Sheet):
 
     dest_ports=None # Allows connections to come in on any port
 
-    def __init__(self,**config):
-        super(Composer,self).__init__(**config)        
+    def __init__(self,**params):
+        super(Composer,self).__init__(**params)        
         self.inputs = {}
         self.__dirty = False
 

@@ -120,9 +120,9 @@ class TestSheetView(unittest.TestCase):
 ##     """
 ##     filename = Parameter(None)
     
-##     def __init__(self,**config):
+##     def __init__(self,**params):
 
-##         super(ImageGenerator,self).__init__(**config)
+##         super(ImageGenerator,self).__init__(**params)
 
 ##         self.verbose("filename = " + self.filename)
 

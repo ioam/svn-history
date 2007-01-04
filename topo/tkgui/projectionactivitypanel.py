@@ -29,10 +29,10 @@ import topo.commands.analysis
 ### ProjectionPanel, and ConnectionFieldsPanel into a shared parent
 ### class.  Then those classes should probably all be in one file.
 class ProjectionActivityPanel(TemplatePlotGroupPanel):
-    def __init__(self,parent,console=None,pgt_name=None,**config):       
+    def __init__(self,parent,console=None,pgt_name=None,**params):       
 
         self.region = StringVar()
-	TemplatePlotGroupPanel.__init__(self,parent,console,pgt_name,**config)
+	TemplatePlotGroupPanel.__init__(self,parent,console,pgt_name,**params)
 
 	self.plotgroup_key='ProjectionActivity'
         self.__params_frame = Frame(master=self)

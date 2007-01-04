@@ -120,8 +120,8 @@ class PlotsMenuEntry(ParameterizedObject):
     different for each plot type since this will include Activity,
     Connection Fields, Projection grids, Preference Maps and more.
     """
-    def __init__(self,console,template,class_name=TemplatePlotGroupPanel,label=None,description=None,**config):
-        super(PlotsMenuEntry,self).__init__(**config)
+    def __init__(self,console,template,class_name=TemplatePlotGroupPanel,label=None,description=None,**params):
+        super(PlotsMenuEntry,self).__init__(**params)
         self.console = console
         self.template = template
 

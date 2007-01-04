@@ -48,9 +48,9 @@ DEFAULT_PRESENTATION = '1.0'
 
 
 class TestPattern(plotgrouppanel.PlotGroupPanel):
-    def __init__(self,parent,console=None,padding=2,**config):
+    def __init__(self,parent,console=None,padding=2,**params):
 
-	super(TestPattern,self).__init__(parent,console,'Preview',**config)
+	super(TestPattern,self).__init__(parent,console,'Preview',**params)
         self.INITIAL_PLOT_HEIGHT = 100
         self.padding = padding
 	self.auto_refresh.set(True)

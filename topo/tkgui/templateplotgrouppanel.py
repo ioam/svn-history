@@ -31,11 +31,11 @@ exec "from topo.commands.pylabplots import *" in __main__.__dict__
 
 
 class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
-    def __init__(self,parent,console,pgt_name,**config):
+    def __init__(self,parent,console,pgt_name,**params):
         # Plotgroup Template associated
         self.pgt = plotgroup_templates.get(pgt_name,None)
 
-	plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,pgt_name,**config)
+	plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,pgt_name,**params)
 
 	self.normalize.set(self.pgt.normalize)
         self.plotgroup.normalize=self.normalize.get()

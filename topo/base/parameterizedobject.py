@@ -605,9 +605,9 @@ class ParameterizedObject(object):
     print_level = Parameter(default=MESSAGE,hidden=True)
 
     
-    def __init__(self,abstract_class=None,**config):
+    def __init__(self,abstract_class=None,**params):
         """        
-        If **config does not contain a 'name' parameter, self.name defaults
+        If **params does not contain a 'name' parameter, self.name defaults
         to a gensym formed from the object's type name and a unique number.
         """
         global object_count
@@ -618,7 +618,7 @@ class ParameterizedObject(object):
 
         self.__generate_name()
         
-        self.__setup_params(**config)
+        self.__setup_params(**params)
         object_count += 1
 
         self.nopickle = []
@@ -687,7 +687,7 @@ class ParameterizedObject(object):
         self.__db_print(DEBUG,*args)
 
 
-    def __setup_params(self,**config):
+    def __setup_params(self,**params):
         """
         """
         # deepcopy a Parameter if its 'instantiate' attribute is True,
@@ -710,7 +710,7 @@ class ParameterizedObject(object):
                         
                     
                     
-        for name,val in config.items():
+        for name,val in params.items():
             desc,desctype = self.__class__.get_param_descriptor(name)
             if desc:
                 self.debug("Setting param %s ="%name, val)

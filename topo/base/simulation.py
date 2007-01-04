@@ -190,7 +190,7 @@ class EventProcessor(ParameterizedObject):
     
     dest_ports=[None]
     
-    def __init__(self,**config):
+    def __init__(self,**params):
         """
         Create an EventProcessor.
 
@@ -201,7 +201,7 @@ class EventProcessor(ParameterizedObject):
         s['name_of_e']=e. At this point, e's 'name' attribute will be set
         to 'name_of_e'.
         """
-        super(EventProcessor,self).__init__(**config)
+        super(EventProcessor,self).__init__(**params)
 
         # A subclass could use another data stucture to optimize operations
         # specific to itself, if it also overrides _dest_connect().
@@ -515,12 +515,12 @@ class Simulation(ParameterizedObject):
             """)
               
 
-    def __init__(self,**config):
+    def __init__(self,**params):
         """
         Create the Simulation and register it with SimSingleton unless
         register==False.        
         """
-        super(Simulation,self).__init__(**config)
+        super(Simulation,self).__init__(**params)
 
         self._time = FixedPoint("0.0",4)
         self._event_processors = {}

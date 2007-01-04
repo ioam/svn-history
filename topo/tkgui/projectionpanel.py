@@ -58,7 +58,7 @@ def cmp_projections(p1,p2):
 ### JABALERT: Maybe this should be called CFProjectionPanel instead,
 ### since it is only valid for CFProjections.
 class ProjectionPanel(TemplatePlotGroupPanel):
-    def __init__(self,parent,console=None,pgt_name=None,**config):
+    def __init__(self,parent,console=None,pgt_name=None,**params):
         
         self.region = StringVar()
 	self.density_str = StringVar()
@@ -67,7 +67,7 @@ class ProjectionPanel(TemplatePlotGroupPanel):
 	self.weight_name = StringVar()
         self.projections = KeyedList()
  
-	super(ProjectionPanel,self).__init__(parent,console,pgt_name,**config)
+	super(ProjectionPanel,self).__init__(parent,console,pgt_name,**params)
 
         self.__params_frame = Frame(master=self)
         self.__params_frame.pack(side=LEFT,expand=YES,fill=X)

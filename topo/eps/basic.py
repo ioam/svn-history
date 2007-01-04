@@ -61,8 +61,8 @@ class ThresholdUnit(EventProcessor):
     initial_accum = Number(default=0.0,doc="The initial accumulator value.")
     amplitude     = Number(default=1.0,doc="The size of the pulse to generate.")
 
-    def __init__(self,**config):
-        EventProcessor.__init__(self,**config)
+    def __init__(self,**params):
+        EventProcessor.__init__(self,**params)
         self.accum = self.initial_accum
 
     def input_event(self,conn,data):

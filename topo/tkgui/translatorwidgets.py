@@ -115,9 +115,9 @@ class TaggedSlider(Frame,WidgetTranslator):
                  tag_width=10,
                  slider_length=100,
                  translator=string.atof,
-                 **config):
+                 **params):
 
-        Frame.__init__(self,root,**config)
+        Frame.__init__(self,root,**params)
         WidgetTranslator.__init__(self,translator=translator)
 
         self.root = root
