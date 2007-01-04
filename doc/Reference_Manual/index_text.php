@@ -150,6 +150,38 @@ widgets from Pmw.</DD>
 included within Python functions, usually for a specific speed optimization.
 This functionality is available for any user-defined library function, 
 for cases when speed is crucial.</DD>
+</DL>
+
+<H2>Optional extensions</H2>
+
+<P>Topographica runs on an unmodified version of the Python language,
+and so it can be used with any Python package that you install
+yourself.  To install such a package in Topographica, just run its
+<code>setup.py</code> as usual, but using the copy of Python in
+<code>topographica/bin/python</code>.  That way the package will be
+installed in Topographica's copy of python, rather than any other copy
+of Python that might be present on your system.
+
+<P>A good list of potentially useful software is located at 
+<A href="http://www.scipy.org/Topical_Software">SciPy.org</A>.
+Some packages of note:
+
+<P><DL COMPACT>
+<P><DT><A href="http://www.scipy.org/">SciPy</A></DT>
+<DD>
+SciPy includes many, many functions useful in scientific research,
+such as statistics, linear algebra, image processing, integration and
+differential equation solvers, etc.  However, because of all the
+external libraries that it uses, it can be difficult to get SciPy
+working on a particular installation.  To avoid these problems, we do
+not ship SciPy with Topographica by default, but encourage users to
+try it out themselves.</DD>
+
+<P><DT><A href="http://rpy.sourceforge.net/">RPy</A></DT>
+<DD>The language R (a free implementation of the S statistical
+language) has a nice interface to Python that allows any R
+function to be called from Python.
+</DD>
 
 </DL>
 
