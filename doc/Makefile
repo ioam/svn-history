@@ -43,6 +43,7 @@ all: ${PHPHTML}
 
 # The --parse-only could be removed later if epydoc were patched to used the 
 # __repr___ for Parameter values, instead of a meaningless object identifier
+# Can also add --graph=classtree for graphical class diagrams
 reference-manual: Reference_Manual/toc.html
 Reference_Manual/toc.html: ../topo/*.py ../topo/*/*.py Reference_Manual/index_text.php
 	mv ../topo/tests ../topo-tests-tmp
@@ -60,7 +61,8 @@ bib2html:
 	${MAKE} -C shared/bib2html/
 
 clean:
-	${RM} .??*~ *~ */*~ */.??*~ Reference_Manual/topo*.html reference-manual
+	${RM} .??*~ *~ */*~ */.??*~ reference-manual
+	${RM} Reference_Manual/*.html Reference_Manual/*.css Reference_Manual/*.png Reference_Manual/*.js
 
 # Not removed by default, for people who do not have PHP locally
 clean_php:
