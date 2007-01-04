@@ -245,7 +245,7 @@ class Slice(object):
         Make this object behave like a sequence.
 
         Specifically, allows unpacking:
-        slice_ = Slice()
+        k = Slice()
         r1,r2,c1,c2 = k
         """
         return iter(self.__slice)
