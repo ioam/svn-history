@@ -155,7 +155,16 @@ different:
      and must be written from the user's perspective.  I.e., the
      docstring must say how someone calling this function, class,
      etc. can use it, rather than having details about how it was
-     implemented or its implementation history.<BR><BR>
+     implemented or its implementation history.  These strings are
+     used to create the reference manual, and are thus extremely
+     important.
+
+     <P>If you want to include structured text in your docstrings such as
+     italics, bold, bulleted or numbered lists, hyperlinks, etc.,
+     please use the
+     <a href="http://docutils.sourceforge.net/docs/user/rst/quickstart.html">
+     ReStructuredText</A> format.  That way the strings will be interpreted
+     correctly when we generate the reference manual.<BR><BR>
 
 <DT>Comments: Communicating with the human reader</DT><DD>
 
