@@ -28,7 +28,7 @@ object_count = 0
 
 def classlist(class_):
     """
-    Return a list of the class hierarchy above (and including) class_.
+    Return a list of the class hierarchy above (and including) the given class.
 
     The list is ordered from least- to most-specific.  Often useful in
     functions to get and set the full state of an object, e.g. for
@@ -49,7 +49,7 @@ def classlist(class_):
 
 def descendents(class_):
     """
-    Return a list of the class hierarchy below (and including) class_.
+    Return a list of the class hierarchy below (and including) the given class.
 
     The list is ordered from least- to most-specific.  Can be useful for
     printing the contents of an entire class hierarchy.
@@ -113,9 +113,9 @@ class Parameter(object):
 
        If Foo implements its own constructor, keyword arguments will
        still be accepted if the constructor accepts a dictionary of
-       keyword arguments (as in 'def __init__(self,**params):'), and
+       keyword arguments (as in ``def __init__(self,**params):``), and
        then each class calls its superclass (as in
-       'super(Foo,self).__init__(**params)') so that the
+       ``super(Foo,self).__init__(**params)``) so that the
        ParameterizedObject constructor will process the keywords.
 
     2. A ParameterizedObject need specify only the attributes of a
@@ -731,8 +731,8 @@ class ParameterizedObject(object):
         Print a warning if params contains something that is
         not a Parameter of this object.
 
-        Typically called by a __call__() method that accepts **params
-        in its arguments.
+        Typically invoked by a __call__() method that accepts keyword
+        arguments for parameter setting.
         """
         for item in params:
             if item not in self.params():

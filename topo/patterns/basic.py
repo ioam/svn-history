@@ -272,7 +272,7 @@ class Composite(PatternGenerator):
 
         Any binary Numeric array "ufunc" returning the same
         type of array as the operands and supporting the reduce
-        operator is allowed here.  Supported ufuncs include:
+        operator is allowed here.  Supported ufuncs include::
 
           add
           subtract
@@ -299,12 +299,12 @@ class Composite(PatternGenerator):
 
         You can also write your own operators, by making a class that
         has a static method named "reduce" that returns an array of the
-        same size and type as the arrays in the list.  For example:
+        same size and type as the arrays in the list.  For example::
         
-        class return_first(object):
-            @staticmethod
-            def reduce(x):
-                return x[0]
+          class return_first(object):
+              @staticmethod
+              def reduce(x):
+                  return x[0]
 
         In this case the Wrapper class should not be necessary.    
         """)

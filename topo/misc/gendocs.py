@@ -6,14 +6,15 @@ created by pydoc.  Intended for use with MAKE, from within the base
 topographica/ directory.
 
 The generated index.html file is for the topo/__init__.py file, which
-does not necessarily catalog topo/*.py.  To see all files, select
-the 'index' link at the top of one of the html docs.
+does not necessarily catalog every .py file in topo/.  To see all
+files, select the 'index' link at the top of one of the html docs.
 
 To generate documentation, enter 'make docs' from the base
 topographica/ directory, which will call this file on the Topographica
 sources.
 
-From the Makefile (Tabs have been stripped):
+From the Makefile (Tabs have been stripped)::
+
     cleandocs:
         - rm -r docs
         

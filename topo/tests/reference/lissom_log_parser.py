@@ -4,8 +4,9 @@ def get_input_params(log_file='or_map_topo.log'):
     """
     Return iterators over list of float values for C++ LISSOM's cx, cy, and theta.
 
-    Expects log file with values held in lines like this:
-    'Iteration: 000000  [Eye0 [Obj0 cx:02.1 cy:11.6 theta:074.0]]\n'  
+    Expects log file with values held in lines like this::
+    
+      'Iteration: 000000  [Eye0 [Obj0 cx:02.1 cy:11.6 theta:074.0]]\n'  
     """
     f = open(log_file,'r')
     

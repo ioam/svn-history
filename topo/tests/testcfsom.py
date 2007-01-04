@@ -48,7 +48,7 @@ class ImageSaver(EventProcessor):
     Where <name> is the name of the ImageSaver object, <port> is the
     name of the input port used, and <time> is the current simulation time.
 
-    Parameters:
+    Parameters::
       file_prefix = (default '') A path or other prefix for the
                     filename.
       file_format = (default 'ppm') The file type to use when saving

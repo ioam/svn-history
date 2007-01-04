@@ -309,12 +309,12 @@ def measure_cog(proj_name ="Afferent"):
     """
     Calculate center of gravity (CoG) for each CF of each unit in each CFSheet.
 
-    Unlike measure_position_pref and other measure_ commands, this one
+    Unlike measure_position_pref and other measure commands, this one
     does not work by collate the responses to a set of input patterns.
     Instead, the CoG is calculated directly from each set of afferent
     weights.  The CoG value thus is an indirect estimate of what
     patterns the neuron will prefer, but is not limited by the finite
-    number of test patterns as the other measure_ commands are.
+    number of test patterns as the other measure commands are.
 
     At present, the name of the projection to use must be specified
     in the argument to this function, and a model using any other

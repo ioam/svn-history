@@ -140,8 +140,8 @@ class Number(Parameter):
     def __init__(self,default=0.0,bounds=None,softbounds=None,**params):
         """
         Number is a numeric parameter. Numbers have a default value,
-        and bounds.  There are two types of bounds: `bounds' and
-        `softbounds'.`bounds' are hard bounds: the parameter must have
+        and bounds.  There are two types of bounds: ``bounds`` and
+        ``softbounds``.  ``bounds`` are hard bounds: the parameter must have
         a value within the specified range.  The default bounds are
         (None,None), meaning there are actually no hard bounds.  One
         or both bounds can be set by specifying a value
@@ -158,13 +158,14 @@ class Number(Parameter):
         silently crop the given value into the legal range, for use
         in, for instance, a GUI.
 
-        `softbounds' are present to indicate the typical range of the
+        ``softbounds`` are present to indicate the typical range of the
         parameter, but are not enforced. Setting the soft bounds
         allows, for instance, a GUI to know what values to display on
         sliders for the Number.
 
-        Example of creating a Number:
-        AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
+        Example of creating a Number::
+        
+          AB = Number(default=0.5, bounds=(None,10), softbounds=(0,1), doc='Distance from A to B.')
         """
         Parameter.__init__(self,default=default,**params)
         self.bounds = bounds
@@ -489,11 +490,11 @@ def concrete_descendents(parentclass):
     Return a dictionary containing all subclasses of the specified
     parentclass, including the parentclass.  Only classes that are
     defined in scripts that have been run or modules that have been
-    imported are included, so the caller will usually first do 'from
-    package import *'.
+    imported are included, so the caller will usually first do ``from
+    package import *``.
 
-    If the class has an attribute 'abstract', and it's True, the class
-    will not be included.
+    If the class has an attribute ``abstract``, and it is True, the
+    class will not be included.
     """
     return dict([(c.__name__,c) for c in descendents(parentclass)
                  if not (hasattr(c,'abstract') and c.abstract==True)])
@@ -637,7 +638,7 @@ class Wrapper(object):
     def __getattribute__(self,attribute):
         """
         If the Wrapper object has the attribute, return it; if the
-        function_ object has the attribute, return it; otherwise,
+        ``function_`` object has the attribute, return it; otherwise,
         raise an AttributeError.
         """
         try:
@@ -669,8 +670,8 @@ class Wrapper(object):
               
     def __call__(self,*args,**kw):
         """
-        If args or kw passed, return self.function_(*args,**kw);
-        otherwise, return self.function_(**self.args,**self.kw).
+        If args or kw passed, return ``self.function_(*args,**kw)``;
+        otherwise, return ``self.function_(**self.args,**self.kw)``.
 
         Allows Wrapper to be used when functions take arguments
         at call-time (e.g. Numeric.add(1,2)) and when functions
@@ -688,9 +689,9 @@ class Wrapper(object):
 
     def __getstate__(self):
         """
-        Can't pickle self.function_, so don't return it
+        Can't pickle ``self.function_``, so don't return it
         as part of the state. Instead, we recreate it
-        in __setstate__().
+        in ``__setstate__()``.
         """
         state = {}
         

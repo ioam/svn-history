@@ -55,18 +55,22 @@ class SheetView(ParameterizedObject):
     ### shouldn't it be simplified?
     def __init__(self, (term_1, term_2), src_name=None, precedence = 0.0,**params):
         """
-        __init__(self, input_tuple, **params)
-
-        Three types of input_tuples.
-        1.  (matrix_data, matrix_bbox)  
+        For ``__init__(self, input_tuple, **params)``, there are three
+        types of input_tuples::
+        
+        (matrix_data, matrix_bbox)
+        
 	    This form locks the value of the sheetview to a single matrix.
             Terminating case of a composite SheetView.
             
-        2.  (operation, [tuple_list])
+        (operation, [tuple_list])
+        
 	    'operation' is performed on the matrices collected from
-                tuple_list.  See the list of valid operations in
-                operations.keys()
-	    Each tuple in the tuple_list is one of the following:
+            tuple_list.  See the list of valid operations in
+            operations.keys().
+             
+	    Each tuple in the tuple_list is one of the following::
+            
                 (SheetView, None)
                     Another SheetView may be passed in to create nested plots.
 	        (matrix_data, bounding_box)
@@ -75,7 +79,8 @@ class SheetView(ParameterizedObject):
                     This gets sheet_name.sheet_view(sheet_view_name) each time
                     the current SheetView has its data requested by .view().
 
-        3.  (Sheet, sheet_view_name)
+        (Sheet, sheet_view_name)
+        
                 Degenerate case that will pull data from another SheetView
                 and not do any additional processing.  Don't yet know a
                 use for this case, but documented for possible future use.

@@ -244,7 +244,7 @@ class Palette(ParameterizedObject):
     def flat(self):
         """
         Return the palette in a flat form of 768 numbers.  If the
-        colors_ parameter is a callable object, call it for the
+        colors parameter is a callable object, call it for the
         list of values.
         """
         c = self.colors_

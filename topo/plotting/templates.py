@@ -47,14 +47,14 @@ class PlotGroupTemplate(ParameterizedObject):
         such as Red, Green, Blue, Outline, etc.
     
         For instance, one could define an Orientation-colored Activity
-        plot as:
+        plot as::
         
-        pgt.plot_templates['Activity'] =
-          PlotGroupTemplate(name='Activity', command='measure_activity()',
-                            plot_templates=[('Activity',
-                                             {'Strength'   : 'Activity',
-                                              'Hue'        : 'OrientationPreference',
-                                              'Confidence' : None})])
+          pgt.plot_templates['Activity'] =
+            PlotGroupTemplate(name='Activity', command='measure_activity()',
+                              plot_templates=[('Activity',
+                                               {'Strength'   : 'Activity',
+                                                'Hue'        : 'OrientationPreference',
+                                                'Confidence' : None})])
     
         This specifies that there will be up to one Plot named Activity in
         the final PlotGroup per Sheet, although there could be no plots at
@@ -63,7 +63,7 @@ class PlotGroupTemplate(ParameterizedObject):
         the value channel will be determined by the SheetView Activity.
     
         Here's a more complicated example specifying two different plots
-        in the same PlotGroup:
+        in the same PlotGroup::
     
           PlotGroupTemplate(name='Orientation Preference', command = 'measure_or_pref()',
                             plot_templates=[('Orientation Preference',

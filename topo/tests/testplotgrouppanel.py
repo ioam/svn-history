@@ -28,10 +28,9 @@ class TestPlotGroupPanel(unittest.TestCase):
 
     def setUp(self):
         """
-        Create a Simulation that has a couple of sheets within it that
-        have data within them that can then be used by the GUI tests.
-        Two objects created after completion:
-            self.s   Sample simulation with a couple of sheets
+        Create a Simulation self.s that has a couple of sheets within
+        it that have data within them that can then be used by the GUI
+        tests.
         """
         GeneratorSheet.period = 1.0
         GeneratorSheet.nominal_density = 5

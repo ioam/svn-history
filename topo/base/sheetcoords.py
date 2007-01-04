@@ -35,7 +35,7 @@ the continuous area from -1/2,-1/2 to -1/6,-1/6 has value 1,
 the continuous area from -1/6,-1/6 to  1/6,1/6  has value 5, and 
 the continuous area from  1/6,1/6  to  1/2,1/2  has value 9.
 
-With the rest of the elements filled in, the Sheet would look like:
+With the rest of the elements filled in, the Sheet would look like::
 
     (-1/2,1/2) -+-----+-----+-----+- (1/2,1/2)
                 |     |     |     |
@@ -52,7 +52,7 @@ With the rest of the elements filled in, the Sheet would look like:
    (-1/2,-1/2) -+-----+-----+-----+- (1/2,-1/2)
 
 where element 5 is centered on 0.0,0.0.  A matrix that would match
-these Sheet coordinates is:
+these Sheet coordinates is::
 
   [[7 8 9]
    [4 5 6]

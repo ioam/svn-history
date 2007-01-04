@@ -16,13 +16,15 @@ class KeyedList(list):
     Note: Not all list operations will work as expected, because
     [] does not return the name tuple.
 
-    Redefined functions:
+    Redefined functions::
+    
         __getitem__ ([,])
         __setitem__ ([,])
         append  --  Now takes a tuple (key,value) so that value
                     can be later accessed by [key].
     
-    New functions modeled from dictionaries:
+    New functions modeled from dictionaries::
+    
         get
         set
         has_key

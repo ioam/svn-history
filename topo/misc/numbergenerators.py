@@ -124,7 +124,7 @@ class RandomWrapper(object):
     def __getattribute__(self,attribute):
         """
         If the Wrapper object has the attribute, return it; if the
-        function_ object has the attribute, return it; otherwise,
+        function object has the attribute, return it; otherwise,
         raise an AttributeError.
         """
         try:
@@ -164,8 +164,8 @@ class RandomWrapper(object):
               
     def __call__(self,*args,**kw):
         """
-        If args or kw passed, return self.function_(*args,**kw);
-        otherwise, return self.function_(**self.args,**self.kw).
+        If args or kw passed, return ``self.function_(*args,**kw)``;
+        otherwise, return ``self.function_(**self.args,**self.kw)``.
 
         Allows Wrapper to be used when functions take arguments
         at call-time (e.g. Numeric.add(1,2)) and when functions
