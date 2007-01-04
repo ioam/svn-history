@@ -92,9 +92,34 @@ CFProjection.weights_generator=topo.patterns.basic.Composite(
 <img src="images/gaussianrandomweights_dense.png" width="396" height="368">
 </center>
 
-<P>Similarly, you can build up arbitrarily complex patterns by
-combining multiple PatternGenerators at different locations, and then
-scaling them, rotating them, and/or placing them together as a unit:
+<P>More complex patterns can be created by combining multiple Composite PatternGenerators:
+
+<pre>
+$ ./topographica -g
+Topographica&gt; from topo.patterns.basic import SineGrating, Disk, Composite
+Topographica&gt; from topo.base.parameterclasses import Wrapper
+Topographica&gt; surroundsine   = SineGrating(frequency=8.0,orientation=0.25*pi, phase=3*pi/2)
+Topographica&gt; centersine     = SineGrating(frequency=8.0,orientation=0.60*pi)
+Topographica&gt; centerdisk     = Disk(aspect_ratio=1.0, size=0.35, smoothing=0.005)
+Topographica&gt; surrounddisk   = Disk(aspect_ratio=1.0, size=0.90, smoothing=0.005)
+Topographica&gt; surroundring   = Composite(generators=[surrounddisk,centerdisk],
+Topographica&gt;                            operator=Wrapper("Numeric.subtract"))
+Topographica&gt; center         = Composite(generators=[centersine,centerdisk],
+Topographica&gt;                            operator=Wrapper("Numeric.multiply"))
+Topographica&gt; surround       = Composite(generators=[surroundsine,surroundring],
+Topographica&gt;                            operator=Wrapper("Numeric.multiply"))
+Topographica&gt; centersurround = Composite(generators=[center,surround],
+Topographica&gt;                            operator=Wrapper("Numeric.add"),
+Topographica&gt;                            xdensity=160,ydensity=160)
+Topographica&gt; matrixplot(centersurround())
+</pre>
+
+<center>
+<img src="images/centersurround.png" width="384" height="384">
+</center>
+
+<P>Once created, even very complex composite patterns can be scaled,
+rotated, and placed together as a unit:
 
 <pre>
 $ ./topographica -g
@@ -107,8 +132,8 @@ Topographica&gt; rightpupil = Disk(    aspect_ratio=1.0, x=0.03, y=-0.08,size=0.
 Topographica&gt; nose       = Gaussian(aspect_ratio=0.8, x=-0.1, y=0.00, size=0.04, scale=-0.5)
 Topographica&gt; mouth      = Gaussian(aspect_ratio=0.8, x=-0.2, y=0.00, size=0.06, scale=-0.8)
 Topographica&gt; head       = Disk(    aspect_ratio=1.5, x=-0.02,y=0.00, size=0.40, scale=0.70)
-Topographica&gt; pg = Composite(generators=[lefteye,leftpupil,righteye,rightpupil,nose,mouth,head],
-Topographica&gt;                operator=Wrapper("Numeric.add"),xdensity=160,ydensity=160)
+Topographica&gt; pg=Composite(generators=[lefteye,leftpupil,righteye,rightpupil,nose,mouth,head],
+Topographica&gt;              operator=Wrapper("Numeric.add"),xdensity=160,ydensity=160)
 Topographica&gt; matrixplot(pg(orientation=pi/1.8, x=0.2, y=0.1, offset=0.5, size=0.75))
 </pre>
 
@@ -116,9 +141,8 @@ Topographica&gt; matrixplot(pg(orientation=pi/1.8, x=0.2, y=0.1, offset=0.5, siz
 <img src="images/face.png" width="310" height="299">
 </center>
 
-<P>Apart from adding the patterns, there are many other possible
-operators; see the
-<A HREF="../Reference_Manual/topo.patterns.basic.html#Composite-function">
+<P>A wide variety of operators are provided for combining the patterns; see the
+<A HREF="../Reference_Manual/topo.patterns.basic.Composite-class.html">
 Composite parameter <code>operator</code></A>) for more details.
 
 
