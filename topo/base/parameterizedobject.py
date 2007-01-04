@@ -606,9 +606,16 @@ class ParameterizedObject(object):
 
     
     def __init__(self,abstract_class=None,**params):
-        """        
-        If **params does not contain a 'name' parameter, self.name defaults
-        to a gensym formed from the object's type name and a unique number.
+        """
+        Initialize this ParameterizedObject.
+
+        The values of parameters can be supplied as keyword arguments
+        to the constructor (using parametername=parametervalue); these
+        values will override the class default values for this one
+        instance.
+
+        If no 'name' parameter is supplied, self.name defaults to a
+        gensym formed from the object's type name and a unique number.
         """
         global object_count
 
