@@ -289,7 +289,7 @@ EPYDOC_UNINSTALL = ${PYTHON_LIB}/site-packages/epydoc
 
 epydoc: ${EPYDOC}.tar.gz python common
 	tar xzf ${EPYDOC}.tar.gz
-	cd ${EPYDOC}; cd epydoc ; patch < ../../epydoc.diff; cd .. ; ${PREFIX}/bin/python setup.py install
+	cd ${EPYDOC}; cd epydoc ; patch -p0 < ../../epydoc.diff; cd .. ; ${PREFIX}/bin/python setup.py install
 	touch epydoc
 
 epydoc-clean:
