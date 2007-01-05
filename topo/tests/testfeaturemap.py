@@ -28,10 +28,10 @@ from topo.base.simulation import Simulation
 from topo.learningfns.som import CFPLF_HebbianSOM
 
 from topo.patterns import basic
-from topo.analysis.featuremap import FeatureMap, MeasureFeatureMap
+from topo.analysis.featureresponses import DistributionMatrix, FeatureMaps
 from topo.commands.analysis import Feature
 
-class TestFeatureMap(unittest.TestCase):
+class TestDistributionMatrix(unittest.TestCase):
 
     def setUp(self):
 
@@ -45,11 +45,11 @@ class TestFeatureMap(unittest.TestCase):
         self.a3 = array([[0,1], [0,1], [0,1]])
         
         # object to test for non-cyclic distributions
-        self.fm1 = FeatureMap(sheet=test_sheet, axis_range=(0.0,1.0), cyclic=False)
+        self.fm1 = DistributionMatrix(test_sheet.shape, axis_range=(0.0,1.0), cyclic=False)
         self.fm1.update(self.a1,0.5)
 
         # object to for cyclic distributions
-        self.fm2 = FeatureMap(sheet=test_sheet, axis_range=(0.0,1.0), cyclic=True)
+        self.fm2 = DistributionMatrix(test_sheet.shape, axis_range=(0.0,1.0), cyclic=True)
         self.fm2.update(self.a1,0.5)
 
 
@@ -60,8 +60,8 @@ class TestFeatureMap(unittest.TestCase):
         
         for i in range(3):
             for j in range(2):
-                self.assertAlmostEqual(self.fm1.preference()[i,j], 0.5)
-                self.assertAlmostEqual(self.fm2.preference()[i,j], 0.5)
+                self.assertAlmostEqual(self.fm1.weighted_average()[i,j], 0.5)
+                self.assertAlmostEqual(self.fm2.weighted_average()[i,j], 0.5)
 
 
         # To test the update function     
@@ -70,9 +70,9 @@ class TestFeatureMap(unittest.TestCase):
 
         for i in range(3):
             for j in range(2):
-                self.assertAlmostEqual(self.fm1.preference()[i,j], 0.6)
+                self.assertAlmostEqual(self.fm1.weighted_average()[i,j], 0.6)
                 vect_sum = wrap(0,1,arg(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/(2*pi)) 
-                self.assertAlmostEqual(self.fm2.preference()[i,j],vect_sum) 
+                self.assertAlmostEqual(self.fm2.weighted_average()[i,j],vect_sum) 
                                       
                                       
 
@@ -83,18 +83,18 @@ class TestFeatureMap(unittest.TestCase):
 
         for i in range(3):
             for j in range(2):
-                self.assertAlmostEqual(self.fm1.preference()[i,j], 0.6)
+                self.assertAlmostEqual(self.fm1.weighted_average()[i,j], 0.6)
                 vect_sum =wrap(0,1,arg(exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/(2*pi))
-                self.assertAlmostEqual(self.fm2.preference()[i,j],vect_sum)
+                self.assertAlmostEqual(self.fm2.weighted_average()[i,j],vect_sum)
                                       
         self.fm1.update(self.a2,0.7)
         self.fm2.update(self.a2,0.7)
 
         for i in range(3):
             for j in range(2):
-                self.assertAlmostEqual(self.fm1.preference()[i,j], 0.65)
+                self.assertAlmostEqual(self.fm1.weighted_average()[i,j], 0.65)
                 vect_sum =wrap(0,1,arg(3*exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/(2*pi))
-                self.assertAlmostEqual(self.fm2.preference()[i,j],vect_sum)
+                self.assertAlmostEqual(self.fm2.weighted_average()[i,j],vect_sum)
 
         # to even test more....
         
@@ -102,12 +102,12 @@ class TestFeatureMap(unittest.TestCase):
         self.fm2.update(self.a3,0.9)
         
         for i in range(3):
-            self.assertAlmostEqual(self.fm1.preference()[i,0], 0.65)
-            self.assertAlmostEqual(self.fm1.preference()[i,1], 0.7)
+            self.assertAlmostEqual(self.fm1.weighted_average()[i,0], 0.65)
+            self.assertAlmostEqual(self.fm1.weighted_average()[i,1], 0.7)
             vect_sum = wrap(0,1,arg(3*exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j))/(2*pi))
-            self.assertAlmostEqual(self.fm2.preference()[i,0],vect_sum)
+            self.assertAlmostEqual(self.fm2.weighted_average()[i,0],vect_sum)
             vect_sum = wrap(0,1,arg(3*exp(0.7*2*pi*1j)+exp(0.5*2*pi*1j)+exp(0.9*2*pi*1j))/(2*pi))
-            self.assertAlmostEqual(self.fm2.preference()[i,1],vect_sum)
+            self.assertAlmostEqual(self.fm2.weighted_average()[i,1],vect_sum)
             
                                           
     def test_selectivity(self):
@@ -187,7 +187,7 @@ class TestFeatureMap(unittest.TestCase):
 
 
 
-class TestMeasureFeatureMap(unittest.TestCase):
+class TestFeatureMaps(unittest.TestCase):
 
     def setUp(self):
         """
@@ -212,15 +212,15 @@ class TestMeasureFeatureMap(unittest.TestCase):
         """
         
         self.feature_param = [Feature(name="phase",range=(0.0,1.0),values=[0.2,0.4,0.6],cyclic=False),
-                          Feature(name="orientation",range=(0.0,1.0),step=0.5,cyclic=True)]
+                              Feature(name="orientation",range=(0.0,1.0),step=0.5,cyclic=True)]
         
-        self.x = MeasureFeatureMap(self.feature_param)
+        self.x = FeatureMaps(self.feature_param)
         #print self.V1.activity
-
         #### test has to be written!!!
+
         
-cases = [TestFeatureMap,
-         TestMeasureFeatureMap]
+cases = [TestDistributionMatrix,
+         TestFeatureMaps]
 
 suite = unittest.TestSuite()
 suite.addTests(unittest.makeSuite(case) for case in cases)
