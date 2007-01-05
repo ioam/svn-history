@@ -23,54 +23,54 @@ from topo.misc.distribution import Distribution
 
 class DistributionMatrix(ParameterizedObject):
     """
-    Given the required shape, initializes a distribution_matrix
-    which is a matrix of Distributions (a dictionary of (feature value: activity) pairs)
-    Then stores the Distribution of activity values for each unit in the sheet for
-    one stimulus dimension (e.g. Orientation) for one Sheet in the distribution_matrix.
+    Maintains a matrix of Distributions (each of which is a dictionary
+    of (feature value: activity) pairs).
+    
+    The matrix contains one Distribution for each unit in a
+    rectangular matrix (given by the matrix_shape constructor
+    argument).  The contents of each Distribution can be updated for a
+    given bin value all at once by providing a matrix of new values to
+    update().
 
-    Can then construct the matrix of weighted averages (preference map)
-    and a selectivity map for that parameter from the distribution_matrix.
+    The results can then be accessed as a matrix of weighted averages
+    (which can be used as a preference map) and/or a selectivity
+    map (which measures the peakedness of each distribution).
     """
 
-
-    def __init__(self,sheet_shape,axis_range=(0.0,1.0), cyclic=False):
+    def __init__(self,matrix_shape,axis_range=(0.0,1.0), cyclic=False):
         self.axis_range=axis_range
         # Initialize the internal data structure: a matrix of Distribution objects.
         # It would be nice to do this using some sort of map() or apply() function...
-        self.distribution_matrix = zeros(sheet_shape,'O')
-        rows, cols = sheet_shape
+        self.distribution_matrix = zeros(matrix_shape,'O')
+        rows, cols = matrix_shape
         for i in range(rows): 
             for j in range(cols):
                 self.distribution_matrix[i,j] = Distribution(axis_range,cyclic,keep_peak=True)
         
   
 
-    def update(self, new_values, feature_value):
-        """Add a new matrix of values for a given stimulus value."""
-        
+    def update(self, new_values, bin):
+        """Add a new matrix of histogram values for a given bin value."""
+
         ### JABHACKALERT!  Need to override +=, not +, due to modifying argument,
         ### or else use a different function name altogether (e.g. update(x,y)).
-        self.distribution_matrix + self.__make_pairs(new_values,feature_value)
+        self.distribution_matrix + self.__make_pairs(new_values,bin)
         
         
 
-    def __make_pairs(self,new_values,feature_value):
-        """
-        Transform an activity matrix to a matrix of dictionaries {feature_value:element}.
-    
-        Private method for use with the __add__ method of the Distribution class.
-        """
+    def __make_pairs(self,new_values,bin):
+        """For a given bin, transform a matrix of values into a matrix of dictionaries {bin:element}."""
         
         new_matrix=zeros(new_values.shape,'O')
         for i in range(len(new_values)):
             for j in range(len(new_values[i])):
-                new_matrix[i,j] = {feature_value:new_values[i,j]}
+                new_matrix[i,j] = {bin:new_values[i,j]}
         return new_matrix
    
     
 
     def weighted_average(self):
-        """Return the weighted average of the distribution matrix as a matrix."""
+        """Return the weighted average of each Distribution as a matrix."""
 
         weighted_average_matrix=zeros(self.distribution_matrix.shape,Float) 
 
@@ -83,7 +83,7 @@ class DistributionMatrix(ParameterizedObject):
 
 
     def selectivity(self):
-        """Return the selectivity for the distribution matrix as a matrix."""
+        """Return the selectivity of each Distribution as a matrix."""
 
         selectivity_matrix=zeros(self.distribution_matrix.shape,Float) 
 
@@ -93,9 +93,11 @@ class DistributionMatrix(ParameterizedObject):
 
         return selectivity_matrix
 
+
+
 class FeatureResponses(ParameterizedObject):
     """
-    Systematically varies input pattern feature values and collates the responses.
+    Systematically vary input pattern feature values and collate the responses.
 
     Each sheet has a DistributionMatrix for each feature that will be
     tested.  The DistributionMatrix stores the distribution of
@@ -104,7 +106,7 @@ class FeatureResponses(ParameterizedObject):
     we will create a DistributionMatrix for orientation and a
     DistributionMatrix for phase for each sheet.  The orientation and
     phase of the input are then systematically varied (when
-    present_input_patterns is called), and the responses of each unit
+    measure_responses is called), and the responses of each unit
     to each pattern are collected into the DistributionMatrix.
 
     The resulting data can then be used to plot feature maps and
@@ -131,31 +133,19 @@ class FeatureResponses(ParameterizedObject):
     
 
     def measure_responses(self,pattern_presenter,param_dict,features,display):
- 
-        topo.sim.state_push()
+        """Present the given input patterns and collate the responses."""
         save_input_generators()
-        self.__present_input_patterns(pattern_presenter,param_dict, features,display)
-        restore_input_generators()
-        topo.sim.state_pop()
-        
-    def __present_input_patterns(self,pattern_presenter,param_dict,features,display):
-	
+
         feature_names=[f.name for f in features]
         values_lists=[f.values for f in features]
         permutations = cross_product(values_lists)
-        
-        
-        # Present the input pattern with various parameter settings,
-        # keeping track of the responses
     
         for p in permutations:
-            topo.sim.state_push() 
+            topo.sim.state_push()
 
+            # Present input patterns
             settings = dict(zip(feature_names, p))
-
-            # DRAW THE PATTERN: call to the pattern_presenter
             pattern_presenter(settings,param_dict)
-            self.isfirst=False
 
             if display:
                 if hasattr(topo,'guimain'):
@@ -163,19 +153,24 @@ class FeatureResponses(ParameterizedObject):
                 else:
                     self.warning("No GUI available for display.")
             
-            # NOW UPDATE EACH FEATUREMAP WITH (ACTIVITY,FEATURE_VALUE)
+            # Update each DistributionMatrix with (activity,bin)
             for sheet in self._sheets_to_measure_maps_for:
                 for feature,value in zip(feature_names, p):
-                    self._featureresponses[sheet][feature].update(sheet.activity, value)              
-        
+                    self._featureresponses[sheet][feature].update(sheet.activity, value)
                     
             topo.sim.state_pop()
+
+        restore_input_generators()
+
 
 
 class FeatureMaps(FeatureResponses):
     """
-    Measures and collects the responses to the required features and stores the preference matrix 
-    and selectivity matrix for each sheet for each feature in the sheet_view_dict. 
+    Measures and collects the responses to the required features.
+
+    For each feature and each sheet, the results are stored as a
+    preference matrix and selectivity matrix in the sheet's
+    sheet_view_dict.
     """
     
     def __init__(self,features):
@@ -191,7 +186,7 @@ class FeatureMaps(FeatureResponses):
             for feature in self._featureresponses[sheet].keys():
             ### JCHACKALERT! This is temporary to avoid the positionpref plot to shrink
             ### Nevertheless we should think more about this (see alert in bitmap.py)
-            ### When passing a sheet_view that is not croped to 1 in the parameter hue of hsv_to_rgb
+            ### When passing a sheet_view that is not cropped to 1 in the parameter hue of hsv_to_rgb
             ### it does not work... The normalization seems to be necessary in this case.
             ### I guess it is always cyclic value that we will color with hue in an hsv plot
             ### but still we should catch the error.
