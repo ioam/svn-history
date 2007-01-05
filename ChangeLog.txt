@@ -1,3 +1,308 @@
+2007-01-04  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/User_Manual/patterns_text.php 1.5: Made link more explicit
+
+	* doc/Makefile 1.16, external/Makefile 1.40, external/epydoc.diff
+	1.2: Major fix to reference manual to provide documentation for
+	Parameters in classes.  Patched epydoc to show parsed Parameter
+	values in all cases, so that introspection can be used to get the
+	__doc__ values for Parameters
+
+	* topo/base/parameterclasses.py 1.51,
+	topo/base/parameterizedobject.py 1.51, topo/base/sheetcoords.py
+	1.9, topo/base/sheetview.py 1.16, topo/commands/analysis.py 1.46,
+	topo/misc/gendocs.py 1.3, topo/misc/keyedlist.py 1.4,
+	topo/misc/numbergenerators.py 1.12, topo/patterns/basic.py 1.102,
+	topo/plotting/palette.py 1.11, topo/plotting/templates.py 1.46,
+	topo/tests/reference/lissom_log_parser.py 1.6,
+	topo/tests/testcfsom.py 1.32, topo/tests/testplotgrouppanel.py
+	1.8, topo/tests/testtemplateplotgrouppanel.py 1.7: Cleaned up
+	docstrings to make epydoc happy.  All of the remaining problems
+	(42 markup errors as of today) should be due to included modules,
+	mainly in TkInter and in the python pickle support.
+
+	* doc/Developer_Manual/coding_text.php 1.3: Clarified what format
+	the docstrings are in
+
+	* topo/base/sheet.py 1.115: Minor fix to docstring
+
+	* topo/base/parameterizedobject.py 1.50: Clarified documentation
+	for ParameterizedObject
+
+	* topo/plotting/plotfilesaver.py 1.30, topo/sheets/composer.py
+	1.19, topo/tests/testsheetview.py 1.16,
+	topo/tkgui/connectionfieldspanel.py 1.30,
+	topo/tkgui/projectionactivitypanel.py 1.3,
+	topo/tkgui/projectionpanel.py 1.65,
+	topo/tkgui/templateplotgrouppanel.py 1.24,
+	topo/tkgui/testpattern.py 1.51, topo/tkgui/topoconsole.py 1.94,
+	topo/tkgui/translatorwidgets.py 1.10,
+	topo/base/parameterizedobject.py 1.49, topo/base/simulation.py
+	1.46, topo/eps/basic.py 1.20: Changed **config to **params for a
+	few ParameterizedObjects that did not match the rest, for
+	consistency.  Should not have changed any user-visible behavior in
+	any way.
+
+	* doc/User_Manual/images/centersurround.png 1.1,
+	doc/User_Manual/patterns_text.php 1.4: Added example of
+	center/surround pattern
+
+	* doc/Makefile 1.15: Added more of reference manual to cleanup
+	list
+
+	* doc/Reference_Manual/index_text.php 1.14: Added notes on
+	external packages
+
+2006-12-21  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.137: Added more to do
+
+2006-12-21  r_primrose  <r_primrose@lodestar.inf.ed.ac.uk>
+
+	* examples/sullivan_neurocomputing04.ty 1.12: added pattern
+	generator for moving lines
+
+2006-12-20  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/lissom_fsa.ty 1.1: Initial sketch based on
+	lissom_oo_or.ty
+
+2006-12-19  judelaw  <judelaw@lodestar.inf.ed.ac.uk>
+
+	* topo/analysis/featuremap.py 1.55: No longer required - has been
+	replaced with featureresponses.py
+
+	* topo/analysis/featureresponses.py 1.1: refactored file
+	containing FeatureResponses and associated classes which replaces
+	featuremap.py
+
+	* topo/commands/analysis.py 1.45: made changes so that functions
+	now use the new featureresponses.py which replaces featuremap.py
+
+2006-12-16  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.136: Transferred information
+	from the existing task about upgrading Numeric to the new one.
+
+2006-12-15  antolikjan  <antolikjan@lodestar.inf.ed.ac.uk>
+
+	* examples/laminar_oo.ty 1.1: Initial version
+
+2006-12-15  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.135,
+	doc/User_Manual/commandline_text.php 1.5,
+	doc/images/ansiprompt.png 1.1, topo/misc/commandline.py 1.21:
+	Documented new configurable command prompt
+
+	* doc/Future_Work/current_text.php 1.134: Added tasks
+
+2006-12-10  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/commandline.py 1.20: Cleaned up new command prompt
+	code
+
+2006-12-10  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/commandline.py 1.19: Allows a dynamic prompt; might
+	need some cleaning up.
+
+2006-12-10  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/shared/index.php 1.24: Added news of PyCon 2007
+
+2006-12-06  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/sullivan_neurocomputing04.ty 1.11: Fixed simulation
+	name.  Moved KernelMax output_fn to the V1 sheet instead of the
+	connection weights
+
+	* topo/outputfns/basic.py 1.55: Fixed KernelMax to return values
+	in the original activity matrix rather than returning a
+	different-sized copy
+
+	* topo/learningfns/som.py 1.12: Added alert -- the kernel_radius
+	for a SOM is mistakenly still in matrix coordinates
+
+	* topo/sheets/generatorsheet.py 1.46: Added alert about memory
+	allocation policies
+
+2006-12-06  r_primrose  <r_primrose@lodestar.inf.ed.ac.uk>
+
+	* examples/sullivan_neurocomputing04.ty 1.10,
+	topo/outputfns/basic.py 1.54: implemented kernel_max output_fn
+
+2006-12-06  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/patterns/basic.py 1.101: Minor clarification to docstring
+
+2006-12-06  fdemertzis  <fdemertzis@lodestar.inf.ed.ac.uk>
+
+	* examples/sullivan_nn06.ty 1.9: Changed Gaussian size, bounding
+	box, and general formatting.
+
+2006-12-05  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/sullivan_nn06.ty 1.8: Simplified measure_topography and
+	cleaned up its documentation
+
+	* doc/index.html 1.4: Added better indexing information
+
+2006-12-05  fdemertzis  <fdemertzis@lodestar.inf.ed.ac.uk>
+
+	* examples/sullivan_nn06.ty 1.7: *** empty log message ***
+
+2006-11-30  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* examples/sullivan_nn06.ty 1.6: Fixed input region to be a 1-D
+	array, with a 1-D Gaussian pattern.  Changed the
+	measure_topography command to have a 1-pixel pattern sweeping from
+	the left
+
+	* examples/sullivan_neurocomputing04.ty 1.9: Fixed typos in
+	previous checkin
+
+	* topo/learningfns/projfns.py 1.16: Fixed bug in commented-out BCM
+	rule; may work now.  Updated comments on Trace learning function.
+	Changed to use activity_type; shouldn't have any actual changes to
+	behavior
+
+	* examples/sullivan_neurocomputing04.ty 1.8: Brought closer to
+	what the paper seems to say, though there is still a lot of work
+	to do figuring it out
+
+2006-11-30  r_primrose  <r_primrose@lodestar.inf.ed.ac.uk>
+
+	* examples/sullivan_neurocomputing04.ty 1.7,
+	topo/learningfns/projfns.py 1.15: *** empty log message ***
+
+2006-11-30  fdemertzis  <fdemertzis@lodestar.inf.ed.ac.uk>
+
+	* examples/sullivan_nn06.ty 1.5: Almost complete, the learned map
+	showing the winning outputs/ inputs.. not quite working
+	properly... changed a bit the inputs..
+
+	* examples/sullivan_nn06.ty 1.4: Almost complete, the learned map
+	showing the winning outputs/ inputs.. not quite working
+	properly...
+
+2006-11-27  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.85: Forced tags to be moved on topographica-win when
+	needed
+
+	* Makefile 1.84: Added more .cvsignores to remove
+
+	* doc/Reference_Manual/index_text.php 1.13: Minor clarification
+
+	* doc/Makefile 1.14, doc/Reference_Manual/index_text.php 1.12:
+	Fixed reference manual to have hand-coded index page, but added a
+	link to the auto-generated index.html
+
+	* Makefile 1.83: Added removal of topographica-win from
+	distribution, in case it is checked out in the local copy
+
+2006-11-26  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.82: Added tagging for topographica-win
+
+	* doc/Downloads/cvs_text.php 1.7: Added note about long pauses
+	with CVS
+
+	* doc/Downloads/cvs_text.php 1.6: Removed requirement for GCC 3.x
+	under OS X
+
+2006-11-24  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* topo/base/arrayutils.py 1.18: Fixed obvious typos in previous
+	checkin
+
+	* examples/sullivan_nn06.ty 1.3: Added appropriate scaling for the
+	learning rates
+
+	* topo/learningfns/projfns.py 1.14: Added changes from Foivos.
+	Changed default activity_target to match sullivan:nn06.  Removed
+	hack for initializing the average activities
+
+	* topo/base/arrayutils.py 1.17, topo/learningfns/som.py 1.11:
+	Replaced special-purpose winner_coords function with general
+	array_argmax function
+
+	* examples/lissom_or_homeoscale.ty 1.7: Added hack to initialize
+	the average activities to those computed during the initial
+	period, rather than relying on that being done within the
+	HomeoSynaptic class.  Changed outputfn from PiecewiseLinear_debug
+	to PiecewiseLinear_debug2 so that x_avg would be available.
+
+2006-11-24  ceball  <ceball@lodestar.inf.ed.ac.uk>
+
+	* topo/misc/patternfns.py 1.10: Removed unused import.
+
+	* topo/patterns/basic.py 1.100: Updated Disk and Ring to transform
+	the corresponding circular patternfns.
+
+	* topo/misc/patternfns.py 1.9: disk() and ring() functions changed
+	to be circular only (and have correct fall-off).
+
+2006-11-24  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* Makefile 1.81: Renamed sullivan_neurocomputing06.ty to
+	sullivan_nn06.ty because it's actually based on the longer journal
+	paper version
+
+	* examples/sullivan_nn06.ty 1.2: Corrected citation
+
+	* examples/sullivan_neurocomputing06.ty 1.7,
+	examples/sullivan_nn06.ty 1.1: Renamed
+	sullivan_neurocomputing06.ty to sullivan_nn06.ty because it's
+	actually based on the longer journal paper version
+
+	* examples/sullivan_neurocomputing06.ty 1.6: Updated with changes
+	from Foivos.  Clarified comments, made bounding boxes long and
+	thin, removed disk weight shape, and added plotting of average
+	activities to compare against the original paper
+
+	* topo/outputfns/homeostatic.py 1.5: Minor cleanup of comments and
+	spacing
+
+	* topo/learningfns/projfns.py 1.13: Clarified documentation, and
+	added normalizing term to the trace learning rule
+
+	* topo/learningfns/basic.py 1.63: Minor documentation update
+
+	* examples/sullivan_neurocomputing04.ty 1.6: Added scaling to make
+	learning rates density-independent
+
+	* Makefile 1.80: Keep tiny.ty in the distribution
+
+2006-11-24  r_primrose  <r_primrose@lodestar.inf.ed.ac.uk>
+
+	* examples/sullivan_neurocomputing04.ty 1.5:
+	fixed connection field functions
+
+2006-11-24  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
+
+	* doc/Future_Work/current_text.php 1.133: Merged identical categories
+
+	* ChangeLog.txt 1.12: Added recent changes
+
+	* doc/Home/oldnews_text.php 1.3, doc/shared/index.php 1.23:
+	Cleaned up news announcements
+
+	* doc/Makefile 1.13: Fixed regeneration of ref manual after cleanup
+
+	* doc/Links/index_text.php 1.6: Minor clarification
+
+	* doc/Team_Members/index_text.php 1.7: Minor updates
+
+	* doc/User_Manual/index_text.php 1.20: Removed outdated links
+
+	* doc/User_Manual/background_text.php.m4 1.4, doc/User_Manual/features_text.php.m4 1.4:
+	Removed unneeded files
+
+	* doc/User_Manual/introduction_text.php.m4 1.4:
+	Added a few bits of text from the background and features files
+
 2006-11-24  Jim Bednar  <jbednar@lodestar.inf.ed.ac.uk>
 
 	* doc/Home/oldnews_text.php 1.3, doc/shared/index.php 1.23:
