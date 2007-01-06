@@ -46,7 +46,7 @@ all: ${PHPHTML}
 # Can also add --graph=classtree for graphical class diagrams
 reference-manual: Reference_Manual/toc.html
 Reference_Manual/toc.html: ../topo/*.py ../topo/*/*.py Reference_Manual/index_text.php
-	mv ../topo/tests ../topo-tests-tmp
+	-mv ../topo/tests ../topo-tests-tmp
 	cd .. ; bin/epydoc --inheritance=listed --docformat=ReStructuredText --show-sourcecode --html -o doc/Reference_Manual --name=Topographica --url=http://topographica.org topo
 	mv ../topo-tests-tmp ../topo/tests 
 	mv Reference_Manual/index.html Reference_Manual/topo.html
