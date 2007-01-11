@@ -32,6 +32,8 @@ from topo.base.sheet import Sheet
 from topo.misc.utils import frange
 
 
+
+
 def windowtitle(title):
     """
     Helper function to set the title of this PyLab plot window to a string.
@@ -136,5 +138,43 @@ def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreferenc
             pylab.show._needmain = False 
             pylab.show()
 
+	   
+def tuning_curve(x_axis,plot_type,x_ticks,x_labels,unit):
+    """
+    Plots a tuning curve for the  appropriate feature type eg. Orientation, Contrast or Size
+    Obtains values for plotting from the curve_dict for each sheet and the parameter values 
+    specified in the gui window (eg unit coordinates and sheet).
+    """
+
+    sheet=topo.sim[topo.commands.analysis.sheet_name]
+    coordinate=topo.commands.analysis.coordinate
+    i_value,j_value=sheet.sheet2matrixidx(coordinate[0],coordinate[1])
+    
+
+    pylab.figure(figsize=(7,7))
+    isint=pylab.isinteractive()
+    pylab.ioff()
+    manager = pylab.get_current_fig_manager()
+    
+    pylab.ylabel('Response')
+    pylab.xlabel(x_axis.capitalize()+' ('+unit+')')
+    pylab.title('Sheet '+topo.commands.analysis.sheet_name+', coordinate(x,y)='+'('+
+	 	str(coordinate[0])+','+str(coordinate[1])+')'+' at time '+str(topo.sim.time()))
+    manager.window.title(x_axis.capitalize()+' Tuning Curve')
 
 
+    for curve_label in sorted(sheet.curve_dict[x_axis].keys()):
+	x_values=[]
+	y_values=[]
+	for key in sorted(sheet.curve_dict[x_axis][curve_label].keys()):
+	    y_values.append(sheet.curve_dict[x_axis][curve_label][key][i_value,j_value])
+	    x_values.append(key)
+	plot_type(x_values,y_values, label=curve_label)
+	if (x_ticks): pylab.xticks(x_ticks,x_labels)
+	 
+	   
+    if isint: pylab.ion()
+    
+    pylab.legend()
+    pylab.show._needmain = False 
+    pylab.show()
