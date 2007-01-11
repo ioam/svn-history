@@ -149,10 +149,14 @@ class FeatureResponses(ParameterizedObject):
 
             if display:
                 if hasattr(topo,'guimain'):
-                    topo.guimain.auto_refresh()
+                    for win in topo.guimain.auto_refresh_panels:
+                        if win.plotgroup_key=='Activity':
+                            win.refresh()
+                            topo.guimain.update_idletasks()
                 else:
                     self.warning("No GUI available for display.")
-            
+
+                       
             # Update each DistributionMatrix with (activity,bin)
             for sheet in self._sheets_to_measure_maps_for:
                 for feature,value in zip(feature_names, p):
@@ -207,7 +211,36 @@ class FeatureMaps(FeatureResponses):
                 sheet.sheet_view_dict[feature.capitalize()+'Selectivity']=selectivity_map
 
 
+class FeatureCurves(FeatureResponses):
+    """
+    Initializes a curve_dict dictionary for the required sheet and x_axis to be plotted.
+    
+    Updates the param_dict to include the curve_param_dict entries which specify the details of the curve to be plotted.
+    Given this set of parameters - collects the responses to the feature to be plotted (given by x_axis) and stores the 
+    array of activity values in the curve_dict for this sheet. Each response curve may be plotted for a variety 
+    of values of some other parameter value (eg. orientation response curves can be plotted at 
+    several different contrasts which are specified in the curve_param_dict). 
+    Therefore each array is indexed by the curve_label and feature value.
+    """
 
+    def __init__(self,sheet,x_axis):
+	self.sheet=sheet
+        self.x_axis=x_axis
+	sheet.curve_dict={}
+	sheet.curve_dict[x_axis]={}
+
+    def collect_feature_responses(self,features,pattern_presenter,param_dict,curve_param_dict, curve_label,display):
+	super(FeatureCurves, self).__init__(features)
+	param_dict.update(curve_param_dict)
+	rows,cols=self.sheet.shape
+	self.measure_responses(pattern_presenter,param_dict,features,display)
+	self.sheet.curve_dict[self.x_axis][curve_label]={}
+	for key in self._featureresponses[self.sheet][self.x_axis].distribution_matrix[0,0]._data.iterkeys():
+	    y_axis_values = zeros(self.sheet.shape,'O')
+	    for i in range(rows):
+		for j in range(cols):
+		    y_axis_values[i,j] = self._featureresponses[self.sheet][self.x_axis].distribution_matrix[i,j].get_value(key)
+	    self.sheet.curve_dict[self.x_axis][curve_label].update({key:y_axis_values})
 
 
 
