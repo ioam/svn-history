@@ -1,3 +1,4 @@
+
 """
 Hierarchy of PlotGroup classes, i.e. output-device-independent sets of plots.
 
@@ -212,7 +213,30 @@ important.""")
 	"""
 	self.plots.sort(cmp_plot)
 
+class FeatureCurvePlotGroup(PlotGroup):
+    
+   updatecommand = Parameter(default="",doc=
+"""Command to execute before updating this plot, e.g. to calculate sheet views.
 
+The command can be any Python code, and will be evaluated in the main namespace
+(as if it were typed into a .ty script).  The initial value is determined by
+the template for this plot, but various arguments can be passed, a modified
+version substituted, etc.""")
+
+   def __init__(self,plot_list,template,sheet_name,x,y):
+
+	super(FeatureCurvePlotGroup,self).__init__(plot_list)
+        self.template=template
+        self.updatecommand = self.template.command
+        self.x = x
+        self.y = y
+        self.sheet_name=sheet_name
+
+   def update_environment(self):
+       topo.commands.analysis.coordinate = (self.x,self.y)
+       topo.commands.analysis.sheet_name = self.sheet_name
+       
+       exec  self.updatecommand in __main__.__dict__
 
 
 class TemplatePlotGroup(PlotGroup):
