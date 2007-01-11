@@ -21,9 +21,10 @@ from topo.base.sheetview import SheetView, ProjectionView
 from topo.commands.basic import pattern_present
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.utils import frange, wrap
-from topo.patterns.basic import SineGrating, Gaussian 
+from topo.patterns.basic import SineGrating, Gaussian, GratingStimulus
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.analysis.featureresponses import FeatureMaps
+from topo.base.parameterclasses import Wrapper
+from topo.analysis.featureresponses import FeatureMaps, FeatureCurves
 
 
 class Feature(object):
@@ -89,7 +90,7 @@ class PatternPresenter(ParameterizedObject):
         ### support for having meta-parameters controlling the
         ### generation of different patterns for each GeneratorSheet.
         ### For instance, we will also need to support xdisparity and
-        ### ydisparity, plus movement of patterns between two eyes,
+        ### ydisparity, plus movement of patterns between two eyes, colors,
         ### etc.  At the very least, it should be simple to control
         ### differences in single parameters easily.  In addition,
         ### these meta-parameters should show up as parameters for
@@ -147,10 +148,18 @@ class PatternPresenter(ParameterizedObject):
                 inputs[input_pattern[0]]=gen_copy1
                 inputs[input_pattern[1]]=gen_copy2
 
+	if features_values.has_key("michelson_contrast") or param_dict.has_key("michelson_contrast"):
+	    self.gen.offset=0.5   
+	    self.gen.scale=2*self.gen.offset*self.gen.michelson_contrast/100
+	
+	if features_values.has_key("weber_contrast" ) or param_dict.has_key("weber_contrast"):
+	     #Weber_contrast is currently only well defined for the special case where 
+             #the background offset is equal to the target offset in the pattern type GratingStimulus')
+	    self.gen.offset=0.5   #In this case this is the offset of both the background and the sine grating
+	    self.gen.scale=2*self.gen.offset*self.gen.weber_contrast/100
+           
         pattern_present(inputs, self.duration, learning=False,
                         apply_output_fn=self.apply_output_fn)
-
-
 # Module variables for passing values to the commands.
 coordinate = (0,0)
 sheet_name = ''
@@ -160,6 +169,31 @@ proj_name =''
 ### JABALERT: This mechanism for passing values is a bit awkward, and
 ### should be changed to something cleaner.  It might also be better
 ### to access a Sheet instance directly, rather than searching by name.
+
+def measure_position_pref(divisions=12,size=0.5,scale=0.3,offset=0.0,display=False,
+                          pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),False,1.0),
+                          x_range=(-0.5,0.5),y_range=(-0.5,0.5)):
+    """
+    Measure position preference map, using a circular Gaussian by default.
+
+    Measures maps by collating the responses to a set of input
+    patterns controlled by some parameters.  The parameter ranges and
+    number of input patterns in each range are determined by the
+    divisions parameter.  The particular pattern used is determined by the
+    size, scale, offset, and pattern_presenter arguments.
+    """
+
+    if divisions <= 0:
+        raise ValueError("divisions must be greater than 0")
+
+    else:
+        # JABALERT: Will probably need some work to support multiple input regions
+        feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
+                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]          
+                          
+        param_dict = {"size":size,"scale":scale,"offset":offset}
+        x=FeatureMaps(feature_values)
+        x.collect_feature_responses(pattern_presenter,param_dict,display)
        
 
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
@@ -198,7 +232,223 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         param_dict = {"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display)
+
+
+def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4],
+                    michelson_contrasts=[30,60,90],display=False,
+                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
+						       apply_output_fn=False,duration=1.0)):
+
+    """
+    Measures orientation tuning curve of a particular unit using a full field grating stimulus. 
+    Michelson Contrast can be replaced by another variable(s) provided it is defined in PatternPresenter.
     
+    """
+        
+    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
+    measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
+    
+    for sheet in measured_sheets:
+	sheet_name=str(sheet)
+	if num_phase <= 0 or num_orientation <= 0:
+	    raise ValueError("num_phase and num_orientation must be greater than 0")
+    
+	else:
+	    step_phase=2*pi/num_phase
+	    step_orientation=pi/num_orientation
+
+        
+        
+	    feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+			      Feature(name="orientation",range=(0,2*pi),step=step_orientation,cyclic=True),
+			      Feature(name="frequency",values=frequencies)]     
+        
+	    x_axis='orientation'
+	    x=FeatureCurves(sheet,x_axis)
+        
+    
+        for michelson_contrast in michelson_contrasts:
+            curve_param_dict = {"michelson_contrast":michelson_contrast}
+	    param_dict={}
+	    curve_label='Contrast = '+str(michelson_contrast)+'%'
+            x.collect_feature_responses(feature_values,pattern_presenter,param_dict,curve_param_dict,curve_label,display)
+	  
+
+def measure_contrast_response_fullfield(michelson_contrasts=[10,20,30,40,50,60,70,80,90],display=False,frequency=2.4,
+                                        pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
+                                                                           apply_output_fn=False,duration=1.0)):
+
+    """
+    Measures contrast response curve of a particular unit using a full field grating stimulus at the 
+    preferred orientation of the unit. Orientation preference must be measured before measuring the contrast response.
+    """
+    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
+    measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
+    
+    for sheet in measured_sheets:
+	sheet_name=str(sheet)
+	matrix_coords = sheet.sheet2matrixidx(coordinate[0],coordinate[1])
+	if(('OrientationPreference' in sheet.sheet_view_dict) and
+	   ('PhasePreference' in sheet.sheet_view_dict)):
+	    or_pref = sheet.sheet_view_dict['OrientationPreference'].view()[0]
+	    phase_pref = sheet.sheet_view_dict['PhasePreference'].view()[0]
+	    or_value = or_pref[matrix_coords]
+	    phase_value = phase_pref[matrix_coords]
+	else:
+	    raise ValueError("Orientation Preference must be measured before plotting Contrast Response")
+	
+	orientations = [or_value, or_value+0.3, or_value-0.3]
+    
+	feature_values = [Feature(name="michelson_contrast",values=michelson_contrasts)]
+	x_axis='michelson_contrast'
+	x=FeatureCurves(sheet,x_axis)
+
+	for orientation in orientations:
+	    curve_param_dict ={"orientation":orientation}
+            curve_label='Orientation = %.4f rad' % orientation 
+	    param_dict = {"phase":phase_value, "frequency":frequency}
+	    x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_param_dict,curve_label,display)
+    
+    
+        
+def measure_size_response(num_phase=18,frequency=2.4,weber_contrasts=[20,40,60],step_size=0.05,display=False,
+                          pattern_presenter=PatternPresenter(pattern_generator=GratingStimulus(),
+                                                           apply_output_fn=False,duration=1.0)):
+
+    """
+   Function for measuring receptive field size. Uses an expanding circular grating stimulus at the preferred 
+   orientation and retinal position of the required unit. Orientation and position preference must be calulated 
+   before measuring size response. Curve can be plotted at various different values of the Weber contrast of the stimulus. 
+    """
+    sheet=topo.sim[sheet_name]
+    matrix_coords = sheet.sheet2matrixidx(topo.commands.analysis.coordinate[0],topo.commands.analysis.coordinate[1])
+    if(('OrientationPreference' in sheet.sheet_view_dict)and
+       ('XPreference' in sheet.sheet_view_dict) and
+       ('YPreference' in sheet.sheet_view_dict)):
+        or_pref = sheet.sheet_view_dict['OrientationPreference'].view()[0]
+        x_pref = sheet.sheet_view_dict['XPreference'].view()[0]
+        y_pref = sheet.sheet_view_dict['YPreference'].view()[0]
+        or_value = or_pref[matrix_coords]
+        x_value=x_pref[matrix_coords]
+        y_value=y_pref[matrix_coords]
+    else:
+        raise ValueError("Orientation Preference and Position Preference must be measured before plotting Size Response")
+
+    
+    if num_phase <= 0:
+        raise ValueError("num_phase must be greater than 0")
+
+    else:
+        step_phase=2*pi/num_phase
+        
+        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                          Feature(name="size",range=(0.1,0.7),step=step_size,cyclic=False)]
+
+        x_axis='size'
+        x=FeatureCurves(sheet,x_axis)
+          
+        for weber_contrast in weber_contrasts:
+            curve_param_dict = {"weber_contrast":weber_contrast} 
+	    curve_label='Contrast = '+str(weber_contrast)+'%'
+            param_dict = {"x":x_value,"y":y_value,"orientation":or_value,"frequency":frequency}
+            x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_param_dict,curve_label,display)
+
+                  
+
+def measure_contrast_response(size=0.5,num_contrasts=12,display=False,frequency=2.4,
+                              num_phase=18,pattern_presenter=PatternPresenter(pattern_generator=GratingStimulus(),
+                                                           apply_output_fn=False,duration=1.0)):
+
+    """
+    Measures contrast response curve of a particular unit using a cicular grating stimulus at the 
+    preferred orientation and retinal position of the unit. 
+    Orientation preference and position preference must be measured before measuring the contrast response.
+   
+    """
+
+    sheet=topo.sim[sheet_name]
+    matrix_coords = sheet.sheet2matrixidx(coordinate[0],coordinate[1])
+    if(('OrientationPreference' in sheet.sheet_view_dict) and
+       ('XPreference' in sheet.sheet_view_dict) and
+
+       ('YPreference' in sheet.sheet_view_dict)):
+        x_pref = sheet.sheet_view_dict['XPreference'].view()[0]
+        y_pref = sheet.sheet_view_dict['YPreference'].view()[0]
+        or_pref = sheet.sheet_view_dict['OrientationPreference'].view()[0]
+        or_value = or_pref[matrix_coords]
+        x_value=x_pref[matrix_coords]
+        y_value=y_pref[matrix_coords]
+    else:
+        raise ValueError("Orientation Preference and Position Preference must be measured before plotting Contrast Response")
+
+    or_values =[or_value, or_value+0.003, or_value-0.003]
+    
+    if num_phase <= 0 :
+        raise ValueError("num_phase must be greater than 0")
+
+    else:
+        step_phase=2*pi/num_phase
+        step_contrast=100/num_contrasts
+        
+        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                          Feature(name="weber_contrast",range=(0,100),step=step_contrast,cyclic=False)]  
+        x_axis='weber_contrast'
+        x=FeatureCurves(sheet,x_axis)
+   
+	for orientation in or_values:
+	    curve_param_dict={"orientation":orientation}
+            curve_label='Orientation = %.4f rad' % orientation 
+            param_dict = {"x":x_value,"y":y_value,"frequency":frequency}
+	    x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_param_dict, curve_label,display)
+                        
+
+def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],size=0.5,
+                        weber_contrasts=[30,60,90],display=True,
+                        pattern_presenter=PatternPresenter(pattern_generator=GratingStimulus(),
+                                                           apply_output_fn=False,duration=1.0)):
+
+    """
+    Measures orientation tuning curve of a particular unit using a circular grating stimulus. 
+    Weber Contrast can be replaced by another variable(s) provided it is defined in PatternPresenter.
+    
+    """
+
+    sheet=topo.sim[sheet_name]
+    sheet_x,sheet_y = coordinate
+    matrix_coords = sheet.sheet2matrixidx(sheet_x,sheet_y)
+    if(('XPreference' in sheet.sheet_view_dict) and
+       ('YPreference' in sheet.sheet_view_dict)):
+	x_pref = sheet.sheet_view_dict['XPreference'].view()[0]
+	y_pref = sheet.sheet_view_dict['YPreference'].view()[0]
+	x_value=x_pref[matrix_coords]
+	y_value=y_pref[matrix_coords]
+    else:
+	raise ValueError("Position Preference must be measured before plotting Orientation Response")
+        
+
+                 
+    if num_phase <= 0 or num_orientation <= 0:
+        raise ValueError("num_phase and num_orientation must be greater than 0")
+    
+    else:
+        step_orientation=pi/num_orientation
+        step_phase=2*pi/num_phase
+        
+        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                          Feature(name="orientation",range=(0,2*pi),step=step_orientation,cyclic=True),
+                          Feature(name="frequency",values=frequencies)]     
+
+        x_axis='orientation'
+        x=FeatureCurves(sheet,x_axis)
+           
+    
+	for weber_contrast in weber_contrasts:
+	    curve_param_dict = {"weber_contrast":weber_contrast}
+	    curve_label='Contrast = '+str(weber_contrast)+'%'
+            param_dict = {"x":x_value,"y":y_value}
+            x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_param_dict,curve_label,display)
+               
+
 
 ### JABALERT: Shouldn't there be a num_ocularities argument as well, to
 ### present various combinations of left and right eye activity?        
@@ -253,6 +503,7 @@ def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequ
     number of input patterns in each range are determined by the
     num_phase, num_orientation, num_disparity, and frequencies
     parameters.  The particular pattern used is determined by the
+
     pattern_presenter argument, which defaults to a sine grating presented
     for a short duration.  By convention, most Topographica example
     files are designed to have a suitable activity pattern computed by
@@ -277,33 +528,9 @@ def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequ
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display)
      
+      
+      
 
-def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=False,
-                          pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),False,1.0),
-                          x_range=(-0.5,0.5),y_range=(-0.5,0.5)):
-    """
-    Measure position preference map, using a circular Gaussian by default.
-
-    Measures maps by collating the responses to a set of input
-    patterns controlled by some parameters.  The parameter ranges and
-    number of input patterns in each range are determined by the
-    divisions parameter.  The particular pattern used is determined by the
-    size, scale, offset, and pattern_presenter arguments.
-    """
-
-    if divisions <= 0:
-        raise ValueError("divisions must be greater than 0")
-
-    else:
-        # JABALERT: Will probably need some work to support multiple input regions
-        feature_values = [Feature(name="x",range=x_range,step=1.0*(x_range[1]-x_range[0])/divisions),
-                          Feature(name="y",range=y_range,step=1.0*(y_range[1]-y_range[0])/divisions)]          
-                          
-        param_dict = {"size":size,"scale":scale,"offset":offset}
-        x=FeatureMaps(feature_values)
-        x.collect_feature_responses(pattern_presenter,param_dict,display)
-
-        
 
 def measure_cog(proj_name ="Afferent"):    
     """
