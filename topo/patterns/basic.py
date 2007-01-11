@@ -392,3 +392,47 @@ class Selector(PatternGenerator):
                          scale=pg.scale*scale,offset=pg.offset+offset)
                        
         return image_array
+
+
+class GratingStimulus(PatternGenerator):
+
+    """
+    A disk shaped sine grating stimulus 
+    """
+    size  = Number(default=0.5, doc="size of the central grating stimulus")
+
+    phase  = Number(default=1.0, doc="phase of the sine grating")
+
+    frequency  = Number(default=1.0,doc="frequency of the sine grating")
+
+
+    def __call__(self,**params):
+        super(GratingStimulus,self).__init__(**params)
+	bounds = params.get('bounds',self.bounds)
+        xdensity=params.get('xdensity',self.xdensity)
+        ydensity=params.get('ydensity',self.ydensity)
+        x=params.get('x',self.x)
+        y=params.get('y',self.y)
+        scale=params.get('scale',self.scale)
+        offset=params.get('offset',self.offset)
+        orientation=params.get('orientation',self.orientation)   
+        size=params.get('size',self.size)
+        phase=params.get('phase',self.phase)
+        frequency=params.get('frequency',self.frequency)
+
+      
+        input_1=SineGrating()
+        input_2=Disk()
+        
+        patterns = [input_1(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
+                       x=x+size*(input_1.x*cos(orientation)-input_1.y*sin(orientation)),
+                       y=y+size*(input_1.x*sin(orientation)+input_1.y*cos(orientation)),
+                       orientation=orientation,size=input_1.size*size,
+                       scale=scale,offset=offset, phase=phase, frequency=frequency),
+                    input_2(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
+                       x=x+size*(input_2.x*cos(orientation)-input_2.y*sin(orientation)),
+                       y=y+size*(input_2.x*sin(orientation)+input_2.y*cos(orientation)),
+                       orientation=input_2.orientation,size=size,
+                       scale=scale,offset=offset)]
+        image_array = Wrapper("Numeric.minimum").reduce(patterns)
+        return image_array
