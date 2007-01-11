@@ -30,6 +30,7 @@ class PlotGroupTemplate(ParameterizedObject):
     """
     
     command = Parameter('pass')
+    refresh_command = Parameter('pass')
     normalize = BooleanParameter(False)
     image_location = Filename(doc='Paths to search for images to be loaded.')
     
@@ -47,14 +48,14 @@ class PlotGroupTemplate(ParameterizedObject):
         such as Red, Green, Blue, Outline, etc.
     
         For instance, one could define an Orientation-colored Activity
-        plot as::
+        plot as:
         
-          pgt.plot_templates['Activity'] =
-            PlotGroupTemplate(name='Activity', command='measure_activity()',
-                              plot_templates=[('Activity',
-                                               {'Strength'   : 'Activity',
-                                                'Hue'        : 'OrientationPreference',
-                                                'Confidence' : None})])
+        pgt.plot_templates['Activity'] =
+          PlotGroupTemplate(name='Activity', command='measure_activity()',
+                            plot_templates=[('Activity',
+                                             {'Strength'   : 'Activity',
+                                              'Hue'        : 'OrientationPreference',
+                                              'Confidence' : None})])
     
         This specifies that there will be up to one Plot named Activity in
         the final PlotGroup per Sheet, although there could be no plots at
@@ -63,7 +64,7 @@ class PlotGroupTemplate(ParameterizedObject):
         the value channel will be determined by the SheetView Activity.
     
         Here's a more complicated example specifying two different plots
-        in the same PlotGroup::
+        in the same PlotGroup:
     
           PlotGroupTemplate(name='Orientation Preference', command = 'measure_or_pref()',
                             plot_templates=[('Orientation Preference',
@@ -150,7 +151,6 @@ pgt.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference
 pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
 pgt.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
 
-
 pgt = new_plotgroup_template(name='Position Preference',command='measure_position_pref() ; topographic_grid()',normalize=True)
 pgt.add_plot('X Preference',[('Strength','XPreference')])
 pgt.add_plot('Y Preference',[('Strength','YPreference')])
@@ -170,3 +170,17 @@ pgt = new_plotgroup_template(name='PhaseDisparity Preference',command='measure_p
 pgt.add_plot('PhaseDisparity Preference',[('Hue','PhasedisparityPreference')])
 pgt.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivity')])
 pgt.add_static_image('Color Key','topo/commands/disp_key_white_vert_small.png')
+
+
+pgt = new_plotgroup_template(name='Orientation Tuning Fullfield',command='measure_or_tuning_fullfield(); tuning_curve(x_axis="orientation", plot_type=pylab.plot, x_ticks=(0,pi/2,pi,3*pi/2,2*pi),x_labels=("0","$\pi/2$","$\pi$","$3\pi/2$","$2\pi$"), unit="radians")')
+
+pgt = new_plotgroup_template(name='Contrast Response Fullfield',command='measure_contrast_response_fullfield(); tuning_curve(x_axis="michelson_contrast", plot_type=pylab.semilogx,x_ticks=None,x_labels=None, unit="%")')
+
+#Not currently in use
+
+#pgt = new_plotgroup_template(name='Orientation Tuning',command='measure_or_tuning(); tuning_curve(x_axis="orientation",plot_type=pylab.plot,x_ticks=(0,pi/2,pi,3*pi/2,2*pi),x_labels=("0","$\pi/2$","$\pi$","$3\pi/2$","$2\pi$"), unit="radians")')
+
+#pgt = new_plotgroup_template(name='Contrast Response',command='measure_contrast_response(); tuning_curve(x_axis="weber_contrast",plot_type=pylab.semilogx,x_ticks=None,x_labels=None,unit="%")')
+
+#pgt = new_plotgroup_template(name='Size Tuning',command='measure_size_response(); tuning_curve(x_axis="size",plot_type=pylab.plot, x_ticks=None, x_labels=None, unit="Diameter of stimulus")')
+
