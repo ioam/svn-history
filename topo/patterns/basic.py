@@ -396,6 +396,10 @@ class Selector(PatternGenerator):
 
 class GratingStimulus(PatternGenerator):
     """A sine grating masked by a circular disk so that only a round patch is visible."""
+    ### JABALERT: This class should not be necessary, if we can provide a way
+    ### to control the parameters of subparts of Composite objects
+    ### more easily (e.g. in the Test Pattern window, or when
+    ### measuring tuning curves).
 
     size  = Number(default=0.5, doc="size of the central grating stimulus")
 
