@@ -395,10 +395,8 @@ class Selector(PatternGenerator):
 
 
 class GratingStimulus(PatternGenerator):
+    """A sine grating masked by a circular disk so that only a round patch is visible."""
 
-    """
-    A disk shaped sine grating stimulus 
-    """
     size  = Number(default=0.5, doc="size of the central grating stimulus")
 
     phase  = Number(default=1.0, doc="phase of the sine grating")
