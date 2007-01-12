@@ -196,10 +196,11 @@ def measure_position_pref(divisions=12,size=0.5,scale=0.3,offset=0.0,display=Fal
         x.collect_feature_responses(pattern_presenter,param_dict,display)
        
 
+
 def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
                     scale=0.3,offset=0.0,display=False,
-                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),apply_output_fn=False,duration=0.175)):
-
+                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
+                                                       apply_output_fn=False,duration=0.175)):
     """
     Measure orientation maps, using a sine grating by default.
 
@@ -234,11 +235,11 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         x.collect_feature_responses(pattern_presenter,param_dict,display)
 
 
+
 def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4],
                     michelson_contrasts=[30,60,90],display=False,
                     pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
 						       apply_output_fn=False,duration=1.0)):
-
     """
     Measures orientation tuning curve of a particular unit using a full field grating stimulus. 
     Michelson Contrast can be replaced by another variable(s) provided it is defined in PatternPresenter.
@@ -257,15 +258,12 @@ def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4
 	    step_phase=2*pi/num_phase
 	    step_orientation=pi/num_orientation
 
-        
-        
 	    feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
 			      Feature(name="orientation",range=(0,2*pi),step=step_orientation,cyclic=True),
 			      Feature(name="frequency",values=frequencies)]     
         
 	    x_axis='orientation'
 	    x=FeatureCurves(sheet,x_axis)
-        
     
         for michelson_contrast in michelson_contrasts:
             curve_param_dict = {"michelson_contrast":michelson_contrast}
@@ -274,14 +272,17 @@ def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4
             x.collect_feature_responses(feature_values,pattern_presenter,param_dict,curve_param_dict,curve_label,display)
 	  
 
+
 def measure_contrast_response_fullfield(michelson_contrasts=[10,20,30,40,50,60,70,80,90],display=False,frequency=2.4,
                                         pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
                                                                            apply_output_fn=False,duration=1.0)):
-
     """
-    Measures contrast response curve of a particular unit using a full field grating stimulus at the 
-    preferred orientation of the unit. Orientation preference must be measured before measuring the contrast response.
+    Measure the contrast response curve of a particular unit.
+    
+    Uses a full field grating stimulus at the preferred orientation of the unit.
+    Orientation preference must be measured before measuring the contrast response.
     """
+    
     f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
     measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
     
@@ -313,13 +314,17 @@ def measure_contrast_response_fullfield(michelson_contrasts=[10,20,30,40,50,60,7
         
 def measure_size_response(num_phase=18,frequency=2.4,weber_contrasts=[20,40,60],step_size=0.05,display=False,
                           pattern_presenter=PatternPresenter(pattern_generator=GratingStimulus(),
-                                                           apply_output_fn=False,duration=1.0)):
+                                                             apply_output_fn=False,duration=1.0)):
+    """
+    Measure receptive field size of one unit of a sheet.
 
+    Uses an expanding circular grating stimulus at the preferred
+    orientation and retinal position of the specified
+    unit. Orientation and position preference must be calulated before
+    measuring size response. The curve can be plotted at various
+    different values of the Weber contrast of the stimulus.
     """
-   Function for measuring receptive field size. Uses an expanding circular grating stimulus at the preferred 
-   orientation and retinal position of the required unit. Orientation and position preference must be calulated 
-   before measuring size response. Curve can be plotted at various different values of the Weber contrast of the stimulus. 
-    """
+    
     sheet=topo.sim[sheet_name]
     matrix_coords = sheet.sheet2matrixidx(topo.commands.analysis.coordinate[0],topo.commands.analysis.coordinate[1])
     if(('OrientationPreference' in sheet.sheet_view_dict)and
@@ -334,7 +339,6 @@ def measure_size_response(num_phase=18,frequency=2.4,weber_contrasts=[20,40,60],
     else:
         raise ValueError("Orientation Preference and Position Preference must be measured before plotting Size Response")
 
-    
     if num_phase <= 0:
         raise ValueError("num_phase must be greater than 0")
 
@@ -357,13 +361,14 @@ def measure_size_response(num_phase=18,frequency=2.4,weber_contrasts=[20,40,60],
 
 def measure_contrast_response(size=0.5,num_contrasts=12,display=False,frequency=2.4,
                               num_phase=18,pattern_presenter=PatternPresenter(pattern_generator=GratingStimulus(),
-                                                           apply_output_fn=False,duration=1.0)):
-
+                                                                              apply_output_fn=False,duration=1.0)):
     """
-    Measures contrast response curve of a particular unit using a cicular grating stimulus at the 
-    preferred orientation and retinal position of the unit. 
-    Orientation preference and position preference must be measured before measuring the contrast response.
-   
+    Measures contrast response curves for a particular unit.
+
+    Uses a circular grating stimulus at the preferred orientation and
+    retinal position of the unit.  Orientation preference and position
+    preference must be measured before measuring the contrast
+    response.
     """
 
     sheet=topo.sim[sheet_name]
@@ -406,11 +411,11 @@ def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],size=0.5
                         weber_contrasts=[30,60,90],display=True,
                         pattern_presenter=PatternPresenter(pattern_generator=GratingStimulus(),
                                                            apply_output_fn=False,duration=1.0)):
-
     """
-    Measures orientation tuning curve of a particular unit using a circular grating stimulus. 
-    Weber Contrast can be replaced by another variable(s) provided it is defined in PatternPresenter.
-    
+    Measures orientation tuning curve of a particular unit.
+
+    Uses a circular grating stimulus. Weber Contrast can be replaced
+    by another variable(s) provided it is defined in PatternPresenter.
     """
 
     sheet=topo.sim[sheet_name]
@@ -487,8 +492,6 @@ def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display)
   
-     
-        
 
 
 def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
@@ -528,8 +531,6 @@ def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequ
         x=FeatureMaps(feature_values)
         x.collect_feature_responses(pattern_presenter,param_dict,display)
      
-      
-      
 
 
 def measure_cog(proj_name ="Afferent"):    
