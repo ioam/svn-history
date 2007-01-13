@@ -170,11 +170,12 @@ class FeatureResponses(ParameterizedObject):
 
 class FeatureMaps(FeatureResponses):
     """
-    Measures and collects the responses to the required features.
+    Measures and collects the responses to a set of features for calculating feature maps.
 
     For each feature and each sheet, the results are stored as a
     preference matrix and selectivity matrix in the sheet's
-    sheet_view_dict.
+    sheet_view_dict; these can then be plotted as preference
+    or selectivity maps.
     """
     
     def __init__(self,features):
@@ -213,14 +214,24 @@ class FeatureMaps(FeatureResponses):
 
 class FeatureCurves(FeatureResponses):
     """
-    Initializes a curve_dict dictionary for the required sheet and x_axis to be plotted.
-    
-    Updates the param_dict to include the curve_param_dict entries which specify the details of the curve to be plotted.
-    Given this set of parameters - collects the responses to the feature to be plotted (given by x_axis) and stores the 
-    array of activity values in the curve_dict for this sheet. Each response curve may be plotted for a variety 
-    of values of some other parameter value (eg. orientation response curves can be plotted at 
-    several different contrasts which are specified in the curve_param_dict). 
-    Therefore each array is indexed by the curve_label and feature value.
+    Measures and collects the responses to a set of features, for calculating tuning and similar curves.    
+
+    These curves represent the response of a Sheet to patterns that
+    are controlled by a set of features.  This class can collect data
+    for multiple curves, each with the same x axis.  The x axis
+    represents the main feature value that is being varied, such as
+    orientation.  Other feature values can also be varied, such as
+    contrast, which will result in multiple curves (one per unique
+    combination of other feature values).
+
+    The sheet responses used to construct the curves will be stored in
+    a dictionary curve_dict kept in the Sheet of interest.  A
+    particular set of patterns is then constructed using a
+    user-specified PatternPresenter by adding the parameters
+    determining the curve (curve_param_dict) to a static list of
+    parameters (param_dict), and then varying the specified set of
+    features.  The results can be accessed in the curve_dict,
+    indexed by the curve_label and feature value.
     """
 
     def __init__(self,sheet,x_axis):
