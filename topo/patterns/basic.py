@@ -394,47 +394,54 @@ class Selector(PatternGenerator):
         return image_array
 
 
-class GratingStimulus(PatternGenerator):
+class SineGratingDisk(PatternGenerator):
     """A sine grating masked by a circular disk so that only a round patch is visible."""
     ### JABALERT: This class should not be necessary, if we can provide a way
     ### to control the parameters of subparts of Composite objects
     ### more easily (e.g. in the Test Pattern window, or when
     ### measuring tuning curves).
 
-    size  = Number(default=0.5, doc="size of the central grating stimulus")
+
+    aspect_ratio  = Number(default=1.0,bounds=(0.0,None),softbounds=(0.0,2.0),
+        precedence=0.31,doc=
+        "Ratio of width to height; size*aspect_ratio gives the width of the disk.")
+
+    size  = Number(default=0.5,doc="Top to bottom height of the disk")
+    
+    smoothing = Number(default=0.1,bounds=(0.0,None),softbounds=(0.0,0.5),
+                       precedence=0.61,doc="Width of the Gaussian fall-off")
 
     phase  = Number(default=1.0, doc="phase of the sine grating")
 
-    frequency  = Number(default=1.0,doc="frequency of the sine grating")
+    frequency  = Number(default=2.4,doc="frequency of the sine grating")
 
 
+    def __init__(self,**params):
+        super(SineGratingDisk,self).__init__(**params)
+       
     def __call__(self,**params):
-        super(GratingStimulus,self).__init__(**params)
-	bounds = params.get('bounds',self.bounds)
+      	bounds = params.get('bounds',self.bounds)
         xdensity=params.get('xdensity',self.xdensity)
         ydensity=params.get('ydensity',self.ydensity)
         x=params.get('x',self.x)
         y=params.get('y',self.y)
         scale=params.get('scale',self.scale)
         offset=params.get('offset',self.offset)
-        orientation=params.get('orientation',self.orientation)   
+        orientation=params.get('orientation',self.orientation)
         size=params.get('size',self.size)
         phase=params.get('phase',self.phase)
         frequency=params.get('frequency',self.frequency)
+        aspect_ratio=params.get('aspect_ratio',self.aspect_ratio)
+        smoothing=params.get('smoothing',self.smoothing)
 
       
-        input_1=SineGrating()
-        input_2=Disk()
+        input_1=SineGrating(phase=phase, frequency=frequency, orientation=orientation, scale=scale, offset=offset)
+        input_2=Disk(aspect_ratio=aspect_ratio,smoothing=smoothing,x=x, y=y,size=size,scale=scale, offset=offset)
         
-        patterns = [input_1(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
-                       x=x+size*(input_1.x*cos(orientation)-input_1.y*sin(orientation)),
-                       y=y+size*(input_1.x*sin(orientation)+input_1.y*cos(orientation)),
-                       orientation=orientation,size=input_1.size*size,
-                       scale=scale,offset=offset, phase=phase, frequency=frequency),
-                    input_2(xdensity=xdensity,ydensity=ydensity,bounds=bounds,
-                       x=x+size*(input_2.x*cos(orientation)-input_2.y*sin(orientation)),
-                       y=y+size*(input_2.x*sin(orientation)+input_2.y*cos(orientation)),
-                       orientation=input_2.orientation,size=size,
-                       scale=scale,offset=offset)]
+        patterns = [input_1(xdensity=xdensity,ydensity=ydensity,bounds=bounds),
+                            input_2(xdensity=xdensity,ydensity=ydensity,bounds=bounds)]
+                      
         image_array = Wrapper("Numeric.minimum").reduce(patterns)
         return image_array
+
+
