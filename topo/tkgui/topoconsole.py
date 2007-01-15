@@ -142,6 +142,9 @@ class PlotsMenuEntry(ParameterizedObject):
         # should add entries to plotpanel_classes.  If no dictionary
         # entry is defined then the default class is used.
         self.class_name = plotpanel_classes.get(self.label,class_name)
+        if self.template.template_plot_type=='curve':
+            self.class_name = plotpanel_classes.get(self.label,FeatureCurvePanel)
+        
 
         self.num_windows = 0
         self.title = ''
@@ -511,7 +514,19 @@ class TopoConsole(Frame):
         for win in self.auto_refresh_panels:
             win.refresh()
         self.update_idletasks()
-                    
+
+    def refresh_activity_windows(self):
+        """
+        Update any windows with a plotgroup_key of 'Activity'.
+
+        Used primarily for debugging long scripts that present a lot of activity patterns.
+        """
+        for win in self.auto_refresh_panels:
+            if win.plotgroup_key=='Activity':
+                win.refresh()
+                self.update_idletasks()
+
+
     # open the model editor window
     def open_model_editor(self) :
 	ModelEditor()
@@ -724,8 +739,4 @@ if __name__ != '__main__':
     plotpanel_classes['Connection Fields'] = ConnectionFieldsPanel
     plotpanel_classes['Projection'] = ProjectionPanel 
     plotpanel_classes['Projection Activity'] = ProjectionActivityPanel
-    plotpanel_classes['Orientation Tuning'] = FeatureCurvePanel
-    plotpanel_classes['Orientation Tuning Fullfield'] = FeatureCurvePanel
-    plotpanel_classes['Contrast Response Fullfield'] = FeatureCurvePanel
-    plotpanel_classes['Contrast Response'] = FeatureCurvePanel
-    plotpanel_classes['Size Tuning'] = FeatureCurvePanel          
+
