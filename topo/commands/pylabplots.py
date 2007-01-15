@@ -138,8 +138,19 @@ def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreferenc
             pylab.show._needmain = False 
             pylab.show()
 
+
+def tuning_curve_data(sheet, x_axis, curve_label, i_value, j_value):
+    """
+    Gets tuning curve data from where it is stored in the curve_dict for each sheet. Requires the x_axis
+    which is the type of feature to be plotted and the curve_label which corresponds to
+    a particular set of curve parameters. Can then access the feature values (which are the x_values)
+    and the corresponding responses (which are the y_values) for the unit we are interested in (given by i_value and j_value) 
+    """
+    x_values= sorted(sheet.curve_dict[x_axis][curve_label].keys())
+    y_values=[sheet.curve_dict[x_axis][curve_label][key][i_value,j_value] for key in x_values]
+    return x_values, y_values
 	   
-def tuning_curve(x_axis,plot_type,x_ticks,x_labels,unit):
+def tuning_curve(x_axis,plot_type,x_ticks,x_labels,x_lim,unit):
     """
     Plots a tuning curve for the  appropriate feature type eg. Orientation, Contrast or Size
     Obtains values for plotting from the curve_dict for each sheet and the parameter values 
@@ -164,14 +175,11 @@ def tuning_curve(x_axis,plot_type,x_ticks,x_labels,unit):
 
 
     for curve_label in sorted(sheet.curve_dict[x_axis].keys()):
-	x_values=[]
-	y_values=[]
-	for key in sorted(sheet.curve_dict[x_axis][curve_label].keys()):
-	    y_values.append(sheet.curve_dict[x_axis][curve_label][key][i_value,j_value])
-	    x_values.append(key)
-	plot_type(x_values,y_values, label=curve_label)
+        x_values, y_values =tuning_curve_data(sheet,x_axis, curve_label, i_value, j_value)
+        plot_type(x_values, y_values, label=curve_label)
 	if (x_ticks): pylab.xticks(x_ticks,x_labels)
-	 
+        if (x_lim): pylab.xlim(x_lim)
+
 	   
     if isint: pylab.ion()
     
