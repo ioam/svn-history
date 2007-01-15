@@ -1,4 +1,5 @@
 """
+The laminar.ty extended with LGN
 Two layer model with one inhibitory and one excitatory sheet.
 Recurrent short range connections between sheets, long range excitation and short range inhibition
 Based on lissom_or_noshrinking - work in progress.
@@ -33,7 +34,7 @@ from topo.misc.numbergenerators import UniformRandom
 from topo.base.parameterclasses import Wrapper
 
 
-topo.sim.name = "new"
+topo.sim.name = "laminar_oo"
 
 input_pattern = topo.patterns.basic.Gaussian(
           scale=1.0, size=0.08333, aspect_ratio=4.6666,
@@ -80,8 +81,8 @@ topo.sim['V1Inh'] =  LISSOM(nominal_density=locals().get('default_density',48.0)
                             output_fn=Sigmoid(r=13, k=-4))
 
 
-topo.sim['V1Exc'].output_fn.lower_bound=0.083
-topo.sim['V1Exc'].output_fn.upper_bound=0.633
+#topo.sim['V1Exc'].output_fn.lower_bound=0.083
+#topo.sim['V1Exc'].output_fn.upper_bound=0.633
 # connection initialization
 
 # DoG weights for the LGN
@@ -99,44 +100,64 @@ off_weights = topo.patterns.basic.Composite(
 
 # Retina -> LGN
 
-# LGN ON channel
+## LGN ON channel
+#topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
+                  #connection_type=SharedWeightCFProjection,strength=2.33,
+                  #name='CenterOn',nominal_bounds_template=BoundingBox(radius=0.375),
+                  #weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
+                                                                 #aspect_ratio=1))
+
+#topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),
+                  #connection_type=SharedWeightCFProjection,strength=-2.33,
+                  #name='SurroundOn',nominal_bounds_template=BoundingBox(radius=0.375),
+                  #weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
+                                                                 #aspect_ratio=1))
+## LGN OFF channel
+#topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
+                  #connection_type=SharedWeightCFProjection,strength=-2.33,
+                  #name='CenterOff',nominal_bounds_template=BoundingBox(radius=0.375),
+                  #weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
+                                                                 #aspect_ratio=1))
+
+#topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
+                  #connection_type=SharedWeightCFProjection,strength=2.33,
+                  #name='SurroundOff',nominal_bounds_template=BoundingBox(radius=0.375),
+                  #weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
+                                                                 #aspect_ratio=1))
+
 topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=2.33,
-                  name='CenterOn',nominal_bounds_template=BoundingBox(radius=0.375),
-                  weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
-                                                                 aspect_ratio=1))
-
-topo.sim.connect('Retina','LGNOn',delay = FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=-2.33,
-                  name='SurroundOn',nominal_bounds_template=BoundingBox(radius=0.375),
-                  weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
-                                                                 aspect_ratio=1))
-# LGN OFF channel
-topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=-2.33,
-                  name='CenterOff',nominal_bounds_template=BoundingBox(radius=0.375),
-                  weights_generator=topo.patterns.basic.Gaussian(size=0.0417,
-                                                                 aspect_ratio=1))
+                 connection_type=SharedWeightCFProjection,strength=2.33,
+                 nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
+                 weights_generator=on_weights)
 
 topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
-                  connection_type=SharedWeightCFProjection,strength=2.33,
-                  name='SurroundOff',nominal_bounds_template=BoundingBox(radius=0.375),
-                  weights_generator=topo.patterns.basic.Gaussian(size=0.1667,
-                                                                 aspect_ratio=1))
+                 connection_type=SharedWeightCFProjection,strength=2.33,
+                 nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
+                 weights_generator=off_weights)
+
 ## LGN -> V1 Exc
-topo.sim.connect('LGNOn','V1Exc', delay = FixedPoint("0.10",4),
-                 connection_type=CFProjection,strength=0.5,name='AfferentExOn',
-                 weights_generator=topo.patterns.basic.Composite(operator=Wrapper("Numeric.multiply"),
-                                                             generators=[Gaussian(aspect_ratio=1.0, size=2*0.271),
-                                                                         topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=0.271),learning_rate=0.959*2)
+#topo.sim.connect('LGNOn','V1Exc', delay = FixedPoint("0.10",4),
+                 #connection_type=CFProjection,strength=0.5,name='AfferentExOn',
+                 #weights_generator=topo.patterns.basic.Composite(operator=Wrapper("Numeric.multiply"),
+                                                             #generators=[Gaussian(aspect_ratio=1.0, size=2*0.271),
+                                                                         #topo.patterns.random.UniformRandom()]),
+                 #nominal_bounds_template=BoundingBox(radius=0.271),learning_rate=0.959*2)
 
-topo.sim.connect('LGNOff','V1Exc', delay = FixedPoint("0.10",4),
-                 connection_type=CFProjection,strength=0.5,name='AfferentExOff',
-                 weights_generator=topo.patterns.basic.Composite(operator=Wrapper("Numeric.multiply"),
-                                                             generators=[Gaussian(aspect_ratio=1.0, size=2*0.271),
-                                                                         topo.patterns.random.UniformRandom()]),
-                 nominal_bounds_template=BoundingBox(radius=0.271),learning_rate=0.959*2)
+#topo.sim.connect('LGNOff','V1Exc', delay = FixedPoint("0.10",4),
+                 #connection_type=CFProjection,strength=0.5,name='AfferentExOff',
+                 #weights_generator=topo.patterns.basic.Composite(operator=Wrapper("Numeric.multiply"),
+                                                             #generators=[Gaussian(aspect_ratio=1.0, size=2*0.271),
+                                                                         #topo.patterns.random.UniformRandom()]),
+                 #nominal_bounds_template=BoundingBox(radius=0.271),learning_rate=0.959*2)
+
+topo.sim.connect('LGNOn','V1Exc',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
+                  connection_type=CFProjection,strength=1.5,name='AfferentExOn',
+                  nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590*2.0)
+
+topo.sim.connect('LGNOff','V1Exc',delay=FixedPoint("0.05"), dest_port=('Activity','JointNormalize', 'Afferent'),
+                  connection_type=CFProjection,strength=1.5,name='AfferentExOff',
+                  nominal_bounds_template=BoundingBox(radius=0.25),learning_rate=0.9590*2.0)
+
 
 # Intra V1  connections
 
