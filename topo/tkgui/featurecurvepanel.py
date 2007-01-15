@@ -22,7 +22,7 @@ import topo
 from inspect import getdoc
 
 from topo.plotting.templates import plotgroup_templates
-from basicplotgrouppanel import BasicPlotGroupPanel
+from plotgrouppanel import BasicPlotGroupPanel
 from topo.base.projection import ProjectionSheet
 from topo.plotting.plotgroup import FeatureCurvePlotGroup
 from topo.base.sheet import Sheet
