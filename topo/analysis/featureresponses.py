@@ -149,10 +149,7 @@ class FeatureResponses(ParameterizedObject):
 
             if display:
                 if hasattr(topo,'guimain'):
-                    for win in topo.guimain.auto_refresh_panels:
-                        if win.plotgroup_key=='Activity':
-                            win.refresh()
-                            topo.guimain.update_idletasks()
+                    topo.guimain.refresh_activity_windows()
                 else:
                     self.warning("No GUI available for display.")
 
@@ -240,9 +237,8 @@ class FeatureCurves(FeatureResponses):
 	sheet.curve_dict={}
 	sheet.curve_dict[x_axis]={}
 
-    def collect_feature_responses(self,features,pattern_presenter,param_dict,curve_param_dict, curve_label,display):
+    def collect_feature_responses(self,features,pattern_presenter,param_dict,curve_label,display):
 	super(FeatureCurves, self).__init__(features)
-	param_dict.update(curve_param_dict)
 	rows,cols=self.sheet.shape
 	self.measure_responses(pattern_presenter,param_dict,features,display)
 	self.sheet.curve_dict[self.x_axis][curve_label]={}
