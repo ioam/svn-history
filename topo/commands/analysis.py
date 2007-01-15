@@ -21,9 +21,9 @@ from topo.base.sheetview import SheetView, ProjectionView
 from topo.commands.basic import pattern_present
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.utils import frange, wrap
-from topo.patterns.basic import SineGrating, Gaussian, GratingStimulus
+from topo.patterns.basic import SineGrating, Gaussian, SineGratingDisk
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.base.parameterclasses import Wrapper
+from topo.base.parameterclasses import Wrapper, Parameter
 from topo.analysis.featureresponses import FeatureMaps, FeatureCurves
 
 
@@ -67,11 +67,13 @@ class PatternPresenter(ParameterizedObject):
     Subclasses can provide additional mechanisms for doing this in
     different ways.
     """
+    contrast_parameter = Parameter('michelson_contrast')
 
-    def __init__(self,pattern_generator,apply_output_fn=True,duration=1.0):
+    def __init__(self,pattern_generator,apply_output_fn=True,duration=1.0,**params):
         self.apply_output_fn=apply_output_fn
         self.duration=duration
         self.gen = pattern_generator
+        self.contrast_parameter=params.get('contrast_parameter',self.contrast_parameter)
 
     def __call__(self,features_values,param_dict):
         
@@ -148,16 +150,25 @@ class PatternPresenter(ParameterizedObject):
                 inputs[input_pattern[0]]=gen_copy1
                 inputs[input_pattern[1]]=gen_copy2
 
-	if features_values.has_key("michelson_contrast") or param_dict.has_key("michelson_contrast"):
-	    self.gen.offset=0.5   
-	    self.gen.scale=2*self.gen.offset*self.gen.michelson_contrast/100
+
+        if features_values.has_key("contrast") or param_dict.has_key("contrast"):
+            if self.contrast_parameter=='michelson_contrast':
+                self.gen.offset=0.5   
+                self.gen.scale=2*self.gen.offset*self.gen.contrast/100
+            
 	
-	if features_values.has_key("weber_contrast" ) or param_dict.has_key("weber_contrast"):
-	     #Weber_contrast is currently only well defined for the special case where 
-             #the background offset is equal to the target offset in the pattern type GratingStimulus')
-	    self.gen.offset=0.5   #In this case this is the offset of both the background and the sine grating
-	    self.gen.scale=2*self.gen.offset*self.gen.weber_contrast/100
-           
+            elif self.contrast_parameter=='weber_contrast':
+                # Weber_contrast is currently only well defined for the special case where 
+                #the background offset is equal to the target offset in the pattern type SineGratingDisk')
+                self.gen.offset=0.5   #In this case this is the offset of both the background and the sine grating
+                self.gen.scale=2*self.gen.offset*self.gen.contrast/100
+            
+                
+            elif self.contrast_parameter=='scale':
+                self.gen.offset=0.0
+                self.gen.scale=self.gen.contrast
+            
+            
         pattern_present(inputs, self.duration, learning=False,
                         apply_output_fn=self.apply_output_fn)
 # Module variables for passing values to the commands.
@@ -170,7 +181,7 @@ proj_name =''
 ### should be changed to something cleaner.  It might also be better
 ### to access a Sheet instance directly, rather than searching by name.
 
-def measure_position_pref(divisions=12,size=0.5,scale=0.3,offset=0.0,display=False,
+def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=False,
                           pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),False,1.0),
                           x_range=(-0.5,0.5),y_range=(-0.5,0.5)):
     """
@@ -237,15 +248,17 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
 
 def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4],
-                    michelson_contrasts=[30,60,90],display=False,
-                    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
-						       apply_output_fn=False,duration=1.0)):
+                                curve_parameters=[{"contrast":30}, {"contrast":60}, {"contrast":90}],
+                                display=True,
+                                pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
+                                                                   apply_output_fn=False,duration=1.0,
+                                                                   contrast_parameter="michelson_contrast")):
     """
     Measures orientation tuning curve of a particular unit using a full field grating stimulus. 
-    Michelson Contrast can be replaced by another variable(s) provided it is defined in PatternPresenter.
-    
+    michelson_contrast can be replaced by another variable(s) eg. scale, weber_contrast or
+    any other contrast definition, provided it is defined in PatternPresenter. 
     """
-        
+
     f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
     measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
     
@@ -259,28 +272,32 @@ def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4
 	    step_orientation=pi/num_orientation
 
 	    feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-			      Feature(name="orientation",range=(0,2*pi),step=step_orientation,cyclic=True),
+			      Feature(name="orientation",range=(0,5*pi/4),step=step_orientation,cyclic=True),
 			      Feature(name="frequency",values=frequencies)]     
         
 	    x_axis='orientation'
 	    x=FeatureCurves(sheet,x_axis)
     
-        for michelson_contrast in michelson_contrasts:
-            curve_param_dict = {"michelson_contrast":michelson_contrast}
+        for curve in curve_parameters:
 	    param_dict={}
-	    curve_label='Contrast = '+str(michelson_contrast)+'%'
-            x.collect_feature_responses(feature_values,pattern_presenter,param_dict,curve_param_dict,curve_label,display)
+            param_dict.update(curve)
+	    curve_label='Contrast = '+str(curve["contrast"])+'%'
+            x.collect_feature_responses(feature_values,pattern_presenter,param_dict,curve_label,display)
 	  
 
 
-def measure_contrast_response_fullfield(michelson_contrasts=[10,20,30,40,50,60,70,80,90],display=False,frequency=2.4,
+def measure_contrast_response_fullfield(contrasts=[10,20,30,40,50,60,70,80,90],relative_orientations=[-pi/10,0,pi/10],
+                                        display=True,frequency=2.4,
                                         pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
-                                                                           apply_output_fn=False,duration=1.0)):
+                                                                           apply_output_fn=False,duration=1.0,
+                                                                           contrast_parameter="michelson_contrast")):
     """
     Measure the contrast response curve of a particular unit.
     
     Uses a full field grating stimulus at the preferred orientation of the unit.
     Orientation preference must be measured before measuring the contrast response.
+    The contrast_parameter is michelson_contrast but can be replaced by another variable
+    eg. scale, weber_contrast or any other contrast definition, provided it is defined in PatternPresenter. 
     """
     
     f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
@@ -297,32 +314,42 @@ def measure_contrast_response_fullfield(michelson_contrasts=[10,20,30,40,50,60,7
 	    phase_value = phase_pref[matrix_coords]
 	else:
 	    raise ValueError("Orientation Preference must be measured before plotting Contrast Response")
-	
-	orientations = [or_value, or_value+0.3, or_value-0.3]
+
+        curve_parameters=[{"orientation":or_value+ro} for ro in relative_orientations]
     
-	feature_values = [Feature(name="michelson_contrast",values=michelson_contrasts)]
-	x_axis='michelson_contrast'
+	feature_values = [Feature(name="contrast",values=contrasts)]
+	x_axis='contrast'
 	x=FeatureCurves(sheet,x_axis)
 
-	for orientation in orientations:
-	    curve_param_dict ={"orientation":orientation}
-            curve_label='Orientation = %.4f rad' % orientation 
-	    param_dict = {"phase":phase_value, "frequency":frequency}
-	    x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_param_dict,curve_label,display)
+	for curve in curve_parameters:
+            param_dict = {"phase":phase_value, "frequency":frequency}
+            param_dict.update(curve)
+            curve_label='Orientation = %.4f rad' % curve["orientation"] 
+	    x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
     
     
         
-def measure_size_response(num_phase=18,frequency=2.4,weber_contrasts=[20,40,60],step_size=0.05,display=False,
-                          pattern_presenter=PatternPresenter(pattern_generator=GratingStimulus(),
-                                                             apply_output_fn=False,duration=1.0)):
+def measure_size_response(num_phase=18,frequency=2.4,
+                          curve_parameters=[{"contrast":0.2}, {"contrast":0.3}, {"contrast":0.4},{"contrast":0.5}],
+                          num_sizes=10,display=True,
+                          pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
+                                                             apply_output_fn=False,duration=1.0,
+                                                             contrast_parameter="weber_contrast")):
     """
     Measure receptive field size of one unit of a sheet.
 
-    Uses an expanding circular grating stimulus at the preferred
-    orientation and retinal position of the specified
-    unit. Orientation and position preference must be calulated before
-    measuring size response. The curve can be plotted at various
-    different values of the Weber contrast of the stimulus.
+    Uses an expanding circular sine grating stimulus at the preferred
+    orientation and retinal position of the specified unit.
+    Orientation and position preference must be calulated before
+    measuring size response.
+
+    The curve can be plotted at various different values of the
+    contrast of the stimulus. If the network contains an LGN layer
+    then weber_contrast can be used as the contrast_parameter.
+    If there is no LGN then scale (offset=0.0) can be used to define
+    the contrast. Other relevant contrast definitions can also be used
+    provided they are defined in PatternPresenter.
+    (The curve_label should also be changed to reflect new units)
     """
     
     sheet=topo.sim[sheet_name]
@@ -344,6 +371,7 @@ def measure_size_response(num_phase=18,frequency=2.4,weber_contrasts=[20,40,60],
 
     else:
         step_phase=2*pi/num_phase
+        step_size=0.6/num_sizes
         
         feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
                           Feature(name="size",range=(0.1,0.7),step=step_size,cyclic=False)]
@@ -351,24 +379,32 @@ def measure_size_response(num_phase=18,frequency=2.4,weber_contrasts=[20,40,60],
         x_axis='size'
         x=FeatureCurves(sheet,x_axis)
           
-        for weber_contrast in weber_contrasts:
-            curve_param_dict = {"weber_contrast":weber_contrast} 
-	    curve_label='Contrast = '+str(weber_contrast)+'%'
+        for curve in curve_parameters:
             param_dict = {"x":x_value,"y":y_value,"orientation":or_value,"frequency":frequency}
-            x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_param_dict,curve_label,display)
+            param_dict.update(curve)
+	    curve_label='Contrast = '+str(curve["contrast"])+'%'
+            x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
 
                   
 
-def measure_contrast_response(size=0.5,num_contrasts=12,display=False,frequency=2.4,
-                              num_phase=18,pattern_presenter=PatternPresenter(pattern_generator=GratingStimulus(),
-                                                                              apply_output_fn=False,duration=1.0)):
+def measure_contrast_response(contrasts=[0.1,0.2,0.3,0.4,0.5],relative_orientations=[-pi/10,0,pi/10],
+                              size=0.5,display=True,frequency=2.4,
+                              num_phase=18,pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
+                                                                              apply_output_fn=False,duration=1.0,
+                                                                              contrast_parameter="weber_contrast")):
     """
     Measures contrast response curves for a particular unit.
 
-    Uses a circular grating stimulus at the preferred orientation and
-    retinal position of the unit.  Orientation preference and position
-    preference must be measured before measuring the contrast
-    response.
+    Uses a circular sine grating patch as the stimulus on the retina.
+    If the network contains an LGN layer then weber_contrast can be
+    used as the contrast_parameter. If there is no LGN then scale (offset=0.0)
+    can be used to define the contrast. Other relevant contrast
+    definitions can also be used provided they are defined in PatternPresenter
+    (The curve_label should also be changed to reflect new units)
+
+    The stimulus is presented at the preferred orientation and
+    retinal position of the unit.Orientation preference and position
+    preference must be measured before measuring the contrast response.
     """
 
     sheet=topo.sim[sheet_name]
@@ -386,36 +422,39 @@ def measure_contrast_response(size=0.5,num_contrasts=12,display=False,frequency=
     else:
         raise ValueError("Orientation Preference and Position Preference must be measured before plotting Contrast Response")
 
-    or_values =[or_value, or_value+0.003, or_value-0.003]
+    curve_parameters=[{"orientation":or_value+ro} for ro in relative_orientations]
     
+     
     if num_phase <= 0 :
         raise ValueError("num_phase must be greater than 0")
 
     else:
         step_phase=2*pi/num_phase
-        step_contrast=100/num_contrasts
         
         feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                          Feature(name="weber_contrast",range=(0,100),step=step_contrast,cyclic=False)]  
-        x_axis='weber_contrast'
+                          Feature(name="contrast",values=contrasts,cyclic=False)]  
+        x_axis='contrast'
         x=FeatureCurves(sheet,x_axis)
    
-	for orientation in or_values:
-	    curve_param_dict={"orientation":orientation}
-            curve_label='Orientation = %.4f rad' % orientation 
+	for curve in curve_parameters:
             param_dict = {"x":x_value,"y":y_value,"frequency":frequency}
-	    x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_param_dict, curve_label,display)
+            param_dict.update(curve)
+            curve_label='Orientation = %.4f rad' % curve["orientation"] 
+	    x.collect_feature_responses(feature_values,pattern_presenter, param_dict, curve_label,display)
                         
 
-def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],size=0.5,
-                        weber_contrasts=[30,60,90],display=True,
-                        pattern_presenter=PatternPresenter(pattern_generator=GratingStimulus(),
-                                                           apply_output_fn=False,duration=1.0)):
+def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
+                      curve_parameters=[{"contrast":0.1}, {"contrast":0.3}, {"contrast":0.4}, {"contrast":0.5}],
+                      display=True,size=0.5,
+                      pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
+                                                         apply_output_fn=False,duration=1.0,
+                                                         contrast_parameter="weber_contrast")):
     """
     Measures orientation tuning curve of a particular unit.
-
-    Uses a circular grating stimulus. Weber Contrast can be replaced
-    by another variable(s) provided it is defined in PatternPresenter.
+    Uses a circular sine grating patch as the stimulus on the retina. If the network contains an LGN layer
+    then weber_contrast can be used as the contrast_parameter. If there is no LGN then scale (offset=0.0)
+    can be used to define the contrast. Other relevant contrast definitions can also be used provided
+    they are defined in PatternPresenter.(The curve_label should also be changed to reflect new units)
     """
 
     sheet=topo.sim[sheet_name]
@@ -440,18 +479,18 @@ def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],size=0.5
         step_phase=2*pi/num_phase
         
         feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                          Feature(name="orientation",range=(0,2*pi),step=step_orientation,cyclic=True),
+                          Feature(name="orientation",range=(0,5*pi/4),step=step_orientation,cyclic=True),
                           Feature(name="frequency",values=frequencies)]     
 
         x_axis='orientation'
         x=FeatureCurves(sheet,x_axis)
            
     
-	for weber_contrast in weber_contrasts:
-	    curve_param_dict = {"weber_contrast":weber_contrast}
-	    curve_label='Contrast = '+str(weber_contrast)+'%'
+	for curve in curve_parameters:
             param_dict = {"x":x_value,"y":y_value}
-            x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_param_dict,curve_label,display)
+            param_dict.update(curve)
+	    curve_label='Contrast = '+str(curve["contrast"])+'%'
+            x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
                
 
 
