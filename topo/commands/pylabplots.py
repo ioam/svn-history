@@ -175,7 +175,7 @@ def tuning_curve(x_axis,plot_type,x_ticks,x_labels,x_lim,unit):
 
 
     for curve_label in sorted(sheet.curve_dict[x_axis].keys()):
-        x_values, y_values =tuning_curve_data(sheet,x_axis, curve_label, i_value, j_value)
+        x_values, y_values = tuning_curve_data(sheet,x_axis, curve_label, i_value, j_value)
         plot_type(x_values, y_values, label=curve_label)
 	if (x_ticks): pylab.xticks(x_ticks,x_labels)
         if (x_lim): pylab.xlim(x_lim)
