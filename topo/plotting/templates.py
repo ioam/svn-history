@@ -29,9 +29,12 @@ class PlotGroupTemplate(ParameterizedObject):
     be modified.
     """
     
-    command = Parameter('pass')
-    template_plot_type=Parameter('bitmap', doc='wether the plots are bitmap images or curves, used when deciding on plotpanel class')
-    normalize = BooleanParameter(False)
+    command = Parameter("pass",
+      doc="Command string to run before plotting, if any.")
+    template_plot_type=Parameter('bitmap',
+      doc="Whether the plots are bitmap images or curves, to determine which GUI components are needed")
+    normalize = BooleanParameter(False,
+      doc="Default value for the normalize option for the plot")
     image_location = Filename(doc='Paths to search for images to be loaded.')
 
     def __init__(self, plot_templates=[], static_images = [],**params):
@@ -118,11 +121,9 @@ plotgroup_templates = KeyedList()
 # treatment of any particular input feature.
 
 # JABALERT:
-# We should also be able to store things like the Normalize option setting
-# (currently ignored?) and a documentation string describing each plot
+# We should also be able to store a documentation string describing each plot
 # (for hovering help text) within each template.
 # JC: we should also maybe add the situate option (and auto-refresh?)
-# I think Normalize is alright now...
 ### we might want to pass a plotgroup_type to the template
 ### (see corresponding alert in PlotGroupPanel)
 
