@@ -1,8 +1,13 @@
 """
-goodhill_network90, 2D elastic net OD, currently being
-implemented..
+Implementation of 2D ocular dominance model from G.J. Goodhill & D.J. Willshaw (1990),
+"Application of the elastic net algorithm to the formation of ocular
+dominance stripes", Network: Computation in Neural Systems 1(1), p41-59.
 
+NOT YET TESTED.  (Still only a sketch!)
+
+$Id$
 """
+_version__='$Revision$'
 
 
 import RandomArray
@@ -64,7 +69,7 @@ class ElasticNet(LearningFn):
 RandomArray.seed(500,500)
 
 
-#Folowing not need it just to test...
+# Following not needed; just to test...
 input_pattern=topo.patterns.basic.Gaussian(
     x=DynamicNumber(UniformRandom(lbound=-0.8,ubound=0.8,seed=12)),
     y=DynamicNumber(UniformRandom(lbound=-0.8,ubound=0.8,seed=34)),
