@@ -3,8 +3,8 @@
 <H1>Parameters</H1>
 
 <P>The behavior of most of the objects making up a Topographica
-simulation can be controlled by variables called Parameters. A
-<?php classref('topo.base.parameterizedobject','Parameter')?>
+simulation can be controlled by variables called Parameters. A 
+<?php classref('topo.base.parameterizedobject','Parameter')?> 
 is a special type of Python attribute extended to have
 features such as type and range checking, dynamically generated
 values, documentation strings, default values, etc., each of which
