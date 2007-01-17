@@ -834,6 +834,20 @@ class ParameterizedObject(object):
         return type(self).classparams()
 
 
+    def reset_params(self):
+        """
+        Return Parameters with modifiable values to the class defaults.
+        """
+        for (attr_name,param) in self.params().items():
+            # CEBHACKALERT: name should be Constant - should stop faking it
+            # everywhere (see current task list).
+            if param.constant or attr_name=="name": # CB:what about instantiate & dynamic?
+                pass
+            else:
+                setattr(self,attr_name,param.default)
+
+
+
 def print_all_param_defaults():
     print "_______________________________________________________________________________"
     print ""
