@@ -141,9 +141,9 @@ class PlotsMenuEntry(ParameterizedObject):
         # If users want to extend the Plot Panel classes, then they
         # should add entries to plotpanel_classes.  If no dictionary
         # entry is defined then the default class is used.
-        self.class_name = plotpanel_classes.get(self.label,class_name)
         if self.template.template_plot_type=='curve':
-            self.class_name = plotpanel_classes.get(self.label,FeatureCurvePanel)
+            class_name = plotpanel_classes.get(self.label,FeatureCurvePanel)
+        self.class_name = plotpanel_classes.get(self.label,class_name)
         
 
         self.num_windows = 0
