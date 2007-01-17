@@ -271,11 +271,12 @@ class ParametersTool(Frame):
         self.doc_label = Label(self, font = ("Times", 12))
         self.doc_label.pack(side = TOP)
 
-        # CEBHACKALERT: the problem is, a tiny little window
-        # with nothing in it opens when the model editor is
-        # started. If it's shut, there'll be an error if someone
-        # tries to add a new object.
-        parameter_window = Toplevel() #self
+        parameter_window = Toplevel()
+        # CEBHACKALERT:
+        # Hide this window; we unhide it if it's to be used.
+        # Shouldn't be able to close it (should just hide again).
+        # Would be better for it to be created when needed.
+        parameter_window.withdraw()
         parameter_window.title('New object parameters')
         #Label(parameter_window, text = "Edit class p").pack(side = TOP)
         self.parameter_frame = ParametersFrame(parameter_window)
@@ -285,12 +286,14 @@ class ParametersTool(Frame):
         self.parameter_frame.set_parameters()
 
     def set_focus(self, name, focus_class, doc = ''):
+        
         self.focus = name
             
         self.title_label.config(text = name)
         self.doc_label.config(text = doc)
 
         if focus_class:
+            self.parameter_window.deiconify()
             self.parameter_frame.create_widgets(focus_class)
 
             
