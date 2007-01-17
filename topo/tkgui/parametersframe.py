@@ -185,6 +185,8 @@ class ParametersFrame(Frame):
                        pady=self.__properties_frame.padding,
                        sticky=E)
 
+            self.__help_balloon.bind(label, help_text)
+            
             # We want widgets to stretch to both sides...
             posn=E+W
             # ...except Checkbuttons, which should be left-aligned.
@@ -196,8 +198,11 @@ class ParametersFrame(Frame):
                         padx=self.__properties_frame.padding,
                         pady=self.__properties_frame.padding,
                         sticky=posn)
+            
+            # Store the name of the parameter that this widget is controlling.
+            widget.param_name = parameter_name
 
-            self.__help_balloon.bind(label, help_text)
+            
 
 
 
@@ -309,13 +314,6 @@ class ParametersFrame(Frame):
         possible_classes = parameter.range()
         self.translator_dictionary[parameter_name] = possible_classes
 
-
-        # CEBHACKALERT: since this method is only called on creation of
-        # the widgets, 'caching' the object like this only works for the
-        # default object! This means that when you right click on a Parameter
-        # and get a new ParameterizedObject, if you change the values of the
-        # PO's Paremeters, they won't be saved...unless you're editing the
-        # default (original) PO.
         for (visible_name,class_) in possible_classes.items():
             if class_ == value.__class__:
                 value_text = visible_name
@@ -342,7 +340,7 @@ class ParametersFrame(Frame):
         w = self.__widgets[parameter_name][1] 
         w._entryWidget.bind('<Button-3>', 
             lambda event: self.__right_click(event, w))
-
+        
 
     def __add_boolean_property(self,parameter_name,value,parameter):
         """
@@ -367,7 +365,8 @@ class ParametersFrame(Frame):
         PO in __currently_selected_widget.
         """
         param_to_edit = self.__currently_selected_widget.get_value()
-
+        param_name = self.__currently_selected_widget.param_name
+        
         parameter_window = Toplevel()
         parameter_window.title(param_to_edit.name+' parameters')
         title = Label(parameter_window, text = param_to_edit.name)
@@ -375,10 +374,19 @@ class ParametersFrame(Frame):
         self.__help_balloon.bind(title,getdoc(param_to_edit))
         parameter_frame = ParametersFrame(parameter_window)
         parameter_frame.create_widgets(param_to_edit)
+
+        #CEBHACKALERT: this code is the same as some in add_class_selector_property()
+        for (vis_name,class_) in self.translator_dictionary[param_name].items():
+            if param_to_edit.__class__ == class_:
+                 self.translator_dictionary[param_name].update({vis_name:param_to_edit})
+                 break
+
+
+        
         button_panel = Frame(parameter_window)
         button_panel.pack(side = BOTTOM)
         Button(button_panel, text = 'Ok', command = lambda frame=parameter_frame, win=parameter_window: 
-            parameter_properties_ok(frame, win)).pack(side = RIGHT)
+            self.__parameter_properties_ok(frame, win)).pack(side = RIGHT)
         Button(button_panel, text = 'Apply', 
             command = parameter_frame.set_parameters).pack(side = RIGHT)
 
