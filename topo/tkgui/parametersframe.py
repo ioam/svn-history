@@ -46,21 +46,22 @@ class ParametersFrame(Frame):
         self.__properties_frame = PropertiesFrame(parent)
         self.__properties_frame.pack(side=TOP,expand=YES,fill=BOTH)
 
-        # Add the right click properties menu
+        ### Right-click menu for widgets
         self.option_add("*Menu.tearOff", "0") 
         self.menu = Menu(self)
         self.menu.insert_command(END, label = 'Properties', command = lambda: 
-            self.show_parameter_properties(self.parameters_properties))
+            self.__edit_PO_in_currently_selected_widget())
 
         self.__help_balloon = Pmw.Balloon(parent)
 
-
+        # CEBHACKALERT: to comment (& maybe simplify)
         self.translator_dictionary = {}
 
         # The ParameterizedObject instance or class for which this
         # ParametersFrame displays and alters parameters.
         self.parameterized_object = None
 
+        # CB: __widgets is actually label/widget pairs, so maybe should rename 
         self.__widgets = {}
         self.__visible_parameters = {}
 
@@ -336,8 +337,9 @@ class ParametersFrame(Frame):
                     value = value_text,
                     scrolledlist_items = possible_classes.keys(),
                     translator = translator)
-        w = self.__widgets[parameter_name][1]
-        # bind right click to allow the selected classes properties to be changed.
+
+        # A right-click on the widget shows the right-click menu
+        w = self.__widgets[parameter_name][1] 
         w._entryWidget.bind('<Button-3>', 
             lambda event: self.__right_click(event, w))
 
@@ -350,29 +352,33 @@ class ParametersFrame(Frame):
         self.__widgets[parameter_name] = self.__properties_frame.add_checkbutton_property(parameter_name,value=value)
 
 
-    def __right_click(self, event, widget) :
-        self.parameters_properties = widget
+    def __right_click(self, event, widget):
+        """
+        Set self.__currently_selected_widget to the widget that was right clicked
+        on, and show the right-click properties menu.
+        """
+        self.__currently_selected_widget = widget
         self.menu.tk_popup(event.x_root, event.y_root)
 
 
-    def show_parameter_properties(self, widget):
+    def __edit_PO_in_currently_selected_widget(self):
         """
-        Open a new window containing a ParametersFrame for the
-        current object in the supplied widget.
+        Open a new window containing a ParametersFrame for the 
+        PO in __currently_selected_widget.
         """
-        obj = widget.get_value()
+        param_to_edit = self.__currently_selected_widget.get_value()
 
         parameter_window = Toplevel()
-        parameter_window.title(obj.name+' parameters')
-        title = Label(parameter_window, text = obj.name)
+        parameter_window.title(param_to_edit.name+' parameters')
+        title = Label(parameter_window, text = param_to_edit.name)
         title.pack(side = TOP)
-        self.__help_balloon.bind(title,getdoc(obj))
+        self.__help_balloon.bind(title,getdoc(param_to_edit))
         parameter_frame = ParametersFrame(parameter_window)
-        parameter_frame.create_widgets(obj)
+        parameter_frame.create_widgets(param_to_edit)
         button_panel = Frame(parameter_window)
         button_panel.pack(side = BOTTOM)
         Button(button_panel, text = 'Ok', command = lambda frame=parameter_frame, win=parameter_window: 
-            self.__parameter_properties_ok(frame, win)).pack(side = RIGHT)
+            parameter_properties_ok(frame, win)).pack(side = RIGHT)
         Button(button_panel, text = 'Apply', 
             command = parameter_frame.set_parameters).pack(side = RIGHT)
 
