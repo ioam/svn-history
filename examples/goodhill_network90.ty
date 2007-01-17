@@ -1,0 +1,100 @@
+"""
+goodhill_network90, 2D elastic net OD, currently being
+implemented..
+
+"""
+
+
+import RandomArray
+
+from fixedpoint import FixedPoint
+
+import topo.patterns.random
+import topo.patterns.basic
+ 
+from topo.base.parameterclasses import Number
+from topo.base.boundingregion import BoundingBox
+from topo.base.cf import CFSheet,CFProjection,CFPOF_Plugin
+from topo.base.functionfamilies import LearningFn
+from topo.base.parameterclasses import DynamicNumber
+from topo.learningfns.projfns import CFPLF_Plugin
+from topo.learningfns.basic import Hebbian
+from topo.outputfns.basic import PiecewiseLinear
+from topo.responsefns.optimized import CFPRF_DotProduct_opt
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.outputfns.basic import DivisiveNormalizeL1
+from topo.misc.numbergenerators import UniformRandom
+
+topo.sim.name = "goodhill_network90"
+
+
+class ElasticNet(LearningFn):
+    """
+    Basic Elastic net learning function (work in progress..)
+    """
+    alpha = Number(default=0.2,bounds=(0,None),
+       doc="Scaling constant,contribution from neighbouring cities")
+
+    beta  = Number(default=2.0,bounds=(0,None),
+       doc="Scaling constant,contribution from neighbouring points ont he ring")
+                   
+    initial_k = Number(default=0.2,bounds=(0,None),
+         doc="Initial k")
+
+    rate_of_k = Number(default=0.1,bounds=(0,None),
+         doc="Rate of reduction of k by 10%")
+
+    
+    
+    def __init__(self,**params):
+        super(ElasticNet,self).__init__(**params)
+        
+    
+    def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
+
+	"""
+        Update the value of the given weights matrix...
+        
+	"""
+     
+
+#################
+
+# Weight seed
+RandomArray.seed(500,500)
+
+
+#Folowing not need it just to test...
+input_pattern=topo.patterns.basic.Gaussian(
+    x=DynamicNumber(UniformRandom(lbound=-0.8,ubound=0.8,seed=12)),
+    y=DynamicNumber(UniformRandom(lbound=-0.8,ubound=0.8,seed=34)),
+    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)),
+    size = 2*0.3*1.5/7.0,
+    aspect_ratio = 7.0/1.5,
+    bounds = BoundingBox(radius=1.0))
+
+###sheets,connections,parameters
+
+
+CFProjection.learning_fn=ElasticNet()
+
+topo.sim['LeftRetina']=GeneratorSheet(nominal_density=20,
+                                  input_generator=input_pattern,
+                                  period=1.0, phase=0.05,
+                                  nominal_bounds=BoundingBox(radius=0.5))
+
+topo.sim['RightRetina']=GeneratorSheet(nominal_density=20,
+                                  input_generator=input_pattern,
+                                  period=1.0, phase=0.05,
+                                  nominal_bounds=BoundingBox(radius=0.5))
+
+
+topo.sim['V1'] = CFSheet(nominal_density=40,nominal_bounds=BoundingBox(radius=0.5),
+                         output_fn=PiecewiseLinear(lower_bound=0,upper_bound=1.0))
+
+topo.sim.connect('RightRetina','V1',name='RtoV1',delay=FixedPoint("0.05"),connection_type=CFProjection,nominal_bounds_template=BoundingBox(radius=1.0))
+
+topo.sim.connect('LeftRetina','V1',name='LtoV1',delay=FixedPoint("0.05"),connection_type=CFProjection,nominal_bounds_template=BoundingBox(radius=1.0))
+
+    
+    
