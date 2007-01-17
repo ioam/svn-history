@@ -22,9 +22,6 @@ from translatorwidgets import CheckbuttonTranslator
 
 # Some things missing from/wrong with ParametersFrame (other than the HACKALERTs):
 #
-# - There used to be a 'reset_to_defaults' method, which
-#   didn't work. It would be good to be able to reset an object to have
-#   the class defaults.
 # - When creating a new Projection, we offer a 'name' field and
 #   allow it to be typed in, but then ignore any text that's been entered.
 # - Some kind of 'cancel' button, for window managers that don't have the
@@ -42,6 +39,7 @@ class ParametersFrame(Frame):
     def __init__(self, parent=None, **config):
         """
         """
+        self.parent = parent
         Frame.__init__(self,parent,config)
         self.__properties_frame = PropertiesFrame(parent)
         self.__properties_frame.pack(side=TOP,expand=YES,fill=BOTH)
@@ -71,6 +69,13 @@ class ParametersFrame(Frame):
             Enumeration: self.__add_enumeration_property,
             BooleanParameter: self.__add_boolean_property,
             ClassSelectorParameter: self.__add_class_selector_property}
+
+        ### Reset button
+        button_panel = Frame(parent)
+        button_panel.pack(side = BOTTOM)
+        Button(button_panel, text='Reset',
+               command= self.__reset_values).pack(side=LEFT)
+
 
 
     def set_parameters(self) :
@@ -155,7 +160,7 @@ class ParametersFrame(Frame):
         Remove old labels and widgets from the screen (if there
         are any), then create new ones, sort them by Parameter
         precedence, and finally add them to the screen.
-        """
+        """       
         # wipe old labels and widgets from screen
         for (label,widget) in self.__widgets.values():
             label.grid_forget()
@@ -213,12 +218,12 @@ class ParametersFrame(Frame):
         If the parameter's type is not listed in
         self.__parameter_property, the class hierarchy is traversed until
         a match is found. If no match is found, the Parameter just gets a
-        textbox. 
+        textbox.
         """
         # CEBHACKALERT: results in DynamicNumber being called and producing
         # a value, rather than displaying information about the dynamic number.
         value = getattr(self.parameterized_object,parameter_name)
-
+ 
         # CEBHACKALERT: name should be a constant Parameter; the
         # 'or parameter_name' can be removed when it is. (see earlier alert too)
         if (parameter.constant==True or parameter_name=='name') and isinstance(self.parameterized_object,ParameterizedObject):
@@ -395,4 +400,35 @@ class ParametersFrame(Frame):
         frame.set_parameters()
         win.destroy()
                 
-                
+
+
+    def __reset_values(self):
+        """
+        Reset self.parameterized_object's Parameters to their default values.
+
+        For a ParameterizedObject, calls the ParameterizedObject's
+        reset_params() methods to return the Parameters to the class defaults.
+        
+        For a ParameterizedObjectMetaclass, CEBHACKALERT currently does nothing.
+        """
+        if isinstance(self.parameterized_object,ParameterizedObjectMetaclass):
+            # CB: get values from source files, or what?
+            pass
+        elif isinstance(self.parameterized_object,ParameterizedObject):
+            self.parameterized_object.reset_params()
+            self.__new_widgets()
+
+            # CEBHACKALERT: For Test Pattern window.
+            # The Test Pattern window refreshes automatically (no
+            # ok/apply).  Maybe ParametersFrame could be either
+            # auto-refreshing or not, then all the buttons could be
+            # controlled (i.e. be there or not) by ParametersFrame.
+            try:
+                self.parent.refresh()
+            except AttributeError:
+                pass
+
+        else:
+            raise TypeError, "ParameterFrame must be associated with a ParameterizedObject or ParameterizedObjectMetaclass."
+
+
