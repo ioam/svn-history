@@ -141,20 +141,29 @@ def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreferenc
 
 def tuning_curve_data(sheet, x_axis, curve_label, i_value, j_value):
     """
-    Gets tuning curve data from where it is stored in the curve_dict for each sheet. Requires the x_axis
-    which is the type of feature to be plotted and the curve_label which corresponds to
-    a particular set of curve parameters. Can then access the feature values (which are the x_values)
-    and the corresponding responses (which are the y_values) for the unit we are interested in (given by i_value and j_value) 
+    Collect data for one tuning curve from the curve_dict of each sheet.
+
+    The unit to plot is specified as a matrix index (i_value,j_value).
+    There may be many possible curves in the curve_dict; the specific
+    one is determined by the x_axis (i.e., what feature to plot), and
+    the curve_label (which determines other parameters that specify a
+    particular plot).  Returns the feature values (the x_values,
+    i.e. locations along the x axis), x_values) and the corresponding
+    responses (the y_values).
     """
     x_values= sorted(sheet.curve_dict[x_axis][curve_label].keys())
     y_values=[sheet.curve_dict[x_axis][curve_label][key][i_value,j_value] for key in x_values]
     return x_values, y_values
+
 	   
 def tuning_curve(x_axis,plot_type,x_ticks,x_labels,x_lim,unit):
     """
-    Plots a tuning curve for the  appropriate feature type eg. Orientation, Contrast or Size
-    Obtains values for plotting from the curve_dict for each sheet and the parameter values 
-    specified in the gui window (eg unit coordinates and sheet).
+    Plots a tuning curve for the appropriate feature type, such as orientation, contrast or size.
+
+    The curve datapoints are collected from the curve_dict for each
+    sheet, depending on the value of topo.commands.analysis.sheet_name
+    and topo.commands.analysis.coordinate (which may be set by the GUI or
+    by hand).
     """
 
     sheet=topo.sim[topo.commands.analysis.sheet_name]
