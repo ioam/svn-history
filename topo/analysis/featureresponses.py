@@ -19,6 +19,8 @@ from topo.misc.utils import cross_product, frange
 from topo.base.sheetcoords import SheetCoordinateSystem
 from topo.commands.basic import restore_input_generators, save_input_generators
 from topo.misc.distribution import Distribution
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.base.cf import CFSheet
 
 
 class DistributionMatrix(ParameterizedObject):
@@ -113,24 +115,27 @@ class FeatureResponses(ParameterizedObject):
     tuning curves, or for similar types of feature-based analyses.
     """
     
-    def __init__(self,features):
+    # CEB: we might want to measure the map on a sheet due
+    # to a specific projection, rather than measure the map due
+    # to all projections.
 
-        # Sheets that have the attribute measure_maps and have it set True
-        # get their maps measured.
-        # CEBHACKALERT: we might want to measure the map on a sheet due
-        # to a specific projection, rather than measure the map due
-        # to all projections.
-        # The Sheet 'learning' parameter should be per projection
-        # see alert in sheet.py), and we will have a per projection plastic
-        # attribute, too.
-        f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-        self._sheets_to_measure_maps_for = filter(f,topo.sim.objects(Sheet).values())
+    def __init__(self,features):
+        self.initialize_featureresponses(features)
+        
+    def initialize_featureresponses(self,features):
+        """Create an empty DistributionMatrix for each feature and each sheet."""
 	self._featureresponses = {}
-        for sheet in self._sheets_to_measure_maps_for:
+        for sheet in self.sheets_to_measure():
             self._featureresponses[sheet] = {}
             for f in features:
                 self._featureresponses[sheet][f.name]=DistributionMatrix(sheet.shape,axis_range=f.range,cyclic=f.cyclic)
-    
+
+
+    def sheets_to_measure(self):
+        """Return a list of the Sheets in the current simulation for which to collect responses."""
+        return  [x for x in topo.sim.objects(Sheet).values()
+                 if hasattr(x,'measure_maps') and x.measure_maps]
+        
 
     def measure_responses(self,pattern_presenter,param_dict,features,display):
         """Present the given input patterns and collate the responses."""
@@ -155,7 +160,7 @@ class FeatureResponses(ParameterizedObject):
 
                        
             # Update each DistributionMatrix with (activity,bin)
-            for sheet in self._sheets_to_measure_maps_for:
+            for sheet in self.sheets_to_measure():
                 for feature,value in zip(feature_names, p):
                     self._featureresponses[sheet][feature].update(sheet.activity, value)
                     
@@ -182,7 +187,7 @@ class FeatureMaps(FeatureResponses):
     def collect_feature_responses(self,pattern_presenter,param_dict,display):
 	self.measure_responses(pattern_presenter,param_dict,self.features,display)    
 	
-        for sheet in self._sheets_to_measure_maps_for:
+        for sheet in self.sheets_to_measure():
             bounding_box = sheet.bounds
             
             for feature in self._featureresponses[sheet].keys():
@@ -231,23 +236,27 @@ class FeatureCurves(FeatureResponses):
     indexed by the curve_label and feature value.
     """
 
-    def __init__(self,sheet,x_axis):
-	self.sheet=sheet
+    def __init__(self,features,sheet,x_axis):
+	super(FeatureCurves, self).__init__(features)
+        self.sheet=sheet
         self.x_axis=x_axis
-	sheet.curve_dict={}
-	sheet.curve_dict[x_axis]={}
+        sheet.curve_dict={}
+        sheet.curve_dict[x_axis]={}
+
+    def sheets_to_measure(self):
+        return topo.sim.objects(CFSheet).values()
 
     def collect_feature_responses(self,features,pattern_presenter,param_dict,curve_label,display):
-	super(FeatureCurves, self).__init__(features)
-	rows,cols=self.sheet.shape
-	self.measure_responses(pattern_presenter,param_dict,features,display)
-	self.sheet.curve_dict[self.x_axis][curve_label]={}
-	for key in self._featureresponses[self.sheet][self.x_axis].distribution_matrix[0,0]._data.iterkeys():
-	    y_axis_values = zeros(self.sheet.shape,'O')
-	    for i in range(rows):
-		for j in range(cols):
-		    y_axis_values[i,j] = self._featureresponses[self.sheet][self.x_axis].distribution_matrix[i,j].get_value(key)
-	    self.sheet.curve_dict[self.x_axis][curve_label].update({key:y_axis_values})
+        self.initialize_featureresponses(features)
+        rows,cols=self.sheet.shape
+        self.measure_responses(pattern_presenter,param_dict,features,display)
+        self.sheet.curve_dict[self.x_axis][curve_label]={}
+        for key in self._featureresponses[self.sheet][self.x_axis].distribution_matrix[0,0]._data.iterkeys():
+            y_axis_values = zeros(self.sheet.shape,'O')
+            for i in range(rows):
+                for j in range(cols):
+                    y_axis_values[i,j] = self._featureresponses[self.sheet][self.x_axis].distribution_matrix[i,j].get_value(key)
+            self.sheet.curve_dict[self.x_axis][curve_label].update({key:y_axis_values})
 
 
 
