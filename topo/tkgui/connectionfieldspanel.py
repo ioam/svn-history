@@ -67,13 +67,13 @@ class ConnectionFieldsPanel(TemplatePlotGroupPanel):
         """
         # Create the item list for CFSheet 'Sheet'  This will not change
         # since this window will only examine one Simulation.
-        self._sim_eps = [ep for ep in topo.sim.objects(Sheet).values()
-                  if isinstance(ep,topo.base.cf.CFSheet)]
+
+        self._sim_eps = topo.sim.objects(CFSheet).values()
 	self._sim_eps.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
         sim_ep_names = [ep.name for ep in self._sim_eps]
         if len(sim_ep_names) > 0:
             self.region.set(sim_ep_names[0])
-
+            
         # The GUI label says Sheet, not CFSheet, because users probably 
         # don't need to worry about the distinction.
         self.opt_menu = Pmw.OptionMenu(self.__params_frame,
