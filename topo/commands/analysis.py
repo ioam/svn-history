@@ -259,34 +259,32 @@ def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4
     any other contrast definition, provided it is defined in PatternPresenter. 
     """
 
-    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-    measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
-    
-    for sheet in measured_sheets:
-	sheet_name=str(sheet)
-	if num_phase <= 0 or num_orientation <= 0:
-	    raise ValueError("num_phase and num_orientation must be greater than 0")
-    
-	else:
-	    step_phase=2*pi/num_phase
-	    step_orientation=pi/num_orientation
+    sheets_to_measure=topo.sim.objects(CFSheet).values()
 
-	    feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-			      Feature(name="orientation",range=(0,5*pi/4),step=step_orientation,cyclic=True),
-			      Feature(name="frequency",values=frequencies)]     
+    for sheet in sheets_to_measure:
+        if num_phase <= 0 or num_orientation <= 0:
+            raise ValueError("num_phase and num_orientation must be greater than 0")
         
-	    x_axis='orientation'
-	    x=FeatureCurves(sheet,x_axis)
-    
-        for curve in curve_parameters:
-	    param_dict={}
-            param_dict.update(curve)
-	    curve_label='Contrast = '+str(curve["contrast"])+'%'
-            x.collect_feature_responses(feature_values,pattern_presenter,param_dict,curve_label,display)
+        else:
+            step_phase=2*pi/num_phase
+            step_orientation=pi/num_orientation
+            
+            feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+                              Feature(name="orientation",range=(0,5*pi/4),step=step_orientation,cyclic=True),
+                              Feature(name="frequency",values=frequencies)]     
+            
+            x_axis='orientation'
+            x=FeatureCurves(feature_values,sheet,x_axis)
+            
+            for curve in curve_parameters:
+                param_dict={}
+                param_dict.update(curve)
+                curve_label='Contrast = '+str(curve["contrast"])+'%'
+                x.collect_feature_responses(feature_values,pattern_presenter,param_dict,curve_label,display)
 	  
 
 
-def measure_contrast_response_fullfield(contrasts=[10,20,30,40,50,60,70,80,90],relative_orientations=[-pi/10,0,pi/10],
+def measure_contrast_response_fullfield(contrasts=[10,20,30,40,50,60,70,80,90],relative_orientations=[-pi/10,0,pi/10], 
                                         display=True,frequency=2.4,
                                         pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
                                                                            apply_output_fn=False,duration=1.0,
@@ -299,38 +297,39 @@ def measure_contrast_response_fullfield(contrasts=[10,20,30,40,50,60,70,80,90],r
     The contrast_parameter is michelson_contrast but can be replaced by another variable
     eg. scale, weber_contrast or any other contrast definition, provided it is defined in PatternPresenter. 
     """
-    
-    f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-    measured_sheets = filter(f,topo.sim.objects(CFSheet).values())
-    
-    for sheet in measured_sheets:
-	sheet_name=str(sheet)
-	matrix_coords = sheet.sheet2matrixidx(coordinate[0],coordinate[1])
-	if(('OrientationPreference' in sheet.sheet_view_dict) and
-	   ('PhasePreference' in sheet.sheet_view_dict)):
-	    or_pref = sheet.sheet_view_dict['OrientationPreference'].view()[0]
-	    phase_pref = sheet.sheet_view_dict['PhasePreference'].view()[0]
-	    or_value = or_pref[matrix_coords]
-	    phase_value = phase_pref[matrix_coords]
-	else:
-	    raise ValueError("Orientation Preference must be measured before plotting Contrast Response")
 
+    sheets_to_measure=topo.sim.objects(CFSheet).values()
+
+    for sheet in sheets_to_measure:
+        matrix_coords = sheet.sheet2matrixidx(coordinate[0],coordinate[1])
+        if(('OrientationPreference' in sheet.sheet_view_dict) and
+           ('PhasePreference' in sheet.sheet_view_dict)):
+            or_pref = sheet.sheet_view_dict['OrientationPreference'].view()[0]
+            phase_pref = sheet.sheet_view_dict['PhasePreference'].view()[0]
+            or_value = or_pref[matrix_coords]
+            phase_value = phase_pref[matrix_coords]
+        else:
+            print  "Warning ! Orientation Preference should be measured before plotting Contrast Response - using default values"
+            or_value = 0.0
+            phase_value = 0.0  
+        
+    
         curve_parameters=[{"orientation":or_value+ro} for ro in relative_orientations]
     
-	feature_values = [Feature(name="contrast",values=contrasts)]
-	x_axis='contrast'
-	x=FeatureCurves(sheet,x_axis)
-
-	for curve in curve_parameters:
+        feature_values = [Feature(name="contrast",values=contrasts)]
+        x_axis='contrast'
+        x=FeatureCurves(feature_values,sheet,x_axis)
+    
+        for curve in curve_parameters:
             param_dict = {"phase":phase_value, "frequency":frequency}
             param_dict.update(curve)
             curve_label='Orientation = %.4f rad' % curve["orientation"] 
-	    x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
+            x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
     
     
         
-def measure_size_response(num_phase=18,frequency=2.4,
-                          curve_parameters=[{"contrast":0.2}, {"contrast":0.3}, {"contrast":0.4},{"contrast":0.5}],
+def measure_size_response(num_phase=18,
+                          curve_parameters=[{"contrast":30}, {"contrast":80}],
                           num_sizes=10,display=True,
                           pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
                                                              apply_output_fn=False,duration=1.0,
@@ -353,7 +352,8 @@ def measure_size_response(num_phase=18,frequency=2.4,
     """
     
     sheet=topo.sim[sheet_name]
-    matrix_coords = sheet.sheet2matrixidx(topo.commands.analysis.coordinate[0],topo.commands.analysis.coordinate[1])
+
+    matrix_coords = sheet.sheet2matrixidx(coordinate[0],coordinate[1])
     if(('OrientationPreference' in sheet.sheet_view_dict)and
        ('XPreference' in sheet.sheet_view_dict) and
        ('YPreference' in sheet.sheet_view_dict)):
@@ -364,7 +364,11 @@ def measure_size_response(num_phase=18,frequency=2.4,
         x_value=x_pref[matrix_coords]
         y_value=y_pref[matrix_coords]
     else:
-        raise ValueError("Orientation Preference and Position Preference must be measured before plotting Size Response")
+        print "Warning!! Orientation and Position Preference should be measured before plotting Size Response - using default values"
+        or_value = 0.0
+        x_value=coordinate[0]
+        y_value=coordinate[1]
+      
 
     if num_phase <= 0:
         raise ValueError("num_phase must be greater than 0")
@@ -377,17 +381,17 @@ def measure_size_response(num_phase=18,frequency=2.4,
                           Feature(name="size",range=(0.1,0.7),step=step_size,cyclic=False)]
 
         x_axis='size'
-        x=FeatureCurves(sheet,x_axis)
+        x=FeatureCurves(feature_values,sheet,x_axis)
           
         for curve in curve_parameters:
-            param_dict = {"x":x_value,"y":y_value,"orientation":or_value,"frequency":frequency}
+            param_dict = {"x":x_value,"y":y_value,"orientation":or_value}
             param_dict.update(curve)
 	    curve_label='Contrast = '+str(curve["contrast"])+'%'
             x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
 
                   
 
-def measure_contrast_response(contrasts=[0.1,0.2,0.3,0.4,0.5],relative_orientations=[-pi/10,0,pi/10],
+def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90],relative_orientations=[-pi/10,0,pi/10],
                               size=0.5,display=True,frequency=2.4,
                               num_phase=18,pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
                                                                               apply_output_fn=False,duration=1.0,
@@ -420,7 +424,11 @@ def measure_contrast_response(contrasts=[0.1,0.2,0.3,0.4,0.5],relative_orientati
         x_value=x_pref[matrix_coords]
         y_value=y_pref[matrix_coords]
     else:
-        raise ValueError("Orientation Preference and Position Preference must be measured before plotting Contrast Response")
+        print "Warning!! Orientation and Position Preference should be measured before plotting Contrast Response - using default values"
+        or_value = 0.0
+        x_value=coordinate[0]
+        y_value=coordinate[1]
+      
 
     curve_parameters=[{"orientation":or_value+ro} for ro in relative_orientations]
     
@@ -434,7 +442,7 @@ def measure_contrast_response(contrasts=[0.1,0.2,0.3,0.4,0.5],relative_orientati
         feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
                           Feature(name="contrast",values=contrasts,cyclic=False)]  
         x_axis='contrast'
-        x=FeatureCurves(sheet,x_axis)
+        x=FeatureCurves(feature_values,sheet,x_axis)
    
 	for curve in curve_parameters:
             param_dict = {"x":x_value,"y":y_value,"frequency":frequency}
@@ -444,7 +452,7 @@ def measure_contrast_response(contrasts=[0.1,0.2,0.3,0.4,0.5],relative_orientati
                         
 
 def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
-                      curve_parameters=[{"contrast":0.1}, {"contrast":0.3}, {"contrast":0.4}, {"contrast":0.5}],
+                      curve_parameters=[{"contrast":10}, {"contrast":30}, {"contrast":40}, {"contrast":50}],
                       display=True,size=0.5,
                       pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
                                                          apply_output_fn=False,duration=1.0,
@@ -467,9 +475,11 @@ def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
 	x_value=x_pref[matrix_coords]
 	y_value=y_pref[matrix_coords]
     else:
-	raise ValueError("Position Preference must be measured before plotting Orientation Response")
-        
-
+        print "Warning!! Position Preference should be measured before plotting Orientation Tuning - using default values"
+        x_value=coordinate[0]
+        y_value=coordinate[1]
+      
+	
                  
     if num_phase <= 0 or num_orientation <= 0:
         raise ValueError("num_phase and num_orientation must be greater than 0")
@@ -483,7 +493,7 @@ def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
                           Feature(name="frequency",values=frequencies)]     
 
         x_axis='orientation'
-        x=FeatureCurves(sheet,x_axis)
+        x=FeatureCurves(feature_values,sheet,x_axis)
            
     
 	for curve in curve_parameters:
