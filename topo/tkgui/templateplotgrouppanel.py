@@ -72,7 +72,7 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
 
         # we do not want to refresh for subclasses, when calling the superclass constructor:
         # refresh will need to be explicitly called from subclasses
-        if self.__class__ == TemplatePlotGroupPanel:
+        if self.__class__ == TemplatePlotGroupPanel and self.pgt.initial_plot:
             self.refresh()
 
 
