@@ -78,7 +78,6 @@ class UniformRandomInt(RandomDistribution):
     
     def __call__(self):
         x = self.random_generator.randint(self.lbound,self.ubound)
-        print x
         return x
 
 
