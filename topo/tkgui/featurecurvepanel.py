@@ -26,6 +26,7 @@ from plotgrouppanel import BasicPlotGroupPanel
 from topo.base.projection import ProjectionSheet
 from topo.plotting.plotgroup import FeatureCurvePlotGroup
 from topo.base.sheet import Sheet
+from topo.base.cf import CFSheet
 import topoconsole
 
 
@@ -75,7 +76,7 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
         self.auto_refresh.set(False)
         self.set_auto_refresh()
 
-	self.refresh()
+        if self.pgt.initial_plot: self.refresh()
         
 
     def _add_region_menu(self):
@@ -85,12 +86,11 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
         _region_refresh() is called.  It can either call the refresh()
         funcion, or update another menu, and so on.
         """
-  
-	f = lambda x: hasattr(x,'measure_maps') and x.measure_maps
-        self.__sheets_to_measure_maps_for = filter(f,topo.sim.objects(Sheet).values())
-        self._sim_eps = [ep for ep in self.__sheets_to_measure_maps_for]
+
+        self._sim_eps = topo.sim.objects(CFSheet).values()
 	self._sim_eps.sort(lambda x, y: cmp(-x.precedence,-y.precedence))
         sim_ep_names = [ep.name for ep in self._sim_eps]
+	
         if len(sim_ep_names) > 0:
             self.region.set(sim_ep_names[0])
 
@@ -164,6 +164,7 @@ It is an error to request a unit outside the area of the Sheet.""")
             w.pack(expand = 1, fill = 'both', padx = 4, pady = 4)
 	self.plotgroup.sheet_name = self.region.get()
 
+       
 
     def generate_plotgroup(self):
         """
