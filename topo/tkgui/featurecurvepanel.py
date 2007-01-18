@@ -83,8 +83,7 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
         """
         This function adds a Sheet: menu that queries the active
         simulation for the list of options.  When an update is made,
-        _region_refresh() is called.  It can either call the refresh()
-        funcion, or update another menu, and so on.
+        refresh() is called.
         """
 
         self._sim_eps = topo.sim.objects(CFSheet).values()
@@ -128,11 +127,8 @@ It is an error to request a unit outside the area of the Sheet.""")
 
     def update_plotgroup_variables(self):
         """
-        The plotgroup_key for the ConnectionFieldsPanel will change depending on the
-        input within the window widgets.  This means that the key
-        needs to be regenerated at the appropriate times.
-
-        Key Format:  Tuple: ('Weights', Sheet_Name, X_Number, Y_Number)
+        Get the plotgroup variables (ie. x,y, sheet and update command) from the gui before
+        updating the plots.
         """
         g = __main__.__dict__
         self.x = eval(self.x_str.get(),g)
@@ -163,16 +159,14 @@ It is an error to request a unit outside the area of the Sheet.""")
                               pady = 20)
             w.pack(expand = 1, fill = 'both', padx = 4, pady = 4)
 	self.plotgroup.sheet_name = self.region.get()
+        self.plotgroup.updatecommand = self.cmdname.get()
 
        
 
     def generate_plotgroup(self):
         """
         Create the right Plot Key that will define the needed
-        information for a WeightsPlotGroup.  This is the key-word
-        'Weights', and the necessary x,y coordinate.  Once the
-        PlotGroup is created, call its do_plot_cmd() to prepare
-        the Plot objects.
+        information for a FeatureCurvePlotGroup. 
         """
 	plotgroup = FeatureCurvePlotGroup([],self.pgt,self.region.get(),self.x,self.y)
                                            
@@ -182,8 +176,7 @@ It is an error to request a unit outside the area of the Sheet.""")
 
     def display_labels(self):
         """
-        Change the title of the grid group by refreshing the simulated time,
-        then call PlotGroupPanel's display_labels().
+        Change the title of the grid group by refreshing the simulated time.
         """
         self.plot_group_title.configure(tag_text = str(self.plotgroup_key) + \
                                   ' at time ' + str(self.plotgroup.time))
