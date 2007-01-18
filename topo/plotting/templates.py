@@ -31,6 +31,8 @@ class PlotGroupTemplate(ParameterizedObject):
     
     command = Parameter("pass",
       doc="Command string to run before plotting, if any.")
+    plotcommand=Parameter("pass",
+      doc="Command string to run before plotting when no further measurement of responses is required")
     template_plot_type=Parameter('bitmap',
       doc="Whether the plots are bitmap images or curves, to determine which GUI components are needed")
     initial_plot=BooleanParameter(True,
@@ -129,8 +131,8 @@ plotgroup_templates = KeyedList()
 ### we might want to pass a plotgroup_type to the template
 ### (see corresponding alert in PlotGroupPanel)
 
-def new_plotgroup_template(name,command,initial_plot,template_plot_type='bitmap',normalize=False):
-    pgt = PlotGroupTemplate(name=name,command=command,initial_plot=initial_plot,template_plot_type=template_plot_type,normalize=normalize)
+def new_plotgroup_template(name,command,initial_plot,plotcommand="pass",template_plot_type='bitmap',normalize=False):
+    pgt = PlotGroupTemplate(name=name,command=command,initial_plot=initial_plot,plotcommand=plotcommand,template_plot_type=template_plot_type,normalize=normalize)
     plotgroup_templates[pgt.name]=pgt
     return pgt
 
@@ -175,9 +177,9 @@ pgt.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivit
 pgt.add_static_image('Color Key','topo/commands/disp_key_white_vert_small.png')
 
 
-pgt = new_plotgroup_template(name='Orientation Tuning Fullfield',command='measure_or_tuning_fullfield(); tuning_curve(x_axis="orientation", plot_type=pylab.plot, x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',initial_plot=False,template_plot_type="curve")
+pgt = new_plotgroup_template(name='Orientation Tuning Fullfield',command='measure_or_tuning_fullfield(); tuning_curve(x_axis="orientation", plot_type=pylab.plot, x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',initial_plot=False,plotcommand='tuning_curve(x_axis="orientation", plot_type=pylab.plot, x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',template_plot_type="curve")
 
-pgt = new_plotgroup_template(name='Contrast Response Fullfield',command='measure_contrast_response_fullfield(); tuning_curve(x_axis="contrast", plot_type=pylab.semilogx,x_ticks=None,x_labels=None,x_lim=None, unit="%")',initial_plot=False,template_plot_type="curve")
+pgt = new_plotgroup_template(name='Contrast Response Fullfield',command='measure_contrast_response_fullfield(); tuning_curve(x_axis="contrast", plot_type=pylab.semilogx,x_ticks=None,x_labels=None,x_lim=None, unit="%")',initial_plot=False,plotcommand='tuning_curve(x_axis="contrast", plot_type=pylab.semilogx,x_ticks=None,x_labels=None,x_lim=None, unit="%")',template_plot_type="curve")
 
 pgt = new_plotgroup_template(name='Orientation Tuning',command='measure_or_tuning(); tuning_curve(x_axis="orientation",plot_type=pylab.plot,x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',initial_plot=False,template_plot_type="curve")
 
