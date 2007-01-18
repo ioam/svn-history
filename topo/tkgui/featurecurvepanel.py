@@ -1,5 +1,5 @@
 """
-class FeatureCurvePanel
+class FeatureCurvePanel and FullFieldFeatureCurvePanel
 
 Panel for displaying tuning curves.
 
@@ -44,7 +44,7 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
 
 	self.plotgroup = self.generate_plotgroup()
 
-       	 # Command used to refresh the plot, if any
+        # Command used to refresh the plot, if any
         self.cmdname = StringVar()
 	self.cmdname.set(self.plotgroup.updatecommand)
       
@@ -64,6 +64,7 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
   
         self.__params_frame = Frame(master=self)
         self.__params_frame.pack(side=LEFT,expand=YES,fill=X)
+
         
 	self.x_str = StringVar()
         self.x_str.set(0.0)
@@ -77,13 +78,20 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
         self.set_auto_refresh()
 
         if self.pgt.initial_plot: self.refresh()
-        
 
+
+    def refresh_variables(self, update=True):
+        """
+        Command to be called when plotgroup variables are updated in the GUI
+        """
+        
+        self.refresh(update)
+              
     def _add_region_menu(self):
         """
         This function adds a Sheet: menu that queries the active
         simulation for the list of options.  When an update is made,
-        refresh() is called.
+        refresh_variables() is called.
         """
 
         self._sim_eps = topo.sim.objects(CFSheet).values()
@@ -95,7 +103,7 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
 
      
         self.opt_menu = Pmw.OptionMenu(self.__params_frame,
-                       command = self.refresh,
+                       command = self.refresh_variables,
                        labelpos = 'w',
                        label_text = 'Sheet:',
                        menubutton_textvariable = self.region,
@@ -104,12 +112,16 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
         self.balloon.bind(self.opt_menu,"""Sheet whose unit(s) will be plotted.""")
 
     def _add_xy_boxes(self):
+        """
+        This function adds boxes that allow the user to input the x and y variables
+        When an update is made,refresh_variables() is called.
+        """
       
         Message(self.__params_frame,text="Unit  X:",aspect=1000).pack(side=LEFT)
         self.xe = Entry(self.__params_frame,textvariable=self.x_str)
         # JC: we would like to update when the user leaves the box,
 	# but we don't know yet how to do it.(id for ye)
-        self.xe.bind('<Return>',self.refresh)
+        self.xe.bind('<Return>',self.refresh_variables)
         self.xe.pack(side=LEFT,expand=YES,fill=X)
         self.balloon.bind(self.xe,
 """Sheet coordinate location desired.  The unit nearest this location will be returned.
@@ -118,7 +130,7 @@ It is an error to request a unit outside the area of the Sheet.""")
 
         Message(self.__params_frame,text="Y:",aspect=1000).pack(side=LEFT)
         self.ye = Entry(self.__params_frame,textvariable=self.y_str)
-	self.ye.bind('<Return>', self.refresh)
+	self.ye.bind('<Return>', self.refresh_variables)
         self.ye.pack(side=LEFT,expand=YES,fill=X,padx=5)
         self.balloon.bind(self.ye,
 """Sheet coordinate location desired.  The unit nearest this location will be returned.
@@ -183,3 +195,46 @@ It is an error to request a unit outside the area of the Sheet.""")
      
 
 
+class FullFieldFeatureCurvePanel(FeatureCurvePanel):
+    """
+    In some cases it is not necessary to use the full updatecommand before plotting.
+    This class creates a gui window showing the reduced update command and in which updating the
+    plotgroup variables from the gui calls the plotcommand rather than the full updatecommand.
+    """
+    def __init__(self,parent,console=None,pgt_name=None,**config):
+
+        FeatureCurvePanel.__init__(self,parent,console,pgt_name,**config)
+
+        self.plot_cmdname = StringVar()
+	self.plot_cmdname.set(self.plotgroup.plotcommand)
+      
+     
+	plotcmd_params_frame = Frame(master=self)
+        plotcmd_params_frame.pack(side=TOP,expand=YES,fill=X)
+        
+	plot_cmdlabel = Message(plotcmd_params_frame,text="Plot command:",aspect=1000)
+        plot_cmdlabel.pack(side=LEFT)
+        self.balloon.bind(plot_cmdlabel,getdoc(self.plotgroup.params()['plotcommand'])) 
+
+        plot_cmdbox = Pmw.ComboBox(plotcmd_params_frame,autoclear=1,history=1,dropdown=1,
+                              entry_textvariable=self.plot_cmdname,
+                              scrolledlist_items=([self.plot_cmdname]))
+        plot_cmdbox.pack(side=TOP,expand=YES,fill=X)
+        self.balloon.bind(plot_cmdbox,getdoc(self.plotgroup.params()['plotcommand']))
+                     
+    def refresh_variables(self, update=True):
+        """
+        Command called when variables are updated in the gui.
+        In this case only the plotcommand is called rather than the full updatecommand.
+        """
+        Pmw.showbusycursor()
+	self.plotgroup = copy.copy(self.plotgroup)
+	self.update_plotgroup_variables()# update PlotGroup variables
+        self.plotgroup.plotcommand = self.plot_cmdname.get()# in this case must also update plotcommand
+	self.plotgroup.update_variables()
+	self.display_plots()              # Put images in GUI canvas
+        self.display_labels()             # Match labels to grid
+        self.refresh_title()              # Update Frame title.
+        Pmw.hidebusycursor()
+
+ 
