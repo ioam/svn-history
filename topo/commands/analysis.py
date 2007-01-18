@@ -309,7 +309,7 @@ def measure_contrast_response_fullfield(contrasts=[10,20,30,40,50,60,70,80,90],r
             or_value = or_pref[matrix_coords]
             phase_value = phase_pref[matrix_coords]
         else:
-            print  "Warning ! Orientation Preference should be measured before plotting Contrast Response - using default values"
+            topo.sim.warning("Orientation Preference should be measured before plotting Contrast Response -- using default values")
             or_value = 0.0
             phase_value = 0.0  
         
@@ -364,7 +364,7 @@ def measure_size_response(num_phase=18,
         x_value=x_pref[matrix_coords]
         y_value=y_pref[matrix_coords]
     else:
-        print "Warning!! Orientation and Position Preference should be measured before plotting Size Response - using default values"
+        topo.sim.warning("Orientation and Position Preference should be measured before plotting Size Response -- using default values")
         or_value = 0.0
         x_value=coordinate[0]
         y_value=coordinate[1]
@@ -424,7 +424,7 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90],relative_or
         x_value=x_pref[matrix_coords]
         y_value=y_pref[matrix_coords]
     else:
-        print "Warning!! Orientation and Position Preference should be measured before plotting Contrast Response - using default values"
+        topo.sim.warning("Orientation and Position Preference should be measured before plotting Contrast Response -- using default values")
         or_value = 0.0
         x_value=coordinate[0]
         y_value=coordinate[1]
@@ -475,7 +475,7 @@ def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
 	x_value=x_pref[matrix_coords]
 	y_value=y_pref[matrix_coords]
     else:
-        print "Warning!! Position Preference should be measured before plotting Orientation Tuning - using default values"
+        topo.sim.warning("Position Preference should be measured before plotting Orientation Tuning -- using default values")
         x_value=coordinate[0]
         y_value=coordinate[1]
       
