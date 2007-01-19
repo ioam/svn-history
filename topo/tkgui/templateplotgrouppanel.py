@@ -70,10 +70,10 @@ class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
 	    self.auto_refresh.set(True)
             self.set_auto_refresh()
 
-        # we do not want to refresh for subclasses, when calling the superclass constructor:
-        # refresh will need to be explicitly called from subclasses
-        if self.__class__ == TemplatePlotGroupPanel and self.pgt.initial_plot:
-            self.refresh()
+        # Display any plots that can be done with existing data, but
+        # don't regenerate the SheetViews
+        if self.__class__ == TemplatePlotGroupPanel:
+            self.refresh(update=self.pgt.initial_plot)
 
 
     def generate_plotgroup(self):

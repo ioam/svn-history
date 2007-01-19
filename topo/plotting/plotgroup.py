@@ -101,7 +101,7 @@ important.""")
 	self.minimum_height_of_tallest_plot = 1.0
 
 	# Time attribute.
-	self.time = topo.sim.time()
+	self.time = None
 
 
     ### JCALERT: ASK JIM if we should rename that.
@@ -129,8 +129,25 @@ important.""")
 	### JCALERT! See if we keep this test
 	if update:
 	    self.update_environment()
-	    self.time = topo.sim.time()
-	self.plots = [plot for plot in self._plot_list() if plot != None]
+
+        self.plots = [plot for plot in self._plot_list() if plot != None]
+
+        # Suppress plots in the special case of an initial plot that
+        # has no resizable images, to suppress plotgroups that have
+        # nothing but a color key
+        resizeable_plots = [p for p in self.plots if p.resize]
+        if self.initial_plot and not resizeable_plots:
+            self.plots=[]
+
+        # Take the timestamps from the underlying Plots
+	timestamps = [plot.timestamp for plot in self._plot_list()
+                      if plot != None and plot.timestamp >= 0]
+        if timestamps != []:
+            self.time = max(timestamps)
+            if max(timestamps) != min(timestamps):
+                self.warning("Combining Plots from different times (%s,%s)" %
+                             (min(timestamps),max(timestamps)))
+
 	# scaling the Plots
 	### JCALERT: momentary hack
 	if self.plots!=[]:
@@ -156,13 +173,15 @@ important.""")
         ### JCALERT: that cannot be in the constructor for the moment, because when creating the 
  	### panel, there is no PlotGroup assigned to it... It will change when all will be inserted 
  	### in the PlotGroup (i.e scale_image, set_initial_master_zoom, compute_max_height...)
- 	if self.initial_plot:
- 	    self._calculate_minimum_height_of_tallest_plot()
-
-	### JCALERT: here we should take the plot bounds instead of the sheet one (id in set_height_of..)?
-	max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
- 			      -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
- 			     for p in self.plots if p.resize])
+        if self.initial_plot:
+            self._calculate_minimum_height_of_tallest_plot()
+            
+        ### JCALERT: here we should take the plot bounds instead of the sheet one (id in set_height_of..)?
+        resizeable_plots = [p for p in self.plots if p.resize]
+        if resizeable_plots:
+            max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
+                                     -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
+                                    for p in resizeable_plots])
 
 	for plot in self.plots:
             if not plot.resize:
@@ -190,20 +209,22 @@ important.""")
         minimum height to which the plot can be reduced.
 	"""
         # JCALERT: Should be rewritten more cleanly.
-	max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
- 			  -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
- 			  for p in self.plots if p.resize])
-	max_density = max([topo.sim.objects(Sheet)[p.plot_src_name].xdensity
-			   for p in self.plots if p.resize])
-	sheet_max_height = max_density*max_sheet_height
-	matrix_max_height = max([p.bitmap.height() for p in self.plots if p.resize])
-	max_height = max(sheet_max_height,matrix_max_height)
-        self.minimum_height_of_tallest_plot = max_height
-	if (max_height >= self.INITIAL_PLOT_HEIGHT):
-	    self.height_of_tallest_plot = max_height
-	else:	
-	    self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
-	self.initial_plot=False
+        resizeable_plots = [p for p in self.plots if p.resize]
+        if resizeable_plots:
+            max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
+                              -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
+                              for p in resizeable_plots])
+            max_density = max([topo.sim.objects(Sheet)[p.plot_src_name].xdensity
+                               for p in resizeable_plots])
+            sheet_max_height = max_density*max_sheet_height
+            matrix_max_height = max([p.bitmap.height() for p in self.plots if p.resize])
+            max_height = max(sheet_max_height,matrix_max_height)
+            self.minimum_height_of_tallest_plot = max_height
+            if (max_height >= self.INITIAL_PLOT_HEIGHT):
+                self.height_of_tallest_plot = max_height
+            else:   
+                self.height_of_tallest_plot = self.INITIAL_PLOT_HEIGHT
+            self.initial_plot=False
 
 
     def _ordering_plots(self):
@@ -551,14 +572,17 @@ class ProjectionPlotGroup(ProjectionSheetPlotGroup):
 
 
     def scale_images(self):
-	if self.initial_plot:
- 	    self._calculate_minimum_height_of_tallest_plot()
+        if self.initial_plot:
+            self._calculate_minimum_height_of_tallest_plot()
+            
+	    ### JCALERT: here we should take the plot bounds instead of the sheet one (id in set_height_of..)?
 
-	### JCALERT: here we should take the plot bounds instead of the sheet one (id in set_height_of..)?
-	max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
- 			      -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
- 			     for p in self.plots if p.resize])
-        matrix_max_height = max([p.bitmap.height() for p in self.plots if p.resize])
+        resizeable_plots = [p for p in self.plots if p.resize]
+        if resizeable_plots:
+            max_sheet_height = max([(topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[3]
+                                     -topo.sim.objects(Sheet)[p.plot_src_name].bounds.lbrt()[1])
+                                    for p in resizeable_plots])
+            matrix_max_height = max([p.bitmap.height() for p in resizeable_plots])
 
 	for plot in self.plots:
             if not plot.resize:
