@@ -237,9 +237,9 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
         step_phase=2*pi/num_phase
         step_orientation=pi/num_orientation
 
-        feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
+        feature_values = [Feature(name="frequency",values=frequencies),
                           Feature(name="orientation",range=(0.0,pi),step=step_orientation,cyclic=True),
-                          Feature(name="frequency",values=frequencies)]     
+                          Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True)]
 
         param_dict = {"scale":scale,"offset":offset}
         x=FeatureMaps(feature_values)
