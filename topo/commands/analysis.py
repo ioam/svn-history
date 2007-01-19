@@ -621,9 +621,9 @@ def measure_cog(proj_name ="Afferent"):
 			xpref[r][c]= xcentroid
 			ypref[r][c]= ycentroid
                     
-			new_view = SheetView((xpref,sheet.bounds), sheet.name,sheet.precedence)
+			new_view = SheetView((xpref,sheet.bounds), sheet.name,sheet.precedence,topo.sim.time())
 			sheet.sheet_view_dict['XCoG']=new_view
-			new_view = SheetView((ypref,sheet.bounds), sheet.name,sheet.precedence)
+			new_view = SheetView((ypref,sheet.bounds), sheet.name,sheet.precedence,topo.sim.time())
 			sheet.sheet_view_dict['YCoG']=new_view
     
                 
@@ -640,7 +640,7 @@ def update_activity():
     for sheet in topo.sim.objects(Sheet).values():
         activity_copy = array(sheet.activity)
         new_view = SheetView((activity_copy,sheet.bounds),
-                              sheet.name,sheet.precedence)
+                              sheet.name,sheet.precedence,topo.sim.time())
         sheet.sheet_view_dict['Activity']=new_view
     
 

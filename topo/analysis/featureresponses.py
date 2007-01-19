@@ -204,13 +204,13 @@ class FeatureMaps(FeatureResponses):
                     norm_factor = 1.0
                     
                 preference_map = SheetView(((self._featureresponses[sheet][feature].weighted_average())/norm_factor,
-                                            bounding_box), sheet.name ,sheet.precedence)
+                                            bounding_box), sheet.name, sheet.precedence, topo.sim.time())
                 sheet.sheet_view_dict[feature.capitalize()+'Preference']=preference_map
                 
                 # note the temporary multiplication by 17
                 # (just because I remember JAB saying it was something like that in LISSOM)
                 selectivity_map = SheetView((17*self._featureresponses[sheet][feature].selectivity(),
-                                             bounding_box), sheet.name , sheet.precedence)
+                                             bounding_box), sheet.name , sheet.precedence, topo.sim.time())
                 sheet.sheet_view_dict[feature.capitalize()+'Selectivity']=selectivity_map
 
 

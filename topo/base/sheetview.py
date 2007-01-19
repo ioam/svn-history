@@ -53,7 +53,7 @@ class SheetView(ParameterizedObject):
     ### JCALERT! term_1 and term_2 should be more explicit...
     ### the 3 cases described in the doc, are they really useful?
     ### shouldn't it be simplified?
-    def __init__(self, (term_1, term_2), src_name=None, precedence = 0.0,**params):
+    def __init__(self, (term_1, term_2), src_name=None, precedence = 0.0, timestamp = -1, **params):
         """
         For ``__init__(self, input_tuple, **params)``, there are three
         types of input_tuples::
@@ -89,6 +89,7 @@ class SheetView(ParameterizedObject):
 
 	self.src_name = src_name
 	self.precedence = precedence
+	self.timestamp = timestamp
         
         # Assume there's no such thing as an operator that can be mistaken
         # for a matrix_data element.  This is true as long as the real
@@ -168,14 +169,15 @@ class UnitView(SheetView):
     """
 
     ### JCALERT! UnitView (as well as SheetView have to be reviewed.
-    def __init__(self, term_tuple, x, y, projection,**params):
+    def __init__(self, term_tuple, x, y, projection, timestamp, **params):
         """
         Subclass of SheetView.  Contains additional x,y member data.
         """
-        super(UnitView,self).__init__(term_tuple, projection.src.name, projection.src.precedence,**params)
+        super(UnitView,self).__init__(term_tuple, projection.src.name, projection.src.precedence, timestamp = timestamp, **params)
         self.x = x
         self.y = y
         self.projection = projection
+
 
 class ProjectionView(SheetView):
     """
@@ -187,7 +189,7 @@ class ProjectionView(SheetView):
         """
         Subclass of SheetView. 
         """
-	super(ProjectionView,self).__init__(term_tuple, projection.src.name, projection.src.precedence,**params)
+	super(ProjectionView,self).__init__(term_tuple, projection.src.name, projection.src.precedence, timestamp, **params)
 	self.projection = projection
 
 

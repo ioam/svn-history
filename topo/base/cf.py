@@ -765,7 +765,7 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         r1,r2,c1,c2 = self.cf(r,c).slice_array
 	matrix_data[r1:r2,c1:c2] = self.cf(r,c).weights
 
-        return UnitView((matrix_data,self.src.bounds),sheet_x,sheet_y,self)
+        return UnitView((matrix_data,self.src.bounds),sheet_x,sheet_y,self,topo.sim.time())
 
 
     def get_projection_view(self):
