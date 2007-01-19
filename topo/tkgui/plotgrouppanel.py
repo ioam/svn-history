@@ -458,7 +458,19 @@ original data is no longer available.""")
         it may be useful to make this function a stub, and display the
         labels at the same time the images are displayed.
         """
-        if self._num_labels != len(self.canvases):
+        if len(self.canvases) == 0:
+            # If there are no plots yet, tell the user what to do.
+            self.labels=[Label(self.plot_frame,text="""
+              (Press Refresh to generate the plot, after
+              modifying the commands below if necessary.
+              Refreshing may take some time.  Many
+              commands accept 'display=True' so that
+              the progress can be viewed in an open
+              Activity window, e.g. for debugging.)
+              """)]
+            self.labels[0].grid(row=1,column=0,sticky=NSEW)
+                
+        elif self._num_labels != len(self.canvases):
             old_labels = self.labels
             self.labels = [Label(self.plot_frame,text=each)
 				 for each in self.plotgroup.labels]
