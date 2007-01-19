@@ -9,7 +9,7 @@ __version__='$Revision$'
 from Numeric import zeros, ones, Float, divide,ravel,clip,array
 
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.base.parameterclasses import Dynamic
+from topo.base.parameterclasses import Number
 from topo.base.sheetview import SheetView
 from topo.base.sheet import Slice
 from topo.base.sheetcoords import SheetCoordinateSystem
@@ -32,6 +32,15 @@ class Plot(ParameterizedObject):
      """
      Simple Plot object constructed from a specified PIL image.
      """
+
+     staleness_warning=Number(default=10,bounds=(0,None),doc="""
+       Time length allowed between bitmaps making up a single plot before warning.
+
+       If the difference between the SheetView with the earliest
+       timestamp and the one with the latest timestamp is larger
+       than this parameter's value, produce a warning.
+       """)
+     
      def __init__(self,image=None,**params):
           
           super(Plot,self).__init__(**params) 
@@ -42,6 +51,11 @@ class Plot(ParameterizedObject):
           # or if it is a static image that we can re-size without having to worry 
           # about what a pixel represents.
           self.resize=False
+
+          # Time at which the bitmaps were created
+          self.timestamp = -1
+
+          
           
 
 
@@ -129,6 +143,8 @@ class TemplatePlot(Plot):
 	# def annotated_bitmap(self):  
         # enable other construction....
 
+        self.warn_time=-2
+
     def _get_matrix(self,key):
         """
 	Private Plot routine that just retrieves the matrix view (if any)
@@ -149,6 +165,18 @@ class TemplatePlot(Plot):
 	    view = sv.view()
 	    matrix = view[0]
 
+            # Calculate timestamp for this plot
+            timestamp = sv.timestamp
+            if timestamp >=0:
+                if self.timestamp < 0:
+                    self.timestamp = timestamp
+                elif abs(timestamp - self.timestamp) > self.staleness_warning:
+                    # Warns only once for each old matrix used
+                    if self.warn_time != min(timestamp, self.timestamp):
+                        self.warning("Combining SheetViews from different times (%s,%s); see staleness_warning" %
+                                     (timestamp, self.timestamp))
+                        self.warn_time = min(timestamp, self.timestamp)
+            
         return matrix
 
 
@@ -162,7 +190,7 @@ class TemplatePlot(Plot):
                  self.precedence = sv.precedence
         
 
-    ### JCALERT: This could be inserted in teh code of get_matrix
+    ### JCALERT: This could be inserted in the code of get_matrix
     def _get_shape_and_box(self):
 	"""
 	Sub-function used by plot: get the matrix shape and the bounding box
