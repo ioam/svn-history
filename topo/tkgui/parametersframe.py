@@ -24,9 +24,6 @@ from translatorwidgets import CheckbuttonTranslator
 #
 # - When creating a new Projection, we offer a 'name' field and
 #   allow it to be typed in, but then ignore any text that's been entered.
-# - Some kind of 'cancel' button, for window managers that don't have the
-#   'X' button to close a window.
-
 
 
 # CB: some grouping might improve appearance. Could have a LabelFrame, with the
@@ -85,7 +82,9 @@ class ParametersFrame(Frame):
                                 Button(self.__aroc_panel, text='Reset',
                                        command= self.__reset_values),
                                 Button(self.__aroc_panel, text = 'Ok',
-                                       command= self.__ok_values) )
+                                       command= self.__ok_values),
+                                Button(self.__aroc_panel, text = 'Cancel',
+                                       command= self.__cancel_values) )
 
 
 
@@ -184,6 +183,11 @@ class ParametersFrame(Frame):
             self.__aroc_buttons[2].pack(side=LEFT)
         else:
             self.__aroc_buttons[2].pack_forget()
+
+        if aroc[3]:
+            self.__aroc_buttons[3].pack(side=LEFT)
+        else:
+            self.__aroc_buttons[3].pack_forget()
 
         self.__aroc_panel.pack(side=BOTTOM)
 
@@ -431,6 +435,13 @@ class ParametersFrame(Frame):
         shown, and close this window.
         """
         self.set_parameters()
+        self.parent.destroy()
+
+
+    def __cancel_values(self):
+        """
+        Close the ParametersFrame and do not set the values on self.parameterized_object.
+        """
         self.parent.destroy()
 
 
