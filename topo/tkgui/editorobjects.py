@@ -60,15 +60,6 @@ class EditorObject:
         title.pack(side = TOP)
         self.parameter_frame = ParametersFrame(parameter_window)
         balloon.bind(title,self.objdoc())
-        
-        self.button_panel = Frame(parameter_window)
-        self.button_panel.pack(side = BOTTOM)
-        update_button = Button(self.button_panel, text = 'Apply', 
-            command = self.update_parameters)
-        okay_button = Button(self.button_panel, text = 'Ok', 
-            command = lambda : self.okay_parameters(parameter_window))
-        okay_button.pack(side = RIGHT)
-        update_button.pack(side = RIGHT)
         self.parameter_window = parameter_window
 
     def update_parameters(self):
