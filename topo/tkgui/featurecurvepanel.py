@@ -48,15 +48,14 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
         self.cmdname = StringVar()
 	self.cmdname.set(self.plotgroup.updatecommand)
       
-     
-	params_frame = Frame(master=self)
-        params_frame.pack(side=TOP,expand=YES,fill=X)
+	self.params_frame = Frame(master=self)
+        self.params_frame.pack(side=TOP,expand=YES,fill=X)
         
-	cmdlabel = Message(params_frame,text="Update command:",aspect=1000)
+	cmdlabel = Message(self.params_frame,text="Update command:",aspect=1000)
         cmdlabel.pack(side=LEFT)
         self.balloon.bind(cmdlabel,getdoc(self.plotgroup.params()['updatecommand'])) 
 
-        cmdbox = Pmw.ComboBox(params_frame,autoclear=1,history=1,dropdown=1,
+        cmdbox = Pmw.ComboBox(self.params_frame,autoclear=1,history=1,dropdown=1,
                               entry_textvariable=self.cmdname,
                               scrolledlist_items=([self.cmdname]))
         cmdbox.pack(side=LEFT,expand=YES,fill=X)
@@ -208,15 +207,11 @@ class FullFieldFeatureCurvePanel(FeatureCurvePanel):
         self.plot_cmdname = StringVar()
 	self.plot_cmdname.set(self.plotgroup.plotcommand)
       
-     
-	plotcmd_params_frame = Frame(master=self)
-        plotcmd_params_frame.pack(side=TOP,expand=YES,fill=X)
-        
-	plot_cmdlabel = Message(plotcmd_params_frame,text="Plot command:",aspect=1000)
+	plot_cmdlabel = Message(self.params_frame, text="Plot command:",aspect=1000)
         plot_cmdlabel.pack(side=LEFT)
-        self.balloon.bind(plot_cmdlabel,getdoc(self.plotgroup.params()['plotcommand'])) 
+        self.balloon.bind(plot_cmdlabel,getdoc(self.plotgroup.params()['plotcommand']))
 
-        plot_cmdbox = Pmw.ComboBox(plotcmd_params_frame,autoclear=1,history=1,dropdown=1,
+        plot_cmdbox = Pmw.ComboBox(self.params_frame,autoclear=1,history=1,dropdown=1,
                               entry_textvariable=self.plot_cmdname,
                               scrolledlist_items=([self.plot_cmdname]))
         plot_cmdbox.pack(side=TOP,expand=YES,fill=X)
