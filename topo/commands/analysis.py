@@ -249,7 +249,7 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
 def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4],
                                 curve_parameters=[{"contrast":30}, {"contrast":60}, {"contrast":90}],
-                                display=True,
+                                display=False,
                                 pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
                                                                    apply_output_fn=False,duration=1.0,
                                                                    contrast_parameter="michelson_contrast")):
@@ -285,7 +285,7 @@ def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4
 
 
 def measure_contrast_response_fullfield(contrasts=[10,20,30,40,50,60,70,80,90],relative_orientations=[-pi/10,0,pi/10], 
-                                        display=True,frequency=2.4,
+                                        display=False,frequency=2.4,
                                         pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
                                                                            apply_output_fn=False,duration=1.0,
                                                                            contrast_parameter="michelson_contrast")):
@@ -330,7 +330,7 @@ def measure_contrast_response_fullfield(contrasts=[10,20,30,40,50,60,70,80,90],r
         
 def measure_size_response(num_phase=18,
                           curve_parameters=[{"contrast":30}, {"contrast":80}],
-                          num_sizes=10,display=True,
+                          num_sizes=10,display=False,
                           pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
                                                              apply_output_fn=False,duration=1.0,
                                                              contrast_parameter="weber_contrast")):
@@ -392,7 +392,7 @@ def measure_size_response(num_phase=18,
                   
 
 def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90],relative_orientations=[-pi/10,0,pi/10],
-                              size=0.5,display=True,frequency=2.4,
+                              size=0.5,display=False,frequency=2.4,
                               num_phase=18,pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
                                                                               apply_output_fn=False,duration=1.0,
                                                                               contrast_parameter="weber_contrast")):
@@ -453,7 +453,7 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90],relative_or
 
 def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
                       curve_parameters=[{"contrast":10}, {"contrast":30}, {"contrast":40}, {"contrast":50}],
-                      display=True,size=0.5,
+                      display=False,size=0.5,
                       pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
                                                          apply_output_fn=False,duration=1.0,
                                                          contrast_parameter="weber_contrast")):
@@ -507,7 +507,7 @@ def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
 ### JABALERT: Shouldn't there be a num_ocularities argument as well, to
 ### present various combinations of left and right eye activity?        
 def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
-                    scale=0.3,offset=0.0,display=True,
+                    scale=0.3,offset=0.0,display=False,
 		    pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
                                                    apply_output_fn=False,duration=0.175)):
     """
@@ -544,7 +544,7 @@ def measure_od_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
 
 def measure_phasedisparity(num_phase=12,num_orientation=4,num_disparity=12,frequencies=[2.4],
-                           scale=0.3,offset=0.0,display=True,
+                           scale=0.3,offset=0.0,display=False,
                            pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
                                                               apply_output_fn=False,duration=0.175)):
     """
