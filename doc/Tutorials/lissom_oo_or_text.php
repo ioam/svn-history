@@ -172,11 +172,9 @@ activity patterns are patchy.
 </p><p></p></li><li>To visualize all the neurons at once
 in experimental animals, optical imaging experiments measure responses
 to a variety of patterns and record the one most effective at stimulating each
-neuron.  A similar procedure can be performed in the model by selecting
+neuron.  The results of a similar procedure can be viewed by selecting
 <span class='t_item'>Orientation Preference</span> from the <span
-class='t_item'>Plots</span> menu.  This will usually take about 30
-seconds to complete; it is normal for the Topographica windows not to
-refresh during this time.  Once it completes, you should see:
+class='t_item'>Plots</span> menu, which should show something like:
 
 <p class="center">
 <img src="images/oo_or_map.png" alt="Orientation map" width="629" height="369">
@@ -424,18 +422,26 @@ train for more iterations you'll see the new pattern and its effect on
 the weights.  (Note that the position and orientation of the new
 training pattern will always be (**FIXED!) for this simulation, and that
 training with (**UPDATE:) a photograph works only for photos named image.pgm.)</li></p>
+-->
 
-
-<p></p></li><li>After a few steps (or to do e.g. 20 steps in a row, change
-<span class='t_item'>Learning iterations</span> to 20 and press return), you can
+<p></p></li><li>After a few steps
+<!--
+(or to do e.g. 20 steps in a row, change
+<span class='t_item'>Learning iterations</span> to 20 and press return)
+-->, you can
 plot (or refresh) an <span class='w_title'>Orientation
 Preference</span> map to see what sort of
-orientation map has developed.  If you've changed the learning rate to
+orientation map has developed.  (Press 'Refresh' if no plot is visible when
+first opening the window.  Measuring a new map will usually take about 30
+seconds to complete, and it is normal for the Topographica windows not to
+refresh during this time.)  If you've changed the learning rate to
 a high value, or haven't presented many inputs, the map will not
 resemble actual animal maps, but it should still have patches
-selective for each orientation. 
+selective for each orientation.
 <p></p></li>
 
+
+<!--
 <li>If you are patient, you can even run a full, more realistic,
 simulation with your favorite type of input. (**no you can't, or at
 least not this way: UPDATE.)  To do this, quit and
