@@ -29,6 +29,11 @@ from translatorwidgets import CheckbuttonTranslator
 
 
 
+# CB: some grouping might improve appearance. Could have a LabelFrame, with the
+# text as the name of self.parameterized_object.
+#
+# Does the order of Apply, Reset, Ok, Cancel match well-known software? If not, it should.
+
 
 class ParametersFrame(Frame):
     """
@@ -41,7 +46,8 @@ class ParametersFrame(Frame):
         """
         self.parent = parent
         Frame.__init__(self,parent,config)
-        self.__properties_frame = PropertiesFrame(parent)
+
+        self.__properties_frame = PropertiesFrame(parent) # CB:why do we pass parent rather than self here?
         self.__properties_frame.pack(side=TOP,expand=YES,fill=BOTH)
 
         ### Right-click menu for widgets
@@ -70,11 +76,16 @@ class ParametersFrame(Frame):
             BooleanParameter: self.__add_boolean_property,
             ClassSelectorParameter: self.__add_class_selector_property}
 
-        ### Reset button
-        button_panel = Frame(parent)
-        button_panel.pack(side = BOTTOM)
-        Button(button_panel, text='Reset',
-               command= self.__reset_values).pack(side=LEFT)
+
+
+        ### Apply, Reset, Ok, and Cancel buttons; not displayed on creation
+        self.__aroc_panel = Frame(self)
+        self.__aroc_buttons = ( Button(self.__aroc_panel, text = 'Apply', 
+                                       command = self.set_parameters),
+                                Button(self.__aroc_panel, text='Reset',
+                                       command= self.__reset_values),
+                                Button(self.__aroc_panel, text = 'Ok',
+                                       command= self.__ok_values) )
 
 
 
@@ -119,7 +130,7 @@ class ParametersFrame(Frame):
 
  
 
-    def create_widgets(self, parameterized_object, translator_dictionary = {}):
+    def create_widgets(self, parameterized_object, translator_dictionary = {},aroc=(True,True,True,True)):
         """
         Create widgets for all non-hidden Parameters of parameterized_object and add them
         to the screen.
@@ -136,6 +147,8 @@ class ParametersFrame(Frame):
         updates the lists and it can be retrieved from
         self.translator_dictionary when set_parameters is called and
         used on subsequent uses.
+
+        'Apply', 'Ok', 'Reset', and 'Cancel' buttons can each be displayed (the default) or hidden.
         """
         self.parameterized_object = parameterized_object
         params = None
@@ -153,6 +166,31 @@ class ParametersFrame(Frame):
                                       in params
                                       if not parameter.hidden])
         self.__new_widgets()
+
+
+        ### Display or hide 'Apply', 'Reset', 'Ok', 'Cancel'
+        # CB: probably could simplify this is aroc were a dictionary
+        if aroc[0]:
+            self.__aroc_buttons[0].pack(side=LEFT)
+        else:
+            self.__aroc_buttons[0].pack_forget()
+
+        if aroc[1]:
+            self.__aroc_buttons[1].pack(side=LEFT)
+        else:
+            self.__aroc_buttons[1].pack_forget()
+
+        if aroc[2]:
+            self.__aroc_buttons[2].pack(side=LEFT)
+        else:
+            self.__aroc_buttons[2].pack_forget()
+
+        self.__aroc_panel.pack(side=BOTTOM)
+
+        # callers can also call pack() on this frame to set its attributes,
+        # but it's called here so that at least everything appears.
+        self.pack() 
+
 
 
     def __new_widgets(self):
@@ -387,29 +425,22 @@ class ParametersFrame(Frame):
                  break
 
 
-        
-        button_panel = Frame(parameter_window)
-        button_panel.pack(side = BOTTOM)
-        Button(button_panel, text = 'Ok', command = lambda frame=parameter_frame, win=parameter_window: 
-            self.__parameter_properties_ok(frame, win)).pack(side = RIGHT)
-        Button(button_panel, text = 'Apply', 
-            command = parameter_frame.set_parameters).pack(side = RIGHT)
-
-
-    def __parameter_properties_ok(self,frame, win) :
-        frame.set_parameters()
-        win.destroy()
-                
+    def __ok_values(self):
+        """
+        Set self.parameterized_object's Parameters to the values currently
+        shown, and close this window.
+        """
+        self.set_parameters()
+        self.parent.destroy()
 
 
     def __reset_values(self):
         """
         Reset self.parameterized_object's Parameters to their default values.
 
-        For a ParameterizedObject, calls the ParameterizedObject's
-        reset_params() methods to return the Parameters to the class defaults.
-        
-        For a ParameterizedObjectMetaclass, CEBHACKALERT currently does nothing.
+        For a ParameterizedObject, these are the class defaults. For a
+        ParameterizedObjectMetaclass, CEBHACKALERT currently does
+        nothing.
         """
         if isinstance(self.parameterized_object,ParameterizedObjectMetaclass):
             # CB: get values from source files, or what?
@@ -418,11 +449,9 @@ class ParametersFrame(Frame):
             self.parameterized_object.reset_params()
             self.__new_widgets()
 
-            # CEBHACKALERT: For Test Pattern window.
-            # The Test Pattern window refreshes automatically (no
-            # ok/apply).  Maybe ParametersFrame could be either
-            # auto-refreshing or not, then all the buttons could be
-            # controlled (i.e. be there or not) by ParametersFrame.
+            # CEBHACKALERT: is this the right way to do it?
+            # For Test Pattern window, which refreshes automatically (no
+            # ok/apply).
             try:
                 self.parent.refresh()
             except AttributeError:
