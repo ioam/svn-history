@@ -12,7 +12,7 @@ from Numeric import array
 import topo
 import topo.base.sheetcoords
 
-from topo.base.sheet import Sheet
+from topo.base.sheet import Sheet, activity_type
 from topo.base.sheetview import SheetView
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.utils import cross_product, frange
@@ -252,7 +252,7 @@ class FeatureCurves(FeatureResponses):
         self.measure_responses(pattern_presenter,param_dict,features,display)
         self.sheet.curve_dict[self.x_axis][curve_label]={}
         for key in self._featureresponses[self.sheet][self.x_axis].distribution_matrix[0,0]._data.iterkeys():
-            y_axis_values = zeros(self.sheet.shape,'O')
+            y_axis_values = zeros(self.sheet.shape,activity_type)
             for i in range(rows):
                 for j in range(cols):
                     y_axis_values[i,j] = self._featureresponses[self.sheet][self.x_axis].distribution_matrix[i,j].get_value(key)
