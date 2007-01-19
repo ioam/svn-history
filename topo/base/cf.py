@@ -29,7 +29,6 @@ __version__ = '$Revision$'
 import Numeric
 import copy
 from Numeric import sum,ones,exp
-import topo
 
 import patterngenerator
 from patterngenerator import PatternGeneratorParameter
@@ -755,7 +754,7 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         return len(self.cfs),len(self.cfs[0])
 
 
-    def get_view(self,sheet_x, sheet_y):
+    def get_view(self,sheet_x, sheet_y, timestamp):
         """
         Return a single connection field UnitView, for the unit
         located at sheet coordinate (sheet_x,sheet_y).
@@ -764,18 +763,14 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         (r,c) = self.dest.sheet2matrixidx(sheet_x,sheet_y)
         r1,r2,c1,c2 = self.cf(r,c).slice_array
 	matrix_data[r1:r2,c1:c2] = self.cf(r,c).weights
+        return UnitView((matrix_data,self.src.bounds),sheet_x,sheet_y,self,timestamp)
 
-        return UnitView((matrix_data,self.src.bounds),sheet_x,sheet_y,self,topo.sim.time())
-
-
-    def get_projection_view(self):
+    def get_projection_view(self, timestamp):
 	"""
 	Returns the activity in a single projection
 	"""
 	matrix_data = Numeric.array(self.activity)
-	 
-	
-	return ProjectionView((matrix_data,self.src.bounds),self)
+	return ProjectionView((matrix_data,self.src.bounds),self,timestamp)
 
 
     def activate(self,input_activity):
@@ -881,7 +876,7 @@ class CFSheet(ProjectionSheet):
             if not isinstance(p,CFProjection):
                 self.debug("Skipping non-CFProjection "+p.name)
             elif proj_name == '' or p.name==proj_name:
-                v = p.get_view(x,y)
+                v = p.get_view(x,y,self.simulation.time())
                 src = v.projection.src
                 key = ('Weights',v.projection.dest.name,v.projection.name,x,y)
                 src.sheet_view_dict[key] = v

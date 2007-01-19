@@ -185,7 +185,7 @@ class ProjectionView(SheetView):
     ('Weights',Sheet,Projection). 
     """
 
-    def __init__(self, term_tuple,projection,**params):
+    def __init__(self, term_tuple,projection,timestamp,**params):
         """
         Subclass of SheetView. 
         """

@@ -17,7 +17,7 @@ from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.parameterclasses import DynamicNumber
 from topo.base.projection import ProjectionSheet
 from topo.base.sheet import Sheet
-from topo.base.sheetview import SheetView, ProjectionView
+from topo.base.sheetview import SheetView
 from topo.commands.basic import pattern_present
 from topo.misc.numbergenerators import UniformRandom
 from topo.misc.utils import frange, wrap
@@ -683,7 +683,7 @@ def update_projectionactivity():
                 if not isinstance(p,Projection):
                     topo.sim.debug("Skipping non-Projection "+p.name)
                 else:
-                    v = p.get_projection_view()
+                    v = p.get_projection_view(topo.sim.time())
                     key = ('ProjectionActivity',v.projection.dest.name,v.projection.name)
                     v.projection.src.sheet_view_dict[key] = v
 
