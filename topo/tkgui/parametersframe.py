@@ -44,7 +44,12 @@ class ParametersFrame(Frame):
         self.parent = parent
         Frame.__init__(self,parent,config)
 
-        self.__properties_frame = PropertiesFrame(parent) # CB:why do we pass parent rather than self here?
+        # CBHACKALERT: why do we pass parent rather than self here?
+        # PropertiesFrame has all the 'optional refresh' code, I guess that's why.
+        # Maybe take a look at this when that code is investigated.
+        self.__properties_frame = PropertiesFrame(parent)
+
+        
         self.__properties_frame.pack(side=TOP,expand=YES,fill=BOTH)
 
         ### Right-click menu for widgets
