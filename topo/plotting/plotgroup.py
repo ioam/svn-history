@@ -234,6 +234,8 @@ important.""")
 	"""
 	self.plots.sort(cmp_plot)
 
+
+
 class FeatureCurvePlotGroup(PlotGroup):
     
    updatecommand = Parameter(default="",doc=
@@ -274,10 +276,10 @@ version substituted, etc.""")
    def update_variables(self):
        topo.commands.analysis.coordinate = (self.x,self.y)
        topo.commands.analysis.sheet_name = self.sheet_name
-       self.time = topo.sim.time()
        
        exec  self.plotcommand in __main__.__dict__
 
+       self.time = topo.sim.time()
 
 
 class TemplatePlotGroup(PlotGroup):
