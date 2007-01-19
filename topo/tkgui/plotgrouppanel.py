@@ -178,19 +178,17 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
         self.parent.title(topo.sim.name+': '+"%s time:%s" % (self.plotgroup_key,self.plotgroup.time))
           
     def display_plots(self):
-	"""
-	Implemented in sub-classes
-	"""
+	"""Implemented in sub-classes."""
 	pass
+
 
     def display_labels(self):
-	"""
-	Implemented in sub-classes
-	"""
+	"""Implemented in sub-classes."""
 	pass
 
+
     def set_auto_refresh(self):
-        """Function called by Widget when check-box clicked"""
+        """Function called by Widget when check-box clicked."""
 
         if self.auto_refresh.get():
             if not (self in self.console.auto_refresh_panels):
@@ -326,17 +324,8 @@ original data is no longer available.""")
         """
         Main steps for generating plots in the Frame.
         """
-        Pmw.showbusycursor()
-	# We copy the PlotGroup anytime we refresh, for saving in history
-	self.plotgroup = copy.copy(self.plotgroup)
-	self.update_plotgroup_variables() # update PlotGroup variables
-	# if update is True, the SheetViews are re-generated
-	self.plotgroup.update_plots(update)
-	self.display_plots()              # Put images in GUI canvas
+        super(PlotGroupPanel,self).refresh(update)
 	self.add_to_history()             # Add current Plotgroup to history
-        self.display_labels()             # Match labels to grid
-        self.refresh_title()              # Update Frame title.
-        Pmw.hidebusycursor()
 
 
     def update_plotgroup_variables(self):
@@ -502,17 +491,6 @@ original data is no longer available.""")
                 self.display_plots()
     
 
-#    def reduce(self):
-#        """Function called by Widget to reduce the plot size"""
-#        new_height = self.plotgroup.height_of_tallest_plot / self.zoom_factor#
-
-#        if new_height < self.plotgroup.minimum_height_of_tallest_plot:
-#            self.reduce_button.config(state=DISABLED)
-#        else:
-#	    self.plotgroup.height_of_tallest_plot = new_height
-#            self.plotgroup.update_plots(False)
-#            self.display_plots()
-    
     def enlarge(self):
         """Function called by Widget to increase the plot size"""
         self.reduce_button.config(state=NORMAL)
@@ -527,7 +505,7 @@ original data is no longer available.""")
             self.display_plots()
    
 
-    # JLALERT: It would be nice to be able to scroll back through many
+    # JLENHANCEMENT: It would be nice to be able to scroll back through many
     # iterations.  Could put in a box for entering either the iteration
     # number you want to view, or perhaps how many you want to jump...
     def back(self):
