@@ -272,15 +272,18 @@ class ParametersTool(Frame):
         self.doc_label.pack(side = TOP)
 
         parameter_window = Toplevel()
-        # CEBHACKALERT:
+
+        # CEBHACKALERT: Should make this PF be a Frame in the model editor.
+        
         # Hide this window; we unhide it if it's to be used.
-        # Shouldn't be able to close it (should just hide again).
-        # Would be better for it to be created when needed.
         parameter_window.withdraw()
+
         parameter_window.title('New object parameters')
         #Label(parameter_window, text = "Edit class p").pack(side = TOP)
-        self.parameter_frame = ParametersFrame(parameter_window)
+        self.parameter_frame = ParametersFrame(parameter_window)  #CB: parent, not self
         self.parameter_window=parameter_window
+        #self.parameter_frame.pack()
+
 
     def update_parameters(self):
         self.parameter_frame.set_parameters()
@@ -294,7 +297,8 @@ class ParametersTool(Frame):
 
         if focus_class:
             self.parameter_window.deiconify()
-            self.parameter_frame.create_widgets(focus_class)
+            self.parameter_frame.create_widgets(focus_class,aroc=(False,True,False,False))
+            #CB: self.parameter_frame.pack(side=BOTTOM etc)
 
             
             
