@@ -177,9 +177,9 @@ pgt.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivit
 pgt.add_static_image('Color Key','topo/commands/disp_key_white_vert_small.png')
 
 
-pgt = new_plotgroup_template(name='Orientation Tuning Fullfield',command='measure_or_tuning_fullfield(); tuning_curve(x_axis="orientation", plot_type=pylab.plot, x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',initial_plot=False,plotcommand='tuning_curve(x_axis="orientation", plot_type=pylab.plot, x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',template_plot_type="curve")
+pgt = new_plotgroup_template(name='Orientation Tuning Fullfield',command='measure_or_tuning_fullfield()',initial_plot=False,plotcommand='tuning_curve(x_axis="orientation", plot_type=pylab.plot, x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',template_plot_type="curve")
 
-pgt = new_plotgroup_template(name='Contrast Response Fullfield',command='measure_contrast_response_fullfield(); tuning_curve(x_axis="contrast", plot_type=pylab.semilogx,x_ticks=None,x_labels=None,x_lim=None, unit="%")',initial_plot=False,plotcommand='tuning_curve(x_axis="contrast", plot_type=pylab.semilogx,x_ticks=None,x_labels=None,x_lim=None, unit="%")',template_plot_type="curve")
+pgt = new_plotgroup_template(name='Contrast Response Fullfield',command='measure_contrast_response_fullfield()',initial_plot=False,plotcommand='tuning_curve(x_axis="contrast", plot_type=pylab.semilogx,x_ticks=None,x_labels=None,x_lim=None, unit="%")',template_plot_type="curve")
 
 pgt = new_plotgroup_template(name='Orientation Tuning',command='measure_or_tuning(); tuning_curve(x_axis="orientation",plot_type=pylab.plot,x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',initial_plot=False,template_plot_type="curve")
 
