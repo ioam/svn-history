@@ -272,6 +272,7 @@ version substituted, etc.""")
        topo.commands.analysis.sheet_name = self.sheet_name
        
        exec  self.updatecommand in __main__.__dict__
+       exec  self.plotcommand in __main__.__dict__
 
    def update_variables(self):
        topo.commands.analysis.coordinate = (self.x,self.y)
