@@ -13,7 +13,7 @@ from Tkinter import StringVar, Frame, YES, LEFT, TOP, RIGHT, X, Message, \
      Entry, Canvas, Checkbutton
 
 import topo
-import plotgrouppanel
+from plotgrouppanel import PlotGroupPanel
 from topo.plotting.templates import plotgroup_templates
 from topo.plotting.plotgroup import TemplatePlotGroup
 
@@ -30,17 +30,17 @@ exec "from topo.commands.basic import *"  in __main__.__dict__
 exec "from topo.commands.pylabplots import *" in __main__.__dict__
 
 
-class TemplatePlotGroupPanel(plotgrouppanel.PlotGroupPanel):
+class TemplatePlotGroupPanel(PlotGroupPanel):
     def __init__(self,parent,console,pgt_name,**params):
         # Plotgroup Template associated
         self.pgt = plotgroup_templates.get(pgt_name,None)
 
-	plotgrouppanel.PlotGroupPanel.__init__(self,parent,console,pgt_name,**params)
+	PlotGroupPanel.__init__(self,parent,console,pgt_name,**params)
 
 	self.normalize.set(self.pgt.normalize)
         self.plotgroup.normalize=self.normalize.get()
 
-	 # Command used to refresh the plot, if any
+        # Command used to refresh the plot, if any
         self.cmdname = StringVar()
 	self.cmdname.set(self.plotgroup.updatecommand)
 
