@@ -280,7 +280,8 @@ class ParametersTool(Frame):
 
         parameter_window.title('New object parameters')
         #Label(parameter_window, text = "Edit class p").pack(side = TOP)
-        self.parameter_frame = ParametersFrame(parameter_window,buttons_to_remove=['Apply','Ok','Cancel'])  #CB: parent, not self
+        #CEBHACKALERT: 'Reset' shouldn't be removed, but currently it's not implemented
+        self.parameter_frame = ParametersFrame(parameter_window,buttons_to_remove=['Apply','Reset','Ok','Cancel'])  #CB: parent, not self
         
         self.parameter_window=parameter_window
         #self.parameter_frame.pack()

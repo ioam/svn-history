@@ -450,6 +450,8 @@ class ParametersFrame(Frame):
         """
         if isinstance(self.parameterized_object,ParameterizedObjectMetaclass):
             # CB: get values from source files, or what?
+            # When this is implemented, re-enable the Reset button in
+            # editortools.
             pass
         elif isinstance(self.parameterized_object,ParameterizedObject):
             self.parameterized_object.reset_params()
