@@ -30,7 +30,9 @@ from translatorwidgets import CheckbuttonTranslator
 # text as the name of self.parameterized_object.
 #
 # Does the order of Apply, Reset, Ok, Cancel match well-known software? If not, it should.
-
+# Should be some space between e.g. ok & cancel to avoid accidental click on wrong one, etc.
+#
+# go through and fix up documentation.
 
 class ParametersFrame(Frame):
     """
@@ -38,8 +40,12 @@ class ParametersFrame(Frame):
     an associated ParameterizedObject instance or class (via a
     PropertiesFrame for that ParameterizedObject).
     """
-    def __init__(self, parent=None, **config):
+    def __init__(self, parent=None, buttons_to_remove=[], **config):
         """
+        Create a Frame... with  'Apply', 'Reset', 'Ok', and 'Cancel' buttons.
+        
+        Not all users of ParametersFrames will wish to have all the buttons displayed; buttons
+        can be removed by supplying their names in buttons_to_remove.
         """
         self.parent = parent
         Frame.__init__(self,parent,config)
@@ -78,18 +84,21 @@ class ParametersFrame(Frame):
             BooleanParameter: self.__add_boolean_property,
             ClassSelectorParameter: self.__add_class_selector_property}
 
+        button_panel = Frame(self)
+        ### Apply, Reset, etc buttons; not displayed on creation but in create_widgets()
+        self.__buttons = {'Apply': Button(button_panel, text='Apply',
+                                          command = self.set_parameters),
+                          'Reset': Button(button_panel, text='Reset',
+                                          command= self.__reset_values),
+                          'Ok': Button(button_panel, text='Ok',
+                                       command=self.__ok_values),
+                          'Cancel': Button(button_panel, text='Cancel',
+                                           command= self.__cancel_values)}
 
+        for button in buttons_to_remove:
+            self.__buttons.pop(button)
 
-        ### Apply, Reset, Ok, and Cancel buttons; not displayed on creation
-        self.__aroc_panel = Frame(self)
-        self.__aroc_buttons = ( Button(self.__aroc_panel, text = 'Apply', 
-                                       command = self.set_parameters),
-                                Button(self.__aroc_panel, text='Reset',
-                                       command= self.__reset_values),
-                                Button(self.__aroc_panel, text = 'Ok',
-                                       command= self.__ok_values),
-                                Button(self.__aroc_panel, text = 'Cancel',
-                                       command= self.__cancel_values) )
+        button_panel.pack()
 
 
 
@@ -134,7 +143,7 @@ class ParametersFrame(Frame):
 
  
 
-    def create_widgets(self, parameterized_object, translator_dictionary = {},aroc=(True,True,True,True)):
+    def create_widgets(self, parameterized_object, translator_dictionary={}):
         """
         Create widgets for all non-hidden Parameters of parameterized_object and add them
         to the screen.
@@ -172,33 +181,14 @@ class ParametersFrame(Frame):
         self.__new_widgets()
 
 
-        ### Display or hide 'Apply', 'Reset', 'Ok', 'Cancel'
-        # CB: probably could simplify this is aroc were a dictionary
-        if aroc[0]:
-            self.__aroc_buttons[0].pack(side=LEFT)
-        else:
-            self.__aroc_buttons[0].pack_forget()
-
-        if aroc[1]:
-            self.__aroc_buttons[1].pack(side=LEFT)
-        else:
-            self.__aroc_buttons[1].pack_forget()
-
-        if aroc[2]:
-            self.__aroc_buttons[2].pack(side=LEFT)
-        else:
-            self.__aroc_buttons[2].pack_forget()
-
-        if aroc[3]:
-            self.__aroc_buttons[3].pack(side=LEFT)
-        else:
-            self.__aroc_buttons[3].pack_forget()
-
-        self.__aroc_panel.pack(side=BOTTOM)
-
+        ### Display the buttons
+        for button in self.__buttons.values():
+            button.pack(side=LEFT)
+            
         # callers can also call pack() on this frame to set its attributes,
         # but it's called here so that at least everything appears.
-        self.pack() 
+        self.pack()
+        # button_panel.pack()
 
 
 

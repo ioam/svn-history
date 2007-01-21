@@ -150,8 +150,8 @@ Each type will have various parameters that can be changed.""")
 
         ### The ParametersFrame
         #
-        self.__params_frame = parametersframe.ParametersFrame(self)
-        self.__params_frame.create_widgets(self.__current_pattern_generator,aroc=(False,True,False,False))
+        self.__params_frame = parametersframe.ParametersFrame(self,buttons_to_remove=['Apply','Ok','Cancel'])
+        self.__params_frame.create_widgets(self.__current_pattern_generator)
         self.__params_frame.pack(side=TOP,expand=YES,fill=X)
 
         ### 'Edit patterns in' boxes
@@ -224,7 +224,7 @@ Each type will have various parameters that can be changed.""")
         ParametersFrame to draw the relevant widgets
         """
         self.__current_pattern_generator = self.pattern_generators[pattern_generator_name]()
-        self.__params_frame.create_widgets(self.__current_pattern_generator,aroc=(False,True,False,False))
+        self.__params_frame.create_widgets(self.__current_pattern_generator)
         if self.auto_refresh.get(): 
 	    self.refresh()
 

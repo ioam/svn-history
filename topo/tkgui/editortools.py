@@ -280,7 +280,8 @@ class ParametersTool(Frame):
 
         parameter_window.title('New object parameters')
         #Label(parameter_window, text = "Edit class p").pack(side = TOP)
-        self.parameter_frame = ParametersFrame(parameter_window)  #CB: parent, not self
+        self.parameter_frame = ParametersFrame(parameter_window,buttons_to_remove=['Apply','Ok','Cancel'])  #CB: parent, not self
+        
         self.parameter_window=parameter_window
         #self.parameter_frame.pack()
 
@@ -297,7 +298,7 @@ class ParametersTool(Frame):
 
         if focus_class:
             self.parameter_window.deiconify()
-            self.parameter_frame.create_widgets(focus_class,aroc=(False,True,False,False))
+            self.parameter_frame.create_widgets(focus_class)
             #CB: self.parameter_frame.pack(side=BOTTOM etc)
 
             
