@@ -258,8 +258,6 @@ class ConnectionTool(Frame):
         self.option_menu.config(bg = col)
 
 
-
-
 class ParametersTool(Frame):
 
     def __init__(self, parent = None):
@@ -274,7 +272,7 @@ class ParametersTool(Frame):
         parameter_window = Toplevel()
 
         # CEBHACKALERT: Should make this PF be a Frame in the model editor.
-        
+        # At the moment we just hide/unhide the window and don't let it be destroyed
         # Hide this window; we unhide it if it's to be used.
         parameter_window.withdraw()
 
@@ -284,6 +282,8 @@ class ParametersTool(Frame):
         self.parameter_frame = ParametersFrame(parameter_window,buttons_to_remove=['Apply','Reset','Ok','Cancel'])  #CB: parent, not self
         
         self.parameter_window=parameter_window
+        parameter_window.protocol("WM_DELETE_WINDOW",self.__hidenotdestroy)
+        
         #self.parameter_frame.pack()
 
 
@@ -302,5 +302,7 @@ class ParametersTool(Frame):
             self.parameter_frame.create_widgets(focus_class)
             #CB: self.parameter_frame.pack(side=BOTTOM etc)
 
-            
+    def __hidenotdestroy(self):
+        self.parameter_window.withdraw()
+        
             
