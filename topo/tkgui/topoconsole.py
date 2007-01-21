@@ -422,6 +422,10 @@ class TopoConsole(Frame):
                                 obj.name,label=label,
                                 command=entry.command)
     
+    # CEBALERT: Should catch a click on Topoconsole's X (maybe
+    # then offer a 'quit or not?' option), but should go out
+    # finally via this quit method.
+    # Use self.protocol("WM_DELETE_WINDOW",self.whatevermethoditis)
     def quit(self):
         """
         Close the main GUI window.
