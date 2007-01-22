@@ -247,7 +247,7 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
 
 
-def measure_or_tuning_fullfield(num_phase=1,num_orientation=1,frequencies=[2.4],
+def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4],
                                 curve_parameters=[{"contrast":30}, {"contrast":60}, {"contrast":90}],
                                 display=False,
                                 pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
