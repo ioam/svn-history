@@ -249,6 +249,7 @@ class FeatureCurves(FeatureResponses):
     def collect_feature_responses(self,features,pattern_presenter,param_dict,curve_label,display):
         self.initialize_featureresponses(features)
         rows,cols=self.sheet.shape
+        bounding_box = self.sheet.bounds
         self.measure_responses(pattern_presenter,param_dict,features,display)
         self.sheet.curve_dict[self.x_axis][curve_label]={}
         for key in self._featureresponses[self.sheet][self.x_axis].distribution_matrix[0,0]._data.iterkeys():
@@ -256,11 +257,11 @@ class FeatureCurves(FeatureResponses):
             for i in range(rows):
                 for j in range(cols):
                     y_axis_values[i,j] = self._featureresponses[self.sheet][self.x_axis].distribution_matrix[i,j].get_value(key)
-            self.sheet.curve_dict[self.x_axis][curve_label].update({key:y_axis_values})
+            Response = SheetView((y_axis_values,bounding_box), self.sheet.name , self.sheet.precedence, topo.sim.time())
+            self.sheet.curve_dict[self.x_axis][curve_label].update({key:Response})
 
 
-
-
+           
 
 
 
