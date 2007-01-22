@@ -152,7 +152,7 @@ def tuning_curve_data(sheet, x_axis, curve_label, i_value, j_value):
     responses (the y_values).
     """
     x_values= sorted(sheet.curve_dict[x_axis][curve_label].keys())
-    y_values=[sheet.curve_dict[x_axis][curve_label][key][i_value,j_value] for key in x_values]
+    y_values=[sheet.curve_dict[x_axis][curve_label][key].view()[0][i_value,j_value] for key in x_values]
     return x_values, y_values
 
 	   
