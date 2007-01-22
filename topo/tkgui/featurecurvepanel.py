@@ -47,6 +47,9 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
         # Command used to refresh the plot, if any
         self.cmdname = StringVar()
 	self.cmdname.set(self.plotgroup.updatecommand)
+
+        self.plot_cmdname = StringVar()
+	self.plot_cmdname.set(self.plotgroup.plotcommand)
       
 	self.params_frame = Frame(master=self)
         self.params_frame.pack(side=TOP,expand=YES,fill=X)
@@ -86,7 +89,7 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
 	self.plotgroup = copy.copy(self.plotgroup)
 	self.update_plotgroup_variables()# update PlotGroup variables
         self.plotgroup.plotcommand = self.plot_cmdname.get()# in this case must also update plotcommand
-	self.plotgroup.update_environment()
+       	self.plotgroup.update_environment()
 	self.display_plots()              # Put images in GUI canvas
         self.display_labels()             # Match labels to grid
         self.refresh_title()              # Update Frame title.
@@ -228,8 +231,6 @@ class FullFieldFeatureCurvePanel(FeatureCurvePanel):
 
         FeatureCurvePanel.__init__(self,parent,console,pgt_name,**config)
 
-        self.plot_cmdname = StringVar()
-	self.plot_cmdname.set(self.plotgroup.plotcommand)
       
 	plot_cmdlabel = Message(self.params_frame, text="Plot command:",aspect=1000)
         plot_cmdlabel.pack(side=LEFT)

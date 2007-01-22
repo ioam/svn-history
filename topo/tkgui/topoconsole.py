@@ -744,4 +744,3 @@ if __name__ != '__main__':
     plotpanel_classes['Projection'] = ProjectionPanel 
     plotpanel_classes['Projection Activity'] = ProjectionActivityPanel
     plotpanel_classes['Orientation Tuning Fullfield'] = FullFieldFeatureCurvePanel
-    plotpanel_classes['Contrast Response Fullfield'] = FullFieldFeatureCurvePanel
