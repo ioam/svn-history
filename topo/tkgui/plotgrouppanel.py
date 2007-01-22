@@ -332,7 +332,7 @@ original data is no longer available.""")
         """
         x,y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
         sf = float(event.widget.plot_scale_factor)*self.this_panel_scale_factor
-        r,c=floor(y/sf),floor(x/sf)
+        r,c=int(floor(y/sf)),int(floor(x/sf))
         # CB: store the click's (r,c) & the sheet name; what has to be stored
         # and how it's done will presumably change
         self._canvas_click_info = (event.widget.plot_src_name,r,c)        
