@@ -12,6 +12,7 @@ import Numeric
 import copy
 
 from inspect import getdoc
+from math import floor
 
 import Image
 import ImageTk
@@ -19,7 +20,7 @@ import Pmw
 from Tkinter import  Frame, TOP, YES, BOTH, BOTTOM, X, Button, LEFT, \
      RIGHT, DISABLED, Checkbutton, NORMAL, Canvas, Label, NSEW, IntVar, \
      BooleanVar, StringVar, FLAT, SUNKEN, RAISED, GROOVE, RIDGE, \
-     Scrollbar, Y, VERTICAL, HORIZONTAL
+     Scrollbar, Y, VERTICAL, HORIZONTAL, Menu, END
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import Sheet
@@ -307,6 +308,46 @@ original data is no longer available.""")
         self.balloon.bind(self.integerscaling_checkbutton,
                           getdoc(self.plotgroup.params()['integerscaling']))
 
+        # CEBHACKALERT: the reduce and enlarge buttons scale the image; a hack in
+        # plotgroup.py stores the original scaling factor, and we keep track of
+        # this panel's scaling factor to get the true scaling factor! Maybe the
+        # true scaling factor is already available somewhere? If not, this should
+        # all be cleaned up.
+        self.this_panel_scale_factor = 1
+
+        ### Right-click menu for canvases; subclasses should be able to add/
+        ### edit options.
+        self._canvas_menu = Menu(self, tearoff=0)
+        self._canvas_menu.insert_command(0,label='',state=DISABLED) # title
+        self._canvas_menu.insert_command(1,label='print info',
+                                          command=self.__print_info)
+
+
+    # Maybe a right click will go straight to some action, in which case
+    # there is no need for the menu stuff
+    def __canvas_right_click(self,event):
+        """
+        Calculate and store the row and column of the click in the canvas's plot,
+        and show a popup menu.
+        """
+        x,y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
+        sf = float(event.widget.plot_scale_factor)*self.this_panel_scale_factor
+        r,c=floor(y/sf),floor(x/sf)
+        # CB: store the click's (r,c) & the sheet name; what has to be stored
+        # and how it's done will presumably change
+        self._canvas_click_info = (event.widget.plot_src_name,r,c)        
+
+        # set menu title
+        self._canvas_menu.entryconfig(0,state=DISABLED,label="Options for (" + `r` + "," + `c` + ")")
+
+        self._canvas_menu.tk_popup(event.x_root,event.y_root)
+
+   
+    # CB: temporary, example menu command
+    def __print_info(self):
+        s,r,c = self._canvas_click_info
+        print s + ": row "+ `r` + ", col " + `c`
+
 
     def generate_plotgroup(self):
 	"""
@@ -387,6 +428,8 @@ original data is no longer available.""")
                                     image=image)
                 canvas.config(highlightthickness=0,borderwidth=0,relief=FLAT)
                 canvas.grid(row=0,column=i,padx=5)
+
+                
             for c in old_canvases:
                 c.grid_forget()
         else:  # Width of first plot still same, and same number of images.
@@ -395,7 +438,24 @@ original data is no longer available.""")
                 canvas.create_image(image.width()/2+BORDERWIDTH+1,
                                     image.height()/2+BORDERWIDTH+1,image=image)
                 canvas.grid(row=0,column=i,padx=5)
-            
+
+        ### bind right click to each canvas
+        for plot,canvas in zip(plots,self.canvases):
+            # need to store the plot's scale_factor with the canvas for when
+            # the canvas is right clicked on and we want to calculate where
+            # in the matrix that click corresponds to
+            # CEBHACKALERT: in addition to needing the scale_factor,
+            # it seems likely that more information from the plot could be
+            # required in the future. As an example, I've added the sheet
+            # a plot is from (which is not enough info to do anything useful).
+            # Just copying the attributes is not the way to go!
+            # Maybe associate the canvas with a plot. Does the plot logically
+            # store everything that would be needed anyway? Is a plot
+            # associated with a sheetview or something like that?
+            canvas.plot_scale_factor=plot.original_scale_factor
+            canvas.plot_src_name=plot.plot_src_name
+            canvas.bind('<Button-3>',self.__canvas_right_click)
+
 
     def add_to_history(self):
 	"""
@@ -488,7 +548,6 @@ original data is no longer available.""")
     def reduce(self):
         """Function called by Widget to reduce the plot size"""
         new_height = self.plotgroup.height_of_tallest_plot / self.zoom_factor
-                
         if new_height < self.plotgroup.minimum_height_of_tallest_plot:
             self.reduce_button.config(state=DISABLED)
         else:
@@ -501,8 +560,13 @@ original data is no longer available.""")
                 self.plotgroup.height_of_tallest_plot = new_height
                 self.plotgroup.update_plots(False)
                 self.display_plots()
+
+        # CEBHACKALERT: see alert by initial use in __init__
+        self.this_panel_scale_factor /= self.zoom_factor
     
 
+    
+    #CEBHACKALERT: I think there's some duplicate code in reduce() and enlarge()
     def enlarge(self):
         """Function called by Widget to increase the plot size"""
         self.reduce_button.config(state=NORMAL)
@@ -515,7 +579,10 @@ original data is no longer available.""")
             self.plotgroup.height_of_tallest_plot *= self.zoom_factor
             self.plotgroup.update_plots(False)
             self.display_plots()
-   
+
+        # CEBHACKALERT: see alert by initial use in __init__
+        self.this_panel_scale_factor *= self.zoom_factor
+
 
     # JLENHANCEMENT: It would be nice to be able to scroll back through many
     # iterations.  Could put in a box for entering either the iteration
