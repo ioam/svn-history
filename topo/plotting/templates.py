@@ -11,7 +11,7 @@ __version__='$Revision$'
 
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.misc.keyedlist import KeyedList
-from topo.base.parameterclasses import Parameter, BooleanParameter, Filename
+from topo.base.parameterclasses import Parameter, BooleanParameter, Filename, ListParameter
 
 
 class PlotGroupTemplate(ParameterizedObject):
@@ -40,6 +40,7 @@ class PlotGroupTemplate(ParameterizedObject):
     normalize = BooleanParameter(False,
       doc="Default value for the normalize option for the plot")
     image_location = Filename(doc='Paths to search for images to be loaded.')
+    prerequisites=ListParameter([], doc="list of preference maps which should be plotted before a curve is measured")
 
     def __init__(self, plot_templates=[], static_images = [],**params):
         """
@@ -131,8 +132,8 @@ plotgroup_templates = KeyedList()
 ### we might want to pass a plotgroup_type to the template
 ### (see corresponding alert in PlotGroupPanel)
 
-def new_plotgroup_template(name,command,initial_plot,plotcommand="pass",template_plot_type='bitmap',normalize=False):
-    pgt = PlotGroupTemplate(name=name,command=command,initial_plot=initial_plot,plotcommand=plotcommand,template_plot_type=template_plot_type,normalize=normalize)
+def new_plotgroup_template(name,command,initial_plot,plotcommand="pass",template_plot_type='bitmap',normalize=False,prerequisites=[]):
+    pgt = PlotGroupTemplate(name=name,command=command,initial_plot=initial_plot,plotcommand=plotcommand,template_plot_type=template_plot_type,normalize=normalize,prerequisites=prerequisites)
     plotgroup_templates[pgt.name]=pgt
     return pgt
 
@@ -179,11 +180,11 @@ pgt.add_static_image('Color Key','topo/commands/disp_key_white_vert_small.png')
 
 pgt = new_plotgroup_template(name='Orientation Tuning Fullfield',command='measure_or_tuning_fullfield()',initial_plot=False,plotcommand='tuning_curve(x_axis="orientation", plot_type=pylab.plot, x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',template_plot_type="curve")
 
-pgt = new_plotgroup_template(name='Contrast Response Fullfield',command='measure_contrast_response_fullfield()',initial_plot=False,plotcommand='tuning_curve(x_axis="contrast", plot_type=pylab.semilogx,x_ticks=None,x_labels=None,x_lim=None, unit="%")',template_plot_type="curve")
+pgt = new_plotgroup_template(name='Contrast Response Fullfield',command='measure_contrast_response_fullfield()',initial_plot=False,plotcommand='tuning_curve(x_axis="contrast", plot_type=pylab.semilogx,x_ticks=None,x_labels=None,x_lim=None, unit="%")',template_plot_type="curve",prerequisites=['Orientation'])
 
-pgt = new_plotgroup_template(name='Orientation Tuning',command='measure_or_tuning(); tuning_curve(x_axis="orientation",plot_type=pylab.plot,x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',initial_plot=False,template_plot_type="curve")
+pgt = new_plotgroup_template(name='Orientation Tuning',command='measure_or_tuning(); tuning_curve(x_axis="orientation",plot_type=pylab.plot,x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',initial_plot=False,template_plot_type="curve",prerequisites=['XPreference'])
 
-pgt = new_plotgroup_template(name='Contrast Response',command='measure_contrast_response(); tuning_curve(x_axis="contrast",plot_type=pylab.semilogx,x_ticks=None,x_labels=None,x_lim=None,unit="%")',initial_plot=False,template_plot_type="curve")
+pgt = new_plotgroup_template(name='Contrast Response',command='measure_contrast_response(); tuning_curve(x_axis="contrast",plot_type=pylab.semilogx,x_ticks=None,x_labels=None,x_lim=None,unit="%")',initial_plot=False,template_plot_type="curve",prerequisites=['Orientation','XPreference'])
 
-pgt = new_plotgroup_template(name='Size Tuning',command='measure_size_response(); tuning_curve(x_axis="size",plot_type=pylab.plot, x_ticks=None, x_labels=None,x_lim=None, unit="Diameter of stimulus")',initial_plot=False,template_plot_type="curve")
+pgt = new_plotgroup_template(name='Size Tuning',command='measure_size_response(); tuning_curve(x_axis="size",plot_type=pylab.plot, x_ticks=None, x_labels=None,x_lim=None, unit="Diameter of stimulus")',initial_plot=False,template_plot_type="curve",prerequisites=['Orientation','XPreference'])
 
