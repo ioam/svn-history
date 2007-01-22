@@ -275,21 +275,40 @@ version substituted, etc.""")
         self.y = y
         self.sheet_name=sheet_name
 
+  
    def update_environment(self):
        topo.commands.analysis.coordinate = (self.x,self.y)
        topo.commands.analysis.sheet_name = self.sheet_name
-       
+          
        exec  self.updatecommand in __main__.__dict__
        exec  self.plotcommand in __main__.__dict__
 
+       self.get_curve_time()
+       
    def update_variables(self):
        topo.commands.analysis.coordinate = (self.x,self.y)
        topo.commands.analysis.sheet_name = self.sheet_name
        
        exec  self.plotcommand in __main__.__dict__
 
-       self.time = topo.sim.time()
+       self.get_curve_time()
 
+   def get_curve_time(self):
+       """
+       Get timestamps from the current SheetViews in the curve_dict and
+       use the max timestamp as the plot label
+       Displays a warning if not all curves have been measured at the same time.
+       """
+
+       for x_axis in topo.sim[str(self.sheet_name)].curve_dict.itervalues():
+           for curve_label in x_axis.itervalues():
+               timestamps = [SheetView.timestamp for SheetView in curve_label.itervalues()]
+               
+       if timestamps != []:
+           self.time = max(timestamps)
+           if max(timestamps) != min(timestamps):
+               self.warning("Displaying curves from different times (%s,%s)" %
+                            (min(timestamps),max(timestamps)))
 
 class TemplatePlotGroup(PlotGroup):
     """
