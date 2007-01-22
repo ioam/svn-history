@@ -200,6 +200,14 @@ important.""")
                     
 	    plot.bitmap.image = plot.bitmap.zoom(scaling_factor)
 
+	    # CEBHACKALERT!! Remove this hack when it's clear if the plotting or the gui
+	    # does the re-scaling, and where the true scale factor is stored.
+            if not hasattr(plot,'original_scale_factor'):
+                # store the scale factor the first time this is run so that we don't
+                # lose the true scale factor. is it already stored somewhere else?
+                # or can i use 'if self.initial_plot'?
+                plot.original_scale_factor=scaling_factor    
+
 
     def _calculate_minimum_height_of_tallest_plot(self):
 	"""
