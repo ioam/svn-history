@@ -309,7 +309,7 @@ def measure_contrast_response_fullfield(contrasts=[10,20,30,40,50,60,70,80,90],r
             or_value = or_pref[matrix_coords]
             phase_value = phase_pref[matrix_coords]
         else:
-            topo.sim.warning("Orientation Preference should be measured before plotting Contrast Response -- using default values")
+            topo.sim.warning("Orientation Preference should be measured before plotting Contrast Response -- using default values for "+str(sheet.name))
             or_value = 0.0
             phase_value = 0.0  
         
@@ -358,7 +358,7 @@ def measure_size_response(num_phase=18,
         or_pref = sheet.sheet_view_dict['OrientationPreference'].view()[0]
         or_value = or_pref[matrix_coords]
     else:
-        topo.sim.warning("Orientation Preference should be measured before plotting Size Response -- using default values")
+        topo.sim.warning("Orientation Preference should be measured before plotting Size Response -- using default values for "+sheet_name)
         or_value = 0.0
    
 
@@ -369,7 +369,7 @@ def measure_size_response(num_phase=18,
         x_value=x_pref[matrix_coords]
         y_value=y_pref[matrix_coords]
     else:
-        topo.sim.warning("Position Preference should be measured before plotting Size Response -- using default values")
+        topo.sim.warning("Position Preference should be measured before plotting Size Response -- using default values for "+sheet_name)
         x_value=coordinate[0]
         y_value=coordinate[1]
 
@@ -421,7 +421,7 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90],relative_or
         or_pref = sheet.sheet_view_dict['OrientationPreference'].view()[0]
         or_value = or_pref[matrix_coords]
     else:
-        topo.sim.warning("Orientation Preference should be measured before plotting Size Response -- using default values")
+        topo.sim.warning("Orientation Preference should be measured before plotting Size Response -- using default values for "+sheet_name)
         or_value = 0.0
    
 
@@ -432,7 +432,7 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90],relative_or
         x_value=x_pref[matrix_coords]
         y_value=y_pref[matrix_coords]
     else:
-        topo.sim.warning("Position Preference should be measured before plotting Size Response -- using default values")
+        topo.sim.warning("Position Preference should be measured before plotting Size Response -- using default values for "+sheet_name)
         x_value=coordinate[0]
         y_value=coordinate[1]
  
@@ -458,7 +458,7 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90],relative_or
                         
 
 def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
-                      curve_parameters=[{"contrast":10}, {"contrast":30}, {"contrast":40}, {"contrast":50}],
+                      curve_parameters=[{"contrast":30}, {"contrast":60}, {"contrast":90}],
                       display=False,size=0.5,
                       pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
                                                          apply_output_fn=False,duration=1.0,
@@ -481,7 +481,7 @@ def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
 	x_value=x_pref[matrix_coords]
 	y_value=y_pref[matrix_coords]
     else:
-        topo.sim.warning("Position Preference should be measured before plotting Orientation Tuning -- using default values")
+        topo.sim.warning("Position Preference should be measured before plotting Orientation Tuning -- using default values for "+sheet_name)
         x_value=coordinate[0]
         y_value=coordinate[1]
       

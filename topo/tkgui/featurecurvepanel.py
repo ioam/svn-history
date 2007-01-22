@@ -124,7 +124,7 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
                     message = 'Position preference should be plotted before plotting '+ str(self.plotgroup_key)+'\n'\
                               'Otherwise will use default values'
                 else:
-                    message = prerequisite + ' preference should be plotted before plotting '+ str(self.plotgroup_key)+'\n'\
+                    message = prerequisite + ' should be plotted before plotting '+ str(self.plotgroup_key)+'\n'\
                               'Otherwise will use default values'
                 w = Label(self.dialog.interior(),
                           text = message,

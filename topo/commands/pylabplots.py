@@ -180,7 +180,7 @@ def tuning_curve(x_axis,plot_type,x_ticks,x_labels,x_lim,unit):
     pylab.xlabel(x_axis.capitalize()+' ('+unit+')')
     pylab.title('Sheet '+topo.commands.analysis.sheet_name+', coordinate(x,y)='+'('+
 	 	str(coordinate[0])+','+str(coordinate[1])+')'+' at time '+str(topo.sim.time()))
-    manager.window.title(x_axis.capitalize()+' Tuning Curve')
+    manager.window.title(topo.sim.name+': '+x_axis.capitalize()+' Tuning Curve')
 
 
     for curve_label in sorted(sheet.curve_dict[x_axis].keys()):
