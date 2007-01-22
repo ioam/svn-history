@@ -78,13 +78,20 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
 
         if self.pgt.initial_plot: self.refresh()
 
-
     def refresh_variables(self, update=True):
         """
         Command to be called when plotgroup variables are updated in the GUI
         """
-        
-        self.refresh(update)
+        Pmw.showbusycursor()
+	self.plotgroup = copy.copy(self.plotgroup)
+	self.update_plotgroup_variables()# update PlotGroup variables
+        self.plotgroup.plotcommand = self.plot_cmdname.get()# in this case must also update plotcommand
+	self.plotgroup.update_environment()
+	self.display_plots()              # Put images in GUI canvas
+        self.display_labels()             # Match labels to grid
+        self.refresh_title()              # Update Frame title.
+        Pmw.hidebusycursor()
+
               
     def _add_region_menu(self):
         """
@@ -109,6 +116,23 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
                        items = sim_ep_names)
         self.opt_menu.pack(side=LEFT)
         self.balloon.bind(self.opt_menu,"""Sheet whose unit(s) will be plotted.""")
+
+        for prerequisite in self.pgt.prerequisites:
+            if prerequisite not in topo.sim[str(self.region.get())].sheet_view_dict:
+                self.dialog = Pmw.Dialog(self.parent,title = 'Warning')
+                if prerequisite=='XPreference':
+                    message = 'Position preference should be plotted before plotting '+ str(self.plotgroup_key)+'\n'\
+                              'Otherwise will use default values'
+                else:
+                    message = prerequisite + ' preference should be plotted before plotting '+ str(self.plotgroup_key)+'\n'\
+                              'Otherwise will use default values'
+                w = Label(self.dialog.interior(),
+                          text = message,
+                          background = 'black',
+                          foreground = 'white',
+                          pady = 20)
+                w.pack(expand = 1, fill = 'both', padx = 4, pady = 4)
+               
 
     def _add_xy_boxes(self):
         """
