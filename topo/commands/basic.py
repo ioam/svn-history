@@ -9,7 +9,9 @@ import StringIO
 
 import topo
 from topo.base.parameterizedobject import ParameterizedObject, Parameter
+from topo.base.functionfamilies import OutputFn
 from topo.base.sheet import Sheet
+from topo.base.cf import CFSheet
 from topo.base.projection import ProjectionSheet
 from topo.sheets.generatorsheet import GeneratorSheet
 from topo.misc.utils import get_states_of_classes_from_module,ExtraPickler,ExtraUnpickler
@@ -56,19 +58,25 @@ def pattern_present(inputs=None,duration=1.0,learning=False,overwrite_previous=F
     If learning is False, overwrites the existing values of Sheet.learning
     to disable learning, then reenables learning.
     """
-    
+       
     if not overwrite_previous:
         save_input_generators()
 
     ### JABALERT!  Should clean up how these are set on each
     ### sheet; it overwrites any old values.
         
-    # turn off sheets' learning if learning=False
+    # turn off sheets' learning and output function learning
+    #(e.g. in Homeostatic output functions) if learning=False
     if not learning:
         for each in topo.sim.objects(Sheet).values():
              each.learning = False
-
-
+            
+            
+    if not learning:
+        for each in topo.sim.objects(ProjectionSheet).values():
+            each.output_fn.learning = False
+                              
+       
     if not apply_output_fn:
         for each in topo.sim.objects(Sheet).values():
              each.apply_output_fn = False
@@ -87,12 +95,15 @@ def pattern_present(inputs=None,duration=1.0,learning=False,overwrite_previous=F
     topo.sim.run(duration) 
     topo.sim.event_pop()
 
-    # turn sheets' learning back on if we turned it off before
+    # turn sheets' learning and output_fn learning back on if we turned it off before
     if not learning:
         for each in topo.sim.objects(Sheet).values():
             each.learning = True
-  
 
+    if not learning:
+        for each in topo.sim.objects(ProjectionSheet).values():
+            each.output_fn.learning = True
+                              
     if not apply_output_fn:
         for each in topo.sim.objects(Sheet).values():
             each.apply_output_fn = True
