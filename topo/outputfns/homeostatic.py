@@ -12,7 +12,7 @@ from Numeric import exp,zeros,ones
 
 from topo.base.arrayutils import clip_in_place
 from topo.base.functionfamilies import OutputFn
-from topo.base.parameterclasses import Number
+from topo.base.parameterclasses import Number, BooleanParameter
 from topo.base.parameterizedobject import ParameterizedObject
 from topo.base.sheet import activity_type
 
@@ -29,6 +29,11 @@ class HomeostaticMaxEnt(OutputFn):
     will affect future behavior.
     """
 
+    learning = BooleanParameter(True,doc="""
+    Setting this to False tells the Output_fn not to change its
+    state (e.g. The parameters controlling the shape of the function) based on
+    incoming events.
+    """)
     a_init = Number(default=13,doc="Multiplicative parameter controlling the exponential.")
     b_init = Number(default=-4,doc="Additive parameter controlling the exponential.")
     eta = Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
@@ -37,11 +42,12 @@ class HomeostaticMaxEnt(OutputFn):
 
     def __init__(self,**params):
         super(HomeostaticMaxEnt,self).__init__(**params)
-
+        
 	self.first_call = True
-
+    
     def __call__(self,x):
-	
+
+        	
 	if self.first_call:
 	    self.first_call = False
 	    self.a = Numeric.ones(x.shape, x.typecode()) * self.a_init
@@ -52,10 +58,12 @@ class HomeostaticMaxEnt(OutputFn):
         x *= 0.0
 	x += 1.0 / (1.0 + exp(-(self.a*x_orig + self.b)))
 
-	# Update a and b
-	self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
-	self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
+        if self.learning:
+            # Update a and b
+            self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
+            self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
 
+      
 
 class HomeostaticMaxEnt_debug(OutputFn):
     """
@@ -63,6 +71,11 @@ class HomeostaticMaxEnt_debug(OutputFn):
     information.
     """
 
+    learning = BooleanParameter(True,doc="""
+    Setting this to False tells the Output_fn not to change its
+    state (e.g. The parameters controlling the shape of the function) based on
+    incoming events.
+    """)
     lstep = Number(default=8,doc="How often to print debugging information.")
     a_init = Number(default=13,doc="Multiplicative parameter controlling the exponential.")
     b_init = Number(default=-4,doc="Additive parameter controlling the exponential.")
@@ -149,9 +162,10 @@ class HomeostaticMaxEnt_debug(OutputFn):
 	    print self.y_avg[23][23], ' - ', self.y_avg[11][11], ' - ', self.y_avg[0][0], ' - ', self.y_avg[47][47]
 	    print self.a[23][23], ',', self.b[23][23] , ' : ', self.a[11][11], ',', self.b[11][11]
 
-	# Update a and b
-	self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
-	self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
+        if self.learning:
+            # Update a and b
+            self.a += self.eta * (1.0/self.a + x_orig - (2.0 + 1.0/self.mu)*x_orig*x + x_orig*x*x/self.mu)
+            self.b += self.eta * (1.0 - (2.0 + 1.0/self.mu)*x + x*x/self.mu)
 
 
 class PiecewiseLinear_debug(OutputFn):
