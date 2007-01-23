@@ -6,6 +6,11 @@ $Id$
 __version__='$Revision$'
 
 
+import palette
+import copy
+
+from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap, Bitmap
+
 from Numeric import zeros, ones, Float, divide,ravel,clip,array
 
 from topo.base.parameterizedobject import ParameterizedObject
@@ -14,8 +19,6 @@ from topo.base.sheetview import SheetView
 from topo.base.sheet import Slice
 from topo.base.sheetcoords import SheetCoordinateSystem
 
-from bitmap import HSVBitmap, RGBBitmap, PaletteBitmap, Bitmap
-import palette
 
 
 ### JCALERT!
@@ -43,8 +46,10 @@ class Plot(ParameterizedObject):
      
      def __init__(self,image=None,**params):
           
-          super(Plot,self).__init__(**params) 
+          super(Plot,self).__init__(**params)
           self.bitmap = Bitmap(image)
+          self._orig_bitmap = self.bitmap # Copy kept in case of later rescaling
+          self.scale_factor=1.0
           self.plot_src_name = ''
           self.precedence = 0.0
           # indicate if we should re-size as a topographica plot (using integer)
@@ -55,8 +60,22 @@ class Plot(ParameterizedObject):
           # Time at which the bitmaps were created
           self.timestamp = -1
 
-          
-          
+
+     def rescale(self,scale_factor):
+          """
+          Change the size of this image by the specified numerical factor.
+
+          The original image is kept as-is in _orig_bitmap; the scaled
+          image is stored in bitmap.  The scale_factor argument is
+          take as relative to the current scaling of the bitmap.  For
+          instance, calling scale(1.5) followed by scale(2.0) will
+          yield a final scale of 3.0, not 2.0.
+          """
+          self.scale_factor *= scale_factor
+
+          if (self.bitmap):
+              self.bitmap = copy.copy(self._orig_bitmap)
+              self.bitmap.image = self._orig_bitmap.zoom(self.scale_factor)
 
 
 def make_template_plot(channels,sheet_view_dict,density=None,
@@ -294,6 +313,8 @@ class SHCPlot(TemplatePlot):
             
             self.bitmap = HSVBitmap(hue,sat,val)
 
+        self._orig_bitmap=self.bitmap
+        
 
     def __make_hsv_matrices(self,hsc_matrices,shape,normalize):
 	""" 
@@ -369,6 +390,7 @@ class RGBPlot(TemplatePlot):
          
             self.bitmap = RGBBitmap(red,green,blue)
         
+       self._orig_bitmap=self.bitmap
 
   def __make_rgb_matrices(self, rgb_matrices,shape,normalize):
 	""" 
@@ -402,7 +424,7 @@ class RGBPlot(TemplatePlot):
 
 class PalettePlot(TemplatePlot):
      """
-     Bitmap plot based on a Strength matrices, with optional colorization.  
+     Bitmap plot based on a Strength matrix, with optional colorization.
 
      Not yet implemented.
 
