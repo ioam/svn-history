@@ -79,7 +79,7 @@ class FeatureCurvePanel(BasicPlotGroupPanel):
         self.auto_refresh.set(False)
         self.set_auto_refresh()
 
-        if self.pgt.initial_plot: self.refresh()
+        if self.pgt.plot_immediately: self.refresh()
 
     def refresh_variables(self, update=True):
         """

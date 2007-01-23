@@ -73,7 +73,7 @@ class TemplatePlotGroupPanel(PlotGroupPanel):
         # Display any plots that can be done with existing data, but
         # don't regenerate the SheetViews
         if self.__class__ == TemplatePlotGroupPanel:
-            self.refresh(update=self.pgt.initial_plot)
+            self.refresh(update=self.pgt.plot_immediately)
 
 
     def generate_plotgroup(self):

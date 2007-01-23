@@ -35,7 +35,7 @@ class PlotGroupTemplate(ParameterizedObject):
       doc="Command string to run before plotting when no further measurement of responses is required")
     template_plot_type=Parameter('bitmap',
       doc="Whether the plots are bitmap images or curves, to determine which GUI components are needed")
-    initial_plot=BooleanParameter(True,
+    plot_immediately=BooleanParameter(False,
       doc="Whether to call the plot command initially, to avoid waiting for long processes before changing the update command")
     normalize = BooleanParameter(False,
       doc="Default value for the normalize option for the plot")
@@ -132,59 +132,59 @@ plotgroup_templates = KeyedList()
 ### we might want to pass a plotgroup_type to the template
 ### (see corresponding alert in PlotGroupPanel)
 
-def new_plotgroup_template(name,command,initial_plot,plotcommand="pass",template_plot_type='bitmap',normalize=False,prerequisites=[]):
-    pgt = PlotGroupTemplate(name=name,command=command,initial_plot=initial_plot,plotcommand=plotcommand,template_plot_type=template_plot_type,normalize=normalize,prerequisites=prerequisites)
+def new_plotgroup_template(name,command,plot_immediately=False,plotcommand="pass",template_plot_type='bitmap',normalize=False,prerequisites=[]):
+    pgt = PlotGroupTemplate(name=name,command=command,plot_immediately=plot_immediately,plotcommand=plotcommand,template_plot_type=template_plot_type,normalize=normalize,prerequisites=prerequisites)
     plotgroup_templates[pgt.name]=pgt
     return pgt
 
-pgt = new_plotgroup_template(name='Activity',command='update_activity()',initial_plot=True)
+pgt = new_plotgroup_template(name='Activity',command='update_activity()',plot_immediately=True)
 pgt.add_plot('Activity',[('Strength','Activity'),('Hue','OrientationPreference'),('Confidence','OrientationSelectivity')])
 
-pgt = new_plotgroup_template(name='Connection Fields',command='update_connectionfields()',initial_plot=True,normalize=True)
+pgt = new_plotgroup_template(name='Connection Fields',command='update_connectionfields()',plot_immediately=True,normalize=True)
 pgt.add_plot('Connection Fields',[('Strength','Weights'),('Hue','OrientationPreference'),('Confidence','OrientationSelectivity')])
 
-pgt = new_plotgroup_template(name='Projection Activity',command='update_projectionactivity()',initial_plot=True,normalize=True)
+pgt = new_plotgroup_template(name='Projection Activity',command='update_projectionactivity()',plot_immediately=True,normalize=True)
 pgt.add_plot('ProjectionActivity',[('Strength','ProjectionActivity'),('Hue','OrientationPreference'),('Confidence','OrientationSelectivity')])
 
-pgt = new_plotgroup_template(name='Projection',command='update_projections()',initial_plot=True, normalize=True)
+pgt = new_plotgroup_template(name='Projection',command='update_projections()',plot_immediately=True, normalize=True)
 pgt.add_plot('Projection',[('Strength','Weights'),('Hue','OrientationPreference'),('Confidence','OrientationSelectivity')])
 
 
-pgt = new_plotgroup_template(name='Orientation Preference',command='measure_or_pref()',initial_plot=False)
+pgt = new_plotgroup_template(name='Orientation Preference',command='measure_or_pref()')
 pgt.add_plot('Orientation Preference',[('Hue','OrientationPreference')])
 pgt.add_plot('Orientation Preference&Selectivity',[('Hue','OrientationPreference'),
 						   ('Confidence','OrientationSelectivity')])
 pgt.add_plot('Orientation Selectivity',[('Strength','OrientationSelectivity')])
 pgt.add_static_image('Color Key','topo/commands/or_key_white_vert_small.png')
 
-pgt = new_plotgroup_template(name='Position Preference',command='measure_position_pref() ; topographic_grid()',initial_plot=False,normalize=True)
+pgt = new_plotgroup_template(name='Position Preference',command='measure_position_pref() ; topographic_grid()',normalize=True)
 pgt.add_plot('X Preference',[('Strength','XPreference')])
 pgt.add_plot('Y Preference',[('Strength','YPreference')])
 pgt.add_plot('Position Preference',[('Red','XPreference'),('Green','YPreference')])
 
 
-pgt = new_plotgroup_template(name='Center of Gravity',command='measure_cog(proj_name="Afferent") ; topographic_grid(xsheet_view_name="XCoG",ysheet_view_name="YCoG")',initial_plot=False,normalize=True)
+pgt = new_plotgroup_template(name='Center of Gravity',command='measure_cog(proj_name="Afferent") ; topographic_grid(xsheet_view_name="XCoG",ysheet_view_name="YCoG")',normalize=True)
 pgt.add_plot('X CoG',[('Strength','XCoG')])
 pgt.add_plot('Y CoG',[('Strength','YCoG')])
 pgt.add_plot('CoG',[('Red','XCoG'),('Green','YCoG')])
 
-pgt = new_plotgroup_template(name='Ocular Preference',command='measure_od_pref()',initial_plot=False)
+pgt = new_plotgroup_template(name='Ocular Preference',command='measure_od_pref()')
 pgt.add_plot('Ocular Preference',[('Strength','OcularPreference')])
 pgt.add_plot('Ocular Selectivity',[('Strength','OcularSelectivity')])
 
-pgt = new_plotgroup_template(name='PhaseDisparity Preference',command='measure_phasedisparity()',initial_plot=False)
+pgt = new_plotgroup_template(name='PhaseDisparity Preference',command='measure_phasedisparity()')
 pgt.add_plot('PhaseDisparity Preference',[('Hue','PhasedisparityPreference')])
 pgt.add_plot('PhaseDisparity Selectivity',[('Strength','PhasedisparitySelectivity')])
 pgt.add_static_image('Color Key','topo/commands/disp_key_white_vert_small.png')
 
 
-pgt = new_plotgroup_template(name='Orientation Tuning Fullfield',command='measure_or_tuning_fullfield()',initial_plot=False,plotcommand='tuning_curve(x_axis="orientation", plot_type=pylab.plot, x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',template_plot_type="curve")
+pgt = new_plotgroup_template(name='Orientation Tuning Fullfield',command='measure_or_tuning_fullfield()',plotcommand='tuning_curve(x_axis="orientation", plot_type=pylab.plot, x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',template_plot_type="curve")
 
-pgt = new_plotgroup_template(name='Contrast Response Fullfield',command='measure_contrast_response_fullfield();tuning_curve(x_axis="contrast", plot_type=pylab.semilogx,x_ticks=None,x_labels=None,x_lim=None, unit="%")',initial_plot=False,template_plot_type="curve",prerequisites=['OrientationPreference'])
+pgt = new_plotgroup_template(name='Contrast Response Fullfield',command='measure_contrast_response_fullfield();tuning_curve(x_axis="contrast", plot_type=pylab.semilogx,x_ticks=None,x_labels=None,x_lim=None, unit="%")',template_plot_type="curve",prerequisites=['OrientationPreference'])
 
-pgt = new_plotgroup_template(name='Orientation Tuning',command='measure_or_tuning(); tuning_curve(x_axis="orientation",plot_type=pylab.plot,x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',initial_plot=False,template_plot_type="curve",prerequisites=['XPreference'])
+pgt = new_plotgroup_template(name='Orientation Tuning',command='measure_or_tuning(); tuning_curve(x_axis="orientation",plot_type=pylab.plot,x_ticks=(0,pi/4,pi/2,3*pi/4,pi),x_labels=("0","$\pi/4$","$\pi/2$","$3\pi/4$","$\pi$"),x_lim=(0,pi), unit="radians")',template_plot_type="curve",prerequisites=['XPreference'])
 
-pgt = new_plotgroup_template(name='Contrast Response',command='measure_contrast_response(); tuning_curve(x_axis="contrast",plot_type=pylab.semilogx,x_ticks=None,x_labels=None,x_lim=None,unit="%")',initial_plot=False,template_plot_type="curve",prerequisites=['OrientationPreference','XPreference'])
+pgt = new_plotgroup_template(name='Contrast Response',command='measure_contrast_response(); tuning_curve(x_axis="contrast",plot_type=pylab.semilogx,x_ticks=None,x_labels=None,x_lim=None,unit="%")',template_plot_type="curve",prerequisites=['OrientationPreference','XPreference'])
 
-pgt = new_plotgroup_template(name='Size Tuning',command='measure_size_response(); tuning_curve(x_axis="size",plot_type=pylab.plot, x_ticks=None, x_labels=None,x_lim=None, unit="Diameter of stimulus")',initial_plot=False,template_plot_type="curve",prerequisites=['OrientationPreference','XPreference'])
+pgt = new_plotgroup_template(name='Size Tuning',command='measure_size_response(); tuning_curve(x_axis="size",plot_type=pylab.plot, x_ticks=None, x_labels=None,x_lim=None, unit="Diameter of stimulus")',template_plot_type="curve",prerequisites=['OrientationPreference','XPreference'])
 
