@@ -545,30 +545,27 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         if new_height < self.plotgroup.minimum_height_of_tallest_plot:
             self.reduce_button.config(state=DISABLED)
         else:
-            if self.looking_in_history == True:
-                self.plotgroup = self.plotgroups_history[self.history_index]
-                self.plotgroup.height_of_tallest_plot = new_height
-                self.plotgroup.scale_images()
-                self.display_plots()
-            else:
-                self.plotgroup.height_of_tallest_plot = new_height
-                self.plotgroup.update_plots(False)
-                self.display_plots()
+            self.change_plot_sizes(new_height)
 
-    
-    #CEBHACKALERT: I think there's some duplicate code in reduce() and enlarge()
+
     def enlarge(self):
         """Function called by Widget to increase the plot size"""
+        new_height = self.plotgroup.height_of_tallest_plot * self.zoom_factor
         self.reduce_button.config(state=NORMAL)
+        self.change_plot_sizes(new_height)
+
+        
+    def change_plot_sizes(self,new_height):
+        """Set the plots to have a new maximum height"""
         if self.looking_in_history == True:
             self.plotgroup = self.plotgroups_history[self.history_index]
-            self.plotgroup.height_of_tallest_plot *= self.zoom_factor
+            self.plotgroup.height_of_tallest_plot = new_height
             self.plotgroup.scale_images()
-            self.display_plots()
         else:
-            self.plotgroup.height_of_tallest_plot *= self.zoom_factor
+            self.plotgroup.height_of_tallest_plot = new_height
             self.plotgroup.update_plots(False)
-            self.display_plots()
+            
+        self.display_plots()
 
 
     # JLENHANCEMENT: It would be nice to be able to scroll back through many
