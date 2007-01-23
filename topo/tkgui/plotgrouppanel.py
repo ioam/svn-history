@@ -321,7 +321,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         ### edit options.
         self._canvas_menu = Menu(self, tearoff=0)
         self._canvas_menu.insert_command(0,label='',state=DISABLED) # title
-        self._canvas_menu.insert_command(1,label='print info',
+        self._canvas_menu.insert_command(1,label='Print info',
                                           command=self.__print_info)
 
 
@@ -336,9 +336,9 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         x,y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
         sf = event.widget.plot.scale_factor
         r,c=int(floor(y/sf)),int(floor(x/sf))
-        # CB: store the click's (r,c) & the sheet name; what has to be stored
-        # and how it's done will presumably change
-        self._canvas_click_info = (event.widget.plot.plot_src_name,r,c)
+        # Store information about the mouse click location,
+        # for use in code processing the click.
+        self._canvas_click_info = (event.widget.plot,r,c)
 
         # set menu title
         self._canvas_menu.entryconfig(0,state=DISABLED,label="Options for (" + `r` + "," + `c` + ")")
@@ -348,8 +348,8 @@ class PlotGroupPanel(BasicPlotGroupPanel):
    
     # CB: temporary, example menu command
     def __print_info(self):
-        s,r,c = self._canvas_click_info
-        print s + ": row "+ `r` + ", col " + `c`
+        plot,r,c = self._canvas_click_info
+        print plot.plot_src_name + " " + plot.name + ": row "+ `r` + ", col " + `c`
 
 
     def generate_plotgroup(self):
