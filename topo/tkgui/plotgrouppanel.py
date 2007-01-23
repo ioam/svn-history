@@ -1,7 +1,8 @@
 """
-Class PlotGroupPanel.
-Sub-classes BasicPlotGroupPanel and adds features to support displaying bitmap images 
-(enlarge, reduce, integer_scaling, sheet_coordinates and normalize) and storing plot history.
+Classes BasicPlotGroupPanel and PlotGroupPanel.
+
+These classes provide GUI windows for PlotGroups, allowing sets of
+related plots to be displayed.
 
 $Id$
 """
@@ -221,6 +222,10 @@ class PlotGroupPanel(BasicPlotGroupPanel):
     """
     Abstract PlotGroupPanel class for displaying bitmapped images to a TK
     GUI window.  Must be subclassed to be usable.
+
+    Sub-classes BasicPlotGroupPanel and adds features to support
+    displaying bitmap images (enlarge, reduce, integer_scaling,
+    sheet_coordinates and normalize) and storing plot history.
     """
 	
     def __init__(self,parent,console,plotgroup_key,**params):
@@ -243,31 +248,35 @@ class PlotGroupPanel(BasicPlotGroupPanel):
                                     command=self.reduce)
         self.reduce_button.pack(side=LEFT)
         self.balloon.bind(self.reduce_button,
-"""Reduce the displayed size of the current plots by about 20%.  A minimum size that
-preserves at least one pixel per unit is enforced, to ensure that
-no data is lost when displaying.""")
+            """
+            Reduce the displayed size of the current plots by about 20%.  A
+            minimum size that preserves at least one pixel per unit is enforced,
+            to ensure that no data is lost when displaying.
+            """)
 
         
         enlarge_button=Button(self.control_frame_1,text="Enlarge",
                               command=self.enlarge)
         enlarge_button.pack(side=LEFT)
         self.balloon.bind(enlarge_button,
-"""Increase the displayed size of the current plots by about 20%.""")
+            """Increase the displayed size of the current plots by about 20%.""")
 
         self.back_button = Button(self.control_frame_2,text="Back",
                                   state = DISABLED,command=self.back)
         self.back_button.pack(side=LEFT)
         self.balloon.bind(self.back_button,
-"""Move backward through the history of all the plots shown in this window.
-When showing a historical plot, some functions will be disabled, because the
-original data is no longer available.""")
+            """
+            Move backward through the history of all the plots shown in this
+            window.  When showing a historical plot, some functions will be
+            disabled, because the original data is no longer available.
+            """)
 
         self.forward_button = Button(self.control_frame_2,text="Forward",
                                      state = DISABLED,
                                      command=self.forward)
         self.forward_button.pack(side=LEFT)
         self.balloon.bind(self.forward_button,
-"Move forward through the history of all the plots shown in this window.")
+            "Move forward through the history of all the plots shown in this window.")
 
 	# Normalize check button
 	self.normalize = BooleanVar()
