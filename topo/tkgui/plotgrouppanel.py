@@ -147,7 +147,6 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
 # 					   hscrollmode = 'dynamic', vscrollmode = 'dynamic')
 # 	self.scrollbar.pack(side=TOP,expand=YES,fill=X)
 #       self.plot_frame = self.scrollbar.interior()
-
         
         self.control_frame = Frame(self)
         self.control_frame.pack(side=TOP,expand=YES,fill=X)
@@ -177,7 +176,8 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
         Change the window title.  TopoConsole will call this on
         startup of window.  
         """
-        self.parent.title(topo.sim.name+': '+"%s time:%s" % (self.plotgroup_key,self.plotgroup.time))
+        self.parent.title(topo.sim.name+': '+"%s time:%s" %
+                          (self.plotgroup_key,self.plotgroup.time))
           
     def display_plots(self):
 	"""Implemented in sub-classes."""
@@ -211,8 +211,8 @@ class BasicPlotGroupPanel(Frame,ParameterizedObject):
                 self.console.auto_refresh_panels.remove(self)
         Frame.destroy(self)
 
-    # YCHACKALERT: This is a hack to avoid number of argument mismatch
-    # when the Control-q hotkey binding is activated.
+    # The dummy argument makes the method signature match what is
+    # required by the Control-q hotkey
     def parent_destroy(self,dummy):
 	self.destroy()
 	self.parent.destroy()
@@ -302,7 +302,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         self.sheetcoords_checkbutton.pack(side=RIGHT)
         self.sheetcoords_checkbutton.var=False
             
-    	# Factor for reducing or enlarging the Plots (20% anytime)
+    	# Factor for reducing or enlarging the Plots (where 1.2 = 20% change)
 	self.zoom_factor = 1.2
         
 	self.plotgroup = self.generate_plotgroup()
@@ -317,13 +317,6 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         self.balloon.bind(self.integerscaling_checkbutton,
                           getdoc(self.plotgroup.params()['integerscaling']))
 
-        # CEBHACKALERT: the reduce and enlarge buttons scale the image; a hack in
-        # plotgroup.py stores the original scaling factor, and we keep track of
-        # this panel's scaling factor to get the true scaling factor! Maybe the
-        # true scaling factor is already available somewhere? If not, this should
-        # all be cleaned up.
-        self.this_panel_scale_factor = 1
-
         ### Right-click menu for canvases; subclasses should be able to add/
         ### edit options.
         self._canvas_menu = Menu(self, tearoff=0)
@@ -332,19 +325,20 @@ class PlotGroupPanel(BasicPlotGroupPanel):
                                           command=self.__print_info)
 
 
-    # Maybe a right click will go straight to some action, in which case
-    # there is no need for the menu stuff
     def __canvas_right_click(self,event):
         """
-        Calculate and store the row and column of the click in the canvas's plot,
-        and show a popup menu.
+        Method to be called when a user right-clicks inside a displayed Plot.
+        
+        Stub implementation for future expansion; just calculates and
+        stores the row and column of the click in the canvas's plot,
+        and shows a popup menu.
         """
         x,y = event.x-CANVASBUFFER,event.y-CANVASBUFFER
-        sf = float(event.widget.plot_scale_factor)*self.this_panel_scale_factor
+        sf = event.widget.plot.scale_factor
         r,c=int(floor(y/sf)),int(floor(x/sf))
         # CB: store the click's (r,c) & the sheet name; what has to be stored
         # and how it's done will presumably change
-        self._canvas_click_info = (event.widget.plot_src_name,r,c)        
+        self._canvas_click_info = (event.widget.plot.plot_src_name,r,c)
 
         # set menu title
         self._canvas_menu.entryconfig(0,state=DISABLED,label="Options for (" + `r` + "," + `c` + ")")
@@ -400,7 +394,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         things such as 2D grids.
         """
 	plots = self.plotgroup.plots
-	### JCALERT:Momentary: delete when sorting the bitmap history
+	### JCALERT: Temporary: delete when sorting the bitmap history
 	self.bitmaps = [p.bitmap for p in plots]
 	self.zoomed_images = [ImageTk.PhotoImage(p.bitmap.image) for p in plots]
         # If the number of canvases or their sizes has changed, then
@@ -450,19 +444,10 @@ class PlotGroupPanel(BasicPlotGroupPanel):
 
         ### bind right click to each canvas
         for plot,canvas in zip(plots,self.canvases):
-            # need to store the plot's scale_factor with the canvas for when
-            # the canvas is right clicked on and we want to calculate where
-            # in the matrix that click corresponds to
-            # CEBHACKALERT: in addition to needing the scale_factor,
-            # it seems likely that more information from the plot could be
-            # required in the future. As an example, I've added the sheet
-            # a plot is from (which is not enough info to do anything useful).
-            # Just copying the attributes is not the way to go!
-            # Maybe associate the canvas with a plot. Does the plot logically
-            # store everything that would be needed anyway? Is a plot
-            # associated with a sheetview or something like that?
-            canvas.plot_scale_factor=plot.original_scale_factor
-            canvas.plot_src_name=plot.plot_src_name
+            # Store the corresponding plot with each canvas so that the
+            # plot information (e.g. scale_factor) will be available
+            # for the right_click menu.
+            canvas.plot=plot
             canvas.bind('<Button-3>',self.__canvas_right_click)
 
 
@@ -500,7 +485,7 @@ class PlotGroupPanel(BasicPlotGroupPanel):
         self.display_plots()
 
 
-    ### Momentary have to be re-moved:  
+    ### Temporary; needs to be removed:  
     def update_back_fwd_button(self):	
 	if (self.history_index > 0):
             self.back_button.config(state=NORMAL)
@@ -570,10 +555,6 @@ class PlotGroupPanel(BasicPlotGroupPanel):
                 self.plotgroup.update_plots(False)
                 self.display_plots()
 
-        # CEBHACKALERT: see alert by initial use in __init__
-        self.this_panel_scale_factor /= self.zoom_factor
-    
-
     
     #CEBHACKALERT: I think there's some duplicate code in reduce() and enlarge()
     def enlarge(self):
@@ -588,9 +569,6 @@ class PlotGroupPanel(BasicPlotGroupPanel):
             self.plotgroup.height_of_tallest_plot *= self.zoom_factor
             self.plotgroup.update_plots(False)
             self.display_plots()
-
-        # CEBHACKALERT: see alert by initial use in __init__
-        self.this_panel_scale_factor *= self.zoom_factor
 
 
     # JLENHANCEMENT: It would be nice to be able to scroll back through many
