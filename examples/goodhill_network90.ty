@@ -1,22 +1,22 @@
-"""
-Implementation of 2D ocular dominance model from G.J. Goodhill & D.J. Willshaw (1990),
-"Application of the elastic net algorithm to the formation of ocular
-dominance stripes", Network: Computation in Neural Systems 1(1), p41-59.
+""" Implementation of 2D ocular dominance model from G.J. Goodhill &
+D.J. Willshaw (1990), "Application of the elastic net algorithm to the
+formation of ocular dominance stripes", Network: Computation in Neural
+Systems 1(1), p41-59.
 
-NOT YET TESTED.  (Still only a sketch!)
+NOT YET TESTED.  
 
 $Id$
 """
 _version__='$Revision$'
 
 
-import RandomArray
+from RandomArray import *
 
 from fixedpoint import FixedPoint
+from Numeric import *
 
 import topo.patterns.random
 import topo.patterns.basic
- 
 from topo.base.parameterclasses import Number
 from topo.base.boundingregion import BoundingBox
 from topo.base.cf import CFSheet,CFProjection,CFPOF_Plugin
@@ -27,69 +27,104 @@ from topo.learningfns.basic import Hebbian
 from topo.outputfns.basic import PiecewiseLinear
 from topo.responsefns.optimized import CFPRF_DotProduct_opt
 from topo.sheets.generatorsheet import GeneratorSheet
-from topo.outputfns.basic import DivisiveNormalizeL1
+from topo.base.cf import CFPLearningFn
 from topo.misc.numbergenerators import UniformRandom
 
 topo.sim.name = "goodhill_network90"
 
 
-class ElasticNet(LearningFn):
+class ElasticNet(CFPLearningFn):
     """
     Basic Elastic net learning function (work in progress..)
     """
     alpha = Number(default=0.2,bounds=(0,None),
-       doc="Scaling constant,contribution from neighbouring cities")
+                   doc="Scaling constant,contribution from neighbouring cities")
 
     beta  = Number(default=2.0,bounds=(0,None),
-       doc="Scaling constant,contribution from neighbouring points ont he ring")
+                   doc="Scaling constant,contribution from neighbouring points ont he ring")
                    
     initial_k = Number(default=0.2,bounds=(0,None),
-         doc="Initial k")
+                   doc="Initial k")
 
     rate_of_k = Number(default=0.1,bounds=(0,None),
-         doc="Rate of reduction of k by 10%")
+                   doc="Rate of reduction of k by 10%")
 
-    
-    
+    two_l = Number(default=0.2,bounds=(0,None),
+                   doc="Seperation between the two layers of cells")
+
+    two_d = Number(default=0.05,bounds=(0,None),
+                   doc="Seperation between the cells within a layer")
+
     def __init__(self,**params):
         super(ElasticNet,self).__init__(**params)
+        #The elastic net is composed by a 2-D layer and has 40x40 points. There are 3 values rows,cols,z.
+        #rows,cols is used for the topography where z is used for occularity.Occularity represened by z gets
+        #randomised. The paper does not say how much, but by the looks of the figures, is clear that it z(V1 cortical
+        #layer's occularity) can pass above the retinal layers.V1 is between the two layers,the distance between
+        #them is the two_l. 
+
+        gap=(self.two_l)/2
+        self.retinasize=2
+        self.cortexsize=4
+
+        self.Rretina= [[[0,0,gap] for i in range(self.retinasize)] for r in range(self.retinasize)]
+        self.Lretina=[[[0,0,-gap] for i in range(self.retinasize)] for r in range(self.retinasize)]
+        self.v1layer= [[[0,0,randint(-5,5)] for i in range(self.cortexsize)] for r in range(self.cortexsize)]
+
+       #The retinal cells have also a fixed seperation between them, two_d
+        for rows in range(self.retinasize):
+            for cols in range(self.retinasize):
+                        self.Rretina[rows][cols][0]= self.Rretina[rows][cols][0]+(self.two_d*rows)
+                        self.Lretina[rows][cols][0]= self.Lretina[rows-1][cols][0]+(self.two_d*rows)                    
+                        self.Rretina[rows][cols][1]= self.Rretina[rows][cols][1]+(self.two_d*cols)                    
+                        self.Lretina[rows][cols][1]= self.Lretina[rows][cols][1]+(self.two_d*cols) 
+       
+        #The cells in V1 are randomly distributed although a bit of bias(As in the paper)is introduced by
+        #making sure that the left hand end of the sheet is at the left,position 0.
+        #Ther rest get randomized according to the paper
+        for rows in range(self.cortexsize):
+            self.v1layer[rows][0]=[rows,0,randint(-10,10)]
+
+
         
-    
     def __call__(self,input_activity, unit_activity, weights, single_connection_learning_rate):
-
-	"""
-        Update the value of the given weights matrix...
         
-	"""
-     
+        for rows in range(self.cortexsize):
+            for cols in range(self.cortexsize):
+                for x to range(self.retinasize):
+                    for y to range(self.retinasize):
+                        phi=exp(-(abs(self.Rretina[rows][cols][0]-self.v1layer[rows][cols][0])))
 
-#################
+                    
+                self.Rretina[rows][cols]=alpha*citiesforce
+       
+        print "end."        
 
-# Weight seed
-RandomArray.seed(500,500)
+        
 
 
-# Following not needed; just to test...
-input_pattern=topo.patterns.basic.Gaussian(
-    x=DynamicNumber(UniformRandom(lbound=-0.8,ubound=0.8,seed=12)),
-    y=DynamicNumber(UniformRandom(lbound=-0.8,ubound=0.8,seed=34)),
-    orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)),
-    size = 2*0.3*1.5/7.0,
-    aspect_ratio = 7.0/1.5,
-    bounds = BoundingBox(radius=1.0))
 
 ###sheets,connections,parameters
 
 
-CFProjection.learning_fn=ElasticNet()
+##Dummy connection
+CFProjection.nominal_bounds_template=BoundingBox(radius=1.0) # fully connected network.
+
+
+#Dummy Input pattern
+gaussian_generator =topo.patterns.basic.Gaussian(scale=1.0, size=1.0, aspect_ratio=1.0,
+			x=0,
+			y=0,orientation=0)
+
+
 
 topo.sim['LeftRetina']=GeneratorSheet(nominal_density=20,
-                                  input_generator=input_pattern,
+                                  input_generator=gaussian_generator,
                                   period=1.0, phase=0.05,
                                   nominal_bounds=BoundingBox(radius=0.5))
 
 topo.sim['RightRetina']=GeneratorSheet(nominal_density=20,
-                                  input_generator=input_pattern,
+                                  input_generator=gaussian_generator,
                                   period=1.0, phase=0.05,
                                   nominal_bounds=BoundingBox(radius=0.5))
 
@@ -97,9 +132,8 @@ topo.sim['RightRetina']=GeneratorSheet(nominal_density=20,
 topo.sim['V1'] = CFSheet(nominal_density=40,nominal_bounds=BoundingBox(radius=0.5),
                          output_fn=PiecewiseLinear(lower_bound=0,upper_bound=1.0))
 
-topo.sim.connect('RightRetina','V1',name='RtoV1',delay=FixedPoint("0.05"),connection_type=CFProjection,nominal_bounds_template=BoundingBox(radius=1.0))
+##Dummy right retina although is need it for the calling of the elasticnet function and for visualization purpuses
+topo.sim.connect('RightRetina','V1',name='RV1',delay=0.05,connection_type=CFProjection,learning_fn=ElasticNet())
 
-topo.sim.connect('LeftRetina','V1',name='LtoV1',delay=FixedPoint("0.05"),connection_type=CFProjection,nominal_bounds_template=BoundingBox(radius=1.0))
-
-    
-    
+##Dummy left retina, not really need it except from visualization purpuses
+topo.sim.connect('LeftRetina','V1',name='LV1',delay=0.05,connection_type=CFProjection)
