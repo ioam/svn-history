@@ -35,7 +35,7 @@ def restore_input_generators():
 
 ### JABHACKALERT!  Should leave the state of all learning flags
 ### unchanged upon return; currently it's overwriting all of them.
-def pattern_present(inputs=None,duration=1.0,learning=False,overwrite_previous=False,apply_output_fn=True):
+def pattern_present(inputs={},duration=1.0,learning=False,overwrite_previous=False,apply_output_fn=True):
     """
     Present the specified test patterns for the specified duration.
 
