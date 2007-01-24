@@ -69,10 +69,7 @@ class HomeostaticMaxEnt_debug(OutputFn):
     """
 
     learning = BooleanParameter(True,doc="""
-    Setting this to False tells the Output_fn not to change its
-    state (e.g. The parameters controlling the shape of the function) based on
-    incoming events.
-    """)
+      If False, disables the dynamic adjustment of threshold levels.""")
     lstep = Number(default=8,doc="How often to print debugging information.")
     a_init = Number(default=13,doc="Multiplicative parameter controlling the exponential.")
     b_init = Number(default=-4,doc="Additive parameter controlling the exponential.")
