@@ -1,11 +1,11 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-all: python jpeg pil numeric pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils
+all: python jpeg pil numeric numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils
 
-clean: python-clean jpeg-clean pil-clean numeric-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean
+clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall
 
 ##############################################################
 # Python (interpreted language)
@@ -138,6 +138,23 @@ numeric-clean:
 	rm -rf ${NUMERIC} 
 numeric-uninstall:
 	rm -rf numeric $(foreach f, ${NUMERIC_UNINSTALL}, ${PREFIX}/${f})
+
+
+##############################################################
+# numpy (matrix library)
+#
+NUMPY = numpy-1.0.1
+NUMPY_UNINSTALL =  ${PYTHON_LIB}/site-packages/numpy
+
+numpy: ${NUMPY}.tar.gz python
+	tar xzf ${NUMPY}.tar.gz
+	cd ${NUMPY}; ${PREFIX}/bin/python setup.py install
+	touch numpy
+
+numpy-clean:
+	rm -rf ${NUMPY} 
+numpy-uninstall:
+	rm -rf numpy $(foreach f, ${NUMPY_UNINSTALL}, ${PREFIX}/${f})
 
 
 ##############################################################
