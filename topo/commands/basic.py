@@ -70,9 +70,6 @@ def pattern_present(inputs=None,duration=1.0,learning=False,overwrite_previous=F
     if not learning:
         for each in topo.sim.objects(Sheet).values():
              each.learning = False
-            
-            
-    if not learning:
         for each in topo.sim.objects(ProjectionSheet).values():
             each.output_fn.learning = False
                               
@@ -99,8 +96,6 @@ def pattern_present(inputs=None,duration=1.0,learning=False,overwrite_previous=F
     if not learning:
         for each in topo.sim.objects(Sheet).values():
             each.learning = True
-
-    if not learning:
         for each in topo.sim.objects(ProjectionSheet).values():
             each.output_fn.learning = True
                               
