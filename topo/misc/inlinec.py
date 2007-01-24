@@ -38,7 +38,7 @@ from copy import copy
 
 # If true, will attempt to import weave.  Set this to False if you want
 # to avoid weave altogether, e.g. if your installation is broken.
-import_weave = False
+import_weave = True
 
 # Variable that will be used to report whether weave was successfully
 # imported (below).
