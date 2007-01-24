@@ -13,7 +13,7 @@ from topo.base.parameterclasses import Parameter
 from topo.base.cf import CFPLearningFn,CFPLF_Plugin
 from topo.base.functionfamilies import Hebbian
 
-from topo.misc.inlinec import inline, optimized
+from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 
 
 
@@ -102,6 +102,5 @@ class CFPLF_Hebbian(CFPLF_Plugin):
     def __init__(self,**params):
         super(CFPLF_Hebbian,self).__init__(single_cf_fn=Hebbian(),**params)
 
-if not optimized:
-    CFPLF_Hebbian_opt = CFPLF_Hebbian
-    ParameterizedObject().message('Inline-optimized components not available; using CFPLF_Hebbian instead of CFPLF_Hebbian_opt.')
+
+provide_unoptimized_equivalent("CFPLF_Hebbian_opt","CFPLF_Hebbian",locals())

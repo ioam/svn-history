@@ -38,7 +38,7 @@ from copy import copy
 
 # If true, will attempt to import weave.  Set this to False if you want
 # to avoid weave altogether, e.g. if your installation is broken.
-import_weave = True
+import_weave = False
 
 # Variable that will be used to report whether weave was successfully
 # imported (below).
@@ -75,6 +75,32 @@ except ImportError:
 # Flag available for all to use to test whether to use the inline
 # versions or not.
 optimized = weave_imported
+
+def provide_unoptimized_equivalent(optimized_name, unoptimized_name, local_dict):
+    """
+    If not using optimization, replace the optimized component with its unoptimized equivalent.
+    
+    The objects named by optimized_name and unoptimized_name should be
+    plug-compatible.  The local_dict argument should be given the
+    contents of locals(), so that this function can replace the
+    optimized version with the unoptimized one in the namespace from
+    which it has been called.
+
+    As an example, calling this function as::
+    
+      provide_unoptimized_equivalent("sort_opt","sort",locals())
+
+    is equivalent to putting the following code directly into the
+    calling location::
+    
+      if not optimized:
+        sort_opt = sort
+        print 'module: Inline-optimized components not available; using sort instead of sort_opt.'
+    """
+    if not optimized:
+        local_dict[optimized_name] = local_dict[unoptimized_name]
+        print '%s: Inline-optimized components not available; using %s instead of %s.' \
+              % (local_dict['__name__'], optimized_name, unoptimized_name)
 
 
 # Simple test

@@ -11,7 +11,7 @@ __version__='$Revision$'
 from topo.base.functionfamilies import ResponseFnParameter,DotProduct,ResponseFn
 from topo.base.cf import CFPResponseFn, CFPRF_Plugin
 from topo.base.parameterizedobject import ParameterizedObject
-from topo.misc.inlinec import inline, optimized
+from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 
 from topo.responsefns.projfns import CFPRF_EuclideanDistance
 from topo.projections.basic import CFPRF_SharedWeight
@@ -85,10 +85,7 @@ class CFPRF_DotProduct(CFPRF_Plugin):
     def __init__(self,**params):
         super(CFPRF_DotProduct,self).__init__(single_cf_fn=DotProduct(),**params)
 
-if not optimized:
-    CFPRF_DotProduct_opt = CFPRF_DotProduct
-    ParameterizedObject().message('Inline-optimized components not available; using CFPRF_DotProduct instead of CFPRF_DotProduct_opt.')
-
+provide_unoptimized_equivalent("CFPRF_DotProduct_opt","CFPRF_DotProduct",locals())
 
 
 class CFPRF_EuclideanDistance_opt(CFPResponseFn):
@@ -166,11 +163,7 @@ class CFPRF_EuclideanDistance_opt(CFPResponseFn):
 	
     
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows'], local_dict=locals())
-
-if not optimized:
-    CFPRF_EuclideanDistance_opt = CFPRF_EuclideanDistance
-    ParameterizedObject().message('Inline-optimized components not available; using CFPRF_EuclideanDistance instead of CFPRF_EuclideanDistance_opt.')
-
+provide_unoptimized_equivalent("CFPRF_EuclideanDistance_opt","CFPRF_EuclideanDistance",locals())
 
 
 class DotProduct_opt(ResponseFn):
@@ -198,11 +191,7 @@ class DotProduct_opt(ResponseFn):
         inline(code, ['m1', 'm2', 'cols','rows','tot'], local_dict=locals())
         return tot
 
-
-if not optimized:
-    DotProduct_opt = DotProduct
-    ParameterizedObject().message('Inline-optimized components not available; using DotProduct instead of DotProduct_opt.')
-
+provide_unoptimized_equivalent("DotProduct_opt","DotProduct",locals())
 
 
 # See the hackalert in projections/basic.py; this wouldn't be
@@ -264,8 +253,4 @@ class CFPRF_SharedWeightDotProduct_opt(CFPResponseFn):
     
         inline(code, ['X', 'strength', 'len', 'temp_act','cfs','cols','rows','sw'], local_dict=locals())
 
-
-if not optimized:
-    CFPRF_SharedWeightDotProduct_opt = CFPRF_SharedWeight
-    ParameterizedObject().message('Inline-optimized components not available; using CFPRF_SharedWeight instead of CFPRF_SharedWeightDotProduct_opt.')
-
+provide_unoptimized_equivalent("CFPRF_SharedWeightDotProduct_opt","CFPRF_SharedWeight",locals())

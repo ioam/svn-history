@@ -10,7 +10,7 @@ from topo.base.functionfamilies import OutputFn, OutputFnParameter, IdentityOF
 from topo.base.parameterclasses import Number
 from topo.base.parameterizedobject import ParameterizedObject
 
-from topo.misc.inlinec import inline, optimized
+from topo.misc.inlinec import inline, provide_unoptimized_equivalent
 
 from basic import DivisiveNormalizeL1
 
@@ -112,6 +112,4 @@ class CFPOF_DivisiveNormalizeL1(CFPOutputFn):
                         del cf.norm_total
 
 
-if not optimized:
-    CFPOF_DivisiveNormalizeL1_opt = CFPOF_DivisiveNormalizeL1
-    ParameterizedObject().message('Inline-optimized components not available; using CFPOF_DivisiveNormalizeL1 instead of CFPOF_DivisiveNormalizeL1_opt.')
+provide_unoptimized_equivalent("CFPOF_DivisiveNormalizeL1_opt","CFPOF_DivisiveNormalizeL1",locals())
