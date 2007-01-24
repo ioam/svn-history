@@ -30,10 +30,7 @@ class HomeostaticMaxEnt(OutputFn):
     """
 
     learning = BooleanParameter(True,doc="""
-    Setting this to False tells the Output_fn not to change its
-    state (e.g. The parameters controlling the shape of the function) based on
-    incoming events.
-    """)
+      If False, disables the dynamic adjustment of threshold levels.""")
     a_init = Number(default=13,doc="Multiplicative parameter controlling the exponential.")
     b_init = Number(default=-4,doc="Additive parameter controlling the exponential.")
     eta = Number(default=0.0002,doc="Learning rate for homeostatic plasticity.")
