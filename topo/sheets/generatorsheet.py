@@ -114,4 +114,7 @@ class GeneratorSheet(Sheet):
         ### bit of memory each time?  This way allocates a new block
         ### of memory each time a pattern is drawn...
         self.activity = self.input_generator()
+        assert self.shape==self.activity.shape, \
+               "Generated pattern shape %s does not match sheet shape %s." % \
+               (self.shape,self.activity.shape)
         self.send_output(src_port='Activity',data=self.activity)
