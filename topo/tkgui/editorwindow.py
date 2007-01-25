@@ -6,7 +6,7 @@ $Id$
 """
 __version__='$Revision$'
 
-from Tkinter import Canvas, Frame, Checkbutton, Button, Toplevel, Tk, Menu, Scrollbar, SUNKEN, YES, BOTH, LEFT, END, RIGHT, TOP, BOTTOM, X, Y
+from Tkinter import Canvas, Frame, Checkbutton, Button, Toplevel, Menu, Scrollbar, SUNKEN, YES, BOTH, LEFT, END, RIGHT, TOP, BOTTOM, X, Y
 from tkFileDialog import asksaveasfilename
 from random import Random, random
 
@@ -510,7 +510,7 @@ class ModelEditor:
     def __init__(self):
         
         # create editor window and set title
-        root = Tk()
+        root = Toplevel()
         root.title("Model Editor")
         # create a GUICanvas and place it in a frame
         canvas_frame = Frame(root, bg = 'white')
