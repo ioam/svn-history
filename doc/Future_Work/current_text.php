@@ -125,10 +125,34 @@ and well designed so that it can be flexible.
 </li>
 
 <li>
-2006/11/23: ParametersFrame doesn't properly set object properties when 
-right click is used (there's a more detailed explanation in parametersframe.py: see
-comments by uses of 'translator_dictionary').
+2007/01/25 (CB): Set order and names of ParametersFrame's Ok, Apply, Cancel,
+Reset, and Defaults buttons, and make them behave as expected for classes and instances.
+Figure out and clean up translator_dictionary & its uses.
 </li>
+
+<!--
+<li>
+2007/01/25 (CB): Investigate using Tile (which has become part of Tkinter now anyway).
+Tile looks good on linux and windows (haven't tried mac but screenshots look good). But,
+Tile does not have all the widgets we need yet. Tile uses themes so we can 
+set it to classic and use Tile + Tkinter widgets and still have a uniform look. This gives us
+nothing to begin with, but Tile should eventually have all the widgets of Tkinter, at
+which point we can simply set the theme to get a Topographica which looks 'right' on windows and
+mac.
+Well, that is almost true. Pmw (which is not compatible with Tile because of Tile's theme-based
+approach) provides some things we really need. The first of these is balloon help. In fact, that
+is ok to mix with other widgets because Tile doesn't provide an equivalent and the popup help
+doesn't need to match the 'theme' so much. The second is the menubar, which could be replicated 
+in Tkinter easily - except that it doesn't seem to be possible to bind popup help to individual 
+menu items...a really useful feature.
+[Add note about the others: messagebar, combobox, radiobutton, etc.]
+</li>
+
+<li>
+2007/01/25 (CB): Gnosis Utils has xml pickling. Add this as an optional format.
+The xml is still complex, but better than looking at a pickle.
+</li>
+-->
 
 <li>
 2006/12/21: Could add an example of processing auditory data by
@@ -205,10 +229,6 @@ example networks' results haven't changed [testlissom_oo_or.py], that performanc
 
 <li>
 2006/05/15: Objects in the simulation are indexed by name, so name needs to be a constant Parameter (which <i>might</i> cause some other problems).  There are some related hacks in ParametersFrame that would also need to be cleaned up.
-</li>
-
-<li> 
-2006/05/04: Tidy model editor's handling of sheet and projection class parameters (why does the parametersframe have to be in a separate window for the widgets to work properly)?
 </li>
 
 <li> 
