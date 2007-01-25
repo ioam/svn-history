@@ -84,9 +84,11 @@ class PatternPresenter(ParameterizedObject):
            self.gen.__setattr__(feature,value)
 
         gen_list=topo.sim.objects(GeneratorSheet)
-        input_pattern=gen_list.keys()
-
-        inputs = dict().fromkeys(topo.sim.objects(GeneratorSheet),self.gen)
+        input_sheet_names=gen_list.keys()
+        # Copy the given generator once for every GeneratorSheet
+        inputs = dict().fromkeys(gen_list)
+        for k in inputs.keys():
+            inputs[k]=deepcopy(self.gen)
 
         ### JABALERT: Should replace these special cases with general
         ### support for having meta-parameters controlling the
@@ -101,72 +103,68 @@ class PatternPresenter(ParameterizedObject):
         ### should be able to provide general support for manipulating
         ### both pattern parameters and parameters controlling
         ### interaction between or differences between patterns.
-        gen_copy1=deepcopy(self.gen)
-        gen_copy2=deepcopy(self.gen)
 
         if features_values.has_key("phasedisparity"):
-            if len(input_pattern)!=2:
+            if len(input_sheet_names)!=2:
                 self.warning('Disparity is defined only when there are exactly two patterns')
             else:
-                temp_phase1=gen_copy1.phase - gen_copy1.phasedisparity/2.0
-                temp_phase2=gen_copy2.phase + gen_copy2.phasedisparity/2.0
-                gen_copy1.phase=wrap(0,2*pi,temp_phase1)
-                gen_copy2.phase=wrap(0,2*pi,temp_phase2)
-    
-                inputs={}
-                inputs[input_pattern[0]]=gen_copy1
-                inputs[input_pattern[1]]=gen_copy2
+                temp_phase1=inputs[input_sheet_names[0]].phase - inputs[input_sheet_names[0]].phasedisparity/2.0
+                temp_phase2=inputs[input_sheet_names[1]].phase + inputs[input_sheet_names[1]].phasedisparity/2.0
+                inputs[input_sheet_names[0]].phase=wrap(0,2*pi,temp_phase1)
+                inputs[input_sheet_names[1]].phase=wrap(0,2*pi,temp_phase2)
 
         ## Not yet used; example only
         #if features_values.has_key("xdisparity"):
-        #    if len(input_pattern)!=2:
+        #    if len(input_sheet_names)!=2:
         #        self.warning('Disparity is defined only when there are exactly two patterns')
         #    else:
-        #        gen_copy1.x=gen_copy1.x - gen_copy1.xdisparity/2.0
-        #        gen_copy2.x=gen_copy2.x + gen_copy2.xdisparity/2.0
+        #        inputs[input_sheet_names[0]].x=inputs[input_sheet_names[0]].x - inputs[input_sheet_names[0]].xdisparity/2.0
+        #        inputs[input_sheet_names[1]].x=inputs[input_sheet_names[1]].x + inputs[input_sheet_names[1]].xdisparity/2.0
         #
         #        inputs={}
-        #        inputs[input_pattern[0]]=gen_copy1
-        #        inputs[input_pattern[1]]=gen_copy2
+        #        inputs[input_sheet_names[0]]=inputs[input_sheet_names[0]]
+        #        inputs[input_sheet_names[1]]=inputs[input_sheet_names[1]]
         #
         #if features_values.has_key("ydisparity"):
-        #    if len(input_pattern)!=2:
+        #    if len(input_sheet_names)!=2:
         #        self.warning('Disparity is defined only when there are exactly two patterns')
         #    else:
-        #        gen_copy1.y=gen_copy1.y - gen_copy1.ydisparity/2.0
-        #        gen_copy2.y=gen_copy2.y + gen_copy2.ydisparity/2.0
+        #        inputs[input_sheet_names[0]].y=inputs[input_sheet_names[0]].y - inputs[input_sheet_names[0]].ydisparity/2.0
+        #        inputs[input_sheet_names[1]].y=inputs[input_sheet_names[1]].y + inputs[input_sheet_names[1]].ydisparity/2.0
         #
         #        inputs={}
-        #        inputs[input_pattern[0]]=gen_copy1
-        #        inputs[input_pattern[1]]=gen_copy2
+        #        inputs[input_sheet_names[0]]=inputs[input_sheet_names[0]]
+        #        inputs[input_sheet_names[1]]=inputs[input_sheet_names[1]]
 
         if features_values.has_key("ocular"):
-            if len(input_pattern)!=2:
+            if len(input_sheet_names)!=2:
                 self.warning('Ocularity is defined only when there are exactly two patterns')
             else:
-                gen_copy1.scale=2*gen_copy1.ocular
-                gen_copy2.scale=2.0-2*gen_copy2.ocular
-                
-                inputs[input_pattern[0]]=gen_copy1
-                inputs[input_pattern[1]]=gen_copy2
+                inputs[input_sheet_names[0]].scale=2*inputs[input_sheet_names[0]].ocular
+                inputs[input_sheet_names[1]].scale=2.0-2*inputs[input_sheet_names[1]].ocular
 
 
         if features_values.has_key("contrast") or param_dict.has_key("contrast"):
             if self.contrast_parameter=='michelson_contrast':
-                self.gen.offset=0.5   
-                self.gen.scale=2*self.gen.offset*self.gen.contrast/100
+                for g in inputs.itervalues():
+                    g.offset=0.5
+                    g.scale=2*g.offset*g.contrast/100
             
 	
             elif self.contrast_parameter=='weber_contrast':
-                # Weber_contrast is currently only well defined for the special case where 
-                #the background offset is equal to the target offset in the pattern type SineGratingDisk')
-                self.gen.offset=0.5   #In this case this is the offset of both the background and the sine grating
-                self.gen.scale=2*self.gen.offset*self.gen.contrast/100
+                # Weber_contrast is currently only well defined for
+                # the special case where the background offset is equal
+                # to the target offset in the pattern type
+                # SineGratingDisk
+                for g in inputs.itervalues():
+                    g.offset=0.5   #In this case this is the offset of both the background and the sine grating
+                    g.scale=2*g.offset*g.contrast/100
             
                 
             elif self.contrast_parameter=='scale':
-                self.gen.offset=0.0
-                self.gen.scale=self.gen.contrast
+                for g in inputs.itervalues():
+                    g.offset=0.0
+                    g.scale=g.contrast
             
             
         pattern_present(inputs, self.duration, learning=False,
