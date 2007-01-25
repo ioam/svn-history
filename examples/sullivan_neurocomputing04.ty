@@ -16,7 +16,7 @@ _version__='$Revision$'
 
 
 import RandomArray
-from math import exp, sqrt, fmod
+from math import exp, sqrt, fmod, pi, radians,sin,cos
 
 import topo.patterns.random
 import topo.patterns.basic
@@ -33,7 +33,23 @@ from topo.misc.numbergenerators import UniformRandom
 from topo.outputfns.basic import DivisiveNormalizeL1, KernelMax
 from topo.base.functionfamilies import CoordinateMapperFn
 from topo.misc.patternfns import line
+
+
+from math import pi, sin, cos
+from Numeric import around,bitwise_and,sin,add,Float,bitwise_or
+
+from topo.base.parameterclasses import Number, Parameter, Enumeration
+from topo.base.parameterclasses import Wrapper, DynamicNumber, ListParameter
+from topo.base.functionfamilies import OutputFnParameter
 from topo.base.patterngenerator import PatternGenerator
+
+# Imported here so that all PatternGenerators will be in the same package
+from topo.base.patterngenerator import Constant
+
+from topo.misc.patternfns import gaussian,gabor,line,disk,ring
+from topo.misc.utils import wrap
+from topo.misc.numbergenerators import UniformRandom
+
 topo.sim.name = "sullivan_neurocomputing04"
 
 class XModulo(CoordinateMapperFn):
@@ -54,57 +70,103 @@ class YModulo(CoordinateMapperFn):
 	#offset to align with center of box, not corner
         return y-ymod+0.08125
 
-class SweepLine(PatternGenerator):
-    """Generates random 2D lines which then incrementally move until off the
-    edge of the sheet"""
+class OrientedX(ParameterizedObject):
+      """Increments the x position 
+      """
+      base         = Number(default=0.0,doc="Passed in position.")
+      direction	   = Number(default=0.0,doc="Direction line is heading.")
+      step_number  = Number(default=0.0,doc="Current Step.")
+      orientation  = Number(default=0.0,doc="Orientation of line.")
+      angle	   = Number(default=0.0,doc="")
+      def __call__(self,**params):
+	  base=params.get('base',self.base)
+	  orientation=params.get('orientation',self.orientation)
+	  if not hasattr(self,'curr_pos'):
+	     self.curr_pos=base
+	     self.step_number=0
+	     self.direction=1
+	     self.angle=orientation
+	  if (fmod(topo.sim.time(),15)<1): #time starts from 0.05
+	       self.curr_pos=base
+	       self.step_number=0
+	       self.angle=orientation   
 
-    thickness = Number(default=0.006,bounds=(0.0,None),softbounds=(0.0,1.0),
+	  print "orientation is", self.angle
+	  #0.03 as grid is 40 cells wide and line advances 1.2 cells per step
+   	  self.curr_pos+=(self.direction*0.03*self.step_number)*cos(radians(self.angle)-pi/2)
+	  self.step_number+=1
+          return self.curr_pos
+
+class OrientedY(ParameterizedObject):
+      """Increments the y position 
+      """
+      base         = Number(default=0.0,doc="Passed in position.")
+      direction	   = Number(default=0.0,doc="Direction line is heading.")
+      step_number  = Number(default=0.0,doc="Current Step.")
+      orientation  = Number(default=0.0,doc="Orientation of line.")
+      angle	   = Number(default=0.0,doc="")
+      def __call__(self,**params):
+	  base=params.get('base',self.base)
+	  orientation=params.get('orientation',self.orientation)
+	  if not hasattr(self,'curr_pos'):
+	     self.curr_pos=base
+	     self.step_number=0
+	     self.direction=1
+	     self.angle=orientation
+	  if (fmod(topo.sim.time(),15)<1): #time starts from 0.05
+	       self.curr_pos=base
+	       self.step_number=0
+	       self.angle=orientation   
+
+	  print "orientation is", self.angle
+	  #0.03 as grid is 40 cells wide and line advances 1.2 cells per step
+   	  self.curr_pos+=(self.direction*0.03*self.step_number)*sin(radians(self.angle)-pi/2)
+	  self.step_number+=1
+          return self.curr_pos
+
+class OrientedLine(PatternGenerator):
+    """2D line pattern generator."""
+
+    thickness   = Number(default=0.006,bounds=(0.0,None),softbounds=(0.0,1.0),
                          precedence=0.60,
                          doc="Thickness (width) of the solid central part of the line.")
     smoothing = Number(default=0.05,bounds=(0.0,None),softbounds=(0.0,0.5),
                        precedence=0.61,
                        doc="Width of the Gaussian fall-off.")
-    x = Number(default=0.0)
-    y = Number(default=0.0)
-    ###RPHACKALERT need fixed to move x and y correct amounts
-    xoffset=Number(0.1)                       
-    yoffset=Number(0.1)
-    offedge=1 
+
     def function(self,**params):
-	###Only take new random numbers when previous line is off sheet
-	if self.offedge==1:
-	     x=params.get('x',self.x)
-	     y=params.get('y',self.y)
-	     self.offedge=0
-	###else, increment x and y values appropriate amount. Needs fixed for angle.
-	else:
-	   x=self.x
-	   x+=self.xoffset
-	   y=self.y
-	   y+=self.yoffset
-        if((x<-0.5)|(x>0.5)|(y<-0.5)|(y>0.5)):
-		self.offedge=1
-		print "offedge"
-	else:
-		self.x=x	
-		self.y=y
-	print "x is",x
-	print "y is",y
+
+	if (fmod(topo.sim.time(),15)<1):
+		x=params.get('x',self.x)
+		y=params.get('y',self.y)
+		orientation=params.get('orientation',self.orientation)
+		#RPHACKALERT check values from this are correct
+		x=1-sin(radians(180*x))
+	   	y=1-cos(radians(180*y))
+		print "x is ",x
+	#RPHACKALERT Move incrementing code here
         return line(self.pattern_y, 
                     params.get('thickness',self.thickness),
                     params.get('smoothing',self.smoothing))
+
+
 
 # Weight seed
 RandomArray.seed(500,500)
 GeneratorSheet.period = 1.0
 GeneratorSheet.phase = 0
 
-##RPHACKALERT Needs altered to fix movement of line as in paper
-input_pattern = SweepLine(
-	            x=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),
-		    y=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=22)),
-		    thickness=0.02)
+line_x=OrientedX(base=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=12)),orientation=DynamicNumber(UniformRandom(lbound=0,ubound=360,seed=22)))
+line_y=OrientedY(base=DynamicNumber(UniformRandom(lbound=-0.5,ubound=0.5,seed=22)),orientation=DynamicNumber(UniformRandom(lbound=0,ubound=360,seed=22)))
 
+##RPHACKALERT Change to using line_x and line_y
+#input_pattern = OrientedLine(
+input_pattern = topo.patterns.basic.Line(
+	            x=DynamicNumber(line_x),
+		    y=DynamicNumber(line_y),
+		    #orientation=orientation
+		    orientation=70
+		    )
 
 # Sheets, connections, and their parameters
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
