@@ -261,6 +261,8 @@ class ConnectionTool(Frame):
 class ParametersTool(Frame):
 
     def __init__(self, parent = None):
+
+        # CEBHACKALERT: need to tidy up the title, positioning, etc.
         Frame.__init__(self, parent)
         self.focus = None
         # label
@@ -269,26 +271,15 @@ class ParametersTool(Frame):
         self.doc_label = Label(self, font = ("Times", 12))
         self.doc_label.pack(side = TOP)
 
-        parameter_window = Toplevel()
-
-        # CEBHACKALERT: Should make this PF be a Frame in the model editor.
-        # At the moment we just hide/unhide the window and don't let it be destroyed
-        # Hide this window; we unhide it if it's to be used.
-        parameter_window.withdraw()
-
-        parameter_window.title('New object parameters')
-        #Label(parameter_window, text = "Edit class p").pack(side = TOP)
-        #CEBHACKALERT: 'Reset' shouldn't be removed, but currently it's not implemented
-        self.parameter_frame = ParametersFrame(parameter_window,buttons_to_remove=['Apply','Reset','Ok','Cancel'])  #CB: parent, not self
         
-        self.parameter_window=parameter_window
-        parameter_window.protocol("WM_DELETE_WINDOW",self.__hidenotdestroy)
-        
-        #self.parameter_frame.pack()
+        # CEBHACKALERT: (Going to add apply and reset)
+        self.parameter_frame = ParametersFrame(self,buttons_to_remove=['Apply','Reset','Ok','Cancel'])        
+        self.parameter_frame.pack(side=BOTTOM)
 
 
     def update_parameters(self):
         self.parameter_frame.set_parameters()
+
 
     def set_focus(self, name, focus_class, doc = ''):
         
@@ -298,11 +289,7 @@ class ParametersTool(Frame):
         self.doc_label.config(text = doc)
 
         if focus_class:
-            self.parameter_window.deiconify()
             self.parameter_frame.create_widgets(focus_class)
-            #CB: self.parameter_frame.pack(side=BOTTOM etc)
-
-    def __hidenotdestroy(self):
-        self.parameter_window.withdraw()
+            
         
             
