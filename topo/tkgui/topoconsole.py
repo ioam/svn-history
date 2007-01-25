@@ -526,7 +526,7 @@ class TopoConsole(Frame):
         Used primarily for debugging long scripts that present a lot of activity patterns.
         """
         for win in self.auto_refresh_panels:
-            if win.plotgroup_key=='Activity':
+            if win.plotgroup_key=='Activity' or win.plotgroup_key=='ProjectionActivity' :
                 win.refresh()
                 self.update_idletasks()
 
