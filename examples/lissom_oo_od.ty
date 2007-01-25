@@ -108,7 +108,7 @@ topo.sim['LGNOffRight']=CFSheet(nominal_density=24.0,
                            output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
                            measure_maps=False)
 
-topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',48.0),
+topo.sim['V1'] = LISSOM(nominal_density=locals().get('default_density',8.0),
                         nominal_bounds=BoundingBox(radius=0.5))
 
 topo.sim['V1'].output_fn.lower_bound=0.083

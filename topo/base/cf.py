@@ -786,7 +786,7 @@ The true bounds will differ depending on the density (see initialize_bounds())."
         """
         # Learning is performed if the input_buffer has already been set,
         # i.e. there is an input to the Projection.
-        if self.input_buffer:
+        if self.input_buffer != None:
             self.learning_fn(self.cfs,self.input_buffer,self.dest.activity,self.learning_rate)
 
 

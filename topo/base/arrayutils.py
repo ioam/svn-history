@@ -30,16 +30,19 @@ from Numeric import sqrt, ones, dot, sum, arctan2, array2string, logical_not, bi
 #17	 * Convert xx.savespace(?) to pass + ## xx.savespace(?)	
 
 
-
-
-
-# One might think we could use float('inf') or array([float('inf')]) here,
-# but as of Python 2.4 only some platforms will support float('inf').
+# Ideally, we would like to use the floating-point value 'inf' to
+# represent a very large number.  One might think we could use
+# float('inf') or array([float('inf')]), but as of Python 2.4 only
+# some platforms will support float('inf').  In particular, Python 2.4
+# for Windows generates a cast error even though the operation works
+# under Linux (see http://www.python.org/peps/pep-0754.html)
 # 
-# In particular, Python 2.4 for Windows generates a cast error even though
-# the operation works under Linux.
-# (see http://www.python.org/peps/pep-0754.html)
+# Using inf = (ones(1)/0.0)[0] used to work under Numeric, but makes
+# Numpy fail.  Instead we use an arbitrary value near the limit of the
+# floating point range.
+#inf=2e+200
 inf = (ones(1)/0.0)[0]
+
 
 def L2norm(v):
     """
