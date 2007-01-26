@@ -7,7 +7,7 @@ this version are likely to need modification when subsequent versions
 are released.
 
 The Topographica software code and documentation are copyright
-2005-2006 James A. Bednar, Christopher Ball, Christopher Palmer,
+2005-2007 James A. Bednar, Christopher Ball, Christopher Palmer,
 Yoonsuck Choe, Julien Ciroux, Judah B. De Paula, Judith Law, Alan
 Lindsay, Louise Mathews, Jefferson Provost, Veldri Kurniawan, Tikesh
 Ramtohul, Lewis Ng, Ruaidhri Primrose, Foivos Demertzis, Roger Zhao,
