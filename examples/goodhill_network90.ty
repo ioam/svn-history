@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-""" Implementation of 2D ocular dominance model from G.J. Goodhill &
+"""
+Implementation of 2D ocular dominance model from G.J. Goodhill &
 D.J. Willshaw (1990), "Application of the elastic net algorithm to the
 formation of ocular dominance stripes", Network: Computation in Neural
 Systems 1(1), p41-59.
@@ -19,14 +19,13 @@ import topo.patterns.random
 import topo.patterns.basic
 
 from topo.base.boundingregion import BoundingBox
-from topo.base.parameterclasses import DynamicNumber
-from topo.base.parameterclasses import Number
+from topo.base.parameterclasses import DynamicNumber,Number,Integer
 from topo.base.sheet import Sheet
 from topo.sheets.generatorsheet import GeneratorSheet
 
 topo.sim.name = "goodhill_network90"
 
-class point:
+class point(object):
     "An object used to store x,y,z of retinas and V1"
     x=0.0
     y=0.0
@@ -55,11 +54,11 @@ class ElasticNet(Sheet):
     two_d = Number(default=0.05,bounds=(0,None),
                    doc="Separation between the cells within a layer")
 
-    retinasize=Number(default=5,bounds=(0,None),
+    retinasize=Integer(default=5,bounds=(0,None),
                    doc="Retina size")# 20  # Ideally, would get this info from the retina objects
 
-    cortexsize=Number(default=10,bounds=(0,None),
-                   doc="Cortex size")# 40  # Ideally, would get this info from the retina objects
+    cortexsize=Integer(default=10,bounds=(0,None),
+                   doc="Cortex size")# 40  # Ideally, would calculate this info from our bounding box and density
 
 
     def __init__(self,**params):
@@ -77,22 +76,23 @@ class ElasticNet(Sheet):
         RS=self.retinasize
         CS=self.cortexsize
 
-        #Initialize position of retinal and cortical units in 3D space
-        #The retinas are combined in one layer since they have same values and also is used
-        #for convinience in the calculations afterwards, the only difference in the
-        #retinas is the z left has 0 and the right one has two_l. This is done to replicate the
-        #paper's way. It could be done differently as well.
+        # Initialize position of retinal and cortical units in 3D space.
+        # The retinas are combined in one layer since they have same
+        # values and also is used for convinience in the calculations
+        # afterwards, the only difference in the retinas is the z left
+        # has 0 and the right one has two_l. This is done to replicate
+        # the paper's approach. It could be done differently as well.
         
         self.cell  = [[point() for i in range(2*RS)] for r in range(2*RS)]
         self.net  = [[point() for i in range(CS)] for r in range(CS)]
 
-        #convinience matrixes for the calculations
+        # Convenience matrixes for the calculations:
         self.cforce         = [[0.0 for i in range(CS)] for r in range(CS)] ##cell force  matrix
         self.ftot            = [[point() for i in range(CS)] for r in range(CS)] ##total force  matrix
         self.netterm  = [[point() for i in range(CS)] for r in range(CS)] ##netterm  matrix
 
     
-        #The RIGHT retinal cells have a fixed separation between the layers, two_d
+        # The right retinal cells have a fixed separation between the layers, two_d
         
         for i in range(RS):
             for j in range(RS):
@@ -100,7 +100,7 @@ class ElasticNet(Sheet):
                 self.cell[i][j].y=j/(RS-1)
                 self.cell[i][j].z=GAP
 
-        #The LEFT retinal cells have also a fixed separation between them, two_d
+        # The left retinal cells have also a fixed separation between them, two_d
         for i in range(RS):
             for j in range(RS):
                 self.cell[i+RS][j+RS].x=i/(RS-1)
@@ -109,10 +109,11 @@ class ElasticNet(Sheet):
        
                       
        
-        # The cells in V1 are initially between the two sheets (as in the
-        # paper) this bias is introduced to making sure that the left
-        # end of the sheet is at the left. This makes theoretically the
-        # biological orientation. The rest gets randomized as described in the paper
+        # The cells in V1 are initially between the two sheets (as in
+        # the paper).  This bias is introduced to make sure that the
+        # left end of the sheet is at the left, to reproduce the
+        # biological orientation. The rest gets randomized as
+        # described in the paper.
         
         for i in range(CS):
             for j in range(CS):
@@ -150,13 +151,15 @@ class ElasticNet(Sheet):
 ##                activity_copy = z
 ##                new_view = SheetView((activity_copy,sheet.bounds),sheet.name,sheet.precedence)
 ##                sheet.sheet_view_dict['OcularPreference']=new_view
-            print z
+#        from topo.base.arrayutils import octave_str
+#        print octave_str(z) # Need to compute z first, though!
+         pass
     
     def cellforce(self,cx,cy,px,py,K):
          """
          Gives us phi=exp((-|x-y|^2)/2K^2) and returns it.
          """
-         K2=2.0*K*K##2K^2 scale parameter
+         K2=2.0*K*K  # 2K^2 scale parameter
          
          d= (self.cell[cx][cy].x-self.net[px][py].x)*(self.cell[cx][cy].x-self.net[px][py].x)+(self.cell[cx][cy].y-self.net[px][py].y)*(self.cell[cx][cy].y-self.net[px][py].y)+(self.cell[cx][cy].z-self.net[px][py].z)*(self.cell[cx][cy].z-self.net[px][py].z)
          #print "d: ",d, " K: ",K," 3K:",3.0*K
@@ -178,18 +181,20 @@ class ElasticNet(Sheet):
         conditions of the 3D.
         """ 
        
-        CS=self.cortexsize##cortical size
+        CS=self.cortexsize
         
-        ##look at 4x neighbors subtract and add accordingly and since now we have four
-        ##neighbors instead of two the term must be subtracted with 4 times the yi. As in
-        ##the paper only taking into account the the three dimetions and double the neighbors.
+        # Examine the four neighbors.  Subtract and add accordingly,
+        # and since now we have four neighbors instead of two, the
+        # term must be subtracted with 4 times the yi. This should
+        # work as in the paper, but taking into account having three
+        # dimensions and double the neighbors.
         for px in range(1,CS-1):
                 for py in range(1,CS-1):
                         self.netterm[px][py].x = (self.net[px-1][py].x+self.net[px+1][py].x+self.net[px][py-1].x+self.net[px][py+1].x-4.0*self.net[px][py].x)/8.0
                         self.netterm[px][py].y = (self.net[px-1][py].y+self.net[px+1][py].y+self.net[px][py-1].y+self.net[px][py+1].y-4.0*self.net[px][py].y)/8.0
                         self.netterm[px][py].z = (self.net[px-1][py].z+self.net[px+1][py].z+self.net[px][py-1].z+self.net[px][py+1].z-4.0*self.net[px][py].z)/8.0
 
-        for px in range(1,CS-1):##Take into account the borders..
+        for px in range(1,CS-1): # Take into account the borders.
             self.netterm[px][0].x= (self.net[px][1].x+self.net[px-1][0].x+self.net[px+1][0].x-3.0*self.net[px][0].x)/6.0
             self.netterm[px][0].y= (self.net[px][1].y+self.net[px-1][0].y+self.net[px+1][0].y-3.0*self.net[px][0].y)/6.0            
             self.netterm[px][0].z= (self.net[px][1].z+self.net[px-1][0].z+self.net[px+1][0].z-3.0*self.net[px][0].z)/6.0
@@ -198,7 +203,7 @@ class ElasticNet(Sheet):
             self.netterm[px][CS-1].y=(self.net[px][CS-2].y+self.net[px-1][CS-1].y+self.net[px+1][CS-1].y-3.0*self.net[px][CS-1].y)/6.0            
             self.netterm[px][CS-1].z=(self.net[px][CS-2].z+self.net[px-1][CS-1].z+self.net[px+1][CS-1].z-3.0*self.net[px][CS-1].z)/6.0
             
-        for py in range(1,CS-1):##Take into account the borders..
+        for py in range(1,CS-1): # Take into account the borders.
             self.netterm[0][py].x= (self.net[1][py].x+self.net[0][py-1].x+self.net[0][py+1].x-3.0*self.net[0][py].x)/6.0
             self.netterm[0][py].y= (self.net[1][py].y+self.net[0][py-1].y+self.net[0][py+1].y-3.0*self.net[0][py].y)/6.0            
             self.netterm[0][py].z= (self.net[1][py].z+self.net[0][py-1].z+self.net[0][py+1].z-3.0*self.net[0][py].z)/6.0                        
@@ -207,7 +212,7 @@ class ElasticNet(Sheet):
             self.netterm[CS-1][py].y=(self.net[CS-2][py].y+self.net[CS-1][py-1].y+self.net[CS-1][py+1].y-3.0*self.net[CS-1][py].y)/6.0
             self.netterm[CS-1][py].z=(self.net[CS-2][py].z+self.net[CS-1][py-1].z+self.net[CS-1][py+1].z-3.0*self.net[CS-1][py].z)/6.0
 
-        ##Take into account the borders..
+        # Take into account the borders.
         self.netterm[0][0].x= (self.net[1][0].x+self.net[0][1].x-2.0*self.net[0][0].x)/4.0
         self.netterm[0][0].y= (self.net[1][0].y+self.net[0][1].y-2.0*self.net[0][0].y)/4.0
         self.netterm[0][0].z= (self.net[1][0].z+self.net[0][1].z-2.0*self.net[0][0].z)/4.0
@@ -227,26 +232,26 @@ class ElasticNet(Sheet):
 
     def learn(self):
         
-        K=self.initial_k##scale parameter
-        K2=2.0*K*K##2K^2
-        RS=self.retinasize##retina size
-        CS=self.cortexsize##cortical size
+        K=self.initial_k # scale parameter
+        K2=2.0*K*K
+        RS=self.retinasize
+        CS=self.cortexsize
         rateK=self.rate_of_k
 
-        for px in range(CS):    #initialise for every iteration
+        for px in range(CS): #initialise for every iteration
            for py in range(CS):
                 self.ftot[px][py].x=0.0
                 self.ftot[px][py].y=0.0
                 self.ftot[px][py].z=0.0
 
-        ########START OF LOOP OVER CELLS#########
+        ######## START OF LOOP OVER CELLS #########
 
-        for cx in range(RS):##FOR all the RIGHT retina cells DO... calculate Wij
+        for cx in range(RS): # For all the right retina cells do... calculate Wij
             for cy in range(RS):
 
                 Sum=0.0 
                         
-                for px in range(CS):##calculate Phi
+                for px in range(CS): # calculate Phi
                     for py in range(CS):
                         
                         Sum+=self.cellforce(cx,cy,px,py,K)
@@ -260,12 +265,12 @@ class ElasticNet(Sheet):
 
         
                 
-        for cx in range(RS,RS*2):##FOR all the LEFT retina cells DO... calculate Wij
+        for cx in range(RS,RS*2): # For all the left retina cells do... calculate Wij
             for cy in range(RS,RS*2):
 
                 Sum=0.0
                 
-                for px in range(CS):##calculate Phi
+                for px in range(CS): # calculate Phi
                     for py in range(CS):
                         Sum=Sum+self.cellforce(cx,cy,px,py,K)
 
@@ -276,13 +281,13 @@ class ElasticNet(Sheet):
                         self.ftot[px][py].y += (self.cell[cx][cy].y-self.net[px][py].y)*cf/Sum
                         self.ftot[px][py].z += (self.cell[cx][cy].z-self.net[px][py].z)*cf/Sum
 
-           ########END OF LOOP OVER CELLS#########
+           ######## END OF LOOP OVER CELLS #########
  
         
         self.calNetTerm(); ## get (yj+1 - 2yj + yj-1) of equation 1 but with 4 neighbors
 
 
-        #And finally put all the things together..
+        # And finally put all the things together..
         for px in range(CS):
                     for py in range(CS):
                         self.net[px][py].x+= self.alpha*self.ftot[px][py].x+self.beta*K*self.netterm[px][py].x+0.1*(random()-0.5)
@@ -298,19 +303,17 @@ class ElasticNet(Sheet):
 
 ### Sheets,connections,parameters
 
-##Right and left retinas used for visualization
+## Right and left retinas used for visualization
 topo.sim['LeftRetina']=GeneratorSheet(nominal_density=1,period=1.0, phase=0.05,
                                       nominal_bounds=BoundingBox(radius=0.5))
 
 topo.sim['RightRetina']=GeneratorSheet(nominal_density=1, period=1.0, phase=0.05,
                                        nominal_bounds=BoundingBox(radius=0.5))
 
-##The elastic net.
+## The elastic net.
 topo.sim['V1'] = ElasticNet(nominal_density=40,nominal_bounds=BoundingBox(radius=0.5))
 
 
-##NO need for connections not even for vizualization...They just dont exist.
-
-## Dummyconections; used only for calling the elasticnet function and for visualization
+## Currently no need for connections, not even for visualization. They just don't exist.
 #topo.sim.connect('RightRetina','V1',name='RV1',delay=0.05,src_port="Activity")
 #topo.sim.connect('LeftRetina','V1',name='LV1',delay=0.05,src_port="Activity")
