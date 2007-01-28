@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """ Implementation of 2D ocular dominance model from G.J. Goodhill &
 D.J. Willshaw (1990), "Application of the elastic net algorithm to the
 formation of ocular dominance stripes", Network: Computation in Neural
@@ -9,7 +10,7 @@ $Id$
 """
 _version__='$Revision$'
 
-from __future__ import division #It needs this for division. DO NOT DELETE
+from __future__ import division #DO NOT DELETE!Needs it for correct&precise divisions.
 from RandomArray import *
 from Numeric import *
 from fixedpoint import FixedPoint
@@ -32,8 +33,6 @@ class point:
     z=0.0
 
 
-
-
 class ElasticNet(Sheet):
     """
     Basic elastic net sheet (work in progress..)
@@ -47,7 +46,7 @@ class ElasticNet(Sheet):
     initial_k = Number(default=0.2,bounds=(0,None),
                    doc="Initial k, scale parameter for the force of the retinal cells")
 
-    rate_of_k = Number(default=0.1,bounds=(0,None),
+    rate_of_k = Number(default=0.997,bounds=(0,None),
                    doc="Rate of reduction of k by 10%")
 
     two_l = Number(default=0.2,bounds=(0,None),
@@ -56,10 +55,10 @@ class ElasticNet(Sheet):
     two_d = Number(default=0.05,bounds=(0,None),
                    doc="Separation between the cells within a layer")
 
-    retinasize=Number(default=10,bounds=(0,None),
+    retinasize=Number(default=5,bounds=(0,None),
                    doc="Retina size")# 20  # Ideally, would get this info from the retina objects
 
-    cortexsize=Number(default=20,bounds=(0,None),
+    cortexsize=Number(default=10,bounds=(0,None),
                    doc="Cortex size")# 40  # Ideally, would get this info from the retina objects
 
 
@@ -85,15 +84,15 @@ class ElasticNet(Sheet):
         #paper's way. It could be done differently as well.
         
         self.cell  = [[point() for i in range(2*RS)] for r in range(2*RS)]
-        self.net= [[point() for i in range(CS)] for r in range(CS)]
+        self.net  = [[point() for i in range(CS)] for r in range(CS)]
 
         #convinience matrixes for the calculations
-        self.cforce = [[0.0 for i in range(CS)] for r in range(CS)] ##cell force  matrix
-        self.ftot  = [[point() for i in range(CS)] for r in range(CS)] ##total force  matrix
+        self.cforce         = [[0.0 for i in range(CS)] for r in range(CS)] ##cell force  matrix
+        self.ftot            = [[point() for i in range(CS)] for r in range(CS)] ##total force  matrix
+        self.netterm  = [[point() for i in range(CS)] for r in range(CS)] ##netterm  matrix
 
     
-        #The RIGHT retinal cells have also a fixed separation between them, two_d
-        print self.cell[0][0].x
+        #The RIGHT retinal cells have a fixed separation between the layers, two_d
         
         for i in range(RS):
             for j in range(RS):
@@ -106,7 +105,7 @@ class ElasticNet(Sheet):
             for j in range(RS):
                 self.cell[i+RS][j+RS].x=i/(RS-1)
                 self.cell[i+RS][j+RS].y=j/(RS-1)
-                self.cell[i+RS][j+RS].z=0
+                self.cell[i+RS][j+RS].z=0.0
        
                       
        
@@ -142,56 +141,116 @@ class ElasticNet(Sheet):
         """
         self.learn()
 
+    def update_OcularPreference():
+            
+##            for x in range():
+##                for y in range(CS):
+##                   z=append(self.net[x][y].z)
+##            for sheet in topo.sim.objects(Sheet).values():
+##                activity_copy = z
+##                new_view = SheetView((activity_copy,sheet.bounds),sheet.name,sheet.precedence)
+##                sheet.sheet_view_dict['OcularPreference']=new_view
+            print z
+    
     def cellforce(self,cx,cy,px,py,K):
          """
          Gives us phi=exp((-|x-y|^2)/2K^2) and returns it.
-         
          """
-         K2=2*K*K##2K^2 scale parameter
+         K2=2.0*K*K##2K^2 scale parameter
          
          d= (self.cell[cx][cy].x-self.net[px][py].x)*(self.cell[cx][cy].x-self.net[px][py].x)+(self.cell[cx][cy].y-self.net[px][py].y)*(self.cell[cx][cy].y-self.net[px][py].y)+(self.cell[cx][cy].z-self.net[px][py].z)*(self.cell[cx][cy].z-self.net[px][py].z)
-         
-         if (d>3*K):
-             self.cforce[px][py]=0
+         #print "d: ",d, " K: ",K," 3K:",3.0*K
+            
+         if (d>3.0*K):
+             self.cforce[px][py]=0.0
          else:
              self.cforce[px][py]= exp(-d/K2)
 
          return (self.cforce[px][py])
 
-    def calNetTerm()
-    """
-    Basically find the neighbors.. Do stuff.. and check boundaries for the neighbors
-    of this net point thus we get the part (yj+1 - 2yj + yj-1) of equation 1 of the paper
-    which basically are the surrounding neighbors but taking into account the boundary
-    conditions of the 2D case.
-    """ 
-    ##to be written...
-
     
+
+    def calNetTerm(self):
+        """
+        Basically find the neighbors..check boundaries for the neighbors
+        of this net point thus we get the part (yj+1 - 2yj + yj-1) of equation 1 of the paper
+        which basically is the surrounding 4 neighbors but taking into account the boundary
+        conditions of the 3D.
+        """ 
+       
+        CS=self.cortexsize##cortical size
+        
+        ##look at 4x neighbors subtract and add accordingly and since now we have four
+        ##neighbors instead of two the term must be subtracted with 4 times the yi. As in
+        ##the paper only taking into account the the three dimetions and double the neighbors.
+        for px in range(1,CS-1):
+                for py in range(1,CS-1):
+                        self.netterm[px][py].x = (self.net[px-1][py].x+self.net[px+1][py].x+self.net[px][py-1].x+self.net[px][py+1].x-4.0*self.net[px][py].x)/8.0
+                        self.netterm[px][py].y = (self.net[px-1][py].y+self.net[px+1][py].y+self.net[px][py-1].y+self.net[px][py+1].y-4.0*self.net[px][py].y)/8.0
+                        self.netterm[px][py].z = (self.net[px-1][py].z+self.net[px+1][py].z+self.net[px][py-1].z+self.net[px][py+1].z-4.0*self.net[px][py].z)/8.0
+
+        for px in range(1,CS-1):##Take into account the borders..
+            self.netterm[px][0].x= (self.net[px][1].x+self.net[px-1][0].x+self.net[px+1][0].x-3.0*self.net[px][0].x)/6.0
+            self.netterm[px][0].y= (self.net[px][1].y+self.net[px-1][0].y+self.net[px+1][0].y-3.0*self.net[px][0].y)/6.0            
+            self.netterm[px][0].z= (self.net[px][1].z+self.net[px-1][0].z+self.net[px+1][0].z-3.0*self.net[px][0].z)/6.0
+
+            self.netterm[px][CS-1].x=(self.net[px][CS-2].x+self.net[px-1][CS-1].x+self.net[px+1][CS-1].x-3.0*self.net[px][CS-1].x)/6.0
+            self.netterm[px][CS-1].y=(self.net[px][CS-2].y+self.net[px-1][CS-1].y+self.net[px+1][CS-1].y-3.0*self.net[px][CS-1].y)/6.0            
+            self.netterm[px][CS-1].z=(self.net[px][CS-2].z+self.net[px-1][CS-1].z+self.net[px+1][CS-1].z-3.0*self.net[px][CS-1].z)/6.0
+            
+        for py in range(1,CS-1):##Take into account the borders..
+            self.netterm[0][py].x= (self.net[1][py].x+self.net[0][py-1].x+self.net[0][py+1].x-3.0*self.net[0][py].x)/6.0
+            self.netterm[0][py].y= (self.net[1][py].y+self.net[0][py-1].y+self.net[0][py+1].y-3.0*self.net[0][py].y)/6.0            
+            self.netterm[0][py].z= (self.net[1][py].z+self.net[0][py-1].z+self.net[0][py+1].z-3.0*self.net[0][py].z)/6.0                        
+
+            self.netterm[CS-1][py].x=(self.net[CS-2][py].x+self.net[CS-1][py-1].x+self.net[CS-1][py+1].x-3.0*self.net[CS-1][py].x)/6.0
+            self.netterm[CS-1][py].y=(self.net[CS-2][py].y+self.net[CS-1][py-1].y+self.net[CS-1][py+1].y-3.0*self.net[CS-1][py].y)/6.0
+            self.netterm[CS-1][py].z=(self.net[CS-2][py].z+self.net[CS-1][py-1].z+self.net[CS-1][py+1].z-3.0*self.net[CS-1][py].z)/6.0
+
+        ##Take into account the borders..
+        self.netterm[0][0].x= (self.net[1][0].x+self.net[0][1].x-2.0*self.net[0][0].x)/4.0
+        self.netterm[0][0].y= (self.net[1][0].y+self.net[0][1].y-2.0*self.net[0][0].y)/4.0
+        self.netterm[0][0].z= (self.net[1][0].z+self.net[0][1].z-2.0*self.net[0][0].z)/4.0
+
+        self.netterm[CS-1][0].x= (self.net[CS-2][0].x+self.net[CS-1][1].x-2.0*self.net[CS-1][0].x)/4.0
+        self.netterm[CS-1][0].y= (self.net[CS-2][0].y+self.net[CS-1][1].y-2.0*self.net[CS-1][0].y)/4.0
+        self.netterm[CS-1][0].z= (self.net[CS-2][0].z+self.net[CS-1][1].z-2.0*self.net[CS-1][0].z)/4.0
+
+        self.netterm[0][CS-1].x= (self.net[0][CS-2].x+self.net[1][CS-1].x-2.0*self.net[0][CS-1].x)/4.0
+        self.netterm[0][CS-1].y= (self.net[0][CS-2].y+self.net[1][CS-1].y-2.0*self.net[0][CS-1].y)/4.0
+        self.netterm[0][CS-1].z= (self.net[0][CS-2].z+self.net[1][CS-1].z-2.0*self.net[0][CS-1].z)/4.0
+
+        self.netterm[CS-1][CS-1].x= (self.net[CS-1][CS-2].x+self.net[CS-2][CS-1].x-2.0*self.net[CS-1][CS-1].x)/4.0
+        self.netterm[CS-1][CS-1].y= (self.net[CS-1][CS-2].y+self.net[CS-2][CS-1].y-2.0*self.net[CS-1][CS-1].y)/4.0
+        self.netterm[CS-1][CS-1].z= (self.net[CS-1][CS-2].z+self.net[CS-2][CS-1].z-2.0*self.net[CS-1][CS-1].z)/4.0
+        
 
     def learn(self):
         
         K=self.initial_k##scale parameter
-        K2=2*K*K##2K^2
+        K2=2.0*K*K##2K^2
         RS=self.retinasize##retina size
         CS=self.cortexsize##cortical size
+        rateK=self.rate_of_k
 
         for px in range(CS):    #initialise for every iteration
            for py in range(CS):
-                self.ftot[px][py].x=0
-                self.ftot[px][py].y=0
-                self.ftot[px][py].z=0
+                self.ftot[px][py].x=0.0
+                self.ftot[px][py].y=0.0
+                self.ftot[px][py].z=0.0
 
         ########START OF LOOP OVER CELLS#########
 
         for cx in range(RS):##FOR all the RIGHT retina cells DO... calculate Wij
             for cy in range(RS):
 
-                Sum=0 
-                
+                Sum=0.0 
+                        
                 for px in range(CS):##calculate Phi
                     for py in range(CS):
-                        Sum=Sum+self.cellforce(cx,cy,px,py,K)
+                        
+                        Sum+=self.cellforce(cx,cy,px,py,K)
+                        #print "Sum:",Sum
                         
                 for px in range(CS):
                     for py in range(CS):
@@ -204,7 +263,7 @@ class ElasticNet(Sheet):
         for cx in range(RS,RS*2):##FOR all the LEFT retina cells DO... calculate Wij
             for cy in range(RS,RS*2):
 
-                Sum=0 
+                Sum=0.0
                 
                 for px in range(CS):##calculate Phi
                     for py in range(CS):
@@ -220,9 +279,20 @@ class ElasticNet(Sheet):
            ########END OF LOOP OVER CELLS#########
  
         
-        self.calNetTerm(); ## get (yj+1 - 2yj + yj-1) of equation 1 
-                    
-        print "End."
+        self.calNetTerm(); ## get (yj+1 - 2yj + yj-1) of equation 1 but with 4 neighbors
+
+
+        #And finally put all the things together..
+        for px in range(CS):
+                    for py in range(CS):
+                        self.net[px][py].x+= self.alpha*self.ftot[px][py].x+self.beta*K*self.netterm[px][py].x+0.1*(random()-0.5)
+                        self.net[px][py].y+= self.alpha*self.ftot[px][py].y+self.beta*K*self.netterm[px][py].y+0.1*(random()-0.5)
+                        self.net[px][py].z+= self.alpha*self.ftot[px][py].z+self.beta*K*self.netterm[px][py].z+0.1*(random()-0.5)                    
+
+        #print rateK," : ",K
+        self.initial_k*=rateK
+        
+        
 
    
 
@@ -241,9 +311,6 @@ topo.sim['V1'] = ElasticNet(nominal_density=40,nominal_bounds=BoundingBox(radius
 
 ##NO need for connections not even for vizualization...They just dont exist.
 
-## Dummyconection; used only for calling the elasticnet function and for visualization
-## JABALERT: should also use it to control the parameters of the retina
+## Dummyconections; used only for calling the elasticnet function and for visualization
 #topo.sim.connect('RightRetina','V1',name='RV1',delay=0.05,src_port="Activity")
-
-## Dummy connection; used only for visualization
 #topo.sim.connect('LeftRetina','V1',name='LV1',delay=0.05,src_port="Activity")
