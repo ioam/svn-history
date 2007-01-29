@@ -61,6 +61,10 @@ installed in your system, such as <code>libfreetype</code>,
 <code>libpng</code>, <code>libx11-dev</code>, and <code>zlib</code>,
 before <code>make</code> will succeed.
 
+<P>On some recent Mac OS X installations (1/2006), you may need to
+remove "-Wl," from external/Makefile for python to compile; it is not
+yet clear why.
+
 <P>If all goes well, a script named <code>topographica</code> or
 <code>topographica.bat</code> will be created in the
 <code>topographica/</code> directory; you can use this to start
