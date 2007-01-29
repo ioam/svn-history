@@ -151,14 +151,15 @@ under OS X.)
 
 <H4><A NAME="windows">Windows:</A></H4>
 <!--  CEBALERT: One day we might have instructions for building -->
-<!--  Topographica on Windows, compiling everything from source...-->
+<!--  Topographica on Windows, compiling everything from source...
+<!--  see the list of current tasks.-->
 
 <P>Under Windows, we recommend installing
-<A HREF="http://www.tortoisecvs.org/">TortoiseCVS</A> (tested 7/2006
-using TortoiseCVS 1.8.24).  For read/write access, you might
-also need to install an SSH client such as
-<A HREF="http://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</A>
-(though this is included with TortoiseCVS).
+<A HREF="http://www.tortoisecvs.org/">TortoiseCVS</A> (tested 11/2006
+using TortoiseCVS 1.8.29). TortoiseCVS includes everything required
+for read/write access, but if you are using another CVS client
+you might also need an SSH client such as
+<A HREF="http://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</A>.
 
 <P>Then open the Windows directory where you want the files to be
 located on your machine, right click, select "CVS Checkout", fill in
