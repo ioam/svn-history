@@ -296,11 +296,24 @@ class ElasticNet(Sheet):
 
         self.initial_k*=rateK
 
-        self.arraytoprint=[[self.net[i][r].z for i in range(CS)] for r in range(CS)]
-        #print self.arraytoprint
+        self.xarray=[[self.net[i][r].x for i in range(CS)] for r in range(CS)]
+        self.yarray=[[self.net[i][r].y for i in range(CS)] for r in range(CS)]
+        self.zarray=[[self.net[i][r].z for i in range(CS)] for r in range(CS)]
+        #print self.zarray
 
 
-   
+def update_elastic_net_maps():
+    for sheet in topo.sim.objects(ElasticNet).values():
+        sheet.sheet_view_dict['XCoG']= \
+           SheetView((array(sheet.xarray),sheet.bounds),
+                     sheet.name,sheet.precedence,topo.sim.time())
+        sheet.sheet_view_dict['YCoG']= \
+           SheetView((array(sheet.yarray),sheet.bounds),
+                     sheet.name,sheet.precedence,topo.sim.time())
+        sheet.sheet_view_dict['OcularPreference']= \
+           SheetView((array(sheet.zarray),sheet.bounds),
+                     sheet.name,sheet.precedence,topo.sim.time())
+
 
 ### Sheets,connections,parameters
 
