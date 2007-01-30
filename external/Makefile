@@ -1,11 +1,11 @@
 PREFIX = ${dir ${CURDIR}}
 CC = gcc
 
-all: python jpeg pil numeric numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils
+all: python jpeg pil numeric numpy pmw matplotlib weave fixedpoint pychecker common pylint epydoc docutils gnosis
 
-clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean
+clean: python-clean jpeg-clean pil-clean numeric-clean numpy-clean pmw-clean tk-clean tcl-clean matplotlib-clean weave-clean fixedpoint-clean pychecker-clean common-clean pylint-clean epydoc-clean docutils-clean gnosis-clean
 
-uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall
+uninstall: python-uninstall jpeg-uninstall pil-uninstall numeric-uninstall numpy-uninstall pmw-uninstall tk-uninstall tcl-uninstall matplotlib-uninstall fixedpoint-uninstall weave-uninstall pychecker-uninstall common-uninstall pylint-uninstall epydoc-uninstall docutils-uninstall gnosis-uninstall
 
 ##############################################################
 # Python (interpreted language)
@@ -336,6 +336,22 @@ docutils-uninstall:
 	rm -rf docutils ${DOCUTILS} $(foreach f, ${DOCUTILS_UNINSTALL}, ${PREFIX}/${f})
 
 
+
+##############################################################
+# gnosis (xml tools)
+#
+GNOSIS = Gnosis_Utils-1.2.1
+GNOSIS_UNINSTALL =  ${PYTHON_LIB}/site-packages/gnosis
+
+gnosis: ${GNOSIS}.tar.gz python
+	tar xzf ${GNOSIS}.tar.gz
+	cd ${GNOSIS}; ${PREFIX}/bin/python setup.py install
+	touch gnosis
+
+gnosis-clean:
+	rm -rf ${GNOSIS} 
+gnosis-uninstall:
+	rm -rf gnosis $(foreach f, ${GNOSIS_UNINSTALL}, ${PREFIX}/${f})
 
 #############################################################################
 #   Generic targets added for migration from Sourceforge to GitHub.         #
