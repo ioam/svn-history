@@ -3,7 +3,7 @@
 # Commands for running the example files
 
 all_quick: hierarchical cfsom_or som_retinotopy lissom_oo_or
-all_long: som_retinotopy_40000.typ lissom_oo_or_20000.typ lissom_or_20000.typ
+all_long: lissom_oo_or_20000.typ som_retinotopy_40000.typ lissom_or_20000.typ
 saved-examples: lissom_oo_or_20000.typ
 
 
