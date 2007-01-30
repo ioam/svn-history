@@ -1,4 +1,9 @@
 @echo off
+
+REM CEBALERT: need to update Numeric-->numpy, update weave version
+REM (extracting it from the scipy binary), and install Gnosis_Utils
+
+
 REM assumes we're going to c:\Python24
 
 set startdir=%CD%
