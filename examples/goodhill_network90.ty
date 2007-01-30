@@ -87,10 +87,12 @@ class ElasticNet(Sheet):
         self.net  = [[point() for i in range(CS)] for r in range(CS)]
 
         # Convenience matrixes for the calculations:
-        self.cforce         = [[0.0 for i in range(CS)] for r in range(CS)] ##cell force  matrix
+        self.cforce        = [[0.0 for i in range(CS)] for r in range(CS)] ##cell force  matrix
         self.ftot            = [[point() for i in range(CS)] for r in range(CS)] ##total force  matrix
-        self.netterm  = [[point() for i in range(CS)] for r in range(CS)] ##netterm  matrix
+        self.netterm    = [[point() for i in range(CS)] for r in range(CS)] ##netterm  matrix
 
+        #array to save the results, self.net[][].z, for printing..
+        self.arraytoprint    =[[self.net[i][r].z for i in range(CS)] for r in range(CS)]
     
         # The right retinal cells have a fixed separation between the layers  two_l       
         for i in range(RS):
@@ -139,19 +141,6 @@ class ElasticNet(Sheet):
         the simulation. 
         """
         self.learn()
-
-    def update_OcularPreference():
-            
-##            for x in range():
-##                for y in range(CS):
-##                   z=append(self.net[x][y].z)
-##            for sheet in topo.sim.objects(Sheet).values():
-##                activity_copy = z
-##                new_view = SheetView((activity_copy,sheet.bounds),sheet.name,sheet.precedence)
-##                sheet.sheet_view_dict['OcularPreference']=new_view
-#        from topo.base.arrayutils import octave_str
-#        print octave_str(z) # Need to compute z first, though!
-         pass
     
     def cellforce(self,cx,cy,px,py,K):
          """
@@ -307,12 +296,8 @@ class ElasticNet(Sheet):
 
         self.initial_k*=rateK
 
-
-        for i in range(CS):
-            print
-            print
-            for j in range(CS):
-                print " ",i,",",j,":",self.net[i][j].x,"/",self.net[i][j].y,"/",self.net[i][j].z,
+        self.arraytoprint=[[self.net[i][r].z for i in range(CS)] for r in range(CS)]
+        #print self.arraytoprint
 
 
    
