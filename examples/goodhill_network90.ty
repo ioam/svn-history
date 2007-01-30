@@ -46,19 +46,19 @@ class ElasticNet(Sheet):
                    doc="Initial k, scale parameter for the force of the retinal cells")
 
     rate_of_k = Number(default=0.997,bounds=(0,None),
-                   doc="Rate of reduction of k by 10%")
+                   doc="Rate of reduction of k must be a lot less than 10% depending on the parameters")
 
-    two_l = Number(default=0.2,bounds=(0,None),
+    two_l = Number(default=0.1,bounds=(0,None),
                    doc="Separation between the two layers of cells")
 
     two_d = Number(default=0.05,bounds=(0,None),
                    doc="Separation between the cells within a layer")
 
-    retinasize=Integer(default=5,bounds=(0,None),
-                   doc="Retina size")# 20  # Ideally, would get this info from the retina objects
+    retinasize=Integer(default=10,bounds=(0,None),
+                   doc="Retina size") # Ideally, would get this info from the retina objects
 
-    cortexsize=Integer(default=10,bounds=(0,None),
-                   doc="Cortex size")# 40  # Ideally, would calculate this info from our bounding box and density
+    cortexsize=Integer(default=20,bounds=(0,None),
+                   doc="Cortex size") # Ideally, would calculate this info from our bounding box and density
 
 
     def __init__(self,**params):
@@ -92,15 +92,14 @@ class ElasticNet(Sheet):
         self.netterm  = [[point() for i in range(CS)] for r in range(CS)] ##netterm  matrix
 
     
-        # The right retinal cells have a fixed separation between the layers, two_d
-        
+        # The right retinal cells have a fixed separation between the layers  two_l       
         for i in range(RS):
             for j in range(RS):
                 self.cell[i][j].x=i/(RS-1)
                 self.cell[i][j].y=j/(RS-1)
                 self.cell[i][j].z=GAP
 
-        # The left retinal cells have also a fixed separation between them, two_d
+        # The left retinal cells have a fixed separation between the layers  two_l 
         for i in range(RS):
             for j in range(RS):
                 self.cell[i+RS][j+RS].x=i/(RS-1)
@@ -120,7 +119,6 @@ class ElasticNet(Sheet):
                 self.net[i][j].x=i/(CS-1)+0.1*(random()-0.5)
                 self.net[i][j].y=j/(CS-1)+0.1*(random()-0.5)
                 self.net[i][j].z=GAP/2+0.1*(random()-0.5)
-
 
 
     def input_event(self,conn,data):
@@ -160,9 +158,8 @@ class ElasticNet(Sheet):
          Gives us phi=exp((-|x-y|^2)/2K^2) and returns it.
          """
          K2=2.0*K*K  # 2K^2 scale parameter
-         
-         d= (self.cell[cx][cy].x-self.net[px][py].x)*(self.cell[cx][cy].x-self.net[px][py].x)+(self.cell[cx][cy].y-self.net[px][py].y)*(self.cell[cx][cy].y-self.net[px][py].y)+(self.cell[cx][cy].z-self.net[px][py].z)*(self.cell[cx][cy].z-self.net[px][py].z)
-         #print "d: ",d, " K: ",K," 3K:",3.0*K
+           
+         d= ((self.cell[cx][cy].x-self.net[px][py].x)**2)+((self.cell[cx][cy].y-self.net[px][py].y)**2)+((self.cell[cx][cy].z-self.net[px][py].z)**2)
             
          if (d>3.0*K):
              self.cforce[px][py]=0.0
@@ -178,7 +175,7 @@ class ElasticNet(Sheet):
         Basically find the neighbors..check boundaries for the neighbors
         of this net point thus we get the part (yj+1 - 2yj + yj-1) of equation 1 of the paper
         which basically is the surrounding 4 neighbors but taking into account the boundary
-        conditions of the 3D.
+        conditions of the 2D net  instead of rope.
         """ 
        
         CS=self.cortexsize
@@ -188,43 +185,51 @@ class ElasticNet(Sheet):
         # term must be subtracted with 4 times the yi. This should
         # work as in the paper, but taking into account having three
         # dimensions and double the neighbors.
+
+        ##All the elements in the middle not touching borders 
         for px in range(1,CS-1):
                 for py in range(1,CS-1):
                         self.netterm[px][py].x = (self.net[px-1][py].x+self.net[px+1][py].x+self.net[px][py-1].x+self.net[px][py+1].x-4.0*self.net[px][py].x)/8.0
                         self.netterm[px][py].y = (self.net[px-1][py].y+self.net[px+1][py].y+self.net[px][py-1].y+self.net[px][py+1].y-4.0*self.net[px][py].y)/8.0
                         self.netterm[px][py].z = (self.net[px-1][py].z+self.net[px+1][py].z+self.net[px][py-1].z+self.net[px][py+1].z-4.0*self.net[px][py].z)/8.0
+        
 
         for px in range(1,CS-1): # Take into account the borders.
+            ##All the left elements in column 0 not taking into account the very corners
             self.netterm[px][0].x= (self.net[px][1].x+self.net[px-1][0].x+self.net[px+1][0].x-3.0*self.net[px][0].x)/6.0
             self.netterm[px][0].y= (self.net[px][1].y+self.net[px-1][0].y+self.net[px+1][0].y-3.0*self.net[px][0].y)/6.0            
             self.netterm[px][0].z= (self.net[px][1].z+self.net[px-1][0].z+self.net[px+1][0].z-3.0*self.net[px][0].z)/6.0
 
+            ##All the right elements in column CS-1 not taking into account the very corners
             self.netterm[px][CS-1].x=(self.net[px][CS-2].x+self.net[px-1][CS-1].x+self.net[px+1][CS-1].x-3.0*self.net[px][CS-1].x)/6.0
             self.netterm[px][CS-1].y=(self.net[px][CS-2].y+self.net[px-1][CS-1].y+self.net[px+1][CS-1].y-3.0*self.net[px][CS-1].y)/6.0            
             self.netterm[px][CS-1].z=(self.net[px][CS-2].z+self.net[px-1][CS-1].z+self.net[px+1][CS-1].z-3.0*self.net[px][CS-1].z)/6.0
             
         for py in range(1,CS-1): # Take into account the borders.
+            ##All the top elements in row 0 not taking into account the very corners
             self.netterm[0][py].x= (self.net[1][py].x+self.net[0][py-1].x+self.net[0][py+1].x-3.0*self.net[0][py].x)/6.0
             self.netterm[0][py].y= (self.net[1][py].y+self.net[0][py-1].y+self.net[0][py+1].y-3.0*self.net[0][py].y)/6.0            
             self.netterm[0][py].z= (self.net[1][py].z+self.net[0][py-1].z+self.net[0][py+1].z-3.0*self.net[0][py].z)/6.0                        
 
+            ##All the bottom elements in row cs-1 not taking into account the very corners
             self.netterm[CS-1][py].x=(self.net[CS-2][py].x+self.net[CS-1][py-1].x+self.net[CS-1][py+1].x-3.0*self.net[CS-1][py].x)/6.0
             self.netterm[CS-1][py].y=(self.net[CS-2][py].y+self.net[CS-1][py-1].y+self.net[CS-1][py+1].y-3.0*self.net[CS-1][py].y)/6.0
             self.netterm[CS-1][py].z=(self.net[CS-2][py].z+self.net[CS-1][py-1].z+self.net[CS-1][py+1].z-3.0*self.net[CS-1][py].z)/6.0
 
-        # Take into account the borders.
+        # Take into account the 4 corners and we are done.
+        #Top left
         self.netterm[0][0].x= (self.net[1][0].x+self.net[0][1].x-2.0*self.net[0][0].x)/4.0
         self.netterm[0][0].y= (self.net[1][0].y+self.net[0][1].y-2.0*self.net[0][0].y)/4.0
         self.netterm[0][0].z= (self.net[1][0].z+self.net[0][1].z-2.0*self.net[0][0].z)/4.0
-
+        #Bottom left
         self.netterm[CS-1][0].x= (self.net[CS-2][0].x+self.net[CS-1][1].x-2.0*self.net[CS-1][0].x)/4.0
         self.netterm[CS-1][0].y= (self.net[CS-2][0].y+self.net[CS-1][1].y-2.0*self.net[CS-1][0].y)/4.0
         self.netterm[CS-1][0].z= (self.net[CS-2][0].z+self.net[CS-1][1].z-2.0*self.net[CS-1][0].z)/4.0
-
+        #Top right
         self.netterm[0][CS-1].x= (self.net[0][CS-2].x+self.net[1][CS-1].x-2.0*self.net[0][CS-1].x)/4.0
         self.netterm[0][CS-1].y= (self.net[0][CS-2].y+self.net[1][CS-1].y-2.0*self.net[0][CS-1].y)/4.0
         self.netterm[0][CS-1].z= (self.net[0][CS-2].z+self.net[1][CS-1].z-2.0*self.net[0][CS-1].z)/4.0
-
+        #Bottom right
         self.netterm[CS-1][CS-1].x= (self.net[CS-1][CS-2].x+self.net[CS-2][CS-1].x-2.0*self.net[CS-1][CS-1].x)/4.0
         self.netterm[CS-1][CS-1].y= (self.net[CS-1][CS-2].y+self.net[CS-2][CS-1].y-2.0*self.net[CS-1][CS-1].y)/4.0
         self.netterm[CS-1][CS-1].z= (self.net[CS-1][CS-2].z+self.net[CS-2][CS-1].z-2.0*self.net[CS-1][CS-1].z)/4.0
@@ -255,8 +260,8 @@ class ElasticNet(Sheet):
                     for py in range(CS):
                         
                         Sum+=self.cellforce(cx,cy,px,py,K)
-                        #print "Sum:",Sum
                         
+                ##The Sigma(wij)*(xi-yj) gets calculated here and stored in Ftotal matrix for future usage.
                 for px in range(CS):
                     for py in range(CS):
                         self.ftot[px][py].x += self.cforce[px][py]*(self.cell[cx][cy].x-self.net[px][py].x)/Sum
@@ -266,20 +271,25 @@ class ElasticNet(Sheet):
         
                 
         for cx in range(RS,RS*2): # For all the left retina cells do... calculate Wij
+            
             for cy in range(RS,RS*2):
-
+                
                 Sum=0.0
                 
                 for px in range(CS): # calculate Phi
                     for py in range(CS):
-                        Sum=Sum+self.cellforce(cx,cy,px,py,K)
-
+                        Sum+=self.cellforce(cx,cy,px,py,K)
+                        
+                ##The Sigma(wij)*(xi-yj) gets calculated here and stored in Ftotal matrix for future usage.
                 for px in range(CS):
                     for py in range(CS):
                         cf=self.cforce[px][py]
                         self.ftot[px][py].x += (self.cell[cx][cy].x-self.net[px][py].x)*cf/Sum
                         self.ftot[px][py].y += (self.cell[cx][cy].y-self.net[px][py].y)*cf/Sum
                         self.ftot[px][py].z += (self.cell[cx][cy].z-self.net[px][py].z)*cf/Sum
+
+       
+
 
            ######## END OF LOOP OVER CELLS #########
  
@@ -290,14 +300,20 @@ class ElasticNet(Sheet):
         # And finally put all the things together..
         for px in range(CS):
                     for py in range(CS):
-                        self.net[px][py].x+= self.alpha*self.ftot[px][py].x+self.beta*K*self.netterm[px][py].x+0.1*(random()-0.5)
-                        self.net[px][py].y+= self.alpha*self.ftot[px][py].y+self.beta*K*self.netterm[px][py].y+0.1*(random()-0.5)
-                        self.net[px][py].z+= self.alpha*self.ftot[px][py].z+self.beta*K*self.netterm[px][py].z+0.1*(random()-0.5)                    
+                        self.net[px][py].x+= self.alpha*self.ftot[px][py].x+self.beta*K*self.netterm[px][py].x
+                        self.net[px][py].y+= self.alpha*self.ftot[px][py].y+self.beta*K*self.netterm[px][py].y
+                        self.net[px][py].z+= self.alpha*self.ftot[px][py].z+self.beta*K*self.netterm[px][py].z            
 
-        #print rateK," : ",K
+
         self.initial_k*=rateK
-        
-        
+
+
+        for i in range(CS):
+            print
+            print
+            for j in range(CS):
+                print " ",i,",",j,":",self.net[i][j].x,"/",self.net[i][j].y,"/",self.net[i][j].z,
+
 
    
 
