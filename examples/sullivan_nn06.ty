@@ -81,10 +81,10 @@ topo.sim['V1'] = CFSOM(nominal_density=locals().get('default_density',15),
                        output_fn=PiecewiseLinear_debug2())
 
 
-
 topo.sim.connect('Retina','V1',delay=FixedPoint("0.10"),
                   connection_type=CFProjection,strength=1.0,name='Afferent',
                   nominal_bounds_template=BoundingBox(radius=1.0),
+                  response_fn = CFPRF_DotProduct_opt(),
                   learning_fn=HomeoSynaptic(beta_n=0.00033,beta_c=0.000033))
 
 
