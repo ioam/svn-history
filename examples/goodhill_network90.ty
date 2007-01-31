@@ -314,6 +314,10 @@ def update_elastic_net_maps():
            SheetView((array(sheet.zarray),sheet.bounds),
                      sheet.name,sheet.precedence,topo.sim.time())
 
+from topo.plotting.templates import plotgroup_templates 
+plotgroup_templates['Ocular Preference'].command='update_elastic_net_maps()'
+plotgroup_templates['Center of Gravity'].command='update_elastic_net_maps() ; topographic_grid(xsheet_view_name="XCoG",ysheet_view_name="YCoG")'
+
 
 ### Sheets,connections,parameters
 
