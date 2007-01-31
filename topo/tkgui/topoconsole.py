@@ -217,13 +217,13 @@ class TopoConsole(Frame):
         # Simulation Menu
         #
         self.menubar.addmenu('Simulation','Simulation commands')
-        self.menubar.addmenuitem('Simulation', 'command', 'Load script file',
-                                 label = 'Load script',
+        self.menubar.addmenuitem('Simulation', 'command', 'Run a .ty script file',
+                                 label = 'Run script',
                                  command = self.load_network)
-        self.menubar.addmenuitem('Simulation', 'command', "Save simulation's state to disk",
+        self.menubar.addmenuitem('Simulation', 'command', "Save simulation's state to disk as a .typ file",
                                  label = 'Save snapshot',
                                  command = self.save_snapshot)
-        self.menubar.addmenuitem('Simulation', 'command', 'Load the previously saved state',
+        self.menubar.addmenuitem('Simulation', 'command', 'Load the previously saved .typ state',
                                  label = 'Load snapshot',
                                  command = self.load_snapshot)
         self.menubar.addmenuitem('Simulation', 'command', 'Reset the network',
