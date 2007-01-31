@@ -1,0 +1,211 @@
+"""
+Extension of LGN with lateral connectivity
+
+The purpose of this model is to study the effects of contextual modulation in LGN
+
+$Id$
+"""
+__version__='$Revision$'
+
+import RandomArray
+import fixedpoint
+
+from math import pi, sqrt
+from fixedpoint import FixedPoint
+
+import topo.patterns.basic
+import topo.patterns.random
+
+import pprint
+
+from topo.sheets.lissom import LISSOM
+from topo.sheets.generatorsheet import GeneratorSheet
+from topo.projections.basic import CFProjection, SharedWeightCFProjection
+from topo.responsefns.optimized import CFPRF_DotProduct_opt, CFPRF_SharedWeightDotProduct_opt
+from topo.base.parameterclasses import DynamicNumber, Wrapper
+from topo.base.cf import CFSheet
+from topo.base.boundingregion import BoundingBox
+from topo.learningfns.optimized import CFPLF_Hebbian_opt
+from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
+from topo.outputfns.basic import PiecewiseLinear, DivisiveNormalizeL1
+from topo.misc.numbergenerators import UniformRandom
+
+topo.sim.name = "lgn_lateral"
+
+input_pattern = topo.patterns.basic.Gaussian(
+          scale=1.0, size=0.08333, aspect_ratio=4.6666,
+          x=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=12)),
+          y=DynamicNumber(UniformRandom(lbound=-0.75,ubound=0.75,seed=34)),
+          orientation=DynamicNumber(UniformRandom(lbound=-pi,ubound=pi,seed=56)))
+
+                                 
+# Default for tutorial
+topo.patterns.basic.Line.scale=0.9
+topo.patterns.basic.Gaussian.size=0.08333
+topo.patterns.basic.Gaussian.aspect_ratio=4.6666
+
+          
+# Specify weight initialization, response function, and learning function
+RandomArray.seed(500,500)
+CFProjection.weights_generator=topo.patterns.random.UniformRandom()
+CFProjection.weights_shape=topo.patterns.basic.Disk(smoothing=0.0)
+CFProjection.response_fn=CFPRF_DotProduct_opt()
+CFProjection.learning_fn=CFPLF_Hebbian_opt()
+CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
+SharedWeightCFProjection.response_fn=CFPRF_SharedWeightDotProduct_opt()
+
+SharedWeightCFProjection.weights_output_fn.single_cf_fn=DivisiveNormalizeL1()
+
+###########################################
+# build simulation
+
+topo.sim['Retina']=GeneratorSheet(nominal_density=24.0,
+                                  input_generator=input_pattern,
+                                  period=1.0, phase=0.05,
+                                  nominal_bounds=BoundingBox(radius=0.5+0.25+0.375))
+
+#topo.sim['LGNOn']=CFSheet(nominal_density=24.0,
+#                          nominal_bounds=BoundingBox(radius=0.5+0.25),
+#                          output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+#                          measure_maps=True)
+
+#topo.sim['LGNOff']=CFSheet(nominal_density=24.0,
+#                           nominal_bounds=BoundingBox(radius=0.5+0.25),
+#                           output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+#                           measure_maps=True)
+
+topo.sim['LGNOnSep']=CFSheet(nominal_density=24.0,
+                          nominal_bounds=BoundingBox(radius=0.5+0.25),
+                          output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                          measure_maps=True)
+
+topo.sim['LGNOffSep']=CFSheet(nominal_density=24.0,
+                           nominal_bounds=BoundingBox(radius=0.5+0.25),
+                           output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                           measure_maps=True)
+
+#topo.sim['LGNOnCom']=CFSheet(nominal_density=24.0,
+#                          nominal_bounds=BoundingBox(radius=0.5+0.25),
+#                          output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+#                          measure_maps=True)
+
+#topo.sim['LGNOffCom']=CFSheet(nominal_density=24.0,
+#                           nominal_bounds=BoundingBox(radius=0.5+0.25),
+#                           output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+#                           measure_maps=True)
+
+#topo.sim['LGNOnBal']=CFSheet(nominal_density=24.0,
+                          #nominal_bounds=BoundingBox(radius=0.5+0.25),
+                          #output_fn=PiecewiseLinear(lower_bound=0.0,upper_bound=1.0),
+                          #measure_maps=False)
+
+
+
+# DoG weights for the LGN
+centerg = topo.patterns.basic.Gaussian(
+    size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+
+surroundg = topo.patterns.basic.Gaussian(
+    size=0.2954, aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+
+on_weights = topo.patterns.basic.Composite(
+    generators=[centerg,surroundg],operator=Wrapper("Numeric.subtract"))
+
+off_weights = topo.patterns.basic.Composite(
+    generators=[surroundg,centerg],operator=Wrapper("Numeric.subtract"))
+
+lat_inh_gaus = topo.patterns.basic.Gaussian(
+    size=0.3,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+ 
+lat_exc_gaus = topo.patterns.basic.Gaussian(
+    size=0.07385,aspect_ratio=1.0,output_fn=DivisiveNormalizeL1())
+
+
+# Retina -> LGN 
+#topo.sim.connect('Retina','LGNOn',delay=FixedPoint("0.05"),
+#                 connection_type=SharedWeightCFProjection,strength=2.33,
+#                 nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
+#                 weights_generator=on_weights)
+
+#topo.sim.connect('Retina','LGNOff',delay = FixedPoint("0.05"),
+#                 connection_type=SharedWeightCFProjection,strength=2.33,
+#                 nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent1',
+#                 weights_generator=off_weights)
+
+topo.sim.connect('Retina','LGNOnSep',delay=FixedPoint("0.05"),
+                 connection_type=SharedWeightCFProjection,strength=2.33,
+                 nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent2',
+                 weights_generator=on_weights)
+
+topo.sim.connect('Retina','LGNOffSep',delay = FixedPoint("0.05"),
+                 connection_type=SharedWeightCFProjection,strength=2.33,
+                 nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent3',
+                 weights_generator=off_weights)
+
+#topo.sim.connect('Retina','LGNOnCom',delay=FixedPoint("0.05"),
+#                 connection_type=SharedWeightCFProjection,strength=2.33,
+#                 nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent4',
+#                 weights_generator=on_weights)
+
+#topo.sim.connect('Retina','LGNOffCom',delay = FixedPoint("0.05"),
+#                 connection_type=SharedWeightCFProjection,strength=2.33,
+#                 nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent5',
+#                 weights_generator=off_weights)
+
+#topo.sim.connect('Retina','LGNOnBal',delay = FixedPoint("0.05"),
+                 #connection_type=SharedWeightCFProjection,strength=2.33,
+                 #nominal_bounds_template=BoundingBox(radius=0.375),name='Afferent',
+                 #weights_generator=on_weights)
+
+
+
+# Lateral LGN connectivity
+topo.sim.connect('LGNOnSep','LGNOnSep',delay=FixedPoint("0.05"),
+                 connection_type=SharedWeightCFProjection,strength=-2.0,
+                 nominal_bounds_template=BoundingBox(radius=0.5),name='Lateral',
+                 weights_generator=lat_inh_gaus)
+
+topo.sim.connect('LGNOffSep','LGNOffSep',delay=FixedPoint("0.05"),
+                 connection_type=SharedWeightCFProjection,strength=-2.0,
+                 nominal_bounds_template=BoundingBox(radius=0.5),name='Lateral1',
+                 weights_generator=lat_inh_gaus)
+
+#topo.sim.connect('LGNOnCom','LGNOnCom',delay=FixedPoint("0.05"),
+#                 connection_type=SharedWeightCFProjection,strength=-2.0,
+#                 nominal_bounds_template=BoundingBox(radius=0.5),name='Lateral2',
+#                 weights_generator=lat_inh_gaus)
+
+#topo.sim.connect('LGNOffCom','LGNOffCom',delay=FixedPoint("0.05"),
+#                 connection_type=SharedWeightCFProjection,strength=-2.0,
+#                 nominal_bounds_template=BoundingBox(radius=0.5),name='Lateral3',
+#                 weights_generator=lat_inh_gaus)
+
+#topo.sim.connect('LGNOnCom','LGNOffCom',delay=FixedPoint("0.05"),
+#                 connection_type=SharedWeightCFProjection,strength=-2.0,
+#                 nominal_bounds_template=BoundingBox(radius=0.5),name='Lateral4',
+#                 weights_generator=lat_inh_gaus)
+
+#topo.sim.connect('LGNOffCom','LGNOnCom',delay=FixedPoint("0.05"),
+#                 connection_type=SharedWeightCFProjection,strength=-2.0,
+#                 nominal_bounds_template=BoundingBox(radius=0.5),name='Lateral5',
+#                 weights_generator=lat_inh_gaus)
+
+#topo.sim.connect('LGNOnBal','LGNOnBal',delay=FixedPoint("0.05"),
+                 #connection_type=SharedWeightCFProjection,strength=-2.0,
+                 #nominal_bounds_template=BoundingBox(radius=0.375),name='Lateral',
+                 #weights_generator=lat_inh_gaus)
+
+#topo.sim.connect('LGNOnBal','LGNOnBal',delay=FixedPoint("0.05"),
+                 #connection_type=SharedWeightCFProjection,strength=2.0,
+                 #nominal_bounds_template=BoundingBox(radius=0.375),name='Lateral',
+                 #weights_generator=lat_exc_gaus)
+
+
+### Actions scheduled to occur as the simulation proceeds.
+#
+# CEBHACKALERT: add missing scheduled actions from c++ lissom
+# (i.e. ones relevant to all bounds and densities, not just for
+#  the particular ones set in this file right now).
+
+topo.sim.startup_commands.append("from topo.base.boundingregion import BoundingBox")
+
