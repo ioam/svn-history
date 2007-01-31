@@ -89,7 +89,7 @@ def matrixplot(mat,title=None):
     pylab.show()
 
 
-def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreference'):
+def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreference',axis=[-0.5,0.5,-0.5,0.5]):
     """
     By default, plot the XPreference and YPreference preferences for all
     Sheets for which they are defined, using MatPlotLib.
@@ -124,7 +124,7 @@ def topographic_grid(xsheet_view_name='XPreference',ysheet_view_name='YPreferenc
             # Currently sets the input range arbitrarily; should presumably figure out
             # what the actual possible range is for this simulation (which would presumably
             # be the maximum size of any GeneratorSheet?).
-            pylab.axis([-0.5,0.5,-0.5,0.5])
+            pylab.axis(axis)
             windowtitle('Topographic mapping to '+sheet.name+' at time '+str(topo.sim.time()))
 
             # Will need to provide a way to save this output
