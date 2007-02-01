@@ -17,7 +17,7 @@ $Id$
 __version__='$Revision$'
 
 
-# CEBHACKALERT: fix & check scheduled events; check learning rates
+# CEBHACKALERT: scheduled events not yet verified
 
 
 
@@ -78,6 +78,13 @@ scale_input=1.0
 retina_edge_buffer=round((rf_radius+(randomness*BaseRN*area_scale/2.0)),0)
 RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
 
+### (3)
+acs=6.5*6.5/rf_radius/rf_radius
+ecs=19.5*19.5/exc_rad/exc_rad
+ics=47.5*47.5/inh_rad/inh_rad
+alpha_input=0.007*acs
+alpha_exc=0.002*ecs
+alpha_inh=0.00025*ics
 
 
 tsettle=8
@@ -153,55 +160,63 @@ topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"),
           name='LateralInhibitory',
           nominal_bounds_template = inhibitory_weight_bounds)
 
-
+# don't try to pickle this simulation
+V1 = topo.sim['V1']
+Af = V1.projections()["Afferent0"]
+LE = V1.projections()["LateralExcitatory"]
+LI = V1.projections()["LateralInhibitory"]
 
 
 # Topographica learning rate is density-independent so to compare
 # with C++ lissom it's necessary to know the number of units.
-n_aff_units=len(Numeric.nonzero(Numeric.ravel(topo.sim['V1'].in_connections[0].cf(int(BaseN/2),int(BaseN/2)).mask)))
-n_exc_units=len(Numeric.nonzero(Numeric.ravel(topo.sim['V1'].in_connections[1].cf(int(BaseN/2),int(BaseN/2)).mask)))
-n_inh_units=len(Numeric.nonzero(Numeric.ravel(topo.sim['V1'].in_connections[2].cf(int(BaseN/2),int(BaseN/2)).mask)))
-
-### (3)
-acs=6.5*6.5/rf_radius/rf_radius
-ecs=19.5*19.5/exc_rad/exc_rad
-ics=47.5*47.5/inh_rad/inh_rad
-alpha_input=0.007*n_aff_units*acs
-alpha_exc=0.002*ecs*n_exc_units
-alpha_inh=0.00025*ics*n_inh_units
+# (seems like a complex method but it's the same as that in cf.py)
+center=(int(BaseN/2),int(BaseN/2))
+from Numeric import ravel,nonzero
+def n_units(x):
+    return len(nonzero(ravel(x.cf(*center).mask)))
 
 
-topo.sim['V1'].in_connections[0].learning_rate=alpha_input
-topo.sim['V1'].in_connections[1].learning_rate=alpha_exc
-topo.sim['V1'].in_connections[2].learning_rate=alpha_inh
+n_aff_units=n_units(Af)
+n_exc_units=n_units(LE)
+n_inh_units=n_units(LI)
 
 
-        
-
-topo.sim.schedule_command(200, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.6/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=len(Numeric.nonzero(Numeric.ravel(topo.sim["V1"].in_connections[1].cf(int(BaseN/2),int(BaseN/2)).mask)))')
-
-topo.sim.schedule_command(500, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.42/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=len(Numeric.nonzero(Numeric.ravel(topo.sim["V1"].in_connections[1].cf(int(BaseN/2),int(BaseN/2)).mask)))')
-
-topo.sim.schedule_command(1000,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.336/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=len(Numeric.nonzero(Numeric.ravel(topo.sim["V1"].in_connections[0].cf(int(BaseN/2),int(BaseN/2)).mask)))')
-
-#topo.sim.schedule_command(1999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=2.0/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=9')
-
-## CEBHACKALERT: investigate - last bounds change doesn't happen in Topographica
-## Topographica> topo.sim['V1'].in_connections[1].weights_bounds.lbrt()
-## (-0.02777777777777779, -0.04166666666666663, 0.04166666666666663, 0.02777777777777779)
-## Topographica> BoundingBox(radius=2.0/BaseN).lbrt()
-## (-0.027777777777777776, -0.027777777777777776, 0.027777777777777776, 0.027777777777777776)
+Af.learning_rate=alpha_input*n_aff_units
+LE.learning_rate=alpha_exc*n_exc_units
+LI.learning_rate=alpha_inh*n_inh_units
 
 
-topo.sim.schedule_command(  200,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.002*ecs*n_exc_units')
-topo.sim.schedule_command(  500,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.001*ecs*n_exc_units')
 
-topo.sim.schedule_command(  500,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.005*acs*n_aff_units')
-topo.sim.schedule_command( 2000,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.004*acs*n_aff_units')
-topo.sim.schedule_command( 4000,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.003*acs*n_aff_units')
-topo.sim.schedule_command(20000,'topo.sim["V1"].projections()["Afferent0"].learning_rate=0.0015*acs*n_aff_units')
+### Excitatory bounds changes
+#
+# The learning rate is adjusted too because the number of units changes (even if the learning
+# rate is going to be adjusted anyway at this time)
+# 
+# CEBHACKALERT (for somewhere else!): why do I have to type min_rad every time?
+topo.sim.schedule_command(2, 'exc_rad*=0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=n_units(LE); LE.learning_rate=alpha_exc*n_exc_units')
+
+topo.sim.schedule_command(5, 'exc_rad*=0.7; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=n_units(LE); LE.learning_rate=alpha_exc*n_exc_units')
+
+topo.sim.schedule_command(10,'exc_rad*=0.8; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=n_units(LE); LE.learning_rate=alpha_exc*n_exc_units')
+
+topo.sim.schedule_command(20,'exc_rad=2.0; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=n_units(LE); LE.learning_rate=alpha_exc*n_exc_units')
 
 
+### Excitatory learning rate changes
+#
+
+topo.sim.schedule_command(  2,'alpha_exc=0.002*ecs; LE.learning_rate=alpha_exc*n_exc_units')
+topo.sim.schedule_command(  5,'alpha_exc=0.001*ecs; LE.learning_rate=alpha_exc*n_exc_units')
+
+### Afferent learning rate changes
+#
+topo.sim.schedule_command(  5,'alpha_input=0.0050*acs; Af.learning_rate=alpha_input*n_aff_units')
+topo.sim.schedule_command( 20,'alpha_input=0.0040*acs; Af.learning_rate=alpha_input*n_aff_units')
+topo.sim.schedule_command( 40,'alpha_input=0.0030*acs; Af.learning_rate=alpha_input*n_aff_units')
+topo.sim.schedule_command(20000,'alpha_input=0.0015*acs; Af.learning_rate=alpha_input*n_aff_units')
+
+### delta/beta changes
+#
 topo.sim.schedule_command(  200, 'topo.sim["V1"].output_fn.lower_bound=0.11; topo.sim["V1"].output_fn.upper_bound=0.66')
 topo.sim.schedule_command(  500, 'topo.sim["V1"].output_fn.lower_bound=0.12; topo.sim["V1"].output_fn.upper_bound=0.67')
 topo.sim.schedule_command( 1000, 'topo.sim["V1"].output_fn.lower_bound=0.15; topo.sim["V1"].output_fn.upper_bound=0.68')
