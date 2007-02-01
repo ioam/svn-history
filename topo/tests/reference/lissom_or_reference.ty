@@ -115,37 +115,6 @@ alpha_inh=0.00025*ics*n_inh_units
 tsettle=8
 
 
-assert RN == 38
-assert retina_edge_buffer == 7
-assert xsigma == 6
-assert ysigma == 1.5
-#assert inputs_pereye == 1
-#assert round(retina_area_scale,6) == 0.591716
-assert rf_radius == 6.5
-assert delta == 0.1
-assert beta == 0.65
-#assert default_afferent_size_scale == 3
-assert rf_radius == 6.5
-assert inh_rad == 17.5
-assert exc_rad == 7.5
-assert round(min_exc_rad,5) == 2.13636
-assert area_scale == 1
-assert BaseRN == 24.
-assert BaseN == 72.
-#assert num_eyes==1
-assert gammaexc==0.9
-assert gammainh==0.9
-assert randomness == 0.0
-assert round(rf_radius_scale,6)==0.769231
-assert scale_input==1.0
-assert acs==1
-assert round(ecs,5)==6.76000
-assert round(ics,5)==7.36735
-assert round(alpha_input/n_aff_units,3)==0.007
-assert round(alpha_exc/n_exc_units,7)==0.0135200
-assert round(alpha_inh/n_inh_units,8)==0.00184184
-assert tsettle == 8
-
 # Number of decimal places for simulator time
 fixedpoint.DEFAULT_PRECISION=3
 random.seed(1234)
@@ -264,6 +233,8 @@ topo.sim.schedule_command(19999, 'topo.sim["V1"].output_fn.lower_bound=0.24; top
 
 
 
+
+
 # Performance profiling
 #
 # Example 1
@@ -280,3 +251,63 @@ topo.sim.schedule_command(19999, 'topo.sim["V1"].output_fn.lower_bound=0.24; top
 #profile.runctx('s.run(10000)',globals(),locals(),"abc")
 #p = pstats.Stats('abc')
 #p.strip_dirs().sort_stats('cumulative').print_stats()
+
+
+
+### COMPARISONS
+# ./lissom5 commandpath="/home/chris/scratch/DICE_old/lissom_old/command/" display=0 or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+49" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'
+
+#
+import topo.tests.reference.lissom_log_parser
+from topo.tests.reference.lissom_log_parser import get_input_params, get_matrix, compare_elements, compare_weights,compare_activities
+
+# no. of decimal places for matching activity and weight values
+topo.tests.reference.lissom_log_parser.act_dp = 4
+topo.tests.reference.lissom_log_parser.wt_dp = 4
+
+topo.tests.reference.lissom_log_parser.plots = locals().get('plots',False)
+
+
+
+matching = {}
+
+if locals().get('comparisons',False):
+
+
+
+    topo.sim.run(1)
+
+    ### FIRST ITERATION ACTIVITY COMPARISONS
+    #
+    matching.update(compare_activities("topo/tests/reference/or_map_topo.000001p000.Eye0_Activity.matrix",(RN,RN),"Retina"))
+
+    matching.update(compare_activities("topo/tests/reference/or_map_topo.000001p000.Primary_Activity.matrix",(BaseN,BaseN),"V1"))
+
+
+
+
+    #topo.sim.run(49)
+
+
+    # 50th ITERATION WEIGHTS COMPARISONS
+    
+    
+
+    # 50th ITERATION ACTIVITY COMPARISONS
+    
+    
+    
+
+
+
+    print "\n"; print "\n"
+    print "** RESULTS **"
+    print "\n"
+    print "Checking weights to "+str(topo.tests.reference.lissom_log_parser.wt_dp)+" d.p. and activity values to "+str(topo.tests.reference.lissom_log_parser.act_dp)+ " d.p." 
+    print "\n"
+    for what,result in matching.items():
+        if result:
+            print what + " ... pass"
+        else:
+            print what + " ... FAIL"
+
