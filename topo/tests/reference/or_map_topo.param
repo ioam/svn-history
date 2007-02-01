@@ -1,0 +1,158 @@
+#!./lissom
+# RF-LISSOM parameter file for an orientation-map simulation
+# designed to match what Topographica can do as of 2006/01
+#
+# $Header$
+
+###############################################################################
+# Training
+
+# Network architecture
+# To change retinal   resolution,  scale RN and rf_radius by the same proportion
+# To change cortical "resolution", scale N, exc_rad, and inh_rad by the same proportion
+# To change retinal and cortical area, scale RN, N, and inputs_pereye by the same proportion
+#
+
+### (1)
+set BaseN=72  
+set BaseRN=24  
+set area_scale=1
+set num_eyes=1
+set rf_radius=BaseRN/4+0.5 
+set inh_rad=2.5>?(BaseN/4-1)+0.5 
+set exc_rad=2.5>?(BaseN/10)+0.3
+#set default_afferent_size_scale=BaseN/BaseRN
+set gammaexc=0.9 
+set gammainh=0.9
+set delta=0.1 
+set beta=0.65
+set noise=0
+#define_param min_exc_rad Param_Float   0  exc_rad "Minimum exc_rad value allowed" 1>?BaseN/44+0.5
+
+
+### (2)
+# Initial order
+set randomness=0 lat_exc_randomness=1 lat_inh_randomness=1
+set preset_aff_wts=True preset_sigma_aff=0
+set preset_lat_wts=True preset_sigma_exc=0 preset_sigma_inh=0
+set circular_aff_wts=True  circular_lat_wts=True
+set smooth_circular_outlines=False smooth_circular_radius_trim=-0.25
+
+# Allow number of iterations per real time interval to be varied independently
+# Increase to use a denser approximation, decrease to do a quick-and-dirty one
+# Values very different from 1.0 do not yet have the same behavior, so other
+# corrections still need to be determined
+define_param ts Param_Float  0 MaxInt  "Time scale"
+set ts=1.0
+
+# Inputs
+#
+#define_param rf_radius_scale Param_Float   0 MaxInt \
+#"Scale of RF radius relative to an arbitrary base case" 5/rf_radius
+#
+
+#define_param retina_area_scale Param_Float 0 MaxInt \
+#"Scale of retinal area relative to canonical case" (BaseRN*area_scale/24*rf_radius_scale)*(BaseRN*area_scale/24*rf_radius_scale)
+#
+set input_default_type=Input_Gaussian
+set input_default_position="Uncorrelate &uncorrelation 0 RN  Random RN/2 RN/2 Precision 1"
+set input_default_angle="Random PI/2 PI/2 Precision 1"
+#set inputs_pereye=retina_area_scale>?1 uncorrelation=0.0 
+set xsigma=6.0 
+set ysigma=1.5
+set scale_input=1.0 normalize_aff=False
+
+set blur_radius=0
+set input_separation_min_enforce=True
+set bound_multiplier=BaseRN*area_scale*10 # Make sure all input patterns are evaluated fully
+
+# Expand retina to provide full receptive fields to all neurons
+set retina_edge_buffer=(rf_radius+(randomness*BaseRN*area_scale/2)) 
+set RN=BaseRN*area_scale+2*retina_edge_buffer
+
+
+# Learning
+#
+# Scaling factors to keep total unnormalized weight change per
+# iteration the same as in an arbitrary canonical case  
+
+### (3)
+define_param acs Param_Float  0 MaxInt "Afferent connection scale"
+define_param ecs Param_Float  0 MaxInt "Lateral excitatory connection scale"
+define_param ics Param_Float  0 MaxInt "Lateral inhibitory connection scale"
+set acs=6.5*6.5/rf_radius/rf_radius
+set ecs=19.5*19.5/exc_rad/exc_rad
+set ics=47.5*47.5/inh_rad/inh_rad
+
+set alpha_input=0.0070*acs/ts 
+set alpha_exc=0.002*ecs/ts 
+set alpha_inh=0.00025*ics/ts
+
+set tsettle=8
+set dynamics=0
+set tend=20010*ts
+
+# Pruning
+#set exc_death=0*ecs inh_death=1e-05*ics
+#hook before_input (20000*ts) kill_connections
+#hook before_input (30000*ts) kill_connections
+
+# Saving (only enable if desired; the weight file can be as large as the RAM needed)
+hook after_learning tend save_snapshot
+
+# Training phases
+#   The exc_rad multipliers are somewhat arbitrary, just to match previously chosen 
+#   values when exc_rad starts at 19,  while also working ok for smaller networks
+
+hook before_input   (200*ts) set tsettle=8  exc_rad=0.6*exc_rad  delta=0.11 beta=0.66 alpha_input=0.0070*acs/ts  alpha_exc=0.002*ecs/ts
+hook before_input   (500*ts) set tsettle=8  exc_rad=0.7*exc_rad  delta=0.12 beta=0.67 alpha_input=0.0050*acs/ts  alpha_exc=0.001*ecs/ts
+hook before_input  (1000*ts) set tsettle=8  exc_rad=0.8*exc_rad  delta=0.15 beta=0.68 alpha_input=0.0050*acs/ts
+hook before_input  (2000*ts) set tsettle=8 exc_rad=2.0  delta=0.18 beta=0.70 alpha_input=0.0040*acs/ts
+hook before_input  (3000*ts) set tsettle=8 delta=0.20 beta=0.73 alpha_input=0.0040*acs/ts
+hook before_input  (4000*ts) set tsettle=8 delta=0.20 beta=0.76 alpha_input=0.0030*acs/ts
+hook before_input  (5000*ts) set tsettle=8 delta=0.21 beta=0.79 alpha_input=0.0030*acs/ts
+hook before_input  (6500*ts) set tsettle=8 delta=0.22 beta=0.82 alpha_input=0.0030*acs/ts
+hook before_input  (8000*ts) set tsettle=8 delta=0.23 beta=0.85 alpha_input=0.0030*acs/ts
+hook before_input (20000*ts) set tsettle=8 delta=0.24 beta=0.88 alpha_input=0.0015*acs/ts
+
+###############################################################################
+# Analysis and plotting
+
+# Plotting setup (False means tailored to on-screen viewing rather than printing)
+#set ppm_paper_based_colors=False
+
+## This makes the orientation color code match historical usage; omit
+## if that is not desired.
+set reversed_color_order=False
+call mono_plots
+set ppm_histograms=False
+
+# Orientation map computation
+# (Must come before anything analyzing activity values, since it may change them)
+hook before_input  (0*ts),(100*ts),(1000*ts),(5000*ts),(10000*ts),(20000*ts),(30000*ts) exec "call measure_or_pref or_num_angles=4 weighted_average=True" "plot OrientationPreference"
+
+hook before_input 0 set Region::Eye*::activity_threshold=0
+
+# Set up OrientationPreference and OrientationSelectivity as subplots
+#hook before_input 0 child_set plastic=True Region '' *::Color::name="OrientationPreference" *::Confidence::name="OrientationSelectivity"
+
+# Weight plotting for a few randomly-selected neurons over time
+#hook after_learning  (0*ts),(100*ts),(1000*ts),(5000*ts),(10000*ts),(20000*ts),(20000*ts+1),(30000*ts) plot_unit \
+#current_height*1/5-0.5 current_width*1/5-0.5  current_height*4/5-0.5 current_width*2/5-0.5 \
+#current_height*2/5-0.5 current_width*3/5-0.5  current_height*4/5-0.5 current_width*4/5-0.5
+
+# Activity plots showing sample inputs and responses
+#hook after_learning  (0*ts+1)-(0*ts+5),(100*ts+1)-(100*ts+5),(1000*ts+1)-(1000*ts+5),(5000*ts+1)-(5000*ts+5),(10000*ts+1)-(10000*ts+5),(20000*ts+1)-(20000*ts+5),(30000*ts+1)-(30000*ts+5) plot
+
+# Numerical analysis (also plots interesting neurons)
+#hook after_learning   (20000*ts) OR_features          N*1/4-1 N*3/4-1  10
+#hook after_learning  (20000*ts) kurtosis_contrast    N/3     N/3      10  80 0 
+#hook after_learning  (20000*ts) orientation_contrast N/3     N/3      10   2.0 
+#hook after_learning   (30000*ts) OR_features          N*1/4-1 N*3/4-1  10
+
+# Test response to a fixed stimulus over time 
+# (Must come after anything analyzing activity values, since it changes them)
+hook after_learning  (0*ts),(100*ts),(1000*ts),(5000*ts),(10000*ts),(20000*ts),(20000*ts+1),(30000*ts) input_present_object "" Input_Gaussian PI/4
+
+# Collect data for spinning line anim
+#hook after_learning 0*ts,tend for f=0 f<PI f=f+PI/18 input_present_object "" Input_Gaussian f
