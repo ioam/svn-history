@@ -10,31 +10,14 @@ setting up the network are out of date. Please do not use this file as
 an example of how to use Topographica.
 
 
+./topographica -g -c "comparisons=True" topo/tests/reference/lissom_or_reference.ty
 
 $Id$
 """
 __version__='$Revision$'
 
 
-# (needs updating to use schedule_command)
-
-# To do:
-# - check all relevant scheduled events are
-# here.
-
-
-# Current matching status:
-# - With square receptive fields, matches c++ lissom
-# after 100 iterations to the same precision that the
-# retinal input activities match between the two (about
-# 6 decimal places for activity values). Haven't checked
-# after more because learning rates not updated yet (used
-# correct learning rates for the 100-iterations test).
-# - With circular receptive fields, sum over activity
-# after 201 learning iteration matches to 5-6 dp. Haven't
-# checked any further yet, but unless the scheduled actions
-# contain a mistake, it should finish up matching to this
-# accuracy after 20000 iterations (waiting to see...).
+# CEBHACKALERT: fix & check scheduled events; check learning rates
 
 
 
