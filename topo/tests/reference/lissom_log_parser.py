@@ -38,6 +38,8 @@ def get_input_params(log_file='or_map_topo.log'):
 from Numeric import array
 # CEBHACKALERT: this kind of function probably exists somewhere
 # already. In any case, needs to print out meaningful errors.
+from topo.commands.pylabplots import matrixplot
+
 def get_matrix(matrix_file,dim,center=None):
     """
     Returns an array containing the data in the specified C++ LISSOM .matrix
