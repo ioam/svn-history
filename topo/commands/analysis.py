@@ -149,6 +149,7 @@ class PatternPresenter(ParameterizedObject):
                 for g in inputs.itervalues():
                     g.offset=0.5
                     g.scale=2*g.offset*g.contrast/100
+
             
 	
             elif self.contrast_parameter=='weber_contrast':
@@ -180,7 +181,7 @@ proj_name =''
 ### to access a Sheet instance directly, rather than searching by name.
 
 def measure_position_pref(divisions=6,size=0.5,scale=0.3,offset=0.0,display=False,
-                          pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),False,1.0),
+                          pattern_presenter=PatternPresenter(Gaussian(aspect_ratio=1.0),False,0.175),
                           x_range=(-0.5,0.5),y_range=(-0.5,0.5)):
     """
     Measure position preference map, using a circular Gaussian by default.
@@ -246,10 +247,10 @@ def measure_or_pref(num_phase=18,num_orientation=4,frequencies=[2.4],
 
 
 def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4],
-                                curve_parameters=[{"contrast":30}, {"contrast":60}, {"contrast":90}],
+                                curve_parameters=[{"contrast":30}, {"contrast":60},{"contrast":80},{"contrast":90}],
                                 display=False,
                                 pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
-                                                                   apply_output_fn=False,duration=1.0,
+                                                                   apply_output_fn=True,duration=1.0,
                                                                    contrast_parameter="michelson_contrast")):
     """
     Measures orientation tuning curve of a particular unit using a full field grating stimulus. 
@@ -282,55 +283,11 @@ def measure_or_tuning_fullfield(num_phase=18,num_orientation=12,frequencies=[2.4
 	  
 
 
-def measure_contrast_response_fullfield(contrasts=[10,20,30,40,50,60,70,80,90],relative_orientations=[-pi/10,0,pi/10], 
-                                        display=False,frequency=2.4,
-                                        pattern_presenter=PatternPresenter(pattern_generator=SineGrating(),
-                                                                           apply_output_fn=False,duration=1.0,
-                                                                           contrast_parameter="michelson_contrast")):
-    """
-    Measure the contrast response curve of a particular unit.
-    
-    Uses a full field grating stimulus at the preferred orientation of the unit.
-    Orientation preference must be measured before measuring the contrast response.
-    The contrast_parameter is michelson_contrast but can be replaced by another variable
-    eg. scale, weber_contrast or any other contrast definition, provided it is defined in PatternPresenter. 
-    """
-
-    sheets_to_measure=topo.sim.objects(CFSheet).values()
-
-    for sheet in sheets_to_measure:
-        matrix_coords = sheet.sheet2matrixidx(coordinate[0],coordinate[1])
-        if(('OrientationPreference' in sheet.sheet_view_dict) and
-           ('PhasePreference' in sheet.sheet_view_dict)):
-            or_pref = sheet.sheet_view_dict['OrientationPreference'].view()[0]
-            phase_pref = sheet.sheet_view_dict['PhasePreference'].view()[0]
-            or_value = or_pref[matrix_coords]
-            phase_value = phase_pref[matrix_coords]
-        else:
-            topo.sim.warning("Orientation Preference should be measured before plotting Contrast Response -- using default values for "+str(sheet.name))
-            or_value = 0.0
-            phase_value = 0.0  
-        
-    
-        curve_parameters=[{"orientation":or_value+ro} for ro in relative_orientations]
-    
-        feature_values = [Feature(name="contrast",values=contrasts)]
-        x_axis='contrast'
-        x=FeatureCurves(feature_values,sheet,x_axis)
-    
-        for curve in curve_parameters:
-            param_dict = {"phase":phase_value, "frequency":frequency}
-            param_dict.update(curve)
-            curve_label='Orientation = %.4f rad' % curve["orientation"] 
-            x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
-    
-    
-        
 def measure_size_response(num_phase=18,
-                          curve_parameters=[{"contrast":30}, {"contrast":80}],
+                          curve_parameters=[{"contrast":30}, {"contrast":60},{"contrast":80},{"contrast":90}],
                           num_sizes=10,display=False,
                           pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
-                                                             apply_output_fn=False,duration=1.0,
+                                                             apply_output_fn=True,duration=1.0,
                                                              contrast_parameter="weber_contrast")):
     """
     Measure receptive field size of one unit of a sheet.
@@ -358,7 +315,8 @@ def measure_size_response(num_phase=18,
     else:
         topo.sim.warning("Orientation Preference should be measured before plotting Size Response -- using default values for "+sheet_name)
         or_value = 0.0
-   
+
+    print or_value
 
     if(('XPreference' in sheet.sheet_view_dict) and
        ('YPreference' in sheet.sheet_view_dict)):
@@ -371,15 +329,17 @@ def measure_size_response(num_phase=18,
         x_value=coordinate[0]
         y_value=coordinate[1]
 
+    print x_value, y_value
+
     if num_phase <= 0:
         raise ValueError("num_phase must be greater than 0")
 
     else:
         step_phase=2*pi/num_phase
-        step_size=0.6/num_sizes
+        step_size=1.0/num_sizes
         
         feature_values = [Feature(name="phase",range=(0.0,2*pi),step=step_phase,cyclic=True),
-                          Feature(name="size",range=(0.1,0.7),step=step_size,cyclic=False)]
+                          Feature(name="size",range=(0.1,1.0),step=step_size,cyclic=False)]
 
         x_axis='size'
         x=FeatureCurves(feature_values,sheet,x_axis)
@@ -390,12 +350,11 @@ def measure_size_response(num_phase=18,
 	    curve_label='Contrast = '+str(curve["contrast"])+'%'
             x.collect_feature_responses(feature_values,pattern_presenter, param_dict,curve_label,display)
 
-                  
 
-def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90],relative_orientations=[-pi/10,0,pi/10],
+def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90,100],relative_orientations=[-pi/6,0,pi/6, pi/8, pi/2],
                               size=0.5,display=False,frequency=2.4,
                               num_phase=18,pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
-                                                                              apply_output_fn=False,duration=1.0,
+                                                                              apply_output_fn=True,duration=1.0,
                                                                               contrast_parameter="weber_contrast")):
     """
     Measures contrast response curves for a particular unit.
@@ -413,13 +372,13 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90],relative_or
     """
 
     sheet=topo.sim[sheet_name]
-    matrix_coords = sheet.sheet2matrixidx(coordinate[0],coordinate[1])#
+    matrix_coords = sheet.sheet2matrixidx(coordinate[0],coordinate[1])
 
     if('OrientationPreference' in sheet.sheet_view_dict):
         or_pref = sheet.sheet_view_dict['OrientationPreference'].view()[0]
         or_value = or_pref[matrix_coords]
     else:
-        topo.sim.warning("Orientation Preference should be measured before plotting Size Response -- using default values for "+sheet_name)
+        topo.sim.warning("Orientation Preference should be measured before plotting Contrast Response -- using default values for "+sheet_name)
         or_value = 0.0
    
 
@@ -430,7 +389,7 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90],relative_or
         x_value=x_pref[matrix_coords]
         y_value=y_pref[matrix_coords]
     else:
-        topo.sim.warning("Position Preference should be measured before plotting Size Response -- using default values for "+sheet_name)
+        topo.sim.warning("Position Preference should be measured before plotting Contrast Response -- using default values for "+sheet_name)
         x_value=coordinate[0]
         y_value=coordinate[1]
  
@@ -449,17 +408,17 @@ def measure_contrast_response(contrasts=[10,20,30,40,50,60,70,80,90],relative_or
         x=FeatureCurves(feature_values,sheet,x_axis)
    
 	for curve in curve_parameters:
-            param_dict = {"x":x_value,"y":y_value,"frequency":frequency}
+            param_dict = {"x":x_value,"y":y_value,"frequency":frequency, "size":size}
             param_dict.update(curve)
             curve_label='Orientation = %.4f rad' % curve["orientation"] 
 	    x.collect_feature_responses(feature_values,pattern_presenter, param_dict, curve_label,display)
                         
-
+            
 def measure_or_tuning(num_phase=18,num_orientation=12,frequencies=[2.4],
-                      curve_parameters=[{"contrast":30}, {"contrast":60}, {"contrast":90}],
+                      curve_parameters=[{"contrast":30}, {"contrast":60},{"contrast":80}, {"contrast":90}],
                       display=False,size=0.5,
                       pattern_presenter=PatternPresenter(pattern_generator=SineGratingDisk(),
-                                                         apply_output_fn=False,duration=1.0,
+                                                         apply_output_fn=True,duration=1.0,
                                                          contrast_parameter="weber_contrast")):
     """
     Measures orientation tuning curve of a particular unit.
