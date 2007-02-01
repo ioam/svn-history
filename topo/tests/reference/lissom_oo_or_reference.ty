@@ -207,6 +207,7 @@ afferent_weight_bounds   = BoundingBox(radius=rf_radius/BaseRN)
 excitatory_weight_bounds = BoundingBox(radius=exc_rad/BaseN, min_radius=min_exc_radius)  
 inhibitory_weight_bounds = BoundingBox(radius=inh_rad/BaseN)                  
 
+
 # Circular ConnectionFields
 CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
@@ -359,54 +360,20 @@ topo.sim.schedule_command(19999, 'topo.sim["V1"].output_fn.lower_bound=0.223; to
 # command used to generate c++ lissom data:
 # ./lissom5 commandpath="../../../../lissom_old/command/" display=0 oo_or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c "plot_unit region=Ganglia00 save_matrices=True 0 0" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+49" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'
 
-
-from topo.tests.reference.lissom_log_parser import get_input_params, get_matrix, compare_elements
+import topo.tests.reference.lissom_log_parser
+from topo.tests.reference.lissom_log_parser import get_input_params, get_matrix, compare_elements, compare_weights,compare_activities
 
 # no. of decimal places for matching activity and weight values
-act_dp = 5
-wt_dp = 5
+topo.tests.reference.lissom_log_parser.act_dp = 5
+topo.tests.reference.lissom_log_parser.wt_dp = 5
+
+topo.tests.reference.lissom_log_parser.plots = locals().get('plots',False)
 
 
-comparisons = locals().get('comparisons',False)
-
-plots = locals().get('plots',False)
 
 matching = {}
 
-def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_shape,unit,sheet,conn):
-
-    comparing_what = conn + " " + str(unit) + " t=" + str(topo.sim.time()) 
-
-    topo_weights = topo.sim[sheet].projections()[conn].cf(*unit).weights
-    c_weights = get_matrix(c_matrix_filename,c_sheet_shape)[c_row_slice,c_col_slice] # c++ lissom doesn't situate weights  
-
-    match = compare_elements(topo_weights,c_weights,wt_dp,comparing_what)
-
-    if plots and not match:
-        matrixplot(topo_weights,title="topo "+comparing_what)
-        matrixplot(c_weights,title="c++ "+comparing_what)
-
-    matching[comparing_what] = match
-
-
-
-def compare_activities(c_matrix_filename,c_sheet_shape,sheet):
-
-    comparing_what = sheet + " activity, t=" + str(topo.sim.time()) 
-
-    topo_act = topo.sim[sheet].activity
-    c_act = get_matrix(c_matrix_filename,c_sheet_shape)
-
-    match = compare_elements(topo_act,c_act,act_dp,comparing_what)
-
-    if plots and not match:
-        matrixplot(topo_act,title="topo "+comparing_what)
-        matrixplot(c_act,title="c++ "+comparing_what)
-
-    matching[comparing_what] = match
-
-
-if comparisons:
+if locals().get('comparisons',False):
 
 
 
@@ -418,49 +385,49 @@ if comparisons:
     # Using one gaussian (rather than DoG), it doesn't match exactly either.
     # Using a solid disk, though (e.g. see retina_lgn_match.ty), the match is very close.
 
-    compare_weights(
+    matching.update(compare_weights(
         'topo/tests/reference/oo_or_map_topo.000000.wts.Ganglia00.Afferent0.000_000.matrix',
         slice(0,19),slice(0,19),(RN,RN),
-        (0,0),'LGNOn','RetinaToLGNOn')
+        (0,0),'LGNOn','RetinaToLGNOn'))
 
 
     # CEBHACKALERT: Before the simulation has been run, the
     # Topographica weights are not jointly normalized.
     topo.sim.run(0.00001)
     
-    compare_weights(
+    matching.update(compare_weights(
         'topo/tests/reference/oo_or_map_topo.000000.wts.Primary.Afferent00.000_000.matrix', 
         slice(1,14),slice(1,14),(LN,LN),
-        (0,0),'V1','LGNOnAfferent')
+        (0,0),'V1','LGNOnAfferent'))
 
-    compare_weights(
+    matching.update(compare_weights(
         'topo/tests/reference/oo_or_map_topo.000000.wts.Primary.Afferent00.023_023.matrix', 
         slice(12,25),slice(12,25),(LN,LN),
-        (23,23),'V1','LGNOnAfferent')
+        (23,23),'V1','LGNOnAfferent'))
 
 
     #oo_or_map_topo.000000.wts.Primary.Afferent01.000_000.matrix
 
-    compare_weights(
+    matching.update(compare_weights(
         'topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralExcitatory.000_000.matrix',
         slice(0,5),slice(0,5),(BaseN,BaseN),
-        (0,0),'V1','LateralExcitatory')
+        (0,0),'V1','LateralExcitatory'))
 
-    compare_weights(
+    matching.update(compare_weights(
         'topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralExcitatory.023_023.matrix',
         slice(19,28),slice(19,28),(BaseN,BaseN),
-        (23,23),'V1','LateralExcitatory')
+        (23,23),'V1','LateralExcitatory'))
 
 
-    compare_weights(
+    matching.update(compare_weights(
         'topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralInhibitory.000_000.matrix',
         slice(0,12),slice(0,12),(BaseN,BaseN),
-        (0,0),'V1','LateralInhibitory')
+        (0,0),'V1','LateralInhibitory'))
 
-    compare_weights(
+    matching.update(compare_weights(
         'topo/tests/reference/oo_or_map_topo.000000.wts.Primary.LateralInhibitory.023_023.matrix',
         slice(12,35),slice(12,35),(BaseN,BaseN),
-        (23,23),'V1','LateralInhibitory')
+        (23,23),'V1','LateralInhibitory'))
 
 
 
@@ -504,7 +471,7 @@ if comparisons:
     print "\n"; print "\n"
     print "** RESULTS **"
     print "\n"
-    print "Checking weights to "+str(wt_dp)+" d.p. and activity values to "+str(act_dp)+ " d.p." 
+    print "Checking weights to "+str(topo.tests.reference.lissom_log_parser.wt_dp)+" d.p. and activity values to "+str(topo.tests.reference.lissom_log_parser.act_dp)+ " d.p." 
     print "\n"
     for what,result in matching.items():
         if result:

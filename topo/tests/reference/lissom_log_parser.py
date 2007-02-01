@@ -1,5 +1,7 @@
 # CEBHACKALERT: filename should change...
 
+
+
 def get_input_params(log_file='or_map_topo.log'):
     """
     Return iterators over list of float values for C++ LISSOM's cx, cy, and theta.
@@ -87,3 +89,44 @@ def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
                 print "\n" + topo_matrix_name + " element ("+str(i)+","+str(j)+") didn't match to " + str(dp) + " decimal places.\nTopographica value="+str(t_value)+", C++ LISSOM value="+str(l_value)
 
     return matches
+
+
+
+# CEBHACKALERT: these two functions now work in a really hacky way, because I've just changed them to
+# expediate another task.
+wt_dp=5
+act_dp=5
+plots=False
+
+import topo
+def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_shape,unit,sheet,conn):
+
+    comparing_what = conn + " " + str(unit) + " t=" + str(topo.sim.time()) 
+
+    topo_weights = topo.sim[sheet].projections()[conn].cf(*unit).weights
+    c_weights = get_matrix(c_matrix_filename,c_sheet_shape)[c_row_slice,c_col_slice] # c++ lissom doesn't situate weights  
+
+    match = compare_elements(topo_weights,c_weights,wt_dp,comparing_what)
+
+    if plots and not match:
+        matrixplot(topo_weights,title="topo "+comparing_what)
+        matrixplot(c_weights,title="c++ "+comparing_what)
+
+    return {comparing_what:match}
+
+
+
+def compare_activities(c_matrix_filename,c_sheet_shape,sheet):
+
+    comparing_what = sheet + " activity, t=" + str(topo.sim.time()) 
+
+    topo_act = topo.sim[sheet].activity
+    c_act = get_matrix(c_matrix_filename,c_sheet_shape)
+
+    match = compare_elements(topo_act,c_act,act_dp,comparing_what)
+
+    if plots and not match:
+        matrixplot(topo_act,title="topo "+comparing_what)
+        matrixplot(c_act,title="c++ "+comparing_what)
+
+    return {comparing_what:match}
