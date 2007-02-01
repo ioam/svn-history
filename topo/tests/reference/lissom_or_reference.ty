@@ -24,7 +24,8 @@ __version__='$Revision$'
 #import pdb # debugger
 import random
 import fixedpoint
-
+# CEBHACKALERT: this file will need minor updates to change to numpy
+import Numeric
 
 from math import pi, sqrt
 
@@ -40,15 +41,6 @@ from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 import topo.patterns.basic
 
 from topo.tests.reference.lissom_log_parser import get_input_params
-
-
-# Topographica learning rate is density-independent so to compare
-# with C++ lissom it's necessary to know the number of units.
-# Be aware that you'll need to change these later in the script
-# if the bounds are alterered. (Could be automated)
-n_aff_units=137
-n_exc_units=177
-n_inh_units=973
 
 
 
@@ -87,13 +79,6 @@ retina_edge_buffer=round((rf_radius+(randomness*BaseRN*area_scale/2.0)),0)
 RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
 
 
-### (3)
-acs=6.5*6.5/rf_radius/rf_radius
-ecs=19.5*19.5/exc_rad/exc_rad
-ics=47.5*47.5/inh_rad/inh_rad
-alpha_input=0.007*n_aff_units*acs
-alpha_exc=0.002*ecs*n_exc_units
-alpha_inh=0.00025*ics*n_inh_units
 
 tsettle=8
 
@@ -149,23 +134,52 @@ CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
 
+
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
                                     nominal_bounds=input_bounds)
 topo.sim['V1'] = LISSOM()
 
 topo.sim.connect('Retina','V1', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength = 1.0, name='Afferent0',
-          nominal_bounds_template = afferent_weight_bounds, learning_rate=alpha_input)
+          nominal_bounds_template = afferent_weight_bounds)
 
 topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength=gammaexc,
           name='LateralExcitatory',
-          nominal_bounds_template = excitatory_weight_bounds, learning_rate=alpha_exc)
+          nominal_bounds_template = excitatory_weight_bounds)
 
 topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength=-gammainh,
           name='LateralInhibitory',
-          nominal_bounds_template = inhibitory_weight_bounds, learning_rate=alpha_inh)
+          nominal_bounds_template = inhibitory_weight_bounds)
+
+
+
+
+# Topographica learning rate is density-independent so to compare
+# with C++ lissom it's necessary to know the number of units.
+n_aff_units=len(Numeric.nonzero(Numeric.ravel(topo.sim['V1'].in_connections[0].cf(int(BaseN/2),int(BaseN/2)).mask)))
+n_exc_units=len(Numeric.nonzero(Numeric.ravel(topo.sim['V1'].in_connections[1].cf(int(BaseN/2),int(BaseN/2)).mask)))
+n_inh_units=len(Numeric.nonzero(Numeric.ravel(topo.sim['V1'].in_connections[2].cf(int(BaseN/2),int(BaseN/2)).mask)))
+
+### (3)
+acs=6.5*6.5/rf_radius/rf_radius
+ecs=19.5*19.5/exc_rad/exc_rad
+ics=47.5*47.5/inh_rad/inh_rad
+alpha_input=0.007*n_aff_units*acs
+alpha_exc=0.002*ecs*n_exc_units
+alpha_inh=0.00025*ics*n_inh_units
+
+
+topo.sim['V1'].in_connections[0].learning_rate=alpha_input
+topo.sim['V1'].in_connections[1].learning_rate=alpha_exc
+topo.sim['V1'].in_connections[2].learning_rate=alpha_inh
+
+
+
+
+
+
         
 # CEBHACKALERT: this isn't the right way to do it, but it
 # should be ok for our matching purposes...
@@ -177,11 +191,11 @@ topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"),
 # executed before t=200's input pattern is presented, and is therefore
 # equivalent to or_map_topo's event scheduled at t=200.
 
-topo.sim.schedule_command(199, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.6/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=69')
+topo.sim.schedule_command(199, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.6/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=len(Numeric.nonzero(Numeric.ravel(topo.sim["V1"].in_connections[1].cf(int(BaseN/2),int(BaseN/2)).mask)))')
 
-topo.sim.schedule_command(499, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.42/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=29')
+topo.sim.schedule_command(499, 'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.42/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=len(Numeric.nonzero(Numeric.ravel(topo.sim["V1"].in_connections[1].cf(int(BaseN/2),int(BaseN/2)).mask)))')
 
-topo.sim.schedule_command(999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.336/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=21')
+topo.sim.schedule_command(999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=exc_rad*0.336/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=len(Numeric.nonzero(Numeric.ravel(topo.sim["V1"].in_connections[0].cf(int(BaseN/2),int(BaseN/2)).mask)))')
 
 #topo.sim.schedule_command(1999,'topo.sim["V1"].projections()["LateralExcitatory"].change_bounds(BoundingBox(radius=2.0/BaseN,min_radius=min_exc_rad/BaseN)); n_exc_units=9')
 
@@ -190,6 +204,7 @@ topo.sim.schedule_command(999,'topo.sim["V1"].projections()["LateralExcitatory"]
 ## (-0.02777777777777779, -0.04166666666666663, 0.04166666666666663, 0.02777777777777779)
 ## Topographica> BoundingBox(radius=2.0/BaseN).lbrt()
 ## (-0.027777777777777776, -0.027777777777777776, 0.027777777777777776, 0.027777777777777776)
+
 
 topo.sim.schedule_command(  199,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.002*ecs*n_exc_units')
 topo.sim.schedule_command(  499,'topo.sim["V1"].projections()["LateralExcitatory"].learning_rate=0.001*ecs*n_exc_units')
