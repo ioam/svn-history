@@ -22,8 +22,8 @@ __version__='$Revision$'
 # more features can be added, and it can be generalized.
 
 
-# Currently, by 550 iterations a few of the weights values have begun to differ
-# by 5 d.p. There are no bounds changes.
+
+# CB: just plots automatically, sort all that out.
 
 
 #import pdb 
@@ -182,7 +182,7 @@ LI.learning_rate=alpha_inh*n_units(LI)
 # 
 # CURRENTLY NO BOUNDS CHANGES
 
-## topo.sim.schedule_command(200,'exc_rad*=0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
+#topo.sim.schedule_command(200,'exc_rad*=0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
 
 ## topo.sim.schedule_command(500,'exc_rad=exc_rad*0.7+0.35; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
 
@@ -193,27 +193,27 @@ LI.learning_rate=alpha_inh*n_units(LI)
 
 ### Excitatory learning rate changes
 #
-#topo.sim.schedule_command(500,'alpha_exc=0.001*ecs; LE.learning_rate=alpha_exc*n_units(LE)')
+topo.sim.schedule_command(499,'alpha_exc=0.001*ecs; LE.learning_rate=alpha_exc*n_units(LE)')
 
-## ### Afferent learning rate changes
-## #
-## topo.sim.schedule_command(500,  'alpha_input=0.0050*acs; Af.learning_rate=alpha_input*n_units(Af)')
-## topo.sim.schedule_command(2000, 'alpha_input=0.0040*acs; Af.learning_rate=alpha_input*n_units(Af)')
-## topo.sim.schedule_command(4000, 'alpha_input=0.0030*acs; Af.learning_rate=alpha_input*n_units(Af)')
-## topo.sim.schedule_command(20000,'alpha_input=0.0015*acs; Af.learning_rate=alpha_input*n_units(Af)')
+### Afferent learning rate changes
+#
+topo.sim.schedule_command(499,  'alpha_input=0.0050*acs; Af.learning_rate=alpha_input*n_units(Af)')
+#topo.sim.schedule_command(1999, 'alpha_input=0.0040*acs; Af.learning_rate=alpha_input*n_units(Af)')
+#topo.sim.schedule_command(3999, 'alpha_input=0.0030*acs; Af.learning_rate=alpha_input*n_units(Af)')
+#topo.sim.schedule_command(19999,'alpha_input=0.0015*acs; Af.learning_rate=alpha_input*n_units(Af)')
 
-## ### delta/beta changes
-## #
-## topo.sim.schedule_command(  200, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.01; topo.sim["V1"].output_fn.upper_bound=beta_i+0.01')
-## topo.sim.schedule_command(  500, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.02; topo.sim["V1"].output_fn.upper_bound=beta_i+0.02')
-## topo.sim.schedule_command( 1000, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.05; topo.sim["V1"].output_fn.upper_bound=beta_i+0.03')
-## topo.sim.schedule_command( 2000, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.08; topo.sim["V1"].output_fn.upper_bound=beta_i+0.05')
-## topo.sim.schedule_command( 3000, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.10; topo.sim["V1"].output_fn.upper_bound=beta_i+0.08')
-## topo.sim.schedule_command( 4000,                                                    'topo.sim["V1"].output_fn.upper_bound=beta_i+0.11')
-## topo.sim.schedule_command( 5000, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.11; topo.sim["V1"].output_fn.upper_bound=beta_i+0.14')
-## topo.sim.schedule_command( 6500, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.12; topo.sim["V1"].output_fn.upper_bound=beta_i+0.17')
-## topo.sim.schedule_command( 8000, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.13; topo.sim["V1"].output_fn.upper_bound=beta_i+0.20')
-## topo.sim.schedule_command(20000, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.14; topo.sim["V1"].output_fn.upper_bound=beta_i+0.23')
+### delta/beta changes
+#
+topo.sim.schedule_command(  199, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.01; topo.sim["V1"].output_fn.upper_bound=beta_i+0.01')
+topo.sim.schedule_command(  499, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.02; topo.sim["V1"].output_fn.upper_bound=beta_i+0.02')
+#topo.sim.schedule_command(  999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.05; topo.sim["V1"].output_fn.upper_bound=beta_i+0.03')
+#topo.sim.schedule_command( 1999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.08; topo.sim["V1"].output_fn.upper_bound=beta_i+0.05')
+#topo.sim.schedule_command( 2999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.10; topo.sim["V1"].output_fn.upper_bound=beta_i+0.08')
+#topo.sim.schedule_command( 3999,                                                    'topo.sim["V1"].output_fn.upper_bound=beta_i+0.11')
+#topo.sim.schedule_command( 4999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.11; topo.sim["V1"].output_fn.upper_bound=beta_i+0.14')
+#topo.sim.schedule_command( 6499, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.12; topo.sim["V1"].output_fn.upper_bound=beta_i+0.17')
+#topo.sim.schedule_command( 7999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.13; topo.sim["V1"].output_fn.upper_bound=beta_i+0.20')
+#topo.sim.schedule_command(19999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.14; topo.sim["V1"].output_fn.upper_bound=beta_i+0.23')
 
 
 
@@ -569,54 +569,4 @@ if locals().get('comparisons',False):
 
 
 
-
-
-##     topo.sim.run(1450)
-    
-##     matching.update(compare_weights(
-##         'topo/tests/reference/or_map_topo.002000.wts.Primary.Afferent0.000_000.matrix', 
-##         slice(1,14),slice(1,14),RN,
-##         (0,0),'V1','Afferent0'))
-
-##     matching.update(compare_weights(
-##         'topo/tests/reference/or_map_topo.002000.wts.Primary.Afferent0.012_012.matrix', 
-##         slice(13,26),slice(13,26),RN,
-##         (12,12),'V1','Afferent0'))
-
-##     matching.update(compare_weights(
-##         'topo/tests/reference/or_map_topo.002000.wts.Primary.LateralExcitatory.000_000.matrix',
-##         slice(0,3),slice(0,3),BaseN,
-##         (0,0),'V1','LateralExcitatory'))
-
-##     matching.update(compare_weights(
-##         'topo/tests/reference/or_map_topo.002000.wts.Primary.LateralExcitatory.012_012.matrix',
-##         slice(10,15),slice(10,15),BaseN,
-##         (12,12),'V1','LateralExcitatory'))
-
-##     matching.update(compare_weights(
-##         'topo/tests/reference/or_map_topo.002000.wts.Primary.LateralInhibitory.000_000.matrix',
-##         slice(0,6),slice(0,6),BaseN,
-##         (0,0),'V1','LateralInhibitory'))
-
-##     matching.update(compare_weights(
-##         'topo/tests/reference/or_map_topo.002000.wts.Primary.LateralInhibitory.012_012.matrix',
-##         slice(7,18),slice(7,18),BaseN,
-##         (12,12),'V1','LateralInhibitory'))
-
-
-
-
-
-##     ### PRINT OUT RESULTS
-##     #
-##     # CB: there are more useful things we could print...
-##     print "\n"; print "\n"
-##     print "-----RESULTS-----"
-##     print "\n"
-##     for what,result in matching.items():
-##         status="*FAIL*"
-##         if result[0]:
-##             status="pass"
-            
-##         print what + " ... %s (%d d.p.)"%(status,result[1])
 
