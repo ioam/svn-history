@@ -115,7 +115,7 @@ def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_shape,unit
         matrixplot(topo_weights,title="topo "+comparing_what)
         matrixplot(c_weights,title="c++ "+comparing_what)
 
-    return {comparing_what:match}
+    return {comparing_what:(match,wt_dp)}
 
 
 
@@ -132,4 +132,4 @@ def compare_activities(c_matrix_filename,c_sheet_shape,sheet):
         matrixplot(topo_act,title="topo "+comparing_what)
         matrixplot(c_act,title="c++ "+comparing_what)
 
-    return {comparing_what:match}
+    return {comparing_what:(match,act_dp)}
