@@ -69,6 +69,7 @@ def get_matrix(matrix_file,dim,center=None):
 
     return array(matrix)
 
+from math import ceil
 
 def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
     """
@@ -76,6 +77,7 @@ def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
     to the specified number of decimal places (dp).
     """
     assert topo_matrix.shape == lissom_matrix.shape
+
     
     r,c = topo_matrix.shape
 
@@ -83,12 +85,11 @@ def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
     
     for i in range(r):
         for j in range(c):
-            t_value = round(topo_matrix[i,j],dp)
-            l_value = round(lissom_matrix[i][j],dp)
-            # CEBHACKALERT: should be an assert statement
-            if t_value != l_value:
+            # CEBHACKALERT: I think this is ok for testing the values match to the specified
+            # number of dp, given that they are between 0 and 1.
+            if abs(topo_matrix[i,j]-lissom_matrix[i][j])>10**-dp:
                 matches=False
-                print "\n" + topo_matrix_name + " element ("+str(i)+","+str(j)+") didn't match to " + str(dp) + " decimal places.\nTopographica value="+str(t_value)+", C++ LISSOM value="+str(l_value)
+                print "\n" + topo_matrix_name + " element ("+str(i)+","+str(j)+") didn't match to " + str(dp) + " decimal places.\nTopographica value="+str(topo_matrix[i,j])+", C++ LISSOM value="+str(lissom_matrix[i,j])
 
     return matches
 
