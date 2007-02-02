@@ -1,5 +1,6 @@
 # CEBHACKALERT: filename should change...
 import topo
+import Numeric
 from Numeric import array
 from topo.commands.pylabplots import matrixplot
 
@@ -79,23 +80,23 @@ def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
     to the specified number of decimal places (dp).
     """
     assert topo_matrix.shape == lissom_matrix.shape
+    import Numeric
 
+    difference = abs(topo_matrix-lissom_matrix)
+    ones = Numeric.ones(difference.shape)
+    zeros = Numeric.zeros(difference.shape)
+    total_no=difference.shape[0]*difference.shape[1]
     
-    r,c = topo_matrix.shape
+    zed = {}
 
-    matches=True
-    
-    for i in range(r):
-        for j in range(c):
-            # CEBHACKALERT: I think this isn't quite correct for testing a match
-            # to the specified number of dp; I'm not actually using
-            # the automatic comparisons yet.
-            if abs(topo_matrix[i,j]-lissom_matrix[i][j])>10**-dp:
-                matches=False
-                print "\n" + topo_matrix_name + " element ("+str(i)+","+str(j)+") didn't match to " + str(dp) + " decimal places.\nTopographica value="+str(topo_matrix[i,j])+", C++ LISSOM value="+str(lissom_matrix[i,j])
+    # calculate fraction matching for the different no's of dp
+    for a in (9,8,7,6,5,4,3):
+        # CEBHACKALERT: (same as previous version) what's the best way to test for float equality to certain no. of dp?        
+        zed[a] = Numeric.sum(Numeric.ravel(Numeric.where(difference<=10**-a,ones,zeros)))/float(total_no)
 
-    return matches
 
+    return zed
+        
 
 
 # CEBHACKALERT: these two functions now work in a really hacky way, because I've just changed them to
@@ -112,13 +113,13 @@ def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_side,unit,
     topo_weights = topo.sim[sheet].projections()[conn].cf(*unit).weights
     c_weights = get_matrix(c_matrix_filename,c_sheet_side)[c_row_slice,c_col_slice] # c++ lissom doesn't situate weights  
 
-    match = compare_elements(topo_weights,c_weights,wt_dp,comparing_what)
+    zed = compare_elements(topo_weights,c_weights,wt_dp,comparing_what)
 
     if plots and not match:
         matrixplot(topo_weights,title="topo "+comparing_what)
         matrixplot(c_weights,title="c++ "+comparing_what)
 
-    return {comparing_what:(match,wt_dp)}
+    return {comparing_what:zed}
 
 
 
@@ -129,10 +130,12 @@ def compare_activities(c_matrix_filename,c_sheet_side,sheet):
     topo_act = topo.sim[sheet].activity
     c_act = get_matrix(c_matrix_filename,c_sheet_side)
 
-    match = compare_elements(topo_act,c_act,act_dp,comparing_what)
+    zed = compare_elements(topo_act,c_act,act_dp,comparing_what)
 
-    if plots and not match:
-        matrixplot(topo_act,title="topo "+comparing_what)
-        matrixplot(c_act,title="c++ "+comparing_what)
+    #if plots and not match:
+    #    matrixplot(topo_act,title="topo "+comparing_what)
+    #    matrixplot(c_act,title="c++ "+comparing_what)
 
-    return {comparing_what:(match,act_dp)}
+    return {comparing_what:zed}
+
+
