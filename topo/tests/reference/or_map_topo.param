@@ -1,66 +1,55 @@
 #!./lissom
+#
 # RF-LISSOM parameter file for an orientation-map simulation
-# designed to match what Topographica can do as of 2006/01
+# designed to match what lissom_or_reference does at the present time.
+#
+# The plan is that when Topographica matches, this simulation can
+# become more like the one from the book (by removing more and more
+# of the specific values set here, and using or_defs).
 #
 # $Header$
 
-###############################################################################
-# Training
 
-# Network architecture
-# To change retinal   resolution,  scale RN and rf_radius by the same proportion
-# To change cortical "resolution", scale N, exc_rad, and inh_rad by the same proportion
-# To change retinal and cortical area, scale RN, N, and inputs_pereye by the same proportion
-#
-
-### (1)
-set BaseN=72               #72
-set BaseRN=24              #24
+set BaseN=24               
+set BaseRN=24              
 set area_scale=1
 set num_eyes=1
-set rf_radius=BaseRN/4+0.5 #18.5
-set inh_rad=BaseN/4-1+0.5  #17.5 
-set exc_rad=BaseN/10+0.3   #7.5
+set rf_radius=BaseRN/4+0.5      #6.5
+set inh_rad=BaseN/4-1+0.5       #6.5 
+set exc_rad=2.5 #BaseN/10-0.1   #2.5
 #set default_afferent_size_scale=BaseN/BaseRN
 set gammaexc=0.9 
 set gammainh=0.9
 
+# initial values of delta and beta; book table lists relative to initial 
+# so this makes it easier to check the values are correct...but makes
+# the code more complex
 define_param delta_i Param_Float
 define_param beta_i Param_Float
 set delta_i=0.083 
 set beta_i=delta_i+0.55
-
 set delta=delta_i
 set beta=beta_i
-
 set noise=0
+
+# lissom_or is currently manually not going below 2.5
 define_param min_exc_rad Param_Float   0  exc_rad "Minimum exc_rad value allowed" 2.5 #1>?BaseN/44+0.5
 
-
-### (2)
-# Initial order
 set randomness=0 lat_exc_randomness=1 lat_inh_randomness=1
 set preset_aff_wts=True preset_sigma_aff=0
 set preset_lat_wts=True preset_sigma_exc=0 preset_sigma_inh=0
 set circular_aff_wts=True  circular_lat_wts=True
 set smooth_circular_outlines=False smooth_circular_radius_trim=-0.25
 
-# Allow number of iterations per real time interval to be varied independently
-# Increase to use a denser approximation, decrease to do a quick-and-dirty one
-# Values very different from 1.0 do not yet have the same behavior, so other
-# corrections still need to be determined
 define_param ts Param_Float  0 MaxInt  "Time scale"
 set ts=1.0
 
-# Inputs
-#
+
 #define_param rf_radius_scale Param_Float   0 MaxInt \
 #"Scale of RF radius relative to an arbitrary base case" 5/rf_radius
-#
-
 #define_param retina_area_scale Param_Float 0 MaxInt \
 #"Scale of retinal area relative to canonical case" (BaseRN*area_scale/24*rf_radius_scale)*(BaseRN*area_scale/24*rf_radius_scale)
-#
+
 set input_default_type=Input_Gaussian
 set input_default_position="Uncorrelate &uncorrelation 0 RN  Random RN/2 RN/2 Precision 1"
 set input_default_angle="Random PI/2 PI/2 Precision 1"
@@ -68,7 +57,6 @@ set input_default_angle="Random PI/2 PI/2 Precision 1"
 set xsigma=6.0 
 set ysigma=1.5
 set scale_input=1.0 normalize_aff=False
-
 set blur_radius=0
 set input_separation_min_enforce=True
 set bound_multiplier=BaseRN*area_scale*10 # Make sure all input patterns are evaluated fully
@@ -77,7 +65,6 @@ set bound_multiplier=BaseRN*area_scale*10 # Make sure all input patterns are eva
 set retina_edge_buffer=(rf_radius+(randomness*BaseRN*area_scale/2)) 
 set RN=BaseRN*area_scale+2*retina_edge_buffer
 
-# Learning
 define_param acs Param_Float  0 MaxInt "Afferent connection scale"
 define_param ecs Param_Float  0 MaxInt "Lateral excitatory connection scale"
 define_param ics Param_Float  0 MaxInt "Lateral inhibitory connection scale"
@@ -102,18 +89,17 @@ hook after_learning tend save_snapshot
 
 # Training phases
 
-# By historical accident, delta&beta are set from initial values but the others are cumulative: watch out!
-# tsettle changes are missing.
-hook before_input   (200*ts) set exc_rad=0.6*exc_rad       delta=delta_i+0.01 beta=beta_i+0.01                             alpha_exc=0.002*ecs/ts
-hook before_input   (500*ts) set exc_rad=0.7*exc_rad+0.35  delta=delta_i+0.02 beta=beta_i+0.02  alpha_input=0.0050*acs/ts  alpha_exc=0.001*ecs/ts
-hook before_input  (1000*ts) set exc_rad=0.8*exc_rad-0.30  delta=delta_i+0.05 beta=beta_i+0.03  
-hook before_input  (2000*ts) set exc_rad=2.5               delta=delta_i+0.08 beta=beta_i+0.05  alpha_input=0.0040*acs/ts           
-hook before_input  (3000*ts) set                           delta=delta_i+0.10 beta=beta_i+0.08  
-hook before_input  (4000*ts) set                                              beta=beta_i+0.11  alpha_input=0.0030*acs/ts
-hook before_input  (5000*ts) set                           delta=delta_i+0.11 beta=beta_i+0.14                                              
-hook before_input  (6500*ts) set                           delta=delta_i+0.12 beta=beta_i+0.17                                              
-hook before_input  (8000*ts) set                           delta=delta_i+0.13 beta=beta_i+0.20                                                      
-hook before_input (20000*ts) set                           delta=delta_i+0.14 beta=beta_i+0.23  alpha_input=0.0015*acs/ts
+# delta&beta are set from initial values but the others are cumulative: watch out!
+hook before_input   (200*ts) set             delta=delta_i+0.01 beta=beta_i+0.01                             alpha_exc=0.002*ecs/ts
+hook before_input   (500*ts) set             delta=delta_i+0.02 beta=beta_i+0.02  alpha_input=0.0050*acs/ts  alpha_exc=0.001*ecs/ts
+hook before_input  (1000*ts) set             delta=delta_i+0.05 beta=beta_i+0.03  
+hook before_input  (2000*ts) set             delta=delta_i+0.08 beta=beta_i+0.05  alpha_input=0.0040*acs/ts           
+hook before_input  (3000*ts) set             delta=delta_i+0.10 beta=beta_i+0.08  
+hook before_input  (4000*ts) set                                beta=beta_i+0.11  alpha_input=0.0030*acs/ts
+hook before_input  (5000*ts) set             delta=delta_i+0.11 beta=beta_i+0.14                                              
+hook before_input  (6500*ts) set             delta=delta_i+0.12 beta=beta_i+0.17                                              
+hook before_input  (8000*ts) set             delta=delta_i+0.13 beta=beta_i+0.20                                                      
+hook before_input (20000*ts) set             delta=delta_i+0.14 beta=beta_i+0.23  alpha_input=0.0015*acs/ts
 
 
 
@@ -156,5 +142,3 @@ hook before_input 0 set Region::Eye*::activity_threshold=0
 # (Must come after anything analyzing activity values, since it changes them)
 #hook after_learning  (0*ts),(100*ts),(1000*ts),(5000*ts),(10000*ts),(20000*ts),(20000*ts+1),(30000*ts) input_present_object "" Input_Gaussian PI/4
 
-# Collect data for spinning line anim
-#hook after_learning 0*ts,tend for f=0 f<PI f=f+PI/18 input_present_object "" Input_Gaussian f

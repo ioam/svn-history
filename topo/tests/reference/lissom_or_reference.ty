@@ -17,20 +17,19 @@ $Id$
 __version__='$Revision$'
 
 
+# CB:
+# The plan is that when this simulation matches the c++ one (or_map_topo.param),
+# more features can be added, and it can be generalized.
 
 
-# This file is only designed to work for basen=72; it can be generalized
-# once this specific case matches.
-#
-# This file is setup so that all radii end in 0.5.
-# The excitatory radius does not go below 2.5.
+# Currently, by 550 iterations a few of the weights values have begun to differ
+# by 5 d.p. There are no bounds changes.
 
 
-#import pdb # debugger
+#import pdb 
 import random
 import fixedpoint
-
-import Numeric  # CB: (will need update with numpy)
+import Numeric  # CB: (need to update for numpy)
 
 from math import pi, sqrt
 
@@ -45,23 +44,22 @@ from topo.learningfns.optimized import CFPLF_Hebbian_opt
 from topo.outputfns.optimized import CFPOF_DivisiveNormalizeL1_opt
 import topo.patterns.basic
 
-from topo.tests.reference.lissom_log_parser import get_input_params
 
+import topo.tests.reference.lissom_log_parser
+from topo.tests.reference.lissom_log_parser import get_input_params, get_matrix, compare_elements, compare_weights,compare_activities
 
 
 ###########################################
-# Variables to match the C++ version of LISSOM
+# Variables from or_map_topo.param
 
-### (1)
-BaseN=72.0
+BaseN=24.0
 BaseRN=24.0
 area_scale=1.0
 #num_eyes=1
-rf_radius=BaseRN/4.0+0.5   #18.5
-inh_rad=BaseN/4.0-1.0+0.5  #17.5
-exc_rad=BaseN/10.0+0.3     #7.5 
-# hmm worry about this later
-#min_exc_rad=2.5 #max(1.0,BaseN/44+0.5)
+rf_radius=BaseRN/4.0+0.5 
+inh_rad=BaseN/4.0-1.0+0.5
+exc_rad=2.5              
+#min_exc_rad=max(1.0,BaseN/44+0.5)
 
 #default_afferent_size_scale=BaseN/BaseRN
 gammaexc=0.9
@@ -70,8 +68,6 @@ gammainh=0.9
 delta_i=0.083
 beta_i=delta_i+0.55
 
-
-### (2)
 randomness = 0.0
 #smooth_circular_radius_trim = -0.25
 
@@ -85,14 +81,12 @@ scale_input=1.0
 retina_edge_buffer=round((rf_radius+(randomness*BaseRN*area_scale/2.0)),0)
 RN=round(BaseRN*area_scale+2*retina_edge_buffer,0)
 
-### (3)
 acs=6.5*6.5/rf_radius/rf_radius
 ecs=19.5*19.5/exc_rad/exc_rad
 ics=47.5*47.5/inh_rad/inh_rad
 alpha_input=0.007*acs
 alpha_exc=0.002*ecs
 alpha_inh=0.00025*ics
-
 
 tsettle=8
 
@@ -101,19 +95,14 @@ tsettle=8
 fixedpoint.DEFAULT_PRECISION=3
 random.seed(1234)
 
-# input generation params
-GeneratorSheet.nominal_density = BaseRN*area_scale
-GeneratorSheet.period = 1
-GeneratorSheet.phase = 0.05
 
 # take the input pattern position parameters from the log file output
 # of the equivalent c++ simulation
 n_inputs,input_x,input_y,input_orientation = get_input_params(
     log_file="topo/tests/reference/or_map_topo.log")
 
-# c++ lissom's first iteration is just a test...
+# c++ lissom's first iteration is just a test, so we lose it
 n_inputs-=1;input_x.next();input_y.next();input_orientation.next() 
-
 print "Number of patterns available for learning iterations:",n_inputs
 
 input_bounds = BoundingBox(radius=RN/(BaseRN*area_scale)/2.0)
@@ -131,16 +120,6 @@ input_pattern = topo.patterns.basic.Gaussian(
     orientation=DynamicNumber(lambda : round(2*pi*input_orientation.next()/360.0,1)))
 
 
-# LISSOM parameters
-LISSOM.output_fn = PiecewiseLinear(lower_bound=delta_i,upper_bound=beta_i)
-LISSOM.nominal_density = BaseN
-#LISSOM.tsettle=tsettle
-
-# Connection parameters
-afferent_weight_bounds = BoundingBox(radius=rf_radius/BaseRN)
-excitatory_weight_bounds = BoundingBox(radius=exc_rad/BaseN)
-inhibitory_weight_bounds = BoundingBox(radius=inh_rad/BaseN)
-
 CFProjection.weights_shape = topo.patterns.basic.Disk(smoothing=0.0)
 CFProjection.weights_generator = topo.patterns.basic.Constant()
 CFProjection.response_fn=CFPRF_DotProduct_opt()
@@ -148,49 +127,52 @@ CFProjection.learning_fn=CFPLF_Hebbian_opt()
 CFProjection.weights_output_fn=CFPOF_DivisiveNormalizeL1_opt()
 
 
-
 topo.sim['Retina'] = GeneratorSheet(input_generator=input_pattern,
-                                    nominal_bounds=input_bounds)
-topo.sim['V1'] = LISSOM()
+                                    nominal_bounds=input_bounds,
+                                    nominal_density=BaseRN*area_scale,
+                                    period=1,
+                                    phase=0.05)
+
+topo.sim['V1'] = LISSOM(output_fn = PiecewiseLinear(lower_bound=delta_i,upper_bound=beta_i),
+                        nominal_density = BaseN,
+                        tsettle=tsettle)
 
 topo.sim.connect('Retina','V1', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength = 1.0, name='Afferent0',
-          nominal_bounds_template = afferent_weight_bounds)
+          nominal_bounds_template=BoundingBox(radius=rf_radius/BaseRN))
 
 topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength=gammaexc,
           name='LateralExcitatory',
-          nominal_bounds_template = excitatory_weight_bounds)
+          nominal_bounds_template=BoundingBox(radius=exc_rad/BaseN))
 
 topo.sim.connect('V1','V1', delay = fixedpoint.FixedPoint("0.05"),
           connection_type=CFProjection,strength=-gammainh,
           name='LateralInhibitory',
-          nominal_bounds_template = inhibitory_weight_bounds)
-
-# don't try to pickle this simulation
-V1 = topo.sim['V1']
-Af = V1.projections()["Afferent0"]
-LE = V1.projections()["LateralExcitatory"]
-LI = V1.projections()["LateralInhibitory"]
+          nominal_bounds_template=BoundingBox(radius=inh_rad/BaseN) )
 
 
-# Topographica learning rate is density-independent so to compare
-# with C++ lissom it's necessary to know the number of units.
-# (seems like a complex method but it's the same as that in cf.py)
-center=(int(BaseN/2),int(BaseN/2))
-from Numeric import ravel,nonzero
+center_unit=(int(BaseN/2),int(BaseN/2))
+
 def n_units(x):
-    return len(nonzero(ravel(x.cf(*center).mask)))
+    """
+    Topographica learning rate is density-independent so to compare
+    with C++ lissom it's necessary to know the number of units.
+    (Same method as in cf.py.)
+    """
+    return len(Numeric.nonzero(Numeric.ravel(x.cf(*center_unit).mask)))
 
 
-n_aff_units=n_units(Af)
-n_exc_units=n_units(LE)
-n_inh_units=n_units(LI)
+# shortcuts to save on typing...
+# don't try to pickle this simulation
+Af = topo.sim['V1'].projections()["Afferent0"]
+LE = topo.sim['V1'].projections()["LateralExcitatory"]
+LI = topo.sim['V1'].projections()["LateralInhibitory"]
 
 
-Af.learning_rate=alpha_input*n_aff_units
-LE.learning_rate=alpha_exc*n_exc_units
-LI.learning_rate=alpha_inh*n_inh_units
+Af.learning_rate=alpha_input*n_units(Af)
+LE.learning_rate=alpha_exc*n_units(LE)
+LI.learning_rate=alpha_inh*n_units(LI)
 
 
 ### Excitatory bounds changes
@@ -198,28 +180,28 @@ LI.learning_rate=alpha_inh*n_inh_units
 # The learning rate is adjusted too because the number of units changes (even if the learning
 # rate is going to be adjusted anyway at this time)
 # 
-# CEBHACKALERT (for somewhere else!): why do I have to type min_rad every time?
-topo.sim.schedule_command(200,'exc_rad*=0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_exc_units=n_units(LE); LE.learning_rate=alpha_exc*n_exc_units')
+# CURRENTLY NO BOUNDS CHANGES
 
-topo.sim.schedule_command(500,'exc_rad=exc_rad*0.7+0.35; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_exc_units=n_units(LE); LE.learning_rate=alpha_exc*n_exc_units')
+## topo.sim.schedule_command(200,'exc_rad*=0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
 
-topo.sim.schedule_command(1000,'exc_rad=exc_rad*0.8-0.3; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_exc_units=n_units(LE); LE.learning_rate=alpha_exc*n_exc_units')
+## topo.sim.schedule_command(500,'exc_rad=exc_rad*0.7+0.35; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
 
-topo.sim.schedule_command(2000,'exc_rad=2.5; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_exc_units=n_units(LE); LE.learning_rate=alpha_exc*n_exc_units')
+## topo.sim.schedule_command(1000,'exc_rad=exc_rad*0.8-0.3; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
+
+## topo.sim.schedule_command(2000,'exc_rad=2.5; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
 
 
 ### Excitatory learning rate changes
 #
-
-topo.sim.schedule_command(200,'alpha_exc=0.002*ecs; LE.learning_rate=alpha_exc*n_exc_units')
-topo.sim.schedule_command(500,'alpha_exc=0.001*ecs; LE.learning_rate=alpha_exc*n_exc_units')
+topo.sim.schedule_command(200,'alpha_exc=0.002*ecs; LE.learning_rate=alpha_exc*n_units(LE)')
+topo.sim.schedule_command(500,'alpha_exc=0.001*ecs; LE.learning_rate=alpha_exc*n_units(LE)')
 
 ### Afferent learning rate changes
 #
-topo.sim.schedule_command(500,'alpha_input=0.0050*acs; Af.learning_rate=alpha_input*n_aff_units')
-topo.sim.schedule_command(2000,'alpha_input=0.0040*acs; Af.learning_rate=alpha_input*n_aff_units')
-topo.sim.schedule_command(4000,'alpha_input=0.0030*acs; Af.learning_rate=alpha_input*n_aff_units')
-topo.sim.schedule_command(20000,'alpha_input=0.0015*acs; Af.learning_rate=alpha_input*n_aff_units')
+topo.sim.schedule_command(500,  'alpha_input=0.0050*acs; Af.learning_rate=alpha_input*n_units(Af)')
+topo.sim.schedule_command(2000, 'alpha_input=0.0040*acs; Af.learning_rate=alpha_input*n_units(Af)')
+topo.sim.schedule_command(4000, 'alpha_input=0.0030*acs; Af.learning_rate=alpha_input*n_units(Af)')
+topo.sim.schedule_command(20000,'alpha_input=0.0015*acs; Af.learning_rate=alpha_input*n_units(Af)')
 
 ### delta/beta changes
 #
@@ -228,7 +210,7 @@ topo.sim.schedule_command(  500, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0
 topo.sim.schedule_command( 1000, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.05; topo.sim["V1"].output_fn.upper_bound=beta_i+0.03')
 topo.sim.schedule_command( 2000, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.08; topo.sim["V1"].output_fn.upper_bound=beta_i+0.05')
 topo.sim.schedule_command( 3000, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.10; topo.sim["V1"].output_fn.upper_bound=beta_i+0.08')
-topo.sim.schedule_command( 4000, 'topo.sim["V1"].output_fn.upper_bound=beta_i+0.11')
+topo.sim.schedule_command( 4000,                                                    'topo.sim["V1"].output_fn.upper_bound=beta_i+0.11')
 topo.sim.schedule_command( 5000, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.11; topo.sim["V1"].output_fn.upper_bound=beta_i+0.14')
 topo.sim.schedule_command( 6500, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.12; topo.sim["V1"].output_fn.upper_bound=beta_i+0.17')
 topo.sim.schedule_command( 8000, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.13; topo.sim["V1"].output_fn.upper_bound=beta_i+0.20')
@@ -236,48 +218,25 @@ topo.sim.schedule_command(20000, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0
 
 
 
-
-
-
-
-
-# Performance profiling
+# Command to generate lissom data for comparisons
 #
-# Example 1
-#import hotshot,hotshot.stats
-#prof = hotshot.Profile("abc")
-#prof.runctx('s.run(10000)',globals(),locals())
-#prof.close()
-#
-#p = hotshot.stats.load("abc")
-#p.strip_dirs().sort_stats('cumulative','time').print_stats()
-#
-# Example 2
-#import profile,pstats
-#profile.runctx('s.run(10000)',globals(),locals(),"abc")
-#p = pstats.Stats('abc')
-#p.strip_dirs().sort_stats('cumulative').print_stats()
-
-
-
-### COMPARISONS
-# ./lissom5 commandpath="/home/chris/scratch/DICE_old/lissom_old/command/" display=0 or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+49" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' -c "training t+150" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23' -c "training t+350" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 23 23'
-
-#
-import topo.tests.reference.lissom_log_parser
-from topo.tests.reference.lissom_log_parser import get_input_params, get_matrix, compare_elements, compare_weights,compare_activities
-
-# no. of decimal places for matching activity and weight values
-topo.tests.reference.lissom_log_parser.act_dp = 4
-topo.tests.reference.lissom_log_parser.wt_dp = 4
-
-topo.tests.reference.lissom_log_parser.plots = locals().get('plots',False)
+#./lissom5 commandpath="/home/chris/scratch/DICE_old/lissom_old/command/" display=0 or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+49" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+150" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+350" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+1450' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12'
 
 
 
 matching = {}
 
 if locals().get('comparisons',False):
+
+    # no. of decimal places for matching activity and weight values
+    topo.tests.reference.lissom_log_parser.act_dp = 5
+    topo.tests.reference.lissom_log_parser.wt_dp = 5
+    
+    # whether or not those functions should plot if there's a difference
+    topo.tests.reference.lissom_log_parser.plots = locals().get('plots',False)
+
+
+    ## C++ lissom doesn't situate weights in matrix files, so slices etc have to be given
 
     ### Initial weights comparisons
     matching.update(compare_weights(
@@ -286,113 +245,131 @@ if locals().get('comparisons',False):
         (0,0),'V1','Afferent0'))
 
     matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000000.wts.Primary.Afferent0.023_023.matrix', 
-        slice(8,21),slice(8,21),(RN,RN),
-        (23,23),'V1','Afferent0'))
+        'topo/tests/reference/or_map_topo.000000.wts.Primary.Afferent0.012_012.matrix', 
+        slice(13,26),slice(13,26),(RN,RN),
+        (12,12),'V1','Afferent0'))
 
     matching.update(compare_weights(
         'topo/tests/reference/or_map_topo.000000.wts.Primary.LateralExcitatory.000_000.matrix',
-        slice(0,8),slice(0,8),(BaseN,BaseN),
+        slice(0,3),slice(0,3),(BaseN,BaseN),
         (0,0),'V1','LateralExcitatory'))
 
     matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000000.wts.Primary.LateralExcitatory.023_023.matrix',
-        slice(16,31),slice(16,31),(BaseN,BaseN),
-        (23,23),'V1','LateralExcitatory'))
+        'topo/tests/reference/or_map_topo.000000.wts.Primary.LateralExcitatory.012_012.matrix',
+        slice(10,15),slice(10,15),(BaseN,BaseN),
+        (12,12),'V1','LateralExcitatory'))
 
     matching.update(compare_weights(
         'topo/tests/reference/or_map_topo.000000.wts.Primary.LateralInhibitory.000_000.matrix',
-        slice(0,18),slice(0,18),(BaseN,BaseN),
+        slice(0,6),slice(0,6),(BaseN,BaseN),
         (0,0),'V1','LateralInhibitory'))
 
     matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000000.wts.Primary.LateralInhibitory.023_023.matrix',
-        slice(6,41),slice(6,41),(BaseN,BaseN),
-        (23,23),'V1','LateralInhibitory'))
+        'topo/tests/reference/or_map_topo.000000.wts.Primary.LateralInhibitory.012_012.matrix',
+        slice(7,18),slice(7,18),(BaseN,BaseN),
+        (12,12),'V1','LateralInhibitory'))
 
 
     topo.sim.run(50)
 
-    ### weights comparisons after some learning but no bounds changes
+
     matching.update(compare_weights(
         'topo/tests/reference/or_map_topo.000050.wts.Primary.Afferent0.000_000.matrix', 
         slice(1,14),slice(1,14),(RN,RN),
         (0,0),'V1','Afferent0'))
 
     matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000050.wts.Primary.Afferent0.023_023.matrix', 
-        slice(8,21),slice(8,21),(RN,RN),
-        (23,23),'V1','Afferent0'))
+        'topo/tests/reference/or_map_topo.000050.wts.Primary.Afferent0.012_012.matrix', 
+        slice(13,26),slice(13,26),(RN,RN),
+        (12,12),'V1','Afferent0'))
 
     matching.update(compare_weights(
         'topo/tests/reference/or_map_topo.000050.wts.Primary.LateralExcitatory.000_000.matrix',
-        slice(0,8),slice(0,8),(BaseN,BaseN),
+        slice(0,3),slice(0,3),(BaseN,BaseN),
         (0,0),'V1','LateralExcitatory'))
 
     matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000050.wts.Primary.LateralExcitatory.023_023.matrix',
-        slice(16,31),slice(16,31),(BaseN,BaseN),
-        (23,23),'V1','LateralExcitatory'))
+        'topo/tests/reference/or_map_topo.000050.wts.Primary.LateralExcitatory.012_012.matrix',
+        slice(10,15),slice(10,15),(BaseN,BaseN),
+        (12,12),'V1','LateralExcitatory'))
 
     matching.update(compare_weights(
         'topo/tests/reference/or_map_topo.000050.wts.Primary.LateralInhibitory.000_000.matrix',
-        slice(0,18),slice(0,18),(BaseN,BaseN),
+        slice(0,6),slice(0,6),(BaseN,BaseN),
         (0,0),'V1','LateralInhibitory'))
 
     matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000050.wts.Primary.LateralInhibitory.023_023.matrix',
-        slice(6,41),slice(6,41),(BaseN,BaseN),
-        (23,23),'V1','LateralInhibitory'))
+        'topo/tests/reference/or_map_topo.000050.wts.Primary.LateralInhibitory.012_012.matrix',
+        slice(7,18),slice(7,18),(BaseN,BaseN),
+        (12,12),'V1','LateralInhibitory'))
 
 
-
-    topo.sim.run(150)
-
-    ### weights comparisons at (just after) bounds change
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000200.wts.Primary.LateralExcitatory.000_000.matrix',
-        slice(0,5),slice(0,5),(BaseN,BaseN),
-        (0,0),'V1','LateralExcitatory'))
-
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000200.wts.Primary.LateralExcitatory.023_023.matrix',
-        slice(19,28),slice(19,28),(BaseN,BaseN),
-        (23,23),'V1','LateralExcitatory'))
+    topo.sim.run(500)
 
 
-    topo.sim.run(350)
-
-
-    
     matching.update(compare_weights(
         'topo/tests/reference/or_map_topo.000550.wts.Primary.Afferent0.000_000.matrix', 
         slice(1,14),slice(1,14),(RN,RN),
         (0,0),'V1','Afferent0'))
 
     matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000550.wts.Primary.Afferent0.023_023.matrix', 
-        slice(8,21),slice(8,21),(RN,RN),
-        (23,23),'V1','Afferent0'))
+        'topo/tests/reference/or_map_topo.000550.wts.Primary.Afferent0.012_012.matrix', 
+        slice(13,26),slice(13,26),(RN,RN),
+        (12,12),'V1','Afferent0'))
 
     matching.update(compare_weights(
         'topo/tests/reference/or_map_topo.000550.wts.Primary.LateralExcitatory.000_000.matrix',
-        slice(0,4),slice(0,4),(BaseN,BaseN),
+        slice(0,3),slice(0,3),(BaseN,BaseN),
         (0,0),'V1','LateralExcitatory'))
 
     matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000550.wts.Primary.LateralExcitatory.023_023.matrix',
-        slice(20,27),slice(20,27),(BaseN,BaseN),
-        (23,23),'V1','LateralExcitatory'))
+        'topo/tests/reference/or_map_topo.000550.wts.Primary.LateralExcitatory.012_012.matrix',
+        slice(10,15),slice(10,15),(BaseN,BaseN),
+        (12,12),'V1','LateralExcitatory'))
 
     matching.update(compare_weights(
         'topo/tests/reference/or_map_topo.000550.wts.Primary.LateralInhibitory.000_000.matrix',
-        slice(0,18),slice(0,18),(BaseN,BaseN),
+        slice(0,6),slice(0,6),(BaseN,BaseN),
         (0,0),'V1','LateralInhibitory'))
 
     matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000550.wts.Primary.LateralInhibitory.023_023.matrix',
-        slice(6,41),slice(6,41),(BaseN,BaseN),
-        (23,23),'V1','LateralInhibitory'))
+        'topo/tests/reference/or_map_topo.000550.wts.Primary.LateralInhibitory.012_012.matrix',
+        slice(7,18),slice(7,18),(BaseN,BaseN),
+        (12,12),'V1','LateralInhibitory'))
+
+
+##     topo.sim.run(1450)
+    
+##     matching.update(compare_weights(
+##         'topo/tests/reference/or_map_topo.002000.wts.Primary.Afferent0.000_000.matrix', 
+##         slice(1,14),slice(1,14),(RN,RN),
+##         (0,0),'V1','Afferent0'))
+
+##     matching.update(compare_weights(
+##         'topo/tests/reference/or_map_topo.002000.wts.Primary.Afferent0.012_012.matrix', 
+##         slice(13,26),slice(13,26),(RN,RN),
+##         (12,12),'V1','Afferent0'))
+
+##     matching.update(compare_weights(
+##         'topo/tests/reference/or_map_topo.002000.wts.Primary.LateralExcitatory.000_000.matrix',
+##         slice(0,3),slice(0,3),(BaseN,BaseN),
+##         (0,0),'V1','LateralExcitatory'))
+
+##     matching.update(compare_weights(
+##         'topo/tests/reference/or_map_topo.002000.wts.Primary.LateralExcitatory.012_012.matrix',
+##         slice(10,15),slice(10,15),(BaseN,BaseN),
+##         (12,12),'V1','LateralExcitatory'))
+
+##     matching.update(compare_weights(
+##         'topo/tests/reference/or_map_topo.002000.wts.Primary.LateralInhibitory.000_000.matrix',
+##         slice(0,6),slice(0,6),(BaseN,BaseN),
+##         (0,0),'V1','LateralInhibitory'))
+
+##     matching.update(compare_weights(
+##         'topo/tests/reference/or_map_topo.002000.wts.Primary.LateralInhibitory.012_012.matrix',
+##         slice(7,18),slice(7,18),(BaseN,BaseN),
+##         (12,12),'V1','LateralInhibitory'))
+
 
 
 
