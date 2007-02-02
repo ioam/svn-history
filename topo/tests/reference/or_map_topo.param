@@ -90,17 +90,17 @@ hook after_learning tend save_snapshot
 # Training phases
 
 # delta&beta are set from initial values but the others are cumulative: watch out!
-hook before_input   (200*ts) set             delta=delta_i+0.01 beta=beta_i+0.01                             alpha_exc=0.002*ecs/ts
-hook before_input   (500*ts) set             delta=delta_i+0.02 beta=beta_i+0.02  alpha_input=0.0050*acs/ts  alpha_exc=0.001*ecs/ts
-hook before_input  (1000*ts) set             delta=delta_i+0.05 beta=beta_i+0.03  
-hook before_input  (2000*ts) set             delta=delta_i+0.08 beta=beta_i+0.05  alpha_input=0.0040*acs/ts           
-hook before_input  (3000*ts) set             delta=delta_i+0.10 beta=beta_i+0.08  
-hook before_input  (4000*ts) set                                beta=beta_i+0.11  alpha_input=0.0030*acs/ts
-hook before_input  (5000*ts) set             delta=delta_i+0.11 beta=beta_i+0.14                                              
-hook before_input  (6500*ts) set             delta=delta_i+0.12 beta=beta_i+0.17                                              
-hook before_input  (8000*ts) set             delta=delta_i+0.13 beta=beta_i+0.20                                                      
-hook before_input (20000*ts) set             delta=delta_i+0.14 beta=beta_i+0.23  alpha_input=0.0015*acs/ts
-
+###hook before_input   (200*ts) set             delta=delta_i+0.01 beta=beta_i+0.01                             
+#hook before_input   (500*ts) set alpha_exc=0.001*ecs/ts #delta=delta_i+0.02 beta=beta_i+0.02  alpha_input=0.0050*acs/ts  
+###hook before_input  (1000*ts) set             delta=delta_i+0.05 beta=beta_i+0.03  
+###hook before_input  (2000*ts) set             delta=delta_i+0.08 beta=beta_i+0.05  alpha_input=0.0040*acs/ts           
+###hook before_input  (3000*ts) set             delta=delta_i+0.10 beta=beta_i+0.08  
+###hook before_input  (4000*ts) set                                beta=beta_i+0.11  alpha_input=0.0030*acs/ts
+###hook before_input  (5000*ts) set             delta=delta_i+0.11 beta=beta_i+0.14                                              
+###hook before_input  (6500*ts) set             delta=delta_i+0.12 beta=beta_i+0.17                                              
+###hook before_input  (8000*ts) set             delta=delta_i+0.13 beta=beta_i+0.20                                                      
+###hook before_input (20000*ts) set             delta=delta_i+0.14 beta=beta_i+0.23  alpha_input=0.0015*acs/ts
+###
 
 
 ###############################################################################
