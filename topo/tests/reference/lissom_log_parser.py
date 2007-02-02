@@ -1,4 +1,7 @@
 # CEBHACKALERT: filename should change...
+import topo
+from Numeric import array
+from topo.commands.pylabplots import matrixplot
 
 
 
@@ -35,12 +38,11 @@ def get_input_params(log_file='or_map_topo.log'):
     return n_inputs,iter(x),iter(y),iter(orientation)
 
 
-from Numeric import array
+
 # CEBHACKALERT: this kind of function probably exists somewhere
 # already. In any case, needs to print out meaningful errors.
-from topo.commands.pylabplots import matrixplot
 
-def get_matrix(matrix_file,dim,center=None):
+def get_matrix(matrix_file,side_length,center=None):
     """
     Returns an array containing the data in the specified C++ LISSOM .matrix
     file. The dimensions of the array must match those specified in
@@ -59,17 +61,17 @@ def get_matrix(matrix_file,dim,center=None):
         
         if not line.startswith('#'):
             values = line.split()
-            assert len(values)==dim[1], "Number of cols doesn't match expected value."
+            assert len(values)==side_length, "Number of cols doesn't match expected value."
             for v in values:
                 row.append(float(v))
             n_rows_read+=1
             matrix.append(row)
 
-    assert n_rows_read==dim[0], "Number of rows doesn't match expected value."
+    assert n_rows_read==side_length, "Number of rows doesn't match expected value."
 
     return array(matrix)
 
-from math import ceil
+
 
 def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
     """
@@ -85,8 +87,9 @@ def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
     
     for i in range(r):
         for j in range(c):
-            # CEBHACKALERT: I think this is ok for testing the values match to the specified
-            # number of dp, given that they are between 0 and 1.
+            # CEBHACKALERT: I think this isn't quite correct for testing a match
+            # to the specified number of dp; I'm not actually using
+            # the automatic comparisons yet.
             if abs(topo_matrix[i,j]-lissom_matrix[i][j])>10**-dp:
                 matches=False
                 print "\n" + topo_matrix_name + " element ("+str(i)+","+str(j)+") didn't match to " + str(dp) + " decimal places.\nTopographica value="+str(topo_matrix[i,j])+", C++ LISSOM value="+str(lissom_matrix[i,j])
@@ -101,13 +104,13 @@ wt_dp=5
 act_dp=5
 plots=False
 
-import topo
-def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_shape,unit,sheet,conn):
+
+def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_side,unit,sheet,conn):
 
     comparing_what = conn + " " + str(unit) + " t=" + str(topo.sim.time()) 
 
     topo_weights = topo.sim[sheet].projections()[conn].cf(*unit).weights
-    c_weights = get_matrix(c_matrix_filename,c_sheet_shape)[c_row_slice,c_col_slice] # c++ lissom doesn't situate weights  
+    c_weights = get_matrix(c_matrix_filename,c_sheet_side)[c_row_slice,c_col_slice] # c++ lissom doesn't situate weights  
 
     match = compare_elements(topo_weights,c_weights,wt_dp,comparing_what)
 
@@ -119,12 +122,12 @@ def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_shape,unit
 
 
 
-def compare_activities(c_matrix_filename,c_sheet_shape,sheet):
+def compare_activities(c_matrix_filename,c_sheet_side,sheet):
 
     comparing_what = sheet + " activity, t=" + str(topo.sim.time()) 
 
     topo_act = topo.sim[sheet].activity
-    c_act = get_matrix(c_matrix_filename,c_sheet_shape)
+    c_act = get_matrix(c_matrix_filename,c_sheet_side)
 
     match = compare_elements(topo_act,c_act,act_dp,comparing_what)
 
