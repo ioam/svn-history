@@ -316,7 +316,7 @@ def measure_size_response(num_phase=18,
         topo.sim.warning("Orientation Preference should be measured before plotting Size Response -- using default values for "+sheet_name)
         or_value = 0.0
 
-    print or_value
+  
 
     if(('XPreference' in sheet.sheet_view_dict) and
        ('YPreference' in sheet.sheet_view_dict)):
@@ -329,7 +329,7 @@ def measure_size_response(num_phase=18,
         x_value=coordinate[0]
         y_value=coordinate[1]
 
-    print x_value, y_value
+  
 
     if num_phase <= 0:
         raise ValueError("num_phase must be greater than 0")
