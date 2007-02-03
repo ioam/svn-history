@@ -101,10 +101,6 @@ def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
 
 # CEBHACKALERT: these two functions now work in a really hacky way, because I've just changed them to
 # expediate another task.
-wt_dp=5
-act_dp=5
-plots=False
-
 
 def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_side,unit,sheet,conn):
 
@@ -114,10 +110,6 @@ def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_side,unit,
     c_weights = get_matrix(c_matrix_filename,c_sheet_side)[c_row_slice,c_col_slice] # c++ lissom doesn't situate weights  
 
     zed = compare_elements(topo_weights,c_weights,wt_dp,comparing_what)
-
-    if plots and not match:
-        matrixplot(topo_weights,title="topo "+comparing_what)
-        matrixplot(c_weights,title="c++ "+comparing_what)
 
     return {comparing_what:zed}
 
@@ -131,10 +123,6 @@ def compare_activities(c_matrix_filename,c_sheet_side,sheet):
     c_act = get_matrix(c_matrix_filename,c_sheet_side)
 
     zed = compare_elements(topo_act,c_act,act_dp,comparing_what)
-
-    #if plots and not match:
-    #    matrixplot(topo_act,title="topo "+comparing_what)
-    #    matrixplot(c_act,title="c++ "+comparing_what)
 
     return {comparing_what:zed}
 
