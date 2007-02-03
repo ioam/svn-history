@@ -1,7 +1,8 @@
 # CEBHACKALERT: filename should change...
 import topo
-import Numeric
-from Numeric import array
+
+from Numeric import ones,zeros,where,ravel,sum,array
+
 from topo.commands.pylabplots import matrixplot
 
 
@@ -73,34 +74,26 @@ def get_matrix(matrix_file,side_length,center=None):
     return array(matrix)
 
 
+# CB: simplify these three functions when it's clear what is useful to know.
 
-def compare_elements(topo_matrix,lissom_matrix,dp,topo_matrix_name):
+def compare_elements(topo_matrix,lissom_matrix):
     """
-    Go through the two matrices element-by-element and check for match
-    to the specified number of decimal places (dp).
+    Return a dictionary {dp:frac} where frac is the fraction of elements which match
+    at the corresponding number of decimal places (dp).
     """
     assert topo_matrix.shape == lissom_matrix.shape
-    import Numeric
 
-    difference = abs(topo_matrix-lissom_matrix)
-    ones = Numeric.ones(difference.shape)
-    zeros = Numeric.zeros(difference.shape)
-    total_no=difference.shape[0]*difference.shape[1]
+    diffs = abs(topo_matrix-lissom_matrix)
+    n_elements=diffs.shape[0]*diffs.shape[1]
     
-    zed = {}
+    fraction_matching = {}
+    for dp in (9,8,7,6,5,4,3):
+        # CEBHACKALERT: what's the best way to test for float equality to certain no. of dp?
+        # This is unlikely to be correct in general.
+        fraction_matching[dp] = sum(ravel(where(diffs<=10**-dp,ones(diffs.shape),zeros(diffs.shape))))/float(n_elements)
 
-    # calculate fraction matching for the different no's of dp
-    for a in (9,8,7,6,5,4,3):
-        # CEBHACKALERT: (same as previous version) what's the best way to test for float equality to certain no. of dp?        
-        zed[a] = Numeric.sum(Numeric.ravel(Numeric.where(difference<=10**-a,ones,zeros)))/float(total_no)
-
-
-    return zed
+    return fraction_matching
         
-
-
-# CEBHACKALERT: these two functions now work in a really hacky way, because I've just changed them to
-# expediate another task.
 
 def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_side,unit,sheet,conn):
 
@@ -109,10 +102,9 @@ def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_side,unit,
     topo_weights = topo.sim[sheet].projections()[conn].cf(*unit).weights
     c_weights = get_matrix(c_matrix_filename,c_sheet_side)[c_row_slice,c_col_slice] # c++ lissom doesn't situate weights  
 
-    zed = compare_elements(topo_weights,c_weights,wt_dp,comparing_what)
+    zed = compare_elements(topo_weights,c_weights)
 
     return {comparing_what:zed}
-
 
 
 def compare_activities(c_matrix_filename,c_sheet_side,sheet):
@@ -122,7 +114,7 @@ def compare_activities(c_matrix_filename,c_sheet_side,sheet):
     topo_act = topo.sim[sheet].activity
     c_act = get_matrix(c_matrix_filename,c_sheet_side)
 
-    zed = compare_elements(topo_act,c_act,act_dp,comparing_what)
+    zed = compare_elements(topo_act,c_act)
 
     return {comparing_what:zed}
 
