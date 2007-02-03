@@ -23,9 +23,6 @@ __version__='$Revision$'
 
 
 
-# CB: just plots automatically, sort all that out.
-
-
 #import pdb 
 import random
 import fixedpoint
@@ -198,28 +195,28 @@ topo.sim.schedule_command(499,'alpha_exc=0.001*ecs; LE.learning_rate=alpha_exc*n
 ### Afferent learning rate changes
 #
 topo.sim.schedule_command(499,  'alpha_input=0.0050*acs; Af.learning_rate=alpha_input*n_units(Af)')
-#topo.sim.schedule_command(1999, 'alpha_input=0.0040*acs; Af.learning_rate=alpha_input*n_units(Af)')
-#topo.sim.schedule_command(3999, 'alpha_input=0.0030*acs; Af.learning_rate=alpha_input*n_units(Af)')
-#topo.sim.schedule_command(19999,'alpha_input=0.0015*acs; Af.learning_rate=alpha_input*n_units(Af)')
+topo.sim.schedule_command(1999, 'alpha_input=0.0040*acs; Af.learning_rate=alpha_input*n_units(Af)')
+topo.sim.schedule_command(3999, 'alpha_input=0.0030*acs; Af.learning_rate=alpha_input*n_units(Af)')
+topo.sim.schedule_command(19999,'alpha_input=0.0015*acs; Af.learning_rate=alpha_input*n_units(Af)')
 
 ### delta/beta changes
 #
 topo.sim.schedule_command(  199, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.01; topo.sim["V1"].output_fn.upper_bound=beta_i+0.01')
 topo.sim.schedule_command(  499, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.02; topo.sim["V1"].output_fn.upper_bound=beta_i+0.02')
-#topo.sim.schedule_command(  999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.05; topo.sim["V1"].output_fn.upper_bound=beta_i+0.03')
-#topo.sim.schedule_command( 1999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.08; topo.sim["V1"].output_fn.upper_bound=beta_i+0.05')
-#topo.sim.schedule_command( 2999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.10; topo.sim["V1"].output_fn.upper_bound=beta_i+0.08')
-#topo.sim.schedule_command( 3999,                                                    'topo.sim["V1"].output_fn.upper_bound=beta_i+0.11')
-#topo.sim.schedule_command( 4999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.11; topo.sim["V1"].output_fn.upper_bound=beta_i+0.14')
-#topo.sim.schedule_command( 6499, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.12; topo.sim["V1"].output_fn.upper_bound=beta_i+0.17')
-#topo.sim.schedule_command( 7999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.13; topo.sim["V1"].output_fn.upper_bound=beta_i+0.20')
-#topo.sim.schedule_command(19999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.14; topo.sim["V1"].output_fn.upper_bound=beta_i+0.23')
+topo.sim.schedule_command(  999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.05; topo.sim["V1"].output_fn.upper_bound=beta_i+0.03')
+topo.sim.schedule_command( 1999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.08; topo.sim["V1"].output_fn.upper_bound=beta_i+0.05')
+topo.sim.schedule_command( 2999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.10; topo.sim["V1"].output_fn.upper_bound=beta_i+0.08')
+topo.sim.schedule_command( 3999,                                                    'topo.sim["V1"].output_fn.upper_bound=beta_i+0.11')
+topo.sim.schedule_command( 4999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.11; topo.sim["V1"].output_fn.upper_bound=beta_i+0.14')
+topo.sim.schedule_command( 6499, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.12; topo.sim["V1"].output_fn.upper_bound=beta_i+0.17')
+topo.sim.schedule_command( 7999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.13; topo.sim["V1"].output_fn.upper_bound=beta_i+0.20')
+topo.sim.schedule_command(19999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0.14; topo.sim["V1"].output_fn.upper_bound=beta_i+0.23')
 
 
 
 # Command to generate lissom data for comparisons
 #
-#./lissom5 commandpath="/home/chris/scratch/DICE_old/lissom_old/command/" display=0 or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'   -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+5" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'   -c "training t+10" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'        -c "training t+80" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12'
+#./lissom5 commandpath="/home/chris/scratch/DICE_old/lissom_old/command/" display=0 or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'   -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+5" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'   -c "training t+10" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'        -c "training t+80" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12'
 
 
 
@@ -227,19 +224,15 @@ matching = {}
 
 if locals().get('comparisons',False):
 
-    # no. of decimal places for matching activity and weight values are set using the following:
-    # topo.tests.reference.lissom_log_parser.act_dp = 5
-    # topo.tests.reference.lissom_log_parser.wt_dp = 5
-    
     # whether or not those functions should plot if there's a difference
     topo.tests.reference.lissom_log_parser.plots = locals().get('plots',False)
 
 
     ## C++ lissom doesn't situate weights in matrix files, so slices etc have to be given
+    ## Calculate here?
+
 
     ### Initial weights comparisons
-    topo.tests.reference.lissom_log_parser.wt_dp=6
-
     matching.update(compare_weights(
         'topo/tests/reference/or_map_topo.000000.wts.Primary.Afferent0.000_000.matrix', 
         slice(1,14),slice(1,14),RN,
@@ -308,6 +301,7 @@ if locals().get('comparisons',False):
 
     topo.sim.run(80)
 
+    # should clean up these, at least with some kind of function to save the typing!
     
     matching.update(compare_weights(
         'topo/tests/reference/or_map_topo.000100.wts.Primary.Afferent0.000_000.matrix', 
@@ -547,9 +541,45 @@ if locals().get('comparisons',False):
         (12,12),'V1','LateralInhibitory'))
 
 
+##     topo.sim.run(13300) 
+##     print "14000"
+    
+##     matching.update(compare_weights(
+##         'topo/tests/reference/or_map_topo.014000.wts.Primary.Afferent0.000_000.matrix', 
+##         slice(1,14),slice(1,14),RN,
+##         (0,0),'V1','Afferent0'))
 
-    dp = 6
-    times = [0,100,200,300,400,500,600,700]
+##     matching.update(compare_weights(
+##         'topo/tests/reference/or_map_topo.014000.wts.Primary.Afferent0.012_012.matrix', 
+##         slice(13,26),slice(13,26),RN,
+##         (12,12),'V1','Afferent0'))
+
+##     matching.update(compare_weights(
+##         'topo/tests/reference/or_map_topo.014000.wts.Primary.LateralExcitatory.000_000.matrix',
+##         slice(0,3),slice(0,3),BaseN,
+##         (0,0),'V1','LateralExcitatory'))
+
+##     matching.update(compare_weights(
+##         'topo/tests/reference/or_map_topo.014000.wts.Primary.LateralExcitatory.012_012.matrix',
+##         slice(10,15),slice(10,15),BaseN,
+##         (12,12),'V1','LateralExcitatory'))
+
+##     matching.update(compare_weights(
+##         'topo/tests/reference/or_map_topo.014000.wts.Primary.LateralInhibitory.000_000.matrix',
+##         slice(0,6),slice(0,6),BaseN,
+##         (0,0),'V1','LateralInhibitory'))
+
+##     matching.update(compare_weights(
+##         'topo/tests/reference/or_map_topo.014000.wts.Primary.LateralInhibitory.012_012.matrix',
+##         slice(7,18),slice(7,18),BaseN,
+##         (12,12),'V1','LateralInhibitory'))
+
+
+
+
+
+    dp = 7
+    times = [0,100,200,300,400,500,600,700] #14000
     Af = []
     LE = []
     LI = []
@@ -557,15 +587,19 @@ if locals().get('comparisons',False):
         Af.append(matching['Afferent0 (12, 12) t='+str(t)+'.0000'][dp])
         LE.append(matching['LateralExcitatory (12, 12) t='+str(t)+'.0000'][dp])
         LI.append(matching['LateralInhibitory (12, 12) t='+str(t)+'.0000'][dp])
-
         
-    import pylab
-    pylab.grid(True)
-    pylab.show._needmain=False    
-    pylab.scatter(times,Af,marker='o')
-    pylab.scatter(times,LE,marker='^')
-    pylab.scatter(times,LI,marker='v')
-    pylab.show()
+    print times
+    print Af
+    print LE
+    print LI
+        
+    #import pylab
+    #pylab.grid(True)
+    #pylab.show._needmain=False    
+    #pylab.scatter(times,Af,marker='o')
+    #pylab.scatter(times,LE,marker='^')
+    #pylab.scatter(times,LI,marker='v')
+    #pylab.show()
 
 
 
