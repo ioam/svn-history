@@ -76,23 +76,25 @@ def get_matrix(matrix_file,side_length,center=None):
 
 # CB: simplify these three functions when it's clear what is useful to know.
 
+from topo.tests.utils import array_almost_equal
+
 def compare_elements(topo_matrix,lissom_matrix):
     """
-    Return a dictionary {dp:frac} where frac is the fraction of elements which match
-    at the corresponding number of decimal places (dp).
+    Return the smallest number of decimal places to which all corresponding elements of the two arrays match.
+
+    Returns -1 if they don't match to at least 1 decimal place. (CB: Because I don't want to
+    fix the functions in topo.tests.utils - they probably exist in numpy.)
     """
     assert topo_matrix.shape == lissom_matrix.shape
 
-    diffs = abs(topo_matrix-lissom_matrix)
-    n_elements=diffs.shape[0]*diffs.shape[1]
+    match_at=-1
     
-    fraction_matching = {}
-    for dp in (9,8,7,6,5,4,3):
-        # CEBHACKALERT: what's the best way to test for float equality to certain no. of dp?
-        # This is unlikely to be correct in general.
-        fraction_matching[dp] = sum(ravel(where(diffs<=10**-dp,ones(diffs.shape),zeros(diffs.shape))))/float(n_elements)
-
-    return fraction_matching
+    for dp in range(1,10)[::-1]:  
+        if array_almost_equal(topo_matrix,lissom_matrix,dp):
+            match_at = dp
+            break
+        
+    return match_at
         
 
 def compare_weights(c_matrix_filename,c_row_slice,c_col_slice,c_sheet_side,unit,sheet,conn):
