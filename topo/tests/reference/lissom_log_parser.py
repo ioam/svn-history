@@ -25,7 +25,7 @@ def get_input_params(log_file='or_map_topo.log'):
     for line in f.readlines():    
         if line.startswith('Iteration'):
             bits = line.split()
-            assert len(bits)==7, "Messed-up line?\n" + line
+            assert len(bits)==7, "Messed-up line (is lissom still running?)\n" + line
 
             cx = float(bits[4].split(':')[1])
             cy = float(bits[5].split(':')[1])
