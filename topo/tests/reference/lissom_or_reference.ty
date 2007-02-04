@@ -441,7 +441,6 @@ if locals().get('comparisons',False):
 
 
     ### display results for weights
-    dp = 7
     times = [0,100,200,300,400,500,600,700,800]
 
     Af = []
@@ -449,11 +448,11 @@ if locals().get('comparisons',False):
     LI = []
 
     for t in times:
-        Af.append(matching['Afferent0 (12, 12) t='+str(t)+'.0000'][dp])
-        LE.append(matching['LateralExcitatory (12, 12) t='+str(t)+'.0000'][dp])
-        LI.append(matching['LateralInhibitory (12, 12) t='+str(t)+'.0000'][dp])
+        Af.append(matching['Afferent0 (12, 12) t='+str(t)+'.0000'])
+        LE.append(matching['LateralExcitatory (12, 12) t='+str(t)+'.0000'])
+        LI.append(matching['LateralInhibitory (12, 12) t='+str(t)+'.0000'])
 
-    print "** Weights, "+`dp`+ " dp"
+    print "** Weights **"
 
     print "times:", times
     print "Af 12 12:", Af
@@ -466,9 +465,9 @@ if locals().get('comparisons',False):
     LI = []
 
     for t in times:
-        Af.append(matching['Afferent0 (0, 0) t='+str(t)+'.0000'][dp])
-        LE.append(matching['LateralExcitatory (0, 0) t='+str(t)+'.0000'][dp])
-        LI.append(matching['LateralInhibitory (0, 0) t='+str(t)+'.0000'][dp])
+        Af.append(matching['Afferent0 (0, 0) t='+str(t)+'.0000'])
+        LE.append(matching['LateralExcitatory (0, 0) t='+str(t)+'.0000'])
+        LI.append(matching['LateralInhibitory (0, 0) t='+str(t)+'.0000'])
         
     print "Af 0 0:", Af
     print "LE 0 0:", LE
@@ -477,16 +476,15 @@ if locals().get('comparisons',False):
 
 
     ### display results for activities
-    dp = 6
     times=[1,2,3,4,5,10,20,100,200,300,400,500,600,700,800]
     r_act = []
     v_act = []
     for t in times:
-        r_act.append(matching['Retina activity, t='+`t`+'.0000'][dp])
-        v_act.append(matching['V1 activity, t='+`t`+'.0000'][dp])
+        r_act.append(matching['Retina activity, t='+`t`+'.0000'])
+        v_act.append(matching['V1 activity, t='+`t`+'.0000'])
 
 
-    print "** Activities, "+`dp`+ " dp"
+    print "** Activities **"
     
     print "times",times
     print "ret act",r_act
