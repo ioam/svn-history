@@ -8,7 +8,7 @@ import sys
 from Numeric import alltrue,equal,shape,ravel,around,asarray,less_equal,array2string
 
 
-# CEBHACKALERT: are these functions available to us somewhere from numpy?
+# CEBALERT: are these functions available to us somewhere from numpy?
 
 def assert_array_equal(x,y,err_msg=''):
     """
@@ -102,8 +102,5 @@ def array_almost_equal(x,y,decimal=6):
 
     reduced = ravel(equal(less_equal(around(abs(x-y),decimal),10.0**(-decimal)),1))
 
-    if alltrue(reduced):
-        return True
-    else:
-        return False
+    return alltrue(reduced)
 
