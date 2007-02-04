@@ -216,7 +216,41 @@ topo.sim.schedule_command(19999, 'topo.sim["V1"].output_fn.lower_bound=delta_i+0
 
 # Command to generate lissom data for comparisons
 #
-#./lissom5 commandpath="/home/chris/scratch/DICE_old/lissom_old/command/" display=0 or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'   -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+5" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'   -c "training t+10" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'        -c "training t+80" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c 'training t+100' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12'
+#./lissom5 commandpath="/home/chris/scratch/DICE_old/lissom_old/command/" display=0 or_map_topo.param -c "call set_thresholds.command" -c "ppm_weight_scale_type=PPM_WtScale_Fixed" -c "Region::ppm_weight_fixed_multiplier=1" -c 'PlotGroup::Weights::filename_format="$$$${filebase}.$$$${06iteration}.wts.$$$${current_region}.$$$${current_plot}.$$$${03current_ui}_$$$${03current_uj}"' -c "cmd::plot_unit::weight_situate=False" -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True'   -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "step" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+5" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c "training t+10" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+80" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' -c "training t+100" -c 'plot filename_format=$$$${default_filename_format} save_matrices=True' -c 'plot_unit save_matrices=True 0 0' -c 'plot_unit save_matrices=True 12 12' 
+
+
+
+
+# might be better to rename the topographica ones
+c_regions = {'V1':'Primary','Retina':'Eye0'}
+c_names = {'Afferent0':'Afferent0','LateralExcitatory':'LateralExcitatory','LateralInhibitory':'LateralInhibitory'}
+
+
+# CEBHACKALERT: I'm still writing this file as I work on the comparisons
+
+
+def check_weights(sheet_name,name,unit,r_slice,c_slice,side):
+    """
+    """
+    cTIME = "%06d"%long(topo.sim.time())
+    cREGION = c_regions[sheet_name]
+    cNAME = c_names[name]
+    cUNIT = "%03d_%03d"%unit
+    
+    matching.update(compare_weights(
+        'topo/tests/reference/or_map_topo.'+cTIME+'.wts.'+cREGION+'.'+cNAME+'.'+cUNIT+'.matrix',
+        c_slice,r_slice,side,
+        unit,sheet_name,name))
+
+
+def check_activities(sheet_name,side):
+    """
+    """
+    cTIME = "%06d"%long(topo.sim.time())
+    cREGION = c_regions[sheet_name]
+
+    matching.update(compare_activities(
+        'topo/tests/reference/or_map_topo.'+cTIME+'p000.'+cREGION+'_Activity.matrix',side,sheet_name))
 
 
 
@@ -232,366 +266,233 @@ if locals().get('comparisons',False):
     ## Calculate here?
 
 
-    ### Initial weights comparisons
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000000.wts.Primary.Afferent0.000_000.matrix', 
-        slice(1,14),slice(1,14),RN,
-        (0,0),'V1','Afferent0'))
+    ### Initial weights
+    #
+    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000000.wts.Primary.Afferent0.012_012.matrix', 
-        slice(13,26),slice(13,26),RN,
-        (12,12),'V1','Afferent0'))
+    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000000.wts.Primary.LateralExcitatory.000_000.matrix',
-        slice(0,3),slice(0,3),BaseN,
-        (0,0),'V1','LateralExcitatory'))
-
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000000.wts.Primary.LateralExcitatory.012_012.matrix',
-        slice(10,15),slice(10,15),BaseN,
-        (12,12),'V1','LateralExcitatory'))
-
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000000.wts.Primary.LateralInhibitory.000_000.matrix',
-        slice(0,6),slice(0,6),BaseN,
-        (0,0),'V1','LateralInhibitory'))
-
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000000.wts.Primary.LateralInhibitory.012_012.matrix',
-        slice(7,18),slice(7,18),BaseN,
-        (12,12),'V1','LateralInhibitory'))
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
 
-    ### Check retina patterns 
+
+    ### Check initial patterns are ok on the retina (and V1)
     #
     topo.sim.run(1)
-
-    matching.update(compare_activities("topo/tests/reference/or_map_topo.000001p000.Eye0_Activity.matrix",RN,
-                       "Retina"))
+    check_activities('Retina',RN)
+    check_activities('V1',BaseN)
 
     topo.sim.run(1)
+    check_activities('Retina',RN)
+    check_activities('V1',BaseN)
     
-    matching.update(compare_activities("topo/tests/reference/or_map_topo.000002p000.Eye0_Activity.matrix",RN,
-                       "Retina"))
-
     topo.sim.run(1)
-    matching.update(compare_activities("topo/tests/reference/or_map_topo.000003p000.Eye0_Activity.matrix",RN,
-                       "Retina"))
-
+    check_activities('Retina',RN)
+    check_activities('V1',BaseN)
+    
     topo.sim.run(1)
-    matching.update(compare_activities("topo/tests/reference/or_map_topo.000004p000.Eye0_Activity.matrix",RN,
-                       "Retina"))
-
+    check_activities('Retina',RN)
+    check_activities('V1',BaseN)
+    
     topo.sim.run(1)
-    matching.update(compare_activities("topo/tests/reference/or_map_topo.000005p000.Eye0_Activity.matrix",RN,
-                       "Retina"))
-
+    check_activities('Retina',RN)
+    check_activities('V1',BaseN)
+    
     topo.sim.run(5)
-    matching.update(compare_activities("topo/tests/reference/or_map_topo.000010p000.Eye0_Activity.matrix",RN,
-                       "Retina"))
-
+    check_activities('Retina',RN)
+    check_activities('V1',BaseN)
+    
     topo.sim.run(10)
-    matching.update(compare_activities("topo/tests/reference/or_map_topo.000020p000.Eye0_Activity.matrix",RN,
-                       "Retina"))
-
+    check_activities('Retina',RN)
+    check_activities('V1',BaseN)
 
 
 
     topo.sim.run(80)
+    print "100"
 
-    # should clean up these, at least with some kind of function to save the typing!
-    
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000100.wts.Primary.Afferent0.000_000.matrix', 
-        slice(1,14),slice(1,14),RN,
-        (0,0),'V1','Afferent0'))
+    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000100.wts.Primary.Afferent0.012_012.matrix', 
-        slice(13,26),slice(13,26),RN,
-        (12,12),'V1','Afferent0'))
+    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000100.wts.Primary.LateralExcitatory.000_000.matrix',
-        slice(0,3),slice(0,3),BaseN,
-        (0,0),'V1','LateralExcitatory'))
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000100.wts.Primary.LateralExcitatory.012_012.matrix',
-        slice(10,15),slice(10,15),BaseN,
-        (12,12),'V1','LateralExcitatory'))
-
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000100.wts.Primary.LateralInhibitory.000_000.matrix',
-        slice(0,6),slice(0,6),BaseN,
-        (0,0),'V1','LateralInhibitory'))
-
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000100.wts.Primary.LateralInhibitory.012_012.matrix',
-        slice(7,18),slice(7,18),BaseN,
-        (12,12),'V1','LateralInhibitory'))
+    check_activities('Retina',RN)
+    check_activities('V1',BaseN)
 
 
     topo.sim.run(100)
     print "200"
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000200.wts.Primary.Afferent0.000_000.matrix', 
-        slice(1,14),slice(1,14),RN,
-        (0,0),'V1','Afferent0'))
+    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000200.wts.Primary.Afferent0.012_012.matrix', 
-        slice(13,26),slice(13,26),RN,
-        (12,12),'V1','Afferent0'))
+    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000200.wts.Primary.LateralExcitatory.000_000.matrix',
-        slice(0,3),slice(0,3),BaseN,
-        (0,0),'V1','LateralExcitatory'))
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000200.wts.Primary.LateralExcitatory.012_012.matrix',
-        slice(10,15),slice(10,15),BaseN,
-        (12,12),'V1','LateralExcitatory'))
-
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000200.wts.Primary.LateralInhibitory.000_000.matrix',
-        slice(0,6),slice(0,6),BaseN,
-        (0,0),'V1','LateralInhibitory'))
-
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000200.wts.Primary.LateralInhibitory.012_012.matrix',
-        slice(7,18),slice(7,18),BaseN,
-        (12,12),'V1','LateralInhibitory'))
+    check_activities('Retina',RN)
+    check_activities('V1',BaseN)
 
 
     topo.sim.run(100)
     print "300"
 
-    
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000300.wts.Primary.Afferent0.000_000.matrix', 
-        slice(1,14),slice(1,14),RN,
-        (0,0),'V1','Afferent0'))
+    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000300.wts.Primary.Afferent0.012_012.matrix', 
-        slice(13,26),slice(13,26),RN,
-        (12,12),'V1','Afferent0'))
+    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000300.wts.Primary.LateralExcitatory.000_000.matrix',
-        slice(0,3),slice(0,3),BaseN,
-        (0,0),'V1','LateralExcitatory'))
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000300.wts.Primary.LateralExcitatory.012_012.matrix',
-        slice(10,15),slice(10,15),BaseN,
-        (12,12),'V1','LateralExcitatory'))
-
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000300.wts.Primary.LateralInhibitory.000_000.matrix',
-        slice(0,6),slice(0,6),BaseN,
-        (0,0),'V1','LateralInhibitory'))
-
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000300.wts.Primary.LateralInhibitory.012_012.matrix',
-        slice(7,18),slice(7,18),BaseN,
-        (12,12),'V1','LateralInhibitory'))
+    check_activities('Retina',RN)
+    check_activities('V1',BaseN)
 
 
     topo.sim.run(100)
     print "400"
-    
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000400.wts.Primary.Afferent0.000_000.matrix', 
-        slice(1,14),slice(1,14),RN,
-        (0,0),'V1','Afferent0'))
+    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000400.wts.Primary.Afferent0.012_012.matrix', 
-        slice(13,26),slice(13,26),RN,
-        (12,12),'V1','Afferent0'))
+    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000400.wts.Primary.LateralExcitatory.000_000.matrix',
-        slice(0,3),slice(0,3),BaseN,
-        (0,0),'V1','LateralExcitatory'))
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000400.wts.Primary.LateralExcitatory.012_012.matrix',
-        slice(10,15),slice(10,15),BaseN,
-        (12,12),'V1','LateralExcitatory'))
-
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000400.wts.Primary.LateralInhibitory.000_000.matrix',
-        slice(0,6),slice(0,6),BaseN,
-        (0,0),'V1','LateralInhibitory'))
-
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000400.wts.Primary.LateralInhibitory.012_012.matrix',
-        slice(7,18),slice(7,18),BaseN,
-        (12,12),'V1','LateralInhibitory'))
+    check_activities('Retina',RN)
+    check_activities('V1',BaseN)
 
 
     topo.sim.run(100)
     print "500"
-    
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000500.wts.Primary.Afferent0.000_000.matrix', 
-        slice(1,14),slice(1,14),RN,
-        (0,0),'V1','Afferent0'))
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000500.wts.Primary.Afferent0.012_012.matrix', 
-        slice(13,26),slice(13,26),RN,
-        (12,12),'V1','Afferent0'))
+    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000500.wts.Primary.LateralExcitatory.000_000.matrix',
-        slice(0,3),slice(0,3),BaseN,
-        (0,0),'V1','LateralExcitatory'))
+    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000500.wts.Primary.LateralExcitatory.012_012.matrix',
-        slice(10,15),slice(10,15),BaseN,
-        (12,12),'V1','LateralExcitatory'))
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000500.wts.Primary.LateralInhibitory.000_000.matrix',
-        slice(0,6),slice(0,6),BaseN,
-        (0,0),'V1','LateralInhibitory'))
-
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000500.wts.Primary.LateralInhibitory.012_012.matrix',
-        slice(7,18),slice(7,18),BaseN,
-        (12,12),'V1','LateralInhibitory'))
+    check_activities('Retina',RN)
+    check_activities('V1',BaseN)
 
 
     topo.sim.run(100)
     print "600"
-    
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000600.wts.Primary.Afferent0.000_000.matrix', 
-        slice(1,14),slice(1,14),RN,
-        (0,0),'V1','Afferent0'))
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000600.wts.Primary.Afferent0.012_012.matrix', 
-        slice(13,26),slice(13,26),RN,
-        (12,12),'V1','Afferent0'))
+    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000600.wts.Primary.LateralExcitatory.000_000.matrix',
-        slice(0,3),slice(0,3),BaseN,
-        (0,0),'V1','LateralExcitatory'))
+    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000600.wts.Primary.LateralExcitatory.012_012.matrix',
-        slice(10,15),slice(10,15),BaseN,
-        (12,12),'V1','LateralExcitatory'))
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000600.wts.Primary.LateralInhibitory.000_000.matrix',
-        slice(0,6),slice(0,6),BaseN,
-        (0,0),'V1','LateralInhibitory'))
-
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000600.wts.Primary.LateralInhibitory.012_012.matrix',
-        slice(7,18),slice(7,18),BaseN,
-        (12,12),'V1','LateralInhibitory'))
-
+    check_activities('Retina',RN)
+    check_activities('V1',BaseN)
 
 
     topo.sim.run(100)
     print "700"
-    
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000700.wts.Primary.Afferent0.000_000.matrix', 
-        slice(1,14),slice(1,14),RN,
-        (0,0),'V1','Afferent0'))
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000700.wts.Primary.Afferent0.012_012.matrix', 
-        slice(13,26),slice(13,26),RN,
-        (12,12),'V1','Afferent0'))
+    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000700.wts.Primary.LateralExcitatory.000_000.matrix',
-        slice(0,3),slice(0,3),BaseN,
-        (0,0),'V1','LateralExcitatory'))
+    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000700.wts.Primary.LateralExcitatory.012_012.matrix',
-        slice(10,15),slice(10,15),BaseN,
-        (12,12),'V1','LateralExcitatory'))
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000700.wts.Primary.LateralInhibitory.000_000.matrix',
-        slice(0,6),slice(0,6),BaseN,
-        (0,0),'V1','LateralInhibitory'))
-
-    matching.update(compare_weights(
-        'topo/tests/reference/or_map_topo.000700.wts.Primary.LateralInhibitory.012_012.matrix',
-        slice(7,18),slice(7,18),BaseN,
-        (12,12),'V1','LateralInhibitory'))
+    check_activities('Retina',RN)
+    check_activities('V1',BaseN)
 
 
-##     topo.sim.run(13300) 
-##     print "14000"
-    
-##     matching.update(compare_weights(
-##         'topo/tests/reference/or_map_topo.014000.wts.Primary.Afferent0.000_000.matrix', 
-##         slice(1,14),slice(1,14),RN,
-##         (0,0),'V1','Afferent0'))
+    topo.sim.run(100)
+    print "800"
 
-##     matching.update(compare_weights(
-##         'topo/tests/reference/or_map_topo.014000.wts.Primary.Afferent0.012_012.matrix', 
-##         slice(13,26),slice(13,26),RN,
-##         (12,12),'V1','Afferent0'))
+    check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
+    check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-##     matching.update(compare_weights(
-##         'topo/tests/reference/or_map_topo.014000.wts.Primary.LateralExcitatory.000_000.matrix',
-##         slice(0,3),slice(0,3),BaseN,
-##         (0,0),'V1','LateralExcitatory'))
+    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
+    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-##     matching.update(compare_weights(
-##         'topo/tests/reference/or_map_topo.014000.wts.Primary.LateralExcitatory.012_012.matrix',
-##         slice(10,15),slice(10,15),BaseN,
-##         (12,12),'V1','LateralExcitatory'))
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
 
-##     matching.update(compare_weights(
-##         'topo/tests/reference/or_map_topo.014000.wts.Primary.LateralInhibitory.000_000.matrix',
-##         slice(0,6),slice(0,6),BaseN,
-##         (0,0),'V1','LateralInhibitory'))
-
-##     matching.update(compare_weights(
-##         'topo/tests/reference/or_map_topo.014000.wts.Primary.LateralInhibitory.012_012.matrix',
-##         slice(7,18),slice(7,18),BaseN,
-##         (12,12),'V1','LateralInhibitory'))
+    check_activities('Retina',RN)
+    check_activities('V1',BaseN)
 
 
 
-
-
+    ### display results for weights
     dp = 7
-    times = [0,100,200,300,400,500,600,700] #14000
+    times = [0,100,200,300,400,500,600,700,800]
+
     Af = []
     LE = []
     LI = []
+
     for t in times:
         Af.append(matching['Afferent0 (12, 12) t='+str(t)+'.0000'][dp])
         LE.append(matching['LateralExcitatory (12, 12) t='+str(t)+'.0000'][dp])
         LI.append(matching['LateralInhibitory (12, 12) t='+str(t)+'.0000'][dp])
+
+    print "** Weights, "+`dp`+ " dp"
+
+    print "times:", times
+    print "Af 12 12:", Af
+    print "LE 12 12:", LE
+    print "LI 12 12:", LI
+
+
+    Af = []
+    LE = []
+    LI = []
+
+    for t in times:
+        Af.append(matching['Afferent0 (0, 0) t='+str(t)+'.0000'][dp])
+        LE.append(matching['LateralExcitatory (0, 0) t='+str(t)+'.0000'][dp])
+        LI.append(matching['LateralInhibitory (0, 0) t='+str(t)+'.0000'][dp])
         
-    print times
-    print Af
-    print LE
-    print LI
+    print "Af 0 0:", Af
+    print "LE 0 0:", LE
+    print "LI 0 0:", LI
+
+
+
+    ### display results for activities
+    dp = 6
+    times=[1,2,3,4,5,10,20,100,200,300,400,500,600,700,800]
+    r_act = []
+    v_act = []
+    for t in times:
+        r_act.append(matching['Retina activity, t='+`t`+'.0000'][dp])
+        v_act.append(matching['V1 activity, t='+`t`+'.0000'][dp])
+
+
+    print "** Activities, "+`dp`+ " dp"
+    
+    print "times",times
+    print "ret act",r_act
+    print "v1 act",v_act
+    
+
         
     #import pylab
     #pylab.grid(True)
