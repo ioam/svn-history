@@ -8,6 +8,7 @@ import sys
 from Numeric import alltrue,equal,shape,ravel,around,asarray,less_equal,array2string
 
 
+# CEBHACKALERT: are these functions available to us somewhere from numpy?
 
 def assert_array_equal(x,y,err_msg=''):
     """
@@ -48,6 +49,11 @@ def assert_array_almost_equal(x,y,decimal=6,err_msg=''):
 
     Taken from scipy_test.testing.
     """
+    # CB: added in >0 test because otherwise
+    #  assert_array_almost_equal(array([1]),array([2]),0)==True
+    # It's not very likely to come up!
+    assert decimal > 0, "Must test to at least 1 decimal place."
+    
     x = asarray(x)
     y = asarray(y)
     msg = '\nArrays are not almost equal'
@@ -73,3 +79,31 @@ def assert_array_almost_equal(x,y,decimal=6,err_msg=''):
         print shape(x),shape(y)
         print x, y
         raise ValueError, 'arrays are not almost equal'
+
+
+
+def array_almost_equal(x,y,decimal=6):
+    """
+    Return whether or not two arrays are equal to the given number of decimal places.
+
+    Raises an error if x and y are not the same shape.
+    """
+    ## Adapted from assert_array_almost_equal() above.
+    
+    assert decimal>0, "Must test to at least 1 decimal place."
+
+    x = asarray(x)
+    y = asarray(y)
+    
+    if not alltrue(equal(shape(x),shape(y))):
+        msg = 'Shapes do not match:\n\t'\
+              'Shape of array 1: %s\n\tShape of array 2: %s' % (shape(x),shape(y))
+        raise ValueError(msg)
+
+    reduced = ravel(equal(less_equal(around(abs(x-y),decimal),10.0**(-decimal)),1))
+
+    if alltrue(reduced):
+        return True
+    else:
+        return False
+
