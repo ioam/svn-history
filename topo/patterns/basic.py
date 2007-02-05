@@ -20,6 +20,11 @@ from topo.misc.patternfns import gaussian,gabor,line,disk,ring
 from topo.misc.utils import wrap
 from topo.misc.numbergenerators import UniformRandom
 
+# Could add a Gradient class, where the brightness varies as a
+# function of an equation for a plane.  This could be useful as a
+# background, or to see how sharp a gradient is needed to get a
+# response.
+
 class Gaussian(PatternGenerator):
     """
     2D Gaussian pattern generator.
