@@ -25,7 +25,7 @@ that they go together.
 order and grouping so that the code works at every time in the CVS
 repository history.  That is, if you change several files, adding a
 function to one file and then calling it in another, please check in
-the file with the new function *first*, and only then check in the
+the file with the new function <EM>first</EM>, and only then check in the
 file that calls the function.  If you check them in in the opposite
 order, then the repository temporarily will be in a state where it
 cannot supply working code.  Even if you know no one else is working

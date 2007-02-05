@@ -53,7 +53,7 @@ package only and then using the fully qualified name
 (e.g. <CODE>import MLab ; MLab.max()</CODE>).
 
 <P>If you find that you need to change any file in an external
-package, please *DO NOT* change that file, wrap it up into a .tar or
+package, please <EM>DO NOT</EM> change that file, wrap it up into a .tar or
 .zip archive, and put it back into the Topographica repository.  Doing
 so is a very bad idea, because it prevents us from upgrading that
 package in the future.  Instead, keep the original archive intact as
