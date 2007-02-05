@@ -115,6 +115,39 @@ that are e.g. being selected.
 
 <ul>
 
+
+<li> 
+2006/02/04 (JAB): Should work through some of the most commonly used
+non-inline-optimized components to see if the implementation can be
+tuned slightly for better performance.  For instance, numpy.dot()
+appears to be much faster than the current sum(x*y) implementation of
+DotProduct:
+
+<pre>
+Topographica_t0> import time,numpy,Numeric
+Topographica_t0> def runtime(code): start = time.time() ; z = eval(code) ; end = time.time() ; print z, end-start
+... 
+Topographica_t0> x=2*numpy.ones((1000,10000))
+Topographica_t0> y=numpy.ones((1000,10000))
+Topographica_t0> runtime("numpy.dot(x.ravel(),y.ravel())")
+20000000.0 0.122502088547
+Topographica_t0> runtime("numpy.sum(x.ravel()*y.ravel())")
+20000000.0 0.312201976776
+Topographica_t0> 
+Topographica_t0> 
+Topographica_t0> x=2*Numeric.ones((1000,10000))
+Topographica_t0> y=Numeric.ones((1000,10000))
+Topographica_t0> runtime("Numeric.dot(x.flat,y.flat)")
+20000000 0.0919671058655
+Topographica_t0> runtime("Numeric.sum(x.flat*y.flat)")
+20000000 0.358192205429
+</pre>
+
+After this, it would be interesting to get some hard numbers about how
+much faster the inline-optimized components are than those using numpy
+primitives.
+</li>
+
 <li>
 2006/11/09 (JA?): Need to do a general overhaul of the GUI; it needs to be clean 
 and well designed so that it can be flexible.
