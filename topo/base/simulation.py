@@ -460,11 +460,20 @@ class CommandEvent(Event):
     """An Event consisting of a command string to execute."""
 
     def __init__(self,time,command_string):
-        super(CommandEvent,self).__init__(time)
-        self.command_string = command_string
+        """
+        Add the event to the simulation.
 
+        Prints a warning if the syntax is incorrect.
+        """
+        self.command_string = command_string
+        self.__test()
+        super(CommandEvent,self).__init__(time)
+        
     def __repr__(self):
         return "CommandEvent(time="+`self.time`+", command_string='"+self.command_string+"')"
+
+    # CEBHACKALERT: should we stop execution after detecting errors (rather than just printing a warning)
+    # in __call__() and __test()? After deciding, make docstrings match behavior.
     
     def __call__(self):
         """
@@ -479,13 +488,37 @@ class CommandEvent(Event):
         """
         # Presumably here to avoid importing __main__ into the rest of the file
         import __main__
+
         try:
             exec self.command_string in __main__.__dict__
-        except SyntaxError:
-            raise SyntaxError("CommandEvent at "+`self.time`+" contained a syntax error:'"+self.command_string+"'")
+        except Exception, err:
+            ParameterizedObject(name='CommandEvent').warning(`self`+' was not executed because it would cause an error - '+`err`+': "' +err[0]+'".')
+        
+    def __test(self):
+        """
+        Check for SyntaxErrors in the command.
+        
+        All other errors are ignored since __main__ could be in any state at the scheduled time.
+        """
+        # This method doesn't affect an object the user has, because it executes the command in a new
+        # dictionary. So for instance, an iterator will not be advanced because it won't exist in the
+        # new dictionary. But the syntax of the command will be checked.
+        #
+        # CB: we could check for more errors, e.g. by checking for NameError and ignoring *only*
+        # that error. Then we would catch things like attempting to schedule 5/0.
+        # But I don't think we should actually do that (e.g. someone could be catching
+        # divide-by-zero errors later in their simulation).
 
-    
-
+        try:
+            exec self.command_string in {}
+        except SyntaxError, err :
+            # CEBHACKALERT: why don't the offset and text attributes contain anything?
+            # print err.filename,err.lineno,err.offset,err.text
+            # (same above in __call__() - why don't some of the attributes contain anything?)
+            ParameterizedObject(name='CommandEvent').warning('The scheduled command "'+self.command_string+'" will not be executed because it contains a syntax error: "'+err[0]+'".')
+        except:
+            pass
+        
             
 # Simulation stores its events in a linear-time priority queue (i.e., a
 # sorted list.) For efficiency, e.g. for spiking neuron simulations,
