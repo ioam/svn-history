@@ -78,9 +78,11 @@ def get_matrix(matrix_file,side_length,center=None):
 
 from topo.tests.utils import array_almost_equal
 
-def compare_elements(topo_matrix,lissom_matrix):
+def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
     """
     Return the smallest number of decimal places to which all corresponding elements of the two arrays match.
+
+    max_dp specifies the greatest number of decimal places to try.
 
     Returns -1 if they don't match to at least 1 decimal place. (CB: Because I don't want to
     fix the functions in topo.tests.utils - they probably exist in numpy.)
@@ -89,7 +91,7 @@ def compare_elements(topo_matrix,lissom_matrix):
 
     match_at=-1
     
-    for dp in range(1,10)[::-1]:  
+    for dp in range(1,max_dp+1)[::-1]:  
         if array_almost_equal(topo_matrix,lissom_matrix,dp):
             match_at = dp
             break
