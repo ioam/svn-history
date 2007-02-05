@@ -6,6 +6,10 @@ $Id$
 __version__='$Revision$'
 
 
+### CEBHACKALERT: the comparisons in this file will not work
+### until it is updated.
+
+
 ## With one GeneratorSheet connected to one CFSheet via Disk-shaped
 ## weights, presenting a Gaussian input pattern:
 ##

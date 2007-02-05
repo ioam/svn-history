@@ -30,6 +30,10 @@ $Id$
 __version__='$Revision$'
 
 
+### CEBHACKALERT: the comparisons in this file will not work
+### until it is updated.
+
+
 # This simulation is still being worked on:
 #
 # - learning rates need to be adjusted for all the times the bounds
