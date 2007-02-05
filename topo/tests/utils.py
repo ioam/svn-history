@@ -41,6 +41,46 @@ def assert_array_equal(x,y,err_msg=''):
         raise ValueError, msg
 
 
+
+### CEBHACKALERT: do these functions work properly?
+### As far as I can see, the following arrays are not
+### equal to 3 decimal places - but apparently they are.
+##
+## Topographica_t300> q
+## [[ 0.       , 0.0573847, 0.0606149, 0.0598746, 0.       ,]
+##  [ 0.0480538, 0.0552814, 0.0596533, 0.0608909, 0.0596174,]
+##  [ 0.041258 , 0.049408 , 0.0542723, 0.0554007, 0.0529847,]
+##  [ 0.0318477, 0.0382993, 0.043044 , 0.0434216, 0.039614 ,]
+##  [ 0.       , 0.0284601, 0.0302289, 0.0303898, 0.       ,]]
+## Topographica_t300> r
+## [[ 0.        , 0.05664945, 0.06030838, 0.05992609, 0.        ,]
+##  [ 0.04717049, 0.05471333, 0.05939505, 0.06094503, 0.06021817,]
+##  [ 0.0404351 , 0.04891871, 0.05402054, 0.05565059, 0.05440581,]
+##  [ 0.03123766, 0.03796289, 0.04310865, 0.04405752, 0.04102606,]
+##  [ 0.        , 0.02833677, 0.03042182, 0.03109195, 0.        ,]]
+## Topographica_t300> from topo.tests.utils import assert_array_almost_equal
+## Topographica_t300> assert_array_almost_equal(q,r,decimal=3)
+## Topographica_t300> assert_array_almost_equal(q,r,decimal=9)
+## Topographica_t300> assert_array_almost_equal(q,r,decimal=12)
+## Topographica_t300> assert_array_almost_equal(q,r,decimal=13)
+## Traceback (most recent call last):
+##   File "<stdin>", line 1, in ?
+##   File "/home/chris/dev_ext/topographica/topo/tests/utils.py", line 75, in assert_array_almost_equal
+##     assert cond,\
+## AssertionError: 
+## Arrays are not almost equal (mismatch 64.0%):
+## 	Array 1: [[ 0.         0.0573847  0.0606149  0.0598746  0.       ]
+##  [ 0.0480538  0.0552814  0.0596533  0.0608909  0.0596174]
+##  [ 0...
+## 	Array 2: [[ 0.                0.05664944648743  0.0603083781898   0.05992609262466
+##         0.              ]
+##  [ 0.04717049375176 ...
+	
+## Topographica_t300> 
+
+
+
+
 def assert_array_almost_equal(x,y,decimal=6,err_msg=''):
     """
     Test for near equality of two arrays.
