@@ -91,8 +91,9 @@ def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
 
     match_at=-1
     
-    for dp in range(1,max_dp+1)[::-1]:  
-        if array_almost_equal(topo_matrix,lissom_matrix,dp):
+    for dp in range(1,max_dp+1)[::-1]:
+        # CBHACKALERT: aren't lissom_matrix values and topo_matrix values already floats? But astype(float) seems to make the comparisons work...
+        if array_almost_equal(topo_matrix.astype(float),lissom_matrix.astype(float),dp):
             match_at = dp
             break
         
