@@ -49,13 +49,13 @@ from topo.tests.reference.lissom_log_parser import get_input_params, get_matrix,
 ###########################################
 # Variables from or_map_topo.param
 
-BaseN=24.0
+BaseN=36.0
 BaseRN=24.0
 area_scale=1.0
 #num_eyes=1
 rf_radius=BaseRN/4.0+0.5 
 inh_rad=BaseN/4.0-1.0+0.5
-exc_rad=2.5              
+exc_rad=BaseN/10.0-0.1              
 #min_exc_rad=max(1.0,BaseN/44+0.5)
 
 #default_afferent_size_scale=BaseN/BaseRN
@@ -176,16 +176,14 @@ LI.learning_rate=alpha_inh*n_units(LI)
 #
 # The learning rate is adjusted too because the number of units changes (even if the learning
 # rate is going to be adjusted anyway at this time)
-# 
-# CURRENTLY NO BOUNDS CHANGES
+# exc_rad*=0.6
+topo.sim.schedule_command(200,'exc_rad=2.5; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
 
-#topo.sim.schedule_command(200,'exc_rad*=0.6; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
+#topo.sim.schedule_command(500,'exc_rad=exc_rad*0.7+0.35; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
 
-## topo.sim.schedule_command(500,'exc_rad=exc_rad*0.7+0.35; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
+#topo.sim.schedule_command(1000,'exc_rad=exc_rad*0.8-0.3; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
 
-## topo.sim.schedule_command(1000,'exc_rad=exc_rad*0.8-0.3; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
-
-## topo.sim.schedule_command(2000,'exc_rad=2.5; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
+#topo.sim.schedule_command(2000,'exc_rad=2.5; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
 
 
 ### Excitatory learning rate changes
