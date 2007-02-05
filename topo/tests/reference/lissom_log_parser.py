@@ -87,7 +87,7 @@ def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
     Returns -1 if they don't match to at least 1 decimal place. (CB: Because I don't want to
     fix the functions in topo.tests.utils - they probably exist in numpy.)
     """
-    assert topo_matrix.shape == lissom_matrix.shape
+    assert topo_matrix.shape == lissom_matrix.shape, "topographica and c++ matrices are different shapes; did you take the right slice of the c++ matrix?"
 
     match_at=-1
     
