@@ -177,13 +177,13 @@ LI.learning_rate=alpha_inh*n_units(LI)
 # The learning rate is adjusted too because the number of units changes (even if the learning
 # rate is going to be adjusted anyway at this time)
 # exc_rad*=0.6
-topo.sim.schedule_command(200,'exc_rad=2.5; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
+topo.sim.schedule_command(199,'exc_rad=2.5; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); LE.learning_rate=alpha_exc*n_units(LE)')
 
-#topo.sim.schedule_command(500,'exc_rad=exc_rad*0.7+0.35; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
+#topo.sim.schedule_command(499,'exc_rad=exc_rad*0.7+0.35; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); LE.learning_rate=alpha_exc*n_units(LE)')
 
-#topo.sim.schedule_command(1000,'exc_rad=exc_rad*0.8-0.3; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
+#topo.sim.schedule_command(999,'exc_rad=exc_rad*0.8-0.3; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); LE.learning_rate=alpha_exc*n_units(LE)')
 
-#topo.sim.schedule_command(2000,'exc_rad=2.5; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); n_units(LE)=n_units(LE); LE.learning_rate=alpha_exc*n_units(LE)')
+#topo.sim.schedule_command(1999,'exc_rad=2.5; LE.change_bounds(BoundingBox(radius=exc_rad/BaseN)); LE.learning_rate=alpha_exc*n_units(LE)')
 
 
 ### Excitatory learning rate changes
@@ -269,11 +269,11 @@ if locals().get('comparisons',False):
     check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
     check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
-    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
+    check_weights('V1','LateralExcitatory',(0,0),slice(0,4),slice(0,4),BaseN)
+    check_weights('V1','LateralExcitatory',(12,12),slice(9,16),slice(9,16),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,9),slice(0,9),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(4,21),slice(4,21),BaseN)
 
 
 
@@ -315,11 +315,11 @@ if locals().get('comparisons',False):
     check_weights('V1','Afferent0',(0,0),slice(1,14),slice(1,14),RN)
     check_weights('V1','Afferent0',(12,12),slice(13,26),slice(13,26),RN)
 
-    check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
-    check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
+    check_weights('V1','LateralExcitatory',(0,0),slice(0,4),slice(0,4),BaseN)
+    check_weights('V1','LateralExcitatory',(12,12),slice(9,16),slice(9,16),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,9),slice(0,9),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(4,21),slice(4,21),BaseN)
 
     check_activities('Retina',RN)
     check_activities('V1',BaseN)
@@ -334,8 +334,8 @@ if locals().get('comparisons',False):
     check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
     check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,9),slice(0,9),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(4,21),slice(4,21),BaseN)
 
     check_activities('Retina',RN)
     check_activities('V1',BaseN)
@@ -350,8 +350,8 @@ if locals().get('comparisons',False):
     check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
     check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,9),slice(0,9),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(4,21),slice(4,21),BaseN)
 
     check_activities('Retina',RN)
     check_activities('V1',BaseN)
@@ -366,8 +366,8 @@ if locals().get('comparisons',False):
     check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
     check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,9),slice(0,9),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(4,21),slice(4,21),BaseN)
 
     check_activities('Retina',RN)
     check_activities('V1',BaseN)
@@ -382,8 +382,8 @@ if locals().get('comparisons',False):
     check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
     check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,9),slice(0,9),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(4,21),slice(4,21),BaseN)
 
     check_activities('Retina',RN)
     check_activities('V1',BaseN)
@@ -398,8 +398,8 @@ if locals().get('comparisons',False):
     check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
     check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,9),slice(0,9),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(4,21),slice(4,21),BaseN)
 
     check_activities('Retina',RN)
     check_activities('V1',BaseN)
@@ -414,8 +414,8 @@ if locals().get('comparisons',False):
     check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
     check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,9),slice(0,9),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(4,21),slice(4,21),BaseN)
 
     check_activities('Retina',RN)
     check_activities('V1',BaseN)
@@ -430,8 +430,8 @@ if locals().get('comparisons',False):
     check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
     check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,9),slice(0,9),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(4,21),slice(4,21),BaseN)
 
     check_activities('Retina',RN)
     check_activities('V1',BaseN)
@@ -446,8 +446,8 @@ if locals().get('comparisons',False):
     check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
     check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,9),slice(0,9),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(4,21),slice(4,21),BaseN)
 
     check_activities('Retina',RN)
     check_activities('V1',BaseN)
@@ -462,8 +462,8 @@ if locals().get('comparisons',False):
     check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
     check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,9),slice(0,9),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(4,21),slice(4,21),BaseN)
 
     check_activities('Retina',RN)
     check_activities('V1',BaseN)
@@ -478,8 +478,8 @@ if locals().get('comparisons',False):
     check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
     check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,9),slice(0,9),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(4,21),slice(4,21),BaseN)
 
     check_activities('Retina',RN)
     check_activities('V1',BaseN)
@@ -494,8 +494,8 @@ if locals().get('comparisons',False):
     check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
     check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,9),slice(0,9),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(4,21),slice(4,21),BaseN)
 
     check_activities('Retina',RN)
     check_activities('V1',BaseN)
@@ -510,8 +510,8 @@ if locals().get('comparisons',False):
     check_weights('V1','LateralExcitatory',(0,0),slice(0,3),slice(0,3),BaseN)
     check_weights('V1','LateralExcitatory',(12,12),slice(10,15),slice(10,15),BaseN)
 
-    check_weights('V1','LateralInhibitory',(0,0),slice(0,6),slice(0,6),BaseN)
-    check_weights('V1','LateralInhibitory',(12,12),slice(7,18),slice(7,18),BaseRN)
+    check_weights('V1','LateralInhibitory',(0,0),slice(0,9),slice(0,9),BaseN)
+    check_weights('V1','LateralInhibitory',(12,12),slice(4,21),slice(4,21),BaseN)
 
     check_activities('Retina',RN)
     check_activities('V1',BaseN)
