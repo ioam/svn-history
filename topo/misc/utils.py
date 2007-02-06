@@ -55,22 +55,16 @@ class Struct:
     'a'
     >>> s.bar
     1
+
+
+    From http://www.norvig.com/python-iaq.html
     """
-    def __init__(self,**fields):
-        for name,value in fields.items():
-            setattr(self,name,value)
+    def __init__(self, **entries): self.__dict__.update(entries)
 
     def __repr__(self):
-        # from http://www.norvig.com/python-iaq.html
+        # 
         args = ['%s=%s' % (k, repr(v)) for (k,v) in vars(self).items()]
         return 'Struct(%s)' % ', '.join(args)
-
-
-# CEBALERT: what about this version of Struct instead?
-# (From http://www.norvig.com/python-iaq.html)
-#
-## class Struct:
-##     def __init__(self, **entries): self.__dict__.update(entries)
 
 
 
