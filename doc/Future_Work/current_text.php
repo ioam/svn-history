@@ -180,12 +180,21 @@ in Tkinter easily - except that it doesn't seem to be possible to bind popup hel
 menu items...a really useful feature.
 [Add note about the others: messagebar, combobox, radiobutton, etc.]
 </li>
+--> 
 
 <li>
 2007/01/25 (CB): Gnosis Utils has xml pickling. Add this as an optional format.
 The xml is still complex, but better than looking at a pickle.
 </li>
--->
+
+<li>
+2007/02/06 (CB): The apply/ok/cancel/reset etc buttons on ParametersFrame;
+which to have for object, which for class, and what order.
+</li>
+
+<li>
+2007/02/06 (CB): Remove -Wl from LDFLAGS and test that builds ok on os x (keep rpath).
+</li>
 
 <li>
 2006/12/21: Could add an example of processing auditory data by
