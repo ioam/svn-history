@@ -16,7 +16,7 @@ installing</a> Topographica.</p>
 <h2>Self-organization</h2>
 
 In this example, we will see how a simple model cortical network
-develops a mapping of the input space.
+develops a mapping of the dimensions of variance in the input space.
 
 <ol> 
 <p></p>
@@ -345,8 +345,12 @@ different set of initial weights.
 of map.  E.g. if an oriented pattern is used, with random
 orientations, neurons will become selective for orientation and not
 just position.  See the <code>examples/obermayer_pnas90.ty</code> file
-for more details. <!--, though that simulation is quite processor-intensive
-compared to this one. -->
+for more details. <!--, though that simulation is quite
+processor-intensive compared to this one. --> In general, the map
+should form a representation of the dimensions over which the input
+varies, with each neuron representing one location in this space, and
+the properties of nearby neurons typically varying smoothly in all
+dimensions.
 
 </ol>
 
