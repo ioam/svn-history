@@ -107,6 +107,10 @@ the label) in parametersframe so that help can be seen for objects
 that are e.g. being selected.
 </li>
 
+<li>
+2007/02/06 (CB): clean up lissom_or_reference, lissom_oo_or_reference, and associated
+testing files. 
+</li>
 
 </ul>
 
