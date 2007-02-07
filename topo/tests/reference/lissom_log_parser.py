@@ -1,4 +1,6 @@
 """
+Functions for getting C++ LISSOM data and comparing them
+with Topographica's.
 
 
 $Id$
@@ -11,11 +13,12 @@ from Numeric import ones,zeros,where,ravel,sum,array
 import topo
 from topo.tests.utils import array_almost_equal
 
-# 
+# The base part of the C++ lissom files that you are dealing with
+# e.g. "topo/tests/reference/or_map_topo."
 filename_base = ""
 
 
-def get_input_params(log_file='or_map_topo.log'):
+def get_input_params(log_file):
     """
     Return iterators over list of float values for C++ LISSOM's cx, cy, and theta.
 
@@ -85,12 +88,14 @@ def get_matrix(matrix_file,side_length,center=None):
 def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
     """
     Return the smallest number of decimal places to which all
-    corresponding elements of the two arrays match.
+    corresponding elements of a C++ lissom and topographica matrix match.
 
     max_dp specifies the greatest number of decimal places to try.
 
     Returns -1 if they don't match to at least 1 decimal place.
     """
+    # CB: this could be a general function, but I doubt anybody would use it.
+    # Plus the hackalert below would have to be fixed.
     assert topo_matrix.shape == lissom_matrix.shape, "topographica and c++ matrices are different shapes"
     match_at=-1
     
@@ -108,7 +113,12 @@ def compare_elements(topo_matrix,lissom_matrix,max_dp=8):
 
 def check_weights(sheet_name,proj_name,unit,c_row_slice,c_col_slice,side):
     """
-    - slices (not nec. square, lissom doesn't situate)
+    Print the smallest number of decimal places to which all
+    corresponding elements of the C++ lissom and Topographica weights
+    of unit in proj_name (which projects into sheet_name) match.
+
+    c_row_slice and c_col_slice specifiy where the weights are (C++ lissom
+    does not situate weights in its .matrix files).
     """
     cTIME = "%06d"%long(topo.sim.time())
     cREGION = sheet_name
@@ -120,7 +130,7 @@ def check_weights(sheet_name,proj_name,unit,c_row_slice,c_col_slice,side):
     comparing_what = proj_name + " " + str(unit) + " t=" + str(topo.sim.time()) 
 
     topo_weights = topo.sim[sheet_name].projections()[proj_name].cf(*unit).weights
-    c_weights = get_matrix(c_matrix_filename,side)[c_row_slice,c_col_slice] # c++ lissom doesn't situate weights  
+    c_weights = get_matrix(c_matrix_filename,side)[c_row_slice,c_col_slice]
 
     match_dp = compare_elements(topo_weights,c_weights)
     print comparing_what+" matched to "+`match_dp`+" d.p."
@@ -129,6 +139,9 @@ def check_weights(sheet_name,proj_name,unit,c_row_slice,c_col_slice,side):
 
 def check_activities(sheet_name,side):
     """
+    Print the smallest number of decimal places to which all
+    corresponding elements of the C++ lissom and Topographica
+    activities of sheet_name match.
     """
     cTIME = "%06d"%long(topo.sim.time())
     cREGION = sheet_name
